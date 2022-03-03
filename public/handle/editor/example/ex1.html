@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/handle/editor/editor.js"></script>
+    <script type="text/javascript" src="/handle/editor/summernote/summernote-lite.min.js"></script>
+    <script type="text/javascript" src="/handle/editor/summernote/lang/summernote-ko-KR.js"></script>
+    <script type="text/javascript" src="/handle/editor/summernote/plugin/summernote-ext-ssm-emoji/summernote-ext-ssm-emoji.js?v=2020081801"></script>
+    <link rel="stylesheet" href="/handle/editor/summernote/summernote-lite.min.css" >
+    <link rel="stylesheet" href="/handle/editor/summernote/plugin/summernote-ext-ssm-emoji/summernote-ext-ssm-emoji.css?v=2020081820" >
+
+
+<script>
+
+        $(document).ready(function() {
+
+            var editorToolbar = [
+                ['font', ['bold', 'underline', 'clear']],
+                ['color', ['color']],
+                ['para', ['paragraph']],
+                ['insert', ['link', 'picture', 'video', 'emoji']],
+                ['view', ['codeview', 'undo', 'redo', 'help']]
+            ];
+            var editorOptions = {
+                lang: 'ko-KR', // default: 'en-US',
+                minHeight: 200,
+                dialogsInBody: true,
+                disableDragAndDrop: false,
+                toolbar: editorToolbar,
+                imageupload:{
+                    dir:'/data/partner',
+                    maxWidth:1280,
+                    maxSize:10
+                }
+            }
+            var ed = new HDEditor('#editor1',editorOptions);
+        });
+    </script>
+</head>
+<body>
+<div>
+    <h1>에디터</h1>
+    <table>
+        <tr>
+            <td>
+               aaa
+            </td>
+            <td>
+    <textarea id="editor1" class="summernote" name="content">
+    </textarea>
+            </td>
+        </tr>
+    </table>
+    <div id="log"></div>
+</div>
+</body>
+</html>

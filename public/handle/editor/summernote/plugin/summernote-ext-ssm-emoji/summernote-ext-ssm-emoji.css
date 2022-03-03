@@ -1,0 +1,83 @@
+.summernote-ext-ssm-emoji-list {
+    width: 280px;
+    height: 300px;
+    overflow: auto;
+    padding-left: 5px;
+}
+
+.note-ext-ssm-emoji-list-hd {
+    font-size: 11px;
+    text-align: center;
+    border: 0px solid #eee;
+    padding:5px 4px 5px 4px;
+}
+
+.summernote-ext-ssm-emoji-list button {
+    -webkit-appearance: none;
+    background-color:#FFF;
+    font-weight:bold;
+    border: solid #666 1px;
+    font-size: 14px;
+    margin-top: 5px;
+    margin-right: 5px;
+    padding: 0px;
+}
+
+.summernote-ext-ssm-emoji-list .note-emoji-btn img {
+    width: 30px;
+    height: 30px;
+}
+
+img.emoji-img-inline {
+    display: inline-block;
+    height: 1.2em;
+    width: auto;
+}
+
+.ssm-emoji-dropdown {
+
+}
+
+/*
+.note-ext-emoji-search {
+    margin-right: 5px;
+    margin-left: 5px;
+    margin-bottom: 5px;
+}
+*/
+.ssm-emoji-btn-gg-smile {
+    box-sizing: border-box;
+    position: relative;
+    display: block;
+    transform: scale(var(--ggs,0.9));
+    width: 20px;
+    height: 19.88px;
+    border: 2px solid;
+    border-radius: 100px
+}
+.ssm-emoji-btn-gg-smile::after,
+.ssm-emoji-btn-gg-smile::before {
+    content: "";
+    display: block;
+    box-sizing: border-box;
+    position: absolute;
+    left: 4px
+}
+.ssm-emoji-btn-gg-smile::before {
+    background: currentColor;
+    box-shadow: 6px 0 0;
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    top: 5px
+}
+.ssm-emoji-btn-gg-smile::after {
+    width: 8px;
+    height: 4px;
+    border-radius: 150px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border: 2px solid;
+    border-top-color: transparent;
+    top: 9px
+}
