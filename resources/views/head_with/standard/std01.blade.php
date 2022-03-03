@@ -31,11 +31,7 @@
                         <div class="form-group">
                             <label for="formrow-firstname-input">품목</label>
                             <div class="flax_box">
-<<<<<<< HEAD
                                 <input type="text" name="opt_kind" class="form-control form-control-sm w-25 search-enter">
-=======
-                                <input type="text" name="opt_kind" class="form-control form-control-sm">
->>>>>>> main
                             </div>
                         </div>
                     </div>
@@ -99,12 +95,8 @@
             // when the row is loaded) then the cell is refreshed.
             valueGetter: 'node.id',
             cellRenderer: 'loadingRenderer',
-<<<<<<< HEAD
-        },        
-=======
             cellStyle: {"background":"#F5F7F7"}
         },
->>>>>>> main
         {
             field: "opt_kind_cd",
             headerName: "품목코드",
@@ -131,11 +123,7 @@
         {
             field: "use_yn",
             headerName: "사용여부",
-<<<<<<< HEAD
-            width: 72,
-=======
             width:72,
->>>>>>> main
             editable: true,
         },
         {
@@ -281,8 +269,6 @@
     // function openCodePopup(a) {
 
     //     const opt_kind_cd = $(a).attr('data-opt_kind_cd');
-
-<<<<<<< HEAD
     //     let url = '/head/standard/std01/create';
     //     if (opt_kind_cd !== '') {
     //         url = '/head/standard/std01/' + opt_kind_cd;
@@ -293,18 +279,11 @@
     function openCodePopup(opt_kind_cd){
 
         if(opt_kind_cd == '')
-            var url = '/head/standard/std01/create';        
+            var url = '/head/standard/std01/create';
         else
-            var url = '/head/standard/std01/show?opt_kind_cd=' + encodeURIComponent(opt_kind_cd);     
+            var url = '/head/standard/std01/show?opt_kind_cd=' + encodeURIComponent(opt_kind_cd);
 
         var stock = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=568");
-=======
-        let url = '/head/standard/std01/create';
-        if (opt_kind_cd !== '') {
-            url = '/head/standard/std01/' + opt_kind_cd;
-        }
-        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=570");
->>>>>>> main
     }
 
     // function Cmder(cmd) {
@@ -331,7 +310,7 @@
     // }
 
     // /*
-    //  *	품목 등록, 수정 
+    //  *	품목 등록, 수정
     //  */
     // function SaveCmd(cmd) {
     //     var f1 = $("form[name=f1]");
@@ -369,7 +348,7 @@
     // }
 
     // /*
-    //  *	품목 삭제 
+    //  *	품목 삭제
     //  */
     // function DeleteCmd(cmd) {
     //     var f1 = $("form[name=f1]");
@@ -477,7 +456,7 @@
     //     ResetForm();
     //     EnableAdd(true);
     //     /*
-    //     var param = formData2QueryString(document.f2);	
+    //     var param = formData2QueryString(document.f2);
     //     param += "&CMD=chg_opt_kind";
     //     param += "&UID=" + Math.random();
 
@@ -501,7 +480,7 @@
     // }
 
     // /*
-    //  *	품목 코드 중복 및 한글 포함 여부 판단 
+    //  *	품목 코드 중복 및 한글 포함 여부 판단
     //  */
     // var i = 0;
 

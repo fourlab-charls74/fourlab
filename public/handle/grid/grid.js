@@ -41,11 +41,6 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
     this.gridOptions = {
         columnDefs: columns,
         defaultColDef: {
-<<<<<<< HEAD
-            //장건희 추가 2022-01-17
-=======
-            //장건희 추가 2022-01-11
->>>>>>> main
             suppressMenu: true,
             // set every column width
             flex: 1,

@@ -359,16 +359,9 @@ function StyleOrdNo(params) {
             var rowNode = params.api.getDisplayedRowAtIndex(rowIndex - 1);
             if (params.value == rowNode.data.ord_no) {
                 _styleColorIndex = _styleOrdNoCnt % 2;
-<<<<<<< HEAD
                 params.data["ord_no_bg_color"] = colors[_styleColorIndex];
                 rowNode.data["ord_no_bg_color"] = colors[_styleColorIndex];
-                setTimeout(function() { params.api.redrawRows({rowNodes:[rowNode]}); }, 0)
-=======
-                params.data['ord_no_bg_color'] = colors[_styleColorIndex];
-                rowNode.data['ord_no_bg_color'] = colors[_styleColorIndex];
-                //gridOptions.api.redrawRows({rowNodes:[rowNode]});
                 setTimeout(function() { params.api.redrawRows({rowNodes:[rowNode]}); }, 0);
->>>>>>> main
             } else {
                 if (_styleColorIndex >= 0) {
                     _styleOrdNoCnt++;
@@ -478,7 +471,7 @@ function getDeleteCellColumnObject() {
             if (!params.editing) {
                 let isBackspaceKey = params.event.keyCode === 8;
                 let isDeleteKey = params.event.keyCode === 46;
-                
+
                 if(isDeleteKey || isBackspaceKey){
                     params.api.getCellRanges().forEach(r => {
                         const editable_obj = r.columns.reduce((a,c) => ({...a, [c.colId]: c.userProvidedColDef.editable}), {});
@@ -507,7 +500,7 @@ function getDeleteCellColumnObject() {
 }
 
 /*******************************************************************************
-* 문자열 길이를 리턴한다. 
+* 문자열 길이를 리턴한다.
 *******************************************************************************/
 function getLength(str){
 	var length = 0;
@@ -521,7 +514,7 @@ function getLength(str){
 		else
 			if(encodeURI(str.charAt(i)) != "%0D")
 				length++;
-	}	
+	}
 
 	return length;
 }
@@ -531,7 +524,7 @@ function getLength(str){
 *******************************************************************************/
 function stringCut(str, max_length){
 	var count = 0;
-	 
+
 	for(var i = 0; i < str.length; i++)
 	{
 		if(encodeURI(str.charAt(i)).length >= 4)
@@ -544,15 +537,13 @@ function stringCut(str, max_length){
 		{
 			if(encodeURI(str.charAt(i)) == "%0A")
 				i--;
-			break;		
+			break;
 		}
 	}
-	
+
 	return str.substring(0, i);
 }
 
-<<<<<<< HEAD
-=======
 /* grid selected cell delete & backspace key 클릭 시 내용 삭제 기능 관련 */
 function getDeleteCellColumnObject() {
     return {
@@ -586,5 +577,5 @@ function getDeleteCellColumnObject() {
             return false;
         },
     }
-} 
->>>>>>> main
+}
+
