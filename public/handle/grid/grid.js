@@ -126,7 +126,6 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
             GoodsImageType: {
                 cellRenderer: function (params) {
                     if (params.value !== undefined && params.value !== "" && params.value !== null) {
-                        console.log(params);
                         let front_url   = params.colDef.surl;
                         let img         = params.data.img;
                         return '<a href="#" onClick="return openSitePop(\'' + front_url + '\',\'' + params.data.goods_no + '\');"><img src="' + img + '" class="img" alt="" onerror="this.src=\'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\'"/></a>';
