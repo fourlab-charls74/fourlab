@@ -1442,10 +1442,10 @@ class ord01Controller extends Controller
 		if($dlv_type != "")		$where .= " and b.dlv_type = '$dlv_type' ";
 
 		if($goods != ""){			// 파일로 검색일 경우
-			$goods = split(",",$goods);
+			$goods = explode(",",$goods);
 			for($i=0;$i<count($goods);$i++){
 				if(empty($goods[$i])) continue;
-				list($no,$sub) = split("\|",$goods[$i]);
+				list($no,$sub) = explode("\|",$goods[$i]);
 				if($insql == ""){
 					$insql .= " select '$no' as no,'$sub' as sub ";
 				} else {
@@ -2567,7 +2567,7 @@ class ord01Controller extends Controller
 
             DB::commit();
             $msg = '출고완료 처리되었습니다.';
-        } catch(Except $e) {
+        } catch(Exception $e) {
             DB::rollBack();
             $code = 500;
         }
@@ -2575,12 +2575,8 @@ class ord01Controller extends Controller
         return response()->json(["code"	=> $code, "msg"	=> $msg], $code);
     }
 
-<<<<<<< HEAD
     public function refund_save($ord_opt_no, Request $req)
     {
-=======
-    public function refund_save($ord_opt_no, Request $req){
->>>>>>> main
         $user = [
             'id' => Auth('head')->user()->id,
             'name' => Auth('head')->user()->name
@@ -2944,11 +2940,7 @@ class ord01Controller extends Controller
                 , cash_no, ord_no, receipt_no, user_id, user_nm, admin_id, admin_nm, app_time, reg_stat, reg_desc, rt, ut
             from cash_history
             where ord_no = :ord_no
-<<<<<<< HEAD
             order by rt desc
-=======
-            order by tax_no desc
->>>>>>> main
         ";
 
         $result = DB::select($sql, ['ord_no' => $ord_no]);

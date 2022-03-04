@@ -227,7 +227,8 @@
 			]
 		},
 		{field: "tax_day", headerName: "세금계산서" },
-		{field: "pay_day", headerName: "지급일" }
+		{field: "pay_day", headerName: "지급일" },
+		{ width: 'auto' }
 	];
 
 

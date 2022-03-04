@@ -204,7 +204,8 @@
 			]
 		},
 		{field: "com_id",	hide:true},
-		{field: "acc_idx",	hide:true}
+		{field: "acc_idx",	hide:true},
+		{ width: 'auto' }
 	];
 
 </script>

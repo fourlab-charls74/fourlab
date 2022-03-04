@@ -252,7 +252,10 @@
 			]
 		},
 		{field: "tax_day", headerName: "세금계산서",  cellStyle: { 'text-align': 'center' } },
-		{field: "pay_day", headerName: "지급일",  cellStyle: { 'text-align': 'center' } }
+		{field: "pay_day", headerName: "지급일",  cellStyle: { 'text-align': 'center' } },
+		{
+            width: 'auto'
+        }
 	];
 
 
