@@ -123,7 +123,8 @@
         {headerName: "조회수", field: "cnt", type:'numberType', cellClass: 'hd-grid-code'},
         {headerName: "작성자", field: "name", width:100},
         {headerName: "등록일시", field: "regi_date", type:"DateTimeType"},
-        {headerName: "글번호", field: "idx", hide:true }
+        {headerName: "글번호", field: "idx", hide:true },
+        { width: 'auto' }
     ];
 
 </script>

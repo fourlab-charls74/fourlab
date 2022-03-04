@@ -857,12 +857,8 @@
                                 </div>
                             </div>
                         </div>
-
-<<<<<<< HEAD
-						<div class="row use_option_y" style='@if( $type != 'create' && @$goods_info->is_option_use != 'Y' )display:none;@endif'>
-=======
+						
 						<div class="row use_option_y" style="@if( $type != 'create' && @$goods_info->is_option_use != 'Y' )display:none;@endif">
->>>>>>> main
 							<div class="col-4">
 
 								<div class="card-body pt-2">
@@ -907,14 +903,8 @@
 							</div>
 						</div>
 
-<<<<<<< HEAD
-						<div class="row">
-							<div class="col-4">
-
-=======
                         <div class="row">
 							<div class="col-4">
->>>>>>> main
                                 {{-- 옵션관리 좌측 옵션추가영역 s --}}
                                 <div id="option_add" class="table-box-ty2 mobile" style="display: none;">
                                     <table class="table incont table-bordered mt-2 mb-2" width="100%" cellspacing="0"style="border: 1px solid #eff2f7;">
@@ -980,10 +970,6 @@
                                     </div>
                                 </div>
                                 {{-- // 옵션관리 좌측 옵션추가영역 e --}}
-<<<<<<< HEAD
-
-=======
->>>>>>> main
 							</div>
 						</div>
                     </div>
@@ -1077,13 +1063,9 @@
                                         <dl>
                                             <dt class="d-flex align-items-center justify-content-between">
                                                 <div>상품설명</div>
-<<<<<<< HEAD
                                                 @if ($type !== 'create')   
                                                 <button type="button" id="sabang_cont" class="btn btn-sm btn-outline-primary shadow-sm">판매처별</button>
                                                 @endif
-=======
-                                                <button type="button" id="sabang_cont" class="btn btn-sm btn-outline-primary shadow-sm">판매처별</button>
->>>>>>> main
                                             </dt>
                                             <dd>
                                                 <div class="area_box edit_box">
@@ -1372,10 +1354,6 @@
 
 		function addRepCategory(cat_type)
 		{
-<<<<<<< HEAD
-
-=======
->>>>>>> main
 			searchCategory.Open(cat_type.toUpperCase(), function(code, name, full_name, mx_len)
 			{
                 if(searchCategory.type === "ITEM") return alert("대표 카테고리는 전시 카테고리만 설정가능합니다.");
@@ -1389,36 +1367,21 @@
 				$("[name=rep_cat_cd]").val(code);
 				$('#txt_rep_cat_nm').html(full_name);
 
-<<<<<<< HEAD
                 var is_rep = true;
-=======
-				var is_rep = true;
->>>>>>> main
 				addCategory(searchCategory.type, code, name, full_name, mx_len, is_rep);
 			});
 		}
 
 		function addDCategory(cat_type)
 		{
-<<<<<<< HEAD
-		
-            searchCategory.Open(cat_type.toUpperCase(), function(code, name, full_name, mx_len)
-			{
-				addCategory(searchCategory.type, code, name, full_name, mx_len);
-=======
 			searchCategory.Open(cat_type.toUpperCase(), function(code, name, full_name, mx_len)
 			{
                 addCategory(searchCategory.type, code, name, full_name, mx_len);
->>>>>>> main
 			});
 		}
 
 		function addUCategory(cat_type)
 		{
-<<<<<<< HEAD
-
-=======
->>>>>>> main
 			searchCategory.Open(cat_type.toUpperCase(), function(code, name, full_name, mx_len)
 			{
 				addCategory(searchCategory.type, code, name, full_name, mx_len);
@@ -1427,11 +1390,7 @@
 
         function addCategory(cat_type, code, name, full_name, mx_len, is_rep = false)
 		{
-<<<<<<< HEAD
             cat_type = cat_type.toLowerCase();
-=======
-			cat_type = cat_type.toLowerCase();
->>>>>>> main
 
 			if(code.length < mx_len)
 			{
@@ -1807,11 +1766,7 @@
 
 			//전시 카테고리 전송값
 			$("#category_select_display option").each(function(){
-<<<<<<< HEAD
-				if($(this).val() != 0){
-=======
 				if( $(this).val() != 0 ){
->>>>>>> main
 					//d_cat_str	+= ","+$(this).text();
 					d_cat_str	+= ","+$(this).val();
 				} else {
@@ -1957,20 +1912,12 @@
 
 		//재고 사용 유무
 		$('[name=is_option_use]').change(function(e){
-<<<<<<< HEAD
 			@if( $type != 'create' )
-=======
-            @if( $type != 'create' )
->>>>>>> main
                 if(confirm("변경 시 등록되어 있는 옵션 정보와 재고 수량이 모두 삭제됩니다.\n변경 하시겠습니까?")){
                     //DeleteOptionAll();
                 }
 			@endif
-<<<<<<< HEAD
             if( $('#is_option_use2').is(":checked") == true ){
-=======
-             if( $('#is_option_use2').is(":checked") == true ){
->>>>>>> main
                 //작업 해야함
                 $('.use_option_n').css('display','table-row');
                 $('.use_option_y').css('display','none');
@@ -2267,13 +2214,10 @@
                 const url = `/head/product/prd01/${goods_no}/goods-cont`;
                 window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=700");
             })
-<<<<<<< HEAD
 
             // 세일관리 관련
             setSaleDate('{{ @$goods_info->sale_s_dt }}', '{{ @$goods_info->sale_e_dt }}');
             setSaleOnclickEvent();
-=======
->>>>>>> main
         });
 
 		//ESC 클릭시 창 닫기
@@ -2325,15 +2269,9 @@
 	if( $('#div-gd-opt').length > 0 ){
         var columns_opt = [
 			{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
-<<<<<<< HEAD
 			{field:"opt1",headerName: "{{ @$opt_kind_list[0]->name }}", width:90 },
 			{field:"opt_price",headerName:"옵션가", width:90,type: 'numberType', editable: true, cellStyle: {'background' : '#ffff99'}},
             
-=======
-			{field: "opt1", headerName: "{{ @$opt_kind_list[0]->name }}", width:90 },
-			{field: "opt_price",headerName:"옵션가", width:90,type: 'numberType', editable: true, cellStyle: {'background' : '#ffff99'}},
-
->>>>>>> main
             @if($type != 'create' && count(@$opt_kind_list) > 1)
 			{
                 headerName: "{{ @$opt_kind_list[1]->name }}",
@@ -2385,18 +2323,10 @@
     // 해당 상품의 기획전 포함 정보 삭제
     function deletePlanning(d_cat_cd){
         if(!confirm("삭제하시겠습니까?")) return;
-<<<<<<< HEAD
-
-=======
->>>>>>> main
         var data = {
             'goods_sub': goods_sub,
             'd_cat_cd': d_cat_cd,
         }
-<<<<<<< HEAD
-
-=======
->>>>>>> main
         $.ajax({
             type: 'post',
             url: `/head/product/prd01/${goods_no}/planing-delete`,
@@ -2418,18 +2348,10 @@
     // 해당 상품의 할인쿠폰 포함 정보 삭제
     function deleteCoupon(coupon_no){
         if(!confirm("삭제하시겠습니까?")) return;
-<<<<<<< HEAD
-
-=======
->>>>>>> main
         var data = {
             'goods_sub': goods_sub,
             'coupon_no': coupon_no,
         }
-<<<<<<< HEAD
-
-=======
->>>>>>> main
         $.ajax({
             type: 'post',
             url: `/head/product/prd01/${goods_no}/coupon-delete`,
@@ -2450,11 +2372,7 @@
 
     /*
     ***
-<<<<<<< HEAD
     상품 옵션명 관리 관련
-=======
-    상품옵션관리 관련
->>>>>>> main
     ***
     */ 
 
@@ -2550,7 +2468,6 @@
 			{field:"opt1", headerName: res.opt_kind_list[0].name, width:90 },
 			{field:"opt_price", headerName:"옵션가", width:90, type: 'numberType' },
 		];
-<<<<<<< HEAD
 
         let opt2_child = [];
         if(res.opt.opt2.length > 0) {
@@ -2798,38 +2715,6 @@
             }
             setSaleAmount(false, false);
         });
-=======
-
-        let opt2_child = [];
-        if(res.opt.opt2.length > 0) {
-            for(const op of res.opt.opt2) {
-                opt2_child.push({
-                    headerName: op.opt_nm,
-                    children: [
-                        // 수정필요
-                        {headerName: "온라인재고", field: "__qty", type: 'numberType'},
-                        {headerName: "보유재고", field: "__wqty", type: 'numberType'},
-                    ],
-                });
-            }
-        } else {
-            opt2_child.push({headerName: ''});
-        }
-
-        if (res.opt_kind_list.length > 1) {
-            col.push({
-                headerName: res.opt_kind_list[1].name,
-                children: opt2_child,
-            })
-        } else {
-            col.push({headerName: "온라인재고", field: "__qty", type: 'numberType'});
-            col.push({headerName: "보유재고", field: "__wqty", type: 'numberType'});
-        }
-
-        col.push({field:"opt_memo",headerName:"옵션메모", width:90, cellStyle:{"text-align":"center"}});
-
-        gx2.gridOptions.api.setColumnDefs(col);
->>>>>>> main
     }
 
 	</script>
