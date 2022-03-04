@@ -248,10 +248,7 @@
                         <a href="javascript:void(0);" onclick="return UpdateStates();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-sync fs-16 mr-1"></i>상태변경</a>
                         <span>/</span>
                         <a href="#" onclick="SaveSelectedProducts();" class="btn btn-sm btn-primary shadow-sm pl-2">저장</a>
-<<<<<<< HEAD
                         <a href="#" onclick="DeleteTrash();" class="btn btn-sm btn-primary shadow-sm pl-2">휴지통 상품삭제</a>
-=======
->>>>>>> main
                         <div class="btn-group dropleftbtm">
                             <button type="button" class="btn btn-primary waves-light waves-effect dropdown-toggle btn-sm pr-1" data-toggle="dropdown" aria-expanded="false">
                                 <i class="fa fa-folder"></i> <i class="bx bx-chevron-down fs-12"></i>
