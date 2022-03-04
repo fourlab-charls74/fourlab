@@ -1091,18 +1091,38 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::delete('sys04/{type}/{name}', 'sys04Controller@delete');
     });
 
-
+    //XMD(개발작업)
     Route::prefix("xmd")->namespace('xmd')->group(function () {
-        //사방넷
+        //코드관리
         Route::prefix("code")->namespace('code')->group(function () {
-            //상품등록수정 연동
+            //시스템 부속코드
             Route::get('code01',			'code01Controller@index');
-            Route::get('code01/search',		'code01Controller@search');
-            Route::get('code01/show',		'code01Controller@show');
-            Route::put('code01/show',		'code01Controller@update');
-            Route::post('code01/upload',	'code01Controller@upload');
+			Route::get('code01/search',		'code01Controller@search');
+			Route::get('code01/show',		'code01Controller@show');
+			Route::put('code01/show',		'code01Controller@update');
+			Route::post('code01/upload',	'code01Controller@upload');
+
+            //매장관리
+            Route::get('code02',			'code02Controller@index');
+			Route::get('code02/search',		'code02Controller@search');
+			Route::get('code02/show',		'code02Controller@show');
+			Route::put('code02/show',		'code02Controller@update');
+			Route::post('code02/upload',	'code02Controller@upload');
+			Route::get('code02/view/{com_id}',	'code02Controller@view');
+			Route::post('code02/view/{com_id}',	'code02Controller@store_update');
+            Route::delete('code02/view/{com_id}', 'code02Controller@delete');
         });
 
-    });
+        //매장관리
+        Route::prefix("store")->namespace('store')->group(function () {
+            //매장판매일보
+            Route::get('store01',			'store01Controller@index');
+			Route::get('store01/search',	'store01Controller@search');
+			Route::get('store01/show',		'store01Controller@show');
+			Route::post('store01/show',		'store01Controller@update');
+			Route::post('store01/upload',	'store01Controller@upload');
+        });
+
+	});
 
 });
