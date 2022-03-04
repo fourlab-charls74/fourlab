@@ -131,6 +131,9 @@
             headerName: "수정일",
             width: 150,
         },
+        {
+            width: 'auto'
+        }
 
     ];
 </script>

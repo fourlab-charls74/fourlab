@@ -131,6 +131,9 @@
             width: 150,
             cellClass: 'hd-grid-code'
         },
+        {
+            width: 'auto'
+        }
     ];
 </script>
 <script type="text/javascript" charset="utf-8">

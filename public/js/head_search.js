@@ -811,11 +811,7 @@ SearchGoodsNos.prototype.SetGrid = function(divId){
 
         {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
         {field: "goods_no", headerName: "상품번호", width: 100, pinned: 'left'},
-<<<<<<< HEAD
-        {field: "style_no", headerName: "스타일넘버",width: 100, pinned: 'left'},
-=======
         {field: "style_no", headerName: "스타일넘버", width: 100, pinned: 'left'},
->>>>>>> main
         {field: "img", headerName: "이미지", type:'GoodsImageType',width: 60},
         {field: "img", headerName: "이미지_url", hide: true},
         {field: "sale_stat_cl", headerName: "상품상태", type:'GoodsStateType',width: 100},
@@ -850,16 +846,9 @@ SearchGoodsNos.prototype.Choice = function(){
 };
 let searchGoodsNos = new SearchGoodsNos();
 
-<<<<<<< HEAD
-
-=======
->>>>>>> main
-/*
-***
-옵션관리 모달
-***
-*/
-
+/**
+ * 옵션관리모달
+ */
 function ControlOption() {
     this.grid = null;
     this.goods_no = null;
@@ -915,11 +904,7 @@ ControlOption.prototype.Add = function(e) {
             opt_name: opt_kind_no.name,
             goods_opt: opt_nm,
         }]);
-<<<<<<< HEAD
         
-=======
-
->>>>>>> main
         $("#opt_nm").val('');
     }
 };
@@ -951,16 +936,7 @@ ControlOption.prototype.Delete = function() {
     const selected = this.grid.getSelectedRows();
     if(selected.length < 1) return alert("삭제할 옵션을 선택해주세요.");
     if(!confirm("선택하신 옵션을 삭제하시겠습니까?")) return;
-<<<<<<< HEAD
-    
     console.log(this.grid.getSelectedRows());
 };
 
 let controlOption = new ControlOption();
-=======
-
-    console.log(this.grid.getSelectedRows());
-};
-
-let controlOption = new ControlOption(); 
->>>>>>> main

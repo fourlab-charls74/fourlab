@@ -99,6 +99,9 @@
             width: 150,
             cellClass: 'hd-grid-code'
         },
+        {
+            width: 'auto'
+        }
     ];
 </script>
 
