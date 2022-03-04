@@ -302,6 +302,5 @@ var columns = [
         document.search.reset();
     }
 </script>
-    <!-- <a href="https://devel.netpx.co.kr/head/webapps/standard/std07.php">업체관리 링크</a>
-    품목,브랜드은 업체관리처럼 Tree 가 아닌 목록과 상세보기 형태로 만들어 주세요. -->
+
 @stop

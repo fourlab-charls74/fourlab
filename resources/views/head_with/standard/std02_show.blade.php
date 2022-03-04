@@ -107,7 +107,6 @@
 														<div class="custom-control custom-radio">
 															<input type="radio" name="sale_type" id="sale_type_C" class="custom-control-input" @if($company['sale_type']=='C' ) checked="checked" @endif value="C">
 															<label class="custom-control-label" for="sale_type_C">위탁</label>
-<<<<<<< HEAD
 														</div>
 													</div>
 												</td>
@@ -153,61 +152,11 @@
 																<label for="">종류 :</label>
 																<input type="text" class="form-control form-control-sm" name="store_kind" value="{{ $company['store_kind'] }}">
 															</div>
-=======
->>>>>>> main
 														</div>
 													</div>
 												</td>
 											</tr>
 											<tr>
-<<<<<<< HEAD
-=======
-												<th>홈페이지</th>
-												<td colspan="6">
-													<div class="flax_box txt_box">
-														<input type="text" name="homepage" value="{{ $company['homepage'] }}" class="form-control form-control-sm search-all" value="" />
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<th>매장정보</th>
-												<td colspan="5">
-													<div class="row">
-														<div class="col-lg-2">
-															<div class="inner_flax_box">
-																<label for="">구분 :</label>
-																<input type="text" name="store_type" value="{{ $company['store_type'] }}" class="form-control form-control-sm">
-															</div>
-														</div>
-														<div class="col-lg-3 mt-1 mt-lg-0">
-															<div class="inner_flax_box">
-																<label for="">매장명 :</label>
-																<input type="text" name="store_nm" value="{{ $company['store_nm'] }}" class="form-control form-control-sm">
-															</div>
-														</div>
-														<div class="col-lg-3 mt-1 mt-lg-0">
-															<div class="inner_flax_box">
-																<label for="">지점명 :</label>
-																<input type="text" class="form-control form-control-sm" name="store_branch" value="{{ $company['store_branch'] }}">
-															</div>
-														</div>
-														<div class="col-lg-2 mt-1 mt-lg-0">
-															<div class="inner_flax_box">
-																<label for="">지역 :</label>
-																<input type="text" class="form-control form-control-sm" name="store_area" value="{{ $company['store_area'] }}">
-															</div>
-														</div>
-														<div class="col-lg-2 mt-1 mt-lg-0">
-															<div class="inner_flax_box">
-																<label for="">종류 :</label>
-																<input type="text" class="form-control form-control-sm" name="store_kind" value="{{ $company['store_kind'] }}">
-															</div>
-														</div>
-													</div>
-												</td>
-											</tr>
-											<tr>
->>>>>>> main
 												<th>판매구분</th>
 												<td>
 													<div class="form-inline form-radio-box">
@@ -275,11 +224,7 @@
 														</div>
 													</div>
 												</td>
-<<<<<<< HEAD
 											</tr>											
-=======
-											</tr>
->>>>>>> main
 										</tbody>
 									</table>
 								</div>
@@ -1520,6 +1465,4 @@
 </script>
 <!-- 용도카테고리 끝 -->
 
-<!-- <a href="https://devel.netpx.co.kr/head/webapps/standard/std07.php">업체관리 링크</a>
-    품목,브랜드은 업체관리처럼 tree 가 아닌 목록과 상세보기 형태로 만들어 주세요. -->
 @stop

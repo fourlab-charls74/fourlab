@@ -31,7 +31,7 @@
                         <div class="form-group">
                             <label for="formrow-firstname-input">품목</label>
                             <div class="flax_box">
-                                <input type="text" name="opt_kind" class="form-control form-control-sm w-25 search-enter">
+                                <input type="text" name="opt_kind" class="form-control form-control-sm search-enter">
                             </div>
                         </div>
                     </div>
