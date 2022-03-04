@@ -108,8 +108,8 @@ function openSchPop(kwd) {
         "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800"
     );
 }
-function openSitePop(goods_no) {
-    const url = `https://www.netpx.co.kr/app/product/detail/${goods_no}/0`;
+function openSitePop(surl, goods_no) {
+    const url = `${surl}/app/product/detail/${goods_no}/0`;
     window.open(
         url,
         "_blank",
@@ -578,4 +578,3 @@ function getDeleteCellColumnObject() {
         },
     }
 }
-
