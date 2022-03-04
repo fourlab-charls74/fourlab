@@ -28,9 +28,13 @@ class prd01Controller extends Controller
 
 	public function index(Request $request)
 	{
+		$conf = new Conf();
+		
+		$domain		= $conf->getConfigValue("shop", "domain");
 		$style_no	= $request->input('style_no');
 
 		$values = [
+			'domain'		=> $domain,
 			'style_no'		=> $style_no,
 			'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
 			'items'			=> SLib::getItems(),
