@@ -665,11 +665,7 @@ footer a:active{color:#fff !important;}
 }
 
 .ag-theme-balham .ag-ltr .ag-cell {
-<<<<<<< HEAD
-    border-right: 1px solid #D9DDDF !important;
-=======
     border-right: 1px solid #D9DDDF;
->>>>>>> main
 }
 
 .ag-header-group-cell-label, .ag-header-cell-label { justify-content: center; }
