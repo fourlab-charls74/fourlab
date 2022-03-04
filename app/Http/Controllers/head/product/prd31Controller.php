@@ -209,7 +209,7 @@ class prd31Controller extends Controller
 
 		$goods_no	= $request->input('goods_no');
 		$goods_opt	= $request->input('goods_opt');
-		$wonga		= "";
+		$wonga		= 0;
 		$stock_state_date	= date("Ymd");
 
         try 
@@ -220,32 +220,31 @@ class prd31Controller extends Controller
 			$row = DB::selectOne($sql);
 
 			if(empty($row->wonga)) {
-				$result_code	= "-2";
-				$result_msg		= "상품 옵션 데이터를 찾을 수 없습니다.";
+				//$result_code	= "-2";
+				//$result_msg		= "상품 옵션 데이터를 찾을 수 없습니다.";
 			}
 			else
 			{
 				$wonga	= sprintf("%s",$row->wonga);
-
-				// goods_summary 상품수량 수정
-				$sql	= " update goods_summary set good_qty = good_qty + 1, wqty = wqty + 1 where goods_no = '$goods_no' and goods_opt = '$goods_opt' ";
-				DB::update($sql);
-
-				// goods_good 상품수량 추가 등록
-				$sql	= " 
-					insert into goods_good(goods_no, goods_sub, goods_opt, wonga, qty, invoice_no, init_qty, regi_date)
-					values ('$goods_no', '0', '$goods_opt', '$wonga', '1', 'INV_ADJUST', '1', now())
-				";
-				DB::insert($sql);
-
-				// goods_history 상품히스토리 등록
-				$sql	= "
-					insert into goods_history(goods_no, goods_sub, goods_opt, wonga, type, stock_state, qty, etc, admin_id, admin_nm, regi_date, invoice_no, stock_state_date)
-					values ('$goods_no', '0', '$goods_opt', '$wonga', '9', '1', '1', '실사', '$admin_id', '$admin_nm', now(), 'INV_ADJUST', '$stock_state_date')
-				";
-				DB::insert($sql);
-
 			}
+
+			// goods_summary 상품수량 수정
+			$sql	= " update goods_summary set good_qty = good_qty + 1, wqty = wqty + 1 where goods_no = '$goods_no' and goods_opt = '$goods_opt' ";
+			DB::update($sql);
+
+			// goods_good 상품수량 추가 등록
+			$sql	= " 
+				insert into goods_good(goods_no, goods_sub, goods_opt, wonga, qty, invoice_no, init_qty, regi_date)
+				values ('$goods_no', '0', '$goods_opt', '$wonga', '1', 'INV_ADJUST', '1', now())
+			";
+			DB::insert($sql);
+
+			// goods_history 상품히스토리 등록
+			$sql	= "
+				insert into goods_history(goods_no, goods_sub, goods_opt, wonga, type, stock_state, qty, etc, admin_id, admin_nm, regi_date, invoice_no, stock_state_date)
+				values ('$goods_no', '0', '$goods_opt', '$wonga', '9', '1', '1', '실사', '$admin_id', '$admin_nm', now(), 'INV_ADJUST', '$stock_state_date')
+			";
+			DB::insert($sql);
 
 			DB::commit();
         }
