@@ -9,10 +9,7 @@ use App\Models\Conf;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Jaego;
-<<<<<<< HEAD
 use Illuminate\Support\Arr;
-=======
->>>>>>> main
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -119,13 +116,10 @@ class prd01Controller extends Controller
         $ord_field = $request->input('ord_field','g.goods_no');
 		$type = $request->input("type");
 		$goods_type = $request->input("goods_type");
-<<<<<<< HEAD
 
 		$sale_yn	= $request->input("sale_yn");
 		$coupon_yn	= $request->input("coupon_yn");
 		$sale_type	= $request->input("sale_type");
-=======
->>>>>>> main
 
         $orderby = sprintf("order by %s %s", $ord_field, $ord);
 
@@ -176,14 +170,11 @@ class prd01Controller extends Controller
 		if ($type != "") $where .= " and g.type = '" . Lib::quote($type) . "' ";
 		if ($goods_type != "") $where .= " and g.goods_type = '" . Lib::quote($goods_type) . "' ";
 
-<<<<<<< HEAD
 		if( $sale_yn != "" )	$where .= " and g.sale_yn = '$sale_yn' ";
 		if( $coupon_yn != "" )	$where .= " and gc.price > 0 ";
 		if( $sale_type != "" )	$where .= " and g.sale_type = '" . Lib::quote($sale_type) . "' ";
 
 
-=======
->>>>>>> main
         $page_size = $limit;
         $startno = ($page - 1) * $page_size;
         $limit = " limit $startno, $page_size ";
@@ -1002,10 +993,7 @@ class prd01Controller extends Controller
 					, a.new_product_day
 					, (100/(a.price/(a.price-a.wonga))) as prf
 					, ifnull(c.dlv_policy, 'S') as dlv_policy
-<<<<<<< HEAD
 					, a.sale_type, a.sale_yn, a.sale_wonga, a.normal_wonga, a.sale_dt_yn, ifnull(a.normal_price,0) as normal_price
-=======
->>>>>>> main
 				from goods a
 					left join brand br on br.brand = a.brand
 					left join company c on c.com_id = a.com_id
@@ -1062,29 +1050,17 @@ class prd01Controller extends Controller
             " select count(*) as tot from goods_option where goods_no = :goods_no and type = 'basic' ";
         $row	= DB::selectOne($sql,['goods_no' => $goods_no]);
         $opt_kind_cnt	= $row->tot;
-<<<<<<< HEAD
 		$opt 			= ['opt1' => [], 'opt2' => []];
-=======
-        $opt 			= ['opt1' => [], 'opt2' => []];
->>>>>>> main
 		$opt_kind_list	= [];
 
 		$sql	= /** @lang text */
 			" select distinct(substring_index(goods_opt, '^', :index)) as opt_nm from goods_summary where goods_no = :goods_no and use_yn = 'Y' order by opt_nm ";
-<<<<<<< HEAD
 		
-=======
-
->>>>>>> main
 		if($opt_kind_cnt > 0) {
 			$opt['opt1'] = DB::select($sql,['goods_no' => $goods_no, 'index' => 1]);
 			if($opt_kind_cnt == 2) $opt['opt2'] = DB::select($sql,['goods_no' => $goods_no, 'index' => -1]);
 		}
-<<<<<<< HEAD
 		
-=======
-
->>>>>>> main
 		$sql	=
 			"select type, name, required_yn, use_yn from goods_option where goods_no = :goods_no and use_yn = 'Y' and type='basic'";
 		$opt_kind_list	= DB::select($sql, ['goods_no' => $goods_no]);
@@ -1734,65 +1710,11 @@ class prd01Controller extends Controller
 				$baesong_price	= $cfg_dlv_fee;
 			}
 
-<<<<<<< HEAD
 			// 적립금 계산 - 쇼핑몰
 			if( $point_cfg = "S" ){
 				$point_yn	= "Y";
 				$point		= $price * $cfg_order_point_ratio / 100;
 			}
-=======
-		$query	= /** @lang text */
-            "   
-				update goods
-					set 
-						head_desc			= '".$head_desc."',
-						goods_nm			= '".$goods_nm."',
-						goods_nm_eng		= '".$goods_nm_eng."',
-						ad_desc				= '".$ad_desc."',
-						brand				= '".$brand."',
-						sale_stat_cl		= '".$sale_stat_cl."',
-						style_no			= '".$style_no."',
-						goods_type			= '".$goods_type."',
-						com_id				= '".$com_id."',
-						com_type			= '".$com_type."',
-						make				= '".$make."',
-						org_nm				= '".$org_nm."',
-						goods_memo			= '".$goods_memo."',
-						price				= '".$price."',
-						tax_yn				= '".$tax_yn."',
-						md_id				= '".$md_id."',
-						md_nm				= '".$md_nm."',
-						baesong_info		= '".$baesong_info."',
-						baesong_kind		= '".$baesong_kind."',
-						dlv_pay_type		= '".$dlv_pay_type."',
-						dlv_fee_cfg			= '".$dlv_fee_cfg."',
-						bae_yn				= '".$bae_yn."',
-						baesong_price		= '".$baesong_price."',
-						goods_location		= '".$goods_location."',
-						point_cfg			= '".$point_cfg."',
-						point_yn			= '".$point_yn."',
-						point_unit			= '".$point_unit."',
-						point				= '".$point."',
-						rep_cat_cd			= '".$rep_cat_cd."',
-						new_product_type	= '".$new_product_type."',
-						new_product_day		= '".$new_product_day."',
-						is_unlimited		= '".$is_unlimited."',
-						is_option_use		= '".$is_option_use."',
-						goods_cont			= '".$goods_cont."',
-						spec_desc			= '".$spec_desc."',
-						baesong_desc		= '".$baesong_desc."',
-						opinion				= '".$opinion."',
-						opt_kind_cd			= '".$opt_kind_cd."',
-						restock_yn			= '".$restock_yn."',
-						goods_sh			= '".$goods_sh."',
-						admin_id			= '".$id."',
-						admin_nm			= '".$name."',
-						upd_dm				= NOW()
-				where 
-					goods_no = '".$goods_no."'
-				limit 1
-		";
->>>>>>> main
 
 			// 세일관리
 			if($sale_yn !== "Y") {
@@ -1949,72 +1871,6 @@ class prd01Controller extends Controller
 	{
 		$code_status = 200;
 		$msg = "";
-<<<<<<< HEAD
-=======
-
-		$goods_sub = $request->input('goods_sub');
-		$coupon_no = $request->input('coupon_no');
-
-		try {
-			DB::beginTransaction();
-
-			$sql	= "
-				delete from coupon_goods
-				where goods_no = :goods_no and goods_sub = :goods_sub and coupon_no = :coupon_no;
-			";
-
-			DB::delete($sql, ['goods_no' => $goods_no, 'goods_sub' => $goods_sub, 'coupon_no' => $coupon_no]);
-			DB::commit();
-			$msg = "삭제되었습니다.";
-		} catch(Exception $e){
-			DB::rollback();
-			$code_status = 500;
-			$msg = "삭제중 에러가 발생했습니다. 잠시 후 다시시도 해주세요.";
-		}
-
-		return response()->json(['code' => $code_status, 'msg' => $msg], $code_status);
-	}
-
-	public function update_selected(Request $request) // 선택된 상품목록 수정사항 업데이트
-	{
-		$data = $request->input('data');
-		$user = array(
-			"id" => Auth('head')->user()->id,
-			"name" => Auth('head')->user()->name
-		);
-
-		$code = 200;
-		$msg = '';
-
-		try {
-			DB::transaction(function () use (&$result, $user, $data) {
-				$prd = new Product($user);
-				for($i=0;$i<count($data);$i++){
-					$row = $data[$i];
-					$prd->Edit( $row['goods_no'], $row );
-				}
-			});
-			$msg = "변경사항이 저장되었습니다.";
-		} catch(Exception $e){
-			$code = 500;
-			$msg = "변경사항 저장에 실패했습니다.";
-		}
-
-		return response()->json(["code" => $code, "msg" => $msg], $code);
-	}
-
-    private function get_history_modify($goods_no)
-    {
-        $query = "
-                    select
-                        date_format(a.upd_date,'%y.%m.%d %h:%i:%s') as upd_date
-                        , a.memo, a.head_desc, a.price, a.wonga, a.margin, a.id, b.name
-                    from goods_modify_hist a
-                        inner join mgr_user b on a.id = b.id
-                    where a.goods_no = $goods_no
-                    order by a.hist_no desc
-        ";
->>>>>>> main
 
 		$goods_sub = $request->input('goods_sub');
 		$coupon_no = $request->input('coupon_no');
@@ -2125,7 +1981,6 @@ class prd01Controller extends Controller
 	private function get_planing_list($goods_no, $goods_sub){ // 기획전 정보
 		$ar_planning_list = array();
 
-<<<<<<< HEAD
 		$query = "
 			select
 				b.title, b.plan_show, b.plan_date_yn, b.start_date, b.end_date, b.no, a.d_cat_cd
@@ -2134,55 +1989,11 @@ class prd01Controller extends Controller
 			where a.goods_no = '$goods_no' and a.goods_sub = '$goods_sub'
 		";
 		$result = DB::select($query);
-=======
-        $query = "
-            select
-                b.title, b.plan_show, b.plan_date_yn, b.start_date, b.end_date, b.no, a.d_cat_cd
-            from category_goods a
-                inner join planning b on a.cat_type = 'PLAN' and b.p_no = a.d_cat_cd
-            where a.goods_no = '$goods_no' and a.goods_sub = '$goods_sub'
-        ";
-        $result = DB::select($query);
->>>>>>> main
 
 		return $result;
 	}
 
-<<<<<<< HEAD
 	public function delete_planing($goods_no, Request $request) { // 기획전에서 해당 상품 삭제
-=======
-	public function delete_planing($goods_no, Request $request){ // 기획전에서 해당 상품 삭제
-		
-		$code_status = 200;
-		$msg = "";
-
-		$goods_sub = $request->input('goods_sub');
-		$d_cat_cd = $request->input('d_cat_cd');
-	
-		try {
-			DB::beginTransaction();
-	
-			$sql	= "
-				delete from category_goods
-				where goods_no = :goods_no AND goods_sub = :goods_sub AND d_cat_cd = :d_cat_cd;
-			";
-			DB::delete($sql, ['goods_no' => $goods_no, 'goods_sub' => $goods_sub, 'd_cat_cd' => $d_cat_cd]);
-	
-			DB::commit();
-			$msg = "삭제되었습니다.";
-		} catch(Exception $e){
-			DB::rollback();
-			$code_status = 500;
-			$msg = "삭제중 에러가 발생했습니다. 잠시 후 다시시도 해주세요.";
-		}
-	
-		return response()->json(['code' => $code_status, 'msg' => $msg], $code_status);
-
-	}
-
-    private function get_opt_cd_list(){
-        $query = "select opt_kind_cd as 'name', opt_kind_nm as 'value' from opt where opt_id = 'K' and use_yn = 'Y' order by opt_seq";
->>>>>>> main
 
 		$code_status = 200;
 		$msg = "";
@@ -2930,7 +2741,6 @@ class prd01Controller extends Controller
 
             DB::commit();
 
-<<<<<<< HEAD
             return response()->json(["data"=> $error_cnt]);
 
 		}catch(Exception $e) {
@@ -2942,304 +2752,3 @@ class prd01Controller extends Controller
 
 	}
 }
-=======
-	/*
-	***
-	상품옵션관리 옵션 추가&삭제 / 옵션품목 추가&삭제&저장&입고
-	***
-	*/
-
-	// 옵션구분 등록
-	public function add_option_kind(Request $req, $goods_no) {
-		$user	= Auth('head')->user();
-
-		$goods_sub = 0;
-		$opt_type = $req->input("opt_type");
-		$opt_type_nm = $req->input("opt_type_nm");
-		$opt_required_yn = $req->input("opt_required_yn");
-		$opt_use_yn = $req->input("opt_use_yn");
-
-		$code = 200;
-		$msg = '';
-
-		$sql = "
-			insert into goods_option (
-				goods_no, goods_sub, type, name, required_yn, use_yn, seq, option_no, rt
-			) values (
-				'$goods_no', '$goods_sub', '$opt_type', '$opt_type_nm', '$opt_required_yn', '$opt_use_yn', '0', null, now()
-			)
-		";
-
-		try {
-			DB::insert($sql);
-			$msg = "옵션명이 등록되었습니다.";
-		} catch(Exception $e){
-			$code = 500;
-			$msg = "등록 중 에러가 발생했습니다. 잠시 후 다시 시도 해주세요.";
-		}
-
-		return response()->json(['code' => $code, 'msg' => $msg, 'data' => $this->_get($goods_no)], $code);
-	}
-
-	// 옵션구분 삭제
-	public function del_option_kind(Request $req, $goods_no) {
-		$goods_sub = $req->input("goods_sub");
-		$goods_type = $req->input("goods_type");
-		$del_id_list = explode(",", $req->input("del_id_list"));
-
-		// $user = [
-		// 	'id' => Auth('head')->user()->id,
-		// 	'name' => Auth('head')->user()->name,
-		// ];
-		// $jaego = new Jaego($user);
-
-		$code = 200;
-		$msg = '';
-
-		try {
-			DB::beginTransaction();
-
-			foreach($del_id_list as $opt_no) {
-				// 1. 기본옵션여부
-				$sql = "
-					select type
-					from goods_option
-					where no = :opt_no and goods_no = :goods_no and goods_sub = :goods_sub
-				";
-
-				$row = DB::selectOne($sql, ['opt_no' => $opt_no, 'goods_no' => $goods_no, 'goods_sub' => $goods_sub]);
-
-				if($row->type === "basic") {
-					// 1-1. 기본옵션인 경우
-						// 2. 매입상품인 경우 goods_good 삭제
-						if($goods_type === "S") {
-							// * 삭제 전 재고차감 처리 작업필요 ??
-
-							// goods_good 삭제
-							$sql = "
-								delete from goods_good 
-								where goods_no = :goods_no and goods_sub = :goods_sub
-							";
-							DB::delete($sql, ['goods_no' => $goods_no, 'goods_sub' =>  $goods_sub]);
-						}
-						
-						// 3. 재고 삭제 (goods_summary)
-						$sql = "
-							delete from goods_summary 
-							where goods_no = :goods_no and goods_sub = :goods_sub
-						";
-						DB::delete($sql, ['goods_no' => $goods_no, 'goods_sub' =>  $goods_sub]);
-
-				} else if($row->type === "extra") {
-					// 1-2. 추가옵션인 경우
-					$sql = "
-						delete from options 
-						where option_no = :option_no
-					";
-					DB::delete($sql, ['option_no' => $opt_no]);
-				}
-
-				// 4. 옵션 삭제 (goods_option)
-				$sql = "
-					delete from goods_option 
-					where no = :no and goods_no = :goods_no and goods_sub = :goods_sub
-				";
-				DB::delete($sql, ['no' => $opt_no, 'goods_no' => $goods_no, 'goods_sub' => $goods_sub]);
-			}
-
-			DB::commit();
-			$msg = "삭제되었습니다.";
-		} catch(Exception $e){
-			DB::rollback();
-			$code = 500;
-			$msg = "삭제중 에러가 발생했습니다. 잠시 후 다시 시도해주세요.";
-		}
-
-		return response()->json(['code' => $code, 'msg' => $msg, 'data' => $this->_get($goods_no)], $code);
-	}
-
-	// 옵션관리창 옵션조회
-	public function get_option($goods_no) {
-		$code = 200;
-		$opt_kinds = [];
-		$result = [];
-
-		try {
-			$sql = "
-				select no, name
-				from goods_option
-				where goods_no = '$goods_no' and type = 'basic' and required_yn = 'Y' and use_yn = 'Y'
-			";
-			$opt_kinds = DB::select($sql);
-
-			$sql = "
-				select distinct substring_index(goods_opt, '^', :index) as goods_opt, substring_index(opt_name, '^', :index2) as opt_name, goods_no
-				from goods_summary 
-				where goods_no = :goods_no and use_yn = 'Y'
-				order by seq
-			";
-			$result = array_merge(DB::select($sql, ['index' => 1, 'index2' => 1, 'goods_no' => $goods_no]), DB::select($sql, ['index' => -1, 'index2' => -1, 'goods_no' => $goods_no]));
-		} catch(Exception $e){
-			$code = 500;
-		}
-
-		
-		return response()->json([
-			"code" => $code,
-			"head" => array(
-				"total" => count($result),
-				'opt_kinds' => $opt_kinds,
-			),
-			"body" => $result,
-		]);
-	}
-
-	// 옵션품목 저장
-	public function save_option(Request $req, $goods_no) {
-		$code = 200;
-		$msg = '';
-
-		$goods_sub = $req->input('goods_sub');
-		$opt_list = $req->input('opt_list');
-
-		try {
-			DB::beginTransaction();
-			
-			// 새로운 상품 등록
-			foreach($opt_list as $opt) {
-				if($opt['goods_no'] === NULL) {
-
-					$sql = "
-						insert into goods_summary (
-							goods_no, goods_sub, opt_name, goods_opt, opt_price, 
-							good_qty, wqty, soldout_yn, use_yn, seq, rt, ut, bad_qty, last_date
-						) values (
-							:goods_no, :goods_sub, :opt_name, :goods_opt, '0',
-							'0', '0', 'N', 'Y', ??????, now(), now(), '0', now()
-						)
-					";
-
-					DB::insert($sql, ['goods_no' => $goods_no, 'goods_sub' => $goods_sub, 'opt_name' => "?????", 'goods_opt' => "?????"]);
-				}
-			}
-
-			// 기존 상품 수정
-
-
-			DB::commit();
-			$msg = "저장되었습니다.";
-		} catch(Exception $e){
-			DB::rollback();
-			$code = 500;
-			$msg = "저장중 에러가 발생했습니다. 잠시 후 다시 시도해주세요.";
-		}
-
-		return response()->json(['code' => $code, 'msg' => $msg], $code);
-	}
-
-	/*
-	***
-	판매처별 상품관리
-	***
-	*/
-
-	// 판매처별 상품관리 화면 조회
-	public function index_cont($goods_no) {
-		$sql = "
-			select goods_cont as cont, goods_sub
-			from goods
-			where goods_no = :goods_no
-		";
-		$row = DB::selectOne($sql, ['goods_no' => $goods_no]);
-		$goods_sub = $row->goods_sub;
-		$cont = $row->cont;
-
-		$values = [
-			'goods_no' => $goods_no,
-			'goods_sub' => $goods_sub,
-			'sale_places' => SLib::getSalePlaces(),
-			'goods_cont' => $cont,
-		];
-		return view(Config::get('shop.head.view') . '/product/prd01_cont', $values);
-	}
-
-	// 판매처별 상품설명 검색
-	public function search_sale_place_cont(Request $request, $goods_no) {
-		$code = 200;
-		$msg = '';
-
-		$goods_sub = $request->input('goods_sub');
-		$sale_place = $request->input('sale_place');
-		$row = '';
-
-		try {
-			$row = $this->get_cont_of_sale_place($goods_no, $goods_sub, $sale_place);
-			$msg = '조회에 성공했습니다.';
-        } catch(Exception $e){
-			$code = 500;
-            $msg = $e->getMessage();
-        }
-
-		return response()->json(['code' => $code, 'message' => $msg, 'data' => $row], $code);
-	}
-
-	// 판매처별 상품설명 저장
-	public function save_sale_place_cont(Request $request, $goods_no) {
-		$code = 200;
-		$msg = '';
-
-		$conf = new Conf();
-		$cfg_domain = $conf->getConfigValue("shop","domain");
-
-		$goods_sub = $request->input('goods_sub');
-		$sale_place = $request->input('sale_place');
-		$goods_cont = str_replace($cfg_domain, "", $request->input('goods_cont'));
-
-        try {
-            DB::beginTransaction();
-
-			$row = $this->get_cont_of_sale_place($goods_no, $goods_sub, $sale_place);
-
-			if($row !== NULL) {
-				// 기존에 등록된 상품설명이 있을 경우
-				$sql = "
-					update goods_desc
-						set goods_cont = '$goods_cont', ut = now()
-					where goods_no = '$goods_no' and goods_sub = '$goods_sub' and sale_place = '$sale_place'
-				";
-				DB::update($sql);
-			} else {
-				// 기존에 등록된 상품설명이 없을 경우
-				$sql = "
-					insert into goods_desc (
-						goods_no, goods_sub, sale_place, goods_cont, rt, ut
-					) values (
-						'$goods_no', '$goods_sub', '$sale_place', '$goods_cont', now(), now()
-					)
-				";
-				DB::insert($sql);
-			}
-
-            DB::commit();
-            $msg = '저장되었습니다.';
-        } catch(Exception $e){
-            DB::rollback();
-            $code = 500;
-			$msg = $e->getMessage();
-        }
-
-		return response()->json(['code' => $code, 'message' => $msg], $code);
-	}
-
-	private function get_cont_of_sale_place($goods_no, $goods_sub, $sale_place) {
-		$sql = "
-			select goods_no, sale_place, goods_cont
-			from goods_desc
-			where goods_no = :goods_no and goods_sub = :goods_sub and sale_place = :sale_place
-		";
-		$row = DB::selectOne($sql, ['goods_no' => $goods_no, 'goods_sub' => $goods_sub, 'sale_place' => $sale_place]);
-
-		return $row;
-	}
-}
->>>>>>> main
