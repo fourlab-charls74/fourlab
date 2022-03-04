@@ -178,11 +178,7 @@
 												</td>
 											</tr>
                                             <tr>
-<<<<<<< HEAD
-                                                <th class="required">브랜드명(국문)</th>
-=======
                                                 <th class="ty2 required">브랜드명(국문)</th>
->>>>>>> main
                                                 <td class="ty2">
                                                     <div class="input_box">
                                                         <input type="text" name="brand_nm" id="brand_nm" class="form-control form-control-sm search-all">
@@ -190,11 +186,7 @@
                                                 </td>
                                             </tr>
                                             <tr>
-<<<<<<< HEAD
-                                                <th class="required">브랜드명(영문)</th>
-=======
                                                 <th class="ty2 required">브랜드명(영문)</th>
->>>>>>> main
                                                 <td class="ty2">
                                                     <div class="input_box">
                                                         <input type="text" name="brand_nm_eng" id="brand_nm_eng" class="form-control form-control-sm search-all">
@@ -313,11 +305,7 @@
                                                             </span>
                                                         </li>
                                                         <li style="padding-top:5px;">
-<<<<<<< HEAD
                                                             <input type="file" id="brand_file" name="brand_file" />
-=======
-                                                            <input type="file" id="brand_file" name="brand_file">
->>>>>>> main
                                                         </li>
                                                     </ul>
                                                 </td>
@@ -825,11 +813,7 @@
 			var logo_img = "";
 			if( o.brand_logo != "" ) {
 				// logo_img = '<center><img src="{{config('shop.image_svr')}}' + o.brand_logo + '"/></center>';
-<<<<<<< HEAD
 				logo_img = '<center><img src="' + o.brand_logo + '"/></center>'; // 저장위치 관련 추가작업 필요
-=======
-                logo_img = '<center><img src="' + o.brand_logo + '"/></center>'; // 저장위치 관련 추가작업 필요
->>>>>>> main
 			} else {
 				logo_img = '<center></center>';
             }
@@ -1142,21 +1126,13 @@
 
 
     $(function() {
-<<<<<<< HEAD
-        $("[name='brand_file']").change(function() {
-=======
         $("[name=brand_file]").change(function() {
->>>>>>> main
             target_file = this.files;
             if (validatePhoto() === false) return;
 
             document.querySelector("#preview_logo_img center").innerHTML = '';
             $("#preview_logo_img canvas").remove();
-<<<<<<< HEAD
-
-=======
             
->>>>>>> main
             var fr = new FileReader();
             appendCanvas(80, 'c_80', 'a');
 

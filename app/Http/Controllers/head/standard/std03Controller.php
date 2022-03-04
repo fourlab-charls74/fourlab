@@ -168,11 +168,7 @@ class std03Controller extends Controller
 			$update_items	= [
 				"brand_nm"		=> $brand_nm,
 				"brand_nm_eng"	=> $brand_nm_eng,
-<<<<<<< HEAD
 				"overview"		=> $overview,
-=======
-				"overview"	=> $overview,
->>>>>>> main
 				"memo"			=> $memo,
 				"keyword"		=> $keyword,
 				"brand_type"	=> $brand_type,
@@ -299,11 +295,7 @@ class std03Controller extends Controller
 
 		$query = "
 			select
-<<<<<<< HEAD
 				brand, brand_nm, brand_nm_eng, a.overview, memo, a.keyword, a.best_yn,use_yn, brand_contents, ifnull(brand_logo,'') as brand_logo, admin_id, admin_nm, regi_date, ut, brand_type
-=======
-				brand, brand_nm, brand_nm_eng, a.overview, a.memo, a.keyword, a.best_yn,use_yn, brand_contents, ifnull(brand_logo,'') as brand_logo, admin_id, admin_nm, regi_date, ut, brand_type
->>>>>>> main
 			from brand a
 			where 1=1 and brand= :brand
 		";
