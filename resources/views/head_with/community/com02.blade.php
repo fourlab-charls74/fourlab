@@ -172,7 +172,7 @@
 		{field:"board_id", headerName:"board_id", hide:true},
 		{field:"step", headerName:"step", hide:true, },
 		{field:"points" , headerName:"적립금", },
-		{headerName: "", field: "nvl"}
+		{ width: "auto" }
 	];
 	const pApp = new App('', { gridId: "#div-gd" });
 	const gridDiv = document.querySelector(pApp.options.gridId);

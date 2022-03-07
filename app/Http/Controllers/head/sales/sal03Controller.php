@@ -40,11 +40,7 @@ class sal03Controller extends Controller
         $ord_state	= $request->input("ord_state");
 
         $inner_where = "";
-<<<<<<< HEAD
 		$inner_where2	= "";	//매출
-=======
-        $inner_where2 = "";
->>>>>>> main
 
         if($goods_nm != ""){
             $inner_where .= " and g.goods_nm like '%$goods_nm%' ";

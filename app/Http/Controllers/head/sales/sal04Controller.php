@@ -36,7 +36,6 @@ class sal04Controller extends Controller
         $sdate = str_replace("-", "", $request->input('sdate', Carbon::now()->sub(1, 'month')->format('Ymd')));
         $edate = str_replace("-", "", $request->input('edate', date("Ymd")));
 
-<<<<<<< HEAD
 		$m_cat_all		= $request->input("m_cat_all");
 		$stat_pay_type	= $request->input("stat_pay_type");
 		$goods_nm		= $request->input("goods_nm");
@@ -48,18 +47,6 @@ class sal04Controller extends Controller
 		$sale_place		= $request->input("sale_place", "");
 		$goods_stat		= $request->input("goods_stat");
 		$ord_type		= $request->input("ord_type");
-=======
-        $m_cat_all = $request->input("m_cat_all");
-        $stat_pay_type = $request->input("stat_pay_type");
-        $goods_nm        = $request->input("goods_nm");
-        $ord_state    = $request->input("ord_state");
-        $not_sale    = $request->input("not_sale");
-        $cat_type = $request->input("cat_type");
-        $cat_cd = $request->input("cat_cd");
-        $item	= $request->input("item");
-        $sale_place = $request->input("sale_place", "");
-        $goods_stat		= $request->input("goods_stat");
->>>>>>> main
 
         $inner_where = "";
         $inner_where1 = "";    //재고조정
@@ -123,29 +110,6 @@ class sal04Controller extends Controller
 				$inner_where2	.= " and ( $stat_pay_type_where ) ";
 			}
 		}
-<<<<<<< HEAD
-		/*
-        $sumpaytype = 0;
-        if ($stay_pay_type != "") {
-            $paywhere = "";
-            $as_stay_pay_type = split(",", $stay_pay_type);
-            $sumpaytype = array_sum($as_stay_pay_type);
-            for ($i = 0; $i < count($as_stay_pay_type); $i++) {
-                $paytype = $as_stay_pay_type[$i];
-                if ($paywhere == "") {
-                    $paywhere .= " ( o.pay_type & $paytype ) = $paytype ";
-                } else {
-                    $paywhere .= " or ( o.pay_type & $paytype ) = $paytype ";
-                }
-            }
-            if ($paywhere != "") {
-                $inner_where2 .= " and ( $paywhere ) ";
-            }
-        }
-		*/
-=======
-
->>>>>>> main
         $join = " inner join ";
 
         $sql =
