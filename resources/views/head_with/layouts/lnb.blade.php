@@ -45,20 +45,12 @@
                             <li><a href="/head/stock/stk34">재고 등록 오류 관리</a></li>
                             <li><a href="/head/stock/stk35">재고 비교 모니터링</a></li>
                         </ul>
-<<<<<<< HEAD
                     </li> --}}
                     
                     <!-- <li data-menu-kind="P" data-menu-id="stk03" class="d-none"><a href="/head/stock/stk03">입출고현황</a></li>
                     <li><a href="/head/stock/stk04">입출고내역</a></li> -->
                     <li><a href="/head/stock/stk06">재고입고알림</a></li>
                     
-=======
-                    </li>
-                    <!--
-                    <li data-menu-kind="P" data-menu-id="stk03" class="d-none"><a href="/head/stock/stk03">입출고현황</a></li>
-                    <li><a href="/head/stock/stk04">입출고내역</a></li>
-                    //-->
->>>>>>> main
                     <li data-menu-kind="P" data-menu-id="stk20" class="d-none"><a href="/head/stock/stk20">상품별 판매율</a></li>
                 </ul>
             </li>
@@ -66,17 +58,10 @@
                 <a href="javascript:;" class="arrow"><i class="bx bx-task fs-18"></i><span>상품/전시</span></a>
                 <ul>
                     <li data-menu-kind="P" data-menu-id="prd01" class="d-none"><a href="/head/product/prd01">상품관리</a></li>
-<<<<<<< HEAD
                     <li><a href="/head/product/prd04">세일관리</a></li>
                     <li><a href="/head/product/prd06">원사이즈 및 클리어런스</a></li>
                     <li data-menu-kind="P" data-menu-id="prd05" class="d-none"><a href="/head/product/prd05">상품정보고시</a></li>
                     <li data-menu-kind="P" data-menu-id="prd03" class="d-none"><a href="/head/product/prd03">상품도매</a></li>
-=======
-                    <li data-menu-kind="P" data-menu-id="prd05" class="d-none"><a href="/head/product/prd05">상품정보고시</a></li>
-                    <li><a href="/head/product/prd03">상품도매[개발중]</a></li>
-                    <li><a href="/head/product/prd04">세일관리[개발중]</a></li>
-                    <li><a href="/head/product/prd06">원사이즈 및 클리어런스[개발중]</a></li>
->>>>>>> main
                     <!--
                     <li><a href="/head/product/prd07">상품이미지 일괄 등록</a></li>
                     <li><a href="/head/product/prd08">베스트랭킹</a></li>
@@ -85,11 +70,7 @@
                     <li data-menu-kind="P" data-menu-id="prd10" class="d-none"><a href="/head/product/prd10">상품 전시</a></li>
                     <li data-menu-kind="P" data-menu-id="prd11" class="d-none"><a href="/head/product/prd11">섹션 전시</a></li>
                     <li data-menu-kind="P" data-menu-id="prd12" class="d-none"><a href="/head/product/prd12">기획전 전시</a></li>
-<<<<<<< HEAD
                     <li data-menu-kind="M" data-menu-id="prd20" class="depth2 d-none">
-=======
-                    <li data-menu-kind="M" data-menu-id="prd20" class="d-none depth2">
->>>>>>> main
                         <a href="javascript:;" class="arrow"><span>제휴</span></a>
                         <ul>
                             <li><a href="/head/product/prd20">네이버 지식쇼핑</a></li>
@@ -168,11 +149,7 @@
                     <li><a href="/head/promotion/prm05">배너</a></li>
                     -->
                     <li data-menu-kind="P" data-menu-id="prm10" class="d-none"><a href="/head/promotion/prm10">쿠폰</a></li>
-<<<<<<< HEAD
                     <li data-menu-kind="P" data-menu-id="prm20" class="d-none"><a href="/head/promotion/prm20">출첵이벤트</a></li>
-=======
-                    {{-- <li data-menu-kind="P" data-menu-id="prm20" class="d-none"><a href="/head/promotion/prm20">출첵이벤트</a></li> --}}
->>>>>>> main
                     <li data-menu-kind="P" data-menu-id="prm21" class="d-none"><a href="/head/promotion/prm21">댓글이벤트</a></li>
                     <li class="depth2">
                         <a href="javascript:;" class="arrow d-none"><span>검색</span></a>
