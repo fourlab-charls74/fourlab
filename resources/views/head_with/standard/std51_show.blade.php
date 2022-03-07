@@ -120,7 +120,6 @@
                 </div>
             </div>
         </div>
-<<<<<<< HEAD
     </form>
 </div>
 
@@ -157,114 +156,12 @@
                     if(response.code === 200) {
                         window.opener.location.reload();
                         window.close();
-=======
-    </div>
-    <script>
-
-        let code = '{{ $code  }}';
-
-        /**
-         * @return {boolean}
-         */
-        function Save() {
-
-            if ($('#code_kind_cd').val() === '') {
-                $('#code_kind_cd').focus();
-                alert('구분을 선택해주세요.');
-                return false;
-            }
-
-            if ($('#code_kind_nm').val() === '') {
-                $('#code_kind_nm').focus();
-                alert('코드명을 입력해 주세요.');
-                return false;
-            }
-
-            if ($('#code_kind_nm_eng').val() === '') {
-                $('#code_kind_nm_eng').focus();
-                alert('영문명을 입력해 주세요.');
-                return false;
-            }
-
-            if(!confirm('저장하시겠습니까?')){
-                return false;
-            }
-
-            var frm = $('form');
-            //console.log(frm.serialize());
-
-            if(code == ""){
-                $.ajax({
-                    method: 'post',
-                    url: '/head/standard/std51',
-                    data: frm.serialize(),
-                    dataType: 'json',
-                    success: function (res) {
-                        if(res.code == '200'){
-                            alert("정상적으로 저장 되었습니다.");
-                            self.close();
-                            opener.Search(1);
-                        } else {
-                            alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                            console.log(res.msg);
-                        }
-                    },
-                    error: function(e) {
-                        console.log(e.responseText)
-                    }
-                });
-            } else {
-                $.ajax({
-                    method: 'put',
-                    url: '/head/standard/std51/' + code,
-                    data: frm.serialize(),
-                    dataType: 'json',
-                    success: function (res) {
-                        // console.log(res);
-                        if(res.code == '200'){
-                            alert("정상적으로 변경 되었습니다.");
-                            self.close();
-                            opener.Search(1);
-                        } else {
-                            alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                        }
-                    },
-                    error: function(e) {
-                        console.log(e.responseText)
-                    }
-                });
-            }
-
-
-            return true;
-        }
-
-        function Delete() {
-            if(confirm('삭제 하시겠습니까?')){
-                $.ajax({
-                    method: 'delete',
-                    url: '/head/standard/std51/' + code,
-                    dataType: 'json',
-                    success: function (res) {
-                        // console.log(response);
-                        if(res.code == '200'){
-                            alert("삭제되었습니다.");
-                            self.close();
-                            opener.Search(1);
-                        } else {
-                            alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                        }
-                    },
-                    error: function(e) {
-                        console.log(e.responseText)
->>>>>>> main
                     }
                 },
                 error: function(request, status, error) {
                     alert(request.responseJSON.message);
                 }
             });
-<<<<<<< HEAD
         });
     }
 
@@ -287,76 +184,6 @@
                     if(response.code === 200) {
                         window.opener.location.reload();
                         window.close();
-=======
-            //gx.gridOptions.defaultColDef.editable = true;
-        }
-
-		/**
-		 * @return {boolean}
-		 */
-		function DataSave(){
-
-			data_codes = [];
-			let checkRows = gx.getSelectedRows();
-
-			checkRows.map(function(row) {
-				if(row.editable === 'Y'){
-					data_codes.push(row);
-				}
-			});
-
-			if(data_codes.length == 0 ){
-				alert('저장할 코드정보를 선택해 주십시오.');
-				return false;
-			}
-
-			$.ajax({
-				method: 'post',
-				url: '/head/standard/std51/' + code + '/save',
-				data: {data:JSON.stringify(data_codes)},
-				dataType: 'json',
-				success: function (res) {
-					if(res.code == '200'){
-						Search();
-					} else {
-						alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-						console.log(res.msg);
-					}
-				},
-				error: function(e) {
-					console.log(e.responseText)
-				}
-			});
-		}
-
-        /**
-         * @return {boolean}
-         */
-        function DataDel(){
-            let code_ids = [];
-            gx.getSelectedRows().forEach((selectedRow, index) => {
-                code_ids.push(selectedRow.code_id);
-            });
-
-            if(code_ids.length === 0) {
-                alert('삭제할 상품을 선택 해 주십시오.');
-            } else if(code_ids.length > 0 && confirm('삭제 하시겠습니까?')){
-
-                $.ajax({
-                    method: 'post',
-                    url: '/head/standard/std51/' + code + '/del',
-                    data: {'code_ids':code_ids},
-                    dataType: 'json',
-                    success: function (res) {
-                        if(res.code == '200'){
-                            Search();
-                        } else {
-                            alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                        }
-                    },
-                    error: function(e) {
-                        console.log(e.responseText)
->>>>>>> main
                     }
                 },
                 error: function(request, status, error) {
