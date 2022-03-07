@@ -195,7 +195,7 @@
 		
 		{field:"ip" , headerName:"IP", width:100 },
 		{field:"regi_date" , headerName:"작성일", width:130 },
-		{headerName: "", field: "nvl"}
+		{ width: "auto" },
 	];
 	const pApp = new App('', { gridId: "#div-gd" });
 	const gridDiv = document.querySelector(pApp.options.gridId);

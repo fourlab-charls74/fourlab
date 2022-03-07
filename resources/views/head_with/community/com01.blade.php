@@ -138,7 +138,8 @@ var columns = [
     {field:"comment_date" , headerName:"댓글 최근 등록일시"},
     {field:"is_use" , headerName:"사용여부", width: 120},
     {field:"regi_date" , headerName:"등록일시", width: 150},
-    {field:"upd_date" , headerName:"수정일시", width: 150}
+    {field:"upd_date" , headerName:"수정일시", width: 150},
+    { width: "auto" }
 ];
 
 var pApp = new App('', {gridId: "#div-gd"});
