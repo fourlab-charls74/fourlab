@@ -36,11 +36,7 @@ class stk11Controller extends Controller {
         $edate = str_replace('-','',$request->input("edate"));
 		$invoice_no	= $request->input("invoice_no");
 		$item = $request->input("item");
-<<<<<<< HEAD
 		$com_id = $request->input("com_cd");
-=======
-		$com_id = $request->input("com_id");
->>>>>>> main
 		$state = $request->input("order_stock_state");
 		$user_name = $request->input("user_name");
 
@@ -282,11 +278,7 @@ class stk11Controller extends Controller {
 	}
 
 	/**
-<<<<<<< HEAD
 	 * 입고 추가
-=======
-	 * 발주 추가
->>>>>>> main
 	 */
 	public function addCmd(Request $request) {
 
@@ -298,11 +290,6 @@ class stk11Controller extends Controller {
 		$stock_type				= "A";										//입고구분
 		$area_type				= $request->input("area_type");				//입고지역
 		$com_id					= $request->input("com_id");				//공급처
-<<<<<<< HEAD
-
-=======
-		
->>>>>>> main
 		$item					= "";										//품목
 		$currency_unit			= $request->input("currency_unit");			//화폐단위
 		$exchange_rate			= $request->input("exchange_rate");			//환율
@@ -787,7 +774,6 @@ class stk11Controller extends Controller {
 		";
 		$row = DB::selectOne($sql);
 
-<<<<<<< HEAD
 		$fail_message = "상품 입고에 실패하였습니다. 상품번호: " . $goods_no;
 		if ($row) {
 			try {
@@ -803,23 +789,6 @@ class stk11Controller extends Controller {
 					'name' => $name
 				];
 				
-=======
-		$id = Auth::guard('head')->user()->id;
-		$name = Auth::guard('head')->user()->name;
-		
-		$user = [
-			'id' => $id,
-			'name' => $name
-		];
-
-		$fail_message = "상품 입고에 실패하였습니다. 상품번호: " . $goods_no;
-		if ($row) {
-			try {
-				DB::beginTransaction();
-				/**
-				 * 재고 등록(+)
-				 */
->>>>>>> main
 				$jaego = new Jaego($user);
 				$jaego->SetLoc($loc);
 				$jaego->Plus( array(
@@ -842,11 +811,7 @@ class stk11Controller extends Controller {
 				DB::update($sql);
 				DB::commit();
 			} catch (Exception $e) {
-<<<<<<< HEAD
 				DB::rollBack();	
-=======
-				DB::rollBack();
->>>>>>> main
 				$code = -2;
 				throw new Exception($fail_message, $code, $e);
 			}

@@ -269,7 +269,7 @@
     };
 
     var columns= [
-        {headerName: '#', pinned: 'left', type: 'NumType', width: 65,
+        {headerName: '#', pinned: 'left', type: 'NumType', width: 50,
             cellRenderer: params => params.node.rowPinned == 'top' ? '' : params.data.count,
             sortingOrder: ['desc', 'asc', 'null'],
             comparator: (valueA, valueB, nodeA, nodeB, isInverted) => { // 번호순으로 정렬이 안되는 문제 수정
@@ -287,10 +287,10 @@
             cellStyle: params => checkIsEditable(params) ? null : { display: 'none'},
             width: 40, pinned:'left'
         },
-        {field:"item" ,headerName:"품목",pinned:'left',width:130},
+        {field:"item" ,headerName:"품목",pinned:'left',width:96},
 
         // 기존 서비스에서는 브랜드와 스타일 넘버도 수정이 가능하였지만, 논의 후 불필요한 것으로 판단되어 제거
-        {field:"brand" ,headerName:"브랜드",pinned:'left',width:90,
+        {field:"brand" ,headerName:"브랜드",pinned:'left',width:96,
             // cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99'} : null ,
             // editable: params => checkIsEditable(params)
         },
@@ -300,8 +300,8 @@
         },
         {headerName:"상품코드",
             children: [
-                {headerName: "번호", field: "goods_no", width: 80, pinned:'left', cellStyle:{'text-align': 'center'}},
-                {headerName: "보조", field: "goods_sub", width: 70, pinned:'left', cellStyle:{'text-align': 'center'}}
+                {headerName: "번호", field: "goods_no", width: 60, pinned:'left', cellStyle:{'text-align': 'center'}},
+                {headerName: "보조", field: "goods_sub", width: 60, pinned:'left', cellStyle:{'text-align': 'center'}}
             ]
         },
         {field:"goods_nm" , headerName:"상품명", type:"HeadGoodsNameType", width:250, pinned:'left'},
@@ -309,29 +309,30 @@
             editable: params => checkIsEditable(params),
             cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99'} : null,
         },
-        {headerName: "수량", field: "qty", width: 80,
+        {headerName: "수량", field: "qty", width: 60,
             editable: params => checkIsEditable(params),
             cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99', textAlign: 'right'} : {textAlign: 'right'},
         },
-        {headerName: "단가", field: "unit_cost", width: 80,
+        {headerName: "단가", field: "unit_cost", width: 60,
             editable: params => checkIsEditable(params),
             cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99', textAlign: 'right'} : {textAlign: 'right'},
             valueFormatter: numberFormatter,
             cellRenderer: params => { return params.node.rowPinned == "top" ? "" : params.valueFormatted }
         },
-        {headerName: "금액", field: "unit_total_cost", width: 100, cellStyle:{'text-align': 'right'}, 
+        {headerName: "금액", field: "unit_total_cost", width: 72, cellStyle:{'text-align': 'right'}, 
             valueFormatter: numberFormatter
         },
-        {headerName: "원가(원, VAT포함)", field: "cost", width: 140, cellStyle:{'text-align': 'right'}, 
+        {headerName: "원가(원, VAT포함)", field: "cost", width: 120, cellStyle:{'text-align': 'right'}, 
             valueFormatter: currencyFormatter
         },
-        {headerName: "총원가(원)", field: "total_cost", width: 120, cellStyle:{'text-align': 'right'}, 
+        {headerName: "총원가(원)", field: "total_cost", width: 96, cellStyle:{'text-align': 'right'}, 
             valueFormatter: currencyFormatter
         },
-        {headerName: "총원가(원, VAT별도)", field: "total_cost_novat", width: 160, cellStyle:{'text-align': 'right'}, 
+        {headerName: "총원가(원, VAT별도)", field: "total_cost_novat", width: 134, cellStyle:{'text-align': 'right'}, 
             valueFormatter: currencyFormatter
         },
-        {headerName: "최근입고일자", field: "stock_date", cellStyle: {"text-align" : 'center'}}
+        {headerName: "최근입고일자", field: "stock_date", width:96, cellStyle: {"text-align" : 'center'}},
+        {headerName:"", field:"", width:"auto"}
     ];
 
     /**
@@ -356,7 +357,6 @@
             },
             getRowNodeId: (data) => data.hasOwnProperty('count') ? data.count : "0", // 업데이터 및 제거를 위한 식별 ID를 count로 할당
             onCellValueChanged: params => evtAfterEdit(params),
-<<<<<<< HEAD
             // suppressKeyboardEvent: params => {
             //     if (!params.editing) {
             //         let isBackspaceKey = params.event.keyCode === 8;
@@ -383,34 +383,6 @@
             //     }
             //     return false;
             // },
-=======
-            suppressKeyboardEvent: params => {
-                if (!params.editing) {
-                    let isBackspaceKey = params.event.keyCode === 8;
-                    let isDeleteKey = params.event.keyCode === 46;
-                    
-                    if(isDeleteKey || isBackspaceKey){
-                        params.api.getCellRanges().forEach(r => {
-                            let colIds = r.columns.map(col => col.colId);
-                            let startRowIndex = Math.min(r.startRow.rowIndex, r.endRow.rowIndex);
-                            let endRowIndex = Math.max(r.startRow.rowIndex, r.endRow.rowIndex);
-
-                            let itemsToUpdate = [];
-
-                            for (let i = startRowIndex; i <= endRowIndex; i++) {
-                                let data = params.api.rowModel.rowsToDisplay[i].data;
-                                colIds.forEach(column => {
-                                    data[column] = "";
-                                });
-                                itemsToUpdate.push(data);
-                            }
-                            params.api.applyTransaction({ update: itemsToUpdate });
-                        });
-                    }
-                }
-                return false;
-            },
->>>>>>> main
             // animateRows: true
         };
         gx = new HDGrid(gridDiv, columns,options);
