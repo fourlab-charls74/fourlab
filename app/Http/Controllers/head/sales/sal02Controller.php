@@ -56,11 +56,7 @@ class sal02Controller extends Controller
 		$stay_pay_type 	= $request->input("stat_pay_type");
 
         $inner_where = "";
-<<<<<<< HEAD
 		$inner_where2	= "";	//매출
-=======
-		$inner_where2 = "";
->>>>>>> main
 
         if($goods_nm != ""){
             $inner_where .= " and g.goods_nm like '%$goods_nm%' ";
@@ -77,10 +73,7 @@ class sal02Controller extends Controller
 
 		if ($sale_place != "")	$inner_where .= " and o.sale_place = '$sale_place' ";
 		// if ($ord_type != "") 	$inner_where .= " and o.ord_type   = '$ord_type' ";
-<<<<<<< HEAD
 
-=======
->>>>>>> main
 		if( $ord_type != "" ){
 			$ord_type_where	= "";
 			for( $i = 0; $i < 9; $i++ ){
