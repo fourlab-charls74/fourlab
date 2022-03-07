@@ -118,16 +118,12 @@
                             <div class="form-group">
                                 <label for="style_no">스타일넘버</label>
                                 <div class="flax_box">
-<<<<<<< HEAD
                                     <div class="form-inline-inner input-box w-100">
                                         <div class="form-inline inline_btn_box">
                                             <input type="text" class="form-control form-control-sm search-all search-enter ac-style-no w-100" name="style_no" value="">
                                             <a href="#" class="btn btn-sm btn-outline-primary sch-style_nos"><i class="bx bx-plus fs-16"></i></a>
                                         </div>
                                     </div>
-=======
-                                    <input type="text" class="form-control form-control-sm search-all ac-style-no search-enter" name="style_no" value="">
->>>>>>> main
                                 </div>
                             </div>
                         </div>
@@ -155,13 +151,8 @@
                                     </div>
                                     <div class="form-inline-inner input-box w-75">
                                         <div class="form-inline inline_btn_box">
-<<<<<<< HEAD
                                             <input type="hidden" id="com_cd" name="com_cd">
                                             <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company search-all search-enter" style="width:100%;" autocomplete="off">
-=======
-                                            <input type="hidden" id="com_id" name="com_id">
-                                            <input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company" style="width:100%;">
->>>>>>> main
                                             <a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                         </div>
                                     </div>
@@ -172,14 +163,14 @@
                             <div class="form-group">
                                 <label for="f_sqty">판매수량</label>
                                 <div class="form-inline inline_select_box">
-                                    <div class="form-inline-inner input-box w-25 pr-1">
+                                    <div class="form-inline-inner input-box w-50 pr-1">
                                         <select id="formula_type" name="formula_type" class="form-control form-control-sm w-100">
                                             @foreach ($formula_types as $formula_type)
                                                 <option value="{{ $formula_type }}">{{ $formula_type }}</option>
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="form-inline-inner input-box w-25">
+                                    <div class="form-inline-inner input-box w-50">
                                         <input type='text' class="form-control form-control-sm search-all search-enter" name='formula_val' id='formula_val' value='' style="width:100%;">
                                     </div>
                                 </div>
@@ -189,7 +180,7 @@
                             <div class="form-group">
                                 <label>출력자료수/정렬</label>
                                 <div class="form-inline">
-                                    <div class="form-inline-inner input_box" style="width:24%;">
+                                    <div class="form-inline-inner input_box" style="width:30%;">
                                         <select name="limit" class="form-control form-control-sm">
                                             <option value="100">100</option>
                                             <option value="500">500</option>
@@ -198,7 +189,7 @@
                                         </select>
                                     </div>
                                     <span class="text_line">/</span>
-                                    <div class="form-inline-inner input_box" style="width:24%;">
+                                    <div class="form-inline-inner input_box" style="width:30%;">
                                         <select name="ord_field" class="form-control form-control-sm">
                                             <option value="goods_no">상품번호</option>
                                             <option value="now_qty">현재고</option>
@@ -207,7 +198,7 @@
                                             <option value="buy_ord_prd_no" selected>발주일시</option>
                                         </select>
                                     </div>
-                                    <div class="form-inline-inner input_box sort_toggle_btn pr-2" style="width:24%;margin-left:2%;">
+                                    <div class="form-inline-inner input_box sort_toggle_btn pr-2" style="width:30%;margin-left:2%;">
                                         <div class="btn-group" role="group">
                                             <label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="" data-original-title="내림차순"><i class="bx bx-sort-down"></i></label>
                                             <label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="" data-original-title="오름차순"><i class="bx bx-sort-up"></i></label>
@@ -238,21 +229,13 @@
                             <h6 class="m-0 font-weight-bold">총 원가금액 <span id="sum_buy_cost" class="text-primary">0</span>원</h6>
                         </div>
                         <div class="fr_box">
-<<<<<<< HEAD
                             <select id='change_buy_order_state' name='state' class="form-control form-control-sm" style='width:130px; display:inline'>
-=======
-                            <select id='change_buy_order_state' name='state' class="form-control form-control-sm" style='width:130px;display:inline'>
->>>>>>> main
                                 <option value=''>선택</option>
                                 @foreach ($buy_order_states as $buy_order_state)
                                     <option value="{{ $buy_order_state->code_id }}">{{ $buy_order_state->code_val }}</option>
                                 @endforeach
                             </select>
-<<<<<<< HEAD
                             <a href="javascript:void(0);" onclick="changeState();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-sync fs-16 mr-1"></i>발주상태변경</a>
-=======
-                            <a href="javascript:void(0);" onclick="update();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-sync fs-16 mr-1"></i>발주상태변경</a>
->>>>>>> main
                             <a href="#" onclick="del()" class="btn-sm btn btn-primary">발주삭제</a>
                             <span style="color: blue">※ 일평균판매수</span>는 <span style="color: red">최근 30일의 일평균 판매수량</span>
                         </div>
@@ -269,28 +252,15 @@
         // ag-grid set
 
         var columns= [
-<<<<<<< HEAD
             {field:"chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, sort: null, pinned:'left'},
-            {field:"buy_ord_date" ,headerName:"발주일자",pinned:'left',width:100},
+            {field:"buy_ord_date" ,headerName:"발주일자",pinned:'left',width:72},
             {field:"buy_ord_no" ,headerName:"발주번호",pinned:'left',width:100},
-            {field:"state" ,headerName:"발주상태",pinned:'left',width:100},
-=======
-            {field:"chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, sort: null, pinned:'left'
-				,cellStyle: {"background":"#F5F7F7"}
-			},
-            {field:"buy_ord_date" ,headerName:"발주일자",pinned:'left', width:72},
-            {field:"buy_ord_no" ,headerName:"발주번호",pinned:'left',width:100},
-            {field:"state" ,headerName:"발주상태",pinned:'left',width:84},
->>>>>>> main
+            {field:"state" ,headerName:"발주상태",pinned:'left',width:72},
             {field:"com_nm",headerName:"업체",pinned:'left',width:100},
-            {field:"opt_kind_nm" ,headerName:"품목",pinned:'left',width:100},
-            {field:"brand_nm" ,headerName:"브랜드",pinned:'left',width:100},
-            {field:"style_no" ,headerName:"스타일넘버",pinned:'left',width:130},
-<<<<<<< HEAD
-            {field:"org_nm" ,headerName:"원산지",pinned:'left',width:100},
-=======
-            {field:"org_nm" ,headerName:"원산지",pinned:'left',width:72},
->>>>>>> main
+            {field:"opt_kind_nm" ,headerName:"품목",pinned:'left',width:72},
+            {field:"brand_nm" ,headerName:"브랜드",pinned:'left',width:84},
+            {field:"style_no" ,headerName:"스타일넘버",pinned:'left',width:96},
+            {field:"org_nm" ,headerName:"원산지",pinned:'left',width:84},
             // {field:"img" , headerName:"이미지",
             //     cellRenderer: function(params) {
             //         if (params.value !== undefined && params.data.img != "") {
@@ -300,64 +270,40 @@
             // },
             {headerName:"상품코드",
                 children: [
-<<<<<<< HEAD
-                    {headerName: "번호", field: "goods_no", width: 80, pinned:'left', cellStyle:{'text-align': 'right'}},
-                    {headerName: "보조", field: "goods_sub", width: 80, pinned:'left', cellStyle:{'text-align': 'center'}}
-                ]
-            },
-            {field:"goods_nm" , headerName:"상품명", type:"HeadGoodsNameType", width:220, pinned:'left'},
-            {field:"sale_stat_cl" ,headerName:"상태",width:100,cellStyle:StyleGoodsState, pinned:'left'},
-=======
-                    {headerName: "번호", field: "goods_no", width: 72, pinned:'left', cellStyle:{'text-align': 'right'}},
-                    {headerName: "보조", field: "goods_sub", width: 50, pinned:'left', cellStyle:{'text-align': 'center'}}
+                    {headerName: "번호", field: "goods_no", width: 60, pinned:'left', cellStyle:{'text-align': 'right'}},
+                    {headerName: "보조", field: "goods_sub", width: 60, pinned:'left', cellStyle:{'text-align': 'center'}}
                 ]
             },
             {field:"goods_nm" , headerName:"상품명", type:"HeadGoodsNameType", width:220, pinned:'left'},
             {field:"sale_stat_cl" ,headerName:"상태",width:72,cellStyle:StyleGoodsState, pinned:'left'},
->>>>>>> main
             {field:"goods_opt" ,headerName:"옵션",width:100,
                 cellRenderer: function(params) {
                         return '<p>' + params.value + '</p>';
                 }
             },
-            {field:"now_qty",headerName:"현재고",type:'numberType'},
+            {field:"now_qty",headerName:"현재고", width:60, type:'numberType'},
             {headerName:"발주",
                 children: [
-<<<<<<< HEAD
-                    {headerName: "수량", field: "buy_qty", width: 80, cellStyle:{'text-align': 'right'}},
-                    {headerName: "단가", field: "buy_unit_cost", width: 100, type:'currencyType'},
-                    {headerName: "금액", field: "buy_cost", width: 100, type:'currencyType'}
+                    {headerName: "수량", field: "buy_qty", width: 60, cellStyle:{'text-align': 'right'}},
+                    {headerName: "단가", field: "buy_unit_cost", width: 60, type:'currencyType'},
+                    {headerName: "금액", field: "buy_cost", width: 60, type:'currencyType'}
                 ], pinned: 'left'
             },
-=======
-                    {headerName: "수량", field: "buy_qty", width: 50, cellStyle:{'text-align': 'right'}},
-                    {headerName: "단가", field: "buy_unit_cost", width: 72, type:'currencyType'},
-                    {headerName: "금액", field: "buy_cost", width: 84, type:'currencyType'}
-                ], pinned: 'left'
-            },
-            
->>>>>>> main
             {headerName:"판매",
                 children: [
-                    {headerName: "{{$month1}} 월", field: "sale_qty1",type:'currencyType'},
-                    {headerName: "{{$month2}} 월", field: "sale_qty2",type:'currencyType'},
-                    {headerName: "{{$month3}} 월", field: "sale_qty3",type:'currencyType'},
-                    {headerName: "최근30일", field: "sale_qty",type:'currencyType'},
-<<<<<<< HEAD
-                    {headerName: "일평균판매수", field: "avg_qty",type:'percentType'},
-                    {field:"expect_day",headerName:"소진예상일",cellStyle:{"color": "red", "text-align": "right"}},
-=======
-                    {headerName: "일평균판매수", field: "avg_qty",type:'currencyType'},
-                    {field:"expect_day",headerName:"소진예상일",type:'percentType',cellStyle:{"color": "red"}},
->>>>>>> main
+                    {headerName: "{{$month1}} 월", field: "sale_qty1", width:60, type:'currencyType'},
+                    {headerName: "{{$month2}} 월", field: "sale_qty2", width:60, type:'currencyType'},
+                    {headerName: "{{$month3}} 월", field: "sale_qty3", width:60, type:'currencyType'},
+                    {headerName: "최근30일", field: "sale_qty", width:84, type:'currencyType'},
+                    {headerName: "일평균판매수", field: "avg_qty", wdith:84,type:'percentType'},
+                    {field:"expect_day",headerName:"소진예상일", width:84,cellStyle:{"color": "red", "text-align": "right"}},
                 ]
             },
-            {field:"max_wonga",headerName:"최대원가",type:'currencyType'},
-            {field:"avg_wonga",headerName:"평균원가",type:'currencyType'},
-            {field:"tot_wonga",headerName:"총원가",type:'currencyType'},
+            {field:"max_wonga",headerName:"최대원가", width:72,type:'currencyType'},
+            {field:"avg_wonga",headerName:"평균원가", width:72,type:'currencyType'},
+            {field:"tot_wonga",headerName:"총원가", width:60,type:'currencyType'},
             {field:"last_input_date",headerName:"최종입고일자"},
             {field:"price",headerName:"현재판매가",type:'currencyType'},
-<<<<<<< HEAD
             {field:"margin_amt",headerName:"마진",type:'currencyType'},
             {field:"margin_rate",headerName:"마진율(%)",type:'percentType'},
             // {headerName:"테스트등급", // 16
@@ -367,17 +313,6 @@
             //         {field:"group_16_dc_ratio",headerName:"할인율",type:'percentType'},
             //     ]
             // },
-=======
-            {field:"margin_amt",headerName:"마진",type:'percentType'},
-            {field:"margin_rate",headerName:"마진율(%)",type:'percentType'},
-            {headerName:"테스트등급", // 16
-                children: [
-                    {field:"group_16_price",headerName:"판매가",type:'currencyType'},
-                    {field:"group_16_ratio",headerName:"마진율(0%)",type:'percentType'},
-                    {field:"group_16_dc_ratio",headerName:"할인율",type:'percentType'},
-                ]
-            },
->>>>>>> main
             {headerName:"A 등급 회원 (원가 + 14%마진)", // 5
                 children: [
                     {field:"group_5_price",headerName:"판매가",type:'currencyType'},
@@ -417,10 +352,6 @@
             $("#img").click(function() {
                 gx.gridOptions.columnApi.setColumnVisible('img',$("#img").is(":checked"));
             });
-<<<<<<< HEAD
-
-=======
->>>>>>> main
         });
 
         // logics
@@ -446,11 +377,7 @@
             const pop = window.open(url,"_blank","toolbar=no,scrollbars=no,resizable=yes,status=yes,top=100,left=100,width="+width+",height="+height);
         };
 
-<<<<<<< HEAD
         const changeState = () => {
-=======
-        const update = () => {
->>>>>>> main
             let arr;
             let state;
             let buy_ord_prd_nos = [];
@@ -474,11 +401,7 @@
                             : null;
                     });
                     axios({
-<<<<<<< HEAD
                         url: '/head/stock/stk10/change-state',
-=======
-                        url: '/head/stock/stk10/update',
->>>>>>> main
                         method: 'put',
                         data: { state : state, buy_ord_prd_nos : buy_ord_prd_nos }
                     }).then((response) => {
@@ -504,12 +427,6 @@
                             ? buy_ord_prd_nos[idx] = obj.buy_ord_prd_no
                             : null;
                     });
-<<<<<<< HEAD
-=======
-
-					alert(buy_ord_prd_nos);
-
->>>>>>> main
                     axios({
                         url: '/head/stock/stk10/delete',
                         method: 'delete',
