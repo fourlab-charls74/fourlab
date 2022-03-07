@@ -20,11 +20,7 @@
                                             <div class="form-group">
                                                 <label style="min-width:60px;">브랜드</label>
                                                 <div class="flax_box">
-<<<<<<< HEAD
-                                                    <input type='text' class="form-control form-control-sm search-all" name='brand' value='' onkeypress="return searchBrand.Search();">
-=======
-                                                    <input type='text' class="form-control form-control-sm search-all" name='brand' value='' onkeypress="return searchBrand.Search();" />
->>>>>>> main
+                                                    <input type='text' class="form-control form-control-sm search-all" name='brand' value='' onkeypress="return searchBrand.Search();"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -32,11 +28,7 @@
                                             <div class="form-group">
                                                 <label style="min-width:60px;">브랜드명</label>
                                                 <div class="flax_box">
-<<<<<<< HEAD
-                                                    <input type='text' class="form-control form-control-sm search-all" name='brand_nm' value='' onkeypress="return searchBrand.Search();">
-=======
-                                                    <input type='text' class="form-control form-control-sm search-all" name='brand_nm' value='' onkeypress="return searchBrand.Search();" />
->>>>>>> main
+                                                    <input type='text' class="form-control form-control-sm search-all" name='brand_nm' value='' onkeypress="return searchBrand.Search();"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -248,7 +240,6 @@
                                                 <label style="min-width:70px;">스타일넘버</label>
                                                 <div class="flax_box">
                                                     <textarea name="sch_style_nos" id="sch_style_nos" rows=4 class="form-control form-control-sm" ></textarea>
-<<<<<<< HEAD
                                                 </div>
                                             </div>
                                         </div>
@@ -260,19 +251,6 @@
                                                 </div>
                                             </div>
                                         </div>
-=======
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6 inner-td">
-                                            <div class="form-group">
-                                                <label style="min-width:70px;">상품코드</label>
-                                                <div class="flax_box">
-                                                    <textarea name="sch_goods_nos" id="sch_goods_nos" rows=4 class="form-control form-control-sm" ></textarea>
-                                                </div>
-                                            </div>
-                                        </div>
->>>>>>> main
                                     </div>
                                     <div class="row">
                                         <div class="col-lg-12 inner-td">
@@ -305,7 +283,6 @@
                                     </div>
                                 </div>
                             </div>
-<<<<<<< HEAD
                             <div class="table-responsive">
                                 <div id="div-gd-goods_nos" style="width:100%;height:300px;" class="ag-theme-balham"></div>
                             </div>
@@ -380,17 +357,6 @@
                                             <div class="mt-2" style="text-align:right;">
                                                 <button type="button" class="btn btn-sm btn-primary shadow-sm" onclick="return controlOption.Add(event);"><i class="bx bx-plus fs-16"></i> <span class="fs-12">추가</span></button>
                                             </div>
-=======
-                        </form>
-                        <div class="card shadow mb-1">
-                            <div class="card-body m-0">
-                                <div class="card-title">
-                                    <div class="filter_wrap">
-                                        <div class="fl_box">
-                                            <h6 class="m-0 font-weight-bold">총 : <span id="gd-goods_nos-total" class="text-primary">0</span> 건</h6>
-                                        </div>
-                                        <div class="fr_box form-check-box">
->>>>>>> main
                                         </div>
                                     </div>
                                 </div>
@@ -419,100 +385,4 @@
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
-<<<<<<< HEAD
-=======
-</div><!-- /.modal -->
-
-<!-- 
-    ***
-    옵션관리
-    ***
--->
-
-<style>
-    .center {
-        padding: 5px 10px !important;
-        text-align: center;
-    }
-    .sb {
-        display: flex;
-        justify-content: space-between;
-    }
-    .sb::after {
-        content: none;
-        display: inline;
-    }
-</style>
-<div id="ControlOptionModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="ControlOptionModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title mt-0" id="myModalLabel">옵션관리</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body show_layout" style="background:#f5f5f5;">
-                <div class="card_wrap search_cum_form write">
-                    <div class="card shadow">
-                        <form name="control_option" id="control_option" method="get" onsubmit="return false">
-                            <div class="card-body">
-                                <div class="row_wrap">
-                                    <div class="row">
-                                        <div class="col-lg-12 inner-td">
-                                            <div class="table-responsive">
-                                                <table class="table table-bordered th_border_none custm_tb1">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="center">옵션구분</th>
-                                                            <th class="center">옵션</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td class="center">
-                                                                <select id='opt_kind' name='opt_kind' class="form-control form-control-sm">
-                                                                    <option value='0'>= 옵션구분 =</option>
-                                                                </select>
-                                                            </td>
-                                                            <td class="center">
-                                                                <input type='text' id="opt_nm" onkeypress="return controlOption.Add(event);" class="form-control form-control-sm search-all" name='opt_nm' />
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            <div class="mt-2" style="text-align:right;">
-                                                <button type="button" class="btn btn-sm btn-primary shadow-sm" onclick="return controlOption.Add(event);"><i class="bx bx-plus fs-16"></i> <span class="fs-12">추가</span></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="card shadow mb-1">
-                        <div class="card-body m-0">
-                            <div class="card-title">
-                                <div class="filter_wrap sb">
-                                    <div class="fl_box">
-                                        <h6 class="m-0 font-weight-bold">총 <span id="gd-option-total"></span> 건</h6>
-                                    </div>
-                                    <div>
-                                        <button type="button" class="btn btn-sm btn-primary shadow-sm" onclick="return controlOption.Delete();"><span class="fs-12">삭제</span></button>
-                                        <button type="button" class="btn btn-sm btn-primary shadow-sm" onclick="return controlOption.Save();"><span class="fs-12">저장</span></button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="table-responsive">
-                                <div id="div-gd-option" style="width:100%;height:300px;" class="ag-theme-balham"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
->>>>>>> main
 </div><!-- /.modal -->

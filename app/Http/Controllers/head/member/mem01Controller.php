@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\Conf;
 use App\Models\Point;
+use Exception;
 
 class mem01Controller extends Controller
 {
@@ -125,11 +126,7 @@ class mem01Controller extends Controller
                 $user->phone2 = $phone[1] ? $phone[1] : '';
                 $user->phone3 = $phone[2] ? $phone[2] : '';
             }
-<<<<<<< HEAD
             
-=======
-
->>>>>>> main
             $user->mobile1 = $mobile[0] ? $mobile[0] : '';
             if($user->mobile !== '') {
                 $user->mobile2 = $mobile[1] ? $mobile[1] : '';
@@ -467,11 +464,8 @@ class mem01Controller extends Controller
             'name' => Auth('head')->user()->name,
         ];
 
-<<<<<<< HEAD
-        try{
-=======
-         try{
->>>>>>> main
+        try {
+            
             DB::beginTransaction();
 
             $sql = "
@@ -480,11 +474,7 @@ class mem01Controller extends Controller
                     ,phone='',mobile='',yn='',mobile_chk='', interest = '', anniv_date = ''
                     ,yyyy_chk='',yyyy='',mm='',dd='',opt='',out_yn='Y',out_date=now()
                     ,name_chk = '', name_eng = '', job = '', married_yn = '', married_date = ''
-<<<<<<< HEAD
                     ,rmobile = '', opt = '', wsale_status = '', taxpayer_yn = '', memo = ''
-=======
-                    ,rmobile = '', opt = '', wsale_status = '', memo = ''
->>>>>>> main
                     ,visit_cnt = '', jumin1 = '', jumin2 = ''
                     ,sex='', auth_type='', auth_yn='', auth_key='', ipin='', foreigner='', mobile_cert_yn=''
                 where user_id = '$user_id'

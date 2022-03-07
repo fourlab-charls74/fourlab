@@ -79,11 +79,7 @@
                                             <th class="required">비밀번호</th>
                                             <td>
                                                 <div class="flax_box inline_btn_box" @if($type==='edit') style="padding-right:95px;"@else style="padding:0px;" @endif>
-<<<<<<< HEAD
-                                                    <input type="password" name="pw" id="pw" class="form-control form-control-sm" autocomplete="new-password">
-=======
-                                                    <input type="password" name="pw" id="pw" class="form-control form-control-sm" autocomplete="new-password" />
->>>>>>> main
+                                                    <input type="password" name="pw" id="pw" class="form-control form-control-sm" autocomplete="new-password"/>
                                                     @if($type==='edit')
                                                         <a href="#" class="btn btn-sm btn-secondary change-pw-btn fs-12" style="width:90px;">비밀번호변경</a>
                                                     @endif
@@ -1045,10 +1041,6 @@
         // 탈퇴
         $('.out-btn').click(function(e){
             e.preventDefault();
-<<<<<<< HEAD
-=======
-
->>>>>>> main
             if(!confirm("해당 회원을 탈퇴처리 하시겠습니까?")) return;
             $.ajax({
                 async: true,
