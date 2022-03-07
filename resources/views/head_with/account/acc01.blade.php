@@ -459,6 +459,7 @@
 		{field:"fee", headerName: "수수료율"},
 		{field:"sale_amt", headerName: "매출액", type: 'currencyType', cellStyle: numberStyle, aggregation: true},
 		{field:"cal_acc_amt", headerName: "정산액", type: 'currencyType', cellStyle: numberStyle, aggregation: true},
+        { width:"auto" }
     ];
 
     /**

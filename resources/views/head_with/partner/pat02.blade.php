@@ -138,6 +138,7 @@
         {headerName: "문의일자", field: "question_date",type:'DateTimeType'},
         {headerName: "처리완료일", field: "answer_date",type:'DateTimeType'},
         {headerName: "상태", field: "state"},
+        { width: 'auto' }
     ];
 </script>
 <script type="text/javascript" charset="utf-8">
