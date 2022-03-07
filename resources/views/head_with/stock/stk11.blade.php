@@ -79,13 +79,8 @@
                                 <div class="form-inline inline_select_box">
                                     <div class="form-inline-inner input-box w-100">
                                         <div class="form-inline inline_btn_box">
-<<<<<<< HEAD
                                             <input type="hidden" id="com_cd" name="com_cd">
                                             <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company search-all search-enter" style="width:100%;">
-=======
-                                            <input type="hidden" id="com_id" name="com_id" class="search-all">
-                                            <input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company" style="width:100%;">
->>>>>>> main
                                             <a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                         </div>
                                     </div>
@@ -141,7 +136,6 @@
         // ag-grid set
 
         var columns= [
-<<<<<<< HEAD
             { field: "stock_no", headerName: "입고번호", width: 100, cellStyle:{ 'text-align': 'center' } },
             { field: "invoice_no", headerName: "송장번호", width: 120,
                 cellRenderer: (params) => `<a href="#" onClick="clickInvoiceNo(${params.data.stock_no})">${params.data.invoice_no}</a>`
@@ -162,27 +156,6 @@
             { field: "name", headerName: "입고자", width: 80, cellStyle:{ 'text-align': 'center' } },
             { field: "rt", headerName: "최종수정일", width: 150, cellStyle:{ 'text-align': 'center' } },
             { field: "", headerName:"", width: "auto" },
-=======
-            { field: "stock_no", headerName: "입고번호", width: 72, cellStyle:{ 'text-align': 'center' } },
-            { field: "invoice_no", headerName: "송장번호", width: 120,
-                cellRenderer: (params) => `<a href="#" onClick="clickInvoiceNo(${params.data.stock_no})">${params.data.invoice_no}</a>`
-            },
-            { field: "area_type", headerName: "입고지역", width: 72, cellStyle:{ 'text-align': 'center' } },
-            { field: "stock_date", headerName: "입고일자", width: 72, cellStyle:{ 'text-align': 'center' } },
-            { field: "state_nm", headerName: "입고상태", width: 72, cellStyle:{ 'text-align': 'center' } },
-            { field: "com_nm", headerName: "공급업체", width: 110 },
-            { field: "item", headerName: "품목", width: 100 },
-            { field: "currency_unit", headerName: "화폐단위", width: 72, cellStyle:{ 'text-align': 'center' } },
-            { field: "exchange_rate", headerName: "환율", width: 80, cellStyle:{ 'text-align': 'right' }, type:'percentType' },
-            { field: "custom_amt", headerName: "신고금액", width: 90, cellStyle:{ 'text-align': 'right' }, type:'percentType' },
-            { field: "custom_tax", headerName: "통관비", width: 80, cellStyle:{ 'text-align': 'right' }, type:'currencyType' },
-            { field: "custom_tax_rate", headerName: "통관세율(%)", width: 90, cellStyle:{ 'text-align': 'right' }, type:'percentType' },
-            { field: "qty", headerName: "수량", width:72, type:'currencyType' },
-            { field: "total_cost", headerName: "총원가(원)", type:'currencyType' },
-            { field: "buy_order_qty", headerName: "발주 후 입고수", width: 120, type:'numberType', },
-            { field: "name", headerName: "입고자", width: 80, cellStyle:{ 'text-align': 'center' } },
-            { field: "rt", headerName: "최종수정일", width: 120, cellStyle:{ 'text-align': 'center' } }
->>>>>>> main
         ];
 
         const pApp = new App('', {
@@ -202,12 +175,6 @@
                 gx.gridOptions.columnApi.setColumnVisible('img',$("#img").is(":checked"));
             });
 
-<<<<<<< HEAD
-=======
-            document.search.com_nm.addEventListener('focus', (event) => {
-                document.querySelector('.sch-company').click();
-            });
->>>>>>> main
         });
 
         // logics

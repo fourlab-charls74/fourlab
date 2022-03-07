@@ -98,17 +98,10 @@ class goods extends Controller
 		$not_d_cat_cd = $req->input('not_d_cat_cd', '');
 		$style_nos = $req->input('style_nos', '');       // 스타일넘버 textarea
 		$goods_nos = $req->input('goods_nos', '');       // 상품번호 textarea
-<<<<<<< HEAD
         $sch_style_nos = $req->input('sch_style_nos', '');       // 스타일넘버 textarea
         $sch_goods_nos = $req->input('sch_goods_nos', '');       // 상품번호 textarea
 
 		if($sch_style_nos        != ""){
-=======
-		$sch_style_nos = $req->input('sch_style_nos', '');       // 스타일넘버 textarea
-        $sch_goods_nos = $req->input('sch_goods_nos', '');       // 상품번호 textarea
-
-		if($sch_style_nos != ""){
->>>>>>> main
             $style_no = $sch_style_nos;
         }
 		if($style_nos != ""){
