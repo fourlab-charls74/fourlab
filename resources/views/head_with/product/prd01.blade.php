@@ -353,7 +353,7 @@
         {field: "goods_memo", headerName: "메모", width: 200, editable: true, cellStyle: {"line-height": "40px", 'background' : '#ffff99'}},
         {field: "sale_price", headerName: "sale_price", hide: true},
         {field: "goods_type_cd", headerName: "goods_type", hide: true},
-        {field: "com_type_d", headerName: "com_type", hide: false},
+        {field: "com_type_d", headerName: "com_type", hide: true},
     ];
 
     const pApp = new App('', {

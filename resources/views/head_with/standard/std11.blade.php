@@ -47,12 +47,8 @@
                             <label for="">범위</label>
                             <div class="flax_box">
                                 <select name="dc_range" id="dc_range" class="form-control form-control-sm">
-<<<<<<< HEAD
                                     <!-- <option value="A">전체</option> -->
                                     <!-- <option value="G">상품</option> -->
-=======
-                                    {{-- <option value="A">전체</option> --}}
->>>>>>> main
                                     <option value="">상품</option>
                                 </select>
                             </div>

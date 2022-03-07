@@ -242,7 +242,8 @@ var columns = [
             }
         },
         {field:"use_yn",headerName:"사용여부", editable: true,},
-        {field:"qna_no", headerName:"qna_no", hide:true,}
+        {field:"qna_no", headerName:"qna_no", hide:true,},
+        {field:"", headerName:"", width:"auto"}
 ];
 
 </script>

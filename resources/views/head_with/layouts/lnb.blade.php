@@ -21,7 +21,7 @@
                     </li>
                     <li data-menu-kind="P" data-menu-id="std20" class="d-none"><a href="/head/standard/std20">템플릿</a></li>
                     <!-- <li data-menu-kind="P" data-menu-id="std51" class="d-none"><a href="/head/standard/std51">코드</a></li>  -->
-                    <li data-menu-kind="P" data-menu-id="std52" class="d-none"><a href="/head/standard/std52">테스트</a></li>
+                    <!--<li data-menu-kind="P" data-menu-id="std52" class="d-none"><a href="/head/standard/std52">테스트</a></li> //-->
                 </ul>
             </li>
             <li data-menu-kind="M" data-menu-id="stock" class="d-none">

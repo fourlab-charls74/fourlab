@@ -1618,7 +1618,7 @@
         }
 
         function pop_prd_page(){
-            url = "https://www.netpx.co.kr/app/product/detail/"+goods_no+"/"+goods_sub;
+            url = "{{config('shop.front_url')}}/app/product/detail/"+goods_no+"/"+goods_sub;
             window.open(url);
         }
 
