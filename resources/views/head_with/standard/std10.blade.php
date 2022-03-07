@@ -23,7 +23,7 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-lg-6 inner-td">
+                    <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="user_yn">유형</label>
                             <div class="flax_box">
@@ -36,7 +36,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-6 inner-td">
+                    <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="type">광고구분</label>
                             <div class="flax_box">
@@ -49,9 +49,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-6 inner-td">
+                    <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="name">광고명</label>
                             <div class="flax_box">
@@ -59,7 +57,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-6 inner-td">
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="state">상태</label>
                             <div class="flax_box">
