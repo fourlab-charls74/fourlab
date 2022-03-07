@@ -237,7 +237,8 @@
         {field:"total",headerName:"댓글수",width:80, },
         {field:"is_use",headerName:"사용여부", width:90 },
         {field:"regi_date",headerName:"등록일",},
-		{field:"idx", headerName:"idx", hide:true}
+		{field:"idx", headerName:"idx", hide:true},
+		{width:"auto"}
 	];
 
 	const pApp = new App('', { gridId: "#div-gd" });
@@ -347,7 +348,8 @@
         {field:"regi_date",headerName:"등록일", width:120, },
 		{field:"is_show",headerName:"출력여부", width:90},
 		{field:"award_level",headerName:"시상",},
-		{field:"idx", headerName:"idx", hide:true}
+		{field:"idx", headerName:"idx", hide:true},
+		{width:"auto"}
 	];
 
 	const pApp_comment = new App('', { gridId: "#div-gd2" });

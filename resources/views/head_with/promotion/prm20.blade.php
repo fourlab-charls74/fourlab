@@ -170,7 +170,7 @@
 		},
 		{field:"is_use" , headerName:"사용여부"},
 		{field:"ut" , headerName:"최근수정일시", width:130},
-		{headerName: "", field: "nvl"}
+		{width:"auto"}
 	];
 
 	const pApp = new App('', { gridId: "#div-gd" });

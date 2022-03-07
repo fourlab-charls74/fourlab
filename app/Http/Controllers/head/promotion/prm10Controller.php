@@ -712,15 +712,9 @@ class prm10Controller extends Controller
 		}
 
 		if( !empty($req->src) ) {
-<<<<<<< HEAD
-            //$path	= '/head/promotion/coupon/';
-            // $all['coupon_img']	= ULib::uploadBase64img($path, $req->src);
-            
-=======
 			//$path	= '/head/promotion/coupon/';
             // $all['coupon_img']	= ULib::uploadBase64img($path, $req->src);
 
->>>>>>> main
 			$path	= '/images/coupon_img';
             $src = $req->src;
 
