@@ -25,39 +25,6 @@
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group">
-<<<<<<< HEAD
-=======
-                                <label for="formrow-firstname-input">발주일자</label>
-                                <div class="form-inline">
-                                    <div class="docs-datepicker form-inline-inner input_box">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
-                                            <div class="input-group-append">
-                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-                                                <i class="fa fa-calendar" aria-hidden="true"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="docs-datepicker-container"></div>
-                                    </div>
-                                    <span class="text_line">~</span>
-                                    <div class="docs-datepicker form-inline-inner input_box">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
-                                            <div class="input-group-append">
-                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                                <i class="fa fa-calendar" aria-hidden="true"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="docs-datepicker-container"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
->>>>>>> main
                                 <label for="item">품목</label>
                                 <div class="flax_box">
                                     <select id="item" name="item" class="form-control form-control-sm">
@@ -78,11 +45,6 @@
                                 </div>
                             </div>
                         </div>
-<<<<<<< HEAD
-=======
-                    </div>
-                    <div class="row">
->>>>>>> main
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label for="">상품상태</label>
@@ -91,15 +53,11 @@
                                         <select name="goods_stat" class="form-control form-control-sm w-100">
                                             <option value=''>전체</option>
                                             @foreach ($goods_stats as $goods_stat)
-<<<<<<< HEAD
                                                 @if ($goods_stat->code_id == '40')
                                                 <option value='{{ $goods_stat->code_id }}' selected>{{ $goods_stat->code_val }}</option>
                                                 @else
                                                 <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
                                                 @endif
-=======
-                                                <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
->>>>>>> main
                                             @endforeach
                                         </select>
                                     </div>
@@ -123,11 +81,8 @@
                                 </div>
                             </div>
                         </div>
-<<<<<<< HEAD
                     </div>
                     <div class="row">
-=======
->>>>>>> main
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label for="style_no">스타일넘버</label>
@@ -144,11 +99,6 @@
                                 </div>
                             </div>
                         </div>
-<<<<<<< HEAD
-=======
-                    </div>
-                    <div class="row">
->>>>>>> main
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label for="name">업체</label>
@@ -157,37 +107,26 @@
                                         <select id="com_type" name="com_type" class="form-control form-control-sm w-100">
                                             <option value="">전체</option>
                                             @foreach ($com_types as $com_type)
-<<<<<<< HEAD
                                                 @if ($com_type->code_id == '1')
                                                 <option value="{{ $com_type->code_id }}" selected>{{ $com_type->code_val }}</option>
                                                 @else
                                                 <option value="{{ $com_type->code_id }}">{{ $com_type->code_val }}</option>
                                                 @endif
-=======
-                                                <option value="{{ $com_type->code_id }}">{{ $com_type->code_val }}</option>
->>>>>>> main
                                             @endforeach
                                         </select>
                                     </div>
                                     <div class="form-inline-inner input-box w-75">
                                         <div class="form-inline inline_btn_box">
                                             <input type="hidden" id="com_id" name="com_id">
-<<<<<<< HEAD
                                             <input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company search-enter" style="width:100%;">
-=======
-                                            <input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company" style="width:100%;">
->>>>>>> main
                                             <a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-<<<<<<< HEAD
                     </div>
                     <div class="row">
-=======
->>>>>>> main
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label for="f_sqty">판매수량</label>
@@ -200,11 +139,7 @@
                                         </select>
                                     </div>
                                     <div class="form-inline-inner input-box w-25">
-<<<<<<< HEAD
                                         <input type='text' class="form-control form-control-sm search-all search-enter" name='formula_val' id='formula_val' value='' style="width:100%;">
-=======
-                                        <input type='text' class="form-control form-control-sm search-all" name='formula_val' id='formula_val' value='' style="width:100%;">
->>>>>>> main
                                     </div>
                                 </div>
                             </div>
@@ -282,23 +217,15 @@
     <script type="text/javascript" charset="utf-8">
         // ag-grid set field
 
-<<<<<<< HEAD
         const YELLOW = { backgroundColor: '#ffff99' };
 
         var columns= [
             {field:"chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, sort: null, pinned:'left'},
-            {field:"com_nm",headerName:"업체",pinned:'left',width:170},
-            {field:"opt_kind_nm" ,headerName:"품목",pinned:'left',width:100},
-            {field:"brand_nm" ,headerName:"브랜드",pinned:'left',width:150},
-=======
-        var columns= [
-            {field:"chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, sort: null, pinned:'left'},
-            {field:"com_nm",headerName:"업체",pinned:'left',width:100},
-            {field:"opt_kind_nm" ,headerName:"품목",pinned:'left',width:100},
-            {field:"brand_nm" ,headerName:"브랜드",pinned:'left',width:100},
->>>>>>> main
+            {field:"com_nm",headerName:"업체",pinned:'left',width:120},
+            {field:"opt_kind_nm" ,headerName:"품목",pinned:'left',width:84},
+            {field:"brand_nm" ,headerName:"브랜드",pinned:'left',width:84},
             {field:"style_no" ,headerName:"스타일넘버",pinned:'left',width:130},
-            {field:"org_nm" ,headerName:"원산지",pinned:'left',width:100},            
+            {field:"org_nm" ,headerName:"원산지",pinned:'left',width:72},            
             // {field:"img" , headerName:"이미지",
             //     cellRenderer: function(params) {
             //         if (params.value !== undefined && params.data.img != "") {
@@ -308,73 +235,49 @@
             // },
             {headerName:"상품코드",
                 children: [
-                    {headerName: "번호", field: "goods_no", width: 80, pinned:'left', cellStyle:{'text-align': 'right'}},
-                    {headerName: "보조", field: "goods_sub", width: 80, pinned:'left', cellStyle:{'text-align': 'center'}}
+                    {headerName: "번호", field: "goods_no", width: 60, pinned:'left', cellStyle:{'text-align': 'right'}},
+                    {headerName: "보조", field: "goods_sub", width: 60, pinned:'left', cellStyle:{'text-align': 'center'}}
                 ]
             },
             {field:"goods_nm" , headerName:"상품명", type:"HeadGoodsNameType", width:220, pinned:'left'},
-            {field:"sale_stat_cl" ,headerName:"상태",width:100,cellStyle:StyleGoodsState, pinned:'left'},
+            {field:"sale_stat_cl" ,headerName:"상태",width:72,cellStyle:StyleGoodsState, pinned:'left'},
             {field:"goods_opt" ,headerName:"옵션",width:100,
                 cellRenderer: function(params) {
                         return '<p>' + params.value + '</p>';
                 }
             },
-            {field:"wqty",headerName:"현재고",type:'numberType'},
+            {field:"wqty",headerName:"현재고", width:60, type:'numberType'},
             {headerName:"발주",
                 children: [
-<<<<<<< HEAD
-                    {headerName: "예상수량", field: "exp_buy_qty", width: 80, cellStyle:{'text-align': 'right'},
+                    {headerName: "예상수량", field: "exp_buy_qty", width: 72, cellStyle:{'text-align': 'right'},
                         valueFormatter: (params) => Math.ceil(params.value)
                     },
-                    {headerName: "수량", field: "qty", width: 80, cellStyle:{'text-align': 'right'}, editable: true,
+                    {headerName: "수량", field: "qty", width: 60, cellStyle:{'text-align': 'right'}, editable: true,
                         type:'currencyType', cellStyle: (params) => params.colDef.editable == true ? YELLOW : null
                     },
-                    {headerName: "단가", field: "buy_unit_cost", width: 100, type:'currencyType', editable: true,
+                    {headerName: "단가", field: "buy_unit_cost", width: 60, type:'currencyType', editable: true,
                         cellStyle: (params) => params.colDef.editable == true ? YELLOW : null
                     },
-=======
-                    {headerName: "수량", field: "qty", width: 80, cellStyle:{'text-align': 'right'}},
-                    {headerName: "단가", field: "buy_unit_cost", width: 100, type:'currencyType'},
->>>>>>> main
-                    {headerName: "금액", field: "buy_cost", width: 100, type:'currencyType'}
+                    {headerName: "금액", field: "buy_cost", width: 60, type:'currencyType'}
                 ], pinned: 'left'
             },
             {headerName:"판매",
                 children: [
-                    {headerName: "{{$month1}} 월", field: "sale_qty1",type:'currencyType'},
-                    {headerName: "{{$month2}} 월", field: "sale_qty2",type:'currencyType'},
-                    {headerName: "{{$month3}} 월", field: "sale_qty3",type:'currencyType'},
-                    {headerName: "최근30일", field: "sale_qty",type:'currencyType'},
-<<<<<<< HEAD
-                    {headerName: "일평균판매수", field: "avg_qty", type:'percentType'},
-                    {field:"expect_day",headerName:"소진예상일",cellStyle:{"color": "red", "text-align": "right"}},
-=======
-                    {headerName: "일평균판매수", field: "avg_qty",type:'currencyType'},
-                    {field:"expect_day",headerName:"소진예상일",type:'percentType',cellStyle:{"color": "red"}},
->>>>>>> main
+                    {headerName: "{{$month1}} 월", field: "sale_qty1", width:60,type:'currencyType'},
+                    {headerName: "{{$month2}} 월", field: "sale_qty2", width:60,type:'currencyType'},
+                    {headerName: "{{$month3}} 월", field: "sale_qty3", width:60,type:'currencyType'},
+                    {headerName: "최근30일", field: "sale_qty", width:84,type:'currencyType'},
+                    {headerName: "일평균판매수", field: "avg_qty", width:96, type:'percentType'},
+                    {field:"expect_day",headerName:"소진예상일", width:84,cellStyle:{"color": "red", "text-align": "right"}},
                 ]
             },
-            {field:"max_wonga",headerName:"최대원가",type:'currencyType'},
-            {field:"avg_wonga",headerName:"평균원가",type:'currencyType'},
-            {field:"tot_wonga",headerName:"총원가",type:'currencyType'},
-<<<<<<< HEAD
-            {field:"last_input_date",headerName:"최종입고일자", cellStyle:{"text-align": "center"}},
-            {field:"price",headerName:"현재판매가",type:'currencyType'},
-            {field:"margin_amt",headerName:"마진",type:'currencyType'},
-            {field:"margin_rate",headerName:"마진율(%)",type:'percentType'},
-=======
-            {field:"last_input_date",headerName:"최종입고일자"},
-            {field:"price",headerName:"현재판매가",type:'currencyType'},
-            {field:"margin_amt",headerName:"마진",type:'percentType'},
-            {field:"margin_rate",headerName:"마진율(%)",type:'percentType'},
-            {headerName:"테스트등급", // 16
-                children: [
-                    {field:"group_16_price",headerName:"판매가",type:'currencyType'},
-                    {field:"group_16_ratio",headerName:"마진율(0%)",type:'percentType'},
-                    {field:"group_16_dc_ratio",headerName:"할인율",type:'percentType'},
-                ]
-            },
->>>>>>> main
+            {field:"max_wonga",headerName:"최대원가", width:72,type:'currencyType'},
+            {field:"avg_wonga",headerName:"평균원가", width:72,type:'currencyType'},
+            {field:"tot_wonga",headerName:"총원가", width:60,type:'currencyType'},
+            {field:"last_input_date",headerName:"최종입고일자", width:96, cellStyle:{"text-align": "center"}},
+            {field:"price",headerName:"현재판매가", width:84,type:'currencyType'},
+            {field:"margin_amt",headerName:"마진", width:60,type:'currencyType'},
+            {field:"margin_rate",headerName:"마진율(%)", width:84,type:'percentType'},
             {headerName:"A 등급 회원 (원가 + 14%마진)", // 5
                 children: [
                     {field:"group_5_price",headerName:"판매가",type:'currencyType'},
@@ -409,13 +312,9 @@
             pApp.ResizeGrid(275);
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
-<<<<<<< HEAD
             let options = {
                 onCellValueChanged: params => evtAfterEdit(params),
             };
-=======
-            let options = {};
->>>>>>> main
             gx = new HDGrid(gridDiv, columns,options);
             Search();
 
@@ -423,7 +322,6 @@
                 gx.gridOptions.columnApi.setColumnVisible('img',$("#img").is(":checked"));
             });
 
-<<<<<<< HEAD
         });
 
         const evtAfterEdit = (params) => { // edit 가능한 셀 수정시 계산하고 고정 row를 업데이트합니다.
@@ -435,11 +333,6 @@
                 };
             }
         };
-=======
-            // select값 초기화시켜주기
-
-        });
->>>>>>> main
         
         const strNumToPrice = (price) => {
             return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -481,16 +374,10 @@
                         method: 'post',
                         data: { data : data_string }
                     }).then((response) => {
-<<<<<<< HEAD
                         console.log(response);
                         if (response.status == 201) {
                             window.opener.Search();
                             window.close();
-=======
-                        if (response.status == 201) {
-                            window.close();
-                            window.opener.Search();
->>>>>>> main
                         }
                     }).catch((error) => {
                         console.log(error);
@@ -499,44 +386,6 @@
             };
         };
 
-<<<<<<< HEAD
-=======
-        const update = () => {
-            let arr, state;
-            let buy_ord_prd_nos = [];
-            const select = document.querySelector('#change_buy_order_state');
-            if (select.value) {
-                state = select.value
-            } else {
-                alert('발주상태를 선택 해 주십시오.')
-                return false;
-            };
-            if (confirm('발주 상태를 변경하시겠습니까?')) {
-                arr = gx.getSelectedRows();
-                if (Array.isArray(arr) && !(arr.length > 0)) {
-                    alert('항목을 선택 해 주십시오.')
-                    select.focus();
-                    return false;
-                } else {
-                    arr.map((obj, idx) => {
-                        obj.hasOwnProperty('buy_ord_prd_no')
-                            ? buy_ord_prd_nos[idx] = obj.buy_ord_prd_no
-                            : "";
-                    });
-                    axios({
-                        url: '/head/stock/stk10/update',
-                        method: 'put',
-                        data: { state : state, buy_ord_prd_nos : buy_ord_prd_nos }
-                    }).then((response) => {
-                        if (response.status == 200) Search();
-                    }).catch((error) => {
-                        console.log(error.response.data);
-                    });
-                };
-            };
-        };
-
->>>>>>> main
     </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>

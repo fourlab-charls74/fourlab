@@ -34,10 +34,6 @@ class stk10Controller extends Controller
     }
 
     public function search(Request $request) {
-<<<<<<< HEAD
-
-=======
->>>>>>> main
 		/**
 		 * 설정값 얻기
 		 */
@@ -61,15 +57,9 @@ class stk10Controller extends Controller
 		$brand_nm = $request->input("brand_nm");
 		$brand_cd = $request->input("brand_cd");
 		$com_type = $request->input("com_type");
-<<<<<<< HEAD
 		$com_id = $request->input("com_cd");
 		
 		$style_no = $request->input("style_no");
-=======
-		$com_id = $request->input("com_id");
-		$style_no = $request->input("style_no");
-		$style_nos = $request->input("style_nos");
->>>>>>> main
 		$goods_stat = $request->input("goods_stat");
 		$ex_trash = $request->input("ex_trash");
 		$ex_soldout = $request->input("ex_soldout");
@@ -108,13 +98,6 @@ class stk10Controller extends Controller
 			$where_p .= " and g.sale_stat_cl = '$goods_stat'";
 		}
 
-<<<<<<< HEAD
-=======
-        if( $style_nos != "" ) {
-			$style_no = $style_nos;
-		}
-
->>>>>>> main
 		$style_no = preg_replace("/\s/",",",$style_no);
 		$style_no = preg_replace("/,,/",",",$style_no);
 		$style_no = preg_replace("/\t/",",",$style_no);
@@ -137,12 +120,8 @@ class stk10Controller extends Controller
 					$where_p .= " and g.style_no in ( $in_style_nos ) ";
 				}
 			} else {
-<<<<<<< HEAD
 				$where_a .= " and g.style_no like '${style_no}%' ";
 				$where_p .= " and g.style_no like '${style_no}%' ";
-=======
-				$where_p .= " and g.style_no like '$style_no%' ";
->>>>>>> main
 			}
 		}
 
@@ -158,11 +137,7 @@ class stk10Controller extends Controller
 		if( $brand_cd != "" ){
 			$where_a .= " and g.brand = '$brand_cd' ";
 			$where_p .= " and g.brand = '$brand_cd' ";
-<<<<<<< HEAD
 		} else if ($brand_cd == "" && $brand_nm != "") {
-=======
-		} else if ($brand_cd == "" && $brand_nm != ""){
->>>>>>> main
 			$where_a .= " and g.brand ='$brand_cd'";
 			$where_p .= " and g.brand ='$brand_cd'";
 		}
@@ -208,11 +183,7 @@ class stk10Controller extends Controller
 		} else if($ord_field == "now_qty"){
 			$orderby = " order by a.qty $ord ";
 		} else if($ord_field == "goods_no"){
-<<<<<<< HEAD
 			$orderby = " order by goods_no $ord,goods_opt ";
-=======
-			$orderby = " order by p.goods_no $ord,goods_opt ";
->>>>>>> main
 		} else if($ord_field == "expect_day"){
 			$orderby = " order by expect_day $ord ";
 		} else {
@@ -379,17 +350,10 @@ class stk10Controller extends Controller
 		$status = 200;
 		if(count($buy_ord_prd_nos) > 0){
 			try {
-<<<<<<< HEAD
 				DB::beginTransaction();
 				for($i=0;$i<count($buy_ord_prd_nos);$i++){
 					$buy_ord_prd_no = trim($buy_ord_prd_nos[$i]);
 					if($buy_ord_prd_no > 0){
-=======
-				for($i=0;$i<count($buy_ord_prd_nos);$i++){
-					$buy_ord_prd_no = trim($buy_ord_prd_nos[$i]);
-					if($buy_ord_prd_no > 0){
-						DB::beginTransaction();
->>>>>>> main
 						$sql = "
 							delete from buy_order_product where buy_ord_prd_no = :buy_ord_prd_no and state < 30
 						";
@@ -442,11 +406,7 @@ class stk10Controller extends Controller
 		/**
 		 * inputs
 		 */
-<<<<<<< HEAD
 		$opt_kind_cd = $request->input("item");
-=======
-		$opt_kind_cd = $request->input("opt_kind_cd");
->>>>>>> main
 		$brand_nm = $request->input("brand_nm");
 		$brand_cd = $request->input("brand_cd");
 		$com_type = $request->input("com_type");
@@ -459,11 +419,7 @@ class stk10Controller extends Controller
 		$goods_nm = $request->input("goods_nm");
 		$formula_type = $request->input("formula_type");
 		$formula_val = $request->input("formula_val");
-<<<<<<< HEAD
 		$apply_avg_wonga = $request->input("apply_avg_wonga");
-=======
-		$buy_unit_cost = $request->input("buy_unit_cost");
->>>>>>> main
         $ord_field = $request->input("ord_field");
 		$ord = $request->input("ord");
 		$limit = $request->input("limit");
@@ -634,11 +590,7 @@ class stk10Controller extends Controller
 					d.wqty,
 					( d.sale_qty1 + d.sale_qty2 + d.sale_qty3 ) / 3 - ifnull(d.wqty,0) as exp_buy_qty,
 					0 as qty,
-<<<<<<< HEAD
 					if('$apply_avg_wonga' = 'Y',avg_wonga,0) as buy_unit_cost,
-=======
-					if('$buy_unit_cost' = 'Y',avg_wonga,0) as buy_unit_cost,
->>>>>>> main
 					0 as buy_cost,
 					d.sale_qty1,d.sale_qty2,d.sale_qty3,d.sale_qty,
 					round(d.sale_qty/30,2) as avg_qty,
