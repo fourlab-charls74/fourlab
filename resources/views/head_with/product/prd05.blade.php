@@ -196,20 +196,11 @@
 						</div>
 					</div>
 				</div>
-<<<<<<< HEAD
 				<div class="row code_color_row" style="display: none;">
 					<div class="col-lg-12 inner-td">
 						<div class="form-group">
 							<label for="">입력 가능한 색상</label>
 							<div class="flax_box">
-=======
-
-                <div class="row code_color_row" style="display: none;">
-                    <div class="col-lg-12 inner-td">
-                        <div class="form-group">
-                            <label for="">입력 가능한 색상</label>
-                            <div class="flax_box">
->>>>>>> main
                                 <div class="h5 mb-0 text-gray-800 text-xs">
                                     <p class="color_title">
                                         @for ($i=0; $i < count($product_colors); $i++ ) @if( $i> 0 )
@@ -221,18 +212,10 @@
                                     </p>
                                     <b class="guide">* 색상을 여러개 입력할 경우 위의 예처럼 콤마(,)를 사용하여 색상을 등록합니다. </b>
                                 </div>
-<<<<<<< HEAD
 							</div>
 						</div>
 					</div>
 				</div>
-=======
-                            </div>
-						</div>
-					</div>
-				</div>
-
->>>>>>> main
 				<div class="row code_item_row" style="display: none;">
 					<div class="col-lg-12 inner-td">
 						<div class="form-group">
@@ -403,7 +386,7 @@
             pinned: 'left',
             headerCheckboxSelection: true,
             checkboxSelection: true,
-            width: 40,
+            width: 28,
             cellStyle: {"background":"#F5F7F7"}
         },
         {
@@ -449,6 +432,7 @@
         {
             field: "img",
             headerName: "이미지",
+            width:46,
             cellRenderer: function(params) {
                 if (params.value !== undefined && params.data.img != "") {
                     return '<img src="{{config('shop.image_svr')}}/' + params.data.img + '" style="height:30px;"/>';
@@ -583,16 +567,11 @@
     $(document).ready(function() {
         pApp.ResizeGrid(275);
         let gridDiv = document.querySelector(pApp.options.gridId);
-<<<<<<< HEAD
         let styleObj = getDeleteCellColumnObject();
         // style['suppressColumnVirtualisation'] = true;
         // style['skipHeaderOnAutoSize'] = true;
         let options = cloneObject(styleObj);
         gx = new HDGrid(gridDiv, columns, options);
-=======
-        let style = getDeleteCellColumnObject();
-        gx = new HDGrid(gridDiv, columns, style);
->>>>>>> main
         Search(1);
 
         $("select[name='class']").on("change", function() {
@@ -731,12 +710,7 @@
                 headerCheckboxSelection: true,
                 checkboxSelection: true,
                 lockPosition: true,
-<<<<<<< HEAD
-                width: 50,
-=======
-                width: 40,
-                cellStyle: {"background":"#F5F7F7"}
->>>>>>> main
+                width: 28,
             },
             {
                 headerName: '#',
@@ -770,11 +744,7 @@
             {
                 field: "brand_nm",
                 headerName: "브랜드",
-<<<<<<< HEAD
                 minWidth: 100,
-=======
-                minWidth: 100
->>>>>>> main
             },
             {
                 field: "style_no",
@@ -789,11 +759,12 @@
             {
                 field: "img",
                 headerName: "이미지",
+                minWidth:46,
                 cellRenderer: function(params) {
                     if (params.value !== undefined && params.data.img != "") {
                         return '<img src="{{config('shop.image_svr')}}/' + params.data.img + '"/>';
                     }
-                }
+                },
             },
             {
                 field: "goods_nm",
@@ -826,11 +797,7 @@
                 field: "class",
                 headerName: "분류",
                 minWidth: 100,
-<<<<<<< HEAD
             },
-=======
-            }
->>>>>>> main
         ];
         option_key = ['goods_type', 'com_nm', 'opt_kind_nm', 'brand_nm', 'style_no', 'img', 'goods_nm', 'sale_stat_cl', 'goods_no', 'goods_sub', 'class'];
         const basic_keys = option_key;
@@ -879,11 +846,7 @@
                     state: [setCol_style]
                 });
                 gx.gridOptions.columnApi.autoSizeColumns(basic_keys, false);
-<<<<<<< HEAD
                 
-=======
-
->>>>>>> main
                 onPrintColumns();
 
                 //var res = IsJsonString(data);
@@ -899,10 +862,6 @@
                         $(".code_color_row").css("display", "flex");
                         $(".code_item_row").css("display", "flex");
                         $(".code_excel_row").css("display", "flex");
-<<<<<<< HEAD
-
-=======
->>>>>>> main
                         let html = '';
                         for(let i = 0; i < data.code_items.length; i++) {
                             let item = data.code_items[i];
@@ -913,10 +872,6 @@
                                 </div>
                             `;
                         }
-<<<<<<< HEAD
-
-=======
->>>>>>> main
                         $("#code_item").html(html);
                     } else {
                         $(".code_color_row").css("display", "none");
@@ -924,10 +879,6 @@
                         $(".code_excel_row").css("display", "none");
                     }
                 }
-<<<<<<< HEAD
-
-=======
->>>>>>> main
                 let omission_column = $.map( $("[name='omission_column']"), function( n ) { return n.checked ? n.defaultValue : ''; }).join(",");
                 let d = $('form[name="search"]').serialize() + '&omission_column=' + omission_column;
                 gx.Request('/head/product/prd05/search', d, _page);
@@ -1028,10 +979,6 @@
             url: '/head/product/prd05/update',
             data: frm.serialize() + '&class=' + class_code,
             success: function(data) {
-<<<<<<< HEAD
-=======
-                // console.log(data);
->>>>>>> main
                 alert('변경 내용이 저장되었습니다.');
                 Search(1);
             },
