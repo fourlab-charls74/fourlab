@@ -24,11 +24,7 @@
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="">상품구분</label>
-<<<<<<< HEAD
                                 <div class="flex_box">
-=======
-                                <div class="flax_box">
->>>>>>> main
                                     <select name='goods_type' class="form-control form-control-sm">
                                         <option value=''>전체</option>
                                         @foreach ($goods_types as $goods_type)
@@ -38,7 +34,6 @@
                                 </div>
                             </div>
                         </div>
-<<<<<<< HEAD
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="">상품상태</label>
@@ -47,16 +42,6 @@
                                         <option value=''>전체</option>
                                         @foreach ($goods_stats as $goods_stat)
                                             <option value='{{ $goods_stat->code_id }}' @if( $goods_stat->code_id == $default_goods_stat) selected @endif>{{ $goods_stat->code_val }}</option>
-=======
-						<div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="">상품상태</label>
-                                <div class="flax_box">
-                                    <select name='goods_stat' class="form-control form-control-sm">
-                                        <option value=''>전체</option>
-                                        @foreach ($goods_stats as $goods_stat)
-                                            <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
->>>>>>> main
                                         @endforeach
                                     </select>
                                 </div>
@@ -93,11 +78,7 @@
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label>상단홍보글</label>
-<<<<<<< HEAD
                                 <div class="flex_box">
-=======
-                                <div class="flax_box">
->>>>>>> main
                                     <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='head_desc' value=''>
                                 </div>
                             </div>
@@ -105,11 +86,7 @@
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="name">상품명</label>
-<<<<<<< HEAD
                                 <div class="flex_box">
-=======
-                                <div class="flax_box">
->>>>>>> main
                                     <input type="text" class="form-control form-control-sm ac-goods-nm search-enter" name="goods_nm" value="">
                                 </div>
                             </div>
@@ -224,17 +201,9 @@
         // ag-grid
 
         var columns= [
-<<<<<<< HEAD
                 {field:"chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
                 {field:"goods_no", headerName:"상품번호", width:72, cellStyle: {textAlign:"center"}, pinned:'left'},
                 {field:"goods_type_nm", headerName:"상품구분", width:72, 
-=======
-                {field:"chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null
-					, cellStyle: {"background":"#F5F7F7"}
-				},
-                {field:"goods_no", headerName:"상품번호", width:72, cellStyle: {textAlign:"center"}, pinned:'left'},
-                {field:"goods_type_nm", headerName:"상품구분", width:72,
->>>>>>> main
                     cellStyle: function (params) {
                         var state = {
                             "위탁판매":"#F90000",
@@ -247,23 +216,11 @@
                                     color: state[params.value],
                                     textAlign: 'center'
                                 }
-<<<<<<< HEAD
                             }
                         }
                     }, 
                 pinned:'left'},
                 {field:"opt_kind_nm" , headerName:"품목", width:118, pinned:'left'},
-=======
-                            }else{
-                                return {
-                                    textAlign: 'center'
-                                }
-							}
-                        }
-                    }, 
-                pinned:'left'},
-                {field:"opt_kind_nm" , headerName:"품목", width:120, pinned:'left'},
->>>>>>> main
                 {field:"brand_nm" , headerName:"브랜드", pinned:'left'},
                 {field:"style_no" , headerName:"스타일넘버", width:150, pinned:'left'},
                 {field:"head_desc", headerName:"상단홍보글", width:200},
@@ -273,24 +230,14 @@
                             return '<img src="{{config('shop.image_svr')}}/' + params.data.goods_img + '" style="height:30px;"/>';
                         }
                     },
-<<<<<<< HEAD
                     type: 'GoodsImageType', 
-=======
-                    type: 'GoodsImageType', cellStyle: {"text-align": "center"}
->>>>>>> main
                 },
                 {field:"goods_nm", headerName:"상품명", width:320, type:'HeadGoodsNameType'},
                 {field:"sale_stat_cl_val", headerName: "상품상태", width: 72, type:'GoodsStateType'},
                 {field:"goods_opt", headerName: "옵션", width: 150},
-<<<<<<< HEAD
                 {field:"good_qty",headerName:"온라인재고", width:84, type:'numberType'},
                 {field:"wqty", headerName: "보유재고수", width:84, type:'numberType'},
                 {field:"restock_cnt" ,headerName:"재입고요청", width:84, type:'numberType',
-=======
-                {field:"good_qty",headerName:"온라인재고", type:'numberType'},
-                {field:"wqty", headerName: "보유재고수", type:'numberType'},
-                {field:"restock_cnt" ,headerName:"재입고요청", type:'numberType',
->>>>>>> main
                     cellRenderer: function(params) {
                         if (params.value !== undefined && params.data.goods_no !== undefined) {
                             var a = document.createElement('a');
@@ -306,11 +253,7 @@
                         }
                     }
                 },
-<<<<<<< HEAD
                 {field:"restock_ncnt" ,headerName:"미알림요청수", width:96, type:'numberType',
-=======
-                {field:"restock_ncnt" ,headerName:"미알림요청수", type:'numberType',
->>>>>>> main
                     cellRenderer: function(params) {
                         if (params.value !== undefined && params.data.goods_no !== undefined) {
                             var a = document.createElement('a');
@@ -326,15 +269,9 @@
                         }
                     }
                 },
-<<<<<<< HEAD
                 {field:"goods_sh",headerName:"시중가격", width:84, type:'currencyType'},
                 {field:"price" , headerName:"판매가", width:72, type: 'currencyType'},
                 {field:"restock_ut" ,headerName:"최근요청일시", width:120},
-=======
-                {field:"goods_sh",headerName:"시중가격", type:'currencyType'},
-                {field:"price" , headerName:"판매가", type: 'currencyType'},
-                {field:"restock_ut" ,headerName:"최근요청일시"},
->>>>>>> main
             ];
     
         const pApp = new App('',{
@@ -408,11 +345,7 @@
                         return false;
                 };
                 var width = 1000;
-<<<<<<< HEAD
-		        var height = 1000;
-=======
 		        var height = 800;
->>>>>>> main
 		        var pop = window.open(url,"_blank","toolbar=no,scrollbars=no,resizable=yes,status=yes,top=100,left=100,width="+width+",height="+height);
             }
         };

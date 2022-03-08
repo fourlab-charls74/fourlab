@@ -31,18 +31,11 @@
 				</div>
 				<div class="card-body">
 					<div class="row">
-<<<<<<< HEAD
-                        <div class="col-lg-4 inner-td">
-							<div class="form-group">
-								<label for="state_check">알림여부</label>
-								<div class="form-inline inline_btn_box">
-=======
                         <div class="col-lg-6 inner-td">
 							<div class="form-group">
 								<label for="state_check">알림여부</label>
-                                <div class="flax_box">
->>>>>>> main
-                                    <select id="state_check" name="state" class="form-control form-control-sm" style="min-width: 100px;">
+								<div class="flex_box">
+                                    <select id="state_check" name="state" class="form-control form-control-sm">
                                         <option value="">전체</option>
                                         <option value="Y">Y</option>
                                         <option value="N">N</option>
@@ -50,21 +43,11 @@
                                 </div>
 							</div>   
 						</div>
-<<<<<<< HEAD
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="user_id">아이디</label>
-                                <div class="flax_box">
-                                    <div class="form-inline-inner input_box">
-                                        <input id="user_id" type="text" class="form-control form-control-sm search-all search-enter" name="user_id" value="">
-                                    </div>
-=======
                         <div class="col-lg-6 inner-td">
                             <div class="form-group">
                                 <label for="user_id">아이디</label>
-                                <div class="flax_box">
+                                <div class="flex_box">
 									<input id="user_id" type="text" class="form-control form-control-sm search-all search-enter" name="user_id" value="">
->>>>>>> main
                                 </div>
                             </div>
                         </div>
@@ -134,11 +117,7 @@
 		var select_box = document.querySelector('#state_check');
 		var state_check = "<?=$state?>";
 		select_box.value = (state_check == "N") ? "N" : "";
-<<<<<<< HEAD
-		pApp.ResizeGrid(275);
-=======
-		pApp.ResizeGrid(205);
->>>>>>> main
+		pApp.ResizeGrid(200);
         pApp.BindSearchEnter();
 		Search();
 	});
@@ -165,11 +144,7 @@
 		if (confirm("SMS을 발송하시겠습니까?")){
             var arr = gx.getSelectedRows();
                 if (Array.isArray(arr) && !(arr.length > 0)) {
-<<<<<<< HEAD
                     alert('항목을 선택 해 주십시오.')
-=======
-                    alert('항목을 선택 해 주십시오.') 
->>>>>>> main
                     return false;
                 } else {
 					var data = "";

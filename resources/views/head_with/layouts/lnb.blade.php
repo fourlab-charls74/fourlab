@@ -35,7 +35,7 @@
                     <li><a href="/head/stock/stk02">재고현황</a></li>
                     <li><a href="/head/stock/stk06">재고일괄처리-실사</a></li>
                     //-->
-                    {{-- <li data-menu-kind="M" data-menu-id="stk30" class="d-none depth2">
+                    <li data-menu-kind="M" data-menu-id="stk30" class="d-none depth2">
                         <a href="javascript:;" class="arrow"><span>XMD</span></a>
                         <ul>
                             <li><a href="/head/stock/stk30">상품매칭</a></li>
@@ -45,11 +45,10 @@
                             <li><a href="/head/stock/stk34">재고 등록 오류 관리</a></li>
                             <li><a href="/head/stock/stk35">재고 비교 모니터링</a></li>
                         </ul>
-                    </li> --}}
+                    </li>
                     
                     <!-- <li data-menu-kind="P" data-menu-id="stk03" class="d-none"><a href="/head/stock/stk03">입출고현황</a></li>
                     <li><a href="/head/stock/stk04">입출고내역</a></li> -->
-                    <li><a href="/head/stock/stk06">재고입고알림</a></li>
                     
                     <li data-menu-kind="P" data-menu-id="stk20" class="d-none"><a href="/head/stock/stk20">상품별 판매율</a></li>
                 </ul>
