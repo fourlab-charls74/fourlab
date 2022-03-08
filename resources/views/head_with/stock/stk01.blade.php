@@ -230,19 +230,11 @@
                 {field:"opt_kind_nm" ,headerName:"품목", width:118, pinned:'left'},
                 {field:"brand_nm" ,headerName:"브랜드", width:118, pinned:'left' },
                 {field:"style_no" ,headerName:"스타일넘버",pinned:'left' },
-<<<<<<< HEAD
                 {field:"goods_type_nm",headerName:"상품구분",pinned:'left',width:72,cellStyle:StyleGoodsType},
                 {field:"is_unlimited_nm",headerName:"재고구분",pinned:'left',width:72},
                 {field:"goods_no" ,headerName:"상품코드",pinned:'left',width:72},
-                {field:"goods_nm" ,headerName:"상품명",pinned:'left', type:"HeadGoodsNameType", width:400},
+                {field:"goods_nm" ,headerName:"상품명",pinned:'left', type:"HeadGoodsNameType", width:360},
                 {field:"sale_stat_cl_nm" ,headerName:"상태",width:84,cellStyle:StyleGoodsState},
-=======
-                {field:"goods_type_nm",headerName:"상품구분",pinned:'left',width:72,cellStyle:StyleGoodsTypeNM},
-                {field:"is_unlimited_nm",headerName:"재고구분",pinned:'left',width:72},
-                {field:"goods_no" ,headerName:"상품코드",pinned:'left',width:100},
-                {field:"goods_nm" ,headerName:"상품명",pinned:'left', type:"HeadGoodsNameType", width:400},
-                {field:"sale_stat_cl_nm" ,headerName:"상태",width:72,cellStyle:StyleGoodsState},
->>>>>>> main
                 {field:"wonga" ,headerName:"원가", type: 'currencyType'},
                 {field:"goods_opt" ,headerName:"옵션",width:200,
                     checkboxSelection:function(params){ return (params.data !== undefined && params.data.is_unlimited != 'Y')? true:false; },
