@@ -763,6 +763,7 @@
         {field:"brand_nm", headerName:"브랜드", width:100},
         {field:"goods_nm", headerName:"상품명", type:"HeadGoodsNameType"},
         {field:"sale_stat_cl", headerName:"상품상태", type:'GoodsStateType'},
+        { width:"auto" }
     ];
 
     const columns2 = [
@@ -774,7 +775,8 @@
         },
         {field:"com_nm", headerName:"업체명", width: 150},
         {field:"com_rat", headerName:"업체정산(%)", cellStyle: { 'text-align' : 'right' }},
-        {field:"ut", headerName:"최종수정일시", width:140}
+        {field:"ut", headerName:"최종수정일시", width:140},
+        { width:"auto" }
     ];
 
     const pApp1 = new App('', {gridId: "#grid-gd1"});

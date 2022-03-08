@@ -106,6 +106,7 @@ var columns = [
     {field:"name" , headerName:"사용자"},
     {field:"use_cnt", headerName:"사용횟수"},
     {field:"use_date", headerName:"최종사용일"},
+    { width:"auto" }
 ];
 
 const pApp = new App('', {gridId: "#div-gd"});

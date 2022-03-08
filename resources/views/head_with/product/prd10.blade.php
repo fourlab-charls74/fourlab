@@ -468,7 +468,6 @@
             hide: true
         },
         {
-<<<<<<< HEAD
             field: "reg_dm",
             headerName: "등록일시",
             cellStyle: { "text-align": "center" },
@@ -478,26 +477,6 @@
                 return render;
             },
             width: 150
-=======
-            field: "qty",
-            headerName: "재고수",
-            width:60,
-            type: 'numberType',
-            cellStyle:{'line-height':'40px'}
-        },
-        {
-            field: "wqty",
-            headerName: "보유재고수",
-            width:84,
-            type: 'numberType',
-            cellStyle:{'line-height':'40px'}
-        },
-        {
-            field: "reg_dm",
-            headerName: "등록일시",
-            width:120,
-            cellStyle:{'line-height':'40px'}
->>>>>>> main
         },
         {
             field: "new_product_day",
@@ -531,12 +510,8 @@
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
         gx2 = new HDGrid(gridDiv2, columns_list, {
             rowDragManaged: true,
-<<<<<<< HEAD
             enableMultiRowDragging: true, // 버젼이슈 문제 - rowDragMultiRow true하니깐 작동 x 이거로 사용하면 작동함
             rowSelection: 'multiple',
-=======
-            rowDragMultiRow: true,
->>>>>>> main
             animateRows: true,
         });
     });

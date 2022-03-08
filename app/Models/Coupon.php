@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Components\Lib;
 use Illuminate\Support\Facades\DB;
+use Exception;
 
 class Coupon
 {
@@ -39,13 +40,8 @@ class Coupon
 				'use_fr_date'		=> $data['use_fr_date'],
 				'use_to_date'		=> $data['use_to_date'], 
 				'pub_dup_yn'		=> $data['pub_dup_yn'], 
-<<<<<<< HEAD
                 'pub_type'			=>$data['coupon_type'] === "E" ? $data['pub_type'] : '',
                 'pub_day' 			=>$data['coupon_type'] === "E" && $data['pub_type'] === 'D' ? $data['pub_day'] : ($data['coupon_type'] === "E" && $data['pub_type'] === 'W' ? $data['pub_dayofweek'] : ''),
-=======
-				// 'pub_type'			=> $data['coupon_type'] === "E" ? $data['pub_type'] : '',
-                // 'pub_day' 			=> $data['coupon_type'] === "E" && $data['pub_type'] === 'D' ? $data['pub_day'] : ($data['coupon_type'] === "E" && $data['pub_type'] === 'W' ? $data['pub_dayofweek'] : ''),
->>>>>>> main
 				'serial_yn'			=> $data['serial_yn'],
 				'serial_dup_yn'		=> $data['serial_dup_yn'], 
 				'coupon_apply'		=> $data['coupon_apply'],
@@ -94,13 +90,8 @@ class Coupon
                 'use_fr_date'		=>$data['use_fr_date'],
                 'use_to_date'		=>$data['use_to_date'],
                 'pub_dup_yn'		=>$data['pub_dup_yn'],
-<<<<<<< HEAD
                 'pub_type'			=>$data['coupon_type'] === "E" ? $data['pub_type'] : '',
                 'pub_day' 			=>$data['coupon_type'] === "E" && $data['pub_type'] === 'D' ? $data['pub_day'] : ($data['coupon_type'] === "E" && $data['pub_type'] === 'W' ? $data['pub_dayofweek'] : ''),
-=======
-				// 'pub_type'			=>$data['coupon_type'] === "E" ? $data['pub_type'] : '',
-                // 'pub_day' 			=>$data['coupon_type'] === "E" && $data['pub_type'] === 'D' ? $data['pub_day'] : ($data['coupon_type'] === "E" && $data['pub_type'] === 'W' ? $data['pub_dayofweek'] : ''),
->>>>>>> main
                 'serial_yn'			=>$data['serial_yn'],
                 'serial_dup_yn'		=>$data['serial_dup_yn'],
                 'coupon_apply'		=>$data['coupon_apply'],
@@ -115,11 +106,7 @@ class Coupon
                 'pub_cnt'			=>$data['pub_cnt'],
                 'use_yn'			=>$data['use_yn'],
                 'admin_id'			=>$data['admin_id'],
-<<<<<<< HEAD
                 'pub_time'			=>$data['pub_time'],
-=======
-                // 'pub_time'			=>$data['pub_time'],
->>>>>>> main
                 //'use_date_type'	=>$data['use_date_type'],
                 //'use_date_alarm_yn'	=>$data['use_date_alarm_yn'],
                 //'use_date_alarm_day'	=>$data['use_date_alarm_day'],
@@ -329,7 +316,8 @@ class Coupon
 	 */
 	function getApplyData($getApplyData, $coupon_no)
 	{
-		$category = new CategoryMulti($this -> conn, "DISPLAY");
+		$user       = Auth('head')->user();
+        $category   = new Category($user, "DISPLAY");
 		switch ($getApplyData)
 		{
 			// 전체 상품
@@ -361,7 +349,7 @@ class Coupon
                 ";
                 $rows = DB::select($sql);
 
-                foreach($rows as $roww) {
+                foreach($rows as $row) {
 					$data[$row->goods_no . "|" . $row->goods_sub] = $row->goods_nm;
                 }
 			break;

@@ -75,7 +75,8 @@ const columns1 = [
         headerName:"구분",
         cellRenderer : (p) => coupon_types[p.value]
     },
-    {field:"coupon_nm", headerName:"쿠폰명", type:"HeadCouponType"}
+    {field:"coupon_nm", headerName:"쿠폰명", type:"HeadCouponType", width: 250},
+    { width:"auto" }
 ];
 
 const columns2 = [
@@ -86,7 +87,8 @@ const columns2 = [
         width:50
     },
     {field:"user_id", headerName:"아이디"},
-    {field:"name", headerName:"이름"}
+    {field:"name", headerName:"이름"},
+    { width:"auto" }
 ];
 
 const pApp1 = new App('', {gridId: "#div-gd1"});

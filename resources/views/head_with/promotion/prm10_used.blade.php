@@ -120,9 +120,10 @@ var columns = [
     {field:"user_id" , headerName:"아이디", type:"HeadUserType"},
     {field:"name", headerName:"이름"},
     {field:"down_date" , headerName:"다운로드 일시"},
-    {field:"use_date", headerName:"사용일시"},
+    {field:"use_date", headerName:"사용일시", width: 120},
     {field:"ord_no", headerName:"주문번호", type:"HeadOrderNoType"},
-    {field:"serial" , headerName:"쿠폰일련번호"}
+    {field:"serial" , headerName:"쿠폰일련번호"},
+    { width:"auto" }
 ];
 
 const pApp = new App('', {gridId: "#div-gd"});

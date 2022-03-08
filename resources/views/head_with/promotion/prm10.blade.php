@@ -140,7 +140,6 @@
 
 <script>
     let gx;
-<<<<<<< HEAD
 
     $(document).ready(function() {
         let columns = [
@@ -203,7 +202,8 @@
             {field:"coupon_order_cnt" , headerName:"사용수", type: 'currencyType'},
             {field:"use_yn" , headerName:"사용여부"},
             {field:"admin_nm" , headerName:"발행자"},
-            {field:"regi_date" , headerName:"등록일시"}
+            {field:"regi_date" , headerName:"등록일시"},
+            {width:"auto"}
         ];
         
         const pApp = new App('', {gridId: "#div-gd"});
@@ -261,128 +261,5 @@
         const url=`/head/promotion/prm10/serial/${no}`;
         window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
     }
-=======
-
-    $(document).ready(function() {
-        let columns = [
-            {
-                headerName: '',
-                headerCheckboxSelection: true,
-                checkboxSelection: true,
-                width:50,
-            },
-            {field:"coupon_no" , headerName:"번호"},
-            {
-                field:"coupon_nm",
-                headerName:"쿠폰명",
-                width:220,
-                type:"HeadCouponType"
-            },
-            {field:"coupon_type_nm" , headerName:"구분"},
-            {
-                headerName:"발행기간",
-                children : [
-                    {headerName:"시작", field:"pub_fr_date", width:80},
-                    {headerName:"종료", field:"pub_to_date", width:80}
-                ]
-            },
-            {
-                headerName:"유효기간",
-                children : [
-                    {headerName:"시작", field:"use_fr_date", width:100},
-                    {headerName:"종료", field:"use_to_date", width:100}
-                ]
-            },
-            {field:"pub_dup_yn" , headerName:"복수발급"},
-            {field:"coupon_amt" , headerName:"발행금액", cellClass:'hd-grid-number'},
-            {field:"pub_time" , headerName:"발행시점"},
-            {field:"coupon_apply" , headerName:"사용가능 대상"},
-            {
-                field:"pub_cnt",
-                headerName:"발행수",
-                cellStyle : function(p){
-                    if (p.value && p.value != "무제한")
-                        return { 'text-align' : 'right' }
-                },
-                cellRenderer: function(p) {
-                    if (p.value && p.value != "무제한") {
-                        return `<a href="#" onclick="openSerial('${p.data.coupon_no}')">${numberFormat(parseInt(p.value))}</a>`;
-                    }
-                    return p.value;
-                }
-            },
-            {
-                field:"coupon_pub_cnt",
-                headerName:"다운로드",
-                type: 'currencyType',
-                cellRenderer: function(p) {
-                    if (p.value) {
-                        return `<a href="#" onclick="openUsedList('${p.data.coupon_no}')">${numberFormat(parseInt(p.value))}</a>`;
-                    }
-                }
-            },
-            {field:"coupon_order_cnt" , headerName:"사용수", type: 'currencyType'},
-            {field:"use_yn" , headerName:"사용여부"},
-            {field:"admin_nm" , headerName:"발행자"},
-            {field:"regi_date" , headerName:"등록일시"}
-        ];
-        
-        const pApp = new App('', {gridId: "#div-gd"});
-        const gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns);
-        
-        pApp.ResizeGrid(265);
-
-        $('.add-btn').click(() => openCouponDetail());
-
-        $('.gift-coupon-btn').click(() => {
-            const rows = gx.getSelectedRows();
-            if (rows.length === 0) {
-                alert("지급할 쿠폰을 선택해주세요.");
-                return;
-            }
-            coupons = rows.map((row) => row.coupon_no);
-
-            openCoupon('', coupons.join(','));
-        });
-
-        $('.coupon-selected-btn').click((e) => {
-            e.preventDefault();
-            const rows = gx.getSelectedRows();
-
-            if (rows.length === 0) {
-                alert("쿠폰을 선택해주세요.");
-                return;
-            }
-
-            //팝업을 오픈한 페이지에 couponSelectedCallback 메서드가 등록되어 있다면 실행.
-            opener?.couponSelectedCallback?.(rows);
-
-            window.close();
-        });
-
-        $('.gift-auto-btn').click(function(){
-            const url=`/head/promotion/prm10/gift/auto`;
-            window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=600,height=300");
-        });
-
-        Search();
-    });
-
-    function Search() {
-        let data = $('form[name="search"]').serialize();
-        gx.Request(`/head/promotion/prm10/search`, data, 1);
-    }
-
-    const openUsedList = (no) => {
-        const url=`/head/promotion/prm10/used/${no}`;
-        window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
-    }
-    const openSerial = (no) => {
-        const url=`/head/promotion/prm10/serial/${no}`;
-        window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
-    }
-
->>>>>>> main
 </script>
 @stop
