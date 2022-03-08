@@ -66,11 +66,7 @@
                                     <div class="form-inline-inner form-check-box">
                                         <div class="form-inline">
                                             <div class="custom-control custom-checkbox">
-<<<<<<< HEAD
                                                 <input type="checkbox" name="ex_trash" id="ex_trash" class="custom-control-input" value="1" checked>
-=======
-                                                <input type="checkbox" name="ex_trash" id="ex_trash" class="custom-control-input" value="1">
->>>>>>> main
                                                 <label class="custom-control-label" for="ex_trash" style="font-weight: 400;">휴지통제외</label>
                                             </div>
                                         </div>
@@ -216,11 +212,7 @@
                                     <div class="form-inline-inner form-check-box">
                                         <div class="form-inline">
                                             <div class="custom-control custom-checkbox">
-<<<<<<< HEAD
                                                 <input type="checkbox" name="ex_soldout" id="ex_soldout" class="custom-control-input" value="1" checked>
-=======
-                                                <input type="checkbox" name="ex_soldout" id="ex_soldout" class="custom-control-input" value="1">
->>>>>>> main
                                                 <label class="custom-control-label" for="ex_soldout" style="font-weight: 400;">품절제외</label>
                                             </div>
                                         </div>
@@ -295,14 +287,13 @@
 		};
 
         var columns= [
-<<<<<<< HEAD
                 {field:"goods_no" ,headerName:"상품코드",pinned:'left',width:72, cellStyle:cstmCellStyle},
                 {field:"style_no" ,headerName:"스타일넘버",pinned:'left',width:84, cellStyle:cstmCellStyle},
                 {field:"img2",headerName:"img2",hide:true},
-                {field:"img" , headerName:"이미지", width:72,
+                {field:"img" , headerName:"이미지", width:60,
                     cellRenderer: function(params) {
                         if (params.value !== undefined && params.data.img != "") {
-                            return '<img src="{{config('shop.image_svr')}}' + params.data.img + '"/>';
+                            return '<img src="{{config('shop.image_svr')}}' + params.data.img + '" style="height:40px;" />';
                         }
                     }
                 },
@@ -318,33 +309,12 @@
                 {field:"sale_stat_cl_nm" ,headerName:"상태",width:84,cellStyle:StyleGoodsState},
                 {field:"wonga" ,headerName:"원가", type: 'currencyType', width:60, cellStyle:cstmCellStyle},
                 {field:"goods_opt" ,headerName:"옵션",width:150, cellStyle:cstmCellStyle,
-=======
-                {field:"goods_no" ,headerName:"상품코드", width:72, pinned:'left'},
-                {field:"style_no" ,headerName:"스타일넘버",pinned:'left',width:100},
-                {field:"goods_nm" ,headerName:"상품명",pinned:'left', type:"HeadGoodsNameType", width:400},
-                {field:"head_desc" ,headerName:"상단홍보글"},
-                {field:"goods_nm_eng" ,headerName:"상품명(영문)"},
-                {field:"opt_kind_nm" ,headerName:"품목", width:72},
-                {field:"brand_nm" ,headerName:"브랜드" },
-                {field:"style_no" ,headerName:"스타일넘버" },
-                {field:"goods_type_nm",headerName:"상품구분",width:72,cellStyle:StyleGoodsTypeNM},
-                {field:"is_unlimited_nm",headerName:"재고구분",width:72},
-                {field:"com_nm",headerName:"업체",width:100},
-                {field:"sale_stat_cl_nm" ,headerName:"상태",width:72,cellStyle:StyleGoodsState},
-                {field:"wonga" ,headerName:"원가", type: 'currencyType'},
-                {field:"goods_opt" ,headerName:"옵션",width:210,
->>>>>>> main
                     cellRenderer: function(params) {
                             return '<a href="#" onclick="return openHeadStock(' + params.data.goods_no + ',\'' + params.value +'\');">' + params.value + '</a>';
                     }
                 },
-<<<<<<< HEAD
                 {field:"good_qty",headerName:"온라인재고",type:'numberType', width:84, cellStyle:cstmCellStyle},
                 {field:"wqty",headerName:"보유재고",type:'numberType', width:72, cellStyle:cstmCellStyle},
-=======
-                {field:"good_qty",headerName:"온라인재고", width:84,type:'numberType'},
-                {field:"wqty",headerName:"보유재고",type:'numberType'},
->>>>>>> main
                 {headerName:"판매수",
                     children: [
                         {headerName: "{{$month1}} 월", field: "sale_qty1",type:'currencyType',width:60, cellStyle:cstmCellStyle},

@@ -14,7 +14,6 @@ use Exception;
 class stk06Controller extends Controller
 {
     public function index() {
-<<<<<<< HEAD
 		$default_goods_stat	= "40";	//판매중 상태 디폴트
         $values = [
 			'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
@@ -23,14 +22,6 @@ class stk06Controller extends Controller
 			'items'			=> SLib::getItems(),
 			'is_unlimiteds'	=> SLib::getCodes('G_IS_UNLIMITED'),
 			'alter_reasons'	=> SLib::getCodes('G_JAEGO_REASON'),
-=======
-        $values = [
-            'goods_types' => SLib::getCodes('G_GOODS_TYPE'),
-            'goods_stats' => SLib::getCodes('G_GOODS_STAT'),
-            'items' => SLib::getItems(),
-            'is_unlimiteds' => SLib::getCodes('G_IS_UNLIMITED'),
-            'alter_reasons' => SLib::getCodes('G_JAEGO_REASON'),
->>>>>>> main
         ];
         return view( Config::get('shop.head.view') . '/stock/stk06', $values);
     }
