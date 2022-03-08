@@ -18,11 +18,7 @@
                 <h4>검색</h4>
                 <div class="flax_box">
                     <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-<<<<<<< HEAD
                     <a href="#" onclick="AddProduct();" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
-=======
-                    <a href="/head/promotion/prm01/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
->>>>>>> main
                     <a href="#" onclick="document.search.reset()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
@@ -154,7 +150,8 @@
         {headerName: "공개여부", field: "use_yn", cellClass: 'hd-grid-code'},
         {headerName: "등록일시", field: "regi_date", width:130},
         {headerName: "수정일시", field: "ut", width:130},
-        {headerName: "글번호", field: "idx", hide:true }
+        {headerName: "글번호", field: "idx", hide:true },
+        { width: "auto" }
     ];
 
 </script>

@@ -116,6 +116,7 @@
         {headerName: "작성자", field: "name", cellClass: 'hd-grid-code'},
         {headerName: "등록일", field: "rt", cellClass: 'hd-grid-code'},
         {headerName: "조회수", field: "cnt"},
+        { width: "auto" }
     ];
 
     const pApp = new App('', {gridId: "#div-gd"});

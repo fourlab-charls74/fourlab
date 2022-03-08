@@ -246,7 +246,7 @@
 		},
 		{field:"goods_no", headerName:"goods_no", hide:true},
 		{field:"goods_sub", headerName:"goods_sub", hide:true},
-		{headerName: "", field: "nvl"}
+		{ width: "auto" }
 	];
 	const pApp = new App('', { gridId: "#div-gd" });
 

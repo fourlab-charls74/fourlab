@@ -267,7 +267,7 @@
 		{field:"rt" , headerName:"등록일시", width:150},
 		{field:"ut" , headerName:"수정일시", width:150},
 		{field:"memo" , headerName:"메모", width:200},
-		{headerName: "", field: "nvl"}
+		{ width: "auto" }
 	];
 	const pApp = new App('', { gridId: "#div-gd" });
 	const gridDiv = document.querySelector(pApp.options.gridId);
