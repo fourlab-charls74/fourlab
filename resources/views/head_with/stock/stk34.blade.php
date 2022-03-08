@@ -111,6 +111,7 @@
 		{field: "sale_stat_cl",	headerName: "상품상태",		width:80, type:'GoodsStateType'},
 		{field: "match_yn",		headerName: "매칭유무",		width:80, cellStyle:{"text-align":"center"}},
 		{field: "chk_cmt",		headerName: "비고",			width:300, cellStyle:{"color":"#FF0000"}},
+        {field:"", headerName:"", width:"auto"}
     ];
 
 </script>

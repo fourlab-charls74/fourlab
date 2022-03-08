@@ -227,14 +227,14 @@
     <script language="javascript">
 
         var columns= [
-                {field:"opt_kind_nm" ,headerName:"품목", width:118, pinned:'left'},
+                {field:"opt_kind_nm" ,headerName:"품목", width:100, pinned:'left'},
                 {field:"brand_nm" ,headerName:"브랜드", width:118, pinned:'left' },
                 {field:"style_no" ,headerName:"스타일넘버",pinned:'left' },
-                {field:"goods_type_nm",headerName:"상품구분",pinned:'left',width:72,cellStyle:StyleGoodsType},
-                {field:"is_unlimited_nm",headerName:"재고구분",pinned:'left',width:72},
-                {field:"goods_no" ,headerName:"상품코드",pinned:'left',width:72},
+                {field:"goods_type_nm",headerName:"상품구분",pinned:'left',width:58,cellStyle:StyleGoodsType},
+                {field:"is_unlimited_nm",headerName:"재고구분",pinned:'left',width:58},
+                {field:"goods_no" ,headerName:"상품코드",pinned:'left',width:58},
                 {field:"goods_nm" ,headerName:"상품명",pinned:'left', type:"HeadGoodsNameType", width:360},
-                {field:"sale_stat_cl_nm" ,headerName:"상태",width:84,cellStyle:StyleGoodsState},
+                {field:"sale_stat_cl_nm" ,headerName:"상태",width:58,cellStyle:StyleGoodsState},
                 {field:"wonga" ,headerName:"원가", type: 'currencyType'},
                 {field:"goods_opt" ,headerName:"옵션",width:200,
                     checkboxSelection:function(params){ return (params.data !== undefined && params.data.is_unlimited != 'Y')? true:false; },
@@ -246,13 +246,13 @@
                 },
                 {field:"good_qty",headerName:"현재고수",hide:true},
                 {field:"wqty",headerName:"현보유재고수",hide:true},
-                {field:"edit_good_qty" ,headerName:"온라인재고", width:84,
+                {field:"edit_good_qty" ,headerName:"온라인재고", width:70,
                     editable: function(params){ return (params.data !== undefined && params.data.is_unlimited != 'Y')? true:false; },
                     cellClass:function(params){
                         return (params.data !== undefined && params.data.is_unlimited != 'Y')? ['hd-grid-number','hd-grid-edit']: ['hd-grid-number'];
                     },
                     cellStyle:StyleChangeYN, onCellValueChanged:EditQty, valueFormatter:formatNumber},
-                {field:"edit_wqty" ,headerName:"보유재고", width:72,
+                {field:"edit_wqty" ,headerName:"보유재고", width:58,
                     editable: function(params){ return (params.data !== undefined && params.data.is_unlimited != 'Y')? true:false; },
                     cellClass:function(params){
                         return (params.data !== undefined && params.data.is_unlimited != 'Y')? ['hd-grid-number','hd-grid-edit']: ['hd-grid-number'];

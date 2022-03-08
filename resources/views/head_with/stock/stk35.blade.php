@@ -170,6 +170,7 @@
 		{field: "month_ord", headerName: "최근3개월", width: 80, type:'numberType'},
 		{field: "tot_ord", headerName: "총주문", width:70, type:'numberType'},
 		{field: "rt", headerName: "등록일", width:80},
+		{field:"", headerName:"", width:"auto"}
     ];
 
 	function Add()

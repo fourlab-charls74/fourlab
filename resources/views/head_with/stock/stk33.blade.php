@@ -83,7 +83,7 @@
 <script language="javascript">
     var columns = [
         {headerName: "#", field: "num", width:35, type:'NumType', cellStyle: {"background":"#F5F7F7"}},
-		{field: "idx",		headerName: "일련번호", width:90},
+		{field: "idx",		headerName: "일련번호", width:58},
 		{field: "rt",		headerName: "등록일시", width:140},
 		{field: "cnt",		headerName: "등록건수", width:100, type:'numberType'},
 		{field: "match_cnt",		headerName: "매칭수", width:80, type:'numberType',
@@ -96,6 +96,7 @@
 				return '<a href="#" onClick="showList(\''+ params.data.idx +'\',\'non_match_cnt\')">'+ params.value + '</a>'
             }
 		},
+        {field:"", headerName:"", width:"auto"}
     ];
 
 	function Add()

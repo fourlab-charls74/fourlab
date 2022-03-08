@@ -256,17 +256,17 @@
     };
 
     const columns = [   
-        { headerName: '', pinned: 'left', headerCheckboxSelection: true, checkboxSelection: true, width: 50 },
-        { field: "goods_no", headerName: "상품번호", width: 72, pinned: 'left' },
-        { field: "goods_type", headerName: "상품구분", width: 100, cellStyle: (params) => cellStyleGoodsType(params), pinned: 'left' },
+        { headerName: '', pinned: 'left', headerCheckboxSelection: true, checkboxSelection: true, width: 28 },
+        { field: "goods_no", headerName: "상품번호", width: 58, pinned: 'left' },
+        { field: "goods_type", headerName: "상품구분", width: 58, cellStyle: (params) => cellStyleGoodsType(params), pinned: 'left' },
         { field: "opt_kind_nm", headerName: "품목", width: 100, pinned: 'left' },
         { field: "brand_nm", headerName: "브랜드", pinned: 'left' },
         { field: "style_no", headerName: "스타일넘버", width: 120, pinned: 'left' },
         { field: "head_desc", headerName: "상단홍보글", width: 120 },
-        { field: "img", headerName: "이미지", width:60, type:'GoodsImageType', hide: true },
+        { field: "img", headerName: "이미지", width:46, type:'GoodsImageType', hide: true },
         { field: "img_url", headerName: "이미지_url", width:75, hide: true },
         { field: "goods_nm", headerName: "상품명", width: 230, type:"HeadGoodsNameType" },
-        { field: "sale_stat_cl_val", headerName: "상품상태", width:72, cellStyle: (params) => cellStyleGoodsState(params) },
+        { field: "sale_stat_cl_val", headerName: "상품상태", width:70, cellStyle: (params) => cellStyleGoodsState(params) },
         { field: "goods_sh", headerName: "시중가", width:60, type: 'currencyType' },
         { field: "normal_price", headerName: "정상가", width:60, type: 'currencyType' },
         { field: "price", headerName: "판매가", width:60, type: 'currencyType' },

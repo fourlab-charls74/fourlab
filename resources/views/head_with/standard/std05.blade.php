@@ -155,12 +155,12 @@
         {
             field: "show_yn",
             headerName: "공개여부",
-            width:72,
+            width:58,
         },
         {
             field: "best_yn",
             headerName: "베스트여부",
-            width:84,
+            width:70,
         },
         { field: "", headerName: "", width: "auto" }
     ];

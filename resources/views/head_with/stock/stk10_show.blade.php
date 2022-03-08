@@ -220,7 +220,7 @@
         const YELLOW = { backgroundColor: '#ffff99' };
 
         var columns= [
-            {field:"chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, sort: null, pinned:'left'},
+            {field:"chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null, pinned:'left'},
             {field:"com_nm",headerName:"업체",pinned:'left',width:120},
             {field:"opt_kind_nm" ,headerName:"품목",pinned:'left',width:84},
             {field:"brand_nm" ,headerName:"브랜드",pinned:'left',width:84},
@@ -235,12 +235,12 @@
             // },
             {headerName:"상품코드",
                 children: [
-                    {headerName: "번호", field: "goods_no", width: 60, pinned:'left', cellStyle:{'text-align': 'right'}},
-                    {headerName: "보조", field: "goods_sub", width: 60, pinned:'left', cellStyle:{'text-align': 'center'}}
+                    {headerName: "번호", field: "goods_no", width: 46, pinned:'left', cellStyle:{'text-align': 'right'}},
+                    {headerName: "보조", field: "goods_sub", width: 34, pinned:'left', cellStyle:{'text-align': 'center'}}
                 ]
             },
             {field:"goods_nm" , headerName:"상품명", type:"HeadGoodsNameType", width:220, pinned:'left'},
-            {field:"sale_stat_cl" ,headerName:"상태",width:72,cellStyle:StyleGoodsState, pinned:'left'},
+            {field:"sale_stat_cl" ,headerName:"상태",width:58,cellStyle:StyleGoodsState, pinned:'left'},
             {field:"goods_opt" ,headerName:"옵션",width:100,
                 cellRenderer: function(params) {
                         return '<p>' + params.value + '</p>';

@@ -252,7 +252,7 @@
         // ag-grid set
 
         var columns= [
-            {field:"chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, sort: null, pinned:'left'},
+            {field:"chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null, pinned:'left'},
             {field:"buy_ord_date" ,headerName:"발주일자",pinned:'left',width:72},
             {field:"buy_ord_no" ,headerName:"발주번호",pinned:'left',width:100},
             {field:"state" ,headerName:"발주상태",pinned:'left',width:72},
@@ -270,12 +270,12 @@
             // },
             {headerName:"상품코드",
                 children: [
-                    {headerName: "번호", field: "goods_no", width: 60, pinned:'left', cellStyle:{'text-align': 'right'}},
-                    {headerName: "보조", field: "goods_sub", width: 60, pinned:'left', cellStyle:{'text-align': 'center'}}
+                    {headerName: "번호", field: "goods_no", width: 46, pinned:'left', cellStyle:{'text-align': 'right'}},
+                    {headerName: "보조", field: "goods_sub", width: 34, pinned:'left', cellStyle:{'text-align': 'center'}}
                 ]
             },
             {field:"goods_nm" , headerName:"상품명", type:"HeadGoodsNameType", width:220, pinned:'left'},
-            {field:"sale_stat_cl" ,headerName:"상태",width:72,cellStyle:StyleGoodsState, pinned:'left'},
+            {field:"sale_stat_cl" ,headerName:"상태",width:58,cellStyle:StyleGoodsState, pinned:'left'},
             {field:"goods_opt" ,headerName:"옵션",width:100,
                 cellRenderer: function(params) {
                         return '<p>' + params.value + '</p>';

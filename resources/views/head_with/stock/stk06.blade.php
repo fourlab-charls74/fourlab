@@ -201,9 +201,9 @@
         // ag-grid
 
         var columns= [
-                {field:"chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
-                {field:"goods_no", headerName:"상품번호", width:72, cellStyle: {textAlign:"center"}, pinned:'left'},
-                {field:"goods_type_nm", headerName:"상품구분", width:72, 
+                {field:"chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, pinned: 'left', sort: null},
+                {field:"goods_no", headerName:"상품번호", width:58, cellStyle: {textAlign:"center"}, pinned:'left'},
+                {field:"goods_type_nm", headerName:"상품구분", width:58, 
                     cellStyle: function (params) {
                         var state = {
                             "위탁판매":"#F90000",
@@ -223,8 +223,8 @@
                 {field:"opt_kind_nm" , headerName:"품목", width:118, pinned:'left'},
                 {field:"brand_nm" , headerName:"브랜드", pinned:'left'},
                 {field:"style_no" , headerName:"스타일넘버", width:150, pinned:'left'},
-                {field:"head_desc", headerName:"상단홍보글", width:200},
-                {field:"goods_img" , headerName:"이미지", width:60,
+                {field:"head_desc", headerName:"상단홍보글", width:180},
+                {field:"goods_img" , headerName:"이미지", width:46,
                     cellRenderer: function(params) {
                         if (params.value !== undefined && params.data.goods_img != "") {
                             return '<img src="{{config('shop.image_svr')}}/' + params.data.goods_img + '" style="height:30px;"/>';
@@ -233,11 +233,11 @@
                     type: 'GoodsImageType', 
                 },
                 {field:"goods_nm", headerName:"상품명", width:320, type:'HeadGoodsNameType'},
-                {field:"sale_stat_cl_val", headerName: "상품상태", width: 72, type:'GoodsStateType'},
+                {field:"sale_stat_cl_val", headerName: "상품상태", width: 58, type:'GoodsStateType'},
                 {field:"goods_opt", headerName: "옵션", width: 150},
-                {field:"good_qty",headerName:"온라인재고", width:84, type:'numberType'},
-                {field:"wqty", headerName: "보유재고수", width:84, type:'numberType'},
-                {field:"restock_cnt" ,headerName:"재입고요청", width:84, type:'numberType',
+                {field:"good_qty",headerName:"온라인재고", width:70, type:'numberType'},
+                {field:"wqty", headerName: "보유재고수", width:70, type:'numberType'},
+                {field:"restock_cnt" ,headerName:"재입고요청", width:70, type:'numberType',
                     cellRenderer: function(params) {
                         if (params.value !== undefined && params.data.goods_no !== undefined) {
                             var a = document.createElement('a');
@@ -253,7 +253,7 @@
                         }
                     }
                 },
-                {field:"restock_ncnt" ,headerName:"미알림요청수", width:96, type:'numberType',
+                {field:"restock_ncnt" ,headerName:"미알림요청수", width:82, type:'numberType',
                     cellRenderer: function(params) {
                         if (params.value !== undefined && params.data.goods_no !== undefined) {
                             var a = document.createElement('a');
@@ -269,9 +269,10 @@
                         }
                     }
                 },
-                {field:"goods_sh",headerName:"시중가격", width:84, type:'currencyType'},
-                {field:"price" , headerName:"판매가", width:72, type: 'currencyType'},
-                {field:"restock_ut" ,headerName:"최근요청일시", width:120},
+                {field:"goods_sh",headerName:"시중가격", width:60, type:'currencyType'},
+                {field:"price" , headerName:"판매가", width:60, type: 'currencyType'},
+                {field:"restock_ut" ,headerName:"최근요청일시", width:110},
+                {field:"", headerName:"", width:"auto"}
             ];
     
         const pApp = new App('',{

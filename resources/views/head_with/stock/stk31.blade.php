@@ -85,9 +85,8 @@
 			headerName: '',
 			headerCheckboxSelection: true,
 			checkboxSelection: true,
-			width:40,
+			width:28,
 			pinned:'left',
-			cellStyle: {"background":"#F5F7F7"}
 		},
 		{
 			headerName: '#',
@@ -109,6 +108,7 @@
             }
 		},
         {headerName: "IDX", field: "idx", hide:true},
+		{headerName:"", field:"", width:"auto"}
     ];
 
 	function Add()

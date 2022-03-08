@@ -287,10 +287,10 @@
 		};
 
         var columns= [
-                {field:"goods_no" ,headerName:"상품코드",pinned:'left',width:72, cellStyle:cstmCellStyle},
+                {field:"goods_no" ,headerName:"상품코드",pinned:'left',width:58, cellStyle:cstmCellStyle},
                 {field:"style_no" ,headerName:"스타일넘버",pinned:'left',width:84, cellStyle:cstmCellStyle},
                 {field:"img2",headerName:"img2",hide:true},
-                {field:"img" , headerName:"이미지", width:60,
+                {field:"img" , headerName:"이미지", width:46,
                     cellRenderer: function(params) {
                         if (params.value !== undefined && params.data.img != "") {
                             return '<img src="{{config('shop.image_svr')}}' + params.data.img + '" style="height:40px;" />';

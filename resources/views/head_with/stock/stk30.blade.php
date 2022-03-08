@@ -217,23 +217,24 @@
 		{headerName: "#", field: "num",type:'NumType', width:35, cellStyle: {"background":"#F5F7F7"}},
 		{field: "opt_kind_nm", headerName: "품목", width:84},
 		{field: "brand_nm", headerName: "브랜드", width:84},
-		{field: "goods_no", headerName: "상품번호", width: 72},
-		{field: "style_no", headerName: "스타일넘버", width:100,
+		{field: "goods_no", headerName: "상품번호", width: 58},
+		{field: "style_no", headerName: "스타일넘버", width:96,
 			cellRenderer: function(params) {
 				return '<a href="/head/product/prd01/?style_no='+ params.value +'" target="new">'+ params.value+'</a>'
 			}
 		},
-		{field: "sale_stat_cl_val", headerName: "상품상태", width:72, type:'GoodsStateType'},
-		{field: "goods_nm", headerName: "상품명", width: 440, type:'HeadGoodsNameType'},
+		{field: "sale_stat_cl_val", headerName: "상품상태", width:58, type:'GoodsStateType'},
+		{field: "goods_nm", headerName: "상품명", width: 400, type:'HeadGoodsNameType'},
 		{field: "goods_opt", headerName: "옵션", width: 170},
-		{field: "qty", headerName: "재고수", width:60, type:'numberType',
+		{field: "qty", headerName: "재고수", width:46, type:'numberType',
 			cellRenderer: function(params) {
 			if (params.value !== undefined) {
 				return `<a href="javascript:openHeadStock('` + params.data.goods_no + `','` + params.data.goods_opt + `')">` + params.value + `</a>`;
 			}
 		}
 		},
-		{field: "cd", headerName: "XMD 코드", width:150},
+		{field: "cd", headerName: "XMD 코드", width:120},
+        {field: "", headerName: "", width: "auto"}
 	];
 
 	function Add()

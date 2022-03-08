@@ -137,17 +137,18 @@
         },
         {
             field: "state",
-            headerName: "상태"
+            headerName: "상태",
+            width:46
         },
         {
             field: "rt",
             headerName: "등록일시",
-            width: 130
+            width: 110
         },
         {
             field: "ut",
             headerName: "수정일시",
-            width: 130
+            width: 110
         },
         { field: "", headerName: "", width: "auto" }
     ];
