@@ -108,7 +108,8 @@ var columns = [
     {field:"is_point_save" , headerName:"적립금지급"},
     {field:"is_coupon_use" , headerName:"쿠폰사용"},
     {field:"rt" , headerName:"등록일시", width:135},
-    {field:"ut" , headerName:"수정일시", width:135}
+    {field:"ut" , headerName:"수정일시", width:135},
+    { width: "auto" }
 ];
 
 const pApp = new App('', {gridId: "#div-gd"});

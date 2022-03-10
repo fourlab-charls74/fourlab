@@ -296,7 +296,7 @@ var columns = [
         headerName: '',
         headerCheckboxSelection: true,
         checkboxSelection: true,
-        width:50,
+        width:28,
         pinned:'left'
     },
     {field:"user_id" , headerName:"아이디", pinned:'left', type:"HeadUserType"  },
@@ -313,7 +313,8 @@ var columns = [
     {field:"est_cnt" , headerName:"상품평작성횟수", type: 'currencyType'},
     {field:"point" , headerName:"적립금", type: 'currencyType'},
     {field:"email_chk", headerName:"메일수신"},
-    {field:"mobile_chk", headerName:"SMS수신"}
+    {field:"mobile_chk", headerName:"SMS수신"},
+    { width: "auto" }
 ];
 
 const pApp = new App('', {gridId: "#div-gd"});

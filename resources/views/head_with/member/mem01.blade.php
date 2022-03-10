@@ -428,7 +428,7 @@ var columns = [
         headerName: '',
         headerCheckboxSelection: true,
         checkboxSelection: true,
-        width:50,
+        width:28,
         pinned:'left'
     },
     {field:"user_id" , headerName:"아이디", pinned:'left', type:"HeadUserType", width:100  },
@@ -451,7 +451,9 @@ var columns = [
     {field:"email_chk", headerName:"메일수신", width:75},
     {field:"mobile_chk", headerName:"SMS수신", width:75},
     {field:"yn" , headerName:"승인", width:50},
-    {field:"site" , headerName:"판매처", width:70}
+    {field:"site" , headerName:"판매처", width:70},
+    { width: "auto" }
+    
 ];
 
 const pApp = new App('', {gridId: "#div-gd"});

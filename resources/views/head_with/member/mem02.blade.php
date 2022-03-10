@@ -186,7 +186,7 @@
 
     <script language="javascript">
         var columns = [
-            {headerName: '', headerCheckboxSelection: true, checkboxSelection: true, width:50, pinned:'left'},
+            {headerName: '', headerCheckboxSelection: true, checkboxSelection: true, width:28, pinned:'left'},
             {field:"user_id" , headerName:"아이디", pinned:'left', type:"HeadUserType", width:100  },
             {field:"user_nm" , headerName:"이름"},
             {field:"regdate" , headerName:"가입일", type:"DateTimeType"},
@@ -198,6 +198,7 @@
             {field:"mobile_chk" , headerName:"SMS수신",cellClass: 'hd-grid-code'},
             {field:"yn" , headerName:"승인",cellClass: 'hd-grid-code'},
             {field:"site" , headerName:"판매처"},
+            { width: "auto" }
         ];
 
         const pApp = new App('', {gridId: "#div-gd"});

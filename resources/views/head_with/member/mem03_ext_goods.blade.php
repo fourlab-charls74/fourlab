@@ -217,7 +217,7 @@ var columns = [
         headerName: '',
         headerCheckboxSelection: true,
         checkboxSelection: true,
-        width:50,
+        width:28,
         pinned:'left'
     },
     {field:"goods_no", headerName:"상품번호", width:80, type:"HeadGoodsNameType", pinned:'left'},
@@ -234,6 +234,7 @@ var columns = [
     {field:"admin_id" , headerName:"관리자아이디"},
     {field:"brand_nm" , headerName:"관리자명"},
     {field:"rt" , headerName:"등록일시"},
+    { width: "auto" }
 ];
 
 const pApp = new App('', {gridId: "#div-gd"});

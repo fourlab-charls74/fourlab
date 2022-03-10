@@ -167,7 +167,7 @@
             headerName: '',
             headerCheckboxSelection: true,
             checkboxSelection: true,
-            width:50,
+            width:28,
             pinned:'left'
         },
         {field:"user_id" , headerName:"아이디", pinned:'left', type:"HeadUserType"  },
@@ -178,6 +178,7 @@
         {field:"ord_cnt" , headerName:"구매수", type: 'currencyType'},
         {field:"ord_amt" , headerName:"구입금액", type: 'currencyType'},
         {field:"rt" , headerName:"등록일시"},
+        { width: "auto" }
 
     ];
 
