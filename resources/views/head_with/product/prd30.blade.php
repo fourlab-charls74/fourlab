@@ -317,7 +317,7 @@
 			headerName: '',
 			headerCheckboxSelection: true,
 			checkboxSelection: true,
-			width: 35,
+			width: 28,
 			pinned: 'left'
 		},
 		{
@@ -325,7 +325,7 @@
 			children: [{
 					field: "goods_no",
 					headerName: "상품번호",
-					width: 75,
+					width: 58,
 					type: 'HeadGoodsNameType',
 					pinned: 'left'
 				},
@@ -342,7 +342,7 @@
 			children: [{
 					field: "goods_type",
 					headerName: "구분",
-					width: 60
+					width: 46
 				},
 				{
 					field: "head_desc",
@@ -358,31 +358,31 @@
 				{
 					field: "sale_stat_cl",
 					headerName: "상태",
-					width: 60,
+					width: 58,
 					type: 'GoodsStateType'
 				},
 				{
 					field: "qty",
 					headerName: "재고",
-					width: 60,
+					width: 46,
 					type: 'numberType'
 				},
 				{
 					field: "price",
 					headerName: "판매가",
-					width: 70,
+					width: 60,
 					type: 'numberType'
 				},
 				{
 					field: "wonga",
 					headerName: "원가",
-					width: 70,
+					width: 60,
 					type: 'numberType'
 				},
 				{
 					field: "margin_rate",
 					headerName: "마진율",
-					width: 70,
+					width: 60,
 					cellStyle: {
 						"text-align": "right"
 					}
@@ -395,7 +395,7 @@
 				{
 					field: "upd_dm",
 					headerName: "최근수정일시",
-					width: 115
+					width: 110
 				},
 			]
 		},
@@ -404,7 +404,7 @@
 			children: [{
 					field: "shop_goods_no",
 					headerName: "상품번호",
-					width: 75
+					width: 58
 				},
 				{
 					field: "shop_status",
@@ -414,13 +414,13 @@
 				{
 					field: "shop_qty",
 					headerName: "재고",
-					width: 60,
+					width: 46,
 					type: 'numberType'
 				},
 				{
 					field: "shop_price",
 					headerName: "판매가",
-					width: 70,
+					width: 60,
 					editable: true,
 					cellStyle: {
 						"text-align": "right",
@@ -430,12 +430,12 @@
 				{
 					field: "shop_ut",
 					headerName: "최근수정일시",
-					width: 115
+					width: 110
 				},
 				{
 					field: "shop_stock_ut",
 					headerName: "재고연동일시",
-					width: 115
+					width: 110
 				},
 				{
 					field: "shop_result_no",
@@ -447,6 +447,7 @@
 					headerName: "내용",
 					width: 120
 				},
+				{	field:"", headerName:"", width:"auto"}
 			]
 		},
 	];
@@ -609,15 +610,15 @@
 
 		if (res.result_no == "200") {
 			_proc_cnt++;
-			setTimeout("ShopShopGood()", 100);
+			setTimeout("AddShopGood()", 100);
 		} else if (res.result_no == "0") {
-			setTimeout("ShopShopGood()", 100);
+			setTimeout("AddShopGood()", 100);
 		} else if (res.result_no == "-1") {
-			setTimeout("ShopShopGood()", 100);
+			setTimeout("AddShopGood()", 100);
 		} else if (res.result_no == "-2") {
-			setTimeout("ShopShopGood()", 100);
+			setTimeout("AddShopGood()", 100);
 		} else {
-			setTimeout("ShopShopGood()", 100);
+			setTimeout("AddShopGood()", 100);
 		}
 	}
 

@@ -347,12 +347,12 @@
             field: "goods_no",
             headerName: "상품번호",
             width: 72,
-            cellStyle:{'line-height':'40px'}
+            cellStyle:{'line-height':'30px'}
         },
         {
             field: "style_no",
             headerName: "스타일넘버",
-            cellStyle:{'line-height':'40px'}
+            cellStyle:{'line-height':'30px'}
         },
         {
             field: "goods_nm",
@@ -387,7 +387,7 @@
             headerName: "판매가",
             width:72,
             type: 'currencyType',
-            cellStyle:{'line-height':'40px'}
+            cellStyle:{'line-height':'30px'}
         },
         {
             field: "coupon_price",
@@ -399,7 +399,7 @@
             field: "baesong_price",
             headerName: "배송비",
             type: 'currencyType',
-            cellStyle: { "text-align": "center" },
+            cellStyle: { "text-align": "center", "line-height":"12px" },
             cellRenderer: (params) => {
                 const value = params.valueFormatted;
                 const { bae_yn, dlv_pay_type } = params.data;
@@ -424,7 +424,7 @@
         },
         {
             headerName: "판매수(S) 및 조회수(P)",
-            cellStyle: { "text-align": "left" },
+            cellStyle: { "text-align": "left", "line-height":"12px" },
             type: 'currencyType',
             cellRenderer: (params) => {
                 const { sale, sale_3m, pv, pv_3m } = params.data;
@@ -436,7 +436,7 @@
         },
         {
             headerName: "상품평(E) 및 상품문의(O)",
-            cellStyle: { "text-align": "left" },
+            cellStyle: { "text-align": "left","line-height":"12px" },
             type: 'currencyType',
             cellRenderer: (params) => {
                 const { review, grade, grade_3m, qa, qa_3m } = params.data;
@@ -470,7 +470,7 @@
         {
             field: "reg_dm",
             headerName: "등록일시",
-            cellStyle: { "text-align": "center" },
+            cellStyle: { "text-align": "center","line-height":"12px" },
             cellRenderer: (params) => {
                 const { reg_dm, new_product_type, new_product_day } = params.data;
                 let render = `${reg_dm}<br/>(${new_product_type}${new_product_day})`;
@@ -482,7 +482,7 @@
             field: "new_product_day",
             headerName: "신상품일시",
             width:84,
-            cellStyle:{'line-height':'40px'}
+            cellStyle:{'line-height':'30px'}
         },
         {
             field: "soldout_day",
