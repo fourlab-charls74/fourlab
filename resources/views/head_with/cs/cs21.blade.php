@@ -160,7 +160,7 @@
             headerName: '',
             headerCheckboxSelection: true,
             checkboxSelection: true,
-            width:50
+            width:28
         },
         {
             field:"regi_date", 
