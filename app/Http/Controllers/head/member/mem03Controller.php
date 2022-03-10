@@ -807,12 +807,8 @@ class mem03Controller extends Controller
     }
 
     private function __upload_img($id, Request $req) {
-<<<<<<< HEAD
         // $save_path = sprintf("/data/head/user/group/icon/%s", $id);
         $save_path = sprintf("/images/user/group/icon/%s", $id); // 저장위치 관련 추가작업 필요
-=======
-        $save_path = sprintf("/images/user/group/icon/%s", $id);
->>>>>>> main
   
         $image = preg_replace('/data:image\/(.*?);base64,/', '', $req->src);
         

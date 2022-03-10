@@ -459,6 +459,7 @@ var columns = [
         {field:"user_id",headerName:"user_id", hide: true,},
         {field:"admin_open_yn",headerName:"admin_open_yn", hide: true,},
         {field:"ans_yn",headerName:"ans_yn", hide: true,},
+        { width: "auto" }
 ];
 
 </script>

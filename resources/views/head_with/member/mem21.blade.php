@@ -494,7 +494,8 @@
             field: "user_id",
             headerName: "user_id",
             hide: true,
-        }
+        },
+        { width: "auto" }
     ];
 
     function GoodsPopup(url) {

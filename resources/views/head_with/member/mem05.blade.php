@@ -196,7 +196,7 @@
 		{field:"point_date" , headerName:"지급일시", width:140,},
 		{field:"admin_id" , headerName:"지급자", width:100,},
 		{field:"no", headerName:"no", hide:true},
-		{headerName: "", field: "nvl"}
+		{ width: "auto" }
 	];
 	const pApp = new App('', { gridId: "#div-gd" });
 	const gridDiv = document.querySelector(pApp.options.gridId);

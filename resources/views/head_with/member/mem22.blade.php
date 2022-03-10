@@ -251,7 +251,7 @@
 		{
 			headerName: '선택',
 			checkboxSelection: true,
-			width:50,
+			width:28,
 			cellRenderer: function(params) {
 				if (params.data.group_cd !== undefined && params.data.group_cd !== null) {
 					return "<input type='checkbox' checked/>";
@@ -316,8 +316,7 @@
 		{field:'comment_cnt', headerName:'comment_cnt', hide:true},
 		{field:"cnt" , headerName:"조회수", width:60},
 		{field:"regi_date" , headerName:"등록일시", width:135},
-
-		{headerName: "", field: "nvl"}
+		{ width: "auto" }
 	];
 	const pApp = new App('', { gridId: "#div-gd" });
 	const gridDiv = document.querySelector(pApp.options.gridId);
