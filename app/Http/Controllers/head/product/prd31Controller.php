@@ -269,7 +269,7 @@ class prd31Controller extends Controller
         $conf	= new Conf();
 		$cfg_domain_bizest	= $conf->getConfigValue("shop","domain_bizest");
 		//$cfg_domain_bizest	= "127.0.0.1:8000/head";
-		$cfg_domain_bizest	= "handle.netpx.co.kr/head";
+		$cfg_domain_bizest	.= "/head";
 
 		$result_code	= "100";
 		$result_msg		= "";
@@ -991,7 +991,7 @@ class prd31Controller extends Controller
         $conf	= new Conf();
 		$cfg_domain_bizest	= $conf->getConfigValue("shop","domain_bizest");
 		//$cfg_domain_bizest	= "127.0.0.1:8000/head";
-		$cfg_domain_bizest	= "handle.netpx.co.kr/head";
+		$cfg_domain_bizest	.= "/head";
 
 		$result_code	= "100";
 		$result_msg		= "";
@@ -1037,6 +1037,7 @@ class prd31Controller extends Controller
 	}
 
 	// 2021-03-08 ceduce 몰별 옵션 자동 생성 작업
+	// 피엘라벤 커스텀 작업
 	function transOpt($shop_nm, $sku)
 	{
 		$trans_chk	= "N";

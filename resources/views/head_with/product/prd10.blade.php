@@ -319,7 +319,7 @@
             cellClass: 'hd-grid-code',
             headerCheckboxSelection: true,
             checkboxSelection: true,
-            width: 40,
+            width: 28,
             pinned: 'left',
             sort: null,
             cellStyle: {"background":"#F5F7F7"}        },
@@ -327,7 +327,7 @@
             field: "disp_yn",
             headerName: '출력',
             cellClass: 'hd-grid-code',
-            width:60,
+            width:58,
             pinned: 'left',
             rowDrag: true
         },
@@ -335,7 +335,7 @@
             field: "img",
             headerName: "이미지",
             type: 'GoodsImageType',
-            width:60,
+            width:46,
             pinned: 'left'
         },
         {
@@ -346,13 +346,13 @@
         {
             field: "goods_no",
             headerName: "상품번호",
-            width: 72,
-            cellStyle:{'line-height':'30px'}
+            width: 58,
+            cellStyle:{'line-height':'40px'}
         },
         {
             field: "style_no",
             headerName: "스타일넘버",
-            cellStyle:{'line-height':'30px'}
+            cellStyle:{'line-height':'40px'}
         },
         {
             field: "goods_nm",
@@ -373,7 +373,7 @@
         {
             field: "sale_stat_cl",
             headerName: "상품상태",
-            width:72,
+            width:70,
             type: 'GoodsStateType',
         },
         {
@@ -387,19 +387,20 @@
             headerName: "판매가",
             width:72,
             type: 'currencyType',
-            cellStyle:{'line-height':'30px'}
+            cellStyle:{'line-height':'40px'}
         },
         {
             field: "coupon_price",
             headerName: "쿠폰가",
             width:60,
-            type: 'currencyType'
+            type: 'currencyType',
+            cellStyle:{'line-height':'40px'}
         },
         {
             field: "baesong_price",
             headerName: "배송비",
             type: 'currencyType',
-            cellStyle: { "text-align": "center", "line-height":"12px" },
+            cellStyle: { "text-align": "center", "line-height":"20px" },
             cellRenderer: (params) => {
                 const value = params.valueFormatted;
                 const { bae_yn, dlv_pay_type } = params.data;
@@ -420,11 +421,12 @@
         {
             field: "qty",
             headerName: "재고수",
-            type: 'numberType'
+            type: 'numberType',
+            width:46
         },
         {
             headerName: "판매수(S) 및 조회수(P)",
-            cellStyle: { "text-align": "left", "line-height":"12px" },
+            cellStyle: { "text-align": "left", "line-height":"20px" },
             type: 'currencyType',
             cellRenderer: (params) => {
                 const { sale, sale_3m, pv, pv_3m } = params.data;
@@ -436,7 +438,7 @@
         },
         {
             headerName: "상품평(E) 및 상품문의(O)",
-            cellStyle: { "text-align": "left","line-height":"12px" },
+            cellStyle: { "text-align": "left","line-height":"20px" },
             type: 'currencyType',
             cellRenderer: (params) => {
                 const { review, grade, grade_3m, qa, qa_3m } = params.data;
@@ -449,7 +451,8 @@
         {
             field: "com_nm",
             headerName: "업체",
-            width: 180
+            width: 100,
+            cellStyle:{'line-height':'40px'}
         },
         {
             field: "sale_rate",
@@ -470,19 +473,19 @@
         {
             field: "reg_dm",
             headerName: "등록일시",
-            cellStyle: { "text-align": "center","line-height":"12px" },
+            cellStyle: { "text-align": "center","line-height":"20px" },
             cellRenderer: (params) => {
                 const { reg_dm, new_product_type, new_product_day } = params.data;
                 let render = `${reg_dm}<br/>(${new_product_type}${new_product_day})`;
                 return render;
             },
-            width: 150
+            width: 110
         },
         {
             field: "new_product_day",
             headerName: "신상품일시",
-            width:84,
-            cellStyle:{'line-height':'30px'}
+            width:70,
+            cellStyle:{'line-height':'40px'}
         },
         {
             field: "soldout_day",

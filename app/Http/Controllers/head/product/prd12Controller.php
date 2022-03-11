@@ -19,12 +19,8 @@ class prd12Controller extends Controller
     public function index() {
 
         $conf = new Conf();
-<<<<<<< HEAD
         $domain = $conf->getConfig("shop","domain");
 
-=======
-        $domain = $conf->getConfig("shop", "domain");
->>>>>>> main
         $values = [
             'plan_types' => SLib::getCodes('G_PLAN_TYPE'),
             'plan_kinds' => SLib::getCodes('G_PLAN_KIND'),
@@ -65,20 +61,12 @@ class prd12Controller extends Controller
     public function show($code) {
 
         $conf = new Conf();
-<<<<<<< HEAD
         $domain = $conf->getConfig("shop","domain");
-=======
-        $domain = $conf->getConfig("shop", "domain");
->>>>>>> main
 
         $sql = /** @lang text */
             "
 				select a.p_no, a.d_cat_cd, a.plan_type, a.plan_kind, a.title, a.plan_date_yn, a.start_date, a.end_date, a.url
-<<<<<<< HEAD
 					, a.plan_img, a.plan_top_img, a.plan_top_mobile_img
-=======
-					, a.plan_img, a.plan_top_img, a.plan_top_mobile_img 
->>>>>>> main
 					, a.plan_preview_img, a.map, a.is_show, a.plan_show, a.promotion1, a.promotion2
 					, a.disp_prd_yn, a.disp_prd_pc, a.disp_prd_mobile
 					, a.keyword, a.skin
@@ -843,10 +831,5 @@ class prd12Controller extends Controller
 
     }
 
-<<<<<<< HEAD
     
 }
-=======
-
-}
->>>>>>> main

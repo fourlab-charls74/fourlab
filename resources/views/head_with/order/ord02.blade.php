@@ -457,16 +457,15 @@
             headerName: '',
             headerCheckboxSelection: true,
             checkboxSelection: true,
-            width:40,
+            width:28,
             pinned: 'left',
-            cellStyle: {"background":"#F5F7F7"}
         },
         {field:"ord_no" , headerName:"주문번호", width:130, cellStyle:StyleOrdNo, type:'HeadOrderNoType', pinned: 'left'},
-        {field:"ord_opt_no" , headerName:"주문일련번호", width:84, sortable:"ture", pinned: 'left', type:'HeadOrderNoType'},
-        {field:"ord_state" , headerName:"주문상태", width:72, cellStyle:StyleOrdState, pinned: 'left'  },
-        {field:"clm_state" , headerName:"클레임상태", width:72, cellStyle:StyleClmState, pinned: 'left'  },
-        {field:"pay_stat" , headerName:"입금상태", width:72  },
-        {field:"goods_type_nm" , headerName:"상품구분", width:72, cellStyle:StyleGoodsType  },
+        {field:"ord_opt_no" , headerName:"일련번호", width:58, sortable:"ture", pinned: 'left', type:'HeadOrderNoType'},
+        {field:"ord_state" , headerName:"주문상태", width:70, cellStyle:StyleOrdState, pinned: 'left'  },
+        {field:"clm_state" , headerName:"클레임상태", width:70, cellStyle:StyleClmState, pinned: 'left'  },
+        {field:"pay_stat" , headerName:"입금상태", width:58  },
+        {field:"goods_type_nm" , headerName:"상품구분", width:58, cellStyle:StyleGoodsType  },
         {field:"style_no" , headerName:"스타일넘버"  },
         {field:"goods_nm" , headerName:"상품명",type:"HeadGoodsNameType"},
         {
@@ -478,54 +477,39 @@
                 }
             }
         },
-        {field:"opt_val" , headerName:"옵션"  },
-        {field:"qty" , headerName:"주문수량", width:72},
+        {field:"opt_val" , headerName:"옵션", width:84  },
+        {field:"qty" , headerName:"수량", width:46},
         {field:"user_nm" , headerName:"주문자(아이디)"  },
-<<<<<<< HEAD
-        {field:"r_nm" , headerName:"수령자"  },
-        {field:"goods_price" , headerName:"자사몰 판매가", type: 'currencyType'  },
-        {field:"price" , headerName:"판매가", type: 'currencyType'  },
-        {field:"dlv_amt" , headerName:"배송비" , type: 'currencyType'  },
-        {field:"sales_com_fee" , headerName:"판매수수료" , type: 'currencyType'  },
-        {field:"pay_type" , headerName:"결제방법"   },
-=======
         {field:"r_nm" , headerName:"수령자", width:60  },
         {field:"goods_price" , headerName:"자사몰 판매가", width:84, type: 'currencyType'  },
         {field:"price" , headerName:"판매가", width:60, type: 'currencyType'  },
-        {field:"dlv_amt" , headerName:"배송비", width:60, type: 'currencyType'  },
+        {field:"dlv_amt" , headerName:"배송비", width:46, type: 'currencyType'  },
         {field:"sales_com_fee" , headerName:"판매수수료", width:72 , type: 'currencyType'  },
         {field:"pay_type" , headerName:"결제방법", wdith:72   },
->>>>>>> main
         {
             field:"ord_type",
             headerName:"주문구분",
             cellStyle:StyleOrdKind,
-            width:72
+            width:58
         },
         {
             field:"ord_kind",
             headerName:"출고구분",
             cellStyle:StyleOrdKind,
-            width:72
+            width:58
         },
         {field:"sale_place" , headerName:"판매처", width:72 },
         {field:"out_ord_no" , headerName:"판매처주문번호" },
         {field:"com_nm" , headerName:"업체" },
-<<<<<<< HEAD
-        {field:"baesong_kind" , headerName:"배송구분"  },
-        {field:"dlv_cm" , headerName:"택배업체"  },
-        {field:"dlv_no" , headerName:"송장번호"  },
-=======
-        {field:"baesong_kind" , headerName:"배송구분", width:72  },
+        {field:"baesong_kind" , headerName:"배송구분", width:58  },
         {field:"dlv_nm" , headerName:"택배업체", width:72  },
         {field:"dlv_no" , headerName:"송장번호", width:72  },
->>>>>>> main
         {field:"state" , headerName:"처리현황", editable: true, cellStyle: editCellStyle  },
         {field:"memo" , headerName:"메모", editable: true, cellStyle: editCellStyle  },
-        {field:"ord_date" , headerName:"주문일시", width:120 },
-        {field:"pay_date" , headerName:"입금일시", width:120 },
-        {field:"dlv_end_date" , headerName:"배송일시", width:120},
-        {field:"last_up_date" , headerName:"클레임일시", width:120}
+        {field:"ord_date" , headerName:"주문일시", width:110 },
+        {field:"pay_date" , headerName:"입금일시", width:110 },
+        {field:"dlv_end_date" , headerName:"배송일시", width:110},
+        {field:"last_up_date" , headerName:"클레임일시", width:110}
     ];
 
 

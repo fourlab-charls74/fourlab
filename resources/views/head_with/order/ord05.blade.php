@@ -330,7 +330,6 @@
 			// when the row is loaded) then the cell is refreshed.
 			valueGetter: 'node.id',
 			cellRenderer: 'loadingRenderer',
-            cellStyle: {"background":"#F5F7F7"}
 		},
 		/*
 			{

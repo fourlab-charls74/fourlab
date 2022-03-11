@@ -411,7 +411,7 @@
     </style>
     <script>
         const folder_columns = [
-            {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, sort: null, cellStyle: {"background":"#F5F7F7"}},
+            {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null, cellStyle: {"background":"#F5F7F7"}},
             {field: "d_cat_cd", headerName: "코드",width:100},
             {field: "d_cat_nm", headerName: "폴더명",width:200,rowDrag: true,
                 editable: function(params){ return (params.data !== undefined && params.data.editable === 'Y')? true:false; },
@@ -434,23 +434,23 @@
 
         const columns = [
             {headerName: '#', width:35, pinned: 'left', type:'NumType', cellStyle: {"background":"#F5F7F7"}},
-            {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
-            {field: "goods_no", headerName: "상품번호", width: 96, pinned: 'left',rowDrag: true},
+            {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, pinned: 'left', sort: null},
+            {field: "goods_no", headerName: "상품번호", width: 82, pinned: 'left',rowDrag: true},
             {field: "head_desc", headerName: "상단홍보글"},
-            {field: "img", headerName: "이미지", width:60, type:'GoodsImageType', cellStyle: {"text-align":"center"}},
+            {field: "img", headerName: "이미지", width:46, type:'GoodsImageType', cellStyle: {"text-align":"center"}},
             {field: "img", headerName: "이미지_url", hide: true},
             {field: "goods_nm", headerName: "상품명",type:'HeadGoodsNameType'},
             {field: "ad_desc", headerName: "하단홍보글"},
-            {field: "sale_stat_cl", headerName: "상품상태", width:72, type:'GoodsStateType'},
+            {field: "sale_stat_cl", headerName: "상품상태", width:70, type:'GoodsStateType'},
             {field: "before_sale_price", headerName: "정상가", type:'currencyType', hide: true},
             {field: "price", headerName: "판매가", width:60, type:'currencyType'},
             {field: "coupon_price", headerName: "쿠폰가", width:60, type:'currencyType'},
             {field: "sale_rate", headerName: "세일율(,%)", type:'percentType', hide: true},
             {field: "sale_s_dt", headerName: "세일기간", hide: true},
             {field: "sale_e_dt", headerName: "세일기간", hide: true},
-            {field: "qty", headerName: "재고수", width:60, type:'numberType'},
-            {field: "wqty", headerName: "보유재고수", width:72, type:'numberType'},
-            {field: "reg_dm", headerName: "등록일시", width:120},
+            {field: "qty", headerName: "재고수", width:46, type:'numberType'},
+            {field: "wqty", headerName: "보유재고수", width:70, type:'numberType'},
+            {field: "reg_dm", headerName: "등록일시", width:110},
             {field: "sale_price", headerName: "sale_price", hide: true},
             {field: "goods_type_cd", headerName: "goods_type", hide: true},
         ];

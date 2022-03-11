@@ -207,11 +207,7 @@
 						</div>
 					</div>
 				</div>
-<<<<<<< HEAD
-				<div class="row d-none search-area-ext">
-=======
 				<div class="row align-items-center d-none search-area-ext">
->>>>>>> main
 					<!-- 주문번호 -->
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
@@ -250,11 +246,7 @@
 						</div>
 					</div>
 				</div>
-<<<<<<< HEAD
-				<div class="row d-none search-area-ext">
-=======
 				<div class="row align-items-center d-none search-area-ext">
->>>>>>> main
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="goods_type">품목</label>
@@ -339,25 +331,24 @@
 			valueGetter: 'node.id',
 			cellRenderer: 'loadingRenderer',
 			pinned: 'left',
-            cellStyle: {"background":"#F5F7F7"}
 		},
 		{
 			headerName: '',
 			headerCheckboxSelection: true,
 			checkboxSelection:function(params){ return (params.data.ord_kind_nm == '출고가능' || params.data.ord_kind_nm == '정상')? true:false; },
-			width: 40,
+			width: 28,
 			pinned: 'left',
 		},
 		{
 			field: "ord_type_nm",
 			headerName: "주문구분",
-			width: 72,
+			width: 58,
 			pinned: 'left'
 		},
 		{
 			field: "ord_kind_nm",
 			headerName: "출고구분",
-			width: 72,
+			width: 58,
 			cellStyle: StyleOrdKind,
 			pinned: 'left'
 		},
@@ -372,7 +363,7 @@
 		{
 			field: "ord_opt_no",
 			headerName: "일련번호",
-			width: 72,
+			width: 58,
 			sortable: "ture",
 			type: 'HeadOrderNoType',
 			pinned: 'left'
@@ -380,33 +371,29 @@
 		{
 			field: "ord_state_nm",
 			headerName: "주문상태",
-			width: 72,
+			width: 70,
 			cellStyle: StyleOrdState
 		},
 		{
 			field: "pay_stat_nm",
 			headerName: "입금상태",
-			width: 72
+			width: 58
 		},
 		{
 			field: "dlv_type",
 			headerName: "배송방식",
-			width: 72
+			width: 58
 		},
 		{
 			field: "clm_state_nm",
 			headerName: "클레임상태",
-			width: 72,
+			width: 70,
 			cellStyle: StyleClmState
 		},
 		{
 			field: "goods_type_nm",
 			headerName: "상품구분",
-<<<<<<< HEAD
-			width: 90,
-=======
-			width: 72,
->>>>>>> main
+			width: 58,
 			cellStyle: StyleGoodsTypeNM,
 		},
 		{
@@ -427,22 +414,19 @@
 		},
 		{
 			field: "opt_val",
-			headerName: "옵션"
+			headerName: "옵션",
+			width:82
 		},
 		{
 			field: "sale_qty",
-			headerName: "주문수량",
-			width: 72,
+			headerName: "수량",
+			width: 46,
 			type: 'currencyType'
 		},
 		{
 			field: "qty",
 			headerName: "온라인재고",
-<<<<<<< HEAD
-			width: 90,
-=======
-			width: 84,
->>>>>>> main
+			width: 70,
 			type: 'currencyType',
 			cellRenderer: function(params) {
 				return '<a href="#" onclick="return openHeadStock(' + params.data.goods_no + ',\'' + params.data.opt_val +'\');">' + params.value + '</a>';
@@ -451,11 +435,7 @@
 		{
 			field: "wqty",
 			headerName: "보유재고",
-<<<<<<< HEAD
-			width: 90,
-=======
-			width: 72,
->>>>>>> main
+			width: 58,
 			type: 'currencyType',
 			cellStyle: function(params) {
 				return {"background": parseInt(params.value) === 0 && params.data.goods_type === "S" ? "#FF8040" : 'none'};
@@ -539,17 +519,17 @@
 		{
 			field: "ord_date",
 			headerName: "주문일시",
-			width:125
+			width:110
 		},
 		{
 			field: "pay_date",
 			headerName: "입금일시",
-			width:125
+			width:110
 		},
 		{
 			field: "last_up_date",
 			headerName: "클레임일시",
-			width:125
+			width:110
 		}
 	];
 </script>

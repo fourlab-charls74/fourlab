@@ -84,8 +84,8 @@
 <script>
     const columns = [
         {field: "type", headerName: "구분"},
-        {field: "sec_no", headerName: "코드", width: 100, cellClass: 'hd-grid-code',},
-        {field: "name", headerName: "섹션명", width: 200,
+        {field: "sec_no", headerName: "코드", width: 70, cellClass: 'hd-grid-code',},
+        {field: "name", headerName: "섹션명", width: 220,
             cellRenderer: function(params) {
                 return '<a href="#" data-code="'+params.data.sec_no +'" onClick="openCodePopup(this)">'+ params.value+'</a>'
             }
@@ -94,32 +94,21 @@
         {field: "soldout_ex_yn", headerName: "품절상품제외", width:96, cellClass: 'hd-grid-code'},
         {headerName:"상품수",
             children : [
-<<<<<<< HEAD
                 {headerName : "판매중", field : "40_cnt",type:'numberType'},
-=======
-                {headerName : "판매중", field : "40_cnt", width:60, type:'numberType'},
->>>>>>> main
                 {
                     headerName : "품절", 
                     field : "30_cnt",
                     type:'numberType', 
-<<<<<<< HEAD
-=======
-                    width:60,
->>>>>>> main
                     cellStyle: function(params) {
                         return {"background": parseInt(params.value) > 0 ? "#C5FF9D" : 'none'};
                     }
                 },
-<<<<<<< HEAD
                 {headerName : "전체", field : "cnt",type:'numberType'}
-=======
-                {headerName : "전체", field : "cnt", width:60, type:'numberType'}
->>>>>>> main
             ]
         },
-        {field: "use_yn", headerName: "사용여부", width: 72,cellClass: 'hd-grid-code'},
-        {field: "rt", headerName: "등록일시", width: 130,cellClass: 'hd-grid-code'},
+        {field: "use_yn", headerName: "사용여부", width: 58,cellClass: 'hd-grid-code'},
+        {field: "rt", headerName: "등록일시", width: 110,cellClass: 'hd-grid-code'},
+        {field:"", headerName:"", width:"auto"}
     ];
 </script>
 <script type="text/javascript" charset="utf-8">

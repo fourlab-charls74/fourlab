@@ -138,6 +138,9 @@
             <a href="javascript:;" class="btn btn-sm btn-secondary" onclick="window.close()">취소</a>
         </div>
     </div>
+    <style>
+        img{height:30px;}
+    </style>
     <script>
 
         let code = '{{ $code  }}';
@@ -236,24 +239,24 @@
     </script>
     <script>
         const columns = [
-            {headerName: '#', pinned: 'left', type:'NumType', cellStyle: {"line-height": "40px"}},
-            {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
-            {field: "goods_no", headerName: "상품번호", width: 100, pinned: 'left',rowDrag: true},
-            {field: "head_desc", headerName: "상단홍보글", cellStyle: {"line-height": "40px"}},
-            {field: "img", headerName: "이미지", type:'GoodsImageType'},
+            {headerName: '#', pinned: 'left', type:'NumType', cellStyle: {"line-height": "30px"}},
+            {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, pinned: 'left', sort: null},
+            {field: "goods_no", headerName: "상품번호", width: 75, pinned: 'left',rowDrag: true},
+            {field: "head_desc", headerName: "상단홍보글", cellStyle: {"line-height": "30px"}},
+            {field: "img", headerName: "이미지", width:46, type:'GoodsImageType'},
             {field: "img", headerName: "이미지_url", hide: true},
-            {field: "goods_nm", headerName: "상품명",type:'HeadGoodsNameType', cellStyle: {"line-height": "40px"}},
-            {field: "ad_desc", headerName: "하단홍보글", cellStyle: {"line-height": "40px"}},
-            {field: "sale_stat_cl", headerName: "상품상태", type:'GoodsStateType', cellStyle: {"line-height": "40px"}},
+            {field: "goods_nm", headerName: "상품명",type:'HeadGoodsNameType', cellStyle: {"line-height": "30px"}},
+            {field: "ad_desc", headerName: "하단홍보글", cellStyle: {"line-height": "30px"}},
+            {field: "sale_stat_cl", headerName: "상품상태", width:70, type:'GoodsStateType', cellStyle: {"line-height": "30px"}},
             {field: "before_sale_price", headerName: "정상가", type:'currencyType', hide: true},
-            {field: "price", headerName: "판매가", type:'currencyType', cellStyle: {"line-height": "40px"}},
-            {field: "coupon_price", headerName: "쿠폰가", type:'currencyType', cellStyle: {"line-height": "40px"}},
+            {field: "price", headerName: "판매가", type:'currencyType', cellStyle: {"line-height": "30px"}},
+            {field: "coupon_price", headerName: "쿠폰가", type:'currencyType', cellStyle: {"line-height": "30px"}},
             {field: "sale_rate", headerName: "세일율(,%)", type:'percentType', hide: true},
             {field: "sale_s_dt", headerName: "세일기간", hide: true},
             {field: "sale_e_dt", headerName: "세일기간", hide: true},
-            {field: "qty", headerName: "재고수", type:'numberType', cellStyle: {"line-height": "40px"}},
-            {field: "wqty", headerName: "보유재고수", type:'numberType', cellStyle: {"line-height": "40px"}},
-            {field: "reg_dm", headerName: "등록일시", cellStyle: {"line-height": "40px"}},
+            {field: "qty", headerName: "재고수", type:'numberType', width:46, cellStyle: {"line-height": "30px"}},
+            {field: "wqty", headerName: "보유재고수", width:70, type:'numberType', cellStyle: {"line-height": "30px"}},
+            {field: "reg_dm", headerName: "등록일시", width:110, cellStyle: {"line-height": "30px"}},
             {field: "sale_price", headerName: "sale_price", hide: true},
             {field: "goods_type_cd", headerName: "goods_type", hide: true},
         ];

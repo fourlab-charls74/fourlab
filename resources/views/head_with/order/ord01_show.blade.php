@@ -1530,8 +1530,6 @@
         });
     }
 
-<<<<<<< HEAD
-=======
     /*
         주문상태 변경 (출고요청->출고처리 / 출고처리중->출고완료)
         -------------------------------
@@ -1594,7 +1592,6 @@
         });
     }
 
->>>>>>> main
     function openPopup(e, type) {
         e.preventDefault();
         if(type === "cash") {
@@ -1610,15 +1607,11 @@
         }
     }
 
-<<<<<<< HEAD
-     /* 신용카드 영수증 */ 
-=======
     /*
         ---------------------------------
     */
 
     /* 신용카드 영수증 */ 
->>>>>>> main
     /* 실결제시 : "https://admin8.kcp.co.kr/assist/bill.BillActionNew.do?cmd=card_bill&tno=" */
     /* 테스트시 : "https://testadmin8.kcp.co.kr/assist/bill.BillActionNew.do?cmd=card_bill&tno=" */
     function receiptView( tno, ordr_idxx, amount )
@@ -1627,10 +1620,6 @@
         receiptWin	+= tno + "&";
         receiptWin	+= "order_no=" + ordr_idxx + "&"; 
         receiptWin	+= "trade_mony=" + amount ;
-<<<<<<< HEAD
-
-=======
->>>>>>> main
         window.open(receiptWin, "", "width=455, height=815"); 
     }
 
@@ -1656,10 +1645,6 @@
             +''+(today.getHours() < 10 ? '0' : '')
             +''+today.getHours();
     }   
-<<<<<<< HEAD
-    
-=======
->>>>>>> main
 </script>
 <style>
     .checked-goods td:not([rowspan='{{count($ord_lists)}}']) {
