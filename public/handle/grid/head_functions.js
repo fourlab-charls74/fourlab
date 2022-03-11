@@ -242,7 +242,7 @@ function StyleGoodsTypeNM(params) {
             return {
                 color: color,
                 "text-align": "center",
-                "line-height": "40px"
+                //"line-height": "40px"
             };
         }
     }
