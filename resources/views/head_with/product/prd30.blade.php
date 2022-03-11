@@ -311,7 +311,6 @@
 			valueGetter: 'node.id',
 			cellRenderer: 'loadingRenderer',
 			pinned: 'left',
-			cellStyle: {"background":"#F5F7F7"}
 		},
 		{
 			headerName: '',

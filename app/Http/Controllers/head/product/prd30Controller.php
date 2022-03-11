@@ -242,9 +242,9 @@ class prd30Controller extends Controller
 	{
 		// 설정 값 얻기
         $conf	= new Conf();
-		//$cfg_domain_bizest	= $conf->getConfigValue("shop","domain_bizest");
+		$cfg_domain_bizest	= $conf->getConfigValue("shop","domain_bizest");
 		//$cfg_domain_bizest	= "127.0.0.1:8000/head";
-		$cfg_domain_bizest	= "handle.netpx.co.kr/head";
+		$cfg_domain_bizest	.= "/head";
 
 		$result_no	= "";
 		$result_msg	= "";
@@ -435,9 +435,9 @@ class prd30Controller extends Controller
 	{
 		// 설정 값 얻기
         $conf	= new Conf();
-		//$cfg_domain_bizest	= $conf->getConfigValue("shop","domain_bizest");
+		$cfg_domain_bizest	= $conf->getConfigValue("shop","domain_bizest");
 		//$cfg_domain_bizest	= "127.0.0.1:8000/head";
-		$cfg_domain_bizest	= "handle.netpx.co.kr/head";
+		$cfg_domain_bizest	.= "/head";
 
 		$result_no	= "";
 		$result_msg	= "";
