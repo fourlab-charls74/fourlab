@@ -379,7 +379,7 @@
                     <a href="#">결제정보</a>
                 </div>
                 <div class="card-body">
-                    <div id="amt_table" class="row_wrap" style="display: none;">
+                    <div class="row_wrap">
                         <div class="row">
                             <div class="col-12">
                                 <div class="table-box-ty2 mobile">
@@ -394,11 +394,7 @@
                                         </colgroup>
                                         <tbody>
                                             <tr>
-<<<<<<< HEAD
                                                 <th class="required">결제수단</th>
-=======
-                                                <th class="required">결재수단</th>
->>>>>>> main
                                                 <td style="padding:0px 10px 0px 10px;">
                                                     <div class="flax_box">
                                                         <select name="pay_type" id="pay_type" class="form-control form-control-sm">
@@ -480,11 +476,7 @@
             cellClass:['hd-grid-number','hd-grid-edit'],onCellValueChanged:EditAmt,
             //cellStyle:StyleChangeYN,
         },
-<<<<<<< HEAD
         {field:"price" , headerName:"판매가", width:90, type: 'currencyType', editable: function(params) {if(params.data.goods_no) return true; return false;}, cellClass: ['hd-grid-number', 'hd-grid-edit'], onCellValueChanged: EditAmt },
-=======
-        {field:"price" , headerName:"판매가", width:90, type: 'currencyType',  editable: function(params) {if(params.data.goods_no) return true; return false;}, cellClass: ['hd-grid-number', 'hd-grid-edit'], onCellValueChanged: EditAmt },
->>>>>>> main
         {field:"ord_amt" , headerName:"주문액", width:90, type: 'currencyType'  },
         // {field:"recv_amt" , headerName:"입금액", width:90, type: 'currencyType',onCellValueChanged:EditAmt },
         {field:"point_amt" , headerName:"(-)적립금", width:90, type: 'currencyType',editable: function(params) {if(params.data.goods_no) return true; return false;}, onCellValueChanged:EditAmt },

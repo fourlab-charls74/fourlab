@@ -691,17 +691,6 @@
     function save() {
 
         var order_data = getForm2JSON($('form[name=f1]'));
-<<<<<<< HEAD
-=======
-        
-        let rows = [];
-        gx.gridOptions.api.forEachNode(node => {
-            if(node.data.goods_no !== undefined) {
-                rows.push(node.data);
-            }
-        })
-        order_data["cart"] = rows;
->>>>>>> main
 
         let rows = [];
         gx.gridOptions.api.forEachNode(node => {
@@ -748,10 +737,6 @@
     function ChoiceGoodsNo(goods_nos){
         if(goods_nos.length < 1) return;
         const goods_list = [];
-<<<<<<< HEAD
-=======
-
->>>>>>> main
         for(var i=0;i<goods_nos.length;i++){
             $.ajax({
                 type: "get",
@@ -785,10 +770,6 @@
                 _goods_list_of_com_type.etc.push(goods);
             }
         });
-<<<<<<< HEAD
-
-=======
->>>>>>> main
         gx.gridOptions.api.setRowData([]);
         Object.keys(_goods_list_of_com_type).forEach(key => {
             _goods_list_of_com_type[key].forEach(goods => {
@@ -803,10 +784,6 @@
                 }]);
             }
         })
-<<<<<<< HEAD
-
-=======
->>>>>>> main
         setDlvFeeOfComType();
         $("#amt_table").css("display", "block");
     }
@@ -830,10 +807,6 @@
             "dc_amt" : 0,
             "dlv_amt" : res.goods_info.baesong_price,
         }]);
-<<<<<<< HEAD
-
-=======
->>>>>>> main
         var options = [];
         for(var j = 0; j < res.options.length;j++){
             if(res.options[j].qty > 0){
@@ -848,20 +821,12 @@
      */
     function DelGoods(){
         let delrow = gx.getSelectedRows();
-<<<<<<< HEAD
-
-=======
->>>>>>> main
         delrow.forEach(d => {
             if(d.goods_no) {
                 const type = d.com_type == 2 ? d.com_id : "etc";
                 _goods_list_of_com_type[type] = _goods_list_of_com_type[type].filter(item => item.goods_no !== d.goods_no);
                 if(_goods_list_of_com_type[type].length < 1) {
                     _goods_list_of_com_type[type] = null;
-<<<<<<< HEAD
-
-=======
->>>>>>> main
                     gx.gridOptions.api.forEachNode(node => {
                         if(node.data.com_id === d.com_id || (type === "etc" && node.data.com_id === "etc")) node.setSelected(true);
                     })
@@ -894,13 +859,8 @@
         EditAmtTable();
     })
 
-<<<<<<< HEAD
     // 배송비 적용/적용안함 설정
     function setDlvFeeUse(is_use) {
-=======
-     // 배송비 적용/적용안함 설정
-     function setDlvFeeUse(is_use) {
->>>>>>> main
         if(is_use) setDlvFeeOfComType();
         else EditAmtTable(0);
     }
