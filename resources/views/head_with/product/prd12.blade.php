@@ -23,7 +23,7 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-lg-6 inner-td">
+                    <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="user_yn">유형</label>
                             <div class="flax_box">
@@ -36,7 +36,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-6 inner-td">
+                    <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="user_yn">구분</label>
                             <div class="flax_box">
@@ -49,9 +49,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-6 inner-td">
+                    <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="name">제목</label>
                             <div class="flax_box">
@@ -59,7 +57,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-6 inner-td">
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="state">사용여부</label>
                             <div class="flax_box">
@@ -107,10 +107,10 @@
 <script>
 
     const columns = [
-        {field: "no", headerName: "코드", width: 84, cellClass: 'hd-grid-code',},
+        {field: "no", headerName: "코드", width: 70, cellClass: 'hd-grid-code',},
         {field: "plan_type", headerName: "유형", width:96},
         {field: "plan_kind", headerName: "구분"},
-        {field: "title", headerName: "제목", width: 200,
+        {field: "title", headerName: "제목", width: 260,
             cellRenderer: function(params) {
                 return '<a href="#" data-code="'+params.data.no +'" onClick="openCodePopup(this)">'+ params.value+'</a>'
             }
@@ -123,18 +123,14 @@
         {field: "p_cnt", headerName: "조회수", width:60, type: 'numberType' },
         {field: "preview", headerName: "미리보기", width:72,cellClass: 'hd-grid-code',
             cellRenderer: function(params) {
-<<<<<<< HEAD
                 return '<a href="https://' + '{{ $domain }}' + '/app/planning/views/' + params.data.p_no + '/' + params.data.no + '" target="_blank">보기</a>'
-                //https://www.netpx.co.kr/app/boards/views/event_all/2330?page=1&s_type=&q=
-=======
-                return '<a href="https://' + '{{ $domain }}' + '/app/planning2/views/' + params.data.p_no + '/' + params.data.no + '" target="_blank">보기</a>'
->>>>>>> main
             }
         },
-        {field: "is_show", headerName: "사용여부", width:72, cellClass: 'hd-grid-code'},
+        {field: "is_show", headerName: "사용여부", width:58, cellClass: 'hd-grid-code'},
         {field: "admin_name", headerName: "등록자", },
-        {field: "regi_date", headerName: "등록일시", width: 130,cellClass: 'hd-grid-code'},
-        {field: "upd_date", headerName: "수정일시", width: 130,cellClass: 'hd-grid-code'},
+        {field: "regi_date", headerName: "등록일시", width: 110,cellClass: 'hd-grid-code'},
+        {field: "upd_date", headerName: "수정일시", width: 110,cellClass: 'hd-grid-code'},
+        {field:"", headerName:"", width:"auto"}
     ];
     
 </script>

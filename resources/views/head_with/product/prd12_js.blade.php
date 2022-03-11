@@ -126,11 +126,7 @@
 
         function View() {
             var p_no = $('#d_cat_cd').val();
-<<<<<<< HEAD
             var url = "https://" + '{{ @$domain }}' + "/app/planning/views/" + p_no + '/' + code;
-=======
-            var url = "https://" + '{{ @$domain }}' + "/app/planning2/views/" + p_no + '/' + code;
->>>>>>> main
             window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=400,left=550,width=1024,height=900");
         }
 
@@ -476,7 +472,6 @@
             fr.readAsDataURL(files[0]);
         }
 
-<<<<<<< HEAD
         /*
         노출기간설정 관련
         */
@@ -485,14 +480,6 @@
             $("input[name='start_date']").val(getDate(start));
             $("input[name='end_date']").val(getDate(end));
 
-=======
-         /*
-        노출기간설정 관련
-        */
-        function setDisplayDate(start, end) {
-            $("input[name='start_date']").val(getDate(start));
-            $("input[name='end_date']").val(getDate(end));
->>>>>>> main
             // 시간옵션세팅
             const options = [...Array(24).keys()].map((i) => (i < 10 ? "0" : "") + i);
             $(".select-time").each(function(i, node) {
@@ -500,10 +487,6 @@
                 options.forEach(opt => opt_html += `<option value=${opt}>${opt}</option>`);
                 node.innerHTML = opt_html;
             })
-<<<<<<< HEAD
-
-=======
->>>>>>> main
             $("select[name='start_time']").val(getTime(start));
             $("select[name='end_time']").val(getTime(end));
             
@@ -533,8 +516,4 @@
             $("select[name='end_time']").attr("disabled", !is_use);
         }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> main
     </script>
