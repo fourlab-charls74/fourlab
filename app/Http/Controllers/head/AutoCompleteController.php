@@ -154,11 +154,7 @@ class AutoCompleteController extends Controller
                 select 
                     brand as id,brand_nm as text, concat(:image_svr,brand_logo) as img
                 from brand 
-<<<<<<< HEAD
                 where $where ( brand like :brand or brand_nm like :brand_nm ) 
-=======
-                where $where ( brand like :brand or brand_nm like :brand_nm )
->>>>>>> main
                 order by brand
                 limit 0, 10
             ";

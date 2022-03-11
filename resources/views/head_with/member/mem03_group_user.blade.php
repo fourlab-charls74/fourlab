@@ -455,16 +455,11 @@ $('.point-btn').click(function(e){
 
 $('.coupon-btn').click(function(e){
     const rows = gx.getSelectedRows();
-<<<<<<< HEAD
-
-=======
->>>>>>> main
     if (rows.length === 0) {
         alert("쿠폰을 지급할 유저를 선택해주세요.");
         return;
     }
     const user_ids = [];
-<<<<<<< HEAD
 
     rows.forEach(function(data){
         user_ids.push(data.user_id);
@@ -472,13 +467,6 @@ $('.coupon-btn').click(function(e){
 
     openCoupon(user_ids.join(','));
 });
-=======
-    rows.forEach(function(data){
-        user_ids.push(data.user_id);
-    });
-    openCoupon(user_ids.join(','));
-});
 
->>>>>>> main
 </script>
 @stop
