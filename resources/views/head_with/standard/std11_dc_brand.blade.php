@@ -179,7 +179,7 @@
             headerName: '',
             headerCheckboxSelection: true,
             checkboxSelection: true,
-            width:50
+            width:28
         },
         {
             field: "brand_nm", 

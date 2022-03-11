@@ -136,7 +136,7 @@ const column = [
         headerName: '',
         headerCheckboxSelection: true,
         checkboxSelection: true,
-        width:50
+        width:28
     },
     {field: "user_id", headerName: "아이디"},
     {field: "name", headerName: "이름"},

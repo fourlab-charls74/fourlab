@@ -355,7 +355,7 @@ $('.submit-btn').click((e) => {
             headerName: '',
             headerCheckboxSelection: true,
             checkboxSelection: true,
-            width:50
+            width:28
         },
         {
             field: "brand_nm", 
@@ -393,7 +393,7 @@ $('.submit-btn').click((e) => {
             headerName: '',
             headerCheckboxSelection: true,
             checkboxSelection: true,
-            width:50
+            width:28
         },
         {field: "goods_no", headerName: "상품코드"},
         {field: "brand_nm", headerName: "브랜드"},
@@ -410,7 +410,7 @@ $('.submit-btn').click((e) => {
             headerName: '',
             headerCheckboxSelection: true,
             checkboxSelection: true,
-            width:50
+            width:28
         },
         {field: "goods_no", headerName: "상품코드"},
         {field: "brand_nm", headerName: "브랜드"},

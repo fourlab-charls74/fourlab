@@ -219,7 +219,7 @@
 
 <script type="text/javascript" charset="utf-8">
 	var columns = [
-		{field:"chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, sort: null},
+		{field:"chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
 		{field:"no",  headerName: "번호", width: 70},
 		{field:"name" , headerName:"사은품명", width:220,
 			cellRenderer: function(params) {

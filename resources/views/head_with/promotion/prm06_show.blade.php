@@ -417,7 +417,7 @@
 
 	var columns = [
 		{headerName: '#', width:50, maxWidth: 90,type:'NumType', pinned : 'left', width: 40},
-		{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, sort: null},
+		{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
 		{headerName:"상품번호", width:120, 
 			children : [
 				{

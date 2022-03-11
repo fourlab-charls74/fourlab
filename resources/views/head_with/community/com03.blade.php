@@ -171,7 +171,7 @@
 		  headerName: '선택',
 		  checkboxSelection: true,
 		  headerCheckboxSelectionFilteredOnly: true,
-		  width: 50,
+		  width: 28,
 		},
 	
 		{field:"c_no" , headerName:"번호", },

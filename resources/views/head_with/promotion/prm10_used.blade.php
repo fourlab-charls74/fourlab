@@ -114,7 +114,7 @@ var columns = [
         headerName: '',
         headerCheckboxSelection: true,
         checkboxSelection: true,
-        width:50,
+        width:28,
         pinned:'left'
     },
     {field:"user_id" , headerName:"아이디", type:"HeadUserType"},

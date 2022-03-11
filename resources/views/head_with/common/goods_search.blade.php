@@ -288,7 +288,7 @@
             headerName: '',
             headerCheckboxSelection: true,
             checkboxSelection: true,
-            width:50,
+            width:28,
             pinned:'left'
         },
         {field: "goods_no", headerName: "상품번호", pinned:'left'},

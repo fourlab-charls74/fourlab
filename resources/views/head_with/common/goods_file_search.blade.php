@@ -73,7 +73,7 @@ const columnDefs = [
         headerName: '',
         headerCheckboxSelection: true,
         checkboxSelection: true,
-        width:50
+        width:28
 
     },
     {headerName: '상품',

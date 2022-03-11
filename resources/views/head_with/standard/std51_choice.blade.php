@@ -215,7 +215,7 @@
     </script>
     <script>
         const columns = [
-            {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
+            {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, pinned: 'left', sort: null},
             {field: "code_id", headerName: "아이디",rowDrag: true},
             {field: "code_val", headerName: "코드값1"},
             {field: "code_val2", headerName: "코드값2"},

@@ -163,7 +163,7 @@
             headerName: '',
             headerCheckboxSelection: true,
             checkboxSelection: true,
-            width:50
+            width:28
         },
         {field: "goods_no", headerName: "상품코드"},
         {field: "goods_type", headerName: "상품구분", width: 75},

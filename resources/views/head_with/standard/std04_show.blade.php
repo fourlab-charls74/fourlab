@@ -270,7 +270,7 @@ var columns = [
             headerName: '',pinned:'left',
             headerCheckboxSelection: true,
             checkboxSelection: true,
-            width:50,
+            width:28,
             cellRenderer: function(params) {
                 if (params.data.group_cd !== undefined && params.data.group_cd !== null) {
                     return "<input type='checkbox' checked/>";

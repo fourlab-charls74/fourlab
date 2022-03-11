@@ -147,7 +147,7 @@
                 headerName: '',
                 headerCheckboxSelection: true,
                 checkboxSelection: true,
-                width:50,
+                width:28,
             },
             {field:"coupon_no" , headerName:"번호"},
             {

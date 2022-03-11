@@ -755,7 +755,7 @@
             headerName: '',
             headerCheckboxSelection: true,
             checkboxSelection: true,
-            width:50
+            width:28
         },
         {field:"goods_no", headerName:"상품코드", width:90},
         {field:"style_no", headerName:"스타일넘버", width:100},
@@ -771,7 +771,7 @@
             headerName: '',
             headerCheckboxSelection: true,
             checkboxSelection: true,
-            width:50
+            width:28
         },
         {field:"com_nm", headerName:"업체명", width: 150},
         {field:"com_rat", headerName:"업체정산(%)", cellStyle: { 'text-align' : 'right' }},

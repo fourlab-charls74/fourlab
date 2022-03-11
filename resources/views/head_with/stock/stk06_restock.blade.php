@@ -97,7 +97,7 @@
 				valueGetter: 'node.id',
 				cellRenderer: 'loadingRenderer',
 			},
-            {field:"chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, sort: null},
+            {field:"chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
             {field:"rt" , headerName:"요청일시", width:130},
             {field:"user_id" , headerName:"아이디",type:"HeadUserType", width:100},
             {field:"name" , headerName:"이름", width:100},

@@ -252,11 +252,7 @@
         disableDragAndDrop: false,
         toolbar: editorToolbar,
         imageupload:{
-<<<<<<< HEAD
             dir:'/data/head/prm05',
-=======
-            dir:'/data/head/prm06',
->>>>>>> main
             maxWidth:1280,
             maxSize:10,
             callback : function(image) {

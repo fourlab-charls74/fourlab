@@ -183,7 +183,7 @@ var columns = [
         headerName: '',
         headerCheckboxSelection: true,
         checkboxSelection: true,
-        width:50,
+        width:28,
         pinned:'left'
     },
     {field:"code" , headerName:"코드", width:170},
