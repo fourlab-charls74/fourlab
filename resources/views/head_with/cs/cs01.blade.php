@@ -63,7 +63,7 @@
                             <div class="form-group">
                                 <label for="ord_no">주문번호</label>
                                 <div class="flax_box">
-                                    <input type='text' class="form-control form-control-sm search-all" name='ord_no' value=''>
+                                    <input type='text' class="form-control form-control-sm search-all search-enter" name='ord_no' value=''>
                                 </div>
                             </div>
                         </div>
@@ -73,13 +73,13 @@
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box">
                                         <div class="form-group">
-                                            <input type="text" class="form-control form-control-sm search-all" name="user_nm" value="">
+                                            <input type="text" class="form-control form-control-sm search-all search-enter" name="user_nm" value="">
                                         </div>
                                     </div>
                                     <span class="text_line">/</span>
                                     <div class="form-inline-inner input_box">
                                         <div class="form-group">
-                                            <input type="text" class="form-control form-control-sm search-all" name="pay_nm" value="">
+                                            <input type="text" class="form-control form-control-sm search-all search-enter" name="pay_nm" value="">
                                         </div>
                                     </div>
                                 </div>
@@ -122,7 +122,7 @@
                             <div class="form-group">
                                 <label for="ord_type">클레임사유</label>
                                 <div class="flax_box">
-                                    <select name="clm_reason" id="ce" class="form-control form-control-sm">
+                                    <select name="clm_reason" id="ce" class="form-control form-control-sm search-enter">
                                         <option value="">전체</option>
 										@foreach($clm_reason_item as $clm_reason)
 											<option value="{{ $clm_reason->code_id }}">{{ $clm_reason->code_val }}</option>
@@ -172,7 +172,7 @@
                             <div class="form-group">
                                <label for="style_no">스타일넘버</label>
                                <div class="flax_box">
-                                   <input type='text' class="form-control form-control-sm search-all ac-style-no2" name='style_no' value=''>
+                                   <input type='text' class="form-control form-control-sm search-all ac-style-no2 search-enter" name='style_no' value=''>
                                </div>
                             </div>
                         </div>
@@ -180,7 +180,7 @@
                             <div class="form-group">
                                 <label for="goods_nm">상품명</label>
                                 <div class="flax_box">
-                                    <input type='text' class="form-control form-control-sm search-all ac-goods_nm" name='goods_nm' value=''>
+                                    <input type='text' class="form-control form-control-sm search-all ac-goods_nm search-enter" name='goods_nm' value=''>
                                 </div>
                             </div>
                         </div>
@@ -202,7 +202,7 @@
                                     <span class="text_line">/</span>
                                     <div class="form-inline-inner input_box">
                                         <div class="form-group">
-                                            <input type='text' class="form-control form-control-sm" name='head_desc' value=''>
+                                            <input type='text' class="form-control form-control-sm search-enter" name='head_desc' value=''>
                                         </div>
                                     </div>
                                 </div>
@@ -251,7 +251,7 @@
                                     <div class="form-inline-inner input-box">
                                         <div class="form-inline inline_btn_box">
                                             <input type="hidden" name="cat_cd" id="cat_cd" value="">
-                                            <input type="text" class="form-control form-control-sm search-all search-enter ac-company2" name='com_nm' id='com_nm' value='' autocomplete='off' >
+                                            <input type="text" class="form-control form-control-sm search-all search-enter ac-company2" name='com_nm' id='com_nm' value='' autocomplete='off' readonly>
                                             <a href="#" class="btn btn-sm btn-outline-primary company-add-btn"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                         </div>
                                     </div>
@@ -286,13 +286,13 @@
                                 <div class="form-inline">
 									<div class="form-inline-inner input_box">
                                         <div class="form-group">
-                                            <input type="text" class="form-control form-control-sm search-all" name="refund_nm" value="">
+                                            <input type="text" class="form-control form-control-sm search-all search-enter" name="refund_nm" value="">
                                         </div>
                                     </div>
                                     <span class="text_line">/</span>
                                     <div class="form-inline-inner input_box">
                                         <div class="form-group">
-                                            <input type="text" class="form-control form-control-sm search-all" name="refund_bank" value="">
+                                            <input type="text" class="form-control form-control-sm search-all search-enter" name="refund_bank" value="">
                                         </div>
                                     </div>
                                 </div>
@@ -302,7 +302,7 @@
                             <div class="form-group">
                                 <label for="ord_kind">접수자</label>
                                 <div class="flax_box">
-                                    <input type="text" class="form-control form-control-sm" name="req_nm" id="req_nm">
+                                    <input type="text" class="form-control form-control-sm search-enter" name="req_nm" id="req_nm">
                                 </div>
                             </div>
                         </div>
@@ -369,7 +369,7 @@
 		const gx = new HDGrid(gridDiv, columns);
 
 		pApp.ResizeGrid(265);
-
+        pApp.BindSearchEnter();
 
 		function Search() {
 			let data = $('form[name="search"]').serialize();

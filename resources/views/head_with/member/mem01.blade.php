@@ -461,8 +461,6 @@ const gridDiv = document.querySelector(pApp.options.gridId);
 const gx = new HDGrid(gridDiv, columns);
 
 pApp.ResizeGrid(275);
-// pApp.BindSearchEnter();
-
 pApp.BindSearchEnter();
 
 function Search() {
@@ -542,6 +540,5 @@ function getToday()
 }
 
 //openSmsSend
-Search();
 </script>
 @stop

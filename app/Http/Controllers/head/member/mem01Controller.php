@@ -885,6 +885,12 @@ class mem01Controller extends Controller
 
         $where = "";
 
+        // ag grid copy & paste 추가
+        $user_id = preg_replace("/\s/",",",$user_id);
+		$user_id = preg_replace("/,,/",",",$user_id);
+		$user_id = preg_replace("/\t/",",",$user_id);
+		$user_id = preg_replace("/\n/",",",$user_id);
+
         if($user_id !=""){
             $ids = explode(",",$user_id);
             if(count($ids) > 1){

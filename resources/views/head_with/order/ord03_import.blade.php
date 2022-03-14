@@ -62,11 +62,14 @@
                                             <input type="radio" name="fmt" id="fmt_csv" class="custom-control-input" value="csv"/>
                                             <label class="custom-control-label" for="fmt_csv">csv</label>
                                         </div>
-                                        <div class="flax_box img_file_cum_wrap" style="width: 500px;">
+                                        <div class="flax_box img_file_cum_wrap" style="padding-right: 0;">
                                             <div class="custom-file">
                                                 <input type="file" class="custom-file-input" id="file">
                                                 <label id="file-label" class="custom-file-label justify-content-start" for="file" aria-describedby="">입력할 파일을 선택 해 주세요.</label>
                                             </div>
+                                        </div>
+                                        <div class="flex_box pl-1">
+                                            <a href="/sample/sample_sugi_2.xls" target="_blank" class="ml-1" style="text-decoration: underline !important;">수기판매 양식 다운로드</a>
                                         </div>
                                     </div>
                                 </div>

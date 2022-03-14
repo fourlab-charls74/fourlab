@@ -57,11 +57,16 @@ class ord02Controller extends Controller
 
         $conf = new Conf();
 
+        $pay_types = DB::select("SELECT code_id, code_val FROM `code`
+			WHERE code_kind_cd = 'G_PAY_TYPE' AND code_id <> 'K' AND code_id IN ('1','2','5','9','13','16','32','64')
+			ORDER BY code_seq
+        ");
+
         $values = [
             'ord_no' => $ord_no,
             'ord_opt_no' => $ord_opt_no,
             'banks' => $banks,
-            'pay_types' => SLib::getCodes("G_STAT_PAY_TYPE"),
+            'pay_types' => $pay_types,
             'ord_types' => SLib::getCodes('G_ORD_TYPE'),
             'sale_places' => SLib::getSalePlaces(),
             'dlv_cds' => SLib::getCodes('DELIVERY'),
@@ -140,8 +145,8 @@ class ord02Controller extends Controller
             $tmp_txt = "";
             $tmp_val = "";
 
+            $tmp = explode("\^", $goods_opt);
             if ($is_multi_option == "Y") {    // 멀티 옵션인 경우
-                $tmp = split("\^", $goods_opt);
 
                 $tmp_txt = $tmp[$depth - 1];
                 $tmp_val = $tmp[$depth - 1] . "|" . $goods_no . "|" . $goods_sub . "|" . $p_goods_no . "|" . $p_goods_sub . "|" . $tmp[$depth - 1] . "|" . $baesong_info . "|" . $bae_yn . "|" . $baesong_price;
