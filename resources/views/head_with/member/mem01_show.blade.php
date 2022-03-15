@@ -1076,10 +1076,10 @@
             });
         });
 
-        //쿠폰지급
+        //`쿠폰지급`
         $('.coupon-btn').click(function(e){
             e.preventDefault();
-            openCoupon();
+            openCoupon(user_id);
         });
 
         //적립금지급

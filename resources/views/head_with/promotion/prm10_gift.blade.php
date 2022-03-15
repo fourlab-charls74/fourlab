@@ -13,6 +13,7 @@
         </div>
         <div>
             <a href="#" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm save-btn">쿠폰지급</a>
+            <a href="#" onclick="window.close()" class="btn btn-sm btn-primary shadow-sm">닫기</a>
         </div>
     </div>
     <div class="card_wrap aco_card_wrap">
