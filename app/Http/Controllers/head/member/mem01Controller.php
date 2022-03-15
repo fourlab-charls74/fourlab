@@ -270,6 +270,7 @@ class mem01Controller extends Controller
     }
 
     public function add_user(Request $req) {
+
         // 설정 값 얻기
         $conf = new Conf();
 
@@ -287,8 +288,9 @@ class mem01Controller extends Controller
         $name = Auth('head')->user()->name;
 
         $user_id			= Request("user_id");
-        $name				= Request("name");
         $pw     			= Request("pw");
+        $name				= Request("name");
+
         $jumin1				= Request("jumin1");
         $jumin2				= Request("jumin2");
         $chk_jumin			= Request("chk_jumin");
@@ -327,7 +329,7 @@ class mem01Controller extends Controller
         $sex				= Request("sex");
 
         // 비밀번호 암호화
-        $enc_pwd = Lib::get_enc_hash($user_pw, $encrypt_mode, $encrypt_key);
+        $enc_pwd = Lib::get_enc_hash($pw, $encrypt_mode, $encrypt_key);
         // $enc_pwd = $pw;
 
         // 주민등록번호 관련

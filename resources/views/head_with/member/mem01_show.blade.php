@@ -202,7 +202,8 @@
                                             <th class="required">이메일</th>
                                             <td>
                                                 <div class="flax_box">
-                                                    <input type="text" name="email" id="email" class="form-control form-control-sm" value="{{@$user->email}}">
+                                                    <input type="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                                                        name="email" id="email" class="form-control form-control-sm" value="{{@$user->email}}">
                                                 </div>
                                             </td>
                                         </tr>
@@ -269,7 +270,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th>주소</th>
+                                            <th class="required">주소</th>
                                             <td>
                                                 <div class="input_box flax_box address_box">
                                                     <input type="text" id="zipcode" name="zipcode" class="form-control form-control-sm" value="{{@$user->zip}}" style="width:calc(25% - 10px);margin-right:10px;" readonly="readonly">
@@ -790,11 +791,13 @@
 
     }
 
-    function Validate() {
+    
+    const Validate = async () => {
         const ff = document.search;
 
         if (!ff.name.value) {
             alert("회원명을 입력해주세요.");
+            ff.name.focus();
             return false;
         }
 
@@ -802,6 +805,27 @@
 
         if (!mailReg.test(ff.email.value)) {
             alert("이메일을 확인해주세요.");
+            ff.email.focus();
+            return false;
+        }
+
+        const phone_reg = /^(0(2|3[1-3]|4[1-4]|5[1-5]|6[1-4]))$/;
+
+        if (!phone_reg.test(ff.phone1.value)) {
+            alert("일반전화 앞3자리를 확인해주세요.");
+            ff.phone1.focus();
+            return false;
+        }
+
+        if (!ff.phone2.value) {
+            alert("일반전화의 중간 번호를 입력해 주세요.");
+            ff.phone2.focus();
+            return false;
+        }
+
+        if (!ff.phone3.value) {
+            alert("일반전화의 나머지 번호를 입력해 주세요.");
+            ff.phone3.focus();
             return false;
         }
 
@@ -809,9 +833,21 @@
 
         if (!mobile_reg.test(ff.mobile1.value)) {
             alert("휴대전화 앞3자리를 확인해주세요.");
+            ff.mobile1.focus();
             return false;
         }
 
+        if (!ff.mobile2.value) {
+            alert("휴대전화의 중간 번호를 입력해 주세요.");
+            ff.mobile2.focus();
+            return false;
+        }
+
+        if (!ff.mobile3.value) {
+            alert("휴대전화의 나머지 번호를 입력해 주세요.");
+            ff.mobile3.focus();
+            return false;
+        }
 
         if (!ff.zipcode.value) {
             alert("우편번호를 입력해주세요.");
@@ -825,15 +861,21 @@
             return false;
         }
 
-        return true;
-    }
+        if (!ff.addr2.value) {
+            alert("나머지 주소를 입력해주세요.");
+            ff.addr2.focus();
+            return false;
+        }
 
-    function ValidateAdd(){
+        return true;
+    };
+
+    const ValidateAdd = async () => {
         var ff = document.search;
         var pattern_1 =  /^[a-zA-Z]+$/;
         var pattern_2 =  /^[0-9]+$/;
 
-        if (Validate() === false) return false;
+        if (await Validate() === false) return false;
 
         if(ff.user_id.value == ""){
             alert("아이디을 입력하십시오.");
@@ -848,36 +890,43 @@
 
         if (!ff.pw.value) {
             alert("비밀번호 입력해주세요.");
+            ff.pw.focus();
             return false;
         }
 
         if(pattern_1.test(ff.pw.value)){
             alert("비밀번호는 영문과 숫자가 포함되어야 합니다.");
+            ff.pw.focus();
             return false;
         }
 
         if(pattern_2.test(ff.pw.value)){
             alert("비밀번호는 영문과 숫자가 포함되어야 합니다.");
+            ff.pw.focus();
             return false;
         }
 
         if (!ff.name.value) {
             alert("회원명을 입력해주세요.");
+            ff.name.focus();
             return false;
         }
 
         if (!ff.yyyy.value) {
             alert("[생년월일-년]을 선택해주세요.");
+            ff.yyyy.focus();
             return false;
         }
 
         if (!ff.mm.value) {
             alert("[생년월일-월]을 선택해주세요.");
+            ff.mm.focus();
             return false;
         }
 
         if (!ff.dd.value) {
             alert("[생년월일-일]을 선택해주세요.");
+            ff.dd.focus();
             return false;
         }
 
@@ -887,17 +936,19 @@
 
             if (!jumin1_reg.test(ff.jumin1.value)) {
                 alert("주민번호 앞자리를 확인해주세요.");
+                ff.jumin1.focus();
                 return false;
             }
 
             if (!jumin2_reg.test(ff.jumin2.value)) {
                 alert("주민번호 뒷자리를 확인해주세요.");
+                ff.jumin2.focus();
                 return false;
             }
         }
 
         return true;
-    }
+    };
 
     //휴면 유저일경우
     if ($('.active-btn').length > 0) {
@@ -929,10 +980,10 @@
 
     //회원등록일 경우
     if ($('.add-btn').length > 0) {
-        $('.add-btn').click(function(e){
+        $('.add-btn').click(async function(e){
             e.preventDefault();
 
-            if (ValidateAdd() === false) return;
+            if (await ValidateAdd() === false) return;
 
             const data = $('form[name="search"]').serialize();
 
@@ -980,10 +1031,10 @@
     //회원 수정일 경우
     if ($('.edit-btn').length > 0) {
         //수정
-        $('.edit-btn').click(function(e){
+        $('.edit-btn').click(async function(e){
             e.preventDefault();
 
-            if (Validate() === false) return;
+            if (await Validate() === false) return;
 
             const data = $('form[name="search"]').serialize();
 
