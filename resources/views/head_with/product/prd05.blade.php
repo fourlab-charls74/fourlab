@@ -180,7 +180,7 @@
 										<option value="goods_nm">상품명</option>
 										<option value="price">판매가</option>
 										<option value="com_nm">공급업체</option>
-										<option value="md_nm">담당MB별</option>
+										<option value="md_nm">담당MD별</option>
 										<option value="upd_dm">수정일</option>
 									</select>
 								</div>
