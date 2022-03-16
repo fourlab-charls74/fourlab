@@ -120,7 +120,6 @@
                     <li data-menu-kind="M" data-menu-id="mem01" class="d-none"><a href="/head/member/mem01">회원관리</a></li>
                     <li data-menu-kind="M" data-menu-id="mem02" class="d-none"><a href="/head/member/mem02">휴면회원</a></li>
                     <li data-menu-kind="M" data-menu-id="mem03" class="d-none"><a href="/head/member/mem03">회원그룹</a></li>
-                    <!--
                     <li class="depth2">
                         <a href="javascript:;" class="arrow"><span>적립금</span></a>
                         <ul>
@@ -128,7 +127,6 @@
                             <li><a href="/head/member/mem05">적립금내역</a></li>
                         </ul>
                     </li>
-                    //-->
                     <li data-menu-kind="M" data-menu-id="mem20" class="d-none"><a href="/head/member/mem20">1:1문의</a></li>
                     <li data-menu-kind="M" data-menu-id="mem21" class="d-none"><a href="/head/member/mem21">상품Q&A</a></li>
                     <li data-menu-kind="M" data-menu-id="mem22" class="d-none"><a href="/head/member/mem22">상품평</a></li>

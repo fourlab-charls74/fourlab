@@ -187,8 +187,8 @@ class mem01Controller extends Controller
     }
 
     public function download(Request $req) {
-
         $this->set_excel_download("usr01_%s.xls");
+
         /** method : get_condition
          *
          * index 0 : where
@@ -197,21 +197,21 @@ class mem01Controller extends Controller
          */
         $cond = $this->get_condition($req);
 
-        $sql = $this->get_user_sql($cond[0], $cond[1], $cond[2], 0, 100);
+        $sql = $this->get_user_sql($cond[0], $cond[1], $cond[2], 0, 100, true);
 
         $fields = [];
         $_fields = explode(',',Request('fields', ''));
 
         foreach($_fields as $val) {
-            list($name, $feild) = explode('|', $val);
+            list($name, $field) = explode('|', $val);
 
             $fields[] = [
                 'name' => $name,
-                'value' => $feild
+                'value' => $field
             ];
         }
 
-        return view( Config::get('shop.head.view') . '/member/mem01_download', [
+    return view( Config::get('shop.head.view') . '/member/mem01_download', [
             'fields' => $fields,
             'rows' => DB::select($sql)
         ]);
@@ -818,7 +818,21 @@ class mem01Controller extends Controller
         return DB::selectOne($sql);
     }
 
-    private function get_user_sql($where, $order_by, $join, $startno = 0, $page_size = 0) {
+    private function get_user_sql($where, $order_by, $join, $startno = 0, $page_size = 0, $use_group = false) {
+
+        $group_sql = "";
+
+        if ($use_group) {
+            $group_sql = "
+                ,(
+                    select group_concat(ug.group_nm order by ug.point_ratio desc separator ',')
+                    from user_group_member ugm
+                    inner join user_group ug on ug.group_no = ugm.group_no
+                    where ugm.user_id = a.user_id
+                ) as `group`
+            ";
+        }
+
         $sql = "
 			select
 				'' as chkbox, a.user_id, a.name,
@@ -831,6 +845,7 @@ class mem01Controller extends Controller
 				e.ord_date, e.ord_cnt, e.ord_amt,
 				a.email_chk, a.mobile_chk, a.yn, ifnull(cm.com_nm,a.site) as site,
                 a.name_chk, a.addr, a.zip
+                ${group_sql}
 			from
 				member a
 				$join

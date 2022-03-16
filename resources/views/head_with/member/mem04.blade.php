@@ -174,8 +174,7 @@
 			]
 		},
 		{field:"g_sum" , headerName:"적립금", type: 'currencyType'},
-
-		{headerName: "", field: "nvl"}
+		{ width: "auto" }
 	];
 	const pApp = new App('', { gridId: "#div-gd" });
 	const gridDiv = document.querySelector(pApp.options.gridId);

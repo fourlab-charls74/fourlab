@@ -469,8 +469,8 @@ function Search() {
     gx.Request('/head/member/mem01/search', data+user_group_data, 1);
 };
 
-function Download(feilds) {
-    $('[name=fields]').val(feilds);
+function Download(fields) {
+    $('[name=fields]').val(fields);
     let data = $('form[name="search"]').serialize();
     location.href = '/head/member/mem01/download?' + data;
 }

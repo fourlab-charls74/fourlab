@@ -421,6 +421,11 @@
 </script>
 
 <script language="javascript">
+
+const CELL_COLOR = {
+    YELLOW: { 'background' : '#ffff99' }
+};
+
 var columns = [
         // this row shows the row index, doesn't use any data from the row
 
@@ -428,7 +433,7 @@ var columns = [
             headerName: '',
             headerCheckboxSelection: true,
             checkboxSelection: true,
-            width:40,
+            width:28,
 			cellStyle: {"background":"#F5F7F7"},
             cellRenderer: function(params) {
                 if (params.data.group_cd !== undefined && params.data.group_cd !== null) {
@@ -472,7 +477,13 @@ var columns = [
         pApp.ResizeGrid(); //270
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns);
+        let options = {
+            getRowStyle: (params) => {
+                console.log(params);
+                if (params.data.ans_yn == "Y") return CELL_COLOR.YELLOW;
+            }
+        }
+        gx = new HDGrid(gridDiv, columns, options);
         //Search(1);
         Search();
     });
@@ -513,7 +524,7 @@ var columns = [
     }
 
     function setQaInfo(res){
-		console.log(res);
+		// console.log(res);
         var qa_data = res[0];
         var ans_subject = "[re] " + qa_data.subject;
 
@@ -560,6 +571,7 @@ var columns = [
             $("#qa_goods_nm").html("");
 
         if(qa_data.check_id != "" && qa_data.check_id != undefined){
+            
             $("#btn_checkin").val(qa_data.check_nm + " 접수취소 ");
 			$("#btn_save").attr("disabled",false);
 			$("#qa_state").html(qa_data.check_nm + " 접수중 ");
@@ -783,7 +795,7 @@ var columns = [
         if(res.qa_code == "1"){
             $("#btn_checkin").val(ff.ans_nm.value + " 접수취소 ").show();
             $("#btn_save").attr("disabled",false);
-            $("#qa_state").html(ff.ans_nm + " 접수중 ");
+            $("#qa_state").html(ff.ans_nm.value + " 접수중 ");
             $("[name=check_id]").val($("[name=id]").val());
         } else if(res.qa_code == "-1"){
             alert("다른 운영자가 접수중 입니다.");
