@@ -584,7 +584,9 @@ var columns = [
 
         if(qa_data.ans_yn == "N"){
             $("[name=cmd]").val("addcmd");
-			$("#btn_save").val("답변완료").attr("disabled",true);
+            if (qa_data.check_id != "" && qa_data.check_id != undefined) {
+                $("#btn_save").val("답변완료").attr("disabled", false);
+            }
 			$("[name=ans_subject]").val("[re] " + qa_data.subject);
 			//$("[name=c_ans_yn]").val("Y");
         }else{
@@ -675,8 +677,6 @@ var columns = [
         var f1 = $("form[name=f1]");
         const idx = $("[name=idx]").val();
 
-
-
         if(check_id != "" && check_id != user_id){
             if(!confirm('다른 운영자가 접수중 입니다. 답변완료를 하시겠습니까?')){
                 return;
@@ -723,6 +723,7 @@ var columns = [
 
             if(document.f1.cmd.value == "addcmd"){
                 $("#btn_save").val("답변완료 되었습니다.");
+                $("[name=c_ans_yn]").val("Y");
             } else {
                 $("#btn_save").val("수정완료 되었습니다.");
             }
