@@ -1,19 +1,27 @@
 @extends('head_with.layouts.layout')
 @section('title','베스트 랭킹')
 @section('content')
-<div class="d-sm-flex align-items-center justify-content-between mb-2">
-    <h1 class="h3 mb-0 text-gray-800">베스트 랭킹</h1>
-    <div>
-        <a href="#" id="search_sbtn" onclick="Search();" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-        <div id="search-btn-collapse" class="btn-group mr-2 mb-0 mb-sm-0"></div>
+
+<div class="page_tit">
+    <h3 class="d-inline-flex">베스트 랭킹</h3>
+    <div class="d-inline-flex location">
+        <span class="home"></span>
+        <span>/ 프로모션</span>
+        <span>/ 베스트 랭킹</span>
     </div>
 </div>
 
 <form method="get" name="search">
 	<div id="search-area" class="search_cum_form">
-		<div class="card mb-1">
+		<div class="card mb-3">
+            <div class="d-flex card-header justify-content-between">
+                <h4>검색</h4>
+                <div class="flax_box">
+					<a href="#" id="search_sbtn" onclick="Search();" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+        			<div id="search-btn-collapse" class="btn-group mr-2 mb-0 mb-sm-0"></div>
+                </div>
+			</div>
 			<div class="card-body">
-
 				<!-- 주문일자/성별/상품상태 -->
 				<div class="search-area-ext  row">
 					<div class="col-lg-4 inner-td">
@@ -36,7 +44,7 @@
 						<div class="form-group">
 							<label for="ord_no">성별 :</label>
 							<div class="flax_box">
-								<select name="s_sex" id="s_sex" class="form-control form-control-sm" style="width:auto;">
+								<select name="s_sex" id="s_sex" class="form-control form-control-sm" style="width: 70px">
 									<option value="">전체</option>
 									@foreach($sex_types as $sex_type)
 										<option value="{{ $sex_type->code_id }}">{{ $sex_type->code_val }}</option>
@@ -124,7 +132,7 @@
 						<div class="form-group">
 							<label for="ord_no">상품명 :</label>
 							<div class="flax_box">
-								<input type='text' class="form-control form-control-sm ac-goods_nm" name='goods_nm' value=''>
+								<input type='text' class="form-control form-control-sm search-enter ac-goods-nm" name='goods_nm' value=''>
 
 
 							</div>
@@ -159,7 +167,7 @@
 
 <form name="f1">
 
-<div id="filter-area" class="card shadow-none mb-4 search_cum_form ty2 last-card">
+<div id="filter-area" class="card shadow-none search_cum_form ty2 last-card">
 	<div class="card-body shadow">
 		<div class="card-title">
             <div class="filter_wrap">
@@ -182,14 +190,19 @@
 
 
 <script>
+
+	const CELL_COLOR = {
+        YELLOW: { 'background' : '#ffff99' }
+	};
+
 	var columns = [
 		{headerName: '#', width:50,type:'NumType', pinned:'left',},
 		{
 		  field: "blank",
-		  headerName: '선택',
+		  headerName: '',
 		  checkboxSelection: true, pinned:'left',
 		  headerCheckboxSelectionFilteredOnly: true,
-		  width: 50,
+		  width: 28,
 		},
 
 		{field:"img" , headerName:"이미지", pinned:'left', height:50,
@@ -204,7 +217,10 @@
 		{field:"rank" , headerName:"순위", pinned:'left',},
 		{field:"variation" , headerName:"순위증감", pinned:'left', width:80},
 		{field:"sale_point" , headerName:"판매점수", pinned:'left', width:80},
-		{field:"admin_point" , headerName:"관리자 점수", pinned:'left', width:100},
+		{
+			field:"admin_point" , headerName:"관리자 점수", pinned:'left', width:100, editable: true, type: 'currencyType',
+			cellStyle: CELL_COLOR.YELLOW
+		},
 		{field:"pre_point" , headerName:"예상총점", pinned:'left', width:80},
 		{field:"point" , headerName:"총점"},
 
@@ -256,8 +272,8 @@
 	//gx.gridOptions.suppressRowClickSelection = true;
 	//gx.gridOptions.suppressExcelExport = true;
 
-	pApp.ResizeGrid();
-
+	pApp.ResizeGrid(265);
+	pApp.BindSearchEnter();
 
 	function Search() {
 		let data = $('form[name="search"]').serialize();
@@ -265,7 +281,7 @@
 	}
 
 	function callBack(data){
-		console.log(data);
+		// console.log(data);
 	}
 
 	function checkAll(){
@@ -322,15 +338,14 @@
 
 
 	function SaveCmd(){
-		var data = new Array();
-		var selectedRowData = gx.gridOptions.api.getSelectedRows();
-
-		selectedRowData.forEach( function(selectedRowData, index) {
-			data.push(new Array(selectedRowData.goods_no, selectedRowData.goods_sub, selectedRowData.point));
+		var selectedRows = gx.gridOptions.api.getSelectedRows();
+		
+		let data = [];
+		selectedRows.map((item, index) => {
+			data.push([item.goods_no, item.goods_sub, item.admin_point]);
 		});
 
-
-		if(data == ""){
+		if (data == "") {
 			alert("변경할 데이터가 없습니다.");
 			return false;
 		}
@@ -364,25 +379,6 @@
 
 
 	$(function(){
-		$('.ac-goods_nm').autocomplete({
-			//keydown 됬을때 해당 값을 가지고 서버에서 검색함.
-			source : function(request, response) {
-				$.ajax({
-					method: 'get',
-					url: '/head/auto-complete/goods-nm',
-					data: { keyword : this.term },
-					success: function (data) {
-						response(data);
-					},
-					error: function(request, status, error) {
-						console.log("error")
-					}
-				});
-			},
-			minLength: 1,
-			autoFocus: true,
-			delay: 100
-		});
 
 		$(".ac-brand2")
         .autocomplete({
@@ -493,5 +489,4 @@
 	});
 </script>
 
-베스트 랭킹
 @stop
