@@ -33,7 +33,7 @@
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input-box" style="width:47%">
                                     <div class="form-inline-inner inline_btn_box">
-                                        <input type='text' class="form-control form-control-sm w-100" name='goods_no' id='goods_no' value=''>
+                                        <input type='text' class="form-control form-control-sm search-enter w-100" name='goods_no' id='goods_no' value=''>
                                         <a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                     </div>
                                 </div>
@@ -55,13 +55,13 @@
 							<div class="form-inline">
 								<div class="form-inline-inner input_box">
 									<div class="form-group">
-										<input type='text' class="form-control form-control-sm search-all ac-style-no2" name='goods_est_from' value=''>
+										<input type='text' class="form-control form-control-sm search-all search-enter ac-style-no2" name='goods_est_from' value=''>
 									</div>
 								</div>
 								<span class="text_line">/</span>
 								<div class="form-inline-inner input_box">
 									<div class="form-group">
-										<input type="text" class="form-control form-control-sm search-all" name="goods_est_to" value="">
+										<input type="text" class="form-control form-control-sm search-all search-enter" name="goods_est_to" value="">
 									</div>
 								</div>
 							</div>
@@ -75,7 +75,7 @@
 						<div class="form-group">
 							<label for="">제목</label>
 							<div class="flax_box">
-								<input type='text' class="form-control form-control-sm search-all" name='goods_title' value=''>
+								<input type='text' class="form-control form-control-sm search-all search-enter" name='goods_title' value=''>
 							</div>
 						</div>
 					</div>
@@ -86,13 +86,13 @@
 							<div class="form-inline">
 								 <div class="form-inline-inner input_box">
 									<div class="form-group">
-										<input type='text' class="form-control form-control-sm search-all ac-style-no2" name='name' value=''>
+										<input type='text' class="form-control form-control-sm search-all ac-style-no2 search-enter" name='name' value=''>
 									</div>
 								</div>
 								<span class="text_line">~</span>
 								<div class="form-inline-inner input_box">
 									<div class="form-group">
-										<input type="text" class="form-control form-control-sm search-all" name="id" value="">
+										<input type="text" class="form-control form-control-sm search-all search-enter" name="id" value="">
 									</div>
 								</div>
 							</div>
