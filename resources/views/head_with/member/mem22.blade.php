@@ -44,7 +44,7 @@
 						<div class="form-group">
 							<label for="ord_no">상품명</label>
 							<div class="flax_box">
-								<input type='text' class="form-control form-control-sm search-all ac-goods_nm" name='goods_nm' value=''>
+								<input type='text' class="form-control form-control-sm search-all ac-goods-nm search-enter" name='goods_nm' value=''>
 							</div>
 						</div>
 					</div>
@@ -323,6 +323,7 @@
 	const gx = new HDGrid(gridDiv, columns);
 
 	pApp.ResizeGrid(265);
+	pApp.BindSearchEnter();
 
 	function Search() {
         let formData = $('form[name="search"]').serialize();
@@ -332,26 +333,6 @@
 
 	$(function(){
 		Search();
-		$('.ac-goods_nm').autocomplete({
-			//keydown 됬을때 해당 값을 가지고 서버에서 검색함.
-			source : function(request, response) {
-				$.ajax({
-					method: 'get',
-					url: '/head/auto-complete/goods-nm',
-					data: { keyword : this.term },
-					success: function (data) {
-						response(data);
-					},
-					error: function(request, status, error) {
-						console.log("error")
-					}
-				});
-			},
-			minLength: 1,
-			autoFocus: true,
-			delay: 100
-		});
-
 
 		$(".ac-style-no2").autocomplete({
 			//keydown 됬을때 해당 값을 가지고 서버에서 검색함.

@@ -127,7 +127,7 @@ $( document ).ready(function() {
     });
 
     $(".ac-goods-nm")
-        .on('keydown',function(evvent){
+        .on('keydown',function(event){
             if ( event.keyCode === 13) {
                 $(this).autocomplete('close');
             }
