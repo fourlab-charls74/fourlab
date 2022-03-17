@@ -32,7 +32,7 @@
                             <div class="form-inline">
                                 <div class="docs-datepicker form-inline-inner input_box">
                                     <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
+                                        <input type="text" class="form-control form-control-sm docs-date search-enter" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
                                                 <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -44,7 +44,7 @@
                                 <span class="text_line">~</span>
                                 <div class="docs-datepicker form-inline-inner input_box">
                                     <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
+                                        <input type="text" class="form-control form-control-sm docs-date search-enter" name="edate" value="{{ $edate }}" autocomplete="off">
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
                                                 <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -61,7 +61,7 @@
                         <div class="form-group">
                             <label for="dlv_kind">스타일넘버</label>
                             <div class="flax_box">
-                                <input type="text" class="form-control form-control-sm" name="style_no" id="style_no">
+                                <input type="text" class="form-control form-control-sm search-enter" name="style_no" id="style_no">
                             </div>
                         </div>
                     </div>
@@ -102,7 +102,7 @@
                         <div class="form-group">
                             <label for="formrow-email-input">상품코드</label>
                             <div class="flax_box">
-                                <input type="text" class="form-control form-control-sm" name="goods_no">
+                                <input type="text" class="form-control form-control-sm search-enter" name="goods_no">
                                 <input type="hidden" name="goods_sub" value="0">
                             </div>
                         </div>
@@ -113,7 +113,7 @@
                         <div class="form-group">
                             <label for="formrow-email-input">상품명</label>
                             <div class="flax_box">
-                                <input type="text" name="goods_nm" class="form-control form-control-sm" style="width:100%;">
+                                <input type="text" name="goods_nm" class="form-control form-control-sm search-enter" style="width:100%;">
                             </div>
                         </div>
                     </div>
@@ -164,7 +164,7 @@
                                     </select>
                                 </div>
                                 <div class="form-inline-inner input-box">
-                                    <input type="text" name="qry" class="form-control form-control-sm" value="{{$user_id}}">
+                                    <input type="text" name="qry" class="form-control form-control-sm search-enter" value="{{$user_id}}">
                                 </div>
                             </div>
                         </div>
@@ -403,6 +403,11 @@
 </script>
 
 <script language="javascript">
+
+    const CELL_COLOR = {
+        YELLOW: { 'background' : '#ffff99' }
+    };
+
     var columns = [
         // this row shows the row index, doesn't use any data from the row
         {
@@ -508,8 +513,14 @@
         gridId: "#div-gd"
     });
     const gridDiv = document.querySelector(pApp.options.gridId);
-    const gx = new HDGrid(gridDiv, columns);
+    const options = {
+        getRowStyle: (params) => {
+            if (params.data.answer_yn == "Y") return CELL_COLOR.YELLOW;
+        }
+    };
+    const gx = new HDGrid(gridDiv, columns, options);
     pApp.ResizeGrid(); //270
+    pApp.BindSearchEnter();
     const _user_id = "{{ $admin_id }}";
     const _user_nm = "{{ $admin_nm }}";
 
