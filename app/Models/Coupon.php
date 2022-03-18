@@ -56,10 +56,12 @@ class Coupon
 				'admin_id'			=> $data['admin_id'],
 				'regi_date'			=> now(),
 				//'pub_time'			=> $data['pub_time'],
-				//'use_date_type'		=> $data['use_date_type'], 
-				//'use_date_alarm_yn'	=> $data['use_date_alarm_yn'], 
-				//'use_date_alarm_day'	=> $data['use_date_alarm_day'], 
-				//'use_date'			=> $data['use_date']
+
+				// 20220318 모델 주석 수정 - madforre
+				'use_date_type'		=> $data['use_date_type'],
+				'use_date_alarm_yn'	=> $data['use_date_alarm_yn'], 
+				'use_date_alarm_day'	=> $data['use_date_alarm_day'], 
+				'use_date'			=> $data['use_date']
 			]);
 
 			DB::commit();

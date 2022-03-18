@@ -142,16 +142,19 @@
                                                     <div>
                                                         <div class="form-inline form-radio-box">
                                                             <div class="custom-control custom-radio">
-                                                                <input type="radio" name="use_date_type" id="use_date_type_S" class="custom-control-input" value="S" disabled @if(@$coupon->use_date_type != 'P') checked @endif />
+                                                                <?php 
+                                                                    // var_dump($coupon) 
+                                                                ?>
+                                                                <input type="radio" name="use_date_type" id="use_date_type_S" class="custom-control-input" value="S" @if(@$coupon->use_date_type != 'P') checked @endif />
                                                                 <label class="custom-control-label" for="use_date_type_S">설정일 기준</label>
                                                             </div>
                                                             <div class="custom-control custom-radio">
-                                                                <input type="radio" name="use_date_type" id="use_date_type_P" class="custom-control-input" value="P" disabled @if(@$coupon->use_date_type == 'P') checked @endif />
+                                                                <input type="radio" name="use_date_type" id="use_date_type_P" class="custom-control-input" value="P" @if(@$coupon->use_date_type == 'P') checked @endif />
                                                                 <label class="custom-control-label" for="use_date_type_P">발급일 기준</label>
                                                             </div>
                                                         </div>
                                                         <div class="my-1 use_date_p" @if(!isset($coupon->use_date_type) || @$coupon->use_date_type == 'S') style="display:none" @endif>
-                                                            <div class="txt_box">발급일 ~ </div>
+                                                            <div class="txt_box">발급일 ~&nbsp;</div>
                                                             <input 
                                                                 type="text" 
                                                                 id="use_date" 
@@ -161,9 +164,8 @@
                                                                 class="form-control form-control-sm"
                                                                 style="width:50px;text-align:right;" 
                                                                 onkeyup="currency(this);"
-                                                                disabled
                                                             />
-                                                            <div class="txt_box">일 까지</div>
+                                                            <div class="txt_box">&nbsp;일 까지</div>
                                                         </div>
                                                         <div class="my-1 use_date_s" style="display:@if(@$coupon->use_date_type == 'P') none @else block @endif">
                                                             <div class="form-inline">
@@ -195,7 +197,7 @@
                                                         <div class="flax_box">
                                                             <div class="form-inline form-check-box">
                                                                 <div class="custom-control custom-checkbox">
-                                                                    <input type="checkbox" name="use_date_alarm_yn" id="use_date_alarm_y" class="custom-control-input" value="Y" disabled @if(@$coupon->use_date_alarm_yn == 'Y') checked @endif />
+                                                                    <input type="checkbox" name="use_date_alarm_yn" id="use_date_alarm_y" class="custom-control-input" value="Y" @if(@$coupon->use_date_alarm_yn == 'Y') checked @endif />
                                                                     <label class="custom-control-label" for="use_date_alarm_y">유효기간 알림 사용,</label>
                                                                 </div>
                                                             </div>
@@ -210,7 +212,6 @@
                                                                     onkeyup="currency(this);" 
                                                                     maxlength="3" 
                                                                     style="width: 50px; text-align: right;" 
-                                                                    disabled
                                                                 />
                                                                 <div class="txt_box pl-1">일</div>
                                                             </label>

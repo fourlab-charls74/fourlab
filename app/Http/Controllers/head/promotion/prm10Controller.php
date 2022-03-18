@@ -557,6 +557,7 @@ class prm10Controller extends Controller
     }
 
 	public function edit_coupon($coupon_no, Request $req) {
+
 		$values	= $this->__get_coupon_data($req);
 		$values['coupon_no']	= $coupon_no;
 		$user	= [
@@ -686,13 +687,24 @@ class prm10Controller extends Controller
 		$all['pub_dup_yn']			= Request('pub_dup_yn', "N");
 		$all['coupon_type']			= Request('coupon_type', '');
 		$all['coupon_pub_kind']		= Request('coupon_pub_kind', '');
-		//$all['use_date_alarm_yn']	= Request('use_date_alarm_yn', "N");
+        $all['use_date_alarm'] = Request('use_date_alarm_day', "");
+        $all['use_date']			= $all['use_date'] ? Lib::uncm($all['use_date']) : 0;
+
+        // 발급일 기준 유효기간 추가
+        $use_date_type = $all['use_date_type'];
+        if ($use_date_type == "P") {
+            $use_date = $all['use_date'];
+            $use_fr_date = $all['pub_fr_date'];
+            $use_to_date = strtotime($all['pub_fr_date']."+${use_date} days");
+            $all['use_fr_date'] = $use_fr_date;
+            $all['use_to_date'] = date("Ymd", $use_to_date);
+        }
 
 		$all['coupon_amt']			= $all['coupon_amt_kind'] == "W" ? $all['coupon_amt_values'] : 0;
 		$all['coupon_per']			= $all['coupon_amt_kind'] == "P" ? $all['coupon_amt_values'] : 0;
 
 		$all['pub_cnt']				= Lib::uncm($all['pub_cnt']);
-		//$all['use_date']			= Lib::uncm($all['use_date']);
+		
 		$all['low_price']			= Lib::uncm($all['low_price']);
 		$all['high_price']			= Lib::uncm($all['high_price']);
 		$all['coupon_amt']			= Lib::uncm($all['coupon_amt']);
@@ -736,5 +748,7 @@ class prm10Controller extends Controller
 		$all['pub_cnt']	= $all['ck_pub_cnt_kind'] == 1 ? $all['pub_cnt'] : '-1';
 
 		return $all;
+
+        
 	}
 }
