@@ -75,7 +75,7 @@
                                 <div class="form-inline-inner input_box sort_select">
                                     <div class="form-group">
                                         <select name="ad" id="ad" class="sch_ad form-control form-control-sm">
-                                            <option value="">선택</option>
+                                            <option value="">- 광고 -</option>
                                         </select>
                                     </div>
                                 </div>

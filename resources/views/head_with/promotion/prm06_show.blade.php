@@ -23,7 +23,7 @@
 	<div class="card_wrap mb-3">
 		<form name="f1" id="f1">
 		<input type="hidden" name="cmd" id="cmd" value="{{ $cmd }}">
-		<input type="hidden" name="in_group_nos" id="in_group_nos">
+		<input type="hidden" name="in_group_nos" id="in_group_nos" value="{{ $gift_info->apply_group }}">
 		<input type="hidden" name="gift_no" value="{{ $gift_no }}">
 		<input type="hidden" name="apply_group" value= "{{ $gift_info->apply_group }}">
 		<input type="hidden" name="goods"/>

@@ -325,6 +325,7 @@
             headerName: "변경일시",
             width: 120
         },
+        { width: "auto" }
     ];
 
     const pApp = new App('', {

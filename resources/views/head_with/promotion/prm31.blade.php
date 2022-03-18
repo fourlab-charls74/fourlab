@@ -257,6 +257,7 @@
             field: "sort",
             headerName: "정렬"
         },
+        { width: "auto" }
     ];
 
     const pApp = new App('', {

@@ -149,7 +149,7 @@
                     <li data-menu-kind="P" data-menu-id="prm20" class="d-none"><a href="/head/promotion/prm20">출첵이벤트</a></li>
                     <li data-menu-kind="P" data-menu-id="prm21" class="d-none"><a href="/head/promotion/prm21">댓글이벤트</a></li>
                     <li class="depth2">
-                        <a href="javascript:;" class="arrow d-none"><span>검색</span></a>
+                        <a href="javascript:;" class="arrow"><span>검색</span></a>
                         <ul>
                             <li data-menu-kind="P" data-menu-id="prm30" class="d-none"><a href="/head/promotion/prm30">검색어</a></li>
                             <li data-menu-kind="P" data-menu-id="prm31" class="d-none"><a href="/head/promotion/prm31">검색내역</a></li>

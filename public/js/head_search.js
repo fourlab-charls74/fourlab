@@ -415,6 +415,7 @@ $( document ).ready(function() {
                 success: function (data) {
                     var res = data.results;
                     $(".sch_ad option").remove();
+                    $(".sch_ad").append("<option value=''>- 광고 -</option>");
                     for(i=0; i<res.length; i++){
                         $(".sch_ad").append("<option value='"+ res[i]['id'] +"'>"+ res[i]['val'] +"</option>");
                     }
