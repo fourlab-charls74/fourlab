@@ -81,7 +81,6 @@ class ord21Controller extends Controller
 		//품목
 		$item		= $req->input('item');
 		//브랜드
-		$brand		= $req->input('brand');
 		$brand_cd 	= $req->input("brand_cd");
 		$brand_nm 	= $req->input("brand_nm");
 		//상품명
@@ -109,12 +108,8 @@ class ord21Controller extends Controller
 		if( $ord_type != "" )	$where .= " and a.ord_type     = '" . Lib::quote($ord_type) . "'";
 		if( $ord_kind != "" )	$where .= " and a.ord_kind     = '" . Lib::quote($ord_kind) . "' ";
 		if( $item != "" )		$where .= " and opt_kind_cd    = '" . Lib::quote($item) . "' ";
-		if( $brand != "" )		$where .= " and c.brand        = '" . Lib::quote($brand) . "' ";
-		if ($brand_cd != "") {
-            $where .= " and g.brand = '" . Lib::quote($brand_cd) . "' ";
-        } else if ($brand_cd == "" && $brand_nm != "") {
-            $where .= " and g.brand = '" . Lib::quote($brand_cd) . "' ";
-        }
+		if( $brand_cd != "" )		$where .= " and c.brand        = '" . Lib::quote($brand_cd) . "' ";
+		
 		if( $goods_nm != "" )	$where .= " and a.goods_nm like '%" . Lib::quote($goods_nm) . "%' ";
 
 		// 날짜검색 미 사용여부

@@ -41,8 +41,8 @@ class ord51Controller extends Controller
 
 	public function search(Request $request)
 	{
-		$sdate			= $request->input("sdate");
-		$edate			= $request->input("edate");
+		$sdate			= str_replace("-", "", $request->input("sdate"));
+		$edate			= str_replace("-", "", $request->input("edate"));
 		$ad_type		= $request->input("ad_type");
 		$ad				= $request->input("ad");
 		$goods_nm		= $request->input("goods_nm");
@@ -67,7 +67,7 @@ class ord51Controller extends Controller
         $page_cnt	= 0;
 
 		$where = "";
-		if ($sdate != "") $where .= "and o.ord_date >= '$sdate'";
+		if ($sdate != "") $where .= "and o.ord_date >= '$sdate' ";
 		if ($edate != "") $where .= "and o.ord_date < date_add('$edate',interval 1 day) ";
 		if ($ad_type != "") $where .= "and a.type = '$ad_type'";
 		if ($ad != "") $where .= "and t.ad = '$ad'";

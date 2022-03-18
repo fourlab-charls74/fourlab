@@ -500,10 +500,19 @@ SearchBrand.prototype.SetGrid = function(divId){
     this.grid = new HDGrid(document.querySelector( divId ), columns);
 };
 
-SearchBrand.prototype.Search = function(){
-    let data = $('form[name="search_brand"]').serialize();
-    //console.log(data);
-    this.grid.Request('/head/api/brand/getlist', data);
+SearchBrand.prototype.Search = function(e) {
+    const event_type = e?.type;
+    if (event_type == 'keypress') {
+        if (e.key && e.key == 'Enter') {
+            let data = $('form[name="search_brand"]').serialize();
+            this.grid.Request('/head/api/brand/getlist', data);
+        } else {
+            return false;
+        }
+    } else {
+        let data = $('form[name="search_brand"]').serialize();
+        this.grid.Request('/head/api/brand/getlist', data);
+    }
 };
 
 SearchBrand.prototype.Choice = function(code,name){

@@ -20,7 +20,8 @@
                                             <div class="form-group">
                                                 <label style="min-width:60px;">브랜드</label>
                                                 <div class="flax_box">
-                                                    <input type='text' class="form-control form-control-sm search-all" name='brand' value='' onkeypress="return searchBrand.Search();"/>
+                                                    <input type='text' class="form-control form-control-sm search-all" name='brand' value='' 
+                                                        onkeypress="searchBrand.Search(event)"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -28,7 +29,8 @@
                                             <div class="form-group">
                                                 <label style="min-width:60px;">브랜드명</label>
                                                 <div class="flax_box">
-                                                    <input type='text' class="form-control form-control-sm search-all" name='brand_nm' value='' onkeypress="return searchBrand.Search();"/>
+                                                    <input type='text' class="form-control form-control-sm search-all" name='brand_nm' value='' 
+                                                        onkeypress="searchBrand.Search(event)"/>
                                                 </div>
                                             </div>
                                         </div>
