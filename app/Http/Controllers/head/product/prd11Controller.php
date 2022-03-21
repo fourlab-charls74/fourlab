@@ -133,7 +133,7 @@ class prd11Controller extends Controller
         $sec_code = $request->input('sec_code');
         $use_yn	= $request->input('section_use_yn', 'Y');
         $max_limit = $request->input('max_limit',5);
-        $soldout_ex_yn = $request->input('soldout_ex_yn','Y');
+        $soldout_ex_yn = $request->input('soldout_ex_yn','N');
         $sort = $request->input('sort','M');
 
         $id = Auth::guard('head')->user()->id;
@@ -168,7 +168,7 @@ class prd11Controller extends Controller
         $sec_code = $request->input('sec_code');
         $max_limit = $request->input('max_limit',5);
         $use_yn	= $request->input('section_use_yn', 'Y');
-        $soldout_ex_yn = $request->input('soldout_ex_yn','Y');
+        $soldout_ex_yn = $request->input('soldout_ex_yn','N');
         $sort = $request->input('sort','M');
 
         $id = Auth::guard('head')->user()->id;
