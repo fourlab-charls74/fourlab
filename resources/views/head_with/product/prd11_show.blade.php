@@ -70,9 +70,9 @@
                                                     <div class="form-inline form-box">
                                                         <select name="sort" class="form-control form-control-sm">
                                                             <option value="M" @if(@$section->sort == "M") selected @endif>수동</option>
-                                                            <option value="M" @if(@$section->sort == "P") selected @endif>인기도</option>
-                                                            <option value="M" @if(@$section->sort == "N") selected @endif>신상품</option>
-                                                            <option value="M" @if(@$section->sort == "R") selected @endif>랜덤</option>
+                                                            <option value="P" @if(@$section->sort == "P") selected @endif>인기도</option>
+                                                            <option value="N" @if(@$section->sort == "N") selected @endif>신상품</option>
+                                                            <option value="R" @if(@$section->sort == "R") selected @endif>랜덤</option>
                                                         </select>
                                                     </div>
                                                 </td>

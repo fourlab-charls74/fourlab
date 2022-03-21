@@ -106,6 +106,7 @@
         },
         {field: "max_limit", headerName: "최대출력수", width:84, type:'numberType'},
         {field: "soldout_ex_yn", headerName: "품절상품제외", width:96, cellClass: 'hd-grid-code'},
+        {field: "sort", headerName: "정렬"},
         {headerName:"상품수",
             children : [
                 {headerName : "판매중", field : "40_cnt",type:'numberType'},
