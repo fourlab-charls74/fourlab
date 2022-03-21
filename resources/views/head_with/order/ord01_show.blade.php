@@ -664,16 +664,18 @@
                         <button class="btn-sm btn btn-secondary save-order-btn fs-12">출고요청</button>
                         @endif
 
-                        @if ($order_opt->order_state == '출고요청' || $order_opt->order_state == '출고처리중' || $order_opt->order_state == '출고완료' || $order_opt->order_state == '입금완료' || $order_opt->order_state == '배송완료' || $order_opt->order_state == '임시저장' || $order_opt->order_state == '클레임무효' )
-                        <button class="btn-sm btn btn-secondary claim-save-btn fs-12" data-cmd="req">클레임요청</button>
-                        @elseif($order_opt->order_state === '교환요청' || $order_opt->order_state === '환불요청')
-                        <button class="btn-sm btn btn-secondary claim-save-btn fs-12" data-cmd="proc">클레임처리중</button>
-                        @elseif($order_opt->order_state === '교환처리중' || $order_opt->order_state === '환불처리중')
-                        <button class="btn-sm btn btn-secondary claim-save-btn fs-12" data-cmd="end">클레임처리완료</button>
-                        @endif
-
-                        @if ($order_opt->order_state === '입금예정')
-                        <button class="btn-sm btn btn-secondary cancel-order-btn fs-12">주문취소</button>
+                        @if ($order_opt->ord_state >= "5")
+                            @if ($order_opt->clm_state == "0" || $order_opt->clm_state == "1" || $order_opt->clm_state == "-30")
+                                <button class="btn-sm btn btn-secondary claim-save-btn fs-12" data-cmd="req">클레임요청</button>
+                            @elseif ($order_opt->clm_state == "40" || $order_opt->clm_state == "41")
+                                <button class="btn-sm btn btn-secondary claim-save-btn fs-12" data-cmd="proc">클레임처리중</button>
+                            @elseif ($order_opt->clm_state == "50" || $order_opt->clm_state == "51")
+                                <button class="btn-sm btn btn-secondary claim-save-btn fs-12" data-cmd="end">클레임처리완료</button>
+                            @endif
+                        @else
+                            @if ($order_opt->ord_state > "0")
+                            <button class="btn-sm btn btn-secondary cancel-order-btn fs-12">주문취소</button>
+                            @endif
                         @endif
                     </div>
                 </div>
