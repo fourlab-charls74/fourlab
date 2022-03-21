@@ -26,14 +26,14 @@ class prd11Controller extends Controller
 
     public function create(){
 
-        $secion = new \stdClass();
-        $secion->max_limit = 5;
-        $secion->soldout_ex_yn = 'Y';
-        $secion->sort = 'M';
+        $section = new \stdClass();
+        $section->max_limit = 5;
+        $section->soldout_ex_yn = 'Y';
+        $section->sort = 'M';
 
         $values = [
             'code' => '',
-            'section' => $secion,
+            'section' => $section,
             'section_types' => SLib::getCodes('G_SECTION_TYPE'),
         ];
 
@@ -44,16 +44,16 @@ class prd11Controller extends Controller
 
         $sql = /** @lang text */
             "select 
-                a.sec_no,a.sec_code,a.subject,a.max_limit,a.soldout_ex_yn,a.sort, a.regi_date,
+                a.sec_no,a.sec_code,a.subject,a.max_limit,a.soldout_ex_yn,a.sort, a.regi_date, a.use_yn,
                 a.admin_id,ifnull(b.name,'') as admin_nm
             from section a left outer join mgr_user b on a.admin_id = b.id
             where a.sec_no = :code";
-        $secion = DB::selectOne($sql,array("code" => $code));
+        $section = DB::selectOne($sql,array("code" => $code));
 
         $values = [
             'code' => $code,
-            'section' => $secion,
-            'section_types' => SLib::getCodes('G_SECTION_TYPE'),
+            'section' => $section,
+            'section_types' => SLib::getCodes('G_SECTION_TYPE')
         ];
 
         return view( Config::get('shop.head.view') . '/product/prd11_show',$values);
@@ -61,9 +61,11 @@ class prd11Controller extends Controller
 
     public function search(Request $req) {
 
+        
 		$sec_code	= $req->input('sec_code', '');
 		$goods_nm	= $req->input('goods_nm', '');
 		$name		= $req->input('name', '');
+        $use_yn	    = $req->input('use_yn', '');
 
         $where = "";
         $inner_where = "";
@@ -74,6 +76,7 @@ class prd11Controller extends Controller
             $where .= " and cnt > 0 ";
         }
 		if ($name != "")		$where .= " and a.subject like '%" . Lib::quote($name) . "%' ";
+        if ($use_yn != "")	$where .= " and a.use_yn = '" . Lib::quote($use_yn) . "'";
 
 		$sql = /** @lang text */
             "
@@ -128,6 +131,7 @@ class prd11Controller extends Controller
 
         $subject = $request->input('subject');
         $sec_code = $request->input('sec_code');
+        $use_yn	= $request->input('section_use_yn', 'Y');
         $max_limit = $request->input('max_limit',5);
         $soldout_ex_yn = $request->input('soldout_ex_yn','Y');
         $sort = $request->input('sort','M');
@@ -142,7 +146,7 @@ class prd11Controller extends Controller
             'sort' => $sort,
             'comment' => '',
             'admin_id' => $id,
-            'use_yn' => 'Y',
+            'use_yn' => $use_yn,
             'regi_date' => DB::raw('now()')
         ];
 
@@ -163,6 +167,7 @@ class prd11Controller extends Controller
         $subject = $request->input('subject');
         $sec_code = $request->input('sec_code');
         $max_limit = $request->input('max_limit',5);
+        $use_yn	= $request->input('section_use_yn', 'Y');
         $soldout_ex_yn = $request->input('soldout_ex_yn','Y');
         $sort = $request->input('sort','M');
 
@@ -176,7 +181,7 @@ class prd11Controller extends Controller
             'sort' => $sort,
             'comment' => '',
             'admin_id' => $id,
-            'use_yn' => 'Y',
+            'use_yn' => $use_yn,
             'regi_date' => DB::raw('now()')
         ];
 

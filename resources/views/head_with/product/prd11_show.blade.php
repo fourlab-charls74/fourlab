@@ -77,6 +77,17 @@
                                                     </div>
                                                 </td>
                                             </tr>
+                                            <tr>
+                                                <th>사용여부</th>
+                                                <td>
+                                                    <div class="form-inline form-box">
+                                                        <select name="section_use_yn" class="form-control form-control-sm" style="width:54px">
+                                                            <option value="Y" @if(@$section->use_yn == "Y") selected @endif>Y</option>
+                                                            <option value="N" @if(@$section->use_yn == "N") selected @endif>N</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                            </tr>
                                             @if ($code !== '')
                                             <tr>
                                                 <th>등록자</th>

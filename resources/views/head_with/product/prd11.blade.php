@@ -53,6 +53,20 @@
                         </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="name">사용여부</label>
+                            <div class="flex_box">
+                                <select name="use_yn" class="form-control form-control-sm">
+                                    <option value="">전체</option>
+                                    <option value="Y">Y</option>
+                                    <option value="N">N</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="resul_btn_wrap mb-3">
