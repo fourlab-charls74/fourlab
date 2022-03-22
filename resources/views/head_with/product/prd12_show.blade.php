@@ -440,6 +440,8 @@
             {field: "img", headerName: "이미지", width:46, type:'GoodsImageType', cellStyle: {"text-align":"center"}},
             {field: "img", headerName: "이미지_url", hide: true},
             {field: "goods_nm", headerName: "상품명",type:'HeadGoodsNameType'},
+            {field: "com_nm", headerName: "공급업체", width: 80},
+            {field: "com_id", headerName: "com_id", hide:true},
             {field: "ad_desc", headerName: "하단홍보글"},
             {field: "sale_stat_cl", headerName: "상품상태", width:70, type:'GoodsStateType'},
             {field: "before_sale_price", headerName: "정상가", type:'currencyType', hide: true},

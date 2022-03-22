@@ -417,26 +417,24 @@ class prd12Controller extends Controller
         }
 
         $sql = /** @lang text */
-            "
-            select
-                '' as type, a.goods_no, a.style_no, '' as img, a.head_desc, a.goods_nm, a.ad_desc, cd.code_val as sale_stat_cl, a.goods_sh,a.price
-				, ifnull(round((a.before_sale_price - a.price) / a.before_sale_price * 100 ), 0) as sale_rate
-				, date_format(a.sale_s_dt, '%Y%m%d') as sale_s_dt, date_format(a.sale_e_dt, '%Y%m%d') as sale_e_dt
-				, ifnull((
-                    select sum(good_qty)
-					from goods_summary
-					where goods_no = a.goods_no and goods_sub = a.goods_sub
-				), 0) as qty
-				, a.reg_dm
-				, a.goods_no, a.goods_sub,
-                replace(a.img,'a_500', 's_62') as img
-            from category_goods cg 
+            "SELECT
+                '' as type, a.goods_no, a.style_no, '' as img, a.head_desc, a.goods_nm, a.ad_desc, 
+                cd.code_val as sale_stat_cl, a.goods_sh,a.price, c.com_nm, a.com_id, 
+                ifnull(round((a.before_sale_price - a.price) / a.before_sale_price * 100 ), 0) as sale_rate, 
+                date_format(a.sale_s_dt, '%Y%m%d') as sale_s_dt, date_format(a.sale_e_dt, '%Y%m%d') as sale_e_dt, 
+                ifnull((
+                    SELECT sum(good_qty)
+					FROM goods_summary
+					WHERE goods_no = a.goods_no and goods_sub = a.goods_sub
+				), 0) as qty, a.reg_dm, a.goods_no, a.goods_sub, replace(a.img,'a_500', 's_62') as img
+            FROM category_goods cg 
                 inner join goods a on cg.cat_type = 'PLAN' and cg.d_cat_cd = :p_no and cg.goods_no = a.goods_no and cg.goods_sub = cg.goods_sub
                 left outer join company c on a.com_id = c.com_id
                 inner join code cd on cd.code_kind_cd = 'G_GOODS_STAT' and a.sale_stat_cl = cd.code_id
             order by cg.seq   
         ";
             //echo "<pre>$sql</pre>";
+
 
         $rows = DB::select($sql,array("p_no" => $d_cat_cd));
 
