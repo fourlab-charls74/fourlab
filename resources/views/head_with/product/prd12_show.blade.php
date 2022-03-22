@@ -401,6 +401,41 @@
                     </div>
                 </div>
             @endif
+            <div class="card mt-2">
+                <div class="row_wrap card-body" style="border: none;">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="table-box-ty2 mobile">
+                                <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                    <colgroup>
+                                        <col width="150px">
+                                    </colgroup>
+                                    <tbody>
+                                        <tr>
+                                            <th>관련전시카테고리</th>
+                                            <td>
+                                                <div class="flex_box">
+                                                    @foreach ($d_category as $category)
+                                                        @if ($loop->first)
+                                                            <div class="w-100">
+                                                                {{$category}}
+                                                            </div>
+                                                        @else
+                                                            <div class="w-100 mt-2">
+                                                                {{$category}}
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <style>

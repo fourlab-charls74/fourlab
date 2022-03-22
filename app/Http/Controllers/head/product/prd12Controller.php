@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 use App\Models\Conf;
+use App\Models\Category;
 
 class prd12Controller extends Controller
 {
@@ -95,6 +96,23 @@ class prd12Controller extends Controller
             $category = DB::selectone($sql,array("p_d_cat_cd" => $plan->p_no));
         }
 
+        $user = [
+            'id'	=> Auth('head')->user()->id,
+            'name'	=> Auth('head')->user()->name
+        ];
+        $d_cat_cd = $plan->d_cat_cd;
+        $category = new Category($user, "DISPLAY");
+		$categories = array();
+		if ($d_cat_cd != "") {
+			$d_cat_cd = substr($d_cat_cd, 1);
+			$d_cat_cds = explode("s", $d_cat_cd);
+			for($i=0;$i<sizeof($d_cat_cds);$i++){
+				if(!empty($d_cat_cds[$i])){
+					$categories[$d_cat_cds[$i]] = $category->Location($d_cat_cds[$i]);
+				}
+			}
+		}
+
         $times = array();
         for($i=0;$i<24;$i++){
             array_push($times, sprintf("%02d", $i));
@@ -104,6 +122,7 @@ class prd12Controller extends Controller
             'code' => $code,
             'plan' => $plan,
             'category' => $category,
+            'd_category' => $categories,
             'is_shows' => SLib::getCodes('IS_SHOW'),
             'plan_types' => SLib::getCodes('G_PLAN_TYPE'),
             'plan_kinds' => SLib::getCodes('G_PLAN_KIND'),
@@ -433,8 +452,6 @@ class prd12Controller extends Controller
                 inner join code cd on cd.code_kind_cd = 'G_GOODS_STAT' and a.sale_stat_cl = cd.code_id
             order by cg.seq   
         ";
-            //echo "<pre>$sql</pre>";
-
 
         $rows = DB::select($sql,array("p_no" => $d_cat_cd));
 
