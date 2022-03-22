@@ -158,9 +158,9 @@
                                                                 <div style="width:157px; height:100px; border:1px solid #b3b3b3;padding:5px">
                                                                     <label id="plan_img_file-label" for="plan_img_file" class="h-100">
                                                                         @if (@$plan->plan_img != '')
-                                                                            <img src="{{@$plan->plan_img}}" id="plan_img" alt="" style="width:100%;height:100%">
+                                                                            <img src="{{@$plan->plan_img}}" id="plan_img" alt="" style="height:100%">
                                                                         @else
-                                                                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=" id="plan_img" alt="" style="width:100%;height:100%" title="이미지를 추가해 주세요." >
+                                                                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=" id="plan_img" alt="" style="height:100%" title="이미지를 추가해 주세요." >
 
                                                                         @endif
                                                                     </label>
@@ -181,9 +181,9 @@
                                                                 <div style="width:157px; height:100px; border:1px solid #b3b3b3; padding:5px">
                                                                     <label id="plan_preview_img_file-label" for="plan_preview_img_file" class="h-100">
                                                                         @if (@$plan->plan_preview_img != '')
-                                                                            <img src="{{@$plan->plan_preview_img}}" id="plan_preview_img" alt="" style="width:100%;height:100%">
+                                                                            <img src="{{@$plan->plan_preview_img}}" id="plan_preview_img" alt="" style="height:100%">
                                                                         @else
-                                                                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=" id="plan_preview_img" alt="" style="width:100%;height:100%" title="이미지를 추가해 주세요." >
+                                                                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=" id="plan_preview_img" alt="" style="height:100%" title="이미지를 추가해 주세요." >
                                                                         @endif
                                                                     </label>
                                                                 </div>
@@ -204,9 +204,9 @@
                                                                 <div style="width:300px; height:100px; border:1px solid #b3b3b3; padding:5px">
                                                                     <label id="plan_top_img_file-label" for="plan_top_img_file" class="h-100">
                                                                         @if (@$plan->plan_top_img != '')
-                                                                            <img src="{{@$plan->plan_top_img}}" id="plan_top_img" alt="" style="width:100%;height:100%">
+                                                                            <img src="{{@$plan->plan_top_img}}" id="plan_top_img" alt="" style="height:100%">
                                                                         @else
-                                                                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=" id="plan_top_img" alt="" style="width:100%;height:100%" title="이미지를 추가해 주세요." >
+                                                                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=" id="plan_top_img" alt="" style="height:100%" title="이미지를 추가해 주세요." >
                                                                         @endif
                                                                     </label>
                                                                 </div>

@@ -97,7 +97,7 @@ class ord01Controller extends Controller
         return response()->json($values);
     }
 
-    private function _get($ord_no, $ord_opt_no = ''){
+    private function _get($ord_no, $ord_opt_no = '') {
 
         // 설정 값 얻기
         $conf = new Conf();
@@ -598,6 +598,8 @@ class ord01Controller extends Controller
 
         $values['gifts'] = $rows;
 
+        // dd($values);
+
         return $values;
 
         // dd(DB::select($claimInfoSql));
@@ -614,7 +616,7 @@ class ord01Controller extends Controller
         //     'ord_lists' => DB::select($orderListSql),
         //     'clm_state' => empty($claim_info->clm_state) ? 0 : $claim_info->clm_state
         // ];
-        // dd($values);
+        
     }
 
     public function refund($ord_no, $ord_opt_no, Request $req) {
