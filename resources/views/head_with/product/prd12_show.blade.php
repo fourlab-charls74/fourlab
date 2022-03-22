@@ -434,6 +434,9 @@
                             </div>
                         </div>
                     </div>
+                    <div class="flex_box w-100">
+                        <button type="button" style="margin: 0 auto;" class="mt-2 btn-sm btn btn-primary sms-send-btn fs-12" onclick="return Save();">저장</button>
+                    </div>
                 </div>
             </div>
         </div>

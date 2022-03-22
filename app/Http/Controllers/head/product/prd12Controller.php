@@ -450,12 +450,12 @@ class prd12Controller extends Controller
                 inner join goods a on cg.cat_type = 'PLAN' and cg.d_cat_cd = :p_no and cg.goods_no = a.goods_no and cg.goods_sub = cg.goods_sub
                 left outer join company c on a.com_id = c.com_id
                 inner join code cd on cd.code_kind_cd = 'G_GOODS_STAT' and a.sale_stat_cl = cd.code_id
-            order by cg.seq   
+            order by cg.seq
         ";
 
         $rows = DB::select($sql,array("p_no" => $d_cat_cd));
 
-		foreach($rows as $row){
+		foreach ($rows as $row) {
             if($row->img != ""){
                 $row->img = sprintf("%s%s",config("shop.image_svr"),$row->img);
             }
