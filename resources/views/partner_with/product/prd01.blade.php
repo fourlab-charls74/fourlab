@@ -214,7 +214,15 @@
         {headerName: '#', pinned: 'left', type: 'NumType', cellStyle: {"line-height": "40px"}},
         {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
         {field: "goods_no", headerName: "상품번호", width: 80, pinned: 'left', cellStyle: {"line-height": "40px"}},
-        {field: "goods_type", headerName: "상품구분", width: 100, cellStyle: StyleGoodsTypeNM, pinned: 'left', cellStyle: {"line-height": "40px"}},
+        {field: "goods_type", headerName: "상품구분", width: 100, 
+            // cellStyle: { ...StyleGoodsTypeNM, "line-height": "40px" }, 
+            cellStyle: (params) => 
+                { 
+                    let obj = StyleGoodsTypeNM(params);
+                    obj = { ...obj, "line-height": "40px"};
+                    return obj;
+                },
+            pinned: 'left'},
         {field: "com_nm", headerName: "업체", cellStyle: {"line-height": "40px"}},
         {field: "opt_kind_nm", headerName: "품목", cellStyle: {"line-height": "40px"}, width: 110},
         {field: "brand_nm", headerName: "브랜드", cellStyle: {"line-height": "40px"}},
