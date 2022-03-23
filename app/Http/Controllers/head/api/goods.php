@@ -257,7 +257,7 @@ class goods extends Controller
 		if($site != ""){
 			if($ex_site == "Y"){
 				$join .= " left outer join goods_site s on a.goods_no = s.goods_no and a.goods_sub = s.goods_sub and s.site = '$site' ";
-				$where .= " and ifnull(s.site,'') <> '$S_site' ";
+				$where .= " and ifnull(s.site,'') <> '$site' ";
 			} else {
 				$join .= " inner join goods_site s on a.goods_no = s.goods_no and a.goods_sub = s.goods_sub and s.site = '$site' ";
 			}
@@ -289,7 +289,6 @@ class goods extends Controller
                 where 1=1 
                     $where
 			";
-            //$row = DB::select($query,['com_id' => $com_id]);
             $row = DB::select($query);
             $total = $row[0]->total;
             $page_cnt = (int)(($total - 1) / $page_size) + 1;

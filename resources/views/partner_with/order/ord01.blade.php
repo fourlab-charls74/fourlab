@@ -89,7 +89,7 @@
                                     <span class="text_line">/</span>
                                     <div class="form-inline-inner input-box" style="width:47%">
                                         <div class="form-inline-inner inline_btn_box">
-                                            <input type='text' class="form-control form-control-sm w-100 search-enter" name='goods_no' id='goods_no' value=''>
+                                            <input type='text' class="form-control form-control-sm w-100 search-enter" name='goods_no' id='goods_no' value='' readonly>
                                             <a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                         </div>
                                     </div>

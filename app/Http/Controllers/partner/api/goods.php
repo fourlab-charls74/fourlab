@@ -133,11 +133,11 @@ class goods extends Controller
 		}
 
 		if($goods != ""){			// 파일로 검색일 경우
-			$goods = split(",",$goods);
+			$goods = explode(",",$goods);
 
 			for($i=0;$i<count($goods);$i++){
 				if(empty($goods[$i])) continue;
-				list($no,$sub) = split("\|",$goods[$i]);
+				list($no,$sub) = explode("\|",$goods[$i]);
 				if($insql == ""){
 					$insql .= " select '$no' as no,'$sub' as sub ";
 				} else {

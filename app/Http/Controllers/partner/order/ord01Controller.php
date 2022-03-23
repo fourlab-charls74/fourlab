@@ -93,8 +93,46 @@ class ord01Controller extends Controller
         if($user_nm != "")	$where .= " and b.user_nm = '" . Lib::quote($user_nm) . "' ";
         if($r_nm != "")		$where .= " and b.r_nm = '" . Lib::quote($r_nm) . "' ";
         if($user_id != "")	$where .= " and b.user_id = '" . Lib::quote($user_id) . "' ";
-        if($style_no != "")	$where .= " and c.style_no = '" . Lib::quote($style_no) . "' ";
-        if($goods_no != "")	$where .= " and c.goods_no = '" . Lib::quote($goods_no) . "' ";
+
+		$style_no = preg_replace("/\s/",",",$style_no);
+		$style_no = preg_replace("/,,/",",",$style_no);
+		$style_no = preg_replace("/\t/",",",$style_no);
+		$style_no = preg_replace("/\n/",",",$style_no);
+
+		$goods_no = preg_replace("/\s/",",",$goods_no);
+		$goods_no = preg_replace("/,,/",",",$goods_no);
+		$goods_no = preg_replace("/\t/",",",$goods_no);
+		$goods_no = preg_replace("/\n/",",",$goods_no);
+
+        if( $style_no != "" ) {
+			$style_nos = explode(",",$style_no);
+			if(count($style_nos) > 1){
+				if(count($style_nos) > 500) array_splice($style_nos,500);
+				$in_style_nos = "";
+				for($i=0; $i<count($style_nos); $i++){
+					if(isset($style_nos[$i]) && $style_nos[$i] != ""){
+						$in_style_nos .= ($in_style_nos == "") ? "'$style_nos[$i]'" : ",'$style_nos[$i]'";
+					}
+				}
+				if($in_style_nos != "") {
+					$where .= " and c.style_no in ( $in_style_nos ) ";
+				}
+			} else {
+				$where .= " and c.style_no like '$style_no%' ";
+			}
+		}
+
+        if( $goods_no		!= "" ){
+			$goods_nos = explode(",",$goods_no);
+			if(count($goods_nos) > 1){
+				if(count($goods_nos) > 500) array_splice($goods_nos,500);
+				$in_goods_nos = join(",",$goods_nos);
+				$where .= " and c.goods_no in ( $in_goods_nos ) ";
+			} else {
+				$where .= " and c.goods_no = '$goods_no' ";
+			}
+		}
+
         if($item != "")	    $where .= " and opt_kind_cd = '" . Lib::quote($item) . "' ";
         if($goods_nm != "")		$where .= " and c.goods_nm like '%" . Lib::quote($goods_nm) . "%'";
         if($goods_type != "")	$where .= " and c.goods_type = '" . Lib::quote($goods_type) . "' ";
