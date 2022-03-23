@@ -37,7 +37,7 @@ class LoginController extends Controller
             $password =  $request->password;
             $user = Head::where('id','=',$request->email)
                 ->where('use_yn','=','Y')
-                ->where('passwd','=',DB::raw("password('$password')"))
+                ->where('passwd','=',DB::raw("CONCAT('*', UPPER(SHA1(UNHEX(SHA1('$password')))))"))
                 ->first();
             if($user){
                 Auth::guard('head')->login($user,true);
