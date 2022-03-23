@@ -365,7 +365,9 @@
     }
 
     function ShowProductImages() {
-        var url = '/partner/product/prd09';
+        const goods_nos = gx.gridOptions.api.getSelectedRows().map(row => row.goods_no);
+        if (goods_nos.length < 1) return alert("상품을 선택해주세요.");
+        var url = '/partner/product/prd02/slider?goods_nos=' + goods_nos.join(",");
         var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
     }
 </script>

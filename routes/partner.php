@@ -170,6 +170,7 @@ Route::group(['middleware' => 'partner', 'as' => 'partner.', 'namespace' => 'par
         // 이미지 관리
         Route::post('prd02/{idx}/upload', 'prd02Controller@upload');
         Route::get('prd02/{no}/image', 'prd02Controller@index');
+        Route::get("prd02/slider", "prd02Controller@index_slider");
 
         Route::get('prd03', 'prd03Controller@index');
         Route::get('prd03/search', 'prd03Controller@search');
