@@ -177,8 +177,6 @@ select.select_cat
                                 </div>
                             </div>
                             <div class="col-lg-6 mt-4 mt-lg-0">
-                                <style> .required:before {content:"* "; color: red;}</style>
-                                <style>p{margin-left: 10px}</style>
                                 <div class="table-box">
                                     <table class="table incont table-bordered" id="dataTable" width="100%" cellspacing="0">
                                         <tr>
@@ -231,8 +229,8 @@ select.select_cat
                                             <td>
                                                 <div class="wd300">
                                                     <div class="form-inline inline_btn_box">
-                                                        <input type="hidden" name="brand_cd" id="brand_cd" value="{{@$goods_info->brand}}">
-                                                        <input type="text" class="form-control form-control-sm search-all" name="brand" id="brand_nm" value="{{@$goods_info->brand_nm}}" style="width:100%;">
+                                                        <input type="text" name="brand_nm" value="{{@$goods_info->brand_nm}}" class="form-control form-control-sm ac-brand" style="width:70%;">
+														<input type="text" name="brand_cd" id="brand_cd" value="{{@$goods_info->brand}}" class="form-control form-control-sm ml-1" style="width:28%;" readonly>
                                                         <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                                     </div>
                                                 </div>
