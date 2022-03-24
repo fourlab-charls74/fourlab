@@ -392,12 +392,10 @@ SearchBrand.prototype.SetGrid = function(divId){
 
 SearchBrand.prototype.Search = function(){
     let data = $('form[name="search_brand"]').serialize();
-    console.log(data);
     this.grid.Request('/partner/api/brand/getlist', data);
 };
 
 SearchBrand.prototype.Choice = function(code,name){
-
     if(this.callback !== null){
         this.callback(code,name);
     } else {
@@ -414,9 +412,7 @@ SearchBrand.prototype.Choice = function(code,name){
             }
         }
     }
-    if($("#search_brand_close").is(":checked")) {
-        $('#SearchBrandModal').modal('toggle');
-    }
+    $('#SearchBrandModal').modal('toggle');
 };
 let searchBrand = new SearchBrand();
 
@@ -429,8 +425,8 @@ SearchCategory.prototype.Open = function(type = 'DISPLAY',callback = null){
     if(this.grid === null){
         this.SetGrid("#div-gd-category");
         $("#SearchCategoryModal").draggable();
-        this.callback = callback;
     }
+    this.callback = callback;
     if(this.type !== type){
         this.type = type;
         $("#search_category select[name=cat_type]").val(this.type).attr("selected","selected");

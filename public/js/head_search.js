@@ -588,7 +588,6 @@ SearchCategory.prototype.Search = function(){
 };
 
 SearchCategory.prototype.Choice = function(code, name, full_nm, mx_len){
-
     if(this.callback !== null){
         this.callback(code, name, full_nm, mx_len);
     } else {

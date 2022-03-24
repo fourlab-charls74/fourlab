@@ -245,7 +245,7 @@
                                             <td>
                                                 <div class="wd300">
                                                     <div class="form-inline inline_btn_box">
-                                                        <input type="text" name="brand_nm" value="{{@$goods_info->brand_nm}}" class="form-control form-control-sm ac-brand" style="width:70%;">
+                                                        <input type="text" name="brand_nm" id="brand_nm" value="{{@$goods_info->brand_nm}}" class="form-control form-control-sm ac-brand" style="width:70%;">
 														<input type="text" name="brand_cd" id="brand_cd" value="{{@$goods_info->brand}}" class="form-control form-control-sm ml-1" style="width:28%;" readonly>
                                                         <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                                     </div>
@@ -562,7 +562,7 @@
                                                     <select name="md_id" id="md_id" class="form-control form-control-sm search-all">
 														<option value="">==MD선택==</option>
                                                         @foreach($md_list as $md)
-                                                            <option value="{{$md->id}}" {{ (@$goods_info->md_id== $md->id) ? "selected" : "" }} >{{$md->name}} ({{$md->id}})</option>
+                                                            <option value="{{$md->id}}" {{ (@$goods_info->md_id == $md->id) ? "selected" : "" }}>{{$md->name}} ({{$md->id}})</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
