@@ -96,14 +96,20 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="formrow-inputZip">상단홍보글</label>
-                            <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm search-enter" name='head_desc' value=''>
-                            </div>
-                        </div>
+							<label>상단홍보글/하단홍보글</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input_box" style="width: 47%">
+									<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='head_desc' value=''>
+								</div>
+								<span class="text_line" style="width: 6%">/</span>
+								<div class="form-inline-inner input-box" style="width: 47%">
+                                    <input type='text' class="form-control form-control-sm w-100 search-enter" name='ad_desc' value=''>
+								</div>
+							</div>
+						</div>
                     </div>
                 </div>
-                <div class="search-area-ext d-none row">
+                <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="item">카테고리</label>
@@ -117,7 +123,7 @@
                                 <div class="form-inline-inner input-box">
                                     <div class="form-inline inline_btn_box">
                                         <input type='hidden' name='cat_cd' id='cat_cd' value=''>
-                                        <input type='text' class="form-control form-control-sm" name='cat_nm' id='cat_nm' value=''>
+                                        <input type='text' class="form-control form-control-sm" name='cat_nm' id='cat_nm' value='' readonly>
                                         <a href="#" class="btn btn-sm btn-outline-primary sch-category"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                     </div>
                                 </div>
@@ -140,19 +146,116 @@
                         </div>
                     </div>
                     <div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="">자료수/정렬</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input_box" style="width:24%;">
+									<select name="limit" class="form-control form-control-sm">
+										<option value="100">100</option>
+										<option value="500">500</option>
+										<option value="1000">1000</option>
+										<option value="2000">2000</option>
+									</select>
+								</div>
+								<span class="text_line">/</span>
+								<div class="form-inline-inner input_box" style="width:45%;">
+									<select name="ord_field" class="form-control form-control-sm">
+										<option value="goods_no">상품번호</option>
+										<option value="goods_nm">상품명</option>
+									</select>
+								</div>
+								<div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
+									<div class="btn-group" role="group">
+										<label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="내림차순"><i class="bx bx-sort-down"></i></label>
+										<label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="오름차순"><i class="bx bx-sort-up"></i></label>
+									</div>
+									<input type="radio" name="ord" id="sort_desc" value="desc" checked="">
+									<input type="radio" name="ord" id="sort_asc" value="asc">
+								</div>
+							</div>
+						</div>
+					</div>
+                </div>
+                <div class="search-area-ext d-none row">
+                    <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="item">자료수/정렬</label>
-                            <div class="flax_box">
-                                <select name="limit" class="form-control form-control-sm">
-                                    <option value="100">100</option>
-                                    <option value="500">500</option>
-                                    <option value="1000">1000</option>
-                                    <option value="2000">2000</option>
-                                </select>
+                            <label for="org_nm">원산지</label>
+                            <div class="flex_box">
+                                <input type="text" name="org_nm" id="org_nm" class="form-control form-control-sm search-all search-enter"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="make">제조사</label>
+                            <div class="flex_box">
+                                <input type="text" name="make" id="make" class="form-control form-control-sm search-all search-enter"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="formrow-firstname-input">등록일자</label>
+                            <div class="form-inline">
+                                <div class="docs-datepicker form-inline-inner input_box">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="" autocomplete="off" disable>
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
+                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="docs-datepicker-container"></div>
+                                </div>
+                                <span class="text_line">~</span>
+                                <div class="docs-datepicker form-inline-inner input_box">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm docs-date" name="edate" value="" autocomplete="off">
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="docs-datepicker-container"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                <div class="search-area-ext d-none row">
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="item">옵션사용/위치</label>
+                            <div class="form-inline">
+                                <div class="form-inline-inner input_box" style="width:38%;">
+                                    <select name="is_option_use" class="form-control form-control-sm">
+                                        <option value="">전체</option>
+                                        <option value="Y">사용</option>
+                                        <option value="N">미사용</option>
+                                    </select>
+                                </div>
+                                <span class="text_line" style="width: 6%">/</span>
+                                <div class="form-inline-inner input-box" style="width: 56%">
+                                    <input type='text' class="form-control form-control-sm w-100 search-enter" name='goods_location' value=''>
+                                </div>
+                            </div>                     
+                        </div>
+                    </div>
+                </div>
+
+                <!-- <tr name="ext" class="close">
+                    <td class="label">원산지</td><td>{$F_S_ORG_NM}</td>
+                    <td class="label">제조사</td><td>{$F_S_MAKE}</td>
+                    <td class="label">등록일자</td><td>{$F_S_DATE}</td>
+                </tr>
+                <tr name="ext" class="close">
+                    <td class="label">옵션사용/위치</td>
+                    <td colspan="5">{$F_S_IS_OPTION_USE} / {$F_S_GOODS_LOCATION}
+                    </td>
+                </tr> -->
+
             </div>
         </div>
         <div class="resul_btn_wrap mb-3">

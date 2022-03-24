@@ -178,7 +178,6 @@ class prd01Controller extends Controller
 		if( $coupon_yn != "" )	$where .= " and gc.price > 0 ";
 		if( $sale_type != "" )	$where .= " and g.sale_type = '" . Lib::quote($sale_type) . "' ";
 
-
         $page_size = $limit;
         $startno = ($page - 1) * $page_size;
         $limit = " limit $startno, $page_size ";

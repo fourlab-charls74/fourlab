@@ -121,11 +121,11 @@
 						<div class="form-group">
 							<label>상단홍보글/하단홍보글</label>
 							<div class="form-inline">
-								<div class="form-inline-inner input_box" style="width: 205px;">
+								<div class="form-inline-inner input_box" style="width: 47%">
 									<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='head_desc' value=''>
 								</div>
-								<span class="text_line">/</span>
-								<div class="form-inline-inner input-box" style="width: 210px;">
+								<span class="text_line" style="width: 6%">/</span>
+								<div class="form-inline-inner input-box" style="width: 47%">
                                     <input type='text' class="form-control form-control-sm w-100 search-enter" name='ad_desc' value=''>
 								</div>
 							</div>
@@ -204,16 +204,33 @@
 					</div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="item">자료수/정렬</label>
-                            <div class="flax_box">
-                                <select name="limit" class="form-control form-control-sm">
-                                    <option value="100">100</option>
-                                    <option value="500">500</option>
-                                    <option value="1000">1000</option>
-                                    <option value="2000">2000</option>
-                                </select>
-                            </div>
-                        </div>
+							<label for="">자료수/정렬</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input_box" style="width:24%;">
+									<select name="limit" class="form-control form-control-sm">
+										<option value="100">100</option>
+										<option value="500">500</option>
+										<option value="1000">1000</option>
+										<option value="2000">2000</option>
+									</select>
+								</div>
+								<span class="text_line">/</span>
+								<div class="form-inline-inner input_box" style="width:45%;">
+									<select name="ord_field" class="form-control form-control-sm">
+										<option value="goods_no">상품번호</option>
+										<option value="goods_nm">상품명</option>
+									</select>
+								</div>
+								<div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
+									<div class="btn-group" role="group">
+										<label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="내림차순"><i class="bx bx-sort-down"></i></label>
+										<label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="오름차순"><i class="bx bx-sort-up"></i></label>
+									</div>
+									<input type="radio" name="ord" id="sort_desc" value="desc" checked="">
+									<input type="radio" name="ord" id="sort_asc" value="asc">
+								</div>
+							</div>
+						</div>
                     </div>
                 </div>
             </div>

@@ -52,6 +52,9 @@ class prd01Controller extends Controller
         if ($page < 1 or $page == "") $page = 1;
         $limit = $request->input('limit', 100);
 
+        $sdate = str_replace("-", "", $request->input("sdate", date('Y-m-d')));
+        $edate = str_replace("-", "", $request->input("edate", date("Y-m-d")));
+
         $goods_stat = $request->input("goods_stat");
         $style_no = $request->input("style_no");
         $goods_no = $request->input("goods_no");
@@ -68,6 +71,10 @@ class prd01Controller extends Controller
         $limit = $request->input("limit",100);
         $ord = $request->input('ord','desc');
         $ord_field = $request->input('ord_field','g.goods_no');
+        $make = $request->input('make');
+        $org_nm = $request->input('org_nm');
+        $is_option_use = $request->input('is_option_use');
+        $goods_location = $request->input('goods_location');
 
         $orderby = sprintf("order by %s %s", $ord_field, $ord);
 
@@ -93,6 +100,14 @@ class prd01Controller extends Controller
         if ($head_desc != "") $where .= " and g.head_desc like '%" . Lib::quote($head_desc) . "%' ";
         if ($is_unlimited != "") $where .= " and g.is_unlimited = '" . Lib::quote($is_unlimited) . "' ";
         if ($goods_stat != "") $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
+
+        if( $make != "" )				$where .= " and g.make = '$make' ";
+        if( $org_nm != "" )			$where .= " and g.org_nm = '$org_nm' ";
+		if( $is_option_use != "" )	$where .= " and g.is_option_use = '$is_option_use' ";
+		if( $goods_location != "" )	$where .= " and g.goods_location like '%$goods_location%' ";
+
+		if ($sdate != "") $where .= " and g.reg_dm >= '$sdate' ";
+		if ($edate != "") $where .= " and g.reg_dm < date_add('$edate',interval 1 day) ";
 
         if($goods_nos        != ""){
             $goods_no = $goods_nos;
@@ -204,8 +219,9 @@ class prd01Controller extends Controller
             $orderby
 			$limit
 		";
-        //dd($query);
+        
         //$result = DB::select($query,['com_id' => $com_id]);
+
         $pdo = DB::connection()->getPdo();
         $stmt = $pdo->prepare($query);
         $stmt->execute(['com_id' => $com_id]);
