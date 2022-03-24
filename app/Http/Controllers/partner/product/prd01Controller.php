@@ -432,8 +432,8 @@ class prd01Controller extends Controller
             $goods_info->opt_kind_cd = $goods->opt_kind_cd;
             $goods_info->brand_cd = $goods->brand;
             $goods_info->brand_nm = $goods->brand_nm;
-            $goods_info->make = $goods->make;
-            $goods_info->org_nm = $goods->org_nm;
+            // $goods_info->make = $goods->make;
+            // $goods_info->org_nm = $goods->org_nm;
             $goods_info->md_id = $goods->md_id;
             $goods_info->rep_cat_cd = $goods->rep_cat_cd;
             $goods_info->cat_nm	= $this->get_cat_nm($goods_info->rep_cat_cd);
@@ -441,32 +441,35 @@ class prd01Controller extends Controller
             $goods_info->rep_cat_nm	= substr( $category->Location( $goods_info->rep_cat_cd ), 0 );
         }
 
+        $values = [
+            'goods_no'		=> '',
+            'goods_info'	=> $goods_info,
+            'md_list'		=> SLib::getMDs(),
+            'opt_cd_list'	=> SLib::getItems(),
+            'com_info'		=> Auth('partner')->user(),
+            'qty'			=> 0, 
+            'wqty'			=> 0,
+            'coupon_list'	=> [],
+            'planing'		=> [],
+            'modify_hostory'=> [],
+            'type'			=> 'create',
+            'goods_stats'	=> SLib::getCodes('G_GOODS_STAT',["40" => "<>"]),
+            'class_items'	=> $class_items,
+            'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
+
+            'g_dlv_fee'		=> $cfg_dlv_fee,
+            'g_free_dlv_fee_limit'	=> $cfg_free_dlv_fee_limit,
+            'g_order_point_ratio'	=> $cfg_order_point_ratio,
+            'displays'          => [],
+            'items'             => [],
+            'shop_domain'       => $shop_domain,
+            'opt2'			=> array()
+        ];
+
+        // dd($values);
 
 		return view(Config::get('shop.partner.view') . '/product/prd01_show',
-			[
-				'goods_no'		=> '',
-				'goods_info'	=> $goods_info,
-				'md_list'		=> SLib::getMDs(),
-				'opt_cd_list'	=> SLib::getItems(),
-				'com_info'		=> Auth('partner')->user(),
-				'qty'			=> 0,
-				'wqty'			=> 0,
-				'coupon_list'	=> [],
-				'planing'		=> [],
-				'modify_hostory'=> [],
-				'type'			=> 'create',
-				'goods_stats'	=> SLib::getCodes('G_GOODS_STAT',["40" => "<>"]),
-				'class_items'	=> $class_items,
-				'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
-
-				'g_dlv_fee'		=> $cfg_dlv_fee,
-				'g_free_dlv_fee_limit'	=> $cfg_free_dlv_fee_limit,
-				'g_order_point_ratio'	=> $cfg_order_point_ratio,
-                'displays'          => [],
-                'items'             => [],
-                'shop_domain'       => $shop_domain,
-				'opt2'			=> array()
-			]
+			$values
 		);
 	}
 

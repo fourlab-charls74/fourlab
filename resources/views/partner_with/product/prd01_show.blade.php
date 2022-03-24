@@ -27,7 +27,11 @@ select.select_cat
     <div class="show_layout py-3 px-sm-3">
         <div class="page_tit mb-3 d-flex align-items-center justify-content-between">
             <div>
+                @if( $type == '')
                 <h3 class="d-inline-flex">상품수정</h3>
+                @elseif ( $type == 'create')
+                <h3 class="d-inline-flex">상품생성</h3>
+                @endif
                 <div class="d-inline-flex location">
                     <span class="home"></span>
                     <span>/ 상품 - {{ $goods_no }}</span>

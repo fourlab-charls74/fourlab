@@ -27,6 +27,12 @@
             }
         }
         ed = new HDEditor('.editor1',editorOptions, true);
+
+        const TYPE = "{{$type}}";
+        if (TYPE == "create") {
+            document.f1.reset();
+        }
+
     });
 
 
