@@ -115,15 +115,14 @@
                             <label for="item">카테고리</label>
                             <div class="form-inline inline_select_box">
                                 <div class="form-inline-inner select-box">
-                                    <select name='cat_type' id='cat_type' class="form-control form-control-sm">
+                                    <select name='cat_type' id="cat_type" class="form-control form-control-sm">
                                         <option value='DISPLAY'>전시</option>
                                         <option value='ITEM'>용도</option>
                                     </select>
                                 </div>
                                 <div class="form-inline-inner input-box">
                                     <div class="form-inline inline_btn_box">
-                                        <input type='hidden' name='cat_cd' id='cat_cd' value=''>
-                                        <input type='text' class="form-control form-control-sm" name='cat_nm' id='cat_nm' value='' readonly>
+                                        <select name='cat_cd' id='cat_cd' class="form-control form-control-sm select2-category"></select>
                                         <a href="#" class="btn btn-sm btn-outline-primary sch-category"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                     </div>
                                 </div>

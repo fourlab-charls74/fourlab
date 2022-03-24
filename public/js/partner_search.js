@@ -455,7 +455,7 @@ SearchCategory.prototype.SetGrid = function(divId){
             }
         },
         {field:"mx_len" , headerName:"코드길이",hide:true},
-        {field:"nvl" , headerName:"",width:90},
+        {field:"", headerName:"", width: "auto"},
     ];
 
     this.grid = new HDGrid(document.querySelector( divId ), columns);
@@ -464,7 +464,6 @@ SearchCategory.prototype.SetGrid = function(divId){
 SearchCategory.prototype.Search = function(){
     let data = $('form[name="search_category"]').serialize();
     const cat_type = $("#search_category select[name=cat_type]").val();
-    //console.log(cat_type);
     //const url = '/partner/api/category/getlist/' + this.type;
     const url = '/partner/api/category/getlist/' + cat_type;
     this.grid.Request(url, data);
@@ -488,13 +487,9 @@ SearchCategory.prototype.Choice = function(code,name,full_nm = '', mx_len = 0){
             }
         }
     }
-    if($("#search_category_close").is(":checked")){
-        $('#SearchCategoryModal').modal('toggle');
-    }
+    $('#SearchCategoryModal').modal('toggle');
 };
 let searchCategory = new SearchCategory();
-
-
 
 
 function SearchCompany(){

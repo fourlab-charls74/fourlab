@@ -572,7 +572,7 @@ SearchCategory.prototype.SetGrid = function(divId){
             }
         },
         {field:"mx_len" , headerName:"코드길이",hide:true},
-        {field:"nvl" , headerName:"",width:90},
+        {field:"", headerName:"", width: "auto"},
     ];
 
     this.grid = new HDGrid(document.querySelector( divId ), columns);
@@ -588,12 +588,6 @@ SearchCategory.prototype.Search = function(){
 };
 
 SearchCategory.prototype.Choice = function(code, name, full_nm, mx_len){
-/*
-    console.log(code);
-    console.log(name);
-    console.log(full_nm);
-    console.log(mx_len);
-*/
 
     if(this.callback !== null){
         this.callback(code, name, full_nm, mx_len);

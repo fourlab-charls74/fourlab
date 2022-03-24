@@ -93,9 +93,9 @@
     </div><!-- /.modal -->
 
 
-<div id="SearchCategoryModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchCategoryModalLabel"
+    <div id="SearchCategoryModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchCategoryModalLabel"
      aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="max-width:850px;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title mt-0" id="myModalLabel">카테고리 검색</h5>
@@ -106,7 +106,7 @@
             <div class="modal-body show_layout" style="background:#f5f5f5;">
                 <div class="card_wrap search_cum_form write">
                     <div class="card shadow">
-                        <form name="search_category" id="search_category" method="get">
+                        <form name="search_category" id="search_category" method="get" onsubmit="return false">
                             <div class="card-body">
                                 <div class="row_wrap">
                                     <div class="row">
@@ -121,7 +121,7 @@
                                                         </select>
                                                     </div>
                                                     <div class="form-inline-inner input-box w-75 pl-1">
-                                                        <input type='text' class="form-control form-control-sm search-all" name='cat_nm' value=''>
+                                                        <input type='text' onkeypress="return searchCategory.Search();" class="form-control form-control-sm search-all" name='cat_nm' value=''>
                                                     </div>
                                                 </div>
                                             </div>
@@ -139,14 +139,14 @@
                             <div class="card-title">
                                 <div class="filter_wrap">
                                     <div class="fl_box">
-                                        <h6 class="m-0 font-weight-bold">총 : <span id="gd-brand-total" class="text-primary">0</span> 건</h6>
+                                        <h6 class="m-0 font-weight-bold">총 : <span id="gd-category-total" class="text-primary">0</span> 건</h6>
                                     </div>
-                                    <div class="fr_box form-check-box">
+                                    {{-- <div class="fr_box form-check-box">
                                         <div class="custom-control custom-checkbox">
-                                            <input type="checkbox" name="search_category_close" id="search_category_close" class="custom-control-input" value="Y" checked>
-                                            <label class="custom-control-label" for="search_category_close">선택 후 닫기</label>
+                                            <input type="checkbox" name="search_brand_close" id="search_brand_close" class="custom-control-input" value="Y" checked>
+                                            <label class="custom-control-label" for="search_brand_close" value="30">선택 후 닫기</label>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                 </div>
                             </div>
                             <div class="table-responsive">
