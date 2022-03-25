@@ -387,8 +387,13 @@
             data: frm.serialize(),
             success: function (data) {
                 if (!isNaN(data * 1)) {
-                    alert("변경된 내용이 정상적으로 저장 되었습니다.");
-                    location.href="/partner/product/prd01/" + data;
+                    const TYPE = "{{$type}}";
+                    if (TYPE == "create") {
+                        alert("상품이 추가되었습니다.");
+                    } else {
+                        alert("변경된 내용이 정상적으로 저장 되었습니다.");
+                        location.href="/partner/product/prd01/" + data;
+                    }
                 }
             },
             error: function(e) {

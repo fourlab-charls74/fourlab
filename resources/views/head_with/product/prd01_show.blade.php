@@ -44,7 +44,11 @@
     <div class="show_layout py-3 px-sm-3">
         <div class="page_tit mb-3 d-flex align-items-center justify-content-between">
             <div>
+                @if( $type == '')
                 <h3 class="d-inline-flex">상품수정</h3>
+                @elseif ( $type == "create")
+                <h3 class="d-inline-flex">상품추가</h3>
+                @endif
                 <div class="d-inline-flex location">
                     <span class="home"></span>
                     <span>/ 상품 - {{ $goods_no }}</span>
@@ -1822,8 +1826,13 @@
 				data: frm.serialize(),
 				success: function (data) {
 					if (!isNaN(data * 1)) {
-						alert("변경된 내용이 정상적으로 저장 되었습니다.");
-						location.href="/head/product/prd01/" + data;
+                        const TYPE = "{{$type}}";
+                        if (TYPE == "create") {
+                            alert("상품이 추가되었습니다.");
+                        } else {
+						    alert("변경된 내용이 정상적으로 저장 되었습니다.");
+						    location.href="/head/product/prd01/" + data;
+                        }
 					}
 				},
 				error: function(e) {

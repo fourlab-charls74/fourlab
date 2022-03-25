@@ -29,8 +29,8 @@ select.select_cat
             <div>
                 @if( $type == '')
                 <h3 class="d-inline-flex">상품수정</h3>
-                @elseif ( $type == 'create')
-                <h3 class="d-inline-flex">상품생성</h3>
+                @elseif ( $type == "create")
+                <h3 class="d-inline-flex">상품추가</h3>
                 @endif
                 <div class="d-inline-flex location">
                     <span class="home"></span>
@@ -523,7 +523,7 @@ select.select_cat
                                             <th class="required">적립금</th>
                                             <td>
                                                 <div class="form-inline form-radio-box flax_box txt_box">
-                                                    @if($type == 'create')
+                                                    @if($type == "create")
                                                         <div class="custom-control custom-radio">
                                                             <input type="radio" name="point_cfg" class="custom-control-input" value="S" checked/>
                                                             <label class="custom-control-label" for="point_cfg">쇼핑몰 정책 : 구매 금액의 {{$g_order_point_ratio}}% 적립</label>

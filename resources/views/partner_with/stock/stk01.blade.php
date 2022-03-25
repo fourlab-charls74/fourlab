@@ -2,6 +2,14 @@
 @section('title','재고')
 @section('content')
 
+<style>
+    input[type="text"]::placeholder {
+        color: #aaa;
+        text-align: right;
+    }
+
+</style>
+
     <div class="page_tit">
         <h3 class="d-inline-flex">재고</h3>
         <div class="d-inline-flex location">
@@ -81,13 +89,13 @@
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box">
                                         <div class="form-group">
-                                            <input type='text' class="form-control form-control-sm" name='wqty_l' value=''>
+                                            <input type='text' class="form-control form-control-sm" name='wqty_l' value='' placeholder="이상">
                                         </div>
                                     </div>
                                     <span class="text_line">~</span>
                                     <div class="form-inline-inner input_box">
                                         <div class="form-group">
-                                            <input type='text' class="form-control form-control-sm search-enter" name='wqty_h' value=''>
+                                            <input type='text' class="form-control form-control-sm search-enter" name='wqty_h' value='' placeholder="이하">
                                         </div>
                                     </div>
                                 </div>
@@ -99,13 +107,13 @@
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box">
                                         <div class="form-group">
-                                            <input type='text' class="form-control form-control-sm" name='qty_l' value=''>
+                                            <input type='text' class="form-control form-control-sm" name='qty_l' value='' placeholder="이상">
                                         </div>
                                     </div>
                                     <span class="text_line">~</span>
                                     <div class="form-inline-inner input_box">
                                         <div class="form-group">
-                                            <input type='text' class="form-control form-control-sm search-enter" name='qty_h' value=''>
+                                            <input type='text' class="form-control form-control-sm search-enter" name='qty_h' value='' placeholder="이하">
                                         </div>
                                     </div>
                                 </div>
