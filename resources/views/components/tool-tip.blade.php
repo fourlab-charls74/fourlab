@@ -1,7 +1,5 @@
 <?php
-
     use App\Components\Lib;
-
     /**
      * View - Blade에서 컴포넌트 사용하는 방법
      * 
@@ -23,14 +21,27 @@
      */
 
     $html = Lib::quote($html); // 큰 따옴표, 작은 따옴표 충돌 제거
+
+    $box_color = "#FFF59D";
+    $tool_tip_color = "#556ee6";
 ?>
 
 <style>
-    .custom.tooltip .arrow::before {
-        border-color: #FFF59D !important;
+    .bs-tooltip-top .arrow::before, .bs-tooltip-auto[x-placement^=top] .arrow::before {
+        border-top-color: {{$box_color}};
     }
+    .bs-tooltip-right .arrow::before, .bs-tooltip-auto[x-placement^=right] .arrow::before {
+        border-right-color: {{$box_color}};
+    }
+    .bs-tooltip-bottom .arrow::before, .bs-tooltip-auto[x-placement^=bottom] .arrow::before {
+        border-bottom-color: {{$box_color}};
+    }
+    .bs-tooltip-left .arrow::before, .bs-tooltip-auto[x-placement^=left] .arrow::before {
+        border-left-color: {{$box_color}};   
+    }     
     .custom.tooltip .tooltip-inner {
-        background-color: #FFF59D;
+        background-color: {{$box_color}};
+        padding-bottom: 10px;
         color: inherit;
         text-align: {{$align}};
     }
@@ -39,7 +50,7 @@
 <button type="button" class="tool-tip" data-toggle="tooltip" data-placement="{{$arrow}}" data-html="true"
     data-template="<div class='custom tooltip' role='tooltip'><div class='arrow'></div><div class='tooltip-inner'></div></div>'"
     style="border: none; background: none;" title="{{$html}}">
-    <i class="fas fa-question-circle" style="color: #556ee6; pointer-events: none;"></i>
+    <i class="fas fa-question-circle" style="color: {{$tool_tip_color}}; pointer-events: none;"></i>
 </button>
 
 <script>

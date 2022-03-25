@@ -588,6 +588,13 @@ select.select_cat
                                                         <input type="radio" name="is_unlimited" value="Y" id="is_unlimited2" class="custom-control-input" {{ (@$goods_info->is_unlimited=="Y")? "checked" : "" }}>
                                                         <label class="custom-control-label" for="is_unlimited2">수량 관리 안함 (무한재고)</label>
                                                     </div>
+                                                    <x-tool-tip>
+                                                        <x-slot name="arrow">top</x-slot>
+                                                        <x-slot name="align">left</x-slot>
+                                                        <x-slot name="html">
+                                                            매입상품은 무한재고 기능을 사용할 수 없습니다.
+                                                        </x-slot>
+                                                    </x-tool-tip>
                                                 </div>
                                             </td>
                                         </tr>
@@ -603,6 +610,13 @@ select.select_cat
                                                         <input type="radio" name="is_option_use" value="N" id="is_option_use_n" class="custom-control-input" {{ (@$goods_info->is_option_use=="N")? "checked" : "" }}>
                                                         <label class="custom-control-label" for="is_option_use_n">사용 안함</label>
                                                     </div>
+                                                    <x-tool-tip>
+                                                        <x-slot name="arrow">top</x-slot>
+                                                        <x-slot name="align">left</x-slot>
+                                                        <x-slot name="html">
+                                                            옵션 사용 항목을 변경하면, 등록된 모든 재고 수량 정보가 삭제됩니다.
+                                                        </x-slot>
+                                                    </x-tool-tip>
                                                 </div>
                                             </td>
                                         </tr>
