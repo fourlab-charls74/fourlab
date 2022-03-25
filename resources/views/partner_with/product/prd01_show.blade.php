@@ -30,7 +30,7 @@ select.select_cat
                 @if( $type == '')
                 <h3 class="d-inline-flex">상품수정</h3>
                 @elseif ( $type == "create")
-                <h3 class="d-inline-flex">상품추가</h3>
+                <h3 class="d-inline-flex">상품등록</h3>
                 @endif
                 <div class="d-inline-flex location">
                     <span class="home"></span>

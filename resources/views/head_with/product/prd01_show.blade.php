@@ -47,7 +47,7 @@
                 @if( $type == '')
                 <h3 class="d-inline-flex">상품수정</h3>
                 @elseif ( $type == "create")
-                <h3 class="d-inline-flex">상품추가</h3>
+                <h3 class="d-inline-flex">상품등록</h3>
                 @endif
                 <div class="d-inline-flex location">
                     <span class="home"></span>
@@ -1828,7 +1828,7 @@
 					if (!isNaN(data * 1)) {
                         const TYPE = "{{$type}}";
                         if (TYPE == "create") {
-                            alert("상품이 추가되었습니다.");
+                            alert("상품이 등록되었습니다.");
                         } else {
 						    alert("변경된 내용이 정상적으로 저장 되었습니다.");
 						    location.href="/head/product/prd01/" + data;
