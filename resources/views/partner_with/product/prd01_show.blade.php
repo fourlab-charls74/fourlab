@@ -79,8 +79,13 @@ select.select_cat
                                         <div class="cate_scroll">
                                             <ul>
                                                 <li style="word-break:keep-all">
-													<input type="hidden" name="rep_cat_cd" value="{{ @$goods_info->rep_cat_cd }}">
+                                                    @if($type == 'create')
+                                                    <input type="hidden" name="rep_cat_cd" value="">
+													<a href="#" id="txt_rep_cat_nm"></a>
+                                                    @else
+                                                    <input type="hidden" name="rep_cat_cd" value="{{ @$goods_info->rep_cat_cd }}">
 													<a href="#" id="txt_rep_cat_nm">{{ @$goods_info->rep_cat_nm }}</a>
+                                                    @endif
 												</li>
                                             </ul>
                                         </div>
