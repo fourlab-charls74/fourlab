@@ -300,7 +300,9 @@ select.select_cat
                                                 <div class="wd300">
                                                     @if($type == 'create')
                                                     <input value="P" type="hidden"/>
-                                                    <span class="ml-1" style="font-size: 13px; margin-right: 2px;">위탁판매</span>
+                                                    <span class="ml-1" style="font-size: 13px; margin-right: 2px; font-weight:500;">위탁상품</span>
+                                                    @else
+                                                    <span class="ml-1" style="font-size: 13px; margin-right: 2px; font-weight:500;">위탁판매</span>
                                                     <x-tool-tip>
                                                         <x-slot name="arrow">top</x-slot>
                                                         <x-slot name="align">left</x-slot>
@@ -308,18 +310,6 @@ select.select_cat
                                                             위탁판매 : 입점사가 상품에 대한 판매를 위탁하고 일정한 수수료를 지급하는 상품<br/>
                                                         </x-slot>
                                                     </x-tool-tip>
-                                                    @else
-                                                    <select name="goods_type" id="goods_type" class="form-control form-control-sm">
-														<option value="">==상품구분==</option>
-                                                        @foreach($goods_types as $goods_type )
-                                                        <option
-                                                        value="{{$goods_type->code_id}}"
-                                                        @if ($goods_type->code_id === @$goods_info->goods_type) selected @endif
-                                                        >
-                                                            {{ $goods_type->code_val }}
-                                                        </option>
-                                                        @endforeach
-                                                    </select>
                                                     @endif
                                                 </div>
                                             </td>
@@ -331,7 +321,7 @@ select.select_cat
 													<div class="form-inline inline_btn_box">
 														<input type="hidden" name="com_type" id="com_type" value="{{ @$goods_info->com_type }}" >
 														<input type="hidden" name="margin_type" id="margin_type" value="{{ @$goods_info->margin_type }}">
-                                                        {{ @$goods_info->com_nm }}
+                                                        <span class="ml-1" style="font-size: 13px; margin-right: 2px; font-weight:500;">{{ @$goods_info->com_nm }}</span>
 													</div>
                                                 </div>
                                             </td>
@@ -532,16 +522,24 @@ select.select_cat
                                         <tr>
                                             <th class="required">적립금</th>
                                             <td>
-                                                <div class="txt_box">
-                                                    {{ @$goods_info->point  }} 원
-                                                </div>
-											</td>
-                                        </tr>
-                                        <tr>
-                                            <th><p>상품위치</p></th>
-                                            <td>
-                                                <div class="input_box wd200">
-                                                    <input type='text' class="form-control form-control-sm search-all" name='goods_location' id='goods_location' value='{{ @$goods_info->goods_location }}'>
+                                                <div class="form-inline form-radio-box flax_box txt_box">
+                                                    @if($type == 'create')
+                                                        <div class="custom-control custom-radio">
+                                                            <input type="radio" name="point_cfg" class="custom-control-input" value="S" checked/>
+                                                            <label class="custom-control-label" for="point_cfg">쇼핑몰 정책 : 구매 금액의 {{$g_order_point_ratio}}% 적립</label>
+                                                        </div>
+                                                    @else
+                                                        <input type="hidden" name="point_cfg" value="{{$goods_info->point_cfg}}"/>
+                                                        <input type="hidden" name="point_yn" value="{{$goods_info->point_yn}}"/>
+                                                        <input type="hidden" name="point" value="{{$goods_info->point}}"/>
+                                                        @if($goods_info->point_yn == "Y")
+                                                            {{ @$goods_info->point  }} 원 ( 구매 금액의 {{$g_order_point_ratio}}% 적립 )
+                                                        @else
+                                                        <div class="txt_box">
+                                                            지급안함
+                                                        </div>
+                                                        @endif
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>
@@ -549,7 +547,7 @@ select.select_cat
                                             <th><p>등록일시</p></th>
                                             <td>
                                                 <div class="txt_box">
-                                                    {{ @$goods_info->reg_dm  }}
+                                                    {{ @$goods_info->reg_dm }}
                                                 </div>
                                             </td>
                                         </tr>
