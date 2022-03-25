@@ -272,10 +272,17 @@ select.select_cat
                                                     @endif
 													--}}
                                                     </div>
-                                                    <div class="custom-control custom-checkbox form-check-box">
+                                                    <div class="custom-control custom-checkbox form-check-box mr-1">
                                                         <input type="checkbox" class="custom-control-input" value="Y" id="restock" {{ (@$goods_info->restock_yn=="Y") ? "checked" : "" }}>
                                                         <label class="custom-control-label" for="restock">재 입고함</label>
                                                     </div>
+                                                    <x-tool-tip>
+                                                        <x-slot name="arrow">top</x-slot>
+                                                        <x-slot name="align">left</x-slot>
+                                                        <x-slot name="html">
+                                                            품절 시 "<b>재입고알림</b>" 버튼이 노출됩니다.
+                                                        </x-slot>
+                                                    </x-tool-tip>
                                                 </div>
                                             </td>
                                         </tr>
@@ -291,6 +298,17 @@ select.select_cat
                                             <th class="required">상품구분</th>
                                             <td>
                                                 <div class="wd300">
+                                                    @if($type == 'create')
+                                                    <input value="P" type="hidden"/>
+                                                    <span class="ml-1" style="font-size: 13px; margin-right: 2px;">위탁판매</span>
+                                                    <x-tool-tip>
+                                                        <x-slot name="arrow">top</x-slot>
+                                                        <x-slot name="align">left</x-slot>
+                                                        <x-slot name="html">
+                                                            위탁판매 : 입점사가 상품에 대한 판매를 위탁하고 일정한 수수료를 지급하는 상품<br/>
+                                                        </x-slot>
+                                                    </x-tool-tip>
+                                                    @else
                                                     <select name="goods_type" id="goods_type" class="form-control form-control-sm">
 														<option value="">==상품구분==</option>
                                                         @foreach($goods_types as $goods_type )
@@ -302,6 +320,7 @@ select.select_cat
                                                         </option>
                                                         @endforeach
                                                     </select>
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>

@@ -1,4 +1,7 @@
 <?php
+
+    use App\Components\Lib;
+
     /**
      * View - Blade에서 컴포넌트 사용하는 방법
      * 
@@ -18,6 +21,8 @@
      * bootstrap 에서는 html 태그 안에 스타일 속성을 넣으면 자동으로 필터링되고 있음 - 글자색 사용 불가능
      * style의 point-events: none;은 클릭했을 경우 툴팁을 유지함
      */
+
+    $html = Lib::quote($html); // 큰 따옴표, 작은 따옴표 충돌 제거
 ?>
 
 <style>

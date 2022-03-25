@@ -282,10 +282,17 @@
                                                     @endif
 													--}}
                                                     </div>
-                                                    <div class="custom-control custom-checkbox form-check-box">
+                                                    <div class="custom-control custom-checkbox form-check-box mr-1">
                                                         <input type="checkbox" class="custom-control-input" value="Y" id="restock" {{ (@$goods_info->restock_yn=="Y") ? "checked" : "" }}>
                                                         <label class="custom-control-label" for="restock">재 입고함</label>
                                                     </div>
+                                                    <x-tool-tip>
+                                                        <x-slot name="arrow">top</x-slot>
+                                                        <x-slot name="align">left</x-slot>
+                                                        <x-slot name="html">
+                                                            품절 시 "<b>재입고알림</b>" 버튼이 노출됩니다.
+                                                        </x-slot>
+                                                    </x-tool-tip>
                                                 </div>
                                             </td>
                                         </tr>
