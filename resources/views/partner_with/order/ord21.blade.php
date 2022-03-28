@@ -136,7 +136,7 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="formrow-inputZip">검색항목</label>
+                                <label for="formrow-inputZip">재고</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box">
                                         <input type='text' class="form-control form-control-sm search-all" name='wqty_low' value='' placeholder="이상">
