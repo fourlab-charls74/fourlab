@@ -1025,7 +1025,7 @@ class prd01Controller extends Controller
         }
 
         $coupon_list		= $this->get_coupon_info($goods_no, $goods_info->price); // 쿠폰 리스트
-        $modify_hostory		= $this->get_history_modify($goods_no);
+        $modify_history		= $this->get_history_modify($goods_no);
         $goods_info->cat_nm	= $this->get_cat_nm($goods_info->rep_cat_cd);
         $goods_info->goods_related	= $this->get_goods_related_info($goods_no);
         $planing			= $this->get_planing_list($goods_no, $goods_info->goods_sub); // 전시상품 리스트
@@ -1109,7 +1109,7 @@ class prd01Controller extends Controller
             'qty'				=> $qty,
             'wqty'				=> $wqty,
             'coupon_list'		=> $coupon_list,
-            'modify_hostory'	=> $modify_hostory,
+            'modify_history'	=> $modify_history,
             'planing'			=> $planing,
 			'opt'				=> $opt,
             'options'           => $options,

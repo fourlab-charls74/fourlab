@@ -594,6 +594,7 @@ class prd01Controller extends Controller
         }
 
         $coupon_list		= $this->get_coupon_info($goods_no, $goods_info->price); // 쿠폰 리스트
+        $modify_history		= $this->get_history_modify($goods_no); // 상품 변경 내역
         $goods_info->cat_nm	= $this->get_cat_nm($goods_info->rep_cat_cd);
         $planing			= $this->get_planing_list($goods_no, $goods_info->goods_sub); // 전시상품 리스트
 
@@ -672,6 +673,7 @@ class prd01Controller extends Controller
             'qty'				=> $qty,
             'wqty'				=> $wqty,
             'coupon_list'		=> $coupon_list,
+            'modify_history'	=> $modify_history,
             'planing'			=> $planing,
             'opt2'				=> $opt2,
             'options'           => $options,
@@ -2021,6 +2023,23 @@ class prd01Controller extends Controller
         return $result;
 
     }
+
+    private function get_history_modify($goods_no)
+	{
+		$query = "
+					select
+						date_format(a.upd_date,'%y.%m.%d %h:%i:%s') as upd_date
+						, a.memo, a.head_desc, a.price, a.wonga, a.margin, a.id, b.name
+					from goods_modify_hist a
+						inner join mgr_user b on a.id = b.id
+					where a.goods_no = $goods_no
+					order by a.hist_no desc
+		";
+
+		$result = DB::select($query);
+
+		return $result;
+	}
 
     private function get_cat_nm($cat_code){
 

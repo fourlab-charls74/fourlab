@@ -1221,7 +1221,7 @@
                         </div>
                     </div>
                 </div>
-                @if(count($modify_hostory) > 0 && $type === '')
+                @if(count($modify_history) > 0 && $type === '')
                 <div class="card">
                     <div class="card-header mb-0">
                         <a href="#">상품 변경 내역</a>
@@ -1243,7 +1243,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($modify_hostory as $row)
+                                            @foreach ($modify_history as $row)
                                             <tr>
                                                 <td>{{ $row->upd_date }}</td>
                                                 <td>{{ $row->name }} ({{ $row->id }})</td>

@@ -883,6 +883,7 @@ select.select_cat
                         </div>
                     </div>
                 </div>
+                @if(count($modify_history) > 0 && $type === '')
                 <div class="card">
                     <div class="card-header mb-0">
                         <a href="#">상품 변경 내역</a>
@@ -890,29 +891,39 @@ select.select_cat
                     <div class="card-body">
                         <div class="row">
                             <div class="col-12">
-                                <div id="div-gd-history" style="height:200px;" class="ag-theme-balham"></div>
-                                <script>
-                                    const columns_history = [
-                                        {field: "upd_date", headerName: "변경일", type: 'DateTimeType' },
-                                        {field: "name", headerName: "이름(ID)",
-                                            cellRenderer: function(params) {
-                                                if (params.value !== undefined && params.data.id != "") {
-                                                    return params.value + '(' + params.data.id + ')';
-                                                }
-                                            }
-                                        },
-                                        {field: "memo", headerName: "변경사유",width:250 },
-                                        {field: "head_desc", headerName: "상단홍보글" },
-                                        {field: "price", headerName: "판매가", type: 'currencyType'},
-                                        {field: "wonga", headerName: "원가", type: 'currencyType'},
-                                        {field: "margin", headerName: "마진", type: 'currencyType'},
-                                    ];
-                                    let gx_history = new HDGrid(document.querySelector("#div-gd-history"), columns_history);
-                                </script>
+                                <div class="table-responsive" style="max-height:250px;border-bottom:1px solid #F1F1F1;">
+                                    <table class="table table-bordered th_border_none">
+                                        <thead>
+                                            <tr>
+                                                <th>변경일</th>
+                                                <th>이름(ID)</th>
+                                                <th>상단홍보글</th>
+                                                <th>변경사유</th>
+                                                <th>판매가(원)</th>
+                                                <th>원가(원)</th>
+                                                <th>마진(%)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($modify_history as $row)
+                                            <tr>
+                                                <td>{{ $row->upd_date }}</td>
+                                                <td>{{ $row->name }} ({{ $row->id }})</td>
+                                                <td>{{ $row->head_desc }}</td>
+                                                <td>{{ $row->memo }}</td>
+                                                <td>{{ number_format($row->price) }}</td>
+                                                <td>{{ number_format($row->wonga) }}</td>
+                                                <td>{{ $row->margin }}</td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                @endif
                 @if(count($class_items) > 0 && $type === '')
                 <div class="card">
                     <div class="card-header mb-0">
