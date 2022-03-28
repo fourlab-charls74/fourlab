@@ -726,7 +726,9 @@
         });
 
         function Search_optkind() {
-            gx1.Request(`/partner/product/prd01/${goods_no}/get-option-name`, '', -1);
+            if(goods_no) {
+                gx1.Request(`/partner/product/prd01/${goods_no}/get-option-name`, '', -1);
+            }
         }
     }
 
@@ -736,7 +738,9 @@
             Search_opt();
         });
         function Search_opt() {
-            gx2.Request(`/partner/product/prd01/${goods_no}/get-option`, '', -1);
+            if(goods_no) {
+                gx2.Request(`/partner/product/prd01/${goods_no}/get-option`, '', -1);
+            }
         }
     }
 

@@ -2290,8 +2290,10 @@
 		});
 
 		function Search_optkind() {
-			const data = `goods_no=${goods_no}&goods_sub=${goods_sub}`;
-			gx1.Request(`/head/product/prd01/${goods_no}/get-option-name`, data, -1);
+            if(goods_no) {
+                const data = `goods_no=${goods_no}&goods_sub=${goods_sub}`;
+                gx1.Request(`/head/product/prd01/${goods_no}/get-option-name`, data, -1);
+            }
 		}
 	}
 
@@ -2344,10 +2346,12 @@
 
     function Search_opt() {
         let opt_type = "basic"; // 수정필요
-        const data = `goods_no=${goods_no}&goods_sub=${goods_sub}&opt_type=${opt_type}`;
-        gx2.Request(`/head/product/prd01/${goods_no}/get-option-stock`, data, -1, function(params) {
-            $("#opt-type").text(opt_type === "basic" ? "기본옵션" : "추가옵션");
-        });
+        if(goods_no) {
+            const data = `goods_no=${goods_no}&goods_sub=${goods_sub}&opt_type=${opt_type}`;
+            gx2.Request(`/head/product/prd01/${goods_no}/get-option-stock`, data, -1, function(params) {
+                $("#opt-type").text(opt_type === "basic" ? "기본옵션" : "추가옵션");
+            });
+        }
     }
 
     // 해당 상품의 기획전 포함 정보 삭제
