@@ -518,15 +518,23 @@
                     <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                 </div>
                 <div class="fr_box">
-                    <a href="#" class="btn-sm btn btn-primary order-memo-btn">변경내용저장</a>
-                    <a href="#" class="btn-sm btn btn-primary cancel-order-btn">주문취소</a>
-					<!--
-                    <a href="#" class="btn-sm btn btn-primary @if($o == 'pop') @endif confirm-order-btn">구매확정</a>
-					//-->
-					@if($o == 'pop')
-						<a href="#" class="btn-sm btn btn-primary confirm-choice-btn">주문선택</a>
-						<input type="checkbox" name="isclose" value="Y" checked style='display:none;'>
-					@endif
+                    <div class="flex_box">
+                        <div class="box mr-2">
+                            <div class="custom-control custom-checkbox form-check-box" style="display:inline-block;">
+                                <input type="checkbox"  name="chk_to_class" id="chk_to_class" value="Y" class="custom-control-input">
+                                <label class="custom-control-label text-left" for="chk_to_class">이미지출력</label>
+                            </div>
+                        </div>
+                        <a href="#" class="btn-sm btn btn-primary order-memo-btn mr-1">변경내용저장</a>
+                        <a href="#" class="btn-sm btn btn-primary cancel-order-btn">주문취소</a>
+                        <!--
+                        <a href="#" class="btn-sm btn btn-primary @if($o == 'pop') @endif confirm-order-btn">구매확정</a>
+                        //-->
+                        @if($o == 'pop')
+                            <a href="#" class="btn-sm btn btn-primary confirm-choice-btn">주문선택</a>
+                            <input type="checkbox" name="isclose" value="Y" checked style='display:none;'>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
@@ -535,7 +543,7 @@
         </div>
     </div>
 </div>
-
+<style> /* 상품 이미지 사이즈 강제 픽스 */ .img { height:30px; margin: 0 auto; } </style>
 <script>
     const editCellStyle = {
         'background' : '#ffff99',
@@ -558,15 +566,7 @@
         {field:"goods_type_nm" , headerName:"상품구분", width:58, cellStyle:StyleGoodsType  },
         {field:"style_no" , headerName:"스타일넘버", width:96  },
         {field:"goods_nm" , headerName:"상품명",type:"HeadGoodsNameType"},
-        {
-            field:"img" ,
-            headerName:"이미지", width:80, hide:true,
-            cellRenderer: function(params) {
-                if (params.value !== undefined) {
-                    return '<img src="' + params.data.img + '"/>';
-                }
-            }
-        },
+        {field:"img" , headerName:"이미지", type:'GoodsImageType', width: 65, hide: true},
         {field:"opt_val" , headerName:"옵션", width:82  },
         {field:"goods_addopt" , headerName:"추가옵션", width:72  },
         {field:"qty" , headerName:"수량", width:46},
@@ -627,6 +627,9 @@
 		pApp.ResizeGrid(275);
 		pApp.BindSearchEnter();
 		Search();
+        $("#chk_to_class").click(function() {
+            gx.gridOptions.columnApi.setColumnVisible("img", $("#chk_to_class").is(":checked"));
+        });
 	});
 
     function Search(){

@@ -1245,11 +1245,11 @@ class ord01Controller extends Controller
 		$cfg_img_size_real		= SLib::getCodesValue('G_IMG_SIZE', 'list');
         $cfg_domain_img			= $conf->getConfigValue("shop","domain_img");
 
-		if($cfg_domain_img == ""){
-			$cfg_domain_img = $_SERVER["HTTP_HOST"];
-        }
-
-		$goods_img_url = sprintf("http://%s",$cfg_domain_img);
+		// if($cfg_domain_img == ""){
+		// 	$cfg_domain_img = $_SERVER["HTTP_HOST"];
+        // }
+		// $goods_img_url = sprintf("http://%s",$cfg_domain_img);
+        $goods_img_url = '';
 
 		$page       = $req->input("page",1);
 		$page_size  = $req->input("limit", 100);
@@ -1666,6 +1666,10 @@ class ord01Controller extends Controller
 			if($ord_no != $depth_no){
 				$row->depth = "1";
 				$depth_no = $ord_no;
+			}
+
+            if ($row->img != "") { // 이미지 url
+				$row->img = sprintf("%s%s",config("shop.image_svr"),$row->img);
 			}
 		}
 

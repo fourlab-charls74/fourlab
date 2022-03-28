@@ -312,7 +312,7 @@
         </div>
     </div>
 </div>
-<style> /* 상품 이미지 사이즈 강제 픽스 */ .img { height:30px; margin: 0 auto; } </style>
+<style> /* 상품 이미지 사이즈 강제 픽스 */ .img { height:30px; } </style>
 <script language="javascript">
     var columns = [
         {headerName: '#', width:50, maxWidth: 100,/* it is important to have node.id here, so that when the id changes (which happens when the row is loaded) then the cell is refreshed.*/ valueGetter: 'node.id', cellRenderer: 'loadingRenderer',},
@@ -383,7 +383,6 @@
         $('.search-all').keyup(function(){
             date_use_check();
         });
-
         $("#chk_to_class").click(function() {
             gx.gridOptions.columnApi.setColumnVisible("img", $("#chk_to_class").is(":checked"));
         });
