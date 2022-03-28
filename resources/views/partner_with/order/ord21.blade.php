@@ -1,6 +1,14 @@
 @extends('partner_with.layouts.layout')
 @section('title','배송출고요청')
 @section('content')
+
+<style>
+    input[type="text"]::placeholder {
+        color: #aaa;
+        text-align: right;
+    }
+</style>
+
     <div class="page_tit">
         <h3 class="d-inline-flex">배송출고요청</h3>
         <div class="d-inline-flex location">
@@ -131,11 +139,11 @@
                                 <label for="formrow-inputZip">검색항목</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box">
-                                        <input type='text' class="form-control form-control-sm search-all" name='wqty_low' value=''>
+                                        <input type='text' class="form-control form-control-sm search-all" name='wqty_low' value='' placeholder="이상">
                                     </div>
                                     <span class="text_line">~</span>
                                     <div class="form-inline-inner input_box">
-                                        <input type='text' class="form-control form-control-sm search-all" name='wqty_high' value=''>
+                                        <input type='text' class="form-control form-control-sm search-all" name='wqty_high' value='' placeholder="이하">
                                     </div>
                                 </div>
                             </div>

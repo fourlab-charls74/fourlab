@@ -7,7 +7,6 @@
         color: #aaa;
         text-align: right;
     }
-
 </style>
 
     <div class="page_tit">

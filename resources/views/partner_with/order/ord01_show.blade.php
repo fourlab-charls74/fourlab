@@ -166,7 +166,7 @@
                                 <th>적립금</th>
                                 <th>쿠폰</th>
                                 <th>계좌</th>
-                                <th>{{ $bank_ipnm_th ?? ''}}</th>
+                                <th>입금자</th>
                                 <th>처리일자</th>
                             </tr>
                             </thead>
