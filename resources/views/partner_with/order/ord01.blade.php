@@ -21,10 +21,10 @@
             </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-lg-4 inner-td">
+                        <div class="col-lg-4">
                             <div class="form-group">
                                 <label for="formrow-firstname-input">주문일자</label>
-                                <div class="date-switch-wrap form-inline">
+                                <div class="form-inline inline_input_box">
                                     <div class="docs-datepicker form-inline-inner input_box">
                                         <div class="input-group">
                                             <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
@@ -48,7 +48,8 @@
                                         </div>
                                         <div class="docs-datepicker-container"></div>
                                     </div>
-                                    <div class="custom-control custom-switch date-switch-pos"  data-toggle="tooltip" data-placement="top" data-original-title="주문일자 사용">
+                                    <div style="position: absolute; top: 0; left: 0; z-index: -2;"
+                                        class="d-none custom-control custom-switch date-switch-pos"  data-toggle="tooltip" data-placement="top" data-original-title="주문일자 사용">
                                         <input type="checkbox" class="custom-control-input" name="s_nud" id="s_nud" checked="" value="N" onClick="ManualNotUseData();">
                                         <label class="" for="s_nud" data-on-label="ON" data-off-label="OFF"></label>
                                     </div>
