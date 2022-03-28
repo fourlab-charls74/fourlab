@@ -1654,6 +1654,7 @@ class ord01Controller extends Controller
 
         $depth_no = "";
         $rows = DB::select($sql);
+        
 		foreach ($rows as $row) {
 			$ord_no = $row->ord_no;
 

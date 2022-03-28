@@ -16,6 +16,7 @@
                 <h4>검색</h4>
                 <div>
                     <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                    <a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
             </div>
@@ -282,7 +283,7 @@
             </div>
             <div class="resul_btn_wrap mb-3">
                 <a href="javascript:;" class="btn btn-sm w-xs btn-primary shadow-sm apply-btn mr-1" onclick="return Search();"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-
+                <a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
                 <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
             </div>
         </div>
@@ -297,7 +298,12 @@
                     <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                 </div>
                 <div class="fr_box">
-                    
+                    <div class="box">
+                        <div class="custom-control custom-checkbox form-check-box" style="display:inline-block;">
+                            <input type="checkbox"  name="chk_to_class" id="chk_to_class" value="Y" class="custom-control-input">
+                            <label class="custom-control-label text-left" for="chk_to_class">이미지출력</label>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -306,7 +312,7 @@
         </div>
     </div>
 </div>
-
+<style> /* 상품 이미지 사이즈 강제 픽스 */ .img { height:30px; margin: 0 auto; } </style>
 <script language="javascript">
     var columns = [
         {headerName: '#', width:50, maxWidth: 100,/* it is important to have node.id here, so that when the id changes (which happens when the row is loaded) then the cell is refreshed.*/ valueGetter: 'node.id', cellRenderer: 'loadingRenderer',},
@@ -323,7 +329,7 @@
         {field:"pay_stat" , headerName:"입금상태"  },
         {field:"goods_type_nm" , headerName:"상품구분",cellStyle:StyleGoodsType  },
         {field:"style_no" , headerName:"스타일넘버"  },
-        {field:"img" , headerName:"이미지",type:'GoodsImageType'},
+        {field:"img" , headerName:"이미지", type:'GoodsImageType', width: 65, hide: true},
         {field:"goods_nm" , headerName:"상품명",width:200, type:"GoodsNameType"},
         {field:"opt_val" , headerName:"옵션"  },
         {field:"goods_addopt" , headerName:"추가옵션"  },
@@ -376,6 +382,10 @@
         Search();
         $('.search-all').keyup(function(){
             date_use_check();
+        });
+
+        $("#chk_to_class").click(function() {
+            gx.gridOptions.columnApi.setColumnVisible("img", $("#chk_to_class").is(":checked"));
         });
     });
     function Search() {

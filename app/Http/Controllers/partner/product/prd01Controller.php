@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use PDO;
+use Exception;
 
 
 
@@ -226,6 +227,7 @@ class prd01Controller extends Controller
         $stmt = $pdo->prepare($query);
         $stmt->execute(['com_id' => $com_id]);
         $result = [];
+        
         while($row = $stmt->fetch(PDO::FETCH_ASSOC))
         {
             if($row["img"] != ""){
@@ -234,8 +236,6 @@ class prd01Controller extends Controller
             $result[] = $row;
         }
 
-        //echo "<pre>$query</pre>";
-        //dd(array_keys ((array)$result[0]));
         return response()->json([
             "code" => 200,
             "head" => array(
@@ -451,7 +451,7 @@ class prd01Controller extends Controller
             'wqty'			=> 0,
             'coupon_list'	=> [],
             'planing'		=> [],
-            'modify_hostory'=> [],
+            'modify_history'=> [],
             'type'			=> 'create',
             'goods_stats'	=> SLib::getCodes('G_GOODS_STAT',["40" => "<>"]),
             'class_items'	=> $class_items,
@@ -783,7 +783,7 @@ class prd01Controller extends Controller
 							from goods
 							where goods_no = $goods_no
 						")->goods_sub;
-			}else{
+			} else {
 				$goods_no	= DB::selectOne("select max(goods_no) + 1 as goods_no from goods")->goods_no;
 				$goods_sub	= 0;
 			}
@@ -2027,13 +2027,13 @@ class prd01Controller extends Controller
     private function get_history_modify($goods_no)
 	{
 		$query = "
-					select
-						date_format(a.upd_date,'%y.%m.%d %h:%i:%s') as upd_date
-						, a.memo, a.head_desc, a.price, a.wonga, a.margin, a.id, b.name
-					from goods_modify_hist a
-						inner join mgr_user b on a.id = b.id
-					where a.goods_no = $goods_no
-					order by a.hist_no desc
+            select
+                date_format(a.upd_date,'%y.%m.%d %h:%i:%s') as upd_date
+                , a.memo, a.head_desc, a.price, a.wonga, a.margin, a.id, b.name
+            from goods_modify_hist a
+                inner join mgr_user b on a.id = b.id
+            where a.goods_no = $goods_no
+            order by a.hist_no desc
 		";
 
 		$result = DB::select($query);

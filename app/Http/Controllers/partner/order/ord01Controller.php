@@ -283,10 +283,8 @@ class ord01Controller extends Controller
             left outer join code pay_stat on (a.pay_stat = pay_stat.code_id and pay_stat.code_kind_cd = 'G_PAY_STAT')
             left outer join code dlv_type on (a.dlv_type = dlv_type.code_id and dlv_type.code_kind_cd = 'G_DLV_TYPE')
         ";
-        //echo "<pre>$query</pre>";
-        //dd($query);
+
         $rows = DB::select($query,["com_id" => $com_id]);
-        //$rows = DB::select($query);
 
         $depth_no = "";
         foreach ($rows as $row) {
@@ -301,13 +299,12 @@ class ord01Controller extends Controller
                 $row->depth = "1";
                 $depth_no = $ord_no;
             }
+
+            if ($row->img != "") { // 이미지 url
+				$row->img = sprintf("%s%s",config("shop.image_svr"),$row->img);
+			}
         }
 
-//        return response()->json([
-//            "code" => 200,
-//            "head" => $arr_header,
-//            "body" => $rows
-//        ]);
         return response()->json([
             "code" => 200,
             "head" => array(
