@@ -314,7 +314,11 @@
             },
             {field:"opt_val" , headerName:"옵션"  },
             {field:"sale_qty" , headerName:"주문수량"  },
-            {field:"qty", headerName:"온라인재고" },
+            {field:"qty", headerName:"온라인재고",
+                cellRenderer: (params) => {
+				    return '<a href="#" onclick="return openStock(' + params.data.goods_no + ',\'' + params.data.opt_val +'\');">' + params.value + '</a>';
+			    }
+            },
             {field:"user_nm" , headerName:"주문자(아이디)"  },
             {field:"r_nm" , headerName:"수령자"  },
             {field:"price" , headerName:"판매가", type: 'currencyType'  },
