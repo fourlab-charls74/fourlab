@@ -404,14 +404,14 @@
                                                                     <input type="checkbox" class="custom-control-input" id="chk5" value="착불">
                                                                     <label class="custom-control-label" for="chk5">착불</label>
                                                                 </div>
-                                                                <input type="text" id="chk5_val" name="chk5_val" readonly class="form-control form-control-sm" value="">
+                                                                <input type="text" id="chk5_val" name="chk5_val" readonly class="form-control form-control-sm" value="" placeholder="금액(원)">
                                                             </li>
                                                             <li class="form-inline">
                                                                 <div class="custom-control custom-checkbox mr-2 form-check-box" onClick="check_form('chk7','chk7_val');">
                                                                     <input type="checkbox" class="custom-control-input" id="chk7" value="동봉액">
                                                                     <label class="custom-control-label" for="chk7">동봉액</label>
                                                                 </div>
-                                                                <input type="text" id="chk7_val" name="chk7_val" readonly class="form-control form-control-sm" value="">
+                                                                <input type="text" id="chk7_val" name="chk7_val" readonly class="form-control form-control-sm" value="" placeholder="금액(원)">
                                                             </li>
                                                             <li class="form-inline">
                                                                 <div class="custom-control custom-checkbox form-check-box">
@@ -428,12 +428,19 @@
                                                             </li>
                                                             <li class="form-inline">
                                                                 <div class="custom-control custom-checkbox form-check-box">
-                                                                    <input type="checkbox" class="custom-control-input" id="chk8" value="사은품여부">
+                                                                    <input type="checkbox" class="custom-control-input" id="chk8" value="사은품">
                                                                     <label class="custom-control-label" for="chk8">사은품여부</label>
                                                                 </div>
                                                             </li>
                                                             <li class="form-inline">
-                                                                <div class="custom-control custom-checkbox mr-2 form-check-box" onClick="check_form('chk9','chk9_val');CheckClaimStr(this);">
+                                                                <div class="custom-control custom-checkbox mr-2 form-check-box" onClick="check_form('chk6','chk6_val');">
+                                                                    <input type="checkbox" class="custom-control-input" id="chk6" value="환불정보">
+                                                                    <label class="custom-control-label" for="chk6">환불정보</label>
+                                                                </div>
+                                                                <input type="text" id="chk6_val" name="chk6_val" readonly class="form-control form-control-sm" value="" placeholder="예금주, 은행, 계좌번호">
+                                                            </li>
+                                                            <li class="form-inline">
+                                                                <div class="custom-control custom-checkbox mr-2 form-check-box" onClick="check_form('chk9','chk9_val');">
                                                                     <input type="checkbox" class="custom-control-input" id="chk9" value="기타">
                                                                     <label class="custom-control-label" for="chk9">기타</label>
                                                                 </div>
@@ -722,9 +729,11 @@
             var result = true;
             var str = "";
 
-            if(gubun == "REFUND"){
+            gubun == "REFUND" ? str += "반품관련 / " : str += "품절관련 / ";
 
-                if($("#chk1").is(":checked") && $("#chk1_val").val() == ""){
+            if(gubun == "REFUND") {
+
+                if(!$("#chk1").is(":checked") || $("#chk1_val").val() == ""){
                     alert("택배사를 입력해 주십시오.");
                     $("#chk1_val").focus();
                     return false;
@@ -732,27 +741,75 @@
                     str += $("#chk1").val() + "(" + $("#chk1_val").val() +") / ";
                 }
 
-                if($("#chk5").is(":checked") && $("#chk5_val").val() == ""){
-                    alert("동봉액을 입력해 주십시오.");
-                    $("#chk5_val").focus();
+                if(!$("#chk3").is(":checked") && !$("#chk5").is(":checked")) {
+                    alert("선불/착불 여부를 선택해 주십시오.");
                     return false;
-                }else if($("#chk5").is(":checked")){
-                    str += $("#chk5").val() + " ("+$("#chk5_val").val() +") / ";
+                } else {
+
+                    const both_checked 
+                        = $("#chk3").is(":checked") && $("#chk5").is(":checked") ? true : false
+
+                    if (both_checked) {
+                        alert("선불/착불 여부를 하나만 선택해 주십시오.");
+                        return false;
+                    }
+
+                    if($("#chk3").is(":checked")) {
+                        str += $("#chk3").val() + " / ";
+                    } else if($("#chk5").is(":checked")) {
+                        if($("#chk5_val").val() == "") {
+                            alert("착불금액을 입력해 주십시오.");
+                            $("#chk5_val").focus();
+                            return false;
+                        } else {
+                            str += $("#chk5").val() + " ("+Comma($("#chk5_val").val()) +"원) / ";
+                        }
+                    }
                 }
-                if($("#chk6").is(":checked") && $("#chk6_val").val() == ""){
+
+                if($("#chk7").is(":checked") && $("#chk7_val").val() == "") {
+                    alert("동봉액을 입력해 주십시오.");
+                    $("#chk7_val").focus();
+                    return false;
+                } else if($("#chk7").is(":checked")){
+                    str += $("#chk7").val() + " ("+Comma($("#chk7_val").val()) +"원) / ";
+                }
+
+                if(!$("#chk2").is(":checked") && !$("#chk4").is(":checked")){
+                    alert("상품이상 유/무를 선택해 주십시오.");
+                    return false;
+                } else {
+
+                    const both_checked 
+                        = $("#chk2").is(":checked") && $("#chk4").is(":checked") ? true : false
+
+                    if (both_checked) {
+                        alert("상품이상 유/무 여부를 하나만 선택해 주십시오.");
+                        return false;
+                    }
+
+                    if($("#chk2").is(":checked")) {
+                        str += $("#chk2").val() + " / ";
+                    } else if($("#chk4").is(":checked")) {
+                        if($("#chk4_val").val() == "") {
+                            alert("상품이상 사유를 입력해 주십시오.");
+                            $("#chk4_val").focus();
+                            return false;
+                        } else {
+                            str += $("#chk4").val() + "("+ $("#chk4_val").val() + ") / ";
+                        }
+                    }
+
+                }
+
+                if(!$("#chk6").is(":checked") || $("#chk6_val").val() == ""){
                     alert("환불정보를 입력해 주십시오.");
                     $("#chk6_val").focus();
                     return false;
                 }else if($("#chk6").is(":checked")){
                     str += $("#chk6").val() + "(" + $("#chk6_val").val() +") / ";
                 }
-                if($("#chk7").is(":checked") && $("#chk7_val").val() == ""){
-                    alert("택배사를 입력해 주십시오.");
-                    $("#chk7_val").focus();
-                    return false;
-                }else if($("#chk7").is(":checked")){
-                    str += $("#chk7").val()+"("+ $("#chk7_val").val() +") / ";
-                }
+
                 if($("#chk8").is(":checked")){
                     str += $("#chk8").val() + " / ";
                 }
@@ -763,23 +820,6 @@
                     return false;
                 }else if($("#chk9").is(":checked")){
                     str += $("#chk9").val() + "(" + $("#chk9_val").val() +") / ";
-                }
-
-                if(! $("#chk2").is(":checked") && ! $("#chk4").is(":checked")){
-                    alert("상품이상 유/무를 선택해 주십시오.");
-                    return false;
-                }
-                if($("#chk4").is(":checked") && $("#chk4_val").val() == "" ){
-                    alert("상품이상 사유를 입력해 주십시오.");
-                    $("#chk4_val").focus();
-				    return false;
-                }else{ if($("#chk4").is(":checked"))
-                    str += $("#chk4").val() + "( "+ $("#chk4_val").val() + ") / ";
-                }
-
-                if(! $("#chk1").is(":checked") && ! $("#chk3").is(":checked")){
-                    alert("선불/착불 여부를 선택해 주십시오.");
-                    return false;
                 }
 
             }else{
