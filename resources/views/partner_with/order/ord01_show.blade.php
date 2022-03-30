@@ -1,6 +1,17 @@
 @extends('partner_with.layouts.layout-nav')
 @section('title','주문')
 @section('content')
+
+<style>
+    .txt_box {
+        font-weight: 400;
+    }
+    td.txt_box {
+        font-size: 12px;
+        line-height: 1.5;
+    }
+</style>
+
     <div class="container-fluid show_layout py-3">
         <div class="page_tit mb-3 d-flex align-items-center justify-content-between">
             <div>
@@ -172,15 +183,15 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>{{ $payment["pay_stat_nm"] ?? '' }}</td>
-                                    <td>{{ $payment["pay_type_nm"] ?? '' }}</td>
-                                    <td>{{ $payment["bank_code"] }}</td>
-                                    <td>{{ $payment["pay_amt"] }}</td>
-                                    <td>{{ $payment["pay_point"] }}</td>
-                                    <td>{{ $payment["coupon_amt"] }}</td>
-                                    <td>{{ $payment["bank_number"] }}</td>
-                                    <td>{{ $payment["bank_inpnm"] }}</td>
-                                    <td>{{ $payment["pay_upd_dm"] }}</td>
+                                    <td class="txt_box">{{ $payment["pay_stat_nm"] ?? '' }}</td>
+                                    <td class="txt_box">{{ $payment["pay_type_nm"] ?? '' }}</td>
+                                    <td class="txt_box">{{ $payment["bank_code"] }}</td>
+                                    <td class="txt_box">{{ $payment["pay_amt"] }}</td>
+                                    <td class="txt_box">{{ $payment["pay_point"] }}</td>
+                                    <td class="txt_box">{{ $payment["coupon_amt"] }}</td>
+                                    <td class="txt_box">{{ $payment["bank_number"] }}</td>
+                                    <td class="txt_box">{{ $payment["bank_inpnm"] }}</td>
+                                    <td class="txt_box">{{ $payment["pay_upd_dm"] }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -209,11 +220,11 @@
                             <tbody>
                                 @foreach($order_products as $order_product)
                                 <tr style="@if(count($order_products) > 1 && $ord_opt_no == $order_product["ord_opt_no"]) background-color:#ffff96 @endif">
-                                    <td class="txt">
+                                    <td class="txt_box">
                                         <div><a href="/partner/order/ord01/{{ $order_product["ord_no"] }}/{{ $order_product["ord_opt_no"] }}">{{ $order_product["state"] }}</a></div>
                                         <div>{{ $order_product["ord_kind_nm"] }}</div>
                                     </td>
-                                    <td>
+                                    <td class="txt_box">
                                         <div class="row">
                                             <div class="col-lg-2 pl-1">
                                                 <img src='{{ $order_product["img"] }}' height="40" width="40" border="0" align="middle">
@@ -229,14 +240,14 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="text-center">
+                                    <td class="txt_box text-center">
                                         {{ $order_product["qty"] }}
                                         (<a href="#" onclick="PopJaego('{{ $order_product["goods_no"] }}','{{ $order_product["goods_sub"] }}','{{ $order_product["goods_opt"] }}');return false;">{{ $order_product["jaego_qty"] }}</a>)
                                     </td>
-                                    <td class="text-right">{{ number_format($order_product["price"]) }}</td>
-                                    <td class="text-right">{{ number_format($order_product["coupon_amt"]) }}</td>
-                                    <td class="text-right">{{ number_format($order_product["dlv_amt"]) }}</td>
-                                    <td class="text-right">{{ number_format($order_product["refund_amt"]) }}</td>
+                                    <td class="txt_box text-right">{{ number_format($order_product["price"]) }}</td>
+                                    <td class="txt_box text-right">{{ number_format($order_product["coupon_amt"]) }}</td>
+                                    <td class="txt_box text-right">{{ number_format($order_product["dlv_amt"]) }}</td>
+                                    <td class="txt_box text-right">{{ number_format($order_product["refund_amt"]) }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -337,14 +348,14 @@
                             <tbody>
                                 @forelse($claim_msgs as $claim_msg)
                                 <tr>
-                                    <td>{{ $claim_msg->cs_form }} </td>
-                                    <td>{{ $claim_msg->clm_state }} </td>
-                                    <td>{{ $claim_msg->regi_date }} </td>
-                                    <td style="text-align: left;">{{ $claim_msg->memo }} </td>
-                                    <td>{{ $claim_msg->admin_nm }} </td>
+                                    <td class="txt_box">{{ $claim_msg->cs_form }} </td>
+                                    <td class="txt_box">{{ $claim_msg->clm_state }} </td>
+                                    <td class="txt_box">{{ $claim_msg->regi_date }} </td>
+                                    <td class="txt_box"style="text-align: left;">{{ $claim_msg->memo }} </td>
+                                    <td class="txt_box">{{ $claim_msg->admin_nm }} </td>
                                 </tr>
                                 @empty
-                                <tr><td colspan=99 style="text-align: center">클레임 내역이 없습니다.</td></tr>
+                                <tr><td class="txt_box" colspan=99 style="text-align: center">클레임 내역이 없습니다.</td></tr>
                                 @endforelse
                             </tbody>
                         </table>
@@ -568,14 +579,14 @@
                             <tbody>
                             @forelse($accounts as $account)
                                 <tr>
-                                    <td>{{ $account->etc_day }}</td>
-                                    <td>{{ $account->etc_memo }}</td>
-                                    <td class="text-right">{{ number_format($account->etc_amt)  }} </td>
-                                    <td>{{ $account->admin_nm }}</td>
-                                    <td>{{ $account->regi_date }}</td>
+                                    <td class="txt_box">{{ $account->etc_day }}</td>
+                                    <td class="txt_box">{{ $account->etc_memo }}</td>
+                                    <td class="txt_box" class="text-right">{{ number_format($account->etc_amt)  }} </td>
+                                    <td class="txt_box">{{ $account->admin_nm }}</td>
+                                    <td class="txt_box">{{ $account->regi_date }}</td>
                                 </tr>
                             @empty
-                                <tr><td colspan=99 style="text-align: center">기타 정산 내역이 없습니다.</td></tr>
+                                <tr><td class="txt_box" colspan=99 style="text-align: center">기타 정산 내역이 없습니다.</td></tr>
                             @endforelse
                             </tbody>
                         </table>
