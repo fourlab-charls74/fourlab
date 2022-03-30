@@ -277,7 +277,6 @@ class ord21Controller extends Controller
             order by a.ord_opt_no desc
         ";
         //echo "<pre>$query</pre>";
-        //dd($query);
 
         $rows = DB::select($query);
 

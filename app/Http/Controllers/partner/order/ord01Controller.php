@@ -434,7 +434,8 @@ class ord01Controller extends Controller
 
         $accounts = $this->get_accounts_etc_info($ord_opt_no); // 입점업체 기타 정산 정보
         //dd($accounts);
-        return view( Config::get('shop.partner.view') . '/order/ord01_show', [
+        return view( Config::get('shop.partner.view') . '/order/ord01_show', 
+            [
                 "ord_no" => $ord_no,
                 "ord_opt_no" => $ord_opt_no,
                 "order" => $order,
@@ -445,8 +446,6 @@ class ord01Controller extends Controller
                 "claim_msgs" => $claim_msgs,
                 "accounts" => $accounts,
             ]);
-
-
     }
 
     public function claim_comments_store(Request $request){

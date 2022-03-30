@@ -297,7 +297,7 @@
                 }
             },
             {field:"ord_state_nm" , headerName:"주문상태",cellStyle:StyleOrdState  },
-            {field:"pay_stat_nm" , headerName:"입금상태"  },
+            {field:"pay_stat_nm" , headerName:"입금상태"},
             {field:"clm_state_nm" , headerName:"클레임상태",cellStyle:StyleClmState  },
             {field:"goods_type_nm" , headerName:"상품구분",cellStyle:StyleGoodsType  },
             {field:"style_no" , headerName:"스타일넘버"  },
@@ -327,9 +327,24 @@
             {field:"dlv_amt" , headerName:"배송비" , type: 'currencyType'  },
             {field:"pay_fee" , headerName:"결제수수료", type: 'currencyType'  },
             {field:"pay_type" , headerName:"결제방법"   },
-            {field:"fintech" , headerName:"간편결제"   },
-            {field:"cash_apply_yn" , headerName:"현금영수증신청"   },
-            {field:"cash_yn" , headerName:"현금영수증발행"   },
+
+            /**
+             * 3차 QA - 기존과 다르게 개발도중 추가되었던 컬럼을 주석처리
+             */
+            // {field:"fintech" , headerName:"간편결제"},
+            // {field:"cash_apply_yn" , headerName:"현금영수증신청"},
+            // {field:"cash_yn" , headerName:"현금영수증발행"},
+
+            /**
+             * 3차 QA에서 요청한 기존 누락된 컬럼 추가
+             */
+            {field:"dlv_msg", headerName: "특이사항"},
+            {field:"dlv_comment", headerName: "출고 메시지"},
+            {field:"proc_state", headerName: "처리현황"},
+            {field:"proc_memo", headerName: "메모"},
+            {field:"sale_place", headerName: "판매처"},
+            {field:"out_ord_no", headerName: "판매처주문번호"},
+
             {field:"baesong_kind" , headerName:"배송구분"  },
             {field:"dlv_type" , headerName:"배송방식"  },
             //출고요청이라 택배업체, 송장번호는 필요없다고 판단되었습니다.
