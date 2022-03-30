@@ -5,6 +5,7 @@
 <style>
     .txt_box {
         font-weight: 400;
+        color: #665757;
     }
     td.txt_box {
         font-size: 12px;
