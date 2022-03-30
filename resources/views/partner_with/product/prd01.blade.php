@@ -312,37 +312,40 @@
     }
 </style>
 <script language="javascript">
+
+    const style_obj = {"line-height": "48px"};
+    
     const columns = [
-        {headerName: '#', pinned: 'left', type: 'NumType', cellStyle: {"line-height": "40px"}},
+        {headerName: '#', pinned: 'left', type: 'NumType', cellStyle: style_obj},
         {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
-        {field: "goods_no", headerName: "상품번호", width: 80, pinned: 'left', cellStyle: {"line-height": "40px"}},
+        {field: "goods_no", headerName: "상품번호", width: 80, pinned: 'left', cellStyle: style_obj},
         {field: "goods_type", headerName: "상품구분", width: 100, 
             // cellStyle: { ...StyleGoodsTypeNM, "line-height": "40px" }, 
             cellStyle: (params) => 
                 { 
                     let obj = StyleGoodsTypeNM(params);
-                    obj = { ...obj, "line-height": "40px"};
+                    obj = { ...obj, ...style_obj, "text-align": "center"};
                     return obj;
                 },
             pinned: 'left'},
-        {field: "com_nm", headerName: "업체", cellStyle: {"line-height": "40px"}},
-        {field: "opt_kind_nm", headerName: "품목", cellStyle: {"line-height": "40px"}, width: 110},
-        {field: "brand_nm", headerName: "브랜드", cellStyle: {"line-height": "40px"}},
-        {field: "full_nm", headerName: "대표카테고리", cellStyle: {"line-height": "40px"}, width: 200},
-        {field: "style_no", headerName: "스타일넘버", cellStyle: {"line-height": "40px"}},
-        {field: "head_desc", headerName: "상단홍보글", cellStyle: {"line-height": "40px"}, width: 150},
-        {field: "img", headerName: "이미지", type: 'GoodsImageType', cellStyle: {"line-height": "40px"}},
+        {field: "com_nm", headerName: "업체", cellStyle: style_obj},
+        {field: "opt_kind_nm", headerName: "품목", cellStyle: style_obj, width: 110},
+        {field: "brand_nm", headerName: "브랜드", cellStyle: style_obj},
+        {field: "full_nm", headerName: "대표카테고리", cellStyle: style_obj, width: 200},
+        {field: "style_no", headerName: "스타일넘버", cellStyle: style_obj},
+        {field: "head_desc", headerName: "상단홍보글", cellStyle: style_obj, width: 150},
+        {field: "img", headerName: "이미지", type: 'GoodsImageType', cellStyle: style_obj},
         {field: "img", headerName: "이미지_url", hide: true},
-        {field: "goods_nm", headerName: "상품명", type: 'GoodsNameType', cellStyle: {"line-height": "40px"}},
-        {field: "ad_desc", headerName: "하단홍보글", cellStyle: {"line-height": "40px"}, width: 150},
+        {field: "goods_nm", headerName: "상품명", type: 'GoodsNameType', cellStyle: style_obj},
+        {field: "ad_desc", headerName: "하단홍보글", cellStyle: style_obj, width: 150},
         {field: "sale_stat_cl", headerName: "상품상태", type: 'GoodsStateTypeLH50'},
         {field: "before_sale_price", headerName: "정상가", type: 'currencyType', hide: true},
-        {field: "price", headerName: "판매가", type: 'currencyType', cellStyle: {"line-height": "40px"}},
-        {field: "coupon_price", headerName: "쿠폰가", type: 'currencyType', cellStyle: {"line-height": "40px"}},
+        {field: "price", headerName: "판매가", type: 'currencyType', cellStyle: style_obj},
+        {field: "coupon_price", headerName: "쿠폰가", type: 'currencyType', cellStyle: style_obj},
         {field: "sale_rate", headerName: "세일율(,%)", type: 'percentType', hide: true},
         {field: "sale_s_dt", headerName: "세일기간", hide: true}, {field: "sale_e_dt", headerName: "세일기간", hide: true},
         {
-            field: "qty", headerName: "재고수", type: 'numberType', cellStyle: {"line-height": "40px"},
+            field: "qty", headerName: "재고수", type: 'numberType', cellStyle: style_obj,
             cellRenderer: function(params) {
                 if (params.value !== undefined) {
                     return '<a href="#" onclick="return openStock(' + params.data.goods_no + ',\'\');">' + params.value + '</a>';
@@ -350,27 +353,27 @@
             }
         },
         {
-            field: "wqty", headerName: "보유재고수", type: 'numberType', cellStyle: {"line-height": "40px"},
+            field: "wqty", headerName: "보유재고수", type: 'numberType', cellStyle: style_obj,
             cellRenderer: function(params) {
                 if (params.value !== undefined) {
                     return '<a href="#" onclick="return openHeadStock(' + params.data.goods_no + ',\'\');">' + params.value + '</a>';
                 }
             }
         },
-        {field: "wonga", headerName: "원가", type: 'currencyType', cellStyle: {"line-height": "40px"}},
-        {field: "margin_rate", headerName: "마진율", type: 'percentType', cellStyle: {"line-height": "40px"}},
-        {field: "margin_amt", headerName: "마진액", type: 'numberType', cellStyle: {"line-height": "40px"}},
-        {field: "md_nm", headerName: "MD", cellStyle: {"line-height": "40px"}},
-        {field: "baesong_info", headerName: "배송지역", cellStyle: {"line-height": "40px"}},
-        {field: "baesong_kind", headerName: "배송업체", cellStyle: {"line-height": "40px"}},
-        {field: "dlv_pay_type", headerName: "배송비지불", cellStyle: {"line-height": "40px"}},
-        {field: "baesong_price", headerName: "배송비", type: 'numberType', cellStyle: {"line-height": "40px"}},
-        {field: "point", headerName: "적립금", type: 'numberType', cellStyle: {"line-height": "40px"}},
-        {field: "org_nm", headerName: "원산지", cellStyle: {"line-height": "40px"}},
-        {field: "make", headerName: "제조업체", cellStyle: {"line-height": "40px"}},
-        {field: "reg_dm", headerName: "등록일자", cellStyle: {"line-height": "40px"}, width: 130},
-        {field: "upd_dm", headerName: "수정일자", cellStyle: {"line-height": "40px"}, width: 130},
-        {field: "goods_location", headerName: "위치", cellStyle: {"line-height": "40px"}},
+        {field: "wonga", headerName: "원가", type: 'currencyType', cellStyle: style_obj},
+        {field: "margin_rate", headerName: "마진율", type: 'percentType', cellStyle: style_obj},
+        {field: "margin_amt", headerName: "마진액", type: 'numberType', cellStyle: style_obj},
+        {field: "md_nm", headerName: "MD", cellStyle: style_obj},
+        {field: "baesong_info", headerName: "배송지역", cellStyle: style_obj},
+        {field: "baesong_kind", headerName: "배송업체", cellStyle: style_obj},
+        {field: "dlv_pay_type", headerName: "배송비지불", cellStyle: style_obj},
+        {field: "baesong_price", headerName: "배송비", type: 'numberType', cellStyle: style_obj},
+        {field: "point", headerName: "적립금", type: 'numberType', cellStyle: style_obj},
+        {field: "org_nm", headerName: "원산지", cellStyle: style_obj},
+        {field: "make", headerName: "제조업체", cellStyle: style_obj},
+        {field: "reg_dm", headerName: "등록일자", cellStyle: style_obj, width: 130},
+        {field: "upd_dm", headerName: "수정일자", cellStyle: style_obj, width: 130},
+        {field: "goods_location", headerName: "위치", cellStyle: style_obj},
         {field: "sale_price", headerName: "sale_price", hide: true},
         {field: "goods_type_cd", headerName: "goods_type", hide: true},
         {field: "com_type_d", headerName: "com_type", hide: true},
