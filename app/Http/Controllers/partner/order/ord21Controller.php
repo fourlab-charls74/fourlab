@@ -20,7 +20,6 @@ class ord21Controller extends Controller
         $sdate = $mutable->sub(14, 'day')->format('Y-m-d');
         $style_no	= $request->input('style_no');
 
-
         $com_id = Auth('partner')->user()->com_id;
 
         $values = [
