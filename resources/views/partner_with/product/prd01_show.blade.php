@@ -250,7 +250,6 @@ select.select_cat
                                             <td>
                                                 <div class="txt_box flax_box">
                                                     <div class="mr-1">
-													{{--
                                                     @if( $type != '' )
                                                         @foreach ($goods_stats as $goods_stat)
                                                             @if ($goods_stat->code_id === @$goods_info->sale_stat_cl )
@@ -259,7 +258,6 @@ select.select_cat
                                                             @endif
                                                         @endforeach
                                                     @else
-													--}}
                                                         <select name="sale_stat_cl" id="sale_stat_cl" class="form-control form-control-sm">
 															<option value="">상품상태</option>
                                                         @foreach ($goods_stats as $goods_stat)
@@ -268,9 +266,7 @@ select.select_cat
                                                             </option>
                                                         @endforeach
                                                         </select>
-													{{--
                                                     @endif
-													--}}
                                                     </div>
                                                     <div class="custom-control custom-checkbox form-check-box mr-1">
                                                         <input type="checkbox" class="custom-control-input" value="Y" id="restock" {{ (@$goods_info->restock_yn=="Y") ? "checked" : "" }}>
