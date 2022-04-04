@@ -856,6 +856,11 @@ select.select_cat
                                                 <div>관련 상품</div>
                                             </dt>
                                             <dd>
+                                                @if ( $type == "create")
+                                                <div class="txt_box">
+                                                    상품 등록을 완료 하신 후 관련상품을 설정할 수 있습니다. 
+                                                </div>
+                                                @else
                                                 <div class="form-inline form-radio-box flax_box txt_box">
                                                     <div class="custom-control custom-radio pr-0">
                                                         <input type="radio" name="related_cfg" id="related_cfg_1" value="A" class="custom-control-input" onclick="relatedGoods(this);"
@@ -877,7 +882,11 @@ select.select_cat
                                                         <label class="custom-control-label" for="related_cfg_2">상품별 설정</label>
                                                     </div>
                                                 </div>
-                                                
+                                                <style>
+                                                    .img {
+                                                        height: 30px;
+                                                    }
+                                                </style>
                                                 <div class="related_goods_area">
                                                     <div class="filter_wrap mb-2">
                                                         <div class="fl_box"></div>
@@ -904,29 +913,31 @@ select.select_cat
                                                         </div>
                                                     </div>
                                                     <div id="div-gd-related-goods" style="min-height: 48px; height:500px;" class="ag-theme-balham"></div>
-                                                    <script>
-                                                        const related_goods_style_obj = {"height": "48px", "line-height": "48px", "text-align": "center"};
-                                                        const related_goods_columns = [
-                                                            {field: "r_goods_no", headerName: "관련상품번호", hide: true, height: 48},
-                                                            {field: "img", headerName: "이미지", type: 'GoodsImageType', cellStyle: related_goods_style_obj},
-                                                            {field: "img", headerName: "이미지_url", hide: true, cellStyle: related_goods_style_obj},
-                                                            {field: "opt_kind_nm", headerName: "품목", width: 130, cellStyle: related_goods_style_obj},
-                                                            {field: "brand_nm", headerName: "브랜드", width: 80, cellStyle: related_goods_style_obj},
-                                                            {field: "goods_nm", headerName: "상품명", width: 'auto', cellStyle: related_goods_style_obj},
-                                                            {field: "sale_stat_cl", headerName: "상품상태", type: 'GoodsStateTypeLH50', width: 80, cellStyle: related_goods_style_obj},
-                                                            {field: "price", headerName: "판매가", type: 'currencyType', width: 80, cellStyle: related_goods_style_obj},
-                                                            {field: "", headerName: "삭제", cellRenderer: (params) => {
-                                                                const row = params?.data;
-                                                                return "<a href='javascript:void(0);' onclick='delRelatedGood(" + JSON.stringify(row) + ")'>삭제</a>";
-                                                            }, cellStyle: {...related_goods_style_obj, 'text-decoration': "underline"} }
-                                                        ];
-                                                        const related_goods_options = {
-                                                            getRowNodeId: (data) => data?.r_goods_no // 업데이터 및 제거를 위한 식별 ID 할당
-                                                        }
-                                                        let gx_related_goods = new HDGrid(document.querySelector("#div-gd-related-goods"), related_goods_columns, related_goods_options);
-                                                    </script>
-                                                </div>
-                                            </dd>
+                                                        <script>
+                                                            const related_goods_style_obj = {"height": "48px", "line-height": "48px", "text-align": "center"};
+                                                            const related_goods_columns = [
+                                                                {field: "r_goods_no", headerName: "관련상품번호", hide: true, height: 48},
+                                                                {field: "img", headerName: "이미지", type: 'GoodsImageType', cellStyle: related_goods_style_obj},
+                                                                {field: "img", headerName: "이미지_url", hide: true, cellStyle: related_goods_style_obj},
+                                                                {field: "opt_kind_nm", headerName: "품목", width: 130, cellStyle: related_goods_style_obj},
+                                                                {field: "brand_nm", headerName: "브랜드", width: 80, cellStyle: related_goods_style_obj},
+                                                                {field: "goods_nm", headerName: "상품명", width: 'auto', cellStyle: related_goods_style_obj},
+                                                                {field: "sale_stat_cl", headerName: "상품상태", type: 'GoodsStateTypeLH50', width: 80, cellStyle: related_goods_style_obj},
+                                                                {field: "price", headerName: "판매가", type: 'currencyType', width: 80, cellStyle: related_goods_style_obj},
+                                                                {field: "", headerName: "삭제", cellRenderer: (params) => {
+                                                                    const row = params?.data;
+                                                                    return "<a href='javascript:void(0);' onclick='delRelatedGood(" + JSON.stringify(row) + ")'>삭제</a>";
+                                                                }, cellStyle: {...related_goods_style_obj, 'text-decoration': "underline"} }
+                                                            ];
+                                                            const related_goods_options = {
+                                                                getRowNodeId: (data) => data?.r_goods_no // 업데이터 및 제거를 위한 식별 ID 할당
+                                                            }
+                                                            let gx_related_goods = new HDGrid(document.querySelector("#div-gd-related-goods"), related_goods_columns, related_goods_options);
+                                                        </script>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                            @endif
                                         </dl>
                                     </li>
                                 </ul>
