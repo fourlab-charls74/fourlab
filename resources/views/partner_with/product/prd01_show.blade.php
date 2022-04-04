@@ -52,8 +52,6 @@ select.select_cat
         <form name="f1" id="f1">
 			<input type="hidden" name="goods_no" value="{{@$goods_no}}">
             <input type="hidden" name="goods_sub" value="0">
-            <input type="hidden" name="r_goods_no" value="{{@$r_goods_no}}">
-            <input type="hidden" name="r_goods_sub" value="{{@$r_goods_sub}}">
 			<input type="hidden" name="is_def_d_category" value="0">				<!-- 일반카테고리를 선택했는지 -->
 			<input type="hidden" name="d_category_s" id="d_category_s" value="">	<!-- 전시카테고리 string 으로 넘기기 위해서 -->
 			<input type="hidden" name="u_category_s" id="u_category_s" value="">	<!-- 용도카테고리 string 으로 넘기기 위해서 -->
@@ -908,12 +906,12 @@ select.select_cat
                                                             </span>
                                                             <a href="javascript:void(0);" onclick="openAddRelatedGoods()" class="btn btn-sm btn-primary shadow-sm">추가</a>
                                                         </div>
-                                                    </div>여기
-                                                    <div id="div-gd-related-goods" style="height:500px;" class="ag-theme-balham"></div>
+                                                    </div>
+                                                    <div id="div-gd-related-goods" style="min-height: 48px; height:500px;" class="ag-theme-balham"></div>
                                                     <script>
-                                                        const related_goods_style_obj = {"line-height": "48px", "text-align": "center"};
+                                                        const related_goods_style_obj = {"height": "48px", "line-height": "48px", "text-align": "center"};
                                                         const related_goods_columns = [
-                                                            {field: "r_goods_no", headerName: "관련상품번호", hide: true},
+                                                            {field: "r_goods_no", headerName: "관련상품번호", hide: true, height: 48},
                                                             {field: "img", headerName: "이미지", type: 'GoodsImageType', cellStyle: related_goods_style_obj},
                                                             {field: "img", headerName: "이미지_url", hide: true, cellStyle: related_goods_style_obj},
                                                             {field: "opt_kind_nm", headerName: "품목", width: 130, cellStyle: related_goods_style_obj},

@@ -374,7 +374,7 @@
 
         $("#u_category_s").val(u_cat_str);
 
-            @if ($type === '')
+        @if ($type === '')
         const type	= 'put';
             @else
         const type	= 'post';
@@ -1115,9 +1115,6 @@
         });
     }
 
-
-    
-
     /**
      * 관련상품 - goods api 관련 - api에서 직접 invoke할 함수들은 var로 선언함
      */
@@ -1145,15 +1142,16 @@
             document.querySelector(".related_goods_area").style.display = "none";
 	    } else {
             document.querySelector(".related_goods_area").style.display = "block";
+            gx_related_goods.gridOptions.api.resetRowHeights(); // 첫 행 높이 깨짐 버그 수정
 	    }
     }
 
-    const openAddRelatedGoods = () => {
+    const openAddRelatedGoods = () => { // goods api 팝업 오픈
         const url=`/partner/api/goods/show`;
         const pop_up = window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1800,height=1000");
     };
 
-    const checkDuplicated = (data) => {
+    const checkDuplicated = (data) => { // 관련상품 추가시 중복 row 검사
         const rows = gx_related_goods.getRows();
         const r_goods_nos = rows.map((row, index) => {
             return row?.r_goods_no;
@@ -1164,7 +1162,7 @@
         return data;
     };
 
-    const addRelatedGoods = (data) => {
+    const addRelatedGoods = (data) => { // 관련상품 추가
 
         data = Array.isArray(data) ? data : [data]; // 단일 상품인 경우 배열로 감쌈
         data = checkDuplicated(data);

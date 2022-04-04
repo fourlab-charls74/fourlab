@@ -1852,6 +1852,8 @@ class prd01Controller extends Controller
 		$spec_desc			= $request->input('spec_desc');
 		$baesong_desc		= $request->input('baesong_desc');
 		$opinion			= $request->input('opinion');
+
+        $related_cfg        = $request->input('related_cfg');
 		$d_category			= $request->input('d_category_s');
 		$u_category			= $request->input('u_category_s');
 		$rep_cat_cd			= $request->input('rep_cat_cd');
@@ -1942,6 +1944,7 @@ class prd01Controller extends Controller
 						spec_desc			= '".$spec_desc."',
 						baesong_desc		= '".$baesong_desc."',
 						opinion				= '".$opinion."',
+                        related_cfg			= '".$related_cfg."',
 						opt_kind_cd			= '".$opt_kind_cd."',
 						restock_yn			= '".$restock_yn."',
 						goods_sh			= '".$goods_sh."',
