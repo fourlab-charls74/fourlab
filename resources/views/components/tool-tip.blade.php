@@ -4,7 +4,7 @@
      * View - Blade에서 컴포넌트 사용하는 방법
      * 
      * arrow: 툴팁 방향 (top, left, right, bottom)
-     * align: 툴팁 내용 정렬 방향 (left, center, right)
+     * align: 툴팁 내용 정렬 방향 (left, center, right) - 현재 center 안먹고 있음
      * html: 툴팁 내용
      * 
      * 예)
@@ -48,7 +48,11 @@
 </style>
 
 <button type="button" class="tool-tip" data-toggle="tooltip" data-placement="{{$arrow}}" data-html="true"
-    data-template="<div class='custom tooltip' role='tooltip'><div class='arrow'></div><div class='tooltip-inner'></div></div>'"
+    data-template="
+        <div class='custom tooltip' role='tooltip'>
+            <div class='arrow'></div>
+            <div class='tooltip-inner'></div>
+        </div>'"
     style="border: none; background: none;" title="{{$html}}">
     <i class="fas fa-question-circle" style="color: {{$tool_tip_color}}; pointer-events: none;"></i>
 </button>

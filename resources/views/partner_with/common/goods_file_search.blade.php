@@ -1,4 +1,4 @@
-@extends('head_with.layouts.master-without-nav')
+@extends('partner_with.layouts.master-without-nav')
 @section('title','파일 검색')
 @section('content')
 <div class="container-fluid show_layout py-3">

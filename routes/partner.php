@@ -153,6 +153,8 @@ Route::group(['middleware' => 'partner', 'as' => 'partner.', 'namespace' => 'par
         Route::post('prd01/{no}/save-option-extra', 'prd01Controller@save_option_extra');
         Route::post('prd01/{no}/del-option-extra', 'prd01Controller@del_option_extra');
 
+        Route::post('prd01/add-related-goods', 'prd01Controller@addRelatedGoods');
+        Route::post('prd01/del-related-good', 'prd01Controller@delRelatedGood');
 
         //Route::get('prd01/{no}/get-option-stock', 'prd01Controller@get_option_stock');
 
@@ -280,6 +282,8 @@ Route::group(['middleware' => 'partner', 'as' => 'partner.', 'namespace' => 'par
         Route::post('claim/insert', 'claim@store');
 
         Route::get('goods', 'goods@search');
+        Route::get('goods/show', 'goods@show');
+        Route::get('goods/show/file/search', 'goods@file_search');
 
     });
 

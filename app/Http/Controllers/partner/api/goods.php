@@ -13,6 +13,30 @@ use Carbon\Carbon;
 
 class goods extends Controller
 {
+	public function show() {
+        $conf = new Conf();
+
+		$site = $conf->getConfig("shop", "sale_place", "");
+
+        $sql = 'select * from company where site_yn = "Y" and com_type=4';
+
+        $values = [
+            'goods_stats' => SLib::getCodes('G_GOODS_STAT'),
+            'items' => SLib::getItems(),
+            'goods_types' => SLib::getCodes('G_goods_type'),
+            'com_types' => SLib::getCodes('G_COM_TYPE'),
+            'sites' => DB::select($sql),
+            'site' => $site
+        ];
+
+        return view( Config::get('shop.partner.view') . '/common/goods_search',$values);
+    }
+
+    public function file_search() {
+        $values = [];
+        return view( Config::get('shop.partner.view') . '/common/goods_file_search',$values);
+    }
+
     public function search(Request $req) {
 
         // 설정 값 얻기

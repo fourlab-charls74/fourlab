@@ -581,7 +581,7 @@ SearchGoodsNos.prototype.SetGrid = function(divId){
         {field: "img", headerName: "이미지", type:'GoodsImageType',width: 60},
         {field: "img", headerName: "이미지_url", hide: true},
         {field: "sale_stat_cl", headerName: "상품상태", type:'GoodsStateType',width: 100},
-        {field: "goods_nm", headerName: "상품명",type:'HeadGoodsNameType'},
+        {field: "goods_nm", headerName: "상품명",type:'GoodsNameType'},
         {field:"nvl" , headerName:""},
     ];
 

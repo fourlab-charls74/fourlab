@@ -968,7 +968,7 @@
             data:{'is_option_use':is_option_use},
             // data: {},
             success: function (data) {
-                console.log(data);
+                // console.log(data);
                 ViewOptions(data.options,data.qty,data.wqty,[]);
             },
             error: function (e) {
@@ -1093,24 +1093,155 @@
         if(goods_no > 0){
             get_add_info();
         }
+        const hide_related_products = document.f1.related_cfg.value == "A" ? true : false;
+        hide_related_products 
+            ? document.querySelector(".related_goods_area").style.display = "none"
+            : null
     });
 
-    function get_add_info(){
+    function get_add_info() {
         $.ajax({
             type: "get",
             url: '/partner/product/prd01/' + goods_no + '/get-addinfo',
             dataType: 'json',
             // data: {},
             success: function (res) {
-                console.log(res);
                 gx_related_goods.setRows(res.goods_related);
-                gx_history.setRows(res.modify_history);
             },
             error: function(xhr, status, error) {
                 console.log(xhr.responseText);
             }
 
         });
+    }
+
+
+    
+
+    /**
+     * 관련상품 - goods api 관련 - api에서 직접 invoke할 함수들은 var로 선언함
+     */
+    const addRow = (row) => {
+        const IMG_PREFIX = '{{$img_prefix}}';
+        row.img = IMG_PREFIX + row.img
+        gx_related_goods.gridOptions.api.applyTransaction({add : [row]});
+    };
+
+    const deleteRow = (row) => { gx_related_goods.gridOptions.api.applyTransaction({remove : [row]}); };
+
+    var goodsCallback = (row) => {
+        addRelatedGoods(row);
+    }
+
+    var multiGoodsCallback = (rows) => {
+        addRelatedGoods(rows);
+    };
+
+    /**
+     * 관련상품 - 미구현이였던 기존 관련상품 로직 연동 및 추가
+     */
+    function relatedGoods(obj) {
+	    if (obj.value == "A") {
+            document.querySelector(".related_goods_area").style.display = "none";
+	    } else {
+            document.querySelector(".related_goods_area").style.display = "block";
+	    }
+    }
+
+    const openAddRelatedGoods = () => {
+        const url=`/partner/api/goods/show`;
+        const pop_up = window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1800,height=1000");
+    };
+
+    const checkDuplicated = (data) => {
+        const rows = gx_related_goods.getRows();
+        const r_goods_nos = rows.map((row, index) => {
+            return row?.r_goods_no;
+        });
+        data = data.filter((row, index) => {
+            if (!r_goods_nos.includes(row?.goods_no)) return row;
+        });
+        return data;
+    };
+
+    const addRelatedGoods = (data) => {
+
+        data = Array.isArray(data) ? data : [data]; // 단일 상품인 경우 배열로 감쌈
+        data = checkDuplicated(data);
+
+        const related_goods = data.reduce((acc, row, idx) => {
+            const r_goods_no = row?.goods_no;
+            const r_goods_sub = row?.goods_sub;
+            const set = `${r_goods_no}|${r_goods_sub}`;
+            return (idx == 0) ? set : acc + ',' + set;
+        }, "");
+
+        if (related_goods == "") {
+            alert("이미 반영된 상품입니다.")
+            return false;
+        }
+
+        const CMD = "add_related_goods";
+        var related_cfg = document.f1.related_cfg.value;
+        var cross_yn = document.f1.cross_yn ? "Y" : "";
+
+        $.ajax({
+            type: "post",
+            url: '/partner/product/prd01/add-related-goods',
+            dataType: 'json',
+            data: {
+                cmd: CMD,
+                goods_no: document.f1.goods_no.value,
+                goods_sub: document.f1.goods_sub.value,
+                cross_yn: cross_yn,
+                related_cfg: related_cfg,
+                related_goods: related_goods
+            },
+            success: function (response) {
+                if (response == "1") {
+                    data.map((row, index) => {
+                        addRow(row);
+                    });
+                } else if (response == "0") {
+                    alert("[ 관련상품 작업 실패 ] 관리자에게 문의해 주십시오.");
+                }
+            },
+            error: function(xhr, status, error) {
+                alert("[ 관련상품 작업 실패 ] 관리자에게 문의해 주십시오.");
+            }
+        });
+        
+    }
+
+    function delRelatedGood(row) { // 관련상품 삭제
+
+        const { r_goods_no, r_goods_sub } = row;
+        const CMD = "del_related_goods";
+
+        $.ajax({
+            type: "post",
+            url: '/partner/product/prd01/del-related-good',
+            dataType: 'json',
+            data: {
+                cmd: CMD,
+                goods_no: document.f1.goods_no.value,
+                goods_sub: document.f1.goods_sub.value,
+                r_goods_no: r_goods_no,
+                r_goods_sub: r_goods_sub
+            },
+            success: function (response) {
+                if (response == "1") {
+                    deleteRow(row);
+                } else if(response == "0") {
+                    alert("[ 관련상품 작업 실패 ] 관리자에게 문의해 주십시오.");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log(xhr.responseText);
+                alert("[ 관련상품 작업 실패 ] 관리자에게 문의해 주십시오.");
+            }
+        });
+
     }
 
 </script>

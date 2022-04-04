@@ -52,6 +52,8 @@ select.select_cat
         <form name="f1" id="f1">
 			<input type="hidden" name="goods_no" value="{{@$goods_no}}">
             <input type="hidden" name="goods_sub" value="0">
+            <input type="hidden" name="r_goods_no" value="{{@$r_goods_no}}">
+            <input type="hidden" name="r_goods_sub" value="{{@$r_goods_sub}}">
 			<input type="hidden" name="is_def_d_category" value="0">				<!-- 일반카테고리를 선택했는지 -->
 			<input type="hidden" name="d_category_s" id="d_category_s" value="">	<!-- 전시카테고리 string 으로 넘기기 위해서 -->
 			<input type="hidden" name="u_category_s" id="u_category_s" value="">	<!-- 용도카테고리 string 으로 넘기기 위해서 -->
@@ -860,21 +862,76 @@ select.select_cat
                                                 <div>관련 상품</div>
                                             </dt>
                                             <dd>
-                                                <div id="div-gd-related-goods" style="height:300px;" class="ag-theme-balham"></div>
-                                                <script>
-                                                    const columns_related_goods = [
-                                                        {field: "goods_no", headerName: "상품번호", width: 100 },
-                                                        {field: "opt_kind_nm", headerName: "품목" },
-                                                        {field: "brand_nm", headerName: "브랜드" },
-                                                        {field: "style_no", headerName: "스타일넘버" },
-                                                        {field: "img", headerName: "이미지", type: 'GoodsImageType' },
-                                                        {field: "img", headerName: "이미지_url", hide: true},
-                                                        {field: "goods_nm", headerName: "상품명", type: 'GoodsNameType' },
-                                                        {field: "sale_stat_cl", headerName: "상품상태", type: 'GoodsStateTypeLH50'},
-                                                        {field: "price", headerName: "판매가", type: 'currencyType' },
-                                                    ];
-                                                    let gx_related_goods = new HDGrid(document.querySelector("#div-gd-related-goods"), columns_related_goods);
-                                                </script>
+                                                <div class="form-inline form-radio-box flax_box txt_box">
+                                                    <div class="custom-control custom-radio pr-0">
+                                                        <input type="radio" name="related_cfg" id="related_cfg_1" value="A" class="custom-control-input" onclick="relatedGoods(this);"
+                                                        {{ (@$goods_info->related_cfg=="A") ? "checked" : "" }} />
+                                                        <label class="custom-control-label" for="related_cfg_1">자동 설정</label>
+                                                    </div>
+                                                    <span style="margin-left: -2px" class="mr-3">
+                                                        <x-tool-tip>
+                                                            <x-slot name="arrow">top</x-slot>
+                                                            <x-slot name="align">left</x-slot>
+                                                            <x-slot name="html">
+                                                                동일 카테고리 내의 일부 상품이 관련 상품으로 출력됩니다.
+                                                            </x-slot>
+                                                        </x-tool-tip>
+                                                    </span>
+                                                    <div class="custom-control custom-radio">
+                                                        <input type="radio" name="related_cfg" id="related_cfg_2" value="G" class="custom-control-input" onclick="relatedGoods(this);"
+                                                        {{ (@$goods_info->related_cfg=="G") ? "checked" : "" }} />
+                                                        <label class="custom-control-label" for="related_cfg_2">상품별 설정</label>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="related_goods_area">
+                                                    <div class="filter_wrap mb-2">
+                                                        <div class="fl_box"></div>
+                                                        <div class="fr_box">
+                                                            <div class="custom-control custom-checkbox form-check-box mr-1" style="display: inline-block;">
+                                                                <input type="checkbox" name="cross_yn" class="custom-control-input" value="Y" id="cross_yn" {{ (@$goods_info->cross_yn=="Y") ? "checked" : "" }}>
+                                                                <label class="custom-control-label" for="cross_yn">크로스 등록</label>
+                                                            </div>
+                                                            <span class="mr-2">
+                                                                <x-tool-tip>
+                                                                    <x-slot name="arrow">top</x-slot>
+                                                                    <x-slot name="align">left</x-slot>
+                                                                    <x-slot name="html">
+                                                                        <p>
+                                                                            크로스 등록이란?<br/><br/>
+                                                                            <b> A 상품을 기준으로 B, C 상품을 선택했다면, A 상품의 관련상품이 B,C로 등록되며, <br/>
+                                                                            B 상품의 관련상품으로 A,C가 등록되며, C 상품의 관련상품으로 A,B 상품이 등록됩니다.</b><br/><br/>
+                                                                            <b>※ 즉, 한번에 모든 상품을 서로의 관련상품으로 등록할 수 있습니다.</b>
+                                                                        </p>
+                                                                    </x-slot>
+                                                                </x-tool-tip>
+                                                            </span>
+                                                            <a href="javascript:void(0);" onclick="openAddRelatedGoods()" class="btn btn-sm btn-primary shadow-sm">추가</a>
+                                                        </div>
+                                                    </div>여기
+                                                    <div id="div-gd-related-goods" style="height:500px;" class="ag-theme-balham"></div>
+                                                    <script>
+                                                        const related_goods_style_obj = {"line-height": "48px", "text-align": "center"};
+                                                        const related_goods_columns = [
+                                                            {field: "r_goods_no", headerName: "관련상품번호", hide: true},
+                                                            {field: "img", headerName: "이미지", type: 'GoodsImageType', cellStyle: related_goods_style_obj},
+                                                            {field: "img", headerName: "이미지_url", hide: true, cellStyle: related_goods_style_obj},
+                                                            {field: "opt_kind_nm", headerName: "품목", width: 130, cellStyle: related_goods_style_obj},
+                                                            {field: "brand_nm", headerName: "브랜드", width: 80, cellStyle: related_goods_style_obj},
+                                                            {field: "goods_nm", headerName: "상품명", width: 'auto', cellStyle: related_goods_style_obj},
+                                                            {field: "sale_stat_cl", headerName: "상품상태", type: 'GoodsStateTypeLH50', width: 80, cellStyle: related_goods_style_obj},
+                                                            {field: "price", headerName: "판매가", type: 'currencyType', width: 80, cellStyle: related_goods_style_obj},
+                                                            {field: "", headerName: "삭제", cellRenderer: (params) => {
+                                                                const row = params?.data;
+                                                                return "<a href='javascript:void(0);' onclick='delRelatedGood(" + JSON.stringify(row) + ")'>삭제</a>";
+                                                            }, cellStyle: {...related_goods_style_obj, 'text-decoration': "underline"} }
+                                                        ];
+                                                        const related_goods_options = {
+                                                            getRowNodeId: (data) => data?.r_goods_no // 업데이터 및 제거를 위한 식별 ID 할당
+                                                        }
+                                                        let gx_related_goods = new HDGrid(document.querySelector("#div-gd-related-goods"), related_goods_columns, related_goods_options);
+                                                    </script>
+                                                </div>
                                             </dd>
                                         </dl>
                                     </li>
