@@ -87,14 +87,10 @@ class ord51Controller extends Controller
 			$sql	= "
 				select
 					count(*) as total
-				from order_track t
-					left outer join ad a on a.ad= t.ad
-					inner join order_mst m on m.ord_no = t.ord_no
-					inner join order_opt o on o.ord_no = t.ord_no
+				from order_opt o
+					inner join order_mst m on m.ord_no = o.ord_no
+					inner join order_track t on o.ord_no = t.ord_no
 					inner join goods g on g.goods_no = o.goods_no and g.goods_sub = o.goods_sub
-					left outer join code c on c.code_id = o.ord_state and c.code_kind_cd = 'G_ORD_STATE'
-					left outer join code d on d.code_id = o.clm_state and d.code_kind_cd = 'G_CLM_STATE'
-					left outer join code e on e.code_id = a.type and e.code_kind_cd = 'G_AD_TYPE'
 				where 1=1 $where
 			";
 			$row = DB::select($sql);
