@@ -153,7 +153,7 @@
                                                                 <label class="custom-control-label" for="use_date_type_P">발급일 기준</label>
                                                             </div>
                                                         </div>
-                                                        <div class="my-1 use_date_p" @if(!isset($coupon->use_date_type) || @$coupon->use_date_type == 'S') style="display:none" @endif>
+                                                        <div style="display: flex" class="my-1 use_date_p" @if(!isset($coupon->use_date_type) || @$coupon->use_date_type == 'S') style="display:none" @endif>
                                                             <div class="txt_box">발급일 ~&nbsp;</div>
                                                             <input 
                                                                 type="text" 
