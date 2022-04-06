@@ -108,15 +108,16 @@ class Coupon
                 'pub_cnt'			=>$data['pub_cnt'],
                 'use_yn'			=>$data['use_yn'],
                 'admin_id'			=>$data['admin_id'],
-                'pub_time'			=>$data['pub_time'],
-                //'use_date_type'	=>$data['use_date_type'],
-                //'use_date_alarm_yn'	=>$data['use_date_alarm_yn'],
-                //'use_date_alarm_day'	=>$data['use_date_alarm_day'],
-                //'use_date'			=>$data['use_date']
+                // 'pub_time'			=>$data['pub_time'],
+
+				// 20220406 모델 주석 수정 - madforre
+				'use_date_type'		=> $data['use_date_type'],
+				'use_date_alarm_yn'	=> $data['use_date_alarm_yn'], 
+				'use_date_alarm_day'	=> $data['use_date_alarm_day'], 
+				'use_date'			=> $data['use_date']
             ]);
 
             DB::commit();
-
             return $data['coupon_no'];
         }catch(Exception $e){
             DB::rollback();
