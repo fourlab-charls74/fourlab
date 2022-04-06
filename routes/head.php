@@ -274,6 +274,7 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
 
         Route::get('prd01/{no}', 'prd01Controller@show');
         Route::get('prd01/{no}/get', 'prd01Controller@get');
+        Route::get('prd01/{no}/get-addinfo', 'prd01Controller@get_addinfo');
         Route::get('prd01/{no}/in-qty', 'prd01Controller@show_in_qty');
         Route::get('prd01/{no}/options', 'prd01Controller@options');
         Route::get('prd01/{no}/goods-class', 'prd01Controller@goods_class');
@@ -305,6 +306,9 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::post("prd01/{no}/similar-goods-add", "prd01Controller@save_similar_goods");
 
         Route::delete("prd01/{no}/similar-goods-del", "prd01Controller@delete_similar_goods");
+
+        Route::post('prd01/add-related-goods', 'prd01Controller@addRelatedGoods');
+        Route::post('prd01/del-related-good', 'prd01Controller@delRelatedGood');
 
         // 이미지 관리
         Route::post('prd02/{idx}/upload', 'prd02Controller@upload');

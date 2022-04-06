@@ -1178,41 +1178,94 @@
                                                 <div>관련 상품</div>
                                             </dt>
                                             <dd>
-												<!-- 관련상품 기능 생성해야함 //-->
-                                                <div class="table-responsive">
-												@if ($type === '')
-                                                    <table class="table table-bordered th_border_none" id="dataTable" width="100%" cellspacing="0">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>이미지</th>
-                                                                <th>품목</th>
-                                                                <th>브랜드</th>
-                                                                <th>상품명</th>
-                                                                <th>상태</th>
-                                                                <th>판매가</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tfoot>
-                                                        </tfoot>
-                                                        <tbody>
-                                                        @if($goods_info)
-                                                        @forelse(@$goods_info->goods_related as $goods)
-                                                            <tr>
-                                                                <td><img src="{{ $goods->img }}"/></td>
-                                                                <td>{{ $goods->opt_kind_nm }}</td>
-                                                                <td>{{ $goods->brand_nm  }} </td>
-                                                                <td>{{ $goods->goods_nm }}</td>
-                                                                <td>{{ $goods->goods_stat }}</td>
-                                                                <td>{{ $goods->price }}</td>
-                                                            </tr>
-                                                        @empty
-                                                            <tr><td colspan=99 style="text-align: center">등록된 관련 상품이 없습니다.</td></tr>
-                                                        @endforelse
-                                                        @endif
-                                                        </tbody>
-                                                    </table>
-												@endif
+                                                @if ( $type == "create")
+                                                <div class="txt_box">
+                                                    상품 등록을 완료 하신 후 관련상품을 설정할 수 있습니다. 
                                                 </div>
+                                                @else
+                                                <div class="form-inline form-radio-box flax_box txt_box">
+                                                    <div class="custom-control custom-radio pr-0">
+                                                        <input type="radio" name="related_cfg" id="related_cfg_1" value="A" class="custom-control-input" onclick="relatedGoods(this);"
+                                                        {{ (@$goods_info->related_cfg=="A") ? "checked" : "" }} />
+                                                        <label class="custom-control-label" for="related_cfg_1">자동 설정</label>
+                                                    </div>
+                                                    <span style="margin-left: -2px" class="mr-3">
+                                                        <x-tool-tip>
+                                                            <x-slot name="arrow">top</x-slot>
+                                                            <x-slot name="align">left</x-slot>
+                                                            <x-slot name="html">
+                                                                동일 카테고리 내의 일부 상품이 관련 상품으로 출력됩니다.
+                                                            </x-slot>
+                                                        </x-tool-tip>
+                                                    </span>
+                                                    <div class="custom-control custom-radio">
+                                                        <input type="radio" name="related_cfg" id="related_cfg_2" value="G" class="custom-control-input" onclick="relatedGoods(this);"
+                                                        {{ (@$goods_info->related_cfg=="G") ? "checked" : "" }} />
+                                                        <label class="custom-control-label" for="related_cfg_2">상품별 설정</label>
+                                                    </div>
+                                                </div>
+                                                <style>
+                                                    .img {
+                                                        height: 30px;
+                                                    }
+                                                </style>
+                                                <div class="related_goods_area">
+                                                    <div class="filter_wrap mb-2">
+                                                        <div class="fl_box"></div>
+                                                        <div class="fr_box">
+                                                            <div class="custom-control custom-checkbox form-check-box mr-1" style="display: inline-block;">
+                                                                <input type="checkbox" name="cross_yn" class="custom-control-input" value="Y" id="cross_yn" {{ (@$goods_info->cross_yn=="Y") ? "checked" : "" }}>
+                                                                <label class="custom-control-label" for="cross_yn">크로스 등록</label>
+                                                            </div>
+                                                            <span class="mr-2">
+                                                                <x-tool-tip>
+                                                                    <x-slot name="arrow">top</x-slot>
+                                                                    <x-slot name="align">left</x-slot>
+                                                                    <x-slot name="html">
+                                                                        <p>
+                                                                            크로스 등록이란?<br/><br/>
+                                                                            <b> A 상품을 기준으로 B, C 상품을 선택했다면, A 상품의 관련상품이 B,C로 등록되며, <br/>
+                                                                            B 상품의 관련상품으로 A,C가 등록되며, C 상품의 관련상품으로 A,B 상품이 등록됩니다.</b><br/><br/>
+                                                                            <b>※ 즉, 한번에 모든 상품을 서로의 관련상품으로 등록할 수 있습니다.</b>
+                                                                        </p>
+                                                                    </x-slot>
+                                                                </x-tool-tip>
+                                                            </span>
+                                                            <a href="javascript:void(0);" onclick="openAddRelatedGoods()" class="btn btn-sm btn-primary shadow-sm">추가</a>
+                                                        </div>
+                                                    </div>
+                                                    <div id="div-gd-related-goods" style="min-height: 48px; height:500px;" class="ag-theme-balham"></div>
+                                                        <script>
+                                                            const related_goods_style_obj = {"height": "48px", "line-height": "48px", "text-align": "center"};
+                                                            const related_goods_columns = [
+                                                                {field: "r_goods_no", headerName: "관련상품번호", hide: true, height: 48},
+                                                                {field: "img" , headerName:"이미지",
+                                                                    cellRenderer: (params) => {
+                                                                        if (params.value !== undefined && params.data.img != "") {
+                                                                            return '<img class="img" src="' + params.data.img + '"/>';
+                                                                        }
+                                                                    },
+                                                                    cellStyle: related_goods_style_obj
+                                                                },
+                                                                {field: "img", headerName: "이미지_url", hide: true, cellStyle: related_goods_style_obj},
+                                                                {field: "opt_kind_nm", headerName: "품목", width: 130, cellStyle: related_goods_style_obj},
+                                                                {field: "brand_nm", headerName: "브랜드", width: 80, cellStyle: related_goods_style_obj},
+                                                                {field: "goods_nm", headerName: "상품명", width: 'auto', cellStyle: related_goods_style_obj},
+                                                                {field: "sale_stat_cl", headerName: "상품상태", type: 'GoodsStateTypeLH50', width: 80, cellStyle: related_goods_style_obj},
+                                                                {field: "price", headerName: "판매가", type: 'currencyType', width: 80, cellStyle: related_goods_style_obj},
+                                                                {field: "", headerName: "삭제", cellRenderer: (params) => {
+                                                                    const row = params?.data;
+                                                                    return "<a href='javascript:void(0);' onclick='delRelatedGood(" + JSON.stringify(row) + ")'>삭제</a>";
+                                                                }, cellStyle: {...related_goods_style_obj, 'text-decoration': "underline"} }
+                                                            ];
+                                                            const related_goods_options = {
+                                                                getRowNodeId: (data) => data?.r_goods_no // 업데이터 및 제거를 위한 식별 ID 할당
+                                                            }
+                                                            let gx_related_goods = new HDGrid(document.querySelector("#div-gd-related-goods"), related_goods_columns, related_goods_options);
+                                                        </script>
+                                                    </div>
+                                                </div>
+                                            @endif
                                             </dd>
                                         </dl>
                                     </li>
@@ -2749,6 +2802,171 @@
             }
             setSaleAmount(false, false);
         });
+    }
+
+    </script>
+
+    <script language="javascript">
+
+    // 아래부터 관련상품 관련 로직
+
+    $(document).ready(function() {
+        if(goods_no > 0){
+            get_add_info();
+        }
+        const hide_related_products = document.f1.related_cfg.value == "A" ? true : false;
+        hide_related_products 
+            ? document.querySelector(".related_goods_area").style.display = "none"
+            : null
+    });
+
+    function get_add_info() {
+        $.ajax({
+            type: "get",
+            url: '/head/product/prd01/' + goods_no + '/get-addinfo',
+            dataType: 'json',
+            // data: {},
+            success: function (res) {
+                gx_related_goods.setRows(res.goods_related);
+            },
+            error: function(xhr, status, error) {
+                console.log(xhr.responseText);
+            }
+
+        });
+    }
+
+    /**
+     * 관련상품 - goods api 관련 - api에서 직접 invoke할 함수들은 var로 선언함
+     */
+    const addRow = (row) => {
+        const IMG_PREFIX = '{{@$img_prefix}}';
+        const GOODS_NO = document.f1.goods_no.value;
+        row.img = IMG_PREFIX + row.img; // 이미지 보이게 이미지 상수를 추가
+        row.r_goods_no = row.goods_no; // 삭제 가능하도록 매칭 상품번호를 관련상품번호에 매칭
+        if (row.goods_no == GOODS_NO) {
+            alert('추가하려는 관련 상품 중 현재 수정중인 상품은 제외되었습니다.')
+            return false;
+        }
+        gx_related_goods.gridOptions.api.applyTransaction({add : [row]});
+    };
+
+    const deleteRow = (row) => { gx_related_goods.gridOptions.api.applyTransaction({remove : [row]}); };
+
+    var goodsCallback = (row) => {
+        addRelatedGoods(row);
+    }
+
+    var multiGoodsCallback = (rows) => {
+        addRelatedGoods(rows);
+    };
+
+    /**
+     * 관련상품 - 미구현이였던 기존 관련상품 로직 연동 및 추가
+     */
+    function relatedGoods(obj) {
+	    if (obj.value == "A") {
+            document.querySelector(".related_goods_area").style.display = "none";
+	    } else {
+            document.querySelector(".related_goods_area").style.display = "block";
+            gx_related_goods.gridOptions.api.resetRowHeights(); // 첫 행 높이 깨짐 버그 수정
+	    }
+    }
+
+    const openAddRelatedGoods = () => { // goods api 팝업 오픈
+        const url=`/head/api/goods/show`;
+        const pop_up = window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1800,height=1000");
+    };
+
+    const checkDuplicated = (data) => { // 관련상품 추가시 중복 row 검사
+        const rows = gx_related_goods.getRows();
+        const r_goods_nos = rows.map((row, index) => {
+            return row?.r_goods_no;
+        });
+        data = data.filter((row, index) => {
+            if (!r_goods_nos.includes(row?.goods_no)) return row;
+        });
+        return data;
+    };
+
+    const addRelatedGoods = (data) => { // 관련상품 추가
+
+        data = Array.isArray(data) ? data : [data]; // 단일 상품인 경우 배열로 감쌈
+        data = checkDuplicated(data);
+
+        const related_goods = data.reduce((acc, row, idx) => {
+            const r_goods_no = row?.goods_no;
+            const r_goods_sub = row?.goods_sub;
+            const set = `${r_goods_no}|${r_goods_sub}`;
+            return (idx == 0) ? set : acc + ',' + set;
+        }, "");
+
+        if (related_goods == "") {
+            alert("이미 반영된 상품입니다.")
+            return false;
+        }
+
+        const CMD = "add_related_goods";
+        var related_cfg = document.f1.related_cfg.value;
+        var cross_yn = document.f1.cross_yn ? "Y" : "";
+
+        $.ajax({
+            type: "post",
+            url: '/head/product/prd01/add-related-goods',
+            dataType: 'json',
+            data: {
+                cmd: CMD,
+                goods_no: document.f1.goods_no.value,
+                goods_sub: document.f1.goods_sub.value,
+                cross_yn: cross_yn,
+                related_cfg: related_cfg,
+                related_goods: related_goods
+            },
+            success: function (response) {
+                if (response == "1") {
+                    data.map((row, index) => {
+                        addRow(row);
+                    });
+                } else if (response == "0") {
+                    alert("[ 관련상품 작업 실패 ] 관리자에게 문의해 주십시오.");
+                }
+            },
+            error: function(xhr, status, error) {
+                alert("[ 관련상품 작업 실패 ] 관리자에게 문의해 주십시오.");
+            }
+        });
+        
+    }
+
+    function delRelatedGood(row) { // 관련상품 삭제
+
+        const { r_goods_no, r_goods_sub } = row;
+        const CMD = "del_related_goods";
+
+        $.ajax({
+            type: "post",
+            url: '/head/product/prd01/del-related-good',
+            dataType: 'json',
+            data: {
+                cmd: CMD,
+                goods_no: document.f1.goods_no.value,
+                goods_sub: document.f1.goods_sub.value,
+                r_goods_no: r_goods_no,
+                r_goods_sub: r_goods_sub
+            },
+            success: function (response) {
+                if (response == "1") {
+                    deleteRow(row);
+                } else if(response == "0") {
+                    alert("[ 관련상품 작업 실패 ] 관리자에게 문의해 주십시오.");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log(xhr.responseText);
+                alert("[ 관련상품 작업 실패 ] 관리자에게 문의해 주십시오.");
+            }
+        });
+
     }
 
 	</script>

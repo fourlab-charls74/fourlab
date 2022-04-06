@@ -913,7 +913,7 @@ class prd01Controller extends Controller
 				'wqty'			=> 0,
 				'coupon_list'	=> [],
 				'planing'		=> [],
-				'modify_hostory'=> [],
+				'modify_history'=> [],
 				'type'			=> 'create',
 				'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
 				'class_items'	=> $class_items,
@@ -959,6 +959,7 @@ class prd01Controller extends Controller
             'g_dlv_fee'			=> $cfg_dlv_fee,
             'g_free_dlv_fee_limit'	=> $cfg_free_dlv_fee_limit,
             'g_order_point_ratio'	=> $cfg_order_point_ratio,
+            'img_prefix'            => sprintf("%s",config("shop.image_svr"))
         ]);
 
         return view(Config::get('shop.head.view') . '/product/prd01_show',$values);
@@ -1654,6 +1655,7 @@ class prd01Controller extends Controller
 		$spec_desc			= $request->input('spec_desc');
 		$baesong_desc		= $request->input('baesong_desc');
 		$opinion			= $request->input('opinion');
+		$related_cfg        = $request->input('related_cfg');
 		$d_category			= $request->input('d_category_s');
 		$u_category			= $request->input('u_category_s');
 		$rep_cat_cd			= $request->input('rep_cat_cd');
@@ -1777,6 +1779,7 @@ class prd01Controller extends Controller
 							spec_desc			= '".$spec_desc."',
 							baesong_desc		= '".$baesong_desc."',
 							opinion				= '".$opinion."',
+							related_cfg			= '".$related_cfg."',
 							opt_kind_cd			= '".$opt_kind_cd."',
 							restock_yn			= '".$restock_yn."',
 							goods_sh			= '".$goods_sh."',
@@ -2753,5 +2756,196 @@ class prd01Controller extends Controller
 
 		}
 
+	}
+
+	function addRelatedGoods(Request $request) { // 관련 상품 설정
+
+        $goods_no = $request->input("goods_no");
+        $goods_sub = $request->input("goods_sub");
+        $cross_yn = $request->input("cross_yn"); // 크로스 등록
+        $related_cfg = $request->input("related_cfg"); // 관련상품 등록 설정
+        $related_goods = $request->input("related_goods");
+        $a_goods = explode(",", $related_goods);
+
+        try {
+
+            DB::beginTransaction();
+
+            $id = Auth('head')->user()->id;
+            $name = Auth('head')->user()->name;
+
+            $user = array( "id" => $id, "name" => $name );
+
+            // 상품 클래스 생성
+            $goods = new Product( $user );
+            $goods->SetGoodsNo($goods_no); // 현재 서비스에서 sub 번호 필요없으므로 이 메서드로 대체
+
+            // 관련상품 설정 업데이트
+            $goods->Edit( $goods_no , array("related_cfg" => $related_cfg) );
+
+            if ( $related_cfg == "A") { // 자동 설정인 경우: 관련상품 삭제
+
+                // 자동 설정 변경 부분은 상품 수정 시 실행해야 함.
+                $sql = "DELETE
+                    FROM goods_related
+                    WHERE goods_no = :goods_no
+                ";
+                DB::delete($sql, ['goods_no' => $goods_no]);
+                
+            } else if ( $related_cfg == "G" ) { // 개별 상품 설정
+
+                // 관련상품 등록
+                for ( $i=0; $i < count($a_goods); $i++) {
+
+                    list($r_goods_no, $r_goods_sub) = explode("|", $a_goods[$i]);
+
+                    if ( $goods_no != $r_goods_no) {
+
+                        $sql = "SELECT count(*) AS cnt FROM goods_related
+                            WHERE goods_no = '$goods_no' AND goods_sub = '$goods_sub' AND r_goods_no = '$r_goods_no' AND r_goods_sub = '$r_goods_sub'
+                        ";
+                        $row = DB::selectOne($sql);
+                        $count = $row->cnt;
+                        if ($count == 0) {
+                            $sql = "INSERT INTO goods_related (
+                                    goods_no, goods_sub, r_goods_no, r_goods_sub, seq, rt, ut, admin_id, admin_nm
+                                ) VALUES (
+                                    :goods_no, :goods_sub, :r_goods_no, :r_goods_sub, '$i', NOW(), NOW(), '$id', '$name'
+                                )
+                            ";
+                            DB::insert($sql, [
+                                'goods_no' => $goods_no,
+                                'goods_sub' => $goods_sub,
+                                'r_goods_no' => $r_goods_no,
+                                'r_goods_sub' => $r_goods_sub
+                            ]);
+                            $goods->SetGoodsNo($r_goods_no); // 현재 서비스에서 sub 번호 필요없으므로 이 메서드로 대체
+                            
+                            // 관련상품 설정 업데이트
+                            $goods->Edit( $goods_no , array("related_cfg" => $related_cfg) );
+                        }
+                    }
+
+                }
+
+                if ($cross_yn == "Y") { // 관련상품 크로스 등록
+
+                    array_push( $a_goods, $goods_no."|".$goods_sub);
+                    $a_cross = $a_goods;
+
+                    for( $i = 0; $i < count($a_goods); $i++ ){
+                        list($goods_no, $goods_sub) = explode("|", $a_goods[$i]);
+                        for ( $j = 0; $j < count($a_cross); $j++ ) { 
+                            list($r_goods_no, $r_goods_sub) = explode("|", $a_cross[$j]);
+                            if ( $goods_no != $r_goods_no) { // 등록여부 확인
+                                $sql = "SELECT count(*) AS cnt FROM goods_related 
+                                    WHERE goods_no = '$goods_no' AND goods_sub = '$goods_sub' AND r_goods_no = '$r_goods_no' AND r_goods_sub = '$r_goods_sub' ";
+                                $row = DB::selectOne($sql);
+                                $count = $row->cnt;
+                                if ( $count == 0 ) {
+                                    $sql = "INSERT into goods_related (
+                                            goods_no, goods_sub, r_goods_no, r_goods_sub, seq, rt, ut, admin_id, admin_nm
+                                        ) values (
+                                            :goods_no, :goods_sub, :r_goods_no, :r_goods_sub, '$i', NOW(), NOW(), '$id', '$name'
+                                        )
+                                    ";
+                                    DB::insert($sql, [
+                                        'goods_no' => $goods_no,
+                                        'goods_sub' => $goods_sub,
+                                        'r_goods_no' => $r_goods_no,
+                                        'r_goods_sub' => $r_goods_sub
+                                    ]);
+                                    $goods->SetGoodsNo($r_goods_no, $r_goods_sub);
+
+                                    // 관련상품 설정 업데이트
+                                    $goods->Edit( $goods_no , array("related_cfg" => $related_cfg) );
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+            DB::commit();
+            return 1;
+        } catch (Exception $e) {
+            dd($e);
+            DB::rollback();
+            return 0;
+        }
+
+    }
+
+    function delRelatedGood(Request $request) { // 관련 상품 삭제
+
+        $goods_no = $request->input("goods_no");
+        $goods_sub = $request->input("goods_sub");
+        $r_goods_no = $request->input("r_goods_no");
+        $r_goods_sub = $request->input("r_goods_sub");
+        
+        try {
+            $sql = "DELETE FROM goods_related
+                WHERE goods_no = :goods_no AND goods_sub = :goods_sub
+                AND r_goods_no = :r_goods_no AND r_goods_sub = :r_goods_sub
+            ";
+            DB::delete($sql, ['goods_no' => $goods_no, 'goods_sub' => $goods_sub, 'r_goods_no' => $r_goods_no, 'r_goods_sub' => $r_goods_sub]);
+            DB::commit();
+            return 1;
+        } catch (Exception $e) {
+            // dd($e);
+            DB::rollBack();
+            return 0;
+        }
+
+    }
+
+	public function get_addinfo($goods_no){
+
+	    $query = /** @lang text */
+            "
+            select
+                a.upd_date, a.memo, a.head_desc, a.price, a.wonga, a.margin, a.id, b.name
+            from goods_modify_hist a
+                inner join mgr_user b on a.id = b.id
+            where a.goods_no = :goods_no
+            order by a.hist_no desc
+        ";
+        $modify_history = DB::select($query,['goods_no' => $goods_no]);
+
+        $query = /** @lang text */
+            "
+			select
+				a.goods_no,replace(b.img,'a_500', 'a_55') as img,
+				c.opt_kind_nm,
+				d.brand_nm,
+				b.style_no,
+				b.goods_nm,
+				e.code_val as sale_stat_cl,
+				b.price,
+				a.r_goods_no,
+				a.r_goods_sub
+			from goods_related a
+				inner join goods b on a.r_goods_no = b.goods_no and a.r_goods_sub = b.goods_sub
+				inner join opt c on b.opt_kind_cd = c.opt_kind_cd and c.opt_id = 'K'
+				inner join brand d on b.brand = d.brand
+				inner join code e on e.code_kind_cd = 'G_GOODS_STAT' and e.code_id = b.sale_stat_cl
+			where a.goods_no = :goods_no
+        ";
+        $pdo = DB::connection()->getPdo();
+        $stmt = $pdo->prepare($query);
+        $stmt->execute(["goods_no" => $goods_no]);
+        $goods_related = [];
+        while($row = $stmt->fetch(PDO::FETCH_ASSOC))
+        {
+            if($row["img"] != ""){
+                $row["img"] = sprintf("%s%s",config("shop.image_svr"),$row["img"]);
+            }
+            $goods_related[] = $row;
+        }
+
+        return response()->json([
+            'modify_history'        => $modify_history,
+            'goods_related'         => $goods_related
+        ]);
 	}
 }

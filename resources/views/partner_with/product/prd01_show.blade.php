@@ -917,7 +917,14 @@ select.select_cat
                                                             const related_goods_style_obj = {"height": "48px", "line-height": "48px", "text-align": "center"};
                                                             const related_goods_columns = [
                                                                 {field: "r_goods_no", headerName: "관련상품번호", hide: true, height: 48},
-                                                                {field: "img", headerName: "이미지", type: 'GoodsImageType', cellStyle: related_goods_style_obj},
+                                                                {field: "img" , headerName:"이미지",
+                                                                    cellRenderer: (params) => {
+                                                                        if (params.value !== undefined && params.data.img != "") {
+                                                                            return '<img class="img" src="' + params.data.img + '"/>';
+                                                                        }
+                                                                    },
+                                                                    cellStyle: related_goods_style_obj
+                                                                },
                                                                 {field: "img", headerName: "이미지_url", hide: true, cellStyle: related_goods_style_obj},
                                                                 {field: "opt_kind_nm", headerName: "품목", width: 130, cellStyle: related_goods_style_obj},
                                                                 {field: "brand_nm", headerName: "브랜드", width: 80, cellStyle: related_goods_style_obj},
@@ -935,9 +942,9 @@ select.select_cat
                                                             let gx_related_goods = new HDGrid(document.querySelector("#div-gd-related-goods"), related_goods_columns, related_goods_options);
                                                         </script>
                                                     </div>
-                                                </dd>
-                                            </div>
+                                                </div>
                                             @endif
+                                            </dd>
                                         </dl>
                                     </li>
                                 </ul>

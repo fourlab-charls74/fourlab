@@ -2288,6 +2288,7 @@ class prd01Controller extends Controller
             DB::commit();
             return 1;
         } catch (Exception $e) {
+            // dd($e);
             DB::rollback();
             return 0;
         }
@@ -2310,7 +2311,7 @@ class prd01Controller extends Controller
             DB::commit();
             return 1;
         } catch (Exception $e) {
-            dd($e);
+            // dd($e);
             DB::rollBack();
             return 0;
         }
