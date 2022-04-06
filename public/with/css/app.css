@@ -680,8 +680,8 @@ footer a:active{color:#fff !important;}
 }
 
 .ag-theme-balham .ag-cell, .ag-theme-balham .ag-row>.ag-cell-wrapper {
-    padding-left: 5px;
-    padding-right: 5px;
+    padding-left: 6px;
+    padding-right: 6px;
 }
 
 /* 그리드 커스텀 추가 종료 ceduce */
