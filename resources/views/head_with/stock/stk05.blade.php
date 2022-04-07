@@ -199,6 +199,7 @@
 									<span class="text_line">/</span>
 									<div class="form-inline-inner input_box" style="width:45%;">
 										<select name="ord_field" class="form-control form-control-sm">
+                                            <option value="a.history_no">입출고내역순</option>
 											<option value="a.goods_no" >상품번호</option>
 											<option value="a.style_no" >스타일넘버</option>
 										</select>
