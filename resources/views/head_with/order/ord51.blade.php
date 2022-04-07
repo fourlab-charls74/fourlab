@@ -612,7 +612,5 @@
         return calcDate;
     }
 
-
-
 </script>
 @stop

@@ -442,6 +442,10 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::get('stk01/option/search/{goods_no}', 'stk01Controller@show_search');
         Route::get('stk01/{goods_no?}', 'stk01Controller@show');
 
+        // 입출고내역
+        Route::get('stk05', 'stk05Controller@index');
+        Route::get('stk05/search', 'stk05Controller@search');
+
         // 재고입고알림
         Route::get('stk06', 'stk06Controller@index');
         Route::get('stk06/search', 'stk06Controller@search');

@@ -30,6 +30,7 @@
                     <li><a href="/head/stock/stk10">발주</a></li>
                     <li><a href="/head/stock/stk11">입고</a></li>
                     <li data-menu-kind="P" data-menu-id="stk01" class="d-none"><a href="/head/stock/stk01">재고관리</a></li>
+                    <li><a href="/head/stock/stk05">입출고내역</a></li>
                     <li><a href="/head/stock/stk06">재고입고알림</a></li>
                     <!--
                     <li><a href="/head/stock/stk02">재고현황</a></li>

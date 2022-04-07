@@ -18,7 +18,9 @@ class stk20Controller extends Controller
     public function index() {
 
         $mutable = Carbon::now();
-        $sdate	= $mutable->sub(1, 'month')->format('Y-m-d');
+        $sdate = $request->input("sdate", now()->sub(3, 'day')->format('Ymd'));
+        $edate = $request->input("edate", date("Ymd"));
+        
 
         $values = [
             'sdate'         => $sdate,
