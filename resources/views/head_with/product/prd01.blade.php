@@ -454,12 +454,12 @@
 
     function AddProduct() {
         var url = '/head/product/prd01/create';
-        var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
+        var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1024,height=900");
     }
 
     function AddProducts() {
-        var url = '/head/product/prd06';
-        var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
+        var url = '/head/product/prd07';
+        var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1650,height=960");
     }
 
     const EditProducts = () => {
@@ -483,14 +483,14 @@
 
     function AddProductImages() {
         var url = '/head/product/prd08';
-        var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
+        var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1024,height=900");
     }
 
     function ShowProductImages() {
         const goods_nos = gx.gridOptions.api.getSelectedRows().map(row => row.goods_no);
         if(goods_nos.length < 1) return alert("상품을 선택해주세요.");
         var url = '/head/product/prd02/slider?goods_nos=' + goods_nos.join(",");
-        var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
+        var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1024,height=900");
     }
 
     // 수정된 상품정보 저장

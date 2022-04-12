@@ -42,6 +42,17 @@
                                 <col width="35%">
                               </colgroup>
                                   <tr>
+                                  <th class="required">업체</th>
+                                      <td>
+                                        <div class="select_box">
+                                            <select name="op_cd" id="op_cd" class="form-control form-control-sm search-all">
+                                                <option value="">선택하세요.</option>
+                                                @foreach($opt_cd_list as $opt_cd)
+                                                    <option value="{{$opt_cd->name}}">{{$opt_cd->value}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                      </td>
                                       <th class="required">품목</th>
                                       <td>
                                         <div class="select_box">

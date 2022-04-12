@@ -97,10 +97,10 @@ class prd05Controller extends Controller
 
 		if( $goods != "" ){
 			// 파일로 검색일 경우
-			$goods_arr = split(",",$goods);
+			$goods_arr = explode(",",$goods);
 			for($i=0;$i<count($goods_arr);$i++){
 				if(empty($goods_arr[$i])) continue;
-				list($no,$sub) = split("\|",$goods_arr[$i]);
+				list($no,$sub) = explode("\|",$goods_arr[$i]);
 				if($insql == ""){
 					$insql .= " select '$no' as no,'$sub' as sub ";
 				}else{
@@ -225,7 +225,7 @@ class prd05Controller extends Controller
         //echo "<pre>$query</pre>";
         //dd(array_keys ((array)$result[0]));
 
-        $query = "select item, item_nm,field from code_class where class = '$class' order by item+0";
+        $query = "select item, item_nm, field from code_class where class = '$class' order by item+0";
         $code_class_items = DB::select($query);
 
 
@@ -815,7 +815,7 @@ class prd05Controller extends Controller
 		if($style_no != "")	$where .= " and g.style_no like '$style_no%' ";
 		if($goods_no != ""){
 			// 상품코드 검색
-			$goods_nos = split(",",$goods_no);
+			$goods_nos = explode(",",$goods_no);
 			if(count($goods_nos) > 1){
 				if(count($goods_nos) > 50) array_splice($goods_nos,50);
 				$in_goods_nos = join(",",$goods_nos);
@@ -827,10 +827,10 @@ class prd05Controller extends Controller
 
 		if($goods != ""){
 			// 파일로 검색일 경우
-			$goods_arr = split(",",$goods);
+			$goods_arr = explode(",",$goods);
 			for($i=0;$i<count($goods_arr);$i++){
 				if(empty($goods_arr[$i])) continue;
-				list($no,$sub) = split("\|",$goods_arr[$i]);
+				list($no,$sub) = explode("\|",$goods_arr[$i]);
 				if($insql == ""){
 					$insql .= " select '$no' as no,'$sub' as sub ";
 				}else{

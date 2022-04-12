@@ -344,8 +344,8 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::post('prd06/sale-on', 'prd06Controller@saleOn');
         Route::post('prd06/sale-off', 'prd06Controller@saleOff');
 
-        // Route::get('prd07', 'prd07Controller@index');
-        // Route::get('prd07/search', 'prd07Controller@search');
+        Route::get('prd07', 'prd07Controller@index');
+        Route::get('prd07/search', 'prd07Controller@search');
         // Route::put('prd07/update', 'prd07Controller@update');
 
         Route::get('prd08', 'prd08Controller@index');
