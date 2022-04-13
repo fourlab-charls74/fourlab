@@ -32,6 +32,7 @@
     .disabled {
         background: #ccc;
     }
+
 </style>
 <div class="py-3 px-sm-3 wrap">
     <div class="page_tit">
@@ -247,10 +248,10 @@
                                     <input type="text" class="form-control form-control-sm mr-2" name="option_kind1" value="사이즈" onkeyup="checkOptionValue(this);" style="width: 100px"/>
                                     <span class="txt_box mr-2">~</span>
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" name="chk_option_kind2" id="chk_option_kind2" class="custom-control-input" onkeyup="checkOptionValue(this);" readonly/>
+                                        <input type="checkbox" name="chk_option_kind2" id="chk_option_kind2" class="custom-control-input" onkeyup="checkOptionValue(this);"/>
                                         <label class="custom-control-label" for="chk_option_kind2">&nbsp;</label>
                                     </div>
-                                    <input type="text" class="form-control form-control-sm" name="option_kind2" value="컬러" style="width: 100px"/>
+                                    <input type="text" class="form-control form-control-sm" name="option_kind2" value="컬러" style="width: 100px" disabled/>
                                 </div>
                             </div>
                         </div>
@@ -389,7 +390,6 @@
     </form>
 </div>
     <script type="text/javascript" charset="utf-8">
-
 
         /**
          * ag-grid set field
@@ -531,6 +531,12 @@
                 ]
             }
         ];
+      
+        const _ = (selector) => {
+            const result = document.querySelectorAll(selector);
+            if (result == undefined) return result;
+            return result.length > 1 ? result : result[0];
+        };
 
         /**
          * ag-grid rendering
@@ -553,7 +559,6 @@
             getEditingRows(goods_nos);
         });
 
-        
         // 필요한 기능들
         const OnlyNum = (obj) => {
             val = obj.value;
@@ -689,59 +694,7 @@
             gx.gridOptions.api.stopEditing();
         };
 
-        /**
-         * goods api - 상품 가져오기
-         * window opener에서 콜백을 사용하려면 var로 선언해야 합니다.
-         */
-        var addRow = (row) => { // goods_api에서 opener 함수로 사용하기 위해 var로 선언
-            const goods_no = numberSet(row);
-            getEditingRows(goods_no, 'add');
-        };
-
-        var goodsCallback = (row) => {
-            addRow(row);
-        };
-
-        var multiGoodsCallback = (rows) => {
-            if (rows && Array.isArray(rows)) {
-                const goods_nos = rows.reduce((acc, row, index) => {
-                    return acc += (index == 0) ? numberSet(row) : ',' + numberSet(row);
-                }, "");
-                getEditingRows(goods_nos, 'add');
-            }
-        };
-
-        const addGoods = () => {
-            const url=`/head/api/goods/show`;
-            const pop_up = window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1800,height=1000");
-        };
-
-        /**
-         * colors api - 색상 가져오기 (팝업창에서 사용하려면 콜백을 var로 선언해야함)
-         */
-        var multiWordsCallback = (rows) => {
-            const input = document.querySelector("#colors");
-            const words_arr = input.value.split(',');
-            if (rows && Array.isArray(rows)) rows.map(row => {
-                let word = (input.value == "") ? `${row.color}` : `,${row.color}`;
-                words_arr.includes(`${row.color}`) ? null : input.value += word;
-            });
-        };
-
         /** logics */
-
-        const onlyNum = (e) => {
-            if (
-                (( e.keyCode == 9 )	// tab
-                    ||	( e.keyCode == 8 ) // bs
-                    ||	( e.keyCode == 46 ) // delete
-                    ||	( e.keyCode > 47 && e.keyCode < 58 ) // 1 ~ 0
-                    ||	( e.keyCode >= 96 && e.keyCode <= 105 ) // numpad 1~0
-                ) == false
-            ) {
-                e.returnValue = false;
-            }
-        };
 
         const popCategory = (type) => {
             if (type == 'display') {
@@ -766,23 +719,52 @@
         };
 
         const changeOptionUse = (obj) => {
-            const checked = obj.value;
-            if (checked == "Y") { // 여기
-                $("option_kind1").disabled = true;
-                $("option_kind1").readOnly = true;
-                $("option_kind1").value = "";
-                $("chk_option_kind1").disabled = true;
-                $("chk_option_kind1").checked = false;
-                $("option_kind2").disabled = true;
-                $("option_kind2").readOnly = true;
-                $("option_kind2").value = "";
-                $("chk_option_kind2").disabled = true;
-                $("chk_option_kind2").checked = false;
-            } else if (checked =="N") {
-                
+            const used = obj.value;
+            if (used == "N") {
+                $("input[name='option_kind1']").attr("disabled", true);
+                $("input[name='option_kind1']").attr("readonly", true);
+                $("input[name='option_kind1']").val("NONE");
+                $("input[name='chk_option_kind1']").attr("disabled", true);
+                $("input[name='chk_option_kind1']").attr("checked", false);
+                $("input[name='option_kind2']").attr("disabled", true);
+                $("input[name='option_kind2']").attr("readonly", true);
+                $("input[name='option_kind2']").val("NONE");
+                $("input[name='chk_option_kind2']").attr("disabled", true);
+                $("input[name='chk_option_kind2']").checked = false;
+            } else if (used == "Y") {
+                $("input[name='option_kind1']").attr("disabled", false);
+                $("input[name='option_kind1']").attr("readonly", false);
+                $("input[name='option_kind1']").val("사이즈");
+                $("input[name='option_kind1']").className = "input";
+                $("input[name='chk_option_kind1']").attr("disabled", false);
+                $("input[name='chk_option_kind1']").attr("checked", true);
+                $("input[name='option_kind2']").val("컬러");
+                $("input[name='chk_option_kind2']").attr("disabled", false);
             }
-            console.log(obj);
         };
+
+        // 옵션구분 체크박스 얘네 하다 말았음
+        $("#chk_option_kind1").bind("change", () => {
+            var checkbox1 = $("#chk_option_kind1")[0];
+            if (!checkbox1.checked) {
+                if (document.f1.is_option_use[0].checked) {
+                    alert("옵션사용을 \"사용함\"으로 선택하셨기 때문에 적어도 한개의 옵션은 입력하셔야 합니다.");
+                    checkbox1.checked = true;
+                }
+            }
+        });
+        $("#chk_option_kind2").bind("change", () => {
+            if ($("#chk_option_kind2")[0].checked) {
+                $("input[name='option_kind2']").attr("disabled", false);
+                $("input[name='option_kind2']").attr("readonly", false);
+                $("input[name='option_kind2']").val("컬러");
+                $("input[name='option_kind2']").focus();
+            } else {
+                $("input[name='option_kind2']").attr("disabled", true);
+                $("input[name='option_kind2']").attr("readonly", true);
+                $("input[name='option_kind2']").val("컬러");
+            }
+        });
 
         const changeDeliveryConfig = (radio) => {
             if (radio.value == "S") {
@@ -994,466 +976,460 @@
             }
 
         };
-        
-        const _ = (selector) => {
-            const result = document.querySelectorAll(selector);
-            if (result == undefined) return result;
-            return result.length > 1 ? result : result[0];
-        };
 
-        const apply = () => {
+        // const apply = () => {
 
-            var opt_kind_cd		= _("#item").value;
-            var optIndex		= _("#item").selectedIndex;
-            var opt_kind_nm 	= _("#item").options[optIndex].innerText;
+        //     var opt_kind_cd		= _("#item").value;
+        //     var optIndex		= _("#item").selectedIndex;
+        //     var opt_kind_nm 	= _("#item").options[optIndex].innerText;
             
-            var brand		    = _("#brand_cd").value;
-            var brand_nm	    = _("#brand_cd").innerText;
+        //     var brand		    = _("#brand_cd").value;
+        //     var brand_nm	    = _("#brand_cd").innerText;
 
-            var rep_cat_nm		= _("#rep_cat_nm").value;
-            var rep_cat_cd		= _("#rep_cat_cd").value;
+        //     var rep_cat_nm		= _("#rep_cat_nm").value;
+        //     var rep_cat_cd		= _("#rep_cat_cd").value;
 
-            var sale_stat_cl	= _("#goods_stat").value;
-            var statIndex		= _("#goods_stat").selectedIndex;
-            var sale_stat_cl_nm = _("#goods_stat").options[statIndex].innerText;
+        //     var sale_stat_cl	= _("#goods_stat").value;
+        //     var statIndex		= _("#goods_stat").selectedIndex;
+        //     var sale_stat_cl_nm = _("#goods_stat").options[statIndex].innerText;
 
-            var head_desc		= _("#head_desc").value;
-            var ad_desc			= _("#ad_desc").value;
+        //     var head_desc		= _("#head_desc").value;
+        //     var ad_desc			= _("#ad_desc").value;
 
-            var baesong_info	= _("#baesong_info").value;
-            var baeIndex		= _("#baesong_info").selectedIndex;
-            var baesong_info_nm = _("#baesong_info").options[baeIndex].innerText;
+        //     var baesong_info	= _("#baesong_info").value;
+        //     var baeIndex		= _("#baesong_info").selectedIndex;
+        //     var baesong_info_nm = _("#baesong_info").options[baeIndex].innerText;
 
-            var baesong_kind	= _("#baesong_kind").value;
-            var baeKindIndex	= _("#baesong_kind").selectedIndex;
-            var baesong_kind_nm = _("#baesong_kind").options[baeKindIndex].innerText;
+        //     var baesong_kind	= _("#baesong_kind").value;
+        //     var baeKindIndex	= _("#baesong_kind").selectedIndex;
+        //     var baesong_kind_nm = _("#baesong_kind").options[baeKindIndex].innerText;
 
-            var dlv_pay_type	= _("#dlv_pay_type").value;
-            var dlvIndex		= _("#dlv_pay_type").selectedIndex;
-            var dlv_pay_type_nm = _("#dlv_pay_type").options[dlvIndex].innerText;
+        //     var dlv_pay_type	= _("#dlv_pay_type").value;
+        //     var dlvIndex		= _("#dlv_pay_type").selectedIndex;
+        //     var dlv_pay_type_nm = _("#dlv_pay_type").options[dlvIndex].innerText;
 
-            // 배송비 설정
-            let dlv_fee_cfg;
-            if (document.f1.dlv_fee_cfg.value == 'S') {
-                dlv_fee_cfg = "S";
-            } else if (document.f1.dlv_fee_cfg.value == 'G') {
-                dlv_fee_cfg = "G";
-            }
+        //     // 배송비 설정
+        //     let dlv_fee_cfg;
+        //     if (document.f1.dlv_fee_cfg.value == 'S') {
+        //         dlv_fee_cfg = "S";
+        //     } else if (document.f1.dlv_fee_cfg.value == 'G') {
+        //         dlv_fee_cfg = "G";
+        //     }
 
-            var dlv_fee_yn		= _("#dlv_fee_yn").value;
-            var baesong_price	= _("#baesong_price").value;
+        //     var dlv_fee_yn		= _("#dlv_fee_yn").value;
+        //     var baesong_price	= _("#baesong_price").value;
 
-            let point_cfg;
-            // 적립금 설정
-            if (document.f1.point_cfg.value == 'S') {
-                point_cfg = "S";
-            } else if (document.f1.point_cfg.value == 'G') {
-                point_cfg = "G";
-            }
+        //     let point_cfg;
+        //     // 적립금 설정
+        //     if (document.f1.point_cfg.value == 'S') {
+        //         point_cfg = "S";
+        //     } else if (document.f1.point_cfg.value == 'G') {
+        //         point_cfg = "G";
+        //     }
 
-            var point_yn		= _("#point_yn").value;
-            var point_unit		= _("#point_unit").value;
-            var point			= _("#point").value;
-            var point_shop_rate = _("#point_shop_ratio").value;
-            if ( point_cfg == "S" ) {
-                point = point_shop_rate;
-                point_unit = "P";
-            } else {
-                if (point_unit == "W") {
-                    //point_amt = point;
-                }
-            }
+        //     var point_yn		= _("#point_yn").value;
+        //     var point_unit		= _("#point_unit").value;
+        //     var point			= _("#point").value;
+        //     var point_shop_rate = _("#point_shop_ratio").value;
+        //     if ( point_cfg == "S" ) {
+        //         point = point_shop_rate;
+        //         point_unit = "P";
+        //     } else {
+        //         if (point_unit == "W") {
+        //             //point_amt = point;
+        //         }
+        //     }
 
-            // 배송예정
-            var dlv_due_type			= _("#dlv_due_type").value;
-            var dlv_due_day				= _("#dlv_due_day").value;
-            var dlv_due_period			= _("#dlv_due_period").value;
-            var dlv_due_memo			= _("#dlv_due_memo").value;
+        //     // 배송예정
+        //     var dlv_due_type			= _("#dlv_due_type").value;
+        //     var dlv_due_day				= _("#dlv_due_day").value;
+        //     var dlv_due_period			= _("#dlv_due_period").value;
+        //     var dlv_due_memo			= _("#dlv_due_memo").value;
 
-            let dlv_due_yn;
-            if (dlv_due_type == "R") {
-                dlv_due_period = "";
-            } else if (dlv_due_type == "G" || dlv_due_type == "D") {
-                dlv_due_day = "";
-            }
-            if (document.f1.dlv_due_yn.checked) {
-                dlv_due_yn = "N";
-            }
+        //     let dlv_due_yn;
+        //     if (dlv_due_type == "R") {
+        //         dlv_due_period = "";
+        //     } else if (dlv_due_type == "G" || dlv_due_type == "D") {
+        //         dlv_due_day = "";
+        //     }
+        //     if (document.f1.dlv_due_yn.checked) {
+        //         dlv_due_yn = "N";
+        //     }
 
-            var md_id			 = _("#md_nm").value;
-            var mdIndex			 = _("#md_nm").selectedIndex;
-            var md_nm			 = _("#md_nm").options[mdIndex].innerText;
+        //     var md_id			 = _("#md_nm").value;
+        //     var mdIndex			 = _("#md_nm").selectedIndex;
+        //     var md_nm			 = _("#md_nm").options[mdIndex].innerText;
 
-            var goods_cont		 = _("#goods_cont").value;
-            var make			 = _("#make").value;
-            var org_nm			 = _("#org_nm").value;
+        //     var goods_cont		 = _("#goods_cont").value;
+        //     var make			 = _("#make").value;
+        //     var org_nm			 = _("#org_nm").value;
 
-            var spec_desc		 = _("#spec_desc").value;
-            var baesong_desc	 = _("#baesong_desc").value;
-            var opinion			 = _("#opinion").value;
+        //     var spec_desc		 = _("#spec_desc").value;
+        //     var baesong_desc	 = _("#baesong_desc").value;
+        //     var opinion			 = _("#opinion").value;
             
-            var restock_yn		 = _("#restock_yn").value;
-            var price_value		 = _("#price").value;
+        //     var restock_yn		 = _("#restock_yn").value;
+        //     var price_value		 = _("#price").value;
 
-            var price_unit		 = _("#price_unit").value;
-            var price_pm		 = _("#price_pm").value;
-            var tax_yn			 = _("#tax_yn").value;
-            var goods_location	 = _("#goods_location").value;
-            var tags			 = _("#tags").value;
-            var new_product_type = document.f1.new_product_type.value;
-            var new_product_day	 = _("#new_product_day").value;
-            var colors			 = _("#colors").value;
+        //     var price_unit		 = _("#price_unit").value;
+        //     var price_pm		 = _("#price_pm").value;
+        //     var tax_yn			 = _("#tax_yn").value;
+        //     var goods_location	 = _("#goods_location").value;
+        //     var tags			 = _("#tags").value;
+        //     var new_product_type = document.f1.new_product_type.value;
+        //     var new_product_day	 = _("#new_product_day").value;
+        //     var colors			 = _("#colors").value;
 
-            // 판매가 및 마진율
-            try {
-                price_value = parseInt(price_value);
-            } catch(e){
-                price_value = 0;
-            }
+        //     // 판매가 및 마진율
+        //     try {
+        //         price_value = parseInt(price_value);
+        //     } catch(e){
+        //         price_value = 0;
+        //     }
 
-            var margin_rate		= _("#margin_rate").value;
-            if (margin_rate != "") {
-                try {
-                    margin_rate = parseInt(margin_rate);
-                } catch(e){
-                    margin_rate = "";
-                }
-            }
+        //     var margin_rate		= _("#margin_rate").value;
+        //     if (margin_rate != "") {
+        //         try {
+        //             margin_rate = parseInt(margin_rate);
+        //         } catch(e){
+        //             margin_rate = "";
+        //         }
+        //     }
 
-            // 세일 설정
-            var sale_yn = "";
-            if (document.f1.sale_yn[0].checked == "Y") {
-                sale_yn = "Y";
-            } else if (document.f1.sale_yn[1].checked == "N") {
-                sale_yn = "N";
-            }
-            var sale_value			= _("#sale").value;
-            var sale_unit			= _("#sale_unit").value;
-            var sale_margin			= _("#sale_margin").value;
-            var sale_dt_yn			= (_("#sale_dt_yn").checked) ? "Y" : "N";
-            var sale_s_dt			= _("#sale_s_dt").value;
-            var sale_e_dt			= _("#sale_e_dt").value;
+        //     // 세일 설정
+        //     var sale_yn = "";
+        //     if (document.f1.sale_yn[0].checked == "Y") {
+        //         sale_yn = "Y";
+        //     } else if (document.f1.sale_yn[1].checked == "N") {
+        //         sale_yn = "N";
+        //     }
+        //     var sale_value			= _("#sale").value;
+        //     var sale_unit			= _("#sale_unit").value;
+        //     var sale_margin			= _("#sale_margin").value;
+        //     var sale_dt_yn			= (_("#sale_dt_yn").checked) ? "Y" : "N";
+        //     var sale_s_dt			= _("#sale_s_dt").value;
+        //     var sale_e_dt			= _("#sale_e_dt").value;
 
-            var fix_wonga = _("#fix_wonga").checked ? "Y" : "N";
+        //     var fix_wonga = _("#fix_wonga").checked ? "Y" : "N";
 
-            // 수량제한
-            let limited_qty_yn;
-            if (document.f1.limited_qty_yn[0].checked) {
-                limited_qty_yn = "Y";
-            } else if (document.f1.limited_qty_yn[1].checked) {
-                limited_qty_yn = "N";
-            }
-            var limited_min_qty			= _("#limited_min_qty").value;
-            var limited_max_qty			= _("#limited_max_qty").value;
+        //     // 수량제한
+        //     let limited_qty_yn;
+        //     if (document.f1.limited_qty_yn[0].checked) {
+        //         limited_qty_yn = "Y";
+        //     } else if (document.f1.limited_qty_yn[1].checked) {
+        //         limited_qty_yn = "N";
+        //     }
+        //     var limited_min_qty			= _("#limited_min_qty").value;
+        //     var limited_max_qty			= _("#limited_max_qty").value;
 
-            // 총구매수량제한
-            let limited_total_qty_yn;
-            if (document.f1.limited_total_qty_yn[0].checked) {
-                limited_total_qty_yn = "Y";
-            } else if (document.f1.limited_total_qty_yn[1].checked) {
-                limited_total_qty_yn = "N";
-            }
+        //     // 총구매수량제한
+        //     let limited_total_qty_yn;
+        //     if (document.f1.limited_total_qty_yn[0].checked) {
+        //         limited_total_qty_yn = "Y";
+        //     } else if (document.f1.limited_total_qty_yn[1].checked) {
+        //         limited_total_qty_yn = "N";
+        //     }
 
-            // 회원구매제한
-            let member_buy_yn;
-            if(document.f1.member_buy_yn[0].checked){
-                member_buy_yn = "Y";
-            } else if(document.f1.member_buy_yn[1].checked){
-                member_buy_yn = "N";
-            }
+        //     // 회원구매제한
+        //     let member_buy_yn;
+        //     if(document.f1.member_buy_yn[0].checked){
+        //         member_buy_yn = "Y";
+        //     } else if(document.f1.member_buy_yn[1].checked){
+        //         member_buy_yn = "N";
+        //     }
 
-            const rows = gx.getRows();
+        //     const rows = gx.getRows();
 
-            if (rows.length == 0){
-                alert("상품을 추가해 주세요.");
-                return false;
-            }
+        //     if (rows.length == 0){
+        //         alert("상품을 추가해 주세요.");
+        //         return false;
+        //     }
             
-            rows.map(row => {
+        //     rows.map(row => {
 
-                // 품목
-                if (opt_kind_cd) row.opt_kind_cd = opt_kind_cd;
-                if (opt_kind_cd) row.opt_kind_nm = opt_kind_nm;
+        //         // 품목
+        //         if (opt_kind_cd) row.opt_kind_cd = opt_kind_cd;
+        //         if (opt_kind_cd) row.opt_kind_nm = opt_kind_nm;
 
-                // 브랜드
-                if (brand) row.brand = brand;
-                if (brand) row.brand_nm = brand_nm;
+        //         // 브랜드
+        //         if (brand) row.brand = brand;
+        //         if (brand) row.brand_nm = brand_nm;
 
-                // 대표카테고리
-                if (rep_cat_cd) row.rep_cat_nm = rep_cat_nm;
-                if (rep_cat_cd) row.rep_cat_cd = rep_cat_cd;
+        //         // 대표카테고리
+        //         if (rep_cat_cd) row.rep_cat_nm = rep_cat_nm;
+        //         if (rep_cat_cd) row.rep_cat_cd = rep_cat_cd;
 
-                // 상품상태
-                if (sale_stat_cl) row.sale_stat_nm = sale_stat_cl_nm;
-                if (sale_stat_cl) row.sale_stat_cl = sale_stat_cl;
+        //         // 상품상태
+        //         if (sale_stat_cl) row.sale_stat_nm = sale_stat_cl_nm;
+        //         if (sale_stat_cl) row.sale_stat_cl = sale_stat_cl;
                 
-                // 상단홍보글
-                if (head_desc) row.head_desc = head_desc;
+        //         // 상단홍보글
+        //         if (head_desc) row.head_desc = head_desc;
                 
-                // 하단홍보글
-                if (ad_desc) row.ad_desc = ad_desc;
+        //         // 하단홍보글
+        //         if (ad_desc) row.ad_desc = ad_desc;
                 
-                // 배송방식
-                if (baesong_info) row.baesong_info_nm = baesong_info_nm;
-                if (baesong_info) row.baesong_info = baesong_info;
+        //         // 배송방식
+        //         if (baesong_info) row.baesong_info_nm = baesong_info_nm;
+        //         if (baesong_info) row.baesong_info = baesong_info;
 
-                // 배송업체
-                if (baesong_kind) row.baesong_kind_nm = baesong_kind_nm;	
-                if (baesong_kind) row.baesong_kind = baesong_kind;
+        //         // 배송업체
+        //         if (baesong_kind) row.baesong_kind_nm = baesong_kind_nm;	
+        //         if (baesong_kind) row.baesong_kind = baesong_kind;
 
-                // 배송비 지불시점
-                if (dlv_pay_type) row.dlv_pay_type_nm = dlv_pay_type_nm;
-                if (dlv_pay_type) row.dlv_pay_type = dlv_pay_type;
+        //         // 배송비 지불시점
+        //         if (dlv_pay_type) row.dlv_pay_type_nm = dlv_pay_type_nm;
+        //         if (dlv_pay_type) row.dlv_pay_type = dlv_pay_type;
 
-                // 배송비설정
-                if (dlv_fee_cfg) row.dlv_fee_cfg = dlv_fee_cfg;
+        //         // 배송비설정
+        //         if (dlv_fee_cfg) row.dlv_fee_cfg = dlv_fee_cfg;
 
-                // 배송비
-                if (baesong_price) row.baesong_price = baesong_price;
+        //         // 배송비
+        //         if (baesong_price) row.baesong_price = baesong_price;
 
-                // 배송비여부(유료,무료)
-                if (dlv_fee_yn) row.dlv_fee_yn = dlv_fee_yn;
+        //         // 배송비여부(유료,무료)
+        //         if (dlv_fee_yn) row.dlv_fee_yn = dlv_fee_yn;
 
-                // MD
-                if (md_id) row.md_nm = md_nm;
-                if (md_id) row.md_id = md_id;
+        //         // MD
+        //         if (md_id) row.md_nm = md_nm;
+        //         if (md_id) row.md_id = md_id;
 
-                // 제조사
-                if (make) row.make = make;
+        //         // 제조사
+        //         if (make) row.make = make;
 
-                // 원산지
-                if (org_nm) row.org_nm = org_nm;
+        //         // 원산지
+        //         if (org_nm) row.org_nm = org_nm;
 
-                // 상품상세
-                if (goods_cont) row.goods_cont = goods_cont;
+        //         // 상품상세
+        //         if (goods_cont) row.goods_cont = goods_cont;
 
-                // 제품사양
-                if (spec_desc) row.spec_desc = spec_desc;
+        //         // 제품사양
+        //         if (spec_desc) row.spec_desc = spec_desc;
                 
-                // 예약/배송
-                if (baesong_desc) row.baesong_desc = baesong_desc;
+        //         // 예약/배송
+        //         if (baesong_desc) row.baesong_desc = baesong_desc;
 
-                // MD 상품평
-                if (opinion) row.opinion = opinion;
+        //         // MD 상품평
+        //         if (opinion) row.opinion = opinion;
 
-                // 재입고알림
-                if (restock_yn != "") row.restock_yn = restock_yn;
+        //         // 재입고알림
+        //         if (restock_yn != "") row.restock_yn = restock_yn;
 
-                // 과세구분
-                if (tax_yn != "") row.tax_yn = tax_yn;
+        //         // 과세구분
+        //         if (tax_yn != "") row.tax_yn = tax_yn;
 
-                // 상품위치
-                if (goods_location != "") row.goods_location = goods_location;
+        //         // 상품위치
+        //         if (goods_location != "") row.goods_location = goods_location;
 
-                // 태그
-                if (tags != "") row.tags = tags;
+        //         // 태그
+        //         if (tags != "") row.tags = tags;
 
-                // 신상품 적용구분 & 신상품 적용일
-                if (new_product_type == "M" && new_product_day != "") {
-                    row.new_product_type = new_product_type;	// 적용구분
-                    row.new_product_day = new_product_day;		// 적용일
-                }
+        //         // 신상품 적용구분 & 신상품 적용일
+        //         if (new_product_type == "M" && new_product_day != "") {
+        //             row.new_product_type = new_product_type;	// 적용구분
+        //             row.new_product_day = new_product_day;		// 적용일
+        //         }
 
-                // 회원전용상품 - 가격적용 init
-                let apply_price;
+        //         // 회원전용상품 - 가격적용 init
+        //         let apply_price;
 
-                // 세일 설정
-                if (sale_yn == "Y") {
+        //         // 세일 설정
+        //         if (sale_yn == "Y") {
 
-                    if (sale_value > 0) {
+        //             if (sale_value > 0) {
 
-                        if (sale_unit == "%") {
-                            var sale_rate = sale_value;
-                            var sale_price = Math.round((1-sale_rate/100) * row.normal_price);
-                        } else {
-                            var sale_price = parseInt(row.normal_price - sale_value);
-                            var sale_rate = Math.round((1-sale_price/(row.normal_price*100)));
-                        }
+        //                 if (sale_unit == "%") {
+        //                     var sale_rate = sale_value;
+        //                     var sale_price = Math.round((1-sale_rate/100) * row.normal_price);
+        //                 } else {
+        //                     var sale_price = parseInt(row.normal_price - sale_value);
+        //                     var sale_rate = Math.round((1-sale_price/(row.normal_price*100)));
+        //                 }
 
-                        // 세일율
-                        if (sale_rate) row.ed_sale_rate = sale_rate;
+        //                 // 세일율
+        //                 if (sale_rate) row.ed_sale_rate = sale_rate;
 
-                        // 세일가
-                        if(sale_price) row.ed_sale_price = sale_price;
+        //                 // 세일가
+        //                 if(sale_price) row.ed_sale_price = sale_price;
 
-                        // 세일여부
-                        if (sale_yn) row.sale_yn = sale_yn;
+        //                 // 세일여부
+        //                 if (sale_yn) row.sale_yn = sale_yn;
 
-                        // 세일기간사용여부
-                        if (sale_dt_yn) row.sale_dt_yn = sale_dt_yn;
+        //                 // 세일기간사용여부
+        //                 if (sale_dt_yn) row.sale_dt_yn = sale_dt_yn;
 
-                        // 세일시작기간
-                        if (sale_s_dt) {
-                            var sale_s_dt_value = sale_s_dt.substr(0,4) + "-" + sale_s_dt.substr(4,2) + "-" + sale_s_dt.substr(6,2) + " " + sale_s_tm+":00:00";
-                            row.sale_s_dt = sale_s_dt_value;
-                        }
-                        if (sale_e_dt) {
-                            var sale_e_dt_value = sale_e_dt.substr(0,4) + "-" + sale_e_dt.substr(4,2) + "-" + sale_e_dt.substr(6,2) + " " + sale_e_tm+":00:00";
-                            row.sale_e_dt = sale_e_dt_value;
-                        }
+        //                 // 세일시작기간
+        //                 if (sale_s_dt) {
+        //                     var sale_s_dt_value = sale_s_dt.substr(0,4) + "-" + sale_s_dt.substr(4,2) + "-" + sale_s_dt.substr(6,2) + " " + sale_s_tm+":00:00";
+        //                     row.sale_s_dt = sale_s_dt_value;
+        //                 }
+        //                 if (sale_e_dt) {
+        //                     var sale_e_dt_value = sale_e_dt.substr(0,4) + "-" + sale_e_dt.substr(4,2) + "-" + sale_e_dt.substr(6,2) + " " + sale_e_tm+":00:00";
+        //                     row.sale_e_dt = sale_e_dt_value;
+        //                 }
 
-                        if (sale_margin > 0) {
-                            var margin = sale_margin;
-                        } else {
-                            var margin = row.margin_rate;
-                        }
+        //                 if (sale_margin > 0) {
+        //                     var margin = sale_margin;
+        //                 } else {
+        //                     var margin = row.margin_rate;
+        //                 }
 
-                        // 타임세일
-                        if (sale_dt_yn == "Y") {
-                            calPrice(row, row.com_type, row.price, margin, fix_wonga, sale_yn);	// 기존 가격으로 원복
-                        } else {	
-                            // 바로 세일로 판매가 수정
-                            calPrice(row, row.com_type, sale_price, margin, fix_wonga, sale_yn); // 판매가를 세일가로 변경
-                        }
-                    }
+        //                 // 타임세일
+        //                 if (sale_dt_yn == "Y") {
+        //                     calPrice(row, row.com_type, row.price, margin, fix_wonga, sale_yn);	// 기존 가격으로 원복
+        //                 } else {	
+        //                     // 바로 세일로 판매가 수정
+        //                     calPrice(row, row.com_type, sale_price, margin, fix_wonga, sale_yn); // 판매가를 세일가로 변경
+        //                 }
+        //             }
 
-                } else {
+        //         } else {
 
-                    // 세일 설정 초기화
-                    if (sale_yn == "N" && row.sale_yn == "Y") {
+        //             // 세일 설정 초기화
+        //             if (sale_yn == "N" && row.sale_yn == "Y") {
 
-                        // 세일율
-                        row.ed_sale_rate = 0;
+        //                 // 세일율
+        //                 row.ed_sale_rate = 0;
 
-                        // 세일가
-                        row.ed_sale_price = 0
+        //                 // 세일가
+        //                 row.ed_sale_price = 0
 
-                        // 세일여부
-                        if (sale_yn) row.sale_yn = sale_yn;
+        //                 // 세일여부
+        //                 if (sale_yn) row.sale_yn = sale_yn;
 
-                        // 세일기간사용여부
-                        if (sale_dt_yn) row.sale_dt_yn = sale_dt_yn;
+        //                 // 세일기간사용여부
+        //                 if (sale_dt_yn) row.sale_dt_yn = sale_dt_yn;
 
-                        //세일시작기간
-                        row.sale_s_dt = "0000-00-00 00:00:00";
-                        row.sale_e_dt = "0000-00-00 00:00:00";
+        //                 //세일시작기간
+        //                 row.sale_s_dt = "0000-00-00 00:00:00";
+        //                 row.sale_e_dt = "0000-00-00 00:00:00";
 
-                        var normal_margin = Math.round( (1 - row.normal_wonga / row.normal_price) * 10000, 10) /100;
+        //                 var normal_margin = Math.round( (1 - row.normal_wonga / row.normal_price) * 10000, 10) /100;
                         
-                        // 기존 가격으로 원복
-                        row = calPrice(row, row.com_type, row.normal_price, normal_margin, row.fix_wonga, sale_yn);
-                    }
+        //                 // 기존 가격으로 원복
+        //                 row = calPrice(row, row.com_type, row.normal_price, normal_margin, row.fix_wonga, sale_yn);
+        //             }
 
                     
-                    if (price_value > 0) {
-                        if (price_pm == "-") {
-                            apply_price = -1 * price_value;
-                        } else {
-                            apply_price = price_value;
-                        }
-                        if (price_unit == "%") {
-                            var price = row.price * ( 1 + apply_price / 100 );
-                        } else {
-                            var price = parseInt(row.price) + apply_price;
-                        }
-                        var margin = row.margin_rate;
-                        row = cmdPrice(row, price, margin);
-                    }
+        //             if (price_value > 0) {
+        //                 if (price_pm == "-") {
+        //                     apply_price = -1 * price_value;
+        //                 } else {
+        //                     apply_price = price_value;
+        //                 }
+        //                 if (price_unit == "%") {
+        //                     var price = row.price * ( 1 + apply_price / 100 );
+        //                 } else {
+        //                     var price = parseInt(row.price) + apply_price;
+        //                 }
+        //                 var margin = row.margin_rate;
+        //                 row = cmdPrice(row, price, margin);
+        //             }
 
-                    if (margin_rate > 0) {
-                        var price = row.price;
-                        row = cmdPrice(row, price, margin_rate);
-                    }
-                }
+        //             if (margin_rate > 0) {
+        //                 var price = row.price;
+        //                 row = cmdPrice(row, price, margin_rate);
+        //             }
+        //         }
 
-                // 색상
-                if (colors != "") row.color = colors;
+        //         // 색상
+        //         if (colors != "") row.color = colors;
 
-                // 배송예정구분
-                if (dlv_due_type) row.dlv_due_type = dlv_due_type;
+        //         // 배송예정구분
+        //         if (dlv_due_type) row.dlv_due_type = dlv_due_type;
 
-                // 배송기간
-                if (dlv_due_period) row.dlv_due_period = dlv_due_period;
+        //         // 배송기간
+        //         if (dlv_due_period) row.dlv_due_period = dlv_due_period;
 
-                // 배송예정일
-                if (dlv_due_day) row.dlv_due_day = dlv_due_day;
+        //         // 배송예정일
+        //         if (dlv_due_day) row.dlv_due_day = dlv_due_day;
 
-                // 배송예정일 사유
-                if (dlv_due_memo) row.dlv_due_memo = dlv_due_memo;
+        //         // 배송예정일 사유
+        //         if (dlv_due_memo) row.dlv_due_memo = dlv_due_memo;
 
-                // 배송예정구분 사용안함.
-                if (dlv_due_yn == "N") {
-                    row.dlv_due_type = "";	// 배송예정구분
-                    row.dlv_due_period = ""; // 배송기간
-                    row.dlv_due_day = ""; // 배송예정일
-                    row.dlv_due_memo = ""; // 배송예정일 사유
-                }
+        //         // 배송예정구분 사용안함.
+        //         if (dlv_due_yn == "N") {
+        //             row.dlv_due_type = "";	// 배송예정구분
+        //             row.dlv_due_period = ""; // 배송기간
+        //             row.dlv_due_day = ""; // 배송예정일
+        //             row.dlv_due_memo = ""; // 배송예정일 사유
+        //         }
 
-                // 수량제한
-                if (limited_qty_yn) row.limited_qty_yn = limited_qty_yn;
+        //         // 수량제한
+        //         if (limited_qty_yn) row.limited_qty_yn = limited_qty_yn;
 
-                // 구매최소
-                if(limited_min_qty) row.limited_min_qty = limited_min_qty;
+        //         // 구매최소
+        //         if(limited_min_qty) row.limited_min_qty = limited_min_qty;
 
-                // 구매최대
-                if (limited_max_qty) row.limited_max_qty = limited_max_qty;
+        //         // 구매최대
+        //         if (limited_max_qty) row.limited_max_qty = limited_max_qty;
 
-                // 총구매수량제한
-                if (limited_total_qty_yn) row.limited_total_qty_yn = limited_total_qty_yn;
-                if (limited_qty_yn == "N") {
-                    row.limited_min_qty = "";
-                    row.limited_max_qty = "";
-                    row.limited_total_qty_yn = "N";
-                }
+        //         // 총구매수량제한
+        //         if (limited_total_qty_yn) row.limited_total_qty_yn = limited_total_qty_yn;
+        //         if (limited_qty_yn == "N") {
+        //             row.limited_min_qty = "";
+        //             row.limited_max_qty = "";
+        //             row.limited_total_qty_yn = "N";
+        //         }
 
-                // 회원전용상품
-                if (member_buy_yn) row.member_buy_yn = member_buy_yn;
-                if (price_value > 0) {
-                    if (price_pm == "-") {
-                        apply_price = -1 * price_value;
-                    } else {
-                        apply_price = price_value;
-                    }
-                    if (price_unit == "%") {
-                        var price = row.price * ( 1 + apply_price / 100 );
-                    } else {
-                        var price = parseInt(row.price) + apply_price;
-                    }
-                    margin = row.margin_rate;
-                    row = cmdPrice(row, price, margin);
-                }
+        //         // 회원전용상품
+        //         if (member_buy_yn) row.member_buy_yn = member_buy_yn;
+        //         if (price_value > 0) {
+        //             if (price_pm == "-") {
+        //                 apply_price = -1 * price_value;
+        //             } else {
+        //                 apply_price = price_value;
+        //             }
+        //             if (price_unit == "%") {
+        //                 var price = row.price * ( 1 + apply_price / 100 );
+        //             } else {
+        //                 var price = parseInt(row.price) + apply_price;
+        //             }
+        //             margin = row.margin_rate;
+        //             row = cmdPrice(row, price, margin);
+        //         }
 
-                if (margin_rate > 0) {
-                    var price = row.price;
-                    cmdPrice(row, price, margin_rate);
-                }
+        //         if (margin_rate > 0) {
+        //             var price = row.price;
+        //             cmdPrice(row, price, margin_rate);
+        //         }
 
-                var ed_price = row.ed_price;
-                var point_amt = "0";
-                if (point_yn == "Y") {
-                    if (point_unit == "W") {
-                        point_amt = point;
-                    } else {
-                        if (ed_price > 0) {
-                            point_amt = ed_price * point / 100;
-                            //_point_amt = Math.floor(_point_amt/10)*10;
-                        }
-                    }
-                }
-                if (point_cfg) {
+        //         var ed_price = row.ed_price;
+        //         var point_amt = "0";
+        //         if (point_yn == "Y") {
+        //             if (point_unit == "W") {
+        //                 point_amt = point;
+        //             } else {
+        //                 if (ed_price > 0) {
+        //                     point_amt = ed_price * point / 100;
+        //                     //_point_amt = Math.floor(_point_amt/10)*10;
+        //                 }
+        //             }
+        //         }
+        //         if (point_cfg) {
 
-                    // 적립금설정
-                    row.point_cfg = point_cfg;
+        //             // 적립금설정
+        //             row.point_cfg = point_cfg;
 
-                    // 적립금여부(지급함,지급안함)
-                    if (point_yn) row.point_yn = point_yn;
+        //             // 적립금여부(지급함,지급안함)
+        //             if (point_yn) row.point_yn = point_yn;
 
-                    // 적립금단위
-                    if (point_unit) row.point_unit = point_unit;
+        //             // 적립금단위
+        //             if (point_unit) row.point_unit = point_unit;
 
-                    // 적립
-                    if (point) row.point = point;
+        //             // 적립
+        //             if (point) row.point = point;
 
-                    // 적립금액
-                    if (point_amt) row.point_amt = point_amt;
+        //             // 적립금액
+        //             if (point_amt) row.point_amt = point_amt;
 
-                }
+        //         }
 
-                gx.gridOptions.api.applyTransaction({ update : [row] });
+        //         gx.gridOptions.api.applyTransaction({ update : [row] });
 
-            });
+        //     });
 
-        };
+        // };
 
         const cancel = () => { 
 
