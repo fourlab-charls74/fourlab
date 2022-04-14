@@ -17,12 +17,17 @@
         margin-bottom: 0px;
         cursor: pointer;
     }
+
+    .wrap .helpContent {
+        margin-top: 12px;
+    }
     .wrap .FSHelp ul {
         padding-top: 8px;
     }
     .wrap .FSHelp ul, .wrap .FSHelp li {
         list-style: square;
         margin-left: 12px;
+        margin-bottom: 8px;
         font-size: 13px;
     }
     .wrap strong {
@@ -350,13 +355,13 @@
                                 <li style="margin:5 0 0 0;"><span style="color:#ff0000;font-weight:bold;">옵션 가격 입력 시</span> : <span style="color:blue;">100,200,300</span> 또는 <span style="color:blue;">0,0,300</span>과 같이 <span style="color:#ff0000;font-weight:bold;">공백</span> 없이 쉼표(,)로 연결하여 <strong>"옵션가격"</strong> 항목에 입력합니다. <strong>"옵션1"</strong> 항목을 기준으로 적용되므로 <strong>"옵션1"</strong> 항목의 갯수와 <strong>"옵션가격"</strong> 항목의 갯수는 같아야 합니다.</li>
                             </ul>
                         </li>
-                        <!-- <li style="margin:7 0 0 0">
+                        <li style="margin:7 0 0 0">
                             <span style="color:blue;font-weight:bold;">옵션등록 샘플</span>
                             <ul style="margin:5 0 0 0;">
-                                <li>사이즈 또는 컬러 선택시 <strong><a href="/head/skin/x4/prd/single_option.jpg" target="_blank">single_option.jpg</a></strong></li>
-                                <li>컬러/사이즈 선택시 <strong><a href="/head/skin/x4/prd/multi_option.jpg" target="_blank">multi_option.jpg</a></strong></li>
+                                <li>사이즈 또는 컬러 선택시 <strong><a href="/sample/single_option.jpg" target="_blank">single_option.jpg</a></strong></li>
+                                <li>컬러/사이즈 선택시 <strong><a href="/sample/multi_option.jpg" target="_blank">multi_option.jpg</a></strong></li>
                             </ul>
-                        </li> -->
+                        </li>
                         <li style="margin:7 0 0 0">
                             <span style="color:blue;font-weight:bold;">태그 등록</span>
                             <ul style="margin:5 0 0 0;">
