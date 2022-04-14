@@ -722,7 +722,7 @@ SearchCompany.prototype.SetGrid = function(divId){
         {field:"dlv_amt", headerName:"배송료", hide:true},
         {field:"choice" , headerName:"선택",width:50,cellClass:'hd-grid-code',
             cellRenderer: function (params) {
-                return '<a href="#" onclick="return searchCompany.Choice(\'' + params.data.com_id + '\',\'' + params.data.com_nm + '\',\'' + params.data.com_type + '\',\'' + params.data.baesong_kind + '\',\'' + params.data.baesong_info + '\',\'' + params.data.margin_type + '\',\'' + params.data.dlv_amt + '\');">선택</a>';
+                return '<a href="#" onclick="return searchCompany.Choice(\'' + params.data.com_id + '\',\'' + params.data.com_nm + '\',\'' + params.data.com_type + '\',\'' + params.data.baesong_kind + '\',\'' + params.data.baesong_info + '\',\'' + params.data.margin_type + '\',\'' + params.data.dlv_amt + '\',\'' + params.data.com_type_nm + '\');">선택</a>';
             }
         },
     ];
@@ -736,22 +736,18 @@ SearchCompany.prototype.Search = function(){
     this.grid.Request(url, data);
 };
 
-SearchCompany.prototype.Choice = function(code,name, com_type, baesong_kind, baesong_info, margin_type, dlv_amt)
+SearchCompany.prototype.Choice = function(code,name, com_type, baesong_kind, baesong_info, margin_type, dlv_amt, com_type_nm)
 {
-	console.log(code);
-	console.log(name);
-
 	if( this.callback !== null )
 	{
-		//this.callback(code,name);
-		this.callback(code, name, com_type, baesong_kind, baesong_info, margin_type, dlv_amt);
+		this.callback(code, name, com_type, baesong_kind, baesong_info, margin_type, dlv_amt, com_type_nm);
 	}
 	else
 	{
 		if( $('#com_cd.select2-company').length > 0 )
 		{
 			$('#com_cd').val(null);
-			const option	= new Option(name, code, true, true);
+			const option = new Option(name, code, true, true);
 			$('#com_cd').append(option).trigger('change');
 		}
 		else

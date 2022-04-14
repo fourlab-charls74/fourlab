@@ -59,7 +59,7 @@
                             <div class="form-group">
                                 <label for="prd_cnt" style="color: blue; font-weight: 600;">상품수</label>
                                 <div class="flex_box">
-                                    <input type="text" name="prd_cnt" id="prd_cnt" class="form-control form-control-sm" style="width:40px;" onkeydown="OnlyNum(this);"/>
+                                    <input type="text" name="prd_cnt" id="prd_cnt" class="form-control form-control-sm" style="width:40px;" onkeydown="onlyNum(this);"/>
                                     <span>&nbsp;개</span>
                                 </div>
                             </div>
@@ -67,13 +67,24 @@
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label for="item">업체</label>
-                                <div class="flax_box">
-                                    <select id="com_type" name="com_type" class="form-control form-control-sm">
-                                        <option value="">==업체==</option>
-                                        @foreach ($com_types as $com_type)
-                                            <option value="{{ $com_type->code_id }}">{{ $com_type->code_val }}</option>
-                                        @endforeach
-                                    </select>
+                                <div class="form-inline inline_select_box">
+                                    <div class="form-inline-inner input-box w-25 pr-1">
+                                        <select id="com_type" name="com_type" class="form-control form-control-sm w-100" readonly disabled>
+                                            <option value="">전체</option>
+                                            @foreach ($com_types as $com_type)
+                                                <option value="{{ $com_type->code_id }}">{{ $com_type->code_val }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="form-inline-inner input-box w-75">
+                                        <div class="form-inline inline_btn_box">
+                                            <input type='hidden' name='com_cd' id='com_cd' value=''>
+                                            <input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company" style="width:100%;">
+                                            <a href="#" class="btn btn-sm btn-outline-primary" onclick="customSearchCompany()">
+                                                <i class="bx bx-dots-horizontal-rounded fs-16"></i>
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -397,7 +408,7 @@
     <script type="text/javascript" charset="utf-8">
 
         /**
-         * ag-grid set field
+         * ag-grid defines
          */
         const DEFAULT_STYLE = { 'background' : 'none', 'line-height': '40px', 'height': '40px' };
 
@@ -536,15 +547,9 @@
                 ]
             }
         ];
-      
-        const _ = (selector) => {
-            const result = document.querySelectorAll(selector);
-            if (result == undefined) return result;
-            return result.length > 1 ? result : result[0];
-        };
 
         /**
-         * ag-grid rendering
+         * ag-grid render
          */
         const pApp = new App('', {
             gridId: "#div-gd",
@@ -560,129 +565,7 @@
                 getRowNodeId: (data) => data.index // 업데이터 및 제거를 위한 식별 ID를 index로 할당
             };
             gx = new HDGrid(gridDiv, columns, options);
-            const goods_nos = "<?=$goods_nos?>";
-            getEditingRows(goods_nos);
         });
-
-        // 필요한 기능들
-        const OnlyNum = (obj) => {
-            val = obj.value;
-            new_val = '';
-            for (i=0;i<val.length;i++) {
-                char = val.substring(i, i+1);
-                if (char < '0' || char > '9') {
-                    alert('숫자만 입력가능 합니다.');
-                    obj.value = new_val;
-                    return;
-                } else {
-                    new_val = new_val + char;
-                }
-            }
-        };
-
-        const checkOptionValue = (obj) => {
-            if (obj.value.indexOf("^") > -1) {
-                alert("옵션 구분 항목에는 \"^\"문자를 사용할 수 없습니다.");
-                obj.value = obj.value.replace("^","");
-                obj.focus();
-            }
-        };
-
-        //
-
-        const numberSet = (row) => `${row.goods_no}_${row.goods_sub}`; // 문자열 넘버셋을 반환 ( 형식 예시 - 125902_0 )
-        
-        const getEditingRows = (goods_nos, cmd = null) => {
-            
-            if (goods_nos) {
-
-                if (cmd == 'add') {
-                    const prev_rows = gx.getRows();
-                    /**
-                     * 기존 행에서 중복되는 상품번호 체크하여 제거하기 ( 행추가시 적용 )
-                     */
-                    if (Array.isArray(prev_rows) && prev_rows.length > 0) {
-                        const prev_number_sets = prev_rows.map((row) => numberSet(row));
-                        const goods_no_sets = goods_nos.split(',');
-                        goods_nos = goods_no_sets.filter((number_set, index) => {
-                            const duplicated = prev_number_sets.includes(number_set);
-                            return duplicated ? false : true;
-                        }).join(','); // 중복 체크후 배열을 다시 전달받은 문자열 형태(넘버셋)으로 되돌림
-                    }
-                }
-
-                axios({
-                    url: '/head/product/prd01/edit/search',
-                    method: 'post',
-                    data: { goods_nos: goods_nos }
-                }).then((response) => {
-                    const { code, head, body } = response.data;
-                    if (code == 200) {
-                        const count = gx.gridOptions.api.getDisplayedRowCount();
-                        if (cmd == 'add') {
-                            gx.gridOptions.api.applyTransaction({ add : body });
-                        } else {
-                            /**
-                             * 행 추가가 아닌경우 기존의 데이터를 제거하고 초기화
-                             */
-                            const rows = gx.getRows();
-                            rows.map(row => { gx.gridOptions.api.applyTransaction({remove : [row]}) });
-                            gx.gridOptions.api.applyTransaction({ add : body });
-                        }
-                        count ? $('#gd-total').html(head.total + count) : $('#gd-total').html(head.total);
-                    }
-                }).catch((error) => {})
-            }
-        };
-
-        const initMsgInRow = (row) => {
-            row.msg = '';
-            gx.gridOptions.api.applyTransaction({ update : [row] });
-        };
-
-        const saveRows = async () => {
-            if (confirm("변경하신 내용을 저장하시겠습니까?")) {
-                const selectedRows = gx.getSelectedRows();
-                if (selectedRows.length == 0)  {
-                    alert('저장할 항목을 선택하여 주십시오.');
-                    return false;
-                }
-
-                // 새로 저장시 저장후 메세지 초기화
-                selectedRows.map((row) => { initMsgInRow(row) });
-
-                // 검증 및 저장
-                if (validation() == true) selectedRows.map((row) => { saveRow(row);});
-            }
-        };
-
-        const saveRow = async (row) => {
-            try {
-                const response = await axios({ url: '/head/product/prd01/edit/save', method: 'post', data: { row: row } });
-                const { code } = response.data;
-                if (code == 1) {
-                    row.msg = "OK";
-                } else {
-                    row.msg = "FAIL";
-                }
-                gx.gridOptions.api.applyTransaction({ update : [row] });
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        
-        const deleteRows = () => {
-            const rows = gx.getSelectedRows();
-            if (Array.isArray(rows) && !(rows.length > 0)) {
-                alert('선택된 항목이 없습니다.')
-                return false;
-            } else {
-                if (!confirm("선택한 상품을 수정 목록에서 삭제 하시겠습니까?")) return false;
-                rows.map(row => { gx.gridOptions.api.applyTransaction({remove : [row]}); });
-                const count = gx.gridOptions.api.getDisplayedRowCount();
-                $('#gd-total').html(count);
-            };
-        };
 
         /**
          * ag-grid utils
@@ -699,7 +582,77 @@
             gx.gridOptions.api.stopEditing();
         };
 
-        /** logics */
+        /**
+         * utils
+         */
+        const _ = (selector) => {
+            const result = document.querySelectorAll(selector);
+            if (result == undefined) return result;
+            return result.length > 1 ? result : result[0];
+        };
+
+        const onlyNum = (obj) => {
+            val = obj.value;
+            new_val = '';
+            for (i=0; i<val.length; i++) {
+                char = val.substring(i, i+1);
+                if (char < '0' || char > '9') {
+                    alert('숫자만 입력가능 합니다.');
+                    obj.value = new_val;
+                    return;
+                } else {
+                    new_val = new_val + char;
+                }
+            }
+        };
+
+        const isEng = (str) => {
+            for (var i=0; i<str.length; i++) {
+                achar = str.charCodeAt(i);
+                if ( achar > 255 ) {
+                    return false;
+                }
+            }
+            return true;
+        };
+
+        /**
+         * actions
+         */
+        const commander = (cmd) => {
+            switch (cmd) {
+                case "apply":
+                    apply(cmd);
+                break;
+                case "clear":
+                    if (!confirm("취소 시 설정한 데이터와 등록목륵의 모든 상품이 지워집니다..\n취소 하시겠습니까?")) return false;
+                    clear(cmd);
+                break;
+                case "remove":
+                    if (!confirm("선택한 상품을 등록 목록에서 삭제 하시겠습니까?")) return false;
+                    remove(cmd);
+                break;
+                case "save":
+                    save(cmd);
+                break;
+            };
+        };
+        
+        const apply = (cmd) => { // 적용
+
+        };
+
+        const clear = (cmd) => { // 취소
+
+        };
+
+        const remove = (cmd) => { // 삭제
+
+        };
+
+        const save = (cmd) => { //  저장
+
+        };
 
         const popCategory = (type) => {
             if (type == 'display') {
@@ -748,7 +701,6 @@
             }
         };
 
-        // 옵션구분 체크박스 얘네 하다 말았음
         $("#chk_option_kind1").bind("change", () => {
             var checkbox1 = $("#chk_option_kind1")[0];
             if (!checkbox1.checked) {
@@ -829,8 +781,27 @@
             max_qty.value = "";
         };
 
+        const checkOptionValue = (obj) => {
+            if (obj.value.indexOf("^") > -1) {
+                alert("옵션 구분 항목에는 \"^\"문자를 사용할 수 없습니다.");
+                obj.value = obj.value.replace("^","");
+                obj.focus();
+            }
+        };
 
-        let event_row;
+        const customSearchCompany = () => {
+            searchCompany.Open((code, name, com_type) => {
+                if (com_type == '1' || com_type == '2') { // com_type 값: 공급업체 = '1', 입점업체 = '2'
+                    if ( $('#com_cd').length > 0 ) $('#com_cd').val(code);
+                    if ( $('#com_id').length > 0 ) $('#com_id').val(code);
+                    if ( $('#com_nm').length > 0 ) $('#com_nm').val(name);
+                    $('#com_type').val(com_type);
+                } else {
+                    alert('공급업체 또는 입점업체의 상품만 등록하실 수 있습니다.');
+                }
+            });
+        };
+
         const evtAfterEdit = (params) => {
             if (params.oldValue !== params.newValue) {
                 row = params.data;
@@ -981,460 +952,6 @@
             }
 
         };
-
-        // const apply = () => {
-
-        //     var opt_kind_cd		= _("#item").value;
-        //     var optIndex		= _("#item").selectedIndex;
-        //     var opt_kind_nm 	= _("#item").options[optIndex].innerText;
-            
-        //     var brand		    = _("#brand_cd").value;
-        //     var brand_nm	    = _("#brand_cd").innerText;
-
-        //     var rep_cat_nm		= _("#rep_cat_nm").value;
-        //     var rep_cat_cd		= _("#rep_cat_cd").value;
-
-        //     var sale_stat_cl	= _("#goods_stat").value;
-        //     var statIndex		= _("#goods_stat").selectedIndex;
-        //     var sale_stat_cl_nm = _("#goods_stat").options[statIndex].innerText;
-
-        //     var head_desc		= _("#head_desc").value;
-        //     var ad_desc			= _("#ad_desc").value;
-
-        //     var baesong_info	= _("#baesong_info").value;
-        //     var baeIndex		= _("#baesong_info").selectedIndex;
-        //     var baesong_info_nm = _("#baesong_info").options[baeIndex].innerText;
-
-        //     var baesong_kind	= _("#baesong_kind").value;
-        //     var baeKindIndex	= _("#baesong_kind").selectedIndex;
-        //     var baesong_kind_nm = _("#baesong_kind").options[baeKindIndex].innerText;
-
-        //     var dlv_pay_type	= _("#dlv_pay_type").value;
-        //     var dlvIndex		= _("#dlv_pay_type").selectedIndex;
-        //     var dlv_pay_type_nm = _("#dlv_pay_type").options[dlvIndex].innerText;
-
-        //     // 배송비 설정
-        //     let dlv_fee_cfg;
-        //     if (document.f1.dlv_fee_cfg.value == 'S') {
-        //         dlv_fee_cfg = "S";
-        //     } else if (document.f1.dlv_fee_cfg.value == 'G') {
-        //         dlv_fee_cfg = "G";
-        //     }
-
-        //     var dlv_fee_yn		= _("#dlv_fee_yn").value;
-        //     var baesong_price	= _("#baesong_price").value;
-
-        //     let point_cfg;
-        //     // 적립금 설정
-        //     if (document.f1.point_cfg.value == 'S') {
-        //         point_cfg = "S";
-        //     } else if (document.f1.point_cfg.value == 'G') {
-        //         point_cfg = "G";
-        //     }
-
-        //     var point_yn		= _("#point_yn").value;
-        //     var point_unit		= _("#point_unit").value;
-        //     var point			= _("#point").value;
-        //     var point_shop_rate = _("#point_shop_ratio").value;
-        //     if ( point_cfg == "S" ) {
-        //         point = point_shop_rate;
-        //         point_unit = "P";
-        //     } else {
-        //         if (point_unit == "W") {
-        //             //point_amt = point;
-        //         }
-        //     }
-
-        //     // 배송예정
-        //     var dlv_due_type			= _("#dlv_due_type").value;
-        //     var dlv_due_day				= _("#dlv_due_day").value;
-        //     var dlv_due_period			= _("#dlv_due_period").value;
-        //     var dlv_due_memo			= _("#dlv_due_memo").value;
-
-        //     let dlv_due_yn;
-        //     if (dlv_due_type == "R") {
-        //         dlv_due_period = "";
-        //     } else if (dlv_due_type == "G" || dlv_due_type == "D") {
-        //         dlv_due_day = "";
-        //     }
-        //     if (document.f1.dlv_due_yn.checked) {
-        //         dlv_due_yn = "N";
-        //     }
-
-        //     var md_id			 = _("#md_nm").value;
-        //     var mdIndex			 = _("#md_nm").selectedIndex;
-        //     var md_nm			 = _("#md_nm").options[mdIndex].innerText;
-
-        //     var goods_cont		 = _("#goods_cont").value;
-        //     var make			 = _("#make").value;
-        //     var org_nm			 = _("#org_nm").value;
-
-        //     var spec_desc		 = _("#spec_desc").value;
-        //     var baesong_desc	 = _("#baesong_desc").value;
-        //     var opinion			 = _("#opinion").value;
-            
-        //     var restock_yn		 = _("#restock_yn").value;
-        //     var price_value		 = _("#price").value;
-
-        //     var price_unit		 = _("#price_unit").value;
-        //     var price_pm		 = _("#price_pm").value;
-        //     var tax_yn			 = _("#tax_yn").value;
-        //     var goods_location	 = _("#goods_location").value;
-        //     var tags			 = _("#tags").value;
-        //     var new_product_type = document.f1.new_product_type.value;
-        //     var new_product_day	 = _("#new_product_day").value;
-        //     var colors			 = _("#colors").value;
-
-        //     // 판매가 및 마진율
-        //     try {
-        //         price_value = parseInt(price_value);
-        //     } catch(e){
-        //         price_value = 0;
-        //     }
-
-        //     var margin_rate		= _("#margin_rate").value;
-        //     if (margin_rate != "") {
-        //         try {
-        //             margin_rate = parseInt(margin_rate);
-        //         } catch(e){
-        //             margin_rate = "";
-        //         }
-        //     }
-
-        //     // 세일 설정
-        //     var sale_yn = "";
-        //     if (document.f1.sale_yn[0].checked == "Y") {
-        //         sale_yn = "Y";
-        //     } else if (document.f1.sale_yn[1].checked == "N") {
-        //         sale_yn = "N";
-        //     }
-        //     var sale_value			= _("#sale").value;
-        //     var sale_unit			= _("#sale_unit").value;
-        //     var sale_margin			= _("#sale_margin").value;
-        //     var sale_dt_yn			= (_("#sale_dt_yn").checked) ? "Y" : "N";
-        //     var sale_s_dt			= _("#sale_s_dt").value;
-        //     var sale_e_dt			= _("#sale_e_dt").value;
-
-        //     var fix_wonga = _("#fix_wonga").checked ? "Y" : "N";
-
-        //     // 수량제한
-        //     let limited_qty_yn;
-        //     if (document.f1.limited_qty_yn[0].checked) {
-        //         limited_qty_yn = "Y";
-        //     } else if (document.f1.limited_qty_yn[1].checked) {
-        //         limited_qty_yn = "N";
-        //     }
-        //     var limited_min_qty			= _("#limited_min_qty").value;
-        //     var limited_max_qty			= _("#limited_max_qty").value;
-
-        //     // 총구매수량제한
-        //     let limited_total_qty_yn;
-        //     if (document.f1.limited_total_qty_yn[0].checked) {
-        //         limited_total_qty_yn = "Y";
-        //     } else if (document.f1.limited_total_qty_yn[1].checked) {
-        //         limited_total_qty_yn = "N";
-        //     }
-
-        //     // 회원구매제한
-        //     let member_buy_yn;
-        //     if(document.f1.member_buy_yn[0].checked){
-        //         member_buy_yn = "Y";
-        //     } else if(document.f1.member_buy_yn[1].checked){
-        //         member_buy_yn = "N";
-        //     }
-
-        //     const rows = gx.getRows();
-
-        //     if (rows.length == 0){
-        //         alert("상품을 추가해 주세요.");
-        //         return false;
-        //     }
-            
-        //     rows.map(row => {
-
-        //         // 품목
-        //         if (opt_kind_cd) row.opt_kind_cd = opt_kind_cd;
-        //         if (opt_kind_cd) row.opt_kind_nm = opt_kind_nm;
-
-        //         // 브랜드
-        //         if (brand) row.brand = brand;
-        //         if (brand) row.brand_nm = brand_nm;
-
-        //         // 대표카테고리
-        //         if (rep_cat_cd) row.rep_cat_nm = rep_cat_nm;
-        //         if (rep_cat_cd) row.rep_cat_cd = rep_cat_cd;
-
-        //         // 상품상태
-        //         if (sale_stat_cl) row.sale_stat_nm = sale_stat_cl_nm;
-        //         if (sale_stat_cl) row.sale_stat_cl = sale_stat_cl;
-                
-        //         // 상단홍보글
-        //         if (head_desc) row.head_desc = head_desc;
-                
-        //         // 하단홍보글
-        //         if (ad_desc) row.ad_desc = ad_desc;
-                
-        //         // 배송방식
-        //         if (baesong_info) row.baesong_info_nm = baesong_info_nm;
-        //         if (baesong_info) row.baesong_info = baesong_info;
-
-        //         // 배송업체
-        //         if (baesong_kind) row.baesong_kind_nm = baesong_kind_nm;	
-        //         if (baesong_kind) row.baesong_kind = baesong_kind;
-
-        //         // 배송비 지불시점
-        //         if (dlv_pay_type) row.dlv_pay_type_nm = dlv_pay_type_nm;
-        //         if (dlv_pay_type) row.dlv_pay_type = dlv_pay_type;
-
-        //         // 배송비설정
-        //         if (dlv_fee_cfg) row.dlv_fee_cfg = dlv_fee_cfg;
-
-        //         // 배송비
-        //         if (baesong_price) row.baesong_price = baesong_price;
-
-        //         // 배송비여부(유료,무료)
-        //         if (dlv_fee_yn) row.dlv_fee_yn = dlv_fee_yn;
-
-        //         // MD
-        //         if (md_id) row.md_nm = md_nm;
-        //         if (md_id) row.md_id = md_id;
-
-        //         // 제조사
-        //         if (make) row.make = make;
-
-        //         // 원산지
-        //         if (org_nm) row.org_nm = org_nm;
-
-        //         // 상품상세
-        //         if (goods_cont) row.goods_cont = goods_cont;
-
-        //         // 제품사양
-        //         if (spec_desc) row.spec_desc = spec_desc;
-                
-        //         // 예약/배송
-        //         if (baesong_desc) row.baesong_desc = baesong_desc;
-
-        //         // MD 상품평
-        //         if (opinion) row.opinion = opinion;
-
-        //         // 재입고알림
-        //         if (restock_yn != "") row.restock_yn = restock_yn;
-
-        //         // 과세구분
-        //         if (tax_yn != "") row.tax_yn = tax_yn;
-
-        //         // 상품위치
-        //         if (goods_location != "") row.goods_location = goods_location;
-
-        //         // 태그
-        //         if (tags != "") row.tags = tags;
-
-        //         // 신상품 적용구분 & 신상품 적용일
-        //         if (new_product_type == "M" && new_product_day != "") {
-        //             row.new_product_type = new_product_type;	// 적용구분
-        //             row.new_product_day = new_product_day;		// 적용일
-        //         }
-
-        //         // 회원전용상품 - 가격적용 init
-        //         let apply_price;
-
-        //         // 세일 설정
-        //         if (sale_yn == "Y") {
-
-        //             if (sale_value > 0) {
-
-        //                 if (sale_unit == "%") {
-        //                     var sale_rate = sale_value;
-        //                     var sale_price = Math.round((1-sale_rate/100) * row.normal_price);
-        //                 } else {
-        //                     var sale_price = parseInt(row.normal_price - sale_value);
-        //                     var sale_rate = Math.round((1-sale_price/(row.normal_price*100)));
-        //                 }
-
-        //                 // 세일율
-        //                 if (sale_rate) row.ed_sale_rate = sale_rate;
-
-        //                 // 세일가
-        //                 if(sale_price) row.ed_sale_price = sale_price;
-
-        //                 // 세일여부
-        //                 if (sale_yn) row.sale_yn = sale_yn;
-
-        //                 // 세일기간사용여부
-        //                 if (sale_dt_yn) row.sale_dt_yn = sale_dt_yn;
-
-        //                 // 세일시작기간
-        //                 if (sale_s_dt) {
-        //                     var sale_s_dt_value = sale_s_dt.substr(0,4) + "-" + sale_s_dt.substr(4,2) + "-" + sale_s_dt.substr(6,2) + " " + sale_s_tm+":00:00";
-        //                     row.sale_s_dt = sale_s_dt_value;
-        //                 }
-        //                 if (sale_e_dt) {
-        //                     var sale_e_dt_value = sale_e_dt.substr(0,4) + "-" + sale_e_dt.substr(4,2) + "-" + sale_e_dt.substr(6,2) + " " + sale_e_tm+":00:00";
-        //                     row.sale_e_dt = sale_e_dt_value;
-        //                 }
-
-        //                 if (sale_margin > 0) {
-        //                     var margin = sale_margin;
-        //                 } else {
-        //                     var margin = row.margin_rate;
-        //                 }
-
-        //                 // 타임세일
-        //                 if (sale_dt_yn == "Y") {
-        //                     calPrice(row, row.com_type, row.price, margin, fix_wonga, sale_yn);	// 기존 가격으로 원복
-        //                 } else {	
-        //                     // 바로 세일로 판매가 수정
-        //                     calPrice(row, row.com_type, sale_price, margin, fix_wonga, sale_yn); // 판매가를 세일가로 변경
-        //                 }
-        //             }
-
-        //         } else {
-
-        //             // 세일 설정 초기화
-        //             if (sale_yn == "N" && row.sale_yn == "Y") {
-
-        //                 // 세일율
-        //                 row.ed_sale_rate = 0;
-
-        //                 // 세일가
-        //                 row.ed_sale_price = 0
-
-        //                 // 세일여부
-        //                 if (sale_yn) row.sale_yn = sale_yn;
-
-        //                 // 세일기간사용여부
-        //                 if (sale_dt_yn) row.sale_dt_yn = sale_dt_yn;
-
-        //                 //세일시작기간
-        //                 row.sale_s_dt = "0000-00-00 00:00:00";
-        //                 row.sale_e_dt = "0000-00-00 00:00:00";
-
-        //                 var normal_margin = Math.round( (1 - row.normal_wonga / row.normal_price) * 10000, 10) /100;
-                        
-        //                 // 기존 가격으로 원복
-        //                 row = calPrice(row, row.com_type, row.normal_price, normal_margin, row.fix_wonga, sale_yn);
-        //             }
-
-                    
-        //             if (price_value > 0) {
-        //                 if (price_pm == "-") {
-        //                     apply_price = -1 * price_value;
-        //                 } else {
-        //                     apply_price = price_value;
-        //                 }
-        //                 if (price_unit == "%") {
-        //                     var price = row.price * ( 1 + apply_price / 100 );
-        //                 } else {
-        //                     var price = parseInt(row.price) + apply_price;
-        //                 }
-        //                 var margin = row.margin_rate;
-        //                 row = cmdPrice(row, price, margin);
-        //             }
-
-        //             if (margin_rate > 0) {
-        //                 var price = row.price;
-        //                 row = cmdPrice(row, price, margin_rate);
-        //             }
-        //         }
-
-        //         // 색상
-        //         if (colors != "") row.color = colors;
-
-        //         // 배송예정구분
-        //         if (dlv_due_type) row.dlv_due_type = dlv_due_type;
-
-        //         // 배송기간
-        //         if (dlv_due_period) row.dlv_due_period = dlv_due_period;
-
-        //         // 배송예정일
-        //         if (dlv_due_day) row.dlv_due_day = dlv_due_day;
-
-        //         // 배송예정일 사유
-        //         if (dlv_due_memo) row.dlv_due_memo = dlv_due_memo;
-
-        //         // 배송예정구분 사용안함.
-        //         if (dlv_due_yn == "N") {
-        //             row.dlv_due_type = "";	// 배송예정구분
-        //             row.dlv_due_period = ""; // 배송기간
-        //             row.dlv_due_day = ""; // 배송예정일
-        //             row.dlv_due_memo = ""; // 배송예정일 사유
-        //         }
-
-        //         // 수량제한
-        //         if (limited_qty_yn) row.limited_qty_yn = limited_qty_yn;
-
-        //         // 구매최소
-        //         if(limited_min_qty) row.limited_min_qty = limited_min_qty;
-
-        //         // 구매최대
-        //         if (limited_max_qty) row.limited_max_qty = limited_max_qty;
-
-        //         // 총구매수량제한
-        //         if (limited_total_qty_yn) row.limited_total_qty_yn = limited_total_qty_yn;
-        //         if (limited_qty_yn == "N") {
-        //             row.limited_min_qty = "";
-        //             row.limited_max_qty = "";
-        //             row.limited_total_qty_yn = "N";
-        //         }
-
-        //         // 회원전용상품
-        //         if (member_buy_yn) row.member_buy_yn = member_buy_yn;
-        //         if (price_value > 0) {
-        //             if (price_pm == "-") {
-        //                 apply_price = -1 * price_value;
-        //             } else {
-        //                 apply_price = price_value;
-        //             }
-        //             if (price_unit == "%") {
-        //                 var price = row.price * ( 1 + apply_price / 100 );
-        //             } else {
-        //                 var price = parseInt(row.price) + apply_price;
-        //             }
-        //             margin = row.margin_rate;
-        //             row = cmdPrice(row, price, margin);
-        //         }
-
-        //         if (margin_rate > 0) {
-        //             var price = row.price;
-        //             cmdPrice(row, price, margin_rate);
-        //         }
-
-        //         var ed_price = row.ed_price;
-        //         var point_amt = "0";
-        //         if (point_yn == "Y") {
-        //             if (point_unit == "W") {
-        //                 point_amt = point;
-        //             } else {
-        //                 if (ed_price > 0) {
-        //                     point_amt = ed_price * point / 100;
-        //                     //_point_amt = Math.floor(_point_amt/10)*10;
-        //                 }
-        //             }
-        //         }
-        //         if (point_cfg) {
-
-        //             // 적립금설정
-        //             row.point_cfg = point_cfg;
-
-        //             // 적립금여부(지급함,지급안함)
-        //             if (point_yn) row.point_yn = point_yn;
-
-        //             // 적립금단위
-        //             if (point_unit) row.point_unit = point_unit;
-
-        //             // 적립
-        //             if (point) row.point = point;
-
-        //             // 적립금액
-        //             if (point_amt) row.point_amt = point_amt;
-
-        //         }
-
-        //         gx.gridOptions.api.applyTransaction({ update : [row] });
-
-        //     });
-
-        // };
 
         const cancel = () => { 
 
