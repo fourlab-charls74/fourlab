@@ -606,7 +606,7 @@
         /**
          * ag-grid set field
          */
-        const DEFAULT_STYLE = { 'background' : 'none', 'line-height': '40px', 'height': '40px' };   
+        const DEFAULT_STYLE = { 'background' : 'none', 'line-height': '40px', 'height': '40px' };
 
         const CELL_STYLE = {
             EDIT: { 'background': '#ffff99' },
@@ -1135,11 +1135,11 @@
                             row = cmdPrice(row, ed_price, row.ed_margin_rate);
                             if (row.point_yn == "Y") {
                                 if ( row.point_unit == "P" ) {
-                                    row.point_amt = value * point / 100;
+                                    row.point_amt = value * row.point / 100;
                                 }
                             }
                             if (row.sale_yn == "Y") {
-                                row.sale_rate = Math.round((1-val / ed_normal_price) * 100);
+                                row.sale_rate = Math.round((1-value / ed_normal_price) * 100);
                                 row.sale_price = parseInt(value);
                             }
                         }
@@ -1152,7 +1152,7 @@
                             alert("마진율을 입력해 주세요.");
                             startEditingCell(row.index, column_name);
                         } else {
-                            ed_margin_rate = parseInt(value);
+                            const ed_margin_rate = parseInt(value);
                             if (ed_margin_rate > 100) {
                                 alert("마진율은 100을 넘을 수 없습니다.");
                                 startEditingCell(row.index, column_name);

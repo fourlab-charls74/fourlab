@@ -38,6 +38,11 @@
         background: #ccc;
     }
 
+    .required::after {
+        position: relative;
+        top: 3px;
+    }
+
 </style>
 <div class="py-3 px-sm-3 wrap">
     <div class="page_tit">
@@ -57,7 +62,7 @@
                     <div class="row">
                         <div class="col-lg-12 mb-2">
                             <div class="form-group">
-                                <label for="prd_cnt" style="color: blue; font-weight: 600;">상품수</label>
+                                <label for="prd_cnt" class="required" style="color: blue; font-weight: 600;">상품수</label>
                                 <div class="flex_box">
                                     <input type="text" name="prd_cnt" id="prd_cnt" class="form-control form-control-sm mr-2" style="width:40px;" onkeydown="onlyNum(this);"/>
                                     <span>개</span>
@@ -66,7 +71,7 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="item">업체</label>
+                                <label for="item" class="required">업체</label>
                                 <div class="form-inline inline_select_box">
                                     <div class="form-inline-inner input-box w-25 pr-1">
                                         <select id="com_type" name="com_type" class="form-control form-control-sm w-100" readonly disabled>
@@ -90,7 +95,7 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="item">품목</label>
+                                <label for="item" class="required">품목</label>
                                 <div class="flax_box">
                                     <select id="item" name="item" class="form-control form-control-sm">
                                         <option value="">==품목==</option>
@@ -103,7 +108,7 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="brand_cd">브랜드</label>
+                                <label for="brand_cd" class="required">브랜드</label>
                                 <div class="form-inline inline_btn_box">
                                     <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
                                     <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
@@ -114,7 +119,7 @@
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="rep_cat_cd">대표카테고리</label>
+                                <label for="rep_cat_cd" class="required">대표카테고리</label>
                                 <div class="form-inline inline_btn_box">
                                     <input type="hidden" id="rep_cat_cd" name="rep_cat_cd" value=""/>
                                     <input class="w-100 form-control form-control-sm" id="rep_cat_nm" name="rep_cat_nm" value="" placeholder="변경할 카테고리 선택" readonly/>
@@ -134,7 +139,7 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="dlv_pay_type">배송비 지불</label>
+                                <label for="dlv_pay_type" class="required">배송비 지불</label>
                                 <div class="flex_box form-radio-box">
                                     <div class="custom-control custom-radio mr-2">
                                         <input type="radio" name="dlv_pay_type" value="P" id="dlv_pay_type_1" class="custom-control-input" checked>
@@ -151,7 +156,7 @@
                     <div class="row pb-2">
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="">배송비</label>
+                                <label for="" class="required">배송비</label>
                                 <div class="flex_box">
                                     <div class="form-radio-box">
                                         <div class="custom-control custom-radio">
@@ -178,7 +183,7 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="point">적립금</label>
+                                <label for="point" class="required">적립금</label>
                                 <div class="flex_box">
                                     <div class="form-radio-box">
                                         <div class="custom-control custom-radio">
@@ -213,7 +218,7 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="org_nm">원산지</label>
+                                <label for="org_nm" class="required">원산지</label>
                                 <div class="flex_box">
                                     <input type='text' class="form-control form-control-sm" id="org_nm" name='org_nm' value=''>
                                 </div>
@@ -231,7 +236,7 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="dlv_pay_type">옵션사용</label>
+                                <label for="dlv_pay_type" class="required">옵션사용</label>
                                 <div class="form-inline form-radio-box flex_box txt_box">
                                     <div class="custom-control custom-radio">
                                         <input type="radio" name="is_option_use" value="Y" id="is_option_use1" class="custom-control-input" onchange="changeOptionUse(this)" checked>
@@ -255,7 +260,7 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="check_option_kind">옵션구분</label>
+                                <label for="check_option_kind" class="required">옵션구분</label>
                                 <div class="form-inline inline_input_box flex_box">
                                     <div class="custom-control custom-checkbox">
                                         <input type="hidden" id="option_kind" name="option_kind" value="" />
@@ -276,7 +281,7 @@
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="tax_yn">과세구분</label>
+                                <label for="tax_yn" class="required">과세구분</label>
                                 <div class="flex_box">
                                     <select id="tax_yn" name="tax_yn" class="form-control form-control-sm">
                                         @foreach ($tax_yn as $key => $val)
@@ -288,7 +293,7 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="is_unlimited">재고 수량 관리</label>
+                                <label for="is_unlimited" class="required">재고 수량 관리</label>
                                 <div class="flex_box form-inline form-radio-box">
                                     <div class="custom-control custom-radio mr-2">
                                         <input type="radio" name="is_unlimited" value="N" id="is_unlimited1" class="custom-control-input" checked>
@@ -332,10 +337,6 @@
                         <a href="#" class="btn btn-sm btn-secondary" onclick="commander('clear');">취소</a>
                     </div>
                 </div>
-            </div>
-            <div class="resul_btn_wrap mb-2">
-                <a href="#" onclick="addGoods()" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx mr-1"></i>상품추가</a>
-                <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
             </div>
         </div>
         <div class="card">
@@ -440,7 +441,7 @@
                     return "";
                 }
             },
-            {field: "com_id", headerName: "업체", pinned: 'left'},
+            {field: "com_id", headerName: "업체", width:100, pinned: 'left'},
             {field: "opt_kind_cd", headerName: "품목", width: 100, pinned: 'left'},
             {field: "brand", headerName: "브랜드", pinned: 'left'},
             {field: "rep_cat_cd", headerName: "대표카테고리", width: 100, pinned: 'left'},
@@ -467,8 +468,6 @@
             },
             {field: "head_desc", headerName: "상단홍보글", editable: true, cellStyle: CELL_STYLE.EDIT},
             {field: "ad_desc", headerName: "하단홍보글", editable: true, cellStyle: CELL_STYLE.EDIT},
-            {field: "baesong_info", headerName: "배송방법"},
-            {field: "baesong_kind", headerName: "배송처리"},
             {field: "dlv_pay_type", headerName: "배송비지불"},
             {field: "dlv_fee_cfg", headerName: "배송비설정"},
             {field: "bae_yn", headerName: "배송비여부"},
@@ -489,10 +488,12 @@
             {field: "spec_desc", headerName: "제품사양", editable: true, cellStyle: CELL_STYLE.EDIT},
             {field: "baesong_desc", headerName: "예약/배송", editable: true, cellStyle: CELL_STYLE.EDIT},
             {field: "opinion", headerName: "MD상품평", editable: true, cellStyle: CELL_STYLE.EDIT},
+            {field: "is_unlimited", headerName: "무한재고여부"},
             {field: "restock_yn", headerName: "재입고알림"},
             {field: "tax_yn", headerName: "과세구분"},
             {field: "goods_location", headerName: "상품위치", editable: true, cellStyle: CELL_STYLE.EDIT},
             {field: "tags", headerName: "상품태그", editable: true, cellStyle: CELL_STYLE.EDIT},
+            {field: "com_type", hide: true},
             {field: "", headerName: "", width: "auto"}
         ];
 
@@ -603,6 +604,8 @@
         const SHOP_POINT_RATIO = "{{$order_point_ratio}}";
         const apply = (cmd) => { // 적용
 
+            // if (!applyValidation()) return false;
+
             let row = {};
             prd_cnt			    = _("#prd_cnt").value; // 상품수
 
@@ -681,16 +684,7 @@
             row.tax_yn		= _("#tax_yn").value;		// 과세구분
             row.restock_yn	= (_("#restock_yn").checked == true) ? "Y" : "N";	// 재입고 설정
 
-            row.goods_sh = 0;
-            row.price = 0;
-            row.margin_rate = 0;
-            row.wonga = 0;
-
-            if (!prd_cnt || prd_cnt < "0" || prd_cnt == "0") {
-                alert("상품수를 입력해 주세요.");
-                return false;
-            }
-
+            
             const data = gx.getRows();
             const len = data.length;
             if (len > 0 && !confirm("적용 시 입력한 데이터가 초기화되고 덮어쓰여 지워집니다..\n적용 하시겠습니까?")) return false;
@@ -703,6 +697,8 @@
                 
                 if (len < prd_cnt) {
                     if (i <= len) {
+                        const before = getRowNode(index);
+                        row = {...before, ...row};
                         updateRow(row);
                     } else {
                         addRow(row);
@@ -720,6 +716,8 @@
                     const count = index + 1;
                     row.idx = index;
                     if (count <= prd_cnt) {
+                        const before = getRowNode(index);
+                        row = {...before, ...row};
                         updateRow(row);
                     } else {
                         deleteRow(row);
@@ -727,16 +725,32 @@
                 });
             };
 
+            $("#gd-total").text(prd_cnt);
+
         };
 
         const clear = () => { // 취소 - 항목 전체 삭제 및 조건 초기화
             const rows = gx.getRows();
             rows.map((row) => {
-                deleteRow(row)
+                deleteRow(row);
             });
+            
+            // 브랜드 비우기
+            $('#brand_cd').val(null).trigger('change', () => document.f1.brand_cd.value = ""); // 브랜드 select2 박스 초기화
+
+            // 배송비, 적립금, 옵션구분 제거
+            _('#dlv_fee_cfg_s').click();
+            _('#point_cfg_s').click();
+            _('#is_option_use1').click();
+
+            // 나머지 input 초기화
+            document.f1.reset();
+            
+
+            $("#gd-total").text("0");
         };
 
-        const deleteRows = async () => { // 미구현
+        const deleteRows = async () => { // 미구현 - 없어도 기능은 동작
 
         };
 
@@ -892,128 +906,6 @@
             });
         };
 
-        const evtAfterEdit = (params) => {
-            if (params.oldValue !== params.newValue) {
-                row = params.data;
-                const column_name = params.column.colId;
-                const value = params.newValue;
-                switch (column_name) {
-                    // case "ed_goods_sh": // 시중가
-                    //     if (isNaN(value) == true) {
-                    //         alert("숫자만 입력가능합니다.");
-                    //         startEditingCell(row.index, column_name);
-                    //     } else if (value == "") {
-                    //         alert("시중가를 입력해주세요.");
-                    //         startEditingCell(row.index, column_name);
-                    //     }
-                    //     break;
-                    case "ed_price": // 판매가
-                        if (isNaN(value) == true) {
-                            alert("숫자만 입력가능합니다.");
-                            startEditingCell(row.index, column_name);
-                        } else if (value == "") {
-                            alert("판매가를 입력해주세요.");
-                            startEditingCell(row.index, column_name);
-                        } else if (row.fix_wonga && row.margin_type == "FEE") {
-                            alert("수수료 적용 방식이 '수수료 지정'으로 설정된 업체의 상품은,\n'원가고정'이 체크된 상태에서 판매가의 변경이 불가능합니다.");
-                            startEditingCell(row.index, column_name);
-                        } else {
-                            const ed_price = value;
-                            row = cmdPrice(row, ed_price, row.ed_margin_rate);
-                            if (row.point_yn == "Y") {
-                                if ( row.point_unit == "P" ) {
-                                    row.point_amt = value * point / 100;
-                                }
-                            }
-                            if (row.sale_yn == "Y") {
-                                row.sale_rate = Math.round((1-val / ed_normal_price) * 100);
-                                row.sale_price = parseInt(value);
-                            }
-                        }
-                        break;
-                    case "ed_margin_rate": // 마진율
-                        if (isNaN(value) == true) {
-                            alert("숫자만 입력가능합니다.");
-                            startEditingCell(row.index, column_name);
-                        } else if (value == "") {
-                            alert("마진율을 입력해 주세요.");
-                            startEditingCell(row.index, column_name);
-                        } else {
-                            ed_margin_rate = parseInt(value);
-                            if (ed_margin_rate > 100) {
-                                alert("마진율은 100을 넘을 수 없습니다.");
-                                startEditingCell(row.index, column_name);
-                            } else {
-                                row = cmdPrice(row, row.ed_price, ed_margin_rate);
-                            }
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                gx.gridOptions.api.applyTransaction({ update : [row] });
-            }
-        };
-
-        const cmdPrice = (row, price, margin) => {
-            const com_type = row.com_type;
-
-            let fix_wonga = '';
-            if (_("#fix_wonga") && _("#fix_wonga").checked){
-                fix_wonga = 'Y';
-            }
-
-            let sale_yn = "";
-            if(document.f1.sale_yn[0].checked){
-                sale_yn = "Y";
-            } else if(document.f1.sale_yn[1].checked){
-                sale_yn = "N";
-            }
-            
-            return calPrice(row, com_type, parseInt(price), margin, fix_wonga, sale_yn);
-        }
-
-        const calPrice = (row, com_type, price, margin, fix_wonga, sale_yn) => { // 행, 판매가, 마진율
-
-            let wonga = row.wonga;
-            let sale_price, sale_wonga;
-
-            if (com_type == 1) {	// 공급
-                if ( row.price != price ) {
-                    margin = ((price-wonga)/price)*100;
-                } else if ( row.margin_rate != margin ) {
-                    price = parseInt(Math.round(wonga / (1-margin/100)), 10);
-                }
-            } else {
-                const margin_type = row.margin_type;
-                if (fix_wonga == 'Y') {
-                    if ( margin && wonga ) {
-                        price = parseInt(Math.round(wonga / (1 - (margin / 100))),10);
-                    }
-                } else {
-                    if ( margin_type == "FEE" ) {
-                        if ( price && margin ) {
-                            wonga = parseInt(Math.round(price * (1 - margin / 100)), 10);
-                        }
-                    } else {
-                        if ( price && wonga ) {
-                            margin = parseFloat(((price - wonga) / price) * 100).toFixed(2);
-                        }
-                    }
-                    sale_price = row.ed_sale_price;
-                    sale_wonga = Math.round(sale_price * (1 - (margin/100)));
-                }
-            }
-
-            if (sale_yn == "") {
-                row = {...row, ed_normal_price: price, ed_normal_wonga: wonga};
-            }
-
-            row = {...row, ed_price: price, ed_margin_rate: margin, ed_wonga: wonga, ed_sale_wonga: sale_wonga }
-
-            return row;
-        };
-
         /*
             Function: isNumVal
                 Number Format Check
@@ -1035,6 +927,85 @@
             return true;
         }
 
+        const applyValidation = () => {
+
+            const prd_cnt = document.f1.prd_cnt.value;
+            if (!prd_cnt || prd_cnt < "0" || prd_cnt == "0") {
+                alert("상품수를 입력해 주세요.");
+                document.f1.prd_cnt.focus();
+                return false;
+            }
+
+            if (document.f1.com_cd.value == "") {
+                alert("업체를 입력해 주세요.");
+                customSearchCompany();
+                return false;
+            }
+
+            if (document.f1.item.value == "") {
+                alert("품목을 입력해 주세요.");
+                document.f1.item.focus();
+                return false;
+            }
+
+            if (document.f1.brand_cd.value == "") {
+                alert("브랜드를 입력해 주세요.");
+                document.querySelector('.sch-brand').click();
+                return false;
+            }
+
+            if (document.f1.rep_cat_cd.value == "") {
+                alert("대표카테고리를 입력해 주세요.");
+                popCategory('display');
+                return false;
+            }
+
+            if (document.f1.org_nm.value == "") {
+                alert("원산지를 입력해 주세요.");
+                document.f1.org_nm.focus();
+                return false;
+            }
+
+            if (document.f1.is_unlimited.value == "") {
+                alert("재고 수량 관리를 선택해 주세요.");
+                return false;
+            }
+
+            if (document.f1.is_option_use.value == "") {
+                alert("옵션사용을 선택해 주세요.");
+                return false;
+            }
+
+            if (document.f1.dlv_pay_type.value == "") {
+                alert("배송비지불을 입력해 주세요.");
+                return false;
+            }
+            if (document.f1.dlv_fee_cfg.value == "") {
+                alert("배송비설정을 선택해 주세요.");
+                return false;
+            }
+            if (document.f1.dlv_fee_yn.value == "") {
+                alert("배송비여부를 입력해 주세요.");
+                return false;
+            }
+            if (document.f1.point_cfg.value == "") {
+                alert("적립금설정을 선택해 주세요.");
+                return false;
+            }
+            if (document.f1.point_yn.value == "") {
+                alert("적립금여부를 입력해 주세요.");
+                return false;
+            }
+            
+            if (document.f1.tax_yn.value == "") {
+                alert("과세구분을 입력해 주세요.");
+                return false;
+            }
+
+            return true;
+
+        };
+
         const validation = () => {
             
             // 모든 행의 판매가, 마진율을 검사
@@ -1047,26 +1018,6 @@
 
                 row.goods_cont = row.goods_cont?.replace(/^\"+|\"+$/g,"");
                 row.goods_cont = row.goods_cont?.replace(/\"\"/g,"'");
-
-                if (row.com_id == "") {
-                    alert("업체를 입력해 주세요.");
-                    return false;
-                }
-
-                if (row.opt_kind_cd == "") {
-                    alert("품목을 입력해 주세요.");
-                    return false;
-                }
-
-                if (row.brand == "") {
-                    alert("브랜드를 입력해 주세요.");
-                    return false;
-                }
-
-                if (row.rep_cat_cd == "") {
-                    alert("대표카테고리를 입력해 주세요.");
-                    return false;
-                }
 
                 if (row.style_no == "") {
                     stopEditing();
@@ -1103,14 +1054,7 @@
                     startEditingCell(row.idx, 'wonga');
                     return false;
                 }
-                if (row.is_unlimited == "") {
-                    alert("재고 수량 관리를 선택해 주세요.");
-                    return false;
-                }
-                if (row.is_option_use == "") {
-                    alert("옵션사용을 선택해 주세요.");
-                    return false;
-                }
+
                 if (row.option_kind == "") {
                     stopEditing();
                     alert("옵션구분을 입력해 주세요.");
@@ -1167,42 +1111,6 @@
                         return false;
                     }
                 }
-                if (row.baesong_info == "") {
-                    alert("배송방법을 입력해 주세요.");
-                    return false;
-                }
-                if (row.baesong_kind == "") {
-                    alert("배송처리를 입력해 주세요.");
-                    return false;
-                }
-                if (row.dlv_pay_type == "") {
-                    alert("배송비지불을 입력해 주세요.");
-                    return false;
-                }
-                if (row.dlv_fee_cfg == "") {
-                    alert("배송비설정을 선택해 주세요.");
-                    return false;
-                }
-                if (row.dlv_fee_yn == "") {
-                    alert("배송비여부를 입력해 주세요.");
-                    return false;
-                }
-                if (row.point_cfg == "") {
-                    alert("적립금설정을 선택해 주세요.");
-                    return false;
-                }
-                if (row.point_yn == "") {
-                    alert("적립금여부를 입력해 주세요.");
-                    return false;
-                }
-                if (row.org_nm == "") {
-                    alert("원산지를 입력해 주세요.");
-                    return false;
-                }
-                if (row.tax_yn == "") {
-                    alert("과세구분을 입력해 주세요.");
-                    return false;
-                }
                 
             }
 
@@ -1214,6 +1122,98 @@
             }
 
         };
+
+        const evtAfterEdit = (params) => {
+            if (params.oldValue !== params.newValue) {
+                row = params.data;
+                const column_name = params.column.colId;
+                const value = params.newValue;
+                switch (column_name) {
+                    case "goods_sh": // 시중가
+                        if (isNaN(value) == true) {
+                            alert("숫자만 입력가능합니다.");
+                            startEditingCell(row.idx, column_name);
+                        } else if (value == "") {
+                            alert("시중가를 입력해주세요.");
+                            startEditingCell(row.idx, column_name);
+                        }
+                        break;
+                    case "wonga": // 원가
+                        if (isNaN(value) == true) {
+                            alert("숫자만 입력가능합니다.");
+                            startEditingCell(row.idx, column_name);
+                        } else if (value == "") {
+                            alert("원가를 입력해주세요.");
+                            startEditingCell(row.idx, column_name);
+                        }
+                        break;
+                    case "price": // 판매가
+                        if (isNaN(value) == true) {
+                            alert("숫자만 입력가능합니다.");
+                            startEditingCell(row.idx, column_name);
+                        } else if (value == "") {
+                            alert("판매가를 입력해주세요.");
+                            startEditingCell(row.idx, column_name);
+                        } else {
+                            const ed_price = value;
+                            row = cmdPrice(row, ed_price, row.margin_rate); 
+                            if (row.point_yn == "Y") {
+                                if ( row.point_unit == "P" ) {
+                                    row.point_amt = value * row.point / 100;
+                                }
+                            }
+                        }
+                        break;
+                    case "margin_rate": // 마진율
+                        if (isNaN(value) == true) {
+                            alert("숫자만 입력가능합니다.");
+                            startEditingCell(row.idx, column_name);
+                        } else if (value == "") {
+                            alert("마진율을 입력해 주세요.");
+                            startEditingCell(row.idx, column_name);
+                        } else {
+                            const ed_margin_rate = parseInt(value);
+                            if (ed_margin_rate > 100) {
+                                alert("마진율은 100을 넘을 수 없습니다.");
+                                startEditingCell(row.idx, column_name);
+                            } else {
+                                row = cmdPrice(row, row.price, ed_margin_rate);
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                gx.gridOptions.api.applyTransaction({ update : [row] });
+            }
+        };
+       
+        const cmdPrice = (row, price, margin_rate) => {
+            const com_type = row.com_type;
+            return calPrice(row, com_type, parseInt(price), margin_rate);
+        }
+
+        const calPrice = (row, com_type, price, margin_rate) => { // 행, 판매가, 마진율
+
+            let wonga = row.wonga;
+
+            if (com_type == 1) {	// 공급 업체인 경우
+                if ( row.price != price ) {
+                    margin_rate = ((price-wonga)/price)*100;
+                } else if ( row.margin_rate != margin_rate ) {
+                    price = parseInt(Math.round(wonga / (1-margin_rate/100)), 10);
+                }
+            } else { // 그 외의 경우
+                if ( price && wonga ) {
+                    margin_rate = parseFloat(((price - wonga) / price) * 100).toFixed(2);
+                }
+            }
+
+            row = {...row, price: price, margin_rate: margin_rate, wonga: wonga }
+
+            return row;
+        };
+
 
 
 </script>
