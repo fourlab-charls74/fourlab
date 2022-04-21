@@ -268,6 +268,7 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::get('prd01/search', 'prd01Controller@search');
         Route::get('prd01/create', 'prd01Controller@create');
 
+        // 상품관리 - 일괄수정
         Route::match(['get', 'post'], 'prd01/edit', 'prd01Controller@edit_index');
         Route::post('prd01/edit/search', 'prd01Controller@edit_search');
         Route::post('prd01/edit/save', 'prd01Controller@edit_save');
@@ -344,9 +345,9 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::post('prd06/sale-on', 'prd06Controller@saleOn');
         Route::post('prd06/sale-off', 'prd06Controller@saleOff');
 
+        // 상품관리 - 일괄등록
         Route::get('prd07', 'prd07Controller@index');
-        Route::get('prd07/search', 'prd07Controller@search');
-        // Route::put('prd07/update', 'prd07Controller@update');
+        Route::post('prd07/enroll', 'prd07Controller@enroll');
 
         Route::get('prd08', 'prd08Controller@index');
         Route::get('prd09', 'prd09Controller@index');

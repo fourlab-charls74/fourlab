@@ -1,5 +1,5 @@
 @extends('head_with.layouts.layout-nav')
-@section('title','상품관리 - 일괄수정')
+@section('title','상품관리 - 일괄등록')
 @section('content')
 <style>
     .wrap { overflow-y: 'hidden' }
@@ -422,25 +422,7 @@
 
         var columns= [
             // {field:"chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, sort: null, pinned:'left', hide:true},
-            {field:"msg", headerName:"처리", pinned:'left', width:65,
-                cellStyle: (params) => {
-                    let STYLE = {...DEFAULT_STYLE, 'text-align': 'center'};
-                    if (params.data.msg == 'OK') {
-                        STYLE = {...STYLE, ...CELL_STYLE.OK}
-                    } else if (params.data.msg == 'FAIL') {
-                        STYLE = {...STYLE, ...CELL_STYLE.FAIL}
-                    }
-                    return STYLE;
-                },
-                cellRenderer: (params) => {
-                    if (params.data.msg == 'OK') {
-                        return 'OK';
-                    } else if (params.data.msg == 'FAIL') {
-                        return 'FAIL';
-                    }
-                    return "";
-                }
-            },
+            {field:"msg", headerName:"처리", pinned:'left', width:100, cellStyle: (params) => resultStyle(params)},
             {field: "com_id", headerName: "업체", width:100, pinned: 'left'},
             {field: "opt_kind_cd", headerName: "품목", width: 100, pinned: 'left'},
             {field: "brand", headerName: "브랜드", pinned: 'left'},
@@ -684,7 +666,6 @@
             row.tax_yn		= _("#tax_yn").value;		// 과세구분
             row.restock_yn	= (_("#restock_yn").checked == true) ? "Y" : "N";	// 재입고 설정
 
-            
             const data = gx.getRows();
             const len = data.length;
             if (len > 0 && !confirm("적용 시 입력한 데이터가 초기화되고 덮어쓰여 지워집니다..\n적용 하시겠습니까?")) return false;
@@ -712,7 +693,7 @@
              * 입력한 상품수가 데이터보다 줄어들 경우 삭제처리
              */
             if (len > prd_cnt) {
-                data.map((item, index) => { // 상품수가 4, 데이터가 5
+                data.map((item, index) => { // ex) 상품수가 4, 데이터가 5
                     const count = index + 1;
                     row.idx = index;
                     if (count <= prd_cnt) {
@@ -736,7 +717,7 @@
             });
             
             // 브랜드 비우기
-            $('#brand_cd').val(null).trigger('change', () => document.f1.brand_cd.value = ""); // 브랜드 select2 박스 초기화
+            $("#brand_cd").empty();
 
             // 배송비, 적립금, 옵션구분 제거
             _('#dlv_fee_cfg_s').click();
@@ -746,16 +727,41 @@
             // 나머지 input 초기화
             document.f1.reset();
             
-
             $("#gd-total").text("0");
         };
 
-        const deleteRows = async () => { // 미구현 - 없어도 기능은 동작
-
-        };
+        const deleteRows = () => {}; // 미구현 - 없어도 기능은 동작
 
         const save = () => { // 일괄 등록
-            validation();
+            if (validation()) {
+                const data = gx.getRows();
+                insertDB(data);
+            };
+        };
+
+        const insertDB = async (data) => {
+            for (let i = 0; i < data.length; i++) {
+                const row = data[i];
+                const response = await axios({
+                    url: '/head/product/prd07/enroll',
+                    method: 'post',
+                    data: { row: row }
+                });
+                cbinsertDB(response, row.idx);
+            }
+        };
+
+        const cbinsertDB = (response, index) => {
+            const { result, msg } = response;
+            const row = { ...getRowNode(index), msg: msg, result: result };
+            updateRow(row);
+        };
+
+        const resultStyle = (params) => {
+            let STYLE = {...DEFAULT_STYLE, 'text-align': 'center'};
+            if (params.data.result == undefined) return STYLE;
+            if (params.data.result == '100' || params.data.result == '0') STYLE = {...STYLE, ...CELL_STYLE.FAIL} // 중복된 스타일 넘버거나 시스템 에러
+            if (params.data.result) { STYLE = {...STYLE, ...CELL_STYLE.OK} } // 성공
         };
 
         const popCategory = (type) => {
@@ -1036,7 +1042,7 @@
                     startEditingCell(row.idx, 'goods_nm');
                     return false;
                 }
-                if (row.price == "" || row.price <= 0 || !isNumVal(row.price)) {
+                if (row.price == "" || row.price <= 0 || !isNumVal(parseInt(row.price))) {
                     stopEditing();
                     alert("판매가를 입력해 주세요.");
                     startEditingCell(row.idx, 'price');
@@ -1095,18 +1101,18 @@
                 }
                 // 첫번째 옵션 갯수와 수량 갯수 비교
                 if (row.opt_qty != "") {
-                    var a_opt1 = row.opt1.split(",");
-                    var a_opt_qty = row.opt_qty.split(",");
-                    if (a_opt1.length > 1 && a_opt1.length != a_opt_qty.length) {
+                    var a_opt1 = row.opt1?.split(",");
+                    var a_opt_qty = row.opt_qty?.split(",");
+                    if (a_opt1?.length > 1 && a_opt1?.length != a_opt_qty?.length) {
                         alert("수량의 갯수가 옵션의 갯수와 다릅니다.");
                         return false;
                     }
                 }
                 // 첫번째 옵션 갯수와 옵션 가격 비교
                 if (row.opt_price != "") {
-                    var a_opt1 = row.opt1.split(",");
-                    var a_opt_price = row.opt_price.split(",");
-                    if(a_opt1.length > 1 && a_opt1.length != a_opt_price.length){
+                    var a_opt1 = row.opt1?.split(",");
+                    var a_opt_price = row.opt_price?.split(",");
+                    if(a_opt1?.length > 1 && a_opt1?.length != a_opt_price?.length){
                         alert("옵션 가격의 갯수가 옵션1의 갯수와 다릅니다.");
                         return false;
                     }
@@ -1213,8 +1219,6 @@
 
             return row;
         };
-
-
 
 </script>
 
