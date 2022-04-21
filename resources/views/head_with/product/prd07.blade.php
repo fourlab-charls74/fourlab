@@ -744,7 +744,7 @@
                     data: { row: row }
                 });
                 const { result, msg } = response.data;
-                row = { ...getRowNode(data[0]).data, msg: msg, result: result, idx: row.idx };
+                row = { ...getRowNode(row).data, msg: msg, result: result };
                 updateRow(row);
             }
         };
@@ -752,9 +752,8 @@
         const resultStyle = (params) => {
             let STYLE = {...DEFAULT_STYLE, 'text-align': 'center'};
             if (params.data.result == undefined) return STYLE;
-            if (params.data.result == '100' || params.data.result == '0') STYLE = {...STYLE, ...CELL_STYLE.FAIL} // 중복된 스타일 넘버거나 시스템 에러
-            if (params.data.result) STYLE = {...STYLE, ...CELL_STYLE.OK} // 성공
-            return STYLE;
+            if (params.data.result == '100' || params.data.result == '0') return STYLE = {...STYLE, ...CELL_STYLE.FAIL} // 중복된 스타일 넘버거나 시스템 에러
+            if (params.data.result) return STYLE = {...STYLE, ...CELL_STYLE.OK} // 성공
         };
 
         const popCategory = (type) => {
