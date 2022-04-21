@@ -422,7 +422,7 @@
 
         var columns= [
             // {field:"chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, sort: null, pinned:'left', hide:true},
-            {field:"msg", headerName:"처리", pinned:'left', width:100, cellStyle: (params) => resultStyle(params)},
+            {field: "msg", headerName:"처리", pinned:'left', width:100, cellStyle: (params) => resultStyle(params)},
             {field: "com_id", headerName: "업체", width:100, pinned: 'left'},
             {field: "opt_kind_cd", headerName: "품목", width: 100, pinned: 'left'},
             {field: "brand", headerName: "브랜드", pinned: 'left'},
@@ -502,7 +502,7 @@
          * ag-grid utils
          */
         const getRowNode = (row) => {
-            gx.gridOptions.api.getRowNode(row.idx);
+            return gx.gridOptions.api.getRowNode(row.idx);
         };
 
         const startEditingCell = (row_index, col_key) => {
@@ -586,7 +586,7 @@
         const SHOP_POINT_RATIO = "{{$order_point_ratio}}";
         const apply = (cmd) => { // 적용
 
-            // if (!applyValidation()) return false;
+            if (!applyValidation()) return false;
 
             let row = {};
             prd_cnt			    = _("#prd_cnt").value; // 상품수
@@ -678,8 +678,6 @@
                 
                 if (len < prd_cnt) {
                     if (i <= len) {
-                        const before = getRowNode(index);
-                        row = {...before, ...row};
                         updateRow(row);
                     } else {
                         addRow(row);
@@ -697,8 +695,6 @@
                     const count = index + 1;
                     row.idx = index;
                     if (count <= prd_cnt) {
-                        const before = getRowNode(index);
-                        row = {...before, ...row};
                         updateRow(row);
                     } else {
                         deleteRow(row);
@@ -741,27 +737,24 @@
 
         const insertDB = async (data) => {
             for (let i = 0; i < data.length; i++) {
-                const row = data[i];
+                let row = data[i];
                 const response = await axios({
                     url: '/head/product/prd07/enroll',
                     method: 'post',
                     data: { row: row }
                 });
-                cbinsertDB(response, row.idx);
+                const { result, msg } = response.data;
+                row = { ...getRowNode(data[0]).data, msg: msg, result: result, idx: row.idx };
+                updateRow(row);
             }
-        };
-
-        const cbinsertDB = (response, index) => {
-            const { result, msg } = response;
-            const row = { ...getRowNode(index), msg: msg, result: result };
-            updateRow(row);
         };
 
         const resultStyle = (params) => {
             let STYLE = {...DEFAULT_STYLE, 'text-align': 'center'};
             if (params.data.result == undefined) return STYLE;
             if (params.data.result == '100' || params.data.result == '0') STYLE = {...STYLE, ...CELL_STYLE.FAIL} // 중복된 스타일 넘버거나 시스템 에러
-            if (params.data.result) { STYLE = {...STYLE, ...CELL_STYLE.OK} } // 성공
+            if (params.data.result) STYLE = {...STYLE, ...CELL_STYLE.OK} // 성공
+            return STYLE;
         };
 
         const popCategory = (type) => {

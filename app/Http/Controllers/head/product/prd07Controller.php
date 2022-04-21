@@ -81,12 +81,6 @@ class prd07Controller extends Controller
 	 */
 	public function enroll(Request $request) 
 	{
-
-		return response()->json([
-			"result" => 0, // 중복 : style_no, com_id
-			"msg" => "시스템에러"
-		]);
-
 		$row = $request->input('row');
 
 		$row["goods_sh"] = array_key_exists('goods_sh', $row) ? $this->checkInt(Lib::Rq($row["goods_sh"])) : null;
@@ -272,12 +266,12 @@ class prd07Controller extends Controller
 			$a_opt2 = ( $opt2 != "" ) ?  explode(",", $opt2) : array();
 
 			// 옵션 수량
-			$a_opt_qty = ( $opt_qty != "" ) ?  explode(",", $opt_qty) : array();
+			$a_opt_qty = ( @$opt_qty != "" ) ?  explode(",", $opt_qty) : array();
 
 			// 옵션 가격
-			$a_opt_price = ( $opt_price != "" ) ?  explode(",", $opt_price) : array();
+			$a_opt_price = ( @$opt_price != "" ) ?  explode(",", $opt_price) : array();
 
-			$jaego = new Jaego( $conn, $this->user);  //재고 클래스 호출
+			$jaego = new Jaego( $user );  //재고 클래스 호출
 
 			// 멀티옵션
 			if ( $multi_pos != false ) {
@@ -365,7 +359,7 @@ class prd07Controller extends Controller
 			///////////////////////////////////////////////////////
 
 			// 태그 등록
-			if ( $tags != "" ) {
+			if ( @$tags != "" ) {
 
 				$a_tags = explode(",", $tags);
 
@@ -412,14 +406,16 @@ class prd07Controller extends Controller
 
 			DB::commit();
 			return response()->json([
-                "result" => $goods_no."-".$goods_sub
+				"result" => 1,
+                "msg" => $goods_no."-".$goods_sub
             ]);
 
 		} catch (Exception $e) {
 			DB::rollback();
 			return response()->json([
                 "result" => 0, // 중복 : style_no, com_id
-				"msg" => "시스템에러"
+				"msg" => "시스템에러",
+				'error' => $e
             ]);
 		}
 

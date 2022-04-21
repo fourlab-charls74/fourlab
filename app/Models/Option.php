@@ -13,7 +13,7 @@ class Option { // 20220421 - madforre 추가
 	var $goods_sub;
 	var $goods_type;
 
-    function __construct($user = [], $goods_no, $good_sub)
+    function __construct($user = [], $goods_no, $goods_sub)
     {
         $this->user = $user;
         $this->goods_no = $goods_no;
@@ -31,7 +31,6 @@ class Option { // 20220421 - madforre 추가
 			WHERE goods_no = '$goods_no' AND goods_sub = '$goods_sub'
 		";
         $result = DB::selectOne($sql);
-        dd($result);
 		$this->goods_type = $result->goods_type;
 	}
 	
