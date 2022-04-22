@@ -1025,7 +1025,9 @@
                 }
 
                 if (row.style_no && !isEng(row.style_no)) {
+                    stopEditing();
                     alert("스타일넘버는 한글을 입력하실수 없습니다.");
+                    startEditingCell(row.idx, 'style_no');
                     return false;
                 }
                 if (row.goods_nm == "") {
