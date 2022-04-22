@@ -1014,7 +1014,7 @@
 
                 row = rows[i];
 
-                console.log(row);
+                // console.log(row);
 
                 row.goods_cont = row.goods_cont?.replace(/^\"+|\"+$/g,"");
                 row.goods_cont = row.goods_cont?.replace(/\"\"/g,"'");
