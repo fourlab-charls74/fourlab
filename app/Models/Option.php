@@ -119,8 +119,8 @@ class Option { // 20220421 - madforre 추가
                 $collection = collect(DB::select($sql));
 
                 $a_name = [];
-                $collection->map(function ($row) use ($a_name, $name_cnt) {
-                    array_push($a_name, $row["name"]);
+                $collection->map(function ($row, $i) use ($a_name, $name_cnt) {
+                    $a_name[$i] = $row->name;
                     $name_cnt++;
                 });
                 
@@ -151,13 +151,12 @@ class Option { // 20220421 - madforre 추가
             $sql = "UPDATE goods_summary SET
 				opt_price = :opt_price
 				WHERE goods_no = :goods_no AND goods_sub = :goods_sub
-				AND goods_opt LIKE ':opt1%'
+				AND goods_opt LIKE '$opt1%'
 			";
             DB::update($sql, [
                 'opt_price' => $opt_price,
                 'goods_no' => $goods_no,
-                'goods_sub' => $goods_sub,
-                'opt1' => $opt1
+                'goods_sub' => $goods_sub
             ]);
         }
 
@@ -170,13 +169,12 @@ class Option { // 20220421 - madforre 추가
             $sql = "UPDATE goods_summary SET
 				opt_memo = :opt_memo
 				WHERE goods_no = :goods_no AND goods_sub = :goods_sub
-				AND goods_opt LIKE ':opt1%'
+				AND goods_opt LIKE '$opt1%'
             ";
             DB::update($sql, [
                 'opt_memo' => $opt_memo,
                 'goods_no' => $goods_no,
-                'goods_sub' => $goods_sub,
-                'opt1' => $opt1
+                'goods_sub' => $goods_sub
             ]);
         }
 

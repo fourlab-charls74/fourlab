@@ -412,10 +412,10 @@ class prd07Controller extends Controller
 
 		} catch (Exception $e) {
 			DB::rollback();
+			dd($e);
 			return response()->json([
                 "result" => 0,
-				"msg" => "시스템에러",
-				'error' => $e
+				"msg" => "시스템에러"
             ]);
 		}
 

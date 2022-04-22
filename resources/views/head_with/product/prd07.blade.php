@@ -466,7 +466,7 @@
             {field: "org_nm", headerName: "원산지"},
             {field: "md_nm", headerName: "MD"},
             {field: "make", headerName: "제조사"},
-            {field: "goods_cont", headerName: "상품상세", editable: true, cellStyle: CELL_STYLE.EDIT},
+            {field: "goods_cont", headerName: "상품상세", width: 240, editable: true, cellStyle: CELL_STYLE.EDIT},
             {field: "spec_desc", headerName: "제품사양", editable: true, cellStyle: CELL_STYLE.EDIT},
             {field: "baesong_desc", headerName: "예약/배송", editable: true, cellStyle: CELL_STYLE.EDIT},
             {field: "opinion", headerName: "MD상품평", editable: true, cellStyle: CELL_STYLE.EDIT},
@@ -584,9 +584,9 @@
         };
         
         const SHOP_POINT_RATIO = "{{$order_point_ratio}}";
-        const apply = (cmd) => { // 적용
+        const apply = () => { // 적용
 
-            if (!applyValidation()) return false;
+            // if (!applyValidation()) return false; // 여기
 
             let row = {};
             prd_cnt			    = _("#prd_cnt").value; // 상품수
@@ -1014,10 +1014,12 @@
 
                 row = rows[i];
 
+                console.log(row);
+
                 row.goods_cont = row.goods_cont?.replace(/^\"+|\"+$/g,"");
                 row.goods_cont = row.goods_cont?.replace(/\"\"/g,"'");
 
-                if (row.style_no == "") {
+                if (row.style_no == undefined || row.style_no == "") { // 저기
                     stopEditing();
                     alert("스타일넘버을 입력해 주세요.");
                     startEditingCell(row.idx, 'style_no');
@@ -1030,32 +1032,33 @@
                     startEditingCell(row.idx, 'style_no');
                     return false;
                 }
-                if (row.goods_nm == "") {
+                if (row.goods_nm == undefined || row.goods_nm == "") {
                     stopEditing();
                     alert("상품명을 입력해 주세요.");
                     startEditingCell(row.idx, 'goods_nm');
                     return false;
                 }
-                if (row.price == "" || row.price <= 0 || !isNumVal(parseInt(row.price))) {
+
+                if (row.price == undefined || row.price == "" || row.price <= 0 || !isNumVal(parseInt(row.price))) {
                     stopEditing();
                     alert("판매가를 입력해 주세요.");
                     startEditingCell(row.idx, 'price');
                     return false;
                 }
-                if (row.margin_rate == "" || row.margin_rate <= 0) {
+                if (row.margin_rate == undefined || row.margin_rate == "" || row.margin_rate <= 0) {
                     stopEditing();
                     alert("마진율을 입력해 주세요.");
                     startEditingCell(row.idx, 'margin_rate');
                     return false;
                 }
-                if (row.wonga == "" || row.wonga <= 0) {
+                if (row.wonga == undefined || row.wonga == "" || row.wonga <= 0) {
                     stopEditing();
                     alert("원가를 입력해 주세요.");
                     startEditingCell(row.idx, 'wonga');
                     return false;
                 }
 
-                if (row.option_kind == "") {
+                if (row.option_kind == undefined || row.option_kind == "") {
                     stopEditing();
                     alert("옵션구분을 입력해 주세요.");
                     startEditingCell(row.idx, 'option_kind');
@@ -1080,14 +1083,15 @@
                         return false;
                     }
                 } else {
-                    if (row.opt1 == "" ) {
+                    if (row.opt1 == undefined || row.opt1 == "" ) {
                         stopEditing();
                         alert("옵션을 입력해 주세요.");
                         startEditingCell(row.idx, 'opt1');
                         return false;
                     }
                 }
-                if (row.opt_qty == "") {
+
+                if (row.opt_qty == undefined || row.opt_qty == "") {
                     stopEditing();
                     alert("수량을 입력해 주세요.");
                     startEditingCell(row.idx, 'opt_qty');
@@ -1098,7 +1102,9 @@
                     var a_opt1 = row.opt1?.split(",");
                     var a_opt_qty = row.opt_qty?.split(",");
                     if (a_opt1?.length > 1 && a_opt1?.length != a_opt_qty?.length) {
+                        stopEditing();
                         alert("수량의 갯수가 옵션의 갯수와 다릅니다.");
+                        startEditingCell(row.idx, 'opt_qty');
                         return false;
                     }
                 }
@@ -1107,7 +1113,9 @@
                     var a_opt1 = row.opt1?.split(",");
                     var a_opt_price = row.opt_price?.split(",");
                     if(a_opt1?.length > 1 && a_opt1?.length != a_opt_price?.length){
+                        stopEditing();
                         alert("옵션 가격의 갯수가 옵션1의 갯수와 다릅니다.");
+                        startEditingCell(row.idx, 'opt_price');
                         return false;
                     }
                 }
@@ -1133,10 +1141,11 @@
                         if (isNaN(value) == true) {
                             alert("숫자만 입력가능합니다.");
                             startEditingCell(row.idx, column_name);
-                        } else if (value == "") {
-                            alert("시중가를 입력해주세요.");
-                            startEditingCell(row.idx, column_name);
-                        }
+                        } 
+                        // else if (value == "") { - 시중가는 필수 항목 x
+                        //     alert("시중가를 입력해주세요.");
+                        //     startEditingCell(row.idx, column_name);
+                        // }
                         break;
                     case "wonga": // 원가
                         if (isNaN(value) == true) {
