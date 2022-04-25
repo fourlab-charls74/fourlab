@@ -267,6 +267,7 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::get('prd01/choice', 'prd01Controller@index_choice');
         Route::get('prd01/search', 'prd01Controller@search');
         Route::get('prd01/create', 'prd01Controller@create');
+        Route::post('prd01/cleanup-trash', 'prd01Controller@cleanup_trash');
 
         // 상품관리 - 일괄수정
         Route::match(['get', 'post'], 'prd01/edit', 'prd01Controller@edit_index');

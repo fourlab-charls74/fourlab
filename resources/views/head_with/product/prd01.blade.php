@@ -549,7 +549,7 @@
 		if( confirm("리스트에 있는 휴지통 상품을 삭제하시겠습니까?")){
 			$.ajax({
 				async: true,
-				type: 'put',
+				type: 'post',
 				url: '/head/product/prd01/cleanup-trash',
 				data: { "datas" : data },
 				success: function (data) {
