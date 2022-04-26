@@ -2318,6 +2318,21 @@
 	<script language="javascript">
     let gx1;
     let gx2;
+	
+	let opt1	= [];
+	let opt2	= [];
+
+	@if (count(@$opt['opt2']) > 0)
+		@foreach (@$opt['opt2'] as $i => $op)
+
+		opt2[{{$i}}]	= "{{ $op->opt_nm }}";
+
+		@php $i++; @endphp
+
+		@endforeach
+	@endif
+
+
 
 	//상품 옵션 종류
 	if( $('#div-gd-optkind').length > 0 ){
@@ -2353,22 +2368,24 @@
 	//상품 옵션 재고
 	if( $('#div-gd-opt').length > 0 ){
         var columns_opt = [
-			{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
-			{field:"opt1",headerName: "{{ @$opt_kind_list[0]->name }}", width:90 },
-			{field:"opt_price",headerName:"옵션가", width:90,type: 'numberType', editable: true, cellStyle: {'background' : '#ffff99'}},
+			{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 30, sort: null},
+			{field:"opt1",headerName: "{{ @$opt_kind_list[0]->name }}", width:120 },
+			{field:"opt_price",headerName:"옵션가", width:70,type: 'numberType', editable: true, cellStyle: {'background' : '#ffff99'}},
             
             @if($type != 'create' && count(@$opt_kind_list) > 1)
 			{
                 headerName: "{{ @$opt_kind_list[1]->name }}",
                 children: [
                     @if (count(@$opt['opt2']) > 0)
-                        @foreach (@$opt['opt2'] as $op)
+                        @foreach (@$opt['opt2'] as $i => $op)
+
                         {headerName: "{{ $op->opt_nm }}",
                             children: [
-                                {headerName: "온라인재고", field: "{{ $op->opt_nm }}__qty",type: 'numberType', width: 100, editable: true, cellStyle: {'background' : '#ffff99'}},
-                                {headerName: "보유재고", field: "{{ $op->opt_nm }}__wqty",type: 'numberType', width: 100},
+                                {headerName: "온라인재고", field: "{{ $i }}__qty" ,type: 'numberType', width: 70, editable: true, cellStyle: {'background' : '#ffff99'}},
+                                {headerName: "보유재고", field: "{{ $i }}__wqty",type: 'numberType', width: 58},
                             ]
                         },
+						@php $i++; @endphp
                         @endforeach
                     @else
                     {headerName: '', width: 150},
@@ -2376,8 +2393,8 @@
                 ]
 			},
             @else
-            {headerName: "온라인재고", field: "{{ @$opt2['opt2'] }}__qty",type: 'numberType', width: 100, editable: true, cellStyle: {'background' : '#ffff99'}},
-            {headerName: "보유재고", field: "{{ @$opt2['opt2'] }}__wqty",type: 'numberType', width: 100},
+            {headerName: "온라인재고", field: "{{ @$i }}__qty",type: 'numberType', width: 100, editable: true, cellStyle: {'background' : '#ffff99'}},
+            {headerName: "보유재고", field: "{{ @$i }}__wqty",type: 'numberType', width: 100},
             @endif
 
 			{field:"opt_memo",headerName:"옵션메모", width:90, cellStyle:{"text-align":"center"}, editable: true, cellStyle: {'background' : '#ffff99'}},
@@ -2968,6 +2985,67 @@
         });
 
     }
+
+	//선택한 항목 상태변경
+	$('.option-sav-btn').click(function(e){
+		e.preventDefault();
+
+		const selectedRowData	= gx2.gridOptions.api.getSelectedRows();
+		const selectRowCount	= selectedRowData.length;
+
+		if( selectRowCount == 0 ) {
+			alert('수정할 옵션을 선택해주세요.');
+			return;
+		}
+
+		console.log(opt2);
+		console.log(selectedRowData);
+
+/*
+		const selectedRowData	= gx.gridOptions.api.getSelectedRows();
+		const selectRowCount	= selectedRowData.length;
+
+		if( selectRowCount == 0 ) {
+			alert('품목변경할 정보고시내용을 선택해주세요.');
+			return;
+		}
+
+		const s_goods_class_cd	= $('.goods_class').val();
+		const s_goods_class_nm	= $('.goods_class > option:selected').html();
+		const good_no           = '{{$goods_no}}';
+
+		if( s_goods_class_cd === '' ) {
+			alert('변경할 품목을 선택해주세요.');
+			return;
+		}
+
+		if( confirm("선택하신 상품정보고시 품목으로 변경하시겠습니까?") ){
+			$.ajax({
+				method: 'put',
+				url: '/head/product/prd01/goods-class-opt-update',
+				data: {
+					'goods_class': s_goods_class_cd,
+					'goods_no': goods_no
+				},
+				dataType: 'json',
+				success: function(res) {
+					if (res.code == '200') {
+						goodsClassSearch();
+					} else {
+						console.log(res.code);
+						alert(res.msg);
+					}
+				},
+				error: function(e) {
+					console.log(e.responseText)
+				}
+			});
+		}
+*/
+
+	});
+    
+    
 
 	</script>
 

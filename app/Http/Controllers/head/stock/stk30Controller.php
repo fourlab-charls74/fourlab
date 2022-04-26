@@ -121,7 +121,7 @@ class stk30Controller extends Controller
 			select
 				'' as state, opt.opt_kind_nm, brand.brand_nm,g.goods_no,g.style_no,
 				stat.code_val as sale_stat_cl_val,
-				g.goods_nm,gs.goods_opt, gs.good_qty as qty, x.cd
+				g.goods_nm,gs.goods_opt, gs.good_qty as qty, x.cd, gs.goods_opt as org_opt, x.cd as org_cd
 			from goods g
 			$join
 			inner join goods_summary gs on g.goods_no = gs.goods_no and g.goods_sub = gs.goods_sub
@@ -316,6 +316,84 @@ class stk30Controller extends Controller
 			"code" => $error_code,
 			"result_code" => $result_code
 		]);
+	}
+
+	public function select_update(Request $request)
+	{
+		$id		= Auth('head')->user()->id;
+		$name	= Auth('head')->user()->name;
+
+		$error_code		= "200";
+		$result_code	= "";
+
+        $datas	= $request->input('data');
+		$datas	= json_decode($datas);
+
+		if( $datas == "" )
+		{
+			$error_code	= "400";
+		}
+
+		DB::beginTransaction();
+		
+		for( $i = 0; $i < count($datas); $i++ )
+		{
+			$data	= (array)$datas[$i];
+
+			$goods_no	= $data["goods_no"];
+			$goods_opt	= $data["goods_opt"];
+			$cd			= $data["cd"];
+			$org_opt	= $data["org_opt"];
+			$org_cd		= $data["org_cd"];
+
+			$sql	= " 
+				select count(*) as cnt from goods_xmd 
+				where 
+					cd = '" . Lib::quote($cd) . "' and goods_no = '$goods_no' and goods_opt = '" . Lib::quote($goods_opt) . "'
+			";
+			$row	= DB::selectOne($sql);
+
+			if( $row->cnt > 0 ){
+				$error_code	= "401";	//이미 존재하는 매칭데이터 오류
+				break;
+			}
+
+			$sql	= "
+				update goods_xmd set
+					cd			= '" . Lib::quote($cd) . "',
+					goods_opt	= '" . Lib::quote($goods_opt) . "'
+				where
+					cd = '" . Lib::quote($org_cd) . "' and goods_no = '$goods_no' and goods_opt = '" . Lib::quote($org_opt) . "'
+			";
+			DB::update($sql);
+
+			$sql	= "
+				update goods_summary set
+					goods_opt	= '" . Lib::quote($goods_opt) . "'
+				where
+					goods_no = '$goods_no' and goods_sub = '0' and goods_opt = '" . Lib::quote($org_opt) . "'
+			";
+			DB::update($sql);
+
+			$sql	= "
+				update goods_good set
+					goods_opt	= '" . Lib::quote($goods_opt) . "'
+				where
+					goods_no = '$goods_no' and goods_sub = '0' and goods_opt = '" . Lib::quote($org_opt) . "'
+			";
+			DB::update($sql);
+
+		}
+
+		DB::commit();
+
+
+
+		return response()->json([
+			"code" => $error_code,
+			"result_code" => $result_code
+		]);
+
 	}
 
 }

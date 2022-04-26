@@ -205,6 +205,9 @@
 				<div class="fl_box">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
 				</div>
+				<div class="fr_box flax_box">
+					<a href="#" onclick="ChangeData()" class="btn-sm btn btn-primary">옵션 및 코드 변경</a>
+				</div>
 			</div>
 		</div>
 		<div class="table-responsive">
@@ -214,6 +217,13 @@
 </div>
 <script language="javascript">
 	var columns = [
+		{
+			headerName: '',
+			headerCheckboxSelection: true,
+			checkboxSelection: true,
+			width:30,
+			pinned:'left',
+		},
 		{headerName: "#", field: "num",type:'NumType', width:35, cellStyle: {"background":"#F5F7F7"}},
 		{field: "opt_kind_nm", headerName: "품목", width:84},
 		{field: "brand_nm", headerName: "브랜드", width:84},
@@ -225,7 +235,7 @@
 		},
 		{field: "sale_stat_cl_val", headerName: "상품상태", width:58, type:'GoodsStateType'},
 		{field: "goods_nm", headerName: "상품명", width: 400, type:'HeadGoodsNameType'},
-		{field: "goods_opt", headerName: "옵션", width: 170},
+		{field: "goods_opt", headerName: "옵션", width: 170, editable: true, cellStyle:{"background-color":"#FFFF99"}, onCellValueChanged:checkData},
 		{field: "qty", headerName: "재고수", width:46, type:'numberType',
 			cellRenderer: function(params) {
 			if (params.value !== undefined) {
@@ -233,9 +243,18 @@
 			}
 		}
 		},
-		{field: "cd", headerName: "XMD 코드", width:120},
+		{field: "cd", headerName: "XMD 코드", width:120, editable: true, cellStyle:{"background-color":"#FFFF99"}, onCellValueChanged:checkData},
+		{field: "org_opt", headerName: "기존 옵션", hide: true},
+		{field: "org_cd", headerName: "기존 XMD 코드", hide: true},
         {field: "", headerName: "", width: "auto"}
 	];
+
+	function checkData(params){
+		if (params.oldValue !== params.newValue) {
+			var rowNode = params.node;
+			rowNode.setSelected(true);
+		}
+	}
 
 	function Add()
 	{
@@ -249,6 +268,49 @@
 		//const url='/head/promotion/prm12/' + item;
 		//window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
     }
+
+	function ChangeData()
+	{
+		var checkRows = gx.gridOptions.api.getSelectedRows();
+
+		if( checkRows.length === 0 )
+		{
+            alert("수정할 데이터를 선택해주세요.");
+            return;
+		}
+
+		if(confirm("옵션을 수정하면 기존에 연결된 매칭 데이터가 초기화 됩니다.\r\n선택하신 데이터를 수정하시겠습니까?")) 
+		{
+			//console.log(JSON.stringify(checkRows));
+
+			$.ajax({
+				async: true,
+				type: 'put',
+				url: '/head/stock/stk30',
+				data: {
+					data : JSON.stringify(checkRows),
+				},
+				success: function (data) {
+					if( data.code == "200" )
+					{
+						alert("선택한 데이터가 수정 되었습니다.");
+						Search();
+					}else if( data.code == "401" )
+					{
+						alert("이미 존재하는 코드 혹은 옵션 데이터 입니다.");
+					} 
+					else 
+					{
+						alert("데이터 수정이 실패하였습니다.");
+					}
+				},
+				error: function(request, status, error) {
+					alert("시스템 에러입니다. 관리자에게 문의하여 주십시요.");
+					console.log("error")
+				}
+			});
+		}
+	}
 
 </script>
 <script type="text/javascript" charset="utf-8">

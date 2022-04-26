@@ -1453,8 +1453,8 @@ class prd01Controller extends Controller
 					}
 				}
 
-				$opt_array	= array_merge($opt_array, array( $opt2_list[$i]->opt2 . '__qty' => $qty));
-				$opt_array	= array_merge($opt_array, array( $opt2_list[$i]->opt2 . '__wqty' => $wqty));
+				$opt_array	= array_merge($opt_array, array( $i . '__qty' => $qty));
+				$opt_array	= array_merge($opt_array, array( $i . '__wqty' => $wqty));
 				// $opt_array	= array_merge($opt_array, array($opt2_list['opt2'] . '__qty' => $qty));
 				// $opt_array	= array_merge($opt_array, array($opt2_list['opt2'] . '__wqty' => $wqty));
 			}
