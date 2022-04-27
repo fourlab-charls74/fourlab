@@ -8,7 +8,7 @@
 /vendor
 /pay
 .env
-.env.backup
+.env.*
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml

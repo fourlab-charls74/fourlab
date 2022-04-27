@@ -73,11 +73,12 @@ function AddImage($img_dir,$file)
                         $filename = $name . '.' . $ext[1];
 
                         $upload_path = $_SERVER['DOCUMENT_ROOT'] . $img_dir;
-                        if(!file_exists($upload_path)){
-                            @mkdir($upload_path, 0755);
-                            @chmod($upload_path, 0777);
-                        }
                         $destination = $upload_path . '/'. $filename; //change this directory
+
+                        if(!file_exists($upload_path)){
+                            mkdir($upload_path, 0755, true);
+                            chmod($upload_path, 0777);
+                        }
 
                         $tmp_width = $img_info[0];
                         if($tmp_width <= _MAX_UPLOAD_WIDTH_){
@@ -86,12 +87,14 @@ function AddImage($img_dir,$file)
                             auto_image_resize($location,$img_info,$destination,_MAX_UPLOAD_WIDTH_);
                         }
                         //echo $img_dir . '/' . $filename;//change this URL
+
                         echo json_encode(array(
                             "url" => $img_dir . '/' . $filename,
                             "width" => $size[0],
                             "height" => $size[1],
                             "size" => $filesize
                         ));
+                        
                     } else {
                         echo json_encode(array(
                             "errmsg" => 'Error - Over the max file size :  ' . $filesize
