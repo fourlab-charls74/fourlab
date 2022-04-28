@@ -893,7 +893,9 @@ class prd01Controller extends Controller
 		$cfg_free_dlv_fee_limit		= $conf->getConfigValue("delivery","free_delivery_amt");
 		$cfg_order_point_ratio		= $conf->getConfigValue("point","ratio");
 
-		$query = "
+		$opt	= ['opt1' => [], 'opt2' => []];
+
+		$query	= "
 			select a.class , a.class_nm
 			from code_class a 
 			group by class, class_nm
@@ -923,6 +925,7 @@ class prd01Controller extends Controller
 				'g_free_dlv_fee_limit'	=> $cfg_free_dlv_fee_limit,
 				'g_order_point_ratio'	=> $cfg_order_point_ratio,
 
+				'opt'			=> $opt,
 				'opt2'			=> array()
 			]
 		);

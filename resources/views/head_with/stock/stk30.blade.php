@@ -291,16 +291,12 @@
 					data : JSON.stringify(checkRows),
 				},
 				success: function (data) {
-					if( data.code == "200" )
-					{
+					if( data.code == "200" ){
 						alert("선택한 데이터가 수정 되었습니다.");
 						Search();
-					}else if( data.code == "401" )
-					{
+					}else if( data.code == "401" ){
 						alert("이미 존재하는 코드 혹은 옵션 데이터 입니다.");
-					} 
-					else 
-					{
+					}else{
 						alert("데이터 수정이 실패하였습니다.");
 					}
 				},
