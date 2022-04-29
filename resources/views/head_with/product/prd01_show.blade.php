@@ -2052,8 +2052,9 @@
                 {field:"img2",headerName:"img2",hide:true},
                 {field:"img" , headerName:"이미지",
                     cellRenderer: function(params) {
+                        console.log(params);
                         if (params.value !== undefined && params.data.img != "") {
-                            return '<img src="{{config('shop.image_svr')}}/' + params.data.img + '"/>';
+                            return '<img src="{{config('shop.image_svr')}}' + params.data.img + '"/>';
                         }
                     }
                 },

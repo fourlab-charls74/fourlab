@@ -65,7 +65,7 @@ class prd02Controller extends Controller
 			if($img_sep == "s")	$img_sep	= "a";	//추가 크기 이미지는 기본이미지에서 출력되게 설정
 
             $files[$img_sep][] = [
-                'src'		=> "/" . $file,
+                'src'		=> "/" . $file . "?" . mt_rand(),
                 'filesize'	=> $filesize,
                 //'size' => $img_size	//이미지명으로 대처
                 'size'		=> $name

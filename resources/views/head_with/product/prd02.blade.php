@@ -242,7 +242,7 @@
                             <div class="prd-image-list row" style="margin:0px 5px;border-bottom:1px solid #dddddd;text-align:center;">
                                 @foreach($img_urls as $img_url)
                                     <figure class="p-2" style="width:12%;">
-                                        <img src="{{$img_url['img']}}" onClick="location.href='/head/product/prd02/{{$goods_no}}/image?img_ta={{$img_url['kind']}}';" alt="" style="width:100%;border:1px solid #dfdfdf;cursor:pointer;">
+                                        <img src="{{config('shop.image_svr')}}{{$img_url['img']}}" onClick="location.href='/head/product/prd02/{{$goods_no}}/image?img_ta={{$img_url['kind']}}';" alt="" style="width:100%;border:1px solid #dfdfdf;cursor:pointer;">
                                         <figcaption style="@if($img_ta == $img_url['kind']) font-weight:bold; @endif">{{$img_url['title']}}</figcaption>
                                     </figure>
                                 @endforeach
@@ -251,7 +251,7 @@
                                 @foreach($files as $file)
                                     <figure class="p-2">
                                         <figcaption style="text-align:center;">{{$file['size']}} ({{$file['filesize']}}KB)</figcaption>
-                                        <img src="{{$file['src']}}" alt="">
+                                        <img src="{{config('shop.image_svr')}}{{$file['src']}}" alt="">
                                     </figure>
                                 @endforeach
                             </div>
