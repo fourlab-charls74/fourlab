@@ -1252,7 +1252,7 @@
                                                                     // },
                                                                     cellStyle: related_goods_style_obj,
                                                                 },
-                                                                {field: "img", headerName: "이미지_url", cellStyle: related_goods_style_obj,},
+                                                                {field: "img", headerName: "이미지_url", cellStyle: related_goods_style_obj, hide: true},
                                                                 {field: "opt_kind_nm", headerName: "품목", width: 130, cellStyle: related_goods_style_obj},
                                                                 {field: "brand_nm", headerName: "브랜드", width: 80, cellStyle: related_goods_style_obj},
                                                                 {field: "goods_nm", headerName: "상품명", width: 'auto', cellStyle: related_goods_style_obj},
@@ -2055,14 +2055,7 @@
                 {field:"brand_nm",headerName:"브랜드"},
                 {field:"style_no",headerName:"스타일넘버"},
                 {field:"img2",headerName:"img2",hide:true},
-                {field:"img" , headerName:"이미지",
-                    cellRenderer: function(params) {
-                        console.log(params);
-                        if (params.value !== undefined && params.data.img != "") {
-                            return '<img src="{{config('shop.image_svr')}}' + params.data.img + '"/>';
-                        }
-                    }
-                },
+                {field:"img" , headerName:"이미지", type: 'GoodsImageType', cellStyle:{'text-align':'center'}},
                 {field:"sale_stat_cl",headerName:"상품상태",width:100,cellStyle:StyleGoodsState},
                 {field:"goods_no",headerName:"상품번호", width:80,
                     cellRenderer: function(params) {
@@ -2635,13 +2628,7 @@
     function SetSimilarTable() {
         const goods_similar_columns = [
             {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left'},
-            {field:"img" , headerName:"이미지",
-                cellRenderer: function(params) {
-                    if (params.value !== undefined && params.data.img != "") {
-                        return '<img src="' + params.data.img + '"/>';
-                    }
-                }
-            },
+            {field: "img" , headerName:"이미지", type: 'GoodsImageType'},
             {field: 'goods_nm', headerName: "상품명", width: 200},
             {field: 'brand', headerName: "브랜드"},
             {field: 'com_nm', headerName: "업체"},

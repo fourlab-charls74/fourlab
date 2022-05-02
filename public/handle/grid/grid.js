@@ -121,27 +121,24 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
                 }
             },
             GoodsImageType: {
+                cellStyle:{'text-align':'center'},
                 cellRenderer: function (params) {
                     if (params.value !== undefined && params.value !== "" && params.value !== null) {
-                        let front_url   = params.colDef.surl;
-                        let img         = params.data.img;
+                        
+                        let [image_svr, front_url] = [IMAGE_SVR, FRONT_URL];
 
-                        // 이미지에 파라미터가 없는 경우 static 처리
+                        // 이미지 경로 앞에 .env의 IMAGE_SVR 반영
+                        const prefix = image_svr ? image_svr + '/' : "";
+                        let img = prefix + params.data.img;
+
+                        // 이미지에 파라미터가 없는 경우 static 처리 - 캐시 방지
                         const regex = /(\?)[\w|=|&]*/gi;
                         if (img.search(regex) == -1) {
                             img = img + `?${Math.floor(Math.random() * 1000000000)}`;
                         }
-                        console.log(img);
 
-                        // if (front_url) {
-                        //     return '<a href="#" onClick="return openSitePop(\'' + front_url + '\',\'' + params.data.goods_no + '\');"><img src="' + img + '" class="img" alt="" onerror="this.src=\'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\'"/></a>';
-                        // } else {
+                        return '<a href="javascript:void(0);" onClick="return openSitePop(\'' + front_url + '\',\'' + params.data.goods_no + '\');"><img src="' + img + '" class="img" alt="" onerror="this.src=\'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\'"/></a>';
 
-                        // }
-
-                        return '<a href="#" onClick="return openSitePop(\'' + front_url + '\',\'' + params.data.goods_no + '\');"><img src="' + img + '" class="img" alt="" onerror="this.src=\'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\'"/></a>';
-
-                        
                     }
                 }
             },

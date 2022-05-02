@@ -21,6 +21,12 @@
             <script src="/handle/grid/ag-grid/community/dist/ag-grid-community.min.js"></script>
         @endif
 
+
+        <script>
+            const IMAGE_SVR = "{{config('shop.image_svr')}}";
+            const FRONT_URL = "{{config('shop.front_url')}}";
+        </script>
+
         <link href="/handle/grid/ag-grid/community/dist/styles/ag-grid.css" rel="stylesheet" />
         <link href="/handle/grid/ag-grid/community/dist/styles/ag-theme-alpine.css" rel="stylesheet" />
 
