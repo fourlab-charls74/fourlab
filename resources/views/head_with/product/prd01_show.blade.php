@@ -36,6 +36,10 @@
         content: '';
     }
 
+    .img {
+        height: 40px;
+    }
+
 </style>
 
     <script type="text/javascript" src="/handle/editor/editor.js"></script>

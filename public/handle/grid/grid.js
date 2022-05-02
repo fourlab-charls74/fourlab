@@ -101,7 +101,6 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
                 cellRenderer: function (params) {
                     if (params.value !== undefined) {
                         return '<a href="#" onclick="return openProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
-
                     }
                 }
             },
@@ -110,7 +109,6 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
                 cellRenderer: function (params) {
                     if (params.value !== undefined) {
                         return '<a href="#" onclick="return openHeadProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
-
                     }
                 }
             },
@@ -119,7 +117,6 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
                 cellRenderer: function (params) {
                     if (params.value !== undefined) {
                         return `<a href="#" onclick="return openCouponDetail('edit','${params.data.coupon_no}');">${params.value}</a>`;
-
                     }
                 }
             },
@@ -128,6 +125,13 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
                     if (params.value !== undefined && params.value !== "" && params.value !== null) {
                         let front_url   = params.colDef.surl;
                         let img         = params.data.img;
+
+                        // 이미지에 파라미터가 없는 경우 static 처리
+                        const regex = /(\?)[\w|=|&]*/gi;
+                        if (img.search(regex) == -1) {
+                            img = img + `?${Math.floor(Math.random() * 1000000000)}`;
+                        }
+
                         return '<a href="#" onClick="return openSitePop(\'' + front_url + '\',\'' + params.data.goods_no + '\');"><img src="' + img + '" class="img" alt="" onerror="this.src=\'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\'"/></a>';
                     }
                 }
