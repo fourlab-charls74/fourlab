@@ -132,7 +132,6 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
                         if (img.search(regex) == -1) { // http, https가 붙어있지 않은 상대경로인 경우 prefix 추가.
                             const prefix = image_svr ? image_svr + '/' : "";
                             img = prefix + params.data.img;
-                            console.log('http 발견')
                         }
 
                         // 이미지에 파라미터가 없는 경우 static 처리 - 캐시 방지
