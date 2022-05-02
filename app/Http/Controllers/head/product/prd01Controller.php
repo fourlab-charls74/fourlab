@@ -1034,6 +1034,7 @@ class prd01Controller extends Controller
         $goods_info->goods_related	= $this->get_goods_related_info($goods_no);
         $planing			= $this->get_planing_list($goods_no, $goods_info->goods_sub); // 전시상품 리스트
 
+		$goods_info->img = $goods_info->img . "?" . mt_rand();
         $goods_images[0] = $goods_info->img;
 
         $images = DB::table("goods_image")
@@ -1041,7 +1042,7 @@ class prd01Controller extends Controller
             ->where("goods_no","=",$goods_no)->get();
 
         foreach ($images as $image) {
-            $goods_images[] = $image->img;
+            $goods_images[] = $image->img . "?" . mt_rand();
         }
 
         $user		= Auth('head')->user();
@@ -2872,7 +2873,7 @@ class prd01Controller extends Controller
             DB::commit();
             return 1;
         } catch (Exception $e) {
-            dd($e);
+            // dd($e);
             DB::rollback();
             return 0;
         }

@@ -131,8 +131,17 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
                         if (img.search(regex) == -1) {
                             img = img + `?${Math.floor(Math.random() * 1000000000)}`;
                         }
+                        console.log(img);
+
+                        // if (front_url) {
+                        //     return '<a href="#" onClick="return openSitePop(\'' + front_url + '\',\'' + params.data.goods_no + '\');"><img src="' + img + '" class="img" alt="" onerror="this.src=\'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\'"/></a>';
+                        // } else {
+
+                        // }
 
                         return '<a href="#" onClick="return openSitePop(\'' + front_url + '\',\'' + params.data.goods_no + '\');"><img src="' + img + '" class="img" alt="" onerror="this.src=\'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\'"/></a>';
+
+                        
                     }
                 }
             },

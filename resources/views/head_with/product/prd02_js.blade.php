@@ -248,6 +248,7 @@
                         location.href   = "/head/product/prd02/"+goods_no+"/image?img_ta=" + res.img_type_alias;
                     else
                         document.location.reload();
+                        window?.opener?.location.reload();
                 } else {
                     console.log(res.msg);
                 }
