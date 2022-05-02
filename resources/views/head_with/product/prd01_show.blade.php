@@ -2263,7 +2263,7 @@
             });
 
             $(".pop_sd_btn").on("click", function(){
-                console.log(ouTnum,pgwidth,ouTnum-pgwidth);
+                // console.log(ouTnum,pgwidth,ouTnum-pgwidth);
                 if($(this).hasClass("sd_next")){
                     if(ouTnum-pgwidth < end){
                         popSlideWrap.animate({left:end},200);

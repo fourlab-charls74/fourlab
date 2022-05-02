@@ -64,10 +64,10 @@
         });
 
         $('#file').change(function(e){
+
             if($("[name=img_type]:checked").val() == "f" && $("[name=img_type_alias]").prop("selectedIndex") == 0){
                 alert("추가이미지 유형을 선택해 주십시오.");
-                target_file = null;
-                $('#file-label').html('이미지를 선택해주세요.');
+                $('#file').val('');
                 return;
             }
 
@@ -116,6 +116,7 @@
         var fr = new FileReader();
         fr.onload = drawImage;
         fr.readAsDataURL(target_file[0]);
+        console.log(fr);
     }
 
     function drawImage(e) {
