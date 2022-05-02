@@ -124,15 +124,19 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
                 cellStyle:{'text-align':'center'},
                 cellRenderer: function (params) {
                     if (params.value !== undefined && params.value !== "" && params.value !== null) {
-                        
+                        let img = params.data.img;
                         let [image_svr, front_url] = [IMAGE_SVR, FRONT_URL];
 
-                        // 이미지 경로 앞에 .env의 IMAGE_SVR 반영
-                        const prefix = image_svr ? image_svr + '/' : "";
-                        let img = prefix + params.data.img;
+                        // 상대경로인 경우 - 이미지 경로 앞에 .env의 IMAGE_SVR 반영
+                        let regex = /(http:|https:)/gi;
+                        if (img.search(regex) == -1) { // http, https가 붙어있지 않은 상대경로인 경우 prefix 추가.
+                            const prefix = image_svr ? image_svr + '/' : "";
+                            img = prefix + params.data.img;
+                            console.log('http 발견')
+                        }
 
                         // 이미지에 파라미터가 없는 경우 static 처리 - 캐시 방지
-                        const regex = /(\?)[\w|=|&]*/gi;
+                        regex = /(\?)[\w|=|&]*/gi;
                         if (img.search(regex) == -1) {
                             img = img + `?${Math.floor(Math.random() * 1000000000)}`;
                         }
