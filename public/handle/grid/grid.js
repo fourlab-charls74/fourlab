@@ -27,7 +27,6 @@ function formatNumber(params) {
 
 function HDGrid(gridDiv , columns, optionMixin = {}){
 
-
     this.id = gridDiv.id.replace("div-", "");
     this.gridDiv = gridDiv;
     this.gridTotal = this.id + '-total';
@@ -121,27 +120,16 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
                 }
             },
             GoodsImageType: {
-                cellStyle:{'text-align':'center'},
+                cellStyle: {'text-align':'center'},
                 cellRenderer: function (params) {
                     if (params.value !== undefined && params.value !== "" && params.value !== null) {
-                        let img = params.data.img;
-                        let [image_svr, front_url] = [IMAGE_SVR, FRONT_URL];
-
-                        // 상대경로인 경우 - 이미지 경로 앞에 .env의 IMAGE_SVR 반영
-                        let regex = /(http:|https:)/gi;
-                        if (img.search(regex) == -1) { // http, https가 붙어있지 않은 상대경로인 경우 prefix 추가.
-                            const prefix = image_svr ? image_svr + '/' : "";
-                            img = prefix + params.data.img;
+                        let front_url   = params.colDef.surl;
+                        let img         = params.data.img;
+                        if (front_url == undefined) {
+                            return '<a href="javascript:void(0);" onClick="return openSitePop(\'' + front_url + '\',\'' + params.data.goods_no + '\');"><img src="' + img + '" class="img" alt="" onerror="this.src=\'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\'"/></a>';
+                        } else {
+                            return '<img src="' + img + '" class="img" alt="" onerror="this.src=\'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\'"/></a>';
                         }
-
-                        // 이미지에 파라미터가 없는 경우 static 처리 - 캐시 방지
-                        regex = /(\?)[\w|=|&]*/gi;
-                        if (img.search(regex) == -1) {
-                            img = img + `?${Math.floor(Math.random() * 1000000000)}`;
-                        }
-
-                        return '<a href="javascript:void(0);" onClick="return openSitePop(\'' + front_url + '\',\'' + params.data.goods_no + '\');"><img src="' + img + '" class="img" alt="" onerror="this.src=\'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\'"/></a>';
-
                     }
                 }
             },

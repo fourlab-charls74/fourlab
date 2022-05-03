@@ -33,7 +33,7 @@ class prd02Controller extends Controller
 		if( $goods->img != "" ){
 			$img_urls["a"]["kind"]	= "a";
 			$img_urls["a"]["title"]	= "기본이미지";
-			$img_urls["a"]["img"]	= $goods->img . "?" . mt_rand();
+			$img_urls["a"]["img"]	= $goods->img;
 
 			$sql_list	= " select img from goods_image where goods_no = :goods_no and goods_sub = '0' ";
 			$rows		= DB::select($sql_list, array("goods_no" => $goods_no));
@@ -42,7 +42,7 @@ class prd02Controller extends Controller
 				if(preg_match("/_([a-z]+)_/i",$row->img,$m)){
 					$img_urls[$m[1]]["kind"]	= $m[1];
 					$img_urls[$m[1]]["title"]	=  "추가이미지:" . $m[1];
-					$img_urls[$m[1]]["img"]		= $row->img . "?" . mt_rand();
+					$img_urls[$m[1]]["img"]		= $row->img;
 				}
 			}
 		}
@@ -65,7 +65,7 @@ class prd02Controller extends Controller
 			if($img_sep == "s")	$img_sep	= "a";	//추가 크기 이미지는 기본이미지에서 출력되게 설정
 
             $files[$img_sep][] = [
-                'src'		=> "/" . $file . "?" . mt_rand(),
+                'src'		=> "/" . $file,
                 'filesize'	=> $filesize,
                 //'size' => $img_size	//이미지명으로 대처
                 'size'		=> $name

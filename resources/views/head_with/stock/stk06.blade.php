@@ -229,8 +229,7 @@
                         if (params.value !== undefined && params.data.goods_img != "") {
                             return '<img src="{{config('shop.image_svr')}}/' + params.data.goods_img + '" style="height:30px;"/>';
                         }
-                    },
-                    type: 'GoodsImageType', 
+                    }
                 },
                 {field:"goods_nm", headerName:"상품명", width:320, type:'HeadGoodsNameType'},
                 {field:"sale_stat_cl_val", headerName: "상품상태", width: 58, type:'GoodsStateType'},

@@ -169,18 +169,18 @@
                             <div class="col-lg-6">
                                 @if( $type == '' )
                                 <div class="img_box cum_slider_cont p-4">
-									<img src="{{config('shop.image_svr')}}{{@$goods_info->img}}" alt="{{@$goods_info->goods_nm}}">
+									<img src="{{@$goods_info->img}}" alt="{{@$goods_info->goods_nm}}">
                                 </div>
                                 <div class="cum_slider_thum_wrap">
                                     <div class="sd_prev pop_sd_btn bg-secondary"><i class="bx bx-left-arrow"></i></div>
                                     <div class="inbox">
                                         <ul class="cum_slider_thum">
                                             <li>
-                                                <a href="#" class="active"><img src="{{config('shop.image_svr')}}{{@$goods_images[0]}}"></a>
+                                                <a href="#" class="active"><img src="{{@$goods_images[0]}}"></a>
                                             </li>
                                             @for ($i = 1; $i < count($goods_images); $i++)
                                                 <li>
-                                                    <a href="#"><img src="{{config('shop.image_svr')}}{{@$goods_images[$i]}}" alt="22"></a>
+                                                    <a href="#"><img src="{{@$goods_images[$i]}}" alt="22"></a>
                                                 </li>
                                             @endfor
                                         </ul>
@@ -2842,9 +2842,7 @@
      * 관련상품 - goods api 관련 - api에서 직접 invoke할 함수들은 var로 선언함
      */
     const addRow = (row) => {
-        const IMG_PREFIX = '{{@$img_prefix}}';
         const GOODS_NO = document.f1.goods_no.value;
-        row.img = IMG_PREFIX + row.img; // 이미지 보이게 이미지 상수를 추가
         row.r_goods_no = row.goods_no; // 삭제 가능하도록 매칭 상품번호를 관련상품번호에 매칭
         if (row.goods_no == GOODS_NO) {
             alert('추가하려는 관련 상품 중 현재 수정중인 상품은 제외되었습니다.')

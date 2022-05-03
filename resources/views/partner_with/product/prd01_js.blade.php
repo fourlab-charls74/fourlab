@@ -1119,9 +1119,7 @@
      * 관련상품 - goods api 관련 - api에서 직접 invoke할 함수들은 var로 선언함
      */
     const addRow = (row) => {
-        const IMG_PREFIX = '{{@$img_prefix}}';
         const GOODS_NO = document.f1.goods_no.value;
-        row.img = IMG_PREFIX + row.img; // 이미지 보이게 이미지 상수를 추가
         row.r_goods_no = row.goods_no; // 삭제 가능하도록 매칭 상품번호를 관련상품번호에 매칭
         if (row.goods_no == GOODS_NO) {
             alert('추가하려는 관련 상품 중 현재 수정중인 상품은 제외되었습니다.')
