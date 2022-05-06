@@ -1,4 +1,4 @@
-@extends('partner_skote.layouts.master-without-nav')
+@extends('head_with.layouts.layout-nav')
 @section('title','카테고리')
 @section('content')
 <script src="https://unpkg.com/@ag-grid-enterprise/all-modules@24.1.0/dist/ag-grid-enterprise.min.js"></script>

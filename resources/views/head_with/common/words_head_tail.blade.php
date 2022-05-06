@@ -38,7 +38,7 @@
 
 <script type="text/javascript" charset="utf-8">
     const columns = [
-        {field: "chk", headerName: '선택', cellClass: 'hd-grid-code', checkboxSelection: true, width: 100, sort: null},
+        {field: "chk", headerName: '', cellClass: 'hd-grid-code', checkboxSelection: true, width: 38, sort: null},
         {
             field: "code_id",
             headerName: "형식",
@@ -48,7 +48,7 @@
         {
             field: "code_val",
             headerName: "이름",
-            width: 150,
+            width: "auto",
         },
     ];
 </script>

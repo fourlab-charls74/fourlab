@@ -51,7 +51,7 @@ class category extends Controller
 		$site	= $request->input("site");
 
         $where = "";
-        if ($cat_nm != "") $where .= " and a.d_cat_nm like '%" . Lib::quote($cat_nm) . "%' ";
+        if ($cat_nm != "") $where .= " and a.full_nm like '%" . Lib::quote($cat_nm) . "%' ";
 		//if($site != "") $where .= " and site='$site' ";
 
         $query = /** @lang text */

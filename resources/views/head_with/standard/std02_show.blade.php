@@ -758,7 +758,7 @@
 						<div class="card-header mb-0 d-flex align-items-center justify-content-between">
 							<a href="#">전시카테고리</a>
 							<div class="btn-group ml-sm-2 mt-1 mt-sm-0" role="group">
-								<button type="button" class="btn btn-sm btn-primary btn-display-add" data-toggle="tooltip" data-placement="top" title="" data-original-title="추가" onclick="AddCategory('DISPLAY');">
+								<button type="button" class="btn btn-sm btn-primary btn-display-add" data-toggle="tooltip" data-placement="top" title="" data-original-title="추가" onclick="popCategory('DISPLAY')">
 									<i class="bx bx-plus"></i>
 								</button>
 								<button type="button" class="btn btn-sm btn-outline-secondary btn-display-delete" data-toggle="tooltip" data-placement="top" title="" data-original-title="삭제" onclick="DelCategory('DISPLAY');">
@@ -778,7 +778,7 @@
 						<div class="card-header mb-0 d-flex align-items-center justify-content-between">
 							<a href="#">용도카테고리</a>
 							<div class="btn-group ml-sm-2 mt-1 mt-sm-0" role="group">
-								<button type="button" class="btn btn-sm btn-primary btn-display-add" data-toggle="tooltip" data-placement="top" title="" data-original-title="추가" onclick="AddCategory('ITEM');">
+								<button type="button" class="btn btn-sm btn-primary btn-display-add" data-toggle="tooltip" data-placement="top" title="" data-original-title="추가" onclick="popCategory('ITEM')">
 									<i class="bx bx-plus"></i>
 								</button>
 								<button type="button" class="btn btn-sm btn-outline-secondary btn-display-delete" data-toggle="tooltip" data-placement="top" title="" data-original-title="삭제" onclick="DelCategory('ITEM');">
@@ -884,7 +884,6 @@
 					"cat_type": cate_type
 				},
 				success: function(data) {
-
 					if (data.cat_code == 1) {
 						if (cate_type == "DISPLAY") {
 							gx_display.gridOptions.api.updateRowData({
@@ -1381,7 +1380,7 @@
 		{
 			field: "full_nm",
 			headerName: "카테고리",
-			width: 250,
+			width: "auto",
 			editable: true,
 		},
 	];
@@ -1442,7 +1441,7 @@
 		{
 			field: "full_nm",
 			headerName: "카테고리",
-			width: 250,
+			width: "auto",
 			editable: true,
 		},
 	];
@@ -1464,5 +1463,104 @@
 	});
 </script>
 <!-- 용도카테고리 끝 -->
+
+<!-- 전시, 용도 카테고리 api (카테고리 추가시 기존에 에러 발생하던 미구현된 부분들을 대체)-->
+<script language="javascript">
+	
+	const popCategory = (type) => {
+		if (type == 'DISPLAY') {
+			searchCategory.Open('DISPLAY', (code, name, full_name) => {
+				if (searchCategory.type === "ITEM") {
+					alert("전시 카테고리만 설정가능합니다.");
+					return false;
+				}
+
+				let rows = gx_display.getRows();
+				const codes = rows.map(row => row.d_cat_cd );
+				if (codes.includes(code)) {
+					alert("이미 등록된 카테고리입니다.");
+					return false;
+				}
+
+				var comId = $("[name=com_id]").val();
+				$.ajax({
+					async: true,
+					type: 'get',
+					url: '/head/standard/std02/addcate/' + comId,
+					data: {
+						"cat_cd": code,
+						"cat_type": type
+					},
+					success: function(data) {
+						if (data.cat_code == 1) {
+							rows = [{d_cat_cd: code, full_nm: full_name}];
+							gx_display.addRows(rows);
+						} else {
+							alert("장애가 발생했습니다.\n관리자에게 문의해 주십시오.");
+						}
+
+					},
+					complete: function() {
+						_grid_loading = false;
+					},
+					error: function(request, status, error) {
+						alert("장애가 발생했습니다.\n관리자에게 문의해 주십시오.");
+
+						console.log("error")
+						//console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+
+					}
+				});
+
+				
+			});
+		} else if (type == 'ITEM') {
+			searchCategory.Open('ITEM', (code, name, full_name) => {
+				if (searchCategory.type === "DISPLAY") {
+					alert("용도 카테고리만 설정가능합니다.");
+					return false;
+				}
+				
+				let rows = gx_item.getRows();
+				const codes = rows.map(row => row.d_cat_cd );
+				if (codes.includes(code)) {
+					alert("이미 등록된 카테고리입니다.");
+					return false;
+				}
+
+				var comId = $("[name=com_id]").val();
+				$.ajax({
+					async: true,
+					type: 'get',
+					url: '/head/standard/std02/addcate/' + comId,
+					data: {
+						"cat_cd": code,
+						"cat_type": type
+					},
+					success: function(data) {
+						if (data.cat_code == 1) {
+							rows = [{d_cat_cd: code, full_nm: full_name}];
+							gx_item.addRows(rows);
+						} else {
+							alert("장애가 발생했습니다.\n관리자에게 문의해 주십시오.");
+						}
+
+					},
+					complete: function() {
+						_grid_loading = false;
+					},
+					error: function(request, status, error) {
+						alert("장애가 발생했습니다.\n관리자에게 문의해 주십시오.");
+
+						console.log("error")
+						//console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+
+					}
+				});
+
+			});
+		}
+	};
+</script>
 
 @stop

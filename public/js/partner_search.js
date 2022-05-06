@@ -484,7 +484,14 @@ SearchCategory.prototype.Choice = function(code,name,full_nm = '', mx_len = 0){
         }
     }
     $('#SearchCategoryModal').modal('toggle');
+    this.InitValue();
 };
+
+SearchCategory.prototype.InitValue = () => {
+    $('#SearchCategoryModal input[name="cat_nm"]').val('');
+    searchCategory.grid.setRows([]);
+};
+
 let searchCategory = new SearchCategory();
 
 
