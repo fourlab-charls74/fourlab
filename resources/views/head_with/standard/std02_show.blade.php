@@ -1466,8 +1466,16 @@
 
 <!-- 전시, 용도 카테고리 api (카테고리 추가시 기존에 에러 발생하던 미구현된 부분들을 대체)-->
 <script language="javascript">
+
+	const CMD = '{{$cmd}}';
 	
 	const popCategory = (type) => {
+		
+		if (CMD != 'editcmd') {
+			alert("업체 등록 후 설정 가능합니다.");
+			return false;
+		}
+		
 		if (type == 'DISPLAY') {
 			searchCategory.Open('DISPLAY', (code, name, full_name) => {
 				if (searchCategory.type === "ITEM") {
