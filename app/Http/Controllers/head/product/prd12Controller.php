@@ -53,7 +53,8 @@ class prd12Controller extends Controller
             'plan_types' => SLib::getCodes('G_PLAN_TYPE'),
             'plan_kinds' => SLib::getCodes('G_PLAN_KIND'),
             'times' => $times,
-            'start_date' => date("Y-m-d")
+            'start_date' => date("Y-m-d"),
+            'd_category' => []
         ];
 
         return view( Config::get('shop.head.view') . '/product/prd12_show',$values);
@@ -732,8 +733,8 @@ class prd12Controller extends Controller
             from category c
             where c.cat_type = 'PLAN' and c.d_cat_cd = :d_cat_cd
         ";
-        //echo "<pre>$sql</pre>";
-        $rows = DB::selectone($sql,array("d_cat_cd" => $d_cat_cd));
+        // echo "<pre>$sql</pre>";
+        $rows = DB::selectOne($sql,array("d_cat_cd" => $d_cat_cd));
 
         return response()->json([
             "code" => 200,
