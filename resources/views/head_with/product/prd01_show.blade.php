@@ -2984,51 +2984,7 @@
 		console.log(opt2);
 		console.log(selectedRowData);
 
-/*
-		const selectedRowData	= gx.gridOptions.api.getSelectedRows();
-		const selectRowCount	= selectedRowData.length;
-
-		if( selectRowCount == 0 ) {
-			alert('품목변경할 정보고시내용을 선택해주세요.');
-			return;
-		}
-
-		const s_goods_class_cd	= $('.goods_class').val();
-		const s_goods_class_nm	= $('.goods_class > option:selected').html();
-		const good_no           = '{{$goods_no}}';
-
-		if( s_goods_class_cd === '' ) {
-			alert('변경할 품목을 선택해주세요.');
-			return;
-		}
-
-		if( confirm("선택하신 상품정보고시 품목으로 변경하시겠습니까?") ){
-			$.ajax({
-				method: 'put',
-				url: '/head/product/prd01/goods-class-opt-update',
-				data: {
-					'goods_class': s_goods_class_cd,
-					'goods_no': goods_no
-				},
-				dataType: 'json',
-				success: function(res) {
-					if (res.code == '200') {
-						goodsClassSearch();
-					} else {
-						console.log(res.code);
-						alert(res.msg);
-					}
-				},
-				error: function(e) {
-					console.log(e.responseText)
-				}
-			});
-		}
-*/
-
 	});
-    
-    
 
 	</script>
 
