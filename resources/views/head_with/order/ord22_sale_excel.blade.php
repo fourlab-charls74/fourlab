@@ -19,7 +19,7 @@
 		</tr>
 	</thead>
 	<tbody>
-	<?
+	<?php
 		$ord_index1		= 0;
 		$ord_index2		= 0;
 		$ord_pvalue1	= "";
@@ -29,7 +29,7 @@
 		<?php foreach($rows as $row) { ?>
 		<tr>
 		@foreach ($fields as $field)
-		<?
+		<?php
 			$style1	= "";
 			//주문 묶음 단위 표시
 			if( $row->ord_cnt > 1 && $field->name == "ord_no" )

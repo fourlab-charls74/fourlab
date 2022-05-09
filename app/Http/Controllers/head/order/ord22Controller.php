@@ -536,7 +536,7 @@ class ord22Controller extends Controller
 			left outer join code pay_stat on (a.pay_stat = pay_stat.code_id and pay_stat.code_kind_cd = 'G_PAY_STAT')
 			left outer join code gt on (a.goods_type = gt.code_id and gt.code_kind_cd = 'G_GOODS_TYPE')
 		";
-
+       
         $this->set_excel_download("delivery_%s.xls");
 
         return view( Config::get('shop.head.view') . '/order/ord22_pop_excel',[
@@ -598,9 +598,8 @@ class ord22Controller extends Controller
 					 else d.bank_code end bank_code,
 					b.r_zipcode, concat(ifnull(b.r_addr1, ''),ifnull(b.r_addr2, '')) as r_addr, b.r_phone, b.r_mobile, b.dlv_msg, '' as free_gift,
 					concat(ifnull(b.user_nm, ''),'(',ifnull(b.user_id, ''),')') as user_nm, b.r_nm, b.r_jumin,
-					f.com_nm as sale_place, concat('[', ifnull(f.zip_code, ''),']', ifnull(f.addr1, ''), ' ', ifnull(f.addr2, '')) as sale_place_addr, f.cs_phone as sale_place_phone,
-					b.out_ord_no, c.com_nm,
-					c.baesong_kind, b.ord_date,
+					f.com_nm as sale_place, concat('[', ifnull(f.zip_code, ''),']', ifnull(f.addr1, ''), ' ', ifnull(f.addr2, '')) as sale_place_addr, 
+                    f.cs_phone as sale_place_phone, b.out_ord_no, c.com_nm, c.baesong_kind, b.ord_date,
 					case a.ord_state
 						when '-20' then null
 						else d.upd_dm

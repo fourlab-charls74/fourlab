@@ -1,4 +1,5 @@
 <meta charset="utf-8" />
+
 <?php
 function get_bgcolor($name) {
 	if( $name === 'ord_no' )
@@ -21,7 +22,7 @@ function get_bgcolor($name) {
 		</tr>
 	</thead>
 	<tbody>
-	<?
+	<?php
 		$ord_index1		= 0;
 		$ord_index2		= 0;
 		$ord_pvalue1	= "";
@@ -31,7 +32,7 @@ function get_bgcolor($name) {
 	<?php foreach($rows as $row) { ?>
 		<tr>
 		@foreach ($fields as $field)
-		<?
+		<?php
 			$style1	= "";
 			//주문 묶음 단위 표시
 			if( $row->ord_cnt > 1 && $field->name == "ord_no" )
