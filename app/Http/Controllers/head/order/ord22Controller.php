@@ -547,6 +547,7 @@ class ord22Controller extends Controller
 
     public function download_baesong_list_sale(Request $request) {
         $condition = $this->get_condition($request);
+
         $where = $condition[0];
         $orderby = $condition[1];
 
@@ -575,7 +576,7 @@ class ord22Controller extends Controller
         $fieldSql = "select col as name, col_nm as value from delivery_column where sale_place = '$request->sale_place' order by seq";
         $fields = DB::select($fieldSql);
         // return $fieldSql;
-        $field  = $this->getFieldName($fields);
+        $field = $this->getFieldName($fields);
 
         // 임시테이블 생성
         $sql = "
