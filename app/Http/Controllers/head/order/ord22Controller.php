@@ -294,6 +294,10 @@ class ord22Controller extends Controller
             foreach($datas as $data) {
                 list($ord_opt_no, $dlv_no) = explode(",", $data);
 
+                if(is_numeric($ord_opt_no) != 1) {
+                    continue;
+                }
+
                 // 주문번호
                 $sql = "select ord_no from order_opt where ord_opt_no = '$ord_opt_no'";
                 $ord_no = DB::selectOne($sql);
@@ -781,26 +785,26 @@ class ord22Controller extends Controller
                 ];
 
                 $order->AddStateLog($state_log);
-
+                
                 $order->DlvEnd($dlv_cd, $dlv_no);
                 $order->DlvLog($ord_state = 30);
-
+                
                 ################################################################
                 // 보유재고 차감 로직 추가
 
                 $sql	= /** @lang text */
-                    "
-					select qty, goods_no, goods_sub, goods_opt
-					from order_opt
-					where ord_opt_no = '$ord_opt_no'
+                "
+                select qty, goods_no, goods_sub, goods_opt
+                from order_opt
+                where ord_opt_no = '$ord_opt_no'
 				";
                 $opt	= DB::selectOne($sql);
                 $_qty	= $opt->qty;
-
+                
                 $_goods_no	= $opt->goods_no;
                 $_goods_sub	= $opt->goods_sub;
                 $_goods_opt	= $opt->goods_opt;
-
+                
                 $prd = new Product($user);
 
                 // 재고 차감 처리

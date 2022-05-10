@@ -238,7 +238,10 @@ class Product
 		order by regi_date desc limit 0,1
 	  ";
 
-		return DB::selectOne($sql)->wonga;
+	  	$row = DB::selectOne($sql);
+		$wonga = $row == NULL ? 0 : $row->wonga;
+
+		return $wonga;
 	}
 
 	function SetGoodsNo($goods_no)
@@ -678,7 +681,7 @@ class Product
 				$ord_date = $row->ord_date;
 				$ord_price = $row->price;
 			}
-
+			
 			// 주문 정보 있는 경우 해당 가격, 일자의 원가 얻기
 			$ord_stock_wonga = ($is_order) ? $this->__GetPartnerGoodsWonga($com_id, $ord_price, $ord_date) : 0;
 
