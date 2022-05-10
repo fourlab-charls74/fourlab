@@ -341,7 +341,7 @@
                                 <div class="col-12">
                                     <div class="table-box-ty2 mobile">
                                         <form name="category">
-                                            <input type='hidden' name='d_cat_cd' id='d_cat_cd' value='{{ @$category->d_cat_cd }}'>
+                                            <input type='hidden' name='d_cat_cd' id='d_cat_cd' value='{{ @$category->d_cat_cd }}' />
                                             <table class="table incont table-bordered" width="100%" cellspacing="0">
                                             <colgroup>
                                                 <col width="150px">

@@ -125,9 +125,7 @@
         }
 
         function View() {
-            console.log(p_no);
-            var p_no = $('#d_cat_cd').val();
-            var url = "https://" + '{{ @$domain }}' + "/app/planning/views/" + p_no + '/' + code;
+            var url = "https://" + '{{ @$domain }}' + "/app/planning/views/" + '{{ @$plan->p_no }}' + '/' + code;
             window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=400,left=550,width=1024,height=900");
         }
 
@@ -135,7 +133,7 @@
             if(d_cat_cd !== ''){
                 $('#d_cat_cd').val(d_cat_cd);
             }
-            let data = 'd_cat_cd=' + $("#d_cat_cd").val();
+            let data = 'd_cat_cd=' + '{{ @$plan->p_no }}';
             gx.Request('/head/product/prd12/' + code + '/search', data);
 
             CategorySearch();
@@ -148,7 +146,7 @@
 
             var frm = $('form');
             //console.log(frm.serialize());
-            let d_cat_cd = $('#d_cat_cd').val();
+            let d_cat_cd = '{{ @$plan->p_no }}';
 
             $.ajax({
                 method: 'post',
@@ -190,7 +188,7 @@
                 alert('삭제할 상품을 선택 해 주십시오.');
             } else if(goods_nos.length > 0 && confirm('삭제 하시겠습니까?')){
 
-                let d_cat_cd = $('#d_cat_cd').val();
+                let d_cat_cd = '{{ @$plan->p_no }}';
 
                 $.ajax({
                     method: 'post',
@@ -223,7 +221,7 @@
             });
             if(confirm('순서를 변경 하시겠습니까?')){
 
-                let d_cat_cd = $('#d_cat_cd').val();
+                let d_cat_cd = '{{ @$plan->p_no }}';
 
                 $.ajax({
                     method: 'post',
@@ -384,12 +382,12 @@
          */
         function CategorySearch() {
 
-            var d_cat_cd =  $("#d_cat_cd").val();
+            var d_cat_cd = '{{ @$plan->p_no }}';
 
             $.ajax({
                 method: 'get',
                 url: '/head/product/prd12/' + code + '/search_category',
-                data: {'d_cat_cd':d_cat_cd},
+                data: {'d_cat_cd': d_cat_cd},
                 dataType: 'json',
                 success: function (res) {
                     // console.log(res);
