@@ -189,9 +189,9 @@ $('.apply-btn').click(function(e){
 		const uploadLines = [];
 		lines.forEach((line) => {
 			if (line === '') return;
-			uploadLines.push(line.replace(/\t/, ","));
+			uploadLines.push(line.replaceAll(/\t/ig, ","));
 		});
-		console.log()
+
 		$.ajax({
 			async: true,
 			type: 'put',
@@ -209,7 +209,7 @@ $('.apply-btn').click(function(e){
 		});
 	}
 
-	fr.readAsText(target);
+	fr.readAsText(target, "EUC-KR");
 });
 
 $('#file').change(function(e){
@@ -260,7 +260,8 @@ $(".out-complate-btn").click(function()
 			success: function (data) {
 				if(data.code == "200" ){
 					alert("출고완료 상태로 변경되었습니다.");
-					Search();
+					window.opener.Search();
+					window.close();
 				}else{
 					alert(data.msg);
 				}
