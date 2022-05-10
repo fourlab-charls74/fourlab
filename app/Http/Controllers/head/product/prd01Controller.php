@@ -1315,7 +1315,7 @@ class prd01Controller extends Controller
 
         $goods_no    = $req->input('goods_no', '');
         $goods_sub   = $req->input('goods_sub', '');
-        $goods_class = $req->input('class', '');
+        // $goods_class = $req->input('class', '');
         $page        = $req->input("page", -1);
 
         $page_size = 100;
@@ -1334,11 +1334,11 @@ class prd01Controller extends Controller
         // $where .= " and g.com_id = '$com_id' ";
 
         $query = "
-          select count(*) as total
-          from goods g 
-          where 1=1 
-          $where
-      ";
+			select count(*) as total
+			from goods g 
+			where 1=1 
+			$where
+		";
 
         $row = DB::selectOne($query);
         $total = $row->total;
@@ -1479,6 +1479,9 @@ class prd01Controller extends Controller
 	}
 
 	public function goods_class_update(Request $req) {
+
+		// dd($req->all());
+
 		try {
 			DB::beginTransaction();
 
@@ -1494,7 +1497,7 @@ class prd01Controller extends Controller
 				'item_009' => $req->input('item_009', ''),
 				'item_010' => $req->input('item_010', ''),
 				'item_011' => $req->input('item_011', ''),
-				'item_012' => $req->input('item_012', '')
+				'item_012' => $req->input('item_012', ''),
 			];
 
 			$class_cd = $req->input('class_cd', '');
@@ -1508,6 +1511,8 @@ class prd01Controller extends Controller
 					->update(['class' => $class_cd]);
 			}
 
+			dd($values);
+
 			$where = [
 				'goods_no' => $req->goods_no,
 				'goods_sub' => $req->goods_sub
@@ -1519,6 +1524,7 @@ class prd01Controller extends Controller
 
 			return response()->json(null, 201);
 		} catch(Exception $e){
+			dd($e);
 			DB::rollback();
 			return response()->json(['msg' => "수정중 에러가 발생했습니다. 잠시 후 다시시도 해주세요."], 500);
 		}
@@ -1582,6 +1588,8 @@ class prd01Controller extends Controller
 
 			DB::commit();
 		} catch(Exception $e){
+
+			dd($e);
 			$err_code	= "500";
 			$msg		= "시스템 에러입니다. 관리자에게 문의하세요.";
 
@@ -2946,4 +2954,6 @@ class prd01Controller extends Controller
             'goods_related'         => $goods_related
         ]);
 	}
+
+
 }

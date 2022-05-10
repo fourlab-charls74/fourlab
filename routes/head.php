@@ -293,6 +293,8 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::put('prd01/{no}/in-qty', 'prd01Controller@update_in_qty');
         Route::put('prd01/update/state', 'prd01Controller@update_state');
         Route::put('prd01/update/qty', 'prd01Controller@update_qty');
+
+        Route::put('prd01/goods-class-opt-update', 'prd01Controller@goods_class_opt_update');
         Route::put('prd01/goods-class-update', 'prd01Controller@goods_class_update');
         Route::put('prd01/goods-class-delete', 'prd01Controller@goods_class_delete');
         Route::put('prd01/{no}/save/sale-place-cont', 'prd01Controller@save_sale_place_cont');

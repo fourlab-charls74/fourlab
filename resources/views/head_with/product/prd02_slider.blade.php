@@ -113,7 +113,7 @@
                                                         <div class="btn-group">
                                                             <button class="btn btn-outline-secondary" type="button" id="apply">적용</button>
                                                         </div>
-                                                            <p class="mb-0 cum_stxt mt-1 font-sm">(기본이미지 : 500*500 사이즈의 이미지를 업로드 해 주십시오.)</p>
+                                                            <p class="mb-0 cum_stxt mt-1 font-sm">(기본이미지 : 700*700 사이즈의 이미지를 업로드 해 주십시오.)</p>
                                                     </div>
                                                 </td>
                                             </tr>

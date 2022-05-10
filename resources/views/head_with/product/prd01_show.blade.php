@@ -71,7 +71,7 @@
             </div>
         </div>
         <form name="f1" id="f1" onsubmit="return false;">
-
+            @csrf
 			<input type="hidden" name="goods_no" value="{{@$goods_no}}">
             <input type="hidden" name="goods_sub" value="0">
 			<input type="hidden" name="is_def_d_category" value="0">				<!-- 일반카테고리를 선택했는지 -->
@@ -1312,7 +1312,9 @@
                     </div>
                 </div>
                 @endif
+                <form method="post" name="save">
                 @if(count($class_items) > 0 && $type === '')
+                
                 <div class="card">
                     <div class="card-header mb-0">
                         <a href="#">상품정보고시 내역</a>
@@ -1325,7 +1327,7 @@
                                 </div>
                                 <div class="fr_box">
                                     <span class="d-none d-sm-inline">선택한 상품을</span>
-                                    <select class="form-control form-control-sm goods_class" style="width:130px;display:inline">
+                                    <select id="to_class" name="to_class" class="form-control form-control-sm goods_class" style="width:130px;display:inline">
                                         <option value="">선택</option>
                                         @foreach ($class_items as $class_item)
                                             <option value='{{ $class_item->class }}'>
@@ -1346,6 +1348,7 @@
                     </div>
                 </div>
                 @endif
+                </form>
             </div>
         </form>
     </div>
@@ -2073,7 +2076,7 @@
                 {field:"item_012",headerName:"종류",editable: checkEdit,cellStyle : editerStyle},
             ];
 
-			//선택한 항목 상태변경
+			//선택한 항목 상태변경 - 여기
 			$('.goods-info-change-btn').click(function(e){
 				e.preventDefault();
 
@@ -2118,12 +2121,20 @@
                 }
 			});
 
-			//선택된 상품정보고시 저장
+			//선택된 상품정보고시 저장 - 여기
 			$('.goods-info-save-btn').click(function(e){
 				e.preventDefault();
 
-				const selectedRowData	= gx.gridOptions.api.getSelectedRows();
-				const selectRowCount	= selectedRowData.length;
+                var frm = $('form[name=save]');
+                var class_code = $("#class").val();
+                var next_data = "";
+
+                var selectedRowData = gx.gridOptions.api.getSelectedRows();
+                const selectRowCount = selectedRowData.length;
+                var goods = JSON.stringify(selectedRowData);
+
+                $("#goods_info").val(goods);
+                $("#data").val(goods);
 
 				if( selectRowCount == 0 ) {
 					alert('저장하실 정보고시 내용을 선택해주세요.');
@@ -2133,12 +2144,14 @@
 				selectedRowData.forEach(function(data, idx) {
 					$.ajax({
 						async: true,
-						type: 'put',
-						url: `/head/product/prd01/goods-class-update`,
-						data: data,
+						type: 'get',
+						// url: `/head/product/prd01/goods-class-update`,
+                        url: `/head/product/prd05/update`,
+                        data: frm.serialize() + '&class=' + class_code,
+                        dataType: "json",
 						success: function (data) {
 							if (selectRowCount -1 === idx) {
-							alert("변경된 내용이 정상적으로 저장 되었습니다.");
+							    alert("변경된 내용이 정상적으로 저장 되었습니다.");
 							}
 						},
 						error: function(request, status, error) {
@@ -2168,6 +2181,7 @@
 							type: 'put',
 							url: `/head/product/prd01/goods-class-delete`,
 							data: data,
+                            dataType: "json",
 							success: function (data) {
 								if (selectRowCount -1 === idx) {
 									alert("정상적으로 삭제 되었습니다.");
@@ -2192,9 +2206,7 @@
             }
 
             function goodsClassSearch() {
-                const class_value = $('.goods_class').val();
-                const data = `goods_no=${goods_no}&goods_sub=${goods_sub}&class=${class_value}`;
-
+                const data = `goods_no=${goods_no}&goods_sub=${goods_sub}`;
                 gx.Request(`/head/product/prd01/${goods_no}/goods-class`, data, -1);
             }
 
@@ -2981,8 +2993,8 @@
 			return;
 		}
 
-		console.log(opt2);
-		console.log(selectedRowData);
+		// console.log(opt2);
+		// console.log(selectedRowData);
 
 	});
 

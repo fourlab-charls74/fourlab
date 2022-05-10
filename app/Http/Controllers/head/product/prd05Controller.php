@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Exception;
 //use Illuminate\Database\Schema\Blueprint;
 //use Illuminate\Support\Facades\Schema;
 
@@ -325,8 +326,8 @@ class prd05Controller extends Controller
         echo $result;
     }
 
-    public function update(Request $request){
-
+    public function update(Request $request)
+    {
         $id = Auth::guard('head')->user()->id;
         $name = Auth::guard('head')->user()->name;
 
