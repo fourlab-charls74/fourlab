@@ -2062,6 +2062,7 @@
                 },
                 {field:"goods_sub",headerName:"goods_sub",hide:true},
                 {field:"class",headerName:"분류" },
+                {field:"class_cd",headerName:"class_cd", hide:true },
                 {field:"item_001",headerName:"제품소재",editable: checkEdit,cellStyle:editerStyle },
                 {field:"item_002",headerName:"색상",editable: checkEdit,cellStyle : editerStyle},
                 {field:"item_003",headerName:"치수",editable: checkEdit,cellStyle : editerStyle},

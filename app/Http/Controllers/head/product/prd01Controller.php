@@ -1360,7 +1360,8 @@ class prd01Controller extends Controller
               (select class_nm from code_class where class = g.class group by class, class_nm) as class,
               class.item_001, class.item_002, class.item_003, class.item_004, class.item_005, 
               class.item_006, class.item_007, class.item_008, class.item_009, class.item_010, 
-              class.item_011, class.item_012
+              class.item_011, class.item_012,
+			  g.class as class_cd
            from goods g 
               left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
               left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
@@ -1373,6 +1374,8 @@ class prd01Controller extends Controller
           order by g.goods_no
           $sql_limit
       	";
+
+		//dd($query);
 
 		$result = DB::select($query);
 
