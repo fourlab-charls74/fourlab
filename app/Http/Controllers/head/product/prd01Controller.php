@@ -1511,7 +1511,7 @@ class prd01Controller extends Controller
 					->update(['class' => $class_cd]);
 			}
 
-			dd($values);
+			// dd($values);
 
 			$where = [
 				'goods_no' => $req->goods_no,
