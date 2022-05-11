@@ -2076,7 +2076,7 @@
                 {field:"item_012",headerName:"종류",editable: checkEdit,cellStyle : editerStyle},
             ];
 
-			//선택한 항목 상태변경 - 여기
+			//선택한 항목 상태변경
 			$('.goods-info-change-btn').click(function(e){
 				e.preventDefault();
 
@@ -2121,20 +2121,12 @@
                 }
 			});
 
-			//선택된 상품정보고시 저장 - 여기
-			$('.goods-info-save-btn').click(function(e){
+            //선택된 상품정보고시 저장
+            $('.goods-info-save-btn').click(function(e){
 				e.preventDefault();
 
-                var frm = $('form[name=save]');
-                var class_code = $("#class").val();
-                var next_data = "";
-
-                var selectedRowData = gx.gridOptions.api.getSelectedRows();
-                const selectRowCount = selectedRowData.length;
-                var goods = JSON.stringify(selectedRowData);
-
-                $("#goods_info").val(goods);
-                $("#data").val(goods);
+				const selectedRowData	= gx.gridOptions.api.getSelectedRows();
+				const selectRowCount	= selectedRowData.length;
 
 				if( selectRowCount == 0 ) {
 					alert('저장하실 정보고시 내용을 선택해주세요.');
@@ -2144,14 +2136,12 @@
 				selectedRowData.forEach(function(data, idx) {
 					$.ajax({
 						async: true,
-						type: 'get',
-						// url: `/head/product/prd01/goods-class-update`,
-                        url: `/head/product/prd05/update`,
-                        data: frm.serialize() + '&class=' + class_code,
-                        dataType: "json",
+						type: 'put',
+						url: `/head/product/prd01/goods-class-update`,
+						data: data,
 						success: function (data) {
 							if (selectRowCount -1 === idx) {
-							    alert("변경된 내용이 정상적으로 저장 되었습니다.");
+							alert("변경된 내용이 정상적으로 저장 되었습니다.");
 							}
 						},
 						error: function(request, status, error) {
