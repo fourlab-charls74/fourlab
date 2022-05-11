@@ -274,7 +274,7 @@
 						</div>
 						<div class="fl_inner_box">
 							<select id='to_class' name='to_class' class="form-control form-control-sm" style='width:100px;display:inline'>
-								<option value=''>선택</option>
+								<option value='not_selected'>선택</option>
 								@foreach ($class_items as $class_item)
 								<option value='{{ $class_item->class }}'>{{ $class_item->class_nm }}</option>
 								@endforeach
@@ -552,9 +552,9 @@
         var clone = {};
         for (var key in obj) {
             if (typeof obj[key] == "object" && obj[key] != null) {
-            clone[key] = cloneObject(obj[key]);
+                clone[key] = cloneObject(obj[key]);
             } else {
-            clone[key] = obj[key];
+                clone[key] = obj[key];
             }
         }
 
@@ -931,10 +931,6 @@
 
     var removedRows = [];
     var checkedRows = [];
-    //var next_data = "";
-
-
-
 
 	function Cmder(value){
 		if( value == "delete" ){
@@ -963,15 +959,29 @@
 
         var selectedRowData = gx.gridOptions.api.getSelectedRows();
         var goods = JSON.stringify(selectedRowData);
+
+        var to_class_code = $("#to_class").val();
+
+        if (class_code == '') { // 미분류인 경우
+
+            // class 값이 미분류인 경우 품목 선택하지 않았을 때 알림 처리
+            if ((to_class_code == 'not_selected' || to_class_code == '')) {
+                alert('변경할 품목을 선택해주세요.');
+                return false;
+            }
+
+        } else {
+            // 분류항목이 있을 때 select 값이 '선택' 인 경우 to_class를 동일하게 처리
+            if (to_class_code == 'not_selected') {
+                $("#to_class").val(class_code);
+            }
+
+        }
+
         $("#goods_info").val(goods);
         $("#data").val(goods);
-        // console.log("ddd : "+goods);
+
         frm.attr('method', 'post');
-
-        //var goods = JSON.stringify(selectedRowData);
-
-
-        //console.log("serialize : "+frm.serialize());
 
         $.ajax({
             async: true,

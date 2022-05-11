@@ -2142,7 +2142,8 @@
 						data: data,
 						success: function (data) {
 							if (selectRowCount -1 === idx) {
-							alert("변경된 내용이 정상적으로 저장 되었습니다.");
+							    alert("변경된 내용이 정상적으로 저장 되었습니다.");
+                                goodsClassSearch();
 							}
 						},
 						error: function(request, status, error) {
@@ -2176,7 +2177,7 @@
 							success: function (data) {
 								if (selectRowCount -1 === idx) {
 									alert("정상적으로 삭제 되었습니다.");
-									location.reload();
+									goodsClassSearch();
 								}
 							},
 							error: function(request, status, error) {

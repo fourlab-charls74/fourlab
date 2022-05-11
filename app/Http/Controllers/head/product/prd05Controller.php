@@ -328,6 +328,7 @@ class prd05Controller extends Controller
 
     public function update(Request $request)
     {
+
         $id = Auth::guard('head')->user()->id;
         $name = Auth::guard('head')->user()->name;
 
@@ -350,30 +351,16 @@ class prd05Controller extends Controller
         $goods_color_del_result = 0;
         $goods_color_in_result = 500;
 
-        /*
-        print_r($goods_arrs);
-        echo "<br>";
+        // 기존 코드에 품목 변경시 데이터 초기화 추가 및 버그 수정 - madforre --->
+        $class_changed = ($class == $to_class) ? false : true;
+        $class = $to_class ? $to_class : "";
 
-        echo 'class : '. $class;
-        echo "<br>";
-        */
-        if($to_class != ""){
-            $class = $to_class;
-        }
-        /*
-        echo "class : ". $class;
-        echo "<br>";
-        */
-        //$cnt = 0;
         $cc_query = "select * from code_class where class='$class'";
         $code_class_rows = DB::select($cc_query);
-
-        //echo count($code_class_rows);
 
         $color_query = "select code_id as id, code_val_eng as val from code where code_kind_cd='G_PRODUCTS_COLOR' and use_yn='Y' order by code_seq asc";
         $color_rows = DB::select($color_query);
 
-        //for($k=0; $k<$goods_cnt; $k++){
         foreach ($goods_arrs as $goods_arr) {
             $goods_opt_num = 0;
             $goods_opt_cnt = 0;
@@ -384,29 +371,30 @@ class prd05Controller extends Controller
 
             $goods_no = $goods_arr['goods_no'];
             $goods_sub = $goods_arr['goods_sub'];
-            $item_001		= (isset($goods_arr['item_001'])) ? $goods_arr['item_001']:"";
-            $item_002		= (isset($goods_arr['item_002'])) ? $goods_arr['item_002']:"";
-            $item_003		= (isset($goods_arr['item_003'])) ? $goods_arr['item_003']:"";
-            $item_004		= (isset($goods_arr['item_004'])) ? $goods_arr['item_004']:"";
-            $item_005		= (isset($goods_arr['item_005'])) ? $goods_arr['item_005']:"";
-            $item_006		= (isset($goods_arr['item_006'])) ? $goods_arr['item_006']:"";
-            $item_007		= (isset($goods_arr['item_007'])) ? $goods_arr['item_007']:"";
-            $item_008		= (isset($goods_arr['item_008'])) ? $goods_arr['item_008']:"";
-            $item_009		= (isset($goods_arr['item_009'])) ? $goods_arr['item_009']:"";
-            $item_010		= (isset($goods_arr['item_010'])) ? $goods_arr['item_010']:"";
-            $item_011		= (isset($goods_arr['item_011'])) ? $goods_arr['item_011']:"";
-            $item_012		= (isset($goods_arr['item_012'])) ? $goods_arr['item_012']:"";
-            $item_013		= (isset($goods_arr['item_013'])) ? $goods_arr['item_013']:"";
-            $item_014		= (isset($goods_arr['item_014'])) ? $goods_arr['item_014']:"";
-            $item_015		= (isset($goods_arr['item_015'])) ? $goods_arr['item_015']:"";
-            $item_016		= (isset($goods_arr['item_016'])) ? $goods_arr['item_016']:"";
-            $item_017		= (isset($goods_arr['item_017'])) ? $goods_arr['item_017']:"";
-            $item_018		= (isset($goods_arr['item_018'])) ? $goods_arr['item_018']:"";
-            $item_019		= (isset($goods_arr['item_019'])) ? $goods_arr['item_019']:"";
-            $item_020		= (isset($goods_arr['item_020'])) ? $goods_arr['item_020']:"";
-
+            $item_001		= (isset($goods_arr['item_001']) && !$class_changed) ? $goods_arr['item_001']:"";
+            $item_002		= (isset($goods_arr['item_002']) && !$class_changed) ? $goods_arr['item_002']:"";
+            $item_003		= (isset($goods_arr['item_003']) && !$class_changed) ? $goods_arr['item_003']:"";
+            $item_004		= (isset($goods_arr['item_004']) && !$class_changed) ? $goods_arr['item_004']:"";
+            $item_005		= (isset($goods_arr['item_005']) && !$class_changed) ? $goods_arr['item_005']:"";
+            $item_006		= (isset($goods_arr['item_006']) && !$class_changed) ? $goods_arr['item_006']:"";
+            $item_007		= (isset($goods_arr['item_007']) && !$class_changed) ? $goods_arr['item_007']:"";
+            $item_008		= (isset($goods_arr['item_008']) && !$class_changed) ? $goods_arr['item_008']:"";
+            $item_009		= (isset($goods_arr['item_009']) && !$class_changed) ? $goods_arr['item_009']:"";
+            $item_010		= (isset($goods_arr['item_010']) && !$class_changed) ? $goods_arr['item_010']:"";
+            $item_011		= (isset($goods_arr['item_011']) && !$class_changed) ? $goods_arr['item_011']:"";
+            $item_012		= (isset($goods_arr['item_012']) && !$class_changed) ? $goods_arr['item_012']:"";
+            $item_013		= (isset($goods_arr['item_013']) && !$class_changed) ? $goods_arr['item_013']:"";
+            $item_014		= (isset($goods_arr['item_014']) && !$class_changed) ? $goods_arr['item_014']:"";
+            $item_015		= (isset($goods_arr['item_015']) && !$class_changed) ? $goods_arr['item_015']:"";
+            $item_016		= (isset($goods_arr['item_016']) && !$class_changed) ? $goods_arr['item_016']:"";
+            $item_017		= (isset($goods_arr['item_017']) && !$class_changed) ? $goods_arr['item_017']:"";
+            $item_018		= (isset($goods_arr['item_018']) && !$class_changed) ? $goods_arr['item_018']:"";
+            $item_019		= (isset($goods_arr['item_019']) && !$class_changed) ? $goods_arr['item_019']:"";
+            $item_020		= (isset($goods_arr['item_020']) && !$class_changed) ? $goods_arr['item_020']:"";
+            // --->
 
             $query = "select count(*) as cnt from goods_class where goods_no='$goods_no' and goods_sub='$goods_sub' ";
+
             $row = DB::select($query);
             $goods_class_cnt = $row[0]->cnt;
 
@@ -537,11 +525,7 @@ class prd05Controller extends Controller
                         if(@$goods_opt_arr[$k] != ""){
                             $goods_class_sql = $goods_class_sql .", ". $field. " = '". $goods_opt_arr[$k] ."'";
                         }
-                        /*
-                        echo "goods_class_sql : ".$goods_class_sql;
-                        echo "<Br>";
-                        */
-                        //
+                        
                     }
                 }
                 $goods_fields[$item] = $field;
@@ -746,7 +730,7 @@ class prd05Controller extends Controller
                 //
                 //$result[$i] = $goods_result;
             }
-        //$result = DB::select($query,['com_id' => $com_id]);
+            //$result = DB::select($query,['com_id' => $com_id]);
             if($query != ""){
                 if($i>0){
                     $goods_query .= " union all ". $query;

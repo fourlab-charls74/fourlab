@@ -1375,8 +1375,6 @@ class prd01Controller extends Controller
           $sql_limit
       	";
 
-		//dd($query);
-
 		$result = DB::select($query);
 
 		return response()->json([
@@ -1483,8 +1481,6 @@ class prd01Controller extends Controller
 
 	public function goods_class_update(Request $req) {
 
-		// dd($req->all());
-
 		try {
 			DB::beginTransaction();
 
@@ -1589,7 +1585,6 @@ class prd01Controller extends Controller
 			DB::commit();
 		} catch(Exception $e){
 
-			dd($e);
 			$err_code	= "500";
 			$msg		= "시스템 에러입니다. 관리자에게 문의하세요.";
 
