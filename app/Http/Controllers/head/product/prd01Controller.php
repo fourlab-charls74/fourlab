@@ -1511,8 +1511,6 @@ class prd01Controller extends Controller
 					->update(['class' => $class_cd]);
 			}
 
-			// dd($values);
-
 			$where = [
 				'goods_no' => $req->goods_no,
 				'goods_sub' => $req->goods_sub
@@ -1524,7 +1522,6 @@ class prd01Controller extends Controller
 
 			return response()->json(null, 201);
 		} catch(Exception $e){
-			dd($e);
 			DB::rollback();
 			return response()->json(['msg' => "수정중 에러가 발생했습니다. 잠시 후 다시시도 해주세요."], 500);
 		}
