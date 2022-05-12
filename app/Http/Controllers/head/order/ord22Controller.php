@@ -367,11 +367,53 @@ class ord22Controller extends Controller
 
         $s_sale_place	= $req->input("sale_place", "HEAD_OFFICE");
 
-        // $sql = "select col, col_nm from delivery_column where sale_place = '$s_sale_place' order by seq";
-        // $sale_place = DB::selectOne($sql);
-
         $sql = "select cn as name, name as value from columns where type = '$type' order by seq";
         $columns = DB::select($sql);
+        
+        $columns = array(
+			"dlv_series_nm" => "출고차수",
+			"ord_type" => "주문구분",
+			"ord_kind" => "출고구분",
+			"ord_no" => "주문번호",
+			"ord_opt_no" => "주문일련번호",
+			"ord_state" => "주문상태",
+			"pay_stat" => "입금상태",
+			"clm_state" => "클레임상태",
+			"goods_type_nm" => "상품구분",
+			"style_no" => "스타일넘버",
+			"goods_nm" => "상품명",
+			"goods_opt" => "옵션",
+			"qty" => "재고수량",
+			"sale_qty" => "주문수량",
+			"price" => "판매가",
+			"sale_amt" => "쿠폰/할인",
+			"dlv_amt" => "배송비",
+			"pay_type" => "결제방법",
+			"user_nm" => "주문자(아이디)",
+			"r_nm" => "수령자",
+			"r_zipcode" => "우편번호",
+			"r_addr" => "주소",
+			"r_phone" => "전화번호",
+			"r_mobile" => "핸드폰",
+			"r_jumin" => "수령자 주민등록번호",
+			"dlv_msg" => "특이사항",
+			"dlv_no" => "송장번호",
+			"sale_place" => "판매처",
+			"out_ord_no" => "판매처 주문번호",
+			"sale_place_phone" => "판매처 전화번호",
+			"sale_place_addr" => "판매처 주소",
+			"com_nm" => "업체",
+			"baesong_kind" => "배송구분",
+			"dlv_comment" => "출고메시지",
+			"ord_date" => "주문일시",
+			"pay_date" => "입금일시",
+			"dlv_proc_date" => "출고요청일시",
+			"dlv_end_date" => "배송일시",
+			"last_up_date" => "클레임일시",
+			"state" => "처리현황",
+			"memo" => "메모",
+			"head_desc" => "상단홍보글",
+		);
 
         //$sql = "select cn as name, name as value from columns where type = '$type' and use_yn = 'Y' order by use_seq";
         $sql	= "select col as name, col_nm as value from delivery_column where sale_place = '$s_sale_place' order by seq";
@@ -578,8 +620,8 @@ class ord22Controller extends Controller
         });
 
         $fieldSql = "select col as name, col_nm as value from delivery_column where sale_place = '$request->sale_place' order by seq";
+
         $fields = DB::select($fieldSql);
-        // return $fieldSql;
         $field = $this->getFieldName($fields);
 
         // 임시테이블 생성
