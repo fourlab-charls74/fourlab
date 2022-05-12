@@ -50,9 +50,9 @@
 							<tr>
 								<td>
 									<select multiple class="form-control" id="columns" style="height:500px">
-										@foreach ($columns as $key => $val)
-										<option value="{{$key}}">{{$val}}</option>
-										@endforeach
+									@foreach ($columns as $column)
+										<option value="{{$column->name}}">{{$column->value}}</option>
+									@endforeach
 									</select>
 								</td>
 							</tr>
