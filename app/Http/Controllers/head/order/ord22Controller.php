@@ -367,8 +367,8 @@ class ord22Controller extends Controller
 
         $s_sale_place	= $req->input("sale_place", "HEAD_OFFICE");
 
-        $sql = "select cn as name, name as value from columns where type = '$type' order by seq";
-        $columns = DB::select($sql);
+        //$sql = "select cn as name, name as value from columns where type = '$type' order by seq";
+        //$columns = DB::select($sql);
         
         $columns = array(
 			"dlv_series_nm" => "출고차수",
@@ -597,7 +597,8 @@ class ord22Controller extends Controller
         $where = $condition[0];
         $orderby = $condition[1];
 
-        $type = sprintf("dlv_inv_dn_%s", Auth('head')->user()->id);
+        //$type = sprintf("dlv_inv_dn_%s", Auth('head')->user()->id);
+        $type = "sale_dlv_inv_dn";
 
         DB::transaction(function () use($request, $type) {
             $fields	 = explode(",",$request->fields);
@@ -618,6 +619,24 @@ class ord22Controller extends Controller
                 DB::update($sql);
             }
         });
+
+		//기존 판매처 송장 컬럼 삭제
+        $sql_test   = " delete from delivery_column where sale_place = '$request->sale_place'";
+        DB::delete($sql_test);
+
+		//신규 판매처 송장 컬럼 등록
+		$sql_test	= " select cn, name, seq from columns where type = '$type' and use_yn = 'Y' ";
+		$rows		= DB::select($sql_test);
+
+		foreach($rows as $row) {
+			$sql    = "insert into delivery_column(col, col_nm, seq, sale_place) value (:col, :col_nm, :seq, :sale_place) ";
+			DB::insert($sql,array(
+				"col"		=> $row->cn,
+				"col_nm"	=> $row->name,
+				"seq"		=> $row->seq,
+				"sale_place"=> $request->sale_place
+			));
+		}
 
         $fieldSql = "select col as name, col_nm as value from delivery_column where sale_place = '$request->sale_place' order by seq";
 
