@@ -570,18 +570,18 @@ class ord22Controller extends Controller
         });
 
 		//기존 판매처 송장 컬럼 삭제
-        $sql_d   = " delete from delivery_column where sale_place = '$request->sale_place'";
+        $sql_d   = "delete from delivery_column where sale_place = '$request->sale_place'";
         DB::delete($sql_d);
 
 		//신규 판매처 송장 컬럼 등록
-		$sql_s	= " select cn, name, seq from columns where type = '$type' and use_yn = 'Y' ";
+		$sql_s	= " select cn, name, use_seq from columns where type = '$type' and use_yn = 'Y' ";
 		$rows		= DB::select($sql_s);
 		foreach($rows as $row) {
 			$sql    = "insert into delivery_column(col, col_nm, seq, sale_place) value (:col, :col_nm, :seq, :sale_place) ";
 			DB::insert($sql,array(
 				"col"		=> $row->cn,
 				"col_nm"	=> $row->name,
-				"seq"		=> $row->seq,
+				"seq"		=> $row->use_seq,
 				"sale_place"=> $request->sale_place
 			));
 		}
@@ -651,7 +651,7 @@ class ord22Controller extends Controller
 
         return view( Config::get('shop.head.view') . '/order/ord22_sale_excel',[
             'rows' => DB::select($sql),
-            'fields' => DB::select($fieldSql)
+            'fields' => $fields
         ]);
     }
 
@@ -1026,8 +1026,8 @@ class ord22Controller extends Controller
         foreach($fields as $val){
             if($val->name == "coupon_amt") {
                 $field .= ", a.coupon_amt";
-            }else if($val->name == "dlv_series"){
-                $field .= ", a.dlv_series_nm as dlv_series";
+            }else if($val->name == "dlv_series_nm"){
+                $field .= ", a.dlv_series_nm";
             } else if($val->name == "dlv_cd"){
                 $field .= ", a.dlv_cd";
             } else if($val->name == "dlv_no"){
