@@ -531,7 +531,7 @@ class ord22Controller extends Controller
 			left outer join code pay_stat on (a.pay_stat = pay_stat.code_id and pay_stat.code_kind_cd = 'G_PAY_STAT')
 			left outer join code gt on (a.goods_type = gt.code_id and gt.code_kind_cd = 'G_GOODS_TYPE')
 		";
-       
+
         $this->set_excel_download("delivery_%s.xls");
 
         return view( Config::get('shop.head.view') . '/order/ord22_pop_excel',[
@@ -1041,13 +1041,13 @@ class ord22Controller extends Controller
             } else if($val->name == "ord_opt_no"){
                 $field .= ", a.ord_opt_no";
             } else if($val->name == "ord_state"){
-                $field .= ", ord_state.code_val ord_state";
-            } else if($val->name == "pay_state"){
-                $field .= ", pay_stat.code_val as pay_state";
+                $field .= ", ord_state.code_val as ord_state";
+            } else if($val->name == "pay_stat"){
+                $field .= ", pay_stat.code_val as pay_stat";
             } else if($val->name == "clm_state"){
                 $field .= ", clm_state.code_val clm_state";
-            } else if($val->name == "goods_type"){
-                $field .= ", ifnull(gt.code_val,'N/A') as goods_type";
+            } else if($val->name == "goods_type_nm"){
+                $field .= ", ifnull(gt.code_val,'N/A') as goods_type_nm";
             } else if($val->name == "style_no"){
                 $field .= ", a.style_no";
             } else if($val->name == "goods_nm"){
