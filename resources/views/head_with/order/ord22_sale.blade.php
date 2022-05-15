@@ -119,20 +119,13 @@
   //컬럼에 선택된 컬럼 추가.
   $("#addColumn").click(function(e){
 	e.preventDefault();
+	
+	$("#columns > option:selected").each(function(idx){
+      var searchThis = $("#fields option[value="+this.value+"]");
 
-	// 백앤드에서 받아온 컬럼명과 필드명이 다른 경우 문제가 발생하여 중복 검사를 value 값이 아닌 text 값으로 변경하였음.
-	const fields = document.querySelectorAll("#fields > option");
-	let texts = [];
-	for (let i = 0; i < fields.length; i++) {
-		texts[i] = fields[i].innerText;
-	}
-	$("#columns > option:selected").each(function(idx) {
-		const text = this.innerText;
-		if (texts.includes(text)) {
-			return;
-		} else {
-			$("#fields").append("<option value='"+this.value+"'>"+this.innerHTML+"</option>");
-		}
+      if (searchThis.length > 0) return;
+
+      $("#fields").append("<option value='"+this.value+"'>"+this.innerHTML+"</option>");
 	});
 
   });
