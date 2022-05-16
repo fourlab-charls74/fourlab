@@ -154,9 +154,9 @@
                         <ul>
                             <li data-menu-kind="P" data-menu-id="prm30" class="d-none"><a href="/head/promotion/prm30">검색어</a></li>
                             <li data-menu-kind="P" data-menu-id="prm31" class="d-none"><a href="/head/promotion/prm31">검색내역</a></li>
-                            <!--
+                            
                             <li><a href="/head/promotion/prm32">검색 바로가기</a></li>
-                            -->
+                            
                         </ul>
                     </li>
                 </ul>
