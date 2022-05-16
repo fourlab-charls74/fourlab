@@ -179,7 +179,7 @@
                     </div>
                     <div class="fr_box">
                         <div class="font-weight-light">
-                            <span class="mr-2">* 온라인/창고/판매수</span>
+                            <span class="mr-2">* 온라인재고/보유재고/판매수</span>
                         </div>
                     </div>
                 </div>
