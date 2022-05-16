@@ -1,5 +1,6 @@
 <meta charset="utf-8" />
 <?php
+
 	function get_bgcolor($name) {
 		if ($name === 'ord_no') {
 			return 'background:#ffa980; mso-number-format:"\@";';
@@ -32,7 +33,7 @@
 		<?php
 			$style1	= "";
 			//주문 묶음 단위 표시
-			if( $row->ord_cnt > 1 && $field->name == "ord_no" )
+			if( @$row->ord_cnt > 1 && @$field->name == "ord_no" )
 			{
 				if( $row->ord_no != $ord_pvalue1 )
 				{
@@ -45,7 +46,7 @@
 
 			$style2	= "";
 			//주문 묶음 단위 표시
-			if( $row->sale_qty > 1 && $field->name == "sale_qty" )
+			if( @$row->sale_qty > 1 && @$field->name == "sale_qty" )
 			{
 				if( $row->ord_no != $ord_pvalue2 )
 				{

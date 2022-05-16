@@ -569,8 +569,10 @@ class ord22Controller extends Controller
             }
         });
 
+        $sale_place = $request->sale_place ? $request->sale_place : "";
+
 		//기존 판매처 송장 컬럼 삭제
-        $sql_d   = "delete from delivery_column where sale_place = '$request->sale_place'";
+        $sql_d   = "delete from delivery_column where sale_place = '$sale_place'";
         DB::delete($sql_d);
 
 		//신규 판매처 송장 컬럼 등록
@@ -582,11 +584,11 @@ class ord22Controller extends Controller
 				"col"		=> $row->cn,
 				"col_nm"	=> $row->name,
 				"seq"		=> $row->use_seq,
-				"sale_place"=> $request->sale_place
+				"sale_place"=> $sale_place
 			));
 		}
 
-        $fieldSql = "select col as name, col_nm as value from delivery_column where sale_place = '$request->sale_place' order by seq";
+        $fieldSql = "select col as name, col_nm as value from delivery_column where sale_place = '$sale_place' order by seq";
 
         $fields = DB::select($fieldSql);
         $field = $this->getFieldName($fields);
