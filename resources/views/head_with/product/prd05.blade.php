@@ -828,6 +828,7 @@
                         headerName: col_arr[i][1],
                         editable: true,
                         minWidth: 100,
+                        lockPosition: true,
                         cellStyle: {'background' : '#ffff99'},
                     };
                     col_style = {

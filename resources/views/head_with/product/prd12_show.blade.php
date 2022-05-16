@@ -215,7 +215,7 @@
                                                                 <input type="file" id="plan_top_img_file" name="plan_top_img_file">
                                                             </li>
                                                             <li style="padding-top:5px;">
-                                                                상단 ( 1200*400px )
+                                                                상단 ( 940*∞px )
                                                             </li>
                                                         </ul>
                                                     </div>
