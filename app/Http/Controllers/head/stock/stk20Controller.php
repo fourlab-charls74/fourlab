@@ -15,12 +15,11 @@ use PDO;
 
 class stk20Controller extends Controller
 {
-    public function index() {
+    public function index(Request $request) {
 
         $mutable = Carbon::now();
         $sdate = $request->input("sdate", now()->sub(3, 'day')->format('Ymd'));
         $edate = $request->input("edate", date("Ymd"));
-        
 
         $values = [
             'sdate'         => $sdate,
