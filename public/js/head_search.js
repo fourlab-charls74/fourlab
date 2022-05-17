@@ -757,7 +757,7 @@ SearchCompany.prototype.Choice = function(code,name, com_type, baesong_kind, bae
 		}
 		else
 		{
-			if( $('#com_cd').length > 0 )
+            if( $('#com_cd').length > 0 )
 			{
 				$('#com_cd').val(code);
 			}
@@ -767,7 +767,7 @@ SearchCompany.prototype.Choice = function(code,name, com_type, baesong_kind, bae
             }
 			if( $('#com_nm').length > 0 )
 			{
-				$('#com_nm').val(name);
+                $('#com_nm').val(name);
 			}
 		}
 	}
@@ -776,9 +776,9 @@ SearchCompany.prototype.Choice = function(code,name, com_type, baesong_kind, bae
 
 let searchCompany = new SearchCompany();
 if ($('.ac-company').length > 0) {
-    //#com_nm가 수정될 경우 #com_cd값 초기화
-    $('#com_nm').change(function(){
-        $('#com_cd').val('');
+    //#com_nm가 수정되어 빈값이 될 경우 #com_cd값 초기화
+    $("#com_nm").on("change", (e) => {
+        if(e.target.value === '') $("#com_cd").val('');
     });
 }
 

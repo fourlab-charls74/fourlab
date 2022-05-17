@@ -151,8 +151,8 @@
                                     </div>
                                     <div class="form-inline-inner input-box w-75">
                                         <div class="form-inline inline_btn_box">
-                                            <input type="hidden" id="com_cd" name="com_cd">
-                                            <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company search-all search-enter" style="width:100%;" autocomplete="off">
+                                            <input type="hidden" id="com_cd" name="com_cd" />
+                                            <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company search-all search-enter" style="width:100%;" autocomplete="off" />
                                             <a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                         </div>
                                     </div>
@@ -361,9 +361,9 @@
         };
 
         function Search() {
-            let data = $('form[name="search"]').serialize();
-            gx.Request('/head/stock/stk10/search', data, 1, (data) => {
-                const { sum_buy_qty, sum_buy_cost } = data.sum_buy_info;
+            let data = $("form[name=search]").serialize();
+            gx.Request('/head/stock/stk10/search', data, 1, (d) => {
+                const { sum_buy_qty, sum_buy_cost } = d.sum_buy_info;
                 const [ sum_buy_qty_dom, sum_buy_cost_dom ] 
                     = [ document.querySelector('#sum_buy_qty'), document.querySelector('#sum_buy_cost') ];
                 sum_buy_qty_dom.innerText = sum_buy_qty;
