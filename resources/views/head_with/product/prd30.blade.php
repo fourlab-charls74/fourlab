@@ -249,7 +249,7 @@
 						<div class="form-group">
 							<label for="name">상품구분</label>
 							<div class="flax_box">
-								<select name='goods_type' class="form-control form-control-sm">
+								<select name='s_goods_type' class="form-control form-control-sm">
 									<option value=''>전체</option>
 									@foreach ($goods_types as $goods_type)
 									<option value='{{ $goods_type->code_id }}'>{{ $goods_type->code_val }}</option>
@@ -761,6 +761,7 @@
 
 	function Search() {
 		let data = $('form[name="search"]').serialize();
+		console.log(data);
 		gx.Request('/head/product/prd30/search', data, 1);
 	}
 </script>
