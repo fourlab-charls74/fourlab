@@ -1836,7 +1836,7 @@
 			let u_cat_str	= "";
 			let md_nm	= $('#md_id > option:selected').html();
 
-			console.log(md_nm);
+			// console.log(md_nm);
 				md_nm = md_nm.replace(/(\s)|(\t)|(\n)/g, "");
 
 			$('#md_nm').val(md_nm);
@@ -2111,7 +2111,7 @@
 							if (res.code == '200') {
 								goodsClassSearch();
 							} else {
-								console.log(res.code);
+								// console.log(res.code);
 								alert(res.msg);
 							}
 						},

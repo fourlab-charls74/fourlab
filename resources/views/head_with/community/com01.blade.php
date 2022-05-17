@@ -89,7 +89,8 @@ var columns = [
         headerName:"이름",
         width:150,
         cellRenderer : function(p) {
-            return `<a href="https://devel.netpx.co.kr/app/boards/lists/${p.data.board_id}"' target="_blank">${p.value}</a>`;
+            const FRONT_URL = "{{config('shop.front_url')}}";
+            return `<a href="${FRONT_URL}/app/boards/lists/${p.data.board_id}"' target="_blank">${p.value}</a>`;
         }
     },
     { field:"board_type" , headerName:"타입" },
