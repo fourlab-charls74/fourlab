@@ -2224,7 +2224,8 @@ class prd01Controller extends Controller
 	public function del_option_kind(Request $req, $goods_no) {
 		$goods_sub = $req->input("goods_sub");
 		$goods_type = $req->input("goods_type");
-		$del_id_list = explode(",", $req->input("del_id_list"));
+		$del_id_list = $req->input("del_id_list") != null ? explode(",", $req->input("del_id_list")) : [];
+		$is_option_use = $req->input("is_option_use");
 
 		// $user = [
 		// 	'id' => Auth('head')->user()->id,
@@ -2284,6 +2285,66 @@ class prd01Controller extends Controller
 					where no = :no and goods_no = :goods_no and goods_sub = :goods_sub
 				";
 				DB::delete($sql, ['no' => $opt_no, 'goods_no' => $goods_no, 'goods_sub' => $goods_sub]);
+
+			}
+
+			// 5. 옵션 사용여부 설정
+			if($is_option_use != null) {
+				$sql = "
+					update goods
+					set is_option_use = '$is_option_use'
+					where goods_no = '$goods_no'
+					limit 1
+				";
+				DB::update($sql);
+
+				$user	= Auth('head')->user();
+				$id		= Auth('head')->user()->id;
+				$name	= Auth('head')->user()->name;
+				
+				if($is_option_use == 'N') {
+					// 기본 옵션 등록		
+					$sql = "  -- [".$user->com_id."] ". __FILE__ ." > ". __FUNCTION__ ." > ". __LINE__ ."
+						insert into goods_option (
+							goods_no, goods_sub, type, name, required_yn, use_yn, seq, option_no, rt, ut
+						) values (
+							'$goods_no', '$goods_sub', 'basic', 'NONE', 'Y', 'Y', '0', null, now(), now()
+						)
+					";
+					DB::insert($sql);
+
+					// 기본 재고 등록
+					$sql = "  -- [".$user->com_id."] ". __FILE__ ." > ". __FUNCTION__ ." > ". __LINE__ ."
+						insert into goods_summary (
+							goods_no, goods_sub, opt_name, goods_opt, opt_price, good_qty, wqty,
+							soldout_yn, use_yn, seq, rt, ut, bad_qty, last_date
+						) values	(
+							'$goods_no', '$goods_sub', 'NONE', 'none', '0', '0', '0',
+							'N', 'Y', '0', now(), now(), 0, now()
+						)
+					";
+					DB::insert($sql);
+
+					$sql = "
+						select wonga
+						from goods
+						where goods_no = :goods_no
+					";
+					$row = DB::selectOne($sql,['goods_no' => $goods_no]);
+					$wonga = $row->wonga;
+
+					if( $goods_type == "S" ){
+						// 기본 매입상품 처리
+						$sql = "  -- [".$user->com_id."] ". __FILE__ ." > ". __FUNCTION__ ." > ". __LINE__ ."
+							insert into goods_good (
+							goods_no, goods_sub, goods_opt, opt_type, opt_price, wonga, qty, invoice_no, init_qty, regi_date
+							) values (
+							'$goods_no', '$goods_sub', 'none', null, 0, '$wonga', '0', '', '0', now()
+							)
+						";
+						DB::insert($sql);
+					}
+				}
 			}
 
 			DB::commit();
@@ -2291,6 +2352,7 @@ class prd01Controller extends Controller
 		} catch(Exception $e){
 			DB::rollback();
 			$code = 500;
+			// $msg = $e->getMessage();
 			$msg = "삭제중 에러가 발생했습니다. 잠시 후 다시 시도해주세요.";
 		}
 

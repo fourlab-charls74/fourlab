@@ -865,7 +865,7 @@
                                             <td width="35%">
                                                 <div class="input_box flax_box">
                                                     <div class="input_box wd200">
-                                                        <input type='text' name="goods_qty" id="goods_qty" class="form-control form-control-sm search-all" value="{{ $qty }}" onfocus="this.select()">
+                                                        <input type='text' name="goods_qty" id="goods_qty" class="form-control form-control-sm search-all" value="{{ $qty ?? 0 }}" onfocus="this.select()">
                                                     </div>
 													@if( $type != 'create' )
                                                     <button type="button" class="btn-sm btn btn-secondary btn-change-qty" style="max-width:80px;width:19%;margin-left:1%;padding:0.22rem 0;">변경</button>
@@ -875,7 +875,7 @@
                                             <th width="15%">보유 재고</th>
                                             <td width="35%">
                                                 <div class="input_box flax_box">
-                                                    <div class="wd200">{{ $wqty }}개</div>
+                                                    <div class="wd200">{{ $wqty ?? 0 }}개</div>
 													@if( $type != 'create')
                                                     <input type="button" class="btn-sm btn btn-secondary btn-qty-in" value="입고" style="max-width:80px;width:19%;margin-left:1%;padding:0.22rem 0;">
 													@endif
@@ -1993,22 +1993,33 @@
 
         });
 
+        // 초기 옵션사용여부
+        let prevOptionUsed = $("[name=is_option_use]:checked").val();
+
 		//재고 사용 유무
 		$('[name=is_option_use]').change(function(e){
 			@if( $type != 'create' )
-                if(confirm("변경 시 등록되어 있는 옵션 정보와 재고 수량이 모두 삭제됩니다.\n변경 하시겠습니까?")){
-                    //DeleteOptionAll();
+                if(confirm("옵션 사용여부 변경 시 등록되어 있는 옵션 정보와 재고 수량이 모두 삭제됩니다.\n변경하시겠습니까?")){
+                    setOptionArea();
+                    prevOptionUsed = $("[name=is_option_use]:checked").val();
+                    delOptionAll();
+                } else {
+                    $(`[name=is_option_use][value=${prevOptionUsed}]`).prop("checked", true);
                 }
+            @else
+                setOptionArea();
 			@endif
+		});
+
+        function setOptionArea() {
             if( $('#is_option_use2').is(":checked") == true ){
-                //작업 해야함
                 $('.use_option_n').css('display','table-row');
                 $('.use_option_y').css('display','none');
             }else{
                 $('.use_option_n').css('display','none');
                 $('.use_option_y').css('display','flex');
             }
-		});
+        }
 
 
         $(".btn-change-qty").click(function(){
@@ -2026,7 +2037,7 @@
               data: { qty, goods_no, goods_sub },
               success: function (data) {
                   alert("수량이 변경되었습니다.");
-                  location.reload();
+                //   location.reload();
               },
               error: function(request, status, error) {
                   console.log("error")
@@ -2513,6 +2524,7 @@
         });
     }
 
+    // 옵션구분 삭제
     function delOptionKind() {
         let selected_list = gx1.getSelectedRows();
 
@@ -2533,6 +2545,36 @@
                     Search_optkind();
                     setColumnOfGx2(res.data);
                     Search_opt();
+                }
+                else alert(res.msg);
+            },
+            error: function(request, status, error) {
+                console.log(request, status, error)
+            }
+        });
+    }
+
+    // 옵션 사용여부 변경 시 기존 옵션정보 및 재고정보 모두 삭제
+    function delOptionAll() {
+        let rows = gx1.getRows();
+        let is_option_use = $("[name=is_option_use]:checked").val();
+
+        $.ajax({
+            async: true,
+            type: 'post',
+            url: `/head/product/prd01/${goods_no}/option-kind-del`,
+            data: {
+                'del_id_list': rows.map(s => s.no).join(","),
+                'goods_sub': goods_sub,
+                'goods_type': $('#goods_type').val(),
+                'is_option_use': is_option_use
+            },
+            success: function (res) {
+                if(res.code === 200) {
+                    location.reload();
+                    // Search_optkind();
+                    // setColumnOfGx2(res.data);
+                    // Search_opt();
                 }
                 else alert(res.msg);
             },
@@ -2564,7 +2606,7 @@
     function setColumnOfGx2(res) {
         let col = [
 			{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
-			{field:"opt1", headerName: res.opt_kind_list[0].name, width:90 },
+			{field:"opt1", headerName: res.opt_kind_list.length > 0 ? res.opt_kind_list[0].name : '', width:90 },
 			{field:"opt_price", headerName:"옵션가", width:90, type: 'numberType' },
 		];
 
