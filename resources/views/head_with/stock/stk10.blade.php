@@ -87,7 +87,7 @@
                                 <label for="">상품상태</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input-box w-50 pr-2">
-                                        <select name="goods_stat" class="form-control form-control-sm w-100" onload="console.log('hi')">
+                                        <select name="goods_stat" class="form-control form-control-sm w-100">
                                             <option value=''>전체</option>
                                             @foreach ($goods_stats as $goods_stat)
                                                 <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>

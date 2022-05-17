@@ -33,12 +33,20 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
     this.is_agg = false;
 
     //console.log(this.gridTotal);
-
-
     //columns = this.setMobile(columns);
 
+    const applyBizestColumns = (columns) => {
+        applied_columns = columns.map((column) => {
+            if (!column.hasOwnProperty("children")) {
+                column.headerClass = 'bizest';
+            }
+            return column;
+        })
+        return applied_columns;
+    };
+
     this.gridOptions = {
-        columnDefs: columns,
+        columnDefs: applyBizestColumns(columns),
         defaultColDef: {
             suppressMenu: true,
             // set every column width
@@ -251,6 +259,7 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
         onColumnVisible: function (params) {
             params.api.resetRowHeights();
         },
+
         debug:false,
 
         // rowBuffer: 0,

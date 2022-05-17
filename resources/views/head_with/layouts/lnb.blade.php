@@ -293,7 +293,7 @@
         // data: {},
         success: function (data) {
             menu = Object.assign(menu,data.menu);
-            console.log(menu);
+            // console.log(menu);
             $("#side_menu").find('li.d-none').each(function(){
                 var current = $(this);
                 const menu_kind = current.attr("data-menu-kind");

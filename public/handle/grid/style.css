@@ -25,3 +25,36 @@
     height: 100%;
     width: 100%;
 }
+
+/* custom grid css - 이전 bizest 느낌의 UI/UX 로 변경*/
+.ag-header-row.ag-header-row-column, .ag-header-row.ag-header-row-column-group {
+    overflow: inherit;
+}
+
+.ag-theme-balham .ag-header-row:not(:first-child) .ag-header-cell, .ag-theme-balham 
+.ag-header-row:not(:first-child) .ag-header-group-cell.ag-header-group-cell-with-group {
+	border-top: 0;
+}
+
+.ag-header-group-cell-with-group {
+    border-bottom: 1px solid #bdc3c7;
+}
+
+.ag-header-group-cell-with-group .ag-header-cell {
+	transform: translateY(-50%);
+	height: 100% !important;
+}
+
+.ag-theme-balham .ag-header-cell:after, .ag-theme-balham .ag-header-group-cell:after {
+	top: 5%;
+	height: 100%;
+}
+
+.ag-header-row.ag-header-row-column-group + .ag-header-row.ag-header-row-column > .bizest.ag-header-cell {
+    transform: translateY(-50%);
+    height: 200%;
+}
+
+.ag-pinned-left-header {
+    overflow: visible;
+}
