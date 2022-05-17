@@ -340,6 +340,12 @@
                     type: 'currencyType',
                     aggregation: true
                 },
+                {
+                    headerName: "비중",
+                    field: "ratio",
+                    type: 'percentType',
+                    aggregation: true
+                },
             ]
         },
         {
@@ -479,7 +485,9 @@
             "sum": "top",
             "avg": "top"
         });
-        gx.Request('/head/sales/sal04/search', data);
+        gx.Request('/head/sales/sal04/search', data, 1, function(d) {
+            console.log(d);
+        });
     }
 </script>
 

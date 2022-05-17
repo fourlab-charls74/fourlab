@@ -200,17 +200,23 @@ class sal04Controller extends Controller
         //echo "<pre>$sql</pre>";exit;
 
         $result = DB::select($sql);
+		$total_sum_amt = 0;
 
         foreach ($result as $row) {
-            $row->sum_amt = $row->sum_recv_amt + $row->sum_point_amt - $row->sum_fee_amt;
-            $row->sum_taxfree    = $row->sum_amt -  $row->sum_taxation_amt;
-            $row->sum_taxation_no_vat    = round($row->sum_taxation_amt / 1.1);        // 과세 부가세 별도
-            $row->vat = $row->sum_taxation_amt - $row->sum_taxation_no_vat;
-            $row->margin = ($row->sum_amt > 0 && $row->sum_wonga) ? round((1 - $row->sum_wonga / $row->sum_amt) * 100, 2) : 0;
-            $row->margin1 = $row->wonga_10 - $row->wonga_60;
-            $row->margin2 = $row->wonga_10 - $row->wonga_60 - $row->vat;
+            $row->sum_amt 				= $row->sum_recv_amt + $row->sum_point_amt - $row->sum_fee_amt;
+            $row->sum_taxfree    		= $row->sum_amt -  $row->sum_taxation_amt;
+            $row->sum_taxation_no_vat	= round($row->sum_taxation_amt / 1.1);        // 과세 부가세 별도
+            $row->vat 					= $row->sum_taxation_amt - $row->sum_taxation_no_vat;
+            $row->margin 				= ($row->sum_amt > 0 && $row->sum_wonga) ? round((1 - $row->sum_wonga / $row->sum_amt) * 100, 2) : 0;
+            $row->margin1 				= $row->wonga_10 - $row->wonga_60;
+            $row->margin2 				= $row->wonga_10 - $row->wonga_60 - $row->vat;
+
+			$total_sum_amt += $row->sum_amt;
         }
-        //dd($result);
+
+		foreach ($result as $row) {
+			$row->ratio 				= $row->sum_amt / $total_sum_amt * 100; // 비중
+        }
 
         return response()->json(
             [

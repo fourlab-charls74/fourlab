@@ -761,7 +761,6 @@
 
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		console.log(data);
 		gx.Request('/head/product/prd30/search', data, 1);
 	}
 </script>
