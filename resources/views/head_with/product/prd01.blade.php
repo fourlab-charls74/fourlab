@@ -8,6 +8,29 @@
         <span>/ 상품관리</span>
     </div>
 </div>
+<style>
+    .select2.select2-container .select2-selection {
+        border: 1px solid rgb(210, 210, 210);
+    }
+    ::placeholder {
+        font-size: 13px;
+        font-family: "Montserrat","Noto Sans KR",'mg', Dotum,"돋움",Helvetica,AppleSDGothicNeo,sans-serif;
+        font-weight: 300;
+        padding: 0px 2px 1px;
+        color: black;
+    }
+</style>
+<script>
+    //멀티 셀렉트 박스2
+    $(document).ready(function() {
+        $('.multi_select').select2({
+            placeholder :'전체',
+            multiple: true,
+            width : "100%",
+            closeOnSelect: false,
+        });
+    });
+</script>
 <!--div class="d-flex align-items-center justify-content-between mb-2">
         <h1 class="h3 mb-0 text-gray-800">상품</h1>
         <div>
@@ -38,7 +61,7 @@
                         <div class="form-group">
                             <label for="goods_stat">상품상태</label>
                             <div class="flax_box">
-                                <select id="goods_stat" name='goods_stat' class="form-control form-control-sm">
+                                <select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
                                     <option value=''>전체</option>
                                     @foreach ($goods_stats as $goods_stat)
                                     <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
