@@ -35,11 +35,10 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
     //console.log(this.gridTotal);
     //columns = this.setMobile(columns);
 
+    /* custom grid css - 이전 bizest 스타일 형식으로 UI/UX 로 변경 및 적용*/
     const applyBizestColumns = (columns) => {
-        applied_columns = columns.map((column) => {
-            if (!column.hasOwnProperty("children")) {
-                column.headerClass = 'bizest';
-            }
+        const applied_columns = columns.map((column) => {
+            if (!column.hasOwnProperty("children")) column.headerClass = 'bizest';
             return column;
         })
         return applied_columns;
