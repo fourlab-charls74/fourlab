@@ -1372,8 +1372,8 @@
             ];
             var editorOptions = {
                 lang: 'ko-KR', // default: 'en-US',
-                minHeight: 100,
-                height: 150,
+                minHeight: 150,
+                height: 200,
                 dialogsInBody: true,
                 disableDragAndDrop: false,
                 toolbar: editorToolbar,
@@ -1825,7 +1825,7 @@
             return true;
         }
 
-        //store
+        // store
 		$('.save-btn').click(function(){
 			if (!validate()) return;
 

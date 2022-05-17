@@ -1605,6 +1605,9 @@ class prd01Controller extends Controller
 
 	// 상품 수정
 	public function update(request $request){
+
+		// dd($request->all());
+
 		$code_status = 200;
 		$msg = '';
 
@@ -1664,7 +1667,8 @@ class prd01Controller extends Controller
 		$is_option_use		= $request->input('is_option_use');
 		//$qty = $request->input('qty');
 		//$wqty = $request->input('wqty');
-		$goods_cont			= str_replace($cfg_domain, "", $request->input('goods_cont'));
+		$goods_cont			= Lib::Rq(str_replace($cfg_domain, "", $request->input('goods_cont')));
+
 		$spec_desc			= $request->input('spec_desc');
 		$baesong_desc		= $request->input('baesong_desc');
 		$opinion			= $request->input('opinion');
@@ -1842,6 +1846,7 @@ class prd01Controller extends Controller
 			DB::commit();
 			$msg = "저장되었습니다.";
 		} catch(Exception $e){
+			dd($e);
 			DB::rollback();
 			$code_status = 500;
 			$msg = "저장 중 에러가 발생했습니다. 잠시 후 다시 시도해주세요.";
