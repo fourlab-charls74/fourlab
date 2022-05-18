@@ -32,7 +32,7 @@
                                                 <th>구분</th>
                                                 <td>
                                                     <div class="flax_box">
-                                                        <input type='text' class="form-control form-control-sm w-100" name='type' id="type" value='{{@$conf->type}}'>
+                                                        <input type='text' class="form-control form-control-sm w-100" name='type' id="type" value='{{@$conf->type}}' @if($type != '') readonly @endif />
                                                     </div>
                                                 </td>
                                             </tr>
@@ -40,7 +40,7 @@
                                                 <th>이름</th>
                                                 <td>
                                                     <div class="flax_box">
-                                                        <input type='text' class="form-control form-control-sm w-100" name='name' id="name" value='{{@$conf->name}}'>
+                                                        <input type='text' class="form-control form-control-sm w-100" name='name' id="name" value='{{@$conf->name}}' @if($type != '') readonly @endif />
                                                     </div>
                                                 </td>
                                             </tr>
@@ -69,7 +69,7 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th>컨텐츠</th>
+                                                <th>내용</th>
                                                 <td>
                                                     <div class="flax_box">
                                                         <input type='text' class="form-control form-control-sm w-100" name='content' id="cont" value='{{@$conf->content}}'>
@@ -77,7 +77,7 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th>상세</th>
+                                                <th>세부설명</th>
                                                 <td>
                                                     <div class="flax_box">
                                                         <input type='text' class="form-control form-control-sm w-100" name='desc' id="desc" value='{{@$conf->desc}}'>
@@ -106,6 +106,7 @@
 
     let type = '{{ $type  }}';
     let name = '{{ $name }}';
+    let idx = '{{ $idx ?? "-" }}';
 
 
     /**
@@ -115,7 +116,7 @@
 
         if ($('#type').val() === '') {
             $('#type').focus();
-            alert('타입를 꼭 입력해 주세요.');
+            alert('구분을 꼭 입력해 주세요.');
             return false;
         }
 
@@ -143,7 +144,6 @@
         var frm = $('form');
 
         if (type == "") {
-            console.log('store');
             $.ajax({
                 method: 'post',
                 url: '/head/system/sys04',
@@ -169,7 +169,7 @@
         } else {
             $.ajax({
                 method: 'put',
-                url: '/head/system/sys04/' + type + '/' + name,
+                url: '/head/system/sys04/' + type + '/' + name + '/' + idx,
                 data: frm.serialize(),
                 dataType: 'json',
                 success: function(res) {
@@ -196,7 +196,7 @@
         if (confirm('삭제 하시겠습니까?')) {
             $.ajax({
                 method: 'delete',
-                url: '/head/system/sys04/' + type + '/' + name,
+                url: '/head/system/sys04/' + type + '/' + name + '/' + idx,
                 dataType: 'json',
                 success: function(res) {
                     if (res.code == '200') {
@@ -214,11 +214,10 @@
         }
     }
 
-    function show(type,name){
-        console.log('show');
+    function show(type,name,idx){
         $.ajax({
             method: 'get',
-            url: '/head/system/sys04/' + type + '/' + name + '/get',
+            url: '/head/system/sys04/get/' + type + '/' + name + '/' + idx,
             dataType: 'json',
             success: function(res) {
                 if (res.code == '200') {
@@ -232,7 +231,7 @@
                     $('#cont').val(cnf.content);
                     $('#desc').val(cnf.desc);
                 } else {
-                    console.log('요청한 값이 없습니다.')
+                    console.log('요청한 값이 없습니다.');
                 }
             },
             error: function(e) {
@@ -244,7 +243,7 @@
 </script>
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
-        show(type,name);
+        show(type,name,idx);
     });
 </script>
 @stop

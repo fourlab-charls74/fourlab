@@ -1098,10 +1098,10 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::post('sys04', 'sys04Controller@store');
         Route::get('sys04/search', 'sys04Controller@search');
         Route::get('sys04/create', 'sys04Controller@create');
-        Route::get('sys04/{type}/{name}', 'sys04Controller@show');
-        Route::get('sys04/{type}/{name}/get', 'sys04Controller@get');
-        Route::put('sys04/{type}/{name}', 'sys04Controller@update');
-        Route::delete('sys04/{type}/{name}', 'sys04Controller@delete');
+        Route::get('sys04/{type}/{name}/{idx}', 'sys04Controller@show');
+        Route::get('sys04/get/{type}/{name}/{idx}', 'sys04Controller@get');
+        Route::put('sys04/{type}/{name}/{idx}', 'sys04Controller@update');
+        Route::delete('sys04/{type}/{name}/{idx}', 'sys04Controller@delete');
     });
 
     //XMD(개발작업)

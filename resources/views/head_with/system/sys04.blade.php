@@ -84,7 +84,7 @@
 
 <script>
     const columns = [{
-            field: "type",
+            field: "type_nm",
             headerName: "구분",
             width: 100
         },
@@ -93,7 +93,7 @@
             headerName: "이름",
             width: 150,
             cellRenderer: function(params) {
-                return '<a href="#" data-type="' + params.data.type + '" data-name="' + params.data.name + '" onClick="openCodePopup(this)">' + params.value + '</a>'
+                return '<a href="#" data-type="' + params.data.type + '" data-name="' + params.data.name + '" data-idx="' + params.data.idx + '" onClick="openCodePopup(this)">' + params.value + '</a>'
             }
         },
         {
@@ -118,12 +118,12 @@
         },
         {
             field: "desc",
-            headerName: "세부",
+            headerName: "세부설명",
             width: 150,
         },
         {
             field: "rt",
-            headerName: "최초일",
+            headerName: "최초등록일",
             width: 150,
         },
         {
@@ -161,10 +161,11 @@
 
         const type = $(a).attr('data-type');
         const name = $(a).attr('data-name');
+        const idx = $(a).attr('data-idx');
 
         let url = '/head/system/sys04/create';
         if (type !== '') {
-            url = '/head/system/sys04/' + type + '/' + name;
+            url = '/head/system/sys04/' + type + '/' + name + '/' + (idx || '-');
         }
         window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=1024");
     }

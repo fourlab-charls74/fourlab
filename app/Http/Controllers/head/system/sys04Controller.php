@@ -16,13 +16,21 @@ class sys04Controller extends Controller
 {
     protected $types = [
         "shop" => "상점",
+        "order" => "주문",
+        "pay" => "결제",
         "stock" => "재고",
         "delivery" => "배송",
         "point" => "적립금",
+        "coupon" => "쿠폰",
         "api" => "API",
+        "kakao" => "KAKAO",
+        "naver_checkout" => "네이버 체크아웃",
         "sms" => "SMS",
+        "email" => "이메일",
         "stock_reduction" => "부가기능",
         "list_count" => "게시물",
+        "admin" => "서비스",
+        "image" => "이미지",
         "etc" => "기타"
     ];
 
@@ -44,25 +52,25 @@ class sys04Controller extends Controller
         return view(Config::get('shop.head.view') . '/system/sys04_show', $values);
     }
 
-    public function show($type,$name)
+    public function show($type,$name,$idx)
     {
         $values = [
             'type' => $type,
             'name' => $name,
+            'idx'  => $idx,
         ];
         return view(Config::get('shop.head.view') . '/system/sys04_show', $values);
     }
 
-    public function get($type,$name)
+    public function get($type,$name,$idx)
     {
         $sql =
             /** @lang text */
             "
             select * from conf 
-			where type = :type and name = :name
+			where type = :type and name = :name and idx = :idx
             ";
-        $conf = DB::select($sql, array("type" => $type,"name" => $name));
-        // print_r ($conf);
+        $conf = DB::select($sql, array("type" => $type, "name" => $name, "idx" => ($idx != '-' ? $idx : '')));
 
         return response()->json([
             "code" => 200,
@@ -105,6 +113,11 @@ class sys04Controller extends Controller
         ";
 
         $rows = DB::select($sql);
+
+        foreach($rows as $row) {
+            $type_cd = $row->type;
+            $row->type_nm = array_key_exists($type_cd, $this->types) ? $this->types[$type_cd] : '기타';
+        }
 
         return response()->json([
             "code" => 200,
@@ -149,48 +162,50 @@ class sys04Controller extends Controller
         return response()->json(['code' => $code, 'msg' => $msg]);
     }
 
-    public function update($type,$name,Request $request)
+    public function update($type,$name,$idx,Request $request)
     {
 
-        $idx = $request->input('idx');
+        $new_idx = $request->input('idx');
         $value = $request->input('value');
         $mvalue = $request->input('mvalue');
         $content = $request->input('content');
         $desc = $request->input('desc');
 
         $conf = [
-            'idx' => $idx,
+            'idx' => $new_idx,
             'value' => $value,
             'mvalue' => $mvalue,
             'content' => $content,
             'desc'=>$desc,
             'ut' => DB::raw('now()'),
         ];
-
+        
         try {
-            DB::transaction(function () use (&$result, $type,$name, $conf) {
+            DB::transaction(function () use (&$result, $type,$name, $idx, $conf) {
                 DB::table('conf')
                     ->where('type', '=', $type)
                     ->where('name', '=', $name)
+                    ->where('idx', '=', ($idx != '-' ? $idx : ''))
                     ->update($conf);
-            });
-            $code = 200;
-            $msg = '';
-        } catch (Exception $e) {
-            $code = 500;
-            $msg = $e->getMessage();
+                });
+                $code = 200;
+                $msg = '';
+            } catch (Exception $e) {
+                $code = 500;
+                $msg = $e->getMessage();
+            }
+            
+            return response()->json(['code' => $code, 'msg' => $msg]);
         }
-
-        return response()->json(['code' => $code, 'msg' => $msg]);
-    }
-
-    public function delete($type,$name, Request $req)
-    {
-        try {
-            DB::transaction(function () use (&$result, $type,$name) {
-                DB::table('conf')
+        
+        public function delete($type,$name,$idx, Request $req)
+        {
+            try {
+                DB::transaction(function () use (&$result, $type,$name,$idx) {
+                    DB::table('conf')
                     ->where('type', '=', $type)
                     ->where('name', '=', $name)
+                    ->where('idx', '=', ($idx != '-' ? $idx : ''))
                     ->delete();
             });
             $code = 200;
