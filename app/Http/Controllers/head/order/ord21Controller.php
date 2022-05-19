@@ -108,7 +108,7 @@ class ord21Controller extends Controller
 		if( $ord_type != "" )	$where .= " and a.ord_type     = '" . Lib::quote($ord_type) . "'";
 		if( $ord_kind != "" )	$where .= " and a.ord_kind     = '" . Lib::quote($ord_kind) . "' ";
 		if( $item != "" )		$where .= " and opt_kind_cd    = '" . Lib::quote($item) . "' ";
-		if( $brand_cd != "" )		$where .= " and c.brand        = '" . Lib::quote($brand_cd) . "' ";
+		if( $brand_cd != "" )	$where .= " and c.brand        = '" . Lib::quote($brand_cd) . "' ";
 		
 		if( $goods_nm != "" )	$where .= " and a.goods_nm like '%" . Lib::quote($goods_nm) . "%' ";
 
@@ -244,9 +244,7 @@ class ord21Controller extends Controller
 			left outer join code dlv_type on (a.dlv_type = dlv_type.code_id and dlv_type.code_kind_cd = 'G_DLV_TYPE')
 			order by a.ord_opt_no desc
 		";
-		//echo "<pre>$query</pre>";
-		//dd($query);
-
+		
 		$result = DB::select($sql);
 		$pre_ord_no = "";
 

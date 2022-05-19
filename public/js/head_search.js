@@ -133,7 +133,7 @@ $( document ).ready(function() {
             }
         })
         .autocomplete({
-        //keydown 됬을때 해당 값을 가지고 서버에서 검색함.
+        // keydown 됐을때 해당 값을 가지고 서버에서 검색함.
         source : function(request, response) {
             $.ajax({
                 method: 'get',
@@ -172,7 +172,7 @@ $( document ).ready(function() {
             }
         })
         .autocomplete({
-        //keydown 됬을때 해당 값을 가지고 서버에서 검색함.
+        // keydown 됐을때 해당 값을 가지고 서버에서 검색함.
         source : function(request, response) {
             $.ajax({
                 method: 'get',
@@ -265,7 +265,6 @@ $( document ).ready(function() {
                 }
             });
         }
-
     })();
 
     $('.select2-category').select2({
