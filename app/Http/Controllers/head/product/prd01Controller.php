@@ -150,15 +150,15 @@ class prd01Controller extends Controller
 		if ($ad_desc != "") $where .= " and g.ad_desc like '%" . Lib::quote($ad_desc) . "%' ";
 
         if ($is_unlimited != "") $where .= " and g.is_unlimited = '" . Lib::quote($is_unlimited) . "' ";
-
+		
 		if( is_array($goods_stat)) {
-            if (count($goods_stat) == 1 && $goods_stat[0] != "") {
-                $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat[0]) . "' ";
+			if (count($goods_stat) == 1 && $goods_stat[0] != "") {
+				$where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat[0]) . "' ";
             } else if (count($goods_stat) > 1) {
-                $where .= " and g.sale_stat_cl in (" . join(",", $goods_stat) . ") ";
+				$where .= " and g.sale_stat_cl in (" . join(",", $goods_stat) . ") ";
             }
         } else if($goods_stat != ""){
-            $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat[0]) . "' ";
+			$where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
         }
 
         if($goods_nos        != ""){
@@ -284,7 +284,7 @@ class prd01Controller extends Controller
             $orderby
 			$limit
 		";
-        //dd($query);
+        // dd($query);
         //$result = DB::select($query,['com_id' => $com_id]);
         $pdo = DB::connection()->getPdo();
         $stmt = $pdo->prepare($query);
