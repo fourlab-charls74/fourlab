@@ -190,10 +190,10 @@ var columns = [
                 }
             }
         },
-        {field:"com_nm",headerName:"업체명", pinned:'left'},
-        {field:"baesong",headerName:"배송방식"},
+        {field:"com_nm",headerName:"업체명", pinned:'left', width: 'auto'},
+        {field:"baesong",headerName:"배송방식", width: 150},
         {field:"dlv_policy",headerName:"배송비정책"},
-        {field:"baesong_price",headerName:"배송비"},
+        {field:"baesong_price",headerName:"배송비", width: 200},
         {field:"md_nm",headerName:"담당MD"},
         {field:"settle_nm",headerName:"정산담당자"},
         {field:"pay_fee",headerName:"판매수수료율"},
@@ -214,7 +214,7 @@ var columns = [
         {field:"staff_email2",headerName:"정산담당자 이메일"},
         {field:"staff_phone2",headerName:"정산담당자 연락처"},
         {field:"staff_hp2",headerName:"정산담당자 휴대전화"},
-        {field:"", headerName:"", width: "auto"},
+        {width: "auto"}
 ];
 
 </script>

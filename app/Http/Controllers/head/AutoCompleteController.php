@@ -257,7 +257,6 @@ class AutoCompleteController extends Controller
                 where a.use_yn = 'Y'
                     and a.com_nm like '%$keyword%' 
                 order by a.com_type, a.com_nm
-                limit 0, 10
             ";
             $results =  DB::select($sql);
 
@@ -279,7 +278,6 @@ class AutoCompleteController extends Controller
                  where a.use_yn = 'Y'
                        $where
                  order by a.com_type, a.com_nm
-                 limit 0, 10
             ";
 
             return DB::select($sql);

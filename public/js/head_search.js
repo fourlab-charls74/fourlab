@@ -190,10 +190,24 @@ $( document ).ready(function() {
                 input.value = ui.item.id;
             }
         },
+        // 업체명 입력시 관련 업체가 하단에 노출 될 때 스크롤 스타일 클래스 설정
+        classes: {
+            "ui-autocomplete": "ac-company-scroll"
+        },
         minLength: 1,
         autoFocus: true,
         delay: 100
     });
+    // 업체명 검색 스크롤 스타일 클래스 적용
+    (() => {
+        const acCompanyStyleObj = {
+            'box-sizing': 'content-box',
+            'overflow-y': 'scroll',
+            'padding-right': '3px',
+            'height' : '282px'
+        };
+        $('.ac-company-scroll').css(acCompanyStyleObj);
+    })();
 
     $('.select2-category').select2({
         ajax: {

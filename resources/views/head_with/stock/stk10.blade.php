@@ -334,6 +334,7 @@
                     {field:"group_7_dc_ratio",headerName:"할인율",type:'percentType'},
                 ]
             },
+            {width: "auto"}
         ];
 
         const pApp = new App('', {
