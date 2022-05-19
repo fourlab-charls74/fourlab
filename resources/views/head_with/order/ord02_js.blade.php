@@ -758,30 +758,38 @@
 
     // 선택한 상품 정보 목록 세팅
     function setGoodsGrid(goods_list) {
+        let count = gx.getRowCount();
         goods_list.forEach(goods => {
+            let item = {...goods, idx: count++};
             if(goods.goods_info.com_type === 2) {
                 let com_id = goods.goods_info.com_id;
                 if(_goods_list_of_com_type[com_id]) {
-                    _goods_list_of_com_type[com_id].push(goods);
+                    _goods_list_of_com_type[com_id].push(item);
                 } else {
-                    _goods_list_of_com_type[com_id] = [goods];
+                    _goods_list_of_com_type[com_id] = [item];
                 }
             } else {
-                _goods_list_of_com_type.etc.push(goods);
+                if(_goods_list_of_com_type.etc === null) {
+                    _goods_list_of_com_type.etc = [];
+                }
+                _goods_list_of_com_type.etc.push(item);
             }
         });
         gx.gridOptions.api.setRowData([]);
         Object.keys(_goods_list_of_com_type).forEach(key => {
-            _goods_list_of_com_type[key].forEach(goods => {
-                setGoodsRow(goods);
-            })
-            if(key !== "etc" || _goods_list_of_com_type[key].length > 0) {
-                gx.addRows([{
-                    com_id: key,
-                    ord_opt_no: key === "etc" ? "매입상품" : _goods_list_of_com_type[key][0].goods_info.com_nm,
-                    dc_amt: "배송비 : ",
-                    dlv_amt: 0,
-                }]);
+            console.log(_goods_list_of_com_type, key);
+            if(_goods_list_of_com_type[key] !== null) {
+                _goods_list_of_com_type[key].forEach(goods => {
+                    setGoodsRow(goods);
+                })
+                if(key !== "etc" || _goods_list_of_com_type[key].length > 0) {
+                    gx.addRows([{
+                        com_id: key,
+                        ord_opt_no: key === "etc" ? "매입상품" : _goods_list_of_com_type[key][0].goods_info.com_nm,
+                        dc_amt: "배송비 : ",
+                        dlv_amt: 0,
+                    }]);
+                }
             }
         })
         setDlvFeeOfComType();
@@ -791,6 +799,7 @@
     function setGoodsRow(res) {
         var qty = 1;
         gx.addRows([{
+            "idx":res.idx,
             "goods_no":res.goods_no,
             "com_type": res.goods_info.com_type,
             "com_id": res.goods_info.com_id,
@@ -821,10 +830,12 @@
      */
     function DelGoods(){
         let delrow = gx.getSelectedRows();
-        delrow.forEach(d => {
+        console.log(delrow);
+        console.log(_goods_list_of_com_type);
+        delrow.forEach((d,i) => {
             if(d.goods_no) {
                 const type = d.com_type == 2 ? d.com_id : "etc";
-                _goods_list_of_com_type[type] = _goods_list_of_com_type[type].filter(item => item.goods_no !== d.goods_no);
+                _goods_list_of_com_type[type] = _goods_list_of_com_type[type].filter(item => item.goods_no !== d.goods_no || item.idx !== d.idx);
                 if(_goods_list_of_com_type[type].length < 1) {
                     _goods_list_of_com_type[type] = null;
                     gx.gridOptions.api.forEachNode(node => {
