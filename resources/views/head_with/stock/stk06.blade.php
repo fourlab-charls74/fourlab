@@ -160,7 +160,7 @@
                             <div class="fl_inner_box">
                                 <div class="box">
                                     <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
-                                        <input type="checkbox" class="custom-control-input" name="goods_img" id="goods_img" value="Y" checked>
+                                        <input type="checkbox" class="custom-control-input" name="goods_img" id="goods_img" value="Y">
                                         <label class="custom-control-label font-weight-light" for="goods_img">이미지출력</label>
                                     </div>
                                 </div>
@@ -221,15 +221,16 @@
                     }, 
                 pinned:'left'},
                 {field:"opt_kind_nm" , headerName:"품목", width:118, pinned:'left'},
-                {field:"brand_nm" , headerName:"브랜드", pinned:'left'},
+                {field:"brand_nm" , headerName:"브랜드", pinned:'left', width: 90},
                 {field:"style_no" , headerName:"스타일넘버", width:150, pinned:'left'},
                 {field:"head_desc", headerName:"상단홍보글", width:180},
                 {field:"goods_img" , headerName:"이미지", width:46,
                     cellRenderer: function(params) {
                         if (params.value !== undefined && params.data.goods_img != "") {
-                            return '<img src="{{config('shop.image_svr')}}/' + params.data.goods_img + '" style="height:30px;"/>';
+                            return '<img src="{{config('shop.image_svr')}}' + params.data.goods_img + '" style="height:30px;"/>';
                         }
-                    }
+                    },
+                    hide: true
                 },
                 {field:"goods_nm", headerName:"상품명", width:320, type:'HeadGoodsNameType'},
                 {field:"sale_stat_cl_val", headerName: "상품상태", width: 58, type:'GoodsStateType'},
