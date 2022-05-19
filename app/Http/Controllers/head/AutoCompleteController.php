@@ -209,6 +209,32 @@ class AutoCompleteController extends Controller
         }
     }
 
+    public function goods_nm_eng(Request $req) {
+
+        $type = $req->input('type', 'ac');
+        $keyword = $req->input('keyword', '');
+
+        if ($keyword == '') return '';
+
+        if($type == "select2") {
+        } else {
+
+            $sql = /** @lang text */
+                "
+                select 
+                    goods_nm_eng as label,
+                    concat(:image_svr,REPLACE(img,'_a_500','_s_50')) AS img
+                from goods 
+                where goods_nm_eng like :keyword
+                limit 0, 10
+          ";
+            return DB::select($sql, [
+                "image_svr" => config('shop.image_svr'),
+                "keyword" => sprintf("%%%s%%", $keyword)]
+            );
+        }
+    }
+
     public function category(Request $req) {
         $type = $req->input('type', 'ac');
         $cat_type = $req->input('cat_type', 'DISPLAY');

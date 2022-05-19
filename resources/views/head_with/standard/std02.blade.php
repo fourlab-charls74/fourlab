@@ -279,7 +279,7 @@ var columns = [
 
     function Search(page) {
         let data = $('form[name="search"]').serialize();
-        console.log(data);
+        // console.log(data);
         gx.Request('/head/standard/std02/search', data, page);
     }
 

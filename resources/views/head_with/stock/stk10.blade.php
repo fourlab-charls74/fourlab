@@ -40,7 +40,7 @@
                                     <span class="text_line">~</span>
                                     <div class="docs-datepicker form-inline-inner input_box">
                                         <div class="input-group">
-                                            <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
+                                            <input type="text" class="form-control form-control-sm docs-date search-enter" name="edate" value="{{ $edate }}" autocomplete="off">
                                             <div class="input-group-append">
                                                 <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
                                                 <i class="fa fa-calendar" aria-hidden="true"></i>

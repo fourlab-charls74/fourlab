@@ -37,6 +37,7 @@ class prd01Controller extends Controller
 			'domain'		=> $domain,
 			'style_no'		=> $style_no,
 			'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
+			'com_types'     => SLib::getCodes('G_COM_TYPE'),
 			'items'			=> SLib::getItems(),
 			'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
 			'is_unlimiteds'	=> SLib::getCodes('G_IS_UNLIMITED'),
@@ -107,9 +108,12 @@ class prd01Controller extends Controller
         $brand_nm = $request->input("brand_nm");
         $brand_cd = $request->input("brand_cd");
         $goods_nm = $request->input("goods_nm");
+		$goods_nm_eng = $request->input("goods_nm_eng");
         $cat_type = $request->input("cat_type");
         $cat_cd = $request->input("cat_cd");
         $is_unlimited = $request->input("is_unlimited");
+
+		$com_id = $request->input("com_cd");
 		
         $head_desc = $request->input("head_desc");
 		$ad_desc = $request->input("ad_desc");
@@ -136,7 +140,10 @@ class prd01Controller extends Controller
             $where .= " and g.brand = '" . Lib::quote($brand_cd) . "' ";
         }
         if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%' ";
+		if ($goods_nm_eng != "") $where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
         if ($is_unlimited != "") $where .= " and g.is_unlimited = '" . Lib::quote($is_unlimited) . "' ";
+
+		if ($com_id != "") $where .= " and g.com_id = '" . Lib::quote($com_id) . "'";
 
         if($cat_cd != ""){
             if($cat_type === "DISPLAY"){
@@ -232,6 +239,7 @@ class prd01Controller extends Controller
 					from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
 				  )) as img
 				, g.goods_nm
+				, g.goods_nm_eng
 				, g.ad_desc
 				, stat.code_val as sale_stat_cl
 				, g.normal_price

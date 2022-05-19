@@ -53,6 +53,7 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::get('/brand', 'AutoCompleteController@brand');
         Route::get('/company', 'AutoCompleteController@company');
         Route::get('/goods-nm', 'AutoCompleteController@goods_nm');
+        Route::get('/goods-nm-eng', 'AutoCompleteController@goods_nm_eng');
         Route::get('/category', 'AutoCompleteController@category');
 
         Route::get('/ad_type', 'AutoCompleteController@ad_type');

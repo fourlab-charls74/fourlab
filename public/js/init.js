@@ -5,6 +5,7 @@
 * */
 var App = function(id,options){
     this.options = options;
+    this.lifeCycle = {};
 };
 
 App.prototype.ResizeGrid  = function(grid_height_margin, height){

@@ -165,6 +165,45 @@ $( document ).ready(function() {
         }
     });
 
+    $(".ac-goods-nm-eng")
+        .on('keydown',function(event){
+            if ( event.keyCode === 13) {
+                $(this).autocomplete('close');
+            }
+        })
+        .autocomplete({
+        //keydown 됬을때 해당 값을 가지고 서버에서 검색함.
+        source : function(request, response) {
+            $.ajax({
+                method: 'get',
+                url: '/head/auto-complete/goods-nm-eng',
+                data: { keyword : this.term },
+                success: function (data) {
+                    response(data);
+                },
+                error: function(request, status, error) {
+                    console.log("error")
+                }
+            });
+        },
+        minLength: 1,
+        autoFocus: false,
+        delay: 100,
+        create:function(event,ui) {
+            $(this).data('ui-autocomplete')._renderItem = function (ul, item) {
+                let txt;
+                if(item.img !== undefined && item.img !== "") {
+                    txt = '<div><img src=\"' + item.img + '\" style=\"width:30px\" onError="this.src=\'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\'"/> ' + item.label + '</div>';
+                } else {
+                    txt = '<div>' + item.label + '</div>';
+                }
+                return $( "<li>" )
+                    .append( txt )
+                    .appendTo( ul );
+            };
+        }
+    });
+
     $(".ac-company").autocomplete({
         // 해당 값을 가지고 서버에서 검색함.
         source : function(request, response) {
@@ -212,6 +251,21 @@ $( document ).ready(function() {
             'height' : '282px'
         };
         $('.ac-company-scroll').css(acCompanyStyleObj);
+
+        // search-enter로 업체명 검색시 com_nm이 빈값인 경우 검색 안되는 문제 수정
+        const ac_companies = document.querySelectorAll('.ac-company');
+        for (let i = 0; i < ac_companies?.length; i++ ) {
+            const com_nm = ac_companies[i];
+            const input_wrap = com_nm.parentNode;
+            com_nm.addEventListener('keyup', () => {
+                if (com_nm.value == "") {
+                    let input;
+                    if (input = input_wrap.querySelector('#com_cd')) input.value = "";
+                    else if (input = input_wrap.querySelector('#com_id')) input.value = "";
+                }
+            });
+        }
+
     })();
 
     $('.select2-category').select2({

@@ -59,6 +59,27 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
+                            <label for="item">상품구분</label>
+                            <div class="flex_box">
+                                <select name='type' id="type" class="form-control form-control-sm" style="width: 47%">
+                                    <option value=''>전체</option>
+                                    <option value='N'>일반</option>
+                                    <option value='D'>납품</option>
+                                    <option value='E'>기획</option>
+                                </select>
+                                <span class="text_line" style="width: 6%; text-align: center;">/</span>
+                                <select name='goods_type' id="goods_type" class="form-control form-control-sm" style="width: 47%">
+                                    <option value=''>전체</option>
+                                    <option value='S'>매입</option>
+                                    <option value='I'>위탁매입</option>
+                                    <option value='P'>위탁판매</option>
+                                    <option value='O'>구매대행</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
                             <label for="goods_stat">상품상태</label>
                             <div class="flax_box">
                                 <select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
@@ -87,16 +108,30 @@
 							</div>
 						</div>
 					</div>
+                </div>
+                <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="formrow-email-input">상품명</label>
-                            <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm ac-goods-nm" name='goods_nm' value=''>
+                            <label for="name">업체</label>
+                            <div class="form-inline inline_select_box">
+                                <div class="form-inline-inner input-box w-25 pr-1">
+                                    <select id="com_type" name="com_type" class="form-control form-control-sm w-100">
+                                        <option value="">전체</option>
+                                        @foreach ($com_types as $com_type)
+                                            <option value="{{ $com_type->code_id }}">{{ $com_type->code_val }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-inline-inner input-box w-75">
+                                    <div class="form-inline inline_btn_box">
+                                        <input type="hidden" id="com_cd" name="com_cd" />
+                                        <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company search-all search-enter" style="width:100%;" autocomplete="off" />
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="item">품목</label>
@@ -119,27 +154,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="item">카테고리</label>
-                            <div class="form-inline inline_select_box">
-                                <div class="form-inline-inner select-box">
-                                    <select name='cat_type' id="cat_type" class="form-control form-control-sm">
-                                        <option value='DISPLAY'>전시</option>
-                                        <option value='ITEM'>용도</option>
-                                    </select>
-                                </div>
-                                <div class="form-inline-inner input-box">
-                                    <div class="form-inline inline_btn_box">
-                                        <select name='cat_cd' id='cat_cd' class="form-control form-control-sm select2-category"></select>
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-category"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    
                 </div>
-                <div class="search-area-ext d-none row">
+                <div class="row">
                     <div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label>상단홍보글/하단홍보글</label>
@@ -156,47 +173,23 @@
 					</div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="item">상품구분</label>
-                            <div class="form-inline">
-                                <div class="form-inline-inner select-box">
-                                    <select name='type' id="type" class="form-control form-control-sm" style="width: 205px;">
-                                        <option value=''>전체</option>
-                                        <option value='N'>일반</option>
-                                        <option value='D'>납품</option>
-                                        <option value='E'>기획</option>
-                                    </select>
-                                </div>
-                                <span class="text_line">/</span>
-                                <div class="form-inline-inner select-box">
-                                    <select name='goods_type' id="goods_type" class="form-control form-control-sm" style="width: 210px;">
-                                        <option value=''>전체</option>
-                                        <option value='S'>매입</option>
-                                        <option value='I'>위탁매입</option>
-                                        <option value='P'>위탁판매</option>
-                                        <option value='O'>구매대행</option>
-                                    </select>
-                                </div>
+                            <label for="goods_nm">상품명</label>
+                            <div class="flax_box">
+                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value=''>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="item">재고구분</label>
-                            <div class="form-inline form-radio-box">
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="is_unlimited" id="is_unlimited1" class="custom-control-input" checked="" value="N">
-                                    <label class="custom-control-label" for="is_unlimited1" value="20">수량관리함</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="is_unlimited" id="is_unlimited2" class="custom-control-input" value="Y">
-                                    <label class="custom-control-label" for="is_unlimited2" value="30">수량 관리 안함(무한재고)</label>
-                                </div>
+                            <label for="goods_nm_eng">상품명(영문)</label>
+                            <div class="flax_box">
+                                <input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="search-area-ext d-none row">
-					<div class="col-lg-4 inner-td">
+                <div class="row">
+                    <div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="name">세일여부/세일구분</label>
 							<div class="form-inline">
@@ -227,6 +220,25 @@
 					</div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
+                            <label for="item">카테고리</label>
+                            <div class="form-inline inline_select_box">
+                                <div class="form-inline-inner select-box">
+                                    <select name='cat_type' id="cat_type" class="form-control form-control-sm">
+                                        <option value='DISPLAY'>전시</option>
+                                        <option value='ITEM'>용도</option>
+                                    </select>
+                                </div>
+                                <div class="form-inline-inner input-box">
+                                    <div class="form-inline inline_btn_box">
+                                        <select name='cat_cd' id='cat_cd' class="form-control form-control-sm select2-category"></select>
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-category"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
 							<label for="">자료수/정렬</label>
 							<div class="form-inline">
 								<div class="form-inline-inner input_box" style="width:24%;">
@@ -254,6 +266,23 @@
 								</div>
 							</div>
 						</div>
+                    </div>
+                </div>
+                <div class="search-area-ext d-none row">
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="item">재고구분</label>
+                            <div class="form-inline form-radio-box">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="is_unlimited" id="is_unlimited1" class="custom-control-input" checked="" value="N">
+                                    <label class="custom-control-label" for="is_unlimited1" value="20">수량관리함</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="is_unlimited" id="is_unlimited2" class="custom-control-input" value="Y">
+                                    <label class="custom-control-label" for="is_unlimited2" value="30">수량 관리 안함(무한재고)</label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -341,7 +370,8 @@
         {field: "head_desc", headerName: "상단홍보글", editable: true, cellStyle: {"line-height": "40px", 'background' : '#ffff99'}},
         {field: "img", headerName: "이미지", type: 'GoodsImageType', width:46, cellStyle: {"line-height": "40px"}, surl:"{{config('shop.front_url')}}"},
         {field: "img", headerName: "이미지_url", hide: true},
-        {field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', editable: true, cellStyle: {"line-height": "40px", 'background' : '#ffff99'}},
+        {field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', width: 230, editable: true, cellStyle: {"line-height": "40px", 'background' : '#ffff99'}},
+        {field: "goods_nm_eng", headerName: "상품명(영문)", width: 230, cellStyle: {"line-height": "40px"}},
         {field: "ad_desc", headerName: "하단홍보글", editable: true, cellStyle: {"line-height": "40px", 'background' : '#ffff99'}},
         {field: "sale_stat_cl", headerName: "상품상태", width:70, type: 'GoodsStateTypeLH50'},
         {field: "normal_price", headerName: "정상가", type: 'currencyType', cellStyle: {"line-height": "40px"}},
