@@ -190,6 +190,11 @@ $( document ).ready(function() {
                 input.value = ui.item.id;
             }
         },
+        // 업체 검색시 키보드 사용 가능하도록 수정
+        focus : (event, ui) => {
+            event.preventDefault();
+            jQuery(this).val(ui.item.suggestion);
+        },
         // 업체명 입력시 관련 업체가 하단에 노출 될 때 스크롤 스타일 클래스 설정
         classes: {
             "ui-autocomplete": "ac-company-scroll"
