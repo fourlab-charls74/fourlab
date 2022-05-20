@@ -215,7 +215,7 @@
 
         var dlv_amt_total = total_dlv_amt !== undefined ? total_dlv_amt : parseInt($("[name='dlv_amt']").val()); // 배송비합계
 
-        var ord_amt_total = rows.reduce((a,c) => c.goods_no ? c.ord_amt + a : a, 0) + dlv_amt_total; // 주문액합계
+        var ord_amt_total = rows.reduce((a,c) => c.goods_no ? c.ord_amt + a : a, 0); // 주문액합계
 
         if(total_dlv_amt !== undefined) {
             $("[name='dlv_amt']").val(dlv_amt_total);
@@ -223,53 +223,12 @@
         }
 
         var point_amt = parseInt($("[name='point_amt']").val() || 0);
-        var recv_amt_total = ord_amt_total - parseInt(point_amt); // 총입금액
+        var recv_amt_total = ord_amt_total - parseInt(point_amt) + dlv_amt_total; // 총입금액
         $("[name='recv_amt']").val(recv_amt_total.toLocaleString('ko-KR'));
 
         var supply_amt = Math.round(recv_amt_total/1.1); // 공급가액
         $("[name='supply_amt']").val(supply_amt.toLocaleString('ko-KR'));
 
-        var vat_amt = Math.round(recv_amt_total - supply_amt); // 세액
-        $("[name='vat_amt']").val(vat_amt.toLocaleString('ko-KR'));
-    }
-
-     // com_type별 배송비합계 세팅
-     function setDlvFeeOfComType() {
-        let rows = gx.getRows();
-        let nodes = [], dlv_amts = [];
-        let count = 0;
-        gx.gridOptions.api.forEachNode(node => {
-            count++;
-            if(!node.data.goods_no) {
-                nodes.push(node);
-                let total = rows.splice(0, count).reduce((a,c) => (c.price || 0) * (c.qty || 0) + a, 0);
-                let dlv = total < free_dlv_amt ? base_dlv_fee : 0;
-                node.data.dlv_amt = dlv;
-                dlv_amts.push(dlv);
-                count = 0;
-            }
-        })
-        gx.gridOptions.api.redrawRows({rowNodes:nodes});
-        EditAmtTable(dlv_amts.reduce((a,c) => a+c, 0));
-    }
-
-    function EditAmtTable(total_dlv_amt) {
-        var rows = gx.getRows();
-
-        var dlv_amt_total = total_dlv_amt !== undefined ? total_dlv_amt : parseInt($("[name='dlv_amt']").val()); // 배송비합계
-        var ord_amt_total = rows.reduce((a,c) => c.goods_no ? c.ord_amt + a : a, 0) + dlv_amt_total; // 주문액합계
-        if(total_dlv_amt !== undefined) {
-            $("[name='dlv_amt']").val(dlv_amt_total);
-            $("[name='ord_amt']").val(ord_amt_total.toLocaleString('ko-KR'));
-        }
-
-        var point_amt = parseInt($("[name='point_amt']").val() || 0);
-        var recv_amt_total = ord_amt_total - parseInt(point_amt); // 총입금액
-        $("[name='recv_amt']").val(recv_amt_total.toLocaleString('ko-KR'));
-
-        var supply_amt = Math.round(recv_amt_total/1.1); // 공급가액
-        $("[name='supply_amt']").val(supply_amt.toLocaleString('ko-KR'));
-        
         var vat_amt = Math.round(recv_amt_total - supply_amt); // 세액
         $("[name='vat_amt']").val(vat_amt.toLocaleString('ko-KR'));
     }
@@ -707,7 +666,6 @@
             url: "/head/order/ord02/save",
             data: order_data,
             success: function (res) {
-                console.log(res);
                 is_processing = false;
                 alert("저장되었습니다.");
                 document.location.href = '/head/order/ord01/' + res.ord_no;
@@ -777,7 +735,6 @@
         });
         gx.gridOptions.api.setRowData([]);
         Object.keys(_goods_list_of_com_type).forEach(key => {
-            console.log(_goods_list_of_com_type, key);
             if(_goods_list_of_com_type[key] !== null) {
                 _goods_list_of_com_type[key].forEach(goods => {
                     setGoodsRow(goods);
@@ -793,6 +750,7 @@
             }
         })
         setDlvFeeOfComType();
+        setDlvFeeUse($("input[name=dlv_apply]:checked").val() === "Y");
         $("#amt_table").css("display", "block");
     }
 
@@ -830,8 +788,6 @@
      */
     function DelGoods(){
         let delrow = gx.getSelectedRows();
-        console.log(delrow);
-        console.log(_goods_list_of_com_type);
         delrow.forEach((d,i) => {
             if(d.goods_no) {
                 const type = d.com_type == 2 ? d.com_id : "etc";
@@ -873,7 +829,11 @@
     // 배송비 적용/적용안함 설정
     function setDlvFeeUse(is_use) {
         if(is_use) setDlvFeeOfComType();
-        else EditAmtTable(0);
+        else {
+            EditAmtTable(0);
+            let list = gx.getRows().map(g => g.goods_no ? g : {...g, dlv_amt: 0});
+            gx.gridOptions.api.setRowData(list);
+        }
     }
 
 </script>
