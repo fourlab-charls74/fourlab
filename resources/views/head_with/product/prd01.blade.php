@@ -368,7 +368,7 @@
         {field: "full_nm", headerName: "대표카테고리", cellStyle: {"line-height": "40px"}},
         {field: "style_no", headerName: "스타일넘버", editable: true, cellStyle: {"line-height": "40px", 'background' : '#ffff99'}},
         {field: "head_desc", headerName: "상단홍보글", editable: true, cellStyle: {"line-height": "40px", 'background' : '#ffff99'}},
-        {field: "img", headerName: "이미지", type: 'GoodsImageType', width:46, cellStyle: {"line-height": "40px"}, surl:"{{config('shop.front_url')}}"},
+        {field: "img", headerName: "이미지", type: 'GoodsImageType', width:60, cellStyle: {"line-height": "40px"}, surl:"{{config('shop.front_url')}}"},
         {field: "img", headerName: "이미지_url", hide: true},
         {field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', width: 230, editable: true, cellStyle: {"line-height": "40px", 'background' : '#ffff99'}},
         {field: "goods_nm_eng", headerName: "상품명(영문)", width: 230, cellStyle: {"line-height": "40px"}},

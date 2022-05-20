@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Exception;
 
 class prd02Controller extends Controller
 {
@@ -200,7 +201,7 @@ class prd02Controller extends Controller
 					}
                 }
 
-				// 추가이미지 500일때 데이터 저장
+				// 추가이미지 기본사이즈 (500->700)일 때 데이터 저장
 				if( $img_type != "a" ){
 					$sql	= " select count(*) as cnt from goods_image where goods_no = :goods_no and goods_sub = '0' and type = :type ";
 					$selectarr = array(

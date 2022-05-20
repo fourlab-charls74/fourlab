@@ -16,7 +16,7 @@ class ord21Controller extends Controller
 	//
 	public function index() {
 		$mutable  = Carbon::now();
-		$sdate    = $mutable->sub(14, 'day')->format('Y-m-d');
+		$sdate    = $mutable->sub(6, 'month')->format('Y-m-d');
 
 
 		$id = Auth('head')->user()->id;

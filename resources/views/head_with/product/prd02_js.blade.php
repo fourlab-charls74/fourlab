@@ -2,6 +2,8 @@
 
     let target_file = null;
 
+    const IMG_SIZE = 700;
+
     $(document).ready(function() {
         $("#img-setting-tab [name=size]").prop('checked', true);
 
@@ -89,6 +91,7 @@
     });
 
     function validatePhoto() {
+        
         if (target_file === null || target_file.length === 0) {
             alert("업로드할 이미지를 선택해주세요.");
             return false;
@@ -112,12 +115,29 @@
         return true;
     }
 
-    function previewImage() {
+    function previewImage() { // 이미지 크기 검토 로직 추가 - 비동기 콜백 처리
         var fr = new FileReader();
-        fr.onload = drawImage;
+        fr.onload = (e) => {
+            const image = new Image();
+            image.src = fr.result;
+            image.onload = (evt) => {
+                if (checkImageSize(evt) === false) return;
+                drawImage(e);
+            };
+        }
         fr.readAsDataURL(target_file[0]);
-        console.log(fr);
     }
+
+    const checkImageSize = (evt) => { // 기본 이미지 크기 이내일 경우 alert 처리
+        const image = evt.target;
+        if ((image.width < IMG_SIZE) || (image.height < IMG_SIZE)) {
+            alert(`${IMG_SIZE} x ${IMG_SIZE} 크기 이상의 이미지를 업로드 해주세요.`);
+            target_file = null;
+            $('#file-label').html('이미지를 선택해주세요.');
+            return false;
+        }
+        return true;
+    };
 
     function drawImage(e) {
 
@@ -129,7 +149,7 @@
 
             var img_type = $('[name=img_type]:checked').val();
 
-            $("#upload-tab").html('<div class="p-4"><img src="" id="img-preview" width="500px" alt=""></div>');
+            $("#upload-tab").html(`<div class="p-4"><img src="" id="img-preview" width="${IMG_SIZE}" alt=""></div>`);
             $("#img-preview").attr("src", this.src);
 
             //switch(img_type) {
@@ -183,8 +203,9 @@
             }
         });
 
-        //500사이즈는 기본 사이즈
-        sizes.push(500);
+        //500사이즈는 기본 사이즈 -> 700 사이즈로 변경
+        // sizes.push(500);
+        sizes.push(IMG_SIZE);
 
         //오름차순 정렬
         sizes.sort(function(a, b) {
@@ -237,7 +258,7 @@
                 img_type : type,
                 img_type_alias : type_alias,
                 effect : effect,
-                size : '500',
+                size : IMG_SIZE,
                 _token : $("[name=_token]").val()
             },
             success: function(res) {

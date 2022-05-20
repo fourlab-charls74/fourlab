@@ -147,6 +147,10 @@
                                                                 <input type="checkbox" name="size" id="size-320" value="320" class="custom-control-input"/>
                                                                 <label for="size-320" class="custom-control-label">320 * 320</label>
                                                             </div>
+                                                            <div class="custom-control custom-checkbox">
+                                                                <input type="checkbox" name="size" id="size-500" value="500" class="custom-control-input"/>
+                                                                <label for="size-500" class="custom-control-label">500 * 500</label>
+                                                            </div>
                                                         </div>
                                                     </td>
                                                 </tr>
