@@ -228,6 +228,17 @@
     .img{
         height:30px;
     }
+
+    .price-red {
+        font-weight: bold;
+        background: #d05050;
+    }
+    .price-pink {
+        background: #FFACAC;
+    }
+    .price-yellow {
+        background: #FFFF99;
+    }
 </style>
 <script language="javascript">
     let gx;
@@ -257,22 +268,47 @@
         { field: "margin", headerName: "원가대비 마진율", type: 'numberType', width: 100 },
     ];
 
-    function styleOfWholeSalePrice(params) {
-        return {
-            'background': params.data.is_changed ? "#FF0000" : parseInt(params.value) === 0 || params.data.price === parseInt(params.value) ? '#FFACAC' : "#FFFF99",
-            'color': params.data.is_changed ? "#FFFFFF" : "#000000",
-            'font-weight': params.data.is_changed ? "bold" : "normal",
-        };
-    }
-
     function styleOfMarginRatio(params) {
-        return {'background': parseInt(params.value) <= 0 ? '#FF4080' : "none"};
+        return {'background': parseInt(params.value) <= 0 || params.data.is_changed ? '#DD4080' : "none"};
     }
 
     function styleOfDCRatio(params) {
         const max_dc_ratio = $("[name=max_dc_ratio]").val();
         const group_price = parseInt(params.data[`group_${params.column.originalParent.colGroupDef.group_no}_price`]);
         return {'background': max_dc_ratio > 0 && parseInt(params.value) > max_dc_ratio && group_price !== 0 && params.data.price !== group_price ? '#FF4080' : "none"};
+    }
+
+    // 판매가 변경 시 해당 값에 대한 마진율 & 할인율 계산
+    function calculatePriceMargin(e) {
+        if(!Number.isInteger(parseInt(e.newValue))) {
+            alert("숫자만 입력해주세요");
+            e.data[e.colDef.field] = e.oldValue;
+            e.api.refreshCells({columns : [e.colDef.field], rosNodes: [e.node]});
+            return;
+        }
+
+        cut_type = $("[name=cut_type]").val();
+        cut_price = $("[name=cut_price]").val();
+
+        let wonga = e.data.wonga; // 원가
+        let price = e.data.price; // 판매가
+        let group_name = e.colDef.field.split("_").slice(0,2).join("_");
+        let wholesale_price = e.newValue; // 그룹별 판매가
+        let margin_ratio = 0; // 그룹별 마진율
+        let dc_ratio = 0; // 그룹별 할인율
+
+        if(wonga > 0) margin_ratio = (100 - Math.round((wonga / wholesale_price) * 100));
+        else margin_ratio = 0;
+        e.data[group_name + "_ratio"] = margin_ratio;
+
+        if(price > 0) {
+            dc_ratio = Math.round(((price - wholesale_price) / price) * 100);
+            e.data[group_name + "_dc_ratio"] = dc_ratio;
+        }
+
+        e.data['is_changed'] = true;
+        e.api.updateRowData({ update: [e.data] });
+        e.node.setSelected(true);        
     }
 
     group_columns.forEach(col => {
@@ -282,7 +318,14 @@
             children: [
                 { field: `group_${col.group_no}`, headerName: "그룹코드", hide: true },
                 { field: `group_${col.group_no}_margin`, headerName: "그룹마진", type: 'numberType', width: 90 },
-                { field: `group_${col.group_no}_price`, headerName: "판매가", type: 'numberType', cellStyle: styleOfWholeSalePrice, width: 80 },
+                { field: `group_${col.group_no}_price`, headerName: "판매가", type: 'numberType', 
+                    cellClassRules: {
+                        'price-red': (p) => p.data.is_changed,
+                        'price-pink': (p) => !p.data.is_changed && (parseInt(p.value) === 0 || p.data.price === parseInt(p.value)),
+                        'price-yellow': (p) => !p.data.is_changed && !(parseInt(p.value) === 0 || p.data.price === parseInt(p.value)),
+                    },
+                    width: 80, editable: true, onCellValueChanged: calculatePriceMargin 
+                },
                 { field: `group_${col.group_no}_ratio`, headerName: "마진율", type: 'numberType', cellStyle: styleOfMarginRatio, width: 80 },
                 { field: `group_${col.group_no}_dc_ratio`, headerName: "할인율", type: 'numberType', cellStyle: styleOfDCRatio, width: 80 },
             ],
