@@ -1706,8 +1706,8 @@ class ord01Controller extends Controller
 				left outer join code ord_type on (a.ord_type = ord_type.code_id and ord_type.code_kind_cd = 'G_ORD_TYPE')
 			where a.ord_opt_no = '$ord_opt_no'
 		";
-        $row	= DB::selectOne($sql);
 
+        $row = DB::selectOne($sql);
 		$row->price	= Lib::cm($row->price);
 		$row->wonga	= Lib::cm($row->wonga);
 

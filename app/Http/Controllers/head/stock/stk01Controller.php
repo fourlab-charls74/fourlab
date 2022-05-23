@@ -354,13 +354,11 @@ class stk01Controller extends Controller
                 "sdate" => $sdate,
                 "edate" => $edate
             ]);
+
             $stock_sale = [];
             while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 $stock_sale[$row["goods_opt"]] = $row["salecnt"];
             }
-
-
-            //dd(DB::getQueryLog());
 
             $sql = /** @lang text */
                 " 
@@ -376,7 +374,6 @@ class stk01Controller extends Controller
             $row = DB::selectOne($sql, array("goods_no" => $goods_no));
 
             $total = $row->total;
-            //echo "<pre>$sql</pre>";
             if($total > 0){
                 $page_cnt = (int)(($total-1)/$page_size) + 1;
             }
