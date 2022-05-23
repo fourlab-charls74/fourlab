@@ -809,7 +809,7 @@
             return false;
         }
 
-        const phone_reg = /^(0(2|3[1-3]|4[1-4]|5[1-5]|6[1-4]))$/;
+        const phone_reg = /(^(0(2|3[1-3]|4[1-4]|5[1-5]|6[1-4]))$)|^01(?:0|1|[6-9])$/; // mobile 패턴 추가 (일반전화 없을 시)
 
         if (!phone_reg.test(ff.phone1.value)) {
             alert("일반전화 앞3자리를 확인해주세요.");
@@ -875,8 +875,7 @@
         var pattern_1 =  /^[a-zA-Z]+$/;
         var pattern_2 =  /^[0-9]+$/;
 
-        if (await Validate() === false) return false;
-
+        // input 순서대로 validation 진행
         if(ff.user_id.value == ""){
             alert("아이디을 입력하십시오.");
             ff.user_id.focus();
@@ -929,6 +928,8 @@
             ff.dd.focus();
             return false;
         }
+
+        if (await Validate() === false) return false;
 
         if( ff.jumin_chk?.checked ){
             const jumin1_reg = /^(?:[0-9]{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[1,2][0-9]|3[0,1]))$/;

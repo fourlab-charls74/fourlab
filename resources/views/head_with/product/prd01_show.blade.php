@@ -40,6 +40,12 @@
         height: 40px;
     }
 
+    /* 기본옵션 ag grid 3단 가운데 정렬 css 적용 */
+    .basic-option .ag-header-row.ag-header-row-column-group + .ag-header-row.ag-header-row-column > .bizest.ag-header-cell {
+        transform: translateY(-63%);
+        height: 320%;
+    }
+
 </style>
 
     <script type="text/javascript" src="/handle/editor/editor.js"></script>
@@ -924,7 +930,7 @@
 											</div>
 										</div>
 									</div>
-									<div class="table-responsive">
+									<div class="table-responsive basic-option">
 										<div id="div-gd-opt" style="height:200px;" class="ag-theme-balham"></div>
 									</div>
 								</div>
