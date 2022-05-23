@@ -201,7 +201,7 @@ class prd02Controller extends Controller
 					}
                 }
 
-				// 추가이미지 기본사이즈 (500->700)일 때 데이터 저장
+				// 추가이미지 기본사이즈가 700일 때 데이터 저장됨 (2022-05월 qa 요청으로 기존 500에서 700으로 변경됨)
 				if( $img_type != "a" ){
 					$sql	= " select count(*) as cnt from goods_image where goods_no = :goods_no and goods_sub = '0' and type = :type ";
 					$selectarr = array(
@@ -253,14 +253,14 @@ class prd02Controller extends Controller
 
     public function resize($type, $effect, $src_img, $dstFile, $sw, $sh, $dw, $dh = 0)
     {
-
-        if ($sw < $dw) {
+        if ($sw < $dw) { // 이미지가 작은 값이 들어오는 경우 - 프론트 단에서 처리하여 해당 사항 없음.
             $dw = $sw;
             $dh = $sh;
         }
 
-        if ($sw >= $dw) {
-            $dh = ceil(($dw / $sw) * $sh);
+        if ($sw >= $dw) { // 이미지가 리사이징 되어야할 이미지 너비보다 큰 경우
+            // $dh = ceil(($dw / $sw) * $sh);
+            $dh = round(($dw / $sw) * $sh); // 500px 사이즈에서 리사이징된 이미지 높이가 500px 에서 501px로 올림되고 있어 수식을 round로 변경
         }
 
         $dst_img = imagecreatetruecolor($dw, $dh);
