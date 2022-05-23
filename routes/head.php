@@ -415,6 +415,9 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::get('prd22/{code?}', 'prd22Controller@show');
         Route::post('prd22/{code?}', 'prd22Controller@store');
 
+        // 상품이미지 일괄등록
+        Route::get('prd23', 'prd23Controller@index');
+
         //사방넷
         //사방넷 - 상품연동
         Route::get('prd30', 'prd30Controller@index');

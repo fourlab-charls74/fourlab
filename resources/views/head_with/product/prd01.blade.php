@@ -535,7 +535,7 @@
     };
 
     function AddProductImages() {
-        var url = '/head/product/prd08';
+        var url = '/head/product/prd23';
         var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1024,height=900");
     }
 
