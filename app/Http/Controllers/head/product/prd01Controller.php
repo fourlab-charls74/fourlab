@@ -67,9 +67,9 @@ class prd01Controller extends Controller
 		 * 설정 값 얻기
 		 */
 		$conf = new Conf();
-		$cfg_dlv_fee				= $conf->getConfigValue("delivery", "base_delivery_fee");
-		$cfg_free_dlv_fee_limit		= $conf->getConfigValue("delivery", "free_delivery_amt");
-		$cfg_point_ratio		= $conf->getConfigValue("point", "ratio", "0");
+		$cfg_dlv_fee = $conf->getConfigValue("delivery", "base_delivery_fee");
+		$cfg_free_dlv_fee_limit	= $conf->getConfigValue("delivery", "free_delivery_amt");
+		$cfg_point_ratio = $conf->getConfigValue("point", "ratio", "0");
 
 		$sql = "select id id, name val from mgr_user where md_yn = 'Y' and use_yn = 'Y' order by name";
 		$md_names = DB::select($sql);
@@ -275,7 +275,7 @@ class prd01Controller extends Controller
 				, com.com_type as com_type_d
 				,g.sale_type,g.sale_yn,g.before_sale_price,g.sale_price,0 as sale_rate,
 				g.sale_dt_yn,g.sale_s_dt,g.sale_e_dt
-
+				
 			from goods g
 				left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
 				left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id

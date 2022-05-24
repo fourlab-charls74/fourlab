@@ -275,37 +275,37 @@
                 },
                 {
                     headerName: "적립금",
-                    field: "sum_point_amt",
+                    field: "sum_point",
                     type: 'currencyType',
                     aggregation: true
                 },
                 {
                     headerName: "할인",
-                    field: "sum_dc_amt",
+                    field: "sum_dc",
                     type: 'currencyType',
                     aggregation: true
                 },
                 {
                     headerName: "쿠폰",
-                    field: "sum_coupon_amt",
+                    field: "sum_coupon",
                     type: 'currencyType',
                     aggregation: true
                 },
                 {
                     headerName: "수수료",
-                    field: "sum_fee_amt",
+                    field: "sum_fee",
                     type: 'currencyType',
                     aggregation: true
                 },
                 {
                     headerName: "결제금액",
-                    field: "sum_recv_amt",
+                    field: "sum_recv",
                     type: 'currencyType',
                     aggregation: true
                 },
                 {
                     headerName: "과세",
-                    field: "sum_taxation_amt",
+                    field: "sum_taxation",
                     type: 'currencyType',
                     aggregation: true
                 },
@@ -336,13 +336,13 @@
             aggregation: true
         },
         {
-            headerName: "마진율",
+            headerName: "마진율(%)",
             field: "margin",
             type: 'percentType',
             valueGetter: function(params) {
                 if (params.data.date === "합계" || params.data.date === "평균") {
                     const data = params.data;
-                    return (1 - parseInt(data.sum_wonga) / (parseInt(data.sum_recv_amt) + parseInt(data.sum_point_amt) - parseInt(data.sum_fee_amt))) * 100;
+                    return (1 - parseInt(data.sum_wonga) / (parseInt(data.sum_recv) + parseInt(data.sum_point) - parseInt(data.sum_fee))) * 100;
                 }
                 return params.data.margin;
             }
@@ -358,6 +358,58 @@
                 {
                     headerName: "세후",
                     field: "margin2",
+                    type: 'currencyType',
+                    aggregation: true
+                },
+            ]
+        },
+        {
+            headerName: '비용',
+            children: [
+                {
+                    headerName: "PG수수료",
+                    field: "exp_pg_fee",
+                    type: 'currencyType',
+                    aggregation: true
+                },
+                {
+                    headerName: "적립금",
+                    field: "exp_point",
+                    type: 'currencyType',
+                    aggregation: true
+                },
+                {
+                    headerName: "광고비",
+                    field: "exp_ad",
+                    type: 'currencyType',
+                    aggregation: true
+                },
+                {
+                    headerName: "소계",
+                    field: "exp_sum",
+                    type: 'currencyType',
+                    aggregation: true
+                },
+            ]
+        },
+        {
+            headerName: "이익율(%)",
+            field: "biz_margin",
+            type: 'percentType',
+            aggregation: true
+        },
+        {
+            headerName: '이익',
+            children: [
+                {
+                    headerName: "세전",
+                    field: "biz_profit",
+                    type: 'currencyType',
+                    aggregation: true
+                },
+                {
+                    headerName: "세후",
+                    field: "biz_profit_after",
                     type: 'currencyType',
                     aggregation: true
                 },
@@ -483,6 +535,9 @@
                 },
             ]
         },
+        {
+            width: "auto"
+        }
     ];
 </script>
 <script type="text/javascript" charset="utf-8">
@@ -496,7 +551,14 @@
         pApp.ResizeGrid(300);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns);
+        let options = {
+            getRowStyle: (params) => {
+                if (params.node.rowPinned === 'top') {
+                    return { 'background': '#eee' }
+                }
+            }
+        };
+        gx = new HDGrid(gridDiv, columns, options);
         Search();
     });
 
