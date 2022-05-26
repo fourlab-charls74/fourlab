@@ -417,6 +417,9 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
 
         // 상품이미지 일괄등록
         Route::get('prd23', 'prd23Controller@index');
+        Route::get('prd23/goods-info/goods-no', 'prd23Controller@get_goods_info_by_goodsno');
+        Route::get('prd23/goods-info/style-no', 'prd23Controller@get_goods_info_by_styleno');
+        Route::put('prd23/upload', 'prd23Controller@upload_images');
 
         //사방넷
         //사방넷 - 상품연동
