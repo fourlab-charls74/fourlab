@@ -86,6 +86,17 @@
                                     </td>
                                 </tr>
                                 <tr>
+                                    <th>상품파일명</th>
+                                    <td>
+                                        <div class="form-inline-inner input_box wd300">
+                                            <select name="file_type" class="form-control form-control-sm">
+                                                <option value="goods_no" selected>상품번호</option>
+                                                <option value="style_no">스타일넘버</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {{-- <tr>
                                     <th>정렬</th>
                                     <td>
                                         <div class="form-inline-inner input_box wd300">
@@ -97,7 +108,7 @@
                                             </select>
                                         </div>
                                     </td>
-                                </tr>
+                                </tr> --}}
                             </tbody>
                         </table>
                     </div>
@@ -109,11 +120,12 @@
                         <h6 class="m-0 font-weight-bold text-primary fas fa-question-circle"> Help</h6>
                     <ul class="help-list">
                         <li>'파일추가' 버튼을 이용하여 상품이미지를 선택하여 주십시오. 파일선택 박스에서 <strong style="font-weight: bold;">동시에 여러개의 이미지를 선택</strong>하실 수 있습니다.</li>
-                        <li>상품이미지를 추가한 후 상품번호 또는 스타일넘버를 입력해 주십시오. <strong style="color:red;">업체를 선택한 후 상품 이미지의 이름을 스타일넘버로 작성하시면 자동으로 상품을 매칭</strong>하실 수 있습니다.</li>
-                        <li>예&#41; BA2332462.jpg, BA2332462_a_500.jpg</li>
+                        <li>상품이미지를 추가한 후 상품번호 또는 스타일넘버를 입력해 주십시오.</li>
+                        <li>상단 '상품파일명'에서 타입을 선택하신 후, <strong style="color:red;">선택한 타입에 해당하는 값으로 상품 이미지의 이름을 작성하여 추가하시면 자동으로 상품을 매칭</strong>하실 수 있습니다.</li>
+                        <li>예&#41; &#40;상품번호 - 123456.jpg / 123456_a_700.jpg&#41;, &#40;스타일넘버 - BA2332462.jpg / BA2332462_a_500.jpg&#41;</li>
                         <li>매칭된 상품이미지를 '이미지업로드' 버튼을 클릭하여 업로드하실 수 있습니다.</li>
                         <li>목록이미지의 경우 700*700 이상의 이미지를 업로드해주세요.</li>
-                        <li>상세이미지의 경우 'Sample Image' 이미지가 등록하신 각 이미지로 대체됩니다.</li>
+                        <li>상세이미지의 경우 '***이미지영역***' 텍스트가 등록하신 각 이미지로 대체됩니다.</li>
                     </ul>
                 </div>
                 {{-- Help end --}}
@@ -126,7 +138,7 @@
                             <input type="file" class="d-none" id="img-file" accept="image/*" multiple />
                             <label for="img-file" class="btn btn-sm btn-outline-primary shadow-sm mr-1 mb-0" onclick="clickEventForAddBtn(event)">파일추가</label>
                             <button type="button" class="btn btn-sm btn-outline-primary shadow-sm mr-1" onclick="delImageFile()">삭제</button>
-                            {{-- <button type="button" class="btn btn-sm btn-outline-primary shadow-sm mr-1" onclick="">슬라이더</button> --}}
+                            <button type="button" class="btn btn-sm btn-outline-primary shadow-sm mr-1" onclick="openProductImageSlider()">슬라이더</button>
                             <button type="button" class="btn btn-sm btn-primary shadow-sm" onclick="uploadImages()">이미지업로드</button>
                         </div>
                     </div>
@@ -267,6 +279,7 @@
     function pushImageFile(files) {
         console.log(files);
         let uploadFiles = [];
+        let file_type = $("[name=file_type]").val();
         [...files].forEach((f, i) => {
             const reader = new FileReader();
             reader.readAsDataURL(f);
@@ -282,7 +295,11 @@
                                 setTimeout(() => {
                                     gx.addRows(uploadFiles);
                                     list = list.concat(uploadFiles);
-                                    getGoodsinfoByStyleNo(list.map(item => ({style_no: item.file ? item.file.name.split(".")[0].split("_")[0] : '', id: item.id})));
+                                    if(file_type === 'goods_no'){
+                                        // getGoodsInfoByGoodsNo(goods_nos[0], curIdx);
+                                    } else if(file_type === 'style_no') {
+                                        getGoodsinfoByStyleNo(list.map(item => ({style_no: item.file ? item.file.name.split(".")[0].split("_")[0] : '', id: item.id})));
+                                    }
                                 }, 100);
                             }
                             return res(img1);
@@ -483,6 +500,16 @@
         // gx.gridOptions.api.setRowData([]);
         console.log(failedIds, list);
         gx1.addRows(list.map(item => ({...item, result: (failedIds.includes(item.id) || !successIds.includes(item.id)) ? "f" : "s"})));
+    }
+
+    /***************************** 이미지 슬라이더 관련 *****************************/
+
+    function openProductImageSlider() {
+        let goods_nos = gx.gridOptions.api.getSelectedRows().filter(img => img.goods_no);
+        if(goods_nos.length < 1) return alert("상품과 일치하는 파일을 한 개 이상 선택해주세요.");
+
+        var url = '/head/product/prd02/slider?goods_nos=' + goods_nos.map(g => g.goods_no).join(",");
+        var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1024,height=900");
     }
 
 </script>
