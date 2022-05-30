@@ -409,10 +409,8 @@ class prd07Controller extends Controller
 				"result" => 1,
                 "msg" => $goods_no."-".$goods_sub
             ]);
-
 		} catch (Exception $e) {
 			DB::rollback();
-			dd($e);
 			return response()->json([
                 "result" => 0,
 				"msg" => "시스템에러"
