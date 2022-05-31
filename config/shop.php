@@ -9,5 +9,8 @@ return [
     ],
     'head' => [
         'view' => env('HEAD_VIEW','head')
+    ],
+    'store' => [
+        'view' => env('STORE_VIEW','store')
     ]
 ];

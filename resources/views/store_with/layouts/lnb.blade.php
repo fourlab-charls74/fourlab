@@ -1,0 +1,88 @@
+<nav>
+    <div class="side_menu">
+        <ul>
+            <li>
+                <a href="javascript:;" class="arrow waves-effect"><i class="bx bx-package fs-18"></i><span>코드관리</span></a>
+                <ul>
+                    <li><a href="/store/standard/std02">매장관리</a></li>
+                    <li><a href="/store/standard/std03">창고관리</a></li>
+                    <li><a href="/store/standard/std04">동종업계관리</a></li>
+                    <li><a href="/store/standard/std05">판매유형관리</a></li>
+                    <li><a href="/store/standard/std06">매장영업담당자관리</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="javascript:;" class="arrow"><i class="bx bx-shopping-bag fs-18"></i><span>상품관리</span></a>
+                <ul>
+                    <li><a href="/head/product/prd01" target="_blank">상품관리</a></li>
+                    <li><a href="/head/product/prd01" target="_blank">원부자재관리</a></li>
+                    <li><a href="/head/product/prd01" target="_blank">매장가격변경</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="javascript:;" class="arrow"><i class="bx bx-task fs-18"></i><span>생산입고관리</span></a>
+                <ul>
+                    <li><a href="/partner/cs/cs01">상품입고</a></li>
+                    <li><a href="/partner/cs/cs01">상품반품</a></li>
+                    <li><a href="/partner/cs/cs02">창고입고반품이동</a></li>
+                    <li><a href="/partner/cs/cs01">원부자재입고</a></li>
+                    <li><a href="/partner/cs/cs01">원부자재반품</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="javascript:;" class="arrow"><i class="bx bx-task fs-18"></i><span>출고관리</span></a>
+                <ul>
+                    <li><a href="/partner/cs/cs01">출고</a></li>
+                    <li><a href="/partner/cs/cs01">반품</a></li>
+                    <li><a href="/partner/cs/cs02">실사</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="javascript:;" class="arrow"><i class="bx bx-task fs-18"></i><span>매장관리</span></a>
+                <ul>
+                    <li><a href="/store/stock/stk01">매장재고</a></li>
+                    <li><a href="">매장RT</a></li>
+                    <li><a href="">매장주문</a></li>
+                    <li><a href="">실사</a></li>
+                </ul>i>
+            <li>
+                <a href="javascript:;" class="arrow"><i class="bx bx-line-chart fs-18"></i><span>고객/수선관리</span></a>
+                <ul>
+                    <li><a href="/head/member/mem01" target="_blank">회원관리</a></li>
+                    <li><a href="/store/standard/std11">수선관리</a></li>
+                    <li><a href="/head/promotion/prm10" target="_blank">쿠폰</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="javascript:;" class="arrow"><i class="bx bx-file fs-18"></i><span>마감관리</span></a>
+                <ul>
+                    <li><a href="/partner/support/spt01">월마감</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="javascript:;" class="arrow"><i class="bx bx-file fs-18"></i><span>영업관리</span></a>
+                <ul>
+                    <li><a href="/store/sale/sal11">배분현황</a></li>
+                    <li><a href="/store/sale/sal15">배분출고확정</a></li>
+                    <li><a href="/store/sale/sal16">매장RT지시등록</a></li>
+                    <li><a href="/store/sale/sal17">매장목표등록</a></li>
+                    <li><a href="/store/sale/sal18">월별할인적용유형관리</a></li>
+                    <li><a href="/store/sale/sal19">매장확인취소관리</a></li>
+                    <li><a href="/store/sale/sal20">LOSS(창고/매장) 등록</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="javascript:;" class="arrow"><i class="bx bx-file fs-18"></i><span>경영관리</span></a>
+                <ul>
+                    <li><a href="/store/sale/sal01">판매일보</a></li>
+                    <li><a href="/store/sale/sal02">일별판매집계표</a></li>
+                    <li><a href="/store/sale/sal03">기간별 Best/Worst 판매현황</a></li>
+                    <li><a href="/store/sale/sal06">매장상품별판매분석</a></li>
+                    <li><a href="/store/sale/sal07">상품별 이익현황</a></li>
+                </ul>
+            </li>
+        </ul>
+
+    </div>
+</nav>
+

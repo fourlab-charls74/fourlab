@@ -18,7 +18,6 @@ class Head
      */
     public function handle(Request $request, Closure $next)
     {
-
         /*
          * 임시 토큰 구현
          */

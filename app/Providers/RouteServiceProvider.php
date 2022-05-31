@@ -45,6 +45,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapApiRoutes();
         $this->mapHeadRoutes();
         $this->mapPartnerRoutes();
+        $this->mapStoreRoutes();
         $this->mapWebRoutes();
 
         //
@@ -78,6 +79,12 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/head.php'));
     }
 
+    protected function mapStoreRoutes() {
+        Route::prefix('store')
+            ->middleware('web')
+            ->namespace($this->namespace)
+            ->group(base_path('routes/store.php'));
+    }
 
     /**
      * Define the "api" routes for the application.
