@@ -26,23 +26,26 @@ class prd23Controller extends Controller
         $code = 200;
         $msg = '상품정보가 정상적으로 조회되었습니다.';
 
-        $goods_no = $req->goods_no;
-        $result;
+        $req_list = $req->data;
+        $result = [];
+        $failed_ids = [];
 
-        $sql = "
-            select goods_no, goods_sub, style_no, goods_nm
-            from goods
-            where goods_no = :goods_no
-        ";
-        $result = DB::selectOne($sql, ['goods_no' => $goods_no]);
-        if($result == null || $result->goods_no == 0) {
-            $code = 204;
-            $msg = '입력하신 상품번호에 해당하는 상품이 존재하지 않습니다.';
-        } else {
-            $result->id = $req->id;
+        foreach($req_list as $item) {
+            $sql = "
+                select goods_no, goods_sub, style_no, goods_nm
+                from goods
+                where goods_no = :goods_no
+            ";
+            $row = DB::selectOne($sql, ['goods_no' => $item['goods_no']]);
+            if($row == null || $row->goods_no == 0) {
+                array_push($failed_ids, $item['id']);
+            } else {
+                $row->id = $item['id'];
+            }
+            array_push($result, $row);
         }
 
-        return response()->json(['code' => $code, 'msg' => $msg, 'body' => ['data' => $result]]);
+        return response()->json(['code' => $code, 'msg' => $msg, 'body' => ['data' => ['all' => $result, 'failed' => $failed_ids]]]);
     }
 
     // 스타일넘버로 상품정보 조회
@@ -52,17 +55,21 @@ class prd23Controller extends Controller
         $msg = '상품정보가 정상적으로 조회되었습니다.';
         
         $req_list = $req->data;
-        $com_id = $req->com_id;
+        $com_id = $req->com_id ?? '';
         $result = [];
         $failed_ids = [];
 
         foreach($req_list as $item) {
+            $where = '';
+            if($com_id != '') $where += ' and com_id = ' . $com_id;
+
             $sql = "
                 select goods_no, goods_sub, style_no, goods_nm
                 from goods
-                where style_no = :style_no and com_id = :com_id
-            ";
-            $row = DB::selectOne($sql, ['style_no' => $item['style_no'], 'com_id' => $com_id]);
+                where style_no = :style_no
+            " . $where;
+            $row = DB::selectOne($sql, ['style_no' => $item['style_no']]);
+
             if($row == null || $row->goods_no == 0) {
                 array_push($failed_ids, $item['id']);
             } else {
@@ -100,6 +107,8 @@ class prd23Controller extends Controller
                         $goods_no = $item['goods_no'] ?? '';
                         $goods_sub = $item['goods_sub'] ?? '';
                         $src = $item['src'] ?? '';
+
+                        if($goods_no == '' || $goods_sub == '' || $src == '') throw new Exception("PRODUCT::NOT_FOUND");
             
                         $image = preg_replace('/data:image\/(.*?);base64,/', '', $src);
                         preg_match('/data:image\/(.*?);base64,/', $src, $matches, PREG_OFFSET_CAPTURE);
@@ -109,7 +118,7 @@ class prd23Controller extends Controller
                             $ext = "jpg";
                         // } else if ($ext == "png" || $ext == "gif") {
                         }
-                        $cfg_img_size_real = SLib::getCodesValue("G_IMG_SIZE", "real");
+                        // $cfg_img_size_real = SLib::getCodesValue("G_IMG_SIZE", "real");
             
                         $sql = "
                             select date_format(reg_dm,'%Y%m%d') as reg_dm, img
@@ -145,7 +154,7 @@ class prd23Controller extends Controller
                             }
             
                             $dst_file = public_path(sprintf("%s/%s_%s_%s.jpg", $save_path, $goods_no, $img_type, $size));
-                            $this->resize($type, $effect, $src_img, $dst_file, $img_info[0], $img_info[1], $size);
+                            $this->resize($ext_type, $effect, $src_img, $dst_file, $img_info[0], $img_info[1], $size);
         
                             for ($i = 0; $i < count($sizes); $i++) {
                                 $img_type_chk = 'a';
@@ -162,7 +171,7 @@ class prd23Controller extends Controller
                                         break;
                                 }
                                 $dst_file = public_path(sprintf("%s/%s_%s_%s.jpg", $save_path, $goods_no, $img_type_chk, $sizes[$i]));
-                                $this->resize($type, $effect, $src_img, $dst_file, $img_info[0], $img_info[1], $sizes[$i]);
+                                $this->resize($ext_type, $effect, $src_img, $dst_file, $img_info[0], $img_info[1], $sizes[$i]);
                             }
         
                             DB::table('goods')
@@ -183,6 +192,9 @@ class prd23Controller extends Controller
             }
         } else if($type === 'd') { // 상세이미지일 경우
             if(!empty($list)) {
+                define("_MAX_UPLOAD_WIDTH_", 1280);
+                define("_IMG_DIR_", "/images/goods_cont");
+
                 foreach($list as $item) {
                     try {
                         DB::beginTransaction();
@@ -192,28 +204,72 @@ class prd23Controller extends Controller
                         $goods_nm = $item['goods_nm'] ?? '';
                         $src = $item['src'] ?? '';
 
-                        $conf = new Conf();
-                        $cfg_domain	= $conf->getConfigValue("shop","domain");
-                        $cont = Lib::Rq(str_replace($cfg_domain, "", $goods_cont));
-                        $cont = str_replace("<p>***이미지영역***</p>", "<img src=\"\" alt=\"$goods_nm\" />", $cont); // src 수정필요
+                        if($goods_no == '' || $goods_sub == '' || $src == '') throw new Exception("PRODUCT::NOT_FOUND");
 
-                        // /data/head/goods_cont/img_f8c90a7d1079ffcfb0294cfc7b455bd0.jpg
+                        $image = preg_replace('/data:image\/(.*?);base64,/', '', $src);
+                        preg_match('/data:image\/(.*?);base64,/', $src, $matches, PREG_OFFSET_CAPTURE);
+                        $ext = $matches[1][0];
+
+                        if ($ext == "jpeg" || $ext == "jpg") {
+                            $ext = "jpg";
+                        // } else if ($ext == "png" || $ext == "gif") {
+                        }
+
+                        $img_name = sprintf("img_%s", md5(uniqid()));
+                        $file_name = $img_name . '.' . $ext;
+                        $save_file = sprintf("%s/%s", _IMG_DIR_, $file_name);
+
+                        // if(!file_exists(_IMG_DIR_)) {
+                        //     mkdir(_IMG_DIR_, 0755, true);
+                        //     chmod(_IMG_DIR_, 0777);
+                        // }
+
+                        if (!Storage::disk('public')->exists(_IMG_DIR_)) {
+                            Storage::disk('public')->makeDirectory(_IMG_DIR_);
+                        }
+                        Storage::disk('public')->put($save_file, base64_decode($image));
+                        
+                        $src_file = public_path($save_file);
+                        if(file_exists($src_file)) {
+                            $img_info = getimagesize($src_file);
             
-                        $query = "   
-                                update goods
-                                    set 
-                                        goods_cont = '".$cont."',
-                                        upd_dm = NOW()
-                                where 
-                                    goods_no = '".$goods_no."'
-                                    and goods_sub = '".$goods_sub."'
-                                limit 1
-                        ";
-                        DB::update($query);
+                            $ext_type = $img_info[2];
+                            if ($ext_type == 1) {
+                                $src_img = imagecreatefromgif($src_file);
+                            } else if ($ext_type == 2) {
+                                $src_img = imagecreatefromjpeg($src_file);
+                            } else if ($ext_type == 3) {
+                                $src_img = imagecreatefrompng($src_file);
+                            } else {
+                                return false;
+                            }
+            
+                            $dst_file = public_path($save_file);
+                            if($item['width'] > _MAX_UPLOAD_WIDTH_) {
+                                $this->resize($ext_type, $effect, $src_img, $dst_file, $img_info[0], $img_info[1], _MAX_UPLOAD_WIDTH_);
+                            } else {
+                                $this->resize($ext_type, $effect, $src_img, $dst_file, $img_info[0], $img_info[1], $item['width']);
+                            }
+                        }
+            
+                        $conf = new Conf();
+                        $cfg_domain	= $conf->getConfigValue("shop", "domain");
+                        $cont = Lib::Rq(str_replace($cfg_domain, "", $goods_cont));
+                        $cont = str_replace("***이미지영역***", "<img src=\"$save_file\" style=\"width: auto;\" />", $cont);
+
+                        DB::table('goods')
+                            ->where('goods_no', $goods_no)
+                            ->where('goods_sub', $goods_sub)
+                            ->limit(1)
+                            ->update([
+                                'goods_cont' => $cont,
+                                'upd_dm' => now()
+                            ]
+                        );
                         DB::commit();
                         array_push($success, $item);
                     } catch (Exception $e) {
-                        dd($e->getMessage());
+                        // dd($e->getMessage());
                     }
                 }
             }

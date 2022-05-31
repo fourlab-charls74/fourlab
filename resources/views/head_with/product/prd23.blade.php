@@ -69,7 +69,7 @@
                                     <th>상세설명</th>
                                     <td>
                                         <div class="area_box edit_box">
-                                            <textarea name="goods_cont" id="goods_cont" class="form-control editor1"><br /><p>***이미지영역***</p></textarea>
+                                            <textarea name="goods_cont" id="goods_cont" class="form-control editor1">***이미지영역***</textarea>
                                         </div>
                                     </td>
                                 </tr>
@@ -188,7 +188,7 @@
         });
         // 이미지파일 추가 시 목록에 세팅
         $("#img-file").on("change", async function(e) {
-            await pushImageFile(e.target.files)
+            await pushImageFile(e.target.files);
         })
     }
 
@@ -268,8 +268,8 @@
 
     // 파일추가 버튼 클릭 이벤트
     function clickEventForAddBtn(e) {
-        if($("#com_id").val() === '') {
-            if(!confirm("업체를 선택하지 않았을 경우, 상품 이미지의 이름을 스타일넘버로 작성해도 자동으로 상품을 매칭할 수 없습니다. 직접 상품을 매칭하시겠습니까?")) {   
+        if($("[name=file_type]").val() === 'style_no' && $("#com_id").val() === '') {
+            if(!confirm("업체를 선택하지 않았을 경우, 상품 이미지의 이름을 스타일넘버로 작성해도 정확한 상품으로 매칭되지 않을 수 있습니다.")) {   
                 e.preventDefault();
             }
         }
@@ -277,7 +277,6 @@
 
     // 이미지파일 추가 시 목록에 추가
     function pushImageFile(files) {
-        console.log(files);
         let uploadFiles = [];
         let file_type = $("[name=file_type]").val();
         [...files].forEach((f, i) => {
@@ -293,13 +292,16 @@
                             uploadFiles = uploadFiles.concat({id: count + i,file: f, src: this.src, width: this.width, height: this.height, volume: (f.size / 1024).toFixed(1)});
                             if(i >= files.length - 1) {
                                 setTimeout(() => {
+                                    uploadFiles = uploadFiles.sort((a,b) => a.id - b.id);
                                     gx.addRows(uploadFiles);
                                     list = list.concat(uploadFiles);
                                     if(file_type === 'goods_no'){
-                                        // getGoodsInfoByGoodsNo(goods_nos[0], curIdx);
+                                        getGoodsInfoByGoodsNo(uploadFiles.map(item => ({goods_no: item.file ? item.file.name.split(".")[0].split("_")[0] : '', id: item.id})));
                                     } else if(file_type === 'style_no') {
-                                        getGoodsinfoByStyleNo(list.map(item => ({style_no: item.file ? item.file.name.split(".")[0].split("_")[0] : '', id: item.id})));
+                                        getGoodsinfoByStyleNo(uploadFiles.map(item => ({style_no: item.file ? item.file.name.split(".")[0].split("_")[0] : '', id: item.id})));
                                     }
+
+                                    $("#img-file").val('');
                                 }, 100);
                             }
                             return res(img1);
@@ -314,6 +316,8 @@
     // 이미지파일 삭제
     function delImageFile(){
         let delList = gx.getSelectedRows();
+        if(delList.length < 1) return alert("삭제할 파일을 선택해주세요.");
+        
         list = list.filter(item => !delList.map(d => d.id).includes(item.id));
         gx.delSelectedRows();
         setImageRightCount();
@@ -325,7 +329,6 @@
         let rightCount = list.filter(item => item.goods_nm !== undefined).length;
         $("#right-count").text(rightCount);
         $("#wrong-count").text(list.length - rightCount);
-
     }
 
     // 상품번호/스타일넘버 선택 버튼 클릭
@@ -339,7 +342,7 @@
     function setGoodsInfoOnpressEnter(e, id, type) {
         e.stopImmediatePropagation();
         if(e.keyCode !== 13) return;
-        if(type === 'goods-no') getGoodsInfoByGoodsNo(e.target.value, id);
+        if(type === 'goods-no') getGoodsInfoByGoodsNo([{goods_no: e.target.value, id}]);
         else if(type === 'style-no') getGoodsinfoByStyleNo([{style_no: e.target.value, id}]);
     }
 
@@ -348,29 +351,38 @@
     // 선택한 상품의 상품번호로 정보 적용
     function ChoiceGoodsNo(goods_nos) {
         if(goods_nos.length > 1) return alert('상품을 한 개만 선택해주세요.');
-        getGoodsInfoByGoodsNo(goods_nos[0], curIdx);
+        getGoodsInfoByGoodsNo([{goods_no: goods_nos[0], id: curIdx}]);
     }
 
     // 상품번호로 상품정보 조회
-    function getGoodsInfoByGoodsNo(goods_no, id) {
+    function getGoodsInfoByGoodsNo(goods_arr) {
         $.ajax({
             async: true,
             type: 'get',
             url: `/head/product/prd23/goods-info/goods-no`,
-            data: {goods_no, id},
+            data: { data: goods_arr },
             success: function (res) {
                 if(res.code === 200){
-                    const { goods_no, goods_sub, style_no, goods_nm, id: index } = res.body.data;
-                    list = list.map(item => item.id === parseInt(index) ? { ...item, goods_no, goods_sub, style_no, goods_nm } : item);
-
-                    gx.gridOptions.api.forEachNode((rowNode, i) => {
-                        if(rowNode.data.id === parseInt(index)) {
-                            rowNode.setData(list.find((item) => item.id === parseInt(index)));
-                        }
-                    });
-                    setImageRightCount();
-                } else if(res.code === 204) {
-                    clickSearchBtn(id);
+                    if(goods_arr.length === 1 && res.body.data.failed.length == 1) {
+                        clickSearchBtn(goods_arr[0].id);
+                    } else {
+                        let arr = res.body.data.all.filter(item => !res.body.data.failed.includes(fid => fid === item.id)).map(item => item || {});
+                        list = list.map(item => {
+                            if(arr.map(a => parseInt(a.id)).includes(item.id)) {
+                                const c = arr.find(a => parseInt(a.id) === item.id);
+                                const { goods_no, goods_sub, goods_nm, style_no } = c;
+                                return ({...item, goods_no, goods_sub, style_no, goods_nm });
+                            } else{
+                                return item;
+                            }
+                        });
+                        gx.gridOptions.api.forEachNode((rowNode, i) => {
+                            if(arr.map(a => parseInt(a.id)).includes(rowNode.data.id)) {
+                                rowNode.setData(list.find((item) => item.id === rowNode.data.id));
+                            }
+                        });
+                        setImageRightCount();
+                    }
                 } else {
                     console.log(res);
                 }
@@ -430,6 +442,9 @@
         let images = gx.gridOptions.api.getSelectedRows();
         if(images.length < 1) return alert("업로드할 이미지를 선택해주세요.");
 
+        let right_cnt = images.filter(item => item.goods_nm !== undefined).length;
+        if(right_cnt !== images.length) return alert("상품과 매칭되지 않은 이미지가 존재합니다.\n선택하신 모든 이미지를 상품과 매칭한 후 업로드해주세요.");
+
         const type = $("[name=img_type]:checked").val();
         const sizes = [50, 62, 70, 100, 129, 55, 120, 160, 180, 270, 280, 320, 500];
         const effect = {
@@ -437,10 +452,12 @@
             "radius" : 0.5,
             "threshold" : 0,
             "quality" : 95,
-        }; // 수정필요
+        }; // default로 설정
 
         let failedIds = images.filter(img => img.width < IMG_SIZE || img.height < IMG_SIZE).map(img => img.id); // 사이즈로 미리 걸러진 실패 목록 리스트
         images = images.filter(img => img.width >= IMG_SIZE && img.height >= IMG_SIZE);
+        
+        alert("이미지를 업로드하고 있습니다. 잠시만 기다려주세요.");
         
         $.ajax({
             async: true,
@@ -449,7 +466,6 @@
             data: {data: images.map(item => ({...item, file: ''})), type, size: IMG_SIZE, sizes, effect, goods_cont: $("[name=goods_cont]").val()},
             success: function (res) {
                 if(res.code === 200){
-                    console.log(res);
                     alert("이미지 업로드가 완료되었습니다. 업로드 목록을 확인해주세요.");
                     setUploadResultGrid(failedIds, res.body.success.map(s => parseInt(s.id)));
                 } else {
@@ -498,8 +514,19 @@
         pApp1.BindSearchEnter();
 
         // gx.gridOptions.api.setRowData([]);
-        console.log(failedIds, list);
-        gx1.addRows(list.map(item => ({...item, result: (failedIds.includes(item.id) || !successIds.includes(item.id)) ? "f" : "s"})));
+        let images = gx.gridOptions.api.getSelectedRows();
+        images = images.map(item => ({...item, result: (failedIds.includes(item.id) || !successIds.includes(item.id)) ? "f" : "s"}));
+        gx1.addRows(images);
+        setResultRightCount(images);
+    }
+
+    // 업로드 성공/실패 여부 세팅
+    function setResultRightCount(images) {
+        $("#result-total-count").text(images.length);
+        let rightCount = images.filter(item => item.result === 's').length;
+        $("#result-right-count").text(rightCount);
+        $("#result-wrong-count").text(images.length - rightCount);
+
     }
 
     /***************************** 이미지 슬라이더 관련 *****************************/
