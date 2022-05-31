@@ -4,17 +4,17 @@
             <li>
                 <a href="javascript:;" class="arrow waves-effect"><i class="bx bx-package fs-18"></i><span>코드관리</span></a>
                 <ul>
-                    <li><a href="/store/standard/std02">매장관리</a></li>
-                    <li><a href="/store/standard/std03">창고관리</a></li>
-                    <li><a href="/store/standard/std04">동종업계관리</a></li>
-                    <li><a href="/store/standard/std05">판매유형관리</a></li>
-                    <li><a href="/store/standard/std06">매장영업담당자관리</a></li>
+                    <li><a href="/store/standard/std02">(개)매장관리</a></li>
+                    <li><a href="/store/standard/std03">(개)창고관리</a></li>
+                    <li><a href="/store/standard/std04">(개)동종업계관리</a></li>
+                    <li><a href="/store/standard/std05">(개)판매유형관리</a></li>
+                    <li><a href="/store/standard/std06">(개)매장영업담당자관리</a></li>
                 </ul>
             </li>
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-shopping-bag fs-18"></i><span>상품관리</span></a>
                 <ul>
-                    <li><a href="/head/product/prd01" target="_blank">상품관리</a></li>
+                    <li><a href="/head/product/prd01" target="_blank">(개)상품관리</a></li>
                     <li><a href="/head/product/prd01" target="_blank">원부자재관리</a></li>
                     <li><a href="/head/product/prd01" target="_blank">매장가격변경</a></li>
                 </ul>
@@ -48,9 +48,9 @@
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-line-chart fs-18"></i><span>고객/수선관리</span></a>
                 <ul>
-                    <li><a href="/head/member/mem01" target="_blank">회원관리</a></li>
-                    <li><a href="/store/standard/std11">수선관리</a></li>
-                    <li><a href="/head/promotion/prm10" target="_blank">쿠폰</a></li>
+                    <li><a href="/head/member/mem01" target="_blank">(개)회원관리</a></li>
+                    <li><a href="/store/standard/std11">(개)수선관리</a></li>
+                    <li><a href="/head/promotion/prm10" target="_blank">(완)쿠폰</a></li>
                 </ul>
             </li>
             <li>
@@ -74,11 +74,11 @@
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-file fs-18"></i><span>경영관리</span></a>
                 <ul>
-                    <li><a href="/store/sale/sal01">판매일보</a></li>
-                    <li><a href="/store/sale/sal02">일별판매집계표</a></li>
-                    <li><a href="/store/sale/sal03">기간별 Best/Worst 판매현황</a></li>
-                    <li><a href="/store/sale/sal06">매장상품별판매분석</a></li>
-                    <li><a href="/store/sale/sal07">상품별 이익현황</a></li>
+                    <li><a href="/store/sale/sal01">(개)판매일보</a></li>
+                    <li><a href="/store/sale/sal02">(개)일별판매집계표</a></li>
+                    <li><a href="/store/sale/sal03">(개)기간별 Best/Worst 판매현황</a></li>
+                    <li><a href="/store/sale/sal06">(개)매장상품별판매분석</a></li>
+                    <li><a href="/store/sale/sal07">(개)상품별 이익현황</a></li>
                 </ul>
             </li>
         </ul>
