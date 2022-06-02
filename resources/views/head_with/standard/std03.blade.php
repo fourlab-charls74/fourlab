@@ -451,6 +451,14 @@
             cellStyle: {"background":"#F5F7F7"}
         },
         {
+            field: "chk", 
+            headerName: '', 
+            cellClass: 'hd-grid-code', 
+            headerCheckboxSelection: true, 
+            checkboxSelection: true, 
+            width: 40,
+        },
+        {
             field: "brand_type",
             headerName: "구분",
             width: 50,
@@ -917,31 +925,30 @@
     function DeleteCmd(cmd) {
         var f1 = $("form[name=f1]");
         var selectedRowData = gx.gridOptions.api.getSelectedRows();
-        var selectOptInfo = selectedRowData[0];
 
-        if (selectOptInfo == undefined) {
-            alert("삭제할 브랜드를 선택하세요.");
-            return false;
+        if (selectedRowData.length < 1) {
+            return alert("삭제할 브랜드를 선택하세요.");
+        }
+
+        if (selectedRowData.length > 1) {
+            return alert("삭제할 브랜드를 한 개만 선택해주세요.");
         }
 
         if ($("#brand").value == "none") { // 필수 브랜드인 none은 삭제 못함.
-            alert("'none' 브랜드는 삭제 할 수 없습니다.");
-            return false;
+            return alert("'none' 브랜드는 삭제 할 수 없습니다.");
         }
-        if (!confirm("삭제 하시겠습니까?")) {
+        if (!confirm("삭제하시겠습니까?")) {
             return false;
         }
 
-        //console.log(cmd);
+        const delBrand = selectedRowData[0];
 
         $.ajax({
             async: true,
             type: 'post',
             url: '/head/standard/std03/Command',
-            data: f1.serialize() + "&cmd=" + cmd,
+            data: "brand=" + delBrand.brand + "&cmd=" + cmd,
             success: function(data) {
-                //console.log(data);
-                //cbDeleteCmd(res);
                 ResetForm();
                 // 브랜드 현황 초기화
                 ResetSummay();
@@ -956,9 +963,6 @@
                 console.log("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
             }
         });
-        //EnableAdd(true);
-
-        //console.log("success");
     }
 
     function Comma(num) {

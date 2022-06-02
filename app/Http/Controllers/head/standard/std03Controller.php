@@ -209,11 +209,6 @@ class std03Controller extends Controller
             }
 
 			//브랜드 삭제
-			$sql = "
-				delete
-				from brand
-				where brand = '$brand'
-			";
 			try {
                 DB::table('brand')
                    ->where('brand','=',$brand)
