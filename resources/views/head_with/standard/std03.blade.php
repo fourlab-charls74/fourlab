@@ -632,7 +632,7 @@
 		brand_contents	= brand_contents.replace(/(<([^>]+)>)/ig, "");
 
         const form = new FormData(document.querySelector("#f1"));
-        form.append("brand_file", $("#brand_file")[0].files[0]);
+        form.append("brand_file", $("#brand_file")[0].files[0] || '');
 
 		$.ajax({
 			method: 'post',
@@ -654,6 +654,12 @@
 				alert(save_msg);
 				Search(1);
 
+                if (cmd == "editcmd") {
+                    //openCodePopup('');
+                } else {
+                    ResetForm();
+			        EnableAdd(true);
+                }
 			},
 			complete: function() {
 				_grid_loading = false;
@@ -662,12 +668,6 @@
 				console.log("error")
 			}
 		});
-		if (cmd == "editcmd") {
-			//openCodePopup('');
-		} else {
-			ResetForm();
-			EnableAdd(true);
-		}
 	}
 
 
@@ -1130,8 +1130,13 @@
 
 
     $(function() {
-        $("[name=brand_file]").change(function() {
+        $("[name=brand_file]").change(function(e) {
             target_file = this.files;
+            if (target_file.length < 1) {
+                document.querySelector("#preview_logo_img center").innerHTML = '';
+                $("#preview_logo_img canvas").remove();
+                return;
+            }
             if (validatePhoto() === false) return;
 
             document.querySelector("#preview_logo_img center").innerHTML = '';

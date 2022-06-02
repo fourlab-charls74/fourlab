@@ -106,7 +106,7 @@ class std03Controller extends Controller
 
 		$base_path = "/images/brand_logo";
 		$save_path = sprintf("%s/%s", $base_path, $brand);
-		$logo_img_url = $brand_logo;
+		// $logo_img_url = $brand_logo;
 
 		$brand_file = $request->file("brand_file");
 
@@ -151,7 +151,7 @@ class std03Controller extends Controller
 
 				$insert_brand = "
 					insert into brand(
-						brand, brand_nm, brand_nm_eng, overview,memo, keyword, best_yn,use_yn, brand_contents, brand_logo, admin_id, admin_nm, regi_date, ut
+						brand, brand_nm, brand_nm_eng, overview, memo, keyword, best_yn, use_yn, brand_contents, brand_logo, admin_id, admin_nm, regi_date, ut
 					)values(
 						'$brand', '$brand_nm', '$brand_nm_eng', '$overview', '$memo', '$keyword','$best_yn','$use_yn', '$brand_contents', '$logo_img_url', '$id', '$name', now(), now()
 					)
