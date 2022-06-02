@@ -22,10 +22,10 @@
                 </div>
             </div>
             <div>
-			    <a href="javascript:;" class="btn btn-sm btn-primary shadow-sm save-btn"  onclick="Cmder('addcmd');"><i class="bx bx-save mr-1"></i>저장</a>
-                @IF($cmd == "editcmd")
+			    <a href="javascript:;" class="btn btn-sm btn-primary shadow-sm save-btn"  onclick="Cmder(@if($cmd == 'editcmd') 'editcmd' @else 'addcmd' @endif);"><i class="bx bx-save mr-1"></i>저장</a>
+                @if($cmd == "editcmd")
                 <a href="javascript:;" onclick="Cmder('delcmd');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="far fa-trash-alt fs-12"></i> 삭제</a>
-                @ENDIF
+                @endif
             </div>
         </div>
         <div class="card_wrap aco_card_wrap"><!-- 업체 기본 정보 -->
@@ -148,11 +148,11 @@
                                                     <div class="input_box">
                                                         <div class="form-inline form-radio-box">
                                                             <div class="custom-control custom-radio">
-                                                                <input type="radio" name="apply_yn" id="apply_y" class="custom-control-input" value="A">
+                                                                <input type="radio" name="apply_yn" id="apply_y" class="custom-control-input" value="Y">
                                                                 <label class="custom-control-label" for="apply_y">하위카테고리 모두 적용</label>
                                                             </div>
                                                             <div class="custom-control custom-radio">
-                                                                <input type="radio" name="apply_yn" id="apply_n" class="custom-control-input" value="M" checked>
+                                                                <input type="radio" name="apply_yn" id="apply_n" class="custom-control-input" value="N" checked>
                                                                 <label class="custom-control-label" for="apply_n">하위카테고리 적용 안함</label>
                                                             </div>
                                                         </div>
@@ -438,6 +438,11 @@ var columns = [
     };
 
     function ChangeCategory(cmd){
+        if($("[name=chg_d_cat_cd]").val() == ""){
+            alert("변경할 카테고리를 선택해 주십시오.");
+            return false;
+        }
+
         $("[name=cmd]").val(cmd);
         var f1 = $("form[name=f1]");
 
@@ -445,10 +450,7 @@ var columns = [
         alert("devel.netpx.co.kr/에서 기능 작동 안함");
         return false;
         */
-        if($("[name=chg_d_cat_cd]").val() == ""){
-            alert("변경할 카테고리를 선택해 주십시오.");
-            return false;
-        }
+
         //catCdCopy
         $.ajax({
             async: true,
@@ -562,7 +564,7 @@ var columns = [
     function SaveCmd(cmd){
         var f1 = $("form[name=f1]");
         var go_url = "";
-        cmd = $("[name=cmd]").val();
+        // cmd = $("[name=cmd]").val();
 
         $.ajax({
             async: true,

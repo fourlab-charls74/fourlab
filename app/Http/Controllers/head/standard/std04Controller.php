@@ -513,7 +513,7 @@ class std04Controller extends Controller
 						where cate_type = '$cat_type' and d_cat_cd like '$d_cat_cd%'
 					";
 					//$conn->Execute($sql);
-					DB::delete("delete from category_group where cate_type = '$cat_type' and d_cat_cd like '$d_cat_cd%'");
+					DB::delete($sql);
 
 					//권한 그룹 설정
 					if($member_group != ""){
@@ -584,7 +584,22 @@ class std04Controller extends Controller
 						}
 					}
 				}
-				
+
+				// 상단정보 하위카테고리 모두 적용
+				if($apply_yn == 'Y') {
+					try {
+						$sql = "
+							update category set
+								header_html = '$header_html'
+								, auth = '$auth'
+							where cat_type = '$cat_type' and d_cat_cd like '$d_cat_cd%'
+						";
+                        DB::update($sql);
+						$cate_result = 200;
+					} catch(Exception $e){
+						$cate_result = 500;
+					};
+				}
 			}
 
 			$wheres = [ 'cat_type' => DB::raw("UPPER('$cat_type')"), 'd_cat_cd' => $d_cat_cd ];

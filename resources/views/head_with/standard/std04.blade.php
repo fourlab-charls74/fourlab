@@ -273,6 +273,16 @@
     ];
 </script>
 <script type="text/javascript" charset="utf-8">
+
+    $(function() {
+        $("[name=cat_name]").on("keypress", function(e) {
+            if(e.which == 13) {
+                e.preventDefault();
+                Search(1);
+            }
+        });
+    });
+
 	const pApp = new App('', {
 		gridId: "#div-gd"
 	});
