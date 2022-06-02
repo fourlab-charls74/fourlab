@@ -172,7 +172,7 @@
                                                                 <label class="custom-control-label" for="auth_a" onclick="GroupArea(false);">전체</label>
                                                             </div>
                                                             <div class="custom-control custom-radio">
-                                                                <input type="radio" name="auth" id="auth_g" class="custom-control-input" value="M" @IF($auth == "G") checked @ENDIF>
+                                                                <input type="radio" name="auth" id="auth_g" class="custom-control-input" value="G" @IF($auth == "G") checked @ENDIF>
                                                                 <label class="custom-control-label" for="auth_g" onclick="GroupArea(true);">그룹</label>
                                                             </div>
                                                         </div>
@@ -477,15 +477,18 @@ var columns = [
     }
 
     function CopyCategory(cmd){
+        if($("[name=chg_d_cat_cd]").val() == ""){
+            alert("복사할 카테고리를 선택해 주십시오.");
+            return false;
+        }
+
         $("[name=cmd]").val(cmd);
         var f1 = $("form[name=f1]");
         /*
         alert("devel.netpx.co.kr/에서 기능 작동 안함");
         return false;
         */
-        //console.log("");
-        
-        //console.log(f1.serialize());
+
         //catCdCopy
         $.ajax({
             async: true,
@@ -496,6 +499,7 @@ var columns = [
                 //console.log(data);
                 alert("카테고리 상품이 복사되었습니다.");
                 opener.Search(1);
+                self.close();
             },
             complete:function(){
                     _grid_loading = false;
