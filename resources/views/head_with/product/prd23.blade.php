@@ -454,8 +454,12 @@
             "quality" : 95,
         }; // default로 설정
 
-        let failedIds = images.filter(img => img.width < IMG_SIZE || img.height < IMG_SIZE).map(img => img.id); // 사이즈로 미리 걸러진 실패 목록 리스트
-        images = images.filter(img => img.width >= IMG_SIZE && img.height >= IMG_SIZE);
+        let failedIds = [];
+        
+        if(type === 'a') {
+            failedIds = images.filter(img => img.width < IMG_SIZE || img.height < IMG_SIZE).map(img => img.id); // 사이즈로 미리 걸러진 실패 목록 리스트
+            images = images.filter(img => img.width >= IMG_SIZE && img.height >= IMG_SIZE);
+        }
         
         alert("이미지를 업로드하고 있습니다. 잠시만 기다려주세요.");
         
