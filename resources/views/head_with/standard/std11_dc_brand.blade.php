@@ -1,18 +1,18 @@
 @extends('head_with.layouts.layout-nav') 
-@section('title','브랜드 검색')
+@section('title','브랜드별 할인')
 @section('content')
 <div class="container-fluid py-3">
     <div class="page_tit">
-        <h3 class="d-inline-flex">광고할인관리</h3>
+        <h3 class="d-inline-flex">브랜드별 할인</h3>
         <div class="d-inline-flex location">
             <span class="home"></span>
             <span>/ 기준정보</span>
             <span>/ 광고할인관리</span>
-            <span>/ 브랜드검색</span>
+            <span>/ 브랜드관리</span>
         </div>
     </div>
     <div id="search-area" class="search_cum_form">
-        <form method="get" name="search">
+        <form method="get" name="search" onSubmit="return false;">
             <input type="hidden" name="no" value="{{$no}}">
             <div class="card mb-1">
                 <div class="d-flex card-header justify-content-between">
@@ -26,7 +26,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-lg-4 inner-td">
+                        <div class="col-lg-6 inner-td">
                             <div class="form-group">
                                 <label for="brand_cd">브랜드</label>
                                 <div class="form-inline inline_btn_box">
@@ -35,7 +35,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4 inner-td">
+                        <div class="col-lg-6 inner-td">
                             <div class="form-group">
                                 <label for="com_type">업체</label>
                                 <div class="form-inline">
@@ -57,8 +57,10 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="col-lg-4 inner-td">
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-lg-6 inner-td">
                             <div class="form-group">
                                 <label for="type">구분</label>
                                 <div class="form-inline form-radio-box">
@@ -77,29 +79,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="">성별구분</label>
-                                <!--div class="form-inline form-radio-box">
-                                    <div class="custom-control custom-radio">
-                                        <input type="radio" name="sex" id="sex-a" class="custom-control-input" value="" checked>
-                                        <label class="custom-control-label" for="type-a">전체</label>
-                                    </div>
-                                    <div class="custom-control custom-radio">
-                                        <input type="radio" name="sex" id="sex-m" class="custom-control-input" value="m">
-                                        <label class="custom-control-label" for="type-s">남자</label>
-                                    </div>
-                                    <div class="custom-control custom-radio">
-                                        <input type="radio" name="sex" id="sex-w" class="custom-control-input" value="w">
-                                        <label class="custom-control-label" for="type-u">여자</label>
-                                    </div>
-                                </div-->
-                            </div>
-                        </div>
-                        <div class="col-lg-4 inner-td">
+                        <div class="col-lg-6 inner-td">
                             <div class="form-group">
                                 <label for="com_type">베스트여부</label>
                                 <div class="form-inline form-radio-box">
@@ -118,8 +98,28 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="col-lg-4 inner-td">
+                    </div>
+                    <div class="row">
+                        {{-- <div class="col-lg-4 inner-td">
+                            <div class="form-group">
+                                <label for="">성별구분</label>
+                                <!--div class="form-inline form-radio-box">
+                                    <div class="custom-control custom-radio">
+                                        <input type="radio" name="sex" id="sex-a" class="custom-control-input" value="" checked>
+                                        <label class="custom-control-label" for="type-a">전체</label>
+                                    </div>
+                                    <div class="custom-control custom-radio">
+                                        <input type="radio" name="sex" id="sex-m" class="custom-control-input" value="m">
+                                        <label class="custom-control-label" for="type-s">남자</label>
+                                    </div>
+                                    <div class="custom-control custom-radio">
+                                        <input type="radio" name="sex" id="sex-w" class="custom-control-input" value="w">
+                                        <label class="custom-control-label" for="type-u">여자</label>
+                                    </div>
+                                </div-->
+                            </div>
+                        </div> --}}
+                        <div class="col-lg-12 inner-td">
                             <div class="form-group">
                                 <label for="type">사용여부</label>
                                 <div class="form-inline form-radio-box">
@@ -261,7 +261,7 @@
                 alert('추가되었습니다.');
                 Search();
             })
-            .fail((res) => alert(res.responseJSON.msg));
+            .fail((res) => alert(res.responseJSON.message));
         });
     });
     

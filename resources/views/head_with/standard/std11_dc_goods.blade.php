@@ -8,11 +8,11 @@
             <span class="home"></span>
             <span>/ 기준정보</span>
             <span>/ 광고할인관리</span>
-            <span>/ 상품별할인</span>
+            <span>/ 상품별관리</span>
         </div>
     </div>
     <div id="search-area" class="search_cum_form">
-        <form method="get" name="search">
+        <form method="get" name="search" onSubmit="return false;">
             <input type="hidden" name="no" value="{{$no}}">
             <div class="card mb-1">
                 <div class="d-flex card-header justify-content-between">
@@ -137,8 +137,8 @@
                     </div>
                     <div class="fr_box flax_box">
                         <div class="flax_box">할인율 : <div class="mx-1"><input type="text" id="dc_rate" class="form-control form-control-sm" value="0" style="text-align:right;width:50px;"></div>/ </div>
-                        <div class="flax_box ml-1">할인금액 : <div class="mx-1"><input type="text" id="dc_amt" class="form-control form-control-sm" value="0" style="text-align:right;width:50px;"></div> 원 /</div>
-                        <div class="flax_box ml-1">마진율 제한 : <div class="mx-1"><input type="text" id="limit_margin_rate" class="form-control form-control-sm" value="0" style="text-align:right;width:50px;"></div>%</div>
+                        <div class="flax_box ml-1">할인금액 : <div class="mx-1"><input type="text" id="dc_amt" class="form-control form-control-sm" value="0" style="text-align:right;width:50px;"></div> 원</div>
+                        {{-- <div class="flax_box ml-1">마진율 제한 : <div class="mx-1"><input type="text" id="limit_margin_rate" class="form-control form-control-sm" value="0" style="text-align:right;width:50px;"></div>%</div> --}}
                         <a href="#" onclick="" class="btn btn-sm btn-primary shadow-sm apply-btn ml-1">제휴할인 적용</a>
                     </div>
                 </div>

@@ -24,9 +24,9 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="">할인명</label>
+                            <label for="sale_name">할인명</label>
                             <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm search-enter" name='name' value=''>
+                                <input type='text' class="form-control form-control-sm search-enter" name='name' id="sale_name" value='' />
                             </div>
                         </div>
                     </div>
@@ -175,5 +175,14 @@
         const product=window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=600");
     }
     Search();
+
+    $(function() {
+        $("[name=name]").on("keypress", function(e) {
+            if(e.which == 13) {
+                e.preventDefault();
+                Search();
+            }
+        });
+    });
 </script>
 @stop

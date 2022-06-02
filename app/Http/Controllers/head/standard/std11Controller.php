@@ -395,13 +395,13 @@ class std11Controller extends Controller
     } 
 
     public function addDCBrand($no, Request $req) {
-		$brand = $req->input('brand', '');
-
+        $brand = $req->input('brand', '');
+        
         $sql = "select * from  ad_dc where no = '$no'";
-
+        
         $row = DB::selectOne($sql);
 
-		if(!empty($row->dc_rate)) {
+		if(!empty($row)) {
             try {
                 DB::beginTransaction();
 
@@ -500,7 +500,7 @@ class std11Controller extends Controller
 
                     $row = DB::selectOne($sql);
                     
-                    if($row->cnt > 0) throw new Exception("이미 등록되어 있는 상품 있습니다.");
+                    if($row->cnt > 0) throw new Exception("이미 등록되어 있는 상품입니다.");
 
                     $admin_id = Auth('head')->user()->id;
                     $admin_nm = Auth('head')->user()->name;
