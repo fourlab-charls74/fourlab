@@ -415,7 +415,7 @@ class std02Controller extends Controller
 		$com_site			= $request->input("com_site");
 		$sale_type			= $request->input("sale_type");
 		// $com_sale_type		= $request->input("com_sale_type");
-		$site_yn			= $request->input("site_yn", "n");
+		$site_yn			= $request->input("site_yn", "N");
 		$result_code		= 0;
 
 		if (!is_numeric($dlv_amt)) {

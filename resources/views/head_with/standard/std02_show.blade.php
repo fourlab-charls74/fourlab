@@ -88,7 +88,7 @@
 															</select>
 														</div>
 														<div class="custom-control custom-checkbox form-check-box ml-1">
-															<input type="checkbox" id="site_yn" class="custom-control-input" value="y" @if($company['site_yn']=='y' ) checked="checked" @endif>
+															<input type="checkbox" name="site_yn" id="site_yn" class="custom-control-input" value="Y" @if($company['site_yn']=='Y' ) checked="checked" @endif>
 															<label class="custom-control-label" for="site_yn">본사판매처</label>
 														</div>
 													</div>
