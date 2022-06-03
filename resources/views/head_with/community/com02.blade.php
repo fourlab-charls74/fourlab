@@ -11,7 +11,7 @@
 	<style> body { overflow: hidden; padding: 1rem; } </style>
 	<script> var resize_grid = 200; </script>
 @else
-	<script> var resize_grid = 290; </script>
+	<script> var resize_grid = 275; </script>
 @endif
 
 {{-- blade --}}
@@ -36,7 +36,7 @@
 			</div>
 				<div class="card-body">
 				<!-- 구분/제목/내용 -->
-				<div class="search-area-ext row">
+				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="board_id">구분 :</label>
@@ -72,7 +72,7 @@
 				</div>
 
 				<!-- 아이디/작성자/자료수/정렬순서 -->
-				<div class="search-area-ext row">
+				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="">아이디 :</label>
@@ -135,7 +135,7 @@
 	</div>
 </form>
 
-<div id="filter-area" class="card shadow-none mb-4 search_cum_form ty2 last-card">
+<div id="filter-area" class="card shadow-none search_cum_form ty2 last-card">
 	<div class="card-body shadow">
 		<div class="card-title">
 			<div class="filter_wrap">
@@ -175,8 +175,7 @@
 		{ width: "auto" }
 	];
 	const pApp = new App('', { gridId: "#div-gd" });
-	const gridDiv = document.querySelector(pApp.options.gridId);
-	const gx = new HDGrid(gridDiv, columns);
+	let gx;
 	//gx.gridOptions.suppressRowClickSelection = true;
 	//gx.gridOptions.suppressExcelExport = true;
 
@@ -194,12 +193,6 @@
         const boardView=window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1000,height=810");
 	}
 
-	$(function(){
-		Search();
-		pApp.ResizeGrid(resize_grid);
-		pApp.BindSearchEnter();
-	});
-
 	function Add(){
 		var board_id = document.search.board_id.value;
 
@@ -207,6 +200,14 @@
 		//openWindow(url,"contents","status=1,resizable=1,scrollbars=1",1024,768);
 		const boardView=window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1000,height=810");
 	}
+
+	$(function() {
+		pApp.ResizeGrid(resize_grid);
+		pApp.BindSearchEnter();
+		let gridDiv = document.querySelector(pApp.options.gridId);
+		gx = new HDGrid(gridDiv, columns);
+		Search();
+	});
 
 </script>
 

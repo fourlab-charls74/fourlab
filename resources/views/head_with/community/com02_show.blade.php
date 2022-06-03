@@ -45,7 +45,7 @@
 					<p>제목</p>
 				</div>
 				<div class="col td border-left-0 border-bottom-0">
-					<a href="https://devel.netpx.co.kr/app/boards/views/netto/{{ $contents->board_id }}/{{ $contents->b_no }}" target="_blank">{{ $contents->subject }}</a>
+					<a href="{{config('shop.front_url')}}/app/boards/views/{{ $contents->board_id }}/{{ $contents->b_no }}" target="_blank">{{ $contents->subject }}</a>
 				</div>
 			</div>
 			<div class="row" style="line-height: 50px;">

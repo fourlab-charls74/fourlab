@@ -15,14 +15,14 @@
 <div class="container-fluid show_layout py-3">
 
 	<div class="d-sm-flex align-items-center justify-content-between mb-2">
-		<h1 class="h3 mb-0 text-gray-800">게시글관리 - {{ $contents['subject'] }}</h1>
+		<h1 class="h3 mb-0 text-gray-800">게시글관리 - {{ $contents['subject'] == '' ? '등록' : $contents['subject'] }}</h1>
 		<div>
 			<a href="#" id="search_sbtn" onclick="Save();" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">저장</a>
 			<a href="#" class="btn btn-sm btn-secondary" onclick="window.close()">취소</a>
 		</div>
 	</div>
 
-<form name="detail">
+<form name="detail" onSubmit="return false;">
 <input type="hidden" name="cmd" value="save">
 <input type="hidden" name="type" value="{{ $type }}">
 <input type="hidden" name="functions" value="{{ $config['functions'] }}">
@@ -111,12 +111,12 @@
 	</div>
 </div>
 </form>
-	<div class="row justify-content-center mb-3" style="margin-top:20px;">
+	{{-- <div class="row justify-content-center mb-3" style="margin-top:20px;">
 		<div class="col text-center">
 			<a href="#" onclick="Save();" class="btn btn-sm btn-primary shadow-sm mr-1" style="text-decoration: none !important;">저장</a>
 			<a href="#" class="btn btn-sm btn-outline-primary shadow-sm mr-1 pl-2" style="text-decoration: none !important;" onclick="window.close()">취소</a>
 		</div>
-	</div>
+	</div> --}}
 </div>
 
 	<link rel="stylesheet" href="/handle/editor/summernote/summernote-lite.min.css" >
@@ -188,6 +188,7 @@
 						console.log(res);
 						if(res.return_code == 1){
 							console.log(res.b_no);
+							opener.Search();
 							var url = "/head/community/com02/"+res.b_no;
 							location.href=url;
 						}

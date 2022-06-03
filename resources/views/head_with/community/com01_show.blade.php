@@ -15,9 +15,9 @@
             @if ($type == 'add')
                 <a href="#" class="btn btn-sm btn-primary shadow-sm add-btn">저장</a>
             @elseif($type == 'edit')
-                <a href="#" class="btn btn-sm btn-primary shadow-sm update-btn">수정</a>
-                <a href="#" onclick="document.detail.reset()"  class="btn btn-sm btn-primary shadow-sm">취소</a>
-                <a href="#" class="btn btn-sm btn-primary shadow-sm delete-btn">삭제</a>
+                <a href="#" onclick="document.detail.reset()"  class="btn btn-sm btn-outline-primary shadow-sm">입력정보 초기화</a>
+                <a href="#" class="btn btn-sm btn-primary shadow-sm update-btn"><i class="bx bx-edit fs-14"></i> 수정</a>
+                <a href="#" class="btn btn-sm btn-primary shadow-sm delete-btn"><i class="bx bx-trash fs-14"></i> 삭제</a>
             @endif
         </div>
     </div>
@@ -255,302 +255,303 @@
                                         <colgroup>
                                             <col width="120px">
                                         </colgroup>
-                                    <tr>
-                                        <th>리스트 접근</th>
-                                        <td>
-                                            <div class="row pt-1">
-                                                <div class="col-md">
-                                                    <div class="form-inline form-radio-box">
-                                                        <div class="custom-control custom-radio">
-                                                            <input type="radio" name="rights" id="rights_2" class="custom-control-input" value="2" @if (@$board->rights != "1") checked @endif>
-                                                            <label class="custom-control-label" for="rights_2" >회원</label>
-                                                        </div>
-                                                        <div class="custom-control custom-radio">
-                                                            <input type="radio" name="rights" id="rights_1" class="custom-control-input" value="1" @if (@$board->rights == "1") checked @endif>
-                                                            <label class="custom-control-label" for="rights_1">제한 없음</label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md">
-                                                    <select name="s_rights" id="s_rights" class="form-control form-control-sm" @if(@$board->rights == "1") disabled @endif>
-                                                        <option value="">==그룹==</option>
-                                                        @foreach($groups as $val)
-                                                            <option value="{{$val->group_no}}">{{$val->group_nm}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    <a href="#" onclick="addGroup('rights', 'A')" class="btn btn-sm btn-secondary my-2">추가</a>
-                                                </div>
-                                                <div class="col-md">
-                                                    <select
-                                                        name="g_rights" 
-                                                        id="g_rights"  
-                                                        class="form-control form-control-sm" 
-                                                        multiple 
-                                                        style="height: 100px"
-                                                        @if(@$board->rights == "1") disabled @endif>
-                                                        @foreach($auth['L']['A'] as $key => $val)
-                                                            <option value="{{$key}}">{{$val}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    <a href="#" onclick="delGroup('rights')" class="btn btn-sm btn-secondary add-group-btn mt-2">삭제</a>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>리스트 제한</th>
-                                        <td>
-                                            <div class="row pt-1">
-                                                <div class="col-md d-none d-md-block d-lg-block">
-                                                </div>
-                                                <div class="col-md">
-                                                    <select name="s_access" id="s_access"  class="form-control form-control-sm">
-                                                        <option value="">==그룹==</option>
-                                                        @foreach($groups as $val)
-                                                            <option value="{{$val->group_no}}">{{$val->group_nm}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    <a href="#" onclick="addGroup('access', 'D')" class="btn btn-sm btn-secondary my-2">추가</a>
-                                                </div>
-                                                <div class="col-md">
-                                                    <select 
-                                                        name="g_access" 
-                                                        id="g_access"  
-                                                        class="form-control form-control-sm" 
-                                                        multiple 
-                                                        style="height:85px;"
-                                                    >
-                                                        @foreach($auth['L']['D'] as $key => $val)
-                                                            <option value="{{$key}}">{{$val}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    <a href="#" onclick="delGroup('access')" class="btn btn-sm btn-secondary mt-2">삭제</a>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>조회 접근</th>
-                                        <td>
-                                            <div class="row pt-1">
-                                                <div class="col-md">
-                                                    <div class="form-inline form-radio-box">
-                                                        <div class="custom-control custom-radio">
-                                                            <input type="radio" name="rights_view" id="rights_view2" class="custom-control-input" value="2" @if (@$board->rights_view != "1") checked @endif>
-                                                            <label class="custom-control-label" for="rights_view2">회원</label>
-                                                        </div>
-                                                        <div class="custom-control custom-radio">
-                                                            <input type="radio" name="rights_view" id="rights_view1" class="custom-control-input" value="1" @if (@$board->rights_view == "1") checked @endif>
-                                                            <label class="custom-control-label" for="rights_view1">제한 없음</label>
+                                        <tr>
+                                            <th>리스트 접근</th>
+                                            <td>
+                                                <div class="row pt-1">
+                                                    <div class="col-md">
+                                                        <div class="form-inline form-radio-box">
+                                                            <div class="custom-control custom-radio">
+                                                                <input type="radio" name="rights" id="rights_2" class="custom-control-input" value="2" @if (@$board->rights != "1") checked @endif>
+                                                                <label class="custom-control-label" for="rights_2" >회원</label>
+                                                            </div>
+                                                            <div class="custom-control custom-radio">
+                                                                <input type="radio" name="rights" id="rights_1" class="custom-control-input" value="1" @if (@$board->rights == "1") checked @endif>
+                                                                <label class="custom-control-label" for="rights_1">제한 없음</label>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div class="col-md">
-                                                    <select name="s_rights_view" id="s_rights_view" class="form-control form-control-sm" @if(@$board->rights_view == "1") disabled @endif>
-                                                        <option value="">==그룹==</option>
-                                                        @foreach($groups as $val)
-                                                            <option value="{{$val->group_no}}">{{$val->group_nm}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    <a href="#" onclick="addGroup('rights_view', 'A')" class="btn btn-sm btn-secondary add-group-btn my-2">추가</a>
-                                                </div>
-                                                <div class="col-md">
-                                                    <select
-                                                        name="g_rights_view"
-                                                        id="g_rights_view"  
-                                                        class="form-control form-control-sm" 
-                                                        multiple 
-                                                        style="height:85px;"
-                                                        @if(@$board->rights_view == "1") disabled @endif>
-                                                        @foreach($auth['R']['A'] as $key => $val)
-                                                            <option value="{{$key}}">{{$val}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    <a href="#" onclick="delGroup('rights_view')" class="btn btn-sm btn-secondary add-group-btn mt-2">삭제</a>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>조회 제한</th>
-                                        <td>
-                                            <div class="row pt-1">
-                                                <div class="col-md d-none d-md-block d-lg-block">
-                                                </div>
-                                                <div class="col-md">
-                                                    <select name="s_access_view" id="s_access_view"  class="form-control form-control-sm">
-                                                    <option value="">==그룹==</option>
-                                                        @foreach($groups as $val)
-                                                            <option value="{{$val->group_no}}">{{$val->group_nm}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    <a href="#" onclick="addGroup('access_view', 'D')" class="btn btn-sm btn-secondary my-2">추가</a>
-                                                </div>
-                                                <div class="col-md">
-                                                    <select 
-                                                        name="g_access_view" 
-                                                        id="g_access_view"  
-                                                        class="form-control form-control-sm" 
-                                                        multiple 
-                                                        style="height:85px;"
-                                                    >
-                                                        @foreach($auth['R']['D'] as $key => $val)
-                                                            <option value="{{$key}}">{{$val}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    <a href="#" onclick="delGroup('access_view')" class="btn btn-sm btn-secondary mt-2">삭제</a>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>작성 접근</th>
-                                        <td>
-                                            <div class="row pt-1">
-                                                <div class="col-md">
-                                                    <div class="form-inline form-radio-box">
-                                                        <div class="custom-control custom-radio">
-                                                            <input type="radio" class="custom-control-input" name="rights_write" id="rights_write2" value="2" @if (@$board->rights_write != "1") checked @endif>
-                                                            <label for="rights_write2" class="custom-control-label">회원</label>
-                                                        </div>
-                                                        <div class="custom-control custom-radio">
-                                                            <input type="radio" class="custom-control-input" name="rights_write" id="rights_write1" value="1" @if (@$board->rights_write == "1") checked @endif>
-                                                            <label for="rights_write1" class="custom-control-label">관리자</label>
-                                                        </div>
+                                                    <div class="col-md">
+                                                        <select name="s_rights" id="s_rights" class="form-control form-control-sm" @if(@$board->rights == "1") disabled @endif>
+                                                            <option value="">==그룹==</option>
+                                                            @foreach($groups as $val)
+                                                                <option value="{{$val->group_no}}">{{$val->group_nm}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        <a href="#" onclick="addGroup('rights', 'A')" class="btn btn-sm btn-secondary my-2">추가</a>
+                                                    </div>
+                                                    <div class="col-md">
+                                                        <select
+                                                            name="g_rights" 
+                                                            id="g_rights"  
+                                                            class="form-control form-control-sm" 
+                                                            multiple 
+                                                            style="height: 100px"
+                                                            @if(@$board->rights == "1") disabled @endif>
+                                                            @foreach($auth['L']['A'] as $key => $val)
+                                                                <option value="{{$key}}">{{$val}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        <a href="#" onclick="delGroup('rights')" class="btn btn-sm btn-secondary add-group-btn mt-2">삭제</a>
                                                     </div>
                                                 </div>
-                                                <div class="col-md">
-                                                    <select name="s_rights_write" id="s_rights_write" class="form-control form-control-sm" @if(@$board->rights_write == "1") disabled @endif>
-                                                        <option value="">==그룹==</option>
-                                                        @foreach($groups as $val)
-                                                            <option value="{{$val->group_no}}">{{$val->group_nm}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    <a href="#" onclick="addGroup('rights_write', 'A')" class="btn btn-sm btn-secondary my-2">추가</a>
-                                                </div>
-                                                <div class="col-md">
-                                                    <select 
-                                                        name="g_rights_write" 
-                                                        id="g_rights_write"  
-                                                        class="form-control form-control-sm" 
-                                                        multiple 
-                                                        style="height:85px;"
-                                                        @if(@$board->rights_write == "1") disabled @endif>
-                                                        @foreach($auth['W']['A'] as $key => $val)
-                                                            <option value="{{$key}}">{{$val}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    <a href="#" onclick="delGroup('rights_write')" class="btn btn-sm btn-secondary mt-2">삭제</a>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>작성 제한</th>
-                                        <td>
-                                            <div class="row pt-1">
-                                                <div class="col-md d-none d-md-block d-lg-block">
-                                                </div>
-                                                <div class="col-md">
-                                                    <select name="s_access_write" id="s_access_write"  class="form-control form-control-sm">
-                                                        <option value="">==그룹==</option>
-                                                        @foreach($groups as $val)
-                                                            <option value="{{$val->group_no}}">{{$val->group_nm}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    <a href="#" onclick="addGroup('access_write', 'D')" class="btn btn-sm btn-secondary my-2">추가</a>
-                                                </div>
-                                                <div class="col-md">
-                                                    <select
-                                                        name="g_access_write" 
-                                                        id="g_access_write"  
-                                                        class="form-control form-control-sm" 
-                                                        multiple 
-                                                        style="height:85px"
-                                                    >
-                                                        @foreach($auth['W']['D'] as $key => $val)
-                                                            <option value="{{$key}}">{{$val}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    <a href="#" onclick="delGroup('access_write')" class="btn btn-sm btn-secondary mt-2">삭제</a>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>덧글작성 접근</th>
-                                        <td>
-                                            <div class="row pt-1">
-                                                <div class="col-md">
-                                                    <div class="form-inline form-radio-box">
-                                                        <div class="custom-control custom-radio">
-                                                            <input type="radio" class="custom-control-input" name="rights_comment" id="rights_comment2" value="2" @if (@$board->rights_comment != "1") checked @endif>
-                                                            <label for="rights_comment2" class="custom-control-label">회원</label>
-                                                        </div>
-                                                        <div class="custom-control custom-radio">
-                                                            <input type="radio" class="custom-control-input" name="rights_comment" id="rights_comment1" value="1" @if (@$board->rights_comment == "1") checked @endif>
-                                                            <label for="rights_comment1" class="custom-control-label">관리자</label>
-                                                        </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>리스트 제한</th>
+                                            <td>
+                                                <div class="row pt-1">
+                                                    <div class="col-md d-none d-md-block d-lg-block">
+                                                    </div>
+                                                    <div class="col-md">
+                                                        <select name="s_access" id="s_access"  class="form-control form-control-sm">
+                                                            <option value="">==그룹==</option>
+                                                            @foreach($groups as $val)
+                                                                <option value="{{$val->group_no}}">{{$val->group_nm}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        <a href="#" onclick="addGroup('access', 'D')" class="btn btn-sm btn-secondary my-2">추가</a>
+                                                    </div>
+                                                    <div class="col-md">
+                                                        <select 
+                                                            name="g_access" 
+                                                            id="g_access"  
+                                                            class="form-control form-control-sm" 
+                                                            multiple 
+                                                            style="height:85px;"
+                                                        >
+                                                            @foreach($auth['L']['D'] as $key => $val)
+                                                                <option value="{{$key}}">{{$val}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        <a href="#" onclick="delGroup('access')" class="btn btn-sm btn-secondary mt-2">삭제</a>
                                                     </div>
                                                 </div>
-                                                <div class="col-md">
-                                                    <select name="s_rights_comment" id="s_rights_comment"  class="form-control form-control-sm" @if(@$board->rights_comment == "1") disabled @endif>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>조회 접근</th>
+                                            <td>
+                                                <div class="row pt-1">
+                                                    <div class="col-md">
+                                                        <div class="form-inline form-radio-box">
+                                                            <div class="custom-control custom-radio">
+                                                                <input type="radio" name="rights_view" id="rights_view2" class="custom-control-input" value="2" @if (@$board->rights_view != "1") checked @endif>
+                                                                <label class="custom-control-label" for="rights_view2">회원</label>
+                                                            </div>
+                                                            <div class="custom-control custom-radio">
+                                                                <input type="radio" name="rights_view" id="rights_view1" class="custom-control-input" value="1" @if (@$board->rights_view == "1") checked @endif>
+                                                                <label class="custom-control-label" for="rights_view1">제한 없음</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md">
+                                                        <select name="s_rights_view" id="s_rights_view" class="form-control form-control-sm" @if(@$board->rights_view == "1") disabled @endif>
+                                                            <option value="">==그룹==</option>
+                                                            @foreach($groups as $val)
+                                                                <option value="{{$val->group_no}}">{{$val->group_nm}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        <a href="#" onclick="addGroup('rights_view', 'A')" class="btn btn-sm btn-secondary add-group-btn my-2">추가</a>
+                                                    </div>
+                                                    <div class="col-md">
+                                                        <select
+                                                            name="g_rights_view"
+                                                            id="g_rights_view"  
+                                                            class="form-control form-control-sm" 
+                                                            multiple 
+                                                            style="height:85px;"
+                                                            @if(@$board->rights_view == "1") disabled @endif>
+                                                            @foreach($auth['R']['A'] as $key => $val)
+                                                                <option value="{{$key}}">{{$val}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        <a href="#" onclick="delGroup('rights_view')" class="btn btn-sm btn-secondary add-group-btn mt-2">삭제</a>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>조회 제한</th>
+                                            <td>
+                                                <div class="row pt-1">
+                                                    <div class="col-md d-none d-md-block d-lg-block">
+                                                    </div>
+                                                    <div class="col-md">
+                                                        <select name="s_access_view" id="s_access_view"  class="form-control form-control-sm">
                                                         <option value="">==그룹==</option>
-                                                        @foreach($groups as $val)
-                                                            <option value="{{$val->group_no}}">{{$val->group_nm}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    <a href="#" onclick="addGroup('rights_comment', 'A')" class="btn btn-sm btn-secondary my-2">추가</a>
+                                                            @foreach($groups as $val)
+                                                                <option value="{{$val->group_no}}">{{$val->group_nm}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        <a href="#" onclick="addGroup('access_view', 'D')" class="btn btn-sm btn-secondary my-2">추가</a>
+                                                    </div>
+                                                    <div class="col-md">
+                                                        <select 
+                                                            name="g_access_view" 
+                                                            id="g_access_view"  
+                                                            class="form-control form-control-sm" 
+                                                            multiple 
+                                                            style="height:85px;"
+                                                        >
+                                                            @foreach($auth['R']['D'] as $key => $val)
+                                                                <option value="{{$key}}">{{$val}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        <a href="#" onclick="delGroup('access_view')" class="btn btn-sm btn-secondary mt-2">삭제</a>
+                                                    </div>
                                                 </div>
-                                                <div class="col-md">
-                                                    <select 
-                                                        name="g_rights_comment" 
-                                                        id="g_rights_comment"  
-                                                        class="form-control form-control-sm" 
-                                                        multiple 
-                                                        style="height: 85px;"
-                                                        @if(@$board->rights_comment == "1") disabled @endif>
-                                                        @foreach($auth['C']['A'] as $key => $val)
-                                                            <option value="{{$key}}">{{$val}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    <a href="#" onclick="delGroup('rights_comment')" class="btn btn-sm btn-secondary mt-2">삭제</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>작성 접근</th>
+                                            <td>
+                                                <div class="row pt-1">
+                                                    <div class="col-md">
+                                                        <div class="form-inline form-radio-box">
+                                                            <div class="custom-control custom-radio">
+                                                                <input type="radio" class="custom-control-input" name="rights_write" id="rights_write2" value="2" @if (@$board->rights_write != "1") checked @endif>
+                                                                <label for="rights_write2" class="custom-control-label">회원</label>
+                                                            </div>
+                                                            <div class="custom-control custom-radio">
+                                                                <input type="radio" class="custom-control-input" name="rights_write" id="rights_write1" value="1" @if (@$board->rights_write == "1") checked @endif>
+                                                                <label for="rights_write1" class="custom-control-label">관리자</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md">
+                                                        <select name="s_rights_write" id="s_rights_write" class="form-control form-control-sm" @if(@$board->rights_write == "1") disabled @endif>
+                                                            <option value="">==그룹==</option>
+                                                            @foreach($groups as $val)
+                                                                <option value="{{$val->group_no}}">{{$val->group_nm}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        <a href="#" onclick="addGroup('rights_write', 'A')" class="btn btn-sm btn-secondary my-2">추가</a>
+                                                    </div>
+                                                    <div class="col-md">
+                                                        <select 
+                                                            name="g_rights_write" 
+                                                            id="g_rights_write"  
+                                                            class="form-control form-control-sm" 
+                                                            multiple 
+                                                            style="height:85px;"
+                                                            @if(@$board->rights_write == "1") disabled @endif>
+                                                            @foreach($auth['W']['A'] as $key => $val)
+                                                                <option value="{{$key}}">{{$val}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        <a href="#" onclick="delGroup('rights_write')" class="btn btn-sm btn-secondary mt-2">삭제</a>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>덧글작성 제한</th>
-                                        <td>
-                                            <div class="row pt-1">
-                                                <div class="col-md d-none d-md-block d-lg-block">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>작성 제한</th>
+                                            <td>
+                                                <div class="row pt-1">
+                                                    <div class="col-md d-none d-md-block d-lg-block">
+                                                    </div>
+                                                    <div class="col-md">
+                                                        <select name="s_access_write" id="s_access_write"  class="form-control form-control-sm">
+                                                            <option value="">==그룹==</option>
+                                                            @foreach($groups as $val)
+                                                                <option value="{{$val->group_no}}">{{$val->group_nm}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        <a href="#" onclick="addGroup('access_write', 'D')" class="btn btn-sm btn-secondary my-2">추가</a>
+                                                    </div>
+                                                    <div class="col-md">
+                                                        <select
+                                                            name="g_access_write" 
+                                                            id="g_access_write"  
+                                                            class="form-control form-control-sm" 
+                                                            multiple 
+                                                            style="height:85px"
+                                                        >
+                                                            @foreach($auth['W']['D'] as $key => $val)
+                                                                <option value="{{$key}}">{{$val}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        <a href="#" onclick="delGroup('access_write')" class="btn btn-sm btn-secondary mt-2">삭제</a>
+                                                    </div>
                                                 </div>
-                                                <div class="col-md">
-                                                    <select name="s_access_comment" id="s_access_comment"  class="form-control form-control-sm">
-                                                        <option value="">==그룹==</option>
-                                                        @foreach($groups as $val)
-                                                            <option value="{{$val->group_no}}">{{$val->group_nm}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    <a href="#" onclick="addGroup('access_comment', 'D')" class="btn btn-sm btn-secondary my-2">추가</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>덧글작성 접근</th>
+                                            <td>
+                                                <div class="row pt-1">
+                                                    <div class="col-md">
+                                                        <div class="form-inline form-radio-box">
+                                                            <div class="custom-control custom-radio">
+                                                                <input type="radio" class="custom-control-input" name="rights_comment" id="rights_comment2" value="2" @if (@$board->rights_comment != "1") checked @endif>
+                                                                <label for="rights_comment2" class="custom-control-label">회원</label>
+                                                            </div>
+                                                            <div class="custom-control custom-radio">
+                                                                <input type="radio" class="custom-control-input" name="rights_comment" id="rights_comment1" value="1" @if (@$board->rights_comment == "1") checked @endif>
+                                                                <label for="rights_comment1" class="custom-control-label">관리자</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md">
+                                                        <select name="s_rights_comment" id="s_rights_comment"  class="form-control form-control-sm" @if(@$board->rights_comment == "1") disabled @endif>
+                                                            <option value="">==그룹==</option>
+                                                            @foreach($groups as $val)
+                                                                <option value="{{$val->group_no}}">{{$val->group_nm}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        <a href="#" onclick="addGroup('rights_comment', 'A')" class="btn btn-sm btn-secondary my-2">추가</a>
+                                                    </div>
+                                                    <div class="col-md">
+                                                        <select 
+                                                            name="g_rights_comment" 
+                                                            id="g_rights_comment"  
+                                                            class="form-control form-control-sm" 
+                                                            multiple 
+                                                            style="height: 85px;"
+                                                            @if(@$board->rights_comment == "1") disabled @endif>
+                                                            @foreach($auth['C']['A'] as $key => $val)
+                                                                <option value="{{$key}}">{{$val}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        <a href="#" onclick="delGroup('rights_comment')" class="btn btn-sm btn-secondary mt-2">삭제</a>
+                                                    </div>
                                                 </div>
-                                                <div class="col-md">
-                                                    <select
-                                                        name="g_access_comment" 
-                                                        id="g_access_comment"  
-                                                        class="form-control form-control-sm" 
-                                                        multiple 
-                                                        style="height:85px"
-                                                    >
-                                                        @foreach($auth['C']['D'] as $key => $val)
-                                                            <option value="{{$key}}">{{$val}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    <a href="#" onclick="delGroup('access_comment')" class="btn btn-sm btn-secondary mt-2">삭제</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>덧글작성 제한</th>
+                                            <td>
+                                                <div class="row pt-1">
+                                                    <div class="col-md d-none d-md-block d-lg-block">
+                                                    </div>
+                                                    <div class="col-md">
+                                                        <select name="s_access_comment" id="s_access_comment"  class="form-control form-control-sm">
+                                                            <option value="">==그룹==</option>
+                                                            @foreach($groups as $val)
+                                                                <option value="{{$val->group_no}}">{{$val->group_nm}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        <a href="#" onclick="addGroup('access_comment', 'D')" class="btn btn-sm btn-secondary my-2">추가</a>
+                                                    </div>
+                                                    <div class="col-md">
+                                                        <select
+                                                            name="g_access_comment" 
+                                                            id="g_access_comment"  
+                                                            class="form-control form-control-sm" 
+                                                            multiple 
+                                                            style="height:85px"
+                                                        >
+                                                            @foreach($auth['C']['D'] as $key => $val)
+                                                                <option value="{{$key}}">{{$val}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        <a href="#" onclick="delGroup('access_comment')" class="btn btn-sm btn-secondary mt-2">삭제</a>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                            </td>
+                                        </tr>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -719,6 +720,7 @@ $('.update-btn').click(() => {
         data: data,
         success: function () {
             alert("수정되었습니다.");
+            opener?.Search?.();
             location.reload();
         },
         error: function(request, status, error) {
@@ -742,6 +744,7 @@ $('.add-btn').click(() => {
         data: data,
         success: function (id) {
             alert("등록되었습니다.");
+            opener?.Search?.();
             location.href = `/head/community/com01/show/edit/${id}`;
         },
         error: function(request, status, error) {

@@ -166,6 +166,7 @@ $('.delete-btn').click((e) => {
 
     gx.getSelectedRows().forEach((selectedRow, index) => {
         gx.gridOptions.api.updateRowData({remove: [selectedRow]});
+        $("#gd-total").text(gx.getRows().length);
     });
 });
 
