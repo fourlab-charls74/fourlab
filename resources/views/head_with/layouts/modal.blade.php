@@ -63,7 +63,7 @@
                                     </div>
                                 </div>
                                 <div class="resul_btn_wrap" style="padding-top:10px;text-align:right;display:block;">
-                                    <a href="#" id="search_brand_sbtn" onclick="return searchBrand.Search();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                                    <a href="javascript:void(0);" id="search_brand_sbtn" onclick="return searchBrand.Search();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                                 </div>
                             </div>
                         </form>
@@ -131,7 +131,7 @@
                                     </div>
                                 </div>
                                 <div class="resul_btn_wrap" style="padding-top:10px;text-align:right;display:block;">
-                                    <a href="#" id="search_sbtn" onclick="return searchCategory.Search();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                                    <a href="javascript:void(0);" id="search_sbtn" onclick="return searchCategory.Search();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                                 </div>
                             </div>
                         </form>
@@ -189,7 +189,7 @@
                                     </div>
                                 </div>
                                 <div class="resul_btn_wrap mt-2" style="display:block;">
-                                    <a href="#" id="search_sbtn" onclick="return searchCompany.Search();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                                    <a href="javascript:void(0);" id="search_sbtn" onclick="return searchCompany.Search();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                                 </div>
                             </div>
                         </form>
@@ -260,8 +260,8 @@
                                                 {{-- <label style="min-width:60px;">&nbsp;</label> --}}
                                                 <div class="flax_box">
                                                     <div class="resul_btn_wrap mt-2" style="display:block;text-align:right;margin-left:auto;">
-                                                        <a href="#" id="search_sbtn" onclick="return searchGoodsNos.Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                                                        <a href="#" onclick="return searchGoodsNos.Choice();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>선택</a>
+                                                        <a href="javascript:void(0);" id="search_sbtn" onclick="return searchGoodsNos.Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                                                        <a href="javascript:void(0);" onclick="return searchGoodsNos.Choice();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>선택</a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -269,7 +269,7 @@
                                     </div>
                                 </div>
                                 <div class="resul_btn_wrap">
-                                    <a href="#" id="search_sbtn" onclick="return searchGoodsNos.Search();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                                    <a href="javascript:void(0);" id="search_sbtn" onclick="return searchGoodsNos.Search();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                                 </div>
                             </div>
                         </form>

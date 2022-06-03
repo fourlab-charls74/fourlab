@@ -190,33 +190,37 @@
                 </div>
                 <div class="row">
                     <div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="name">세일여부/세일구분</label>
-							<div class="form-inline">
-								<div class="form-inline-inner input_box" style="width:24%;">
-									<select name="sale_yn" class="form-control form-control-sm">
-										<option value="">전체</option>
-										<option value="Y">Y</option>
-										<option value="N">N</option>
-									</select>
-								</div>
-                                <div class="custom-control custom-checkbox" style="width:24%;margin-left:1%;">
-                                    <input type="checkbox" class="custom-control-input" name="coupon_yn" id= "coupon_yn" value="Y">
-                                    <label class="custom-control-label" for="coupon_yn">쿠폰여부</label>
+                        <div class="form-group">
+                            <label for="name">세일여부/세일구분</label>
+                            <div class="form-inline">
+                                <div class="form-inline-inner input-box w-25 pr-1" style="min-width:70px">
+                                    <select id="sale_yn" name="sale_yn" class="form-control form-control-sm w-100">
+                                        <option value="">전체</option>
+                                        <option value="Y">Y</option>
+                                        <option value="N">N</option>
+                                    </select>
                                 </div>
-								<span class="text_line">/</span>
-								<div class="form-inline-inner input_box" style="width:45%;">
-									<select name="sale_type" class="form-control form-control-sm">
-										<option value="">선택</option>
-										<option value="event" >event</option>
-										<option value="onesize" >onesize</option>
-										<option value="clearance" >clearance</option>
-										<option value="refurbished" >refurbished</option>
-										<option value="newmember" >newmember</option>
-									</select>
-								</div>
-							</div>
-						</div>
+                                <div class="form-inline-inner form-check-box ml-2">
+                                    <div class="form-inline">
+                                        <div class="custom-control custom-checkbox" style="display: inline-flex; min-width: 80px;">
+                                            <input type="checkbox" name="coupon_yn" id="coupon_yn" class="custom-control-input" value="Y">
+                                            <label class="custom-control-label" for="coupon_yn" style="font-weight: 400;">쿠폰여부</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span>　/　</span>
+                                <div class="form-inline-inner form-check-box" style="flex-grow: 1;">
+                                    <select id="sale_type" name="sale_type" class="form-control form-control-sm w-100">
+                                        <option value="">선택</option>
+                                        <option value="event">event</option>
+                                        <option value="onesize">onesize</option>
+                                        <option value="clearance">clearance</option>
+                                        <option value="refurbished">refurbished</option>
+                                        <option value="newmember">newmember</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
 					</div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">

@@ -255,7 +255,6 @@
         { field: "img", headerName: "이미지", width: 46, type:'GoodsImageType', pinned: 'left', hide: true },
         { field: "img", headerName: "이미지_url", width:75, hide:true },
         { field: "goods_nm", headerName: "상품명", width: 260, pinned: 'left' },
-
         { 
             headerName: "재고수", 
             children: [
@@ -331,6 +330,9 @@
             ],
         })
     })
+    columns.push({
+        width: "auto"
+    });
 
     const cellStyleGoodsType = (params) => {
         var state = {

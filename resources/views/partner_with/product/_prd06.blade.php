@@ -64,7 +64,7 @@
                         <div class="font-weight-bold text-right mr-3" style="width:100px;">브랜드</div>
                         <div class="mb-0 text-gray-800">
                             <input type='text' class=" input_style form-control-sm search-all" name='brand' id='brand_nm' value='' style='width:70%;'>
-                            <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary " onclick="search_brand();"id="btn_pop_brnad" data-toggle="modal" data-target="#brand_list_modal" >...</a>
+                            <a href="javascript:void(0);" class="d-none d-sm-inline-block btn btn-sm btn-secondary " onclick="search_brand();"id="btn_pop_brnad" data-toggle="modal" data-target="#brand_list_modal" >...</a>
                         </div>
                     </div>
                     <div class="col-4" style="display: flex">
@@ -72,7 +72,7 @@
                         <div class="text-gray-800" >
                             <input type="text" value="" name="rep_cat_nm" id="rep_cat_nm" class=" input_style form-control-sm search-all" style="width:80%"/>
                             <input type="hidden" value="" name="rep_cat_cd" id="rep_cat_cd"/>
-                            <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary " onclick="select_category('display');" id="btn_pop_category" data-toggle="modal" data-target="#category_list_modal" >...</a>
+                            <a href="javascript:void(0);" class="d-none d-sm-inline-block btn btn-sm btn-secondary " onclick="select_category('display');" id="btn_pop_category" data-toggle="modal" data-target="#category_list_modal" >...</a>
                         </div>
                     </div>
                     <div class="col-4" style="display: flex">
@@ -80,7 +80,7 @@
                         <div class="text-gray-800" >
                             <input type="text" value="" name="u_cat_nm" id="u_cat_nm" class=" input_style form-control-sm search-all" style="width:80%"/>
                             <input type="hidden" id="u_cat_cd" name="u_cat_cd" value=""/>
-                            <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-secondary " onclick="select_category('item');" id="btn_pop_category" data-toggle="modal" data-target="#category_list_modal" >...</a>
+                            <a href="javascript:void(0);" class="d-none d-sm-inline-block btn btn-sm btn-secondary " onclick="select_category('item');" id="btn_pop_category" data-toggle="modal" data-target="#category_list_modal" >...</a>
                         </div>
                     </div>
                 </div>

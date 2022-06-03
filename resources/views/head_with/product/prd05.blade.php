@@ -147,17 +147,17 @@
 				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="">상, 하단홍보글</label>
+							<label for="head_ad_desc">상, 하단홍보글</label>
 							<div class="flax_box">
-								<input type="text" name="head_desc" class="form-control form-control-sm">
+								<input type="text" id="head_ad_desc" name="head_desc" class="form-control form-control-sm search-enter">
 							</div>
 						</div>
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="">상품명</label>
+							<label for="goods_nm">상품명</label>
 							<div class="flax_box">
-								<input type="text" name="goods_nm" class="form-control form-control-sm">
+								<input type="text" id="goods_nm" name="goods_nm" class="form-control form-control-sm search-enter">
 							</div>
 						</div>
 					</div>
@@ -468,7 +468,7 @@
         },
         {
             field: "class",
-            headerName: "분류",
+            headerName: "분류"
         },
 
         {
@@ -788,6 +788,7 @@
                     }
                 }
             },
+            { width: "auto" },
             {
                 field: "goods_sub",
                 headerName: "goods_sub",

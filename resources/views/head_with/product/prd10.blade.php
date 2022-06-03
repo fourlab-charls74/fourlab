@@ -45,7 +45,7 @@
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input-box" style="width:47%">
                                     <div class="form-inline-inner inline_btn_box">
-                                        <input type='text' class="form-control form-control-sm w-100" name='goods_no' id='goods_no' value=''>
+                                        <input type='text' class="form-control form-control-sm w-100 search-enter" name='goods_no' id='goods_no' value=''>
                                         <a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                     </div>
                                 </div>
@@ -56,7 +56,7 @@
                         <div class="form-group">
                             <label for="formrow-email-input">상품명</label>
                             <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm ac-goods-nm" name='goods_nm' value=''>
+                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' value=''>
                             </div>
                         </div>
                     </div>
@@ -76,7 +76,7 @@
                                 </div>
                                 <div class="form-inline-inner input-box w-75">
                                     <div class="form-inline inline_btn_box">
-                                        <input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company" style="width:100%;">
+                                        <input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company search-enter" style="width:100%;">
                                         <a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                     </div>
                                 </div>
@@ -87,7 +87,7 @@
                         <div class="form-group">
                             <label for="brand_cd">브랜드</label>
                             <div class="form-inline inline_btn_box">
-                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand" data-all-brand="true"></select>
+                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand search-enter" data-all-brand="true"></select>
                                 <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                             </div>
                         </div>
@@ -97,7 +97,7 @@
                         <div class="form-group">
                             <label for="formrow-inputZip">상단홍보글</label>
                             <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm" name='head_desc' value=''>
+                                <input type='text' class="form-control form-control-sm search-enter" name='head_desc' value=''>
                             </div>
                         </div>
                     </div>
@@ -193,7 +193,7 @@
                                     <h5 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h5>
                                 </div>
                                 <div class="fr_box">
-                                    <select id='cat_type' name='cat_type' class="form-control form-control-sm">
+                                    <select id='cat_type' name='cat_type' class="form-control form-control-sm pr-4">
                                         <option value='DISPLAY'>전시카테고리</option>
                                         <option value='ITEM'>용도카테고리</option>
                                     </select>
@@ -287,6 +287,7 @@
             headerName: "정렬",
             width: 75
         },
+        { width: "auto" }
     ];
 </script>
 <script type="text/javascript" charset="utf-8">
@@ -296,6 +297,7 @@
     let gx;
     $(document).ready(function() {
         pApp.ResizeGrid(275);
+        pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
 
@@ -501,6 +503,7 @@
             headerName: "goods_type",
             hide: true
         },
+        { width: "auto" }
     ];
 </script>
 <script type="text/javascript" charset="utf-8">

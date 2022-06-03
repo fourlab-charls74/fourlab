@@ -108,7 +108,7 @@
                                             <ul>
                                                 <li style="word-break:keep-all">
 													<input type="hidden" name="rep_cat_cd" id="rep_cat_cd" value="{{ @$goods_info->rep_cat_cd }}">
-													<a href="#" id="txt_rep_cat_nm">{{ @$goods_info->rep_cat_nm }}</a>
+													<a href="#" id="txt_rep_cat_nm" style="cursor:default;">{{ @$goods_info->rep_cat_nm }}</a>
 												</li>
                                             </ul>
                                         </div>
@@ -116,7 +116,7 @@
                                 </dl>
                             </li>
                             <li class="col-lg-4 mt-2 mt-lg-0">
-                                <dl class="choice">
+                                <dl>
                                     <dt class="d-flex align-items-center justify-content-between">
                                         <div>
                                             전시 카테고리
@@ -261,7 +261,7 @@
                                                     <div class="form-inline inline_btn_box">
                                                         <input type="text" name="brand_nm" id="brand_nm" value="{{@$goods_info->brand_nm}}" class="form-control form-control-sm ac-brand" style="width:70%;">
 														<input type="text" name="brand_cd" id="brand_cd" value="{{@$goods_info->brand}}" class="form-control form-control-sm ml-1" style="width:28%;" readonly>
-                                                        <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                                        <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                                     </div>
                                                 </div>
                                             </td>
@@ -355,7 +355,7 @@
 														<input type="hidden" name="com_type" id="com_type" value="{{ @$goods_info->com_type }}" >
 														<input type="hidden" name="margin_type" id="margin_type" value="{{ @$goods_info->margin_type }}">
 														<input type="text" id="com_nm" name="com_nm" value="{{ @$goods_info->com_nm }}" class="form-control form-control-sm  btn-select-company" style="width:70%;">
-														<a href="#" class="btn btn-sm btn-outline-primary btn-select-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+														<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary btn-select-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 														<input type="text" name="com_id" id="com_id" value="{{ @$goods_info->com_id }}" class="form-control form-control-sm ml-1" style="width:28%;" readonly>
 													</div>
                                                 </div>
@@ -1741,7 +1741,7 @@
             }
             if( $("#brand_cd").val() == "" ){
                 alert("브랜드를 선택해 주십시오.");
-                $("#brand_cd").focus();
+                $(".sch-brand").click();
                 return false;
             }
 			if( $('#sale_stat_cl').val() == "" ){
@@ -1761,7 +1761,7 @@
 			}
 			if( $('#com_id').val() == "" ){
 				alert('업체를 선택해 주십시오.');
-				$('#com_nm').focus();
+				$('.btn-select-company').click();
 				return false;
 			}
             if( $("#org_nm").val() == "" ) {

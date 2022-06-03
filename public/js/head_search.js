@@ -563,7 +563,7 @@ SearchBrand.prototype.SetGrid = function(divId){
         {field:"choice" , headerName:"선택",width:100,cellClass:'hd-grid-code',
             cellRenderer: function (params) {
                 if (params.data.brand !== undefined) {
-                    return '<a href="#" onclick="return searchBrand.Choice(\'' + params.data.brand + '\',\'' + params.data.brand_nm + '\');">선택</a>';
+                    return '<a href="javascript:void(0);" onclick="return searchBrand.Choice(\'' + params.data.brand + '\',\'' + params.data.brand_nm + '\');">선택</a>';
                 }
             }
         },
@@ -716,7 +716,7 @@ SearchGoods.prototype.SetGrid = function(divId){
         {field:"choice" , headerName:"선택",width:100,cellClass:'hd-grid-code',
             cellRenderer: function (params) {
                 if (params.data.d_cat_cd !== undefined) {
-                    return '<a href="#" onclick="return SearchGoods.Choice(\'' + params.data.d_cat_cd + '\',\'' + params.data.d_cat_nm + '\');">선택</a>';
+                    return '<a href="javascript:void(0);" onclick="return SearchGoods.Choice(\'' + params.data.d_cat_cd + '\',\'' + params.data.d_cat_nm + '\');">선택</a>';
                 }
             }
         },
@@ -799,7 +799,7 @@ SearchCompany.prototype.SetGrid = function(divId){
         {field:"dlv_amt", headerName:"배송료", hide:true},
         {field:"choice" , headerName:"선택",width:50,cellClass:'hd-grid-code',
             cellRenderer: function (params) {
-                return '<a href="#" onclick="return searchCompany.Choice(\'' + params.data.com_id + '\',\'' + params.data.com_nm + '\',\'' + params.data.com_type + '\',\'' + params.data.baesong_kind + '\',\'' + params.data.baesong_info + '\',\'' + params.data.margin_type + '\',\'' + params.data.dlv_amt + '\',\'' + params.data.com_type_nm + '\');">선택</a>';
+                return '<a href="javascript:void(0);" onclick="return searchCompany.Choice(\'' + params.data.com_id + '\',\'' + params.data.com_nm + '\',\'' + params.data.com_type + '\',\'' + params.data.baesong_kind + '\',\'' + params.data.baesong_info + '\',\'' + params.data.margin_type + '\',\'' + params.data.dlv_amt + '\',\'' + params.data.com_type_nm + '\');">선택</a>';
             }
         },
     ];

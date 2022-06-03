@@ -49,7 +49,7 @@
 								<span class="text_line">/</span>
 								<div class="form-inline-inner input-box" style="width:47%">
 									<div class="form-inline-inner inline_btn_box">
-										<input type='text' class="form-control form-control-sm w-100" name='goods_no' id='goods_no' value=''>
+										<input type='text' class="form-control form-control-sm w-100 search-enter" name='goods_no' id='goods_no' value=''>
 										<a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 									</div>
 								</div>
@@ -60,7 +60,7 @@
 						<div class="form-group">
 							<label for="formrow-email-input">상품명</label>
 							<div class="flax_box">
-								<input type='text' class="form-control form-control-sm ac-goods-nm" name='goods_nm' value=''>
+								<input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' value=''>
 							</div>
 						</div>
 					</div>
@@ -241,7 +241,7 @@
 						<div class="form-group">
 							<label for="name">상단홍보글</label>
 							<div class="flax_box">
-								<input type='text' class="form-control form-control-sm" name='s_desc' value=''>
+								<input type='text' class="form-control form-control-sm search-enter" name='s_desc' value=''>
 							</div>
 						</div>
 					</div>
@@ -445,10 +445,10 @@
 					field: "shop_result_msg",
 					headerName: "내용",
 					width: 120
-				},
-				{	field:"", headerName:"", width:"auto"}
+				}
 			]
 		},
+		{ width:"auto" }
 	];
 
 	function SetShopPrice() {
