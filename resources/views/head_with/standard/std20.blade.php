@@ -361,8 +361,11 @@ var columns = [
             url: '/head/standard/std20/Command',
             data: frm1.serialize() +"&cmd="+ cmd,
             success: function (data) {
-                //console.log(data);
                 Search(1);
+                if(cmd === 'addcmd') {
+                    ResetForm();
+                    EnableAdd(true);
+                }
             },
             complete:function(){
                     _grid_loading = false;
@@ -441,7 +444,7 @@ var columns = [
 
         if(o.use_yn == "Y") ff.use_yn[0].checked = true;
         if(o.use_yn == "N") ff.use_yn[1].checked = true;
-        console.log(o.use_yn == "N");
+        // console.log(o.use_yn == "N");
         
     }
 
@@ -460,6 +463,8 @@ var columns = [
         f1.reset();
         
         f1.use_yn[0].checked = true;
+        f1.c.value = "add";
+        f1.qna_no.value = '';
         
         document.getElementById("admin").innerHTML = "";
         document.getElementById("regi_date").innerHTML = "";
