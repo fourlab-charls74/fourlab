@@ -137,7 +137,7 @@
                             <label for="formrow-inputState">브랜드</label>
                             <div class="form-inline inline_btn_box">
                                 <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16" style="line-height: 26px;"></i></a>
                             </div>
                         </div>
                     </div>
@@ -215,7 +215,7 @@
         <input type="hidden" id="chart-type" value="date">
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
-                <a class="nav-link active" id="date-tab" data-toggle=" tab" href="#home" role="tab" aria-controls="date" aria-selected="true">일별</a>
+                <a class="nav-link active" id="date-tab" data-toggle="tab" href="#home" role="tab" aria-controls="date" aria-selected="true">일별</a>
             </li>
             <li class="nav-item" role="presentation">
                 <a class="nav-link" id="yoil-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="yoil" aria-selected="false">요일별</a>

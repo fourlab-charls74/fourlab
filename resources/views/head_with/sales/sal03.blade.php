@@ -151,36 +151,36 @@
                     </div>
                 </div>
                 <div class="search-area-ext d-none row">
-                    <div class="col-lg-4 inner-td">
+                    <div class="col-lg-12 inner-td">
                         <div class="form-group">
                             <label for="formrow-inputState">결제방법</label>
                             <div class="form-inline form-check-box">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type" id="statCheck1" value="16">
+                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[0]" id="statCheck1" value="16">
                                     <label class="custom-control-label" for="statCheck1">계좌이체</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type" id="statCheck2" value="32">
+                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[1]" id="statCheck2" value="32">
                                     <label class="custom-control-label" for="statCheck2">핸드폰</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type" id="statCheck3" value="1">
+                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[2]" id="statCheck3" value="1">
                                     <label class="custom-control-label" for="statCheck3">현금</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type" id="statCheck4" value="2">
+                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[3]" id="statCheck4" value="2">
                                     <label class="custom-control-label" for="statCheck4">카드</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type" id="statCheck5" value="4">
+                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[4]" id="statCheck5" value="4">
                                     <label class="custom-control-label" for="statCheck5">포인트</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type" id="statCheck6" value="8">
+                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[5]" id="statCheck6" value="8">
                                     <label class="custom-control-label" for="statCheck6">쿠폰</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type" id="statCheck7" value="16">
+                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[6]" id="statCheck7" value="16">
                                     <label class="custom-control-label" for="statCheck7">가상계좌</label>
                                 </div>
                             </div>
@@ -234,11 +234,14 @@
             width: 120,
             cellClass: 'hd-grid-code',
             cellRenderer: function(params) {
-                s_sdate = $('[name=sdate]:selected').val();
-                s_edate = $('[name=edate]:selected').val();
-                s_ord_type = $('[name=ord_type]').val();
-                s_ord_state = $('[name=ord_state]:checked').val();
-				return '<a href="/head/sales/sal02/?sdate='+ s_sdate +'&edate='+ s_edate +'&ord_type='+ s_ord_type +'&ord_state='+ s_ord_state +'" target="_new">'+ params.value+'</a>'
+                if(params.value === '합계' || params.value === '평균') return params.value;
+                // let s_ord_type = $('[name=ord_type]:checked').each(function(idx, item) { 
+                //     console.log(item);
+                //     return $(item).val();
+                //  })
+                let s_ord_state = $('[name=ord_state]:checked').val();
+				// return '<a href="/head/sales/sal02?sdate='+ params.data.date +'&ord_type='+ s_ord_type +'&ord_state='+ s_ord_state +'" target="_new">'+ params.value+'</a>';
+				return '<a href="/head/sales/sal02?sdate='+ params.data.date + '&ord_state='+ s_ord_state +'" target="_new">'+ params.value+'</a>';
 			},
             pinned: 'left',
             aggSum: "합계",

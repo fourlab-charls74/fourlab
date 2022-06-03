@@ -38,6 +38,7 @@ class sal03Controller extends Controller
         $item	= $request->input("item");
 		$ord_type = $request->input("ord_type", "");
         $ord_state	= $request->input("ord_state");
+        $stat_pay_type	= $request->input("stat_pay_type");
 
         $inner_where = "";
 		$inner_where2	= "";	//매출
@@ -71,6 +72,21 @@ class sal03Controller extends Controller
 			}
 		} else {
 			$inner_where2	.= " and ( o.ord_type < 0 ) ";
+		}
+
+		// 결제조건
+		if( $stat_pay_type != "" ){
+			$stat_pay_type_where	= "";
+			for( $i = 0; $i < 7; $i++ ){
+				if( !empty($stat_pay_type[$i]) ){
+					if($stat_pay_type_where != "" )	$stat_pay_type_where	.= " or ";
+					$stat_pay_type_where	.= " ( o.pay_type & " . $stat_pay_type[$i] . " ) = " . $stat_pay_type[$i];
+				}
+			}
+
+			if( $stat_pay_type_where != "" ){
+				$inner_where2	.= " and ( $stat_pay_type_where ) ";
+			}
 		}
 
         $sql = /** @lang text */

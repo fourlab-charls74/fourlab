@@ -20,6 +20,11 @@ class sal02Controller extends Controller
         $mutable = Carbon::now();
         $sdate	 = $mutable->sub(1, 'month')->format('Y-m-d');
 
+		// $req_sdate = $req->query("sdate");
+		// if($req_sdate != '') {
+		// 	$sdate = date('Y-m-01', $req_sdate);
+		// }
+		// dd($sdate);
 		$ord_state	= $req->input('ord_state');
 		$ord_type	= $req->input('ord_type');
 
