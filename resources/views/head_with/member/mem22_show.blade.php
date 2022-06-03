@@ -188,13 +188,13 @@
 				</div>
 			</form>
 		</div>
-		<!-- 덧글 0 개  -->
+		<!-- 댓글 0 개  -->
 		<div class="card shadow">
 			<form name="f2">
 				<input type="hidden" name="goods_no">
 				<input type="hidden" name="goods_sub">
 				<div class="card-header mb-0">
-					<h5 class="m-0 font-weight-bold">덧글 {{ count($comment_list) }}개</h5>
+					<h5 class="m-0 font-weight-bold">댓글 {{ count($comment_list) }}개</h5>
 				</div>
 				<div class="card-body">
 					<div class="row_wrap">
@@ -214,7 +214,7 @@
 											<tr>
 												<td colspan="3">
 													@if ( @count($templates) > 0 )
-													후기 덧글 템플릿 :
+													후기 댓글 템플릿 :
 													<select name="template" class="form-control form-control-sm" onchange="GetTemplate(this);" style="width:auto; display:inline-block;">
 														@foreach ($templates as $template)
 														<option value="{{ $template['nm'] }}">{{ $template['val'] }}</option>

@@ -90,7 +90,7 @@
                                                     </div>
                                                     <div class="custom-control custom-checkbox">
                                                         <input type="checkbox" name="func" id="func_comment" class="custom-control-input functions" value="4" @if (@($board->functions & 4) == "4") checked @endif />
-                                                        <label class="custom-control-label" for="func_comment">덧글</label>
+                                                        <label class="custom-control-label" for="func_comment">댓글</label>
                                                     </div>
                                                     <div class="custom-control custom-checkbox">
                                                         <input type="checkbox" name="func" id="func_secret" class="custom-control-input functions" value="8" @if (@($board->functions & 8) == "8") checked @endif />
@@ -119,7 +119,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="ty2">덧글 작성자 노출</th>
+                                            <th class="ty2">댓글 작성자 노출</th>
                                             <td class="ty2">
                                                 <div class="form-inline form-radio-box">
                                                     <div class="custom-control custom-radio">
@@ -478,7 +478,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th>덧글작성 접근</th>
+                                            <th>댓글작성 접근</th>
                                             <td>
                                                 <div class="row pt-1">
                                                     <div class="col-md">
@@ -520,7 +520,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th>덧글작성 제한</th>
+                                            <th>댓글작성 제한</th>
                                             <td>
                                                 <div class="row pt-1">
                                                     <div class="col-md d-none d-md-block d-lg-block">

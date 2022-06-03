@@ -39,9 +39,9 @@
 				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="board_id">구분 :</label>
-							<div class="form-inline inline_input_box">
-								<select name="board_id" id="board_id" class="form-control form-control-sm" style="width:auto;">
+							<label for="board_id">구분</label>
+							<div class="d-flex">
+								<select name="board_id" id="board_id" class="form-control form-control-sm">
 									<option value="">전체</option>
 									@foreach($boards as $board)
 										<option value="{{ $board->board_id }}" @if ($board->board_id == $board_id) selected @endif>{{ $board->board_nm }}</option>
@@ -53,7 +53,7 @@
 
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="subject">제목 :</label>
+							<label for="subject">제목</label>
 							<div class="flax_box">
 								<input id="subject" type='text' class="form-control form-control-sm search-all search-enter" name='subject' value=''>
 							</div>
@@ -62,7 +62,7 @@
 
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="board_content">내용 :</label>
+							<label for="board_content">내용</label>
 							<div class="flax_box">
 								<input id="board_content" type='text' class="form-control form-control-sm search-all search-enter" name='content' value=''>
 							</div>
@@ -75,8 +75,8 @@
 				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="">아이디 :</label>
-							<div class="form-inline inline_input_box">
+							<label for="">아이디</label>
+							<div class="d-flex">
 								<input type='text' class="form-control form-control-sm search-all search-enter" name='id' value=''>
 							</div>
 						</div>
@@ -84,7 +84,7 @@
 
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="ord_no">작성자 :</label>
+							<label for="ord_no">작성자</label>
 							<div class="flax_box">
 								<input type='text' class="form-control form-control-sm search-all search-enter" name='name' value=''>
 							</div>
@@ -93,7 +93,7 @@
 
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="user_nm">자료수/정렬순서 :</label>
+							<label for="user_nm">자료수/정렬순서</label>
 							<div class="form-inline">
 								<div class="form-inline-inner input_box" style="width:24%;">
 									<div class="form-group">
@@ -140,7 +140,7 @@
 		<div class="card-title">
 			<div class="filter_wrap">
 				<div class="fl_box">
-					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span> 건</h6>
+					<h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
 				</div>
 			</div>
 		</div>
@@ -161,7 +161,7 @@
 			}
 		},
 		{field:"hit", headerName:"조회수", width:80 },
-		{field:"comment_cnt" , headerName:"덧글수"  },
+		{field:"comment_cnt" , headerName:"댓글수"  },
 		{field:"file_cnt", headerName:"파일수"},
 		{field:"user_nm" , headerName:"작성자",},
 		{field:"user_id", headerName:"아이디", type:"HeadUserType"},

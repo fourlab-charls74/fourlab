@@ -561,7 +561,7 @@ class mem22Controller extends Controller
                 $del_result2[$i] = 0;
             }
 
-			/* 상품평 덧글 삭제 */
+			/* 상품평 댓글 삭제 */
 			
 			try {
                 DB::table('goods_estimate_comment')
@@ -660,7 +660,7 @@ class mem22Controller extends Controller
 
 		$return_code = 0;
 
-		//덧글 insert
+		//댓글 insert
 		$sql = "
 			insert into goods_estimate_comment(
 				est_no, user_nm, user_id, comment, show_yn, ip, rt

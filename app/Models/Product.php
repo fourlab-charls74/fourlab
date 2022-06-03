@@ -1352,7 +1352,7 @@ class Product
 		foreach ($rows as $row) {
 			$no = $row->no;
 
-			// 덧글 삭제
+			// 댓글 삭제
 			$sql_cmt = " delete from goods_estimate_comment where est_no = '$no' ";
 			DB::delete($sql_cmt);
 
@@ -1371,7 +1371,7 @@ class Product
 		foreach ($rows as $row) {
 			$no = $row->no;
 
-			// 덧글 삭제
+			// 댓글 삭제
 			$sql_cmt = " delete from goods_qa_comment where qa_no = '$no' ";
 			DB::delete($sql_cmt);
 		}

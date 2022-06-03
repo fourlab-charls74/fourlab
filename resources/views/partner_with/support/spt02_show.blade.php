@@ -113,7 +113,7 @@
                                     <table class="table incont table-bordered" id="dataTable" width="100%" cellspacing="0">
                                     <tr>
                                         <th>
-                                            <label for="reply">덧글</label>
+                                            <label for="reply">댓글</label>
                                         </th>
                                         <td> 
                                             <textarea name="reply" id="reply" rows="10" style="width:100%" class="form-control form-control-sm"></textarea>
@@ -166,7 +166,7 @@
                 if (response.data.result == 1) {
                     window.location.reload();
                 } else {
-                    alert("덧글 저장에 실패했습니다. 다시 한번 시도하여 주십시오.");
+                    alert("댓글 저장에 실패했습니다. 다시 한번 시도하여 주십시오.");
                 }
             }).catch((error) => {});
         };

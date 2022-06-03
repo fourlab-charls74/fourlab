@@ -51,7 +51,7 @@ class com03Controller extends Controller
 
         if($board_id != "" ) $where .= sprintf(" and a.board_id = '%s' ",$board_id);
         if($user_id != "" ) $where .= sprintf(" and c.user_id = '%s' ",$user_id);
-        if($name != "" ) $where .= sprintf(" and c.user_nm = '%s' ",$name);
+
         if($subject != "" ) $where .= sprintf(" and a.subject like '%s' ","%" . $subject . "%");
         if($content != "" ) $where .= sprintf(" and c.content like '%s' ","%" . $content . "%");
 
@@ -76,18 +76,19 @@ class com03Controller extends Controller
 		}
 		$end   = $limit;
 
+        if($name != "" ) $where .= sprintf(" and m.name = '%s' ",$name);
 
 		$sql = "
             select 
-              c.c_no,c.b_no,c.board_id,bc.board_nm,a.subject,c.content,c.user_id,c.user_nm,c.ip, if(c.is_secret = 1,'Y','N') as is_secret,c.regi_date
+              c.c_no,c.b_no,c.board_id,bc.board_nm,a.subject,c.content,c.user_id,m.name as user_nm,c.ip, if(c.is_secret = 1,'Y','N') as is_secret,c.regi_date
             from board a
                 inner join board_config bc on a.board_id = bc.board_id
                 inner join board_comment c on a.b_no = c.b_no
+                inner join member m ON m.user_id = c.user_id
             where 1=1 $where
             order by c.c_no $ord
             limit $startno, $end
 		";
-		//echo $sql;
 
 		$result = DB::select($sql);
 		
@@ -105,40 +106,37 @@ class com03Controller extends Controller
 	}
 
 	public function EditSecret(Request $request){
-
         $data = $request->input("data");
-        //$c_nos = explode(",",$data);
+        $use_yn = $request->input("use_yn");
 
-        $c_no = $request->input("c_no");
+        $code = 200;
+        $msg = '';
 
-		$return_codes = array();
-		$return_code = 0;
-
-        // 게시판
-        $board = new Board();
-
-        for($i=0;$i<count($data);$i++){
-
-            $c_no = $data[$i];
-
-            if($c_no != ""){
-                $comment = array(
-                    "c_no" => $c_no
-                );
-                $return_codes[$i] = $board->EditSecret($comment);
+        try {
+            DB::beginTransaction();
+            
+            foreach($data as $c_no) {
+                if($c_no != '') {
+                    $sql = "
+                        update board_comment 
+                            set is_secret = $use_yn
+                        where c_no = $c_no
+                    ";
+                    DB::update($sql);
+                }
             }
+
+            $msg = '비밀글여부가 정상적으로 변경되었습니다.';
+			DB::commit();
+		} catch (Exception $e) {
+            DB::rollback();
+            $cod = 500;
+            $msg = '에러가 발생했습니다. 다시 시도해주세요.';
         }
 
-		if(in_array(0,$return_codes)){
-			$return_code = 0;
-		}else{
-			$return_code = 1;
-		}
-
-        //echo ($result) ? "1":"0";
 		return response()->json([
-            "code" => 200,
-            "return_code" => $return_code
+            "code" => $code,
+            "message" => $msg,
         ]);
     }
 

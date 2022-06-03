@@ -103,7 +103,7 @@ var columns = [
     },
     {
         field:"display_comment_writer", 
-        headerName:"덧글작성자 노출", 
+        headerName:"댓글작성자 노출", 
         cellRenderer: function(params) {
             console.log(params);
             return display_comment_writers[params.value];
@@ -116,7 +116,7 @@ var columns = [
             {headerName: "리스트", field: "rights", cellRenderer: (p) => rights[p.value] },
             {headerName: "조회", field: "rights_view", cellRenderer: (p) => rights[p.value]},
             {headerName: "작성", field: "rights_write", cellRenderer: (p) => writes[p.value]},
-            {headerName: "덧글", field: "rights_comment", cellRenderer: (p) => writes[p.value]}
+            {headerName: "댓글", field: "rights_comment", cellRenderer: (p) => writes[p.value]}
         ]
     },
     {
@@ -130,7 +130,7 @@ var columns = [
     {field:"content_date" , headerName:"최근 등록일시"},
     {
         field:"comment_cnt",
-        headerName:"덧글",
+        headerName:"댓글",
         type:'currencyType',
         cellRenderer: function(p) {
             return `<a href="#" onclick="openComment('${p.data.board_id}')">${numberFormat(p.value)}</a>`;

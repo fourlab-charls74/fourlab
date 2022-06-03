@@ -131,7 +131,7 @@ class Board
 		return $relate_contents;
     }
     
-    // 덧글
+    // 댓글
 	function GetComments( $b_no )
 	{
 		$sql = "
@@ -144,7 +144,7 @@ class Board
     }
     
 
-    /* 덧글 등록 */
+    /* 댓글 등록 */
 	function AddComment($comment){
 
 		$b_no		= $comment['b_no'];
@@ -207,7 +207,7 @@ class Board
     }
 
 
-    // 덧글 삭제
+    // 댓글 삭제
 	function DelComment( $comment ){
         $result_code = 0;
 		$b_no = $comment["b_no"];

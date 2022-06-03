@@ -166,7 +166,7 @@
 			<div class="card-header mb-0">
 				<div>
 					<textarea name="content" rows="5" style="width:100%; padding-left: 0;"></textarea>
-					<input type="button" name="addComment" id="addComment" onclick="AddComment();" value="덧글 작성" style="width:100%;">
+					<input type="button" name="addComment" id="addComment" onclick="AddComment();" value="댓글 작성" style="width:100%;">
 				</div>
 			</div>
 			<div class="card-body">
@@ -219,7 +219,7 @@
 			<div class="card-header mb-0">
 				<div>
 					<textarea name="content" rows="5" style="width:100%;"></textarea>
-					<input type="button" name="addComment" id="addComment" onclick="AddComment();" value="덧글 작성" style="width:100%;">
+					<input type="button" name="addComment" id="addComment" onclick="AddComment();" value="댓글 작성" style="width:100%;">
 				</div>
 			</div>
 			<div class="card-body">
@@ -253,7 +253,7 @@
 								@endforeach
 							@else
 							<tr>
-								<td colspan="6">등록된 덧글이 없습니다.</td>
+								<td colspan="6">등록된 댓글이 없습니다.</td>
 							</tr>
 
 							@endif
@@ -303,7 +303,7 @@
 		var ff = $("[name=f1]");
 		var content = $("[name=content]").val();
 		if(content.trim() == ""){
-			alert("덧글을 입력해주십시오.");
+			alert("댓글을 입력해주십시오.");
 			$("[name=content]").val("").focus();
 			return false;
 		}
@@ -315,7 +315,7 @@
 			data: ff.serialize(),
 			success: function (data) {
 				if(data.return_code == true){
-					alert("덧글이 등록되었습니다.");
+					alert("댓글이 등록되었습니다.");
 					location.reload();
 				}else{
 					alert("저장에 실패하였습니다. 다시 시도하여 주십시오.");

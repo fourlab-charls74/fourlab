@@ -187,7 +187,7 @@ class com02Controller extends Controller
 
 			$brand_all = $this->brand_all($contents->reserve3,$contents->reserve1);
 
-			// 덧글
+			// 댓글
 			$comments = $board->GetComments( $b_no );
 
 
