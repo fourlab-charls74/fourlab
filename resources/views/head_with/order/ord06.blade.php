@@ -31,7 +31,7 @@
                         <div class="form-group">
                             <label for="user_yn">입금일자</label>
 							<div class="form-inline date-select-inbox">
-								<select name="date_type" class="form-control form-control-sm" style="width:23%;margin-right:2%;">
+								<select name="date_type" class="form-control form-control-sm" onchange="return UserFromToDate(this.value,document.search,'sdate','edate');" style="width:23%;margin-right:2%;">
 									<option value="0" selected>사용자</option>
 									<option value="1D">금일</option>
 									<option value="2D">어제</option>
@@ -131,7 +131,7 @@
                         <div class="form-group">
                             <label for="name">입금액</label>
                             <div class="flax_box">
-								<input id="bank_input" class="form-control form-control-sm" name="bank_input">
+								<input id="bank_input" class="form-control form-control-sm search-enter" name="bank_input">
                             </div>
                         </div>
                     </div>
@@ -189,6 +189,9 @@
 </div>
 
 <script language="javascript">
+
+	const YELLOW_CELL = { 'background' : '#ffff99' };
+
 	//const pageNo = -1;
 	var memo_Change_id = new Array();
 	var order_Change_id = new Array();
@@ -232,10 +235,10 @@
 			{field:"number",headerName:"계좌번호", width:90, pinned: 'left',},
 
 
-			{field:"bkjukyo",headerName:"입금자명",width:85,editable: true, pinned: 'left',},
+			{field:"bkjukyo",headerName:"입금자명",width:85,pinned: 'left',},
 			{field:"bkinput" , headerName:"입금액", width:80, type: 'currencyType', pinned: 'left', },
 			{field:"bkinfo" , headerName:"이제청보",sortable:"ture", width:120},
-			{field:"memo" , headerName:"메모", width:200, editable: true, onCellValueChanged:setMemo},
+			{field:"memo" , headerName:"메모", width:200, editable: true, onCellValueChanged:setMemo, cellStyle: YELLOW_CELL},
 
 			{field:"is_matched",headerName:"입금확인여부", width:100},
 			{field:"is_hold",headerName:"입금보류여부", width:100,},
@@ -430,13 +433,17 @@
 
 	function SaveMemo(){
 		var data = new Array();
-		var selectedRowData = gx.gridOptions.api.getSelectedRows();
+		var selectedRowData = gx.gridOptions.api.getSelectedRows(); // 여기
 
 		selectedRowData.forEach( function(selectedRowData, index) {
-			if(memo_Change_id.indexOf(selectedRowData.no)>=0){
-				data.push({"no": selectedRowData.no, "memo" : selectedRowData.memo});
-			}
+			// 기존 코드 - 메모내역을 변경 하지 않고 메모 저장시 저장 안되고 있으므로 조건 처리 해제
+			// if(memo_Change_id.indexOf(selectedRowData.no)>=0){
+			// 	data.push({"no": selectedRowData.no, "memo" : selectedRowData.memo});
+			// }
+			data.push({"no": selectedRowData.no, "memo" : selectedRowData.memo});
 		});
+
+		console.log(data);
 
 		if(data.length > 0){
 			if(!confirm('메모를 저장 하시겠습니까?')) {return false;}
@@ -841,6 +848,136 @@
 
 
 		}
+	}
+
+	/*
+	Function: UserFromToDate
+		사용자 날짜 선택
+
+	Returns:
+		없음
+	*/
+	function UserFromToDate(type, ff, from, to) {
+		if (type.length < 2) return;
+
+		var today = getDateObjToStr(new Date());
+		var date = "";
+
+		var peroid = type.substring(0, type.length - 1);
+		var peroid_type = type.substring(type.length - 1, type.length);
+
+		try {
+			peroid = 0 - parseInt(peroid);
+
+			if (type == "0D") {
+				ff[from].value = chgHyphenDate(today);
+				ff[to].value = chgHyphenDate(today);
+
+			} else if (peroid_type == "R") {
+				if (peroid == 0) {
+					var date = today.substr(0, 4) + today.substr(4, 2) + "01";
+					ff[from].value = chgHyphenDate(date);
+					ff[to].value = chgHyphenDate(today);
+				} else {
+					var lastdays = new Array("", 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
+					var date = calcDate(today, -1, "M");
+					var in_year = date.substr(0, 4);
+					var in_month = date.substr(4, 2);
+					var date = in_year + in_month + "01";
+					var idx = parseInt(in_month);
+					var today = in_year + in_month + lastdays[idx];
+
+					ff[from].value = chgHyphenDate(date);
+					ff[to].value = chgHyphenDate(today);
+				}
+			} else {
+				var date = calcDate(today, peroid, peroid_type);
+				ff[from].value = chgHyphenDate(date);
+				ff[to].value = chgHyphenDate(today);
+			}
+
+		} catch (e) {}
+	}
+
+	/*
+		Function: getDateObjToStr
+			날짜를 YYYYMMDD 형식으로 변경
+
+		Parameters:
+			date - date object
+
+		Returns:
+			date string "YYYYMMDD"
+	*/
+	function getDateObjToStr(date) {
+		var str = new Array();
+
+		var _year = date.getFullYear();
+		str[str.length] = _year;
+
+		var _month = date.getMonth() + 1;
+		if (_month < 10) _month = "0" + _month;
+		str[str.length] = _month;
+
+		var _day = date.getDate();
+		if (_day < 10) _day = "0" + _day;
+		str[str.length] = _day
+		var getDateObjToStr = str.join("");
+
+		return getDateObjToStr;
+	}
+
+	/*
+		Function: calcDate
+		데이트 계산 함수
+
+		Parameters:
+			date - string "yyyymmdd"
+			period - int
+			period_kind - string "Y","M","D"
+			gt_today - boolean
+
+		Returns:
+			calcDate("20080205",30,"D");
+	*/
+	function calcDate(date, period, period_kind, gt_today) {
+		var today = getDateObjToStr(new Date());
+
+		var in_year = date.substr(0, 4);
+		var in_month = date.substr(4, 2);
+		var in_day = date.substr(6, 2);
+
+		var nd = new Date(in_year, in_month - 1, in_day);
+
+		if (period_kind == "D")
+			nd.setDate(nd.getDate() + period);
+
+		if (period_kind == "M")
+			nd.setMonth(nd.getMonth() + period);
+
+		if (period_kind == "Y")
+			nd.setFullYear(nd.getFullYear() + period);
+
+		var new_date = new Date(nd);
+		var calcDate = getDateObjToStr(new_date);
+
+		if (!gt_today) { // 금일보다 큰 날짜 반환한다면
+			if (calcDate > today) calcDate = today;
+		}
+
+		return calcDate;
+	}
+
+	function chgHyphenDate(item) {
+		var date = "";
+
+		tyear = item.substr(0, 4);
+		tmonth = item.substr(4, 2);
+		tday = item.substr(6, 2);
+
+		date = tyear + "-" + tmonth + "-" + tday;
+
+		return date;
 	}
 
 </script>

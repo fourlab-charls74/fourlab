@@ -17,6 +17,7 @@
 
     .custm_tb2 td {
         padding: 5px 12px 5px 12px;
+        vertical-align: middle;
     }
 
     .custm_tb3 tr {

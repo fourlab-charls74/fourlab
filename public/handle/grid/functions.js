@@ -197,7 +197,7 @@ function StyleGoodsStateLH50(params){
 			return {
 				color: color,
 				'text-align': 'center',
-				'line-height': '50px'
+				'line-height': '40px'
 			}
 		}
 	}

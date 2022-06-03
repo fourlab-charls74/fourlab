@@ -424,7 +424,8 @@
 					cellStyle: {
 						"text-align": "right",
 						"background-color": "#FFFF99"
-					}
+					},
+					type: 'numberType'
 				},
 				{
 					field: "shop_ut",
@@ -755,8 +756,30 @@
 		pApp.ResizeGrid(275);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
-		gx = new HDGrid(gridDiv, columns);
+		let options = {
+			onCellValueChanged: params => evtAfterEdit(params),
+		};
+		gx = new HDGrid(gridDiv, columns, options);
 		Search();
+
+		const startEditingCell = (row_index, col_key) => {
+        	gx.gridOptions.api.startEditingCell({ rowIndex: row_index, colKey: col_key });
+		};
+
+		const evtAfterEdit = (params) => {
+			console.log(params);
+			if (params.oldValue !== params.newValue) {
+				row = params.data;
+				const column_name = params.column.colId;
+				const value = params.newValue;
+				if (column_name == "shop_price") {
+					if (isNaN(value) == true) {
+						alert("숫자만 입력가능합니다.");
+						startEditingCell(params.rowIndex, column_name);
+					}
+				}
+			}
+		};
 	});
 
 	function Search() {

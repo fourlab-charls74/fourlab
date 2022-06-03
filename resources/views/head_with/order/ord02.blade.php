@@ -99,7 +99,7 @@
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input-box" style="width:47%">
                                     <div class="form-inline-inner inline_btn_box">
-                                        <input type='text' class="form-control form-control-sm w-100" name='goods_no' id='goods_no' value=''>
+                                        <input type='text' class="form-control form-control-sm search-enter w-100" name='goods_no' id='goods_no' value=''>
                                         <a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                     </div>
                                 </div>
@@ -179,7 +179,7 @@
                         <div class="form-group">
                             <label for="name">판매처 주문번호</label>
                             <div class="flax_box">
-                                <input type="text" name="out_ord_no" id="out_ord_no" class="form-control form-control-sm">
+                                <input type="text" name="out_ord_no" id="out_ord_no" class="form-control form-control-sm search-enter">
                             </div>
                         </div>
                     </div>
@@ -319,7 +319,7 @@
                         <div class="form-group">
                             <label for="name">송장번호</label>
                             <div class="flax_box">
-                                <input type="text" name="dlv_no" id="dlv_no" class="form-control form-control-sm">
+                                <input type="text" name="dlv_no" id="dlv_no" class="form-control form-control-sm search-enter">
                             </div>
                         </div>
                     </div>
@@ -397,7 +397,7 @@
                                         <option value="b.r_nm" >수령자</option>
                                         <option value="c.goods_nm" >상품명</option>
                                         <option value="c.style_no" >스타일넘버</option>
-                                        <option value="a.head_desc" > 상단홍보글</option>
+                                        <option value="a.head_desc" >상단홍보글</option>
                                     </select>
                                 </div>
                                 <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">

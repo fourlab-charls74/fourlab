@@ -129,13 +129,13 @@
 				cellRenderer: 'loadingRenderer',
 			},
 			
-			{field:"number" , headerName:"계좌번호", width:120, editable: true, onCellValueChanged:addRowCheck},
-			{field:"bkname",headerName:"은행명", width:80, editable: true,},
-			{field:"bkdate",headerName:"입금일자", width:130, editable: true,},
+			{field:"number" , headerName:"계좌번호", width:120, onCellValueChanged:addRowCheck},
+			{field:"bkname",headerName:"은행명", width:80},
+			{field:"bkdate",headerName:"입금일자", width:130},
 
 
-			{field:"record",headerName:"수집데이터 개수",width:110,editable: true, },
-			{field:"description" , headerName:"수집결과", width:100, editable: true,
+			{field:"record",headerName:"수집데이터 개수",width:110},
+			{field:"description" , headerName:"수집결과", width:100, 
 				cellRenderer: function(params) {
 					return '<a href="#" onClick="viewLog('+ params.data.no +')">'+ params.value+'</a>'
 				}

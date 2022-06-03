@@ -43,7 +43,7 @@
                                 <span class="text_line">~</span>
                                 <div class="docs-datepicker form-inline-inner input_box">
                                     <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off" onchange="onChangeDate(this)">
+                                        <input type="text" class="form-control form-control-sm docs-date search-enter" name="edate" value="{{ $edate }}" autocomplete="off" onchange="onChangeDate(this)">
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
                                                 <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -88,7 +88,7 @@
                         <div class="form-group">
                             <label for="type">유입사이트</label>
                             <div class="flax_box">
-                                <input type="text" class="form-control form-control-sm" name="referer">
+                                <input type="text" class="form-control form-control-sm search-enter" name="referer">
                             </div>
                         </div>
                     </div>
@@ -390,6 +390,9 @@
             headerName: "diff",
             hide: true,
         },
+        {
+            width: "auto"
+        }
     ];
 
     const pApp = new App('', {
@@ -399,6 +402,7 @@
     const gx = new HDGrid(gridDiv, columns);
 
     pApp.ResizeGrid(250);
+    pApp.BindSearchEnter();
 
     function Search() {
         let formData = $('form[name="search"]').serialize();

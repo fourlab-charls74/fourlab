@@ -48,6 +48,8 @@
 .ag-theme-balham .ag-header-cell:after, .ag-theme-balham .ag-header-group-cell:after {
 	top: 5%;
 	height: 100%;
+    height: 100px;
+    background-color: lightgray;
 }
 
 .ag-header-row.ag-header-row-column-group + .ag-header-row.ag-header-row-column > .bizest.ag-header-cell {

@@ -148,7 +148,7 @@
 									</select>
 								</div>
 								<div class="form-inline-inner input-box">
-									<input id="key" class="form-control form-control-sm" name="key">
+									<input id="key" class="form-control form-control-sm search-enter" name="key">
 								</div>
 							</div>
 						</div>
@@ -533,6 +533,7 @@
 	const gx = new HDGrid(gridDiv, columns);
 
 	pApp.ResizeGrid(275);
+	pApp.BindSearchEnter();
 
 	function Search(page) {
 		let formData = $('form[name="search"]').serialize();
@@ -715,12 +716,6 @@
 	//
 	//
 	// 신규 입금확인 프로세스 종료
-
-
-
-
-
-
 
 
 

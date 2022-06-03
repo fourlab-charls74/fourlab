@@ -42,7 +42,7 @@
 
     /* 기본옵션 ag grid 3단 가운데 정렬 css 적용 */
     .basic-option .ag-header-row.ag-header-row-column-group + .ag-header-row.ag-header-row-column > .bizest.ag-header-cell {
-        transform: translateY(-63%);
+        transform: translateY(-66%);
         height: 320%;
     }
 
@@ -425,18 +425,18 @@
                                                 </div>
                                                 <div class="wd300 d-flex mb-2">
                                                     <span class="sub_title mr-2">정상가</span>
-                                                    <input type='text' value='{{ number_format(@$goods_info->normal_price) }}' class="form-control form-control-sm search-all text-right" disabled />
+                                                    <input type='text' value='{{ number_format(@$goods_info->normal_price) }}' class="form-control form-control-sm search-all text-right" disabled/>
                                                     <div class="txt_box ml-1 mr-2">원</div>
                                                     <a href="#" class="btn btn-sm btn-outline-primary shadow-sm cancel-sale-btn" style="width: 180px;">세일취소</a>
                                                 </div>
                                                 <div class="wd300 d-flex mb-2">
                                                     <span class="sub_title mr-2">세일</span>
-                                                    <input type='text' name='sale_rate' value='{{ @$goods_info->sale_rate }}' class="form-control form-control-sm search-all text-right" />
+                                                    <input type='text' name='sale_rate' value='{{ @$goods_info->sale_rate }}' class="form-control form-control-sm search-all text-right" numberOnly/>
                                                     <div class="txt_box ml-1">%</div>
                                                 </div>
                                                 <div class="wd300 d-flex mb-2 pl-5">
                                                     <span class="sub_title sub mr-2">(세일가</span>
-                                                    <input type='text' name='sale_price' value='{{ number_format(@$goods_info->sale_price) }}' class="form-control form-control-sm search-all text-right" />
+                                                    <input type='text' name='sale_price' value='{{ number_format(@$goods_info->sale_price) }}' class="form-control form-control-sm search-all text-right" numberOnly/>
                                                     <div class="txt_box ml-1">원)</div>
                                                 </div>
                                                 <!-- 상품구분이 위탁판매인 경우에만 보여지도록 설정 -->
@@ -1402,7 +1402,7 @@
                 search_brand();
             }
         });
-       
+
         function get_category_by_goods_no(cat_type, goods_no, goods_sub)
 		{
             $.ajax({
@@ -2747,7 +2747,7 @@
     ***
     */
 
-    const ori_price = '{{  @$goods_info->normal_price }}';
+    const ori_price = '{{  @$goods_info->price }}';
     const ori_sale_rate = '{{  @$goods_info->sale_rate }}';
     const ori_sale_price = '{{  @$goods_info->sale_price }}';
     const ori_sale_margin = '{{  @$goods_info->sale_margin }}';
@@ -2793,6 +2793,7 @@
 
     function setSaleAmount(is_reset, is_sale_rate) {
         if(is_reset) {
+            
             $("[name='price']").val(Comma(ori_price));
             $("[name='sale_rate']").val(0);
             $("[name='sale_price']").val(0);
@@ -2821,6 +2822,8 @@
             $("[name='sale_wonga']").val(Comma(sale_wonga));
         }
     }
+
+    $(document).on("keyup", "input[numberOnly]", function() {$(this).val( $(this).val().replace(/[^0-9]/gi,"") );})
 
     function setSaleOnclickEvent() {
         $("#sale_yn").on("change", function() {

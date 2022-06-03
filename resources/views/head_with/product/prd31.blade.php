@@ -116,7 +116,7 @@
 						<div class="form-group">
 							<label for="formrow-email-input">상품명</label>
 							<div class="flax_box">
-								<input type='text' class="form-control form-control-sm ac-goods-nm" name='goods_nm' value=''>
+								<input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' value=''>
 							</div>
 						</div>
 					</div>

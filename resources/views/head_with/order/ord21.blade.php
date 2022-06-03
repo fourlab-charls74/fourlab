@@ -1,6 +1,14 @@
 @extends('head_with.layouts.layout')
 @section('title','배송출고요청')
 @section('content')
+
+<style>
+    input[type="text"]::placeholder {
+        color: #aaa;
+        text-align: right;
+    }
+</style>
+
 <div class="page_tit">
 	<h3 class="d-inline-flex">배송출고요청</h3>
 	<div class="d-inline-flex location">
@@ -25,15 +33,15 @@
 						<div class="form-group">
 							<label for="formrow-firstname-input">주문일자</label>
 							<div class="form-inline date-select-inbox">
-								<select name="date_type" class="form-control form-control-sm" style="width:23%;margin-right:2%;">
-									<option value=''>사용자</option>
-									<option value="1">금일</option>
-									<option value="2">어제</option>
-									<option value="3">최근1주</option>
-									<option value="4">최근2주</option>
-									<option value="5">최근1달</option>
-									<option value="6">금월</option>
-									<option value="7">전월</option>
+								<select name="date_type" class="form-control form-control-sm" onchange="return UserFromToDate(this.value,document.search,'sdate','edate');" style="width:23%;margin-right:2%;">
+									<option value="0" selected>사용자</option>
+									<option value="1D">금일</option>
+									<option value="2D">어제</option>
+									<option value="7D">최근1주</option>
+									<option value="14D">최근2주</option>
+									<option value="1M">최근1달</option>
+									<option value="0R">금월</option>
+									<option value="1R">전월</option>
 								</select>
 								<div class="docs-datepicker form-inline-inner" style="width:35%;">
 									<div class="input-group">
@@ -194,13 +202,13 @@
 							<div class="form-inline inline_input_box">
 								<div class="form-inline-inner input_box">
 									<div class="form-group">
-										<input type="text" class="form-control form-control-sm" name="wqty_low" id="wqty_low" value="">
+										<input type="text" class="form-control form-control-sm search-enter" name="wqty_low" id="wqty_low" value="" placeholder="이상">
 									</div>
 								</div>
 								<span class="text_line">~</span>
 								<div class="form-inline-inner input_box">
 									<div class="form-group">
-										<input type="text" class="form-control form-control-sm" name="wqty_high" id="wqty_high" value="">
+										<input type="text" class="form-control form-control-sm search-enter" name="wqty_high" id="wqty_high" value="" placeholder="이하">
 									</div>
 								</div>
 							</div>
@@ -662,117 +670,178 @@
 	});
 
 	const onChangeDate = (input) => {
-            const name = input.name;
-            const today = getDateObjToStr(new Date()); // yyyymmdd
+		const name = input.name;
+		const today = getDateObjToStr(new Date()); // yyyymmdd
 
-            // 오늘 이전의 데이터만 조회 가능
-            let value = (input.value).replace(/-/gi, ""); // value is yyyymmdd
+		// 오늘 이전의 데이터만 조회 가능
+		let value = (input.value).replace(/-/gi, ""); // value is yyyymmdd
 
-            if (value > today) {
-                alert("미래의 날짜는 선택할 수 없습니다.");
-                document.search.sdate.value = formatStringToDate(calcDate(today, -3, "M"));
-                document.search.edate.value = formatStringToDate(today);
-                return false;
-            }
+		if (value > today) {
+			alert("미래의 날짜는 선택할 수 없습니다.");
+			document.search.sdate.value = formatStringToDate(calcDate(today, -3, "M"));
+			document.search.edate.value = formatStringToDate(today);
+			return false;
+		}
 
-            // 조회 기간을 6개월로 고정
-            if (name == 'sdate' && value.length == 8) {
-                const edate = (document.search.edate.value).replace(/-/gi, ""); // y-m-d -> yyyymmdd
-                const nn = calcDate(value, 6, "M");
-                if (value > edate || edate > nn) {
-                    document.search.edate.value = formatStringToDate(nn);
-                }
-            } else if (name == 'edate' && value.length == 8) {
-                const sdate = (document.search.sdate.value).replace(/-/gi, "");
-                const nn = calcDate(value, -6, "M");
-                if (value < sdate || sdate < nn) {
-                    document.search.sdate.value = formatStringToDate(nn);
-                }
-            }
-        };
+		// 조회 기간을 6개월로 고정
+		if (name == 'sdate' && value.length == 8) {
+			const edate = (document.search.edate.value).replace(/-/gi, ""); // y-m-d -> yyyymmdd
+			const nn = calcDate(value, 6, "M");
+			if (value > edate || edate > nn) {
+				document.search.edate.value = formatStringToDate(nn);
+			}
+		} else if (name == 'edate' && value.length == 8) {
+			const sdate = (document.search.sdate.value).replace(/-/gi, "");
+			const nn = calcDate(value, -6, "M");
+			if (value < sdate || sdate < nn) {
+				document.search.sdate.value = formatStringToDate(nn);
+			}
+		}
+	};
 
-        const formatDateToString = (date) => {
-            return date.replace("-", "");
-        }
+	const formatDateToString = (date) => {
+		return date.replace("-", "");
+	}
 
-        const formatStringToDate = (string) => {
-            const y = string.substr(0,4);
-            const m = string.substr(4,2);
-            const d = string.substr(6,2);
-            return `${y}-${m}-${d}`;
-        };
+	const formatStringToDate = (string) => {
+		const y = string.substr(0,4);
+		const m = string.substr(4,2);
+		const d = string.substr(6,2);
+		return `${y}-${m}-${d}`;
+	};
 
-            /*
-            Function: getDateObjToStr
-                날짜를 YYYYMMDD 형식으로 변경
+		/*
+		Function: getDateObjToStr
+			날짜를 YYYYMMDD 형식으로 변경
 
-            Parameters:
-                date - date object
+		Parameters:
+			date - date object
 
-            Returns:
-                date string "YYYYMMDD"
-        */
+		Returns:
+			date string "YYYYMMDD"
+	*/
 
-        function getDateObjToStr(date){
-            var str = new Array();
+	function getDateObjToStr(date){
+		var str = new Array();
 
-            var _year = date.getFullYear();
-            str[str.length] = _year;
+		var _year = date.getFullYear();
+		str[str.length] = _year;
 
-            var _month = date.getMonth()+1;
-            if(_month < 10) _month = "0"+_month;
-            str[str.length] = _month;
+		var _month = date.getMonth()+1;
+		if(_month < 10) _month = "0"+_month;
+		str[str.length] = _month;
 
-            var _day = date.getDate();
-            if(_day < 10) _day = "0"+_day;
-            str[str.length] = _day
-            var getDateObjToStr = str.join("");
+		var _day = date.getDate();
+		if(_day < 10) _day = "0"+_day;
+		str[str.length] = _day
+		var getDateObjToStr = str.join("");
 
-            return getDateObjToStr;
-        }
+		return getDateObjToStr;
+	}
 
-        /*
-            Function: calcDate
-            데이트 계산 함수
+	/*
+		Function: calcDate
+		데이트 계산 함수
 
-            Parameters:
-                date - string "yyyymmdd"
-                period - int
-                period_kind - string "Y","M","D"
-                gt_today - boolean
+		Parameters:
+			date - string "yyyymmdd"
+			period - int
+			period_kind - string "Y","M","D"
+			gt_today - boolean
 
-            Returns:
-                calcDate("20080205",30,"D");
-        */
+		Returns:
+			calcDate("20080205",30,"D");
+	*/
 
-        function calcDate(date,period, period_kind,gt_today){
+	function calcDate(date,period, period_kind,gt_today){
 
-            var today = getDateObjToStr(new Date());
+		var today = getDateObjToStr(new Date());
 
-            var in_year = date.substr(0,4);
-            var in_month = date.substr(4,2);
-            var in_day = date.substr(6,2);
+		var in_year = date.substr(0,4);
+		var in_month = date.substr(4,2);
+		var in_day = date.substr(6,2);
 
-            var nd = new Date(in_year, in_month-1, in_day);
-            if(period_kind == "D"){
-                nd.setDate(nd.getDate()+period);
-            }
-            if(period_kind == "M"){
-                nd.setMonth(nd.getMonth()+period);
-            }
-            if(period_kind == "Y"){
-                nd.setFullYear(nd.getFullYear()+period);
-            }
-            var new_date = new Date(nd);
-            var calcDate = getDateObjToStr(new_date);
-            if(! gt_today){ // 금일보다 큰 날짜 반환한다면
-                if(calcDate > today){
-                    calcDate = today;
-                }
-            }
-            return calcDate;
-        }
+		var nd = new Date(in_year, in_month-1, in_day);
+		if(period_kind == "D"){
+			nd.setDate(nd.getDate()+period);
+		}
+		if(period_kind == "M"){
+			nd.setMonth(nd.getMonth()+period);
+		}
+		if(period_kind == "Y"){
+			nd.setFullYear(nd.getFullYear()+period);
+		}
+		var new_date = new Date(nd);
+		var calcDate = getDateObjToStr(new_date);
+		if(! gt_today){ // 금일보다 큰 날짜 반환한다면
+			if(calcDate > today){
+				calcDate = today;
+			}
+		}
+		return calcDate;
+	}
 
+	/*
+	Function: UserFromToDate
+		사용자 날짜 선택
+
+	Returns:
+		없음
+	*/
+	function UserFromToDate(type, ff, from, to) {
+
+		if (type.length < 2) return;
+
+		var today = getDateObjToStr(new Date());
+		var date = "";
+
+		var peroid = type.substring(0, type.length - 1);
+		var peroid_type = type.substring(type.length - 1, type.length);
+
+		try {
+			peroid = 0 - parseInt(peroid);
+
+			if (type == "0D") {
+				ff[from].value = chgHyphenDate(today);
+				ff[to].value = chgHyphenDate(today);
+
+			} else if (peroid_type == "R") {
+				if (peroid == 0) {
+					var date = today.substr(0, 4) + today.substr(4, 2) + "01";
+					ff[from].value = chgHyphenDate(date);
+					ff[to].value = chgHyphenDate(today);
+				} else {
+					var lastdays = new Array("", 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
+					var date = calcDate(today, -1, "M");
+					var in_year = date.substr(0, 4);
+					var in_month = date.substr(4, 2);
+					var date = in_year + in_month + "01";
+					var idx = parseInt(in_month);
+					var today = in_year + in_month + lastdays[idx];
+
+					ff[from].value = chgHyphenDate(date);
+					ff[to].value = chgHyphenDate(today);
+				}
+			} else {
+				var date = calcDate(today, peroid, peroid_type);
+				ff[from].value = chgHyphenDate(date);
+				ff[to].value = chgHyphenDate(today);
+			}
+
+		} catch (e) { }
+	}
+
+	function chgHyphenDate(item) {
+		var date = "";
+
+		tyear = item.substr(0, 4);
+		tmonth = item.substr(4, 2);
+		tday = item.substr(6, 2);
+
+		date = tyear + "-" + tmonth + "-" + tday;
+
+		return date;
+	}
 
 </script>
 @stop

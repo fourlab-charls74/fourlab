@@ -1,6 +1,7 @@
 @extends('head_with.layouts.layout')
 @section('title','상품전시')
 @section('content')
+
 <div class="page_tit">
     <h3 class="d-inline-flex">상품전시</h3>
     <div class="d-inline-flex location">
@@ -299,7 +300,16 @@
         pApp.ResizeGrid(275);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns);
+        let options = {
+            defaultColDef: {
+                suppressMenu: true,
+                flex: 1,
+                resizable: true,
+                autoHeight: true,
+                sortable: false,
+            },
+        }
+        gx = new HDGrid(gridDiv, columns, options);
 
         Search();
 
@@ -315,7 +325,8 @@
     }
 </script>
 <script language="javascript">
-    var columns_list = [{
+    var columns_list = [
+        {
             field: "chk",
             headerName: '',
             cellClass: 'hd-grid-code',
@@ -324,7 +335,8 @@
             width: 28,
             pinned: 'left',
             sort: null,
-            cellStyle: {"background":"#F5F7F7"}        },
+            cellStyle: {"background":"#F5F7F7"}        
+        },
         {
             field: "disp_yn",
             headerName: '출력',
@@ -376,7 +388,7 @@
             field: "sale_stat_cl",
             headerName: "상품상태",
             width:70,
-            type: 'GoodsStateType',
+            type:'GoodsStateTypeLH50',
         },
         {
             field: "before_sale_price",
@@ -519,6 +531,13 @@
             enableMultiRowDragging: true, // 버젼이슈 문제 - rowDragMultiRow true하니깐 작동 x 이거로 사용하면 작동함
             rowSelection: 'multiple',
             animateRows: true,
+            defaultColDef: {
+                suppressMenu: true,
+                flex: 1,
+                resizable: true,
+                autoHeight: true,
+                sortable: false,
+            }
         });
     });
 
