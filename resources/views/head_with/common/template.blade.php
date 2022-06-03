@@ -1,4 +1,5 @@
-@extends('head_skote.layouts.master-without-nav')
+{{-- @extends('head_skote.layouts.master-without-nav') --}}
+@extends('head_with.layouts.layout-nav')
 @section('title','템플릿 검색')
 @section('content')
 <div class="container-fluid show_layout py-3">

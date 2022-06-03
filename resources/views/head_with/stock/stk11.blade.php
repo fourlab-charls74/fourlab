@@ -121,7 +121,7 @@
                 <div class="card-title mb-3">
                     <div class="filter_wrap">
                         <div class="fl_box">
-                            <h6 class="m-0 font-weight-bold">총 : <span id="total" class="text-primary">0</span> 건</h6> 
+                            <h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span> 건</h6> 
                         </div>
                     </div>
                 </div>
@@ -180,10 +180,7 @@
         // logics
         function Search() {
             let data = $('form[name="search"]').serialize();
-            gx.Request('/head/stock/stk11/search', data, 1, (data) => {
-                const { total } = data.head;
-                document.querySelector('#total').innerText = total ? total : 0;
-            });
+            gx.Request('/head/stock/stk11/search', data);
         };
 
         const add = () => {

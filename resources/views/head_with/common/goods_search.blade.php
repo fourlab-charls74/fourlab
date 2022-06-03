@@ -354,10 +354,10 @@
     };
 
     const selectMultiGoods = () => {
+        let arr = gx.getSelectedRows();
+        if(arr.length < 1) return alert("추가할 상품을 한 개 이상 선택해주세요.");
         if (confirm("상품을 추가하시겠습니까?") === false) return;
-
-        if (opener.multiGoodsCallback) opener.multiGoodsCallback(gx.getSelectedRows());
-
+        if (opener.multiGoodsCallback) opener.multiGoodsCallback(arr);
         window.close();   
     };
 

@@ -58,7 +58,7 @@
                                         </div>
                                     </div>
                                     <div class="form-inline-inner input-box w-25 pl-1">
-                                        <input type="text" id="com_id" name="com_id" class="form-control form-control-sm" value="<?=$com_id ? $com_id : ""?>">
+                                        <input type="text" id="com_id" name="com_id" class="form-control form-control-sm" value="<?=$com_id ? $com_id : ""?>" readonly />
                                     </div>
                                 </div>
                             </div>

@@ -389,8 +389,9 @@
                 alert('발주상태를 선택 해 주십시오.')
                 return false;
             };
+            arr = gx.getSelectedRows();
+            if(arr.length < 1) return alert('상태를 변경할 발주건을 선택해주세요.');
             if (confirm('발주 상태를 변경하시겠습니까?')) {
-                arr = gx.getSelectedRows();
                 if (Array.isArray(arr) && !(arr.length > 0)) {
                     alert('항목을 선택 해 주십시오.')
                     select.focus();
@@ -402,7 +403,7 @@
                             : null;
                     });
                     axios({
-                        url: '/head/stock/stk10/change-state',
+                        url: '/head/stock/stk10/update',
                         method: 'put',
                         data: { state : state, buy_ord_prd_nos : buy_ord_prd_nos }
                     }).then((response) => {

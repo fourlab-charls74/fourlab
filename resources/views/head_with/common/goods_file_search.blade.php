@@ -1,4 +1,4 @@
-@extends('head_with.layouts.master-without-nav')
+@extends('head_with.layouts.layout-nav')
 @section('title','파일 검색')
 @section('content')
 <div class="container-fluid show_layout py-3">
@@ -78,8 +78,8 @@ const columnDefs = [
     },
     {headerName: '상품',
         children: [
-            {headerName: "번호", field: "goods_no",type: 'numberType'},
-            {headerName: "하위", field: "goods_sub",type: 'currencyType'}
+            {headerName: "번호", field: "goods_no"},
+            {headerName: "하위", field: "goods_sub", type: 'currencyType'}
         ]
     },
     {field: "style_no", headerName: "스타일넘버"},
@@ -186,7 +186,7 @@ $('.delete-btn').click(() => {
 });
 
 $('.search-btn').click(() => {
-    opener.fileSearch(searchRows);
+    opener.fileSearch(gx.getRows());
 });
 
 pApp.ResizeGrid();
