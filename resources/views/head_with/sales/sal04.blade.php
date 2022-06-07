@@ -188,7 +188,7 @@
                         <div class="form-group">
                             <label for="formrow-inputState">브랜드</label>
                             <div class="form-inline inline_btn_box">
-                                <select id="brand_nm" name="brand_nm" class="form-control form-control-sm select2-brand"></select>
+                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
                                 <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                             </div>
                         </div>
@@ -471,7 +471,7 @@
     let gx;
 
     $(document).ready(function() {
-        pApp.ResizeGrid(430);
+        pApp.ResizeGrid(275);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
@@ -486,7 +486,7 @@
             "avg": "top"
         });
         gx.Request('/head/sales/sal04/search', data, 1, function(d) {
-            console.log(d);
+            // console.log(d);
         });
     }
 </script>

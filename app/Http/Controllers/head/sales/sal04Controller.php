@@ -47,6 +47,7 @@ class sal04Controller extends Controller
 		$sale_place		= $request->input("sale_place", "");
 		$goods_stat		= $request->input("goods_stat");
 		$ord_type		= $request->input("ord_type");
+		$brand_cd		= $request->input("brand_cd");
 
         $inner_where = "";
         $inner_where1 = "";    //재고조정
@@ -76,8 +77,9 @@ class sal04Controller extends Controller
             $inner_where .= " and g.opt_kind_cd = '$item' ";
         }
 
-        if ($sale_place != "")	$inner_where .= " and o.sale_place = '$sale_place' ";
-        if ($goods_stat != "")	$inner_where .= " and a.goods_stat = '$goods_stat' ";
+        if ($sale_place != "") $inner_where2 .= " and o.sale_place = '$sale_place'";
+		if ($goods_stat != "") $inner_where .= " and g.sale_stat_cl = '$goods_stat'";
+		if ($brand_cd != "") $inner_where .= " and g.brand = '$brand_cd'";
 
 		if( $ord_type != "" ){
 			$ord_type_where	= "";
@@ -182,7 +184,7 @@ class sal04Controller extends Controller
 							w.ord_state_date >= '$sdate' 
 							and w.ord_state_date <= '$edate' and w.ord_state in ('$ord_state',60,61)
 							and o.ord_state >= '$ord_state'
-							$inner_where2 $inner_where
+							$inner_where2
 						group by g.goods_no,g.goods_sub,ord_state
 				) b group by b.goods_no,b.goods_sub
 			) t on g.goods_no = t.goods_no and g.goods_sub = t.goods_sub 
@@ -198,7 +200,6 @@ class sal04Controller extends Controller
         ";
 
         //echo "<pre>$sql</pre>";exit;
-
         $result = DB::select($sql);
 		$total_sum_amt = 0;
 

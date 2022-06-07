@@ -476,7 +476,14 @@
         pApp.ResizeGrid(300);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns);
+        let options = {
+            getRowStyle: (params) => {
+                if (params.node.rowPinned === 'top') {
+                    return { 'background': '#eee' }
+                }
+            }
+        };
+        gx = new HDGrid(gridDiv, columns, options);
         Search();
     });
 

@@ -227,7 +227,7 @@
             {headerName: "매출원가", field: "wonga_60",type:'currencyType',aggregation:true},
             {headerName: "마진율", field: "margin",type:'percentType',
                 valueGetter:function(params){
-                    if(params.data.goods_nm === "합계" || params.data.goods_nm === "평균"){
+                    if(params.data.com_nm === "합계" || params.data.com_nm === "평균"){
                         const data = params.data;
                         return (1- parseInt(data.sum_wonga) / ( parseInt(data.sum_recv_amt) + parseInt(data.sum_point_amt) - parseInt(data.sum_fee_amt) )) * 100;
                     }
@@ -267,7 +267,7 @@
         let gx;
 
         $(document).ready(function() {
-            pApp.ResizeGrid(430);
+            pApp.ResizeGrid(275);
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
             gx = new HDGrid(gridDiv, columns);
