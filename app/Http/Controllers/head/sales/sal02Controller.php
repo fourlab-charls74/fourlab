@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use PDO;
 use Carbon\Carbon;
+use DateTime;
 
 class sal02Controller extends Controller
 {
@@ -19,29 +20,49 @@ class sal02Controller extends Controller
         //return '일별매출통계';
         $mutable = Carbon::now();
         $sdate	 = $mutable->sub(1, 'month')->format('Y-m-d');
+		$edate	 = date("Y-m-d");
 
-		// $req_sdate = $req->query("sdate");
-		// if($req_sdate != '') {
-		// 	$sdate = date('Y-m-01', $req_sdate);
-		// }
-		// dd($sdate);
+		$req_sdate = $req->query("sdate");
+		if($req_sdate != '') {
+			$sdate = new DateTime($req_sdate . "01");
+			$edate = $sdate->format('Y-m-t');
+			$sdate = $sdate->format('Y-m-d');
+		}
+
 		$ord_state	= $req->input('ord_state');
 		$ord_type	= $req->input('ord_type');
+
+		if($ord_type != '') {
+			$ord_type = explode(",", $ord_type);
+		}
 
 		if( $ord_state != "" || $ord_type != "" )
 			$pop_search	= "Y";
 		else
 			$pop_search = "N";
 
+		$item = $req->input("item");
+		$brand = $req->input("brand");
+		$goods_nm = $req->input("goods_nm");
+		$stat_pay_type = $req->input("stat_pay_type");
+
+		if($stat_pay_type != '') {
+			$stat_pay_type = explode(",", $stat_pay_type);
+		}
+
         $values = [
             'sdate' 		=> $sdate,
-            'edate' 		=> date("Y-m-d"),
+            'edate' 		=> $edate,
             'items' 		=> SLib::getItems(),
+			'item'			=> $item,
 			'sale_places'   => SLib::getSalePlaces(),
 			'ord_types'     => SLib::getCodes('G_ORD_TYPE'),
 			'ord_state'		=> $ord_state,
 			'ord_type'		=> $ord_type,
-			'pop_search'	=> $pop_search
+			'pop_search'	=> $pop_search,
+			'brand'			=> $brand,
+			'goods_nm'		=> $goods_nm,
+			'stat_pay_type'	=> $stat_pay_type
         ];
         echo Config::get('shop.head.view');
         return view( Config::get('shop.head.view') . '/sales/sal02',$values);
@@ -58,7 +79,7 @@ class sal02Controller extends Controller
         $ord_state		= $request->input("ord_state");
 		$ord_type 		= $request->input("ord_type", "");
 		$sale_place 	= $request->input("sale_place", "");
-		$stay_pay_type 	= $request->input("stat_pay_type");
+		$stat_pay_type 	= $request->input("stat_pay_type");
 
         $inner_where = "";
 		$inner_where2	= "";	//매출
@@ -94,7 +115,22 @@ class sal02Controller extends Controller
 			}
 		} else {
 			$inner_where2	.= " and ( o.ord_type < 0 ) ";
-		}		
+		}
+		
+		// 결제조건
+		if( $stat_pay_type != "" ){
+			$stat_pay_type_where	= "";
+			for( $i = 0; $i < 7; $i++ ){
+				if( !empty($stat_pay_type[$i]) ){
+					if($stat_pay_type_where != "" )	$stat_pay_type_where	.= " or ";
+					$stat_pay_type_where	.= " ( o.pay_type & " . $stat_pay_type[$i] . " ) = " . $stat_pay_type[$i];
+				}
+			}
+
+			if( $stat_pay_type_where != "" ){
+				$inner_where2	.= " and ( $stat_pay_type_where ) ";
+			}
+		}
 
 		$sql = /** @lang text */
 			"
@@ -199,7 +235,7 @@ class sal02Controller extends Controller
 			) p on a.sale_date = p.ord_state_date
 		";
 
-        $rows = DB::select($sql);
+		$rows = DB::select($sql);
 		$result = collect($rows)->map(function ($row) {
 
 			$sale_date		= $row->date;

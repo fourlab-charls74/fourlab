@@ -64,39 +64,39 @@
                             <label>주문구분</label>
                             <div class="form-inline form-check-box">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[0]" id="ord_type_5" value="5" checked>
+                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[0]" id="ord_type_5" value="5" checked>
                                     <label class="custom-control-label" for="ord_type_5">교환</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[1]" id="ord_type_4" value="4" checked>
+                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[1]" id="ord_type_4" value="4" checked>
                                     <label class="custom-control-label" for="ord_type_4">예약</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[2]" id="ord_type_3" value="3" checked>
+                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[2]" id="ord_type_3" value="3" checked>
                                     <label class="custom-control-label" for="ord_type_3">특별주문</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[3]" id="ord_type_13" value="13" checked>
+                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[3]" id="ord_type_13" value="13" checked>
                                     <label class="custom-control-label" for="ord_type_13">도매주문</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[4]" id="ord_type_12" value="12" checked>
+                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[4]" id="ord_type_12" value="12" checked>
                                     <label class="custom-control-label" for="ord_type_12">서비스</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[5]" id="ord_type_17" value="17" checked>
+                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[5]" id="ord_type_17" value="17" checked>
                                     <label class="custom-control-label" for="ord_type_17">기관납품</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[6]" id="ord_type_14" value="14" checked>
+                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[6]" id="ord_type_14" value="14" checked>
                                     <label class="custom-control-label" for="ord_type_14">수기</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[7]" id="ord_type_15" value="15" checked>
+                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[7]" id="ord_type_15" value="15" checked>
                                     <label class="custom-control-label" for="ord_type_15">정상</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[8]" id="ord_type_16" value="16" checked>
+                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[8]" id="ord_type_16" value="16" checked>
                                     <label class="custom-control-label" for="ord_type_16">오픈마켓</label>
                                 </div>
                             </div>
@@ -107,11 +107,11 @@
                             <label for="formrow-email-input">매출시점</label>
                             <div class="form-inline form-radio-box">
                                 <div class="custom-control custom-radio">
-                                    <input type="radio" name="ord_state" id="ord_state10" value="10" class="custom-control-input" checked="">
+                                    <input type="radio" name="ord_state" id="ord_state10" value="10" class="custom-control-input" checked />
                                     <label class="custom-control-label" for="ord_state10">출고요청</label>
                                 </div>
                                 <div class="custom-control custom-radio">
-                                    <input type="radio" name="ord_state" id="ord_state30" value="30" class="custom-control-input">
+                                    <input type="radio" name="ord_state" id="ord_state30" value="30" class="custom-control-input" />
                                     <label class="custom-control-label" for="ord_state30">출고완료</label>
                                 </div>
                             </div>
@@ -156,31 +156,31 @@
                             <label for="formrow-inputState">결제방법</label>
                             <div class="form-inline form-check-box">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[0]" id="statCheck1" value="16">
+                                    <input type="checkbox" class="custom-control-input stat_pay_type" name="stat_pay_type[0]" id="statCheck1" value="16">
                                     <label class="custom-control-label" for="statCheck1">계좌이체</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[1]" id="statCheck2" value="32">
+                                    <input type="checkbox" class="custom-control-input stat_pay_type" name="stat_pay_type[1]" id="statCheck2" value="32">
                                     <label class="custom-control-label" for="statCheck2">핸드폰</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[2]" id="statCheck3" value="1">
+                                    <input type="checkbox" class="custom-control-input stat_pay_type" name="stat_pay_type[2]" id="statCheck3" value="1">
                                     <label class="custom-control-label" for="statCheck3">현금</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[3]" id="statCheck4" value="2">
+                                    <input type="checkbox" class="custom-control-input stat_pay_type" name="stat_pay_type[3]" id="statCheck4" value="2">
                                     <label class="custom-control-label" for="statCheck4">카드</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[4]" id="statCheck5" value="4">
+                                    <input type="checkbox" class="custom-control-input stat_pay_type" name="stat_pay_type[4]" id="statCheck5" value="4">
                                     <label class="custom-control-label" for="statCheck5">포인트</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[5]" id="statCheck6" value="8">
+                                    <input type="checkbox" class="custom-control-input stat_pay_type" name="stat_pay_type[5]" id="statCheck6" value="8">
                                     <label class="custom-control-label" for="statCheck6">쿠폰</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[6]" id="statCheck7" value="16">
+                                    <input type="checkbox" class="custom-control-input stat_pay_type" name="stat_pay_type[6]" id="statCheck7" value="64">
                                     <label class="custom-control-label" for="statCheck7">가상계좌</label>
                                 </div>
                             </div>
@@ -235,13 +235,13 @@
             cellClass: 'hd-grid-code',
             cellRenderer: function(params) {
                 if(params.value === '합계' || params.value === '평균') return params.value;
-                // let s_ord_type = $('[name=ord_type]:checked').each(function(idx, item) { 
-                //     console.log(item);
-                //     return $(item).val();
-                //  })
+                let s_ord_type = $(".ord_type:checked").map(function() {return this.value;}).get().join(",");
                 let s_ord_state = $('[name=ord_state]:checked').val();
-				// return '<a href="/head/sales/sal02?sdate='+ params.data.date +'&ord_type='+ s_ord_type +'&ord_state='+ s_ord_state +'" target="_new">'+ params.value+'</a>';
-				return '<a href="/head/sales/sal02?sdate='+ params.data.date + '&ord_state='+ s_ord_state +'" target="_new">'+ params.value+'</a>';
+                let s_item = $("[name=item]").val();
+                let s_brand = $("[name=brand_cd]").val();
+                let s_prd_nm = $("[name=goods_nm]").val();
+                let s_stat_pay_type = $(".stat_pay_type:checked").map(function() {return this.value;}).get().join(",");
+				return '<a href="/head/sales/sal02?sdate='+ params.data.date + '&ord_type=' + s_ord_type + '&ord_state='+ s_ord_state + '&item='+ s_item + '&brand='+ s_brand + '&goods_nm='+ s_prd_nm + '&stat_pay_type='+ s_stat_pay_type +'" target="_new">'+ params.value+'</a>';
 			},
             pinned: 'left',
             aggSum: "합계",

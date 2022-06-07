@@ -64,39 +64,39 @@
                             <label>주문구분</label>
                             <div class="form-inline form-check-box">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[0]" id="ord_type_5" value="5" checked>
+                                    <input type="checkbox" class="custom-control-input" name="ord_type[0]" id="ord_type_5" value="5" @if($ord_type == '' or in_array('5', $ord_type)) checked @endif>
                                     <label class="custom-control-label" for="ord_type_5">교환</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[1]" id="ord_type_4" value="4" checked>
+                                    <input type="checkbox" class="custom-control-input" name="ord_type[1]" id="ord_type_4" value="4" @if($ord_type == '' or in_array('4', $ord_type)) checked @endif>
                                     <label class="custom-control-label" for="ord_type_4">예약</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[2]" id="ord_type_3" value="3" checked>
+                                    <input type="checkbox" class="custom-control-input" name="ord_type[2]" id="ord_type_3" value="3" @if($ord_type == '' or in_array('3', $ord_type)) checked @endif>
                                     <label class="custom-control-label" for="ord_type_3">특별주문</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[3]" id="ord_type_13" value="13" checked>
+                                    <input type="checkbox" class="custom-control-input" name="ord_type[3]" id="ord_type_13" value="13" @if($ord_type == '' or in_array('13', $ord_type)) checked @endif>
                                     <label class="custom-control-label" for="ord_type_13">도매주문</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[4]" id="ord_type_12" value="12" checked>
+                                    <input type="checkbox" class="custom-control-input" name="ord_type[4]" id="ord_type_12" value="12" @if($ord_type == '' or in_array('12', $ord_type)) checked @endif>
                                     <label class="custom-control-label" for="ord_type_12">서비스</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[5]" id="ord_type_17" value="17" checked>
+                                    <input type="checkbox" class="custom-control-input" name="ord_type[5]" id="ord_type_17" value="17" @if($ord_type == '' or in_array('17', $ord_type)) checked @endif>
                                     <label class="custom-control-label" for="ord_type_17">기관납품</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[6]" id="ord_type_14" value="14" checked>
+                                    <input type="checkbox" class="custom-control-input" name="ord_type[6]" id="ord_type_14" value="14" @if($ord_type == '' or in_array('14', $ord_type)) checked @endif>
                                     <label class="custom-control-label" for="ord_type_14">수기</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[7]" id="ord_type_15" value="15" checked>
+                                    <input type="checkbox" class="custom-control-input" name="ord_type[7]" id="ord_type_15" value="15" @if($ord_type == '' or in_array('15', $ord_type)) checked @endif>
                                     <label class="custom-control-label" for="ord_type_15">정상</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[8]" id="ord_type_16" value="16" checked>
+                                    <input type="checkbox" class="custom-control-input" name="ord_type[8]" id="ord_type_16" value="16" @if($ord_type == '' or in_array('16', $ord_type)) checked @endif>
                                     <label class="custom-control-label" for="ord_type_16">오픈마켓</label>
                                 </div>
                             </div>
@@ -125,8 +125,8 @@
                             <div class="flax_box">
                                 <select name='item' class="form-control form-control-sm">
                                     <option value=''>전체</option>
-                                    @foreach ($items as $item)
-                                    <option value='{{ $item->cd }}'>{{ $item->val }}</option>
+                                    @foreach ($items as $t)
+                                    <option value='{{ $t->cd }}' @if($item == $t->cd) selected @endif>{{ $t->val }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -145,7 +145,7 @@
                         <div class="form-group">
                             <label for="formrow-inputZip">상품명</label>
                             <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' value=''>
+                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' value='{{ $goods_nm }}'>
                             </div>
                         </div>
                     </div>
@@ -169,31 +169,31 @@
                             <label for="formrow-inputState">결제방법</label>
                             <div class="form-inline form-check-box">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type" id="stat_pay_type_16" value="16">
+                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[0]" id="stat_pay_type_16" value="16" @if($stat_pay_type != '' and in_array('16', $stat_pay_type)) checked @endif>
                                     <label class="custom-control-label" for="stat_pay_type_16">계좌이체</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type" id="stat_pay_type_32" value="32">
+                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[1]" id="stat_pay_type_32" value="32" @if($stat_pay_type != '' and in_array('32', $stat_pay_type)) checked @endif>
                                     <label class="custom-control-label" for="stat_pay_type_32">핸드폰</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type" id="stat_pay_type_1" value="1">
+                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[2]" id="stat_pay_type_1" value="1" @if($stat_pay_type != '' and in_array('1', $stat_pay_type)) checked @endif>
                                     <label class="custom-control-label" for="stat_pay_type_1">현금</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type" id="stat_pay_type_2" value="2">
+                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[3]" id="stat_pay_type_2" value="2" @if($stat_pay_type != '' and in_array('2', $stat_pay_type)) checked @endif>
                                     <label class="custom-control-label" for="stat_pay_type_2">카드</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type" id="stat_pay_type_4" value="4">
+                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[4]" id="stat_pay_type_4" value="4" @if($stat_pay_type != '' and in_array('4', $stat_pay_type)) checked @endif>
                                     <label class="custom-control-label" for="stat_pay_type_4">포인트</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type" id="stat_pay_type_8" value="8">
+                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[5]" id="stat_pay_type_8" value="8" @if($stat_pay_type != '' and in_array('8', $stat_pay_type)) checked @endif>
                                     <label class="custom-control-label" for="stat_pay_type_8">쿠폰</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type" id="stat_pay_type_64" value="64">
+                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[6]" id="stat_pay_type_64" value="64" @if($stat_pay_type != '' and in_array('64', $stat_pay_type)) checked @endif>
                                     <label class="custom-control-label" for="stat_pay_type_64">가상계좌</label>
                                 </div>
                             </div>
@@ -549,6 +549,10 @@
     });
     let gx;
     $(document).ready(function() {
+        @if($brand != '')
+            $("#brand_cd").select2({data:['{{ $brand }}'], tags: true});
+        @endif
+
         pApp.ResizeGrid(300);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
