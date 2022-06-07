@@ -23,10 +23,16 @@ class sal02Controller extends Controller
 		$edate	 = date("Y-m-d");
 
 		$req_sdate = $req->query("sdate");
+		$req_edate = $req->query("edate");
 		if($req_sdate != '') {
-			$sdate = new DateTime($req_sdate . "01");
-			$edate = $sdate->format('Y-m-t');
-			$sdate = $sdate->format('Y-m-d');
+			if($req_edate != '') {
+				$sdate = $req_sdate;
+				$edate = $req_edate;
+			} else {
+				$sdate = new DateTime($req_sdate . "01");
+				$edate = $sdate->format('Y-m-t');
+				$sdate = $sdate->format('Y-m-d');
+			}
 		}
 
 		$ord_state	= $req->input('ord_state');
@@ -50,6 +56,8 @@ class sal02Controller extends Controller
 			$stat_pay_type = explode(",", $stat_pay_type);
 		}
 
+		$com_nm = $req->input("com_nm");
+
         $values = [
             'sdate' 		=> $sdate,
             'edate' 		=> $edate,
@@ -62,7 +70,8 @@ class sal02Controller extends Controller
 			'pop_search'	=> $pop_search,
 			'brand'			=> $brand,
 			'goods_nm'		=> $goods_nm,
-			'stat_pay_type'	=> $stat_pay_type
+			'stat_pay_type'	=> $stat_pay_type,
+			'com_nm'		=> $com_nm
         ];
         echo Config::get('shop.head.view');
         return view( Config::get('shop.head.view') . '/sales/sal02',$values);

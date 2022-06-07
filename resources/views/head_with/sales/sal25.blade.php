@@ -113,10 +113,19 @@
             headerName: "아이디",
             field: "user_id",
             width: 100,
-            type: "HeadUserType",
             pinned: 'left',
             aggSum: "합계",
-            aggAvg: "평균"
+            aggAvg: "평균",
+            cellRenderer: function(params){
+                if(params.value !== undefined){
+                    if( params.value === '합계' || params.value === '평균' )
+                        return params.value;
+                    else if( params.data.user_id != "" )
+                        return '<a href="#" onclick="return openUserEdit(\'' + params.data.user_id + '\');">'+ params.value +'</a>';
+                    else
+                        return params.value;
+                }
+            }
         },
         {
             headerName: "이름",
@@ -256,7 +265,14 @@
         pApp.ResizeGrid(265);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns);
+        let options = {
+            getRowStyle: (params) => {
+                if (params.node.rowPinned === 'top') {
+                    return { 'background': '#eee' }
+                }
+            }
+        };
+        gx = new HDGrid(gridDiv, columns, options);
         Search();
     });
 

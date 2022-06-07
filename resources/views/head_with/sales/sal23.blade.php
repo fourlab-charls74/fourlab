@@ -61,7 +61,7 @@
                                 <div class="form-inline-inner input-box" style="width:47%">
                                     <div class="form-inline-inner inline_btn_box">
                                         <input type='text' class="form-control form-control-sm w-100" name='goods_no' id='goods_no' value=''>
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16" style="line-height: 28px;"></i></a>
                                     </div>
                                 </div>
                             </div>
@@ -100,7 +100,7 @@
                                 <label for="formrow-inputState">브랜드</label>
                                 <div class="form-inline inline_btn_box">
                                     <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-                                    <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                    <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16" style="line-height: 28px;"></i></a>
                                 </div>
                             </div>
                         </div>
@@ -142,7 +142,7 @@
                                     <div class="form-inline-inner input-box w-75">
                                         <div class="form-inline inline_btn_box">
                                             <input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company" style="width:100%;">
-                                            <a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                            <a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16" style="line-height: 28px;"></i></a>
                                         </div>
                                     </div>
                                 </div>
@@ -270,7 +270,14 @@
             pApp.ResizeGrid(285);
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
-            gx = new HDGrid(gridDiv, columns);
+            let options = {
+                getRowStyle: (params) => {
+                    if (params.node.rowPinned === 'top') {
+                        return { 'background': '#eee' }
+                    }
+                }
+            };
+            gx = new HDGrid(gridDiv, columns, options);
             Search();
         });
 

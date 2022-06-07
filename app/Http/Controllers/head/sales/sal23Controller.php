@@ -114,7 +114,7 @@ class sal23Controller extends Controller
 				group by g.goods_no, g.goods_sub, g.style_no, g.goods_nm, g.brand, g.opt_kind_cd
 			) o left outer join (
 				select
-					g.goods_no, g.goods_sub
+					g.goods_no as ggn, g.goods_sub as ggs
 					, sum(if(w.ord_state = 10, ifnull(w.qty, 0), 0)) as qty_10
 					, sum(if(w.ord_state = 10, ifnull(w.price * w.qty, 0), 0)) as price_10
 					, sum(if(w.ord_state = 61, ifnull(w.qty, 0), 0)) * -1 as qty_61
@@ -128,8 +128,8 @@ class sal23Controller extends Controller
 				where
 					o.ord_date >= '$sdate'  and o.ord_date < date_add('$edate',interval 1 day)
 					$where
-				group by g.goods_no, g.goods_sub
-			) w on o.goods_no = w.goods_no and o.goods_sub = w.goods_sub
+				group by ggn, ggs
+			) w on o.goods_no = ggn and o.goods_sub = ggs
 			left outer join brand cb on cb.brand = o.brand
 			left outer join opt opt on opt.opt_kind_cd = o.opt_kind_cd and opt.opt_id = 'K'     
 			order by item,brand_nm       

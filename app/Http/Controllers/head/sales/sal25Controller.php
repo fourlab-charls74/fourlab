@@ -45,6 +45,7 @@ class sal25Controller extends Controller
         $user_nm	= $request->input("user_nm");
 
         $where = "";
+        $where2 = "";
 
         if($user_id !=""){
             $ids = explode(",",$user_id);
@@ -63,7 +64,7 @@ class sal25Controller extends Controller
         if ($goods_nm != "") $where .= " and g.goods_nm like '%$goods_nm%' ";
         if ($brand_cd != "") $where .= " and g.brand ='$brand_cd'";
         if ($item != "") $where .= " and g.opt_kind_cd = '$item' ";
-        if ($user_nm !="")	$where .= " and m.name = '$user_nm' ";
+        if ($user_nm !="")	$where2 .= " and m.name = '$user_nm' ";
 
 
 
@@ -114,7 +115,7 @@ class sal25Controller extends Controller
 				) a 
 				group by a.user_id
 			) a on m.user_id = a.user_id
-			where 1=1 and m.user_id <> '' 
+			where 1=1 and m.user_id <> '' $where2
 			order by net_amt desc            
         ";
             //echo "<pre>$sql</pre>";

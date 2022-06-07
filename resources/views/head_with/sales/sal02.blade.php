@@ -158,7 +158,7 @@
                                 <select name='sale_place' class="form-control form-control-sm">
                                     <option value=''>전체</option>
                                     @foreach ($sale_places as $sale_place)
-                                    <option value='{{ $sale_place->com_id }}'>{{ $sale_place->com_nm }}</option>
+                                    <option value='{{ $sale_place->com_id }}' @if($com_nm == $sale_place->com_nm) selected @endif>{{ $sale_place->com_nm }}</option>
                                     @endforeach
                                 </select>
                             </div>

@@ -128,39 +128,39 @@
 								<label for="formrow-inputState">주문구분</label>
 								<div class="form-inline form-check-box">
 									<div class="custom-control custom-checkbox">
-										<input type="checkbox" class="custom-control-input" name="ord_type[0]" id="ord_type_5" value="5" checked>
+										<input type="checkbox" class="custom-control-input ord_type" name="ord_type[0]" id="ord_type_5" value="5" checked>
 										<label class="custom-control-label" for="ord_type_5">교환</label>
 									</div>
 									<div class="custom-control custom-checkbox">
-										<input type="checkbox" class="custom-control-input" name="ord_type[1]" id="ord_type_4" value="4" checked>
+										<input type="checkbox" class="custom-control-input ord_type" name="ord_type[1]" id="ord_type_4" value="4" checked>
 										<label class="custom-control-label" for="ord_type_4">예약</label>
 									</div>
 									<div class="custom-control custom-checkbox">
-										<input type="checkbox" class="custom-control-input" name="ord_type[2]" id="ord_type_3" value="3" checked>
+										<input type="checkbox" class="custom-control-input ord_type" name="ord_type[2]" id="ord_type_3" value="3" checked>
 										<label class="custom-control-label" for="ord_type_3">특별주문</label>
 									</div>
 									<div class="custom-control custom-checkbox">
-										<input type="checkbox" class="custom-control-input" name="ord_type[3]" id="ord_type_13" value="13" checked>
+										<input type="checkbox" class="custom-control-input ord_type" name="ord_type[3]" id="ord_type_13" value="13" checked>
 										<label class="custom-control-label" for="ord_type_13">도매주문</label>
 									</div>
 									<div class="custom-control custom-checkbox">
-										<input type="checkbox" class="custom-control-input" name="ord_type[4]" id="ord_type_12" value="12" checked>
+										<input type="checkbox" class="custom-control-input ord_type" name="ord_type[4]" id="ord_type_12" value="12" checked>
 										<label class="custom-control-label" for="ord_type_12">서비스</label>
 									</div>
 									<div class="custom-control custom-checkbox">
-										<input type="checkbox" class="custom-control-input" name="ord_type[5]" id="ord_type_17" value="17" checked>
+										<input type="checkbox" class="custom-control-input ord_type" name="ord_type[5]" id="ord_type_17" value="17" checked>
 										<label class="custom-control-label" for="ord_type_17">기관납품</label>
 									</div>
 									<div class="custom-control custom-checkbox">
-										<input type="checkbox" class="custom-control-input" name="ord_type[6]" id="ord_type_14" value="14" checked>
+										<input type="checkbox" class="custom-control-input ord_type" name="ord_type[6]" id="ord_type_14" value="14" checked>
 										<label class="custom-control-label" for="ord_type_14">수기</label>
 									</div>
 									<div class="custom-control custom-checkbox">
-										<input type="checkbox" class="custom-control-input" name="ord_type[7]" id="ord_type_15" value="15" checked>
+										<input type="checkbox" class="custom-control-input ord_type" name="ord_type[7]" id="ord_type_15" value="15" checked>
 										<label class="custom-control-label" for="ord_type_15">정상</label>
 									</div>
 									<div class="custom-control custom-checkbox">
-										<input type="checkbox" class="custom-control-input" name="ord_type[8]" id="ord_type_16" value="16" checked>
+										<input type="checkbox" class="custom-control-input ord_type" name="ord_type[8]" id="ord_type_16" value="16" checked>
 										<label class="custom-control-label" for="ord_type_16">오픈마켓</label>
 									</div>
 								</div>
@@ -207,9 +207,21 @@
             </ul>
         </div>
     </div>
-    <script language="javascript">
-        var columns = [
-            {headerName: "업체", field: "com_nm", cellRenderer: function(params) {return '<a href="/head/sales/sal02/?com_nm='+ params.value +'" target="new">'+ params.value+'</a>'}, pinned:'left', aggSum:"합계", aggAvg:"평균"},
+    <script type="text/javascript" charset="utf-8">
+        let columns = [
+            {headerName: "업체", field: "com_nm", pinned:'left', aggSum:"합계", aggAvg:"평균",width:100,
+                cellRenderer: function(params) {
+                    let s_date = $("[name=sdate]").val();
+                    let e_date = $("[name=edate]").val();
+                    let s_ord_type = $(".ord_type:checked").map(function() {return this.value;}).get().join(",");
+                    let s_ord_state = $('[name=ord_state]:checked').val();
+                    let s_item = $("[name=item]").val();
+                    let s_brand = $("[name=brand_cd]").val() || '';
+                    let s_prd_nm = $("[name=goods_nm]").val();
+                    return '<a href="/head/sales/sal02?com_nm='+ params.value + '&sdate='+ s_date + '&edate='+ e_date + '&ord_type=' + s_ord_type + '&ord_state='+ s_ord_state + '&item='+ s_item + '&brand='+ s_brand + '&goods_nm='+ s_prd_nm + '" target="new">'+ params.value+'</a>';
+                    // return '<a href="/head/sales/sal02?com_nm='+ params.value + '" target="new">'+ params.value+'</a>'
+
+                }},
             {headerName: '매출액구분',
                 children: [
                     {headerName: "수량", field: "sum_qty",type:'numberType',aggregation:true},
@@ -259,8 +271,6 @@
             },
         ];
 
-    </script>
-    <script type="text/javascript" charset="utf-8">
         const pApp = new App('',{
             gridId:"#div-gd",
         });
