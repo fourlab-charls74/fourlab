@@ -51,7 +51,7 @@
                                                 <th>아이디</th>
                                                 <td>
                                                     <div class="flax_box">
-                                                        <input type='text' class="form-control form-control-sm search-enter w-25" name='id' id="id" value='{{@$user->id}}'>
+                                                        <input type='text' class="form-control form-control-sm search-enter w-25" name='id' id="id" value="{{@$user->id}}" autocomplete="off" />
                                                     </div>
                                                 </td>
                                             </tr>
@@ -59,14 +59,15 @@
                                                 <th>비밀번호</th>
                                                 <td>
                                                     <div class="flax_box">
-                                                        <input type='password' class="form-control form-control-sm w-25" name='passwd' id="passwd" value='passwd'>
-                                                        <div class="custom-control custom-checkbox form-check-box ml-2">
-                                                            <input type="checkbox" class="custom-control-input" value="Y" name="passwd_chg" id="passwd_chg">
-                                                            <label class="custom-control-label" for="passwd_chg">비밀번호 변경 시 체크해 주십시오(* 비밀번호는 6~12자 영문과 숫자가 조합되어야 합니다.)</label>
+                                                        <input type='password' class="form-control form-control-sm w-25" name='passwd' id="passwd" autocomplete="new-password" />
+                                                        <div class="custom-control custom-checkbox form-check-box ml-2" style="@if($code == '') display:none; @endif">
+                                                            <input type="checkbox" class="custom-control-input" value="Y" name="passwd_chg" id="passwd_chg" @if($code == '') checked @endif/>
+                                                            <label class="custom-control-label" for="passwd_chg">비밀번호 변경 시 체크해 주십시오</label>
                                                         </div>
                                                     </div>
+                                                    <p class="fs-12" style="color:red;">* 비밀번호는 6~12자 영문과 숫자가 조합되어야 합니다.</p>
                                                     <div class="flax_box pt-1">
-                                                        <input type="text" name="pwchgperiod" class="form-control form-control-sm w-25 mr-1" value="{{@$user->pwchgperiod}}">
+                                                        <input type="text" name="pwchgperiod" class="form-control form-control-sm text-right w-25 mr-1" value="{{@$user->pwchgperiod ?? '0'}}" />
                                                         일 주기로 변경, 최근변경일 : {{@$user->pwchgdate}}
                                                     </div>
                                                 </td>
@@ -105,7 +106,7 @@
                                                 <td>
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio">
-                                                            <input type="radio" name="md_yn" id="md_y" class="custom-control-input" value="Y" @if(@$user->md_yn == 'Y') checked @endif />
+                                                            <input type="radio" name="md_yn" id="md_y" class="custom-control-input" value="Y" @if(@$user->md_yn != 'N') checked @endif />
                                                             <label class="custom-control-label" for="md_y">사용</label>
                                                         </div>
                                                         <div class="custom-control custom-radio">
@@ -120,7 +121,7 @@
                                                 <td>
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio">
-                                                            <input type="radio" name="use_yn" id="use_y" class="custom-control-input" value="Y" @if(@$user->use_yn == 'Y') checked @endif />
+                                                            <input type="radio" name="use_yn" id="use_y" class="custom-control-input" value="Y" @if(@$user->use_yn != 'N') checked @endif />
                                                             <label class="custom-control-label" for="use_y">사용</label>
                                                         </div>
                                                         <div class="custom-control custom-radio">
@@ -212,7 +213,11 @@
                 </div>
             </div>
             <div class="table-responsive">
-                <div id="div-gd" style="height:250px;width:100%;" class="ag-theme-balham"></div>
+                @if($code == '')
+                    <p>* 그룹정보는 사용자를 등록한 후, 상세페이지에서 설정할 수 있습니다.</p>
+                @else
+                    <div id="div-gd" style="height:250px;width:100%;" class="ag-theme-balham"></div>
+                @endif
             </div>
         </div>
     </div>
@@ -261,20 +266,23 @@
 <script>
     let code = '{{ $code  }}';
 
-    /**
-     * @return {boolean}
-     */
     function Save() {
 
         if ($('#id').val() === '') {
             $('#id').focus();
-            alert('아이디를 입력해 주세요.');
+            alert('아이디를 입력해주세요.');
+            return false;
+        }
+
+        if ($('#passwd_chg').is(':checked') && $("#passwd").val() === '') {
+            $('#passwd').focus();
+            alert('비밀번호를 입력해주세요.');
             return false;
         }
 
         if ($('#name').val() === '') {
             $('#name').focus();
-            alert('이름을 입력해 주세요.');
+            alert('이름을 입력해주세요.');
             return false;
         }
 
@@ -282,8 +290,11 @@
             return false;
         }
 
+        if (!$('#passwd_chg').is(':checked') && $("#passwd").val() !== '') {
+            if(!confirm("비밀번호 변경에 체크하지 않았습니다. 비밀번호 변경없이 저장하시겠습니까?")) return;
+        }
+
         var frm = $('form[name="detail"]');
-        //console.log(frm.serialize());
 
         if (code == "") {
             $.ajax({
@@ -379,8 +390,8 @@
     });
 
     function Search() {
-        let data = '';
-        gx.Request('/head/system/sys01/' + code + '/search', data);
+        let c = code == '' ? '-' : code;
+        gx.Request('/head/system/sys01/' + c + '/search', '');
     }
 </script>
 @stop

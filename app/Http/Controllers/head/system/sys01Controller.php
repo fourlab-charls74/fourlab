@@ -73,7 +73,7 @@ class sys01Controller extends Controller
         if ($part != "")        $where .= " and part like '%" . Lib::quote($part) . "%' ";
 
         $sql =
-            /** @lang text */
+			/** @lang text */
             "
             select * from mgr_user 
 			where 1=1 $where
@@ -93,21 +93,21 @@ class sys01Controller extends Controller
 	public function store(Request $request)
 	{
 
-		$grade		= $request->input('grade');
-		$id			= $request->input('id');
-		$passwd		= $request->input('passwd');
+		$grade			= $request->input('grade');
+		$id				= $request->input('id');
+		$passwd			= $request->input('passwd');
 		$pwchgperiod	= $request->input('pwchgperiod');
-		$name		= $request->input('name');
-		$ipfrom		= $request->input('ipfrom');
-		$ipto		= $request->input('ipto');
-		$md_yn		= $request->input('md_yn');
-		$use_yn		= $request->input('use_yn');
-		$part		= $request->input('part');
-		$posi		= $request->input('posi');
-		$tel		= $request->input('tel');
-		$exttel		= $request->input('exttel');
-		$messenger	= $request->input('messenger');
-		$email		= $request->input('email');
+		$name			= $request->input('name');
+		$ipfrom			= $request->input('ipfrom');
+		$ipto			= $request->input('ipto');
+		$md_yn			= $request->input('md_yn');
+		$use_yn			= $request->input('use_yn');
+		$part			= $request->input('part');
+		$posi			= $request->input('posi');
+		$tel			= $request->input('tel');
+		$exttel			= $request->input('exttel');
+		$messenger		= $request->input('messenger');
+		$email			= $request->input('email');
 
 		$user_cnt	= DB::table('mgr_user')
 						->where('id', $id)->count();
@@ -117,7 +117,7 @@ class sys01Controller extends Controller
 			$mgr_user = [
 				'grade' => $grade,
 				'id' => $id,
-				'passwd' => DB::raw("password('" . $passwd . "')"),
+				'passwd' => DB::raw("CONCAT('*', UPPER(SHA1(UNHEX(SHA1('$passwd')))))"),
 				'pwchgperiod' => $pwchgperiod,
 				'name' => $name,
 				'ipfrom' => $ipfrom,
@@ -130,7 +130,7 @@ class sys01Controller extends Controller
 				'exttel' => $exttel,
 				'messenger' => $messenger,
 				'email' => $email,
-				'pwchgdate' => DB::raw('now()')
+				'pwchgdate' => now(),
 			];
 
 			try {
@@ -145,7 +145,7 @@ class sys01Controller extends Controller
 			}
 		} else {
 			$code = 501;
-			$msg = 'id dup..';
+			$msg = '중복된 아이디가 존재합니다.';
 		}
 
 		return response()->json(['code' => $code, 'msg' => $msg]);
@@ -191,7 +191,7 @@ class sys01Controller extends Controller
 
 		if( $passwd_chg == "Y" ){
 			$mgr_user	= array_merge($mgr_user,[
-				'passwd'	=> DB::raw("password('" . $passwd . "')")
+				'passwd'	=> DB::raw("CONCAT('*', UPPER(SHA1(UNHEX(SHA1('$passwd')))))")
 			]);
 		}
 
@@ -245,16 +245,22 @@ class sys01Controller extends Controller
 
     public function group_search($code)
     {
-        $sql =
-            /** @lang text */
-            "
+		$where = "";
+		$role = "0";
+		$code = $code == '-' ? '' : $code;
+
+		if($code != '') {
+			$where .= "and r.`id` = :code";
+			$role = "if(ifnull(r.group_no ,-1) >= 0,1,0)";
+		}
+		
+        $sql = "
             select
-                g.group_no,g.group_nm,if(ifnull(r.group_no ,-1) >= 0,1,0) as role
-            from mgr_group g left outer join mgr_user_group r on g.`group_no` = r.`group_no` and r.`id` = :code    
+                g.group_no,g.group_nm, $role as role
+            from mgr_group g left outer join mgr_user_group r on g.`group_no` = r.`group_no` $where    
         ";
 
         $rows = DB::select($sql, array("code" => $code));
-
         return response()->json([
             "code" => 200,
             "head" => array(
