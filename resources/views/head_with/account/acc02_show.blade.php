@@ -16,12 +16,14 @@
 	<form method="post" name="search">
 		<div class="card_wrap aco_card_wrap">
 			<div class="card shadow">
-				<div class="d-flex card-header justify-content-between">
-					<a href="#">정산 - 상세 </a>
+				<div class="d-flex justify-content-between">
+					<h1 class="card-header">
+						<a href="#">정산 - 상세 </a>
+					</h1>
 					<div class="flax_box">
-						<a href="#" onclick="Search();" class="btn btn-sm btn-primary submit-btn custm_btn mr-1">검색</a>
-						<a href="#" @if( $acc_idx == '')onclick="Closed();"@endif class="btn btn-sm btn-primary submit-btn custm_btn mr-1 closed_btn" @if( $acc_idx != '') disabled style="background-color:#DBDBDB;" @endif>마감추가</a>
-						<a href="#" onclick="gridDownload();" class="btn btn-sm btn-primary submit-btn custm_btn">자료받기</a>
+						<a href="#" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1">검색</a>
+						<a href="#" @if( $acc_idx == '')onclick="Closed();"@endif class="btn btn-sm btn-outline-primary shadow-sm mr-1 closed_btn" @if( $acc_idx != '') disabled style="background-color:#DBDBDB;" @endif>마감추가</a>
+						<a href="#" onclick="gridDownload();" class="btn btn-sm btn-outline-primary shadow-sm">자료받기</a>
 					</div>
 				</div>
 				<div class="card-body mt-1">
@@ -209,6 +211,9 @@
 				if( params.value == "Y" ){
 					return '<a href="#" onclick="return openHeadOrderOpt(\'' + params.data.ord_opt_no +'\');">'+ params.value +'</a>';
 				}
+			},
+			cellStyle: function(params){
+				return params.value === 'Y' ? {"background-color": "yellow"} : {};
 			},
 			pinned: 'left'
 		},

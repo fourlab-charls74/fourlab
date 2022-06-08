@@ -25,8 +25,7 @@ class acc03Controller extends Controller
 
         $values = [
             'sdate' => $sdate,
-            'edate' => $edate,
-            'closed_yn' => ["전체", "Y", "N"]
+            'edate' => $edate
         ];
 
         return view( Config::get('shop.head.view') . '/account/acc03', $values);
@@ -36,11 +35,11 @@ class acc03Controller extends Controller
     {
         $sdate = str_replace("-", "", $request->input("sdate"));
         $edate = str_replace("-", "", $request->input("edate"));
-        $closed_state = $request->input("closed_state");
+        $closed_yn = $request->input("closed_yn");
         $com_cd = $request->input("com_cd");
 
         $where = "";
-        if ($closed_state != "") $where .= " and a.closed_yn = '${closed_state}'";
+        if ($closed_yn != "") $where .= " and a.closed_yn = '${closed_yn}'";
         if ($com_cd != "") $where .= " and a.com_id = '${com_cd}'";
 
         $sql = "

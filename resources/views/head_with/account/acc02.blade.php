@@ -216,7 +216,7 @@
 	let gx;
 
 	$(document).ready(function() {
-		pApp.ResizeGrid(445);
+		pApp.ResizeGrid(275);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
         let options = {

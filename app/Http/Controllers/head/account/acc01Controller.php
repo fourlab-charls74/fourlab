@@ -56,7 +56,7 @@ class acc01Controller extends Controller
         $ord_no =  $request->input("ord_no", "");
         $user_nm =  $request->input("user_nm");
         $com_type =  $request->input("com_type");
-        $com_id =  $request->input("com_id");
+        $com_id =  $request->input("com_cd");
         // $cat_cd =  $request->input("cat_cd");
         // $com_nm =  $request->input("com_nm");
         $sale_place =  $request->input("sale_place");
@@ -105,10 +105,10 @@ class acc01Controller extends Controller
         if ($ord_edate != "")  $where .= " and o.ord_date < DATE_ADD('${ord_edate}', INTERVAL 1 DAY) ";
         if ($pay_sdate != "")  $where .= " and p.pay_date >= '${pay_sdate}' ";
         if ($pay_edate != "")  $where .= " and p.pay_date < DATE_ADD('${pay_edate}', INTERVAL 1 DAY) ";
-        if ($dlv_sdate != "")  $where .= " and o.dlv_end_date >= ${dlv_sdate} ";
-        if ($dlv_edate != "")  $where .= " and o.dlv_end_date < DATE_ADD(${dlv_edate}, INTERVAL 1 DAY) ";
-        if ($clm_sdate != "")  $where .= " and c.end_date >= ${clm_sdate} ";
-        if ($clm_edate != "")  $where .= " and c.end_date < DATE_ADD(${clm_edate}, INTERVAL 1 DAY) ";
+        if ($dlv_sdate != "")  $where .= " and o.dlv_end_date >= '${dlv_sdate}' ";
+        if ($dlv_edate != "")  $where .= " and o.dlv_end_date < DATE_ADD('${dlv_edate}', INTERVAL 1 DAY) ";
+        if ($clm_sdate != "")  $where .= " and c.end_date >= '${clm_sdate}' ";
+        if ($clm_edate != "")  $where .= " and c.end_date < DATE_ADD('${clm_edate}', INTERVAL 1 DAY) ";
 
         // 결제조건
         if ($stat_pay_type != "") {

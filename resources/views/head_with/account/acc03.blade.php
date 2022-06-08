@@ -72,19 +72,14 @@
 							</div>
 						</div>
 					</div>
-				</div>
-                <div class="row">
 					<div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="closed_yn">상태</label>
-                            <div class="flex_box">
-                                <select name="closed_yn" id="closed_yn" class="form-control form-control-sm mr-2" style="width:20%">
-                                    <?php
-                                        foreach ($closed_yn as $id => $val) {
-                                            $selected = ($id == '30') ? 'selected' : '';
-                                            echo "<option value='${id}' ${selected}>${val}</option>";
-                                        }
-                                    ?>
+                            <label for="closed_yn">마감상태</label>
+                            <div class="flax_box">
+                                <select name="closed_yn" id="closed_yn" class="form-control form-control-sm">
+									<option value="">전체</option>
+									<option value="Y">Y</option>
+									<option value="N">N</option>
                                 </select>
                             </div>
                         </div>
@@ -242,7 +237,7 @@
 	let gx;
 
     $(document).ready(function() {
-        pApp.ResizeGrid(225);
+        pApp.ResizeGrid(275);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         let options = {
@@ -250,13 +245,7 @@
                 if (params.node.rowPinned === 'top') {
                     return { 'background': '#eee' }
                 }
-            },
-			onPinnedRowDataChanged: (params) => {
-				let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
-				gx.gridOptions.api.setPinnedTopRowData([
-				    { ...pinnedRow.data, closed_day: '합계' }
-				]);
-			}
+            }
         };
         gx = new HDGrid(gridDiv, columns, options);
     });
@@ -264,7 +253,15 @@
 	function Search() {
         let data = $('form[name="search"]').serialize();
         gx.Aggregation({ "sum": "top" });
-        gx.Request('/head/account/acc03/search', data, -1);
+        gx.Request('/head/account/acc03/search', data, -1, function() {
+			let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
+			if(pinnedRow) {
+				console.log(pinnedRow);
+				gx.gridOptions.api.setPinnedTopRowData([
+					{ ...pinnedRow.data, closed_day: '합계' }
+				]);
+			}
+		});
     }
 
 	const popDetail = (idx) => {

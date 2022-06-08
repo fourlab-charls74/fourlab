@@ -26,8 +26,10 @@
                     <h4>검색</h4>
                     <div>
                         <a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 다운로드</a>
-                        <a href="#" onclick="setAccountClose()" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>마감완료</a>
-                        <a href="#" onclick="removeAll()" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>삭제</a>
+                        @if($closed_yn !== 'Y')
+                            <a href="#" onclick="setAccountClose()" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>마감완료</a>
+                            <a href="#" onclick="removeAll()" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>삭제</a>
+                        @endif
                         <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                     </div>
                 </div>
@@ -109,17 +111,19 @@
         </div>
         <div id="filter-area" class="card shadow-none mb-0 ty2 last-card">
             <div class="card-body">
-                <div class="card-title mb-3">
-                    <div class="filter_wrap">
-                        <div class="fl_box">
-                        </div>
-                        <div class="fr_box">
-                            <div class="flax_box">
-                                <a href="#" onclick="updateData();" class="btn-sm btn btn-primary">저장</a>
+                @if($closed_yn !== 'Y')
+                    <div class="card-title mb-3">
+                        <div class="filter_wrap">
+                            <div class="fl_box">
+                            </div>
+                            <div class="fr_box">
+                                <div class="flax_box">
+                                    <a href="#" onclick="updateData();" class="btn-sm btn btn-primary">저장</a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                @endif
                 <div class="table-responsive">
                     <div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
                 </div>
@@ -172,6 +176,9 @@
 				if( params.value == "Y" ){
 					return '<a href="#" onclick="return openHeadOrderOpt(\'' + params.data.ord_opt_no +'\');">'+ params.value +'</a>';
 				}
+			},
+            cellStyle: function(params){
+				return params.value === 'Y' ? {"background-color": "yellow"} : {};
 			},
 			pinned: 'left'
 		},
@@ -465,7 +472,8 @@
                 data: { idx: document.search.idx.value }
             }).then((response) => {
                 if (response.data.result == 1) {
-                    window.Search();
+                    opener.Search();
+                    location.reload();
                 }
             }).catch((error) => { console.log(error) });
         }
@@ -479,7 +487,8 @@
                 data: { idx: document.search.idx.value }
             }).then((response) => {
                 if (response.data.result == 1) {
-                    window.Search();
+                    opener.Search();
+                    self.close();
                 } else if(response.data.result == 0) {
                     alert("처리 시 장애가 발생했습니다. 관리자에게 문의해 주십시오.");
                 }

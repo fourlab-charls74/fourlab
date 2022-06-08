@@ -24,7 +24,7 @@
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="date_type">매출일자</label>
-                            <div class="flex_box">
+                            <div class="d-flex">
                                 <span class="mr-2">
                                     <div class="form-group">
                                         <select id="date_type" name='date_type' class="form-control form-control-sm" onchange="onChangeDateType(this);" style="width: 80px">
@@ -37,28 +37,30 @@
                                         </select>
                                     </div>
                                 </span>
-                                <div class="docs-datepicker form-inline-inner input_box mr-2" style="width: 120px">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" onchange="onChangeDate(this)">
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable="">
-                                            <i class="fa fa-calendar" aria-hidden="true"></i>
-                                            </button>
+                                <div class="w-100 d-flex align-items-center">
+                                    <div class="docs-datepicker form-inline-inner input_box mr-2">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" onchange="onChangeDate(this)">
+                                            <div class="input-group-append">
+                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable="">
+                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
                                         </div>
+                                        <div class="docs-datepicker-container"></div>
                                     </div>
-                                    <div class="docs-datepicker-container"></div>
-                                </div>
-                                <span class="text_line mr-2">~</span>
-                                <div class="docs-datepicker form-inline-inner input_box mr-2" style="width: 120px">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off" onchange="onChangeDate(this)">
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                            <i class="fa fa-calendar" aria-hidden="true"></i>
-                                            </button>
+                                    <span class="text_line mr-2">~</span>
+                                    <div class="docs-datepicker form-inline-inner input_box">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off" onchange="onChangeDate(this)">
+                                            <div class="input-group-append">
+                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
                                         </div>
+                                        <div class="docs-datepicker-container"></div>
                                     </div>
-                                    <div class="docs-datepicker-container"></div>
                                 </div>
                             </div>
                         </div>
@@ -66,8 +68,8 @@
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="state">상태</label>
-                            <div class="flex_box">
-                                <select name="state" id="state" class="form-control form-control-sm mr-2" style="width:20%">
+                            <div class="d-flex align-items-center">
+                                <select name="state" id="state" class="form-control form-control-sm w-100 mr-2">
                                     <?php
                                         foreach ($states as $id => $val) {
                                             $selected = ($id == '30') ? 'selected' : '';
@@ -75,8 +77,8 @@
                                         }
                                     ?>
                                 </select>
-                                <div class="custom-control custom-checkbox form-check-box">
-                                    <input type="checkbox" name="clm_state_ex" id="clm_state_ex" class="custom-control-input" value="Y"/>
+                                <div class="custom-control custom-checkbox form-check-box" style="min-width:110px;">
+                                    <input type="checkbox" name="clm_state_ex" id="clm_state_ex" class="custom-control-input" value="Y" />
                                     <label class="custom-control-label" for="clm_state_ex">클레임 매출 제외</label>
                                 </div>
                             </div>
@@ -113,9 +115,9 @@
                                 </div>
                                 <div class="form-inline-inner input-box">
                                     <div class="form-inline inline_btn_box">
-                                        <input type="hidden" name="cat_cd" id="cat_cd" value="">
+                                        <input type="hidden" name="com_cd" id="com_cd" value="">
                                         <input type="text" class="form-control form-control-sm search-all search-enter ac-company2" name='com_nm' id='com_nm' value='' autocomplete='off'>
-                                        <a href="#" class="btn btn-sm btn-outline-primary company-add-btn"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                     </div>
                                 </div>
                             </div>
@@ -166,7 +168,7 @@
                                         <input type="text" class="form-control form-control-sm docs-date" name="ord_sdate" value="" autocomplete="off">
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                <i class="fa fa-calendar" aria-hidden="true"></i>
                                             </button>
                                         </div>
                                     </div>
@@ -178,7 +180,7 @@
                                         <input type="text" class="form-control form-control-sm docs-date" name="ord_edate" value="" autocomplete="off">
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                <i class="fa fa-calendar" aria-hidden="true"></i>
                                             </button>
                                         </div>
                                     </div>
@@ -196,7 +198,7 @@
                                         <input type="text" class="form-control form-control-sm docs-date" name="pay_sdate" value="" autocomplete="off">
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                <i class="fa fa-calendar" aria-hidden="true"></i>
                                             </button>
                                         </div>
                                     </div>
@@ -208,7 +210,7 @@
                                         <input type="text" class="form-control form-control-sm docs-date" name="pay_edate" value="" autocomplete="off">
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                <i class="fa fa-calendar" aria-hidden="true"></i>
                                             </button>
                                         </div>
                                     </div>
@@ -226,7 +228,7 @@
                                         <input type="text" class="form-control form-control-sm docs-date" name="dlv_sdate" value="" autocomplete="off">
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                <i class="fa fa-calendar" aria-hidden="true"></i>
                                             </button>
                                         </div>
                                     </div>
@@ -238,7 +240,7 @@
                                         <input type="text" class="form-control form-control-sm docs-date" name="dlv_edate" value="" autocomplete="off">
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                <i class="fa fa-calendar" aria-hidden="true"></i>
                                             </button>
                                         </div>
                                     </div>
@@ -258,7 +260,7 @@
                                         <input type="text" class="form-control form-control-sm docs-date" name="clm_sdate" value="" autocomplete="off">
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                <i class="fa fa-calendar" aria-hidden="true"></i>
                                             </button>
                                         </div>
                                     </div>
@@ -270,7 +272,7 @@
                                         <input type="text" class="form-control form-control-sm docs-date" name="clm_edate" value="" autocomplete="off">
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                <i class="fa fa-calendar" aria-hidden="true"></i>
                                             </button>
                                         </div>
                                     </div>
@@ -288,7 +290,7 @@
                                         <select id="ord_type" name='ord_type' class="form-control form-control-sm">
                                             <option value=''>전체</option>
                                             @foreach ($ord_types as $ord_type)
-                                                <option value='{{ $ord_type->code_id }}'>{{ $ord_type->code_val }}</option>
+                                            <option value='{{ $ord_type->code_id }}'>{{ $ord_type->code_val }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -299,7 +301,7 @@
                                         <select name='ord_kind' class="form-control form-control-sm">
                                             <option value=''>전체</option>
                                             @foreach ($ord_kinds as $ord_kind)
-                                                <option value='{{ $ord_kind->code_id }}'>{{ $ord_kind->code_val }}</option>
+                                            <option value='{{ $ord_kind->code_id }}'>{{ $ord_kind->code_val }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -310,16 +312,16 @@
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="stat_pay_type">결제방법</label>
-                            <div class="flax_box">
-                                <select id="stat_pay_type" name='stat_pay_type' class="form-control form-control-sm" style="width:calc(20% - 10px);margin-right:10px;">
+                            <div class="d-flex align-items-center">
+                                <select id="stat_pay_type" name='stat_pay_type' class="form-control form-control-sm w-100 mr-2" style="width:calc(20% - 10px);margin-right:10px;">
                                     <option value=''>전체</option>
                                     @foreach($stat_pay_types as $stat_pay_type)
                                     <option value="{{ $stat_pay_type->code_id }}">{{ $stat_pay_type->code_val }}</option>
                                     @endforeach
                                 </select>
-                                <div class="form-inline" style="width:80%;">
+                                <div class="form-inline" style="min-width:100px;">
                                     <div class="custom-control custom-checkbox form-check-box">
-                                        <input type="checkbox" name="not_complex" id="not_complex_y" class="custom-control-input" value="Y"/>
+                                        <input type="checkbox" name="not_complex" id="not_complex_y" class="custom-control-input" value="Y" />
                                         <label class="custom-control-label" for="not_complex_y">복합결제 제외</label>
                                     </div>
                                 </div>
@@ -335,7 +337,7 @@
                                 <select id="item" name="item" class="form-control form-control-sm">
                                     <option value="">전체</option>
                                     @foreach ($items as $item)
-                                        <option value="{{ $item->cd }}">{{ $item->val }}</option>
+                                    <option value="{{ $item->cd }}">{{ $item->val }}</option>
                                     @endforeach
                                 </select>
                             </div>

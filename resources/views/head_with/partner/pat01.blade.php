@@ -54,7 +54,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 inner-td">
+                    {{-- <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="">공개여부</label>
                             <div class="flax_box">
@@ -65,7 +65,7 @@
                                 </select>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                           <label for="">제목</label>
@@ -74,8 +74,6 @@
                           </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                         <label for="">내용</label>
