@@ -472,10 +472,8 @@ $( document ).ready(function() {
     });
 
 
-    $(".sch-ad_type").change(function(){
+    $(".sch-ad_type").on("change", function(){
         var ad_type = $(this).val();
-        //console.log(ad_type);
-        //console.log($(this).val());
         if(ad_type !== "1" || ad_type !== ""){
             $.ajax({
                 async: true,

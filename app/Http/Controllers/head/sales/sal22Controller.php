@@ -14,11 +14,14 @@ use Carbon\Carbon;
 class sal22Controller extends Controller
 {
     // 일별 매출 통계
-    public function index() {
+    public function index(Request $req) {
 
         //return '일별매출통계';
         $mutable = Carbon::now();
         $sdate	= $mutable->sub(1, 'month')->format('Y-m-d');
+
+        $ad_type = $req->input("ad_type");
+        $ad = $req->input("ad");
 
         $values = [
             'sdate' => $sdate,
@@ -27,7 +30,9 @@ class sal22Controller extends Controller
             'sale_places'   => SLib::getSalePlaces(),
             'com_types'     => SLib::getCodes('G_COM_TYPE'),
             'ord_types'     => SLib::getCodes('G_ORD_TYPE'),
-            "ad_types"      => SLib::getCodes("G_AD_TYPE")
+            "ad_types"      => SLib::getCodes("G_AD_TYPE"),
+            "ad_type"       => $ad_type,
+            "ad"            => $ad
         ];
         echo Config::get('shop.head.view');
         return view( Config::get('shop.head.view') . '/sales/sal22',$values);

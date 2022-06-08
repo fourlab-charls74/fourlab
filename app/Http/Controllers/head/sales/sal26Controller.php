@@ -41,7 +41,7 @@ class sal26Controller extends Controller
         $style_no = $request->input("style_no");
         $goods_no = $request->input("goods_no");
         $com_type = $request->input("com_type", "");
-        $com_id = $request->input("com_id", "");
+        $com_cd = $request->input("com_cd", "");
         $ad_type = $request->input("ad_type");
         $ad = $request->input("ad");
 
@@ -57,14 +57,14 @@ class sal26Controller extends Controller
         $goods_no = preg_replace("/\n/",",",$goods_no);
         $goods_no = preg_replace("/,,/",",",$goods_no);
 
-        if( $goods_no != "" ){
+        if( $goods_no != "" ) {
             $goods_nos = explode(",",$goods_no);
             if(count($goods_nos) > 1){
                 if(count($goods_nos) > 500) array_splice($goods_nos,500);
                 $in_goods_nos = join(",",$goods_nos);
-                $where .= " and a.goods_no in ( $in_goods_nos ) ";
+                $inner_where .= " and g.goods_no in ( $in_goods_nos ) ";
             } else {
-                if ($goods_no != "") $where .= " and a.goods_no = '" . Lib::quote($goods_no) . "' ";
+                if ($goods_no != "") $inner_where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
             }
         }
 
@@ -72,17 +72,24 @@ class sal26Controller extends Controller
         if ($item != "") $inner_where .= " and g.opt_kind_cd = '$item' ";
 
         if ($com_type != "")	$inner_where .= " and g.com_type   = '$com_type' ";
-        if ($com_id != "")		$inner_where .= " and g.com_id     = '$com_id' ";
+        if ($com_cd != "")		$inner_where .= " and g.com_id     = '$com_cd' ";
 
-        if ($ad_type != "") $inner_where .= "and ad.type = '$ad_type'";
-        if ($ad != "") $inner_where .= "and ad.ad = '$ad'";
+        if ($ad_type != "") {
+            $inner_where .= " and ad.type = '$ad_type'";
+            $where .= " and a.type = '$ad_type'";
+        }
+        if ($ad != "") {
+            $inner_where .= " and ad.ad = '$ad'";
+            $where .= " and a.ad = '$ad'";
+        }
 
         $sql = /** @lang text */
             "
 			select
 				if(a.ad = '','None',a.ad) as code,
 				a.name as ad_name,
-				a.type as ad_type,ifnull(p.pageview,0) as pageview,
+				a.type as ad_type,
+                ifnull(p.pageview,0) as pageview,
 				o.*, w.*
 			from (
 				select ad,type,name from ad

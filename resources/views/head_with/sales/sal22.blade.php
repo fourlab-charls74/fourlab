@@ -156,8 +156,8 @@
                                     <div class="form-group">
                                         <select name="ad_type" id="ad_type" class="sch-ad_type form-control form-control-sm">
                                             <option value="">광고구분</option>
-                                            @foreach($ad_types as $ad_type)
-                                            <option value="{{ $ad_type->code_id }}">{{ $ad_type->code_val }}</option>
+                                            @foreach($ad_types as $t)
+                                            <option value="{{ $t->code_id }}">{{ $t->code_val }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -369,6 +369,33 @@
     });
     let gx;
     $(document).ready(function() {
+        @if ($ad_type != '')
+            let ad_type = '{{ $ad_type }}';
+            $(".sch-ad_type").val(ad_type).attr("selected", true);
+            @if ($ad != '')
+                let ad = '{{ $ad }}';
+                $.ajax({
+                    async: true,
+                    type: 'get',
+                    url: '/head/auto-complete/ad_type',
+                    data:{
+                        "ad_type": ad_type
+                    },
+                    success: function (data) {
+                        var res = data.results;
+                        $(".sch_ad option").remove();
+                        $(".sch_ad").append("<option value=''>- 광고 -</option>");
+                        for(i=0; i<res.length; i++){
+                            $(".sch_ad").append(`<option value='`+ res[i]['id'] + `' ${ad === res[i]['id'] ? "selected" : ''}>`+ res[i]['val'] +"</option>");
+                        }
+                    },
+                    error: function(request, status, error) {
+                        console.log("error");
+                    }
+                });
+            @endif
+        @endif
+
         pApp.ResizeGrid(300);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
@@ -400,7 +427,6 @@
     }
 
     function drawCanvas() {
-        console.log($("#chart-type").val());
         switch ($("#chart-type").val()) {
             case "date":
                 drawCanvasByDate();

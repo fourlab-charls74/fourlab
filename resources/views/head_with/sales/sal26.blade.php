@@ -111,7 +111,7 @@
                         <div class="form-group">
                             <label for="formrow-inputState">브랜드</label>
                             <div class="form-inline inline_btn_box">
-                                <select id="brand_nm" name="brand_nm" class="form-control form-control-sm select2-brand"></select>
+                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
                                 <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                             </div>
                         </div>
@@ -130,7 +130,7 @@
                                 </div>
                                 <div class="form-inline-inner input-box w-75">
                                     <div class="form-inline inline_btn_box">
-                                        <input type='hidden' name='com_cd' id='com_cd' value=''>
+                                        <input type='hidden' name='com_cd' id='com_cd' value='' />
                                         <input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company" style="width:100%;">
                                         <a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                     </div>
@@ -159,7 +159,7 @@
             </div>
         </div>
         <div class="table-responsive">
-            <div id="div-gd" style="width:100%;min-height:600px;height:calc(100vh - 370px);" class="ag-theme-balham"></div>
+            <div id="div-gd" class="ag-theme-balham"></div>
         </div>
     </div>
 </div>
@@ -177,9 +177,10 @@
             field: "ad_name",
             width: 200,
             cellRenderer: function(params) {
-                s_ad_type = $('[name=s_ad_type]').val();
-                s_ad = $('[name=s_ad]').val();
-				return '<a href="/head/sales/sal22/?ad_type='+ s_ad_type +'&ad='+ s_ad +'"target="_new">'+ params.value+'</a>'
+                if(params.value === '합계' || params.value === '평균') return params.value;
+                let s_ad_type = params.data.ad_type;
+                let s_ad = params.data.ad;
+				return '<a href="/head/sales/sal22?ad_type='+ s_ad_type +'&ad='+ s_ad +'"target="_new">'+ params.value+'</a>'
 			},
             pinned: 'left',
             aggSum: "합계",
@@ -326,10 +327,17 @@
     });
     let gx;
     $(document).ready(function() {
-        pApp.ResizeGrid(400);
+        pApp.ResizeGrid(275);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns);
+        let options = {
+            getRowStyle: (params) => {
+                if (params.node.rowPinned === 'top') {
+                    return { 'background': '#eee' }
+                }
+            }
+        };
+        gx = new HDGrid(gridDiv, columns, options);
         Search();
     });
 
