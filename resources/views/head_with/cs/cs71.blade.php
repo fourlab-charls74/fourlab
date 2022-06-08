@@ -114,13 +114,13 @@
 <script src="https://unpkg.com/ag-charts-community@2.1.0/dist/ag-charts-community.min.js"></script>
 <script language="javascript">
     var columns = [
-        {headerName: "등록일", field: "reg_date",width:120,cellStyle: {'text-align':'center'},
-        cellRenderer: function(params) {
-            sdate = $('[name=sdate]').val();
-            edate = $('[name=edate]').val();
-			return '<a href="/head/cs/cs01/?sdate='+ sdate +'&edate='+ edate +'"target="_new">'+ params.value+'</a>'
-		    },
-        aggSum:"합계",aggAvg:"평균"},
+        {headerName: "등록일", field: "reg_date",width:120,cellStyle: {'text-align':'center'},aggSum:"합계",aggAvg:"평균",
+            cellRenderer: function(params) {
+                if(params.value == '합계') return params.value;
+                let sdate = params.data.reg_date;
+                let edate = params.data.reg_date;
+                return '<a href="/head/cs/cs01?sdate='+ sdate +'&edate='+ edate +'"target="_new">'+ params.value+'</a>'
+        }},
         {headerName: "합계", field: "합계", type: 'numberType',cellStyle: StyleValue,aggregation:true},
         {headerName: "배송지연", field: "배송지연", type: 'numberType',cellStyle: StyleValue,aggregation:true},
         {headerName: "오배송", field: "오배송", type: 'numberType',cellStyle: StyleValue,aggregation:true},

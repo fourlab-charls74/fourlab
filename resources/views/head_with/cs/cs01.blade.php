@@ -172,7 +172,7 @@
                             <div class="form-group">
                                <label for="style_no">스타일넘버</label>
                                <div class="flax_box">
-                                   <input type='text' class="form-control form-control-sm search-all ac-style-no2 search-enter" name='style_no' value=''>
+                                   <input type='text' class="form-control form-control-sm search-all ac-style-no2 search-enter" name='style_no' value='@if($style_no != '') {{ $style_no }} @endif'>
                                </div>
                             </div>
                         </div>

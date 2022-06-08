@@ -25,7 +25,7 @@
                                 <div class="form-inline">
                                     <div class="docs-datepicker form-inline-inner input_box">
                                         <div class="input-group">
-                                            <input type="text" class="form-control form-control-sm docs-date month" name="sdate" value="{{ $sdate }}" autocomplete="off">
+                                            <input type="text" class="form-control form-control-sm docs-date docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off">
                                             <div class="input-group-append">
                                                 <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable="">
                                                 <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -37,7 +37,7 @@
                                     <span class="text_line">~</span>
                                     <div class="docs-datepicker form-inline-inner input_box">
                                         <div class="input-group">
-                                            <input type="text" class="form-control form-control-sm docs-date month" name="edate" value="{{ $edate }}" autocomplete="off">
+                                            <input type="text" class="form-control form-control-sm docs-date docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
                                             <div class="input-group-append">
                                                 <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
                                                 <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -108,8 +108,9 @@
     var columns = [
         {headerName: "스타일넘버", field: "style_no",
         cellRenderer: function(params) {
-            s_style_no = $('[name=style_no]').val();
-			return '<a href="/head/cs/cs01/?style_no='+ s_style_no +'"target="_new">'+ params.value+'</a>'
+            if(params.value === '합계') return params.value;
+            let s_style_no = params.value;
+			return '<a href="/head/cs/cs01?style_no='+ s_style_no +'"target="_new">'+ params.value+'</a>'
 		    },
         aggSum:"합계"},
         {headerName: "상품명", field: "goods_nm",type:"HeadGoodsNameType"},

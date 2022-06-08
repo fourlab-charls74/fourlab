@@ -12,10 +12,17 @@ use Carbon\Carbon;
 
 class cs01Controller extends Controller
 {
-	public function index() {
+	public function index(Request $req) {
 		$today = date("Y-m-d");
 		$edate = $today;
 		$sdate = date('Y-m-d', strtotime(-3 .'day'));
+
+		$req_sdate = $req->input("sdate");
+		if($req_sdate != '') {
+			$sdate = date_format(date_create($req_sdate), "Y-m-d");
+			$edate = date_format(date_create($req->input("edate")), "Y-m-d");
+		}
+		$style_no = $req->input("style_no");
 		
 		$date_type = SLib::getCodes("G_DATE_TYPE");
 		$com_types = SLib::getCodes("G_COM_TYPE");
@@ -50,7 +57,8 @@ class cs01Controller extends Controller
 			'clm_state_items'	=> $clm_state_item,
 			'clm_type_item'		=> $clm_type_item,
 			'clm_reason_item'	=> $clm_reason_item,
-			'stat_pay_types'	=> $stat_pay_types
+			'stat_pay_types'	=> $stat_pay_types,
+			'style_no'	=> $style_no
 		];
 		return view( Config::get('shop.head.view') . '/cs/cs01',$values);
 	}
