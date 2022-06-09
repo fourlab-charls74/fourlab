@@ -391,7 +391,7 @@
 
     function Search() {
         let c = code == '' ? '-' : code;
-        gx.Request('/head/system/sys01/' + c + '/search', '');
+        gx.Request('/head/system/sys01/' + encodeURIComponent(c) + '/search', '');
     }
 </script>
 @stop

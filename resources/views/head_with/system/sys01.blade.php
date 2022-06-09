@@ -159,7 +159,7 @@
         const cd = $(a).attr('data-code');
         let url = '/head/system/sys01/create';
         if (cd !== '') {
-            url = '/head/system/sys01/' + cd;
+            url = '/head/system/sys01/' + encodeURIComponent(cd);
         }
         window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
     }

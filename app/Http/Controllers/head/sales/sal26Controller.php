@@ -136,7 +136,7 @@ class sal26Controller extends Controller
 				group by ad.ad
 			) w on a.ad = w.ad
 			where 1=1 $where
-			order by o.qty_all desc     
+			order by o.qty_all desc, a.name asc   
         ";
 
         $rows = DB::select($sql);

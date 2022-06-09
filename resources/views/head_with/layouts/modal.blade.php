@@ -182,7 +182,7 @@
                                             <div class="form-group">
                                                 <label style="min-width:60px;">업체명</label>
                                                 <div class="flax_box">
-                                                    <input type='text' class="form-control form-control-sm ac-company" name='com_nm' value=''>
+                                                    <input type='text' class="form-control form-control-sm sch-company" name='com_nm' value=''>
                                                 </div>
                                             </div>
                                         </div>
