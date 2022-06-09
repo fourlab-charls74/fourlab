@@ -385,29 +385,35 @@
             width: 72,
             cellStyle: StyleGoodsTypeNM,
             pinned: 'left',
+            lockPosition: true,
         },
         {
             field: "com_nm",
             headerName: "업체",
             pinned: 'left',
+            lockPosition: true,
         },
         {
             field: "opt_kind_nm",
             headerName: "품목",
             pinned: 'left',
+            lockPosition: true,
         },
         {
             field: "brand_nm",
             headerName: "브랜드",
+            lockPosition: true,
         },
         {
             field: "style_no",
             headerName: "스타일넘버",
+            lockPosition: true,
         },
         {
             field: "img2",
             headerName: "img2",
-            hide: true
+            hide: true,
+            lockPosition: true,
         },
         {
             field: "img",
@@ -417,18 +423,21 @@
                 if (params.value !== undefined && params.data.img != "") {
                     return '<img src="{{config('shop.image_svr')}}/' + params.data.img + '" style="height:30px;"/>';
                 }
-            }
+            },
+            lockPosition: true,
         },
         {
             field: "goods_nm",
             headerName: "상품명",
             type: "GoodsNameType",
+            lockPosition: true,
         },
         {
             field: "sale_stat_cl",
             headerName: "상품상태",
             width: 100,
-            cellStyle: StyleGoodsState
+            cellStyle: StyleGoodsState,
+            lockPosition: true,
         },
         {
             field: "goods_no",
@@ -439,16 +448,19 @@
                     return params.data.goods_no + ' [' + params.data.goods_sub + ']';
 
                 }
-            }
+            },
+            lockPosition: true,
         },
         {
             field: "goods_sub",
             headerName: "goods_sub",
-            hide: true
+            hide: true,
+            lockPosition: true,
         },
         {
             field: "class",
-            headerName: "분류"
+            headerName: "분류",
+            lockPosition: true,
         },
 
         {
@@ -456,74 +468,86 @@
             headerName: "제품소재",
             cellStyle: {'background' : '#ffff99'},
             editable: true,
+            lockPosition: true,
         },
         {
             field: "item_002",
             headerName: "색상",
             cellStyle: {'background' : '#ffff99'},
             editable: true,
+            lockPosition: true,
         },
         {
             field: "item_003",
             headerName: "치수",
             cellStyle: {'background' : '#ffff99'},
             editable: true,
+            lockPosition: true,
         },
         {
             field: "item_004",
             headerName: "제조사(수입자/병행수입)",
             cellStyle: {'background' : '#ffff99'},
             editable: true,
+            lockPosition: true,
         },
         {
             field: "item_005",
             headerName: "제조국",
             cellStyle: {'background' : '#ffff99'},
             editable: true,
+            lockPosition: true,
         },
         {
             field: "item_006",
             headerName: "세탁방법 및 취급시 주의사항",
             cellStyle: {'background' : '#ffff99'},
             editable: true,
+            lockPosition: true,
         },
         {
             field: "item_007",
             headerName: "제조연월",
             cellStyle: {'background' : '#ffff99'},
             editable: true,
+            lockPosition: true,
         },
         {
             field: "item_008",
             headerName: "품질보증기준",
             cellStyle: {'background' : '#ffff99'},
             editable: true,
+            lockPosition: true,
         },
         {
             field: "item_009",
             headerName: "A/S 책임자와 전화번호",
             cellStyle: {'background' : '#ffff99'},
             editable: true,
+            lockPosition: true,
         },
         {
             field: "item_010",
             headerName: "KC안전인증 대상 유무",
             cellStyle: {'background' : '#ffff99'},
             editable: true,
+            lockPosition: true,
         },
         {
             field: "item_011",
             headerName: "수입여부",
             cellStyle: {'background' : '#ffff99'},
             editable: true,
+            lockPosition: true,
         },
         {
             field: "item_012",
             headerName: "종류",
             cellStyle: {'background' : '#ffff99'},
             editable: true,
+            lockPosition: true,
         },
-        { field: "", headerName: "", width: "auto"}
+        { field: "", headerName: "", width: "auto",lockPosition: true}
     ];
 </script>
 <script type="text/javascript" charset="utf-8">

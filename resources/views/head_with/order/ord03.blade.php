@@ -51,14 +51,14 @@
                             </div>--}}
 
                             <label for="name">파일</label>
-                            <div class="flax_box img_file_cum_wrap">
-                                <div class="custom-file">
+                            <div class="d-flex align-items-center flex-column flex-sm-row">
+                                <div class="custom-file w-100 mr-2">
                                     <input type="file" class="custom-file-input" id="file" aria-describedby="inputGroupFileAddon03">
                                     <label id="file-label" class="custom-file-label" for="file"><i class="bx bx-images font-size-16 align-middle mr-1"></i>입력할 파일을 선택 해 주세요.</label>
                                 </div>
-                                <div class="btn-group">
-                                    <button class="btn btn-outline-secondary" type="button" id="apply">적용
-                                    </button>
+                                <div class="" style="min-width: 180px;">
+                                    <button class="btn btn-outline-secondary" type="button" id="apply">적용</button>
+                                    <a href="/sample/sample_sugi_2.xls" target="_blank" class="ml-2" style="text-decoration: underline !important;">수기판매 양식 다운로드</a>
                                 </div>
                             </div>
                         </div>

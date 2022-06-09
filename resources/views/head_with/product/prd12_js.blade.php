@@ -125,7 +125,7 @@
         }
 
         function View() {
-            var url = "https://" + '{{ @$domain }}' + "/app/planning/views/" + '{{ @$plan->p_no }}' + '/' + code;
+            var url = "https://" + '{{ @$domain }}' + "/app/planning/views/" + '{{ @$plan->p_no }}' + '/' + code + "?is_preview=y";
             window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=400,left=550,width=1024,height=900");
         }
 
