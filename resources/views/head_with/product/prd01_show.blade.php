@@ -2230,13 +2230,13 @@
 			});
 
             let pApp, gx;
-            let goods_class;
+            const goods_class = "{{ $class ?? '' }}";
 
             $.ajax({
                 async: true,
                 type: 'get',
                 url: '/head/product/prd05/column_search',
-                data: "class=" + "{{ $class }}",
+                data: "class=" + goods_class,
                 success: function(data) {
                     let col_arr = data['columns'];
                     col_arr.forEach((col, i) => {
@@ -2270,14 +2270,14 @@
                 gx.Request(`/head/product/prd01/${goods_no}/goods-class`, data, -1);
             }
 
-            // function checkEdit(params) {
-            //   return params.data.class;
-            // }
+            function checkEdit(params) {
+              return params.data.class;
+            }
 
-            // function editerStyle(params) {
-            //   if (params.data.class != null)
-            //       return { 'background' : '#ffff99', 'border-right' : '1px solid #e0e7e7' }
-            // }
+            function editerStyle(params) {
+              if (params.data.class != null)
+                  return { 'background' : '#ffff99', 'border-right' : '1px solid #e0e7e7' }
+            }
         }
 
         $(document).ready(function(){

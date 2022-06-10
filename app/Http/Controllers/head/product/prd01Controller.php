@@ -979,7 +979,7 @@ class prd01Controller extends Controller
             'type'				=> $type,
             'goods_stats'		=> SLib::getCodes('G_GOODS_STAT'),
             'class_items'		=> $class_items,
-            'class'				=> $goods_class->class,
+            'class'				=> $goods_class == null ? '' : $goods_class->class,
             'goods_types'		=> SLib::getCodes('G_GOODS_TYPE'),
             'com_info'			=> (object)array("dlv_amt" => 0,"free_dlv_amt_limit" => 0),
             'g_dlv_fee'			=> $cfg_dlv_fee,
