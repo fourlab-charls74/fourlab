@@ -180,4 +180,54 @@ class Option { // 20220421 - madforre 추가
 
 	}
 
+    /*
+	 * 	function : delBasicOption
+	 * 		기본 옵션 삭제
+	 */	
+	function delBasicOption( $basic_options ) 
+    {
+		$goods_no = $this->goods_no;
+		$goods_type = $this->goods_type;
+		$goods_opt = Lib::GetValue($basic_options, "goods_opt");
+
+        $a_goods_opt = array();
+
+		// 삭제할 옵션
+		$sql = "
+			select goods_opt
+			from goods_good
+			where goods_no = '$goods_no' and goods_opt like '%$goods_opt%'
+		";
+
+        $collection = collect(DB::select($sql));
+
+        $collection->map(function($row, $i) use ($a_goods_opt) {
+            $a_goods_opt[$i] = $row->goods_opt;
+        });
+
+		if ( $goods_type == "S" ) {
+			$jaego = new Jaego($this->user);
+			for ( $i = 0; $i < count($a_goods_opt); $i++ ) {
+				$goods_opt = $a_goods_opt[$i];
+				$jaego->SetStockQty($goods_no, $goods_opt, 0, "옵션삭제");
+			}
+		}
+
+		for ( $i = 0; $i < count($a_goods_opt); $i++ ) {
+			$goods_opt = $a_goods_opt[$i];
+
+			$sql = "
+				delete from goods_good
+				where goods_no = :goods_no and goods_opt = :goods_opt
+			";
+            DB::delete($sql, ["goods_no" => $goods_no, "goods_opt" => $goods_opt]);
+
+			$sql = "
+				delete from goods_summary
+                where goods_no = :goods_no and goods_opt = :goods_opt
+			";
+			DB::delete($sql, ["goods_no" => $goods_no, "goods_opt" => $goods_opt]);
+		}
+	}
+
 }

@@ -346,7 +346,6 @@
                                                         <tr>
                                                             <td class="center">
                                                                 <select id='opt_kind' name='opt_kind' class="form-control form-control-sm">
-                                                                    <option value='0'>= 옵션구분 =</option>
                                                                 </select>
                                                             </td>
                                                             <td class="center">

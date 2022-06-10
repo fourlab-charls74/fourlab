@@ -930,9 +930,10 @@ function ControlOption() {
     this.deleted_opts = [];
 }
 
-ControlOption.prototype.Open = function(goods_no = 0, callback = null) {
+ControlOption.prototype.Open = function(goods_no = 0, afterGridLoaded = null, afterCRUD = null) {
     this.goods_no = goods_no;
-    this.callback = callback; // 옵션 저장 이후 콜백으로 사용
+    this.afterGridLoaded = afterGridLoaded;
+    this.afterCRUD = afterCRUD;
 
     if(this.grid === null){
         this.SetGrid("#div-gd-option");
@@ -942,15 +943,12 @@ ControlOption.prototype.Open = function(goods_no = 0, callback = null) {
     $('#ControlOptionModal').modal({
         keyboard: false
     });
-    
-    $('#ControlOptionModal').on('hidden.bs.modal', () => { // modal close시 init
-        $("#div-gd-option").html("");
-        document.control_option.reset();
-        this.SetGrid("#div-gd-option");
-    });
 };
 
 ControlOption.prototype.SetGrid = function(divId) {
+
+    const afterGridLoaded = this.afterGridLoaded;
+
     const columns = [
         {headerName: '', width:40, valueGetter: 'node.id', cellRenderer: 'loadingRenderer'},
         {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, sort: null},
@@ -960,13 +958,17 @@ ControlOption.prototype.SetGrid = function(divId) {
     ];
 
     this.grid = new HDGrid(document.querySelector( divId ), columns);
-    this.grid.Request(`/head/product/prd01/${this.goods_no}/get-option`, null, 1, function(e) {
+    this.grid.Request(`/head/product/prd01/${this.goods_no}/get-basic-options`, null, 1, function(e) {
         const opt_kinds = e.head.opt_kinds;
         this.kinds = opt_kinds;
-        opt_kinds.forEach(opt => {
-            $("#opt_kind").append(`<option value='${JSON.stringify(opt)}'>${opt.name}</option>`);
-        });
+        if ($("#opt_kind .option").length == 0) {
+            $("#opt_kind").append(`<option value=0>= 옵션구분 =</option>`);
+            opt_kinds.forEach(opt => {
+                $("#opt_kind").append(`<option value='${JSON.stringify(opt)}'>${opt.name}</option>`);
+            });
+        }
         $("#gd-option-total").text(e.head.total);
+        afterGridLoaded();
     });
 };
 
@@ -975,7 +977,10 @@ ControlOption.prototype.Add = function(e) {
         const opt_kind_no = JSON.parse($("#opt_kind").val());
         const opt_nm = $("#opt_nm").val();
 
-        if(opt_kind_no == 0) return alert("옵션구분을 선택해주세요.");
+        if(opt_kind_no == 0) {
+            $("#opt_kind").trigger("focus");
+            return alert("옵션구분을 선택해주세요.");
+        }
         if(opt_nm == '') return;
 
         if(this.grid.getRows().filter(n => n.opt_name === opt_kind_no.name && n.goods_opt === opt_nm).length > 0) return alert("이미 등록된 옵션입니다.");
@@ -990,16 +995,20 @@ ControlOption.prototype.Add = function(e) {
 };
 
 ControlOption.prototype.Save = function() {
-    if(!confirm("옵션 정보를 저장하시겠습니까?")) return;
+    if (!confirm("옵션 정보를 저장하시겠습니까?")) return;
 
-    const afterSuccess = (response) => {
-        this.callback(response);
+    const afterSuccess = (data) => {
+        const { code, msg } = data;
+        if (code == 200) {
+            alert(msg);
+            this.afterCRUD(data);
+        } else alert(msg);
     };
 
     $.ajax({
         async: true,
         type: 'post',
-        url: `/head/product/prd01/${this.goods_no}/option-save`,
+        url: `/head/product/prd01/${this.goods_no}/save-basic-options`,
         data: {
             'opt_list': this.grid.getRows(),
         },
@@ -1012,11 +1021,32 @@ ControlOption.prototype.Save = function() {
     });
 };
 
-ControlOption.prototype.Delete = function() {
-    const selected = this.grid.getSelectedRows();
-    if(selected.length < 1) return alert("삭제할 옵션을 선택해주세요.");
-    if(!confirm("선택하신 옵션을 삭제하시겠습니까?")) return;
-    console.log(this.grid.getSelectedRows());
+ControlOption.prototype.Delete = async function() {
+
+    const afterSuccess = (data) => {
+        const { code, msg } = data;
+        if (code == 200) {
+            alert(msg);
+            this.afterCRUD(data);
+        } else alert(msg);
+    };
+
+    const rows = this.grid.getSelectedRows();
+    if (Array.isArray(rows) && !(rows.length > 0)) {
+        alert('삭제할 옵션을 선택해주세요.');
+        return false;
+    } else {
+        if (!confirm("선택하신 옵션을 삭제하시겠습니까?")) return false;
+        try {
+            const response = await axios({ url: `/head/product/prd01/${this.goods_no}/delete-basic-options`, 
+                method: 'post', data: { del_opt_list: rows } 
+            });
+            afterSuccess(response?.data);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    
 };
 
 let controlOption = new ControlOption();

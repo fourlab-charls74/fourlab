@@ -281,9 +281,6 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::get('prd01/{no}/in-qty', 'prd01Controller@show_in_qty');
         Route::get('prd01/{no}/options', 'prd01Controller@options');
         Route::get('prd01/{no}/goods-class', 'prd01Controller@goods_class');
-        Route::get('prd01/{no}/get-option-name', 'prd01Controller@get_option_name');
-        Route::post('prd01/get-option-stock', 'prd01Controller@get_option_stock');
-        Route::get("prd01/{no}/get-option", "prd01Controller@get_option");
         Route::get("prd01/{no}/get-similar-goods", "prd01Controller@get_similar_goods");
         Route::get("prd01/{no}/goods-cont", "prd01Controller@index_cont");
         Route::get("prd01/{no}/search/sale-place-cont", "prd01Controller@search_sale_place_cont");
@@ -305,9 +302,18 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
 
         Route::post("prd01/update", 'prd01Controller@update_selected');
 
+        Route::get('prd01/{no}/get-option-name', 'prd01Controller@get_option_name');
+        Route::post('prd01/get-option-stock', 'prd01Controller@get_option_stock');
         Route::post("prd01/{no}/option-kind-add", "prd01Controller@add_option_kind");
         Route::post("prd01/{no}/option-kind-del", "prd01Controller@del_option_kind");
-        Route::post("prd01/{no}/option-save", "prd01Controller@save_option");
+
+        Route::get("prd01/{no}/get-basic-options", "prd01Controller@getBasicOptions");
+        Route::post("prd01/{no}/save-basic-options", "prd01Controller@saveBasicOptions");
+        Route::post("prd01/{no}/delete-basic-options", "prd01Controller@deleteBasicOptions");
+
+        Route::post("prd01/{no}/update-basic-opts-data", "prd01Controller@updateBasicOptsData");
+        Route::post("prd01/{no}/update-extra-opts-data", "prd01Controller@updateExtraOptsData");
+
         Route::post("prd01/{no}/similar-goods-add", "prd01Controller@save_similar_goods");
 
         Route::delete("prd01/{no}/similar-goods-del", "prd01Controller@delete_similar_goods");

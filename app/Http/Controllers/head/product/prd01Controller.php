@@ -9,6 +9,7 @@ use App\Models\Conf;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Jaego;
+use App\Models\Option;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
@@ -1447,75 +1448,6 @@ class prd01Controller extends Controller
 		return response()->json([ "result" => $result ]);
 	}
 
-	// public function get_option_stock($no, Request $req) {
-	// 	//상품 옵션 정보
-	// 	//1. 단일옵션, 2. 다중옵션(2단)
-	// 	$option_field_arr	= array();
-	// 	$sql	= " select count(*) as tot from goods_option where goods_no = :goods_no and type = 'basic' ";
-	// 	$row	= DB::selectOne($sql,['goods_no' => $no]);
-	// 	$opt_kind_cnt	= $row->tot;
-
-	// 	$sql		= " select distinct substring_index(goods_opt,'^',1) as opt1, opt_price, opt_memo from goods_summary where goods_no = :goods_no and use_yn = 'Y' ";
-	// 	$opt1_list	= DB::select($sql, ['goods_no' => $no]);
-
-	// 	if( $opt_kind_cnt == 1 ){
-	// 		$opt2_list	= array();
-	// 	}else if( $opt_kind_cnt == 2 ){
-	// 		$sql	= " select distinct(substring_index(goods_opt,'^',-1)) as opt2 from goods_summary where goods_no = :goods_no and use_yn = 'Y' order by opt2 ";
-	// 		$opt2_list	= DB::select($sql,['goods_no' => $no]);
-	// 	}
-
-	// 	$sql		= " select goods_opt, good_qty, wqty from goods_summary where goods_no = :goods_no and use_yn = 'Y' ";
-	// 	$opt_list	= DB::select($sql, ['goods_no' => $no]);
-
-	// 	$data	= array();
-
-	// 	foreach($opt1_list as $row){
-
-	// 		$opt_array	= array();
-
-	// 		for( $i = 0; $i < count($opt2_list); $i++ ){
-
-	// 			if( $opt_kind_cnt == 1 )	$goods_opt	= $row->opt1;
-	// 			else						$goods_opt	= $row->opt1 . "^" . $opt2_list[$i]->opt2;
-
-	// 			$qty		= 0;
-	// 			$wqty		= 0;
-	
-	// 			for( $j = 0; $j < count($opt_list); $j++ )
-	// 			{
-	// 				if( $opt_list[$j]->goods_opt == $goods_opt){
-	// 					$qty	= $opt_list[$j]->good_qty;
-	// 					$wqty	= $opt_list[$j]->wqty;
-
-	// 					break;
-	// 				}
-	// 			}
-
-	// 			$opt_array	= array_merge($opt_array, array( $i . '__qty' => $qty));
-	// 			$opt_array	= array_merge($opt_array, array( $i . '__wqty' => $wqty));
-	// 			// $opt_array	= array_merge($opt_array, array($opt2_list['opt2'] . '__qty' => $qty));
-	// 			// $opt_array	= array_merge($opt_array, array($opt2_list['opt2'] . '__wqty' => $wqty));
-	// 		}
-
-	// 		$default_array	= array(
-	// 			'opt1'		=> $row->opt1,
-	// 			'opt_price'	=> $row->opt_price,
-	// 			'opt_memo'	=> $row->opt_memo
-	// 		);
-
-	// 		$data[]	= array_merge($opt_array, $default_array);
-	// 	}
-
-	// 	return response()->json([
-	// 		"code" => 200,
-	// 		"head" => array(
-	// 			"total" => count($data)
-	// 		),
-	// 		"body" => $data
-	// 	]);
-	// }
-
 	public function goods_class_update(Request $req) {
 
 		try {
@@ -2387,8 +2319,8 @@ class prd01Controller extends Controller
 		return response()->json(['code' => $code, 'msg' => $msg, 'data' => $this->_get($goods_no)], $code);
 	}
 
-	// 옵션관리창 옵션조회
-	public function get_option($goods_no) {
+	// 옵션관리창 옵션조회 ( 유형 - 기본 )
+	public function getBasicOptions($goods_no) {
 		$code = 200;
 		$opt_kinds = [];
 		$result = [];
@@ -2423,8 +2355,8 @@ class prd01Controller extends Controller
 		]);
 	}
 
-	// 옵션품목 저장
-	public function save_option(Request $request, $goods_no) {
+	// 옵션품목 저장 ( 유형 - 기본 )
+	public function saveBasicOptions(Request $request, $goods_no) {
 		$code = 200;
 		$msg = '';
 
@@ -2497,6 +2429,45 @@ class prd01Controller extends Controller
 		}
 
 		return response()->json(['code' => $code, 'msg' => $msg], $code);
+	}
+
+	// 옵션 품목 삭제 ( 유형 - 기본 )
+	public function deleteBasicOptions(Request $request, $goods_no)
+	{
+		$code = 200;
+		$msg = '';
+		$data = $request->input("del_opt_list", []);
+		try {
+			DB::beginTransaction();
+			for ( $i = 0; $i < count($data); $i++ ) {
+				$arr = $data[$i];
+				$opt_value = $arr["goods_opt"];
+				$sql = "
+					delete from goods_summary
+                	where goods_no = :goods_no and goods_opt like '%$opt_value%'
+				";
+				DB::delete($sql, ["goods_no" => $goods_no]);
+			}
+			DB::commit();
+			$msg = "삭제되었습니다.";
+		} catch (Exception $e) {
+			DB::rollBack();
+			$code = 500;
+			$msg = "삭제중 에러가 발생했습니다. 잠시 후 다시 시도해주세요.";
+		}
+		return response()->json(['code' => $code, 'msg' => $msg], $code);
+	}
+
+	public function updateBasicOptsData(Request $request, $goods_no)
+	{
+		$data = $request->input("data", []);
+		dd($data);
+	}
+
+	public function updateExtraOptsData(Request $request, $goods_no)
+	{
+		$data = $request->input("data", []);
+
 	}
 
 	/*

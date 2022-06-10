@@ -946,7 +946,7 @@
 												<h6 class="m-0 font-weight-bold"><span id="opt-type" class="text-primary"></span></h6>
 											</div>
 											<div class="fr_box">
-												<a href="#" class="btn btn-sm btn-primary shadow-sm option-add-btn"><span class="fs-12">추가</span></a>
+												<a href="#" class="btn btn-sm btn-primary shadow-sm option-add-btn"><span class="fs-12">관리</span></a>
 												<a href="#" class="btn btn-sm btn-primary shadow-sm option-del-btn"><span class="fs-12">삭제</span></a>
 												<a href="#" class="btn btn-sm btn-primary shadow-sm option-sav-btn"><span class="fs-12">저장</span></a>
 												<a href="#" class="btn btn-sm btn-primary shadow-sm option-inv-btn"><span class="fs-12">입고</span></a>
@@ -2380,7 +2380,7 @@
 	<script language="javascript">
 
     /**
-     * ----------------------------------------------------------------------------------------------- 상품 옵션 시작 
+     * -------------------------------------------------------- 상품 옵션 시작
      */
     let gx1;
     let gx2;
@@ -2426,16 +2426,14 @@
      */
     const basic_option_stock_columns = [
         {field:"opt1_name", headerName:"{{@$opt_kind_list[0]->name}}", width:100, cellStyle: CELL_COLOR.LOCKED, cellClass: "locked-cell", checkboxSelection: true, pinned: "left"},
-        {field:"opt_price",headerName:"옵션가격", width:70,type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW},
+        {field:"opt_price", headerName:"옵션가격", width:70, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW},
         @if($type != 'create' && count(@$opt_kind_list) > 1)
         {
             field: "{{ @$opt_kind_list[1]->name }}",
             headerName: "{{ @$opt_kind_list[1]->name }}",
-            checkboxSelection: true,
             children: [
                 @if (count(@$opt['opt2']) > 0)
                     @foreach (@$opt['opt2'] as $i => $op)
-
                     {headerName: "{{ $op->opt_nm }}",
                         children: [
                             {headerName: "온라인재고", field: "{{ $op->opt_nm }}_good_qty" ,type: 'numberType', width: 70, editable: true, cellStyle: CELL_COLOR.YELLOW},
@@ -2450,7 +2448,7 @@
             ]
         },
         @endif
-        {field:"opt_memo",headerName:"옵션메모", width:90, cellStyle:{"text-align":"center"}, editable: true, cellStyle: CELL_COLOR.YELLOW}
+        {field:"opt_memo", headerName:"옵션메모", width:90, cellStyle:{"text-align":"center"}, editable: true, cellStyle: CELL_COLOR.YELLOW}
     ];
 
     const extra_option_stock_columns = [
@@ -2486,7 +2484,6 @@
             const data = `goods_no=${goods_no}&goods_sub=${goods_sub}`;
             gx1.Request(`/head/product/prd01/${goods_no}/get-option-name`, data, -1, (response) => {
                 const { code, body } = response;
-                console.log(response);
                 if (code == 200 && body.length > 0) {
                     const first_row = body[0];
                     getOptionStock(first_row);
@@ -2499,10 +2496,12 @@
         if (type == "기본") {
             columns = Object.keys(columns).length > 0 ? columns : basic_option_stock_columns;
             $("#opt-type").html("기본옵션");
+            $(".option-add-btn").html("관리");
             $(".option-inv-btn").show();
         } else if (type == "추가") {
             columns = Object.keys(columns).length > 0 ? columns : extra_option_stock_columns;
             $("#opt-type").html("추가옵션");
+            $(".option-add-btn").html("추가");
             $(".option-inv-btn").hide();
             gx2.setRows([]);
         }
@@ -2529,6 +2528,8 @@
     };
 
     const setRightOptRows = (type, { result }) => {
+
+        console.log(result);
 
         if (type == "기본") {
 
@@ -2671,25 +2672,58 @@
     */
     $(".option-add-btn").on("click", function(e) {
         e.preventDefault();
-        controlOption.Open(goods_no, async (response) => {
-            const { code, msg } = response;
-            if (code == 200) {
-                alert(msg);
-                $('#ControlOptionModal .close').click();
-                getOptionStock(last_option_row);
-            } else {
-                alert(msg);
+        controlOption.Open(goods_no, 
+            /**
+             * afterGridLoaded
+             */
+            () => { console.log("test"); getOptionStock(last_option_row); },
+            /**
+             * afterCRUD
+             */
+            async (response) => {
+                $('#ControlOptionModal .close').trigger('click');
+                $("#div-gd-option").html("");
+                document.control_option.reset();
+                controlOption.SetGrid("#div-gd-option");
             }
-        });
-    })
+        );
+    });
 
     $(".option-del-btn").on("click", function(e) {
         e.preventDefault();
-        // 옵션 삭제 작업필요
-    })
+        controlOption.Delete();
+    });
 
     /**
-     * ----------------------------------------------------------------------------------------------- 상품 옵션 끝
+     * 상품 옵션 관련 재고 및 메모, 가격 일괄 수정
+     */
+	$('.option-sav-btn').click(function(e){
+		e.preventDefault();
+        const type = last_option_row?.type;
+        const rows = gx2.getRows();
+        if (type == "기본") {
+            updateBasicOptsData(rows);
+        } else if (type =="추가") {
+            updateExtraOptsData(rows);
+        }
+	});
+
+    const updateBasicOptsData = async (rows) => {
+        // goods_summary
+        const response = await axios({ url: `/head/product/prd01/${goods_no}/update-basic-opts-data`, 
+            method: 'post', data: { data: rows } 
+        });
+    };
+
+    const updateExtraOptsData = async (rows) => {
+        // options where option_no = (goods_option에 들어있는 option_no)
+        const response = await axios({ url: `/head/product/prd01/${goods_no}/update-extra-opts-data`, 
+            method: 'post', data: { data: rows } 
+        });
+    };
+
+    /**
+     * -------------------------------------------------------- 상품 옵션 끝
      */
 
 
@@ -3119,23 +3153,6 @@
         });
 
     }
-
-	//선택한 항목 상태변경
-	$('.option-sav-btn').click(function(e){
-		e.preventDefault();
-
-		const selectedRowData	= gx2.gridOptions.api.getSelectedRows();
-		const selectRowCount	= selectedRowData.length;
-
-		if( selectRowCount == 0 ) {
-			alert('수정할 옵션을 선택해주세요.');
-			return;
-		}
-
-		// console.log(opt2);
-		// console.log(selectedRowData);
-
-	});
 
 	</script>
 
