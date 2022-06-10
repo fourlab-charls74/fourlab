@@ -282,7 +282,7 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::get('prd01/{no}/options', 'prd01Controller@options');
         Route::get('prd01/{no}/goods-class', 'prd01Controller@goods_class');
         Route::get('prd01/{no}/get-option-name', 'prd01Controller@get_option_name');
-        Route::get('prd01/{no}/get-option-stock', 'prd01Controller@get_option_stock');
+        Route::post('prd01/get-option-stock', 'prd01Controller@get_option_stock');
         Route::get("prd01/{no}/get-option", "prd01Controller@get_option");
         Route::get("prd01/{no}/get-similar-goods", "prd01Controller@get_similar_goods");
         Route::get("prd01/{no}/goods-cont", "prd01Controller@index_cont");

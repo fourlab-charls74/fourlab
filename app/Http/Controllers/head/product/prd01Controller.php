@@ -1022,6 +1022,7 @@ class prd01Controller extends Controller
                                         left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and a.goods_type = type.code_id
 				where a.goods_no = :goods_no
             ";
+
         $goods_info = DB::selectone($query,array("goods_no" => $goods_no));
 
         // 총 재고 합계
@@ -1427,74 +1428,91 @@ class prd01Controller extends Controller
 		]);
 	}
 
-	public function get_option_stock($no, Request $req) {
-		//상품 옵션 정보
-		//1. 단일옵션, 2. 다중옵션(2단)
-		$option_field_arr	= array();
-		$sql	= " select count(*) as tot from goods_option where goods_no = :goods_no and type = 'basic' ";
-		$row	= DB::selectOne($sql,['goods_no' => $no]);
-		$opt_kind_cnt	= $row->tot;
+	public function get_option_stock(Request $request) 
+	{
+		$type = $request->input("data.type", "기본");
+		$goods_no = $request->input("data.goods_no");
+		$option_no = $request->input("data.no");
 
-		$sql		= " select distinct substring_index(goods_opt,'^',1) as opt1, opt_price, opt_memo from goods_summary where goods_no = :goods_no and use_yn = 'Y' ";
-		$opt1_list	= DB::select($sql, ['goods_no' => $no]);
+		if ($type == "기본") {
+			$sql = "select * from goods_summary where `goods_no` = :goods_no order by seq";
+			$result = DB::select($sql, ['goods_no' => $goods_no]);
+		} else if ($type == "추가") {
+			$sql = "select * from `options` where `option_no` = :option_no order by seq";
+			$result = DB::select($sql, ['option_no' => $option_no]);
+		};
 
-		if( $opt_kind_cnt == 1 ){
-			$opt2_list	= array();
-		}else if( $opt_kind_cnt == 2 ){
-			$sql	= " select distinct(substring_index(goods_opt,'^',-1)) as opt2 from goods_summary where goods_no = :goods_no and use_yn = 'Y' order by opt2 ";
-			$opt2_list	= DB::select($sql,['goods_no' => $no]);
-		}
-
-		$sql		= " select goods_opt, good_qty, wqty from goods_summary where goods_no = :goods_no and use_yn = 'Y' ";
-		$opt_list	= DB::select($sql, ['goods_no' => $no]);
-
-		$data	= array();
-
-		foreach($opt1_list as $row){
-
-			$opt_array	= array();
-
-			for( $i = 0; $i < count($opt2_list); $i++ ){
-
-				if( $opt_kind_cnt == 1 )	$goods_opt	= $row->opt1;
-				else						$goods_opt	= $row->opt1 . "^" . $opt2_list[$i]->opt2;
-
-				$qty		= 0;
-				$wqty		= 0;
-	
-				for( $j = 0; $j < count($opt_list); $j++ )
-				{
-					if( $opt_list[$j]->goods_opt == $goods_opt){
-						$qty	= $opt_list[$j]->good_qty;
-						$wqty	= $opt_list[$j]->wqty;
-
-						break;
-					}
-				}
-
-				$opt_array	= array_merge($opt_array, array( $i . '__qty' => $qty));
-				$opt_array	= array_merge($opt_array, array( $i . '__wqty' => $wqty));
-				// $opt_array	= array_merge($opt_array, array($opt2_list['opt2'] . '__qty' => $qty));
-				// $opt_array	= array_merge($opt_array, array($opt2_list['opt2'] . '__wqty' => $wqty));
-			}
-
-			$default_array	= array(
-				'opt1'		=> $row->opt1,
-				'opt_price'	=> $row->opt_price,
-				'opt_memo'	=> $row->opt_memo
-			);
-
-			$data[]	= array_merge($opt_array, $default_array);
-		}
-
-		return response()->json([
-			"code" => 200,
-			"head" => array(
-				"total" => count($data)
-			),
-			"body" => $data
-		]);
+		return response()->json([ "result" => $result ]);
 	}
+
+	// public function get_option_stock($no, Request $req) {
+	// 	//상품 옵션 정보
+	// 	//1. 단일옵션, 2. 다중옵션(2단)
+	// 	$option_field_arr	= array();
+	// 	$sql	= " select count(*) as tot from goods_option where goods_no = :goods_no and type = 'basic' ";
+	// 	$row	= DB::selectOne($sql,['goods_no' => $no]);
+	// 	$opt_kind_cnt	= $row->tot;
+
+	// 	$sql		= " select distinct substring_index(goods_opt,'^',1) as opt1, opt_price, opt_memo from goods_summary where goods_no = :goods_no and use_yn = 'Y' ";
+	// 	$opt1_list	= DB::select($sql, ['goods_no' => $no]);
+
+	// 	if( $opt_kind_cnt == 1 ){
+	// 		$opt2_list	= array();
+	// 	}else if( $opt_kind_cnt == 2 ){
+	// 		$sql	= " select distinct(substring_index(goods_opt,'^',-1)) as opt2 from goods_summary where goods_no = :goods_no and use_yn = 'Y' order by opt2 ";
+	// 		$opt2_list	= DB::select($sql,['goods_no' => $no]);
+	// 	}
+
+	// 	$sql		= " select goods_opt, good_qty, wqty from goods_summary where goods_no = :goods_no and use_yn = 'Y' ";
+	// 	$opt_list	= DB::select($sql, ['goods_no' => $no]);
+
+	// 	$data	= array();
+
+	// 	foreach($opt1_list as $row){
+
+	// 		$opt_array	= array();
+
+	// 		for( $i = 0; $i < count($opt2_list); $i++ ){
+
+	// 			if( $opt_kind_cnt == 1 )	$goods_opt	= $row->opt1;
+	// 			else						$goods_opt	= $row->opt1 . "^" . $opt2_list[$i]->opt2;
+
+	// 			$qty		= 0;
+	// 			$wqty		= 0;
+	
+	// 			for( $j = 0; $j < count($opt_list); $j++ )
+	// 			{
+	// 				if( $opt_list[$j]->goods_opt == $goods_opt){
+	// 					$qty	= $opt_list[$j]->good_qty;
+	// 					$wqty	= $opt_list[$j]->wqty;
+
+	// 					break;
+	// 				}
+	// 			}
+
+	// 			$opt_array	= array_merge($opt_array, array( $i . '__qty' => $qty));
+	// 			$opt_array	= array_merge($opt_array, array( $i . '__wqty' => $wqty));
+	// 			// $opt_array	= array_merge($opt_array, array($opt2_list['opt2'] . '__qty' => $qty));
+	// 			// $opt_array	= array_merge($opt_array, array($opt2_list['opt2'] . '__wqty' => $wqty));
+	// 		}
+
+	// 		$default_array	= array(
+	// 			'opt1'		=> $row->opt1,
+	// 			'opt_price'	=> $row->opt_price,
+	// 			'opt_memo'	=> $row->opt_memo
+	// 		);
+
+	// 		$data[]	= array_merge($opt_array, $default_array);
+	// 	}
+
+	// 	return response()->json([
+	// 		"code" => 200,
+	// 		"head" => array(
+	// 			"total" => count($data)
+	// 		),
+	// 		"body" => $data
+	// 	]);
+	// }
 
 	public function goods_class_update(Request $req) {
 
@@ -2404,41 +2422,74 @@ class prd01Controller extends Controller
 	}
 
 	// 옵션품목 저장
-	public function save_option(Request $req, $goods_no) {
+	public function save_option(Request $request, $goods_no) {
 		$code = 200;
 		$msg = '';
 
-		$goods_sub = $req->input('goods_sub');
-		$opt_list = $req->input('opt_list');
+		$collection = collect($request->input("opt_list", []));
+		$grouped = $collection->mapToGroups(function($item, $key) {
+			return [$item['opt_name'] => $item['goods_opt']];
+		});
+		
+		$keys = $grouped->keys()->all();
+		$opt_name = $keys[0] . "^" . $keys[1];
+
+		$sql = "select count(*) as count from goods_summary where `goods_no` = :goods_no and `opt_name` = :opt_name order by seq limit 1";
+		$result = DB::selectOne($sql, ['goods_no' => $goods_no, 'opt_name' => $opt_name]);
+
+		if (!($result->count > 0)) {
+			$grouped = $grouped->reverse();
+			$opt_name = $keys[1] . "^" . $keys[0];
+		}
+
+		$arr = $grouped->map(function($item) {
+			$arr = $item->all();
+			return $arr;
+		})->values()->all();
+
+		$opt1 = $arr[0];
+		$opt2 = $arr[1];
+
+		$goods_opts = [];
+		foreach ($opt1 as $opt1_val) {
+			foreach ($opt2 as $opt2_val) {
+				array_push($goods_opts, $opt1_val . "^" . $opt2_val);
+			}
+		}
 
 		try {
 			DB::beginTransaction();
-			
-			// 새로운 상품 등록
-			foreach($opt_list as $opt) {
-				if($opt['goods_no'] === NULL) {
 
-					$sql = "
-						insert into goods_summary (
-							goods_no, goods_sub, opt_name, goods_opt, opt_price, 
-							good_qty, wqty, soldout_yn, use_yn, seq, rt, ut, bad_qty, last_date
-						) values (
-							:goods_no, :goods_sub, :opt_name, :goods_opt, '0',
-							'0', '0', 'N', 'Y', ??????, now(), now(), '0', now()
-						)
+			for ($i=0; $i<count($goods_opts); $i++) {
+
+				$goods_opt = $goods_opts[$i];
+
+				$sql = "select count(*) as count from goods_summary where `goods_no` = :goods_no and `goods_opt` = :goods_opt order by seq";
+				$result = DB::selectOne($sql, ['goods_no' => $goods_no, 'goods_opt' => $goods_opt]);
+
+				if (!($result->count > 0)) {
+					$sql = " 
+						insert into goods_summary 
+							(goods_no, goods_sub, opt_name, goods_opt, opt_price, soldout_yn, use_yn, good_qty, wqty, bad_qty, rt, ut, last_date) 
+						values (:goods_no, :goods_sub, :opt_name, :goods_opt, 0, 'N', 'Y', 0, 0, 0, NOW(), NOW(), DATE_FORMAT(NOW(),'%Y-%m-%d'))
 					";
-
-					DB::insert($sql, ['goods_no' => $goods_no, 'goods_sub' => $goods_sub, 'opt_name' => "?????", 'goods_opt' => "?????"]);
+					DB::insert($sql, ['goods_no' => $goods_no, 'goods_sub' => 0, 'goods_opt' => $goods_opt, 'opt_name' => $opt_name]);
 				}
+
+				$sql = "
+					update goods_summary set
+						seq = $i
+					where goods_no = '$goods_no'
+						and goods_sub = '0'
+						and goods_opt = '$goods_opt'
+					";
+				DB::update($sql);
 			}
-
-			// 기존 상품 수정
-
-
+					
 			DB::commit();
 			$msg = "저장되었습니다.";
-		} catch(Exception $e){
-			DB::rollback();
+		} catch (Exception $e) {
+			DB::rollBack();
 			$code = 500;
 			$msg = "저장중 에러가 발생했습니다. 잠시 후 다시 시도해주세요.";
 		}

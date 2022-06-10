@@ -932,7 +932,7 @@ function ControlOption() {
 
 ControlOption.prototype.Open = function(goods_no = 0, callback = null) {
     this.goods_no = goods_no;
-    this.callback = callback;
+    this.callback = callback; // 옵션 저장 이후 콜백으로 사용
 
     if(this.grid === null){
         this.SetGrid("#div-gd-option");
@@ -941,6 +941,12 @@ ControlOption.prototype.Open = function(goods_no = 0, callback = null) {
 
     $('#ControlOptionModal').modal({
         keyboard: false
+    });
+    
+    $('#ControlOptionModal').on('hidden.bs.modal', () => { // modal close시 init
+        $("#div-gd-option").html("");
+        document.control_option.reset();
+        this.SetGrid("#div-gd-option");
     });
 };
 
@@ -986,6 +992,10 @@ ControlOption.prototype.Add = function(e) {
 ControlOption.prototype.Save = function() {
     if(!confirm("옵션 정보를 저장하시겠습니까?")) return;
 
+    const afterSuccess = (response) => {
+        this.callback(response);
+    };
+
     $.ajax({
         async: true,
         type: 'post',
@@ -994,11 +1004,7 @@ ControlOption.prototype.Save = function() {
             'opt_list': this.grid.getRows(),
         },
         success: function (res) {
-            if(res.code === 200) {
-                // 작업필요
-                console.log(res);
-            }
-            else alert(res.msg);
+            afterSuccess(res);
         },
         error: function(request, status, error) {
             console.log(request, status, error)

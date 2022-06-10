@@ -46,6 +46,29 @@
         height: 320%;
     }
 
+    /* 옵션 컬럼 셀 잠금 */
+    .locked-cell.ag-cell:focus{  border:none !important;  outline: none; border-right: 1px solid #bdc3c7 !important }
+    .locked-cell.ag-cell.ag-cell-range-selected:not(.ag-cell-range-single-cell).ag-cell-range-left {
+        border-left-color: transparent;
+    }
+    .locked-cell.ag-cell.ag-cell-range-selected:not(.ag-cell-range-single-cell).ag-cell-range-top {
+        border-top-color: transparent;
+    }
+    .locked-cell.ag-cell.ag-cell-range-selected:not(.ag-cell-range-single-cell).ag-cell-range-right {
+        border-right-color: transparent;
+    }
+    .locked-cell.ag-cell.ag-cell-range-selected:not(.ag-cell-range-single-cell).ag-cell-range-bottom {
+        border-bottom-color: transparent;
+    }
+
+    .ag-theme-balham .ag-ltr .locked-cell.ag-cell-range-single-cell, 
+    .ag-theme-balham .ag-ltr .locked-cell.ag-cell-range-single-cell.ag-cell-range-handle, 
+    .ag-theme-balham .ag-ltr .ag-has-focus .locked-cell.ag-cell-focus:not(.ag-cell-range-selected), 
+    .ag-theme-balham .ag-rtl .ag-cell-range-single-cell, .ag-theme-balham .ag-rtl .locked-cell.ag-cell-range-single-cell.ag-cell-range-handle, 
+    .ag-theme-balham .ag-rtl .ag-has-focus .locked-cell.ag-cell-focus:not(.ag-cell-range-selected) {
+        border: 1px solid transparent;
+    }
+
 </style>
 
     <script type="text/javascript" src="/handle/editor/editor.js"></script>
@@ -909,7 +932,7 @@
 										</div>
 									</div>
 									<div class="table-responsive">
-										<div id="div-gd-optkind" style="height:200px;" class="ag-theme-balham"></div>
+										<div id="div-gd-optkind" style="height:277px;" class="ag-theme-balham"></div>
 									</div>
 								</div>
 
@@ -931,7 +954,7 @@
 										</div>
 									</div>
 									<div class="table-responsive basic-option">
-										<div id="div-gd-opt" style="height:200px;" class="ag-theme-balham"></div>
+										<div id="div-gd-opt" style="height:277px;" class="ag-theme-balham"></div>
 									</div>
 								</div>
 
@@ -2328,11 +2351,17 @@
 
 
 	<script language="javascript">
+
+    /**
+     * ----------------------------------------------------------------------------------------------- 상품 옵션 시작 
+     */
     let gx1;
     let gx2;
-	
-	let opt1	= [];
-	let opt2	= [];
+    
+    let opt1 = [];
+	let opt2 = [];
+
+    let last_option_row = {};
 
 	@if (count(@$opt['opt2']) > 0)
 		@foreach (@$opt['opt2'] as $i => $op)
@@ -2343,98 +2372,299 @@
 
 		@endforeach
 	@endif
-
-
-
-	//상품 옵션 종류
-	if( $('#div-gd-optkind').length > 0 ){
-		var columns_optkind = [
-			{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
-			{field:"type",headerName:"유형", width:70, cellStyle:{"text-align":"center"} },
-			{field:"name",headerName:"옵션구분", width:75 },
-			{field:"required_yn",headerName:"필수", width:70, cellStyle:{"text-align":"center"} },
-			{field:"use_yn",headerName:"사용", width:70, cellStyle:{"text-align":"center"}},
-			{field:"no",headerName:"no", hide:true},
-		];
-
-		const pApp1 = new App('',{
-			gridId:"#div-gd-optkind",
-		});
-
-		$(document).ready(function() {
-			let gridDiv = document.querySelector(pApp1.options.gridId);
-			gx1 = new HDGrid(gridDiv, columns_optkind);
-
-			Search_optkind();
-
-		});
-
-		function Search_optkind() {
-            if(goods_no) {
-                const data = `goods_no=${goods_no}&goods_sub=${goods_sub}`;
-                gx1.Request(`/head/product/prd01/${goods_no}/get-option-name`, data, -1);
+    
+    const CELL_COLOR = {
+        LOCKED: {'background' : '#f5f7f7'},
+        YELLOW : {'background' : '#ffff99'},
+    };
+    
+    /**
+     * 옵션 좌측 그리드 컬럼 정의
+     */
+    const option_kind_columns = [
+        { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 30, pinned: 'left', sort: null },
+        { field: "type",headerName: "유형", width:50, cellStyle: {"text-align":"center"} },
+        { field: "name",headerName: "옵션구분", width:"auto", cellStyle: {"text-align":"center"},
+            cellRenderer: (params) => {
+                return "<a href='javascript:void(0)' onclick='getOptionStock("+JSON.stringify(params.data)+")'>" + params.value +"</a>";
             }
-		}
-	}
+        },
+        { field:"required_yn", headerName:"필수", width:70, cellStyle:{"text-align":"center"} },
+        { field:"use_yn", headerName:"사용", width:70, cellStyle:{"text-align":"center"} },
+        { field:"no", headerName:"no", hide:true }
+    ];
 
-	//상품 옵션 재고
-	if( $('#div-gd-opt').length > 0 ){
-        var columns_opt = [
-			{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 30, sort: null},
-			{field:"opt1",headerName: "{{ @$opt_kind_list[0]->name }}", width:120 },
-			{field:"opt_price",headerName:"옵션가", width:70,type: 'numberType', editable: true, cellStyle: {'background' : '#ffff99'}},
-            
-            @if($type != 'create' && count(@$opt_kind_list) > 1)
-			{
-                headerName: "{{ @$opt_kind_list[1]->name }}",
-                children: [
-                    @if (count(@$opt['opt2']) > 0)
-                        @foreach (@$opt['opt2'] as $i => $op)
+    /**
+     * 옵션 우측 그리드 컬럼 정의
+     */
+    const basic_option_stock_columns = [
+        {field:"opt1_name", headerName:"{{@$opt_kind_list[0]->name}}", width:100, cellStyle: CELL_COLOR.LOCKED, cellClass: "locked-cell", checkboxSelection: true, pinned: "left"},
+        {field:"opt_price",headerName:"옵션가격", width:70,type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW},
+        @if($type != 'create' && count(@$opt_kind_list) > 1)
+        {
+            field: "{{ @$opt_kind_list[1]->name }}",
+            headerName: "{{ @$opt_kind_list[1]->name }}",
+            checkboxSelection: true,
+            children: [
+                @if (count(@$opt['opt2']) > 0)
+                    @foreach (@$opt['opt2'] as $i => $op)
 
-                        {headerName: "{{ $op->opt_nm }}",
-                            children: [
-                                {headerName: "온라인재고", field: "{{ $i }}__qty" ,type: 'numberType', width: 70, editable: true, cellStyle: {'background' : '#ffff99'}},
-                                {headerName: "보유재고", field: "{{ $i }}__wqty",type: 'numberType', width: 58},
-                            ]
-                        },
-						@php $i++; @endphp
-                        @endforeach
-                    @else
-                    {headerName: '', width: 150},
-                    @endif
-                ]
-			},
-            @else
-            {headerName: "온라인재고", field: "{{ @$i }}__qty",type: 'numberType', width: 100, editable: true, cellStyle: {'background' : '#ffff99'}},
-            {headerName: "보유재고", field: "{{ @$i }}__wqty",type: 'numberType', width: 100},
-            @endif
+                    {headerName: "{{ $op->opt_nm }}",
+                        children: [
+                            {headerName: "온라인재고", field: "{{ $op->opt_nm }}_good_qty" ,type: 'numberType', width: 70, editable: true, cellStyle: CELL_COLOR.YELLOW},
+                            {headerName: "보유재고", field: "{{ $op->opt_nm }}_wqty",type: 'numberType', width: 58},
+                        ]
+                    },
+                    @php $i++; @endphp
+                    @endforeach
+                @else
+                {headerName: '', width: 150},
+                @endif
+            ]
+        },
+        @endif
+        {field:"opt_memo",headerName:"옵션메모", width:90, cellStyle:{"text-align":"center"}, editable: true, cellStyle: CELL_COLOR.YELLOW}
+    ];
 
-			{field:"opt_memo",headerName:"옵션메모", width:90, cellStyle:{"text-align":"center"}, editable: true, cellStyle: {'background' : '#ffff99'}},
-		];
+    const extra_option_stock_columns = [
+        { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 30, pinned: 'left', sort: null },
+        { field: "opt_name", headerName: "옵션명", width:100, type: 'numberType'},
+        { field: "", headerName: "옵션", width:"auto", type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW },
+        { field: "", headerName: "온라인재고", width:80, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW },
+        { field: "", headerName: "보유재고", width:80, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW },
+        { field: "", headerName: "추가금액", width:80, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW },
+        { field: "soldout_yn", headerName: "품절여부", width:80, editable: true, cellStyle: CELL_COLOR.YELLOW }
+    ];
+    
+    /**
+     * DOM 로딩 이후 옵션 관련 그리드 생성 및 초기화
+     */
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const pApp1 = new App('', { gridId:"#div-gd-optkind" });
+        let gridDiv = document.querySelector(pApp1.options.gridId);
+        gx1 = new HDGrid(gridDiv, option_kind_columns);
 
-		const pApp2 = new App('',{
-			gridId:"#div-gd-opt",
-		});
+        const pApp2 = new App('', { gridId:"#div-gd-opt" });
+        gridDiv = document.querySelector(pApp2.options.gridId);
+        gx2 = new HDGrid(gridDiv, extra_option_stock_columns);
 
-		$(document).ready(function() {
-			let gridDiv = document.querySelector(pApp2.options.gridId);
-			gx2 = new HDGrid(gridDiv, columns_opt);
+        searchOptKind();
+    });
 
-			Search_opt();
-
-		});
-
-	}
-
-    function Search_opt() {
-        let opt_type = "basic"; // 수정필요
-        if(goods_no) {
-            const data = `goods_no=${goods_no}&goods_sub=${goods_sub}&opt_type=${opt_type}`;
-            gx2.Request(`/head/product/prd01/${goods_no}/get-option-stock`, data, -1, function(params) {
-                $("#opt-type").text(opt_type === "basic" ? "기본옵션" : "추가옵션");
+    /**
+     * 상품 옵션 로직
+     */
+    const searchOptKind = () => { // 좌측 옵션 그리드 초기화
+        if (goods_no) {
+            const data = `goods_no=${goods_no}&goods_sub=${goods_sub}`;
+            gx1.Request(`/head/product/prd01/${goods_no}/get-option-name`, data, -1, (response) => {
+                const { code, body } = response;
+                console.log(response);
+                if (code == 200 && body.length > 0) {
+                    const first_row = body[0];
+                    getOptionStock(first_row);
+                }
             });
         }
+    };
+
+    const initRightOptSection = (type = "기본", columns = []) => {
+        if (type == "기본") {
+            columns = Object.keys(columns).length > 0 ? columns : basic_option_stock_columns;
+            $("#opt-type").html("기본옵션");
+            $(".option-inv-btn").show();
+        } else if (type == "추가") {
+            columns = Object.keys(columns).length > 0 ? columns : extra_option_stock_columns;
+            $("#opt-type").html("추가옵션");
+            $(".option-inv-btn").hide();
+            gx2.setRows([]);
+        }
+        gx2.gridOptions.api.setColumnDefs(columns);
+    };
+
+    const getOptionStock = async (row) => {
+        const type = row?.type;
+        initRightOptSection(type);
+
+        const GOODS_NO = '{{$goods_no}}';
+        row.goods_no = GOODS_NO;
+
+        try {
+            const response = await axios({ url: `/head/product/prd01/get-option-stock`, method: 'post', data: { data: row, type: type } });
+            const { data, status } = response;
+            if (status == 200) {
+                last_option_row = row;
+                setRightOptRows(type, data);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const setRightOptRows = (type, { result }) => {
+
+        if (type == "기본") {
+
+            let list = [];
+            result.reduce((prev, item) => {
+
+                let { idx, opt1_name } = prev;
+                const { goods_no, goods_opt, opt_name, opt_memo, opt_price, good_qty, wqty } = item;
+                const basic_opts = goods_opt.split('^');
+                const opt_names = opt_name.split('^');
+
+                if (opt1_name != basic_opts[0]) idx++;
+
+                opt1_name = basic_opts[0];
+                const opt2_name = basic_opts[1];
+
+                list[idx] = { opt1_name: opt1_name, opt_memo: opt_memo, opt_price: opt_price, ...list[idx] };
+                list[idx][`${opt2_name}_good_qty`] = good_qty;
+                list[idx][`${opt2_name}_wqty`] = wqty;
+
+                return {idx: idx, opt1_name: opt1_name};
+                
+            }, {idx: 0, opt1_name: ""});
+
+            list.shift();
+
+            gx2.setRows(list);
+            
+        } else if (type == "추가") {
+
+            gx2.setRows([{opt_name: ""}]);
+
+        }
+    };
+
+    
+    /*
+    ***
+    상품 옵션명 관리 관련
+    ***
+    */ 
+
+    $(".option-kind-add-btn").on("click", function(e) {
+        e.preventDefault();
+        $("#option_add").css("display", "block");
+    })
+    $(".option-kind-del-btn").on("click", function(e) {
+        e.preventDefault();
+        delOptionKind();
+    })
+    $(".option-kind-add-cancel-btn").on("click", function() {resetAddOptionKindBox()});
+
+    function resetAddOptionKindBox() {
+        $("#option_add").css("display", "none");
+        $("#opt_type_nm").val("");
     }
+
+    function addOptionKind() {
+        if($("[name='opt_type']").val() === 'basic' && gx1.getRows().filter(item => item.type === '기본').length >= 2) return alert("기본옵션은 최대 2개까지 설정 가능합니다.");
+        if($("[name='opt_type_nm']").val() === '') return alert("옵션구분값을 입력해주세요.");
+
+        $.ajax({
+            async: true,
+            type: 'post',
+            url: `/head/product/prd01/${goods_no}/option-kind-add`,
+            data: $("#f1").serialize(),
+            success: function (res) {
+                if(res.code === 200) {
+                    resetAddOptionKindBox();
+                    searchOptKind();
+                } else alert(res.msg);
+            },
+            error: function(request, status, error) {
+                console.log(request, status, error)
+            }
+        });
+    }
+
+    // 옵션구분 삭제
+    function delOptionKind() {
+        let selected_list = gx1.getSelectedRows();
+
+        if(selected_list.length < 1) return alert("삭제하실 옵션구분을 선택하십시오.");
+        if(!confirm("옵션구분을 삭제하게 되면, 해당 옵션구분으로 등록된 모든 옵션이 삭제됩니다. 정말 삭제하시곘습니까?")) return;
+
+        $.ajax({
+            async: true,
+            type: 'post',
+            url: `/head/product/prd01/${goods_no}/option-kind-del`,
+            data: {
+                'del_id_list': selected_list.map(s => s.no).join(","),
+                'goods_sub': goods_sub,
+                'goods_type': $('#goods_type').val(),
+            },
+            success: function (res) {
+                if(res.code === 200) {
+                    searchOptKind();
+                }
+                else alert(res.msg);
+            },
+            error: function(request, status, error) {
+                console.log(request, status, error)
+            }
+        });
+    }
+
+    // 옵션 사용여부 변경 시 기존 옵션정보 및 재고정보 모두 삭제
+    function delOptionAll() {
+        let rows = gx1.getRows();
+        let is_option_use = $("[name=is_option_use]:checked").val();
+
+        $.ajax({
+            async: true,
+            type: 'post',
+            url: `/head/product/prd01/${goods_no}/option-kind-del`,
+            data: {
+                'del_id_list': rows.map(s => s.no).join(","),
+                'goods_sub': goods_sub,
+                'goods_type': $('#goods_type').val(),
+                'is_option_use': is_option_use
+            },
+            success: function (res) {
+                if(res.code === 200) {
+                    location.reload();
+                    // searchOptKind();
+                    // 
+                }
+                else alert(res.msg);
+            },
+            error: function(request, status, error) {
+                console.log(request, status, error)
+            }
+        });
+    }
+
+    /*
+    ***
+    상품 옵션 품목 관리 관련
+    ***
+    */
+    $(".option-add-btn").on("click", function(e) {
+        e.preventDefault();
+        controlOption.Open(goods_no, async (response) => {
+            const { code, msg } = response;
+            if (code == 200) {
+                alert(msg);
+                $('#ControlOptionModal .close').click();
+                getOptionStock(last_option_row);
+            } else {
+                alert(msg);
+            }
+        });
+    })
+
+    $(".option-del-btn").on("click", function(e) {
+        e.preventDefault();
+        // 옵션 삭제 작업필요
+    })
+
+    /**
+     * ----------------------------------------------------------------------------------------------- 상품 옵션 끝
+     */
+
 
     // 해당 상품의 기획전 포함 정보 삭제
     function deletePlanning(d_cat_cd){
@@ -2484,167 +2714,6 @@
                 console.log(request.responseJSON);
             }
         });
-    }
-
-    /*
-    ***
-    상품 옵션명 관리 관련
-    ***
-    */ 
-
-    $(".option-kind-add-btn").on("click", function(e) {
-        e.preventDefault();
-        $("#option_add").css("display", "block");
-    })
-    $(".option-kind-del-btn").on("click", function(e) {
-        e.preventDefault();
-        delOptionKind();
-    })
-    $(".option-kind-add-cancel-btn").on("click", function() {resetAddOptionKindBox()});
-
-    function resetAddOptionKindBox() {
-        $("#option_add").css("display", "none");
-        $("#opt_type_nm").val("");
-    }
-
-    function addOptionKind() {
-        if($("[name='opt_type']").val() === 'basic' && gx1.getRows().filter(item => item.type === '기본').length >= 2) return alert("기본옵션은 최대 2개까지 설정 가능합니다.");
-        if($("[name='opt_type_nm']").val() === '') return alert("옵션구분값을 입력해주세요.");
-
-        $.ajax({
-            async: true,
-            type: 'post',
-            url: `/head/product/prd01/${goods_no}/option-kind-add`,
-            data: $("#f1").serialize(),
-            success: function (res) {
-                if(res.code === 200) {
-                    resetAddOptionKindBox();
-                    Search_optkind();
-                    setColumnOfGx2(res.data);
-                    Search_opt();
-                } else alert(res.msg);
-            },
-            error: function(request, status, error) {
-                console.log(request, status, error)
-            }
-        });
-    }
-
-    // 옵션구분 삭제
-    function delOptionKind() {
-        let selected_list = gx1.getSelectedRows();
-
-        if(selected_list.length < 1) return alert("삭제하실 옵션구분을 선택하십시오.");
-        if(!confirm("옵션구분을 삭제하게 되면, 해당 옵션구분으로 등록된 모든 옵션이 삭제됩니다.\n정말 삭제하시곘습니까?")) return;
-
-        $.ajax({
-            async: true,
-            type: 'post',
-            url: `/head/product/prd01/${goods_no}/option-kind-del`,
-            data: {
-                'del_id_list': selected_list.map(s => s.no).join(","),
-                'goods_sub': goods_sub,
-                'goods_type': $('#goods_type').val(),
-            },
-            success: function (res) {
-                if(res.code === 200) {
-                    Search_optkind();
-                    setColumnOfGx2(res.data);
-                    Search_opt();
-                }
-                else alert(res.msg);
-            },
-            error: function(request, status, error) {
-                console.log(request, status, error)
-            }
-        });
-    }
-
-    // 옵션 사용여부 변경 시 기존 옵션정보 및 재고정보 모두 삭제
-    function delOptionAll() {
-        let rows = gx1.getRows();
-        let is_option_use = $("[name=is_option_use]:checked").val();
-
-        $.ajax({
-            async: true,
-            type: 'post',
-            url: `/head/product/prd01/${goods_no}/option-kind-del`,
-            data: {
-                'del_id_list': rows.map(s => s.no).join(","),
-                'goods_sub': goods_sub,
-                'goods_type': $('#goods_type').val(),
-                'is_option_use': is_option_use
-            },
-            success: function (res) {
-                if(res.code === 200) {
-                    location.reload();
-                    // Search_optkind();
-                    // setColumnOfGx2(res.data);
-                    // Search_opt();
-                }
-                else alert(res.msg);
-            },
-            error: function(request, status, error) {
-                console.log(request, status, error)
-            }
-        });
-    }
-
-    /*
-    ***
-    상품 옵션 품목 관리 관련
-    ***
-    */
-
-    $(".option-add-btn").on("click", function(e) {
-        e.preventDefault();
-        controlOption.Open(goods_no, function(e) {
-            console.log(e); // 콜백함수 수정필요
-        })
-    })
-    $(".option-del-btn").on("click", function(e) {
-        e.preventDefault();
-        // 옵션 삭제 작업필요
-    })
-    
-
-    // 상품옵션 품목테이블 재생성
-    function setColumnOfGx2(res) {
-        let col = [
-			{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
-			{field:"opt1", headerName: res.opt_kind_list.length > 0 ? res.opt_kind_list[0].name : '', width:90 },
-			{field:"opt_price", headerName:"옵션가", width:90, type: 'numberType' },
-		];
-
-        let opt2_child = [];
-        if(res.opt.opt2.length > 0) {
-            for(const op of res.opt.opt2) {
-                opt2_child.push({
-                    headerName: op.opt_nm,
-                    children: [
-                        // 수정필요
-                        {headerName: "온라인재고", field: "__qty", type: 'numberType'},
-                        {headerName: "보유재고", field: "__wqty", type: 'numberType'},
-                    ],
-                });
-            }
-        } else {
-            opt2_child.push({headerName: ''});
-        }
-
-        if (res.opt_kind_list.length > 1) {
-            col.push({
-                headerName: res.opt_kind_list[1].name,
-                children: opt2_child,
-            })
-        } else {
-            col.push({headerName: "온라인재고", field: "__qty", type: 'numberType'});
-            col.push({headerName: "보유재고", field: "__wqty", type: 'numberType'});
-        }
-
-        col.push({field:"opt_memo",headerName:"옵션메모", width:90, cellStyle:{"text-align":"center"}});
-
-        gx2.gridOptions.api.setColumnDefs(col);
     }
 
     /*
