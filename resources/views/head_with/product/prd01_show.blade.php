@@ -2103,18 +2103,18 @@
                 {field:"goods_sub",headerName:"goods_sub",hide:true},
                 {field:"class",headerName:"분류" },
                 {field:"class_cd",headerName:"class_cd", hide:true },
-                {field:"item_001",headerName:"제품소재",editable: checkEdit,cellStyle:editerStyle },
-                {field:"item_002",headerName:"색상",editable: checkEdit,cellStyle : editerStyle},
-                {field:"item_003",headerName:"치수",editable: checkEdit,cellStyle : editerStyle},
-                {field:"item_004",headerName:"제조사(수입자/병행수입)",editable: checkEdit,cellStyle : editerStyle},
-                {field:"item_005",headerName:"제조국",editable: checkEdit,cellStyle : editerStyle},
-                {field:"item_006",headerName:"세탁방법 및 취급시 주의사항",editable: checkEdit,cellStyle : editerStyle},
-                {field:"item_007",headerName:"제조연월",editable: checkEdit,cellStyle : editerStyle},
-                {field:"item_008",headerName:"품질보증기준",editable: checkEdit,cellStyle : editerStyle},
-                {field:"item_009",headerName:"A/S 책임자와 전화번호",editable: checkEdit,cellStyle : editerStyle},
-                {field:"item_010",headerName:"KC안전인증 대상 유무",editable: checkEdit,cellStyle : editerStyle},
-                {field:"item_011",headerName:"수입여부",editable: checkEdit,cellStyle : editerStyle},
-                {field:"item_012",headerName:"종류",editable: checkEdit,cellStyle : editerStyle},
+                // {field:"item_001",headerName:"제품소재",editable: checkEdit,cellStyle:editerStyle },
+                // {field:"item_002",headerName:"색상",editable: checkEdit,cellStyle : editerStyle},
+                // {field:"item_003",headerName:"치수",editable: checkEdit,cellStyle : editerStyle},
+                // {field:"item_004",headerName:"제조사(수입자/병행수입)",editable: checkEdit,cellStyle : editerStyle},
+                // {field:"item_005",headerName:"제조국",editable: checkEdit,cellStyle : editerStyle},
+                // {field:"item_006",headerName:"세탁방법 및 취급시 주의사항",editable: checkEdit,cellStyle : editerStyle},
+                // {field:"item_007",headerName:"제조연월",editable: checkEdit,cellStyle : editerStyle},
+                // {field:"item_008",headerName:"품질보증기준",editable: checkEdit,cellStyle : editerStyle},
+                // {field:"item_009",headerName:"A/S 책임자와 전화번호",editable: checkEdit,cellStyle : editerStyle},
+                // {field:"item_010",headerName:"KC안전인증 대상 유무",editable: checkEdit,cellStyle : editerStyle},
+                // {field:"item_011",headerName:"수입여부",editable: checkEdit,cellStyle : editerStyle},
+                // {field:"item_012",headerName:"종류",editable: checkEdit,cellStyle : editerStyle},
             ];
 
 			//선택한 항목 상태변경
@@ -2229,29 +2229,55 @@
 				}
 			});
 
-            const pApp = new App('', { gridId: "#goods-class-grid" });
-            const gridDiv = document.querySelector(pApp.options.gridId);
-            const gx = new HDGrid(gridDiv, goods_class_columns);
+            let pApp, gx;
+            let goods_class;
 
-            gx.gridOptions.getRowNodeId = function(data) {
-              return data.rownum;
-            }
+            $.ajax({
+                async: true,
+                type: 'get',
+                url: '/head/product/prd05/column_search',
+                data: "class=" + "{{ $class }}",
+                success: function(data) {
+                    let col_arr = data['columns'];
+                    col_arr.forEach((col, i) => {
+                        let col_val = {
+                            field: col[0],
+                            headerName: col[1],
+                            editable: true,
+                            minWidth: 100,
+                            cellStyle: {'background' : '#ffff99', 'border-right' : '1px solid #e0e7e7'},
+                        }
+                        goods_class_columns.push(col_val);
+                    });
+                    
+                    pApp = new App('', { gridId: "#goods-class-grid" });
+                    const gridDiv = document.querySelector(pApp.options.gridId);
+                    gx = new HDGrid(gridDiv, goods_class_columns);
+                    gx.gridOptions.getRowNodeId = function(data) {
+                        return data.rownum;
+                    }
+
+                    goodsClassSearch();
+                },
+                error: function(request, status, error) {
+                    alert("error");
+                    console.log(request);
+                }
+            });
 
             function goodsClassSearch() {
                 const data = `goods_no=${goods_no}&goods_sub=${goods_sub}`;
                 gx.Request(`/head/product/prd01/${goods_no}/goods-class`, data, -1);
             }
 
-            function checkEdit(params) {
-              return params.data.class;
-            }
+            // function checkEdit(params) {
+            //   return params.data.class;
+            // }
 
-            function editerStyle(params) {
-              if (params.data.class != null)
-                  return { 'background' : '#ffff99', 'border-right' : '1px solid #e0e7e7' }
-            }
-
-            goodsClassSearch();
+            // function editerStyle(params) {
+            //   if (params.data.class != null)
+            //       return { 'background' : '#ffff99', 'border-right' : '1px solid #e0e7e7' }
+            // }
         }
 
         $(document).ready(function(){

@@ -963,6 +963,14 @@ class prd01Controller extends Controller
         ";
         $class_items = DB::select($query);
 
+        $query = /** @lang text */
+            "
+            select class
+        	from goods_class 
+            where goods_no = :goods_no
+        ";
+		$goods_class = DB::selectOne($query, ['goods_no' => $goods_no]);
+
 		$values = $this->_get($goods_no);
 
 		$values = array_merge($values,[
@@ -971,6 +979,7 @@ class prd01Controller extends Controller
             'type'				=> $type,
             'goods_stats'		=> SLib::getCodes('G_GOODS_STAT'),
             'class_items'		=> $class_items,
+            'class'				=> $goods_class->class,
             'goods_types'		=> SLib::getCodes('G_GOODS_TYPE'),
             'com_info'			=> (object)array("dlv_amt" => 0,"free_dlv_amt_limit" => 0),
             'g_dlv_fee'			=> $cfg_dlv_fee,
@@ -1378,7 +1387,8 @@ class prd01Controller extends Controller
               (select class_nm from code_class where class = g.class group by class, class_nm) as class,
               class.item_001, class.item_002, class.item_003, class.item_004, class.item_005, 
               class.item_006, class.item_007, class.item_008, class.item_009, class.item_010, 
-              class.item_011, class.item_012,
+              class.item_011, class.item_012, class.item_013, class.item_014, class.item_015,
+              class.item_016, class.item_017, class.item_018, class.item_019, class.item_020,
 			  g.class as class_cd
            from goods g 
               left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
