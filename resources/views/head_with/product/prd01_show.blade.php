@@ -2149,9 +2149,10 @@
 						dataType: 'json',
 						success: function(res) {
 							if (res.code == '200') {
-								goodsClassSearch();
+                                location.reload();
+								// goodsClassSearch();
 							} else {
-								// console.log(res.code);
+								console.log(res);
 								alert(res.msg);
 							}
 						},

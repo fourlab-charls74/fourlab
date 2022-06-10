@@ -325,7 +325,7 @@ class ord02Controller extends Controller
         $dlv_no = $req->input("dlv_no", "");
         $sale_place = $req->input("sale_place", "");
         $com_type = $req->input("com_type", "");
-        $com_id = $req->input("com_id", "");
+        $com_nm = $req->input("com_nm", "");
         $out_ord_no = $req->input("out_ord_no", "");
         $cols = $req->input("cols", "");
         $baesong_kind = $req->input("baesong_kind", "");
@@ -362,6 +362,7 @@ class ord02Controller extends Controller
         }
 
         $where = " and a.ord_kind != '10' "; // 정상판매건이 아닌 경우에만 출력한다!
+        $com_where = "";
         $is_not_use_date = false;
 
         /////////////////////////////////////////////////////////
@@ -416,7 +417,7 @@ class ord02Controller extends Controller
 
         if ($sale_place != "") $where .= " and a.sale_place = '$sale_place' ";
         if ($com_type != "") $where .= " and c.com_type = '$com_type' ";
-        if ($com_id != "") $where .= " and c.com_id = '$com_id' ";
+        if ($com_nm != "") $com_where .= " and c.com_nm = '$com_nm' ";
         if ($ord_kind != "") $where .= " and a.ord_kind = '$ord_kind' ";
         if ($ord_type != "") $where .= " and a.ord_type = '$ord_type' ";
         if ($bank_inpnm != "") $where .= " and d.bank_inpnm = '$bank_inpnm' ";
@@ -509,7 +510,7 @@ class ord02Controller extends Controller
             left outer join payment d on b.ord_no = d.ord_no
             inner join company e on a.sale_place = e.com_id and e.com_type = '4'
             left outer join order_opt_memo h on a.ord_opt_no = h.ord_opt_no
-          where 1=1 $where
+          where 1=1 $where $com_where
         ";
             $total = DB::selectOne($sql)->total;
 
@@ -539,6 +540,9 @@ class ord02Controller extends Controller
         } else {
             $limit = " limit $startno, $page_size ";
         }
+
+        if ($com_nm != "") $where .= " and i.com_nm = '$com_nm' ";
+
         $sql = "
 				select
 					'' as chkbox, a.ord_no, a.ord_opt_no, ord_state.code_val ord_state, clm_state.code_val clm_state, pay_stat.code_val as pay_stat
