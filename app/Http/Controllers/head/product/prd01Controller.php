@@ -963,23 +963,14 @@ class prd01Controller extends Controller
         ";
         $class_items = DB::select($query);
 
-        $query = /** @lang text */
-            "
-            select class
-        	from goods_class 
-            where goods_no = :goods_no
-        ";
-		$goods_class = DB::selectOne($query, ['goods_no' => $goods_no]);
-
 		$values = $this->_get($goods_no);
-
+		
 		$values = array_merge($values,[
             'opt_cd_list'		=> SLib::getItems(),
             'md_list'			=> SLib::getMDs(),
             'type'				=> $type,
             'goods_stats'		=> SLib::getCodes('G_GOODS_STAT'),
             'class_items'		=> $class_items,
-            'class'				=> $goods_class == null ? '' : $goods_class->class,
             'goods_types'		=> SLib::getCodes('G_GOODS_TYPE'),
             'com_info'			=> (object)array("dlv_amt" => 0,"free_dlv_amt_limit" => 0),
             'g_dlv_fee'			=> $cfg_dlv_fee,
@@ -1024,6 +1015,7 @@ class prd01Controller extends Controller
 					, (100/(a.price/(a.price-a.wonga))) as prf
 					, ifnull(c.dlv_policy, 'S') as dlv_policy
 					, a.sale_type, a.sale_yn, a.sale_wonga, a.normal_wonga, a.sale_dt_yn, ifnull(a.normal_price,0) as normal_price
+					, a.class
 				from goods a
 					left join brand br on br.brand = a.brand
 					left join company c on c.com_id = a.com_id

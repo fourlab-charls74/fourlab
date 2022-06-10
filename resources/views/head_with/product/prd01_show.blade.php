@@ -2230,7 +2230,7 @@
 			});
 
             let pApp, gx;
-            const goods_class = "{{ $class ?? '' }}";
+            const goods_class = "{{ @$goods_info->class ?? '' }}";
 
             $.ajax({
                 async: true,
