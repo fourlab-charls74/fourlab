@@ -308,6 +308,7 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::post("prd01/{no}/option-kind-del", "prd01Controller@del_option_kind");
 
         Route::get("prd01/{no}/get-basic-options", "prd01Controller@getBasicOptions");
+        Route::get("prd01/{no}/get-basic-opts-matrix", "prd01Controller@getBasicOptsMatrix");
         Route::post("prd01/{no}/save-basic-options", "prd01Controller@saveBasicOptions");
         Route::post("prd01/{no}/delete-basic-options", "prd01Controller@deleteBasicOptions");
 

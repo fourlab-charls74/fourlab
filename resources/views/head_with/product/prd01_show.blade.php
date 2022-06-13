@@ -2247,7 +2247,7 @@
                             editable: true,
                             minWidth: 100,
                             cellStyle: {'background' : '#ffff99', 'border-right' : '1px solid #e0e7e7'},
-                        }
+                        }   
                         goods_class_columns.push(col_val);
                     });
                     
@@ -2421,35 +2421,45 @@
         { field:"no", headerName:"no", hide:true }
     ];
 
+    const initRightOptColumns = () => {
+        return [
+            {field:"opt1_name", headerName:"{{@$opt_kind_list[0]->name}}", width:100, cellStyle: CELL_COLOR.LOCKED, cellClass: "locked-cell", checkboxSelection: true, pinned: "left"},
+            {field:"opt_price", headerName:"옵션가격", width:70, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW},
+            @if($type != 'create' && count(@$opt_kind_list) > 1)
+            {
+                field: "opt2_name",
+                headerName: "{{ @$opt_kind_list[1]->name }}",
+                children: [
+                    @if (count(@$opt['opt2']) > 0)
+                        @foreach (@$opt['opt2'] as $i => $op)
+                        initRightOptStockColumns("{{ $op->opt_nm }}"),
+                        @php $i++; @endphp
+                        @endforeach
+                    @else
+                    {headerName: '', width: 150},
+                    @endif
+                ]
+            },
+            @endif
+            {field:"opt_memo", headerName:"옵션메모", width:90, cellStyle:{"text-align":"center"}, editable: true, cellStyle: CELL_COLOR.YELLOW}
+        ];
+    };
+
+    const initRightOptStockColumns = (name) => {
+        return {
+            headerName: name,
+            field: name,
+            children: [
+                {headerName: "온라인재고", field: `${name}_good_qty` ,type: 'numberType', width: 70, editable: true, cellStyle: CELL_COLOR.YELLOW},
+                {headerName: "보유재고", field: `${name}_wqty`,type: 'numberType', width: 58},
+            ]
+        };
+    };
+
     /**
      * 옵션 우측 그리드 컬럼 정의
      */
-    const basic_option_stock_columns = [
-        {field:"opt1_name", headerName:"{{@$opt_kind_list[0]->name}}", width:100, cellStyle: CELL_COLOR.LOCKED, cellClass: "locked-cell", checkboxSelection: true, pinned: "left"},
-        {field:"opt_price", headerName:"옵션가격", width:70, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW},
-        @if($type != 'create' && count(@$opt_kind_list) > 1)
-        {
-            field: "{{ @$opt_kind_list[1]->name }}",
-            headerName: "{{ @$opt_kind_list[1]->name }}",
-            children: [
-                @if (count(@$opt['opt2']) > 0)
-                    @foreach (@$opt['opt2'] as $i => $op)
-                    {headerName: "{{ $op->opt_nm }}",
-                        children: [
-                            {headerName: "온라인재고", field: "{{ $op->opt_nm }}_good_qty" ,type: 'numberType', width: 70, editable: true, cellStyle: CELL_COLOR.YELLOW},
-                            {headerName: "보유재고", field: "{{ $op->opt_nm }}_wqty",type: 'numberType', width: 58},
-                        ]
-                    },
-                    @php $i++; @endphp
-                    @endforeach
-                @else
-                {headerName: '', width: 150},
-                @endif
-            ]
-        },
-        @endif
-        {field:"opt_memo", headerName:"옵션메모", width:90, cellStyle:{"text-align":"center"}, editable: true, cellStyle: CELL_COLOR.YELLOW}
-    ];
+    const basic_option_stock_columns = initRightOptColumns();
 
     const extra_option_stock_columns = [
         { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 30, pinned: 'left', sort: null },
@@ -2520,6 +2530,7 @@
             const { data, status } = response;
             if (status == 200) {
                 last_option_row = row;
+                await setRightOptColumns(type);
                 setRightOptRows(type, data);
             }
         } catch (error) {
@@ -2528,8 +2539,6 @@
     };
 
     const setRightOptRows = (type, { result }) => {
-
-        console.log(result);
 
         if (type == "기본") {
 
@@ -2564,7 +2573,44 @@
 
         }
     };
+    
+    const setRightOptColumns = async (type) => {
 
+        if (type == "기본") {
+
+            try {
+                const response = await axios({ url: `/head/product/prd01/${goods_no}/get-basic-opts-matrix`, method: 'get' });
+                const { data, status } = response;
+                if (status == 200) {
+                    
+                    let { opt1, opt2 } = data.opt_matrix;
+                    let rightOptColumns = gx2.gridOptions.api.getColumnDefs();
+
+                    let stock_cols = [];
+                    opt2.map((item, idx) => {
+                        const opt_nm = item.opt_nm;
+                        stock_cols[idx] = initRightOptStockColumns(opt_nm);
+                    });
+
+                    rightOptColumns = rightOptColumns.map((column) => {
+                        if (column.field == "opt2_name") {
+                            column.children = stock_cols;
+                        }
+                        return column;
+                    });
+
+                    gx2.gridOptions.api.setColumnDefs(rightOptColumns);
+
+                }
+            } catch (error) {
+                console.log(error);
+            }
+
+        } else if (type == "추가") {
+
+        }
+            
+    };
     
     /*
     ***
@@ -2676,9 +2722,9 @@
             /**
              * afterGridLoaded
              */
-            () => { console.log("test"); getOptionStock(last_option_row); },
+            () => { getOptionStock(last_option_row); },
             /**
-             * afterCRUD
+             * afterSaveOrDel
              */
             async (response) => {
                 $('#ControlOptionModal .close').trigger('click');

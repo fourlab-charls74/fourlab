@@ -1806,7 +1806,7 @@ class prd01Controller extends Controller
 			DB::commit();
 			$msg = "저장되었습니다.";
 		} catch(Exception $e){
-			dd($e);
+			// dd($e);
 			DB::rollback();
 			$code_status = 500;
 			$msg = "저장 중 에러가 발생했습니다. 잠시 후 다시 시도해주세요.";
@@ -2458,10 +2458,29 @@ class prd01Controller extends Controller
 		return response()->json(['code' => $code, 'msg' => $msg], $code);
 	}
 
+	public function getBasicOptsMatrix($goods_no)
+	{
+		$opt	= ['opt1' => [], 'opt2' => []];
+		$sql	=
+			" select count(*) as tot from goods_option where goods_no = :goods_no and type = 'basic' ";
+		$row	= DB::selectOne($sql,['goods_no' => $goods_no]);
+		$opt_kind_cnt	= $row->tot;
+
+		$sql = 
+			" select distinct(substring_index(goods_opt, '^', :index)) as opt_nm from goods_summary where goods_no = :goods_no and use_yn = 'Y' order by opt_nm ";
+	
+		if ($opt_kind_cnt > 0) {
+			$opt['opt1'] = DB::select($sql,['goods_no' => $goods_no, 'index' => 1]);
+			if ($opt_kind_cnt == 2) $opt['opt2'] = DB::select($sql,['goods_no' => $goods_no, 'index' => -1]);
+		}
+
+		return response()->json(['code' => 200, 'opt_matrix' => $opt]);
+	}
+
 	public function updateBasicOptsData(Request $request, $goods_no)
 	{
 		$data = $request->input("data", []);
-		dd($data);
+		// dd($data);
 	}
 
 	public function updateExtraOptsData(Request $request, $goods_no)

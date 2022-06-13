@@ -930,10 +930,10 @@ function ControlOption() {
     this.deleted_opts = [];
 }
 
-ControlOption.prototype.Open = function(goods_no = 0, afterGridLoaded = null, afterCRUD = null) {
+ControlOption.prototype.Open = function(goods_no = 0, afterGridLoaded = null, afterSaveOrDel = null) {
     this.goods_no = goods_no;
     this.afterGridLoaded = afterGridLoaded;
-    this.afterCRUD = afterCRUD;
+    this.afterSaveOrDel = afterSaveOrDel;
 
     if(this.grid === null){
         this.SetGrid("#div-gd-option");
@@ -1001,7 +1001,7 @@ ControlOption.prototype.Save = function() {
         const { code, msg } = data;
         if (code == 200) {
             alert(msg);
-            this.afterCRUD(data);
+            this.afterSaveOrDel(data);
         } else alert(msg);
     };
 
@@ -1027,7 +1027,7 @@ ControlOption.prototype.Delete = async function() {
         const { code, msg } = data;
         if (code == 200) {
             alert(msg);
-            this.afterCRUD(data);
+            this.afterSaveOrDel(data);
         } else alert(msg);
     };
 
