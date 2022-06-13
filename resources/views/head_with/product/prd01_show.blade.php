@@ -2428,17 +2428,7 @@
             @if($type != 'create' && count(@$opt_kind_list) > 1)
             {
                 field: "opt2_name",
-                headerName: "{{ @$opt_kind_list[1]->name }}",
-                children: [
-                    @if (count(@$opt['opt2']) > 0)
-                        @foreach (@$opt['opt2'] as $i => $op)
-                        initRightOptStockColumns("{{ $op->opt_nm }}"),
-                        @php $i++; @endphp
-                        @endforeach
-                    @else
-                    {headerName: '', width: 150},
-                    @endif
-                ]
+                headerName: "{{ @$opt_kind_list[1]->name }}"
             },
             @endif
             {field:"opt_memo", headerName:"옵션메모", width:90, cellStyle:{"text-align":"center"}, editable: true, cellStyle: CELL_COLOR.YELLOW}
@@ -2459,7 +2449,7 @@
     /**
      * 옵션 우측 그리드 컬럼 정의
      */
-    const basic_option_stock_columns = initRightOptColumns();
+    let basic_option_stock_columns = initRightOptColumns();
 
     const extra_option_stock_columns = [
         { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 30, pinned: 'left', sort: null },
@@ -2503,6 +2493,7 @@
     };
 
     const initRightOptSection = (type = "기본", columns = []) => {
+        gx2.setRows([]);
         if (type == "기본") {
             columns = Object.keys(columns).length > 0 ? columns : basic_option_stock_columns;
             $("#opt-type").html("기본옵션");
@@ -2513,13 +2504,13 @@
             $("#opt-type").html("추가옵션");
             $(".option-add-btn").html("추가");
             $(".option-inv-btn").hide();
-            gx2.setRows([]);
         }
         gx2.gridOptions.api.setColumnDefs(columns);
     };
 
     const getOptionStock = async (row) => {
         const type = row?.type;
+
         initRightOptSection(type);
 
         const GOODS_NO = '{{$goods_no}}';
@@ -2534,7 +2525,7 @@
                 setRightOptRows(type, data);
             }
         } catch (error) {
-            console.log(error);
+            // console.log(error);
         }
     };
 
@@ -2603,7 +2594,7 @@
 
                 }
             } catch (error) {
-                console.log(error);
+                // console.log(error);
             }
 
         } else if (type == "추가") {
@@ -2755,16 +2746,72 @@
 	});
 
     const updateBasicOptsData = async (rows) => {
+
+        const opt_name = "{{ @$opt_kind_list[0]->name }}^{{ @$opt_kind_list[1]->name }}";
+
+        let data = [];
+        rows.map((row, idx) => { // 여기
+
+            const keys = Object.keys(row);
+            const opt1 = row?.opt1_name;
+
+            console.log(row);
+
+            row = keys.reduce((prev, key) => {
+
+                let obj = {};
+                let { opt1, opt2, goods_opt } = prev;
+
+                obj.opt1 = opt1;
+
+                if (!opt2) { // prefix 추출하여 opt2 값 알아냄
+                    var regExp = /.+(?=_good_qty)/i;
+                    const arr = key.match(regExp);
+                    if (arr) obj.opt2 = arr[0];
+                }
+                
+                if ((opt2)) {
+                    obj.goods_opt = opt1 + "^" + opt2;
+                }
+
+                // 루프돌면서 백앤드에서 사용하는 형식에 맞는 goods_opt 만들었으면 data에 push함
+                if (obj?.goods_opt) {
+
+                    // prev[`${opt1}_good_qty`];
+
+                    // prev[`${opt2_name}_good_qty`];
+                    // list[idx][`${opt2_name}_wqty`] = wqty;
+
+                    data.push(obj);
+                    obj.opt_name = opt_name;
+                }
+
+               return obj;
+                
+            }, { goods_opt : "", opt1 : opt1, opt2: "" });
+
+            return row;
+        });
+
+        console.log(data);
+
+        // list.shift();
+
+        // gx2.setRows(list);
+
+        return false;
+
+
         // goods_summary
         const response = await axios({ url: `/head/product/prd01/${goods_no}/update-basic-opts-data`, 
-            method: 'post', data: { data: rows } 
+            method: 'post', data: { data: rows }  // 여기
         });
     };
 
     const updateExtraOptsData = async (rows) => {
         // options where option_no = (goods_option에 들어있는 option_no)
         const response = await axios({ url: `/head/product/prd01/${goods_no}/update-extra-opts-data`, 
-            method: 'post', data: { data: rows } 
+            method: 'post', data: { data: rows }
         });
     };
 
