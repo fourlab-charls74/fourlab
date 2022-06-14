@@ -1121,7 +1121,7 @@
                     //     }
                     //     break;
                     case "ed_price": // 판매가
-                        if (isNaN(value) == true || value == "" || value >= 0) {
+                        if (isNaN(value) == true || value == "" || parseFloat(value) < 0) {
                             alert("숫자만 입력가능합니다.");
                             startEditingCell(row.index, column_name);
                         } else if (value == "") {
@@ -1145,7 +1145,7 @@
                         }
                         break;
                     case "ed_margin_rate": // 마진율
-                        if (isNaN(value) == true || value == "") {
+                        if (isNaN(value) == true || value == "" || parseFloat(value) < 0) {
                             alert("숫자만 입력가능합니다.");
                             startEditingCell(row.index, column_name);
                         } else if (value == "") {

@@ -772,7 +772,7 @@
 				const column_name = params.column.colId;
 				const value = params.newValue;
 				if (column_name == "shop_price") {
-					if (isNaN(value) == true || value == "" || value >= 0) {
+					if (isNaN(value) == true || value == "" || parseFloat(value) < 0) {
 						alert("숫자만 입력가능합니다.");
 						startEditingCell(params.rowIndex, column_name);
 					}

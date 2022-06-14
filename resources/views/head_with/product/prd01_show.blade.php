@@ -2554,9 +2554,10 @@
                 let regExp = /.+(?=_good_qty)/i;
                 let arr = column_name.match(regExp);
                 if (arr) {
-                    if (isNaN(value) == true || value == "" || value >= 0) {
+                    if (isNaN(value) == true || value == "" || parseFloat(value) < 0) {
                         alert("숫자만 입력가능합니다.");
                         gx2StartEditingCell(row_index, column_name);
+                        return false;
                     }
                 }
             }
