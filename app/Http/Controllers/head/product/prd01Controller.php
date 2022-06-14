@@ -2480,13 +2480,30 @@ class prd01Controller extends Controller
 	public function updateBasicOptsData(Request $request, $goods_no)
 	{
 		$data = $request->input("data", []);
-
 		try {
 			foreach ($data as $item) {
-				dd($item["opt_price"]);
+				$opt_price = $item["opt_price"];
+				$opt_memo = $item["opt_memo"] ? $item["opt_memo"] : "";
+				$good_qty = $item["good_qty"];
+				$goods_opt = $item["goods_opt"];
+				$sql = "
+					update goods_summary set
+					opt_price = :opt_price, opt_memo = :opt_memo,
+					good_qty = :good_qty
+					where goods_no = :goods_no
+					and goods_sub = '0'
+					and goods_opt = :goods_opt
+				";
+				DB::update($sql, [
+					'opt_price' => $opt_price, 'opt_memo' => $opt_memo, 'good_qty' => $good_qty,
+					'goods_no' => $goods_no, 'goods_opt' => $goods_opt
+				]);
 			}
+			DB::commit();
+			return response()->json(['code' => 200, 'msg' => "저장되었습니다."]);
 		} catch (Exception $e) {
-			dd($e);
+			DB::rollBack();
+			return response()->json(['code' => 500, 'msg' => "저장중 에러가 발생했습니다. 잠시 후 다시 시도해주세요."]);
 		}
 	}
 

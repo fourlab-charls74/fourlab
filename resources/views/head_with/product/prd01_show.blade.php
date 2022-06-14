@@ -42,7 +42,7 @@
 
     /* 기본옵션 ag grid 3단 가운데 정렬 css 적용 */
     .basic-option .ag-header-row.ag-header-row-column-group + .ag-header-row.ag-header-row-column > .bizest.ag-header-cell {
-        transform: translateY(-66%);
+        transform: translateY(-65%);
         height: 320%;
     }
 
@@ -1382,8 +1382,6 @@
         </form>
     </div>
 
-
-
     <script type="text/javascript" charset="utf-8">
         const goods_no = '{{$goods_no}}';
         const goods_sub = '{{@$goods_info->goods_sub}}';
@@ -2424,11 +2422,12 @@
     const initRightOptColumns = () => {
         return [
             {field:"opt1_name", headerName:"{{@$opt_kind_list[0]->name}}", width:100, cellStyle: CELL_COLOR.LOCKED, cellClass: "locked-cell", checkboxSelection: true, pinned: "left"},
-            {field:"opt_price", headerName:"옵션가격", width:70, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW},
+            {field:"opt_price", headerName:"옵션가격", width:100, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW},
             @if($type != 'create' && count(@$opt_kind_list) > 1)
             {
                 field: "opt2_name",
-                headerName: "{{ @$opt_kind_list[1]->name }}"
+                headerName: "{{ @$opt_kind_list[1]->name }}",
+                width: 120
             },
             @endif
             {field:"opt_memo", headerName:"옵션메모", width:90, cellStyle:{"text-align":"center"}, editable: true, cellStyle: CELL_COLOR.YELLOW}
@@ -2475,6 +2474,28 @@
 
         searchOptKind();
     });
+
+    const autoSizeColumns = (grid, except, skipHeader = false) => {
+        const allColumnIds = [];
+        grid.gridOptions.columnApi.getAllColumns().forEach((column) => {
+            if (column.getId() == except) return;
+            allColumnIds.push(column.getId());
+        });
+        grid.gridOptions.columnApi.autoSizeColumns(allColumnIds, skipHeader);
+    };
+
+    /* custom grid css - 이전 bizest 스타일 형식으로 UI/UX 로 변경 및 적용 */
+    const applyBizestColumns = (columns) => {
+        const applied_columns = columns.map((column) => {
+            if (!column.hasOwnProperty("children")) {
+                column.headerClass = column.hasOwnProperty("headerClass")
+                    ? `${column.headerClass} bizest`
+                    : 'bizest'
+            }
+            return column;
+        })
+        return applied_columns;
+    };
 
     /**
      * 상품 옵션 로직
@@ -2590,8 +2611,8 @@
                         return column;
                     });
 
-                    gx2.gridOptions.api.setColumnDefs(rightOptColumns);
-
+                    gx2.gridOptions.api.setColumnDefs(applyBizestColumns(rightOptColumns));
+                    autoSizeColumns(gx2, "opt1_name");
                 }
             } catch (error) {
                 // console.log(error);
@@ -2792,6 +2813,12 @@
         const response = await axios({ url: `/head/product/prd01/${goods_no}/update-basic-opts-data`, 
             method: 'post', data: { data: data }
         });
+        data = response?.data;
+        if (data?.code == 500) {
+            alert(data.msg)
+        } else if (data?.code == 200) {
+            alert(data.msg)
+        };
     };
 
     const updateExtraOptsData = async (rows) => {
