@@ -932,7 +932,7 @@
 										</div>
 									</div>
 									<div class="table-responsive">
-										<div id="div-gd-optkind" style="height:277px;" class="ag-theme-balham"></div>
+										<div id="div-gd-optkind" style="height:255px;" class="ag-theme-balham"></div>
 									</div>
 								</div>
 
@@ -954,7 +954,7 @@
 										</div>
 									</div>
 									<div class="table-responsive basic-option">
-										<div id="div-gd-opt" style="height:277px;" class="ag-theme-balham"></div>
+										<div id="div-gd-opt" style="height:255px;" class="ag-theme-balham"></div>
 									</div>
 								</div>
 
@@ -2421,8 +2421,8 @@
 
     const initRightOptColumns = () => {
         return [
-            {field:"opt1_name", headerName:"{{@$opt_kind_list[0]->name}}", width:100, cellStyle: CELL_COLOR.LOCKED, cellClass: "locked-cell", checkboxSelection: true, pinned: "left"},
-            {field:"opt_price", headerName:"옵션가격", width:100, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW},
+            {field:"opt1_name", headerName:"{{@$opt_kind_list[0]->name}}", width:100, cellStyle: CELL_COLOR.LOCKED, cellClass: "locked-cell", checkboxSelection: true, pinned: 'left', suppressMovable: true},
+            {field:"opt_price", headerName:"옵션가격", width:100, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true},
             @if($type != 'create' && count(@$opt_kind_list) > 1)
             {
                 field: "opt2_name",
@@ -2430,7 +2430,7 @@
                 width: 120
             },
             @endif
-            {field:"opt_memo", headerName:"옵션메모", width:90, cellStyle:{"text-align":"center"}, editable: true, cellStyle: CELL_COLOR.YELLOW}
+            {field:"opt_memo", headerName:"옵션메모", width:90, cellStyle:{"text-align":"center"}, editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true}
         ];
     };
 
@@ -2439,8 +2439,8 @@
             headerName: name,
             field: name,
             children: [
-                {headerName: "온라인재고", field: `${name}_good_qty` ,type: 'numberType', width: 70, editable: true, cellStyle: CELL_COLOR.YELLOW},
-                {headerName: "보유재고", field: `${name}_wqty`,type: 'numberType', width: 58},
+                {headerName: "온라인재고", field: `${name}_good_qty` ,type: 'numberType', width: 70, editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true},
+                {headerName: "보유재고", field: `${name}_wqty`,type: 'numberType', width: 58, suppressMovable: true},
             ]
         };
     };
@@ -2466,11 +2466,17 @@
     document.addEventListener('DOMContentLoaded', (event) => {
         const pApp1 = new App('', { gridId:"#div-gd-optkind" });
         let gridDiv = document.querySelector(pApp1.options.gridId);
+        let options = {
+
+        }
         gx1 = new HDGrid(gridDiv, option_kind_columns);
 
         const pApp2 = new App('', { gridId:"#div-gd-opt" });
         gridDiv = document.querySelector(pApp2.options.gridId);
-        gx2 = new HDGrid(gridDiv, extra_option_stock_columns);
+        options = {
+            onCellValueChanged: (params) => optEvtAfterEdit(params)
+        }
+        gx2 = new HDGrid(gridDiv, extra_option_stock_columns, options);
 
         searchOptKind();
     });
@@ -2495,6 +2501,37 @@
             return column;
         })
         return applied_columns;
+    };
+
+    const gx2StartEditingCell = (row_index, col_key) => {
+        gx2.gridOptions.api.startEditingCell({ rowIndex: row_index, colKey: col_key });
+    };
+
+    const optEvtAfterEdit = (params) => {
+        if (params.oldValue !== params.newValue) {
+
+            row = params.data;
+            const row_index = params.rowIndex;
+            const column_name = params.column.colId;
+            const value = params.newValue;
+
+            if (column_name == "opt_price") {
+                if (isNaN(value) == true || value == "") {
+                    alert("숫자만 입력가능합니다.");
+                    gx2StartEditingCell(row_index, column_name);
+                }
+            } else {
+                // 온라인 재고인 경우 유효성 검사
+                let regExp = /.+(?=_good_qty)/i;
+                let arr = column_name.match(regExp);
+                if (arr) {
+                    if (isNaN(value) == true || value == "") {
+                        alert("숫자만 입력가능합니다.");
+                        gx2StartEditingCell(row_index, column_name);
+                    }
+                }
+            }
+        }
     };
 
     /**
@@ -2604,15 +2641,21 @@
                         stock_cols[idx] = initRightOptStockColumns(opt_nm);
                     });
 
-                    rightOptColumns = rightOptColumns.map((column) => {
+                    let opt2_count;
+                    let opt2_child_count;
+                    rightOptColumns = rightOptColumns.map((column) => { // opt2 종류별로 재고 컬럼 정의
                         if (column.field == "opt2_name") {
                             column.children = stock_cols;
+                            opt2_count = column.children.length;
+                            opt2_child_count = column.children[0].children.length;
                         }
                         return column;
                     });
 
-                    gx2.gridOptions.api.setColumnDefs(applyBizestColumns(rightOptColumns));
+                    await gx2.gridOptions.api.setColumnDefs(applyBizestColumns(rightOptColumns));
+                    gx2.gridOptions.columnApi.moveColumn("opt_memo", 2 + opt2_count * opt2_child_count); // 옵션 메모 열을 맨 뒤로 보냄
                     autoSizeColumns(gx2, "opt1_name");
+
                 }
             } catch (error) {
                 // console.log(error);
