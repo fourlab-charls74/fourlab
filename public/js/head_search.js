@@ -930,9 +930,8 @@ function ControlOption() {
     this.deleted_opts = [];
 }
 
-ControlOption.prototype.Open = function(goods_no = 0, afterGridLoaded = null, afterSaveOrDel = null) {
+ControlOption.prototype.Open = function(goods_no = 0, afterSaveOrDel = null) {
     this.goods_no = goods_no;
-    this.afterGridLoaded = afterGridLoaded;
     this.afterSaveOrDel = afterSaveOrDel;
 
     if(this.grid === null){
@@ -946,8 +945,6 @@ ControlOption.prototype.Open = function(goods_no = 0, afterGridLoaded = null, af
 };
 
 ControlOption.prototype.SetGrid = function(divId) {
-
-    const afterGridLoaded = this.afterGridLoaded;
 
     const columns = [
         {headerName: '', width:40, valueGetter: 'node.id', cellRenderer: 'loadingRenderer'},
@@ -968,7 +965,6 @@ ControlOption.prototype.SetGrid = function(divId) {
             });
         }
         $("#gd-option-total").text(e.head.total);
-        afterGridLoaded();
     });
 };
 

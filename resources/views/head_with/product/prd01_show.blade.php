@@ -2711,13 +2711,10 @@
         e.preventDefault();
         controlOption.Open(goods_no, 
             /**
-             * afterGridLoaded
-             */
-            () => { getOptionStock(last_option_row); },
-            /**
              * afterSaveOrDel
              */
             async (response) => {
+                getOptionStock(last_option_row);
                 $('#ControlOptionModal .close').trigger('click');
                 $("#div-gd-option").html("");
                 document.control_option.reset();
@@ -2750,61 +2747,50 @@
         const opt_name = "{{ @$opt_kind_list[0]->name }}^{{ @$opt_kind_list[1]->name }}";
 
         let data = [];
-        rows.map((row, idx) => { // 여기
+        rows.map((row, idx) => {
 
             const keys = Object.keys(row);
-            const opt1 = row?.opt1_name;
-
-            console.log(row);
-
-            row = keys.reduce((prev, key) => {
+            const { opt1_name, opt_price, opt_memo } = row;
+            keys.reduce((prev, key) => {
 
                 let obj = {};
-                let { opt1, opt2, goods_opt } = prev;
-
+                let { opt1, opt2, goods_opt, good_qty, opt_price, opt_memo } = prev;
                 obj.opt1 = opt1;
+                obj.opt_price = opt_price;
+                obj.opt_memo = opt_memo;
 
                 if (!opt2) { // prefix 추출하여 opt2 값 알아냄
-                    var regExp = /.+(?=_good_qty)/i;
-                    const arr = key.match(regExp);
+                    let regExp = /.+(?=_good_qty)/i;
+                    let arr = key.match(regExp);
                     if (arr) obj.opt2 = arr[0];
                 }
-                
+
                 if ((opt2)) {
                     obj.goods_opt = opt1 + "^" + opt2;
                 }
 
+                // 온라인 재고 할당
+                obj.good_qty = good_qty;
+                regExp = /.+(?=_good_qty)/i;
+                let arr_2 = key.match(regExp);
+                if (arr_2) {
+                    obj.good_qty = parseInt(row[`${arr_2[0]}_good_qty`]);
+                }
+
                 // 루프돌면서 백앤드에서 사용하는 형식에 맞는 goods_opt 만들었으면 data에 push함
                 if (obj?.goods_opt) {
-
-                    // prev[`${opt1}_good_qty`];
-
-                    // prev[`${opt2_name}_good_qty`];
-                    // list[idx][`${opt2_name}_wqty`] = wqty;
-
                     data.push(obj);
                     obj.opt_name = opt_name;
                 }
 
                return obj;
                 
-            }, { goods_opt : "", opt1 : opt1, opt2: "" });
+            }, { goods_opt : "", opt1 : opt1_name, opt2: "", good_qty: 0, opt_price: opt_price, opt_memo: opt_memo });
 
-            return row;
         });
 
-        console.log(data);
-
-        // list.shift();
-
-        // gx2.setRows(list);
-
-        return false;
-
-
-        // goods_summary
         const response = await axios({ url: `/head/product/prd01/${goods_no}/update-basic-opts-data`, 
-            method: 'post', data: { data: rows }  // 여기
+            method: 'post', data: { data: data }
         });
     };
 

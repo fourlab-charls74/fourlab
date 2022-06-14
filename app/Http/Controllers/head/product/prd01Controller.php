@@ -2413,11 +2413,11 @@ class prd01Controller extends Controller
 				$sql = "
 					update goods_summary set
 						seq = $i
-					where goods_no = '$goods_no'
+					where goods_no = :goods_no
 						and goods_sub = '0'
-						and goods_opt = '$goods_opt'
+						and goods_opt = :goods_opt
 					";
-				DB::update($sql);
+				DB::update($sql, ['goods_no' => $goods_no, 'goods_opt' => $goods_opt]);
 			}
 					
 			DB::commit();
@@ -2480,7 +2480,14 @@ class prd01Controller extends Controller
 	public function updateBasicOptsData(Request $request, $goods_no)
 	{
 		$data = $request->input("data", []);
-		// dd($data);
+
+		try {
+			foreach ($data as $item) {
+				dd($item["opt_price"]);
+			}
+		} catch (Exception $e) {
+			dd($e);
+		}
 	}
 
 	public function updateExtraOptsData(Request $request, $goods_no)
