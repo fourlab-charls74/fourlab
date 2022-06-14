@@ -767,13 +767,12 @@
 		};
 
 		const evtAfterEdit = (params) => {
-			console.log(params);
 			if (params.oldValue !== params.newValue) {
 				row = params.data;
 				const column_name = params.column.colId;
 				const value = params.newValue;
 				if (column_name == "shop_price") {
-					if (isNaN(value) == true || value == "") {
+					if (isNaN(value) == true || value == "" || value >= 0) {
 						alert("숫자만 입력가능합니다.");
 						startEditingCell(params.rowIndex, column_name);
 					}

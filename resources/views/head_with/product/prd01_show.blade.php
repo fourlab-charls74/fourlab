@@ -1088,7 +1088,7 @@
                 @if($type != 'create')
                 <div class="card">
                     <div class="card-header mb-0">
-                        <a href="#">유사 상품</a>
+                        <a href="#" class="d-inline-block">유사 상품</a>
                     </div>
                     <div class="card-body pt-2">
                         <div class="card-title">
@@ -2373,7 +2373,19 @@
 
     </script>
 
+    <style>
 
+        /* 상품 옵션 grid - gx2 셀 변경시 색깔 css */
+        .opt-cell-changed {
+            background: #DC3545 !important;
+            color: white;
+            font-weight: 700;
+        }
+        .opt-cell-common {
+            background: #ffff99 !important;
+        }
+
+    </style>
 
 	<script language="javascript">
 
@@ -2400,7 +2412,7 @@
     
     const CELL_COLOR = {
         LOCKED: {'background' : '#f5f7f7'},
-        YELLOW : {'background' : '#ffff99'},
+        YELLOW : {'background' : '#ffff99'}
     };
     
     /**
@@ -2422,7 +2434,9 @@
     const initRightOptColumns = () => {
         return [
             {field:"opt1_name", headerName:"{{@$opt_kind_list[0]->name}}", width:100, cellStyle: CELL_COLOR.LOCKED, cellClass: "locked-cell", checkboxSelection: true, pinned: 'left', suppressMovable: true},
-            {field:"opt_price", headerName:"옵션가격", width:100, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true},
+            {field:"opt_price", headerName:"옵션가격", width:100, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true,
+                cellClassRules: optCellClassRules
+            },
             @if($type != 'create' && count(@$opt_kind_list) > 1)
             {
                 field: "opt2_name",
@@ -2430,8 +2444,21 @@
                 width: 120
             },
             @endif
-            {field:"opt_memo", headerName:"옵션메모", width:90, cellStyle:{"text-align":"center"}, editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true}
+            {field:"opt_memo", headerName:"옵션메모", width:90, cellStyle:{"text-align":"center"}, editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true,
+                cellClassRules: optCellClassRules
+            }
         ];
+    };
+    
+    const optCellClassRules = { // 색 변경 규칙 정의
+        "opt-cell-changed": params => {
+            const column_name = params.colDef.field;
+            if (params.data.hasOwnProperty('is_changed')) {
+                return params.data?.is_changed[column_name] ? true : false;
+            } else {
+                return false;
+            }
+        }
     };
 
     const initRightOptStockColumns = (name) => {
@@ -2439,8 +2466,10 @@
             headerName: name,
             field: name,
             children: [
-                {headerName: "온라인재고", field: `${name}_good_qty` ,type: 'numberType', width: 70, editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true},
-                {headerName: "보유재고", field: `${name}_wqty`,type: 'numberType', width: 58, suppressMovable: true},
+                {headerName: "온라인재고", field: `${name}_good_qty`, type: 'numberType', width: 70, editable: true, cellStyle: CELL_COLOR.YELLOW, 
+                    suppressMovable: true, cellClassRules: optCellClassRules
+                },
+                {headerName: "보유재고", field: `${name}_wqty`, type: 'numberType', width: 58, suppressMovable: true},
             ]
         };
     };
@@ -2475,7 +2504,7 @@
         gridDiv = document.querySelector(pApp2.options.gridId);
         options = {
             onCellValueChanged: (params) => optEvtAfterEdit(params)
-        }
+        }   
         gx2 = new HDGrid(gridDiv, extra_option_stock_columns, options);
 
         searchOptKind();
@@ -2507,14 +2536,14 @@
         gx2.gridOptions.api.startEditingCell({ rowIndex: row_index, colKey: col_key });
     };
 
+    let changedOptCells = [];
     const optEvtAfterEdit = (params) => {
         if (params.oldValue !== params.newValue) {
-
             row = params.data;
+
             const row_index = params.rowIndex;
             const column_name = params.column.colId;
             const value = params.newValue;
-
             if (column_name == "opt_price") {
                 if (isNaN(value) == true || value == "") {
                     alert("숫자만 입력가능합니다.");
@@ -2525,12 +2554,21 @@
                 let regExp = /.+(?=_good_qty)/i;
                 let arr = column_name.match(regExp);
                 if (arr) {
-                    if (isNaN(value) == true || value == "") {
+                    if (isNaN(value) == true || value == "" || value >= 0) {
                         alert("숫자만 입력가능합니다.");
                         gx2StartEditingCell(row_index, column_name);
                     }
                 }
             }
+
+            // 셀 값 수정시 빨간색으로 변경
+            if (row.hasOwnProperty('is_changed')) {
+                row.is_changed[column_name] = true;
+            } else {
+                row.is_changed = {};
+                row.is_changed[`${column_name}`] = true;
+            }
+            gx2.gridOptions.api.applyTransaction({ update : [row] });
         }
     };
 
@@ -2874,7 +2912,6 @@
     /**
      * -------------------------------------------------------- 상품 옵션 끝
      */
-
 
     // 해당 상품의 기획전 포함 정보 삭제
     function deletePlanning(d_cat_cd){

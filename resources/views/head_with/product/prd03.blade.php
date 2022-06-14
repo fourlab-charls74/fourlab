@@ -323,7 +323,7 @@
                         'price-pink': (p) => !p.data.is_changed && (parseInt(p.value) === 0 || p.data.price === parseInt(p.value)),
                         'price-yellow': (p) => !p.data.is_changed && !(parseInt(p.value) === 0 || p.data.price === parseInt(p.value)),
                     },
-                    width: 80, editable: true, onCellValueChanged: calculatePriceMargin 
+                    width: 80, editable: true, onCellValueChanged: calculatePriceMargin
                 },
                 { field: `group_${col.group_no}_ratio`, headerName: "마진율", type: 'numberType', cellStyle: styleOfMarginRatio, width: 80 },
                 { field: `group_${col.group_no}_dc_ratio`, headerName: "할인율", type: 'numberType', cellStyle: styleOfDCRatio, width: 80 },

@@ -1138,7 +1138,7 @@
                 const value = params.newValue;
                 switch (column_name) {
                     case "goods_sh": // 시중가
-                        if (isNaN(value) == true || value == "") {
+                        if (isNaN(value) == true || value == "" || value >= 0) {
                             alert("숫자만 입력가능합니다.");
                             startEditingCell(row.idx, column_name);
                         } 
@@ -1148,7 +1148,7 @@
                         // }
                         break;
                     case "wonga": // 원가
-                        if (isNaN(value) == true || value == "") {
+                        if (isNaN(value) == true || value == "" || value >= 0) {
                             alert("숫자만 입력가능합니다.");
                             startEditingCell(row.idx, column_name);
                         } else if (value == "") {
@@ -1157,7 +1157,7 @@
                         }
                         break;
                     case "price": // 판매가
-                        if (isNaN(value) == true || value == "") {
+                        if (isNaN(value) == true || value == "" || value >= 0) {
                             alert("숫자만 입력가능합니다.");
                             startEditingCell(row.idx, column_name);
                         } else if (value == "") {
@@ -1174,7 +1174,7 @@
                         }
                         break;
                     case "margin_rate": // 마진율
-                        if (isNaN(value) == true || value == "") {
+                        if (isNaN(value) == true || value == "" || value >= 0) {
                             alert("숫자만 입력가능합니다.");
                             startEditingCell(row.idx, column_name);
                         } else if (value == "") {
