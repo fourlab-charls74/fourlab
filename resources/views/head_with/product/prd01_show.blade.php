@@ -2866,7 +2866,7 @@
 
     /*
     ***
-    상품 옵션 품목 관리 관련
+    상품 기본 옵션 품목 관리 관련
     ***
     */
     $(".option-add-btn").on("click", function(e) {
@@ -2881,8 +2881,10 @@
         );
     });
 
+    // 옵션 삭제 (공통)
     $(".option-del-btn").on("click", function(e) {
         e.preventDefault();
+        const type = last_option_row?.type;
         if (type == "기본") {
             optDeleteInGrid();
         } else if (type =="추가") {
@@ -2915,7 +2917,7 @@
                 const { code, msg } = response?.data;
                 if (code == 200) {
                     alert(msg);
-                    afterSaveOrDel();
+                    afterSaveOrDel(); // 여기
                 } else alert(msg);
             } catch (error) {
                 console.log(error);
@@ -2992,7 +2994,7 @@
             alert(data.msg)
         } else if (data?.code == 200) {
             alert(data.msg)
-            getOptionStock(last_option_row);
+            afterSaveOrDel();
         };
 
     };

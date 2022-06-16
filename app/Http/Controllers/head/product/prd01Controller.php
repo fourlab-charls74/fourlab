@@ -2343,7 +2343,6 @@ class prd01Controller extends Controller
 		} catch(Exception $e){
 			$code = 500;
 		}
-
 		
 		return response()->json([
 			"code" => $code,

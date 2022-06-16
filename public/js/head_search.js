@@ -882,7 +882,6 @@ SearchGoodsNos.prototype.Open = function(id = 'goods_no',callback = null){
 
 SearchGoodsNos.prototype.SetGrid = function(divId){
     const columns = [
-
         {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
         {field: "goods_no", headerName: "상품번호", width: 100, pinned: 'left'},
         {field: "style_no", headerName: "스타일넘버", width: 100, pinned: 'left'},
@@ -945,7 +944,6 @@ ControlOption.prototype.Open = function(goods_no = 0, afterSaveOrDel = null) {
 };
 
 ControlOption.prototype.SetGrid = function(divId) {
-
     const columns = [
         {headerName: '', width:40, valueGetter: 'node.id', cellRenderer: 'loadingRenderer'},
         {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, sort: null},
@@ -958,7 +956,7 @@ ControlOption.prototype.SetGrid = function(divId) {
     this.grid.Request(`/head/product/prd01/${this.goods_no}/get-basic-options`, null, 1, function(e) {
         const opt_kinds = e.head.opt_kinds;
         this.kinds = opt_kinds;
-        if ($("#opt_kind .option").length == 0) {
+        if ($("#opt_kind option").length == 0) {
             $("#opt_kind").append(`<option value=0>= 옵션구분 =</option>`);
             opt_kinds.forEach(opt => {
                 $("#opt_kind").append(`<option value='${JSON.stringify(opt)}'>${opt.name}</option>`);
