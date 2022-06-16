@@ -743,8 +743,8 @@ class ord22Controller extends Controller
 
     public function out_complete(Request $req) {
 
-        $code	= "200";
-        $msg	= "";
+        $code = 200;
+        $msg = "모든 항목이 정상적으로 출고완료 처리되었습니다.";
 
         // 설정 값 얻기
         $conf = new Conf();
@@ -754,7 +754,7 @@ class ord22Controller extends Controller
         $cfg_sms_yn			= $conf->getValue($cfg_sms,"sms_yn");
         $cfg_delivery_yn	= $conf->getValue($cfg_sms,"delivery_yn");
         $cfg_delivery_msg	= $conf->getValue($cfg_sms,"delivery_msg");
-        $shop_phone =       $conf->getConfigValue("shop","phone");
+        $shop_phone         = $conf->getConfigValue("shop","phone");
 
         $user = [
             'id'	=> Auth('head')->user()->id,
@@ -764,12 +764,13 @@ class ord22Controller extends Controller
 		$dlv_cd			= $req->input("dlv_cd", '');
 		$send_sms_yn	= $req->input("send_sms_yn", 'N');
 
-        try {
-            // Start transaction
-            DB::beginTransaction();
-            foreach($order_nos as $order_data)
-            {
-                list($ord_no, $ord_opt_no, $dlv_no)	= explode(",", $order_data);
+        $failed = [];
+
+        foreach($order_nos as $order_data) {
+            list($ord_no, $ord_opt_no, $dlv_no)	= explode(",", $order_data);
+            try {
+                DB::beginTransaction();
+
                 $dlv_nm = SLib::getCodesValue('DELIVERY',$dlv_cd);
                 if($dlv_nm === "") $dlv_nm = $dlv_cd;
 
@@ -977,29 +978,21 @@ class ord22Controller extends Controller
                             'msg_yn' => $msg_yn,
                             'rt' => DB::raw("now()")
                         ]);
+                } else {
+                    throw new Exception("재고없음");
+                    // throw new Exception("선택하신 주문 중 재고가 없는 주문건이 있습니다. 검색 후 다시 처리하여 주십시오.[ord_no:" . $ord_no . ", ord_opt_no:" . $ord_opt_no . "]");
                 }
-                else
-                {
-                    throw new Exception("선택하신 주문 중 재고가 없는 주문건이 있습니다. 검색 후 다시 처리하여 주십시오.[ord_no:" . $ord_no . ", ord_opt_no:" . $ord_opt_no . "]");
-                }
+
+                DB::commit();
+            } catch (Exception $e) {
+                DB::rollBack();
+                $code = 206;
+                $msg = "선택하신 주문 중 재고가 없는 주문건이 있습니다. 처리 실패한 항목은 다시 처리해주세요.";
+                array_push($failed, $ord_opt_no);
             }
-
-            // Finish transaction
-            DB::commit();
-
-            $code = "200";
-            $msg = "";
-
-        } catch(Exception $e) {
-            DB::rollBack();
-            $code = 500;
-            $msg = $e->getMessage();
         }
 
-        return response()->json([
-            "code" => $code,
-            "msg" => $msg
-        ]);
+        return response()->json(['code' => $code, 'msg' => $msg, 'body' => ['failed' => $failed]]);
     }
 
     private function get_is_not_use_date(Request $request) {

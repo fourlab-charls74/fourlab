@@ -9,7 +9,7 @@
 				<div class="d-sm-flex card-header mb-0 justify-content-between">
 					<a href="#">택배송장 일괄입력</a>
 					<div class="d-none d-sm-inline-block">
-							<button class="btn btn-sm btn-primary shadow-sm search-btn"><i class="fas fa-search fa-sm mr-1 fs-12"></i>조회</button>
+						<button type="button" class="btn btn-sm btn-primary shadow-sm search-btn"><i class="fas fa-search fa-sm mr-1 fs-12"></i>조회</button>
 					</div>
 				</div>
 				<div class="card-body">
@@ -102,7 +102,7 @@
 					headerName: '',
 					headerCheckboxSelection: true,
 					headerCheckboxSelectionFilteredOnly: true,
-					width: 50,
+					width: 40,
 					checkboxSelection: function(params) {
 						return params.data.chk != 2;
 					},
@@ -118,7 +118,10 @@
 					valueGetter: 'node.id',
 					cellRenderer: 'loadingRenderer',
 				},
-				{field:"msg" , headerName:"내용"},
+				{field:"msg" , headerName:"내용", 
+					cellRenderer: (p) => p.value === "S" ? "성공" : p.value === "F" ? "실패" : "", 
+					cellStyle: (p) => ({"text-align": "center", "color": p.value === "S" ? "blue" : p.value === "F" ? "red" : "black"}),
+				},
 				{field:"ord_opt_no" , headerName:"주문일련번호"},
 				{field:"dlv_cd_nm" , headerName:"택배사"  },
 				{field:"dlv_no" , headerName:"송장번호"  },
@@ -258,19 +261,27 @@ $(".out-complate-btn").click(function()
 				send_sms_yn : $("[name=snd_sms_yn]:checked").val()
 			},
 			success: function (data) {
-				if(data.code == "200" ){
-					alert("출고완료 상태로 변경되었습니다.");
-					window.opener.Search();
-					window.close();
-				}else{
-					alert(data.msg);
+				if(data.code === 200) {
+					gx.gridOptions.api.forEachNode(function(node) {
+						if(node.selected) {
+							node.setDataValue('msg', 'S');
+						}
+					});
+				} else if(data.code === 206) {
+					gx.gridOptions.api.forEachNode(function(node) {
+						if(node.selected) {
+							let result = data.body.failed.includes(node.data.ord_opt_no.toString()) ? 'F' : 'S';
+							node.setDataValue('msg', result);
+						}
+					});
 				}
+				alert(data.msg);
+				window.opener.Search();
 			},
 			error: function(request, status, error) {
 				const msg = request.responseJSON.msg;
 				const code = request.status;
 				alert(`${msg} (Code : ${code})`);
-				//console.log(error);
 			}
 		});
 	}
