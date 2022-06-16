@@ -2165,7 +2165,7 @@ class prd01Controller extends Controller
 			insert into goods_option (
 				goods_no, goods_sub, type, name, required_yn, use_yn, seq, option_no, rt
 			) values (
-				'$goods_no', '$goods_sub', '$opt_type', '$opt_type_nm', '$opt_required_yn', '$opt_use_yn', '0', null, now()
+				'$goods_no', '$goods_sub', '$opt_type', '$opt_type_nm', '$opt_required_yn', '$opt_use_yn', '0', 0, now()
 			)
 		";
 
@@ -2333,6 +2333,8 @@ class prd01Controller extends Controller
 			";
 			$opt_kinds = DB::select($sql);
 
+			// dd($opt_kinds);
+
 			$sql = "
 				select distinct substring_index(goods_opt, '^', :index) as goods_opt, substring_index(opt_name, '^', :index2) as opt_name, goods_no
 				from goods_summary 
@@ -2471,6 +2473,15 @@ class prd01Controller extends Controller
 		$row	= DB::selectOne($sql,['goods_no' => $goods_no]);
 		$opt_kind_cnt	= $row->tot;
 
+		$opt_kind_names = [];
+		$sql =
+			" select `name` from goods_option where goods_no = :goods_no and TYPE = 'basic' ";
+		$rows = DB::select($sql,['goods_no' => $goods_no]);
+		foreach($rows as $row) {
+			$name = $row->name;
+			array_push($opt_kind_names, $name);
+		}
+
 		$sql = 
 			" select distinct(substring_index(goods_opt, '^', :index)) as opt_nm from goods_summary where goods_no = :goods_no and use_yn = 'Y' order by opt_nm ";
 	
@@ -2479,7 +2490,7 @@ class prd01Controller extends Controller
 			if ($opt_kind_cnt == 2) $opt['opt2'] = DB::select($sql,['goods_no' => $goods_no, 'index' => -1]);
 		}
 
-		return response()->json(['code' => 200, 'opt_matrix' => $opt]);
+		return response()->json(['code' => 200, 'opt_matrix' => $opt, 'opt_kind_names' => $opt_kind_names]);
 	}
 
 	public function updateBasicOptsData(Request $request, $goods_no)

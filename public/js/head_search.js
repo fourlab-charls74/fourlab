@@ -929,6 +929,10 @@ function ControlOption() {
     this.deleted_opts = [];
 }
 
+ControlOption.prototype.SetGoodsNo = (goods_no) => {
+    this.goods_no = goods_no;
+}
+
 ControlOption.prototype.Open = function(goods_no = 0, afterSaveOrDel = null) {
     this.goods_no = goods_no;
     this.afterSaveOrDel = afterSaveOrDel;
@@ -951,23 +955,22 @@ ControlOption.prototype.SetGrid = function(divId) {
         {field: "goods_opt" , headerName: "옵션", width: 200, editable: true, cellStyle: {'background' : '#ffff99'}},
         {field: "goods_no", hide: true},
     ];
-
     this.grid = new HDGrid(document.querySelector( divId ), columns);
     this.grid.Request(`/head/product/prd01/${this.goods_no}/get-basic-options`, null, 1, function(e) {
         const opt_kinds = e.head.opt_kinds;
         this.kinds = opt_kinds;
-        if ($("#opt_kind option").length == 0) {
-            $("#opt_kind").append(`<option value=0>= 옵션구분 =</option>`);
-            opt_kinds.forEach(opt => {
-                $("#opt_kind").append(`<option value='${JSON.stringify(opt)}'>${opt.name}</option>`);
-            });
-        }
+        $("#opt_kind").html("");
+        $("#opt_kind").append(`<option value=0>= 옵션구분 =</option>`);
+        opt_kinds.forEach(opt => {
+            $("#opt_kind").append(`<option value='${JSON.stringify(opt)}'>${opt.name}</option>`);
+        });
         $("#gd-option-total").text(e.head.total);
     });
 };
 
 ControlOption.prototype.Add = function(e) {
     if(e.key === "Enter" || e.type === "click") {
+
         const opt_kind_no = JSON.parse($("#opt_kind").val());
         const opt_nm = $("#opt_nm").val();
 

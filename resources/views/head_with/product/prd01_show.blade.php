@@ -916,7 +916,7 @@
                             </div>
                         </div>
 						
-						<div class="row use_option_y" style="@if( $type != 'create' && @$goods_info->is_option_use != 'Y' )display:none;@endif">
+						<div class="row use_option_y" style="@if( $type == 'create' || @$goods_info->is_option_use == 'N' )display:none;@endif">
 							<div class="col-4">
 
 								<div class="card-body pt-2">
@@ -2373,7 +2373,17 @@
 
     </script>
 
+@if($type == 'create')
     <style>
+        .use_option_y {
+            display: none !important;
+        }
+    </style>
+@endif
+
+
+    <style>
+    /* -------------------------------------------------------- 상품 옵션 시작 */
 
         /* 상품 옵션 grid - gx2 셀 변경시 색깔 css */
         .opt-cell-changed {
@@ -2393,9 +2403,6 @@
 
 	<script language="javascript">
 
-    /**
-     * -------------------------------------------------------- 상품 옵션 시작
-     */
     let gx1;
     let gx2;
     
@@ -2419,8 +2426,8 @@
         YELLOW : {'background' : '#ffff99'}
     };
 
-    const OPT1_NM = "{{ @$opt_kind_list[0]->name }}";
-    const OPT2_NM = "{{ @$opt_kind_list[1]->name }}";
+    let opt1_kind_nm = "{{ @$opt_kind_list[0]->name }}";
+    let opt2_kind_nm = "{{ @$opt_kind_list[1]->name }}";
 
     /**
      * 옵션 좌측 그리드 컬럼 정의
@@ -2438,19 +2445,18 @@
         { field: "no", headerName: "no", hide:true }
     ];
 
-    const initRightOptColumns = () => {
+    const initRightOptColumns = (opt1_kind_nm, opt2_kind_nm) => {
         return [
-            {field: "opt1_name", headerName: OPT1_NM, width:100, cellStyle: CELL_COLOR.LOCKED, cellClass: "locked-cell", checkboxSelection: true, pinned: 'left', suppressMovable: true},
+            {field: "opt1_kind_name", headerName: opt1_kind_nm, width:100, cellStyle: CELL_COLOR.LOCKED, cellClass: "locked-cell", checkboxSelection: true, pinned: 'left', suppressMovable: true},
             {field: "opt_price", headerName: "옵션가격", width:100, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true,
                 cellClassRules: optCellClassRules
             },
-            @if($type != 'create' && count(@$opt_kind_list) > 1)
+            
             {
-                field: "opt2_name",
-                headerName: OPT2_NM,
+                field: "opt2_kind_name",
+                headerName: opt2_kind_nm,
                 width: 120
             },
-            @endif
             {field: "opt_memo", headerName: "옵션메모", width:90, cellStyle: {"text-align":"center"}, editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true,
                 cellClassRules: optCellClassRules
             }
@@ -2485,7 +2491,7 @@
     /**
      * 옵션 우측 그리드 컬럼 정의
      */
-    let basic_option_stock_columns = initRightOptColumns();
+    let basic_option_stock_columns = initRightOptColumns(opt1_kind_nm, opt2_kind_nm);
 
     const extra_option_stock_columns = [
         { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 30, pinned: 'left', sort: null },
@@ -2499,7 +2505,7 @@
 
     const column_opt_del_list = [];
     /**
-     * 커스텀 그룹 체크박스 헤더 (컬럼 별 옵션 삭제 - opt2_name 관련)
+     * 커스텀 그룹 체크박스 헤더 (컬럼 별 옵션 삭제 - opt2_kind_name 관련)
      */
     class columnOptDelete {
         init(agParams) {
@@ -2545,6 +2551,7 @@
     /**
      * DOM 로딩 이후 옵션 관련 그리드 생성 및 초기화
      */
+    
     document.addEventListener('DOMContentLoaded', (event) => {
         const pApp1 = new App('', { gridId:"#div-gd-optkind" });
         let gridDiv = document.querySelector(pApp1.options.gridId);
@@ -2640,10 +2647,19 @@
         }
     };
 
-    const initRightOptSection = (type = "기본", columns = []) => {
+    const initRightOptSection = async (type = "기본", columns = []) => {
         gx2.setRows([]);
         if (type == "기본") {
-            columns = Object.keys(columns).length > 0 ? columns : basic_option_stock_columns;
+            const response = await axios({ url: `/head/product/prd01/${goods_no}/get-basic-opts-matrix`, method: 'get' });
+            const { data, status } = response;
+            if (status == 200) {
+                let { opt_kind_names } = data;
+                if (opt_kind_names && Array.isArray(opt_kind_names)) { // 변경된 옵션구분이 있는 경우 우측 컬럼 초기화
+                    opt1_kind_nm = opt_kind_names[0] ? opt_kind_names[0] : "";
+                    opt2_kind_nm = opt_kind_names[1] ? opt_kind_names[1] : "";
+                }
+            }
+            columns = Object.keys(columns).length > 0 ? columns : initRightOptColumns(opt1_kind_nm, opt2_kind_nm);
             $("#opt-type").html("기본옵션");
             $(".option-add-btn").html("관리");
             $(".option-inv-btn").show();
@@ -2659,7 +2675,7 @@
     const getOptionStock = async (row) => {
         const type = row?.type;
 
-        initRightOptSection(type);
+        await initRightOptSection(type);
 
         const GOODS_NO = '{{$goods_no}}';
         row.goods_no = GOODS_NO;
@@ -2684,32 +2700,31 @@
             let list = [];
             result.reduce((prev, item) => {
 
-                let { idx, opt1_name } = prev;
+                let { idx, opt1_kind_name } = prev;
                 const { goods_no, goods_opt, opt_name, opt_memo, opt_price, good_qty, wqty } = item;
                 const basic_opts = goods_opt.split('^');
                 const opt_names = opt_name.split('^');
 
-                if (opt1_name != basic_opts[0]) idx++;
+                if (opt1_kind_name != basic_opts[0]) idx++;
 
-                opt1_name = basic_opts[0];
-                const opt2_name = basic_opts[1];
+                opt1_kind_name = basic_opts[0];
+                const opt2_kind_name = basic_opts[1];
 
-                list[idx] = { opt1_name: opt1_name, opt_memo: opt_memo, opt_price: opt_price, ...list[idx] };
-                list[idx][`${opt2_name}_good_qty`] = good_qty;
-                list[idx][`${opt2_name}_wqty`] = wqty;
+                list[idx] = { opt1_kind_name: opt1_kind_name, opt_memo: opt_memo, opt_price: opt_price, ...list[idx] };
+                list[idx][`${opt2_kind_name}_good_qty`] = good_qty;
+                list[idx][`${opt2_kind_name}_wqty`] = wqty;
 
-                return {idx: idx, opt1_name: opt1_name};
+                return {idx: idx, opt1_kind_name: opt1_kind_name};
                 
-            }, {idx: 0, opt1_name: ""});
+            }, {idx: 0, opt1_kind_name: ""});
 
             list.shift();
 
             gx2.setRows(list);
             
         } else if (type == "추가") {
-
+            // 미구현
             gx2.setRows([{opt_name: ""}]);
-
         }
     };
     
@@ -2722,19 +2737,21 @@
                 const { data, status } = response;
                 if (status == 200) {
                     
-                    let { opt1, opt2 } = data.opt_matrix;
+                    let { opt_matrix } = data;
+                    let { opt1, opt2 } = opt_matrix;
+
                     let rightOptColumns = gx2.gridOptions.api.getColumnDefs();
 
                     let stock_cols = [];
                     opt2.map((item, idx) => {
-                        const opt_nm = item.opt_nm;
-                        stock_cols[idx] = initRightOptStockColumns(opt_nm);
+                        const goods_opt_nm = item.opt_nm;
+                        stock_cols[idx] = initRightOptStockColumns(goods_opt_nm);
                     });
 
                     let opt2_count;
                     let opt2_child_count;
                     rightOptColumns = rightOptColumns.map((column) => { // opt2 종류별로 재고 컬럼 정의
-                        if (column.field == "opt2_name") {
+                        if (column.field == "opt2_kind_name") {
                             column.children = stock_cols;
                             opt2_count = column.children.length;
                             opt2_child_count = column.children[0].children.length;
@@ -2744,17 +2761,16 @@
 
                     await gx2.gridOptions.api.setColumnDefs(applyBizestColumns(rightOptColumns));
                     gx2.gridOptions.columnApi.moveColumn("opt_memo", 2 + opt2_count * opt2_child_count); // 옵션 메모 열을 맨 뒤로 보냄
-                    autoSizeColumns(gx2, "opt1_name");
-
+                    autoSizeColumns(gx2, "opt1_kind_name");
                 }
             } catch (error) {
                 // console.log(error);
             }
 
         } else if (type == "추가") {
-
+            // 미구현
         }
-            
+
     };
     
     /*
@@ -2779,6 +2795,7 @@
     }
 
     function addOptionKind() {
+        
         if($("[name='opt_type']").val() === 'basic' && gx1.getRows().filter(item => item.type === '기본').length >= 2) return alert("기본옵션은 최대 2개까지 설정 가능합니다.");
         if($("[name='opt_type_nm']").val() === '') return alert("옵션구분값을 입력해주세요.");
 
@@ -2787,10 +2804,11 @@
             type: 'post',
             url: `/head/product/prd01/${goods_no}/option-kind-add`,
             data: $("#f1").serialize(),
-            success: function (res) {
+            success: async function (res) {
                 if(res.code === 200) {
                     resetAddOptionKindBox();
                     searchOptKind();
+                    initOptGridAndApi();
                 } else alert(res.msg);
             },
             error: function(request, status, error) {
@@ -2818,6 +2836,7 @@
             success: function (res) {
                 if(res.code === 200) {
                     searchOptKind();
+                    initOptGridAndApi();
                 }
                 else alert(res.msg);
             },
@@ -2831,7 +2850,6 @@
     function delOptionAll() {
         let rows = gx1.getRows();
         let is_option_use = $("[name=is_option_use]:checked").val();
-
         $.ajax({
             async: true,
             type: 'post',
@@ -2844,9 +2862,8 @@
             },
             success: function (res) {
                 if(res.code === 200) {
-                    location.reload();
-                    // searchOptKind();
-                    // 
+                    searchOptKind();
+                    getOptionStock(last_option_row);
                 }
                 else alert(res.msg);
             },
@@ -2856,7 +2873,7 @@
         });
     }
 
-    const afterSaveOrDel = async () => {
+    const initOptGridAndApi = async () => {
         getOptionStock(last_option_row);
         $('#ControlOptionModal .close').trigger('click');
         $("#div-gd-option").html("");
@@ -2876,7 +2893,7 @@
              * afterSaveOrDel 콜백 정의
              */
             async (data) => {
-                afterSaveOrDel();
+                initOptGridAndApi();
             }
         );
     });
@@ -2888,7 +2905,7 @@
         if (type == "기본") {
             optDeleteInGrid();
         } else if (type =="추가") {
-
+            // 미구현
         }
     });
     
@@ -2897,12 +2914,12 @@
         const rows = gx2.getSelectedRows();
 
         rows.map((item, idx) => {
-            const { opt1_name } = item;
-            del_opt_list.push({goods_opt: opt1_name, opt_name: OPT1_NM, goods_no: parseInt(goods_no)});
+            const { opt1_kind_name } = item;
+            del_opt_list.push({goods_opt: opt1_kind_name, opt_name: opt1_kind_nm, goods_no: parseInt(goods_no)});
         });
 
-        column_opt_del_list.map((opt2_name, idx) => {
-            del_opt_list.push({goods_opt: opt2_name, opt_name: OPT2_NM, goods_no: parseInt(goods_no)});
+        column_opt_del_list.map((opt2_kind_name, idx) => {
+            del_opt_list.push({goods_opt: opt2_kind_name, opt_name: opt2_kind_nm, goods_no: parseInt(goods_no)});
         });
 
         if (Array.isArray(del_opt_list) && !(del_opt_list.length > 0)) {
@@ -2917,7 +2934,7 @@
                 const { code, msg } = response?.data;
                 if (code == 200) {
                     alert(msg);
-                    afterSaveOrDel(); // 여기
+                    initOptGridAndApi();
                 } else alert(msg);
             } catch (error) {
                 console.log(error);
@@ -2941,13 +2958,13 @@
 
     const updateBasicOptsData = async (rows) => {
 
-        const opt_name = `${OPT1_NM}^${OPT2_NM}`;
+        const opt_name = `${opt1_kind_nm}^${opt2_kind_nm}`;
 
         let data = [];
         rows.map((row, idx) => {
 
             const keys = Object.keys(row);
-            const { opt1_name, opt_price, opt_memo } = row;
+            const { opt1_kind_name, opt_price, opt_memo } = row;
             keys.reduce((prev, key) => {
 
                 let obj = {};
@@ -2982,7 +2999,7 @@
 
                return obj;
                 
-            }, { goods_opt : "", opt1 : opt1_name, opt2: "", good_qty: 0, opt_price: opt_price, opt_memo: opt_memo });
+            }, { goods_opt : "", opt1 : opt1_kind_name, opt2: "", good_qty: 0, opt_price: opt_price, opt_memo: opt_memo });
 
         });
 
@@ -2994,13 +3011,13 @@
             alert(data.msg)
         } else if (data?.code == 200) {
             alert(data.msg)
-            afterSaveOrDel();
+            initOptGridAndApi();
         };
 
     };
 
     const updateExtraOptsData = async (rows) => {
-        // options where option_no = (goods_option에 들어있는 option_no)
+        //  미구현 (관련 SQL - options where option_no = (goods_option에 들어있는 option_no) 활용할 것)
         const response = await axios({ url: `/head/product/prd01/${goods_no}/update-extra-opts-data`,
             method: 'post', data: { data: rows }
         });
