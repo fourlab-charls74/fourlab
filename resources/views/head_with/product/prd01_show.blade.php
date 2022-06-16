@@ -2384,6 +2384,10 @@
         .opt-cell-common {
             background: #ffff99 !important;
         }
+        
+        .ag-input-field-input.ag-text-field-input {
+            color: #222 !important;
+        }
 
     </style>
 
@@ -2414,7 +2418,10 @@
         LOCKED: {'background' : '#f5f7f7'},
         YELLOW : {'background' : '#ffff99'}
     };
-    
+
+    const OPT1_NM = "{{ @$opt_kind_list[0]->name }}";
+    const OPT2_NM = "{{ @$opt_kind_list[1]->name }}";
+
     /**
      * 옵션 좌측 그리드 컬럼 정의
      */
@@ -2426,25 +2433,25 @@
                 return "<a href='javascript:void(0)' onclick='getOptionStock("+JSON.stringify(params.data)+")'>" + params.value +"</a>";
             }
         },
-        { field:"required_yn", headerName:"필수", width:70, cellStyle:{"text-align":"center"} },
-        { field:"use_yn", headerName:"사용", width:70, cellStyle:{"text-align":"center"} },
-        { field:"no", headerName:"no", hide:true }
+        { field: "required_yn", headerName: "필수", width:70, cellStyle:{"text-align":"center"} },
+        { field: "use_yn", headerName: "사용", width:70, cellStyle:{"text-align":"center"} },
+        { field: "no", headerName: "no", hide:true }
     ];
 
     const initRightOptColumns = () => {
         return [
-            {field:"opt1_name", headerName:"{{@$opt_kind_list[0]->name}}", width:100, cellStyle: CELL_COLOR.LOCKED, cellClass: "locked-cell", checkboxSelection: true, pinned: 'left', suppressMovable: true},
-            {field:"opt_price", headerName:"옵션가격", width:100, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true,
+            {field: "opt1_name", headerName: OPT1_NM, width:100, cellStyle: CELL_COLOR.LOCKED, cellClass: "locked-cell", checkboxSelection: true, pinned: 'left', suppressMovable: true},
+            {field: "opt_price", headerName: "옵션가격", width:100, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true,
                 cellClassRules: optCellClassRules
             },
             @if($type != 'create' && count(@$opt_kind_list) > 1)
             {
                 field: "opt2_name",
-                headerName: "{{ @$opt_kind_list[1]->name }}",
+                headerName: OPT2_NM,
                 width: 120
             },
             @endif
-            {field:"opt_memo", headerName:"옵션메모", width:90, cellStyle:{"text-align":"center"}, editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true,
+            {field: "opt_memo", headerName: "옵션메모", width:90, cellStyle: {"text-align":"center"}, editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true,
                 cellClassRules: optCellClassRules
             }
         ];
@@ -2470,7 +2477,8 @@
                     suppressMovable: true, cellClassRules: optCellClassRules
                 },
                 {headerName: "보유재고", field: `${name}_wqty`, type: 'numberType', width: 58, suppressMovable: true},
-            ]
+            ],
+            headerGroupComponent: columnOptDelete
         };
     };
 
@@ -2488,16 +2496,59 @@
         { field: "", headerName: "추가금액", width:80, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW },
         { field: "soldout_yn", headerName: "품절여부", width:80, editable: true, cellStyle: CELL_COLOR.YELLOW }
     ];
-    
+
+    const column_opt_del_list = [];
+    /**
+     * 커스텀 그룹 체크박스 헤더 (컬럼 별 옵션 삭제 - opt2_name 관련)
+     */
+    class columnOptDelete {
+        init(agParams) {
+            this.agParams = agParams;
+            this.eGui = document.createElement('div');
+            this.eGui.innerHTML = `
+                <div class="customHeaderLabel">
+                    <input ref="eInput" class="customHeaderCheckBox" type="checkbox" tabindex="-1">
+                    ${this.agParams.displayName}
+                </div>
+            `;
+            this.eCheckBox = this.eGui.querySelector(".customHeaderCheckBox");
+            this.onChangeListener = this.onChange.bind(this);
+            this.eCheckBox.addEventListener('change', this.onChangeListener);
+        }
+
+        onChange(e) {
+            const { target } = e;
+            const goods_opt = this.agParams.displayName;
+            if (target.checked == true) {
+                // 컬럼이 체크된 경우 해당 컬럼 이름을 저장
+                column_opt_del_list.push(goods_opt);
+            } else if (target.checked == false) {
+                // 컬럼을 체크 해제할 경우 해당 컬럼 이름을 배열에서 제거
+                const idx = column_opt_del_list.findIndex((item) => {
+                    return item == goods_opt;
+                });
+                column_opt_del_list.splice(idx, 1);
+            }
+        }
+
+        getGui() {
+            return this.eGui;
+        }
+
+        destroy() {
+            if (this.onChangeListener) {
+                this.eCheckBox.removeEventListener('change', this.onChangeListener)
+            }
+        }
+    };
+
     /**
      * DOM 로딩 이후 옵션 관련 그리드 생성 및 초기화
      */
     document.addEventListener('DOMContentLoaded', (event) => {
         const pApp1 = new App('', { gridId:"#div-gd-optkind" });
         let gridDiv = document.querySelector(pApp1.options.gridId);
-        let options = {
-
-        }
+        let options = {};
         gx1 = new HDGrid(gridDiv, option_kind_columns);
 
         const pApp2 = new App('', { gridId:"#div-gd-opt" });
@@ -2710,7 +2761,7 @@
     ***
     상품 옵션명 관리 관련
     ***
-    */ 
+    */
 
     $(".option-kind-add-btn").on("click", function(e) {
         e.preventDefault();
@@ -2805,6 +2856,14 @@
         });
     }
 
+    const afterSaveOrDel = async () => {
+        getOptionStock(last_option_row);
+        $('#ControlOptionModal .close').trigger('click');
+        $("#div-gd-option").html("");
+        document.control_option.reset();
+        controlOption.SetGrid("#div-gd-option");
+    };
+
     /*
     ***
     상품 옵션 품목 관리 관련
@@ -2814,22 +2873,55 @@
         e.preventDefault();
         controlOption.Open(goods_no, 
             /**
-             * afterSaveOrDel
+             * afterSaveOrDel 콜백 정의
              */
-            async (response) => {
-                getOptionStock(last_option_row);
-                $('#ControlOptionModal .close').trigger('click');
-                $("#div-gd-option").html("");
-                document.control_option.reset();
-                controlOption.SetGrid("#div-gd-option");
+            async (data) => {
+                afterSaveOrDel();
             }
         );
     });
 
     $(".option-del-btn").on("click", function(e) {
         e.preventDefault();
-        controlOption.Delete();
+        if (type == "기본") {
+            optDeleteInGrid();
+        } else if (type =="추가") {
+
+        }
     });
+    
+    const optDeleteInGrid = async () => {
+        let del_opt_list = [];
+        const rows = gx2.getSelectedRows();
+
+        rows.map((item, idx) => {
+            const { opt1_name } = item;
+            del_opt_list.push({goods_opt: opt1_name, opt_name: OPT1_NM, goods_no: parseInt(goods_no)});
+        });
+
+        column_opt_del_list.map((opt2_name, idx) => {
+            del_opt_list.push({goods_opt: opt2_name, opt_name: OPT2_NM, goods_no: parseInt(goods_no)});
+        });
+
+        if (Array.isArray(del_opt_list) && !(del_opt_list.length > 0)) {
+            alert('삭제할 옵션을 선택해주세요.');
+            return false;
+        } else {
+            if (!confirm("체크된 옵션을 삭제하시겠습니까?")) return false;
+            try {
+                const response = await axios({ url: `/head/product/prd01/${goods_no}/delete-basic-options`, 
+                    method: 'post', data: { del_opt_list: del_opt_list } 
+                });
+                const { code, msg } = response?.data;
+                if (code == 200) {
+                    alert(msg);
+                    afterSaveOrDel();
+                } else alert(msg);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+    };
 
     /**
      * 상품 옵션 관련 재고 및 메모, 가격 일괄 수정
@@ -2847,7 +2939,7 @@
 
     const updateBasicOptsData = async (rows) => {
 
-        const opt_name = "{{ @$opt_kind_list[0]->name }}^{{ @$opt_kind_list[1]->name }}";
+        const opt_name = `${OPT1_NM}^${OPT2_NM}`;
 
         let data = [];
         rows.map((row, idx) => {
@@ -2900,12 +2992,14 @@
             alert(data.msg)
         } else if (data?.code == 200) {
             alert(data.msg)
+            getOptionStock(last_option_row);
         };
+
     };
 
     const updateExtraOptsData = async (rows) => {
         // options where option_no = (goods_option에 들어있는 option_no)
-        const response = await axios({ url: `/head/product/prd01/${goods_no}/update-extra-opts-data`, 
+        const response = await axios({ url: `/head/product/prd01/${goods_no}/update-extra-opts-data`,
             method: 'post', data: { data: rows }
         });
     };

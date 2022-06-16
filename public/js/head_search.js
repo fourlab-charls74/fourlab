@@ -998,7 +998,7 @@ ControlOption.prototype.Save = function() {
         if (code == 200) {
             alert(msg);
             this.afterSaveOrDel(data);
-        } else alert(msg);
+        }
     };
 
     $.ajax({
@@ -1011,8 +1011,9 @@ ControlOption.prototype.Save = function() {
         success: function (res) {
             afterSuccess(res);
         },
-        error: function(request, status, error) {
-            console.log(request, status, error)
+        error: function(response, status, error) {
+            const { code, msg } = response?.responseJSON;
+            alert(msg);
         }
     });
 };

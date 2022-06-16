@@ -2366,6 +2366,12 @@ class prd01Controller extends Controller
 		});
 		
 		$keys = $grouped->keys()->all();
+		if (count($keys) < 2) {
+			$code = 500;
+			$msg = "기본 옵션은 2가지 이상으로 구분되어야 합니다.";
+			return response()->json(['code' => $code, 'msg' => $msg], $code);
+		}
+
 		$opt_name = $keys[0] . "^" . $keys[1];
 
 		$sql = "select count(*) as count from goods_summary where `goods_no` = :goods_no and `opt_name` = :opt_name order by seq limit 1";
