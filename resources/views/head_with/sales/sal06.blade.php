@@ -211,6 +211,7 @@
         let columns = [
             {headerName: "업체", field: "com_nm", pinned:'left', aggSum:"합계", aggAvg:"평균",width:100,
                 cellRenderer: function(params) {
+                    if(params.value === '합계' || params.value === '평균') return params.value;
                     let s_date = $("[name=sdate]").val();
                     let e_date = $("[name=edate]").val();
                     let s_ord_type = $(".ord_type:checked").map(function() {return this.value;}).get().join(",");
