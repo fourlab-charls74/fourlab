@@ -68,7 +68,7 @@ class std03Controller extends Controller
         }
 
         $result = DB::select($query);
-        //echo count($result);
+
         return response()->json([
             "code" => 200,
             "head" => array(

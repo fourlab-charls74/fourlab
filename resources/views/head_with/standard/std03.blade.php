@@ -513,13 +513,13 @@
     let gx;
     $(document).ready(function() {
         pApp.ResizeGrid();
+        pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
         //console.log(gs.gridOptions.onBodyScroll);
         Search(1);
     });
 
-    pApp.BindSearchEnter();
 
     /*
     function Search() {
@@ -553,8 +553,7 @@
 
     function Search(page) {
         let data = $('form[name=search]').serialize();
-        //console.log(data);
-        gx.Request('/head/standard/std03/search', data, page);
+        gx.Request('/head/standard/std03/search', data, -1);
     }
 </script>
 
@@ -754,10 +753,6 @@
     }
 
     function ResetSummay() {
-        console.log("브랜드 현황 초기화");
-    }
-
-    function ResetSummay() {
         document.getElementById("stat_none_cnt").innerHTML = "0";
         document.getElementById("stat_-10_cnt").innerHTML = "0";
         document.getElementById("stat_-90_cnt").innerHTML = "0";
@@ -840,6 +835,9 @@
 			document.getElementById("admin").innerHTML = o.admin_nm + "(" + o.admin_id + ")";
 			document.getElementById("regi_date").innerHTML = o.regi_date;
 			document.getElementById("upd_date").innerHTML = o.ut;
+
+            // 기존 선택된 브랜드 로고 파일 초기화
+            f1.brand_file.value = '';
 		}
 		//LoadingPopupShowHide();
 	}
@@ -986,13 +984,12 @@
      *	브랜드 리스트 얻기
      */
     function GetBrandList() {
-        //console.log("dd");
+
         $.ajax({
             async: true,
             type: 'post',
             url: '/head/standard/std03/GetBrandList',
             success: function(data) {
-                //console.log(data);
                 //console.log(data);
                 cbGetBrandList(data.body);
             },

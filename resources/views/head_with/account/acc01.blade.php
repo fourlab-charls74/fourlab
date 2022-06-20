@@ -116,7 +116,7 @@
                                 <div class="form-inline-inner input-box">
                                     <div class="form-inline inline_btn_box">
                                         <input type="hidden" name="com_cd" id="com_cd" value="">
-                                        <input type="text" class="form-control form-control-sm search-all search-enter ac-company2" name='com_nm' id='com_nm' value='' autocomplete='off'>
+                                        <input type="text" class="form-control form-control-sm sch-company" name='com_nm' id='com_nm' value='' autocomplete='off' readonly style="background-color: white;" />
                                         <a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                     </div>
                                 </div>
