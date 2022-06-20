@@ -210,7 +210,7 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th class="ty2 required">키워드</th>
+                                                <th class="ty2">키워드</th>
                                                 <td class="ty2">
                                                     <div class="input_box">
                                                         <input type="text" name="keyword" id="keyword" class="form-control form-control-sm search-all">

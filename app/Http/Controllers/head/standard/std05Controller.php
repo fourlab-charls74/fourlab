@@ -130,7 +130,8 @@ class std05Controller extends Controller
     public function store($idx = '', Request $req)
     {
         $id = Auth('head')->user()->id;
-        $name = Auth('head')->user()->name;
+        // $name = Auth('head')->user()->name;
+        $admin_nm = $req->admin_nm;
         $req_idx = $req->idx;
         $answer = $req->input('answer', '');
         //echo $req_idx;
@@ -154,15 +155,13 @@ class std05Controller extends Controller
             'question' => $req->input('question', ''),
             'answer' => $req->input('answer', ''),
             'admin_id' => $id,
-            'admin_nm' => $name,
+            'admin_nm' => $admin_nm,
             'show_yn' => $req->input('show_yn', ''),
             'best_yn' => $req->input('best_yn', ''),
             'regi_date' => now()
         ];
 
-        //print_r($values);
         DB::table('faq')->updateOrInsert($wheres, $values);
-
 
         return response()->json(null, 204);
     }

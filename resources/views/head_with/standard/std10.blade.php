@@ -173,7 +173,7 @@
 
     function openCodePopup(a) {
         const url = '/head/standard/std10/show/' + $(a).attr('data-code');
-        const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=600,height=350");
+        const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=600,height=400");
     }
 
     function openAddPopup() {

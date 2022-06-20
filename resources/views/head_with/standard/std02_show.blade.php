@@ -309,10 +309,10 @@
 														</div>
 													</div>
 												</td>
-												<th class="required">배송기간</th>
+												<th>배송기간</th>
 												<td>
 													<div class="input_box flax_box">
-														<input type="text" class="form-control form-control-sm" name="dlv_day" value="{{ $company['dlv_day'] }}" maxlength="2" style="width:80px;text-aling:right;ime-mode:disabled;" onkeydown="onlynum(this);" onfocus="this.select()" />일
+														<input type="text" class="form-control form-control-sm mr-2 text-right" name="dlv_day" value="{{ $company['dlv_day'] ? $company['dlv_day'] : 0 }}" maxlength="2" style="width:80px;text-aling:right;ime-mode:disabled;" onkeydown="onlynum(this);" onfocus="this.select()" /> 일
 													</div>
 												</td>
 											</tr>
@@ -950,6 +950,8 @@
 				success: function(data) {
 					if (data.cat_code == 1) {
 						setRowData(idx, text, cate_type);
+					} else if (data.cat_code == 2) {
+							alert("최하단에서만 등록 가능합니다.");
 					} else {
 						alert("장애가 발생했습니다.\n관리자에게 문의해 주십시오.");
 					}
@@ -1503,6 +1505,8 @@
 						if (data.cat_code == 1) {
 							rows = [{d_cat_cd: code, full_nm: full_name}];
 							gx_display.addRows(rows);
+						} else if (data.cat_code == 2) {
+							alert("최하단에서만 등록 가능합니다.");
 						} else {
 							alert("장애가 발생했습니다.\n관리자에게 문의해 주십시오.");
 						}
@@ -1549,6 +1553,8 @@
 						if (data.cat_code == 1) {
 							rows = [{d_cat_cd: code, full_nm: full_name}];
 							gx_item.addRows(rows);
+						} else if (data.cat_code == 2) {
+							alert("최하단에서만 등록 가능합니다.");
 						} else {
 							alert("장애가 발생했습니다.\n관리자에게 문의해 주십시오.");
 						}

@@ -278,21 +278,30 @@ class std02Controller extends Controller
 
 		if ($cat_cd != "") {
 			$query = "
-				insert into p_partner_category ( com_id, cat_type, cat_cd, admin_id, admin_nm,regi_date,upd_date )
-				select
+				select * from category where cat_type = :cat_type and d_cat_cd like :d_cat_cd
+			";
+			$rows = DB::select($query, ['cat_type' => $cat_type, 'd_cat_cd' => $cat_cd . '%']);
+
+			if(count($rows) > 1) {
+				$code = 2;
+			} else {
+				$query = "
+					insert into p_partner_category ( com_id, cat_type, cat_cd, admin_id, admin_nm,regi_date,upd_date )
+					select
 					'$com_id' as com_id,c.cat_type,c.d_cat_cd,'$id' as admin_id,'$name' as admin_nm,now() as regi_date, now() as upd_date
-				from category c
-				where cat_type = '$cat_type' and d_cat_cd like '$cat_cd%'
+					from category c
+					where cat_type = '$cat_type' and d_cat_cd like '$cat_cd%'
 					and ( select count(*) from category where cat_type = c.cat_type and p_d_cat_cd = c.d_cat_cd ) = 0
 					and ( select count(*) from p_partner_category where com_id = '$com_id' and cat_type = c.cat_type and cat_cd = c.d_cat_cd ) = 0
-			";
-
-			try {
-				DB::insert($query);
-				$code = 1;
-			} catch (Exception $e) {
-				$code = 0;
-			};
+				";
+				
+				try {
+					DB::insert($query);
+					$code = 1;
+				} catch (Exception $e) {
+					$code = 0;
+				};
+			}
 		}
 
 		return response()->json([
