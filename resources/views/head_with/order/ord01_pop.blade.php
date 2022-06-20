@@ -619,8 +619,8 @@
         {field:"pay_date" , headerName:"입금일시", width:125 },
         {field:"dlv_end_date" , headerName:"배송일시", width:125},
         {field:"last_up_date" , headerName:"클레임일시", width:125},
-		{field:"sms_name", hearName:"SMS_주문자명", hide:true},
-		{field:"sms_mobile", hearName:"SMS_주문자휴대폰", hide:true},
+		{field:"sms_name", headerName:"SMS_주문자명", hide:true},
+		{field:"sms_mobile", headerName:"SMS_주문자휴대폰", hide:true},
         {headerName: "", field: "nvl"}
     ];
 
