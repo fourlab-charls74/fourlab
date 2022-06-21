@@ -24,70 +24,210 @@ class std03Controller extends Controller
 
 	public function search(Request $request)
 	{
-		// 설정 값 얻기
-		//$cfg_dlv_fee				= $conf->getConfigValue("delivery","base_delivery_fee");
-		//$cfg_free_dlv_fee_limit		= $conf->getConfigValue("delivery","free_delivery_amt");
-		$cfg_dlv_fee = "2500";
-		$cfg_free_dlv_fee_limit = "20000";
+		$storage_cd = $request->input("storage_cd");
+		$storage_nm = $request->input("storage_nm");
+		$use_yn = $request->input("use_yn");
+		$stock_check_yn = $request->input("stock_check_yn");
 
-		$com_nm	= $request->input("com_nm");
-		$com_type	= $request->input("com_type");
-		$md_nm	= $request->input("md_nm");
-		$use_yn	= $request->input("use_yn");
-		$margin_type = $request->input("margin_type");
-		$api_yn	= $request->input("api_yn");
-		$site_yn	= $request->input("site_yn");
-		$dlv_policy	= $request->input("dlv_policy");
-		$settle_nm = $request->input("settle_nm");
-
+		$code = 200;
 		$where = "";
-		if ($com_nm != "") $where .= " and a.com_nm like '%$com_nm%' ";
-		if ($com_type != "") $where .= " and a.com_type = '$com_type' ";
-		if ($md_nm != "") $where .= " and a.md_nm like '$md_nm%' ";
-		if ($use_yn != "") $where .= " and a.use_yn = '$use_yn' ";
-		if ($margin_type != "") $where .= " and a.margin_type = '$margin_type' ";
-		if ($api_yn != "") $where .= " and a.api_yn = '$api_yn' ";
-		if ($site_yn != "") $where .= " and a.site_yn = '$site_yn' ";
-		if ($dlv_policy != "") $where .= " and a.dlv_policy = '$dlv_policy' ";
-		if ($settle_nm != "") $where .= " and a.settle_nm like '$settle_nm%' ";
 
-		$query = /** @lang text */
-            "
-			select
-				com_type.code_val as com_type, a.com_id, a.com_nm, concat(baesong_kind.code_val, ' / ' ,baesong_info.code_val) as baesong,
-				case a.dlv_policy
-					when 'S' then '쇼핑몰 정책'
-					when 'C' then '업체 정책'
-				end as dlv_policy,
-				if(a.dlv_policy='S', concat(format($cfg_dlv_fee,0), '원 [ ' , format($cfg_free_dlv_fee_limit,0), '원 이상 무료배송 ]'), concat(format(a.dlv_amt,0), '원 [ ' , format(a.free_dlv_amt_limit,0), '원 이상 무료배송 ]')) as baesong_price,
-				a.md_nm, a.settle_nm, a.pay_fee, margin_type.code_val as margin_type, a.site_yn, a.api_yn, a.use_yn,
-				case a.biz_type
-					when 'P' then '개인'
-					when 'C' then '법인'
-				end as biz_type,
-				a.cs_nm, a.cs_email,  a.cs_phone, a.cs_hp,
-				a.staff_nm1, a.staff_email1, a.staff_phone1, a.staff_hp1, a.staff_nm2, a.staff_email2, a.staff_phone2, a.staff_hp2
-			from company a
-				inner join `code` com_type on a.com_type = com_type.code_id and com_type.code_kind_cd = 'G_COM_TYPE'
-				inner join `code` margin_type on a.margin_type = margin_type.code_id and margin_type.code_kind_cd = 'G_MARGIN_TYPE'
-				left join `code` baesong_kind on a.baesong_kind = baesong_kind.code_id and baesong_kind.code_kind_cd = 'G_BAESONG_KIND'
-				left join `code` baesong_info on a.baesong_info = baesong_info.code_id and baesong_info.code_kind_cd = 'G_BAESONG_INFO'
+		if($storage_cd != null) 
+			$where .= " and storage_cd = '$storage_cd'";
+		if($storage_nm != null) 
+			$where .= " and (storage_nm = '$storage_nm' or storage_nm_s = '$storage_nm')";
+		if($use_yn != null) 
+			$where .= " and use_yn = '$use_yn'";
+		if($stock_check_yn != null) 
+			$where .= " and stock_check_yn = '$stock_check_yn'";
+
+		$sql = "
+			select storage_cd, storage_nm, phone, use_yn, stock_check_yn
+			from storage
 			where 1=1 $where
-			order by a.com_nm
-        ";
+			order by storage_cd
+		";
 
-		//echo $query;
-		$result = DB::select($query);
+		$rows = DB::select($sql);
+
 		return response()->json([
-			"code" => 200,
-			"head" => array(
-				"total" => count($result),
+			"code" => $code,
+			"head" => [
+				"total" => count($rows),
 				"page" => 1,
 				"page_cnt" => 1,
 				"page_total" => 1
-			),
-			"body" => $result
+			],
+			"body" => $rows
 		]);
 	}
 
+	public function show($storage_cd = '') 
+	{
+		$storage = "";
+
+		if($storage_cd != '') {
+			$sql = "
+				select storage_cd, storage_nm, storage_nm_s, zipcode, addr1, addr2, phone, fax, ceo, use_yn, loss_yn, stock_check_yn, reg_date, mod_date, admin_id
+				from storage
+				where storage_cd = :storage_cd
+			";
+
+			$storage = DB::selectOne($sql, ["storage_cd" => $storage_cd]);
+		}
+
+		$values = [
+			"cmd" => $storage_cd == '' ? "add" : "update",
+			"storage" => $storage,
+		];
+
+		return view(Config::get('shop.store.view') . '/standard/std03_show', $values);
+	}
+
+	// 창고코드 중복체크
+	public function dupcheck_storage($storage_cd = '') 
+	{
+		$code = 200;
+		$msg = "사용가능한 코드입니다.";
+
+		$sql = "
+			select count(storage_cd) as cnt
+			from storage
+			where storage_cd = :storage_cd
+		";
+
+		$cnt = DB::selectOne($sql, ["storage_cd" => $storage_cd])->cnt;
+
+		if($cnt > 0) {
+			$code = 409;
+			$msg = "이미 사용중인 코드입니다.";
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg]);
+	}
+
+	// 창고등록
+	public function add_storage(Request $request) 
+	{
+		$code = 200;
+		$msg = "창고정보가 정상적으로 등록되었습니다.";
+
+		$admin_id = Auth('head')->user()->id;
+		$storage_cd = $request->input("storage_cd", "");
+		$storage_nm = $request->input("storage_nm", "");
+		$storage_nm_s = $request->input("storage_nm_s", "");
+		$zipcode = $request->input("zipcode", "");
+		$addr1 = $request->input("addr1", "");
+		$addr2 = $request->input("addr2", "");
+		$phone = $request->input("phone", "");
+		$fax = $request->input("fax", "");
+		$ceo = $request->input("ceo", "");
+		$use_yn = $request->input("use_yn", "Y");
+		$loss_yn = $request->input("loss_yn", "Y");
+		$stock_check_yn = $request->input("stock_check_yn", "Y");
+
+		try {
+            DB::beginTransaction();
+			
+			DB::table('storage')->insert([
+				'storage_cd' => $storage_cd,
+				'storage_nm' => $storage_nm,
+				'storage_nm_s' => $storage_nm_s,
+				'zipcode' => $zipcode,
+				'addr1' => $addr1,
+				'addr2' => $addr2,
+				'phone' => $phone,
+				'fax' => $fax,
+				'ceo' => $ceo,
+				'use_yn' => $use_yn,
+				'loss_yn' => $loss_yn,
+				'stock_check_yn' => $stock_check_yn,
+				'reg_date' => now(),
+				'admin_id' => $admin_id,
+			]);
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg, "data" => ["storage_cd" => $storage_cd]]);
+	}
+
+	// 창고수정
+	public function update_storage(Request $request) 
+	{
+		$code = 200;
+		$msg = "창고정보가 정상적으로 수정되었습니다.";
+
+		$admin_id = Auth('head')->user()->id;
+		$storage_cd = $request->input("storage_cd", "");
+		$storage_nm = $request->input("storage_nm", "");
+		$storage_nm_s = $request->input("storage_nm_s", "");
+		$zipcode = $request->input("zipcode", "");
+		$addr1 = $request->input("addr1", "");
+		$addr2 = $request->input("addr2", "");
+		$phone = $request->input("phone", "");
+		$fax = $request->input("fax", "");
+		$ceo = $request->input("ceo", "");
+		$use_yn = $request->input("use_yn", "Y");
+		$loss_yn = $request->input("loss_yn", "Y");
+		$stock_check_yn = $request->input("stock_check_yn", "Y");
+
+		try {
+			DB::beginTransaction();
+			
+			DB::table('storage')
+				->where("storage_cd", "=", $storage_cd)
+				->update([
+					'storage_cd' => $storage_cd,
+					'storage_nm' => $storage_nm,
+					'storage_nm_s' => $storage_nm_s,
+					'zipcode' => $zipcode,
+					'addr1' => $addr1,
+					'addr2' => $addr2,
+					'phone' => $phone,
+					'fax' => $fax,
+					'ceo' => $ceo,
+					'use_yn' => $use_yn,
+					'loss_yn' => $loss_yn,
+					'stock_check_yn' => $stock_check_yn,
+					'mod_date' => now(),
+					'admin_id' => $admin_id,
+			]);
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg]);
+	}
+
+	// 창고삭제
+	public function delete_storage(Request $request, $storage_cd)
+	{
+		$code = 200;
+		$msg = "창고정보가 정상적으로 삭제되었습니다.";
+
+		try {
+			DB::beginTransaction();
+			
+			DB::table('storage')
+				->where("storage_cd", "=", $storage_cd)
+				->delete();
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg]);
+	}
 }

@@ -34,9 +34,15 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('std02/addcate/{com_id?}', 'std02Controller@addcategory');
         Route::get('std02/delcate/{com_id?}', 'std02Controller@DelCategory');
 
-        //업체
+        // 창고관리
         Route::get('std03', 'std03Controller@index');
         Route::get('std03/search', 'std03Controller@search');
+        Route::get('std03/show/{storage_cd?}', 'std03Controller@show');
+        Route::get('std03/dupcheck/{storage_cd?}', 'std03Controller@dupcheck_storage');
+
+        Route::post('std03/add', 'std03Controller@add_storage');
+        Route::put('std03/update', 'std03Controller@update_storage');
+        Route::delete('std03/delete/{storage_cd?}', 'std03Controller@delete_storage');
 
         // 동종업계
         Route::get('std04', 'std04Controller@index');
