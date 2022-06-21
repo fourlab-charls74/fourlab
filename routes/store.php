@@ -54,6 +54,13 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('std11', 'std11Controller@index');
         Route::get('std11/search', 'std11Controller@search');
 
+        Route::get('std11/create', 'std11Controller@createIndex');
+        Route::post('std11/create', 'std11Controller@create');
+
+        Route::get('std11/detail', 'std11Controller@detail');
+        Route::post('std11/edit', 'std11Controller@edit');
+        Route::post('std11/remove', 'std11Controller@remove');
+
     });
 
     //매장관리
@@ -74,13 +81,11 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('sal11','sal11Controller@index');
         Route::get('sal12','sal12Controller@index');
         Route::get('sal13','sal13Controller@index');
-
     });
 
     //매장관리
     Route::prefix("stock")->namespace('stock')->group(function () {
         Route::get('stk01','stk01Controller@index');
-
     });
 
 });
