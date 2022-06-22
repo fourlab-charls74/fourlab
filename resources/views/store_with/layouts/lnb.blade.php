@@ -6,7 +6,7 @@
                 <ul>
                     <li><a href="/store/standard/std51">공통코드관리</a></li>
                     <li><a href="/store/standard/std02">(개)매장관리</a></li>
-                    <li><a href="/store/standard/std03">(개)창고관리</a></li>
+                    <li><a href="/store/standard/std03">(완)창고관리</a></li>
                     <li><a href="/store/standard/std04">(개)동종업계관리</a></li>
                     <li><a href="/store/standard/std05">(개)판매유형관리</a></li>
                     <li><a href="/store/standard/std06">(개)매장영업담당자관리</a></li>
