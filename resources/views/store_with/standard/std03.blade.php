@@ -119,6 +119,7 @@
         {field: "phone", headerName: "전화번호", width: 120, cellStyle: {"text-align": "center"}},
         {field: "use_yn", headerName: "창고사용", cellStyle: {"text-align": "center"}},
         {field: "stock_check_yn", headerName: "매장재고조회", cellStyle: {"text-align": "center"}},
+        {field: "", headerName: "", width: "auto"}
     ];
 </script>
 
@@ -148,7 +149,7 @@
     // 등록/상세 팝업창 오픈
     function openPopup(storage_cd = '') {
         const url = "/store/standard/std03/show/" + storage_cd;
-        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=900,height=700");
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=900,height=570");
     }
 </script>
 @stop
