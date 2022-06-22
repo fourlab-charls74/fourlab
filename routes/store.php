@@ -25,7 +25,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
     //코드관리
     Route::prefix("standard")->namespace('standard')->group(function () {
-        //업체
+        //매장
         Route::get('std02', 'std02Controller@index');
         Route::get('std02/search', 'std02Controller@search');
         Route::get('std02/show/{com_id?}', 'std02Controller@show');

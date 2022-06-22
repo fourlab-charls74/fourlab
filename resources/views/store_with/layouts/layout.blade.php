@@ -38,9 +38,12 @@
     <script src="/with/js/app.js"></script>
     <script language="javascript">
         $(document).ready(function() {
+            /*
+            2022-06-22 ceduce 메뉴 정의해야함!!
+            
             $.ajax({
                 type: "get",
-                url: '/partner/menu',
+                url: '/user/menu',
                 dataType: 'json',
                 // data: {},
                 success: function (res) {
@@ -55,6 +58,7 @@
                 }
 
             });
+            */
         });
     </script>
 </html>
