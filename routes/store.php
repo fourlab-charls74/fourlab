@@ -60,6 +60,20 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('std11', 'std11Controller@index');
         Route::get('std11/search', 'std11Controller@search');
 
+        //코드
+        Route::get('std51', 'std51Controller@index');
+        Route::post('std51', 'std51Controller@store');
+        Route::get('std51/search', 'std51Controller@search');
+        Route::get('std51/create', 'std51Controller@create');
+        Route::get('std51/{code?}', 'std51Controller@show');
+        Route::put('std51/{code?}', 'std51Controller@update');
+        Route::delete('std51/{code}', 'std51Controller@delete');
+
+        Route::get('std51/{code?}/search', 'std51Controller@data_search');
+        Route::post('std51/{code?}/save', 'std51Controller@data_add');
+        Route::post('std51/{code?}/del', 'std51Controller@data_del');
+        Route::post('std51/{code?}/seq', 'std51Controller@data_seq');
+
     });
 
     //매장관리

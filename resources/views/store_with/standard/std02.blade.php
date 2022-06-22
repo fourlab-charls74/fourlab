@@ -9,247 +9,211 @@
     </div>
 </div>
 <form method="get" name="search">
-    <div id="search-area" class="search_cum_form">
-        <div class="card mb-3">
-            <div class="d-flex card-header justify-content-between">
-                <h4>검색</h4>
-                <div>
-                    <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                    <a href="#" onclick="Cmder('add')" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
-		            <a href="#" onclick="formReset()" class="btn btn-sm btn-outline-primary shadow-sm">검색조건 초기화</a>
-                    <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-							<label for="name">업체</label>
-                            <div class="form-inline inline_select_box">
-                                <div class="form-inline-inner input-box w-100">
-                                    <div class="form-inline inline_btn_box">
-                                        <input type="hidden" id="com_id" name="com_id">
-                                        <input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company" style="width:100%;">
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
-                                </div>
-                            </div>
+	<div id="search-area" class="search_cum_form">
+		<div class="card mb-3">
+
+			<div class="d-flex card-header justify-content-between">
+				<h4>검색</h4>
+				<div class="flax_box">
+					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+					<a href="#" onclick="Add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>데이터업로드</a>
+					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
+				</div>
+			</div>
+
+			<div class="card-body">
+				<div class="row">
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="good_types">매장구분 :</label>
+							<div class="flax_box">
+								<select name='store_type' class="form-control form-control-sm">
+									<option value=''>전체</option>
+                                @foreach ($store_types as $store_type)
+                                    <option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
+                                @endforeach
+								</select>
+							</div>
 						</div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="dlv_kind">업체구분</label>
-                            <div class="flax_box">
-                                <select id="com_type" name="com_type" class="form-control form-control-sm">
-                                    <option value="">전체</option>
-                                    @foreach ($com_types as $com_type)
-                                        <option value="{{ $com_type->code_id }}">{{ $com_type->code_val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="formrow-email-input">본사판매처여부</label>
-                            <div class="flax_box">
-                                <select class="form-control form-control-sm" name="site_yn">
-                                    <option selected value="">전체</option>
-                                    <option value="Y">사용</option>
-                                    <option value="N">미사용</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="formrow-firstname-input">사용여부</label>
-                            <div class="flax_box">
-                                <select class="form-control form-control-sm" name="use_yn">
-                                    <option value="">전체</option>
-                                    <option selected value="Y">사용</option>
-                                    <option value="N">미사용</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="dlv_kind">수수료적용</label>
-                            <div class="flax_box">
-                                <select class="form-control form-control-sm" name="margin_type">
-                                    <option selected value="">전체</option>
-                                    <option value="FEE">수수료 지정</option>
-                                    <option value="WONGA">공급가 지정</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+					</div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="">매장종류 :</label>
+							<div class="flax_box">
+								<select name='store_kind' class="form-control form-control-sm">
+									<option value=''>전체</option>
+									@foreach ($store_kinds as $store_kind)
+										<option value='{{ $store_kind->code_id }}'>{{ $store_kind->code_val }}</option>
+									@endforeach
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="">매장명 :</label>
+							<div class="flax_box">
+								<input type='text' class="form-control form-control-sm search-enter" name='com_nm' value=''>
+							</div>
+						</div>
+					</div>
+				</div>
 
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="dlv_kind">API연동</label>
-                            <div class="flax_box">
-                                <select class="form-control form-control-sm" name="api_yn">
-                                    <option selected value="">전체</option>
-                                    <option value="Y">사용</option>
-                                    <option value="N">미사용</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="resul_btn_wrap mb-3">
-            <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-            <a href="#" onclick="Cmder('add')" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
-            <a href="#" onclick="formReset()" class="btn btn-sm btn-outline-primary shadow-sm">검색조건 초기화</a>
-            <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
-        </div>
-    </div>
+				<div class="row">
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="">매장코드 :</label>
+							<div class="flax_box">
+								<input type='text' class="form-control form-control-sm search-enter" name='com_id' value=''>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="item">사용유무</label>
+							<div class="form-inline form-radio-box">
+								<div class="custom-control custom-radio">
+									<input type="radio" name="use_yn" id="use_yn1" class="custom-control-input" value="Y" checked>
+									<label class="custom-control-label" for="use_yn1" value="">Y</label>
+								</div>
+								<div class="custom-control custom-radio">
+									<input type="radio" name="use_yn" id="use_yn2" class="custom-control-input" value="N">
+									<label class="custom-control-label" for="use_yn2" value="Y">N</label>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="item">자료수/정렬 :</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input_box" style="width:24%;">
+									<select name="limit" class="form-control form-control-sm">
+										<option value="100">100</option>
+										<option value="500" selected>500</option>
+										<option value="1000">1000</option>
+										<option value="2000">2000</option>
+									</select>
+								</div>
+								<span class="text_line">/</span>
+								<div class="form-inline-inner input_box" style="width:45%;">
+									<select name="ord_field" class="form-control form-control-sm">
+										<option value="a.com_nm" selected>코드명</option>
+										<option value="a.com_id" >코드아이디</option>
+										<option value="a.seq" >SEQ</option>
+									</select>
+								</div>
+								<div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
+									<div class="btn-group" role="group">
+										<label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="" data-original-title="내림차순"><i class="bx bx-sort-down"></i></label>
+										<label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="" data-original-title="오름차순"><i class="bx bx-sort-up"></i></label>
+									</div>
+									<input type="radio" name="ord" id="sort_desc" value="desc">
+									<input type="radio" name="ord" id="sort_asc" value="asc" checked="">
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<div class="resul_btn_wrap mb-3">
+			<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+			<a href="#" onclick="Add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 데이터업로드</a>
+			<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
+		</div>
+
+	</div>
 </form>
-
-<div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
-    <div class="card-body shadow">
-        <div class="card-title mb-3">
-            <div class="filter_wrap">
-                <div class="fl_box">
-                    <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
-                </div>
-                <div class="fr_box">
-
-                </div>
-            </div>
-        </div>
-        <div class="table-responsive">
-            <div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
-        </div>
-    </div>
+<!-- DataTales Example -->
+<div class="card shadow mb-0 last-card pt-2 pt-sm-0">
+	<div class="card-body">
+		<div class="card-title">
+			<div class="filter_wrap">
+				<div class="fl_box">
+					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
+				</div>
+			</div>
+		</div>
+		<div class="table-responsive">
+			<div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
+		</div>
+	</div>
 </div>
 <script language="javascript">
-var columns = [
-        // this row shows the row index, doesn't use any data from the row
-        {headerName: '#', width:35, pinned:'left', maxWidth: 100,valueGetter: 'node.id', cellRenderer: 'loadingRenderer', cellStyle: {"background":"#F5F7F7"}},
-        {field:"com_type",headerName:"업체구분", pinned:'left', cellStyle:StyleGoodsTypeNM,editable: true},
-        {field:"com_id",headerName:"매장코드", pinned:'left',
-            cellRenderer: function(params) {
-                if (params.value !== undefined && params.data.no != "") {
-                    return '<a href="#" onclick="ComDetail(\''+ params.value +'\');" >'+ params.value+'</a>';
-                }
-            }
-        },
-        {field:"com_nm",headerName:"매장명", pinned:'left'},
-        {field:"",headerName:"거래구분"},
-        {field:"",headerName:"대표번호"},
-        {field:"",headerName:"핸드폰번호"},
-        {field:"",headerName:"FAX번호"},
-        {field:"",headerName:"주소",width:300},
-        {field:"",headerName:"개장일자"},
-        {field:"",headerName:"폐점일자"},
-        {field:"",headerName:"매니저",
-            children: [
-                {headerName: "매니저명", field: ""},
-                {headerName: "시작일자", field: ""},
-                {headerName: "종료일자", field: ""},
-                {field:"",headerName:"매니저보증금"},
-            ]
-        },
-        {field:"",headerName:"매니저수수료",
-            children: [
-                {field:"",headerName:"정상"},
-                {field:"",headerName:"행사"},
-            ]
-        },
-        {field:"", headerName:"", width: "auto"},
-];
+	var columns = [
+		{headerName: "#",			field: "num",			filter:true,width:50,valueGetter: function(params) {return params.node.rowIndex+1;},pinned:'left'},
+		{headerName:"매장구분",		field:"com_type_nm",	width:90},
+		{headerName:"매장코드",		field:"com_id",			width:90,
+			cellRenderer: function(params) {
+				return '<a href="#" onClick="popDetail(\''+ params.data.com_id +'\')">'+ params.value+'</a>'
+			}
+		},
+		{headerName:"매장명",		field:"com_nm",			width:90},
+		{headerName:"매장종류",		field:"store_kind_nm",	width:100},
+		{headerName:"전화",			field:"phone",			width:100},
+		{headerName:"모바일",		field:"mobile",			width:100},
+		{headerName:"FAX",			field:"fax",			width:100},
+		{headerName:"우편번호",		field:"zipcode",		width:100},
+		{headerName:"주소",			field:"addr",			width:100},
+		{headerName:"개장일",		field:"sdate",			width:100},
+		{headerName:"폐점일",		field:"edate",			width:100},
+		{headerName:"매니저",		children:[
+			{headerName:"매니저명",	field:"manager_nm",		width:100},
+			{headerName:"시작일",	field:"manager_sdate",	width:100},
+			{headerName:"종료일",	field:"manager_edate",	width:100},
+		]},
+		{headerName:"매니저보증금",	field:"manager_deposit",width:100, type: 'currencyType'},
+		{headerName:"매니저수수료",	children:[
+			{headerName:"정상",		field:"manager_fee",	width:100, type: 'currencyType'},
+			{headerName:"행사",		field:"manager_sfee",	width:100, type: 'currencyType'},
+		]},
+		{headerName:"보증금",		children:[
+			{headerName:"현금",		field:"deposit_cash",	width:100, type: 'currencyType'},
+			{headerName:"담보",		field:"deposit_coll",	width:100, type: 'currencyType'},
+		]},
+		{headerName:"인테리어",		children:[
+			{headerName:"비용",		field:"interior_cost",	width:100, type: 'currencyType'},
+			{headerName:"부담",		field:"interior_burden",width:100, type: 'currencyType'},
+		]},
+		{headerName:"기본수수료",	field:"fee",			width:100, type: 'currencyType'},
+		{headerName:"판매수수료율",	field:"sale_fee",		width:100, cellStyle:{"text-align":"right"}},
+		{headerName:"사용여부",		field:"use_yn",			width:90}
+	];
+
+	function Add()
+	{
+		const url='/store/standard/std02/show';
+		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
+	}
+
+	function popDetail(com_id){
+		const url='/store/standard/std02/view/' + com_id;
+		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
+	}
 
 </script>
 <script type="text/javascript" charset="utf-8">
-    const pApp = new App('',{
-        gridId:"#div-gd",
-    });
-    let gx;
+	const pApp = new App('',{
+		gridId:"#div-gd",
+	});
+	let gx;
 
-    $(document).ready(function() {
-        pApp.ResizeGrid(275);
-        let gridDiv = document.querySelector(pApp.options.gridId);
-        const gridOptions = {
-            rowData: null,
-            onColumnResized: (params) => {
-                // console.log(params);
-            }
-        };
-        gx = new HDGrid(gridDiv, columns, gridOptions);
-        Search(1);
-    });
+	$(document).ready(function() {
+		pApp.ResizeGrid(265);
+		pApp.BindSearchEnter();
+		let gridDiv = document.querySelector(pApp.options.gridId);
+		gx = new HDGrid(gridDiv, columns);
+		Search();
+	});
 
-    pApp.BindSearchEnter();
-
-    var _isloading = false;
-    function onscroll(params){
-
-        if(_isloading === false && params.top > gridDiv.scrollHeight){
-
-            var rowtotal = gridOptions.api.getDisplayedRowCount();
-            // console.log('getLastDisplayedRow : ' + gridOptions.api.getLastDisplayedRow());
-            // console.log('rowTotalHeight : ' + rowtotal * 25);
-            // console.log('params.top : ' + params.top);
-
-            if(gridOptions.api.getLastDisplayedRow() > 0 && gridOptions.api.getLastDisplayedRow() ==  rowtotal -1) {
-                // console.log(params);
-                Search(0);
-            }
-            // var rowtotal = gridOptions.api.getDisplayedRowCount();
-            // var rowHeight = 25;
-            // var rowTotalHeight = rowtotal * gridOptions.rowHeight;
-            // if(rowtotal > 0 && params.top > rowTotalHeight && (rowtotal - 1) == gridOptions.api.getLastDisplayedRow()){
-            //     console.log('params.top :' + params.top);
-            //     console.log('rowTotalHeight :' + rowTotalHeight);
-            //     console.log('top : ' + params.top);
-            //     console.log('eGridDiv : ' + eGridDiv.scrollHeight);
-            //     console.log(gridOptions.api.getDisplayedRowCount());
-            //     console.log(gridOptions.api.getFirstDisplayedRow());
-            //     console.log(gridOptions.api.getLastDisplayedRow());
-            //     _isloading = true;
-            //     Search(0);
-            // }
-        }
-    }
-
-    var _page = 1;
-    var _total = 0;
-    var _grid_loading = false;
-    var _code_items = "";
-    var columns_arr = {};
-    var option_key = {};
-
-    function Search(page) {
-        let data = $('form[name="search"]').serialize();
-        console.log(data);
-        gx.Request('/store/standard/std02/search', data, page);
-    }
-
-	function Cmder(cmd){
-		if(cmd == "add"){
-			var url = "/store/standard/std02/show/";
-			//openWindow(url,'','resizable=yes,scrollbars=yes', '900', '600');
-			const Com=window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=2 00,left=500,width=1100,height=760");
-
-		}
+	function Search() {
+		let data = $('form[name="search"]').serialize();
+		gx.Request('/store/standard/std02/search', data,1);
 	}
 
-    function ComDetail(com_id){
-        var url = "/store/standard/std02/show/" + com_id;
-        //openWindow(url,'','resizable=yes,scrollbars=yes', '900', '600');
-        const Com=window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=2 00,left=500,width=1100,height=760");
-    }
-
-	function formReset() {
-        document.search.reset();
-    }
 </script>
-
 @stop
