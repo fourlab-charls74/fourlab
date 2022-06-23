@@ -93,7 +93,7 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="style_no">스타일넘버/상품코드</label>
+                                <label for="style_no">스타일넘버/상품번호</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box">
                                         <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="{{ $style_no }}">
@@ -159,20 +159,6 @@
                     <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label>상단홍보글/하단홍보글</label>
-                                <div class="form-inline">
-                                    <div class="form-inline-inner input_box" style="width: 47%">
-                                        <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='head_desc' value=''>
-                                    </div>
-                                    <span class="text_line" style="width: 6%">/</span>
-                                    <div class="form-inline-inner input-box" style="width: 47%">
-                                        <input type='text' class="form-control form-control-sm w-100 search-enter" name='ad_desc' value=''>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
                                 <label for="goods_nm">상품명</label>
                                 <div class="flax_box">
                                     <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value=''>
@@ -187,6 +173,17 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-lg-4 inner-td">
+                            <div class="form-group">
+                                <label>상품코드</label>
+                                <div class="form-inline">
+                                    <div class="form-inline-inner input_box">
+                                        <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='head_desc' value=''>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                     <div class="row">
                         <div class="col-lg-4 inner-td">
@@ -355,6 +352,7 @@
             {field: "sale_stat_cl", headerName: "상품상태", width:70, type: 'GoodsStateTypeLH50'},
             {field: "prd_cd", headerName: "상품코드", cellStyle: {"line-height": "40px"}},
             {field: "goods_opt", headerName: "옵션", cellStyle: {"line-height": "40px"}},
+            {field: "barcode", headerName: "바코드", cellStyle: {"line-height": "40px"}},
             {
                 field: "wqty", headerName: "보유재고수", width:70, type: 'numberType', cellStyle: {"line-height": "40px"},
                 cellRenderer: function(params) {
