@@ -80,8 +80,15 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('std51/{code?}/save', 'std51Controller@data_add');
         Route::post('std51/{code?}/del', 'std51Controller@data_del');
         Route::post('std51/{code?}/seq', 'std51Controller@data_seq');
-        
+
     });
+
+    // 상품관리
+    Route::prefix("product")->namespace('product')->group(function () {
+        Route::get('prd02','prd02Controller@index');
+        Route::get('prd02/search','prd02Controller@search');
+    });
+
 
     //매장관리
     Route::prefix("sale")->namespace('sale')->group(function () {

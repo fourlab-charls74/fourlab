@@ -16,6 +16,7 @@
                 <a href="javascript:;" class="arrow"><i class="bx bx-shopping-bag fs-18"></i><span>상품관리</span></a>
                 <ul>
                     <li><a href="/head/product/prd01" target="_blank">(개)상품관리</a></li>
+                    <li><a href="/store/product/prd02">(개)상품관리(재고)</a></li>
                     <li><a href="/head/product/prd01" target="_blank">원부자재관리</a></li>
                     <li><a href="/head/product/prd01" target="_blank">매장가격변경</a></li>
                 </ul>
