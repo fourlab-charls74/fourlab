@@ -29,7 +29,7 @@
     </div>
 </div>
 
-<form method="get" name="f1">
+<form method="get" id="f1" name="f1">
     <div id="search-area" class="search_cum_form">
         <div class="card mb-3">
             <div class="d-flex card-header justify-content-between">
@@ -61,9 +61,9 @@
                             <div class="flex_box">
                                 <select id="as_type" name="as_type" class="form-control form-control-sm">
                                     <option value="">선택</option>
-                                    <option value="고객수선">고객수선</option>
-                                    <option value="매장수선">매장수선</option>
-                                    <option value="본사수선">본사수선</option>
+                                    <option value="C">고객수선</option>
+                                    <option value="S">매장수선</option>
+                                    <option value="H">본사수선</option>
                                 </select>
                             </div>
                         </div>
@@ -102,11 +102,11 @@
                             <label for="store_no" class="required">매장번호/매장명</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box">
-                                    <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='store_no' id="store_no" value="">
+                                    <input type='text' class="form-control form-control-sm search-enter" name='store_no' id="store_no" value="">
                                 </div>
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input_box">
-                                    <input type="text" class="form-control form-control-sm search-enter" name="store_nm" value="">
+                                    <input type="text" class="form-control form-control-sm search-enter" name="store_nm" id="store_nm" value="">
                                 </div>
                             </div>
                         </div>
@@ -116,12 +116,12 @@
                             <label for="item" class="required">품목구분</label>
                             <div class="flex_box">
                                 <select name="item" id="item" class="form-control form-control-sm">
-                                    <option value="CLOTH TOP">CLOTH TOP</option>
-                                    <option value="CLOTH BOTTOM">CLOTH BOTTOM</option>
-                                    <option value="BAG">BAG</option>
-                                    <option value="SHOES">SHOES</option>
-                                    <option value="ACC">ACC</option>
-                                    <option value="SAMPLE">SAMPLE</option>
+                                    <option value="CT">CLOTH TOP</option>
+                                    <option value="CB">CLOTH BOTTOM</option>
+                                    <option value="BA">BAG</option>
+                                    <option value="SO">SHOES</option>
+                                    <option value="AC">ACC</option>
+                                    <option value="SM">SAMPLE</option>
                                 </select>
                             </div>
                         </div>
@@ -143,7 +143,7 @@
                             <label for="customer_no" class="required">고객번호/고객명</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box">
-                                    <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='customer_no' id="customer_no" value="">
+                                    <input type='text' class="form-control form-control-sm search-enter" name='customer_no' id="customer_no" value="">
                                 </div>
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input_box">
@@ -158,15 +158,15 @@
                             <div class="flex_box">
                                 <div class="form-inline mr-0 mr-sm-1" style="width:100%;">
                                     <div class="form-inline-inner input_box" style="width:30%;">
-                                        <input type="text" name="mobile" class="form-control form-control-sm" maxlength="3" value="" onkeyup="onlynum(this)">
+                                        <input type="text" name="mobile[]" class="form-control form-control-sm" maxlength="3" value="" onkeyup="onlynum(this)">
                                     </div>
                                     <span class="text_line">-</span>
                                     <div class="form-inline-inner input_box" style="width:29%;">
-                                        <input type="text" name="mobile" class="form-control form-control-sm" maxlength="4" value="" onkeyup="onlynum(this)">
+                                        <input type="text" name="mobile[]" class="form-control form-control-sm" maxlength="4" value="" onkeyup="onlynum(this)">
                                     </div>
                                     <span class="text_line">-</span>
                                     <div class="form-inline-inner input_box" style="width:29%;">
-                                        <input type="text" name="mobile" class="form-control form-control-sm" maxlength="4" value="" onkeyup="onlynum(this)">
+                                        <input type="text" name="mobile[]" class="form-control form-control-sm" maxlength="4" value="" onkeyup="onlynum(this)">
                                     </div>
                                 </div>
                             </div>
@@ -176,12 +176,12 @@
                 <div class="row">
                     <div class="col-lg-8 inner-td">
                         <div class="form-group">
-                            <label for="addr2" onclick="openFindAddress('zip_cd', 'addr1')">집주소</label>
+                            <label for="addr2" onclick="openFindAddress('zipcode', 'addr1')">집주소</label>
                             <div class="input_box flex_box address_box">
-                                <input type="text" id="zip_cd" name="zip_cd" class="form-control form-control-sm" value="" style="width:calc(25% - 10px);margin-right:10px;" readonly="readonly">
+                                <input type="text" id="zipcode" name="zipcode" class="form-control form-control-sm" value="" style="width:calc(25% - 10px);margin-right:10px;" readonly="readonly">
                                 <input type="text" id="addr1" name="addr1" class="form-control form-control-sm" value="" style="width:calc(25% - 10px);margin-right:10px;" readonly="readonly">
                                 <input type="text" id="addr2" name="addr2" class="form-control form-control-sm" value="" style="width:calc(25% - 10px);margin-right:10px;">
-                                <a href="javascript:;" onclick="openFindAddress('zip_cd', 'addr1')" class="btn btn-sm btn-primary shadow-sm fs-12" style="width:80px;">
+                                <a href="javascript:;" onclick="openFindAddress('zipcode', 'addr1')" class="btn btn-sm btn-primary shadow-sm fs-12" style="width:80px;">
                                     <i class="fas fa-search fa-sm text-white-50"></i>
                                     검색
                                 </a>
@@ -191,9 +191,9 @@
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <!-- 추후 api 작업 예상됨 -->
-                            <label for="goods_nm" class="required">상품</label>
+                            <label for="product" class="required">상품</label>
                             <div class="flex_box">
-                                <input type="text" class="form-control form-control-sm" name="goods_nm" id="goods_nm" value="" autocomplete="off">
+                                <input type="text" class="form-control form-control-sm" name="product" id="product" value="" autocomplete="off">
                             </div>
                         </div>
                     </div>
@@ -204,7 +204,7 @@
                             <label for="color">칼라/사이즈</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box">
-                                    <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='color' id="color" value="">
+                                    <input type='text' class="form-control form-control-sm search-enter" name='color' id="color" value="">
                                 </div>
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input_box">
@@ -367,49 +367,12 @@
             </div>
         </div>
         <div style="text-align: center;">
-            <a href="javascript:void(0);" onclick="return save();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>저장하기</a>
-            <a href="/store/standard/std11/" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-list-ul mr-1"></i>목록으로 이동</a>
+            <a href="javascript:void(0);" onclick="return createAs();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>저장</a>
+            <a href="javascript:void(0);" onclick="return goList();"class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-list-ul mr-1"></i>목록으로 이동</a>
         </div>
     </div>
 </form>
-<script language="javascript">
-var columns = [
-        // this row shows the row index, doesn't use any data from the row
-        {headerName: '#', width:35, pinned:'left', maxWidth: 100,valueGetter: 'node.id', cellRenderer: 'loadingRenderer', cellStyle: {"background":"#F5F7F7"}},
-        {field:"",headerName:"접수일자"},
-        {field:"",headerName:"고객번호"},
-        {field:"",headerName:"고객명"},
-        {field:"",headerName:"수선구분"},
-        {field:"",headerName:"판매일자"},
-        {field:"",headerName:"본사접수일"},
-        {field:"",headerName:"수선인도일"},
-        {field:"",headerName:"수선예정일"},
-        {field:"",headerName:"수선완료일"},
-        {field:"",headerName:"접수번호"},
-        {field:"",headerName:"매장번호"},
-        {field:"",headerName:"매장명"},
-        {field:"",headerName:"수선품목"},
-        {field:"",headerName:"제품코드"},
-        {field:"",headerName:"제품명"},
-        {field:"",headerName:"칼라"},
-        {field:"",headerName:"사이즈"},
-        {field:"",headerName:"수량"},
-        {field:"",headerName:"수선구분"},
-        {field:"",headerName:"유료수선금액"},
-        {field:"",headerName:"무료수선금액"},
-        {field:"",headerName:"연락처1"},
-        {field:"",headerName:"연락처2"},
-        {field:"",headerName:"연락처3"},
-        {field:"",headerName:"우편번호"},
-        {field:"",headerName:"주소1"},
-        {field:"",headerName:"주소2"},
-        {field:"",headerName:"수선내용"},
-        {field:"",headerName:"본사설명"},
-        {field:"",headerName:"수선처코드"},
-        {field:"",headerName:"수선처명"},
-];
 
-</script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script type="text/javascript" charset="utf-8">
     
@@ -424,16 +387,94 @@ var columns = [
         }).open();
     }
 
-    const save = () => {        
-        let data = document.f1;
+    const goList = () => location.href = "/store/standard/std11/";
+
+    const createAs = async () => {        
+        if (validate() === false) return;
         try {
             const response = await axios({ url: `/store/standard/std11/create`,
-                method: 'post', data: { data: data } 
+                method: 'post', data: $('form[name="f1"]').serialize()
             });
             const { code, msg } = response?.data;
+            if (code == 200) {
+                alert(msg);
+                // goList();
+            } else alert(msg);
         } catch (error) {
             console.log(error);
         }
+    };
+
+    const validate = () => {
+        const f1 = document.f1;
+
+        if ($('#receipt_date').val() == "") {
+            alert("접수일자을 입력해 주십시오.");
+            f1.receipt_date.focus();
+            return false;
+        }
+
+        if ($('#as_type').val() == "") {
+            alert("수선구분을 선택해 주십시오.");
+            f1.as_type.focus();
+            return false;
+        }
+
+        if ($('#store_no').val() == "") {
+            alert("매장번호를 입력하여 주십시오.");
+            f1.store_no.focus();
+            return false;
+        }
+
+        if ($('#store_nm').val() == "") {
+            alert("매장명를 입력하여 주십시오.");
+            f1.store_nm.focus();
+            return false;
+        }
+
+        if ($('#item').val() == "") {
+            alert("품목구분을 선택해 주십시오.");
+            f1.item.focus();
+            return false;
+        }
+
+        if ($('#customer_no').val() == "") {
+            alert("고객번호를 선택해 주십시오.");
+            f1.customer_no.focus();
+            return false;
+        }
+
+        if ($('#customer').val() == "") {
+            alert("고객명를 선택해 주십시오.");
+            f1.customer.focus();
+            return false;
+        }
+        
+        if ($('#product').val() == "") {
+            alert("상품을 선택해 주십시오.");
+            f1.product.focus();
+            return false;
+        }
+
+        if ($('#is_free').val() == "") {
+            alert("수선유료구분을 선택해 주십시오.");
+            f1.is_free.focus();
+            return false;
+        }
+        
+        if ($('#quantity').val() == "") {
+            alert("수량을 입력해 주십시오.");
+            f1.quantity.focus();
+            return false;
+        }
+
+        if ($('#content').val() == "") {
+            alert("수선내용을 입력해 주십시오.");
+            f1.content.focus();
+            return false;
+        }
+
+        return true;
     };
     
 </script>
