@@ -1,5 +1,5 @@
 @extends('store_with.layouts.layout')
-@section('title','수선관리 추가')
+@section('title','수선관리 등록')
 @section('content')
 
 <style>
@@ -9,7 +9,7 @@
     }
 
     .card, #search-area .card-header {
-        background: #eeeef0 !important;
+        background: #e5e5e5 !important;
     }
 
     .card {
@@ -22,14 +22,14 @@
 </style>
 
 <div class="page_tit">
-    <h3 class="d-inline-flex">수선관리 추가</h3>
+    <h3 class="d-inline-flex">수선관리 등록</h3>
     <div class="d-inline-flex location">
         <span class="home"></span>
-        <span>/ 고객 / 수선관리 / 추가</span>
+        <span>/ 고객 / 수선관리 / 등록</span>
     </div>
 </div>
 
-<form method="get" name="search">
+<form method="get" name="f1">
     <div id="search-area" class="search_cum_form">
         <div class="card mb-3">
             <div class="d-flex card-header justify-content-between">
@@ -367,7 +367,7 @@
             </div>
         </div>
         <div style="text-align: center;">
-            <a href="/store/standard/std11/create" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>저장하기</a>
+            <a href="javascript:void(0);" onclick="return save();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>저장하기</a>
             <a href="/store/standard/std11/" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-list-ul mr-1"></i>목록으로 이동</a>
         </div>
     </div>
@@ -412,22 +412,8 @@ var columns = [
 </script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script type="text/javascript" charset="utf-8">
-    const pApp = new App('',{
-        gridId:"#div-gd",
-    });
-    let gx;
-    $(document).ready(function() {
-        pApp.ResizeGrid(265);
-        pApp.BindSearchEnter();
-        let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns);
-        Search();
-    });
-    function Search() {
-        let data = $('form[name="search"]').serialize();
-        gx.Request('/store/standard/std02/search', data,1);
-    }
-
+    
+    // 주소 api
     function openFindAddress(zipName, addName) {
         new daum.Postcode({
             // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분입니다..
@@ -437,6 +423,19 @@ var columns = [
             }
         }).open();
     }
+
+    const save = () => {        
+        let data = document.f1;
+        try {
+            const response = await axios({ url: `/store/standard/std11/create`,
+                method: 'post', data: { data: data } 
+            });
+            const { code, msg } = response?.data;
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    
 </script>
 
 @stop

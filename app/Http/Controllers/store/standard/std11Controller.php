@@ -67,7 +67,8 @@ class std11Controller extends Controller
 
 	public function create(Request $request)
 	{
-		$request->input('data');
+		$data = $request->input('data');
+		dd($data);
 	}
 
 	public function detail(Request $request)
