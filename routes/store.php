@@ -47,6 +47,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 동종업계
         Route::get('std04', 'std04Controller@index');
         Route::get('std04/search', 'std04Controller@search');
+        Route::get('std04/search-competitor/{store_cd?}', 'std04Controller@search_competitor');
+
+        Route::put('std04/update-competitor', 'std04Controller@update_competitor');
 
         // 판매유형관리
         Route::get('std05', 'std05Controller@index');

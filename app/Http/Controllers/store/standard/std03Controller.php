@@ -17,8 +17,7 @@ class std03Controller extends Controller
 {
 	public function index()
 	{
-		$com_types = SLib::getCodes("G_COM_TYPE");
-		$values = [ "com_types" => $com_types ];
+		$values = [];
 		return view(Config::get('shop.store.view') . '/standard/std03', $values);
 	}
 
