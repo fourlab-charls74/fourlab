@@ -60,7 +60,7 @@ class std02Controller extends Controller
 		if( $page == 1 ){
 			$query	= "
 				select count(*) as total
-				from __tmp_store a
+				from store a
 				where 1=1 $where
 			";
 			//$row = DB::select($query,['com_id' => $com_id]);
@@ -74,10 +74,10 @@ class std02Controller extends Controller
 				a.*,
 				c.code_val as com_type_nm,
 				d.code_val as store_kind_nm
-			from __tmp_store a
-			left outer join __tmp_store_info b on a.com_id = b.com_id
-			left outer join __tmp_code c on c.code_kind_cd = 'com_type' and c.code_id = a.com_type
-			left outer join __tmp_code d on d.code_kind_cd = 'store_kind' and d.code_id = a.store_kind
+			from store a
+			left outer join store_info b on a.com_id = b.com_id
+			left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = a.store_type
+			left outer join code d on d.code_kind_cd = 'store_kind' and d.code_id = a.store_kind
 			where 1=1 $where
 			$orderby
 			$limit

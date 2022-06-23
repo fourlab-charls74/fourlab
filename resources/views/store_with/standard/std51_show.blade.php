@@ -220,25 +220,30 @@
             {field: "code_id", headerName: "아이디",rowDrag: true,
                 editable: function(params){ return (params.data !== undefined && params.data.editable === 'Y')? true:false; },
                 cellClass:function(params){ return (params.data !== undefined && params.data.editable == 'Y')? ['hd-grid-edit']: [];},
+                width:100
             },
             {field: "code_val", headerName: "코드값1",
                 editable: function(params){ return (params.data !== undefined && params.data.editable === 'Y')? true:false; },
                 cellClass:function(params){ return (params.data !== undefined && params.data.editable == 'Y')? ['hd-grid-edit']: [];},
+                width:120
             },
             {field: "code_val2", headerName: "코드값2",
                 editable: function(params){ return (params.data !== undefined && params.data.editable === 'Y')? true:false; },
                 cellClass:function(params){ return (params.data !== undefined && params.data.editable == 'Y')? ['hd-grid-edit']: [];},
+                width:120
             },
             {field: "code_val3", headerName: "코드값3",
                 editable: function(params){ return (params.data !== undefined && params.data.editable === 'Y')? true:false; },
                 cellClass:function(params){ return (params.data !== undefined && params.data.editable == 'Y')? ['hd-grid-edit']: [];},
+                width:120
             },
             {field: "code_val_eng", headerName: "영문코드값",
                 editable: function(params){ return (params.data !== undefined && params.data.editable === 'Y')? true:false; },
                 cellClass:function(params){ return (params.data !== undefined && params.data.editable == 'Y')? ['hd-grid-edit']: [];},
+                width:120
             },
-            {field: "use_yn", headerName: "사용여부", width: 130,cellClass: 'hd-grid-code'},
-            {field: "admin_nm", headerName: "작성자",width: 150},
+            {field: "use_yn", headerName: "사용여부", width: 58,cellClass: 'hd-grid-code'},
+            {field: "admin_nm", headerName: "작성자",width: 120},
             {field: "rt", headerName: "작성일시", width: 130,cellClass: 'hd-grid-code'},
             {field: "ut", headerName: "수정일시", width: 130,cellClass: 'hd-grid-code'},
             {field: "editable",hide:true},

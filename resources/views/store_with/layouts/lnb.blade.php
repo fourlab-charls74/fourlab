@@ -4,7 +4,7 @@
             <li>
                 <a href="javascript:;" class="arrow waves-effect"><i class="bx bx-package fs-18"></i><span>코드관리</span></a>
                 <ul>
-                    <li><a href="/store/standard/std51">공통코드관리</a></li>
+                    <li><a href="/store/standard/std51">(임)공통코드관리</a></li>
                     <li><a href="/store/standard/std02">(개)매장관리</a></li>
                     <li><a href="/store/standard/std03">(완)창고관리</a></li>
                     <li><a href="/store/standard/std04">(개)동종업계관리</a></li>
