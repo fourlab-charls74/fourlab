@@ -98,6 +98,8 @@ class std11Controller extends Controller
 	public function detail($idx = "")
 	{
 		$row = DB::table(self::T)->where("idx", "=", $idx)->first();
+		$mobile = $row->mobile;
+		if ($mobile != "") $row->mobile = explode("-", $mobile);
 		$values = [ 'idx' => $idx, 'row' => $row ];
 		return view(Config::get('shop.store.view') . '/standard/std11_detail', $values);
 	}

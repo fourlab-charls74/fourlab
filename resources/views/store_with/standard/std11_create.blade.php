@@ -116,6 +116,7 @@
                             <label for="item" class="required">품목구분</label>
                             <div class="flex_box">
                                 <select name="item" id="item" class="form-control form-control-sm">
+                                    <option value="">선택</option>
                                     <option value="CT">CLOTH TOP</option>
                                     <option value="CB">CLOTH BOTTOM</option>
                                     <option value="BA">BAG</option>
@@ -158,15 +159,15 @@
                             <div class="flex_box">
                                 <div class="form-inline mr-0 mr-sm-1" style="width:100%;">
                                     <div class="form-inline-inner input_box" style="width:30%;">
-                                        <input type="text" name="mobile[]" class="form-control form-control-sm" maxlength="3" value="" onkeyup="onlynum(this)">
+                                        <input type="text" id="mobile1" name="mobile[]" class="form-control form-control-sm" maxlength="3" value="{{ @$row->mobile[0] }}" onkeyup="onlynum(this)">
                                     </div>
                                     <span class="text_line">-</span>
                                     <div class="form-inline-inner input_box" style="width:29%;">
-                                        <input type="text" name="mobile[]" class="form-control form-control-sm" maxlength="4" value="" onkeyup="onlynum(this)">
+                                        <input type="text" id="mobile2" name="mobile[]" class="form-control form-control-sm" maxlength="4" value="{{ @$row->mobile[1] }}" onkeyup="onlynum(this)">
                                     </div>
                                     <span class="text_line">-</span>
                                     <div class="form-inline-inner input_box" style="width:29%;">
-                                        <input type="text" name="mobile[]" class="form-control form-control-sm" maxlength="4" value="" onkeyup="onlynum(this)">
+                                        <input type="text" id="mobile3" name="mobile[]" class="form-control form-control-sm" maxlength="4" value="{{ @$row->mobile[2] }}" onkeyup="onlynum(this)">
                                     </div>
                                 </div>
                             </div>
@@ -375,6 +376,11 @@
 
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script type="text/javascript" charset="utf-8">
+
+    window.addEventListener('DOMContentLoaded', () => {
+        document.f1.content.value = "{{@$row->content}}";
+        document.f1.h_explain.value = "{{@$row->h_explain}}";
+    });
     
     // 주소 api
     function openFindAddress(zipName, addName) {
@@ -398,7 +404,7 @@
             const { code, msg } = response?.data;
             if (code == 200) {
                 alert(msg);
-                // goList();
+                goList();
             } else alert(msg);
         } catch (error) {
             console.log(error);
@@ -449,6 +455,23 @@
             f1.customer.focus();
             return false;
         }
+
+        const mobile_reg = /^01(?:0|1|[6-9])$/;
+        if (!mobile_reg.test($('#mobile1').val())) {
+            alert("휴대전화 앞3자리를 확인해주세요.");
+            $('#mobile1').focus();
+            return false;
+        }
+        if ($('#mobile2').val() == "") {
+            alert("휴대전화의 중간 번호를 입력해 주세요.");
+            $('#mobile2').focus();
+            return false;
+        }
+        if ($('#mobile3').val() == "") {
+            alert("휴대전화의 나머지 번호를 입력해 주세요.");
+            $('#mobile3').focus();
+            return false;
+        }
         
         if ($('#product').val() == "") {
             alert("상품을 선택해 주십시오.");
@@ -468,7 +491,7 @@
             return false;
         }
 
-        if ($('#content').val() == "") {
+        if ($('#as_content').val() == "") {
             alert("수선내용을 입력해 주십시오.");
             f1.content.focus();
             return false;

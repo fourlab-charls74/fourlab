@@ -24,7 +24,7 @@
     <h3 class="d-inline-flex">수선관리 상세</h3>
     <div class="d-inline-flex location">
         <span class="home"></span>
-        <span>/ 고객 / 수선관리 / 상세 </span>
+        <span>/ 고객 / 수선관리 / 상세 {{@$idx ? '- 접수번호: ' . $idx : ''}}</span>
     </div>
 </div>
 
@@ -159,15 +159,15 @@
                             <div class="flex_box">
                                 <div class="form-inline mr-0 mr-sm-1" style="width:100%;">
                                     <div class="form-inline-inner input_box" style="width:30%;">
-                                        <input type="text" name="mobile[]" class="form-control form-control-sm" maxlength="3" value="" onkeyup="onlynum(this)">
+                                        <input type="text" id="mobile1" name="mobile[]" class="form-control form-control-sm" maxlength="3" value="{{ @$row->mobile[0] }}" onkeyup="onlynum(this)">
                                     </div>
                                     <span class="text_line">-</span>
                                     <div class="form-inline-inner input_box" style="width:29%;">
-                                        <input type="text" name="mobile[]" class="form-control form-control-sm" maxlength="4" value="" onkeyup="onlynum(this)">
+                                        <input type="text" id="mobile2" name="mobile[]" class="form-control form-control-sm" maxlength="4" value="{{ @$row->mobile[1] }}" onkeyup="onlynum(this)">
                                     </div>
                                     <span class="text_line">-</span>
                                     <div class="form-inline-inner input_box" style="width:29%;">
-                                        <input type="text" name="mobile[]" class="form-control form-control-sm" maxlength="4" value="" onkeyup="onlynum(this)">
+                                        <input type="text" id="mobile3" name="mobile[]" class="form-control form-control-sm" maxlength="4" value="{{ @$row->mobile[2] }}" onkeyup="onlynum(this)">
                                     </div>
                                 </div>
                             </div>
@@ -267,9 +267,7 @@
                         <div class="form-group">
                             <label for="as_content" class="required">수선내용</label>
                             <div class="flex_box">
-                                <textarea name="content" id="as_content" class="form-control form-control-sm" style="height: 200px;"
-                                    onload="return setContent(this);"
-                                ></textarea>
+                                <textarea name="content" id="as_content" class="form-control form-control-sm" style="height: 200px;"></textarea>
                             </div>
                         </div>
                     </div>
@@ -362,9 +360,7 @@
                         <div class="form-group">
                             <label for="h_explain">본사설명</label>
                             <div class="flex_box">
-                                <textarea name="h_explain" id="h_explain" class="form-control form-control-sm" style="height: 200px;"
-                                    onload="return setHExplain(this);"
-                                ></textarea>
+                                <textarea name="h_explain" id="h_explain" class="form-control form-control-sm" style="height: 200px;"></textarea>
                             </div>
                         </div>
                     </div>
@@ -416,14 +412,16 @@
     };
 
     const removeAs = async () => {
+        const idx = "{{@$idx}}";
         if (confirm("등록된 수선 정보를 삭제하시겠습니까?") === false) return;
         try {
             const response = await axios({ url: `/store/standard/std11/remove`,
-                method: 'post', data: { 'idx': $idx }
+                method: 'post', data: { 'idx': idx }
             });
             const { code, msg } = response?.data;
             if (code == 200) {
                 alert(msg);
+                goList();
             } else alert(msg);
         } catch (error) {
             console.log(error);
@@ -474,6 +472,23 @@
             f1.customer.focus();
             return false;
         }
+
+        const mobile_reg = /^01(?:0|1|[6-9])$/;
+        if (!mobile_reg.test($('#mobile1').val())) {
+            alert("휴대전화 앞3자리를 확인해주세요.");
+            $('#mobile1').focus();
+            return false;
+        }
+        if ($('#mobile2').val() == "") {
+            alert("휴대전화의 중간 번호를 입력해 주세요.");
+            $('#mobile2').focus();
+            return false;
+        }
+        if ($('#mobile3').val() == "") {
+            alert("휴대전화의 나머지 번호를 입력해 주세요.");
+            $('#mobile3').focus();
+            return false;
+        }
         
         if ($('#product').val() == "") {
             alert("상품을 선택해 주십시오.");
@@ -493,7 +508,7 @@
             return false;
         }
 
-        if ($('#content').val() == "") {
+        if ($('#as_content').val() == "") {
             alert("수선내용을 입력해 주십시오.");
             f1.content.focus();
             return false;

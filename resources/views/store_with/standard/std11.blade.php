@@ -28,7 +28,7 @@
                             <div class="form-inline date-select-inbox">
                                 <div class="docs-datepicker form-inline-inner input_box">
                                     <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
+                                        <input type="text" class="form-control form-control-sm docs-date search-enter" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
                                                 <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -40,7 +40,7 @@
                                 <span class="text_line">~</span>
                                 <div class="docs-datepicker form-inline-inner input_box">
                                     <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
+                                        <input type="text" class="form-control form-control-sm docs-date search-enter" name="edate" value="{{ $edate }}" autocomplete="off">
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
                                                 <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -152,9 +152,26 @@
 
     const DEFAULT_STYLE = {'text-align': 'center'};
 
+    const CELL_COLOR = {
+        COMMON: {'background' : '#FFFFFF'},
+        IN_PROGRESS: {'background' : '#FFFF99'},
+        DONE: {'background' : '#F5F7F7'}
+    };
+
     const columns = [
         // this row shows the row index, doesn't use any data from the row
-        { field: "idx", headerName: 'No', width:35, pinned:'left', maxWidth: 100, cellRenderer: 'loadingRenderer', 
+        {
+            headerName: '#',
+            width: 40,
+            maxWidth: 100,
+            // it is important to have node.id here, so that when the id changes (which happens
+            // when the row is loaded) then the cell is refreshed.
+            valueGetter: 'node.id',
+            cellRenderer: 'loadingRenderer',
+            cellStyle: { ...DEFAULT_STYLE, "background": CELL_COLOR.DONE },
+            pinned: 'left'
+        },
+        { field: "idx", headerName: '접수번호', width:100, pinned:'left', maxWidth: 100, cellRenderer: 'loadingRenderer', 
             cellStyle: { ...DEFAULT_STYLE, 'font-size': '13px', 'font-weight': 500 },
             cellRenderer: (params) => {
                 return `<a href="/store/standard/std11/detail/${params.value}" style="text-decoration: underline !important">${params.value}</a>`
@@ -211,7 +228,7 @@
         { field: "color", headerName: "칼라", width: 80, cellStyle: DEFAULT_STYLE },
         { field: "size", headerName: "사이즈", width: 80, cellStyle: DEFAULT_STYLE },
         { field: "quantity", headerName: "수량", width: 80, cellStyle: DEFAULT_STYLE },
-        { field: "is_free", headerName: "수선유료구분", width: 80, cellStyle: DEFAULT_STYLE,
+        { field: "is_free", headerName: "수선유료구분", width: 100, cellStyle: DEFAULT_STYLE,
             cellRenderer: (params) => {
                 switch (params.value) {
                     case "Y": 
@@ -243,11 +260,19 @@
         gridId:"#div-gd",
     });
     let gx;
+    const options = {
+        rowStyle: CELL_COLOR.COMMON,
+        getRowStyle: params => {
+            if (params.data.end_date) return CELL_COLOR.IN_PROGRESS;
+            if (params.data.h_receipt_date) return CELL_COLOR.DONE;
+        },
+    };
+
     $(document).ready(function() {
         pApp.ResizeGrid(265);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns);
+        gx = new HDGrid(gridDiv, columns, options);
         Search();
     });
     function Search() {
