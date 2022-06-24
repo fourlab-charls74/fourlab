@@ -28,7 +28,7 @@
                             <div class="form-inline date-select-inbox">
                                 <div class="docs-datepicker form-inline-inner input_box">
                                     <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
+                                        <input type="text" class="form-control form-control-sm docs-date search-enter" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
                                                 <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -40,7 +40,7 @@
                                 <span class="text_line">~</span>
                                 <div class="docs-datepicker form-inline-inner input_box">
                                     <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
+                                        <input type="text" class="form-control form-control-sm docs-date search-enter" name="edate" value="{{ $edate }}" autocomplete="off">
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
                                                 <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -54,24 +54,68 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="formrow-firstname-input">매장</label>
-                            <div class="flax_box">
-                                <select class="form-control form-control-sm" name="use_yn">
-                                    <option value="">전체</option>
-                                    <option value="Y">사용</option>
-                                    <option value="N">미사용</option>
+                            <label for="where1">조회구분</label>
+                            <div class="flex_box">
+                                <select class="form-control form-control-sm" name="where1" id="where1" onchange="changeWhere1(this)">
+                                    <option value="">조회내역없음</option>
+                                    <option value="customer">고객명</option>
+                                    <option value="mobile">전화번호</option>
+                                    <option value="product_cd">상품코드</option>
+                                    <option value="product">상품명</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="formrow-firstname-input">상태</label>
-                            <div class="flax_box">
-                                <select class="form-control form-control-sm" name="use_yn">
+                            <label for="where2">조회내역</label>
+                            <div class="flex_box">
+                                <input type='text' class="form-control form-control-sm search-enter" name='where2' value='' disabled>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <!-- 추후 api 작업 예상됨 -->
+                            <label for="store_no">매장번호/매장명</label>
+                            <div class="form-inline">
+                                <div class="form-inline-inner input_box">
+                                    <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='store_no' id="store_no" value="">
+                                </div>
+                                <span class="text_line">/</span>
+                                <div class="form-inline-inner input_box">
+                                    <input type="text" class="form-control form-control-sm search-enter" name="store_nm" value="">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="item">품목구분</label>
+                            <div class="flex_box">
+                                <select name="item" id="item" class="form-control form-control-sm">
                                     <option value="">전체</option>
-                                    <option value="Y">사용</option>
-                                    <option value="N">미사용</option>
+                                    <option value="CT">CLOTH TOP</option>
+                                    <option value="CB">CLOTH BOTTOM</option>
+                                    <option value="BA">BAG</option>
+                                    <option value="SO">SHOES</option>
+                                    <option value="AC">ACC</option>
+                                    <option value="SM">SAMPLE</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="as_type">수선구분</label>
+                            <div class="flex_box">
+                                <select id="as_type" name="as_type" class="form-control form-control-sm">
+                                    <option value="">전체</option>
+                                    <option value="C">고객수선</option>
+                                    <option value="S">매장수선</option>
+                                    <option value="H">본사수선</option>
                                 </select>
                             </div>
                         </div>
@@ -105,59 +149,148 @@
     </div>
 </div>
 <script language="javascript">
-var columns = [
-        // this row shows the row index, doesn't use any data from the row
-        {headerName: '#', width:35, pinned:'left', maxWidth: 100,valueGetter: 'node.id', cellRenderer: 'loadingRenderer', cellStyle: {"background":"#F5F7F7"}},
-        {field:"",headerName:"접수일자"},
-        {field:"",headerName:"고객번호"},
-        {field:"",headerName:"고객명"},
-        {field:"",headerName:"수선구분"},
-        {field:"",headerName:"판매일자"},
-        {field:"",headerName:"본사접수일"},
-        {field:"",headerName:"수선인도일"},
-        {field:"",headerName:"수선예정일"},
-        {field:"",headerName:"수선완료일"},
-        {field:"",headerName:"접수번호"},
-        {field:"",headerName:"매장번호"},
-        {field:"",headerName:"매장명"},
-        {field:"",headerName:"수선품목"},
-        {field:"",headerName:"제품코드"},
-        {field:"",headerName:"제품명"},
-        {field:"",headerName:"칼라"},
-        {field:"",headerName:"사이즈"},
-        {field:"",headerName:"수량"},
-        {field:"",headerName:"수선구분"},
-        {field:"",headerName:"유료수선금액"},
-        {field:"",headerName:"무료수선금액"},
-        {field:"",headerName:"연락처1"},
-        {field:"",headerName:"연락처2"},
-        {field:"",headerName:"연락처3"},
-        {field:"",headerName:"우편번호"},
-        {field:"",headerName:"주소1"},
-        {field:"",headerName:"주소2"},
-        {field:"",headerName:"수선내용"},
-        {field:"",headerName:"본사설명"},
-        {field:"",headerName:"수선처코드"},
-        {field:"",headerName:"수선처명"},
-];
 
+    const DEFAULT_STYLE = {'text-align': 'center'};
+
+    const CELL_COLOR = {
+        COMMON: {'background' : '#FFFFFF'},
+        IN_PROGRESS: {'background' : '#FFFF99'},
+        DONE: {'background' : '#F5F7F7'}
+    };
+
+    const columns = [
+        // this row shows the row index, doesn't use any data from the row
+        {
+            headerName: '#',
+            width: 40,
+            maxWidth: 100,
+            // it is important to have node.id here, so that when the id changes (which happens
+            // when the row is loaded) then the cell is refreshed.
+            valueGetter: 'node.id',
+            cellRenderer: 'loadingRenderer',
+            cellStyle: { ...DEFAULT_STYLE, "background": CELL_COLOR.DONE },
+            pinned: 'left'
+        },
+        { field: "idx", headerName: '접수번호', width:100, pinned:'left', maxWidth: 100, cellRenderer: 'loadingRenderer', 
+            cellStyle: { ...DEFAULT_STYLE, 'font-size': '13px', 'font-weight': 500 },
+            cellRenderer: (params) => {
+                return `<a href="/store/standard/std11/detail/${params.value}" style="text-decoration: underline !important">${params.value}</a>`
+            },
+            pinned: 'left'
+        },
+        { field: "receipt_date", headerName: "접수일자", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
+        { field: "customer_no", headerName: "고객번호", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
+        { field: "customer", headerName: "고객명", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
+        { field: "as_type", headerName: "수선구분", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left',
+            cellRenderer: (params) => {
+                switch (params.value) {
+                    case "C": 
+                        return "고객수선";
+                    case "S": 
+                        return "매장수선";
+                    case "H": 
+                        return "본사수선";
+                    default:
+                        return params.value;
+                };
+            }
+        },
+        { field: "sale_date", headerName: "판매일자", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
+        { field: "h_receipt_date", headerName: "본사접수일", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
+        { field: "start_date", headerName: "수선인도일", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
+        { field: "due_date", headerName: "수선예정일", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
+        { field: "end_date", headerName: "수선완료일", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
+        { field: "receipt_no", headerName: "접수번호", width: 100, cellStyle: DEFAULT_STYLE },
+        { field: "store_no", headerName: "매장번호", width: 100, cellStyle: DEFAULT_STYLE },
+        { field: "store_nm", headerName: "매장명", width: 100, cellStyle: DEFAULT_STYLE },
+        { field: "item", headerName: "수선품목", width: 100, cellStyle: DEFAULT_STYLE,
+            cellRenderer: (params) => {
+                switch (params.value) {
+                    case "CT": 
+                        return "CLOTH TOP";
+                    case "CB": 
+                        return "CLOTH BOTTOM";
+                    case "BA": 
+                        return "BAG";
+                    case "SO": 
+                        return "SHOES";
+                    case "AC": 
+                        return "ACC";
+                    case "SM": 
+                        return "SAMPLE";
+                    default:
+                        return params.value;
+                };
+            }
+        },
+        { field: "product_cd", headerName: "제품코드", width: 100, cellStyle: DEFAULT_STYLE },
+        { field: "product", headerName: "제품명", width: 150, cellStyle: DEFAULT_STYLE },
+        { field: "color", headerName: "칼라", width: 80, cellStyle: DEFAULT_STYLE },
+        { field: "size", headerName: "사이즈", width: 80, cellStyle: DEFAULT_STYLE },
+        { field: "quantity", headerName: "수량", width: 80, cellStyle: DEFAULT_STYLE },
+        { field: "is_free", headerName: "수선유료구분", width: 100, cellStyle: DEFAULT_STYLE,
+            cellRenderer: (params) => {
+                switch (params.value) {
+                    case "Y": 
+                        return "유료";
+                    case "N": 
+                        return "무료";
+                    default:
+                        return params.value;
+                };
+            }
+        },
+        { field: "charged_price", headerName: "유료수선금액", width: 100, type: 'currencyType' },
+        { field: "free_price", headerName: "무료수선금액", width: 100, type: 'currencyType' },
+        { field: "mobile", headerName: "핸드폰", width: 100, cellStyle: DEFAULT_STYLE },
+        { field: "zipcode", headerName: "우편번호", width: 80, cellStyle: DEFAULT_STYLE },
+        { field: "addr1", headerName: "주소1", width: 150, cellStyle: DEFAULT_STYLE },
+        { field: "addr2", headerName: "주소2", width: 150, cellStyle: DEFAULT_STYLE },
+        { field: "content", headerName: "수선내용", width: 180, cellStyle: DEFAULT_STYLE },
+        { field: "h_explain", headerName: "본사설명", width: 180, cellStyle: DEFAULT_STYLE },
+        { field: "storing_cd", headerName: "입고처코드", width: 100, cellStyle: DEFAULT_STYLE },
+        { field: "storing_nm", headerName: "입고처명", width: 100, cellStyle: DEFAULT_STYLE },
+        { field: "as_cd", headerName: "수선처코드", width: 100, cellStyle: DEFAULT_STYLE },
+        { field: "as_place", headerName: "수선처명", width: 100, cellStyle: DEFAULT_STYLE },
+        { field: "", width: "auto" }
+    ];
 </script>
 <script type="text/javascript" charset="utf-8">
     const pApp = new App('',{
         gridId:"#div-gd",
     });
     let gx;
+    const options = {
+        rowStyle: CELL_COLOR.COMMON,
+        getRowStyle: params => {
+            if (params.data.end_date) return CELL_COLOR.IN_PROGRESS;
+            if (params.data.h_receipt_date) return CELL_COLOR.DONE;
+        },
+    };
+
     $(document).ready(function() {
         pApp.ResizeGrid(265);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns);
+        gx = new HDGrid(gridDiv, columns, options);
         Search();
     });
     function Search() {
         let data = $('form[name="search"]').serialize();
-        gx.Request('/store/standard/std02/search', data,1);
+        gx.Request('/store/standard/std11/search', data, -1, (data) => {});
     }
+
+    const formReset = () => {
+        document.search.reset();
+    };
+
+    const changeWhere1 = (obj) => {
+        if (obj.value == "") {
+            document.search.where2.disabled = true;
+        } else {
+            document.search.where2.disabled = false;
+        }
+    };
 
 </script>
 

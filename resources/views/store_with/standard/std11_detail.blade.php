@@ -1,46 +1,49 @@
 @extends('store_with.layouts.layout')
-@section('title','수선관리')
+@section('title','수선관리 상세')
 @section('content')
+
+<style>
+    .search_cum_form .row {
+        margin-top: 20px;
+    }
+
+    .card, #search-area .card-header {
+        background: #e5e5e5 !important;
+    }
+
+    .card {
+        border: 1px solid #ddd;
+    }
+    .required::after {
+        position: relative;
+        top: 2px;
+    }
+</style>
+
 <div class="page_tit">
     <h3 class="d-inline-flex">수선관리 상세</h3>
     <div class="d-inline-flex location">
         <span class="home"></span>
-        <span>/ 고객/수선관리</span>
+        <span>/ 고객 / 수선관리 / 상세 {{@$idx ? '- 접수번호: ' . $idx : ''}}</span>
     </div>
 </div>
-<form method="get" name="search">
+
+<form method="get" id="f1" name="f1">
     <div id="search-area" class="search_cum_form">
+        <input type="hidden" name="idx" value="{{@$idx}}"/>
         <div class="card mb-3">
             <div class="d-flex card-header justify-content-between">
-                <h4>검색</h4>
-                <div>
-                    <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                    <a href="#" onclick="Cmder('add')" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
-		            <a href="#" onclick="formReset()" class="btn btn-sm btn-outline-primary shadow-sm">검색조건 초기화</a>
-                    <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
-                </div>
+                <h4>입력</h4>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="good_types">접수일자</label>
-                            <div class="form-inline date-select-inbox">
-                                <div class="docs-datepicker form-inline-inner input_box">
+                            <label for="receipt_date" class="required">접수일자</label>
+                            <div class="form-inline">
+                                <div class="docs-datepicker form-inline-inner input_box w-100">
                                     <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-                                                <i class="fa fa-calendar" aria-hidden="true"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="docs-datepicker-container"></div>
-                                </div>
-                                <span class="text_line">~</span>
-                                <div class="docs-datepicker form-inline-inner input_box">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
+                                        <input type="text" class="form-control form-control-sm docs-date" name="receipt_date" value="{{ @$row->receipt_date }}" id="receipt_date" autocomplete="off">
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
                                                 <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -54,110 +57,465 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="formrow-firstname-input">매장</label>
-                            <div class="flax_box">
-                                <select class="form-control form-control-sm" name="use_yn">
-                                    <option value="">전체</option>
-                                    <option value="Y">사용</option>
-                                    <option value="N">미사용</option>
+                            <label for="as_type" class="required">수선구분</label>
+                            <div class="flex_box">
+                                <select id="as_type" name="as_type" class="form-control form-control-sm">
+                                    <option value="">선택</option>
+                                    <option value="C" {{ (@$row->as_type == 'C') ? "selected" : "" }}>고객수선</option>
+                                    <option value="S" {{ (@$row->as_type == 'S') ? "selected" : "" }}>매장수선</option>
+                                    <option value="H" {{ (@$row->as_type == 'H') ? "selected" : "" }}>본사수선</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="formrow-firstname-input">상태</label>
-                            <div class="flax_box">
-                                <select class="form-control form-control-sm" name="use_yn">
-                                    <option value="">전체</option>
-                                    <option value="Y">사용</option>
-                                    <option value="N">미사용</option>
+                            <label for="sale_date">판매일자</label>
+                            <div class="form-inline">
+                                <div class="docs-datepicker form-inline-inner input_box w-100">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm docs-date" name="sale_date" value="{{ @$row->sale_date }}" id="sale_date" autocomplete="off">
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+                                                <i class="fa fa-calendar" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="docs-datepicker-container"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="receipt_no">접수번호</label>
+                            <div class="flex_box">
+                                <input type='text' class="form-control form-control-sm" name='receipt_no' value='{{ @$row->receipt_no }}'>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <!-- 추후 api 작업 예상됨 -->
+                            <label for="store_no" class="required">매장번호/매장명</label>
+                            <div class="form-inline">
+                                <div class="form-inline-inner input_box">
+                                    <input type='text' class="form-control form-control-sm search-enter" name='store_no' id="store_no" value="{{ @$row->store_no }}">
+                                </div>
+                                <span class="text_line">/</span>
+                                <div class="form-inline-inner input_box">
+                                    <input type="text" class="form-control form-control-sm search-enter" name="store_nm" id="store_nm" value="{{ @$row->store_nm }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="item" class="required">품목구분</label>
+                            <div class="flex_box">
+                                <select name="item" id="item" class="form-control form-control-sm">
+                                    <option value="">선택</option>
+                                    <option value="CT" {{ (@$row->item == 'CT') ? "selected" : "" }}>CLOTH TOP</option>
+                                    <option value="CB" {{ (@$row->item == 'CB') ? "selected" : "" }}>CLOTH BOTTOM</option>
+                                    <option value="BA" {{ (@$row->item == 'BA') ? "selected" : "" }}>BAG</option>
+                                    <option value="SO" {{ (@$row->item == 'SO') ? "selected" : "" }}>SHOES</option>
+                                    <option value="AC" {{ (@$row->item == 'AC') ? "selected" : "" }}>ACC</option>
+                                    <option value="SM" {{ (@$row->item == 'SM') ? "selected" : "" }}>SAMPLE</option>
                                 </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <!-- 추후 api 작업 예상됨 -->
+                            <label for="as_place">수선처</label>
+                            <div class="flex_box">
+                                <input type='text' class="form-control form-control-sm" name='as_place' value="{{ @$row->as_place }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <!-- 추후 api 작업 예상됨 -->
+                            <label for="customer_no" class="required">고객번호/고객명</label>
+                            <div class="form-inline">
+                                <div class="form-inline-inner input_box">
+                                    <input type="text" class="form-control form-control-sm search-enter" name='customer_no' id="customer_no" value="{{ @$row->customer_no }}">
+                                </div>
+                                <span class="text_line">/</span>
+                                <div class="form-inline-inner input_box">
+                                    <input type="text" class="form-control form-control-sm search-enter" name="customer" id="customer" value="{{ @$row->customer }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="item" class="required">핸드폰</label>
+                            <div class="flex_box">
+                                <div class="form-inline mr-0 mr-sm-1" style="width:100%;">
+                                    <div class="form-inline-inner input_box" style="width:30%;">
+                                        <input type="text" id="mobile1" name="mobile[]" class="form-control form-control-sm" maxlength="3" value="{{ @$row->mobile[0] }}" onkeyup="onlynum(this)">
+                                    </div>
+                                    <span class="text_line">-</span>
+                                    <div class="form-inline-inner input_box" style="width:29%;">
+                                        <input type="text" id="mobile2" name="mobile[]" class="form-control form-control-sm" maxlength="4" value="{{ @$row->mobile[1] }}" onkeyup="onlynum(this)">
+                                    </div>
+                                    <span class="text_line">-</span>
+                                    <div class="form-inline-inner input_box" style="width:29%;">
+                                        <input type="text" id="mobile3" name="mobile[]" class="form-control form-control-sm" maxlength="4" value="{{ @$row->mobile[2] }}" onkeyup="onlynum(this)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-8 inner-td">
+                        <div class="form-group">
+                            <label for="addr2" onclick="openFindAddress('zipcode', 'addr1')">집주소</label>
+                            <div class="input_box flex_box address_box">
+                                <input type="text" id="zipcode" name="zipcode" class="form-control form-control-sm" value="{{ @$row->zipcode }}" style="width:calc(25% - 10px);margin-right:10px;" readonly="readonly">
+                                <input type="text" id="addr1" name="addr1" class="form-control form-control-sm" value="{{ @$row->addr1 }}" style="width:calc(25% - 10px);margin-right:10px;" readonly="readonly">
+                                <input type="text" id="addr2" name="addr2" class="form-control form-control-sm" value="{{ @$row->addr2 }}" style="width:calc(25% - 10px);margin-right:10px;">
+                                <a href="javascript:;" onclick="openFindAddress('zipcode', 'addr1')" class="btn btn-sm btn-primary shadow-sm fs-12" style="width:80px;">
+                                    <i class="fas fa-search fa-sm text-white-50"></i>
+                                    검색
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <!-- 추후 api 작업 예상됨 -->
+                            <label for="product" class="required">상품</label>
+                            <div class="flex_box">
+                                <input type="text" class="form-control form-control-sm" name="product" id="product" value="{{ @$row->product }}" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="color">칼라/사이즈</label>
+                            <div class="form-inline">
+                                <div class="form-inline-inner input_box">
+                                    <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='color' id="color" value="{{ @$row->color }}">
+                                </div>
+                                <span class="text_line">/</span>
+                                <div class="form-inline-inner input_box">
+                                    <input type="text" class="form-control form-control-sm search-enter" name="size" value="{{ @$row->size }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="storing_nm">입고처</label>
+                            <div class="flex_box">
+                                <input type='text' class="form-control form-control-sm" name='storing_nm' value='{{ @$row->storing_nm }}'>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="quantity" class="required">수량</label>
+                            <div class="flex_box">
+                                <input type='text' class="form-control form-control-sm" name='quantity' id="quantity" value='{{ @$row->quantity }}' onkeyup="onlynum(this)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="use_y" class="required">수선유료구분</label>
+                            <div class="form-inline form-radio-box">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="is_free" id="use_y" class="custom-control-input" value="Y" {{ (@$row->is_free == 'Y') ? "checked" : "" }}/>
+                                    <label class="custom-control-label" for="use_y">유료</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="is_free" id="use_n" class="custom-control-input" value="N" {{ (@$row->is_free == 'N') ? "checked" : "" }}/>
+                                    <label class="custom-control-label" for="use_n">무료</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="charged_price">수선금액</label>
+                            <div class="form-inline">
+                                <div class="form-inline-inner input_box">
+                                    <input type='text' class="form-control form-control-sm search-enter" name='charged_price' id="charged_price" value="{{ @$row->charged_price }}" placeholder="유료비용" onkeyup="onlynum(this)">
+                                </div>
+                                <span class="text_line">/</span>
+                                <div class="form-inline-inner input_box">
+                                    <input type="text" class="form-control form-control-sm search-enter" name="free_price" value="{{ @$row->free_price }}" placeholder="무료비용" onkeyup="onlynum(this)">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 inner-td">
+                        <div class="form-group">
+                            <label for="as_content" class="required">수선내용</label>
+                            <div class="flex_box">
+                                <textarea name="content" id="as_content" class="form-control form-control-sm" style="height: 200px;"></textarea>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="resul_btn_wrap mb-3">
-            <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-            <a href="#" onclick="Cmder('add')" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
-            <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
+        <div class="card mb-3">
+            <div class="d-flex card-header justify-content-between">
+                <h4>본사처리 내용</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="h_receipt_date">본사접수일</label>
+                            <div class="form-inline">
+                                <div class="docs-datepicker form-inline-inner input_box w-100">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm docs-date" name="h_receipt_date" value="{{ @$row->h_receipt_date }}" id="h_receipt_date" autocomplete="off">
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+                                                <i class="fa fa-calendar" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="docs-datepicker-container"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="due_date">수선예정일</label>
+                            <div class="form-inline">
+                                <div class="docs-datepicker form-inline-inner input_box w-100">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm docs-date" name="due_date" value="{{ @$row->due_date }}" id="due_date" autocomplete="off">
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+                                                <i class="fa fa-calendar" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="docs-datepicker-container"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="start_date">수선인도일</label>
+                            <div class="form-inline">
+                                <div class="docs-datepicker form-inline-inner input_box w-100">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm docs-date" name="start_date" value="{{ @$row->start_date }}" id="start_date" autocomplete="off">
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+                                                <i class="fa fa-calendar" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="docs-datepicker-container"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="end_date">수선완료일</label>
+                            <div class="form-inline">
+                                <div class="docs-datepicker form-inline-inner input_box w-100">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm docs-date" name="end_date" value="{{ @$row->end_date }}" id="end_date" autocomplete="off">
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+                                                <i class="fa fa-calendar" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="docs-datepicker-container"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 inner-td">
+                        <div class="form-group">
+                            <label for="h_explain">본사설명</label>
+                            <div class="flex_box">
+                                <textarea name="h_explain" id="h_explain" class="form-control form-control-sm" style="height: 200px;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="text-align: center;">
+            <a href="javascript:void(0);" onclick="return editAs();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>수정</a>
+            <a href="javascript:void(0);" onclick="return removeAs();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx mr-1"></i>삭제</a>
+            <a href="javascript:void(0);" onclick="return goList();"class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-list-ul mr-1"></i>목록으로 이동</a>
         </div>
     </div>
 </form>
 
-<div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
-    <div class="card-body shadow">
-        <div class="card-title mb-3">
-            <div class="filter_wrap">
-                <div class="fl_box">
-                    <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
-                </div>
-                <div class="fr_box">
-
-                </div>
-            </div>
-        </div>
-        <div class="table-responsive">
-            <div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
-        </div>
-    </div>
-</div>
-<script language="javascript">
-var columns = [
-        // this row shows the row index, doesn't use any data from the row
-        {headerName: '#', width:35, pinned:'left', maxWidth: 100,valueGetter: 'node.id', cellRenderer: 'loadingRenderer', cellStyle: {"background":"#F5F7F7"}},
-        {field:"",headerName:"접수일자"},
-        {field:"",headerName:"고객번호"},
-        {field:"",headerName:"고객명"},
-        {field:"",headerName:"수선구분"},
-        {field:"",headerName:"판매일자"},
-        {field:"",headerName:"본사접수일"},
-        {field:"",headerName:"수선인도일"},
-        {field:"",headerName:"수선예정일"},
-        {field:"",headerName:"수선완료일"},
-        {field:"",headerName:"접수번호"},
-        {field:"",headerName:"매장번호"},
-        {field:"",headerName:"매장명"},
-        {field:"",headerName:"수선품목"},
-        {field:"",headerName:"제품코드"},
-        {field:"",headerName:"제품명"},
-        {field:"",headerName:"칼라"},
-        {field:"",headerName:"사이즈"},
-        {field:"",headerName:"수량"},
-        {field:"",headerName:"수선구분"},
-        {field:"",headerName:"유료수선금액"},
-        {field:"",headerName:"무료수선금액"},
-        {field:"",headerName:"연락처1"},
-        {field:"",headerName:"연락처2"},
-        {field:"",headerName:"연락처3"},
-        {field:"",headerName:"우편번호"},
-        {field:"",headerName:"주소1"},
-        {field:"",headerName:"주소2"},
-        {field:"",headerName:"수선내용"},
-        {field:"",headerName:"본사설명"},
-        {field:"",headerName:"수선처코드"},
-        {field:"",headerName:"수선처명"},
-];
-
-</script>
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script type="text/javascript" charset="utf-8">
-    const pApp = new App('',{
-        gridId:"#div-gd",
+
+    window.addEventListener('DOMContentLoaded', () => {
+        document.f1.content.value = "{{@$row->content}}";
+        document.f1.h_explain.value = "{{@$row->h_explain}}";
     });
-    let gx;
-    $(document).ready(function() {
-        pApp.ResizeGrid(265);
-        pApp.BindSearchEnter();
-        let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns);
-        Search();
-    });
-    function Search() {
-        let data = $('form[name="search"]').serialize();
-        gx.Request('/store/standard/std02/search', data,1);
+    
+    // 주소 api
+    function openFindAddress(zipName, addName) {
+        new daum.Postcode({
+            // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분입니다..
+            oncomplete: function(data) {
+                $("#" + zipName).val(data.zonecode);
+                $("#" + addName).val(data.address);
+            }
+        }).open();
     }
+
+    const goList = () => location.href = "/store/standard/std11/";
+
+    const editAs = async () => {
+        if (validate() === false) return;
+        try {
+            const response = await axios({ url: `/store/standard/std11/edit`,
+                method: 'post', data: $('form[name="f1"]').serialize()
+            });
+            const { code, msg } = response?.data;
+            if (code == 200) {
+                alert(msg);
+            } else alert(msg);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const removeAs = async () => {
+        const idx = "{{@$idx}}";
+        if (confirm("등록된 수선 정보를 삭제하시겠습니까?") === false) return;
+        try {
+            const response = await axios({ url: `/store/standard/std11/remove`,
+                method: 'post', data: { 'idx': idx }
+            });
+            const { code, msg } = response?.data;
+            if (code == 200) {
+                alert(msg);
+                goList();
+            } else alert(msg);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const validate = () => {
+        const f1 = document.f1;
+
+        if ($('#receipt_date').val() == "") {
+            alert("접수일자을 입력해 주십시오.");
+            f1.receipt_date.focus();
+            return false;
+        }
+
+        if ($('#as_type').val() == "") {
+            alert("수선구분을 선택해 주십시오.");
+            f1.as_type.focus();
+            return false;
+        }
+
+        if ($('#store_no').val() == "") {
+            alert("매장번호를 입력하여 주십시오.");
+            f1.store_no.focus();
+            return false;
+        }
+
+        if ($('#store_nm').val() == "") {
+            alert("매장명를 입력하여 주십시오.");
+            f1.store_nm.focus();
+            return false;
+        }
+
+        if ($('#item').val() == "") {
+            alert("품목구분을 선택해 주십시오.");
+            f1.item.focus();
+            return false;
+        }
+
+        if ($('#customer_no').val() == "") {
+            alert("고객번호를 선택해 주십시오.");
+            f1.customer_no.focus();
+            return false;
+        }
+
+        if ($('#customer').val() == "") {
+            alert("고객명를 선택해 주십시오.");
+            f1.customer.focus();
+            return false;
+        }
+
+        const mobile_reg = /^01(?:0|1|[6-9])$/;
+        if (!mobile_reg.test($('#mobile1').val())) {
+            alert("휴대전화 앞3자리를 확인해주세요.");
+            $('#mobile1').focus();
+            return false;
+        }
+        if ($('#mobile2').val() == "") {
+            alert("휴대전화의 중간 번호를 입력해 주세요.");
+            $('#mobile2').focus();
+            return false;
+        }
+        if ($('#mobile3').val() == "") {
+            alert("휴대전화의 나머지 번호를 입력해 주세요.");
+            $('#mobile3').focus();
+            return false;
+        }
+        
+        if ($('#product').val() == "") {
+            alert("상품을 선택해 주십시오.");
+            f1.product.focus();
+            return false;
+        }
+
+        if ($('#is_free').val() == "") {
+            alert("수선유료구분을 선택해 주십시오.");
+            f1.is_free.focus();
+            return false;
+        }
+        
+        if ($('#quantity').val() == "") {
+            alert("수량을 입력해 주십시오.");
+            f1.quantity.focus();
+            return false;
+        }
+
+        if ($('#as_content').val() == "") {
+            alert("수선내용을 입력해 주십시오.");
+            f1.content.focus();
+            return false;
+        }
+
+        return true;
+    };
 
 </script>
 
