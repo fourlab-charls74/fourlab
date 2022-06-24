@@ -66,7 +66,7 @@ class productController extends Controller
         $use_yn	= $request->input("use_yn","Y");
 
         $where = "";
-        if ($brand_nm != "")	$where .= "and brand_nm like '$brand_nm%' ";
+        if ($brand_nm != "")	$where .= "and brand_nm like '%$brand_nm%' ";
         if ($use_yn != "")	$where .= "and use_yn = '$use_yn' ";
 
         $sql = "
