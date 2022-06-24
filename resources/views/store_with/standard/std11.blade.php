@@ -93,16 +93,13 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="item">품목구분</label>
+                            <label for="item">품목</label>
                             <div class="flex_box">
-                                <select name="item" id="item" class="form-control form-control-sm">
+                                <select name="item" class="form-control form-control-sm">
                                     <option value="">전체</option>
-                                    <option value="CT">CLOTH TOP</option>
-                                    <option value="CB">CLOTH BOTTOM</option>
-                                    <option value="BA">BAG</option>
-                                    <option value="SO">SHOES</option>
-                                    <option value="AC">ACC</option>
-                                    <option value="SM">SAMPLE</option>
+                                    @foreach ($items as $item)
+                                        <option value="{{ $item->cd }}">{{ $item->val }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -206,18 +203,24 @@
         { field: "item", headerName: "수선품목", width: 100, cellStyle: DEFAULT_STYLE,
             cellRenderer: (params) => {
                 switch (params.value) {
-                    case "CT": 
-                        return "CLOTH TOP";
-                    case "CB": 
-                        return "CLOTH BOTTOM";
-                    case "BA": 
-                        return "BAG";
-                    case "SO": 
-                        return "SHOES";
-                    case "AC": 
-                        return "ACC";
-                    case "SM": 
-                        return "SAMPLE";
+                    case "bag": 
+                        return "가방";
+                    case "books": 
+                        return "도서";
+                    case "stove": 
+                        return "스토브";
+                    case "shoes": 
+                        return "신발";
+                    case "accessory": 
+                        return "악세사리";
+                    case "clothes": 
+                        return "의류";
+                    case "cooker":
+                        return "조리기구";
+                    case "kanken":
+                        return "칸켄백";
+                    case "bottle":
+                        return "텀블러";
                     default:
                         return params.value;
                 };
@@ -254,8 +257,10 @@
         { field: "as_place", headerName: "수선처명", width: 100, cellStyle: DEFAULT_STYLE },
         { field: "", width: "auto" }
     ];
+
 </script>
 <script type="text/javascript" charset="utf-8">
+
     const pApp = new App('',{
         gridId:"#div-gd",
     });
@@ -291,7 +296,7 @@
             document.search.where2.disabled = false;
         }
     };
-
+    
 </script>
 
 @stop
