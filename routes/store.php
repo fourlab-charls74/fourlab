@@ -29,6 +29,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('members', 'MemberController@show');
         Route::get('members/search', 'MemberController@search');
 
+        // 매장명 조회
+        Route::get('stores', 'StoreController@show');
+        Route::get('stores/search', 'StoreController@search');
+
     });
 
     //코드관리
@@ -125,7 +129,11 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
     //매장관리
     Route::prefix("stock")->namespace('stock')->group(function () {
+
+        // 매장재고
         Route::get('stk01','stk01Controller@index');
+        Route::get('stk01/search','stk01Controller@search');
+
         Route::get('stk02','stk02Controller@index');
     });
 

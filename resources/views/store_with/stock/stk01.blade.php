@@ -1,5 +1,5 @@
 @extends('store_with.layouts.layout')
-@section('title','판매일보')
+@section('title','매장재고')
 @section('content')
 <div class="page_tit">
 	<h3 class="d-inline-flex">매장재고</h3>
@@ -29,7 +29,7 @@
 						<div class="form-group">
 							<label for="">매장구분</label>
 							<div class="flax_box">
-								<select name='com_type' class="form-control form-control-sm">
+								<select name='store_type' class="form-control form-control-sm">
 									<option value=''>전체</option>
 									@foreach ($com_types as $com_type)
 										<option value='{{ $com_type->code_id }}'>{{ $com_type->code_val }}</option>
@@ -40,17 +40,17 @@
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="">매장명</label>
+							<label for="store_nm">매장명</label>
 							<div class="flax_box">
-								<input type='text' class="form-control form-control-sm search-enter" name='com_nm' value=''>
+								<input type='text' class="form-control form-control-sm search-enter" name='store_nm' value=''>
 							</div>
 						</div>
 					</div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="">상품코드</label>
+                            <label for="prd_cd">상품코드</label>
                             <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm search-enter" name='goods_code' value=''>
+                                <input type='text' class="form-control form-control-sm search-enter" name='prd_cd' value=''>
                             </div>
                         </div>
                     </div>
@@ -98,16 +98,16 @@
         },
         {field: "prd_cd", headerName: "상품코드", cellStyle: {"line-height": "40px"}},
         {field: "goods_type", headerName: "상품구분", width: 58, pinned: 'left', type: 'StyleGoodsTypeNM'},
-        {field: "opt_kind_nm", headerName: "품목", width:96, cellStyle: {"line-height": "40px"}},
+        {field: "opt_kind_cd", headerName: "품목", width:96, cellStyle: {"line-height": "40px"}},
         {field: "brand_nm", headerName: "브랜드", cellStyle: {"line-height": "40px"}},
-        {field: "style_no", headerName: "스타일넘버", editable: true, cellStyle: {"line-height": "40px", 'background' : '#ffff99'}},
+        {field: "style_no", headerName: "스타일넘버", width: 120, cellStyle: {"line-height": "40px"}},
         {field: "sale_stat_cl", headerName: "상품상태", width:70, type: 'GoodsStateTypeLH50'},
         {field: "img", headerName: "이미지", type: 'GoodsImageType', width:60, cellStyle: {"line-height": "40px"}, surl:"{{config('shop.front_url')}}"},
         {field: "img", headerName: "이미지_url", hide: true},
-        {field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', width: 230, editable: true, cellStyle: {"line-height": "40px", 'background' : '#ffff99'}},
+        {field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', width: 230, cellStyle: {"line-height": "40px"}},
         {field: "goods_nm_eng", headerName: "상품명(영문)", width: 230, cellStyle: {"line-height": "40px"}},
         {field: "goods_opt", headerName: "옵션", cellStyle: {"line-height": "40px"}},
-        {field: "goods_opt", headerName: "매장", cellStyle: {"line-height": "40px"}},
+        {field: "store_nm", headerName: "매장", width: 170, cellStyle: {"line-height": "40px"}},
         {field: "barcode", headerName: "바코드", cellStyle: {"line-height": "40px"}},
         {
             field: "wqty", headerName: "보유재고수", width:70, type: 'numberType', cellStyle: {"line-height": "40px"},
@@ -117,8 +117,9 @@
                 }
             }
         },
-        {field: "reg_dm", headerName: "등록일자", width:110, cellStyle: {"line-height": "40px"}},
-        {field: "upd_dm", headerName: "수정일자", width:110, cellStyle: {"line-height": "40px"}}
+        {field: "rt", headerName: "등록일자", width:110, cellStyle: {"line-height": "40px"}},
+        {field: "ut", headerName: "수정일자", width:110, cellStyle: {"line-height": "40px"}},
+		{width: "auto"}
     ];
 
 	function Add()
@@ -142,8 +143,21 @@
 	});
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/store/sale/sal01/search', data,1);
+		gx.Request('/store/stock/stk01/search', data,1);
 	}
+
+	/**
+     * 고객명 팝업 api
+     */
+    var goodsCallback = (row) => {
+        const { name } = row;
+        $('#customer').val(name);
+    };
+
+    const getStores = () => {
+        const url=`/store/api/stores`;
+        const pop_up = window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=800,height=800");
+    };
 
 </script>
 @stop
