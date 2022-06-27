@@ -65,10 +65,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('std11', 'std11Controller@index');
         Route::get('std11/search', 'std11Controller@search');
 
-        Route::get('std11/create', 'std11Controller@createIndex');
+        Route::get('std11/create', 'std11Controller@showCreate');
         Route::post('std11/create', 'std11Controller@create');
-
-        Route::get('std11/detail/{idx?}', 'std11Controller@detail');
+        
+        Route::get('std11/detail/{idx?}', 'std11Controller@showDetail');
         Route::post('std11/edit', 'std11Controller@edit');
         Route::post('std11/remove', 'std11Controller@remove');
 
