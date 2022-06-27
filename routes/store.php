@@ -23,6 +23,14 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
     Route::post('/login', 'LoginController@login');
     Route::get('/logout', 'LoginController@logout');
 
+    Route::prefix("api")->namespace('api')->group(function () { 
+
+        // 고객명 조회
+        Route::get('members', 'MemberController@show');
+        Route::get('members/search', 'MemberController@search');
+
+    });
+
     //코드관리
     Route::prefix("standard")->namespace('standard')->group(function () {
         //매장
