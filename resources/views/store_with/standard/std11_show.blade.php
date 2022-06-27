@@ -285,94 +285,107 @@
             </div>
         </div>
         <div class="card mb-3">
-            <div class="d-flex card-header justify-content-between">
-                <h4>본사처리 내용</h4>
+            <div class="card-header mb-0">
+                <a href="javascript:void(0);">본사처리</a>
             </div>
             <div class="card-body">
-                <div class="row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="h_receipt_date">본사접수일</label>
-                            <div class="form-inline">
-                                <div class="docs-datepicker form-inline-inner input_box w-100">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date" name="h_receipt_date" value="{{ @$type === 'detail' ? @$row->h_receipt_date : '' }}" id="h_receipt_date" autocomplete="off">
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                                <i class="fa fa-calendar" aria-hidden="true"></i>
-                                            </button>
+                <div class="table-responsive">
+                    <div class="table-box-ty2 mobile">
+                        <table class="table incont table-bordered" width="100%" cellspacing="0">
+                            <colgroup>
+                                <col width="20%">
+                                <col width="30%">
+                                <col width="20%">
+                                <col width="30%">
+                            </colgroup>
+                            <tbody>
+                            <tr>
+                                <th>
+                                    <label for="h_receipt_date">본사접수일</label>
+                                </th>
+                                <td>
+                                    <div class="form-inline">
+                                        <div class="docs-datepicker form-inline-inner input_box w-100">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control form-control-sm docs-date" name="h_receipt_date" value="{{ @$type === 'detail' ? @$row->h_receipt_date : '' }}" id="h_receipt_date" autocomplete="off">
+                                                <div class="input-group-append">
+                                                    <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+                                                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="docs-datepicker-container"></div>
                                         </div>
                                     </div>
-                                    <div class="docs-datepicker-container"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="due_date">수선예정일</label>
-                            <div class="form-inline">
-                                <div class="docs-datepicker form-inline-inner input_box w-100">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date" name="due_date" value="{{ @$type === 'detail' ? @$row->due_date : '' }}" id="due_date" autocomplete="off">
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                                <i class="fa fa-calendar" aria-hidden="true"></i>
-                                            </button>
+                                </td>
+                                <th>
+                                    <label for="due_date">수선예정일</label>
+                                </th>
+                                <td>
+                                    <div class="form-inline">
+                                        <div class="docs-datepicker form-inline-inner input_box w-100">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control form-control-sm docs-date" name="due_date" value="{{ @$type === 'detail' ? @$row->due_date : '' }}" id="due_date" autocomplete="off">
+                                                <div class="input-group-append">
+                                                    <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+                                                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="docs-datepicker-container"></div>
                                         </div>
                                     </div>
-                                    <div class="docs-datepicker-container"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="start_date">수선인도일</label>
-                            <div class="form-inline">
-                                <div class="docs-datepicker form-inline-inner input_box w-100">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date" name="start_date" value="{{ @$type === 'detail' ? @$row->start_date : '' }}" id="start_date" autocomplete="off">
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                                <i class="fa fa-calendar" aria-hidden="true"></i>
-                                            </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <label for="start_date">수선인도일</label>
+                                </th>
+                                <td>
+                                    <div class="form-inline">
+                                        <div class="docs-datepicker form-inline-inner input_box w-100">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control form-control-sm docs-date" name="start_date" value="{{ @$type === 'detail' ? @$row->start_date : '' }}" id="start_date" autocomplete="off">
+                                                <div class="input-group-append">
+                                                    <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+                                                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="docs-datepicker-container"></div>
                                         </div>
                                     </div>
-                                    <div class="docs-datepicker-container"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="end_date">수선완료일</label>
-                            <div class="form-inline">
-                                <div class="docs-datepicker form-inline-inner input_box w-100">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date" name="end_date" value="{{ @$type === 'detail' ? @$row->end_date : '' }}" id="end_date" autocomplete="off">
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                                <i class="fa fa-calendar" aria-hidden="true"></i>
-                                            </button>
+                                </td>
+                                <th>
+                                    <label for="end_date">수선완료일</label>
+                                </th>
+                                <td>
+                                    <div class="form-inline">
+                                        <div class="docs-datepicker form-inline-inner input_box w-100">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control form-control-sm docs-date" name="end_date" value="{{ @$type === 'detail' ? @$row->end_date : '' }}" id="end_date" autocomplete="off">
+                                                <div class="input-group-append">
+                                                    <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+                                                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="docs-datepicker-container"></div>
                                         </div>
                                     </div>
-                                    <div class="docs-datepicker-container"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-12 inner-td">
-                        <div class="form-group">
-                            <label for="h_explain">본사설명</label>
-                            <div class="flex_box">
-                                <textarea name="h_explain" id="h_explain" class="form-control form-control-sm" style="height: 200px;"></textarea>
-                            </div>
-                        </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <label for="h_explain">본사설명</label>
+                                </th>
+                                <td colspan="4">
+                                    <div class="flex_box">
+                                        <textarea name="h_explain" id="h_explain" class="form-control form-control-sm" style="height: 200px;"></textarea>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
             </div>
