@@ -22,11 +22,13 @@ class std11Controller extends Controller
 	{
         $mutable = now();
         $sdate = $mutable->sub(1, 'day')->format('Y-m-d');
+		$items = SLib::getItems();
         $com_types = SLib::getCodes("G_COM_TYPE");
 		$values = [
             'sdate' => $sdate,
             'edate' => date("Y-m-d"),
-		    "com_types" => $com_types
+			'items' => $items,
+		    'com_types' => $com_types
         ];
 		return view(Config::get('shop.store.view') . '/standard/std11', $values);
 	}
@@ -69,16 +71,34 @@ class std11Controller extends Controller
 		]);
 	}
 
-	public function createIndex(Request $request)
+	public function showCreate()
 	{
 		$mutable = now();
         $sdate = $mutable->format('Y-m-d');
+		$items = SLib::getItems();
         $com_types = SLib::getCodes("G_COM_TYPE");
 		$values = [
+			'type' => 'create',
             'sdate' => $sdate,
-		    "com_types" => $com_types
+			'items' => $items,
+		    'com_types' => $com_types
         ];
-		return view(Config::get('shop.store.view') . '/standard/std11_create', $values);
+		return view(Config::get('shop.store.view') . '/standard/std11_show', $values);
+	}
+
+	public function showDetail($idx = "")
+	{
+		$row = DB::table(self::T)->where("idx", "=", $idx)->first();
+		$mobile = $row->mobile;
+		$items = SLib::getItems();
+		if ($mobile != "") $row->mobile = explode("-", $mobile);
+		$values = [ 
+			'type' => 'detail',
+			'idx' => $idx,
+			'items' => $items,
+			'row' => $row,
+		];
+		return view(Config::get('shop.store.view') . '/standard/std11_show', $values);
 	}
 
 	public function create(Request $request)
@@ -89,19 +109,10 @@ class std11Controller extends Controller
 			DB::transaction(function () use ($inputs) {
 				DB::table(self::T)->insert($inputs);
 			});
-			return response()->json(["code"	=> "200", "msg"	=> "등록되었습니다."]);
+			return response()->json(['code'	=> '200']);
 		} catch (Exception $e) {
-			return response()->json(["code"	=> "500", "msg"	=> "등록 중 에러가 발생했습니다. 잠시 후 다시 시도 해주세요."]);
+			return response()->json(['code' => '500']);
 		}
-	}
-
-	public function detail($idx = "")
-	{
-		$row = DB::table(self::T)->where("idx", "=", $idx)->first();
-		$mobile = $row->mobile;
-		if ($mobile != "") $row->mobile = explode("-", $mobile);
-		$values = [ 'idx' => $idx, 'row' => $row ];
-		return view(Config::get('shop.store.view') . '/standard/std11_detail', $values);
 	}
 
 	public function edit(Request $request)
@@ -112,22 +123,22 @@ class std11Controller extends Controller
 			DB::transaction(function () use ($inputs) {
 				DB::table(self::T)->where('idx', $inputs['idx'])->update($inputs);
 			});
-			return response()->json(["code"	=> "200", "msg"	=> "수정되었습니다."]);
+			return response()->json(['code'	=> '200']);
 		} catch (Exception $e) {
-			return response()->json(["code"	=> "500", "msg"	=> "수정 중 에러가 발생했습니다. 잠시 후 다시 시도 해주세요."]);
+			return response()->json(['code'	=> '500']);
 		}
 	}
 
 	public function remove(Request $request)
 	{
-		$idx = $request->input("idx");
+		$idx = $request->input('idx');
 		try {
 			DB::transaction(function () use ($idx) {
 				DB::table(self::T)->where('idx', $idx)->delete();
 			});
-			return response()->json(["code"	=> "200", "msg"	=> "삭제되었습니다."]);
+			return response()->json(['code'	=> '200']);
 		} catch (Exception $e) {
-			return response()->json(["code"	=> "500", "msg"	=> "삭제 중 에러가 발생했습니다. 잠시 후 다시 시도 해주세요."]);
+			return response()->json(['code'	=> '500']);
 		}
 	}
 }

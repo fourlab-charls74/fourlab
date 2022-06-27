@@ -54,6 +54,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 판매유형관리
         Route::get('std05', 'std05Controller@index');
         Route::get('std05/search', 'std05Controller@search');
+        Route::get('std05/show/{sale_type_cd?}', 'std05Controller@show');
+        Route::get('std05/search-store/{sale_type_cd?}', 'std05Controller@search_store');
 
         // 매장 영업담당자
         Route::get('std06', 'std06Controller@index');
@@ -63,10 +65,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('std11', 'std11Controller@index');
         Route::get('std11/search', 'std11Controller@search');
 
-        Route::get('std11/create', 'std11Controller@createIndex');
+        Route::get('std11/create', 'std11Controller@showCreate');
         Route::post('std11/create', 'std11Controller@create');
-
-        Route::get('std11/detail/{idx?}', 'std11Controller@detail');
+        
+        Route::get('std11/detail/{idx?}', 'std11Controller@showDetail');
         Route::post('std11/edit', 'std11Controller@edit');
         Route::post('std11/remove', 'std11Controller@remove');
 
