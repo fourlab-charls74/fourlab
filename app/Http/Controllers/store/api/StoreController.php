@@ -8,24 +8,24 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 /**
- * 고객명 조회
+ * 매장명 조회
  */
-class MemberController extends Controller {
+class StoreController extends Controller {
 
     /**
-     * 고객명 선택 화면 랜더링
+     * 매장명 선택 화면 랜더링
      */
     public function show() {
-        return view(Config::get('shop.store.view') . "/common/member");
+        return view(Config::get('shop.store.view') . "/common/store");
     }
 
     /**
      * 검색
      */
     public function search(Request $request) {
-        $name = $request->input('name');
+        $store_nm = $request->input('store_nm');
         $sql = "
-            select name, phone, addr, addr2 from member where name like '%" . Lib::quote($name) . "%'
+            select store_cd, store_nm from store where store_nm like '%" . Lib::quote($store_nm) . "%'
         ";
         $rows = DB::select($sql);
         return response()->json([
