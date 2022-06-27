@@ -144,14 +144,12 @@
                                     <label for="customer_no" class="required">고객번호 / 고객명</label>
                                 </th>
                                 <td>
-                                    <div class="form-inline">
-                                        <div class="form-inline-inner input_box">
-                                            <input type="text" class="form-control form-control-sm search-enter" name='customer_no' id="customer_no" value="{{ @$type === 'detail' ? @$row->customer_no : '' }}">
-                                        </div>
-                                        <span class="text_line">/</span>
-                                        <div class="form-inline-inner input_box">
-                                            <input type="text" class="form-control form-control-sm search-enter" name="customer" id="customer" value="{{ @$type === 'detail' ? @$row->customer : '' }}">
-                                        </div>
+                                    <div class="flex_box">
+                                        <input type="text" class="form-control form-control-sm search-enter" name='customer_no' id="customer_no" value="{{ @$type === 'detail' ? @$row->customer_no : '' }}"
+                                        style="width:30%;">
+                                        <span class="text_line mx-2">/</span>
+                                        <input type="text" style="width:30%;" class="form-control form-control-sm search-enter" name="customer" id="customer" value="{{ @$type === 'detail' ? @$row->customer : '' }}">
+                                        <a href="#" onclick="getMember();"class="ml-2 btn btn-sm btn-outline-primary"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                     </div>
                                 </td>
                             </tr>
@@ -558,6 +556,19 @@
         }
 
         return true;
+    };
+
+    /**
+     * 고객명 팝업 api
+     */
+    var goodsCallback = (row) => {
+        const { name } = row;
+        $('#customer').val(name);
+    };
+
+    const getMember = () => {
+        const url=`/store/api/members`;
+        const pop_up = window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=800,height=800");
     };
 
 </script>
