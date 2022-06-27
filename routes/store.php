@@ -116,6 +116,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
     //매장관리
     Route::prefix("stock")->namespace('stock')->group(function () {
         Route::get('stk01','stk01Controller@index');
+        Route::get('stk02','stk02Controller@index');
     });
 
 });

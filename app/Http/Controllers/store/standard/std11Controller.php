@@ -130,5 +130,4 @@ class std11Controller extends Controller
 			return response()->json(["code"	=> "500", "msg"	=> "삭제 중 에러가 발생했습니다. 잠시 후 다시 시도 해주세요."]);
 		}
 	}
-
 }

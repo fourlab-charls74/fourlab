@@ -2,7 +2,7 @@
 @section('title','판매일보')
 @section('content')
 <div class="page_tit">
-	<h3 class="d-inline-flex">매장재고</h3>
+	<h3 class="d-inline-flex">매장재고입출고</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
 		<span>매장관리</span>
@@ -82,45 +82,30 @@
 	</div>
 </div>
 <script language="javascript">
-    const columns = [
-        {headerName: '#', pinned: 'left', type: 'NumType', width:40, cellStyle: {"line-height": "40px"}},
-        {
-            field: "goods_no",
-            headerName: "상품번호",
-            width: 58,
-            pinned: 'left',
-            cellStyle: {"line-height": "40px"},
-            cellRenderer: function (params) {
-                if (params.value) {
-                    return `<a href="{{config('shop.front_url')}}/app/product/detail/${params.value}" target="_blank">${params.value}</a>`
-                }
-            }
-        },
-        {field: "prd_cd", headerName: "상품코드", cellStyle: {"line-height": "40px"}},
-        {field: "goods_type", headerName: "상품구분", width: 58, pinned: 'left', type: 'StyleGoodsTypeNM'},
-        {field: "opt_kind_nm", headerName: "품목", width:96, cellStyle: {"line-height": "40px"}},
-        {field: "brand_nm", headerName: "브랜드", cellStyle: {"line-height": "40px"}},
-        {field: "style_no", headerName: "스타일넘버", editable: true, cellStyle: {"line-height": "40px", 'background' : '#ffff99'}},
-        {field: "sale_stat_cl", headerName: "상품상태", width:70, type: 'GoodsStateTypeLH50'},
-        {field: "img", headerName: "이미지", type: 'GoodsImageType', width:60, cellStyle: {"line-height": "40px"}, surl:"{{config('shop.front_url')}}"},
-        {field: "img", headerName: "이미지_url", hide: true},
-        {field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', width: 230, editable: true, cellStyle: {"line-height": "40px", 'background' : '#ffff99'}},
-        {field: "goods_nm_eng", headerName: "상품명(영문)", width: 230, cellStyle: {"line-height": "40px"}},
-        {field: "goods_opt", headerName: "옵션", cellStyle: {"line-height": "40px"}},
-        {field: "goods_opt", headerName: "매장", cellStyle: {"line-height": "40px"}},
-        {field: "barcode", headerName: "바코드", cellStyle: {"line-height": "40px"}},
-        {
-            field: "wqty", headerName: "보유재고수", width:70, type: 'numberType', cellStyle: {"line-height": "40px"},
-            cellRenderer: function(params) {
-                if (params.value !== undefined) {
-                    return '<a href="#" onclick="return openHeadStock(' + params.data.goods_no + ',\'\');">' + params.value + '</a>';
-                }
-            }
-        },
-        {field: "reg_dm", headerName: "등록일자", width:110, cellStyle: {"line-height": "40px"}},
-        {field: "upd_dm", headerName: "수정일자", width:110, cellStyle: {"line-height": "40px"}}
-    ];
-
+	var columns = [
+		{headerName: "#", field: "num",type:'NumType'},
+		{field: "",	headerName: "구분"},
+		{field: "",	headerName: "출고"},
+		{field: "",	headerName: "입고"},
+		{field: "",	headerName: "상품코드"},
+		{field: "",	headerName: "스타일넘버"},
+		{field: "",	headerName: "이미지"},
+		{field: "",	headerName: "상품명"},
+		{field: "",	headerName: "옵션"},
+		{field: "",	headerName: "출고수량"},
+		{field: "",	headerName: "입고수량"},
+		{field: "",	headerName: "상태"},
+		{field: "",	headerName: "출고요청"},
+		{field: "",	headerName: "출고(RT)요청일시"},
+		{field: "",	headerName: "출고일시"},
+		{field: "",	headerName: "배송방법"},
+		{field: "",	headerName: "배송업체"},
+		{field: "",	headerName: "송장번호"},
+		{field: "",	headerName: "출고자"},
+		{field: "",	headerName: "입고일시"},
+		{field: "",	headerName: "입고자"},
+        {field: "nvl",headerName: ""}
+	];
 	function Add()
 	{
 		const url='/head/xmd/store/store01/show';
