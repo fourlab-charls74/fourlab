@@ -69,6 +69,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('std05/show/{sale_type_cd?}', 'std05Controller@show');
         Route::get('std05/search-store/{sale_type_cd?}', 'std05Controller@search_store');
 
+        Route::post('std05/add', 'std05Controller@add_sale_type');
+        Route::put('std05/update', 'std05Controller@update_sale_type');
+
         // 매장 영업담당자
         Route::get('std06', 'std06Controller@index');
         Route::get('std06/search', 'std06Controller@search');

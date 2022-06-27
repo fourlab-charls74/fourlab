@@ -202,7 +202,6 @@
         cur_store_nm = store_nm;
         gx2.Request("/store/standard/std04/search-competitor/" + store_cd, "", -1, function(d) {
             $("#select_store_nm").text(`${store_nm} - `);
-            console.log("동종업계정보 검색결과", d);
         })
     }
 

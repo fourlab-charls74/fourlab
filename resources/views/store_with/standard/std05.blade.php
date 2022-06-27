@@ -131,7 +131,10 @@
             cellRenderer: function(params) {
                     return params.value === "per" ? "할인율" : params.value === "amt" ? "할인액" : "";
         }},
-        {field: "sale_amt", headerName: "할인율/액", width: 100, type: "percentType"},
+        {field: "sale_amt", headerName: "할인율/액", width: 100, cellStyle: {"text-align": "right"},
+            cellRenderer: function(params) {
+                return params.data.amt_kind === 'per' ? Number.parseFloat(params.data.sale_per).toFixed(2) : params.value;
+        }},
         {field: "use_yn", headerName: "사용여부", cellStyle: {"text-align": "center"}},
         {field: "", headerName: "", width: "auto"}
     ];
