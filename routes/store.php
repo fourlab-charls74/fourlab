@@ -41,10 +41,6 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('std02', 'std02Controller@index');
         Route::get('std02/search', 'std02Controller@search');
         Route::get('std02/show/{com_id?}', 'std02Controller@show');
-        Route::get('std02/getcate1/{com_id?}', 'std02Controller@getdisplaycategory');
-        Route::get('std02/getcate2/{com_id?}', 'std02Controller@getitemcategory');
-        Route::get('std02/addcate/{com_id?}', 'std02Controller@addcategory');
-        Route::get('std02/delcate/{com_id?}', 'std02Controller@DelCategory');
 
         // 창고관리
         Route::get('std03', 'std03Controller@index');

@@ -111,11 +111,32 @@ class std02Controller extends Controller
 
 	public function show()
 	{
-
 		$values = [
+			'cmd'			=> '',
+			'store_types'	=> SLib::getCodes("STORE_TYPE"),
+			'store_kinds'	=> SLib::getCodes("STORE_KIND"),
+			'store_areas'	=> SLib::getCodes("STORE_AREA"),
 		];
 
-		return view( Config::get('shop.head.view') . '/standard/std02_show',$values);
+		return view( Config::get('shop.store.view') . '/standard/std02_show',$values);
+	}
+
+	// 매장코드 중복체크
+	public function check_code($store_cd = '') 
+	{
+		$code	= 200;
+		$msg	= "사용가능한 코드입니다.";
+
+		$sql	= " select count(store_cd) as cnt from store where store_cd = :store_cd ";
+
+		$cnt	= DB::selectOne($sql, ["store_cd" => $store_cd])->cnt;
+
+		if( $cnt > 0 ){
+			$code	= 409;
+			$msg	= "이미 사용중인 코드입니다.";
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg]);
 	}
 
 	public function view($com_id)
