@@ -138,7 +138,7 @@
 					<a href="#">매장 정보</a>
                     <div class="d-flex align-items-center">
                         매장구분 : 
-                        <select id="store_type" name="store_type" class="form-control mr-2" style="width:120px;height:33px;">
+                        <select id="store_type" name="store_type" class="form-control ml-2 mr-1" style="width:120px;height:33px;">
                             <option value="">전체</option>
                             @foreach ($store_types as $store_type)
                             <option value="{{ $store_type->code_id }}">
@@ -232,7 +232,9 @@
             if(res.data.code === 200) {
                 alert(res.data.msg);
                 opener.Search();
-                location.href = "/store/standard/std05/show/" + res.data.data.sale_type_cd;;
+                if(type === 'add') {
+                    location.href = "/store/standard/std05/show/" + res.data.data.sale_type_cd;;
+                }
             } else {
                 console.log(res.data);
                 alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
