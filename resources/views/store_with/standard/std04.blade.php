@@ -10,6 +10,12 @@
     </div>
 </div>
 
+<style>
+    @media (max-width: 740px) {
+        #div-gd {height: 130px !important;}
+    }
+</style>
+
 <form method="get" name="search">
     <div id="search-area" class="search_cum_form">
         <div class="card mb-3">
@@ -78,38 +84,37 @@
         </div>
         <div class="resul_btn_wrap mb-3">
             <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-            <a href="#" onclick="openPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
-            <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
+            <a href="#" onclick="formReset('search')" class="btn btn-sm btn-outline-primary shadow-sm">검색조건 초기화</a>
         </div>
     </div>
 </form>
 
 <div class="row show_layout">
-    <div class="col-lg-3">
+    <div class="col-lg-3 pr-1">
         <div class="card shadow-none mb-0">
-            <div class="card-header mb-0">
-                <h5 class="m-0 mb-2">매장목록</h5>
+            <div class="card-header mb-0 pt-1 pb-1">
+                <h5 class="m-0">매장목록</h5>
             </div>
-            <div class="card-body shadow pt-3">
+            <div class="card-body shadow pt-2">
                 <div class="table-responsive">
-                    <div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
+                    <div id="div-gd" class="ag-theme-balham"></div>
                 </div>
             </div>
         </div>
     </div>
     <div class="col-lg-9">
         <div class="card shadow-none mb-0">
-            <div class="card-header mb-0 d-flex justify-content-between">
-                <h5 class="m-0"><span id="select_store_nm"></span>동종업계 세부정보</h5>
-                <div>
-                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2" onclick="updateCompetitors()"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
-                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2" onclick="downlaodExcel()"><i class="fas fa-download fa-sm text-white-50 mr-1"></i> 엑셀다운로드</button>
+            <div class="card-header mb-0 d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row">
+                <h5 class="m-0 mb-3 mb-sm-0"><span id="select_store_nm"></span>동종업계 세부정보</h5>
+                <div class="d-flex align-items-center justify-content-center justify-content-sm-end">
+                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateCompetitors()"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
+                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="downlaodExcel()"><i class="fas fa-download fa-sm text-white-50 mr-1"></i> 엑셀다운로드</button>
                     <button type="button" class="btn btn-sm btn-outline-primary shadow-sm" onclick="resetCompetitors()">전체 초기화</button>
                 </div>
             </div>
-            <div class="card-body shadow pt-3">
+            <div class="card-body shadow pt-2">
                 <div class="table-responsive">
-                    <div id="div-gd-competitor" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
+                    <div id="div-gd-competitor" class="ag-theme-balham"></div>
                 </div>
             </div>
         </div>
@@ -118,23 +123,25 @@
 
 <script language="javascript">
     let columns = [
-        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 49, cellStyle: {"text-align": "center"}},
-        {field: "store_cd", headerName: "매장코드", width: 140, 
+        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
+        {field: "store_type", headerName: "매장구분", width: 100, cellStyle: {"text-align": "center"}},
+        {field: "store_cd", headerName: "매장코드", width: 100, 
             cellRenderer: function(params) {
                 return `<a href='javascript:void(0)' onclick='SearchDetail("${params.value}", "${params.data.store_nm}")'>${params.value}</a>`;
             }
         },
-        {field: "store_nm", headerName: "매장명", width: 140, 
+        {field: "store_nm", headerName: "매장명", width: 100, 
             cellRenderer: function(params) {
                 return `<a href='javascript:void(0)' onclick='SearchDetail("${params.data.store_cd}", "${params.value}")'>${params.value}</a>`;
             }
         },
-        {field: "use_yn", headerName: "사용여부", cellStyle: {"text-align": "center"}}
+        {field: "use_yn", headerName: "사용여부", cellStyle: {"text-align": "center"}},
+        {headerName: "", width: "auto"},
     ];
 
     let competitor_columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
-        {field: "use_yn", headerName: "사용", cellStyle: {"text-align": "center"}, 
+        {field: "use_yn", headerName: "사용", cellStyle: {"text-align": "center"}, pinned: "left",
             cellRenderer: function(params) {
                 return `<input type="checkbox" onclick="changeUseYnVal(event, '${params.rowIndex}')" style="width:15px;height:15px;" ${params.value === 'Y' ? "checked" : ""} />`;
         }},
@@ -176,6 +183,13 @@
 
         // 최초검색
         Search();
+
+        // 검색조건 숨김 시 우측 grid 높이 설정
+        $(".search_mode_wrap .dropdown-menu a").on("click", function(e) {
+            if(pApp2.options.grid_resize == true){
+                pApp2.ResizeGrid(275);
+            }
+        });
     });
 
     // 매장목록 조회

@@ -25,15 +25,20 @@
     </div>
 
     <style> 
-        .required:after {content:" *"; color: red;}
-        .table th {min-width:120px;}
+        .required:after {content: " *"; color: red;}
+        .table th {min-width: 120px;}
+        .grid-date {width: 100%;background-color: transparent;border: none;outline: none;text-align: center;font-weight: 400;}
+        .grid-date::-webkit-calendar-picker-indicator {background: transparent;bottom: 0;color: transparent;cursor: pointer;height: auto;left: 0;position: absolute;right: 0;top: 0;width: auto;}
+        .grid-date[value=""]::-webkit-datetime-edit {
+            color: transparent;
+        }
 
         @media (max-width: 740px) {
-            .table td {float: unset !important;width:100% !important;}
+            .table td {float: unset !important;width: 100% !important;}
         }
     </style>
 
-	<form name="f1" id="f1">
+	<form name="f1" id="f1" onsubmit="return false;">
 		<input type="hidden" name="cmd" id="cmd" value="{{ $cmd }}">
 		<div class="card_wrap aco_card_wrap mb-3">
 			<div class="card shadow">
@@ -48,31 +53,31 @@
                                     <tbody>
                                         <tr>
                                             <th class="required">판매구분</th>
-                                            <td colspan="3">
+                                            <td>
                                                 <div class="d-flex">
                                                     @if($cmd == "add")
-                                                    <select id="sale_kind" name="sale_kind" class="form-control form-control-sm w-100">
+                                                    <select id="sale_kind" name="sale_kind" class="form-control form-control-sm w-100" onchange="autoWriteTypeName(this)">
                                                         <option value="">전체</option>
                                                         @foreach ($sale_kinds as $sale_kind)
-                                                        <option value="{{ $sale_kind->code_id }}">
-                                                            [{{ $sale_kind->code_id }}] {{ $sale_kind->code_val }}
+                                                        <option value="{{ $sale_kind->code_id }}" @if($sale_kind->use_yn == 1) disabled style="background-color: #DEDEDE" @endif>
+                                                            {{ $sale_kind->code_val }}
                                                         </option>
                                                         @endforeach
                                                     </select>
                                                     @else
                                                     <input type="hidden" id="sale_kind" name="sale_kind" value="{{ @$sale_type->sale_kind }}" />
-                                                    <p>[{{ @$sale_type->sale_kind }}] {{ @$sale_type->sale_type_nm }}</p>
+                                                    <p>{{ @$sale_type->sale_kind_nm }}</p>
                                                     @endif
                                                 </div>
                                             </td>
-                                        </tr>
-                                        <tr>
-                                            {{-- <th class="required">판매유형명</th>
+                                            <th class="required">판매유형명</th>
                                             <td>
                                                 <div class="form-inline">
                                                     <input type="text" name="sale_type_nm" id="sale_type_nm" value="{{ @$sale_type->sale_type_nm }}" class="form-control form-control-sm w-100" />
                                                 </div>
-                                            </td> --}}
+                                            </td>
+                                        </tr>
+                                        <tr>
                                             <th>기준금액</th>
                                             <td>
                                                 <div class="form-inline form-radio-box">
@@ -118,7 +123,7 @@
                                             <td>
                                                 <div class="form-inline">
                                                     <div class="d-flex align-items-center w-100">
-                                                        <input type="text" name="sale_val" id="sale_val" value="@if(@$sale_type->amt_kind == 'amt'){{ @$sale_type->sale_amt ?? 0 }}@else{{ @$sale_type->sale_per ?? 0 }}@endif" class="form-control form-control-sm text-right w-100" />
+                                                        <input type="text" name="sale_val" id="sale_val" value="@if(@$sale_type->amt_kind == 'amt'){{ @number_format(@$sale_type->sale_amt ?? 0) }}@else{{ @$sale_type->sale_per ?? 0 }}@endif" class="form-control form-control-sm text-right w-100" onkeyup="inputNumberFormat(this)" />
                                                         <span class="ml-2 fs-14" id="amt_kind_unit">@if(@$sale_type->amt_kind == 'amt') 원 @else % @endif</span>
                                                     </div>
                                                 </div>
@@ -134,11 +139,11 @@
 		</div>
 		<div class="card_wrap aco_card_wrap">
 			<div class="card shadow">
-				<div class="card-header d-flex justify-content-between align-items-center mb-0">
+				<div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
 					<a href="#">매장 정보</a>
-                    <div class="d-flex align-items-center">
+                    <div class="d-flex align-items-center justify-content-end">
                         매장구분 : 
-                        <select id="store_type" name="store_type" class="form-control ml-2 mr-1" style="width:120px;height:33px;">
+                        <select id="store_type" name="store_type" class="form-control ml-2 mr-1 pt-1 pb-1" style="width:140px;height:33px;">
                             <option value="">전체</option>
                             @foreach ($store_types as $store_type)
                             <option value="{{ $store_type->code_id }}">
@@ -166,14 +171,22 @@
 <script language="javascript">
     let columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
-        {field: "use_yn", headerName: "사용", cellStyle: {"text-align": "center"}, 
+        {field: "use_yn", headerName: "사용", cellStyle: {"text-align": "center"}, pinned: "left",
             cellRenderer: function(params) {
                 return `<input type="checkbox" onclick="changeUseYnVal(event, '${params.rowIndex}')" style="width:15px;height:15px;" ${params.value === 'Y' ? "checked" : ""} />`;
         }},
         {field: "store_cd", headerName: "매장코드", width: 100, cellStyle: {"text-align": "center"}},
         {field: "store_nm", headerName: "매장명", width: 200},
-        {field: "sdate", headerName: "시작일", width: 100, cellStyle: {"text-align": "center", "background-color": "#ffff99"}, editable: true},
-        {field: "edate", headerName: "종료일", width: 100, cellStyle: {"text-align": "center", "background-color": "#ffff99"}, editable: true},
+        {field: "sdate", headerName: "시작일", width: 100, cellStyle: {"text-align": "center", "background-color": "#ffff99"},
+            cellRenderer: (params) => {
+                return `<input type="date" class="grid-date" value="${params.value ?? ''}" onchange="changeUseYnValWhenChangeDate('sdate', this, '${params.rowIndex}')" />`;
+            }
+        },
+        {field: "edate", headerName: "종료일", width: 100, cellStyle: {"text-align": "center", "background-color": "#ffff99"},
+            cellRenderer: (params) => {
+                return `<input type="date" class="grid-date" value="${params.value ?? ''}" onchange="changeUseYnValWhenChangeDate('edate', this, '${params.rowIndex}')" />`;
+            }
+        },
         {headerName: "", width: "auto"},
     ];
 </script>
@@ -209,11 +222,18 @@
         });
     }
 
-    // 매장별 판매유형 사용여부 변경
+    // 매장별 사용여부 변경
     function changeUseYnVal(e, rowIndex) {
         const node = gx.getRowNode(rowIndex);
         node.data.use_yn = e.target.checked ? 'Y' : 'N';
         node.setSelected(e.target.checked);
+    }
+
+    // 매장 시작일/종료일 변경 시 사용여부 변경
+    function changeUseYnValWhenChangeDate(fieldName, e, rowIndex) {
+        const node = gx.getRowNode(rowIndex);
+        node.data[fieldName] = e.value;
+        node.setDataValue(fieldName, e.value);
     }
 
     // 판매유형 등록 / 수정
@@ -234,6 +254,8 @@
                 opener.Search();
                 if(type === 'add') {
                     location.href = "/store/standard/std05/show/" + res.data.data.sale_type_cd;;
+                } else {
+                    Search();
                 }
             } else {
                 console.log(res.data);
@@ -254,7 +276,12 @@
             }
         }
 
-        if(isNaN(f1.sale_val.value)) {
+        if(f1.sale_type_nm.value === "") {
+            f1.sale_type_nm.focus();
+            return alert("판매유형명을 입력해주세요.");
+        }
+
+        if(isNaN(unComma(f1.sale_val.value))) {
             f1.sale_val.focus();
             return alert("할인율/액의 값을 숫자형태로 입력해주세요.");
         }
@@ -275,11 +302,12 @@
         return {
             sale_kind_cd: cmd === 'update' ? "{{ @$sale_type->idx }}" : '',
             sale_kind: f1.sale_kind.value,
-            sale_type_nm: sale_type ? sale_type['code_val'] : '',
+            // sale_type_nm: sale_type ? sale_type['code_val'] : '',
+            sale_type_nm: f1.sale_type_nm.value,
             sale_apply: f1.sale_apply.value,
             amt_kind: f1.amt_kind.value,
-            sale_amt: f1.amt_kind.value === 'amt' ? f1.sale_val.value : '',
-            sale_per: f1.amt_kind.value === 'per' ? f1.sale_val.value : '',
+            sale_amt: f1.amt_kind.value === 'amt' ? unComma(f1.sale_val.value) : '',
+            sale_per: f1.amt_kind.value === 'per' ? unComma(f1.sale_val.value) : '',
             use_yn: f1.use_yn.value,
             store_datas: gx.getRows(),
         }
@@ -291,6 +319,18 @@
             let unit = e.target.value === 'per' ? '%' : '원';
             $("#amt_kind_unit").text(unit);
         });
+    }
+
+    // 할인액 입력 시 콤마처리
+    function inputNumberFormat(obj) {
+        if(isNaN(unComma(obj.value))) return obj.value = 0;
+        if(obj.value.indexOf(".") > 0) return;
+        obj.value = Comma(unComma(obj.value));
+    }
+
+    // 판매구분 선택 시 판매유형명 자동완성
+    function autoWriteTypeName(obj) {
+        $("[name=sale_type_nm]").val(obj.options[obj.selectedIndex].text);
     }
 </script>
 @stop

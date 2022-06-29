@@ -34,17 +34,18 @@ class std05Controller extends Controller
 		$where = "";
 
 		if($sale_kind != null) 
-			$where .= " and sale_kind = '$sale_kind'";
+			$where .= " and s.sale_kind = '$sale_kind'";
 		if($sale_type_nm != null) 
-			$where .= " and sale_type_nm like '%$sale_type_nm%'";
+			$where .= " and s.sale_type_nm like '%$sale_type_nm%'";
 		if($sale_apply != null) 
-			$where .= " and sale_apply = '$sale_apply'";
+			$where .= " and s.sale_apply = '$sale_apply'";
 		if($use_yn != null) 
-			$where .= " and use_yn = '$use_yn'";
+			$where .= " and s.use_yn = '$use_yn'";
 
 		$sql = "
-			select idx as sale_type_cd, sale_kind, sale_type_nm, sale_apply, amt_kind, sale_amt, sale_per, use_yn
-			from sale_type
+			select s.sale_kind, c.code_val as sale_kind_nm, s.idx as sale_type_cd, s.sale_type_nm, s.sale_apply, s.amt_kind, s.sale_amt, s.sale_per, s.use_yn, (select count(ss.idx) from sale_type_store ss where ss.sale_type_cd = s.idx and ss.use_yn = 'Y') as store_cnt
+			from sale_type s
+				inner join code c on c.code_kind_cd = 'SALE_KIND' and c.code_id = s.sale_kind
 			where 1=1 $where
 			order by sale_kind
 		";
@@ -69,23 +70,25 @@ class std05Controller extends Controller
 
 		if($sale_type_cd != '') {
 			$sql = "
-				select *
-				from sale_type
-				where idx = :sale_type_cd
+				select s.idx, s.sale_kind, c.code_val as sale_kind_nm, s.sale_type_nm, s.sale_apply, s.amt_kind, s.sale_amt, s.sale_per, s.use_yn
+				from sale_type s
+					inner join code c
+						on c.code_kind_cd = 'SALE_KIND' and c.code_id = s.sale_kind
+				where s.idx = :sale_type_cd
 			";
 
 			$sale_type = DB::selectOne($sql, ["sale_type_cd" => $sale_type_cd]);
 		}
 
 		$sql = "
-		select c.code_id, c.code_val
-		from code c
-			left outer join sale_type s
-				on s.sale_kind = c.code_id
-		where 
-			c.code_kind_cd = 'SALE_KIND' 
-			and c.use_yn = 'Y' 
-			and c.code_id not in(select sale_kind from sale_type);
+			select c.code_id, c.code_val, c.code_id in(select sale_kind from sale_type) as use_yn
+			from code c
+				left outer join sale_type s
+					on s.sale_kind = c.code_id
+			where 
+				c.code_kind_cd = 'SALE_KIND' 
+				and c.use_yn = 'Y' 
+			order by c.code_id
 		";
 		$sale_kinds = DB::select($sql);
 			
@@ -159,8 +162,8 @@ class std05Controller extends Controller
 					'sale_type_cd' => $idx,
 					'store_cd' => $s['store_cd'],
 					'store_nm' => $s['store_nm'],
-					'sdate' => $s['sdate'] ?? null,
-					'edate' => $s['edate'] ?? null,
+					'sdate' => $s['sdate'] ?? ($s['use_yn'] == 'Y' ? date("Y-m-d") : null),
+					'edate' => $s['edate'] ?? ($s['use_yn'] == 'Y' ? '9999-12-31' : null),
 					'use_yn' => $s['use_yn'] ?? "N",
 					'reg_date' => now(),
 				]);
@@ -193,6 +196,7 @@ class std05Controller extends Controller
 			DB::table('sale_type')
 				->where("idx", "=", $idx)
 				->update([
+					'sale_type_nm' => $r['sale_type_nm'],
 					'sale_apply' => $r['sale_apply'],
 					'amt_kind' => $r['amt_kind'],
 					'sale_amt' => $r['sale_amt'] ?? null,
@@ -207,8 +211,8 @@ class std05Controller extends Controller
 					->where("sale_type_cd", "=", $idx)
 					->where("store_cd", "=", $s['store_cd'])
 					->update([
-						'sdate' => $s['sdate'] ?? null,
-						'edate' => $s['edate'] ?? null,
+						'sdate' => $s['sdate'] ?? ($s['use_yn'] == 'Y' ? date("Y-m-d") : null),
+						'edate' => $s['edate'] ?? ($s['use_yn'] == 'Y' ? '9999-12-31' : null),
 						'use_yn' => $s['use_yn'] ?? "N",
 						'mod_date' => now(),
 					]);

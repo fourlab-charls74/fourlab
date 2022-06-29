@@ -117,8 +117,9 @@
 <script language="javascript">
     let columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {"text-align": "center"}},
-        {field: "sale_kind", headerName: "판매구분", pinned: "left", width: 70, cellStyle: {"text-align": "center"}},
-        {field: "sale_type_nm", headerName: "판매유형명", width: 200,
+        {field: "sale_kind", headerName: "판매구분코드", pinned: "left", width: 90, cellStyle: {"text-align": "center"}},
+        {field: "sale_kind_nm", headerName: "판매구분", pinned: "left", width: 120},
+        {field: "sale_type_nm", headerName: "판매유형명", width: 150,
             cellRenderer: function(params) {
                 return `<a href='javascript:void(0)' onclick='openPopup("${params.data.sale_type_cd}")'>${params.value}</a>`;
             }
@@ -133,9 +134,10 @@
         }},
         {field: "sale_amt", headerName: "할인율/액", width: 100, cellStyle: {"text-align": "right"},
             cellRenderer: function(params) {
-                return params.data.amt_kind === 'per' ? Number.parseFloat(params.data.sale_per).toFixed(2) : params.value;
+                return params.data.amt_kind === 'per' ? Number.parseFloat(params.data.sale_per).toFixed(2) : Comma(params.value);
         }},
         {field: "use_yn", headerName: "사용여부", cellStyle: {"text-align": "center"}},
+        {field: "store_cnt", headerName: "적용매장수", type: "numberType", cellStyle: {"text-align": "center"}},
         {field: "", headerName: "", width: "auto"}
     ];
 </script>

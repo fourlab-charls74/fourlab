@@ -31,20 +31,21 @@ class std04Controller extends Controller
 		$use_yn = $request->input("use_yn");
 
 		$code = 200;
-		$where = "competitor_yn = 'Y'"; // 동종업계정보입력을 사용하는 항목만 조회
+		$where = "s.competitor_yn = 'Y'"; // 동종업계정보입력을 사용하는 항목만 조회
 
 		if($store_type != null) 
-			$where .= " and store_type = '$store_type'";
+			$where .= " and s.store_type = '$store_type'";
 		if($store_cd != null) 
-			$where .= " and store_cd = '$store_cd'";
+			$where .= " and s.store_cd = '$store_cd'";
 		if($store_nm != null) 
-			$where .= " and (store_nm = '$store_nm' or store_nm_s = '$store_nm')";
+			$where .= " and (s.store_nm like '%$store_nm%' or s.store_nm_s like '%$store_nm%')";
 		if($use_yn != null) 
-			$where .= " and use_yn = '$use_yn'";
+			$where .= " and s.use_yn = '$use_yn'";
 
 		$sql = "
-			select store_cd, store_nm_s as store_nm, use_yn
-			from store
+			select s.store_cd, s.store_nm_s as store_nm, s.use_yn, c.code_val as store_type
+			from store s
+				inner join code c on c.code_kind_cd = 'STORE_TYPE' and c.code_id = s.store_type
 			where $where
 			order by store_cd
 		";
