@@ -15,17 +15,23 @@ class StoreController extends Controller {
     /**
      * 매장명 선택 화면 랜더링
      */
-    public function show() {
+    public function show()
+    {
         return view(Config::get('shop.store.view') . "/common/store");
     }
 
     /**
      * 검색
      */
-    public function search(Request $request) {
+    public function search(Request $request)
+    {
+        $store_cd = $request->input('store_cd');
         $store_nm = $request->input('store_nm');
         $sql = "
-            select store_cd, store_nm from store where store_nm like '%" . Lib::quote($store_nm) . "%'
+            select store_cd, store_nm 
+            from store 
+            where store_nm like '%" . Lib::quote($store_nm) . "%'
+                and store_cd like '%" . Lib::quote($store_cd) . "%'
         ";
         $rows = DB::select($sql);
         return response()->json([

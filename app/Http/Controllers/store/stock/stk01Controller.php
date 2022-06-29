@@ -52,6 +52,7 @@ class stk01Controller extends Controller
 
 		$where	= "";
 		if ( $store_type != "" )	$where .= " and s.store_type = '" . $store_type . "' ";
+		if ( $store_cd != "" )	$where .= " and s.store_cd = '" . $store_cd . "' ";
 		if ( $store_nm != "" )	$where .= " and s.store_nm like '%" . Lib::quote($store_nm) . "%' ";
 		if ( $prd_cd != "" )	$where .= " and p.prd_cd = '" . $prd_cd . "' ";
 
