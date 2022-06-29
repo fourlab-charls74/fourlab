@@ -241,8 +241,7 @@ function StyleGoodsTypeNM(params) {
             var color = state[params.value];
             return {
                 color: color,
-                "text-align": "center",
-                //"line-height": "40px"
+                "text-align": "center"
             };
         }
     }

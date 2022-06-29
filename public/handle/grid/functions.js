@@ -153,7 +153,9 @@ function StyleGoodsTypeNM(params){
     if (params.value !== undefined) {
         if (state[params.value]) {
             return {
-                color :state[params.value]
+                color :state[params.value],
+                "text-align": "center",
+                "line-height": "40px"
             }
         }
     }

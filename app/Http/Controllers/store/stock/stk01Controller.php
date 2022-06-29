@@ -66,8 +66,8 @@ class stk01Controller extends Controller
 			$query = "
 				select count(*) as total
 				from product_stock_store p
-				left join goods g on p.goods_no = g.goods_no
-				left join store s on p.store_cd = s.store_cd
+					left join goods g on p.goods_no = g.goods_no
+					left join store s on p.store_cd = s.store_cd
 				where 1=1 $where
 			";
 			$row = DB::selectOne($query);
@@ -77,11 +77,15 @@ class stk01Controller extends Controller
 
 		$sql = "
 			select 
-				p.goods_no, goods_type, prd_cd, opt_kind_cd, brand_nm, style_no, sale_stat_cl, 
-				img, goods_nm, goods_nm_eng, goods_opt, p.store_cd, store_nm, store_type, wqty, rt, ut
+				p.goods_no, goods_type, prd_cd, g.opt_kind_cd, opt_kind_nm, brand_nm, style_no, 
+				c.code_val as sale_stat_cl_val, ifnull( c2.code_val, 'N/A') as goods_type_nm,
+				img, goods_nm, goods_nm_eng, goods_opt, p.store_cd, store_nm, store_type, wqty, p.rt, p.ut
 			from product_stock_store p 
-			left join goods g on p.goods_no = g.goods_no
-			left join store s on p.store_cd = s.store_cd
+				left join goods g on p.goods_no = g.goods_no
+				left join store s on p.store_cd = s.store_cd
+				left join opt o on g.opt_kind_cd = o.opt_kind_cd
+				left join `code` c on c.code_kind_cd = 'G_GOODS_STAT' and sale_stat_cl = c.code_id
+				left join `code` c2 on c2.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = c2.code_id 
 			where 1=1
 			$where
 			$orderby 
