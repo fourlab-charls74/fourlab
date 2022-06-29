@@ -42,7 +42,7 @@
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-task fs-18"></i><span>매장관리</span></a>
                 <ul>
-                    <li><a href="/store/stock/stk01">(개)매장재고</a></li>
+                    <li><a href="/store/stock/stk01">(완)매장재고</a></li>
                     <li><a href="/store/stock/stk02">매장재고입출고</a></li>
                     <li><a href="">매장RT</a></li>
                     <li><a href="">매장주문</a></li>
