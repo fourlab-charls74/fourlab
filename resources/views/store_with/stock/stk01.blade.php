@@ -18,7 +18,6 @@
 				<h4>검색</h4>
 				<div class="flex_box">
 					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-					<a href="#" onclick="Add();" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>데이터업로드</a>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
 			</div>
@@ -40,11 +39,10 @@
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="store_nm">매장명</label>
-							<!-- <input type='text' class="form-control form-control-sm search-enter" name='store_nm' value=''> -->
+							<label for="store_cd">매장</label>
 							<div class="form-inline inline_btn_box">
 								<select id="store_cd" name="store_cd" class="form-control form-control-sm select2-store"></select>
-								<a href="#" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+								<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 							</div>
 						</div>
 					</div>
@@ -62,7 +60,6 @@
 
 		<div class="resul_btn_wrap mb-3">
 			<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-			<a href="#" onclick="Add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 데이터업로드</a>
 			<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
 		</div>
 
@@ -125,42 +122,30 @@
 		{width: "auto"}
     ];
 
-	function Add()
-	{
-		const url='/head/xmd/store/store01/show';
-		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
-	}
-
 </script>
 <script type="text/javascript" charset="utf-8">
+
 	const pApp = new App('',{
 		gridId:"#div-gd",
 	});
 	let gx;
+	
 	$(document).ready(function() {
 		pApp.ResizeGrid(265);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns);
 		Search();
+
+		// 매장 검색 클릭 이벤트 바인딩 및 콜백 사용
+        $( ".sch-store" ).on("click", function() {
+            searchStore.Open();
+        });
 	});
 	function Search() {
 		let data = $('form[name="search"]').serialize();
 		gx.Request('/store/stock/stk01/search', data,1);
 	}
-
-	/**
-     * 고객명 팝업 api
-     */
-    var goodsCallback = (row) => {
-        const { name } = row;
-        $('#customer').val(name);
-    };
-
-    const getStores = () => {
-        const url=`/store/api/stores`;
-        const pop_up = window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=800,height=800");
-    };
 
 </script>
 @stop

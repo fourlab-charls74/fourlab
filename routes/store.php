@@ -23,6 +23,12 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
     Route::post('/login', 'LoginController@login');
     Route::get('/logout', 'LoginController@logout');
 
+    Route::prefix("auto-complete")->group(function () {
+        
+        Route::get('/store', 'AutoCompleteController@store');
+        
+    });
+
     Route::prefix("api")->namespace('api')->group(function () { 
 
         // 고객명 조회

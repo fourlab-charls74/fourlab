@@ -78,17 +78,11 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <!-- 추후 api 작업 예상됨 -->
-                            <label for="store_no">매장번호/매장명</label>
-                            <div class="form-inline">
-                                <div class="form-inline-inner input_box">
-                                    <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='store_no' id="store_no" value="">
-                                </div>
-                                <span class="text_line">/</span>
-                                <div class="form-inline-inner input_box">
-                                    <input type="text" class="form-control form-control-sm search-enter" name="store_nm" value="">
-                                </div>
-                            </div>
+                            <label for="store_no">매장</label>
+							<div class="form-inline inline_btn_box">
+								<select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
+								<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+							</div>
                         </div>
                     </div>
                     <div class="col-lg-4 inner-td">
@@ -279,6 +273,11 @@
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, options);
         Search();
+
+        // 매장 검색 클릭 이벤트 바인딩 및 콜백 사용
+        $( ".sch-store" ).on("click", function() {
+            searchStore.Open();
+        });
     });
     function Search() {
         let data = $('form[name="search"]').serialize();
