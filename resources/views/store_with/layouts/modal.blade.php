@@ -113,7 +113,7 @@
                                                 <div class="form-group">
                                                     <label style="min-width:60px;">매장명</label>
                                                     <div class="flex_box">
-                                                        <input type='text' class="form-control form-control-sm search-all" onkeypress="return searchStore.Search(event);" name='store_nm' value=''>
+                                                        <input type='text' class="form-control form-control-sm search-all" onkeypress="searchStore.Search(event);" name='store_nm' value=''>
                                                     </div>
                                                 </div>
                                             </div>
