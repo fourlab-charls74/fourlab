@@ -404,7 +404,12 @@
         // 수정시의 값 초기화
         document.f1.content.value = "{{@$type === 'detail' ? @$row->content : ''}}";
         document.f1.h_explain.value = "{{@$type === 'detail' ? @$row->h_explain : ''}}";
-        $("#store_no").select2({data:["{{ @$type === 'detail' ? @$row->store_no : '' }}"], tags: true});
+
+        // select2, autocomplete input에 값 할당
+        $("#store_no").select2({data:[{
+            id: "{{ @$type === 'detail' ? @$row->store_no : '' }}",
+            text: "{{ @$type === 'detail' ? @$row->store_nm : '' }}"
+        }], tags: true});
         document.f1.store_nm.value = "{{ @$type === 'detail' ? @$row->store_nm : '' }}"; 
 
         // 매장 검색 클릭 이벤트 바인딩 및 콜백 사용

@@ -109,15 +109,7 @@
                                 <div class="card-body">
                                     <div class="row_wrap">
                                         <div class="row">
-                                            <div class="col-lg-6 inner-td">
-                                                <div class="form-group">
-                                                    <label style="min-width:60px;">매장코드</label>
-                                                    <div class="flex_box">
-                                                        <input type='text' class="form-control form-control-sm search-all" name='store_cd' value=''>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6 inner-td">
+                                            <div class="col-lg-12 inner-td">
                                                 <div class="form-group">
                                                     <label style="min-width:60px;">매장명</label>
                                                     <div class="flex_box">
@@ -127,13 +119,13 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="resul_btn_wrap" style="padding-top:10px;text-align:right;display:block;">
-                                        <a href="#" id="search_sbtn" onclick="return searchStore.Search();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                                    <div class="resul_btn_wrap" style="padding-top:20px;text-align:right;display:block;">
+                                        <a href="javascript:void(0);" id="search_sbtn" onclick="return searchStore.Search();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                                     </div>
                                 </div>
                             </form>
                         </div>
-                        <div class="card shadow mb-1">
+                        <div class="card shadow mb-1 pt-0">
                             <div class="card-body m-0">
                                 <div class="card-title">
                                     <div class="filter_wrap">

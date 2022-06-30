@@ -63,7 +63,7 @@ SearchStore.prototype.Open = function(callback = null){
 
 SearchStore.prototype.SetGrid = function(divId){
     const columns = [
-        { field:"store_cd", headerName:"매장코드", width:100, cellStyle: { "text-align": "center" } },
+        { field:"store_cd", headerName:"매장코드", width:100, cellStyle: { "text-align": "center" }, hide: true },
         { field:"store_nm", headerName:"매장", width: "auto" },
         { field:"choice", headerName:"선택", width:100, cellClass:'hd-grid-code',
             cellRenderer: function (params) {
