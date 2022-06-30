@@ -105,7 +105,7 @@
                 <div class="modal-body show_layout" style="background:#f5f5f5;">
                     <div class="card_wrap search_cum_form write">
                         <div class="card shadow">
-                            <form name="search_store" method="get">
+                            <form name="search_store" method="get" onsubmit="return false">
                                 <div class="card-body">
                                     <div class="row_wrap">
                                         <div class="row">
@@ -113,14 +113,14 @@
                                                 <div class="form-group">
                                                     <label style="min-width:60px;">매장명</label>
                                                     <div class="flex_box">
-                                                        <input type='text' class="form-control form-control-sm search-all" name='store_nm' value=''>
+                                                        <input type='text' class="form-control form-control-sm search-all" onkeypress="return searchStore.Search(event);" name='store_nm' value=''>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="resul_btn_wrap" style="padding-top:20px;text-align:right;display:block;">
-                                        <a href="javascript:void(0);" id="search_sbtn" onclick="return searchStore.Search();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                                        <a href="javascript:void(0);" id="search_store_sbtn" onclick="return searchStore.Search();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                                     </div>
                                 </div>
                             </form>
