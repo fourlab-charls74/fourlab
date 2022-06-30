@@ -961,8 +961,8 @@ ControlOption.prototype.SetGrid = function(divId) {
         this.kinds = opt_kinds;
         $("#opt_kind").html("");
         $("#opt_kind").append(`<option value=0>= 옵션구분 =</option>`);
-        opt_kinds.forEach(opt => {
-            $("#opt_kind").append(`<option value='${JSON.stringify(opt)}'>${opt.name}</option>`);
+        opt_kinds.map(item => {
+            $("#opt_kind").append(`<option value='${JSON.stringify(item.name)}'>${item.name}</option>`);
         });
         $("#gd-option-total").text(e.head.total);
     });
@@ -971,19 +971,19 @@ ControlOption.prototype.SetGrid = function(divId) {
 ControlOption.prototype.Add = function(e) {
     if(e.key === "Enter" || e.type === "click") {
 
-        const opt_kind_no = JSON.parse($("#opt_kind").val());
+        const opt_kind = JSON.parse($("#opt_kind").val());
         const opt_nm = $("#opt_nm").val();
 
-        if(opt_kind_no == 0) {
+        if (opt_kind == 0) {
             $("#opt_kind").trigger("focus");
             return alert("옵션구분을 선택해주세요.");
         }
-        if(opt_nm == '') return;
+        if (opt_nm == '') return;
 
-        if(this.grid.getRows().filter(n => n.opt_name === opt_kind_no.name && n.goods_opt === opt_nm).length > 0) return alert("이미 등록된 옵션입니다.");
+        if (this.grid.getRows().filter(n => n.opt_name === opt_kind && n.goods_opt === opt_nm).length > 0) return alert("이미 등록된 옵션입니다.");
 
         this.grid.addRows([{
-            opt_name: opt_kind_no.name,
+            opt_name: opt_kind,
             goods_opt: opt_nm,
         }]);
         
@@ -1034,7 +1034,7 @@ ControlOption.prototype.Delete = async function() {
         alert('삭제할 옵션을 선택해주세요.');
         return false;
     } else {
-        if (!confirm("선택하신 옵션을 삭제하시겠습니까?")) return false;
+        if (!confirm("선택하신 옵션을 삭제하시겠습니까? \n(하나의 옵션구분만 남게되면 등록된 모든 옵션이 삭제됩니다.)")) return false;
         try {
             const response = await axios({ url: `/head/product/prd01/${this.goods_no}/delete-basic-options`, 
                 method: 'post', data: { del_opt_list: rows } 

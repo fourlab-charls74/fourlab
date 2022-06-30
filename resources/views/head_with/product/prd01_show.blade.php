@@ -818,7 +818,7 @@
                                             <th>등록일시</th>
                                             <td>
                                                 <div class="txt_box">
-                                                    {{ @$goods_info->reg_dm  }}
+                                                    {{ @$goods_info->reg_dm }}
                                                 </div>
                                             </td>
                                         </tr>
@@ -2409,6 +2409,7 @@
     let opt1 = [];
 	let opt2 = [];
 
+    let basic_is_single = false; // basic 옵션 기준 싱글, 멀티 구분
     let last_option_row = {};
 
 	@if (count(@$opt['opt2']) > 0)
@@ -2445,13 +2446,23 @@
         { field: "no", headerName: "no", hide:true }
     ];
 
-    const initRightOptColumns = (opt1_kind_nm, opt2_kind_nm) => {
+    const basicSingleOptStockColumns = (opt1_kind_nm) => {
+        return [
+            { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, cellClass: "locked-cell", checkboxSelection: true, width: 30, pinned: 'left', sort: null },
+            { field: "opt1_kind_name", headerName: opt1_kind_nm, width:100, pinned: 'left', suppressMovable: true },
+            { field: "opt_price", headerName: "옵션가격", width:100, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true },
+            { field: "good_qty", headerName: "온라인재고", width:80, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW },
+            { field: "wqty", headerName: "보유재고", width:80, type: 'numberType', editable: true },
+            { field: "opt_memo", headerName: "옵션메모", width:90, cellStyle: {"text-align":"center"}, editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true }
+        ];
+    };
+
+    const basicMultiOptStockColumns = (opt1_kind_nm, opt2_kind_nm) => {
         return [
             {field: "opt1_kind_name", headerName: opt1_kind_nm, width:100, cellStyle: CELL_COLOR.LOCKED, cellClass: "locked-cell", checkboxSelection: true, pinned: 'left', suppressMovable: true},
             {field: "opt_price", headerName: "옵션가격", width:100, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true,
                 cellClassRules: optCellClassRules
             },
-            
             {
                 field: "opt2_kind_name",
                 headerName: opt2_kind_nm,
@@ -2491,8 +2502,6 @@
     /**
      * 옵션 우측 그리드 컬럼 정의
      */
-    let basic_option_stock_columns = initRightOptColumns(opt1_kind_nm, opt2_kind_nm);
-
     const extra_option_stock_columns = [
         { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 30, pinned: 'left', sort: null },
         { field: "opt_name", headerName: "옵션명", width:100, type: 'numberType'},
@@ -2653,13 +2662,18 @@
             const response = await axios({ url: `/head/product/prd01/${goods_no}/get-basic-opts-matrix`, method: 'get' });
             const { data, status } = response;
             if (status == 200) {
-                let { opt_kind_names } = data;
+                let { opt_kind_names, is_single } = data;
                 if (opt_kind_names && Array.isArray(opt_kind_names)) { // 변경된 옵션구분이 있는 경우 우측 컬럼 초기화
                     opt1_kind_nm = opt_kind_names[0] ? opt_kind_names[0] : "";
                     opt2_kind_nm = opt_kind_names[1] ? opt_kind_names[1] : "";
+                    basic_is_single = is_single;
                 }
             }
-            columns = Object.keys(columns).length > 0 ? columns : initRightOptColumns(opt1_kind_nm, opt2_kind_nm);
+            if (basic_is_single) { // 기본 싱글 옵션인지 기본 멀티 옵션인지 구분하여 컬럼 초기화
+                columns = Object.keys(columns).length > 0 ? columns : basicSingleOptStockColumns(opt1_kind_nm);
+            } else {
+                columns = Object.keys(columns).length > 0 ? columns : basicMultiOptStockColumns(opt1_kind_nm, opt2_kind_nm);
+            }
             $("#opt-type").html("기본옵션");
             $(".option-add-btn").html("관리");
             $(".option-inv-btn").show();
@@ -2698,27 +2712,38 @@
         if (type == "기본") {
 
             let list = [];
-            result.reduce((prev, item) => {
 
-                let { idx, opt1_kind_name } = prev;
-                const { goods_no, goods_opt, opt_name, opt_memo, opt_price, good_qty, wqty } = item;
-                const basic_opts = goods_opt.split('^');
-                const opt_names = opt_name.split('^');
+            if (basic_is_single) { // 기본 상품 단일 옵션
 
-                if (opt1_kind_name != basic_opts[0]) idx++;
+                list = result.map((item) => {
+                    return { ...item, opt1_kind_name: item?.goods_opt };
+                });
 
-                opt1_kind_name = basic_opts[0];
-                const opt2_kind_name = basic_opts[1];
+            } else { // 기본 상품 멀티 옵션
 
-                list[idx] = { opt1_kind_name: opt1_kind_name, opt_memo: opt_memo, opt_price: opt_price, ...list[idx] };
-                list[idx][`${opt2_kind_name}_good_qty`] = good_qty;
-                list[idx][`${opt2_kind_name}_wqty`] = wqty;
+                result.reduce((prev, item) => {
 
-                return {idx: idx, opt1_kind_name: opt1_kind_name};
-                
-            }, {idx: 0, opt1_kind_name: ""});
+                    let { idx, opt1_kind_name } = prev;
+                    const { goods_no, goods_opt, opt_name, opt_memo, opt_price, good_qty, wqty } = item;
+                    const basic_opts = goods_opt.split('^');
+                    const opt_names = opt_name.split('^');
 
-            list.shift();
+                    if (opt1_kind_name != basic_opts[0]) idx++;
+
+                    opt1_kind_name = basic_opts[0];
+                    const opt2_kind_name = basic_opts[1];
+
+                    list[idx] = { opt1_kind_name: opt1_kind_name, opt_memo: opt_memo, opt_price: opt_price, ...list[idx] };
+                    list[idx][`${opt2_kind_name}_good_qty`] = good_qty;
+                    list[idx][`${opt2_kind_name}_wqty`] = wqty;
+
+                    return {idx: idx, opt1_kind_name: opt1_kind_name};
+                    
+                }, {idx: 0, opt1_kind_name: ""});
+
+                list.shift();
+
+            }
 
             gx2.setRows(list);
             
@@ -2795,17 +2820,32 @@
     }
 
     function addOptionKind() {
+
+        const basic_count = gx1.getRows().filter(item => item.type === '기본').length;
         
-        if($("[name='opt_type']").val() === 'basic' && gx1.getRows().filter(item => item.type === '기본').length >= 2) return alert("기본옵션은 최대 2개까지 설정 가능합니다.");
+        if($("[name='opt_type']").val() === 'basic' && basic_count >= 2) return alert("기본옵션은 최대 2개까지 설정 가능합니다.");
         if($("[name='opt_type_nm']").val() === '') return alert("옵션구분값을 입력해주세요.");
+
+        if (basic_count == 1 && ($("[name='opt_type']").val() === 'basic')) {
+            if(!confirm("2단옵션으로 변경됩니다. 진행하시겠습니까? \n(단일옵션을 다시 사용하려면 삭제후 재등록하셔야 합니다.)")) return;
+        }
 
         $.ajax({
             async: true,
             type: 'post',
             url: `/head/product/prd01/${goods_no}/option-kind-add`,
-            data: $("#f1").serialize(),
+            data: {
+                'opt_type': document.f1.opt_type.value,
+                'opt_type_nm': document.f1.opt_type_nm.value,
+                'opt_required_yn': document.f1.opt_required_yn.value,
+                'opt_use_yn': document.f1.opt_use_yn.value,
+                'basic_count': basic_count
+            },
             success: async function (res) {
-                if(res.code === 200) {
+
+                console.log(res);
+
+                if (res.code === 200) {
                     resetAddOptionKindBox();
                     searchOptKind();
                     initOptGridAndApi();
@@ -2888,7 +2928,8 @@
     */
     $(".option-add-btn").on("click", function(e) {
         e.preventDefault();
-        controlOption.Open(goods_no, 
+        const GOODS_NO = document.f1.goods_no.value;
+        controlOption.Open(GOODS_NO, 
             /**
              * afterSaveOrDel 콜백 정의
              */
@@ -2926,7 +2967,8 @@
             alert('삭제할 옵션을 선택해주세요.');
             return false;
         } else {
-            if (!confirm("체크된 옵션을 삭제하시겠습니까?")) return false;
+            if (!confirm("체크된 옵션을 삭제하시겠습니까? \n(하나의 옵션구분만 남게되면 등록된 모든 옵션이 삭제됩니다.)")) return false;
+
             try {
                 const response = await axios({ url: `/head/product/prd01/${goods_no}/delete-basic-options`, 
                     method: 'post', data: { del_opt_list: del_opt_list } 
@@ -2958,50 +3000,61 @@
 
     const updateBasicOptsData = async (rows) => {
 
-        const opt_name = `${opt1_kind_nm}^${opt2_kind_nm}`;
-
         let data = [];
-        rows.map((row, idx) => {
 
-            const keys = Object.keys(row);
-            const { opt1_kind_name, opt_price, opt_memo } = row;
-            keys.reduce((prev, key) => {
+        if (basic_is_single) {
 
-                let obj = {};
-                let { opt1, opt2, goods_opt, good_qty, opt_price, opt_memo } = prev;
-                obj.opt1 = opt1;
-                obj.opt_price = opt_price;
-                obj.opt_memo = opt_memo;
+            data = rows.map((item) => {
+                return { ...item, opt1: item?.opt1_kind_name }
+            });
 
-                if (!opt2) { // prefix 추출하여 opt2 값 알아냄
-                    let regExp = /.+(?=_good_qty)/i;
-                    let arr = key.match(regExp);
-                    if (arr) obj.opt2 = arr[0];
-                }
+        } else {
 
-                if ((opt2)) {
-                    obj.goods_opt = opt1 + "^" + opt2;
-                }
+            const opt_name = `${opt1_kind_nm}^${opt2_kind_nm}`;
+            
+            rows.map((row, idx) => {
 
-                // 온라인 재고 할당
-                obj.good_qty = good_qty;
-                regExp = /.+(?=_good_qty)/i;
-                let arr_2 = key.match(regExp);
-                if (arr_2) {
-                    obj.good_qty = parseInt(row[`${arr_2[0]}_good_qty`]);
-                }
+                const keys = Object.keys(row);
+                const { opt1_kind_name, opt_price, opt_memo } = row;
+                keys.reduce((prev, key) => {
 
-                // 루프돌면서 백앤드에서 사용하는 형식에 맞는 goods_opt 만들었으면 data에 push함
-                if (obj?.goods_opt) {
-                    data.push(obj);
-                    obj.opt_name = opt_name;
-                }
+                    let obj = {};
+                    let { opt1, opt2, goods_opt, good_qty, opt_price, opt_memo } = prev;
+                    obj.opt1 = opt1;
+                    obj.opt_price = opt_price;
+                    obj.opt_memo = opt_memo;
 
-               return obj;
-                
-            }, { goods_opt : "", opt1 : opt1_kind_name, opt2: "", good_qty: 0, opt_price: opt_price, opt_memo: opt_memo });
+                    if (!opt2) { // prefix 추출하여 opt2 값 알아냄
+                        let regExp = /.+(?=_good_qty)/i;
+                        let arr = key.match(regExp);
+                        if (arr) obj.opt2 = arr[0];
+                    }
 
-        });
+                    if ((opt2)) {
+                        obj.goods_opt = opt1 + "^" + opt2;
+                    }
+
+                    // 온라인 재고 할당
+                    obj.good_qty = good_qty;
+                    regExp = /.+(?=_good_qty)/i;
+                    let arr_2 = key.match(regExp);
+                    if (arr_2) {
+                        obj.good_qty = parseInt(row[`${arr_2[0]}_good_qty`]);
+                    }
+
+                    // 루프돌면서 백앤드에서 사용하는 형식에 맞는 goods_opt 만들었으면 data에 push함
+                    if (obj?.goods_opt) {
+                        data.push(obj);
+                        obj.opt_name = opt_name;
+                    }
+
+                return obj;
+                    
+                }, { goods_opt : "", opt1 : opt1_kind_name, opt2: "", good_qty: 0, opt_price: opt_price, opt_memo: opt_memo });
+
+            });
+            
+        }
 
         const response = await axios({ url: `/head/product/prd01/${goods_no}/update-basic-opts-data`, 
             method: 'post', data: { data: data }
