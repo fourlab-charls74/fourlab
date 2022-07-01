@@ -99,18 +99,14 @@
                                 </td>
                             </tr>
                             <tr>
-                                <th><!-- 추후 api 작업 예상됨 -->
-                                    <label for="store_no" class="required">매장번호 / 매장명</label>
+                                <th>
+                                    <label for="store_no">매장</label>
                                 </th>
                                 <td>
-                                    <div class="form-inline">
-                                        <div class="form-inline-inner input_box">
-                                            <input type='text' class="form-control form-control-sm search-enter" name='store_no' id="store_no" value="{{ @$type === 'detail' ? @$row->store_no : '' }}">
-                                        </div>
-                                        <span class="text_line">/</span>
-                                        <div class="form-inline-inner input_box">
-                                            <input type="text" class="form-control form-control-sm search-enter" name="store_nm" id="store_nm" value="{{ @$type === 'detail' ? @$row->store_nm : '' }}">
-                                        </div>
+                                    <div class="form-inline inline_btn_box">
+                                        <input type='hidden' id="store_nm" name="store_nm">
+                                        <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
+                                        <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                     </div>
                                 </td>
                                 <th>
@@ -144,14 +140,12 @@
                                     <label for="customer_no" class="required">고객번호 / 고객명</label>
                                 </th>
                                 <td>
-                                    <div class="form-inline">
-                                        <div class="form-inline-inner input_box">
-                                            <input type="text" class="form-control form-control-sm search-enter" name='customer_no' id="customer_no" value="{{ @$type === 'detail' ? @$row->customer_no : '' }}">
-                                        </div>
-                                        <span class="text_line">/</span>
-                                        <div class="form-inline-inner input_box">
-                                            <input type="text" class="form-control form-control-sm search-enter" name="customer" id="customer" value="{{ @$type === 'detail' ? @$row->customer : '' }}">
-                                        </div>
+                                    <div class="flex_box">
+                                        <input type="text" class="form-control form-control-sm search-enter" name='customer_no' id="customer_no" value="{{ @$type === 'detail' ? @$row->customer_no : '' }}"
+                                        style="width:30%;">
+                                        <span class="text_line mx-2">/</span>
+                                        <input type="text" style="width:30%;" class="form-control form-control-sm search-enter" name="customer" id="customer" value="{{ @$type === 'detail' ? @$row->customer : '' }}">
+                                        <a href="#" onclick="getMember();"class="ml-2 btn btn-sm btn-outline-primary"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                     </div>
                                 </td>
                             </tr>
@@ -406,8 +400,23 @@
 <script type="text/javascript" charset="utf-8">
 
     window.addEventListener('DOMContentLoaded', () => {
+
+        // 수정시의 값 초기화
         document.f1.content.value = "{{@$type === 'detail' ? @$row->content : ''}}";
         document.f1.h_explain.value = "{{@$type === 'detail' ? @$row->h_explain : ''}}";
+
+        // select2, autocomplete input에 값 할당
+        $("#store_no").select2({data:[{
+            id: "{{ @$type === 'detail' ? @$row->store_no : '' }}",
+            text: "{{ @$type === 'detail' ? @$row->store_nm : '' }}"
+        }], tags: true});
+        document.f1.store_nm.value = "{{ @$type === 'detail' ? @$row->store_nm : '' }}"; 
+
+        // 매장 검색 클릭 이벤트 바인딩 및 콜백 사용
+        $( ".sch-store" ).on("click", function() {
+            searchStore.Open();
+        });
+        
     });
     
     // 주소 api
@@ -558,6 +567,19 @@
         }
 
         return true;
+    };
+
+    /**
+     * 고객명 팝업 api
+     */
+    var goodsCallback = (row) => {
+        const { name } = row;
+        $('#customer').val(name);
+    };
+
+    const getMember = () => {
+        const url=`/store/api/members`;
+        const pop_up = window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=800,height=800");
     };
 
 </script>

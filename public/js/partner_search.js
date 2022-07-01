@@ -392,7 +392,7 @@ SearchBrand.prototype.SetGrid = function(divId){
 
 SearchBrand.prototype.Search = function(){
     let data = $('form[name="search_brand"]').serialize();
-    this.grid.Request('/partner/api/brand/getlist', data);
+    // this.grid.Request('/partner/api/brand/getlist', data); // 파트너에서 에러 발생 - 주석처리 (미구현 추정)
 };
 
 SearchBrand.prototype.Choice = function(code,name){

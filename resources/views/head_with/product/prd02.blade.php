@@ -105,6 +105,10 @@
                                                                 <label for="size-70" class="custom-control-label">70 * 70</label>
                                                             </div>
                                                             <div class="custom-control custom-checkbox">
+                                                                <input type="checkbox" name="size" id="size-90" value="90" class="custom-control-input" disabled="disabled"/>
+                                                                <label for="size-90" class="custom-control-label">90 * 90</label>
+                                                            </div>
+                                                            <div class="custom-control custom-checkbox">
                                                                 <input type="checkbox" name="size" id="size-100" value="100" class="custom-control-input" disabled="disabled"/>
                                                                 <label for="size-100" class="custom-control-label">100 * 100</label>
                                                             </div>
@@ -150,6 +154,10 @@
                                                             <div class="custom-control custom-checkbox">
                                                                 <input type="checkbox" name="size" id="size-500" value="500" class="custom-control-input"/>
                                                                 <label for="size-500" class="custom-control-label">500 * 500</label>
+                                                            </div>
+                                                            <div class="custom-control custom-checkbox">
+                                                                <input type="checkbox" name="size" id="size-600" value="600" class="custom-control-input"/>
+                                                                <label for="size-600" class="custom-control-label">600 * 600</label>
                                                             </div>
                                                         </div>
                                                     </td>

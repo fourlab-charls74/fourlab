@@ -12,8 +12,6 @@ use Carbon\Carbon;
 
 class stk01Controller extends Controller
 {
-
-	//
 	public function index() {
 
         $mutable	= now();
@@ -39,80 +37,63 @@ class stk01Controller extends Controller
 
 	public function search(Request $request)
 	{
-		$page	= $request->input('page', 1);
-		if( $page < 1 or $page == "" )	$page = 1;
-		$limit	= $request->input('limit', 100);
+		$store_type = $request->input('store_type');
+		$store_cd = $request->input('store_cd');
+		$store_nm = $request->input('store_nm');
+		$prd_cd = $request->input('prd_cd');
 
-		$sdate		= $request->input('sdate',Carbon::now()->sub(2, 'year')->format('Ymd'));
-		$edate		= $request->input('edate',date("Ymd"));
-		$com_type	= $request->input('com_type');
-		$com_nm		= $request->input('com_nm');
-		$goods_code	= $request->input('goods_code');
-		$event_cd	= $request->input('event_cd');
-		$user_id	= $request->input('user_id');
-		$sell_type	= $request->input('sell_type');
+		$page = $request->input('page', 1);
+		if ( $page < 1 or $page == "" )	$page = 1;
+		$limit = $request->input('limit', 100);
 
-		$limit		= $request->input("limit",100);
-		$ord		= $request->input('ord','desc');
-		$ord_field	= $request->input('ord_field','g.goods_no');
-		$orderby	= sprintf("order by %s %s", $ord_field, $ord);
+		$ord = $request->input('ord','desc');
+		$ord_field = $request->input('ord_field','p.goods_no');
+		$orderby = sprintf("order by %s %s", $ord_field, $ord);
 
 		$where	= "";
-		if( $com_type != "" )	$where .= " and a.com_type = '" . $com_type . "' ";
-		if( $com_nm != "" )		$where .= " and a.com_nm like '%" . Lib::quote($com_nm) . "%' ";
-		if( $goods_code != "" )	$where .= " and a.goods_code like '" . Lib::quote($goods_code) . "%' ";
-		if( $event_cd != "" )	$where .= " and a.event_cd = '" . $event_cd . "' ";
-		if( $user_id != "" )	$where .= " and a.user_id = '" . Lib::quote($user_id) . "%' ";
-		if( $sell_type != "" )	$where .= " and a.sell_type = '" . $sell_type . "' ";
+		if ( $store_type != "" )	$where .= " and s.store_type = '" . $store_type . "' ";
+		if ( $store_cd != "" )	$where .= " and s.store_cd = '" . $store_cd . "' ";
+		if ( $store_nm != "" )	$where .= " and s.store_nm like '%" . Lib::quote($store_nm) . "%' ";
+		if ( $prd_cd != "" )	$where .= " and p.prd_cd = '" . $prd_cd . "' ";
 
-		$page_size	= $limit;
-		$startno	= ($page - 1) * $page_size;
-		$limit		= " limit $startno, $page_size ";
+		$page_size = $limit;
+		$startno = ($page - 1) * $page_size;
+		$limit = " limit $startno, $page_size ";
 
-		$total		= 0;
-		$page_cnt	= 0;
+		$total = 0;
+		$page_cnt = 0;
 
-		if( $page == 1 ){
-			$query	= "
+		if ( $page == 1 ) {
+			$query = "
 				select count(*) as total
-				from __tmp_order a
-				where 1=1 
-					and ( a.ord_date >= :sdate and a.ord_date < date_add(:edate,interval 1 day))
-					$where
+				from product_stock_store p
+					left join goods g on p.goods_no = g.goods_no
+					left join store s on p.store_cd = s.store_cd
+				where 1=1 $where
 			";
-			//$row = DB::select($query,['com_id' => $com_id]);
-			$row		= DB::select($query, ['sdate' => $sdate,'edate' => $edate]);
-			$total		= $row[0]->total;
-			$page_cnt	= (int)(($total - 1) / $page_size) + 1;
+			$row = DB::selectOne($query);
+			$total = $row->total;
+			$page_cnt = (int)(($total - 1) / $page_size) + 1;
 		}
 
-		$query	= "
-			select
-				a.*, 
-				(100 - round(a.price/a.goods_sh * 100)) as sale_rate,
-				(100 - round(a.ord_amt/a.goods_sh * 100)) as ord_sale_rate,
-				( (100 - round(a.ord_amt/a.goods_sh * 100)) - (100 - round(a.price/a.goods_sh * 100)) ) as sale_gap,
-				b.code_val as com_type_nm,
-				c.code_val as opt_kind_nm,
-				d.code_val as brand_nm,
-				e.code_val as stat_pay_type_nm,
-				f.code_val as sell_type_nm,
-				g.code_val as event_kind_nm
-			from __tmp_order a
-			left outer join __tmp_code b on b.code_kind_cd = 'com_type' and b.code_id = a.com_type
-			left outer join __tmp_code c on c.code_kind_cd = 'opt_kind_cd' and c.code_id = a.opt_kind
-			left outer join __tmp_code d on d.code_kind_cd = 'brand' and d.code_id = a.brand
-			left outer join __tmp_code e on e.code_kind_cd = 'stat_pay_type' and e.code_id = a.stat_pay_type
-			left outer join __tmp_code f on f.code_kind_cd = 'sell_type' and f.code_id = a.sell_type
-			left outer join __tmp_code g on g.code_kind_cd = 'event_cd' and g.code_id = a.event_cd
-			where 1=1 
-				and ( a.ord_date >= :sdate and a.ord_date < date_add(:edate,interval 1 day))
-				$where
-			$orderby
+		$sql = "
+			select 
+				p.goods_no, goods_type, prd_cd, g.opt_kind_cd, opt_kind_nm, brand_nm, style_no, 
+				c.code_val as sale_stat_cl_val, ifnull( c2.code_val, 'N/A') as goods_type_nm,
+				img, goods_nm, goods_nm_eng, goods_opt, p.store_cd, store_nm, store_type, wqty, p.rt, p.ut
+			from product_stock_store p 
+				left join goods g on p.goods_no = g.goods_no
+				left join store s on p.store_cd = s.store_cd
+				left join opt o on g.opt_kind_cd = o.opt_kind_cd
+				left join `code` c on c.code_kind_cd = 'G_GOODS_STAT' and sale_stat_cl = c.code_id
+				left join `code` c2 on c2.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = c2.code_id 
+			where 1=1
+			$where
+			$orderby 
 			$limit
 		";
 
-		$result = DB::select($query, ['sdate' => $sdate,'edate' => $edate]);
+		$result = DB::select($sql);
 
 		return response()->json([
 			"code"	=> 200,

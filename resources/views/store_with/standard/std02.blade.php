@@ -16,7 +16,7 @@
 				<h4>검색</h4>
 				<div class="flax_box">
 					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-					<a href="#" onclick="Add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>데이터업로드</a>
+					<a href="#" onclick="Add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>등록</a>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
 			</div>
@@ -53,7 +53,7 @@
 						<div class="form-group">
 							<label for="">매장명 :</label>
 							<div class="flax_box">
-								<input type='text' class="form-control form-control-sm search-enter" name='com_nm' value=''>
+								<input type='text' class="form-control form-control-sm search-enter" name='store_nm' value=''>
 							</div>
 						</div>
 					</div>
@@ -64,7 +64,7 @@
 						<div class="form-group">
 							<label for="">매장코드 :</label>
 							<div class="flax_box">
-								<input type='text' class="form-control form-control-sm search-enter" name='com_id' value=''>
+								<input type='text' class="form-control form-control-sm search-enter" name='store_cd' value=''>
 							</div>
 						</div>
 					</div>
@@ -98,9 +98,9 @@
 								<span class="text_line">/</span>
 								<div class="form-inline-inner input_box" style="width:45%;">
 									<select name="ord_field" class="form-control form-control-sm">
-										<option value="a.com_nm" selected>코드명</option>
-										<option value="a.com_id" >코드아이디</option>
-										<option value="a.seq" >SEQ</option>
+										<option value="a.store_nm" selected>코드명</option>
+										<option value="a.store_cd" >코드아이디</option>
+										<option value="a.reg_date" >등록일</option>
 									</select>
 								</div>
 								<div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -122,7 +122,7 @@
 
 		<div class="resul_btn_wrap mb-3">
 			<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-			<a href="#" onclick="Add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 데이터업로드</a>
+			<a href="#" onclick="Add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 등록</a>
 			<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
 		</div>
 

@@ -178,6 +178,7 @@ class prd02Controller extends Controller
                         case '50':
                         case '62':
                         case '70':
+                        case '90':
                         case '100':
                         case '129':
                             $img_type_chk = "s";

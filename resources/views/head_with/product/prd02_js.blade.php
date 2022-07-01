@@ -196,7 +196,7 @@
         var sizes = [];
 
         $("[name=size]:checked").each(function(){
-            if( img_type == "f" && ( this.value == "50" || this.value == "62" || this.value == "70" || this.value == "100" || this.value == "129" )){
+            if( img_type == "f" && ( this.value == "50" || this.value == "62" || this.value == "70" || this.value == "90" || this.value == "100" || this.value == "129" )){
                 //추가이미지 생성은 기본크기만 생성
             }else{
                 sizes.push(this.value);

@@ -23,16 +23,30 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
     Route::post('/login', 'LoginController@login');
     Route::get('/logout', 'LoginController@logout');
 
+    Route::prefix("auto-complete")->group(function () {
+        
+        Route::get('/store', 'AutoCompleteController@store');
+        
+    });
+
+    Route::prefix("api")->namespace('api')->group(function () { 
+
+        // 고객명 조회
+        Route::get('members', 'MemberController@show');
+        Route::get('members/search', 'MemberController@search');
+
+        // 매장명 조회
+        Route::get('stores', 'StoreController@show');
+        Route::get('stores/search', 'StoreController@search');
+
+    });
+
     //코드관리
     Route::prefix("standard")->namespace('standard')->group(function () {
         //매장
         Route::get('std02', 'std02Controller@index');
         Route::get('std02/search', 'std02Controller@search');
         Route::get('std02/show/{com_id?}', 'std02Controller@show');
-        Route::get('std02/getcate1/{com_id?}', 'std02Controller@getdisplaycategory');
-        Route::get('std02/getcate2/{com_id?}', 'std02Controller@getitemcategory');
-        Route::get('std02/addcate/{com_id?}', 'std02Controller@addcategory');
-        Route::get('std02/delcate/{com_id?}', 'std02Controller@DelCategory');
 
         // 창고관리
         Route::get('std03', 'std03Controller@index');
@@ -56,6 +70,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('std05/search', 'std05Controller@search');
         Route::get('std05/show/{sale_type_cd?}', 'std05Controller@show');
         Route::get('std05/search-store/{sale_type_cd?}', 'std05Controller@search_store');
+
+        Route::post('std05/add', 'std05Controller@add_sale_type');
+        Route::put('std05/update', 'std05Controller@update_sale_type');
 
         // 매장 영업담당자
         Route::get('std06', 'std06Controller@index');
@@ -117,7 +134,11 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
     //매장관리
     Route::prefix("stock")->namespace('stock')->group(function () {
+
+        // 매장재고
         Route::get('stk01','stk01Controller@index');
+        Route::get('stk01/search','stk01Controller@search');
+
         Route::get('stk02','stk02Controller@index');
     });
 

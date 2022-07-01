@@ -34,6 +34,7 @@
     <script src="{{ URL::asset('/skin/libs/select2/select2.min.js')}}"></script>
     <script src="{{ URL::asset('/skin/libs/datepicker/datepicker.min.js')}}"></script>
     <script src="{{ URL::asset('/js/partner_search.js')}}"></script>
+    <script src="{{ URL::asset('/js/store_search.js')}}"></script>
     <script src="/handle/http/axios.js"></script>
     <script src="/with/js/app.js"></script>
     <script language="javascript">

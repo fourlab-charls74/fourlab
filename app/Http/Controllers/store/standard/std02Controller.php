@@ -32,10 +32,10 @@ class std02Controller extends Controller
 		if( $page < 1 or $page == "" )	$page = 1;
 		$limit	= $request->input('limit', 100);
 
-		$com_type	= $request->input("com_type");
+		$store_type	= $request->input("store_type");
 		$store_kind	= $request->input("store_kind");
-		$com_nm		= $request->input("com_nm");
-		$com_id		= $request->input("com_id");
+		$store_nm	= $request->input("store_nm");
+		$store_cd	= $request->input("store_cd");
 		$use_yn		= $request->input("use_yn");			// 사용유무
 
 		$limit		= $request->input("limit",100);
@@ -44,10 +44,10 @@ class std02Controller extends Controller
 		$orderby	= sprintf("order by %s %s", $ord_field, $ord);
 
 		$where = "";
-		if( $com_type != "" )	$where .= " and a.com_type = '$com_type' ";
+		if( $store_type != "" )	$where .= " and a.store_type = '$store_type' ";
 		if( $store_kind != "" )	$where .= " and a.store_kind = '$store_kind' ";
-		if( $com_nm != "" )		$where .= " and a.com_nm like '%" . Lib::quote($com_nm) . "%' ";
-		if( $com_id != "" )		$where .= " and a.com_id = '" . Lib::quote($com_id) . "' ";
+		if( $store_nm != "" )	$where .= " and ( a.store_nm like '%" . Lib::quote($store_nm) . "%' or a.store_nm_s like '%" . Lib::quote($store_nm) . "%' ) ";
+		if( $store_cd != "" )	$where .= " and a.com_id = '" . Lib::quote($store_cd) . "' ";
 		if( $use_yn != "" )		$where .= " and a.use_yn = '$use_yn' ";
 
 		$page_size	= $limit;
@@ -75,7 +75,6 @@ class std02Controller extends Controller
 				c.code_val as com_type_nm,
 				d.code_val as store_kind_nm
 			from store a
-			left outer join store_info b on a.com_id = b.com_id
 			left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = a.store_type
 			left outer join code d on d.code_kind_cd = 'store_kind' and d.code_id = a.store_kind
 			where 1=1 $where
@@ -111,11 +110,32 @@ class std02Controller extends Controller
 
 	public function show()
 	{
-
 		$values = [
+			'cmd'			=> '',
+			'store_types'	=> SLib::getCodes("STORE_TYPE"),
+			'store_kinds'	=> SLib::getCodes("STORE_KIND"),
+			'store_areas'	=> SLib::getCodes("STORE_AREA"),
 		];
 
-		return view( Config::get('shop.head.view') . '/standard/std02_show',$values);
+		return view( Config::get('shop.store.view') . '/standard/std02_show',$values);
+	}
+
+	// 매장코드 중복체크
+	public function check_code($store_cd = '') 
+	{
+		$code	= 200;
+		$msg	= "사용가능한 코드입니다.";
+
+		$sql	= " select count(store_cd) as cnt from store where store_cd = :store_cd ";
+
+		$cnt	= DB::selectOne($sql, ["store_cd" => $store_cd])->cnt;
+
+		if( $cnt > 0 ){
+			$code	= 409;
+			$msg	= "이미 사용중인 코드입니다.";
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg]);
 	}
 
 	public function view($com_id)
