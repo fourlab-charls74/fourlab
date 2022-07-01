@@ -2150,29 +2150,88 @@ class prd01Controller extends Controller
 
 	// 옵션구분 등록
 	public function add_option_kind(Request $req, $goods_no) {
-		$user	= Auth('head')->user();
 
 		$goods_sub = 0;
 		$opt_type = $req->input("opt_type");
 		$opt_type_nm = $req->input("opt_type_nm");
 		$opt_required_yn = $req->input("opt_required_yn");
 		$opt_use_yn = $req->input("opt_use_yn");
+		$basic_count = $req->input("basic_count");
 
 		$code = 200;
 		$msg = '';
 
 		$sql = "
-			insert into goods_option (
-				goods_no, goods_sub, type, name, required_yn, use_yn, seq, option_no, rt
-			) values (
-				'$goods_no', '$goods_sub', '$opt_type', '$opt_type_nm', '$opt_required_yn', '$opt_use_yn', '0', 0, now()
-			)
+			select 
+				count(*) as seq 
+			from goods_option 
+			where goods_no = ':goods_no' and goods_sub = ':goods_sub' 
+				and type = '${opt_type}' and name = '${opt_type_nm}'
 		";
 
+		$result = DB::selectOne($sql, ['goods_no' => $goods_no, 'goods_sub' =>  $goods_sub]);
+		$seq = $result->seq;
+		$seq = $seq + 1;
+
 		try {
+			$sql = "
+				insert into goods_option (
+					goods_no, goods_sub, type, name, required_yn, use_yn, seq, option_no, rt
+				) values (
+					'$goods_no', '$goods_sub', '$opt_type', '$opt_type_nm', '$opt_required_yn', '$opt_use_yn', '$seq', 0, now()
+				)
+			";
 			DB::insert($sql);
+
+			/**
+			 * 2단 전환시 샘플 옵션 등록 (기존 옵션구분이 하나인 경우)
+			 */
+			if ($basic_count == 1) {
+				$sql = "
+					select goods_opt, opt_name, goods_no
+					from goods_summary 
+					where goods_no = :goods_no and use_yn = 'Y'
+					order by seq
+				";
+				$result = DB::select($sql, ['goods_no' => $goods_no]);
+
+				foreach ($result as $idx => $item) {
+					$opt_value = $item->goods_opt;
+					$sql = "
+						delete from goods_summary
+						where goods_no = :goods_no and goods_opt like '%$opt_value%'
+					";
+					DB::delete($sql, ["goods_no" => $goods_no]);
+				}
+				
+				/**
+				 * 옵션관리 팝업 api의 저장 기능을 활용하여 2단 옵션의 초기 샘플 옵션품목 값 생성
+				 * (saveBasicOptions 데이터 형식에 맞게 가공)
+				 */
+				$count = count($result);
+				$arr = ['opt_list' => []];
+				foreach ($result as $idx => $item) {
+					$no = $idx + 1;
+					$arr['opt_list'][$idx] = (array) $item;
+				}
+				foreach ($result as $idx => $item) {
+					$no = $idx + 1;
+					$idx = $idx + $count;
+					$item->goods_opt = "옵션${no}";
+					$item->opt_name = "${opt_type_nm}";
+					$arr['opt_list'][$idx] = (array) $item;
+				}
+				
+				/**
+				 * 기존 단일옵션들이 반영된 2단옵션 초기 품목 저장
+				 */
+				$request = $req->merge($arr);
+				$this->saveBasicOptions($request, $goods_no);
+			}
+
 			$msg = "옵션명이 등록되었습니다.";
 		} catch(Exception $e){
+			dd($e);
 			$code = 500;
 			$msg = "등록 중 에러가 발생했습니다. 잠시 후 다시 시도 해주세요.";
 		}
@@ -2186,12 +2245,6 @@ class prd01Controller extends Controller
 		$goods_type = $req->input("goods_type");
 		$del_id_list = $req->input("del_id_list") != null ? explode(",", $req->input("del_id_list")) : [];
 		$is_option_use = $req->input("is_option_use");
-
-		// $user = [
-		// 	'id' => Auth('head')->user()->id,
-		// 	'name' => Auth('head')->user()->name,
-		// ];
-		// $jaego = new Jaego($user);
 
 		$code = 200;
 		$msg = '';
@@ -2319,30 +2372,57 @@ class prd01Controller extends Controller
 		return response()->json(['code' => $code, 'msg' => $msg, 'data' => $this->_get($goods_no)], $code);
 	}
 
-	// 옵션관리창 옵션조회 ( 유형 - 기본 )
+	// 옵션 관리 - 옵션 조회 ( 기본 )
 	public function getBasicOptions($goods_no) {
+
 		$code = 200;
 		$opt_kinds = [];
 		$result = [];
+		$is_single = $this->checkBasicOptKindIsSingle($goods_no);
 
 		try {
-			$sql = "
-				select no, name
-				from goods_option
-				where goods_no = '$goods_no' and type = 'basic' and required_yn = 'Y' and use_yn = 'Y'
-			";
-			$opt_kinds = DB::select($sql);
-
-			// dd($opt_kinds);
 
 			$sql = "
-				select distinct substring_index(goods_opt, '^', :index) as goods_opt, substring_index(opt_name, '^', :index2) as opt_name, goods_no
-				from goods_summary 
-				where goods_no = :goods_no and use_yn = 'Y'
-				order by seq
+				select name
+				from goods_option 
+				where goods_no = :goods_no and use_yn = 'Y' and type = 'basic'
+				order by no
 			";
-			$result = array_merge(DB::select($sql, ['index' => 1, 'index2' => 1, 'goods_no' => $goods_no]), DB::select($sql, ['index' => -1, 'index2' => -1, 'goods_no' => $goods_no]));
-		} catch(Exception $e){
+
+			$opt_kinds = DB::select($sql, ['goods_no' => $goods_no]);
+
+			if ($is_single) { // 기본 싱글 옵션인 경우
+
+				$sql = "
+					select goods_opt, opt_name, goods_no
+					from goods_summary 
+					where goods_no = :goods_no and use_yn = 'Y'
+					order by seq
+				";
+
+				$result = DB::select($sql, ['goods_no' => $goods_no]);
+
+			} else { // 기본 2단 옵션인 경우
+
+				$sql = "
+					select distinct substring_index(goods_opt, '^', :index) as goods_opt, substring_index(opt_name, '^', :index2) as opt_name, goods_no
+					from goods_summary 
+					where goods_no = :goods_no and use_yn = 'Y'
+					order by seq
+				";
+
+				$sql = "
+					select distinct substring_index(goods_opt, '^', :index) as goods_opt, substring_index(opt_name, '^', :index2) as opt_name, goods_no
+					from goods_summary 
+					where goods_no = :goods_no and use_yn = 'Y'
+					order by seq
+				";
+
+				$result = array_merge(DB::select($sql, ['index' => 1, 'index2' => 1, 'goods_no' => $goods_no]), DB::select($sql, ['index' => -1, 'index2' => -1, 'goods_no' => $goods_no]));
+
+			}
+
+		} catch(Exception $e) {
 			$code = 500;
 		}
 		
@@ -2358,6 +2438,7 @@ class prd01Controller extends Controller
 
 	// 옵션품목 저장 ( 유형 - 기본 )
 	public function saveBasicOptions(Request $request, $goods_no) {
+
 		$code = 200;
 		$msg = '';
 
@@ -2367,75 +2448,198 @@ class prd01Controller extends Controller
 		});
 		
 		$keys = $grouped->keys()->all();
-		if (count($keys) < 2) {
-			$code = 500;
-			$msg = "기본 옵션은 2가지 이상으로 구분되어야 합니다.";
-			return response()->json(['code' => $code, 'msg' => $msg], $code);
-		}
-
-		$opt_name = $keys[0] . "^" . $keys[1];
-
-		$sql = "select count(*) as count from goods_summary where `goods_no` = :goods_no and `opt_name` = :opt_name order by seq limit 1";
-		$result = DB::selectOne($sql, ['goods_no' => $goods_no, 'opt_name' => $opt_name]);
-
-		if (!($result->count > 0)) {
-			$grouped = $grouped->reverse();
-			$opt_name = $keys[1] . "^" . $keys[0];
-		}
-
-		$arr = $grouped->map(function($item) {
-			$arr = $item->all();
-			return $arr;
-		})->values()->all();
-
-		$opt1 = $arr[0];
-		$opt2 = $arr[1];
-
-		$goods_opts = [];
-		foreach ($opt1 as $opt1_val) {
-			foreach ($opt2 as $opt2_val) {
-				array_push($goods_opts, $opt1_val . "^" . $opt2_val);
+		
+		/**
+		 * 전달받은 옵션구분 항목이 1개인 경우
+		 */
+		if (count($keys) == 1) {
+			
+			$opt_kind_names = [];
+			$sql =
+				" select `name` from goods_option where goods_no = :goods_no and `type` = 'basic' order by seq";
+			$rows = DB::select($sql,['goods_no' => $goods_no]);
+			foreach ($rows as $row) {
+				$name = $row->name;
+				array_push($opt_kind_names, $name);
 			}
-		}
 
-		try {
-			DB::beginTransaction();
+			/**
+			 * 2단 옵션인데 하나의 옵션 구분만 선택하는 경우 더미데이터 생성
+			 */
+			if (count($opt_kind_names) == 2) {
 
-			for ($i=0; $i<count($goods_opts); $i++) {
+				$opt_list = $request->input("opt_list", []);
 
-				$goods_opt = $goods_opts[$i];
+				// 더이데이터 옵션 구분 이름 설정
+				$opt_name = "";
+				if ($opt_kind_names[0] == $opt_list[0]['opt_name']) {
+					$opt_name = $opt_kind_names[1];
+				} else if ($opt_kind_names[1] == $opt_list[0]['opt_name']) {
+					$opt_name = $opt_kind_names[0];
+				};
 
-				$sql = "select count(*) as count from goods_summary where `goods_no` = :goods_no and `goods_opt` = :goods_opt order by seq";
-				$result = DB::selectOne($sql, ['goods_no' => $goods_no, 'goods_opt' => $goods_opt]);
-
-				if (!($result->count > 0)) {
-					$sql = " 
-						insert into goods_summary 
-							(goods_no, goods_sub, opt_name, goods_opt, opt_price, soldout_yn, use_yn, good_qty, wqty, bad_qty, rt, ut, last_date) 
-						values (:goods_no, :goods_sub, :opt_name, :goods_opt, 0, 'N', 'Y', 0, 0, 0, NOW(), NOW(), DATE_FORMAT(NOW(),'%Y-%m-%d'))
-					";
-					DB::insert($sql, ['goods_no' => $goods_no, 'goods_sub' => 0, 'goods_opt' => $goods_opt, 'opt_name' => $opt_name]);
+				// 더미데이터 옵션 추가
+				$c_count = $collection->count();
+				for ($i = 0; $i < $c_count; $i++) {
+					$idx = $i + $c_count;
+					$no = $i + 1;
+					$opt_list[$idx] = ['opt_name' => $opt_name, 'goods_opt' => "옵션${no}"];
 				}
 
-				$sql = "
-					update goods_summary set
-						seq = $i
-					where goods_no = :goods_no
-						and goods_sub = '0'
-						and goods_opt = :goods_opt
-					";
-				DB::update($sql, ['goods_no' => $goods_no, 'goods_opt' => $goods_opt]);
-			}
-					
-			DB::commit();
-			$msg = "저장되었습니다.";
-		} catch (Exception $e) {
-			DB::rollBack();
-			$code = 500;
-			$msg = "저장중 에러가 발생했습니다. 잠시 후 다시 시도해주세요.";
-		}
+				// 저장 준비
+				$collection = collect($opt_list);
+				$grouped = $collection->mapToGroups(function($item, $key) {
+					return [$item['opt_name'] => $item['goods_opt']];
+				});
+				$opt_name = $opt_kind_names[0] . "^" . $opt_kind_names[1];
 
-		return response()->json(['code' => $code, 'msg' => $msg], $code);
+				$arr = $grouped->map(function($item) {
+					$arr = $item->all();
+					return $arr;
+				})->all();
+		
+				$opt1 = $arr[$opt_kind_names[0]];
+				$opt2 = $arr[$opt_kind_names[1]];
+		
+				$goods_opts = [];
+				foreach ($opt1 as $opt1_val) {
+					foreach ($opt2 as $opt2_val) {
+						array_push($goods_opts, $opt1_val . "^" . $opt2_val);
+					}
+				}
+
+			} else {
+
+				/**
+				 * 단일 옵션인 경우 저장 준비
+				 */
+				$opt_name = $keys[0];
+
+				$arr = $grouped->map(function($item) {
+					$arr = $item->all();
+					return $arr;
+				})->values()->all();
+
+				$goods_opts = $arr[0];
+
+			}
+
+			/**
+			 * 옵션 저장
+			 */
+			try {
+				DB::beginTransaction();
+
+				for ($i=0; $i<count($goods_opts); $i++) {
+	
+					$goods_opt = $goods_opts[$i];
+					$sql = "select count(*) as count from goods_summary where `goods_no` = :goods_no and `goods_opt` = :goods_opt order by seq";
+					$result = DB::selectOne($sql, ['goods_no' => $goods_no, 'goods_opt' => $goods_opt]);
+	
+					if (!($result->count > 0)) {
+						$sql = " 
+							insert into goods_summary 
+								(goods_no, goods_sub, opt_name, goods_opt, opt_price, soldout_yn, use_yn, good_qty, wqty, bad_qty, rt, ut, last_date) 
+							values (:goods_no, :goods_sub, :opt_name, :goods_opt, 0, 'N', 'Y', 0, 0, 0, NOW(), NOW(), DATE_FORMAT(NOW(),'%Y-%m-%d'))
+						";
+						DB::insert($sql, ['goods_no' => $goods_no, 'goods_sub' => 0, 'goods_opt' => $goods_opt, 'opt_name' => $opt_name]);
+					}
+	
+					$sql = "
+						update goods_summary set
+							seq = $i
+						where goods_no = :goods_no
+							and goods_sub = '0'
+							and goods_opt = :goods_opt
+						";
+					DB::update($sql, ['goods_no' => $goods_no, 'goods_opt' => $goods_opt]);
+				}
+						
+				DB::commit();
+				$msg = "저장되었습니다.";
+			} catch (Exception $e) {
+				DB::rollBack();
+				$code = 500;
+				$msg = "저장중 에러가 발생했습니다. 잠시 후 다시 시도해주세요.";
+			}
+			return response()->json(['code' => $code, 'msg' => $msg], $code);
+
+		} else if (count($keys) == 2) {
+
+			/**
+			 * 전달받은 옵션구분 항목이 2개인 경우
+			 */
+			$opt_kind_names = [];
+			$sql =
+				" select `name` from goods_option where goods_no = :goods_no and TYPE = 'basic' order by seq";
+			$rows = DB::select($sql,['goods_no' => $goods_no]);
+			foreach($rows as $row) {
+				$name = $row->name;
+				array_push($opt_kind_names, $name);
+			}
+
+			$opt_name = $opt_kind_names[0] . "^" . $opt_kind_names[1];
+
+			$arr = $grouped->map(function($item) {
+				$arr = $item->all();
+				return $arr;
+			})->all();
+
+			$opt1 = $arr[$opt_kind_names[0]];
+			$opt2 = $arr[$opt_kind_names[1]];
+
+			$goods_opts = [];
+			foreach ($opt1 as $opt1_val) {
+				foreach ($opt2 as $opt2_val) {
+					array_push($goods_opts, $opt1_val . "^" . $opt2_val);
+				}
+			}
+
+			/**
+			 * 옵션 저장
+			 */
+			try {
+				DB::beginTransaction();
+
+				for ($i=0; $i<count($goods_opts); $i++) {
+
+					$goods_opt = $goods_opts[$i];
+
+					// goods_opt like 문으로 변경필요해보임.
+					$sql = "select count(*) as count from goods_summary where `goods_no` = :goods_no and `goods_opt` = :goods_opt order by seq";
+					$result = DB::selectOne($sql, ['goods_no' => $goods_no, 'goods_opt' => $goods_opt]);
+
+					if (!($result->count > 0)) {
+						$sql = " 
+							insert into goods_summary 
+								(goods_no, goods_sub, opt_name, goods_opt, opt_price, soldout_yn, use_yn, good_qty, wqty, bad_qty, rt, ut, last_date) 
+							values (:goods_no, :goods_sub, :opt_name, :goods_opt, 0, 'N', 'Y', 0, 0, 0, NOW(), NOW(), DATE_FORMAT(NOW(),'%Y-%m-%d'))
+						";
+						DB::insert($sql, ['goods_no' => $goods_no, 'goods_sub' => 0, 'goods_opt' => $goods_opt, 'opt_name' => $opt_name]);
+					}
+
+					$sql = "
+						update goods_summary set
+							seq = $i
+						where goods_no = :goods_no
+							and goods_sub = '0'
+							and goods_opt = :goods_opt
+						";
+					DB::update($sql, ['goods_no' => $goods_no, 'goods_opt' => $goods_opt]);
+				}
+						
+				DB::commit();
+				$msg = "저장되었습니다.";
+			} catch (Exception $e) {
+				DB::rollBack();
+				$code = 500;
+				$msg = "저장중 에러가 발생했습니다. 잠시 후 다시 시도해주세요.";
+			}
+
+			return response()->json(['code' => $code, 'msg' => $msg], $code);
+
+		}
+		
 	}
 
 	// 옵션 품목 삭제 ( 유형 - 기본 )
@@ -2467,15 +2671,17 @@ class prd01Controller extends Controller
 
 	public function getBasicOptsMatrix($goods_no)
 	{
+		$is_single = $this->checkBasicOptKindIsSingle($goods_no);
+
 		$opt	= ['opt1' => [], 'opt2' => []];
 		$sql	=
-			" select count(*) as tot from goods_option where goods_no = :goods_no and type = 'basic' ";
+			" select count(*) as tot from goods_option where goods_no = :goods_no and `type` = 'basic' order by seq";
 		$row	= DB::selectOne($sql,['goods_no' => $goods_no]);
 		$opt_kind_cnt	= $row->tot;
 
 		$opt_kind_names = [];
 		$sql =
-			" select `name` from goods_option where goods_no = :goods_no and TYPE = 'basic' ";
+			" select `name` from goods_option where goods_no = :goods_no and `type` = 'basic' order by seq";
 		$rows = DB::select($sql,['goods_no' => $goods_no]);
 		foreach($rows as $row) {
 			$name = $row->name;
@@ -2490,7 +2696,7 @@ class prd01Controller extends Controller
 			if ($opt_kind_cnt == 2) $opt['opt2'] = DB::select($sql,['goods_no' => $goods_no, 'index' => -1]);
 		}
 
-		return response()->json(['code' => 200, 'opt_matrix' => $opt, 'opt_kind_names' => $opt_kind_names]);
+		return response()->json(['code' => 200, 'opt_matrix' => $opt, 'opt_kind_names' => $opt_kind_names, 'is_single' => $is_single]);
 	}
 
 	public function updateBasicOptsData(Request $request, $goods_no)
@@ -2523,10 +2729,89 @@ class prd01Controller extends Controller
 		}
 	}
 
-	public function updateExtraOptsData(Request $request, $goods_no)
+	public function checkBasicOptKindIsSingle($goods_no)
 	{
-		$data = $request->input("data", []);
+		$is_single = false;
+		$sql = "
+			select name
+			from goods_option 
+			where goods_no = :goods_no and use_yn = 'Y' and type = 'basic'
+			order by no
+		";
+		$opt_kinds = DB::select($sql, ['goods_no' => $goods_no]);
+		if (count($opt_kinds) < 2) $is_single = true;
+		return $is_single;
+	}
 
+	// 옵션 관리 - 옵션 조회 ( 추가 )
+	public function getExtraOptions(Request $request)
+	{
+		$option_no = $request->input('option_no');
+
+		$sql = "
+			select *
+			from options 
+			where option_no = :option_no
+			order by seq
+		";
+		$result = DB::select($sql, ['option_no' => $option_no]);
+
+		return $result;
+	}
+
+	public function updateExtraOptsData(Request $request)
+	{
+		$code = 200;
+		$data = $request->input("data", []);
+		$opt_no = $request->input("opt_no");
+
+		try {
+			DB::transaction(function () use ($data, $opt_no) {
+
+				$sql = "
+					delete from `options`
+					where option_no = :option_no
+				";
+				DB::delete($sql, ["option_no" => $opt_no]);
+
+				for ( $i = 0; $i < count($data); $i++ ) {
+
+					$arr = $data[$i];
+					$option_no = $arr["option_no"];
+					$name = $arr["name"];
+					$option = isset($arr["option"]) ? $arr["option"] : "";
+
+					$sql = "
+						select *, count(*) as count
+						from `options`
+						where option_no = :option_no and name = :name and `option` = :option
+					";
+					$result = DB::selectOne($sql, ["option_no" => $option_no, 'name' => $name, 'option' => $option]);
+					
+					if ($result->count < 1) {
+						$arr = $data[$i];
+						DB::table("options")->insert([
+							'option_no' => $option_no,
+							'name' => $name,
+							'option' => $option,
+							'price' => $arr["price"],
+							'qty' => $arr["qty"],
+							'wqty' => $arr["wqty"],
+							'soldout_yn' => $arr["soldout_yn"],
+							'use_yn' => "Y",
+							'seq' => $i,
+							'rt' => DB::raw("now()"),
+							'ut' => DB::raw("now()")
+						]);
+					}
+					
+				}
+			});
+		} catch(Exception $e){
+			dd($e->getMessage());
+			$code = 500;
+		}
+		return response()->json(['code' => $code]);
 	}
 
 	/*

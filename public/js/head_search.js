@@ -940,6 +940,9 @@ ControlOption.prototype.Open = function(goods_no = 0, afterSaveOrDel = null) {
     if(this.grid === null){
         this.SetGrid("#div-gd-option");
         $("#ControlOptionModal").draggable();
+    } else {
+        this.grid.setRows([]);
+        this.grid.Request(`/head/product/prd01/${this.goods_no}/get-basic-options`, null, 1);
     }
 
     $('#ControlOptionModal').modal({
@@ -955,35 +958,45 @@ ControlOption.prototype.SetGrid = function(divId) {
         {field: "goods_opt" , headerName: "옵션", width: 200, editable: true, cellStyle: {'background' : '#ffff99'}},
         {field: "goods_no", hide: true},
     ];
+    
     this.grid = new HDGrid(document.querySelector( divId ), columns);
     this.grid.Request(`/head/product/prd01/${this.goods_no}/get-basic-options`, null, 1, function(e) {
+
         const opt_kinds = e.head.opt_kinds;
         this.kinds = opt_kinds;
+
         $("#opt_kind").html("");
         $("#opt_kind").append(`<option value=0>= 옵션구분 =</option>`);
-        opt_kinds.forEach(opt => {
-            $("#opt_kind").append(`<option value='${JSON.stringify(opt)}'>${opt.name}</option>`);
-        });
-        $("#gd-option-total").text(e.head.total);
+        
+        // 옵션이 NONE인 경우 반영 x
+        if (opt_kinds[0]?.name == 'NONE') {
+            return;
+        } else {
+            opt_kinds.map(item => {
+                $("#opt_kind").append(`<option value='${JSON.stringify(item.name)}'>${item.name}</option>`);
+            });
+            $("#gd-option-total").text(e.head.total);
+        }
+
     });
 };
 
 ControlOption.prototype.Add = function(e) {
     if(e.key === "Enter" || e.type === "click") {
 
-        const opt_kind_no = JSON.parse($("#opt_kind").val());
+        const opt_kind = JSON.parse($("#opt_kind").val());
         const opt_nm = $("#opt_nm").val();
 
-        if(opt_kind_no == 0) {
+        if (opt_kind == 0) {
             $("#opt_kind").trigger("focus");
             return alert("옵션구분을 선택해주세요.");
         }
-        if(opt_nm == '') return;
+        if (opt_nm == '') return;
 
-        if(this.grid.getRows().filter(n => n.opt_name === opt_kind_no.name && n.goods_opt === opt_nm).length > 0) return alert("이미 등록된 옵션입니다.");
+        if (this.grid.getRows().filter(n => n.opt_name === opt_kind && n.goods_opt === opt_nm).length > 0) return alert("이미 등록된 옵션입니다.");
 
         this.grid.addRows([{
-            opt_name: opt_kind_no.name,
+            opt_name: opt_kind,
             goods_opt: opt_nm,
         }]);
         
@@ -992,7 +1005,11 @@ ControlOption.prototype.Add = function(e) {
 };
 
 ControlOption.prototype.Save = function() {
+    if (this.grid.getRows()?.length == 0) {
+        return alert("옵션을 추가해주세요.");
+    }
     if (!confirm("옵션 정보를 저장하시겠습니까?")) return;
+    
 
     const afterSuccess = (data) => {
         const { code, msg } = data;
@@ -1034,7 +1051,7 @@ ControlOption.prototype.Delete = async function() {
         alert('삭제할 옵션을 선택해주세요.');
         return false;
     } else {
-        if (!confirm("선택하신 옵션을 삭제하시겠습니까?")) return false;
+        if (!confirm("선택하신 옵션을 삭제하시겠습니까? \n(하나의 옵션구분만 남게되면 등록된 모든 옵션이 삭제됩니다.)")) return false;
         try {
             const response = await axios({ url: `/head/product/prd01/${this.goods_no}/delete-basic-options`, 
                 method: 'post', data: { del_opt_list: rows } 
