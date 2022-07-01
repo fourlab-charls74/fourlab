@@ -98,19 +98,19 @@
 												</div>
 											</td>
 										</tr>
-                                        <tr>
-                                            <th class="required">주소</th>
-                                            <td colspan="3">
-                                                <div class="d-flex flex-column">
-                                                    <div class="d-flex mb-2">
-                                                        <input type="text" name="zipcode" id="zipcode" value="{{ @$store->zipcode }}" class="form-control form-control-sm w-50 mr-2" style="max-width:280px;" readonly />
-                                                        <button type="button" class="btn btn-outline-primary" onclick="searchZipcode()"><i class="fas fa-search fa-sm mr-1"></i>검색</button>
-                                                    </div>
-                                                    <input type="text" name="addr1" id="addr1" value="{{ @$store->addr1 }}" class="form-control form-control-sm mb-2 w-100" readonly />
-                                                    <input type="text" name="addr2" id="addr2" value="{{ @$store->addr2 }}" class="form-control form-control-sm w-100" />
-                                                </div>
-                                            </td>
-                                        </tr>
+										<tr>
+											<th class="required">주소</th>
+											<td colspan="3">
+												<div class="d-flex flex-column">
+													<div class="d-flex mb-2">
+														<input type="text" name="zipcode" id="zipcode" value="{{ @$store->zipcode }}" class="form-control form-control-sm w-50 mr-2" style="max-width:280px;" readonly />
+														<button type="button" class="btn btn-outline-primary" onclick="searchZipcode()"><i class="fas fa-search fa-sm mr-1"></i>검색</button>
+													</div>
+													<input type="text" name="addr1" id="addr1" value="{{ @$store->addr1 }}" class="form-control form-control-sm mb-2 w-100" readonly />
+													<input type="text" name="addr2" id="addr2" value="{{ @$store->addr2 }}" class="form-control form-control-sm w-100" />
+												</div>
+											</td>
+										</tr>
 										<tr>
 											<th class="required">매장지역</th>
 											<td>
@@ -183,7 +183,7 @@
 											<td>
 												<div class="form-inline form-radio-box">
 													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="md_manage_yn_Y" name="md_manage_yn" value="Y" @if(@$store->md_manage_yn == 'Y') checked @endif />
+														<input type="radio" class="custom-control-input" id="md_manage_yn_Y" name="md_manage_yn" value="Y" @if(@$store->md_manage_yn != 'N') checked @endif />
 														<label class="custom-control-label" for="md_manage_yn_Y">Y</label>
 													</div>
 													<div class="custom-control custom-radio">
@@ -219,12 +219,188 @@
 												</div>
 											</td>
 										</tr>
+										<tr>
+											<th>오픈일</th>
+											<td>
+												<div class="form-inline">
+													<input type="text" name="sdate" id="sdate" value="{{ @$store->sdate }}" class="form-control form-control-sm w-100" />
+												</div>
+											</td>
+											<th>종료일</th>
+											<td>
+												<div class="form-inline">
+													<input type="text" name="edate" id="edate" value="{{ @$store->edate }}" class="form-control form-control-sm w-100" />
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th>로스인정률</th>
+											<td>
+												<div class="d-flex flex-column">
+                                                    <div class="d-flex" style="width:100%;line-height:30px;">
+    													<input type="text" name="loss_rate" id="deposit_cash" value="{{ @$store->loss_rate }}" class="form-control form-control-sm mr-1 w-50" />
+                                                        %
+                                                    </div>
+												</div>
+											</td>
+											<th>매장사용여부</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="use_yn_Y" name="use_yn" value="Y" @if(@$store->use_yn != 'N') checked @endif />
+														<label class="custom-control-label" for="use_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="use_yn_N" name="use_yn" value="N" @if(@$store->use_yn == 'N') checked @endif />
+														<label class="custom-control-label" for="use_yn_N">N</label>
+													</div>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th>입고확인사용여부</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="ipgo_yn_Y" name="ipgo_yn" value="Y" @if(@$store->ipgo_yn != 'N') checked @endif />
+														<label class="custom-control-label" for="ipgo_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="ipgo_yn_N" name="ipgo_yn" value="N" @if(@$store->ipgo_yn == 'N') checked @endif />
+														<label class="custom-control-label" for="ipgo_yn_N">N</label>
+													</div>
+												</div>
+											</td>
+											<th>부가세사용여부</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="vat_yn_Y" name="vat_yn" value="Y" @if(@$store->vat_yn != 'N') checked @endif />
+														<label class="custom-control-label" for="vat_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="vat_yn_N" name="vat_yn" value="N" @if(@$store->vat_yn == 'N') checked @endif />
+														<label class="custom-control-label" for="vat_yn_N">N</label>
+													</div>
+												</div>
+											</td>
+										</tr>
 
 									</tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
+
+					<div class="row">
+						<div class="col-12" style="padding-top:30px;font-size:18px;font-weight:bold;">+ 사업자 정보</div>
+					</div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="table-box-ty2 mobile">
+                                <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                    <tbody>
+										<tr>
+											<th>사업자등록번호</th>
+											<td colspan="3">
+												<div class="form-inline">
+													<input type="text" name="biz_no" id="biz_no" value="{{ @$store->biz_no }}" class="form-control form-control-sm w-50" />
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th>상호</th>
+											<td style="width:35%;">
+												<div class="form-inline">
+													<input type="text" name="biz_nm" id="biz_nm" value="{{ @$store->biz_nm }}" class="form-control form-control-sm w-100" />
+												</div>
+											</td>
+											<th>대표자명</th>
+											<td style="width:35%;">
+												<div class="form-inline">
+													<input type="text" name="biz_no" id="biz_no" value="{{ @$store->biz_no }}" class="form-control form-control-sm w-100" />
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th>주소</th>
+											<td colspan="3">
+												<div class="d-flex flex-column">
+													<div class="d-flex mb-2">
+														<input type="text" name="biz_zipcode" id="biz_zipcode" value="{{ @$store->biz_zipcode }}" class="form-control form-control-sm w-50 mr-2" style="max-width:280px;" readonly />
+														<button type="button" class="btn btn-outline-primary" onclick="searchBizZipcode()"><i class="fas fa-search fa-sm mr-1"></i>검색</button>
+													</div>
+													<input type="text" name="biz_addr1" id="biz_addr1" value="{{ @$store->biz_addr1 }}" class="form-control form-control-sm mb-2 w-100" readonly />
+													<input type="text" name="biz_addr2" id="biz_addr2" value="{{ @$store->biz_addr2 }}" class="form-control form-control-sm w-100" />
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th>업태</th>
+											<td style="width:35%;">
+												<div class="form-inline">
+													<input type="text" name="biz_uptae" id="biz_uptae" value="{{ @$store->biz_uptae }}" class="form-control form-control-sm w-100" />
+												</div>
+											</td>
+											<th>업종</th>
+											<td style="width:35%;">
+												<div class="form-inline">
+													<input type="text" name="biz_upjong" id="biz_upjong" value="{{ @$store->biz_upjong }}" class="form-control form-control-sm w-100" />
+												</div>
+											</td>
+										</tr>
+
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-12" style="padding-top:30px;font-size:18px;font-weight:bold;">+ 환경 정보</div>
+					</div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="table-box-ty2 mobile">
+                                <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                    <tbody>
+										<tr>
+											<th>관리기준</th>
+											<td style="width:35%;">
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="manage_type_M" name="manage_type" value="M" @if(@$store->vat_yn != 'M') checked @endif />
+														<label class="custom-control-label" for="manage_type_M">중간관리식</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="manage_type_P" name="manage_type" value="P" @if(@$store->vat_yn == 'P') checked @endif />
+														<label class="custom-control-label" for="manage_type_P">사입식</label>
+													</div>
+												</div>
+											</td>
+											<th>경비관리</th>
+											<td style="width:35%;">
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="exp_manage_yn_Y" name="exp_manage_yn" value="Y" @if(@$store->vat_yn == 'Y') checked @endif />
+														<label class="custom-control-label" for="exp_manage_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="exp_manage_yn_N" name="exp_manage_yn" value="N" @if(@$store->vat_yn != 'Y') checked @endif />
+														<label class="custom-control-label" for="exp_manage_yn_N">N</label>
+													</div>
+												</div>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+
+
 				</div>
 			</div>
 		</div>
@@ -350,8 +526,18 @@
     function searchZipcode() {
         new daum.Postcode({
             oncomplete: function(data) {
-                f1.zipcode.value = data.zonecode;
-                f1.addr1.value = data.address;
+                f1.zipcode.value	= data.zonecode;
+                f1.addr1.value		= data.address;
+            }
+        }).open();
+    }
+
+    // 우편번호 검색하기 - 사업자
+    function searchBizZipcode() {
+        new daum.Postcode({
+            oncomplete: function(data) {
+                f1.biz_zipcode.value	= data.zonecode;
+                f1.biz_addr1.value		= data.address;
             }
         }).open();
     }

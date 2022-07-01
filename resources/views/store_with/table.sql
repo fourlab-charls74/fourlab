@@ -71,7 +71,7 @@ CREATE TABLE `store` (
     `biz_addr2` varchar(100) DEFAULT NULL COMMENT '사업자 - 주소2',
     `biz_uptae` varchar(30) DEFAULT NULL COMMENT '사업자 - 업태',
     `biz_upjong` varchar(50) DEFAULT NULL COMMENT '사업자 - 업종',
-    `manage_type` varchar(30) DEFAULT '중간관리식' COMMENT '관리기준 : 중간관리식, 사입식',
+    `manage_type` char(1) DEFAULT 'M' COMMENT '관리기준 - M:중간관리식, P:사입식',
     `exp_manage_yn` char(1) DEFAULT 'N' COMMENT '경비관리유무',
     `priority` varchar(30) DEFAULT NULL COMMENT '출고우선순위 - code : prority',
     `competitor_yn` char(1) DEFAULT 'N' COMMENT '동종업계정보입력',

@@ -53,7 +53,7 @@
 						<div class="form-group">
 							<label for="">매장명 :</label>
 							<div class="flax_box">
-								<input type='text' class="form-control form-control-sm search-enter" name='com_nm' value=''>
+								<input type='text' class="form-control form-control-sm search-enter" name='store_nm' value=''>
 							</div>
 						</div>
 					</div>
@@ -64,7 +64,7 @@
 						<div class="form-group">
 							<label for="">매장코드 :</label>
 							<div class="flax_box">
-								<input type='text' class="form-control form-control-sm search-enter" name='com_id' value=''>
+								<input type='text' class="form-control form-control-sm search-enter" name='store_cd' value=''>
 							</div>
 						</div>
 					</div>
@@ -98,9 +98,9 @@
 								<span class="text_line">/</span>
 								<div class="form-inline-inner input_box" style="width:45%;">
 									<select name="ord_field" class="form-control form-control-sm">
-										<option value="a.com_nm" selected>코드명</option>
-										<option value="a.com_id" >코드아이디</option>
-										<option value="a.seq" >SEQ</option>
+										<option value="a.store_nm" selected>코드명</option>
+										<option value="a.store_cd" >코드아이디</option>
+										<option value="a.reg_date" >등록일</option>
 									</select>
 								</div>
 								<div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
