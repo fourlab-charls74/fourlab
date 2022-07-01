@@ -940,6 +940,9 @@ ControlOption.prototype.Open = function(goods_no = 0, afterSaveOrDel = null) {
     if(this.grid === null){
         this.SetGrid("#div-gd-option");
         $("#ControlOptionModal").draggable();
+    } else {
+        this.grid.setRows([]);
+        this.grid.Request(`/head/product/prd01/${this.goods_no}/get-basic-options`, null, 1);
     }
 
     $('#ControlOptionModal').modal({
@@ -955,16 +958,26 @@ ControlOption.prototype.SetGrid = function(divId) {
         {field: "goods_opt" , headerName: "옵션", width: 200, editable: true, cellStyle: {'background' : '#ffff99'}},
         {field: "goods_no", hide: true},
     ];
+    
     this.grid = new HDGrid(document.querySelector( divId ), columns);
     this.grid.Request(`/head/product/prd01/${this.goods_no}/get-basic-options`, null, 1, function(e) {
+
         const opt_kinds = e.head.opt_kinds;
         this.kinds = opt_kinds;
+
         $("#opt_kind").html("");
         $("#opt_kind").append(`<option value=0>= 옵션구분 =</option>`);
-        opt_kinds.map(item => {
-            $("#opt_kind").append(`<option value='${JSON.stringify(item.name)}'>${item.name}</option>`);
-        });
-        $("#gd-option-total").text(e.head.total);
+        
+        // 옵션이 NONE인 경우 반영 x
+        if (opt_kinds[0]?.name == 'NONE') {
+            return;
+        } else {
+            opt_kinds.map(item => {
+                $("#opt_kind").append(`<option value='${JSON.stringify(item.name)}'>${item.name}</option>`);
+            });
+            $("#gd-option-total").text(e.head.total);
+        }
+
     });
 };
 
