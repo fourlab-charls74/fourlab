@@ -2182,6 +2182,53 @@ class prd01Controller extends Controller
 				)
 			";
 			DB::insert($sql);
+
+			/**
+			 * 2단 전환시 샘플 옵션 등록 (기존 옵션구분이 하나인 경우)
+			 */
+			if ($basic_count == 1) {
+				$sql = "
+					select goods_opt, opt_name, goods_no
+					from goods_summary 
+					where goods_no = :goods_no and use_yn = 'Y'
+					order by seq
+				";
+				$result = DB::select($sql, ['goods_no' => $goods_no]);
+
+				foreach ($result as $idx => $item) {
+					$opt_value = $item->goods_opt;
+					$sql = "
+						delete from goods_summary
+						where goods_no = :goods_no and goods_opt like '%$opt_value%'
+					";
+					DB::delete($sql, ["goods_no" => $goods_no]);
+				}
+				
+				/**
+				 * 옵션관리 팝업 api의 저장 기능을 활용하여 2단 옵션의 초기 샘플 옵션품목 값 생성
+				 * (saveBasicOptions 데이터 형식에 맞게 가공)
+				 */
+				$count = count($result);
+				$arr = ['opt_list' => []];
+				foreach ($result as $idx => $item) {
+					$no = $idx + 1;
+					$arr['opt_list'][$idx] = (array) $item;
+				}
+				foreach ($result as $idx => $item) {
+					$no = $idx + 1;
+					$idx = $idx + $count;
+					$item->goods_opt = "옵션${no}";
+					$item->opt_name = "${opt_type_nm}";
+					$arr['opt_list'][$idx] = (array) $item;
+				}
+				
+				/**
+				 * 기존 단일옵션들이 반영된 2단옵션 초기 품목 저장
+				 */
+				$request = $req->merge($arr);
+				$this->saveBasicOptions($request, $goods_no);
+			}
+
 			$msg = "옵션명이 등록되었습니다.";
 		} catch(Exception $e){
 			$code = 500;
@@ -2336,7 +2383,7 @@ class prd01Controller extends Controller
 		$code = 200;
 		$opt_kinds = [];
 		$result = [];
-		$is_single = $this->checkBasicOptIsSingle($goods_no);
+		$is_single = $this->checkBasicOptKindIsSingle($goods_no);
 
 		try {
 
@@ -2360,7 +2407,7 @@ class prd01Controller extends Controller
 
 				$result = DB::select($sql, ['goods_no' => $goods_no]);
 
-			} else { // 기본 멀티 옵션인 경우
+			} else { // 기본 2단 옵션인 경우
 
 				$sql = "
 					select distinct substring_index(goods_opt, '^', :index) as goods_opt, substring_index(opt_name, '^', :index2) as opt_name, goods_no
@@ -2396,6 +2443,7 @@ class prd01Controller extends Controller
 
 	// 옵션품목 저장 ( 유형 - 기본 )
 	public function saveBasicOptions(Request $request, $goods_no) {
+
 		$code = 200;
 		$msg = '';
 
@@ -2405,20 +2453,85 @@ class prd01Controller extends Controller
 		});
 		
 		$keys = $grouped->keys()->all();
-
+		
 		/**
-		 * 기본 옵션이 싱글로 변경되는 경우
+		 * 전달받은 옵션구분 항목이 1개인 경우
 		 */
 		if (count($keys) == 1) {
-			$opt_name = $keys[0];
+			
+			$opt_kind_names = [];
+			$sql =
+				" select `name` from goods_option where goods_no = :goods_no and `type` = 'basic' order by seq";
+			$rows = DB::select($sql,['goods_no' => $goods_no]);
+			foreach ($rows as $row) {
+				$name = $row->name;
+				array_push($opt_kind_names, $name);
+			}
 
-			$arr = $grouped->map(function($item) {
-				$arr = $item->all();
-				return $arr;
-			})->values()->all();
+			/**
+			 * 2단 옵션인데 하나의 옵션 구분만 선택하는 경우 더미데이터 생성
+			 */
+			if (count($opt_kind_names) == 2) {
 
-			$goods_opts = $arr[0];
+				$opt_list = $request->input("opt_list", []);
 
+				// 더이데이터 옵션 구분 이름 설정
+				$opt_name = "";
+				if ($opt_kind_names[0] == $opt_list[0]['opt_name']) {
+					$opt_name = $opt_kind_names[1];
+				} else if ($opt_kind_names[1] == $opt_list[0]['opt_name']) {
+					$opt_name = $opt_kind_names[0];
+				};
+
+				// 더미데이터 옵션 추가
+				$c_count = $collection->count();
+				for ($i = 0; $i < $c_count; $i++) {
+					$idx = $i + $c_count;
+					$no = $i + 1;
+					$opt_list[$idx] = ['opt_name' => $opt_name, 'goods_opt' => "옵션${no}"];
+				}
+
+				// 저장 준비
+				$collection = collect($opt_list);
+				$grouped = $collection->mapToGroups(function($item, $key) {
+					return [$item['opt_name'] => $item['goods_opt']];
+				});
+				$opt_name = $opt_kind_names[0] . "^" . $opt_kind_names[1];
+
+				$arr = $grouped->map(function($item) {
+					$arr = $item->all();
+					return $arr;
+				})->all();
+		
+				$opt1 = $arr[$opt_kind_names[0]];
+				$opt2 = $arr[$opt_kind_names[1]];
+		
+				$goods_opts = [];
+				foreach ($opt1 as $opt1_val) {
+					foreach ($opt2 as $opt2_val) {
+						array_push($goods_opts, $opt1_val . "^" . $opt2_val);
+					}
+				}
+
+			} else {
+
+				/**
+				 * 단일 옵션인 경우 저장 준비
+				 */
+				$opt_name = $keys[0];
+
+				$arr = $grouped->map(function($item) {
+					$arr = $item->all();
+					return $arr;
+				})->values()->all();
+
+				$goods_opts = $arr[0];
+
+			}
+
+			/**
+			 * 옵션 저장
+			 */
 			try {
 				DB::beginTransaction();
 
@@ -2458,7 +2571,7 @@ class prd01Controller extends Controller
 		}
 
 		/**
-		 * 기본 옵션이 멀티로 변경되는 경우
+		 * 전달받은 옵션구분 항목이 2개인 경우
 		 */
 		$opt_kind_names = [];
 		$sql =
@@ -2486,6 +2599,9 @@ class prd01Controller extends Controller
 			}
 		}
 
+		/**
+		 * 옵션 저장
+		 */
 		try {
 			DB::beginTransaction();
 
@@ -2556,17 +2672,17 @@ class prd01Controller extends Controller
 
 	public function getBasicOptsMatrix($goods_no)
 	{
-		$is_single = $this->checkBasicOptIsSingle($goods_no);
+		$is_single = $this->checkBasicOptKindIsSingle($goods_no);
 
 		$opt	= ['opt1' => [], 'opt2' => []];
 		$sql	=
-			" select count(*) as tot from goods_option where goods_no = :goods_no and type = 'basic' order by seq";
+			" select count(*) as tot from goods_option where goods_no = :goods_no and `type` = 'basic' order by seq";
 		$row	= DB::selectOne($sql,['goods_no' => $goods_no]);
 		$opt_kind_cnt	= $row->tot;
 
 		$opt_kind_names = [];
 		$sql =
-			" select `name` from goods_option where goods_no = :goods_no and TYPE = 'basic' order by seq";
+			" select `name` from goods_option where goods_no = :goods_no and `type` = 'basic' order by seq";
 		$rows = DB::select($sql,['goods_no' => $goods_no]);
 		foreach($rows as $row) {
 			$name = $row->name;
@@ -2620,7 +2736,7 @@ class prd01Controller extends Controller
 
 	}
 
-	public function checkBasicOptIsSingle($goods_no)
+	public function checkBasicOptKindIsSingle($goods_no)
 	{
 		$is_single = false;
 		$sql = "

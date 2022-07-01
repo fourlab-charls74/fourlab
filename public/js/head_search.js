@@ -992,7 +992,11 @@ ControlOption.prototype.Add = function(e) {
 };
 
 ControlOption.prototype.Save = function() {
+    if (this.grid.getRows()?.length == 0) {
+        return alert("옵션을 추가해주세요.");
+    }
     if (!confirm("옵션 정보를 저장하시겠습니까?")) return;
+    
 
     const afterSuccess = (data) => {
         const { code, msg } = data;

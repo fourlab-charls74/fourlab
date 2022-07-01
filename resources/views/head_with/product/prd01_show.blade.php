@@ -949,7 +949,7 @@
 												<a href="#" class="btn btn-sm btn-primary shadow-sm option-add-btn"><span class="fs-12">관리</span></a>
 												<a href="#" class="btn btn-sm btn-primary shadow-sm option-del-btn"><span class="fs-12">삭제</span></a>
 												<a href="#" class="btn btn-sm btn-primary shadow-sm option-sav-btn"><span class="fs-12">저장</span></a>
-												<a href="#" class="btn btn-sm btn-primary shadow-sm option-inv-btn"><span class="fs-12">입고</span></a>
+												<a href="javascript:void(0);" onclick="alert('입고는 추후 진행할 예정입니다.')" class="btn btn-sm btn-primary shadow-sm option-inv-btn"><span class="fs-12">입고</span></a>
 											</div>
 										</div>
 									</div>
@@ -2450,10 +2450,10 @@
         return [
             { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, cellClass: "locked-cell", checkboxSelection: true, width: 30, pinned: 'left', sort: null },
             { field: "opt1_kind_name", headerName: opt1_kind_nm, width:100, pinned: 'left', suppressMovable: true },
-            { field: "opt_price", headerName: "옵션가격", width:100, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true },
-            { field: "good_qty", headerName: "온라인재고", width:80, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW },
+            { field: "opt_price", headerName: "옵션가격", width:100, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true, cellClassRules: optCellClassRules },
+            { field: "good_qty", headerName: "온라인재고", width:80, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW, cellClassRules: optCellClassRules },
             { field: "wqty", headerName: "보유재고", width:80, type: 'numberType', editable: true },
-            { field: "opt_memo", headerName: "옵션메모", width:90, cellStyle: {"text-align":"center"}, editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true }
+            { field: "opt_memo", headerName: "옵션메모", width:90, cellStyle: {"text-align":"center"}, editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true, cellClassRules: optCellClassRules }
         ];
     };
 
@@ -2512,7 +2512,7 @@
         { field: "soldout_yn", headerName: "품절여부", width:80, editable: true, cellStyle: CELL_COLOR.YELLOW }
     ];
 
-    const column_opt_del_list = [];
+    let column_opt_del_list = [];
     /**
      * 커스텀 그룹 체크박스 헤더 (컬럼 별 옵션 삭제 - opt2_kind_name 관련)
      */
@@ -2629,6 +2629,14 @@
                 }
             }
 
+            // 단일 옵션 - 온라인 재고인 경우
+            if (column_name == "good_qty") {
+                if (isNaN(value) == true || value == "") {
+                    alert("숫자만 입력가능합니다.");
+                    gx2StartEditingCell(row_index, column_name);
+                }
+            }
+
             // 셀 값 수정시 빨간색으로 변경
             if (row.hasOwnProperty('is_changed')) {
                 row.is_changed[column_name] = true;
@@ -2658,6 +2666,7 @@
 
     const initRightOptSection = async (type = "기본", columns = []) => {
         gx2.setRows([]);
+        gx2.gridOptions.api.setColumnDefs([]);
         if (type == "기본") {
             const response = await axios({ url: `/head/product/prd01/${goods_no}/get-basic-opts-matrix`, method: 'get' });
             const { data, status } = response;
@@ -2842,13 +2851,17 @@
                 'basic_count': basic_count
             },
             success: async function (res) {
-
-                console.log(res);
-
                 if (res.code === 200) {
+                    
                     resetAddOptionKindBox();
                     searchOptKind();
+
+                    // 사용안함인 경우 api에 none 뜨는 버그 방지 (goods_no가 null 인 경우)
+                    const GOODS_NO = document.f1.goods_no.value;
+                    controlOption.SetGoodsNo(GOODS_NO);
+
                     initOptGridAndApi();
+
                 } else alert(res.msg);
             },
             error: function(request, status, error) {
@@ -2926,7 +2939,7 @@
     상품 기본 옵션 품목 관리 관련
     ***
     */
-    $(".option-add-btn").on("click", function(e) {
+    $(".option-add-btn").on("click", async function(e) {
         e.preventDefault();
         const GOODS_NO = document.f1.goods_no.value;
         controlOption.Open(GOODS_NO, 
@@ -2975,8 +2988,16 @@
                 });
                 const { code, msg } = response?.data;
                 if (code == 200) {
+
                     alert(msg);
+                    column_opt_del_list = [];
+
+                    // 삭제후 옵션구분값 표시안되는 버그 방지 (goods_no가 null 인 경우)
+                    const GOODS_NO = document.f1.goods_no.value;
+                    controlOption.SetGoodsNo(GOODS_NO);
+
                     initOptGridAndApi();
+                    
                 } else alert(msg);
             } catch (error) {
                 console.log(error);
