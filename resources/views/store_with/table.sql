@@ -3,7 +3,8 @@
 CREATE TABLE `product_stock` (
                                  `goods_no` INT(11) NOT NULL DEFAULT '0' COMMENT '상품번호',
                                  `prd_cd` VARCHAR(50) NOT NULL DEFAULT '0' COMMENT '상품코드',
-                                 `wqty` INT(11) DEFAULT NULL COMMENT '보유재고',
+                                 `qty` INT(11) DEFAULT NULL COMMENT '전체보유재고',
+                                 `wqty` INT(11) DEFAULT NULL COMMENT '창고보유재고',
                                  `goods_opt` VARCHAR(100) NOT NULL DEFAULT '' COMMENT '상품옵션명',
                                  `barcode` VARCHAR(50) DEFAULT NULL COMMENT '바코드',
                                  `use_yn` CHAR(1) DEFAULT NULL COMMENT '사용여부',
@@ -25,13 +26,91 @@ CREATE TABLE `product_stock_store` (
                                  PRIMARY KEY (`goods_no`,`prd_cd`,`store_cd`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='상품재고 매장별';
 
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values
+('P_STOCK_TYPE','10','매입','','','','Y','0','ceduce','본사_김용남',now(),now()),
+('P_STOCK_TYPE','20','주문','','','','Y','0','ceduce','본사_김용남',now(),now()),
+('P_STOCK_TYPE','11','반품','','','','Y','0','ceduce','본사_김용남',now(),now()),
+('P_STOCK_TYPE','30','재고조정','','','','Y','0','ceduce','본사_김용남',now(),now());
 
+
+CREATE TABLE `product_stock_release` (
+    `type` VARCHAR(50) DEFAULT NULL COMMENT '분류',
+    `goods_no` INT(11) NOT NULL DEFAULT '0' COMMENT '상품번호',
+    `prd_cd` VARCHAR(50) NOT NULL DEFAULT '0' COMMENT '상품코드',
+    `goods_opt` VARCHAR(100) NOT NULL DEFAULT '' COMMENT '상품옵션명',
+    `qty` INT(11) DEFAULT NULL COMMENT '수량',
+    `store_cd` VARCHAR(30) NOT NULL DEFAULT '0' COMMENT '수령매장코드',
+    `state` INT(11) NOT NULL DEFAULT '0' COMMENT '상태(요청/접수/처리/완료:10/20/30/40)',
+    `exp_dlv_day` VARCHAR(8) DEFAULT NULL COMMENT '출고예정일자',
+    `rel_order` VARCHAR(30) DEFAULT NULL COMMENT '출고차수',
+    `req_id` VARCHAR(50) DEFAULT NULL COMMENT '요청자',
+    `req_rt` DATETIME DEFAULT NULL COMMENT '요청일시',
+    `rec_id` VARCHAR(50) DEFAULT NULL COMMENT '접수자',
+    `rec_rt` DATETIME DEFAULT NULL COMMENT '접수일시',
+    `prc_id` VARCHAR(50) DEFAULT NULL COMMENT '처리자',
+    `prc_rt` DATETIME DEFAULT NULL COMMENT '처리일시',
+    `fin_id` VARCHAR(50) DEFAULT NULL COMMENT '완료자',
+    `fin_rt` DATETIME DEFAULT NULL COMMENT '완료일시',
+    `rt` DATETIME DEFAULT NULL COMMENT '등록일시',
+    `ut` DATETIME DEFAULT NULL COMMENT '변경일시',
+    PRIMARY KEY (`goods_no`,`prd_cd`,`store_cd`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='상품재고 이동';
+
+CREATE TABLE `product_stock_rotation` (
+  `type` VARCHAR(50) DEFAULT NULL COMMENT '분류',
+  `goods_no` INT(11) NOT NULL DEFAULT '0' COMMENT '상품번호',
+  `prd_cd` VARCHAR(50) NOT NULL DEFAULT '0' COMMENT '상품코드',
+  `goods_opt` VARCHAR(100) NOT NULL DEFAULT '' COMMENT '상품옵션명',
+  `qty` INT(11) DEFAULT NULL COMMENT '수량',
+  `dep_store_cd` VARCHAR(30) NOT NULL DEFAULT '0' COMMENT '출고매장코드',
+  `store_cd` VARCHAR(30) NOT NULL DEFAULT '0' COMMENT '수령매장코드',
+  `state` INT(11) NOT NULL DEFAULT '0' COMMENT '상태(요청/접수/처리/완료:10/20/30/40)',
+  `exp_dlv_day` VARCHAR(8) DEFAULT NULL COMMENT '출고예정일자',
+  `req_id` VARCHAR(50) DEFAULT NULL COMMENT '요청자',
+  `req_rt` DATETIME DEFAULT NULL COMMENT '요청일시',
+  `rec_id` VARCHAR(50) DEFAULT NULL COMMENT '접수자',
+  `rec_rt` DATETIME DEFAULT NULL COMMENT '접수일시',
+  `prc_id` VARCHAR(50) DEFAULT NULL COMMENT '처리자',
+  `prc_rt` DATETIME DEFAULT NULL COMMENT '처리일시',
+  `fin_id` VARCHAR(50) DEFAULT NULL COMMENT '완료자',
+  `fin_rt` DATETIME DEFAULT NULL COMMENT '완료일시',
+  `rt` DATETIME DEFAULT NULL COMMENT '등록일시',
+  `ut` DATETIME DEFAULT NULL COMMENT '변경일시',
+  PRIMARY KEY (`goods_no`,`prd_cd`,`store_cd`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='상품재고 이동';
+
+
+-- 오프라인 재고(매장) 입출고
+CREATE TABLE `product_stock_hst` (
+    `idx` INT(11) NOT NULL AUTO_INCREMENT COMMENT '일련번호',
+    `goods_no` INT(11) NOT NULL DEFAULT '0' COMMENT '상품번호',
+    `prd_cd` VARCHAR(50) NOT NULL DEFAULT '0' COMMENT '상품코드',
+    `goods_opt` VARCHAR(100) NOT NULL DEFAULT '' COMMENT '상품옵션명',
+    `store_cd` VARCHAR(30) NOT NULL DEFAULT '0' COMMENT '매장코드',
+    `type` VARCHAR(50) DEFAULT NULL COMMENT '분류',
+    `cost` DECIMAL(10,0) DEFAULT NULL COMMENT '원가',
+    `qty` INT(11) DEFAULT NULL COMMENT '수량',
+    `invoice_no` VARCHAR(20) DEFAULT NULL COMMENT '송장번호',
+    `stock_state_date` VARCHAR(8) DEFAULT NULL COMMENT '재고상태일시',
+    `com_id` VARCHAR(20) DEFAULT NULL COMMENT '업체ID',
+    `ord_opt_no` INT(11) DEFAULT NULL COMMENT '주문옵션번호',
+    `uid` VARCHAR(50) DEFAULT NULL COMMENT '처리자',
+    `unm` VARCHAR(50) DEFAULT NULL COMMENT '처리자명',
+    `rt` DATETIME DEFAULT NULL COMMENT '등록일시',
+    `ut` DATETIME DEFAULT NULL COMMENT '변경일시',
+    PRIMARY KEY (`idx`),
+    KEY `goods_no` (`goods_no`,`goods_opt`),
+    KEY `prd_cd` (`prd_cd`),
+    KEY `invoice_no` (`invoice_no`),
+    KEY `stock_state_date` (`stock_state_date`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='상품재고 이력';
+
+-- 입고
+ALTER TABLE `bizest_smart`.`stock_product` ADD COLUMN `prd_cd` VARCHAR(50) NULL COMMENT '상품코드' AFTER `brand`;
 
 -- 주문에 '상품코드' 추가
 ALTER TABLE `bizest_smart`.`order_opt` ADD COLUMN `prd_cd` VARCHAR(50) NULL COMMENT '상품코드' AFTER `out_ord_opt_no`;
-ALTER TABLE `bizest_smart`.`order_opt_wonga` ADD COLUMN `prd_cd` VARCHAR(50) NULL COMMENT '상품코드' AFTER `tax_fee`; 
-
-
+ALTER TABLE `bizest_smart`.`order_opt_wonga` ADD COLUMN `prd_cd` VARCHAR(50) NULL COMMENT '상품코드' AFTER `tax_fee`;
 
 -- 매장
 CREATE TABLE `store` (

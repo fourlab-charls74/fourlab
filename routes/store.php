@@ -24,12 +24,12 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
     Route::get('/logout', 'LoginController@logout');
 
     Route::prefix("auto-complete")->group(function () {
-        
+
         Route::get('/store', 'AutoCompleteController@store');
-        
+
     });
 
-    Route::prefix("api")->namespace('api')->group(function () { 
+    Route::prefix("api")->namespace('api')->group(function () {
 
         // 고객명 조회
         Route::get('members', 'MemberController@show');
@@ -84,7 +84,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
         Route::get('std11/create', 'std11Controller@showCreate');
         Route::post('std11/create', 'std11Controller@create');
-        
+
         Route::get('std11/detail/{idx?}', 'std11Controller@showDetail');
         Route::post('std11/edit', 'std11Controller@edit');
         Route::post('std11/remove', 'std11Controller@remove');
@@ -140,6 +140,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk01/search','stk01Controller@search');
 
         Route::get('stk02','stk02Controller@index');
+        Route::get('stk11','stk11Controller@index');
+        Route::get('stk10','stk10Controller@index');
+        Route::get('stk12','stk12Controller@index');
+
     });
 
 });

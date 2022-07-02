@@ -31,22 +31,16 @@
                 </ul>
             </li>
             <li>
-                <a href="javascript:;" class="arrow"><i class="bx bx-task fs-18"></i><span>출고관리</span></a>
-                <ul>
-                    <li><a href="/partner/cs/cs01">출고</a></li>
-                    <li><a href="/partner/cs/cs01">반품</a></li>
-                    <li><a href="/partner/cs/cs02">실사</a></li>
-                </ul>
-            </li>
-            <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-task fs-18"></i><span>매장관리</span></a>
                 <ul>
                     <li><a href="/store/stock/stk01">(완)매장재고</a></li>
-                    <li><a href="/store/stock/stk02">매장재고입출고</a></li>
+                    <li><a href="/store/stock/stk02">(개)매장재고입출고</a></li>
+                    <li><a href="/store/stock/stk10">(개)출고</a></li>
+                    <li><a href="/store/stock/stk11">(개)반품</a></li>
                     <li><a href="">매장RT</a></li>
-                    <li><a href="">매장주문</a></li>
+                    <li><a href="">매장주문 - 는 포스화면</a></li>
                     <li><a href="">실사</a></li>
-                </ul>i>
+                </ul>
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-line-chart fs-18"></i><span>고객/수선관리</span></a>
                 <ul>
