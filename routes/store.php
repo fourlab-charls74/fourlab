@@ -143,6 +143,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk11','stk11Controller@index');
         Route::get('stk10','stk10Controller@index');
         Route::get('stk12','stk12Controller@index');
+        Route::get('stk15','stk15Controller@index');
 
     });
 
