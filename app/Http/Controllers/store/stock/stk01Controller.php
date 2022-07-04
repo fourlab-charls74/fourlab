@@ -14,19 +14,11 @@ class stk01Controller extends Controller
 {
 	public function index() {
 
-        $mutable	= now();
-        $sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
-
         $com_types	= [];
-        $event_cds	= [];
-        //판매유형
-        $sell_types	= [];
         $code_kinds	= [];
 
 		$values = [
 			'com_types'		=> $com_types,
-			'event_cds'		=> $event_cds,
-			'sell_types'	=> $sell_types,
 			'code_kinds'	=> $code_kinds,
             'style_no'		=> "",
             'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),

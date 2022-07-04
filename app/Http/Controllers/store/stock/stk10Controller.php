@@ -20,110 +20,151 @@ class stk10Controller extends Controller
         $sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
 
         $com_types	= [];
-        $event_cds	= [];
-        //판매유형
-        $sell_types	= [];
         $code_kinds	= [];
 
-		$values = [
+        $values = [
             'sdate'         => $sdate,
             'edate'         => date("Y-m-d"),
-			'com_types'		=> $com_types,
-			'event_cds'		=> $event_cds,
-			'sell_types'	=> $sell_types,
-			'code_kinds'	=> $code_kinds,
-		];
+            'com_types'		=> $com_types,
+            'code_kinds'	=> $code_kinds,
+            'style_no'		=> "",
+            'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
+            'com_types'     => SLib::getCodes('G_COM_TYPE'),
+            'items'			=> SLib::getItems(),
+            'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
+
+        ];
 
 		return view( Config::get('shop.store.view') . '/stock/stk10',$values);
 	}
 
-	public function search(Request $request)
-	{
-		$page	= $request->input('page', 1);
-		if( $page < 1 or $page == "" )	$page = 1;
-		$limit	= $request->input('limit', 100);
+    public function search(Request $request)
+    {
+        $store_type = $request->input('store_type');
+        $store_cd = $request->input('store_cd');
+        $store_nm = $request->input('store_nm');
+        $prd_cd = $request->input('prd_cd');
 
-		$sdate		= $request->input('sdate',Carbon::now()->sub(2, 'year')->format('Ymd'));
-		$edate		= $request->input('edate',date("Ymd"));
-		$com_type	= $request->input('com_type');
-		$com_nm		= $request->input('com_nm');
-		$goods_code	= $request->input('goods_code');
-		$event_cd	= $request->input('event_cd');
-		$user_id	= $request->input('user_id');
-		$sell_type	= $request->input('sell_type');
+        $goods_stat = $request->input("goods_stat");
+        $style_no = $request->input("style_no");
+        $goods_no = $request->input("goods_no");
+        $goods_nos = $request->input('goods_nos', '');       // 상품번호 textarea
+        $item = $request->input("item");
+        $brand_nm = $request->input("brand_nm");
+        $brand_cd = $request->input("brand_cd");
+        $goods_nm = $request->input("goods_nm");
+        $goods_nm_eng = $request->input("goods_nm_eng");
 
-		$limit		= $request->input("limit",100);
-		$ord		= $request->input('ord','desc');
-		$ord_field	= $request->input('ord_field','g.goods_no');
-		$orderby	= sprintf("order by %s %s", $ord_field, $ord);
+        $type = $request->input("type");
+        $goods_type = $request->input("goods_type");
 
-		$where	= "";
-		if( $com_type != "" )	$where .= " and a.com_type = '" . $com_type . "' ";
-		if( $com_nm != "" )		$where .= " and a.com_nm like '%" . Lib::quote($com_nm) . "%' ";
-		if( $goods_code != "" )	$where .= " and a.goods_code like '" . Lib::quote($goods_code) . "%' ";
-		if( $event_cd != "" )	$where .= " and a.event_cd = '" . $event_cd . "' ";
-		if( $user_id != "" )	$where .= " and a.user_id = '" . Lib::quote($user_id) . "%' ";
-		if( $sell_type != "" )	$where .= " and a.sell_type = '" . $sell_type . "' ";
 
-		$page_size	= $limit;
-		$startno	= ($page - 1) * $page_size;
-		$limit		= " limit $startno, $page_size ";
+        $page = $request->input('page', 1);
+        if ( $page < 1 or $page == "" )	$page = 1;
+        $limit = $request->input('limit', 100);
 
-		$total		= 0;
-		$page_cnt	= 0;
+        $ord = $request->input('ord','desc');
+        $ord_field = $request->input('ord_field','p.goods_no');
+        $orderby = sprintf("order by %s %s", $ord_field, $ord);
 
-		if( $page == 1 ){
-			$query	= "
+        $where	= "";
+        if ( $store_type != "" )	$where .= " and s.store_type = '" . $store_type . "' ";
+        if ( $store_cd != "" )	$where .= " and s.store_cd = '" . $store_cd . "' ";
+        if ( $store_nm != "" )	$where .= " and s.store_nm like '%" . Lib::quote($store_nm) . "%' ";
+        if ( $prd_cd != "" )	$where .= " and p.prd_cd = '" . $prd_cd . "' ";
+        if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%' ";
+        if ($item != "") $where .= " and g.opt_kind_cd = '" . Lib::quote($item) . "' ";
+        if ($brand_cd != "") {
+            $where .= " and g.brand = '" . Lib::quote($brand_cd) . "' ";
+        } else if ($brand_cd == "" && $brand_nm != "") {
+            $where .= " and g.brand = '" . Lib::quote($brand_cd) . "' ";
+        }
+        if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%' ";
+        if ($goods_nm_eng != "") $where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
+
+        if( is_array($goods_stat)) {
+            if (count($goods_stat) == 1 && $goods_stat[0] != "") {
+                $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat[0]) . "' ";
+            } else if (count($goods_stat) > 1) {
+                $where .= " and g.sale_stat_cl in (" . join(",", $goods_stat) . ") ";
+            }
+        } else if($goods_stat != ""){
+            $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
+        }
+
+        if($goods_nos        != ""){
+            $goods_no = $goods_nos;
+        }
+        $goods_no = preg_replace("/\s/",",",$goods_no);
+        $goods_no = preg_replace("/\t/",",",$goods_no);
+        $goods_no = preg_replace("/\n/",",",$goods_no);
+        $goods_no = preg_replace("/,,/",",",$goods_no);
+
+        if( $goods_no != "" ){
+            $goods_nos = explode(",",$goods_no);
+            if(count($goods_nos) > 1){
+                if(count($goods_nos) > 500) array_splice($goods_nos,500);
+                $in_goods_nos = join(",",$goods_nos);
+                $where .= " and g.goods_no in ( $in_goods_nos ) ";
+            } else {
+                if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
+            }
+        }
+
+        if ($type != "") $where .= " and g.type = '" . Lib::quote($type) . "' ";
+        if ($goods_type != "") $where .= " and g.goods_type = '" . Lib::quote($goods_type) . "' ";
+
+        $page_size = $limit;
+        $startno = ($page - 1) * $page_size;
+        $limit = " limit $startno, $page_size ";
+
+        $total = 0;
+        $page_cnt = 0;
+
+        if ( $page == 1 ) {
+            $query = /** @lang text */
+                "
 				select count(*) as total
-				from __tmp_order a
-				where 1=1 
-					and ( a.ord_date >= :sdate and a.ord_date < date_add(:edate,interval 1 day))
-					$where
+				from product_stock_store p
+					left join goods g on p.goods_no = g.goods_no
+					left join store s on p.store_cd = s.store_cd
+				where 1=1 $where
 			";
-			//$row = DB::select($query,['com_id' => $com_id]);
-			$row		= DB::select($query, ['sdate' => $sdate,'edate' => $edate]);
-			$total		= $row[0]->total;
-			$page_cnt	= (int)(($total - 1) / $page_size) + 1;
-		}
+            $row = DB::selectOne($query);
+            $total = $row->total;
+            $page_cnt = (int)(($total - 1) / $page_size) + 1;
+        }
 
-		$query	= "
-			select
-				a.*, 
-				(100 - round(a.price/a.goods_sh * 100)) as sale_rate,
-				(100 - round(a.ord_amt/a.goods_sh * 100)) as ord_sale_rate,
-				( (100 - round(a.ord_amt/a.goods_sh * 100)) - (100 - round(a.price/a.goods_sh * 100)) ) as sale_gap,
-				b.code_val as com_type_nm,
-				c.code_val as opt_kind_nm,
-				d.code_val as brand_nm,
-				e.code_val as stat_pay_type_nm,
-				f.code_val as sell_type_nm,
-				g.code_val as event_kind_nm
-			from __tmp_order a
-			left outer join __tmp_code b on b.code_kind_cd = 'com_type' and b.code_id = a.com_type
-			left outer join __tmp_code c on c.code_kind_cd = 'opt_kind_cd' and c.code_id = a.opt_kind
-			left outer join __tmp_code d on d.code_kind_cd = 'brand' and d.code_id = a.brand
-			left outer join __tmp_code e on e.code_kind_cd = 'stat_pay_type' and e.code_id = a.stat_pay_type
-			left outer join __tmp_code f on f.code_kind_cd = 'sell_type' and f.code_id = a.sell_type
-			left outer join __tmp_code g on g.code_kind_cd = 'event_cd' and g.code_id = a.event_cd
-			where 1=1 
-				and ( a.ord_date >= :sdate and a.ord_date < date_add(:edate,interval 1 day))
-				$where
-			$orderby
+        $sql = /** @lang text */
+            "
+			select 
+				p.goods_no, goods_type, prd_cd, g.opt_kind_cd, opt_kind_nm, brand_nm, style_no, 
+				c.code_val as sale_stat_cl_val, ifnull( c2.code_val, 'N/A') as goods_type_nm,
+				img, goods_nm, goods_nm_eng, goods_opt, p.store_cd, store_nm, store_type, wqty, p.rt, p.ut
+			from product_stock_store p 
+				left join goods g on p.goods_no = g.goods_no
+				left join store s on p.store_cd = s.store_cd
+				left join opt o on g.opt_kind_cd = o.opt_kind_cd
+				left join `code` c on c.code_kind_cd = 'G_GOODS_STAT' and sale_stat_cl = c.code_id
+				left join `code` c2 on c2.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = c2.code_id 
+			where 1=1
+			$where
+			$orderby 
 			$limit
 		";
 
-		$result = DB::select($query, ['sdate' => $sdate,'edate' => $edate]);
+        $result = DB::select($sql);
 
-		return response()->json([
-			"code"	=> 200,
-			"head"	=> array(
-				"total"		=> $total,
-				"page"		=> $page,
-				"page_cnt"	=> $page_cnt,
-				"page_total"=> count($result)
-			),
-			"body" => $result
-		]);
+        return response()->json([
+            "code"	=> 200,
+            "head"	=> array(
+                "total"		=> $total,
+                "page"		=> $page,
+                "page_cnt"	=> $page_cnt,
+                "page_total"=> count($result)
+            ),
+            "body" => $result
+        ]);
 
-	}
+    }
 }
