@@ -41,6 +41,11 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
     });
 
+    // 포스
+    Route::prefix("pos")->namespace('pos')->group(function () {
+        Route::get('', 'PosController@index');
+    });
+
     //코드관리
     Route::prefix("standard")->namespace('standard')->group(function () {
         //매장

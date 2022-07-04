@@ -10,7 +10,7 @@
         </div>
         <div class="d-flex">
             <ul class="top_link_btn">
-                <li><a href="" class="cart">포스</a></li>
+                <li><a href="/store/pos" class="cart">포스</a></li>
                 <li><a href="" class="history"></a></li>
                 <li><a href="" class="cart"></a></li>
                 <li><a href="javascript:void(0);" onclick="return openSmsList();" class="mail act"></a></li>

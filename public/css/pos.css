@@ -1,0 +1,39 @@
+#pos {font-size: 20px;background-color: #fdfdfd;}
+.store-title {border-left: 10px solid var(--primary);}
+
+/* font-size */
+.fs-10 {font-size: 1rem !important;}
+.fs-12 {font-size: 1.2rem !important;}
+.fs-14 {font-size: 1.4rem !important;}
+.fs-15 {font-size: 1.5rem !important;}
+.fs-16 {font-size: 1.6rem !important;}
+.fs-18 {font-size: 1.8rem !important;}
+.fs-20 {font-size: 2rem !important;}
+h1, h2, h3, h4, h5, h6 {font-size: inherit;}
+
+/* font-weight */
+.fw-sb {font-weight: 500;}
+.fw-b {font-weight: bold;}
+
+/* font-color */
+.fc-gray {color: #999999;}
+.fc-price {color: var(--primary);}
+
+/* width */
+.w-10 {width: 10% !important;}
+
+/* btn */
+.btn {padding: 0;font-size: inherit;}
+.btn:focus {box-shadow: none;}
+.btn.btn-outline {border: 1px solid #dedede;}
+
+/* input */
+.inp {min-height:30px;border: none;border-bottom: 2px solid #333;}
+.inp:focus {outline: none !important;}
+
+/* select */
+.custom-select {min-height: 30px;}
+.custom-select:focus {box-shadow: none;}
+
+/* etc */
+.noresize {resize: none;}
