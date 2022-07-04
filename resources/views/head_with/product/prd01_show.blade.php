@@ -2042,6 +2042,7 @@
             if( $('#is_option_use2').is(":checked") == true ){
                 $('.use_option_n').css('display','table-row');
                 $('.use_option_y').css('display','none');
+                resetAddOptionKindBox();
             }else{
                 $('.use_option_n').css('display','none');
                 $('.use_option_y').css('display','flex');
