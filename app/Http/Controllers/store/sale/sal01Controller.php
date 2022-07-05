@@ -237,6 +237,7 @@ class sal01Controller extends Controller
 
 		$order["ord_amt"] = Lib::uncm($order["ord_amt"]);
 		$order["recv_amt"] = Lib::uncm($order["recv_amt"]);
+		$order["pay_stat"] = 1;
 
 		/**
 		 * 옵션 처리
