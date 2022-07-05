@@ -219,6 +219,10 @@ class sal01Controller extends Controller
 		 * goods_no 가져오기
 		 */
 		$prd_cd = $order['goods_code'];
+		$store_cd = $order['com_id'];
+		$order['sale_place'] = $order['com_nm'];
+		$order['user_nm'] = $order['ord_nm'];
+
 		$sql = /** @lang text */
 		"
 			select goods_no
@@ -226,9 +230,7 @@ class sal01Controller extends Controller
 			where prd_cd = :prd_cd
 		";
 		$result = DB::selectOne($sql, array("prd_cd" => $prd_cd));
-		$order['goods_no'] = $result->goods_no;
-
-		
+		$order['goods_no'] = $result->goods_no;		
 		
 		$order['goods_sub'] = 0;
 		$order['out_ord_no'] = 0;
@@ -251,10 +253,7 @@ class sal01Controller extends Controller
 		}
 		$order['goods_opt'] = $goods_opt;
 		
-		$order['user_nm'] = $order['ord_nm'];
-		$order['sale_place'] = $order['com_nm'];
 
-		
 
 		/**
 		 * validation 추후 처리 할 것 (주문자명, 상품명, 상품코드, 매장명, 매장코드 등등... 아래는 샘플)
@@ -270,7 +269,7 @@ class sal01Controller extends Controller
 			$code = "-107";
 		} else if (@$order["ord_nm"] == "") {
 			$code = "-108";	
-		} 
+		}
 
 		// else if (@$order["r_nm"] == "") {
 		// 	$code = "-110";
@@ -382,7 +381,7 @@ class sal01Controller extends Controller
 				if ($ord_seq == 0) {
 					$order_mst = [
 						"ord_no"		=> $ord_no,
-						"store_cd"      => $prd_cd,
+						"store_cd"      => $store_cd,
 						"ord_date"      => DB::raw('now()'),
 						"user_id" 		=> $order["user_id"],
 						"user_nm" 		=> $order["user_nm"],
@@ -472,6 +471,7 @@ class sal01Controller extends Controller
 					"admin_id" 		=> $admin_id,
 					"sales_com_fee" => @$order["sales_com_fee"],
 					"ord_date"      => DB::raw('now()'),
+					'prd_cd'        => $prd_cd
 				];
 				DB::table('order_opt')->insert($order_opt);
 				$ord_opt_no = DB::getPdo()->lastInsertId();
@@ -514,7 +514,6 @@ class sal01Controller extends Controller
 				}
 
 				// outbound_order 저장 /////////////////////////////////////////////
-
 
 				$out_order = array(
 					"sale_place"	=> @$order["sale_place"],
