@@ -145,8 +145,9 @@
                 </ul>
             </div>
             <div>
-                <div class="p-3">
-                    <h3 class="fc-gray pb-1">결제정보</h3>
+                <div class="d-flex justify-content-between align-items-center p-3">
+                    <p class="fs-12 fw-sb pt-1">TOTAL</p>
+                    <p class="fc-price fs-16 fw-b">2,359,000</p>
                 </div>
                 <button type="button" class="btn w-100 text-light fs-20 fw-sb bg-primary rounded-0" style="height: 70px;">판매</button>
             </div>
@@ -155,6 +156,7 @@
 
 </div>
 
+{{-- MODAL --}}
 <div id="pos-modal">
     <div class="modal fade" id="receiptNoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
