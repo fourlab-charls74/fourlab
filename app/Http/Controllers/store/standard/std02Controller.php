@@ -152,7 +152,7 @@ class std02Controller extends Controller
 	}
 
 	// 매장 등록
-	public function update(Request $request){
+	public function update_store(Request $request){
 		$id		= Auth('head')->user()->id;
 		$code	= 200;
 		$msg	= "Success";
@@ -160,12 +160,11 @@ class std02Controller extends Controller
 		try {
 			DB::beginTransaction();
 
-			$values	= [
+			$where	= [
 				'store_cd'	=> $request->input('store_cd')
 			];
 
-			$where	= [
-				'store_cd'		=> $request->input('store_cd'),
+			$values	= [
 				'store_nm'		=> $request->input('store_nm'),
 				'store_nm_s'	=> $request->input('store_nm_s'),
 				'store_type'	=> $request->input('store_type'),

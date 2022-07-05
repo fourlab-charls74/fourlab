@@ -535,7 +535,7 @@
 
         axios({
             url: `/store/standard/std02/update`,
-            method: 'put',
+            method: 'post',
             data: frm.serialize(),
         }).then(function (res) {
             if(res.data.code === 200) {
