@@ -117,7 +117,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('sal01','sal01Controller@index');
         Route::get('sal01/search','sal01Controller@search');
         Route::get('sal01/show','sal01Controller@show');
-        Route::post('sal01/show','sal01Controller@update');
+        Route::post('sal01/update','sal01Controller@update');
         Route::post('sal01/upload',	'sal01Controller@upload');
 
         Route::get('sal02','sal02Controller@index');
