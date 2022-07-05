@@ -72,7 +72,7 @@ class std02Controller extends Controller
 		$query	= "
 			select
 				a.*,
-				c.code_val as com_type_nm,
+				c.code_val as store_type_nm,
 				d.code_val as store_kind_nm
 			from store a
 			left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = a.store_type
@@ -108,13 +108,26 @@ class std02Controller extends Controller
 
 	}
 
-	public function show()
+	public function show($store_cd = '')
 	{
+		$store	= "";
+
+		if($store_cd != '') {
+			$sql = "
+				select * from store
+				where store_cd = :store_cd
+			";
+
+			$store = DB::selectOne($sql, ["store_cd" => $store_cd]);
+		}
+
 		$values = [
-			'cmd'			=> '',
+			"cmd"	=> $store_cd == '' ? "" : "update",
+			"store"	=> $store,
 			'store_types'	=> SLib::getCodes("STORE_TYPE"),
 			'store_kinds'	=> SLib::getCodes("STORE_KIND"),
 			'store_areas'	=> SLib::getCodes("STORE_AREA"),
+			'prioritys'		=> SLib::getCodes("PRIORITY")
 		];
 
 		return view( Config::get('shop.store.view') . '/standard/std02_show',$values);
@@ -137,6 +150,96 @@ class std02Controller extends Controller
 
 		return response()->json(["code" => $code, "msg" => $msg]);
 	}
+
+	// 매장 등록
+	public function add_store(Request $request){
+		$id		= Auth('head')->user()->id;
+		$code	= 200;
+		$msg	= "Success";
+
+		try {
+			DB::beginTransaction();
+
+			$values	= [
+				'store_cd'	=> $request->input('store_cd')
+			];
+
+			$where	= [
+				'store_cd'		=> $request->input('store_cd'),
+				'store_nm'		=> $request->input('store_nm'),
+				'store_nm_s'	=> $request->input('store_nm_s'),
+				'store_type'	=> $request->input('store_type'),
+				'store_kind'	=> $request->input('store_kind'),
+				'store_area'	=> $request->input('store_area'),
+				'zipcode'		=> $request->input('zipcode'),
+				'addr1'			=> $request->input('addr1'),
+				'addr2'			=> $request->input('addr2'),
+				'phone'			=> $request->input('phone'),
+				'fax'			=> $request->input('fax'),
+				'mobile'		=> $request->input('mobile'),
+				'manager_nm'	=> $request->input('manage_nm'),
+				'manager_mobile'=> $request->input('manager_mobile'),
+				'email'			=> $request->input('email'),
+				'fee'			=> $request->input('fee'),
+				'sale_fee'		=> $request->input('sale_fee'),
+				'md_manage_yn'	=> $request->input('md_manage_yn'),
+				'bank_no'		=> $request->input('bank_no'),
+				'bank_nm'		=> $request->input('bank_nm'),
+				'depositor'		=> $request->input('depositor'),
+				'deposit_cash'	=> $request->input('deposit_cash'),
+				'deposit_coll'	=> $request->input('deposit_coll'),
+				'loss_rate'		=> $request->input('loss_rate'),
+				'sdate'			=> $request->input('sdate'),
+				'edate'			=> $request->input('edate'),
+				'use_yn'		=> $request->input('use_yn'),
+				'ipgo_yn'		=> $request->input('ipgo_yn'),
+				'vat_yn'		=> $request->input('vat_yn'),
+				'biz_no'		=> $request->input('biz_no'),
+				'biz_nm'		=> $request->input('biz_nm'),
+				'biz_ceo'		=> $request->input('biz_ceo'),
+				'biz_zipcode'	=> $request->input('biz_zipcode'),
+				'biz_addr1'		=> $request->input('biz_addr1'),
+				'biz_addr2'		=> $request->input('biz_addr2'),
+				'biz_uptae'		=> $request->input('biz_uptae'),
+				'biz_upjong'	=> $request->input('biz_upjong'),
+				'manage_type'	=> $request->input('manage_type'),
+				'exp_manage_yn'	=> $request->input('exp_manage_yn'),
+				'priority'		=> $request->input('priority'),
+				'competitor_yn'	=> $request->input('competitor_yn'),
+				'pos_yn'		=> $request->input('pos_yn'),
+				'ostore_stock_yn'	=> $request->input('ostore_stock_yn'),
+				'sale_dist_yn'	=> $request->input('sale_dist_yn'),
+				'rt_yn'			=> $request->input('rt_yn'),
+				'point_in_yn'	=> $request->input('point_in_yn'),
+				'point_out_yn'	=> $request->input('point_out_yn'),
+				'reg_date'		=> now(),
+				'mod_date'		=> now(),
+				'admin_id'		=> $id
+			];
+
+			DB::table('store')->updateOrInsert($where, $values);
+
+			DB::commit();
+
+			return response()->json(["code" => $code, "msg" => $msg]);
+
+		} catch(Exception $e){
+
+			DB::rollback();
+			return response()->json(["code" => '500', 'msg' => "에러가 발생했습니다. 잠시 후 다시시도 해주세요."]);
+
+		}
+	}
+
+
+
+
+
+
+
+
+
+
 
 	public function view($com_id)
 	{
