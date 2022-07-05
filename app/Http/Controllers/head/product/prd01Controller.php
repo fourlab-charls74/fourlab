@@ -2547,7 +2547,7 @@ class prd01Controller extends Controller
 				DB::commit();
 				$msg = "저장되었습니다.";
 			} catch (Exception $e) {
-				dd($e->getMessage());
+				// dd($e->getMessage());
 				DB::rollBack();
 				$code = 500;
 				$msg = "저장중 에러가 발생했습니다. 잠시 후 다시 시도해주세요.";
@@ -2608,7 +2608,7 @@ class prd01Controller extends Controller
 				DB::commit();
 				$msg = "저장되었습니다.";
 			} catch (Exception $e) {
-				dd($e->getMessage());
+				// dd($e->getMessage());
 				DB::rollBack();
 				$code = 500;
 				$msg = "저장중 에러가 발생했습니다. 잠시 후 다시 시도해주세요.";
