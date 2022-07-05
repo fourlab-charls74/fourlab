@@ -2231,7 +2231,7 @@ class prd01Controller extends Controller
 
 			$msg = "옵션명이 등록되었습니다.";
 		} catch(Exception $e){
-			dd($e);
+			// dd($e);
 			$code = 500;
 			$msg = "등록 중 에러가 발생했습니다. 잠시 후 다시 시도 해주세요.";
 		}
@@ -2529,35 +2529,25 @@ class prd01Controller extends Controller
 			 */
 			try {
 				DB::beginTransaction();
-
+				$sql = "
+					delete from `goods_summary`
+					where goods_no = :goods_no
+					and opt_name = :opt_name
+				";
+				DB::delete($sql, ['goods_no' => $goods_no, 'opt_name' => $opt_name]);
 				for ($i=0; $i<count($goods_opts); $i++) {
-	
 					$goods_opt = $goods_opts[$i];
-					$sql = "select count(*) as count from goods_summary where `goods_no` = :goods_no and `goods_opt` = :goods_opt order by seq";
-					$result = DB::selectOne($sql, ['goods_no' => $goods_no, 'goods_opt' => $goods_opt]);
-	
-					if (!($result->count > 0)) {
-						$sql = " 
-							insert into goods_summary 
-								(goods_no, goods_sub, opt_name, goods_opt, opt_price, soldout_yn, use_yn, good_qty, wqty, bad_qty, rt, ut, last_date) 
-							values (:goods_no, :goods_sub, :opt_name, :goods_opt, 0, 'N', 'Y', 0, 0, 0, NOW(), NOW(), DATE_FORMAT(NOW(),'%Y-%m-%d'))
-						";
-						DB::insert($sql, ['goods_no' => $goods_no, 'goods_sub' => 0, 'goods_opt' => $goods_opt, 'opt_name' => $opt_name]);
-					}
-	
-					$sql = "
-						update goods_summary set
-							seq = $i
-						where goods_no = :goods_no
-							and goods_sub = '0'
-							and goods_opt = :goods_opt
-						";
-					DB::update($sql, ['goods_no' => $goods_no, 'goods_opt' => $goods_opt]);
+					$sql = " 
+						insert into goods_summary 
+							(goods_no, goods_sub, opt_name, goods_opt, opt_price, soldout_yn, use_yn, good_qty, wqty, bad_qty, rt, ut, last_date, seq) 
+						values (:goods_no, :goods_sub, :opt_name, :goods_opt, 0, 'N', 'Y', 0, 0, 0, NOW(), NOW(), DATE_FORMAT(NOW(),'%Y-%m-%d'), $i)
+					";
+					DB::insert($sql, ['goods_no' => $goods_no, 'goods_sub' => 0, 'goods_opt' => $goods_opt, 'opt_name' => $opt_name]);
 				}
-						
 				DB::commit();
 				$msg = "저장되었습니다.";
 			} catch (Exception $e) {
+				dd($e->getMessage());
 				DB::rollBack();
 				$code = 500;
 				$msg = "저장중 에러가 발생했습니다. 잠시 후 다시 시도해주세요.";
@@ -2600,37 +2590,25 @@ class prd01Controller extends Controller
 			 */
 			try {
 				DB::beginTransaction();
-
+				$sql = "
+					delete from `goods_summary`
+					where goods_no = :goods_no
+					and opt_name = :opt_name
+				";
+				DB::delete($sql, ['goods_no' => $goods_no, 'opt_name' => $opt_name]);
 				for ($i=0; $i<count($goods_opts); $i++) {
-
 					$goods_opt = $goods_opts[$i];
-
-					// goods_opt like 문으로 변경필요해보임.
-					$sql = "select count(*) as count from goods_summary where `goods_no` = :goods_no and `goods_opt` = :goods_opt order by seq";
-					$result = DB::selectOne($sql, ['goods_no' => $goods_no, 'goods_opt' => $goods_opt]);
-
-					if (!($result->count > 0)) {
-						$sql = " 
-							insert into goods_summary 
-								(goods_no, goods_sub, opt_name, goods_opt, opt_price, soldout_yn, use_yn, good_qty, wqty, bad_qty, rt, ut, last_date) 
-							values (:goods_no, :goods_sub, :opt_name, :goods_opt, 0, 'N', 'Y', 0, 0, 0, NOW(), NOW(), DATE_FORMAT(NOW(),'%Y-%m-%d'))
-						";
-						DB::insert($sql, ['goods_no' => $goods_no, 'goods_sub' => 0, 'goods_opt' => $goods_opt, 'opt_name' => $opt_name]);
-					}
-
-					$sql = "
-						update goods_summary set
-							seq = $i
-						where goods_no = :goods_no
-							and goods_sub = '0'
-							and goods_opt = :goods_opt
-						";
-					DB::update($sql, ['goods_no' => $goods_no, 'goods_opt' => $goods_opt]);
+					$sql = " 
+						insert into goods_summary 
+							(goods_no, goods_sub, opt_name, goods_opt, opt_price, soldout_yn, use_yn, good_qty, wqty, bad_qty, rt, ut, last_date, seq) 
+						values (:goods_no, :goods_sub, :opt_name, :goods_opt, 0, 'N', 'Y', 0, 0, 0, NOW(), NOW(), DATE_FORMAT(NOW(),'%Y-%m-%d'), $i)
+					";
+					DB::insert($sql, ['goods_no' => $goods_no, 'goods_sub' => 0, 'goods_opt' => $goods_opt, 'opt_name' => $opt_name]);
 				}
-						
 				DB::commit();
 				$msg = "저장되었습니다.";
 			} catch (Exception $e) {
+				dd($e->getMessage());
 				DB::rollBack();
 				$code = 500;
 				$msg = "저장중 에러가 발생했습니다. 잠시 후 다시 시도해주세요.";
@@ -2808,7 +2786,7 @@ class prd01Controller extends Controller
 				}
 			});
 		} catch(Exception $e){
-			dd($e->getMessage());
+			// dd($e->getMessage());
 			$code = 500;
 		}
 		return response()->json(['code' => $code]);
