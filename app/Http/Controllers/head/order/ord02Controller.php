@@ -48,10 +48,10 @@ class ord02Controller extends Controller
                 concat(code_val,'_',ifnull(code_val2, '')) as 'name',
                 concat(code_val,' [',ifnull(code_val2, ''),']') as 'value'
             from code 
-            where code_kind_cd ='BANK' 
+            where code_kind_cd ='BANK'
                 and code_id != 'K' 
-                and use_yn = 'Y' 
-            order by code_seq        
+                and use_yn = 'Y'
+            order by code_seq
         ";
         $banks = DB::select($sql);
 
@@ -640,7 +640,7 @@ class ord02Controller extends Controller
 
         $tel = trim($tel);
 
-        if (strpos($tel, "-") === false) {
+        if (strpos($tel, "-") === false) { 
 
             $len = strlen($tel);
 

@@ -8,6 +8,23 @@ var App = function(id,options){
     this.lifeCycle = {};
 };
 
+/**
+ * 토큰 만료시 ajax 요청하는 경우 로그인 페이지로 이동
+ */
+ (function(open) {
+    XMLHttpRequest.prototype.open = function() {
+        this.addEventListener("readystatechange", function() {
+            const { responseURL } = this;
+            let regExp = /.+(?=\/login)/i;
+            let match_arr = responseURL.match(regExp);
+            if (match_arr) {
+                location.href = responseURL;
+            }
+        }, false);
+        open.apply(this, arguments);
+    };
+})(XMLHttpRequest.prototype.open);
+
 App.prototype.ResizeGrid  = function(grid_height_margin, height){
     this.options.grid_resize = true;
     if(grid_height_margin !== undefined){

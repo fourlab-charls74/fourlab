@@ -6,6 +6,7 @@ $.ajaxSetup({
      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
   }
 });
+
 /*
     autocomplete에서 선택되었을때의 이벤트 추가하는 예제
     $('.ac-template').autocomplete({ select : 이벤트명 });
@@ -15,7 +16,6 @@ $.ajaxSetup({
     autoFocus : 첫번째 검색어 자동선택
     delay : 검색 후 화면에 나오는 딜레이
 */
-
 $( document ).ready(function() {
     $(".ac-template").autocomplete({
         //keydown 됬을때 해당 값을 가지고 서버에서 검색함.

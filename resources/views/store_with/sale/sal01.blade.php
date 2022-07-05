@@ -190,7 +190,7 @@
 		{field: "ord_date",		headerName: "판매일자",		width:100},
 		{field: "com_type_nm",	headerName: "매장구분",		width:90},
 		{field: "com_id",		headerName: "매장코드",		width:90},
-		{field: "com_nm",		headerName: "매장명",		width:100},
+		{field: "com_nm",		headerName: "매장명",		width:150},
 		{field: "receipt_no",	headerName: "영수번호",		width:85},
 		{field: "seq",			headerName: "일련번호",		width:85},
 		{field: "style_no",		headerName: "아이템코드",	width:100},
@@ -227,8 +227,8 @@
 	];
 	function Add()
 	{
-		const url='/head/xmd/store/store01/show';
-		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
+		const url='/store/sale/sal01/show';
+		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=800");
 	}
 
 </script>

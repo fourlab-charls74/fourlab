@@ -1,4 +1,4 @@
-@extends('head_with.layouts.layout-nav')
+@extends('store_with.layouts.layout-nav')
 @section('title','XMD - 매장판매일보 등록')
 @section('content')
 
@@ -27,6 +27,7 @@
 												<td>
 													<input id="excelfile" type="file" name="excelfile" />
 													<a href="#" onclick="Upload();" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">자료 불러오기</a>
+													
 													<span>※ XMD >> 매장관리 >> 매장판매일보(본사) 조회에서 엑셀 다운로드</span>
 												</td>
 											</tr>
@@ -52,7 +53,7 @@
 							<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
 						</div>
 						<div class="fr_box flax_box" style="font-size:12px;font-weight:700;color:#FF0000;">
-							※ 저장 - 자료 없슴:신규등록, 자료 있슴:업데이트
+							※ 저장 - 자료 없음:신규등록, 자료 있음:업데이트
 						</div>
 					</div>
 				</div>
@@ -65,6 +66,7 @@
 	</form>
 
     <div class="resul_btn_wrap mt-3 d-block">
+		<a href="#" onclick="Clear();" class="btn btn-sm btn-primary">초기화</a>
         <a href="#" onclick="Save();" class="btn btn-sm btn-primary submit-btn">저장</a>
         <a href="#" onclick="window.close()" class="btn btn-sm btn-secondary" onclick="window.close()">닫기</a>
     </div>
@@ -74,12 +76,13 @@
 <script language="javascript">
 	var columnDefs = [
 		{headerName: "#",			field: "num",			filter:true,width:50,valueGetter: function(params) {return params.node.rowIndex+1;},pinned:'left'},
+		{headerName:"결과",			field:"result",			width:120},
 		{headerName:"판매일자",		field:"ord_date",		width:75},
 		{headerName:"매장구분",		field:"com_type_nm",	width:90},
 		{headerName:"매장코드",		field:"com_id",			width:90},
-		{headerName:"매장명",		field:"com_nm",			width:100},
+		{headerName:"매장명",		field:"com_nm",			width:150},
 		{headerName:"영수번호",		field:"receipt_no",		width:100},
-		{headerName:"주문일련번호",	field:"seq",			width:90},
+		{headerName:"판매순서",		field:"seq",			width:90},
 		{headerName:"아이템코드",	field:"style_no",		width:100},
 		{headerName:"품목",			field:"opt_kind_nm",	width:100},
 		{headerName:"브랜드",		field:"brand_nm",		width:100},
@@ -159,6 +162,24 @@
 </script>
 <script type="text/javascript" charset="utf-8">
 
+	var out_order_errors = new Object();
+    out_order_errors['-100'] = "판매처 주문번호 부정확";
+    out_order_errors['-101'] = "상품번호 없음";
+    out_order_errors['-102'] = "옵션 없음";
+    out_order_errors['-106'] = "수량 없음";
+    out_order_errors['-107'] = "금액 없음";
+    out_order_errors['-108'] = "주문자 없음";
+    out_order_errors['-110'] = "수령자 없음";
+    out_order_errors['-111'] = "수령자 우편번호 없음";
+    out_order_errors['-112'] = "수령자 주소 없음";
+    out_order_errors['-210'] = "상품번호 부정확";
+    out_order_errors['-220'] = "옵션 부정확";
+    out_order_errors['-310'] = "주문 중복";
+    out_order_errors['-320'] = "묶음주문 주문자명 불일치";
+    out_order_errors['-330'] = "묶음주문 주문번호 없음";
+    out_order_errors['-500'] = "시스템오류";
+    out_order_errors['110'] = "재고 부족";
+
 	$(document).ready(function() {
 		gridOptions.api.setRowData([]);
 	});
@@ -169,47 +190,39 @@
 	/**
 	 * @return {boolean}
 	 */
-	function Save() 
-	{
-		//console.log(GridData);
-		//return;
-
+	const Save = async () => {
 		var frm = $('form');
-
-		if(GridData.length === 0){
+		if (GridData.length === 0) {
 			alert('엑셀파일을 입력하여 주십시오.');
 			return false;
-		}
-
-		//console.log(JSON.stringify(GridData));
-		//return false;
-
-		$.ajax({
-			async: false,
-			type: 'post',
-			url: '/head/xmd/store/store01/show',
-			data: {
-				data : JSON.stringify(GridData),
-			},
-			success: function (data) {
-				if( data.code == "200" )
-				{
-					alert("매장 판매일보가 등록(수정)되었습니다.");
-					window.opener.Search();
-					self.close();
-				} 
-				else 
-				{
-					alert("데이터 등록(수정)이 실패하였습니다.");
+		} else {
+			for (let i = 0; i<GridData.length; i++ ) {
+				let row = GridData[i];
+				let rowNode = gridOptions.api.getRowNode(i);
+				try {
+					const response = await axios({ 
+						url: '/store/sale/sal01/update', method: 'post', data: { data: row }
+					});
+					const { data } = response;
+					const code = data?.code;
+					if (code == 200) {
+						rowNode.setDataValue('result', "성공");
+						gx.gridOptions.api.applyTransaction({ update : [row] });
+					} else {
+						if (out_order_errors.hasOwnProperty(code)) {
+                            result = "[" + code + "] " + out_order_errors[code];
+                        } else {
+                            result = "[" + code + "] ";
+                        }
+						rowNode.setDataValue('result', result);
+					}
+				} catch (error) {
+					console.log(error);
 				}
-			},
-			error: function(request, status, error) {
-				alert("시스템 에러입니다. 관리자에게 문의하여 주십시요.11" + request + status + error);
-				console.log("error");
 			}
-		});
-
-	}
+			alert("매장 판매일보가 등록(수정)되었습니다.");
+		}
+	};
 
 	// read the raw data and convert it to a XLSX workbook
 	function convertDataToWorkbook(data) {
@@ -319,13 +332,18 @@
 		$("#gd-total").text(rowData.length);
 	}
 
+	const Clear = () => {
+		gridOptions.api.setRowData([]);
+		$("#gd-total").text(0);
+	};
+
 	function Upload(){
 		var file_data = $('#excelfile').prop('files')[0];
 		var form_data = new FormData();
 		form_data.append('file', file_data);
 		form_data.append('_token', "{{ csrf_token() }}");
 		$.ajax({
-			url: '/head/xmd/store/store01/upload', // point to server-side PHP script
+			url: '/store/sale/sal01/upload', // point to server-side PHP script
 			dataType: 'json',  // what to expect back from the PHP script, if anything
 			cache: false,
 			contentType: false,
