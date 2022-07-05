@@ -219,6 +219,10 @@ class sal01Controller extends Controller
 		 * goods_no 가져오기
 		 */
 		$prd_cd = $order['goods_code'];
+		$store_cd = $order['com_id'];
+		$order['sale_place'] = $order['com_nm'];
+		$order['user_nm'] = $order['ord_nm'] ? $order['ord_nm']: "비회원";
+
 		$sql = /** @lang text */
 		"
 			select goods_no
@@ -226,12 +230,14 @@ class sal01Controller extends Controller
 			where prd_cd = :prd_cd
 		";
 		$result = DB::selectOne($sql, array("prd_cd" => $prd_cd));
-		$order['goods_no'] = $result->goods_no;
-
-		
+		$order['goods_no'] = $result->goods_no;		
 		
 		$order['goods_sub'] = 0;
 		$order['out_ord_no'] = 0;
+
+		$order["ord_amt"] = Lib::uncm($order["ord_amt"]);
+		$order["recv_amt"] = Lib::uncm($order["recv_amt"]);
+		$order["pay_stat"] = 1;
 
 		/**
 		 * 옵션 처리
@@ -251,10 +257,7 @@ class sal01Controller extends Controller
 		}
 		$order['goods_opt'] = $goods_opt;
 		
-		$order['user_nm'] = $order['ord_nm'];
-		$order['sale_place'] = $order['com_nm'];
 
-		
 
 		/**
 		 * validation 추후 처리 할 것 (주문자명, 상품명, 상품코드, 매장명, 매장코드 등등... 아래는 샘플)
@@ -268,9 +271,7 @@ class sal01Controller extends Controller
 			$code = "-106";
 		} else if (@$order["ord_amt"] == "") {
 			$code = "-107";
-		} else if (@$order["ord_nm"] == "") {
-			$code = "-108";	
-		} 
+		}
 
 		// else if (@$order["r_nm"] == "") {
 		// 	$code = "-110";
@@ -282,46 +283,46 @@ class sal01Controller extends Controller
 
 		if ($code === 0) {
 			$stock = new Jaego();
-			if ($stock->IsOption($order["goods_no"], 0, $order["goods_opt"]) == false) {
-				$code = "-220";
-				return ["code" => $code];
-			}
+			// if ($stock->IsOption($order["goods_no"], 0, $order["goods_opt"]) == false) {
+			// 	$code = "-220";
+			// 	return ["code" => $code];
+			// }
 
-			$sql = /** @lang text */
-			"
-				select goods_no, opt_id, ord_no, user_nm
-				from outbound_order
-				where sale_place = :sale_place and out_ord_no = :out_ord_no
-			";
-			$rows = DB::select($sql, array("sale_place" => @$order["sale_place"], "out_ord_no" => $out_ord_no));
-			$ord_seq = 0;
+			// $sql = /** @lang text */
+			// "
+			// 	select goods_no, opt_id, ord_no, user_nm
+			// 	from outbound_order
+			// 	where sale_place = :sale_place and out_ord_no = :out_ord_no
+			// ";
+			// $rows = DB::select($sql, array("sale_place" => @$order["sale_place"], "out_ord_no" => $out_ord_no));
+			// $ord_seq = 0;
 
-			if (count($rows) > 0) {
-				for ($i = 0; $i < count($rows); $i++) {
-					$out_order_row = (array)$rows[$i];
-					if (trim($out_order_row["goods_no"]) == $order["goods_no"] && trim($out_order_row["opt_id"]) == $order["goods_opt"]) {
-						return ["code" => "-310"];
-					} else {
-						$ord_no = $out_order_row["ord_no"];
-					}
-				}
+			// if (count($rows) > 0) {
+			// 	for ($i = 0; $i < count($rows); $i++) {
+			// 		$out_order_row = (array)$rows[$i];
+			// 		if (trim($out_order_row["goods_no"]) == $order["goods_no"] && trim($out_order_row["opt_id"]) == $order["goods_opt"]) {
+			// 			return ["code" => "-310"];
+			// 		} else {
+			// 			$ord_no = $out_order_row["ord_no"];
+			// 		}
+			// 	}
 
-				$sql =
-					/** @lang text */
-				"
-					select user_nm from order_mst
-					where ord_no = :ord_no
-				";
-				$row = (array)DB::selectone($sql, array("ord_no" => $ord_no));
-				if ($row) {
-					if (trim($row["user_nm"]) != $order["user_nm"]) {	// 묶음주문인데 주문자명이 다른 경우 처리
-						return ["code" => "-320"];
-					}
-					$ord_seq++;
-				} else {
-					return ["code" => "-330"];
-				}
-			}
+			// 	$sql =
+			// 		/** @lang text */
+			// 	"
+			// 		select user_nm from order_mst
+			// 		where ord_no = :ord_no
+			// 	";
+			// 	$row = (array)DB::selectone($sql, array("ord_no" => $ord_no));
+			// 	if ($row) {
+			// 		if (trim($row["user_nm"]) != $order["user_nm"]) {	// 묶음주문인데 주문자명이 다른 경우 처리
+			// 			return ["code" => "-320"];
+			// 		}
+			// 		$ord_seq++;
+			// 	} else {
+			// 		return ["code" => "-330"];
+			// 	}
+			// }
 
 			$sql = /** @lang text */
 				"
@@ -351,22 +352,27 @@ class sal01Controller extends Controller
 			/**
 			 * 재고 확인
 			 */
-			$is_stock = true;
-			$good_qty = $stock->GetQty($order["goods_no"], $order["goods_sub"], $order["goods_opt"]);
+			// $is_stock = true;
+			// $good_qty = $stock->GetQty($order["goods_no"], $order["goods_sub"], $order["goods_opt"]);
 
-			if ($is_unlimited == "Y") {
-				if ($good_qty == 0) {
-					$is_stock = false;
-				}
-			} else {
-				if ($order["qty"] > $good_qty) {
-					$is_stock = false;
-				}
-			}
+			// if ($is_unlimited == "Y") {
+			// 	if ($good_qty == 0) {
+			// 		$is_stock = false;
+			// 	}
+			// } else {
+			// 	if ($order["qty"] > $good_qty) {
+			// 		$is_stock = false;
+			// 	}
+			// }
 
 			// 주문 상태
-			$order["ord_state"] = ($is_stock == true) ? "10" : "5";
-			$order["clm_state"] = ($is_stock == true) ? "0" : "0";	// 클레임 : 주문취소 상태
+			// $order["ord_state"] = ($is_stock == true) ? "10" : "5";
+			// $order["clm_state"] = ($is_stock == true) ? "0" : "0";	// 클레임 : 주문취소 상태
+
+			$order["ord_state"] = 10;
+			$order["clm_state"] = 0;
+			$ord_seq = 0;
+			// $is_stock = true;
 
 			try {
 
@@ -382,7 +388,7 @@ class sal01Controller extends Controller
 				if ($ord_seq == 0) {
 					$order_mst = [
 						"ord_no"		=> $ord_no,
-						"store_cd"      => $prd_cd,
+						"store_cd"      => $store_cd,
 						"ord_date"      => DB::raw('now()'),
 						"user_id" 		=> $order["user_id"],
 						"user_nm" 		=> $order["user_nm"],
@@ -472,82 +478,60 @@ class sal01Controller extends Controller
 					"admin_id" 		=> $admin_id,
 					"sales_com_fee" => @$order["sales_com_fee"],
 					"ord_date"      => DB::raw('now()'),
+					'prd_cd'        => $prd_cd
 				];
 				DB::table('order_opt')->insert($order_opt);
 				$ord_opt_no = DB::getPdo()->lastInsertId();
 
-				// ORDER_OPT_WONGA vs CLAIM //////////////////////////////
-				if ($is_stock === true) {
+				/**
+				 * 주문상태 로그
+				 */
+				$state_log = array(
+					"ord_no"		=> $ord_no,
+					"ord_opt_no"	=> $ord_opt_no,
+					"ord_state"		=> $order["ord_state"],
+					"comment" 		=> "매장판매일보",
+					"admin_id" => $admin_id,
+					"admin_nm" => $admin_nm
+				);
+				$orderClass->AddStateLog($state_log);
 
-					/**
-					 * 주문상태 로그
-					 */
-					$state_log = array(
-						"ord_no"		=> $ord_no,
-						"ord_opt_no"	=> $ord_opt_no,
-						"ord_state"		=> $order["ord_state"],
-						"comment" 		=> "매장판매일보",
-						"admin_id" => $admin_id,
-						"admin_nm" => $admin_nm
-					);
-					$orderClass->AddStateLog($state_log);
-
-					// 재고 차감
-					$orderClass->CompleteOrderSugi($ord_opt_no, $order["ord_state"]);
-				} else {
-
-					/**
-					 * 주문상태 로그
-					 */
-					$state_log = array(
-						"ord_no" => $ord_no,
-						"ord_opt_no" => $ord_opt_no,
-						"ord_state" => $order["ord_state"],
-						"comment" => "매장판매일보(품절)",
-						"admin_id" => $admin_id,
-						"admin_nm" => $admin_nm
-					);
-					$orderClass->AddStateLog($state_log);
-
-					// 재고 없는 경우 주문상태 변경
-					$orderClass->OutOfScockAfterPaid();
-				}
+				// 재고 차감
+				$orderClass->CompleteOrderSugi($ord_opt_no, $order["ord_state"]);
 
 				// outbound_order 저장 /////////////////////////////////////////////
 
+				// $out_order = array(
+				// 	"sale_place"	=> @$order["sale_place"],
+				// 	"out_ord_no" 	=> @$order["out_ord_no"],
 
-				$out_order = array(
-					"sale_place"	=> @$order["sale_place"],
-					"out_ord_no" 	=> @$order["out_ord_no"],
+				// 	"pay_date" 		=> @$order["pay_date"],
+				// 	"goods_no" 		=> $order["goods_no"],
+				// 	"goods_nm" 		=> $order["goods_nm"],
+				// 	"opt1" 			=> $order["goods_opt"],
+				// 	"qty" 			=> $order["qty"],
+				// 	"price" 		=> $order["ord_amt"],
 
-					"pay_date" 		=> @$order["pay_date"],
-					"goods_no" 		=> $order["goods_no"],
-					"goods_nm" 		=> $order["goods_nm"],
-					"opt1" 			=> $order["goods_opt"],
-					"qty" 			=> $order["qty"],
-					"price" 		=> $order["ord_amt"],
+				// 	"r_nm" 			=> @$order["r_nm"],
+				// 	"r_zipcode" 	=> @$order["r_zipcode"],
+				// 	"r_addr1" 		=> @$order["r_addr1"],
+				// 	"r_addr2" 		=> @$order["r_addr2"],
+				// 	"r_phone" 		=> @$order["r_phone"],
+				// 	"r_mobile" 		=> @$order["r_mobile"],
+				// 	"dlv_msg" 		=> @$order["dlv_msg"],
 
-					"r_nm" 			=> @$order["r_nm"],
-					"r_zipcode" 	=> @$order["r_zipcode"],
-					"r_addr1" 		=> @$order["r_addr1"],
-					"r_addr2" 		=> @$order["r_addr2"],
-					"r_phone" 		=> @$order["r_phone"],
-					"r_mobile" 		=> @$order["r_mobile"],
-					"dlv_msg" 		=> @$order["dlv_msg"],
+				// 	"user_nm" 		=> $order["user_nm"],
+				// 	"user_phone" 	=> Lib::getValue($order, "phone", ""),
+				// 	"user_mobile" 	=> Lib::getValue($order, "email", ""),
 
-					"user_nm" 		=> $order["user_nm"],
-					"user_phone" 	=> Lib::getValue($order, "phone", ""),
-					"user_mobile" 	=> Lib::getValue($order, "email", ""),
-
-					"opt_id" 		=> $order["goods_opt"],
-					"ord_no" 		=> $ord_no,
-					"ord_opt_no" 	=> $ord_opt_no,
-					"sales_com_fee" => @$order["sales_com_fee"],
-					"dlv_amt" 		=> @$order["dlv_amt"],
-				);
-				DB::table('outbound_order')->insert($out_order);
-
-				$code = ($is_stock) ? 200 : 110;
+				// 	"opt_id" 		=> $order["goods_opt"],
+				// 	"ord_no" 		=> $ord_no,
+				// 	"ord_opt_no" 	=> $ord_opt_no,
+				// 	"sales_com_fee" => @$order["sales_com_fee"],
+				// 	"dlv_amt" 		=> @$order["dlv_amt"],
+				// );
+				// DB::table('outbound_order')->insert($out_order);
+				$code = 200;
 			} catch (Exception $e) {
 				dd($e->getMessage());
 			}
