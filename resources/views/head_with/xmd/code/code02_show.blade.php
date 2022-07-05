@@ -52,7 +52,7 @@
 							<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
 						</div>
 						<div class="fr_box flax_box" style="font-size:12px;font-weight:700;color:#FF0000;">
-							※ 저장 - 자료 없슴:신규등록, 자료 있슴:업데이트
+							※ 저장 - 자료 없음:신규등록, 자료 있음:업데이트
 						</div>
 					</div>
 				</div>

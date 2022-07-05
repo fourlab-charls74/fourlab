@@ -229,7 +229,7 @@ class ord03Controller extends Controller
             }
 
             /**
-            재고 확인
+             * 재고 확인
              */
             $is_stock = true;
             $good_qty = $stock->GetQty($order["goods_no"],$order["goods_sub"],$order["goods_opt"]);
