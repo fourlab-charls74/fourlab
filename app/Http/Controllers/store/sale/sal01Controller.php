@@ -5,13 +5,20 @@ namespace App\Http\Controllers\store\sale;
 use App\Http\Controllers\Controller;
 use App\Components\Lib;
 use App\Components\SLib;
+use App\Models\Jaego;
+use App\Models\Order;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
 class sal01Controller extends Controller
 {
+
+	protected $file;
+	protected $tmp_name;
 
 	//
 	public function index() {
@@ -158,15 +165,13 @@ class sal01Controller extends Controller
 	public function show()
 	{
 
-		$values = [
-		];
+		$values = [];
 
-		return view( Config::get('shop.head.view') . '/xmd/store/store01_show',$values);
+		return view( Config::get('shop.store.view') . '/sale/sal01_show',$values);
 	}
 
 	public function upload(Request $request)
 	{
-
 		if ( 0 < $_FILES['file']['error'] ) {
 			echo json_encode(array(
 				"code" => 500,
@@ -174,219 +179,366 @@ class sal01Controller extends Controller
 			));
 		}
 		else {
-			//$file = sprintf("data/store01/%s", $_FILES['file']['name']);
-			$file = sprintf("data/head/xmd/store/store01/%s", $_FILES['file']['name']);
-			move_uploaded_file($_FILES['file']['tmp_name'], $file);
+
+			/**
+			 * DB 저장이 끝나면 디렉토리 생성(없을 경우) 및 파일 저장
+			 */
+			$save_path = "data/store/sale/sal01/";
+
+			if (!Storage::disk('public')->exists($save_path)) {
+				Storage::disk('public')->makeDirectory($save_path);
+			}
+
+			$file = sprintf("data/store/sale/sal01/%s", $_FILES['file']['name']);
+			$tmp_name = $_FILES['file']['tmp_name'];
+			move_uploaded_file($tmp_name, $file);
+
 			echo json_encode(array(
 				"code" => 200,
 				"file" => $file
 			));
 		}
-
 	}
 
 	public function update(Request $request)
 	{
 		ini_set('max_execution_time', '600');
 		//set_time_limit(0);
+		$order = $request->input('data');
 
-		$error_code		= "200";
-		$result_code	= "";
+		$admin_id = Auth('head')->user()->id;
+        $admin_nm = Auth('head')->user()->name;
+		$ord_type = 14;
+        $ord_no = "";
+        $code = 0;
+        $msg = "";
 
-		$id		= Auth('head')->user()->id;
-		$name	= Auth('head')->user()->name;
+		$order = (array)$order;
 
-		$datas	= $request->input('data');
-		$datas	= json_decode($datas);
+		/**
+		 * goods_no 가져오기
+		 */
+		$prd_cd = $order['goods_code'];
+		$store_cd = $order['com_id'];
+		$order['sale_place'] = $order['com_nm'];
+		$order['user_nm'] = $order['ord_nm'] ? $order['ord_nm']: "비회원";
 
-		if( $datas == "" )
-		{
-			$error_code	= "400";
+		$sql = /** @lang text */
+		"
+			select goods_no
+			from product_stock
+			where prd_cd = :prd_cd
+		";
+		$result = DB::selectOne($sql, array("prd_cd" => $prd_cd));
+		$order['goods_no'] = $result->goods_no;		
+		
+		$order['goods_sub'] = 0;
+		$order['out_ord_no'] = 0;
+
+		$order["ord_amt"] = Lib::uncm($order["ord_amt"]);
+		$order["recv_amt"] = Lib::uncm($order["recv_amt"]);
+		$order["pay_stat"] = 1;
+
+		/**
+		 * 옵션 처리
+		 */
+		$goods_opt = "";
+		$color_nm = @$order['color_nm'];
+		$size_nm = @$order['size_nm'];
+		if ($color_nm && $size_nm) {
+			$goods_opt = $color_nm . "^" . $size_nm;
+		} else {
+			if ($color_nm) {
+				$goods_opt .= $color_nm;
+			}
+			if ($size_nm) {
+				$goods_opt .= $size_nm;
+			}
+		}
+		$order['goods_opt'] = $goods_opt;
+		
+
+
+		/**
+		 * validation 추후 처리 할 것 (주문자명, 상품명, 상품코드, 매장명, 매장코드 등등... 아래는 샘플)
+		 */
+		$out_ord_no = @$order["out_ord_no"];
+		if (@$order["goods_no"] == "") {
+			$code = "-101";
+		} else if (@$order["goods_opt"] == "") {
+			$code = "-102";
+		} else if (@$order["qty"] == "") {
+			$code = "-106";
+		} else if (@$order["ord_amt"] == "") {
+			$code = "-107";
 		}
 
-        //try
-		//{
-           // DB::beginTransaction();
+		// else if (@$order["r_nm"] == "") {
+		// 	$code = "-110";
+		// } else if (@$order["r_zipcode"] == "") {
+		// 	$code = "-111";
+		// } else if (@$order["r_addr"] == "") {
+		// 	$code = "-112";
+		// }
 
-			$insert_cnt	= 0;
-			$insert_sql	= "insert into __tmp_order( ord_no, ord_date, com_type, com_id, com_nm, receipt_no, seq, style_no, opt_kind, brand, goods_code, goods_nm, color, color_nm, size, size_nm, stat_pay_type, goods_sh, price, wonga, sell_type, ord_amt, qty, recv_amt, act_amt, event_cd, pay_fee, store_pay_fee, user_id, ord_nm, ord_nm2, comment, barcode, admin_nm, reg_date ) values ";
+		if ($code === 0) {
+			$stock = new Jaego();
+			// if ($stock->IsOption($order["goods_no"], 0, $order["goods_opt"]) == false) {
+			// 	$code = "-220";
+			// 	return ["code" => $code];
+			// }
 
-			for( $i = 0; $i < count($datas); $i++ )
-			{
-				$data	= (array)$datas[$i];
+			// $sql = /** @lang text */
+			// "
+			// 	select goods_no, opt_id, ord_no, user_nm
+			// 	from outbound_order
+			// 	where sale_place = :sale_place and out_ord_no = :out_ord_no
+			// ";
+			// $rows = DB::select($sql, array("sale_place" => @$order["sale_place"], "out_ord_no" => $out_ord_no));
+			// $ord_seq = 0;
 
-				$ord_date		= $data["ord_date"];
-				$com_type_nm	= $data["com_type_nm"];
-				$com_type		= $this->getTmpCode('com_type', $com_type_nm);
-				$com_id			= $data["com_id"];
-				$com_nm			= "";
-				$receipt_no		= $data["receipt_no"];
-				$seq			= $data["seq"];
-				$style_no		= $data["style_no"];
-				$opt_kind_nm	= $data["opt_kind_nm"];
-				$opt_kind		= $this->getTmpCode('opt_kind_cd', $opt_kind_nm);;
-				$brand_nm		= $data["brand_nm"];
-				$brand			= $this->getTmpCode('brand', $brand_nm);
-				$goods_code		= $data["goods_code"];
-				$goods_nm		= $data["goods_nm"];
-				$color			= $data["color"];
-				$color_nm		= $data["color_nm"];
-				$size			= $data["size"];
-				$size_nm		= $data["size_nm"];
-				$stat_pay_type_nm	= $data["stat_pay_type_nm"];
-				$stat_pay_type	= $this->getTmpCode('stat_pay_type', $stat_pay_type_nm);
-				$goods_sh		= Lib::uncm($data["goods_sh"]);
-				$price			= Lib::uncm($data["price"]);
-				$wonga			= Lib::uncm($data["wonga"]);
-				$sell_type_nm	= $data["sell_type_nm"];
-				$sell_type		= $this->getTmpCode('sell_type', $sell_type_nm);
-				$ord_amt		= Lib::uncm($data["ord_amt"]);
-				$qty			= Lib::uncm($data["qty"]);
-				$recv_amt		= Lib::uncm($data["recv_amt"]);
-				$act_amt		= Lib::uncm($data["act_amt"]);
-				$event_kind_nm	= $data["event_kind_nm"];
-				$event_kind		= $this->getTmpCode('event_cd', $event_kind_nm);
-				$pay_fee		= $data["pay_fee"];
-				$store_pay_fee	= $data["store_pay_fee"];
-				$user_id		= $data["user_id"];
-				$ord_nm			= $data["ord_nm"];
-				$ord_nm2		= $data["ord_nm2"];
-				$comment		= $data["comment"];
-				$barcode		= $data["barcode"];
-				$admin_nm		= $data["admin_nm"];
-				$reg_date		= $data["reg_date"];
+			// if (count($rows) > 0) {
+			// 	for ($i = 0; $i < count($rows); $i++) {
+			// 		$out_order_row = (array)$rows[$i];
+			// 		if (trim($out_order_row["goods_no"]) == $order["goods_no"] && trim($out_order_row["opt_id"]) == $order["goods_opt"]) {
+			// 			return ["code" => "-310"];
+			// 		} else {
+			// 			$ord_no = $out_order_row["ord_no"];
+			// 		}
+			// 	}
 
-				$ord_p_date		= str_replace("-","",$ord_date);
-				$ord_p_seq		= ( strlen($seq) == 2 ) ? "0".$seq:$seq;
+			// 	$sql =
+			// 		/** @lang text */
+			// 	"
+			// 		select user_nm from order_mst
+			// 		where ord_no = :ord_no
+			// 	";
+			// 	$row = (array)DB::selectone($sql, array("ord_no" => $ord_no));
+			// 	if ($row) {
+			// 		if (trim($row["user_nm"]) != $order["user_nm"]) {	// 묶음주문인데 주문자명이 다른 경우 처리
+			// 			return ["code" => "-320"];
+			// 		}
+			// 		$ord_seq++;
+			// 	} else {
+			// 		return ["code" => "-330"];
+			// 	}
+			// }
 
-				$ord_no			= $com_id . $ord_p_date . $receipt_no . $ord_p_seq;
-
-				if( $com_id != "" ){
-					$query	= " select com_nm from __tmp_store where com_id = :com_id ";
-					$row	= DB::selectOne($query, ['com_id' => $com_id]);
-
-					if(!empty($row)){
-						$com_nm	= $row->com_nm;
-					}
+			$sql = /** @lang text */
+				"
+					select
+						a.head_desc, a.goods_nm, a.style_no, a.md_id, a.md_nm, b.com_nm, a.com_id,
+						a.baesong_kind, a.baesong_price, b.pay_fee/100 as com_rate, a.price, a.com_type,
+						a.is_unlimited
+					from goods a left outer join company b on a.com_id  = b.com_id
+					where a.goods_no = :goods_no 
+				";
+			$row = (array)DB::selectone($sql, array("goods_no" => $order["goods_no"]));
+			if ($row) {
+				if (isset($order["goods_nm"]) || $order["goods_nm"] == "") {
+					$order["goods_nm"]	= $row["goods_nm"];
 				}
-
-				$sql_data	= [
-					'ord_no'			=> $ord_no,
-					'ord_date'			=> $ord_date,
-					'com_type'			=> $com_type,
-					'com_id'			=> $com_id,
-					'com_nm'			=> $com_nm,
-					'receipt_no'		=> $receipt_no,
-					'seq'				=> $seq,
-					'style_no'			=> $style_no,
-					'opt_kind'			=> $opt_kind,
-					'brand'				=> $brand,
-					'goods_code'		=> $goods_code,
-					'goods_nm'			=> $goods_nm,
-					'color'				=> $color,
-					'color_nm'			=> $color_nm,
-					'size'				=> $size,
-					'size_nm'			=> $size_nm,
-					'stat_pay_type'		=> $stat_pay_type,
-					'goods_sh'			=> $goods_sh,
-					'price'				=> $price,
-					'wonga'				=> $wonga,
-					'sell_type'			=> $sell_type,
-					'ord_amt'			=> $ord_amt,
-					'qty'				=> $qty,
-					'recv_amt'			=> $recv_amt,
-					'act_amt'			=> $act_amt,
-					'event_kind'		=> $event_kind,
-					'pay_fee'			=> $pay_fee,
-					'store_pay_fee'		=> $store_pay_fee,
-					'user_id'			=> $user_id,
-					'ord_nm'			=> Lib::quote($ord_nm),
-					'ord_nm2'			=> Lib::quote($ord_nm2),
-					'comment'			=> Lib::quote($comment),
-					'barcode'			=> $barcode,
-					'admin_nm'			=> Lib::quote($admin_nm),
-					'reg_date'			=> $reg_date
-				];
-
-
-				$query	= " select count(*) as cnt from __tmp_order where ord_no = :ord_no ";
-				$rows	= DB::selectOne($query, ['ord_no' => $ord_no]);
-
-				if( $rows->cnt == 0 ){
-					//if( $insert_cnt > 0 )	$insert_sql .= ",";
-
-					//$insert_sql	.= " ( '$ord_no', '$ord_date', '$com_type', '$com_id', '$com_nm', '$receipt_no', '$seq', '$style_no', '$opt_kind', '$brand', '$goods_code', '$goods_nm', '$color', '$color_nm', '$size', '$size_nm', '$stat_pay_type', '$goods_sh', '$price', '$wonga', '$sell_type', '$ord_amt', '$qty', '$recv_amt', '$act_amt', '$event_kind', '$pay_fee', '$store_pay_fee', '$user_id', '$ord_nm', '$ord_nm2', '$comment', '$barcode', '$admin_nm', '$reg_date' ) ";
-
-					//$insert_cnt++;
-
-					$sql	= "
-						insert into __tmp_order( ord_no, ord_date, com_type, com_id, com_nm, receipt_no, seq, style_no, opt_kind, brand, goods_code, goods_nm, color, color_nm, size, size_nm, stat_pay_type, goods_sh, price, wonga, sell_type, ord_amt, qty, recv_amt, act_amt, event_cd, pay_fee, store_pay_fee, user_id, ord_nm, ord_nm2, comment, barcode, admin_nm, reg_date )
-						values ( :ord_no, :ord_date, :com_type, :com_id, :com_nm, :receipt_no, :seq, :style_no, :opt_kind, :brand, :goods_code, :goods_nm, :color, :color_nm, :size, :size_nm, :stat_pay_type, :goods_sh, :price, :wonga, :sell_type, :ord_amt, :qty, :recv_amt, :act_amt, :event_kind, :pay_fee, :store_pay_fee, :user_id, :ord_nm, :ord_nm2, :comment, :barcode, :admin_nm, :reg_date )
-					";
-					DB::insert($sql, $sql_data);
-				}
-				else{
-					$sql	= "
-						update __tmp_order set
-							ord_date		= :ord_date,
-							com_type		= :com_type,
-							com_id			= :com_id,
-							com_nm			= :com_nm,
-							receipt_no		= :receipt_no,
-							seq				= :seq,
-							style_no		= :style_no,
-							opt_kind		= :opt_kind,
-							brand			= :brand,
-							goods_code		= :goods_code,
-							goods_nm		= :goods_nm,
-							color			= :color,
-							color_nm		= :color_nm,
-							size			= :size,
-							size_nm			= :size_nm,
-							stat_pay_type	= :stat_pay_type,
-							goods_sh		= :goods_sh,
-							price			= :price,
-							wonga			= :wonga,
-							sell_type		= :sell_type,
-							ord_amt			= :ord_amt,
-							qty				= :qty,
-							recv_amt		= :recv_amt,
-							act_amt			= :act_amt,
-							event_cd		= :event_kind,
-							pay_fee			= :pay_fee,
-							store_pay_fee	= :store_pay_fee,
-							user_id			= :user_id,
-							ord_nm			= :ord_nm,
-							ord_nm2			= :ord_nm2,
-							comment			= :comment,
-							barcode			= :barcode,
-							admin_nm		= :admin_nm,
-							reg_date		= :reg_date
-						where
-							ord_no		= :ord_no
-					";
-					DB::update($sql, $sql_data);
-				}
+				$order["md_id"]		= $row["md_id"];
+				$order["md_nm"]		= $row["md_nm"];
+				$order["com_type"] 	= $row["com_type"];
+				$order["com_id"]	= $row["com_id"];
+				$order["com_nm"] 	= $row["com_nm"];
+				$order["baesong_kind"] =  $row["baesong_kind"];
+				$is_unlimited = $row["is_unlimited"];
+			} else {
+				return ["code" => "-210"];
 			}
 
-			//if( $insert_cnt > 0 )	DB::insert($insert_sql);
+			/**
+			 * 재고 확인
+			 */
+			// $is_stock = true;
+			// $good_qty = $stock->GetQty($order["goods_no"], $order["goods_sub"], $order["goods_opt"]);
 
-			//DB::commit();
-        //}
-		//catch(Exception $e)
-		//{
-        //    DB::rollback();
+			// if ($is_unlimited == "Y") {
+			// 	if ($good_qty == 0) {
+			// 		$is_stock = false;
+			// 	}
+			// } else {
+			// 	if ($order["qty"] > $good_qty) {
+			// 		$is_stock = false;
+			// 	}
+			// }
 
-		//	$result_code	= "500";
-		//	$result_msg		= "데이터 등록/수정 오류";
-		//}
+			// 주문 상태
+			// $order["ord_state"] = ($is_stock == true) ? "10" : "5";
+			// $order["clm_state"] = ($is_stock == true) ? "0" : "0";	// 클레임 : 주문취소 상태
 
+			$order["ord_state"] = 10;
+			$order["clm_state"] = 0;
+			$ord_seq = 0;
+			// $is_stock = true;
 
+			try {
 
-		return response()->json([
-			"code"			=> $error_code,
-			"result_code"	=> $result_code
-		]);
+				$orderClass = new Order([
+					"id" => $admin_id,
+					"name" => $admin_nm
+				]);
+				if ($ord_no === "") {
+					$ord_no = $orderClass->GetNextOrdNo();
+				}
+				$orderClass->SetOrdNo($ord_no);
+
+				if ($ord_seq == 0) {
+					$order_mst = [
+						"ord_no"		=> $ord_no,
+						"store_cd"      => $store_cd,
+						"ord_date"      => DB::raw('now()'),
+						"user_id" 		=> $order["user_id"],
+						"user_nm" 		=> $order["user_nm"],
+						"phone" 		=> Lib::getValue($order, "phone", ""),
+						"mobile" 		=> Lib::getValue($order, "mobile", ""),
+						"email" 	    => Lib::getValue($order, "email", ""),
+						"ord_amt" 		=> $order["ord_amt"],
+						"recv_amt"		=> $order["recv_amt"],
+						"point_amt" 	=> 0,
+						"coupon_amt"	=> 0,
+						"dlv_amt" 		=> @$order["dlv_amt"],
+						"r_nm" 			=> @$order["r_nm"],
+						"r_zipcode" 	=> @$order["r_zipcode"],
+						"r_addr1" 		=> @$order["r_addr1"],
+						"r_addr2" 		=> @$order["r_addr2"],
+						"r_phone" 		=> @$order["r_phone"],
+						"r_mobile" 		=> @$order["r_mobile"],
+						"dlv_msg" 		=> @$order["dlv_msg"],
+						"ord_state" 	=> @$order["ord_state"],
+						"ord_type" 		=> @$order["ord_type"],
+						"ord_kind" 		=> @$order["ord_kind"],
+						"sale_place" 	=> @$order["sale_place"],
+						"out_ord_no" 	=> @$order["out_ord_no"],
+						"upd_date"      => DB::raw('now()'),
+						"dlv_end_date"  => DB::raw('now()'),
+					];
+					DB::table('order_mst')->insert($order_mst);
+
+					$payment = [
+						"ord_no"		=> $ord_no,
+						"pay_type" 		=> @$order["pay_type"],
+						"pay_nm" 		=> $order["user_nm"],
+						"pay_amt" 		=> $order["ord_amt"],
+						"pay_stat" 		=> @$order["pay_stat"],
+						"bank_inpnm" 	=> Lib::getValue($order, "bank_inpnm", ""),
+						"bank_code" 	=> Lib::getValue($order, "bank_code", ""),
+						"bank_number" 	=> Lib::getValue($order, "bank_number", ""),
+						"ord_dm"        => DB::raw('date_format(now(),\'%Y%m%d%H%i%s\')'),
+						"upd_dm"        => DB::raw('date_format(now(),\'%Y%m%d%H%i%s\')'),
+					];
+					DB::table('payment')->insert($payment);
+				} else {
+					DB::table('order_mst')
+						->where('ord_no', '=', $ord_no)
+						->update([
+							'ord_amt' => DB::raw(sprintf("ord_amt + %d", $order["ord_amt"])),
+							'recv_amt' => DB::raw(sprintf("recv_amt + %d", $order["ord_amt"])),
+							'dlv_amt' => DB::raw(sprintf("dlv_amt + %d", $order["ord_amt"])),
+						]);
+
+					DB::table('payment')
+						->where('ord_no', '=', $ord_no)
+						->update([
+							'pay_amt' => $order["ord_amt"]
+						]);
+				}
+
+				$order_opt = [
+					"goods_no"		=> $order["goods_no"],
+					"goods_sub" 	=> $order["goods_sub"],
+					"ord_no" 		=> $ord_no,
+					"ord_seq" 		=> $ord_seq,
+					"head_desc" 	=> Lib::getValue($order, "head_desc", ""),
+					"goods_nm" 		=> $order["goods_nm"],
+					"goods_opt" 	=> $order["goods_opt"],
+					"qty"			=> $order["qty"],
+					"price" 		=> $order["price"],
+					"pay_type"		=> @$order["pay_type"],
+					"dlv_pay_type" 	=> @$order["dlv_pay_type"],
+					"dlv_amt" 		=> @$order["dlv_amt"],
+					"point_amt" 	=> 0,
+					"coupon_amt" 	=> 0,
+					"recv_amt" 		=> $order["ord_amt"],
+					"md_id" 		=> $order["md_id"],
+					"md_nm" 		=> $order["md_nm"],
+
+					"sale_place" 	=> @$order["sale_place"],
+					"ord_state" 	=> $order["ord_state"],
+					"clm_state" 	=> $order["clm_state"],
+					"com_id" 		=> $order["com_id"],
+					"ord_kind" 		=> @$order["ord_kind"],
+					"ord_type" 		=> @$order["ord_type"],
+					"baesong_kind" 	=> $order["baesong_kind"],
+
+					//"dlv_state_date"=> ($order["ord_state"] == "10" ) ? DB::raw('now()') : DB::raw('NULL'),
+					"dlv_comment" 	=> @$order["dlv_comment"],
+					"admin_id" 		=> $admin_id,
+					"sales_com_fee" => @$order["sales_com_fee"],
+					"ord_date"      => DB::raw('now()'),
+					'prd_cd'        => $prd_cd
+				];
+				DB::table('order_opt')->insert($order_opt);
+				$ord_opt_no = DB::getPdo()->lastInsertId();
+
+				/**
+				 * 주문상태 로그
+				 */
+				$state_log = array(
+					"ord_no"		=> $ord_no,
+					"ord_opt_no"	=> $ord_opt_no,
+					"ord_state"		=> $order["ord_state"],
+					"comment" 		=> "매장판매일보",
+					"admin_id" => $admin_id,
+					"admin_nm" => $admin_nm
+				);
+				$orderClass->AddStateLog($state_log);
+
+				// 재고 차감
+				$orderClass->CompleteOrderSugi($ord_opt_no, $order["ord_state"]);
+
+				// outbound_order 저장 /////////////////////////////////////////////
+
+				// $out_order = array(
+				// 	"sale_place"	=> @$order["sale_place"],
+				// 	"out_ord_no" 	=> @$order["out_ord_no"],
+
+				// 	"pay_date" 		=> @$order["pay_date"],
+				// 	"goods_no" 		=> $order["goods_no"],
+				// 	"goods_nm" 		=> $order["goods_nm"],
+				// 	"opt1" 			=> $order["goods_opt"],
+				// 	"qty" 			=> $order["qty"],
+				// 	"price" 		=> $order["ord_amt"],
+
+				// 	"r_nm" 			=> @$order["r_nm"],
+				// 	"r_zipcode" 	=> @$order["r_zipcode"],
+				// 	"r_addr1" 		=> @$order["r_addr1"],
+				// 	"r_addr2" 		=> @$order["r_addr2"],
+				// 	"r_phone" 		=> @$order["r_phone"],
+				// 	"r_mobile" 		=> @$order["r_mobile"],
+				// 	"dlv_msg" 		=> @$order["dlv_msg"],
+
+				// 	"user_nm" 		=> $order["user_nm"],
+				// 	"user_phone" 	=> Lib::getValue($order, "phone", ""),
+				// 	"user_mobile" 	=> Lib::getValue($order, "email", ""),
+
+				// 	"opt_id" 		=> $order["goods_opt"],
+				// 	"ord_no" 		=> $ord_no,
+				// 	"ord_opt_no" 	=> $ord_opt_no,
+				// 	"sales_com_fee" => @$order["sales_com_fee"],
+				// 	"dlv_amt" 		=> @$order["dlv_amt"],
+				// );
+				// DB::table('outbound_order')->insert($out_order);
+				$code = 200;
+			} catch (Exception $e) {
+				dd($e->getMessage());
+			}
+			return response()->json(['code'	=> $code]);
+		} else {
+			return response()->json(['code'	=> $code]);
+		}
 	}
 
 	public function getTmpCode($item, $item_nm)
