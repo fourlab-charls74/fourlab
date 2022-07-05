@@ -281,10 +281,10 @@ class sal01Controller extends Controller
 
 		if ($code === 0) {
 			$stock = new Jaego();
-			if ($stock->IsOption($order["goods_no"], 0, $order["goods_opt"]) == false) {
-				$code = "-220";
-				return ["code" => $code];
-			}
+			// if ($stock->IsOption($order["goods_no"], 0, $order["goods_opt"]) == false) {
+			// 	$code = "-220";
+			// 	return ["code" => $code];
+			// }
 
 			$sql = /** @lang text */
 			"
@@ -350,22 +350,26 @@ class sal01Controller extends Controller
 			/**
 			 * 재고 확인
 			 */
-			$is_stock = true;
-			$good_qty = $stock->GetQty($order["goods_no"], $order["goods_sub"], $order["goods_opt"]);
+			// $is_stock = true;
+			// $good_qty = $stock->GetQty($order["goods_no"], $order["goods_sub"], $order["goods_opt"]);
 
-			if ($is_unlimited == "Y") {
-				if ($good_qty == 0) {
-					$is_stock = false;
-				}
-			} else {
-				if ($order["qty"] > $good_qty) {
-					$is_stock = false;
-				}
-			}
+			// if ($is_unlimited == "Y") {
+			// 	if ($good_qty == 0) {
+			// 		$is_stock = false;
+			// 	}
+			// } else {
+			// 	if ($order["qty"] > $good_qty) {
+			// 		$is_stock = false;
+			// 	}
+			// }
 
 			// 주문 상태
-			$order["ord_state"] = ($is_stock == true) ? "10" : "5";
-			$order["clm_state"] = ($is_stock == true) ? "0" : "0";	// 클레임 : 주문취소 상태
+			// $order["ord_state"] = ($is_stock == true) ? "10" : "5";
+			// $order["clm_state"] = ($is_stock == true) ? "0" : "0";	// 클레임 : 주문취소 상태
+
+			$order["ord_state"] = 10;
+			$order["clm_state"] = 0;
+			// $is_stock = true;
 
 			try {
 
@@ -476,42 +480,21 @@ class sal01Controller extends Controller
 				DB::table('order_opt')->insert($order_opt);
 				$ord_opt_no = DB::getPdo()->lastInsertId();
 
-				// ORDER_OPT_WONGA vs CLAIM //////////////////////////////
-				if ($is_stock === true) {
+				/**
+				 * 주문상태 로그
+				 */
+				$state_log = array(
+					"ord_no"		=> $ord_no,
+					"ord_opt_no"	=> $ord_opt_no,
+					"ord_state"		=> $order["ord_state"],
+					"comment" 		=> "매장판매일보",
+					"admin_id" => $admin_id,
+					"admin_nm" => $admin_nm
+				);
+				$orderClass->AddStateLog($state_log);
 
-					/**
-					 * 주문상태 로그
-					 */
-					$state_log = array(
-						"ord_no"		=> $ord_no,
-						"ord_opt_no"	=> $ord_opt_no,
-						"ord_state"		=> $order["ord_state"],
-						"comment" 		=> "매장판매일보",
-						"admin_id" => $admin_id,
-						"admin_nm" => $admin_nm
-					);
-					$orderClass->AddStateLog($state_log);
-
-					// 재고 차감
-					$orderClass->CompleteOrderSugi($ord_opt_no, $order["ord_state"]);
-				} else {
-
-					/**
-					 * 주문상태 로그
-					 */
-					$state_log = array(
-						"ord_no" => $ord_no,
-						"ord_opt_no" => $ord_opt_no,
-						"ord_state" => $order["ord_state"],
-						"comment" => "매장판매일보(품절)",
-						"admin_id" => $admin_id,
-						"admin_nm" => $admin_nm
-					);
-					$orderClass->AddStateLog($state_log);
-
-					// 재고 없는 경우 주문상태 변경
-					$orderClass->OutOfScockAfterPaid();
-				}
+				// 재고 차감
+				$orderClass->CompleteOrderSugi($ord_opt_no, $order["ord_state"]);
 
 				// outbound_order 저장 /////////////////////////////////////////////
 
@@ -545,8 +528,7 @@ class sal01Controller extends Controller
 					"dlv_amt" 		=> @$order["dlv_amt"],
 				);
 				DB::table('outbound_order')->insert($out_order);
-
-				$code = ($is_stock) ? 200 : 110;
+				$code = 200;
 			} catch (Exception $e) {
 				dd($e->getMessage());
 			}
