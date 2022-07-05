@@ -145,7 +145,7 @@
 </div>
 <script language="javascript">
 	var columns = [
-		{headerName: "#",			field: "num",			filter:true,width:50,valueGetter: function(params) {return params.node.rowIndex+1;},pinned:'left'},
+		{headerName: "#",			field: "num",			filter:true,width:50,valueGetter: function(params) {return params.node.rowIndex+1;}, cellStyle:{"text-align":"right"},pinned:'left'},
 		{headerName:"매장코드",		field:"store_cd",			width:60, cellStyle:{"text-align":"center"},
 			cellRenderer: function(params) {
 				return '<a href="#" onClick="popDetail(\''+ params.data.store_cd +'\')">'+ params.value+'</a>'

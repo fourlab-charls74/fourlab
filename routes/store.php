@@ -52,8 +52,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('std02', 'std02Controller@index');
         Route::get('std02/search', 'std02Controller@search');
         Route::get('std02/show/{store_cd?}', 'std02Controller@show');
+        Route::get('std02/check-code/{storage_cd?}', 'std02Controller@check_code');
 
-        Route::post('std02/add', 'std02Controller@add_store');
+        Route::post('std02/update', 'std02Controller@update_store');
 
         // 창고관리
         Route::get('std03', 'std03Controller@index');

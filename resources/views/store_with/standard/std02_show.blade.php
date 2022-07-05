@@ -175,8 +175,11 @@
 										<tr>
 											<th>판매수수료율</th>
 											<td>
-												<div class="form-inline">
-													<input type="text" name="sale_fee" id="sale_fee" value="{{ @$store->sale_fee }}" class="form-control form-control-sm w-100" />
+												<div class="d-flex flex-column">
+													<div class="d-flex" style="width:100%;line-height:30px;">
+														<input type="text" name="sale_fee" id="sale_fee" value="{{ @$store->sale_fee }}" class="form-control form-control-sm mr-1 w-50" />
+														%
+													</div>
 												</div>
 											</td>
 											<th>중간관리여부</th>
@@ -237,10 +240,10 @@
 											<th>로스인정률</th>
 											<td>
 												<div class="d-flex flex-column">
-                                                    <div class="d-flex" style="width:100%;line-height:30px;">
-    													<input type="text" name="loss_rate" id="deposit_cash" value="{{ @$store->loss_rate }}" class="form-control form-control-sm mr-1 w-50" />
-                                                        %
-                                                    </div>
+													<div class="d-flex" style="width:100%;line-height:30px;">
+														<input type="text" name="loss_rate" id="loss_rate" value="{{ @$store->loss_rate }}" class="form-control form-control-sm mr-1 w-50" />
+														%
+													</div>
 												</div>
 											</td>
 											<th>매장사용여부</th>
@@ -506,7 +509,7 @@
         if( !window.confirm("매장정보를 등록하시겠습니까?") )	return;
 
         axios({
-            url: `/store/standard/std02/add`,
+            url: `/store/standard/std02/update`,
             method: 'post',
             data: frm.serialize(),
         }).then(function (res) {
@@ -523,15 +526,17 @@
         });
     }
 
-    // 창고정보 수정
-    async function updateStorage() {
-        if(!validation('update')) return;
-        if(!window.confirm("창고정보를 수정하시겠습니까?")) return;
+    // 매장정보 수정
+    async function updateStore() {
+		var frm	= $('form[name="f1"]');
+
+		if(!validation('update')) return;
+        if(!window.confirm("매장정보를 수정하시겠습니까?")) return;
 
         axios({
-            url: `/store/standard/std03/update`,
+            url: `/store/standard/std02/update`,
             method: 'put',
-            data: getFormInputData(),
+            data: frm.serialize(),
         }).then(function (res) {
             if(res.data.code === 200) {
                 alert(res.data.msg);
@@ -546,12 +551,12 @@
         });
     }
 
-    // 창고정보 삭제
-    async function deleteStorage() {
-        if(!window.confirm("해당 창고정보를 삭제하시겠습니까?")) return;
+    // 매장정보 삭제
+    async function deleteStore() {
+        if(!window.confirm("매장정보를 삭제하시겠습니까?")) return;
 
         axios({
-            url: `/store/standard/std03/delete/` + f1.storage_cd.value,
+            url: `/store/standard/std02/delete/` + f1.storage_cd.value,
             method: 'delete',
         }).then(function (res) {
             if(res.data.code === 200) {
@@ -566,26 +571,6 @@
             console.log(err);
         });
     }
-
-    // 폼 입력 데이터 반환
-	/*
-    function getFormInputData() {
-        return {
-            storage_cd: f1.storage_cd.value,
-            storage_nm: f1.storage_nm.value,
-            storage_nm_s: f1.storage_nm_s.value,
-            zipcode: f1.zipcode.value,
-            addr1: f1.addr1.value,
-            addr2: f1.addr2.value,
-            phone: f1.phone.value,
-            fax: f1.fax.value,
-            ceo: f1.ceo.value,
-            use_yn: f1.use_yn.value,
-            loss_yn: f1.loss_yn.value,
-            stock_check_yn: f1.stock_check_yn.value,
-        }
-    }
-	*/
 
     // 매장코드 중복체크
     async function checkCode() {
