@@ -58,7 +58,7 @@ CREATE TABLE `product_stock_release` (
     `storage_cd` VARCHAR(30) NOT NULL DEFAULT '0' COMMENT '창고코드',
     `state` INT(11) NOT NULL DEFAULT '0' COMMENT '상태(요청/접수/출고/입고(매장)/거부:10/20/30/40/-10)',
     `exp_dlv_day` VARCHAR(8) DEFAULT NULL COMMENT '출고예정일자',
-    `rel_order` VARCHAR(30) DEFAULT NULL COMMENT '출고차수 - code : REL_ORDER (01 - 25)',
+    `rel_order` VARCHAR(30) DEFAULT NULL COMMENT '출고차수 - 출고예정일자 + code : REL_ORDER (01 - 25)',
     `req_id` VARCHAR(50) DEFAULT NULL COMMENT '요청자',
     `req_rt` DATETIME DEFAULT NULL COMMENT '요청일시',
     `rec_id` VARCHAR(50) DEFAULT NULL COMMENT '접수자',
