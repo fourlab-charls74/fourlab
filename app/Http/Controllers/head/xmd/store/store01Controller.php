@@ -45,12 +45,9 @@ class store01Controller extends Controller
 				code_kind_cd = 'sell_type' and use_yn = 'Y' order by code_seq
 		";
 		$sell_types	= DB::select($sql);
-		
-
 
 		$sql		= " select * from __tmp_code_kind order by code_kind_nm ";
 		$code_kinds	= DB::select($sql);
-
 
 		$values = [
             'sdate'         => $sdate,
@@ -58,7 +55,6 @@ class store01Controller extends Controller
 			'com_types'		=> $com_types,
 			'event_cds'		=> $event_cds,
 			'sell_types'	=> $sell_types,
-
 			'code_kinds'	=> $code_kinds,
 		];
 
