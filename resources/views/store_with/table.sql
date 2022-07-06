@@ -416,11 +416,17 @@ insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_va
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('SALE_KIND','09','브랜드데이10%','','','','Y','9','ceduce','본사_김용남',now(),now());
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('SALE_KIND','10','임직원20%할인(당월 매출 10%)','','','','Y','10','ceduce','본사_김용남',now(),now());
 
+-- code_kind 데이터 추가 출고상태 : REL_TYPE
+insert into `code_kind` (`code_kind_cd`, `code_kind_nm`, `code_kind_nm_eng`, `use_yn`, `type`, `seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_TYPE','[매장관리]출고상태','rel_type','Y',NULL,'0','','본사_김용남',now(),now());
+
 -- code 데이터 추가 출고상태 : REL_TYPE
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_TYPE','F','초도출고','','','','Y','1','ceduce','본사_김용남',now(),now());
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_TYPE','S','판매분출고','','','','Y','2','ceduce','본사_김용남',now(),now());
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_TYPE','R','요청분출고','','','','Y','3','ceduce','본사_김용남',now(),now());
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_TYPE','G','일반출고','','','','Y','4','ceduce','본사_김용남',now(),now());
+
+-- code_kind 데이터 추가 출고차수 : REL_ORDER
+insert into `code_kind` (`code_kind_cd`, `code_kind_nm`, `code_kind_nm_eng`, `use_yn`, `type`, `seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','[매장관리]출고차수','rel_order','Y',NULL,'0','','본사_김용남',now(),now());
 
 -- code 데이터 추가 출고차수 : REL_ORDER
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','01','01','','','','Y','1','ceduce','본사_김용남',now(),now());
