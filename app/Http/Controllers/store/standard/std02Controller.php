@@ -19,7 +19,8 @@ class std02Controller extends Controller
 
 		$values = [
 			'store_types'	=> SLib::getCodes("STORE_TYPE"),	// 매장구분
-			'store_kinds'	=> SLib::getCodes("STORE_KIND")		// 매장종류
+			'store_kinds'	=> SLib::getCodes("STORE_KIND"),	// 매장종류
+			'store_areas'	=> SLib::getCodes("STORE_AREA")		// 매장지역
 		];
 
 		return view( Config::get('shop.store.view') . '/standard/std02',$values);
@@ -34,6 +35,7 @@ class std02Controller extends Controller
 
 		$store_type	= $request->input("store_type");
 		$store_kind	= $request->input("store_kind");
+		$store_area	= $request->input("store_area");
 		$store_nm	= $request->input("store_nm");
 		$store_cd	= $request->input("store_cd");
 		$use_yn		= $request->input("use_yn");			// 사용유무
@@ -46,6 +48,7 @@ class std02Controller extends Controller
 		$where = "";
 		if( $store_type != "" )	$where .= " and a.store_type = '$store_type' ";
 		if( $store_kind != "" )	$where .= " and a.store_kind = '$store_kind' ";
+		if( $store_area != "" )	$where .= " and a.store_area = '$store_area' ";
 		if( $store_nm != "" )	$where .= " and ( a.store_nm like '%" . Lib::quote($store_nm) . "%' or a.store_nm_s like '%" . Lib::quote($store_nm) . "%' ) ";
 		if( $store_cd != "" )	$where .= " and a.com_id = '" . Lib::quote($store_cd) . "' ";
 		if( $use_yn != "" )		$where .= " and a.use_yn = '$use_yn' ";
@@ -73,10 +76,12 @@ class std02Controller extends Controller
 			select
 				a.*,
 				c.code_val as store_type_nm,
-				d.code_val as store_kind_nm
+				d.code_val as store_kind_nm,
+				e.code_val as store_area_nm
 			from store a
 			left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = a.store_type
 			left outer join code d on d.code_kind_cd = 'store_kind' and d.code_id = a.store_kind
+			left outer join code e on e.code_kind_cd = 'store_area' and e.code_id = a.store_area
 			where 1=1 $where
 			$orderby
 			$limit

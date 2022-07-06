@@ -70,6 +70,19 @@
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
+							<label for="">매장지역 :</label>
+							<div class="flax_box">
+								<select name='store_area' class="form-control form-control-sm">
+									<option value=''>전체</option>
+									@foreach ($store_areas as $store_area)
+										<option value='{{ $store_area->code_id }}'>{{ $store_area->code_val }}</option>
+									@endforeach
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
 							<label for="item">사용유무</label>
 							<div class="form-inline form-radio-box">
 								<div class="custom-control custom-radio">
@@ -83,6 +96,9 @@
 							</div>
 						</div>
 					</div>
+				</div>
+
+				<div class="row d-none search-area-ext">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="item">자료수/정렬 :</label>
@@ -151,14 +167,18 @@
 				return '<a href="#" onClick="popDetail(\''+ params.data.store_cd +'\')">'+ params.value+'</a>'
 			}
 		},
-		{headerName:"매장명",		field:"store_nm",		width:150},
+		{headerName:"매장명",		field:"store_nm",		width:150,
+			cellRenderer: function(params) {
+				return '<a href="#" onClick="popDetail(\''+ params.data.store_cd +'\')">'+ params.value+'</a>'
+			}
+		},
 		{headerName:"매장구분",		field:"store_type_nm",	width:90, cellStyle:{"text-align":"center"}},
 		{headerName:"매장종류",		field:"store_kind_nm",	width:100, cellStyle:{"text-align":"center"}},
 		{headerName:"전화",			field:"phone",			width:100},
 		{headerName:"모바일",		field:"mobile",			width:100},
 		{headerName:"FAX",			field:"fax",			width:100},
-		{headerName:"우편번호",		field:"zipcode",		width:100},
-		{headerName:"주소",			field:"addr1",			width:180},
+		{headerName:"지역",			field:"store_area_nm",	width:72, cellStyle:{"text-align":"center"}},
+		{headerName:"주소",			field:"addr1",			width:240},
 		{headerName:"개장일",		field:"sdate",			width:60},
 		{headerName:"폐점일",		field:"edate",			width:60},
 		{headerName:"매니저",		children:[
