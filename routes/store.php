@@ -129,6 +129,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('sal01/upload',	'sal01Controller@upload');
 
         Route::get('sal02','sal02Controller@index');
+        Route::get('sal02/search','sal02Controller@search');
+
         Route::get('sal03','sal03Controller@index');
         Route::get('sal04','sal04Controller@index');
         Route::get('sal05','sal05Controller@index');
