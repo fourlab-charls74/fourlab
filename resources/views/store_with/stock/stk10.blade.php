@@ -26,11 +26,12 @@
 			</div>
 
 			<div class="card-body">
+                <input type='hidden' name='goods_nos' value='' />
 				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
                             <div class="form-group">
-                                <label for="good_types">출고일자</label>
+                                <label>출고일자</label>
                                 <div class="form-inline date-select-inbox">
                                     <div class="docs-datepicker form-inline-inner input_box">
                                         <div class="input-group">
@@ -61,30 +62,47 @@
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="">구분</label>
-							<div class="flax_box">
-								<input type='text' class="form-control form-control-sm search-enter" name='com_nm' value=''>
-							</div>
+							<label for="rel_order">출고차수</label>
+                            <div class="flex_box">
+                                <select name='rel_order' class="form-control form-control-sm">
+                                    <option value=''>전체</option>
+                                    @foreach ($rel_orders as $rel_order)
+                                        <option value='{{ $rel_order->code_id }}'>{{ $rel_order->code_val }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
 						</div>
 					</div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="">출고상태</label>
-                            <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm search-enter" name='com_nm' value=''>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label>출고구분/상태</label>
+                            <div class="flex_box">
+                                <select name='rel_type' class="form-control form-control-sm" style="width: 47%;">
+                                    <option value=''>전체</option>
+                                    @foreach ($rel_types as $rel_type)
+                                        <option value='{{ $rel_type->code_id }}'>{{ $rel_type->code_val }}</option>
+                                    @endforeach
+                                </select>
+                                <span class="text_line" style="width: 6%; text-align: center;">/</span>
+                                <select name='state' class="form-control form-control-sm" style="width: 47%;">
+                                    <option value=''>전체</option>
+                                    @foreach ($rel_states as $key => $value)
+                                        <option value='{{ $key }}'>{{ $value }}</option>
+                                    @endforeach
+                                </select>
                             </div>
-                        </div>
-                    </div>
+						</div>
+					</div>
 				</div>
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="">매장구분</label>
+                            <label for="store_type">매장구분</label>
                             <div class="flex_box">
                                 <select name='store_type' class="form-control form-control-sm">
                                     <option value=''>전체</option>
-                                    @foreach ($com_types as $com_type)
-                                        <option value='{{ $com_type->code_id }}'>{{ $com_type->code_val }}</option>
+                                    @foreach ($store_types as $store_type)
+                                        <option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -92,9 +110,10 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="store_cd">매장</label>
+                            <label for="store_no">매장</label>
                             <div class="form-inline inline_btn_box">
-                                <select id="store_cd" name="store_cd" class="form-control form-control-sm select2-store"></select>
+                                <input type='hidden' id="store_nm" name="store_nm">
+                                <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
                                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                             </div>
                         </div>
@@ -145,7 +164,7 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="style_no">스타일넘버/상품코드</label>
+                            <label for="style_no">스타일넘버/상품번호</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box">
                                     <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="{{ $style_no }}">
@@ -206,7 +225,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
                 <div class="row">
                     <div class="col-lg-4 inner-td">
@@ -256,15 +274,17 @@
                         </div>
                     </div>
                 </div>
-
             </div>
 		</div>
-
-		<div class="resul_btn_wrap mb-3">
-			<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-			<a href="#" onclick="Add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 데이터업로드</a>
-			<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
-		</div>
+        
+        <div class="resul_btn_wrap mb-3">
+            <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+            <a href="/store/stock/stk12" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>초도출고</a>
+            <a href="/store/stock/stk13" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>판매분출고</a>
+            <a href="/store/stock/stk14" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>요청분출고</a>
+            <a href="/store/stock/stk15" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>일반출고</a>
+            <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
+        </div>
 
 	</div>
 </form>
@@ -273,8 +293,14 @@
 	<div class="card-body">
 		<div class="card-title">
 			<div class="filter_wrap">
-				<div class="fl_box">
+				<div class="d-flex justify-content-between">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
+                    <div>
+                        <a href="javascript:void(0);" onclick="" class="btn btn-sm btn-primary shadow-sm">접수</a>
+                        <a href="javascript:void(0);" onclick="" class="btn btn-sm btn-primary shadow-sm">출고</a>
+                        <a href="javascript:void(0);" onclick="" class="btn btn-sm btn-primary shadow-sm">매장입고</a>
+                        <a href="javascript:void(0);" onclick="" class="btn btn-sm btn-primary shadow-sm">거부</a>
+                    </div>
 				</div>
 			</div>
 		</div>
@@ -284,52 +310,68 @@
 	</div>
 </div>
 <script language="javascript">
-	var columns = [
-		{headerName: "#", field: "num",type:'NumType'},
-        {field: "",	headerName: "출고일자"},
-        {field: "",	headerName: "출고상태"},
-        {field: "",	headerName: "구분"},
-        {field: "",	headerName: "매장"},
-        {field: "",	headerName: "상품코드"},
-		{field: "",	headerName: "스타일넘버"},
-		{field: "",	headerName: "상품명"},
-		{field: "",	headerName: "옵션"},
-		{field: "",	headerName: "수량"},
-		{field: "",	headerName: "출고차수"},
-		{field: "",	headerName: "출고예정일자"},
-        {field: "",	headerName: "요청자"},
-        {field: "",	headerName: "요청일시"},
-        {field: "",	headerName: "접수자"},
-        {field: "",	headerName: "접수일시"},
-        {field: "",	headerName: "처리자"},
-        {field: "",	headerName: "처리일시"},
-        {field: "",	headerName: "완료(입고)자"},
-        {field: "",	headerName: "완료(입고)일시"},
-        {field: "nvl",headerName: ""}
-	];
-	function Add()
-	{
-		const url='/head/xmd/store/store01/show';
-		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
-	}
+    const rel_states = {'10': '요청', '20': '접수', '30': '출고', '40': '매장입고', '-10': '거부'};
 
+	let columns = [
+        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {"text-align": "center"}},
+        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null,
+            checkboxSelection: function(params) {
+                return params.data.state === 10; // 요청상태인 출고건만 선택가능
+            },
+        },
+        // 출고일자 값 : 출고상태가 요청/접수 일때 -> 출고예정일자(exp_dlv_day) | 출고상태가 출고/입고 일때 -> 출고처리일자(prc_rt)
+        {field: "dlv_day",	headerName: "출고일자", width: 110, cellStyle: {"text-align": "center"}, 
+            cellRenderer: function(params) {
+                return params.value + (params.data.state < 30 ? ' (예정)' : '');
+            }
+        },
+        {field: "state",	headerName: "출고상태", cellStyle: {"text-align": "center"},
+            cellRenderer: function(params) {
+                return rel_states[params.value];
+            }
+        },
+        {field: "rel_type",	headerName: "구분", width: 80, cellStyle: {"text-align": "center"}},
+        {field: "store_nm",	headerName: "매장", width: 100, cellStyle: {"text-align": "center"}},
+        {field: "storage_nm", headerName: "창고", width: 100, cellStyle: {"text-align": "center"}},
+        {field: "prd_cd", headerName: "상품코드", width: 100, cellStyle: {"text-align": "center"}},
+		{field: "style_no",	headerName: "스타일넘버", cellStyle: {"text-align": "center"}},
+		{field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 200},
+		{field: "goods_opt", headerName: "옵션", width: 70, cellStyle: {"text-align": "center"}},
+		{field: "qty", headerName: "수량", type: "numberType", editable: function(params) {return params.data.state === 10;}, cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};}},
+		{field: "exp_dlv_day", headerName: "출고예정일자", editable: function(params) {return params.data.state === 10;}, cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99", "text-align": "center"} : {"text-align": "center"};}},
+		{field: "rel_order", headerName: "출고차수", editable: function(params) {return params.data.state === 10;}, cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99", "text-align": "center"} : {"text-align": "center"};}},
+        {field: "req_id", headerName: "요청자", cellStyle: {"text-align": "center"}},
+        {field: "req_rt", headerName: "요청일시", width: 110, cellStyle: {"text-align": "center"}},
+        {field: "rec_id", headerName: "접수자", cellStyle: {"text-align": "center"}},
+        {field: "rec_rt", headerName: "접수일시", width: 110, cellStyle: {"text-align": "center"}},
+        {field: "prc_id", headerName: "처리자", cellStyle: {"text-align": "center"}},
+        {field: "prc_rt", headerName: "처리일시", width: 110, cellStyle: {"text-align": "center"}},
+        {field: "fin_id", headerName: "완료(입고)자", cellStyle: {"text-align": "center"}},
+        {field: "fin_rt", headerName: "완료(입고)일시", width: 110, cellStyle: {"text-align": "center"}},
+        {field: "comment", headerName: "메모", width: 200, editable: function(params) {return params.data.state === 10;}, cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};}},
+        {width: 'auto'}
+	];
 </script>
 <script type="text/javascript" charset="utf-8">
-	const pApp = new App('',{
-		gridId:"#div-gd",
-	});
-	let gx;
-	$(document).ready(function() {
-		pApp.ResizeGrid(265);
-		pApp.BindSearchEnter();
-		let gridDiv = document.querySelector(pApp.options.gridId);
-		gx = new HDGrid(gridDiv, columns);
-		Search();
-	});
+    let gx;
+    const pApp = new App('', { gridId: "#div-gd" });
+
+    $(document).ready(function() {
+        pApp.ResizeGrid(275);
+        pApp.BindSearchEnter();
+        let gridDiv = document.querySelector(pApp.options.gridId);
+        gx = new HDGrid(gridDiv, columns);
+        Search();
+
+        // 매장검색
+        $( ".sch-store" ).on("click", function() {
+            searchStore.Open();
+        });
+    });
+
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/store/sale/sal01/search', data,1);
+		gx.Request('/store/stock/stk10/search', data, 1);
 	}
-
 </script>
 @stop

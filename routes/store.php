@@ -149,7 +149,11 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
         Route::get('stk02','stk02Controller@index');
         Route::get('stk11','stk11Controller@index');
+
+        // 출고리스트
         Route::get('stk10','stk10Controller@index');
+        Route::get('stk10/search','stk10Controller@search');
+        
         Route::get('stk12','stk12Controller@index');
         Route::get('stk15','stk15Controller@index');
 
