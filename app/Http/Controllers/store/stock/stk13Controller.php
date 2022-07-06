@@ -10,17 +10,21 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
-class stk12Controller extends Controller
+class stk13Controller extends Controller
 {
 
 	//
 	public function index() {
 
+        $mutable	= now();
+        $sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
+
         $com_types	= [];
         $code_kinds	= [];
 
 		$values = [
-		    'sdate'         => date("Y-m-d"),
+            'sdate'         => $sdate,
+            'edate'         => date("Y-m-d"),
             'com_types'		=> $com_types,
             'code_kinds'	=> $code_kinds,
             'style_no'		=> "",
@@ -31,7 +35,7 @@ class stk12Controller extends Controller
 
 		];
 
-		return view( Config::get('shop.store.view') . '/stock/stk12',$values);
+		return view( Config::get('shop.store.view') . '/stock/stk13',$values);
 	}
 
 	public function search(Request $request)

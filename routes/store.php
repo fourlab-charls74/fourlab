@@ -130,6 +130,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('sal11','sal11Controller@index');
         Route::get('sal12','sal12Controller@index');
         Route::get('sal13','sal13Controller@index');
+        Route::get('sal17','sal17Controller@index');
     });
 
     //매장관리
@@ -143,6 +144,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk11','stk11Controller@index');
         Route::get('stk10','stk10Controller@index');
         Route::get('stk12','stk12Controller@index');
+        Route::get('stk13','stk13Controller@index');
+        Route::get('stk14','stk14Controller@index');
         Route::get('stk15','stk15Controller@index');
 
     });

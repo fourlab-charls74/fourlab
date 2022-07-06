@@ -138,7 +138,7 @@ CREATE TABLE `store` (
     `store_type` varchar(30) NOT NULL COMMENT '매장구분 - code : store_type',
     `store_kind` varchar(30) NOT NULL COMMENT '매장종류 - code : store_kind',
     `store_area` varchar(30) NOT NULL COMMENT '지역코드 - code : store_area',
-    `zipcode` varchar(5) DEFAULT NULL COMMENT '우편번호',
+    `zipcode` varchar(7) DEFAULT NULL COMMENT '우편번호',
     `addr1` varchar(255) DEFAULT NULL COMMENT '주소1',
     `addr2` varchar(100) DEFAULT NULL COMMENT '주소2',
     `phone` varchar(15) DEFAULT NULL COMMENT '전화번호',
@@ -262,7 +262,9 @@ CREATE TABLE `sale_type_store` (
 -- code_kind 데이터 추가 매장구분 : STORE_TYPE
 insert into `code_kind` (`code_kind_cd`, `code_kind_nm`, `code_kind_nm_eng`, `use_yn`, `type`, `seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('STORE_TYPE','[매장관리]매장구분','store type','Y','S','0','admin','본사_김용남',now(),now());
 
+
 -- code 데이터 추가 매장구분 : STORE_TYPE
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('STORE_TYPE','00','본사매장',NULL,NULL,NULL,'Y',NULL,'ceduce','본사_김용남',now(),now());
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('STORE_TYPE','07','편집샵',NULL,NULL,NULL,'Y',NULL,'ceduce','본사_김용남',now(),now());
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('STORE_TYPE','08','피엘라벤',NULL,NULL,NULL,'Y',NULL,'ceduce','본사_김용남',now(),now());
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('STORE_TYPE','10','사입매장',NULL,NULL,NULL,'Y',NULL,'ceduce','본사_김용남',now(),now());
@@ -274,6 +276,10 @@ insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_va
 
 -- code_kind 데이터 추가 매장종류 : STORE_KIND
 insert into `code_kind` (`code_kind_cd`, `code_kind_nm`, `code_kind_nm_eng`, `use_yn`, `type`, `seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('STORE_KIND','[매장관리]매장종류','store kind','Y','S','0','admin','본사_김용남',now(),now());
+
+
+
+
 
 -- code 데이터 추가 매장종류 : STORE_KIND
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('STORE_KIND','02','온라인매장',NULL,NULL,NULL,'Y',NULL,'ceduce','본사_김용남',now(),now());

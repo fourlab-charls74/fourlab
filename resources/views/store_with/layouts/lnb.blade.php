@@ -59,11 +59,8 @@
                 <a href="javascript:;" class="arrow"><i class="bx bx-file fs-18"></i><span>영업관리</span></a>
                 <ul>
                     <li><a href="/store/sale/sal11">배분현황</a></li>
-                    <li><a href="/store/sale/sal15">배분출고확정</a></li>
-                    <li><a href="/store/sale/sal16">매장RT지시등록</a></li>
-                    <li><a href="/store/sale/sal17">매장목표등록</a></li>
+                    <li><a href="/store/sale/sal17">(개)매장목표</a></li>
                     <li><a href="/store/sale/sal18">월별할인적용유형관리</a></li>
-                    <li><a href="/store/sale/sal19">매장확인취소관리</a></li>
                     <li><a href="/store/sale/sal20">LOSS(창고/매장) 등록</a></li>
                 </ul>
             </li>
