@@ -623,7 +623,7 @@
 			}
 			
 			// 중복체크여부 검사
-			if($("[name='store_only']").val() !== "true") return alert("매장코드를 중복체크해주세요.");
+			if($("[name='store_only']").val() !== "true") return alert("매장코드 중복체크를 해주세요.");
 		}
 
 		// 매장명칭 입력여부

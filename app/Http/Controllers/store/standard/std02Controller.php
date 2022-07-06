@@ -151,11 +151,11 @@ class std02Controller extends Controller
 		return response()->json(["code" => $code, "msg" => $msg]);
 	}
 
-	// 매장 등록
+	// 매장 등록/수정
 	public function update_store(Request $request){
 		$id		= Auth('head')->user()->id;
 		$code	= 200;
-		$msg	= "Success";
+		$msg	= "매장정보가 정상적으로 반영되었습니다.";
 
 		try {
 			DB::beginTransaction();
@@ -176,7 +176,7 @@ class std02Controller extends Controller
 				'phone'			=> $request->input('phone'),
 				'fax'			=> $request->input('fax'),
 				'mobile'		=> $request->input('mobile'),
-				'manager_nm'	=> $request->input('manage_nm'),
+				'manager_nm'	=> $request->input('manager_nm'),
 				'manager_mobile'=> $request->input('manager_mobile'),
 				'email'			=> $request->input('email'),
 				'fee'			=> $request->input('fee'),
@@ -220,7 +220,7 @@ class std02Controller extends Controller
 
 			DB::commit();
 
-			return response()->json(["code" => $code, "msg" => $msg]);
+			return response()->json(["code" => $code, "msg" => $msg, "store_cd" => $request->input('store_cd')]);
 
 		} catch(Exception $e){
 
