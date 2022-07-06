@@ -18,7 +18,7 @@
         </div>
         <div class="d-flex">
             <a href="javascript:void(0)" onclick="Cmder('{{ $cmd }}')" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i>저장</a>
-            <a href="javascript:void(0)" onclick="Cmder('delete')" class="btn btn-primary mr-1"><i class="fas fa-trash fa-sm text-white-50 mr-1"></i>삭제</a>
+            {{-- <!--<a href="javascript:void(0)" onclick="Cmder('delete')" class="btn btn-primary mr-1"><i class="fas fa-trash fa-sm text-white-50 mr-1"></i>삭제</a>//--> --}}
             <a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i>닫기</a>
         </div>
     </div>
@@ -175,8 +175,11 @@
 										<tr>
 											<th>판매수수료율</th>
 											<td>
-												<div class="form-inline">
-													<input type="text" name="sale_fee" id="sale_fee" value="{{ @$store->sale_fee }}" class="form-control form-control-sm w-100" />
+												<div class="d-flex flex-column">
+													<div class="d-flex" style="width:100%;line-height:30px;">
+														<input type="text" name="sale_fee" id="sale_fee" value="{{ @$store->sale_fee }}" class="form-control form-control-sm mr-1 w-50" />
+														%
+													</div>
 												</div>
 											</td>
 											<th>중간관리여부</th>
@@ -237,10 +240,10 @@
 											<th>로스인정률</th>
 											<td>
 												<div class="d-flex flex-column">
-                                                    <div class="d-flex" style="width:100%;line-height:30px;">
-    													<input type="text" name="loss_rate" id="deposit_cash" value="{{ @$store->loss_rate }}" class="form-control form-control-sm mr-1 w-50" />
-                                                        %
-                                                    </div>
+													<div class="d-flex" style="width:100%;line-height:30px;">
+														<input type="text" name="loss_rate" id="loss_rate" value="{{ @$store->loss_rate }}" class="form-control form-control-sm mr-1 w-50" />
+														%
+													</div>
 												</div>
 											</td>
 											<th>매장사용여부</th>
@@ -394,6 +397,88 @@
 												</div>
 											</td>
 										</tr>
+										<tr>
+											<th>출고우선순위</th>
+											<td>
+												<div class="flax_box">
+													<select name='priority' class="form-control form-control-sm">
+														<option value=''>전체</option>
+														@foreach ($prioritys as $priority)
+															<option value='{{ $priority->code_id }}' @if(@$store->priority == $priority->code_id) selected @endif>{{ $priority->code_val }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
+											<th>동종업계정보입력</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="competitor_yn_Y" name="competitor_yn" value="Y" @if(@$store->competitor_yn == 'Y') checked @endif />
+														<label class="custom-control-label" for="competitor_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="competitor_yn_N" name="competitor_yn" value="N" @if(@$store->competitor_yn != 'Y') checked @endif />
+														<label class="custom-control-label" for="competitor_yn_N">N</label>
+													</div>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th>POS 사용여부</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="pos_yn_Y" name="pos_yn" value="Y" @if(@$store->pos_yn != 'N') checked @endif />
+														<label class="custom-control-label" for="pos_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="pos_yn_N" name="pos_yn" value="N" @if(@$store->pos_yn == 'N') checked @endif />
+														<label class="custom-control-label" for="pos_yn_N">N</label>
+													</div>
+												</div>
+											</td>
+											<th>타매장재고조회</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="ostore_stock_yn_Y" name="ostore_stock_yn" value="Y" @if(@$store->ostore_stock_yn != 'N') checked @endif />
+														<label class="custom-control-label" for="ostore_stock_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="ostore_stock_yn_N" name="ostore_stock_yn" value="N" @if(@$store->ostore_stock_yn == 'N') checked @endif />
+														<label class="custom-control-label" for="ostore_stock_yn_N">N</label>
+													</div>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th>판매분배분여부</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="sale_dist_yn_Y" name="sale_dist_yn" value="Y" @if(@$store->sale_dist_yn != 'N') checked @endif />
+														<label class="custom-control-label" for="sale_dist_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="sale_dist_yn_N" name="sale_dist_yn" value="N" @if(@$store->sale_dist_yn == 'N') checked @endif />
+														<label class="custom-control-label" for="sale_dist_yn_N">N</label>
+													</div>
+												</div>
+											</td>
+											<th>매장RT여부</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="rt_yn_Y" name="rt_yn" value="Y" @if(@$store->rt_yn != 'N') checked @endif />
+														<label class="custom-control-label" for="rt_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="rt_yn_N" name="rt_yn" value="N" @if(@$store->rt_yn == 'N') checked @endif />
+														<label class="custom-control-label" for="rt_yn_N">N</label>
+													</div>
+												</div>
+											</td>
+										</tr>
 									</tbody>
 								</table>
 							</div>
@@ -411,25 +496,27 @@
 <script type="text/javascript" charset="utf-8">
 
     function Cmder(type) {
-        if(type === "add") addStorage();
-        else if(type === "update") updateStorage();
-        else if(type === "delete") deleteStorage();
+        if( type === "" )				addStore();
+        else if( type === "update" )	updateStore();
+        else if( type === "delete" )	deleteStore();
     }
 
-    // 창고정보 등록
-    async function addStorage() {
-        if(!validation('add')) return;
-        if(!window.confirm("창고정보를 등록하시겠습니까?")) return;
+    // 매장정보 등록
+    async function addStore() {
+		var frm	= $('form[name="f1"]');
+
+        if( !validation('add') )	return;
+        if( !window.confirm("매장정보를 등록하시겠습니까?") )	return;
 
         axios({
-            url: `/store/standard/std03/add`,
+            url: `/store/standard/std02/update`,
             method: 'post',
-            data: getFormInputData(),
+            data: frm.serialize(),
         }).then(function (res) {
             if(res.data.code === 200) {
                 alert(res.data.msg);
                 opener.Search();
-                location.href = "/store/standard/std03/show/" + res.data.data.storage_cd;;
+                location.href = "/store/standard/std02/show/" + res.data.data.store_cd;;
             } else {
                 console.log(res.data);
                 alert("등록 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
@@ -439,15 +526,17 @@
         });
     }
 
-    // 창고정보 수정
-    async function updateStorage() {
-        if(!validation('update')) return;
-        if(!window.confirm("창고정보를 수정하시겠습니까?")) return;
+    // 매장정보 수정
+    async function updateStore() {
+		var frm	= $('form[name="f1"]');
+
+		if(!validation('update')) return;
+        if(!window.confirm("매장정보를 수정하시겠습니까?")) return;
 
         axios({
-            url: `/store/standard/std03/update`,
-            method: 'put',
-            data: getFormInputData(),
+            url: `/store/standard/std02/update`,
+            method: 'post',
+            data: frm.serialize(),
         }).then(function (res) {
             if(res.data.code === 200) {
                 alert(res.data.msg);
@@ -462,12 +551,12 @@
         });
     }
 
-    // 창고정보 삭제
-    async function deleteStorage() {
-        if(!window.confirm("해당 창고정보를 삭제하시겠습니까?")) return;
+    // 매장정보 삭제
+    async function deleteStore() {
+        if(!window.confirm("매장정보를 삭제하시겠습니까?")) return;
 
         axios({
-            url: `/store/standard/std03/delete/` + f1.storage_cd.value,
+            url: `/store/standard/std02/delete/` + f1.storage_cd.value,
             method: 'delete',
         }).then(function (res) {
             if(res.data.code === 200) {
@@ -481,24 +570,6 @@
         }).catch(function (err) {
             console.log(err);
         });
-    }
-
-    // 폼 입력 데이터 반환
-    function getFormInputData() {
-        return {
-            storage_cd: f1.storage_cd.value,
-            storage_nm: f1.storage_nm.value,
-            storage_nm_s: f1.storage_nm_s.value,
-            zipcode: f1.zipcode.value,
-            addr1: f1.addr1.value,
-            addr2: f1.addr2.value,
-            phone: f1.phone.value,
-            fax: f1.fax.value,
-            ceo: f1.ceo.value,
-            use_yn: f1.use_yn.value,
-            loss_yn: f1.loss_yn.value,
-            stock_check_yn: f1.stock_check_yn.value,
-        }
     }
 
     // 매장코드 중복체크
@@ -542,35 +613,53 @@
         }).open();
     }
 
-    // 저장 시 입력값 확인
-    const validation = (cmd) => {
-        if(cmd === "add"){
-            // 창고코드 입력여부
-            if(f1.storage_cd.value.trim() === '') {
-                f1.storage_cd.focus();
-                return alert("창고코드를 입력해주세요.");
-            }
-            
-            // 중복체크여부 검사
-            if($("[name='storage_only']").val() !== "true") return alert("창고코드를 중복체크해주세요.");
-        }
+	// 저장 시 입력값 확인
+	const validation = (cmd) => {
+		if(cmd === "add"){
+			// 매장코드 입력여부
+			if(f1.store_cd.value.trim() === '') {
+				f1.store_cd.focus();
+				return alert("매장코드를 입력해주세요.");
+			}
+			
+			// 중복체크여부 검사
+			if($("[name='store_only']").val() !== "true") return alert("매장코드 중복체크를 해주세요.");
+		}
 
-        // 창고명칭 입력여부
-        if(f1.storage_nm.value.trim() === '') {
-            f1.storage_nm.focus();
-            return alert("창고명칭을 입력해주세요.");
-        }
+		// 매장명칭 입력여부
+		if(f1.store_nm.value.trim() === '') {
+			f1.store_nm.focus();
+			return alert("매장명을 입력해주세요.");
+		}
 
-        // 창고명칭(약칭) 입력여부
-        if(f1.storage_nm_s.value.trim() === '') {
-            f1.storage_nm_s.focus();
-            return alert("창고명칭(약칭)을 입력해주세요.");
-        }
+		// 매장명칭(약칭) 입력여부
+		if(f1.store_nm_s.value.trim() === '') {
+			f1.store_nm_s.focus();
+			return alert("매장명(약칭)을 입력해주세요.");
+		}
 
-        // 주소 입력여부
-        if(f1.zipcode.value === '') return alert("주소를 입력해주세요.");
+		// 매장구분 선택여부
+		if(f1.store_type.selectedIndex == 0) {
+			f1.store_type.focus();
+			return alert("매장구분을 선택해주세요.");
+		}
 
-        return true;
-    }
+		// 매장종류 선택여부
+		if(f1.store_kind.selectedIndex == 0) {
+			f1.store_kind.focus();
+			return alert("매장종류를 선택해주세요.");
+		}
+
+		// 매장지역 선택여부
+		if(f1.store_area.selectedIndex == 0) {
+			f1.store_area.focus();
+			return alert("매장지역을 선택해주세요.");
+		}
+
+		// 주소 입력여부
+		if(f1.zipcode.value === '') return alert("주소를 입력해주세요.");
+
+		return true;
+	}
 </script>
 @stop

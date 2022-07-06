@@ -19,7 +19,8 @@ class std02Controller extends Controller
 
 		$values = [
 			'store_types'	=> SLib::getCodes("STORE_TYPE"),	// 매장구분
-			'store_kinds'	=> SLib::getCodes("STORE_KIND")		// 매장종류
+			'store_kinds'	=> SLib::getCodes("STORE_KIND"),	// 매장종류
+			'store_areas'	=> SLib::getCodes("STORE_AREA")		// 매장지역
 		];
 
 		return view( Config::get('shop.store.view') . '/standard/std02',$values);
@@ -34,6 +35,7 @@ class std02Controller extends Controller
 
 		$store_type	= $request->input("store_type");
 		$store_kind	= $request->input("store_kind");
+		$store_area	= $request->input("store_area");
 		$store_nm	= $request->input("store_nm");
 		$store_cd	= $request->input("store_cd");
 		$use_yn		= $request->input("use_yn");			// 사용유무
@@ -46,6 +48,7 @@ class std02Controller extends Controller
 		$where = "";
 		if( $store_type != "" )	$where .= " and a.store_type = '$store_type' ";
 		if( $store_kind != "" )	$where .= " and a.store_kind = '$store_kind' ";
+		if( $store_area != "" )	$where .= " and a.store_area = '$store_area' ";
 		if( $store_nm != "" )	$where .= " and ( a.store_nm like '%" . Lib::quote($store_nm) . "%' or a.store_nm_s like '%" . Lib::quote($store_nm) . "%' ) ";
 		if( $store_cd != "" )	$where .= " and a.com_id = '" . Lib::quote($store_cd) . "' ";
 		if( $use_yn != "" )		$where .= " and a.use_yn = '$use_yn' ";
@@ -72,11 +75,13 @@ class std02Controller extends Controller
 		$query	= "
 			select
 				a.*,
-				c.code_val as com_type_nm,
-				d.code_val as store_kind_nm
+				c.code_val as store_type_nm,
+				d.code_val as store_kind_nm,
+				e.code_val as store_area_nm
 			from store a
 			left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = a.store_type
 			left outer join code d on d.code_kind_cd = 'store_kind' and d.code_id = a.store_kind
+			left outer join code e on e.code_kind_cd = 'store_area' and e.code_id = a.store_area
 			where 1=1 $where
 			$orderby
 			$limit
@@ -108,13 +113,26 @@ class std02Controller extends Controller
 
 	}
 
-	public function show()
+	public function show($store_cd = '')
 	{
+		$store	= "";
+
+		if($store_cd != '') {
+			$sql = "
+				select * from store
+				where store_cd = :store_cd
+			";
+
+			$store = DB::selectOne($sql, ["store_cd" => $store_cd]);
+		}
+
 		$values = [
-			'cmd'			=> '',
+			"cmd"	=> $store_cd == '' ? "" : "update",
+			"store"	=> $store,
 			'store_types'	=> SLib::getCodes("STORE_TYPE"),
 			'store_kinds'	=> SLib::getCodes("STORE_KIND"),
 			'store_areas'	=> SLib::getCodes("STORE_AREA"),
+			'prioritys'		=> SLib::getCodes("PRIORITY")
 		];
 
 		return view( Config::get('shop.store.view') . '/standard/std02_show',$values);
@@ -138,389 +156,83 @@ class std02Controller extends Controller
 		return response()->json(["code" => $code, "msg" => $msg]);
 	}
 
-	public function view($com_id)
-	{
-
-		//매장구분
-		$sql		= " 
-			select 
-				* from __tmp_code 
-			where 
-			code_kind_cd = 'com_type' and use_yn = 'Y' order by code_seq 
-		";
-		$com_types	= DB::select($sql);
-
-		//매장종류
-		$sql		= " 
-			select 
-				* from __tmp_code 
-			where 
-			code_kind_cd = 'store_kind' and use_yn = 'Y' order by code_seq 
-		";
-		$store_kinds	= DB::select($sql);
-
-		//출고우선순위
-		$sql		= " 
-			select 
-			* from __tmp_code 
-			where 
-			code_kind_cd = 'priority' and use_yn = 'Y' order by code_seq 
-		";
-		$prioritys	= DB::select($sql);
-
-		$sql	= "
-			select
-				a.*, b.*
-			from __tmp_store a
-			left outer join __tmp_store_info b on a.com_id = b.com_id
-			where
-				a.com_id = :com_id
-		";
-		$data	= DB::selectOne($sql, ['com_id' => $com_id]);
-
-		$values = [
-			'com_types'		=> $com_types,
-			'store_kinds'	=> $store_kinds,
-			'prioritys'		=> $prioritys,
-			"com_id"		=> $com_id,
-			'data'			=> $data
-		];
-
-		return view( Config::get('shop.head.view') . '/xmd/code/code02_view',$values);
-	}
-
-	public function upload(Request $request)
-	{
-
-		if ( 0 < $_FILES['file']['error'] ) {
-			echo json_encode(array(
-				"code" => 500,
-				"errmsg" => 'Error: ' . $_FILES['file']['error']
-			));
-		}
-		else {
-			//$file = sprintf("data/code02/%s", $_FILES['file']['name']);
-			$file = sprintf("data/head/xmd/code/code02/%s", $_FILES['file']['name']);
-			move_uploaded_file($_FILES['file']['tmp_name'], $file);
-			echo json_encode(array(
-				"code" => 200,
-				"file" => $file
-			));
-		}
-
-	}
-
-	public function update(Request $request)
-	{
-		$error_code		= "200";
-		$result_code	= "";
-
+	// 매장 등록/수정
+	public function update_store(Request $request){
 		$id		= Auth('head')->user()->id;
-		$name	= Auth('head')->user()->name;
+		$code	= 200;
+		$msg	= "매장정보가 정상적으로 반영되었습니다.";
 
-		$datas	= $request->input('data');
-		$datas	= json_decode($datas);
+		try {
+			DB::beginTransaction();
 
-		if( $datas == "" )
-		{
-			$error_code	= "400";
-		}
+			$where	= [
+				'store_cd'	=> $request->input('store_cd')
+			];
 
-        try 
-		{
-            DB::beginTransaction();
+			$values	= [
+				'store_nm'		=> $request->input('store_nm'),
+				'store_nm_s'	=> $request->input('store_nm_s'),
+				'store_type'	=> $request->input('store_type'),
+				'store_kind'	=> $request->input('store_kind'),
+				'store_area'	=> $request->input('store_area'),
+				'zipcode'		=> $request->input('zipcode'),
+				'addr1'			=> $request->input('addr1'),
+				'addr2'			=> $request->input('addr2'),
+				'phone'			=> $request->input('phone'),
+				'fax'			=> $request->input('fax'),
+				'mobile'		=> $request->input('mobile'),
+				'manager_nm'	=> $request->input('manager_nm'),
+				'manager_mobile'=> $request->input('manager_mobile'),
+				'email'			=> $request->input('email'),
+				'fee'			=> $request->input('fee'),
+				'sale_fee'		=> $request->input('sale_fee'),
+				'md_manage_yn'	=> $request->input('md_manage_yn'),
+				'bank_no'		=> $request->input('bank_no'),
+				'bank_nm'		=> $request->input('bank_nm'),
+				'depositor'		=> $request->input('depositor'),
+				'deposit_cash'	=> $request->input('deposit_cash'),
+				'deposit_coll'	=> $request->input('deposit_coll'),
+				'loss_rate'		=> $request->input('loss_rate'),
+				'sdate'			=> $request->input('sdate'),
+				'edate'			=> $request->input('edate'),
+				'use_yn'		=> $request->input('use_yn'),
+				'ipgo_yn'		=> $request->input('ipgo_yn'),
+				'vat_yn'		=> $request->input('vat_yn'),
+				'biz_no'		=> $request->input('biz_no'),
+				'biz_nm'		=> $request->input('biz_nm'),
+				'biz_ceo'		=> $request->input('biz_ceo'),
+				'biz_zipcode'	=> $request->input('biz_zipcode'),
+				'biz_addr1'		=> $request->input('biz_addr1'),
+				'biz_addr2'		=> $request->input('biz_addr2'),
+				'biz_uptae'		=> $request->input('biz_uptae'),
+				'biz_upjong'	=> $request->input('biz_upjong'),
+				'manage_type'	=> $request->input('manage_type'),
+				'exp_manage_yn'	=> $request->input('exp_manage_yn'),
+				'priority'		=> $request->input('priority'),
+				'competitor_yn'	=> $request->input('competitor_yn'),
+				'pos_yn'		=> $request->input('pos_yn'),
+				'ostore_stock_yn'	=> $request->input('ostore_stock_yn'),
+				'sale_dist_yn'	=> $request->input('sale_dist_yn'),
+				'rt_yn'			=> $request->input('rt_yn'),
+				'point_in_yn'	=> $request->input('point_in_yn'),
+				'point_out_yn'	=> $request->input('point_out_yn'),
+				'reg_date'		=> now(),
+				'mod_date'		=> now(),
+				'admin_id'		=> $id
+			];
 
-			for( $i = 0; $i < count($datas); $i++ )
-			{
-				$data		= (array)$datas[$i];
-	
-				$com_type			= "";
-				$com_type_nm		= $data["com_type_nm"];
-				$com_id				= $data["com_id"];
-				$com_nm				= $data["com_nm"];
-				$store_kind			= "";
-				$store_kind_nm		= $data["store_kind_nm"];
-				$phone				= $data["phone"];
-				$mobile				= $data["mobile"];
-				$fax				= $data["fax"];
-				$zipcode			= $data["zipcode"];
-				$addr				= $data["addr"];
-				$sdate				= $data["sdate"];
-				$edate				= $data["edate"];
-				$manager_nm			= $data["manager_nm"];
-				$manager_sdate		= $data["manager_sdate"];
-				$manager_edate		= $data["manager_edate"];
-				$manager_deposit	= Lib::uncm($data["manager_deposit"]);
-				$manager_fee		= Lib::uncm($data["manager_fee"]);
-				$manager_sfee		= Lib::uncm($data["manager_sfee"]);
-				$deposit_cash		= Lib::uncm($data["deposit_cash"]);
-				$deposit_coll		= Lib::uncm($data["deposit_coll"]);
-				$interior_cost		= Lib::uncm($data["interior_cost"]);
-				$interior_burden	= Lib::uncm($data["interior_burden"]);
-				$fee				= Lib::uncm($data["fee"]);
-				$sale_fee			= $data["sale_fee"];
-				$use_yn				= ($data["use_yn"] == "T")?"Y":"N";
+			DB::table('store')->updateOrInsert($where, $values);
 
-				if( $com_type_nm != "" ){
-					$query		= " select code_id as com_type from __tmp_code where code_kind_cd = 'com_type' and use_yn = 'Y' and code_val = :com_type_nm ";
-					$row		= DB::selectOne($query, ['com_type_nm' => $com_type_nm]);
-					$com_type	= $row->com_type;
-				}
-
-				if( $store_kind_nm != "" ){
-					$query		= " select code_id as store_kind from __tmp_code where code_kind_cd = 'store_kind' and use_yn = 'Y' and code_val = :store_kind_nm ";
-					$row		= DB::selectOne($query, ['store_kind_nm' => $store_kind_nm]);
-					$store_kind	= $row->store_kind;
-				}
-	
-				$query	= " select count(*) as cnt from __tmp_store where com_id = :com_id ";
-				$row	= DB::selectOne($query, ['com_id' => $com_id]);
-
-				$sql_data	= [
-					'com_id'			=> $com_id, 
-					'com_nm'			=> $com_nm, 
-					'com_type'			=> $com_type, 
-					'store_kind'		=> $store_kind, 
-					'phone'				=> $phone, 
-					'mobile'			=> $mobile, 
-					'fax'				=> $fax, 
-					'zipcode'			=> $zipcode, 
-					'addr'				=> $addr, 
-					'sdate'				=> $sdate, 
-					'edate'				=> $edate, 
-					'manager_nm'		=> $manager_nm, 
-					'manager_sdate'		=> $manager_sdate, 
-					'manager_edate'		=> $manager_edate, 
-					'manager_deposit'	=> $manager_deposit, 
-					'manager_fee'		=> $manager_fee, 
-					'manager_sfee'		=> $manager_sfee, 
-					'deposit_cash'		=> $deposit_cash, 
-					'deposit_coll'		=> $deposit_coll, 
-					'interior_cost'		=> $interior_cost, 
-					'interior_burden'	=> $interior_burden, 
-					'fee'				=> $fee, 
-					'sale_fee'			=> $sale_fee, 
-					'use_yn'			=> $use_yn, 
-					'admin_id'			=> $id, 
-					'admin_nm'			=> $name
-				];
-	
-				if( $row->cnt == 0 ){
-					$sql	= "
-						insert into __tmp_store( com_id, com_nm, com_type, store_kind, phone, mobile, fax, zipcode, addr, sdate, edate, manager_nm, manager_sdate, manager_edate, manager_deposit, manager_fee, manager_sfee, deposit_cash, deposit_coll, interior_cost, interior_burden, fee, sale_fee, use_yn, rt, admin_id, admin_nm )
-						values ( :com_id, :com_nm, :com_type, :store_kind, :phone, :mobile, :fax, :zipcode, :addr, :sdate, :edate, :manager_nm, :manager_sdate, :manager_edate, :manager_deposit, :manager_fee, :manager_sfee, :deposit_cash, :deposit_coll, :interior_cost, :interior_burden, :fee, :sale_fee, :use_yn, now(), :admin_id, :admin_nm )
-					";
-					DB::insert($sql, $sql_data);
-				}
-				else{
-					$sql	= "
-						update __tmp_store set
-							com_nm			= :com_nm, 
-							com_type		= :com_type, 
-							store_kind		= :store_kind, 
-							phone			= :phone, 
-							mobile			= :mobile, 
-							fax				= :fax, 
-							zipcode			= :zipcode, 
-							addr			= :addr, 
-							sdate			= :sdate, 
-							edate			= :edate, 
-							manager_nm		= :manager_nm, 
-							manager_sdate	= :manager_sdate, 
-							manager_edate	= :manager_edate, 
-							manager_deposit	= :manager_deposit, 
-							manager_fee		= :manager_fee, 
-							manager_sfee	= :manager_sfee, 
-							deposit_cash	= :deposit_cash, 
-							deposit_coll	= :deposit_coll, 
-							interior_cost	= :interior_cost, 
-							interior_burden	= :interior_burden, 
-							fee				= :fee, 
-							sale_fee		= :sale_fee, 
-							use_yn			= :use_yn,
-							admin_id		= :admin_id,
-							admin_nm		= :admin_nm,
-							ut				= now()
-						where
-							com_id	= :com_id
-					";
-					DB::update($sql, $sql_data);
-				}
-			}
-	
 			DB::commit();
-        }
-		catch(Exception $e) 
-		{
-            DB::rollback();
 
-			$result_code	= "500";
-			$result_msg		= "데이터 등록/수정 오류";
+			return response()->json(["code" => $code, "msg" => $msg, "store_cd" => $request->input('store_cd')]);
+
+		} catch(Exception $e){
+
+			DB::rollback();
+			return response()->json(["code" => '500', 'msg' => "에러가 발생했습니다. 잠시 후 다시시도 해주세요."]);
+
 		}
-
-
-
-		return response()->json([
-			"code"			=> $error_code,
-			"result_code"	=> $result_code
-		]);
-	}
-
-	public function store_update($com_id, Request $request)
-	{
-		$error_code		= "200";
-		$result_code	= "";
-
-		$id		= Auth('head')->user()->id;
-		$name	= Auth('head')->user()->name;
-
-		$store_data	= [
-			'com_id'			=> $com_id,
-			'com_type'			=> $request->input('com_type'),
-			'com_nm'			=> $request->input("com_nm"),
-			'store_kind'		=> $request->input('store_kind_nm'),
-			'phone'				=> $request->input("phone"),
-			'mobile'			=> $request->input("mobile"),
-			'fax'				=> $request->input("fax"),
-			'zipcode'			=> $request->input("zipcode"),
-			'addr'				=> $request->input("addr"),
-			'sdate'				=> $request->input("sdate"),
-			'edate'				=> $request->input("edate"),
-			'manager_nm'		=> $request->input("manager_nm"),
-			'manager_sdate'		=> $request->input("manager_sdate"),
-			'manager_edate'		=> $request->input("manager_edate"),
-			'manager_deposit'	=> $request->input("manager_deposit"),
-			'manager_fee'		=> $request->input("manager_fee"),
-			'manager_sfee'		=> $request->input("manager_sfee"),
-			'deposit_cash'		=> $request->input("deposit_cash"),
-			'deposit_coll'		=> $request->input("deposit_coll"),
-			'interior_cost'		=> $request->input("interior_cost"),
-			'interior_burden'	=> $request->input("interior_burden"),
-			'fee'				=> $request->input("fee"),
-			'sale_fee'			=> $request->input("sale_fee"),
-			'use_yn'			=> $request->input("use_yn"),
-			'admin_id'			=> $id, 
-			'admin_nm'			=> $name,
-
-			'biz_num'			=> $request->input("biz_num"),
-			'biz_name'			=> $request->input("biz_name"),
-			'biz_ceo'			=> $request->input("biz_ceo"),
-			'biz_zipcode'		=> $request->input("biz_zipcode"),
-			'biz_addr1'			=> $request->input("biz_addr1"),
-			'biz_addr2'			=> $request->input("biz_addr2"),
-			'biz_uptae'			=> $request->input("biz_uptae"),
-			'biz_upjong'		=> $request->input("biz_upjong")
-		];
-
-		$store_info_data	= [
-			'com_id'			=> $com_id,
-			'manage_type'		=> $request->input("manage_type"),
-			'exp_manage_yn'		=> $request->input("exp_manage_yn"),
-			'priority'			=> $request->input("priority"),
-			'ocompany_info_yn'	=> $request->input("ocompany_info_yn"),
-			'pos_yn'			=> $request->input("pos_yn"),
-			'ostore_stock_yn'	=> $request->input("ostore_stock_yn"),
-			'sale_dist_yn'		=> $request->input("sale_dist_yn"),
-			'rt_yn'				=> $request->input("rt_yn"),
-			'rt_sdate'			=> $request->input("rt_sdate"),
-			'point_in_yn'		=> $request->input("point_in_yn"),
-			'point_out_yn'		=> $request->input("point_out_yn"),
-			'unpaid_proc_type'	=> $request->input("unpaid_proc_type")
-		];
-
-        try 
-		{
-            DB::beginTransaction();
-
-			$query	= " select count(*) as cnt from __tmp_store_info where com_id = :com_id ";
-			$row	= DB::selectOne($query, ['com_id' => $com_id]);
-	
-			if( $row->cnt == 0 ){
-				$sql	= "
-					insert into __tmp_store_info( com_id, manage_type, exp_manage_yn, priority, ocompany_info_yn, pos_yn, ostore_stock_yn, sale_dist_yn, rt_yn, rt_sdate, point_in_yn, point_out_yn, unpaid_proc_type )
-					values ( :com_id, :manage_type, :exp_manage_yn, :priority, :ocompany_info_yn, :pos_yn, :ostore_stock_yn, :sale_dist_yn, :rt_yn, :rt_sdate, :point_in_yn, :point_out_yn, :unpaid_proc_type )
-				";
-				DB::insert($sql, $store_info_data);
-			}else{
-				$sql	= "
-					update __tmp_store_info set
-						manage_type			= :manage_type, 
-						exp_manage_yn		= :exp_manage_yn, 
-						priority			= :priority, 
-						ocompany_info_yn	= :ocompany_info_yn, 
-						pos_yn				= :pos_yn, 
-						ostore_stock_yn		= :ostore_stock_yn, 
-						sale_dist_yn		= :sale_dist_yn, 
-						rt_yn				= :rt_yn, 
-						rt_sdate			= :rt_sdate, 
-						point_in_yn			= :point_in_yn, 
-						point_out_yn		= :point_out_yn, 
-						unpaid_proc_type	= :unpaid_proc_type
-					where
-						com_id	= :com_id
-				";
-				DB::update($sql, $store_info_data);
-			}
-	
-			$sql	= "
-				update __tmp_store set
-					com_nm			= :com_nm, 
-					com_type		= :com_type, 
-					store_kind		= :store_kind, 
-					phone			= :phone, 
-					mobile			= :mobile, 
-					fax				= :fax, 
-					zipcode			= :zipcode, 
-					addr			= :addr, 
-					sdate			= :sdate, 
-					edate			= :edate, 
-					manager_nm		= :manager_nm, 
-					manager_sdate	= :manager_sdate, 
-					manager_edate	= :manager_edate, 
-					manager_deposit	= :manager_deposit, 
-					manager_fee		= :manager_fee, 
-					manager_sfee	= :manager_sfee, 
-					deposit_cash	= :deposit_cash, 
-					deposit_coll	= :deposit_coll, 
-					interior_cost	= :interior_cost, 
-					interior_burden	= :interior_burden, 
-					fee				= :fee, 
-					sale_fee		= :sale_fee, 
-					use_yn			= :use_yn,
-					admin_id		= :admin_id,
-					admin_nm		= :admin_nm,
-					ut				= now(),
-	
-					biz_num			= :biz_num,
-					biz_name		= :biz_name,
-					biz_ceo			= :biz_ceo,
-					biz_zipcode		= :biz_zipcode,
-					biz_addr1		= :biz_addr1,
-					biz_addr2		= :biz_addr2,
-					biz_uptae		= :biz_uptae,
-					biz_upjong		= :biz_upjong
-				where
-					com_id	= :com_id
-			";
-			DB::update($sql, $store_data);
-		
-			DB::commit();
-        }
-		catch(Exception $e) 
-		{
-            DB::rollback();
-
-			$result_code	= "500";
-			$result_msg		= "데이터 등록/수정 오류";
-		}
-
-
-
-		return response()->json([
-			"code"			=> $error_code,
-			"result_code"	=> $result_code
-		]);
-
 	}
 
 	public function delete($com_id)

@@ -27,7 +27,7 @@ CREATE TABLE `product_stock_store` (
                                  PRIMARY KEY (`goods_no`,`prd_cd`,`store_cd`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='상품재고 매장별';
 
--- 오프라인 재고(매장)
+-- 오프라인 재고(물류)
 CREATE TABLE `product_stock_storage` (
                                  `goods_no` INT(11) NOT NULL DEFAULT '0' COMMENT '상품번호',
                                  `prd_cd` VARCHAR(50) NOT NULL DEFAULT '0' COMMENT '상품코드',
@@ -49,16 +49,17 @@ insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_va
 
 -- 오프라인 출고
 CREATE TABLE `product_stock_release` (
-    `type` VARCHAR(50) DEFAULT NULL COMMENT '분류',
+    `type` VARCHAR(50) DEFAULT NULL COMMENT '분류 - code : REL_TYPE (초도/판매분/요청분/일반 : F/S/R/G)',
     `goods_no` INT(11) NOT NULL DEFAULT '0' COMMENT '상품번호',
     `prd_cd` VARCHAR(50) NOT NULL DEFAULT '0' COMMENT '상품코드',
     `goods_opt` VARCHAR(100) NOT NULL DEFAULT '' COMMENT '상품옵션명',
     `qty` INT(11) DEFAULT NULL COMMENT '수량',
     `store_cd` VARCHAR(30) NOT NULL DEFAULT '0' COMMENT '수령매장코드',
     `storage_cd` VARCHAR(30) NOT NULL DEFAULT '0' COMMENT '창고코드',
-    `state` INT(11) NOT NULL DEFAULT '0' COMMENT '상태(요청/접수/출고/입고(매장):10/20/30/40)',
+    `state` INT(11) NOT NULL DEFAULT '0' COMMENT '상태(요청/접수/출고/입고(매장)/거부:10/20/30/40/-10)',
     `exp_dlv_day` VARCHAR(8) DEFAULT NULL COMMENT '출고예정일자',
-    `rel_order` VARCHAR(30) DEFAULT NULL COMMENT '출고차수',
+    `rel_order` VARCHAR(30) DEFAULT NULL COMMENT '출고차수 - 출고예정일자 + code : REL_ORDER (01 - 25)',
+    `comment` VARCHAR(255) DEFAULT NULL COMMENT '출고메모(거부사유 등)',
     `req_id` VARCHAR(50) DEFAULT NULL COMMENT '요청자',
     `req_rt` DATETIME DEFAULT NULL COMMENT '요청일시',
     `rec_id` VARCHAR(50) DEFAULT NULL COMMENT '접수자',
@@ -83,6 +84,7 @@ CREATE TABLE `product_stock_rotation` (
   `store_cd` VARCHAR(30) NOT NULL DEFAULT '0' COMMENT '수령매장코드',
   `state` INT(11) NOT NULL DEFAULT '0' COMMENT '상태(요청/접수/출고(매장)/입고/거부:10/20/30/40/-10)',
   `exp_dlv_day` VARCHAR(8) DEFAULT NULL COMMENT '출고예정일자',
+  `comment` VARCHAR(255) DEFAULT NULL COMMENT 'RT메모(거부사유 등)',
   `req_id` VARCHAR(50) DEFAULT NULL COMMENT '요청자',
   `req_rt` DATETIME DEFAULT NULL COMMENT '요청일시',
   `rec_id` VARCHAR(50) DEFAULT NULL COMMENT '접수자',
@@ -421,6 +423,45 @@ insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_va
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('SALE_KIND','08','30%할인','','','','Y','8','ceduce','본사_김용남',now(),now());
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('SALE_KIND','09','브랜드데이10%','','','','Y','9','ceduce','본사_김용남',now(),now());
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('SALE_KIND','10','임직원20%할인(당월 매출 10%)','','','','Y','10','ceduce','본사_김용남',now(),now());
+
+-- code_kind 데이터 추가 출고상태 : REL_TYPE
+insert into `code_kind` (`code_kind_cd`, `code_kind_nm`, `code_kind_nm_eng`, `use_yn`, `type`, `seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_TYPE','[매장관리]출고상태','rel_type','Y',NULL,'0','','본사_김용남',now(),now());
+
+-- code 데이터 추가 출고상태 : REL_TYPE
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_TYPE','F','초도출고','','','','Y','1','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_TYPE','S','판매분출고','','','','Y','2','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_TYPE','R','요청분출고','','','','Y','3','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_TYPE','G','일반출고','','','','Y','4','ceduce','본사_김용남',now(),now());
+
+-- code_kind 데이터 추가 출고차수 : REL_ORDER
+insert into `code_kind` (`code_kind_cd`, `code_kind_nm`, `code_kind_nm_eng`, `use_yn`, `type`, `seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','[매장관리]출고차수','rel_order','Y',NULL,'0','','본사_김용남',now(),now());
+
+-- code 데이터 추가 출고차수 : REL_ORDER
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','01','01','','','','Y','1','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','02','02','','','','Y','2','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','03','03','','','','Y','3','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','04','04','','','','Y','4','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','05','05','','','','Y','5','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','06','06','','','','Y','6','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','07','07','','','','Y','7','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','08','08','','','','Y','8','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','09','09','','','','Y','9','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','10','10','','','','Y','10','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','11','11','','','','Y','11','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','12','12','','','','Y','12','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','13','13','','','','Y','13','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','14','14','','','','Y','14','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','15','15','','','','Y','15','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','16','16','','','','Y','16','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','17','17','','','','Y','17','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','18','18','','','','Y','18','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','19','19','','','','Y','19','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','20','20','','','','Y','20','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','21','21','','','','Y','21','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','22','22','','','','Y','22','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','23','23','','','','Y','23','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','24','24','','','','Y','24','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('REL_ORDER','25','25','','','','Y','25','ceduce','본사_김용남',now(),now());
 
 --
 -- 테이블 데이터 추가 종료

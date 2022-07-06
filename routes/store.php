@@ -41,12 +41,20 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
     });
 
+    // 포스
+    Route::prefix("pos")->namespace('pos')->group(function () {
+        Route::get('', 'PosController@index');
+    });
+
     //코드관리
     Route::prefix("standard")->namespace('standard')->group(function () {
         //매장
         Route::get('std02', 'std02Controller@index');
         Route::get('std02/search', 'std02Controller@search');
-        Route::get('std02/show/{com_id?}', 'std02Controller@show');
+        Route::get('std02/show/{store_cd?}', 'std02Controller@show');
+        Route::get('std02/check-code/{storage_cd?}', 'std02Controller@check_code');
+
+        Route::post('std02/update', 'std02Controller@update_store');
 
         // 창고관리
         Route::get('std03', 'std03Controller@index');
@@ -121,6 +129,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('sal01/upload',	'sal01Controller@upload');
 
         Route::get('sal02','sal02Controller@index');
+        Route::get('sal02/search','sal02Controller@search');
+
         Route::get('sal03','sal03Controller@index');
         Route::get('sal04','sal04Controller@index');
         Route::get('sal05','sal05Controller@index');
@@ -142,7 +152,11 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
         Route::get('stk02','stk02Controller@index');
         Route::get('stk11','stk11Controller@index');
+
+        // 출고리스트
         Route::get('stk10','stk10Controller@index');
+        Route::get('stk10/search','stk10Controller@search');
+        
         Route::get('stk12','stk12Controller@index');
         Route::get('stk13','stk13Controller@index');
         Route::get('stk14','stk14Controller@index');

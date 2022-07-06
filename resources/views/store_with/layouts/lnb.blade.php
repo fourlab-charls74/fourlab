@@ -5,7 +5,7 @@
                 <a href="javascript:;" class="arrow waves-effect"><i class="bx bx-package fs-18"></i><span>코드관리</span></a>
                 <ul>
                     <li><a href="/store/standard/std51">(임)공통코드관리</a></li>
-                    <li><a href="/store/standard/std02">(개)매장관리</a></li>
+                    <li><a href="/store/standard/std02">(완)매장관리</a></li>
                     <li><a href="/store/standard/std03">(완)창고관리</a></li>
                     <li><a href="/store/standard/std04">(완)동종업계관리</a></li>
                     <li><a href="/store/standard/std05">(완)판매유형관리</a></li>
@@ -67,8 +67,8 @@
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-file fs-18"></i><span>경영관리</span></a>
                 <ul>
-                    <li><a href="/store/sale/sal01">(개)판매일보</a></li>
-                    <li><a href="/store/sale/sal02">(개)일별판매집계표</a></li>
+                    <li><a href="/store/sale/sal01">(완)판매일보</a></li>
+                    <li><a href="/store/sale/sal02">(개)월별판매집계표</a></li>
                     <li><a href="/store/sale/sal03">(개)기간별 Best/Worst 판매현황</a></li>
                     <li><a href="/store/sale/sal06">(개)매장상품별판매분석</a></li>
                     <li><a href="/store/sale/sal07">(개)상품별 이익현황</a></li>

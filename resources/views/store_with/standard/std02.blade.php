@@ -70,6 +70,19 @@
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
+							<label for="">매장지역 :</label>
+							<div class="flax_box">
+								<select name='store_area' class="form-control form-control-sm">
+									<option value=''>전체</option>
+									@foreach ($store_areas as $store_area)
+										<option value='{{ $store_area->code_id }}'>{{ $store_area->code_val }}</option>
+									@endforeach
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
 							<label for="item">사용유무</label>
 							<div class="form-inline form-radio-box">
 								<div class="custom-control custom-radio">
@@ -83,6 +96,9 @@
 							</div>
 						</div>
 					</div>
+				</div>
+
+				<div class="row d-none search-area-ext">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="item">자료수/정렬 :</label>
@@ -98,8 +114,8 @@
 								<span class="text_line">/</span>
 								<div class="form-inline-inner input_box" style="width:45%;">
 									<select name="ord_field" class="form-control form-control-sm">
-										<option value="a.store_nm" selected>코드명</option>
-										<option value="a.store_cd" >코드아이디</option>
+										<option value="a.store_nm" selected>매장명</option>
+										<option value="a.store_cd" >매장코드</option>
 										<option value="a.reg_date" >등록일</option>
 									</select>
 								</div>
@@ -145,43 +161,38 @@
 </div>
 <script language="javascript">
 	var columns = [
-		{headerName: "#",			field: "num",			filter:true,width:50,valueGetter: function(params) {return params.node.rowIndex+1;},pinned:'left'},
-		{headerName:"매장구분",		field:"com_type_nm",	width:90},
-		{headerName:"매장코드",		field:"com_id",			width:90,
+		{headerName: "#",			field: "num",			filter:true,width:40,valueGetter: function(params) {return params.node.rowIndex+1;}, cellStyle:{"text-align":"center"},pinned:'left'},
+		{headerName:"매장코드",		field:"store_cd",			width:60, cellStyle:{"text-align":"center"},
 			cellRenderer: function(params) {
-				return '<a href="#" onClick="popDetail(\''+ params.data.com_id +'\')">'+ params.value+'</a>'
+				return '<a href="#" onClick="popDetail(\''+ params.data.store_cd +'\')">'+ params.value+'</a>'
 			}
 		},
-		{headerName:"매장명",		field:"com_nm",			width:90},
-		{headerName:"매장종류",		field:"store_kind_nm",	width:100},
+		{headerName:"매장명",		field:"store_nm",		width:150,
+			cellRenderer: function(params) {
+				return '<a href="#" onClick="popDetail(\''+ params.data.store_cd +'\')">'+ params.value+'</a>'
+			}
+		},
+		{headerName:"매장구분",		field:"store_type_nm",	width:90, cellStyle:{"text-align":"center"}},
+		{headerName:"매장종류",		field:"store_kind_nm",	width:100, cellStyle:{"text-align":"center"}},
 		{headerName:"전화",			field:"phone",			width:100},
 		{headerName:"모바일",		field:"mobile",			width:100},
 		{headerName:"FAX",			field:"fax",			width:100},
-		{headerName:"우편번호",		field:"zipcode",		width:100},
-		{headerName:"주소",			field:"addr",			width:100},
-		{headerName:"개장일",		field:"sdate",			width:100},
-		{headerName:"폐점일",		field:"edate",			width:100},
+		{headerName:"지역",			field:"store_area_nm",	width:72, cellStyle:{"text-align":"center"}},
+		{headerName:"주소",			field:"addr1",			width:240},
+		{headerName:"개장일",		field:"sdate",			width:60},
+		{headerName:"폐점일",		field:"edate",			width:60},
 		{headerName:"매니저",		children:[
 			{headerName:"매니저명",	field:"manager_nm",		width:100},
-			{headerName:"시작일",	field:"manager_sdate",	width:100},
-			{headerName:"종료일",	field:"manager_edate",	width:100},
-		]},
-		{headerName:"매니저보증금",	field:"manager_deposit",width:100, type: 'currencyType'},
-		{headerName:"매니저수수료",	children:[
-			{headerName:"정상",		field:"manager_fee",	width:100, type: 'currencyType'},
-			{headerName:"행사",		field:"manager_sfee",	width:100, type: 'currencyType'},
+			{headerName:"연락처",	field:"manager_mobile",	width:100},
 		]},
 		{headerName:"보증금",		children:[
-			{headerName:"현금",		field:"deposit_cash",	width:100, type: 'currencyType'},
-			{headerName:"담보",		field:"deposit_coll",	width:100, type: 'currencyType'},
+			{headerName:"매장",		field:"deposit_cash",	width:72, type: 'currencyType'},
+			{headerName:"담보",		field:"deposit_coll",	width:72, type: 'currencyType'},
 		]},
-		{headerName:"인테리어",		children:[
-			{headerName:"비용",		field:"interior_cost",	width:100, type: 'currencyType'},
-			{headerName:"부담",		field:"interior_burden",width:100, type: 'currencyType'},
-		]},
-		{headerName:"기본수수료",	field:"fee",			width:100, type: 'currencyType'},
-		{headerName:"판매수수료율",	field:"sale_fee",		width:100, cellStyle:{"text-align":"right"}},
-		{headerName:"사용여부",		field:"use_yn",			width:90}
+		{headerName:"기본수수료",	field:"fee",			width:80, type: 'currencyType'},
+		{headerName:"판매수수료율",	field:"sale_fee",		width:84, cellStyle:{"text-align":"right"}},
+		{headerName:"사용여부",		field:"use_yn",			width:60, cellStyle:{"text-align":"center"}},
+		{headerName:"",				field:"",				width:"auto"}
 	];
 
 	function Add()
@@ -190,8 +201,8 @@
 		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
 	}
 
-	function popDetail(com_id){
-		const url='/store/standard/std02/view/' + com_id;
+	function popDetail(store_cd){
+		const url='/store/standard/std02/show/' + store_cd;
 		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
 	}
 
