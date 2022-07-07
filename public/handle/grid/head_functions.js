@@ -201,6 +201,7 @@ function openCouponDetail(type = "add", no = "") {
     );
 }
 
+
 function sortnumber(n1, n2) {
     if (n1 === null && n2 === null) {
         return 0;

@@ -125,55 +125,32 @@
 
 	// const qty column
 
-
 	var columns = [
 		{headerName: "#", field: "num",type:'NumType'},
-		{field: "com_type_nm",	headerName: "매장구분",		width:90},
-		{field: "store_cd",		headerName: "매장코드",		width:90},
-		{field: "store_nm",		headerName: "매장명",		width:130},
-		{field: "",	headerName: "목표",	        width:85},
-        {field: "",			headerName: "달성율(%)",		width:85},
-		{field: "",	headerName: "합계",	        width:85,
+		{field: "store_type_nm",headerName: "매장구분"},
+		{field: "store_cd",	headerName: "매장코드"},
+		{field: "store_nm",	headerName: "매장명", type: 'StoreNameType'},
+		{field: "proj_amt",	headerName: "목표",type: 'numberType'},
+        {field: "",	headerName: "달성율(%)"},
+		{field: "",	headerName: "합계",
             children: [
                 {headerName: "오프라인", field: "", type: 'numberType'},
                 {headerName: "온라인", field: "", type: 'currencyType'},
-                {headerName: "소계", field: "qty", type: 'currencyType'}
+                {headerName: "주문수량", field: "qty", type: 'currencyType'},
+                {headerName: "주문금액", field: "ord_amt", type: 'currencyType'},
+                {headerName: "결제금액", field: "recv_amt", type: 'currencyType'}
             ]
         },
         {
             headerName: "기간",
             children: [
-                {field: "1_qty", headerName: "1	(일)",headerClass:'hd-grid-red'},
-                {field: "2_qty", headerName: "2	(월)"},
-                {field: "3_qty", headerName: "3	(화)"},
-                {field: "4_qty", headerName: "4	(수)"},
-                {field: "5_qty", headerName: "5	(목)"},
-                {field: "6_qty", headerName: "6	(금)"},
-                {field: "7_qty", headerName: "7	(토)",headerClass:'hd-grid-red'},
-                {field: "8_qty", headerName: "8	(일)",headerClass:'hd-grid-red'},
-                {field: "9_qty", headerName: "9	(월)"},
-                {field: "10_qty", headerName: "10 (화)"},
-                {field: "11_qty", headerName: "11 (수)"},
-                {field: "12_qty", headerName: "12 (목)"},
-                {field: "13_qty", headerName: "13 (금)"},
-                {field: "14_qty", headerName: "14 (토)",headerClass:'hd-grid-red'},
-                {field: "15_qty", headerName: "15 (일)",headerClass:'hd-grid-red'},
-                {field: "16_qty", headerName: "16 (월)"},
-                {field: "17_qty", headerName: "17 (화)"},
-                {field: "18_qty", headerName: "18 (수)"},
-                {field: "19_qty", headerName: "19 (목)"},
-                {field: "20_qty", headerName: "20 (금)"},
-                {field: "21_qty", headerName: "21 (토)",headerClass:'hd-grid-red'},
-                {field: "22_qty", headerName: "22 (일)",headerClass:'hd-grid-red'},
-                {field: "23_qty", headerName: "23 (월)"},
-                {field: "24_qty", headerName: "24 (화)"},
-                {field: "25_qty", headerName: "25 (수)"},
-                {field: "26_qty", headerName: "26 (목)"},
-                {field: "27_qty", headerName: "27 (금)"},
-                {field: "28_qty", headerName: "28 (토)",headerClass:'hd-grid-red'},
-                {field: "29_qty", headerName: "29 (일)",headerClass:'hd-grid-red'},
-                {field: "30_qty", headerName: "30 (월)"},
-                {field: "31_qty", headerName: "31 (화)"}
+                @foreach($months as $month)
+                    @if($month["week"] == 'Sat' || $month["week"] == 'Sun')
+                        {field: "{{$month["day"]}}_qty", headerName: "{{$month["day"]}} ({{$month["week"]}})",headerClass:'hd-grid-red'},
+                    @else
+                        {field: "{{$month["day"]}}_qty", headerName: "{{$month["day"]}} ({{$month["week"]}})"},
+                    @endif
+                @endforeach
             ]
         },
         {headerName: "", field: "nvl", width: "auto"}
@@ -184,7 +161,7 @@
 	});
 	let gx;
 	$(document).ready(function() {
-		
+
 		pApp.ResizeGrid(265);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
@@ -192,7 +169,7 @@
 		Search();
 
 	});
-	
+
 	const yoil = {
 		codes: [],
 		format: ["일", "월", "화", "수", "목", "금", "토"],
@@ -214,7 +191,7 @@
 	// 	}
 	// };
 
-	const formatDay = (e) => { 
+	const formatDay = (e) => {
 		yoil.codes = e.head.yoil_codes
 		const columns = yoil.codes.map((code, index) => {
 			const day = index + 1;
@@ -230,7 +207,7 @@
 		gx.Request('/store/sale/sal02/search', data, 1, (e) => formatDay(e));
 	}
 
-	
+
 
 </script>
 @stop

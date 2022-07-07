@@ -115,6 +115,12 @@ function openCouponDetail(type='add',no='') {
     window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
 }
 
+function openStore(store_cd){
+    const url='/store/standard/std02/show/' + store_cd;
+    window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
+}
+
+
 function sortnumber(n1,n2){
     if (n1 === null && n2 === null) {
         return 0;

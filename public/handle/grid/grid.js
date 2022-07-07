@@ -219,6 +219,14 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
                         return eOuterDiv;
                     }
                 }
+            },
+            StoreNameType:{
+                width:200,
+                cellRenderer: function (params) {
+                    if (params.value !== undefined) {
+                        return '<a href="#" onclick="return openStore(\'' + params.data.store_cd + '\');">' + params.value + '</a>';
+                    }
+                }
             }
         },
 
