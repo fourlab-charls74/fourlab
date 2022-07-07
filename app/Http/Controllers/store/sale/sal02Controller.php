@@ -63,15 +63,24 @@ class sal02Controller extends Controller
 		$sell_type = $request->input('sell_type');
 
 		$max_day = 31;
+
 		$sum_qty = "";
 		$sum_price = "";
 		$sum_recv_amt = "";
+
+		
+		$yoil_codes = [];
 		for ($i = 0; $i < $max_day; $i++) {
 			$day = $i + 1;
 			$comma = ($day == 31) ? "" : ",";
 			$sum_qty .= "sum(if(day(m.ord_date) = ${day}, o.qty, 0)) as ${day}_qty${comma}";
 			$sum_price .= "sum(if(day(m.ord_date) = ${day}, o.price, 0)) as ${day}_price${comma}";
 			$sum_recv_amt .= "sum(if(day(m.ord_date) = ${day}, o.recv_amt, 0)) as ${day}_recv_amt${comma}";
+
+			// 해당 월의 모든 요일 구하기
+			$day = sprintf("%02d", $day);
+			$day = $sdate . "-${day}";
+			$yoil_codes[$i] = date('w', strtotime($day));
 		}
 
 		$sql = /** @lang text */
@@ -93,7 +102,8 @@ class sal02Controller extends Controller
 		return response()->json([
             "code" => 200,
             "head" => array(
-                "total" => count($rows)
+                "total" => count($rows),
+				"yoil_codes" => $yoil_codes
             ),
             "body" => $rows
         ]);
