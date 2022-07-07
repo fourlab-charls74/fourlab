@@ -285,6 +285,37 @@ function StyleOrdNo(params){
     }
 }
 
+var _styleGoodsNoCnt = 0;
+var _styleColorGIndex = -1;
+function StyleGoodsNo(params){
+    if(params.value !== undefined){
+        var colors = {
+            0:"#FFFFE6",
+            1:"#F0FFE6",
+        }
+        var rowIndex = params.node.rowIndex;
+        if(rowIndex > 0 && params.data.goods_no_bg_color === undefined){
+            var rowNode = params.api.getDisplayedRowAtIndex(rowIndex-1);
+            if( params.value == rowNode.data.goods_no){
+                _styleColorGIndex = _styleGoodsNoCnt % 2;
+                params.data['goods_no_bg_color'] = colors[_styleColorGIndex];
+                rowNode.data['goods_no_bg_color'] = colors[_styleColorGIndex];
+                //gridOptions.api.redrawRows({rowNodes:[rowNode]});
+            } else {
+                if(_styleColorGIndex >= 0){
+                    _styleGoodsNoCnt++;
+                    _styleColorGIndex = -1;
+                }
+            }
+        }
+        if(params.data.goods_no_bg_color !== undefined || params.data.goods_no_bg_color != '') {
+            return {
+                'background-color': params.data.goods_no_bg_color
+            }
+        }
+    }
+}
+
 const StyleEditCell = {
     'background' : '#ffff99',
     'border-right' : '1px solid #e0e7e7'

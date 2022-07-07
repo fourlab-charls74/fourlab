@@ -49,7 +49,8 @@
                     <h4>검색</h4>
                     <div>
                         <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                        <a href="#" onclick="AddProduct();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
+                        <a href="#" onclick="AddProduct();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 상품코드 등록</a>
+                        <a href="#" onclick="AddProduct();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx fs-16"></i> 상품매칭</a>
                         <a href="#" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
                         <a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
                         <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
@@ -290,7 +291,8 @@
             </div>
             <div class="resul_btn_wrap mb-3">
                 <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                <a href="#" onclick="Cmder('add')" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
+                <a href="#" onclick="Cmder('add')" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 상품코드 등록</a>
+                <a href="#" onclick="Cmder('add')" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx fs-16"></i> 상품매칭</a>
                 <a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
                 <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
             </div>
@@ -306,7 +308,13 @@
                         <div class="fl_box">
                             <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                         </div>
-                        <div class="fr_box">
+                        <div class="fr_box flax_box">
+                            <span style="font-weight:500;line-height:30px;margin-left:5px;vertical-align:middle;" class="mr-1">선택한 상품을 상품번호</span>
+                            <div>
+                                <input type="text" id="goods_no" class="form-control form-control-sm" name="goods_no" value="">
+                            </div>
+                            <span style="font-weight:500;line-height:30px;margin-left:5px;vertical-align:middle;" class="mr-1">로</span>
+                            <a href="#" onclick="Save();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>매칭</a>
                         </div>
                     </div>
                 </div>
@@ -319,57 +327,59 @@
     <style>
         /* 전시카테고리 상품 이미지 사이즈 픽스 */
         .img {
-            height:40px;
+            height:30px;
         }
     </style>
     <script language="javascript">
         const columns = [
-            {headerName: '#', pinned: 'left', type: 'NumType', width:40, cellStyle: {"line-height": "40px"}},
+            {headerName: '#', pinned: 'left', type: 'NumType', width:40, cellStyle: {"line-height": "30px"}},
             {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, pinned: 'left', sort: null},
+            {field: "prd_cd", headerName: "상품코드", width:120, pinned: 'left', cellStyle: {"line-height": "30px"}},
             {
                 field: "goods_no",
                 headerName: "상품번호",
                 width: 58,
                 pinned: 'left',
-                cellStyle: {"line-height": "40px"},
-                cellRenderer: function (params) {
-                    if (params.value) {
-                        return `<a href="{{config('shop.front_url')}}/app/product/detail/${params.value}" target="_blank">${params.value}</a>`
-                    }
-                }
+                cellStyle:StyleGoodsNo,
             },
             {field: "goods_type", headerName: "상품구분", width: 58, pinned: 'left', type: 'StyleGoodsTypeNM'},
-            {field: "com_nm", headerName: "업체", width:84, cellStyle: {"line-height": "40px"}},
-            {field: "opt_kind_nm", headerName: "품목", width:96, cellStyle: {"line-height": "40px"}},
-            {field: "brand_nm", headerName: "브랜드", cellStyle: {"line-height": "40px"}},
-            {field: "full_nm", headerName: "대표카테고리", cellStyle: {"line-height": "40px"}},
-            {field: "style_no", headerName: "스타일넘버", editable: true, cellStyle: {"line-height": "40px", 'background' : '#ffff99'}},
-            {field: "head_desc", headerName: "상단홍보글", editable: true, cellStyle: {"line-height": "40px", 'background' : '#ffff99'}},
-            {field: "img", headerName: "이미지", type: 'GoodsImageType', width:60, cellStyle: {"line-height": "40px"}, surl:"{{config('shop.front_url')}}"},
+            {field: "opt_kind_nm", headerName: "품목", width:70, cellStyle: {"line-height": "30px"}},
+            {field: "brand_nm", headerName: "브랜드", cellStyle: {"line-height": "30px"}},
+            {field: "style_no", headerName: "스타일넘버", cellStyle: {"line-height": "30px"}},
+            {field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}"},
             {field: "img", headerName: "이미지_url", hide: true},
-            {field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', width: 230, editable: true, cellStyle: {"line-height": "40px", 'background' : '#ffff99'}},
-            {field: "goods_nm_eng", headerName: "상품명(영문)", width: 230, cellStyle: {"line-height": "40px"}},
+            {field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', width: 230, cellStyle: {"line-height": "30px"}},
+            {field: "goods_nm_eng", headerName: "상품명(영문)", width: 230, cellStyle: {"line-height": "30px"}},
             {field: "sale_stat_cl", headerName: "상품상태", width:70, type: 'GoodsStateTypeLH50'},
-            {field: "prd_cd", headerName: "상품코드", cellStyle: {"line-height": "40px"}},
-            {field: "goods_opt", headerName: "옵션", cellStyle: {"line-height": "40px"}},
-            {field: "barcode", headerName: "바코드", cellStyle: {"line-height": "40px"}},
-            {
-                field: "wqty", headerName: "보유재고수", width:70, type: 'numberType', cellStyle: {"line-height": "40px"},
-                cellRenderer: function(params) {
-                    if (params.value !== undefined) {
-                        return '<a href="#" onclick="return openHeadStock(' + params.data.goods_no + ',\'\');">' + params.value + '</a>';
-                    }
-                }
-            },
-            {field: "normal_price", headerName: "정상가", type: 'currencyType', cellStyle: {"line-height": "40px"}},
-            {field: "price", headerName: "판매가", editable: true, type: 'currencyType', width:60, cellStyle: {"line-height": "40px", 'background' : '#ffff99'}},
-            {field: "wonga", headerName: "원가", type: 'currencyType', width:60, cellStyle: {"line-height": "40px"}},
-            {field: "margin_rate", headerName: "마진율", type: 'percentType', width:60, cellStyle: {"line-height": "40px"}},
-            {field: "margin_amt", headerName: "마진액", type: 'numberType', width:60, cellStyle: {"line-height": "40px"}},
-            {field: "org_nm", headerName: "원산지", cellStyle: {"line-height": "40px"}},
-            {field: "make", headerName: "제조업체", cellStyle: {"line-height": "40px"}},
-            {field: "reg_dm", headerName: "등록일자", width:110, cellStyle: {"line-height": "40px"}},
-            {field: "upd_dm", headerName: "수정일자", width:110, cellStyle: {"line-height": "40px"}}
+            {field: "goods_opt", headerName: "옵션", width:150, cellStyle: {"line-height": "30px"}},
+			{
+				field: "wqty", headerName: "창고재고", width:70, type: 'numberType', cellStyle: {"line-height": "30px"},
+				cellRenderer: function(params) {
+					if (params.value !== undefined) {
+						return '<a href="#" onclick="return openHeadStock(' + params.data.goods_no + ',\'\');">' + params.value + '</a>';
+					}
+				}
+			},
+			{
+				field: "wqty", headerName: "매장재고", width:70, type: 'numberType', cellStyle: {"line-height": "30px"},
+				cellRenderer: function(params) {
+					if (params.value !== undefined) {
+						return '<a href="#" onclick="return openHeadStock(' + params.data.goods_no + ',\'\');">' + params.value + '</a>';
+					}
+				}
+			},
+            {field: "normal_price", headerName: "정상가", type: 'currencyType', cellStyle: {"line-height": "30px"}},
+            {field: "price", headerName: "판매가", type: 'currencyType', width:60, cellStyle: {"line-height": "30px"}},
+            {field: "wonga", headerName: "원가", type: 'currencyType', width:60, cellStyle: {"line-height": "30px"}},
+            {field: "margin_rate", headerName: "마진율", type: 'percentType', width:60, cellStyle: {"line-height": "30px"}},
+            {field: "margin_amt", headerName: "마진액", type: 'numberType', width:60, cellStyle: {"line-height": "30px"}},
+            {field: "org_nm", headerName: "원산지", cellStyle: {"line-height": "30px"}},
+            {field: "com_nm", headerName: "업체", width:84, cellStyle: {"line-height": "30px"}},
+            {field: "full_nm", headerName: "대표카테고리", cellStyle: {"line-height": "30px"}},
+            {field: "head_desc", headerName: "상단홍보글", cellStyle: {"line-height": "30px"}},
+            {field: "make", headerName: "제조업체", cellStyle: {"line-height": "30px"}},
+            {field: "reg_dm", headerName: "등록일자", width:110, cellStyle: {"line-height": "30px"}},
+            {field: "upd_dm", headerName: "수정일자", width:110, cellStyle: {"line-height": "30px"}}
         ];
 
         const pApp = new App('', {

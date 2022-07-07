@@ -543,7 +543,7 @@
         </div>
     </div>
 </div>
-<style> /* 상품 이미지 사이즈 강제 픽스 */ .img { height:30px; margin: 0 auto; } </style>
+<style> /* 상품 이미지 사이즈 강제 픽스 */ .img { height:50px; margin: 0 auto; } </style>
 <script>
     const editCellStyle = {
         'background' : '#ffff99',
