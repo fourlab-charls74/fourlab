@@ -26,7 +26,7 @@
 				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="good_types">판매기간</label>
+							<label for="good_types">판매기간(판매연월)</label>
 							<div class="docs-datepicker flex_box">
 								<div class="input-group">
 								<input type="text" class="form-control form-control-sm docs-date month" name="sdate" value="{{ $sdate }}" autocomplete="off">
@@ -121,23 +121,27 @@
         color: red;
     }
 </style>
-<script language="javascript">
+<script type="text/javascript" charset="utf-8">
+
+	// const qty column
+
+
 	var columns = [
 		{headerName: "#", field: "num",type:'NumType'},
 		{field: "com_type_nm",	headerName: "매장구분",		width:90},
 		{field: "store_cd",		headerName: "매장코드",		width:90},
 		{field: "store_nm",		headerName: "매장명",		width:130},
-		{field: "receipt_no",	headerName: "목표",	        width:85},
+		{field: "",	headerName: "목표",	        width:85},
         {field: "",			headerName: "달성율(%)",		width:85},
 		{field: "",	headerName: "합계",	        width:85,
             children: [
-                {headerName: "오프라인", field: "sum_qty", type: 'numberType'},
-                {headerName: "온라인", field: "sum_point_amt", type: 'currencyType'},
+                {headerName: "오프라인", field: "", type: 'numberType'},
+                {headerName: "온라인", field: "", type: 'currencyType'},
                 {headerName: "소계", field: "qty", type: 'currencyType'}
             ]
         },
         {
-            field: "", headerName: "기간",
+            headerName: "기간",
             children: [
                 {field: "1_qty", headerName: "1	(일)",headerClass:'hd-grid-red'},
                 {field: "2_qty", headerName: "2	(월)"},
@@ -175,24 +179,58 @@
         {headerName: "", field: "nvl", width: "auto"}
 	];
 
-</script>
-<script type="text/javascript" charset="utf-8">
 	const pApp = new App('',{
 		gridId:"#div-gd",
 	});
 	let gx;
 	$(document).ready(function() {
+		
 		pApp.ResizeGrid(265);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns);
 		Search();
+
 	});
+	
+	const yoil = {
+		codes: [],
+		format: ["일", "월", "화", "수", "목", "금", "토"],
+	};
+
+	// const renderWithYoil = (params) => {
+	// 	if (params.value !== undefined) {
+	// 		const value = params?.value;
+	// 		let regExp = /\d+(?=_)/i;
+	// 		const arr = value.match(regExp);
+
+	// 		const day = arr[0];
+	// 		const code = yoil.codes[day];
+	// 		const f_yoil = yoil.format[code];
+
+	// 		return `${value} (${f_yoil})`;
+
+	// 		gx2.gridOptions.api.setColumnDefs([]);
+	// 	}
+	// };
+
+	const formatDay = (e) => { 
+		yoil.codes = e.head.yoil_codes
+		const columns = yoil.codes.map((code, index) => {
+			const day = index + 1;
+			const column = yoil.format[code];
+			return column;
+		});
+		// gx2.gridOptions.api.setColumnDefs([]);
+		console.log(columns);
+	};
 
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/store/sale/sal02/search', data, 1);
+		gx.Request('/store/sale/sal02/search', data, 1, (e) => formatDay(e));
 	}
+
+	
 
 </script>
 @stop
