@@ -78,7 +78,7 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="store_no">매장</label>
+                            <label for="store_no">매장명</label>
 							<div class="form-inline inline_btn_box">
 								<select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
 								<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>

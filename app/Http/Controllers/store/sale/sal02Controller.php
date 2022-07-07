@@ -14,24 +14,17 @@ class sal02Controller extends Controller
 {
 	public function index() {
 
-		$sdate = Carbon::now()->subMonth()->startOfMonth()->format("Y-m");
-        $m = Carbon::now()->subMonth()->startOfMonth();
-        $lastofMonth = $m->lastOfMonth()->format("d");
-
-        $months = [];
-        for($i = 1;$i <= $lastofMonth;$i++){
-            $m->addDays();
-            $months[] = array( "day" => $i, "week" => $m->format("D"));
-        }
+		// $sdate = Carbon::now()->startOfMonth()->format("Y-m"); // 이번 달 기준
+		$sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 1달전 기준 (테스트 용)
 
 		// 매장구분
 		$sql = " 
 			select *
-			from __tmp_code
+			from code
 			where 
-				code_kind_cd = 'com_type' and use_yn = 'Y' order by code_seq 
+				code_kind_cd = 'store_type' and use_yn = 'Y' order by code_seq 
 		";
-		$com_types	= DB::select($sql);
+		$store_types	= DB::select($sql);
 
 		// 행사구분
 		$sql = "
@@ -53,10 +46,9 @@ class sal02Controller extends Controller
 
 		$values = [
             'sdate'         => $sdate,
-			'com_types'		=> $com_types,
+			'store_types'	=> $store_types,
 			'event_cds'		=> $event_cds,
-			'sell_types'	=> $sell_types,
-            'months'        => $months
+			'sell_types'	=> $sell_types
 		];
         return view( Config::get('shop.store.view') . '/sale/sal02',$values);
 	}
@@ -64,7 +56,12 @@ class sal02Controller extends Controller
 	public function search(Request $request)
 	{
 		$sdate = $request->input('sdate', now()->format("Y-m"));
-		$ym = str_replace("-","-",$sdate);
+		$list_type = $request->input('list_type', "qty");
+		$store_type = $request->input('store_type', "");
+		$store_cd = $request->input('store_cd', "");
+		$store_nm = $request->input('store_nm', "");
+
+		$ym = str_replace("-", "", $sdate);
 		$next_month = $sdate[-1] + 1;
 		$edate = substr($sdate, 0, -1) . $next_month;
 
@@ -74,24 +71,39 @@ class sal02Controller extends Controller
         $sale_yn = $request->input('sale_yn','Y');
 
         $where = "";
-        if($sale_yn == "Y"){
-            $where = " and qty is not null";
-        }
+        if ($sale_yn == "Y") $where .= " and qty is not null";
+		if ($store_type) $where .= " and c.code_id = ${store_type}";
+		if ($store_cd != "") $where .= " and s.store_cd like '%" . Lib::quote($store_cd) . "%'";
+		if ($store_nm != "") $where .= " and s.store_nm like '%" . Lib::quote($store_nm) . "%'";
 
-		$max_day = 31;
+		Carbon::parse($sdate)->endOfMonth()->toDateString();
+		$last_day = Carbon::parse($sdate)->endOfMonth()->toDateString();
+		$max_day = substr($last_day, 8, 2);
 
-		$sum_qty = "";
-		$sum_price = "";
-		$sum_recv_amt = "";
+		// 전달 받은 리스트 타입에 따라 합계 쿼리 구분
+		$sum = "";
+		$sum_true = "";
+		$sum_false = 0;
+		switch ($list_type) {
+			case 'qty':
+				$sum_true = "o.qty";
+				break;
+			case 'ord_amt':
+				$sum_true = "o.price*o.qty";
+				break;
+			case 'recv_amt':
+				$sum_true = "o.recv_amt";
+				break;
+			default:
+				break;
+		}
 
-
+		// 요일코드 추가 및 날짜별 합계 쿼리 적용
 		$yoil_codes = [];
 		for ($i = 0; $i < $max_day; $i++) {
 			$day = $i + 1;
-			$comma = ($day == 31) ? "" : ",";
-			$sum_qty .= "sum(if(day(m.ord_date) = ${day}, o.qty, 0)) as ${day}_qty${comma}";
-			$sum_price .= "sum(if(day(m.ord_date) = ${day}, o.price*o.qty, 0)) as ${day}_price${comma}";
-			$sum_recv_amt .= "sum(if(day(m.ord_date) = ${day}, o.recv_amt, 0)) as ${day}_recv_amt${comma}";
+			$comma = ($day == $max_day) ? "" : ",";
+			$sum .= "sum(if(day(m.ord_date) = ${day}, ${sum_true}, ${sum_false})) as ${day}_val${comma}";
 
 			// 해당 월의 모든 요일 구하기
 			$day = sprintf("%02d", $day);
@@ -105,20 +117,17 @@ class sal02Controller extends Controller
 			from store s left outer join (
 				select 
 					store_cd, sum(o.qty) as qty, sum(o.price*o.qty) as ord_amt, sum(o.recv_amt) as recv_amt,
-					${sum_qty},
-					${sum_price},
-					${sum_recv_amt}
+					${sum}
 				from order_mst m inner join order_opt o on m.ord_no = o.ord_no 
 				where m.ord_date >= :sdate and m.ord_date < :edate and m.store_cd <> ''
 				group by store_cd
 			) a on s.store_cd = a.store_cd
                 left outer join store_sales_projection p on p.ym = :ym and s.`store_cd` = p.`store_cd`			
                 left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = s.store_type
-            where 1=1 $where                
+            where 1=1 $where
 		";
-		$rows = DB::select($sql,[
-		    'sdate' => $sdate,'edate' => $edate,"ym" => $ym
-        ]);
+
+		$rows = DB::select($sql, ['sdate' => $sdate,'edate' => $edate, "ym" => $ym]);
 
 		return response()->json([
             "code" => 200,

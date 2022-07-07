@@ -16,7 +16,7 @@
 
 			<div class="d-flex card-header justify-content-between">
 				<h4>검색</h4>
-				<div class="flax_box">
+				<div class="flex_box">
 					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
@@ -24,7 +24,7 @@
 
 			<div class="card-body">
 				<div class="row">
-					<div class="col-lg-4 inner-td">
+					<div class="col-lg-4">
 						<div class="form-group">
 							<label for="good_types">판매기간(판매연월)</label>
 							<div class="docs-datepicker flex_box">
@@ -40,39 +40,168 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4 inner-td">
+					<div class="col-lg-4">
 						<div class="form-group">
-							<label for="">매장구분</label>
-							<div class="flax_box">
-								<select name='com_type' class="form-control form-control-sm">
+							<label for="store_type">매장구분</label>
+							<div class="flex_box">
+								<select name='store_type' class="form-control form-control-sm">
 									<option value=''>전체</option>
-									@foreach ($com_types as $com_type)
-										<option value='{{ $com_type->code_id }}'>{{ $com_type->code_val }}</option>
+									@foreach ($store_types as $store_type)
+										<option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
 									@endforeach
 								</select>
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4 inner-td">
+					<div class="col-lg-4">
 						<div class="form-group">
-							<label for="">매장명</label>
-							<div class="flax_box">
-								<input type='text' class="form-control form-control-sm search-enter" name='com_nm' value=''>
+                            <label for="store_cd">매장명</label>
+							<div class="form-inline inline_btn_box">
+								<select id="store_cd" name="store_cd" class="form-control form-control-sm select2-store"></select>
+								<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 							</div>
-						</div>
+                        </div>
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-lg-4 inner-td">
+					<div class="col-lg-4">
 						<div class="form-group">
 							<label for="">판매유형</label>
-							<div class="flax_box">
+							<div class="flex_box">
 								<select name='sell_type' class="form-control form-control-sm">
 									<option value=''>전체</option>
 								@foreach ($sell_types as $sell_type)
 									<option value='{{ $sell_type->code_id }}'>{{ $sell_type->code_val }}</option>
 								@endforeach
 								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4">
+						<div class="form-group">
+                            <label for="formrow-email-input">상품명</label>
+                            <div class="flex_box">
+                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' value=''>
+                            </div>
+                        </div>
+					</div>
+					<div class="col-lg-4">
+						<div class="form-group">
+							<label for="style_no">스타일넘버/상품코드</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input_box">
+									<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no">
+								</div>
+								<span class="text_line">/</span>
+								<div class="form-inline-inner input-box" style="width:47%">
+									<div class="form-inline-inner inline_btn_box">
+										<input type='text' class="form-control form-control-sm w-100 search-enter" name='goods_no' id='goods_no' value=''>
+										<a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+									</div>
+								</div>
+							</div>
+                        </div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-lg-4">
+						<div class="form-group">
+                            <label for="brand_cd">브랜드</label>
+                            <div class="form-inline inline_btn_box">
+                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
+                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                            </div>
+                        </div>
+					</div>
+					<div class="col-lg-4">
+						<div class="form-group">
+							<label for="item">카테고리</label>
+							<div class="form-inline inline_select_box">
+								<div class="form-inline-inner select-box">
+									<select name='cat_type' id="cat_type" class="form-control form-control-sm">
+										<option value='DISPLAY'>전시</option>
+										<option value='ITEM'>용도</option>
+									</select>
+								</div>
+								<div class="form-inline-inner input-box">
+									<div class="form-inline inline_btn_box">
+										<select name='cat_cd' id='cat_cd' class="form-control form-control-sm select2-category"></select>
+										<a href="#" class="btn btn-sm btn-outline-primary sch-category"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4">
+						<div class="form-group">
+                            <label for="sale_yn">세일여부/세일구분</label>
+                            <div class="form-inline">
+                                <div class="form-inline-inner input-box w-25 pr-1" style="min-width:70px">
+                                    <select id="sale_yn" name="sale_yn" class="form-control form-control-sm w-100">
+                                        <option value="">전체</option>
+                                        <option value="Y">Y</option>
+                                        <option value="N">N</option>
+                                    </select>
+                                </div>
+                                <div class="form-inline-inner form-check-box ml-2">
+                                    <div class="form-inline">
+                                        <div class="custom-control custom-checkbox" style="display: inline-flex; min-width: 80px;">
+                                            <input type="checkbox" name="coupon_yn" id="coupon_yn" class="custom-control-input" value="Y">
+                                            <label class="custom-control-label" for="coupon_yn" style="font-weight: 400;">쿠폰여부</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span>　/　</span>
+                                <div class="form-inline-inner form-check-box" style="flex-grow: 1;">
+                                    <select id="sale_type" name="sale_type" class="form-control form-control-sm w-100">
+                                        <option value="">선택</option>
+                                        <option value="event">event</option>
+                                        <option value="onesize">onesize</option>
+                                        <option value="clearance">clearance</option>
+                                        <option value="refurbished">refurbished</option>
+                                        <option value="newmember">newmember</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-lg-4">
+						<div class="form-group">
+							<label for="qty">집계구분</label>
+							<div class="flex_box">
+								<div class="form-inline form-radio-box">
+									<div class="custom-control custom-radio">
+										<input type="radio" name="list_type" id="qty" value="qty" class="custom-control-input" checked />
+										<label class="custom-control-label" for="qty">주문수량</label>
+									</div>
+									<div class="custom-control custom-radio">
+										<input type="radio" name="list_type" id="ord_amt" value="ord_amt" class="custom-control-input" />
+										<label class="custom-control-label" for="ord_amt">주문금액</label>
+									</div>
+									<div class="custom-control custom-radio">
+										<input type="radio" name="list_type" id="recv_amt" value="recv_amt" class="custom-control-input" />
+										<label class="custom-control-label" for="recv_amt">결제금액</label>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4">
+						<div class="form-group">
+							<label for="sale_yn">매출여부</label>
+							<div class="flex_box">
+								<div class="form-inline form-radio-box">
+									<div class="custom-control custom-radio">
+										<input type="radio" name="sale_yn" id="sale_y" value="Y" class="custom-control-input" checked/>
+										<label class="custom-control-label" for="sale_y">Y</label>
+									</div>
+									<div class="custom-control custom-radio">
+										<input type="radio" name="sale_yn" id="sale_n" value="N" class="custom-control-input"/>
+										<label class="custom-control-label" for="sale_n">N</label>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -94,20 +223,6 @@
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
 				</div>
 				<div class="fr_box">
-					<div class="form-inline form-radio-box">
-						<div class="custom-control custom-radio">
-							<input type="radio" name="list_type" id="total_qty" value="total_qty" class="custom-control-input" checked />
-							<label class="custom-control-label" for="total_qty">주문수량</label>
-						</div>
-						<div class="custom-control custom-radio">
-							<input type="radio" name="list_type" id="total_price" value="total_price" class="custom-control-input" />
-							<label class="custom-control-label" for="total_price">주문금액</label>
-						</div>
-						<div class="custom-control custom-radio">
-							<input type="radio" name="list_type" id="total_recv_amt" value="total_recv_amt" class="custom-control-input" />
-							<label class="custom-control-label" for="total_recv_amt">결제금액</label>
-						</div>
-					</div>
 				</div>
 			</div>
 		</div>
@@ -120,86 +235,93 @@
     .hd-grid-red {
         color: red;
     }
+	.hd-grid-blue {
+        color: blue;
+    }
 </style>
 <script type="text/javascript" charset="utf-8">
-
-	// const qty column
-
-	var columns = [
-		{headerName: "#", field: "num",type:'NumType'},
-		{field: "store_type_nm",headerName: "매장구분"},
-		{field: "store_cd",	headerName: "매장코드"},
-		{field: "store_nm",	headerName: "매장명", type: 'StoreNameType'},
-		{field: "proj_amt",	headerName: "목표",type: 'numberType'},
-        {field: "",	headerName: "달성율(%)"},
-		{field: "",	headerName: "합계",
-            children: [
-                {headerName: "오프라인", field: "", type: 'numberType'},
-                {headerName: "온라인", field: "", type: 'currencyType'},
-                {headerName: "주문수량", field: "qty", type: 'currencyType'},
-                {headerName: "주문금액", field: "ord_amt", type: 'currencyType'},
-                {headerName: "결제금액", field: "recv_amt", type: 'currencyType'}
-            ]
-        },
-        {
-            headerName: "기간",
-            children: [
-                @foreach($months as $month)
-                    @if($month["week"] == 'Sat' || $month["week"] == 'Sun')
-                        {field: "{{$month["day"]}}_qty", headerName: "{{$month["day"]}} ({{$month["week"]}})",headerClass:'hd-grid-red'},
-                    @else
-                        {field: "{{$month["day"]}}_qty", headerName: "{{$month["day"]}} ({{$month["week"]}})"},
-                    @endif
-                @endforeach
-            ]
-        },
-        {headerName: "", field: "nvl", width: "auto"}
-	];
-
-	const pApp = new App('',{
-		gridId:"#div-gd",
-	});
-	let gx;
-	$(document).ready(function() {
-
-		pApp.ResizeGrid(265);
-		pApp.BindSearchEnter();
-		let gridDiv = document.querySelector(pApp.options.gridId);
-		gx = new HDGrid(gridDiv, columns);
-		Search();
-
-	});
 
 	const yoil = {
 		codes: [],
 		format: ["일", "월", "화", "수", "목", "금", "토"],
 	};
 
-	// const renderWithYoil = (params) => {
-	// 	if (params.value !== undefined) {
-	// 		const value = params?.value;
-	// 		let regExp = /\d+(?=_)/i;
-	// 		const arr = value.match(regExp);
+	var columns = [
+		{headerName: "#", field: "num",type:'NumType'},
+		{field: "store_type_nm", headerName: "매장구분", width:90},
+		{field: "store_cd", headerName: "매장코드", width:90},
+		{field: "store_nm", headerName: "매장명", initailWidth: 200},
+		{field: "proj_amt",	headerName: "목표", width:85, type: 'currencyType'},
+        {field: "",	headerName: "달성율(%)", width:85, type: 'percentType'}
+	];
 
-	// 		const day = arr[0];
-	// 		const code = yoil.codes[day];
-	// 		const f_yoil = yoil.format[code];
+	const mutable_cols = (max_day) => [ ...columns, { ...sum_cols() }, { ...day_cols(max_day) }, { headerName: "", field: "nvl", width: "auto" } ];
 
-	// 		return `${value} (${f_yoil})`;
+	const sum_cols = () => {
+		return (
+			{field: "",	headerName: "합계",
+				children: [
+					{headerName: "오프라인", field: "", type: 'numberType'},
+					{headerName: "온라인", field: "", type: 'currencyType'},
+					{headerName: "주문수량", field: "qty", type: 'currencyType'},
+					{headerName: "주문금액", field: "ord_amt", type: 'currencyType'},
+					{headerName: "결제금액", field: "recv_amt", type: 'currencyType'}
+				]
+			}
+		);
+	};
 
-	// 		gx2.gridOptions.api.setColumnDefs([]);
-	// 	}
-	// };
+	const day_cols = (max_day) => {
+		let obj = { fields: "day", headerName: "기간", children: [] };
+		for ( var i=0; i < max_day; i++ ) {
+			const day = i + 1;
+			const code = yoil.codes[i];
+			const day_of_week = yoil.format[code];
+			const f_day = day + ` (${day_of_week})`;
+			let col = { field: `${day}_val`, headerName: f_day, type: 'numberType' };
+			if ( code == 0 ) {
+				col.headerClass = 'hd-grid-red'; // 일요일 표시
+			} else if ( code == 6 ) {
+				col.headerClass = 'hd-grid-blue'; // 토요일 표시
+			}
+			obj.children.push(col);
+		}
+		return obj;
+	};
 
-	const formatDay = (e) => {
+	const pApp = new App('',{
+		gridId:"#div-gd",
+	});
+	let gx;
+	$(document).ready(function() {
+		
+		pApp.ResizeGrid(265);
+		pApp.BindSearchEnter();
+		let gridDiv = document.querySelector(pApp.options.gridId);
+		gx = new HDGrid(gridDiv, columns);
+		Search();
+
+		// 매장 검색 클릭 이벤트 바인딩 및 콜백 사용
+        $( ".sch-store" ).on("click", function() {
+            searchStore.Open();
+        });
+	});
+	const autoSizeColumns = (grid, except = [], skipHeader = false) => {
+        const allColumnIds = [];
+        grid.gridOptions.columnApi.getAllColumns().forEach((column) => {
+            if (except.includes(column.getId())) return;
+            allColumnIds.push(column.getId());
+        });
+        grid.gridOptions.columnApi.autoSizeColumns(allColumnIds, skipHeader);
+    };
+
+	const formatDay = (e) => { 
 		yoil.codes = e.head.yoil_codes
-		const columns = yoil.codes.map((code, index) => {
-			const day = index + 1;
-			const column = yoil.format[code];
-			return column;
-		});
-		// gx2.gridOptions.api.setColumnDefs([]);
+		const max_day = yoil.codes.length;
+		const columns = mutable_cols(max_day);
 		console.log(columns);
+		gx.gridOptions.api.setColumnDefs(columns);
+		autoSizeColumns(gx, ["nvl"]);
 	};
 
 	function Search() {
@@ -207,7 +329,7 @@
 		gx.Request('/store/sale/sal02/search', data, 1, (e) => formatDay(e));
 	}
 
-
+	
 
 </script>
 @stop

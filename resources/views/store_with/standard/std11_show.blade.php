@@ -100,7 +100,7 @@
                             </tr>
                             <tr>
                                 <th>
-                                    <label for="store_no">매장</label>
+                                    <label for="store_no">매장명</label>
                                 </th>
                                 <td>
                                     <div class="form-inline inline_btn_box">
