@@ -187,6 +187,18 @@ CREATE TABLE `store` (
     PRIMARY KEY (`store_cd`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `store_sales_projection` (
+                         `store_cd` varchar(30) NOT NULL COMMENT '매장코드',
+                         `ym` varchar(6) NOT NULL COMMENT '년월',
+                         `amt` bigint NOT NULL default '0' COMMENT '매출액',
+                         `uid` VARCHAR(50) DEFAULT NULL COMMENT '처리자',
+                         `unm` VARCHAR(50) DEFAULT NULL COMMENT '처리자명',
+                         `rt` datetime DEFAULT NULL COMMENT '등록일',
+                         `ut` datetime DEFAULT NULL COMMENT '수정일',
+                         PRIMARY KEY (`store_cd`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 
 -- 창고
 CREATE TABLE `storage` (

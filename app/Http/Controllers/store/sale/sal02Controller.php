@@ -74,7 +74,8 @@ class sal02Controller extends Controller
 			$sum_recv_amt .= "sum(if(day(m.ord_date) = ${day}, o.recv_amt, 0)) as ${day}_recv_amt${comma}";
 		}
 
-		$sql = "
+		$sql = /** @lang text */
+            "
 			select a.*, s.store_nm from (
 				select 
 					store_cd, sum(o.qty) as qty, sum(o.price) as price, sum(o.recv_amt) as recv_amt,
