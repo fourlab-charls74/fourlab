@@ -115,11 +115,16 @@
                 return `<a href='javascript:void(0)' onclick='openPopup("${params.value}")'>${params.value}</a>`;
             }
         },
-        {field: "storage_nm", headerName: "창고명", width: 300},
+        {field: "storage_nm", headerName: "창고명", width: 200},
         {field: "phone", headerName: "전화번호", width: 120, cellStyle: {"text-align": "center"}},
         {field: "use_yn", headerName: "창고사용", cellStyle: {"text-align": "center"}},
         {field: "stock_check_yn", headerName: "매장재고조회", cellStyle: {"text-align": "center"}},
-        {field: "", headerName: "", width: "auto"}
+        {field: "default_yn", headerName: "대표창고",
+            cellStyle: function(params) {
+                return {"text-align": "center", "background-color": params.value === "Y" ? "#FFACAC" : "none"};
+            }
+        },
+        {width: "auto"}
     ];
 </script>
 

@@ -49,6 +49,7 @@ class stk10Controller extends Controller
 		$code = 200;
 		$where = "";
         $having = "";
+        $orderby = "";
 
         // having
         $sdate = str_replace("-", "", $r['sdate'] ?? now()->sub(1, 'week')->format('Ymd'));
@@ -120,6 +121,11 @@ class stk10Controller extends Controller
         if($r['goods_nm_eng'] != null) 
             $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
 
+        // ordreby
+        $ord = $r['ord'] ?? 'desc';
+        $ord_field = $r['ord_field'] ?? "g.goods_no";
+        $orderby = sprintf("order by %s %s", $ord_field, $ord);
+
         // pagination
         $page = $r['page'] ?? 1;
         if ($page < 1 or $page == "") $page = 1;
@@ -141,7 +147,7 @@ class stk10Controller extends Controller
                 s.store_nm, 
                 sg.storage_nm, 
                 psr.state, 
-                psr.exp_dlv_day, 
+                cast(psr.exp_dlv_day as date) as exp_dlv_day, 
                 psr.rel_order, 
                 psr.req_id, 
                 psr.req_rt, 
@@ -158,7 +164,7 @@ class stk10Controller extends Controller
                 left outer join goods g on g.goods_no = psr.goods_no
             where 1=1 $where
             having 1=1 $having
-            order by psr.rt
+            $orderby
             $limit
 		";
 		$result = DB::select($sql);

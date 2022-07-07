@@ -659,3 +659,10 @@ footer a:active{color:#fff !important;}
 
 /* 필수입력요소 *표시 커스텀 */
 .required::after {content:" *"; color: #ff0000;}
+
+/* grid-date */
+.grid-date {width: 100%;background-color: transparent;border: none;outline: none;text-align: center;font-weight: 400;}
+.grid-date::-webkit-calendar-picker-indicator {background: transparent;bottom: 0;color: transparent;cursor: pointer;height: auto;left: 0;position: absolute;right: 0;top: 0;width: auto;}
+.grid-date[value=""]::-webkit-datetime-edit {
+    color: transparent;
+}

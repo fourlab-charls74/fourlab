@@ -144,7 +144,8 @@ function StyleGoodsType(params){
         if (state[params.data.goods_type]) {
             var color = state[params.data.goods_type];
             return {
-                color: color
+                color: color,
+                "text-align": "center"
             }
         }
     }

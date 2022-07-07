@@ -27,12 +27,7 @@
     <style> 
         .required:after {content: " *"; color: red;}
         .table th {min-width: 120px;}
-        .grid-date {width: 100%;background-color: transparent;border: none;outline: none;text-align: center;font-weight: 400;}
-        .grid-date::-webkit-calendar-picker-indicator {background: transparent;bottom: 0;color: transparent;cursor: pointer;height: auto;left: 0;position: absolute;right: 0;top: 0;width: auto;}
-        .grid-date[value=""]::-webkit-datetime-edit {
-            color: transparent;
-        }
-
+        
         @media (max-width: 740px) {
             .table td {float: unset !important;width: 100% !important;}
         }

@@ -38,7 +38,7 @@ CREATE TABLE `product_stock_storage` (
                                  `rt` DATETIME DEFAULT NULL COMMENT '등록일시',
                                  `ut` DATETIME DEFAULT NULL COMMENT '변경일시',
                                  PRIMARY KEY (`goods_no`,`prd_cd`,`storage_cd`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='상품재고 매장별';
+) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='상품재고 물류별';
 
 
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values
@@ -214,6 +214,7 @@ CREATE TABLE `storage` (
     `use_yn` char(1) DEFAULT NULL COMMENT '창고사용여부',
     `loss_yn` char(1) DEFAULT NULL COMMENT 'LOSS창고여부',
     `stock_check_yn` char(1) DEFAULT NULL COMMENT '매장재고조회여부',
+    `default_yn` char(1) DEFAULT 'N' COMMENT '대표창고여부',
     `reg_date` datetime DEFAULT NULL COMMENT '등록일',
     `mod_date` datetime DEFAULT NULL COMMENT '수정일',
     `admin_id` varchar(30) DEFAULT NULL COMMENT '등록/수정아이디',

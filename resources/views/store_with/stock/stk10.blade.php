@@ -1,5 +1,5 @@
 @extends('store_with.layouts.layout')
-@section('title','판매일보')
+@section('title','출고')
 @section('content')
 <div class="page_tit">
 	<h3 class="d-inline-flex">출고</h3>
@@ -122,7 +122,7 @@
                         <div class="form-group">
                             <label for="prd_cd">상품코드</label>
                             <div class="flex_box">
-                                <input type='text' class="form-control form-control-sm search-enter" name='prd_cd' value=''>
+                                <input type='text' class="form-control form-control-sm search-enter" name='prd_cd' value='' />
                             </div>
                         </div>
                     </div>
@@ -310,7 +310,8 @@
 	</div>
 </div>
 <script language="javascript">
-    const rel_states = {'10': '요청', '20': '접수', '30': '출고', '40': '매장입고', '-10': '거부'};
+    let rel_states = <?= json_encode(@$rel_states) ?> ;
+    let rel_orders = <?= json_encode(@$rel_orders) ?> ;
 
 	let columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {"text-align": "center"}},
@@ -330,26 +331,48 @@
                 return rel_states[params.value];
             }
         },
-        {field: "rel_type",	headerName: "구분", width: 80, cellStyle: {"text-align": "center"}},
+        {field: "rel_type",	headerName: "출고구분", width: 80, cellStyle: {"text-align": "center"}},
         {field: "store_nm",	headerName: "매장", width: 100, cellStyle: {"text-align": "center"}},
         {field: "storage_nm", headerName: "창고", width: 100, cellStyle: {"text-align": "center"}},
-        {field: "prd_cd", headerName: "상품코드", width: 100, cellStyle: {"text-align": "center"}},
+        {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {"text-align": "center"}},
 		{field: "style_no",	headerName: "스타일넘버", cellStyle: {"text-align": "center"}},
-		{field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 200},
+		{field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 300},
 		{field: "goods_opt", headerName: "옵션", width: 70, cellStyle: {"text-align": "center"}},
-		{field: "qty", headerName: "수량", type: "numberType", editable: function(params) {return params.data.state === 10;}, cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};}},
-		{field: "exp_dlv_day", headerName: "출고예정일자", editable: function(params) {return params.data.state === 10;}, cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99", "text-align": "center"} : {"text-align": "center"};}},
-		{field: "rel_order", headerName: "출고차수", editable: function(params) {return params.data.state === 10;}, cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99", "text-align": "center"} : {"text-align": "center"};}},
+		{field: "qty", headerName: "수량", type: "numberType",
+            editable: function(params) {return params.data.state === 10;}, 
+            cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};},
+        },
+		{field: "exp_dlv_day", headerName: "출고예정일자", 
+            cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99", "text-align": "center"} : {"text-align": "center"};},
+            cellRenderer: (params) => {
+                    return params.data.state === 10 ? `<input type="date" class="grid-date" value="${params.value ?? ''}" onchange="selectCurRow('exp_dlv_day', this, '${params.rowIndex}')" />` : params.value;
+            }
+        },
+		{field: "rel_order", headerName: "출고차수", width: 100, 
+            editable: function(params) {return params.data.state === 10;}, 
+            cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99", "text-align": "center"} : {"text-align": "center"};},
+            cellEditorSelector: function(params) {
+                return {
+                    component: 'agRichSelectCellEditor',
+                    params: { values: rel_orders.map(o => o.code_val) },
+                };
+            },
+            cellRenderer: function(params) {
+                return params.data.state === 10 ? params.value : params.data.dlv_day.replaceAll("-", "") + params.value;
+            }
+        },
         {field: "req_id", headerName: "요청자", cellStyle: {"text-align": "center"}},
-        {field: "req_rt", headerName: "요청일시", width: 110, cellStyle: {"text-align": "center"}},
+        {field: "req_rt", headerName: "요청일시", width: 120, cellStyle: {"text-align": "center"}},
         {field: "rec_id", headerName: "접수자", cellStyle: {"text-align": "center"}},
-        {field: "rec_rt", headerName: "접수일시", width: 110, cellStyle: {"text-align": "center"}},
+        {field: "rec_rt", headerName: "접수일시", width: 120, cellStyle: {"text-align": "center"}},
         {field: "prc_id", headerName: "처리자", cellStyle: {"text-align": "center"}},
-        {field: "prc_rt", headerName: "처리일시", width: 110, cellStyle: {"text-align": "center"}},
+        {field: "prc_rt", headerName: "처리일시", width: 120, cellStyle: {"text-align": "center"}},
         {field: "fin_id", headerName: "완료(입고)자", cellStyle: {"text-align": "center"}},
-        {field: "fin_rt", headerName: "완료(입고)일시", width: 110, cellStyle: {"text-align": "center"}},
-        {field: "comment", headerName: "메모", width: 200, editable: function(params) {return params.data.state === 10;}, cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};}},
-        {width: 'auto'}
+        {field: "fin_rt", headerName: "완료(입고)일시", width: 120, cellStyle: {"text-align": "center"}},
+        {field: "comment", headerName: "메모", width: 300, 
+            editable: function(params) {return params.data.state === 10;}, 
+            cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};}
+        },
 	];
 </script>
 <script type="text/javascript" charset="utf-8">
@@ -360,7 +383,17 @@
         pApp.ResizeGrid(275);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns);
+        gx = new HDGrid(gridDiv, columns, {
+            onCellValueChanged: (e) => {
+                e.node.setSelected(true);
+                if (e.column.colId == "qty") {
+                    if (isNaN(e.newValue) == true || e.newValue == "") {
+                        alert("숫자만 입력가능합니다.");
+                        gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                    }
+                }
+            }
+        });
         Search();
 
         // 매장검색
@@ -373,5 +406,11 @@
 		let data = $('form[name="search"]').serialize();
 		gx.Request('/store/stock/stk10/search', data, 1);
 	}
+
+    function selectCurRow(fieldName, e, rowIndex) {
+        const node = gx.getRowNode(rowIndex);
+        node.data[fieldName] = e.value;
+        node.setDataValue(fieldName, e.value);
+    }
 </script>
 @stop

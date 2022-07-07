@@ -651,3 +651,10 @@ footer a:active{color:#fff !important;}
 .refund_input_list li:first-child{margin-top:0px;}
 .refund_input_list li span{position: relative;left:0px;top:0px;line-height:20px;}
 .refund_input_list li .cont{line-height:30px;}
+
+/* grid-date */
+.grid-date {width: 100%;background-color: transparent;border: none;outline: none;text-align: center;font-weight: 400;}
+.grid-date::-webkit-calendar-picker-indicator {background: transparent;bottom: 0;color: transparent;cursor: pointer;height: auto;left: 0;position: absolute;right: 0;top: 0;width: auto;}
+.grid-date[value=""]::-webkit-datetime-edit {
+    color: transparent;
+}

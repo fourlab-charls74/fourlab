@@ -41,7 +41,7 @@ class std03Controller extends Controller
 			$where .= " and stock_check_yn = '$stock_check_yn'";
 
 		$sql = "
-			select storage_cd, storage_nm, phone, use_yn, stock_check_yn
+			select storage_cd, storage_nm, phone, use_yn, stock_check_yn, default_yn
 			from storage
 			where 1=1 $where
 			order by storage_cd
@@ -67,7 +67,7 @@ class std03Controller extends Controller
 
 		if($storage_cd != '') {
 			$sql = "
-				select storage_cd, storage_nm, storage_nm_s, zipcode, addr1, addr2, phone, fax, ceo, use_yn, loss_yn, stock_check_yn, reg_date, mod_date, admin_id
+				select storage_cd, storage_nm, storage_nm_s, zipcode, addr1, addr2, phone, fax, ceo, use_yn, loss_yn, stock_check_yn, default_yn, reg_date, mod_date, admin_id
 				from storage
 				where storage_cd = :storage_cd
 			";
@@ -75,9 +75,12 @@ class std03Controller extends Controller
 			$storage = DB::selectOne($sql, ["storage_cd" => $storage_cd]);
 		}
 
+		$is_exit_default_storage = DB::table('storage')->where('default_yn', '=', 'Y')->count();
+
 		$values = [
 			"cmd" => $storage_cd == '' ? "add" : "update",
 			"storage" => $storage,
+			"is_exit_default_storage" => $is_exit_default_storage > 0 ? 'true' : 'false',
 		];
 
 		return view(Config::get('shop.store.view') . '/standard/std03_show', $values);
@@ -124,9 +127,14 @@ class std03Controller extends Controller
 		$use_yn = $request->input("use_yn", "Y");
 		$loss_yn = $request->input("loss_yn", "Y");
 		$stock_check_yn = $request->input("stock_check_yn", "Y");
+		$default_yn = $request->input("default_yn", "N");
 
 		try {
             DB::beginTransaction();
+
+			if($default_yn == 'Y') {
+				DB::table('storage')->update(['default_yn' => 'N']);
+			}
 			
 			DB::table('storage')->insert([
 				'storage_cd' => $storage_cd,
@@ -141,6 +149,7 @@ class std03Controller extends Controller
 				'use_yn' => $use_yn,
 				'loss_yn' => $loss_yn,
 				'stock_check_yn' => $stock_check_yn,
+				'default_yn' => $default_yn,
 				'reg_date' => now(),
 				'admin_id' => $admin_id,
 			]);
@@ -174,10 +183,14 @@ class std03Controller extends Controller
 		$use_yn = $request->input("use_yn", "Y");
 		$loss_yn = $request->input("loss_yn", "Y");
 		$stock_check_yn = $request->input("stock_check_yn", "Y");
+		$default_yn = $request->input("default_yn", "N");
 
 		try {
 			DB::beginTransaction();
-			
+
+			if($default_yn == 'Y') {
+				DB::table('storage')->update(['default_yn' => 'N']);
+			}
 			DB::table('storage')
 				->where("storage_cd", "=", $storage_cd)
 				->update([
@@ -193,6 +206,7 @@ class std03Controller extends Controller
 					'use_yn' => $use_yn,
 					'loss_yn' => $loss_yn,
 					'stock_check_yn' => $stock_check_yn,
+					'default_yn' => $default_yn,
 					'mod_date' => now(),
 					'admin_id' => $admin_id,
 			]);
