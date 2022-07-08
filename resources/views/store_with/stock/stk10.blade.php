@@ -297,10 +297,10 @@
 				<div class="d-flex justify-content-between">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
                     <div>
-                        <a href="javascript:void(0);" onclick="" class="btn btn-sm btn-primary shadow-sm">접수</a>
-                        <a href="javascript:void(0);" onclick="" class="btn btn-sm btn-primary shadow-sm">출고</a>
-                        <a href="javascript:void(0);" onclick="" class="btn btn-sm btn-primary shadow-sm">매장입고</a>
-                        <a href="javascript:void(0);" onclick="" class="btn btn-sm btn-primary shadow-sm">거부</a>
+                        <a href="javascript:void(0);" onclick="receipt()" class="btn btn-sm btn-primary shadow-sm">접수</a>
+                        <a href="javascript:void(0);" onclick="release()" class="btn btn-sm btn-primary shadow-sm">출고</a>
+                        <a href="javascript:void(0);" onclick="receive()" class="btn btn-sm btn-primary shadow-sm">매장입고</a>
+                        <a href="javascript:void(0);" onclick="reject()" class="btn btn-sm btn-primary shadow-sm">거부</a>
                     </div>
 				</div>
 			</div>
@@ -314,20 +314,40 @@
     let rel_states = <?= json_encode(@$rel_states) ?> ;
     let rel_orders = <?= json_encode(@$rel_orders) ?> ;
 
+    function StyleReleaseState(params) {
+        let state = {
+            "10":"#ff0000",
+            "20":"#669900",
+            "30":"#190DDB",
+            "40":"#C628E8",
+            "-10":"#666666",
+        }
+        if (params.value !== undefined) {
+            if (state[params.value]) {
+                let color = state[params.value];
+                return {
+                    'color': color,
+                    'text-align': 'center'
+                }
+            }
+        }
+    }
+
 	let columns = [
+        {field: "idx", hide: true},
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {"text-align": "center"}},
-        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null,
+        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, sort: null, width: 28,
             checkboxSelection: function(params) {
-                return params.data.state === 10; // 요청상태인 출고건만 선택가능
+                return params.data.state < 40 && params.data.state > 0;
             },
         },
         // 출고일자 값 : 출고상태가 요청/접수 일때 -> 출고예정일자(exp_dlv_day) | 출고상태가 출고/입고 일때 -> 출고처리일자(prc_rt)
-        {field: "dlv_day",	headerName: "출고일자", width: 110, cellStyle: {"text-align": "center"}, 
+        {field: "dlv_day", headerName: "출고일자", width: 110, cellStyle: {"text-align": "center"}, 
             cellRenderer: function(params) {
                 return params.value + (params.data.state < 30 ? ' (예정)' : '');
             }
         },
-        {field: "state",	headerName: "출고상태", cellStyle: {"text-align": "center"},
+        {field: "state", headerName: "출고상태", cellStyle: StyleReleaseState,
             cellRenderer: function(params) {
                 return rel_states[params.value];
             }
@@ -412,6 +432,86 @@
         const node = gx.getRowNode(rowIndex);
         node.data[fieldName] = e.value;
         node.setDataValue(fieldName, e.value);
+    }
+
+    // 접수 (10 -> 20)
+    function receipt() {
+        let rows = gx.getSelectedRows();
+        console.log(rows);
+        // 작업중
+    }
+
+    // 출고 (20 -> 30)
+    function release() {
+        let rows = gx.getSelectedRows();
+        if(rows.length < 1) return alert("출고처리할 항목을 선택해주세요.");
+        if(rows.filter(r => r.state !== 20).length > 0) return alert("'접수'상태의 항목만 출고처리 가능합니다.");
+        if(!confirm("선택한 항목을 출고처리하시겠습니까?")) return;
+
+        axios({
+            url: '/store/stock/stk10/release',
+            method: 'post',
+            data: {data: rows},
+        }).then(function (res) {
+            if(res.data.code === 200) {
+                alert(res.data.msg);
+                Search();
+            } else {
+                console.log(res.data);
+                alert("출고처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
+    }
+
+    // 매장입고 (30 -> 40)
+    function receive() {
+        let rows = gx.getSelectedRows();
+        if(rows.length < 1) return alert("매장입고처리할 항목을 선택해주세요.");
+        if(rows.filter(r => r.state !== 30).length > 0) return alert("'출고'상태의 항목만 매장입고처리 가능합니다.");
+        if(!confirm("선택한 항목을 매장입고처리하시겠습니까?")) return;
+
+        axios({
+            url: '/store/stock/stk10/receive',
+            method: 'post',
+            data: {data: rows},
+        }).then(function (res) {
+            if(res.data.code === 200) {
+                alert(res.data.msg);
+                Search();
+            } else {
+                console.log(res.data);
+                alert("매장입고처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
+    }
+
+    // 거부 (10 -> -10)
+    function reject() {
+        let rows = gx.getSelectedRows();
+        if(rows.length < 1) return alert("거부처리할 항목을 선택해주세요.");
+        if(rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 거부처리 가능합니다.");
+        if(rows.filter(r => !r.comment).length > 0) return alert("'메모'에 거부사유를 반드시 입력해주세요.");
+        if(!confirm("선택한 항목을 거부처리하시겠습니까?")) return;
+
+        axios({
+            url: '/store/stock/stk10/reject',
+            method: 'post',
+            data: {data: rows},
+        }).then(function (res) {
+            if(res.data.code === 200) {
+                alert(res.data.msg);
+                Search();
+            } else {
+                console.log(res.data);
+                alert("거부처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
     }
 </script>
 @stop

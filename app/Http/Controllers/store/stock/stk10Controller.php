@@ -137,7 +137,8 @@ class stk10Controller extends Controller
 
         // search
 		$sql = "
-            select 
+            select
+                psr.idx,
                 cast(if(psr.state < 30, psr.exp_dlv_day, psr.prc_rt) as date) as dlv_day,
                 c.code_val as rel_type, 
                 psr.goods_no, 
@@ -145,12 +146,15 @@ class stk10Controller extends Controller
                 g.goods_nm, 
                 psr.prd_cd, 
                 psr.goods_opt, 
-                psr.qty, 
+                psr.qty,
+                psr.store_cd,
                 s.store_nm, 
+                psr.storage_cd,
                 sg.storage_nm, 
                 psr.state, 
                 cast(psr.exp_dlv_day as date) as exp_dlv_day, 
                 psr.rel_order, 
+                psr.comment,
                 psr.req_id, 
                 psr.req_rt, 
                 psr.rec_id, 
@@ -204,5 +208,123 @@ class stk10Controller extends Controller
 			],
 			"body" => $result
 		]);
+    }
+
+    // 접수 (10 -> 20)
+    public function receipt() {
+
+    }
+
+    // 출고 (20 -> 30)
+    public function release(Request $request) {          
+        $ori_state = 20;
+        $new_state = 30;
+        $admin_id = Auth('head')->user()->id;
+        $data = $request->input("data", []);
+
+        try {
+            DB::beginTransaction();
+
+			foreach($data as $d) {
+                if($d['state'] != $ori_state) continue;
+
+                DB::table('product_stock_release')
+                    ->where('idx', '=', $d['idx'])
+                    ->update([
+                        'state' => $new_state,
+                        'prc_id' => $admin_id,
+                        'prc_rt' => now(),
+                        'ut' => now(),
+                    ]);
+            }
+
+			DB::commit();
+            $code = 200;
+            $msg = "출고처리가 정상적으로 완료되었습니다.";
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+        return response()->json(["code" => $code, "msg" => $msg]);
+    }
+
+    // 매장입고 (30 -> 40)
+    public function receive(Request $request) {
+        $ori_state = 30;
+        $new_state = 40;
+        $admin_id = Auth('head')->user()->id;
+        $data = $request->input("data", []);
+
+        try {
+            DB::beginTransaction();
+
+			foreach($data as $d) {
+                if($d['state'] != $ori_state) continue;
+
+                DB::table('product_stock_release')
+                    ->where('idx', '=', $d['idx'])
+                    ->update([
+                        'state' => $new_state,
+                        'fin_id' => $admin_id,
+                        'fin_rt' => now(),
+                        'ut' => now(),
+                    ]);
+
+                // product_stock_store 매장 실재고 플러스
+                DB::table('product_stock_store')
+                    ->where('prd_cd', '=', $d['prd_cd'])
+                    ->where('store_cd', '=', $d['store_cd']) 
+                    ->update([
+                        'qty' => DB::raw('qty + ' . ($d['qty'] ?? 0)),
+                        'ut' => now(),
+                    ]);
+            }
+
+			DB::commit();
+            $code = 200;
+            $msg = "매장입고처리가 정상적으로 완료되었습니다.";
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+        return response()->json(["code" => $code, "msg" => $msg]);
+    }
+
+    // 거부 (10 -> -10)
+    public function reject(Request $request) {
+        $ori_state = 10;
+        $new_state = -10;
+        $admin_id = Auth('head')->user()->id;
+        $data = $request->input("data", []);
+
+        try {
+            DB::beginTransaction();
+
+			foreach($data as $d) {
+                if($d['state'] != $ori_state) continue;
+
+                DB::table('product_stock_release')
+                    ->where('idx', '=', $d['idx'])
+                    ->update([
+                        'state' => $new_state,
+                        'comment' => $d['comment'] ?? '',
+                        'ut' => now(),
+                    ]);
+            }
+
+			DB::commit();
+            $code = 200;
+            $msg = "거부처리가 정상적으로 완료되었습니다.";
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+        return response()->json(["code" => $code, "msg" => $msg]);
     }
 }

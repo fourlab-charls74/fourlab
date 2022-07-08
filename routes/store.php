@@ -156,6 +156,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 출고리스트
         Route::get('stk10','stk10Controller@index');
         Route::get('stk10/search','stk10Controller@search');
+        Route::post('stk10/receipt','stk10Controller@receipt'); // 접수
+        Route::post('stk10/release','stk10Controller@release'); // 출고
+        Route::post('stk10/receive','stk10Controller@receive'); // 매장입고
+        Route::post('stk10/reject','stk10Controller@reject'); // 거부
         
         Route::get('stk12','stk12Controller@index');
         Route::get('stk13','stk13Controller@index');
