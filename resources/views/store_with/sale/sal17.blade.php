@@ -18,14 +18,13 @@
 				<h4>검색</h4>
 				<div class="flax_box">
 					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-					<a href="#" onclick="Add();" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>데이터업로드</a>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
 			</div>
 
 			<div class="card-body">
 				<div class="row">
-					<div class="col-lg-4 inner-td">
+					<div class="col-lg-6 inner-td">
 						<div class="form-group">
 							<label for="good_types">판매기간</label>
 							<div class="form-inline date-select-inbox">
@@ -55,7 +54,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4 inner-td">
+					<div class="col-lg-6 inner-td">
 						<div class="form-group">
 							<label for="">매장구분</label>
 							<div class="flax_box">
@@ -68,30 +67,17 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="">매장명</label>
-							<div class="flax_box">
-								<input type='text' class="form-control form-control-sm search-enter" name='com_nm' value=''>
-							</div>
-						</div>
-					</div>
 				</div>
 				<div class="row">
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="">판매유형</label>
-							<div class="flax_box">
-								<select name='sell_type' class="form-control form-control-sm">
-									<option value=''>전체</option>
-								@foreach ($sell_types as $sell_type)
-									<option value='{{ $sell_type->code_id }}'>{{ $sell_type->code_val }}</option>
-								@endforeach
-								</select>
-							</div>
-						</div>
-					</div>
-					<div class="col-lg-4 inner-td">
+                    <div class="col-lg-6 inner-td">
+                        <div class="form-group">
+                            <label for="">매장명</label>
+                            <div class="flax_box">
+                                <input type='text' class="form-control form-control-sm search-enter" name='com_nm' value=''>
+                            </div>
+                        </div>
+                    </div>
+					<div class="col-lg-6 inner-td">
 						<div class="form-group">
 							<label for="item">자료수/정렬</label>
 							<div class="form-inline">
