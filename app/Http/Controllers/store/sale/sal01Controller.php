@@ -578,7 +578,7 @@ class sal01Controller extends Controller
 				// DB::table('outbound_order')->insert($out_order);
 				$code = 200;
 			} catch (Exception $e) {
-				dd($e->getMessage());
+				// dd($e->getMessage());
 			}
 			return response()->json(['code'	=> $code]);
 		} else {
