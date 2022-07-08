@@ -24,7 +24,7 @@ class sal02Controller extends Controller
 			where 
 				code_kind_cd = 'store_type' and use_yn = 'Y' order by code_seq 
 		";
-		$store_types	= DB::select($sql);
+		$store_types = DB::select($sql);
 
 		// 행사구분
 		$sql = "
@@ -33,7 +33,7 @@ class sal02Controller extends Controller
 			where
 				code_kind_cd = 'event_cd' and use_yn = 'Y' order by code_seq
 		";
-		$event_cds	= DB::select($sql);
+		$event_cds = DB::select($sql);
 
 		// 판매유형
 		$sql = "
@@ -60,21 +60,30 @@ class sal02Controller extends Controller
 		$store_type = $request->input('store_type', "");
 		$store_cd = $request->input('store_cd', "");
 		$store_nm = $request->input('store_nm', "");
+		$goods_no = $request->input('goods_no', "");
+		$goods_nm = $request->input('goods_nm', "");
+		$brand_cd = $request->input('brand', "");
+		$style_no = $request->input('style_no', "");
+		$sale_yn = $request->input('sale_yn','Y');
+
+		// 판매 유형은 추후 반영 예정
+		$sell_type = $request->input('sell_type');
 
 		$ym = str_replace("-", "", $sdate);
 		$next_month = $sdate[-1] + 1;
 		$edate = substr($sdate, 0, -1) . $next_month;
 
-		// 검색 필드는 sql에 추후 추가 예정
-		$com_type = $request->input('com_type');
-		$sell_type = $request->input('sell_type');
-        $sale_yn = $request->input('sale_yn','Y');
+		$where = "";
+		if ($brand_cd != "") $where .= " and b.brand = " . Lib::quote($brand_cd);
+		if ($goods_no != "") $where .= " and g.goods_no like '%" . Lib::quote($goods_no) . "%'";
+		if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%'";
+		if ($style_no != "") $where .= " and g.style_no like '%" . Lib::quote($style_no) . "%'";
 
-        $where = "";
-        if ($sale_yn == "Y") $where .= " and qty is not null";
-		if ($store_type) $where .= " and c.code_id = ${store_type}";
-		if ($store_cd != "") $where .= " and s.store_cd like '%" . Lib::quote($store_cd) . "%'";
-		if ($store_nm != "") $where .= " and s.store_nm like '%" . Lib::quote($store_nm) . "%'";
+        $where2 = "";
+        if ($sale_yn == "Y") $where2 .= " and qty is not null";
+		if ($store_type) $where2 .= " and c.code_id = ${store_type}";
+		if ($store_cd != "") $where2 .= " and s.store_cd like '%" . Lib::quote($store_cd) . "%'";
+		if ($store_nm != "") $where2 .= " and s.store_nm like '%" . Lib::quote($store_nm) . "%'";
 
 		Carbon::parse($sdate)->endOfMonth()->toDateString();
 		$last_day = Carbon::parse($sdate)->endOfMonth()->toDateString();
@@ -118,16 +127,19 @@ class sal02Controller extends Controller
 				select 
 					store_cd, sum(o.qty) as qty, sum(o.price*o.qty) as ord_amt, sum(o.recv_amt) as recv_amt,
 					${sum}
-				from order_mst m inner join order_opt o on m.ord_no = o.ord_no 
-				where m.ord_date >= :sdate and m.ord_date < :edate and m.store_cd <> ''
+				from order_mst m 
+					inner join order_opt o on m.ord_no = o.ord_no 
+					inner join goods g on o.goods_no = g.goods_no
+					left outer join brand b on g.brand = b.brand
+				where m.ord_date >= :sdate and m.ord_date < :edate and m.store_cd <> '' $where
 				group by store_cd
 			) a on s.store_cd = a.store_cd
                 left outer join store_sales_projection p on p.ym = :ym and s.`store_cd` = p.`store_cd`			
                 left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = s.store_type
-            where 1=1 $where
+            where 1=1 $where2
 		";
 
-		$rows = DB::select($sql, ['sdate' => $sdate,'edate' => $edate, "ym" => $ym]);
+		$rows = DB::select($sql, ['sdate' => $sdate,'edate' => $edate, 'ym' => $ym]);
 
 		return response()->json([
             "code" => 200,

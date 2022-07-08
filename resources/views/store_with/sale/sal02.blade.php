@@ -18,6 +18,7 @@
 				<h4>검색</h4>
 				<div class="flex_box">
 					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+					<a href="#" onclick="formReset()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
 			</div>
@@ -115,60 +116,6 @@
 					</div>
 					<div class="col-lg-4">
 						<div class="form-group">
-							<label for="item">카테고리</label>
-							<div class="form-inline inline_select_box">
-								<div class="form-inline-inner select-box">
-									<select name='cat_type' id="cat_type" class="form-control form-control-sm">
-										<option value='DISPLAY'>전시</option>
-										<option value='ITEM'>용도</option>
-									</select>
-								</div>
-								<div class="form-inline-inner input-box">
-									<div class="form-inline inline_btn_box">
-										<select name='cat_cd' id='cat_cd' class="form-control form-control-sm select2-category"></select>
-										<a href="#" class="btn btn-sm btn-outline-primary sch-category"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-lg-4">
-						<div class="form-group">
-                            <label for="sale_yn">세일여부/세일구분</label>
-                            <div class="form-inline">
-                                <div class="form-inline-inner input-box w-25 pr-1" style="min-width:70px">
-                                    <select id="sale_yn" name="sale_yn" class="form-control form-control-sm w-100">
-                                        <option value="">전체</option>
-                                        <option value="Y">Y</option>
-                                        <option value="N">N</option>
-                                    </select>
-                                </div>
-                                <div class="form-inline-inner form-check-box ml-2">
-                                    <div class="form-inline">
-                                        <div class="custom-control custom-checkbox" style="display: inline-flex; min-width: 80px;">
-                                            <input type="checkbox" name="coupon_yn" id="coupon_yn" class="custom-control-input" value="Y">
-                                            <label class="custom-control-label" for="coupon_yn" style="font-weight: 400;">쿠폰여부</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <span>　/　</span>
-                                <div class="form-inline-inner form-check-box" style="flex-grow: 1;">
-                                    <select id="sale_type" name="sale_type" class="form-control form-control-sm w-100">
-                                        <option value="">선택</option>
-                                        <option value="event">event</option>
-                                        <option value="onesize">onesize</option>
-                                        <option value="clearance">clearance</option>
-                                        <option value="refurbished">refurbished</option>
-                                        <option value="newmember">newmember</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-lg-4">
-						<div class="form-group">
 							<label for="qty">집계구분</label>
 							<div class="flex_box">
 								<div class="form-inline form-radio-box">
@@ -210,6 +157,7 @@
 		</div>
 		<div class="resul_btn_wrap mb-3">
 			<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+			<input type="reset" id="search_reset" value="검색조건 초기화" class="btn btn-sm btn-outline-primary shadow-sm" onclick="formReset()">
 			<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
 		</div>
 	</div>
@@ -329,7 +277,9 @@
 		gx.Request('/store/sale/sal02/search', data, 1, (e) => formatDay(e));
 	}
 
-	
+	const formReset = () => {
+		document.search.reset();
+	};
 
 </script>
 @stop
