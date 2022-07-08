@@ -195,38 +195,59 @@
 	};
 
 	var columns = [
-		{headerName: "#", field: "num",type:'NumType',pinned: 'left'},
-		{field: "store_type_nm", headerName: "매장구분", pinned: 'left'},
-		{field: "store_cd", headerName: "매장코드",  pinned: 'left',hide: true},
-		{field: "store_nm", headerName: "매장명",  pinned: 'left',type: 'StoreNameType'},
-		{field: "proj_amt",	headerName: "목표", width:85, type: 'currencyMinusColorType'},
-        {field: "",	headerName: "달성율(%)", width:85, type: 'percentType'}
+		{ headerName: "#", field: "num", type:'NumType', pinned:'left', aggSum:"합계", aggAvg:"평균", cellStyle: { 'text-align': "center" },
+			cellRenderer: function (params) {
+				if (params.node.rowPinned === 'top') {
+					return "합계";
+				} else {
+					return parseInt(params.value) + 1;
+				}
+			}
+		},
+		{ field: "store_type_nm", headerName: "매장구분", pinned:'left', width:90, cellStyle: { 'text-align': "center" } },
+		{ field: "store_cd", headerName: "매장코드", pinned:'left', hide: true },
+		{ field: "store_nm", headerName: "매장명", pinned:'left', type: 'StoreNameType', width: 250 },
+		{ field: "proj_amt", headerName: "목표", pinned:'left', width:85, type: 'currencyType', aggregation:true },
+        { field: "progress_proj_amt", headerName: "달성율(%)", pinned:'left', width:85, type: 'percentType',
+			cellRenderer: function (params) {
+				if (params.node.rowPinned === 'top') {
+					return "";
+				} else {
+					const { proj_amt, recv_amt } = params.data;
+					/**
+					 * ( 목표 - 결제금액 ) / 목표 * 100 = 달성율(%)
+					 */
+					let progress = (Math.abs(parseInt(proj_amt) - parseInt(recv_amt))) / parseInt(proj_amt) * 100;
+					if (proj_amt == 0) progress = ""; // 목표액이 없는경우 빈 값 할당
+					if (progress > 100) progress = 100; // 달성율 100 넘어가는 경우 100으로 고정
+					return progress;
+				}
+			}
+		},
+		{ field: "summary",	headerName: "합계",
+			children: [
+				{ headerName: "오프라인", field: "offline", type: 'numberType', aggregation: true },
+				{ headerName: "온라인", field: "online", type: 'currencyType', aggregation: true, type: 'currencyMinusColorType' },
+				{ headerName: "주문수량", field: "qty", type: 'currencyType', aggregation: true, type: 'currencyMinusColorType' },
+				{ headerName: "주문금액", field: "ord_amt", type: 'currencyType', aggregation: true, type: 'currencyMinusColorType' },
+				{ headerName: "결제금액", field: "recv_amt", type: 'currencyType', aggregation: true, type: 'currencyMinusColorType' }
+			]
+		}
 	];
 
-	const mutable_cols = (max_day) => [ ...columns, { ...sum_cols() }, { ...day_cols(max_day) }, { headerName: "", field: "nvl", width: "auto" } ];
-
-	const sum_cols = () => {
-		return (
-			{field: "",	headerName: "합계",
-				children: [
-					{headerName: "오프라인", field: "", type: 'numberType'},
-					{headerName: "온라인", field: "", type: 'currencyMinusColorType'},
-					{headerName: "주문수량", field: "qty", type: 'currencyMinusColorType'},
-					{headerName: "주문금액", field: "ord_amt", type: 'currencyMinusColorType'},
-					{headerName: "결제금액", field: "recv_amt", type: 'currencyMinusColorType'}
-				]
-			}
-		);
+	const setColumns = (max_day) => {
+		columns.push({ ...dayColumns(max_day) });
+		columns.push({ headerName: "", field: "nvl", width: "auto" });
 	};
 
-	const day_cols = (max_day) => {
+	const dayColumns = (max_day) => {
 		let obj = { fields: "day", headerName: "기간", children: [] };
 		for ( var i=0; i < max_day; i++ ) {
 			const day = i + 1;
 			const code = yoil.codes[i];
 			const day_of_week = yoil.format[code];
 			const f_day = day + ` (${day_of_week})`;
-			let col = { field: `${day}_val`, headerName: f_day, type: 'currencyMinusColorType' };
+			let col = { field: `${day}_val`, headerName: f_day, type: 'numberType', aggregation:true, type: 'currencyMinusColorType' };
 			if ( code == 0 ) {
 				col.headerClass = 'hd-grid-red'; // 일요일 표시
 			} else if ( code == 6 ) {
@@ -237,16 +258,22 @@
 		return obj;
 	};
 
-	const pApp = new App('',{
+	const pApp = new App('', {
 		gridId:"#div-gd",
 	});
 	let gx;
 	$(document).ready(function() {
-
 		pApp.ResizeGrid(265);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
-		gx = new HDGrid(gridDiv, columns);
+		let options = {
+			getRowStyle: (params) => {
+				if (params.node.rowPinned === 'top') {
+					return { 'background': '#eee' }
+				}
+			}
+		}
+		gx = new HDGrid(gridDiv, columns, options);
 		Search();
 
 		// 매장 검색 클릭 이벤트 바인딩 및 콜백 사용
@@ -254,27 +281,31 @@
             searchStore.Open();
         });
 	});
+
 	const autoSizeColumns = (grid, except = [], skipHeader = false) => {
         const allColumnIds = [];
         grid.gridOptions.columnApi.getAllColumns().forEach((column) => {
             if (except.includes(column.getId())) return;
             allColumnIds.push(column.getId());
+			
         });
+		console.log(allColumnIds);
         grid.gridOptions.columnApi.autoSizeColumns(allColumnIds, skipHeader);
     };
 
 	const formatDay = (e) => {
 		yoil.codes = e.head.yoil_codes
 		const max_day = yoil.codes.length;
-		const columns = mutable_cols(max_day);
-		console.log(columns);
+		setColumns(max_day);
 		gx.gridOptions.api.setColumnDefs(columns);
+		gx.CalAggregation();
 		autoSizeColumns(gx, ["nvl"]);
 	};
 
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/store/sale/sal02/search', data, 1, (e) => formatDay(e));
+		gx.Aggregation({ sum: "top" });
+		gx.Request('/store/sale/sal02/search', data, -1, (e) => formatDay(e));
 	}
 
 	const formReset = () => {
