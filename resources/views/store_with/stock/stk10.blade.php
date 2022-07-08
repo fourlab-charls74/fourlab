@@ -258,6 +258,7 @@
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
+                                        <option value="req_rt">출고요청일</option>
                                         <option value="goods_no">상품번호</option>
                                         <option value="prd_cd">상품코드</option>
                                     </select>
@@ -336,8 +337,8 @@
         {field: "storage_nm", headerName: "창고", width: 100, cellStyle: {"text-align": "center"}},
         {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {"text-align": "center"}},
 		{field: "style_no",	headerName: "스타일넘버", cellStyle: {"text-align": "center"}},
-		{field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 300},
-		{field: "goods_opt", headerName: "옵션", width: 70, cellStyle: {"text-align": "center"}},
+		{field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 350},
+		{field: "goods_opt", headerName: "옵션", width: 350},
 		{field: "qty", headerName: "수량", type: "numberType",
             editable: function(params) {return params.data.state === 10;}, 
             cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};},

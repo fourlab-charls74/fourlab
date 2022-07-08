@@ -248,7 +248,7 @@
                 alert(res.data.msg);
                 opener.Search();
                 if(type === 'add') {
-                    location.href = "/store/standard/std05/show/" + res.data.data.sale_type_cd;;
+                    location.href = "/store/standard/std05/show/" + res.data.data.sale_type_cd;
                 } else {
                     Search();
                 }
