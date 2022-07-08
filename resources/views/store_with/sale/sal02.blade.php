@@ -198,7 +198,7 @@
 		{headerName: "#", field: "num",type:'NumType'},
 		{field: "store_type_nm", headerName: "매장구분", width:90},
 		{field: "store_cd", headerName: "매장코드", width:90},
-		{field: "store_nm", headerName: "매장명", initailWidth: 200},
+		{field: "store_nm", headerName: "매장명", type: 'StoreNameType'},
 		{field: "proj_amt",	headerName: "목표", width:85, type: 'currencyType'},
         {field: "",	headerName: "달성율(%)", width:85, type: 'percentType'}
 	];
