@@ -123,7 +123,9 @@ class stk10Controller extends Controller
 
         // ordreby
         $ord = $r['ord'] ?? 'desc';
-        $ord_field = $r['ord_field'] ?? "g.goods_no";
+        $ord_field = $r['ord_field'] ?? "psr.req_rt";
+        if($ord_field == 'goods_no') $ord_field = 'g.' . $ord_field;
+        else $ord_field = 'psr.' . $ord_field;
         $orderby = sprintf("order by %s %s", $ord_field, $ord);
 
         // pagination

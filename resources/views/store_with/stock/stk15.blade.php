@@ -230,7 +230,7 @@
                         <select id='storage' name='storage' class="form-control form-control-sm"  style='width:160px;display:inline'>
                             <option value=''>선택</option>
                             @foreach ($storages as $storage)
-                                <option value='{{ $storage->storage_cd }}'>{{ $storage->storage_nm }}</option>
+                                <option value='{{ $storage->storage_cd }}' @if($storage->default_yn == "Y") selected @endif>{{ $storage->storage_nm }} @if($storage->default_yn == "Y") (대표) @endif </option>
                             @endforeach
                         </select>
                     </div>
@@ -247,9 +247,9 @@
                     <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
                     <div class="d-flex mr-1 mb-1 mb-lg-0">
                         <span class="mr-1">출고예정일</span>
-                        <div class="docs-datepicker form-inline-inner input_box" style="width:160px;display:inline;">
+                        <div class="docs-datepicker form-inline-inner input_box" style="width:130px;display:inline;">
                             <div class="input-group">
-                                <input type="text" class="form-control form-control-sm docs-date" name="exp_dlv_day" value="{{ $today }}" autocomplete="off">
+                                <input type="text" class="form-control form-control-sm docs-date bg-white" name="exp_dlv_day" value="{{ $today }}" autocomplete="off" readonly />
                                 <div class="input-group-append">
                                     <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
                                         <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -287,12 +287,25 @@
 		{field: "sale_stat_cl", headerName: "상품상태", cellStyle: StyleGoodsState},
 		{field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 300},
 		{field: "goods_opt", headerName: "옵션", width: 300},
-		{field: "wqty", headerName: "보유재고", type: "numberType"},
+		{headerName: "창고보유재고",
+            children: [
+                @foreach (@$storages as $storage)
+                    {field: '{{ $storage->storage_cd }}', headerName: '{{ $storage->storage_nm }}', type: "numberType",
+                        cellRenderer: function(params) {
+                            let storage_cd = '{{ $storage->storage_cd }}';
+                            let arr = params.data.storage_qty.filter(s => s.storage_cd === storage_cd);
+                            if(arr.length > 0) {
+                                return arr[0].wqty;
+                            }
+                            return 0;
+                        }
+                    },
+                @endforeach
+            ],
+        },
 		{field: "rel_qty", headerName: "요청수량", type: "numberType", editable: true, cellStyle: {'background-color': '#ffff99'}},
         {width: 'auto'}
     ];
-
-    // columns.push()
 </script>
 <script type="text/javascript" charset="utf-8">
     let gx;
@@ -325,12 +338,26 @@
     function requestRelease() {
         let rows = gx.getSelectedRows();
         if(rows.length < 1) return alert("출고요청할 상품을 선택해주세요.");
+        if(rows.filter(r => !r.rel_qty || !r.rel_qty.trim() || r.rel_qty == 0 || isNaN(parseInt(r.rel_qty))).length > 0) return alert("선택한 상품의 요청수량을 입력해주세요.");
 
         let storage_cd = $('[name=storage]').val();
         if(storage_cd === '') return alert("상품을 출고할 창고를 선택해주세요.");
 
         let store_cd =$('[name=store]').val();
-        if(store_cd === '') return alert("상품을 보낼 매장을 선택해주세요.");   
+        if(store_cd === '') return alert("상품을 보낼 매장을 선택해주세요.");
+
+        let over_qty_rows = rows.filter(row => {
+            let cur_storage = row.storage_qty.filter(s => s.storage_cd === storage_cd);
+            if(cur_storage.length > 0) {
+                if(cur_storage[0].wqty < parseInt(row.rel_qty)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            return true; // 상품재고가 없는경우
+        });
+        if(over_qty_rows.length > 0) return alert(`선택하신 창고의 재고보다 많은 수량을 요청하실 수 없습니다.\n상품코드 : ${over_qty_rows.map(o => o.prd_cd).join(", ")}`);
 
         if(!confirm("해당 상품을 출고요청하시겠습니까?")) return;
 
@@ -341,7 +368,6 @@
             exp_dlv_day: $('[name=exp_dlv_day]').val(),
             rel_order: $('[name=rel_order]').val(),
         };
-        console.log(data);
 
         axios({
             url: '/store/stock/stk15/request-release',
@@ -349,8 +375,11 @@
             data: data,
         }).then(function (res) {
             if(res.data.code === 200) {
-                // alert(res.data.msg);
-                console.log(res.data.code);
+                if(!confirm(res.data.msg + "\n출고요청을 계속하시겠습니까?")) {
+                    location.href = "/store/stock/stk10";
+                } else {
+                    Search();
+                }
             } else {
                 console.log(res.data);
                 alert("출고요청 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");

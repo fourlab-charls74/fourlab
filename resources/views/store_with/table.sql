@@ -49,6 +49,7 @@ insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_va
 
 -- 오프라인 출고
 CREATE TABLE `product_stock_release` (
+    `idx` INT(11) NOT NULL AUTO_INCREMENT COMMENT '일련번호',
     `type` VARCHAR(50) DEFAULT NULL COMMENT '분류 - code : REL_TYPE (초도/판매분/요청분/일반 : F/S/R/G)',
     `goods_no` INT(11) NOT NULL DEFAULT '0' COMMENT '상품번호',
     `prd_cd` VARCHAR(50) NOT NULL DEFAULT '0' COMMENT '상품코드',
@@ -70,7 +71,7 @@ CREATE TABLE `product_stock_release` (
     `fin_rt` DATETIME DEFAULT NULL COMMENT '완료일시',
     `rt` DATETIME DEFAULT NULL COMMENT '등록일시',
     `ut` DATETIME DEFAULT NULL COMMENT '변경일시',
-    PRIMARY KEY (`goods_no`,`prd_cd`,`store_cd`)
+    PRIMARY KEY (`idx`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='상품재고 이동';
 
 -- 오프라인 RT

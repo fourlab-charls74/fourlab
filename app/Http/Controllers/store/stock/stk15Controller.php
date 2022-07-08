@@ -18,7 +18,7 @@ class stk15Controller extends Controller
     public function index()
 	{
         $stores = DB::table('store')->where('use_yn', '=', 'Y')->select('store_cd', 'store_nm')->get();
-        $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm')->get();
+        $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')->orderBy('default_yn')->get();
 
 		$values = [
             'today'         => date("Y-m-d"),
@@ -100,6 +100,8 @@ class stk15Controller extends Controller
         // orderby
         $ord = $r['ord'] ?? 'desc';
         $ord_field = $r['ord_field'] ?? "g.goods_no";
+        if($ord_field == 'goods_no') $ord_field = 'g.' . $ord_field;
+        else $ord_field = 'psr.' . $ord_field;
         $orderby = sprintf("order by %s %s", $ord_field, $ord);
 
         // pagination
@@ -122,8 +124,6 @@ class stk15Controller extends Controller
                 stat.code_val as sale_stat_cl, 
                 g.goods_nm, 
                 p.goods_opt, 
-                ifnull(p.qty, 0) as qty, 
-                ifnull(p.wqty, 0) as wqty,
                 '' as rel_qty
             from product_stock p
                 inner join goods g on p.goods_no = g.goods_no
@@ -157,6 +157,18 @@ class stk15Controller extends Controller
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
         }
 
+        foreach($result as $re) {
+            $prd_cd = $re->prd_cd;
+            $sql = "
+                select s.storage_cd, p.prd_cd, p.wqty
+                from storage s
+                    left outer join product_stock_storage p on p.storage_cd = s.storage_cd and p.prd_cd = '$prd_cd'
+                where s.use_yn = 'Y' and p.use_yn = 'Y'
+            ";
+            $row = DB::select($sql);
+            $re->storage_qty = $row;
+        }
+        // dd($result);
 		return response()->json([
 			"code" => $code,
 			"head" => [
@@ -169,19 +181,100 @@ class stk15Controller extends Controller
 		]);
     }
 
+    // 일반출고 요청 (요청과 동시에 접수완료 처리됩니다.)
     public function request_release(Request $request) {
         $r = $request->all();
-        dd($r);
+
         $code = 200;
-        $msg = "";
+        $msg = "일반출고 요청 및 접수가 정상적으로 등록되었습니다.";
 
-        // $sql = "
-        //     insert into product_stock_release
-        //         (type, goods_no, prd_cd, goods_opt, qty, store_cd, storage_cd, state, exp_dlv_day, rel_order, comment, req_id, req_rt, rec_id, rec_rt, prc_id, prc_rt, fin_id, fin_rt, rt, ut)
-        //     values
-        //         ('G', '$goods_no', '$prd_cd')
-        // ";
+        $release_type = 'G';
+        $state = 20;
+        $admin_id = Auth('head')->user()->id;
+        $storage_cd = $request->input("storage_cd", '');
+        $store_cd = $request->input("store_cd", '');
+        $exp_dlv_day = $request->input("exp_dlv_day", '');
+        $rel_order = $request->input("rel_order", '');
+        $data = $request->input("products", []);
 
-        return respose()->json(["code" => $code, "msg" => $msg]);
+        try {
+            DB::beginTransaction();
+
+			foreach($data as $d) {
+                DB::table('product_stock_release')
+                    ->insert([
+                        'type' => $release_type,
+                        'goods_no' => $d['goods_no'],
+                        'prd_cd' => $d['prd_cd'],
+                        'goods_opt' => $d['goods_opt'] ?? '',
+                        'qty' => $d['rel_qty'] ?? 0,
+                        'store_cd' => $store_cd,
+                        'storage_cd' => $storage_cd,
+                        'state' => $state,
+                        'exp_dlv_day' => str_replace("-", "", $exp_dlv_day),
+                        'rel_order' => $rel_order,
+                        'req_id' => $admin_id,
+                        'req_rt' => now(),
+                        'rec_id' => $admin_id,
+                        'rec_rt' => now(),
+                        'rt' => now(),
+                    ]);
+    
+                // product_stock -> 창고보유재고 차감
+                DB::table('product_stock')
+                    ->where('prd_cd', '=', $d['prd_cd'])
+                    ->update([
+                        'wqty' => DB::raw('wqty - ' . ($d['rel_qty'] ?? 0)),
+                        'ut' => now(),
+                    ]);
+
+                // product_stock_storage -> 보유재고 차감
+                DB::table('product_stock_storage')
+                    ->where('prd_cd', '=', $d['prd_cd'])
+                    ->where('storage_cd', '=', $storage_cd)
+                    ->update([
+                        'wqty' => DB::raw('wqty - ' . ($d['rel_qty'] ?? 0)),
+                        'ut' => now(),
+                    ]);
+
+                // product_stock_store -> 재고 존재여부 확인 후 보유재고 플러스 (실재고qty는? 확인필요)
+                $store_stock_cnt = 
+                    DB::table('product_stock_store')
+                        ->where('store_cd', '=', $store_cd)
+                        ->where('prd_cd', '=', $d['prd_cd'])
+                        ->count();
+                if($store_stock_cnt < 1) {
+                    // 해당 매장에 상품 기존재고가 없을 경우
+                    DB::table('product_stock_store')
+                        ->insert([
+                            'goods_no' => $d['goods_no'],
+                            'prd_cd' => $d['prd_cd'],
+                            'store_cd' => $store_cd,
+                            'qty' => 0,
+                            'wqty' => $d['rel_qty'] ?? 0,
+                            'goods_opt' => $d['goods_opt'] ?? '',
+                            'use_yn' => 'Y',
+                            'rt' => now(),
+                        ]);
+                } else {
+                    // 해당 매장에 상품 기존재고가 이미 존재할 경우
+                    DB::table('product_stock_store')
+                        ->where('prd_cd', '=', $d['prd_cd'])
+                        ->where('store_cd', '=', $store_cd) 
+                        ->update([
+                            'wqty' => DB::raw('wqty + ' . ($d['rel_qty'] ?? 0)),
+                            'ut' => now(),
+                        ]);
+                }
+            }
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+        return response()->json(["code" => $code, "msg" => $msg]);
     }
 }
