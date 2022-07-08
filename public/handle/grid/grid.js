@@ -77,12 +77,59 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
                 cellClass:'hd-grid-number',
                 precision: 2,
             },
+
+            percentColorType:{
+                //filter: 'agNumberColumnFilter',
+                comparator: sortnumber,
+                valueFormatter:formatNumber,
+                cellClass:'hd-grid-number',
+                cellStyle: params => {
+                    if (params.value > 0) {
+                        return {color: 'red'};
+                    } else if (params.value < 0) {
+                        return {color: 'blue'};
+                    } else {
+                    }
+                },
+                precision: 2,
+            },
+
             currencyType:{
                 //filter: 'agNumberColumnFilter',
                 comparator: sortnumber,
                 valueFormatter:formatNumber,
                 cellClass:'hd-grid-number',
             },
+
+            currencyColorType:{
+                //filter: 'agNumberColumnFilter',
+                comparator: sortnumber,
+                valueFormatter:formatNumber,
+                cellClass:'hd-grid-number',
+                cellStyle: params => {
+                    if (params.value > 0) {
+                        return {color: 'red'};
+                    } else if (params.value < 0) {
+                        return {color: 'blue'};
+                    } else {
+                    }
+                },
+            },
+
+            currencyMinusColorType:{
+                //filter: 'agNumberColumnFilter',
+                comparator: sortnumber,
+                valueFormatter:formatNumber,
+                cellClass:'hd-grid-number',
+                cellStyle: params => {
+                    if (params.value < 0) {
+                        return {color: 'blue'};
+                    } else {
+                    }
+                },
+            },
+
+
             DayType:{
                 //filter: 'agNumberColumnFilter',
                 width:120,

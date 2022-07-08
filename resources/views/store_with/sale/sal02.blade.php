@@ -120,7 +120,7 @@
 							<div class="flex_box">
 								<div class="form-inline form-radio-box">
 									<div class="custom-control custom-radio">
-										<input type="radio" name="list_type" id="qty" value="qty" class="custom-control-input" checked />
+										<input type="radio" name="list_type" id="qty" value="qty" class="custom-control-input" />
 										<label class="custom-control-label" for="qty">주문수량</label>
 									</div>
 									<div class="custom-control custom-radio">
@@ -128,7 +128,7 @@
 										<label class="custom-control-label" for="ord_amt">주문금액</label>
 									</div>
 									<div class="custom-control custom-radio">
-										<input type="radio" name="list_type" id="recv_amt" value="recv_amt" class="custom-control-input" />
+										<input type="radio" name="list_type" id="recv_amt" value="recv_amt" class="custom-control-input" checked />
 										<label class="custom-control-label" for="recv_amt">결제금액</label>
 									</div>
 								</div>
@@ -195,11 +195,11 @@
 	};
 
 	var columns = [
-		{headerName: "#", field: "num",type:'NumType'},
-		{field: "store_type_nm", headerName: "매장구분", width:90},
-		{field: "store_cd", headerName: "매장코드", width:90},
-		{field: "store_nm", headerName: "매장명", type: 'StoreNameType'},
-		{field: "proj_amt",	headerName: "목표", width:85, type: 'currencyType'},
+		{headerName: "#", field: "num",type:'NumType',pinned: 'left'},
+		{field: "store_type_nm", headerName: "매장구분", pinned: 'left'},
+		{field: "store_cd", headerName: "매장코드",  pinned: 'left',hide: true},
+		{field: "store_nm", headerName: "매장명",  pinned: 'left',type: 'StoreNameType'},
+		{field: "proj_amt",	headerName: "목표", width:85, type: 'currencyMinusColorType'},
         {field: "",	headerName: "달성율(%)", width:85, type: 'percentType'}
 	];
 
@@ -210,10 +210,10 @@
 			{field: "",	headerName: "합계",
 				children: [
 					{headerName: "오프라인", field: "", type: 'numberType'},
-					{headerName: "온라인", field: "", type: 'currencyType'},
-					{headerName: "주문수량", field: "qty", type: 'currencyType'},
-					{headerName: "주문금액", field: "ord_amt", type: 'currencyType'},
-					{headerName: "결제금액", field: "recv_amt", type: 'currencyType'}
+					{headerName: "온라인", field: "", type: 'currencyMinusColorType'},
+					{headerName: "주문수량", field: "qty", type: 'currencyMinusColorType'},
+					{headerName: "주문금액", field: "ord_amt", type: 'currencyMinusColorType'},
+					{headerName: "결제금액", field: "recv_amt", type: 'currencyMinusColorType'}
 				]
 			}
 		);
@@ -226,7 +226,7 @@
 			const code = yoil.codes[i];
 			const day_of_week = yoil.format[code];
 			const f_day = day + ` (${day_of_week})`;
-			let col = { field: `${day}_val`, headerName: f_day, type: 'numberType' };
+			let col = { field: `${day}_val`, headerName: f_day, type: 'currencyMinusColorType' };
 			if ( code == 0 ) {
 				col.headerClass = 'hd-grid-red'; // 일요일 표시
 			} else if ( code == 6 ) {
@@ -242,7 +242,7 @@
 	});
 	let gx;
 	$(document).ready(function() {
-		
+
 		pApp.ResizeGrid(265);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
@@ -263,7 +263,7 @@
         grid.gridOptions.columnApi.autoSizeColumns(allColumnIds, skipHeader);
     };
 
-	const formatDay = (e) => { 
+	const formatDay = (e) => {
 		yoil.codes = e.head.yoil_codes
 		const max_day = yoil.codes.length;
 		const columns = mutable_cols(max_day);
