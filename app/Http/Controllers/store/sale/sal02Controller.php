@@ -26,7 +26,7 @@ class sal02Controller extends Controller
 		";
 		$store_types = DB::select($sql);
 
-		// 행사구분
+		// 행사구분 - 추후 논의사항
 		$sql = "
 			select *
 			from __tmp_code
@@ -35,7 +35,7 @@ class sal02Controller extends Controller
 		";
 		$event_cds = DB::select($sql);
 
-		// 판매유형
+		// 판매유형 - 추후 논의사항
 		$sql = "
 			select *
 			from __tmp_code
@@ -59,7 +59,6 @@ class sal02Controller extends Controller
 		$list_type = $request->input('list_type', "qty");
 		$store_type = $request->input('store_type', "");
 		$store_cd = $request->input('store_cd', "");
-		$store_nm = $request->input('store_nm', "");
 		$goods_no = $request->input('goods_no', "");
 		$goods_nm = $request->input('goods_nm', "");
 		$brand_cd = $request->input('brand', "");
@@ -73,21 +72,32 @@ class sal02Controller extends Controller
 		$next_month = $sdate[-1] + 1;
 		$edate = substr($sdate, 0, -1) . $next_month;
 
+		// 검색조건 필터링
 		$where = "";
 		if ($brand_cd != "") $where .= " and b.brand = " . Lib::quote($brand_cd);
-		if ($goods_no != "") $where .= " and g.goods_no like '%" . Lib::quote($goods_no) . "%'";
+
+		$goods_no = preg_replace("/\s/", ",", $goods_no);
+		$goods_no = preg_replace("/\t/", ",", $goods_no);
+		$goods_no = preg_replace("/\n/", ",", $goods_no);
+		$goods_no = preg_replace("/,,/", ",", $goods_no);
+		if ($goods_no != "") {
+			$goods_nos = explode(",", $goods_no);
+			if (count($goods_nos) > 1) {
+				if (count($goods_nos) > 500) array_splice($goods_nos, 500);
+				$in_goods_nos = join(",", $goods_nos);
+				$where .= " and g.goods_no in ( $in_goods_nos ) ";
+			} else {
+				if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
+			}
+		}
+
 		if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%'";
-		if ($style_no != "") $where .= " and g.style_no like '%" . Lib::quote($style_no) . "%'";
+		if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%'";
 
         $where2 = "";
         if ($sale_yn == "Y") $where2 .= " and qty is not null";
-		if ($store_type) $where2 .= " and c.code_id = ${store_type}";
-		if ($store_cd != "") $where2 .= " and s.store_cd like '%" . Lib::quote($store_cd) . "%'";
-		if ($store_nm != "") $where2 .= " and s.store_nm like '%" . Lib::quote($store_nm) . "%'";
-
-		Carbon::parse($sdate)->endOfMonth()->toDateString();
-		$last_day = Carbon::parse($sdate)->endOfMonth()->toDateString();
-		$max_day = substr($last_day, 8, 2);
+		if ($store_type) $where2 .= " and c.code_id = " . Lib::quote($store_type);
+		if ($store_cd != "") $where2 .= " and s.store_cd like '" . Lib::quote($store_cd) . "%'";
 
 		// 전달 받은 리스트 타입에 따라 합계 쿼리 구분
 		$sum = "";
@@ -108,6 +118,9 @@ class sal02Controller extends Controller
 		}
 
 		// 요일코드 추가 및 날짜별 합계 쿼리 적용
+		Carbon::parse($sdate)->endOfMonth()->toDateString();
+		$last_day = Carbon::parse($sdate)->endOfMonth()->toDateString();
+		$max_day = substr($last_day, 8, 2);
 		$yoil_codes = [];
 		for ($i = 0; $i < $max_day; $i++) {
 			$day = $i + 1;
