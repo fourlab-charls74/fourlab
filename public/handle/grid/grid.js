@@ -467,7 +467,6 @@ HDGrid.prototype._Request = function(callback) {
 
                 $("#" + _gx.gridTotal).text(numberWithCommas(_total));
 
-
                 if (_gx.IsAggregation() === true) {
                     _gx.CalAggregation();
                 }
@@ -519,15 +518,15 @@ HDGrid.prototype.Aggregation = function(params){
     this.agg_params = params;
 };
 
-HDGrid.prototype.CalAggregation = function(){
+HDGrid.prototype.CalAggregation = function(){ // 2022-07-08 동적으로 컬럼 정의해도 변경되도록 수정 -  madforre
 
     var cnt = this.gridOptions.api.getDisplayedRowCount();
 
     if(cnt > 0){
 
         let sumRow = {};
-        for (let i = 0; i < this.gridOptions.columnDefs.length; i++) {
-            let column = this.gridOptions.columnDefs[i];
+        for (let i = 0; i < this.gridOptions.api.getColumnDefs().length; i++) {
+            let column = this.gridOptions.api.getColumnDefs()[i];
             if(column.aggregation === true){
                 sumRow[column.field] = 0;
             } else {
@@ -541,6 +540,7 @@ HDGrid.prototype.CalAggregation = function(){
                 }
             }
         }
+        
         const fields = Object.keys(sumRow);
 
         for (row = 0; row < cnt; row++) {
@@ -562,8 +562,8 @@ HDGrid.prototype.CalAggregation = function(){
             }
         }
 
-        for (let i = 0; i < this.gridOptions.columnDefs.length; i++) {
-            let column = this.gridOptions.columnDefs[i];
+        for (let i = 0; i < this.gridOptions.api.getColumnDefs().length; i++) {
+            let column = this.gridOptions.api.getColumnDefs()[i];
             if (column.hasOwnProperty('aggSum')) {
                 sumRow[column.field] = column.aggSum;
             }
@@ -576,6 +576,10 @@ HDGrid.prototype.CalAggregation = function(){
         let bottomRow = [];
 
         Object.keys(this.agg_params).forEach(key => {
+
+
+            console.log(key);
+
             switch(key) {
                 case "sum":
                     if(this.agg_params.sum === "top"){
