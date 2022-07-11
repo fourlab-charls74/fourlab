@@ -54,8 +54,7 @@ class stk10Controller extends Controller
         // having
         $sdate = str_replace("-", "", $r['sdate'] ?? now()->sub(1, 'week')->format('Ymd'));
         $edate = str_replace("-", "", $r['edate'] ?? date("Ymd"));
-        $having .= " and dlv_day >= '$sdate'";
-        $having .= " and dlv_day <= '$edate'";
+        $having .= " and if(psr.state > 10, dlv_day >= '$sdate' and dlv_day <= '$edate', 1=1)";
 
         // where
 		if($r['rel_order'] != null)
@@ -179,8 +178,7 @@ class stk10Controller extends Controller
         $total = 0;
         $page_cnt = 0;
         if($page == 1) {
-            $where .= " and cast(if(psr.state < 30, psr.exp_dlv_day, psr.prc_rt) as date) >= '$sdate'";
-            $where .= " and cast(if(psr.state < 30, psr.exp_dlv_day, psr.prc_rt) as date) <= '$edate'";
+            $where .= " and if(psr.state > 10, cast(if(psr.state < 30, psr.exp_dlv_day, psr.prc_rt) as date) >= '$sdate' and cast(if(psr.state < 30, psr.exp_dlv_day, psr.prc_rt) as date) <= '$edate', 1=1)";
 
             $sql = "
                 select count(*) as total
@@ -211,8 +209,91 @@ class stk10Controller extends Controller
     }
 
     // 접수 (10 -> 20)
-    public function receipt() {
+    public function receipt(Request $request) {
+        $ori_state = 10;
+        $new_state = 20;
+        $admin_id = Auth('head')->user()->id;
+        $data = $request->input("data", []);
+        $exp_dlv_day = $request->input("exp_dlv_day", '');
+        $rel_order = $request->input("rel_order", '');
 
+        try {
+            DB::beginTransaction();
+
+			foreach($data as $d) {
+                if($d['state'] != $ori_state) continue;
+
+                DB::table('product_stock_release')
+                    ->where('idx', '=', $d['idx'])
+                    ->update([
+                        'qty' => $d['qty'] ?? 0,
+                        'exp_dlv_day' => str_replace("-", "", $exp_dlv_day),
+                        'rel_order' => $rel_order,
+                        'state' => $new_state,
+                        'comment' => $d['comment'],
+                        'rec_id' => $admin_id,
+                        'rec_rt' => now(),
+                        'ut' => now(),
+                    ]);
+
+                // product_stock -> 창고보유재고 차감
+                DB::table('product_stock')
+                    ->where('prd_cd', '=', $d['prd_cd'])
+                    ->update([
+                        'wqty' => DB::raw('wqty - ' . ($d['rel_qty'] ?? 0)),
+                        'ut' => now(),
+                    ]);
+
+                // product_stock_storage -> 보유재고 차감
+                DB::table('product_stock_storage')
+                    ->where('prd_cd', '=', $d['prd_cd'])
+                    ->where('storage_cd', '=', $d['storage_cd'])
+                    ->update([
+                        'wqty' => DB::raw('wqty - ' . ($d['qty'] ?? 0)),
+                        'ut' => now(),
+                    ]);
+
+                // product_stock_store -> 재고 존재여부 확인 후 보유재고 플러스
+                $store_stock_cnt = 
+                    DB::table('product_stock_store')
+                        ->where('store_cd', '=', $d['store_cd'])
+                        ->where('prd_cd', '=', $d['prd_cd'])
+                        ->count();
+                if($store_stock_cnt < 1) {
+                    // 해당 매장에 상품 기존재고가 없을 경우
+                    DB::table('product_stock_store')
+                        ->insert([
+                            'goods_no' => $d['goods_no'],
+                            'prd_cd' => $d['prd_cd'],
+                            'store_cd' => $d['store_cd'],
+                            'qty' => 0,
+                            'wqty' => $d['qty'] ?? 0,
+                            'goods_opt' => $d['goods_opt'] ?? '',
+                            'use_yn' => 'Y',
+                            'rt' => now(),
+                        ]);
+                } else {
+                    // 해당 매장에 상품 기존재고가 이미 존재할 경우
+                    DB::table('product_stock_store')
+                        ->where('prd_cd', '=', $d['prd_cd'])
+                        ->where('store_cd', '=', $d['store_cd']) 
+                        ->update([
+                            'wqty' => DB::raw('wqty + ' . ($d['qty'] ?? 0)),
+                            'ut' => now(),
+                        ]);
+                }
+            }
+
+			DB::commit();
+            $code = 200;
+            $msg = "접수처리가 정상적으로 완료되었습니다.";
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+        return response()->json(["code" => $code, "msg" => $msg]);
     }
 
     // 출고 (20 -> 30)
@@ -234,6 +315,15 @@ class stk10Controller extends Controller
                         'state' => $new_state,
                         'prc_id' => $admin_id,
                         'prc_rt' => now(),
+                        'ut' => now(),
+                    ]);
+
+                // product_stock_storage 창고 실재고 차감
+                DB::table('product_stock_storage')
+                    ->where('prd_cd', '=', $d['prd_cd'])
+                    ->where('storage_cd', '=', $d['storage_cd']) 
+                    ->update([
+                        'qty' => DB::raw('qty - ' . ($d['qty'] ?? 0)),
                         'ut' => now(),
                     ]);
             }
@@ -312,6 +402,8 @@ class stk10Controller extends Controller
                     ->update([
                         'state' => $new_state,
                         'comment' => $d['comment'] ?? '',
+                        'fin_id' => $admin_id,
+                        'fin_rt' => now(),
                         'ut' => now(),
                     ]);
             }

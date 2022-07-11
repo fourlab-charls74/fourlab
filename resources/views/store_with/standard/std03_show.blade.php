@@ -155,6 +155,14 @@
                                                 </div>
                                             </td>
                                         </tr>
+                                        <tr>
+                                            <th>설명</th>
+                                            <td colspan="3">
+                                                <div class="form-inline">
+                                                    <input type="text" name="comment" id="comment" value="{{ @$storage->comment }}" class="form-control form-control-sm w-100" />
+                                                </div>
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -182,7 +190,7 @@
         if(!validation('add')) return;
         if(!window.confirm("창고정보를 등록하시겠습니까?")) return;
 
-        if(is_exit_default_storage === 'true') {
+        if(f1.default_yn.checked && '{{ @$storage->default_yn }}' !== "Y" && is_exit_default_storage === 'true') {
             if(!confirm("해당 창고를 대표창고로 설정하실 경우, 기존에 대표창고로 설정된 창고는 대표창고에서 제외됩니다.")) return;
         } 
 
@@ -267,7 +275,8 @@
             use_yn: f1.use_yn.value,
             loss_yn: f1.loss_yn.value,
             stock_check_yn: f1.stock_check_yn.value,
-            default_yn: f1.default_yn.checked ? 'Y' : 'N'
+            default_yn: f1.default_yn.checked ? 'Y' : 'N',
+            comment: f1.comment.value,
         }
     }
 

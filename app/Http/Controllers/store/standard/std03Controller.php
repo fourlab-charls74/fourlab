@@ -41,7 +41,7 @@ class std03Controller extends Controller
 			$where .= " and stock_check_yn = '$stock_check_yn'";
 
 		$sql = "
-			select storage_cd, storage_nm, phone, use_yn, stock_check_yn, default_yn
+			select storage_cd, storage_nm, phone, use_yn, stock_check_yn, default_yn, comment
 			from storage
 			where 1=1 $where
 			order by storage_cd
@@ -67,7 +67,7 @@ class std03Controller extends Controller
 
 		if($storage_cd != '') {
 			$sql = "
-				select storage_cd, storage_nm, storage_nm_s, zipcode, addr1, addr2, phone, fax, ceo, use_yn, loss_yn, stock_check_yn, default_yn, reg_date, mod_date, admin_id
+				select storage_cd, storage_nm, storage_nm_s, zipcode, addr1, addr2, phone, fax, ceo, use_yn, loss_yn, stock_check_yn, default_yn, comment, reg_date, mod_date, admin_id
 				from storage
 				where storage_cd = :storage_cd
 			";
@@ -128,6 +128,7 @@ class std03Controller extends Controller
 		$loss_yn = $request->input("loss_yn", "Y");
 		$stock_check_yn = $request->input("stock_check_yn", "Y");
 		$default_yn = $request->input("default_yn", "N");
+		$comment = $request->input("comment", "");
 
 		try {
             DB::beginTransaction();
@@ -150,6 +151,7 @@ class std03Controller extends Controller
 				'loss_yn' => $loss_yn,
 				'stock_check_yn' => $stock_check_yn,
 				'default_yn' => $default_yn,
+				'comment' => $comment,
 				'reg_date' => now(),
 				'admin_id' => $admin_id,
 			]);
@@ -184,6 +186,7 @@ class std03Controller extends Controller
 		$loss_yn = $request->input("loss_yn", "Y");
 		$stock_check_yn = $request->input("stock_check_yn", "Y");
 		$default_yn = $request->input("default_yn", "N");
+		$comment = $request->input("comment", "");
 
 		try {
 			DB::beginTransaction();
@@ -207,6 +210,7 @@ class std03Controller extends Controller
 					'loss_yn' => $loss_yn,
 					'stock_check_yn' => $stock_check_yn,
 					'default_yn' => $default_yn,
+					'comment' => $comment,
 					'mod_date' => now(),
 					'admin_id' => $admin_id,
 			]);

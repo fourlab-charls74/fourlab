@@ -168,7 +168,7 @@ class stk15Controller extends Controller
             $row = DB::select($sql);
             $re->storage_qty = $row;
         }
-        // dd($result);
+
 		return response()->json([
 			"code" => $code,
 			"head" => [
@@ -237,7 +237,7 @@ class stk15Controller extends Controller
                         'ut' => now(),
                     ]);
 
-                // product_stock_store -> 재고 존재여부 확인 후 보유재고 플러스 (실재고qty는? 확인필요)
+                // product_stock_store -> 재고 존재여부 확인 후 보유재고 플러스
                 $store_stock_cnt = 
                     DB::table('product_stock_store')
                         ->where('store_cd', '=', $store_cd)

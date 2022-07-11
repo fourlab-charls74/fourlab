@@ -38,11 +38,8 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-<<<<<<< Updated upstream
                             <label for="store_no">매장</label>
-=======
                             <label for="store_cd">매장명</label>
->>>>>>> Stashed changes
                             <div class="form-inline inline_btn_box">
                                 <input type='hidden' id="store_nm" name="store_nm">
                                 <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>

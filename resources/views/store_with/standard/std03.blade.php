@@ -124,6 +124,7 @@
                 return {"text-align": "center", "background-color": params.value === "Y" ? "#FFACAC" : "none"};
             }
         },
+        {field: "comment", headerName: "설명", width: 300},
         {width: "auto"}
     ];
 </script>
@@ -154,7 +155,7 @@
     // 등록/상세 팝업창 오픈
     function openPopup(storage_cd = '') {
         const url = "/store/standard/std03/show/" + storage_cd;
-        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=900,height=570");
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=900,height=640");
     }
 </script>
 @stop

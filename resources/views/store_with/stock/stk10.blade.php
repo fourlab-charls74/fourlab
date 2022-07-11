@@ -296,10 +296,32 @@
 			<div class="filter_wrap">
 				<div class="d-flex justify-content-between">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
-                    <div>
+                    <div class="d-flex">
+                        <div class="d-flex mr-1 mb-1 mb-lg-0">
+                            <span class="mr-1">출고예정일</span>
+                            <div class="docs-datepicker form-inline-inner input_box" style="width:130px;display:inline;">
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm docs-date bg-white" name="exp_dlv_day" value="{{ $edate }}" autocomplete="off" readonly />
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="docs-datepicker-container"></div>
+                            </div>
+                        </div>
+                        <div class="d-flex">
+                            <select id='exp_rel_order' name='exp_rel_order' class="form-control form-control-sm mr-2"  style='width:70px;display:inline'>
+                                @foreach ($rel_orders as $rel_order)
+                                    <option value='{{ $rel_order->code_id }}'>{{ $rel_order->code_val }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                         <a href="javascript:void(0);" onclick="receipt()" class="btn btn-sm btn-primary shadow-sm">접수</a>
-                        <a href="javascript:void(0);" onclick="release()" class="btn btn-sm btn-primary shadow-sm">출고</a>
-                        <a href="javascript:void(0);" onclick="receive()" class="btn btn-sm btn-primary shadow-sm">매장입고</a>
+                        <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
+                        <a href="javascript:void(0);" onclick="release()" class="btn btn-sm btn-primary shadow-sm mr-1">출고</a>
+                        <a href="javascript:void(0);" onclick="receive()" class="btn btn-sm btn-primary shadow-sm mr-1">매장입고</a>
                         <a href="javascript:void(0);" onclick="reject()" class="btn btn-sm btn-primary shadow-sm">거부</a>
                     </div>
 				</div>
@@ -342,20 +364,20 @@
             },
         },
         // 출고일자 값 : 출고상태가 요청/접수 일때 -> 출고예정일자(exp_dlv_day) | 출고상태가 출고/입고 일때 -> 출고처리일자(prc_rt)
-        {field: "dlv_day", headerName: "출고일자", width: 110, cellStyle: {"text-align": "center"}, 
+        {field: "dlv_day", headerName: "출고일자", pinned: 'left', width: 110, cellStyle: {"text-align": "center"}, 
             cellRenderer: function(params) {
-                return params.value + (params.data.state < 30 ? ' (예정)' : '');
+                return params.data.state > 10 ? params.value + (params.data.state < 30 ? ' (예정)' : '') : '';
             }
         },
-        {field: "state", headerName: "출고상태", cellStyle: StyleReleaseState,
+        {field: "state", headerName: "출고상태", pinned: 'left', cellStyle: StyleReleaseState,
             cellRenderer: function(params) {
                 return rel_states[params.value];
             }
         },
-        {field: "rel_type",	headerName: "출고구분", width: 80, cellStyle: {"text-align": "center"}},
-        {field: "store_nm",	headerName: "매장", width: 100, cellStyle: {"text-align": "center"}},
-        {field: "storage_nm", headerName: "창고", width: 100, cellStyle: {"text-align": "center"}},
-        {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {"text-align": "center"}},
+        {field: "rel_type",	headerName: "출고구분", pinned: 'left', width: 80, cellStyle: {"text-align": "center"}},
+        {field: "store_nm",	headerName: "매장", pinned: 'left', width: 100, cellStyle: {"text-align": "center"}},
+        {field: "storage_nm", headerName: "창고", pinned: 'left', width: 100, cellStyle: {"text-align": "center"}},
+        {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
 		{field: "style_no",	headerName: "스타일넘버", cellStyle: {"text-align": "center"}},
 		{field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 350},
 		{field: "goods_opt", headerName: "옵션", width: 350},
@@ -363,21 +385,22 @@
             editable: function(params) {return params.data.state === 10;}, 
             cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};},
         },
-		{field: "exp_dlv_day", headerName: "출고예정일자", 
-            cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99", "text-align": "center"} : {"text-align": "center"};},
-            cellRenderer: (params) => {
-                    return params.data.state === 10 ? `<input type="date" class="grid-date" value="${params.value ?? ''}" onchange="selectCurRow('exp_dlv_day', this, '${params.rowIndex}')" />` : params.value;
-            }
+		{field: "exp_dlv_day", headerName: "출고예정일자", cellStyle: {"text-align": "center"},
+            // cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99", "text-align": "center"} : {"text-align": "center"};},
+            // cellRenderer: (params) => {
+            //         return params.data.state === 10 ? `<input type="date" class="grid-date" value="${params.value ?? ''}" onchange="selectCurRow('exp_dlv_day', this, '${params.rowIndex}')" />` : params.value;
+            // }
         },
 		{field: "rel_order", headerName: "출고차수", width: 100, 
-            editable: function(params) {return params.data.state === 10;}, 
-            cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99", "text-align": "center"} : {"text-align": "center"};},
-            cellEditorSelector: function(params) {
-                return {
-                    component: 'agRichSelectCellEditor',
-                    params: { values: rel_orders.map(o => o.code_val) },
-                };
-            },
+            // editable: function(params) {return params.data.state === 10;}, 
+            // cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99", "text-align": "center"} : {"text-align": "center"};},
+            // cellEditorSelector: function(params) {
+            //     return {
+            //         component: 'agRichSelectCellEditor',
+            //         params: { values: rel_orders.map(o => o.code_val) },
+            //     };
+            // },
+            cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {
                 return params.data.state === 10 ? params.value : params.data.dlv_day.replaceAll("-", "") + params.value;
             }
@@ -437,8 +460,29 @@
     // 접수 (10 -> 20)
     function receipt() {
         let rows = gx.getSelectedRows();
-        console.log(rows);
-        // 작업중
+        if(rows.length < 1) return alert("접수처리할 항목을 선택해주세요.");
+        if(rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 출고처리 가능합니다.");
+        if(!confirm("선택한 항목을 접수처리하시겠습니까?")) return;
+
+        axios({
+            url: '/store/stock/stk10/receipt',
+            method: 'post',
+            data: {
+                data: rows, 
+                exp_dlv_day: $("[name=exp_dlv_day]").val(), 
+                rel_order: $("[name=exp_rel_order]").val(),
+            },
+        }).then(function (res) {
+            if(res.data.code === 200) {
+                alert(res.data.msg);
+                Search();
+            } else {
+                console.log(res.data);
+                alert("출고처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
     }
 
     // 출고 (20 -> 30)
