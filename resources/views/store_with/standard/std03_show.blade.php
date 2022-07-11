@@ -215,6 +215,11 @@
     // 창고정보 수정
     async function updateStorage() {
         if(!validation('update')) return;
+
+        if('{{ @$storage->default_yn }}' === "Y" && !f1.default_yn.checked) {
+            return alert("대표창고를 해제할 수 없습니다.\n타 창고를 대표창고로 수정하면 자동으로 업데이트됩니다.");
+        }
+        
         if(!window.confirm("창고정보를 수정하시겠습니까?")) return;
 
         if(f1.default_yn.checked && '{{ @$storage->default_yn }}' !== "Y" && is_exit_default_storage === 'true') {

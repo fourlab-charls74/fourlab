@@ -26,12 +26,12 @@
                     <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="">매장구분</label>
+                                <label for="store_type">매장구분</label>
                                 <div class="flex_box">
                                     <select name='store_type' class="form-control form-control-sm">
                                         <option value=''>전체</option>
-                                        @foreach ($com_types as $com_type)
-                                            <option value='{{ $com_type->code_id }}'>{{ $com_type->code_val }}</option>
+                                        @foreach ($store_types as $store_type)
+                                            <option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -39,7 +39,7 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label>매장명</label>
+                                <label for="store_cd">매장명</label>
                                 <div class="form-inline inline_btn_box">
                                     <input type='hidden' id="store_nm" name="store_nm">
                                     <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
@@ -166,7 +166,7 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="goods_nm_eng">출고차수</label>
+                                <label for="goods_nm_eng">상품명(영문)</label>
                                 <div class="flax_box">
                                     <input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
                                 </div>

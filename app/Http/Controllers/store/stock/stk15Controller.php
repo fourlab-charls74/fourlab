@@ -185,9 +185,6 @@ class stk15Controller extends Controller
     public function request_release(Request $request) {
         $r = $request->all();
 
-        $code = 200;
-        $msg = "일반출고 요청 및 접수가 정상적으로 등록되었습니다.";
-
         $release_type = 'G';
         $state = 20;
         $admin_id = Auth('head')->user()->id;
@@ -269,6 +266,8 @@ class stk15Controller extends Controller
             }
 
 			DB::commit();
+            $code = 200;
+            $msg = "일반출고 요청 및 접수가 정상적으로 등록되었습니다.";
 		} catch (Exception $e) {
 			DB::rollback();
 			$code = 500;

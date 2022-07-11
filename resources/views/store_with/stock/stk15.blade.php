@@ -38,7 +38,6 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="store_no">매장</label>
                             <label for="store_cd">매장명</label>
                             <div class="form-inline inline_btn_box">
                                 <input type='hidden' id="store_nm" name="store_nm">
