@@ -13,7 +13,7 @@
 <form method="get" name="search">
 	<div id="search-area" class="search_cum_form">
 		<div class="card mb-3">
-
+			<input type='hidden' name='is_searched' value='{{$is_searched}}'>
 			<div class="d-flex card-header justify-content-between">
 				<h4>검색</h4>
 				<div class="flax_box">
@@ -22,7 +22,6 @@
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
 			</div>
-
 			<div class="card-body">
 				<div class="row">
 					<div class="col-lg-4 inner-td">
@@ -109,45 +108,60 @@
 </style>
 <script type="text/javascript" charset="utf-8">
 
+	const IS_SEARCHED = document.search.is_searched.value;
+
 	let col_keys = [];
 
-	const init_cols = () => [
-		{ headerName: "#", field: "num", type:'NumType', pinned:'left', aggSum:"합계", cellStyle: { 'text-align': "center" },
-			cellRenderer: function (params) {
-				if (params.node.rowPinned === 'top') {
-					return "합계";
-				} else {
-					return parseInt(params.value) + 1;
+	const init_cols = () => {
+		return (IS_SEARCHED == 'y') 
+			? [
+				{ headerName: "#", field: "num", type:'NumType', pinned:'left', aggSum:"합계", cellStyle: { 'text-align': "center" },
+					cellRenderer: function (params) {
+						if (params.node.rowPinned === 'top') {
+							return "합계";
+						} else {
+							return parseInt(params.value) + 1;
+						}
+					}
+				},
+				{ field: "store_type_nm", headerName: "매장구분", pinned:'left', width:90, cellStyle: { 'text-align': "center" } },
+				{ field: "store_cd", headerName: "매장코드", pinned:'left', hide: true },
+				{ field: "store_nm", headerName: "매장명", pinned:'left', type: 'StoreNameType', width: 250 },
+				{
+					field: "summary", headerName: "합계",
+					children: [
+						{field: "proj_amt", headerName: "목표", type: 'currencyType', aggregation: true },
+						{field: "last_recv_amt", headerName: "전년", type: 'currencyMinusColorType', aggregation: true },
+						{field: "recv_amt", headerName: "금액", type: 'currencyMinusColorType', aggregation: true },
+						{field: "progress_proj_amt", headerName: "달성율(%)", type: 'currencyMinusColorType', aggregation: true,
+							cellRenderer: params => goalProgress(params.data)
+						},
+					]
 				}
-			}
-		},
-		{ field: "store_type_nm", headerName: "매장구분", pinned:'left', width:90, cellStyle: { 'text-align': "center" } },
-		{ field: "store_cd", headerName: "매장코드", pinned:'left', hide: true },
-		{ field: "store_nm", headerName: "매장명", pinned:'left', type: 'StoreNameType', width: 250 },
-		{
-			field: "summary", headerName: "합계",
-			children: [
-				{field: "proj_amt", headerName: "목표"},
-				{field: "prev_recv_amt", headerName: "전월"},
-				{field: "last_recv_amt", headerName: "전년"},
-				{field: "recv_amt", headerName: "금액", type: 'currencyMinusColorType'},
-				{field: "progress_proj_amt", headerName: "달성율(%)"},
-			]
-		}
-	];
+			] 
+			: []
+	};
 
 	let columns = init_cols();
 
 	/**
 	 * ( 목표 - 결제금액 ) / 목표 * 100 = 달성율(%)
 	 */
-	const goalProgress = (params, Ym) => {
-		console.log(params.data);
-		const proj_amt = params.data[`proj_amt_${Ym}`];
-		const recv_amt = params.data[`recv_amt_${Ym}`];
-		let progress = (Math.abs(parseInt(proj_amt) - parseInt(recv_amt))) / parseInt(proj_amt) * 100;
-		if (proj_amt == 0 || proj_amt == null || proj_amt == "") progress = ""; // 목표액이 없는경우 빈 값 할당
-		if (progress > 100) progress = 100; // 달성율 100 넘어가는 경우 100으로 고정
+	const goalProgress = (row, Ym) => {
+		let prefix = "";
+		let progress = 0;
+		if (Ym) prefix = `_${Ym}`;
+		let proj_amt = parseInt(row[`proj_amt${prefix}`]);
+		let recv_amt = parseInt(row[`recv_amt${prefix}`]);
+		proj_amt = isNaN(proj_amt) ? 0 : proj_amt;
+		recv_amt = isNaN(recv_amt) ? 0 : recv_amt;
+
+		if (proj_amt == 0 || proj_amt == null || proj_amt == "") progress; // 목표액이 없는경우 빈 값 할당
+		if (progress > 100) return progress = 100; // 달성율 100 넘어가는 경우 100으로 고정
+		if (proj_amt <= recv_amt) return progress = 100; // 목표액보다 큰 경우 100 처리
+
+		progress = ( (proj_amt - recv_amt) / proj_amt );
+		
 		return progress;
 	};
 
@@ -159,12 +173,21 @@
 			const f = Ym.substr(0, 4) + "-" + Ym.substr(4, 2);
 			let obj = { fields: `${Ym}`, headerName: `${f}`};
 			obj.children = [
-				{ field: `proj_amt_${Ym}`, headerName: "목표", type: 'currencyType', aggregation: true },
+				{ field: `proj_amt_${Ym}`, headerName: "목표", type: 'currencyType', aggregation: true, 
+					editable: params => params.node.rowPinned === 'top' ? false : true, 
+					cellStyle: params => {
+						if (params.node.rowPinned === 'top') {
+							return {};
+						} else {
+							return { 'background': '#ffff99' };
+						}
+					}
+				},
 				{ field: `prev_recv_amt_${Ym}`, headerName: "전월", type: 'currencyMinusColorType', aggregation: true },
                 { field: `last_recv_amt_${Ym}`, headerName: "전년", type: 'currencyMinusColorType', aggregation: true },
                 { field: `recv_amt_${Ym}`, headerName: "금액", type: 'currencyMinusColorType', aggregation: true},
                 { field: `progress_proj_amt_${Ym}`, headerName: "달성율(%)", type: 'currencyMinusColorType', aggregation: true,
-				 	cellRenderer: params => goalProgress(params, Ym)
+				 	cellRenderer: params => goalProgress(params.data, Ym)
 				}
 			];
 			cols.push(obj);
@@ -198,20 +221,28 @@
 				if (params.node.rowPinned === 'top') {
 					return { 'background': '#eee' }
 				}
-			}
+			},
+			onCellValueChanged: params => evtAfterEdit(params)
 		}
 		gx = new HDGrid(gridDiv, columns, options);
-		Search();
+
+		if (IS_SEARCHED == 'y') Search();
 
 		// 매장 검색 클릭 이벤트 바인딩 및 콜백 사용
 		$( ".sch-store" ).on("click", function() {
             searchStore.Open();
         });
 	});
+
 	function Search() {
-		let data = $('form[name="search"]').serialize();
-		gx.Aggregation({ sum: "top" });
-		gx.Request('/store/sale/sal17/search', data, -1, (e) => afterSearch(e));
+		if (IS_SEARCHED == 'y') {
+			let data = $('form[name="search"]').serialize();
+			gx.Aggregation({ sum: "top" });
+			gx.Request('/store/sale/sal17/search', data, -1, (e) => afterSearch(e));
+		} else {
+			document.search.is_searched.value = 'y';
+			$('form[name="search"]').submit();
+		}
 	}
 
 	const afterSearch = (e) => {
@@ -224,6 +255,62 @@
 		document.search.reset();
 	};
 
+	const startEditingCell = (row_index, col_key) => {
+        gx.gridOptions.api.startEditingCell({ rowIndex: row_index, colKey: col_key });
+    };
+
+	const evtAfterEdit = async (params) => {
+		let prev_value = params.oldValue;
+        let value = params.newValue;
+
+		if (prev_value !== value) {
+			let row = params.data;
+            const row_index = params.rowIndex;
+            const column_name = params.column.colId;
+
+			let regExp = /(?=proj_amt_).+/i;
+			let arr = column_name.match(regExp);
+			if (arr) {
+				if (isNaN(value) == true || value == "" || parseFloat(value) < 0) {
+					alert("숫자만 입력가능합니다.");
+					startEditingCell(row_index, column_name);
+					return false;
+				}
+
+				prev_value = toInt(params.oldValue);
+				value = toInt(params.newValue);
+
+				regExp = new RegExp(/[proj_amt_]/, "g");
+				const Ym = column_name.replace(regExp, "");
+				const rowNode = gx.gridOptions.api.getRowNode(row_index);
+
+				// 목표 금액부터 반영
+				row[column_name] = value;
+				gx.gridOptions.api.applyTransaction({ update: [row] });
+
+				// 목표 금액, 달성률 반영
+				row['proj_amt'] = toInt(row['proj_amt']) - prev_value + value;
+				row[`progress_proj_amt_${Ym}`] = goalProgress(row, Ym);
+
+                const response = await axios({ 
+                    url: `/store/sale/sal17/update`, method: 'post', 
+                    data: { 'store_cd': row.store_cd, 'proj_amt': value, 'Ym': Ym }
+                });
+                const { data, status } = response;
+                if (data?.code == 200) {
+                    gx.gridOptions.api.applyTransaction({ update: [row] });
+					gx.CalAggregation();
+                } else if (data?.code == 500) {
+					alert('목표 저장에 실패했습니다. 잠시후 다시 시도해주세요.');
+				}
+			}
+		}
+	};
+
+	const toInt = (value) => {
+		if (value == "" || value == NaN || value == null || value == undefined) return 0;
+		return parseInt(value);
+	};
 
 </script>
 @stop
