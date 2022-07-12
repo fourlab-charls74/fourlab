@@ -119,7 +119,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="resul_btn_wrap" style="padding-top:20px;text-align:right;display:block;">
+                                    <div class="resul_btn_wrap" style="padding-top:7px;text-align:right;display:block;">
                                         <a href="javascript:void(0);" id="search_store_sbtn" onclick="return searchStore.Search();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                                     </div>
                                 </div>
@@ -131,6 +131,9 @@
                                     <div class="filter_wrap">
                                         <div class="fl_box">
                                             <h6 class="m-0 font-weight-bold">총 : <span id="gd-store-total" class="text-primary">0</span> 건</h6>
+                                        </div>
+                                        <div class="fr_box">
+                                            <a href="javascript:void(0);" id="search_store_cbtn" onclick="return searchStore.ChoiceMultiple();" class="btn btn-sm btn-primary shadow-sm" style="display: none"><i class="fas fa-check fa-sm text-white-50"></i> 선택</a>
                                         </div>
                                     </div>
                                 </div>
