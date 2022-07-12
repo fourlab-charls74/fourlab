@@ -118,7 +118,6 @@ class sal02Controller extends Controller
 		}
 
 		// 요일코드 추가 및 날짜별 합계 쿼리 적용
-		Carbon::parse($sdate)->endOfMonth()->toDateString();
 		$last_day = Carbon::parse($sdate)->endOfMonth()->toDateString();
 		$max_day = substr($last_day, 8, 2);
 		$yoil_codes = [];
@@ -152,7 +151,7 @@ class sal02Controller extends Controller
             where 1=1 $where2
 		";
 
-		$rows = DB::select($sql, ['sdate' => $sdate,'edate' => $edate, 'ym' => $ym]);
+		$rows = DB::select($sql, ['sdate' => $sdate, 'edate' => $edate, 'ym' => $ym]);
 
 		return response()->json([
             "code" => 200,
