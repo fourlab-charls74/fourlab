@@ -222,7 +222,7 @@
                         <h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
                     </div>
                     <div class="d-flex flex-grow-1 flex-column flex-lg-row justify-content-end align-items-end align-items-lg-center">
-                        <div class="d-flex mb-1 mb-lg-0">
+                        {{-- <div class="d-flex mb-1 mb-lg-0">
                             <span class="mr-1">창고</span>
                             <select id='storage' name='storage' class="form-control form-control-sm"  style='width:160px;display:inline'>
                                 <option value=''>선택</option>
@@ -231,7 +231,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
+                        <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span> --}}
                         <div class="d-flex mr-1 mb-1 mb-lg-0">
                             <span class="mr-1">출고예정일</span>
                             <div class="docs-datepicker form-inline-inner input_box" style="width:130px;display:inline;">
@@ -281,27 +281,6 @@
                     {field: "storage_wqty", headerName: "보유재고", type: 'currencyType'},
                 ]
             }
-            // {
-            //     headerName: '롯데본점(피엘라벤)',
-            //     children: [
-            //         {
-            //             headerName: "재고",
-            //             field: "qty",
-            //             type: 'currencyType',
-            //         },
-            //         {
-            //             headerName: "보유재고",
-            //             field: "qty",
-            //             type: 'currencyType',
-            //         },
-            //         {field:"edit_good_qty" ,headerName:"배분수량",
-            //             editable: function(params){ return (params.data !== undefined && params.data.is_unlimited != 'Y')? true:false; },
-            //             cellClass:function(params){
-            //                 return (params.data !== undefined && params.data.is_unlimited != 'Y')? ['hd-grid-number','hd-grid-edit']: ['hd-grid-number'];
-            //             },
-            //             valueFormatter:formatNumber}
-            //     ]
-            // },
         ];
 
         function setColumn(stores) {
@@ -316,21 +295,22 @@
                     headerName: nm,
                     children: [
                         {
-                            field: cd + '_store_qty',
+                            field: cd + '_qty',
                             headerName: '재고', 
                             type: "currencyType",
                             width: 50,
                             cellRenderer: function(params) {
-                                return params.data.store_qty?.qty || 0;
+                                // return params.data.store_qty?.qty || 0;
+                                return params.data[cd] ? params.data[cd][cd + "_qty"] : 0;
                             }
                         },
                         {
-                            field: cd + '_store_wqty',
+                            field: cd + '_wqty',
                             headerName: '보유재고',
                             type: "currencyType",
                             width: 80,
                             cellRenderer: function(params) {
-                                return params.data.store_qty?.wqty || 0;
+                                return params.data[cd] ? params.data[cd][cd + "_wqty"] : 0;
                             }
                         },
                         {
@@ -363,6 +343,10 @@
                         if (isNaN(e.newValue) == true || e.newValue == "") {
                             alert("숫자만 입력가능합니다.");
                             gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                        } else {
+                            // let store_cd = e.column.colId.split("_")[0];
+                            // if(e.data[store_cd] === null) e.data[store_cd] = {};
+                            // e.data[store_cd][e.column.colId] = parseInt(e.newValue);
                         }
                     }
                 }
@@ -381,8 +365,7 @@
 
         function Search() {
             if($("[name=store_no]").val().length < 1) return alert("출고할 매장을 선택 후 검색해주세요.");
-            let data = $('form[name="search"]').serialize();
-
+            
             axios({
                 url: '/store/api/stores/search-storenm',
                 method: 'post',
@@ -390,9 +373,71 @@
             }).then(function (res) {
                 if(res.data.code === 200) {
                     setColumn(res.data.body);
+                    let data = $('form[name="search"]').serialize();
+                    data += "&store_nos=" + $("[name=store_no]").val();
                     gx.Request('/store/stock/stk12/search', data, 1);
                 } else {
                     console.log(res.data);
+                }
+            }).catch(function (err) {
+                console.log(err);
+            });
+        }
+
+        // 출고요청
+        function requestRelease() {
+            let rows = gx.getSelectedRows();
+            if(rows.length < 1) return alert("출고요청할 상품을 선택해주세요.");
+
+            let stores = $("[name=store_no]").val();
+            let emptyRow = rows.filter(r => {
+                for(let store_cd of stores) {
+                    let q = r[store_cd + '_rel_qty'];
+                    if(!q || !q.trim() || q == 0 || isNaN(parseInt(q))) return true;
+                }
+                return false;
+            });
+            if(emptyRow.length > 0) {
+                return alert("선택한 상품의 매장별 배분수량을 모두 입력해주세요.");
+            }
+
+            // let storage_cd = $('[name=storage]').val();
+            // if(storage_cd === '') return alert("상품을 출고할 창고를 선택해주세요.");
+
+            let over_qty_rows = rows.filter(r => {
+                let cnt = 0;
+                for(let store_cd of stores) {
+                    let q = r[store_cd + '_rel_qty'];
+                    cnt += parseInt(q);
+                }
+                if(cnt > (r.storage_wqty || 0)) return true;
+                else return false;
+            });
+            if(over_qty_rows.length > 0) return alert(`대표창고의 재고보다 많은 수량을 요청하실 수 없습니다.\n상품코드 : ${over_qty_rows.map(o => o.prd_cd).join(", ")}`);
+
+            if(!confirm("해당 상품을 출고요청하시겠습니까?")) return;
+
+            const data = {
+                products: rows,
+                stores: $("[name=store_no]").val(),
+                exp_dlv_day: $('[name=exp_dlv_day]').val(),
+                rel_order: $('[name=rel_order]').val(),
+            };
+
+            axios({
+                url: '/store/stock/stk12/request-release',
+                method: 'post',
+                data: data,
+            }).then(function (res) {
+                if(res.data.code === 200) {
+                    if(!confirm(res.data.msg + "\n출고요청을 계속하시겠습니까?")) {
+                        location.href = "/store/stock/stk10";
+                    } else {
+                        Search();
+                    }
+                } else {
+                    console.log(res.data);
+                    alert("출고요청 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
                 }
             }).catch(function (err) {
                 console.log(err);
