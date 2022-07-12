@@ -93,6 +93,7 @@ class std03Controller extends Controller
 		$brand			= $request->input("brand");
 		$brand_nm 		= $request->input("brand_nm");
 		$brand_nm_eng 	= $request->input("brand_nm_eng");
+		$br_cd		 	= $request->input("br_cd");
 		$memo			= $request->input("memo");
 		$overview 		= $request->input("overview");
 		$keyword 		= $request->input("keyword");
@@ -151,9 +152,9 @@ class std03Controller extends Controller
 
 				$insert_brand = "
 					insert into brand(
-						brand, brand_nm, brand_nm_eng, overview, memo, keyword, best_yn, use_yn, brand_contents, brand_logo, admin_id, admin_nm, regi_date, ut
+						brand, brand_nm, brand_nm_eng, br_cd, overview, memo, keyword, best_yn, use_yn, brand_contents, brand_logo, admin_id, admin_nm, regi_date, ut
 					)values(
-						'$brand', '$brand_nm', '$brand_nm_eng', '$overview', '$memo', '$keyword','$best_yn','$use_yn', '$brand_contents', '$logo_img_url', '$id', '$name', now(), now()
+						'$brand', '$brand_nm', '$brand_nm_eng', '$br_cd', '$overview', '$memo', '$keyword','$best_yn','$use_yn', '$brand_contents', '$logo_img_url', '$id', '$name', now(), now()
 					)
 				";
 
@@ -168,6 +169,7 @@ class std03Controller extends Controller
 			$update_items	= [
 				"brand_nm"		=> $brand_nm,
 				"brand_nm_eng"	=> $brand_nm_eng,
+				"br_cd"			=> $br_cd,
 				"overview"		=> $overview,
 				"memo"			=> $memo,
 				"keyword"		=> $keyword,
@@ -290,7 +292,7 @@ class std03Controller extends Controller
 
 		$query = "
 			select
-				brand, brand_nm, brand_nm_eng, a.overview, memo, a.keyword, a.best_yn,use_yn, brand_contents, ifnull(brand_logo,'') as brand_logo, admin_id, admin_nm, regi_date, ut, brand_type
+				brand, brand_nm, brand_nm_eng, a.br_cd, a.overview, memo, a.keyword, a.best_yn,use_yn, brand_contents, ifnull(brand_logo,'') as brand_logo, admin_id, admin_nm, regi_date, ut, brand_type
 			from brand a
 			where 1=1 and brand= :brand
 		";

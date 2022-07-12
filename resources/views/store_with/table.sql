@@ -275,6 +275,17 @@ CREATE TABLE `sale_type_store` (
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
 --
+-- 기존 테이블 컬럼 추가 시작
+--
+
+-- 브랜드에 '브랜드 단축코드' 추가
+ALTER TABLE `bizest_smart`.`brand` ADD COLUMN `br_cd` VARCHAR(3) NULL COMMENT '단축코드' AFTER `brand_nm_eng`;
+
+--
+-- 기존 테이블 컬럼 추가 종료
+--
+
+--
 -- 테이블 데이터 추가 시작
 --
 -- code_kind 데이터 추가 매장구분 : STORE_TYPE
