@@ -218,7 +218,7 @@
 					 * ( 목표 - 결제금액 ) / 목표 * 100 = 달성율(%)
 					 */
 					let progress = (Math.abs(parseInt(proj_amt) - parseInt(recv_amt))) / parseInt(proj_amt) * 100;
-					if (proj_amt == 0) progress = ""; // 목표액이 없는경우 빈 값 할당
+					if (proj_amt == 0 || proj_amt == null || proj_amt == "") progress = ""; // 목표액이 없는경우 빈 값 할당
 					if (progress > 100) progress = 100; // 달성율 100 넘어가는 경우 100으로 고정
 					return progress;
 				}
@@ -284,13 +284,12 @@
 
 	const autoSizeColumns = (grid, except = [], skipHeader = false) => {
         const allColumnIds = [];
-        grid.gridOptions.columnApi.getAllColumns().forEach((column) => {
+        gx.grid.gridOptions.columnApi.getAllColumns().forEach((column) => {
             if (except.includes(column.getId())) return;
             allColumnIds.push(column.getId());
 			
         });
-		console.log(allColumnIds);
-        grid.gridOptions.columnApi.autoSizeColumns(allColumnIds, skipHeader);
+        gx.grid.gridOptions.columnApi.autoSizeColumns(allColumnIds, skipHeader);
     };
 
 	const formatDay = (e) => {

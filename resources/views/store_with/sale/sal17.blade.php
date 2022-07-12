@@ -1,5 +1,5 @@
 @extends('store_with.layouts.layout')
-@section('title','매장일별판매집계표')
+@section('title','매장목표')
 @section('content')
 <div class="page_tit">
 	<h3 class="d-inline-flex">매장목표</h3>
@@ -18,19 +18,20 @@
 				<h4>검색</h4>
 				<div class="flax_box">
 					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+					<a href="#" onclick="formReset()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
 			</div>
 
 			<div class="card-body">
 				<div class="row">
-					<div class="col-lg-6 inner-td">
+					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="good_types">판매기간</label>
 							<div class="form-inline date-select-inbox">
 								<div class="docs-datepicker form-inline-inner input_box">
 									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
+										<input type="text" class="form-control form-control-sm docs-date month" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
 										<div class="input-group-append">
 											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
 												<i class="fa fa-calendar" aria-hidden="true"></i>
@@ -42,7 +43,7 @@
 								<span class="text_line">~</span>
 								<div class="docs-datepicker form-inline-inner input_box">
 									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
+										<input type="text" class="form-control form-control-sm docs-date month" name="edate" value="{{ $edate }}" autocomplete="off">
 										<div class="input-group-append">
 											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
 												<i class="fa fa-calendar" aria-hidden="true"></i>
@@ -54,67 +55,34 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-6 inner-td">
+					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="">매장구분</label>
 							<div class="flax_box">
-								<select name='com_type' class="form-control form-control-sm">
+								<select name='store_type' class="form-control form-control-sm">
 									<option value=''>전체</option>
-									@foreach ($com_types as $com_type)
-										<option value='{{ $com_type->code_id }}'>{{ $com_type->code_val }}</option>
+									@foreach ($store_types as $store_type)
+										<option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
 									@endforeach
 								</select>
 							</div>
 						</div>
 					</div>
-				</div>
-				<div class="row">
-                    <div class="col-lg-6 inner-td">
-                        <div class="form-group">
-                            <label for="">매장명</label>
-                            <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm search-enter" name='com_nm' value=''>
-                            </div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+                            <label for="store_cd">매장명</label>
+							<div class="form-inline inline_btn_box">
+								<select id="store_cd" name="store_cd" class="form-control form-control-sm select2-store"></select>
+								<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+							</div>
                         </div>
                     </div>
-					<div class="col-lg-6 inner-td">
-						<div class="form-group">
-							<label for="item">자료수/정렬</label>
-							<div class="form-inline">
-								<div class="form-inline-inner input_box" style="width:24%;">
-									<select name="limit" class="form-control form-control-sm">
-										<option value="100">100</option>
-										<option value="500" selected>500</option>
-										<option value="1000">1000</option>
-										<option value="2000">2000</option>
-									</select>
-								</div>
-								<span class="text_line">/</span>
-								<div class="form-inline-inner input_box" style="width:45%;">
-									<select name="ord_field" class="form-control form-control-sm">
-										<option value="a.ord_date" selected>판매일자</option>
-										<option value="a.com_nm" >매장명</option>
-									</select>
-								</div>
-								<div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
-									<div class="btn-group" role="group">
-										<label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="" data-original-title="내림차순"><i class="bx bx-sort-down"></i></label>
-										<label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="" data-original-title="오름차순"><i class="bx bx-sort-up"></i></label>
-									</div>
-									<input type="radio" name="ord" id="sort_desc" value="desc" checked="">
-									<input type="radio" name="ord" id="sort_asc" value="asc">
-								</div>
-							</div>
-
-						</div>
-					</div>
 				</div>
-
 			</div>
 		</div>
 		<div class="resul_btn_wrap mb-3">
 			<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-			<a href="#" onclick="Add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 데이터업로드</a>
+			<input type="reset" id="search_reset" value="검색조건 초기화" class="btn btn-sm btn-outline-primary shadow-sm" onclick="formReset()">
 			<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
 		</div>
 	</div>
@@ -139,52 +107,84 @@
         color: red;
     }
 </style>
-<script language="javascript">
-	var columns = [
-		{headerName: "#", field: "num",type:'NumType'},
-		{field: "com_type_nm",	headerName: "매장구분",		width:90},
-		{field: "com_id",		headerName: "매장코드",		width:90},
-		{field: "com_nm",		headerName: "매장명",		width:100},
-        {
-            field: "", headerName: "합계",
-            children: [
-                {field: "", headerName: "목표"},
-                {field: "", headerName: "전월"},
-                {field: "", headerName: "전년"},
-                {field: "", headerName: "금액"},
-                {field: "", headerName: "달성율(%)"},
-            ]
-        },
-        {
-            field: "", headerName: "6월",
-            children: [
-                {field: "", headerName: "목표"},
-                {field: "", headerName: "전월"},
-                {field: "", headerName: "전년"},
-                {field: "", headerName: "금액"},
-                {field: "", headerName: "달성율(%)"},
-            ]
-        },
-        {
-            field: "", headerName: "7월",
-            children: [
-                {field: "", headerName: "목표"},
-                {field: "", headerName: "전월"},
-                {field: "", headerName: "전년"},
-                {field: "", headerName: "금액"},
-                {field: "", headerName: "달성율(%)"},
-            ]
-        },
-        {headerName: "", field: "nvl"}
-	];
-	function Add()
-	{
-		const url='/head/xmd/store/store01/show';
-		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
-	}
-
-</script>
 <script type="text/javascript" charset="utf-8">
+
+	let col_keys = [];
+
+	const init_cols = () => [
+		{ headerName: "#", field: "num", type:'NumType', pinned:'left', aggSum:"합계", cellStyle: { 'text-align': "center" },
+			cellRenderer: function (params) {
+				if (params.node.rowPinned === 'top') {
+					return "합계";
+				} else {
+					return parseInt(params.value) + 1;
+				}
+			}
+		},
+		{ field: "store_type_nm", headerName: "매장구분", pinned:'left', width:90, cellStyle: { 'text-align': "center" } },
+		{ field: "store_cd", headerName: "매장코드", pinned:'left', hide: true },
+		{ field: "store_nm", headerName: "매장명", pinned:'left', type: 'StoreNameType', width: 250 },
+		{
+			field: "summary", headerName: "합계",
+			children: [
+				{field: "proj_amt", headerName: "목표"},
+				{field: "prev_recv_amt", headerName: "전월"},
+				{field: "last_recv_amt", headerName: "전년"},
+				{field: "recv_amt", headerName: "금액", type: 'currencyMinusColorType'},
+				{field: "progress_proj_amt", headerName: "달성율(%)"},
+			]
+		}
+	];
+
+	let columns = init_cols();
+
+	/**
+	 * ( 목표 - 결제금액 ) / 목표 * 100 = 달성율(%)
+	 */
+	const goalProgress = (params, Ym) => {
+		console.log(params.data);
+		const proj_amt = params.data[`proj_amt_${Ym}`];
+		const recv_amt = params.data[`recv_amt_${Ym}`];
+		let progress = (Math.abs(parseInt(proj_amt) - parseInt(recv_amt))) / parseInt(proj_amt) * 100;
+		if (proj_amt == 0 || proj_amt == null || proj_amt == "") progress = ""; // 목표액이 없는경우 빈 값 할당
+		if (progress > 100) progress = 100; // 달성율 100 넘어가는 경우 100으로 고정
+		return progress;
+	};
+
+	const setColumns = (count) => {
+		let cols = init_cols();
+		gx.gridOptions.api.setColumnDefs(cols);
+		for ( let i = 0; i < count; i++ ) {
+			const Ym = `${col_keys[i]}`;
+			const f = Ym.substr(0, 4) + "-" + Ym.substr(4, 2);
+			let obj = { fields: `${Ym}`, headerName: `${f}`};
+			obj.children = [
+				{ field: `proj_amt_${Ym}`, headerName: "목표", type: 'currencyType', aggregation: true },
+				{ field: `prev_recv_amt_${Ym}`, headerName: "전월", type: 'currencyMinusColorType', aggregation: true },
+                { field: `last_recv_amt_${Ym}`, headerName: "전년", type: 'currencyMinusColorType', aggregation: true },
+                { field: `recv_amt_${Ym}`, headerName: "금액", type: 'currencyMinusColorType', aggregation: true},
+                { field: `progress_proj_amt_${Ym}`, headerName: "달성율(%)", type: 'currencyMinusColorType', aggregation: true,
+				 	cellRenderer: params => goalProgress(params, Ym)
+				}
+			];
+			cols.push(obj);
+		}
+		cols.push({ headerName: "", field: "nvl", width: "auto" });
+		gx.gridOptions.api.setColumnDefs(cols);
+		gx.CalAggregation();
+		autoSizeColumns(gx, ["nvl"]);
+	};
+
+	const autoSizeColumns = (grid, except = [], skipHeader = false) => {
+        const allColumnIds = [];
+        gx.gridOptions.columnApi.getAllColumns().forEach((column) => {
+            if (except.includes(column.getId())) return;
+            allColumnIds.push(column.getId());
+			
+        });
+        gx.gridOptions.columnApi.autoSizeColumns(allColumnIds, skipHeader);
+    };
+
 	const pApp = new App('',{
 		gridId:"#div-gd",
 	});
@@ -193,13 +193,37 @@
 		pApp.ResizeGrid(265);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
-		gx = new HDGrid(gridDiv, columns);
+		let options = {
+			getRowStyle: (params) => {
+				if (params.node.rowPinned === 'top') {
+					return { 'background': '#eee' }
+				}
+			}
+		}
+		gx = new HDGrid(gridDiv, columns, options);
 		Search();
+
+		// 매장 검색 클릭 이벤트 바인딩 및 콜백 사용
+		$( ".sch-store" ).on("click", function() {
+            searchStore.Open();
+        });
 	});
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/store/sale/sal01/search', data,1);
+		gx.Aggregation({ sum: "top" });
+		gx.Request('/store/sale/sal17/search', data, -1, (e) => afterSearch(e));
 	}
+
+	const afterSearch = (e) => {
+		col_keys = e.head.col_keys;
+		const count = col_keys?.length;
+		setColumns(count);
+	};
+
+	const formReset = () => {
+		document.search.reset();
+	};
+
 
 </script>
 @stop

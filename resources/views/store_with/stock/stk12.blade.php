@@ -42,7 +42,7 @@
                                 <label for="store_cd">매장명</label>
                                 <div class="form-inline inline_btn_box">
                                     <input type='hidden' id="store_nm" name="store_nm">
-                                    <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
+                                    <select id="store_no" name="store_no" class="form-control form-control-sm select2-store multi_select" multiple></select>
                                     <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                 </div>
                             </div>
@@ -414,7 +414,7 @@
 
             // 매장검색
             $( ".sch-store" ).on("click", function() {
-                searchStore.Open();
+                searchStore.Open(null, true);
             });
         });
 

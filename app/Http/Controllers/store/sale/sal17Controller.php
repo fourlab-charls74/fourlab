@@ -14,27 +14,169 @@ class sal17Controller extends Controller
 {
 	//
 	public function index() {
-        $mutable	= now();
-        $sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
+        
+		// $sdate = Carbon::now()->startOfMonth()->format("Y-m"); // 이번 달 기준
+		$sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 1달전 기준 (테스트 용)
 
-		$com_types	= [];
-		$event_cds	= [];
-		//판매유형
-		$sell_types	= [];
-		$code_kinds	= [];
+		// 매장구분
+		$sql = " 
+			select *
+			from code
+			where 
+				code_kind_cd = 'store_type' and use_yn = 'Y' order by code_seq 
+		";
+		$store_types = DB::select($sql);
+
+		// // 행사구분 - 추후 논의사항
+		// $sql = "
+		// 	select *
+		// 	from __tmp_code
+		// 	where
+		// 		code_kind_cd = 'event_cd' and use_yn = 'Y' order by code_seq
+		// ";
+		// $event_cds = DB::select($sql);
+
+		// // 판매유형 - 추후 논의사항
+		// $sql = "
+		// 	select *
+		// 	from __tmp_code
+		// 	where
+		// 		code_kind_cd = 'sell_type' and use_yn = 'Y' order by code_seq
+		// ";
+		$sell_types	= DB::select($sql);
 
 		$values = [
             'sdate'         => $sdate,
-            'edate'         => date("Y-m-d"),
-			'com_types'		=> [],
-			'event_cds'		=> [],
-			'sell_types'	=> [],
-			'code_kinds'	=> [],
+            'edate'         => date("Y-m"),
+			'store_types'	=> $store_types,
+			// 'event_cds'		=> $event_cds,
+			// 'sell_types'	=> $sell_types
 		];
-        return view( Config::get('shop.store.view') . '/sale/sal17',$values);
+        return view( Config::get('shop.store.view') . '/sale/sal17', $values);
 	}
 
 	public function search(Request $request)
 	{
+		$sdate = $request->input('sdate', now()->startOfMonth()->subMonth()->format("Y-m"));
+		$edate = $request->input('edate', now()->format("Y-m"));
+
+		$prev_sdate = Carbon::parse($sdate)->subMonth()->format("Ym");
+		$months_count = Carbon::parse($sdate)->diffInMonths(Carbon::parse($edate)->lastOfMonth());
+
+		$store_type = $request->input('store_type', "");
+		$store_cd = $request->input('store_cd', "");
+
+		$where = "";
+		if ($store_type) $where .= " and c.code_id = " . Lib::quote($store_type);
+		if ($store_cd != "") { // 특정 매장 검색시 row 중복 방지
+			$where .= " and s.store_cd like '" . Lib::quote($store_cd) . "%'";
+		}
+
+		/**
+		 * 합계 쿼리 작성
+		 */
+		$sum_month_prev = "";
+		$sum_month_others = "";
+		$sum_last_year = "";
+		$sum_proj_amt = "";
+
+		$col_keys = [];
+		$Ym = (int)str_replace("-", "", $sdate);
+		for ( $i = 0; $i <= $months_count; $i++ ) {
+			$comma = ($i == $months_count) ? "" : ",";
+
+			// sdate 기준 저번 달 주문금액, 결제금액 가져오기
+			if ($i == 0) {
+				$sum_month_prev = "
+					sum(if(date_format(m.ord_date,'%Y%m') = '${prev_sdate}', o.price*o.qty,0)) as prev_ord_amt_${Ym}, 
+					sum(if(date_format(m.ord_date,'%Y%m') = '${prev_sdate}', o.recv_amt,0)) as prev_recv_amt_${Ym},
+				";
+			}
+
+			// 기간 이내의 주문금액, 결제금액 가져오기
+			$sum_month_others .= " 
+				sum(if(date_format(m.ord_date,'%Y%m') = '${Ym}', o.price*o.qty,0)) as ord_amt_${Ym}, 
+				sum(if(date_format(m.ord_date,'%Y%m') = '${Ym}', o.recv_amt,0)) as recv_amt_${Ym}${comma}
+			";
+
+			// 기간 이내의 매장목표 가져오기
+			$sum_proj_amt .= "
+				sum(if(ym = '${Ym}',amt,0)) as proj_amt_${Ym}${comma}
+			";
+
+			// 기간 이내의 작년 주문금액, 결제금액 가져오기
+			$last_year = (int)substr($Ym, 0, 4) - 1;
+			$month = substr($Ym, 4, 2);
+			$last_Ym = $last_year . $month;
+			$sum_last_year .= " 
+				sum(if(date_format(m.ord_date,'%Y%m') = '${last_Ym}', o.price*o.qty,0)) as last_ord_amt_${Ym}, 
+				sum(if(date_format(m.ord_date,'%Y%m') = '${last_Ym}', o.recv_amt,0)) as last_recv_amt_${Ym}${comma}
+			";
+
+			// 12월 넘어가는 경우 01월로 변경, 아닌 경우 한달을 더해줌
+			array_push($col_keys, (int)$Ym);
+			$year = substr($Ym, 0, 4);
+			$month = substr($Ym, 4, 2);
+			if ((int)$month >= 12) {
+				$year = (int)$year + 1;
+				$month = sprintf("%02d", 1);
+				$Ym = $year . $month;
+			} else {
+				$Ym = $year . sprintf("%02d", (int)$month + 1);
+			}
+
+		}
+
+		$ym_s = str_replace("-", "", $sdate);
+		$ym_e = str_replace("-", "", $edate);
+		$next_edate = Carbon::parse($edate)->addMonth()->format("Y-m");
+
+		// 작성된 쿼리에서 데이터 중복이 발생(같은 행당 61건)하여 distinct 처리함
+		$sql =	"
+			select distinct s.store_nm,c.code_val as store_type_nm,a.*,b.*,p.*
+				from store s 
+				left outer join
+				( 
+					select store_cd, sum(o.price*o.qty) as ord_amt, sum(o.recv_amt) as recv_amt,
+						${sum_month_prev}
+						${sum_month_others}
+					from order_mst m 
+						inner join order_opt o on m.ord_no = o.ord_no 
+					where m.ord_date >= '${sdate}' and m.ord_date < '${next_edate}' and m.store_cd <> ''
+					group by store_cd
+				) a on s.store_cd = a.store_cd 
+				left outer join 
+				(
+					select 
+						${sum_last_year}
+					from order_mst m 
+						inner join order_opt o on m.ord_no = o.ord_no 
+					where m.ord_date >= '${sdate}' and m.ord_date < '${next_edate}' and m.store_cd <> ''
+					group by store_cd
+				) b on s.store_cd = a.store_cd 
+				left outer join 
+				(
+					select 
+						store_cd,
+						${sum_proj_amt}
+					from store_sales_projection 
+					where ym >= '${ym_s}' and ym <= '${ym_e}'
+					group by store_cd
+				) p on s.`store_cd` = p.`store_cd` 
+				left outer join `code` c on c.code_kind_cd = 'store_type' and c.code_id = s.store_type
+			where 1=1 ${where}
+		";
+
+		$rows = DB::select($sql, ['sdate' => $sdate, 'edate' => $edate]);
+
+		return response()->json([
+			'code' => 200,
+			'head' => array(
+				'total' => count($rows),
+				'col_keys' => $col_keys
+			),
+			'body' => $rows
+		]);
+
 	}
 }

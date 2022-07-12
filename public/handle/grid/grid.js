@@ -577,9 +577,6 @@ HDGrid.prototype.CalAggregation = function(){ // 2022-07-08 동적으로 컬럼 
 
         Object.keys(this.agg_params).forEach(key => {
 
-
-            console.log(key);
-
             switch(key) {
                 case "sum":
                     if(this.agg_params.sum === "top"){
