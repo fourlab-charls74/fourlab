@@ -63,7 +63,6 @@ class sal17Controller extends Controller
 		$sdate = $request->input('sdate', now()->startOfMonth()->subMonth()->format("Y-m"));
 		$edate = $request->input('edate', now()->format("Y-m"));
 
-		$prev_sdate = Carbon::parse($sdate)->subMonth()->format("Ym");
 		$months_count = Carbon::parse($sdate)->diffInMonths(Carbon::parse($edate)->lastOfMonth());
 
 		$store_type = $request->input('store_type', "");
@@ -71,7 +70,7 @@ class sal17Controller extends Controller
 
 		$where = "";
 		if ($store_type) $where .= " and c.code_id = " . Lib::quote($store_type);
-		if ($store_cd != "") { // 특정 매장 검색시 row 중복 방지
+		if ($store_cd != "") {
 			$where .= " and s.store_cd like '" . Lib::quote($store_cd) . "%'";
 		}
 
@@ -84,17 +83,16 @@ class sal17Controller extends Controller
 		$sum_proj_amt = "";
 
 		$col_keys = [];
+		$prev_sdate = Carbon::parse($sdate)->subMonth()->format("Ym");
 		$Ym = (int)str_replace("-", "", $sdate);
 		for ( $i = 0; $i <= $months_count; $i++ ) {
 			$comma = ($i == $months_count) ? "" : ",";
 
 			// sdate 기준 저번 달 주문금액, 결제금액 가져오기
-			if ($i == 0) {
-				$sum_month_prev = "
-					sum(if(date_format(m.ord_date,'%Y%m') = '${prev_sdate}', o.price*o.qty,0)) as prev_ord_amt_${Ym}, 
-					sum(if(date_format(m.ord_date,'%Y%m') = '${prev_sdate}', o.recv_amt,0)) as prev_recv_amt_${Ym},
-				";
-			}
+			$sum_month_prev .= "
+				sum(if(date_format(m.ord_date,'%Y%m') = '${prev_sdate}', o.price*o.qty,0)) as prev_ord_amt_${Ym}, 
+				sum(if(date_format(m.ord_date,'%Y%m') = '${prev_sdate}', o.recv_amt,0)) as prev_recv_amt_${Ym},
+			";
 
 			// 기간 이내의 주문금액, 결제금액 가져오기
 			$sum_month_others .= " 
@@ -128,16 +126,18 @@ class sal17Controller extends Controller
 				$Ym = $year . sprintf("%02d", (int)$month + 1);
 			}
 
+			// 다음달의 전월 구하기
+			$prev_sdate = Carbon::parse($Ym)->subMonth()->format("Ym");
 		}
 
 		$ym_s = str_replace("-", "", $sdate);
 		$ym_e = str_replace("-", "", $edate);
+		$prev_sdate = Carbon::parse($sdate)->subMonth()->format("Y-m");
 		$next_edate = Carbon::parse($edate)->addMonth()->format("Y-m");
 
 		$last_year_sdate = Carbon::parse($sdate)->subYear()->format("Y-m");
 		$last_year_next_edate = Carbon::parse($edate)->subYear()->addMonth()->format("Y-m");
 
-		// 작성된 쿼리에서 데이터 중복이 발생(같은 행당 61건)하여 distinct 처리함
 		$sql =	"
 			select s.store_nm,c.code_val as store_type_nm,a.*,b.*,p.*
 				from store s 
@@ -148,7 +148,7 @@ class sal17Controller extends Controller
 						${sum_month_others}
 					from order_mst m 
 						inner join order_opt o on m.ord_no = o.ord_no 
-					where m.ord_date >= '${sdate}' and m.ord_date < '${next_edate}' and m.store_cd <> ''
+					where m.ord_date >= '${prev_sdate}' and m.ord_date < '${next_edate}' and m.store_cd <> ''
 					group by store_cd
 				) a on s.store_cd = a.store_cd 
 				left outer join 

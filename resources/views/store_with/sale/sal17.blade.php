@@ -151,17 +151,15 @@
 		let prefix = "";
 		let progress = 0;
 		if (Ym) prefix = `_${Ym}`;
-		let proj_amt = parseInt(row[`proj_amt${prefix}`]);
-		let recv_amt = parseInt(row[`recv_amt${prefix}`]);
-		proj_amt = isNaN(proj_amt) ? 0 : proj_amt;
-		recv_amt = isNaN(recv_amt) ? 0 : recv_amt;
+		let proj_amt = toInt(row[`proj_amt${prefix}`]);
+		let recv_amt = toInt(row[`recv_amt${prefix}`]);
 
-		if (proj_amt == 0 || proj_amt == null || proj_amt == "") progress; // 목표액이 없는경우 빈 값 할당
 		if (progress > 100) return progress = 100; // 달성율 100 넘어가는 경우 100으로 고정
 		if (proj_amt <= recv_amt) return progress = 100; // 목표액보다 큰 경우 100 처리
 
-		progress = ( (proj_amt - recv_amt) / proj_amt );
-		
+		progress = ( recv_amt / proj_amt ) * 100;
+		progress = Math.round(progress * 10) / 10; // 소수점 첫째짜리까지 반올림 처리
+
 		return progress;
 	};
 
