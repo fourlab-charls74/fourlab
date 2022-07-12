@@ -139,11 +139,10 @@ SearchStore.prototype.Choice = function(code,name){
 
 SearchStore.prototype.ChoiceMultiple = function(){
     let rows = this.grid.getSelectedRows();
-
     if(this.callback !== null){
         this.callback(rows);
     } else {
-
+        
         if($('#store_no.select2-store').length > 0){
             for(let r of rows) {
                 if($("#store_no").val().includes(r.store_cd)) continue;

@@ -43,4 +43,20 @@ class StoreController extends Controller {
         ]);
     }
 
+    /**
+     * 매장코드로 매장명 조회
+     */
+    public function search_storenm(Request $request)
+    {
+        $store_cds = $request->input("store_cds", []);
+        $result = [];
+
+        foreach($store_cds as $store_cd) {
+            $store = DB::table("store")->where('store_cd', '=', $store_cd)->select('store_cd', 'store_nm')->get();
+            array_push($result, $store[0]);
+        }
+
+        return response()->json(['code' => 200, 'head' => ['total' => count($result)], 'body' => $result]);
+    }
+
 }

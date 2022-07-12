@@ -221,32 +221,6 @@
                     <div class="fl_box">
                         <h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
                     </div>
-
-{{-- 
-                    <div class="fr_box flax_box">
-                        <span style="font-weight:500;line-height:30px;margin-left:5px;vertical-align:middle;" class="mr-1">출고차수 :</span>
-                        <div class="mr-1">
-                            <input type="text" id="dlv_series_no" class="form-control form-control-sm" name="dlv_series_no" value="{{date('YmdH')}}">
-                        </div>
-                        <span style="font-weight:500;line-height:30px;margin-left:5px;vertical-align:middle;" class="mr-1">출고예정일 :</span>
-                        <div class="docs-datepicker form-inline-inner mr-2">
-                            <div class="input-group">
-                                <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $today }}" autocomplete="off" onchange="onChangeDate(this)" disable>
-                                <div class="input-group-append">
-                                    <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-                                        <i class="fa fa-calendar" aria-hidden="true"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="docs-datepicker-container"></div>
-                        </div>
-                        <span>창고 : </span>
-                        <select id='reason' name='reason' class="form-control form-control-sm mr-1"  style='width:160px;display:inline'>
-                            <option value=''>선택</option>
-                        </select>
-                        <a href="#" onclick="Save();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>출고요청</a>
-                    </div> --}}
-
                     <div class="d-flex flex-grow-1 flex-column flex-lg-row justify-content-end align-items-end align-items-lg-center">
                         <div class="d-flex mb-1 mb-lg-0">
                             <span class="mr-1">창고</span>
@@ -289,29 +263,26 @@
         </div>
     </div>
     <script language="javascript">
-        let columns= [
+        let columns = [
             {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
-            {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {"text-align": "center"}},
+            {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
             {field: "goods_no", headerName: "상품번호", cellStyle: {"text-align": "center"}},
             {field: "goods_type_nm", headerName: "상품구분", cellStyle: StyleGoodsType},
             {field: "opt_kind_nm", headerName: "품목", width: 100, cellStyle: {"text-align": "center"}},
             {field: "brand_nm", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
             {field: "style_no",	headerName: "스타일넘버", cellStyle: {"text-align": "center"}},
             {field: "sale_stat_cl", headerName: "상품상태", cellStyle: StyleGoodsState},
-            {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 300},
+            {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 350},
             {field: "goods_opt", headerName: "옵션", width: 300},
-
-            // {field:"goods_opt" ,headerName:"옵션",width:200,
-            //     checkboxSelection:function(params){ return (params.data !== undefined && params.data.is_unlimited != 'Y')? true:false; },
-            //     cellRenderer: function(params) {
-            //         if (params.value !== undefined) {
-            //             return '<a href="#" onclick="return openHeadStock(' + params.data.goods_no + ',\'' + params.value +'\');">' + params.value + '</a>';
-            //         }
-            //     }
-            // },
-            {field: "storage_wqty", headerName: "창고보유재고", type: "currencyType"},
+            {
+                headerName: '(대표)창고재고', // 대표창고의 재고를 조회
+                children: [
+                    {field: "storage_qty", headerName: "재고", type: 'currencyType'},
+                    {field: "storage_wqty", headerName: "보유재고", type: 'currencyType'},
+                ]
+            }
             // {
-            //     headerName: '창고재고',
+            //     headerName: '롯데본점(피엘라벤)',
             //     children: [
             //         {
             //             headerName: "재고",
@@ -323,73 +294,59 @@
             //             field: "qty",
             //             type: 'currencyType',
             //         },
+            //         {field:"edit_good_qty" ,headerName:"배분수량",
+            //             editable: function(params){ return (params.data !== undefined && params.data.is_unlimited != 'Y')? true:false; },
+            //             cellClass:function(params){
+            //                 return (params.data !== undefined && params.data.is_unlimited != 'Y')? ['hd-grid-number','hd-grid-edit']: ['hd-grid-number'];
+            //             },
+            //             valueFormatter:formatNumber}
             //     ]
             // },
-            {
-                headerName: '롯데본점(피엘라벤)',
-                children: [
-                    {
-                        headerName: "재고",
-                        field: "qty",
-                        type: 'currencyType',
-                    },
-                    {
-                        headerName: "보유재고",
-                        field: "qty",
-                        type: 'currencyType',
-                    },
-                    {field:"edit_good_qty" ,headerName:"배분수량",
-                        editable: function(params){ return (params.data !== undefined && params.data.is_unlimited != 'Y')? true:false; },
-                        cellClass:function(params){
-                            return (params.data !== undefined && params.data.is_unlimited != 'Y')? ['hd-grid-number','hd-grid-edit']: ['hd-grid-number'];
-                        },
-                        valueFormatter:formatNumber}
-                ]
-            },
-            {
-                headerName: '롯데잠실(피엘라벤)',
-                children: [
-                    {
-                        headerName: "재고",
-                        field: "qty",
-                        type: 'currencyType',
-                    },
-                    {
-                        headerName: "보유재고",
-                        field: "qty",
-                        type: 'currencyType',
-                    },
-                    {field:"edit_good_qty" ,headerName:"배분수량",
-                        editable: function(params){ return (params.data !== undefined && params.data.is_unlimited != 'Y')? true:false; },
-                        cellClass:function(params){
-                            return (params.data !== undefined && params.data.is_unlimited != 'Y')? ['hd-grid-number','hd-grid-edit']: ['hd-grid-number'];
-                        },
-                        valueFormatter:formatNumber}
-                ]
-            },
-            {field:"opt_kind_nm" ,headerName:"..."},
-            {
-                headerName: '롯데동부산아울렛(피엘라벤)',
-                children: [
-                    {
-                        headerName: "재고",
-                        field: "qty",
-                        type: 'currencyType',
-                    },
-                    {
-                        headerName: "보유재고",
-                        field: "qty",
-                        type: 'currencyType',
-                    },
-                    {field:"edit_good_qty" ,headerName:"배분수량",
-                        editable: function(params){ return (params.data !== undefined && params.data.is_unlimited != 'Y')? true:false; },
-                        cellClass:function(params){
-                            return (params.data !== undefined && params.data.is_unlimited != 'Y')? ['hd-grid-number','hd-grid-edit']: ['hd-grid-number'];
-                        },
-                        valueFormatter:formatNumber}
-                ]
-            },
         ];
+
+        function setColumn(stores) {
+            if(!stores) return;
+            columns.splice(11);
+
+            for(let i = 0; i < stores.length; i++) {
+                let cd = stores[i].store_cd;
+                let nm = stores[i].store_nm;
+                columns.push({
+                    field: cd,
+                    headerName: nm,
+                    children: [
+                        {
+                            field: cd + '_store_qty',
+                            headerName: '재고', 
+                            type: "currencyType",
+                            width: 50,
+                            cellRenderer: function(params) {
+                                return params.data.store_qty?.qty || 0;
+                            }
+                        },
+                        {
+                            field: cd + '_store_wqty',
+                            headerName: '보유재고',
+                            type: "currencyType",
+                            width: 80,
+                            cellRenderer: function(params) {
+                                return params.data.store_qty?.wqty || 0;
+                            }
+                        },
+                        {
+                            field: cd + '_rel_qty',
+                            headerName: '배분수량',
+                            type: "currencyType",
+                            width: 80,
+                            editable: true,
+                            cellStyle: {'background-color': '#ffff99'},
+                            valueFormatter: formatNumber
+                        },
+                    ],
+                });
+            }
+            gx.gridOptions.api.setColumnDefs(columns);
+        }
     </script>
     <script type="text/javascript" charset="utf-8">
         let gx;
@@ -402,15 +359,19 @@
             gx = new HDGrid(gridDiv, columns, {
                 onCellValueChanged: (e) => {
                     e.node.setSelected(true);
-                    // if (e.column.colId == "qty") {
-                    //     if (isNaN(e.newValue) == true || e.newValue == "") {
-                    //         alert("숫자만 입력가능합니다.");
-                    //         gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
-                    //     }
-                    // }
+                    if (e.column.colId.includes('rel_qty')) {
+                        if (isNaN(e.newValue) == true || e.newValue == "") {
+                            alert("숫자만 입력가능합니다.");
+                            gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                        }
+                    }
                 }
             });
-            Search();
+            gx.gridOptions.defaultColDef = {
+                suppressMenu: true,
+                resizable: false,
+                sortable: true,
+            };
 
             // 매장검색
             $( ".sch-store" ).on("click", function() {
@@ -419,8 +380,23 @@
         });
 
         function Search() {
+            if($("[name=store_no]").val().length < 1) return alert("출고할 매장을 선택 후 검색해주세요.");
             let data = $('form[name="search"]').serialize();
-            gx.Request('/store/stock/stk12/search', data, 1);
+
+            axios({
+                url: '/store/api/stores/search-storenm',
+                method: 'post',
+                data: {store_cds: $("[name=store_no]").val()},
+            }).then(function (res) {
+                if(res.data.code === 200) {
+                    setColumn(res.data.body);
+                    gx.Request('/store/stock/stk12/search', data, 1);
+                } else {
+                    console.log(res.data);
+                }
+            }).catch(function (err) {
+                console.log(err);
+            });
         }
     </script>
 @stop

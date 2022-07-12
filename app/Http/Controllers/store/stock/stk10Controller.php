@@ -48,15 +48,15 @@ class stk10Controller extends Controller
 
 		$code = 200;
 		$where = "";
-        $having = "";
         $orderby = "";
-
-        // having
+        
+        // where
         $sdate = str_replace("-", "", $r['sdate'] ?? now()->sub(1, 'week')->format('Ymd'));
         $edate = str_replace("-", "", $r['edate'] ?? date("Ymd"));
-        $having .= " and if(psr.state > 10, dlv_day >= '$sdate' and dlv_day <= '$edate', 1=1)";
-
-        // where
+        $where .= "
+            and cast(if(psr.state > 20, psr.prc_rt, if(psr.state > 10, psr.exp_dlv_day, psr.req_rt)) as date) >= '$sdate' 
+            and cast(if(psr.state > 20, psr.prc_rt, if(psr.state > 10, psr.exp_dlv_day, psr.req_rt)) as date) <= '$edate'
+        ";
 		if($r['rel_order'] != null)
 			$where .= " and psr.rel_order = '" . $r['rel_order'] . "'";
 		if($r['rel_type'] != null) 
@@ -163,12 +163,11 @@ class stk10Controller extends Controller
                 psr.fin_id, 
                 psr.fin_rt
             from product_stock_release psr
+                inner join goods g on g.goods_no = psr.goods_no
                 left outer join code c on c.code_kind_cd = 'REL_TYPE' and c.code_id = psr.type
                 left outer join store s on s.store_cd = psr.store_cd
                 left outer join storage sg on sg.storage_cd = psr.storage_cd
-                left outer join goods g on g.goods_no = psr.goods_no
             where 1=1 $where
-            having 1=1 $having
             $orderby
             $limit
 		";
@@ -178,15 +177,13 @@ class stk10Controller extends Controller
         $total = 0;
         $page_cnt = 0;
         if($page == 1) {
-            $where .= " and if(psr.state > 10, cast(if(psr.state < 30, psr.exp_dlv_day, psr.prc_rt) as date) >= '$sdate' and cast(if(psr.state < 30, psr.exp_dlv_day, psr.prc_rt) as date) <= '$edate', 1=1)";
-
             $sql = "
                 select count(*) as total
                 from product_stock_release psr
+                    inner join goods g on g.goods_no = psr.goods_no
                     left outer join code c on c.code_kind_cd = 'REL_TYPE' and c.code_id = psr.type
                     left outer join store s on s.store_cd = psr.store_cd
                     left outer join storage sg on sg.storage_cd = psr.storage_cd
-                    left outer join goods g on g.goods_no = psr.goods_no
                 where 1=1 $where
                 order by psr.rt
             ";

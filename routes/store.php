@@ -38,6 +38,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 매장명 조회
         Route::get('stores', 'StoreController@show');
         Route::get('stores/search', 'StoreController@search');
+        Route::post('stores/search-storenm', 'StoreController@search_storenm');
 
     });
 
@@ -165,6 +166,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         
         // 초도출고
         Route::get('stk12','stk12Controller@index');
+        Route::get('stk12/search','stk12Controller@search');
 
         // 판매분출고
         Route::get('stk13','stk13Controller@index');

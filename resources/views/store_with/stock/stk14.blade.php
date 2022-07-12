@@ -213,7 +213,7 @@
                         <h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
                     </div>
                     <div class="d-flex flex-grow-1 flex-column flex-lg-row justify-content-end align-items-end align-items-lg-center">
-                        <div class="d-flex mr-1 mb-1 mb-lg-0">
+                        {{-- <div class="d-flex mr-1 mb-1 mb-lg-0">
                             <span class="mr-1">출고예정일</span>
                             <div class="docs-datepicker form-inline-inner input_box" style="width:130px;display:inline;">
                                 <div class="input-group">
@@ -226,13 +226,13 @@
                                 </div>
                                 <div class="docs-datepicker-container"></div>
                             </div>
-                        </div>
+                        </div> --}}
                         <div class="d-flex">
-                            <select id='rel_order' name='rel_order' class="form-control form-control-sm mr-2"  style='width:70px;display:inline'>
+                            {{-- <select id='rel_order' name='rel_order' class="form-control form-control-sm mr-2"  style='width:70px;display:inline'>
                                 @foreach ($rel_orders as $rel_order)
                                     <option value='{{ $rel_order->code_id }}'>{{ $rel_order->code_val }}</option>
                                 @endforeach
-                            </select>
+                            </select> --}}
                             <a href="#" onclick="requestRelease();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>출고요청</a>
                         </div>
                     </div>
@@ -302,10 +302,10 @@
             {width: 'auto'}
         ];
 
-        function setColumn(store_nm) {
-            if(!store_nm) return;
+        function setColumn(store) {
+            if(!store) return;
 
-            columns[11].headerName = store_nm;
+            columns[11].headerName = store.store_nm;
             gx.gridOptions.api.setColumnDefs(columns);
 
             gx.gridOptions.columnApi.applyColumnState({
@@ -352,8 +352,21 @@
         function Search() {
             if(!$("[name=store_no]").val()) return alert("요청매장을 선택 후 검색해주세요.");
             let data = $('form[name="search"]').serialize();
-            setColumn($("[name=store_nm]").val());
-            gx.Request('/store/stock/stk14/search', data, 1);
+
+            axios({
+                url: '/store/api/stores/search-storenm',
+                method: 'post',
+                data: {store_cds: [$("[name=store_no]").val()]},
+            }).then(function (res) {
+                if(res.data.code === 200) {
+                    setColumn(res.data.body[0]);
+                    gx.Request('/store/stock/stk14/search', data, 1);
+                } else {
+                    console.log(res.data);
+                }
+            }).catch(function (err) {
+                console.log(err);
+            });
         }
 
         // 출고요청
@@ -378,8 +391,8 @@
             const data = {
                 products: rows, 
                 store_cd,
-                exp_dlv_day: $('[name=exp_dlv_day]').val(),
-                rel_order: $('[name=rel_order]').val(),
+                // exp_dlv_day: $('[name=exp_dlv_day]').val(),
+                // rel_order: $('[name=rel_order]').val(),
             };
 
             axios({

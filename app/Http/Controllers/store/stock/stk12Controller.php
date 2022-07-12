@@ -118,10 +118,13 @@ class stk12Controller extends Controller
                 g.style_no, 
                 stat.code_val as sale_stat_cl, 
                 g.goods_nm, 
-                p.goods_opt, 
+                p.goods_opt,
+                pss.qty as storage_qty,
+                pss.wqty as storage_wqty,
                 '' as rel_qty
             from product_stock p
                 inner join goods g on p.goods_no = g.goods_no
+                left outer join product_stock_storage pss on pss.prd_cd = p.prd_cd and pss.storage_cd = (select storage_cd from storage where default_yn = 'Y')
                 left outer join brand b on b.brand = g.brand
                 left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
                 left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
@@ -140,6 +143,7 @@ class stk12Controller extends Controller
                 select count(*) as total
                 from product_stock p
                     inner join goods g on p.goods_no = g.goods_no
+                    left outer join product_stock_storage pss on pss.prd_cd = p.prd_cd and pss.storage_cd = (select storage_cd from storage where default_yn = 'Y')
                     left outer join brand b on b.brand = g.brand
                     left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
                     left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
@@ -152,18 +156,18 @@ class stk12Controller extends Controller
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
         }
 
-        foreach($result as $re) {
-            $prd_cd = $re->prd_cd;
-            $sql = "
-                select s.storage_cd, p.prd_cd, p.wqty
-                from storage s
-                    left outer join product_stock_storage p on p.storage_cd = s.storage_cd and p.prd_cd = '$prd_cd'
-                where s.use_yn = 'Y' and p.use_yn = 'Y'
-            ";
-            $row = DB::select($sql);
-            $re->storage_qty = $row;
-        }
-        // dd($result);
+        // foreach($result as $re) {
+        //     $prd_cd = $re->prd_cd;
+        //     $store_cd = $r['store_no'];
+        //     $sql = "
+        //         select qty, wqty
+        //         from product_stock_store
+        //         where store_cd ='$store_cd' and prd_cd = '$prd_cd'
+        //     ";
+        //     $row = DB::selectOne($sql);
+        //     $re->store_qty = $row;
+        // }
+        dd($result);
 		return response()->json([
 			"code" => $code,
 			"head" => [
