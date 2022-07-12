@@ -142,6 +142,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('sal13','sal13Controller@index');
         Route::get('sal17','sal17Controller@index');
         Route::get('sal17/search','sal17Controller@search');
+        Route::post('sal17/update','sal17Controller@update');
     });
 
     //매장관리
