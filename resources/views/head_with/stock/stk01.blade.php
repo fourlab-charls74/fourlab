@@ -265,7 +265,7 @@
 
             ];
 
-			function EditQty(params){
+			function EditQty(params) {
 				if (params.oldValue !== params.newValue) {
 					params.data[params.colDef.field + '_chg_yn'] = 'Y';
 					var rowNode = params.node;
