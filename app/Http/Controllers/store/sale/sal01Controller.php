@@ -177,7 +177,6 @@ class sal01Controller extends Controller
 			));
 		}
 		else {
-
 			/**
 			 * DB 저장이 끝나면 디렉토리 생성(없을 경우) 및 파일 저장
 			 */

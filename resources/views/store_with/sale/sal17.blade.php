@@ -266,6 +266,7 @@
             const row_index = params.rowIndex;
             const column_name = params.column.colId;
 
+			// 목표에 음수 입력시 합계의 목표 컬럼이 더해지는 문제 있음 - 추후 수정 필요
 			let regExp = /(?=proj_amt_).+/i;
 			let arr = column_name.match(regExp);
 			if (arr) {
@@ -273,33 +274,34 @@
 					alert("숫자만 입력가능합니다.");
 					startEditingCell(row_index, column_name);
 					return false;
-				}
+				} else {
+					prev_value = toInt(params.oldValue);
+					value = toInt(params.newValue);
 
-				prev_value = toInt(params.oldValue);
-				value = toInt(params.newValue);
+					regExp = new RegExp(/[proj_amt_]/, "g");
+					const Ym = column_name.replace(regExp, "");
+					const rowNode = gx.gridOptions.api.getRowNode(row_index);
 
-				regExp = new RegExp(/[proj_amt_]/, "g");
-				const Ym = column_name.replace(regExp, "");
-				const rowNode = gx.gridOptions.api.getRowNode(row_index);
+					// 목표 금액부터 반영
+					row[column_name] = value;
+					gx.gridOptions.api.applyTransaction({ update: [row] });
 
-				// 목표 금액부터 반영
-				row[column_name] = value;
-				gx.gridOptions.api.applyTransaction({ update: [row] });
+					// 목표 금액, 달성률 반영
+					row['proj_amt'] = toInt(row['proj_amt']) - prev_value + value;
+					row[`progress_proj_amt_${Ym}`] = goalProgress(row, Ym);
 
-				// 목표 금액, 달성률 반영
-				row['proj_amt'] = toInt(row['proj_amt']) - prev_value + value;
-				row[`progress_proj_amt_${Ym}`] = goalProgress(row, Ym);
-
-                const response = await axios({ 
-                    url: `/store/sale/sal17/update`, method: 'post', 
-                    data: { 'store_cd': row.store_cd, 'proj_amt': value, 'Ym': Ym }
-                });
-                const { data, status } = response;
-                if (data?.code == 200) {
-                    gx.gridOptions.api.applyTransaction({ update: [row] });
-					gx.CalAggregation();
-                } else if (data?.code == 500) {
-					alert('목표 저장에 실패했습니다. 잠시후 다시 시도해주세요.');
+					const response = await axios({ 
+						url: `/store/sale/sal17/update`, method: 'post', 
+						data: { 'store_cd': row.store_cd, 'proj_amt': value, 'Ym': Ym }
+					});
+					const { data, status } = response;
+					if (data?.code == 200) {
+						gx.gridOptions.api.applyTransaction({ update: [row] });
+						gx.CalAggregation();
+						return true;
+					} else if (data?.code == 500) {
+						alert('목표 저장에 실패했습니다. 잠시후 다시 시도해주세요.');
+					}
 				}
 			}
 		}

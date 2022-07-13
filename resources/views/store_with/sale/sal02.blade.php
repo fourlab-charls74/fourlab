@@ -277,22 +277,23 @@
 		Search();
 
 		// 매장 검색 클릭 이벤트 바인딩 및 콜백 사용
-        $( ".sch-store" ).on("click", function() {
+        $( ".sch-store" ).on("click", function() {S
             searchStore.Open();
         });
+
+
 	});
 
 	const autoSizeColumns = (grid, except = [], skipHeader = false) => {
-        const allColumnIds = [];
-        gx.grid.gridOptions.columnApi.getAllColumns().forEach((column) => {
-            if (except.includes(column.getId())) return;
-            allColumnIds.push(column.getId());
-			
-        });
-        gx.grid.gridOptions.columnApi.autoSizeColumns(allColumnIds, skipHeader);
-    };
+		const allColumnIds = [];
+		gx.gridOptions.columnApi.getAllColumns().forEach((column) => {
+			if (except.includes(column.getId())) return;
+			allColumnIds.push(column.getId());
+		});
+		gx.gridOptions.columnApi.autoSizeColumns(allColumnIds, skipHeader);
+	};
 
-	const formatDay = (e) => {
+	const formatDay = async (e) => {
 		yoil.codes = e.head.yoil_codes
 		const max_day = yoil.codes.length;
 		setColumns(max_day);
