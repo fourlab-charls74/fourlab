@@ -39,6 +39,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stores', 'StoreController@show');
         Route::get('stores/search', 'StoreController@search');
         Route::post('stores/search-storenm', 'StoreController@search_storenm');
+        Route::post('stores/search-storenm-from-type', 'StoreController@search_storenm_from_type');
 
     });
 
@@ -168,9 +169,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk12','stk12Controller@index');
         Route::get('stk12/search','stk12Controller@search');
         Route::post('stk12/request-release', 'stk12Controller@request_release');
-
+        
         // 판매분출고
         Route::get('stk13','stk13Controller@index');
+        Route::get('stk13/search','stk13Controller@search');
 
         // 요청분출고
         Route::get('stk14','stk14Controller@index');
