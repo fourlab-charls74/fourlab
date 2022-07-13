@@ -266,14 +266,14 @@
         let columns = [
             {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
             {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
-            {field: "goods_no", headerName: "상품번호", cellStyle: {"text-align": "center"}},
-            {field: "goods_type_nm", headerName: "상품구분", cellStyle: StyleGoodsType},
-            {field: "opt_kind_nm", headerName: "품목", width: 100, cellStyle: {"text-align": "center"}},
-            {field: "brand_nm", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
-            {field: "style_no",	headerName: "스타일넘버", cellStyle: {"text-align": "center"}},
-            {field: "sale_stat_cl", headerName: "상품상태", cellStyle: StyleGoodsState},
-            {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 350},
-            {field: "goods_opt", headerName: "옵션", width: 300},
+            {field: "goods_no", headerName: "상품번호", pinned: 'left', cellStyle: {"text-align": "center"}},
+            {field: "goods_type_nm", headerName: "상품구분", pinned: 'left', cellStyle: StyleGoodsType},
+            {field: "opt_kind_nm", headerName: "품목", pinned: 'left', width: 100, cellStyle: {"text-align": "center"}},
+            {field: "brand_nm", headerName: "브랜드", pinned: 'left', width: 80, cellStyle: {"text-align": "center"}},
+            {field: "style_no",	headerName: "스타일넘버", pinned: 'left', cellStyle: {"text-align": "center"}},
+            {field: "sale_stat_cl", headerName: "상품상태", pinned: 'left', cellStyle: StyleGoodsState},
+            {field: "goods_nm",	headerName: "상품명", pinned: 'left', type: 'HeadGoodsNameType', width: 350},
+            {field: "goods_opt", headerName: "옵션", pinned: 'left', width: 300},
             {
                 headerName: '(대표)창고재고', // 대표창고의 재고를 조회
                 children: [
@@ -356,23 +356,55 @@
                 resizable: false,
                 sortable: true,
             };
+
+            // 매장검색
+            $( ".sch-store" ).on("click", function() {
+                searchStore.Open(null, true);
+            });
         });
 
         function Search() {
-            if($("[name=store_no]").val().length < 1) return alert("출고할 매장을 선택 후 검색해주세요.");
+            let store_type = $("[name=store_type]").val();
+            let store_nos = $("[name=store_no]").val();
+            if(store_nos.length < 1 && store_type === '') return alert("매장구분 또는 출고할 매장을 선택 후 검색해주세요.");
+
+            let url = '/store/api/stores/search-storenm-from-type';
+            let data = {store_type: store_type};
+            if(store_nos.length > 0) {
+                url = '/store/api/stores/search-storenm';
+                data = {store_cds: store_nos};
+            }
             
             axios({
-                url: '/store/api/stores/search-storenm',
+                url: url,
                 method: 'post',
-                data: {store_cds: $("[name=store_no]").val()},
+                data: data,
             }).then(function (res) {
                 if(res.data.code === 200) {
-                    setColumn(res.data.body);
-                    let data = $('form[name="search"]').serialize();
-                    data += "&store_nos=" + $("[name=store_no]").val();
-                    gx.Request('/store/stock/stk12/search', data, 1);
-                } else {
-                    console.log(res.data);
+                    if(store_nos.length > 0 && store_type !== '') {
+                        // 매장구분, 매장명 둘 다 선택한 경우
+                        axios({
+                            url: '/store/api/stores/search-storenm-from-type',
+                            method: 'post',
+                            data: {store_type: store_type},
+                        }).then(function (response) {
+                            if(response.data.code === 200) {
+                                let arr = res.data.body.filter(r => response.data.body.find(f => f.store_cd === r.store_cd));
+                                setColumn(arr);
+                                let d = $('form[name="search"]').serialize();
+                                d += "&store_nos=" + arr.map(r => r.store_cd);
+                                gx.Request('/store/stock/stk12/search', d, 1);
+                            }
+                        }).catch(function (error) {
+                            console.log(error);
+                        });
+
+                    } else {
+                        setColumn(res.data.body);
+                        let data = $('form[name="search"]').serialize();
+                        data += "&store_nos=" + res.data.body.map(r => r.store_cd);
+                        gx.Request('/store/stock/stk12/search', data, 1);
+                    }
                 }
             }).catch(function (err) {
                 console.log(err);

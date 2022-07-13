@@ -59,4 +59,15 @@ class StoreController extends Controller {
         return response()->json(['code' => 200, 'head' => ['total' => count($result)], 'body' => $result]);
     }
 
+    /**
+     * 매장구분으로 매장명 조회
+     */
+    public function search_storenm_from_type(Request $request)
+    {
+        $store_type = $request->input("store_type", '');
+        $result = DB::table('store')->where('store_type', '=', $store_type)->select('store_cd', 'store_nm')->get();
+        
+        return response()->json(['code' => 200, 'head' => ['total' => count($result)], 'body' => $result]);
+    }
+
 }

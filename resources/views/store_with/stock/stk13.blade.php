@@ -6,6 +6,7 @@
         <div class="d-inline-flex location">
             <span class="home"></span>
             <span>매장관리</span>
+            <span>/ 출고</span>
             <span>/ 판매분출고</span>
         </div>
     </div>
@@ -59,7 +60,8 @@
                             <div class="form-group">
                                 <label for="store_cd">매장명</label>
                                 <div class="form-inline inline_btn_box">
-                                    <select id="store_cd" name="store_cd" class="form-control form-control-sm select2-store"></select>
+                                    <input type='hidden' id="store_nm" name="store_nm">
+                                    <select id="store_no" name="store_no" class="form-control form-control-sm select2-store multi_select" multiple></select>
                                     <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                 </div>
                             </div>
@@ -68,7 +70,7 @@
                             <div class="form-group">
                                 <label for="prd_cd">상품코드</label>
                                 <div class="flex_box">
-                                    <input type='text' class="form-control form-control-sm search-enter" name='prd_cd' value=''>
+                                    <input type='text' class="form-control form-control-sm search-enter" name='prd_cd' value='' />
                                 </div>
                             </div>
                         </div>
@@ -102,7 +104,7 @@
                                     <select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
                                         <option value=''>전체</option>
                                         @foreach ($goods_stats as $goods_stat)
-                                            <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
+                                            <option value='{{ $goods_stat->code_id }}' @if($goods_stat->code_id == 40) selected @endif>{{ $goods_stat->code_val }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -110,7 +112,7 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="style_no">스타일넘버/상품코드</label>
+                                <label for="style_no">스타일넘버/상품번호</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box">
                                         <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="{{ $style_no }}">
@@ -171,7 +173,6 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
                     <div class="row">
                         <div class="col-lg-4 inner-td">
@@ -184,7 +185,7 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="goods_nm_eng">출고차수</label>
+                                <label for="goods_nm_eng">상품명(영문)</label>
                                 <div class="flax_box">
                                     <input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
                                 </div>
@@ -227,7 +228,6 @@
 
             <div class="resul_btn_wrap mb-3">
                 <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-                <a href="#" onclick="Add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 데이터업로드</a>
                 <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
             </div>
 
@@ -241,31 +241,39 @@
                     <div class="fl_box">
                         <h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
                     </div>
-                    <div class="fr_box flax_box">
-                        <span style="font-weight:500;line-height:30px;margin-left:5px;vertical-align:middle;" class="mr-1">출고차수 :</span>
-                        <div class="mr-1">
-                            <input type="text" id="dlv_series_no" class="form-control form-control-sm" name="dlv_series_no" value="{{date('YmdH')}}">
+                    <div class="d-flex flex-grow-1 flex-column flex-lg-row justify-content-end align-items-end align-items-lg-center">
+                        {{-- <div class="d-flex mb-1 mb-lg-0">
+                            <span class="mr-1">창고</span>
+                            <select id='storage' name='storage' class="form-control form-control-sm"  style='width:160px;display:inline'>
+                                <option value=''>선택</option>
+                                @foreach ($storages as $storage)
+                                    <option value='{{ $storage->storage_cd }}' @if($storage->default_yn == "Y") selected @endif>{{ $storage->storage_nm }} @if($storage->default_yn == "Y") (대표) @endif </option>
+                                @endforeach
+                            </select>
                         </div>
-                        <span style="font-weight:500;line-height:30px;margin-left:5px;vertical-align:middle;" class="mr-1">출고예정일 :</span>
-                        <div class="docs-datepicker form-inline-inner mr-2">
-                            <div class="input-group">
-                                <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" onchange="onChangeDate(this)" disable>
-                                <div class="input-group-append">
-                                    <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-                                        <i class="fa fa-calendar" aria-hidden="true"></i>
-                                    </button>
+                        <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span> --}}
+                        <div class="d-flex mr-1 mb-1 mb-lg-0">
+                            <span class="mr-1">출고예정일</span>
+                            <div class="docs-datepicker form-inline-inner input_box" style="width:130px;display:inline;">
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm docs-date bg-white" name="exp_dlv_day" value="{{ $edate }}" autocomplete="off" readonly />
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
                                 </div>
+                                <div class="docs-datepicker-container"></div>
                             </div>
-                            <div class="docs-datepicker-container"></div>
                         </div>
-                        <span>창고 : </span>
-                        <select id='reason' name='reason' class="form-control form-control-sm mr-1"  style='width:160px;display:inline'>
-                            <option value=''>선택</option>
-                        </select>
-                        <a href="#" onclick="Save();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>출고요청</a>
-                    </div>
-
-                    <div class="fr_box">
+                        <div class="d-flex">
+                            <select id='rel_order' name='rel_order' class="form-control form-control-sm mr-2"  style='width:70px;display:inline'>
+                                @foreach ($rel_orders as $rel_order)
+                                    <option value='{{ $rel_order->code_id }}'>{{ $rel_order->code_val }}</option>
+                                @endforeach
+                            </select>
+                            <a href="#" onclick="requestRelease();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>출고요청</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -275,105 +283,169 @@
         </div>
     </div>
     <script language="javascript">
-
-        var columns= [
-            {field:"store" ,headerName:"매장", width:100, pinned:'left'},
-            {field:"opt_kind_nm" ,headerName:"품목", width:100, pinned:'left'},
-            {field:"brand_nm" ,headerName:"브랜드", width:118, pinned:'left' },
-            {field:"style_no" ,headerName:"스타일넘버",pinned:'left' },
-            {field:"goods_no" ,headerName:"상품번호",pinned:'left',width:58},
-            {field:"prd_cd" ,headerName:"상품코드",pinned:'left',width:58},
-            {field:"goods_nm" ,headerName:"상품명",pinned:'left', type:"HeadGoodsNameType", width:360},
-            {field:"sale_stat_cl_nm" ,headerName:"상태",width:58,cellStyle:StyleGoodsState},
-            {field:"goods_opt" ,headerName:"옵션",width:200,
-                checkboxSelection:function(params){ return (params.data !== undefined && params.data.is_unlimited != 'Y')? true:false; },
-                cellRenderer: function(params) {
-                    if (params.value !== undefined) {
-                        return '<a href="#" onclick="return openHeadStock(' + params.data.goods_no + ',\'' + params.value +'\');">' + params.value + '</a>';
-                    }
-                }
-            },
+        let columns = [
+            {field: "store" , headerName: "매장",pinned: 'left', width: 200},
+            {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
+            {field: "goods_no", headerName: "상품번호", pinned: 'left', cellStyle: {"text-align": "center"}},
+            {field: "goods_type_nm", headerName: "상품구분", cellStyle: StyleGoodsType},
+            {field: "opt_kind_nm", headerName: "품목", width: 100, cellStyle: {"text-align": "center"}},
+            {field: "brand_nm", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
+            {field: "style_no",	headerName: "스타일넘버", cellStyle: {"text-align": "center"}},
+            {field: "sale_stat_cl", headerName: "상품상태", cellStyle: StyleGoodsState},
+            {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 350},
+            {field: "goods_opt", headerName: "옵션", width: 300},
             {
-                headerName: '창고재고',
+                headerName: '(대표)창고재고', // 대표창고의 재고를 조회
                 children: [
-                    {
-                        headerName: "재고",
-                        field: "qty",
-                        type: 'currencyType',
-                    },
-                    {
-                        headerName: "보유재고",
-                        field: "qty",
-                        type: 'currencyType',
-                    },
+                    {field: "storage_qty", headerName: "재고", type: 'currencyType'},
+                    {field: "storage_wqty", headerName: "보유재고", type: 'currencyType'},
                 ]
             },
             {
                 headerName: '판매',
                 children: [
-                    {
-                        headerName: "총판매수량",
-                        field: "qty",
-                        type: 'currencyType',
-                    },
-                    {
-                        headerName: "판매수량",
-                        field: "qty",
-                        type: 'currencyType',
-                    }
+                    {field: "total_sale_cnt", headerName: "총판매수량", type: 'currencyType'},
+                    {field: "sale_cnt", headerName: "판매수량", type: 'currencyType'},
                 ]
             },
             {
                 headerName: '매장재고',
                 children: [
+                    {field: "qty", headerName: "재고", type: 'currencyType'},
+                    {field: "wqty", headerName: "보유재고", type: 'currencyType'},
+                    {field: "exp_soldout_day", headerName: "소진예상일", type: 'currencyType'},
                     {
-                        headerName: "재고",
-                        field: "qty",
-                        type: 'currencyType',
-                    },
-                    {
-                        headerName: "보유재고",
-                        field: "qty",
-                        type: 'currencyType',
-                    },
-                    {
-                        headerName: "소진예상일",
-                        field: "qty",
-                        type: 'currencyType',
-                    },
-                    {field:"edit_good_qty" ,headerName:"배분수량",
-                        editable: function(params){ return (params.data !== undefined && params.data.is_unlimited != 'Y')? true:false; },
-                        cellClass:function(params){
-                            return (params.data !== undefined && params.data.is_unlimited != 'Y')? ['hd-grid-number','hd-grid-edit']: ['hd-grid-number'];
-                        },
-                        valueFormatter:formatNumber}
+                        field: "rel_qty",
+                        headerName: "배분수량",
+                        type: "currencyType",
+                        width: 80,
+                        editable: true,
+                        cellStyle: {'background-color': '#ffff99'},
+                        valueFormatter: formatNumber
+                    }
                 ]
             },
-            {field:"nvl",headerName:" ",width:'auto'}
         ];
-
-        function Add()
-        {
-            const url='/head/xmd/store/store01/show';
-            window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
-        }
-
     </script>
     <script type="text/javascript" charset="utf-8">
-        const pApp = new App('',{
-            gridId:"#div-gd",
-        });
         let gx;
+        const pApp = new App('', { gridId: "#div-gd" });
+
         $(document).ready(function() {
-            pApp.ResizeGrid(265);
+            pApp.ResizeGrid(275);
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
-            gx = new HDGrid(gridDiv, columns);
-            Search();
+            gx = new HDGrid(gridDiv, columns, {
+                onCellValueChanged: (e) => {
+                    e.node.setSelected(true);
+                    if (e.column.colId === "rel_qty") {
+                        if (isNaN(e.newValue) == true || e.newValue == "") {
+                            alert("숫자만 입력가능합니다.");
+                            gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                        }
+                    }
+                }
+            });
+            gx.gridOptions.defaultColDef = {
+                suppressMenu: true,
+                resizable: false,
+                sortable: true,
+            };
+
+            // 매장검색
+            $( ".sch-store" ).on("click", function() {
+                searchStore.Open(null, true);
+            });
         });
+
         function Search() {
-            let data = $('form[name="search"]').serialize();
-            gx.Request('/store/sale/sal01/search', data,1);
+            // let store_type = $("[name=store_type]").val();
+            // let store_nos = $("[name=store_no]").val();
+            // if(store_nos.length < 1 && store_type === '') return alert("매장구분 또는 출고할 매장을 선택 후 검색해주세요.");
+
+            // let url = '/store/api/stores/search-storenm-from-type';
+            // let data = {store_type: store_type};
+            // if(store_nos.length > 0) {
+            //     url = '/store/api/stores/search-storenm';
+            //     data = {store_cds: store_nos};
+            // }
+            
+            // axios({
+            //     url: url,
+            //     method: 'post',
+            //     data: data,
+            // }).then(function (res) {
+            //     if(res.data.code === 200) {
+            //         setColumn(res.data.body);
+            //         let data = $('form[name="search"]').serialize();
+            //         data += "&store_nos=" + store_nos;
+            //         gx.Request('/store/stock/stk12/search', data, 1);
+            //     } else {
+            //         console.log(res.data);
+            //     }
+            // }).catch(function (err) {
+            //     console.log(err);
+            // });
+        }
+
+        // 출고요청
+        function requestRelease() {
+            // let rows = gx.getSelectedRows();
+            // if(rows.length < 1) return alert("출고요청할 상품을 선택해주세요.");
+
+            // let stores = $("[name=store_no]").val();
+            // let emptyRow = rows.filter(r => {
+            //     for(let store_cd of stores) {
+            //         let q = r[store_cd + '_rel_qty'];
+            //         if(!q || !q.trim() || q == 0 || isNaN(parseInt(q))) return true;
+            //     }
+            //     return false;
+            // });
+            // if(emptyRow.length > 0) {
+            //     return alert("선택한 상품의 매장별 배분수량을 모두 입력해주세요.");
+            // }
+
+            // // let storage_cd = $('[name=storage]').val();
+            // // if(storage_cd === '') return alert("상품을 출고할 창고를 선택해주세요.");
+
+            // let over_qty_rows = rows.filter(r => {
+            //     let cnt = 0;
+            //     for(let store_cd of stores) {
+            //         let q = r[store_cd + '_rel_qty'];
+            //         cnt += parseInt(q);
+            //     }
+            //     if(cnt > (r.storage_wqty || 0)) return true;
+            //     else return false;
+            // });
+            // if(over_qty_rows.length > 0) return alert(`대표창고의 재고보다 많은 수량을 요청하실 수 없습니다.\n상품코드 : ${over_qty_rows.map(o => o.prd_cd).join(", ")}`);
+
+            // if(!confirm("해당 상품을 출고요청하시겠습니까?")) return;
+
+            // const data = {
+            //     products: rows,
+            //     stores: $("[name=store_no]").val(),
+            //     exp_dlv_day: $('[name=exp_dlv_day]').val(),
+            //     rel_order: $('[name=rel_order]').val(),
+            // };
+
+            // axios({
+            //     url: '/store/stock/stk12/request-release',
+            //     method: 'post',
+            //     data: data,
+            // }).then(function (res) {
+            //     if(res.data.code === 200) {
+            //         if(!confirm(res.data.msg + "\n출고요청을 계속하시겠습니까?")) {
+            //             location.href = "/store/stock/stk10";
+            //         } else {
+            //             Search();
+            //         }
+            //     } else {
+            //         console.log(res.data);
+            //         alert("출고요청 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+            //     }
+            // }).catch(function (err) {
+            //     console.log(err);
+            // });
         }
 
     </script>

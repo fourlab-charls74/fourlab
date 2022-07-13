@@ -12,30 +12,23 @@ use Carbon\Carbon;
 
 class stk13Controller extends Controller
 {
-
-	//
-	public function index() {
-
-        $mutable	= now();
-        $sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
-
-        $com_types	= [];
-        $code_kinds	= [];
+    public function index()
+	{
+        $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')->orderBy('default_yn')->get();
 
 		$values = [
-            'sdate'         => $sdate,
+            'sdate'         => now()->sub(1, 'week')->format('Y-m-d'),
             'edate'         => date("Y-m-d"),
-            'com_types'		=> $com_types,
-            'code_kinds'	=> $code_kinds,
-            'style_no'		=> "",
-            'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
-            'com_types'     => SLib::getCodes('G_COM_TYPE'),
-            'items'			=> SLib::getItems(),
-            'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
-
+            // 'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
+            'style_no'		=> "", // 스타일넘버
+            'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
+            'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
+            'items'			=> SLib::getItems(), // 품목
+            'rel_orders'    => SLib::getCodes("REL_ORDER"), // 출고차수
+            'storages'      => $storages, // 창고리스트
 		];
 
-		return view( Config::get('shop.store.view') . '/stock/stk13',$values);
+        return view(Config::get('shop.store.view') . '/stock/stk13', $values);
 	}
 
 	public function search(Request $request)
