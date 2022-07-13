@@ -140,7 +140,10 @@ class sal17Controller extends Controller
 			}
 
 			// 다음달의 전월 구하기
-			$prev_sdate = Carbon::parse($Ym)->subMonth()->format("Ym");
+			$year = substr($Ym, 0, 4);
+			$month = substr($Ym, 4, 2);
+			$f_ym = $year . "-" . $month;
+			$prev_sdate = Carbon::parse($f_ym)->subMonth()->format("Ym");
 		}
 
 		$ym_s = str_replace("-", "", $sdate);
@@ -225,7 +228,6 @@ class sal17Controller extends Controller
 			$code = 200;
 		} catch (\Exception $e) {
 			$code = 500;
-			dd($e->getMessage());
 		}
 		return response()->json(['code' => $code]);
 
