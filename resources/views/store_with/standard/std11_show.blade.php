@@ -411,11 +411,6 @@
             text: "{{ @$type === 'detail' ? @$row->store_nm : '' }}"
         }], tags: true});
         document.f1.store_nm.value = "{{ @$type === 'detail' ? @$row->store_nm : '' }}"; 
-
-        // 매장 검색 클릭 이벤트 바인딩 및 콜백 사용
-        $( ".sch-store" ).on("click", function() {
-            searchStore.Open();
-        });
         
     });
     

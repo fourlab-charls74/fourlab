@@ -356,11 +356,6 @@
                 resizable: false,
                 sortable: true,
             };
-
-            // 매장검색
-            $( ".sch-store" ).on("click", function() {
-                searchStore.Open(null, true);
-            });
         });
 
         function Search() {
