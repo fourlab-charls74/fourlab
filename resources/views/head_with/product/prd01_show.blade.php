@@ -2899,7 +2899,9 @@
             },
             success: async function (res) {
                 if (res.code === 200) {
-                    
+
+                    if ($("[name='opt_type']").val() === 'basic' && basic_count == 0) location.reload();
+
                     resetAddOptionKindBox();
                     searchOptKind();
 
@@ -2915,6 +2917,7 @@
                 console.log(request, status, error)
             }
         });
+
     }
 
     // 옵션구분 삭제
@@ -3133,7 +3136,7 @@
                         obj.opt_name = opt_name;
                     }
 
-                return obj;
+                    return obj;
                     
                 }, { goods_opt : "", opt1 : opt1_kind_name, opt2: "", good_qty: 0, opt_price: opt_price, opt_memo: opt_memo });
 
