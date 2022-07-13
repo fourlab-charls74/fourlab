@@ -15,13 +15,15 @@ class sal17Controller extends Controller
 	//
 	public function index(Request $request)
 	{
-		$is_searched = $request->input('is_searched', '');
-        
-		// $sdate = Carbon::now()->startOfMonth()->format("Y-m"); // 이번 달 기준
-		$sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 1달전 기준 (테스트 용)
+		$is_searched = $request->input('is_searched', 'y');
+        $sdate = $request->input('sdate', now()->startOfMonth()->subMonth()->format("Y-m"));
+        $edate = $request->input('edate', now()->format("Y-m"));
+        $store_type = $request->input('store_type', "");
+        $store_cd = $request->input('store_cd', "");
 
 		// 매장구분
-		$sql = " 
+		$sql = /** @lang text */
+            " 
 			select *
 			from code
 			where 
@@ -29,7 +31,17 @@ class sal17Controller extends Controller
 		";
 		$store_types = DB::select($sql);
 
-		// // 행사구분 - 추후 논의사항
+		$months = [];
+		$sd = Carbon::parse($sdate);
+        while($sd <= Carbon::parse($edate)){
+            //$months[] = [ "val" => $sd->format("Y-m"), "fmt" => $sd->format("Y-m") ];
+            $months[] = [ "val" => $sd->format("Ym"), "fmt" => $sd->format("Y-m") ];
+            $sd->addMonth();
+        }
+//        print_r($months);
+//        exit;
+
+        // // 행사구분 - 추후 논의사항
 		// $sql = "
 		// 	select *
 		// 	from __tmp_code
@@ -49,7 +61,8 @@ class sal17Controller extends Controller
 
 		$values = [
             'sdate'         => $sdate,
-            'edate'         => date("Y-m"),
+            'edate'         => $edate,
+			'months'	    => $months,
 			'store_types'	=> $store_types,
 			'is_searched' 	=> $is_searched
 			// 'event_cds'		=> $event_cds,
@@ -138,8 +151,9 @@ class sal17Controller extends Controller
 		$last_year_sdate = Carbon::parse($sdate)->subYear()->format("Y-m");
 		$last_year_next_edate = Carbon::parse($edate)->subYear()->addMonth()->format("Y-m");
 
-		$sql =	"
-			select s.store_nm,c.code_val as store_type_nm,a.*,b.*,p.*
+		$sql = /** @lang text */
+            "
+			select s.store_cd as scd,s.store_nm,c.code_val as store_type_nm,a.*,b.*,p.*
 				from store s 
 				left outer join
 				( 
@@ -173,6 +187,7 @@ class sal17Controller extends Controller
 				left outer join `code` c on c.code_kind_cd = 'store_type' and c.code_id = s.store_type
 			where 1=1 ${where}
 		";
+            //echo "<pre>$sql</pre>";
 
 		$rows = DB::select($sql, ['sdate' => $sdate, 'edate' => $edate]);
 
@@ -187,18 +202,30 @@ class sal17Controller extends Controller
 
 	}
 
-	public function update(Request $request) 
+	public function update(Request $request)
 	{
 		$store_cd = $request->input('store_cd');
 		$proj_amt = $request->input('proj_amt');
 		$Ym = $request->input('Ym');
 		try {
 			DB::transaction(function () use ($store_cd, $proj_amt, $Ym) {
-				DB::table('store_sales_projection')->where('store_cd', $store_cd)->where('ym', $Ym)->update(['amt' => $proj_amt]);
+                $cnt = DB::table('store_sales_projection')->where('store_cd', $store_cd)->where('ym', $Ym)->count();
+                if($cnt === 0){
+                    DB::table('store_sales_projection')->insert([
+                        "store_cd" => $store_cd,
+                        "ym" => $Ym,
+                        "amt" => $proj_amt,
+                        "uid" => "",
+                        "unm" => "",
+                    ]);
+                } else {
+                    DB::table('store_sales_projection')->where('store_cd', $store_cd)->where('ym', $Ym)->update(['amt' => $proj_amt]);
+                }
 			});
 			$code = 200;
 		} catch (\Exception $e) {
 			$code = 500;
+			dd($e->getMessage());
 		}
 		return response()->json(['code' => $code]);
 

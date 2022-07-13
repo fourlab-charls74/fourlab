@@ -9,11 +9,10 @@
 		<span>/ 경영관리</span>
 	</div>
 </div>
-
 <form method="get" name="search">
 	<div id="search-area" class="search_cum_form">
 		<div class="card mb-3">
-			<input type='hidden' name='is_searched' value='{{$is_searched}}'>
+			<input type='hidden' id='is_searched' name='is_searched' value='{{$is_searched}}'>
 			<div class="d-flex card-header justify-content-between">
 				<h4>검색</h4>
 				<div class="flax_box">
@@ -30,7 +29,7 @@
 							<div class="form-inline date-select-inbox">
 								<div class="docs-datepicker form-inline-inner input_box">
 									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date month" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
+										<input type="text" class="form-control form-control-sm docs-date month" name="sdate" value="{{ $sdate }}" onchange="return isSearch('');" autocomplete="off" disable>
 										<div class="input-group-append">
 											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
 												<i class="fa fa-calendar" aria-hidden="true"></i>
@@ -42,7 +41,7 @@
 								<span class="text_line">~</span>
 								<div class="docs-datepicker form-inline-inner input_box">
 									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date month" name="edate" value="{{ $edate }}" autocomplete="off">
+										<input type="text" class="form-control form-control-sm docs-date month" name="edate" value="{{ $edate }}" onchange="return isSearch('');"  autocomplete="off">
 										<div class="input-group-append">
 											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
 												<i class="fa fa-calendar" aria-hidden="true"></i>
@@ -108,41 +107,56 @@
 </style>
 <script type="text/javascript" charset="utf-8">
 
-	const IS_SEARCHED = document.search.is_searched.value;
-
-	let col_keys = [];
-
-	const init_cols = () => {
-		return (IS_SEARCHED == 'y') 
-			? [
-				{ headerName: "#", field: "num", type:'NumType', pinned:'left', aggSum:"합계", cellStyle: { 'text-align': "center" },
-					cellRenderer: function (params) {
-						if (params.node.rowPinned === 'top') {
-							return "합계";
-						} else {
-							return parseInt(params.value) + 1;
-						}
-					}
-				},
-				{ field: "store_type_nm", headerName: "매장구분", pinned:'left', width:90, cellStyle: { 'text-align': "center" } },
-				{ field: "store_cd", headerName: "매장코드", pinned:'left', hide: true },
-				{ field: "store_nm", headerName: "매장명", pinned:'left', type: 'StoreNameType', width: 250 },
-				{
-					field: "summary", headerName: "합계",
-					children: [
-						{field: "proj_amt", headerName: "목표", type: 'currencyType', aggregation: true },
-						{field: "last_recv_amt", headerName: "전년", type: 'currencyMinusColorType', aggregation: true },
-						{field: "recv_amt", headerName: "금액", type: 'currencyMinusColorType', aggregation: true },
-						{field: "progress_proj_amt", headerName: "달성율(%)", type: 'currencyMinusColorType', aggregation: true,
-							cellRenderer: params => goalProgress(params.data)
-						},
-					]
-				}
-			] 
-			: []
-	};
-
-	let columns = init_cols();
+	//const IS_SEARCHED = document.search.is_searched.value;
+	let columns = [
+        { headerName: "#", field: "num", type:'NumType', pinned:'left', aggSum:"합계", cellStyle: { 'text-align': "center" },
+            cellRenderer: function (params) {
+                if (params.node.rowPinned === 'top') {
+                    return "합계";
+                } else {
+                    return parseInt(params.value) + 1;
+                }
+            }
+        },
+        { field: "store_type_nm", headerName: "매장구분", pinned:'left', width:90, cellStyle: { 'text-align': "center" } },
+        { field: "scd", headerName: "매장코드", pinned:'left'},
+        { field: "store_nm", headerName: "매장명", pinned:'left', type: 'StoreNameType', width: 250 },
+        {
+            field: "summary", headerName: "합계",
+            children: [
+                {field: "proj_amt", headerName: "목표", type: 'currencyType', width:75, aggregation: true },
+                {field: "last_recv_amt", headerName: "전년", type: 'currencyMinusColorType', width:75, aggregation: true },
+                {field: "recv_amt", headerName: "금액", type: 'currencyMinusColorType', width:75, aggregation: true },
+                {field: "progress_proj_amt", headerName: "달성율(%)", type: 'currencyMinusColorType', aggregation: true,
+                    cellRenderer: params => goalProgress(params.data)
+                },
+            ]
+        },
+        @foreach($months as $index => $month)
+        {
+            field: "{{$month["val"]}}", headerName: "{{$month["fmt"]}}",
+            children: [
+                { field: 'proj_amt_{{$month["val"]}}', headerName: "목표", type: 'currencyType', width:75, aggregation: true,
+                    editable: params => params.node.rowPinned === 'top' ? false : true,
+                    cellStyle: params => {
+                        if (params.node.rowPinned === 'top') {
+                            return {};
+                        } else {
+                            return { 'background': '#ffff99' };
+                        }
+                    }
+                },
+                { field: 'prev_recv_amt_{{$month["val"]}}', headerName: "전월", type: 'currencyMinusColorType', width:75, aggregation: true },
+                { field: 'last_recv_amt_{{$month["val"]}}', headerName: "전년", type: 'currencyMinusColorType', width:75, aggregation: true },
+                { field: 'recv_amt_{{$month["val"]}}', headerName: "금액", type: 'currencyMinusColorType', width:75, aggregation: true},
+                { field: 'progress_proj_amt_{{$month["val"]}}', headerName: "달성율(%)", type: 'currencyMinusColorType', aggregation: true,
+                    cellRenderer: params => goalProgress(params.data, '111')
+                }
+            ]
+        },
+        @endforeach
+        {field: "", headerName: "", width: "auto"}
+    ];
 
 	/**
 	 * ( 목표 - 결제금액 ) / 목표 * 100 = 달성율(%)
@@ -163,49 +177,6 @@
 		return progress;
 	};
 
-	const setColumns = (count) => {
-		let cols = init_cols();
-		gx.gridOptions.api.setColumnDefs(cols);
-		for ( let i = 0; i < count; i++ ) {
-			const Ym = `${col_keys[i]}`;
-			const f = Ym.substr(0, 4) + "-" + Ym.substr(4, 2);
-			let obj = { fields: `${Ym}`, headerName: `${f}`};
-			obj.children = [
-				{ field: `proj_amt_${Ym}`, headerName: "목표", type: 'currencyType', aggregation: true, 
-					editable: params => params.node.rowPinned === 'top' ? false : true, 
-					cellStyle: params => {
-						if (params.node.rowPinned === 'top') {
-							return {};
-						} else {
-							return { 'background': '#ffff99' };
-						}
-					}
-				},
-				{ field: `prev_recv_amt_${Ym}`, headerName: "전월", type: 'currencyMinusColorType', aggregation: true },
-                { field: `last_recv_amt_${Ym}`, headerName: "전년", type: 'currencyMinusColorType', aggregation: true },
-                { field: `recv_amt_${Ym}`, headerName: "금액", type: 'currencyMinusColorType', aggregation: true},
-                { field: `progress_proj_amt_${Ym}`, headerName: "달성율(%)", type: 'currencyMinusColorType', aggregation: true,
-				 	cellRenderer: params => goalProgress(params.data, Ym)
-				}
-			];
-			cols.push(obj);
-		}
-		cols.push({ headerName: "", field: "nvl", width: "auto" });
-		gx.gridOptions.api.setColumnDefs(cols);
-		gx.CalAggregation();
-		autoSizeColumns(gx, ["nvl"]);
-	};
-
-	const autoSizeColumns = (grid, except = [], skipHeader = false) => {
-        const allColumnIds = [];
-        gx.gridOptions.columnApi.getAllColumns().forEach((column) => {
-            if (except.includes(column.getId())) return;
-            allColumnIds.push(column.getId());
-			
-        });
-        gx.gridOptions.columnApi.autoSizeColumns(allColumnIds, skipHeader);
-    };
-
 	const pApp = new App('',{
 		gridId:"#div-gd",
 	});
@@ -224,24 +195,27 @@
 		}
 		gx = new HDGrid(gridDiv, columns, options);
 
-		if (IS_SEARCHED == 'y') Search();
+        if ($('#is_searched').val() === 'y') {
+            Search();
+        }
 	});
 
+	function isSearch(val){
+        $('#is_searched').val(val);
+    }
 	function Search() {
-		if (IS_SEARCHED == 'y') {
+	    console.log($('#is_searched').val());
+		if ($('#is_searched').val() === 'y') {
 			let data = $('form[name="search"]').serialize();
 			gx.Aggregation({ sum: "top" });
 			gx.Request('/store/sale/sal17/search', data, -1, (e) => afterSearch(e));
 		} else {
-			document.search.is_searched.value = 'y';
+            isSearch('y');
 			$('form[name="search"]').submit();
 		}
 	}
 
 	const afterSearch = (e) => {
-		col_keys = e.head.col_keys;
-		const count = col_keys?.length;
-		setColumns(count);
 	};
 
 	const formReset = () => {
@@ -285,9 +259,9 @@
 					row['proj_amt'] = toInt(row['proj_amt']) - prev_value + value;
 					row[`progress_proj_amt_${Ym}`] = goalProgress(row, Ym);
 
-					const response = await axios({ 
-						url: `/store/sale/sal17/update`, method: 'post', 
-						data: { 'store_cd': row.store_cd, 'proj_amt': value, 'Ym': Ym }
+					const response = await axios({
+						url: `/store/sale/sal17/update`, method: 'post',
+						data: { 'store_cd': row.scd, 'proj_amt': value, 'Ym': Ym }
 					});
 					const { data, status } = response;
 					if (data?.code == 200) {
