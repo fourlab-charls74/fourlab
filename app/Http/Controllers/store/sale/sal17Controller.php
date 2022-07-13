@@ -38,8 +38,6 @@ class sal17Controller extends Controller
             $months[] = [ "val" => $sd->format("Ym"), "fmt" => $sd->format("Y-m") ];
             $sd->addMonth();
         }
-//        print_r($months);
-//        exit;
 
         // // 행사구분 - 추후 논의사항
 		// $sql = "
@@ -189,6 +187,7 @@ class sal17Controller extends Controller
 				) p on s.`store_cd` = p.`store_cd` 
 				left outer join `code` c on c.code_kind_cd = 'store_type' and c.code_id = s.store_type
 			where 1=1 ${where}
+			order by scd
 		";
             //echo "<pre>$sql</pre>";
 

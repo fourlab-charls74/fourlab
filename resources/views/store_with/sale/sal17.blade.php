@@ -119,7 +119,7 @@
             }
         },
         { field: "store_type_nm", headerName: "매장구분", pinned:'left', width:90, cellStyle: { 'text-align': "center" } },
-        { field: "scd", headerName: "매장코드", pinned:'left'},
+        { field: "scd", headerName: "매장코드", pinned:'left', hide: true },
         { field: "store_nm", headerName: "매장명", pinned:'left', type: 'StoreNameType', width: 250 },
         {
             field: "summary", headerName: "합계",
@@ -227,21 +227,23 @@
     };
 
 	const evtAfterEdit = async (params) => {
+
 		let prev_value = params.oldValue;
         let value = params.newValue;
 
 		if (prev_value !== value) {
 			let row = params.data;
             const row_index = params.rowIndex;
+			const rowNode = gx.gridOptions.api.getRowNode(row_index);
             const column_name = params.column.colId;
 
-			// 목표에 음수 입력시 합계의 목표 컬럼이 더해지는 문제 있음 - 추후 수정 필요
 			let regExp = /(?=proj_amt_).+/i;
 			let arr = column_name.match(regExp);
 			if (arr) {
 				if (isNaN(value) == true || value == "" || parseFloat(value) < 0) {
 					alert("숫자만 입력가능합니다.");
 					startEditingCell(row_index, column_name);
+					rowNode.setDataValue(column_name, prev_value);
 					return false;
 				} else {
 					prev_value = toInt(params.oldValue);
@@ -249,16 +251,26 @@
 
 					regExp = new RegExp(/[proj_amt_]/, "g");
 					const Ym = column_name.replace(regExp, "");
-					const rowNode = gx.gridOptions.api.getRowNode(row_index);
 
 					// 목표 금액부터 반영
 					row[column_name] = value;
 					gx.gridOptions.api.applyTransaction({ update: [row] });
 
 					// 목표 금액, 달성률 반영
-					row['proj_amt'] = toInt(row['proj_amt']) - prev_value + value;
+					regExp = /(?=proj_amt_).+/i;
+					const proj_keys = Object.keys(row).filter(key => {
+						return key.match(regExp) ? true : false;
+					});
+
+					let total_proj = 0;
+					proj_keys.map(key => {
+						total_proj = total_proj + toInt(row[key]);
+					});
+
+					row['proj_amt'] = total_proj;
 					row[`progress_proj_amt_${Ym}`] = goalProgress(row, Ym);
 
+					// 변경된 목표 저장
 					const response = await axios({
 						url: `/store/sale/sal17/update`, method: 'post',
 						data: { 'store_cd': row.scd, 'proj_amt': value, 'Ym': Ym }
