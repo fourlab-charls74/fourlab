@@ -58,19 +58,24 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="store_cd">매장명</label>
-                                <div class="form-inline inline_btn_box">
-                                    <input type='hidden' id="store_nm" name="store_nm">
-                                    <select id="store_no" name="store_no" class="form-control form-control-sm select2-store multi_select" multiple></select>
-                                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                <label for="store_type">매장구분</label>
+                                <div class="flex_box">
+                                    <select name='store_type' class="form-control form-control-sm">
+                                        <option value=''>전체</option>
+                                        @foreach ($store_types as $store_type)
+                                            <option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="prd_cd">상품코드</label>
-                                <div class="flex_box">
-                                    <input type='text' class="form-control form-control-sm search-enter" name='prd_cd' value='' />
+                                <label for="store_cd">매장명</label>
+                                <div class="form-inline inline_btn_box">
+                                    <input type='hidden' id="store_nm" name="store_nm">
+                                    <select id="store_no" name="store_no" class="form-control form-control-sm select2-store multi_select" multiple></select>
+                                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                 </div>
                             </div>
                         </div>
@@ -185,9 +190,9 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="goods_nm_eng">상품명(영문)</label>
-                                <div class="flax_box">
-                                    <input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
+                                <label for="prd_cd">상품코드</label>
+                                <div class="flex_box">
+                                    <input type='text' class="form-control form-control-sm search-enter" name='prd_cd' value='' />
                                 </div>
                             </div>
                         </div>
@@ -207,7 +212,7 @@
                                     <div class="form-inline-inner input_box" style="width:45%;">
                                         <select name="ord_field" class="form-control form-control-sm">
                                             <option value="goods_no">상품번호</option>
-                                            <option value="prd_cd">상품코드</option>
+                                            <option value="barcode">상품코드</option>
                                         </select>
                                     </div>
                                     <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -284,9 +289,10 @@
     </div>
     <script language="javascript">
         let columns = [
-            {field: "store" , headerName: "매장",pinned: 'left', width: 200},
-            {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
-            {field: "goods_no", headerName: "상품번호", pinned: 'left', cellStyle: {"text-align": "center"}},
+            {field: "store_nm" , headerName: "매장", rowGroup: true, hide: true},
+            // {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
+            {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {"text-align": "center"}, checkboxSelection: true},
+            {field: "goods_no", headerName: "상품번호", cellStyle: {"text-align": "center"}},
             {field: "goods_type_nm", headerName: "상품구분", cellStyle: StyleGoodsType},
             {field: "opt_kind_nm", headerName: "품목", width: 100, cellStyle: {"text-align": "center"}},
             {field: "brand_nm", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
@@ -311,17 +317,17 @@
             {
                 headerName: '매장재고',
                 children: [
-                    {field: "qty", headerName: "재고", type: 'currencyType'},
-                    {field: "wqty", headerName: "보유재고", type: 'currencyType'},
-                    {field: "exp_soldout_day", headerName: "소진예상일", type: 'currencyType'},
+                    {field: "store_qty", headerName: "재고", type: 'currencyType'},
+                    {field: "store_wqty", headerName: "보유재고", type: 'currencyType'},
+                    {field: "exp_soldout_day", headerName: "소진예상일", cellStyle: {"text-align": "center"}},
                     {
                         field: "rel_qty",
                         headerName: "배분수량",
                         type: "currencyType",
                         width: 80,
                         editable: true,
-                        cellStyle: {'background-color': '#ffff99'},
-                        valueFormatter: formatNumber
+                        cellStyle: function(params) {return params.value ? {"background-color": "#ffff99"} : {}},
+                        valueFormatter: formatNumber,
                     }
                 ]
             },
@@ -336,6 +342,16 @@
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
             gx = new HDGrid(gridDiv, columns, {
+                autoGroupColumnDef: {
+                    headerName: '매장',
+                    minWidth: 230,
+                    cellRenderer: 'agGroupCellRenderer',
+                },
+                groupDefaultExpanded: 1,
+                rowSelection: 'multiple',
+                groupSelectsChildren: true,
+                suppressRowClickSelection: true,
+                suppressAggFuncInHeader: true,
                 onCellValueChanged: (e) => {
                     e.node.setSelected(true);
                     if (e.column.colId === "rel_qty") {
@@ -358,94 +374,101 @@
             });
         });
 
+        // 검색버튼 클릭 시
         function Search() {
-            // let store_type = $("[name=store_type]").val();
-            // let store_nos = $("[name=store_no]").val();
-            // if(store_nos.length < 1 && store_type === '') return alert("매장구분 또는 출고할 매장을 선택 후 검색해주세요.");
+            let store_type = $("[name=store_type]").val();
+            let store_nos = $("[name=store_no]").val();
 
-            // let url = '/store/api/stores/search-storenm-from-type';
-            // let data = {store_type: store_type};
-            // if(store_nos.length > 0) {
-            //     url = '/store/api/stores/search-storenm';
-            //     data = {store_cds: store_nos};
-            // }
+            let url = '/store/api/stores/search-storenm-from-type';
+            let data = {store_type: store_type};
+            if(store_nos.length > 0) {
+                url = '/store/api/stores/search-storenm';
+                data = {store_cds: store_nos};
+            }
             
-            // axios({
-            //     url: url,
-            //     method: 'post',
-            //     data: data,
-            // }).then(function (res) {
-            //     if(res.data.code === 200) {
-            //         setColumn(res.data.body);
-            //         let data = $('form[name="search"]').serialize();
-            //         data += "&store_nos=" + store_nos;
-            //         gx.Request('/store/stock/stk12/search', data, 1);
-            //     } else {
-            //         console.log(res.data);
-            //     }
-            // }).catch(function (err) {
-            //     console.log(err);
-            // });
+            if(store_nos.length < 1 && store_type === '') {
+                SearchConnect();
+            } else {
+                axios({
+                    url: url,
+                    method: 'post',
+                    data: data,
+                }).then(function (res) {
+                    if(res.data.code === 200) {
+                        if(store_nos.length > 0 && store_type !== '') {
+                            // 매장구분, 매장명 둘 다 선택한 경우
+                            axios({
+                                url: '/store/api/stores/search-storenm-from-type',
+                                method: 'post',
+                                data: {store_type: store_type},
+                            }).then(function (response) {
+                                if(response.data.code === 200) {
+                                    let arr = res.data.body.filter(r => response.data.body.find(f => f.store_cd === r.store_cd));
+                                    SearchConnect(arr.map(r => r.store_cd));
+                                }
+                            }).catch(function (error) {
+                                console.log(error);
+                            });
+                        } else {
+                            SearchConnect(res.data.body.map(r => r.store_cd));
+                        }
+                    }
+                }).catch(function (err) {
+                    console.log(err);
+                });
+            }
+        }
+
+        // 검색연결
+        function SearchConnect(store_cds = []) {
+            let d = $('form[name="search"]').serialize();
+            d += "&store_nos=" + store_cds;
+            gx.Request('/store/stock/stk13/search', d, -1);
         }
 
         // 출고요청
         function requestRelease() {
-            // let rows = gx.getSelectedRows();
-            // if(rows.length < 1) return alert("출고요청할 상품을 선택해주세요.");
+            let rows = gx.getSelectedRows();
+            if(rows.length < 1) return alert("출고요청할 상품을 선택해주세요.");
 
-            // let stores = $("[name=store_no]").val();
-            // let emptyRow = rows.filter(r => {
-            //     for(let store_cd of stores) {
-            //         let q = r[store_cd + '_rel_qty'];
-            //         if(!q || !q.trim() || q == 0 || isNaN(parseInt(q))) return true;
-            //     }
-            //     return false;
-            // });
-            // if(emptyRow.length > 0) {
-            //     return alert("선택한 상품의 매장별 배분수량을 모두 입력해주세요.");
-            // }
+            let empty_rows = rows.filter(r => {
+                if(!r.rel_qty || !r.rel_qty.trim() || r.rel_qty == 0 || isNaN(parseInt(r.rel_qty))) return true;
+                return false;
+            });
+            if(empty_rows.length > 0) return alert("선택한 상품의 배분수량을 모두 입력해주세요.");
 
-            // // let storage_cd = $('[name=storage]').val();
-            // // if(storage_cd === '') return alert("상품을 출고할 창고를 선택해주세요.");
+            let over_qty_rows = rows.filter(r => {
+                if(r.rel_qty > (r.storage_wqty || 0)) return true;
+                return false;
+            });
+            if(over_qty_rows.length > 0) return alert(`대표창고의 재고보다 많은 수량을 요청하실 수 없습니다.\n상품코드 : ${over_qty_rows.map(o => o.prd_cd).join(", ")}`);
 
-            // let over_qty_rows = rows.filter(r => {
-            //     let cnt = 0;
-            //     for(let store_cd of stores) {
-            //         let q = r[store_cd + '_rel_qty'];
-            //         cnt += parseInt(q);
-            //     }
-            //     if(cnt > (r.storage_wqty || 0)) return true;
-            //     else return false;
-            // });
-            // if(over_qty_rows.length > 0) return alert(`대표창고의 재고보다 많은 수량을 요청하실 수 없습니다.\n상품코드 : ${over_qty_rows.map(o => o.prd_cd).join(", ")}`);
+            if(!confirm("해당 상품을 출고요청하시겠습니까?")) return;
 
-            // if(!confirm("해당 상품을 출고요청하시겠습니까?")) return;
+            const data = {
+                products: rows,
+                exp_dlv_day: $('[name=exp_dlv_day]').val(),
+                rel_order: $('[name=rel_order]').val(),
+            };
 
-            // const data = {
-            //     products: rows,
-            //     stores: $("[name=store_no]").val(),
-            //     exp_dlv_day: $('[name=exp_dlv_day]').val(),
-            //     rel_order: $('[name=rel_order]').val(),
-            // };
-
-            // axios({
-            //     url: '/store/stock/stk12/request-release',
-            //     method: 'post',
-            //     data: data,
-            // }).then(function (res) {
-            //     if(res.data.code === 200) {
-            //         if(!confirm(res.data.msg + "\n출고요청을 계속하시겠습니까?")) {
-            //             location.href = "/store/stock/stk10";
-            //         } else {
-            //             Search();
-            //         }
-            //     } else {
-            //         console.log(res.data);
-            //         alert("출고요청 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-            //     }
-            // }).catch(function (err) {
-            //     console.log(err);
-            // });
+            axios({
+                url: '/store/stock/stk13/request-release',
+                method: 'post',
+                data: data,
+            }).then(function (res) {
+                if(res.data.code === 200) {
+                    if(!confirm(res.data.msg + "\n출고요청을 계속하시겠습니까?")) {
+                        location.href = "/store/stock/stk10";
+                    } else {
+                        Search();
+                    }
+                } else {
+                    console.log(res.data);
+                    alert("출고요청 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+                }
+            }).catch(function (err) {
+                console.log(err);
+            });
         }
 
     </script>

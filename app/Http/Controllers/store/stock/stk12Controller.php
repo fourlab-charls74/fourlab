@@ -155,7 +155,7 @@ class stk12Controller extends Controller
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
         }
 
-        $store_cds = explode(',', $r['store_nos']);
+        $store_cds = array_filter(explode(',', $r['store_nos']));
 
         foreach($result as $re) {
             $prd_cd = $re->prd_cd;

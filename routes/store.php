@@ -173,6 +173,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 판매분출고
         Route::get('stk13','stk13Controller@index');
         Route::get('stk13/search','stk13Controller@search');
+        Route::post('stk13/request-release', 'stk13Controller@request_release');
 
         // 요청분출고
         Route::get('stk14','stk14Controller@index');
