@@ -85,7 +85,7 @@ class sal07Controller extends Controller
             $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
         }
 
-        if($goods_nos        != ""){
+        if($goods_nos != ""){
             $goods_no = $goods_nos;
         }
         $goods_no = preg_replace("/\s/",",",$goods_no);
@@ -106,6 +106,7 @@ class sal07Controller extends Controller
 
         if ($type != "") $where .= " and g.type = '" . Lib::quote($type) . "' ";
         if ($goods_type != "") $where .= " and g.goods_type = '" . Lib::quote($goods_type) . "' ";
+		if ($goods_stat != "")	$where .= " and g.sale_stat_cl = '$goods_stat' ";
 
         $page_size = $limit;
 		$startno = ($page - 1) * $page_size;
