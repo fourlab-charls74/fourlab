@@ -474,6 +474,7 @@ class sal01Controller extends Controller
 					"goods_opt" 	=> $order["goods_opt"],
 					"qty"			=> $order["qty"],
 					"price" 		=> $order["price"],
+					"wonga"			=> $order["wonga"],
 					"pay_type"		=> @$order["pay_type"],
 					"dlv_pay_type" 	=> @$order["dlv_pay_type"],
 					"dlv_amt" 		=> $order["dlv_amt"],

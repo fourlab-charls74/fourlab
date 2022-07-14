@@ -213,13 +213,22 @@
 				if (params.node.rowPinned === 'top') {
 					return "";
 				} else {
-					const { proj_amt, recv_amt } = params.data;
+					let { proj_amt, recv_amt } = params.data;
 					/**
 					 * ( 목표 - 결제금액 ) / 목표 * 100 = 달성율(%)
 					 */
-					let progress = (Math.abs(parseInt(proj_amt) - parseInt(recv_amt))) / parseInt(proj_amt) * 100;
-					if (proj_amt == 0 || proj_amt == null || proj_amt == "") progress = ""; // 목표액이 없는경우 빈 값 할당
-					if (progress > 100) progress = 100; // 달성율 100 넘어가는 경우 100으로 고정
+					let progress = 0;
+					proj_amt = toInt(proj_amt);
+					recv_amt = toInt(recv_amt);
+
+					if (progress > 100) return progress = 100; // 달성율 100 넘어가는 경우 100으로 고정
+					if (proj_amt <= recv_amt) return progress = 100; // 목표액보다 큰 경우 100 처리
+
+					progress = ( recv_amt / proj_amt ) * 100;
+					progress = Math.round(progress * 10) / 10; // 소수점 첫째짜리까지 반올림 처리
+
+					if (progress == -Infinity) progress = 0;
+
 					return progress;
 				}
 			}
@@ -234,6 +243,11 @@
 			]
 		}
 	];
+
+	const toInt = (value) => {
+		if (value == "" || value == NaN || value == null || value == undefined) return 0;
+		return parseInt(value);
+	};
 
 	const setColumns = (max_day) => {
 		columns.push({ ...dayColumns(max_day) });

@@ -174,6 +174,8 @@
 		progress = ( recv_amt / proj_amt ) * 100;
 		progress = Math.round(progress * 10) / 10; // 소수점 첫째짜리까지 반올림 처리
 
+		if (progress == -Infinity) progress = 0;
+
 		return progress;
 	};
 
