@@ -17,11 +17,21 @@ class sal07Controller extends Controller
         $mutable	= now();
         $sdate		= $mutable->sub(1, 'month')->format('Y-m-d');
 
+		// 매장구분
+		$sql = " 
+			select *
+			from code
+			where 
+				code_kind_cd = 'store_type' and use_yn = 'Y' order by code_seq 
+		";
+		$store_types = DB::select($sql);
+
 		$values = [
             'sdate'         => $sdate,
             'edate'         => date("Y-m-d"),
             'style_no'		=> "",
             'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
+			'store_types'     => $store_types,
             'com_types'     => SLib::getCodes('G_COM_TYPE'),
             'items'			=> SLib::getItems(),
             'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
@@ -39,6 +49,8 @@ class sal07Controller extends Controller
 		$store_type = $request->input('store_type');
 		$store_cd = $request->input('store_cd');
 		$prd_cd = $request->input('prd_cd');
+		$com_id = $request->input("com_cd");
+		$com_type = $request->input("com_type");
 
         $goods_stat = $request->input("goods_stat");
         $style_no = $request->input("style_no");
@@ -62,53 +74,55 @@ class sal07Controller extends Controller
 		$orderby = sprintf("order by %s %s", $ord_field, $ord);
 
 		$where	= "";
-		if ( $store_type != "" )	$where .= " and s.store_type = '" . $store_type . "' ";
-		if ( $store_cd != "" )	$where .= " and m.store_cd = '" . $store_cd . "' ";
-		if ( $prd_cd != "" )	$where .= " and o.prd_cd = '" . $prd_cd . "' ";
-        if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%' ";
-        if ($item != "") $where .= " and g.opt_kind_cd = '" . Lib::quote($item) . "' ";
-        if ($brand_cd != "") {
-            $where .= " and g.brand = '" . Lib::quote($brand_cd) . "' ";
-        } else if ($brand_cd == "" && $brand_nm != "") {
-            $where .= " and g.brand = '" . Lib::quote($brand_cd) . "' ";
-        }
-        if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%' ";
-        if ($goods_nm_eng != "") $where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
+		if ($com_type != "") $where .= " and g.com_type = '$com_type' ";
+		if ($store_type != "")	$where .= " and s.store_type = '" . $store_type . "' ";
+		if ($store_cd != "")	$where .= " and m.store_cd = '" . $store_cd . "' ";
+		if ($prd_cd != "")	$where .= " and o.prd_cd = '" . $prd_cd . "' ";
+		if ($com_id != "") $where .= " and g.com_id = '" . Lib::quote($com_id) . "'";
+		if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%' ";
+		if ($item != "") $where .= " and g.opt_kind_cd = '" . Lib::quote($item) . "' ";
+		if ($brand_cd != "") {
+			$where .= " and g.brand = '" . Lib::quote($brand_cd) . "' ";
+		} else if ($brand_cd == "" && $brand_nm != "") {
+			$where .= " and g.brand = '" . Lib::quote($brand_cd) . "' ";
+		}
+		if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%' ";
+		if ($goods_nm_eng != "") $where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
 
-        if( is_array($goods_stat)) {
-            if (count($goods_stat) == 1 && $goods_stat[0] != "") {
-                $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat[0]) . "' ";
-            } else if (count($goods_stat) > 1) {
-                $where .= " and g.sale_stat_cl in (" . join(",", $goods_stat) . ") ";
-            }
-        } else if($goods_stat != ""){
-            $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
-        }
+		if (is_array($goods_stat)) {
+			if (count($goods_stat) == 1 && $goods_stat[0] != "") {
+				$where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat[0]) . "' ";
+			} else if (count($goods_stat) > 1) {
+				$where .= " and g.sale_stat_cl in (" . join(",", $goods_stat) . ") ";
+			}
+		} else if ($goods_stat != "") {
+			$where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
+		}
 
-        if($goods_nos != ""){
-            $goods_no = $goods_nos;
-        }
-        $goods_no = preg_replace("/\s/",",",$goods_no);
-        $goods_no = preg_replace("/\t/",",",$goods_no);
-        $goods_no = preg_replace("/\n/",",",$goods_no);
-        $goods_no = preg_replace("/,,/",",",$goods_no);
+		if ($goods_nos != "") {
+			$goods_no = $goods_nos;
+		}
+		$goods_no = preg_replace("/\s/", ",", $goods_no);
+		$goods_no = preg_replace("/\t/", ",", $goods_no);
+		$goods_no = preg_replace("/\n/", ",", $goods_no);
+		$goods_no = preg_replace("/,,/", ",", $goods_no);
 
-        if( $goods_no != "" ){
-            $goods_nos = explode(",",$goods_no);
-            if(count($goods_nos) > 1){
-                if(count($goods_nos) > 500) array_splice($goods_nos,500);
-                $in_goods_nos = join(",",$goods_nos);
-                $where .= " and g.goods_no in ( $in_goods_nos ) ";
-            } else {
-                if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
-            }
-        }
+		if ($goods_no != "") {
+			$goods_nos = explode(",", $goods_no);
+			if (count($goods_nos) > 1) {
+				if (count($goods_nos) > 500) array_splice($goods_nos, 500);
+				$in_goods_nos = join(",", $goods_nos);
+				$where .= " and g.goods_no in ( $in_goods_nos ) ";
+			} else {
+				if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
+			}
+		}
 
-        if ($type != "") $where .= " and g.type = '" . Lib::quote($type) . "' ";
-        if ($goods_type != "") $where .= " and g.goods_type = '" . Lib::quote($goods_type) . "' ";
+		if ($type != "") $where .= " and g.type = '" . Lib::quote($type) . "' ";
+		if ($goods_type != "") $where .= " and g.goods_type = '" . Lib::quote($goods_type) . "' ";
 		if ($goods_stat != "")	$where .= " and g.sale_stat_cl = '$goods_stat' ";
 
-        $page_size = $limit;
+		$page_size = $limit;
 		$startno = ($page - 1) * $page_size;
 		$limit = " limit $startno, $page_size ";
 
@@ -128,6 +142,7 @@ class sal07Controller extends Controller
 						inner join order_opt o on m.ord_no = o.ord_no 
 						inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
 						inner join goods g on o.goods_no = g.goods_no
+						left outer join store s on m.store_cd = s.store_cd
 						left outer join brand b on g.brand = b.brand
 						left outer join `code` c on c.code_kind_cd = 'g_goods_stat' and g.sale_stat_cl = c.code_id
 						left outer join `code` c2 on c2.code_kind_cd = 'g_goods_type' and g.goods_type = c2.code_id
@@ -147,15 +162,21 @@ class sal07Controller extends Controller
             "
 			select 
 				o.prd_cd,count(*) as cnt,
-				(w.qty*w.price) as amt,
-				(w.recv_amt+w.point_apply_amt) as recv_amt, sum(w.wonga*w.qty) as wonga,
+				sum(w.qty) as qty,
+				sum(w.qty * w.price) as amt,
+				sum(w.recv_amt + w.point_apply_amt) as recv_amt,
+				sum(w.qty * w.price - w.recv_amt) as discount,
 				avg(w.price) as avg_price,
+				w.wonga as wonga,
+				sum(w.wonga * w.qty) as sum_wonga,
+				sum(w.qty * w.price - w.wonga * w.qty) sales_profit,
 				g.goods_type, c.code_val as sale_stat_cl_val, c2.code_val as goods_type_nm,
 				o.goods_no, g.brand, b.brand_nm, g.style_no, o.goods_opt, g.img, g.goods_nm, g.goods_nm_eng
 			from order_mst m 
 				inner join order_opt o on m.ord_no = o.ord_no 
 				inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
 				inner join goods g on o.goods_no = g.goods_no
+				left outer join store s on m.store_cd = s.store_cd
 				left outer join brand b on g.brand = b.brand
 				left outer join `code` c on c.code_kind_cd = 'g_goods_stat' and g.sale_stat_cl = c.code_id
 				left outer join `code` c2 on c2.code_kind_cd = 'g_goods_type' and g.goods_type = c2.code_id
