@@ -28,8 +28,8 @@
 							<div class="flex_box">
 								<select name='store_type' class="form-control form-control-sm">
 									<option value=''>전체</option>
-									@foreach ($com_types as $com_type)
-										<option value='{{ $com_type->code_id }}'>{{ $com_type->code_val }}</option>
+									@foreach ($store_types as $store_type)
+										<option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
 									@endforeach
 								</select>
 							</div>
@@ -285,22 +285,22 @@
         // {field: "",	headerName: "TAG가"},
         {field: "s",	headerName: "판매현황",
             children: [
-                {headerName: "총매출액", field: ""},
-                {headerName: "총수량", field: ""},
-                {headerName: "에누리", field: ""},
-                {headerName: "순매출액", field: ""},
-                {headerName: "매장수수료", field: ""},
-                {headerName: "중간관리수수료", field: ""},
+                {headerName: "수량", field: "qty", type: 'currencyMinusColorType'},
+                {headerName: "매출액", field: "amt", type: 'currencyMinusColorType'},
+                {headerName: "할인", field: "discount", type: 'currencyMinusColorType'},
+                {headerName: "결제금액", field: "recv_amt", type: 'currencyMinusColorType'}, // 판매금액 + 포인트 합친게 결제(주문) 금액.
+                {headerName: "매장수수료", field: "", cellRenderer: (params) => 0, type: 'currencyMinusColorType'}, // 0 처리
+                {headerName: "중간관리수수료", field: "", cellRenderer: (params) => 0, type: 'currencyMinusColorType'}, // 0 처리
             ]
         },
         {field: "w",	headerName: "원가",
             children: [
-                {headerName: "단가", field: "", type: 'numberType'},
-                {headerName: "합계금액", field: "", type: 'currencyType'},
+                {headerName: "단가", field: "wonga", type: 'numberType'},
+                {headerName: "합계금액", field: "sum_wonga", type: 'currencyMinusColorType'},
             ]
         },
-        {field: "",	headerName: "매출이익"},
-        {field: "",	headerName: "이익율(%)"},
+        {field: "sales_profit",	headerName: "매출이익", type: 'currencyMinusColorType'}, // 매출이익 = 결제금액 - 원가 합계금액
+        {field: "",	headerName: "이익율(%)"}, // 추후 논의 사항
         {headerName: "", field: "nvl", width: "auto"}
 	];
 </script>
