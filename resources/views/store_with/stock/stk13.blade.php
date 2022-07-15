@@ -344,6 +344,7 @@
             gx = new HDGrid(gridDiv, columns, {
                 autoGroupColumnDef: {
                     headerName: '매장',
+                    headerClass: 'bizest',
                     minWidth: 230,
                     cellRenderer: 'agGroupCellRenderer',
                 },

@@ -17,8 +17,7 @@ class stk13Controller extends Controller
         $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')->orderBy('default_yn')->get();
 
 		$values = [
-            // 'sdate'         => now()->sub(1, 'week')->format('Y-m-d'),
-            'sdate'         => now()->sub(2, 'week')->format('Y-m-d'),
+            'sdate'         => now()->sub(1, 'week')->format('Y-m-d'),
             'edate'         => date("Y-m-d"),
             'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
             'style_no'		=> "", // 스타일넘버

@@ -180,12 +180,15 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk14','stk14Controller@index');
         Route::get('stk14/search','stk14Controller@search');
         Route::post('stk14/request-release', 'stk14Controller@request_release');
-
+        
         // 일반출고
         Route::get('stk15','stk15Controller@index');
         Route::get('stk15/search','stk15Controller@search');
         Route::post('stk15/request-release', 'stk15Controller@request_release');
-
+        
+        // 매장RT
+        Route::get('stk20','stk20Controller@index');
+        Route::get('stk20/search','stk20Controller@search');
     });
 
 });
