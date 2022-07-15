@@ -17,6 +17,7 @@
 				<h4>검색</h4>
 				<div class="flax_box">
 					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+                    <a href="#" onclick="initSearch()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
 			</div>
@@ -79,7 +80,7 @@
                         <div class="form-group">
                             <label for="goods_stat">상품상태</label>
                             <div class="flax_box">
-                                <select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
+                                <select id="goods_stat" name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
                                     <option value=''>전체</option>
                                     @foreach ($goods_stats as $goods_stat)
                                         <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
@@ -238,6 +239,7 @@
 
 		<div class="resul_btn_wrap mb-3">
 			<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+            <input type="reset" id="search_reset" value="검색조건 초기화" class="btn btn-sm btn-outline-primary shadow-sm" onclick="initSearch()">
 			<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
 		</div>
 	</div>
@@ -320,6 +322,5 @@
 		let data = $('form[name="search"]').serialize();
 		gx.Request('/store/sale/sal07/search', data, 1);
 	}
-
 </script>
 @stop

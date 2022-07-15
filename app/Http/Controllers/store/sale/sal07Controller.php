@@ -89,16 +89,6 @@ class sal07Controller extends Controller
 		if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%' ";
 		if ($goods_nm_eng != "") $where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
 
-		if (is_array($goods_stat)) {
-			if (count($goods_stat) == 1 && $goods_stat[0] != "") {
-				$where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat[0]) . "' ";
-			} else if (count($goods_stat) > 1) {
-				$where .= " and g.sale_stat_cl in (" . join(",", $goods_stat) . ") ";
-			}
-		} else if ($goods_stat != "") {
-			$where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
-		}
-
 		if ($goods_nos != "") {
 			$goods_no = $goods_nos;
 		}
@@ -120,7 +110,15 @@ class sal07Controller extends Controller
 
 		if ($type != "") $where .= " and g.type = '" . Lib::quote($type) . "' ";
 		if ($goods_type != "") $where .= " and g.goods_type = '" . Lib::quote($goods_type) . "' ";
-		if ($goods_stat != "")	$where .= " and g.sale_stat_cl = '$goods_stat' ";
+		if (is_array($goods_stat)) {
+			if (count($goods_stat) == 1 && $goods_stat[0] != "") {
+				$where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat[0]) . "' ";
+			} else if (count($goods_stat) > 1) {
+				$where .= " and g.sale_stat_cl in (" . join(",", $goods_stat) . ") ";
+			}
+		} else if ($goods_stat != "") {
+			$where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
+		}
 
 		$page_size = $limit;
 		$startno = ($page - 1) * $page_size;
