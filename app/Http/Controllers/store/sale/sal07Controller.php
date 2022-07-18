@@ -167,7 +167,8 @@ class sal07Controller extends Controller
 				avg(w.price) as avg_price,
 				avg(w.wonga) as wonga,
 				sum(w.wonga * w.qty) as sum_wonga,
-				sum(w.qty * w.price - w.wonga * w.qty) sales_profit,
+				sum(w.qty * w.price - w.wonga * w.qty) as sales_profit,
+				(sum(w.qty * w.price) / sum(w.qty * w.price - w.wonga * w.qty)) * 100 as profit_rate,
 				g.goods_type, c.code_val as sale_stat_cl_val, c2.code_val as goods_type_nm,
 				o.goods_no, g.brand, b.brand_nm, g.style_no, o.goods_opt, g.img, g.goods_nm, g.goods_nm_eng
 			from order_mst m 
