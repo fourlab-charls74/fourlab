@@ -165,7 +165,7 @@ class sal07Controller extends Controller
 				sum(w.recv_amt + w.point_apply_amt) as recv_amt,
 				sum(w.qty * w.price - w.recv_amt) as discount,
 				avg(w.price) as avg_price,
-				w.wonga as wonga,
+				avg(w.wonga) as wonga,
 				sum(w.wonga * w.qty) as sum_wonga,
 				sum(w.qty * w.price - w.wonga * w.qty) sales_profit,
 				g.goods_type, c.code_val as sale_stat_cl_val, c2.code_val as goods_type_nm,

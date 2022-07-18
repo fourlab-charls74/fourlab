@@ -288,6 +288,7 @@
         {field: "s",	headerName: "판매현황",
             children: [
                 {headerName: "수량", field: "qty", type: 'currencyMinusColorType'},
+                {headerName: "단가", field: "wonga", type: 'numberType'},
                 {headerName: "매출액", field: "amt", type: 'currencyMinusColorType'},
                 {headerName: "할인", field: "discount", type: 'currencyMinusColorType'},
                 {headerName: "결제금액", field: "recv_amt", type: 'currencyMinusColorType'}, // 판매금액 + 포인트 합친게 결제(주문) 금액.
@@ -295,12 +296,7 @@
                 {headerName: "중간관리수수료", field: "", cellRenderer: (params) => 0, type: 'currencyMinusColorType'}, // 0 처리
             ]
         },
-        {field: "w",	headerName: "원가",
-            children: [
-                {headerName: "단가", field: "wonga", type: 'numberType'},
-                {headerName: "합계금액", field: "sum_wonga", type: 'currencyMinusColorType'},
-            ]
-        },
+        {field: "sum_wonga", headerName: "원가", type: 'currencyMinusColorType'},
         {field: "sales_profit",	headerName: "매출이익", type: 'currencyMinusColorType'}, // 매출이익 = 결제금액 - 원가 합계금액
         {field: "",	headerName: "이익율(%)"}, // 추후 논의 사항
         {headerName: "", field: "nvl", width: "auto"}
