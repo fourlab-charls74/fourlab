@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\head\stock;
+namespace App\Http\Controllers\store\cs;
 
 use App\Components\Lib;
 use App\Components\SLib;
@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Exception;
 
-class stk11Controller extends Controller {
+class cs01Controller extends Controller {
     public function index(Request $request) {
         $immutable = CarbonImmutable::now();
         $sdate = $immutable->sub(6, 'month')->format('Y-m-d');
@@ -27,7 +27,7 @@ class stk11Controller extends Controller {
             'items' => SLib::getItems(),
             'order_stock_states' => Slib::getCodes('G_ORDER_STOCK_STATE')
         ];
-        return view( Config::get('shop.head.view') . '/stock/stk11', $values);
+        return view( Config::get('shop.store.view') . '/cs/cs01', $values);
     }
 
     public function search(Request $request) {
