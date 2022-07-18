@@ -121,35 +121,22 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('prd02/search','prd02Controller@search');
     });
 
+    // 생산입고관리
+    Route::prefix("cs")->namespace('cs')->group(function () {
 
-    //매장관리
-    Route::prefix("sale")->namespace('sale')->group(function () {
-        Route::get('sal01','sal01Controller@index');
-        Route::get('sal01/search','sal01Controller@search');
-        Route::get('sal01/show','sal01Controller@show');
-        Route::post('sal01/update','sal01Controller@update');
-        Route::post('sal01/upload',	'sal01Controller@upload');
+        // 입고
+        Route::get('cs01','cs01Controller@index');
+        Route::get('cs01/search','cs01Controller@search');
+        Route::get('cs01/show','cs01Controller@show');
+        Route::post('cs01/comm', 'cs01Controller@command');
 
-        Route::get('sal02','sal02Controller@index');
-        Route::get('sal02/search','sal02Controller@search');
-
-        Route::get('sal03','sal03Controller@index');
-        Route::get('sal04','sal04Controller@index');
-        Route::get('sal05','sal05Controller@index');
-        Route::get('sal06','sal06Controller@index');
-        Route::get('sal07','sal07Controller@index');
-        Route::get('sal07/search','sal07Controller@search');
-
-        Route::get('sal11','sal11Controller@index');
-        Route::get('sal12','sal12Controller@index');
-        Route::get('sal13','sal13Controller@index');
-        Route::get('sal17','sal17Controller@index');
-        Route::get('sal17/search','sal17Controller@search');
-        Route::post('sal17/update','sal17Controller@update');
     });
 
     //매장관리
     Route::prefix("stock")->namespace('stock')->group(function () {
+
+        // 생산입고관리
+        Route::get('cs01','cs01Controller@index');
 
         // 매장재고
         Route::get('stk01','stk01Controller@index');
@@ -189,6 +176,32 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 매장RT
         Route::get('stk20','stk20Controller@index');
         Route::get('stk20/search','stk20Controller@search');
+    });
+
+    // 영업관리
+    Route::prefix("sale")->namespace('sale')->group(function () {
+        Route::get('sal01','sal01Controller@index');
+        Route::get('sal01/search','sal01Controller@search');
+        Route::get('sal01/show','sal01Controller@show');
+        Route::post('sal01/update','sal01Controller@update');
+        Route::post('sal01/upload',	'sal01Controller@upload');
+
+        Route::get('sal02','sal02Controller@index');
+        Route::get('sal02/search','sal02Controller@search');
+
+        Route::get('sal03','sal03Controller@index');
+        Route::get('sal04','sal04Controller@index');
+        Route::get('sal05','sal05Controller@index');
+        Route::get('sal06','sal06Controller@index');
+        Route::get('sal07','sal07Controller@index');
+        Route::get('sal07/search','sal07Controller@search');
+
+        Route::get('sal11','sal11Controller@index');
+        Route::get('sal12','sal12Controller@index');
+        Route::get('sal13','sal13Controller@index');
+        Route::get('sal17','sal17Controller@index');
+        Route::get('sal17/search','sal17Controller@search');
+        Route::post('sal17/update','sal17Controller@update');
     });
 
 });
