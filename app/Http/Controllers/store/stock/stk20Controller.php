@@ -49,74 +49,84 @@ class stk20Controller extends Controller
         $orderby = "";
         
         // where
-        // $sdate = str_replace("-", "", $r['sdate'] ?? now()->sub(1, 'week')->format('Ymd'));
-        // $edate = str_replace("-", "", $r['edate'] ?? date("Ymd"));
-        // $where .= "
-        //     and cast(if(psr.state > 20, psr.prc_rt, if(psr.state > 10, psr.exp_dlv_day, psr.req_rt)) as date) >= '$sdate' 
-        //     and cast(if(psr.state > 20, psr.prc_rt, if(psr.state > 10, psr.exp_dlv_day, psr.req_rt)) as date) <= '$edate'
-        // ";
-		// if($r['rel_order'] != null)
-		// 	$where .= " and psr.rel_order = '" . $r['rel_order'] . "'";
-		// if($r['rel_type'] != null) 
-		// 	$where .= " and psr.type = '" . $r['rel_type'] . "'";
-		// if($r['state'] != null) 
-		// 	$where .= " and psr.state = '" . $r['state'] . "'";
-		// if($r['store_type'] != null) 
-		// 	$where .= " and s.store_type = '" . $r['store_type'] . "'";
-		// if(isset($r['store_no'])) 
-		// 	$where .= " and s.store_cd = '" . $r['store_no'] . "'";
-		// if($r['prd_cd'] != null) 
-		// 	$where .= " and psr.prd_cd = '" . $r['prd_cd'] . "'";
-		// if($r['type'] != null) 
-		// 	$where .= " and g.type = '" . $r['type'] . "'";
-		// if($r['goods_type'] != null) 
-		// 	$where .= " and g.goods_type = '" . $r['goods_type'] . "'";
-        // if(isset($r['goods_stat'])) {
-        //     $goods_stat = $r['goods_stat'];
-        //     if(is_array($goods_stat)) {
-        //         if (count($goods_stat) == 1 && $goods_stat[0] != "") {
-        //             $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat[0]) . "' ";
-        //         } else if (count($goods_stat) > 1) {
-        //             $where .= " and g.sale_stat_cl in (" . join(",", $goods_stat) . ") ";
-        //         }
-        //     } else if($goods_stat != ""){
-        //         $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
-        //     }
-        // }
-        // if($r['style_no'] != null) 
-        //     $where .= " and g.style_no = '" . $r['style_no'] . "'";
+        $req_sdate = str_replace("-", "", $r['req_sdate'] ?? now()->sub(1, 'week')->format('Ymd'));
+        $req_edate = str_replace("-", "", $r['req_edate'] ?? date("Ymd"));
+        $rec_sdate = str_replace("-", "", $r['rec_sdate'] ?? now()->sub(1, 'week')->format('Ymd'));
+        $rec_edate = str_replace("-", "", $r['rec_edate'] ?? date("Ymd"));
+        $prc_sdate = str_replace("-", "", $r['prc_sdate'] ?? now()->sub(1, 'week')->format('Ymd'));
+        $prc_edate = str_replace("-", "", $r['prc_edate'] ?? date("Ymd"));
+        $fin_sdate = str_replace("-", "", $r['fin_sdate'] ?? now()->sub(1, 'week')->format('Ymd'));
+        $fin_edate = str_replace("-", "", $r['fin_edate'] ?? date("Ymd"));
+        $where .= "
+            and cast(psr.req_rt as date) >= '$req_sdate' 
+            and cast(psr.req_rt as date) <= '$req_edate'
+            and if(psr.state > 10, cast(psr.rec_rt as date) >= '$rec_sdate', 1=1)
+            and if(psr.state > 10, cast(psr.rec_rt as date) <= '$rec_edate', 1=1)
+            and if(psr.state > 20, cast(psr.prc_rt as date) >= '$prc_sdate', 1=1)
+            and if(psr.state > 20, cast(psr.prc_rt as date) <= '$prc_edate', 1=1)
+            and if(psr.state > 30, cast(psr.fin_rt as date) >= '$fin_sdate', 1=1)
+            and if(psr.state > 30, cast(psr.fin_rt as date) <= '$fin_sdate', 1=1)
+        ";
+		if($r['rt_type'] != null)
+			$where .= " and psr.type = '" . $r['rt_type'] . "'";
+		if(isset($r['send_store_no']))
+			$where .= " and psr.dep_store_cd = '" . $r['send_store_no'] . "'";
+		if(isset($r['store_no']))
+			$where .= " and psr.store_cd = '" . $r['store_no'] . "'";
+		if($r['rt_stat'] != null)
+			$where .= " and psr.state = '" . $r['rt_stat'] . "'";
+		if($r['prd_cd'] != null) 
+			$where .= " and psr.prd_cd = '" . $r['prd_cd'] . "'";
+		if($r['type'] != null) 
+			$where .= " and g.type = '" . $r['type'] . "'";
+		if($r['goods_type'] != null) 
+			$where .= " and g.goods_type = '" . $r['goods_type'] . "'";
+        if(isset($r['goods_stat'])) {
+            $goods_stat = $r['goods_stat'];
+            if(is_array($goods_stat)) {
+                if (count($goods_stat) == 1 && $goods_stat[0] != "") {
+                    $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat[0]) . "' ";
+                } else if (count($goods_stat) > 1) {
+                    $where .= " and g.sale_stat_cl in (" . join(",", $goods_stat) . ") ";
+                }
+            } else if($goods_stat != ""){
+                $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
+            }
+        }
+        if($r['style_no'] != null) 
+            $where .= " and g.style_no = '" . $r['style_no'] . "'";
 
-        // $goods_no = $r['goods_no'];
-        // $goods_nos = $request->input('goods_nos', '');
-        // if($goods_nos != '') $goods_no = $goods_nos;
-        // $goods_no = preg_replace("/\s/",",",$goods_no);
-        // $goods_no = preg_replace("/\t/",",",$goods_no);
-        // $goods_no = preg_replace("/\n/",",",$goods_no);
-        // $goods_no = preg_replace("/,,/",",",$goods_no);
+        $goods_no = $r['goods_no'];
+        $goods_nos = $request->input('goods_nos', '');
+        if($goods_nos != '') $goods_no = $goods_nos;
+        $goods_no = preg_replace("/\s/",",",$goods_no);
+        $goods_no = preg_replace("/\t/",",",$goods_no);
+        $goods_no = preg_replace("/\n/",",",$goods_no);
+        $goods_no = preg_replace("/,,/",",",$goods_no);
 
-        // if($goods_no != ""){
-        //     $goods_nos = explode(",", $goods_no);
-        //     if(count($goods_nos) > 1) {
-        //         if(count($goods_nos) > 500) array_splice($goods_nos, 500);
-        //         $in_goods_nos = join(",", $goods_nos);
-        //         $where .= " and g.goods_no in ( $in_goods_nos ) ";
-        //     } else {
-        //         if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
-        //     }
-        // }
+        if($goods_no != ""){
+            $goods_nos = explode(",", $goods_no);
+            if(count($goods_nos) > 1) {
+                if(count($goods_nos) > 500) array_splice($goods_nos, 500);
+                $in_goods_nos = join(",", $goods_nos);
+                $where .= " and g.goods_no in ( $in_goods_nos ) ";
+            } else {
+                if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
+            }
+        }
 
-        // if($r['com_type'] != null) 
-        //     $where .= " and g.com_type = '" . $r['com_type'] . "'";
-        // if($r['com_cd'] != null) 
-        //     $where .= " and g.com_id = '" . $r['com_cd'] . "'";
-        // if($r['item'] != null) 
-        //     $where .= " and g.opt_kind_cd = '" . $r['item'] . "'";
-        // if(isset($r['brand_cd']))
-        //     $where .= " and g.brand = '" . $r['brand_cd'] . "'";
-        // if($r['goods_nm'] != null) 
-        //     $where .= " and g.goods_nm like '%" . $r['goods_nm'] . "%'";
-        // if($r['goods_nm_eng'] != null) 
-        //     $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
+        if($r['com_type'] != null) 
+            $where .= " and g.com_type = '" . $r['com_type'] . "'";
+        if($r['com_cd'] != null) 
+            $where .= " and g.com_id = '" . $r['com_cd'] . "'";
+        if($r['item'] != null) 
+            $where .= " and g.opt_kind_cd = '" . $r['item'] . "'";
+        if(isset($r['brand_cd']))
+            $where .= " and g.brand = '" . $r['brand_cd'] . "'";
+        if($r['goods_nm'] != null) 
+            $where .= " and g.goods_nm like '%" . $r['goods_nm'] . "%'";
+        if($r['goods_nm_eng'] != null) 
+            $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
 
         // ordreby
         $ord = $r['ord'] ?? 'desc';
@@ -195,7 +205,8 @@ class stk20Controller extends Controller
     }
 
     // 접수 (10 -> 20)
-    public function receipt(Request $request) {
+    public function receipt(Request $request) 
+    {
         $ori_state = 10;
         $new_state = 20;
         $admin_id = Auth('head')->user()->id;
@@ -209,8 +220,8 @@ class stk20Controller extends Controller
 			foreach($data as $d) {
                 if($d['state'] != $ori_state) continue;
 
-                DB::table('product_stock_release')
-                    ->where('idx', '=', $d['idx'])
+                DB::table('product_stock_rotation')
+                    // ->where('idx', '=', $d['idx']) // 수정필요 (idx 추가할지?)
                     ->update([
                         'qty' => $d['qty'] ?? 0,
                         'exp_dlv_day' => str_replace("-", "", $exp_dlv_day),
@@ -222,23 +233,17 @@ class stk20Controller extends Controller
                         'ut' => now(),
                     ]);
 
-                // product_stock -> 창고보유재고 차감
-                DB::table('product_stock')
+                // 보내는 매장
+                // product_stock_store -> 보유재고 차감
+                DB::table('product_stock_store')
                     ->where('prd_cd', '=', $d['prd_cd'])
-                    ->update([
-                        'wqty' => DB::raw('wqty - ' . ($d['rel_qty'] ?? 0)),
-                        'ut' => now(),
-                    ]);
-
-                // product_stock_storage -> 보유재고 차감
-                DB::table('product_stock_storage')
-                    ->where('prd_cd', '=', $d['prd_cd'])
-                    ->where('storage_cd', '=', $d['storage_cd'])
+                    ->where('store_cd', '=', $d['dep_store_cd']) 
                     ->update([
                         'wqty' => DB::raw('wqty - ' . ($d['qty'] ?? 0)),
                         'ut' => now(),
                     ]);
 
+                // 받는 매장
                 // product_stock_store -> 재고 존재여부 확인 후 보유재고 플러스
                 $store_stock_cnt = 
                     DB::table('product_stock_store')
@@ -282,8 +287,9 @@ class stk20Controller extends Controller
         return response()->json(["code" => $code, "msg" => $msg]);
     }
 
-    // 출고 (20 -> 30)
-    public function release(Request $request) {          
+    // 보내는매장 출고 (20 -> 30)
+    public function release(Request $request) 
+    {          
         $ori_state = 20;
         $new_state = 30;
         $admin_id = Auth('head')->user()->id;
@@ -295,8 +301,8 @@ class stk20Controller extends Controller
 			foreach($data as $d) {
                 if($d['state'] != $ori_state) continue;
 
-                DB::table('product_stock_release')
-                    ->where('idx', '=', $d['idx'])
+                DB::table('product_stock_rotation')
+                    // ->where('idx', '=', $d['idx']) // 수정필요 (idx 추가할지?)
                     ->update([
                         'state' => $new_state,
                         'prc_id' => $admin_id,
@@ -304,10 +310,10 @@ class stk20Controller extends Controller
                         'ut' => now(),
                     ]);
 
-                // product_stock_storage 창고 실재고 차감
-                DB::table('product_stock_storage')
+                // product_stock_store -> 보내는 매장 실재고 차감
+                DB::table('product_stock_store')
                     ->where('prd_cd', '=', $d['prd_cd'])
-                    ->where('storage_cd', '=', $d['storage_cd']) 
+                    ->where('store_cd', '=', $d['dep_store_cd']) 
                     ->update([
                         'qty' => DB::raw('qty - ' . ($d['qty'] ?? 0)),
                         'ut' => now(),
@@ -326,8 +332,9 @@ class stk20Controller extends Controller
         return response()->json(["code" => $code, "msg" => $msg]);
     }
 
-    // 매장입고 (30 -> 40)
-    public function receive(Request $request) {
+    // 받는매장 입고 (30 -> 40)
+    public function receive(Request $request) 
+    {
         $ori_state = 30;
         $new_state = 40;
         $admin_id = Auth('head')->user()->id;
@@ -339,8 +346,8 @@ class stk20Controller extends Controller
 			foreach($data as $d) {
                 if($d['state'] != $ori_state) continue;
 
-                DB::table('product_stock_release')
-                    ->where('idx', '=', $d['idx'])
+                DB::table('product_stock_rotation')
+                    // ->where('idx', '=', $d['idx']) // 수정필요 (idx 추가할지?)
                     ->update([
                         'state' => $new_state,
                         'fin_id' => $admin_id,
@@ -348,7 +355,7 @@ class stk20Controller extends Controller
                         'ut' => now(),
                     ]);
 
-                // product_stock_store 매장 실재고 플러스
+                // product_stock_store 받는 매장 실재고 플러스
                 DB::table('product_stock_store')
                     ->where('prd_cd', '=', $d['prd_cd'])
                     ->where('store_cd', '=', $d['store_cd']) 
@@ -371,7 +378,8 @@ class stk20Controller extends Controller
     }
 
     // 거부 (10 -> -10)
-    public function reject(Request $request) {
+    public function reject(Request $request) 
+    {
         $ori_state = 10;
         $new_state = -10;
         $admin_id = Auth('head')->user()->id;
@@ -383,8 +391,8 @@ class stk20Controller extends Controller
 			foreach($data as $d) {
                 if($d['state'] != $ori_state) continue;
 
-                DB::table('product_stock_release')
-                    ->where('idx', '=', $d['idx'])
+                DB::table('product_stock_rotation')
+                    // ->where('idx', '=', $d['idx']) // 수정필요 (idx 추가할지?)
                     ->update([
                         'state' => $new_state,
                         'comment' => $d['comment'] ?? '',
@@ -402,6 +410,15 @@ class stk20Controller extends Controller
 			$code = 500;
 			$msg = $e->getMessage();
 		}
+
+        return response()->json(["code" => $code, "msg" => $msg]);
+    }
+
+    // 삭제
+    public function remove(Request $request) 
+    {
+        $code = 200;
+        $msg = "RT삭제 개발중입니다.";
 
         return response()->json(["code" => $code, "msg" => $msg]);
     }

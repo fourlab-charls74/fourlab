@@ -206,7 +206,8 @@ class stk10Controller extends Controller
     }
 
     // 접수 (10 -> 20)
-    public function receipt(Request $request) {
+    public function receipt(Request $request) 
+    {
         $ori_state = 10;
         $new_state = 20;
         $admin_id = Auth('head')->user()->id;
@@ -294,7 +295,8 @@ class stk10Controller extends Controller
     }
 
     // 출고 (20 -> 30)
-    public function release(Request $request) {          
+    public function release(Request $request) 
+    {          
         $ori_state = 20;
         $new_state = 30;
         $admin_id = Auth('head')->user()->id;
@@ -338,7 +340,8 @@ class stk10Controller extends Controller
     }
 
     // 매장입고 (30 -> 40)
-    public function receive(Request $request) {
+    public function receive(Request $request)
+    {
         $ori_state = 30;
         $new_state = 40;
         $admin_id = Auth('head')->user()->id;
@@ -382,7 +385,8 @@ class stk10Controller extends Controller
     }
 
     // 거부 (10 -> -10)
-    public function reject(Request $request) {
+    public function reject(Request $request) 
+    {
         $ori_state = 10;
         $new_state = -10;
         $admin_id = Auth('head')->user()->id;

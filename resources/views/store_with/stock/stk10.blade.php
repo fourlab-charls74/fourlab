@@ -456,7 +456,7 @@
     function receipt() {
         let rows = gx.getSelectedRows();
         if(rows.length < 1) return alert("접수처리할 항목을 선택해주세요.");
-        if(rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 출고처리 가능합니다.");
+        if(rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 접수처리 가능합니다.");
         if(!confirm("선택한 항목을 접수처리하시겠습니까?")) return;
 
         axios({
@@ -473,7 +473,7 @@
                 Search();
             } else {
                 console.log(res.data);
-                alert("출고처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+                alert("접수처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
             }
         }).catch(function (err) {
             console.log(err);
