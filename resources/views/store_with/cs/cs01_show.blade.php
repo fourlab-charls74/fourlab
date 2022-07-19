@@ -495,7 +495,7 @@
             ff.com_nm.click();
             return false;
         }
-        const url=`/head/api/goods/show`;
+        const url=`/store/api/goods/show`;
         const pop_up = window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1800,height=1000");
     };
 

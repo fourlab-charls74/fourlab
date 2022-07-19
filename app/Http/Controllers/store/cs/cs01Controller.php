@@ -18,7 +18,9 @@ use Illuminate\Support\Facades\Storage;
 use Exception;
 
 class cs01Controller extends Controller {
-    public function index(Request $request) {
+
+    public function index(Request $request)
+	{
         $immutable = CarbonImmutable::now();
         $sdate = $immutable->sub(6, 'month')->format('Y-m-d');
         $values = [
@@ -30,7 +32,8 @@ class cs01Controller extends Controller {
         return view( Config::get('shop.store.view') . '/cs/cs01', $values);
     }
 
-    public function search(Request $request) {
+    public function search(Request $request)
+	{
 
 		$sdate = str_replace('-','',$request->input("sdate"));
         $edate = str_replace('-','',$request->input("edate"));
@@ -90,7 +93,8 @@ class cs01Controller extends Controller {
         ]);
     }
 
-	public function show(Request $request) {
+	public function show(Request $request) 
+	{
 
 		$cmd = $request->input('cmd');
 		$stock_no = $request->input('stock_no');
@@ -222,7 +226,7 @@ class cs01Controller extends Controller {
 			"loc" => $loc
         ];
 
-        return view( Config::get('shop.head.view') . '/stock/stk11_show', $values);
+        return view( Config::get('shop.store.view') . '/cs/cs01_show', $values);
 		
 	}
 
@@ -304,6 +308,8 @@ class cs01Controller extends Controller {
 		$state					= $request->input("state");					//입고상태
 		$loc					= $request->input("loc");					//위치
 
+		$prd_cd = $request->input("prd_cd"); // 상품코드
+
 		$data					= $request->input("data");
 
 		if ($currency_unit == "KRW") {
@@ -363,10 +369,9 @@ class cs01Controller extends Controller {
 				'ut'			=> now()
 			]);
 
-
 			$this->saveStockProduct(
 				"E", $stock_no, $invoice_no, $state, $loc, $stock_date, $com_id,
-				$currency_unit, $exchange_rate, $custom_tax_rate, $opt_cnt, $data
+				$currency_unit, $exchange_rate, $custom_tax_rate, $opt_cnt, $data, $prd_cd
 			);
 			DB::commit();
 		} catch (Exception $e) {
@@ -412,6 +417,8 @@ class cs01Controller extends Controller {
 		$loc					= $request->input("loc");					//위치
 		$data					= $request->input("data");
 
+		$prd_cd = $request->input("prd_cd"); // 상품코드
+
 		if ($currency_unit == "KRW") {
 			$exchange_rate = 0;
 			$custom_tax_rate = 0;
@@ -456,7 +463,7 @@ class cs01Controller extends Controller {
 				DB::update($sql);
 				$this->saveStockProduct(
 					"E", $stock_no, $invoice_no, $state, $loc, $stock_date, $com_id,
-					$currency_unit, $exchange_rate, $custom_tax_rate, $opt_cnt, $data
+					$currency_unit, $exchange_rate, $custom_tax_rate, $opt_cnt, $data, $prd_cd
 				);
 				DB::commit();
 			}
@@ -619,6 +626,7 @@ class cs01Controller extends Controller {
 			$exchange_rate = $row->exchange_rate;
 			$custom_tax_rate = $row->custom_tax_rate;
 			$loc = $row->loc;
+			$prd_cd = $row->prd_cd; // 상품코드
 
 			if ($currency_unit == "KRW") {
 				$exchange_rate = 0;
@@ -637,7 +645,7 @@ class cs01Controller extends Controller {
 
 				$this->saveStockProduct(
 					"A", $stock_no, $invoice_no, $state, $loc, $stock_date, $com_id, 
-					$currency_unit, $exchange_rate, $custom_tax_rate, $opt_cnt, $data
+					$currency_unit, $exchange_rate, $custom_tax_rate, $opt_cnt, $data, $prd_cd
 				);
 
 				DB::commit();
@@ -683,7 +691,7 @@ class cs01Controller extends Controller {
 	/**
 	 * 상품 입고
 	 */
-	public function saveStockProduct($type, $stock_no, $invoice_no, $state, $loc, $stock_date, $com_id, $currency_unit, $exchange_rate, $custom_tax_rate, $opt_cnt, $data) {
+	public function saveStockProduct($type, $stock_no, $invoice_no, $state, $loc, $stock_date, $com_id, $currency_unit, $exchange_rate, $custom_tax_rate, $opt_cnt, $data, $prd_cd) {
 		try {
 			DB::beginTransaction();
 			if ($type != "A") {
@@ -729,10 +737,10 @@ class cs01Controller extends Controller {
 
 								$sql = "
 									insert into stock_product
-									( stock_no,invoice_no,com_id,item,brand,style_no,goods_no,goods_sub,opt_kor,
+									( stock_no,invoice_no,com_id,item,brand,style_no, prd_cd, goods_no,goods_sub,opt_kor,
 										qty,unit_cost,cost_notax,cost,state,stock_date,id,rt,ut ) values
 									( '${stock_no}', '${invoice_no}',
-										'${com_id}', '${item}', '${brand}','${style_no}','${goods_no}','0','${opt}',
+										'${com_id}', '${item}', '${brand}','${style_no}', '${prd_cd}', '${goods_no}','0','${opt}',
 										'${qty}','${unit_cost}','${cost_notax}','${cost}','${state}','${stock_date}','${id}',now(),now())
 								";
 

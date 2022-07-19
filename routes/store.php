@@ -25,11 +25,17 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
     Route::prefix("auto-complete")->group(function () {
 
+        // 매장명 조회 (자동완성)
         Route::get('/store', 'AutoCompleteController@store');
 
     });
 
     Route::prefix("api")->namespace('api')->group(function () {
+
+        // 상품검색
+        Route::get('goods', 'goods@search');
+        Route::get('goods/show', 'goods@show');
+        Route::get('goods/show/file/search', 'goods@file_search');
 
         // 고객명 조회
         Route::get('members', 'MemberController@show');

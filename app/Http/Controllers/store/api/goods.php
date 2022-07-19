@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\head\api;
+namespace App\Http\Controllers\store\api;
 
 use App\Components\SLib;
 use App\Components\Lib;
@@ -29,12 +29,12 @@ class goods extends Controller
             'site' => $site
         ];
 
-        return view( Config::get('shop.head.view') . '/common/goods_search',$values);
+        return view( Config::get('shop.store.view') . '/common/goods_search',$values);
     }
 
     public function file_search() {
         $values = [];
-        return view( Config::get('shop.head.view') . '/common/goods_file_search',$values);
+        return view( Config::get('shop.store.view') . '/common/goods_file_search',$values);
     }
 
     public function search(Request $req) {
@@ -257,7 +257,7 @@ class goods extends Controller
 		if($site != ""){
 			if($ex_site == "Y"){
 				$join .= " left outer join goods_site s on a.goods_no = s.goods_no and a.goods_sub = s.goods_sub and s.site = '$site' ";
-				$where .= " and ifnull(s.site,'') <> '$S_site' ";
+				$where .= " and ifnull(s.site,'') <> '$site' ";
 			} else {
 				$join .= " inner join goods_site s on a.goods_no = s.goods_no and a.goods_sub = s.goods_sub and s.site = '$site' ";
 			}
@@ -350,7 +350,8 @@ class goods extends Controller
         ";
 
         $rows = DB::select($sql);
-        //echo "<pre>$sql</pre>";
+        echo "<pre>$sql</pre>";
+		exit;
 
         return response()->json([
             "code" => 200,
