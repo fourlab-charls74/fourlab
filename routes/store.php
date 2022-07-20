@@ -187,6 +187,11 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('stk20/receive','stk20Controller@receive'); // 매장입고
         Route::post('stk20/reject','stk20Controller@reject'); // 거부
         Route::delete('stk20','stk20Controller@remove'); // 삭제
+
+        // RT요청
+        Route::get('stk21','stk21Controller@index');
+        Route::get('stk21/search-goods','stk21Controller@search_goods');
+        Route::get('stk21/search-stock','stk21Controller@search_stock');
     });
 
     // 영업관리
