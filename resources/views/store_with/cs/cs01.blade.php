@@ -5,7 +5,7 @@
         <h3 class="d-inline-flex">입고</h3>
         <div class="d-inline-flex location">
             <span class="home"></span>
-            <span>/ 재고</span>
+            <span>/ 생산입고관리</span>
         </div>
     </div>
     <form method="get" name="search">
@@ -38,7 +38,7 @@
                                     <span class="text_line">~</span>
                                     <div class="docs-datepicker form-inline-inner input_box">
                                         <div class="input-group">
-                                            <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
+                                            <input type="text" class="form-control form-control-sm docs-date search-enter" name="edate" value="{{ $edate }}" autocomplete="off">
                                             <div class="input-group-append">
                                                 <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
                                                 <i class="fa fa-calendar" aria-hidden="true"></i>

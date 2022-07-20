@@ -5,10 +5,7 @@ namespace App\Http\Controllers\store\cs;
 use App\Components\Lib;
 use App\Components\SLib;
 use App\Http\Controllers\Controller;
-use App\Models\Conf;
 use App\Models\Stock;
-use Carbon\Carbon;
-use App\Models\Jaego;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
@@ -34,23 +31,25 @@ class cs01Controller extends Controller {
 
     public function search(Request $request)
 	{
-
 		$sdate = str_replace('-','',$request->input("sdate"));
         $edate = str_replace('-','',$request->input("edate"));
 		$invoice_no	= $request->input("invoice_no");
 		$item = $request->input("item");
 		$com_id = $request->input("com_cd");
+		$com_nm = $request->input("com_nm");
 		$state = $request->input("order_stock_state");
 		$user_name = $request->input("user_name");
 
-		$where = "";
-		$having = "";
+		$where = "where b.stock_date >= '$sdate' and b.stock_date <= '$edate'";
+		$where2 = "where 1=1";
 
-		if ($item != "") $having = " having s.item like '%$item%' ";
-		if ($com_id != "") $where .= " and b.com_id = '$com_id' ";
-		if ($invoice_no != "") $where .= " and b.invoice_no = '$invoice_no' ";
-		if ($state != "") $where .= " and b.state = '$state' ";
-		if ($user_name != "") $having .= " and u.name = '$user_name' ";
+		if ($com_id != "") $where .= " and b.com_id = '" . Lib::quote($com_id) . "'";
+		if ($state != "") $where .= " and b.state = '" . Lib::quote($state) . "'";
+		if ($invoice_no != "") $where .= " and b.invoice_no = '" . Lib::quote($invoice_no) . "'";
+		
+		if ($com_nm != "") $where2 .= " and c.com_nm like '%" . Lib::quote($com_nm) . "%' ";
+		if ($user_name != "") $where2 .= " and u.name like '%" . Lib::quote($user_name) . "%' ";
+		if ($item != "") $where2 .= " and item_cds like '%" . Lib::quote($item) . "%' ";
 
 		/**
 		 * 추후 입고 유저 롤에 대한 처리 필요
@@ -64,21 +63,24 @@ class cs01Controller extends Controller {
 				b.stock_no, b.invoice_no, ar.code_val as area_type,
 				b.stock_date, cd.code_val as state_nm, c.com_nm, s.item,
 				b.currency_unit,b.exchange_rate,b.custom_amt, b.custom_tax,b.custom_tax_rate,
-				s.qty,s.total_cost,
+				s.qty, s.total_cost,
 				ifnull((select sum(qty) from stock_product_buy_order where stock_no = b.stock_no),0) as buy_order_qty,
-				u.name,b.rt
+				u.name, b.rt, s.item_cds as item_cds
 			from stock_order b
-				inner join company c on c.com_id = b.com_id
-				left outer join code ar on ar.code_kind_cd = 'G_BUY_ORDER_AR_TYPE' and ar.code_id = b.area_type
-				left outer join code cd on cd.code_kind_cd = 'G_ORDER_STOCK_state' and cd.code_id = b.state
-				left outer join mgr_user u on b.id = u.id
-				left outer join (
-					select p.stock_no,group_concat(distinct p.item) as item,sum(p.qty) as qty, sum(cost * qty) as total_cost
+				inner join (
+					select p.stock_no,group_concat(distinct p.item) as item,
+					group_concat(distinct o.opt_kind_cd) as item_cds,
+					sum(p.qty) as qty, sum(cost * qty) as total_cost
 					from stock_order b inner join stock_product p on b.stock_no = p.stock_no
-					where b.stock_date >= '$sdate' and b.stock_date <= '$edate' $where
+						left outer join opt o on p.item = o.opt_kind_nm
+					$where
 					group by p.stock_no
 				) s on b.stock_no = s.stock_no
-			where stock_date >= '$sdate' AND stock_date <= '$edate' $where $having
+				inner join company c on c.com_id = b.com_id
+				left outer join code ar on ar.code_kind_cd = 'g_buy_order_ar_type' and ar.code_id = b.area_type
+				left outer join code cd on cd.code_kind_cd = 'g_order_stock_state' and cd.code_id = b.state
+				left outer join mgr_user u on b.id = u.id
+			$where2
 			order by b.stock_date desc, b.rt desc
 		";
 
@@ -251,9 +253,7 @@ class cs01Controller extends Controller {
 				$response = $this->cancelCmd($stock_no);
 				break;
 			case 'addstockcmd':
-				$stock_no = $request->input('stock_no');
-				$data = $request->input('data');
-				$response = $this->addStockCmd($stock_no, $data);
+				$response = $this->addStockCmd($request);
 				break;
 			case 'product':
 				$stock_no = $request->input('stock_no');
@@ -331,23 +331,6 @@ class cs01Controller extends Controller {
 				$invoice_no = $this->getInvoiceNo($com_id);
 			}
 			// 등록
-			/*
-			$sql = "
-				insert into stock_order (
-					invoice_no, stock_date, stock_type, area_type, com_id, item,
-					currency_unit, exchange_rate, custom_amt, custom_tax, custom_tax_rate, state,loc,opts,id, rt, ut
-				) values (
-					'${invoice_no}','${stock_date}', '${stock_type}', '${area_type}', '${com_id}', '${item}',
-					'${currency_unit}', '${exchange_rate}','${custom_amt}','${custom_tax}','${custom_tax_rate}',
-					'${state}','${loc}','${opts}', '${id}', now(), now()
-				)
-			";
-
-			DB::insert($sql);
-			$stock_no = DB::table('stock_order')->insertGetId(
-				['id' => $id, 'stock_date' => $stock_date]
-			);
-			*/
 
 			$stock_no = DB::table('stock_order')->insertGetId([
 				'invoice_no'	=> $invoice_no, 
@@ -371,7 +354,7 @@ class cs01Controller extends Controller {
 
 			$this->saveStockProduct(
 				"E", $stock_no, $invoice_no, $state, $loc, $stock_date, $com_id,
-				$currency_unit, $exchange_rate, $custom_tax_rate, $opt_cnt, $data, $prd_cd
+				$currency_unit, $exchange_rate, $custom_tax_rate, $opt_cnt, $data
 			);
 			DB::commit();
 		} catch (Exception $e) {
@@ -463,7 +446,7 @@ class cs01Controller extends Controller {
 				DB::update($sql);
 				$this->saveStockProduct(
 					"E", $stock_no, $invoice_no, $state, $loc, $stock_date, $com_id,
-					$currency_unit, $exchange_rate, $custom_tax_rate, $opt_cnt, $data, $prd_cd
+					$currency_unit, $exchange_rate, $custom_tax_rate, $opt_cnt, $data
 				);
 				DB::commit();
 			}
@@ -519,14 +502,19 @@ class cs01Controller extends Controller {
 	public function cancelCmd($stock_no) { // 입고번호
 
 		$sql = "
-			select * from  stock_order where stock_no = '$stock_no' and state = 30
+			select * from stock_order where stock_no = '$stock_no' and state = 30
 		";
 
 		$row = DB::selectOne($sql);
-		$loc = $row->loc;
+		
+		if ($row) {
+			$loc = $row->loc;
+		} else {
+			$loc = '';
+		}
 
-		$id = Auth('head')->user()->id;
-		$name = Auth('head')->user()->name;
+		$id = Auth::guard('head')->user()->id;
+		$name = Auth::guard('head')->user()->name;
 
 		$user = [
 			'id' => $id,
@@ -538,11 +526,11 @@ class cs01Controller extends Controller {
 			/**
 			 * 재고 등록(+)
 			 */
-			$jaego = new Jaego($user);
-			$jaego->SetLoc($loc);
+			$s = new Stock($user);
+			$s->SetLoc($loc);
 
 			$sql = "
-				select stock_no,invoice_no,goods_no,goods_sub,opt_kor as opt,unit_cost,cost_notax,qty
+				select stock_no,invoice_no,goods_no,prd_cd,opt_kor as opt,unit_cost,cost_notax,qty
 				from stock_product
 				where stock_no = '$stock_no' and state = 30
 			";
@@ -552,26 +540,26 @@ class cs01Controller extends Controller {
 			foreach ($rows as $row) {
 				$invoice_no = $row->invoice_no;
 				$goods_no = $row->goods_no;
-				$goods_sub = $row->goods_sub;
+				$prd_cd = $row->prd_cd;
 				$opt = $row->opt;
 				$cost_notax = $row->cost_notax;
 				$qty = $row->qty;
 
 				$stock = array(
-					"type" => 9,
+					"type" => 9, // 여기
 					"etc" => "입고 취소",
 					"qty" => $qty,
 					"goods_no" => $goods_no,
-					"goods_sub" => $goods_sub,
+					"prd_cd" => $prd_cd,
 					"goods_opt" => $opt,
 					"wonga" => $cost_notax,
 					"invoice_no" => $invoice_no,
 				);
 				
-				$jaego->Minus( $stock );
+				$s->Minus( $stock );
 				$sql = "
 					update stock_product set state = '-10'
-					where stock_no = '$stock_no' and goods_no = '$goods_no' and goods_sub = '$goods_sub'
+					where stock_no = '$stock_no' and goods_no = '$goods_no' and prd_cd = '$prd_cd'
 							and opt_kor = '$opt' and cost_notax = '$cost_notax'
 				";
 				DB::update($sql);
@@ -579,6 +567,7 @@ class cs01Controller extends Controller {
 			
 			DB::commit();
 		} catch (Exception $e) {
+			dd($e);
 			DB::rollBack();
 			return response()->json(['code' => -1, 'message' => "입고 취소를 실패하였습니다. 다시 한번 시도하여 주십시오."], 200);
 		}
@@ -602,7 +591,10 @@ class cs01Controller extends Controller {
 	/**
 	 * 입고 추가
 	 */
-	public function addStockCmd($stock_no, $data) { // 입고번호, 데이터
+	public function addStockCmd(Request $request) { // 입고번호, 데이터
+
+		$stock_no = $request->input('stock_no');
+		$data = $request->input('data');
 
 		$opts		= "";
 		$opt_cnt 	= 0;
@@ -626,7 +618,6 @@ class cs01Controller extends Controller {
 			$exchange_rate = $row->exchange_rate;
 			$custom_tax_rate = $row->custom_tax_rate;
 			$loc = $row->loc;
-			$prd_cd = $row->prd_cd; // 상품코드
 
 			if ($currency_unit == "KRW") {
 				$exchange_rate = 0;
@@ -645,7 +636,7 @@ class cs01Controller extends Controller {
 
 				$this->saveStockProduct(
 					"A", $stock_no, $invoice_no, $state, $loc, $stock_date, $com_id, 
-					$currency_unit, $exchange_rate, $custom_tax_rate, $opt_cnt, $data, $prd_cd
+					$currency_unit, $exchange_rate, $custom_tax_rate, $opt_cnt, $data
 				);
 
 				DB::commit();
@@ -669,9 +660,9 @@ class cs01Controller extends Controller {
 			select
 				if(state = 30 or state = -10,'0','2') as chk,
 				stock_prd_no as stock_prd_no,
-				s.item,s.brand,s.style_no,s.goods_no,s.goods_sub,g.goods_nm, g.brand_nm,
-				ifnull(( select goods_opt from goods_summary
-						where goods_no = s.goods_no and goods_sub = s.goods_sub and goods_opt = s.opt_kor),concat('ERR:',ifnull(s.opt_kor, ''))) as opt_kor,
+				s.item,s.brand,s.style_no,s.goods_no,s.prd_cd,g.goods_nm, g.brand_nm,
+				ifnull(( select goods_opt from product_stock
+						where goods_no = s.goods_no and prd_cd = s.prd_cd and goods_opt = s.opt_kor),concat('ERR:',ifnull(s.opt_kor, ''))) as opt_kor,
 				s.qty as qty,
 				s.unit_cost as unit_cost,
 				(s.unit_cost * qty) as unit_total_cost,
@@ -680,7 +671,7 @@ class cs01Controller extends Controller {
 				(s.cost_notax * qty) as total_cost_novat,
 				s.stock_date as stock_date
 			from stock_product s inner join goods g
-					on s.goods_no = g.goods_no and s.goods_sub = g.goods_sub
+					on s.goods_no = g.goods_no
 			where stock_no = '$stock_no'
 			order by stock_prd_no asc
 		";
@@ -691,7 +682,7 @@ class cs01Controller extends Controller {
 	/**
 	 * 상품 입고
 	 */
-	public function saveStockProduct($type, $stock_no, $invoice_no, $state, $loc, $stock_date, $com_id, $currency_unit, $exchange_rate, $custom_tax_rate, $opt_cnt, $data, $prd_cd) {
+	public function saveStockProduct($type, $stock_no, $invoice_no, $state, $loc, $stock_date, $com_id, $currency_unit, $exchange_rate, $custom_tax_rate, $opt_cnt, $data) {
 		try {
 			DB::beginTransaction();
 			if ($type != "A") {
@@ -715,7 +706,7 @@ class cs01Controller extends Controller {
 						$brand = $row['brand'];
 						$style_no = $row['style_no'];
 						$goods_no = $row['goods_no'];
-						$goods_sub = $row['goods_sub'];
+						$prd_cd = $row['prd_cd'];
 
 						if ($goods_no > 0) {
 							$unit_cost = str_replace(",","",str_replace("\\","",$row['unit_cost']));
@@ -748,7 +739,7 @@ class cs01Controller extends Controller {
 							}
 
 							if ($state == 30) { // 입고 완료인 경우
-								$this->stockIn($goods_no, $goods_sub, $opt, $qty, $stock_no, $invoice_no, $cost, $loc);
+								$this->stockIn($goods_no, $prd_cd, $opt, $qty, $stock_no, $invoice_no, $cost, $loc);
 							}
 						}
 					}
@@ -770,15 +761,15 @@ class cs01Controller extends Controller {
 	/**
 	 * 상품 입고
 	 */
-	public function stockIn($goods_no, $goods_sub, $opt, $qty, $stock_no, $invoice_no, $cost, $loc) {
+	public function stockIn($goods_no, $prd_cd, $opt, $qty, $stock_no, $invoice_no, $cost, $loc) {
 		/**
 		 * '입고완료' 라면 입고처리
-		 * 관련테이블 - goods_summary, goods_good, goods_history, stock
+		 * 관련테이블 - product_stock, goods_good, goods_history, stock
 		 */
 		$sql = "
 			select goods_no
 			from goods
-			where goods_no = '${goods_no}' and goods_sub = '${goods_sub}'
+			where goods_no = '${goods_no}'
 		";
 		$row = DB::selectOne($sql);
 
@@ -797,24 +788,25 @@ class cs01Controller extends Controller {
 					'name' => $name
 				];
 				
-				$jaego = new Jaego($user);
-				$jaego->SetLoc($loc);
-				$jaego->Plus( array(
+				$s = new Stock($user);
+				$s->SetPrdCd($prd_cd);
+				$s->SetLoc($loc);
+				$s->Plus( array(
 					"type" => 1,
 					"etc" => "",
 					"qty" => $qty,
 					"goods_no" => $goods_no,
-					"goods_sub" => $goods_sub,
+					"prd_cd" => $prd_cd,
 					"goods_opt" => $opt,
 					"wonga" => $cost,
-					"invoice_no" => $invoice_no
+					"invoice_no" => $invoice_no,
 				));
 				/**
 				 * 재고확정 시 상품의 원가 변경
 				 */
 				$sql = "
 					update goods set wonga = '${cost}'
-					where goods_no = '${goods_no}' and goods_sub = '${goods_sub}'
+					where goods_no = '${goods_no}'
 				";
 				DB::update($sql);
 				DB::commit();
@@ -876,16 +868,16 @@ class cs01Controller extends Controller {
 	 */
 	public function checkOption(Request $request) {
 
-		$goods_no		= $request->input("goods_no", 0);				// 상품코드
-		$goods_sub		= $request->input("goods_sub");					// 상품코드
-		$opt			= $this->Rq(Trim($request->input("opt")));		// 옵션
+		$goods_no	= $request->input("goods_no", 0);				// 상품번호
+		$prd_cd		= $request->input("prd_cd");					// 상품코드
+		$opt		= $this->Rq(Trim($request->input("opt")));		// 옵션
 
-		if($opt == '') $opt = "NONE";
+		if ($opt == '') $opt = "NONE";
 
 		$sql = "
 			select count(*) as cnt
-			from goods_summary
-			where goods_no = '$goods_no' and goods_sub = '$goods_sub' and goods_opt = '$opt'
+			from product_stock
+			where goods_no = '$goods_no' and prd_cd = '$prd_cd' and goods_opt = '$opt'
 		";
 
 		$row = DB::selectOne($sql);
@@ -901,7 +893,7 @@ class cs01Controller extends Controller {
 	public function getInvoiceNo($com_id) {
 		$prefix_invoice_no = sprintf("%s_%s_A",$com_id,date("ymd"));
 		$sql = "
-			select ifnull(max(invoice_no),0) as invoice_no  from stock_order
+			select ifnull(max(invoice_no),0) as invoice_no from stock_order
 			where invoice_no like '$prefix_invoice_no%'
 		";
 		$row = DB::selectOne($sql);
@@ -930,7 +922,7 @@ class cs01Controller extends Controller {
 				$user_id = Auth::guard('head')->user()->id;
 				$extension = $file->extension();
 	
-				$save_path = "data/head/stk11/";
+				$save_path = "data/store/cs01/";
 				$file_name = "${now}_${user_id}.${extension}";
 				
 				if (!Storage::disk('public')->exists($save_path)) {

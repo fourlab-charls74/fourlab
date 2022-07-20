@@ -50,6 +50,7 @@ class sal07Controller extends Controller
 		$store_cd = $request->input('store_cd');
 		$prd_cd = $request->input('prd_cd');
 		$com_id = $request->input("com_cd");
+		$com_nm = $request->input("com_nm");
 		$com_type = $request->input("com_type");
 
         $goods_stat = $request->input("goods_stat");
@@ -79,6 +80,8 @@ class sal07Controller extends Controller
 		if ($store_cd != "")	$where .= " and m.store_cd = '" . $store_cd . "' ";
 		if ($prd_cd != "")	$where .= " and o.prd_cd = '" . $prd_cd . "' ";
 		if ($com_id != "") $where .= " and g.com_id = '" . Lib::quote($com_id) . "'";
+		if ($com_nm != "") $where .= " and g.com_nm like '%" . Lib::quote($com_nm) . "%' ";
+
 		if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%' ";
 		if ($item != "") $where .= " and g.opt_kind_cd = '" . Lib::quote($item) . "' ";
 		if ($brand_cd != "") {

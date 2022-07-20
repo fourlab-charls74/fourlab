@@ -21,7 +21,7 @@
         <h3 class="d-inline-flex">입고 {{ $invoice_no ? (" - " . $invoice_no) : "" }}</h3>
         <div class="d-inline-flex location">
             <span class="home"></span>
-            <span>/ 재고</span>
+            <span>/ 생산입고관리</span>
         </div>
     </div>
     <form method="get" name="search">
@@ -263,9 +263,8 @@
 
     // 기존에 공용으로 사용하던 화폐단위 type은 소수점을 전부 버리므로 반올림으로 커스텀하여 구현하였음
     const currencyFormatter = (params) => { 
-        return Math.round(params.value)
-            .toString()
-            .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+        const value = Math.round(params.value).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+        return isNaN(value) ? 0 : value;
     };
 
     var columns= [
@@ -285,7 +284,12 @@
             },
             checkboxSelection: params => checkIsEditable(params),
             cellStyle: params => checkIsEditable(params) ? null : { display: 'none'},
-            width: 40, pinned:'left'
+            width: 40, pinned:'left',
+            hide: params => {
+                const state = STATE; // 입고취소: -10, 입고대기: 10, 입고처리중: 20, 입고완료: 30
+                // 입고 대기이거나 입고 처리중인 경우에만 체크박스 표시 -> 삭제 가능하게함
+                return state == -10 || state == 30 ? false : true;
+            }
         },
         {field:"item" ,headerName:"품목",pinned:'left',width:96},
 
@@ -298,12 +302,7 @@
             // cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99'} : null ,
             // editable: params => checkIsEditable(params)
         },
-        {headerName:"상품코드",
-            children: [
-                {headerName: "번호", field: "goods_no", width: 60, pinned:'left', cellStyle:{'text-align': 'center'}},
-                {headerName: "보조", field: "goods_sub", width: 60, pinned:'left', cellStyle:{'text-align': 'center'}}
-            ]
-        },
+        {headerName:"상품코드", field:"prd_cd", width: 120, pinned:'left', cellStyle:{'text-align': 'center'}},
         {field:"goods_nm" , headerName:"상품명", type:"HeadGoodsNameType", width:250, pinned:'left'},
         {field:"opt_kor",headerName:"옵션",pinned:'left',width:130,
             editable: params => checkIsEditable(params),
@@ -356,34 +355,7 @@
                 if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#eee', 'border': 'none'};
             },
             getRowNodeId: (data) => data.hasOwnProperty('count') ? data.count : "0", // 업데이터 및 제거를 위한 식별 ID를 count로 할당
-            onCellValueChanged: params => evtAfterEdit(params),
-            // suppressKeyboardEvent: params => {
-            //     if (!params.editing) {
-            //         let isBackspaceKey = params.event.keyCode === 8;
-            //         let isDeleteKey = params.event.keyCode === 46;
-                    
-            //         if(isDeleteKey || isBackspaceKey){
-            //             params.api.getCellRanges().forEach(r => {
-            //                 let colIds = r.columns.map(col => col.colId);
-            //                 let startRowIndex = Math.min(r.startRow.rowIndex, r.endRow.rowIndex);
-            //                 let endRowIndex = Math.max(r.startRow.rowIndex, r.endRow.rowIndex);
-
-            //                 let itemsToUpdate = [];
-
-            //                 for (let i = startRowIndex; i <= endRowIndex; i++) {
-            //                     let data = params.api.rowModel.rowsToDisplay[i].data;
-            //                     colIds.forEach(column => {
-            //                         data[column] = "";
-            //                     });
-            //                     itemsToUpdate.push(data);
-            //                 }
-            //                 params.api.applyTransaction({ update: itemsToUpdate });
-            //             });
-            //         }
-            //     }
-            //     return false;
-            // },
-            // animateRows: true
+            onCellValueChanged: params => evtAfterEdit(params)
         };
         gx = new HDGrid(gridDiv, columns,options);
         $("#img").click(() => {
@@ -502,7 +474,7 @@
     var beforeSearchCallback = (api_document) => {
         const [ search_form, api_search_form ] = [ document.search, api_document.search ];
         api_search_form.com_nm.value = search_form.com_nm.value;
-        api_search_form.com_id.value = search_form.com_id.value;
+        api_search_form.com_cd.value = search_form.com_id.value;
     };
 
     /**
@@ -602,7 +574,7 @@
 
     const checkOption = async (row) => {
         const CMD = 'checkopt';
-        const data = { cmd: CMD, goods_no: row.goods_no, goods_sub: row.goods_sub, opt: row.opt_kor };
+        const data = { cmd: CMD, goods_no: row.goods_no, prd_cd: row.prd_cd, opt: row.opt_kor };
         let code;
         await axios({ url: COMMAND_URL, method: 'post', data: data })
             .then((response) => { code = response.data.code; }).catch((error) => { console.log(error); });

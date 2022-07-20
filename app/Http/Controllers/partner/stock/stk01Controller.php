@@ -6,7 +6,7 @@ use App\Components\Lib;
 use App\Components\SLib;
 use App\Http\Controllers\Controller;
 use App\Models\Conf;
-use App\Models\Stock;
+use App\Models\Jaego;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -164,17 +164,17 @@ class stk01Controller extends Controller
             );
 
             DB::transaction(function () use (&$result,$user,$reason,$data) {
-                $stock = new Stock($user);
+                $jaego = new Jaego($user);
                 for($i=0;$i<count($data);$i++){
                     $row = $data[$i];
-                    $stock->SetQty($row["goods_no"],$row["goods_opt"],$row["qty"]);
-                    if($stock->isUnlimited($row["goods_no"]) == "N"){
-                        $stock->SetStockQty($row["goods_no"],$row["goods_opt"],$row["wqty"],$reason);
+                    $jaego->SetQty($row["goods_no"], 0, $row["goods_opt"],$row["qty"]);
+                    if($jaego->isUnlimited($row["goods_no"]) == "N"){
+                        $jaego->SetStockQty($row["goods_no"],$row["goods_opt"],$row["wqty"],$reason);
                     }
                 }
             });
             $code = 200;
-        } catch(Exception $e){
+        } catch(\Exception $e){
             $code = 500;
         }
         return response()->json([

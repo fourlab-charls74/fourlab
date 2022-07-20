@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Components\Lib;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\Stock;
+use App\Models\Jaego;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -204,8 +204,8 @@ class prd06Controller extends Controller
                 // 옵션 가격
                 $a_opt_price = ( $opt_price != "" ) ?  explode(",", $opt_price) : array();
 
-                $stock = new Stock($user);
-                //$stock->Plus();
+                $jaego = new Jaego($user);
+                //$jaego->Plus();
                 //옵션
 
                 if($multi_pos !== false){
@@ -223,7 +223,7 @@ class prd06Controller extends Controller
 
                             $prd->AddOptionQty($goods_opt,$_opt_qty,$_opt_price,$i);
 
-                            $stock->Plus($goods_no,$goods_opt,$_opt_qty,[
+                            $jaego->Plus($goods_no,$goods_opt,$_opt_qty,[
                                 "type" => 9,
                                 "etc" => "재고수정",
                                 "wonga" => $wonga,
@@ -244,7 +244,7 @@ class prd06Controller extends Controller
 
                         $prd->AddOptionQty($goods_opt,$_opt_qty,$_opt_price,$i);
 
-                        $stock->Plus($goods_no,$goods_opt,$_opt_qty,[
+                        $jaego->Plus($goods_no,$goods_opt,$_opt_qty,[
                             "type" => 9,
                             "etc" => "재고수정",
                             "wonga" => $wonga,
@@ -256,7 +256,7 @@ class prd06Controller extends Controller
 
             });
             $code = 200;
-        } catch(Exception $e){
+        } catch(\Exception $e){
             $code = 500;
         }
 
@@ -427,8 +427,8 @@ class prd06Controller extends Controller
                 // 옵션 가격
                 $a_opt_price = ( $opt_price != "" ) ?  explode(",", $opt_price) : array();
 
-                $stock = new Stock($user);
-                //$stock->Plus();
+                $jaego = new Jaego($user);
+                //$jaego->Plus();
                 //옵션
 
                 if($multi_pos !== false){
@@ -446,7 +446,7 @@ class prd06Controller extends Controller
 
                             $prd->AddOptionQty($goods_opt,$_opt_qty,$_opt_price,$i);
 
-                            $stock->Plus($goods_no,$goods_opt,$_opt_qty,[
+                            $jaego->Plus($goods_no,$goods_opt,$_opt_qty,[
                                 "type" => 9,
                                 "etc" => "재고수정",
                                 "wonga" => $wonga,
@@ -467,7 +467,7 @@ class prd06Controller extends Controller
 
                         $prd->AddOptionQty($goods_opt,$_opt_qty,$_opt_price,$i);
 
-                        $stock->Plus($goods_no,$goods_opt,$_opt_qty,[
+                        $jaego->Plus($goods_no,$goods_opt,$_opt_qty,[
                             "type" => 9,
                             "etc" => "재고수정",
                             "wonga" => $wonga,
@@ -479,12 +479,11 @@ class prd06Controller extends Controller
 
             });
             $code = 200;
-        } catch(Exception $e){
+        } catch(\Exception $e){
             $code = 500;
         }
 
         return $code;
-
 
     }
 

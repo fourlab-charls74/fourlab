@@ -17,7 +17,6 @@ class Jaego
     private $opt_name;        // 옵션명
     private $opt_seq;        // 옵션 순서
 
-
     function __construct($user = [])
     {
         $this->user = $user;
@@ -1020,5 +1019,11 @@ class Jaego
         } else {
             return 0;
         }
+    }
+
+    public function isUnlimited($goods_no)
+    {
+        return DB::table('goods')
+            ->where('goods_no','=',$goods_no)->value('is_unlimited');
     }
 }

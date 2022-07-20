@@ -37,17 +37,20 @@ class stk11Controller extends Controller {
 		$invoice_no	= $request->input("invoice_no");
 		$item = $request->input("item");
 		$com_id = $request->input("com_cd");
+		$com_nm = $request->input("com_nm");
 		$state = $request->input("order_stock_state");
 		$user_name = $request->input("user_name");
 
-		$where = "";
-		$having = "";
+		$where = "where b.stock_date >= '$sdate' and b.stock_date <= '$edate'";
+		$where2 = "where 1=1";
 
-		if ($item != "") $having = " having s.item like '%$item%' ";
-		if ($com_id != "") $where .= " and b.com_id = '$com_id' ";
-		if ($invoice_no != "") $where .= " and b.invoice_no = '$invoice_no' ";
-		if ($state != "") $where .= " and b.state = '$state' ";
-		if ($user_name != "") $having .= " and u.name = '$user_name' ";
+		if ($com_id != "") $where .= " and b.com_id = '" . Lib::quote($com_id) . "'";
+		if ($state != "") $where .= " and b.state = '" . Lib::quote($state) . "'";
+		if ($invoice_no != "") $where .= " and b.invoice_no = '" . Lib::quote($invoice_no) . "'";
+		
+		if ($com_nm != "") $where2 .= " and c.com_nm like '%" . Lib::quote($com_nm) . "%' ";
+		if ($user_name != "") $where2 .= " and u.name like '%" . Lib::quote($user_name) . "%' ";
+		if ($item != "") $where2 .= " and item_cds like '%" . Lib::quote($item) . "%' ";
 
 		/**
 		 * 추후 입고 유저 롤에 대한 처리 필요
@@ -61,21 +64,24 @@ class stk11Controller extends Controller {
 				b.stock_no, b.invoice_no, ar.code_val as area_type,
 				b.stock_date, cd.code_val as state_nm, c.com_nm, s.item,
 				b.currency_unit,b.exchange_rate,b.custom_amt, b.custom_tax,b.custom_tax_rate,
-				s.qty,s.total_cost,
+				s.qty, s.total_cost,
 				ifnull((select sum(qty) from stock_product_buy_order where stock_no = b.stock_no),0) as buy_order_qty,
-				u.name,b.rt
+				u.name, b.rt, s.item_cds as item_cds
 			from stock_order b
-				inner join company c on c.com_id = b.com_id
-				left outer join code ar on ar.code_kind_cd = 'G_BUY_ORDER_AR_TYPE' and ar.code_id = b.area_type
-				left outer join code cd on cd.code_kind_cd = 'G_ORDER_STOCK_state' and cd.code_id = b.state
-				left outer join mgr_user u on b.id = u.id
-				left outer join (
-					select p.stock_no,group_concat(distinct p.item) as item,sum(p.qty) as qty, sum(cost * qty) as total_cost
+				inner join (
+					select p.stock_no,group_concat(distinct p.item) as item,
+					group_concat(distinct o.opt_kind_cd) as item_cds,
+					sum(p.qty) as qty, sum(cost * qty) as total_cost
 					from stock_order b inner join stock_product p on b.stock_no = p.stock_no
-					where b.stock_date >= '$sdate' and b.stock_date <= '$edate' $where
+						left outer join opt o on p.item = o.opt_kind_nm
+					$where
 					group by p.stock_no
 				) s on b.stock_no = s.stock_no
-			where stock_date >= '$sdate' AND stock_date <= '$edate' $where $having
+				inner join company c on c.com_id = b.com_id
+				left outer join code ar on ar.code_kind_cd = 'g_buy_order_ar_type' and ar.code_id = b.area_type
+				left outer join code cd on cd.code_kind_cd = 'g_order_stock_state' and cd.code_id = b.state
+				left outer join mgr_user u on b.id = u.id
+			$where2
 			order by b.stock_date desc, b.rt desc
 		";
 

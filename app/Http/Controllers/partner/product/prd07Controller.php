@@ -5,7 +5,7 @@ namespace App\Http\Controllers\partner\product;
 use App\Http\Controllers\Controller;
 use App\Components\Lib;
 use App\Models\Product;
-use App\Models\Stock;
+use App\Models\Jaego;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -42,8 +42,8 @@ class prd07Controller extends Controller
         $wheres = "and goods_no = '$no' and goods_sub = '$sub'";
 
         $sql = "
-          SELECT
-            CONCAT(g.goods_no, '_' ,g.goods_sub) as id
+          select
+            concat(g.goods_no, '_' ,g.goods_sub) as id
             ,'' as blank, g.goods_no, g.goods_sub, g.style_no, opt.opt_kind_nm
             , brand.brand_nm, c.full_nm, stat.code_val as sale_stat_nm
             , '' as img, g.head_desc, g.goods_nm, g.ad_desc
@@ -51,27 +51,27 @@ class prd07Controller extends Controller
             , g.price as mod_price, '' as mod_margin_rate, g.wonga as mod_wonga
             , bi.code_val as bae_info, bk.code_val as bae_kind
             , dpt.code_val as dlv_pay_type_nm, g.dlv_fee_cfg, g.bae_yn, g.baesong_price
-            , g.org_nm, g.make, if(g.restock_yn = '', 'N', ifnull(g.restock_yn, 'N')) as restock_yn
+            , g.org_nm, g.make, if(g.restock_yn = '', 'n', ifnull(g.restock_yn, 'n')) as restock_yn
             , g.goods_cont, g.spec_desc, g.baesong_desc, g.opinion
             , g.opt_kind_cd, g.brand, g.rep_cat_cd, g.sale_stat_cl
             , g.baesong_info, g.baesong_kind, g.dlv_pay_type
-            , 'N' as category_yn
+            , 'n' as category_yn
             , cp.com_type, g.goods_type
-            , if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
+            , if(g.special_yn <> 'y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
               select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
               from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
               )) as img_s_62
-          FROM
+          from
             goods g
-            LEFT OUTER JOIN opt opt ON opt.opt_kind_cd = g.opt_kind_cd AND opt.opt_id = 'K'
-            LEFT OUTER JOIN brand brand ON brand.brand = g.brand
-            LEFT OUTER JOIN category c ON c.d_cat_cd = g.rep_cat_cd AND c.cat_type  = 'DISPLAY'
-            LEFT OUTER JOIN company cp ON g.com_id = cp.com_id
-            LEFT OUTER JOIN code stat ON stat.code_kind_cd = 'G_GOODS_STAT' AND g.sale_stat_cl = stat.code_id
-            LEFT OUTER JOIN code bk ON bk.code_kind_cd = 'G_BAESONG_KIND' AND bk.code_id = g.baesong_kind
-            LEFT OUTER JOIN code bi ON bi.code_kind_cd = 'G_BAESONG_INFO' AND bi.code_id = g.baesong_info
-            LEFT OUTER JOIN code dpt ON dpt.code_kind_cd = 'G_DLV_PAY_TYPE' AND dpt.code_id = g.dlv_pay_type
-          WHERE 1=1
+            left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'k'
+            left outer join brand brand on brand.brand = g.brand
+            left outer join category c on c.d_cat_cd = g.rep_cat_cd and c.cat_type  = 'display'
+            left outer join company cp on g.com_id = cp.com_id
+            left outer join code stat on stat.code_kind_cd = 'g_goods_stat' and g.sale_stat_cl = stat.code_id
+            left outer join code bk on bk.code_kind_cd = 'g_baesong_kind' and bk.code_id = g.baesong_kind
+            left outer join code bi on bi.code_kind_cd = 'g_baesong_info' and bi.code_id = g.baesong_info
+            left outer join code dpt on dpt.code_kind_cd = 'g_dlv_pay_type' and dpt.code_id = g.dlv_pay_type
+          where 1=1
             $wheres
         ";
         $result = DB::selectOne($sql);
@@ -144,13 +144,13 @@ class prd07Controller extends Controller
                 //$u_cat_cd = $row["u_cat_cd"];
 
                 // 카테고리 추가
-                $stock = new Stock($user);
+                $stock = new Jaego($user);
                 //$stock->Plus();
                 //옵션
 
             });
             $code = 200;
-        } catch(Exception $e){
+        } catch(\Exception $e){
             $code = 500;
         }
 
