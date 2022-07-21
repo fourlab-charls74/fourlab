@@ -70,6 +70,7 @@ class prd02Controller extends Controller
         $cat_cd = $request->input("cat_cd");
         $is_unlimited = $request->input("is_unlimited");
 
+        $prd_cd = $request->input("prd_cd");
         $com_id = $request->input("com_cd");
 
         $head_desc = $request->input("head_desc");
@@ -89,6 +90,9 @@ class prd02Controller extends Controller
         $orderby = sprintf("order by %s %s", $ord_field, $ord);
 
         $where = "";
+        
+        if ($prd_cd != "") $where .= " and s.prd_cd = '" . Lib::quote($prd_cd) . "' ";
+
         if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%' ";
         if ($item != "") $where .= " and g.opt_kind_cd = '" . Lib::quote($item) . "' ";
         if ($brand_cd != "") {
