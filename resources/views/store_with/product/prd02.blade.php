@@ -82,7 +82,7 @@
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="goods_stat">상품상태</label>
-                                <div class="flax_box">
+                                <div class="flex_box">
                                     <select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
                                         <option value=''>전체</option>
                                         @foreach ($goods_stats as $goods_stat)
@@ -136,7 +136,7 @@
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="item">품목</label>
-                                <div class="flax_box">
+                                <div class="flex_box">
                                     <select name="item" class="form-control form-control-sm">
                                         <option value="">전체</option>
                                         @foreach ($items as $item)
@@ -161,7 +161,7 @@
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="goods_nm">상품명</label>
-                                <div class="flax_box">
+                                <div class="flex_box">
                                     <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value=''>
                                 </div>
                             </div>
@@ -169,7 +169,7 @@
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="goods_nm_eng">상품명(영문)</label>
-                                <div class="flax_box">
+                                <div class="flex_box">
                                     <input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
                                 </div>
                             </div>
@@ -177,14 +177,11 @@
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label>상품코드</label>
-                                <div class="form-inline">
-                                    <div class="form-inline-inner input_box">
-                                        <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='prd_cd' value=''>
-                                    </div>
+                                <div class="flex_box">
+                                    <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='prd_cd' value=''>
                                 </div>
                             </div>
                         </div>
-
                     </div>
                     <div class="row">
                         <div class="col-lg-4 inner-td">
@@ -308,7 +305,7 @@
                         <div class="fl_box">
                             <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                         </div>
-                        <div class="fr_box flax_box">
+                        <div class="fr_box flex_box">
                             <span style="font-weight:500;line-height:30px;margin-left:5px;vertical-align:middle;" class="mr-1">선택한 상품을 상품번호</span>
                             <div>
                                 <input type="text" id="goods_no" class="form-control form-control-sm" name="goods_no" value="">
