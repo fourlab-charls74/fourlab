@@ -187,8 +187,8 @@ class sal03Controller extends Controller
 					where w.`ord_state_date` >= '$sdate' and w.ord_state_date <= '$edate' and w.`ord_state` in ( '10','60','61') 
 						and o.prd_cd <> '' $where
 					group by o.prd_cd
-				) as a inner join product_stock ps on a.prd_cd = ps.prd_cd
-				left outer join ( 
+				) as a inner join product_stock ps on a.prd_cd = ps.prd_cd left outer join 
+				( 
 					select 
 						sp.prd_cd as prd_cd, 
 						sum(sp.qty) as in_sum_qty, sum(sp.cost) as in_sum_amt
