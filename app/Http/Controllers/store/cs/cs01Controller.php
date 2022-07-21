@@ -163,7 +163,7 @@ class cs01Controller extends Controller {
 			}
 		}
 
-		$states = Slib::getCodes('G_ORDER_STOCK_state');
+		$states = Slib::getCodes('G_ORDER_STOCK_STATE');
 		$collection = $states->map(function ($item) {
 			return collect($item)->only(['code_id','code_val'])->all();
 		});

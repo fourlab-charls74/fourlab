@@ -346,5 +346,13 @@ class Lib
 			return str_replace("'","''",stripslashes($str));
 		}
 	}
+
+    /**
+     * 작성된 쿼리 확인
+     */
+    public static function q($sql = "") {
+        echo "<pre>" . $sql. "</pre>";
+        exit;
+    }
    
 }

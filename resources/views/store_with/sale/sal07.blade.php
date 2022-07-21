@@ -12,7 +12,6 @@
 <form method="get" name="search">
 	<div id="search-area" class="search_cum_form">
 		<div class="card mb-3">
-
 			<div class="d-flex card-header justify-content-between">
 				<h4>검색</h4>
 				<div class="flax_box">
