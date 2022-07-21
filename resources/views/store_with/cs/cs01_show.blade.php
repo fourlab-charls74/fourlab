@@ -303,11 +303,8 @@
             // editable: params => checkIsEditable(params)
         },
         {headerName:"상품코드", field:"prd_cd", width: 120, pinned:'left', cellStyle:{'text-align': 'center'}},
-        {field:"goods_nm" , headerName:"상품명", type:"HeadGoodsNameType", width:250, pinned:'left'},
-        {field:"opt_kor",headerName:"옵션",pinned:'left',width:130,
-            editable: params => checkIsEditable(params),
-            cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99'} : null,
-        },
+        {field:"goods_nm", headerName:"상품명", type:"HeadGoodsNameType", width:250, pinned:'left'},
+        {field:"opt_kor", headerName:"옵션", pinned:'left', width:200},
         {headerName: "수량", field: "qty", width: 60,
             editable: params => checkIsEditable(params),
             cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99', textAlign: 'right'} : {textAlign: 'right'},
@@ -403,7 +400,7 @@
         const count = gx.gridOptions.api.getDisplayedRowCount();
         row = { ...row, 
             item: row.opt_kind_nm, qty: 0, cost: 0, unit_cost: 0, unit_total_cost: 0, total_cost: 0, total_cost_novat: 0,
-            isEditable: true, count: count + 1, opt_kor: ''
+            isEditable: true, count: count + 1, opt_kor: row.goods_opt
         };
         gx.gridOptions.api.applyTransaction({add : [row]});
         // $('#gx-total').html(count);

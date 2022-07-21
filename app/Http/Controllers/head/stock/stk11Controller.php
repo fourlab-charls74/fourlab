@@ -163,7 +163,7 @@ class stk11Controller extends Controller {
 			}
 		}
 
-		$states = Slib::getCodes('G_ORDER_STOCK_state');
+		$states = SLib::getCodes('G_ORDER_STOCK_STATE');
 		$collection = $states->map(function ($item) {
 			return collect($item)->only(['code_id','code_val'])->all();
 		});
@@ -224,7 +224,7 @@ class stk11Controller extends Controller {
 			'opts' => $opts,
 			'opt_cnt' => count($col_opts),
 			"col_opts" => $col_opts,
-			"locs" => Slib::getCodes('G_STOCK_loc'),
+			"locs" => Slib::getCodes('G_STOCK_LOC'),
 			"loc" => $loc
         ];
 
@@ -368,7 +368,6 @@ class stk11Controller extends Controller {
 				'rt'			=> now(),
 				'ut'			=> now()
 			]);
-
 
 			$this->saveStockProduct(
 				"E", $stock_no, $invoice_no, $state, $loc, $stock_date, $com_id,
