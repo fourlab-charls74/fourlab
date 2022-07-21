@@ -207,49 +207,18 @@ class stk21Controller extends Controller
     // 매장/창고별 상품재고 검색
     public function search_stock(Request $request)
     {
-        $r = $request->all();
-
 		$code = 200;
-		$where = "";
-        $orderby = "";
+		$prd_cd =$request->input("prd_cd", '');
 
 		$sql = "
-            select
-                g.goods_no,
-                g.goods_sub,
-                p.prd_cd,
-                p.goods_opt,
-                ifnull(type.code_val, 'N/A') as goods_type_nm,
-                com.com_nm,
-                opt.opt_kind_nm,
-                brand.brand_nm,
-                cat.full_nm,
-                g.style_no,
-                g.head_desc,
-                g.goods_nm,
-                g.goods_nm_eng,
-                stat.code_val as sale_stat_cl,
-                g.normal_price,
-                g.price,
-                g.wonga,
-                (100/(g.price/(g.price-g.wonga))) as margin_rate,
-                (g.price-g.wonga) as margin_amt,
-                g.org_nm
-            from goods g 
-                inner join product_stock p on g.goods_no = p.goods_no
-                left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
-                left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
-                left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
-                left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
-                left outer join company com on com.com_id = g.com_id
-                left outer join brand brand on brand.brand = g.brand
-                left outer join category cat on cat.d_cat_cd = g.rep_cat_cd and cat.cat_type = 'DISPLAY'
-                left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
-                left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
-                left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
-            where 1=1 $where
-            $orderby
-            $limit
+            select 
+                s.store_cd as dep_store_cd, 
+                s.store_nm as dep_store_nm, 
+                ifnull(ps.qty, 0) as qty, 
+                ifnull(ps.wqty, 0) as wqty
+            from store s
+                left outer join product_stock_store ps on s.store_cd = ps.store_cd and ps.prd_cd = '$prd_cd'
+            where s.use_yn = 'Y'
 		";
 
 		$result = DB::select($sql);

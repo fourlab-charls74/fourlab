@@ -291,7 +291,7 @@
     let product_columns = [
         {field: "idx", hide: true},
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {"text-align": "center"}},
-        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, sort: null, width: 28},
+        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: false, checkboxSelection: true, sort: null, width: 28},
         {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
         {field: "goods_no",	headerName: "상품번호", pinned: 'left', width: 80, cellStyle: {"text-align": "center"}},
         {field: "goods_type_nm", headerName: "상품구분", pinned: 'left', cellStyle: StyleGoodsType},
@@ -321,22 +321,22 @@
         {field: "qty",	headerName: "재고", width: 60},
         {field: "wqty",	headerName: "보유재고", width: 60},
         {field: "rt_qty", headerName: "RT수량", type: "numberType", editable: true, cellStyle: {"background-color": "#ffFF99"}},
-        {headerName: "창고보유재고",
-            children: [
-                @foreach (@$storages as $storage)
-                    {field: '{{ $storage->storage_cd }}', headerName: '{{ $storage->storage_nm }}', type: "numberType",
-                        cellRenderer: function(params) {
-                            let storage_cd = '{{ $storage->storage_cd }}';
-                            let arr = params.data.storage_qty.filter(s => s.storage_cd === storage_cd);
-                            if(arr.length > 0) {
-                                return arr[0].wqty;
-                            }
-                            return 0;
-                        }
-                    },
-                @endforeach
-            ],
-        },
+        // {headerName: "창고보유재고",
+        //     children: [
+        //         @foreach (@$storages as $storage)
+        //             {field: '{{ $storage->storage_cd }}', headerName: '{{ $storage->storage_nm }}', type: "numberType",
+        //                 cellRenderer: function(params) {
+        //                     let storage_cd = '{{ $storage->storage_cd }}';
+        //                     let arr = params.data.storage_qty.filter(s => s.storage_cd === storage_cd);
+        //                     if(arr.length > 0) {
+        //                         return arr[0].wqty;
+        //                     }
+        //                     return 0;
+        //                 }
+        //             },
+        //         @endforeach
+        //     ],
+        // },
         {field: "comment", headerName: "비고", width: 300, editable: true, cellStyle: {"background-color": "#ffFF99"}},
         {width: 'auto'}
     ];
@@ -366,15 +366,13 @@
 
     // 매장/창고별 재고검색
     function SearchStock() {
-        let rows = gx.getSelectedRows();
+        let rows = gx1.getSelectedRows();
         if(rows.length < 1) return alert("RT요청할 상품을 선택해주세요.");
-        
-        alert("작업중입니다.");
-        console.log(rows);
-        return;
+        if(rows.length > 1) return alert("상품을 한 개만 선택해주세요.");
 
-        // let data = '';
-		// gx1.Request('/store/stock/stk21/search-stock', data, 1);
+        let prd_cd = rows[0].prd_cd;
+        let data = 'prd_cd=' + prd_cd;
+		gx2.Request('/store/stock/stk21/search-stock', data, 1);
     }
 </script>
 @stop
