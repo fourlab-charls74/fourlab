@@ -70,7 +70,7 @@
                     <li><a href="/store/sale/sal01">(완)판매일보</a></li>
                     <li><a href="/store/sale/sal02">(완)월별판매집계표</a></li>
                     <li><a href="/store/sale/sal03">(개)기간별 Best/Worst 판매현황</a></li>
-                    <li><a href="/store/sale/sal06">(개)매장상품별판매분석</a></li>
+                    <li><a href="/store/sale/sal06">(개)매장별판매분석</a></li>
                     <li><a href="/store/sale/sal07">(완)상품별 이익현황</a></li>
                 </ul>
             </li>
