@@ -31,7 +31,7 @@ class sal07Controller extends Controller
             'edate'         => date("Y-m-d"),
             'style_no'		=> "",
             'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
-			'store_types'     => $store_types,
+			'store_types'   => $store_types,
             'com_types'     => SLib::getCodes('G_COM_TYPE'),
             'items'			=> SLib::getItems(),
             'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
