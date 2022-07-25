@@ -148,31 +148,44 @@
 	</div>
 </div>
 <script language="javascript">
-	var columns = [
-		{headerName: "#", field: "num",type:'NumType'},
-        {field: "",	headerName: "상품코드"},
-        {field: "",	headerName: "상품명"},
-        {field: "",	headerName: "TAG가"},
-        {field: "",	headerName: "판매현황",
+    var columns = [
+        { headerName: "#", field: "num", type:'NumType', pinned:'left', aggSum:"합계", aggAvg:"평균", cellStyle: { 'text-align': "center" },
+            cellRenderer: function (params) {
+                if (params.node.rowPinned === 'top') {
+                    return "합계";
+                } else {
+                    return parseInt(params.value) + 1;
+                }
+            }
+        },
+        { field: "store_type_nm", headerName: "매장구분", pinned:'left', width:90, cellStyle: { 'text-align': "center" } },
+        { field: "store_cd", headerName: "매장코드", pinned:'left', hide: true },
+        { field: "store_nm", headerName: "매장명", pinned:'left', type: 'StoreNameType', width: 250 },
+        // {field: "",	headerName: "TAG가"},
+        {field: "s",	headerName: "판매유형",
             children: [
-                {headerName: "총매출액", field: ""},
-                {headerName: "총수량", field: ""},
-                {headerName: "에누리", field: ""},
-                {headerName: "순매출액", field: ""},
-                {headerName: "매장수수료", field: ""},
-                {headerName: "중간관리수수료", field: ""},
+                {headerName: "일반판매", field: "discount", type: 'currencyMinusColorType'},
+                {headerName: "쿠폰판매(10%)", field: "recv_amt", type: 'currencyMinusColorType'}, // 판매금액 + 포인트 합친게 결제(주문) 금액.
+                {headerName: "브랜드데이10%", field: "", cellRenderer: (params) => 0, type: 'currencyMinusColorType'}, // 0 처리
             ]
         },
-        {field: "",	headerName: "원가",
+        {field: "s",	headerName: "판매현황",
             children: [
-                {headerName: "단가", field: "", type: 'numberType'},
-                {headerName: "합계금액", field: "", type: 'currencyType'},
+                {headerName: "수량", field: "qty", type: 'currencyMinusColorType'},
+                {headerName: "단가", field: "wonga", type: 'numberType'},
+                {headerName: "매출액", field: "amt", type: 'currencyMinusColorType'},
+                {headerName: "할인", field: "discount", type: 'currencyMinusColorType'},
+                {headerName: "결제금액", field: "recv_amt", type: 'currencyMinusColorType'}, // 판매금액 + 포인트 합친게 결제(주문) 금액.
+                {headerName: "매장수수료", field: "", cellRenderer: (params) => 0, type: 'currencyMinusColorType'}, // 0 처리
+                {headerName: "중간관리수수료", field: "", cellRenderer: (params) => 0, type: 'currencyMinusColorType'}, // 0 처리
             ]
         },
-        {field: "",	headerName: "매출이익"},
-        {field: "",	headerName: "이익율(%)"},
-        {headerName: "", field: "nvl"}
-	];
+        {field: "sum_wonga", headerName: "원가", type: 'currencyMinusColorType'},
+        {field: "sales_profit",	headerName: "매출이익", type: 'currencyMinusColorType'}, // 매출이익 = 결제금액 - 원가 합계금액
+        {field: "profit_rate",	headerName: "이익율(%)", type:'percentType'}, // 매출이익 분의 매출액 = 이익율
+        {headerName: "", field: "nvl", width: "auto"}
+    ];
+
 	function Add()
 	{
 		const url='/head/xmd/store/store01/show';

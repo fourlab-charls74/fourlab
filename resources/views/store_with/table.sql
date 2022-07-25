@@ -131,6 +131,9 @@ ALTER TABLE `bizest_smart`.`stock_product` ADD COLUMN `prd_cd` VARCHAR(50) NULL 
 
 -- 주문에 '상품코드' 추가
 ALTER TABLE `bizest_smart`.`order_mst` ADD COLUMN `store_cd` VARCHAR(30) NULL COMMENT '매장코드' AFTER `out_ord_no`;
+ALTER TABLE `bizest_smart`.`order_mst` ADD COLUMN `sale_kind` VARCHAR(30) NULL COMMENT '판매유형' AFTER `store_cd`;
+UPDATE  `bizest_smart`.`order_mst` SET sale_kind = '01' WHERE store_cd <> '';
+
 ALTER TABLE `bizest_smart`.`order_opt` ADD COLUMN `prd_cd` VARCHAR(50) NULL COMMENT '상품코드' AFTER `out_ord_opt_no`;
 ALTER TABLE `bizest_smart`.`order_opt_wonga` ADD COLUMN `prd_cd` VARCHAR(50) NULL COMMENT '상품코드' AFTER `tax_fee`;
 

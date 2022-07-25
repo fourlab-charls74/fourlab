@@ -52,6 +52,7 @@
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-file fs-18"></i><span>마감관리</span></a>
                 <ul>
+                    <li><a href="/partner/support/spt01">월정산</a></li>
                     <li><a href="/partner/support/spt01">월마감</a></li>
                 </ul>
             </li>
