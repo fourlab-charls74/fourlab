@@ -77,6 +77,7 @@ CREATE TABLE `product_stock_release` (
 
 -- 오프라인 RT
 CREATE TABLE `product_stock_rotation` (
+  `idx` INT(11) NOT NULL AUTO_INCREMENT COMMENT '일련번호',
   `type` VARCHAR(50) DEFAULT NULL COMMENT '분류',
   `goods_no` INT(11) NOT NULL DEFAULT '0' COMMENT '상품번호',
   `prd_cd` VARCHAR(50) NOT NULL DEFAULT '0' COMMENT '상품코드',
@@ -97,7 +98,8 @@ CREATE TABLE `product_stock_rotation` (
   `fin_rt` DATETIME DEFAULT NULL COMMENT '완료일시',
   `rt` DATETIME DEFAULT NULL COMMENT '등록일시',
   `ut` DATETIME DEFAULT NULL COMMENT '변경일시',
-  PRIMARY KEY (`goods_no`,`prd_cd`,`store_cd`)
+  `del_yn` CHAR(1) DEFAULT 'N' COMMENT '삭제여부',
+  PRIMARY KEY (`idx`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='상품재고 이동';
 
 

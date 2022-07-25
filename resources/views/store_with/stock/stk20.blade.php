@@ -63,128 +63,40 @@
                     <div class="col-lg-4 inner-td">
 						<div class="form-group">
                             <div class="form-group">
-                                <label>요청일자</label>
-                                <div class="form-inline date-select-inbox">
-                                    <div class="docs-datepicker form-inline-inner input_box">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control form-control-sm docs-date" name="req_sdate" value="{{ $sdate }}" autocomplete="off" disable>
-                                            <div class="input-group-append">
-                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="docs-datepicker-container"></div>
+                                <label>일자검색</label>
+                                <div class="d-flex">
+                                    <div class="flex_box mr-2">
+                                        <select name='rt_date_stat' class="form-control form-control-sm" style="width: 100px;">
+                                            @foreach ($rt_states as $key => $value)
+                                                @if($key == '-10') @continue @endif
+                                                <option value='{{ $key }}'>{{ $value }}일자</option>
+                                            @endforeach
+                                        </select>
                                     </div>
-                                    <span class="text_line">~</span>
-                                    <div class="docs-datepicker form-inline-inner input_box">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control form-control-sm docs-date" name="req_edate" value="{{ $edate }}" autocomplete="off">
-                                            <div class="input-group-append">
-                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
-                                                </button>
+                                    <div class="form-inline date-select-inbox">
+                                        <div class="docs-datepicker form-inline-inner input_box">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
+                                                <div class="input-group-append">
+                                                    <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
+                                                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
                                             </div>
+                                            <div class="docs-datepicker-container"></div>
                                         </div>
-                                        <div class="docs-datepicker-container"></div>
-                                    </div>
-                                </div>
-                            </div>
-						</div>
-					</div>
-                    <div class="col-lg-4 inner-td">
-						<div class="form-group">
-                            <div class="form-group">
-                                <label>접수일자</label>
-                                <div class="form-inline date-select-inbox">
-                                    <div class="docs-datepicker form-inline-inner input_box">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control form-control-sm docs-date" name="rec_sdate" value="{{ $sdate }}" autocomplete="off" disable>
-                                            <div class="input-group-append">
-                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
-                                                </button>
+                                        <span class="text_line">~</span>
+                                        <div class="docs-datepicker form-inline-inner input_box">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
+                                                <div class="input-group-append">
+                                                    <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+                                                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
                                             </div>
+                                            <div class="docs-datepicker-container"></div>
                                         </div>
-                                        <div class="docs-datepicker-container"></div>
-                                    </div>
-                                    <span class="text_line">~</span>
-                                    <div class="docs-datepicker form-inline-inner input_box">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control form-control-sm docs-date" name="rec_edate" value="{{ $edate }}" autocomplete="off">
-                                            <div class="input-group-append">
-                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="docs-datepicker-container"></div>
-                                    </div>
-                                </div>
-                            </div>
-						</div>
-					</div>
-                    <div class="col-lg-4 inner-td">
-						<div class="form-group">
-                            <div class="form-group">
-                                <label>처리일자</label>
-                                <div class="form-inline date-select-inbox">
-                                    <div class="docs-datepicker form-inline-inner input_box">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control form-control-sm docs-date" name="prc_sdate" value="{{ $sdate }}" autocomplete="off" disable>
-                                            <div class="input-group-append">
-                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="docs-datepicker-container"></div>
-                                    </div>
-                                    <span class="text_line">~</span>
-                                    <div class="docs-datepicker form-inline-inner input_box">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control form-control-sm docs-date" name="prc_edate" value="{{ $edate }}" autocomplete="off">
-                                            <div class="input-group-append">
-                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="docs-datepicker-container"></div>
-                                    </div>
-                                </div>
-                            </div>
-						</div>
-					</div>
-                </div>
-				<div class="row">
-                    <div class="col-lg-4 inner-td">
-						<div class="form-group">
-                            <div class="form-group">
-                                <label>완료일자</label>
-                                <div class="form-inline date-select-inbox">
-                                    <div class="docs-datepicker form-inline-inner input_box">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control form-control-sm docs-date" name="fin_sdate" value="{{ $sdate }}" autocomplete="off" disable>
-                                            <div class="input-group-append">
-                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="docs-datepicker-container"></div>
-                                    </div>
-                                    <span class="text_line">~</span>
-                                    <div class="docs-datepicker form-inline-inner input_box">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control form-control-sm docs-date" name="fin_edate" value="{{ $edate }}" autocomplete="off">
-                                            <div class="input-group-append">
-                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="docs-datepicker-container"></div>
                                     </div>
                                 </div>
                             </div>
@@ -379,7 +291,7 @@
 				<div class="d-flex justify-content-between">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
                     <div class="d-flex">
-                        <div class="d-flex mr-1 mb-1 mb-lg-0">
+                        <div class="d-flex mr-2 mb-1 mb-lg-0">
                             <span class="mr-1">출고예정일</span>
                             <div class="docs-datepicker form-inline-inner input_box" style="width:130px;display:inline;">
                                 <div class="input-group">
@@ -392,13 +304,6 @@
                                 </div>
                                 <div class="docs-datepicker-container"></div>
                             </div>
-                        </div>
-                        <div class="d-flex">
-                            <select id='exp_rel_order' name='exp_rel_order' class="form-control form-control-sm mr-2"  style='width:70px;display:inline'>
-                                @foreach ($rel_orders as $rel_order)
-                                    <option value='{{ $rel_order->code_id }}'>{{ $rel_order->code_val }}</option>
-                                @endforeach
-                            </select>
                         </div>
                         <a href="javascript:void(0);" onclick="receipt()" class="btn btn-sm btn-primary shadow-sm">접수</a>
                         <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
@@ -483,8 +388,7 @@
         {field: "tag_price", headerName: "TAG가", type: "currencyType", hide: true}, // 작업예정 (테이블 미정상태 20220715)
         {field: "price", headerName: "판매가", type: "currencyType"},
         {field: "qty", headerName: "수량", type: "numberType",
-            editable: function(params) {return params.data.state === 10;}, 
-            cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};},
+            cellStyle: {"font-weight": "700"},
         },
         {field: "req_rt", headerName: "요청일시", width: 120, cellStyle: {"text-align": "center"}},
         {field: "rec_rt", headerName: "접수일시", width: 120, cellStyle: {"text-align": "center"}},
@@ -494,7 +398,15 @@
             editable: function(params) {return params.data.state === 10;},
             cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};}
         },
-        {field: "del_rt", headerName: "RT 삭제", cellStyle: {"text-align": "center"}, hide: true},
+        {field: "del_rt", headerName: "RT 삭제", cellStyle: {"text-align": "center"},
+            cellRenderer: function(params) {
+                if(params.data.state === 10 || params.data.state === -10) {
+                    return `<a href="javascript:void(0);" onclick="remove(${params.data.idx})" style="color:blue;">삭제</a>`;
+                } else{
+                    return '-';
+                }
+            }
+        },
 	];
 </script>
 <script type="text/javascript" charset="utf-8">
@@ -626,14 +538,20 @@
     }
 
     // 삭제 (RT 삭제)
-    function remove(data) {
+    function remove(idx) {
         let rows;
-        if(!data) {
+        if(!idx) {
             rows = gx.getSelectedRows();
-            console.log(rows);
+            if(rows.length < 1) {
+                return alert("삭제할 RT를 선택해주세요.");
+            }
+            if(rows.filter(r => (r.state !== 10 && r.state !== -10)).length > 0) {
+                return alert("'요청'상태나 '거부'상태의 항목만 삭제 가능합니다.");
+            }
         } else{
-            rows = [data];
+            rows = [{idx}];
         }
+        if(!confirm("선택한 항목을 삭제하시겠습니까?")) return;
 
         axios({
             url: '/store/stock/stk20',

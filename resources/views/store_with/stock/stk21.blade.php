@@ -355,7 +355,17 @@
         pApp2.ResizeGrid(275);
         pApp2.BindSearchEnter();
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
-        gx2 = new HDGrid(gridDiv2, stock_columns);
+        gx2 = new HDGrid(gridDiv2, stock_columns, {
+            onCellValueChanged: (e) => {
+                e.node.setSelected(true);
+                if (e.column.colId == "rt_qty") {
+                    if (isNaN(e.newValue) == true || e.newValue == "") {
+                        alert("숫자만 입력가능합니다.");
+                        gx2.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                    }
+                }
+            }
+        });
     });
 
     // 상품검색
@@ -372,7 +382,7 @@
 
         let prd_cd = rows[0].prd_cd;
         let data = 'prd_cd=' + prd_cd;
-		gx2.Request('/store/stock/stk21/search-stock', data, 1);
+		gx2.Request('/store/stock/stk21/search-stock', data, -1);
     }
 </script>
 @stop
