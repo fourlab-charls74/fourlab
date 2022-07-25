@@ -211,6 +211,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('sal04','sal04Controller@index');
         Route::get('sal05','sal05Controller@index');
         Route::get('sal06','sal06Controller@index');
+        Route::get('sal06/search','sal06Controller@search');
+
         Route::get('sal07','sal07Controller@index');
         Route::get('sal07/search','sal07Controller@search');
 
