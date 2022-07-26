@@ -82,7 +82,7 @@
 						<div class="form-group">
 							<label for="">판매유형</label>
 							<div class="flex_box">
-								<select name='sale_kind' class="form-control form-control-sm">
+								<select name='sale_kind' class="form-control form-control-sm multi_select" multiple>
 									<option value=''>전체</option>
 									@foreach ($sale_kinds as $sale_kind)
 									<option value='{{ $sale_kind->code_id }}' @if (@$sale_kind_id == $sale_kind->code_id) selected @endif>{{ $sale_kind->code_val }}</option>

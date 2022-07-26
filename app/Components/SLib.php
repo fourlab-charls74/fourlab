@@ -97,10 +97,19 @@ class SLib
         return $store_types;
     }
 
-    public static function getUsedSaleKinds($sale_kind_id = '')
+    public static function getUsedSaleKinds($sale_kind_ids = "")
     {
         $where = "";
-        if ($sale_kind_id != "") $where .= " and s.sale_kind = '" . Lib::quote($sale_kind_id) . "' ";
+        if (is_array($sale_kind_ids)) {
+            if (count($sale_kind_ids) == 1 && $sale_kind_ids[0] != "") {
+                $where .= " and s.sale_kind = '" . Lib::quote($sale_kind_ids[0]) . "' ";
+            } else if (count($sale_kind_ids) > 1) {
+                $where .= " and s.sale_kind in (" . join(",", $sale_kind_ids) . ") ";
+            }
+        } else if ($sale_kind_ids != "") {
+			$where .= " and s.sale_kind = '" . Lib::quote($sale_kind_ids) . "' ";
+		}
+
         $sql = "
             select 
                 s.sale_kind as code_id, c.code_val as code_val, s.idx as sale_type_cd, 

@@ -62,24 +62,8 @@ class sal06Controller extends Controller
         $brand_cd = $request->input("brand_cd");
 		$style_no = $request->input('style_no', "");
 
-		$sale_kind = $request->input("sale_kind");
 		$sale_yn = $request->input('sale_yn','Y');
-		$sale_kind_id = $request->input('sale_kind', "");
-		$sale_kind_cols =  SLib::getUsedSaleKinds($sale_kind_id);
-
-		// $select_sale_kinds = "";
-		// $cnt = 0;
-		// foreach ($sale_kind_cols as $sale_kind_col) {
-		// 	if ($cnt == count(&$sale_kind_cols)) {
-		// 		$id = $sale_kind_col->code_id;
-		// 		$select_sale_kinds .= "where ";
-		// 	} else {
-				
-		// 	}
-		// }
-
-		// $cnt++;
-		// dd($sale_kind_cols);
+		$sale_kind_ids = $request->input('sale_kind', "");
 
 		// 검색조건 필터링
 		$where = "";
@@ -102,14 +86,15 @@ class sal06Controller extends Controller
 
 		if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%'";
 		if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%'";
-		if (is_array($sale_kind)) {
-			if (count($sale_kind) == 1 && $sale_kind[0] != "") {
-				$where .= " and m.sale_kind = '" . Lib::quote($sale_kind[0]) . "' ";
-			} else if (count($sale_kind) > 1) {
-				$where .= " and m.sale_kind in (" . join(",", $sale_kind) . ") ";
+
+		if (is_array($sale_kind_ids)) {
+			if (count($sale_kind_ids) == 1 && $sale_kind_ids[0] != "") {
+				$where .= " and m.sale_kind = '" . Lib::quote($sale_kind_ids[0]) . "' ";
+			} else if (count($sale_kind_ids) > 1) {
+				$where .= " and m.sale_kind in (" . join(",", $sale_kind_ids) . ") ";
 			}
-		} else if ($sale_kind != "") {
-			$where .= " and m.sale_kind = '" . Lib::quote($sale_kind) . "' ";
+		} else if ($sale_kind_ids != "") {
+			$where .= " and m.sale_kind = '" . Lib::quote($sale_kind_ids) . "' ";
 		}
 
         $where2 = "";
