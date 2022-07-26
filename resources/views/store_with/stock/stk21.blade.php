@@ -10,6 +10,11 @@
 		<span>/ RT요청</span>
 	</div>
 </div>
+
+<style>
+    .hide-element-title {position: relative; top: -80px;}
+</style>
+
 <form method="get" name="search">
 	<div id="search-area" class="search_cum_form">
 		<div class="card mb-3">
@@ -253,7 +258,7 @@
 				<div class="d-flex justify-content-between">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-product-total" class="text-primary">0</span>건</h6>
                     <div class="d-flex">
-                        <a href="javascript:void(0);" onclick="SearchStock()" class="btn btn-sm btn-outline-primary shadow-sm">RT요청</a>
+                        <a href="javascript:void(0);" onclick="SearchStock()" class="btn btn-sm btn-outline-primary shadow-sm">RT수량입력</a>
                     </div>
 				</div>
 			</div>
@@ -264,25 +269,51 @@
 	</div>
 </div>
 
+<div id="stock_table_area" class="hide-element-title"></div>
 
 <!-- 재고 입력 테이블 -->
 <div class="card shadow mb-0 last-card pt-2 pt-sm-0">
     <div class="card-body">
-        <div class="d-flex justify-content-center">
+        <div class="d-flex justify-content-center mb-4">
             <i class="fas fa-arrow-down fa-sm" aria-hidden="true" style="font-size: 24px;"></i>
         </div>
 		<div class="card-title">
 			<div class="filter_wrap">
 				<div class="d-flex justify-content-between">
-					<h6 class="m-0 font-weight-bold">총 : <span id="gd-stock-total" class="text-primary">0</span>건</h6>
-                    {{-- <div class="d-flex">
-                        <a href="javascript:void(0);" onclick="remove()" class="btn btn-sm btn-outline-primary shadow-sm">등록</a>
-                    </div> --}}
+					<h6 class="m-0 font-weight-bold">총 : <span id="gd-stock-total" class="text-primary">0</span>건 <strong id="selected_prd" class="ml-2 fs-14" style="font-weight: 500; color: blue;"></strong></h6>
+                    <div class="d-flex">
+                        <a href="javascript:void(0);" onclick="AddRTToFinalTable()" class="btn btn-sm btn-outline-primary shadow-sm">RT리스트에 등록</a>
+                    </div>
 				</div>
 			</div>
 		</div>
 		<div class="table-responsive">
 			<div id="div-gd-stock" class="ag-theme-balham"></div>
+		</div>
+	</div>
+</div>
+
+<div id="final_table_area" class="hide-element-title"></div>
+
+<!-- RT 최종 등록 테이블 -->
+<div class="card shadow mb-0 last-card pt-2 pt-sm-0">
+    <div class="card-body">
+        <div class="d-flex justify-content-center mb-4">
+            <i class="fas fa-arrow-down fa-sm" aria-hidden="true" style="font-size: 24px;"></i>
+        </div>
+		<div class="card-title">
+			<div class="filter_wrap">
+				<div class="d-flex justify-content-between">
+					<h6 class="m-0 font-weight-bold">총 : <span id="gd-rt-total" class="text-primary">0</span>건</h6>
+                    <div class="d-flex">
+                        <a href="javascript:void(0);" onclick="RequestRT()" class="btn btn-sm btn-primary shadow-sm mr-2">RT요청</a>
+                        <a href="javascript:void(0);" onclick="DeleteRows()" class="btn btn-sm btn-outline-primary shadow-sm">삭제</a>
+                    </div>
+				</div>
+			</div>
+		</div>
+		<div class="table-responsive">
+			<div id="div-gd-rt" class="ag-theme-balham"></div>
 		</div>
 	</div>
 </div>
@@ -313,44 +344,76 @@
         {field: "head_desc", headerName: "상단홍보글", width: 100},
 	];
 
+    const stores = <?= json_encode(@$stores) ?> ;
+
     let stock_columns = [
+        {field: "prd_cd", hide: true},
+        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {"text-align": "center"}},
+        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, sort: null, width: 28},
+        {field: "dep_store_nm",	headerName: "보내는 매장", pinned: 'left', width: 200},
+        {field: "store_nm",	headerName: "받는 매장", pinned: 'left', width: 200, editable: true, 
+            cellStyle: {"background-color": "#ffFF99"},
+            cellEditorSelector: function(params) {
+                return {
+                    component: 'agRichSelectCellEditor',
+                    params: { 
+                        values: stores.map(s => s.store_nm)
+                    },
+                };
+            },
+        },
+        {field: "store_cd", hide: true},
+        {headerName: "(대표)창고재고",
+            children: [
+                {field: "storage_qty", headerName: "재고", type: "currencyType", width: 60},
+                {field: "storage_wqty", headerName: "보유재고", type: "currencyType", width: 60},
+            ]
+        },
+        {headerName: "매장재고",
+            children: [
+                {field: "qty", headerName: "재고", type: "currencyType", width: 60},
+                {field: "wqty", headerName: "보유재고", type: "currencyType", width: 60},
+            ]
+        },
+        {field: "rt_qty", headerName: "RT수량", type: "numberType", editable: true, cellStyle: {"background-color": "#ffFF99"}},
+        {field: "comment", headerName: "비고", width: 300, editable: true, cellStyle: {"background-color": "#ffFF99"}},
+        {width: 'auto'}
+    ];
+
+    let rt_columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {"text-align": "center"}},
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, sort: null, width: 28},
         {field: "dep_store_nm",	headerName: "보내는 매장", pinned: 'left', width: 200},
         {field: "store_nm",	headerName: "받는 매장", pinned: 'left', width: 200},
-        {field: "qty",	headerName: "재고", width: 60},
-        {field: "wqty",	headerName: "보유재고", width: 60},
-        {field: "rt_qty", headerName: "RT수량", type: "numberType", editable: true, cellStyle: {"background-color": "#ffFF99"}},
-        // {headerName: "창고보유재고",
-        //     children: [
-        //         @foreach (@$storages as $storage)
-        //             {field: '{{ $storage->storage_cd }}', headerName: '{{ $storage->storage_nm }}', type: "numberType",
-        //                 cellRenderer: function(params) {
-        //                     let storage_cd = '{{ $storage->storage_cd }}';
-        //                     let arr = params.data.storage_qty.filter(s => s.storage_cd === storage_cd);
-        //                     if(arr.length > 0) {
-        //                         return arr[0].wqty;
-        //                     }
-        //                     return 0;
-        //                 }
-        //             },
-        //         @endforeach
-        //     ],
-        // },
-        {field: "comment", headerName: "비고", width: 300, editable: true, cellStyle: {"background-color": "#ffFF99"}},
-        {width: 'auto'}
+        {field: "rt_qty", headerName: "RT수량", type: "numberType", pinned: 'left', cellStyle: {"font-weight": "700"}},
+        {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
+        {field: "goods_no",	headerName: "상품번호", pinned: 'left', width: 80, cellStyle: {"text-align": "center"}},
+        {field: "goods_type_nm", headerName: "상품구분", cellStyle: StyleGoodsType},
+        {field: "opt_kind_nm", headerName: "품목", width: 80, cellStyle: {"text-align": "center"}},
+        {field: "brand_nm", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
+        {field: "style_no",	headerName: "스타일넘버", width: 80, cellStyle: {"text-align": "center"}},
+        {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 250},
+        {field: "goods_nm_eng", headerName: "상품명(영문)", width: 250, cellStyle: {"line-height": "30px"}},
+        {field: "sale_stat_cl", headerName: "상품상태", cellStyle: StyleGoodsState},
+        {field: "goods_opt", headerName: "옵션", width: 250},
+        {field: "normal_price", headerName: "정상가", type: "currencyType", width: 60},
+        {field: "price", headerName: "판매가", type: "currencyType", width: 60},
+        {field: "wonga", headerName: "원가", type: "currencyType", width: 60},
+        {field: "comment", headerName: "비고", width: 300},
     ];
 </script>
 <script type="text/javascript" charset="utf-8">
-    let gx1, gx2;
-    const pApp1 = new App('', { gridId: "#div-gd-product" });
+    let gx, gx2, gx3;
+    const pApp = new App('', { gridId: "#div-gd-product" });
     const pApp2 = new App('', { gridId: "#div-gd-stock" });
+    const pApp3 = new App('', { gridId: "#div-gd-rt" });
+    let selected_prd = {};
 
     $(document).ready(function() {
-        pApp1.ResizeGrid(275);
-        pApp1.BindSearchEnter();
-        let gridDiv1 = document.querySelector(pApp1.options.gridId);
-        gx1 = new HDGrid(gridDiv1, product_columns);
+        pApp.ResizeGrid(275);
+        pApp.BindSearchEnter();
+        let gridDiv = document.querySelector(pApp.options.gridId);
+        gx = new HDGrid(gridDiv, product_columns);
 
         pApp2.ResizeGrid(275);
         pApp2.BindSearchEnter();
@@ -364,25 +427,102 @@
                         gx2.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
                     }
                 }
+                if (e.column.colId == "store_nm") {
+                    let arr = stores.filter(s => s.store_nm === e.newValue);
+                    if(arr.length > 0) {
+                        e.data.store_cd = arr[0].store_cd;
+                    }
+                }
             }
         });
+
+        pApp3.ResizeGrid(275);
+        pApp3.BindSearchEnter();
+        let gridDiv3 = document.querySelector(pApp3.options.gridId);
+        gx3 = new HDGrid(gridDiv3, rt_columns);
     });
 
     // 상품검색
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx1.Request('/store/stock/stk21/search-goods', data, 1);
+		gx.Request('/store/stock/stk21/search-goods', data, 1);
 	}
 
     // 매장/창고별 재고검색
     function SearchStock() {
-        let rows = gx1.getSelectedRows();
-        if(rows.length < 1) return alert("RT요청할 상품을 선택해주세요.");
+        let rows = gx.getSelectedRows();
+        if(rows.length < 1) return alert("상품을 한 개 선택해주세요.");
         if(rows.length > 1) return alert("상품을 한 개만 선택해주세요.");
 
-        let prd_cd = rows[0].prd_cd;
-        let data = 'prd_cd=' + prd_cd;
-		gx2.Request('/store/stock/stk21/search-stock', data, -1);
+        selected_prd = rows[0];
+        
+        let data = 'prd_cd=' + selected_prd.prd_cd;
+		gx2.Request('/store/stock/stk21/search-stock', data, -1, function(d) {
+            $("#selected_prd").html(`[${selected_prd.prd_cd}] ${selected_prd.goods_nm}`);
+            document.getElementById("stock_table_area").scrollIntoView({ behavior: "smooth" });
+        });
+    }
+
+    // 최종RT리스트에 등록
+    function AddRTToFinalTable() {
+        let rows = gx2.getSelectedRows();
+        if(rows.length < 1) return alert("RT리스트에 등록할 항목을 선택해주세요.");
+        if(rows.filter(r => !r.rt_qty || !r.rt_qty.trim() || r.rt_qty == 0 || isNaN(parseInt(r.rt_qty))).length > 0) 
+            return alert("선택한 항목의 RT수량을 입력해주세요.");
+        if(rows.filter(r => !r.store_cd).length > 0) 
+            return alert("선택한 항목의 받는 매장을 선택해주세요.");
+
+        let over_qty_rows = rows.filter(row => {
+            if(row.wqty !== null) {
+                if(row.wqty < parseInt(row.rt_qty)) return true;
+                else return false;
+            }
+            return true; // 상품재고가 없는경우
+        });
+        if(over_qty_rows.length > 0) return alert(`보내는 매장의 보유재고보다 많은 수량을 요청하실 수 없습니다.\n보내는 매장명 : ${over_qty_rows.map(o => o.dep_store_nm).join(", ")}`);
+
+        let same_item_rows = gx3.getRows().filter(final => {
+            if(rows.filter(row => row.prd_cd === final.prd_cd && row.store_cd === final.store_cd && row.dep_store_cd === final.dep_store_cd).length > 0) return true;
+            return false;
+        });
+        if(same_item_rows.length > 0) return alert('이미 등록된 항목입니다.');
+
+
+        rows = rows.map(r => ({...selected_prd, ...r, comment: r.comment ?? ''}));
+        gx3.gridOptions.api.updateRowData({ add: rows });
+        document.getElementById("final_table_area").scrollIntoView({ behavior: "smooth" });
+    }
+
+    // 최종RT 리스트 중 선택항목 삭제
+    function DeleteRows() {
+        let rows = gx3.getSelectedRows();
+        if(rows.length < 1) return alert("삭제할 항목을 선택해주세요.");
+        if(!confirm("선택한 항목을 삭제하시겠습니까?")) return;
+
+        gx3.gridOptions.api.updateRowData({ remove: rows });
+    }
+
+    // RT 요청
+    function RequestRT() {
+        let rows = gx3.getSelectedRows();
+        if(rows.length < 1) return alert("RT요청할 항목을 선택해주세요.");
+        if(!confirm("선택한 항목을 RT요청하시겠습니까?")) return;
+
+        axios({
+            url: '/store/stock/stk21/request-rt',
+            method: 'post',
+            data: {data: rows},
+        }).then(function (res) {
+            if(res.data.code === 200) {
+                alert(res.data.msg);
+                location.href = "/store/stock/stk20";
+            } else {
+                console.log(res.data);
+                alert("RT요청 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
     }
 </script>
 @stop

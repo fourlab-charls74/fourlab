@@ -17,6 +17,7 @@ class stk21Controller extends Controller
 {
     public function index()
 	{
+        $stores = DB::table('store')->where('use_yn', '=', 'Y')->select('store_cd', 'store_nm')->get();
         $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')->orderByDesc('default_yn')->get();
 
 		$values = [
@@ -26,6 +27,7 @@ class stk21Controller extends Controller
             'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
             'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
             'items'			=> SLib::getItems(), // 품목
+            'stores'        => $stores, // 매장리스트
             'storages'      => $storages, // 창고리스트
 		];
 
@@ -211,17 +213,25 @@ class stk21Controller extends Controller
 		$prd_cd =$request->input("prd_cd", '');
 
 		$sql = "
-            select 
+            select
                 s.store_cd as dep_store_cd, 
                 s.store_nm as dep_store_nm, 
                 ifnull(ps.qty, 0) as qty, 
-                ifnull(ps.wqty, 0) as wqty
+                ifnull(ps.wqty, 0) as wqty,
+                ifnull(pss.qty, 0) as storage_qty, 
+                ifnull(pss.wqty, 0) as storage_wqty
             from store s
                 left outer join product_stock_store ps on s.store_cd = ps.store_cd and ps.prd_cd = '$prd_cd'
+                left outer join product_stock_storage pss on pss.storage_cd = (select storage_cd from storage where default_yn = 'Y') and pss.prd_cd = '$prd_cd'
             where s.use_yn = 'Y'
 		";
 
 		$result = DB::select($sql);
+
+        foreach($result as $r) 
+        {
+            $r->prd_cd = $prd_cd;
+        }
 
 		return response()->json([
 			"code" => $code,
@@ -233,5 +243,46 @@ class stk21Controller extends Controller
 			],
 			"body" => $result
 		]);
+    }
+
+    // RT요청
+    public function request_rt(Request $request)
+    {
+        $state = 10;
+        $rt_type = 'R';
+        $admin_id = Auth('head')->user()->id;
+        $data = $request->input("data", []);
+
+        try {
+            DB::beginTransaction();
+
+			foreach($data as $d) {
+                DB::table('product_stock_rotation')
+                    ->insert([
+                        'type' => $rt_type,
+                        'goods_no' => $d['goods_no'] ?? 0,
+                        'prd_cd' => $d['prd_cd'] ?? 0,
+                        'goods_opt' => $d['goods_opt'] ?? '',
+                        'qty' => $d['rt_qty'] ?? 0,
+                        'dep_store_cd' => $d['dep_store_cd'] ?? '',
+                        'store_cd' => $d['store_cd'] ?? '',
+                        'state' => $state,
+                        'comment' => $d['comment'] ?? '',
+                        'req_id' => $admin_id,
+                        'req_rt' => now(),
+                        'rt' => now(),
+                    ]);
+            }
+
+			DB::commit();
+            $code = 200;
+            $msg = "RT요청이 정상적으로 완료되었습니다.";
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+        return response()->json(["code" => $code, "msg" => $msg]);
     }
 }

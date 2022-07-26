@@ -207,7 +207,6 @@ class stk20Controller extends Controller
         $admin_id = Auth('head')->user()->id;
         $data = $request->input("data", []);
         $exp_dlv_day = $request->input("exp_dlv_day", '');
-        $rel_order = $request->input("rel_order", '');
 
         try {
             DB::beginTransaction();

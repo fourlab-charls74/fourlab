@@ -65,15 +65,15 @@
                             <div class="form-group">
                                 <label>일자검색</label>
                                 <div class="d-flex">
-                                    <div class="flex_box mr-2">
-                                        <select name='rt_date_stat' class="form-control form-control-sm" style="width: 100px;">
+                                    <div class="flex_box w-25 mr-2">
+                                        <select name='rt_date_stat' class="form-control form-control-sm">
                                             @foreach ($rt_states as $key => $value)
                                                 @if($key == '-10') @continue @endif
                                                 <option value='{{ $key }}'>{{ $value }}일자</option>
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="form-inline date-select-inbox">
+                                    <div class="form-inline date-select-inbox w-75">
                                         <div class="docs-datepicker form-inline-inner input_box">
                                             <div class="input-group">
                                                 <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
