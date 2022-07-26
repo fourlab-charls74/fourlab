@@ -84,9 +84,9 @@
 							<div class="flex_box">
 								<select name='sale_kind' class="form-control form-control-sm">
 									<option value=''>전체</option>
-								@foreach ($sale_kinds as $sale_kind)
-									<option value='{{ $sale_kind->code_id }}'>{{ $sale_kind->code_val }}</option>
-								@endforeach
+									@foreach ($sale_kinds as $sale_kind)
+									<option value='{{ $sale_kind->code_id }}' @if (@$sale_kind_id == $sale_kind->code_id) selected @endif>{{ $sale_kind->code_val }}</option>
+									@endforeach
 								</select>
 							</div>
 						</div>
@@ -186,14 +186,21 @@
         // {field: "",	headerName: "TAG가"},
         { field: "sale_kind", headerName: "판매유형",
             children: [
-                { headerName: "일반판매", field: "", type: 'currencyMinusColorType' },
-                { headerName: "쿠폰판매(10%)", field: "", type: 'currencyMinusColorType' },
-				{ headerName: "브랜드데이10%", field: "", type: 'currencyMinusColorType' },
+				@if (count($sale_kind_cols) > 0)
+					@foreach ($sale_kind_cols as $sale_kind)
+						{ headerName: '{{ $sale_kind->code_val }}', field: '{{ $sale_kind->code_id }}', type: 'currencyMinusColorType' },
+					@endforeach
+				@else
+					@foreach ($sale_kinds as $sale_kind)
+						{ headerName: '{{ $sale_kind->code_val }}', field: '{{ $sale_kind->code_id }}', type: 'currencyMinusColorType' },
+					@endforeach
+				@endif
+				{ headerName: "합계", field: "qty", type: 'currencyMinusColorType' }
             ]
         },
         { field: "sale_status", headerName: "판매현황",
             children: [
-                { headerName: "수량", field: "qty", type: 'currencyMinusColorType' },
+				{ headerName: "합계", field: "qty", type: 'currencyMinusColorType' },
                 { headerName: "단가", field: "wonga", type: 'numberType' },
                 { headerName: "매출액", field: "amt", width: 90, type: 'currencyMinusColorType' },
                 { headerName: "할인", field: "discount", width: 80, type: 'currencyMinusColorType' },
@@ -203,7 +210,7 @@
             ]
         },
         { field: "sum_wonga", headerName: "원가", width: 80, type: 'currencyMinusColorType' },
-        { field: "sales_profit",	headerName: "매출이익", type: 'currencyMinusColorType' }, // 매출이익 = 결제금액 - 원가 합계금액
+        { field: "sales_profit", headerName: "매출이익", type: 'currencyMinusColorType' }, // 매출이익 = 결제금액 - 원가 합계금액
         { field: "profit_rate",	headerName: "이익율(%)", type:'percentType' }, // 매출이익 분의 매출액 = 이익율
         { headerName: "", field: "nvl", width: "auto" }
     ];
@@ -219,9 +226,17 @@
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns);
-		Search();
+
+		getGridData();
 	});
+	
 	function Search() {
+		const sale_kind_id = document.search.sale_kind.value;
+		if (sale_kind_id == "") location.href = `/store/sale/sal06`
+		if (sale_kind_id) location.href = `/store/sale/sal06?sale_kind_id=${sale_kind_id}`
+	}
+
+	function getGridData() {
 		let data = $('form[name="search"]').serialize();
 		gx.Request('/store/sale/sal06/search', data, -1);
 	}

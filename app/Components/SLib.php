@@ -84,4 +84,40 @@ class SLib
             ->limit(30)
             ->select(DB::raw("dlv_series_no as name"), DB::raw("dlv_series_nm as value"))->get();
     }
+
+    public static function getStoreTypes()
+    {
+        $sql = " 
+			select *
+			from code
+			where 
+				code_kind_cd = 'store_type' and use_yn = 'Y' order by code_seq 
+		";
+		$store_types = DB::select($sql);
+        return $store_types;
+    }
+
+    public static function getUsedSaleKinds($sale_kind_id = '')
+    {
+        $where = "";
+        if ($sale_kind_id != "") $where .= " and s.sale_kind = '" . Lib::quote($sale_kind_id) . "' ";
+        $sql = "
+            select 
+                s.sale_kind as code_id, c.code_val as code_val, s.idx as sale_type_cd, 
+                s.sale_type_nm, s.sale_apply, s.amt_kind, s.sale_amt, s.sale_per, s.use_yn, 
+                (
+                    select count(ss.idx) 
+                    from sale_type_store ss 
+                    where ss.sale_type_cd = s.idx 
+                        and ss.use_yn = 'Y'
+                ) as store_cnt
+            from sale_type s
+                inner join code c on c.code_kind_cd = 'SALE_KIND' and c.code_id = s.sale_kind
+                where 1=1 $where
+            order by sale_kind
+        ";
+        $sale_kinds = DB::select($sql);
+        return $sale_kinds;
+    }
+
 }

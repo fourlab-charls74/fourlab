@@ -245,6 +245,7 @@ class sal01Controller extends Controller
 		$order['com_coupon_ratio'] = 0;
 		$order['sales_com_fee'] = $order['pay_fee'];
 		$store_cd = $order['com_id'];
+		$order['sale_kind'] = $order['sell_type_nm'];
 		$order['sale_place'] = $order['com_nm'];
 		$order['user_nm'] = $order['ord_nm'] ? $order['ord_nm']: "비회원";
 
@@ -428,6 +429,7 @@ class sal01Controller extends Controller
 						"ord_state" 	=> @$order["ord_state"],
 						"ord_type" 		=> @$order["ord_type"],
 						"ord_kind" 		=> @$order["ord_kind"],
+						"sale_kind" 	=> @$order["sale_kind"],
 						"sale_place" 	=> @$order["sale_place"],
 						"out_ord_no" 	=> @$order["out_ord_no"],
 						"upd_date"      => DB::raw('now()'),

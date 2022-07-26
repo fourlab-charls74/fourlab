@@ -12,20 +12,19 @@ use Carbon\Carbon;
 
 class sal06Controller extends Controller
 {
-	public function index() {
+	public function index(Request $request) {
 
 		$sdate = Carbon::now()->startOfMonth()->format("Y-m-d"); // 이번 달 기준
 		$edate = Carbon::now()->format("Y-m-d");
-		// $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m-d"); // 1달전 기준 (테스트 용)
 
-		// 매장구분
-		$sql = " 
-			select *
-			from code
-			where 
-				code_kind_cd = 'store_type' and use_yn = 'Y' order by code_seq 
-		";
-		$store_types = DB::select($sql);
+		$store_types = SLib::getStoreTypes();
+		$sale_kind_id = $request->input('sale_kind_id', "");
+
+		$sale_kinds = SLib::getUsedSaleKinds();
+		$sale_kind_cols = [];
+		if ($sale_kind_id != "") {
+			$sale_kind_cols =  SLib::getUsedSaleKinds($sale_kind_id);
+		}
 
 		// 행사구분 - 추후 논의사항
 		$sql = "
@@ -41,9 +40,11 @@ class sal06Controller extends Controller
 			'edate'         => $edate,
 			'store_types'	=> $store_types,
 			'event_cds'		=> $event_cds,
-			'sale_kinds' 	=> SLib::getCodes("SALE_KIND"),
+			'sale_kinds' 	=> $sale_kinds,
+			'sale_kind_id'	=> $sale_kind_id,
+			'sale_kind_cols' => $sale_kind_cols
 		];
-        return view( Config::get('shop.store.view') . '/sale/sal06',$values);
+        return view( Config::get('shop.store.view') . '/sale/sal06', $values );
 	}
 
 	public function search(Request $request)
@@ -60,10 +61,25 @@ class sal06Controller extends Controller
 		$goods_nm = $request->input("goods_nm");
         $brand_cd = $request->input("brand_cd");
 		$style_no = $request->input('style_no', "");
-		$sale_yn = $request->input('sale_yn','Y');
 
-		// 판매 유형은 추후 반영 예정
-		$sale_kind = $request->input('sale_kind');
+		$sale_kind = $request->input("sale_kind");
+		$sale_yn = $request->input('sale_yn','Y');
+		$sale_kind_id = $request->input('sale_kind', "");
+		$sale_kind_cols =  SLib::getUsedSaleKinds($sale_kind_id);
+
+		// $select_sale_kinds = "";
+		// $cnt = 0;
+		// foreach ($sale_kind_cols as $sale_kind_col) {
+		// 	if ($cnt == count(&$sale_kind_cols)) {
+		// 		$id = $sale_kind_col->code_id;
+		// 		$select_sale_kinds .= "where ";
+		// 	} else {
+				
+		// 	}
+		// }
+
+		// $cnt++;
+		// dd($sale_kind_cols);
 
 		// 검색조건 필터링
 		$where = "";
@@ -86,6 +102,15 @@ class sal06Controller extends Controller
 
 		if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%'";
 		if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%'";
+		if (is_array($sale_kind)) {
+			if (count($sale_kind) == 1 && $sale_kind[0] != "") {
+				$where .= " and m.sale_kind = '" . Lib::quote($sale_kind[0]) . "' ";
+			} else if (count($sale_kind) > 1) {
+				$where .= " and m.sale_kind in (" . join(",", $sale_kind) . ") ";
+			}
+		} else if ($sale_kind != "") {
+			$where .= " and m.sale_kind = '" . Lib::quote($sale_kind) . "' ";
+		}
 
         $where2 = "";
         if ($sale_yn == "Y") $where2 .= " and qty is not null";
@@ -98,6 +123,7 @@ class sal06Controller extends Controller
 			from store s left outer join ( 
 				select 
 					m.store_cd,count(*) as cnt,
+					m.sale_kind,
 					sum(w.qty) as qty,
 					sum(w.qty * w.price) as amt,
 					sum(w.recv_amt + w.point_apply_amt) as recv_amt,
@@ -128,11 +154,11 @@ class sal06Controller extends Controller
 		$result = DB::select($sql);
 
 		return response()->json([
-			"code"	=> 200,
-			"head"	=> array(
-				"total"	=> count($result)
+			'code'	=> 200,
+			'head'	=> array(
+				'total'	=> count($result)
 			),
-			"body" => $result
+			'body' => $result
 		]);
 
 	}
