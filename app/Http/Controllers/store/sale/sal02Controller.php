@@ -74,7 +74,7 @@ class sal02Controller extends Controller
 
 		// 검색조건 필터링
 		$where = "";
-		if ($brand_cd != "") $where .= " and b.brand = " . Lib::quote($brand_cd);
+		if ($brand_cd != "") $where .= " and b.brand = '" . Lib::quote($brand_cd) . "' ";
 
 		$goods_no = preg_replace("/\s/", ",", $goods_no);
 		$goods_no = preg_replace("/\t/", ",", $goods_no);
