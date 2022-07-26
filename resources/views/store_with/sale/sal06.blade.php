@@ -17,7 +17,7 @@
 				<h4>검색</h4>
 				<div class="flax_box">
 					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-					<a href="#" onclick="Add();" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>데이터업로드</a>
+					<a href="#" onclick="initSearch()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
 			</div>
@@ -149,7 +149,7 @@
 		</div>
 		<div class="resul_btn_wrap mb-3">
 			<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-			<a href="#" onclick="Add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 데이터업로드</a>
+			<input type="reset" id="search_reset" value="검색조건 초기화" class="btn btn-sm btn-outline-primary shadow-sm" onclick="initSearch()">
 			<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
 		</div>
 	</div>
@@ -184,35 +184,29 @@
         { field: "store_cd", headerName: "매장코드", pinned:'left', hide: true },
         { field: "store_nm", headerName: "매장명", pinned:'left', type: 'StoreNameType', width: 250 },
         // {field: "",	headerName: "TAG가"},
-        {field: "s",	headerName: "판매유형",
+        { field: "sale_kind", headerName: "판매유형",
             children: [
-                {headerName: "일반판매", field: "", type: 'currencyMinusColorType'},
-                {headerName: "쿠폰판매(10%)", field: "", type: 'currencyMinusColorType'},
-				{headerName: "브랜드데이10%", field: "", type: 'currencyMinusColorType'},
+                { headerName: "일반판매", field: "", type: 'currencyMinusColorType' },
+                { headerName: "쿠폰판매(10%)", field: "", type: 'currencyMinusColorType' },
+				{ headerName: "브랜드데이10%", field: "", type: 'currencyMinusColorType' },
             ]
         },
-        {field: "s",	headerName: "판매현황",
+        { field: "sale_status", headerName: "판매현황",
             children: [
-                {headerName: "수량", field: "qty", type: 'currencyMinusColorType'},
-                {headerName: "단가", field: "wonga", type: 'numberType'},
-                {headerName: "매출액", field: "amt", type: 'currencyMinusColorType'},
-                {headerName: "할인", field: "discount", width: 80, type: 'currencyMinusColorType'},
-                {headerName: "결제금액", field: "recv_amt", type: 'currencyMinusColorType'}, // 판매금액 + 포인트 합친게 결제(주문) 금액.
-                {headerName: "매장수수료", field: "", cellRenderer: (params) => 0, type: 'currencyMinusColorType'}, // 0 처리
-                {headerName: "중간관리수수료", field: "", cellRenderer: (params) => 0, type: 'currencyMinusColorType'}, // 0 처리
+                { headerName: "수량", field: "qty", type: 'currencyMinusColorType' },
+                { headerName: "단가", field: "wonga", type: 'numberType' },
+                { headerName: "매출액", field: "amt", width: 90, type: 'currencyMinusColorType' },
+                { headerName: "할인", field: "discount", width: 80, type: 'currencyMinusColorType' },
+                { headerName: "결제금액", field: "recv_amt", type: 'currencyMinusColorType' }, // 판매금액 + 포인트 합친게 결제(주문) 금액.
+                { headerName: "매장수수료", field: "", cellRenderer: (params) => 0, type: 'currencyMinusColorType' }, // 0 처리
+                { headerName: "중간관리수수료", field: "", cellRenderer: (params) => 0, type: 'currencyMinusColorType' }, // 0 처리
             ]
         },
-        {field: "sum_wonga", headerName: "원가", width: 80, type: 'currencyMinusColorType'},
-        {field: "sales_profit",	headerName: "매출이익", type: 'currencyMinusColorType'}, // 매출이익 = 결제금액 - 원가 합계금액
-        {field: "profit_rate",	headerName: "이익율(%)", type:'percentType'}, // 매출이익 분의 매출액 = 이익율
-        {headerName: "", field: "nvl", width: "auto"}
+        { field: "sum_wonga", headerName: "원가", width: 80, type: 'currencyMinusColorType' },
+        { field: "sales_profit",	headerName: "매출이익", type: 'currencyMinusColorType' }, // 매출이익 = 결제금액 - 원가 합계금액
+        { field: "profit_rate",	headerName: "이익율(%)", type:'percentType' }, // 매출이익 분의 매출액 = 이익율
+        { headerName: "", field: "nvl", width: "auto" }
     ];
-
-	function Add()
-	{
-		const url='/head/xmd/store/store01/show';
-		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
-	}
 
 </script>
 <script type="text/javascript" charset="utf-8">
@@ -229,8 +223,7 @@
 	});
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/store/sale/sal06/search', data,1);
+		gx.Request('/store/sale/sal06/search', data, -1);
 	}
-
 </script>
 @stop
