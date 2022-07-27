@@ -13,7 +13,7 @@ use Exception;
 
 use App\Models\Conf;
 
-class stk21Controller extends Controller
+class stk22Controller extends Controller
 {
     public function index()
 	{
@@ -32,7 +32,7 @@ class stk21Controller extends Controller
             'storages'      => $storages, // 창고리스트
 		];
 
-        return view(Config::get('shop.store.view') . '/stock/stk21', $values);
+        return view(Config::get('shop.store.view') . '/stock/stk22', $values);
 	}
 
     // 상품검색

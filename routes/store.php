@@ -194,6 +194,12 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk21/search-goods','stk21Controller@search_goods');
         Route::get('stk21/search-stock','stk21Controller@search_stock');
         Route::post('stk21/request-rt','stk21Controller@request_rt');
+
+        // 일반RT
+        Route::get('stk22','stk22Controller@index');
+        Route::get('stk22/search-goods','stk22Controller@search_goods');
+        Route::get('stk22/search-stock','stk22Controller@search_stock');
+        Route::post('stk22/request-rt','stk22Controller@request_rt');
     });
 
     // 영업관리
