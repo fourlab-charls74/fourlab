@@ -245,7 +245,7 @@ class sal01Controller extends Controller
 		$order['com_coupon_ratio'] = 0;
 		$order['sales_com_fee'] = $order['pay_fee'];
 		$store_cd = $order['com_id'];
-		$order['sale_kind'] = $order['sell_type_nm'];
+		$order['sale_kind'] = sprintf('%02d', $order['sell_type_nm']);
 		$order['sale_place'] = $order['com_nm'];
 		$order['user_nm'] = $order['ord_nm'] ? $order['ord_nm']: "비회원";
 
