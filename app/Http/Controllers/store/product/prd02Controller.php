@@ -273,7 +273,14 @@ class prd02Controller extends Controller
 
 	public function create(Request $request)
 	{
+		$sql	= " select brand_nm, br_cd from brand where use_yn = 'Y' and br_cd <> '' ";
+		$brands	= DB::select($sql);
+		
 		$values = [
+			'brands'	=> $brands,
+			'years'		=> SLib::getCodes("PRD_CD_YEAR"),
+			'seasons'	=> SLib::getCodes("PRD_CD_SEASON"),
+			'genders'	=> SLib::getCodes("PRD_CD_GENDER"),
 		];
 
 		return view( Config::get('shop.store.view') . '/product/prd02_create',$values);

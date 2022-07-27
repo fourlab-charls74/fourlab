@@ -10,8 +10,8 @@ class SLib
     public static function getCodes($code_kind,$code_ids = array()){
         $query = DB::table("code")
             ->where("code_kind_cd", "=", $code_kind)
-            ->where("use_yn", "=", "Y")
-            ->where("code_id", "<>", "K");
+            ->where("use_yn", "=", "Y");
+            //->where("code_id", "<>", "K");
         foreach($code_ids as $code_id => $sign){
             $query = $query->where("code_id",$sign,$code_id);
         }
@@ -22,7 +22,7 @@ class SLib
         return DB::table("code")
             ->where("code_kind_cd","=",$code_kind)
             ->where("use_yn","=","Y")
-            ->where("code_id","<>","K")
+            //->where("code_id","<>","K")
             ->where("code_id", $code_id)
             ->value($value);
     }

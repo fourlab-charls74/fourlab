@@ -45,28 +45,48 @@
 										<tr>
 											<th class="required">브랜드</th>
 											<td style="width:35%;">
-												<div class="form-inline">
-													<input type="text" name="store_nm" id="store_nm" value="" class="form-control form-control-sm w-100" />
+												<div class="flax_box">
+													<select name='brand' class="form-control form-control-sm">
+														<option value=''>선택</option>
+														@foreach ($brands as $brand)
+															<option value='{{ $brand->br_cd }}'>{{ $brand->br_cd }} : {{ $brand->brand_nm }}</option>
+														@endforeach
+													</select>
 												</div>
 											</td>
 											<th class="required">년도</th>
 											<td style="width:35%;">
-												<div class="form-inline">
-													<input type="text" name="store_nm_s" id="store_nm_s" value="" class="form-control form-control-sm w-100" />
+												<div class="flax_box">
+													<select name='year' class="form-control form-control-sm">
+														<option value=''>선택</option>
+														@foreach ($years as $year)
+															<option value='{{ $year->code_id }}'>{{ $year->code_id }} : {{ $year->code_val }}</option>
+														@endforeach
+													</select>
 												</div>
 											</td>
 										</tr>
 										<tr>
 											<th class="required">시즌</th>
 											<td>
-												<div class="form-inline">
-													<input type="text" name="store_nm" id="store_nm" value="" class="form-control form-control-sm w-100" />
+												<div class="flax_box">
+													<select name='season' class="form-control form-control-sm">
+														<option value=''>선택</option>
+														@foreach ($seasons as $season)
+															<option value='{{ $season->code_id }}'>{{ $season->code_id }} : {{ $season->code_val }}</option>
+														@endforeach
+													</select>
 												</div>
 											</td>
 											<th class="required">성별</th>
 											<td>
-												<div class="form-inline">
-													<input type="text" name="store_nm_s" id="store_nm_s" value="" class="form-control form-control-sm w-100" />
+												<div class="flax_box">
+													<select name='gender' class="form-control form-control-sm">
+														<option value=''>선택</option>
+														@foreach ($genders as $gender)
+															<option value='{{ $gender->code_id }}'>{{ $gender->code_id }} : {{ $gender->code_val }}</option>
+														@endforeach
+													</select>
 												</div>
 											</td>
 										</tr>
