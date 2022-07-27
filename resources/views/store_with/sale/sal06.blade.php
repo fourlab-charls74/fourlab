@@ -82,7 +82,7 @@
 						<div class="form-group">
 							<label for="">판매유형</label>
 							<div class="flex_box">
-								<select name='sale_kind' class="form-control form-control-sm multi_select" multiple>
+								<select name='sale_kind' class="form-control form-control-sm">
 									<option value=''>전체</option>
 									@foreach ($sale_kinds as $sale_kind)
 									<option value='{{ $sale_kind->code_id }}' @if (@$sale_kind_id == $sale_kind->code_id) selected @endif>{{ $sale_kind->code_val }}</option>
@@ -186,21 +186,14 @@
         // {field: "",	headerName: "TAG가"},
         { field: "sale_kind", headerName: "판매유형",
             children: [
-				@if (count($sale_kind_cols) > 0)
-					@foreach ($sale_kind_cols as $sale_kind)
-						{ headerName: '{{ $sale_kind->code_val }}', field: '{{ $sale_kind->code_id }}', type: 'currencyMinusColorType' },
-					@endforeach
-				@else
-					@foreach ($sale_kinds as $sale_kind)
-						{ headerName: '{{ $sale_kind->code_val }}', field: '{{ $sale_kind->code_id }}', type: 'currencyMinusColorType' },
-					@endforeach
-				@endif
+				@foreach ($sale_kinds as $sale_kind)
+					{ headerName: '{{ $sale_kind->code_val }}', field: 'sale_kind_{{ $sale_kind->code_id }}', type: 'currencyMinusColorType' },
+				@endforeach
 				{ headerName: "합계", field: "qty", type: 'currencyMinusColorType' }
             ]
         },
         { field: "sale_status", headerName: "판매현황",
             children: [
-				{ headerName: "합계", field: "qty", type: 'currencyMinusColorType' },
                 { headerName: "단가", field: "wonga", type: 'numberType' },
                 { headerName: "매출액", field: "amt", width: 90, type: 'currencyMinusColorType' },
                 { headerName: "할인", field: "discount", width: 80, type: 'currencyMinusColorType' },
@@ -226,19 +219,13 @@
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns);
-
-		getGridData();
+		Search();
 	});
 	
 	function Search() {
-		const sale_kind_id = document.search.sale_kind.value;
-		if (sale_kind_id == "") location.href = `/store/sale/sal06`
-		if (sale_kind_id) location.href = `/store/sale/sal06?sale_kind_id=${sale_kind_id}`
-	}
-
-	function getGridData() {
 		let data = $('form[name="search"]').serialize();
 		gx.Request('/store/sale/sal06/search', data, -1);
 	}
+
 </script>
 @stop

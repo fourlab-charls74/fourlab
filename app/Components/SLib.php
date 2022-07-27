@@ -4,7 +4,6 @@ namespace App\Components;
 
 use Illuminate\Support\Facades\DB;
 use Exception;
-
 class SLib
 {
     public static function getCodes($code_kind,$code_ids = array()){
