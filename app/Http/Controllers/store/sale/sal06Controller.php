@@ -21,10 +21,6 @@ class sal06Controller extends Controller
 		$sale_kind_id = $request->input('sale_kind_id', "");
 
 		$sale_kinds = SLib::getUsedSaleKinds();
-		$sale_kind_cols = [];
-		if ($sale_kind_id != "") {
-			$sale_kind_cols =  SLib::getUsedSaleKinds($sale_kind_id);
-		}
 
 		// 행사구분 - 추후 논의사항
 		$sql = "
@@ -40,9 +36,7 @@ class sal06Controller extends Controller
 			'edate'         => $edate,
 			'store_types'	=> $store_types,
 			'event_cds'		=> $event_cds,
-			'sale_kinds' 	=> $sale_kinds,
-			'sale_kind_id'	=> $sale_kind_id,
-			'sale_kind_cols' => $sale_kind_cols
+			'sale_kinds' 	=> $sale_kinds
 		];
         return view( Config::get('shop.store.view') . '/sale/sal06', $values );
 	}
@@ -63,9 +57,11 @@ class sal06Controller extends Controller
 		$style_no = $request->input('style_no', "");
 
 		$sale_yn = $request->input('sale_yn','Y');
-		$sale_kind_ids = $request->input('sale_kind', "");
+		$sale_kind = $request->input('sale_kind', "");
 
-		// 검색조건 필터링
+		/**
+		 * 검색조건 필터링
+		 */
 		$where = "";
 		if ($brand_cd != "") $where .= " and b.brand = '" . Lib::quote($brand_cd) . "' ";
 
@@ -83,24 +79,23 @@ class sal06Controller extends Controller
 				if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
 			}
 		}
-
+		
 		if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%'";
 		if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%'";
-
-		if (is_array($sale_kind_ids)) {
-			if (count($sale_kind_ids) == 1 && $sale_kind_ids[0] != "") {
-				$where .= " and m.sale_kind = '" . Lib::quote($sale_kind_ids[0]) . "' ";
-			} else if (count($sale_kind_ids) > 1) {
-				$where .= " and m.sale_kind in (" . join(",", $sale_kind_ids) . ") ";
-			}
-		} else if ($sale_kind_ids != "") {
-			$where .= " and m.sale_kind = '" . Lib::quote($sale_kind_ids) . "' ";
-		}
+		if ($sale_kind != "") $where .= " and m.sale_kind = '" . Lib::quote($sale_kind) . "' ";
 
         $where2 = "";
         if ($sale_yn == "Y") $where2 .= " and qty is not null";
 		if ($store_type) $where2 .= " and c.code_id = " . Lib::quote($store_type);
 		if ($store_cd != "") $where2 .= " and s.store_cd like '" . Lib::quote($store_cd) . "%'";
+	
+		// 판매유형별 쿼리 추가
+		$sale_kinds = SLib::getUsedSaleKinds();
+		$sale_kinds_query = "";
+		foreach ($sale_kinds as $item) {
+			$id = $item->code_id;
+			$sale_kinds_query .= "sum(if(m.sale_kind = '$id', w.qty, 0)) as sale_kind_$id, ";
+		}
 
 		$sql = /** @lang text */
 		"
@@ -108,7 +103,7 @@ class sal06Controller extends Controller
 			from store s left outer join ( 
 				select 
 					m.store_cd,count(*) as cnt,
-					m.sale_kind,
+					$sale_kinds_query
 					sum(w.qty) as qty,
 					sum(w.qty * w.price) as amt,
 					sum(w.recv_amt + w.point_apply_amt) as recv_amt,
@@ -135,7 +130,7 @@ class sal06Controller extends Controller
 				left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = s.store_type
 			where 1=1 $where2
 		";
-		
+
 		$result = DB::select($sql);
 
 		return response()->json([
