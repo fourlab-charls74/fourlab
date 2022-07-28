@@ -1,5 +1,5 @@
 @extends('store_with.layouts.layout')
-@section('title','RT요청')
+@section('title','일반RT')
 @section('content')
 <div class="page_tit">
 	<h3 class="d-inline-flex">일반RT</h3>
@@ -24,6 +24,7 @@
 				<div class="flax_box">
 					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
                     <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1" onclick="initSearch()">검색조건 초기화</a>
+                    <a href="/store/stock/stk20" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="fas fa-step-backward fa-sm"></i> 매장RT 리스트</a>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
 			</div>
@@ -416,12 +417,12 @@
     let selected_prd = {};
 
     $(document).ready(function() {
-        pApp.ResizeGrid(275);
+        pApp.ResizeGrid(275, 530);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, product_columns);
 
-        pApp2.ResizeGrid(275);
+        pApp2.ResizeGrid(275, 530);
         pApp2.BindSearchEnter();
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
         gx2 = new HDGrid(gridDiv2, stock_columns, {
@@ -442,7 +443,7 @@
             }
         });
 
-        pApp3.ResizeGrid(275);
+        pApp3.ResizeGrid(275, 530);
         pApp3.BindSearchEnter();
         let gridDiv3 = document.querySelector(pApp3.options.gridId);
         gx3 = new HDGrid(gridDiv3, rt_columns);
