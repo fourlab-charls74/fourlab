@@ -250,11 +250,11 @@ class stk22Controller extends Controller
 		]);
     }
 
-    // RT요청
+    // 일반RT등록
     public function request_rt(Request $request)
     {
         $state = 10;
-        $rt_type = 'R';
+        $rt_type = 'G';
         $admin_id = Auth('head')->user()->id;
         $data = $request->input("data", []);
 
@@ -281,7 +281,7 @@ class stk22Controller extends Controller
 
 			DB::commit();
             $code = 200;
-            $msg = "RT요청이 정상적으로 완료되었습니다.";
+            $msg = "일반RT등록이 정상적으로 완료되었습니다.";
 		} catch (Exception $e) {
 			DB::rollback();
 			$code = 500;
