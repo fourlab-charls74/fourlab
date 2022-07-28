@@ -21,7 +21,9 @@ CREATE TABLE `product_code` (
 CREATE TABLE `product_stock` (
                                  `goods_no` INT(11) NOT NULL DEFAULT '0' COMMENT '상품번호',
                                  `prd_cd` VARCHAR(50) NOT NULL DEFAULT '0' COMMENT '상품코드',
-                                 `qty` INT(11) DEFAULT NULL COMMENT '전체보유재고',
+                                 `in_qty` INT(11) DEFAULT NULL COMMENT '입고수량',
+                                 `out_qty` INT(11) DEFAULT NULL COMMENT '출고수량',
+                                 `qty` INT(11) DEFAULT NULL COMMENT '보유재고',
                                  `wqty` INT(11) DEFAULT NULL COMMENT '창고보유재고',
                                  `goods_opt` VARCHAR(100) NOT NULL DEFAULT '' COMMENT '상품옵션명',
                                  `barcode` VARCHAR(50) DEFAULT NULL COMMENT '바코드',
