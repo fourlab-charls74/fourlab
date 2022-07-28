@@ -28,7 +28,6 @@ class stk20Controller extends Controller
 		$values = [
             'sdate'         => now()->sub(1, 'week')->format('Y-m-d'),
             'edate'         => date("Y-m-d"),
-            'rel_orders'     => SLib::getCodes("REL_ORDER"), // 출고차수
             'rt_states'    => $this->rt_states, // RT상태
             'style_no'		=> "", // 스타일넘버
             // 'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'), // 상품구분(2)
@@ -49,24 +48,19 @@ class stk20Controller extends Controller
         $orderby = "";
         
         // where
-        $req_sdate = str_replace("-", "", $r['req_sdate'] ?? now()->sub(1, 'week')->format('Ymd'));
-        $req_edate = str_replace("-", "", $r['req_edate'] ?? date("Ymd"));
-        $rec_sdate = str_replace("-", "", $r['rec_sdate'] ?? now()->sub(1, 'week')->format('Ymd'));
-        $rec_edate = str_replace("-", "", $r['rec_edate'] ?? date("Ymd"));
-        $prc_sdate = str_replace("-", "", $r['prc_sdate'] ?? now()->sub(1, 'week')->format('Ymd'));
-        $prc_edate = str_replace("-", "", $r['prc_edate'] ?? date("Ymd"));
-        $fin_sdate = str_replace("-", "", $r['fin_sdate'] ?? now()->sub(1, 'week')->format('Ymd'));
-        $fin_edate = str_replace("-", "", $r['fin_edate'] ?? date("Ymd"));
+        $sdate = str_replace("-", "", $r['sdate'] ?? now()->sub(1, 'week')->format('Ymd'));
+        $edate = str_replace("-", "", $r['edate'] ?? date("Ymd"));
+        $rt_date_state = $r['rt_date_stat'] ?? 10;
+        $date_state = "";
+        if($rt_date_state == 10) $date_state = "req_rt";
+        if($rt_date_state == 20) $date_state = "rec_rt";
+        if($rt_date_state == 30) $date_state = "prc_rt";
+        if($rt_date_state == 40) $date_state = "fin_rt";
         $where .= "
-            and cast(psr.req_rt as date) >= '$req_sdate' 
-            and cast(psr.req_rt as date) <= '$req_edate'
-            and if(psr.state > 10, cast(psr.rec_rt as date) >= '$rec_sdate', 1=1)
-            and if(psr.state > 10, cast(psr.rec_rt as date) <= '$rec_edate', 1=1)
-            and if(psr.state > 20, cast(psr.prc_rt as date) >= '$prc_sdate', 1=1)
-            and if(psr.state > 20, cast(psr.prc_rt as date) <= '$prc_edate', 1=1)
-            and if(psr.state > 30, cast(psr.fin_rt as date) >= '$fin_sdate', 1=1)
-            and if(psr.state > 30, cast(psr.fin_rt as date) <= '$fin_sdate', 1=1)
+            and cast(psr.$date_state as date) >= '$sdate'
+            and cast(psr.$date_state as date) <= '$edate'
         ";
+
 		if($r['rt_type'] != null)
 			$where .= " and psr.type = '" . $r['rt_type'] . "'";
 		if(isset($r['send_store_no']))
@@ -145,6 +139,7 @@ class stk20Controller extends Controller
         // search
 		$sql = "
             select
+                psr.idx,
                 psr.type,
                 psr.goods_no, 
                 g.style_no, 
@@ -170,7 +165,7 @@ class stk20Controller extends Controller
                 psr.fin_rt
             from product_stock_rotation psr
                 inner join goods g on g.goods_no = psr.goods_no
-            where 1=1 $where
+            where 1=1 and psr.del_yn = 'N' $where
             $orderby
             $limit
 		";
@@ -212,22 +207,21 @@ class stk20Controller extends Controller
         $admin_id = Auth('head')->user()->id;
         $data = $request->input("data", []);
         $exp_dlv_day = $request->input("exp_dlv_day", '');
-        $rel_order = $request->input("rel_order", '');
 
         try {
             DB::beginTransaction();
 
 			foreach($data as $d) {
+                if($d['idx'] == "") continue;
                 if($d['state'] != $ori_state) continue;
 
                 DB::table('product_stock_rotation')
-                    // ->where('idx', '=', $d['idx']) // 수정필요 (idx 추가할지?)
+                    ->where('idx', '=', $d['idx'])
                     ->update([
                         'qty' => $d['qty'] ?? 0,
                         'exp_dlv_day' => str_replace("-", "", $exp_dlv_day),
-                        'rel_order' => $rel_order,
                         'state' => $new_state,
-                        'comment' => $d['comment'],
+                        'comment' => $d['comment'] ?? '',
                         'rec_id' => $admin_id,
                         'rec_rt' => now(),
                         'ut' => now(),
@@ -247,8 +241,8 @@ class stk20Controller extends Controller
                 // product_stock_store -> 재고 존재여부 확인 후 보유재고 플러스
                 $store_stock_cnt = 
                     DB::table('product_stock_store')
-                        ->where('store_cd', '=', $d['store_cd'])
                         ->where('prd_cd', '=', $d['prd_cd'])
+                        ->where('store_cd', '=', $d['store_cd'])
                         ->count();
                 if($store_stock_cnt < 1) {
                     // 해당 매장에 상품 기존재고가 없을 경우
@@ -287,7 +281,7 @@ class stk20Controller extends Controller
         return response()->json(["code" => $code, "msg" => $msg]);
     }
 
-    // 보내는매장 출고 (20 -> 30)
+    // 보내는매장 출고 (처리) (20 -> 30)
     public function release(Request $request) 
     {          
         $ori_state = 20;
@@ -299,10 +293,11 @@ class stk20Controller extends Controller
             DB::beginTransaction();
 
 			foreach($data as $d) {
+                if($d['idx'] == "") continue;
                 if($d['state'] != $ori_state) continue;
 
                 DB::table('product_stock_rotation')
-                    // ->where('idx', '=', $d['idx']) // 수정필요 (idx 추가할지?)
+                    ->where('idx', '=', $d['idx'])
                     ->update([
                         'state' => $new_state,
                         'prc_id' => $admin_id,
@@ -332,7 +327,7 @@ class stk20Controller extends Controller
         return response()->json(["code" => $code, "msg" => $msg]);
     }
 
-    // 받는매장 입고 (30 -> 40)
+    // 받는매장 입고 (완료) (30 -> 40)
     public function receive(Request $request) 
     {
         $ori_state = 30;
@@ -344,10 +339,11 @@ class stk20Controller extends Controller
             DB::beginTransaction();
 
 			foreach($data as $d) {
+                if($d['idx'] == "") continue;
                 if($d['state'] != $ori_state) continue;
 
                 DB::table('product_stock_rotation')
-                    // ->where('idx', '=', $d['idx']) // 수정필요 (idx 추가할지?)
+                    ->where('idx', '=', $d['idx'])
                     ->update([
                         'state' => $new_state,
                         'fin_id' => $admin_id,
@@ -367,7 +363,7 @@ class stk20Controller extends Controller
 
 			DB::commit();
             $code = 200;
-            $msg = "매장입고처리가 정상적으로 완료되었습니다.";
+            $msg = "완료처리가 정상적으로 완료되었습니다.";
 		} catch (Exception $e) {
 			DB::rollback();
 			$code = 500;
@@ -389,15 +385,14 @@ class stk20Controller extends Controller
             DB::beginTransaction();
 
 			foreach($data as $d) {
+                if($d['idx'] == "") continue;
                 if($d['state'] != $ori_state) continue;
 
                 DB::table('product_stock_rotation')
-                    // ->where('idx', '=', $d['idx']) // 수정필요 (idx 추가할지?)
+                    ->where('idx', '=', $d['idx'])
                     ->update([
                         'state' => $new_state,
                         'comment' => $d['comment'] ?? '',
-                        'fin_id' => $admin_id,
-                        'fin_rt' => now(),
                         'ut' => now(),
                     ]);
             }
@@ -417,8 +412,30 @@ class stk20Controller extends Controller
     // 삭제
     public function remove(Request $request) 
     {
-        $code = 200;
-        $msg = "RT삭제 개발중입니다.";
+        $data = $request->input("data", []);
+
+        try {
+            DB::beginTransaction();
+
+			foreach($data as $d) {
+                if($d['idx'] == "") continue;
+
+                DB::table('product_stock_rotation')
+                    ->where('idx', '=', $d['idx'])
+                    ->update([
+                        'del_yn' => "Y",
+                        'ut' => now(),
+                    ]);
+            }
+
+			DB::commit();
+            $code = 200;
+            $msg = "삭제처리가 정상적으로 완료되었습니다.";
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
 
         return response()->json(["code" => $code, "msg" => $msg]);
     }

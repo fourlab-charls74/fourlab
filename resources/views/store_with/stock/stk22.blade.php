@@ -1,13 +1,13 @@
 @extends('store_with.layouts.layout')
-@section('title','RT요청')
+@section('title','일반RT')
 @section('content')
 <div class="page_tit">
-	<h3 class="d-inline-flex">RT요청</h3>
+	<h3 class="d-inline-flex">일반RT</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
 		<span>매장관리</span>
 		<span>/ 매장RT</span>
-		<span>/ RT요청</span>
+		<span>/ 일반RT</span>
 	</div>
 </div>
 
@@ -313,7 +313,7 @@
 				<div class="d-flex justify-content-between">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-rt-total" class="text-primary">0</span>건</h6>
                     <div class="d-flex">
-                        <a href="javascript:void(0);" onclick="RequestRT()" class="btn btn-sm btn-primary shadow-sm mr-2">RT요청</a>
+                        <a href="javascript:void(0);" onclick="RequestRT()" class="btn btn-sm btn-primary shadow-sm mr-2">RT등록</a>
                         <a href="javascript:void(0);" onclick="DeleteRows()" class="btn btn-sm btn-outline-primary shadow-sm">삭제</a>
                     </div>
 				</div>
@@ -456,7 +456,7 @@
     // 상품검색
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/store/stock/stk21/search-goods', data, 1);
+		gx.Request('/store/stock/stk22/search-goods', data, 1);
 	}
 
     // 매장/창고별 재고검색
@@ -469,7 +469,7 @@
         
         let store_type = $("[name=store_type]").val();
         let data = 'prd_cd=' + selected_prd.prd_cd + "&store_type=" + store_type;
-		gx2.Request('/store/stock/stk21/search-stock', data, -1, function(d) {
+		gx2.Request('/store/stock/stk22/search-stock', data, -1, function(d) {
             $("#selected_prd").html(`[${selected_prd.prd_cd}] ${selected_prd.goods_nm}`);
             document.getElementById("stock_table_area").scrollIntoView({ behavior: "smooth" });
         });
@@ -517,11 +517,11 @@
     // RT 요청
     function RequestRT() {
         let rows = gx3.getSelectedRows();
-        if(rows.length < 1) return alert("RT요청할 항목을 선택해주세요.");
-        if(!confirm("선택한 항목을 RT요청하시겠습니까?")) return;
+        if(rows.length < 1) return alert("RT등록할 항목을 선택해주세요.");
+        if(!confirm("선택한 항목을 RT등록하시겠습니까?")) return;
 
         axios({
-            url: '/store/stock/stk21/request-rt',
+            url: '/store/stock/stk22/request-rt',
             method: 'post',
             data: {data: rows},
         }).then(function (res) {
@@ -530,7 +530,7 @@
                 location.href = "/store/stock/stk20";
             } else {
                 console.log(res.data);
-                alert("RT요청 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+                alert("RT등록 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
             }
         }).catch(function (err) {
             console.log(err);

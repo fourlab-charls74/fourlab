@@ -13,7 +13,7 @@ use Exception;
 
 use App\Models\Conf;
 
-class stk21Controller extends Controller
+class stk22Controller extends Controller
 {
     public function index()
 	{
@@ -32,7 +32,7 @@ class stk21Controller extends Controller
             'storages'      => $storages, // 창고리스트
 		];
 
-        return view(Config::get('shop.store.view') . '/stock/stk21', $values);
+        return view(Config::get('shop.store.view') . '/stock/stk22', $values);
 	}
 
     // 상품검색
@@ -250,11 +250,11 @@ class stk21Controller extends Controller
 		]);
     }
 
-    // RT요청
+    // 일반RT등록
     public function request_rt(Request $request)
     {
         $state = 10;
-        $rt_type = 'R';
+        $rt_type = 'G';
         $admin_id = Auth('head')->user()->id;
         $data = $request->input("data", []);
 
@@ -281,7 +281,7 @@ class stk21Controller extends Controller
 
 			DB::commit();
             $code = 200;
-            $msg = "RT요청이 정상적으로 완료되었습니다.";
+            $msg = "일반RT등록이 정상적으로 완료되었습니다.";
 		} catch (Exception $e) {
 			DB::rollback();
 			$code = 500;

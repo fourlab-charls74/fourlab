@@ -35,7 +35,7 @@
                 <ul>
                     <li><a href="/store/stock/stk01">(완)매장재고</a></li>
                     <li><a href="/store/stock/stk02">(개)매장재고입출고</a></li>
-                    <li><a href="/store/stock/stk10">(개)출고</a></li>
+                    <li><a href="/store/stock/stk10">(완)출고</a></li>
                     <li><a href="/store/stock/stk11">(개)반품</a></li>
                     <li><a href="/store/stock/stk20">매장RT</a></li>
                     <li><a href="">매장주문 - 는 포스화면</a></li>
@@ -52,8 +52,9 @@
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-file fs-18"></i><span>마감관리</span></a>
                 <ul>
-                    <li><a href="/partner/support/spt01">월정산</a></li>
-                    <li><a href="/partner/support/spt01">월마감</a></li>
+                    <li><a href="/store/account/acc01">(개)기간별정산내역</a></li>
+                    <li><a href="/store/account/acc02">(개)월정산</a></li>
+                    <li><a href="/store/account/acc03">(개)월마감</a></li>
                 </ul>
             </li>
             <li>
@@ -71,7 +72,7 @@
                     <li><a href="/store/sale/sal01">(완)판매일보</a></li>
                     <li><a href="/store/sale/sal02">(완)월별판매집계표</a></li>
                     <li><a href="/store/sale/sal03">(개)기간별 Best/Worst 판매현황</a></li>
-                    <li><a href="/store/sale/sal06">(개)매장별판매분석</a></li>
+                    <li><a href="/store/sale/sal06">(완)매장별판매분석</a></li>
                     <li><a href="/store/sale/sal07">(완)상품별 이익현황</a></li>
                 </ul>
             </li>

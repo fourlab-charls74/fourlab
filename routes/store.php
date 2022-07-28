@@ -125,6 +125,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
     Route::prefix("product")->namespace('product')->group(function () {
         Route::get('prd02','prd02Controller@index');
         Route::get('prd02/search','prd02Controller@search');
+        Route::get('prd02/create', 'prd02Controller@create');
+
+        Route::get('prd02/create', 'prd02Controller@create');
+        Route::get('prd02/prd-search', 'prd02Controller@prd_search');
     });
 
     // 생산입고관리
@@ -192,6 +196,13 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk21','stk21Controller@index');
         Route::get('stk21/search-goods','stk21Controller@search_goods');
         Route::get('stk21/search-stock','stk21Controller@search_stock');
+        Route::post('stk21/request-rt','stk21Controller@request_rt');
+
+        // 일반RT
+        Route::get('stk22','stk22Controller@index');
+        Route::get('stk22/search-goods','stk22Controller@search_goods');
+        Route::get('stk22/search-stock','stk22Controller@search_stock');
+        Route::post('stk22/request-rt','stk22Controller@request_rt');
     });
 
     // 영업관리
@@ -211,6 +222,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('sal04','sal04Controller@index');
         Route::get('sal05','sal05Controller@index');
         Route::get('sal06','sal06Controller@index');
+        Route::get('sal06/search','sal06Controller@search');
+
         Route::get('sal07','sal07Controller@index');
         Route::get('sal07/search','sal07Controller@search');
 
@@ -220,6 +233,30 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('sal17','sal17Controller@index');
         Route::get('sal17/search','sal17Controller@search');
         Route::post('sal17/update','sal17Controller@update');
+    });
+
+    Route::prefix("account")->namespace('account')->group(function () {
+
+        // 정산내역
+        Route::get('acc01', 'acc01Controller@index');
+        Route::get('acc01/search', 'acc01Controller@search');
+
+        // 정산관리
+        Route::get('acc02', 'acc02Controller@index');
+        Route::get('acc02/search', 'acc02Controller@search');
+        Route::get('acc02/show/{com_id}/{sdate}/{edate}', 'acc02Controller@show');
+        Route::get('acc02/show-search', 'acc02Controller@show_search');
+        Route::put('acc02/show', 'acc02Controller@closed');
+
+        // 마감
+        Route::get('acc03', 'acc03Controller@index');
+        Route::get('acc03/search', 'acc03Controller@search');
+        Route::get('acc03/show', 'acc03Controller@show');
+        Route::get('acc03/show_search', 'acc03Controller@show_search');
+        Route::put('acc03/show_update', 'acc03Controller@show_update');
+        Route::delete('acc03/show_delete', 'acc03Controller@show_delete');
+        Route::post('acc03/show_close', 'acc03Controller@show_close');
+
     });
 
 });
