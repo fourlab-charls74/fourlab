@@ -134,8 +134,13 @@ ALTER TABLE `bizest_smart`.`order_mst` ADD COLUMN `store_cd` VARCHAR(30) NULL CO
 ALTER TABLE `bizest_smart`.`order_mst` ADD COLUMN `sale_kind` VARCHAR(30) NULL COMMENT '판매유형' AFTER `store_cd`;
 UPDATE  `bizest_smart`.`order_mst` SET sale_kind = '01' WHERE store_cd <> '';
 
+ALTER TABLE `bizest_smart`.`order_opt` ADD COLUMN `store_cd` VARCHAR(30) NULL COMMENT '매장코드' AFTER `prd_cd`;
 ALTER TABLE `bizest_smart`.`order_opt` ADD COLUMN `prd_cd` VARCHAR(50) NULL COMMENT '상품코드' AFTER `out_ord_opt_no`;
 ALTER TABLE `bizest_smart`.`order_opt_wonga` ADD COLUMN `prd_cd` VARCHAR(50) NULL COMMENT '상품코드' AFTER `tax_fee`;
+ALTER TABLE `bizest_smart`.`order_opt_wonga` ADD COLUMN `store_cd` VARCHAR(30) NULL COMMENT '매장코드' AFTER `prd_cd`;
+
+ALTER TABLE `bizest_smart`.`order_opt` ADD INDEX `idx_store_cd_orddate` (`store_cd`, `ord_date`);
+ALTER TABLE `bizest_smart`.`order_opt_wonga` ADD INDEX `idx_ord_state_date` (ord_state_date,ord_state,store_cd);
 
 -- 매장
 CREATE TABLE `store` (
@@ -276,6 +281,93 @@ CREATE TABLE `sale_type_store` (
     `mod_date` datetime DEFAULT NULL COMMENT '수정일자',
     PRIMARY KEY (`idx`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+-- 매장마감
+CREATE TABLE `store_account_closed` (
+                                        `idx` INT(11) NOT NULL AUTO_INCREMENT COMMENT '정산번호',
+                                        `store_cd` VARCHAR(30) NOT NULL DEFAULT '' COMMENT '매장코드',
+                                        `sday` VARCHAR(8) NOT NULL DEFAULT '' COMMENT '마감기준시작일',
+                                        `eday` VARCHAR(8) NOT NULL DEFAULT '' COMMENT '마감기준종료일',
+                                        `sale_amt` INT(11) DEFAULT NULL COMMENT '판매금액',
+                                        `clm_amt` INT(11) DEFAULT NULL COMMENT '클레임금액',
+                                        `sale_fee` INT(11) DEFAULT '0' COMMENT '판매 수수료',
+                                        `dc_amt` INT(11) DEFAULT '0' COMMENT '할인 금액',
+                                        `coupon_amt` INT(11) DEFAULT NULL COMMENT '쿠폰금액',
+                                        `dlv_amt` INT(11) DEFAULT NULL COMMENT '배송비',
+                                        `allot_amt` INT(11) DEFAULT NULL COMMENT '쿠폰금액(본사부담)',
+                                        `etc_amt` INT(11) DEFAULT NULL COMMENT '기타정산액',
+                                        `sale_net_taxation_amt` INT(11) DEFAULT '0' COMMENT '과세',
+                                        `sale_net_taxfree_amt` INT(11) DEFAULT '0' COMMENT '비과세',
+                                        `sale_net_amt` INT(11) DEFAULT NULL COMMENT '매출금액',
+                                        `tax_amt` INT(11) DEFAULT '0' COMMENT '부과세',
+                                        `fee` INT(11) DEFAULT NULL COMMENT '수수료',
+                                        `fee_dc_amt` INT(11) DEFAULT '0' COMMENT '수수료할인',
+                                        `fee_net` INT(11) DEFAULT '0' COMMENT '수수료총계',
+                                        `acc_amt` INT(11) DEFAULT NULL COMMENT '정산금액',
+                                        `closed_yn` CHAR(1) DEFAULT 'N' COMMENT '마감여부',
+                                        `closed_date` DATETIME DEFAULT NULL COMMENT '마감일시',
+                                        `pay_day` VARCHAR(8) DEFAULT NULL COMMENT '지급일',
+                                        `tax_no` DOUBLE DEFAULT NULL COMMENT '세금계산서번호',
+                                        `admin_id` VARCHAR(50) DEFAULT NULL COMMENT '관리자아이디',
+                                        `admin_nm` VARCHAR(50) DEFAULT NULL COMMENT '관리자명',
+                                        `reg_date` DATETIME DEFAULT NULL COMMENT '등록일시',
+                                        `upd_date` DATETIME DEFAULT NULL COMMENT '수정일시',
+                                        PRIMARY KEY (`idx`),
+                                        UNIQUE KEY `store_cd` (`store_cd`,`sday`,`eday`),
+                                        KEY `sdate` (`sday`,`eday`)
+) ENGINE=INNODB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='매장 마감'
+
+
+CREATE TABLE `store_account_closed_list` (
+                                             `idx` INT(11) NOT NULL AUTO_INCREMENT COMMENT '일련번호',
+                                             `acc_idx` INT(11) NOT NULL DEFAULT '0' COMMENT '정산번호',
+                                             `store_cd` VARCHAR(30) NOT NULL DEFAULT '' COMMENT '매장코드',
+                                             `sday` VARCHAR(8) NOT NULL DEFAULT '' COMMENT '마감기준시작일',
+                                             `eday` VARCHAR(8) NOT NULL DEFAULT '' COMMENT '마감기준종료일',
+                                             `type` VARCHAR(10) NOT NULL DEFAULT '' COMMENT '판매 : 30, 교환 : 60, 환불 : 61, 판매 및 교환 : 90, 판매 및 환불 : 91, 기타 : 00',
+                                             `ord_opt_no` INT(11) NOT NULL DEFAULT '0' COMMENT '주문일련번호',
+                                             `state_date` VARCHAR(8) NOT NULL DEFAULT '' COMMENT '마감대상일자 - 출고완료일,클레임완료일,기타정산처리일등',
+                                             `qty` INT(11) DEFAULT NULL COMMENT '수량',
+                                             `sale_amt` INT(11) DEFAULT NULL COMMENT '판매',
+                                             `clm_amt` INT(11) DEFAULT NULL COMMENT '클레임',
+                                             `sale_fee` INT(11) DEFAULT '0' COMMENT '판매 수수료',
+                                             `dc_amt` INT(11) DEFAULT '0' COMMENT '할인 금액',
+                                             `sale_clm_amt` INT(11) DEFAULT NULL COMMENT '판매 + 클레임',
+                                             `coupon_amt` INT(11) DEFAULT NULL COMMENT '쿠폰금액',
+                                             `dlv_amt` INT(11) DEFAULT NULL COMMENT '배송비',
+                                             `etc_amt` INT(11) DEFAULT NULL COMMENT '기타정산액',
+                                             `sale_net_taxation_amt` INT(11) DEFAULT '0' COMMENT '과세',
+                                             `sale_net_taxfree_amt` INT(11) DEFAULT '0' COMMENT '비과세',
+                                             `sale_net_amt` INT(11) DEFAULT NULL COMMENT '매출액',
+                                             `tax_amt` INT(11) DEFAULT '0' COMMENT '부가세',
+                                             `fee_ratio` FLOAT DEFAULT NULL COMMENT '수수료율(%)',
+                                             `fee` INT(11) DEFAULT NULL COMMENT '수수료',
+                                             `fee_dc_amt` INT(11) DEFAULT '0' COMMENT '세금할인액',
+                                             `allot_amt` INT(11) DEFAULT NULL COMMENT '부담액',
+                                             `fee_net` INT(11) DEFAULT NULL COMMENT '수수료',
+                                             `acc_amt` INT(11) DEFAULT NULL COMMENT '정산금액',
+                                             `bigo` VARCHAR(255) DEFAULT NULL COMMENT '비고',
+                                             PRIMARY KEY (`idx`),
+                                             KEY `idx_accidx` (`acc_idx`),
+                                             KEY `store_cd` (`store_cd`,`sday`,`eday`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='매장 마감내역';
+
+
+CREATE TABLE `store_account_etc` (
+                                     `no` INT(11) NOT NULL AUTO_INCREMENT COMMENT '일련번호',
+                                     `ymonth` VARCHAR(6) DEFAULT NULL COMMENT '정산연월',
+                                     `etc_day` VARCHAR(8) DEFAULT NULL COMMENT '기타정산일자',
+                                     `store_cd` VARCHAR(30) NOT NULL DEFAULT '' COMMENT '매장코드',
+                                     `ord_no` VARCHAR(20) DEFAULT NULL COMMENT '주문번호',
+                                     `ord_opt_no` INT(11) DEFAULT NULL COMMENT '주문일련번호',
+                                     `etc_amt` INT(11) DEFAULT NULL COMMENT '기타정산액',
+                                     `etc_memo` MEDIUMTEXT COMMENT '기타정산메모',
+                                     `admin_id` VARCHAR(20) DEFAULT NULL COMMENT '관리자아이디',
+                                     `admin_nm` VARCHAR(20) DEFAULT NULL COMMENT '관리자명',
+                                     `regi_date` DATETIME DEFAULT NULL COMMENT '등록일시',
+                                     PRIMARY KEY (`no`),
+                                     KEY `idx_etc_day` (`etc_day`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='매장 기타정산액';
 
 --
 -- 기존 테이블 컬럼 추가 시작
