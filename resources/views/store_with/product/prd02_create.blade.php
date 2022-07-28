@@ -93,21 +93,31 @@
 										<tr>
 											<th class="required">아이템</th>
 											<td>
-												<div class="form-inline">
-													<input type="text" name="store_nm" id="store_nm" value="" class="form-control form-control-sm w-100" />
+												<div class="flax_box">
+													<select name='item' class="form-control form-control-sm">
+														<option value=''>선택</option>
+														@foreach ($items as $item)
+															<option value='{{ $item->code_id }}'>{{ $item->code_id }} : {{ $item->code_val }}</option>
+														@endforeach
+													</select>
 												</div>
 											</td>
 											<th class="required">품목</th>
 											<td>
-												<div class="form-inline">
-													<input type="text" name="store_nm_s" id="store_nm_s" value="" class="form-control form-control-sm w-100" />
+												<div class="flax_box">
+													<select name='opt' class="form-control form-control-sm">
+														<option value=''>선택</option>
+														@foreach ($opts as $opt)
+															<option value='{{ $opt->code_id }}'>{{ $opt->code_id }} : {{ $opt->code_val }}</option>
+														@endforeach
+													</select>
 												</div>
 											</td>
 										</tr>
 										<tr>
 											<th class="required">상품번호</th>
 											<td colspan="3">
-												<div class="form-inline">
+											<div class="flax_box">
 													<div class="form-inline-inner inline_btn_box">
 														<input type='text' class="form-control form-control-sm search-enter" style="width:100%;" name='goods_no' id='goods_no' value=''>
 														<a href="#" class="btn btn-sm btn-outline-primary sch-goods_no"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
@@ -128,6 +138,134 @@
 				</div>
 			</div>
 		</div>
+
+		<div class="card">
+			<div class="card-header mb-0">
+				<a href="#">상품코드정보</a>
+			</div>
+			<div class="card-body pt-2">
+				<div class="card-title">
+					<div class="filter_wrap">
+						<div class="fl_box px-0 mx-0">
+							<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span> 건</h6>
+						</div>
+						<div class="fr_box">
+						</div>
+					</div>
+				</div>
+				<div class="table-responsive">
+					<div id="div-gd" class="ag-theme-balham"></div>
+				</div>
+			</div>
+		</div>
+
 	</form>
 
 </div>
+
+
+
+<script>
+	const columns = [
+		{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
+		{field: "goods_no", headerName: "상품번호",rowDrag: true,
+			width:100
+		},
+		{field: "goods_opt", headerName: "상품옵션",
+			width:120
+		},
+		{field: "prd_cd1", headerName: "상품코드",
+			editable: true,
+			cellClass:['hd-grid-edit'],
+			width:120
+		},
+		{field: "color", headerName: "컬러",
+			editable: true,
+			cellClass:['hd-grid-edit'],
+			width:120
+		},
+		{field: "size", headerName: "사이즈",
+			editable: true,
+			cellClass:['hd-grid-edit'],
+			width:120
+		},
+		{field: "", headerName:"", width:"auto"},
+	];
+</script>
+<script type="text/javascript" charset="utf-8">
+
+    const pApp = new App('', {
+        gridId: "#div-gd",
+    });
+	let gx;
+
+	$(document).ready(function() {
+		pApp.ResizeGrid(550);
+		pApp.BindSearchEnter();
+		let gridDiv = document.querySelector(pApp.options.gridId);
+		gx = new HDGrid(gridDiv, columns);
+		gx.gridOptions.rowDragManaged = true;
+		gx.gridOptions.animateRows = true;
+		//Search();
+	});
+	
+    function Search() {
+        let data = $('form[name="f1"]').serialize();
+        gx.Request('/head/product/prd02/prd-search', data);
+    }
+
+	//상품옵션 불러오기
+	function getOption(){
+		var frm	= $('form[name="f1"]');
+
+		if(!validation()) return;
+
+	}
+
+	const validation = (cmd) => {
+		// 브랜드 선택 여부
+		if(f1.brand.selectedIndex == 0) {
+			f1.brand.focus();
+			return alert("브랜드를 선택해주세요.");
+		}
+
+		// 년도 선택여부
+		if(f1.year.selectedIndex == 0) {
+			f1.year.focus();
+			return alert("년도를 선택해주세요.");
+		}
+
+		// 시즌 선택여부
+		if(f1.season.selectedIndex == 0) {
+			f1.season.focus();
+			return alert("시즌을 선택해주세요.");
+		}
+
+		// 성별 선택여부
+		if(f1.gender.selectedIndex == 0) {
+			f1.gender.focus();
+			return alert("성별을 선택해주세요.");
+		}
+
+		// 아이템 선택여부
+		if(f1.item.selectedIndex == 0) {
+			f1.item.focus();
+			return alert("아이템을 선택해주세요.");
+		}
+
+		// 품목 선택여부
+		if(f1.opt.selectedIndex == 0) {
+			f1.opt.focus();
+			return alert("품목을 선택해주세요.");
+		}
+
+		// 상품번호 입력여부
+		if(f1.goods_no.value.trim() === '') {
+			f1.goods_no.focus();
+			return alert("상품번호를 입력해주세요.");
+		}
+
+		return true;
+	}
+</script>
+@stop

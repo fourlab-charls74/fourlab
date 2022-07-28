@@ -281,9 +281,15 @@ class prd02Controller extends Controller
 			'years'		=> SLib::getCodes("PRD_CD_YEAR"),
 			'seasons'	=> SLib::getCodes("PRD_CD_SEASON"),
 			'genders'	=> SLib::getCodes("PRD_CD_GENDER"),
+			'items'		=> SLib::getCodes("PRD_CD_ITEM"),
+			'opts'		=> SLib::getCodes("PRD_CD_OPT"),
 		];
 
 		return view( Config::get('shop.store.view') . '/product/prd02_create',$values);
+	}
+
+	public function prd_search(Request $request){
+
 	}
 
 }
