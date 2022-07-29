@@ -53,7 +53,7 @@
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-file fs-18"></i><span>마감관리</span></a>
                 <ul>
-                    <li><a href="/store/account/acc01">(개)기간별정산내역</a></li>
+                    <!-- <li><a href="/store/account/acc01">(개)정산내역</a></li> -->
                     <li><a href="/store/account/acc02">(개)월정산</a></li>
                     <li><a href="/store/account/acc03">(개)월마감</a></li>
                 </ul>

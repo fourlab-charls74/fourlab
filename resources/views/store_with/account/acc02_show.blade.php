@@ -28,7 +28,6 @@
 				</div>
 				<div class="card-body mt-1">
 					<div class="row_wrap">
-
 						<div class="row">
 							<div class="col-12">
 								<div class="table-box-ty2 mobile">
@@ -69,16 +68,14 @@
 														</div>
 													</div>
 												</td>
-												<th>업체</th>
+												<th>
+													<label for="store_no">매장명</label>
+												</th>
 												<td>
-													<div class="form-inline inline_select_box">
-														<div class="form-inline-inner input-box w-100">
-															<div class="form-inline inline_btn_box">
-																<input type="hidden" id="com_cd" name="com_cd" value="{{ $com_id }}">
-																<input type="text" id="com_nm" name="com_nm" value="{{ $com_nm }}" class="form-control form-control-sm ac-company sch-company" style="width:100%;">
-																<a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-															</div>
-														</div>
+													<div class="form-inline inline_btn_box">
+														<input type='hidden' id="store_nm" name="store_nm">
+														<select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
+														<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 													</div>
 												</td>
 											</tr>
@@ -222,7 +219,7 @@
 		{field: "opt_nm",		headerName: "옵션",			width:70},
 		{field: "style_no",		headerName: "스타일넘버",	width:90},
 		{field: "opt_type",		headerName: "출고형태",		width:90},
-		{field: "com_nm",		headerName: "판매처",		width:80},
+		{field: "store_nm",		headerName: "매장명",		width:100},
 		{field: "user_nm",		headerName: "주문자",		width:80},
 		{field: "pay_type",		headerName: "결제방법",		width:90},
 		{field: "tax_yn",		headerName: "과세",			width:70},
@@ -333,6 +330,15 @@
 	let gx;
 
 	$(document).ready(function() {
+
+		// 매장명 초기화 - select2, autocomplete input에 값 할당
+        $("#store_no").select2({data:[{
+            id: "{{ @$store_cd ? @$store_cd : '' }}",
+            text: "{{ @$store_nm ? @$store_nm : '' }}"
+        }], tags: true});
+        document.search.store_nm.value = "{{ @$store_nm ? @$store_nm : '' }}";
+
+		// ag-grid 설정
 		pApp.ResizeGrid(325);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
@@ -360,7 +366,7 @@
 				type: 'put',
 				url: '/store/account/acc02/show',
 				data: {
-					com_id : $('input[name="com_cd"]').val(),
+					store_cd : $('input[name="store_no"]').val(),
 					sdate : $('input[name="sdate"]').val(),
 					edate : $('input[name="edate"]').val(),
 				},

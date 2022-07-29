@@ -18,8 +18,6 @@ class acc02Controller extends Controller
 		$sdate	= date("Y-m-d", strtotime("first day of -1 month"));
 		$edate	= date("Y-m-d", strtotime("last day of -1 month"));
 
-
-
 		$values = [
 			'sdate' => $sdate,
 			'edate' => $edate,
@@ -34,171 +32,144 @@ class acc02Controller extends Controller
 		$sdate	= str_replace("-", "", $sdate);
 		$edate	= $request->input('edate',strtotime("last day of -1 month"));
 		$edate	= str_replace("-", "", $edate);
-		$com_cd	= $request->input('com_cd');
+		$store_cd	= $request->input('store_cd');
 
 		$where	= "";
 		$inner_where	= "";
 		
-		if( $com_cd != "" ){
-			$where	.= " and c.com_id = '$com_cd' ";
-			$inner_where	.= " and w.com_id = '$com_cd' ";
+		if( $store_cd != "" ){
+			$where .= " and s.store_cd = '$store_cd' ";
+			$inner_where .= " and w.store_cd = '$store_cd' ";
 		}
 
-		$total		= 0;
-		$page_cnt	= 0;
-
 		$query	= "
-			SELECT
-				ifnull(
-					( select
-						case
-							when sday = '$sdate' and eday = '$edate' then closed_yn
-						else concat_ws(' ~ ',sday,eday)
-						end as chk
-						from account_closed
-						where com_id = a.com_id and sday <= '$edate' and eday >= '$sdate'
-						order by idx desc limit 0,1
-					),'-'
-				) as closed,
+			select
 				'$sdate ~ $edate' as day,
-				c.com_nm,
-				cd.code_val as margin_type,
+				s.store_nm,
 				a.sale_amt, a.clm_amt, a.dc_apply_amt, a.coupon_com_amt, a.dlv_amt,
 				a.fee_etc_amt, a.sale_net_taxation_amt, a.sale_net_taxfree_amt, a.sale_net_amt, a.tax_amt,
 				a.fee, a.fee_dc_amt,
 				a.fee_net_amt,
 				a.acc_amt,
 				a.fee_allot_amt,
-				a.com_id,
-				ifnull(( select idx from account_closed where com_id = a.com_id and sday = '$sdate' and eday = '$edate' ),'-') as acc_idx
-			FROM
+				s.store_cd
+			from
 			(
-				SELECT
-					o.com_id,
-					SUM(w.sale_amt) AS sale_amt,
-					SUM(w.clm_amt) AS clm_amt,
-					SUM(w.dc_apply_amt) AS dc_apply_amt,
-					SUM(w.coupon_apply_amt) AS coupon_apply_amt,
-					SUM(w.coupon_apply_amt - w.allot_amt) AS coupon_com_amt,
-					SUM(w.dlv_amt) AS dlv_amt,
-					SUM(w.sale_net_amt + w.dlv_amt + w.etc_amt) AS sale_net_taxation_amt,
-					'0' AS sale_net_taxfree_amt,
-					SUM(w.sale_net_amt + w.dlv_amt + w.etc_amt) AS sale_net_amt,
-					SUM(FLOOR(( w.sale_net_amt + w.dlv_amt + w.etc_amt )/11)) AS tax_amt,
-					SUM(w.fee) AS fee,
-					SUM(dc_apply_amt) AS fee_dc_amt,
-					/*SUM(w.coupon_apply_amt - w.allot_amt) AS fee_allot_amt,*/
-					sum(w.allot_amt) AS fee_allot_amt,
-					SUM(w.etc_amt) AS fee_etc_amt,
-					SUM(w.fee - w.dc_apply_amt) AS fee_net_amt,
+				select
+					o.store_cd,
+					sum(w.sale_amt) as sale_amt,
+					sum(w.clm_amt) as clm_amt,
+					sum(w.dc_apply_amt) as dc_apply_amt,
+					sum(w.coupon_apply_amt) as coupon_apply_amt,
+					sum(w.coupon_apply_amt - w.allot_amt) as coupon_com_amt,
+					sum(w.dlv_amt) as dlv_amt,
+					sum(w.sale_net_amt + w.dlv_amt + w.etc_amt) as sale_net_taxation_amt,
+					'0' as sale_net_taxfree_amt,
+					sum(w.sale_net_amt + w.dlv_amt + w.etc_amt) as sale_net_amt,
+					sum(floor(( w.sale_net_amt + w.dlv_amt + w.etc_amt )/11)) as tax_amt,
+					sum(w.fee) as fee,
+					sum(dc_apply_amt) as fee_dc_amt,
+					/*sum(w.coupon_apply_amt - w.allot_amt) as fee_allot_amt,*/
+					sum(w.allot_amt) as fee_allot_amt,
+					sum(w.etc_amt) as fee_etc_amt,
+					sum(w.fee - w.dc_apply_amt) as fee_net_amt,
 					/* 정산 금액 */
-					SUM( (w.sale_net_amt + w.dlv_amt + w.etc_amt) - (w.fee - w.dc_apply_amt) ) as acc_amt
-				FROM
+					sum( (w.sale_net_amt + w.dlv_amt + w.etc_amt) - (w.fee - w.dc_apply_amt) ) as acc_amt
+				from 
 				(
-					SELECT
+					select
 						ord_opt_no
-						, ROUND(SUM(type)) AS type
-						, MAX(state_date) AS state_date
-						, SUM(qty) AS qty, SUM(sale_qty) AS sale_qty
-						, SUM(sale_amt) AS sale_amt, SUM(clm_amt) AS clm_amt
-						, SUM(coupon_apply_amt) AS coupon_apply_amt
-						, /*SUM(dc_apply_amt)*/ 0 AS dc_apply_amt
-						, SUM(sale_amt + clm_amt - /*dc_apply_amt*/ 0 - ( coupon_apply_amt - allot_amt ) ) AS sale_net_amt
-						, SUM(dlv_amt) AS dlv_amt
-						, SUM(wonga) AS wonga, SUM(fee_ratio) AS fee_ratio, SUM(fee) AS fee
-						, SUM(etc_amt) AS etc_amt
-						, SUM(allot_amt) AS allot_amt
-						, SUM(com_coupon_apply_amt) as com_coupon_apply_amt
-					FROM
+						, round(sum(type)) as `type`
+						, max(state_date) as state_date
+						, sum(qty) as qty, sum(sale_qty) as sale_qty
+						, sum(sale_amt) as sale_amt, sum(clm_amt) as clm_amt
+						, sum(coupon_apply_amt) as coupon_apply_amt
+						, /*sum(dc_apply_amt)*/ 0 as dc_apply_amt
+						, sum(sale_amt + clm_amt - /*dc_apply_amt*/ 0 - ( coupon_apply_amt - allot_amt ) ) as sale_net_amt
+						, sum(dlv_amt) as dlv_amt
+						, sum(wonga) as wonga, sum(fee_ratio) as fee_ratio, sum(fee) as fee
+						, sum(etc_amt) as etc_amt
+						, sum(allot_amt) as allot_amt
+						, sum(com_coupon_apply_amt) as com_coupon_apply_amt
+					from
 					(
-						SELECT
-							e.ord_opt_no,0 AS type, MAX(e.etc_day) AS state_date, 0 AS qty, 0 AS sale_qty,
-							0 AS sale_amt, 0 AS clm_amt, 0 AS coupon_apply_amt, 0 AS dc_apply_amt,
-							0 AS dlv_amt, 0 AS wonga, 0 AS fee_ratio, 0 AS fee, 0 AS allot_amt, SUM(e.etc_amt) AS etc_amt,
+						/*
+							기타정산액 (account_etc 추후 store_account_etc로 변경)
+						*/
+						select
+							e.ord_opt_no,0 as `type`, max(e.etc_day) as state_date, 0 as qty, 0 as sale_qty,
+							0 as sale_amt, 0 as clm_amt, 0 as coupon_apply_amt, 0 as dc_apply_amt,
+							0 as dlv_amt, 0 as wonga, 0 as fee_ratio, 0 as fee, 0 as allot_amt, sum(e.etc_amt) as etc_amt,
 							0 as com_coupon_apply_amt
-						FROM
-							account_etc e INNER JOIN order_opt o ON e.ord_opt_no = o.ord_opt_no
-						WHERE
-							e.etc_day >= '$sdate' AND e.etc_day <= '$edate'
-						GROUP BY
+						from
+							account_etc e inner join order_opt o on e.ord_opt_no = o.ord_opt_no
+						where
+							e.etc_day >= '$sdate' and e.etc_day <= '$edate'
+						group by
 							e.ord_opt_no
+						union all
 
-						UNION ALL
-
-						SELECT
-							ord_opt_no, type, state_date, qty, sale_qty,
-							sale_amt, clm_amt, coupon_apply_amt, /*dc_apply_amt*/ 0 as dc_apply_amt,
-							( a.dlv_amt + dlv_ref_amt ) AS dlv_amt, wonga, fee_ratio,
-							IF(c.margin_type = 'WONGA',
-							IF(qty = 0, 0, (sale_amt + clm_amt - wonga)),
-							ROUND(( sale_amt + clm_amt ) * fee_ratio / 100)) AS fee,
-							( coupon_apply_amt - coupon_allot_amt ) AS allot_amt,
-
-							/* 클레임 발생으로 쿠폰적용 금액이 (-) 인 경우 0 으로..
-							IF (
-								coupon_apply_amt <= 0,
-								0,
-								( coupon_apply_amt - com_coupon_apply_amt )
-							) AS allot_amt,*/
-
-							0 as etc_amt,
-							com_coupon_apply_amt
-						FROM
+						select
+							ord_opt_no, `type`, state_date, qty, sale_qty,
+							sale_amt, clm_amt, coupon_apply_amt, 0 as dc_apply_amt,
+							( a.dlv_amt + dlv_ref_amt ) as dlv_amt, wonga, fee_ratio,
+							round(( sale_amt + clm_amt ) * a.fee_ratio / 100) as fee,
+							( coupon_apply_amt - coupon_allot_amt ) as allot_amt,
+							com_coupon_apply_amt, 0 as etc_amt
+						from
 						(
-							SELECT
-								ord_opt_no,com_id
-								, SUM(distinct(if(ord_state = 30,30,ord_state))) as type
-								, MAX(ord_state_date) AS state_date
-								, SUM(qty) AS qty
-								, SUM(IF(ord_state = 30, qty,0)) AS sale_qty
-								, SUM(IF(ord_state = 30, price*qty, 0)) AS sale_amt
-								, SUM(IF(ord_state IN (60, 61), price*qty, 0)) AS clm_amt
-								, SUM(IF(ord_state = 30, coupon_apply_amt, -1 * coupon_apply_amt)) AS coupon_apply_amt
-								, SUM(IF(ord_state = 30, coupon_allot_amt, -1 * coupon_allot_amt)) AS coupon_allot_amt
-								, SUM(IF(ord_state = 30, /*dc_apply_amt*/ 0, -1 * /*dc_apply_amt*/ 0)) AS dc_apply_amt
-								, SUM(IF(ord_state = 30, dlv_amt, -1 * dlv_amt)) AS dlv_amt
-								, SUM(dlv_ref_amt) AS dlv_ref_amt
-
-								, ROUND(wonga*qty) as wonga
-								, ROUND(100*(1 - MAX(wonga)/MAX(price)),2) as fee_ratio
-								, SUM(com_coupon_apply_amt) AS com_coupon_apply_amt
-							FROM
-							(
-								SELECT
-									w.ord_opt_no, w.com_id, o.ord_no, w.ord_state_date, w.ord_state,
-									IF(w.ord_state = 30, w.qty, w.qty * -1) AS qty,
-									ABS(w.price) AS price, ABS(w.wonga) AS wonga, w.coupon_apply_amt,
-									IFNULL( /*w.dc_apply_amt*/ 0,0) as dc_apply_amt,
-									ROUND(IF(IFNULL(w.com_coupon_ratio, 0) > 1,IFNULL(w.com_coupon_ratio, 0) / 100,IFNULL(w.com_coupon_ratio, 0))	* IFNULL(w.coupon_apply_amt, 0)) AS coupon_allot_amt,
-									IFNULL(w.dlv_amt, 0) AS dlv_amt,
-									IFNULL(w.dlv_ret_amt, 0) + IFNULL(w.dlv_add_amt, 0) - IFNULL(w.dlv_enc_amt, 0) AS dlv_ref_amt,
+							/*
+								주문번호로 매출합을 구하기
+							*/
+							select
+								ord_opt_no, store_cd
+								, sum(distinct(if(ord_state = 10,10,ord_state))) as `type`
+								, max(ord_state_date) as state_date
+								, sum(qty) as qty
+								, sum(if(ord_state = 10, qty,0)) as sale_qty
+								, sum(if(ord_state = 10, price*qty, 0)) as sale_amt
+								, sum(if(ord_state in (60, 61), price*qty, 0)) as clm_amt
+								, sum(if(ord_state = 10, coupon_apply_amt, -1 * coupon_apply_amt)) as coupon_apply_amt
+								, sum(if(ord_state = 10, coupon_allot_amt, -1 * coupon_allot_amt)) as coupon_allot_amt
+								, sum(if(ord_state = 10, /*dc_apply_amt*/ 0, -1 * /*dc_apply_amt*/ 0)) as dc_apply_amt
+								, sum(if(ord_state = 10, dlv_amt, -1 * dlv_amt)) as dlv_amt
+								, sum(dlv_ref_amt) as dlv_ref_amt
+								, round(wonga*qty) as wonga
+								, round(100*(1 - max(wonga)/max(price)),2) as fee_ratio
+								, sum(com_coupon_apply_amt) as com_coupon_apply_amt
+							from
+								(
+								/* 10 에 대한 매출내역 */
+								select
+									s.store_cd, w.ord_opt_no, o.ord_no, w.ord_state_date, w.ord_state,
+									if(w.ord_state = 10, w.qty, w.qty * -1) as qty,
+									abs(w.price) as price, abs(w.wonga) as wonga, w.coupon_apply_amt,
+									ifnull( /*w.dc_apply_amt*/ 0,0) as dc_apply_amt,
+									round(if(ifnull(w.com_coupon_ratio, 0) > 1,ifnull(w.com_coupon_ratio, 0) / 100,ifnull(w.com_coupon_ratio, 0))	* ifnull(w.coupon_apply_amt, 0)) as coupon_allot_amt,
+									ifnull(w.dlv_amt, 0) as dlv_amt,
+									ifnull(w.dlv_ret_amt, 0) + ifnull(w.dlv_add_amt, 0) - ifnull(w.dlv_enc_amt, 0) as dlv_ref_amt,
 									/* 업체 쿠폰 부담 금액 ( 2010.10.07 추가 ) */
-									ROUND(
-										IF( IFNULL(w.com_coupon_ratio, 0) > 1, IFNULL(w.com_coupon_ratio, 0) / 100, IFNULL(w.com_coupon_ratio, 0) ) * w.coupon_apply_amt
-									) AS com_coupon_apply_amt
-								FROM
-									order_opt o INNER JOIN order_opt_wonga w ON o.ord_opt_no = w.ord_opt_no
-									INNER JOIN company c on w.com_id = c.com_id and c.com_type = '2'
-								WHERE
-									w.ord_state_date >= '$sdate' AND w.ord_state_date <= '$edate'
-									AND w.ord_state IN (30,60,61) $inner_where
-									AND o.ord_state >= 30 /* 결제 오류 발생시 order_opt_wonga 가 자료가 입력 되는 경우 처리 */
-							)
-							a GROUP BY ord_opt_no,com_id
-						)
-						a INNER JOIN company c ON a.com_id = c.com_id
-					)
-					a GROUP BY ord_opt_no
-				)
-					w INNER JOIN order_opt o ON o.ord_opt_no = w.ord_opt_no
-					INNER JOIN goods g ON o.goods_no = g.goods_no AND o.goods_sub = g.goods_sub
-				WHERE
+									round(
+										if( ifnull(w.com_coupon_ratio, 0) > 1, ifnull(w.com_coupon_ratio, 0) / 100, ifnull(w.com_coupon_ratio, 0) ) * w.coupon_apply_amt
+									) as com_coupon_apply_amt
+								from
+									order_opt o inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
+									inner join store s on o.store_cd = s.store_cd
+									where
+										w.ord_state_date >= '$sdate' and w.ord_state_date <= '$edate'
+										and w.ord_state in (10,60,61) $inner_where
+										and o.ord_state >= 10 /* 결제 오류 발생시 order_opt_wonga 가 자료가 입력 되는 경우 처리 */
+								)
+								a group by ord_opt_no, store_cd
+							) a
+						) a group by ord_opt_no
+					) w inner join order_opt o on o.ord_opt_no = w.ord_opt_no
+					inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
+				where
 					1 = 1
-				GROUP BY
-					o.com_id
-			)
-				a inner join company c on a.com_id = c.com_id
-				inner join code cd on cd.code_kind_cd = 'G_MARGIN_TYPE' and c.margin_type = cd.code_id
+				group by
+					o.store_cd
+				) a inner join store s on a.store_cd = s.`store_cd`
 			where
 				1 = 1 $where
 			order by
@@ -217,28 +188,28 @@ class acc02Controller extends Controller
 
 	}
 
-	public function show($com_id, $sdate, $edate, Request $request)
+	public function show($store_cd, $sdate, $edate, Request $request)
 	{
-		$com_type	= "";
-		$com_nm		= "";
+		$store_type   = "";
+		$store_nm	= "";
 		$acc_idx	= "";
 		$closed_yn	= "";
 
-		if( $com_id != "" ){
-			$sql	= " select com_type, com_nm from company where com_id = :com_id ";
-			$row	= DB::selectOne($sql, ['com_id' => $com_id]);
+		if( $store_cd != "" ){
+			$sql	= " select store_type, store_nm from store where store_cd = :store_cd ";
+			$row	= DB::selectOne($sql, ['store_cd' => $store_cd]);
 
 			if(!empty($row)){
-				$com_type	= $row->com_type;
-				$com_nm		= $row->com_nm;
+				$store_type	= $row->store_type;
+				$store_nm = $row->store_nm;
 			}
 		}
 
-		$sql	= "
-			select idx,closed_yn from account_closed
-			where com_id = :com_id and sday = :sday and eday = :eday
+		$sql = "
+			select idx, closed_yn from store_account_closed
+			where store_cd = :store_cd and sday = :sday and eday = :eday
 		";
-		$row	= DB::selectOne($sql, ['com_id' => $com_id, 'sday' => str_replace("-","",$sdate), 'eday' => str_replace("-","",$edate)]);
+		$row = DB::selectOne($sql, ['store_cd' => $store_cd, 'sday' => str_replace("-","",$sdate), 'eday' => str_replace("-","",$edate)]);
 
 		if(!empty($row)){
 			$acc_idx	= $row->idx;
@@ -248,8 +219,8 @@ class acc02Controller extends Controller
 		$values = [
 			'sdate'			=> $sdate,
 			'edate'			=> $edate,
-			'com_id'		=> $com_id,
-			'com_nm'		=> $com_nm,
+			'store_cd'		=> $store_cd,
+			'store_nm'		=> $store_nm,
 			'ord_states'	=> SLib::getOrdStates(),
 			'clm_states'	=> SLib::getCodes('G_CLM_STATE'),
 			'stat_pay_types'	=> SLib::getCodes('G_STAT_PAY_TYPE'),
@@ -257,16 +228,16 @@ class acc02Controller extends Controller
 			'acc_idx'		=> $acc_idx
 		];
 
-		return view( Config::get('shop.store.view') . '/account/acc02_show',$values);
+		return view( Config::get('shop.store.view') . '/account/acc02_show', $values);
 	}
 
 	public function show_search(Request $request)
 	{
-		$sdate	= $request->input('sdate',strtotime("first day of -1 month"));
-		$sdate	= str_replace("-", "", $sdate);
-		$edate	= $request->input('edate',strtotime("last day of -1 month"));
-		$edate	= str_replace("-", "", $edate);
-		$com_cd	= $request->input('com_cd');
+		$sdate = $request->input('sdate',strtotime("first day of -1 month"));
+		$sdate = str_replace("-", "", $sdate);
+		$edate = $request->input('edate',strtotime("last day of -1 month"));
+		$edate = str_replace("-", "", $edate);
+		$store_cd = $request->input('store_no');
 
 		$ord_state	= $request->input('ord_state');
 		$clm_state	= $request->input('clm_state');
@@ -288,14 +259,14 @@ class acc02Controller extends Controller
 		}
 
 		$sql	= "
-			SELECT
-				acc_type.code_val AS type,w.state_date,o.ord_no,o.ord_opt_no,
-				IF((SELECT COUNT(*) FROM order_opt WHERE ord_no = o.ord_no) > 1, 'Y','') AS multi_order,
-				IF(o.coupon_no <>0,(SELECT coupon_nm FROM coupon WHERE coupon_no = o.coupon_no),'') AS coupon_nm,
-				o.goods_nm, REPLACE(o.goods_opt,'^',':') AS opt_nm, g.style_no,
-				opt_type.code_val AS opt_type, cp.com_nm, m.user_nm, pay_type.code_val AS pay_type,
-				'Y' as tax_yn,
-				w.qty AS qty, w.sale_amt, w.clm_amt,w.dc_apply_amt,
+			select
+				acc_type.code_val as `type`, w.state_date,o.ord_no, o.ord_opt_no,
+				if((select count(*) from order_opt where ord_no = o.ord_no) > 1, 'y','') as multi_order,
+				if(o.coupon_no <>0,(select coupon_nm from coupon where coupon_no = o.coupon_no),'') as coupon_nm,
+				o.goods_nm, replace(o.goods_opt,'^',':') as opt_nm, g.style_no,
+				opt_type.code_val as opt_type, s.store_nm, m.user_nm, pay_type.code_val as pay_type,
+				'y' as tax_yn,
+				w.qty as qty, w.sale_amt, w.clm_amt,w.dc_apply_amt,
 				w.coupon_com_amt,
 				w.dlv_amt,  w.etc_amt as fee_etc_amt,
 				( sale_net_amt + w.dlv_amt + w.etc_amt ) as sale_net_taxation_amt,
@@ -304,147 +275,145 @@ class acc02Controller extends Controller
 				floor(( w.sale_net_amt + w.dlv_amt )/11) as tax_amt,
 
 				/* 본사 수수료 */
-				ROUND(w.fee_ratio, 2) as fee_ratio,
+				round(w.fee_ratio, 2) as fee_ratio,
 				w.fee,
 				w.dc_apply_amt as fee_dc_amt,
 				/*( w.coupon_apply_amt - w.allot_amt ) as fee_allot_amt,*/
-				/*( w.coupon_apply_amt - w.com_coupon_apply_amt - w.allot_amt ) AS fee_allot_amt,*/
+				/*( w.coupon_apply_amt - w.com_coupon_apply_amt - w.allot_amt ) as fee_allot_amt,*/
 				( w.fee - w.dc_apply_amt ) as fee_net_amt,
 
 				/* 정산 금액 */
 				(( w.sale_net_amt + w.dlv_amt + w.etc_amt ) - ( w.fee - w.dc_apply_amt ) ) as acc_amt,
 
-				( w.allot_amt ) AS fee_allot_amt,
+				( w.allot_amt ) as fee_allot_amt,
 				/* 기타 정보 */
-				cd.code_val AS ord_state, cd2.code_val AS clm_state,
-				DATE_FORMAT(o.ord_date,'%Y%m%d') AS ord_date, DATE_FORMAT(o.dlv_end_date,'%Y%m%d') AS dlv_end_date,
-				IF(o.clm_state IN (60,61), (
-					SELECT
-						DATE_FORMAT(MAX(end_date),'%Y%m%d') as clm_end_date
-					FROM
+				cd.code_val as ord_state, cd2.code_val as clm_state,
+				date_format(o.ord_date,'%y%m%d') as ord_date, date_format(o.dlv_end_date,'%y%m%d') as dlv_end_date,
+				if(o.clm_state in (60,61), (
+					select
+						date_format(max(end_date),'%y%m%d') as clm_end_date
+					from
 						claim
-					WHERE
+					where
 						ord_opt_no = o.ord_opt_no
-				), '') AS clm_end_date,'' AS bigo,
-				g.goods_no ,g.goods_sub ,acc_type.code_id AS acc_type,
-				CASE
-					WHEN
-						w.type IN ( 30,90,91 ) AND o.qty <> w.sale_qty THEN 'qtyerror'
-					ELSE ''
-				END AS err_notice
-			FROM
+				), '') as clm_end_date,'' as bigo,
+				g.goods_no ,g.goods_sub ,acc_type.code_id as acc_type,
+				case
+					when
+						w.type in ( 30,90,91 ) and o.qty <> w.sale_qty then 'qtyerror'
+					else ''
+				end as err_notice
+			from
 			(
-				SELECT
+				select
 					ord_opt_no
-					, ROUND(SUM(type)) AS type
-					, MAX(state_date) AS state_date
-					, SUM(qty) AS qty, SUM(sale_qty) AS sale_qty
-					, SUM(sale_amt) AS sale_amt, SUM(clm_amt) AS clm_amt
-					, SUM(coupon_apply_amt) AS coupon_apply_amt
-					, SUM(coupon_apply_amt - allot_amt) AS coupon_com_amt,
-					/*SUM(dc_apply_amt)*/ 0 AS dc_apply_amt
-					, SUM(sale_amt + clm_amt - /*dc_apply_amt*/ 0 - ( coupon_apply_amt - allot_amt )) AS sale_net_amt
-					, SUM(dlv_amt) AS dlv_amt
-					, SUM(wonga) AS wonga, SUM(fee_ratio) AS fee_ratio, SUM(fee) AS fee
-					, SUM(etc_amt) AS etc_amt
-					, SUM(allot_amt) AS allot_amt
-					, SUM(com_coupon_apply_amt) as com_coupon_apply_amt
-				FROM
+					, round(sum(type)) as `type`
+					, max(state_date) as state_date
+					, sum(qty) as qty, sum(sale_qty) as sale_qty
+					, sum(sale_amt) as sale_amt, sum(clm_amt) as clm_amt
+					, sum(coupon_apply_amt) as coupon_apply_amt
+					, sum(coupon_apply_amt - allot_amt) as coupon_com_amt,
+					/*sum(dc_apply_amt)*/ 0 as dc_apply_amt
+					, sum(sale_amt + clm_amt - /*dc_apply_amt*/ 0 - ( coupon_apply_amt - allot_amt )) as sale_net_amt
+					, sum(dlv_amt) as dlv_amt
+					, sum(wonga) as wonga, sum(fee_ratio) as fee_ratio, sum(fee) as fee
+					, sum(etc_amt) as etc_amt
+					, sum(allot_amt) as allot_amt
+					, sum(com_coupon_apply_amt) as com_coupon_apply_amt
+				from
 				(
-					SELECT
-						e.ord_opt_no,0 AS type, MAX(e.etc_day) AS state_date,0 AS qty, 0 AS sale_qty,
-						0 AS sale_amt, 0 AS clm_amt, 0 AS coupon_apply_amt, 0 AS dc_apply_amt,
-						0 AS dlv_amt, 0 AS wonga, 0 AS fee_ratio, 0 AS fee, 0 AS allot_amt, SUM(e.etc_amt) AS etc_amt,
+					select
+						e.ord_opt_no,0 as `type`, max(e.etc_day) as state_date,0 as qty, 0 as sale_qty,
+						0 as sale_amt, 0 as clm_amt, 0 as coupon_apply_amt, 0 as dc_apply_amt,
+						0 as dlv_amt, 0 as wonga, 0 as fee_ratio, 0 as fee, 0 as allot_amt, sum(e.etc_amt) as etc_amt,
 						0 as com_coupon_apply_amt
-					FROM
-						account_etc e INNER JOIN order_opt o ON e.ord_opt_no = o.ord_opt_no
-					WHERE
-						e.etc_day >= '$sdate' AND e.etc_day <= '$edate' AND o.com_id = '$com_cd'
-					GROUP BY
+					from
+						account_etc e inner join order_opt o on e.ord_opt_no = o.ord_opt_no
+					where
+						e.etc_day >= '$sdate' and e.etc_day <= '$edate' and o.com_id = '$store_cd'
+					group by
 						e.ord_opt_no
 
-					UNION ALL
+					union all
 
-					SELECT
-						ord_opt_no, type, state_date, qty, sale_qty,
+					select
+						ord_opt_no, `type`, state_date, qty, sale_qty,
 						sale_amt, clm_amt, coupon_apply_amt, dc_apply_amt,
-						( a.dlv_amt + dlv_ref_amt ) AS dlv_amt, wonga, fee_ratio,
-						IF(c.margin_type = 'WONGA',
-						IF(qty = 0, 0, (sale_amt + clm_amt - wonga)),
-						round(( sale_amt + clm_amt ) * fee_ratio / 100)) AS fee,
-						( coupon_apply_amt - coupon_allot_amt ) AS allot_amt,
+						( a.dlv_amt + dlv_ref_amt ) as dlv_amt, wonga, fee_ratio,
+						round(( sale_amt + clm_amt ) * fee_ratio / 100) as fee,
+						( coupon_apply_amt - coupon_allot_amt ) as allot_amt,
 
 						/* 클레임 발생으로 쿠폰적용 금액이 (-) 인 경우 0 으로..
-						IF (
+						if (
 							coupon_apply_amt <= 0,
 							0,
 							( coupon_apply_amt - com_coupon_apply_amt )
-						) AS allot_amt,*/
+						) as allot_amt,*/
 
 						0 as etc_amt,
 
 						com_coupon_apply_amt
-					FROM
+					from
 					(
-						SELECT
-							ord_opt_no,com_id
-							, SUM(distinct(if(ord_state = 30,30,ord_state))) as type
-							, MAX(ord_state_date) AS state_date
-							, SUM(qty) AS qty
-							, SUM(IF(ord_state = 30, qty,0)) AS sale_qty
-							, SUM(IF(ord_state = 30, price*qty, 0)) AS sale_amt
-							, SUM(IF(ord_state IN (60, 61), price*qty, 0)) AS clm_amt
-							, SUM(IF(ord_state = 30, coupon_apply_amt, -1 * coupon_apply_amt)) AS coupon_apply_amt
-							, SUM(IF(ord_state = 30, coupon_allot_amt, -1 * coupon_allot_amt)) AS coupon_allot_amt
-							, SUM(IF(ord_state = 30, /*dc_apply_amt*/ 0, -1 * /*dc_apply_amt*/ 0)) AS dc_apply_amt
-							, SUM(IF(ord_state = 30, dlv_amt, -1 * dlv_amt)) AS dlv_amt
-							, SUM(dlv_ref_amt) AS dlv_ref_amt
+						select
+							ord_opt_no, store_cd
+							, sum(distinct(if(ord_state = 30,30,ord_state))) as type
+							, max(ord_state_date) as state_date
+							, sum(qty) as qty
+							, sum(if(ord_state = 30, qty,0)) as sale_qty
+							, sum(if(ord_state = 30, price*qty, 0)) as sale_amt
+							, sum(if(ord_state in (60, 61), price*qty, 0)) as clm_amt
+							, sum(if(ord_state = 30, coupon_apply_amt, -1 * coupon_apply_amt)) as coupon_apply_amt
+							, sum(if(ord_state = 30, coupon_allot_amt, -1 * coupon_allot_amt)) as coupon_allot_amt
+							, sum(if(ord_state = 30, /*dc_apply_amt*/ 0, -1 * /*dc_apply_amt*/ 0)) as dc_apply_amt
+							, sum(if(ord_state = 30, dlv_amt, -1 * dlv_amt)) as dlv_amt
+							, sum(dlv_ref_amt) as dlv_ref_amt
 
-							, ROUND(wonga * qty) AS wonga
-							, ROUND(100 * (1 - MAX(wonga) / MAX(price)), 2) AS fee_ratio
-							, SUM(com_coupon_apply_amt) AS com_coupon_apply_amt
-						FROM
+							, round(wonga * qty) as wonga
+							, round(100 * (1 - max(wonga) / max(price)), 2) as fee_ratio
+							, sum(com_coupon_apply_amt) as com_coupon_apply_amt
+						from
 						(
-							SELECT
-								w.ord_opt_no, w.com_id, o.ord_no, w.ord_state_date, w.ord_state,
-								IF(w.ord_state = 30, w.qty, w.qty * -1) AS qty,
-								ABS(w.price) AS price, ABS(w.wonga) AS wonga,
+							select
+								w.ord_opt_no, w.store_cd, o.ord_no, w.ord_state_date, w.ord_state,
+								if(w.ord_state = 30, w.qty, w.qty * -1) as qty,
+								abs(w.price) as price, abs(w.wonga) as wonga,
 								w.coupon_apply_amt,
-								IFNULL( /*w.dc_apply_amt*/ 0,0) as dc_apply_amt,
-								ROUND(IF(IFNULL(w.com_coupon_ratio, 0) > 1,IFNULL(w.com_coupon_ratio, 0) / 100,IFNULL(w.com_coupon_ratio, 0)) * IFNULL(w.coupon_apply_amt, 0)) AS coupon_allot_amt,
-								IFNULL(w.dlv_amt, 0) AS dlv_amt,
-								IFNULL(w.dlv_ret_amt, 0) + IFNULL(w.dlv_add_amt, 0) - IFNULL(w.dlv_enc_amt, 0) AS dlv_ref_amt,
+								ifnull( /*w.dc_apply_amt*/ 0,0) as dc_apply_amt,
+								round(if(ifnull(w.com_coupon_ratio, 0) > 1,ifnull(w.com_coupon_ratio, 0) / 100,ifnull(w.com_coupon_ratio, 0)) * ifnull(w.coupon_apply_amt, 0)) as coupon_allot_amt,
+								ifnull(w.dlv_amt, 0) as dlv_amt,
+								ifnull(w.dlv_ret_amt, 0) + ifnull(w.dlv_add_amt, 0) - ifnull(w.dlv_enc_amt, 0) as dlv_ref_amt,
 								/* 업체 쿠폰 부담 금액 ( 2010.10.07 추가 ) */
-								ROUND(
-									IF( IFNULL(w.com_coupon_ratio, 0) > 1, IFNULL(w.com_coupon_ratio, 0) / 100, IFNULL(w.com_coupon_ratio, 0) ) * w.coupon_apply_amt
-								) AS com_coupon_apply_amt
-							FROM
-								order_opt o INNER JOIN order_opt_wonga w ON o.ord_opt_no = w.ord_opt_no
-							WHERE
-								w.ord_state_date >= '$sdate' AND w.ord_state_date <= '$edate'
-								AND w.ord_state IN (30,60,61)
-								AND w.com_id = '$com_cd'
-								AND o.ord_state >= 30 /* 결제 오류 발생시 order_opt_wonga 가 자료가 입력 되는 경우 처리 */
+								round(
+									if( ifnull(w.com_coupon_ratio, 0) > 1, ifnull(w.com_coupon_ratio, 0) / 100, ifnull(w.com_coupon_ratio, 0) ) * w.coupon_apply_amt
+								) as com_coupon_apply_amt
+							from
+								order_opt o inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
+							where
+								w.ord_state_date >= '$sdate' and w.ord_state_date <= '$edate'
+								and w.ord_state in (10,60,61)
+								and w.store_cd = '$store_cd'
+								and o.ord_state >= 10 /* 결제 오류 발생시 order_opt_wonga 가 자료가 입력 되는 경우 처리 */
 						)
-						a GROUP BY ord_opt_no,com_id
+						a group by ord_opt_no, store_cd
 					)
-					a INNER JOIN company c ON a.com_id = c.com_id
+					a
 				)
-				a GROUP BY ord_opt_no
+				a group by ord_opt_no
 			)
-				w INNER JOIN order_opt o ON o.ord_opt_no = w.ord_opt_no
-				INNER JOIN order_mst m ON o.ord_no = m.ord_no
-				INNER JOIN goods g ON o.goods_no = g.goods_no AND o.goods_sub = g.goods_sub
-				INNER JOIN payment p ON m.ord_no = p.ord_no
-				LEFT OUTER JOIN company cp ON o.sale_place = cp.com_id AND cp.com_type = '4'
-				LEFT OUTER JOIN  code cd ON cd.code_kind_cd = 'G_ORD_STATE' AND cd.code_id = o.ord_state
-				LEFT OUTER JOIN  code cd2 ON cd2.code_kind_cd = 'G_CLM_STATE' AND cd2.code_id = o.clm_state
-				LEFT OUTER JOIN  code opt_type ON opt_type.code_kind_cd = 'G_ORD_TYPE' AND o.ord_type = opt_type.code_id
-				LEFT OUTER JOIN  code acc_type ON acc_type.code_kind_cd = 'G_ACC_TYPE' AND w.type = acc_type.code_id
-				LEFT OUTER JOIN  code pay_type ON pay_type.code_kind_cd = 'G_PAY_TYPE' AND p.pay_type = pay_type.code_id
-			WHERE
+				w inner join order_opt o on o.ord_opt_no = w.ord_opt_no
+				inner join order_mst m on o.ord_no = m.ord_no
+				inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
+				inner join payment p on m.ord_no = p.ord_no
+				inner join store s on o.store_cd = s.store_cd
+				left outer join  code cd on cd.code_kind_cd = 'g_ord_state' and cd.code_id = o.ord_state
+				left outer join  code cd2 on cd2.code_kind_cd = 'g_clm_state' and cd2.code_id = o.clm_state
+				left outer join  code opt_type on opt_type.code_kind_cd = 'g_ord_type' and o.ord_type = opt_type.code_id
+				left outer join  code acc_type on acc_type.code_kind_cd = 'g_acc_type' and w.type = acc_type.code_id
+				left outer join  code pay_type on pay_type.code_kind_cd = 'g_pay_type' and p.pay_type = pay_type.code_id
+			where
 				1 = 1 $where
-			ORDER BY
+			order by
 				w.state_date, o.ord_opt_no
 		";
 

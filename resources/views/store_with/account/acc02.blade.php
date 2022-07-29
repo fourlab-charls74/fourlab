@@ -26,7 +26,7 @@
 
 			<div class="card-body">
 				<div class="row">
-					<div class="col-lg-4 inner-td">
+					<div class="col-lg-4">
 						<div class="form-group">
 							<label for="good_types">정산일자 :</label>
 							<div class="form-inline date-select-inbox">
@@ -56,17 +56,12 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4 inner-td">
+					<div class="col-lg-4">
 						<div class="form-group">
-							<label for="name">업체</label>
-							<div class="form-inline inline_select_box">
-								<div class="form-inline-inner input-box w-100">
-									<div class="form-inline inline_btn_box">
-										<input type="hidden" id="com_cd" name="com_cd">
-										<input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company sch-company" style="width:100%;">
-										<a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-									</div>
-								</div>
+							<label for="store_cd">매장명</label>
+							<div class="form-inline inline_btn_box">
+								<select id="store_cd" name="store_cd" class="form-control form-control-sm select2-store"></select>
+								<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 							</div>
 						</div>
 					</div>
@@ -123,13 +118,14 @@
 		{field: "num",			headerName: "#", type:'NumType', pinned: 'left'},
 		{field: "closed",		headerName: "마감",			width:65, pinned: 'left'},
 		{field: "day",			headerName: "정산일자",		width:140, pinned: 'left'},
-		{field: "com_nm",		headerName: "업체",			width:140,
+		{field: "store_nm",		headerName: "매장명", width:140,
 			cellRenderer: function(params) {
-				if( params.value != undefined )
-					return '<a href="#" onClick="popDetail(\''+ params.data.com_id +'\')">' + params.value+'</a>';
+				if( params.value != undefined ) {
+					return '<a href="#" onClick="popDetail(\''+ params.data.store_cd +'\')">' + params.value+'</a>';
+				}
 			}
-		},
-		{field: "margin_type",	headerName: "수수료지정",	width:100},
+		 },
+		// {field: "margin_type",	headerName: "수수료지정",	width:100},
 		{field: "sale_amt",		headerName: "판매금액",		width:100, type: 'currencyType', aggregation: true},
 		{field: "clm_amt",		headerName: "클레임금액",	width:100, type: 'currencyType', aggregation: true},
 		{field: "dc_apply_amt",	headerName: "할인금액",		width:90, type: 'currencyType', aggregation: true},
@@ -137,7 +133,7 @@
 			headerName: '쿠폰금액',
 			children: [{
 					field: "coupon_com_amt",
-					headerName: "(업체부담)",
+					headerName: "(매장부담)",
 					type: 'currencyType',
 					aggregation: true
 				}
@@ -187,6 +183,7 @@
 				{
 					field: "fee_net_amt",
 					headerName: "소계",
+					width:100,
 					type: 'currencyType',
 					aggregation: true
 				},
@@ -203,8 +200,8 @@
 				}
 			]
 		},
-		{field: "com_id",	hide:true},
-		{field: "acc_idx",	hide:true},
+		{field: "store_cd",	hide:true},
+		// {field: "acc_idx",	hide:true},
 		{ width: 'auto' }
 	];
 
@@ -227,6 +224,7 @@
             },
 			onPinnedRowDataChanged: (params) => {
 				let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
+				if (pinnedRow == undefined) return false;
 				gx.gridOptions.api.setPinnedTopRowData([ { ...pinnedRow.data, closed: '합계' } ]);
 			}
         };
@@ -244,10 +242,10 @@
 		gx.Download("정산내역.csv");
 	}
 
-	function popDetail(com_id){
+	function popDetail(store_cd){
 		let sdate	= $('input[name="sdate"]').val();
 		let edate	= $('input[name="edate"]').val();
-		const url	='/store/account/acc02/show/' + com_id + '/' + sdate + '/' + edate;
+		const url	='/store/account/acc02/show/' + store_cd + '/' + sdate + '/' + edate;
 		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
 	}
 

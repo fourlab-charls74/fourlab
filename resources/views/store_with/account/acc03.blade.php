@@ -28,7 +28,7 @@
 
 			<div class="card-body">
 				<div class="row">
-					<div class="col-lg-4 inner-td">
+					<div class="col-lg-4">
 						<div class="form-group">
 							<label for="good_types">마감일자 :</label>
 							<div class="form-inline date-select-inbox">
@@ -58,21 +58,16 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4 inner-td">
+					<div class="col-lg-4">
 						<div class="form-group">
-							<label for="name">업체</label>
-							<div class="form-inline inline_select_box">
-								<div class="form-inline-inner input-box w-100">
-									<div class="form-inline inline_btn_box">
-										<input type="hidden" id="com_cd" name="com_cd">
-										<input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company sch-company" style="width:100%;">
-										<a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-									</div>
-								</div>
+							<label for="store_cd">매장명</label>
+							<div class="form-inline inline_btn_box">
+								<select id="store_cd" name="store_cd" class="form-control form-control-sm select2-store"></select>
+								<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4 inner-td">
+					<div class="col-lg-4">
                         <div class="form-group">
                             <label for="closed_yn">마감상태</label>
                             <div class="flax_box">
@@ -146,7 +141,7 @@
 				}
 			}
 		},
-		{field: "com_nm",		headerName: "업체명",			width:140 },
+		{field: "store_nm",		headerName: "매장명",	width:140 },
 		{field: "margin_type",	headerName: "수수료지정",	width:100},
 		{field: "sale_amt",		headerName: "판매금액",		width:100, type: 'currencyType', aggregation: true},
 		{field: "clm_amt",		headerName: "클레임금액",	width:100, type: 'currencyType', aggregation: true},
