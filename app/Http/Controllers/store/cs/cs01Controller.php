@@ -662,16 +662,18 @@ class cs01Controller extends Controller {
 				stock_prd_no as stock_prd_no,
 				s.item,s.brand,s.style_no,s.goods_no,s.prd_cd,g.goods_nm, g.brand_nm,
 				ifnull(( select goods_opt from product_stock
-						where goods_no = s.goods_no and prd_cd = s.prd_cd and goods_opt = s.opt_kor),concat('ERR:',ifnull(s.opt_kor, ''))) as opt_kor,
+						where goods_no = s.goods_no and prd_cd = s.prd_cd and goods_opt = s.opt_kor),concat('err:',ifnull(s.opt_kor, ''))) as opt_kor,
 				s.qty as qty,
+				ps.in_qty,
 				s.unit_cost as unit_cost,
-				(s.unit_cost * qty) as unit_total_cost,
+				(s.unit_cost * s.qty) as unit_total_cost,
 				s.cost as cost,
-				(s.cost * qty) as total_cost,
-				(s.cost_notax * qty) as total_cost_novat,
-				s.stock_date as stock_date
+				(s.cost * s.qty) as total_cost,
+				(s.cost_notax * s.qty) as total_cost_novat,
+				s.stock_date as stock_date		
 			from stock_product s inner join goods g
 					on s.goods_no = g.goods_no
+					inner join product_stock ps on s.prd_cd = ps.prd_cd
 			where stock_no = '$stock_no'
 			order by stock_prd_no asc
 		";

@@ -191,8 +191,9 @@ class sal03Controller extends Controller
 				( 
 					select 
 						sp.prd_cd as prd_cd, 
-						sum(sp.qty) as in_sum_qty, sum(sp.cost) as in_sum_amt
-					from stock_product sp 
+						sum(ps.in_qty) as in_sum_qty, sum(sp.cost) as in_sum_amt
+					from stock_product sp
+						inner join product_stock ps on sp.prd_cd = ps.prd_cd
 					group by sp.prd_cd
 				) as b on a.prd_cd = b.prd_cd
 			$orderby 

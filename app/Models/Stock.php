@@ -496,6 +496,9 @@ class Stock
             if ($ord_opt_no == "" || ($ord_opt_no != "" && $ord_state >= 30)) {
                 $this->PlusStockQty($goods_no, $prd_cd, $goods_opt, $qty, $type,
                     $invoice_no, $etc, $wonga, $com_id, $ord_no, $ord_opt_no);
+
+                // 입고완료시 입고처리
+                $this->PlusInQty($goods_no, $prd_cd, $goods_opt, $qty);
             }
         }
 
@@ -677,6 +680,20 @@ class Stock
         $sql = "
             update product_stock 
                 set qty = qty + $qty 
+                    , ut = now()
+            where goods_no = '$goods_no' 
+                and prd_cd = '$prd_cd'
+                and goods_opt = '$goods_opt'
+        ";
+
+        return DB::update($sql);
+    }
+
+    public function PlusInQty($goods_no, $prd_cd, $goods_opt, $qty)
+    {
+        $sql = "
+            update product_stock 
+                set in_qty = in_qty + $qty 
                     , ut = now()
             where goods_no = '$goods_no' 
                 and prd_cd = '$prd_cd'

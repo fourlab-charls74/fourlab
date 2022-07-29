@@ -305,6 +305,7 @@
         {headerName:"상품코드", field:"prd_cd", width: 120, pinned:'left', cellStyle:{'text-align': 'center'}},
         {field:"goods_nm", headerName:"상품명", type:"HeadGoodsNameType", width:250, pinned:'left'},
         {field:"opt_kor", headerName:"옵션", pinned:'left', width:200},
+        {field: "in_qty", headerName: "입고수량", type:'currencyType'},
         {headerName: "수량", field: "qty", width: 60,
             editable: params => checkIsEditable(params),
             cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99', textAlign: 'right'} : {textAlign: 'right'},
