@@ -304,6 +304,23 @@ CREATE TABLE `sale_type_store` (
     PRIMARY KEY (`idx`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
+-- 매장마진관리
+CREATE TABLE `store_fee` (
+    `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT 'identify',
+    `store_cd` varchar(30) NOT NULL COMMENT '매장코드 - store : store_cd',
+    `pr_code` varchar(30) NOT NULL COMMENT '행사코드 - code : PR_CODE',
+    `store_fee` decimal(10,2) DEFAULT NULL COMMENT '매장수수료',
+    `manager_fee` decimal(10,2) DEFAULT NULL COMMENT '중간관리수수료',
+    `sdate` varchar(10) DEFAULT NULL COMMENT '시작일',
+    `edate` varchar(10) DEFAULT NULL COMMENT '종료일',
+    `comment` varchar(100) DEFAULT NULL COMMENT '메모',
+    `use_yn` char(1) DEFAULT 'Y' COMMENT '사용',
+    `reg_date` datetime DEFAULT NULL COMMENT '등록일자',
+    `mod_date` datetime DEFAULT NULL COMMENT '수정일자',
+    `admin_id` varchar(30) DEFAULT NULL COMMENT '관리자아이디',
+    PRIMARY KEY (`idx`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 -- 매장마감
 CREATE TABLE `store_account_closed` (
                                         `idx` INT(11) NOT NULL AUTO_INCREMENT COMMENT '정산번호',
@@ -678,6 +695,16 @@ insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_va
 
 -- code_kind 데이터 추가 상품코드 - 아이템 : PRD_CD_COLOR
 insert into `code_kind` (`code_kind_cd`, `code_kind_nm`, `code_kind_nm_eng`, `use_yn`, `type`, `seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PRD_CD_COLOR','[매장관리]상품코드 - 컬러','RPD_CD_COLOR','Y',NULL,'0','','본사_김용남',now(),now());
+
+-- code 데이터 추가 행사코드 : PR_CODE
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PR_CODE','JS','정상','','','','Y','1','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PR_CODE','GL','행사','','','','Y','1','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PR_CODE','J1','균일','','','','Y','1','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PR_CODE','J2','용품','','','','Y','1','ceduce','본사_김용남',now(),now());
+
+-- code_kind 데이터 추가 행사코드 : PR_CODE
+insert into `code_kind` (`code_kind_cd`, `code_kind_nm`, `code_kind_nm_eng`, `use_yn`, `type`, `seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PR_CODE','[매장관리]행사코드','pr_code','Y',NULL,'0','','본사_김용남',now(),now());
+
 
 --
 -- 테이블 데이터 추가 종료

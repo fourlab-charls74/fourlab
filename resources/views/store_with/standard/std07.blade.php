@@ -1,9 +1,9 @@
 @extends('store_with.layouts.layout')
-@section('title','동종업계관리')
+@section('title','매장마진관리')
 
 @section('content')
 <div class="page_tit">
-    <h3 class="d-inline-flex">동종업계관리</h3>
+    <h3 class="d-inline-flex">매장마진관리</h3>
     <div class="d-inline-flex location">
         <span class="home"></span>
         <span>/ 코드관리</span>
@@ -105,16 +105,15 @@
     <div class="col-lg-9">
         <div class="card shadow-none mb-0">
             <div class="card-header mb-0 d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row">
-                <h5 class="m-0 mb-3 mb-sm-0"><span id="select_store_nm"></span>동종업계 세부정보</h5>
+                <h5 class="m-0 mb-3 mb-sm-2"><span id="select_store_nm"></span>매장별 마진정보</h5>
                 <div class="d-flex align-items-center justify-content-center justify-content-sm-end">
-                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateCompetitors()"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
-                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="downlaodExcel()"><i class="fas fa-download fa-sm text-white-50 mr-1"></i> 엑셀다운로드</button>
-                    <button type="button" class="btn btn-sm btn-outline-primary shadow-sm" onclick="resetCompetitors()">전체 초기화</button>
+                    {{-- <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateStoreFee()"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary shadow-sm" onclick="resetStoreFee()">전체 초기화</button> --}}
                 </div>
             </div>
             <div class="card-body shadow pt-2">
                 <div class="table-responsive">
-                    <div id="div-gd-competitor" class="ag-theme-balham"></div>
+                    <div id="div-gd-store-fee" class="ag-theme-balham"></div>
                 </div>
             </div>
         </div>
@@ -139,18 +138,24 @@
         {width: "auto"},
     ];
 
-    let competitor_columns = [
+    let fee_columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
-        {field: "use_yn", headerName: "사용", cellStyle: {"text-align": "center"}, pinned: "left",
+        {field: "use_yn", headerName: "사용", pinned: "left", cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {
-                return `<input type="checkbox" onclick="changeUseYnVal(event, '${params.rowIndex}')" style="width:15px;height:15px;" ${params.value === 'Y' ? "checked" : ""} />`;
-        }},
-        {field: "competitor_cd", headerName: "동종업계코드", width: 100, cellStyle: {"text-align": "center"}},
-        {field: "competitor_nm", headerName: "동종업계명", width: 200},
-        {field: "item", headerName: "아이템", width: 200, cellStyle: {"background-color": "#ffff99"}, editable: true},
-        {field: "manager", headerName: "매니저", cellStyle: {"text-align": "center", "background-color": "#ffff99"}, editable: true},
-        {field: "sdate", headerName: "등록일", width: 80, cellStyle: {"text-align": "center", "background-color": "#ffff99"}, editable: true},
-        {field: "edate", headerName: "폐점일", width: 80, cellStyle: {"text-align": "center", "background-color": "#ffff99"}, editable: true},
+                return params.value || 'N';
+            }
+        },
+        {field: "pr_code_cd", headerName: "행사코드", width: 60, cellStyle: {"text-align": "center"}},
+        {field: "pr_code_nm", headerName: "행사명", width: 60, cellStyle: {"text-align": "center"},
+            cellRenderer: function(params) {
+                return `<a href='javascript:void(0)' onclick='showDetailPopup("${params.data.store_cd}", "${params.data.pr_code_cd}")'>${params.value}</a>`;
+            }
+        },
+        {field: "sdate", headerName: "시작일", width: 90, cellStyle: {"text-align": "center"}},
+        {field: "edate", headerName: "종료일", width: 90, cellStyle: {"text-align": "center"}},
+        {field: "store_fee", headerName: "매장수수료(%)", width: 120, type: "percentType"},
+        {field: "manager_fee", headerName: "중간관리수수료(%)", width: 120, type: "percentType"},
+        {field: "comment", headerName: "메모", width: 300},
         {width: "auto"},
     ];
 </script>
@@ -159,7 +164,7 @@
     let gx, gx2;
 
     const pApp = new App('', { gridId: "#div-gd" });
-    const pApp2 = new App('', { gridId: "#div-gd-competitor" });
+    const pApp2 = new App('', { gridId: "#div-gd-store-fee" });
     let cur_store_cd = "";
     let cur_store_nm = "";
 
@@ -170,15 +175,15 @@
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
 
-        // 동종업계 세부정보
+        // 마진정보
         pApp2.ResizeGrid(275);
         pApp2.BindSearchEnter();
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
-        gx2 = new HDGrid(gridDiv2, competitor_columns, {
-            onCellValueChanged: (e) => {
-                e.node.data.use_yn = 'Y';
-                gx2.gridOptions.api.updateRowData({update: [e.node.data]});
-            }
+        gx2 = new HDGrid(gridDiv2, fee_columns, {
+            // onCellValueChanged: (e) => {
+            //     e.node.data.use_yn = 'Y';
+            //     gx2.gridOptions.api.updateRowData({update: [e.node.data]});
+            // }
         });
 
         // 최초검색
@@ -193,10 +198,9 @@
     });
 
     // 매장목록 조회
-    // * competitor_yn가 "Y"가 아닌 값은 조회되지않습니다.
     function Search() {
         const data = $('[name=search]').serialize();
-        gx.Request("/store/standard/std04/search", data, -1, function(d) {
+        gx.Request("/store/standard/std07/search", data, -1, function(d) {
             if(cur_store_cd === "" && d.body.length > 0) {
                 SearchDetail(d.body[0].store_cd, d.body[0].store_nm);
             }
@@ -214,61 +218,74 @@
         
         cur_store_cd = store_cd;
         cur_store_nm = store_nm;
-        gx2.Request("/store/standard/std04/search-competitor/" + store_cd, "", -1, function(d) {
+        gx2.Request("/store/standard/std07/search-store-fee/" + store_cd, "", -1, function(d) {
             $("#select_store_nm").text(`${store_nm} - `);
+            gx2.gridOptions.api.forEachNode(function(node) {
+                if(node.data.use_yn === 'Y') node.setSelected(true);
+            });
         })
     }
 
-    // 동종업계별 사용여부 변경
-    function changeUseYnVal(e, rowIndex) {
-        const node = gx2.getRowNode(rowIndex);
-        node.data.use_yn = e.target.checked ? 'Y' : 'N';
-    }
+    // // 마진정보 사용여부 변경
+    // function changeUseYnVal(e, rowIndex) {
+    //     const node = gx2.getRowNode(rowIndex);
+    //     node.data.use_yn = e.target.checked ? 'Y' : 'N';
+    // }
 
-    // 동종업계 세부정보 입력정보 저장
-    function updateCompetitors() {
-        if(!confirm(cur_store_nm + "의 동종업계 세부정보를 저장하시겠습니까?")) return;
+    // // 마진정보 입력정보 저장
+    // function updateStoreFee() {
+    //     if(!confirm(cur_store_nm + "의 마진정보를 저장하시겠습니까?")) return;
 
-        axios({
-            url: `/store/standard/std04/update-competitor`,
-            method: 'put',
-            data: {
-                store_cd: cur_store_cd,
-                data: gx2.getRows()
-            },
-        }).then(function (res) {
-            if(res.data.code === 200) {
-                alert(res.data.msg);
-            } else {
-                console.log(res.data.msg);
-                alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-            }
-        }).catch(function (err) {
-            console.log(err);
-        });
-    }
+    //     axios({
+    //         url: `/store/standard/std07/update-store-fee`,
+    //         method: 'put',
+    //         data: {
+    //             store_cd: cur_store_cd,
+    //             data: gx2.getRows()
+    //         },
+    //     }).then(function (res) {
+    //         if(res.data.code === 200) {
+    //             alert(res.data.msg);
+    //         } else {
+    //             console.log(res.data.msg);
+    //             alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+    //         }
+    //     }).catch(function (err) {
+    //         console.log(err);
+    //     });
+    // }
 
-    // 동종업계 세부정보 엑셀다운로드
-    function downlaodExcel() {
-        gx2.gridOptions.api.exportDataAsExcel({
-            skipHeader: false,
-            skipPinnedTop: false,
-        });
-    }
+    // // 매장별 마진정보 전체 초기화
+    // function resetStoreFee() {
+    //     if(!confirm(cur_store_nm + "의 마진정보를 초기화하시겠습니까?")) return;
 
-    // 동종업계 세부정보 전체 초기화
-    function resetCompetitors() {
-        if(!confirm(cur_store_nm + "의 동종업계 세부정보를 초기화하시겠습니까?")) return;
+    //     const rows = gx2.getRows();
+    //     gx2.gridOptions.api.setRowData(
+    //         rows.map(
+    //             row => ({
+    //                 ...row,
+    //                 use_yn: 'N',
+    //                 sdate: null,
+    //                 edate: null,
+    //                 store_fee: null,
+    //                 manager_fee: null,
+    //                 comment: null,
+    //             })
+    //         )
+    //     );
+    // }
 
-        const rows = gx2.getRows();
-        gx2.gridOptions.api.setRowData(
-            rows.map(
-                row => ({
-                    competitor_cd: row.competitor_cd, 
-                    competitor_nm: row.competitor_nm
-                })
-            )
-        );
+    // // 마진정보 시작일/종료일 변경 시 사용여부 변경
+    // function changeUseYnValWhenChangeDate(fieldName, e, rowIndex) {
+    //     const node = gx2.getRowNode(rowIndex);
+    //     node.data[fieldName] = e.value;
+    //     node.setDataValue(fieldName, e.value);
+    // }
+
+    // 마진정보 세부변경내역 팝업창 열기
+    function showDetailPopup(store_cd, pr_code_cd) {
+        // const url = "/store/standard/std05/show/" + sale_type_cd;
+        // window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=900,height=900");
     }
 </script>
 @stop

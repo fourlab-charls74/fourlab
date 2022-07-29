@@ -78,21 +78,26 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('std04', 'std04Controller@index');
         Route::get('std04/search', 'std04Controller@search');
         Route::get('std04/search-competitor/{store_cd?}', 'std04Controller@search_competitor');
-
         Route::put('std04/update-competitor', 'std04Controller@update_competitor');
-
+        
         // 판매유형관리
         Route::get('std05', 'std05Controller@index');
         Route::get('std05/search', 'std05Controller@search');
         Route::get('std05/show/{sale_type_cd?}', 'std05Controller@show');
         Route::get('std05/search-store/{sale_type_cd?}', 'std05Controller@search_store');
-
+        
         Route::post('std05/add', 'std05Controller@add_sale_type');
         Route::put('std05/update', 'std05Controller@update_sale_type');
-
+        
         // 매장 영업담당자
         Route::get('std06', 'std06Controller@index');
         Route::get('std06/search', 'std06Controller@search');
+        
+        // 매장마진관리
+        Route::get('std07', 'std07Controller@index');
+        Route::get('std07/search', 'std07Controller@search');
+        Route::get('std07/search-store-fee/{store_cd?}', 'std07Controller@search_store_fee');
+        Route::put('std07/update-store-fee', 'std07Controller@update_store_fee');
 
         // 수선관리
         Route::get('std11', 'std11Controller@index');
