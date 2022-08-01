@@ -167,12 +167,19 @@
 
 <script>
 	const columns = [
-		{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
+		{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 30, pinned: 'left', sort: null,
+            checkboxSelection: function(params) {
+                return params.data.match_yn == '';
+            },
+		},
 		{field: "goods_no", headerName: "상품번호",rowDrag: true,
-			width:100
+			width:84
+		},
+		{field: "goods_nm", headerName: "상품명",
+			width:250
 		},
 		{field: "goods_opt", headerName: "상품옵션",
-			width:120
+			width:200
 		},
 		{field: "prd_cd1", headerName: "상품코드",
 			editable: true,
@@ -182,12 +189,15 @@
 		{field: "color", headerName: "컬러",
 			editable: true,
 			cellClass:['hd-grid-edit'],
-			width:120
+			width:80
 		},
 		{field: "size", headerName: "사이즈",
 			editable: true,
 			cellClass:['hd-grid-edit'],
-			width:120
+			width:80
+		},
+		{field: "match_yn", headerName: "등록유무",
+			width:72
 		},
 		{field: "", headerName:"", width:"auto"},
 	];
@@ -211,7 +221,7 @@
 	
     function Search() {
         let data = $('form[name="f1"]').serialize();
-        gx.Request('/head/product/prd02/prd-search', data);
+        gx.Request('/store/product/prd02/prd-search/', data);
     }
 
 	//상품옵션 불러오기
@@ -220,6 +230,7 @@
 
 		if(!validation()) return;
 
+		Search();
 	}
 
 	const validation = (cmd) => {

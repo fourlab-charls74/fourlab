@@ -289,6 +289,93 @@ class prd02Controller extends Controller
 	}
 
 	public function prd_search(Request $request){
+		$brand		= $request->input('brand');
+		$year		= $request->input('year');
+		$season		= $request->input('season');
+		$gender		= $request->input('gender');
+		$item		= $request->input('item');
+		$opt		= $request->input('opt');
+		$goods_no	= $request->input('goods_no');
+		$goods_sub	= 0;
+		$prd_cd1	= "";
+		$seq		= "01";
+
+		$sql	= "
+			select
+				a.goods_no, b.goods_nm, a.goods_opt, '' as prd_cd1, '' as color, '' as size, '' as match_yn
+			from goods_summary a
+			inner join goods b on a.goods_no = b.goods_no and b.goods_sub = 0
+			where
+				a.goods_no = :goods_no and a.goods_sub = :goods_sub
+		";
+
+		$result = DB::select($sql,['goods_no' => $goods_no, 'goods_sub' => $goods_sub]);
+
+		foreach($result as $row){
+
+			$sql_sub	= " 
+				select count(*) as cnt 
+				from product_code 
+				where
+				goods_no	= :goods_no
+				and brand	= :brand
+				and year	= :year
+				and season	= :season
+				and item	= :item
+				and opt		= :opt
+			";
+			$cnt	= DB::selectOne($sql_sub,['goods_no' => $goods_no, 'brand' => $brand, 'year' => $year, 'season' => $season, 'item' => $item, 'opt' => $opt])->cnt;
+
+			if( $cnt > 0 ){
+				$row->match_yn	= "Y";
+			}else{
+				$row->match_yn	= "";
+			}
+
+			if( $row->match_yn == "Y" ){
+					$sql_sub	= " 
+						select seq
+						from product_code 
+						where 
+							goods_no	= :goods_no
+							and brand	= :brand
+							and year	= :year
+							and season	= :season
+							and item	= :item
+							and opt		= :opt
+					";
+					$result_sub	= DB::select($sql_sub,['goods_no' => $goods_no, 'brand' => $brand, 'year' => $year, 'season' => $season, 'item' => $item, 'opt' => $opt]);
+					$seq = $result_sub[0]->seq;
+			}else{
+				$sql_sub	= " 
+					select ifnull(max(seq),'00') as seq
+					from product_code 
+					where 
+						brand	= :brand
+						and year	= :year
+						and season	= :season
+						and item	= :item
+						and opt		= :opt
+				";
+				$result_sub	= DB::select($sql_sub,['brand' => $brand, 'year' => $year, 'season' => $season, 'item' => $item, 'opt' => $opt]);
+				$seq = $result_sub[0]->seq + 1;
+			}
+
+			if(strlen($seq) == "1")	$seq = "0" . $seq;
+
+			$prd_cd1		= $brand . $year . $season . $gender . $item . $seq . $opt;
+
+			$row->prd_cd1	= $prd_cd1;
+
+		}
+
+		return response()->json([
+			"code"	=> 200,
+			"head"	=> array(
+				"total"		=> count($result),
+			),
+			"body" => $result
+		]);
 
 	}
 
