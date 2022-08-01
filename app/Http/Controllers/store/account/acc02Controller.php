@@ -261,11 +261,11 @@ class acc02Controller extends Controller
 		$sql	= "
 			select
 				acc_type.code_val as `type`, w.state_date,o.ord_no, o.ord_opt_no,
-				if((select count(*) from order_opt where ord_no = o.ord_no) > 1, 'y','') as multi_order,
+				if((select count(*) from order_opt where ord_no = o.ord_no) > 1, 'Y','') as multi_order,
 				if(o.coupon_no <>0,(select coupon_nm from coupon where coupon_no = o.coupon_no),'') as coupon_nm,
 				o.goods_nm, replace(o.goods_opt,'^',':') as opt_nm, g.style_no,
 				opt_type.code_val as opt_type, s.store_nm, m.user_nm, pay_type.code_val as pay_type,
-				'y' as tax_yn,
+				'Y' as tax_yn,
 				w.qty as qty, w.sale_amt, w.clm_amt,w.dc_apply_amt,
 				w.coupon_com_amt,
 				w.dlv_amt,  w.etc_amt as fee_etc_amt,
@@ -434,13 +434,13 @@ class acc02Controller extends Controller
 	{
 		$sdate	= $request->input('sdate');
 		$edate	= $request->input('edate');
-		$com_id	= $request->input('com_id');
+		$store_cd	= $request->input('store_cd');
 
 		$sdate	= str_replace("-", "", $sdate);
 		$edate	= str_replace("-", "", $edate);
 
-		$id		= Auth('head')->user()->id;
-		$name	= Auth('head')->user()->name;
+		$id		= auth('head')->user()->id;
+		$name	= auth('head')->user()->name;
         $code	= "000";
         $msg	= "";
 
@@ -452,15 +452,15 @@ class acc02Controller extends Controller
 			200 : 자료등록시 오류
 		*/
 
-		if(strlen($sdate) != 8 && strlen($edate) != 8 && $com_id != ""){
+		if(strlen($sdate) != 8 && strlen($edate) != 8 && $store_cd != ""){
 			return response()->json(["code"	=> "100", "msg"	=> "부정확한 요청입니다."]);
 		}
 
 		$sql = "
-			select count(*) as cnt from account_closed
-			where com_id = :com_id and sday = :sday and eday = :eday limit 0,1
+			select count(*) as cnt from store_account_closed
+			where store_cd = :store_cd and sday = :sday and eday = :eday limit 0,1
 		";
-		$row	= DB::selectOne($sql, ['com_id' => $com_id, 'sday' => $sdate, 'eday' => $edate]);
+		$row	= db::selectone($sql, ['store_cd' => $store_cd, 'sday' => $sdate, 'eday' => $edate]);
 		$cnt	= $row->cnt;
 
 		if( $cnt > 0 ){
@@ -469,19 +469,19 @@ class acc02Controller extends Controller
 
 		try {
 
-			// Start transaction
-			DB::beginTransaction();
+			// start transaction
+			db::begintransaction();
 
 			$sql	= "
-				delete from account_closed_list
-				where com_id = :com_id and sday = :sday and eday = :eday
+				delete from store_account_closed_list
+				where store_cd = :store_cd and sday = :sday and eday = :eday
 			";
-			DB::delete($sql, ['com_id' => $com_id, 'sday' => $sdate, 'eday' => $edate]);
+			db::delete($sql, ['store_cd' => $store_cd, 'sday' => $sdate, 'eday' => $edate]);
 
 			$sql	= "
-				INSERT INTO account_closed_list
+				insert into store_account_closed_list
 				(
-					acc_idx, com_id, sday, eday,
+					acc_idx, store_cd, sday, eday,
 					type, ord_opt_no, state_date,
 
 					qty, sale_amt, clm_amt, sale_fee,
@@ -491,11 +491,11 @@ class acc02Controller extends Controller
 
 					fee_ratio, fee, fee_dc_amt, allot_amt, etc_amt, fee_net, acc_amt, bigo
 				)
-				SELECT
-					0 as acc_idx, '$com_id' as com_id, '$sdate' as sday, '$edate' as eday,
+				select
+					0 as acc_idx, '$store_cd' as store_cd, '$sdate' as sday, '$edate' as eday,
 					w.type, w.ord_opt_no, w.state_date,
 
-					w.qty AS qty, w.sale_amt, w.clm_amt, w.fee as sale_fee,
+					w.qty as qty, w.sale_amt, w.clm_amt, w.fee as sale_fee,
 					0 as sale_clm_amt, w.dc_apply_amt, w.coupon_apply_amt, w.dlv_amt,
 
 					( w.sale_net_amt + w.dlv_amt + w.etc_amt ) as sale_net_taxation_amt,
@@ -504,162 +504,159 @@ class acc02Controller extends Controller
 					floor(( w.sale_net_amt + w.dlv_amt ) / 11) as tax_amt,
 
 					/* 본사 수수료 */
-					ROUND(w.fee_ratio, 2) AS fee_ratio,
+					round(w.fee_ratio, 2) as fee_ratio,
 					w.fee,
 					w.dc_apply_amt as fee_dc_amt,
 					/*( w.coupon_apply_amt - w.allot_amt ) as fee_allot_amt, */
-					( w.allot_amt ) AS fee_allot_amt,
+					( w.allot_amt ) as fee_allot_amt,
 					w.etc_amt as fee_etc_amt,
 					( w.fee - w.dc_apply_amt ) as fee_net_amt,
 
 					/* 정산 금액 */
 					(( w.sale_net_amt + w.dlv_amt + w.etc_amt ) - ( w.fee - w.dc_apply_amt ) ) as acc_amt,
 
-					'' AS bigo
-				FROM
+					'' as bigo
+				from
 				(
-					SELECT
+					select
 						ord_opt_no
-						, ROUND(SUM(type)) AS type
-						, MAX(state_date) AS state_date
-						, SUM(qty) AS qty, SUM(sale_qty) AS sale_qty
-						, SUM(sale_amt) AS sale_amt, SUM(clm_amt) AS clm_amt
-						, SUM(coupon_apply_amt) AS coupon_apply_amt
-						, SUM(/*dc_apply_amt*/ 0) AS dc_apply_amt
-						, SUM(sale_amt + clm_amt - dc_apply_amt - ( coupon_apply_amt - allot_amt) ) AS sale_net_amt
-						, SUM(dlv_amt) AS dlv_amt
-						, SUM(wonga) AS wonga, SUM(fee_ratio) AS fee_ratio, SUM(fee) AS fee
-						, SUM(etc_amt) AS etc_amt
-						, SUM(allot_amt) AS allot_amt
-						, SUM(com_coupon_apply_amt) as com_coupon_apply_amt
-					FROM
+						, round(sum(type)) as type
+						, max(state_date) as state_date
+						, sum(qty) as qty, sum(sale_qty) as sale_qty
+						, sum(sale_amt) as sale_amt, sum(clm_amt) as clm_amt
+						, sum(coupon_apply_amt) as coupon_apply_amt
+						, sum(/*dc_apply_amt*/ 0) as dc_apply_amt
+						, sum(sale_amt + clm_amt - dc_apply_amt - ( coupon_apply_amt - allot_amt) ) as sale_net_amt
+						, sum(dlv_amt) as dlv_amt
+						, sum(wonga) as wonga, sum(fee_ratio) as fee_ratio, sum(fee) as fee
+						, sum(etc_amt) as etc_amt
+						, sum(allot_amt) as allot_amt
+						, sum(com_coupon_apply_amt) as com_coupon_apply_amt
+					from
 					(
-						SELECT
-							e.ord_opt_no,0 AS type, MAX(e.etc_day) AS state_date,0 AS qty, 0 AS sale_qty,
-							0 AS sale_amt, 0 AS clm_amt, 0 AS coupon_apply_amt, 0 AS dc_apply_amt,
-							0 AS dlv_amt, 0 AS wonga, 0 AS fee_ratio, 0 AS fee, 0 AS allot_amt, SUM(e.etc_amt) AS etc_amt,
+						select
+							e.ord_opt_no,0 as type, max(e.etc_day) as state_date,0 as qty, 0 as sale_qty,
+							0 as sale_amt, 0 as clm_amt, 0 as coupon_apply_amt, 0 as dc_apply_amt,
+							0 as dlv_amt, 0 as wonga, 0 as fee_ratio, 0 as fee, 0 as allot_amt, sum(e.etc_amt) as etc_amt,
 							0 as com_coupon_apply_amt
-						FROM
-							account_etc e INNER JOIN order_opt o ON e.ord_opt_no = o.ord_opt_no
-						WHERE
-							e.etc_day >= '$sdate' AND e.etc_day <= '$edate' AND o.com_id = '$com_id'
-						GROUP BY
+						from
+							store_account_etc e inner join order_opt o on e.ord_opt_no = o.ord_opt_no
+						where
+							e.etc_day >= '$sdate' and e.etc_day <= '$edate' and o.store_cd = '$store_cd'
+						group by
 							e.ord_opt_no
 
-						UNION ALL
+						union all
 
-						SELECT
+						select
 							ord_opt_no, type, state_date, qty, sale_qty,
 							sale_amt, clm_amt, coupon_apply_amt, dc_apply_amt,
-							( a.dlv_amt + dlv_ref_amt ) AS dlv_amt, wonga, fee_ratio,
-							IF(c.margin_type = 'WONGA',
-							IF(qty = 0, 0, (sale_amt + clm_amt - wonga)),
-							round(( sale_amt + clm_amt ) * fee_ratio / 100)) AS fee,
-							( coupon_apply_amt - coupon_allot_amt ) AS allot_amt,
+							( a.dlv_amt + dlv_ref_amt ) as dlv_amt, wonga, fee_ratio,
+							round(( sale_amt + clm_amt ) * fee_ratio / 100) as fee,
+							( coupon_apply_amt - coupon_allot_amt ) as allot_amt,
 
 							/* 클레임 발생으로 쿠폰적용 금액이 (-) 인 경우 0 으로..
-							IF (
+							if (
 								coupon_apply_amt <= 0,
 								0,
 								( coupon_apply_amt - com_coupon_apply_amt )
-							) AS allot_amt, */
+							) as allot_amt, */
 
 							0 as etc_amt,
 							com_coupon_apply_amt
-						FROM
+						from
 						(
-							SELECT
-								ord_opt_no,com_id
-								, SUM(distinct(if(ord_state = 30,30,ord_state))) as type
-								, MAX(ord_state_date) AS state_date
-								, SUM(qty) AS qty
-								, SUM(IF(ord_state = 30, qty,0)) AS sale_qty
-								, SUM(IF(ord_state = 30, price*qty, 0)) AS sale_amt
-								, SUM(IF(ord_state IN (60, 61), price*qty, 0)) AS clm_amt
-								, SUM(IF(ord_state = 30, coupon_apply_amt, -1 * coupon_apply_amt)) AS coupon_apply_amt
-								, SUM(IF(ord_state = 30, coupon_allot_amt, -1 * coupon_allot_amt)) AS coupon_allot_amt
-								, SUM(IF(ord_state = 30, /*dc_apply_amt*/ 0, -1 * /*dc_apply_amt*/ 0)) AS dc_apply_amt
-								, SUM(IF(ord_state = 30, dlv_amt, -1 * dlv_amt)) AS dlv_amt
-								, SUM(dlv_ref_amt) AS dlv_ref_amt
-
-								, ROUND(wonga * qty) AS wonga
-								, ROUND(100 * (1 - MAX(wonga) / MAX(price)), 2) AS fee_ratio
-								, SUM(com_coupon_apply_amt) AS com_coupon_apply_amt
-							FROM
+							select
+								ord_opt_no, store_cd
+								, sum(distinct(if(ord_state = 30,30,ord_state))) as type
+								, max(ord_state_date) as state_date
+								, sum(qty) as qty
+								, sum(if(ord_state = 30, qty,0)) as sale_qty
+								, sum(if(ord_state = 30, price*qty, 0)) as sale_amt
+								, sum(if(ord_state in (60, 61), price*qty, 0)) as clm_amt
+								, sum(if(ord_state = 30, coupon_apply_amt, -1 * coupon_apply_amt)) as coupon_apply_amt
+								, sum(if(ord_state = 30, coupon_allot_amt, -1 * coupon_allot_amt)) as coupon_allot_amt
+								, sum(if(ord_state = 30, /*dc_apply_amt*/ 0, -1 * /*dc_apply_amt*/ 0)) as dc_apply_amt
+								, sum(if(ord_state = 30, dlv_amt, -1 * dlv_amt)) as dlv_amt
+								, sum(dlv_ref_amt) as dlv_ref_amt
+								, round(wonga * qty) as wonga
+								, round(100 * (1 - max(wonga) / max(price)), 2) as fee_ratio
+								, sum(com_coupon_apply_amt) as com_coupon_apply_amt
+							from
 							(
-								SELECT
-									w.ord_opt_no, w.com_id, o.ord_no, w.ord_state_date, w.ord_state,
-									IF(w.ord_state = 30, w.qty, w.qty * -1) AS qty,
-									ABS(w.price) AS price, ABS(w.wonga) AS wonga, w.coupon_apply_amt,IFNULL( /*w.dc_apply_amt*/ 0,0) as dc_apply_amt,
-									ROUND(IF(IFNULL(w.com_coupon_ratio, 0) > 1,IFNULL(w.com_coupon_ratio, 0) / 100,IFNULL(w.com_coupon_ratio, 0))
-										* IFNULL(w.coupon_apply_amt, 0)) AS coupon_allot_amt,
-									IFNULL(w.dlv_amt, 0) AS dlv_amt,
-									IFNULL(w.dlv_ret_amt, 0) + IFNULL(w.dlv_add_amt, 0) - IFNULL(w.dlv_enc_amt, 0) AS dlv_ref_amt,
+								select
+									w.ord_opt_no, w.store_cd, o.ord_no, w.ord_state_date, w.ord_state,
+									if(w.ord_state = 30, w.qty, w.qty * -1) as qty,
+									abs(w.price) as price, abs(w.wonga) as wonga, w.coupon_apply_amt,ifnull( /*w.dc_apply_amt*/ 0,0) as dc_apply_amt,
+									round(if(ifnull(w.com_coupon_ratio, 0) > 1,ifnull(w.com_coupon_ratio, 0) / 100,ifnull(w.com_coupon_ratio, 0))
+										* ifnull(w.coupon_apply_amt, 0)) as coupon_allot_amt,
+									ifnull(w.dlv_amt, 0) as dlv_amt,
+									ifnull(w.dlv_ret_amt, 0) + ifnull(w.dlv_add_amt, 0) - ifnull(w.dlv_enc_amt, 0) as dlv_ref_amt,
 									/* 업체 쿠폰 부담 금액 ( 2010.10.07 추가 ) */
-									ROUND(
-										IF( IFNULL(w.com_coupon_ratio, 0) > 1, IFNULL(w.com_coupon_ratio, 0) / 100, IFNULL(w.com_coupon_ratio, 0) ) * w.coupon_apply_amt
-									) AS com_coupon_apply_amt
-								FROM
-									order_opt o INNER JOIN order_opt_wonga w ON o.ord_opt_no = w.ord_opt_no
-								WHERE
+									round(
+										if( ifnull(w.com_coupon_ratio, 0) > 1, ifnull(w.com_coupon_ratio, 0) / 100, ifnull(w.com_coupon_ratio, 0) ) * w.coupon_apply_amt
+									) as com_coupon_apply_amt
+								from
+									order_opt o inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
+								where
 									w.ord_state_date >= '$sdate'
-									AND w.ord_state_date <= '$edate'
-									AND w.ord_state IN (30,60,61)
-									AND w.com_id = '$com_id'
-									AND o.ord_state >= 30 /* 결제 오류 발생시 order_opt_wonga 가 자료가 입력 되는 경우 처리 */
+									and w.ord_state_date <= '$edate'
+									and w.ord_state in (30,60,61)
+									and w.store_cd = '$store_cd'
+									and o.ord_state >= 30 /* 결제 오류 발생시 order_opt_wonga 가 자료가 입력 되는 경우 처리 */
 							)
-							a GROUP BY ord_opt_no,com_id
+							a group by ord_opt_no, store_cd
 						)
-						a INNER JOIN company c ON a.com_id = c.com_id
+						a inner join store s on a.store_cd = s.store_cd
 					)
-					a GROUP BY ord_opt_no
+					a group by ord_opt_no
 				)
-					w INNER JOIN order_opt o ON o.ord_opt_no = w.ord_opt_no
-					INNER JOIN goods g ON o.goods_no = g.goods_no AND o.goods_sub = g.goods_sub
+					w inner join order_opt o on o.ord_opt_no = w.ord_opt_no
+					inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
 			";
-			DB::insert($sql);
+			db::insert($sql);
 
 			$sql	= "
-				INSERT into account_closed
+				insert into store_account_closed
 				(
-					com_id,sday,eday,
+					store_cd,sday,eday,
 					sale_amt, clm_amt, sale_fee, dc_amt, coupon_amt, dlv_amt,
 					sale_net_taxation_amt, sale_net_taxfree_amt, sale_net_amt, tax_amt,
 					fee, fee_dc_amt, allot_amt, etc_amt, fee_net, acc_amt ,
 					closed_yn, admin_id, admin_nm, reg_date, upd_date
 				)
-				SELECT
-					com_id,sday,eday,
+				select
+					store_cd,sday,eday,
 					sum(sale_amt) as sale_amt, sum(clm_amt), sum(sale_fee), sum(dc_amt), sum(coupon_amt),sum(dlv_amt),
 					sum(sale_net_taxation_amt), sum(sale_net_taxfree_amt), sum(sale_net_amt),sum(tax_amt),
 					sum(fee), sum(fee_dc_amt), sum(allot_amt), sum(etc_amt), sum(fee_net), sum(acc_amt),
-					'N', :id, :name, now() as reg_date, now() as upd_date
-				FROM
-					account_closed_list
-				WHERE
-					com_id = :com_id and sday = :sday and eday = :eday
-				GROUP BY
-					com_id,sday,eday
+					'n', :id, :name, now() as reg_date, now() as upd_date
+				from
+					store_account_closed_list
+				where
+					store_cd = :store_cd and sday = :sday and eday = :eday
+				group by
+					store_cd,sday,eday
 			";
-			DB::insert($sql, ['id' => $id, 'name' => $name, 'com_id' => $com_id, 'sday' => $sdate, 'eday' => $edate]);
+			db::insert($sql, ['id' => $id, 'name' => $name, 'store_cd' => $store_cd, 'sday' => $sdate, 'eday' => $edate]);
 
-			$acc_idx = DB::table('account_closed')->latest('idx')->first()->idx;
+			$acc_idx = db::table('account_closed')->latest('idx')->first()->idx;
 
 			$sql	= "
-				UPDATE account_closed_list set
+				update store_account_closed_list set
 					acc_idx = :acc_idx
-				WHERE
-					com_id = :com_id and sday = :sday and eday = :eday
+				where
+					store_cd = :store_cd and sday = :sday and eday = :eday
 			";
-			DB::update($sql, ['acc_idx' => $acc_idx, 'com_id' => $com_id, 'sday' => $sdate, 'eday' => $edate]);
+			db::update($sql, ['acc_idx' => $acc_idx, 'store_cd' => $store_cd, 'sday' => $sdate, 'eday' => $edate]);
 
-			DB::commit();
+			db::commit();
 
-		} catch(Exception $e) {
+		} catch(exception $e) {
 
-			DB::rollBack();
+			db::rollback();
 			$code	= "999";
-			$msg	= $e->getMessage();
+			$msg	= $e->getmessage();
 
 		}
 
