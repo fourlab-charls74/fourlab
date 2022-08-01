@@ -98,7 +98,7 @@ class std07Controller extends Controller
 				sf.use_yn
 			from code cd
 				left outer join store_fee sf 
-					on cd.code_id = sf.pr_code and sf.store_cd = :store_cd
+					on cd.code_id = sf.pr_code and sf.store_cd = :store_cd and sf.idx in (select max(idx) from store_fee group by pr_code)
 			where cd.code_kind_cd = 'PR_CODE' and cd.use_yn = 'Y'
 			order by cd.code_seq
 		";
@@ -107,55 +107,135 @@ class std07Controller extends Controller
 		return $rows;
 	}
 
+	public function show($store_cd, $pr_code_cd)
+	{
+		$sql = "select store_cd, store_nm from store where store_cd = :store_cd";
+		$store = DB::selectOne($sql, ["store_cd" => $store_cd]);
+
+		$sql = "select code_id as pr_code_cd, code_val as pr_code_nm from code where code_kind_cd = 'PR_CODE' and code_id = :pr_code_cd";
+		$pr_code = DB::selectOne($sql, ["pr_code_cd" => $pr_code_cd]);
+
+		$values = [
+			"store" => $store,
+			"pr_code" => $pr_code,
+		];
+
+		return view(Config::get('shop.store.view') . '/standard/std07_show', $values);
+	}
+
+	public function search_store_fee_history(Request $request)
+	{
+		$store_cd = $request->input("store_cd");
+		$pr_code_cd = $request->input("pr_code_cd");
+
+		$sql = "
+			select 
+				sf.idx, 
+				cd.code_id as pr_code_cd, 
+				cd.code_val as pr_code_nm, 
+				sf.store_cd, 
+				sf.store_fee, 
+				sf.manager_fee, 
+				sf.sdate, 
+				sf.edate, 
+				sf.comment, 
+				if(sf.idx in (select max(idx) from store_fee group by pr_code), 'Y', 'N') as use_yn
+			from code cd
+				inner join store_fee sf 
+					on cd.code_id = sf.pr_code and sf.store_cd = :store_cd
+			where cd.code_kind_cd = 'PR_CODE' and cd.use_yn = 'Y' and cd.code_id = :pr_code_cd
+			order by sf.idx desc
+		";
+
+		$rows = DB::select($sql, ["store_cd" => $store_cd, "pr_code_cd" => $pr_code_cd]);
+
+		return response()->json([
+			"code" => 200,
+			"head" => [
+				"total" => count($rows),
+				"page" => 1,
+				"page_cnt" => 1,
+				"page_total" => 1
+			],
+			"body" => $rows
+		]);
+	}
+
+	// 마진정보 추가 & 수정
 	public function update_store_fee(Request $request)
 	{
-		$code = 200;
-		$msg = "";
-
 		$admin_id = Auth('head')->user()->id;
-		$store_cd = $request->input("store_cd");
-		$data = $request->input("data");
-		dd($store_cd, $data);
-		try {
-			// DB::beginTransaction();
-			// foreach($data as $i => $d) {
-			// 	$ori = DB::table('store_fee')
-			// 		->where("store_cd", "=", $store_cd)
-			// 		->where("competitor_cd", "=", $d['competitor_cd'])
-			// 		->get();
-			// 	$is_exist = count($ori) > 0;
+		$data = $request->all();
 
-			// 	if(!$is_exist) {
-			// 		// 등록
-			// 		DB::table('competitor')->insert([
-			// 			'store_cd' => $store_cd,
-			// 			'competitor_cd' => $d['competitor_cd'],
-			// 			'item' => $d['item'] ?? null,
-			// 			'manager' => $d['manager'] ?? null,
-			// 			'sdate' => $d['sdate'] ?? null,
-			// 			'edate' => $d['edate'] ?? null,
-			// 			'use_yn' => $d['use_yn'] ?? 'N',
-			// 			'reg_date' => now(),
-			// 			'admin_id' => $admin_id,
-			// 		]);
-			// 	} else {
-			// 		// 수정
-			// 		DB::table('competitor')
-			// 			->where("store_cd", "=", $store_cd)
-			// 			->where("competitor_cd", "=", $d['competitor_cd'])
-			// 			->update([
-			// 				'item' => $d['item'] ?? null,
-			// 				'manager' => $d['manager'] ?? null,
-			// 				'sdate' => $d['sdate'] ?? null,
-			// 				'edate' => $d['edate'] ?? null,
-			// 				'use_yn' => $d['use_yn'] ?? 'N',
-			// 				'mod_date' => now(),
-			// 				'admin_id' => $admin_id,
-			// 			]);
-			// 	}
-			// }
-			// $msg = "정상적으로 저장되었습니다.";
-			// DB::commit();
+		$new_data = '';
+
+		try {
+			DB::beginTransaction();
+
+			foreach($data as $i => $d) {
+				if($d['use_yn'] == 'A') {
+					$new_data = $d;
+
+					// 등록
+					DB::table('store_fee')->insert([
+						'store_cd' => $d['store_cd'],
+						'pr_code' => $d['pr_code_cd'],
+						'store_fee' => $d['store_fee'] ?? 0,
+						'manager_fee' => $d['manager_fee'] ?? 0,
+						'sdate' => $d['sdate'] ?? null,
+						'edate' => $d['edate'] ?? '9999-12-31',
+						'comment' => $d['comment'] ?? null,
+						'use_yn' => 'Y',
+						'reg_date' => now(),
+						'admin_id' => $admin_id,
+					]);
+				} else if($d['use_yn'] == 'Y') {
+					$edate = $d['edate'] ?? '9999-12-31';
+					if($new_data != '') {
+						$edate = date('Y-m-d', strtotime($new_data['sdate'] . '-1 day'));
+					}
+					// 수정
+					DB::table('store_fee')
+						->where('idx', '=', $d['idx'] ?? 0)
+						->update([
+							'store_fee' => $d['store_fee'] ?? 0,
+							'manager_fee' => $d['manager_fee'] ?? 0,
+							'sdate' => $d['sdate'] ?? null,
+							'edate' => $edate,
+							'comment' => $d['comment'] ?? null,
+							'mod_date' => now(),
+							'admin_id' => $admin_id,
+						]);
+				}
+			}
+
+			$code = 200;
+			$msg = "정상적으로 저장되었습니다.";
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg]);
+	}
+
+	// 마진정보 삭제
+	public function remove_store_fee($fee_idx)
+	{
+		$admin_id = Auth('head')->user()->id;
+
+		try {
+			DB::beginTransaction();
+
+			DB::table('store_fee')
+				->where('idx', '=', $fee_idx)
+				->delete();
+
+			$code = 200;
+			$msg = "정상적으로 삭제되었습니다.";
+			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
 			$code = 500;

@@ -179,12 +179,7 @@
         pApp2.ResizeGrid(275);
         pApp2.BindSearchEnter();
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
-        gx2 = new HDGrid(gridDiv2, fee_columns, {
-            // onCellValueChanged: (e) => {
-            //     e.node.data.use_yn = 'Y';
-            //     gx2.gridOptions.api.updateRowData({update: [e.node.data]});
-            // }
-        });
+        gx2 = new HDGrid(gridDiv2, fee_columns);
 
         // 최초검색
         Search();
@@ -226,66 +221,10 @@
         })
     }
 
-    // // 마진정보 사용여부 변경
-    // function changeUseYnVal(e, rowIndex) {
-    //     const node = gx2.getRowNode(rowIndex);
-    //     node.data.use_yn = e.target.checked ? 'Y' : 'N';
-    // }
-
-    // // 마진정보 입력정보 저장
-    // function updateStoreFee() {
-    //     if(!confirm(cur_store_nm + "의 마진정보를 저장하시겠습니까?")) return;
-
-    //     axios({
-    //         url: `/store/standard/std07/update-store-fee`,
-    //         method: 'put',
-    //         data: {
-    //             store_cd: cur_store_cd,
-    //             data: gx2.getRows()
-    //         },
-    //     }).then(function (res) {
-    //         if(res.data.code === 200) {
-    //             alert(res.data.msg);
-    //         } else {
-    //             console.log(res.data.msg);
-    //             alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-    //         }
-    //     }).catch(function (err) {
-    //         console.log(err);
-    //     });
-    // }
-
-    // // 매장별 마진정보 전체 초기화
-    // function resetStoreFee() {
-    //     if(!confirm(cur_store_nm + "의 마진정보를 초기화하시겠습니까?")) return;
-
-    //     const rows = gx2.getRows();
-    //     gx2.gridOptions.api.setRowData(
-    //         rows.map(
-    //             row => ({
-    //                 ...row,
-    //                 use_yn: 'N',
-    //                 sdate: null,
-    //                 edate: null,
-    //                 store_fee: null,
-    //                 manager_fee: null,
-    //                 comment: null,
-    //             })
-    //         )
-    //     );
-    // }
-
-    // // 마진정보 시작일/종료일 변경 시 사용여부 변경
-    // function changeUseYnValWhenChangeDate(fieldName, e, rowIndex) {
-    //     const node = gx2.getRowNode(rowIndex);
-    //     node.data[fieldName] = e.value;
-    //     node.setDataValue(fieldName, e.value);
-    // }
-
     // 마진정보 세부변경내역 팝업창 열기
     function showDetailPopup(store_cd, pr_code_cd) {
-        // const url = "/store/standard/std05/show/" + sale_type_cd;
-        // window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=900,height=900");
+        const url = "/store/standard/std07/show/" + store_cd + "/" + pr_code_cd;
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=900,height=535");
     }
 </script>
 @stop

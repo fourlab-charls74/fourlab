@@ -97,7 +97,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('std07', 'std07Controller@index');
         Route::get('std07/search', 'std07Controller@search');
         Route::get('std07/search-store-fee/{store_cd?}', 'std07Controller@search_store_fee');
+        Route::get('std07/show/{store_cd?}/{pr_code_cd?}', 'std07Controller@show');
+        Route::get('std07/search-store-fee-history', 'std07Controller@search_store_fee_history');
         Route::put('std07/update-store-fee', 'std07Controller@update_store_fee');
+        Route::delete('std07/remove-store-fee/{fee_idx?}', 'std07Controller@remove_store_fee');
 
         // 수선관리
         Route::get('std11', 'std11Controller@index');
