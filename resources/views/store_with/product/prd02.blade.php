@@ -50,7 +50,7 @@
                     <div>
                         <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                         <a href="#" onclick="AddProduct();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 상품코드 등록</a>
-                        <a href="#" onclick="AddProduct();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx fs-16"></i> 상품매칭</a>
+                        <a href="#" onclick="alert('준비중입니다.');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx fs-16"></i> 상품일괄매칭</a>
                         <a href="#" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
                         <a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
                         <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
@@ -288,8 +288,8 @@
             </div>
             <div class="resul_btn_wrap mb-3">
                 <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                <a href="#" onclick="Cmder('add')" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 상품코드 등록</a>
-                <a href="#" onclick="Cmder('add')" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx fs-16"></i> 상품매칭</a>
+                <a href="#" onclick="AddProduct();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 상품코드등록</a>
+                <a href="#" onclick="alert('준비중입니다.');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx fs-16"></i> 상품일괄매칭</a>
                 <a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
                 <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
             </div>
@@ -306,7 +306,7 @@
                             <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                         </div>
                         <div class="fr_box flex_box">
-                            <span style="font-weight:500;line-height:30px;margin-left:5px;vertical-align:middle;" class="mr-1">선택한 상품을 상품번호</span>
+                            <span style="font-weight:500;line-height:30px;margin-left:5px;vertical-align:middle;" class="mr-1">선택한 상품코드를 상품번호</span>
                             <div>
                                 <input type="text" id="goods_no" class="form-control form-control-sm" name="goods_no" value="">
                             </div>
@@ -358,14 +358,14 @@
 				}
 			},
 			{
-				field: "wqty", headerName: "매장재고", width:70, type: 'numberType', cellStyle: {"line-height": "30px"},
+				field: "sqty", headerName: "매장재고", width:70, type: 'numberType', cellStyle: {"line-height": "30px"},
 				cellRenderer: function(params) {
 					if (params.value !== undefined) {
 						return '<a href="#" onclick="return openHeadStock(' + params.data.goods_no + ',\'\');">' + params.value + '</a>';
 					}
 				}
 			},
-            {field: "normal_price", headerName: "정상가", type: 'currencyType', cellStyle: {"line-height": "30px"}},
+            {field: "goods_sh", headerName: "정상가", type: 'currencyType', cellStyle: {"line-height": "30px"}},
             {field: "price", headerName: "판매가", type: 'currencyType', width:60, cellStyle: {"line-height": "30px"}},
             {field: "wonga", headerName: "원가", type: 'currencyType', width:60, cellStyle: {"line-height": "30px"}},
             {field: "margin_rate", headerName: "마진율", type: 'percentType', width:60, cellStyle: {"line-height": "30px"}},

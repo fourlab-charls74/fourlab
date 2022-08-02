@@ -202,11 +202,14 @@ class prd02Controller extends Controller
 				, g.goods_nm_eng
 				, g.ad_desc
 				, stat.code_val as sale_stat_cl
-				, g.normal_price
+				-- , g.normal_price
+				,g.goods_sh
 				, g.price
-				 , ifnull(
-					(select sum(wqty) from goods_summary where goods_no = g.goods_no and goods_sub = g.goods_sub), 0
-				  ) as wqty
+				-- , ifnull(
+				--	(select sum(wqty) from goods_summary where goods_no = g.goods_no and goods_sub = g.goods_sub), 0
+				--  ) as wqty
+				, s.wqty
+				, (s.qty - s.wqty) as sqty
 				, g.wonga
 				, (100/(g.price/(g.price-g.wonga))) as margin_rate
 				, (g.price-g.wonga) as margin_amt
@@ -394,7 +397,7 @@ class prd02Controller extends Controller
 				$year		= $data['year'];
 				$season		= $data['season'];
 				$gender		= $data['gender'];
-				$item		= $data['data'];
+				$item		= $data['item'];
 				$opt		= $data['opt'];
 				$seq		= $data['seq'];
 				$color		= $data['color'];
