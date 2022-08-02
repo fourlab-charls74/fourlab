@@ -152,9 +152,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('cs01/search','cs01Controller@search');
         Route::get('cs01/show','cs01Controller@show');
         Route::post('cs01/comm', 'cs01Controller@command');
-
+        
         // 상품반품
         Route::get('cs02', 'cs02Controller@index');
+        Route::get('cs02/show','cs02Controller@show');
 
     });
 

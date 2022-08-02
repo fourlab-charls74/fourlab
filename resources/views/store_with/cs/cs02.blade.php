@@ -17,66 +17,62 @@
 				<h4>검색</h4>
 				<div class="flax_box">
 					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-                    <a href="/store/cs/cs03" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
+                    <a href="javascript:void(0);" onclick="add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
                     {{-- <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="initSearch()">검색조건 초기화</a> --}}
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
 			</div>
 
-			{{-- <div class="card-body">
-                <input type='hidden' name='goods_nos' value='' />
+            <div class="card-body">
+                <input type="hidden" name="goods_no" value="">
                 <div class="row">
-                    <div class="col-lg-4 inner-td">
+                    <div class="col-lg-4">
                         <div class="form-group">
-                            <label>구분</label>
-                            <div class="flex_box">
-                                <select name='rt_type' class="form-control form-control-sm">
-                                    <option value=''>전체</option>
-                                    <option value='G'>일반</option>
-                                    <option value='R'>요청</option>
+                            <label for="">반품일자</label>
+                            <div class="form-inline date-select-inbox">
+                                <div class="docs-datepicker form-inline-inner input_box">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off">
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+                                                <i class="fa fa-calendar" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="docs-datepicker-container"></div>
+                                </div>
+                                <span class="text_line">~</span>
+                                <div class="docs-datepicker form-inline-inner input_box">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+                                                <i class="fa fa-calendar" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="docs-datepicker-container"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label for="">반품창고</label>
+                            <div class="d-flex">
+                                <select name='storage_cd' class="form-control form-control-sm">
+                                    @foreach (@$storages as $storage)
+                                        <option value='{{ $storage->storage_cd }}'>{{ $storage->storage_nm }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label>보내는 매장</label>
-                            <div class="form-inline inline_btn_box">
-                                <input type='hidden' id="send_store_nm" name="send_store_nm">
-                                <select id="send_store_no" name="send_store_no" class="form-control form-control-sm select2-store"></select>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-send-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label>받는 매장</label>
-                            <div class="form-inline inline_btn_box">
-                                <input type='hidden' id="store_nm" name="store_nm">
-                                <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-				<div class="row">
-                    <div class="col-lg-4 inner-td">
-						<div class="form-group">
-                            <div class="form-group">
-                                <label>일자검색</label>
-                            </div>
-						</div>
-					</div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label>RT상태</label>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
+                    <div class="col-lg-4">
                         <div class="form-group">
                             <label for="prd_cd">상품코드</label>
                             <div class="flex_box">
-                                <input type='text' class="form-control form-control-sm search-enter" name='prd_cd' value='' />
+                                <input type='text' class="form-control form-control-sm search-enter" name='prd_cd' id="prd_cd" value='' />
                             </div>
                         </div>
                     </div>
@@ -212,7 +208,7 @@
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
-                                        <option value="req_rt">RT요청일</option>
+                                        <option value="return_date">반품일자</option>
                                         <option value="goods_no">상품번호</option>
                                         <option value="prd_cd">상품코드</option>
                                     </select>
@@ -229,106 +225,52 @@
                         </div>
                     </div>
                 </div>
-            </div> --}}
+            </div>
 		</div>
         
         <div class="resul_btn_wrap mb-3">
             <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-            <a href="/store/stock/stk21" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>RT요청</a>
+            <a href="javascript:void(0);" onclick="add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
             <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
         </div>
 
 	</div>
 </form>
 <!-- DataTales Example -->
-{{-- <div class="card shadow mb-0 last-card pt-2 pt-sm-0">
+<div class="card shadow mb-0 last-card pt-2 pt-sm-0">
 	<div class="card-body">
 		<div class="card-title">
 			<div class="filter_wrap">
 				<div class="d-flex justify-content-between">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
-                    <div class="d-flex">
-                        <div class="d-flex mr-2 mb-1 mb-lg-0">
-                            <span class="mr-1">출고예정일</span>
-                            <div class="docs-datepicker form-inline-inner input_box" style="width:130px;display:inline;">
-                                <div class="input-group">
-                                    <input type="text" class="form-control form-control-sm docs-date bg-white" name="exp_dlv_day" value="{{ $edate }}" autocomplete="off" readonly />
-                                    <div class="input-group-append">
-                                        <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                            <i class="fa fa-calendar" aria-hidden="true"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="docs-datepicker-container"></div>
-                            </div>
-                        </div>
-                        <a href="javascript:void(0);" onclick="receipt()" class="btn btn-sm btn-primary shadow-sm">접수</a>
-                        <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
-                        <a href="javascript:void(0);" onclick="release()" class="btn btn-sm btn-primary shadow-sm mr-1">처리</a>
-                        <a href="javascript:void(0);" onclick="receive()" class="btn btn-sm btn-primary shadow-sm mr-1">완료</a>
-                        <a href="javascript:void(0);" onclick="reject()" class="btn btn-sm btn-primary shadow-sm">거부</a>
-                        <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
-                        <a href="javascript:void(0);" onclick="remove()" class="btn btn-sm btn-outline-primary shadow-sm">삭제</a>
-                    </div>
 				</div>
 			</div>
 		</div>
 		<div class="table-responsive">
-			<div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
+			<div id="div-gd" class="ag-theme-balham"></div>
 		</div>
 	</div>
-</div> --}}
-<!-- script -->
-@include('store_with.stock.stk20_js')
-<!-- script -->
+</div>
+
 <script language="javascript">
 	let columns = [
         {field: "idx", hide: true},
-        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {"text-align": "center"}},
-        // {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, sort: null, width: 28,
-        //     checkboxSelection: function(params) {
-        //         return params.data.state < 40 && params.data.state > 0;
-        //     },
-        // },
-        // {field: "type", headerName: "구분", pinned: 'left', cellStyle: StyleRtType,
-        //     cellRenderer: function(params) {
-        //         return params.value === 'R' ? '요청' : params.value === 'G' ? '일반' : '';
-        //     }
-        // },
-        // {field: "state", headerName: "RT상태", pinned: 'left', cellStyle: StyleReleaseState,
-        //     cellRenderer: function(params) {
-        //         return rt_states[params.value];
-        //     }
-        // },
+        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
+        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, sort: null, width: 28},
+        {field: "req_rt", headerName: "반품일자", width: 120, cellStyle: {"text-align": "center"}},
         // {field: "dep_store_nm",	headerName: "보내는 매장", pinned: 'left', width: 200},
         // {field: "store_nm",	headerName: "받는 매장", pinned: 'left', width: 200},
-        // {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
-        // {field: "goods_no",	headerName: "상품번호", cellStyle: {"text-align": "center"}},
-        // {field: "style_no",	headerName: "스타일넘버", cellStyle: {"text-align": "center"}},
-        // {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 350},
-        // {field: "goods_opt", headerName: "옵션", width: 350},
-        // {field: "tag_price", headerName: "TAG가", type: "currencyType", hide: true}, // 작업예정 (테이블 미정상태 20220715)
-        // {field: "price", headerName: "판매가", type: "currencyType"},
-        // {field: "qty", headerName: "수량", type: "numberType",
-        //     cellStyle: {"font-weight": "700"},
-        // },
-        // {field: "req_rt", headerName: "요청일시", width: 120, cellStyle: {"text-align": "center"}},
-        // {field: "rec_rt", headerName: "접수일시", width: 120, cellStyle: {"text-align": "center"}},
-        // {field: "prc_rt", headerName: "처리일시", width: 120, cellStyle: {"text-align": "center"}},
-        // {field: "fin_rt", headerName: "완료일시", width: 120, cellStyle: {"text-align": "center"}},
-        // {field: "comment", headerName: "메모", width: 300, 
-        //     editable: function(params) {return params.data.state === 10;},
-        //     cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};}
-        // },
-        // {field: "del_rt", headerName: "RT 삭제", cellStyle: {"text-align": "center"},
-        //     cellRenderer: function(params) {
-        //         if(params.data.state === 10 || params.data.state === -10) {
-        //             return `<a href="javascript:void(0);" onclick="remove(${params.data.idx})" style="color:blue;">삭제</a>`;
-        //         } else{
-        //             return '-';
-        //         }
-        //     }
-        // },
+        {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
+        {field: "goods_no",	headerName: "상품번호", cellStyle: {"text-align": "center"}},
+        {field: "style_no",	headerName: "스타일넘버", cellStyle: {"text-align": "center"}},
+        {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 350},
+        {field: "goods_opt", headerName: "옵션", width: 350},
+        {field: "qty", headerName: "반품수량", type: "numberType",
+            cellStyle: {"font-weight": "700"},
+        },
+        {field: "price", headerName: "반품금액", type: "currencyType"},
+        {field: "price", headerName: "반품단가", type: "currencyType"},
+        {field: "comment", headerName: "메모", width: 300},
 	];
 </script>
 <script type="text/javascript" charset="utf-8">
@@ -339,17 +281,7 @@
         pApp.ResizeGrid(275);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns, {
-            // onCellValueChanged: (e) => {
-            //     e.node.setSelected(true);
-            //     if (e.column.colId == "qty") {
-            //         if (isNaN(e.newValue) == true || e.newValue == "") {
-            //             alert("숫자만 입력가능합니다.");
-            //             gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
-            //         }
-            //     }
-            // }
-        });
+        gx = new HDGrid(gridDiv, columns);
         Search();
     });
 
@@ -357,5 +289,11 @@
 		// let data = $('form[name="search"]').serialize();
 		// gx.Request('/store/stock/stk20/search', data, 1);
 	}
+
+    // 상품반품등록 팝업 오픈
+    const add = () => {
+        const url = '/store/cs/cs02/show';
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1735,height=800");
+    };
 </script>
 @stop

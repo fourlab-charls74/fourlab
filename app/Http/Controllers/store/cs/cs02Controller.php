@@ -17,14 +17,13 @@ class cs02Controller extends Controller
 {
     public function index()
 	{
+        $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')->orderByDesc('default_yn')->get();
+
 		$values = [
             'sdate'         => now()->sub(1, 'week')->format('Y-m-d'),
             'edate'         => date("Y-m-d"),
-            'rel_orders'     => SLib::getCodes("REL_ORDER"), // 출고차수
-            'rel_types'     => SLib::getCodes("REL_TYPE"), // 출고구분
-            'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
+            'storages'      => $storages,
             'style_no'		=> "", // 스타일넘버
-            // 'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'), // 상품구분(2)
             'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
             'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
             'items'			=> SLib::getItems(), // 품목
@@ -194,5 +193,17 @@ class cs02Controller extends Controller
 			],
 			"body" => $result
 		]);
+    }
+
+    // 상품반품 등록팝업 오픈
+    public function show() 
+    {
+        $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')->orderByDesc('default_yn')->get();
+
+        $values = [
+            'sdate'         => date("Y-m-d"),
+            'storages'      => $storages,
+        ];
+        return view(Config::get('shop.store.view') . '/cs/cs02_show', $values);
     }
 }
