@@ -25,7 +25,7 @@
                 <a href="javascript:;" class="arrow"><i class="bx bx-task fs-18"></i><span>생산입고관리</span></a>
                 <ul>
                     <li><a href="/store/cs/cs01">(완)상품입고</a></li>
-                    <li><a href="/partner/cs/cs01">상품반품</a></li>
+                    <li><a href="/store/cs/cs02">(개)상품반품</a></li>
                     <li><a href="/partner/cs/cs02">창고입고반품이동</a></li>
                     <li><a href="/partner/cs/cs01">원부자재입고</a></li>
                     <li><a href="/partner/cs/cs01">원부자재반품</a></li>
