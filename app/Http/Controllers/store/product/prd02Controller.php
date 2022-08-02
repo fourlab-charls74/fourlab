@@ -299,10 +299,12 @@ class prd02Controller extends Controller
 		$goods_sub	= 0;
 		$prd_cd1	= "";
 		$seq		= "01";
+		$prd_yn		= "N";
+		$chk_prd_cd	= "";
 
 		$sql	= "
 			select
-				a.goods_no, b.goods_nm, a.goods_opt, '' as prd_cd1, '' as color, '' as size, '' as match_yn
+				a.goods_no, b.style_no, b.goods_nm, a.goods_opt, '' as prd_cd1, '' as color, '' as size, '' as match_yn
 			from goods_summary a
 			inner join goods b on a.goods_no = b.goods_no and b.goods_sub = 0
 			where
@@ -311,62 +313,75 @@ class prd02Controller extends Controller
 
 		$result = DB::select($sql,['goods_no' => $goods_no, 'goods_sub' => $goods_sub]);
 
-		foreach($result as $row){
-
-			$sql_sub	= " 
-				select count(*) as cnt 
-				from product_code 
-				where
+		$sql_sub	= " 
+			select count(*) as cnt 
+			from product_code 
+			where
 				goods_no	= :goods_no
 				and brand	= :brand
 				and year	= :year
 				and season	= :season
 				and item	= :item
 				and opt		= :opt
+		";
+		$cnt	= DB::selectOne($sql_sub,['goods_no' => $goods_no, 'brand' => $brand, 'year' => $year, 'season' => $season, 'item' => $item, 'opt' => $opt])->cnt;
+
+		if( $cnt > 0 )	$prd_yn	= "Y";
+		else			$prd_yn	= "N";
+
+		if( $prd_yn == "Y" ){
+			$sql_sub	= " 
+				select seq
+				from product_code 
+				where 
+					goods_no	= :goods_no
+					and brand	= :brand
+					and year	= :year
+					and season	= :season
+					and item	= :item
+					and opt		= :opt
 			";
-			$cnt	= DB::selectOne($sql_sub,['goods_no' => $goods_no, 'brand' => $brand, 'year' => $year, 'season' => $season, 'item' => $item, 'opt' => $opt])->cnt;
+			$result_sub	= DB::select($sql_sub,['goods_no' => $goods_no, 'brand' => $brand, 'year' => $year, 'season' => $season, 'item' => $item, 'opt' => $opt]);
+			$seq = $result_sub[0]->seq;
+		}else{
+			$sql_sub	= " 
+				select ifnull(max(seq),'00') as seq
+				from product_code 
+				where 
+					brand	= :brand
+					and year	= :year
+					and season	= :season
+					and item	= :item
+					and opt		= :opt
+			";
+			$result_sub	= DB::select($sql_sub,['brand' => $brand, 'year' => $year, 'season' => $season, 'item' => $item, 'opt' => $opt]);
+			$seq = $result_sub[0]->seq + 1;
+		}
 
-			if( $cnt > 0 ){
-				$row->match_yn	= "Y";
-			}else{
-				$row->match_yn	= "";
+		if(strlen($seq) == "1")	$seq = "0" . $seq;
+
+		foreach($result as $row){
+
+			$goods_opt	= explode('^', $row->goods_opt);
+			$color		= strtolower(str_replace(" ", "", $goods_opt[0]));
+			$size		= isset($goods_opt[1]) ? $goods_opt[1] : "";
+
+			$sql		= " select code_id as color_cd from code where	code_kind_cd = 'PRD_CD_COLOR' and LOWER(replace(code_val,' ','')) = :color limit 1 ";
+			$color_cd	= DB::selectOne($sql, ["color" => $color])->color_cd;
+
+			if( $size != "" ){
+				$size		= strtolower(str_replace(" ", "", $goods_opt[1]));
+
+				$sql		= " select code_val as size_cd from code where	code_kind_cd = 'PRD_CD_SIZE_MATCH' and LOWER(replace(code_val2,' ','')) = :size limit 1 ";
+				$size_cd	= DB::selectOne($sql, ["size" => $size])->size_cd;
 			}
 
-			if( $row->match_yn == "Y" ){
-					$sql_sub	= " 
-						select seq
-						from product_code 
-						where 
-							goods_no	= :goods_no
-							and brand	= :brand
-							and year	= :year
-							and season	= :season
-							and item	= :item
-							and opt		= :opt
-					";
-					$result_sub	= DB::select($sql_sub,['goods_no' => $goods_no, 'brand' => $brand, 'year' => $year, 'season' => $season, 'item' => $item, 'opt' => $opt]);
-					$seq = $result_sub[0]->seq;
-			}else{
-				$sql_sub	= " 
-					select ifnull(max(seq),'00') as seq
-					from product_code 
-					where 
-						brand	= :brand
-						and year	= :year
-						and season	= :season
-						and item	= :item
-						and opt		= :opt
-				";
-				$result_sub	= DB::select($sql_sub,['brand' => $brand, 'year' => $year, 'season' => $season, 'item' => $item, 'opt' => $opt]);
-				$seq = $result_sub[0]->seq + 1;
-			}
-
-			if(strlen($seq) == "1")	$seq = "0" . $seq;
-
+			
 			$prd_cd1		= $brand . $year . $season . $gender . $item . $seq . $opt;
 
 			$row->prd_cd1	= $prd_cd1;
-
+			$row->color		= isset($color_cd) ? $color_cd : "";
+			$row->size		= isset($size_cd) ? $size_cd : "";
 		}
 
 		return response()->json([
