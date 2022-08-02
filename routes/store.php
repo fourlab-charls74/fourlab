@@ -79,20 +79,20 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('std04/search', 'std04Controller@search');
         Route::get('std04/search-competitor/{store_cd?}', 'std04Controller@search_competitor');
         Route::put('std04/update-competitor', 'std04Controller@update_competitor');
-        
+
         // 판매유형관리
         Route::get('std05', 'std05Controller@index');
         Route::get('std05/search', 'std05Controller@search');
         Route::get('std05/show/{sale_type_cd?}', 'std05Controller@show');
         Route::get('std05/search-store/{sale_type_cd?}', 'std05Controller@search_store');
-        
+
         Route::post('std05/add', 'std05Controller@add_sale_type');
         Route::put('std05/update', 'std05Controller@update_sale_type');
-        
+
         // 매장 영업담당자
         Route::get('std06', 'std06Controller@index');
         Route::get('std06/search', 'std06Controller@search');
-        
+
         // 매장마진관리
         Route::get('std07', 'std07Controller@index');
         Route::get('std07/search', 'std07Controller@search');
@@ -170,12 +170,12 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('stk10/release','stk10Controller@release'); // 출고
         Route::post('stk10/receive','stk10Controller@receive'); // 매장입고
         Route::post('stk10/reject','stk10Controller@reject'); // 거부
-        
+
         // 초도출고
         Route::get('stk12','stk12Controller@index');
         Route::get('stk12/search','stk12Controller@search');
         Route::post('stk12/request-release', 'stk12Controller@request_release');
-        
+
         // 판매분출고
         Route::get('stk13','stk13Controller@index');
         Route::get('stk13/search','stk13Controller@search');
@@ -185,12 +185,12 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk14','stk14Controller@index');
         Route::get('stk14/search','stk14Controller@search');
         Route::post('stk14/request-release', 'stk14Controller@request_release');
-        
+
         // 일반출고
         Route::get('stk15','stk15Controller@index');
         Route::get('stk15/search','stk15Controller@search');
         Route::post('stk15/request-release', 'stk15Controller@request_release');
-        
+
         // 매장RT
         Route::get('stk20','stk20Controller@index');
         Route::get('stk20/search','stk20Controller@search');
@@ -264,6 +264,12 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::put('acc03/show_update', 'acc03Controller@show_update');
         Route::delete('acc03/show_delete', 'acc03Controller@show_delete');
         Route::post('acc03/show_close', 'acc03Controller@show_close');
+
+        // 매장판매수수료
+        Route::get('acc04', 'acc04Controller@index');
+        Route::get('acc05', 'acc05Controller@index');
+        Route::get('acc06', 'acc06Controller@index');
+
 
     });
 
