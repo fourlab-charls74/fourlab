@@ -304,84 +304,69 @@ class prd02Controller extends Controller
 
 		$sql	= "
 			select
-				a.goods_no, b.style_no, b.goods_nm, a.goods_opt, '' as prd_cd1, '' as color, '' as size, '' as match_yn
+				a.goods_no, b.style_no, b.goods_nm, a.goods_opt, '' as prd_cd1, '' as color, '' as size, '' as match_yn,
+				'$brand' as brand, '$year' as year, '$season' as season, '$gender' as gender, '$item' as item, '$opt' as opt,
+				'' as seq
 			from goods_summary a
 			inner join goods b on a.goods_no = b.goods_no and b.goods_sub = 0
 			where
-				a.goods_no = :goods_no and a.goods_sub = :goods_sub
-		";
+				a.goods_no = :goods_no1 and a.goods_sub = :goods_sub
 
-		$result = DB::select($sql,['goods_no' => $goods_no, 'goods_sub' => $goods_sub]);
+			union all
 
-		$sql_sub	= " 
-			select count(*) as cnt 
-			from product_code 
+			select
+				a.goods_no, b.style_no, b.goods_nm, c.goods_opt, concat(a.brand, a.year, a.season, a.item, a.seq, a.opt) as prd_cd1, a.color, a.size, 'Y' as match_yn,
+				a.brand, a.year, a.season, a.gender, a.item, a.opt, a.seq
+			from product_code a
+			inner join goods b on a.goods_no = b.goods_no and b.goods_sub = 0
+			inner join product_stock c on a.prd_cd = c.prd_cd
 			where
-				goods_no	= :goods_no
-				and brand	= :brand
-				and year	= :year
-				and season	= :season
-				and item	= :item
-				and opt		= :opt
+				a.goods_no = :goods_no2
 		";
-		$cnt	= DB::selectOne($sql_sub,['goods_no' => $goods_no, 'brand' => $brand, 'year' => $year, 'season' => $season, 'item' => $item, 'opt' => $opt])->cnt;
 
-		if( $cnt > 0 )	$prd_yn	= "Y";
-		else			$prd_yn	= "N";
-
-		if( $prd_yn == "Y" ){
-			$sql_sub	= " 
-				select seq
-				from product_code 
-				where 
-					goods_no	= :goods_no
-					and brand	= :brand
-					and year	= :year
-					and season	= :season
-					and item	= :item
-					and opt		= :opt
-			";
-			$result_sub	= DB::select($sql_sub,['goods_no' => $goods_no, 'brand' => $brand, 'year' => $year, 'season' => $season, 'item' => $item, 'opt' => $opt]);
-			$seq = $result_sub[0]->seq;
-		}else{
-			$sql_sub	= " 
-				select ifnull(max(seq),'00') as seq
-				from product_code 
-				where 
-					brand	= :brand
-					and year	= :year
-					and season	= :season
-					and item	= :item
-					and opt		= :opt
-			";
-			$result_sub	= DB::select($sql_sub,['brand' => $brand, 'year' => $year, 'season' => $season, 'item' => $item, 'opt' => $opt]);
-			$seq = $result_sub[0]->seq + 1;
-		}
-
-		if(strlen($seq) == "1")	$seq = "0" . $seq;
+		$result = DB::select($sql,['goods_no1' => $goods_no, 'goods_sub' => $goods_sub, 'goods_no2' => $goods_no]);
 
 		foreach($result as $row){
 
-			$goods_opt	= explode('^', $row->goods_opt);
-			$color		= strtolower(str_replace(" ", "", $goods_opt[0]));
-			$size		= isset($goods_opt[1]) ? $goods_opt[1] : "";
+			if( $row->match_yn == "Y" ){
+			}else{
+				$sql_sub	= " 
+					select ifnull(max(seq),'00') as seq
+					from product_code 
+					where 
+						brand	= :brand
+						and year	= :year
+						and season	= :season
+						and item	= :item
+						and opt		= :opt
+				";
+				$result_sub	= DB::select($sql_sub,['brand' => $brand, 'year' => $year, 'season' => $season, 'item' => $item, 'opt' => $opt]);
+				$seq = $result_sub[0]->seq + 1;
+	
+				if(strlen($seq) == "1")	$seq = "0" . $seq;
+		
+				$row->seq	= $seq;
 
-			$sql		= " select code_id as color_cd from code where	code_kind_cd = 'PRD_CD_COLOR' and LOWER(replace(code_val,' ','')) = :color limit 1 ";
-			$color_cd	= DB::selectOne($sql, ["color" => $color])->color_cd;
+				$goods_opt	= explode('^', $row->goods_opt);
+				$color		= strtolower(str_replace(" ", "", $goods_opt[0]));
+				$size		= isset($goods_opt[1]) ? $goods_opt[1] : "";
 
-			if( $size != "" ){
-				$size		= strtolower(str_replace(" ", "", $goods_opt[1]));
+				$sql		= " select code_id as color_cd from code where	code_kind_cd = 'PRD_CD_COLOR' and LOWER(replace(code_val,' ','')) = :color limit 1 ";
+				$color_cd	= DB::selectOne($sql, ["color" => $color])->color_cd;
 
-				$sql		= " select code_val as size_cd from code where	code_kind_cd = 'PRD_CD_SIZE_MATCH' and LOWER(replace(code_val2,' ','')) = :size limit 1 ";
-				$size_cd	= DB::selectOne($sql, ["size" => $size])->size_cd;
+				if( $size != "" ){
+					$size		= strtolower(str_replace(" ", "", $goods_opt[1]));
+
+					$sql		= " select code_val as size_cd from code where	code_kind_cd = 'PRD_CD_SIZE_MATCH' and LOWER(replace(code_val2,' ','')) = :size limit 1 ";
+					$size_cd	= DB::selectOne($sql, ["size" => $size])->size_cd;
+				}
+				
+				$prd_cd1		= $brand . $year . $season . $gender . $item . $seq . $opt;
+
+				$row->prd_cd1	= $prd_cd1;
+				$row->color		= isset($color_cd) ? $color_cd : "";
+				$row->size		= isset($size_cd) ? $size_cd : "";
 			}
-
-			
-			$prd_cd1		= $brand . $year . $season . $gender . $item . $seq . $opt;
-
-			$row->prd_cd1	= $prd_cd1;
-			$row->color		= isset($color_cd) ? $color_cd : "";
-			$row->size		= isset($size_cd) ? $size_cd : "";
 		}
 
 		return response()->json([
@@ -392,6 +377,77 @@ class prd02Controller extends Controller
 			"body" => $result
 		]);
 
+	}
+
+	public function add_product_code(Request $request){
+		$admin_id	= Auth('head')->user()->id;
+        $datas		= $request->input("data", []);
+
+        try {
+            DB::beginTransaction();
+
+			foreach($datas as $data) {
+
+				$prd_cd1	= $data['prd_cd1'];
+				$goods_no	= $data['goods_no'];
+				$brand		= $data['brand'];
+				$year		= $data['year'];
+				$season		= $data['season'];
+				$gender		= $data['gender'];
+				$item		= $data['data'];
+				$opt		= $data['opt'];
+				$seq		= $data['seq'];
+				$color		= $data['color'];
+				$size		= $data['size'];
+				$goods_opt	= $data['goods_opt'];
+
+				$prd_cd		= $prd_cd1 . $color . $size;
+
+				DB::table('product_code')
+					->insert([
+						'prd_cd'	=> $prd_cd,
+						'goods_no'	=> $goods_no,
+						'brand'		=> $brand,
+						'year'		=> $year,
+						'season'	=> $season,
+						'gender'	=> $gender,
+						'item'		=> $item,
+						'opt'		=> $opt,
+						'seq'		=> $seq,
+						'color'		=> $color,
+						'size'		=> $size,
+						'rt'		=> now(),
+						'ut'		=> now(),
+						'admin_id'	=> $admin_id
+					]);
+
+				DB::table('product_stock')
+					->insert([
+						'goods_no'	=> $goods_no,
+						'prd_cd'	=> $prd_cd,
+						'in_qty'	=> 0,
+						'out_qty'	=> 0,
+						'qty'		=> 0,
+						'wqty'		=> 0,
+						'goods_opt'	=> $goods_opt,
+						'barcode'	=> $prd_cd,
+						'use_yn'	=> 'Y',
+						'rt'		=> now(),
+						'ut'		=> now()
+					]);
+            }
+
+			DB::commit();
+			$code = 200;
+			$msg = "상품코드 등록이 완료되었습니다.";
+
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+        return response()->json(["code" => $code, "msg" => $msg]);
 	}
 
 }

@@ -15,7 +15,7 @@
 			</div>
 		</div>
 		<div class="d-flex">
-			<a href="javascript:void(0)" onclick="Cmder('add')" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i>저장</a>
+			<a href="javascript:void(0)" onclick="addPrdCd();" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i>저장</a>
 			{{-- <!--<a href="javascript:void(0)" onclick="Cmder('delete')" class="btn btn-primary mr-1"><i class="fas fa-trash fa-sm text-white-50 mr-1"></i>삭제</a>//--> --}}
 			<a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i>닫기</a>
 		</div>
@@ -172,36 +172,30 @@
                 return params.data.match_yn == '';
             },
 		},
-		{field: "goods_no", headerName: "상품번호",
-			width:72
+		{field:"goods_no",	headerName: "상품번호",		width:72},
+		{field:"style_no",	headerName: "아이템코드",	width:72},
+		{field:"goods_nm",	headerName: "상품명",		width:250},
+		{field:"goods_opt",	headerName: "상품옵션",		width:200},
+		{field:"prd_cd1",	headerName: "상품코드",		width:120,
+			editable: function(params) {return params.data.match_yn !== 'Y';}, 
+			cellStyle: function(params) {return params.data.match_yn !== 'Y' ? {"background-color": "#ffFF99"} : {};}
 		},
-		{field: "style_no", headerName: "아이템코드",
-			width:72
+		{field:"color",		headerName: "컬러",			width:72,
+			editable: function(params) {return params.data.match_yn !== 'Y';}, 
+			cellStyle: function(params) {return params.data.match_yn !== 'Y' ? {"background-color": "#ffFF99"} : {};}
 		},
-		{field: "goods_nm", headerName: "상품명",
-			width:250
+		{field:"size",		headerName: "사이즈",		width:72,
+			editable: function(params) {return params.data.match_yn !== 'Y';}, 
+			cellStyle: function(params) {return params.data.match_yn !== 'Y' ? {"background-color": "#ffFF99"} : {};}
 		},
-		{field: "goods_opt", headerName: "상품옵션",
-			width:200
-		},
-		{field: "prd_cd1", headerName: "상품코드",
-			editable: true,
-			cellClass:['hd-grid-edit'],
-			width:120
-		},
-		{field: "color", headerName: "컬러",
-			editable: true,
-			cellClass:['hd-grid-edit'],
-			width:72
-		},
-		{field: "size", headerName: "사이즈",
-			editable: true,
-			cellClass:['hd-grid-edit'],
-			width:72
-		},
-		{field: "match_yn", headerName: "등록유무",
-			width:72
-		},
+		{field:"match_yn", headerName: "등록유무",		width:72},
+		{field:"brand",		headerName:"브랜드",		hide:true},
+		{field:"year",		headerName:"년도",			hide:true},
+		{field:"season",	headerName:"시즌",			hide:true},
+		{field:"gender",	headerName:"성별",			hide:true},
+		{field:"item",		headerName:"아이템",		hide:true},
+		{field:"opt",		headerName:"품목",			hide:true},
+		{field:"seq",		headerName:"순서차수",		hide:true},
 		{field: "", headerName:"", width:"auto"},
 	];
 </script>
@@ -280,6 +274,31 @@
 		}
 
 		return true;
+	}
+
+	function addPrdCd(){
+		let rows	= gx.getSelectedRows();
+		if(rows.length < 1) return alert("저장할 상품코드 정보를 선택해주세요.");
+
+		//console.log(rows);
+
+		axios({
+			url: '/store/product/prd02/add-product-code',
+			method: 'put',
+			data: {
+				data: rows, 
+			},
+		}).then(function (res) {
+			if(res.data.code === 200) {
+				alert(res.data.msg);
+				opener.Search();
+			} else {
+				console.log(res.data);
+				alert("상품코드 등록중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+			}
+		}).catch(function (err) {
+			console.log(err);
+		});
 	}
 </script>
 @stop
