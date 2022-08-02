@@ -172,8 +172,11 @@
                 return params.data.match_yn == '';
             },
 		},
-		{field: "goods_no", headerName: "상품번호",rowDrag: true,
-			width:84
+		{field: "goods_no", headerName: "상품번호",
+			width:72
+		},
+		{field: "style_no", headerName: "아이템코드",
+			width:72
 		},
 		{field: "goods_nm", headerName: "상품명",
 			width:250
@@ -189,12 +192,12 @@
 		{field: "color", headerName: "컬러",
 			editable: true,
 			cellClass:['hd-grid-edit'],
-			width:80
+			width:72
 		},
 		{field: "size", headerName: "사이즈",
 			editable: true,
 			cellClass:['hd-grid-edit'],
-			width:80
+			width:72
 		},
 		{field: "match_yn", headerName: "등록유무",
 			width:72
