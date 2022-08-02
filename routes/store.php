@@ -102,6 +102,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::put('std07/update-store-fee', 'std07Controller@update_store_fee');
         Route::delete('std07/remove-store-fee/{fee_idx?}', 'std07Controller@remove_store_fee');
 
+        // 매장등급관리
+        Route::get('std08', 'std08Controller@index');
+
+
         // 수선관리
         Route::get('std11', 'std11Controller@index');
         Route::get('std11/search', 'std11Controller@search');

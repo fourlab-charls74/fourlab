@@ -2,7 +2,7 @@
 @section('title','매장판매수수료')
 @section('content')
 <div class="page_tit">
-	<h3 class="d-inline-flex">매장판매수수료</h3>
+	<h3 class="d-inline-flex">매장판매처수수료</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
 		<span>매장관리</span>
@@ -158,6 +158,7 @@
         { field: "store_nm", headerName: "매장명", pinned:'left', type: 'StoreNameType', width: 250 },
         { field: "sale_status", headerName: "매출",
             children: [
+                { headerName: "소계", field: "wonga", type: 'numberType',width:100 },
                 { headerName: "정상", field: "wonga", type: 'numberType',width:100 },
                 { headerName: "행사", field: "wonga", type: 'numberType',width:100 },
                 { headerName: "용품", field: "wonga", type: 'numberType',width:100 },

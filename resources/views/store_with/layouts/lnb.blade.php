@@ -11,6 +11,7 @@
                     <li><a href="/store/standard/std05">(완)판매유형관리</a></li>
                     <li><a href="/store/standard/std06">(개)매장영업담당자관리</a></li>
                     <li><a href="/store/standard/std07">(개)매장마진관리</a></li>
+                    <li><a href="/store/standard/std08">(개)매장등급관리</a></li>
                 </ul>
             </li>
             <li>
@@ -54,8 +55,8 @@
                 <a href="javascript:;" class="arrow"><i class="bx bx-file fs-18"></i><span>정산/마감관리</span></a>
                 <ul>
                     <!-- <li><a href="/store/account/acc01">(개)정산내역</a></li> -->
-                    <li><a href="/store/account/acc04">매장판매수수료</a></li>
-                    <li><a href="/store/account/acc06">매장정산</a></li>
+                    <li><a href="/store/account/acc04">매장판매처수수료</a></li>
+                    <li><a href="/store/account/acc06">매장중간관리자정산</a></li>
                     <li><a href="/store/account/acc05">기타재반자료</a></li>
                     <li><a href="/store/account/acc02">(개)월정산</a></li>
                     <li><a href="/store/account/acc03">(개)월마감</a></li>

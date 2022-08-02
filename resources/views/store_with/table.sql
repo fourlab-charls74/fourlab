@@ -321,6 +321,33 @@ CREATE TABLE `store_fee` (
     PRIMARY KEY (`idx`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `store_grade` (
+                               `idx` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'identify',
+                               `grade` VARCHAR(2) NOT NULL COMMENT '등급',
+                               `name` VARCHAR(30) NOT NULL COMMENT '등급명',
+                               `sdate` VARCHAR(10) DEFAULT NULL COMMENT '시작일',
+                               `edate` VARCHAR(10) DEFAULT NULL COMMENT '종료일',
+                               `amt1` INT DEFAULT NULL COMMENT '금액1',
+                               `fee1` DECIMAL(5,2) DEFAULT NULL COMMENT '수수료1',
+                               `amt2` INT DEFAULT NULL COMMENT '금액1',
+                               `fee2` DECIMAL(5,2) DEFAULT NULL COMMENT '수수료1',
+                               `amt3` INT DEFAULT NULL COMMENT '금액1',
+                               `fee3` DECIMAL(5,2) DEFAULT NULL COMMENT '수수료1',
+                               `amt4` INT DEFAULT NULL COMMENT '금액1',
+                               `fee4` DECIMAL(5,2) DEFAULT NULL COMMENT '수수료1',
+
+                               `fee_10` DECIMAL(5,2) DEFAULT NULL COMMENT '(특가)수수료1',
+                               `fee_11` DECIMAL(5,2) DEFAULT NULL COMMENT '(용품)수수료1',
+                               `fee_12` DECIMAL(5,2) DEFAULT NULL COMMENT '(특판온라인)수수료1',
+
+                               `id` VARCHAR(30) DEFAULT NULL COMMENT '작성자',
+                               `use_yn` CHAR(1) DEFAULT 'Y' COMMENT '사용',
+                               `rt` DATETIME DEFAULT NULL COMMENT '등록일자',
+                               `ut` DATETIME DEFAULT NULL COMMENT '수정일자',
+                               PRIMARY KEY (`idx`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8
+
+
 -- 매장마감
 CREATE TABLE `store_account_closed` (
                                         `idx` INT(11) NOT NULL AUTO_INCREMENT COMMENT '정산번호',
@@ -627,7 +654,7 @@ insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_va
 -- code_kind 데이터 추가 상품코드 - 아이템 : PRD_CD_ITEM
 insert into `code_kind` (`code_kind_cd`, `code_kind_nm`, `code_kind_nm_eng`, `use_yn`, `type`, `seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PRD_CD_ITEM','[매장관리]상품코드 - 아이템','RPD_CD_ITEM','Y',NULL,'0','','본사_김용남',now(),now());
 
--- code 데이터 추가 상품코드 - 아이템 : PRD_CD_ITEM 
+-- code 데이터 추가 상품코드 - 아이템 : PRD_CD_ITEM
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PRD_CD_ITEM','AC','Acc','','','','Y','0','ceduce','본사_김용남',now(),now());
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PRD_CD_ITEM','BA','Bag','','','','Y','0','ceduce','본사_김용남',now(),now());
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PRD_CD_ITEM','BE','Belt','','','','Y','0','ceduce','본사_김용남',now(),now());
@@ -702,7 +729,7 @@ insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_va
 -- code_kind 데이터 추가 행사코드 : PR_CODE
 insert into `code_kind` (`code_kind_cd`, `code_kind_nm`, `code_kind_nm_eng`, `use_yn`, `type`, `seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PR_CODE','[매장관리]행사코드','pr_code','Y',NULL,'0','','본사_김용남',now(),now());
 
--- code_kind 데이터 추가 상품코드 - 아이템 : PRD_CD_COLOR 
+-- code_kind 데이터 추가 상품코드 - 아이템 : PRD_CD_COLOR
 insert into `code_kind` (`code_kind_cd`, `code_kind_nm`, `code_kind_nm_eng`, `use_yn`, `type`, `seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PRD_CD_COLOR','[매장관리]상품코드 - 컬러','RPD_CD_COLOR','Y',NULL,'0','','본사_김용남',now(),now());
 
 -- code 데이터 추가 상품코드 - 아이템 : PRD_CD_COLOR
