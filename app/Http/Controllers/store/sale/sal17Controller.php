@@ -158,32 +158,32 @@ class sal17Controller extends Controller
 				from store s 
 				left outer join
 				( 
-					select store_cd, sum(o.price*o.qty) as ord_amt, sum(o.recv_amt) as recv_amt,
+					select m.store_cd, sum(o.price*o.qty) as ord_amt, sum(o.recv_amt) as recv_amt,
 						${sum_month_prev}
 						${sum_month_others}
 					from order_mst m 
 						inner join order_opt o on m.ord_no = o.ord_no 
 					where m.ord_date >= '${prev_sdate}' and m.ord_date < '${next_edate}' and m.store_cd <> ''
-					group by store_cd
+					group by m.store_cd
 				) a on s.store_cd = a.store_cd 
 				left outer join 
 				(
 					select 
-						store_cd, sum(o.recv_amt) as last_recv_amt,
+						m.store_cd, sum(o.recv_amt) as last_recv_amt,
 						${sum_last_year}
 					from order_mst m 
 						inner join order_opt o on m.ord_no = o.ord_no 
 					where m.ord_date >= '${last_year_sdate}' and m.ord_date < '${last_year_next_edate}' and m.store_cd <> ''
-					group by store_cd
+					group by m.store_cd
 				) b on s.store_cd = b.store_cd 
 				left outer join 
 				(
 					select 
-						store_cd, sum(amt) as proj_amt,
+						ssp.store_cd, sum(amt) as proj_amt,
 						${sum_proj_amt}
-					from store_sales_projection 
+					from store_sales_projection ssp
 					where ym >= '${ym_s}' and ym <= '${ym_e}'
-					group by store_cd
+					group by ssp.store_cd
 				) p on s.`store_cd` = p.`store_cd` 
 				left outer join `code` c on c.code_kind_cd = 'store_type' and c.code_id = s.store_type
 			where 1=1 ${where}

@@ -137,14 +137,14 @@ class sal02Controller extends Controller
 			select s.store_nm,c.code_val as store_type_nm,a.*,ifnull(p.amt,0) as proj_amt
 			from store s left outer join (
 				select 
-					store_cd, sum(o.qty) as qty, sum(o.price*o.qty) as ord_amt, sum(o.recv_amt) as recv_amt,
+					m.store_cd, sum(o.qty) as qty, sum(o.price*o.qty) as ord_amt, sum(o.recv_amt) as recv_amt,
 					${sum}
 				from order_mst m 
 					inner join order_opt o on m.ord_no = o.ord_no 
 					inner join goods g on o.goods_no = g.goods_no
 					left outer join brand b on g.brand = b.brand
 				where m.ord_date >= :sdate and m.ord_date < :edate and m.store_cd <> '' $where
-				group by store_cd
+				group by m.store_cd
 			) a on s.store_cd = a.store_cd
                 left outer join store_sales_projection p on p.ym = :ym and s.`store_cd` = p.`store_cd`			
                 left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = s.store_type
