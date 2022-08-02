@@ -272,6 +272,26 @@ class sal01Controller extends Controller
 		}
 
 		/**
+		 * 행사구분 자료 변환 작업
+		 */
+		$pr_code = 'JS'; // 행사구분 기본 값: 정상
+		$pr_code_val = $order['pr_code_val'];
+
+		$sql = /** @lang text */
+		"
+			select * from `code` where code_kind_cd = 'pr_code'
+		";
+		$result = DB::select($sql);
+		for ($i=0; $i<count($result); $i++) {
+			$item = $result[$i];
+			$id = $item->code_id;
+			$value = $item->code_val;
+			if ($pr_code_val == $value) {
+				$pr_code = $id; break;
+			}
+		}
+
+		/**
 		 * goods_no 가져오기
 		 */
 		$sql = /** @lang text */
@@ -500,7 +520,8 @@ class sal01Controller extends Controller
 						"sale_place" 	=> @$order["sale_place"],
 						"out_ord_no" 	=> @$order["out_ord_no"],
 						"upd_date"      => DB::raw('now()'),
-						"dlv_end_date"  => DB::raw('now()')
+						"dlv_end_date"  => DB::raw('now()'),
+						"pr_code"		=> $pr_code
 					];
 					DB::table('order_mst')->insert($order_mst);
 

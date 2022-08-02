@@ -63,7 +63,7 @@ class sal17Controller extends Controller
 			'months'	    => $months,
 			'store_types'	=> $store_types,
 			'is_searched' 	=> $is_searched
-			// 'event_cds'		=> $event_cds,
+			// 'event_cds'	=> $event_cds,
 			// 'sell_types'	=> $sell_types
 		];
         return view( Config::get('shop.store.view') . '/sale/sal17', $values);

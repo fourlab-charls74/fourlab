@@ -106,7 +106,7 @@
 		{headerName:"판매금액",		field:"recv_amt",		width:100},
 		{headerName:"순판매금액",	field:"act_amt",		width:100},
 		{headerName:"택가합계",		field:"tag_sum",		width:100},
-		{headerName:"행사구분",		field:"event_kind_nm",	width:100},
+		{headerName:"행사구분",		field:"pr_code_val",	width:100},
 		{headerName:"수수료(%)",	field:"pay_fee",		width:100},
 		{headerName:"중간관리(%)",	field:"store_pay_fee",	width:100},
 		{headerName:"주문자ID",		field:"user_id",		width:100},
