@@ -402,8 +402,8 @@
 
 		if( ret == "000" ){
 			alert('마감내역을 추가하였습니다.');
-			location.reload();
-			opener.Search();
+			// location.reload();
+			// opener.Search();
 		} else {
 			alert(results[ret]);
 		}

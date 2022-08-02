@@ -1,3 +1,13 @@
+/*
+  _token 값을 ajax할때 기본적으로 보내도록 설정
+*/
+$.ajaxSetup({
+    headers: {
+       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+  });
+  
+
 $( document ).ready(function() {
 
     $('.select2-store').select2({

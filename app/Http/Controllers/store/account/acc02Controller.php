@@ -13,7 +13,6 @@ use Exception;
 
 class acc02Controller extends Controller
 {
-	//
 	public function index() {
 		$sdate	= date("Y-m-d", strtotime("first day of -1 month"));
 		$edate	= date("Y-m-d", strtotime("last day of -1 month"));
@@ -52,7 +51,8 @@ class acc02Controller extends Controller
 				a.fee_net_amt,
 				a.acc_amt,
 				a.fee_allot_amt,
-				s.store_cd
+				s.store_cd,
+				c.closed_yn as closed
 			from
 			(
 				select
@@ -170,6 +170,7 @@ class acc02Controller extends Controller
 				group by
 					o.store_cd
 				) a inner join store s on a.store_cd = s.`store_cd`
+				left outer join store_account_closed c on s.store_cd = c.store_cd
 			where
 				1 = 1 $where
 			order by
@@ -460,7 +461,7 @@ class acc02Controller extends Controller
 			select count(*) as cnt from store_account_closed
 			where store_cd = :store_cd and sday = :sday and eday = :eday limit 0,1
 		";
-		$row	= db::selectone($sql, ['store_cd' => $store_cd, 'sday' => $sdate, 'eday' => $edate]);
+		$row	= DB::selectOne($sql, ['store_cd' => $store_cd, 'sday' => $sdate, 'eday' => $edate]);
 		$cnt	= $row->cnt;
 
 		if( $cnt > 0 ){
@@ -470,13 +471,13 @@ class acc02Controller extends Controller
 		try {
 
 			// start transaction
-			db::begintransaction();
+			DB::beginTransaction();
 
 			$sql	= "
 				delete from store_account_closed_list
 				where store_cd = :store_cd and sday = :sday and eday = :eday
 			";
-			db::delete($sql, ['store_cd' => $store_cd, 'sday' => $sdate, 'eday' => $edate]);
+			DB::delete($sql, ['store_cd' => $store_cd, 'sday' => $sdate, 'eday' => $edate]);
 
 			$sql	= "
 				insert into store_account_closed_list
@@ -614,7 +615,7 @@ class acc02Controller extends Controller
 					w inner join order_opt o on o.ord_opt_no = w.ord_opt_no
 					inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
 			";
-			db::insert($sql);
+			DB::insert($sql);
 
 			$sql	= "
 				insert into store_account_closed
@@ -622,7 +623,7 @@ class acc02Controller extends Controller
 					store_cd,sday,eday,
 					sale_amt, clm_amt, sale_fee, dc_amt, coupon_amt, dlv_amt,
 					sale_net_taxation_amt, sale_net_taxfree_amt, sale_net_amt, tax_amt,
-					fee, fee_dc_amt, allot_amt, etc_amt, fee_net, acc_amt ,
+					fee, fee_dc_amt, allot_amt, etc_amt, fee_net, acc_amt,
 					closed_yn, admin_id, admin_nm, reg_date, upd_date
 				)
 				select
@@ -638,7 +639,7 @@ class acc02Controller extends Controller
 				group by
 					store_cd,sday,eday
 			";
-			db::insert($sql, ['id' => $id, 'name' => $name, 'store_cd' => $store_cd, 'sday' => $sdate, 'eday' => $edate]);
+			DB::insert($sql, ['id' => $id, 'name' => $name, 'store_cd' => $store_cd, 'sday' => $sdate, 'eday' => $edate]);
 
 			$acc_idx = db::table('account_closed')->latest('idx')->first()->idx;
 
@@ -648,11 +649,13 @@ class acc02Controller extends Controller
 				where
 					store_cd = :store_cd and sday = :sday and eday = :eday
 			";
-			db::update($sql, ['acc_idx' => $acc_idx, 'store_cd' => $store_cd, 'sday' => $sdate, 'eday' => $edate]);
+			DB::update($sql, ['acc_idx' => $acc_idx, 'store_cd' => $store_cd, 'sday' => $sdate, 'eday' => $edate]);
 
-			db::commit();
+			DB::commit();
 
 		} catch(exception $e) {
+
+			dd($e);
 
 			db::rollback();
 			$code	= "999";

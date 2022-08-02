@@ -165,6 +165,9 @@ class sal01Controller extends Controller
 	public function show()
 	{
 		$values = [];
+
+		$sale_kinds = SLib::getCodes("SALE_KIND");
+
 		return view( Config::get('shop.store.view') . '/sale/sal01_show',$values);
 	}
 
@@ -217,6 +220,58 @@ class sal01Controller extends Controller
 		$prd_cd = $order['barcode'] ? $order['barcode'] : $order['goods_code'] . $order['color'] . $order['size'];
 
 		/**
+		 * 매출구분 자료 변환 작업
+		 */
+		$pay_type = $order['pay_type'];
+		$pay_type = 1;
+		if (preg_match("/현금/", $pay_type)){
+			$pay_type = 1; 
+		} elseif (preg_match("/카드/", $pay_type)){
+			$pay_type = 2; 	
+		} elseif (preg_match("/포인트/", $pay_type)){
+			$pay_type = 4; 
+		} else {
+		}
+
+		/**
+		 * 판매유형 자료 변환 작업
+		 */
+		$sale_kind = $order['sale_kind'];
+		$sale_kind = str_replace(" ", "", $sale_kind); // 공백 제거
+		if (preg_match("/쿠폰/", $sale_kind)) {
+			if (preg_match("/\d+%/i", $sale_kind, $matches)) {
+				$percent = $matches[0];
+				$sale_kind = "쿠폰판매(${percent})";
+			}
+		} else if (preg_match("/할인/", $sale_kind)) {
+			if (preg_match("/\d+%/i", $sale_kind, $matches)) {
+				$percent = $matches[0];
+				$sale_kind = "${percent}할인";
+			}
+		} 
+		// else if (preg_match("/프로모션/", $sale_kind)) {
+		// 	if (preg_match("/\d+%/i", $sale_kind, $matches)) {
+		// 		$percent = $matches[0];
+		// 		$sale_kind = "브랜드데이(${percent})";
+		// 	}
+		// }
+
+		$sale_kind_id = "99"; // 조건에 없는 경우 기타로 처리
+		$sale_kinds = SLib::getCodes("SALE_KIND")->all();
+		for ($i=0; $i<count($sale_kinds); $i++) {
+
+			$item = $sale_kinds[$i];
+			$id = $item->code_id;
+			$value = $item->code_val;
+			$value = str_replace(" ", "", $value); // 기존 항목들 공백 제거하여 입력하는 판매유형과 비교
+
+			if ($sale_kind == $value) {
+				$sale_kind_id = $id;
+				break;
+			}
+		}
+
+		/**
 		 * goods_no 가져오기
 		 */
 		$sql = /** @lang text */
@@ -226,7 +281,13 @@ class sal01Controller extends Controller
 			where prd_cd = :prd_cd
 		";
 		$result = DB::selectOne($sql, array("prd_cd" => $prd_cd));
-		$order['goods_no'] = @$result->goods_no;
+
+		// 임시방편 - 매칭이 안된 상품 0 처리
+		if($result){
+			$order['goods_no'] = @$result->goods_no;
+		} else {
+			$order['goods_no'] = 0;
+		}
 
 		/**
 		 * 초기 값 설정
@@ -236,6 +297,10 @@ class sal01Controller extends Controller
 		$order['dlv_amt'] = 0;
 		$order['point_amt'] = 0;
 		$order['coupon_amt'] = 0;
+
+		// 영수증번호 / SEQ 전부 0 으로 처리
+		$order['receipt_no'] = 0;
+		$order['seq'] = 0;
 		
 		$order['com_rate'] = 0;
 		$order['ord_kind'] = 20;
@@ -245,7 +310,7 @@ class sal01Controller extends Controller
 		$order['com_coupon_ratio'] = 0;
 		$order['sales_com_fee'] = $order['pay_fee'];
 		$store_cd = $order['com_id'];
-		$order['sale_kind'] = sprintf('%02d', $order['sell_type_nm']);
+		
 		$order['sale_place'] = $order['com_nm'];
 		$order['user_nm'] = $order['ord_nm'] ? $order['ord_nm']: "비회원";
 
@@ -281,8 +346,9 @@ class sal01Controller extends Controller
 		 * validation 추후 처리 할 것 (주문자명, 상품명, 상품코드, 매장명, 매장코드 등등... 아래는 샘플)
 		 */
 		$out_ord_no = @$order["out_ord_no"];
-		if (@$order["goods_no"] == "") {
-			$code = "-101";
+		if (@$order["goods_no"] === "") {
+			@$order["goods_no"] == "0"; // 상품번호 없는경우 일단 0 처리 - 임시
+			// $code = "-101";
 		} else if (@$order["goods_opt"] == "") {
 			$code = "-102";
 		} else if (@$order["qty"] == "") {
@@ -351,7 +417,7 @@ class sal01Controller extends Controller
 					from goods a left outer join company b on a.com_id  = b.com_id
 					where a.goods_no = :goods_no 
 				";
-			$row = (array)DB::selectone($sql, array("goods_no" => $order["goods_no"]));
+			$row = (array)DB::selectOne($sql, array("goods_no" => $order["goods_no"]));
 			if ($row) {
 				if (isset($order["goods_nm"]) || $order["goods_nm"] == "") {
 					$order["goods_nm"]	= $row["goods_nm"];
@@ -364,6 +430,7 @@ class sal01Controller extends Controller
 				$order["baesong_kind"] =  $row["baesong_kind"];
 				$is_unlimited = $row["is_unlimited"];
 			} else {
+				// Lib::q($sql);
 				return ["code" => "-210"];
 			}
 
@@ -429,7 +496,7 @@ class sal01Controller extends Controller
 						"ord_state" 	=> @$order["ord_state"],
 						"ord_type" 		=> @$order["ord_type"],
 						"ord_kind" 		=> @$order["ord_kind"],
-						"sale_kind" 	=> @$order["sale_kind"],
+						"sale_kind" 	=> $sale_kind_id,
 						"sale_place" 	=> @$order["sale_place"],
 						"out_ord_no" 	=> @$order["out_ord_no"],
 						"upd_date"      => DB::raw('now()'),
@@ -439,7 +506,7 @@ class sal01Controller extends Controller
 
 					$payment = [
 						"ord_no"		=> $ord_no,
-						"pay_type" 		=> @$order["pay_type"],
+						"pay_type" 		=> $pay_type,
 						"pay_nm" 		=> $order["user_nm"],
 						"pay_amt" 		=> $order["ord_amt"],
 						"pay_stat" 		=> @$order["pay_stat"],
@@ -477,7 +544,7 @@ class sal01Controller extends Controller
 					"qty"			=> $order["qty"],
 					"price" 		=> $order["price"],
 					"wonga"			=> $order["wonga"],
-					"pay_type"		=> @$order["pay_type"],
+					"pay_type"		=> $pay_type,
 					"dlv_pay_type" 	=> @$order["dlv_pay_type"],
 					"dlv_amt" 		=> $order["dlv_amt"],
 					"dc_amt" 		=> $order["dc_amt"],

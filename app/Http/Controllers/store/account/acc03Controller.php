@@ -36,11 +36,11 @@ class acc03Controller extends Controller
         $sdate = str_replace("-", "", $request->input("sdate"));
         $edate = str_replace("-", "", $request->input("edate"));
         $closed_yn = $request->input("closed_yn");
-        $com_cd = $request->input("com_cd");
+        $store_cd = $request->input("store_cd");
 
         $where = "";
         if ($closed_yn != "") $where .= " and a.closed_yn = '${closed_yn}'";
-        if ($com_cd != "") $where .= " and a.com_id = '${com_cd}'";
+        if ($store_cd != "") $where .= " and a.store_cd = '${store_cd}'";
 
         $sql = "
 			select
