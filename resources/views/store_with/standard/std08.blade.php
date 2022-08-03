@@ -29,7 +29,7 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-lg-6">
+                    <div class="col-lg-3">
                         <div class="form-group">
                             <label for="good_types">기간</label>
                             <div class="form-inline date-select-inbox">
@@ -59,12 +59,22 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-6 inner-td">
+                    <div class="col-lg-3">
                         <div class="form-group">
-							<label for="store_nm">사용여부</label>
-                            <div class="form-inline">
+                            <label for="use_yn_y">사용여부</label>
+                            <div class="flex_box">
+                                <div class="form-inline form-radio-box">
+                                    <div class="custom-control custom-radio">
+                                        <input type="radio" name="use_yn" id="use_yn_y" class="custom-control-input" value="Y" checked/>
+                                        <label class="custom-control-label" for="use_yn_y">Y</label>
+                                    </div>
+                                    <div class="custom-control custom-radio">
+                                        <input type="radio" name="use_yn" id="use_yn_n" class="custom-control-input" value="N"/>
+                                        <label class="custom-control-label" for="use_yn_n">N</label>
+                                    </div>
+                                </div>
                             </div>
-						</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -76,91 +86,204 @@
     </div>
 </form>
 
-<div class="row show_layout">
-    <div class="col-lg-12">
-        <div class="card shadow-none mb-0">
-            <div class="card-header mb-0 d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row">
-                <h5 class="m-0 mb-3 mb-sm-2"><span id="select_store_nm"></span>총 N 개수</h5>
-                <div class="d-flex align-items-center justify-content-center justify-content-sm-end">
-                    {{-- <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateStoreFee()"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
-                    <button type="button" class="btn btn-sm btn-outline-primary shadow-sm" onclick="resetStoreFee()">전체 초기화</button> --}}
+<div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
+    <div class="card-body shadow">
+        <div class="card-title mb-3">
+            <div class="filter_wrap">
+                <div class="fl_box">
+                    <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
+                </div>
+                <div class="fr_box">
+                    <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataAdd();"><span class="fs-12">추가</span></a>
+                    <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataSave();"><span class="fs-12">저장</span></a>
+                    <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataDel();"><span class="fs-12">선택삭제</span></a>
                 </div>
             </div>
-            <div class="card-body shadow pt-2">
-                <div class="table-responsive">
-                    <div id="div-gd-store-fee" class="ag-theme-balham"></div>
-                </div>
-            </div>
+        </div>
+        <div class="table-responsive">
+            <div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
         </div>
     </div>
 </div>
 <script language="javascript">
-
+    const CENTER = {'text-align': 'center'};
     let columns = [
-        {field: "pr_code_cd", headerName: "등급", width: 60},
-        {field: "pr_code_cd", headerName: "정상",
+        { field: "chk", headerName: '', cellClass: 'hd-grid-code', checkboxSelection: true, width: 40, pinned: 'left', sort: null },
+        { field: "idx", hide: true },
+        { field: "seq", hide: true },
+        { field: "grade", headerName: "등급코드(2글자)", width: 100, rowDrag: true, editable: true },
+        { field: "name", headerName: "등급명", width: 100, cellStyle: CENTER, editable: true },
+        { field: "sdate", headerName: "시작일", width: 100, cellStyle: CENTER, editable: true },
+        { field: "edate", headerName: "종료일", width: 100, cellStyle: CENTER, editable: true },
+        { field: "g1", headerName: "정상",
             children: [
-                { headerName: "금액", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "수수료율", field: "wonga", type: 'numberType',width:100 },
+                { headerName: "금액", field: "amt1", type: 'currencyType', width:100, editable: true },
+                { headerName: "수수료율", field: "fee1", type: 'percentType', width:100, editable: true },
             ]
         },
-        {field: "pr_code_cd", headerName: "정상2",
+        { field: "g2", headerName: "정상2",
             children: [
-                { headerName: "금액", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "수수료율", field: "wonga", type: 'numberType',width:100 },
+                { headerName: "금액", field: "amt2", type: 'currencyType', width:100, editable: true },
+                { headerName: "수수료율", field: "fee2", type: 'percentType', width:100, editable: true },
             ]
         },
-        {field: "pr_code_cd", headerName: "정상3",
+        { field: "g3", headerName: "정상3",
             children: [
-                { headerName: "금액", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "수수료율", field: "wonga", type: 'numberType',width:100 },
+                { headerName: "금액", field: "amt3", type: 'currencyType', width:100, editable: true },
+                { headerName: "수수료율", field: "fee3", type: 'percentType', width:100, editable: true },
             ]
         },
-        {field: "pr_code_cd", headerName: "특판", width: 60},
-        {field: "pr_code_cd", headerName: "용품", width: 60},
-        {field: "pr_code_cd", headerName: "특약온라인", width: 60},
-        {field: "pr_code_cd", headerName: "비고", width: 60},
-        {width: "auto"},
+        { field: "fee_10", headerName: "특판", width: 60, type: 'percentType', editable: true },
+        { field: "fee_11", headerName: "용품", width: 60, type: 'percentType', editable: true },
+        { field: "fee_12", headerName: "특약온라인", width: 90, type: 'percentType', editable: true },
+        { field: "use_yn", headerName: "사용여부", width: 60, cellStyle: CENTER, editable: true },
+        { field: "bigo", headerName: "비고", width: 200, editable: true },
+        { width: "auto" },
     ];
 </script>
 <script type="text/javascript" charset="utf-8">
-    let gx, gx2;
 
-    const pApp = new App('', { gridId: "#div-gd-store-fee" });
-    let cur_store_cd = "";
-    let cur_store_nm = "";
+    let gx;
+    const pApp = new App('', { gridId: "#div-gd" });
 
     $(document).ready(function() {
-        // 매장목록
         pApp.ResizeGrid(275);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
-
-        // 최초검색
-        //Search();
-
-        // 검색조건 숨김 시 우측 grid 높이 설정
-        $(".search_mode_wrap .dropdown-menu a").on("click", function(e) {
-            if(pApp2.options.grid_resize == true){
-                pApp2.ResizeGrid(275);
+        gx.gridOptions.rowDragManaged = true;
+        gx.gridOptions.animateRows = true;
+        gx.gridOptions.getRowStyle = (params) => {
+            if (params.data?.added === true) {
+                return { 'background': '#FFFF99' }
             }
-        });
+        };
+        Search();
     });
 
-    // 매장목록 조회
     function Search() {
         const data = $('[name=search]').serialize();
-        gx.Request("/store/standard/std07/search", data, -1, function(d) {
-            if(cur_store_cd === "" && d.body.length > 0) {
-                SearchDetail(d.body[0].store_cd, d.body[0].store_nm);
-            }
-        });
+        gx.Request("/store/standard/std08/search", data, -1, () => {});
     }
 
     // 검색조건 초기화
     function formReset(id) {
         document[id].reset();
     }
+
+    function DataAdd() {
+        let rows = gx.getRows();
+        var newData = {
+            idx: rows.length,
+            seq: rows.length,
+            use_yn: 'Y',
+            editable: 'Y',
+            added: true
+        };
+        gx.gridOptions.api.applyTransaction({
+            add: [newData],
+            addIndex: rows.length,
+        });
+        gx.gridOptions.api.redrawRows();
+    }
+
+    async function DataSave() {
+        let arr = [];
+        let rows = gx.getRows();
+        let seq = 0;
+        for (let i=0; i < rows.length; i++) {
+            let row = rows[i];
+            row.seq = seq;
+            const is_valid = await validation(row, i);
+            if (is_valid) {
+                arr.push(row);
+                seq++;
+            } else {
+                return false;
+            }
+        }
+        try {
+            const response = await axios({ 
+                url: '/store/standard/std08/save',
+                method: 'post', 
+                data: { data: arr } 
+            });
+            const { data } = response;
+            if (data?.code == 200) {
+                Search();
+            } else {
+                alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+            }
+        } catch (error) {
+            // console.log(error);
+        }
+    }
+
+    async function DataDel() {
+        let arr = [];
+        const rows = gx.getSelectedRows();
+        rows.map(row => arr.push(row));
+        if (arr.length > 0 && confirm('삭제 하시겠습니까?')) {
+            try {
+                const response = await axios({ 
+                    url: '/store/standard/std08/remove',
+                    method: 'post', 
+                    data: { data: arr } 
+                });
+                const { data } = response;
+                if (data?.code == 200) {
+                    Search();
+                } else {
+                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                }
+            } catch (error) {
+                // console.log(error);
+            }
+        } else {
+            alert('삭제할 상품을 선택 해 주십시오.');
+        }
+    }
+
+    const validation = (row, i)  => {
+        const validSdate = new Date(row?.sdate);
+        const validEdate = new Date(row?.edate);
+        if (row?.grade == "" || row?.grade == null) {
+            alert("등급 코드를 입력해 주세요.");
+            startEditingCell(i, "grade");
+            return false;
+        }
+        if (row?.name == "" || row?.name == null) {
+            alert("등급명을 입력해 주세요.");
+            startEditingCell(i, "name");
+            return false;
+        }
+        const regex = /\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])/;
+        let arr = row?.sdate?.match(regex);
+        if (Array.isArray(arr) && arr.length > 0) {
+        } else {
+            alert("시작일은 연-월-일 형식으로 입력해 주세요.");
+            startEditingCell(i, "sdate");
+            return false;
+        }
+        arr = row?.edate?.match(regex);
+        if (Array.isArray(arr) && arr.length > 0) {
+        } else {
+            alert("종료일은 연-월-일 형식으로 입력해 주세요.");
+            startEditingCell(i, "edate");
+            return false;
+        }
+        const use_yn_type = ["Y", "N"];
+        if (use_yn_type.includes(row?.use_yn) === false) {
+            alert("사용여부는 Y 또는 N 으로 입력하셔야 합니다.");
+            startEditingCell(i, "use_yn");
+            return false;
+        }
+        return true;
+    };
+
+    const startEditingCell = (row_index, col_key) => {
+        gx.gridOptions.api.startEditingCell({ rowIndex: row_index, colKey: col_key });
+    };
+
 </script>
 @stop

@@ -10,19 +10,17 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Exception;
-
 use App\Models\Conf;
 
 class std08Controller extends Controller
 {
 	public function index()
 	{
-        $sdate = Carbon::now()->startOfMonth()->format("Y-m-d"); // 이번 달 기준
+        $sdate = Carbon::now()->startOfMonth()->format("Y-m-d");
         $edate = Carbon::now()->format("Y-m-d");
-
 		$values = [
-            "sdate"         => $sdate,
-            "edate"         => $edate,
+            "sdate" => $sdate,
+            "edate" => $edate,
 			"store_types" => SLib::getCodes("STORE_TYPE"),
 		];
 		return view(Config::get('shop.store.view') . '/standard/std08', $values);
@@ -30,224 +28,78 @@ class std08Controller extends Controller
 
 	public function search(Request $request)
 	{
-		$store_type = $request->input("store_type");
-		$store_cd = $request->input("store_cd");
-		$store_nm = $request->input("store_nm");
-		$use_yn = $request->input("use_yn");
-
-		$code = 200;
+		$sdate = $request->input('sdate', now()->format("Y-m-d"));
+		$edate = $request->input('edate', date("Y-m-d"));
+		$use_yn = $request->input("use_yn", "Y");
 		$where = "";
-
-		if($store_type != null)
-			$where .= " and s.store_type = '$store_type'";
-		if($store_cd != null)
-			$where .= " and s.store_cd = '$store_cd'";
-		if($store_nm != null)
-			$where .= " and (s.store_nm like '%$store_nm%' or s.store_nm_s like '%$store_nm%')";
-		if($use_yn != null)
-			$where .= " and s.use_yn = '$use_yn'";
-
+		if ($use_yn != null) $where .= " and sg.use_yn = '$use_yn'";
 		$sql = "
-			select s.store_cd, s.store_nm as store_nm, s.use_yn, c.code_val as store_type
-			from store s
-				inner join code c on c.code_kind_cd = 'STORE_TYPE' and c.code_id = s.store_type
-			where 1=1 $where
-			order by store_cd
+			select *
+			from store_grade sg
+			where sg.sdate >= '$sdate' and sg.edate <= '$edate'
+			$where
+			order by seq asc
 		";
-
 		$rows = DB::select($sql);
-
-		return response()->json([
-			"code" => $code,
-			"head" => [
-				"total" => count($rows),
-				"page" => 1,
-				"page_cnt" => 1,
-				"page_total" => 1
-			],
-			"body" => $rows
-		]);
-	}
-
-	public function search_store_fee($store_cd)
-	{
-		$code = 200;
-
-		$rows = $this->_get_store_fee($store_cd);
-
-		return response()->json([
-			"code" => $code,
-			"head" => [
-				"total" => count($rows),
-				"page" => 1,
-				"page_cnt" => 1,
-				"page_total" => 1
-			],
-			"body" => $rows
-		]);
-	}
-
-	public function _get_store_fee($store_cd)
-	{
-		$sql = "
-			select
-				sf.idx,
-				cd.code_id as pr_code_cd,
-				cd.code_val as pr_code_nm,
-				sf.store_cd,
-				sf.store_fee,
-				sf.manager_fee,
-				sf.sdate,
-				sf.edate,
-				sf.comment,
-				sf.use_yn
-			from code cd
-				left outer join store_fee sf
-					on cd.code_id = sf.pr_code and sf.store_cd = :store_cd and sf.idx in (select max(idx) from store_fee group by pr_code)
-			where cd.code_kind_cd = 'PR_CODE' and cd.use_yn = 'Y'
-			order by cd.code_seq
-		";
-
-		$rows = DB::select($sql, ["store_cd" => $store_cd]);
-		return $rows;
-	}
-
-	public function show($store_cd, $pr_code_cd)
-	{
-		$sql = "select store_cd, store_nm from store where store_cd = :store_cd";
-		$store = DB::selectOne($sql, ["store_cd" => $store_cd]);
-
-		$sql = "select code_id as pr_code_cd, code_val as pr_code_nm from code where code_kind_cd = 'PR_CODE' and code_id = :pr_code_cd";
-		$pr_code = DB::selectOne($sql, ["pr_code_cd" => $pr_code_cd]);
-
-		$values = [
-			"store" => $store,
-			"pr_code" => $pr_code,
-		];
-
-		return view(Config::get('shop.store.view') . '/standard/std07_show', $values);
-	}
-
-	public function search_store_fee_history(Request $request)
-	{
-		$store_cd = $request->input("store_cd");
-		$pr_code_cd = $request->input("pr_code_cd");
-
-		$sql = "
-			select
-				sf.idx,
-				cd.code_id as pr_code_cd,
-				cd.code_val as pr_code_nm,
-				sf.store_cd,
-				sf.store_fee,
-				sf.manager_fee,
-				sf.sdate,
-				sf.edate,
-				sf.comment,
-				if(sf.idx in (select max(idx) from store_fee group by pr_code), 'Y', 'N') as use_yn
-			from code cd
-				inner join store_fee sf
-					on cd.code_id = sf.pr_code and sf.store_cd = :store_cd
-			where cd.code_kind_cd = 'PR_CODE' and cd.use_yn = 'Y' and cd.code_id = :pr_code_cd
-			order by sf.idx desc
-		";
-
-		$rows = DB::select($sql, ["store_cd" => $store_cd, "pr_code_cd" => $pr_code_cd]);
-
 		return response()->json([
 			"code" => 200,
 			"head" => [
 				"total" => count($rows),
-				"page" => 1,
-				"page_cnt" => 1,
-				"page_total" => 1
+				"page" => 1
 			],
 			"body" => $rows
 		]);
 	}
 
-	// 마진정보 추가 & 수정
-	public function update_store_fee(Request $request)
+	public function save(Request $request)
 	{
-		$admin_id = Auth('head')->user()->id;
-		$data = $request->all();
-
-		$new_data = '';
-
+		$data = $request->input('data');
 		try {
-			DB::beginTransaction();
-
-			foreach($data as $i => $d) {
-				if($d['use_yn'] == 'A') {
-					$new_data = $d;
-
-					// 등록
-					DB::table('store_fee')->insert([
-						'store_cd' => $d['store_cd'],
-						'pr_code' => $d['pr_code_cd'],
-						'store_fee' => $d['store_fee'] ?? 0,
-						'manager_fee' => $d['manager_fee'] ?? 0,
-						'sdate' => $d['sdate'] ?? null,
-						'edate' => $d['edate'] ?? '9999-12-31',
-						'comment' => $d['comment'] ?? null,
-						'use_yn' => 'Y',
-						'reg_date' => now(),
-						'admin_id' => $admin_id,
-					]);
-				} else if($d['use_yn'] == 'Y') {
-					$edate = $d['edate'] ?? '9999-12-31';
-					if($new_data != '') {
-						$edate = date('Y-m-d', strtotime($new_data['sdate'] . '-1 day'));
+			DB::transaction(function () use ($data) {
+				foreach ($data as $row) {
+					/**
+					 * 데이터 가공, 초기 값 설정 및 불필요한 프로퍼티 제거
+					 */
+					if (array_key_exists('sdate', $row) === false) $row['sdate'] = now()->format("Y-m-d");
+					if (array_key_exists('edate', $row) === false) $row['edate'] = now()->format("Y-m-d");
+					unset($row['added']);
+					unset($row['editable']);
+					/**
+					 * 등급이 있는 경우 업데이트 / 없는 경우 추가
+					 */
+					$idx = Lib::quote($row['idx']);
+					$sql = "select idx, count(*) as cnt from store_grade sg where sg.idx = '$idx'";
+					$result = DB::selectOne($sql);
+					if ($result->cnt > 0) {
+						unset($row['idx']);
+						DB::table('store_grade')->where('idx', "=", $result->idx)->update($row);
+					} else {
+						$row['seq'] = count($data) - 1;
+						DB::table('store_grade')->insert($row);
 					}
-					// 수정
-					DB::table('store_fee')
-						->where('idx', '=', $d['idx'] ?? 0)
-						->update([
-							'store_fee' => $d['store_fee'] ?? 0,
-							'manager_fee' => $d['manager_fee'] ?? 0,
-							'sdate' => $d['sdate'] ?? null,
-							'edate' => $edate,
-							'comment' => $d['comment'] ?? null,
-							'mod_date' => now(),
-							'admin_id' => $admin_id,
-						]);
 				}
-			}
-
-			$code = 200;
-			$msg = "정상적으로 저장되었습니다.";
-			DB::commit();
+			});
+			return response()->json(['code'	=> '200']);
 		} catch (Exception $e) {
-			DB::rollback();
-			$code = 500;
-			$msg = $e->getMessage();
+			return response()->json(['code' => '500']);
 		}
-
-		return response()->json(["code" => $code, "msg" => $msg]);
+		return response()->json([]);
 	}
 
-	// 마진정보 삭제
-	public function remove_store_fee($fee_idx)
+	public function remove(Request $request)
 	{
-		$admin_id = Auth('head')->user()->id;
-
+		$data = $request->input('data');
 		try {
-			DB::beginTransaction();
-
-			DB::table('store_fee')
-				->where('idx', '=', $fee_idx)
-				->delete();
-
-			$code = 200;
-			$msg = "정상적으로 삭제되었습니다.";
-			DB::commit();
+			DB::transaction(function () use ($data) {
+				foreach ($data as $row) {
+					$idx = $row['idx'];
+					DB::table('store_grade')->where('idx', $idx)->delete();
+				}
+			});
+			return response()->json(['code'	=> '200']);
 		} catch (Exception $e) {
-			DB::rollback();
-			$code = 500;
-			$msg = $e->getMessage();
+			return response()->json(['code'	=> '500']);
 		}
-
-		return response()->json(["code" => $code, "msg" => $msg]);
 	}
 }
 
