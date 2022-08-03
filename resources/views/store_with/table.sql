@@ -322,32 +322,28 @@ CREATE TABLE `store_fee` (
     PRIMARY KEY (`idx`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- 매장등급관리
 CREATE TABLE `store_grade` (
-                               `idx` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'identify',
-                               `grade` VARCHAR(2) NOT NULL COMMENT '등급',
-                               `name` VARCHAR(30) NOT NULL COMMENT '등급명',
-                               `sdate` VARCHAR(10) DEFAULT NULL COMMENT '시작일',
-                               `edate` VARCHAR(10) DEFAULT NULL COMMENT '종료일',
-                               `amt1` INT DEFAULT NULL COMMENT '금액1',
-                               `fee1` DECIMAL(5,2) DEFAULT NULL COMMENT '수수료1',
-                               `amt2` INT DEFAULT NULL COMMENT '금액1',
-                               `fee2` DECIMAL(5,2) DEFAULT NULL COMMENT '수수료1',
-                               `amt3` INT DEFAULT NULL COMMENT '금액1',
-                               `fee3` DECIMAL(5,2) DEFAULT NULL COMMENT '수수료1',
-                               `amt4` INT DEFAULT NULL COMMENT '금액1',
-                               `fee4` DECIMAL(5,2) DEFAULT NULL COMMENT '수수료1',
-
-                               `fee_10` DECIMAL(5,2) DEFAULT NULL COMMENT '(특가)수수료1',
-                               `fee_11` DECIMAL(5,2) DEFAULT NULL COMMENT '(용품)수수료1',
-                               `fee_12` DECIMAL(5,2) DEFAULT NULL COMMENT '(특판온라인)수수료1',
-
-                               `id` VARCHAR(30) DEFAULT NULL COMMENT '작성자',
-                               `use_yn` CHAR(1) DEFAULT 'Y' COMMENT '사용',
-                               `rt` DATETIME DEFAULT NULL COMMENT '등록일자',
-                               `ut` DATETIME DEFAULT NULL COMMENT '수정일자',
-                               PRIMARY KEY (`idx`)
+    `idx` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'identify',
+    `grade` VARCHAR(2) NOT NULL COMMENT '등급',
+    `name` VARCHAR(30) NOT NULL COMMENT '등급명',
+    `sdate` VARCHAR(10) DEFAULT NULL COMMENT '시작일',
+    `edate` VARCHAR(10) DEFAULT NULL COMMENT '종료일',
+    `amt1` INT DEFAULT NULL COMMENT '구간금액1',
+    `fee1` DECIMAL(5,2) DEFAULT NULL COMMENT '수수료1',
+    `amt2` INT DEFAULT NULL COMMENT '구간금액2',
+    `fee2` DECIMAL(5,2) DEFAULT NULL COMMENT '수수료2',
+    `amt3` INT DEFAULT NULL COMMENT '구간금액3',
+    `fee3` DECIMAL(5,2) DEFAULT NULL COMMENT '수수료3',
+    `fee_10` DECIMAL(5,2) DEFAULT NULL COMMENT '(특가)수수료',
+    `fee_11` DECIMAL(5,2) DEFAULT NULL COMMENT '(용품)수수료',
+    `fee_12` DECIMAL(5,2) DEFAULT NULL COMMENT '(특판온라인)수수료',
+    `id` VARCHAR(30) DEFAULT NULL COMMENT '작성자',
+    `use_yn` CHAR(1) DEFAULT 'Y' COMMENT '사용',
+    `rt` DATETIME DEFAULT NULL COMMENT '등록일자',
+    `ut` DATETIME DEFAULT NULL COMMENT '수정일자',
+    PRIMARY KEY (`idx`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8
-
 
 -- 매장마감
 CREATE TABLE `store_account_closed` (

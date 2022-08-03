@@ -289,7 +289,7 @@
 			'AA':"recv_amt",		
 			'AB':"act_amt",
 			'AC':"tag_sum",		
-			'AD':"event_kind_nm",
+			'AD':"pr_code_val",
 			'AE':"pay_fee",		
 			'AF':"store_pay_fee",
 			'AG':"user_id",		
