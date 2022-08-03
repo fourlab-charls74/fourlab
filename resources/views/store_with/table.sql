@@ -345,6 +345,36 @@ CREATE TABLE `store_grade` (
     PRIMARY KEY (`idx`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8
 
+-- 창고반품
+CREATE TABLE `storage_return` (
+    `sr_cd` int(11) NOT NULL AUTO_INCREMENT COMMENT 'identify (반품코드)',
+    `storage_cd` varchar(30) NOT NULL COMMENT '창고코드 - storage : storage_cd',
+    `store_cd` varchar(30) NOT NULL COMMENT '매장코드 - store : store_cd',
+    `sr_date` char(10) NOT NULL COMMENT '반품일자',
+    `sr_kind` varchar(30) NOT NULL COMMENT '반품종류 - 관리자(S) / 일반(G) / 일괄(B)',
+    `sr_state` varchar(30) NOT NULL COMMENT '반품상태 - code : SR_CODE',
+    `sr_reason` varchar(30) NOT NULL COMMENT '반품사유 - code : SR_REASON',
+    `comment` varchar(255) DEFAULT NULL COMMENT '메모',
+    `rt` datetime DEFAULT NULL COMMENT '등록일자',
+    `ut` datetime DEFAULT NULL COMMENT '수정일자',
+    `admin_id` varchar(30) DEFAULT NULL COMMENT '관리자아이디',
+    PRIMARY KEY (`sr_cd`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 창고반품 상품리스트
+CREATE TABLE `storage_return_product` (
+    `sr_prd_cd` int(11) NOT NULL AUTO_INCREMENT COMMENT 'identify (반품일련코드)',
+    `sr_cd` int(11) NOT NULL COMMENT '반품코드',
+    `prd_cd` varchar(50) NOT NULL COMMENT '상품코드',
+    `price` int(11) NOT NULL COMMENT '판매가',
+    `return_price` int(11) NOT NULL COMMENT '반품단가',
+    `return_qty` int(11) NOT NULL COMMENT '반품수량',
+    `rt` datetime DEFAULT NULL COMMENT '등록일자',
+    `ut` datetime DEFAULT NULL COMMENT '수정일자',
+    `admin_id` varchar(30) DEFAULT NULL COMMENT '관리자아이디',
+    PRIMARY KEY (`sr_prd_cd`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 -- 매장마감
 CREATE TABLE `store_account_closed` (
                                         `idx` INT(11) NOT NULL AUTO_INCREMENT COMMENT '정산번호',

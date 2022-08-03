@@ -220,6 +220,11 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk22/search-goods','stk22Controller@search_goods');
         Route::get('stk22/search-stock','stk22Controller@search_stock');
         Route::post('stk22/request-rt','stk22Controller@request_rt');
+        
+        // 창고반품
+        Route::get('stk30','stk30Controller@index');
+        Route::get('stk30/search','stk30Controller@search');
+
     });
 
     // 영업관리
