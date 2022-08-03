@@ -104,7 +104,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
         // 매장등급관리
         Route::get('std08', 'std08Controller@index');
-
+        Route::get('std08/search', 'std08Controller@search');
+        Route::post('std08/save', 'std08Controller@save');
+        Route::post('std08/remove', 'std08Controller@remove');
 
         // 수선관리
         Route::get('std11', 'std11Controller@index');
