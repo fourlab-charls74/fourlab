@@ -372,6 +372,7 @@
         },
         {field: "normal_price", headerName: "정상가", type: 'currencyType', cellStyle: {"line-height": "30px"}},
         {field: "price", headerName: "판매가", type: 'currencyType', width:60, cellStyle: {"line-height": "30px"}},
+        {field: "goods_sh", headerName: "TAG가", hide: true},
         {field: "wonga", headerName: "원가", type: 'currencyType', width:60, cellStyle: {"line-height": "30px"}},
         {field: "margin_rate", headerName: "마진율", type: 'percentType', width:60, cellStyle: {"line-height": "30px"}},
         {field: "margin_amt", headerName: "마진액", type: 'numberType', width:60, cellStyle: {"line-height": "30px"}},

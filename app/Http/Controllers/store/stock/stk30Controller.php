@@ -63,7 +63,8 @@ class stk30Controller extends Controller
         if($store_no != "")     $where .= " and sr.store_cd = '" . $store_no . "'";
 
         // ordreby
-        $ord_field  = $request->input("ord_field", "sr.sr_date");
+        $ord_field  = $request->input("ord_field", "sr.sr_cd");
+        if($ord_field == 'sr_cd') $ord_field = 'sr.' . $ord_field;
         $ord        = $request->input("ord", "desc");
         $orderby    = sprintf("order by %s %s", $ord_field, $ord);
         
@@ -88,6 +89,8 @@ class stk30Controller extends Controller
                 sr.sr_kind,
                 sr.sr_state,
                 c.code_val as sr_state_nm,
+                (select sum(return_price) from storage_return_product where sr_cd = sr.sr_cd) as sr_price,
+                (select sum(return_qty) from storage_return_product where sr_cd = sr.sr_cd) as sr_qty,
                 sr.sr_reason,
                 co.code_val as sr_reason_nm,
                 sr.comment
@@ -135,14 +138,110 @@ class stk30Controller extends Controller
     }
 
     // 창고반품 등록팝업 오픈
-    public function show() 
+    public function show($sr_cd = '') 
     {
+        $sr = '';
+        $new_sr_cd = '';
         $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')->orderByDesc('default_yn')->get();
 
+        if($sr_cd != '') {
+            $sql = "
+                select
+                    sr.sr_cd,
+                    sr.storage_cd,
+                    sr.store_cd,
+                    s.store_nm,
+                    sr.sr_date,
+                    sr.sr_kind,
+                    sr.sr_state,
+                    sr.sr_reason,
+                    sr.comment,
+                    sr.rt,
+                    sr.ut
+                from storage_return sr
+                    inner join store s on s.store_cd = sr.store_cd
+                where sr_cd = :sr_cd
+            ";
+            $sr = DB::selectOne($sql, ['sr_cd' => $sr_cd]);
+        } else {
+            $sql = "
+                select sr_cd
+                from storage_return
+                order by sr_cd desc
+                limit 1
+            ";
+            $row = DB::selectOne($sql);
+            $new_sr_cd = $row->sr_cd + 1;
+        }
+
         $values = [
-            'sdate'         => date("Y-m-d"),
+            "cmd" => $sr == '' ? "add" : "update",
+            'sdate'         => $sr == '' ? date("Y-m-d") : $sr->sr_date,
             'storages'      => $storages,
+            'sr_reasons'    => SLib::getCodes("SR_REASON"),
+            'sr'            => $sr,
+            'new_sr_cd'     => $new_sr_cd,
         ];
         return view(Config::get('shop.store.view') . '/stock/stk30_show', $values);
+    }
+
+    // 반품할 상품 등록 시 매장수량 조회
+    public function search_store_qty(Request $request)
+    {
+        $store_cd = $request->input("store_cd", "");
+        $data = $request->input("data", []);
+        $result = [];
+
+        foreach($data as $d)
+        {
+            $sql = "
+                select wqty
+                from product_stock_store
+                where store_cd = :store_cd
+                    and prd_cd = :prd_cd
+            ";
+            $row = DB::selectOne($sql, ["store_cd" => $store_cd, "prd_cd" => $d['prd_cd']]);
+            $d['store_wqty'] = $row != null ? $row->wqty : 0;
+            array_push($result, $d);
+        }
+
+		return response()->json([
+			"code" => 200,
+			"body" => $result
+		]);
+    }
+
+    // 창고반품 등록
+    public function add_storage_return(Request $request)
+    {
+        $sr_date = $request->input("sr_date", date("Y-m-d"));
+        $storage_cd = $request->input("storage_cd", "");
+        $store_cd = $request->input("store_cd", "");
+        $sr_reason = $request->input("sr_reason", "");
+        $comment = $request->input("comment", "");
+        $products = $request->input("products", []);
+
+        try {
+            DB::beginTransaction();
+
+			foreach($products as $product) {
+                // 작업예정
+
+                // DB::table('storage_return')
+                //     ->insert([
+                //     ]);
+            }
+
+			DB::commit();
+            $code = 200;
+            // $msg = "창고반품등록이 정상적으로 완료되었습니다.";
+            $msg = "작업예정입니다.";
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+        return response()->json(["code" => $code, "msg" => "msg"]);
     }
 }

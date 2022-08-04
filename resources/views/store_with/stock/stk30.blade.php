@@ -17,7 +17,7 @@
 				<h4>검색</h4>
 				<div class="flax_box">
 					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-                    <a href="javascript:void(0);" onclick="add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
+                    <a href="javascript:void(0);" onclick="openDetailPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
                     <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="initSearch(['#store_no'])">검색조건 초기화</a>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
@@ -132,7 +132,7 @@
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
-                                        <option value="sr_date">반품일자</option>
+                                        <option value="sr_cd">반품코드</option>
                                     </select>
                                 </div>
                                 <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -152,7 +152,7 @@
         
         <div class="resul_btn_wrap mb-3">
             <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-            <a href="javascript:void(0);" onclick="add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
+            <a href="javascript:void(0);" onclick="openDetailPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
             <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
         </div>
 
@@ -178,7 +178,7 @@
 	let columns = [
         {field: "sr_cd", headerName: "반품코드", width: 100, cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {
-                return `<a href="#">${params.value}</a>`;
+                return `<a href="javascript:void(0);" onclick="openDetailPopup(${params.value})">${params.value}</a>`;
             }
         },
         {field: "sr_date", headerName: "반품일자", width: 100, cellStyle: {"text-align": "center"}},
@@ -196,6 +196,7 @@
         {field: "sr_reason", hide: true},
         {field: "sr_reason_nm", headerName: "반품사유", width: 120, cellStyle: {"text-align": "center"}},
         {field: "comment", headerName: "메모", width: 300},
+        {width: "auto"},
 	];
 </script>
 <script type="text/javascript" charset="utf-8">
@@ -215,10 +216,10 @@
 		gx.Request('/store/stock/stk30/search', data, 1);
 	}
 
-    // 창고반품 추가 팝업 오픈
-    const add = () => {
-        const url = '/store/stock/stock30/show';
-        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1735,height=800");
+    // 창고반품관리 팝업 오픈
+    const openDetailPopup = (sr_cd = '') => {
+        const url = '/store/stock/stk30/show/' + sr_cd;
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=880");
     };
 </script>
 @stop

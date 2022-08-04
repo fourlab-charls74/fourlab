@@ -224,6 +224,7 @@ class goods extends Controller
 				, g.upd_dm
 				, g.goods_location
 				, g.sale_price
+                , g.goods_sh 
 				, g.goods_type as goods_type_cd
 				, com.com_type as com_type_d
 				, s.prd_cd , s.goods_opt

@@ -226,6 +226,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 창고반품
         Route::get('stk30','stk30Controller@index');
         Route::get('stk30/search','stk30Controller@search');
+        Route::get('stk30/show/{sr_cd?}','stk30Controller@show');
+        Route::post('stk30/search-store-qty','stk30Controller@search_store_qty'); //  상품추가 시 매장수량 조회
+        Route::put('stk30/add-storage-return','stk30Controller@add_storage_return'); // 창고반품등록
 
     });
 
