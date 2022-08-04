@@ -116,61 +116,58 @@
         { field: "store_cd", headerName: "매장코드", pinned:'left', hide: true },
         { field: "store_nm", headerName: "매장명", pinned:'left', type: 'StoreNameType', width: 250 },
         { field: "", headerName: "매니저", pinned:'left',width: 70 },
-        { field: "", headerName: "등급", pinned:'left'},
+        { field: "name", headerName: "등급", pinned:'left', width: 100},
         { field: "sale_status", headerName: "매출",
-            children: [
-                { headerName: "소계", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "정상", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "정상2", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "정상3", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "특가", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "용품", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "특가(온라인)", field: "wonga", type: 'numberType',width:100 },
-            ]
+			children: [
+				{ headerName: "소계", field: "ord_amt", type: 'currencyMinusColorType', width: 100 },
+				@foreach (@$pr_codes as $pr_code)
+					{ headerName: "{{ $pr_code->code_val }}", field: "{{ $pr_code->code_id }}", type: 'currencyMinusColorType', width: 100 },
+				@endforeach
+			]
         },
-        { field: "sale_status", headerName: "수수료",
+        { field: "sale_fee", headerName: "수수료",
             children: [
                 { headerName: "소계", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "정상", field: "wonga", type: 'numberType',width:100,
+                { headerName: "정상", field: "", type: 'numberType',width:100,
                     children: [
-                        { headerName: "수수료율", field: "wonga", type: 'numberType',width:100 },
-                        { headerName: "수수료", field: "wonga", type: 'numberType',width:100 },
+                        { headerName: "수수료율", field: "fee1", type: 'percentType',width:100 },
+                        { headerName: "수수료", field: "fee_amt_1", type: 'currencyMinusColorType',width:100 },
                     ]
                 },
                 { headerName: "정상2", field: "wonga", type: 'numberType',width:100,
                     children: [
-                        { headerName: "수수료율", field: "wonga", type: 'numberType',width:100 },
-                        { headerName: "수수료", field: "wonga", type: 'numberType',width:100 },
+                        { headerName: "수수료율", field: "fee2", type: 'percentType',width:100 },
+                        { headerName: "수수료", field: "fee_amt_2", type: 'currencyMinusColorType',width:100 },
                     ]
                 },
                 { headerName: "정상3", field: "wonga", type: 'numberType',width:100,
                     children: [
-                        { headerName: "수수료율", field: "wonga", type: 'numberType',width:100 },
-                        { headerName: "수수료", field: "wonga", type: 'numberType',width:100 },
+                        { headerName: "수수료율", field: "fee3", type: 'percentType',width:100 },
+                        { headerName: "수수료", field: "fee_amt_3", type: 'currencyMinusColorType',width:100 },
                     ]
                 },
                 { headerName: "특가", field: "wonga", type: 'numberType',width:100,
                     children: [
-                        { headerName: "수수료율", field: "wonga", type: 'numberType',width:100 },
-                        { headerName: "수수료", field: "wonga", type: 'numberType',width:100 },
+                        { headerName: "수수료율", field: "fee_10", type: 'percentType',width:100 },
+                        { headerName: "수수료", field: "wonga", type: 'currencyMinusColorType',width:100 },
                     ]
                 },
                 { headerName: "용품", field: "wonga", type: 'numberType',width:100,
                     children: [
-                        { headerName: "수수료율", field: "wonga", type: 'numberType',width:100 },
-                        { headerName: "수수료", field: "wonga", type: 'numberType',width:100 },
+                        { headerName: "수수료율", field: "fee_11", type: 'percentType',width:100 },
+                        { headerName: "수수료", field: "wonga", type: 'currencyMinusColorType',width:100 },
                     ]
                 },
                 { headerName: "특가(온라인)", field: "wonga", type: 'numberType',width:100,
                     children: [
-                        { headerName: "수수료율", field: "wonga", type: 'numberType',width:100 },
-                        { headerName: "수수료", field: "wonga", type: 'numberType',width:100 },
+                        { headerName: "수수료율", field: "fee_12", type: 'percentType',width:100 },
+                        { headerName: "수수료", field: "wonga", type: 'currencyMinusColorType',width:100 },
                     ]
                 },
             ]
         },
-        { field: "sales_profit", headerName: "기타재반", type: 'currencyMinusColorType' },
-        { field: "sales_profit", headerName: "수수료+기타재반", type: 'currencyMinusColorType' },
+        { field: "", headerName: "기타재반", cellRenderer: (params) => 0, type: 'currencyMinusColorType' },
+        { field: "", headerName: "수수료+기타재반", type: 'currencyMinusColorType' },
         { headerName: "", field: "nvl", width: "auto" }
     ];
 
@@ -190,7 +187,7 @@
 
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/store/sale/sal06/search', data, -1);
+		gx.Request('/store/account/acc06/search', data, -1);
 	}
 
 </script>
