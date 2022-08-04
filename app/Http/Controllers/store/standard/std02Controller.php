@@ -77,11 +77,13 @@ class std02Controller extends Controller
 				a.*,
 				c.code_val as store_type_nm,
 				d.code_val as store_kind_nm,
-				e.code_val as store_area_nm
+				e.code_val as store_area_nm,
+				sg.name as grade_nm
 			from store a
 			left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = a.store_type
 			left outer join code d on d.code_kind_cd = 'store_kind' and d.code_id = a.store_kind
 			left outer join code e on e.code_kind_cd = 'store_area' and e.code_id = a.store_area
+			left outer join store_grade sg on a.grade_cd = sg.grade_cd
 			where 1=1 $where
 			$orderby
 			$limit
@@ -116,6 +118,7 @@ class std02Controller extends Controller
 	public function show($store_cd = '')
 	{
 		$store	= "";
+		$grades = [];
 
 		if($store_cd != '') {
 			$sql = "
@@ -129,10 +132,11 @@ class std02Controller extends Controller
 		$values = [
 			"cmd"	=> $store_cd == '' ? "" : "update",
 			"store"	=> $store,
-			'store_types'	=> SLib::getCodes("STORE_TYPE"),
-			'store_kinds'	=> SLib::getCodes("STORE_KIND"),
-			'store_areas'	=> SLib::getCodes("STORE_AREA"),
-			'prioritys'		=> SLib::getCodes("PRIORITY")
+			'store_types' => SLib::getCodes("STORE_TYPE"),
+			'store_kinds' => SLib::getCodes("STORE_KIND"),
+			'store_areas' => SLib::getCodes("STORE_AREA"),
+			'grades' => SLib::getValidStoreGrades(),
+			'prioritys' => SLib::getCodes("PRIORITY")
 		];
 
 		return view( Config::get('shop.store.view') . '/standard/std02_show',$values);
@@ -175,6 +179,7 @@ class std02Controller extends Controller
 				'store_type'	=> $request->input('store_type'),
 				'store_kind'	=> $request->input('store_kind'),
 				'store_area'	=> $request->input('store_area'),
+				'grade_cd'		=> $request->input('grade_cd'),
 				'zipcode'		=> $request->input('zipcode'),
 				'addr1'			=> $request->input('addr1'),
 				'addr2'			=> $request->input('addr2'),

@@ -170,6 +170,7 @@
 		{headerName:"매장명",		field:"store_nm", type: 'StoreNameType'},
 		{headerName:"매장구분",		field:"store_type_nm",	width:90, cellStyle:{"text-align":"center"}},
 		{headerName:"매장종류",		field:"store_kind_nm",	width:100, cellStyle:{"text-align":"center"}},
+		{headerName:"매장등급",		field:"grade_nm",	width:100, cellStyle:{"text-align":"center"}},
 		{headerName:"전화",			field:"phone",			width:100},
 		{headerName:"모바일",		field:"mobile",			width:100},
 		{headerName:"FAX",			field:"fax",			width:100},

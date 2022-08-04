@@ -111,7 +111,7 @@
         { field: "chk", headerName: '', cellClass: 'hd-grid-code', checkboxSelection: true, width: 40, pinned: 'left', sort: null },
         { field: "idx", hide: true },
         { field: "seq", hide: true },
-        { field: "grade", headerName: "등급코드(2글자)", width: 100, rowDrag: true, editable: true },
+        { field: "grade_cd", headerName: "등급코드", width: 100, rowDrag: true, editable: true },
         { field: "name", headerName: "등급명", width: 100, cellStyle: CENTER, editable: true },
         { field: "sdate", headerName: "시작일", width: 100, cellStyle: CENTER, editable: true },
         { field: "edate", headerName: "종료일", width: 100, cellStyle: CENTER, editable: true },
@@ -247,9 +247,9 @@
     const validation = (row, i)  => {
         const validSdate = new Date(row?.sdate);
         const validEdate = new Date(row?.edate);
-        if (row?.grade == "" || row?.grade == null) {
+        if (row?.grade_cd == "" || row?.grade_cd == null) {
             alert("등급 코드를 입력해 주세요.");
-            startEditingCell(i, "grade");
+            startEditingCell(i, "grade_cd");
             return false;
         }
         if (row?.name == "" || row?.name == null) {

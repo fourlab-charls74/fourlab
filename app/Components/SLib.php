@@ -61,6 +61,19 @@ class SLib
             ->orderBy("com_nm")->get();
     }
 
+    public static function getValidStoreGrades()
+    {
+        $sql = "
+            select 
+                grade_cd as code_id, name as code_val, seq, sdate, edate 
+            from store_grade sg
+            where sg.use_yn = 'Y' 
+            group by sg.grade_cd
+            order by sg.seq asc
+        ";
+        return DB::select($sql);
+    }
+
     public static function getBanks()
     {
         return DB::table('code')

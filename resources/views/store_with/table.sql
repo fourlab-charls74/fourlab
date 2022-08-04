@@ -219,18 +219,19 @@ CREATE TABLE `store` (
     `admin_id` varchar(30) DEFAULT NULL COMMENT '관리자 아이디',
     PRIMARY KEY (`store_cd`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+-- 매장에 '매장등급' 추가
+ALTER TABLE `bizest_smart`.`store` ADD COLUMN `grade_cd` varchar(2) NOT NULL COMMENT '매장등급 - store_grade : grade_cd' AFTER `store_kind`;
 
 CREATE TABLE `store_sales_projection` (
-                         `store_cd` varchar(30) NOT NULL COMMENT '매장코드',
-                         `ym` varchar(6) NOT NULL COMMENT '년월',
-                         `amt` bigint NOT NULL default '0' COMMENT '매출액',
-                         `uid` VARCHAR(50) DEFAULT NULL COMMENT '처리자',
-                         `unm` VARCHAR(50) DEFAULT NULL COMMENT '처리자명',
-                         `rt` datetime DEFAULT NULL COMMENT '등록일',
-                         `ut` datetime DEFAULT NULL COMMENT '수정일',
-                         PRIMARY KEY (`store_cd`)
+    `store_cd` varchar(30) NOT NULL COMMENT '매장코드',
+    `ym` varchar(6) NOT NULL COMMENT '년월',
+    `amt` bigint NOT NULL default '0' COMMENT '매출액',
+    `uid` VARCHAR(50) DEFAULT NULL COMMENT '처리자',
+    `unm` VARCHAR(50) DEFAULT NULL COMMENT '처리자명',
+    `rt` datetime DEFAULT NULL COMMENT '등록일',
+    `ut` datetime DEFAULT NULL COMMENT '수정일',
+    PRIMARY KEY (`store_cd`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 
 
 -- 창고
@@ -326,7 +327,7 @@ CREATE TABLE `store_fee` (
 CREATE TABLE `store_grade` (
     `idx` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'identify',
     `seq` INT(11) NOT NULL COMMENT '정렬순서',
-    `grade` VARCHAR(2) NOT NULL COMMENT '등급',
+    `grade_cd` VARCHAR(2) NOT NULL COMMENT '등급코드',
     `name` VARCHAR(30) NOT NULL COMMENT '등급명',
     `sdate` VARCHAR(10) DEFAULT NULL COMMENT '시작일',
     `edate` VARCHAR(10) DEFAULT NULL COMMENT '종료일',

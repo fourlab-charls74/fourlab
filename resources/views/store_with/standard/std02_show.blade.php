@@ -47,7 +47,7 @@
                                     <tbody>
                                         <tr>
                                             <th class="required">매장코드</th>
-                                            <td colspan="3">
+                                            <td style="width:35%;">
                                                 <div class="d-flex flex-column">
                                                     <div class="d-flex">
                                                         <input type="text" name="store_cd" id="store_cd" value="{{ @$store->store_cd }}" onkeydown="setDupCheckValue()" class="form-control form-control-sm w-50 mr-2" style="max-width:280px;" @if($cmd == "update") readonly @endif />
@@ -59,25 +59,23 @@
                                                     <input type="hidden" name="store_only" />
                                                 </div>
                                             </td>
-                                        </tr>
-                                        <tr>
 											<th class="required">매장명</th>
 											<td style="width:35%;">
 												<div class="form-inline">
 													<input type="text" name="store_nm" id="store_nm" value="{{ @$store->store_nm }}" class="form-control form-control-sm w-100" />
 												</div>
 											</td>
+                                        </tr>
+                                        <tr>
 											<th class="required">매장명(약칭)</th>
 											<td style="width:35%;">
 												<div class="form-inline">
 													<input type="text" name="store_nm_s" id="store_nm_s" value="{{ @$store->store_nm_s }}" class="form-control form-control-sm w-100" />
 												</div>
 											</td>
-                                        </tr>
-										<tr>
 											<th class="required">매장구분</th>
 											<td>
-												<div class="flax_box">
+												<div class="flex_box">
 													<select name='store_type' class="form-control form-control-sm">
 														<option value=''>전체</option>
 														@foreach ($store_types as $store_type)
@@ -86,13 +84,26 @@
 													</select>
 												</div>
 											</td>
+                                        </tr>
+										<tr>
 											<th class="required">매장종류</th>
 											<td>
-												<div class="flax_box">
+												<div class="flex_box">
 													<select name='store_kind' class="form-control form-control-sm">
 														<option value=''>전체</option>
 														@foreach ($store_kinds as $store_kind)
 															<option value='{{ $store_kind->code_id }}' @if(@$store->store_kind == $store_kind->code_id) selected @endif>{{ $store_kind->code_val }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
+											<th class="required">매장등급</th>
+											<td>
+												<div class="flex_box">
+													<select name='grade_cd' class="form-control form-control-sm">
+														<option value=''>미등록</option>
+														@foreach ($grades as $grade)
+															<option value='{{ $grade->code_id }}' @if(@$store->grade_cd == $grade->code_id) selected @endif>{{ $grade->code_val }}</option>
 														@endforeach
 													</select>
 												</div>
@@ -114,7 +125,7 @@
 										<tr>
 											<th class="required">매장지역</th>
 											<td>
-												<div class="flax_box">
+												<div class="flex_box">
 													<select name='store_area' class="form-control form-control-sm">
 														<option value=''>전체</option>
 														@foreach ($store_areas as $store_area)
@@ -400,7 +411,7 @@
 										<tr>
 											<th>출고우선순위</th>
 											<td>
-												<div class="flax_box">
+												<div class="flex_box">
 													<select name='priority' class="form-control form-control-sm">
 														<option value=''>전체</option>
 														@foreach ($prioritys as $priority)
