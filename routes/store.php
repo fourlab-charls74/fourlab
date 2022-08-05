@@ -287,12 +287,15 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
         // 매장판매수수료
         Route::get('acc04', 'acc04Controller@index');
+
+        // 기타재반자료
         Route::get('acc05', 'acc05Controller@index');
+        Route::get('acc05/search', 'acc05Controller@search');
+        Route::post('acc05/save', 'acc05Controller@save');
 
         // 매장중간관리자정산
         Route::get('acc06', 'acc06Controller@index');
         Route::get('acc06/search', 'acc06Controller@search');
-
 
     });
 

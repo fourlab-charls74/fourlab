@@ -69,8 +69,7 @@ class sal02Controller extends Controller
 		$sell_type = $request->input('sell_type');
 
 		$ym = str_replace("-", "", $sdate);
-		$next_month = $sdate[-1] + 1;
-		$edate = substr($sdate, 0, -1) . $next_month;
+		$edate = Carbon::parse($sdate)->firstOfMonth()->addMonth()->format("Y-m-d");
 
 		// 검색조건 필터링
 		$where = "";

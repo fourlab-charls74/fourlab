@@ -244,14 +244,21 @@
 		}
 	];
 
+	var mutable_cols = [];
+
 	const toInt = (value) => {
 		if (value == "" || value == NaN || value == null || value == undefined) return 0;
 		return parseInt(value);
 	};
 
-	const setColumns = (max_day) => {
-		columns.push({ ...dayColumns(max_day) });
-		columns.push({ headerName: "", field: "nvl", width: "auto" });
+	const setMutableColumns = (max_day) => {
+		mutable_cols = [];
+		columns.map(col => {
+			mutable_cols.push(col);
+		});
+		mutable_cols.push(dayColumns(max_day));
+		mutable_cols.push({ headerName: "", field: "nvl", width: "auto" });
+		console.log(mutable_cols);
 	};
 
 	const dayColumns = (max_day) => {
@@ -303,8 +310,8 @@
 	const formatDay = async (e) => {
 		yoil.codes = e.head.yoil_codes
 		const max_day = yoil.codes.length;
-		setColumns(max_day);
-		gx.gridOptions.api.setColumnDefs(columns);
+		setMutableColumns(max_day);
+		gx.gridOptions.api.setColumnDefs(mutable_cols);
 		gx.CalAggregation();
 		autoSizeColumns(gx, ["nvl"]);
 	};

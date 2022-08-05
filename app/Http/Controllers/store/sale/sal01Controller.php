@@ -334,6 +334,9 @@ class sal01Controller extends Controller
 		$order['sale_place'] = $order['com_nm'];
 		$order['user_nm'] = $order['ord_nm'] ? $order['ord_nm']: "비회원";
 
+		$ord_date = $order["ord_date"];
+		$ord_state_date = Carbon::parse($order["ord_date"])->format('Ymd');
+
 		$order['qty'] = Lib::uncm($order['qty']);
 
 		$order["ord_amt"] = Lib::uncm($order["ord_amt"]);
@@ -494,7 +497,7 @@ class sal01Controller extends Controller
 					$order_mst = [
 						"ord_no"		=> $ord_no,
 						"store_cd"      => $store_cd,
-						"ord_date"      => $order["ord_date"],
+						"ord_date"      => $ord_date,
 						"user_id" 		=> $order["user_id"],
 						"user_nm" 		=> $order["user_nm"],
 						"phone" 		=> Lib::getValue($order, "phone", ""),
@@ -587,7 +590,7 @@ class sal01Controller extends Controller
 					"dlv_comment" 	=> @$order["dlv_comment"],
 					"admin_id" 		=> $admin_id,
 					"sales_com_fee" => @$order["sales_com_fee"],
-					"ord_date"      => $order["ord_date"],
+					"ord_date"      => $ord_date,
 					'prd_cd'        => $prd_cd
 				];
 				DB::table('order_opt')->insert($order_opt);
@@ -608,6 +611,9 @@ class sal01Controller extends Controller
 
 				// 재고 차감 여기
 				// $orderClass->CompleteOrderSugi($ord_opt_no, $order["ord_state"]);
+				
+				
+
 				$orderClass->SetOrdOptNo($ord_opt_no);
 				$order_opt_wonga = array(
 					"goods_no" => $order['goods_no'],
@@ -630,6 +636,7 @@ class sal01Controller extends Controller
 					"coupon_no" => $order['coupon_no'],
 					"com_coupon_ratio" => $order['com_coupon_ratio'],
 					"sales_com_fee" => $order['sales_com_fee'],
+					'order_state_date' => $ord_state_date,
 					'prd_cd' => $prd_cd
 				);
 				$orderClass->__InsertOptWonga($order_opt_wonga);

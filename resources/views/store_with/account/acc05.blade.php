@@ -26,31 +26,17 @@
 				<div class="row">
 					<div class="col-lg-4">
 						<div class="form-group">
-							<label for="good_types">판매기간</label>
-							<div class="form-inline date-select-inbox">
-								<div class="docs-datepicker form-inline-inner input_box">
-									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
-										<div class="input-group-append">
-											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-												<i class="fa fa-calendar" aria-hidden="true"></i>
-											</button>
-										</div>
+							<label for="good_types">판매기간(판매연월)</label>
+							<div class="docs-datepicker flex_box">
+								<div class="input-group">
+								<input type="text" class="form-control form-control-sm docs-date month" name="sdate" value="{{ $sdate }}" autocomplete="off">
+									<div class="input-group-append">
+										<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
+											<i class="fa fa-calendar" aria-hidden="true"></i>
+										</button>
 									</div>
-									<div class="docs-datepicker-container"></div>
 								</div>
-								<span class="text_line">~</span>
-								<div class="docs-datepicker form-inline-inner input_box">
-									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
-										<div class="input-group-append">
-											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-												<i class="fa fa-calendar" aria-hidden="true"></i>
-											</button>
-										</div>
-									</div>
-									<div class="docs-datepicker-container"></div>
-								</div>
+								<div class="docs-datepicker-container"></div>
 							</div>
 						</div>
 					</div>
@@ -87,12 +73,15 @@
 	</div>
 </form>
 <!-- DataTales Example -->
-<div class="card shadow mb-0 last-card pt-2 pt-sm-0">
-	<div class="card-body">
-		<div class="card-title">
+<div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
+	<div class="card-body shadow">
+        <div class="card-title mb-3">
 			<div class="filter_wrap">
 				<div class="fl_box">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
+				</div>
+				<div class="fr_box">
+					<a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataEdit();"><span class="fs-12">선택 매장 수정</span></a>
 				</div>
 			</div>
 		</div>
@@ -102,8 +91,16 @@
 	</div>
 </div>
 <script language="javascript">
+
+	const emptyToZero = (params) => {
+		if (params.value === "" || params.value === undefined | params.value === null) {
+        	return 0;
+        }
+	};
+
     var columns = [
-        { headerName: "#", field: "num", type:'NumType', pinned:'left', aggSum:"합계", aggAvg:"평균", cellStyle: { 'text-align': "center" },
+		{ field: "chk", headerName: '', cellClass: 'hd-grid-code', checkboxSelection: true, width: 40, pinned: 'left', sort: null },
+        { headerName: "#", field: "num", type:'NumType', pinned:'left', cellStyle: { 'text-align': "center" },
             cellRenderer: function (params) {
                 if (params.node.rowPinned === 'top') {
                     return "합계";
@@ -114,66 +111,96 @@
         },
         { field: "store_type_nm", headerName: "매장구분", pinned:'left', width:90, cellStyle: { 'text-align': "center" } },
         { field: "store_cd", headerName: "매장코드", pinned:'left', hide: true },
-        { field: "store_nm", headerName: "매장명", pinned:'left', type: 'StoreNameType', width: 250 },
-        { field: "sale_status", headerName: "관리",
-            children: [
-                { headerName: "소계", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "전화요금", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "인터넷", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "본사수선비", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "보관비외부창고", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "본사창고본사부담", field: "wonga", type: 'numberType',width:100 },
-            ]
+        { field: "store_nm", headerName: "매장명", pinned:'left', type: 'StoreNameType', width: 180 },
+		@foreach($dynamic_cols as $group_nm => $children)
+		{ field: "{{$group_nm}}", headerName: "{{$group_nm}}",
+			children: [
+				{ headerName: "소계", field: "{{$group_nm}}_sum", type: 'numberType', width:100, valueFormatter: (params) => emptyToZero(params) },
+			@foreach($children as $child)
+				{ headerName: "{{$child->code_val}}", field: "{{$child->code_id}}_code", 
+					type: 'numberType', width:100, valueFormatter: (params) => emptyToZero(params), editable: true
+				},
+			@endforeach
+			]
         },
-        { field: "sale_status", headerName: "소모품",
-            children: [
-                { headerName: "소계", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "반다나", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "에코백", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "스티커", field: "wonga", type: 'numberType',width:100 },
-            ]
-        },
-        { field: "sale_status", headerName: "사은품",
-            children: [
-                { headerName: "소계", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "박스테이프", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "수입 쇼핑백(소)", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "수입 쇼핑백(중)", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "수입 쇼핑백(대)", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "쇼핑백(특소)", field: "wonga", type: 'numberType',width:100 },
-            ]
-        },
-        { field: "sale_status", headerName: "기타",
-            children: [
-                { headerName: "소계", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "온라인", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "인센티브", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "페널티", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "기타", field: "wonga", type: 'numberType',width:100 },
-            ]
-        },
-        { field: "sales_profit", headerName: "추가지급", type: 'currencyMinusColorType' },
+		@endforeach
         { headerName: "", field: "nvl", width: "auto" }
     ];
 
 </script>
 <script type="text/javascript" charset="utf-8">
+
 	const pApp = new App('',{
 		gridId:"#div-gd",
 	});
 	let gx;
 	$(document).ready(function() {
-		pApp.ResizeGrid(265);
+		pApp.ResizeGrid(275);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns);
+		gx.gridOptions.onCellValueChanged = params => evtAfterEdit(params);
 		Search();
 	});
 
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/store/sale/sal06/search', data, -1);
+		gx.Request('/store/account/acc05/search', data, -1);
 	}
+
+	async function DataEdit() {
+		let arr = [];
+        let rows = gx.getSelectedRows();
+        for (let i=0; i < rows.length; i++) {
+            let row = rows[i];
+			let regExp = /.+(?=_code)/i;
+			
+			const code_ids = Object.keys(row)
+				.filter(key => key.match(regExp))
+				.map(key => key.split('_code')[0]);
+			const code_amts = code_ids.map(id => row[id] ? row[id] : 0);
+
+			arr.push({
+				codes: code_ids,
+				amts: code_amts,
+				store_cd: row.store_cd,
+				ymonth: row.ymonth ? row.ymonth : 
+			});
+        }
+		console.log(arr);
+		return false;
+        try {
+            const response = await axios({ 
+                url: '/store/account/acc05/save',
+                method: 'post', 
+                data: { data: arr } 
+            });
+            const { data } = response;
+            if (data?.code == 200) {
+                // Search();
+            } else {
+                alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+            }
+        } catch (error) {
+            // console.log(error);
+        }
+    }
+
+	const evtAfterEdit = (params) => {
+		if (params.oldValue !== params.newValue) {
+			row = params.data;
+			const column_name = params.column.colId;
+			const value = params.newValue;
+			if (isNaN(value) == true || value == "" || parseFloat(value) < 0) {
+				alert("숫자만 입력가능합니다.");
+				startEditingCell(params.rowIndex, column_name);
+			}
+		}
+	};
+
+    const startEditingCell = (row_index, col_key) => {
+        gx.gridOptions.api.startEditingCell({ rowIndex: row_index, colKey: col_key });
+    };
 
 </script>
 @stop

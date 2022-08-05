@@ -14,121 +14,77 @@ class acc05Controller extends Controller
 {
     public function index(Request $request) {
 
-        $sdate = Carbon::now()->startOfMonth()->format("Y-m-d"); // 이번 달 기준
-        $edate = Carbon::now()->format("Y-m-d");
+        $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 이번 달 기준
 
         $store_types = SLib::getStoreTypes();
-        $sale_kind_id = $request->input('sale_kind_id', "");
-
         $sale_kinds = SLib::getUsedSaleKinds();
-
-        // 행사구분 - 추후 논의사항
-        $sql = "
-			select *
-			from __tmp_code
-			where
-				code_kind_cd = 'event_cd' and use_yn = 'Y' order by code_seq
-		";
-        $event_cds = DB::select($sql);
-
+        $dynamic_cols = SLib::getCodes('G_ACC_EXTRA_TYPE')->groupBy('code_val2');
+        
         $values = [
-            'sdate'         => $sdate,
-            'edate'         => $edate,
-            'store_types'	=> $store_types,
-            'event_cds'		=> $event_cds,
-            'sale_kinds' 	=> $sale_kinds
+            'sdate' => $sdate,
+            'store_types' => $store_types,
+            'sale_kinds' => $sale_kinds,
+            'dynamic_cols' => $dynamic_cols,
         ];
+
         return view( Config::get('shop.store.view') . '/account/acc05', $values );
     }
 
     public function search(Request $request)
     {
-        $sdate = $request->input('sdate', now()->format("Ymd"));
-        $edate = $request->input('edate', date("Ymd"));
-
-        $sdate = str_replace("-", "", $sdate);
-        $edate = str_replace("-", "", $edate);
+        $sdate = $request->input('sdate', now()->format("Y-m"));
+        $sdate = Lib::quote(str_replace("-", "", $sdate));
 
         $store_type = $request->input('store_type', "");
         $store_cd = $request->input('store_cd', "");
-        $goods_no = $request->input('goods_no', "");
-        $goods_nm = $request->input("goods_nm");
-        $brand_cd = $request->input("brand_cd");
-        $style_no = $request->input('style_no', "");
-
-        $sale_yn = $request->input('sale_yn','Y');
-        $sale_kind = $request->input('sale_kind', "");
 
         /**
          * 검색조건 필터링
          */
         $where = "";
-        if ($brand_cd != "") $where .= " and b.brand = '" . Lib::quote($brand_cd) . "' ";
-
-        $goods_no = preg_replace("/\s/", ",", $goods_no);
-        $goods_no = preg_replace("/\t/", ",", $goods_no);
-        $goods_no = preg_replace("/\n/", ",", $goods_no);
-        $goods_no = preg_replace("/,,/", ",", $goods_no);
-        if ($goods_no != "") {
-            $goods_nos = explode(",", $goods_no);
-            if (count($goods_nos) > 1) {
-                if (count($goods_nos) > 500) array_splice($goods_nos, 500);
-                $in_goods_nos = join(",", $goods_nos);
-                $where .= " and g.goods_no in ( $in_goods_nos ) ";
-            } else {
-                if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
-            }
-        }
-
-        if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%'";
-        if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%'";
-        if ($sale_kind != "") $where .= " and m.sale_kind = '" . Lib::quote($sale_kind) . "' ";
+        if ($store_cd != "") $where .= " and s.store_cd like '" . Lib::quote($store_cd) . "%'";
 
         $where2 = "";
-        if ($sale_yn == "Y") $where2 .= " and qty is not null";
         if ($store_type) $where2 .= " and c.code_id = " . Lib::quote($store_type);
-        if ($store_cd != "") $where2 .= " and s.store_cd like '" . Lib::quote($store_cd) . "%'";
 
-        // 판매유형별 쿼리 추가
-        $sale_kinds = SLib::getUsedSaleKinds();
-        $sale_kinds_query = "";
-        foreach ($sale_kinds as $item) {
-            $id = $item->code_id;
-            $sale_kinds_query .= "sum(if(m.sale_kind = '$id', w.qty, 0)) as sale_kind_$id, ";
-        }
+        /**
+         * 기타재반자료구분 쿼리 추가
+         */
+        $extra_types = SLib::getCodes('G_ACC_EXTRA_TYPE');
+
+        $extra_types_query = $extra_types->reduce((function ($carry, $item) 
+        {
+            $query = $carry[0];
+            $group_nm = $carry[1];
+            
+            $type = $item->code_id;
+            if ($group_nm != $item->code_val2) {
+                $group_nm = $item->code_val2;
+                $query = $query . "sum(if(c2.code_val2 = '$group_nm', e.extra_amt, 0)) as ${group_nm}_sum, ";
+            }
+
+            $query = $query . "sum(if(e.type = '$type', e.extra_amt, 0)) as ${type}_code, ";
+            return [$query, $group_nm];
+        }), ["", ""]);
+        $extra_types_query = $extra_types_query[0];
 
         $sql = /** @lang text */
-            "
-			select s.store_nm, c.code_val as store_type_nm, a.*
-			from store s left outer join (
-				select
-					m.store_cd,count(*) as cnt,
-					$sale_kinds_query
-					sum(w.qty) as qty,
-					sum(w.qty * w.price) as amt,
-					sum(w.recv_amt + w.point_apply_amt) as recv_amt,
-					sum(w.qty * w.price - w.recv_amt) as discount,
-					avg(w.price) as avg_price,
-					avg(w.wonga) as wonga,
-					sum(w.wonga * w.qty) as sum_wonga,
-					sum(w.qty * w.price - w.wonga * w.qty) as sales_profit,
-					(sum(w.qty * w.price) / sum(w.qty * w.price - w.wonga * w.qty)) * 100 as profit_rate,
-					g.goods_type, c.code_val as sale_stat_cl_val, c2.code_val as goods_type_nm,
-					o.goods_no, g.brand, b.brand_nm, g.style_no, o.goods_opt, g.img, g.goods_nm, g.goods_nm_eng
-				from order_mst m
-					inner join order_opt o on m.ord_no = o.ord_no
-					inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
-					inner join goods g on o.goods_no = g.goods_no
-					left outer join store s on m.store_cd = s.store_cd
-					left outer join brand b on g.brand = b.brand
-					left outer join `code` c on c.code_kind_cd = 'g_goods_stat' and g.sale_stat_cl = c.code_id
-					left outer join `code` c2 on c2.code_kind_cd = 'g_goods_type' and g.goods_type = c2.code_id
-				where w.`ord_state_date` >= '$sdate' and w.ord_state_date <= '$edate' and w.`ord_state` in ( '10','60','61')
-					and m.store_cd <> '' $where
-				group by m.store_cd
-			) as a on s.store_cd = a.store_cd
-				left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = s.store_type
-			where 1=1 $where2
+        "
+			select s.store_cd, s.store_nm, c.code_val as store_type_nm, a.* 
+            from store s
+                left outer join `code` c on c.code_kind_cd = 'store_type' and c.code_id = s.store_type
+                left outer join 
+                (
+                    select 
+                        e.ymonth as ymonth,
+                        $extra_types_query
+                        e.store_cd as scd
+                    from store_account_extra as e
+                        left outer join `code` c2 on c2.code_kind_cd = 'g_acc_extra_type' and c2.code_id = e.type
+                    where ymonth = '$sdate' $where
+                    group by e.store_cd
+                ) as a on s.store_cd = a.scd
+            $where2
 		";
 
         $result = DB::select($sql);
@@ -142,5 +98,49 @@ class acc05Controller extends Controller
         ]);
 
     }
+
+	public function save(Request $request)
+	{
+		$data = $request->input('data');
+		try {
+			DB::transaction(function () use ($data) {
+				foreach ($data as $row) {
+					/**
+					 * 데이터 가공, 초기 값 설정 및 불필요한 프로퍼티 제거
+					 */
+                    unset($row['editable']);
+                    if (array_key_exists('ymonth', $row) === false) $row['ymonth'] = now()->format("Ym");
+                    $store_cd = Lib::quote($row['store_cd']);
+                    $ymonth = Lib::quote($row['ymonth']);
+					/**
+					 * 등급이 있는 경우 업데이트 / 없는 경우 추가
+					 */
+					
+					$sql = /** @lang text */
+                    "
+                        select store_cd, ymonth, count(*) as cnt 
+                        from store_account_extra s
+                        where s.store_cd = '$store_cd'
+                        and s.ymonth = '$ymonth'
+                    ";
+					$result = DB::selectOne($sql);
+					if ($result->cnt > 0) {
+                        echo "업데이트";
+						dd($result);
+						// DB::table('store_grade')->where('idx', "=", $result->idx)->update($row);
+					} else {
+                        echo "삽입";
+						dd($result);
+						DB::table('store_account_extra')->insert($row);
+					}
+				}
+			});
+			return response()->json(['code'	=> '200']);
+		} catch (\Exception $e) {
+            dd($e);
+			return response()->json(['code' => '500']);
+		}
+		return response()->json([]);
+	}
 
 }
