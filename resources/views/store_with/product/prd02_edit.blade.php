@@ -31,6 +31,10 @@
 	</style>
 
 	<form name="f1" id="f1">
+
+        <input type="hidden" name="product_code" value="{{ $product_code }}">
+        <input type="hidden" name="org_goods_no" value="{{ $goods_no }}">
+
 		<div class="card_wrap aco_card_wrap">
 			<div class="card shadow">
 				<div class="card-header mb-0">
@@ -182,18 +186,9 @@
 		{field:"style_no",	headerName: "아이템코드",	width:72},
 		{field:"goods_nm",	headerName: "상품명",		width:250},
 		{field:"goods_opt",	headerName: "상품옵션",		width:200},
-		{field:"prd_cd1",	headerName: "상품코드",		width:120,
-			editable: function(params) {return params.data.match_yn !== 'Y';}, 
-			cellStyle: function(params) {return params.data.match_yn !== 'Y' ? {"background-color": "#ffFF99"} : {};}
-		},
-		{field:"color",		headerName: "컬러",			width:72,
-			editable: function(params) {return params.data.match_yn !== 'Y';}, 
-			cellStyle: function(params) {return params.data.match_yn !== 'Y' ? {"background-color": "#ffFF99"} : {};}
-		},
-		{field:"size",		headerName: "사이즈",		width:72,
-			editable: function(params) {return params.data.match_yn !== 'Y';}, 
-			cellStyle: function(params) {return params.data.match_yn !== 'Y' ? {"background-color": "#ffFF99"} : {};}
-		},
+		{field:"prd_cd1",	headerName: "상품코드",		width:120},
+		{field:"color",		headerName: "컬러",			width:72},
+		{field:"size",		headerName: "사이즈",		width:72},
 		{field:"match_yn", headerName: "등록유무",		width:72},
 		{field:"brand",		headerName:"브랜드",		hide:true},
 		{field:"year",		headerName:"년도",			hide:true},
@@ -224,7 +219,7 @@
 	
     function Search() {
         let data = $('form[name="f1"]').serialize();
-        gx.Request('/store/product/prd02/prd-search/', data);
+        gx.Request('/store/product/prd02/prd-edit-search/', data);
     }
 
 	//상품옵션 불러오기
@@ -238,7 +233,8 @@
 
 	const validation = (cmd) => {
 		// 브랜드 선택 여부
-		if(f1.brand.selectedIndex == 0) {
+/*
+        if(f1.brand.selectedIndex == 0) {
 			f1.brand.focus();
 			return alert("브랜드를 선택해주세요.");
 		}
@@ -272,7 +268,7 @@
 			f1.opt.focus();
 			return alert("품목을 선택해주세요.");
 		}
-
+*/
 		// 상품번호 입력여부
 		if(f1.goods_no.value.trim() === '') {
 			f1.goods_no.focus();

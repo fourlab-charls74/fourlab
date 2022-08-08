@@ -483,4 +483,99 @@ class prd02Controller extends Controller
 
 	}
 
+	public function prd_edit_search(Request $request){
+		$product_code	= $request->input('product_code');
+		$org_goods_no	= $request->input('org_goods_no');
+
+		$brand		= $request->input('brand');
+		$year		= $request->input('year');
+		$season		= $request->input('season');
+		$gender		= $request->input('gender');
+		$item		= $request->input('item');
+		$opt		= $request->input('opt');
+		$goods_no	= $request->input('goods_no');
+		$goods_sub	= 0;
+		$prd_cd1	= "";
+		$seq		= "01";
+		$prd_yn		= "N";
+		$chk_prd_cd	= "";
+
+		$sql	= "
+			select
+				a.goods_no, b.style_no, b.goods_nm, a.goods_opt, '' as prd_cd1, '' as color, '' as size, '' as match_yn,
+				'$brand' as brand, '$year' as year, '$season' as season, '$gender' as gender, '$item' as item, '$opt' as opt,
+				'' as seq
+			from goods_summary a
+			inner join goods b on a.goods_no = b.goods_no and b.goods_sub = 0
+			where
+				a.goods_no = :goods_no1 and a.goods_sub = :goods_sub
+
+			union all
+
+			select
+				a.goods_no, b.style_no, b.goods_nm, c.goods_opt, concat(a.brand, a.year, a.season, a.gender, a.item, a.seq, a.opt) as prd_cd1, a.color, a.size, 'Y' as match_yn,
+				a.brand, a.year, a.season, a.gender, a.item, a.opt, a.seq
+			from product_code a
+			inner join goods b on a.goods_no = b.goods_no and b.goods_sub = 0
+			inner join product_stock c on a.prd_cd = c.prd_cd
+			where
+				a.goods_no = :goods_no2
+				and a.goods_no <> :org_goods_no
+		";
+
+		$result = DB::select($sql,['goods_no1' => $goods_no, 'goods_sub' => $goods_sub, 'goods_no2' => $goods_no, 'org_goods_no' => $org_goods_no]);
+
+		foreach($result as $row){
+
+			if( $row->match_yn == "Y" ){
+			}else{
+				$sql_sub	= " 
+					select ifnull(max(seq),'00') as seq
+					from product_code 
+					where 
+						brand	= :brand
+						and year	= :year
+						and season	= :season
+						and item	= :item
+						and opt		= :opt
+				";
+				$result_sub	= DB::select($sql_sub,['brand' => $brand, 'year' => $year, 'season' => $season, 'item' => $item, 'opt' => $opt]);
+				$seq = $result_sub[0]->seq + 1;
+	
+				if(strlen($seq) == "1")	$seq = "0" . $seq;
+		
+				$row->seq	= $seq;
+
+				$goods_opt	= explode('^', $row->goods_opt);
+				$color		= strtolower(str_replace(" ", "", $goods_opt[0]));
+				$size		= isset($goods_opt[1]) ? $goods_opt[1] : "";
+
+				$sql		= " select code_id as color_cd from code where	code_kind_cd = 'PRD_CD_COLOR' and LOWER(replace(code_val,' ','')) = :color limit 1 ";
+				$color_cd	= DB::selectOne($sql, ["color" => $color])->color_cd;
+
+				if( $size != "" ){
+					$size		= strtolower(str_replace(" ", "", $goods_opt[1]));
+
+					$sql		= " select code_val as size_cd from code where	code_kind_cd = 'PRD_CD_SIZE_MATCH' and LOWER(replace(code_val2,' ','')) = :size limit 1 ";
+					$size_cd	= DB::selectOne($sql, ["size" => $size])->size_cd;
+				}
+				
+				$prd_cd1		= $brand . $year . $season . $gender . $item . $seq . $opt;
+
+				$row->prd_cd1	= $prd_cd1;
+				$row->color		= isset($color_cd) ? $color_cd : "";
+				$row->size		= isset($size_cd) ? $size_cd : "";
+			}
+		}
+
+		return response()->json([
+			"code"	=> 200,
+			"head"	=> array(
+				"total"		=> count($result),
+			),
+			"body" => $result
+		]);
+
+	}
+
 }
