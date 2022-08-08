@@ -318,7 +318,7 @@ class prd02Controller extends Controller
 			union all
 
 			select
-				a.goods_no, b.style_no, b.goods_nm, c.goods_opt, concat(a.brand, a.year, a.season, a.item, a.seq, a.opt) as prd_cd1, a.color, a.size, 'Y' as match_yn,
+				a.goods_no, b.style_no, b.goods_nm, c.goods_opt, concat(a.brand, a.year, a.season, a.gender, a.item, a.seq, a.opt) as prd_cd1, a.color, a.size, 'Y' as match_yn,
 				a.brand, a.year, a.season, a.gender, a.item, a.opt, a.seq
 			from product_code a
 			inner join goods b on a.goods_no = b.goods_no and b.goods_sub = 0
@@ -451,6 +451,36 @@ class prd02Controller extends Controller
 		}
 
         return response()->json(["code" => $code, "msg" => $msg]);
+	}
+
+	public function edit_goods_no($product_code, $goods_no, Request $request){
+
+		$sql	= "
+			select
+				brand, year, season, gender, item, opt, seq, color, size
+			from product_code
+			where
+				prd_cd = :prd_cd and goods_no = :goods_no
+		";
+		$product	= DB::selectOne($sql,['prd_cd' => $product_code, 'goods_no' => $goods_no]);
+
+		$sql	= " select brand_nm, br_cd from brand where use_yn = 'Y' and br_cd <> '' ";
+		$brands	= DB::select($sql);
+		
+		$values = [
+			'brands'	=> $brands,
+			'years'		=> SLib::getCodes("PRD_CD_YEAR"),
+			'seasons'	=> SLib::getCodes("PRD_CD_SEASON"),
+			'genders'	=> SLib::getCodes("PRD_CD_GENDER"),
+			'items'		=> SLib::getCodes("PRD_CD_ITEM"),
+			'opts'		=> SLib::getCodes("PRD_CD_OPT"),
+			'product_code'	=> $product_code,
+			'goods_no'	=> $goods_no,
+			'product'	=> $product
+		];
+
+		return view( Config::get('shop.store.view') . '/product/prd02_edit',$values);
+
 	}
 
 }
