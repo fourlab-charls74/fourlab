@@ -85,6 +85,7 @@ class acc05Controller extends Controller
                     group by e.store_cd
                 ) as a on s.store_cd = a.scd
             $where2
+            order by s.store_cd
 		";
 
         $result = DB::select($sql);
@@ -101,43 +102,50 @@ class acc05Controller extends Controller
 
 	public function save(Request $request)
 	{
-		$data = $request->input('data');
+		$data = $request->input('selected_data');
 		try {
 			DB::transaction(function () use ($data) {
 				foreach ($data as $row) {
 					/**
-					 * 데이터 가공, 초기 값 설정 및 불필요한 프로퍼티 제거
+					 * 데이터 가공, 초기 값 설정
 					 */
-                    unset($row['editable']);
-                    if (array_key_exists('ymonth', $row) === false) $row['ymonth'] = now()->format("Ym");
+                    $codes = $row['codes'];
+                    $amts = $row['amts'];
                     $store_cd = Lib::quote($row['store_cd']);
                     $ymonth = Lib::quote($row['ymonth']);
+
 					/**
 					 * 등급이 있는 경우 업데이트 / 없는 경우 추가
 					 */
-					
-					$sql = /** @lang text */
-                    "
-                        select store_cd, ymonth, count(*) as cnt 
-                        from store_account_extra s
-                        where s.store_cd = '$store_cd'
-                        and s.ymonth = '$ymonth'
-                    ";
-					$result = DB::selectOne($sql);
-					if ($result->cnt > 0) {
-                        echo "업데이트";
-						dd($result);
-						// DB::table('store_grade')->where('idx', "=", $result->idx)->update($row);
-					} else {
-                        echo "삽입";
-						dd($result);
-						DB::table('store_account_extra')->insert($row);
-					}
+                    for ($i=0; $i < count($codes); $i++) { 
+                        $code = Lib::quote($codes[$i]);
+                        $amt = Lib::quote($amts[$i]);
+                        $sql = /** @lang text */
+                        "
+                            select idx, count(*) as cnt 
+                            from store_account_extra s
+                            where s.store_cd = '$store_cd'
+                                and s.ymonth = '$ymonth'
+                                and s.type = '$code'
+                        ";
+                        $result = DB::selectOne($sql);
+                        if ($result->cnt > 0) {
+                            DB::table('store_account_extra')->where('idx', "=", $result->idx)
+                            ->update(['extra_amt' => $amt]);
+                        } else {
+                            DB::table('store_account_extra')->insert([
+                                'store_cd' => $store_cd,
+                                'ymonth' => $ymonth,
+                                'type' => $code,
+                                'extra_amt' => $amt
+                            ]);
+                        }
+                    }
 				}
 			});
 			return response()->json(['code'	=> '200']);
 		} catch (\Exception $e) {
-            dd($e);
+            // dd($e);
 			return response()->json(['code' => '500']);
 		}
 		return response()->json([]);
