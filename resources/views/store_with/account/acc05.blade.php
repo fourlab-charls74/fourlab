@@ -130,6 +130,8 @@
 </script>
 <script type="text/javascript" charset="utf-8">
 
+	let current_Ym = "";
+
 	const pApp = new App('',{
 		gridId:"#div-gd",
 	});
@@ -145,7 +147,9 @@
 
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/store/account/acc05/search', data, -1);
+		gx.Request('/store/account/acc05/search', data, -1, () => {
+			current_Ym = (document.search.sdate.value).replace("-", "");
+		});
 	}
 
 	async function DataEdit() {
@@ -158,26 +162,26 @@
 			const code_ids = Object.keys(row)
 				.filter(key => key.match(regExp))
 				.map(key => key.split('_code')[0]);
-			const code_amts = code_ids.map(id => row[id] ? row[id] : 0);
+			const code_amts = code_ids.map(id => row[`${id}_code`] ? row[`${id}_code`] : 0);
 
 			arr.push({
 				codes: code_ids,
 				amts: code_amts,
 				store_cd: row.store_cd,
-				ymonth: row.ymonth ? row.ymonth : 
+				ymonth: row.ymonth ? row.ymonth : current_Ym
 			});
         }
-		console.log(arr);
-		return false;
+		
         try {
             const response = await axios({ 
                 url: '/store/account/acc05/save',
                 method: 'post', 
-                data: { data: arr } 
+                data: { selected_data: arr } 
             });
             const { data } = response;
             if (data?.code == 200) {
-                // Search();
+				alert('저장되었습니다.');
+                Search();
             } else {
                 alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
             }

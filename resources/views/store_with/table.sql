@@ -466,12 +466,14 @@ CREATE TABLE `store_account_etc` (
 
 -- 매장기타재반자료
 CREATE TABLE `store_account_extra` (
+    `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT 'identify',
     `store_cd` VARCHAR(30) NOT NULL DEFAULT '' COMMENT '매장코드',
     `ymonth` VARCHAR(6) NOT NULL COMMENT '정산연월',
     `rt` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '등록일시',
     `type` VARCHAR(10) NOT NULL DEFAULT '' COMMENT 'code - G_ACC_EXTRA_TYPE',
     `extra_amt` INT(11) DEFAULT NULL COMMENT '기타재반자료액',
-    PRIMARY KEY (`store_cd`, `ymonth`)
+    PRIMARY KEY (`idx`),
+    KEY `store_cd` (`store_cd`, `ymonth`, `type`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='매장기타재반자료'
 
 --
