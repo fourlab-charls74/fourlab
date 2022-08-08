@@ -111,7 +111,19 @@
                                         <div class="row">
                                             <div class="col-lg-12 inner-td">
                                                 <div class="form-group">
-                                                    <label style="min-width:60px;">매장명</label>
+                                                    <label style="min-width:80px;">매장구분</label>
+                                                    <div class="flax_box">
+														<select name='store_type' class="form-control form-control-sm" id="search_store_type">
+															<option value=''>전체</option>
+														</select>
+													</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12 inner-td">
+                                                <div class="form-group">
+                                                    <label style="min-width:80px;">매장명</label>
                                                     <div class="flex_box">
                                                         <input type='text' class="form-control form-control-sm search-all" onkeypress="searchStore.Search(event);" name='store_nm' value=''>
                                                     </div>

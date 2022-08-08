@@ -4,6 +4,7 @@ namespace App\Http\Controllers\store\api;
 
 use App\Http\Controllers\Controller;
 use App\Components\Lib;
+use App\Components\SLib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -27,13 +28,22 @@ class StoreController extends Controller {
     {
         $store_cd = $request->input('store_cd');
         $store_nm = $request->input('store_nm');
+        $store_type = $request->input('store_type', '');
+        $where = "";
+
+        if($store_type != '') {
+            $where .= " and store_type = $store_type";
+        }
+
         $sql = "
             select store_cd, store_nm 
             from store 
             where store_nm like '%" . Lib::quote($store_nm) . "%'
                 and store_cd like '%" . Lib::quote($store_cd) . "%'
+                $where
         ";
         $rows = DB::select($sql);
+
         return response()->json([
             "code" => 200,
             "head" => array(
@@ -41,6 +51,15 @@ class StoreController extends Controller {
             ),
             "body" => $rows
         ]);
+    }
+
+    /**
+     * 매장구분 목록조회
+     */
+    public function search_storetype(Request $request)
+    {
+        $store_types = SLib::getCodes("STORE_TYPE");
+        return response()->json(['code' => 200, 'body' => $store_types]);
     }
 
     /**
