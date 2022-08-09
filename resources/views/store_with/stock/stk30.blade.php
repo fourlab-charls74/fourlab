@@ -187,7 +187,7 @@
 
 <script language="javascript">
 	let columns = [
-        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 28,
+        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: false, sort: null, width: 28,
             checkboxSelection: function(params) {
                 return params.data.sr_state < 40;
             },

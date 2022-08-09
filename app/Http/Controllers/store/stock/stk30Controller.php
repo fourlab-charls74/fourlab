@@ -204,7 +204,7 @@ class stk30Controller extends Controller
                 g.style_no, 
                 stat.code_val as sale_stat_cl, 
                 g.goods_nm,
-                ps.goods_opt,
+                pc.goods_opt,
                 g.goods_sh,
                 srp.price,
                 srp.return_price, 
@@ -215,7 +215,6 @@ class stk30Controller extends Controller
             from storage_return_product srp
                 inner join product_code pc on pc.prd_cd = srp.prd_cd
                 inner join goods g on g.goods_no = pc.goods_no
-                inner join product_stock ps on ps.prd_cd = srp.prd_cd
                 left outer join storage_return sr on sr.sr_cd = srp.sr_cd
                 left outer join product_stock_store pss on pss.store_cd = sr.store_cd and pss.prd_cd = srp.prd_cd
                 left outer join brand b on b.brand = g.brand
@@ -236,32 +235,6 @@ class stk30Controller extends Controller
 				"page_total" => 1,
 			],
 			"body" => $products
-		]);
-    }
-
-    // 반품할 상품 등록 시 매장수량 조회
-    public function search_store_qty(Request $request)
-    {
-        $store_cd = $request->input("store_cd", "");
-        $data = $request->input("data", []);
-        $result = [];
-
-        foreach($data as $d)
-        {
-            $sql = "
-                select wqty
-                from product_stock_store
-                where store_cd = :store_cd
-                    and prd_cd = :prd_cd
-            ";
-            $row = DB::selectOne($sql, ["store_cd" => $store_cd, "prd_cd" => $d['prd_cd']]);
-            $d['store_wqty'] = $row != null ? $row->wqty : 0;
-            array_push($result, $d);
-        }
-
-		return response()->json([
-			"code" => 200,
-			"body" => $result
 		]);
     }
 

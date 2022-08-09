@@ -16,7 +16,9 @@
             </div>
         </div>
         <div class="d-flex">
+            @if(@$cmd == 'add' or @$sr->sr_state == '10')
             <a href="javascript:void(0)" onclick="Save('{{ @$cmd }}')" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
+            @endif
             <a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i> 닫기</a>
         </div>
     </div>
@@ -142,6 +144,8 @@
 </div>
 
 <script language="javascript">
+    const cmd = '{{ @$cmd }}';
+    const now_state = '{{ @$sr->sr_state }}';
     const pinnedRowData = [{ prd_cd: '합계', qty: 0, total_return_price: 0 }];
 
     let columns = [
@@ -157,7 +161,7 @@
         {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
         {field: "goods_no", headerName: "상품번호", cellStyle: {"text-align": "center"}},
         {field: "goods_type_nm", headerName: "상품구분", cellStyle: StyleGoodsType},
-        {field: "opt_kind_nm", headerName: "품목", width: 100, cellStyle: {"text-align": "center"}},
+        {field: "opt_kind_nm", headerName: "품목", width: 80, cellStyle: {"text-align": "center"}},
         {field: "brand", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
         {field: "style_no",	headerName: "스타일넘버", cellStyle: {"text-align": "center"}},
         {field: "sale_stat_cl", headerName: "상품상태", cellStyle: StyleGoodsState},
@@ -169,7 +173,7 @@
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
-        {field: "store_wqty", headerName: "매장수량", width: 60, type: 'currencyType'},
+        {field: "store_wqty", headerName: "매장보유재고", width: 80, type: 'currencyType'},
         {field: "qty", headerName: "반품수량", width: 60, type: 'currencyType', 
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
@@ -197,15 +201,28 @@
                     if (isNaN(e.newValue) == true || e.newValue == "") {
                         alert("숫자만 입력가능합니다.");
                         gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                    } else if(e.newValue < 0) {
+                        alert("음수는 입력할 수 없습니다.");
+                        gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
                     } else {
-                        e.data.total_return_price = parseInt(e.data.qty) * parseInt(e.data.return_price);
-                        gx.gridOptions.api.updateRowData({update: [e.data]});
-                        updatePinnedRow();
+                        if(e.column.colId === "qty" && e.data.store_wqty < parseInt(e.data.qty)) {
+                            alert("해당 매장의 보유재고보다 많은 수량을 반품할 수 없습니다.");
+                            gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                        } else {
+                            e.data.total_return_price = parseInt(e.data.qty) * parseInt(e.data.return_price);
+                            gx.gridOptions.api.updateRowData({update: [e.data]});
+                            updatePinnedRow();
+                        }
                     }
                 }
             }
         });
         if('{{ @$cmd }}' === 'update') GetProducts();
+
+        $("#store_no").on("change", function(e) {
+            gx.gridOptions.api.setRowData([]);
+            updatePinnedRow();
+        });
     });
 
     // 등록된 상품리스트 가져오기
@@ -229,7 +246,15 @@
             let storage_cd = document.f1.storage_cd.value;
             let store_cd = document.f1.store_no.value;
 
-            if(store_cd === '') return alert("매장을 선택해주세요.");
+            if(store_cd === '') {
+                $(".sch-store").click();
+                return alert("매장을 선택해주세요.");
+            }
+            if(rows.length < 1) return alert("반품등록할 상품을 선택해주세요.");
+
+            let zero_qtys = rows.filter(r => r.qty < 1);
+            if(zero_qtys.length > 0) return alert("반품수량이 0개인 항목이 존재합니다.");
+
             if(!confirm("등록하시겠습니까?")) return;
 
             axios({
@@ -287,7 +312,7 @@
     }
 
     const checkIsEditable = (params) => {
-        return params.data.hasOwnProperty('isEditable') && params.data.isEditable ? true : false;
+        return (cmd == 'add' || now_state == '10') && params.data.hasOwnProperty('isEditable') && params.data.isEditable ? true : false;
     };
 
     // 상품 삭제
@@ -314,7 +339,7 @@
             return alert('매장을 선택해주세요.');
         }
 
-        const url = `/store/api/goods/show`;
+        const url = `/store/api/store-goods/show/` + ff.store_no.value;
         window.open(url, "_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1800,height=1000");
     }
 
@@ -340,34 +365,19 @@
         row = { 
             ...row, 
             item: row.opt_kind_nm, 
-            qty: 1, 
+            qty: row.store_wqty > 0 ? 1 : 0, 
             return_price: row.price,
-            total_return_price: row.price,
+            total_return_price: row.price * (row.store_wqty > 0 ? 1 : 0),
             isEditable: true,
             count: count + 1,
         };
         callbaackRows.push(row);
     };
     
-    var setStoreQty = (data = callbaackRows) => {
-        const store_cd = $("[name=store_no]").val();
-        axios({
-            url: '/store/stock/stk30/search-store-qty',
-            method: 'post',
-            data: {
-                data, 
-                store_cd
-            },
-        }).then(function (res) {
-            if(res.data.code === 200) {
-                gx.gridOptions.api.applyTransaction({ add : res.data.body });
-                callbaackRows = [];
-                updatePinnedRow();
-            }
-        }).catch(function (err) {
-            console.log(err);
-            alert("매장수량 조회 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-        });
+    var setStoreQty = () => {
+        gx.gridOptions.api.applyTransaction({ add : callbaackRows });
+        callbaackRows = [];
+        updatePinnedRow();
     }
 
     const updatePinnedRow = () => { // 총 반품금액, 반품수량을 반영한 PinnedRow를 업데이트
