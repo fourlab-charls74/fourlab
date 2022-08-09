@@ -365,9 +365,11 @@
         row = { 
             ...row, 
             item: row.opt_kind_nm, 
-            qty: row.store_wqty > 0 ? 1 : 0, 
+            qty: 0, 
             return_price: row.price,
-            total_return_price: row.price * (row.store_wqty > 0 ? 1 : 0),
+            // qty: row.store_wqty > 0 ? 1 : 0, 
+            // total_return_price: row.price * (row.store_wqty > 0 ? 1 : 0),
+            total_return_price: 0,
             isEditable: true,
             count: count + 1,
         };
