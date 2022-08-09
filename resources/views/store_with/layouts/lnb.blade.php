@@ -38,7 +38,7 @@
                     <li><a href="/store/stock/stk01">(완)매장재고</a></li>
                     <li><a href="/store/stock/stk02">(개)매장재고입출고</a></li>
                     <li><a href="/store/stock/stk10">(완)출고</a></li>
-                    <li><a href="/store/stock/stk30">(개)창고반품</a></li>
+                    <li><a href="/store/stock/stk30">(완)창고반품</a></li>
                     <li><a href="/store/stock/stk11">(개)반품</a></li>
                     <li><a href="/store/stock/stk20">(완)매장RT</a></li>
                     <li><a href="">매장주문 - 는 포스화면</a></li>
@@ -68,7 +68,7 @@
                 <ul>
                     <li><a href="/store/sale/sal11">배분현황</a></li>
                     <li><a href="/store/sale/sal17">(완)매장목표</a></li>
-                    <li><a href="/store/sale/sal18">월별할인적용유형관리</a></li>
+                    <li><a href="/store/sale/sal18">(개)월별할인적용유형관리</a></li>
                     <li><a href="/store/sale/sal20">LOSS(창고/매장) 등록</a></li>
                 </ul>
             </li>

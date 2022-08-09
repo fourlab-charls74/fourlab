@@ -270,6 +270,11 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('sal17','sal17Controller@index');
         Route::get('sal17/search','sal17Controller@search');
         Route::post('sal17/update','sal17Controller@update');
+
+        // 월별할인유형적용관리
+        Route::get('sal18', 'sal18Controller@index');
+        Route::get('sal18/search', 'sal18Controller@search');
+        Route::get('sal18/search-store', 'sal18Controller@search_store');
     });
 
     Route::prefix("account")->namespace('account')->group(function () {
