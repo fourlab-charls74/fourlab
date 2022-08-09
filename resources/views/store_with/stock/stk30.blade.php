@@ -165,6 +165,17 @@
 			<div class="filter_wrap">
 				<div class="d-flex justify-content-between">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
+                    <div class="d-flex">
+                        <div class="d-flex">
+                            <select id='chg_return_state' name='chg_return_state' class="form-control form-control-sm mr-1" style='width:70px;display:inline'>
+                                <option value="30">이동</option>
+                                <option value="40">완료</option>
+                            </select>
+                        </div>
+                        <a href="javascript:void(0);" onclick="ChangeState()" class="btn btn-sm btn-primary">상태변경</a>
+                        <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
+                        <a href="javascript:void(0);" onclick="DelReturn()" class="btn btn-sm btn-outline-primary">삭제</a>
+                    </div>
 				</div>
 			</div>
 		</div>
@@ -176,6 +187,11 @@
 
 <script language="javascript">
 	let columns = [
+        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 28,
+            checkboxSelection: function(params) {
+                return params.data.sr_state < 40;
+            },
+        },
         {field: "sr_cd", headerName: "반품코드", width: 100, cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {
                 return `<a href="javascript:void(0);" onclick="openDetailPopup(${params.value})">${params.value}</a>`;
@@ -221,5 +237,71 @@
         const url = '/store/stock/stk30/show/' + sr_cd;
         window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=880");
     };
+
+    // 반품상태변경
+    function ChangeState() {
+        let rows = gx.getSelectedRows();
+        if(rows.length < 1) return alert("상태변경할 항목을 선택해주세요.");
+
+        let chg_state = $("[name=chg_return_state]").val();
+
+        if(chg_state == 30) {
+            let wrong_list = rows.filter(r => r.sr_state != 10);
+            if(wrong_list.length > 0) return alert("'요청'상태의 항목만 '이동'처리할 수 있습니다.");
+        } else if(chg_state == 40) {
+            let wrong_list = rows.filter(r => r.sr_state != 30);
+            if(wrong_list.length > 0) return alert("'이동'상태의 항목만 '완료'처리할 수 있습니다.");
+        }
+
+        if(!confirm("선택한 항목의 반품상태를 변경하시겠습니까?")) return;
+
+        axios({
+            url: '/store/stock/stk30/update-return-state',
+            method: 'put',
+            data: {
+                data: rows,
+                new_state: chg_state
+            },
+        }).then(function (res) {
+            if(res.data.code === 200) {
+                alert(res.data.msg);
+                Search();
+            } else {
+                console.log(res.data);
+                alert("상태변경 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
+    }
+
+    // 반품정보 삭제
+    function DelReturn() {
+        let rows = gx.getSelectedRows();
+        if(rows.length < 1) return alert("삭제할 항목을 선택해주세요.");
+
+        let wrong_list = rows.filter(r => r.sr_state != 10);
+        if(wrong_list.length > 0) return alert("'요청'상태의 항목만 삭제할 수 있습니다.");
+
+        if(!confirm("삭제한 창고반품정보는 다시 되돌릴 수 없습니다.\n선택한 항목을 삭제하시겠습니까?")) return;
+
+        axios({
+            url: '/store/stock/stk30/del-return',
+            method: 'delete',
+            data: {
+                sr_cds: rows.map(r => r.sr_cd),
+            },
+        }).then(function (res) {
+            if(res.data.code === 200) {
+                alert(res.data.msg);
+                Search();
+            } else {
+                console.log(res.data);
+                alert("삭제 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
+    }
 </script>
 @stop

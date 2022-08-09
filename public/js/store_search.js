@@ -60,10 +60,11 @@ function SearchStore(){
     this.grid = null;
 }
 
-SearchStore.prototype.Open = function(callback = null, isMultiple = false){
+SearchStore.prototype.Open = async function(callback = null, isMultiple = false){
     if(this.grid === null){
         this.isMultiple = isMultiple;
         this.SetGrid("#div-gd-store");
+        this.SetStoreTypeSelect();
         $("#SearchStoreModal").draggable();
         if(this.isMultiple) $("#SearchStoreModal #search_store_cbtn").css("display", "block");
         this.callback = callback;
@@ -72,6 +73,17 @@ SearchStore.prototype.Open = function(callback = null, isMultiple = false){
         keyboard: false
     });
 };
+
+// 매장구분 세팅
+SearchStore.prototype.SetStoreTypeSelect = async function(){
+    const { data: { body: types } } = await axios({ 
+        url: `/store/api/stores/search-storetype`, 
+        method: 'get' 
+    });
+    for(let type of types) {
+        $("#search_store_type").append(`<option value="${type.code_id}">${type.code_val}</option>`);
+    }
+}
 
 SearchStore.prototype.SetGrid = function(divId){
     let columns = [];
