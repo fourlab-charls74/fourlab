@@ -18,7 +18,7 @@ class acc05Controller extends Controller
 
         $store_types = SLib::getStoreTypes();
         $sale_kinds = SLib::getUsedSaleKinds();
-        $dynamic_cols = SLib::getCodes('G_ACC_EXTRA_TYPE')->groupBy('code_val2');
+        $dynamic_cols = SLib::getCodes('G_ACC_EXTRA_TYPE')->groupBy('code_val2'); // code_val2를 상위 카테고리로 사용
         
         $values = [
             'sdate' => $sdate,

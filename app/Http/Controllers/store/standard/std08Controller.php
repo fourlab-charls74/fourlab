@@ -28,15 +28,14 @@ class std08Controller extends Controller
 
 	public function search(Request $request)
 	{
-		$sdate = $request->input('sdate', now()->format("Y-m-d"));
-		$edate = $request->input('edate', date("Y-m-d"));
-		$use_yn = $request->input("use_yn", "Y");
-		$where = "";
-		if ($use_yn != null) $where .= " and sg.use_yn = '$use_yn'";
+		$grade_nm = $request->input("name", ""); 
+		$use_yn = $request->input("use_yn", "");
+		$where = "where 1=1";
+		if ($use_yn != "") $where .= " and sg.use_yn = '$use_yn'";
+		if ($grade_nm != "") $where .= " and sg.name like '%" . Lib::quote($grade_nm) . "%'";
 		$sql = "
 			select *
 			from store_grade sg
-			where sg.sdate >= '$sdate' and sg.edate <= '$edate'
 			$where
 			order by seq asc
 		";
@@ -61,18 +60,28 @@ class std08Controller extends Controller
 					 * 데이터 가공, 초기 값 설정 및 불필요한 프로퍼티 제거
 					 */
 					if (array_key_exists('sdate', $row) === false) $row['sdate'] = now()->format("Y-m-d");
-					if (array_key_exists('edate', $row) === false) $row['edate'] = now()->format("Y-m-d");
+					$grade_cd = Lib::quote($row['grade_cd']);
+					$added = Lib::quote(@$row['added']);
+					$idx = Lib::quote($row['idx']);
+					unset($row['idx']);
 					unset($row['added']);
 					unset($row['editable']);
+
+					/**
+					 * 새로 추가되는 등급인 경우 등급코드가 중복인 항목들의 사용여부를 N으로 변경
+					 */
+					if ($added) {
+						DB::table('store_grade')->where([['grade_cd', "=", $grade_cd], ['idx', "<>", $idx]])->update(['use_yn' => "N", 'edate' => now()->format("Y-m-d")]);
+					}
+
 					/**
 					 * 등급이 있는 경우 업데이트 / 없는 경우 추가
 					 */
-					$idx = Lib::quote($row['idx']);
-					$sql = "select idx, count(*) as cnt from store_grade sg where sg.idx = '$idx'";
+					$sql = "select count(*) as cnt from store_grade sg where sg.idx = '$idx'";
 					$result = DB::selectOne($sql);
 					if ($result->cnt > 0) {
-						unset($row['idx']);
-						DB::table('store_grade')->where('idx', "=", $result->idx)->update($row);
+						$result = DB::selectOne($sql);
+						DB::table('store_grade')->where('idx', "=", $idx)->update($row);
 					} else {
 						$row['seq'] = count($data) - 1;
 						DB::table('store_grade')->insert($row);
@@ -81,6 +90,7 @@ class std08Controller extends Controller
 			});
 			return response()->json(['code'	=> '200']);
 		} catch (Exception $e) {
+			// dd($e);
 			return response()->json(['code' => '500']);
 		}
 		return response()->json([]);
