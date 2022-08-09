@@ -92,6 +92,8 @@
 </div>
 <script language="javascript">
 
+	const YELLOW = {'background-color': "#ffff99"};
+
 	const emptyToZero = (params) => {
 		if (params.value === "" || params.value === undefined | params.value === null) {
         	return 0;
@@ -118,7 +120,8 @@
 				{ headerName: "소계", field: "{{$group_nm}}_sum", type: 'numberType', width:100, valueFormatter: (params) => emptyToZero(params) },
 			@foreach($children as $child)
 				{ headerName: "{{$child->code_val}}", field: "{{$child->code_id}}_code", 
-					type: 'numberType', width:100, valueFormatter: (params) => emptyToZero(params), editable: true
+					type: 'numberType', width:100, valueFormatter: (params) => emptyToZero(params), editable: true, 
+					cellStyle: YELLOW, group_nm: "{{$group_nm}}"
 				},
 			@endforeach
 			]
@@ -151,6 +154,24 @@
 			current_Ym = (document.search.sdate.value).replace("-", "");
 		});
 	}
+
+	const sumChildren = (children, group_nm, idx) => {
+		const rowNode = gx.gridOptions.api.getRowNode(idx);
+		console.log(rowNode);
+		// const row = rowNode.data[idx];
+		// let sum = 0;
+		// children.map(item => {
+		// 	const id = item.code_id;
+		// 	console.log(row);
+		// 	// sum += row[id];
+		// })
+		// rowNode.setDataValue(`${group_nm}_sum`, sum);
+		// const rowNode = gx.gridOptions.api.getRowNode(idx);
+		// console.log(rowNode.data);
+		// console.log(row, sum, children, group_nm);
+		// console.log(idx, group_nm);
+		// rowNode.setDataValue(`${group_nm}_sum`, 1);
+	};
 
 	async function DataEdit() {
 		let arr = [];
