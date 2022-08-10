@@ -471,7 +471,7 @@
 
 		function EditProduct(product_code, goods_no) {
 			var url = '/store/product/prd02/edit-goods-no/' + product_code + '/' + goods_no;
-			var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1024,height=900");
+			var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1100,height=900");
 		}
 
 		const EditProducts = () => {
