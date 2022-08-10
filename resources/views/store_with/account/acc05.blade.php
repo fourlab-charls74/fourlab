@@ -117,11 +117,14 @@
 		@foreach($dynamic_cols as $group_nm => $children)
 		{ field: "{{$group_nm}}", headerName: "{{$group_nm}}",
 			children: [
-				{ headerName: "소계", field: "{{$group_nm}}_sum", type: 'numberType', width:100, valueFormatter: (params) => emptyToZero(params) },
+				{ headerName: "소계", field: "{{$group_nm}}_sum", 
+					type: 'currencyType', width:100, valueFormatter: (params) => formatNumber(params),
+					valueGetter: (params) => sumChildren(params, @php echo json_encode($children); @endphp)
+				},
 			@foreach($children as $child)
-				{ headerName: "{{$child->code_val}}", field: "{{$child->code_id}}_code", 
-					type: 'numberType', width:100, valueFormatter: (params) => emptyToZero(params), editable: true, 
-					cellStyle: YELLOW, group_nm: "{{$group_nm}}"
+				{ headerName: "{{$child->code_val}}", field: "{{$child->code_id}}_code",
+					type: 'currencyType', editable: true, width:100, valueFormatter: (params) => formatNumber(params),
+					cellStyle: YELLOW
 				},
 			@endforeach
 			]
@@ -155,22 +158,16 @@
 		});
 	}
 
-	const sumChildren = (children, group_nm, idx) => {
-		const rowNode = gx.gridOptions.api.getRowNode(idx);
-		console.log(rowNode);
-		// const row = rowNode.data[idx];
-		// let sum = 0;
-		// children.map(item => {
-		// 	const id = item.code_id;
-		// 	console.log(row);
-		// 	// sum += row[id];
-		// })
-		// rowNode.setDataValue(`${group_nm}_sum`, sum);
-		// const rowNode = gx.gridOptions.api.getRowNode(idx);
-		// console.log(rowNode.data);
-		// console.log(row, sum, children, group_nm);
-		// console.log(idx, group_nm);
-		// rowNode.setDataValue(`${group_nm}_sum`, 1);
+	const sumChildren = (params, children) => {
+		const row = params.data;
+		let total_str = 0;
+		total_str = children.reduce((prev, curr) => {
+			let id = curr.code_id;
+			let value = row[`${id}_code`];
+			if (value === null) value = 0;
+			return prev += parseInt(value);
+		}, total_str)
+		return isNaN(total_str) ? 0 : total_str;
 	};
 
 	async function DataEdit() {
@@ -214,6 +211,7 @@
 	const evtAfterEdit = (params) => {
 		if (params.oldValue !== params.newValue) {
 			row = params.data;
+			const rowNode = params.node;
 			const column_name = params.column.colId;
 			const value = params.newValue;
 			if (isNaN(value) == true || value == "" || parseFloat(value) < 0) {
