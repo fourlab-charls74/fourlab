@@ -31,48 +31,21 @@
                 <div class="row">
                     <div class="col-lg-3">
                         <div class="form-group">
-                            <label for="good_types">기간</label>
-                            <div class="form-inline date-select-inbox">
-                                <div class="docs-datepicker form-inline-inner input_box">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-                                                <i class="fa fa-calendar" aria-hidden="true"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="docs-datepicker-container"></div>
-                                </div>
-                                <span class="text_line">~</span>
-                                <div class="docs-datepicker form-inline-inner input_box">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                                <i class="fa fa-calendar" aria-hidden="true"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="docs-datepicker-container"></div>
-                                </div>
+                            <label for="name">등급명</label>
+                            <div class="flex_box">
+                                <input type='text' class="form-control form-control-sm search-enter" name='name' value=''>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-3">
                         <div class="form-group">
-                            <label for="use_yn_y">사용여부</label>
+                            <label for="use_yn">사용여부</label>
                             <div class="flex_box">
-                                <div class="form-inline form-radio-box">
-                                    <div class="custom-control custom-radio">
-                                        <input type="radio" name="use_yn" id="use_yn_y" class="custom-control-input" value="Y" checked/>
-                                        <label class="custom-control-label" for="use_yn_y">Y</label>
-                                    </div>
-                                    <div class="custom-control custom-radio">
-                                        <input type="radio" name="use_yn" id="use_yn_n" class="custom-control-input" value="N"/>
-                                        <label class="custom-control-label" for="use_yn_n">N</label>
-                                    </div>
-                                </div>
+                                <select id="use_yn" name="use_yn" class="form-control form-control-sm">
+                                    <option value="">전체</option>
+                                    <option value="Y" @if(@$section->use_yn == "Y") selected @endif>Y</option>
+                                    <option value="N" @if(@$section->use_yn == "N") selected @endif>N</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -106,42 +79,47 @@
     </div>
 </div>
 <script language="javascript">
-    const CENTER = {'text-align': 'center'};
+    const CENTER = {'text-align': "center"};
+    const YELLOW = {'background-color': "#ffff99"};
     let columns = [
         { field: "chk", headerName: '', cellClass: 'hd-grid-code', checkboxSelection: true, width: 40, pinned: 'left', sort: null },
         { field: "idx", hide: true },
         { field: "seq", hide: true },
-        { field: "grade_cd", headerName: "등급코드", width: 100, rowDrag: true, editable: true },
-        { field: "name", headerName: "등급명", width: 100, cellStyle: CENTER, editable: true },
-        { field: "sdate", headerName: "시작일", width: 100, cellStyle: CENTER, editable: true },
-        { field: "edate", headerName: "종료일", width: 100, cellStyle: CENTER, editable: true },
+        { field: "grade_cd", headerName: "등급코드", width: 100, rowDrag: true, editable: (params) => isAdded(params), 
+            cellStyle: (params) => isAdded(params) ? YELLOW : {}
+        },
+        { field: "name", headerName: "등급명", width: 100, cellStyle: CENTER, editable: true, cellStyle: YELLOW },
+        { field: "sdate", headerName: "시작일", width: 100, cellStyle: CENTER, editable: true, cellStyle: {...YELLOW, ...CENTER} },
+        { field: "edate", headerName: "종료일", width: 100, cellStyle: CENTER },
         { field: "g1", headerName: "정상",
             children: [
-                { headerName: "금액", field: "amt1", type: 'currencyType', width:100, editable: true },
-                { headerName: "수수료율", field: "fee1", type: 'percentType', width:100, editable: true },
+                { headerName: "금액", field: "amt1", type: 'currencyType', width:100, editable: true, cellStyle: YELLOW },
+                { headerName: "수수료율", field: "fee1", type: 'percentType', width:100, editable: true, cellStyle: YELLOW },
             ]
         },
         { field: "g2", headerName: "정상2",
             children: [
-                { headerName: "금액", field: "amt2", type: 'currencyType', width:100, editable: true },
-                { headerName: "수수료율", field: "fee2", type: 'percentType', width:100, editable: true },
+                { headerName: "금액", field: "amt2", type: 'currencyType', width:100, editable: true, cellStyle: YELLOW },
+                { headerName: "수수료율", field: "fee2", type: 'percentType', width:100, editable: true, cellStyle: YELLOW },
             ]
         },
         { field: "g3", headerName: "정상3",
             children: [
-                { headerName: "금액", field: "amt3", type: 'currencyType', width:100, editable: true },
-                { headerName: "수수료율", field: "fee3", type: 'percentType', width:100, editable: true },
+                { headerName: "금액", field: "amt3", type: 'currencyType', width:100, editable: true, cellStyle: YELLOW },
+                { headerName: "수수료율", field: "fee3", type: 'percentType', width:100, editable: true, cellStyle: YELLOW },
             ]
         },
-        { field: "fee_10", headerName: "특판", width: 60, type: 'percentType', editable: true },
-        { field: "fee_11", headerName: "용품", width: 60, type: 'percentType', editable: true },
-        { field: "fee_12", headerName: "특약온라인", width: 90, type: 'percentType', editable: true },
-        { field: "use_yn", headerName: "사용여부", width: 60, cellStyle: CENTER, editable: true },
-        { field: "bigo", headerName: "비고", width: 200, editable: true },
+        { field: "fee_10", headerName: "특판", width: 60, type: 'percentType', editable: true, cellStyle: YELLOW },
+        { field: "fee_11", headerName: "용품", width: 60, type: 'percentType', editable: true, cellStyle: YELLOW },
+        { field: "fee_12", headerName: "특약온라인", width: 90, type: 'percentType', editable: true, cellStyle: YELLOW },
+        { field: "use_yn", headerName: "사용여부", width: 60, cellStyle: CENTER },
+        { field: "bigo", headerName: "비고", width: 200, editable: true, cellStyle: YELLOW },
         { width: "auto" },
     ];
 </script>
 <script type="text/javascript" charset="utf-8">
+
+    const isAdded = (params) => params?.data.added ? true : false;
 
     let gx;
     const pApp = new App('', { gridId: "#div-gd" });
@@ -153,11 +131,6 @@
         gx = new HDGrid(gridDiv, columns);
         gx.gridOptions.rowDragManaged = true;
         gx.gridOptions.animateRows = true;
-        gx.gridOptions.getRowStyle = (params) => {
-            if (params.data?.added === true) {
-                return { 'background': '#FFFF99' }
-            }
-        };
         Search();
     });
 
@@ -177,7 +150,6 @@
             idx: rows.length,
             seq: rows.length,
             use_yn: 'Y',
-            editable: 'Y',
             added: true
         };
         gx.gridOptions.api.applyTransaction({
@@ -222,7 +194,13 @@
     async function DataDel() {
         let arr = [];
         const rows = gx.getSelectedRows();
-        rows.map(row => arr.push(row));
+        rows.map(row => {
+            if (row.added) {
+                gx.gridOptions.api.applyTransaction({remove : [row]});
+                return false;
+            }
+            arr.push(row)
+        });
         if (arr.length > 0 && confirm('삭제 하시겠습니까?')) {
             try {
                 const response = await axios({ 
@@ -239,8 +217,6 @@
             } catch (error) {
                 // console.log(error);
             }
-        } else {
-            alert('삭제할 상품을 선택 해 주십시오.');
         }
     }
 
@@ -265,19 +241,12 @@
             startEditingCell(i, "sdate");
             return false;
         }
-        arr = row?.edate?.match(regex);
-        if (Array.isArray(arr) && arr.length > 0) {
-        } else {
-            alert("종료일은 연-월-일 형식으로 입력해 주세요.");
-            startEditingCell(i, "edate");
-            return false;
-        }
-        const use_yn_type = ["Y", "N"];
-        if (use_yn_type.includes(row?.use_yn) === false) {
-            alert("사용여부는 Y 또는 N 으로 입력하셔야 합니다.");
-            startEditingCell(i, "use_yn");
-            return false;
-        }
+        // const use_yn_type = ["Y", "N"];
+        // if (use_yn_type.includes(row?.use_yn) === false) {
+        //     alert("사용여부는 Y 또는 N 으로 입력하셔야 합니다.");
+        //     startEditingCell(i, "use_yn");
+        //     return false;
+        // }
         return true;
     };
 
