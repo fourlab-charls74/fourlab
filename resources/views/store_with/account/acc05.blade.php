@@ -218,6 +218,7 @@
 				alert("숫자만 입력가능합니다.");
 				startEditingCell(params.rowIndex, column_name);
 			}
+			rowNode.setSelected(true);
 		}
 	};
 
