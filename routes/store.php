@@ -277,6 +277,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('sal18', 'sal18Controller@index');
         Route::get('sal18/search', 'sal18Controller@search');
         Route::get('sal18/search-store', 'sal18Controller@search_store');
+        Route::post('sal18/save', 'sal18Controller@save');
     });
 
     Route::prefix("account")->namespace('account')->group(function () {

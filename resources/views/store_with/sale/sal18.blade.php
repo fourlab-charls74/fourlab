@@ -23,8 +23,10 @@
             <div class="d-flex card-header justify-content-between">
                 <h4>검색</h4>
                 <div>
-                    <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-					<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2" onclick="initSearch()">검색조건 초기화</a>
+                    <a href="javascript:void(0);" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+					<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1" onclick="initSearch()">검색조건 초기화</a>
+                    <a href="javascript:void(0);" onclick="return Save();" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
+					<a href="#" class="btn btn-sm btn-outline-primary shadow-sm pl-2">매장별할인율적용</a>
                 </div>
             </div>
             <div class="card-body">
@@ -49,13 +51,13 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-							<label for="sale_kind">판매구분</label>
+							<label for="store_type">매장구분</label>
                             <div class="form-inline">
-                                <select id="sale_kind" name="sale_kind" class="form-control form-control-sm w-100">
+                                <select id="store_type" name="store_type" class="form-control form-control-sm w-100 mr-1">
                                     <option value="">전체</option>
-                                    @foreach ($sale_kinds as $sale_kind)
-                                    <option value="{{ $sale_kind->code_id }}">
-                                        {{ $sale_kind->code_val }}
+                                    @foreach ($store_types as $store_type)
+                                    <option value="{{ $store_type->code_id }}">
+                                        {{ $store_type->code_val }}
                                     </option>
                                     @endforeach
                                 </select>
@@ -64,9 +66,11 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-							<label for="sale_type_nm">판매유형명</label>
-                            <div class="form-inline">
-                                <input type="text" id="sale_type_nm" name="sale_type_nm" class="form-control form-control-sm w-100" />
+							<label>매장명</label>
+                            <div class="form-inline inline_btn_box">
+                                <input type='hidden' id="store_nm" name="store_nm">
+                                <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
+                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                             </div>
 						</div>
                     </div>
@@ -75,42 +79,24 @@
         </div>
         <div class="resul_btn_wrap mb-3">
 			<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-			<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1" onclick="initSearch()">검색조건 초기화</a>
+			<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2" onclick="initSearch()">검색조건 초기화</a>
+            <a href="javascript:void(0);" onclick="return Save();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
+            <a href="#" class="btn btn-sm btn-outline-primary shadow-sm pl-2">매장별할인율적용</a>
         </div>
     </div>
 </form>
 
 <div class="row show_layout">
-    <div class="col-lg-3 pr-1">
-        <div class="card shadow-none mb-0">
-            <div class="card-header mb-0">
-                <h5 class="m-0">판매유형목록</h5>
-            </div>
-            <div class="card-body shadow pt-2">
-                <div class="table-responsive">
-                    <div id="div-gd" class="ag-theme-balham"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-9">
+    <div class="col-lg-10 pr-1">
         <div class="card shadow-none mb-0">
             <div class="card-header mb-0 d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row">
                 <h5 class="m-0 mb-3 mb-sm-0"><span id="select_store_nm"></span>매장목록</h5>
                 <div class="d-flex align-items-center justify-content-center justify-content-sm-end">
-					<div class="d-flex">
-						<select id="store_type" name="store_type" class="form-control form-control-sm mr-1" style="width: 110px;">
-							<option value="">== 선택 ==</option>
-							@foreach ($store_types as $store_type)
-							<option value="{{ $store_type->code_id }}">
-								{{ $store_type->code_val }}
-							</option>
-							@endforeach
-						</select>
-						<button type="button" class="btn btn-sm btn-primary shadow-sm" onclick="SearchDetail()"><i class="fas fa-search fa-sm text-white-50"></i> 조회</button>
-					</div>
+                    <input type='text' class="form-control form-control-sm mr-1" name='batch_apply' value='15' style="width: 60px;">
+                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="applyRate('batch')">일괄적용</button>
+                    <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
+                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2" onclick="applyRate('last-month')">전월적용</button>
                     {{-- <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateCompetitors()"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
-                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="downlaodExcel()"><i class="fas fa-download fa-sm text-white-50 mr-1"></i> 엑셀다운로드</button>
                     <button type="button" class="btn btn-sm btn-outline-primary shadow-sm" onclick="resetCompetitors()">전체 초기화</button> --}}
                 </div>
             </div>
@@ -121,19 +107,28 @@
             </div>
         </div>
     </div>
+    <div class="col-lg-2">
+        <div class="card shadow-none mb-0">
+            <div class="card-header mt-1 mb-2">
+                <h5 class="m-0">판매유형목록</h5>
+            </div>
+            <div class="card-body shadow pt-2">
+                <div class="table-responsive">
+                    <div id="div-gd" class="ag-theme-balham"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script language="javascript">
     let columns = [
+        {field: "sale_type_cd", hide: true},
 		{field: "chk", headerName: '적용', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, sort: null, width: 40},
         {field: "sale_kind", headerName: "판매구분", width: 60, cellStyle: {"text-align": "center"}},
-        {field: "sale_type_cd", hide: true},
-        {field: "sale_type_nm", headerName: "판매유형명", width: 130,
-            // cellRenderer: function(params) {
-            //     return `<a href='javascript:void(0)' onclick='openPopup("${params.data.sale_type_cd}")'>${params.value}</a>`;
-            // }
-        },
-        {width: "auto"},
+        {field: "sale_type_nm", headerName: "판매유형명", width: 'auto'},
+        {field: "apply_date", hide: true},
+        {field: "apply_yn", hide: true},
     ];
 
     let store_list_columns = [
@@ -142,9 +137,9 @@
 		{field: "store_type_nm", headerName: "매장구분", width: 80, cellStyle: {"text-align": "center"}},
 		{field: "store_cd", headerName: "매장코드", width: 80, cellStyle: {"text-align": "center"}},
 		{field: "store_nm", headerName: "매장명", width: 200},
-		{field: "this_month", headerName: "현월(%)", width: 60, type: "currencyType", editable: true, cellStyle: {"background-color": "#ffff99"}},
-		{field: "last_month", headerName: "전월(%)", width: 60, type: "currencyType"},
-		{field: "last_year", headerName: "전년(%)", width: 60, type: "currencyType"},
+		{field: "this_month_rate", headerName: "현월(%)", width: 60, type: "currencyType", editable: true, cellStyle: {"background-color": "#ffff99"}},
+		{field: "last_month_rate", headerName: "전월(%)", width: 60, type: "currencyType"},
+		{field: "last_year_rate", headerName: "전년(%)", width: 60, type: "currencyType"},
 		{field: "comment", headerName: "메모", width: 300, editable: true, cellStyle: {"background-color": "#ffff99"}},
         {width: "auto"},
     ];
@@ -162,10 +157,10 @@
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {
-			onFirstDataRendered: (params) => {
-				params.api.forEachNode((node) => node.setSelected(false)); // db생성 후 작업예정
-			},
-		});
+            onSelectionChanged: (e) => {
+                e.api.forEachNode(node => node.data.apply_yn = node.selected ? 'Y' : 'N');
+            }
+        });
 
         // 매장목록
         pApp2.ResizeGrid(275);
@@ -173,8 +168,13 @@
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
         gx2 = new HDGrid(gridDiv2, store_list_columns, {
             onCellValueChanged: (e) => {
-                // e.node.data.use_yn = 'Y';
-                // gx2.gridOptions.api.updateRowData({update: [e.node.data]});
+                e.node.setSelected(true);
+                if (e.column.colId == "this_month_rate") {
+                    if (isNaN(e.newValue) == true || e.newValue == "") {
+                        alert("숫자만 입력가능합니다.");
+                        gx2.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                    }
+                }
             }
         });
 
@@ -182,23 +182,63 @@
         Search();
     });
 
-	// 판매유형목록 조회
-    // * 코드관리 > 판매유형관리 에 등록되지 않았거나, 사용여부가 "N"인 항목은 조회되지 않습니다.
+    // 매장목록 조회
     function Search() {
-        const data = $('[name=search]').serialize();
-        gx.Request("/store/sale/sal18/search", data, -1, function(d) {
-			SearchDetail();
-            // if(cur_store_cd === "" && d.body.length > 0) {
-            //     SearchDetail(d.body[0].store_cd, d.body[0].store_nm);
-            // }
+		let data = $('[name=search]').serialize();
+		gx2.Request("/store/sale/sal18/search-store", data, -1, function(d) {
+            SearchDetail();
         });
     }
 
-	// 매장목록 조회
+	// 판매유형목록 조회
+    // * 코드관리 > 판매유형관리 에 등록되지 않았거나, 사용여부가 "N"인 항목은 조회되지 않습니다.
 	function SearchDetail() {
-		let data = $('[name=search]').serialize();
-		data += "&store_type=" + $("#store_type").val();
-		gx2.Request("/store/sale/sal18/search-store", data, -1);
+        const data = $('[name=search]').serialize();
+        gx.Request("/store/sale/sal18/search", data, -1, function(e) {
+            gx.gridOptions.api.forEachNode((node) => node.setSelected(node.data.apply_yn === 'Y'));
+        });
 	}
+
+    // 일괄적용 & 전월적용
+    function applyRate(type) {
+        if(type === 'batch') {
+            const per = $("[name=batch_apply]").val();
+            gx2.gridOptions.api.forEachNode((node) => {
+                node.data.this_month_rate = per;
+                node.setSelected(true);
+            });
+        } else if(type === 'last-month') {
+            gx2.gridOptions.api.forEachNode((node) => {
+                node.data.this_month_rate = node.data.last_month_rate;
+                node.setSelected(true);
+            });
+        }
+        
+        gx2.gridOptions.api.updateRowData({update: gx2.getRows()});
+    }
+
+    // 변경정보 저장
+    function Save() {
+        if(!confirm("변경내역을 저장하시겠습니까?")) return;
+        
+        axios({
+            url: '/store/sale/sal18/save',
+            method: 'post',
+            data: {
+                sale_types: gx.getRows(),
+                sale_type_stores: gx2.getSelectedRows(),
+            },
+        }).then(function (res) {
+            if(res.data.code === 200) {
+                alert(res.data.msg);
+                Search();
+            } else {
+                console.log(res.data);
+                alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
+    }
 </script>
 @stop
