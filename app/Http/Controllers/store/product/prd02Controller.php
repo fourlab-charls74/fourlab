@@ -509,6 +509,7 @@ class prd02Controller extends Controller
 			left outer join product_code c on c.goods_no = a.goods_no and c.goods_opt = a.goods_opt
 			where
 				a.goods_no = :goods_no and a.goods_sub = :goods_sub
+			order by a.seq
 		";
 
 		$result = DB::select($sql,[
@@ -554,8 +555,32 @@ class prd02Controller extends Controller
 
 	public function del_product_code(Request $request){
 
-		$prd_cd	= $request->input('prd_cd');
+		$prd_cd		= $request->input('prd_cd');
+		$goods_no	= $request->input('goods_no');
 
-        return response()->json(["code" => 200, "msg" => $prd_cd]);
+		try {
+			DB::beginTransaction();
+
+			DB::table('product_code')
+				->where('prd_cd', '=', $prd_cd)
+				->where('goods_no', '=', $goods_no) 
+				->delete();
+
+			DB::table('product_stock')
+				->where('prd_cd', '=', $prd_cd)
+				->where('goods_no', '=', $goods_no) 
+				->delete();
+
+			DB::commit();
+			$code = 200;
+			$msg = "상품코드 삭제가 완료되었습니다.";
+
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+        return response()->json(["code" => $code, "msg" => $msg]);
 	}
 }

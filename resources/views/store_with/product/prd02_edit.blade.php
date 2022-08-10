@@ -32,7 +32,7 @@
 
 	<form name="f1" id="f1">
 
-		<input type="hidden" name="product_code" value="{{ $product_code }}">
+		<input type="hidden" name="product_code" id="product_code" value="{{ $product_code }}">
 
 		<div class="card_wrap aco_card_wrap">
 			<div class="card shadow">
@@ -174,6 +174,11 @@
 
 
 <script>
+
+	const CELL_COLOR = {
+		THISPRD: { 'background' : '#F8D3D4' }
+	};
+
 	const columns = [
 		{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 30, pinned: 'left', sort: null,
 			checkboxSelection: function(params) {
@@ -219,7 +224,15 @@
 		pApp.ResizeGrid(550);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
-		gx = new HDGrid(gridDiv, columns);
+
+		let options = {
+            getRowStyle: (params) => {
+				console.log(params.data);
+                if (params.data.prd_cd == $("#product_code").val()) return CELL_COLOR.THISPRD;
+            }
+        }
+
+		gx = new HDGrid(gridDiv, columns, options);
 		gx.gridOptions.rowDragManaged = true;
 		gx.gridOptions.animateRows = true;
 		Search();
@@ -305,7 +318,7 @@
 			if(res.data.code === 200) {
 				alert(res.data.msg);
 				opener.Search();
-				self.close();
+				Search();
 			} else {
 				console.log(res.data);
 				alert("상품코드 등록중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
@@ -322,12 +335,14 @@
 			url: '/store/product/prd02/del-product-code',
 			method: 'put',
 			data: {
-				prd_cd: prd_cd, 
+				prd_cd : prd_cd, 
+				goods_no : $("#goods_no").val()
 			},
 		}).then(function (res) {
 			if(res.data.code === 200) {
 				alert(res.data.msg);
 				opener.Search();
+				Search();
 			} else {
 				console.log(res.data);
 				alert("상품코드 삭제중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
