@@ -31,6 +31,9 @@
 	</style>
 
 	<form name="f1" id="f1">
+
+		<input type="hidden" name="product_code" value="{{ $product_code }}">
+
 		<div class="card_wrap aco_card_wrap">
 			<div class="card shadow">
 				<div class="card-header mb-0">
@@ -48,9 +51,9 @@
 												<div class="flax_box">
 													<select name='brand' class="form-control form-control-sm">
 														@foreach ($brands as $brand)
-                                                            @if( $brand->br_cd == $product->brand)
+															@if( $brand->br_cd == $product->brand)
 															<option value='{{ $brand->br_cd }}'>{{ $brand->br_cd }} : {{ $brand->brand_nm }}</option>
-                                                            @endif
+															@endif
 														@endforeach
 													</select>
 												</div>
@@ -60,9 +63,9 @@
 												<div class="flax_box">
 													<select name='year' class="form-control form-control-sm">
 														@foreach ($years as $year)
-                                                            @if( $year->code_id == $product->year)
+															@if( $year->code_id == $product->year)
 															<option value='{{ $year->code_id }}'>{{ $year->code_id }} : {{ $year->code_val }}</option>
-                                                            @endif
+															@endif
 														@endforeach
 													</select>
 												</div>
@@ -74,9 +77,9 @@
 												<div class="flax_box">
 													<select name='season' class="form-control form-control-sm">
 														@foreach ($seasons as $season)
-                                                            @if( $season->code_id == $product->season)
+															@if( $season->code_id == $product->season)
 															<option value='{{ $season->code_id }}'>{{ $season->code_id }} : {{ $season->code_val }}</option>
-                                                            @endif
+															@endif
 														@endforeach
 													</select>
 												</div>
@@ -86,9 +89,9 @@
 												<div class="flax_box">
 													<select name='gender' class="form-control form-control-sm">
 														@foreach ($genders as $gender)
-                                                            @if($gender->code_id == $product->gender)
+															@if($gender->code_id == $product->gender)
 															<option value='{{ $gender->code_id }}'>{{ $gender->code_id }} : {{ $gender->code_val }}</option>
-                                                            @endif
+															@endif
 														@endforeach
 													</select>
 												</div>
@@ -100,9 +103,9 @@
 												<div class="flax_box">
 													<select name='item' class="form-control form-control-sm">
 														@foreach ($items as $item)
-                                                            @if($item->code_id == $product->item)
+															@if($item->code_id == $product->item)
 															<option value='{{ $item->code_id }}'>{{ $item->code_id }} : {{ $item->code_val }}</option>
-                                                            @endif
+															@endif
 														@endforeach
 													</select>
 												</div>
@@ -112,9 +115,9 @@
 												<div class="flax_box">
 													<select name='opt' class="form-control form-control-sm">
 														@foreach ($opts as $opt)
-                                                            @if($opt->code_id == $product->opt)
+															@if($opt->code_id == $product->opt)
 															<option value='{{ $opt->code_id }}'>{{ $opt->code_id }} : {{ $opt->code_val }}</option>
-                                                            @endif
+															@endif
 														@endforeach
 													</select>
 												</div>
@@ -125,8 +128,7 @@
 											<td colspan="3">
 											<div class="flax_box">
 													<div class="form-inline-inner inline_btn_box">
-														<input type='text' class="form-control form-control-sm search-enter" style="width:100%;" name='goods_no' id='goods_no' value='{{ $goods_no }}'>
-														<a href="#" class="btn btn-sm btn-outline-primary sch-goods_no"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+														<input type='text' class="form-control form-control-sm search-enter" style="width:100%;" name='goods_no' id='goods_no' value='{{ $goods_no }}' readonly>
 													</div>
 												</div>
 											</td>
@@ -174,27 +176,27 @@
 <script>
 	const columns = [
 		{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 30, pinned: 'left', sort: null,
-            checkboxSelection: function(params) {
-                return params.data.match_yn == '';
-            },
+			checkboxSelection: function(params) {
+				return params.data.match_yn == '';
+			},
 		},
 		{field:"goods_no",	headerName: "상품번호",		width:72},
 		{field:"style_no",	headerName: "아이템코드",	width:72},
 		{field:"goods_nm",	headerName: "상품명",		width:250},
 		{field:"goods_opt",	headerName: "상품옵션",		width:200},
-		{field:"prd_cd1",	headerName: "상품코드",		width:120,
-			editable: function(params) {return params.data.match_yn !== 'Y';}, 
-			cellStyle: function(params) {return params.data.match_yn !== 'Y' ? {"background-color": "#ffFF99"} : {};}
+		{field:"prd_cd1",	headerName: "상품코드",		width:120},
+		{field:"color",		headerName: "컬러",			width:72},
+		{field:"size",		headerName: "사이즈",		width:72},
+		{field:"match_yn",  headerName: "등록유무",		width:60, cellStyle:{'text-align':'center'}},
+		{field:"del",       headerName: "삭제",  		width:60, cellStyle:{'text-align':'center'},
+			cellRenderer: function(params) {
+				if (params.value !== undefined) {
+					if( params.value != ''){
+						return '<a href="#" onclick="return delPrdCd(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+					}
+				}
+			}
 		},
-		{field:"color",		headerName: "컬러",			width:72,
-			editable: function(params) {return params.data.match_yn !== 'Y';}, 
-			cellStyle: function(params) {return params.data.match_yn !== 'Y' ? {"background-color": "#ffFF99"} : {};}
-		},
-		{field:"size",		headerName: "사이즈",		width:72,
-			editable: function(params) {return params.data.match_yn !== 'Y';}, 
-			cellStyle: function(params) {return params.data.match_yn !== 'Y' ? {"background-color": "#ffFF99"} : {};}
-		},
-		{field:"match_yn", headerName: "등록유무",		width:72},
 		{field:"brand",		headerName:"브랜드",		hide:true},
 		{field:"year",		headerName:"년도",			hide:true},
 		{field:"season",	headerName:"시즌",			hide:true},
@@ -202,14 +204,15 @@
 		{field:"item",		headerName:"아이템",		hide:true},
 		{field:"opt",		headerName:"품목",			hide:true},
 		{field:"seq",		headerName:"순서차수",		hide:true},
+		{field:"prd_cd",	headerName:"상품코드",		hide:true},
 		{field: "", headerName:"", width:"auto"},
 	];
 </script>
 <script type="text/javascript" charset="utf-8">
 
-    const pApp = new App('', {
-        gridId: "#div-gd",
-    });
+	const pApp = new App('', {
+		gridId: "#div-gd",
+	});
 	let gx;
 
 	$(document).ready(function() {
@@ -222,10 +225,13 @@
 		Search();
 	});
 	
-    function Search() {
-        let data = $('form[name="f1"]').serialize();
-        gx.Request('/store/product/prd02/prd-search/', data);
-    }
+	function Search() {
+		let data = $('form[name="f1"]').serialize();
+
+		//console.log(data);
+
+		gx.Request('/store/product/prd02/prd-edit-search/', data);
+	}
 
 	//상품옵션 불러오기
 	function getOption(){
@@ -238,6 +244,7 @@
 
 	const validation = (cmd) => {
 		// 브랜드 선택 여부
+/*
 		if(f1.brand.selectedIndex == 0) {
 			f1.brand.focus();
 			return alert("브랜드를 선택해주세요.");
@@ -272,7 +279,7 @@
 			f1.opt.focus();
 			return alert("품목을 선택해주세요.");
 		}
-
+*/
 		// 상품번호 입력여부
 		if(f1.goods_no.value.trim() === '') {
 			f1.goods_no.focus();
@@ -298,9 +305,32 @@
 			if(res.data.code === 200) {
 				alert(res.data.msg);
 				opener.Search();
+				self.close();
 			} else {
 				console.log(res.data);
 				alert("상품코드 등록중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+			}
+		}).catch(function (err) {
+			console.log(err);
+		});
+	}
+
+	function delPrdCd(prd_cd){
+		if(!window.confirm("상품코드를 삭제하면 기존 재고 정보도 함께 삭제됩니다.\r\n삭제하시겠습니까?")) return;
+
+		axios({
+			url: '/store/product/prd02/del-product-code',
+			method: 'put',
+			data: {
+				prd_cd: prd_cd, 
+			},
+		}).then(function (res) {
+			if(res.data.code === 200) {
+				alert(res.data.msg);
+				opener.Search();
+			} else {
+				console.log(res.data);
+				alert("상품코드 삭제중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
 			}
 		}).catch(function (err) {
 			console.log(err);

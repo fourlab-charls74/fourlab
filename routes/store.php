@@ -149,6 +149,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::put('prd02/add-product-code', 'prd02Controller@add_product_code');
 
         Route::get('prd02/edit-goods-no/{product_code}/{goods_no}/', 'prd02Controller@edit_goods_no');
+        Route::get('prd02/prd-edit-search', 'prd02Controller@prd_edit_search');
+        Route::put('prd02/del-product-code', 'prd02Controller@del_product_code');
 
     });
 

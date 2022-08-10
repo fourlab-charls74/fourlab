@@ -410,6 +410,7 @@ class prd02Controller extends Controller
 					->insert([
 						'prd_cd'	=> $prd_cd,
 						'goods_no'	=> $goods_no,
+						'goods_opt'	=> $goods_opt,
 						'brand'		=> $brand,
 						'year'		=> $year,
 						'season'	=> $season,
@@ -483,4 +484,78 @@ class prd02Controller extends Controller
 
 	}
 
+	public function prd_edit_search(Request $request){
+		$product_code	= $request->input('product_code');
+
+		$brand		= $request->input('brand');
+		$year		= $request->input('year');
+		$season		= $request->input('season');
+		$gender		= $request->input('gender');
+		$item		= $request->input('item');
+		$opt		= $request->input('opt');
+		$goods_no	= $request->input('goods_no');
+		$goods_sub	= 0;
+		$prd_cd1	= "";
+		$seq		= "01";
+		$chk_prd_cd	= "";
+
+		$sql	= "
+			select
+				a.goods_no, b.style_no, b.goods_nm, a.goods_opt, '' as prd_cd1, '' as color, '' as size, if(ifnull(c.prd_cd,'') = '', '', 'Y') as match_yn,
+				'$brand' as brand, '$year' as year, '$season' as season, '$gender' as gender, '$item' as item, '$opt' as opt,
+				c.seq, c.prd_cd, if(ifnull(c.prd_cd,'') = '', '', '삭제') as del
+			from goods_summary a
+			inner join goods b on a.goods_no = b.goods_no and b.goods_sub = 0
+			left outer join product_code c on c.goods_no = a.goods_no and c.goods_opt = a.goods_opt
+			where
+				a.goods_no = :goods_no and a.goods_sub = :goods_sub
+		";
+
+		$result = DB::select($sql,[
+			'goods_no'	=> $goods_no, 
+			'goods_sub'	=> $goods_sub
+		]);
+
+		foreach($result as $row){
+
+			$row->seq	= $seq;
+
+			$goods_opt	= explode('^', $row->goods_opt);
+			$color		= strtolower(str_replace(" ", "", $goods_opt[0]));
+			$size		= isset($goods_opt[1]) ? $goods_opt[1] : "";
+
+			$sql		= " select code_id as color_cd from code where	code_kind_cd = 'PRD_CD_COLOR' and LOWER(replace(code_val,' ','')) = :color limit 1 ";
+			$color_cd	= DB::selectOne($sql, ["color" => $color])->color_cd;
+
+			if( $size != "" ){
+				$size		= strtolower(str_replace(" ", "", $goods_opt[1]));
+
+				$sql		= " select code_val as size_cd from code where	code_kind_cd = 'PRD_CD_SIZE_MATCH' and LOWER(replace(code_val2,' ','')) = :size limit 1 ";
+				$size_cd	= DB::selectOne($sql, ["size" => $size])->size_cd;
+			}
+			
+			$prd_cd1		= $brand . $year . $season . $gender . $item . $seq . $opt;
+
+			$row->prd_cd1	= $prd_cd1;
+			$row->color		= isset($color_cd) ? $color_cd : "";
+			$row->size		= isset($size_cd) ? $size_cd : "";
+
+		}
+
+		return response()->json([
+			"code"	=> 200,
+			"head"	=> array(
+				"total"		=> count($result),
+			),
+			"body" => $result
+		]);
+
+	}
+
+	public function del_product_code(Request $request){
+
+		$prd_cd	= $request->input('prd_cd');
+
+        return response()->json(["code" => 200, "msg" => $prd_cd]);
+	}
 }
