@@ -2,6 +2,7 @@
 CREATE TABLE `product_code` (
     `prd_cd` varchar(20) NOT NULL COMMENT '상품코드',
     `goods_no` int(11) NOT NULL COMMENT '상품번호',
+    `goods_opt` varchar(100) NOT NULL COMMENT '상품옵션명',
     `brand` varchar(2) NOT NULL COMMENT '브랜드 code - prd_cd_brand',
     `year` varchar(3) NOT NULL COMMENT '년도 code - prd_cd_year',
     `season` char(1) NOT NULL COMMENT '시즌 code - prd_cd_season',

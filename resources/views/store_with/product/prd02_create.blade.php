@@ -292,6 +292,7 @@
 			if(res.data.code === 200) {
 				alert(res.data.msg);
 				opener.Search();
+				self.close();
 			} else {
 				console.log(res.data);
 				alert("상품코드 등록중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
