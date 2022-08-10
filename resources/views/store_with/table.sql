@@ -476,6 +476,31 @@ CREATE TABLE `store_account_extra` (
     KEY `store_cd` (`store_cd`, `ymonth`, `type`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='매장기타재반자료'
 
+-- 월별할인유형적용관리 - 판매유형별
+CREATE TABLE `sale_type_apply` (
+    `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT 'identify',
+    `apply_date` char(6) NOT NULL COMMENT '적용년월 (202208)',
+    `sale_type_cd` int(11) NOT NULL COMMENT '판매유형코드 - sale_type : idx',
+    `apply_yn` char(1) NOT NULL DEFAULT 'N' COMMENT '적용여부',
+    `rt` datetime DEFAULT NULL COMMENT '등록일자',
+    `ut` datetime DEFAULT NULL COMMENT '수정일자',
+    `admin_id` varchar(30) DEFAULT NULL COMMENT '관리자아이디',
+    PRIMARY KEY (`idx`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='월별할인유형적용관리-판매유형별'
+
+-- 월별할인유형적용관리 - 매장별
+CREATE TABLE `sale_type_apply_store` (
+    `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT 'identify',
+    `store_cd` varchar(30) NOT NULL COMMENT '매장코드',
+    `apply_date` char(6) NOT NULL COMMENT '적용년월 (202208)',
+    `apply_rate` int(11) NOT NULL COMMENT '적용요율',
+    `comment` varchar(255) DEFAULT NULL COMMENT '메모',
+    `rt` datetime DEFAULT NULL COMMENT '등록일자',
+    `ut` datetime DEFAULT NULL COMMENT '수정일자',
+    `admin_id` varchar(30) DEFAULT NULL COMMENT '관리자아이디',
+    PRIMARY KEY (`idx`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='월별할인유형적용관리-매장별'
+
 --
 -- 기존 테이블 컬럼 추가 시작
 --
