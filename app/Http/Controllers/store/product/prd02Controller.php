@@ -583,4 +583,13 @@ class prd02Controller extends Controller
 
         return response()->json(["code" => $code, "msg" => $msg]);
 	}
+
+	public function batch_create(Request $request){
+		
+		$values = [];
+
+		return view( Config::get('shop.store.view') . '/product/prd02_batch_create',$values);
+
+	}
+
 }
