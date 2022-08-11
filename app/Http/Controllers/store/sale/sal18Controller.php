@@ -70,6 +70,7 @@ class sal18Controller extends Controller
 				s.store_nm,
 				s.store_type,
 				c.code_val as store_type_nm,
+				'$sale_month' as apply_date,
 				stas.apply_rate as this_month_rate,
 				(select apply_rate from sale_type_apply_store where apply_date = '$last_month' and store_cd = s.store_cd) as last_month_rate,
 				(select apply_rate from sale_type_apply_store where apply_date = '$last_year' and store_cd = s.store_cd) as last_year_rate,
@@ -106,15 +107,15 @@ class sal18Controller extends Controller
 			{
                 $is_exist =
                     DB::table('sale_type_apply')
-                        ->where('apply_date', '=', $sale_type['apply_date'])
+                        ->where('apply_date', '=', $sale_type['apply_date'] ?? '')
                         ->where('sale_type_cd', '=', $sale_type['sale_type_cd'])
                         ->count();
                 if($is_exist < 1) {
                     DB::table('sale_type_apply')
                         ->insert([
-                            'apply_date' => $sale_type['apply_date'],
-                            'sale_type_cd' => $sale_type['sale_type_cd'],
-                            'apply_yn' => $sale_type['apply_yn'],
+							'sale_type_cd' => $sale_type['sale_type_cd'],
+                            'apply_date' => $sale_type['apply_date'] ?? '',
+                            'apply_yn' => $sale_type['apply_yn'] ?? 'N',
                             'rt' => now(),
                             'admin_id' => $admin_id,
                         ]);
@@ -123,7 +124,7 @@ class sal18Controller extends Controller
 						->where('apply_date', '=', $sale_type['apply_date'])
                         ->where('sale_type_cd', '=', $sale_type['sale_type_cd'])
                         ->update([
-                            'apply_yn' => $sale_type['apply_yn'],
+                            'apply_yn' => $sale_type['apply_yn'] ?? 'N',
                             'ut' => now(),
                             'admin_id' => $admin_id,
                         ]);
@@ -133,8 +134,32 @@ class sal18Controller extends Controller
 			// 매장별 월별할인유형정보 업데이트
 			foreach($sale_type_stores as $sale_type_store)
 			{
-				// 작업예정
-				dd($sale_type_store);
+				$is_exist =
+					DB::table('sale_type_apply_store')
+						->where('apply_date', '=', $sale_type_store['apply_date'] ?? '')
+						->where('store_cd', '=', $sale_type_store['store_cd'])
+						->count();
+				if($is_exist < 1) {
+					DB::table('sale_type_apply_store')
+						->insert([
+							'store_cd' => $sale_type_store['store_cd'],
+							'apply_date' => $sale_type_store['apply_date'] ?? '',
+							'apply_rate' => $sale_type_store['this_month_rate'] ?? 0,
+							'comment' => $sale_type_store['comment'] ?? '',
+							'rt' => now(),
+							'admin_id' => $admin_id,
+						]);
+				} else {
+					DB::table('sale_type_apply_store')
+						->where('apply_date', '=', $sale_type_store['apply_date'] ?? '')
+						->where('store_cd', '=', $sale_type_store['store_cd'])
+						->update([
+							'apply_rate' => $sale_type_store['this_month_rate'] ?? 0,
+							'comment' => $sale_type_store['comment'] ?? '',
+							'ut' => now(),
+							'admin_id' => $admin_id,
+						]);
+				}
 			}
 
 			DB::commit();

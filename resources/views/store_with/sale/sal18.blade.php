@@ -130,17 +130,22 @@
         {field: "apply_date", hide: true},
         {field: "apply_yn", hide: true},
     ];
-
+    
     let store_list_columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
 		{field: "store_type", hide: true},
 		{field: "store_type_nm", headerName: "매장구분", width: 80, cellStyle: {"text-align": "center"}},
 		{field: "store_cd", headerName: "매장코드", width: 80, cellStyle: {"text-align": "center"}},
-		{field: "store_nm", headerName: "매장명", width: 200},
+		{field: "store_nm", headerName: "매장명", width: 200,
+            cellRenderer: function(params) {
+                return `<a href="#">${params.value}</a>`;
+            }
+        },
 		{field: "this_month_rate", headerName: "현월(%)", width: 60, type: "currencyType", editable: true, cellStyle: {"background-color": "#ffff99"}},
 		{field: "last_month_rate", headerName: "전월(%)", width: 60, type: "currencyType"},
 		{field: "last_year_rate", headerName: "전년(%)", width: 60, type: "currencyType"},
 		{field: "comment", headerName: "메모", width: 300, editable: true, cellStyle: {"background-color": "#ffff99"}},
+        {field: "apply_date", hide: true},
         {width: "auto"},
     ];
 </script>
@@ -150,6 +155,9 @@
 
     const pApp = new App('', { gridId: "#div-gd" });
     const pApp2 = new App('', { gridId: "#div-gd-store-list" });
+
+    let original_sale_type_apply = [];
+    let changed_sale_type_apply = [];
 
     $(document).ready(function() {
         // 판매유형목록
@@ -194,7 +202,8 @@
     // * 코드관리 > 판매유형관리 에 등록되지 않았거나, 사용여부가 "N"인 항목은 조회되지 않습니다.
 	function SearchDetail() {
         const data = $('[name=search]').serialize();
-        gx.Request("/store/sale/sal18/search", data, -1, function(e) {
+        gx.Request("/store/sale/sal18/search", data, -1, function(d) {
+            original_sale_type_apply = JSON.parse(JSON.stringify(d.body));
             gx.gridOptions.api.forEachNode((node) => node.setSelected(node.data.apply_yn === 'Y'));
         });
 	}
@@ -220,12 +229,15 @@
     // 변경정보 저장
     function Save() {
         if(!confirm("변경내역을 저장하시겠습니까?")) return;
-        
+
+        changed_sale_type_apply = gx.getRows();
+        changed_sale_type_apply = changed_sale_type_apply.filter((c,i) => c.apply_yn != original_sale_type_apply[i].apply_yn);
+
         axios({
             url: '/store/sale/sal18/save',
             method: 'post',
             data: {
-                sale_types: gx.getRows(),
+                sale_types: changed_sale_type_apply,
                 sale_type_stores: gx2.getSelectedRows(),
             },
         }).then(function (res) {
