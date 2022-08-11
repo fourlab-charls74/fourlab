@@ -23,6 +23,7 @@ class acc05Controller extends Controller
         $values = [
             'sdate' => $sdate,
             'store_types' => $store_types,
+            'store_kinds'	=> SLib::getCodes("STORE_KIND"),
             'sale_kinds' => $sale_kinds,
             'dynamic_cols' => $dynamic_cols,
         ];
@@ -36,16 +37,16 @@ class acc05Controller extends Controller
         $sdate = Lib::quote(str_replace("-", "", $sdate));
 
         $store_type = $request->input('store_type', "");
+        $store_kind = $request->input('store_kind', "");
         $store_cd = $request->input('store_cd', "");
 
         /**
          * 검색조건 필터링
          */
         $where = "";
-        if ($store_cd != "") $where .= " and s.store_cd like '" . Lib::quote($store_cd) . "%'";
-
-        $where2 = "";
-        if ($store_type) $where2 .= " and c.code_id = " . Lib::quote($store_type);
+        if ($store_type) $where .= " and c.code_id = " . Lib::quote($store_type);
+        if ($store_kind != "") $where .= " and s.store_kind = '". Lib::quote($store_kind) . "'";
+        if ($store_cd != "") $where .= " and s.store_cd = '" . Lib::quote($store_cd) . "'";
 
         /**
          * 기타재반자료구분 쿼리 추가
@@ -81,10 +82,10 @@ class acc05Controller extends Controller
                         e.store_cd as scd
                     from store_account_extra as e
                         left outer join `code` c2 on c2.code_kind_cd = 'g_acc_extra_type' and c2.code_id = e.type
-                    where ymonth = '$sdate' $where
+                    where 1=1 and ymonth = '$sdate'
                     group by e.store_cd
                 ) as a on s.store_cd = a.scd
-            $where2
+            where 1=1 $where
             order by s.store_cd
 		";
 

@@ -26,10 +26,10 @@
 				<div class="row">
 					<div class="col-lg-4">
 						<div class="form-group">
-							<label for="good_types">판매기간(판매연월)</label>
+							<label for="sdate">판매기간(판매연월)</label>
 							<div class="docs-datepicker flex_box">
 								<div class="input-group">
-								<input type="text" class="form-control form-control-sm docs-date month" name="sdate" value="{{ $sdate }}" autocomplete="off">
+								<input type="text" id="sdate" class="form-control form-control-sm docs-date month" name="sdate" value="{{ $sdate }}" autocomplete="off">
 									<div class="input-group-append">
 										<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
 											<i class="fa fa-calendar" aria-hidden="true"></i>
@@ -53,6 +53,21 @@
 							</div>
 						</div>
 					</div>
+					<div class="col-lg-4">
+						<div class="form-group">
+							<label for="store_kind">매장종류</label>
+							<div class="flex_box">
+								<select name='store_kind' class="form-control form-control-sm">
+									<option value=''>전체</option>
+									@foreach ($store_kinds as $store_kind)
+										<option value='{{ $store_kind->code_id }}'>{{ $store_kind->code_val }}</option>
+									@endforeach
+								</select>
+							</div>
+                        </div>
+					</div>
+				</div>
+				<div class="row">
 					<div class="col-lg-4">
 						<div class="form-group">
                             <label for="store_cd">매장명</label>

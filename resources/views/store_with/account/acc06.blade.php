@@ -26,31 +26,17 @@
 				<div class="row">
 					<div class="col-lg-4">
 						<div class="form-group">
-							<label for="good_types">판매기간</label>
-							<div class="form-inline date-select-inbox">
-								<div class="docs-datepicker form-inline-inner input_box">
-									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
-										<div class="input-group-append">
-											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-												<i class="fa fa-calendar" aria-hidden="true"></i>
-											</button>
-										</div>
+							<label for="sdate">판매기간(판매연월)</label>
+							<div class="docs-datepicker flex_box">
+								<div class="input-group">
+								<input type="text" id="sdate" class="form-control form-control-sm docs-date month" name="sdate" value="{{ $sdate }}" autocomplete="off">
+									<div class="input-group-append">
+										<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
+											<i class="fa fa-calendar" aria-hidden="true"></i>
+										</button>
 									</div>
-									<div class="docs-datepicker-container"></div>
 								</div>
-								<span class="text_line">~</span>
-								<div class="docs-datepicker form-inline-inner input_box">
-									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
-										<div class="input-group-append">
-											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-												<i class="fa fa-calendar" aria-hidden="true"></i>
-											</button>
-										</div>
-									</div>
-									<div class="docs-datepicker-container"></div>
-								</div>
+								<div class="docs-datepicker-container"></div>
 							</div>
 						</div>
 					</div>
@@ -69,13 +55,28 @@
 					</div>
 					<div class="col-lg-4">
 						<div class="form-group">
+							<label for="store_kind">매장종류</label>
+							<div class="flex_box">
+								<select name='store_kind' class="form-control form-control-sm">
+									<option value=''>전체</option>
+									@foreach ($store_kinds as $store_kind)
+										<option value='{{ $store_kind->code_id }}'>{{ $store_kind->code_val }}</option>
+									@endforeach
+								</select>
+							</div>
+                        </div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-lg-4">
+						<div class="form-group">
                             <label for="store_cd">매장명</label>
 							<div class="form-inline inline_btn_box">
 								<select id="store_cd" name="store_cd" class="form-control form-control-sm select2-store"></select>
 								<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 							</div>
                         </div>
-					</div>
+					</div>					
 				</div>
 			</div>
 		</div>
@@ -103,7 +104,7 @@
 </div>
 <script language="javascript">
     var columns = [
-        { headerName: "#", field: "num", type:'NumType', pinned:'left', aggSum:"합계", aggAvg:"평균", cellStyle: { 'text-align': "center" },
+        { headerName: "#", field: "num", type:'NumType', pinned:'left', cellStyle: { 'text-align': "center" },
             cellRenderer: function (params) {
                 if (params.node.rowPinned === 'top') {
                     return "합계";
@@ -121,56 +122,64 @@
 			children: [
 				{ headerName: "소계", field: "ord_amt", type: 'currencyMinusColorType', width: 100 },
 				@foreach (@$pr_codes as $pr_code)
-					{ headerName: "{{ $pr_code->code_val }}", field: "{{ $pr_code->code_id }}", type: 'currencyMinusColorType', width: 100 },
+					{ headerName: "{{ $pr_code->code_val }}", field: "amt_{{ $pr_code->code_id }}", type: 'currencyMinusColorType', width: 100 },
 				@endforeach
 			]
         },
         { field: "sale_fee", headerName: "수수료",
             children: [
-                { headerName: "소계", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "정상", field: "", type: 'numberType',width:100,
+                { headerName: "소계", field: "s1", width:100,
+					type: 'currencyMinusColorType', 
+					valueFormatter: (params) => formatNumber(params),
+					valueGetter: (params) => sumSaleFees(params)
+				},
+                { headerName: "정상", field: "s2", type: 'numberType', width:100,
                     children: [
-                        { headerName: "수수료율", field: "fee1", type: 'percentType',width:100 },
-                        { headerName: "수수료", field: "fee_amt_1", type: 'currencyMinusColorType',width:100 },
+                        { headerName: "수수료율", field: "fee1", type: 'percentType', width:100 },
+                        { headerName: "수수료", field: "fee_amt_js1", type: 'currencyMinusColorType', width:100 },
                     ]
                 },
-                { headerName: "정상2", field: "wonga", type: 'numberType',width:100,
+                { headerName: "정상2", field: "s3", type: 'numberType', width:100,
                     children: [
-                        { headerName: "수수료율", field: "fee2", type: 'percentType',width:100 },
-                        { headerName: "수수료", field: "fee_amt_2", type: 'currencyMinusColorType',width:100 },
+                        { headerName: "수수료율", field: "fee2", type: 'percentType', width:100 },
+                        { headerName: "수수료", field: "fee_amt_js2", type: 'currencyMinusColorType', width:100 },
                     ]
                 },
-                { headerName: "정상3", field: "wonga", type: 'numberType',width:100,
+                { headerName: "정상3", field: "s4", type: 'numberType', width:100,
                     children: [
-                        { headerName: "수수료율", field: "fee3", type: 'percentType',width:100 },
-                        { headerName: "수수료", field: "fee_amt_3", type: 'currencyMinusColorType',width:100 },
+                        { headerName: "수수료율", field: "fee3", type: 'percentType', width:100 },
+                        { headerName: "수수료", field: "fee_amt_js3", type: 'currencyMinusColorType', width:100 },
                     ]
                 },
-                { headerName: "특가", field: "wonga", type: 'numberType',width:100,
+                { headerName: "특가", field: "s5", type: 'numberType', width:100,
+					// 행사로 해놓았음 추후 특가 반영 필요 (미구현)
                     children: [
-                        { headerName: "수수료율", field: "fee_10", type: 'percentType',width:100 },
-                        { headerName: "수수료", field: "wonga", type: 'currencyMinusColorType',width:100 },
+                        { headerName: "수수료율", field: "fee_10", type: 'percentType', width:100 },
+                        { headerName: "수수료", field: "fee_amt_gl", type: 'currencyMinusColorType', width:100 },
                     ]
                 },
-                { headerName: "용품", field: "wonga", type: 'numberType',width:100,
+                { headerName: "용품", field: "s6", type: 'numberType', width:100,
                     children: [
-                        { headerName: "수수료율", field: "fee_11", type: 'percentType',width:100 },
-                        { headerName: "수수료", field: "wonga", type: 'currencyMinusColorType',width:100 },
+                        { headerName: "수수료율", field: "fee_11", type: 'percentType', width:100 },
+                        { headerName: "수수료", field: "fee_amt_j2", type: 'currencyMinusColorType', width:100 },
                     ]
                 },
-                { headerName: "특가(온라인)", field: "wonga", type: 'numberType',width:100,
+                { headerName: "특가(온라인)", field: "s7", type: 'numberType', width:100,
+					// 균일로 해놓았음 추후 특가 반영 필요 (미구현)
                     children: [
-                        { headerName: "수수료율", field: "fee_12", type: 'percentType',width:100 },
-                        { headerName: "수수료", field: "wonga", type: 'currencyMinusColorType',width:100 },
+                        { headerName: "수수료율", field: "fee_12", type: 'percentType', width:100 },
+                        { headerName: "수수료", field: "fee_amt_j1", type: 'currencyMinusColorType', width:100 },
                     ]
                 },
             ]
         },
-        { field: "", headerName: "기타재반", cellRenderer: (params) => 0, type: 'currencyMinusColorType' },
-        { field: "", headerName: "수수료+기타재반", type: 'currencyMinusColorType' },
+        { field: "extra_total", headerName: "기타재반", type: 'currencyMinusColorType' },
+        { field: "", headerName: "수수료+기타재반", type: 'currencyMinusColorType',
+			valueFormatter: (params) => formatNumber(params),
+			valueGetter: (params) => sumFeeExtra(params)
+		},
         { headerName: "", field: "nvl", width: "auto" }
     ];
-
 </script>
 <script type="text/javascript" charset="utf-8">
 	const pApp = new App('',{
@@ -189,6 +198,19 @@
 		let data = $('form[name="search"]').serialize();
 		gx.Request('/store/account/acc06/search', data, -1);
 	}
+
+	const sumSaleFees = (params) => {
+		const row = params.data;
+		const sum = parseInt(row.fee_amt_js1) + parseInt(row.fee_amt_js2) + parseInt(row.fee_amt_js3)
+			+ parseInt(row.fee_amt_gl) + parseInt(row.fee_amt_j1) + parseInt(row.fee_amt_j2);
+		return isNaN(sum) ? 0 : sum;
+	};
+
+	const sumFeeExtra = (params) => {
+		const extra = parseInt(params.data.extra_total);
+		const sum = sumSaleFees(params) + extra;
+		return isNaN(sum) ? 0 : sum;
+	};
 
 </script>
 @stop
