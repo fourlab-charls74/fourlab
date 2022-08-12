@@ -592,4 +592,223 @@ class prd02Controller extends Controller
 
 	}
 
+	public function upload(Request $request)
+	{
+
+        if ( 0 < $_FILES['file']['error'] ) {
+            echo json_encode(array(
+                "code" => 500,
+                "errmsg" => 'Error: ' . $_FILES['file']['error']
+            ));
+        }
+        else {
+			$file = sprintf("data/store/prd02/%s", $_FILES['file']['name']);
+            move_uploaded_file($_FILES['file']['tmp_name'], $file);
+            echo json_encode(array(
+                "code" => 200,
+                "file" => $file
+            ));
+        }
+
+	}
+
+	public function update(Request $request)
+	{
+		$admin_id		= Auth('head')->user()->id;
+		$error_code		= "200";
+		$result_code	= "";
+
+        $datas	= $request->input('data');
+		$datas	= json_decode($datas);
+
+		if( $datas == "" ){
+			$error_code	= "400";
+		}
+
+		DB::beginTransaction();
+
+		for( $i = 0; $i < count($datas); $i++ ){
+			$data	= (array)$datas[$i];
+
+			$cd			= $data["xmd_code"];
+			$goods_no	= $data["goods_no"];
+			$goods_opt	= $data["goods_opt"];
+
+			$query	= " select count(*) as cnt from goods_xmd_imp2 where cd = :cd ";
+			$rows	= DB::selectOne($query, ['cd' => $cd]);
+
+			if( $rows->cnt == 0 ){
+				$sql	= "
+					insert into goods_xmd_imp2( cd,goods_no,goods_opt )
+					values (  '$cd','$goods_no','$goods_opt' )
+				";
+				DB::insert($sql);
+			}
+		}
+
+		$sql	= " update goods_xmd_imp2 set goods_opt = replace(goods_opt,' ^ ','^') ";
+		DB::update( $sql);
+
+		$sql	= " update goods_xmd_imp2 set goods_opt = replace(goods_opt,'\r','') where goods_opt like '%\r%'; ";
+		DB::update( $sql);
+
+		$sql	= "
+			delete from goods_summary 
+			where goods_no in (
+				select goods_no from goods_xmd_imp2 group by goods_no
+			)
+		";
+		DB::delete($sql);
+
+		$sql	= "
+			insert into goods_summary ( goods_no,goods_sub,opt_name,goods_opt,opt_price,opt_memo,good_qty,wqty,soldout_yn,use_yn, seq,rt,ut,bad_qty,last_date )
+			select 
+				a.goods_no, 0 as goods_sub,
+				if( instr(goods_opt,'^') > 0,'컬러^사이즈','사이즈') as opt_name, 
+				a.goods_opt,0 as opt_price,
+				REVERSE(SUBSTR(REVERSE(a.cd),3,2)) AS opt_memo,
+				0 as good_qty, 0 as wqty,'N' AS soldout_yn,'Y' AS use_yn, 0 AS seq,
+				NOW() AS rt, NOW() AS ut, 0 AS bad_qty, DATE_FORMAT(NOW(),'%Y-%m-%d') AS last_date
+			from ( select goods_no,goods_opt,max(cd) as cd from goods_xmd_imp2 group by goods_no,goods_opt )  a inner join goods g on a.goods_no = g.goods_no
+		";
+		DB::insert($sql);
+
+		$sql	= "
+			delete o.* FROM goods_option o 
+			INNER JOIN (SELECT goods_no FROM goods_xmd_imp2 GROUP BY goods_no ) b ON o.goods_no = b.goods_no 
+			WHERE o.type = 'basic' AND NAME IN ('사이즈','컬러^사이즈','컬러')
+		";
+		DB::delete($sql);
+
+		$sql	= "
+			insert into goods_option ( goods_no,goods_sub,type,name,required_yn,use_yn,seq,option_no,rt,ut )
+			select 
+				goods_no, goods_sub,'basic' as type,'사이즈' as name, 'Y' as required_yn, 
+				'Y' as use_yn, 0 as seq, 0 as option_no, now() as rt, now() as ut
+			from goods_summary 
+			where goods_no in ( select goods_no from goods_xmd_imp2 group by goods_no ) and opt_name = '사이즈'
+			group by goods_no, goods_sub
+		";
+		DB::insert($sql);
+
+		$sql	= "
+			insert into goods_option ( goods_no,goods_sub,type,name,required_yn,use_yn,seq,option_no,rt,ut )
+			select 
+				s.goods_no, s.goods_sub,'basic' as type,'사이즈' as name, 'Y' as required_yn, 
+				'Y' as use_yn, 0 as seq, 0 as option_no, now() as rt, now() as ut
+			from (
+				select goods_no from goods_xmd_imp2 group by goods_no
+			) a inner join goods_summary s on a.goods_no = s.goods_no
+			where s.goods_no in ( select goods_no from goods_xmd_imp2 group by goods_no )
+				and opt_name = '사이즈' and ( select count(*) from goods_option where goods_no = a.goods_no ) = 0
+			group by s.goods_no,s.opt_name
+		";
+		DB::insert($sql);
+
+		$sql	= "
+			insert into goods_option ( goods_no,goods_sub,type,name,required_yn,use_yn,seq,option_no,rt,ut )
+			select * from (
+				select 
+					s.goods_no, s.goods_sub,'basic' as type,'컬러' as name, 'Y' as required_yn, 
+					'Y' as use_yn, 0 as seq, 0 as option_no, now() as rt, now() as ut
+				from (
+					select goods_no from goods_xmd_imp2 group by goods_no
+				) a inner join goods_summary s on a.goods_no = s.goods_no
+				where opt_name = '컬러^사이즈' and ( select count(*) from goods_option where goods_no = a.goods_no ) = 0
+				group by s.goods_no,s.opt_name
+				union 
+				select 
+					s.goods_no, s.goods_sub,'basic' as type,'사이즈' as name, 'Y' as required_yn, 
+					'Y' as use_yn, 0 as seq, 1 as option_no, now() as rt, now() as ut
+				from (
+					select goods_no from goods_xmd_imp2 group by goods_no
+				) a inner join goods_summary s on a.goods_no = s.goods_no
+				where opt_name = '컬러^사이즈' and ( select count(*) from goods_option where goods_no = a.goods_no ) = 0
+				group by s.goods_no,s.opt_name
+			) a order by goods_no, goods_sub, name desc
+		";
+		DB::insert($sql);
+
+		$sql	= " delete from goods_xmd where cd in ( select cd from goods_xmd_imp2 ) ";
+		DB::delete($sql);
+
+		//추후 삭제 예정
+		$sql	= " insert into goods_xmd select cd,goods_no,0 as goods_sub,goods_opt,now() as rt, now() as ut from goods_xmd_imp2 ";
+		DB::insert($sql);
+
+		//#####상풍코드용 추가 작업 시작
+		////
+		$sql	= " delete from product_code where prd_cd = :prd_cd ";
+		DB::delete($sql,['prd_cd' => $cd]);
+
+		$sql	= " delete from product_stock where prd_cd = :prd_cd ";
+		DB::delete($sql,['prd_cd' => $cd]);
+
+		$prd_cd	= $cd;
+
+		if( substr($cd, 0 , 2) != "HR" ){
+			$cd_cut_cnt	= "1";
+
+			if( strlen($cd) == 13 )	$size_cnt = 3;
+			else					$size_cnt = 2;
+	
+			$size	= substr($cd, ($cd_cut_cnt+12), $size_cnt); 
+		}else{
+			$cd_cut_cnt	= "2";
+			$size	= substr($cd, ($cd_cut_cnt+12), 2); 
+		}
+
+		$brand	= substr($cd, 0, 1);
+		$year	= substr($cd, $cd_cut_cnt, 2);
+		$season	= substr($cd, ($cd_cut_cnt+2), 1);
+		$gender	= substr($cd, ($cd_cut_cnt+3), 1); 
+		$item	= substr($cd, ($cd_cut_cnt+4), 2); 
+		$opt	= substr($cd, ($cd_cut_cnt+8), 2); 
+		$seq	= substr($cd, ($cd_cut_cnt+6), 2); 
+		$color	= substr($cd, ($cd_cut_cnt+10), 2); 
+
+		DB::table('product_code')
+			->insert([
+				'prd_cd'	=> $prd_cd,
+				'goods_no'	=> $goods_no,
+				'goods_opt'	=> $goods_opt,
+				'brand'		=> $brand,
+				'year'		=> $year,
+				'season'	=> $season,
+				'gender'	=> $gender,
+				'item'		=> $item,
+				'opt'		=> $opt,
+				'seq'		=> $seq,
+				'color'		=> $color,
+				'size'		=> $size,
+				'rt'		=> now(),
+				'ut'		=> now(),
+				'admin_id'	=> $admin_id
+			]);
+
+		DB::table('product_stock')
+			->insert([
+				'goods_no'	=> $goods_no,
+				'prd_cd'	=> $prd_cd,
+				'in_qty'	=> 0,
+				'out_qty'	=> 0,
+				'qty'		=> 0,
+				'wqty'		=> 0,
+				'goods_opt'	=> $goods_opt,
+				'barcode'	=> $prd_cd,
+				'use_yn'	=> 'Y',
+				'rt'		=> now(),
+				'ut'		=> now()
+			]);
+		////	
+		//#####상풍코드용 추가 작업 종료
+
+		DB::commit();
+
+		return response()->json([
+			"code" => $error_code,
+			"result_code" => $result_code
+		]);
+	}
+	
 }

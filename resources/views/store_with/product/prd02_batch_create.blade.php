@@ -63,7 +63,8 @@
 						<h6 class="mt10 m-0 font-weight-bold text-primary fas fa-question-circle"> 주의사항</h6>
 					</div>
 					<ul class="mb-0">
-						<li>- 해당 상품번호에 이미 매칭된 상품코드가 있다면 삭제됩니다!</li>
+						<li>- 해당 상품번호의 재고가 초기화 됩니다.</li>
+						<li>- 해당 상품번호에 이미 매칭된 상품코드가 있다면 삭제됩니다.</li>
 					</ul>
 				</div>
 
@@ -77,7 +78,7 @@
 						</div>
 					</div>
 					<div class="table-responsive">
-						<div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
+						<div id="div-gd" style="height:calc(100vh - 380px);width:100%;" class="ag-theme-balham"></div>
 					</div>
 				</div>
 
@@ -151,15 +152,13 @@
 			return false;
 		}
 
-		//$('input[name="data"]').val(JSON.stringify(GridData));
-		//frm.submit();
-
-		// console.log(frm.serialize());
+		alert('개발완료 테스트 예정입니다.');
+		return false;
 
 		$.ajax({
 			async: true,
 			type: 'put',
-			url: '/head/stock/stk30/show',
+			url: '/store/product/prd02/show',
 			data: {
 				data : JSON.stringify(GridData),
 			},
@@ -234,7 +233,6 @@
 		while (worksheet['A' + rowIndex]) {
 			var row = {};
 			Object.keys(columns).forEach(function(column) {
-				//console.log(worksheet[column + rowIndex]);
 				if(worksheet[column + rowIndex] !== undefined){
 					row[columns[column]] = worksheet[column + rowIndex].w;
 				}
@@ -261,7 +259,7 @@
 		form_data.append('file', file_data);
 		form_data.append('_token', "{{ csrf_token() }}");
 		$.ajax({
-			url: '/head/stock/stk30/upload', // point to server-side PHP script
+			url: '/store/product/prd02/upload', // point to server-side PHP script
 			dataType: 'json',  // what to expect back from the PHP script, if anything
 			cache: false,
 			contentType: false,
@@ -274,10 +272,12 @@
 					//alert(file);
 					importExcel("/" + file);
 				} else {
+					alert('엑셀 파일 업로드 오류 입니다[1].');
 					console.log(res.errmsg);
 				}
 			},
 			error: function(request, status, error) {
+				alert('엑셀 파일 업로드 오류 입니다[2].');
 				console.log(error)
 			}
 		});
@@ -291,9 +291,7 @@
 			url,
 			// success
 			function (data) {
-			//console.log(data);
 				var workbook = convertDataToWorkbook(data);
-				//console.log(workbook);
 				populateGrid(workbook);
 			},
 			// error

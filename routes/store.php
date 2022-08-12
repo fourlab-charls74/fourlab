@@ -153,6 +153,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::put('prd02/del-product-code', 'prd02Controller@del_product_code');
 
         Route::get('prd02/batch-create', 'prd02Controller@batch_create');
+        Route::post('prd02/upload', 'prd02Controller@upload');
+        Route::put('prd02/show', 'prd02Controller@update');
     });
 
     // 생산입고관리
