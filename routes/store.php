@@ -233,6 +233,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk22/search-goods','stk22Controller@search_goods');
         Route::get('stk22/search-stock','stk22Controller@search_stock');
         Route::post('stk22/request-rt','stk22Controller@request_rt');
+
+        // 매장별할인율적용
+        Route::get('stk25','stk25Controller@index');
+        Route::get('stk25/search','stk25Controller@search');
         
         // 창고반품
         Route::get('stk30','stk30Controller@index');

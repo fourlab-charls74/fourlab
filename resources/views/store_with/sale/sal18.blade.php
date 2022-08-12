@@ -23,10 +23,10 @@
             <div class="d-flex card-header justify-content-between">
                 <h4>검색</h4>
                 <div>
-                    <a href="javascript:void(0);" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-					<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1" onclick="initSearch()">검색조건 초기화</a>
-                    <a href="javascript:void(0);" onclick="return Save();" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
-					<a href="#" class="btn btn-sm btn-outline-primary shadow-sm pl-2">매장별할인율적용</a>
+                    <a href="javascript:void(0);" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+					<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2" onclick="initSearch(['#store_no'])">검색조건 초기화</a>
+                    <a href="javascript:void(0);" onclick="return Save();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
+					<a href="/store/stock/stk25" class="btn btn-sm btn-outline-primary shadow-sm pl-2">매장별할인율적용</a>
                 </div>
             </div>
             <div class="card-body">
@@ -138,7 +138,7 @@
 		{field: "store_cd", headerName: "매장코드", width: 80, cellStyle: {"text-align": "center"}},
 		{field: "store_nm", headerName: "매장명", width: 200,
             cellRenderer: function(params) {
-                return `<a href="#">${params.value}</a>`;
+                return `<a href="/store/stock/stk25?store_cd=${params.data.store_cd}">${params.value}</a>`;
             }
         },
 		{field: "this_month_rate", headerName: "현월(%)", width: 60, type: "currencyType", editable: true, cellStyle: {"background-color": "#ffff99"}},
