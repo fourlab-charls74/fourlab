@@ -351,7 +351,7 @@ class prd05Controller extends Controller
         $goods_color_del_result = 0;
         $goods_color_in_result = 500;
 
-        // 기존 코드에 품목 변경시 데이터 초기화 추가 및 버그 수정 - madforre --->
+        // 기존 코드에 품목 변경시 데이터 초기화 추가 및 버그 수정 --->
         $class_changed = ($class == $to_class) ? false : true;
         $class = $to_class ? $to_class : "";
 

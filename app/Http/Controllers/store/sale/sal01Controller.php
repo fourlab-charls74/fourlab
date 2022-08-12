@@ -329,9 +329,9 @@ class sal01Controller extends Controller
 		$order['coupon_no'] = 0;
 		$order['com_coupon_ratio'] = 0;
 		$order['sales_com_fee'] = $order['pay_fee'];
-		$store_cd = $order['com_id'];
+		$store_cd = $order['store_cd'];
 		
-		$order['sale_place'] = $order['com_nm'];
+		$order['sale_place'] = $order['store_nm'];
 		$order['user_nm'] = $order['ord_nm'] ? $order['ord_nm']: "비회원";
 
 		$ord_date = $order["ord_date"];
@@ -558,6 +558,7 @@ class sal01Controller extends Controller
 				}
 
 				$order_opt = [
+					"store_cd"      => $store_cd,
 					"goods_no"		=> $order["goods_no"],
 					"goods_sub" 	=> $order["goods_sub"],
 					"ord_no" 		=> $ord_no,
@@ -616,6 +617,7 @@ class sal01Controller extends Controller
 
 				$orderClass->SetOrdOptNo($ord_opt_no);
 				$order_opt_wonga = array(
+					"store_cd" => $store_cd,
 					"goods_no" => $order['goods_no'],
 					"goods_sub" => $order['goods_sub'],
 					"goods_opt" => $order['goods_opt'],
@@ -637,7 +639,8 @@ class sal01Controller extends Controller
 					"com_coupon_ratio" => $order['com_coupon_ratio'],
 					"sales_com_fee" => $order['sales_com_fee'],
 					'order_state_date' => $ord_state_date,
-					'prd_cd' => $prd_cd
+					'prd_cd' => $prd_cd,
+					'store_cd' => $store_cd
 				);
 				$orderClass->__InsertOptWonga($order_opt_wonga);
 
