@@ -314,6 +314,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 매장중간관리자정산
         Route::get('acc06', 'acc06Controller@index');
         Route::get('acc06/search', 'acc06Controller@search');
+        Route::get('acc06/show/{store_cd}/{sdate}', 'acc06Controller@show');
+        Route::get('acc06/show-search', 'acc06Controller@show_search');
+        Route::put('acc06/show', 'acc06Controller@closed');
 
     });
 

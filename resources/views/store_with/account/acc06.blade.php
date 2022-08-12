@@ -120,7 +120,15 @@
         { field: "name", headerName: "등급", pinned:'left', width: 100},
         { field: "sale_status", headerName: "매출",
 			children: [
-				{ headerName: "소계", field: "ord_amt", type: 'currencyMinusColorType', width: 100 },
+				{ headerName: "소계", field: "ord_amt", type: 'currencyMinusColorType', width: 100,
+					cellRenderer: (params) => {
+						if ( params.value != undefined ) {
+							return '<a href="#" onClick="popDetail(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>';
+						} else {
+							return 0;
+						}
+					}
+				},
 				@foreach (@$pr_codes as $pr_code)
 					{ headerName: "{{ $pr_code->code_val }}", field: "amt_{{ $pr_code->code_id }}", type: 'currencyMinusColorType', width: 100 },
 				@endforeach
@@ -211,6 +219,12 @@
 		const sum = sumSaleFees(params) + extra;
 		return isNaN(sum) ? 0 : sum;
 	};
+
+	function popDetail(store_cd) {
+		let sdate	= $('input[name="sdate"]').val();
+		const url	='/store/account/acc06/show/' + store_cd + '/' + sdate;
+		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=800");
+	}
 
 </script>
 @stop

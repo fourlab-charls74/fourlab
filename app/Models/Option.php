@@ -6,7 +6,7 @@ use Exception;
 use App\Components\Lib;
 use Illuminate\Support\Facades\DB;
 
-class Option { // 20220421 - madforre 추가
+class Option { // 20220421 추가
 
 	var $user;
 	var $goods_no;

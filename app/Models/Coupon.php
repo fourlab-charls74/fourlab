@@ -57,7 +57,7 @@ class Coupon
 				'regi_date'			=> now(),
 				//'pub_time'			=> $data['pub_time'],
 
-				// 20220318 모델 주석 수정 - madforre
+				// 20220318 모델 주석 수정
 				'use_date_type'		=> $data['use_date_type'],
 				'use_date_alarm_yn'	=> $data['use_date_alarm_yn'], 
 				'use_date_alarm_day'	=> $data['use_date_alarm_day'], 
@@ -110,7 +110,7 @@ class Coupon
                 'admin_id'			=>$data['admin_id'],
                 // 'pub_time'			=>$data['pub_time'],
 
-				// 20220406 모델 주석 수정 - madforre
+				// 20220406 모델 주석 수정
 				'use_date_type'		=> $data['use_date_type'],
 				'use_date_alarm_yn'	=> $data['use_date_alarm_yn'], 
 				'use_date_alarm_day'	=> $data['use_date_alarm_day'], 

@@ -518,7 +518,7 @@ HDGrid.prototype.Aggregation = function(params){
     this.agg_params = params;
 };
 
-HDGrid.prototype.CalAggregation = function(){ // 2022-07-08 동적으로 컬럼 정의해도 변경되도록 수정 -  madforre
+HDGrid.prototype.CalAggregation = function(){ // 2022-07-08 동적으로 컬럼 정의해도 변경되도록 수정
 
     var cnt = this.gridOptions.api.getDisplayedRowCount();
 
