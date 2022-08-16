@@ -208,7 +208,7 @@
 		{field: "dlv_end_date",	headerName: "배송완료일",	width:90},
 		{field: "clm_end_date",	headerName: "클레임완료일",	width:90},
 		{field: "bigo",			headerName: "비고",			width:120},
-		{field: "",			headerName: "nvl",			width: "auto"}
+		{field: "nvl", headerName: "", width: "auto"}
 	];
 
 </script>
