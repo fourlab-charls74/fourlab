@@ -12,160 +12,143 @@
 	}	
 </style>
 
-<div class="show_layout py-3">
-	<form method="post" name="search">
-		<div class="card_wrap aco_card_wrap">
-			<div class="card shadow">
-				<div class="d-flex justify-content-between">
-					<h1 class="card-header">
-						<a href="#">매장중간관리자정산 - 상세 </a>
-					</h1>
-					<div class="flax_box">
-						<a href="#" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1">검색</a>
-						<a href="#" @if( $acc_idx == '')onclick="Closed();"@endif class="btn btn-sm btn-outline-primary shadow-sm mr-1 closed_btn" @if( $acc_idx != '') disabled style="background-color:#DBDBDB;" @endif>마감추가</a>
-						<a href="#" onclick="gridDownload();" class="btn btn-sm btn-outline-primary shadow-sm">자료받기</a>
-					</div>
+<form method="post" name="search">
+	<div id="search-area" class="search_cum_form">
+		<div class="card mb-3">
+			<div class="d-flex card-header justify-content-between">
+				<h4>매장중간관리자정산 - 상세</h4>
+				<div class="flex_box">
+					<a href="#" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1">검색</a>
+					<a href="#" @if( $acc_idx == '')onclick="Closed();"@endif class="btn btn-sm btn-outline-primary shadow-sm mr-1 closed_btn" @if( $acc_idx != '') disabled style="background-color:#DBDBDB;" @endif>마감추가</a>
+					<a href="#" onclick="gridDownload();" class="btn btn-sm btn-outline-primary shadow-sm">자료받기</a>
 				</div>
-				<div class="card-body mt-1">
-					<div class="row_wrap">
-						<div class="row">
-							<div class="col-12">
-								<div class="table-box-ty2 mobile">
-									<table class="table incont table-bordered" width="100%" cellspacing="0">
-										<colgroup>
-											<col width="15%">
-											<col width="35%">
-											<col width="15%">
-											<col width="35%">
-										</colgroup>
-										<tbody>
-											<tr>
-												<th>정산일자</th>
-												<td>
-													<div class="form-inline date-select-inbox">
-														<div class="docs-datepicker form-inline-inner input_box">
-															<div class="input-group">
-																<input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
-																<div class="input-group-append">
-																	<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-																		<i class="fa fa-calendar" aria-hidden="true"></i>
-																	</button>
-																</div>
-															</div>
-															<div class="docs-datepicker-container"></div>
-														</div>
-													</div>
-												</td>
-												<th>
-													<label for="store_no">매장명</label>
-												</th>
-												<td>
-													<div class="form-inline inline_btn_box">
-														<input type='hidden' id="store_nm" name="store_nm">
-														<select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
-														<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<th>주문상태</th>
-												<td>
-													<div class="flax_box">
-														<select name='ord_state' class="form-control form-control-sm">
-															<option value=''>전체</option>
-															@foreach ($ord_states as $ord_state)
-																<option value='{{ $ord_state->code_id }}'>
-																	{{ $ord_state->code_val }}
-																</option>
-															@endforeach
-														</select>
-													</div>
-												</td>
-												<th>클레임상태</th>
-												<td>
-													<div class="flax_box">
-														<select name='clm_state' class="form-control form-control-sm">
-															<option value=''>전체</option>
-															@foreach ($clm_states as $clm_state)
-																<option value='{{ $clm_state->code_id }}'>
-																	{{ $clm_state->code_val }}
-																</option>
-															@endforeach
-														</select>
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<th>결제방법</th>
-												<td>
-													<div class="form-inline">
-														<div class="form-inline-inner" style="width:100%;">
-															<div class="form-group flax_box">
-																<div style="width:calc(100% - 65px);">
-																	<select name="stat_pay_type" class="form-control form-control-sm mr-2" style="width:100%;">
-																		<option value="">전체</option>
-																		@foreach ($stat_pay_types as $stat_pay_type)
-																			<option value='{{ $stat_pay_type->code_id }}'>
-																				{{ $stat_pay_type->code_val }}
-																			</option>
-																		@endforeach
-																	</select>
-																</div>
-																<div style="height:30px;margin-left:5px;">
-																	<div class="custom-control custom-switch date-switch-pos" data-toggle="tooltip" data-placement="top" data-original-title="복합결제 제외">
-																		<input type="checkbox" class="custom-control-input" id="not_complex" name="not_complex" value="Y">
-																		<label for="not_complex" data-on-label="ON" data-off-label="OFF" style="margin-top:2px;"></label>
-																	</div>
-																</div>
-															</div>
-														</div>
-													</div>
-												</td>
-												<th>주문구분</th>
-												<td>
-													<div class="flax_box">
-														<select name='ord_type' class="form-control form-control-sm">
-															<option value=''>전체</option>
-															@foreach ($ord_types as $ord_type)
-																<option value='{{ $ord_type->code_id }}'>{{ $ord_type->code_val }}</option>
-															@endforeach
-														</select>
-													</div>
-												</td>
-											</tr>
-										</tbody>
-									</table>
+			</div>
+			<div class="card-body">
+				<div class="row">
+					<div class="col-lg-4">
+						<div class="form-group">
+							<label for="sdate">정산일자</label>
+							<div class="docs-datepicker flex_box">
+								<div class="input-group">
+									<input type="text" id="sdate" class="form-control form-control-sm docs-date month" name="sdate" value="{{ $sdate }}" autocomplete="off">
+									<div class="input-group-append">
+										<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
+											<i class="fa fa-calendar" aria-hidden="true"></i>
+										</button>
+									</div>
 								</div>
+								<div class="docs-datepicker-container"></div>
 							</div>
 						</div>
-					
 					</div>
-				</div>
-
-			</div>
-
-		</div>
-
-		<!-- DataTales Example -->
-		<div class="card shadow last-card pt-2 pt-sm-0">
-			<div class="card-body">
-				<div class="card-title">
-					<div class="filter_wrap">
-						<div class="fl_box">
-							<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
+					<div class="col-lg-4">
+						<div class="form-group">
+							<label for="store_no">매장명</label>
+							<div class="form-inline inline_btn_box">
+								<input type='hidden' id="store_nm" name="store_nm">
+								<select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
+								<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4">
+						<div class="form-group">
+							<label for="ord_state">주문상태</label>
+							<div class="flex_box">
+								<select name='ord_state' class="form-control form-control-sm">
+									<option value=''>전체</option>
+									@foreach ($ord_states as $ord_state)
+										<option value='{{ $ord_state->code_id }}'>
+											{{ $ord_state->code_val }}
+										</option>
+									@endforeach
+								</select>
+							</div>
 						</div>
 					</div>
 				</div>
-				<div class="table-responsive">
-					<div id="div-gd" style="height:calc(100vh - 280px);width:100%;" class="ag-theme-balham"></div>
+				<div class="row">
+					<div class="col-lg-4">
+						<div class="form-group">
+							<label for="clm_state">클레임상태</label>
+							<div class="flex_box">
+								<select name='clm_state' class="form-control form-control-sm">
+									<option value=''>전체</option>
+									@foreach ($clm_states as $clm_state)
+										<option value='{{ $clm_state->code_id }}'>
+											{{ $clm_state->code_val }}
+										</option>
+									@endforeach
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4">
+						<div class="form-group">
+							<label for="stat_pay_type">결제방법</label>
+							<div class="form-inline">
+								<div class="form-inline-inner" style="width:100%;">
+									<div class="form-group flex_box">
+										<div style="width:calc(100% - 65px);">
+											<select name="stat_pay_type" class="form-control form-control-sm mr-2" style="width:100%;">
+												<option value="">전체</option>
+												@foreach ($stat_pay_types as $stat_pay_type)
+													<option value='{{ $stat_pay_type->code_id }}'>
+														{{ $stat_pay_type->code_val }}
+													</option>
+												@endforeach
+											</select>
+										</div>
+										<div style="height:30px;margin-left:5px;">
+											<div class="custom-control custom-switch date-switch-pos" data-toggle="tooltip" data-placement="top" data-original-title="복합결제 제외">
+												<input type="checkbox" class="custom-control-input" id="not_complex" name="not_complex" value="Y">
+												<label for="not_complex" data-on-label="ON" data-off-label="OFF" style="margin-top:2px;"></label>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+                        </div>
+					</div>
+					<div class="col-lg-4">
+						<div class="form-group">
+						<label for="ord_type">주문구분</label>
+							<div class="flex_box">
+								<select name='ord_type' class="form-control form-control-sm">
+									<option value=''>전체</option>
+									@foreach ($ord_types as $ord_type)
+										<option value='{{ $ord_type->code_id }}'>{{ $ord_type->code_val }}</option>
+									@endforeach
+								</select>
+							</div>
+                        </div>
+					</div>
 				</div>
 			</div>
 		</div>
-
-	</form>
-
+		<div class="resul_btn_wrap mb-3">
+			<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+			<a href="#" @if( $acc_idx == '')onclick="Closed();"@endif class="btn btn-sm btn-outline-primary shadow-sm mr-1 closed_btn" @if( $acc_idx != '') disabled style="background-color:#DBDBDB;" @endif>마감추가</a>
+			<a href="#" onclick="gridDownload();" class="btn btn-sm btn-outline-primary shadow-sm">자료받기</a>
+			<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
+		</div>
+	</div>
+</form>
+<!-- DataTales Example -->
+<div class="card shadow mb-0 last-card pt-2 pt-sm-0">
+	<div class="card-body">
+		<div class="card-title">
+			<div class="filter_wrap">
+				<div class="fl_box">
+					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
+				</div>
+			</div>
+		</div>
+		<div class="table-responsive">
+			<div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
+		</div>
+	</div>
 </div>
-
 <div class="card shadow">
 	<div class="card-body">
 		<div class="card-title">
@@ -181,8 +164,6 @@
 		</ul>
 	</div>
 </div>
-
-
 
 <script language="javascript">
 	var columns = [
@@ -206,108 +187,27 @@
 		{field: "goods_nm",		headerName: "상품명",		width:150, type:'HeadGoodsNameType'},
 		{field: "opt_nm",		headerName: "옵션",			width:70},
 		{field: "style_no",		headerName: "스타일넘버",	width:90},
+		{field: "",				headerName: "상품코드",		width:90},
 		{field: "opt_type",		headerName: "출고형태",		width:90},
-		{field: "store_nm",		headerName: "매장명",		width:100},
+		{field: "",				headerName: "행사구분",		width:90},
+		{field: "store_nm",		headerName: "매장",		width:100},
 		{field: "user_nm",		headerName: "주문자",		width:80},
 		{field: "pay_type",		headerName: "결제방법",		width:90},
 		{field: "tax_yn",		headerName: "과세",			width:70},
 		{field: "qty",			headerName: "수량",			width:70, type: 'currencyType'},
-		{field: "sale_amt",		headerName: "판매금액",		width:90, type: 'currencyType'},
+		// {field: "sale_amt",		headerName: "판매금액",		width:90, type: 'currencyType'},
+		{field: "recv_amt",		headerName: "판매금액",		width:90, type: 'currencyType'},
 		{field: "clm_amt",		headerName: "클레임금액",	width:90, type: 'currencyType'},
 		{field: "dc_apply_amt",	headerName: "할인금액",		width:90, type: 'currencyType'},
-		{
-			headerName: '쿠폰금액',
-			children: [{
-					field: "coupon_com_amt",
-					headerName: "(업체부담)",
-					width:95,
-					type: 'currencyType',
-					aggregation: true
-				}
-			]
-		},
 		{field: "dlv_amt",		headerName: "배송비",		width:80, type: 'currencyType'},
-		{field: "fee_etc_amt",	headerName: "기타정산액",	width:90, type: 'currencyType'},
-		{
-			headerName: '매출금액',
-			children: [{
-					field: "sale_net_taxation_amt",
-					headerName: "과세",
-					width:90,
-					type: 'currencyType',
-					aggregation: true
-				},
-				{
-					field: "sale_net_taxfree_amt",
-					headerName: "비과세",
-					width:90,
-					type: 'currencyType',
-					aggregation: true
-				},
-				{
-					field: "sale_net_amt",
-					headerName: "소계",
-					width:90,
-					type: 'currencyType',
-					aggregation: true
-				},
-			]
-		},
-		{field: "tax_amt",	headerName: "부가세",	type: 'currencyType',	hide:true},
-		{
-			headerName: '본사수수료',
-			children: [{
-					field: "fee_ratio",
-					headerName: "수수료율(%)",
-					width:90,
-					cellStyle:{"text-align":"right"},
-					aggregation: true
-				},
-				{
-					field: "fee",
-					headerName: "판매수수료",
-					width:90,
-					type: 'currencyType',
-					aggregation: true
-				},
-				{
-					field: "fee_dc_amt",
-					headerName: "할인금액",
-					width:90,
-					type: 'currencyType',
-					aggregation: true
-				},
-				{
-					field: "fee_net_amt",
-					headerName: "소계",
-					width:90,
-					type: 'currencyType',
-					aggregation: true
-				},
-			]
-		},
-		{field: "acc_amt",		headerName: "정산금액",		width:90, type: 'currencyType'},
-		{
-			headerName: '쿠폰금액',
-			children: [{
-					field: "fee_allot_amt",
-					headerName: "(본사부담)",
-					width:95,
-					type: 'currencyType',
-					aggregation: true
-				}
-			]
-		},
+		{field: "",		headerName: "소계",		width:80, type: 'currencyType'},
 		{field: "ord_state",	headerName: "주문상태",		width:90},
 		{field: "clm_state",	headerName: "클레임상태",	width:90},
 		{field: "ord_date",		headerName: "주문일",		width:80},
 		{field: "dlv_end_date",	headerName: "배송완료일",	width:90},
 		{field: "clm_end_date",	headerName: "클레임완료일",	width:90},
 		{field: "bigo",			headerName: "비고",			width:120},
-		{field: "goods_no",		headerName: "상품코드1", hide:true},
-		{field: "goods_sub",	headerName: "상품코드2", hide:true},
-		{field: "acc_type",		headerName: "정산구분", hide:true},
-		{field: "err_notice",	headerName: "에러공지", hide:true},
+		{field: "nvl", headerName: "", width: "auto"}
 	];
 
 </script>
@@ -327,7 +227,7 @@
         document.search.store_nm.value = "{{ @$store_nm ? @$store_nm : '' }}";
 
 		// ag-grid 설정
-		pApp.ResizeGrid(325);
+		pApp.ResizeGrid(275);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
         let options = {
@@ -397,7 +297,5 @@
 		}
 	}
 </script>
-
-
 
 @stop

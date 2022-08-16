@@ -29,7 +29,7 @@
 							<label for="sdate">판매기간(판매연월)</label>
 							<div class="docs-datepicker flex_box">
 								<div class="input-group">
-								<input type="text" id="sdate" class="form-control form-control-sm docs-date month" name="sdate" value="{{ $sdate }}" autocomplete="off">
+									<input type="text" id="sdate" class="form-control form-control-sm docs-date month" name="sdate" value="{{ $sdate }}" autocomplete="off">
 									<div class="input-group-append">
 										<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
 											<i class="fa fa-calendar" aria-hidden="true"></i>
