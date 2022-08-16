@@ -12,7 +12,6 @@
 	}	
 </style>
 
-
 <form method="post" name="search">
 	<div id="search-area" class="search_cum_form">
 		<div class="card mb-3">
