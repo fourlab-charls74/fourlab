@@ -258,7 +258,7 @@
             if(!confirm("등록하시겠습니까?")) return;
 
             axios({
-                url: '/store/stock/stk30/add-storage-return',
+                url: '/store/stock/stk30/add-store_return',
                 method: 'put',
                 data: {
                     sr_date,
@@ -288,7 +288,7 @@
             if(!confirm("수정하시겠습니까?")) return;
 
             axios({
-                url: '/store/stock/stk30/update-storage-return',
+                url: '/store/stock/stk30/update-store_return',
                 method: 'put',
                 data: {
                     sr_cd,

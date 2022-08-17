@@ -89,12 +89,12 @@ class stk30Controller extends Controller
                 sr.sr_kind,
                 sr.sr_state,
                 c.code_val as sr_state_nm,
-                (select sum(return_price) from storage_return_product where sr_cd = sr.sr_cd) as sr_price,
-                (select sum(return_qty) from storage_return_product where sr_cd = sr.sr_cd) as sr_qty,
+                (select sum(return_price) from store_return_product where sr_cd = sr.sr_cd) as sr_price,
+                (select sum(return_qty) from store_return_product where sr_cd = sr.sr_cd) as sr_qty,
                 sr.sr_reason,
                 co.code_val as sr_reason_nm,
                 sr.comment
-            from storage_return sr
+            from store_return sr
                 inner join storage on storage.storage_cd = sr.storage_cd
                 inner join store on store.store_cd = sr.store_cd
                 inner join code c on c.code_kind_cd = 'SR_CODE' and c.code_id = sr.sr_state
@@ -112,7 +112,7 @@ class stk30Controller extends Controller
         if($page == 1) {
             $sql = "
                 select count(*) as total
-                from storage_return sr
+                from store_return sr
                     inner join storage on storage.storage_cd = sr.storage_cd
                     inner join store on store.store_cd = sr.store_cd
                     inner join code c on c.code_kind_cd = 'SR_CODE' and c.code_id = sr.sr_state
@@ -158,7 +158,7 @@ class stk30Controller extends Controller
                     sr.comment,
                     sr.rt,
                     sr.ut
-                from storage_return sr
+                from store_return sr
                     inner join store s on s.store_cd = sr.store_cd
                 where sr_cd = :sr_cd
             ";
@@ -166,7 +166,7 @@ class stk30Controller extends Controller
         } else {
             $sql = "
                 select sr_cd
-                from storage_return
+                from store_return
                 order by sr_cd desc
                 limit 1
             ";
@@ -212,10 +212,10 @@ class stk30Controller extends Controller
                 srp.return_qty as qty,
                 (srp.return_qty * srp.return_price) as total_return_price,
                 true as isEditable
-            from storage_return_product srp
+            from store_return_product srp
                 inner join product_code pc on pc.prd_cd = srp.prd_cd
                 inner join goods g on g.goods_no = pc.goods_no
-                left outer join storage_return sr on sr.sr_cd = srp.sr_cd
+                left outer join store_return sr on sr.sr_cd = srp.sr_cd
                 left outer join product_stock_store pss on pss.store_cd = sr.store_cd and pss.prd_cd = srp.prd_cd
                 left outer join brand b on b.brand = g.brand
                 left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
@@ -239,7 +239,7 @@ class stk30Controller extends Controller
     }
 
     // 창고반품 등록
-    public function add_storage_return(Request $request)
+    public function add_store_return(Request $request)
     {
         $admin_id = Auth('head')->user()->id;
         $sr_kind = "S";
@@ -258,7 +258,7 @@ class stk30Controller extends Controller
                 throw new Exception("반품등록할 상품을 선택해주세요.");
             }
 
-            $sr_cd = DB::table('storage_return')
+            $sr_cd = DB::table('store_return')
                 ->insertGetId([
                     'storage_cd' => $storage_cd,
                     'store_cd' => $store_cd,
@@ -272,7 +272,7 @@ class stk30Controller extends Controller
                 ]);
 
 			foreach($products as $product) {
-                DB::table('storage_return_product')
+                DB::table('store_return_product')
                     ->insert([
                         'sr_cd' => $sr_cd,
                         'prd_cd' => $product['prd_cd'],
@@ -297,7 +297,7 @@ class stk30Controller extends Controller
     }
 
     // 창고반품 수정
-    public function update_storage_return(Request $request)
+    public function update_store_return(Request $request)
     {
         $admin_id = Auth('head')->user()->id;
         $sr_cd = $request->input("sr_cd", "");
@@ -308,7 +308,7 @@ class stk30Controller extends Controller
         try {
             DB::beginTransaction();
 
-            DB::table('storage_return')
+            DB::table('store_return')
                 ->where('sr_cd', '=', $sr_cd)
                 ->update([
                     'sr_reason' => $sr_reason,
@@ -318,7 +318,7 @@ class stk30Controller extends Controller
                 ]);
 
 			foreach($products as $product) {
-                DB::table('storage_return_product')
+                DB::table('store_return_product')
                     ->where('sr_prd_cd', '=', $product['sr_prd_cd'])
                     ->update([
                         'return_price' => $product['return_price'], // 반품단가
@@ -352,7 +352,7 @@ class stk30Controller extends Controller
 
             if($new_state != "") {
                 foreach($data as $d) {
-                    DB::table('storage_return')
+                    DB::table('store_return')
                         ->where('sr_cd', '=', $d['sr_cd'])
                         ->update([
                             'sr_state' => $new_state,
@@ -366,7 +366,7 @@ class stk30Controller extends Controller
                             sr_prd_cd,
                             prd_cd,
                             return_qty
-                        from storage_return_product
+                        from store_return_product
                         where sr_cd = :sr_cd
                     ";
                     $rows = DB::select($sql, ["sr_cd" => $d['sr_cd']]);
@@ -430,11 +430,11 @@ class stk30Controller extends Controller
             DB::beginTransaction();
 
             foreach($sr_cds as $sr_cd) {
-                DB::table('storage_return')
+                DB::table('store_return')
                     ->where('sr_cd', '=', $sr_cd)
                     ->delete();
 
-                DB::table('storage_return_product')
+                DB::table('store_return_product')
                     ->where('sr_cd', '=', $sr_cd)
                     ->delete();
             }

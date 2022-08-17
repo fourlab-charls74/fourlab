@@ -350,7 +350,7 @@ CREATE TABLE `store_grade` (
 ) ENGINE=INNODB DEFAULT CHARSET=utf8
 
 -- 창고반품
-CREATE TABLE `storage_return` (
+CREATE TABLE `store_return` (
     `sr_cd` int(11) NOT NULL AUTO_INCREMENT COMMENT 'identify (반품코드)',
     `storage_cd` varchar(30) NOT NULL COMMENT '창고코드 - storage : storage_cd',
     `store_cd` varchar(30) NOT NULL COMMENT '매장코드 - store : store_cd',
@@ -366,7 +366,7 @@ CREATE TABLE `storage_return` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 창고반품 상품리스트
-CREATE TABLE `storage_return_product` (
+CREATE TABLE `store_return_product` (
     `sr_prd_cd` int(11) NOT NULL AUTO_INCREMENT COMMENT 'identify (반품일련코드)',
     `sr_cd` int(11) NOT NULL COMMENT '반품코드',
     `prd_cd` varchar(50) NOT NULL COMMENT '상품코드',
