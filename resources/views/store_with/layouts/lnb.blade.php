@@ -26,8 +26,8 @@
                 <a href="javascript:;" class="arrow"><i class="bx bx-task fs-18"></i><span>생산입고관리</span></a>
                 <ul>
                     <li><a href="/store/cs/cs01">(완)상품입고</a></li>
-                    <li><a href="/store/cs/cs02">(개)상품반품</a></li>
-                    <li><a href="/partner/cs/cs02">창고입고반품이동</a></li>
+                    <li><a href="/store/cs/cs02">(개)상품반품이동</a></li>
+                    {{-- <li><a href="/partner/cs/cs02">상품반품이동 (일괄등록)</a></li> --}}
                     <li><a href="/partner/cs/cs01">원부자재입고</a></li>
                     <li><a href="/partner/cs/cs01">원부자재반품</a></li>
                 </ul>
@@ -42,7 +42,7 @@
                     <li><a href="/store/stock/stk11">(개)반품</a></li>
                     <li><a href="/store/stock/stk20">(완)매장RT</a></li>
                     <li><a href="">매장주문 - 는 포스화면</a></li>
-                    <li><a href="/store/stock/stk25">(개)매장별할인율적용</a></li>
+                    <li><a href="/store/stock/stk25">(완)매장별할인율적용조회</a></li>
                     <li><a href="">실사</a></li>
                 </ul>
             <li>

@@ -1,12 +1,12 @@
 @extends('store_with.layouts.layout')
-@section('title','상품반품')
+@section('title','상품반품이동')
 @section('content')
 <div class="page_tit">
-	<h3 class="d-inline-flex">상품반품</h3>
+	<h3 class="d-inline-flex">상품반품이동</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
 		<span>/ 생산입고관리</span>
-		<span>/ 상품반품</span>
+		<span>/ 상품반품이동</span>
 	</div>
 </div>
 <form method="get" name="search">
@@ -290,7 +290,7 @@
 		// gx.Request('/store/stock/stk20/search', data, 1);
 	}
 
-    // 상품반품등록 팝업 오픈
+    // 상품반품이동등록 팝업 오픈
     const add = () => {
         const url = '/store/cs/cs02/show';
         window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1735,height=800");

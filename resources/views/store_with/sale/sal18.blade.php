@@ -26,7 +26,7 @@
                     <a href="javascript:void(0);" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
 					<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2" onclick="initSearch(['#store_no'])">검색조건 초기화</a>
                     <a href="javascript:void(0);" onclick="return Save();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
-					<a href="/store/stock/stk25" class="btn btn-sm btn-outline-primary shadow-sm pl-2">매장별할인율적용</a>
+					<a href="javascript:void(0);" onclick="return moveToStk25()" class="btn btn-sm btn-outline-primary shadow-sm pl-2">매장별할인율적용조회</a>
                 </div>
             </div>
             <div class="card-body">
@@ -81,7 +81,7 @@
 			<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
 			<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2" onclick="initSearch()">검색조건 초기화</a>
             <a href="javascript:void(0);" onclick="return Save();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
-            <a href="#" class="btn btn-sm btn-outline-primary shadow-sm pl-2">매장별할인율적용</a>
+            <a href="javascript:void(0);" onclick="return moveToStk25()" class="btn btn-sm btn-outline-primary shadow-sm pl-2">매장별할인율적용조회</a>
         </div>
     </div>
 </form>
@@ -96,8 +96,6 @@
                     <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="applyRate('batch')">일괄적용</button>
                     <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
                     <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2" onclick="applyRate('last-month')">전월적용</button>
-                    {{-- <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateCompetitors()"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
-                    <button type="button" class="btn btn-sm btn-outline-primary shadow-sm" onclick="resetCompetitors()">전체 초기화</button> --}}
                 </div>
             </div>
             <div class="card-body shadow pt-2">
@@ -138,7 +136,7 @@
 		{field: "store_cd", headerName: "매장코드", width: 80, cellStyle: {"text-align": "center"}},
 		{field: "store_nm", headerName: "매장명", width: 200,
             cellRenderer: function(params) {
-                return `<a href="/store/stock/stk25?store_cd=${params.data.store_cd}">${params.value}</a>`;
+                return `<a href="/store/stock/stk25?store_cd=${params.data.store_cd}&sale_month=${$("[name=sdate]").val()}">${params.value}</a>`;
             }
         },
 		{field: "this_month_rate", headerName: "현월(%)", width: 60, type: "currencyType", editable: true, cellStyle: {"background-color": "#ffff99"}},
@@ -251,6 +249,11 @@
         }).catch(function (err) {
             console.log(err);
         });
+    }
+
+    // 매장별할인율적용조회 페이지로 이동
+    function moveToStk25() {
+        location.href = '/store/stock/stk25?sale_month=' + $("[name=sdate]").val();
     }
 </script>
 @stop
