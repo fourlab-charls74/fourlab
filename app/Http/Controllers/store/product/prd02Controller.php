@@ -738,68 +738,74 @@ class prd02Controller extends Controller
 
 		//#####상풍코드용 추가 작업 시작
 		////
-		$sql	= " delete from product_code where prd_cd = :prd_cd ";
-		DB::delete($sql,['prd_cd' => $cd]);
+		for( $i = 0; $i < count($datas); $i++ ){
+			$data	= (array)$datas[$i];
 
-		$sql	= " delete from product_stock where prd_cd = :prd_cd ";
-		DB::delete($sql,['prd_cd' => $cd]);
+			$prd_cd		= $data["xmd_code"];
+			$goods_no	= $data["goods_no"];
+			$goods_opt	= $data["goods_opt"];
 
-		$prd_cd	= $cd;
-
-		if( substr($cd, 0 , 2) != "HR" ){
-			$cd_cut_cnt	= "1";
-
-			if( strlen($cd) == 13 )	$size_cnt = 3;
-			else					$size_cnt = 2;
+			$sql	= " delete from product_code where prd_cd = :prd_cd ";
+			DB::delete($sql,['prd_cd' => $prd_cd]);
 	
-			$size	= substr($cd, ($cd_cut_cnt+12), $size_cnt); 
-		}else{
-			$cd_cut_cnt	= "2";
-			$size	= substr($cd, ($cd_cut_cnt+12), 2); 
+			$sql	= " delete from product_stock where prd_cd = :prd_cd ";
+			DB::delete($sql,['prd_cd' => $prd_cd]);
+	
+			if( substr($prd_cd, 0 , 2) != "HR" ){
+				$cd_cut_cnt	= "1";
+	
+				if( strlen($prd_cd) == 13 )	$size_cnt = 3;
+				else						$size_cnt = 2;
+		
+				$size	= substr($prd_cd, ($cd_cut_cnt+12), $size_cnt); 
+			}else{
+				$cd_cut_cnt	= "2";
+				$size	= substr($prd_cd, ($cd_cut_cnt+12), 2); 
+			}
+	
+			$brand	= substr($prd_cd, 0, 1);
+			$year	= substr($prd_cd, $cd_cut_cnt, 2);
+			$season	= substr($prd_cd, ($cd_cut_cnt+2), 1);
+			$gender	= substr($prd_cd, ($cd_cut_cnt+3), 1); 
+			$item	= substr($prd_cd, ($cd_cut_cnt+4), 2); 
+			$opt	= substr($prd_cd, ($cd_cut_cnt+8), 2); 
+			$seq	= substr($prd_cd, ($cd_cut_cnt+6), 2); 
+			$color	= substr($prd_cd, ($cd_cut_cnt+10), 2); 
+	
+			DB::table('product_code')
+				->insert([
+					'prd_cd'	=> $prd_cd,
+					'goods_no'	=> $goods_no,
+					'goods_opt'	=> $goods_opt,
+					'brand'		=> $brand,
+					'year'		=> $year,
+					'season'	=> $season,
+					'gender'	=> $gender,
+					'item'		=> $item,
+					'opt'		=> $opt,
+					'seq'		=> $seq,
+					'color'		=> $color,
+					'size'		=> $size,
+					'rt'		=> now(),
+					'ut'		=> now(),
+					'admin_id'	=> $admin_id
+				]);
+	
+			DB::table('product_stock')
+				->insert([
+					'goods_no'	=> $goods_no,
+					'prd_cd'	=> $prd_cd,
+					'in_qty'	=> 0,
+					'out_qty'	=> 0,
+					'qty'		=> 0,
+					'wqty'		=> 0,
+					'goods_opt'	=> $goods_opt,
+					'barcode'	=> $prd_cd,
+					'use_yn'	=> 'Y',
+					'rt'		=> now(),
+					'ut'		=> now()
+				]);
 		}
-
-		$brand	= substr($cd, 0, 1);
-		$year	= substr($cd, $cd_cut_cnt, 2);
-		$season	= substr($cd, ($cd_cut_cnt+2), 1);
-		$gender	= substr($cd, ($cd_cut_cnt+3), 1); 
-		$item	= substr($cd, ($cd_cut_cnt+4), 2); 
-		$opt	= substr($cd, ($cd_cut_cnt+8), 2); 
-		$seq	= substr($cd, ($cd_cut_cnt+6), 2); 
-		$color	= substr($cd, ($cd_cut_cnt+10), 2); 
-
-		DB::table('product_code')
-			->insert([
-				'prd_cd'	=> $prd_cd,
-				'goods_no'	=> $goods_no,
-				'goods_opt'	=> $goods_opt,
-				'brand'		=> $brand,
-				'year'		=> $year,
-				'season'	=> $season,
-				'gender'	=> $gender,
-				'item'		=> $item,
-				'opt'		=> $opt,
-				'seq'		=> $seq,
-				'color'		=> $color,
-				'size'		=> $size,
-				'rt'		=> now(),
-				'ut'		=> now(),
-				'admin_id'	=> $admin_id
-			]);
-
-		DB::table('product_stock')
-			->insert([
-				'goods_no'	=> $goods_no,
-				'prd_cd'	=> $prd_cd,
-				'in_qty'	=> 0,
-				'out_qty'	=> 0,
-				'qty'		=> 0,
-				'wqty'		=> 0,
-				'goods_opt'	=> $goods_opt,
-				'barcode'	=> $prd_cd,
-				'use_yn'	=> 'Y',
-				'rt'		=> now(),
-				'ut'		=> now()
-			]);
 		////	
 		//#####상풍코드용 추가 작업 종료
 
