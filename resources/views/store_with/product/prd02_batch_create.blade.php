@@ -15,7 +15,7 @@
 			</div>
 		</div>
 		<div class="d-flex">
-			<a href="javascript:void(0)" onclick="addPrdCd();" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i>저장</a>
+			<a href="javascript:void(0)" onclick="Save();" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i>저장</a>
 			<a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i>닫기</a>
 		</div>
 	</div>
@@ -99,7 +99,7 @@
 <script language="javascript">
 	var columnDefs = [
 		{headerName: "#", field: "num",filter:true,width:50,valueGetter: function(params) {return params.node.rowIndex+1;},pinned:'left'},
-		{headerName:"코드",field:"xmd_code", width:150},
+		{headerName:"상품코드",field:"xmd_code", width:150},
 		{headerName:"상품번호",field:"goods_no", width:100},
 		{headerName:"옵션",field:"goods_opt", width:250},
 	];
@@ -152,8 +152,8 @@
 			return false;
 		}
 
-		alert('개발완료 테스트 예정입니다.');
-		return false;
+		//alert('개발완료 테스트 예정입니다.');
+		//return false;
 
 		$.ajax({
 			async: true,
