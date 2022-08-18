@@ -1,6 +1,23 @@
 @extends('store_with.layouts.layout')
 @section('title','매장중간관리자정산')
 @section('content')
+
+<style>
+	/* 기본옵션 ag grid 3단 가운데 정렬 css 적용 */
+	.basic-option .ag-header-row.ag-header-row-column-group + .ag-header-row.ag-header-row-column > .bizest.ag-header-cell {
+        transform: translateY(-65%);
+        height: 320%;
+    }
+
+	/**
+	 * 3단이 포함되지 않은 2단 셀 깨지는 부분 css 처리
+	 */
+	.merged-cell {
+		height: 200%;
+		top: -107%;
+		padding-top: 4px;
+	}
+</style>
 <div class="page_tit">
 	<h3 class="d-inline-flex">매장중간관리자정산</h3>
 	<div class="d-inline-flex location">
@@ -97,7 +114,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="table-responsive">
+		<div class="table-responsive basic-option">
 			<div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
 		</div>
 	</div>
@@ -121,6 +138,7 @@
         { field: "sale_status", headerName: "매출",
 			children: [
 				{ headerName: "소계", field: "ord_amt", type: 'currencyMinusColorType', width: 100,
+					headerClass: "merged-cell",
 					cellRenderer: (params) => {
 						if ( params.value != undefined ) {
 							return '<a href="#" onClick="popDetail(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>';
@@ -130,7 +148,11 @@
 					}
 				},
 				@foreach (@$pr_codes as $pr_code)
-					{ headerName: "{{ $pr_code->code_val }}", field: "amt_{{ $pr_code->code_id }}", type: 'currencyMinusColorType', width: 100 },
+				{ 
+					headerName: "{{ $pr_code->code_val }}", field: "amt_{{ $pr_code->code_id }}", 
+					type: 'currencyMinusColorType', width: 100,
+					headerClass: "merged-cell",
+				 },
 				@endforeach
 			]
         },
@@ -139,7 +161,8 @@
                 { headerName: "소계", field: "s1", width:100,
 					type: 'currencyMinusColorType', 
 					valueFormatter: (params) => formatNumber(params),
-					valueGetter: (params) => sumSaleFees(params)
+					valueGetter: (params) => sumSaleFees(params),
+					headerClass: "merged-cell"
 				},
                 { headerName: "정상", field: "s2", type: 'numberType', width:100,
                     children: [

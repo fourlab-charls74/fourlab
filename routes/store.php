@@ -289,17 +289,6 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
     Route::prefix("account")->namespace('account')->group(function () {
 
-        // 정산내역
-        Route::get('acc01', 'acc01Controller@index');
-        Route::get('acc01/search', 'acc01Controller@search');
-
-        // 정산관리
-        Route::get('acc02', 'acc02Controller@index');
-        Route::get('acc02/search', 'acc02Controller@search');
-        Route::get('acc02/show/{com_id}/{sdate}/{edate}', 'acc02Controller@show');
-        Route::get('acc02/show-search', 'acc02Controller@show_search');
-        Route::put('acc02/show', 'acc02Controller@closed');
-
         // 마감
         Route::get('acc03', 'acc03Controller@index');
         Route::get('acc03/search', 'acc03Controller@search');
@@ -317,12 +306,21 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('acc05/search', 'acc05Controller@search');
         Route::post('acc05/save', 'acc05Controller@save');
 
-        // 매장중간관리자정산
+        // 매장중간관리자 - 정산
         Route::get('acc06', 'acc06Controller@index');
         Route::get('acc06/search', 'acc06Controller@search');
         Route::get('acc06/show/{store_cd}/{sdate}', 'acc06Controller@show');
         Route::get('acc06/show-search', 'acc06Controller@show_search');
         Route::put('acc06/show', 'acc06Controller@closed');
+
+        // 매장중간관리자 - 마감
+        Route::get('acc07', 'acc07Controller@index');
+        Route::get('acc07/search', 'acc07Controller@search');
+        Route::get('acc07/show', 'acc07Controller@show');
+        Route::get('acc07/show_search', 'acc07Controller@show_search');
+        Route::put('acc07/show_update', 'acc07Controller@show_update');
+        Route::delete('acc07/show_delete', 'acc07Controller@show_delete');
+        Route::post('acc07/show_close', 'acc07Controller@show_close');
 
     });
 

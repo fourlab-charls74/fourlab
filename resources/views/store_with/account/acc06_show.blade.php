@@ -167,7 +167,16 @@
 
 <script language="javascript">
 	var columns = [
-		{field: "num",			headerName: "#", type:'NumType', pinned: 'left'},
+		{field: "num", headerName: "#", type:'NumType', pinned: 'left', aggSum:"합계",
+			cellStyle: { 'text-align': "center" },
+			cellRenderer: function (params) {
+                if (params.node.rowPinned === 'top') {
+                    return "합계";
+                } else {
+                    return parseInt(params.value) + 1;
+                }
+            }
+		},
 		{field: "type",			headerName: "구분",			width:80, pinned: 'left'},
 		{field: "state_date",	headerName: "일자",			width:80, pinned: 'left'},
 		{field: "ord_no",		headerName: "주문번호",		width:130, pinned: 'left'},
@@ -195,12 +204,12 @@
 		{field: "pay_type",		headerName: "결제방법",		width:90},
 		{field: "tax_yn",		headerName: "과세",			width:70},
 		{field: "qty",			headerName: "수량",			width:70, type: 'currencyType'},
-		// {field: "sale_amt",		headerName: "판매금액",		width:90, type: 'currencyType'},
-		{field: "recv_amt",		headerName: "판매금액",		width:90, type: 'currencyType'},
-		{field: "clm_amt",		headerName: "클레임금액",	width:90, type: 'currencyType'},
-		{field: "dc_apply_amt",	headerName: "할인금액",		width:90, type: 'currencyType'},
-		{field: "dlv_amt",		headerName: "배송비",		width:80, type: 'currencyType'},
-		{field: "",		headerName: "소계",		width:80, type: 'currencyType'},
+		{field: "sale_amt",		headerName: "판매금액",		width:90, type: 'currencyType', aggregation:true},
+		// {field: "recv_amt",		headerName: "판매금액",		width:90, type: 'currencyType'},
+		{field: "clm_amt",		headerName: "클레임금액",	width:90, type: 'currencyType', aggregation:true},
+		{field: "dc_apply_amt",	headerName: "할인금액",		width:90, type: 'currencyType', aggregation:true},
+		{field: "dlv_amt",		headerName: "배송비",		width:80, type: 'currencyType', aggregation:true},
+		{field: "",		headerName: "소계",		width:80, type: 'currencyType', aggregation:true},
 		{field: "ord_state",	headerName: "주문상태",		width:90},
 		{field: "clm_state",	headerName: "클레임상태",	width:90},
 		{field: "ord_date",		headerName: "주문일",		width:80},
@@ -231,9 +240,16 @@
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
         let options = {
-            
+			getRowStyle: (params) => {
+				if (params.node.rowPinned === 'top') {
+					return { 'background': '#eee' }
+				}
+			}
         };
 		gx = new HDGrid(gridDiv, columns, options);
+		gx.Aggregation({
+			"sum": "top"
+		});
 		Search();
 	});
 
@@ -254,9 +270,8 @@
 				type: 'put',
 				url: '/store/account/acc06/show',
 				data: {
-					store_cd : $('input[name="store_no"]').val(),
-					sdate : $('input[name="sdate"]').val(),
-					edate : $('input[name="edate"]').val(),
+					store_cd : document.search.store_no.value,
+					sdate : document.search.sdate.value
 				},
 				success: function(data) {
 					cbClosed(data);
@@ -290,8 +305,8 @@
 
 		if( ret == "000" ){
 			alert('마감내역을 추가하였습니다.');
-			// location.reload();
-			// opener.Search();
+			location.reload();
+			opener.Search();
 		} else {
 			alert(results[ret]);
 		}

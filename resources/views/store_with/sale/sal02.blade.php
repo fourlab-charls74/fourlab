@@ -252,13 +252,16 @@
 	};
 
 	const setMutableColumns = (max_day) => {
+		gx.gridOptions.api.setColumnDefs([]);
 		mutable_cols = [];
 		columns.map(col => {
 			mutable_cols.push(col);
 		});
 		mutable_cols.push(dayColumns(max_day));
 		mutable_cols.push({ headerName: "", field: "nvl", width: "auto" });
-		console.log(mutable_cols);
+		gx.gridOptions.api.setColumnDefs(mutable_cols);
+		autoSizeColumns(gx, ["nvl"]);
+		gx.CalAggregation();
 	};
 
 	const dayColumns = (max_day) => {
@@ -311,9 +314,6 @@
 		yoil.codes = e.head.yoil_codes
 		const max_day = yoil.codes.length;
 		setMutableColumns(max_day);
-		gx.gridOptions.api.setColumnDefs(mutable_cols);
-		gx.CalAggregation();
-		autoSizeColumns(gx, ["nvl"]);
 	};
 
 	function Search() {

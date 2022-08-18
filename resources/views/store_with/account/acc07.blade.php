@@ -1,13 +1,15 @@
 @extends('store_with.layouts.layout')
-@section('title','정산')
+@section('title','마감')
 @section('content')
 
+<style> .pop {text-decoration:underline !important; } </style>
+
 <div class="page_tit">
-	<h3 class="d-inline-flex">정산</h3>
+	<h3 class="d-inline-flex">매장중간관리자마감</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
-		<span>/ 입점/정산</span>
-		<span>/ 정산</span>
+		<span>/ 매장관리</span>
+		<span>/ 경영관리</span>
 	</div>
 </div>
 
@@ -19,7 +21,7 @@
 				<h4>검색</h4>
 				<div class="flax_box">
 					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-					<a href="#" onclick="gridDownload();" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>자료받기</a>
+					<a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>자료받기</a>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
 			</div>
@@ -28,7 +30,7 @@
 				<div class="row">
 					<div class="col-lg-4">
 						<div class="form-group">
-							<label for="good_types">정산일자 :</label>
+							<label for="good_types">마감일자 :</label>
 							<div class="form-inline date-select-inbox">
 								<div class="docs-datepicker form-inline-inner input_box">
 									<div class="input-group">
@@ -65,6 +67,18 @@
 							</div>
 						</div>
 					</div>
+					<div class="col-lg-4">
+                        <div class="form-group">
+                            <label for="closed_yn">마감상태</label>
+                            <div class="flax_box">
+                                <select name="closed_yn" id="closed_yn" class="form-control form-control-sm">
+									<option value="">전체</option>
+									<option value="Y">Y</option>
+									<option value="N">N</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
 				</div>
 			</div>
 
@@ -111,36 +125,39 @@
 	</div>
 </div>
 
+<script type="text/javascript" charset="utf-8">
 
-
-<script language="javascript">
-	var columns = [
+    /**
+     * ag grid columns
+     */
+    var columns = [
 		{field: "num",			headerName: "#", type:'NumType', pinned: 'left'},
-		{field: "closed",		headerName: "마감",			width:65, pinned: 'left'},
-		{field: "day",			headerName: "정산일자",		width:140, pinned: 'left'},
-		{field: "store_nm",		headerName: "매장명", width:140,
-			cellRenderer: function(params) {
-				if( params.value != undefined ) {
-					return '<a href="#" onClick="popDetail(\''+ params.data.store_cd +'\')">' + params.value+'</a>';
+		{field: "closed_yn",		headerName: "마감",			width:65, pinned: 'left', cellStyle: { 'text-align': 'center' }},
+		{field: "closed_day",			headerName: "마감일자",		width:140, pinned: 'left', cellStyle: { 'text-align': 'center' },
+			cellRenderer: (params) => {
+				if (params.node.rowPinned) return params.value;
+				if (params.value != undefined) {
+					return '<a href="#" class="pop" onClick="popDetail(\''+ params.data.idx +'\')">' + params.value+'</a>';
 				}
 			}
-		 },
+		},
+		{field: "store_nm",		headerName: "매장명",	width:140 },
 		// {field: "margin_type",	headerName: "수수료지정",	width:100},
 		{field: "sale_amt",		headerName: "판매금액",		width:100, type: 'currencyType', aggregation: true},
 		{field: "clm_amt",		headerName: "클레임금액",	width:100, type: 'currencyType', aggregation: true},
-		{field: "dc_apply_amt",	headerName: "할인금액",		width:90, type: 'currencyType', aggregation: true},
+		{field: "dc_amt",	headerName: "할인금액",		width:90, type: 'currencyType', aggregation: true},
 		{
 			headerName: '쿠폰금액',
 			children: [{
 					field: "coupon_com_amt",
-					headerName: "(매장부담)",
+					headerName: "(업체부담)",
 					type: 'currencyType',
 					aggregation: true
 				}
 			]
 		},
 		{field: "dlv_amt",		headerName: "배송비",		width:90, type: 'currencyType', aggregation: true},
-		{field: "fee_etc_amt",	headerName: "기타정산액",	width:90, type: 'currencyType', aggregation: true},
+		{field: "etc_amt",	headerName: "기타정산액",	width:110, type: 'currencyType', aggregation: true},
 		{
 			headerName: '매출금액',
 			children: [{
@@ -181,11 +198,11 @@
 					aggregation: true
 				},
 				{
-					field: "fee_net_amt",
+					field: "fee_net",
 					headerName: "소계",
-					width:100,
 					type: 'currencyType',
-					aggregation: true
+					aggregation: true,
+					width: 100
 				},
 			]
 		},
@@ -193,61 +210,60 @@
 		{
 			headerName: '쿠폰금액',
 			children: [{
-					field: "fee_allot_amt",
+					field: "allot_amt",
 					headerName: "(본사부담)",
 					type: 'currencyType',
 					aggregation: true
 				}
 			]
 		},
-		{field: "store_cd",	hide:true},
-		// {field: "acc_idx",	hide:true},
+		// {field: "tax_day", headerName: "세금계산서" },
+		{field: "pay_day", headerName: "지급일" },
 		{ width: 'auto' }
 	];
 
-</script>
-<script type="text/javascript" charset="utf-8">
+
+    /**
+     * ag grid init
+     */
+
 	const pApp = new App('',{
-		gridId:"#div-gd",
+		gridId: "#div-gd",
 	});
 	let gx;
 
-	$(document).ready(function() {
-		pApp.ResizeGrid(275);
-		pApp.BindSearchEnter();
-		let gridDiv = document.querySelector(pApp.options.gridId);
+    $(document).ready(function() {
+        pApp.ResizeGrid(450);
+        pApp.BindSearchEnter();
+        let gridDiv = document.querySelector(pApp.options.gridId);
         let options = {
             getRowStyle: (params) => {
                 if (params.node.rowPinned === 'top') {
                     return { 'background': '#eee' }
                 }
-            },
-			onPinnedRowDataChanged: (params) => {
-				let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
-				if (pinnedRow == undefined) return false;
-				gx.gridOptions.api.setPinnedTopRowData([ { ...pinnedRow.data, closed: '합계' } ]);
-			}
+            }
         };
-		gx = new HDGrid(gridDiv, columns, options);
-		Search();
-	});
+        gx = new HDGrid(gridDiv, columns, options);
+    });
 
 	function Search() {
-		let data = $('form[name="search"]').serialize();
+        let data = $('form[name="search"]').serialize();
         gx.Aggregation({ "sum": "top" });
-		gx.Request('/store/account/acc02/search', data,-1);
-	}
+        gx.Request('/store/account/acc07/search', data, -1, function() {
+			let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
+			if(pinnedRow) {
+				console.log(pinnedRow);
+				gx.gridOptions.api.setPinnedTopRowData([
+					{ ...pinnedRow.data, closed_day: '합계' }
+				]);
+			}
+		});
+    }
 
-	function gridDownload() {
-		gx.Download("정산내역.csv");
-	}
-
-	function popDetail(store_cd){
-		let sdate	= $('input[name="sdate"]').val();
-		let edate	= $('input[name="edate"]').val();
-		const url	='/store/account/acc02/show/' + store_cd + '/' + sdate + '/' + edate;
-		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
-	}
+	const popDetail = (idx) => {
+		const url = '/store/account/acc07/show/?idx=' + idx;
+		window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=2100,height=1200");
+	};
 
 </script>
 
