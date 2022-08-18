@@ -298,8 +298,9 @@
 		{field: "bigo",			headerName: "비고",			width:120, editable: true, 
             cellStyle: (params) => { return params.node.rowPinned === 'top' ? {} : CELL_STYLE.EDIT; }
         },
-		{field: "goods_no",		headerName: "상품코드1"},
-		{field: "goods_sub",	headerName: "상품코드2"},
+        {field: "prd_cd",		headerName: "상품코드", width: 120},
+		// {field: "goods_no",		headerName: "상품코드1"},
+		// {field: "goods_sub",	headerName: "상품코드2"},
 		{field: "idx",		headerName: "마감일련번호"}
 	];
 

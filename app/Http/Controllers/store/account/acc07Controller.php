@@ -136,7 +136,7 @@ class acc07Controller extends Controller
 				acc_type.code_val as type, w.state_date, o.ord_no, o.ord_opt_no,
 				if((select count(*) from order_opt where ord_no = o.ord_no) > 1, 'Y','') as multi_order,
 				if(o.coupon_no <>0, (select coupon_nm from coupon where coupon_no = o.coupon_no),'') as coupon_nm,
-				o.goods_nm , replace(o.goods_opt,'^',':') as opt_nm, g.style_no,
+				o.goods_nm, o.prd_cd, replace(o.goods_opt,'^',':') as opt_nm, g.style_no,
 				opt_type.code_val as opt_type, m.user_nm, pay_type.code_val as pay_type,
 				'Y' as tax_yn,
 				w.qty as qty,
