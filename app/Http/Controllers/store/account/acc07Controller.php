@@ -4,6 +4,7 @@ namespace App\Http\Controllers\store\account;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Components\Lib;
 use App\Components\SLib;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
@@ -16,7 +17,12 @@ class acc07Controller extends Controller
     public function index()
     {
         $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m");
-        $values = [ 'sdate' => $sdate ];
+		$store_types = SLib::getStoreTypes();
+        $values = [ 
+			'sdate' => $sdate, 
+			'store_types' => $store_types,
+			'store_kinds' => SLib::getCodes("STORE_KIND")
+		];
         return view( Config::get('shop.store.view') . '/account/acc07', $values);
     }
 
@@ -27,18 +33,24 @@ class acc07Controller extends Controller
         $f_sdate = Carbon::parse($sdate)->firstOfMonth()->format("Ymd");
         $f_edate = Carbon::parse($sdate)->lastOfMonth()->format("Ymd");
 
-        $closed_yn = $request->input("closed_yn");
+		$store_type = $request->input('store_type', "");
+        $store_kind = $request->input('store_kind', "");
         $store_cd = $request->input("store_cd");
+		$closed_yn = $request->input("closed_yn");
 
+		/**
+         * 검색조건 필터링
+         */
         $where = "";
-        if ($closed_yn != "") $where .= " and a.closed_yn = '${closed_yn}'";
-        if ($store_cd != "") $where .= " and a.store_cd = '${store_cd}'";
+        if ($store_type) $where .= " and c.code_id = " . Lib::quote($store_type);
+        if ($store_kind != "") $where .= " and b.store_kind = '". Lib::quote($store_kind) . "'";
+		if ($closed_yn != "") $where .= " and a.closed_yn = '" . Lib::quote($closed_yn) . "'";
+        if ($store_cd != "") $where .= " and a.store_cd = '" . Lib::quote($store_cd) . "'";
 
         $sql = "
 			select
 				a.closed_yn,concat_ws('~',a.sday,a.eday) as closed_day,
 				b.store_nm,
-				-- cd.code_val as margin_type,
 				a.sale_amt, a.clm_amt, a.dc_amt,
 				( a.coupon_amt - a.allot_amt ) as coupon_com_amt,
 				a.dlv_amt, a.etc_amt,
@@ -50,7 +62,7 @@ class acc07Controller extends Controller
 				a.idx, a.store_cd, a.sday, a.eday
 			from
 				store_account_closed a inner join store b on ( a.store_cd = b.store_cd )
-				-- inner join code cd on cd.code_kind_cd = 'G_MARGIN_TYPE' and b.margin_type = cd.code_id
+				left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = b.store_type
 				left outer join tax t on a.tax_no = t.idx
 			where
 				a.sday >= '20110101' and a.sday <= '$f_edate' and a.eday >= '$f_sdate' $where
@@ -126,7 +138,6 @@ class acc07Controller extends Controller
 				if(o.coupon_no <>0, (select coupon_nm from coupon where coupon_no = o.coupon_no),'') as coupon_nm,
 				o.goods_nm , replace(o.goods_opt,'^',':') as opt_nm, g.style_no,
 				opt_type.code_val as opt_type, m.user_nm, pay_type.code_val as pay_type,
-				-- cp.com_nm, 
 				'Y' as tax_yn,
 				w.qty as qty,
 				w.sale_amt, w.clm_amt, w.dc_amt, ( w.coupon_amt - w.allot_amt ) as coupon_com_amt,
@@ -154,7 +165,6 @@ class acc07Controller extends Controller
 				inner join order_mst m on o.ord_no = m.ord_no
 				inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
 				inner join payment p on m.ord_no = p.ord_no
-				-- left outer join company cp on o.sale_place = cp.com_id and cp.com_type = '4'
 				left outer join code cd on cd.code_kind_cd = 'g_ord_state' and cd.code_id = o.ord_state
 				left outer join code cd2 on cd2.code_kind_cd = 'g_clm_state' and cd2.code_id = o.clm_state
 				left outer join code opt_type on opt_type.code_kind_cd = 'g_ord_type' and o.ord_type = opt_type.code_id

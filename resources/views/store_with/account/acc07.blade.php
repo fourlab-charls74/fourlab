@@ -46,6 +46,34 @@
 					</div>
 					<div class="col-lg-4">
 						<div class="form-group">
+							<label for="store_type">매장구분</label>
+							<div class="flex_box">
+								<select name='store_type' class="form-control form-control-sm">
+									<option value=''>전체</option>
+									@foreach ($store_types as $store_type)
+										<option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
+									@endforeach
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4">
+						<div class="form-group">
+							<label for="store_kind">매장종류</label>
+							<div class="flex_box">
+								<select name='store_kind' class="form-control form-control-sm">
+									<option value=''>전체</option>
+									@foreach ($store_kinds as $store_kind)
+										<option value='{{ $store_kind->code_id }}'>{{ $store_kind->code_val }}</option>
+									@endforeach
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-lg-4">
+						<div class="form-group">
 							<label for="store_cd">매장명</label>
 							<div class="form-inline inline_btn_box">
 								<select id="store_cd" name="store_cd" class="form-control form-control-sm select2-store"></select>
