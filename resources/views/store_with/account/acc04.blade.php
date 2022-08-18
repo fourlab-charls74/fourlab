@@ -1,6 +1,23 @@
 @extends('store_with.layouts.layout')
 @section('title','매장판매수수료')
 @section('content')
+<style>
+	/* 기본옵션 ag grid 3단 가운데 정렬 css 적용 */
+	.ag-header-row.ag-header-row-column-group + .ag-header-row.ag-header-row-column > .bizest.ag-header-cell {
+        transform: translateY(-65%);
+        height: 320%;
+		padding-top: 2px;
+    }
+
+	/**
+	 * 3단이 포함되지 않은 2단 셀 깨지는 부분 css 처리
+	 */
+	.merged-cell {
+		height: 200%;
+		top: -107%;
+		padding-top: 4px;
+	}
+</style>
 <div class="page_tit">
 	<h3 class="d-inline-flex">매장판매처수수료</h3>
 	<div class="d-inline-flex location">
@@ -158,11 +175,11 @@
         { field: "store_nm", headerName: "매장명", pinned:'left', type: 'StoreNameType', width: 250 },
         { field: "sale_status", headerName: "매출",
             children: [
-                { headerName: "소계", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "정상", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "행사", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "용품", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "기타", field: "wonga", type: 'numberType',width:100 },
+                { headerName: "소계", field: "wonga", type: 'numberType', width:100, headerClass: "merged-cell" },
+                { headerName: "정상", field: "wonga", type: 'numberType', width:100, headerClass: "merged-cell" },
+                { headerName: "행사", field: "wonga", type: 'numberType', width:100, headerClass: "merged-cell" },
+                { headerName: "용품", field: "wonga", type: 'numberType', width:100, headerClass: "merged-cell" },
+                { headerName: "기타", field: "wonga", type: 'numberType', width:100, headerClass: "merged-cell" },
             ]
         },
         { field: "sum_wonga", headerName: "원가", width: 80, type: 'currencyMinusColorType' },
@@ -170,8 +187,8 @@
         { field: "profit_rate",	headerName: "이익율(%)", type:'percentType' }, // 매출이익 분의 매출액 = 이익율
         { field: "sale_status", headerName: "수수료",
             children: [
-                { headerName: "수수료합계", field: "wonga", type: 'numberType',width:100 },
-                { headerName: "임대관리비", field: "wonga", type: 'numberType',width:100 },
+                { headerName: "수수료합계", field: "wonga", type: 'numberType', width:100, headerClass: "merged-cell" },
+                { headerName: "임대관리비", field: "wonga", type: 'numberType', width:100, headerClass: "merged-cell" },
                 { headerName: "정상", field: "wonga", type: 'numberType',width:100,
                     children: [
                         { headerName: "수수료율", field: "wonga", type: 'numberType',width:100 },

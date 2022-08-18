@@ -251,7 +251,7 @@ class acc06Controller extends Controller
 				g.goods_no ,g.goods_sub ,acc_type.code_id as acc_type,
 				case
 					when
-						w.type in ( 30,90,91 ) and o.qty <> w.sale_qty then 'qtyerror'
+						w.type in ( 10,90,91 ) and o.qty <> w.sale_qty then 'qtyerror'
 					else ''
 				end as err_notice
 			from
@@ -307,16 +307,16 @@ class acc06Controller extends Controller
 					(
 						select
 							ord_opt_no, store_cd
-							, sum(distinct(if(ord_state = 30,30,ord_state))) as type
+							, sum(distinct(if(ord_state = 10,10,ord_state))) as type
 							, max(ord_state_date) as state_date
 							, sum(qty) as qty
-							, sum(if(ord_state = 30, qty,0)) as sale_qty
-							, sum(if(ord_state = 30, price*qty, 0)) as sale_amt
+							, sum(if(ord_state = 10, qty,0)) as sale_qty
+							, sum(if(ord_state = 10, price*qty, 0)) as sale_amt
 							, sum(if(ord_state in (60, 61), price*qty, 0)) as clm_amt
-							, sum(if(ord_state = 30, coupon_apply_amt, -1 * coupon_apply_amt)) as coupon_apply_amt
-							, sum(if(ord_state = 30, coupon_allot_amt, -1 * coupon_allot_amt)) as coupon_allot_amt
-							, sum(if(ord_state = 30, /*dc_apply_amt*/ 0, -1 * /*dc_apply_amt*/ 0)) as dc_apply_amt
-							, sum(if(ord_state = 30, dlv_amt, -1 * dlv_amt)) as dlv_amt
+							, sum(if(ord_state = 10, coupon_apply_amt, -1 * coupon_apply_amt)) as coupon_apply_amt
+							, sum(if(ord_state = 10, coupon_allot_amt, -1 * coupon_allot_amt)) as coupon_allot_amt
+							, sum(if(ord_state = 10, /*dc_apply_amt*/ 0, -1 * /*dc_apply_amt*/ 0)) as dc_apply_amt
+							, sum(if(ord_state = 10, dlv_amt, -1 * dlv_amt)) as dlv_amt
 							, sum(dlv_ref_amt) as dlv_ref_amt
 
 							, round(wonga * qty) as wonga
@@ -326,7 +326,7 @@ class acc06Controller extends Controller
 						(
 							select
 								w.ord_opt_no, w.store_cd, o.ord_no, w.ord_state_date, w.ord_state,
-								if(w.ord_state = 30, w.qty, w.qty * -1) as qty,
+								if(w.ord_state = 10, w.qty, w.qty * -1) as qty,
 								abs(w.price) as price, abs(w.wonga) as wonga,
 								w.coupon_apply_amt,
 								ifnull( /*w.dc_apply_amt*/ 0,0) as dc_apply_amt,
@@ -381,12 +381,15 @@ class acc06Controller extends Controller
 
 	public function closed(Request $request)
 	{
-		$sdate	= $request->input('sdate');
-		$edate	= $request->input('edate');
-		$store_cd	= $request->input('store_cd');
+		$store_cd = $request->input('store_cd');
 
-		$sdate	= str_replace("-", "", $sdate);
-		$edate	= str_replace("-", "", $edate);
+		$sdate = $request->input('sdate', now()->format("Y-m"));
+        // $f_sdate = Carbon::parse($sdate)->firstOfMonth()->subMonth()->format("Ymd");
+        // $f_edate = Carbon::parse($sdate)->lastOfMonth()->subMonth()->format("Ymd");
+
+        // 테스트용
+        $f_sdate = Carbon::parse($sdate)->firstOfMonth()->format("Ymd");
+        $f_edate = Carbon::parse($sdate)->lastOfMonth()->format("Ymd");
 
 		$id		= auth('head')->user()->id;
 		$name	= auth('head')->user()->name;
@@ -401,7 +404,7 @@ class acc06Controller extends Controller
 			200 : 자료등록시 오류
 		*/
 
-		if(strlen($sdate) != 8 && strlen($edate) != 8 && $store_cd != ""){
+		if(strlen($f_sdate) != 8 && strlen($f_edate) != 8 && $store_cd != ""){
 			return response()->json(["code"	=> "100", "msg"	=> "부정확한 요청입니다."]);
 		}
 
@@ -409,7 +412,7 @@ class acc06Controller extends Controller
 			select count(*) as cnt from store_account_closed
 			where store_cd = :store_cd and sday = :sday and eday = :eday limit 0,1
 		";
-		$row	= DB::selectOne($sql, ['store_cd' => $store_cd, 'sday' => $sdate, 'eday' => $edate]);
+		$row	= DB::selectOne($sql, ['store_cd' => $store_cd, 'sday' => $f_sdate, 'eday' => $f_edate]);
 		$cnt	= $row->cnt;
 
 		if( $cnt > 0 ){
@@ -424,7 +427,7 @@ class acc06Controller extends Controller
 				delete from store_account_closed_list
 				where store_cd = :store_cd and sday = :sday and eday = :eday
 			";
-			DB::delete($sql, ['store_cd' => $store_cd, 'sday' => $sdate, 'eday' => $edate]);
+			DB::delete($sql, ['store_cd' => $store_cd, 'sday' => $f_sdate, 'eday' => $f_edate]);
 
 			$sql	= "
 				insert into store_account_closed_list
@@ -440,7 +443,7 @@ class acc06Controller extends Controller
 					fee_ratio, fee, fee_dc_amt, allot_amt, etc_amt, fee_net, acc_amt, bigo
 				)
 				select
-					0 as acc_idx, '$store_cd' as store_cd, '$sdate' as sday, '$edate' as eday,
+					0 as acc_idx, '$store_cd' as store_cd, '$f_sdate' as sday, '$f_edate' as eday,
 					w.type, w.ord_opt_no, w.state_date,
 
 					w.qty as qty, w.sale_amt, w.clm_amt, w.fee as sale_fee,
@@ -490,7 +493,7 @@ class acc06Controller extends Controller
 						from
 							store_account_etc e inner join order_opt o on e.ord_opt_no = o.ord_opt_no
 						where
-							e.etc_day >= '$sdate' and e.etc_day <= '$edate' and o.store_cd = '$store_cd'
+							e.etc_day >= '$f_sdate' and e.etc_day <= '$f_edate' and o.store_cd = '$store_cd'
 						group by
 							e.ord_opt_no
 
@@ -516,16 +519,16 @@ class acc06Controller extends Controller
 						(
 							select
 								ord_opt_no, store_cd
-								, sum(distinct(if(ord_state = 30,30,ord_state))) as type
+								, sum(distinct(if(ord_state = 10,10,ord_state))) as type
 								, max(ord_state_date) as state_date
 								, sum(qty) as qty
-								, sum(if(ord_state = 30, qty,0)) as sale_qty
-								, sum(if(ord_state = 30, price*qty, 0)) as sale_amt
+								, sum(if(ord_state = 10, qty,0)) as sale_qty
+								, sum(if(ord_state = 10, price*qty, 0)) as sale_amt
 								, sum(if(ord_state in (60, 61), price*qty, 0)) as clm_amt
-								, sum(if(ord_state = 30, coupon_apply_amt, -1 * coupon_apply_amt)) as coupon_apply_amt
-								, sum(if(ord_state = 30, coupon_allot_amt, -1 * coupon_allot_amt)) as coupon_allot_amt
-								, sum(if(ord_state = 30, /*dc_apply_amt*/ 0, -1 * /*dc_apply_amt*/ 0)) as dc_apply_amt
-								, sum(if(ord_state = 30, dlv_amt, -1 * dlv_amt)) as dlv_amt
+								, sum(if(ord_state = 10, coupon_apply_amt, -1 * coupon_apply_amt)) as coupon_apply_amt
+								, sum(if(ord_state = 10, coupon_allot_amt, -1 * coupon_allot_amt)) as coupon_allot_amt
+								, sum(if(ord_state = 10, /*dc_apply_amt*/ 0, -1 * /*dc_apply_amt*/ 0)) as dc_apply_amt
+								, sum(if(ord_state = 10, dlv_amt, -1 * dlv_amt)) as dlv_amt
 								, sum(dlv_ref_amt) as dlv_ref_amt
 								, round(wonga * qty) as wonga
 								, round(100 * (1 - max(wonga) / max(price)), 2) as fee_ratio
@@ -534,7 +537,7 @@ class acc06Controller extends Controller
 							(
 								select
 									w.ord_opt_no, w.store_cd, o.ord_no, w.ord_state_date, w.ord_state,
-									if(w.ord_state = 30, w.qty, w.qty * -1) as qty,
+									if(w.ord_state = 10, w.qty, w.qty * -1) as qty,
 									abs(w.price) as price, abs(w.wonga) as wonga, w.coupon_apply_amt,ifnull( /*w.dc_apply_amt*/ 0,0) as dc_apply_amt,
 									round(if(ifnull(w.com_coupon_ratio, 0) > 1,ifnull(w.com_coupon_ratio, 0) / 100,ifnull(w.com_coupon_ratio, 0))
 										* ifnull(w.coupon_apply_amt, 0)) as coupon_allot_amt,
@@ -547,11 +550,11 @@ class acc06Controller extends Controller
 								from
 									order_opt o inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
 								where
-									w.ord_state_date >= '$sdate'
-									and w.ord_state_date <= '$edate'
-									and w.ord_state in (30,60,61)
+									w.ord_state_date >= '$f_sdate'
+									and w.ord_state_date <= '$f_edate'
+									and w.ord_state in (10,60,61)
 									and w.store_cd = '$store_cd'
-									and o.ord_state >= 30 /* 결제 오류 발생시 order_opt_wonga 가 자료가 입력 되는 경우 처리 */
+									and o.ord_state >= 10 /* 결제 오류 발생시 order_opt_wonga 가 자료가 입력 되는 경우 처리 */
 							)
 							a group by ord_opt_no, store_cd
 						)
@@ -562,6 +565,7 @@ class acc06Controller extends Controller
 					w inner join order_opt o on o.ord_opt_no = w.ord_opt_no
 					inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
 			";
+
 			DB::insert($sql);
 
 			$sql	= "
@@ -578,7 +582,7 @@ class acc06Controller extends Controller
 					sum(sale_amt) as sale_amt, sum(clm_amt), sum(sale_fee), sum(dc_amt), sum(coupon_amt),sum(dlv_amt),
 					sum(sale_net_taxation_amt), sum(sale_net_taxfree_amt), sum(sale_net_amt),sum(tax_amt),
 					sum(fee), sum(fee_dc_amt), sum(allot_amt), sum(etc_amt), sum(fee_net), sum(acc_amt),
-					'n', :id, :name, now() as reg_date, now() as upd_date
+					'N', :id, :name, now() as reg_date, now() as upd_date
 				from
 					store_account_closed_list
 				where
@@ -586,9 +590,9 @@ class acc06Controller extends Controller
 				group by
 					store_cd,sday,eday
 			";
-			DB::insert($sql, ['id' => $id, 'name' => $name, 'store_cd' => $store_cd, 'sday' => $sdate, 'eday' => $edate]);
+			DB::insert($sql, ['id' => $id, 'name' => $name, 'store_cd' => $store_cd, 'sday' => $f_sdate, 'eday' => $f_edate]);
 
-			$acc_idx = db::table('store_account_closed')->latest('idx')->first()->idx;
+			$acc_idx = @DB::table('store_account_closed')->latest('idx')->first()->idx;
 
 			$sql	= "
 				update store_account_closed_list set
@@ -596,15 +600,15 @@ class acc06Controller extends Controller
 				where
 					store_cd = :store_cd and sday = :sday and eday = :eday
 			";
-			DB::update($sql, ['acc_idx' => $acc_idx, 'store_cd' => $store_cd, 'sday' => $sdate, 'eday' => $edate]);
+			DB::update($sql, ['acc_idx' => $acc_idx, 'store_cd' => $store_cd, 'sday' => $f_sdate, 'eday' => $f_edate]);
 
 			DB::commit();
 
 		} catch(\exception $e) {
 
-			dd($e);
+			// dd($e);
 
-			db::rollback();
+			DB::rollback();
 			$code	= "999";
 			$msg	= $e->getmessage();
 
