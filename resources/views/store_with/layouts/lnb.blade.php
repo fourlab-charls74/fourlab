@@ -58,7 +58,7 @@
                 <ul>
                     <li><a href="/store/account/acc04">매장판매처수수료</a></li>
                     <li><a href="/store/account/acc06">(개)매장중간관리자정산</a></li>
-                    <li><a href="/store/account/acc07">(개)매장중간관리자마감</a></li>
+                    <li><a href="/store/account/acc07">(완)매장중간관리자마감</a></li>
                     <li><a href="/store/account/acc05">(완)기타재반자료</a></li>
                 </ul>
             </li>
