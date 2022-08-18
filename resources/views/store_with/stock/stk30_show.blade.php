@@ -167,13 +167,13 @@
         {field: "sale_stat_cl", headerName: "상품상태", cellStyle: StyleGoodsState},
         {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 250},
         {field: "goods_opt", headerName: "옵션", width: 240},
-        {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 80},
-        {field: "price", headerName: "판매가", type: "currencyType", width: 80},
+        {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 70},
+        {field: "price", headerName: "판매가", type: "currencyType", width: 70},
         {field: "return_price", headerName: "반품단가", width: 80, type: 'currencyType',
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
-        {field: "store_wqty", headerName: "매장보유재고", width: 80, type: 'currencyType'},
+        {field: "store_wqty", headerName: "매장보유재고", width: 100, type: 'currencyType'},
         {field: "qty", headerName: "반품수량", width: 60, type: 'currencyType', 
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
@@ -258,7 +258,7 @@
             if(!confirm("등록하시겠습니까?")) return;
 
             axios({
-                url: '/store/stock/stk30/add-store_return',
+                url: '/store/stock/stk30/add-store-return',
                 method: 'put',
                 data: {
                     sr_date,
@@ -288,7 +288,7 @@
             if(!confirm("수정하시겠습니까?")) return;
 
             axios({
-                url: '/store/stock/stk30/update-store_return',
+                url: '/store/stock/stk30/update-store-return',
                 method: 'put',
                 data: {
                     sr_cd,

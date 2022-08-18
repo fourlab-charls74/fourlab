@@ -89,7 +89,7 @@ class stk30Controller extends Controller
                 sr.sr_kind,
                 sr.sr_state,
                 c.code_val as sr_state_nm,
-                (select sum(return_price) from store_return_product where sr_cd = sr.sr_cd) as sr_price,
+                (select sum(return_price * return_qty) from store_return_product where sr_cd = sr.sr_cd) as sr_price,
                 (select sum(return_qty) from store_return_product where sr_cd = sr.sr_cd) as sr_qty,
                 sr.sr_reason,
                 co.code_val as sr_reason_nm,
