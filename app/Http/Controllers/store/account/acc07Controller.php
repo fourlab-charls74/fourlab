@@ -5,6 +5,7 @@ namespace App\Http\Controllers\store\account;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Components\SLib;
+use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Exception;
 use Illuminate\Support\Facades\Config;
@@ -14,27 +15,18 @@ class acc07Controller extends Controller
 {
     public function index()
     {
-        $immutable = CarbonImmutable::now();
-
-        $sdate = $immutable->sub(1, 'month')->startOfMonth()->format('Y-m-d');
-        $edate = $immutable->sub(1, 'month')->endOfMonth()->format('Y-m-d');
-
-        // 20110101
-		if ($sdate <= '20110101') $sdate = '20110101';
-		if ($edate <= '20110101') $edate = '20110131';
-
-        $values = [
-            'sdate' => $sdate,
-            'edate' => $edate
-        ];
-
+        $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m");
+        $values = [ 'sdate' => $sdate ];
         return view( Config::get('shop.store.view') . '/account/acc07', $values);
     }
 
     public function search(Request $request)
     {
-        $sdate = str_replace("-", "", $request->input("sdate"));
-        $edate = str_replace("-", "", $request->input("edate"));
+        $sdate = $request->input('sdate', now()->format("Y-m"));
+
+        $f_sdate = Carbon::parse($sdate)->firstOfMonth()->format("Ymd");
+        $f_edate = Carbon::parse($sdate)->lastOfMonth()->format("Ymd");
+
         $closed_yn = $request->input("closed_yn");
         $store_cd = $request->input("store_cd");
 
@@ -61,7 +53,7 @@ class acc07Controller extends Controller
 				-- inner join code cd on cd.code_kind_cd = 'G_MARGIN_TYPE' and b.margin_type = cd.code_id
 				left outer join tax t on a.tax_no = t.idx
 			where
-				a.sday >= '20110101' and a.sday <= '$edate' and a.eday >= '$sdate' $where
+				a.sday >= '20110101' and a.sday <= '$f_edate' and a.eday >= '$f_sdate' $where
 			order by
 				a.acc_amt desc
 		";
