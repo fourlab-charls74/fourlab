@@ -12,6 +12,7 @@
             <ul class="top_link_btn">
 {{--                <li><a href="" class="history"></a></li>--}}
 {{--                <li><a href="" class="cart"></a></li>--}}
+                <li><a href="/store" class="store_sc"></a></li>
                 <li><a href="javascript:void(0);" onclick="return openSmsList();" class="mail act"></a></li>
                 <li>
                     <div class="dropdown d-inline-block">
