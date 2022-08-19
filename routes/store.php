@@ -172,11 +172,13 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('cs02', 'cs02Controller@index');
         Route::get('cs02/search', 'cs02Controller@search');
         Route::get('cs02/show/{sgr_cd?}','cs02Controller@show');
-        Route::put('cs02/update-return-state','cs02Controller@update_return_state'); // 창고반품 상태변경
-        Route::delete('cs02/del-return','cs02Controller@del_return'); // 창고반품 삭제
+        Route::put('cs02/update-return-state','cs02Controller@update_return_state'); // 상품반품이동 상태변경
+        Route::delete('cs02/del-return','cs02Controller@del_return'); // 상품반품이동 삭제
         Route::get('cs02/search-return-products','cs02Controller@search_return_products'); // 기존에 반품등록된 상품목록 조회
         Route::put('cs02/add-storage-return','cs02Controller@add_storage_return'); // 상품반품이동정보 등록
         Route::put('cs02/update-storage-return','cs02Controller@update_storage_return'); // 상품반품이동정보 수정
+        Route::get('cs02/batch','cs02Controller@batch_show'); // 상품반품이동 일괄등록
+        Route::post('cs02/batch-import','cs02Controller@import_excel'); // 상품반품이동 엑셀파일 적용
         
     });
 

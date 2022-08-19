@@ -8,6 +8,8 @@ use App\Components\SLib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Exception;
 
@@ -420,4 +422,38 @@ class cs02Controller extends Controller
 
         return response()->json(["code" => $code, "msg" => $msg]);
     }
+
+    // 일괄등록 show
+    public function batch_show()
+    {
+        $values = [];
+        return view(Config::get('shop.store.view') . '/cs/cs02_batch', $values);
+    }
+
+	// Excel 파일 저장 후 ag-grid(front)에 사용할 응답을 JSON으로 반환
+	public function import_excel(Request $request) {
+		if (count($_FILES) > 0) {
+			if ( 0 < $_FILES['file']['error'] ) {
+				return response()->json(['code' => 0, 'message' => 'Error: ' . $_FILES['file']['error']], 200);
+			}
+			else {
+				$file = $request->file('file');
+				$now = date('YmdHis');
+				$user_id = Auth::guard('head')->user()->id;
+				$extension = $file->extension();
+	
+				$save_path = "data/store/cs02/";
+				$file_name = "${now}_${user_id}.${extension}";
+				
+				if (!Storage::disk('public')->exists($save_path)) {
+					Storage::disk('public')->makeDirectory($save_path);
+				}
+	
+				$file = sprintf("${save_path}%s", $file_name);
+				move_uploaded_file($_FILES['file']['tmp_name'], $file);
+	
+				return response()->json(['code' => 1, 'file' => $file], 200);
+			}
+		}
+	}
 }
