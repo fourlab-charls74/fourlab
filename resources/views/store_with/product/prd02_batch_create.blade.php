@@ -152,9 +152,6 @@
 			return false;
 		}
 
-		//alert('개발완료 테스트 예정입니다.');
-		//return false;
-
 		$.ajax({
 			async: true,
 			type: 'put',
