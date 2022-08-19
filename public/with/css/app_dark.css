@@ -148,7 +148,9 @@ header .top_inner_box .top_link_btn li .btn.profile_btn .img img{width:100%;left
 header .top_inner_box .top_link_btn li .btn.profile_btn .txt{color:#a8b1c2;}
 header .top_inner_box .top_link_btn li .btn.profile_btn:before{content:'';display:block;position:absolute;right:0;top:50%;width:9px;height:6px;background:url(../images/select_arrow.png) no-repeat 0 0;transform: translateY(-50%);-webkit-transform: translateY(-50%);}
 header .top_inner_box .top_link_btn li > a.history{display:none;}
+header .top_inner_box .top_link_btn li > a.pos{background:url(../images/top_right_icon05.png) no-repeat center center;}
 header .top_inner_box .top_link_btn li > a.cart{background:url(../images/top_right_icon01.png) no-repeat center center;}
+header .top_inner_box .top_link_btn li > a.store_sc{background:url(../images/top_right_icon04.png) no-repeat center center;}
 header .top_inner_box .top_link_btn li > a.mail{background:url(../images/top_right_icon02.png) no-repeat center center;}
 header .top_inner_box .top_link_btn li > a.mail.act{position: relative;}
 header .top_inner_box .top_link_btn li > a.mail.act:before{content:'';position:absolute;border:1px solid #262936;background:#f09721;width:8px;height:8px;border-radius:4px;

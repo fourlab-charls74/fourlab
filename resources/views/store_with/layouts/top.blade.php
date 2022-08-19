@@ -10,7 +10,7 @@
         </div>
         <div class="d-flex">
             <ul class="top_link_btn">
-                <li><a href="javascript:void(0);" class="cart" onclick="return window.open('/store/pos', '_blank', 'toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=0,left=0,width=1420,height=900');">포스</a></li>
+                <li><a href="javascript:void(0);" class="pos" onclick="return window.open('/store/pos', '_blank', 'toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=0,left=0,width=1420,height=900');"></a></li>
                 <li><a href="" class="history"></a></li>
                 <li><a href="" class="cart"></a></li>
                 <li><a href="javascript:void(0);" onclick="return openSmsList();" class="mail act"></a></li>
