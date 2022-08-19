@@ -81,7 +81,7 @@
                                                         </select>
                                                     </div>
                                                     @else
-                                                    <input type="text" name="target_nm" id="target_nm" value="{{ @$sgr->target_nm }}" class="form-control form-control-sm w-100" readonly />
+                                                    <input type="text" name="target_nm" id="target_nm" value="[{{ @$sgr->target_type == 'C' ? '공급' : '창고' }}] {{ @$sgr->target_nm }}" class="form-control form-control-sm w-100" readonly />
                                                     @endif
                                                 </div>
                                             </td>
@@ -340,8 +340,7 @@
 
     // 상품 추가
     function addGoods() {
-        // const url = `/store/api/goods/show/` + document.f1.storage_cd.value; // 추후 창고별 보유재고 데이터 포함한 상품선택 api 개발 예정
-        const url = `/store/api/goods/show/`;
+        const url = `/store/api/storage-goods/show/` + document.f1.storage_cd.value;
         window.open(url, "_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1800,height=1000");
     }
 
@@ -372,7 +371,6 @@
             total_return_price: 0,
             isEditable: true,
             count: count + 1,
-            storage_wqty: 1, // 테스트용
         };
         callbaackRows.push(row);
     };
