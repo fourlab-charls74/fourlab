@@ -130,8 +130,8 @@
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
-                                        <option value="sgr_date">반품일자</option>
                                         <option value="sgr_cd">반품코드</option>
+                                        <option value="sgr_date">반품일자</option>
                                     </select>
                                 </div>
                                 <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -235,7 +235,7 @@
     // 상품반품이동 일괄등록 팝업 오픈
     const openBatchPopup = () => {
         const url = '/store/cs/cs02/batch';
-        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=880");
     }
 
     // 반품상태변경

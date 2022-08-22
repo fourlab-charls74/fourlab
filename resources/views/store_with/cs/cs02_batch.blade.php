@@ -16,7 +16,7 @@
             </div>
         </div>
         <div class="d-flex">
-            <a href="javascript:void(0)" onclick="Save('{{ @$cmd }}')" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
+            <a href="javascript:void(0)" onclick="Save()" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
             <a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i> 닫기</a>
         </div>
     </div>
@@ -65,7 +65,7 @@
                 </form>
             </div>
         </div>
-        <div class="card shadow mt-3">
+        <div class="card shadow mt-3 d-none" id="basic_info_form">
             <div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
                 <a href="#">기본정보</a>
             </div>
@@ -77,36 +77,36 @@
                                 <table class="table incont table-bordered" width="100%" cellspacing="0">
                                     <tbody>
                                         <tr>
-                                            <th class="required">반품일자</th>
+                                            <th>반품일자</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    <p class="fs-14">??</p>
+                                                    <p class="fs-14" id="sgr_date"></p>
                                                 </div>
                                             </td>
-                                            <th class="required">이동처</th>
+                                            <th>이동처</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    <p class="fs-14">??</p>
+                                                    <p class="fs-14" id="target_nm"></p>
                                                 </div>
                                             </td>
                                             <th>반품번호</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    <p class="fs-14">??</p>
+                                                    <p class="fs-14" id="sgr_idx"></p>
                                                 </div>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="required">반품창고</th>
+                                            <th>반품창고</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    <p class="fs-14">??</p>
+                                                    <p class="fs-14" id="storage_nm"></p>
                                                 </div>
                                             </td>
                                             <th>메모</th>
                                             <td colspan="3">
                                                 <div class="form-inline">
-                                                    <p class="fs-14">??</p>
+                                                    <p class="fs-14" id="comment"></p>
                                                 </div>
                                             </td>
                                         </tr>
@@ -171,12 +171,39 @@
 <script type="text/javascript" charset="utf-8">
     let gx;
     const pApp = new App('', { gridId: "#div-gd" });
+    let basic_info = {};
 
     $(document).ready(function() {
-        pApp.ResizeGrid(275, 470);
+        pApp.ResizeGrid(275, 450);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns);
+        gx = new HDGrid(gridDiv, columns, {
+            pinnedTopRowData: pinnedRowData,
+            getRowStyle: (params) => { // 고정된 row styling
+                if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#eee', 'border': 'none'};
+            },
+            getRowNodeId: (data) => data.hasOwnProperty('count') ? data.count : "0", // 업데이터 및 제거를 위한 식별 ID를 count로 할당
+            onCellValueChanged: (e) => {
+                if (e.column.colId === "return_price" || e.column.colId === "qty") {
+                    if (isNaN(e.newValue) == true || e.newValue == "") {
+                        alert("숫자만 입력가능합니다.");
+                        gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                    } else if(e.newValue < 0) {
+                        alert("음수는 입력할 수 없습니다.");
+                        gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                    } else {
+                        if(e.column.colId === "qty" && e.data.storage_wqty < parseInt(e.data.qty)) {
+                            alert("해당 창고의 보유재고보다 많은 수량을 반품할 수 없습니다.");
+                            gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                        } else {
+                            e.data.total_return_price = parseInt(e.data.qty) * parseInt(e.data.return_price);
+                            gx.gridOptions.api.updateRowData({update: [e.data]});
+                            updatePinnedRow();
+                        }
+                    }
+                }
+            }
+        });
 
         $('#excel_file').on('change', function(e){
             if (validateFile() === false) {
@@ -242,7 +269,6 @@
 	};
 
 	const populateGrid = async (workbook) => {
-        console.log(workbook);
 		var firstSheetName = workbook.SheetNames[0]; // our data is in the first sheet
 		var worksheet = workbook.Sheets[firstSheetName];
 
@@ -257,10 +283,11 @@
             'H': 'return_qty',
 		};
 
-		var rowIndex = 6; // 엑셀 6행부터 시작 (샘플데이터 참고)
+        var firstRowIndex = 6; // 엑셀 6행부터 시작 (샘플데이터 참고)
+		var rowIndex = firstRowIndex; 
 
-        alert('상품을 순차적으로 불러오고 스타일 넘버를 검사합니다. \n다소 시간이 소요될 수 있습니다.'); // progress
         let count = gx.gridOptions.api.getDisplayedRowCount();
+        let rows = [];
 		while (worksheet['F' + rowIndex]) {
 			let row = {};
 			Object.keys(excel_columns).forEach((column) => {
@@ -274,12 +301,11 @@
             row = { ...row, 
                 count: ++count, isEditable: true,
             };
-
-            gx.gridOptions.api.applyTransaction({add : [row]}); // 한 줄씩 import
-            
-            await getGood(row, rowIndex === 6);
+            rows.push(row);
             rowIndex++;
 		}
+        if(rows.length < 1) return alert("한 개 이상의 상품정보를 입력해주세요.");
+        await getGood(rows, firstRowIndex);
 	};
     
 	const importExcel = async (url) => {
@@ -298,12 +324,18 @@
 	};
 
     const upload = () => {
+        if(basic_info.sgr_date !== undefined && !confirm("새로 적용하시는 경우 기존정보는 저장되지 않습니다.\n적용하시겠습니까?")) return;
+        
 		const file_data = $('#excel_file').prop('files')[0];
+        if(!file_data) return alert("적용할 파일을 선택해주세요.");
+
 		const form_data = new FormData();
         form_data.append('cmd', 'import');
 		form_data.append('file', file_data);
 		form_data.append('_token', "{{ csrf_token() }}");
 
+        alert("엑셀파일을 적용하고 있습니다. 잠시만 기다려주세요.");
+        
         axios({
             method: 'post',
             url: '/store/cs/cs02/batch-import',
@@ -312,6 +344,7 @@
                 "Content-Type": "multipart/form-data",
             }
         }).then(async (res) => {
+            gx.gridOptions.api.setRowData([]);
             if (res.data.code == 1) {
                 const file = res.data.file;
                 await importExcel("/" + file);
@@ -325,109 +358,95 @@
 		return false;
 	};
 
-    const getGood = async (row, isFirst) => {
-        console.log(row);
-        // const CMD = 'getgood';
-        // axios({
-        //     cmd: CMD,
-        //     url: COMMAND_URL,
-        //     method: 'post',
-        //     data: { cmd: CMD, style_no: row.style_no }
-        // }).then(async (response) => {
-            
-        //     const code = response.data.code; // 0: 상품없음, -1: 상품중복 또는 입점상품, 1: 존재하는 상품
-        //     let good, message, checked_row;
-            
-        //     if (response.data.code == 1) {
-        //         good = response.data.good;                
-        //         checked_row = {...row, ...good};
-        //     } else {
-        //         message = response.data.message;
-        //         checked_row = {...row, goods_no: message};
-        //     }
+    const getGood = async (rows, firstIndex) => {
 
-        //     await gx.gridOptions.api.applyTransaction({update : [checked_row]});
-
-        // }).catch((error) => {
-        //     console.log(error);
-        // });
+        axios({
+            url: '/store/cs/cs02/batch-getgoods',
+            method: 'post',
+            data: { data: rows },
+        }).then(async (res) => {
+            setBasicInfo({...res.data.head, ...rows[0]});
+            await gx.gridOptions.api.applyTransaction({add : res.data.body});
+            updatePinnedRow();
+        }).catch((error) => {
+            console.log(error);
+        });
     };
 
-    // 상품반품 등록
-    // function Save(cmd) {
-    //     if(!cmd) return;
+    function setBasicInfo(obj) {
+        basic_info = {...obj};
+        
+        $("#sgr_date").text(basic_info.sgr_date);
+        $("#sgr_idx").text(basic_info.sgr_idx);
+        $("#target_nm").text(basic_info.target_nm);
+        $("#storage_nm").text(basic_info.storage_nm);
+        $("#comment").text(basic_info.comment);
 
-    //     let comment = document.f1.comment.value;
-    //     let rows = gx.getRows();
+        $("#basic_info_form").removeClass("d-none");
+        pApp.ResizeGrid(275, 370);
+    }
 
-    //     if(cmd === 'add') {
-    //         let sgr_date = document.f1.sdate.value;
-    //         let storage_cd = document.f1.storage_cd.value;
-    //         let target_type = document.f1.target_type.value;
-    //         let target_cd = document.f1.target_cd.value;
+    // 상품반품 일괄등록
+    function Save() {
+        let rows = gx.getRows();
+        if(basic_info.sgr_date === undefined) return alert("일괄등록할 엑셀 파일을 적용해주세요.");
+        if(rows.length < 1) return alert("일괄등록할 상품이 존재하지 않습니다.");
 
-    //         if(rows.length < 1) return alert("반품등록할 상품을 선택해주세요.");
+        let sgr_date = basic_info.sgr_date;
+        let storage_cd = basic_info.storage_cd;
+        let target_type = basic_info.target_type;
+        let target_cd = basic_info.target_cd;
+        let comment = basic_info.comment;
 
-    //         let zero_qtys = rows.filter(r => r.qty < 1);
-    //         if(zero_qtys.length > 0) return alert("반품수량이 0개인 항목이 존재합니다.");
+        let zero_qtys = rows.filter(r => r.qty < 1);
+        if(zero_qtys.length > 0) return alert("반품수량이 0개인 항목이 존재합니다.");
 
-    //         if(!confirm("등록하시겠습니까?")) return;
+        if(!confirm("일괄등록하시겠습니까?")) return;
 
-    //         axios({
-    //             url: '/store/cs/cs02/add-storage-return',
-    //             method: 'put',
-    //             data: {
-    //                 sgr_date,
-    //                 storage_cd,
-    //                 target_type,
-    //                 target_cd,
-    //                 comment,
-    //                 products: rows.map(r => ({ prd_cd: r.prd_cd, price: r.price, return_price: r.return_price, return_qty: r.qty })),
-    //             },
-    //         }).then(function (res) {
-    //             if(res.data.code === 200) {
-    //                 alert(res.data.msg);
-    //                 opener.Search();
-    //                 window.close();
-    //             } else {
-    //                 console.log(res.data);
-    //                 alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-    //             }
-    //         }).catch(function (err) {
-    //             console.log(err);
-    //         });
-    //     } else if(cmd === 'update') {
-    //         let sgr_state = '{{ @$sgr->sgr_state }}';
-    //         let sgr_cd = '{{ @$sgr->sgr_cd }}';
-
-    //         if('{{ @$sgr->sgr_state }}' != 10) return alert("상품반품이동이 '접수'상태일떄만 수정가능합니다.");
-    //         if(!confirm("수정하시겠습니까?")) return;
-
-    //         axios({
-    //             url: '/store/cs/cs02/update-storage-return',
-    //             method: 'put',
-    //             data: {
-    //                 sgr_cd,
-    //                 comment,
-    //                 products: rows.map(r => ({ sgr_prd_cd: r.sgr_prd_cd, return_price: r.return_price, return_qty: r.qty })),
-    //             },
-    //         }).then(function (res) {
-    //             if(res.data.code === 200) {
-    //                 alert(res.data.msg);
-    //                 opener.Search();
-    //                 window.close();
-    //             } else {
-    //                 console.log(res.data);
-    //                 alert("수정 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-    //             }
-    //         }).catch(function (err) {
-    //             console.log(err);
-    //         });
-    //     }
-    // }
+        axios({
+            url: '/store/cs/cs02/add-storage-return',
+            method: 'put',
+            data: {
+                sgr_type: 'B',
+                sgr_date,
+                storage_cd,
+                target_type,
+                target_cd,
+                comment,
+                products: rows.map(r => ({ prd_cd: r.prd_cd, price: r.price, return_price: r.return_price, return_qty: r.qty })),
+            },
+        }).then(function (res) {
+            if(res.data.code === 200) {
+                alert(res.data.msg);
+                opener.Search();
+                window.close();
+            } else {
+                console.log(res.data);
+                alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
+    }
 
     const checkIsEditable = (params) => {
         return params.data.hasOwnProperty('isEditable') && params.data.isEditable ? true : false;
+    };
+
+    const updatePinnedRow = () => { // 총 반품금액, 반품수량을 반영한 PinnedRow를 업데이트
+        let [ qty, total_return_price ] = [ 0, 0 ];
+        const rows = gx.getRows();
+        if (rows && Array.isArray(rows) && rows.length > 0) {
+            rows.forEach((row, idx) => {
+                qty += parseFloat(row.qty);
+                total_return_price += parseFloat(row.total_return_price);
+            });
+        }
+
+        let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
+        gx.gridOptions.api.setPinnedTopRowData([
+            { ...pinnedRow.data, qty: qty, total_return_price: total_return_price }
+        ]);
     };
 </script>
 @stop

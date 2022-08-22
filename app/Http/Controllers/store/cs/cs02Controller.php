@@ -64,7 +64,7 @@ class cs02Controller extends Controller
         if($sgr_state != "")            $where .= " and sgr.sgr_state = '" . $sgr_state . "'";
 
         // ordreby
-        $ord_field  = 'sgr.' . $request->input("ord_field", "sgr_date");
+        $ord_field  = 'sgr.' . $request->input("ord_field", "sgr_cd");
         $ord        = $request->input("ord", "desc");
         $orderby    = sprintf("order by %s %s", $ord_field, $ord);
         
@@ -327,8 +327,8 @@ class cs02Controller extends Controller
     public function add_storage_return(Request $request)
     {
         $admin_id = Auth('head')->user()->id;
-        $sgr_type = "G";
-        $sgr_state = 10; // 일반등록 시 접수 상태로 등록
+        $sgr_type = $request->input("sgr_type", "G");
+        $sgr_state = $sgr_type == "G" ? 10 : 30;
         $sgr_date = $request->input("sgr_date", date("Y-m-d"));
         $storage_cd = $request->input("storage_cd", "");
         $target_type = $request->input("target_type", "");
@@ -367,6 +367,31 @@ class cs02Controller extends Controller
                         'rt' => now(),
                         'admin_id' => $admin_id,
                     ]);
+
+                if($sgr_type == 'B') // 일괄등록의 경우 등록 시 완료처리
+                {
+                    // 창고 재고 차감
+                    DB::table('product_stock_storage')
+                    ->where('prd_cd', '=', $product['prd_cd'])
+                    ->where('storage_cd', '=', $storage_cd) 
+                    ->update([
+                        'qty' => DB::raw('qty - ' . ($product['return_qty'] ?? 0)),
+                        'wqty' => DB::raw('wqty - ' . ($product['return_qty'] ?? 0)),
+                        'ut' => now(),
+                    ]);
+                    
+                    if($target_type == 'S') {
+                        // 상품을 반품받은 창고 재고 플러스
+                        DB::table('product_stock_storage')
+                        ->where('prd_cd', '=', $product['prd_cd'])
+                        ->where('storage_cd', '=', $target_cd) 
+                        ->update([
+                            'qty' => DB::raw('qty + ' . ($product['return_qty'] ?? 0)),
+                            'wqty' => DB::raw('wqty + ' . ($product['return_qty'] ?? 0)),
+                            'ut' => now(),
+                        ]);
+                    }
+                }
             }
 
             DB::commit();
@@ -456,4 +481,95 @@ class cs02Controller extends Controller
 			}
 		}
 	}
+
+    // 일괄등록 상품 개별 조회
+    public function get_goods(Request $request) {
+        $data = $request->input('data', []);
+        $target_nm = '';
+        $storage_cd = '';
+        $storage_nm = '';
+        $sgr_idx = '';
+        $result = [];
+
+        foreach($data as $key => $d)
+        {
+            if($key < 1) 
+            {
+                $is_company = $d['target_type'] == 'C';
+                $row = DB::table($is_company ? 'company' : 'storage')->where($is_company ? 'com_id' : 'storage_cd', '=', $d['target_cd'])->first();
+                $target_nm = $is_company ? $row->com_nm ?? '' : $row->storage_nm ?? '';
+                
+                $storage_cd = $d['storage_cd'];
+                $row = DB::table('storage')->where('storage_cd', '=', $storage_cd)->first();
+                $storage_nm = $row->storage_nm ?? '';
+
+                $sql = "
+                    select sgr_cd
+                    from storage_return
+                    order by sgr_cd desc
+                    limit 1
+                ";
+                $row = DB::selectOne($sql);
+                if($row == null) $sgr_idx = 1;
+                else $sgr_idx = $row->sgr_cd + 1;
+            }
+
+            $prd_cd = $d['prd_cd'];
+            $return_price = $d['return_price'];
+            $return_qty = $d['return_qty'];
+            $count = $d['count'] ?? '';
+            $sql = "
+                select
+                    g.goods_no
+                    , ifnull( type.code_val, 'N/A') as goods_type
+                    , com.com_nm
+                    , opt.opt_kind_nm
+                    , brand.brand_nm as brand
+                    , g.style_no
+                    , g.goods_nm
+                    , g.goods_nm_eng
+                    , stat.code_val as sale_stat_cl
+                    , g.price
+                    , g.wonga
+                    , g.goods_sh 
+                    , g.goods_type as goods_type_cd
+                    , com.com_type as com_type_d
+                    , s.prd_cd , s.goods_opt
+                    , ps.qty as storage_qty, ps.wqty as storage_wqty
+                    , '$return_price' as return_price, '$return_qty' as qty
+                    , true as isEditable
+                    , '$count' as count
+                    , ('$return_price' * '$return_qty') as total_return_price
+                from goods g inner join product_stock s on g.goods_no = s.goods_no
+                    left outer join product_stock_storage ps on s.prd_cd = ps.prd_cd and ps.storage_cd = '$storage_cd'
+                    left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
+                    left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
+                    left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
+                    left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
+                    left outer join company com on com.com_id = g.com_id
+                    left outer join brand brand on brand.brand = g.brand
+                    left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
+                    left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
+                    left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
+                where s.prd_cd = '$prd_cd'
+                limit 1
+            ";
+            $row = DB::selectOne($sql);
+            array_push($result, $row);
+        }
+
+        return response()->json([
+            "code" => 200,
+            "head" => [
+                "total" => count($result),
+                "page" => 1,
+                "page_cnt" => 1,
+                "page_total" => 1,
+                "target_nm" => $target_nm,
+                "storage_nm" => $storage_nm,
+                "sgr_idx" => $sgr_idx,
+            ],
+            "body" => $result
+        ]);
+    }
 }
