@@ -89,8 +89,8 @@
             cellStyle: (params) => isAdded(params) ? YELLOW : {}
         },
         { field: "name", headerName: "등급명", width: 100, cellStyle: CENTER, editable: true, cellStyle: YELLOW },
-        { field: "sdate", headerName: "시작일", width: 100, cellStyle: CENTER, editable: true, cellStyle: {...YELLOW, ...CENTER} },
-        { field: "edate", headerName: "종료일", width: 100, cellStyle: CENTER },
+        { field: "sdate", headerName: "시작월", width: 100, cellStyle: CENTER, editable: true, cellStyle: {...YELLOW, ...CENTER} },
+        { field: "edate", headerName: "종료월", width: 100, cellStyle: CENTER },
         { field: "g1", headerName: "정상",
             children: [
                 { headerName: "금액", field: "amt1", type: 'currencyType', width:100, editable: true, cellStyle: YELLOW },
@@ -233,11 +233,11 @@
             startEditingCell(i, "name");
             return false;
         }
-        const regex = /\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])/;
+        const regex = /\d{4}-(0[1-9]|1[012])/;
         let arr = row?.sdate?.match(regex);
         if (Array.isArray(arr) && arr.length > 0) {
         } else {
-            alert("시작일은 연-월-일 형식으로 입력해 주세요.");
+            alert("시작월은 연-월 형식으로 입력해 주세요.");
             startEditingCell(i, "sdate");
             return false;
         }

@@ -519,12 +519,10 @@ class sal01Controller extends Controller
 						"ord_state" 	=> @$order["ord_state"],
 						"ord_type" 		=> @$order["ord_type"],
 						"ord_kind" 		=> @$order["ord_kind"],
-						"sale_kind" 	=> $sale_kind_id,
 						"sale_place" 	=> @$order["sale_place"],
 						"out_ord_no" 	=> @$order["out_ord_no"],
 						"upd_date"      => DB::raw('now()'),
-						"dlv_end_date"  => DB::raw('now()'),
-						"pr_code"		=> $pr_code
+						"dlv_end_date"  => DB::raw('now()')
 					];
 					DB::table('order_mst')->insert($order_mst);
 
@@ -579,6 +577,7 @@ class sal01Controller extends Controller
 					"md_id" 		=> $order["md_id"],
 					"md_nm" 		=> $order["md_nm"],
 
+					"sale_kind" 	=> $sale_kind_id,
 					"sale_place" 	=> @$order["sale_place"],
 					"ord_state" 	=> $order["ord_state"],
 					"clm_state" 	=> $order["clm_state"],
@@ -592,7 +591,8 @@ class sal01Controller extends Controller
 					"admin_id" 		=> $admin_id,
 					"sales_com_fee" => @$order["sales_com_fee"],
 					"ord_date"      => $ord_date,
-					'prd_cd'        => $prd_cd
+					'prd_cd'        => $prd_cd,
+					"pr_code"		=> $pr_code
 				];
 				DB::table('order_opt')->insert($order_opt);
 				$ord_opt_no = DB::getPdo()->lastInsertId();
