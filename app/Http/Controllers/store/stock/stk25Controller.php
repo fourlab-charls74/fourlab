@@ -80,7 +80,7 @@ class stk25Controller extends Controller
         $sql = "
             select 
                 ow.ord_state,
-                if(ow.ord_state = 30, '출고완료', if(ow.ord_state = 61, '환불완료', '-')) as ord_state_nm,
+                if(ow.ord_state = 30, '출고완료', if(ow.ord_state = 61, '환불완료', if(ow.ord_state = 60, '교환완료', '-'))) as ord_state_nm,
                 o.store_cd,
                 o.ord_opt_no,
                 o.ord_no,
@@ -112,7 +112,7 @@ class stk25Controller extends Controller
                 inner join brand b on b.brand = g.brand
                 inner join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
                 left outer join sale_type st on st.sale_kind = om.sale_kind
-            where (ow.ord_state = 30 or ow.ord_state = 61) $where
+            where (ow.ord_state = 30 or ow.ord_state = 61 or ow.ord_state = 60) $where
             order by ow.ord_state_date
         ";
         $result = DB::select($sql);
@@ -135,7 +135,7 @@ class stk25Controller extends Controller
                 inner join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
                 left outer join sale_type st on st.sale_kind = om.sale_kind
                 left outer join sale_type_apply_store stas on stas.apply_date = '$sale_month' and stas.store_cd = '$store_cd'
-            where (ow.ord_state = 30 or ow.ord_state = 61) $where
+            where (ow.ord_state = 30 or ow.ord_state = 61 or ow.ord_state = 60) $where
         ";
         $row = DB::selectOne($sql);
 		

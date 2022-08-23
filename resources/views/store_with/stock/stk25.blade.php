@@ -147,7 +147,7 @@
         {field: "ord_state", hide: true},
         {field: "ord_state_nm", headerName: "주문상태", pinned: "left", 
             cellStyle: function(params) {
-                return {"text-align": "center", "color": params.data.ord_state === 61 ? "red" : "none"};
+                return {"text-align": "center", "color": params.data.ord_state === 30 ? "none" : "red"};
             }
         },
         {field: "prd_cd", headerName: "상품코드", pinned: "left", width: 110, cellStyle: {"text-align": "center"}},
