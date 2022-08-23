@@ -392,6 +392,14 @@ class stk30Controller extends Controller
                                     'wqty' => DB::raw('wqty + ' . ($row->return_qty ?? 0)),
                                     'ut' => now(),
                                 ]);
+
+                            // product_stock -> 창고보유재고 플러스
+                            DB::table('product_stock')
+                                ->where('prd_cd', '=', $row->prd_cd)
+                                ->update([
+                                    'wqty' => DB::raw('wqty + ' . ($row->return_qty ?? 0)),
+                                    'ut' => now(),
+                                ]);
                         }
                     } else if($new_state == 40) {
                         // 완료처리

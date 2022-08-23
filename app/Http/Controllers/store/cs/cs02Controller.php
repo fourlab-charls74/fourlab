@@ -179,6 +179,16 @@ class cs02Controller extends Controller
                                 'wqty' => DB::raw('wqty + ' . ($row->return_qty ?? 0)),
                                 'ut' => now(),
                             ]);
+                    } else if($d['target_type'] == 'C') {
+                        // product_stock -> 재고 / 창고재고 / 입고수량 차감
+                        DB::table('product_stock')
+                            ->where('prd_cd', '=', $row->prd_cd)
+                            ->update([
+                                'qty' => DB::raw('qty - ' . ($row->return_qty ?? 0)),
+                                'wqty' => DB::raw('wqty - ' . ($row->return_qty ?? 0)),
+                                'in_qty' => DB::raw('in_qty - ' . ($row->return_qty ?? 0)),
+                                'ut' => now(),
+                            ]);
                     }
                 }
             }
@@ -390,6 +400,16 @@ class cs02Controller extends Controller
                             'wqty' => DB::raw('wqty + ' . ($product['return_qty'] ?? 0)),
                             'ut' => now(),
                         ]);
+                    } else if($target_type == 'C') {
+                        // product_stock -> 재고 / 창고재고 / 입고수량 차감
+                        DB::table('product_stock')
+                            ->where('prd_cd', '=', $product['prd_cd'])
+                            ->update([
+                                'qty' => DB::raw('qty - ' . ($product['return_qty'] ?? 0)),
+                                'wqty' => DB::raw('wqty - ' . ($product['return_qty'] ?? 0)),
+                                'in_qty' => DB::raw('in_qty - ' . ($product['return_qty'] ?? 0)),
+                                'ut' => now(),
+                            ]);
                     }
                 }
             }

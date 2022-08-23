@@ -297,7 +297,7 @@
 				}
 			});
             
-            row.return_price = row.return_price || -1; // 반품단가
+            row.return_price = row.return_price || 0; // 반품단가
             row = { ...row, 
                 count: ++count, isEditable: true,
             };
@@ -305,6 +305,7 @@
             rowIndex++;
 		}
         if(rows.length < 1) return alert("한 개 이상의 상품정보를 입력해주세요.");
+        rows = rows.filter(r => r.prd_cd);
         await getGood(rows, firstRowIndex);
 	};
     
@@ -366,7 +367,8 @@
             data: { data: rows },
         }).then(async (res) => {
             setBasicInfo({...res.data.head, ...rows[0]});
-            await gx.gridOptions.api.applyTransaction({add : res.data.body});
+            let data = res.data.body.map(r => ({...r, qty: r.storage_wqty < r.qty ? r.storage_wqty : r.qty}));
+            await gx.gridOptions.api.applyTransaction({add : data});
             updatePinnedRow();
         }).catch((error) => {
             console.log(error);
