@@ -59,8 +59,8 @@ class std08Controller extends Controller
 		});
 		try {
 			DB::transaction(function () use (&$data, &$f_data) {
-				foreach ($f_data as $group_nm => $group) {
-					$grade_cd = $group_nm;
+				foreach ($f_data as $group_key => $group) {
+					$grade_cd = $group_key;
 					$duplicated = count($group) > 1 ? true : false;
 					if ($duplicated) {
 						/**
