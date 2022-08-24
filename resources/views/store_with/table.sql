@@ -156,14 +156,12 @@ ALTER TABLE `bizest_smart`.`stock_product` ADD COLUMN `prd_cd` VARCHAR(50) NULL 
 ALTER TABLE `bizest_smart`.`order_mst` ADD COLUMN `store_cd` VARCHAR(30) NULL COMMENT '매장코드' AFTER `out_ord_no`;
 -- ALTER TABLE `bizest_smart`.`order_mst` ADD COLUMN `sale_kind` VARCHAR(30) NULL COMMENT '판매유형' AFTER `store_cd`;
 -- ALTER TABLE `bizest_smart`.`order_mst` ADD COLUMN `pr_code` VARCHAR(30) NULL COMMENT '행사구분' AFTER `sale_kind`;
--- UPDATE  `bizest_smart`.`order_mst` SET sale_kind = '01' WHERE store_cd <> '';
--- 위 3개 항목 order_msg => order_opt 변경 (2022-08-23)
+-- 위 2개 항목 order_msg => order_opt 변경 (2022-08-23)
 
-ALTER TABLE `bizest_smart`.`order_opt` ADD COLUMN `store_cd` VARCHAR(30) NULL COMMENT '매장코드' AFTER `prd_cd`;
-ALTER TABLE `bizest_smart`.`order_opt` ADD COLUMN `prd_cd` VARCHAR(50) NULL COMMENT '상품코드' AFTER `out_ord_opt_no`;
 ALTER TABLE `bizest_smart`.`order_opt` ADD COLUMN `sale_kind` VARCHAR(30) NULL COMMENT '판매유형' AFTER `store_cd`;
 ALTER TABLE `bizest_smart`.`order_opt` ADD COLUMN `pr_code` VARCHAR(30) NULL COMMENT '행사구분' AFTER `sale_kind`;
-UPDATE  `bizest_smart`.`order_opt` SET sale_kind = '01' WHERE store_cd <> '';
+ALTER TABLE `bizest_smart`.`order_opt` ADD COLUMN `store_cd` VARCHAR(30) NULL COMMENT '매장코드' AFTER `prd_cd`;
+ALTER TABLE `bizest_smart`.`order_opt` ADD COLUMN `prd_cd` VARCHAR(50) NULL COMMENT '상품코드' AFTER `out_ord_opt_no`;
 
 ALTER TABLE `bizest_smart`.`order_opt_wonga` ADD COLUMN `prd_cd` VARCHAR(50) NULL COMMENT '상품코드' AFTER `tax_fee`;
 ALTER TABLE `bizest_smart`.`order_opt_wonga` ADD COLUMN `store_cd` VARCHAR(30) NULL COMMENT '매장코드' AFTER `prd_cd`;
@@ -335,8 +333,8 @@ CREATE TABLE `store_grade` (
     `seq` INT(11) NOT NULL COMMENT '정렬순서',
     `grade_cd` VARCHAR(2) NOT NULL COMMENT '등급코드',
     `name` VARCHAR(30) NOT NULL COMMENT '등급명',
-    `sdate` VARCHAR(10) DEFAULT NULL COMMENT '시작일',
-    `edate` VARCHAR(10) DEFAULT NULL COMMENT '종료일',
+    `sdate` VARCHAR(7) DEFAULT NULL COMMENT '시작월',
+    `edate` VARCHAR(7) DEFAULT NULL COMMENT '종료월',
     `amt1` INT DEFAULT NULL COMMENT '금액1',
     `fee1` DECIMAL(5,2) DEFAULT NULL COMMENT '수수료1',
     `amt2` INT DEFAULT NULL COMMENT '금액2',

@@ -37,7 +37,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-3">
+                    <!-- <div class="col-lg-3">
                         <div class="form-group">
                             <label for="use_yn">사용여부</label>
                             <div class="flex_box">
@@ -48,7 +48,7 @@
                                 </select>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -67,6 +67,7 @@
                     <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                 </div>
                 <div class="fr_box">
+                    <span style="color: blue;">※등급코드가 중복된 경우에는 순서가 제일 아래인 행을 기준으로 종료일이 변경됩니다.<span>
                     <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataAdd();"><span class="fs-12">추가</span></a>
                     <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataSave();"><span class="fs-12">저장</span></a>
                     <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataDel();"><span class="fs-12">선택삭제</span></a>
@@ -89,8 +90,10 @@
             cellStyle: (params) => isAdded(params) ? YELLOW : {}
         },
         { field: "name", headerName: "등급명", width: 100, cellStyle: CENTER, editable: true, cellStyle: YELLOW },
-        { field: "sdate", headerName: "시작일", width: 100, cellStyle: CENTER, editable: true, cellStyle: {...YELLOW, ...CENTER} },
-        { field: "edate", headerName: "종료일", width: 100, cellStyle: CENTER },
+        { field: "sdate", headerName: "시작월", width: 100, cellStyle: CENTER, editable: true, cellStyle: {...YELLOW, ...CENTER} },
+        { field: "edate", headerName: "종료월", width: 100, cellStyle: CENTER,
+            cellRenderer: (params) => params.data?.edate != "9999-99" && params.data?.edate ? params.data.edate : "-"
+        },
         { field: "g1", headerName: "정상",
             children: [
                 { headerName: "금액", field: "amt1", type: 'currencyType', width:100, editable: true, cellStyle: YELLOW },
@@ -112,7 +115,7 @@
         { field: "fee_10", headerName: "특판", width: 60, type: 'percentType', editable: true, cellStyle: YELLOW },
         { field: "fee_11", headerName: "용품", width: 60, type: 'percentType', editable: true, cellStyle: YELLOW },
         { field: "fee_12", headerName: "특약온라인", width: 90, type: 'percentType', editable: true, cellStyle: YELLOW },
-        { field: "use_yn", headerName: "사용여부", width: 60, cellStyle: CENTER },
+        { field: "use_yn", headerName: "사용여부", width: 60, cellStyle: CENTER, hide: true },
         { field: "bigo", headerName: "비고", width: 200, editable: true, cellStyle: YELLOW },
         { width: "auto" },
     ];
@@ -123,7 +126,7 @@
 
     let gx;
     const pApp = new App('', { gridId: "#div-gd" });
-
+    
     $(document).ready(function() {
         pApp.ResizeGrid(275);
         pApp.BindSearchEnter();
@@ -178,7 +181,7 @@
             const response = await axios({ 
                 url: '/store/standard/std08/save',
                 method: 'post', 
-                data: { data: arr } 
+                data: { data: arr }
             });
             const { data } = response;
             if (data?.code == 200) {
@@ -233,11 +236,11 @@
             startEditingCell(i, "name");
             return false;
         }
-        const regex = /\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])/;
+        const regex = /\d{4}-(0[1-9]|1[012])/;
         let arr = row?.sdate?.match(regex);
         if (Array.isArray(arr) && arr.length > 0) {
         } else {
-            alert("시작일은 연-월-일 형식으로 입력해 주세요.");
+            alert("시작월은 연-월 형식으로 입력해 주세요.");
             startEditingCell(i, "sdate");
             return false;
         }
