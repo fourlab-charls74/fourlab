@@ -39,7 +39,7 @@ class stk13Controller extends Controller
 		$where = "";
 		$store_where = "";
         $orderby = "";
-
+		
 		$sdate = $r['sdate'] ?? '';
 		$edate = $r['edate'] ?? '';
         $store_cds = array_filter(explode(',', $r['store_nos']));
@@ -47,9 +47,9 @@ class stk13Controller extends Controller
 		// store_where
 		foreach($store_cds as $key => $cd) {
 			if($key === 0) {
-				$store_where .= "t.com_id = '$cd'";
+				$store_where .= "o.store_cd = '$cd'";
 			} else {
-				$store_where .= " or t.com_id = '$cd'";
+				$store_where .= " or o.store_cd = '$cd'";
 			}
 		}
 		if(count($store_cds) < 1) {
@@ -58,9 +58,9 @@ class stk13Controller extends Controller
 
         // where
 		if($r['prd_cd'] != null) 
-			$where .= " and t.barcode = '" . $r['prd_cd'] . "'";
+			$where .= " and o.prd_cd = '" . $r['prd_cd'] . "'";
 		else
-			$where .= " and t.barcode != ''";
+			$where .= " and o.prd_cd != ''";
 		if($r['type'] != null) 
 			$where .= " and g.type = '" . $r['type'] . "'";
 		if($r['goods_type'] != null) 
@@ -78,7 +78,7 @@ class stk13Controller extends Controller
             }
         } 
         if($r['style_no'] != null) 
-            $where .= " and t.style_no = '" . $r['style_no'] . "'";
+            $where .= " and g.style_no = '" . $r['style_no'] . "'";
 
         $goods_no = $r['goods_no'];
         $goods_nos = $request->input('goods_nos', '');
@@ -116,7 +116,7 @@ class stk13Controller extends Controller
         $ord = $r['ord'] ?? 'desc';
         $ord_field = $r['ord_field'] ?? "g.goods_no";
         if($ord_field == 'goods_no') $ord_field = 'g.' . $ord_field;
-        else $ord_field = 't.' . $ord_field;
+        else $ord_field = 'o.' . $ord_field;
         $orderby = sprintf("%s %s", $ord_field, $ord);
 
         // pagination
@@ -128,41 +128,42 @@ class stk13Controller extends Controller
 
         // search
 		$sql = "
-			select
-				t.com_id as store_cd,
-				(select store_nm from store where store_cd = t.com_id) as store_nm,
-				t.barcode as prd_cd,
-				g.goods_no as goods_no,
+			select 
+				o.store_cd,
+				(select store_nm from store where store_cd = o.store_cd) as store_nm,
+				o.prd_cd,
+				o.goods_no,
 				ifnull(type.code_val, 'N/A') as goods_type_nm,
 				op.opt_kind_nm,
 				b.brand_nm, 
-				t.style_no,
+				g.style_no,
 				stat.code_val as sale_stat_cl, 
 				g.goods_nm,
-				p.goods_opt,
+				o.goods_opt,
 				ifnull(pss.qty, 0) as storage_qty,
 				ifnull(pss.wqty, 0) as storage_wqty,
-				sum(t.qty) as total_sale_cnt,
-				ifnull(sum(tt.qty), 0) as sale_cnt,
 				ifnull(ps.qty, 0) as store_qty, 
 				ifnull(ps.wqty, 0) as store_wqty,
-				DATE_FORMAT(DATE_ADD(NOW(), INTERVAL (ifnull(ROUND(ps.wqty * (TIMESTAMPDIFF(DAY, '$sdate', '$edate') / sum(tt.qty))), 0)) DAY),'%Y-%m-%d') as exp_soldout_day,
-				LEAST(ifnull(sum(tt.qty), 0), ifnull(pss.wqty, 0)) as rel_qty
-			from __tmp_order t
-				inner join __tmp_order tt on tt.ord_no = t.ord_no and tt.ord_date >= '$sdate' and tt.ord_date <= '$edate'
-				left outer join product_stock p on p.prd_cd = t.barcode
-				left outer join product_stock_storage pss on pss.prd_cd = t.barcode and pss.storage_cd = (select storage_cd from storage where default_yn = 'Y')
-				left outer join product_stock_store ps on ps.store_cd = t.com_id and ps.prd_cd = t.barcode
-				left outer join goods g on g.goods_no = p.goods_no
+				sum(ifnull(o.qty, 0)) as sale_cnt,
+				(select sum(qty) from order_opt where (o.clm_state = 90 or o.clm_state = -30 or o.clm_state = 0) and prd_cd = o.prd_cd and store_cd = o.store_cd) as total_sale_cnt,
+				DATE_FORMAT(DATE_ADD(NOW(), INTERVAL (ifnull(ROUND(ps.wqty * (TIMESTAMPDIFF(DAY, '$sdate 00:00:00', '$edate 23:59:59') / sum(o.qty))), 0)) DAY),'%Y-%m-%d') as exp_soldout_day,
+				LEAST(if(sum(ifnull(o.qty, 0)) < 0, 0, sum(o.qty)), ifnull(pss.wqty, 0)) as rel_qty
+			from order_opt o
+				left outer join product_stock_storage pss on pss.prd_cd = o.prd_cd and pss.storage_cd = (select storage_cd from storage where default_yn = 'Y')
+				left outer join product_stock_store ps on ps.prd_cd = o.prd_cd and ps.store_cd = o.store_cd
+				left outer join goods g on g.goods_no = o.goods_no
 				left outer join brand b on b.brand = g.brand
 				left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
 				left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
 				left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
-			where 1=1				
+			where 1=1
+				-- and o.ord_state = 30
+				and (o.clm_state = 90 or o.clm_state = -30 or o.clm_state = 0)
+				and o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59'
 				and ($store_where)
 				$where
-			group by t.barcode
-			order by t.com_id, $orderby
+			group by o.prd_cd
+			order by o.store_cd, $orderby
 		";
 
 		$result = DB::select($sql);
@@ -170,10 +171,6 @@ class stk13Controller extends Controller
 		return response()->json([
 			"code" => $code,
 			"head" => [
-				// "total" => $total,
-				// "page" => $page,
-				// "page_cnt" => $page_cnt,
-				// "page_total" => count($result)
 				"total" => count($result),
 				"page" => 1,
 				"page_cnt" => 1,

@@ -291,16 +291,15 @@
     <script language="javascript">
         let columns = [
             {field: "store_nm" , headerName: "매장", rowGroup: true, hide: true},
-            // {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
-            {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {"text-align": "center"}, checkboxSelection: true},
-            {field: "goods_no", headerName: "상품번호", cellStyle: {"text-align": "center"}},
-            {field: "goods_type_nm", headerName: "상품구분", cellStyle: StyleGoodsType},
-            {field: "opt_kind_nm", headerName: "품목", width: 100, cellStyle: {"text-align": "center"}},
+            {field: "prd_cd", headerName: "상품코드", width: 130, pinned: "left", cellStyle: {"text-align": "center"}, checkboxSelection: true},
+            {field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"}},
+            {field: "goods_type_nm", headerName: "상품구분", width: 60, cellStyle: StyleGoodsTypeNM},
+            {field: "opt_kind_nm", headerName: "품목", width: 60, cellStyle: {"text-align": "center"}},
             {field: "brand_nm", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
-            {field: "style_no",	headerName: "스타일넘버", cellStyle: {"text-align": "center"}},
+            {field: "style_no",	headerName: "스타일넘버", width: 90, cellStyle: {"text-align": "center"}},
             {field: "sale_stat_cl", headerName: "상품상태", cellStyle: StyleGoodsState},
-            {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 350},
-            {field: "goods_opt", headerName: "옵션", width: 300},
+            {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 250},
+            {field: "goods_opt", headerName: "옵션", width: 200},
             {
                 headerName: '(대표)창고재고', // 대표창고의 재고를 조회
                 children: [
@@ -348,6 +347,7 @@
                     headerClass: 'bizest',
                     minWidth: 230,
                     cellRenderer: 'agGroupCellRenderer',
+                    pinned: 'left'
                 },
                 groupDefaultExpanded: 1,
                 rowSelection: 'multiple',
