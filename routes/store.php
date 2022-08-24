@@ -249,6 +249,11 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk25','stk25Controller@index');
         Route::get('stk25/search','stk25Controller@search');
         
+        // 실사
+        Route::get('stk26','stk26Controller@index');
+        Route::get('stk26/search','stk26Controller@search');
+        Route::get('stk26/show/{sc_cd?}','stk26Controller@show');
+        
         // 창고반품
         Route::get('stk30','stk30Controller@index');
         Route::get('stk30/search','stk30Controller@search');
