@@ -29,9 +29,7 @@ class std08Controller extends Controller
 	public function search(Request $request)
 	{
 		$grade_nm = $request->input("name", ""); 
-		$use_yn = $request->input("use_yn", "");
 		$where = "where 1=1";
-		if ($use_yn != "") $where .= " and sg.use_yn = '$use_yn'";
 		if ($grade_nm != "") $where .= " and sg.name like '%" . Lib::quote($grade_nm) . "%'";
 		$sql = "
 			select *
@@ -102,7 +100,7 @@ class std08Controller extends Controller
 			});
 			return response()->json(['code'	=> '200']);
 		} catch (Exception $e) {
-			dd($e);
+			// dd($e);
 			return response()->json(['code' => '500']);
 		}
 		return response()->json([]);

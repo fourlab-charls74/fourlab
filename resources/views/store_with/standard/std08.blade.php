@@ -37,18 +37,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- <div class="col-lg-3">
-                        <div class="form-group">
-                            <label for="use_yn">사용여부</label>
-                            <div class="flex_box">
-                                <select id="use_yn" name="use_yn" class="form-control form-control-sm">
-                                    <option value="">전체</option>
-                                    <option value="Y" @if(@$section->use_yn == "Y") selected @endif>Y</option>
-                                    <option value="N" @if(@$section->use_yn == "N") selected @endif>N</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div> -->
                 </div>
             </div>
         </div>
@@ -115,7 +103,6 @@
         { field: "fee_10", headerName: "특판", width: 60, type: 'percentType', editable: true, cellStyle: YELLOW },
         { field: "fee_11", headerName: "용품", width: 60, type: 'percentType', editable: true, cellStyle: YELLOW },
         { field: "fee_12", headerName: "특약온라인", width: 90, type: 'percentType', editable: true, cellStyle: YELLOW },
-        { field: "use_yn", headerName: "사용여부", width: 60, cellStyle: CENTER, hide: true },
         { field: "bigo", headerName: "비고", width: 200, editable: true, cellStyle: YELLOW },
         { width: "auto" },
     ];
@@ -152,7 +139,6 @@
         var newData = {
             idx: rows.length,
             seq: rows.length,
-            use_yn: 'Y',
             added: true
         };
         gx.gridOptions.api.applyTransaction({
@@ -244,12 +230,6 @@
             startEditingCell(i, "sdate");
             return false;
         }
-        // const use_yn_type = ["Y", "N"];
-        // if (use_yn_type.includes(row?.use_yn) === false) {
-        //     alert("사용여부는 Y 또는 N 으로 입력하셔야 합니다.");
-        //     startEditingCell(i, "use_yn");
-        //     return false;
-        // }
         return true;
     };
 

@@ -346,7 +346,6 @@ CREATE TABLE `store_grade` (
     `fee_12` DECIMAL(5,2) DEFAULT NULL COMMENT '(특판온라인)수수료',
     `id` VARCHAR(30) DEFAULT NULL COMMENT '작성자',
     `bigo` VARCHAR(255) DEFAULT NULL COMMENT '비고',
-    `use_yn` CHAR(1) DEFAULT 'Y' COMMENT '사용',
     `rt` DATETIME DEFAULT NULL COMMENT '등록일자',
     `ut` DATETIME DEFAULT NULL COMMENT '수정일자',
     PRIMARY KEY (`idx`)

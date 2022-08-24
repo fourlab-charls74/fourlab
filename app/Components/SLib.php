@@ -67,8 +67,7 @@ class SLib
             select 
                 grade_cd as code_id, name as code_val, seq, sdate, edate 
             from store_grade sg
-            where sg.use_yn = 'Y' 
-            group by sg.grade_cd
+            where sg.sdate <= date_format(now(), '%Y-%m') and sg.edate >= date_format(now(), '%Y-%m')
             order by sg.seq asc
         ";
         return DB::select($sql);
