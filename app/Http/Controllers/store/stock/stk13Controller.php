@@ -149,20 +149,20 @@ class stk13Controller extends Controller
 				DATE_FORMAT(DATE_ADD(NOW(), INTERVAL (ifnull(ROUND(ps.wqty * (TIMESTAMPDIFF(DAY, '$sdate 00:00:00', '$edate 23:59:59') / sum(o.qty))), 0)) DAY),'%Y-%m-%d') as exp_soldout_day,
 				LEAST(if(sum(ifnull(o.qty, 0)) < 0, 0, sum(o.qty)), ifnull(pss.wqty, 0)) as rel_qty
 			from order_opt o
-				left outer join product_stock_storage pss on pss.prd_cd = o.prd_cd and pss.storage_cd = (select storage_cd from storage where default_yn = 'Y')
-				left outer join product_stock_store ps on ps.prd_cd = o.prd_cd and ps.store_cd = o.store_cd
+				inner join product_stock_storage pss on pss.prd_cd = o.prd_cd and pss.storage_cd = (select storage_cd from storage where default_yn = 'Y')
+				inner join product_stock_store ps on ps.prd_cd = o.prd_cd and ps.store_cd = o.store_cd
 				left outer join goods g on g.goods_no = o.goods_no
 				left outer join brand b on b.brand = g.brand
 				left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
 				left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
 				left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
 			where 1=1
-				-- and o.ord_state = 30
+				and o.ord_state = 30
 				and (o.clm_state = 90 or o.clm_state = -30 or o.clm_state = 0)
 				and o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59'
 				and ($store_where)
 				$where
-			group by o.prd_cd
+			group by o.store_cd, o.prd_cd
 			order by o.store_cd, $orderby
 		";
 
