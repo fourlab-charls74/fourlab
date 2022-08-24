@@ -82,7 +82,7 @@ class sal06Controller extends Controller
 		
 		if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%'";
 		if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%'";
-		if ($sale_kind != "") $where .= " and m.sale_kind = '" . Lib::quote($sale_kind) . "' ";
+		if ($sale_kind != "") $where .= " and o.sale_kind = '" . Lib::quote($sale_kind) . "' ";
 
         $where2 = "";
         if ($sale_yn == "Y") $where2 .= " and qty is not null";
@@ -94,7 +94,7 @@ class sal06Controller extends Controller
 		$sale_kinds_query = "";
 		foreach ($sale_kinds as $item) {
 			$id = $item->code_id;
-			$sale_kinds_query .= "sum(if(m.sale_kind = '$id', w.qty, 0)) as sale_kind_$id, ";
+			$sale_kinds_query .= "sum(if(o.sale_kind = '$id', w.qty, 0)) as sale_kind_$id, ";
 		}
 
 		$sql = /** @lang text */

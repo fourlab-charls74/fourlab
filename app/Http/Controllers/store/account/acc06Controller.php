@@ -44,8 +44,6 @@ class acc06Controller extends Controller
         $f_sdate = Carbon::parse($sdate)->firstOfMonth()->format("Ymd");
         $f_edate = Carbon::parse($sdate)->lastOfMonth()->format("Ymd");
 
-        $sdate = str_replace("-", "", $sdate);
-
         $store_type = $request->input('store_type', "");
         $store_kind = $request->input('store_kind', "");
         $store_cd = $request->input('store_cd', "");
@@ -70,7 +68,7 @@ class acc06Controller extends Controller
         $pr_codes_query = "";
         foreach ($pr_codes as $item) {
             $key = $item->code_id;
-            $pr_codes_query .= "sum(if(m.pr_code = '$key', o.price * o.qty, 0)) as amt_$key,";
+            $pr_codes_query .= "sum(if(o.pr_code = '$key', o.price * o.qty, 0)) as amt_$key,";
         }
 
         /**
@@ -114,10 +112,10 @@ class acc06Controller extends Controller
                         sum(e.extra_amt) as extra_total
                     from store_account_extra as e
                         left outer join `code` c3 on c3.code_kind_cd = 'g_acc_extra_type' and c3.code_id = e.type
-                    where ymonth = '$sdate'
+                    where ymonth = date_format('$sdate', '%Y%m')
                     group by e.store_cd
                 ) b on s.store_cd = b.scd
-			where 1=1 and sg.use_yn = 'Y' $where
+			where 1=1 $where and sg.sdate <= '$sdate' and sg.edate >= '$sdate'
             order by a.ord_amt desc
 		";
 

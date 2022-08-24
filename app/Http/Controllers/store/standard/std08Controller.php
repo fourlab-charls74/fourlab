@@ -53,44 +53,56 @@ class std08Controller extends Controller
 	public function save(Request $request)
 	{
 		$data = $request->input('data');
+		$f_data = collect($data)->map(function ($item, $i) {
+			$item['seq'] = $i;
+			return $item;
+		})->groupBy('grade_cd')->map(function ($item) {
+			return $item->sortByDesc('seq')->values();
+		});
 		try {
-			DB::transaction(function () use ($data) {
-				foreach ($data as $row) {
-					/**
-					 * 데이터 가공, 초기 값 설정 및 불필요한 프로퍼티 제거
-					 */
-					if (array_key_exists('sdate', $row) === false) $row['sdate'] = now()->format("Y-m-d");
-					$grade_cd = Lib::quote($row['grade_cd']);
-					$added = Lib::quote(@$row['added']);
-					$idx = Lib::quote($row['idx']);
-					unset($row['idx']);
-					unset($row['added']);
-					unset($row['editable']);
-
-					/**
-					 * 새로 추가되는 등급인 경우 등급코드가 중복인 항목들의 사용여부를 N으로 변경
-					 */
-					if ($added) {
-						DB::table('store_grade')->where([['grade_cd', "=", $grade_cd], ['idx', "<>", $idx]])->update(['use_yn' => "N", 'edate' => now()->format("Y-m-d")]);
-					}
-
-					/**
-					 * 등급이 있는 경우 업데이트 / 없는 경우 추가
-					 */
-					$sql = "select count(*) as cnt from store_grade sg where sg.idx = '$idx'";
-					$result = DB::selectOne($sql);
-					if ($result->cnt > 0) {
-						$result = DB::selectOne($sql);
-						DB::table('store_grade')->where('idx', "=", $idx)->update($row);
+			DB::transaction(function () use (&$data, &$f_data) {
+				foreach ($f_data as $group_nm => $group) {
+					$grade_cd = $group_nm;
+					$duplicated = count($group) > 1 ? true : false;
+					if ($duplicated) {
+						/**
+						 * grade_cd가 중복된 경우 - 순서가 제일 아래인 행을 기준으로 종료일 변경
+						 */
+						$highest_seq_item = $group[0];
+						$idx = Lib::quote($highest_seq_item['idx']);
+						$grade_cd = Lib::quote($highest_seq_item['grade_cd']);
+						$sdate = $highest_seq_item['sdate'];
+						$edate = Carbon::parse($sdate)->subMonth()->format("Y-m");
+						DB::table('store_grade')->where([['grade_cd', "=", $grade_cd], ['idx', "<>", $idx]])->update(['edate' => $edate]);
+						DB::table('store_grade')->where([['grade_cd', "=", $grade_cd], ['idx', "=", $idx]])->update(['sdate' => $sdate, 'edate' => "9999-99"]);
 					} else {
-						$row['seq'] = count($data) - 1;
-						DB::table('store_grade')->insert($row);
+						/**
+						 * grade_cd가 중복되지 않은 경우 - 등급이 있으면 update, 없는 경우 insert 처리
+						 */
+						$row = $group[0];
+						$idx = Lib::quote($row['idx']);
+						$edate = Carbon::parse($row['sdate'])->subMonth()->format("Y-m");
+						$sql = "select count(*) as cnt from store_grade sg where sg.idx = '$idx'";
+						$result = DB::selectOne($sql);
+						/**
+						 * save시 불필요한 컬럼 제거
+						 */
+						unset($row['idx']);
+						unset($row['added']);
+						unset($row['editable']);
+						if ($result->cnt > 0) {
+							$result = DB::selectOne($sql);
+							DB::table('store_grade')->where('idx', "=", $idx)->update($row);
+						} else {
+							$row['seq'] = count($data) - 1;
+							DB::table('store_grade')->insert($row);
+						}
 					}
 				}
 			});
 			return response()->json(['code'	=> '200']);
 		} catch (Exception $e) {
-			// dd($e);
+			dd($e);
 			return response()->json(['code' => '500']);
 		}
 		return response()->json([]);
