@@ -14,18 +14,14 @@ class stk01Controller extends Controller
 {
 	public function index() {
 
-        $com_types	= [];
-        $code_kinds	= [];
-
 		$values = [
-			'com_types'		=> $com_types,
-			'code_kinds'	=> $code_kinds,
+			'code_kinds'	=> [],
             'style_no'		=> "",
             'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
-            'com_types'     => SLib::getCodes('G_COM_TYPE'),
+            'store_types'	=> SLib::getStoreTypes(),
+			'com_types'     => SLib::getCodes('G_COM_TYPE'),
             'items'			=> SLib::getItems(),
-            'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
-
+            'goods_types'	=> SLib::getCodes('G_GOODS_TYPE')
 		];
 
 		return view( Config::get('shop.store.view') . '/stock/stk01',$values);
@@ -34,8 +30,6 @@ class stk01Controller extends Controller
 	public function search(Request $request)
 	{
 		$store_type = $request->input('store_type');
-		$store_cd = $request->input('store_cd');
-		$store_nm = $request->input('store_nm');
 		$prd_cd = $request->input('prd_cd');
 
         $goods_stat = $request->input("goods_stat");
@@ -51,6 +45,7 @@ class stk01Controller extends Controller
         $type = $request->input("type");
         $goods_type = $request->input("goods_type");
 
+		$com_id		= $request->input("com_cd");
 
         $page = $request->input('page', 1);
 		if ( $page < 1 or $page == "" )	$page = 1;
@@ -60,11 +55,21 @@ class stk01Controller extends Controller
 		$ord_field = $request->input('ord_field','p.goods_no');
 		$orderby = sprintf("order by %s %s", $ord_field, $ord);
 
+
+		// $store_cds = array_filter(explode(',', $request->input('store_nos')));
+		// $store_where = "";
+		// foreach ($store_cds as $key => $cd) {
+		// 	if ($key === 0) {
+		// 		$store_where .= "and p.store_cd = '$cd'";
+		// 	} else {
+		// 		$store_where .= " or p.store_cd = '$cd'";
+		// 	}
+		// }
+
 		$where	= "";
-		if ( $store_type != "" )	$where .= " and s.store_type = '" . $store_type . "' ";
-		if ( $store_cd != "" )	$where .= " and s.store_cd = '" . $store_cd . "' ";
-		if ( $store_nm != "" )	$where .= " and s.store_nm like '%" . Lib::quote($store_nm) . "%' ";
-		if ( $prd_cd != "" )	$where .= " and p.prd_cd = '" . $prd_cd . "' ";
+		if ($store_type != "")	$where .= " and s.store_type = '" . $store_type . "' ";
+		
+		if ($prd_cd != "") $where .= " and p.prd_cd = '" . $prd_cd . "' ";
         if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%' ";
         if ($item != "") $where .= " and g.opt_kind_cd = '" . Lib::quote($item) . "' ";
         if ($brand_cd != "") {
@@ -75,17 +80,19 @@ class stk01Controller extends Controller
         if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%' ";
         if ($goods_nm_eng != "") $where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
 
-        if( is_array($goods_stat)) {
+		if ($com_id != "") $where .= " and g.com_id = '" . Lib::quote($com_id) . "'";
+
+        if (is_array($goods_stat)) {
             if (count($goods_stat) == 1 && $goods_stat[0] != "") {
                 $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat[0]) . "' ";
             } else if (count($goods_stat) > 1) {
                 $where .= " and g.sale_stat_cl in (" . join(",", $goods_stat) . ") ";
             }
-        } else if($goods_stat != ""){
+        } else if($goods_stat != "") {
             $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
         }
 
-        if($goods_nos        != ""){
+        if ($goods_nos != "") {
             $goods_no = $goods_nos;
         }
         $goods_no = preg_replace("/\s/",",",$goods_no);
@@ -93,7 +100,7 @@ class stk01Controller extends Controller
         $goods_no = preg_replace("/\n/",",",$goods_no);
         $goods_no = preg_replace("/,,/",",",$goods_no);
 
-        if( $goods_no != "" ){
+        if ( $goods_no != "" ) {
             $goods_nos = explode(",",$goods_no);
             if(count($goods_nos) > 1){
                 if(count($goods_nos) > 500) array_splice($goods_nos,500);
@@ -119,8 +126,8 @@ class stk01Controller extends Controller
                 "
 				select count(*) as total
 				from product_stock_store p
-					left join goods g on p.goods_no = g.goods_no
-					left join store s on p.store_cd = s.store_cd
+					left outer join goods g on p.goods_no = g.goods_no
+					left outer join store s on p.store_cd = s.store_cd
 				where 1=1 $where
 			";
 			$row = DB::selectOne($query);
@@ -128,25 +135,39 @@ class stk01Controller extends Controller
 			$page_cnt = (int)(($total - 1) / $page_size) + 1;
 		}
 
+		$cfg_img_size_real	= "a_500";
+		$cfg_img_size_list	 = "s_50";
+
 		$sql = /** @lang text */
             "
 			select 
-				p.goods_no, goods_type, prd_cd, g.opt_kind_cd, opt_kind_nm, brand_nm, style_no, 
-				c.code_val as sale_stat_cl_val, ifnull( c2.code_val, 'N/A') as goods_type_nm,
-				img, goods_nm, goods_nm_eng, goods_opt, p.store_cd, store_nm, store_type, wqty, p.rt, p.ut
+				p.goods_no, goods_type, prd_cd, g.opt_kind_cd, opt_kind_nm, b.brand_nm, style_no, 
+				c.code_val as sale_stat_cl, ifnull( c2.code_val, 'N/A') as goods_type_nm,
+				if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
+					select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
+					from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
+				)) as img, goods_nm, goods_nm_eng, goods_opt, p.store_cd, store_nm, store_type, qty, wqty, p.rt, p.ut,
+				g.goods_sh, g.price
 			from product_stock_store p 
-				left join goods g on p.goods_no = g.goods_no
-				left join store s on p.store_cd = s.store_cd
-				left join opt o on g.opt_kind_cd = o.opt_kind_cd
-				left join `code` c on c.code_kind_cd = 'G_GOODS_STAT' and sale_stat_cl = c.code_id
-				left join `code` c2 on c2.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = c2.code_id 
-			where 1=1
-			$where
+				left outer join goods g on p.goods_no = g.goods_no
+				left outer join store s on p.store_cd = s.store_cd
+				left outer join opt o on g.opt_kind_cd = o.opt_kind_cd
+				left outer join `code` c on c.code_kind_cd = 'G_GOODS_STAT' and sale_stat_cl = c.code_id
+				left outer join `code` c2 on c2.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = c2.code_id 
+				left outer join brand b on b.brand = g.brand
+			where 1=1 $where 
+			-- store_where 들어갈 예정
 			$orderby 
 			$limit
 		";
 
-		$result = DB::select($sql);
+		$rows = DB::select($sql);
+		$rows = collect($rows)->map(function ($row) { // shop image_svr 적용
+			if ($row->img != "") {
+				$row->img = sprintf("%s%s",config("shop.image_svr"), $row->img);
+			}
+			return $row;
+		})->all();
 
 		return response()->json([
 			"code"	=> 200,
@@ -154,9 +175,9 @@ class stk01Controller extends Controller
 				"total"		=> $total,
 				"page"		=> $page,
 				"page_cnt"	=> $page_cnt,
-				"page_total"=> count($result)
+				"page_total"=> count($rows)
 			),
-			"body" => $result
+			"body" => $rows
 		]);
 
 	}

@@ -254,7 +254,7 @@ class prd02Controller extends Controller
 		while($row = $stmt->fetch(PDO::FETCH_ASSOC))
 		{
 			if($row["img"] != ""){
-				$row["img"] = sprintf("%s%s",config("shop.image_svr"),$row["img"]);
+				$row["img"] = sprintf("%s%s",config("shop.image_svr"), $row["img"]);
 			}
 
 			$result[] = $row;
