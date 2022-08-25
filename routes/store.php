@@ -264,6 +264,13 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::put('stk30/update-return-state','stk30Controller@update_return_state'); // 창고반품 상태변경
         Route::delete('stk30/del-return','stk30Controller@del_return'); // 창고반품 삭제
 
+        // 매장 공지사항
+        Route::get('stk31','stk31Controller@index');
+        Route::get('stk31/search', 'stk31Controller@search');
+        Route::get('stk31/create', 'stk31Controller@create');
+        Route::get('stk31/{no}', 'stk31Controller@show');
+        Route::put('stk31/store', 'stk31Controller@store');
+        Route::put('stk31/edit/{no}', 'stk31Controller@update');
     });
 
     // 영업관리
