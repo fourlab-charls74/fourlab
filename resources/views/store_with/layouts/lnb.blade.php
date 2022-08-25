@@ -9,7 +9,7 @@
                     <li><a href="/store/standard/std03">(완)창고관리</a></li>
                     <li><a href="/store/standard/std04">(완)동종업계관리</a></li>
                     <li><a href="/store/standard/std05">(완)판매유형관리</a></li>
-                    <li><a href="/store/standard/std06">(개)매장영업담당자관리</a></li>
+                    <!--<li><a href="/store/standard/std06">(개)매장영업담당자관리</a></li>//-->
                     <li><a href="/store/standard/std07">(완)매장마진관리</a></li>
                     <li><a href="/store/standard/std08">(완)매장등급관리</a></li>
                 </ul>
@@ -36,7 +36,7 @@
                 <a href="javascript:;" class="arrow"><i class="bx bx-task fs-18"></i><span>매장관리</span></a>
                 <ul>
                     <li><a href="/store/stock/stk01">(완)매장재고</a></li>
-                    <li><a href="/store/stock/stk02">(개)매장재고입출고</a></li>
+                    <!--<li><a href="/store/stock/stk02">(개)매장재고입출고</a></li>//-->
                     <li><a href="/store/stock/stk10">(완)출고</a></li>
                     <li><a href="/store/stock/stk30">(완)창고반품</a></li>
                     <li><a href="/store/stock/stk11">(개)반품</a></li>
@@ -65,7 +65,7 @@
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-file fs-18"></i><span>영업관리</span></a>
                 <ul>
-                    <li><a href="/store/sale/sal11">배분현황</a></li>
+                    <!--<li><a href="/store/sale/sal11">배분현황</a></li>//-->
                     <li><a href="/store/sale/sal17">(완)매장목표</a></li>
                     <li><a href="/store/sale/sal18">(완)월별할인적용유형관리</a></li>
                     <li><a href="/store/sale/sal20">LOSS(창고/매장) 등록</a></li>
