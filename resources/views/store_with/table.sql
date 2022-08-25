@@ -562,6 +562,30 @@ CREATE TABLE `sale_type_apply_store` (
     PRIMARY KEY (`idx`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='월별할인유형적용관리-매장별'
 
+-- 매장공지사항
+CREATE TABLE `notice_store` (
+    `ns_cd` int(11) NOT NULL AUTO_INCREMENT COMMENT '공지번호',
+    `subject` varchar(255) DEFAULT NULL COMMENT '공지 제목',
+    `content` mediumtext DEFAULT NULL COMMENT '공지 내용',
+    `admin_id` varchar(30) DEFAULT NULL COMMENT '작성자ID',
+    `admin_nm` varchar(30) DEFAULT NULL COMMENT '작성자명',
+    `admin_email` varchar(50) DEFAULT NULL COMMENT '작성자이메일',
+    `cnt` int(11) DEFAULT NULL COMMENT '조회수',
+    `sc_state` char(1) DEFAULT 'N' COMMENT '전체공지여부 - Y / N',
+    `rt` datetime DEFAULT NULL COMMENT '등록일자',
+    `ut` datetime DEFAULT NULL COMMENT '수정일자',
+    PRIMARY KEY (`ns_cd`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 매장공지사항 - 매장별
+CREATE TABLE `notice_store_detail` (
+    `ns_cd` int(11) NOT NULL COMMENT '공지번호 - notice_store : ns_cd',
+    `store_cd` varchar(30) NOT NULL COMMENT '매장코드',
+    `check_yn` char(1) DEFAULT 'N' COMMENT '확인여부',
+    `rt` datetime DEFAULT NULL COMMENT '등록일자',
+    PRIMARY KEY (`ns_cd`, `store_cd`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 --
 -- 기존 테이블 컬럼 추가 시작
 --
