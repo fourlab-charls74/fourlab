@@ -40,7 +40,7 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="store_cd">매장명</label>
+                                <label>매장명</label>
                                 <div class="form-inline inline_btn_box">
                                     <input type='hidden' id="store_nm" name="store_nm">
                                     <select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select" multiple></select>
@@ -301,8 +301,7 @@
                             type: "currencyType",
                             width: 50,
                             cellRenderer: function(params) {
-                                // return params.data.store_qty?.qty || 0;
-                                return params.data[cd] ? params.data[cd][cd + "_qty"] : 0;
+                                return params.data[cd + "_qty"] || 0;
                             }
                         },
                         {
@@ -311,7 +310,7 @@
                             type: "currencyType",
                             width: 80,
                             cellRenderer: function(params) {
-                                return params.data[cd] ? params.data[cd][cd + "_wqty"] : 0;
+                                return params.data[cd + "_wqty"] || 0;
                             }
                         },
                         {
