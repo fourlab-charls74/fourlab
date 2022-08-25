@@ -24,9 +24,17 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="good_types">접수일자</label>
+                            <label for="date_type">연월일</label>
                             <div class="form-inline date-select-inbox">
-                                <div class="docs-datepicker form-inline-inner input_box">
+                                <select id="date_type" name="date_type" class="form-control form-control-sm" style="width:30%; margin-right: auto;">
+                                    <option value="receipt_date">접수일자</option>
+                                    <option value="sale_date">판매일자</option>
+                                    <option value="h_receipt_date">본사접수일</option>
+                                    <option value="start_date">수선인도일</option>
+                                    <option value="due_date">수선예정일</option>
+                                    <option value="end_date">수선완료일</option>
+                                </select>
+                                <div class="docs-datepicker form-inline-inner input_box" style="width:30%">
                                     <div class="input-group">
                                         <input type="text" class="form-control form-control-sm docs-date search-enter" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
                                         <div class="input-group-append">
@@ -38,7 +46,7 @@
                                     <div class="docs-datepicker-container"></div>
                                 </div>
                                 <span class="text_line">~</span>
-                                <div class="docs-datepicker form-inline-inner input_box">
+                                <div class="docs-datepicker form-inline-inner input_box" style="width:30%">
                                     <div class="input-group">
                                         <input type="text" class="form-control form-control-sm docs-date search-enter" name="edate" value="{{ $edate }}" autocomplete="off">
                                         <div class="input-group-append">
@@ -130,7 +138,30 @@
                     <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                 </div>
                 <div class="fr_box">
-
+                    <form method="get" name="batch">
+                        <div class="flex_box">
+                            <span class="mr-2">
+                                <select name="edit_date_type" class="form-control form-control-sm" style="min-width: 100px;">
+                                    <option value="h_receipt_date">본사접수일</option>
+                                    <option value="start_date">수선인도일</option>
+                                    <option value="due_date">수선예정일</option>
+                                    <option value="end_date">수선완료일</option>
+                                </select>
+                            </span>
+                            <span class="mr-2">
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm docs-date search-enter" name="edit_date" value="{{ $sdate }}" autocomplete="off" disable>
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
+                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="docs-datepicker-container"></div>
+                            </span>
+                            <a href="#" onclick="edit();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>일괄수정</a>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -150,6 +181,7 @@
     };
 
     const columns = [
+        {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
         // this row shows the row index, doesn't use any data from the row
         {
             headerName: '#',
@@ -288,6 +320,31 @@
             document.search.where2.disabled = true;
         } else {
             document.search.where2.disabled = false;
+        }
+    };
+
+    const edit = async () => {
+        const rows = gx.getSelectedRows();
+        const date_type = document.batch.edit_date_type.value;
+        const date_type_nm = document.querySelector(`select[name='edit_date_type'] option[value='${date_type}']`).innerText;
+        const date = document.batch.edit_date.value;
+        if (Array.isArray(rows) && rows.length == 0) alert('수정할 항목을 선택해주세요'); return;
+        if (confirm(`체크된 항목들의 ${date_type_nm}을 일괄수정하시겠습니까?`) === false) return;
+        try {
+            const response = await axios({ 
+                url: '/store/standard/std11/batch-edit',
+                method: 'post', 
+                data: { data: rows, type: date_type, date: date }
+            });
+            const { data } = response;
+            if (data?.code == 200) {
+                alert('수정되었습니다.');
+                Search();
+            } else {
+                alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+            }
+        } catch (error) {
+            // console.log(error);
         }
     };
     

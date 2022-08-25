@@ -116,6 +116,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 수선관리
         Route::get('std11', 'std11Controller@index');
         Route::get('std11/search', 'std11Controller@search');
+        Route::post('std11/batch-edit', 'std11Controller@batchEdit');
 
         Route::get('std11/create', 'std11Controller@showCreate');
         Route::post('std11/create', 'std11Controller@create');
