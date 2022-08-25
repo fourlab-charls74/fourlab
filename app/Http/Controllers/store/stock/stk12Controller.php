@@ -155,33 +155,64 @@ class stk12Controller extends Controller
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
         }
 
-        $store_cds = array_filter(explode(',', $r['store_nos']));
+        $store_cds = $r['store_no'] ?? [];
+        $store_type = $r['store_type'] ?? '';
+        $where = "";
+        $is_type_cd = false;
+
+        if(count($store_cds) < 1) {
+            $sql = "
+                select store_cd
+                from store
+                where store_type = '$store_type'
+            ";
+            $store_cds = DB::select($sql);
+            $is_type_cd = true;
+        }
+
+        if($store_type != '') $where .= " and store.store_type = '$store_type'";
 
         foreach($result as $re) {
             $prd_cd = $re->prd_cd;
             foreach($store_cds as $cd) {
+                if($is_type_cd) $cd = $cd->store_cd;
                 $qty = $cd . '_qty';
                 $wqty = $cd . '_wqty';
                 $rel_qty = $cd . '_rel_qty';
                 $sql = "
-                    select qty as $qty, wqty as $wqty
-                    from product_stock_store
+                    select s.qty as $qty, s.wqty as $wqty
+                    from product_stock_store s
+                        inner join store on store.store_cd = s.store_cd
                     where 1=1
-                        and prd_cd = '$prd_cd'
-                        and store_cd = '$cd'
+                        and s.prd_cd = '$prd_cd'
+                        and s.store_cd = '$cd'
+                        $where
                 ";
                 $row = DB::selectOne($sql);
                 $re->$cd = $row;
             }
         }
-        // dd($result);
+
+        $stores = [];
+        foreach($store_cds as $cd) {
+            if($is_type_cd) $cd = $cd->store_cd;
+            $sql = "
+                select store_cd, store_nm
+                from store
+                where store_cd = '$cd' $where
+            ";
+            $row = DB::selectOne($sql);
+            if($row != null) array_push($stores, $row);
+        }
+
 		return response()->json([
 			"code" => $code,
 			"head" => [
 				"total" => $total,
 				"page" => $page,
 				"page_cnt" => $page_cnt,
-				"page_total" => count($result)
+				"page_total" => count($result),
+                "stores" => $stores,
 			],
 			"body" => $result
 		]);

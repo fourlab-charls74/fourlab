@@ -312,7 +312,7 @@
 
         // 매장검색
         $( ".sch-store" ).on("click", function() {
-            searchStore.Open(null, true);
+            searchStore.Open(null, "multiple");
         });
 	});
 

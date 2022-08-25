@@ -75,7 +75,7 @@
                                 <label for="store_cd">매장명</label>
                                 <div class="form-inline inline_btn_box">
                                     <input type='hidden' id="store_nm" name="store_nm">
-                                    <select id="store_no" name="store_no" class="form-control form-control-sm select2-store multi_select" multiple></select>
+                                    <select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select" multiple></select>
                                     <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                 </div>
                             </div>
@@ -372,59 +372,13 @@
 
             // 매장검색
             $( ".sch-store" ).on("click", function() {
-                searchStore.Open(null, true);
+                searchStore.Open(null, "multiple");
             });
         });
 
         // 검색버튼 클릭 시
         function Search() {
-            let store_type = $("[name=store_type]").val();
-            let store_nos = $("[name=store_no]").val();
-
-            let url = '/store/api/stores/search-storenm-from-type';
-            let data = {store_type: store_type};
-            if(store_nos.length > 0) {
-                url = '/store/api/stores/search-storenm';
-                data = {store_cds: store_nos};
-            }
-            
-            if(store_nos.length < 1 && store_type === '') {
-                SearchConnect();
-            } else {
-                axios({
-                    url: url,
-                    method: 'post',
-                    data: data,
-                }).then(function (res) {
-                    if(res.data.code === 200) {
-                        if(store_nos.length > 0 && store_type !== '') {
-                            // 매장구분, 매장명 둘 다 선택한 경우
-                            axios({
-                                url: '/store/api/stores/search-storenm-from-type',
-                                method: 'post',
-                                data: {store_type: store_type},
-                            }).then(function (response) {
-                                if(response.data.code === 200) {
-                                    let arr = res.data.body.filter(r => response.data.body.find(f => f.store_cd === r.store_cd));
-                                    SearchConnect(arr.map(r => r.store_cd));
-                                }
-                            }).catch(function (error) {
-                                console.log(error);
-                            });
-                        } else {
-                            SearchConnect(res.data.body.map(r => r.store_cd));
-                        }
-                    }
-                }).catch(function (err) {
-                    console.log(err);
-                });
-            }
-        }
-
-        // 검색연결
-        function SearchConnect(store_cds = []) {
             let d = $('form[name="search"]').serialize();
-            d += "&store_nos=" + store_cds;
             gx.Request('/store/stock/stk13/search', d, -1);
         }
 

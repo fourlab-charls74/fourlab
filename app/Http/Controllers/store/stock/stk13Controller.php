@@ -34,7 +34,7 @@ class stk13Controller extends Controller
 	public function search(Request $request)
 	{
 		$r = $request->all();
-
+		
 		$code = 200;
 		$where = "";
 		$store_where = "";
@@ -42,7 +42,7 @@ class stk13Controller extends Controller
 		
 		$sdate = $r['sdate'] ?? '';
 		$edate = $r['edate'] ?? '';
-        $store_cds = array_filter(explode(',', $r['store_nos']));
+        $store_cds = $r['store_no'] ?? [];
 
 		// store_where
 		foreach($store_cds as $key => $cd) {
@@ -57,6 +57,8 @@ class stk13Controller extends Controller
 		}
 
         // where
+		if($r['store_type'] != null)
+			$where .= " and store.store_type = '" . $r['store_type'] . "'";
 		if($r['prd_cd'] != null) 
 			$where .= " and o.prd_cd = '" . $r['prd_cd'] . "'";
 		else
@@ -151,6 +153,7 @@ class stk13Controller extends Controller
 			from order_opt o
 				inner join product_stock_storage pss on pss.prd_cd = o.prd_cd and pss.storage_cd = (select storage_cd from storage where default_yn = 'Y')
 				inner join product_stock_store ps on ps.prd_cd = o.prd_cd and ps.store_cd = o.store_cd
+				inner join store on store.store_cd = o.store_cd
 				left outer join goods g on g.goods_no = o.goods_no
 				left outer join brand b on b.brand = g.brand
 				left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
