@@ -18,7 +18,7 @@
                 <a href="javascript:;" class="arrow"><i class="bx bx-shopping-bag fs-18"></i><span>상품관리</span></a>
                 <ul>
                     <li><a href="/head/product/prd01" target="_blank">(개)상품관리</a></li>
-                    <li><a href="/store/product/prd02">(개)상품관리(재고)</a></li>
+                    <li><a href="/store/product/prd02">(완)상품관리(재고)</a></li>
                     <li><a href="/head/product/prd01" target="_blank">원부자재관리</a></li>
                 </ul>
             </li>
@@ -76,7 +76,7 @@
                 <ul>
                     <li><a href="/store/sale/sal01">(완)판매일보</a></li>
                     <li><a href="/store/sale/sal02">(완)월별판매집계표</a></li>
-                    <li><a href="/store/sale/sal03">(개)기간별 Best/Worst 판매현황</a></li>
+                    <li><a href="/store/sale/sal03">(완)기간별 Best/Worst 판매현황</a></li>
                     <li><a href="/store/sale/sal06">(완)매장별판매분석</a></li>
                     <li><a href="/store/sale/sal07">(완)상품별 이익현황</a></li>
                 </ul>
