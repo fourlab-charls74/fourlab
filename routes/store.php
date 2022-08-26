@@ -305,6 +305,11 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('sal18/search', 'sal18Controller@search');
         Route::get('sal18/search-store', 'sal18Controller@search_store');
         Route::post('sal18/save', 'sal18Controller@save');
+
+        // 매장LOSS등록
+        Route::get('sal20', 'sal20Controller@index');
+        Route::get('sal20/search', 'sal20Controller@search');
+        Route::post('sal20/loss', 'sal20Controller@save_loss');
     });
 
     Route::prefix("account")->namespace('account')->group(function () {

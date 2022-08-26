@@ -73,8 +73,9 @@ class stk26Controller extends Controller
 		]);
     }
 
-    public function show($sc_cd = '')
+    public function show($sc_cd = '', Request $request)
     {
+        $editable = $request->input("editable", 'Y'); // 매장LOSS등록에서 실사상세팝업에 접근할 경우, 정보를 수정할 수 없습니다.
         $sc = '';
         $new_sc_cd = '';
 
@@ -106,6 +107,7 @@ class stk26Controller extends Controller
             if($row == null) $new_sc_cd = 1;
             else $new_sc_cd = $row->sc_cd + 1;
         }
+        if($editable == 'N') $sc->sc_state = 'Y';
 
         $values = [
             "cmd"           => $sc == '' ? "add" : "update",
