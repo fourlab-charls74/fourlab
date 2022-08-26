@@ -45,6 +45,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('members', 'MemberController@show');
         Route::get('members/search', 'MemberController@search');
 
+        // 관리자 (담당자MD) 조회
+        Route::get('mds/search', 'AdminController@search');
+
         // 매장명 조회
         Route::get('stores', 'StoreController@show');
         Route::get('stores/search', 'StoreController@search');

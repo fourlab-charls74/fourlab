@@ -93,10 +93,13 @@
                                             <td>
                                                 <div class="form-inline">
                                                     @if(@$cmd == 'add')
-                                                    {{-- md 관련 api 작업 예정 --}}
-                                                    <input type="text" id="md_id" name="md_id" class="form-control form-control-sm w-100">
+                                                    <div class="form-inline inline_btn_box w-100">
+                                                        <input type="hidden" id="md_id" name="md_id">
+                                                        <input type="text" id="md_nm" name="md_nm" class="form-control form-control-sm w-100 bg-white" readonly>
+                                                        <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-md"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                                    </div>
                                                     @else
-                                                    <p class="fs-14">{{ $sc->md_id }}</p>
+                                                    <p class="fs-14">{{ $sc->md_nm }}</p>
                                                     @endif
                                                 </div>
                                             </td>
