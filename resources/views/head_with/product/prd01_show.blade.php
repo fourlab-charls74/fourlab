@@ -949,7 +949,7 @@
 												<a href="#" class="btn btn-sm btn-primary shadow-sm option-add-btn"><span class="fs-12">관리</span></a>
 												<a href="#" class="btn btn-sm btn-primary shadow-sm option-del-btn"><span class="fs-12">삭제</span></a>
 												<a href="#" class="btn btn-sm btn-primary shadow-sm option-sav-btn"><span class="fs-12">저장</span></a>
-												<a href="javascript:void(0);" onclick="alert('입고는 추후 진행할 예정입니다.')" class="btn btn-sm btn-primary shadow-sm option-inv-btn"><span class="fs-12">입고</span></a>
+												<a href="javascript:void(0);" onclick="openOptsStock();" class="btn btn-sm btn-primary shadow-sm option-inv-btn"><span class="fs-12">입고</span></a>
 											</div>
 										</div>
 									</div>
@@ -3175,6 +3175,11 @@
         } else if (data?.code == 500) {
             alert("저장중 에러가 발생했습니다. 잠시 후 다시 시도해주세요.");
         };
+    };
+
+    const openOptsStock = () => { // 상품관리 - 입고 오픈
+        const url = `/head/product/prd01/${goods_no}/stock`;
+        const pop_up = window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1024,height=960");
     };
 
     /**

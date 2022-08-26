@@ -15,7 +15,6 @@ use App\Models\Conf;
 
 class std11Controller extends Controller
 {
-
 	const T = "after_service";
 
 	public function index()

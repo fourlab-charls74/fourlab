@@ -319,6 +319,8 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::post("prd01/get-extra-options", "prd01Controller@getExtraOptions");
         Route::post("prd01/{no}/update-basic-opts-data", "prd01Controller@updateBasicOptsData");
         Route::post("prd01/update-extra-opts-data", "prd01Controller@updateExtraOptsData");
+        Route::get('prd01/{no}/stock', 'prd01Controller@stock');
+        Route::post('prd01/stock-in', 'prd01Controller@stockIn');
 
         // 관련 상품
         Route::post('prd01/add-related-goods', 'prd01Controller@addRelatedGoods');

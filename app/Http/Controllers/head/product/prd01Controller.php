@@ -1910,13 +1910,13 @@ class prd01Controller extends Controller
 	private function get_history_modify($goods_no)
 	{
 		$query = "
-					select
-						date_format(a.upd_date,'%y.%m.%d %h:%i:%s') as upd_date
-						, a.memo, a.head_desc, a.price, a.wonga, a.margin, a.id, b.name
-					from goods_modify_hist a
-						inner join mgr_user b on a.id = b.id
-					where a.goods_no = $goods_no
-					order by a.hist_no desc
+			select
+				date_format(a.upd_date,'%y.%m.%d %h:%i:%s') as upd_date, 
+				a.memo, a.head_desc, a.price, a.wonga, a.margin, a.id, b.name
+			from goods_modify_hist a
+				inner join mgr_user b on a.id = b.id
+			where a.goods_no = $goods_no
+			order by a.hist_no desc
 		";
 
 		$result = DB::select($query);
@@ -2790,6 +2790,89 @@ class prd01Controller extends Controller
 			$code = 500;
 		}
 		return response()->json(['code' => $code]);
+	}
+
+	public function stock($goods_no = 0)
+	{
+		$wonga = 0;
+		$sql = "
+			select wonga from goods
+			where goods_no = :goods_no and goods_sub = '0'
+		";
+		$result = DB::select($sql, ['goods_no' => $goods_no]);
+		if (count($result) > 0) $wonga = $result[0]->wonga;
+
+		$values = $this->getBasicOptsMatrix($goods_no)->getOriginalContent();
+		$values['sdate'] = date("Y-m-d");
+		$values['invoice'] = date("Ymd");
+		$values['wonga'] = Lib::cm($wonga);
+		$values['locs'] = SLib::getCodes('G_STOCK_LOC')->all();
+
+		// dd($values);
+
+        return view( Config::get('shop.head.view') . '/product/prd01_stock', $values);
+	}
+
+	public function stockIn(Request $request)
+	{
+		
+		// // 설정 값 얻기
+		// $conf = new Config($conn, $this->user);
+		// $cfg_domain = $conf->getConfigValue("shop", "domain");
+
+		// $goods_no = Request("GOODS_NO");
+		// $goods_sub = Request("GOODS_SUB");
+		// $invoice_no = Rq(Request("INVOICE_NO"));
+		// $wonga = CheckInt(Request("WONGA"));
+		// $loc = Request("LOC");
+		// $data = Rq(Request("DATA"));
+		// $a_row = split("\n", $data);
+
+		// $jaego = new Jaego($conn, $this->user);  //재고 클래스 호출
+		// $jaego->SetLoc($loc);
+
+		// $err_msg = "";
+
+		// $conn->StartTrans();
+
+		// for ($i = 0; $i < count($a_row); $i++) {
+
+		// 	$a_col = split("\t", $a_row[$i]);
+		// 	$opt = $a_col[0];
+		// 	$qty = $a_col[1];
+
+		// 	$sql = "
+		// 		select opt_name from goods_summary where goods_no = '$goods_no' and goods_sub = '$goods_sub'
+		// 	";
+		// 	$rs = &$conn->Execute($sql);
+		// 	$row = $rs->fields;
+		// 	$opt_name = $row["opt_name"];
+
+		// 	$check = $jaego->Plus(array(
+		// 		"type" => 1,
+		// 		"etc" => '',
+		// 		"qty" => $qty,
+		// 		"goods_no" => $goods_no,
+		// 		"goods_sub" => $goods_sub,
+		// 		"goods_opt" => $opt,
+		// 		"wonga" => $wonga,
+		// 		"invoice_no" => $invoice_no,
+		// 		"opt_name"	=>  $opt_name,
+		// 		"wonga_apply_yn" => "Y"
+		// 	));
+		// 	if (!$check) {
+		// 		$err_msg .= _f("재고조정용 발주건 또는 송장번호가 존재하지 않습니다.\\n발주건은 공급처가 [%1] 만 가능합니다.\\n", $cfg_domain);
+		// 	}
+		// }
+		// if ($conn->CompleteTrans()) {
+		// 	if ($err_msg == "") {
+		// 		echo 1;
+		// 	} else {
+		// 		echo $err_msg;
+		// 	}
+		// } else {
+		// 	echo 0;
+		// }
 	}
 
 	/*
