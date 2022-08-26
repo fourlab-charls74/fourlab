@@ -254,6 +254,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk26','stk26Controller@index');
         Route::get('stk26/search','stk26Controller@search');
         Route::get('stk26/show/{sc_cd?}','stk26Controller@show');
+        Route::get('stk26/search-check-products','stk26Controller@search_check_products');
+        Route::put('stk26/save', 'stk26Controller@save');
+        Route::put('stk26/update', 'stk26Controller@update');
         
         // 창고반품
         Route::get('stk30','stk30Controller@index');

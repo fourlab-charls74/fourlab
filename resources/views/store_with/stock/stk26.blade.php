@@ -131,9 +131,11 @@
         },
         {field: "store_cd", headerName: "매장코드", width: 100, cellStyle: {"text-align": "center"}},
         {field: "store_nm", headerName: "매장명", width: 150},
+        {field: "loss_qty", headerName: "LOSS 총수량", width: 80, type: "currencyType"},
+        {field: "loss_price", headerName: "LOSS 총금액", width: 80, type: "currencyType"},
         {field: "sc_state", headerName: "LOSS처리여부", width: 100, cellStyle: (params) => ({"text-align": "center", "color": params.value == "N" ? "red" : params.value == "Y" ? "green" : "none"})},
         {field: "md_id", hide: true},
-        {field: "md_nm", headerName: "담당자", width: 80},
+        {field: "md_nm", headerName: "담당자", width: 80, cellStyle: {"text-align": "center"}},
         {field: "comment", headerName: "메모", width: 300},
         {width: 'auto'}
     ];
