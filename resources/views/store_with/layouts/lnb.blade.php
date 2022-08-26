@@ -43,7 +43,7 @@
                     <li><a href="/store/stock/stk20">(완)매장RT</a></li>
                     <li><a href="">매장주문 - 는 포스화면</a></li>
                     <li><a href="/store/stock/stk25">(완)매장별할인율적용조회</a></li>
-                    <li><a href="/store/stock/stk26">(개)실사</a></li>
+                    <li><a href="/store/stock/stk26">(완)실사</a></li>
                 </ul>
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-line-chart fs-18"></i><span>고객/수선관리</span></a>
@@ -68,7 +68,7 @@
                     <!--<li><a href="/store/sale/sal11">배분현황</a></li>//-->
                     <li><a href="/store/sale/sal17">(완)매장목표</a></li>
                     <li><a href="/store/sale/sal18">(완)월별할인적용유형관리</a></li>
-                    <li><a href="/store/sale/sal20">(개)메장LOSS등록</a></li>
+                    <li><a href="/store/sale/sal20">(완)메장LOSS등록</a></li>
                 </ul>
             </li>
             <li>

@@ -237,6 +237,7 @@
                 return alert("매장을 선택해주세요.");
             }
             if(rows.length < 1) return alert("실사등록할 상품을 선택해주세요.");
+            if($("[name=md_id]").val() === '') return alert("담당자를 선택해주세요.");
 
             if(!confirm("등록하시겠습니까?")) return;
 
