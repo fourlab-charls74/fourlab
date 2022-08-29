@@ -8,6 +8,7 @@
             </div>
         </div>
         <form name="stock">
+            <input name="goods_no" type="hidden" class="d-none" value="{{ $goods_no }}">
             <div class="card_wrap aco_card_wrap">
                 <div class="card shadow">
                     <div class="card-body mt-1">
@@ -37,10 +38,10 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th><label for="invoice">송장번호</label></th>
+                                                <th><label for="invoice_no">송장번호</label></th>
                                                 <td>
                                                     <div class="flex_box">
-                                                        <input type='text' class="form-control form-control-sm" name='invoice' id="invoice" value='{{ $invoice }}'>
+                                                        <input type='text' class="form-control form-control-sm" name='invoice_no' id="invoice_no" value='{{ $invoice_no }}'>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -95,10 +96,11 @@
             </div>
         </form>
         <div class="resul_btn_wrap mt-3 d-block">
-            <a href="javascript:Save();" class="btn btn-sm btn-primary submit-btn">입고</a>
+            <a href="javascript:;" onclick="stockIn()" class="btn btn-sm btn-primary submit-btn">입고</a>
             <a href="javascript:;" class="btn btn-sm btn-secondary" onclick="window.close()">취소</a>
         </div>
     </div>
+    
     <style>
         /* 상품 옵션 grid - gx2 셀 변경시 색깔 css */
         .opt-cell-changed {
@@ -106,6 +108,7 @@
             color: white;
             font-weight: 700;
         }
+
         /* 옵션 컬럼 셀 잠금 */
         .locked-cell.ag-cell:focus{  border:none !important;  outline: none; border-right: 1px solid #bdc3c7 !important }
         .locked-cell.ag-cell.ag-cell-range-selected:not(.ag-cell-range-single-cell).ag-cell-range-left {
@@ -120,13 +123,17 @@
         .locked-cell.ag-cell.ag-cell-range-selected:not(.ag-cell-range-single-cell).ag-cell-range-bottom {
             border-bottom-color: transparent;
         }
-
         .ag-theme-balham .ag-ltr .locked-cell.ag-cell-range-single-cell, 
         .ag-theme-balham .ag-ltr .locked-cell.ag-cell-range-single-cell.ag-cell-range-handle, 
         .ag-theme-balham .ag-ltr .ag-has-focus .locked-cell.ag-cell-focus:not(.ag-cell-range-selected), 
         .ag-theme-balham .ag-rtl .ag-cell-range-single-cell, .ag-theme-balham .ag-rtl .locked-cell.ag-cell-range-single-cell.ag-cell-range-handle, 
         .ag-theme-balham .ag-rtl .ag-has-focus .locked-cell.ag-cell-focus:not(.ag-cell-range-selected) {
             border: 1px solid transparent;
+        }
+
+        /* 수정 시 글자 색깔이 검은색으로 고정되도록 적용 (수정후 글자색이 흰색으로 변환되지 않도록 처리) */
+        .ag-cell-inline-editing {
+            color: black;
         }
     </style>
     <script type="text/javascript" charset="utf-8">
@@ -139,11 +146,17 @@
         const OPT1_KIND_NM = "{{ @$opt_kind_names[0] }}";
         const OPT2_KIND_NM = "{{ @$opt_kind_names[1] }}";
 
+        const IS_SINGLE = "{{ @$is_single ? 'true' : 'false' }}";
+
         const optCellClassRules = { // 색 변경 규칙 정의
             "opt-cell-changed": params => {
                 const column_name = params.colDef.field;
                 if (params.data.hasOwnProperty('is_changed')) {
-                    return params.data?.is_changed[column_name] ? true : false;
+                    if (IS_SINGLE == "true") {
+                        return params.data?.is_changed ? true : false;
+                    } else if (IS_SINGLE == "false") {
+                        return params.data?.is_changed[column_name] ? true : false;
+                    }
                 } else {
                     return false;
                 }
@@ -153,7 +166,7 @@
         let opt1_kind_opts = [];
         @if (count(@$opt_matrix['opt1']) > 0)
             @foreach (@$opt_matrix['opt1'] as $idx => $obj)
-                opt1_kind_opts.push({opt1_kind_name: "{{ $obj->opt_nm }}"});
+                opt1_kind_opts.push({opt1_nm: "{{ $obj->opt_nm }}"});
             @endforeach
         @endif
 
@@ -161,7 +174,7 @@
         @if (count(@$opt_matrix['opt2']) > 0)
             @foreach (@$opt_matrix['opt2'] as $idx => $obj)
                 opt2_kind_opts.push({
-                    headerName: "{{ $obj->opt_nm }}", field: "{{ $idx }}", 
+                    headerName: "{{ $obj->opt_nm }}", field: "opt2_{{ $obj->opt_nm }}", 
                     type: 'numberType', suppressMovable: true, 
                     cellClassRules: optCellClassRules,
                     editable: true,
@@ -171,17 +184,34 @@
         @endif
 
         const optStockColumns = (opt1_kind_nm, opt2_kind_nm) => {
-            let cols = [
-                {field: "opt1_kind_name", headerName: opt1_kind_nm, width:100, cellStyle: CELL_COLOR.LOCKED, cellClass: "locked-cell", pinned: 'left', suppressMovable: true},
-                {
-                    field: "opt2_kind_name",
-                    headerName: opt2_kind_nm,
-                    width: 120,
-                    
-                },
-                {field: "nvl", width: "auto", headerName: ""}
-            ];
-            if (opt2_kind_opts.length > 0) cols[1].children = opt2_kind_opts;
+            let cols = [];
+            if (IS_SINGLE == "true") {
+                // 단일 옵션인 경우
+                cols = [
+                    {field: "opt1_nm", headerName: "옵션", width:100, cellStyle: CELL_COLOR.LOCKED, cellClass: "locked-cell", pinned: 'left', suppressMovable: true},
+                    {
+                        field: "qty",
+                        headerName: "입고수량",
+                        width: 120,
+                        cellStyle: CELL_COLOR.YELLOW,
+                        editable: true,
+                        cellClassRules: optCellClassRules
+                    },
+                    {field: "nvl", width: "auto", headerName: ""}
+                ];
+            } else if (IS_SINGLE == "false") {
+                // 멀티 옵션인 경우
+                cols = [
+                    {field: "opt1_nm", headerName: "옵션", width:100, cellStyle: CELL_COLOR.LOCKED, cellClass: "locked-cell", pinned: 'left', suppressMovable: true},
+                    {
+                        field: "opt2_kind_name",
+                        headerName: "입고수량",
+                        width: 120
+                    },
+                    {field: "nvl", width: "auto", headerName: ""}
+                ];
+                if (opt2_kind_opts.length > 0) cols[1].children = opt2_kind_opts;
+            }
             return cols;
         };
 
@@ -215,12 +245,17 @@
                     gxStartEditingCell(row_index, column_name);
                 }
 
-                // 셀 값 수정시 빨간색으로 변경
-                if (row.hasOwnProperty('is_changed')) {
-                    row.is_changed[column_name] = true;
-                } else {
-                    row.is_changed = {};
-                    row.is_changed[`${column_name}`] = true;
+                // 셀 값 수정시 빨간색으로 변경 - 단일 옵션인 경우
+                if (IS_SINGLE == "true") {
+                    row.is_changed = true;
+                } else if (IS_SINGLE == "false") {
+                    // 셀 값 수정시 빨간색으로 변경 - 2단 옵션인 경우
+                    if (row.hasOwnProperty('is_changed')) {
+                        row.is_changed[column_name] = true;
+                    } else {
+                        row.is_changed = {};
+                        row.is_changed[`${column_name}`] = true;
+                    }
                 }
                 gx.gridOptions.api.applyTransaction({ update : [row] });
             }
@@ -242,6 +277,83 @@
 
         setOptRows();
         autoSizeColumns(gx, ["nvl"]);
+
+        const validate = () => {
+            if ( document.stock.sdate.value == "" ) {
+                alert("입고일자를 입력해주세요.");
+                document.stock.sdate.focus();
+                return false;
+            }
+
+            if ( document.stock.invoice_no.value == "" ) {
+                alert("송장번호를 입력해주세요.");
+                document.stock.invoice_no.focus();
+                return false;
+            }
+
+            if ( document.stock.wonga.value == "" ) {
+                alert("원가를 입력해주세요.");
+                document.stock.wonga.focus();
+                return false;
+            }
+            return true;
+        };
+
+        const refinedData = () => {
+            const rows = gx.getRows();
+            let data = [];
+            if (IS_SINGLE == "true") {
+                rows.map((row) => {
+                    const opt = row.opt1_nm;
+                    const qty = row.qty;
+                    data.push({ opt: opt, qty: qty });
+                });
+            } else if (IS_SINGLE == "false") {
+                rows.map((row) => {
+                    let opt2_nms = [];
+                    Object.keys(row).map(key => {
+                        const arr = key.split("opt2_");
+                        if (arr.length > 1 && arr[1]) opt2_nms.push(arr[1]);
+                    })
+                    const opt1_nm = row.opt1_nm;
+                    opt2_nms.map(key => {
+                        const opt = opt1_nm + "^" + key;
+                        const qty = row[`opt2_${key}`];
+                        data.push({ opt: opt, qty: qty });
+                    });
+                });
+            }
+            return data;
+        };
+
+        const stockIn = async () => {
+            if (validate() === false) return false;
+            if (confirm('입력하신 수량으로 입고 처리 하시겠습니까?')) {
+                try {
+                    const response = await axios({ 
+                        url: `/head/product/prd01/stock-in`, method: 'post', 
+                        data: {
+                            'goods_no': document.stock.goods_no.value,
+                            'invoice_no': document.stock.invoice_no.value,
+                            'wonga': document.stock.wonga.value,
+                            'loc': document.stock.loc.value,
+                            'data': refinedData()
+                        }
+                    });
+                    const { data, cfg_domain } = response;
+                    if (data?.code == 200) {
+                        alert("[ 입고완료 ] 입고 처리가 완료되었습니다.");
+                        window.opener.location.reload();
+                    } else if (data?.code == 500) { 
+                        alert("[ 입고 실패 ] 관리자에게 문의해 주세요.");
+                    } else if (data?.code == -1) {
+                        alert("재고조정용 발주건 또는 송장번호가 존재하지 않습니다.\\n발주건은 공급처가 [%1] 만 가능합니다.\\n", cfg_domain);
+                    }
+                } catch (error) {
+                    // console.log(error);
+                }
+            }
+        };
 
     </script>
 @stop

@@ -2743,7 +2743,7 @@
     };
 
     const setRightOptRows = async (type, { result }) => {
-
+        
         if (type == "기본") {
 
             let list = [];
@@ -2902,14 +2902,15 @@
 
                     if ($("[name='opt_type']").val() === 'basic' && basic_count == 0) location.reload();
 
-                    resetAddOptionKindBox();
-                    searchOptKind();
+                    // resetAddOptionKindBox();
+                    // searchOptKind();
 
                     // 사용안함인 경우 api에 none 뜨는 버그 방지 (goods_no가 null 인 경우)
-                    const GOODS_NO = document.f1.goods_no.value;
-                    controlOption.SetGoodsNo(GOODS_NO);
+                    // const GOODS_NO = document.f1.goods_no.value;
+                    // controlOption.SetGoodsNo(GOODS_NO);
+                    // initOptGridAndApi();
 
-                    initOptGridAndApi();
+                    window.location.reload(); // 추가시 관리팝업에서 옵션구분이 다른 경우가 있어 새로고침 처리
 
                 } else alert(res.msg);
             },
@@ -2938,8 +2939,9 @@
             },
             success: function (res) {
                 if(res.code === 200) {
-                    searchOptKind();
-                    initOptGridAndApi();
+                    // searchOptKind();
+                    // initOptGridAndApi();
+                    window.location.reload(); // 삭제시 관리팝업에서 옵션구분이 다른 경우가 있어 새로고침 처리
                 }
                 else alert(res.msg);
             },

@@ -2667,7 +2667,7 @@ class prd01Controller extends Controller
 		}
 
 		$sql = 
-			" select distinct(substring_index(goods_opt, '^', :index)) as opt_nm from goods_summary where goods_no = :goods_no and use_yn = 'Y' order by opt_nm ";
+			" select distinct(substring_index(goods_opt, '^', :index)) as opt_nm from goods_summary where goods_no = :goods_no and use_yn = 'Y' order by seq";
 	
 		if ($opt_kind_cnt > 0) {
 			$opt['opt1'] = DB::select($sql,['goods_no' => $goods_no, 'index' => 1]);
@@ -2804,7 +2804,8 @@ class prd01Controller extends Controller
 
 		$values = $this->getBasicOptsMatrix($goods_no)->getOriginalContent();
 		$values['sdate'] = date("Y-m-d");
-		$values['invoice'] = date("Ymd");
+		$values['goods_no'] = $goods_no;
+		$values['invoice_no'] = date("Ymd");
 		$values['wonga'] = Lib::cm($wonga);
 		$values['locs'] = SLib::getCodes('G_STOCK_LOC')->all();
 
@@ -2815,64 +2816,61 @@ class prd01Controller extends Controller
 
 	public function stockIn(Request $request)
 	{
+		// 설정 값 얻기
+		$conf = new Conf();
+		$cfg_domain = $conf->getConfigValue("shop", "domain");
+
+		$user = [
+			'id' => Auth('head')->user()->id,
+			'name' => Auth('head')->user()->name
+		];
+
+		$inputs = $request->all();
+
+		try {
+			DB::transaction(function () use (&$inputs, $user, $cfg_domain) {
+
+				$goods_no = $inputs['goods_no'];
+				$invoice_no = $inputs['invoice_no'];
+				$wonga = $inputs['wonga'];
+				$loc = $inputs['loc'];
+				$data = $inputs['data'];
+
+				$jaego = new Jaego($user); // 재고 클래스 호출
+				$jaego->SetLoc($loc);
+				
+				foreach ($data as $row) {
+					$qty = $row['qty'];
+					$opt = $row['opt'];
+					$sql = "
+						select distinct opt_name from goods_summary where goods_no = :goods_no and goods_sub = '0'
+					";
+					$result = DB::selectOne($sql, ['goods_no' => $goods_no]);
+					$opt_name = $result->opt_name;
+
+					$check = $jaego->Plus(array(
+						"type" => 1,
+						"etc" => '',
+						"qty" => $qty,
+						"goods_no" => $goods_no,
+						"goods_sub" => 0,
+						"goods_opt" => $opt,
+						"wonga" => $wonga,
+						"invoice_no" => $invoice_no,
+						"opt_name"	=>  $opt_name,
+						"wonga_apply_yn" => "Y"
+					));
 		
-		// // 설정 값 얻기
-		// $conf = new Config($conn, $this->user);
-		// $cfg_domain = $conf->getConfigValue("shop", "domain");
-
-		// $goods_no = Request("GOODS_NO");
-		// $goods_sub = Request("GOODS_SUB");
-		// $invoice_no = Rq(Request("INVOICE_NO"));
-		// $wonga = CheckInt(Request("WONGA"));
-		// $loc = Request("LOC");
-		// $data = Rq(Request("DATA"));
-		// $a_row = split("\n", $data);
-
-		// $jaego = new Jaego($conn, $this->user);  //재고 클래스 호출
-		// $jaego->SetLoc($loc);
-
-		// $err_msg = "";
-
-		// $conn->StartTrans();
-
-		// for ($i = 0; $i < count($a_row); $i++) {
-
-		// 	$a_col = split("\t", $a_row[$i]);
-		// 	$opt = $a_col[0];
-		// 	$qty = $a_col[1];
-
-		// 	$sql = "
-		// 		select opt_name from goods_summary where goods_no = '$goods_no' and goods_sub = '$goods_sub'
-		// 	";
-		// 	$rs = &$conn->Execute($sql);
-		// 	$row = $rs->fields;
-		// 	$opt_name = $row["opt_name"];
-
-		// 	$check = $jaego->Plus(array(
-		// 		"type" => 1,
-		// 		"etc" => '',
-		// 		"qty" => $qty,
-		// 		"goods_no" => $goods_no,
-		// 		"goods_sub" => $goods_sub,
-		// 		"goods_opt" => $opt,
-		// 		"wonga" => $wonga,
-		// 		"invoice_no" => $invoice_no,
-		// 		"opt_name"	=>  $opt_name,
-		// 		"wonga_apply_yn" => "Y"
-		// 	));
-		// 	if (!$check) {
-		// 		$err_msg .= _f("재고조정용 발주건 또는 송장번호가 존재하지 않습니다.\\n발주건은 공급처가 [%1] 만 가능합니다.\\n", $cfg_domain);
-		// 	}
-		// }
-		// if ($conn->CompleteTrans()) {
-		// 	if ($err_msg == "") {
-		// 		echo 1;
-		// 	} else {
-		// 		echo $err_msg;
-		// 	}
-		// } else {
-		// 	echo 0;
-		// }
+					if (!$check) {
+						return response()->json(['code'	=> '-1', 'cfg_domain' => $cfg_domain]);
+					}
+				}
+			});
+			return response()->json(['code'	=> '200', 'cfg_domain' => $cfg_domain]);
+		} catch (\Exception $e) {
+            // dd($e->getMessage());
+			return response()->json(['code'	=> '500', 'cfg_domain' => $cfg_domain]);
+		}
 	}
 
 	/*
