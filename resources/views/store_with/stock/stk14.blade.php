@@ -274,9 +274,6 @@
                         type: "currencyType",
                         hide: true,
                         width: 50,
-                        cellRenderer: function(params) {
-                            return params.data.store_qty?.qty || 0;
-                        }
                     },
                     {
                         field: 'store_wqty',
@@ -284,9 +281,6 @@
                         type: "currencyType",
                         hide: true,
                         width: 80,
-                        cellRenderer: function(params) {
-                            return params.data.store_qty?.wqty || 0;
-                        }
                     },
                     {
                         field: 'rel_qty',
