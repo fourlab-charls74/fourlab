@@ -275,7 +275,7 @@
 <script language="javascript">
     let columns = [
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
-        {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {"text-align": "center"}},
+        {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
         {field: "goods_no", headerName: "상품번호", cellStyle: {"text-align": "center"}},
         {field: "goods_type_nm", headerName: "상품구분", cellStyle: StyleGoodsType},
         {field: "opt_kind_nm", headerName: "품목", width: 100, cellStyle: {"text-align": "center"}},
