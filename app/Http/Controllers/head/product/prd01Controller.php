@@ -2408,14 +2408,7 @@ class prd01Controller extends Controller
 					select distinct substring_index(goods_opt, '^', :index) as goods_opt, substring_index(opt_name, '^', :index2) as opt_name, goods_no
 					from goods_summary 
 					where goods_no = :goods_no and use_yn = 'Y'
-					order by seq
-				";
-
-				$sql = "
-					select distinct substring_index(goods_opt, '^', :index) as goods_opt, substring_index(opt_name, '^', :index2) as opt_name, goods_no
-					from goods_summary 
-					where goods_no = :goods_no and use_yn = 'Y'
-					order by seq
+					order by goods_opt
 				";
 
 				$result = array_merge(DB::select($sql, ['index' => 1, 'index2' => 1, 'goods_no' => $goods_no]), DB::select($sql, ['index' => -1, 'index2' => -1, 'goods_no' => $goods_no]));
@@ -2667,7 +2660,7 @@ class prd01Controller extends Controller
 		}
 
 		$sql = 
-			" select distinct(substring_index(goods_opt, '^', :index)) as opt_nm from goods_summary where goods_no = :goods_no and use_yn = 'Y' order by seq";
+			" select distinct(substring_index(goods_opt, '^', :index)) as opt_nm from goods_summary where goods_no = :goods_no and use_yn = 'Y' order by goods_opt";
 	
 		if ($opt_kind_cnt > 0) {
 			$opt['opt1'] = DB::select($sql,['goods_no' => $goods_no, 'index' => 1]);

@@ -58,41 +58,68 @@ class std08Controller extends Controller
 			return $item->sortByDesc('seq')->values();
 		});
 		try {
-			DB::transaction(function () use (&$data, &$f_data) {
+			DB::transaction(function () use (&$f_data) {
 				foreach ($f_data as $group_key => $group) {
 					$grade_cd = $group_key;
 					$duplicated = count($group) > 1 ? true : false;
-					if ($duplicated) {
+
+					if ($duplicated) { // 등급 코드(grade_cd)가 중복된 경우 - 복수 행
+
 						/**
-						 * grade_cd가 중복된 경우 - 순서가 제일 아래인 행을 기준으로 종료일 변경
+						 * 순서가 제일 아래인 행을 기준으로 종료일 업데이트 되도록 설정
 						 */
 						$highest_seq_item = $group[0];
-						$idx = Lib::quote($highest_seq_item['idx']);
-						$grade_cd = Lib::quote($highest_seq_item['grade_cd']);
-						$sdate = $highest_seq_item['sdate'];
-						$edate = Carbon::parse($sdate)->subMonth()->format("Y-m");
-						DB::table('store_grade')->where([['grade_cd', "=", $grade_cd], ['idx', "<>", $idx]])->update(['edate' => $edate]);
-						DB::table('store_grade')->where([['grade_cd', "=", $grade_cd], ['idx', "=", $idx]])->update(['sdate' => $sdate, 'edate' => "9999-99"]);
-					} else {
+						$highest_seq_sdate = $highest_seq_item['sdate'];
+						$highest_seq_edate = Carbon::parse($highest_seq_sdate)->subMonth()->format("Y-m");
+						$highest_seq = $highest_seq_item['seq'];
+
+						foreach ($group as $row) {
+							/**
+							 * idx가 있으면 업데이트, 없으면 insert 처리
+							 */
+							$idx = Lib::quote($row['idx']);
+							$where = ($idx != "") ? "sg.idx = $idx" : "1<>1";
+							$sql = "select count(*) as cnt from store_grade sg where $where";
+							$result = DB::selectOne($sql);
+
+							// save시 불필요한 컬럼 제거
+							unset($row['idx']);
+							unset($row['added']);
+							unset($row['editable']);
+
+							if ($result->cnt > 0) {
+								$row['edate'] = "9999-99";
+								DB::table('store_grade')->where('idx', "=", $idx)->update($row);
+							} else {
+								$row['edate'] = "9999-99";
+								DB::table('store_grade')->insert($row);
+							}
+						}
+
+						// 등급 코드가 중복된 모든 행의 종료일을 가장 아래 행의 시작월의 전월로 업데이트
+						DB::table('store_grade')->where([['grade_cd', "=", $grade_cd], ['seq', "<>", $highest_seq]])->update(['edate' => $highest_seq_edate]); 
+
+					} else { // 등급 코드(grade_cd)가 중복되지 않은 경우 - 단일 행
+
 						/**
-						 * grade_cd가 중복되지 않은 경우 - 등급이 있으면 update, 없는 경우 insert 처리
+						 * idx가 동일한 등급이 있으면 update, 없는 경우 insert 처리
 						 */
 						$row = $group[0];
 						$idx = Lib::quote($row['idx']);
-						$edate = Carbon::parse($row['sdate'])->subMonth()->format("Y-m");
-						$sql = "select count(*) as cnt from store_grade sg where sg.idx = '$idx'";
+						$where = ($idx != "") ? "sg.idx = $idx" : "1<>1";
+						$sql = "select count(*) as cnt from store_grade sg where $where";
 						$result = DB::selectOne($sql);
-						/**
-						 * save시 불필요한 컬럼 제거
-						 */
-						unset($row['idx']);
+
+						// save시 불필요한 컬럼 제거
+						unset($row['idx']); 
 						unset($row['added']);
 						unset($row['editable']);
+
 						if ($result->cnt > 0) {
 							$result = DB::selectOne($sql);
 							DB::table('store_grade')->where('idx', "=", $idx)->update($row);
 						} else {
-							$row['seq'] = count($data) - 1;
+							$row['edate'] = "9999-99";
 							DB::table('store_grade')->insert($row);
 						}
 					}

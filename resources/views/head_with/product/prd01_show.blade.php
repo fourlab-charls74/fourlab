@@ -3115,7 +3115,7 @@
                     obj.opt_memo = opt_memo;
 
                     if (!opt2) { // prefix 추출하여 opt2 값 알아냄
-                        let regExp = /.+(?=_good_qty)/i;
+                        let regExp = /.+(?=_good_qty)/i; // 전방탐색
                         let arr = key.match(regExp);
                         if (arr) obj.opt2 = arr[0];
                     }

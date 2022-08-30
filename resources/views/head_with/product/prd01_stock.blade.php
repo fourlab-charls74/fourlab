@@ -175,7 +175,7 @@
             @foreach (@$opt_matrix['opt2'] as $idx => $obj)
                 opt2_kind_opts.push({
                     headerName: "{{ $obj->opt_nm }}", field: "opt2_{{ $obj->opt_nm }}", 
-                    type: 'numberType', suppressMovable: true, 
+                    suppressMovable: true, 
                     cellClassRules: optCellClassRules,
                     editable: true,
                     cellStyle: CELL_COLOR.YELLOW
@@ -312,8 +312,9 @@
                 rows.map((row) => {
                     let opt2_nms = [];
                     Object.keys(row).map(key => {
-                        const arr = key.split("opt2_");
-                        if (arr.length > 1 && arr[1]) opt2_nms.push(arr[1]);
+                        let regExp = /(?<=opt2_).+/i; // 후방탐색
+                        const arr = key.match(regExp);
+                        if (arr) opt2_nms.push(arr[0]);
                     })
                     const opt1_nm = row.opt1_nm;
                     opt2_nms.map(key => {

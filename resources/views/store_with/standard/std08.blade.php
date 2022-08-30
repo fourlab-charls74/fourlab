@@ -74,7 +74,7 @@
         { field: "chk", headerName: '', cellClass: 'hd-grid-code', checkboxSelection: true, width: 40, pinned: 'left', sort: null },
         { field: "idx", hide: true },
         { field: "seq", hide: true },
-        { field: "grade_cd", headerName: "등급코드", width: 100, rowDrag: true, editable: (params) => isAdded(params), 
+        { field: "grade_cd", headerName: "등급코드", width: 120, rowDrag: true, editable: (params) => isAdded(params), 
             cellStyle: (params) => isAdded(params) ? YELLOW : {}
         },
         { field: "name", headerName: "등급명", width: 100, cellStyle: CENTER, editable: true, cellStyle: YELLOW },
@@ -137,7 +137,7 @@
     function DataAdd() {
         let rows = gx.getRows();
         var newData = {
-            idx: rows.length,
+            idx: "",
             seq: rows.length,
             added: true
         };
