@@ -18,7 +18,9 @@
                 <h4>검색</h4>
                 <div class="flax_box">
                     <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                    <input type="reset" class="btn btn-sm btn-primary shadow-sm mr-1" value="초기화">
+                    
+                    <a href="#" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
+                    <!-- <input type="reset" id="search_reset" value="검색조건 초기화" class="btn btn-sm btn-outline-primary shadow-sm" onclick="formReset()"> -->
                     <a href="/store/stock/stk31/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
@@ -71,7 +73,7 @@
                         <div class="form-group">
                           <label for="">제목</label>
                           <div class="flax_box">
-                            <input type='text' class="form-control form-control-sm search-all" name='subject' value=''>
+                            <input type='text' class="form-control form-control-sm search-all" name='subject' value='' onkeyup="enterkey()">
                           </div>
                         </div>
                     </div>
@@ -79,13 +81,68 @@
                         <div class="form-group">
                         <label for="">내용</label>
                         <div class="flax_box">
-                            <input type='text' class="form-control form-control-sm search-all" name='content' value=''>
+                            <input type='text' class="form-control form-control-sm search-all" name='content' value=''  onkeyup="enterkey()">
                         </div>
                         </div>
                     </div>
                 </div>
+                    <div class="row">
+                        <div class="col-lg-4 inner-td">
+                            <div class="form-group">
+                                <label for="good_types">매장구분</label>
+                                <div class="flax_box">
+                                    <select name='store_type' class="form-control form-control-sm">
+                                        <option value=''>전체</option>
+                                    @foreach ($store_types as $store_type)
+                                        <option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
+                                    @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 inner-td">
+                            <div class="form-group">
+                                <label for="store_no">매장</label>
+                                <div class="form-inline inline_btn_box"  onkeyup="enterkey()">
+                                    <input type='hidden' id="store_nm" name="store_nm">
+                                    <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
+                                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 inner-td">
+                            <div class="form-group">
+                                <label for="">자료수/정렬</label>
+                                <div class="form-inline">
+                                    <div class="form-inline-inner input_box" style="width:24%;">
+                                        <select name="limit" class="form-control form-control-sm">
+                                            <option value="100">100</option>
+                                            <option value="500">500</option>
+                                            <option value="1000">1000</option>
+                                            <option value="2000">2000</option>
+                                        </select>
+                                    </div>
+                                    <span class="text_line">/</span>
+                                    <div class="form-inline-inner input_box" style="width:45%;">
+                                        <select name="ord_field" class="form-control form-control-sm">
+                                            <option value="rt">등록일</option>
+                                            <option value="subject">제목</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
+                                        <div class="btn-group" role="group">
+                                            <label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="내림차순"><i class="bx bx-sort-down"></i></label>
+                                            <label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="오름차순"><i class="bx bx-sort-up"></i></label>
+                                        </div>
+                                        <input type="radio" name="ord" id="sort_desc" value="desc" checked="">
+                                        <input type="radio" name="ord" id="sort_asc" value="asc">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
         <div class="resul_btn_wrap mb-3">
             <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
             <a href="/store/stock/stk31/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
@@ -119,22 +176,37 @@
             cellRenderer: function(params) {
                 return '<a href="/store/stock/stk31/' + params.data.ns_cd +'" rel="noopener">'+ params.value+'</a>'
             }},
-        {headerName: "ID", field: "admin_id",  width:100, cellClass: 'hd-grid-code'},
-        {headerName: "이름", field: "admin_nm",  width:100, cellClass: 'hd-grid-code'},
-        {headerName: "이메일", field: "admin_email", width: 170, cellClass: 'hd-grid-code'},
-        {headerName: "조회수", field: "cnt", type:'numberType', cellClass: 'hd-grid-code'},
-        {headerName: "상태", field: "sc_state", cellClass: 'hd-grid-code',
-            cellStyle: pararms=>{
-                // console.log(pararms.data.sc_state);
-                if(pararms.data.sc_state === 'Y'){
+        {headerName: "ID", field: "admin_id",  width:80, cellClass: 'hd-grid-code'},
+        {headerName: "이름", field: "admin_nm",  width:80, cellClass: 'hd-grid-code'},
+        {headerName: "이메일", field: "admin_email", width: 130, cellClass: 'hd-grid-code'},
+        {headerName: "조회수", field: "cnt", type:'numberType',width: 50, cellClass: 'hd-grid-code'},
+        {headerName: "전체 공지 여부", field: "all_store_yn",width: 90, cellClass: 'hd-grid-code',
+            cellStyle: params => {
+                // console.log(pararms.data.all_store_yn);
+                if(params.data.all_store_yn == 'Y'){
                     return {color:'red'}
+                }else{
+                    return {color:'blue'}
+                }
+            },
+            cellRenderer: function(params){
+                if(params.data.stores == null){
+                    return params.data.all_store_yn = "Y";
+                }else{
+                    return params.data.all_store_yn = "N";
                 }
             }
         },
-        {headerName: "공지매장", field: "store_cd", width: 'auto', cellClass: 'hd-grid-code'},
+        {headerName: "공지매장", field: "store_nm", width: 340, cellClass: 'hd-grid-code',
+            cellRenderer: function(params) {
+                //  console.log(params.data.stores);
+                return params.data.stores;
+            }
+        },
         {headerName: "등록일시", field: "rt", type:"DateTimeType"},
         {headerName: "수정일시", field: "ut", type:"DateTimeType"},
         {headerName: "글번호", field: "ns_cd", hide:true },
+        {headerName: "매장구분", field: "store_type" },
         { width: 'auto' }
     ];
 
@@ -158,5 +230,18 @@
         gx.Request('/store/stock/stk31/search', data);
     }
 
+</script>
+
+<script>
+    function enterkey() {
+	if (window.event.keyCode == 13) {
+        Search();
+    }
+}
+
+const initSearchInputs = () => {
+        document.search.reset(); // 모든 일반 input 초기화
+        $('#store_no').val(null).trigger('change'); // 브랜드 select2 박스 초기화
+    };
 </script>
 @stop

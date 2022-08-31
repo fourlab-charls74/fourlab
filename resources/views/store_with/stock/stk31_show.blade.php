@@ -71,10 +71,33 @@
                                         <th>매장 선택</th>
                                         <td>
                                             <div class="form-inline inline_btn_box">
-                                                <input type='hidden' id="store_nm" name="store_nm">
-                                                <select id="store_no" name="store_no" class="form-control form-control-sm select2-store multi_select" multiple></select>
-                                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                                @if($no > 0)
+                                                    <input type='hidden' id="store_nm" name="store_nm">
+                                                            @foreach($storeCode as $sc)
+                                                                <div class="store_sel" data-store='{{$sc->store_cd}}' style="border:0.5px solid gray; border-radius: 5px; margin-right:15px;margin-bottom:10px;">
+                                                                    <span>{{$sc->store_nm}}
+                                                                        @if($sc->store_nm == null)
+                                                                            <b style="color:red;">※전체 매장 공지입니다.</b>
+                                                                        @elseif($sc->check_yn == 'Y')
+                                                                            <b style="color:blue;">[확인]</b>
+                                                                        @elseif($sc->check_yn == 'N')
+                                                                            <b style="color:red;">[미확인]</b>&nbsp;
+                                                                            <button type= "button" class= "select_store_delete" onclick="select_store_delete('{{$sc->store_cd}}','{{$sc->ns_cd}}')" style="border:none;background:none;color:#153066;">x</button>
+                                                                  @endif
+                                                                    &nbsp;&nbsp;
+                                                                    </span>
+                                                                </div>
+                                                            @endforeach
+                                                    <select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select" multiple ></select>
+                                                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                                    
+                                                @else
+                                                    <input type='hidden' id="store_nm" name="store_nm">
+                                                    <select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select" multiple ></select>
+                                                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                             </div>
+                                                    <span style="color:red">※매장 미선택시 전체 매장 공지로 등록됩니다.</span>
+                                                @endif
                                         </td>
                                     </tr>
                                 </table>
@@ -87,6 +110,11 @@
     </form>
 </div>
 <script type="text/javascript" charset="utf-8">
+
+
+
+
+
     var ed;
 
     $(document).ready(function() {
@@ -150,14 +178,14 @@
         });
     }
 
+    
+    
     function Update(no) {
+        
         var frm = $('form[name=store]');
-        //console.log(frm.serialize());
-
-        // editor value
-        //console.log(ed.html());
+        
         $('input[name="content"]').val(ed.html());
-
+        
         $.ajax({
             method: 'put',
             url: '/store/stock/stk31/edit/' + no,
@@ -175,83 +203,30 @@
             }
         });
     }
+    
+    $( ".sch-store" ).on("click", function() {
+            searchStore.Open(null, "multiple");
+        });
+        
+    </script>
 
-    // function Destroy(no) {
-    //     var frm = $('form');
-    //     //console.log(frm.serialize());
-    //     if (!confirm("삭제 하시겠습니까?")) {
-    //         return false;
-    //     }
-
-    //     $.ajax({
-    //         method: 'get',
-    //         url: '/store/stock/stk31/del/' + no,
-    //         data: frm.serialize(),
-    //         success: function(data) {
-    //             if (data.code == '200') {
-    //                 document.location.href = '/store/stock/stk31'
-    //             } else {
-    //                 alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-    //             }
-    //         },
-    //         error: function(xhr, status, error) {
-    //             console.log(xhr.responseText);
-    //         }
-    //     });
-    // }
-
-
-     // 검색버튼 클릭 시
-     function Search() {
-            let store_type = $("[name=store_type]").val();
-            let store_nos = $("[name=store_no]").val();
-
-            let url = '/store/api/stores/search-storenm-from-type';
-            let data = {store_type: store_type};
-            if(store_nos.length > 0) {
-                url = '/store/api/stores/search-storenm';
-                data = {store_cds: store_nos};
-            }
+<script>
+    
+    function select_store_delete(store_cd, ns_cd){
+    
+        let ss = document.querySelectorAll(".store_sel");
+        let data_store = [];
+        for(let i = 0;i<ss.length;i++){
             
-            if(store_nos.length < 1 && store_type === '') {
-                SearchConnect();
-            } else {
-                axios({
-                    url: url,
-                    method: 'post',
-                    data: data,
-                }).then(function (res) {
-                    if(res.data.code === 200) {
-                        if(store_nos.length > 0 && store_type !== '') {
-                            // 매장구분, 매장명 둘 다 선택한 경우
-                            axios({
-                                url: '/store/api/stores/search-storenm-from-type',
-                                method: 'post',
-                                data: {store_type: store_type},
-                            }).then(function (response) {
-                                if(response.data.code === 200) {
-                                    let arr = res.data.body.filter(r => response.data.body.find(f => f.store_cd === r.store_cd));
-                                    SearchConnect(arr.map(r => r.store_cd));
-                                }
-                            }).catch(function (error) {
-                                console.log(error);
-                            });
-                        } else {
-                            SearchConnect(res.data.body.map(r => r.store_cd));
-                        }
-                    }
-                }).catch(function (err) {
-                    console.log(err);
-                });
+            if(ss[i].dataset.store == store_cd){
+                data_store = ss[i].dataset.store;
+                ss[i].remove();
             }
         }
 
-        // 검색연결
-        function SearchConnect(store_cds = []) {
-            let d = $('form[name="search"]').serialize();
-            d += "&store_nos=" + store_cds;
-            gx.Request('/store/stock/stk31/search', d, -1);
-        }
+        console.log(data_store);
+    }
+    
 </script>
 
 

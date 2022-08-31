@@ -271,6 +271,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk31/{no}', 'stk31Controller@show');
         Route::put('stk31/store', 'stk31Controller@store');
         Route::put('stk31/edit/{no}', 'stk31Controller@update');
+        Route::delete('stk31/del_store/{no}', 'stk31Controller@del_store');
+
     });
 
     // 영업관리
