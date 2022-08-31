@@ -2660,7 +2660,7 @@ class prd01Controller extends Controller
 		}
 
 		$sql = 
-			" select distinct(substring_index(goods_opt, '^', :index)) as opt_nm from goods_summary where goods_no = :goods_no and use_yn = 'Y' order by goods_opt";
+			" select distinct(substring_index(goods_opt, '^', :index)) as opt_nm from goods_summary where goods_no = :goods_no and use_yn = 'Y' order by seq";
 	
 		if ($opt_kind_cnt > 0) {
 			$opt['opt1'] = DB::select($sql,['goods_no' => $goods_no, 'index' => 1]);
