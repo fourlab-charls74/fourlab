@@ -65,14 +65,6 @@ class std08Controller extends Controller
 
 					if ($duplicated) { // 등급 코드(grade_cd)가 중복된 경우 - 복수 행
 
-						/**
-						 * 순서가 제일 아래인 행을 기준으로 종료일 업데이트 되도록 설정
-						 */
-						$highest_seq_item = $group[0];
-						$highest_seq_sdate = $highest_seq_item['sdate'];
-						$highest_seq_edate = Carbon::parse($highest_seq_sdate)->subMonth()->format("Y-m");
-						$highest_seq = $highest_seq_item['seq'];
-
 						foreach ($group as $row) {
 							/**
 							 * idx가 있으면 업데이트, 없으면 insert 처리
@@ -82,7 +74,7 @@ class std08Controller extends Controller
 							$sql = "select count(*) as cnt from store_grade sg where $where";
 							$result = DB::selectOne($sql);
 
-							// save시 불필요한 컬럼 제거
+							// save시 ag-grid에서 전달받은 데이터의 불필요한 컬럼 제거
 							unset($row['idx']);
 							unset($row['added']);
 							unset($row['editable']);
@@ -95,6 +87,14 @@ class std08Controller extends Controller
 								DB::table('store_grade')->insert($row);
 							}
 						}
+
+						/**
+						 * 순서가 제일 아래인 행을 기준으로 종료일 업데이트 되도록 설정
+						 */
+						$highest_seq_item = $group[0];
+						$highest_seq_sdate = $highest_seq_item['sdate'];
+						$highest_seq_edate = Carbon::parse($highest_seq_sdate)->subMonth()->format("Y-m");
+						$highest_seq = $highest_seq_item['seq'];
 
 						// 등급 코드가 중복된 모든 행의 종료일을 가장 아래 행의 시작월의 전월로 업데이트
 						DB::table('store_grade')->where([['grade_cd', "=", $grade_cd], ['seq', "<>", $highest_seq]])->update(['edate' => $highest_seq_edate]); 
@@ -110,7 +110,7 @@ class std08Controller extends Controller
 						$sql = "select count(*) as cnt from store_grade sg where $where";
 						$result = DB::selectOne($sql);
 
-						// save시 불필요한 컬럼 제거
+						// save시 ag-grid에서 전달받은 데이터의 불필요한 컬럼 제거
 						unset($row['idx']); 
 						unset($row['added']);
 						unset($row['editable']);
