@@ -2408,7 +2408,7 @@ class prd01Controller extends Controller
 					select distinct substring_index(goods_opt, '^', :index) as goods_opt, substring_index(opt_name, '^', :index2) as opt_name, goods_no
 					from goods_summary 
 					where goods_no = :goods_no and use_yn = 'Y'
-					order by goods_opt
+					order by seq
 				";
 
 				$result = array_merge(DB::select($sql, ['index' => 1, 'index2' => 1, 'goods_no' => $goods_no]), DB::select($sql, ['index' => -1, 'index2' => -1, 'goods_no' => $goods_no]));

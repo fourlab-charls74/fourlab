@@ -1023,7 +1023,7 @@ ControlOption.prototype.Open = function(goods_no = 0, afterSaveOrDel = null) {
 
     if(this.grid === null){
         this.SetGrid("#div-gd-option");
-        // $("#ControlOptionModal").draggable();
+        $("#ControlOptionModal").draggable();
         $('#ControlOptionModal').draggable( 'disable' ) // ag-grid의 rowDrag 기능 사용을 위해 disable 처리
     } else {
         this.grid.setRows([]);

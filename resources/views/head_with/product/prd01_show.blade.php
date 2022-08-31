@@ -2478,8 +2478,9 @@
     const optCellClassRules = { // 색 변경 규칙 정의
         "opt-cell-changed": params => {
             const column_name = params.colDef.field;
+            const key = encodeURIComponent(column_name) // 공백 에러 방지
             if (params.data.hasOwnProperty('is_changed')) {
-                return params.data?.is_changed[column_name] ? true : false;
+                return params.data?.is_changed[key] ? true : false;
             } else {
                 return false;
             }
@@ -2664,11 +2665,12 @@
             }
 
             // 셀 값 수정시 빨간색으로 변경
+            const key = encodeURIComponent(column_name) // 공백 에러 방지
             if (row.hasOwnProperty('is_changed')) {
-                row.is_changed[column_name] = true;
+                row.is_changed[key] = true;
             } else {
                 row.is_changed = {};
-                row.is_changed[`${column_name}`] = true;
+                row.is_changed[key] = true;
             }
             gx2.gridOptions.api.applyTransaction({ update : [row] });
         }
