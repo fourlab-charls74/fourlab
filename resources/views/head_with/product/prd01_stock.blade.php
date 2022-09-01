@@ -235,8 +235,6 @@
 
         const optEvtAfterEdit = (params) => {
 
-            console.log(params);
-
             if (params.oldValue !== params.newValue) {
                 row = params.data;
                 const row_index = params.rowIndex;

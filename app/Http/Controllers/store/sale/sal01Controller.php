@@ -325,6 +325,10 @@ class sal01Controller extends Controller
 		$order['com_rate'] = 0;
 		$order['ord_kind'] = 20;
 		$order['ord_type'] = 12;
+
+		$order_states = [5, 10, 30];
+		$order["ord_state"] = $order_states[2];
+
 		$order["pay_stat"] = 1;
 		$order['coupon_no'] = 0;
 		$order['com_coupon_ratio'] = 0;
@@ -477,7 +481,6 @@ class sal01Controller extends Controller
 			// $order["ord_state"] = ($is_stock == true) ? "10" : "5";
 			// $order["clm_state"] = ($is_stock == true) ? "0" : "0";	// 클레임 : 주문취소 상태
 
-			$order["ord_state"] = 10;
 			$order["clm_state"] = 0;
 			$ord_seq = 0;
 			// $is_stock = true;
@@ -612,37 +615,39 @@ class sal01Controller extends Controller
 
 				// 재고 차감 여기
 				// $orderClass->CompleteOrderSugi($ord_opt_no, $order["ord_state"]);
-				
-				
 
 				$orderClass->SetOrdOptNo($ord_opt_no);
-				$order_opt_wonga = array(
-					"store_cd" => $store_cd,
-					"goods_no" => $order['goods_no'],
-					"goods_sub" => $order['goods_sub'],
-					"goods_opt" => $order['goods_opt'],
-					"qty" => $order['qty'],
-					"wonga" => $order['wonga'],
-					"price" => $order['price'],
-					"dlv_amt" => @$order['dlv_amt'],
-					"recv_amt" => $order['recv_amt'],
-					"point_apply_amt" => $order['point_amt'],
-					"coupon_apply_amt" => $order['coupon_amt'],
-					"dc_apply_amt" => $order['dc_amt'],
-					"pay_fee" => $order['pay_fee'],
-					"com_id" => $order['com_id'],
-					"com_rate" => $order['com_rate'],
-					"ord_state" => $order['ord_state'] ? $order['ord_state'] : 10,
-					"ord_kind"	=> $order['ord_kind'],
-					"ord_type" => $order['ord_type'],
-					"coupon_no" => $order['coupon_no'],
-					"com_coupon_ratio" => $order['com_coupon_ratio'],
-					"sales_com_fee" => $order['sales_com_fee'],
-					'order_state_date' => $ord_state_date,
-					'prd_cd' => $prd_cd,
-					'store_cd' => $store_cd
-				);
-				$orderClass->__InsertOptWonga($order_opt_wonga);
+
+				// 주문상태 30 이하의 5, 10, 30 이 전부 order_opt_wonga에 저장되도록 수정
+				foreach ($order_states as $value) {
+					$order_opt_wonga = array(
+						"store_cd" => $store_cd,
+						"goods_no" => $order['goods_no'],
+						"goods_sub" => $order['goods_sub'],
+						"goods_opt" => $order['goods_opt'],
+						"qty" => $order['qty'],
+						"wonga" => $order['wonga'],
+						"price" => $order['price'],
+						"dlv_amt" => @$order['dlv_amt'],
+						"recv_amt" => $order['recv_amt'],
+						"point_apply_amt" => $order['point_amt'],
+						"coupon_apply_amt" => $order['coupon_amt'],
+						"dc_apply_amt" => $order['dc_amt'],
+						"pay_fee" => $order['pay_fee'],
+						"com_id" => $order['com_id'],
+						"com_rate" => $order['com_rate'],
+						"ord_state" => $value,
+						"ord_kind"	=> $order['ord_kind'],
+						"ord_type" => $order['ord_type'],
+						"coupon_no" => $order['coupon_no'],
+						"com_coupon_ratio" => $order['com_coupon_ratio'],
+						"sales_com_fee" => $order['sales_com_fee'],
+						'order_state_date' => $ord_state_date,
+						'prd_cd' => $prd_cd,
+						'store_cd' => $store_cd
+					);
+					$orderClass->__InsertOptWonga($order_opt_wonga);
+				}
 
 				// outbound_order 저장 /////////////////////////////////////////////
 

@@ -149,13 +149,15 @@ class std11Controller extends Controller
 			DB::transaction(function () use ($inputs) {
 				$type = $inputs['type'];
 				$date = $inputs['date'];
-				collect($inputs['data'])->map(function ($item) use ($type, $date) {
-					$idx = $item['idx'];
-					DB::table(self::T)->where('idx', $idx)->update([ $type => $date ]);
+				$data =	$inputs['data'];
+				collect($data)->map(function ($row) use ($type, $date) {
+					DB::table(self::T)->where('idx', $row['idx'])->update([$type => $date]);
 				});
 			});
+			
 			return response()->json(['code'	=> '200']);
 		} catch (Exception $e) {
+			// dd($e);
 			return response()->json(['code'	=> '500']);
 		}
 	}
