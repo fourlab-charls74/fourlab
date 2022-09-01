@@ -15,34 +15,30 @@ use PDO;
 class prd02Controller extends Controller
 {
 
-	//
-	public function index() {
+	public function index() 
+	{
 
 		$mutable	= now();
 		$sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
 
-		$com_types	= [];
 		$event_cds	= [];
 		//판매유형
 		$sell_types	= [];
 		$code_kinds	= [];
 
 		$conf = new Conf();
-
 		$domain		= $conf->getConfigValue("shop", "domain");
-
 
 		$values = [
 			'sdate'         => $sdate,
 			'edate'         => date("Y-m-d"),
-			'com_types'		=> $com_types,
 			'event_cds'		=> $event_cds,
 			'sell_types'	=> $sell_types,
 			'code_kinds'	=> $code_kinds,
 			'domain'		=> $domain,
 			'style_no'		=> "",
 			'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
-			'com_types'     => SLib::getCodes('G_COM_TYPE'),
+			// 'com_types'     => SLib::getCodes('G_COM_TYPE'),
 			'items'			=> SLib::getItems(),
 			'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
 			'is_unlimiteds'	=> SLib::getCodes('G_IS_UNLIMITED'),
@@ -66,11 +62,8 @@ class prd02Controller extends Controller
 		$brand_cd	= $request->input("brand_cd");
 		$goods_nm	= $request->input("goods_nm");
 		$goods_nm_eng	= $request->input("goods_nm_eng");
-		$cat_type	= $request->input("cat_type");
-		$cat_cd		= $request->input("cat_cd");
-		$is_unlimited	= $request->input("is_unlimited");
 
-		$prd_cd		= $request->input("prd_cd");
+		$prd_cd		= $request->input("prd_cd", "");
 		$com_id		= $request->input("com_cd");
 
 		$head_desc	= $request->input("head_desc");
@@ -80,18 +73,18 @@ class prd02Controller extends Controller
 		$limit		= $request->input("limit",100);
 		$ord		= $request->input('ord','desc');
 		$ord_field	= $request->input('ord_field','g.goods_no');
-		$type		= $request->input("type");
-		$goods_type	= $request->input("goods_type");
-
-		$sale_yn	= $request->input("sale_yn");
-		$coupon_yn	= $request->input("coupon_yn");
-		$sale_type	= $request->input("sale_type");
-
 		$orderby	= sprintf("order by %s %s", $ord_field, $ord);
 
 		$where		= "";
 		
-		if($prd_cd != "")		$where .= " and s.prd_cd = '" . Lib::quote($prd_cd) . "' ";
+		if($prd_cd != "") {
+			$prd_cd = explode(',', $prd_cd);
+			$where .= " and (1!=1";
+			foreach($prd_cd as $cd) {
+				$where .= " or s.prd_cd = '" . Lib::quote($cd) . "' ";
+			}
+			$where .= ")";
+		}
 		if($style_no != "")		$where .= " and g.style_no like '" . Lib::quote($style_no) . "%' ";
 		if($item != "")			$where .= " and g.opt_kind_cd = '" . Lib::quote($item) . "' ";
 		if($brand_cd != "") {
@@ -105,18 +98,8 @@ class prd02Controller extends Controller
 
 		if($com_id != "")		$where .= " and g.com_id = '" . Lib::quote($com_id) . "'";
 
-		if($cat_cd != ""){
-			if($cat_type === "DISPLAY"){
-				$where .= " and g.rep_cat_cd = '". Lib::quote($cat_cd) . "' ";
-			} else if($cat_type === "ITEM"){
-				$where .= " and ( select count(*) from category_goods where cat_type = 'ITEM' and d_cat_cd = '". Lib::quote($cat_cd) . "' and goods_no = g.goods_no ) > 0 ";
-			}
-		}
-
 		if($head_desc != "")	$where .= " and g.head_desc like '%" . Lib::quote($head_desc) . "%' ";
 		if($ad_desc != "")		$where .= " and g.ad_desc like '%" . Lib::quote($ad_desc) . "%' ";
-
-		if($is_unlimited != "")	$where .= " and g.is_unlimited = '" . Lib::quote($is_unlimited) . "' ";
 
 		if( is_array($goods_stat)) {
 			if (count($goods_stat) == 1 && $goods_stat[0] != "") {
@@ -146,13 +129,6 @@ class prd02Controller extends Controller
 				if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
 			}
 		}
-
-		if($type != "")			$where .= " and g.type = '" . Lib::quote($type) . "' ";
-		if($goods_type != "")	$where .= " and g.goods_type = '" . Lib::quote($goods_type) . "' ";
-
-		if( $sale_yn != "" )	$where .= " and g.sale_yn = '$sale_yn' ";
-		if( $coupon_yn != "" )	$where .= " and gc.price > 0 ";
-		if( $sale_type != "" )	$where .= " and g.sale_type = '" . Lib::quote($sale_type) . "' ";
 
 		$page_size	= $limit;
 		$startno	= ($page - 1) * $page_size;

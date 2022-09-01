@@ -55,6 +55,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('stores/search-storenm', 'StoreController@search_storenm');
         Route::post('stores/search-storenm-from-type', 'StoreController@search_storenm_from_type');
 
+        // 상품코드 조회
+        Route::get('prdcd/conds', 'goods@search_product_conditions');
+        Route::get('prdcd/search', 'goods@search_prdcd');
+
     });
 
     // 포스

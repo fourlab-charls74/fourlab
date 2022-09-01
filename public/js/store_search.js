@@ -287,6 +287,124 @@ SearchMD.prototype.Choice = function(code,name) {
 
 let searchMd = new SearchMD();
 
+/**
+ * 상품코드검색
+ */
+
+const conds = {
+    brand: '브랜드',
+    year: '년도',
+    season: '시즌',
+    gender: '성별',
+    item: '아이템',
+    opt: '품목'
+};
+function SearchPrdcd(){
+    this.grid = null;
+}
+
+SearchPrdcd.prototype.Open = async function(callback = null){
+    if(this.grid === null){
+        this.SetGrid("#div-gd-prdcd");
+        this.SetGridCond();
+        $("#SearchPrdcdModal").draggable();
+        this.callback = callback;
+    }
+    $('#SearchPrdcdModal').modal({
+        keyboard: false
+    });
+};
+
+SearchPrdcd.prototype.SetGrid = function(divId){
+    let columns = [];
+
+    columns.push(
+        { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null },
+        { field: "prd_cd", headerName: "상품코드", width: 120 },
+        { field: "goods_no", headerName: "상품번호", width: 60 },
+        { field: "goods_nm", headerName: "상품명", width: 290 },
+        { field: "goods_opt", headerName: "옵션", width: 180 },
+        { field: "color", headerName: "컬러", width: 60 },
+        { field: "size", headerName: "사이즈", width: 60 },
+        { width: "auto" }
+    );
+    this.grid = new HDGrid(document.querySelector( divId ), columns);
+};
+
+SearchPrdcd.prototype.SetGridCond = async function() {
+    Object.keys(conds).forEach( async (cond_title) => {
+        let columns = [];
+        
+        columns.push(
+            { field: "chk", headerName: '', cellClass: 'hd-grid-code', checkboxSelection: true, width: 28, sort: null },
+            { field: "item", headerName: conds[cond_title], width: "auto",
+                cellRenderer: (params) => `[${params.data.code_id || ''}] ${params.data.code_val || ''}`,
+            },
+        );
+        this[cond_title + '_grid'] = await new HDGrid(document.querySelector( "#div-gd-prdcd-" + cond_title ), columns);
+        document.querySelector( "#div-gd-prdcd-" + cond_title ).style.height = '210px';
+    });
+    const { data: { body: res } } = await axios({ 
+        url: '/store/api/prdcd/conds', 
+        method: 'get' 
+    });
+    Object.keys(res).forEach(r => {
+        this[r + '_grid'].gridOptions.api.setRowData(res[r]);
+    })
+}
+
+SearchPrdcd.prototype.Search = function(e) {
+    const event_type = e?.type;
+
+    const request = () => {
+        let data = $('form[name="search_prdcd"]').serialize();
+
+        Object.keys(conds).forEach(c => {
+            let rows = this[c + '_grid'].getSelectedRows();
+            rows.forEach(r => {
+                data += `&${c}[]=${r.code_id}`;
+            });
+        });
+        this.grid.Request('/store/api/prdcd/search', data, 1);
+    }
+
+    if (event_type == 'keypress') {
+        if (e.key && e.key == 'Enter') {
+            request();
+        } else {
+            return false;
+        }
+    } else {
+        request();
+    }
+};
+
+SearchPrdcd.prototype.Choice = function() {
+    if(this.callback !== null){
+        this.callback(code, name);
+    } else {
+        let rows = this.grid.getSelectedRows();
+        if(rows.length < 1) return alert("항목을 선택해주세요.");
+        
+        if($('#prd_cd').length > 0){
+            $('#prd_cd').val(rows.map(r => r.prd_cd).join(","));
+        }
+    }
+
+    document.search_prdcd.reset();
+    this.grid.setRows([]);
+    Object.keys(conds).forEach(c => {
+        this[c + '_grid'].gridOptions.api.forEachNodeAfterFilter(node => {
+            node.setSelected(false);
+        });
+    });
+
+    $('#gd-prdcd-total').html(0);
+    $('#SearchPrdcdModal').modal('toggle');
+};
+
+let searchPrdcd = new SearchPrdcd();
+
 $( document ).ready(function() {
     // 매장 검색 클릭 이벤트 바인딩 및 콜백 사용
     $( ".sch-store" ).on("click", function() {
@@ -297,6 +415,11 @@ $( document ).ready(function() {
     $( ".sch-md" ).on("click", function() {
         searchMd.Open();
     });
+
+    // 상품코드 검색 클릭 이벤트 바인딩 및 콜백 사용
+    $(".sch-prdcd").on("click", function() {
+        searchPrdcd.Open();
+    })
 });
 
 /**

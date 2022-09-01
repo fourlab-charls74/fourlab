@@ -482,3 +482,99 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<!-- 상품코드 검색 -->
+<div id="SearchPrdcdModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchPrdcdModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title mt-0" id="myModalLabel">상품코드 검색</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body show_layout" style="background:#f5f5f5;">
+                <div class="card_wrap search_cum_form write">
+                    <div class="card shadow">
+                        <form name="search_prdcd" method="get" onsubmit="return false">
+                            <div class="card-body">
+                                <div class="row_wrap mb-2">
+                                    <div class="row">
+                                        <div class="col-lg-6 inner-td">
+                                            <div class="form-group">
+                                                <label style="min-width:80px;">상품코드</label>
+                                                <div class="flex_box">
+                                                    <input type='text' class="form-control form-control-sm search-all" onkeypress="searchPrdcd.Search(event);" name='prd_cd' value=''>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 inner-td">
+                                            <div class="form-group">
+                                                <label style="min-width:80px;">상품명</label>
+                                                <div class="flex_box">
+                                                    <input type='text' class="form-control form-control-sm search-all" onkeypress="searchPrdcd.Search(event);" name='goods_nm' value=''>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row_wrap">
+                                    <div class="row">
+                                        <div class="col-4 col-lg-2 pr-0">
+                                            <div class="table-responsive">
+                                                <div id="div-gd-prdcd-brand" style="width:100%;height:300px;" class="ag-theme-balham"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-lg-2 pr-0 pl-0">
+                                            <div class="table-responsive">
+                                                <div id="div-gd-prdcd-year" style="width:100%;height:300px;" class="ag-theme-balham"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-lg-2 pr-0 pl-0">
+                                            <div class="table-responsive">
+                                                <div id="div-gd-prdcd-season" style="width:100%;height:300px;" class="ag-theme-balham"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-lg-2 pr-0 pl-0">
+                                            <div class="table-responsive">
+                                                <div id="div-gd-prdcd-gender" style="width:100%;height:300px;" class="ag-theme-balham"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-lg-2 pr-0 pl-0">
+                                            <div class="table-responsive">
+                                                <div id="div-gd-prdcd-item" style="width:100%;height:300px;" class="ag-theme-balham"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-lg-2 pl-0">
+                                            <div class="table-responsive">
+                                                <div id="div-gd-prdcd-opt" style="width:100%;height:300px;" class="ag-theme-balham"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="resul_btn_wrap" style="padding-top:7px;text-align:right;display:block;">
+                                    <a href="javascript:void(0);" id="search_prdcd_sbtn" onclick="return searchPrdcd.Search();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card shadow mb-1 pt-0">
+                        <div class="card-body m-0">
+                            <div class="card-title">
+                                <div class="d-flex justify-content-between">
+                                    <div class="filter_wrap">
+                                        <h6 class="m-0 font-weight-bold">총 : <span id="gd-prdcd-total" class="text-primary">0</span> 건</h6>
+                                    </div>
+                                    <a href="#" onclick="return searchPrdcd.Choice();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-check fa-sm text-white-50"></i>선택</a>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <div id="div-gd-prdcd" style="width:100%;height:300px;" class="ag-theme-balham"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

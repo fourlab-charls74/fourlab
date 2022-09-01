@@ -460,6 +460,10 @@ $( document ).ready(function() {
         searchCompany.Open();
     });
 
+    $( ".sch-sup-company" ).on("click", () => {
+        searchCompany.Open(null, '1');
+    });
+
     $( ".sch-goods_nos" ).click(function() {
         if($(this).attr("data-name") !== null){
             searchGoodsNos.Open($(this).attr("data-name"));
@@ -766,8 +770,9 @@ function SearchCompany(){
     this.grid = null;
 }
 
-SearchCompany.prototype.Open = function(callback = null){
+SearchCompany.prototype.Open = function(callback = null, type = ""){
     if(this.grid === null){
+        this.type = type;
         this.SetGrid("#div-gd-company");
         //gxBrand = new HDGrid(document.querySelector("#div-gd-brand"), columnsBrand);
         $("#SearchCompanyModal").draggable();
@@ -783,6 +788,7 @@ SearchCompany.prototype.Open = function(callback = null){
         if ((evt.keyCode || evt.which) === 13) {
             evt.preventDefault();
             let data = $('form[name="search_company"]').serialize();
+            data += "&com_type=" + this.type;
             const url = '/head/api/company/getlist/';
             this.grid.Request(url, data);
         }
@@ -813,6 +819,7 @@ SearchCompany.prototype.SetGrid = function(divId){
 
 SearchCompany.prototype.Search = function(){
     let data = $('form[name="search_company"]').serialize();
+    data += "&com_type=" + this.type;
     const url = '/head/api/company/getlist/';
     this.grid.Request(url, data);
 };

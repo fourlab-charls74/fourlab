@@ -586,6 +586,30 @@ CREATE TABLE `notice_store_detail` (
     PRIMARY KEY (`ns_cd`, `store_cd`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- 알림
+CREATE TABLE `msg_store` (
+    `msg_cd` int(11) NOT NULL AUTO_INCREMENT COMMENT '알림번호',
+    `sender_type` char(1) NOT NULL COMMENT '발신처 타입 (매장 - S)',
+    `sender_cd` int(11) NOT NULL COMMENT '발신처코드',
+    `reservation_yn` char(1) NOT NULL COMMENT '예약발송여부',
+    `reservation_date` varchar(20) DEFAULT NULL COMMENT '예약발송일 (0000-00-00 00:00:00)',
+    `content` mediumtext DEFAULT NULL COMMENT '알림 내용',
+    `rt` datetime DEFAULT NULL COMMENT '등록일자 (발신일자)',
+    PRIMARY KEY (`msg_cd`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 알림 - 수신처별
+CREATE TABLE `msg_store_detail` (
+    `msg_cd` int(11) NOT NULL COMMENT '알림번호 - msg_store : msg_cd',
+    `receiver_type` char(1) NOT NULL COMMENT '수신처 타입 (매장 - S)',
+    `receiver_cd` int(11) NOT NULL COMMENT '수신처코드',
+    `check_yn` char(1) NOT NULL COMMENT '알림확인여부',
+    `check_date` datetime DEFAULT NULL COMMENT '알림확인일시',
+    `rt` datetime DEFAULT NULL COMMENT '등록일자',
+    `ut` datetime DEFAULT NULL COMMENT '수정일자',
+    PRIMARY KEY (`msg_cd`, `receiver_cd`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 --
 -- 기존 테이블 컬럼 추가 시작
 --

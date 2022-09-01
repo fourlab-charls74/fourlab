@@ -800,4 +800,149 @@ class goods extends Controller
             "body" => $result
         ]);
     }
+
+    /*********************************************************************************/
+    /******************************** 상품코드 검색 관련 ******************************/
+    /********************************************************************************/
+
+    const Conds = [
+        'brand' => 'BRAND',
+        'year' => 'YEAR',
+        'season' => 'SEASON',
+        'gender' => 'GENDER',
+        'item' => 'ITEM',
+        'opt' => 'OPT'
+    ];
+
+    public function search_product_conditions()
+    {
+        $result = [];
+
+        foreach(self::Conds as $key => $cond_cd)
+        {
+            $sql = "
+                select code_id, code_val
+                from code
+                where code_kind_cd = 'PRD_CD_$cond_cd'
+                order by code_seq
+            ";
+
+            if($key == 'brand') {
+                $sql = "
+                    select br_cd as code_id, brand_nm as code_val
+                    from brand
+                    where use_yn = 'Y'
+                        and br_cd != ''
+                    order by field(br_cd, 'F') desc, br_cd
+                ";
+            }
+            $result[$key] = DB::select($sql);
+        }
+
+        return response()->json([
+            "code" => '200',
+            "head" => [
+                "total" => 1,
+            ],
+            "body" => $result
+        ]);
+    }
+
+    public function search_prdcd(Request $request)
+    {
+        $prd_cd = $request->input('prd_cd', '');
+        $goods_nm = $request->input('goods_nm', '');
+        $brand = $request->input('brand', []);
+        $year = $request->input('year', []);
+        $season = $request->input('season', []);
+        $gender = $request->input('gender', []);
+        $items = $request->input('item', []);
+        $opt = $request->input('opt', []);
+        $page = $request->input('page', 1);
+        $where = "";
+
+        if($prd_cd != '') $where .= " and p.prd_cd like '%$prd_cd%'";
+        if($goods_nm != '') $where .= " and g.goods_nm like '%$goods_nm%'";
+        if(count($brand) > 0) {
+            $where .= " and (1!=1";
+            foreach($brand as $item) {
+                $where .= " or p.brand = '$item'";
+            }
+            $where .= ")";
+        }
+        if(count($year) > 0) {
+            $where .= " and (1!=1";
+            foreach($year as $item) {
+                $where .= " or p.year = '$item'";
+            }
+            $where .= ")";
+        }
+        if(count($season) > 0) {
+            $where .= " and (1!=1";
+            foreach($season as $item) {
+                $where .= " or p.season = '$item'";
+            }
+            $where .= ")";
+        }
+        if(count($gender) > 0) {
+            $where .= " and (1!=1";
+            foreach($gender as $item) {
+                $where .= " or p.gender = '$item'";
+            }
+            $where .= ")";
+        }
+        if(count($items) > 0) {
+            $where .= " and (1!=1";
+            foreach($items as $item) {
+                $where .= " or p.item = '$item'";
+            }
+            $where .= ")";
+        }
+        if(count($opt) > 0) {
+            $where .= " and (1!=1";
+            foreach($opt as $item) {
+                $where .= " or p.opt = '$item'";
+            }
+            $where .= ")";
+        }
+
+        $page_size = 100;
+        $startno = ($page - 1) * $page_size;
+        $limit = " limit $startno, $page_size ";
+        $total = 0;
+        $page_cnt = 0;
+
+        $sql = "
+            select p.prd_cd, p.goods_no, g.goods_nm, p.goods_opt, p.color, p.size
+            from product_code p
+                inner join goods g on g.goods_no = p.goods_no
+            where 1=1 $where
+            $limit
+        ";
+
+        $result = DB::select($sql);
+
+        if ($page == 1) {
+            $sql = "
+                select count(*) as total
+                from product_code p
+                    inner join goods g on g.goods_no = p.goods_no
+                where 1=1 $where
+            ";
+            $row = DB::select($sql);
+            $total = $row[0]->total;
+            $page_cnt = (int)(($total - 1) / $page_size) + 1;
+        }
+
+        return response()->json([
+            "code" => '200',
+            "head" => [
+                "total" => $total,
+                "page" => $page,
+                "page_cnt" => $page_cnt,
+                "page_total" => count($result)
+            ],
+            "body" => $result
+        ]);
+    }
 }

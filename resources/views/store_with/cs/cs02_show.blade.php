@@ -85,7 +85,7 @@
                                                     @endif
                                                 </div>
                                             </td>
-                                            <th>반품번호</th>
+                                            <th>반품코드</th>
                                             <td>
                                                 <div class="form-inline">
                                                     <p id="sgr_cd" class="fs-14">@if(@$sgr != null) {{ @$sgr->sgr_cd }} @else {{ @$new_sgr_cd }} @endif</p>

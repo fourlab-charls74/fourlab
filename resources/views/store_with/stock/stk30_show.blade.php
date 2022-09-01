@@ -75,7 +75,7 @@
                                                     </select>
                                                 </div>
                                             </td>
-                                            <th>반품번호</th>
+                                            <th>반품코드</th>
                                             <td>
                                                 <div class="form-inline">
                                                     <p id="sr_cd" class="fs-14">@if(@$sr != null) {{ @$sr->sr_cd }} @else {{ @$new_sr_cd }} @endif</p>
