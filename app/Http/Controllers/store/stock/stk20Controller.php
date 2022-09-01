@@ -32,7 +32,7 @@ class stk20Controller extends Controller
             'style_no'		=> "", // 스타일넘버
             // 'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'), // 상품구분(2)
             'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
-            'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
+            // 'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
             'items'			=> SLib::getItems(), // 품목
 		];
 
@@ -69,12 +69,14 @@ class stk20Controller extends Controller
 			$where .= " and psr.store_cd = '" . $r['store_no'] . "'";
 		if($r['rt_stat'] != null)
 			$where .= " and psr.state = '" . $r['rt_stat'] . "'";
-		if($r['prd_cd'] != null) 
-			$where .= " and psr.prd_cd = '" . $r['prd_cd'] . "'";
-		if($r['type'] != null) 
-			$where .= " and g.type = '" . $r['type'] . "'";
-		if($r['goods_type'] != null) 
-			$where .= " and g.goods_type = '" . $r['goods_type'] . "'";
+		if($r['prd_cd'] != null) {
+            $prd_cd = explode(',', $r['prd_cd']);
+			$where .= " and (1!=1";
+			foreach($prd_cd as $cd) {
+				$where .= " or psr.prd_cd = '" . Lib::quote($cd) . "' ";
+			}
+			$where .= ")";
+        }
         if(isset($r['goods_stat'])) {
             $goods_stat = $r['goods_stat'];
             if(is_array($goods_stat)) {
@@ -109,8 +111,6 @@ class stk20Controller extends Controller
             }
         }
 
-        if($r['com_type'] != null) 
-            $where .= " and g.com_type = '" . $r['com_type'] . "'";
         if($r['com_cd'] != null) 
             $where .= " and g.com_id = '" . $r['com_cd'] . "'";
         if($r['item'] != null) 
