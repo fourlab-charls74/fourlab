@@ -203,26 +203,26 @@
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box" style="width:24%;">
                                         <select name="limit" class="form-control form-control-sm">
-                                            <option value="100">100</option>
                                             <option value="500">500</option>
                                             <option value="1000">1000</option>
                                             <option value="2000">2000</option>
+                                            <option value="5000">5000</option>
                                         </select>
                                     </div>
                                     <span class="text_line">/</span>
                                     <div class="form-inline-inner input_box" style="width:45%;">
                                         <select name="ord_field" class="form-control form-control-sm">
-                                            <option value="goods_no">상품번호</option>
-                                            <option value="barcode">상품코드</option>
+                                            <option value="store_cd">매장</option>
+                                            <option value="prd_cd">상품코드</option>
                                         </select>
                                     </div>
                                     <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
                                         <div class="btn-group" role="group">
-                                            <label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="내림차순"><i class="bx bx-sort-down"></i></label>
-                                            <label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="오름차순"><i class="bx bx-sort-up"></i></label>
+                                            <label class="btn btn-secondary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="내림차순"><i class="bx bx-sort-down"></i></label>
+                                            <label class="btn btn-primary primary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="오름차순"><i class="bx bx-sort-up"></i></label>
                                         </div>
-                                        <input type="radio" name="ord" id="sort_desc" value="desc" checked="">
-                                        <input type="radio" name="ord" id="sort_asc" value="asc">
+                                        <input type="radio" name="ord" id="sort_desc" value="desc">
+                                        <input type="radio" name="ord" id="sort_asc" value="asc" checked>
                                     </div>
                                 </div>
                             </div>
@@ -290,8 +290,9 @@
     </div>
     <script language="javascript">
         let columns = [
-            {field: "store_nm" , headerName: "매장", rowGroup: true, hide: true},
-            {field: "prd_cd", headerName: "상품코드", width: 130, pinned: "left", cellStyle: {"text-align": "center"}, checkboxSelection: true},
+            {field: "store_nm" , headerName: "매장", rowGroup: true, hide: true, width: 230, pinned: "left", checkboxSelection: true},
+            {field: "prd_cd_sm", headerName: "상품코드", width: 110, pinned: "left", cellStyle: {"text-align": "center"}, checkboxSelection: true},
+            {field: "prd_cd" , hide: true},
             {field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"}},
             {field: "goods_type_nm", headerName: "상품구분", width: 60, cellStyle: StyleGoodsTypeNM},
             {field: "opt_kind_nm", headerName: "품목", width: 60, cellStyle: {"text-align": "center"}},
@@ -332,6 +333,14 @@
                 ]
             },
         ];
+
+        const basic_autoGroupColumnDef = (headerName, minWidth = 230) => ({
+            headerName: headerName,
+            headerClass: 'bizest',
+            minWidth: minWidth,
+            cellRenderer: 'agGroupCellRenderer',
+            pinned: 'left'
+        });
     </script>
     <script type="text/javascript" charset="utf-8">
         let gx;
@@ -342,13 +351,7 @@
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
             gx = new HDGrid(gridDiv, columns, {
-                autoGroupColumnDef: {
-                    headerName: '매장',
-                    headerClass: 'bizest',
-                    minWidth: 230,
-                    cellRenderer: 'agGroupCellRenderer',
-                    pinned: 'left'
-                },
+                autoGroupColumnDef: basic_autoGroupColumnDef('매장'),
                 groupDefaultExpanded: 1,
                 rowSelection: 'multiple',
                 groupSelectsChildren: true,
@@ -378,8 +381,23 @@
 
         // 검색버튼 클릭 시
         function Search() {
+            setColumn();
             let d = $('form[name="search"]').serialize();
             gx.Request('/store/stock/stk13/search', d, -1);
+        }
+
+        // 정렬 타입에 따른 column 업데이트
+        function setColumn() {
+            let ord_field = $("[name=ord_field]").val();
+            if(ord_field === "store_cd") {
+                let prd_columns = columns.map(c => c.field === "store_nm" ? ({...c, rowGroup: true, hide: true}) : c.field === "prd_cd_sm" ? ({...c, rowGroup: false, hide: false}) : c);
+                gx.gridOptions.api.setColumnDefs(prd_columns);
+                gx.gridOptions.api.setAutoGroupColumnDef(basic_autoGroupColumnDef('매장'));
+            } else if(ord_field === "prd_cd") {
+                let prd_columns = columns.map(c => c.field === "store_nm" ? ({...c, rowGroup: false, hide: false}) : c.field === "prd_cd_sm" ? ({...c, rowGroup: true, hide: true}) : c);
+                gx.gridOptions.api.setColumnDefs(prd_columns);
+                gx.gridOptions.api.setAutoGroupColumnDef(basic_autoGroupColumnDef('상품코드', 120));
+            }
         }
 
         // 출고요청

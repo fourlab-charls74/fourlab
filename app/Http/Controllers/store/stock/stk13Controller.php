@@ -117,9 +117,8 @@ class stk13Controller extends Controller
 
         // orderby
         $ord = $r['ord'] ?? 'desc';
-        $ord_field = $r['ord_field'] ?? "g.goods_no";
-        if($ord_field == 'goods_no') $ord_field = 'g.' . $ord_field;
-        else $ord_field = 'o.' . $ord_field;
+        $ord_field = $r['ord_field'] ?? "o.store_cd";
+		$ord_field = 'o.' . $ord_field;
         $orderby = sprintf("%s %s", $ord_field, $ord);
 
         // pagination
@@ -135,6 +134,7 @@ class stk13Controller extends Controller
 				o.store_cd,
 				(select store_nm from store where store_cd = o.store_cd) as store_nm,
 				o.prd_cd,
+				concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_sm,
 				o.goods_no,
 				ifnull(type.code_val, 'N/A') as goods_type_nm,
 				op.opt_kind_nm,
@@ -152,6 +152,7 @@ class stk13Controller extends Controller
 				DATE_FORMAT(DATE_ADD(NOW(), INTERVAL (ifnull(ROUND(ps.wqty * (TIMESTAMPDIFF(DAY, '$sdate 00:00:00', '$edate 23:59:59') / sum(o.qty))), 0)) DAY),'%Y-%m-%d') as exp_soldout_day,
 				LEAST(if(sum(ifnull(o.qty, 0)) < 0, 0, sum(o.qty)), ifnull(pss.wqty, 0)) as rel_qty
 			from order_opt o
+				inner join product_code pc on pc.prd_cd = o.prd_cd
 				inner join product_stock_storage pss on pss.prd_cd = o.prd_cd and pss.storage_cd = (select storage_cd from storage where default_yn = 'Y')
 				inner join product_stock_store ps on ps.prd_cd = o.prd_cd and ps.store_cd = o.store_cd
 				inner join store on store.store_cd = o.store_cd
@@ -167,7 +168,7 @@ class stk13Controller extends Controller
 				and ($store_where)
 				$where
 			group by o.store_cd, o.prd_cd
-			order by o.store_cd, $orderby
+			order by $orderby
 		";
 
 		$result = DB::select($sql);
