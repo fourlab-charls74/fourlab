@@ -234,6 +234,9 @@
         };
 
         const optEvtAfterEdit = (params) => {
+
+            console.log(params);
+
             if (params.oldValue !== params.newValue) {
                 row = params.data;
                 const row_index = params.rowIndex;
@@ -254,7 +257,7 @@
                         row.is_changed[column_name] = true;
                     } else {
                         row.is_changed = {};
-                        row.is_changed[`${column_name}`] = true;
+                        row.is_changed[column_name] = true;
                     }
                 }
                 gx.gridOptions.api.applyTransaction({ update : [row] });
@@ -271,7 +274,8 @@
         let gridDiv = document.querySelector(pApp.options.gridId);
         const columns = optStockColumns(OPT1_KIND_NM, OPT2_KIND_NM)
         const options = {
-            onCellValueChanged: (params) => optEvtAfterEdit(params)
+            onCellValueChanged: (params) => optEvtAfterEdit(params),
+            suppressFieldDotNotation: true // 컬럼명에 . 문자가 들어간 경우 깊은 참조로 처리 되는 것을 방지
         }   
         gx = new HDGrid(gridDiv, columns, options);
 

@@ -2478,9 +2478,8 @@
     const optCellClassRules = { // 색 변경 규칙 정의
         "opt-cell-changed": params => {
             const column_name = params.colDef.field;
-            const key = encodeURIComponent(column_name) // 공백 에러 방지
             if (params.data.hasOwnProperty('is_changed')) {
-                return params.data?.is_changed[key] ? true : false;
+                return params.data?.is_changed[column_name] ? true : false;
             } else {
                 return false;
             }
@@ -2572,7 +2571,8 @@
         const pApp2 = new App('', { gridId:"#div-gd-opt" });
         gridDiv = document.querySelector(pApp2.options.gridId);
         options = {
-            onCellValueChanged: (params) => optEvtAfterEdit(params)
+            onCellValueChanged: (params) => optEvtAfterEdit(params),
+            suppressFieldDotNotation: true // 컬럼명에 . 문자가 들어간 경우 깊은 참조로 처리 되는 것을 방지
         }   
         gx2 = new HDGrid(gridDiv, extra_option_stock_columns, options);
 
@@ -2607,6 +2607,7 @@
 
     let changedOptCells = [];
     const optEvtAfterEdit = (params) => {
+
         if (params.oldValue !== params.newValue) {
             row = params.data;
 
@@ -2665,13 +2666,13 @@
             }
 
             // 셀 값 수정시 빨간색으로 변경
-            const key = encodeURIComponent(column_name) // 공백 에러 방지
             if (row.hasOwnProperty('is_changed')) {
-                row.is_changed[key] = true;
+                row.is_changed[column_name] = true;
             } else {
                 row.is_changed = {};
-                row.is_changed[key] = true;
+                row.is_changed[`${column_name}`] = true;
             }
+
             gx2.gridOptions.api.applyTransaction({ update : [row] });
         }
     };
