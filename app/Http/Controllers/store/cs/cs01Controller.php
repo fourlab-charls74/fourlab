@@ -29,6 +29,19 @@ class cs01Controller extends Controller {
         return view( Config::get('shop.store.view') . '/cs/cs01', $values);
     }
 
+	public function choice_index()
+	{
+		$immutable = CarbonImmutable::now();
+        $sdate = $immutable->sub(6, 'month')->format('Y-m-d');
+        $values = [
+            'sdate' => $sdate,
+            'edate' => date("Y-m-d"),
+            'items' => SLib::getItems(),
+            'order_stock_states' => Slib::getCodes('G_ORDER_STOCK_STATE')
+        ];
+        return view( Config::get('shop.store.view') . '/cs/cs01_choice', $values);
+	}
+
     public function search(Request $request)
 	{
 		$sdate = str_replace('-','',$request->input("sdate"));

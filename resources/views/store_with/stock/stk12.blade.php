@@ -50,9 +50,14 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="prd_cd">상품코드</label>
-                                <div class="flex_box">
-                                    <input type='text' class="form-control form-control-sm search-enter" name='prd_cd' value='' />
+                                <label>송장번호</label>
+                                <div class="form-inline">
+                                    <div class="form-inline-inner input-box w-100">
+                                        <div class="form-inline inline_btn_box">
+                                            <input type='text' id="invoice_no" name='invoice_no' class="form-control form-control-sm w-100 ac-style-no search-enter">
+                                            <a href="#" class="btn btn-sm btn-outline-primary sch-invoice"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -60,35 +65,14 @@
                     <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="item">상품구분</label>
-                                <div class="flex_box">
-                                    <select name='type' id="type" class="form-control form-control-sm" style="width: 47%">
-                                        <option value=''>전체</option>
-                                        <option value='N'>일반</option>
-                                        <option value='D'>납품</option>
-                                        <option value='E'>기획</option>
-                                    </select>
-                                    <span class="text_line" style="width: 6%; text-align: center;">/</span>
-                                    <select name='goods_type' id="goods_type" class="form-control form-control-sm" style="width: 47%">
-                                        <option value=''>전체</option>
-                                        <option value='S'>매입</option>
-                                        <option value='I'>위탁매입</option>
-                                        <option value='P'>위탁판매</option>
-                                        <option value='O'>구매대행</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="goods_stat">상품상태</label>
-                                <div class="flax_box">
-                                    <select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
-                                        <option value=''>전체</option>
-                                        @foreach ($goods_stats as $goods_stat)
-                                            <option value='{{ $goods_stat->code_id }}' @if($goods_stat->code_id == 40) selected @endif>{{ $goods_stat->code_val }}</option>
-                                        @endforeach
-                                    </select>
+                                <label for="prd_cd">상품코드</label>
+                                <div class="form-inline">
+                                    <div class="form-inline-inner input-box w-100">
+                                        <div class="form-inline inline_btn_box">
+                                            <input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm w-100 ac-style-no search-enter">
+                                            <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -109,27 +93,26 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-lg-4 inner-td">
+                            <div class="form-group">
+                                <label for="goods_nm">상품명</label>
+                                <div class="flax_box">
+                                    <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value=''>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="name">업체</label>
-                                <div class="form-inline inline_select_box">
-                                    <div class="form-inline-inner input-box w-25 pr-1">
-                                        <select id="com_type" name="com_type" class="form-control form-control-sm w-100">
-                                            <option value="">전체</option>
-                                            @foreach ($com_types as $com_type)
-                                                <option value="{{ $com_type->code_id }}">{{ $com_type->code_val }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="form-inline-inner input-box w-75">
-                                        <div class="form-inline inline_btn_box">
-                                            <input type="hidden" id="com_cd" name="com_cd" />
-                                            <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company search-all search-enter" style="width:100%;" autocomplete="off" />
-                                            <a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                        </div>
-                                    </div>
+                                <label for="goods_stat">상품상태</label>
+                                <div class="flax_box">
+                                    <select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
+                                        <option value=''>전체</option>
+                                        @foreach ($goods_stats as $goods_stat)
+                                            <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -156,15 +139,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="goods_nm">상품명</label>
-                                <div class="flax_box">
-                                    <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value=''>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="row search-area-ext d-none">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="goods_nm_eng">상품명(영문)</label>
@@ -175,14 +150,27 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
+                                <label for="name">공급업체</label>
+                                <div class="form-inline inline_select_box">
+                                    <div class="form-inline-inner input-box w-100">
+                                        <div class="form-inline inline_btn_box">
+                                            <input type="hidden" id="com_cd" name="com_cd" />
+                                            <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
+                                            <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 inner-td">
+                            <div class="form-group">
                                 <label for="">자료수/정렬</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box" style="width:24%;">
                                         <select name="limit" class="form-control form-control-sm">
-                                            <option value="100">100</option>
-                                            <option value="500">500</option>
                                             <option value="1000">1000</option>
                                             <option value="2000">2000</option>
+                                            <option value="5000">5000</option>
                                         </select>
                                     </div>
                                     <span class="text_line">/</span>
@@ -372,6 +360,10 @@
             gx.Request('/store/stock/stk12/search', d, 1, function(d) {
                 setColumn(d.head.stores);
             });
+        }
+
+        function setInvoiceNo(invoice_no) {
+            $("[name=invoice_no]").val(invoice_no);
         }
 
         // 출고요청

@@ -21,7 +21,7 @@ class stk12Controller extends Controller
             'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
             'style_no'		=> "", // 스타일넘버
             'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
-            'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
+            // 'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
             'items'			=> SLib::getItems(), // 품목
             'rel_orders'    => SLib::getCodes("REL_ORDER"), // 출고차수
             'storages'      => $storages, // 창고리스트
@@ -39,12 +39,18 @@ class stk12Controller extends Controller
         $orderby = "";
 
         // where
-		if($r['prd_cd'] != null) 
-			$where .= " and p.prd_cd = '" . $r['prd_cd'] . "'";
-		if($r['type'] != null) 
-			$where .= " and g.type = '" . $r['type'] . "'";
-		if($r['goods_type'] != null) 
-			$where .= " and g.goods_type = '" . $r['goods_type'] . "'";
+		if($r['prd_cd'] != null) {
+            $prd_cd = explode(',', $r['prd_cd']);
+			$where .= " and (1!=1";
+			foreach($prd_cd as $cd) {
+				$where .= " or p.prd_cd = '" . Lib::quote($cd) . "' ";
+			}
+			$where .= ")";
+        }
+        if($r['invoice_no'] != null) {
+            $invoice_no = $r['invoice_no'];
+            $where .= " and p.prd_cd in (select prd_cd from stock_product where invoice_no = '$invoice_no')";
+        }
         if(isset($r['goods_stat'])) {
             $goods_stat = $r['goods_stat'];
             if(is_array($goods_stat)) {
@@ -79,8 +85,6 @@ class stk12Controller extends Controller
             }
         }
 
-        if($r['com_type'] != null) 
-            $where .= " and g.com_type = '" . $r['com_type'] . "'";
         if($r['com_cd'] != null) 
             $where .= " and g.com_id = '" . $r['com_cd'] . "'";
         if($r['item'] != null) 

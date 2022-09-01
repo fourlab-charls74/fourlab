@@ -172,6 +172,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
         // 입고
         Route::get('cs01','cs01Controller@index');
+        Route::get('cs01/choice','cs01Controller@choice_index'); // 송장번호 선택 팝업 index
         Route::get('cs01/search','cs01Controller@search');
         Route::get('cs01/show','cs01Controller@show');
         Route::post('cs01/comm', 'cs01Controller@command');

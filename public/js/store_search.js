@@ -419,7 +419,13 @@ $( document ).ready(function() {
     // 상품코드 검색 클릭 이벤트 바인딩 및 콜백 사용
     $(".sch-prdcd").on("click", function() {
         searchPrdcd.Open();
-    })
+    });
+
+    // 입고 내 송장번호 선택
+    $(".sch-invoice").on("click", function() {
+        let url = "/store/cs/cs01/choice";
+		window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1400,height=800");
+    });
 });
 
 /**
