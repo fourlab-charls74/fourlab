@@ -19,7 +19,7 @@ class stk01Controller extends Controller
             'style_no'		=> "",
             'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
             'store_types'	=> SLib::getStoreTypes(),
-			'com_types'     => SLib::getCodes('G_COM_TYPE'),
+			// 'com_types'     => SLib::getCodes('G_COM_TYPE'),
             'items'			=> SLib::getItems(),
             'goods_types'	=> SLib::getCodes('G_GOODS_TYPE')
 		];
@@ -30,7 +30,7 @@ class stk01Controller extends Controller
 	public function search(Request $request)
 	{
 		$store_type = $request->input('store_type');
-		$prd_cd = $request->input('prd_cd');
+		$prd_cd = $request->input('prd_cd', '');
 
         $goods_stat = $request->input("goods_stat");
         $style_no = $request->input("style_no");
@@ -41,9 +41,6 @@ class stk01Controller extends Controller
         $brand_cd = $request->input("brand_cd");
         $goods_nm = $request->input("goods_nm");
         $goods_nm_eng = $request->input("goods_nm_eng");
-
-        $type = $request->input("type");
-        $goods_type = $request->input("goods_type");
 
 		$com_id		= $request->input("com_cd");
 
@@ -71,7 +68,14 @@ class stk01Controller extends Controller
 		$where	= "";
 		if ($store_type != "")	$where .= " and s.store_type = '" . $store_type . "' ";
 		
-		if ($prd_cd != "") $where .= " and p.prd_cd = '" . $prd_cd . "' ";
+		if($prd_cd != "") {
+			$prd_cd = explode(',', $prd_cd);
+			$where .= " and (1!=1";
+			foreach($prd_cd as $cd) {
+				$where .= " or p.prd_cd = '" . $cd . "' ";
+			}
+			$where .= ")";
+		}
         if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%' ";
         if ($item != "") $where .= " and g.opt_kind_cd = '" . Lib::quote($item) . "' ";
         if ($brand_cd != "") {
@@ -112,9 +116,6 @@ class stk01Controller extends Controller
                 if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
             }
         }
-
-        if ($type != "") $where .= " and g.type = '" . Lib::quote($type) . "' ";
-        if ($goods_type != "") $where .= " and g.goods_type = '" . Lib::quote($goods_type) . "' ";
 
         $page_size = $limit;
 		$startno = ($page - 1) * $page_size;

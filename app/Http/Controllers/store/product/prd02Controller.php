@@ -76,7 +76,6 @@ class prd02Controller extends Controller
 		$orderby	= sprintf("order by %s %s", $ord_field, $ord);
 
 		$where		= "";
-		
 		if($prd_cd != "") {
 			$prd_cd = explode(',', $prd_cd);
 			$where .= " and (1!=1";

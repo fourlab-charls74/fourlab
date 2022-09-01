@@ -552,7 +552,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="resul_btn_wrap" style="padding-top:7px;text-align:right;display:block;">
+                                <div class="w-100 text-center mt-2">
                                     <a href="javascript:void(0);" id="search_prdcd_sbtn" onclick="return searchPrdcd.Search();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                                 </div>
                             </div>
@@ -565,7 +565,7 @@
                                     <div class="filter_wrap">
                                         <h6 class="m-0 font-weight-bold">총 : <span id="gd-prdcd-total" class="text-primary">0</span> 건</h6>
                                     </div>
-                                    <a href="#" onclick="return searchPrdcd.Choice();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-check fa-sm text-white-50"></i>선택</a>
+                                    <a href="#" onclick="return searchPrdcd.Choice();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-check fa-sm text-white-50 pr-1"></i>선택</a>
                                 </div>
                             </div>
                             <div class="table-responsive">

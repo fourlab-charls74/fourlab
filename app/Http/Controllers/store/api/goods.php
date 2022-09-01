@@ -19,7 +19,6 @@ class goods extends Controller
         $mutable	= now();
         $sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
 
-        $com_types	= [];
         $event_cds	= [];
         //판매유형
         $sell_types	= [];
@@ -33,17 +32,13 @@ class goods extends Controller
         $values = [
             'sdate'         => $sdate,
             'edate'         => date("Y-m-d"),
-			'com_types'		=> $com_types,
-			'event_cds'		=> $event_cds,
-			'sell_types'	=> $sell_types,
-			'code_kinds'	=> $code_kinds,
+			// 'event_cds'		=> $event_cds,
+			// 'code_kinds'	    => $code_kinds,
             'domain'		=> $domain,
             'style_no'		=> "",
             'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
-            'com_types'     => SLib::getCodes('G_COM_TYPE'),
+            // 'com_types'     => SLib::getCodes('G_COM_TYPE'),
             'items'			=> SLib::getItems(),
-            'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
-            'is_unlimiteds'	=> SLib::getCodes('G_IS_UNLIMITED'),
 		];
 
 		return view(Config::get('shop.store.view') . '/common/goods_search', $values);
@@ -61,6 +56,7 @@ class goods extends Controller
         if ($page < 1 or $page == "") $page = 1;
         $limit = $request->input('limit', 100);
 
+        $prd_cd = $request->input("prd_cd", "");
         $goods_stat = $request->input("goods_stat");
         $style_no = $request->input("style_no");
         $goods_no = $request->input("goods_no");
@@ -70,29 +66,27 @@ class goods extends Controller
         $brand_cd = $request->input("brand_cd");
         $goods_nm = $request->input("goods_nm");
         $goods_nm_eng = $request->input("goods_nm_eng");
-        $cat_type = $request->input("cat_type");
-        $cat_cd = $request->input("cat_cd");
-        $is_unlimited = $request->input("is_unlimited");
 
         $com_id = $request->input("com_cd");
 
         $head_desc = $request->input("head_desc");
         $ad_desc = $request->input("ad_desc");
 
-        $is_unlimited = $request->input("is_unlimited");
         $limit = $request->input("limit",100);
         $ord = $request->input('ord','desc');
         $ord_field = $request->input('ord_field','g.goods_no');
-        $type = $request->input("type");
-        $goods_type = $request->input("goods_type");
-
-        $sale_yn	= $request->input("sale_yn");
-        $coupon_yn	= $request->input("coupon_yn");
-        $sale_type	= $request->input("sale_type");
 
         $orderby = sprintf("order by %s %s", $ord_field, $ord);
 
         $where = "";
+        if($prd_cd != "") {
+			$prd_cd = explode(',', $prd_cd);
+			$where .= " and (1!=1";
+			foreach($prd_cd as $cd) {
+				$where .= " or s.prd_cd = '" . Lib::quote($cd) . "' ";
+			}
+			$where .= ")";
+		}
         if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%' ";
         if ($item != "") $where .= " and g.opt_kind_cd = '" . Lib::quote($item) . "' ";
         if ($brand_cd != "") {
@@ -102,22 +96,11 @@ class goods extends Controller
         }
         if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%' ";
         if ($goods_nm_eng != "") $where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
-        if ($is_unlimited != "") $where .= " and g.is_unlimited = '" . Lib::quote($is_unlimited) . "' ";
 
         if ($com_id != "") $where .= " and g.com_id = '" . Lib::quote($com_id) . "'";
 
-        if($cat_cd != ""){
-            if($cat_type === "DISPLAY"){
-                $where .= " and g.rep_cat_cd = '". Lib::quote($cat_cd) . "' ";
-            } else if($cat_type === "ITEM"){
-                $where .= " and ( select count(*) from category_goods where cat_type = 'ITEM' and d_cat_cd = '". Lib::quote($cat_cd) . "' and goods_no = g.goods_no ) > 0 ";
-            }
-        }
-
         if ($head_desc != "") $where .= " and g.head_desc like '%" . Lib::quote($head_desc) . "%' ";
         if ($ad_desc != "") $where .= " and g.ad_desc like '%" . Lib::quote($ad_desc) . "%' ";
-
-        if ($is_unlimited != "") $where .= " and g.is_unlimited = '" . Lib::quote($is_unlimited) . "' ";
 
         if( is_array($goods_stat)) {
             if (count($goods_stat) == 1 && $goods_stat[0] != "") {
@@ -147,13 +130,6 @@ class goods extends Controller
                 if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
             }
         }
-
-        if ($type != "") $where .= " and g.type = '" . Lib::quote($type) . "' ";
-        if ($goods_type != "") $where .= " and g.goods_type = '" . Lib::quote($goods_type) . "' ";
-
-        if( $sale_yn != "" )	$where .= " and g.sale_yn = '$sale_yn' ";
-        if( $coupon_yn != "" )	$where .= " and gc.price > 0 ";
-        if( $sale_type != "" )	$where .= " and g.sale_type = '" . Lib::quote($sale_type) . "' ";
 
         $page_size = $limit;
         $startno = ($page - 1) * $page_size;
@@ -244,8 +220,7 @@ class goods extends Controller
             $orderby
 			$limit
 		";
-        // dd($query);
-        //$result = DB::select($query,['com_id' => $com_id]);
+
         $pdo = DB::connection()->getPdo();
         $stmt = $pdo->prepare($query);
         $stmt->execute();
@@ -280,7 +255,6 @@ class goods extends Controller
         $mutable	= now();
         $sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
 
-        $com_types	= [];
         $event_cds	= [];
         //판매유형
         $sell_types	= [];
@@ -298,17 +272,12 @@ class goods extends Controller
             'store'         => $store[0],
             'sdate'         => $sdate,
             'edate'         => date("Y-m-d"),
-			'com_types'		=> $com_types,
-			'event_cds'		=> $event_cds,
-			'sell_types'	=> $sell_types,
-			'code_kinds'	=> $code_kinds,
+			// 'event_cds'		=> $event_cds,
+			// 'code_kinds'	=> $code_kinds,
             'domain'		=> $domain,
             'style_no'		=> "",
             'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
-            'com_types'     => SLib::getCodes('G_COM_TYPE'),
             'items'			=> SLib::getItems(),
-            'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
-            'is_unlimiteds'	=> SLib::getCodes('G_IS_UNLIMITED'),
 		];
 
 		return view(Config::get('shop.store.view') . '/common/store_goods_search', $values);
@@ -329,31 +298,30 @@ class goods extends Controller
         $brand_cd = $request->input("brand_cd");
         $goods_nm = $request->input("goods_nm");
         $goods_nm_eng = $request->input("goods_nm_eng");
-        $cat_type = $request->input("cat_type");
-        $cat_cd = $request->input("cat_cd");
-        $is_unlimited = $request->input("is_unlimited");
 
+        $prd_cd		= $request->input("prd_cd", "");
         $com_id = $request->input("com_cd");
 
         $head_desc = $request->input("head_desc");
         $ad_desc = $request->input("ad_desc");
 
-        $is_unlimited = $request->input("is_unlimited");
         $limit = $request->input("limit",100);
         $ord = $request->input('ord','desc');
         $ord_field = $request->input('ord_field','g.goods_no');
-        $type = $request->input("type");
-        $goods_type = $request->input("goods_type");
-
-        $sale_yn	= $request->input("sale_yn");
-        $coupon_yn	= $request->input("coupon_yn");
-        $sale_type	= $request->input("sale_type");
 
         $store_cd   = $request->input("store_cd", "");
 
         $orderby = sprintf("order by %s %s", $ord_field, $ord);
 
         $where = "";
+        if($prd_cd != "") {
+			$prd_cd = explode(',', $prd_cd);
+			$where .= " and (1!=1";
+			foreach($prd_cd as $cd) {
+				$where .= " or s.prd_cd = '" . Lib::quote($cd) . "' ";
+			}
+			$where .= ")";
+		}
         if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%' ";
         if ($item != "") $where .= " and g.opt_kind_cd = '" . Lib::quote($item) . "' ";
         if ($brand_cd != "") {
@@ -363,22 +331,12 @@ class goods extends Controller
         }
         if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%' ";
         if ($goods_nm_eng != "") $where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
-        if ($is_unlimited != "") $where .= " and g.is_unlimited = '" . Lib::quote($is_unlimited) . "' ";
 
         if ($com_id != "") $where .= " and g.com_id = '" . Lib::quote($com_id) . "'";
-
-        if($cat_cd != ""){
-            if($cat_type === "DISPLAY"){
-                $where .= " and g.rep_cat_cd = '". Lib::quote($cat_cd) . "' ";
-            } else if($cat_type === "ITEM"){
-                $where .= " and ( select count(*) from category_goods where cat_type = 'ITEM' and d_cat_cd = '". Lib::quote($cat_cd) . "' and goods_no = g.goods_no ) > 0 ";
-            }
-        }
 
         if ($head_desc != "") $where .= " and g.head_desc like '%" . Lib::quote($head_desc) . "%' ";
         if ($ad_desc != "") $where .= " and g.ad_desc like '%" . Lib::quote($ad_desc) . "%' ";
 
-        if ($is_unlimited != "") $where .= " and g.is_unlimited = '" . Lib::quote($is_unlimited) . "' ";
 
         if( is_array($goods_stat)) {
             if (count($goods_stat) == 1 && $goods_stat[0] != "") {
@@ -408,13 +366,6 @@ class goods extends Controller
                 if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
             }
         }
-
-        if ($type != "") $where .= " and g.type = '" . Lib::quote($type) . "' ";
-        if ($goods_type != "") $where .= " and g.goods_type = '" . Lib::quote($goods_type) . "' ";
-
-        if( $sale_yn != "" )	$where .= " and g.sale_yn = '$sale_yn' ";
-        if( $coupon_yn != "" )	$where .= " and gc.price > 0 ";
-        if( $sale_type != "" )	$where .= " and g.sale_type = '" . Lib::quote($sale_type) . "' ";
 
         $page_size = $limit;
         $startno = ($page - 1) * $page_size;
@@ -508,8 +459,7 @@ class goods extends Controller
             $orderby
 			$limit
 		";
-        // dd($query);
-        //$result = DB::select($query,['com_id' => $com_id]);
+
         $pdo = DB::connection()->getPdo();
         $stmt = $pdo->prepare($query);
         $stmt->execute();
@@ -544,7 +494,6 @@ class goods extends Controller
         $mutable	= now();
         $sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
 
-        $com_types	= [];
         $event_cds	= [];
         //판매유형
         $sell_types	= [];
@@ -562,17 +511,12 @@ class goods extends Controller
             'storage'       => $storage[0],
             'sdate'         => $sdate,
             'edate'         => date("Y-m-d"),
-			'com_types'		=> $com_types,
-			'event_cds'		=> $event_cds,
-			'sell_types'	=> $sell_types,
-			'code_kinds'	=> $code_kinds,
+			// 'event_cds'		=> $event_cds,
+			// 'code_kinds'	=> $code_kinds,
             'domain'		=> $domain,
             'style_no'		=> "",
             'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
-            'com_types'     => SLib::getCodes('G_COM_TYPE'),
             'items'			=> SLib::getItems(),
-            'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
-            'is_unlimiteds'	=> SLib::getCodes('G_IS_UNLIMITED'),
 		];
 
 		return view(Config::get('shop.store.view') . '/common/storage_goods_search', $values);
@@ -593,31 +537,30 @@ class goods extends Controller
         $brand_cd = $request->input("brand_cd");
         $goods_nm = $request->input("goods_nm");
         $goods_nm_eng = $request->input("goods_nm_eng");
-        $cat_type = $request->input("cat_type");
-        $cat_cd = $request->input("cat_cd");
-        $is_unlimited = $request->input("is_unlimited");
 
+        $prd_cd		= $request->input("prd_cd", "");
         $com_id = $request->input("com_cd");
 
         $head_desc = $request->input("head_desc");
         $ad_desc = $request->input("ad_desc");
 
-        $is_unlimited = $request->input("is_unlimited");
         $limit = $request->input("limit",100);
         $ord = $request->input('ord','desc');
         $ord_field = $request->input('ord_field','g.goods_no');
-        $type = $request->input("type");
-        $goods_type = $request->input("goods_type");
-
-        $sale_yn	= $request->input("sale_yn");
-        $coupon_yn	= $request->input("coupon_yn");
-        $sale_type	= $request->input("sale_type");
 
         $storage_cd   = $request->input("storage_cd", "");
 
         $orderby = sprintf("order by %s %s", $ord_field, $ord);
 
         $where = "";
+        if($prd_cd != "") {
+			$prd_cd = explode(',', $prd_cd);
+			$where .= " and (1!=1";
+			foreach($prd_cd as $cd) {
+				$where .= " or p.prd_cd = '" . Lib::quote($cd) . "' ";
+			}
+			$where .= ")";
+		}
         if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%' ";
         if ($item != "") $where .= " and g.opt_kind_cd = '" . Lib::quote($item) . "' ";
         if ($brand_cd != "") {
@@ -627,22 +570,11 @@ class goods extends Controller
         }
         if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%' ";
         if ($goods_nm_eng != "") $where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
-        if ($is_unlimited != "") $where .= " and g.is_unlimited = '" . Lib::quote($is_unlimited) . "' ";
 
         if ($com_id != "") $where .= " and g.com_id = '" . Lib::quote($com_id) . "'";
 
-        if($cat_cd != ""){
-            if($cat_type === "DISPLAY"){
-                $where .= " and g.rep_cat_cd = '". Lib::quote($cat_cd) . "' ";
-            } else if($cat_type === "ITEM"){
-                $where .= " and ( select count(*) from category_goods where cat_type = 'ITEM' and d_cat_cd = '". Lib::quote($cat_cd) . "' and goods_no = g.goods_no ) > 0 ";
-            }
-        }
-
         if ($head_desc != "") $where .= " and g.head_desc like '%" . Lib::quote($head_desc) . "%' ";
         if ($ad_desc != "") $where .= " and g.ad_desc like '%" . Lib::quote($ad_desc) . "%' ";
-
-        if ($is_unlimited != "") $where .= " and g.is_unlimited = '" . Lib::quote($is_unlimited) . "' ";
 
         if( is_array($goods_stat)) {
             if (count($goods_stat) == 1 && $goods_stat[0] != "") {
@@ -673,13 +605,6 @@ class goods extends Controller
             }
         }
 
-        if ($type != "") $where .= " and g.type = '" . Lib::quote($type) . "' ";
-        if ($goods_type != "") $where .= " and g.goods_type = '" . Lib::quote($goods_type) . "' ";
-
-        if( $sale_yn != "" )	$where .= " and g.sale_yn = '$sale_yn' ";
-        if( $coupon_yn != "" )	$where .= " and gc.price > 0 ";
-        if( $sale_type != "" )	$where .= " and g.sale_type = '" . Lib::quote($sale_type) . "' ";
-
         $page_size = $limit;
         $startno = ($page - 1) * $page_size;
         $limit = " limit $startno, $page_size ";
@@ -704,7 +629,7 @@ class goods extends Controller
                     inner join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
                 where p.storage_cd = '$storage_cd' $where
 			";
-            //$row = DB::select($query,['com_id' => $com_id]);
+
             $row = DB::select($query);
             $total = $row[0]->total;
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
