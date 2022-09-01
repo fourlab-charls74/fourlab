@@ -96,7 +96,9 @@
         },
         { field: "g3", headerName: "정상3",
             children: [
-                { headerName: "금액", field: "amt3", type: 'currencyType', width:100, editable: true, cellStyle: YELLOW },
+                { headerName: "금액", field: "amt2", type: 'currencyType', width:100,
+                    valueFormatter: (params) => formatNumber(params) + ' ~'
+                },
                 { headerName: "수수료율", field: "fee3", type: 'percentType', width:100, editable: true, cellStyle: YELLOW },
             ]
         },
