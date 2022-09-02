@@ -43,12 +43,7 @@
                     <li><a href="/store/stock/stk20">(완)매장RT</a></li>
                     <li><a href="#">매장주문 - 는 포스화면</a></li>
                     <li><a href="/store/stock/stk25">(완)매장별할인율적용조회</a></li>
-<<<<<<< HEAD
                     <li><a href="/store/stock/stk26">(개)실사</a></li>
-                    <li><a href="/store/stock/stk31">(개)매장 공지사항</a></li>
-=======
-                    <li><a href="/store/stock/stk26">(완)실사</a></li>
->>>>>>> 76c0ef82031ccdb42722beed23818b5a61594365
                 </ul>
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-line-chart fs-18"></i><span>고객/수선관리</span></a>
