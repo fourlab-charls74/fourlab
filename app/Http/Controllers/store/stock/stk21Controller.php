@@ -45,12 +45,14 @@ class stk21Controller extends Controller
         $orderby = "";
         
         // where
-		if($r['prd_cd'] != null) 
-			$where .= " and p.prd_cd = '" . $r['prd_cd'] . "'";
-		if($r['type'] != null) 
-			$where .= " and g.type = '" . $r['type'] . "'";
-		if($r['goods_type'] != null) 
-			$where .= " and g.goods_type = '" . $r['goods_type'] . "'";
+		if($r['prd_cd'] != null) {
+            $prd_cd = explode(',', $r['prd_cd']);
+			$where .= " and (1!=1";
+			foreach($prd_cd as $cd) {
+				$where .= " or p.prd_cd = '" . Lib::quote($cd) . "' ";
+			}
+			$where .= ")";
+        }
         if(isset($r['goods_stat'])) {
             $goods_stat = $r['goods_stat'];
             if(is_array($goods_stat)) {
@@ -85,8 +87,6 @@ class stk21Controller extends Controller
             }
         }
 
-        if($r['com_type'] != null) 
-            $where .= " and g.com_type = '" . $r['com_type'] . "'";
         if($r['com_cd'] != null) 
             $where .= " and g.com_id = '" . $r['com_cd'] . "'";
         if($r['item'] != null) 
@@ -97,22 +97,7 @@ class stk21Controller extends Controller
             $where .= " and g.goods_nm like '%" . $r['goods_nm'] . "%'";
         if($r['goods_nm_eng'] != null) 
             $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
-        if($r['sale_yn'] != null)
-            $where .= " and g.sale_yn = '" . $r['sale_yn'] . "'";
-        if(isset($r['coupon_yn']))
-            $where .= " and gc.price > 0";
-        if($r['sale_type'] != null)
-                $where .= " and g.sale_type = '" . $r['sale_type'] . "'";
-
-        if(isset($r['cat_cd'])){
-            $cat_type = $r['cat_type'] ?? '';
-            if($cat_type === "DISPLAY"){
-                $where .= " and g.rep_cat_cd = '" . $r['cat_cd'] . "'";
-            } else if($cat_type === "ITEM"){
-                $where .= " and ( select count(*) from category_goods where cat_type = 'ITEM' and d_cat_cd = '" . $r['cat_cd'] . "' and goods_no = g.goods_no ) > 0 ";
-            }
-        }
-
+            
         // ordreby
         $ord = $r['ord'] ?? 'desc';
         $ord_field = $r['ord_field'] ?? "g.goods_no";
