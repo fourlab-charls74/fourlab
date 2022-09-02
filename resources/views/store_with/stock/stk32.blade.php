@@ -20,7 +20,6 @@
                     <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                     
                     <a href="#" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
-                    <!-- <input type="reset" id="search_reset" value="검색조건 초기화" class="btn btn-sm btn-outline-primary shadow-sm" onclick="formReset()"> -->
                     <a href="#" onclick="openMsgPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"> 알림전송</a>
                     <a href="#" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"> 보낸알림 보관함</a>
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
@@ -137,21 +136,19 @@
 	</div>
 </div>
 <script language="javascript">
-    var columns = [
+    let columns = [
         {
-        headerName: '',
-        headerCheckboxSelection: true,
-        checkboxSelection: true,
-        width:28,
-        pinned:'left'
+            headerName: '',
+            headerCheckboxSelection: true,
+            checkboxSelection: true,
+            width:28,
+            pinned:'left'
         },
         {headerName: "발신처", field: "sender_type",width:400},
         {headerName: "연락처", field: "sender_cd",  width:80, cellClass: 'hd-grid-code'},
         {headerName: "내용", field: "content",  width:80, cellClass: 'hd-grid-code'},
         {headerName: "받은 날짜", field: "rt", width: 130, cellClass: 'hd-grid-code'},
-        {headerName: "알림 번호", field: "msg_cd", hide: true},
-        
-        
+        {headerName: "알림 번호", field: "msg_cd", hide: true},        
         { width: 'auto' }
     ];                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
 
@@ -187,7 +184,7 @@
 </script>
 
 <script>
- function openMsgPopup() {
+    function openMsgPopup() {
         const url = '/store/stock/stk32/create';
         const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=1000");
     }

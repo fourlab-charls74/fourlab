@@ -58,41 +58,41 @@
                             </div>
                         </div>
                     </div>
-                    
                 </div>    
             </div>
         </form>
     </div>
     <div class="show_layout py-3 px-sm-3">
         <div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
-                <div class="card-title">
-                    <div class="filter_wrap">
-                        <div class="fl_box">
-                            <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
-                        </div>
-                        <a href="#" onclick="openSendMsgPopup()" id="send_msg_btn" class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;"> 알림 보내기</a>
-                        <a href="#" id="add_group_btn" class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;"> 그룹추가</a>
+            <div class="card-title">
+                <div class="filter_wrap">
+                    <div class="fl_box">
+                        <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                     </div>
+                    <a href="#" onclick="openSendMsgPopup()" id="send_msg_btn" class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;"> 알림 보내기</a>
+                    <a href="#" id="add_group_btn" class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;"> 그룹추가</a>
                 </div>
-                <div class="table-responsive">
-                    <div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
-                </div>
+            </div>
+            <div class="table-responsive">
+                <div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
+            </div>
         </div>
     </div>
-    <script language="javascript">
+
+<script language="javascript">
     var columns = [
         {
-        headerName: '',
-        headerCheckboxSelection: true,
-        checkboxSelection: true,
-        width:28,
-        pinned:'left'
+            headerName: '',
+            headerCheckboxSelection: true,
+            checkboxSelection: true,
+            width:28,
+            pinned:'left'
         },
         {headerName: "매장코드", field: "sender_type",width:150},
         {headerName: "매장명", field: "sender_cd",  width:150, cellClass: 'hd-grid-code'},
         {headerName: "연락처", field: "content",  width:150, cellClass: 'hd-grid-code'},
         {headerName: "그룹명", field: "rt", width: 150, cellClass: 'hd-grid-code'},
-        { width: 'auto' }
+        {width: 'auto'}
     ];                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
 
 </script>
@@ -119,7 +119,7 @@
 </script>
 
 <script>
- function openSendMsgPopup() {
+    unction openSendMsgPopup() {
         const url = '/store/stock/stk32/sendMsg';
         const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=600");
     }

@@ -6,8 +6,6 @@
 <script type="text/javascript" src="/handle/editor/summernote/summernote-lite.min.js"></script>
 <script type="text/javascript" src="/handle/editor/summernote/lang/summernote-ko-KR.js"></script>
 <script type="text/javascript" src="/handle/editor/summernote/plugin/summernote-ext-ssm-emoji/summernote-ext-ssm-emoji.js?v=2020081801"></script>
-<link rel="stylesheet" href="/handle/editor/summernote/summernote-lite.min.css">
-<link rel="stylesheet" href="/handle/editor/summernote/plugin/summernote-ext-ssm-emoji/summernote-ext-ssm-emoji.css?v=2020081821">
 
 <div class="show_layout">
     <div class="page_tit">
@@ -119,14 +117,10 @@
 </div>
 <script type="text/javascript" charset="utf-8">
 
-
-
-
-
-    var ed;
+    let editor1;
 
     $(document).ready(function() {
-        var editorToolbar = [
+        let editorToolbar = [
             ['font', ['bold', 'underline', 'clear']],
             ['color', ['color']],
             ['para', ['paragraph']],
@@ -134,7 +128,7 @@
             ['emoji', ['emoji']],
             ['view', ['undo', 'redo', 'codeview', 'help']]
         ];
-        var editorOptions = {
+        let editorOptions = {
             lang: 'ko-KR', // default: 'en-US',
             minHeight: 200,
             dialogsInBody: true,
@@ -146,11 +140,11 @@
                 maxSize: 10
             }
         }
-        ed = new HDEditor('#editor1', editorOptions, true);
+        editor1 = new HDEditor('#editor1', editorOptions, true);
     });
 
     function Create() {
-        var frm = $('form[name=store]');
+        let frm = $('form[name=store]');
         //console.log(frm.serialize());
 
         if ($('input[name="subject"]').val() === '') {
@@ -165,7 +159,7 @@
             return false;
         }
 
-        $('input[name="content"]').val(ed.html());
+        $('input[name="content"]').val(editor1.html());
 
         $.ajax({
             method: 'put',
@@ -190,9 +184,9 @@
     
     function Update(no) {
         
-        var frm = $('form[name=store]');
+        let frm = $('form[name=store]');
         
-        $('input[name="content"]').val(ed.html());
+        $('input[name="content"]').val(editor1.html());
         
         $.ajax({
             method: 'put',
@@ -213,48 +207,44 @@
     }
     
     $( ".sch-store" ).on("click", function() {
-            searchStore.Open(null, "multiple");
-        });
+        searchStore.Open(null, "multiple");
+    });
         
-    </script>
+</script>
 
 <script>
     
     function select_store_delete(store_cd, ns_cd){
-    
         let ss = document.querySelectorAll(".store_sel");
-        // console.log(ns_cd);
-
        
         if(confirm("삭제하시겠습니까?")){
-        $.ajax({
-            method: 'post',
-            url: '/store/stock/stk31/del_store',
-            data: {data_store : store_cd, ns_cd : ns_cd},
-            success: function(data) {
-                if (data.code == '200') {
-                    for(let i = 0;i<ss.length;i++){
-                        if(ss[i].dataset.store == store_cd){
-                            data_store = ss[i].dataset.store;
-                            ss[i].remove();
-                            break;
+            $.ajax({
+                method: 'post',
+                url: '/store/stock/stk31/del_store',
+                data: {data_store : store_cd, ns_cd : ns_cd},
+                success: function(data) {
+                    if (data.code == '200') {
+                        for(let i = 0;i<ss.length;i++){
+                            if(ss[i].dataset.store == store_cd){
+                                data_store = ss[i].dataset.store;
+                                ss[i].remove();
+                                break;
+                            }
                         }
-                     }
-                    alert('공지매장 삭제에 성공하였습니다.');
-                } else {
-                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                        alert('공지매장 삭제에 성공하였습니다.');
+                    } else {
+                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                    }
+                },
+                error: function(res, status, error) {
+                    console.log(error);
                 }
-            },
-            error: function(res, status, error) {
-                console.log(error);
-            }
-        });
+            });
         }
-
-        // console.log(data_store);
     }
     
 </script>
 
-
+<link rel="stylesheet" href="/handle/editor/summernote/summernote-lite.min.css">
+<link rel="stylesheet" href="/handle/editor/summernote/plugin/summernote-ext-ssm-emoji/summernote-ext-ssm-emoji.css?v=2020081821">
 @stop

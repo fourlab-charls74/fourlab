@@ -18,9 +18,7 @@
                 <h4>검색</h4>
                 <div class="flax_box">
                     <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                    
                     <a href="#" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
-                    <!-- <input type="reset" id="search_reset" value="검색조건 초기화" class="btn btn-sm btn-outline-primary shadow-sm" onclick="formReset()"> -->
                     <a href="/store/stock/stk31/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
@@ -170,19 +168,19 @@
 	</div>
 </div>
 <script language="javascript">
-    var columns = [
+    let columns = [
         {headerName: "#", field: "num",type:'NumType', cellClass: 'hd-grid-code'},
-        {headerName: "제목", field: "subject",width:400,
+        {headerName: "제목", field: "subject", width: 400,
             cellRenderer: function(params) {
-                return '<a href="/store/stock/stk31/' + params.data.ns_cd +'" rel="noopener">'+ params.value+'</a>'
-            }},
-        {headerName: "ID", field: "admin_id",  width:80, cellClass: 'hd-grid-code'},
-        {headerName: "이름", field: "admin_nm",  width:80, cellClass: 'hd-grid-code'},
+                return '<a href="/store/stock/stk31/' + params.data.ns_cd +'" rel="noopener">'+ params.value+'</a>';
+            }
+        },
+        {headerName: "ID", field: "admin_id",  width: 80, cellClass: 'hd-grid-code'},
+        {headerName: "이름", field: "admin_nm",  width: 80, cellClass: 'hd-grid-code'},
         {headerName: "이메일", field: "admin_email", width: 130, cellClass: 'hd-grid-code'},
         {headerName: "조회수", field: "cnt", type:'numberType',width: 50, cellClass: 'hd-grid-code'},
         {headerName: "전체 공지 여부", field: "all_store_yn",width: 90, cellClass: 'hd-grid-code',
             cellStyle: params => {
-                // console.log(pararms.data.all_store_yn);
                 if(params.data.all_store_yn == 'Y'){
                     return {color:'red'}
                 }else{
@@ -199,7 +197,6 @@
         },
         {headerName: "공지매장", field: "store_nm", width: 340, cellClass: 'hd-grid-code',
             cellRenderer: function(params) {
-                //  console.log(params.data.stores);
                 return params.data.stores;
             }
         },
@@ -207,7 +204,7 @@
         {headerName: "수정일시", field: "ut", type:"DateTimeType"},
         {headerName: "글번호", field: "ns_cd", hide:true },
         {headerName: "매장구분", field: "store_type" },
-        { width: 'auto' }
+        {width: 'auto'}
     ];
 
 </script>

@@ -35,12 +35,10 @@ class stk32Controller extends Controller
         $sender = $request->input('');
         $content = $request->input('');
 
-
         $where = "";
         $orderby = "";
         if ($sender != "") $where .= "";
         if ($content != "") $where .= "";
-
 
         $sql = "";
 
@@ -55,13 +53,14 @@ class stk32Controller extends Controller
         ]);
     }
 
-    public function create(){
+    public function create()
+    {
 
-     
         return view( Config::get('shop.store.view') . '/stock/stk32_show');
     }
 
-    public function sendMsg(){
+    public function sendMsg()
+    {
         
         $mutable = Carbon::now();
         $sdate	= $mutable->sub(1, 'month')->format('Y-m-d');
@@ -72,17 +71,18 @@ class stk32Controller extends Controller
             'edate' => date("Y-m-d")
         ];
 
-     
         return view( Config::get('shop.store.view') . '/stock/stk32_sendMsg', $values);
     }
 
-    public function show($no) {
+    public function show($no) 
+    {
 
         $sql = /** @lang text */
             "
-            select * from msg_store_detail
+            select * 
+            from msg_store_detail
 			where msg_cd = $no
-         ";
+        ";
         $result = DB::selectOne($sql,array("msg_cd" => $no));
 
         $values = [
@@ -90,10 +90,11 @@ class stk32Controller extends Controller
             'result' => $result,
         ];
 
-        return view( Config::get('shop.store.view') . '/stock/stk32_show',$values);
+        return view( Config::get('shop.store.view') . '/stock/stk32_show', $values);
     }
 
-    public function msg($no) {
+    public function msg($no) 
+    {
 
         $sql = /** @lang text */
             "
@@ -107,7 +108,7 @@ class stk32Controller extends Controller
             'result' => $result,
         ];
 
-        return view( Config::get('shop.store.view') . '/stock/stk32_msg',$values);
+        return view( Config::get('shop.store.view') . '/stock/stk32_msg', $values);
     }
 
 }
