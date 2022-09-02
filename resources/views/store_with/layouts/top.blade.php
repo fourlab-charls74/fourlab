@@ -14,7 +14,7 @@
                 <li><a href="" class="history"></a></li>
                 <li><a href="" class="cart"></a></li>
                 <li><a href="javascript:void(0);" onclick="return openSmsList();" class="mail act"></a></li>
-                <li><a href="" class="notice act"></a></li>
+                <li><a href="stk31" class="notice act"></a></li>
                 <li>
                     <div class="dropdown d-inline-block">
                         <button type="button" class="profile_btn btn header-item waves-effect notice" id="page-header-user-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
