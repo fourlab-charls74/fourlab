@@ -67,6 +67,7 @@
         </div>
     </div>
 </div>
+
 <script language="javascript">
     const CENTER = {'text-align': "center"};
     const YELLOW = {'background-color': "#ffff99"};
@@ -96,6 +97,7 @@
         },
         { field: "g3", headerName: "정상3",
             children: [
+                // 정상3은 정상2 금액을 넘어가는 경우에 적용되며 금액 기준선은 동일
                 { headerName: "금액", field: "amt2", type: 'currencyType', width:100,
                     valueFormatter: (params) => formatNumber(params) + ' ~'
                 },
