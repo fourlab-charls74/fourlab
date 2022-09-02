@@ -55,16 +55,18 @@ class stk01Controller extends Controller
 		$ord_field = $request->input('ord_field','p.goods_no');
 		$orderby = sprintf("order by %s %s", $ord_field, $ord);
 
-
-		// $store_cds = array_filter(explode(',', $request->input('store_nos')));
-		// $store_where = "";
-		// foreach ($store_cds as $key => $cd) {
-		// 	if ($key === 0) {
-		// 		$store_where .= "and p.store_cd = '$cd'";
-		// 	} else {
-		// 		$store_where .= " or p.store_cd = '$cd'";
-		// 	}
-		// }
+		$store_cds = $request->input('store_no') ?? [];
+		$store_where = "";
+		foreach ($store_cds as $key => $cd) {
+			if ($key === 0) {
+				$store_where .= "p.store_cd = '$cd'";
+			} else {
+				$store_where .= " or p.store_cd = '$cd'";
+			}
+		}
+		if (count($store_cds) < 1) {
+			$store_where = "1=1";
+		}
 
 		$where	= "";
 		if ($store_type != "")	$where .= " and s.store_type = '" . $store_type . "' ";
@@ -155,8 +157,7 @@ class stk01Controller extends Controller
 				left outer join `code` c on c.code_kind_cd = 'G_GOODS_STAT' and sale_stat_cl = c.code_id
 				left outer join `code` c2 on c2.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = c2.code_id 
 				left outer join brand b on b.brand = g.brand
-			where 1=1 $where 
-			-- store_where 들어갈 예정
+			where 1=1 $where and ($store_where)
 			$orderby 
 			$limit
 		";

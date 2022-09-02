@@ -93,10 +93,13 @@
                                             <td>
                                                 <div class="form-inline">
                                                     @if(@$cmd == 'add')
-                                                    {{-- md 관련 api 작업 예정 --}}
-                                                    <input type="text" id="md_id" name="md_id" class="form-control form-control-sm w-100">
+                                                    <div class="form-inline inline_btn_box w-100">
+                                                        <input type="hidden" id="md_id" name="md_id">
+                                                        <input type="text" id="md_nm" name="md_nm" class="form-control form-control-sm w-100 bg-white" readonly>
+                                                        <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-md"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                                    </div>
                                                     @else
-                                                    <p class="fs-14">{{ $sc->sc_date }}</p>
+                                                    <p class="fs-14">{{ $sc->md_nm }}</p>
                                                     @endif
                                                 </div>
                                             </td>
@@ -221,78 +224,73 @@
     function Save(cmd) {
         if(!cmd) return;
 
-        // let sr_reason = document.f1.sr_reason.value;
-        // let comment = document.f1.comment.value;
-        // let rows = gx.getRows();
+        let comment = document.f1.comment.value;
+        let rows = gx.getRows();
 
-        // if(cmd === 'add') {
-        //     let sr_date = document.f1.sdate.value;
-        //     let storage_cd = document.f1.storage_cd.value;
-        //     let store_cd = document.f1.store_no.value;
+        if(cmd === 'add') {
+            let sc_date = document.f1.sdate.value;
+            let store_cd = document.f1.store_no.value;
+            let md_id = document.f1.md_id.value;
 
-        //     if(store_cd === '') {
-        //         $(".sch-store").click();
-        //         return alert("매장을 선택해주세요.");
-        //     }
-        //     if(rows.length < 1) return alert("반품등록할 상품을 선택해주세요.");
+            if(store_cd === '') {
+                $(".sch-store").click();
+                return alert("매장을 선택해주세요.");
+            }
+            if(rows.length < 1) return alert("실사등록할 상품을 선택해주세요.");
+            if($("[name=md_id]").val() === '') return alert("담당자를 선택해주세요.");
 
-        //     let zero_qtys = rows.filter(r => r.qty < 1);
-        //     if(zero_qtys.length > 0) return alert("반품수량이 0개인 항목이 존재합니다.");
+            if(!confirm("등록하시겠습니까?")) return;
 
-        //     if(!confirm("등록하시겠습니까?")) return;
+            axios({
+                url: '/store/stock/stk26/save',
+                method: 'put',
+                data: {
+                    sc_date,
+                    store_cd,
+                    md_id,
+                    comment,
+                    products: rows.map(r => ({ prd_cd: r.prd_cd, price: r.price, qty: r.qty, store_qty: r.store_wqty })),
+                },
+            }).then(function (res) {
+                if(res.data.code === '200') {
+                    alert("실사등록이 성공적으로 완료되었습니다.");
+                    opener.Search();
+                    window.close();
+                } else {
+                    console.log(res.data);
+                    alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+                }
+            }).catch(function (err) {
+                console.log(err);
+            });
+        } else if(cmd === 'update') {
+            let sc_state = '{{ @$sc->sc_state }}';
+            let sc_cd = '{{ @$sc->sc_cd }}';
 
-        //     axios({
-        //         url: '/store/stock/stk30/add-store-return',
-        //         method: 'put',
-        //         data: {
-        //             sr_date,
-        //             storage_cd,
-        //             store_cd,
-        //             sr_reason,
-        //             comment,
-        //             products: rows.map(r => ({ prd_cd: r.prd_cd, price: r.price, return_price: r.return_price, return_qty: r.qty })),
-        //         },
-        //     }).then(function (res) {
-        //         if(res.data.code === 200) {
-        //             alert(res.data.msg);
-        //             opener.Search();
-        //             window.close();
-        //         } else {
-        //             console.log(res.data);
-        //             alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-        //         }
-        //     }).catch(function (err) {
-        //         console.log(err);
-        //     });
-        // } else if(cmd === 'update') {
-        //     let sr_state = '{{ @$sr->sr_state }}';
-        //     let sr_cd = '{{ @$sr->sr_cd }}';
+            if(sc_state != 'N') return alert("매장LOSS등록 이전에만 수정가능합니다.");
+            if(!confirm("수정하시겠습니까?")) return;
 
-        //     if('{{ @$sr->sr_state }}' != 10) return alert("창고반품이 '요청'상태일떄만 수정가능합니다.");
-        //     if(!confirm("수정하시겠습니까?")) return;
-
-        //     axios({
-        //         url: '/store/stock/stk30/update-store-return',
-        //         method: 'put',
-        //         data: {
-        //             sr_cd,
-        //             sr_reason,
-        //             comment,
-        //             products: rows.map(r => ({ sr_prd_cd: r.sr_prd_cd, return_price: r.return_price, return_qty: r.qty })),
-        //         },
-        //     }).then(function (res) {
-        //         if(res.data.code === 200) {
-        //             alert(res.data.msg);
-        //             opener.Search();
-        //             window.close();
-        //         } else {
-        //             console.log(res.data);
-        //             alert("수정 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-        //         }
-        //     }).catch(function (err) {
-        //         console.log(err);
-        //     });
-        // }
+            axios({
+                url: '/store/stock/stk26/update',
+                method: 'put',
+                data: {
+                    sc_cd,
+                    comment,
+                    products: rows.map(r => ({ sc_prd_cd: r.sc_prd_cd, qty: r.qty })),
+                },
+            }).then(function (res) {
+                if(res.data.code === '200') {
+                    alert("실사정보 수정이 성공적으로 완료되었습니다.");
+                    opener.Search();
+                    window.close();
+                } else {
+                    console.log(res.data);
+                    alert("수정 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+                }
+            }).catch(function (err) {
+                console.log(err);
+            });
+        }
     }
 
     const checkIsEditable = (params) => {

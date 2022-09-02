@@ -7,6 +7,9 @@ $.ajaxSetup({
     }
   });
   
+/**
+ * 매장검색
+ */
 
 $( document ).ready(function() {
 
@@ -209,10 +212,90 @@ SearchStore.prototype.InitValue = () => {
 
 let searchStore = new SearchStore();
 
+/**
+ * 담당자 (MD) 검색
+ */
+function SearchMD(){
+    this.grid = null;
+}
+
+SearchMD.prototype.Open = async function(callback = null){
+    if(this.grid === null){
+        this.SetGrid("#div-gd-md");
+        $("#SearchMdModal").draggable();
+        this.callback = callback;
+    }
+    this.Search();
+    $('#SearchMdModal').modal({
+        keyboard: false
+    });
+};
+
+SearchMD.prototype.SetGrid = function(divId){
+    let columns = [];
+
+    columns.push(
+        { field:"md_id", hide: true},
+        { field:"md_nm", headerName:"이름", width: 150, cellStyle: {"text-align": "center"} },
+        { 
+            field:"choice", headerName:"선택", width: 60, cellClass:'hd-grid-code',
+            cellRenderer: function (params) {
+                if (params.data.md_id !== undefined) {
+                    return '<a href="javascript:void(0);" onclick="return searchMd.Choice(\'' + params.data.md_id + '\',\'' + params.data.md_nm + '\');">선택</a>';
+                }
+            }
+        },
+        { width: "auto" }
+    );
+
+    this.grid = new HDGrid(document.querySelector( divId ), columns);
+};
+
+SearchMD.prototype.Search = function(e) {
+    const event_type = e?.type;
+    if (event_type == 'keypress') {
+        if (e.key && e.key == 'Enter') {
+            let data = $('form[name="search_md"]').serialize();
+            this.grid.Request('/store/api/mds/search', data);
+        } else {
+            return false;
+        }
+    } else {
+        let data = $('form[name="search_md"]').serialize();
+        this.grid.Request('/store/api/mds/search', data);
+    }
+};
+
+SearchMD.prototype.Choice = function(code,name) {
+    if(this.callback !== null){
+        this.callback(code, name);
+    } else {
+        if($('#md_id').length > 0){
+            $('#md_id').val(code);
+        }
+        if($('#md_nm').length > 0){
+            $('#md_nm').val(name);
+        }
+    }
+
+    document.search_md.reset();
+    searchMd.grid.setRows([]);
+    $('#gd-md-total').html(0);
+
+    $('#SearchMdModal').modal('toggle');
+};
+
+let searchMd = new SearchMD();
+
 $( document ).ready(function() {
     // 매장 검색 클릭 이벤트 바인딩 및 콜백 사용
     $( ".sch-store" ).on("click", function() {
         searchStore.Open();
+    });
+
+    // 담당자 검색 클릭 이벤트 바인딩 및 콜백 사용
+    $( ".sch-md" ).on("click", function() {
+        searchMd.Open();
     });
 });
 

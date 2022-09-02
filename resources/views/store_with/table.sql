@@ -571,7 +571,7 @@ CREATE TABLE `notice_store` (
     `admin_nm` varchar(30) DEFAULT NULL COMMENT '작성자명',
     `admin_email` varchar(50) DEFAULT NULL COMMENT '작성자이메일',
     `cnt` int(11) DEFAULT NULL COMMENT '조회수',
-    `sc_state` char(1) DEFAULT 'N' COMMENT '전체공지여부 - Y / N',
+    `all_store_yn` char(1) DEFAULT 'N' COMMENT '전체공지여부 - Y / N',
     `rt` datetime DEFAULT NULL COMMENT '등록일자',
     `ut` datetime DEFAULT NULL COMMENT '수정일자',
     PRIMARY KEY (`ns_cd`)

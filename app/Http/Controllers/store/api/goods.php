@@ -691,12 +691,18 @@ class goods extends Controller
             $query = /** @lang text */
                 "
                 select count(*) as total
-                from goods g inner join product_stock s on g.goods_no = s.goods_no 
-                inner join product_stock_storage ps on s.prd_cd = ps.prd_cd and ps.storage_cd = '$storage_cd'
-				left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
-                where 1=1 
-                    -- g.com_id = :com_id 
-                    $where
+                from product_stock_storage p
+                    inner join goods g on g.goods_no = p.goods_no
+                    inner join brand b on b.brand = g.brand
+                    inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
+                    inner join company com on com.com_id = g.com_id
+                    inner join category cat on cat.d_cat_cd = g.rep_cat_cd and cat.cat_type = 'DISPLAY'
+                    inner join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
+                    inner join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
+                    inner join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
+                    inner join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
+                    inner join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
+                where p.storage_cd = '$storage_cd' $where
 			";
             //$row = DB::select($query,['com_id' => $com_id]);
             $row = DB::select($query);
@@ -708,67 +714,67 @@ class goods extends Controller
         $cfg_img_size_real = "a_500";
         $cfg_img_size_list = "s_50";
 
-        $query = /** @lang text */
-            "
-			select
-				'' as blank
-				, g.goods_no , g.goods_sub
-				, ifnull( type.code_val, 'N/A') as goods_type
-				, com.com_nm
-				, opt.opt_kind_nm
-				, brand.brand_nm as brand
-				, cat.full_nm
-				, g.style_no
-				, g.head_desc
-				, '' as img_view
-				, if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
+        $query = "
+            select
+                p.goods_no,
+                g.goods_sub,
+                ifnull(type.code_val, 'N/A') as goods_type,
+                com.com_nm,
+                p.prd_cd,
+                op.opt_kind_nm,
+                b.brand_nm as brand,
+                cat.full_nm,
+                g.style_no,
+                g.head_desc,
+                '' as img_view,
+                if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
 					select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
 					from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
-				  )) as img
-				, g.goods_nm
-				, g.goods_nm_eng
-				, g.ad_desc
-				, stat.code_val as sale_stat_cl
-				, g.normal_price
-				, g.price
-				, g.wonga
-				, (100/(g.price/(g.price-g.wonga))) as margin_rate
-				, (g.price-g.wonga) as margin_amt
-				, g.md_nm
-				, bi.code_val as baesong_info
-				, bk.code_val as baesong_kind
-				, dpt.code_val as dlv_pay_type
-				, g.baesong_price
-				, g.point
-				, g.org_nm
-				, g.make
-				, g.type
-				, g.reg_dm
-				, g.upd_dm
-				, g.goods_location
-				, g.sale_price
-                , g.goods_sh 
-				, g.goods_type as goods_type_cd
-				, com.com_type as com_type_d
-				, s.prd_cd , s.goods_opt
-                , ps.qty as storage_qty, ps.wqty as storage_wqty
-			from goods g inner join product_stock s on g.goods_no = s.goods_no
-                inner join product_stock_storage ps on s.prd_cd = ps.prd_cd and ps.storage_cd = '$storage_cd'
-				left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
-				left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
-				left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
-				left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
-				left outer join company com on com.com_id = g.com_id
-				left outer join brand brand on brand.brand = g.brand
-				left outer join category cat on cat.d_cat_cd = g.rep_cat_cd and cat.cat_type = 'DISPLAY'
-				left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
-				left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
-				left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
-			where 1 = 1
-                $where
+                )) as img,
+                stat.code_val as sale_stat_cl,
+                g.goods_nm,
+                g.goods_nm_eng,
+                g.ad_desc,
+                g.normal_price,
+                g.price,
+                g.wonga,
+                (100/(g.price/(g.price-g.wonga))) as margin_rate,
+                (g.price-g.wonga) as margin_amt,
+                g.md_nm,
+                bi.code_val as baesong_info,
+                bk.code_val as baesong_kind,
+                dpt.code_val as dlv_pay_type,
+                g.baesong_price,
+                g.point,
+                g.org_nm,
+                g.make,
+                g.type,
+                g.reg_dm,
+                g.upd_dm,
+                g.goods_location,
+                g.sale_price,
+                g.goods_sh ,
+                g.goods_type as goods_type_cd,
+                com.com_type as com_type_d,
+                p.goods_opt,
+                p.qty as storage_qty,
+                p.wqty as storage_wqty,
+                '' as rel_qty
+            from product_stock_storage p
+                inner join goods g on g.goods_no = p.goods_no
+                inner join brand b on b.brand = g.brand
+                inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
+                inner join company com on com.com_id = g.com_id
+                inner join category cat on cat.d_cat_cd = g.rep_cat_cd and cat.cat_type = 'DISPLAY'
+                inner join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
+                inner join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
+                inner join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
+                inner join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
+                inner join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
+            where p.storage_cd = '$storage_cd' $where
             $orderby
 			$limit
-		";
+        ";
 
         $pdo = DB::connection()->getPdo();
         $stmt = $pdo->prepare($query);

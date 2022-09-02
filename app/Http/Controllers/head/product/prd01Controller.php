@@ -1910,13 +1910,13 @@ class prd01Controller extends Controller
 	private function get_history_modify($goods_no)
 	{
 		$query = "
-					select
-						date_format(a.upd_date,'%y.%m.%d %h:%i:%s') as upd_date
-						, a.memo, a.head_desc, a.price, a.wonga, a.margin, a.id, b.name
-					from goods_modify_hist a
-						inner join mgr_user b on a.id = b.id
-					where a.goods_no = $goods_no
-					order by a.hist_no desc
+			select
+				date_format(a.upd_date,'%y.%m.%d %h:%i:%s') as upd_date, 
+				a.memo, a.head_desc, a.price, a.wonga, a.margin, a.id, b.name
+			from goods_modify_hist a
+				inner join mgr_user b on a.id = b.id
+			where a.goods_no = $goods_no
+			order by a.hist_no desc
 		";
 
 		$result = DB::select($query);
@@ -2411,13 +2411,6 @@ class prd01Controller extends Controller
 					order by seq
 				";
 
-				$sql = "
-					select distinct substring_index(goods_opt, '^', :index) as goods_opt, substring_index(opt_name, '^', :index2) as opt_name, goods_no
-					from goods_summary 
-					where goods_no = :goods_no and use_yn = 'Y'
-					order by seq
-				";
-
 				$result = array_merge(DB::select($sql, ['index' => 1, 'index2' => 1, 'goods_no' => $goods_no]), DB::select($sql, ['index' => -1, 'index2' => -1, 'goods_no' => $goods_no]));
 
 			}
@@ -2667,7 +2660,7 @@ class prd01Controller extends Controller
 		}
 
 		$sql = 
-			" select distinct(substring_index(goods_opt, '^', :index)) as opt_nm from goods_summary where goods_no = :goods_no and use_yn = 'Y' order by opt_nm ";
+			" select distinct(substring_index(goods_opt, '^', :index)) as opt_nm from goods_summary where goods_no = :goods_no and use_yn = 'Y' order by seq";
 	
 		if ($opt_kind_cnt > 0) {
 			$opt['opt1'] = DB::select($sql,['goods_no' => $goods_no, 'index' => 1]);
@@ -2790,6 +2783,87 @@ class prd01Controller extends Controller
 			$code = 500;
 		}
 		return response()->json(['code' => $code]);
+	}
+
+	public function stock($goods_no = 0)
+	{
+		$wonga = 0;
+		$sql = "
+			select wonga from goods
+			where goods_no = :goods_no and goods_sub = '0'
+		";
+		$result = DB::select($sql, ['goods_no' => $goods_no]);
+		if (count($result) > 0) $wonga = $result[0]->wonga;
+
+		$values = $this->getBasicOptsMatrix($goods_no)->getOriginalContent();
+		$values['sdate'] = date("Y-m-d");
+		$values['goods_no'] = $goods_no;
+		$values['invoice_no'] = date("Ymd");
+		$values['wonga'] = Lib::cm($wonga);
+		$values['locs'] = SLib::getCodes('G_STOCK_LOC')->all();
+
+		// dd($values);
+
+        return view( Config::get('shop.head.view') . '/product/prd01_stock', $values);
+	}
+
+	public function stockIn(Request $request)
+	{
+		// 설정 값 얻기
+		$conf = new Conf();
+		$cfg_domain = $conf->getConfigValue("shop", "domain");
+
+		$user = [
+			'id' => Auth('head')->user()->id,
+			'name' => Auth('head')->user()->name
+		];
+
+		$inputs = $request->all();
+
+		try {
+			DB::transaction(function () use (&$inputs, $user, $cfg_domain) {
+
+				$goods_no = $inputs['goods_no'];
+				$invoice_no = $inputs['invoice_no'];
+				$wonga = $inputs['wonga'];
+				$loc = $inputs['loc'];
+				$data = $inputs['data'];
+
+				$jaego = new Jaego($user); // 재고 클래스 호출
+				$jaego->SetLoc($loc);
+				
+				foreach ($data as $row) {
+					$qty = $row['qty'];
+					$opt = $row['opt'];
+					$sql = "
+						select distinct opt_name from goods_summary where goods_no = :goods_no and goods_sub = '0'
+					";
+					$result = DB::selectOne($sql, ['goods_no' => $goods_no]);
+					$opt_name = $result->opt_name;
+
+					$check = $jaego->Plus(array(
+						"type" => 1,
+						"etc" => '',
+						"qty" => $qty,
+						"goods_no" => $goods_no,
+						"goods_sub" => 0,
+						"goods_opt" => $opt,
+						"wonga" => $wonga,
+						"invoice_no" => $invoice_no,
+						"opt_name"	=>  $opt_name,
+						"wonga_apply_yn" => "Y"
+					));
+		
+					if (!$check) {
+						return response()->json(['code'	=> '-1', 'cfg_domain' => $cfg_domain]);
+					}
+				}
+			});
+			return response()->json(['code'	=> '200', 'cfg_domain' => $cfg_domain]);
+		} catch (\Exception $e) {
+            // dd($e->getMessage());
+			return response()->json(['code'	=> '500', 'cfg_domain' => $cfg_domain]);
+		}
 	}
 
 	/*

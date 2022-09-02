@@ -67,6 +67,7 @@
         </div>
     </div>
 </div>
+
 <script language="javascript">
     const CENTER = {'text-align': "center"};
     const YELLOW = {'background-color': "#ffff99"};
@@ -74,7 +75,7 @@
         { field: "chk", headerName: '', cellClass: 'hd-grid-code', checkboxSelection: true, width: 40, pinned: 'left', sort: null },
         { field: "idx", hide: true },
         { field: "seq", hide: true },
-        { field: "grade_cd", headerName: "등급코드", width: 100, rowDrag: true, editable: (params) => isAdded(params), 
+        { field: "grade_cd", headerName: "등급코드", width: 120, rowDrag: true, editable: (params) => isAdded(params), 
             cellStyle: (params) => isAdded(params) ? YELLOW : {}
         },
         { field: "name", headerName: "등급명", width: 100, cellStyle: CENTER, editable: true, cellStyle: YELLOW },
@@ -96,7 +97,10 @@
         },
         { field: "g3", headerName: "정상3",
             children: [
-                { headerName: "금액", field: "amt3", type: 'currencyType', width:100, editable: true, cellStyle: YELLOW },
+                // 정상3은 정상2 금액을 넘어가는 경우에 적용되며 금액 기준선은 동일
+                { headerName: "금액", field: "amt2", type: 'currencyType', width:100,
+                    valueFormatter: (params) => formatNumber(params) + ' ~'
+                },
                 { headerName: "수수료율", field: "fee3", type: 'percentType', width:100, editable: true, cellStyle: YELLOW },
             ]
         },
@@ -137,7 +141,7 @@
     function DataAdd() {
         let rows = gx.getRows();
         var newData = {
-            idx: rows.length,
+            idx: "",
             seq: rows.length,
             added: true
         };

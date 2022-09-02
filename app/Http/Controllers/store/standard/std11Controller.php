@@ -15,7 +15,6 @@ use App\Models\Conf;
 
 class std11Controller extends Controller
 {
-
 	const T = "after_service";
 
 	public function index()
@@ -35,6 +34,7 @@ class std11Controller extends Controller
 
 	public function search(Request $request)
 	{
+		$date_type = $request->input('date_type', "receipt_date");
 		$sdate = $request->input('sdate', "");
 		$edate = $request->input('edate', "");
 		$store_no = $request->input('store_no', "");
@@ -45,8 +45,8 @@ class std11Controller extends Controller
 		$where2 = $request->input('where2', "");
 
 		$where = "";
-		if ($sdate) $where .= " and a.receipt_date >= '${sdate}'";
-		if ($edate) $where .= " and a.receipt_date < date_add('${edate}', interval 1 day)";
+		if ($sdate) $where .= " and a.${date_type} >= '${sdate}'";
+		if ($edate) $where .= " and a.${date_type} < date_add('${edate}', interval 1 day)";
 		if ($store_no != "") $where .= " and a.store_no like '%" . Lib::quote($store_no) . "%'";
 		if ($store_nm != "") $where .= " and a.store_nm like '%" . Lib::quote($store_nm) . "%'";
 		if ($item != "") $where .= " and a.item like '%" . Lib::quote($item) . "%'";
@@ -138,6 +138,26 @@ class std11Controller extends Controller
 			});
 			return response()->json(['code'	=> '200']);
 		} catch (Exception $e) {
+			return response()->json(['code'	=> '500']);
+		}
+	}
+
+	public function batchEdit(Request $request)
+	{
+		$inputs = $request->all();
+		try {
+			DB::transaction(function () use ($inputs) {
+				$type = $inputs['type'];
+				$date = $inputs['date'];
+				$data =	$inputs['data'];
+				collect($data)->map(function ($row) use ($type, $date) {
+					DB::table(self::T)->where('idx', $row['idx'])->update([$type => $date]);
+				});
+			});
+			
+			return response()->json(['code'	=> '200']);
+		} catch (Exception $e) {
+			// dd($e);
 			return response()->json(['code'	=> '500']);
 		}
 	}

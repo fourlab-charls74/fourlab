@@ -1024,6 +1024,7 @@ ControlOption.prototype.Open = function(goods_no = 0, afterSaveOrDel = null) {
     if(this.grid === null){
         this.SetGrid("#div-gd-option");
         $("#ControlOptionModal").draggable();
+        $('#ControlOptionModal').draggable( 'disable' ) // ag-grid의 rowDrag 기능 사용을 위해 disable 처리
     } else {
         this.grid.setRows([]);
         this.grid.Request(`/head/product/prd01/${this.goods_no}/get-basic-options`, null, 1);
@@ -1035,15 +1036,18 @@ ControlOption.prototype.Open = function(goods_no = 0, afterSaveOrDel = null) {
 };
 
 ControlOption.prototype.SetGrid = function(divId) {
+    
     const columns = [
-        {headerName: '', width:40, valueGetter: 'node.id', cellRenderer: 'loadingRenderer'},
+        {headerName: '', width:40, valueGetter: 'node.id', cellRenderer: 'loadingRenderer', rowDrag: true},
         {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, sort: null},
         {field: "opt_name" , headerName: "옵션구분", width: 150},
         {field: "goods_opt" , headerName: "옵션", width: 200, editable: true, cellStyle: {'background' : '#ffff99'}},
         {field: "goods_no", hide: true},
     ];
     
-    this.grid = new HDGrid(document.querySelector( divId ), columns);
+    const option = { rowDragManaged: true, animateRows: true };
+    this.grid = new HDGrid(document.querySelector( divId ), columns, option);
+    
     this.grid.Request(`/head/product/prd01/${this.goods_no}/get-basic-options`, null, 1, function(e) {
 
         const opt_kinds = e.head.opt_kinds;

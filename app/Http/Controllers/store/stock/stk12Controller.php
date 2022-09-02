@@ -107,28 +107,50 @@ class stk12Controller extends Controller
         $limit = " limit $startno, $page_size ";
 
         // search
+        $store_cds = $r['store_no'] ?? [];
+        $store_type = $r['store_type'] ?? '';
+        $stores = [];
+        $store_select_sql = "";
+        foreach($store_cds as $store_cd) {
+            $row = DB::table('store')->select('store_cd', 'store_nm', 'store_type')->where('store_cd', '=', $store_cd)->first();
+            if($store_type == '' or ($store_type != '' and $row->store_type == $store_type)) {
+                array_push($stores, $row);
+                $store_select_sql .= "(select qty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd) as $store_cd" . "_qty,";
+                $store_select_sql .= "(select wqty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd) as $store_cd" . "_wqty,";
+            }
+        }
+        if(count($store_cds) < 1) {
+            $stores = DB::table('store')->select('store_cd', 'store_nm')->where('store_type', '=', $store_type)->get();
+            foreach($stores as $s) {
+                $store_cd = $s->store_cd;
+                $store_select_sql .= "(select qty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd) as $store_cd" . "_qty,";
+                $store_select_sql .= "(select wqty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd) as $store_cd" . "_wqty,";
+            }
+        }
+
 		$sql = "
             select
-                g.goods_no, 
+                p.goods_no,
                 g.goods_type,
-                ifnull(type.code_val, 'N/A') as goods_type_nm, 
-                p.prd_cd, 
+                ifnull(type.code_val, 'N/A') as goods_type_nm,
+                p.prd_cd,
                 op.opt_kind_nm,
-                b.brand_nm, 
-                g.style_no, 
-                stat.code_val as sale_stat_cl, 
-                g.goods_nm, 
+                b.brand_nm,
+                g.style_no,
+                stat.code_val as sale_stat_cl,
+                g.goods_nm,
                 p.goods_opt,
-                pss.qty as storage_qty,
-                pss.wqty as storage_wqty
-            from product_stock p
-                inner join goods g on p.goods_no = g.goods_no
-                left outer join product_stock_storage pss on pss.prd_cd = p.prd_cd and pss.storage_cd = (select storage_cd from storage where default_yn = 'Y')
-                left outer join brand b on b.brand = g.brand
-                left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
-                left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
-                left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
-            where 1=1 $where
+                p.qty as storage_qty,
+                p.wqty as storage_wqty,
+                $store_select_sql
+                '' as blank
+            from product_stock_storage p
+                inner join goods g on g.goods_no = p.goods_no
+                inner join brand b on b.brand = g.brand
+                inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
+                inner join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
+                inner join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
+            where p.storage_cd = (select storage_cd from storage where default_yn = 'Y') $where
             $orderby
             $limit
 		";
@@ -140,69 +162,18 @@ class stk12Controller extends Controller
         if($page == 1) {
             $sql = "
                 select count(*) as total
-                from product_stock p
-                    inner join goods g on p.goods_no = g.goods_no
-                    left outer join product_stock_storage pss on pss.prd_cd = p.prd_cd and pss.storage_cd = (select storage_cd from storage where default_yn = 'Y')
-                    left outer join brand b on b.brand = g.brand
-                    left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
-                    left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
-                    left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
-                where 1=1 $where
+                from product_stock_storage p
+                    inner join goods g on g.goods_no = p.goods_no
+                    inner join brand b on b.brand = g.brand
+                    inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
+                    inner join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
+                    inner join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
+                where p.storage_cd = (select storage_cd from storage where default_yn = 'Y') $where
             ";
 
             $row = DB::selectOne($sql);
             $total = $row->total;
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
-        }
-
-        $store_cds = $r['store_no'] ?? [];
-        $store_type = $r['store_type'] ?? '';
-        $where = "";
-        $is_type_cd = false;
-
-        if(count($store_cds) < 1) {
-            $sql = "
-                select store_cd
-                from store
-                where store_type = '$store_type'
-            ";
-            $store_cds = DB::select($sql);
-            $is_type_cd = true;
-        }
-
-        if($store_type != '') $where .= " and store.store_type = '$store_type'";
-
-        foreach($result as $re) {
-            $prd_cd = $re->prd_cd;
-            foreach($store_cds as $cd) {
-                if($is_type_cd) $cd = $cd->store_cd;
-                $qty = $cd . '_qty';
-                $wqty = $cd . '_wqty';
-                $rel_qty = $cd . '_rel_qty';
-                $sql = "
-                    select s.qty as $qty, s.wqty as $wqty
-                    from product_stock_store s
-                        inner join store on store.store_cd = s.store_cd
-                    where 1=1
-                        and s.prd_cd = '$prd_cd'
-                        and s.store_cd = '$cd'
-                        $where
-                ";
-                $row = DB::selectOne($sql);
-                $re->$cd = $row;
-            }
-        }
-
-        $stores = [];
-        foreach($store_cds as $cd) {
-            if($is_type_cd) $cd = $cd->store_cd;
-            $sql = "
-                select store_cd, store_nm
-                from store
-                where store_cd = '$cd' $where
-            ";
-            $row = DB::selectOne($sql);
-            if($row != null) array_push($stores, $row);
         }
 
 		return response()->json([

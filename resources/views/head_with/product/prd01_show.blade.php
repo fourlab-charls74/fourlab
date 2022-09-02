@@ -949,7 +949,7 @@
 												<a href="#" class="btn btn-sm btn-primary shadow-sm option-add-btn"><span class="fs-12">관리</span></a>
 												<a href="#" class="btn btn-sm btn-primary shadow-sm option-del-btn"><span class="fs-12">삭제</span></a>
 												<a href="#" class="btn btn-sm btn-primary shadow-sm option-sav-btn"><span class="fs-12">저장</span></a>
-												<a href="javascript:void(0);" onclick="alert('입고는 추후 진행할 예정입니다.')" class="btn btn-sm btn-primary shadow-sm option-inv-btn"><span class="fs-12">입고</span></a>
+												<a href="javascript:void(0);" onclick="openOptsStock();" class="btn btn-sm btn-primary shadow-sm option-inv-btn"><span class="fs-12">입고</span></a>
 											</div>
 										</div>
 									</div>
@@ -2571,7 +2571,8 @@
         const pApp2 = new App('', { gridId:"#div-gd-opt" });
         gridDiv = document.querySelector(pApp2.options.gridId);
         options = {
-            onCellValueChanged: (params) => optEvtAfterEdit(params)
+            onCellValueChanged: (params) => optEvtAfterEdit(params),
+            suppressFieldDotNotation: true // 컬럼명에 . 문자가 들어간 경우 깊은 참조로 처리 되는 것을 방지
         }   
         gx2 = new HDGrid(gridDiv, extra_option_stock_columns, options);
 
@@ -2606,6 +2607,7 @@
 
     let changedOptCells = [];
     const optEvtAfterEdit = (params) => {
+
         if (params.oldValue !== params.newValue) {
             row = params.data;
 
@@ -2670,6 +2672,7 @@
                 row.is_changed = {};
                 row.is_changed[`${column_name}`] = true;
             }
+
             gx2.gridOptions.api.applyTransaction({ update : [row] });
         }
     };
@@ -2743,7 +2746,7 @@
     };
 
     const setRightOptRows = async (type, { result }) => {
-
+        
         if (type == "기본") {
 
             let list = [];
@@ -2902,14 +2905,15 @@
 
                     if ($("[name='opt_type']").val() === 'basic' && basic_count == 0) location.reload();
 
-                    resetAddOptionKindBox();
-                    searchOptKind();
+                    // resetAddOptionKindBox();
+                    // searchOptKind();
 
                     // 사용안함인 경우 api에 none 뜨는 버그 방지 (goods_no가 null 인 경우)
-                    const GOODS_NO = document.f1.goods_no.value;
-                    controlOption.SetGoodsNo(GOODS_NO);
+                    // const GOODS_NO = document.f1.goods_no.value;
+                    // controlOption.SetGoodsNo(GOODS_NO);
+                    // initOptGridAndApi();
 
-                    initOptGridAndApi();
+                    window.location.reload(); // 추가시 관리팝업에서 옵션구분이 다른 경우가 있어 새로고침 처리
 
                 } else alert(res.msg);
             },
@@ -2938,8 +2942,9 @@
             },
             success: function (res) {
                 if(res.code === 200) {
-                    searchOptKind();
-                    initOptGridAndApi();
+                    // searchOptKind();
+                    // initOptGridAndApi();
+                    window.location.reload(); // 삭제시 관리팝업에서 옵션구분이 다른 경우가 있어 새로고침 처리
                 }
                 else alert(res.msg);
             },
@@ -3113,7 +3118,7 @@
                     obj.opt_memo = opt_memo;
 
                     if (!opt2) { // prefix 추출하여 opt2 값 알아냄
-                        let regExp = /.+(?=_good_qty)/i;
+                        let regExp = /.+(?=_good_qty)/i; // 전방탐색
                         let arr = key.match(regExp);
                         if (arr) obj.opt2 = arr[0];
                     }
@@ -3175,6 +3180,11 @@
         } else if (data?.code == 500) {
             alert("저장중 에러가 발생했습니다. 잠시 후 다시 시도해주세요.");
         };
+    };
+
+    const openOptsStock = () => { // 상품관리 - 입고 오픈
+        const url = `/head/product/prd01/${goods_no}/stock`;
+        const pop_up = window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1024,height=960");
     };
 
     /**

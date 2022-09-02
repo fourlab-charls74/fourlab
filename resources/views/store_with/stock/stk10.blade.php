@@ -366,7 +366,7 @@
         // 출고일자 값 : 출고상태가 요청/접수 일때 -> 출고예정일자(exp_dlv_day) | 출고상태가 출고/입고 일때 -> 출고처리일자(prc_rt)
         {field: "dlv_day", headerName: "출고일자", pinned: 'left', width: 110, cellStyle: {"text-align": "center"}, 
             cellRenderer: function(params) {
-                return params.data.state > 0 ? params.value + (params.data.state < 30 ? ' (예정)' : '') : '';
+                return params.data.state > 0 ? (params.value || '') + (params.data.state < 30 ? ' (예정)' : '') : '';
             }
         },
         {field: "state", headerName: "출고상태", pinned: 'left', cellStyle: StyleReleaseState,
@@ -402,7 +402,7 @@
             // },
             cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {
-                return params.data.state === 10 ? params.value : params.data.dlv_day.replaceAll("-", "") + params.value;
+                return params.data.state === 10 ? params.value : params.data.dlv_day?.replaceAll("-", "") || '' + (params.value || '');
             }
         },
         {field: "req_id", headerName: "요청자", cellStyle: {"text-align": "center"}},

@@ -42,17 +42,18 @@ class stk13Controller extends Controller
 		
 		$sdate = $r['sdate'] ?? '';
 		$edate = $r['edate'] ?? '';
+
         $store_cds = $r['store_no'] ?? [];
 
 		// store_where
 		foreach($store_cds as $key => $cd) {
-			if($key === 0) {
+			if ($key === 0) {
 				$store_where .= "o.store_cd = '$cd'";
 			} else {
 				$store_where .= " or o.store_cd = '$cd'";
 			}
 		}
-		if(count($store_cds) < 1) {
+		if (count($store_cds) < 1) {
 			$store_where = "1=1";
 		}
 

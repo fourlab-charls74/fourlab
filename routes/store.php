@@ -45,6 +45,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('members', 'MemberController@show');
         Route::get('members/search', 'MemberController@search');
 
+        // 관리자 (담당자MD) 조회
+        Route::get('mds/search', 'AdminController@search');
+
         // 매장명 조회
         Route::get('stores', 'StoreController@show');
         Route::get('stores/search', 'StoreController@search');
@@ -116,6 +119,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 수선관리
         Route::get('std11', 'std11Controller@index');
         Route::get('std11/search', 'std11Controller@search');
+        Route::post('std11/batch-edit', 'std11Controller@batchEdit');
 
         Route::get('std11/create', 'std11Controller@showCreate');
         Route::post('std11/create', 'std11Controller@create');
@@ -253,6 +257,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk26','stk26Controller@index');
         Route::get('stk26/search','stk26Controller@search');
         Route::get('stk26/show/{sc_cd?}','stk26Controller@show');
+        Route::get('stk26/search-check-products','stk26Controller@search_check_products');
+        Route::put('stk26/save', 'stk26Controller@save');
+        Route::put('stk26/update', 'stk26Controller@update');
         
         // 창고반품
         Route::get('stk30','stk30Controller@index');
@@ -310,6 +317,11 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('sal18/search', 'sal18Controller@search');
         Route::get('sal18/search-store', 'sal18Controller@search_store');
         Route::post('sal18/save', 'sal18Controller@save');
+
+        // 매장LOSS등록
+        Route::get('sal20', 'sal20Controller@index');
+        Route::get('sal20/search', 'sal20Controller@search');
+        Route::post('sal20/loss', 'sal20Controller@save_loss');
     });
 
     Route::prefix("account")->namespace('account')->group(function () {
