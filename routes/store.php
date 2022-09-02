@@ -278,7 +278,15 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk31/{no}', 'stk31Controller@show');
         Route::put('stk31/store', 'stk31Controller@store');
         Route::put('stk31/edit/{no}', 'stk31Controller@update');
-        Route::delete('stk31/del_store/{no}', 'stk31Controller@del_store');
+        Route::post('stk31/del_store', 'stk31Controller@del_store');
+
+        //알림
+        Route::get('stk32','stk32Controller@index');
+        Route::get('stk32/search', 'stk32Controller@search');
+        Route::get('stk32/create', 'stk32Controller@create');
+        Route::get('stk32/sendMsg', 'stk32Controller@sendMsg');
+        Route::get('stk32/show/{no?}', 'stk32Controller@show');
+        Route::get('stk32/msg{no?}', 'stk32Controller@msg');
 
     });
 

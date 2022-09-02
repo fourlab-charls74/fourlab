@@ -15,8 +15,9 @@ use App\Models\Conf;
 
 class std02Controller extends Controller
 {
-	public function index() {
-
+	public function index() 
+	{
+	
 		$values = [
 			'store_types'	=> SLib::getCodes("STORE_TYPE"),	// 매장구분
 			'store_kinds'	=> SLib::getCodes("STORE_KIND"),	// 매장종류
@@ -39,12 +40,12 @@ class std02Controller extends Controller
 		$store_nm	= $request->input("store_nm");
 		$store_cd	= $request->input("store_cd");
 		$use_yn		= $request->input("use_yn");			// 사용유무
-
+		
 		$limit		= $request->input("limit",100);
 		$ord		= $request->input('ord','desc');
 		$ord_field	= $request->input('ord_field','a.rt');
 		$orderby	= sprintf("order by %s %s", $ord_field, $ord);
-
+		
 		$where = "";
 		if( $store_type != "" )	$where .= " and a.store_type = '$store_type' ";
 		if( $store_kind != "" )	$where .= " and a.store_kind = '$store_kind' ";
@@ -84,7 +85,10 @@ class std02Controller extends Controller
 			left outer join code d on d.code_kind_cd = 'store_kind' and d.code_id = a.store_kind
 			left outer join code e on e.code_kind_cd = 'store_area' and e.code_id = a.store_area
 			left outer join store_grade sg on a.grade_cd = sg.grade_cd
-			where 1=1 $where
+			where 1=1 
+				and concat(sg.sdate, '-01 00:00:00') <= date_format(now(), '%Y-%m-%d 00:00:00') 
+				and concat(sg.edate, '-01 00:00:00') >= date_format(now(),  '%Y-%m-%d 00:00:00') 
+				$where
 			$orderby
 			$limit
 		";

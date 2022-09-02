@@ -100,6 +100,8 @@ class stk31Controller extends Controller
                 "body" => $result
             ]);
 
+            
+
         }
 
         // 추가
@@ -209,73 +211,87 @@ class stk31Controller extends Controller
             ]);
     
         }
-    
+
         public function update($no, Request $request){
     
             $id =  Auth('head')->user()->id;
-    
-            $subject = $request->input('subject');
-            $content = $request->input('content');
-    
-            $notice_store = [
-                'subject' => $subject,
-                'content' => $content,
-                'ut' => DB::raw('now()')
-            ];
-    
-            try {
-                DB::transaction(function () use (&$result,$no,$notice_store) {
-                    DB::table('notice_store')
-                        ->where('ns_cd','=',$no)
-                        ->update($notice_store);
-                });
-                $code = 200;
-                $msg = "";
-            } catch(Exception $e){
-                $code = 500;
-                $msg = $e->getMessage();
-            }
-    
-            return response()->json([
-                "code" => $code,
-                "msg" => $msg
-            ]);
-        }
-
-        public function del_store($no,$store_cd, Request $request){
             
             $subject = $request->input('subject');
             $content = $request->input('content');
-    
+            $store_cd = $request->input('store_no', '');
+            $ns_cd = $no;
+            $ut = DB::raw('now()');
+            $rt2 = DB::raw('now()');
+
+            if($store_cd == null){
+                $all_store_yn = "Y";
+            }else{
+                $all_store_yn = "N";
+            }
+
             $notice_store = [
                 'subject' => $subject,
                 'content' => $content,
-                'ut' => DB::raw('now()')
+                'all_store_yn' => $all_store_yn,
+                'ut' => $ut
             ];
-
+      
             try {
-                DB::transaction(function () use (&$result,$no,$store_cd) {
-                    
-                    $res = DB::table('notice_store')
-                    ->insertGetId([
-                        
-                    ]);
-                
+                DB::beginTransaction();
+
+                DB::table('notice_store')
+                    ->where('ns_cd','=',$ns_cd)
+                    ->update($notice_store);
                 
                 if($store_cd !=''){
                     foreach($store_cd as $sc){
                         DB::table('notice_store_detail')
                             ->insert([
-                               
+                                'ns_cd' => $ns_cd,
+                                'store_cd' => $sc,
+                                'check_yn' => 'N',
+                                'rt' => $rt2
                             ]);
                         }
                 }
-                });
+                DB::commit();
                 $code = 200;
                 $msg = "";
-            } catch(Exception $e){
+            } catch (Exception $e) {
+                DB::rollBack();
                 $code = 500;
                 $msg = $e->getMessage();
+            }
+            return response()->json([
+                "code" => $code,
+                "msg" => $msg
+            ]);
+    
+        }
+
+        public function del_store(Request $request)
+        {
+            $store_cd = $request->input('data_store');
+            $ns_cd = $request->input('ns_cd');
+
+            try {
+                DB::beginTransaction();
+
+                $sql = "
+                    delete 
+                    from notice_store_detail
+                    where ns_cd = '$ns_cd' and store_cd = '$store_cd'
+                    ";
+
+                DB::delete($sql);
+                
+                DB::commit();
+                $code = '200';
+                $msg = "";
+            } catch(Exception $e){
+                DB::rollBack();
+                $code = 500;
+                $msg = "실패!";
             }
     
             return response()->json([
@@ -283,6 +299,7 @@ class stk31Controller extends Controller
                 "msg" => $msg
             ]);
         
-        }
+        
 
+        }
 }

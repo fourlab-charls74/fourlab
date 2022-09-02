@@ -73,7 +73,7 @@
                         <div class="form-group">
                           <label for="">제목</label>
                           <div class="flax_box">
-                            <input type='text' class="form-control form-control-sm search-all" name='subject' value='' onkeyup="enterkey()">
+                            <input type='text' class="form-control form-control-sm search-all search-enter" name='subject' value=''>
                           </div>
                         </div>
                     </div>
@@ -81,7 +81,7 @@
                         <div class="form-group">
                         <label for="">내용</label>
                         <div class="flax_box">
-                            <input type='text' class="form-control form-control-sm search-all" name='content' value=''  onkeyup="enterkey()">
+                            <input type='text' class="form-control form-control-sm search-all search-enter" name='content' value=''>
                         </div>
                         </div>
                     </div>
@@ -91,7 +91,7 @@
                             <div class="form-group">
                                 <label for="good_types">매장구분</label>
                                 <div class="flax_box">
-                                    <select name='store_type' class="form-control form-control-sm">
+                                    <select name='store_type' class="form-control form-control-sm search-enter">
                                         <option value=''>전체</option>
                                     @foreach ($store_types as $store_type)
                                         <option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
@@ -103,7 +103,7 @@
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="store_no">매장</label>
-                                <div class="form-inline inline_btn_box"  onkeyup="enterkey()">
+                                <div class="form-inline inline_btn_box search-enter" >
                                     <input type='hidden' id="store_nm" name="store_nm">
                                     <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
                                     <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
@@ -222,6 +222,7 @@
         pApp.ResizeGrid(265);
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
+        pApp.BindSearchEnter();
         Search();
     });
 
@@ -233,15 +234,10 @@
 </script>
 
 <script>
-    function enterkey() {
-	if (window.event.keyCode == 13) {
-        Search();
-    }
-}
-
-const initSearchInputs = () => {
+    const initSearchInputs = () => {
         document.search.reset(); // 모든 일반 input 초기화
         $('#store_no').val(null).trigger('change'); // 브랜드 select2 박스 초기화
+        location.reload();
     };
 </script>
 @stop

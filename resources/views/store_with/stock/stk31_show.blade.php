@@ -27,9 +27,11 @@
                     <div>
                         @if($no > 0)
                         <button type="button" onclick="return Update('{{ $no }}');" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="bx bx-save fs-14 mr-1"></i> 저장</button>
+                        <button type="button" href="#" onclick="history.back();" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"> 목록</button>
                         <!-- <button type="button" href="#" onclick="return Destroy('{{ $no }}');" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="far fa-trash-alt fs-12 mr-1"></i> 삭제</button> -->
                         @else
                         <button type="button" href="#" onclick="Create();return false;" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="bx bx-save fs-14 mr-1"></i> 저장</button>
+                        <button type="button" href="#" onclick="location.href = document.referrer; " class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"> 취소</button>
                         @endif
                     </div>
                 </div>
@@ -70,34 +72,40 @@
                                     <tr>
                                         <th>매장 선택</th>
                                         <td>
+                                            @if($no > 0)
                                             <div class="form-inline inline_btn_box">
-                                                @if($no > 0)
-                                                    <input type='hidden' id="store_nm" name="store_nm">
-                                                            @foreach($storeCode as $sc)
-                                                                <div class="store_sel" data-store='{{$sc->store_cd}}' style="border:0.5px solid gray; border-radius: 5px; margin-right:15px;margin-bottom:10px;">
+                                                <input type='hidden' id="store_nm" name="store_nm">
+                                                        @foreach($storeCode as $sc)
+                                                            @if($sc->store_nm == null)
+                                                                <b style="color:red;">※전체 매장 공지입니다.</b>
+                                                            @elseif($sc->check_yn == 'Y')
+                                                                <div class="store_sel" data-store='{{$sc->store_cd}}' style="border:0.5px solid gray; border-radius: 5px; margin-right:15px;margin-bottom:10px;padding-left:10px;">
                                                                     <span>{{$sc->store_nm}}
-                                                                        @if($sc->store_nm == null)
-                                                                            <b style="color:red;">※전체 매장 공지입니다.</b>
-                                                                        @elseif($sc->check_yn == 'Y')
-                                                                            <b style="color:blue;">[확인]</b>
-                                                                        @elseif($sc->check_yn == 'N')
-                                                                            <b style="color:red;">[미확인]</b>&nbsp;
-                                                                            <button type= "button" class= "select_store_delete" onclick="select_store_delete('{{$sc->store_cd}}','{{$sc->ns_cd}}')" style="border:none;background:none;color:#153066;">x</button>
-                                                                  @endif
-                                                                    &nbsp;&nbsp;
+                                                                        <b style="color:blue;">[확인]</b>&nbsp;&nbsp;
                                                                     </span>
                                                                 </div>
-                                                            @endforeach
-                                                    <select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select" multiple ></select>
-                                                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                                    
-                                                @else
-                                                    <input type='hidden' id="store_nm" name="store_nm">
-                                                    <select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select" multiple ></select>
-                                                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                                            @elseif($sc->check_yn == 'N')
+                                                                <div class="store_sel" data-store='{{$sc->store_cd}}' style="border:0.5px solid gray; border-radius: 5px; margin-right:15px;margin-bottom:10px;padding-left:10px;">
+                                                                    <span>{{$sc->store_nm}}
+                                                                        <b style="color:red;">[미확인]</b>&nbsp;
+                                                                        <button type= "button" class= "select_store_delete" onclick="select_store_delete('{{$sc->store_cd}}','{{$sc->ns_cd}}')" style="border:none;background:none;color:#153066;padding-bottom:3px;">x</button>&nbsp;&nbsp;
+                                                                    </span>
+                                                                </div>
+                                                            @endif
+                                                        @endforeach
+                                                        
                                             </div>
-                                                    <span style="color:red">※매장 미선택시 전체 매장 공지로 등록됩니다.</span>
-                                                @endif
+                                            @endif
+                                            <div class="form-inline inline_btn_box">
+                                                <input type='hidden' id="store_nm" name="store_nm">
+                                                <select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select" multiple ></select>
+                                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                            </div>
+                                            @if($no == "")
+                                            <span style="color:red">※매장 미선택시 전체 매장 공지로 등록됩니다.</span>
+                                            @endif
+                                               
+                                            
                                         </td>
                                     </tr>
                                 </table>
@@ -193,7 +201,7 @@
             success: function(data) {
                 if (data.code == '200') {
                     alert('게시물 수정에 성공하였습니다.');
-                    document.location.href = '/store/stock/stk31'
+                    location.reload();
                 } else {
                     alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
                 }
@@ -215,16 +223,35 @@
     function select_store_delete(store_cd, ns_cd){
     
         let ss = document.querySelectorAll(".store_sel");
-        let data_store = [];
-        for(let i = 0;i<ss.length;i++){
-            
-            if(ss[i].dataset.store == store_cd){
-                data_store = ss[i].dataset.store;
-                ss[i].remove();
+        // console.log(ns_cd);
+
+       
+        if(confirm("삭제하시겠습니까?")){
+        $.ajax({
+            method: 'post',
+            url: '/store/stock/stk31/del_store',
+            data: {data_store : store_cd, ns_cd : ns_cd},
+            success: function(data) {
+                if (data.code == '200') {
+                    for(let i = 0;i<ss.length;i++){
+                        if(ss[i].dataset.store == store_cd){
+                            data_store = ss[i].dataset.store;
+                            ss[i].remove();
+                            break;
+                        }
+                     }
+                    alert('공지매장 삭제에 성공하였습니다.');
+                } else {
+                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                }
+            },
+            error: function(res, status, error) {
+                console.log(error);
             }
+        });
         }
 
-        console.log(data_store);
+        // console.log(data_store);
     }
     
 </script>
