@@ -137,6 +137,8 @@ class stk13Controller extends Controller
 				(select store_nm from store where store_cd = o.store_cd) as store_nm,
 				o.prd_cd,
 				concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_sm,
+				pc.color,
+				pc.size,
 				o.goods_no,
 				ifnull(type.code_val, 'N/A') as goods_type_nm,
 				op.opt_kind_nm,
@@ -172,7 +174,7 @@ class stk13Controller extends Controller
 			group by o.store_cd, o.prd_cd
 			order by $orderby
 		";
-		
+
 		$result = DB::select($sql);
 
 		return response()->json([

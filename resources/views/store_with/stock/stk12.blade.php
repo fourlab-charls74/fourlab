@@ -226,7 +226,7 @@
                                 <label class="custom-control-label font-weight-normal" for="ext_storage_qty">창고재고 0 제외</label>
                             </div>
                         </div>
-                        <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
+                        <span class="d-none d-lg-block mr-2 tex-secondary">|</span>
                         <div class="d-flex mr-1 mb-1 mb-lg-0">
                             <span class="mr-1">출고예정일</span>
                             <div class="docs-datepicker form-inline-inner input_box" style="width:130px;display:inline;">
@@ -261,21 +261,21 @@
         let columns = [
             {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
             {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
-            {field: "goods_no", headerName: "상품번호", pinned: 'left', cellStyle: {"text-align": "center"}},
-            {field: "goods_type_nm", headerName: "상품구분", pinned: 'left', cellStyle: StyleGoodsType},
-            {field: "opt_kind_nm", headerName: "품목", pinned: 'left', width: 100, cellStyle: {"text-align": "center"}},
-            {field: "brand_nm", headerName: "브랜드", pinned: 'left', width: 80, cellStyle: {"text-align": "center"}},
-            {field: "style_no",	headerName: "스타일넘버", pinned: 'left', cellStyle: {"text-align": "center"}},
-            {field: "sale_stat_cl", headerName: "상품상태", pinned: 'left', cellStyle: StyleGoodsState},
-            {field: "goods_nm",	headerName: "상품명", pinned: 'left', type: 'HeadGoodsNameType', width: 350},
-            {field: "goods_opt", headerName: "옵션", pinned: 'left', width: 300},
+            {field: "goods_no", headerName: "상품번호", pinned: 'left', width: 60, cellStyle: {"text-align": "center"}},
+            {field: "goods_type_nm", headerName: "상품구분", pinned: 'left', width: 50, cellStyle: StyleGoodsType},
+            {field: "opt_kind_nm", headerName: "품목", pinned: 'left', width: 80, cellStyle: {"text-align": "center"}},
+            {field: "brand_nm", headerName: "브랜드", pinned: 'left', width: 60, cellStyle: {"text-align": "center"}},
+            {field: "style_no",	headerName: "스타일넘버", pinned: 'left', width: 80, cellStyle: {"text-align": "center"}},
+            {field: "sale_stat_cl", headerName: "상품상태", pinned: 'left', width: 60, cellStyle: StyleGoodsState},
+            {field: "goods_nm",	headerName: "상품명", pinned: 'left', type: 'HeadGoodsNameType', width: 250},
+            {field: "goods_opt", headerName: "옵션", pinned: 'left', width: 200},
             {
                 headerName: '(대표)창고재고', // 대표창고의 재고를 조회
                 children: [
                     {field: "storage_qty", headerName: "재고", type: 'currencyType'},
                     {field: "storage_wqty", headerName: "보유재고", type: 'currencyType'},
                 ]
-            }
+            },
         ];
 
         function setColumn(stores) {

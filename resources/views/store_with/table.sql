@@ -590,7 +590,7 @@ CREATE TABLE `notice_store_detail` (
 CREATE TABLE `msg_store` (
     `msg_cd` int(11) NOT NULL AUTO_INCREMENT COMMENT '알림번호',
     `sender_type` char(1) NOT NULL COMMENT '발신처 타입 (매장 - S)',
-    `sender_cd` int(11) NOT NULL COMMENT '발신처코드',
+    `sender_cd` varchar(30) NOT NULL COMMENT '발신처코드',
     `reservation_yn` char(1) NOT NULL COMMENT '예약발송여부',
     `reservation_date` varchar(20) DEFAULT NULL COMMENT '예약발송일 (0000-00-00 00:00:00)',
     `content` mediumtext DEFAULT NULL COMMENT '알림 내용',
@@ -602,7 +602,7 @@ CREATE TABLE `msg_store` (
 CREATE TABLE `msg_store_detail` (
     `msg_cd` int(11) NOT NULL COMMENT '알림번호 - msg_store : msg_cd',
     `receiver_type` char(1) NOT NULL COMMENT '수신처 타입 (매장 - S)',
-    `receiver_cd` int(11) NOT NULL COMMENT '수신처코드',
+    `receiver_cd` varchar(30) NOT NULL COMMENT '수신처코드',
     `check_yn` char(1) NOT NULL COMMENT '알림확인여부',
     `check_date` datetime DEFAULT NULL COMMENT '알림확인일시',
     `rt` datetime DEFAULT NULL COMMENT '등록일자',

@@ -237,14 +237,14 @@
         let columns = [
             {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
             {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
-            {field: "goods_no", headerName: "상품번호", cellStyle: {"text-align": "center"}},
-            {field: "goods_type_nm", headerName: "상품구분", cellStyle: StyleGoodsType},
-            {field: "opt_kind_nm", headerName: "품목", width: 100, cellStyle: {"text-align": "center"}},
+            {field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"}},
+            {field: "goods_type_nm", headerName: "상품구분", width: 60, cellStyle: StyleGoodsType},
+            {field: "opt_kind_nm", headerName: "품목", width: 60, cellStyle: {"text-align": "center"}},
             {field: "brand_nm", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
-            {field: "style_no",	headerName: "스타일넘버", cellStyle: {"text-align": "center"}},
-            {field: "sale_stat_cl", headerName: "상품상태", cellStyle: StyleGoodsState},
-            {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 350},
-            {field: "goods_opt", headerName: "옵션", width: 300},
+            {field: "style_no",	headerName: "스타일넘버", width: 80, cellStyle: {"text-align": "center"}},
+            {field: "sale_stat_cl", headerName: "상품상태", width: 60, cellStyle: StyleGoodsState},
+            {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 250},
+            {field: "goods_opt", headerName: "옵션", width: 200},
             {
                 headerName: '(대표)창고재고', // 대표창고의 재고를 조회
                 children: [

@@ -246,7 +246,7 @@
                                 <label class="custom-control-label font-weight-normal" for="ext_storage_qty">창고재고 0 제외</label>
                             </div>
                         </div>
-                        <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
+                        <span class="d-none d-lg-block mr-2 tex-secondary">|</span>
                         <div class="d-flex mr-1 mb-1 mb-lg-0">
                             <span class="mr-1">출고예정일</span>
                             <div class="docs-datepicker form-inline-inner input_box" style="width:130px;display:inline;">
@@ -280,14 +280,16 @@
     <script language="javascript">
         let columns = [
             {field: "store_nm" , headerName: "매장", rowGroup: true, hide: true, width: 230, pinned: "left", checkboxSelection: true},
-            {field: "prd_cd_sm", headerName: "상품코드", width: 110, pinned: "left", cellStyle: {"text-align": "center"}, checkboxSelection: true},
+            {field: "prd_cd_sm", headerName: "상품코드", width: 120, pinned: "left", cellStyle: {"text-align": "center"}, checkboxSelection: true},
             {field: "prd_cd" , hide: true},
+            {field: "color", headerName: "컬러", width: 50, cellStyle: {"text-align": "center"}},
+            {field: "size", headerName: "사이즈", width: 50, cellStyle: {"text-align": "center"}},
             {field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"}},
             {field: "goods_type_nm", headerName: "상품구분", width: 60, cellStyle: StyleGoodsTypeNM},
             {field: "opt_kind_nm", headerName: "품목", width: 60, cellStyle: {"text-align": "center"}},
             {field: "brand_nm", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
-            {field: "style_no",	headerName: "스타일넘버", width: 90, cellStyle: {"text-align": "center"}},
-            {field: "sale_stat_cl", headerName: "상품상태", cellStyle: StyleGoodsState},
+            {field: "style_no",	headerName: "스타일넘버", width: 80, cellStyle: {"text-align": "center"}},
+            {field: "sale_stat_cl", headerName: "상품상태", width: 60, cellStyle: StyleGoodsState},
             {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 250},
             {field: "goods_opt", headerName: "옵션", width: 200},
             {
