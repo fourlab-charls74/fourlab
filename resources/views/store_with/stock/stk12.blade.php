@@ -219,8 +219,14 @@
                                     <option value='{{ $storage->storage_cd }}' @if($storage->default_yn == "Y") selected @endif>{{ $storage->storage_nm }} @if($storage->default_yn == "Y") (대표) @endif </option>
                                 @endforeach
                             </select>
+                        </div> --}}
+                        <div class="d-flex">
+                            <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+                                <input type="checkbox" class="custom-control-input" name="ext_storage_qty" id="ext_storage_qty" value="Y" checked>
+                                <label class="custom-control-label font-weight-normal" for="ext_storage_qty">창고재고 0 제외</label>
+                            </div>
                         </div>
-                        <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span> --}}
+                        <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
                         <div class="d-flex mr-1 mb-1 mb-lg-0">
                             <span class="mr-1">출고예정일</span>
                             <div class="docs-datepicker form-inline-inner input_box" style="width:130px;display:inline;">
@@ -356,8 +362,9 @@
             let store_nos = $("[name='store_no[]']").val();
             if(store_nos.length < 1 && store_type === '') return alert("매장구분 또는 출고할 매장을 선택 후 검색해주세요.");
 
-            let d = $('form[name="search"]').serialize();
-            gx.Request('/store/stock/stk12/search', d, 1, function(d) {
+            let data = $('form[name="search"]').serialize();
+            data += "&ext_storage_qty=" + $("[name=ext_storage_qty]").is(":checked");
+            gx.Request('/store/stock/stk12/search', data, 1, function(d) {
                 setColumn(d.head.stores);
             });
         }

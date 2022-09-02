@@ -44,12 +44,14 @@ class stk15Controller extends Controller
         $orderby = "";
 
         // where
-		if($r['prd_cd'] != null) 
-			$where .= " and p.prd_cd = '" . $r['prd_cd'] . "'";
-		if($r['type'] != null) 
-			$where .= " and g.type = '" . $r['type'] . "'";
-		if($r['goods_type'] != null) 
-			$where .= " and g.goods_type = '" . $r['goods_type'] . "'";
+        if($r['prd_cd'] != null) {
+            $prd_cd = explode(',', $r['prd_cd']);
+            $where .= " and (1!=1";
+            foreach($prd_cd as $cd) {
+                $where .= " or p.prd_cd = '" . Lib::quote($cd) . "' ";
+            }
+            $where .= ")";
+        }
         if(isset($r['goods_stat'])) {
             $goods_stat = $r['goods_stat'];
             if(is_array($goods_stat)) {
@@ -84,8 +86,6 @@ class stk15Controller extends Controller
             }
         }
 
-        if($r['com_type'] != null) 
-            $where .= " and g.com_type = '" . $r['com_type'] . "'";
         if($r['com_cd'] != null) 
             $where .= " and g.com_id = '" . $r['com_cd'] . "'";
         if($r['item'] != null) 
@@ -96,6 +96,10 @@ class stk15Controller extends Controller
             $where .= " and g.goods_nm like '%" . $r['goods_nm'] . "%'";
         if($r['goods_nm_eng'] != null) 
             $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
+
+        $having = "";
+        if(($r['ext_storage_qty'] ?? 'false') == 'true')
+            $having .= " and sum(p.wqty) > '0'";
 
         // orderby
         $ord = $r['ord'] ?? 'desc';
@@ -125,16 +129,19 @@ class stk15Controller extends Controller
                 g.goods_nm, 
                 p.goods_opt, 
                 '' as rel_qty
-            from product_stock p
+            from product_stock_storage p
                 inner join goods g on p.goods_no = g.goods_no
                 left outer join brand b on b.brand = g.brand
                 left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
                 left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
                 left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
             where 1=1 $where
+            group by p.prd_cd
+            having 1=1 $having
             $orderby
             $limit
 		";
+
 		$result = DB::select($sql);
 
         // pagination
@@ -142,14 +149,19 @@ class stk15Controller extends Controller
         $page_cnt = 0;
         if($page == 1) {
             $sql = "
-                select count(*) as total
-                from product_stock p
-                    inner join goods g on p.goods_no = g.goods_no
-                    left outer join brand b on b.brand = g.brand
-                    left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
-                    left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
-                    left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
-                where 1=1 $where
+                select count(c.prd_cd) as total
+                from (
+                    select prd_cd, count(prd_cd)
+                    from product_stock_storage p
+                        inner join goods g on p.goods_no = g.goods_no
+                        left outer join brand b on b.brand = g.brand
+                        left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
+                        left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
+                        left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
+                    where 1=1 $where
+                    group by p.prd_cd
+                    having 1=1 $having
+                ) as c
             ";
 
             $row = DB::selectOne($sql);

@@ -60,14 +60,16 @@ class stk13Controller extends Controller
         // where
 		if($r['store_type'] != null)
 			$where .= " and store.store_type = '" . $r['store_type'] . "'";
-		if($r['prd_cd'] != null) 
-			$where .= " and o.prd_cd = '" . $r['prd_cd'] . "'";
-		else
+		if($r['prd_cd'] != null) {
+			$prd_cd = explode(',', $r['prd_cd']);
+			$where .= " and (1!=1";
+			foreach($prd_cd as $cd) {
+				$where .= " or o.prd_cd = '" . Lib::quote($cd) . "' ";
+			}
+			$where .= ")";
+		} else {
 			$where .= " and o.prd_cd != ''";
-		if($r['type'] != null) 
-			$where .= " and g.type = '" . $r['type'] . "'";
-		if($r['goods_type'] != null) 
-			$where .= " and g.goods_type = '" . $r['goods_type'] . "'";
+		}
         if(isset($r['goods_stat'])) {
             $goods_stat = $r['goods_stat'];
             if(is_array($goods_stat)) {
@@ -102,8 +104,6 @@ class stk13Controller extends Controller
             }
         }
 
-        if($r['com_type'] != null) 
-            $where .= " and g.com_type = '" . $r['com_type'] . "'";
         if($r['com_cd'] != null) 
             $where .= " and g.com_id = '" . $r['com_cd'] . "'";
         if($r['item'] != null) 
@@ -112,8 +112,10 @@ class stk13Controller extends Controller
             $where .= " and g.brand = '" . $r['brand_cd'] . "'";
         if($r['goods_nm'] != null) 
             $where .= " and g.goods_nm like '%" . $r['goods_nm'] . "%'";
-        // if($r['goods_nm_eng'] != null) 
-        //     $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
+        if($r['goods_nm_eng'] != null) 
+            $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
+		if(($r['ext_storage_qty'] ?? 'false') == 'true')
+			$where .= " and (pss.wqty != '' and pss.wqty != '0')";
 
         // orderby
         $ord = $r['ord'] ?? 'desc';
@@ -170,7 +172,7 @@ class stk13Controller extends Controller
 			group by o.store_cd, o.prd_cd
 			order by $orderby
 		";
-
+		
 		$result = DB::select($sql);
 
 		return response()->json([

@@ -33,7 +33,7 @@ class stk12Controller extends Controller
 	public function search(Request $request)
 	{
 		$r = $request->all();
-
+        
 		$code = 200;
 		$where = "";
         $orderby = "";
@@ -95,6 +95,8 @@ class stk12Controller extends Controller
             $where .= " and g.goods_nm like '%" . $r['goods_nm'] . "%'";
         if($r['goods_nm_eng'] != null) 
             $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
+        if(($r['ext_storage_qty'] ?? 'false') == 'true')
+            $where .= " and (p.wqty != '' and p.wqty != '0')";
 
         // orderby
         $ord = $r['ord'] ?? 'desc';

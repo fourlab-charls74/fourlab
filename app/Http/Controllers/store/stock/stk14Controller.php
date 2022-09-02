@@ -36,12 +36,14 @@ class stk14Controller extends Controller
         $orderby = "";
 
         // where
-		if($r['prd_cd'] != null) 
-			$where .= " and p.prd_cd = '" . $r['prd_cd'] . "'";
-		if($r['type'] != null) 
-			$where .= " and g.type = '" . $r['type'] . "'";
-		if($r['goods_type'] != null) 
-			$where .= " and g.goods_type = '" . $r['goods_type'] . "'";
+        if($r['prd_cd'] != null) {
+            $prd_cd = explode(',', $r['prd_cd']);
+            $where .= " and (1!=1";
+            foreach($prd_cd as $cd) {
+                $where .= " or p.prd_cd = '" . Lib::quote($cd) . "' ";
+            }
+            $where .= ")";
+        }
         if(isset($r['goods_stat'])) {
             $goods_stat = $r['goods_stat'];
             if(is_array($goods_stat)) {
@@ -76,18 +78,18 @@ class stk14Controller extends Controller
             }
         }
 
-        if($r['com_type'] != null) 
-            $where .= " and g.com_type = '" . $r['com_type'] . "'";
-        if($r['com_cd'] != null) 
-            $where .= " and g.com_id = '" . $r['com_cd'] . "'";
+        // if($r['com_cd'] != null) 
+        //     $where .= " and g.com_id = '" . $r['com_cd'] . "'";
         if($r['item'] != null) 
             $where .= " and g.opt_kind_cd = '" . $r['item'] . "'";
         if(isset($r['brand_cd']))
             $where .= " and g.brand = '" . $r['brand_cd'] . "'";
         if($r['goods_nm'] != null) 
             $where .= " and g.goods_nm like '%" . $r['goods_nm'] . "%'";
-        // if($r['goods_nm_eng'] != null) 
-        //     $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
+        if($r['goods_nm_eng'] != null) 
+            $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
+        if(($r['ext_storage_qty'] ?? 'false') == 'true')
+            $where .= " and (p.wqty != '' and p.wqty != '0')";
 
         // orderby
         $ord = $r['ord'] ?? 'desc';
