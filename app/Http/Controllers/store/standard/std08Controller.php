@@ -28,7 +28,7 @@ class std08Controller extends Controller
 
 	public function search(Request $request)
 	{
-		$grade_nm = $request->input("name", ""); 
+		$grade_nm = $request->input("name", "");
 		$where = "where 1=1";
 		if ($grade_nm != "") $where .= " and sg.name like '%" . Lib::quote($grade_nm) . "%'";
 		$sql = "
@@ -97,7 +97,7 @@ class std08Controller extends Controller
 						$highest_seq = $highest_seq_item['seq'];
 
 						// 등급 코드가 중복된 모든 행의 종료일을 가장 아래 행의 시작월의 전월로 업데이트
-						DB::table('store_grade')->where([['grade_cd', "=", $grade_cd], ['seq', "<>", $highest_seq]])->update(['edate' => $highest_seq_edate]); 
+						DB::table('store_grade')->where([['grade_cd', "=", $grade_cd], ['seq', "<>", $highest_seq]])->update(['edate' => $highest_seq_edate]);
 
 					} else { // 등급 코드(grade_cd)가 중복되지 않은 경우 - 단일 행
 

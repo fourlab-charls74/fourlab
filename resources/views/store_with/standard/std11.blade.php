@@ -329,10 +329,16 @@
         const date_type_nm = document.querySelector(`select[name='edit_date_type'] option[value='${date_type}']`).innerText;
         const date = document.batch.edit_date.value;
 
-        if (rows.length == 0) {
-            alert('수정할 항목을 선택해주세요');
+        if (Number.isNaN(Date.parse(date))) {
+            alert("유효한 날짜 형식을 입력해주세요");
             return false;
         }
+
+        if (rows.length == 0) {
+            alert("수정할 항목을 선택해주세요");
+            return false;
+        }
+        
         const msg = `체크된 항목들의 ${date_type_nm}을 일괄수정하시겠습니까?`;
         const confirmed = window.confirm(msg);
 
@@ -345,17 +351,17 @@
                 });
                 const { data } = response;
                 if (data?.code == 200) {
-                    alert('수정되었습니다.');
+                    alert("수정되었습니다.");
                     Search();
                 } else {
-                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                    alert("처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.");
                 }
             } catch (error) {
                 // console.log(error)
             }
         }
     };
-    
+
 </script>
 
 @stop
