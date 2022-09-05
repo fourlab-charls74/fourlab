@@ -197,6 +197,12 @@
 				<div class="fl_box">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
 				</div>
+                <div class="fr_box">
+                    <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+                        <input type="checkbox" class="custom-control-input" name="ext_store_qty" id="ext_store_qty" value="Y" checked>
+                        <label class="custom-control-label font-weight-normal" for="ext_store_qty">매장재고 0 제외</label>
+                    </div>
+                </div>
 			</div>
 		</div>
 		<div class="table-responsive">
@@ -293,6 +299,7 @@
 
 	function Search() {
 		let data = $('form[name="search"]').serialize();
+        data += "&ext_store_qty=" + $("[name=ext_store_qty]").is(":checked");
 		gx.Request('/store/stock/stk01/search', data,1);
 	}
 
