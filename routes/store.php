@@ -119,6 +119,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('std08/search', 'std08Controller@search');
         Route::post('std08/save', 'std08Controller@save');
         Route::post('std08/remove', 'std08Controller@remove');
+        Route::get('std08/choice', 'std08Controller@choice_index');
 
         // 수선관리
         Route::get('std11', 'std11Controller@index');

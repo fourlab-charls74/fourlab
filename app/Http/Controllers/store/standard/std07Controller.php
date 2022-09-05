@@ -89,16 +89,22 @@ class std07Controller extends Controller
 				sf.idx, 
 				cd.code_id as pr_code_cd, 
 				cd.code_val as pr_code_nm, 
-				sf.store_cd, 
-				sf.store_fee, 
-				sf.manager_fee, 
+				s.store_cd, 
+				sf.store_fee,
+				s.grade_cd,
+				sg.name as grade_nm,
 				sf.sdate, 
 				sf.edate, 
 				sf.comment, 
 				sf.use_yn
 			from code cd
-				left outer join store_fee sf 
-					on cd.code_id = sf.pr_code and sf.store_cd = :store_cd and sf.idx in (select max(idx) from store_fee group by pr_code)
+				inner join store s on s.store_cd = :store_cd
+				left outer join store_fee sf
+					on cd.code_id = sf.pr_code and sf.store_cd = s.store_cd and sf.idx in (select max(idx) from store_fee group by pr_code)
+				left outer join store_grade sg 
+					on sg.grade_cd = s.grade_cd 
+					and concat(sg.sdate, '-01 00:00:00') <= date_format(now(), '%Y-%m-%d 00:00:00') 
+					and concat(sg.edate, '-31 23:59:59') >= date_format(now(), '%Y-%m-%d 00:00:00')			
 			where cd.code_kind_cd = 'PR_CODE' and cd.use_yn = 'Y'
 			order by cd.code_seq
 		";

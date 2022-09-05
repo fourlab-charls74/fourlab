@@ -148,5 +148,22 @@ class std08Controller extends Controller
 			return response()->json(['code'	=> '500']);
 		}
 	}
+
+	public function choice_index(Request $request)
+	{
+		$sdate = Carbon::now()->startOfMonth()->format("Y-m-d");
+		$edate = Carbon::now()->format("Y-m-d");
+		$grade_cd = $request->input("grade_cd", "");
+		$grade_nm = DB::table('store_grade')->select('name')->where('grade_cd', '=', $grade_cd)->first();
+		if($grade_nm != null) $grade_nm = $grade_nm->name;
+
+		$values = [
+			"sdate" => $sdate,
+			"edate" => $edate,
+			"grade_nm" => $grade_nm,
+			"store_types" => SLib::getCodes("STORE_TYPE"),
+		];
+		return view(Config::get('shop.store.view') . '/standard/std08_choice', $values);
+	}
 }
 

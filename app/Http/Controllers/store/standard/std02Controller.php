@@ -87,7 +87,7 @@ class std02Controller extends Controller
 			left outer join store_grade sg on a.grade_cd = sg.grade_cd
 			where 1=1 
 				and concat(sg.sdate, '-01 00:00:00') <= date_format(now(), '%Y-%m-%d 00:00:00') 
-				and concat(sg.edate, '-01 00:00:00') >= date_format(now(),  '%Y-%m-%d 00:00:00') 
+				and concat(sg.edate, '-31 23:59:59') >= date_format(now(), '%Y-%m-%d 00:00:00') 
 				$where
 			$orderby
 			$limit
