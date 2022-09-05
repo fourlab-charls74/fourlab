@@ -167,59 +167,52 @@
         
         <div class="resul_btn_wrap mb-3">
             <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+            <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1" onclick="initSearch()">검색조건 초기화</a>
+            <a href="/store/stock/stk20" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="fas fa-step-backward fa-sm"></i> 매장RT 리스트</a>
             <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
         </div>
 
 	</div>
 </form>
 
-<!-- 상품 검색 테이블 -->
-<div class="card shadow mb-0 last-card pt-2 pt-sm-0">
-	<div class="card-body">
-		<div class="card-title">
-			<div class="filter_wrap">
-				<div class="d-flex justify-content-between">
-					<h6 class="m-0 font-weight-bold">총 : <span id="gd-product-total" class="text-primary">0</span>건</h6>
-                    <div class="d-flex">
-                        <a href="javascript:void(0);" onclick="SearchStock()" class="btn btn-sm btn-outline-primary shadow-sm">RT수량입력</a>
+<div class="row show_layout mb-3">
+    <div class="col-lg-4 pr-1">
+        <div class="card shadow mb-0 pt-2 pt-sm-0">
+            <div class="card-title">
+                <div class="filter_wrap mt-2 pt-2">
+                    <div class="d-flex justify-content-between">
+                        <h6 class="m-0 font-weight-bold">총 : <span id="gd-product-total" class="text-primary">0</span>건</h6>
                     </div>
-				</div>
-			</div>
-		</div>
-		<div class="table-responsive">
-			<div id="div-gd-product" class="ag-theme-balham"></div>
-		</div>
-	</div>
-</div>
-
-<div id="stock_table_area" class="hide-element-title"></div>
-
-<!-- 재고 입력 테이블 -->
-<div class="card shadow mb-0 last-card pt-2 pt-sm-0">
-    <div class="card-body">
-        <div class="d-flex justify-content-center mb-4">
-            <i class="fas fa-arrow-down fa-sm" aria-hidden="true" style="font-size: 24px;"></i>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <div id="div-gd-product" class="ag-theme-balham"></div>
+            </div>
         </div>
-		<div class="card-title">
-			<div class="filter_wrap">
-				<div class="d-flex justify-content-between">
-					<h6 class="m-0 font-weight-bold">총 : <span id="gd-stock-total" class="text-primary">0</span>건 <strong id="selected_prd" class="ml-2 fs-14" style="font-weight: 500; color: blue;"></strong></h6>
-                    <div class="d-flex">
-                        <select id="store_type" name="store_type" class="form-control form-control-sm mr-2" style="width:140px;">
-                            <option value="">전체</option>
-                                @foreach ($store_types as $store_type)
-                                    <option value='{{ $store_type->code_id }}' @if($store_type->code_id == '08') selected @endif>{{ $store_type->code_val }}</option>
-                                @endforeach
-                        </select>
-                        <a href="javascript:void(0);" onclick="AddRTToFinalTable()" class="btn btn-sm btn-outline-primary shadow-sm">RT리스트에 등록</a>
+    </div>
+    <div class="col-lg-8">
+        <div class="card shadow mb-0 pt-2 pt-sm-0">
+            <div class="card-title">
+                <div class="filter_wrap mt-2 pt-2">
+                    <div class="d-flex justify-content-between">
+                        <h6 class="m-0 font-weight-bold">총 : <span id="gd-stock-total" class="text-primary">0</span>건 <strong id="selected_prd_nm" class="ml-2 fs-14" style="font-weight: 500; color: blue;"></strong></h6>
+                        <div class="d-flex">
+                            <select id="store_type" name="store_type" class="form-control form-control-sm mr-2" style="width:140px;">
+                                <option value="">전체</option>
+                                    @foreach ($store_types as $store_type)
+                                        <option value='{{ $store_type->code_id }}' @if($store_type->code_id == '08') selected @endif>{{ $store_type->code_val }}</option>
+                                    @endforeach
+                            </select>
+                            <a href="javascript:void(0);" onclick="AddRTToFinalTable()" class="btn btn-sm btn-outline-primary shadow-sm">RT리스트에 등록</a>
+                        </div>
                     </div>
-				</div>
-			</div>
-		</div>
-		<div class="table-responsive">
-			<div id="div-gd-stock" class="ag-theme-balham"></div>
-		</div>
-	</div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <div id="div-gd-stock" class="ag-theme-balham"></div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div id="final_table_area" class="hide-element-title"></div>
@@ -227,9 +220,6 @@
 <!-- RT 최종 등록 테이블 -->
 <div class="card shadow mb-0 last-card pt-2 pt-sm-0">
     <div class="card-body">
-        <div class="d-flex justify-content-center mb-4">
-            <i class="fas fa-arrow-down fa-sm" aria-hidden="true" style="font-size: 24px;"></i>
-        </div>
 		<div class="card-title">
 			<div class="filter_wrap">
 				<div class="d-flex justify-content-between">
@@ -250,27 +240,16 @@
 <script language="javascript">
     let product_columns = [
         {field: "idx", hide: true},
-        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 30, cellStyle: {"text-align": "center"}},
-        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: false, checkboxSelection: true, sort: null, width: 28},
-        {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
-        {field: "goods_no",	headerName: "상품번호", pinned: 'left', width: 60, cellStyle: {"text-align": "center"}},
-        {field: "goods_type_nm", headerName: "상품구분", width: 60, pinned: 'left', cellStyle: StyleGoodsType},
-        {field: "opt_kind_nm", headerName: "품목", width: 60, cellStyle: {"text-align": "center"}},
-        {field: "brand_nm", headerName: "브랜드", width: 60, cellStyle: {"text-align": "center"}},
+        {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 110, cellStyle: {"text-align": "center"},
+            cellRenderer: (params) => `<a href="javascript:void(0);" onclick="SearchStock('${params.rowIndex}')">${params.value}</a>`,
+        },
+        {field: "goods_nm",	headerName: "상품명", pinned: 'left', type: 'HeadGoodsNameType', width: 150},
+        {field: "goods_opt", headerName: "옵션", pinned: 'left', width: 120},
+        {field: "goods_no",	headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"}},
         {field: "style_no",	headerName: "스타일넘버", width: 60, cellStyle: {"text-align": "center"}},
-        {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 250},
         {field: "goods_nm_eng", headerName: "상품명(영문)", width: 250, cellStyle: {"line-height": "30px"}},
-        {field: "sale_stat_cl", headerName: "상품상태", cellStyle: StyleGoodsState},
-        {field: "goods_opt", headerName: "옵션", width: 200},
-        {field: "normal_price", headerName: "정상가", type: "currencyType", width: 60},
+        {field: "goods_sh", headerName: "정상가", type: "currencyType", width: 60},
         {field: "price", headerName: "판매가", type: "currencyType", width: 60},
-        {field: "wonga", headerName: "원가", type: "currencyType", width: 60},
-        {field: "margin_rate", headerName: "마진율", type: "percentType", width: 60},
-        {field: "margin_amt", headerName: "마진액", type: "currencyType", width: 60},
-        {field: "org_nm", headerName: "원산지", width: 80, cellStyle: {"text-align": "center"}},
-        {field: "com_nm", headerName: "업체", width: 100, cellStyle: {"text-align": "center"}},
-        {field: "full_nm", headerName: "대표카테고리", width: 100},
-        {field: "head_desc", headerName: "상단홍보글", width: 100},
 	];
 
     const stores = <?= json_encode(@$stores) ?> ;
@@ -278,7 +257,7 @@
     let stock_columns = [
         {field: "prd_cd", hide: true},
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 30, cellStyle: {"text-align": "center"}},
-        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, sort: null, width: 28},
+        {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, sort: null, width: 28},
         {field: "dep_store_nm",	headerName: "보내는 매장", pinned: 'left', width: 140},
         {field: "store_nm",	headerName: "받는 매장", pinned: 'left', width: 140, editable: true, 
             cellStyle: {"background-color": "#ffFF99"},
@@ -325,7 +304,7 @@
         {field: "goods_nm_eng", headerName: "상품명(영문)", width: 250, cellStyle: {"line-height": "30px"}},
         {field: "sale_stat_cl", headerName: "상품상태", cellStyle: StyleGoodsState},
         {field: "goods_opt", headerName: "옵션", width: 200},
-        {field: "normal_price", headerName: "정상가", type: "currencyType", width: 60},
+        {field: "goods_sh", headerName: "정상가", type: "currencyType", width: 60},
         {field: "price", headerName: "판매가", type: "currencyType", width: 60},
         {field: "wonga", headerName: "원가", type: "currencyType", width: 60},
         {field: "comment", headerName: "메모", width: 200},
@@ -339,12 +318,12 @@
     let selected_prd = {};
 
     $(document).ready(function() {
-        pApp.ResizeGrid(275, 530);
+        pApp.ResizeGrid(275, 350);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, product_columns);
 
-        pApp2.ResizeGrid(275, 530);
+        pApp2.ResizeGrid(275, 350);
         pApp2.BindSearchEnter();
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
         gx2 = new HDGrid(gridDiv2, stock_columns, {
@@ -365,7 +344,7 @@
             }
         });
 
-        pApp3.ResizeGrid(275, 530);
+        pApp3.ResizeGrid(275, 350);
         pApp3.BindSearchEnter();
         let gridDiv3 = document.querySelector(pApp3.options.gridId);
         gx3 = new HDGrid(gridDiv3, rt_columns);
@@ -382,18 +361,16 @@
 	}
 
     // 매장/창고별 재고검색
-    function SearchStock() {
-        let rows = gx.getSelectedRows();
-        if(rows.length < 1) return alert("상품을 한 개 선택해주세요.");
-        if(rows.length > 1) return alert("상품을 한 개만 선택해주세요.");
+    function SearchStock(rowIndex = '') {
+        if(rowIndex !== '') {
+            selected_prd = gx.gridOptions.api.getDisplayedRowAtIndex(rowIndex).data;
+        }
+        if(!selected_prd.prd_cd) return alert("좌측에서 상품을 선택해주세요.");
 
-        selected_prd = rows[0];
-        
         let store_type = $("[name=store_type]").val();
         let data = 'prd_cd=' + selected_prd.prd_cd + "&store_type=" + store_type;
 		gx2.Request('/store/stock/stk22/search-stock', data, -1, function(d) {
-            $("#selected_prd").html(`[${selected_prd.prd_cd}] ${selected_prd.goods_nm}`);
-            document.getElementById("stock_table_area").scrollIntoView({ behavior: "smooth" });
+            $("#selected_prd_nm").html(`[${selected_prd.prd_cd}] ${selected_prd.goods_nm}`);
         });
     }
 

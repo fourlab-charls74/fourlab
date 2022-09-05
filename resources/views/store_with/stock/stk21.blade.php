@@ -1,13 +1,13 @@
 @extends('store_with.layouts.layout')
-@section('title','RT요청')
+@section('title','요청RT')
 @section('content')
 <div class="page_tit">
-	<h3 class="d-inline-flex">RT요청</h3>
+	<h3 class="d-inline-flex">요청RT</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
 		<span>매장관리</span>
 		<span>/ 매장RT</span>
-		<span>/ RT요청</span>
+		<span>/ 요청RT</span>
 	</div>
 </div>
 
@@ -167,6 +167,8 @@
         
         <div class="resul_btn_wrap mb-3">
             <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+            <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1" onclick="initSearch()">검색조건 초기화</a>
+            <a href="/store/stock/stk20" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="fas fa-step-backward fa-sm"></i> 매장RT 리스트</a>
             <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
         </div>
 
@@ -193,7 +195,7 @@
             <div class="card-title">
                 <div class="filter_wrap mt-2 pt-2">
                     <div class="d-flex justify-content-between">
-                        <h6 class="m-0 font-weight-bold">총 : <span id="gd-stock-total" class="text-primary">0</span>건 <strong id="selected_prd" class="ml-2 fs-14" style="font-weight: 500; color: blue;"></strong></h6>
+                        <h6 class="m-0 font-weight-bold">총 : <span id="gd-stock-total" class="text-primary">0</span>건 <strong id="selected_prd_nm" class="ml-2 fs-14" style="font-weight: 500; color: blue;"></strong></h6>
                         <div class="d-flex">
                             <select id="store_type" name="store_type" class="form-control form-control-sm mr-2" style="width:140px;">
                                 <option value="">전체</option>
@@ -223,7 +225,7 @@
 				<div class="d-flex justify-content-between">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-rt-total" class="text-primary">0</span>건</h6>
                     <div class="d-flex">
-                        <a href="javascript:void(0);" onclick="RequestRT()" class="btn btn-sm btn-primary shadow-sm mr-2">RT요청</a>
+                        <a href="javascript:void(0);" onclick="RequestRT()" class="btn btn-sm btn-primary shadow-sm mr-2">RT등록</a>
                         <a href="javascript:void(0);" onclick="DeleteRows()" class="btn btn-sm btn-outline-primary shadow-sm">삭제</a>
                     </div>
 				</div>
@@ -239,14 +241,14 @@
     let product_columns = [
         {field: "idx", hide: true},
         {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 110, cellStyle: {"text-align": "center"},
-            cellRenderer: (params) => `<a href="javascript:void(0);" onclick="SearchStock('${params.value}', '${params.data.goods_nm}')">${params.value}</a>`,
+            cellRenderer: (params) => `<a href="javascript:void(0);" onclick="SearchStock('${params.rowIndex}')">${params.value}</a>`,
         },
         {field: "goods_nm",	headerName: "상품명", pinned: 'left', type: 'HeadGoodsNameType', width: 150},
         {field: "goods_opt", headerName: "옵션", pinned: 'left', width: 120},
         {field: "goods_no",	headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"}},
         {field: "style_no",	headerName: "스타일넘버", width: 60, cellStyle: {"text-align": "center"}},
         {field: "goods_nm_eng", headerName: "상품명(영문)", width: 250, cellStyle: {"line-height": "30px"}},
-        {field: "normal_price", headerName: "정상가", type: "currencyType", width: 60},
+        {field: "goods_sh", headerName: "정상가", type: "currencyType", width: 60},
         {field: "price", headerName: "판매가", type: "currencyType", width: 60},
 	];
 
@@ -302,7 +304,7 @@
         {field: "goods_nm_eng", headerName: "상품명(영문)", width: 250, cellStyle: {"line-height": "30px"}},
         {field: "sale_stat_cl", headerName: "상품상태", cellStyle: StyleGoodsState},
         {field: "goods_opt", headerName: "옵션", width: 200},
-        {field: "normal_price", headerName: "정상가", type: "currencyType", width: 60},
+        {field: "goods_sh", headerName: "정상가", type: "currencyType", width: 60},
         {field: "price", headerName: "판매가", type: "currencyType", width: 60},
         {field: "wonga", headerName: "원가", type: "currencyType", width: 60},
         {field: "comment", headerName: "메모", width: 200},
@@ -359,17 +361,16 @@
 	}
 
     // 매장/창고별 재고검색
-    function SearchStock(prd_cd = '', goods_nm = '') {
-        if(prd_cd) {
-            selected_prd.prd_cd = prd_cd;
-            selected_prd.goods_nm = goods_nm;
+    function SearchStock(rowIndex = '') {
+        if(rowIndex !== '') {
+            selected_prd = gx.gridOptions.api.getDisplayedRowAtIndex(rowIndex).data;
         }
         if(!selected_prd.prd_cd) return alert("좌측에서 상품을 선택해주세요.");
 
         let store_type = $("[name=store_type]").val();
         let data = 'prd_cd=' + selected_prd.prd_cd + "&store_type=" + store_type;
 		gx2.Request('/store/stock/stk21/search-stock', data, -1, function(d) {
-            $("#selected_prd").html(`[${selected_prd.prd_cd}] ${selected_prd.goods_nm}`);
+            $("#selected_prd_nm").html(`[${selected_prd.prd_cd}] ${selected_prd.goods_nm}`);
         });
     }
 
@@ -415,8 +416,8 @@
     // RT 요청
     function RequestRT() {
         let rows = gx3.getSelectedRows();
-        if(rows.length < 1) return alert("RT요청할 항목을 선택해주세요.");
-        if(!confirm("선택한 항목을 RT요청하시겠습니까?")) return;
+        if(rows.length < 1) return alert("RT등록할 항목을 선택해주세요.");
+        if(!confirm("선택한 항목을 RT등록하시겠습니까?")) return;
 
         axios({
             url: '/store/stock/stk21/request-rt',
@@ -428,7 +429,7 @@
                 location.href = "/store/stock/stk20";
             } else {
                 console.log(res.data);
-                alert("RT요청 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+                alert("RT등록 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
             }
         }).catch(function (err) {
             console.log(err);

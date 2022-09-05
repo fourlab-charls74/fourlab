@@ -129,7 +129,7 @@ class stk21Controller extends Controller
                 g.goods_nm,
                 g.goods_nm_eng,
                 stat.code_val as sale_stat_cl,
-                g.normal_price,
+                g.goods_sh,
                 g.price,
                 g.wonga,
                 (100/(g.price/(g.price-g.wonga))) as margin_rate,
