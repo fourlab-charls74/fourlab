@@ -257,7 +257,7 @@ class stk21Controller extends Controller
                         'dep_store_cd' => $d['dep_store_cd'] ?? '',
                         'store_cd' => $d['store_cd'] ?? '',
                         'state' => $state,
-                        'comment' => $d['comment'] ?? '',
+                        'req_comment' => $d['comment'] ?? '',
                         'req_id' => $admin_id,
                         'req_rt' => now(),
                         'rt' => now(),

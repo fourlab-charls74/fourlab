@@ -62,9 +62,16 @@
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="rel_order">출고차수</label>
+							<label for="rel_order">출고구분/차수</label>
                             <div class="flex_box">
-                                <select name='rel_order' class="form-control form-control-sm">
+                                <select name='rel_type' class="form-control form-control-sm" style="width: 47%;">
+                                    <option value=''>전체</option>
+                                    @foreach ($rel_types as $rel_type)
+                                        <option value='{{ $rel_type->code_id }}'>{{ $rel_type->code_val }}</option>
+                                    @endforeach
+                                </select>
+                                <span class="text_line" style="width: 6%; text-align: center;">/</span>
+                                <select name='rel_order' class="form-control form-control-sm" style="width: 47%">
                                     <option value=''>전체</option>
                                     @foreach ($rel_orders as $rel_order)
                                         <option value='{{ $rel_order->code_id }}'>{{ $rel_order->code_val }}</option>
@@ -75,21 +82,18 @@
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label>출고구분/상태</label>
-                            <div class="flex_box">
-                                <select name='rel_type' class="form-control form-control-sm" style="width: 47%;">
-                                    <option value=''>전체</option>
-                                    @foreach ($rel_types as $rel_type)
-                                        <option value='{{ $rel_type->code_id }}'>{{ $rel_type->code_val }}</option>
-                                    @endforeach
-                                </select>
-                                <span class="text_line" style="width: 6%; text-align: center;">/</span>
-                                <select name='state' class="form-control form-control-sm" style="width: 47%;">
+							<label>출고상태</label>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <select name='state' class="form-control form-control-sm mr-2">
                                     <option value=''>전체</option>
                                     @foreach ($rel_states as $key => $value)
                                         <option value='{{ $key }}'>{{ $value }}</option>
                                     @endforeach
                                 </select>
+                                <div class="custom-control custom-checkbox form-check-box" style="min-width: 130px;">
+                                    <input type="checkbox" class="custom-control-input" name="ext_done_state" id="ext_done_state" value="Y">
+                                    <label class="custom-control-label font-weight-normal" for="ext_done_state">매장입고완료 제외</label>
+                                </div>
                             </div>
 						</div>
 					</div>

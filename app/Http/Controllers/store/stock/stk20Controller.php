@@ -69,6 +69,8 @@ class stk20Controller extends Controller
 			$where .= " and psr.store_cd = '" . $r['store_no'] . "'";
 		if($r['rt_stat'] != null)
 			$where .= " and psr.state = '" . $r['rt_stat'] . "'";
+        if($r['ext_done_state'] ?? '' != '')
+            $where .= " and psr.state != '40'";
 		if($r['prd_cd'] != null) {
             $prd_cd = explode(',', $r['prd_cd']);
 			$where .= " and (1!=1";
@@ -154,7 +156,8 @@ class stk20Controller extends Controller
                 (select store_nm from store where store_cd = psr.store_cd) as store_nm,
                 psr.state, 
                 cast(psr.exp_dlv_day as date) as exp_dlv_day, 
-                psr.comment,
+                psr.req_comment,
+                psr.rec_comment,
                 psr.req_id, 
                 psr.req_rt, 
                 psr.rec_id, 
@@ -221,7 +224,7 @@ class stk20Controller extends Controller
                         'qty' => $d['qty'] ?? 0,
                         'exp_dlv_day' => str_replace("-", "", $exp_dlv_day),
                         'state' => $new_state,
-                        'comment' => $d['comment'] ?? '',
+                        'rec_comment' => $d['rec_comment'] ?? '',
                         'rec_id' => $admin_id,
                         'rec_rt' => now(),
                         'ut' => now(),
@@ -392,7 +395,7 @@ class stk20Controller extends Controller
                     ->where('idx', '=', $d['idx'])
                     ->update([
                         'state' => $new_state,
-                        'comment' => $d['comment'] ?? '',
+                        'rec_comment' => $d['rec_comment'] ?? '',
                         'ut' => now(),
                     ]);
             }

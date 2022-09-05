@@ -63,6 +63,8 @@ class stk10Controller extends Controller
 			$where .= " and psr.type = '" . $r['rel_type'] . "'";
 		if($r['state'] != null) 
 			$where .= " and psr.state = '" . $r['state'] . "'";
+        if($r['ext_done_state'] ?? '' != '')
+            $where .= " and psr.state != '40'";
 		if($r['store_type'] != null) 
 			$where .= " and s.store_type = '" . $r['store_type'] . "'";
 		if(isset($r['store_no'])) 
