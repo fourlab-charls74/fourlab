@@ -148,7 +148,7 @@
                                     <option value="end_date">수선완료일</option>
                                 </select>
                             </span>
-                            <span class="mr-2">
+                            <span class="docs-datepicker mr-2">
                                 <div class="input-group">
                                     <input type="text" class="form-control form-control-sm docs-date search-enter" name="edit_date" value="{{ $sdate }}" autocomplete="off" disable>
                                     <div class="input-group-append">
