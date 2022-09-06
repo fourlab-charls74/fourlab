@@ -777,58 +777,42 @@ class goods extends Controller
     {
         $prd_cd = $request->input('prd_cd', '');
         $goods_nm = $request->input('goods_nm', '');
+
         $brand = $request->input('brand', []);
+        $brand_contain = $request->input('brand_contain', '');
         $year = $request->input('year', []);
+        $year_contain = $request->input('year_contain', '');
         $season = $request->input('season', []);
+        $season_contain = $request->input('season_contain', '');
         $gender = $request->input('gender', []);
+        $gender_contain = $request->input('gender_contain', '');
         $items = $request->input('item', []);
+        $items_contain = $request->input('item_contain', '');
         $opt = $request->input('opt', []);
+        $opt_contain = $request->input('opt_contain', '');
+
         $page = $request->input('page', 1);
         $where = "";
 
         if($prd_cd != '') $where .= " and p.prd_cd like '%$prd_cd%'";
         if($goods_nm != '') $where .= " and g.goods_nm like '%$goods_nm%'";
-        if(count($brand) > 0) {
-            $where .= " and (1!=1";
-            foreach($brand as $item) {
-                $where .= " or p.brand = '$item'";
+
+        foreach(self::Conds as $key => $value)
+        {
+            if($key === 'item') $key = 'items';
+            if(count(${ $key }) > 0)
+            {
+                $where .= ${ $key . '_contain' } == 'true' ? " and (1!=1" : " and (1=1";
+
+                $col = $key === 'items' ? 'item' : $key;
+                foreach(${ $key } as $item) {
+                    if(${ $key . '_contain' } == 'true')
+                        $where .= " or p.$col = '$item'";
+                    else
+                        $where .= " and p.$col != '$item'";
+                }
+                $where .= ")";
             }
-            $where .= ")";
-        }
-        if(count($year) > 0) {
-            $where .= " and (1!=1";
-            foreach($year as $item) {
-                $where .= " or p.year = '$item'";
-            }
-            $where .= ")";
-        }
-        if(count($season) > 0) {
-            $where .= " and (1!=1";
-            foreach($season as $item) {
-                $where .= " or p.season = '$item'";
-            }
-            $where .= ")";
-        }
-        if(count($gender) > 0) {
-            $where .= " and (1!=1";
-            foreach($gender as $item) {
-                $where .= " or p.gender = '$item'";
-            }
-            $where .= ")";
-        }
-        if(count($items) > 0) {
-            $where .= " and (1!=1";
-            foreach($items as $item) {
-                $where .= " or p.item = '$item'";
-            }
-            $where .= ")";
-        }
-        if(count($opt) > 0) {
-            $where .= " and (1!=1";
-            foreach($opt as $item) {
-                $where .= " or p.opt = '$item'";
-            }
-            $where .= ")";
         }
 
         $page_size = 100;

@@ -338,10 +338,32 @@ SearchPrdcd.prototype.SetGridCond = async function() {
         columns.push(
             { field: "chk", headerName: '', cellClass: 'hd-grid-code', checkboxSelection: true, width: 28, sort: null },
             { field: "item", headerName: conds[cond_title], width: "auto",
-                cellRenderer: (params) => `[${params.data.code_id || ''}] ${params.data.code_val || ''}`,
+                cellStyle: (params) => (params.data.key || '') === 'contain' ? {"color": params.data.item === '포함' ? "green" : "red"} : '',
+                editable: (params) => (params.data.key || '') === 'contain',
+                cellRenderer: (params) => {
+                    if((params.data.key || '') === 'contain') return params.value;
+                    return `${(params.data.code_id || '') != '' ? `[${params.data.code_id}] ` : ''}${params.data.code_val || ''}`;
+                },
+                cellEditorSelector: function(params) {
+                    if((params.data.key || '') === 'contain') {
+                        return {
+                            component: 'agRichSelectCellEditor',
+                            params: { 
+                                values: ['포함', '미포함']
+                            },
+                        };
+                    }
+                    return false;
+                },
             },
         );
-        this[cond_title + '_grid'] = await new HDGrid(document.querySelector( "#div-gd-prdcd-" + cond_title ), columns);
+
+        this[cond_title + '_grid'] = await new HDGrid(document.querySelector( "#div-gd-prdcd-" + cond_title ), columns, {
+            pinnedTopRowData: [{item: "포함", key: "contain"}],
+            getRowStyle: (params) => {
+                if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#f2f2f2', 'border': 'none'};
+            },
+        });
         document.querySelector( "#div-gd-prdcd-" + cond_title ).style.height = '210px';
     });
     const { data: { body: res } } = await axios({ 
@@ -350,7 +372,7 @@ SearchPrdcd.prototype.SetGridCond = async function() {
     });
     Object.keys(res).forEach(r => {
         this[r + '_grid'].gridOptions.api.setRowData(res[r]);
-    })
+    });
 }
 
 SearchPrdcd.prototype.Search = function(e) {
@@ -364,6 +386,9 @@ SearchPrdcd.prototype.Search = function(e) {
             rows.forEach(r => {
                 data += `&${c}[]=${r.code_id}`;
             });
+
+            let is_contain = this[c + '_grid'].gridOptions.api.getPinnedTopRow(0).data.item === "포함";
+            data += `&${c}_contain=${is_contain}`;
         });
         this.grid.Request('/store/api/prdcd/search', data, 1);
     }
