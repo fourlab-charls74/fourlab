@@ -288,10 +288,12 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         //알림
         Route::get('stk32','stk32Controller@index');
         Route::get('stk32/search', 'stk32Controller@search');
+        Route::get('stk32/search2', 'stk32Controller@search2');
         Route::get('stk32/create', 'stk32Controller@create');
         Route::get('stk32/sendMsg', 'stk32Controller@sendMsg');
         Route::get('stk32/show/{no?}', 'stk32Controller@show');
         Route::get('stk32/msg{no?}', 'stk32Controller@msg');
+        Route::post('stk32/store', 'stk32Controller@store');
 
     });
 

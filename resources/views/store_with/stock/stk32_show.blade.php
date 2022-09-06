@@ -11,8 +11,7 @@
                 </div>
             </div>
         </div>
-        <!-- FAQ 세부 정보 -->
-        <form name="detail">
+        <form name="search">
             <div class="card_wrap aco_card_wrap">
                 <div class="card shadow">
                     <div class="card-header mb-0">
@@ -33,7 +32,7 @@
                                                 <td>
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio">
-                                                            <input type="radio" name="div_store" id="store_o" class="custom-control-input" value="onceStore"/>
+                                                            <input type="radio" name="div_store" id="store_o" class="custom-control-input" value="onceStore" checked/>
                                                             <label class="custom-control-label" for="store_o">개별매장</label>
                                                         </div>
                                                         <div class="custom-control custom-radio">
@@ -53,6 +52,9 @@
                                             </tr>
                                             </tbody>
                                         </table>
+                                        <div style="text-align:center;margin-top:7px;margin-bottom:-14px;">
+                                            <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                                        </div>                                    
                                     </div>
                                 </div>
                             </div>
@@ -70,7 +72,7 @@
                         <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                     </div>
                     <a href="#" onclick="openSendMsgPopup()" id="send_msg_btn" class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;"> 알림 보내기</a>
-                    <a href="#" id="add_group_btn" class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;"> 그룹추가</a>
+                    <a href="#" id="add_group_btn" class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;"> 그룹관리</a>
                 </div>
             </div>
             <div class="table-responsive">
@@ -88,10 +90,10 @@
             width:28,
             pinned:'left'
         },
-        {headerName: "매장코드", field: "sender_type",width:150},
-        {headerName: "매장명", field: "sender_cd",  width:150, cellClass: 'hd-grid-code'},
-        {headerName: "연락처", field: "content",  width:150, cellClass: 'hd-grid-code'},
-        {headerName: "그룹명", field: "rt", width: 150, cellClass: 'hd-grid-code'},
+        {headerName: "매장코드", field: "store_cd",width:100},
+        {headerName: "매장명", field: "store_nm",  width:200, cellClass: 'hd-grid-code'},
+        {headerName: "연락처", field: "mobile",  width:150, cellClass: 'hd-grid-code'},
+        // {headerName: "그룹명", field: "store_group", width: 150, cellClass: 'hd-grid-code'},
         {width: 'auto'}
     ];                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
 
@@ -104,24 +106,42 @@
     let gx;
 
     $(document).ready(function() {
-        pApp.ResizeGrid(265);
+        pApp.ResizeGrid(420);
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
         pApp.BindSearchEnter();
-        // Search();
+        Search();
     });
 
-    // function Search() {
-    //     let data = $('form[name="search"]').serialize();
-    //     gx.Request('/store/stock/stk32/search', data);
-    // }
+    function Search() {
+        let data = $('form[name="search"]').serialize();
+        gx.Request('/store/stock/stk32/search2', data);
+    }
 
 </script>
 
 <script>
-    unction openSendMsgPopup() {
-        const url = '/store/stock/stk32/sendMsg';
+    function openSendMsgPopup() {
+        const rows = gx.getSelectedRows();
+        let i;
+        let store_cd = "";
+        
+        for (i=0; i<rows.length; i++) {
+            store_cd += rows[i].store_cd+',';
+        }
+
+        const sc = store_cd.replace(/,\s*$/, "");
+
+        
+        const url = '/store/stock/stk32/sendMsg?store_cd='+sc;
         const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=600");
     }
+
+
+    
+</script>
+
+<script>
+
 </script>
 @stop

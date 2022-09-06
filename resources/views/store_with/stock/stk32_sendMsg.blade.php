@@ -11,12 +11,12 @@
                 </div>
             </div>
         </div>
-        <form name="sendMsg">
+        <form name="store">
             <div class="card_wrap aco_card_wrap">
                 <div class="card shadow">
                     <div class="card-header mb-0" style="display:inline-block">
                         <a>수신처</a>
-                        <button id="sendMsg_btn" class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;"> 전송</button>
+                        <button onclick="Create();return false;" id="sendMsg_btn" class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">전송</button>
                     </div>
                     <div style="display:inline-block;"></div>
                     <div class="card-body mt-1">
@@ -32,8 +32,10 @@
                                                 <tr>
                                                     <th>수신처</th>
                                                     <td>
-                                                        <div class="flax_box">
-                                                            <input type='text' class="form-control form-control-sm search-enter" name='store_nm' id="store_nm" >
+                                                        <div class="flax_box" name="sd" id="sd">
+                                                            @foreach($stores as $store)
+                                                                <span>{{$store->store_nm}},&nbsp;&nbsp;</span>
+                                                            @endforeach
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -46,105 +48,71 @@
                     </div>
                 </div>    
             </div>
-        </form>
-    </div>
-
-    <div class="show_layout py-3 px-sm-3">
-        <div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
-            <div class="card-title">
-                <div class="filter_wrap">
-                    <div class="fl_box">
-                        <h6 class="m-0 font-weight-bold">내용</h6>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <textarea class="form-control" id="exampleFormControlTextarea1" rows="10"></textarea>
-            </div>
-            <br>
-            <div>
-                <div style="font-size: 14px;display:inline-block">
-                    <input type="checkbox" id="reservation_msg" value="rm">&nbsp;
-                    <label for="reservation_msg">예약발송</label>
-                </div>
-
-                <div id="res_date" style="float:right;display:none">
-                    <div style="width:120px;display:inline-block;">
-                        <div class="docs-datepicker form-inline-inner input_box">
-                            <div class="input-group">
-                                <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{$edate}}" autocomplete="off" disable>
-                                <div class="input-group-append">
-                                    <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-                                        <i class="fa fa-calendar" aria-hidden="true"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="docs-datepicker-container"></div>
+        </div>
+        
+        <div class="show_layout py-3 px-sm-3">
+            <div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
+                <div class="card-title">
+                    <div class="filter_wrap">
+                        <div class="fl_box">
+                            <h6 class="m-0 font-weight-bold">내용</h6>
                         </div>
                     </div>
-
-                    <div style="width:100px;display:inline-block">
-                        <select name="hour" id="hour" class="form-control form-control-sm">
-                            @for( $i=1; $i <= 12;$i++)
-                                <option value="{{$i}}">{{$i}}시</option>
-                            @endfor
-                        </select>
+                </div>
+                <div class="form-group">
+                    <textarea class="form-control" id="content" name="content" rows="10" style="margin:auto;resize: none;"></textarea>
+                    <div id="test_cnt" style="text-align:right;">(0 / 20000)</div>
+                </div>
+                <br>
+                <div>
+                    <div style="font-size: 14px;display:inline-block">
+                        <input type="checkbox" id="reservation_msg" name="reservation_msg" value="">&nbsp;
+                        <label for="reservation_msg">예약발송</label>
                     </div>
                     
-                    <div style="width:100px;display:inline-block;">
-                        <select name="minite" id="minute" class="form-control form-control-sm">
-                            @for($i=00; $i <= 59; $i++)
+                    <div id="res_date" style="float:right;display:none">
+                        <div style="width:120px;display:inline-block;">
+                            <div class="docs-datepicker form-inline-inner input_box">
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm docs-date" name="rm_date" value="{{$edate}}" autocomplete="off" disable>
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
+                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="docs-datepicker-container"></div>
+                            </div>
+                        </div>
+                        
+                        <div style="width:100px;display:inline-block">
+                            <select name="rm_hour" id="rm_hour" class="form-control form-control-sm">
+                            @for( $i=0; $i <= 23;$i++)
                                 @if($i < 10)
-                                    <option value="{{$i}}">0{{$i}}분</option>
+                                    <option value="{{$i}}">0{{$i}}시</option>
                                 @else
-                                    <option value="{{$i}}">{{$i}}분</option>
+                                    <option value="{{$i}}">{{$i}}시</option>
                                 @endif
-                            @endfor
-                        </select>
+                                @endfor
+                            </select>
+                        </div>
+                        
+                        <div style="width:100px;display:inline-block;">
+                            <select name="rm_minite" id="rm_minute" class="form-control form-control-sm">
+                                @for($i=00; $i <= 59; $i++)
+                                @if($i < 10)
+                                <option value="{{$i}}">0{{$i}}분</option>
+                                @else
+                                <option value="{{$i}}">{{$i}}분</option>
+                                @endif
+                                @endfor
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
-    
-<script language="javascript">
-    let columns = [
-        {
-            headerName: '',
-            headerCheckboxSelection: true,
-            checkboxSelection: true,
-            width:28,
-            pinned:'left'
-        },
-        {headerName: "매장코드", field: "sender_type",width:150},
-        {headerName: "매장명", field: "sender_cd",  width:150, cellClass: 'hd-grid-code'},
-        {headerName: "연락처", field: "content",  width:150, cellClass: 'hd-grid-code'},
-        {headerName: "그룹명", field: "rt", width: 150, cellClass: 'hd-grid-code'},
-        {width: 'auto'}
-    ];                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
-
-</script>
-
-<script type="text/javascript" charset="utf-8">
-    const pApp = new App('',{
-        gridId:"#div-gd",
-    });
-    let gx;
-
-    $(document).ready(function() {
-        pApp.ResizeGrid(265);
-        let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns);
-        pApp.BindSearchEnter();
-        // Search();
-    });
-
-    // function Search() {
-    //     let data = $('form[name="search"]').serialize();
-    //     gx.Request('/store/stock/stk32/search', data);
-    // }
-
-</script>
 
 <script>
     $(document).ready(function(){
@@ -158,4 +126,53 @@
     });
 </script>
 
+<script>
+    function Create() {
+
+            let frm = $('form[name=store]').serialize();
+            // let check = document.querySelector('input[name="reservation_msg"]').checked;
+        
+            if ($('#content').val() === '') {
+                $('#content').focus();
+                alert('내용을 입력해 주세요.');
+                return false;
+            }
+
+            frm += "&store_cds=" + "{{ @$store_cds }}";
+
+            $.ajax({
+                method: 'post',
+                url: '/store/stock/stk32/store',
+                data: frm,
+                dataType: 'json',
+                success: function(data) {
+                    if (data.code == '200') {
+                        alert('알림 전송에 성공하였습니다.');
+                        window.close();
+                    } else {
+                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                        console.log(data);
+                    }
+                },
+                error: function(e) {
+                        console.log(e.responseText)
+                }
+            });
+        }
+
+    
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('#content').on('keyup', function() {
+            $('#test_cnt').html("("+$(this).val().length+" / 20000)");
+ 
+            if($(this).val().length > 20000) {
+                $(this).val($(this).val().substring(0, 20000));
+                $('#test_cnt').html("(20000 / 20000)");
+            }
+        });
+    });
+</script>
 @stop

@@ -15,13 +15,13 @@ use App\Models\Conf;
 
 class stk31Controller extends Controller
 {
-    public function index() 
+    public function index()
     {
         $mutable = Carbon::now();
-        $sdate	= $mutable->sub(1, 'week')->format('Y-m-d');
+        $sdate    = $mutable->sub(1, 'week')->format('Y-m-d');
 
         $values = [
-            'store_types'	=> SLib::getCodes("STORE_TYPE"),
+            'store_types'    => SLib::getCodes("STORE_TYPE"),
             'sdate' => $sdate,
             'edate' => date("Y-m-d")
         ];
@@ -33,26 +33,26 @@ class stk31Controller extends Controller
     {
 
         $r = $request->all();
-        
-        $sdate = $request->input('sdate',Carbon::now()->sub(3, 'month')->format('Ymd'));
-        $edate = $request->input('edate',date("Ymd"));
+
+        $sdate = $request->input('sdate', Carbon::now()->sub(3, 'month')->format('Ymd'));
+        $edate = $request->input('edate', date("Ymd"));
         $subject = $request->input('subject', '');
         $content = $request->input('content', '');
         $store_no = $request->input('store_no', '');
         $store_nm = $request->input('store_nm', '');
-        $store_type	= $request->input("store_type", '');
+        $store_type    = $request->input("store_type", '');
 
         $where = "";
         $orderby = "";
         if ($subject != "") $where .= " and s.subject like '%" . Lib::quote($subject) . "%' ";
         if ($content != "") $where .= " and s.content like '%" . Lib::quote($content) . "%' ";
-        if ($store_no != "") $where .= " and d.store_cd like '%" . Lib::quote($store_no) . "%'  or s.all_store_yn = 'Y'" ;
-        if( $store_type != "" )	$where .= " and a.store_type = '$store_type' or s.all_store_yn = 'Y'";
+        if ($store_no != "") $where .= " and d.store_cd like '%" . Lib::quote($store_no) . "%'  or s.all_store_yn = 'Y'";
+        if ($store_type != "")    $where .= " and a.store_type = '$store_type' or s.all_store_yn = 'Y'";
 
         // ordreby
         $ord = $r['ord'] ?? 'desc';
         $ord_field = $r['ord_field'] ?? "s.rt";
-        if($ord_field == 'subject') $ord_field = 's.' . $ord_field;
+        if ($ord_field == 'subject') $ord_field = 's.' . $ord_field;
         else $ord_field = 's.' . $ord_field;
         $orderby = sprintf("order by %s %s", $ord_field, $ord);
 
@@ -64,8 +64,9 @@ class stk31Controller extends Controller
         $limit = " limit $startno, $page_size ";
 
 
-        $query = /** @lang text */
-        "
+        $query =
+            /** @lang text */
+            "
             select 
                 s.ns_cd,
                 s.subject,
@@ -89,7 +90,7 @@ class stk31Controller extends Controller
             $limit
         ";
 
-        $result = DB::select($query, ['sdate' => $sdate,'edate' => $edate]);
+        $result = DB::select($query, ['sdate' => $sdate, 'edate' => $edate]);
 
         return response()->json([
             "code" => 200,
@@ -115,14 +116,14 @@ class stk31Controller extends Controller
         $user->store_cd = '';
         $user->store_nm = '';
 
-        $values = ['no' => $no,'user' => $user];
+        $values = ['no' => $no, 'user' => $user];
 
-        return view( Config::get('shop.store.view') . '/stock/stk31_show', $values);
+        return view(Config::get('shop.store.view') . '/stock/stk31_show', $values);
     }
 
     public function show($no)
     {
-        $user = DB::table('notice_store')->where('ns_cd',"=",$no)->first();
+        $user = DB::table('notice_store')->where('ns_cd', "=", $no)->first();
         $user->name = $user->admin_nm;
 
         $storeCode = "
@@ -140,12 +141,12 @@ class stk31Controller extends Controller
         $storeCodes = DB::select($storeCode);
 
         $values = [
-            'no' => $no, 
-            'user' => $user, 
+            'no' => $no,
+            'user' => $user,
             'storeCode' => $storeCodes
         ];
-        
-        return view( Config::get('shop.store.view') . '/stock/stk31_show', $values);
+
+        return view(Config::get('shop.store.view') . '/stock/stk31_show', $values);
     }
 
     public function store(Request $request)
@@ -154,19 +155,19 @@ class stk31Controller extends Controller
         $id =  Auth('head')->user()->id;
         $email = Auth('head')->user()->email;
 
-        $ns_cd = $request->input('ns_cd');            
+        $ns_cd = $request->input('ns_cd');
         $subject = $request->input('subject');
         $content = $request->input('content');
         $admin_id = $id;
         $admin_nm = $request->input('name');
-        $store_cd = $request->input('store_no','');
+        $store_cd = $request->input('store_no', '');
         $rt = DB::raw('now()');
         $store_nm = $request->input('store_nm');
         $rt2 = DB::raw('now()');
 
-        if($store_cd == null){
+        if ($store_cd == null) {
             $all_store_yn = "Y";
-        }else{
+        } else {
             $all_store_yn = "N";
         }
 
@@ -185,9 +186,9 @@ class stk31Controller extends Controller
                     'cnt' => 0,
                     'rt' => $rt
                 ]);
-            
-            if($store_cd !=''){
-                foreach($store_cd as $sc){
+
+            if ($store_cd != '') {
+                foreach ($store_cd as $sc) {
                     DB::table('notice_store_detail')
                         ->insert([
                             'ns_cd' => $res,
@@ -195,7 +196,7 @@ class stk31Controller extends Controller
                             'check_yn' => 'N',
                             'rt' => $rt2
                         ]);
-                    }
+                }
             }
 
             DB::commit();
@@ -210,14 +211,13 @@ class stk31Controller extends Controller
             "code" => $code,
             "msg" => $msg
         ]);
-
     }
 
     public function update($no, Request $request)
     {
 
         $id =  Auth('head')->user()->id;
-        
+
         $subject = $request->input('subject');
         $content = $request->input('content');
         $store_cd = $request->input('store_no', '');
@@ -225,9 +225,9 @@ class stk31Controller extends Controller
         $ut = DB::raw('now()');
         $rt2 = DB::raw('now()');
 
-        if($store_cd == null){
+        if ($store_cd == null) {
             $all_store_yn = "Y";
-        }else{
+        } else {
             $all_store_yn = "N";
         }
 
@@ -237,16 +237,16 @@ class stk31Controller extends Controller
             'all_store_yn' => $all_store_yn,
             'ut' => $ut
         ];
-    
+
         try {
             DB::beginTransaction();
 
             DB::table('notice_store')
-                ->where('ns_cd','=',$ns_cd)
+                ->where('ns_cd', '=', $ns_cd)
                 ->update($notice_store);
-            
-            if($store_cd !=''){
-                foreach($store_cd as $sc){
+
+            if ($store_cd != '') {
+                foreach ($store_cd as $sc) {
                     DB::table('notice_store_detail')
                         ->insert([
                             'ns_cd' => $ns_cd,
@@ -254,7 +254,7 @@ class stk31Controller extends Controller
                             'check_yn' => 'N',
                             'rt' => $rt2
                         ]);
-                    }
+                }
             }
             DB::commit();
             $code = 200;
@@ -268,7 +268,6 @@ class stk31Controller extends Controller
             "code" => $code,
             "msg" => $msg
         ]);
-
     }
 
     public function del_store(Request $request)
@@ -286,11 +285,11 @@ class stk31Controller extends Controller
             ";
 
             DB::delete($sql);
-            
+
             DB::commit();
             $code = '200';
             $msg = "";
-        } catch(Exception $e){
+        } catch (Exception $e) {
             DB::rollBack();
             $code = 500;
             $msg = "실패!";
@@ -300,6 +299,5 @@ class stk31Controller extends Controller
             "code" => $code,
             "msg" => $msg
         ]);
-
     }
 }

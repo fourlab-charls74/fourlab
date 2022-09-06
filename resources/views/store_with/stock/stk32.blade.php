@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="page_tit">
-    <h3 class="d-inline-flex">받은 알림 보관함</h3>
+    <h3 class="d-inline-flex">{{ @$cmd == 'send' ? '보낸' : '받은' }} 알림 보관함</h3>
     <div class="d-inline-flex location">
         <span class="home"></span>
         <span>/ 매장관리</span>
@@ -21,7 +21,11 @@
                     
                     <a href="#" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
                     <a href="#" onclick="openMsgPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"> 알림전송</a>
-                    <a href="#" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"> 보낸알림 보관함</a>
+                    @if(@$cmd == 'receive')
+                        <a href="/store/stock/stk32?is_send_msg=true" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"> 보낸알림 보관함</a>
+                    @elseif(@$cmd == 'send')
+                        <a href="/store/stock/stk32" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"> 받은알림 보관함</a>
+                    @endif
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
             </div>
@@ -29,7 +33,7 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="formrow-firstname-input">받은 날짜</label>
+                            <label for="formrow-firstname-input">{{ @$cmd == 'send' ? '보낸' : '받은' }} 날짜</label>
                             <div class="form-inline">
                                 <div class="docs-datepicker form-inline-inner input_box">
                                     <div class="input-group">
@@ -59,9 +63,9 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                          <label for="">발신처</label>
+                          <label for="">{{ @$cmd == 'send' ? '수신' : '발신' }}처</label>
                           <div class="flax_box">
-                            <input type='text' class="form-control form-control-sm search-all search-enter" name='subject' value=''>
+                            <input type='text' class="form-control form-control-sm search-all search-enter" name='sender' value=''>
                           </div>
                         </div>
                     </div>
@@ -81,7 +85,7 @@
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box" style="width:24%;">
                                         <select name="limit" class="form-control form-control-sm">
-                                            <option value="10">20</option>
+                                            <option value="20">20</option>
                                             <option value="50">50</option>
                                             <option value="100">100</option>
                                             <option value="200">200</option>
@@ -136,21 +140,47 @@
 	</div>
 </div>
 <script language="javascript">
-    let columns = [
-        {
-            headerName: '',
-            headerCheckboxSelection: true,
-            checkboxSelection: true,
-            width:28,
-            pinned:'left'
-        },
-        {headerName: "발신처", field: "sender_type",width:400},
-        {headerName: "연락처", field: "sender_cd",  width:80, cellClass: 'hd-grid-code'},
-        {headerName: "내용", field: "content",  width:80, cellClass: 'hd-grid-code'},
-        {headerName: "받은 날짜", field: "rt", width: 130, cellClass: 'hd-grid-code'},
-        {headerName: "알림 번호", field: "msg_cd", hide: true},        
-        { width: 'auto' }
-    ];                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+    let columns = [];
+    if('{{ @$cmd }}' == 'send'){
+
+        columns = [
+                {
+                    headerName: '',
+                    headerCheckboxSelection: true,
+                    checkboxSelection: true,
+                    width:28,
+                    pinned:'left'
+                },
+                {headerName: "수신처", field: "receiver_cd",width:150,
+                    cellRenderer: function(params) {
+                        return params.data.receiver_cds
+                        
+                    }
+                },
+                {headerName: "내용", field: "content",  width:150, cellClass: 'hd-grid-code'},
+                {headerName: "보낸 날짜", field: "rt",  width:300, cellClass: 'hd-grid-code'},
+                {headerName: "확인여부", field: "check_yn", width: 150, cellClass: 'hd-grid-code'},
+                {width: 'auto'}
+            ];                              
+        }else{
+        
+        columns = [
+                {
+                    headerName: '',
+                    headerCheckboxSelection: true,
+                    checkboxSelection: true,
+                    width:28,
+                    pinned:'left'
+                },
+                {headerName: "발신처", field: "sender_cd",width:150},
+                {headerName: "연락처", field: "mobile",  width:150, cellClass: 'hd-grid-code'},
+                {headerName: "내용", field: "content",  width:300, cellClass: 'hd-grid-code'},
+                {headerName: "받은 날짜", field: "rt", width: 150, cellClass: 'hd-grid-code'},
+                {headerName: "알림 번호", field: "msg_cd", hide: true},        
+                {width: 'auto'}
+            ];                              
+        }
 
 </script>
 
@@ -186,7 +216,7 @@
 <script>
     function openMsgPopup() {
         const url = '/store/stock/stk32/create';
-        const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=1000");
+        const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=700");
     }
 </script>
 @stop
