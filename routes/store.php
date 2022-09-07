@@ -296,6 +296,12 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
     });
 
+    // 고객관리
+    Route::prefix("member")->namespace('member')->group(function () {
+        Route::get('mem01','mem01Controller@index');
+        Route::get('mem01/search', 'mem01Controller@search');
+    });
+
     // 영업관리
     Route::prefix("sale")->namespace('sale')->group(function () {
         Route::get('sal01','sal01Controller@index');
