@@ -50,7 +50,7 @@
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-line-chart fs-18"></i><span>고객/수선관리</span></a>
                 <ul>
-                    <li><a href="/head/member/mem01" target="_blank">(개)회원관리</a></li>
+                    <li><a href="/store/member/mem01">(개)회원관리</a></li>
                     <li><a href="/store/standard/std11">(완)수선관리</a></li>
                     <li><a href="/head/promotion/prm10" target="_blank">(완)쿠폰</a></li>
                 </ul>
