@@ -307,7 +307,7 @@ SearchPrdcd.prototype.Open = async function(callback = null){
     if(this.grid === null){
         this.SetGrid("#div-gd-prdcd");
         this.SetGridCond();
-        $("#SearchPrdcdModal").draggable();
+        // $("#SearchPrdcdModal").draggable();
         this.callback = callback;
     }
     $('#SearchPrdcdModal').modal({
@@ -320,12 +320,12 @@ SearchPrdcd.prototype.SetGrid = function(divId){
 
     columns.push(
         { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null },
-        { field: "prd_cd", headerName: "상품코드", width: 120 },
-        { field: "goods_no", headerName: "상품번호", width: 60 },
-        { field: "goods_nm", headerName: "상품명", width: 290 },
-        { field: "goods_opt", headerName: "옵션", width: 180 },
-        { field: "color", headerName: "컬러", width: 60 },
-        { field: "size", headerName: "사이즈", width: 60 },
+        { field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {"text-align": "center"} },
+        { field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"} },
+        { field: "goods_nm", headerName: "상품명", width: 400 },
+        { field: "goods_opt", headerName: "옵션", width: 300 },
+        { field: "color", headerName: "컬러", width: 60, cellStyle: {"text-align": "center"} },
+        { field: "size", headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"} },
         { width: "auto" }
     );
     this.grid = new HDGrid(document.querySelector( divId ), columns);
@@ -364,7 +364,7 @@ SearchPrdcd.prototype.SetGridCond = async function() {
                 if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#f2f2f2', 'border': 'none'};
             },
         });
-        document.querySelector( "#div-gd-prdcd-" + cond_title ).style.height = '210px';
+        document.querySelector( "#div-gd-prdcd-" + cond_title ).style.height = '204px';
     });
     const { data: { body: res } } = await axios({ 
         url: '/store/api/prdcd/conds', 

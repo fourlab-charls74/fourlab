@@ -520,34 +520,34 @@
                                 </div>
                                 <div class="row_wrap">
                                     <div class="row">
-                                        <div class="col-4 col-lg-2 pr-0 pl-0 pl-lg-2">
+                                        <div class="col-4 col-lg-2 p-1 pl-0 pl-lg-2">
                                             <div class="table-responsive">
-                                                <div id="div-gd-prdcd-brand" style="width:100%;height:300px;" class="ag-theme-balham"></div>
+                                                <div id="div-gd-prdcd-brand" class="ag-theme-balham"></div>
                                             </div>
                                         </div>
-                                        <div class="col-4 col-lg-2 pr-0 pl-0">
+                                        <div class="col-4 col-lg-2 p-1">
                                             <div class="table-responsive">
-                                                <div id="div-gd-prdcd-year" style="width:100%;height:300px;" class="ag-theme-balham"></div>
+                                                <div id="div-gd-prdcd-year" class="ag-theme-balham"></div>
                                             </div>
                                         </div>
-                                        <div class="col-4 col-lg-2 pr-0 pl-0">
+                                        <div class="col-4 col-lg-2 p-1">
                                             <div class="table-responsive">
-                                                <div id="div-gd-prdcd-season" style="width:100%;height:300px;" class="ag-theme-balham"></div>
+                                                <div id="div-gd-prdcd-season" class="ag-theme-balham"></div>
                                             </div>
                                         </div>
-                                        <div class="col-4 col-lg-2 pr-0 pl-0">
+                                        <div class="col-4 col-lg-2 p-1">
                                             <div class="table-responsive">
-                                                <div id="div-gd-prdcd-gender" style="width:100%;height:300px;" class="ag-theme-balham"></div>
+                                                <div id="div-gd-prdcd-gender" class="ag-theme-balham"></div>
                                             </div>
                                         </div>
-                                        <div class="col-4 col-lg-2 pr-0 pl-0">
+                                        <div class="col-4 col-lg-2 p-1">
                                             <div class="table-responsive">
-                                                <div id="div-gd-prdcd-item" style="width:100%;height:300px;" class="ag-theme-balham"></div>
+                                                <div id="div-gd-prdcd-item" class="ag-theme-balham"></div>
                                             </div>
                                         </div>
-                                        <div class="col-4 col-lg-2 pr-0 pr-lg-2 pl-0">
+                                        <div class="col-4 col-lg-2 p-1 pr-0 pr-lg-2">
                                             <div class="table-responsive">
-                                                <div id="div-gd-prdcd-opt" style="width:100%;height:300px;" class="ag-theme-balham"></div>
+                                                <div id="div-gd-prdcd-opt" class="ag-theme-balham"></div>
                                             </div>
                                         </div>
                                     </div>
