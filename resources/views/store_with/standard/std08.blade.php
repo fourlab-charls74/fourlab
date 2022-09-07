@@ -31,6 +31,14 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
+                            <label for="grade_cd">등급코드</label>
+                            <div class="flex_box">
+                                <input type='text' class="form-control form-control-sm search-enter" name='grade_cd' value=''>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
                             <label for="name">등급명</label>
                             <div class="flex_box">
                                 <input type='text' class="form-control form-control-sm search-enter" name='name' value=''>

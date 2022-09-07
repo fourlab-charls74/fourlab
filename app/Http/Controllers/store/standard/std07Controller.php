@@ -92,6 +92,7 @@ class std07Controller extends Controller
 				s.store_cd, 
 				sf.store_fee,
 				s.grade_cd,
+				sg.idx as grade_idx,
 				sg.name as grade_nm,
 				sf.sdate, 
 				sf.edate, 

@@ -28,9 +28,13 @@ class std08Controller extends Controller
 
 	public function search(Request $request)
 	{
+		$grade_cd = $request->input("grade_cd", "");
 		$grade_nm = $request->input("name", "");
+
 		$where = "where 1=1";
+		if ($grade_cd != "") $where .= " and sg.grade_cd like '%" . Lib::quote($grade_cd) . "%'";
 		if ($grade_nm != "") $where .= " and sg.name like '%" . Lib::quote($grade_nm) . "%'";
+		
 		$sql = "
 			select *
 			from store_grade sg
@@ -151,17 +155,12 @@ class std08Controller extends Controller
 
 	public function choice_index(Request $request)
 	{
-		$sdate = Carbon::now()->startOfMonth()->format("Y-m-d");
-		$edate = Carbon::now()->format("Y-m-d");
-		$grade_cd = $request->input("grade_cd", "");
-		$grade_nm = DB::table('store_grade')->select('name')->where('grade_cd', '=', $grade_cd)->first();
+		$grade_idx = $request->input('grade_idx', '');
+		$grade_nm = DB::table('store_grade')->select('name')->where('idx', '=', $grade_idx)->first();
 		if($grade_nm != null) $grade_nm = $grade_nm->name;
 
 		$values = [
-			"sdate" => $sdate,
-			"edate" => $edate,
 			"grade_nm" => $grade_nm,
-			"store_types" => SLib::getCodes("STORE_TYPE"),
 		];
 		return view(Config::get('shop.store.view') . '/standard/std08_choice', $values);
 	}

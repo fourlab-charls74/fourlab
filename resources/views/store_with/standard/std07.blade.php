@@ -157,7 +157,7 @@
         {field: "grade_cd", hide: true},
         {field: "grade_nm", headerName: "매장등급", width: 100, cellStyle: {"text-align": "center"},
             cellRenderer: (params) => {
-                return `<a href='javascript:void(0)' onclick='showStoreGradePopup("${params.data.grade_cd}")'>${params.value}</a>`;
+                return `<a href='javascript:void(0)' onclick='showStoreGradePopup("${params.data.grade_idx}")'>${params.value}</a>`;
             }
         },
         // {field: "manager_fee", headerName: "중간관리수수료(%)", width: 120, type: "percentType"},
@@ -234,9 +234,9 @@
     }
     
     // 매장등급조회
-    function showStoreGradePopup(grade_cd = '') {
-        const url = "/store/standard/std08/choice?grade_cd=" + grade_cd;
-        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1200,height=700");
+    function showStoreGradePopup(grade_idx = '') {
+        const url = "/store/standard/std08/choice?grade_idx=" + grade_idx;
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1200,height=710");
     }
 </script>
 @stop
