@@ -208,6 +208,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 매장주문
         Route::get('stk03', 'stk03Controller@index');
         Route::get('stk03/search', 'stk03Controller@search');
+        Route::get('stk03/create', 'stk03Controller@create');
 
         Route::get('stk11','stk11Controller@index');
 

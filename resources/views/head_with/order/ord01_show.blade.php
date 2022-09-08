@@ -625,13 +625,13 @@
                                         </tr>
                                         <tr>
                                             <th colspan="10">
-                                                결제금액 ({{ number_format($pay->pay_amt) }}) =
+                                                결제금액 ({{ number_format(@$pay->pay_amt) }}) =
                                                 주문금액 ({{ number_format($t_price) }}) +
-                                                결제수수료 ({{ number_format($pay->pay_fee) }}) +
-                                                배송비 ({{ number_format($pay->pay_baesong) }}) +
-                                                적립금사용 ({{ number_format($pay->pay_point)}}) +
-                                                쿠폰사용 ({{ number_format($pay->coupon_amt)}}) +
-                                                할인금액 ({{ number_format($pay->dc_amt) }}) +
+                                                결제수수료 ({{ number_format(@$pay->pay_fee) }}) +
+                                                배송비 ({{ number_format(@$pay->pay_baesong) }}) +
+                                                적립금사용 ({{ number_format(@$pay->pay_point)}}) +
+                                                쿠폰사용 ({{ number_format(@$pay->coupon_amt)}}) +
+                                                할인금액 ({{ number_format(@$pay->dc_amt) }}) +
                                                 환불금액 ({{ number_format($t_refund_amt) }}) +
                                                 할인금액 ({{ number_format($ord->tax) }})
                                             </th>

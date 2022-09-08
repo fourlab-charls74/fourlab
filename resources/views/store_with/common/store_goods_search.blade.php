@@ -33,7 +33,7 @@
 <div class="container-fluid py-3">
     <div class="page_tit d-flex align-items-center justify-content-between">
         <div>
-            <h3 class="d-inline-flex">매장별 상품 검색 - {{ @$store->store_nm }}</h3>
+            <h3 class="d-inline-flex">매장별 상품 검색 - @if(@$store->store_nm != '') {{ @$store->store_nm }} @else 전체 매장 @endif</h3>
             <div class="d-inline-flex location">
                 <span class="home"></span>
                 <span>/ 매장별 상품 검색</span>
@@ -313,7 +313,6 @@
         if (isOpenerCallback('beforeSearchCallback')) opener.beforeSearchCallback(document);
         let data = $('form[name="search"]').serialize();
         data += '&store_cd=' + store_cd;
-        console.log(store_cd);
         gx.Request('/store/api/store-goods', data, 1);
     };
     

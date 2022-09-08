@@ -250,7 +250,7 @@ class goods extends Controller
     /******************************* 매장별 상품검색 관련 *****************************/
     /********************************************************************************/
     
-    public function store_show($store_cd) 
+    public function store_show($store_cd = '') 
     {
         $mutable	= now();
         $sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
@@ -265,11 +265,11 @@ class goods extends Controller
         $domain		= $conf->getConfigValue("shop", "domain");
 
         // 매장정보
-        $store = DB::table("store")->where('store_cd', '=', $store_cd)->select('store_cd', 'store_nm')->get();
-        if(count($store) < 1) $store = ['store_cd' => '', 'store_nm' => ''];
+        $store = DB::table("store")->where('store_cd', '=', $store_cd)->select('store_cd', 'store_nm')->first();
+        if($store == null) $store = ['store_cd' => '', 'store_nm' => ''];
 
         $values = [
-            'store'         => $store[0],
+            'store'         => $store,
             'sdate'         => $sdate,
             'edate'         => date("Y-m-d"),
 			// 'event_cds'		=> $event_cds,
