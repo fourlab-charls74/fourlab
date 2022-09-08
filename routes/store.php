@@ -204,6 +204,11 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk01/search','stk01Controller@search');
 
         Route::get('stk02','stk02Controller@index');
+
+        // 매장주문
+        Route::get('stk03', 'stk03Controller@index');
+        Route::get('stk03/search', 'stk03Controller@search');
+
         Route::get('stk11','stk11Controller@index');
 
         // 출고리스트

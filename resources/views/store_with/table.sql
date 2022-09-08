@@ -614,7 +614,7 @@ CREATE TABLE `msg_store_detail` (
 -- 매장그룹
 CREATE TABLE `msg_group` (
     `group_cd` int(11) NOT NULL AUTO_INCREMENT COMMENT '그룹번호',
-    `gruop_nm` varchar(100) NOT NULL COMMENT '그룹명',
+    `group_nm` varchar(100) NOT NULL COMMENT '그룹명',
     `account_cd` varchar(30) NOT NULL COMMENT '그룹추가한 계정(매장)코드',
     `rt` datetime DEFAULT NULL COMMENT '등록일자',
     `ut` datetime DEFAULT NULL COMMENT '수정일자',
