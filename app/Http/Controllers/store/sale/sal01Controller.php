@@ -230,9 +230,8 @@ class sal01Controller extends Controller
 		DB::beginTransaction();
 		try {
 			$saved_type = $this->saveTmpOrder($order);
-		} catch (Exception $e) {
+		} catch (Exception $e) { // 임시 주문서 저장시 문제 발생한 경우 에러 처리
 			DB::rollback();
-			// 임시 주문서 저장시 문제 발생한 경우 에러 처리
 			$code = -400;
 			return response()->json(['code'	=> $code]);
 		}
@@ -242,7 +241,8 @@ class sal01Controller extends Controller
 		} else if ($saved_type == "update") {
 			$code = $this->updateOrder($order);
 		}
-		$code >= 200 ? DB::commit() : DB::rollBack();
+
+		($code == 200 || $code == 201) ? DB::commit() : DB::rollBack(); // 추가 또는 수정이 완료된 경우 commit하여 DB 반영
 		return response()->json(['code'	=> $code]);
 	}
 
