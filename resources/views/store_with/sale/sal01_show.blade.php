@@ -180,6 +180,7 @@
 	out_order_errors['-400'] = "임시 주문서 저장 오류";
 	out_order_errors['-410'] = "주문서 추가 오류";
 	out_order_errors['-420'] = "주문서 업데이트 오류";
+	out_order_errors['-425'] = "기존 데이터 불일치 오류";
     out_order_errors['-500'] = "시스템오류";
     out_order_errors['110'] = "재고 부족";
 
