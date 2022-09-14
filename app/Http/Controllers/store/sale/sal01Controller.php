@@ -215,7 +215,7 @@ class sal01Controller extends Controller
 		return $data;
 	}
 
-	public function update(Request $request, $saved_type = "")
+	public function update(Request $request, $re_insert = false)
 	{
 		ini_set('max_execution_time', '600');
 		// set_time_limit(0);
@@ -234,23 +234,18 @@ class sal01Controller extends Controller
 			$code = -400;
 			return response()->json(['code'	=> $code]);
 		}
+		
+		if ($re_insert) $saved_type = "re-insert";
 
-		if ($saved_type == "insert") {
+		if ($saved_type == "insert" || $saved_type =="re-insert") {
 			$code = $this->insertOrder($order);
 		} else if ($saved_type == "update") {
 			$code = $this->updateOrder($order);
-			if ($code == -201) { // 업데이트 하려는 테이블에 초기 데이터 값들이 존재하지 않을 경우 재삽입 처리
+			if ($code == -201) { // 주문 관련 테이블에 초기 데이터 값들이 존재하지 않을 경우 롤백하고 재삽입 처리
 				DB::rollback();
-				$response = $this->update($request, "re-insert");
+				$response = $this->update($request, true);
 				return $response;
 			}
-		} else if ($saved_type == "re-insert") {
-			try {
-				DB::table('__tmp_order')->where('ord_no', $this->inserted_tmp_ord_no)->update(['out_ord_opt_no' => ""]);
-			} catch (Exception $e) { // 업데이트시 오류 처리
-				return response()->json(['code'	=> -425]);
-			}
-			$code = $this->insertOrder($order);
 		}
 
 		($code == 200 || $code == 201) ? DB::commit() : DB::rollBack(); // 추가 또는 수정이 완료된 경우 commit하여 DB 반영
@@ -1024,7 +1019,6 @@ class sal01Controller extends Controller
 				$updated_row = DB::table('order_opt')->where('ord_opt_no', $ord_opt_no)->first();
 				if ($updated_row == null) return $code = -201;
 
-				// 현재 업데이트 row가 null 나오고 있음. 데이터 다 지우고 새로 등록하면 null이 나오지 않을 것
 				$ord_no = $updated_row->ord_no;
 
 				DB::table('order_mst')->where('ord_no', $ord_no)->update([
