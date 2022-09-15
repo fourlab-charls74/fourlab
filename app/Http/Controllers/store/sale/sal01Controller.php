@@ -20,7 +20,7 @@ class sal01Controller extends Controller
 	protected $file;
 	protected $tmp_name;
 
-	protected $inserted_tmp_ord_no;
+	protected $tmp_ord_no;
 	protected $updated_tmp_ord_row;
 
 	//
@@ -215,7 +215,7 @@ class sal01Controller extends Controller
 		return $data;
 	}
 
-	public function update(Request $request, $re_insert = false)
+	public function update(Request $request)
 	{
 		ini_set('max_execution_time', '600');
 		// set_time_limit(0);
@@ -235,16 +235,12 @@ class sal01Controller extends Controller
 			return response()->json(['code'	=> $code]);
 		}
 		
-		if ($re_insert) $saved_type = "re-insert";
-
-		if ($saved_type == "insert" || $saved_type =="re-insert") {
+		if ($saved_type == "insert") {
 			$code = $this->insertOrder($order);
 		} else if ($saved_type == "update") {
 			$code = $this->updateOrder($order);
 			if ($code == -201) { // 주문 관련 테이블에 초기 데이터 값들이 존재하지 않을 경우 롤백하고 재삽입 처리
-				DB::rollback();
-				$response = $this->update($request, true);
-				return $response;
+				$code = $this->insertOrder($order);
 			}
 		}
 
@@ -359,7 +355,7 @@ class sal01Controller extends Controller
 			";
 			DB::insert($sql, $sql_data);
 			$saved_type = "insert";
-			$this->inserted_tmp_ord_no = $ord_no;
+			$this->tmp_ord_no = $ord_no;
 		} else {
 			$sql	= "
 				update __tmp_order set
@@ -402,6 +398,7 @@ class sal01Controller extends Controller
 			";
 			DB::update($sql, $sql_data);
 			$saved_type = "update";
+			$this->tmp_ord_no = $ord_no;
 			$this->updated_tmp_ord_row = DB::table('__tmp_order')->where('ord_no', $ord_no)->get()->all()[0];
 		}
 		return $saved_type;
@@ -414,7 +411,7 @@ class sal01Controller extends Controller
         $admin_nm = Auth('head')->user()->name;
 		$code = 0;
 
-		$tmp_ord_no = $this->inserted_tmp_ord_no;
+		$tmp_ord_no = $this->tmp_ord_no;
 		
 		/**
 		 * prd_cd 설정 (자사바코드 있는 경우 자사바코드 사용, 없는 경우 상품코드 + 칼라 + 사이즈로 상품코드 설정)
