@@ -239,7 +239,7 @@ class sal01Controller extends Controller
 			$code = $this->insertOrder($order);
 		} else if ($saved_type == "update") {
 			$code = $this->updateOrder($order);
-			if ($code == -201) { // 주문 관련 테이블에 초기 데이터 값들이 존재하지 않을 경우 롤백하고 재삽입 처리
+			if ($code == -201) { // 주문 관련 테이블에 초기 데이터 값들이 존재하지 않을 경우 재삽입 처리
 				$code = $this->insertOrder($order);
 			}
 		}
@@ -618,9 +618,9 @@ class sal01Controller extends Controller
 					"id" => $admin_id,
 					"name" => $admin_nm
 				]);
-				if ($ord_no === "") {
-					$ord_no = $orderClass->GetNextOrdNo();
-				}
+
+				$f_ord_date = Carbon::parse($ord_date)->format("YmdHis");
+				$ord_no = $f_ord_date . $store_cd . rand(000000, 999999);
 				$orderClass->SetOrdNo($ord_no);
 
 				$order_mst = [
@@ -650,8 +650,8 @@ class sal01Controller extends Controller
 					"ord_kind" 		=> @$order["ord_kind"],
 					"sale_place" 	=> @$order["sale_place"],
 					"out_ord_no" 	=> @$order["out_ord_no"],
-					"upd_date"      => DB::raw('now()'),
-					"dlv_end_date"  => DB::raw('now()')
+					"upd_date"      => $ord_date,
+					"dlv_end_date"  => $ord_date
 				];
 				DB::table('order_mst')->insert($order_mst);
 
@@ -664,8 +664,8 @@ class sal01Controller extends Controller
 					"bank_inpnm" 	=> Lib::getValue($order, "bank_inpnm", ""),
 					"bank_code" 	=> Lib::getValue($order, "bank_code", ""),
 					"bank_number" 	=> Lib::getValue($order, "bank_number", ""),
-					"ord_dm"        => DB::raw('date_format(now(),\'%Y%m%d%H%i%s\')'),
-					"upd_dm"        => DB::raw('date_format(now(),\'%Y%m%d%H%i%s\')'),
+					"ord_dm"        => $f_ord_date,
+					"upd_dm"        => $f_ord_date
 				];
 				DB::table('payment')->insert($payment);
 				
@@ -1044,13 +1044,14 @@ class sal01Controller extends Controller
 					"ord_kind" 		=> @$order["ord_kind"],
 					"sale_place" 	=> @$order["sale_place"],
 					"out_ord_no" 	=> @$order["out_ord_no"],
-					"upd_date"      => DB::raw('now()'),
-					"dlv_end_date"  => DB::raw('now()')
+					"upd_date"      => $ord_date,
+					"dlv_end_date"  => $ord_date
 				]);
 
 				$updated_row = DB::table('order_mst')->where('ord_no', $ord_no)->first();
 				if ($updated_row == null) return $code = -201;
 
+				$f_ord_date = Carbon::parse($ord_date)->format("YmdHis");
 				DB::table('payment')->where('ord_no', $ord_no)->update([
 					"pay_type" 		=> $pay_type,
 					"pay_nm" 		=> $order["user_nm"],
@@ -1059,8 +1060,8 @@ class sal01Controller extends Controller
 					"bank_inpnm" 	=> Lib::getValue($order, "bank_inpnm", ""),
 					"bank_code" 	=> Lib::getValue($order, "bank_code", ""),
 					"bank_number" 	=> Lib::getValue($order, "bank_number", ""),
-					"ord_dm"        => DB::raw('date_format(now(),\'%Y%m%d%H%i%s\')'),
-					"upd_dm"        => DB::raw('date_format(now(),\'%Y%m%d%H%i%s\')')
+					"ord_dm"        => $f_ord_date,
+					"upd_dm"        => $f_ord_date
 				]);
 
 				$updated_row = DB::table('payment')->where('ord_no', $ord_no)->first();
