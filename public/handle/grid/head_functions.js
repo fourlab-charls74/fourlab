@@ -225,7 +225,8 @@ function StyleGoodsType(params) {
         if (state[params.data.goods_type]) {
             var color = state[params.data.goods_type];
             return {
-                color: color
+                color: color,
+                "text-align": "center"
             };
         }
     }
@@ -303,7 +304,8 @@ function StyleOrdKind(params) {
     if (state[params.value]) {
         var color = state[params.value];
         return {
-            color: color
+            color: color,
+            "text-align": "center"
         };
     }
 }
@@ -335,7 +337,8 @@ function StyleOrdState(params) {
     var bold = state_bd[params.value];
     return {
         color: color,
-        fontWeight: bold
+        fontWeight: bold,
+        "text-align":"center"
     };
 }
 
@@ -343,7 +346,8 @@ function StyleClmState(params) {
     if (params.value != "") {
         return {
             color: "#FF0000",
-            "font-weight": "bold"
+            "font-weight": "bold",
+            "text-align":"center"
         };
     }
 }

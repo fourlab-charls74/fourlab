@@ -108,7 +108,8 @@ CREATE TABLE `product_stock_rotation` (
   `store_cd` VARCHAR(30) NOT NULL DEFAULT '0' COMMENT '수령매장코드',
   `state` INT(11) NOT NULL DEFAULT '0' COMMENT '상태(요청/접수/출고(매장)/입고/거부:10/20/30/40/-10)',
   `exp_dlv_day` VARCHAR(8) DEFAULT NULL COMMENT '출고예정일자',
-  `comment` VARCHAR(255) DEFAULT NULL COMMENT 'RT메모(거부사유 등)',
+  `req_comment` VARCHAR(255) DEFAULT NULL COMMENT 'RT요청메모',
+  `rec_comment` VARCHAR(255) DEFAULT NULL COMMENT 'RT접수메모(거부사유 등)',
   `req_id` VARCHAR(50) DEFAULT NULL COMMENT '요청자',
   `req_rt` DATETIME DEFAULT NULL COMMENT '요청일시',
   `rec_id` VARCHAR(50) DEFAULT NULL COMMENT '접수자',
@@ -589,7 +590,7 @@ CREATE TABLE `notice_store_detail` (
 -- 알림
 CREATE TABLE `msg_store` (
     `msg_cd` int(11) NOT NULL AUTO_INCREMENT COMMENT '알림번호',
-    `sender_type` char(1) NOT NULL COMMENT '발신처 타입 (매장 - S)',
+    `sender_type` char(1) NOT NULL COMMENT '발신처 타입 (매장 - S / 본사 - H)',
     `sender_cd` varchar(30) NOT NULL COMMENT '발신처코드',
     `reservation_yn` char(1) NOT NULL COMMENT '예약발송여부',
     `reservation_date` varchar(20) DEFAULT NULL COMMENT '예약발송일 (0000-00-00 00:00:00)',
@@ -601,13 +602,31 @@ CREATE TABLE `msg_store` (
 -- 알림 - 수신처별
 CREATE TABLE `msg_store_detail` (
     `msg_cd` int(11) NOT NULL COMMENT '알림번호 - msg_store : msg_cd',
-    `receiver_type` char(1) NOT NULL COMMENT '수신처 타입 (매장 - S)',
+    `receiver_type` char(1) NOT NULL COMMENT '수신처 타입 (매장 - S / 본사 - H)',
     `receiver_cd` varchar(30) NOT NULL COMMENT '수신처코드',
     `check_yn` char(1) NOT NULL COMMENT '알림확인여부',
     `check_date` datetime DEFAULT NULL COMMENT '알림확인일시',
     `rt` datetime DEFAULT NULL COMMENT '등록일자',
     `ut` datetime DEFAULT NULL COMMENT '수정일자',
     PRIMARY KEY (`msg_cd`, `receiver_cd`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 매장그룹
+CREATE TABLE `msg_group` (
+    `group_cd` int(11) NOT NULL AUTO_INCREMENT COMMENT '그룹번호',
+    `group_nm` varchar(100) NOT NULL COMMENT '그룹명',
+    `account_cd` varchar(30) NOT NULL COMMENT '그룹추가한 계정(매장)코드',
+    `rt` datetime DEFAULT NULL COMMENT '등록일자',
+    `ut` datetime DEFAULT NULL COMMENT '수정일자',
+    PRIMARY KEY (`group_cd`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 매장그룹 내 매장정보
+CREATE TABLE `msg_group_store` (
+    `group_cd` int(11) NOT NULL COMMENT '그룹번호 - store_group',
+    `store_cd` varchar(30) NOT NULL COMMENT '매장코드',
+    `rt` datetime DEFAULT NULL COMMENT '등록일자',
+    PRIMARY KEY (`group_cd`, `store_cd`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --

@@ -124,19 +124,6 @@
                     <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="goods_stat">상품상태</label>
-                                <div class="flax_box">
-                                    <select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
-                                        <option value=''>전체</option>
-                                        @foreach ($goods_stats as $goods_stat)
-                                            <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
                                 <label for="item">품목</label>
                                 <div class="flax_box">
                                     <select name="item" class="form-control form-control-sm">
@@ -154,30 +141,6 @@
                                 <div class="form-inline inline_btn_box">
                                     <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
                                     <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row search-area-ext d-none">
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="goods_nm_eng">상품명(영문)</label>
-                                <div class="flax_box">
-                                    <input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="name">공급업체</label>
-                                <div class="form-inline inline_select_box">
-                                    <div class="form-inline-inner input-box w-100">
-                                        <div class="form-inline inline_btn_box">
-                                            <input type="hidden" id="com_cd" name="com_cd" />
-                                            <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
-                                            <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -207,6 +170,43 @@
                                         </div>
                                         <input type="radio" name="ord" id="sort_desc" value="desc">
                                         <input type="radio" name="ord" id="sort_asc" value="asc" checked>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row search-area-ext d-none">
+                        <div class="col-lg-4 inner-td">
+                            <div class="form-group">
+                                <label for="goods_stat">상품상태</label>
+                                <div class="flax_box">
+                                    <select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
+                                        <option value=''>전체</option>
+                                        @foreach ($goods_stats as $goods_stat)
+                                            <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 inner-td">
+                            <div class="form-group">
+                                <label for="goods_nm_eng">상품명(영문)</label>
+                                <div class="flax_box">
+                                    <input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 inner-td">
+                            <div class="form-group">
+                                <label for="name">공급업체</label>
+                                <div class="form-inline inline_select_box">
+                                    <div class="form-inline-inner input-box w-100">
+                                        <div class="form-inline inline_btn_box">
+                                            <input type="hidden" id="com_cd" name="com_cd" />
+                                            <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
+                                            <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -281,7 +281,7 @@
         let columns = [
             {field: "store_nm" , headerName: "매장", rowGroup: true, hide: true, width: 230, pinned: "left", checkboxSelection: true},
             {field: "prd_cd_sm", headerName: "상품코드", width: 120, pinned: "left", cellStyle: {"text-align": "center"}, checkboxSelection: true},
-            {field: "prd_cd" , hide: true},
+            {field: "prd_cd" , headerName: "바코드", width: 110, cellStyle: {"text-align": "center"}},
             {field: "color", headerName: "컬러", width: 50, cellStyle: {"text-align": "center"}},
             {field: "size", headerName: "사이즈", width: 50, cellStyle: {"text-align": "center"}},
             {field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"}},

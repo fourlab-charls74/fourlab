@@ -39,18 +39,19 @@
                     <!--<li><a href="/store/stock/stk02">(개)매장재고입출고</a></li>//-->
                     <li><a href="/store/stock/stk10">(완)출고</a></li>
                     <li><a href="/store/stock/stk30">(완)창고반품</a></li>
+                    <li><a href="/store/stock/stk03">(개)매장주문</a></li>
                     <li><a href="/store/stock/stk11">(개)반품</a></li>
                     <li><a href="/store/stock/stk20">(완)매장RT</a></li>
                     <li><a href="#">매장주문 - 는 포스화면</a></li>
                     <li><a href="/store/stock/stk25">(완)매장별할인율적용조회</a></li>
-                    <li><a href="/store/stock/stk26">(개)실사</a></li>
+                    <li><a href="/store/stock/stk26">(완)실사</a></li>
                     <li><a href="/store/stock/stk31">(개)매장 공지사항</a></li>
                     <li><a href="/store/stock/stk32">(개)알림</a></li>
                 </ul>
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-line-chart fs-18"></i><span>고객/수선관리</span></a>
                 <ul>
-                    <li><a href="/head/member/mem01" target="_blank">(개)회원관리</a></li>
+                    <li><a href="/store/member/mem01">(개)회원관리</a></li>
                     <li><a href="/store/standard/std11">(완)수선관리</a></li>
                     <li><a href="/head/promotion/prm10" target="_blank">(완)쿠폰</a></li>
                 </ul>

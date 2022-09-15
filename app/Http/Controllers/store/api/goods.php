@@ -250,7 +250,7 @@ class goods extends Controller
     /******************************* 매장별 상품검색 관련 *****************************/
     /********************************************************************************/
     
-    public function store_show($store_cd) 
+    public function store_show($store_cd = '') 
     {
         $mutable	= now();
         $sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
@@ -265,11 +265,11 @@ class goods extends Controller
         $domain		= $conf->getConfigValue("shop", "domain");
 
         // 매장정보
-        $store = DB::table("store")->where('store_cd', '=', $store_cd)->select('store_cd', 'store_nm')->get();
-        if(count($store) < 1) $store = ['store_cd' => '', 'store_nm' => ''];
+        $store = DB::table("store")->where('store_cd', '=', $store_cd)->select('store_cd', 'store_nm')->first();
+        if($store == null) $store = ['store_cd' => '', 'store_nm' => ''];
 
         $values = [
-            'store'         => $store[0],
+            'store'         => $store,
             'sdate'         => $sdate,
             'edate'         => date("Y-m-d"),
 			// 'event_cds'		=> $event_cds,
@@ -311,7 +311,7 @@ class goods extends Controller
 
         $store_cd   = $request->input("store_cd", "");
 
-        $orderby = sprintf("order by %s %s", $ord_field, $ord);
+        $orderby = sprintf("order by %s %s, s.prd_cd", $ord_field, $ord);
 
         $where = "";
         if($prd_cd != "") {
@@ -367,6 +367,9 @@ class goods extends Controller
             }
         }
 
+        $store_where = "";
+        if ($store_cd != "") $store_where .= " and ps.store_cd = '$store_cd'"; 
+
         $page_size = $limit;
         $startno = ($page - 1) * $page_size;
         $limit = " limit $startno, $page_size ";
@@ -375,17 +378,17 @@ class goods extends Controller
         $page_cnt = 0;
 
         if ($page == 1) {
-            $query = /** @lang text */
-                "
-                select count(*) as total
-                from goods g inner join product_stock s on g.goods_no = s.goods_no 
-                inner join product_stock_store ps on s.prd_cd = ps.prd_cd and ps.store_cd = '$store_cd'
-				left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
-                where 1=1 
-                    -- g.com_id = :com_id 
-                    $where
+            $query = "
+                select count(c.prd_cd) as total
+                from (
+                    select s.prd_cd, count(s.prd_cd)
+                    from goods g 
+                        inner join product_stock s on g.goods_no = s.goods_no 
+                        inner join product_stock_store ps on s.prd_cd = ps.prd_cd $store_where
+                    where 1=1 $where
+                    group by s.prd_cd
+                ) as c
 			";
-            //$row = DB::select($query,['com_id' => $com_id]);
             $row = DB::select($query);
             $total = $row[0]->total;
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
@@ -395,56 +398,55 @@ class goods extends Controller
         $cfg_img_size_real = "a_500";
         $cfg_img_size_list = "s_50";
 
-        $query = /** @lang text */
-            "
+        $query = "
 			select
-				'' as blank
-				, g.goods_no , g.goods_sub
-				, ifnull( type.code_val, 'N/A') as goods_type
-				, com.com_nm
-				, opt.opt_kind_nm
-				, brand.brand_nm as brand
-				, cat.full_nm
-				, g.style_no
-				, g.head_desc
-				, '' as img_view
-				, if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
-					select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
-					from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
-				  )) as img
-				, g.goods_nm
-				, g.goods_nm_eng
-				, g.ad_desc
-				, stat.code_val as sale_stat_cl
-				, g.normal_price
-				, g.price
-				 , ifnull(
-					(select sum(wqty) from goods_summary where goods_no = g.goods_no and goods_sub = g.goods_sub), 0
-				  ) as wqty
-				, g.wonga
-				, (100/(g.price/(g.price-g.wonga))) as margin_rate
-				, (g.price-g.wonga) as margin_amt
-				, g.md_nm
-				, bi.code_val as baesong_info
-				, bk.code_val as baesong_kind
-				, dpt.code_val as dlv_pay_type
-				, g.baesong_price
-				, g.point
-				, g.org_nm
-				, g.make
-				, g.type
-				, g.reg_dm
-				, g.upd_dm
-				, g.goods_location
-				, g.sale_price
+                '' as blank
+                , g.goods_no
+                , g.goods_sub
+                , ifnull( type.code_val, 'N/A') as goods_type
+                , com.com_nm
+                , opt.opt_kind_nm
+                , brand.brand_nm as brand
+                , cat.full_nm
+                , g.style_no
+                , g.head_desc
+                , '' as img_view
+                , if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
+                    select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
+                    from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
+                )) as img
+                , g.goods_nm
+                , g.goods_nm_eng
+                , g.ad_desc
+                , stat.code_val as sale_stat_cl
+                , g.normal_price
+                , g.price
+                , g.wonga
+                , (100/(g.price/(g.price-g.wonga))) as margin_rate
+                , (g.price-g.wonga) as margin_amt
+                , g.md_nm
+                , bi.code_val as baesong_info
+                , bk.code_val as baesong_kind
+                , dpt.code_val as dlv_pay_type
+                , g.baesong_price
+                , g.point
+                , g.org_nm
+                , g.make
+                , g.type
+                , g.reg_dm
+                , g.upd_dm
+                , g.goods_location
+                , g.sale_price
                 , g.goods_sh 
-				, g.goods_type as goods_type_cd
-				, com.com_type as com_type_d
-				, s.prd_cd , s.goods_opt
-                , ps.qty as store_qty, ps.wqty as store_wqty
-			from goods g inner join product_stock s on g.goods_no = s.goods_no
-                inner join product_stock_store ps on s.prd_cd = ps.prd_cd and ps.store_cd = '$store_cd'
-				left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
+                , g.goods_type as goods_type_cd
+                , com.com_type as com_type_d
+                , s.prd_cd , s.goods_opt
+                , s.wqty as wqty
+                , sum(ps.qty) as store_qty
+                , sum(ps.wqty) as store_wqty
+			from goods g 
+                inner join product_stock s on g.goods_no = s.goods_no
+                inner join product_stock_store ps on s.prd_cd = ps.prd_cd $store_where
 				left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
 				left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
 				left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
@@ -456,6 +458,7 @@ class goods extends Controller
 				left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
 			where 1 = 1
                 $where
+            group by s.prd_cd
             $orderby
 			$limit
 		";
@@ -777,58 +780,42 @@ class goods extends Controller
     {
         $prd_cd = $request->input('prd_cd', '');
         $goods_nm = $request->input('goods_nm', '');
+
         $brand = $request->input('brand', []);
+        $brand_contain = $request->input('brand_contain', '');
         $year = $request->input('year', []);
+        $year_contain = $request->input('year_contain', '');
         $season = $request->input('season', []);
+        $season_contain = $request->input('season_contain', '');
         $gender = $request->input('gender', []);
+        $gender_contain = $request->input('gender_contain', '');
         $items = $request->input('item', []);
+        $items_contain = $request->input('item_contain', '');
         $opt = $request->input('opt', []);
+        $opt_contain = $request->input('opt_contain', '');
+
         $page = $request->input('page', 1);
         $where = "";
 
         if($prd_cd != '') $where .= " and p.prd_cd like '%$prd_cd%'";
         if($goods_nm != '') $where .= " and g.goods_nm like '%$goods_nm%'";
-        if(count($brand) > 0) {
-            $where .= " and (1!=1";
-            foreach($brand as $item) {
-                $where .= " or p.brand = '$item'";
+
+        foreach(self::Conds as $key => $value)
+        {
+            if($key === 'item') $key = 'items';
+            if(count(${ $key }) > 0)
+            {
+                $where .= ${ $key . '_contain' } == 'true' ? " and (1!=1" : " and (1=1";
+
+                $col = $key === 'items' ? 'item' : $key;
+                foreach(${ $key } as $item) {
+                    if(${ $key . '_contain' } == 'true')
+                        $where .= " or p.$col = '$item'";
+                    else
+                        $where .= " and p.$col != '$item'";
+                }
+                $where .= ")";
             }
-            $where .= ")";
-        }
-        if(count($year) > 0) {
-            $where .= " and (1!=1";
-            foreach($year as $item) {
-                $where .= " or p.year = '$item'";
-            }
-            $where .= ")";
-        }
-        if(count($season) > 0) {
-            $where .= " and (1!=1";
-            foreach($season as $item) {
-                $where .= " or p.season = '$item'";
-            }
-            $where .= ")";
-        }
-        if(count($gender) > 0) {
-            $where .= " and (1!=1";
-            foreach($gender as $item) {
-                $where .= " or p.gender = '$item'";
-            }
-            $where .= ")";
-        }
-        if(count($items) > 0) {
-            $where .= " and (1!=1";
-            foreach($items as $item) {
-                $where .= " or p.item = '$item'";
-            }
-            $where .= ")";
-        }
-        if(count($opt) > 0) {
-            $where .= " and (1!=1";
-            foreach($opt as $item) {
-                $where .= " or p.opt = '$item'";
-            }
-            $where .= ")";
         }
 
         $page_size = 100;

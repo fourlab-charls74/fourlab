@@ -222,7 +222,8 @@ function StyleOrdKind(params){
     if(state[params.value]){
         var color = state[params.value];
         return {
-            color:color
+            color: color,
+            "text-align": "center",
         }
     }
 }
@@ -242,6 +243,7 @@ function StyleOrdState(params) {
     var color = state[params.value];
     return {
         color: color,
+        "text-align": "center",
     };
 }
 
@@ -249,7 +251,8 @@ function StyleClmState(params){
     if(params.value != ""){
         return {
             'color':'#FF0000',
-            'font-weight':'bold'
+            'font-weight':'bold',
+            "text-align": "center",
         }
     }
 }
@@ -310,7 +313,8 @@ function StyleGoodsNo(params){
         }
         if(params.data.goods_no_bg_color !== undefined || params.data.goods_no_bg_color != '') {
             return {
-                'background-color': params.data.goods_no_bg_color
+                'background-color': params.data.goods_no_bg_color,
+                'text-align': 'center',
             }
         }
     }
@@ -319,6 +323,11 @@ function StyleGoodsNo(params){
 const StyleEditCell = {
     'background' : '#ffff99',
     'border-right' : '1px solid #e0e7e7'
+};
+
+const StyleLineHight = {
+    'line-height': '30px',
+    'text-align': 'center',
 };
 
 function unComma(txt) {

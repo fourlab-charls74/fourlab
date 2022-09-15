@@ -17,7 +17,7 @@
 				<h4>검색</h4>
 				<div class="flax_box">
 					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-                    <a href="/store/stock/stk21" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>RT요청</a>
+                    <a href="/store/stock/stk21" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>요청RT</a>
                     <a href="/store/stock/stk22" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>일반RT</a>
                     {{-- <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="initSearch()">검색조건 초기화</a> --}}
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
@@ -33,8 +33,8 @@
                             <div class="flex_box">
                                 <select name='rt_type' class="form-control form-control-sm">
                                     <option value=''>전체</option>
-                                    <option value='G'>일반</option>
-                                    <option value='R'>요청</option>
+                                    <option value='G'>일반RT</option>
+                                    <option value='R'>요청RT</option>
                                 </select>
                             </div>
                         </div>
@@ -106,13 +106,17 @@
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label>RT상태</label>
-                            <div class="flex_box">
-                                <select name='rt_stat' class="form-control form-control-sm">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <select name='rt_stat' class="form-control form-control-sm mr-2">
                                     <option value=''>전체</option>
                                     @foreach ($rt_states as $key => $value)
                                         <option value='{{ $key }}'>{{ $value }}</option>
                                     @endforeach
                                 </select>
+                                <div class="custom-control custom-checkbox form-check-box" style="min-width: 100px;">
+                                    <input type="checkbox" class="custom-control-input" name="ext_done_state" id="ext_done_state" value="Y">
+                                    <label class="custom-control-label font-weight-normal" for="ext_done_state">완료상태 제외</label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -307,7 +311,7 @@
     function StyleRtType(params) {
         let state = {
             "G":"#669900",
-            "R":"#ff0000",
+            "R":"green",
         }
         if (params.value !== undefined) {
             if (state[params.value]) {
@@ -347,7 +351,7 @@
         },
         {field: "type", headerName: "구분", pinned: 'left', cellStyle: StyleRtType,
             cellRenderer: function(params) {
-                return params.value === 'R' ? '요청' : params.value === 'G' ? '일반' : '';
+                return params.value === 'R' ? '요청RT' : params.value === 'G' ? '일반RT' : '';
             }
         },
         {field: "state", headerName: "RT상태", pinned: 'left', cellStyle: StyleReleaseState,
@@ -371,7 +375,8 @@
         {field: "rec_rt", headerName: "접수일시", width: 120, cellStyle: {"text-align": "center"}},
         {field: "prc_rt", headerName: "처리일시", width: 120, cellStyle: {"text-align": "center"}},
         {field: "fin_rt", headerName: "완료일시", width: 120, cellStyle: {"text-align": "center"}},
-        {field: "comment", headerName: "메모", width: 300, 
+        {field: "req_comment", headerName: "요청메모", width: 300},
+        {field: "rec_comment", headerName: "접수메모", width: 300, 
             editable: function(params) {return params.data.state === 10;},
             cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};}
         },
@@ -494,7 +499,7 @@
         let rows = gx.getSelectedRows();
         if(rows.length < 1) return alert("거부처리할 항목을 선택해주세요.");
         if(rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 거부처리 가능합니다.");
-        if(rows.filter(r => !r.comment).length > 0) return alert("'메모'에 거부사유를 반드시 입력해주세요.");
+        if(rows.filter(r => !r.rec_comment).length > 0) return alert("'접수메모'에 거부사유를 반드시 입력해주세요.");
         if(!confirm("선택한 항목을 거부처리하시겠습니까?")) return;
 
         axios({

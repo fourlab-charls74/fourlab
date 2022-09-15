@@ -84,7 +84,7 @@ class ord01Controller extends Controller
             'dlv_cds'		=> SLib::getCodes("DELIVERY"),
 			'refund_yn'		=> $refund_yn
         ]);
-
+        
         if($format == "json"){
             return response()->json($values);
         } else {
@@ -140,7 +140,7 @@ class ord01Controller extends Controller
                     , b.r_nm, b.r_phone, b.r_mobile, b.r_zipcode, b.r_addr1, b.r_addr2
                     , b.dlv_msg, a.com_id, b.url, a.ord_state, ord_state.code_val ord_state_nm, a.ord_type, a.dlv_no /*송장번호*/
                     , c.code_val dlv_cd /*택배사*/,c.code_val2 dlv_homepage
-                    , date_format(b.dlv_end_date,'%Y.%m.%d %H:%i:%s') mst_dlv_end_date, d.com_nm sale_place
+                    , date_format(b.dlv_end_date,'%Y.%m.%d %H:%i:%s') mst_dlv_end_date, d.com_nm sale_place, b.sale_place sale_place_nm
                     , 0 as tax, b.dlv_amt, b.add_dlv_fee, a.add_point
                     , date_format(a.dlv_start_date,'%Y.%m.%d %H:%i:%s') dlv_start_date
                     , date_format(a.dlv_proc_date,'%Y.%m.%d %H:%i:%s') dlv_proc_date

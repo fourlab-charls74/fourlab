@@ -133,12 +133,17 @@ class Order
         return $ord_no;
     }
 
-    public function CompleteOrderSugi($ord_opt_no = "", $ord_state = ""){
-		if( $ord_state != ORD_STATE_PG_EXPECTED ){	// 출고요청, 출고완료 상태만 재고 차감 처리
+    public function CompleteOrderSugi($ord_opt_no = "", $ord_state = "", $is_store_order = false)
+	{
+		if ( $ord_state != ORD_STATE_PG_EXPECTED ) {	// 출고요청, 출고완료 상태만 재고 차감 처리
 
-			$result = $this->ProcOrder($ord_opt_no, $point_flag = false, $sms_flag = false);
+			if ($is_store_order == true) {
+				$result = $this->ProcStoreOrder($ord_opt_no, $point_flag = false, $sms_flag = false);
+			} else {
+				$result = $this->ProcOrder($ord_opt_no, $point_flag = false, $sms_flag = false);
+			}
 
-			if( $result == 1 ){
+			if ( $result == 1 ) {
 				// 입금확인
 				$this->PaymentPaid("", "", "", array());
 
@@ -150,7 +155,7 @@ class Order
 		}
 
 		return $result;
-
+		
     }
 
 	function CheckStockQty($ord_opt_no = "0")
@@ -491,6 +496,8 @@ class Order
 		$com_coupon_ratio	= isset($value["com_coupon_ratio"]) ? $value["com_coupon_ratio"] : '';
 		$sales_com_fee		= isset($value["sales_com_fee"]) ? $value["sales_com_fee"] : '';
 		$ord_state_date		= isset($value["ord_state_date"]) ? $value["ord_state_date"] : '';
+		$prd_cd				= isset($value["prd_cd"]) ? $value["prd_cd"] : '';
+		$store_cd			= isset($value["store_cd"]) ? $value["store_cd"] : '';
 
 		//if($ord_state_date == "") $ord_state_date = now();
 		if( $ord_state_date == "" )	$ord_state_date = date("Ymd");
@@ -536,7 +543,9 @@ class Order
 				'ord_state_date'	=> $ord_state_date,
 				'coupon_no'			=> $coupon_no,
 				'com_coupon_ratio'	=> $com_coupon_ratio,
-				'sales_com_fee'		=> $sales_com_fee
+				'sales_com_fee'		=> $sales_com_fee,
+				'prd_cd'			=> $prd_cd,
+				'store_cd'			=> $store_cd,
 			]);
 		}
 
@@ -1413,4 +1422,353 @@ class Order
         }
 
     }
+
+	//////////////////////////////////////////////////////
+	/////////////////////// 매장주문 //////////////////////
+	//////////////////////////////////////////////////////
+
+	public function ProcStoreOrder($ord_opt_no = "", $point_flag = true, $sms_flag = true)
+	{
+		$ord_no = $this->ord_no;
+		$where = " a.ord_no = '$ord_no' ";
+
+		if ($ord_opt_no != "") $where .= " and a.ord_opt_no = '$ord_opt_no' ";
+
+		// 주문 옵션별 (판매가*수량) 및 정보 얻기
+		$sql = "
+			select
+				a.ord_opt_no, a.qty, a.price, ifnull(a.wonga, g.wonga) as wonga, a.goods_no, a.goods_sub, a.goods_opt,
+				a.recv_amt, a.point_amt, a.coupon_amt, a.dc_amt, '' as pay_fee, a.com_id, c.pay_fee com_rate,
+				a.ord_kind, a.ord_type, a.add_point, a.com_coupon_ratio, a.coupon_no,
+				c.com_type, date_format(a.ord_date,'%Y%m%d') as ord_date, a.sales_com_fee, a.dlv_amt,
+				b.user_id, a.ord_state, g.is_unlimited, g.sale_stat_cl, a.prd_cd, a.store_cd
+			from order_opt a
+				inner join order_mst b on a.ord_no = b.ord_no
+				left outer join company c on a.com_id = c.com_id
+				left outer join goods g on a.goods_no = g.goods_no and a.goods_sub = g.goods_sub
+			where $where
+        ";
+        $rows = DB::select($sql);
+		foreach ($rows as $row) {
+			$ord_opt_no			= $row->ord_opt_no;
+			$goods_no			= $row->goods_no;
+			$goods_sub			= $row->goods_sub;
+			$goods_opt			= $row->goods_opt;
+			$ord_qty			= $row->qty;
+			$ord_price			= $row->price;
+			$wonga				= $row->wonga;
+			$recv_amt			= $row->recv_amt;
+			$point_amt			= $row->point_amt;
+			$coupon_amt			= $row->coupon_amt;
+			$dc_amt				= $row->dc_amt;
+			$pay_fee			= $row->pay_fee;
+			$com_id				= $row->com_id;
+			$com_rate			= $row->com_rate;
+			$ord_kind			= $row->ord_kind;
+			$ord_type			= $row->ord_type;
+			$add_point			= $row->add_point;
+			$coupon_no			= $row->coupon_no;
+			$com_coupon_ratio	= $row->com_coupon_ratio;
+			$com_type			= $row->com_type;
+			$ord_date			= $row->ord_date;
+			$dlv_amt			= $row->dlv_amt;
+			$sales_com_fee		= $row->sales_com_fee;
+			$user_id			= $row->user_id;
+			$ord_state			= $row->ord_state;
+			$is_unlimited		= $row->is_unlimited;	// 무한재고 여부
+			$sale_stat_cl		= $row->sale_stat_cl;	// 상품상태
+			$prd_cd				= $row->prd_cd;
+			$store_cd			= $row->store_cd;
+
+			$this->SetOrdOptNo($ord_opt_no);
+
+			// 재고 처리된 주문건인지 확인
+			if($this->__IsFirstMinus() == false) return -1;
+
+			// 입금예정 상태의 주문 처리 : 넷텔러, 가상계좌
+			if ( $ord_state == ORD_STATE_PG_EXPECTED || $ord_state == ORD_STATE_PG_OK ) {
+
+				// 모든 입금확인은 5 상태를 기록한다.
+				$order_opt_wonga = array(
+					"goods_no" => $goods_no,
+					"goods_sub" => $goods_sub,
+					"goods_opt" => $goods_opt,
+					"qty" => $ord_qty,
+					"wonga" => $wonga,
+					"price" => $ord_price,
+					"dlv_amt" => $dlv_amt,
+					"recv_amt" => $recv_amt,
+					"point_apply_amt" => $point_amt,
+					"coupon_apply_amt" => $coupon_amt,
+					"dc_apply_amt" => $dc_amt,
+					"pay_fee" => $pay_fee,
+					"com_id" => $com_id,
+					"com_rate" => $com_rate,
+					"ord_state" => $ord_state = ORD_STATE_PG_OK,
+					"ord_kind" => $ord_kind,
+					"ord_type" => $ord_type,
+					"coupon_no" => $coupon_no,
+					"com_coupon_ratio" => $com_coupon_ratio,
+					"sales_com_fee" => $sales_com_fee,
+					"prd_cd" => $prd_cd,
+					"store_cd" => $store_cd
+				);
+				$this->__InsertOptWonga($order_opt_wonga);
+
+				$order_opt_wonga = array(
+					"goods_no" => $goods_no,
+					"goods_sub" => $goods_sub,
+					"goods_opt" => $goods_opt,
+					"qty" => $ord_qty,
+					"wonga" => $wonga,
+					"price" => $ord_price,
+					"dlv_amt" => $dlv_amt,
+					"recv_amt" => $recv_amt,
+					"point_apply_amt" => $point_amt,
+					"coupon_apply_amt" => $coupon_amt,
+					"dc_apply_amt" => $dc_amt,
+					"pay_fee" => $pay_fee,
+					"com_id" => $com_id,
+					"com_rate" => $com_rate,
+					"ord_state" => $ord_state = ORD_STATE_DLV_START,
+					"ord_kind" => $ord_kind,
+					"ord_type" => $ord_type,
+					"coupon_no" => $coupon_no,
+					"com_coupon_ratio" => $com_coupon_ratio,
+					"sales_com_fee" => $sales_com_fee,
+					"prd_cd" => $prd_cd,
+					"store_cd" => $store_cd
+				);
+				$this->__InsertOptWonga($order_opt_wonga);
+				unset($order_opt_wonga);
+
+				// 주문건 입금 완료 상태로 변경
+				$this->PayOk(ORD_STATE_PG_OK);
+
+				/**
+				 * 주문상태 : 배송출고 요청 상태로 변경
+				 */
+				$this->DlvStart(ORD_STATE_DLV_START, $ord_kind);
+
+			} else if ( $ord_state == ORD_STATE_DLV_START ) {
+				// 출고요청 주문 처리
+
+				// 재고차감
+				if ($store_cd != '') {
+					DB::table('product_stock_store')
+						->where('prd_cd', '=', $prd_cd)
+						->where('store_cd', '=', $store_cd) 
+						->update([
+							'wqty' => DB::raw('wqty - ' . $ord_qty),
+							'ut' => now(),
+						]);
+					DB::table('product_stock')
+						->where('prd_cd', '=', $prd_cd)
+						->update([
+							'qty' => DB::raw('qty - ' . $ord_qty),
+							'ut' => now(),
+						]);
+				} else {
+					DB::table('product_stock_storage')
+						->where('prd_cd', '=', $prd_cd)
+						->where('storage_cd', '=', DB::raw("(select storage_cd from storage where default_yn = 'Y')"))
+						->update([
+							'wqty' => DB::raw('wqty - ' . $ord_qty),
+							'ut' => now(),
+						]);
+					DB::table('product_stock')
+						->where('prd_cd', '=', $prd_cd)
+						->update([
+							'qty' => DB::raw('qty - ' . $ord_qty),
+							'wqty' => DB::raw('wqty - ' . $ord_qty),
+							'ut' => now(),
+						]);
+				}
+
+				// 모든 입금확인은 5 상태를 기록한다.
+				$order_opt_wonga = array(
+					"goods_no" => $goods_no,
+					"goods_sub" => $goods_sub,
+					"goods_opt" => $goods_opt,
+					"qty" => $ord_qty,
+					"wonga" => $wonga,
+					"price" => $ord_price,
+					"dlv_amt" => $dlv_amt,
+					"recv_amt" => $recv_amt,
+					"point_apply_amt" => $point_amt,
+					"coupon_apply_amt" => $coupon_amt,
+					"dc_apply_amt" => $dc_amt,
+					"pay_fee" => $pay_fee,
+					"com_id" => $com_id,
+					"com_rate" => $com_rate,
+					"ord_state" => $ord_state = ORD_STATE_PG_OK,
+					"ord_kind"	=> $ord_kind,
+					"ord_type" => $ord_type,
+					"coupon_no" => $coupon_no,
+					"com_coupon_ratio" => $com_coupon_ratio,
+					"sales_com_fee" => $sales_com_fee,
+					"prd_cd" => $prd_cd,
+					"store_cd" => $store_cd
+				);
+				$this->__InsertOptWonga($order_opt_wonga);
+
+				$order_opt_wonga = array(
+					"goods_no" => $goods_no,
+					"goods_sub" => $goods_sub,
+					"goods_opt" => $goods_opt,
+					"qty" => $ord_qty,
+					"wonga" => $wonga,
+					"price" => $ord_price,
+					"dlv_amt" => $dlv_amt,
+					"recv_amt" => $recv_amt,
+					"point_apply_amt" => $point_amt,
+					"coupon_apply_amt" => $coupon_amt,
+					"dc_apply_amt" => $dc_amt,
+					"pay_fee" => $pay_fee,
+					"com_id" => $com_id,
+					"com_rate" => $com_rate,
+					"ord_state" => $ord_state = ORD_STATE_DLV_START,
+					"ord_kind"	=> $ord_kind,
+					"ord_type" => $ord_type,
+					"coupon_no" => $coupon_no,
+					"com_coupon_ratio" => $com_coupon_ratio,
+					"sales_com_fee" => $sales_com_fee,
+					"prd_cd" => $prd_cd,
+					"store_cd" => $store_cd
+				);
+				$this->__InsertOptWonga($order_opt_wonga);
+				unset($order_opt_wonga);
+
+				// 주문건 입금 완료 상태로 변경
+				$this->PayOk(ORD_STATE_PG_OK);
+
+				/**
+				 * 주문상태 : 배송출고 요청 상태로 변경
+				 */
+				$this->DlvStart(ORD_STATE_DLV_START, $ord_kind);
+			} else if ( $ord_state == ORD_STATE_DLV_FINISH ) {
+				//  출고완료 주문처리
+
+				// 재고차감
+				if ($store_cd != '') {
+					DB::table('product_stock_store')
+						->where('prd_cd', '=', $prd_cd)
+						->where('store_cd', '=', $store_cd) 
+						->update([
+							'qty' => DB::raw('qty - ' . $ord_qty),
+							'ut' => now(),
+						]);
+				} else {
+					DB::table('product_stock_storage')
+						->where('prd_cd', '=', $prd_cd)
+						->where('storage_cd', '=', DB::raw("(select storage_cd from storage where default_yn = 'Y')"))
+						->update([
+							'qty' => DB::raw('qty - ' . $ord_qty),
+							'ut' => now(),
+						]);
+				}
+
+				// 모든 입금확인은 5 상태를 기록한다.
+				$order_opt_wonga = array(
+					"goods_no" => $goods_no,
+					"goods_sub" => $goods_sub,
+					"goods_opt" => $goods_opt,
+					"qty" => $ord_qty,
+					"wonga" => $wonga,
+					"price" => $ord_price,
+					"dlv_amt" => $dlv_amt,
+					"recv_amt" => $recv_amt,
+					"point_apply_amt" => $point_amt,
+					"coupon_apply_amt" => $coupon_amt,
+					"dc_apply_amt" => $dc_amt,
+					"pay_fee" => $pay_fee,
+					"com_id" => $com_id,
+					"com_rate" => $com_rate,
+					"ord_state" => $ord_state = ORD_STATE_PG_OK,
+					"ord_kind"	=> $ord_kind,
+					"ord_type" => $ord_type,
+					"coupon_no" => $coupon_no,
+					"com_coupon_ratio" => $com_coupon_ratio,
+					"sales_com_fee" => $sales_com_fee,
+					"prd_cd" => $prd_cd,
+					"store_cd" => $store_cd
+				);
+				$this->__InsertOptWonga($order_opt_wonga);
+
+				// 주문건 입금 완료 상태로 변경
+				$this->PayOk(ORD_STATE_PG_OK);
+
+				$order_opt_wonga = array(
+					"goods_no" => $goods_no,
+					"goods_sub" => $goods_sub,
+					"goods_opt" => $goods_opt,
+					"qty" => $ord_qty,
+					"wonga" => $wonga,
+					"price" => $ord_price,
+					"dlv_amt" => $dlv_amt,
+					"recv_amt" => $recv_amt,
+					"point_apply_amt" => $point_amt,
+					"coupon_apply_amt" => $coupon_amt,
+					"dc_apply_amt" => $dc_amt,
+					"pay_fee" => $pay_fee,
+					"com_id" => $com_id,
+					"com_rate" => $com_rate,
+					"ord_state" => $ord_state = ORD_STATE_DLV_START,
+					"ord_kind"	=> $ord_kind,
+					"ord_type" => $ord_type,
+					"coupon_no" => $coupon_no,
+					"com_coupon_ratio" => $com_coupon_ratio,
+					"sales_com_fee" => $sales_com_fee,
+					"prd_cd" => $prd_cd,
+					"store_cd" => $store_cd
+				);
+				$this->__InsertOptWonga($order_opt_wonga);
+
+				$order_opt_wonga = array(
+					"goods_no" => $goods_no,
+					"goods_sub" => $goods_sub,
+					"goods_opt" => $goods_opt,
+					"qty" => $ord_qty,
+					"wonga" => $wonga,
+					"price" => $ord_price,
+					"dlv_amt" => $dlv_amt,
+					"recv_amt" => $recv_amt,
+					"point_apply_amt" => $point_amt,
+					"coupon_apply_amt" => $coupon_amt,
+					"dc_apply_amt" => $dc_amt,
+					"pay_fee" => $pay_fee,
+					"com_id" => $com_id,
+					"com_rate" => $com_rate,
+					"ord_state" => $ord_state = ORD_STATE_DLV_FINISH,
+					"ord_kind"	=> $ord_kind,
+					"ord_type" => $ord_type,
+					"coupon_no" => $coupon_no,
+					"com_coupon_ratio" => $com_coupon_ratio,
+					"sales_com_fee" => $sales_com_fee,
+					"prd_cd" => $prd_cd,
+					"store_cd" => $store_cd
+				);
+				$this->__InsertOptWonga($order_opt_wonga);
+				unset($order_opt_wonga);
+
+				/**
+				 * 주문상태 : 배송출고 요청 > 처리중 > 완료 상태로 변경
+				 */
+				$this->DlvStart(ORD_STATE_DLV_START, $ord_kind);
+				$this->DlvProc(0, ORD_STATE_DLV_PROCESS);
+			}
+		}
+
+		/*************************************/
+		/******** 포인트 지급 설정된 경우 ******/
+		/*************************************/
+		if ($point_flag) {
+			// 포인트 지급
+			$point = new Point($this->user, "");
+			$point->SetOrdNo($this->ord_no);
+			$point->Order($add_point);
+		}
+
+		return 1;
+	}
 }

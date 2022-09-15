@@ -43,6 +43,7 @@ class stk01Controller extends Controller
         $goods_nm_eng = $request->input("goods_nm_eng");
 
 		$com_id		= $request->input("com_cd");
+		$ext_store_qty = $request->input("ext_store_qty", "false");
 
         $page = $request->input('page', 1);
 		if ( $page < 1 or $page == "" )	$page = 1;
@@ -67,6 +68,8 @@ class stk01Controller extends Controller
 
 		$where	= "";
 		if ($store_type != "")	$where .= " and s.store_type = '" . $store_type . "' ";
+        if ($ext_store_qty == 'true')
+            $where .= " and (p.wqty != '' and p.wqty != '0')";
 		
 		if($prd_cd != "") {
 			$prd_cd = explode(',', $prd_cd);

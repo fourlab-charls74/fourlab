@@ -1,77 +1,81 @@
-@extends('store_with.layouts.layout')
+@extends('store_with.layouts.layout-nav')
 @section('title','매장등급관리')
 
 @section('content')
-<div class="page_tit">
-    <h3 class="d-inline-flex">매장등급관리</h3>
-    <div class="d-inline-flex location">
-        <span class="home"></span>
-        <span>/ 코드관리</span>
-    </div>
-</div>
-
-<style>
-    @media (max-width: 740px) {
-        #div-gd {height: 130px !important;}
-    }
-</style>
-
-<form method="get" name="search">
-    <div id="search-area" class="search_cum_form">
-        <div class="card mb-3">
-            <div class="d-flex card-header justify-content-between">
-                <h4>검색</h4>
-                <div>
-                    <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-		            <a href="#" onclick="formReset('search')" class="btn btn-sm btn-outline-primary shadow-sm">검색조건 초기화</a>
-                    <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
-                </div>
+<div class="py-3 px-sm-3">
+    <div class="page_tit d-flex justify-content-between">
+        <div class="d-flex">
+            <h3 class="d-inline-flex">매장등급관리</h3>
+            <div class="d-inline-flex location">
+                <span class="home"></span>
+                <span>/ 코드관리</span>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label for="grade_cd">등급코드</label>
-                            <div class="flex_box">
-                                <input type='text' class="form-control form-control-sm search-enter" name='grade_cd' value=''>
+        </div>
+    </div>
+
+    <style>
+        @media (max-width: 740px) {
+            #div-gd {height: 130px !important;}
+        }
+    </style>
+    
+    <form method="get" name="search">
+        <div id="search-area" class="search_cum_form">
+            <div class="card mb-3">
+                <div class="d-flex card-header justify-content-between">
+                    <h4>검색</h4>
+                    <div>
+                        <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                        <a href="#" onclick="formReset('search')" class="btn btn-sm btn-outline-primary shadow-sm">검색조건 초기화</a>
+                        <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label for="grade_cd">등급코드</label>
+                                <div class="flex_box">
+                                    <input type='text' class="form-control form-control-sm search-enter" name='grade_cd' value=''>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label for="name">등급명</label>
+                                <div class="flex_box">
+                                    <input type='text' class="form-control form-control-sm search-enter" name='name' value='{{ @$grade_nm }}'>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label for="name">등급명</label>
-                            <div class="flex_box">
-                                <input type='text' class="form-control form-control-sm search-enter" name='name' value=''>
-                            </div>
-                        </div>
+                </div>
+            </div>
+            <div class="resul_btn_wrap mb-3">
+                <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                <a href="#" onclick="formReset('search')" class="btn btn-sm btn-outline-primary shadow-sm">검색조건 초기화</a>
+            </div>
+        </div>
+    </form>
+
+    <div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
+        <div class="card-body shadow">
+            <div class="card-title mb-3">
+                <div class="filter_wrap">
+                    <div class="fl_box">
+                        <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
+                    </div>
+                    <div class="fr_box">
+                        <span style="color: blue;">※등급코드가 중복된 경우에는 순서가 제일 아래인 행을 기준으로 종료일이 변경됩니다.<span>
+                        <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataAdd();"><span class="fs-12">추가</span></a>
+                        <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataSave();"><span class="fs-12">저장</span></a>
+                        <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataDel();"><span class="fs-12">선택삭제</span></a>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="resul_btn_wrap mb-3">
-            <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-            <a href="#" onclick="formReset('search')" class="btn btn-sm btn-outline-primary shadow-sm">검색조건 초기화</a>
-        </div>
-    </div>
-</form>
-
-<div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
-    <div class="card-body shadow">
-        <div class="card-title mb-3">
-            <div class="filter_wrap">
-                <div class="fl_box">
-                    <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
-                </div>
-                <div class="fr_box">
-                    <span style="color: blue;">※등급코드가 중복된 경우에는 순서가 제일 아래인 행을 기준으로 종료일이 변경됩니다.<span>
-                    <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataAdd();"><span class="fs-12">추가</span></a>
-                    <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataSave();"><span class="fs-12">저장</span></a>
-                    <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataDel();"><span class="fs-12">선택삭제</span></a>
-                </div>
+            <div class="table-responsive">
+                <div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
             </div>
-        </div>
-        <div class="table-responsive">
-            <div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
         </div>
     </div>
 </div>
@@ -127,7 +131,7 @@
     const pApp = new App('', { gridId: "#div-gd" });
     
     $(document).ready(function() {
-        pApp.ResizeGrid(275);
+        pApp.ResizeGrid(275, 380);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);

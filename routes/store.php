@@ -119,6 +119,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('std08/search', 'std08Controller@search');
         Route::post('std08/save', 'std08Controller@save');
         Route::post('std08/remove', 'std08Controller@remove');
+        Route::get('std08/choice', 'std08Controller@choice_index');
 
         // 수선관리
         Route::get('std11', 'std11Controller@index');
@@ -203,6 +204,13 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk01/search','stk01Controller@search');
 
         Route::get('stk02','stk02Controller@index');
+
+        // 매장주문
+        Route::get('stk03', 'stk03Controller@index');
+        Route::get('stk03/search', 'stk03Controller@search');
+        Route::get('stk03/create', 'stk03Controller@create');
+        Route::post('stk03/save', 'stk03Controller@save');
+
         Route::get('stk11','stk11Controller@index');
 
         // 출고리스트
@@ -242,7 +250,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('stk20/reject','stk20Controller@reject'); // 거부
         Route::delete('stk20','stk20Controller@remove'); // 삭제
 
-        // RT요청
+        // 요청RT
         Route::get('stk21','stk21Controller@index');
         Route::get('stk21/search-goods','stk21Controller@search_goods');
         Route::get('stk21/search-stock','stk21Controller@search_stock');
@@ -295,6 +303,12 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk32/msg{no?}', 'stk32Controller@msg');
         Route::post('stk32/store', 'stk32Controller@store');
 
+    });
+
+    // 고객관리
+    Route::prefix("member")->namespace('member')->group(function () {
+        Route::get('mem01','mem01Controller@index');
+        Route::get('mem01/search', 'mem01Controller@search');
     });
 
     // 영업관리

@@ -307,7 +307,7 @@ SearchPrdcd.prototype.Open = async function(callback = null){
     if(this.grid === null){
         this.SetGrid("#div-gd-prdcd");
         this.SetGridCond();
-        $("#SearchPrdcdModal").draggable();
+        // $("#SearchPrdcdModal").draggable();
         this.callback = callback;
     }
     $('#SearchPrdcdModal').modal({
@@ -320,12 +320,12 @@ SearchPrdcd.prototype.SetGrid = function(divId){
 
     columns.push(
         { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null },
-        { field: "prd_cd", headerName: "상품코드", width: 120 },
-        { field: "goods_no", headerName: "상품번호", width: 60 },
-        { field: "goods_nm", headerName: "상품명", width: 290 },
-        { field: "goods_opt", headerName: "옵션", width: 180 },
-        { field: "color", headerName: "컬러", width: 60 },
-        { field: "size", headerName: "사이즈", width: 60 },
+        { field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {"text-align": "center"} },
+        { field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"} },
+        { field: "goods_nm", headerName: "상품명", width: 400 },
+        { field: "goods_opt", headerName: "옵션", width: 300 },
+        { field: "color", headerName: "컬러", width: 60, cellStyle: {"text-align": "center"} },
+        { field: "size", headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"} },
         { width: "auto" }
     );
     this.grid = new HDGrid(document.querySelector( divId ), columns);
@@ -338,11 +338,33 @@ SearchPrdcd.prototype.SetGridCond = async function() {
         columns.push(
             { field: "chk", headerName: '', cellClass: 'hd-grid-code', checkboxSelection: true, width: 28, sort: null },
             { field: "item", headerName: conds[cond_title], width: "auto",
-                cellRenderer: (params) => `[${params.data.code_id || ''}] ${params.data.code_val || ''}`,
+                cellStyle: (params) => (params.data.key || '') === 'contain' ? {"color": params.data.item === '포함' ? "green" : "red"} : '',
+                editable: (params) => (params.data.key || '') === 'contain',
+                cellRenderer: (params) => {
+                    if((params.data.key || '') === 'contain') return params.value;
+                    return `${(params.data.code_id || '') != '' ? `[${params.data.code_id}] ` : ''}${params.data.code_val || ''}`;
+                },
+                cellEditorSelector: function(params) {
+                    if((params.data.key || '') === 'contain') {
+                        return {
+                            component: 'agRichSelectCellEditor',
+                            params: { 
+                                values: ['포함', '미포함']
+                            },
+                        };
+                    }
+                    return false;
+                },
             },
         );
-        this[cond_title + '_grid'] = await new HDGrid(document.querySelector( "#div-gd-prdcd-" + cond_title ), columns);
-        document.querySelector( "#div-gd-prdcd-" + cond_title ).style.height = '210px';
+
+        this[cond_title + '_grid'] = await new HDGrid(document.querySelector( "#div-gd-prdcd-" + cond_title ), columns, {
+            pinnedTopRowData: [{item: "포함", key: "contain"}],
+            getRowStyle: (params) => {
+                if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#f2f2f2', 'border': 'none'};
+            },
+        });
+        document.querySelector( "#div-gd-prdcd-" + cond_title ).style.height = '204px';
     });
     const { data: { body: res } } = await axios({ 
         url: '/store/api/prdcd/conds', 
@@ -350,7 +372,7 @@ SearchPrdcd.prototype.SetGridCond = async function() {
     });
     Object.keys(res).forEach(r => {
         this[r + '_grid'].gridOptions.api.setRowData(res[r]);
-    })
+    });
 }
 
 SearchPrdcd.prototype.Search = function(e) {
@@ -364,6 +386,9 @@ SearchPrdcd.prototype.Search = function(e) {
             rows.forEach(r => {
                 data += `&${c}[]=${r.code_id}`;
             });
+
+            let is_contain = this[c + '_grid'].gridOptions.api.getPinnedTopRow(0).data.item === "포함";
+            data += `&${c}_contain=${is_contain}`;
         });
         this.grid.Request('/store/api/prdcd/search', data, 1);
     }
