@@ -79,9 +79,9 @@ class acc06Controller extends Controller
             "
 			select 
                 s.store_nm, c.code_val as store_type_nm, 
-                round(if(amt_js > sg.amt1,sg.amt1 * fee1/100,amt_js * fee1/100 )) as fee_amt_js1,
-                round(if(amt_js > sg.amt1,if((amt_js - sg.amt1) > sg.amt2,sg.amt2 * fee2/100,(amt_js - sg.amt1) * fee2/100 ),0)) as fee_amt_js2,
-                round(if((amt_js - sg.amt1) > sg.amt2,(amt_js - sg.amt1 - sg.`amt2`) * fee3/100,0)) as fee_amt_js3,
+                round(if(amt_js > sg.amt1, sg.amt1 * fee1/100, amt_js * fee1/100 )) as fee_amt_js1,
+                round(if(amt_js > sg.amt1 and amt_js > sg.amt2, (sg.amt2 - sg.amt1) * fee2/100, 0)) as fee_amt_js2,
+                round(if(amt_js > sg.amt1 and amt_js > sg.amt2 and amt_js > sg.amt3, (amt_js - sg.amt2) * fee3/100, 0)) as fee_amt_js3,
                 round(amt_gl * sg.fee_10/100) as fee_amt_gl,
                 round(amt_j1 * sg.fee_10/100) as fee_amt_j1,
                 round(amt_j2 * sg.fee_11/100) as fee_amt_j2,
