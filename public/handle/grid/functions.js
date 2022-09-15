@@ -313,7 +313,8 @@ function StyleGoodsNo(params){
         }
         if(params.data.goods_no_bg_color !== undefined || params.data.goods_no_bg_color != '') {
             return {
-                'background-color': params.data.goods_no_bg_color
+                'background-color': params.data.goods_no_bg_color,
+                'text-align': 'center',
             }
         }
     }
@@ -322,6 +323,11 @@ function StyleGoodsNo(params){
 const StyleEditCell = {
     'background' : '#ffff99',
     'border-right' : '1px solid #e0e7e7'
+};
+
+const StyleLineHight = {
+    'line-height': '30px',
+    'text-align': 'center',
 };
 
 function unComma(txt) {

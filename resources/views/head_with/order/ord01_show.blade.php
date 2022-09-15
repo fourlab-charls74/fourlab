@@ -122,7 +122,7 @@
                                             </td>
                                             <th>판매처</th>
                                             <td>
-                                                <div class="txt_box">{{ @$ord->sale_place }}</div>
+                                                <div class="txt_box">@if(@$ord->sale_place != '') {{ @$ord->sale_place }} @elseif(@$ord->sale_place_nm != '') {{ @$ord->sale_place_nm }} @endif</div>
                                             </td>
                                         </tr>
                                         <tr>

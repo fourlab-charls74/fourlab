@@ -311,7 +311,7 @@ class goods extends Controller
 
         $store_cd   = $request->input("store_cd", "");
 
-        $orderby = sprintf("order by %s %s", $ord_field, $ord);
+        $orderby = sprintf("order by %s %s, s.prd_cd", $ord_field, $ord);
 
         $where = "";
         if($prd_cd != "") {
@@ -367,6 +367,9 @@ class goods extends Controller
             }
         }
 
+        $store_where = "";
+        if ($store_cd != "") $store_where .= " and ps.store_cd = '$store_cd'"; 
+
         $page_size = $limit;
         $startno = ($page - 1) * $page_size;
         $limit = " limit $startno, $page_size ";
@@ -375,17 +378,17 @@ class goods extends Controller
         $page_cnt = 0;
 
         if ($page == 1) {
-            $query = /** @lang text */
-                "
-                select count(*) as total
-                from goods g inner join product_stock s on g.goods_no = s.goods_no 
-                inner join product_stock_store ps on s.prd_cd = ps.prd_cd and ps.store_cd = '$store_cd'
-				left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
-                where 1=1 
-                    -- g.com_id = :com_id 
-                    $where
+            $query = "
+                select count(c.prd_cd) as total
+                from (
+                    select s.prd_cd, count(s.prd_cd)
+                    from goods g 
+                        inner join product_stock s on g.goods_no = s.goods_no 
+                        inner join product_stock_store ps on s.prd_cd = ps.prd_cd $store_where
+                    where 1=1 $where
+                    group by s.prd_cd
+                ) as c
 			";
-            //$row = DB::select($query,['com_id' => $com_id]);
             $row = DB::select($query);
             $total = $row[0]->total;
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
@@ -395,56 +398,55 @@ class goods extends Controller
         $cfg_img_size_real = "a_500";
         $cfg_img_size_list = "s_50";
 
-        $query = /** @lang text */
-            "
+        $query = "
 			select
-				'' as blank
-				, g.goods_no , g.goods_sub
-				, ifnull( type.code_val, 'N/A') as goods_type
-				, com.com_nm
-				, opt.opt_kind_nm
-				, brand.brand_nm as brand
-				, cat.full_nm
-				, g.style_no
-				, g.head_desc
-				, '' as img_view
-				, if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
-					select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
-					from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
-				  )) as img
-				, g.goods_nm
-				, g.goods_nm_eng
-				, g.ad_desc
-				, stat.code_val as sale_stat_cl
-				, g.normal_price
-				, g.price
-				 , ifnull(
-					(select sum(wqty) from goods_summary where goods_no = g.goods_no and goods_sub = g.goods_sub), 0
-				  ) as wqty
-				, g.wonga
-				, (100/(g.price/(g.price-g.wonga))) as margin_rate
-				, (g.price-g.wonga) as margin_amt
-				, g.md_nm
-				, bi.code_val as baesong_info
-				, bk.code_val as baesong_kind
-				, dpt.code_val as dlv_pay_type
-				, g.baesong_price
-				, g.point
-				, g.org_nm
-				, g.make
-				, g.type
-				, g.reg_dm
-				, g.upd_dm
-				, g.goods_location
-				, g.sale_price
+                '' as blank
+                , g.goods_no
+                , g.goods_sub
+                , ifnull( type.code_val, 'N/A') as goods_type
+                , com.com_nm
+                , opt.opt_kind_nm
+                , brand.brand_nm as brand
+                , cat.full_nm
+                , g.style_no
+                , g.head_desc
+                , '' as img_view
+                , if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
+                    select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
+                    from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
+                )) as img
+                , g.goods_nm
+                , g.goods_nm_eng
+                , g.ad_desc
+                , stat.code_val as sale_stat_cl
+                , g.normal_price
+                , g.price
+                , g.wonga
+                , (100/(g.price/(g.price-g.wonga))) as margin_rate
+                , (g.price-g.wonga) as margin_amt
+                , g.md_nm
+                , bi.code_val as baesong_info
+                , bk.code_val as baesong_kind
+                , dpt.code_val as dlv_pay_type
+                , g.baesong_price
+                , g.point
+                , g.org_nm
+                , g.make
+                , g.type
+                , g.reg_dm
+                , g.upd_dm
+                , g.goods_location
+                , g.sale_price
                 , g.goods_sh 
-				, g.goods_type as goods_type_cd
-				, com.com_type as com_type_d
-				, s.prd_cd , s.goods_opt
-                , ps.qty as store_qty, ps.wqty as store_wqty
-			from goods g inner join product_stock s on g.goods_no = s.goods_no
-                inner join product_stock_store ps on s.prd_cd = ps.prd_cd and ps.store_cd = '$store_cd'
-				left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
+                , g.goods_type as goods_type_cd
+                , com.com_type as com_type_d
+                , s.prd_cd , s.goods_opt
+                , s.wqty as wqty
+                , sum(ps.qty) as store_qty
+                , sum(ps.wqty) as store_wqty
+			from goods g 
+                inner join product_stock s on g.goods_no = s.goods_no
+                inner join product_stock_store ps on s.prd_cd = ps.prd_cd $store_where
 				left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
 				left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
 				left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
@@ -456,6 +458,7 @@ class goods extends Controller
 				left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
 			where 1 = 1
                 $where
+            group by s.prd_cd
             $orderby
 			$limit
 		";

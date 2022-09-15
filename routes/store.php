@@ -209,6 +209,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk03', 'stk03Controller@index');
         Route::get('stk03/search', 'stk03Controller@search');
         Route::get('stk03/create', 'stk03Controller@create');
+        Route::post('stk03/save', 'stk03Controller@save');
 
         Route::get('stk11','stk11Controller@index');
 

@@ -13,7 +13,8 @@
             </div>
         </div>
         <div class="d-flex">
-            <a href="javascript:void(0);" onclick="Save()" class="btn btn-primary"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 판매등록</a>
+            <a href="javascript:void(0);" onclick="return Validate(document.f1)" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 판매등록</a>
+            <a href="javascript:void(0);" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i> 닫기</a>
         </div>
     </div>
 
@@ -148,10 +149,10 @@
                                                 <td style="padding:0px 10px 0px 10px;">
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio">
-                                                            <input type="radio" name="dlv_apply" id="dlv_apply_y" value="Y" class="custom-control-input" checked onclick="setDlvFeeUse(true);"><label class="custom-control-label" for="dlv_apply_y">적용함</label>
+                                                            <input type="radio" name="dlv_apply" id="dlv_apply_y" value="Y" class="custom-control-input" checked onclick="EditAmtTable();"><label class="custom-control-label" for="dlv_apply_y">적용함</label>
                                                         </div>
                                                         <div class="custom-control custom-radio">
-                                                            <input type="radio" name="dlv_apply" id="dlv_apply_n" value="N" class="custom-control-input" onclick="setDlvFeeUse(false);"><label class="custom-control-label" for="dlv_apply_n">적용안함</label>
+                                                            <input type="radio" name="dlv_apply" id="dlv_apply_n" value="N" class="custom-control-input" onclick="EditAmtTable();"><label class="custom-control-label" for="dlv_apply_n">적용안함</label>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -196,8 +197,8 @@
                                                 <td style="padding:0px 10px 0px 10px;">
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio">
-                                                            <input type="radio" name="ord_state" id="ord_state_5" class="custom-control-input" value="1" />
-                                                            <label class="custom-control-label" for="ord_state_5">입금예정</label>
+                                                            <input type="radio" name="ord_state" id="ord_state_1" class="custom-control-input" value="1" />
+                                                            <label class="custom-control-label" for="ord_state_1">입금예정</label>
                                                         </div>
                                                         <div class="custom-control custom-radio">
                                                             <input type="radio" name="ord_state" id="ord_state_10" class="custom-control-input" value="10"  />
@@ -226,12 +227,15 @@
                                             <tr>
                                                 <th class="required">주문매장</th>
                                                 <td style="padding:0px 10px 0px 10px;">
-                                                    <div class="flax_box" style="width: 307px;">
-                                                        <div class="form-inline inline_btn_box w-100">
-                                                            <input type='hidden' id="store_nm" name="store_nm">
-                                                            <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
-                                                            <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="flax_box mr-2" style="width: 307px;">
+                                                            <div class="form-inline inline_btn_box w-100">
+                                                                <input type='hidden' id="store_nm" name="store_nm">
+                                                                <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
+                                                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                                            </div>
                                                         </div>
+                                                        <p style="color: red;">* 주문매장 변경 시, 상품정보가 초기화됩니다.</p>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -411,7 +415,7 @@
                                                 <th class="required">입금자</th>
                                                 <td style="padding:0px 10px 0px 10px;">
                                                     <div class="flax_box">
-                                                        <input type="text" class="form-control form-control-sm" name="bank_number" id="bank_number" value=""/>
+                                                        <input type="text" class="form-control form-control-sm" name="bank_inpnm" id="bank_inpnm" value=""/>
                                                         <input type="hidden" name="coupon_no" value="">
                                                     </div>
                                                 </td>
@@ -432,82 +436,34 @@
 @include('store_with.stock.stk03_js')
 <script language="javascript">
     let columns = [
-        {headerName: '', headerCheckboxSelection: true,  width:50,
-            checkboxSelection: function(params) {
-                if(params.data.goods_no) return true;
-                return false;
-            }
+        {headerCheckboxSelection: true, checkboxSelection: true,  width: 28},
+        {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {"text-align": "center"}},
+        {field: "goods_no", hide: true},
+        {field: "goods_nm", headerName: "상품명", type: "HeadGoodsNameType", width: 227, wrapText: true, autoHeight: true},
+        {field: "goods_opt", headerName: "옵션", width: 130},
+        {field: "goods_price", headerName: "판매단가", width: 60, type: 'currencyType'},
+        {field: "price", headerName: "판매가", width: 60, type: 'currencyType', editable: true, cellStyle: {"background-color": "#ffff99"}, onCellValueChanged: EditAmt},
+        {field: "wqty", headerName: "창고재고", width: 60, type: 'currencyType'},
+        {field: "store_wqty", headerName: "매장재고", width: 60, type: 'currencyType'},
+        {field: "qty", headerName: "수량", width: 60, type: 'currencyType', editable: true, cellStyle: {"background-color": "#ffff99"}, onCellValueChanged: EditAmt},
+        {field: "ord_amt", headerName: "주문액", width: 60, type: 'currencyType'},
+        {field: "point_amt", headerName: "(-)적립금", width: 60, type: 'currencyType',
+            // editable: true, cellStyle: {"background-color": "#ffff99"}, onCellValueChanged: EditAmt
         },
-        {field: "ord_opt_no", headerName: "주문일련번호", width: 100, sortable: "ture", 
-            type: function(params) {
-                if(params.data.goods_no) return 'HeadOrdOptNoType';
-                return "none";
-            }
+        {field: "coupon_amt", headerName: "(-)쿠폰", width: 60, type: 'currencyType',
+            // editable: true, cellStyle: {"background-color": "#ffff99"}, onCellValueChanged: EditAmt
         },
-        {field: "goods_nm", headerName: "상품명", type: "HeadGoodsNameType", width: 200, wrapText: true, autoHeight: true},
-        {field: "opt_val", headerName: "옵션", width: 100,
-            editable: true,
-            cellClass: ['hd-grid-edit'],
-            cellEditor: 'agRichSelectCellEditor',
-            cellEditorParams: cellOpionsParams,
+        {field: "dc_amt", headerName: "(-)할인", width: 60, type: 'currencyType',
+            // editable: true, cellStyle: {"background-color": "#ffff99"}, onCellValueChanged: EditAmt
         },
-        {field: "qty", headerName: "수량", width: 90, type: 'numberType',
-            editable: function(params) {
-                if(params.data.goods_no) return true;
-                return false;
-            },
-            cellClass: ['hd-grid-number','hd-grid-edit'],
-            onCellValueChanged: EditAmt,
-            //cellStyle: StyleChangeYN,
+        {field: "dlv_amt", headerName: "(+)배송비", width: 60, type: 'currencyType',
+            // editable: true, cellStyle: {"background-color": "#ffff99"}, onCellValueChanged: EditAmt
         },
-        {field: "price", headerName: "판매가", width: 90, type: 'currencyType', 
-            editable: function(params) {
-                if(params.data.goods_no) return true; 
-                return false;
-            }, 
-            cellClass: ['hd-grid-number', 'hd-grid-edit'], 
-            nCellValueChanged: EditAmt 
-        },
-        {field: "ord_amt", headerName: "주문액", width: 90, type: 'currencyType'},
-        // {field:"recv_amt", headerName: "입금액", width: 90, type: 'currencyType', onCellValueChanged: EditAmt },
-        {field: "point_amt", headerName: "(-)적립금", width: 90, type: 'currencyType',
-            editable: function(params) {
-                if(params.data.goods_no) return true; 
-                return false;
-            }, 
-            onCellValueChanged: EditAmt 
-        },
-        {field: "coupon_amt", headerName: "(-)쿠폰", width: 90, type: 'currencyType', 
-            editable: function(params) {
-                if(params.data.goods_no) return true; 
-                return false;
-            }, 
-            onCellValueChanged:EditAmt 
-        },
-        {field: "dc_amt", headerName: "(-)할인", width: 90, type: 'currencyType', 
-            editable: function(params) {
-                if(params.data.goods_no) return true; 
-                return false;
-            }, 
-            onCellValueChanged: EditAmt 
-        },
-        {field: "dlv_amt", headerName: "(+)배송비", width: 90, type: 'currencyType', 
-            editable: function(params) {
-                if(params.data.goods_no) return true; 
-                return false;
-            },
-            onCellValueChanged: EditAmt 
-        },
-        {field: "nvl"}
     ];
 
-    const pApp = new App('',{
-        gridId:"#div-gd",
-    });
+    const pApp = new App('', { gridId:"#div-gd" });
     let gx;
-    // let _goods_options = {};
-    // let _goods_list_of_com_type = {etc:[]};
-
+    
     const base_dlv_fee = parseInt('{{ @$dlv_fee[base_dlv_fee] }}');
     const add_dlv_fee = parseInt('{{ @$dlv_fee[add_dlv_fee] }}');
     const free_dlv_amt = parseInt('{{ @$dlv_fee[free_dlv_amt] }}');
