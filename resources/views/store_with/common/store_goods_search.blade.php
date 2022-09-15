@@ -208,6 +208,10 @@
                     <div class="fr_box">
                         <div class="box">
                             <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+                                <input type="checkbox" class="custom-control-input" name="ext_zero_qty" id="ext_zero_qty" value="Y" checked>
+                                <label class="custom-control-label font-weight-normal" for="ext_zero_qty">@if(@$store->store_cd == '') 창고재고 @else 매장재고 @endif 0 제외</label>
+                            </div>
+                            <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
                                 <input type="checkbox" class="custom-control-input" name="goods_img" id="goods_img" value="Y" checked>
                                 <label class="custom-control-label font-weight-light" for="goods_img">이미지출력</label>
                             </div>
@@ -317,6 +321,7 @@
         if (isOpenerCallback('beforeSearchCallback')) opener.beforeSearchCallback(document);
         let data = $('form[name="search"]').serialize();
         data += '&store_cd=' + store_cd;
+        data += '&ext_zero_qty=' + $("[name=ext_zero_qty]").is(":checked");
         gx.Request('/store/api/store-goods', data, 1);
     };
     
