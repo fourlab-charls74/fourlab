@@ -206,6 +206,7 @@ class stk03Controller extends Controller
                 a.qty,
                 concat(a.user_nm, ' (', a.user_id, ')') as user_nm,
                 a.r_nm,
+                a.sale_place,
                 a.goods_price,
                 a.price,
                 a.dlv_amt,
@@ -214,7 +215,6 @@ class stk03Controller extends Controller
                 ord_type.code_val as ord_type,
                 ord_kind.code_val as ord_kind,
                 a.store_cd,
-                a.store_nm,
                 baesong_kind.code_val as baesong_kind,
                 a.dlv_no,
                 dlv_cd.code_val as dlv_cm,
@@ -243,6 +243,7 @@ class stk03Controller extends Controller
                     om.user_id,
                     om.user_nm,
                     om.r_nm,
+                    om.sale_place,
                     g.price as goods_price,
                     o.price,
                     o.dlv_amt,
@@ -251,7 +252,6 @@ class stk03Controller extends Controller
                     o.ord_type,
                     o.ord_kind,
                     o.store_cd,
-                    s.store_nm,
                     g.baesong_kind as dlv_baesong_kind,
                     o.dlv_no,
                     o.dlv_cd,
@@ -267,7 +267,6 @@ class stk03Controller extends Controller
                     inner join product_code p on o.prd_cd = p.prd_cd
                     inner join goods g on p.goods_no = g.goods_no
                     left outer join payment pay on om.ord_no = pay.ord_no
-                    left outer join store s on o.store_cd = s.store_cd
                     left outer join claim c on c.ord_opt_no = o.ord_opt_no
                     left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
                 where 1=1 $where
@@ -297,7 +296,6 @@ class stk03Controller extends Controller
                     inner join product_code p on o.prd_cd = p.prd_cd
                     inner join goods g on p.goods_no = g.goods_no
                     left outer join payment pay on om.ord_no = pay.ord_no
-                    left outer join store s on o.store_cd = s.store_cd
                     left outer join claim c on c.ord_opt_no = o.ord_opt_no
                     left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
                 where 1=1 $where
@@ -387,10 +385,12 @@ class stk03Controller extends Controller
         $coupon_amt = 0;
         $dc_amt = 0;
         $pay_fee = 0;
-        $dlv_amt = $conf->getConfigValue('delivery', 'base_delivery_fee'); // 기본배송비
+        $dlv_amt = 0;
+        $base_dlv_amt = $conf->getConfigValue('delivery', 'base_delivery_fee'); // 기본배송비
+        $free_dlv_amt = $conf->getConfigValue('delivery', 'free_delivery_amt'); // 배송비무료 금액
+        $dlv_apply = $req->input("dlv_apply", ""); // 배송비적용 여부
         $add_dlv_fee = $req->input("add_dlv_fee", 0); // 추가배송비
         if($add_dlv_fee == '') $add_dlv_fee = 0;
-        $dlv_apply = $req->input("dlv_apply", ""); // 배송비적용 여부
 
         $coupon_no = $req->input("coupon_no", "");
         $pay_type = $req->input("pay_type", ""); // 결제방법
@@ -589,6 +589,10 @@ class stk03Controller extends Controller
 
                 $a_ord_amt = $cart[$i]["ord_amt"] ?? 0;
                 $a_recv_amt = $cart[$i]["recv_amt"] ?? ($a_ord_amt - $ord_opt_point_amt - $ord_opt_coupon_amt - $ord_opt_dc_amt);
+                if ($dlv_apply == 'N' || $a_ord_amt >= $free_dlv_amt) {
+                    $ord_opt_dlv_amt = 0;
+                }
+
                 array_push($order_opt, [
                         'goods_no' => $goods_no,
                         'goods_sub' => $goods_sub,
@@ -627,7 +631,7 @@ class stk03Controller extends Controller
                         'dlv_cancel_date' => null,
                         'dlv_series_no' => null,
                         'ord_date' => DB::raw('now()'),
-                        'dlv_comment' => $dlv_msg,
+                        'dlv_comment' => null,
                         'admin_id' => $c_admin_id,
                         'coupon_no' => $coupon_no,
                         'com_coupon_ratio' => $com_rat,
@@ -646,6 +650,10 @@ class stk03Controller extends Controller
 
             $order = new Order($user, true);
             $ord_no = $order->ord_no;
+
+            if ($dlv_apply == 'Y' && $ord_amt < $free_dlv_amt) {
+                $dlv_amt = $base_dlv_amt;
+            }
 
             DB::table('order_mst')->insert([
                 'ord_no' => $ord_no,
