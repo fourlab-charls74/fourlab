@@ -146,67 +146,53 @@
 <script language="javascript">
 
     let columns = [];
-    if('{{ @$cmd }}' == 'send'){
+    if('{{ @$cmd }}' == 'send') {
 
         columns = [
-                {
-                    headerName: '',
-                    headerCheckboxSelection: true,
-                    checkboxSelection: true,
-                    width:28,
-                    pinned:'left'
-                },
-                {field: "receiver_cd", hide: true},
-                {headerName: "수신처", field: "receiver_nm", width:200,
-                    cellRenderer: (params) => 
-                            params.data.first_receiver + (params.data.receiver_cnt > 1 ? `외 ${params.data.receiver_cnt - 1}개` : '')
-                },
-                {headerName: "내용", field: "content",  width:300, cellClass: 'hd-grid-code',
-                    cellStyle: params => {
-                    return {textAlign:'left'}
-                    }
-                },
-                {headerName: "보낸 날짜", field: "rt",  width:110, cellClass: 'hd-grid-code'},
-                //{headerName: "확인여부", field: "check_yn", width: 150, cellClass: 'hd-grid-code'},
-                {width: 'auto'}
-            ];                              
-        }else{
-        
+            {
+                headerName: '',
+                headerCheckboxSelection: true,
+                checkboxSelection: true,
+                width:28,
+                pinned:'left'
+            },
+            {field: "receiver_cd", hide: true},
+            {headerName: "수신처", field: "receiver_nm", width:200,
+                cellRenderer: (params) => 
+                        params.data.first_receiver + (params.data.receiver_cnt > 1 ? `외 ${params.data.receiver_cnt - 1}개` : '')
+            },
+            {headerName: "내용", field: "content", width:300},
+            {headerName: "보낸 날짜", field: "rt", width:120},
+            //{headerName: "확인여부", field: "check_yn", width: 150, cellClass: 'hd-grid-code'},
+            {width: 'auto'}
+        ];                              
+    } else {
+    
         columns = [
-                {
-                    headerName: '',
-                    headerCheckboxSelection: true,
-                    checkboxSelection: true,
-                    width:28,
-                    pinned:'left'
-                },
-                {field: "sender_cd", hide: true},
-                {headerName: "발신처", field: "sender_nm",width:150},
-                {headerName: "연락처", field: "mobile",  width:80, cellClass: 'hd-grid-code'},
-                {headerName: "내용", field: "content",  width:300, cellClass: 'hd-grid-code',
-                    cellStyle: params => {
-                    return {textAlign:'left'}
-                    }
-                },
-                {headerName: "받은 날짜", field: "rt", width: 110, cellClass: 'hd-grid-code'},
-                {headerName: "확인여부", field: "check_yn", width: 110, cellClass: 'hd-grid-code',
-                    cellStyle: params => {
-                        if(params.data.check_yn == 'Y'){
-                            return {color:'green'}
-                        }else{
-                            
-                        }
-                    }
-                },
-                {headerName: "알림 번호", field: "msg_cd", hide: true},        
-                {width: 'auto'}
-            ];                              
-        }
+            {
+                headerName: '',
+                headerCheckboxSelection: true,
+                checkboxSelection: true,
+                width:28,
+                pinned:'left'
+            },
+            {field: "sender_cd", hide: true},
+            {headerName: "발신처", field: "sender_nm", width:150},
+            {headerName: "연락처", field: "mobile", width: 80, cellClass: 'hd-grid-code'},
+            {headerName: "내용", field: "content", width: 300},
+            {headerName: "받은 날짜", field: "rt", width: 110, cellClass: 'hd-grid-code'},
+            {headerName: "확인여부", field: "check_yn", width: 110, cellClass: 'hd-grid-code',
+                cellStyle: (params) => ({color: params.data.check_yn == 'Y' ? 'green' : 'none'})
+            },
+            {headerName: "알림 번호", field: "msg_cd", hide: true},        
+            {width: 'auto'}
+        ];                              
+    }
 
 </script>
 
 <script type="text/javascript" charset="utf-8">
-    const pApp = new App('',{
+    const pApp = new App('', {
         gridId:"#div-gd",
     });
     let gx;
@@ -225,55 +211,74 @@
         gx.Request('/store/stock/stk32/search', data);
     }
 
-</script>
-
-<script>
     const initSearchInputs = () => {
         document.search.reset(); // 모든 일반 input 초기화
         $('#store_no').val(null).trigger('change'); // 브랜드 select2 박스 초기화
         location.reload();
     };
-</script>
 
-<script>
     function openMsgPopup() {
         const url = '/store/stock/stk32/create';
         const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=700");
     }
-</script>
 
-<script>
-    function msgRead(){
+    function msgRead() {
         const rows = gx.getSelectedRows();
 
-        let i;
         let msg_cd = "";
         
-        for (i=0; i<rows.length; i++) {
-            msg_cd += rows[i].msg_cd+',';
+        for (let i=0; i<rows.length; i++) {
+            msg_cd += rows[i].msg_cd + ',';
         }
 
         msg_cd = msg_cd.replace(/,\s*$/, "");
-
         let msg_cds = msg_cd.split(',');
 
-        // console.log(msg_cds);
+        if (rows.length == 0) return alert('적어도 하나 이상 선택해주세요.');
 
-        if (rows.length == 0) {
-                alert('적어도 하나 이상 선택해주세요.');
-                return false;
+        $.ajax({
+            method: 'put',
+            url: '/store/stock/stk32/msg_read',
+            data: {msg_cd : msg_cds},
+            dataType : 'json',
+            success: function(data) {
+                if (data.code == '200') {
+                    alert('선택한 알림이 읽음 처리 되었습니다.');
+                } else {
+                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                }
+            },
+            error: function(e) {
+                    // console.log(e.responseText)
+            }
+        });
+
+    }
+
+    function msgDel() {
+        const rows = gx.getSelectedRows();
+
+        let msg_cd = "";
+        
+        for (let i=0; i<rows.length; i++) {
+            msg_cd += rows[i].msg_cd + ',';
         }
 
-        // console.log(msg_cd);
+        msg_cd = msg_cd.replace(/,\s*$/, "");
+        let msg_cds = msg_cd.split(',');
 
+        if (rows.length == 0) return alert('적어도 하나 이상 선택해주세요.');
+
+        if(confirm("삭제하시겠습니까?")) {
             $.ajax({
-                method: 'put',
-                url: '/store/stock/stk32/msg_read',
+                method: 'post',
+                url: '/store/stock/stk32/msg_del',
                 data: {msg_cd : msg_cds},
                 dataType : 'json',
                 success: function(data) {
-                    if (data.code == '200') {
-                        alert('선택한 알림이 읽음 처리 되었습니다.');
+                    if (data.code == 200) {
+                        alert('선택한 알림이 삭제 처리 되었습니다.');
+                        location.reload();
                     } else {
                         alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
                     }
@@ -282,47 +287,6 @@
                         // console.log(e.responseText)
                 }
             });
-
-    }
-
-    function msgDel(){
-        const rows = gx.getSelectedRows();
-
-        let i;
-        let msg_cd = "";
-        
-        for (i=0; i<rows.length; i++) {
-            msg_cd += rows[i].msg_cd+',';
-        }
-
-        msg_cd = msg_cd.replace(/,\s*$/, "");
-
-        let msg_cds = msg_cd.split(',');
-
-        // console.log(msg_cds);
-
-        if (rows.length == 0) {
-                alert('적어도 하나 이상 선택해주세요.');
-                return false;
-        }
-        if(confirm("삭제하시겠습니까?")){
-            $.ajax({
-                    method: 'post',
-                    url: '/store/stock/stk32/msg_del',
-                    data: {msg_cd : msg_cds},
-                    dataType : 'json',
-                    success: function(data) {
-                        if (data.code == 200) {
-                            alert('선택한 알림이 삭제 처리 되었습니다.');
-                            location.reload();
-                        } else {
-                            alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                        }
-                    },
-                    error: function(e) {
-                            // console.log(e.responseText)
-                    }
-                });
         }
     }
 

@@ -297,7 +297,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         //알림
         Route::get('stk32','stk32Controller@index');
         Route::get('stk32/search', 'stk32Controller@search');
-        Route::get('stk32/search2', 'stk32Controller@search2');
+        Route::get('stk32/search-receiver', 'stk32Controller@search_receiver');
         Route::get('stk32/search_group', 'stk32Controller@search_group');
         Route::get('stk32/search_group2{group_cd?}', 'stk32Controller@search_group2');
         Route::get('stk32/create', 'stk32Controller@create');

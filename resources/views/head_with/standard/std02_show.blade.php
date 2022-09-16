@@ -1050,9 +1050,6 @@
 
 		frm += "&free_dlv_amt_limit=" + unComma(free_dlv_amt_limit);
 
-
-		console.log(frm);
-
 		$.ajax({
 			async: true,
 			type: 'put',

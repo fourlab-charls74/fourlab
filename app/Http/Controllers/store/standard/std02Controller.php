@@ -167,7 +167,6 @@ class std02Controller extends Controller
 	// 매장 등록/수정
 	public function update_store(Request $request){
 
-		// dd($request->all());
 		$id		= Auth('head')->user()->id;
 		$code	= 200;
 		$msg	= "매장정보가 정상적으로 반영되었습니다.";
@@ -257,7 +256,7 @@ class std02Controller extends Controller
 
 			return response()->json(["code" => $code, "msg" => $msg, "store_cd" => $request->input('store_cd')]);
 
-		} catch(Exception $e){
+		} catch(Exception $e) {
 
 			DB::rollback();
 			return response()->json(["code" => '500', 'msg' => "에러가 발생했습니다. 잠시 후 다시시도 해주세요."]);

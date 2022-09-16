@@ -427,12 +427,12 @@ class std02Controller extends Controller
 		$site_yn			= $request->input("site_yn", "N");
 		$result_code		= 0;
 
-		// if (!is_numeric($dlv_amt)) {
-		// 	$dlv_amt = 0;
-		// }
-		// if (!is_numeric($free_dlv_amt_limit)) {
-		// 	$free_dlv_amt_limit = 0;
-		// }
+		if (!is_numeric($dlv_amt)) {
+			$dlv_amt = 0;
+		}
+		if (!is_numeric($free_dlv_amt_limit)) {
+			$free_dlv_amt_limit = 0;
+		}
 
 		//판매구분값 처리
 		$sum_sell_type = 0;

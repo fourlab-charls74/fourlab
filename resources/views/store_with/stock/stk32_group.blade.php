@@ -80,37 +80,25 @@
         let columns = [
             {headerName: "그룹명", field: "group_nm",width:120,
                 cellRenderer: function(params) {
-                    // console.log(params.data.group_cd);
                     return `<a href='javascript:void(0)' onclick='SearchDetail("${params.value}", "${params.data.group_nm}", "${params.data.group_cd}")'>${params.value}</a>`;
                 }
             },
-            {headerName: "삭제",width:60, 
+            {headerName: "삭제", width: 60, cellStyle: {'text-align':'center'},
                 cellRenderer: function(params) {
                     return `<a href='#' onclick="del_group_data('${params.data.group_cd}')">삭제</a>`;
                 },
-                cellStyle: params => {
-                    return {textAlign:'center'}
-            }
             },
-            {headerName: "인덱스", field: "group_cd",hide:true},
+            {headerName: "인덱스", field: "group_cd", hide: true},
             {width: "auto"}
         ];
 
         let group_columns = [
-            {headerName: "매장코드", field: "store_cd",width:70,
-                cellStyle: params => {
-                    return {textAlign:'center'}
-                }
-            },
+            {headerName: "매장코드", field: "store_cd", width: 70, cellStyle: {'text-align':'center'}},
             {headerName: "매장명", field: "store_nm",width:"auto"},
-            {headerName: "삭제",width:60, 
+            {headerName: "삭제", width:60, cellStyle: {'text-align':'center'},
                 cellRenderer: function(params) {
-                    // console.log(params.rowIndex);
                     return `<a href='#' onclick="del_store_data('${params.data.store_cd}')">삭제</a>`;
                 },
-                cellStyle: params => {
-                    return {textAlign:'center'}
-                }
             },
             {headerName: "인덱스", field: "group_cd",hide:true},
             {width: "auto"},
@@ -141,7 +129,7 @@
             gx2.Request('/store/stock/stk32/search_group2');
 
         });
-        $(document).ready(function(){
+        $(document).ready(function() {
             $('#saveData').show();
             $('#modData').hide();
         })
@@ -179,7 +167,6 @@
                     store_nms.push(sel_option.innerText);
                 }
             }
-
             
             for (let i = 0;i<store_cds.length;i++) {
                 newData.push({
@@ -187,7 +174,6 @@
                     store_nm: store_nms[i]
                 })
             }
-            console.log(newData);
 
             gx2.gridOptions.api.applyTransaction({add:newData});
             $('#store_no').val(null).trigger('change');
@@ -195,8 +181,6 @@
 
        // 그룹삭제
         function del_group_data(group_cd) {
-
-            console.log(group_cd);
             
             if(confirm('그룹을 삭제하면 매장목록도 같이 삭제됩니다.\n그래도 삭제하시겠습니까?')) {
                 $.ajax({
@@ -236,25 +220,18 @@
             
             let saveData = [];
                 gx2.gridOptions.api.forEachNode((obj,idx)=>{
-                    // console.log(obj);
                     saveData.push( obj.data.store_cd);
             });
-
-            // console.log(saveData);
         
             let frm = $('form[name=add_group]').serialize();
             
             frm += "&store_cd=" + saveData
-            
-            console.log(frm);
-
 
             if ($('input[name="group_nm"]').val() === '') {
                 $('input[name="group_nm"]').focus();
                 alert('그룹명을 입력해 주세요.');
                 return false;
             }
-
 
             $.ajax({
                 method: 'post',
@@ -303,8 +280,6 @@
                 add_newData.push(newData[i].store_cd);
            }
 
-        //    console.log(add_newData);
-
             let frm = $('form[name=add_group]').serialize();
             frm += "&store_cd=" + del_arr.join(',');
             frm += "&group_cd=" + cur_group_cd;
@@ -330,17 +305,12 @@
                         console.log(e.responseText)
                 }
             });
-            
 
         }
-
-        
        
        $( ".sch-store" ).on("click", function() {
             searchStore.Open(null, "multiple");
         });
 
     </script>
-
-
 @stop

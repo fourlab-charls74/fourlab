@@ -4,12 +4,7 @@
 	else					$title = "매장 수정";
 @endphp
 @section('title', $title)
-
 @section('content')
-<html>
-<head>
-	<body>
-
 
 <div class="show_layout py-3 px-sm-3">
     <div class="page_tit d-flex justify-content-between">
@@ -35,8 +30,6 @@
         @media (max-width: 740px) {
             .table td {float: unset !important;width:100% !important;}
         }
-
-
 		#multi_img {
 			display: grid;
 			grid-template-columns: 1fr 1fr 1fr;
@@ -577,11 +570,11 @@
 <!-- 지도 영역 -->
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=65bdbe35b21eabad4db595e6a9c785ec&libraries=services"></script>
 <script>
-	var mapContainer = document.getElementById('map'),
-		mapOption = {
-			center: new kakao.maps.LatLng(33.450701, 126.570667),
-			level: 4
-		};  
+	var mapContainer = document.getElementById('map');
+	var	mapOption = {
+		center: new kakao.maps.LatLng(33.450701, 126.570667),
+		level: 4
+	};
 
 	var map = new kakao.maps.Map(mapContainer, mapOption); 
 	var geocoder = new kakao.maps.services.Geocoder();
@@ -610,11 +603,10 @@
 </script>
 
 <script>
-      function multireadImage(input) {
+	function multireadImage(input) {
 		let multi = document.getElementById("multi_img");
 
 		if(input.files) {
-			// console.log(input.files);
 
 			let fileArr = Array.from(input.files);
 			let $colDiv1 = document.createElement("div");
@@ -622,23 +614,21 @@
 			$colDiv1.classList.add("column");
 			$colDiv2.classList.add("column");
 
+			fileArr.forEach((file, index) => {
+				let reader = new FileReader();
 
-				fileArr.forEach((file, index) => {
-					let reader = new FileReader();
+				const $imgDiv = document.createElement("div");   
+				const $img = document.createElement("img");
+				$img.classList.add("image");
+				$imgDiv.appendChild($img);
 
-					const $imgDiv = document.createElement("div");   
-					const $img = document.createElement("img");
-					$img.classList.add("image");
-					$imgDiv.appendChild($img);
-
-					reader.onload = e => {
-						$img.src = e.target.result;
-						
-						// $imgDiv.style.width = "200px";
-						// $imgDiv.style.height = "200px";
-					}
-
+				reader.onload = e => {
+					$img.src = e.target.result;
 					
+					// $imgDiv.style.width = "200px";
+					// $imgDiv.style.height = "200px";
+				}
+
 				if(index % 2 == 0) {
 					$colDiv1.appendChild($imgDiv);
 				} else {
@@ -646,24 +636,20 @@
 				}
 
 				reader.readAsDataURL(file);
-		});
+			});
 
-		multi.appendChild($colDiv1);
-		multi.appendChild($colDiv2);
-
-
-
-	  }
+			multi.appendChild($colDiv1);
+			multi.appendChild($colDiv2);
+		}
 	}
-		const inputMultipleImage = document.getElementById("fileUpload")
-		inputMultipleImage.addEventListener("change", e => {
-			multireadImage(e.target)
-		});
 
-        
+	const inputMultipleImage = document.getElementById("fileUpload");
+
+	inputMultipleImage.addEventListener("change", e => {
+		multireadImage(e.target)
+	});        
 
 </script>
-
 
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script type="text/javascript" charset="utf-8">
@@ -845,7 +831,4 @@
 		return true;
 	}
 </script>
-</body>
-</head>
-</html>
 @stop

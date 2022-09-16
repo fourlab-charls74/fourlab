@@ -278,10 +278,10 @@
 
     function openCodePopup(opt_kind_cd){
 
-        if(opt_kind_cd == ''){
+        if(opt_kind_cd == '') {
             var url = '/head/standard/std01/create';
             var stock = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=435");
-        }else{
+        } else {
             var url = '/head/standard/std01/show?opt_kind_cd=' + encodeURIComponent(opt_kind_cd);
             var stock = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=550");
         }

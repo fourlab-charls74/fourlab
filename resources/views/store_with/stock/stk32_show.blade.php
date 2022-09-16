@@ -89,14 +89,14 @@
         $('#div-gd2').hide();
         $('#search_sbtn2').hide();
 
-        $("input[name='div_store']").change(function(){
-            if($("input[name='div_store']:checked").val() == 'onceStore'){
+        $("input[name='div_store']").change(function() {
+            if($("input[name='div_store']:checked").val() == 'onceStore') {
                 $('#div-gd2').hide();
                 $('#div-gd').show();
                 $('#search_sbtn2').hide();
                 $('#search_sbtn').show();
                 Search();
-            }else if($("input[name='div_store']:checked").val() == 'groupStore'){
+            } else if ($("input[name='div_store']:checked").val() == 'groupStore') {
                 $('#div-gd2').show();
                 $('#div-gd').hide();
                 $('#search_sbtn2').show();
@@ -107,22 +107,22 @@
 		
     });
 
-        let columns = [
-            {headerName: '', headerCheckboxSelection: true, checkboxSelection: true, width:28, pinned:'left'},
-            {headerName: "매장코드", field: "store_cd",width:100, cellStyle: {'text-align':'center' }},
-            {headerName: "매장명", field: "store_nm",  width:200, cellClass: 'hd-grid-code'},
-            {headerName: "연락처", field: "mobile",  width:100, cellClass: 'hd-grid-code'},
-            {headerName: "그룹명", field: "store_group", width: 150, cellClass: 'hd-grid-code'},
-            {width: 'auto'}
-        ];
-    
-    
-        let g_columns = [
-            {headerName: '', headerCheckboxSelection: true, checkboxSelection: true, width:28, pinned:'left'},
-            {headerName: "그룹명", field: "group_nm",width:100, cellStyle: {'text-align':'center' }},
-            {headerName: "그룹코드", field: "group_cd", hide:true},
-            {width: 'auto'}
-        ];     
+    let columns = [
+        {headerName: '', headerCheckboxSelection: true, checkboxSelection: true, width:28, pinned:'left'},
+        {headerName: "매장코드", field: "store_cd",width:100, cellStyle: {'text-align':'center' }},
+        {headerName: "매장명", field: "store_nm",  width:200, cellClass: 'hd-grid-code'},
+        {headerName: "연락처", field: "mobile",  width:100, cellClass: 'hd-grid-code'},
+        {headerName: "그룹명", field: "store_group", width: 150, cellClass: 'hd-grid-code'},
+        {width: 'auto'}
+    ];
+
+
+    let g_columns = [
+        {headerName: '', headerCheckboxSelection: true, checkboxSelection: true, width:28, pinned:'left'},
+        {headerName: "그룹명", field: "group_nm",width:100, cellStyle: {'text-align':'center' }},
+        {headerName: "그룹코드", field: "group_cd", hide:true},
+        {width: 'auto'}
+    ];     
         
 </script>
 
@@ -138,10 +138,10 @@
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
         gx.gridOptions.defaultColDef = {
-                suppressMenu: true,
-                resizable: false,
-                sortable: true,
-            };
+            suppressMenu: true,
+            resizable: false,
+            sortable: true,
+        };
         Search();
     });
 
@@ -151,21 +151,21 @@
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
         gx2 = new HDGrid(gridDiv2, g_columns);
         gx2.gridOptions.defaultColDef = {
-                suppressMenu: true,
-                resizable: false,
-                sortable: true,
-            };
+            suppressMenu: true,
+            resizable: false,
+            sortable: true,
+        };
         Search2();
     });
 
     function Search() {
         let data = $('form[name="search"]').serialize();
-        gx.Request('/store/stock/stk32/search2', data);
+        gx.Request('/store/stock/stk32/search-receiver', data);
     }
     
     function Search2() {
         let data2 = $('form[name="search"]').serialize();
-        gx2.Request('/store/stock/stk32/search2', data2);
+        gx2.Request('/store/stock/stk32/search-receiver', data2);
     }
 
 </script>
@@ -173,15 +173,12 @@
 <script>
     function openSendMsgPopup() {
         const rows = gx.getSelectedRows();
-        let i;
         let store_cd = "";
 
         const rows2 = gx2.getSelectedRows();
-        let j;
         let group_nm = "";
         
         const rows3 = gx2.getSelectedRows();
-        let k;
         let group_cd = "";
 
         let check_radio = $('input[name=div_store]:checked').val();
@@ -189,22 +186,22 @@
         console.log(check_radio);
 
         
-        for (i=0; i<rows.length; i++) {
-            store_cd += rows[i].store_cd+',';
+        for (let i=0; i<rows.length; i++) {
+            store_cd += rows[i].store_cd + ',';
         }
         const sc = store_cd.replace(/,\s*$/, "");
         
-        for (j=0; j<rows2.length; j++) {
-            group_nm += rows2[j].group_nm+',';
+        for (let i=0; i<rows2.length; i++) {
+            group_nm += rows2[i].group_nm + ',';
         }
         const sc2 = group_nm.replace(/,\s*$/, "");
 
-        for (k=0; k<rows3.length; k++) {
-            group_cd += rows2[k].group_cd+',';
+        for (let i=0; i<rows3.length; i++) {
+            group_cd += rows2[i].group_cd + ',';
         }
         const sc3 = group_cd.replace(/,\s*$/, "");
 
-        const url = '/store/stock/stk32/sendMsg?store_cd='+sc+'&group_nm='+sc2+'&group_cd='+sc3+'&check='+check_radio;
+        const url = '/store/stock/stk32/sendMsg?store_cd=' + sc + '&group_nm=' + sc2 + '&group_cd=' + sc3 + '&check=' + check_radio;
         const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=615");
     }
 
@@ -213,12 +210,6 @@
         const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=500");
 
     }
-
-
-    
-</script>
-
-<script>
 
 </script>
 @stop

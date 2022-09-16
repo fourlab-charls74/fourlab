@@ -18,10 +18,10 @@ class stk31Controller extends Controller
     public function index()
     {
         $mutable = Carbon::now();
-        $sdate    = $mutable->sub(1, 'week')->format('Y-m-d');
+        $sdate = $mutable->sub(1, 'week')->format('Y-m-d');
 
         $values = [
-            'store_types'    => SLib::getCodes("STORE_TYPE"),
+            'store_types' => SLib::getCodes("STORE_TYPE"),
             'sdate' => $sdate,
             'edate' => date("Y-m-d")
         ];
@@ -47,7 +47,7 @@ class stk31Controller extends Controller
         if ($subject != "") $where .= " and s.subject like '%" . Lib::quote($subject) . "%' ";
         if ($content != "") $where .= " and s.content like '%" . Lib::quote($content) . "%' ";
         if ($store_no != "") $where .= " and d.store_cd like '%" . Lib::quote($store_no) . "%'  or s.all_store_yn = 'Y'";
-        if ($store_type != "")    $where .= " and a.store_type = '$store_type' or s.all_store_yn = 'Y'";
+        if ($store_type != "") $where .= " and a.store_type = '$store_type' or s.all_store_yn = 'Y'";
 
         // ordreby
         $ord = $r['ord'] ?? 'desc';
@@ -63,9 +63,7 @@ class stk31Controller extends Controller
         $startno = ($page - 1) * $page_size;
         $limit = " limit $startno, $page_size ";
 
-
-        $query =
-            /** @lang text */
+        $query = /** @lang text */
             "
             select 
                 s.ns_cd,
@@ -126,7 +124,7 @@ class stk31Controller extends Controller
         $user = DB::table('notice_store')->where('ns_cd', "=", $no)->first();
         $user->name = $user->admin_nm;
 
-        $storeCode = "
+        $sql = "
             select
                 d.check_yn,
                 d.ns_cd,
@@ -138,7 +136,7 @@ class stk31Controller extends Controller
                 left outer join store on store.store_cd = d.store_cd
             where s.ns_cd = $no
         ";
-        $storeCodes = DB::select($storeCode);
+        $storeCodes = DB::select($sql);
 
         $values = [
             'no' => $no,
