@@ -619,8 +619,13 @@ class sal01Controller extends Controller
 					"name" => $admin_nm
 				]);
 
-				$f_ord_date = Carbon::parse($ord_date)->format("YmdHis");
-				$ord_no = $f_ord_date . $store_cd . rand(000000, 999999);
+				list($usec, $sec) = explode(" ", microtime());
+				$f_ord_date = Carbon::parse($ord_date)->format("Ymd");
+
+				$ord_no_front = $f_ord_date != "" ? $f_ord_date . $store_cd : date("Ymd") . $store_cd; // 주문번호 앞 자리
+				$ord_no_back = round($usec * 1000000, 0); // 주문번호 맨 뒤 6자리 숫자에 해당
+
+                $ord_no = sprintf("%s%06d", $ord_no_front, $ord_no_back);
 				$orderClass->SetOrdNo($ord_no);
 
 				$order_mst = [
@@ -760,6 +765,7 @@ class sal01Controller extends Controller
 				DB::table('__tmp_order')->where('ord_no', $tmp_ord_no)->update(['out_ord_opt_no' => $ord_opt_no]);
 				$code = 201;
 			} catch (Exception $e) {
+				dd($e);
 				$code = -410;
 			}
 			return $code;
