@@ -19,16 +19,16 @@ class stk03Controller extends Controller
     public function index()
 	{
 		$values = [
-            'sdate'         => now()->sub(3, 'month')->format('Y-m-d'),
-            'edate'         => date("Y-m-d"),
-            'style_no'      => '',
-            'ord_states' => SLib::getordStates(), // 주문상태
-            'clm_states' => SLib::getCodes('G_CLM_STATE'), // 클레임상태
-            'stat_pay_types' => SLib::getCodes('G_STAT_PAY_TYPE'), // 결제방법
-            'ord_types' => SLib::getCodes('G_ord_TYPE'), // 주문구분
-            'ord_kinds' => SLib::getCodes('G_ord_KIND'), // 출고구분
-            'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
-			'items'			=> SLib::getItems(), // 품목
+            'sdate'             => now()->sub(3, 'month')->format('Y-m-d'),
+            'edate'             => date("Y-m-d"),
+            'style_no'          => '',
+            'ord_states'        => SLib::getordStates(), // 주문상태
+            'clm_states'        => SLib::getCodes('G_CLM_STATE'), // 클레임상태
+            'stat_pay_types'    => SLib::getCodes('G_STAT_PAY_TYPE'), // 결제방법
+            'ord_types'         => SLib::getCodes('G_ord_TYPE'), // 주문구분
+            'ord_kinds'         => SLib::getCodes('G_ord_KIND'), // 출고구분
+            'goods_stats'	    => SLib::getCodes('G_GOODS_STAT'), // 상품상태
+			'items'			    => SLib::getItems(), // 품목
 		];
 
         return view(Config::get('shop.store.view') . '/stock/stk03', $values);

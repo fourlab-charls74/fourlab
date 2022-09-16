@@ -420,7 +420,7 @@
     // 수기일괄등록 팝업오픈
     function AddBatch() {
         let url = '/store/stock/stk03/batch-create';
-        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1400,height=800");
     }
 </script>
 @stop
