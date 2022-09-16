@@ -1,15 +1,15 @@
 @extends('store_with.layouts.layout-nav')
-@section('title', '수기판매')
+@section('title', '수기 일괄판매')
 @section('content')
 <div class="show_layout py-3 px-sm-3">
     <div class="page_tit d-flex justify-content-between">
         <div class="d-flex">
-            <h3 class="d-inline-flex">수기판매</h3>
+            <h3 class="d-inline-flex">수기 일괄판매</h3>
             <div class="d-inline-flex location">
                 <span class="home"></span>
                 <span>/ 매장관리</span>
                 <span>/ 매장주문</span>
-                <span>/ 수기판매</span>
+                <span>/ 수기 일괄판매</span>
             </div>
         </div>
         <div class="d-flex">

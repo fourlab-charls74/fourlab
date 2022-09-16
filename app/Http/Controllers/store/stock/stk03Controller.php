@@ -880,6 +880,52 @@ class stk03Controller extends Controller
     }
 
     /**
+     * 
+     * 수기 일괄등록
+     * 
+     */
+    public function batch_create()
+    {
+        $sql = "
+            select 
+                concat(code_val,'_',ifnull(code_val2, '')) as 'name',
+                concat(code_val,' [',ifnull(code_val2, ''),']') as 'value'
+            from code 
+            where code_kind_cd ='BANK'
+                and code_id != 'K' 
+                and use_yn = 'Y'
+            order by code_seq
+        ";
+        $banks = DB::select($sql);
+
+        $sql = "
+            select
+                code_id, code_val
+            from code
+            where code_kind_cd = 'G_PAY_TYPE'
+                and code_id <> 'K'
+                and code_id in ('1','2','5','9','13','16','32','64')
+            order by code_seq
+        ";
+        $pay_types = DB::select($sql);
+
+        $conf = new Conf();
+
+        $values = [
+            'ord_types'     => SLib::getCodes('G_ORD_TYPE'),
+            'pay_types'     => $pay_types,
+            'banks'         => $banks,
+            'dlv_cds'       => SLib::getCodes('DELIVERY'),
+            'dlv_fee'       => [
+                'base_dlv_fee'  => $conf->getConfigValue('delivery', 'base_delivery_fee'), 
+                'add_dlv_fee'   => $conf->getConfigValue('delivery', 'add_delivery_fee'), 
+                'free_dlv_amt'  => $conf->getConfigValue('delivery', 'free_delivery_amt'),
+            ],
+        ];
+        return view(Config::get('shop.store.view') . '/stock/stk03_batch', $values);
+    }
+
+    /**
      * 전화번호 숫자에 '-' 넣어서 반환
      * - Parameters: $tel(전화번호)
      * - Returns: String

@@ -210,6 +210,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk03/search', 'stk03Controller@search');
         Route::get('stk03/create', 'stk03Controller@create');
         Route::post('stk03/save', 'stk03Controller@save');
+        Route::get('stk03/batch-create', 'stk03Controller@batch_create');
 
         Route::get('stk11','stk11Controller@index');
 
