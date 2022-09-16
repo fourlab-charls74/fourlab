@@ -123,26 +123,26 @@ class acc02Controller extends Controller
 							*/
 							select
 								ord_opt_no, store_cd
-								, sum(distinct(if(ord_state = 10,10,ord_state))) as `type`
+								, sum(distinct(if(ord_state = 30, 30, ord_state))) as `type`
 								, max(ord_state_date) as state_date
 								, sum(qty) as qty
-								, sum(if(ord_state = 10, qty,0)) as sale_qty
-								, sum(if(ord_state = 10, price*qty, 0)) as sale_amt
+								, sum(if(ord_state = 30, qty,0)) as sale_qty
+								, sum(if(ord_state = 30, price*qty, 0)) as sale_amt
 								, sum(if(ord_state in (60, 61), price*qty, 0)) as clm_amt
-								, sum(if(ord_state = 10, coupon_apply_amt, -1 * coupon_apply_amt)) as coupon_apply_amt
-								, sum(if(ord_state = 10, coupon_allot_amt, -1 * coupon_allot_amt)) as coupon_allot_amt
-								, sum(if(ord_state = 10, /*dc_apply_amt*/ 0, -1 * /*dc_apply_amt*/ 0)) as dc_apply_amt
-								, sum(if(ord_state = 10, dlv_amt, -1 * dlv_amt)) as dlv_amt
+								, sum(if(ord_state = 30, coupon_apply_amt, -1 * coupon_apply_amt)) as coupon_apply_amt
+								, sum(if(ord_state = 30, coupon_allot_amt, -1 * coupon_allot_amt)) as coupon_allot_amt
+								, sum(if(ord_state = 30, /*dc_apply_amt*/ 0, -1 * /*dc_apply_amt*/ 0)) as dc_apply_amt
+								, sum(if(ord_state = 30, dlv_amt, -1 * dlv_amt)) as dlv_amt
 								, sum(dlv_ref_amt) as dlv_ref_amt
 								, round(wonga*qty) as wonga
 								, round(100*(1 - max(wonga)/max(price)),2) as fee_ratio
 								, sum(com_coupon_apply_amt) as com_coupon_apply_amt
 							from
 								(
-								/* 10 에 대한 매출내역 */
+								/* 30 에 대한 매출내역 */
 								select
 									s.store_cd, w.ord_opt_no, o.ord_no, w.ord_state_date, w.ord_state,
-									if(w.ord_state = 10, w.qty, w.qty * -1) as qty,
+									if(w.ord_state = 30, w.qty, w.qty * -1) as qty,
 									abs(w.price) as price, abs(w.wonga) as wonga, w.coupon_apply_amt,
 									ifnull( /*w.dc_apply_amt*/ 0,0) as dc_apply_amt,
 									round(if(ifnull(w.com_coupon_ratio, 0) > 1,ifnull(w.com_coupon_ratio, 0) / 100,ifnull(w.com_coupon_ratio, 0))	* ifnull(w.coupon_apply_amt, 0)) as coupon_allot_amt,
@@ -157,8 +157,8 @@ class acc02Controller extends Controller
 									inner join store s on o.store_cd = s.store_cd
 									where
 										w.ord_state_date >= '$sdate' and w.ord_state_date <= '$edate'
-										and w.ord_state in (10,60,61) $inner_where
-										and o.ord_state >= 10 /* 결제 오류 발생시 order_opt_wonga 가 자료가 입력 되는 경우 처리 */
+										and w.ord_state in (30,60,61) $inner_where
+										and o.ord_state >= 30 /* 결제 오류 발생시 order_opt_wonga 가 자료가 입력 되는 경우 처리 */
 								)
 								a group by ord_opt_no, store_cd
 							) a
@@ -392,9 +392,9 @@ class acc02Controller extends Controller
 								order_opt o inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
 							where
 								w.ord_state_date >= '$sdate' and w.ord_state_date <= '$edate'
-								and w.ord_state in (10,60,61)
+								and w.ord_state in (30,60,61)
 								and w.store_cd = '$store_cd'
-								and o.ord_state >= 10 /* 결제 오류 발생시 order_opt_wonga 가 자료가 입력 되는 경우 처리 */
+								and o.ord_state >= 30 /* 결제 오류 발생시 order_opt_wonga 가 자료가 입력 되는 경우 처리 */
 						)
 						a group by ord_opt_no, store_cd
 					)
