@@ -646,40 +646,42 @@
 		const form = new FormData(document.querySelector("#f1"));
 		form.append("brand_file", $("#brand_file")[0].files[0] || '');
 
-		$.ajax({
-			method: 'post',
-			url: '/head/standard/std03/Command',
-			data: form,
-			contentType: false,
-			processData: false,
-			success: function(data) {
-				var save_msg = "";
-				if (data.brand_result == "200") {
-					if (cmd == "editcmd") {
-						save_msg = "수정되었습니다.";
-					} else {
-						save_msg = "등록되었습니다.";
-					}
-				} else {
-					save_msg = "처리 중 오류가 발생하였습니다. 관리자에게 문의하세요.";
-				}
-				alert(save_msg);
-				Search(1);
+		console.log(form);
 
-				if (cmd == "editcmd") {
-					//openCodePopup('');
-				} else {
-					ResetForm();
-					EnableAdd(true);
-				}
-			},
-			complete: function() {
-				_grid_loading = false;
-			},
-			error: function(request, status, error) {
-				console.log("error")
-			}
-		});
+		// $.ajax({
+		// 	method: 'post',
+		// 	url: '/head/standard/std03/Command',
+		// 	data: form,
+		// 	contentType: false,
+		// 	processData: false,
+		// 	success: function(data) {
+		// 		var save_msg = "";
+		// 		if (data.brand_result == "200") {
+		// 			if (cmd == "editcmd") {
+		// 				save_msg = "수정되었습니다.";
+		// 			} else {
+		// 				save_msg = "등록되었습니다.";
+		// 			}
+		// 		} else {
+		// 			save_msg = "처리 중 오류가 발생하였습니다. 관리자에게 문의하세요.";
+		// 		}
+		// 		alert(save_msg);
+		// 		Search(1);
+
+		// 		if (cmd == "editcmd") {
+		// 			//openCodePopup('');
+		// 		} else {
+		// 			ResetForm();
+		// 			EnableAdd(true);
+		// 		}
+		// 	},
+		// 	complete: function() {
+		// 		_grid_loading = false;
+		// 	},
+		// 	error: function(request, status, error) {
+		// 		console.log("error")
+		// 	}
+		// });
 	}
 
 

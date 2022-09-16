@@ -6,6 +6,11 @@
 @section('title', $title)
 
 @section('content')
+<html>
+<head>
+	<body>
+
+
 <div class="show_layout py-3 px-sm-3">
     <div class="page_tit d-flex justify-content-between">
         <div class="d-flex">
@@ -30,9 +35,26 @@
         @media (max-width: 740px) {
             .table td {float: unset !important;width:100% !important;}
         }
+
+
+		#multi_img {
+			display: grid;
+			grid-template-columns: 1fr 1fr 1fr;
+		}
+		.image {
+			display: block;
+			width: 100%;
+		}
+		/* .image-label {
+			position: relative;
+			bottom: 50px;
+			left: 5px;
+			color: white;
+			text-shadow: 2px 2px 2px black;
+		} */
     </style>
 
-	<form name="f1" id="f1">
+	<form name="f1" id="f1" enctype="multipart/form-data">
 		<input type="hidden" name="cmd" id="cmd" value="{{ $cmd }}">
 		<div class="card_wrap aco_card_wrap">
 			<div class="card shadow">
@@ -370,6 +392,55 @@
 							</div>
 						</div>
 					</div>
+			
+		<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+		<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+		<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+		<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+		<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+
+					<!-- 매장 정보 시작 -->
+					<div class="row">
+						<div class="col-12" style="padding-top:30px;font-size:18px;font-weight:bold;">+ 매장 정보</div>
+					</div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="table-box-ty2 mobile">
+                                <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                    <tbody>
+										<tr>
+											<th>이미지</th>
+											<td colspan="3">
+												<div class="form-inline">
+													<input type="file" style = "display: inline-block" id="fileUpload"  multiple='multiple' accept="image/jpeg,image/gif,image/png"/>
+												</div>
+												<div style="text-align:center;" id="multi_img">
+													<!-- <img src="" alt="" id="img" name="img" style="width:50px;height:50px;"> -->
+												</div>
+											</td>
+										</tr>
+										@if($cmd !== "")
+										<tr>
+											<th>지도</th>
+											<td style="width:100%;">
+												<div class="form-inline">
+													<div id="map" style="width:100%;height:400px;"></div>
+												</div>
+											</td>
+										</tr>
+										@endif
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+
+		<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+		<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+		<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+		<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+		<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
 
 					<div class="row">
 						<div class="col-12" style="padding-top:30px;font-size:18px;font-weight:bold;">+ 환경 정보</div>
@@ -503,6 +574,97 @@
 	</form>
 </div>
 
+<!-- 지도 영역 -->
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=65bdbe35b21eabad4db595e6a9c785ec&libraries=services"></script>
+<script>
+	var mapContainer = document.getElementById('map'),
+		mapOption = {
+			center: new kakao.maps.LatLng(33.450701, 126.570667),
+			level: 4
+		};  
+
+	var map = new kakao.maps.Map(mapContainer, mapOption); 
+	var geocoder = new kakao.maps.services.Geocoder();
+	let address = document.getElementById('addr1').value;
+	let store_nm = document.getElementById('store_nm').value;
+
+	geocoder.addressSearch(address, function(result, status) {
+
+		if (status === kakao.maps.services.Status.OK) {
+
+			var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+			var marker = new kakao.maps.Marker({
+				map: map,
+				position: coords
+			});
+
+			var infowindow = new kakao.maps.InfoWindow({
+				content: '<div style="width:150px;text-align:center;padding:6px 0;">'+store_nm+'</div>'
+			});
+
+			infowindow.open(map, marker);
+			map.setCenter(coords);
+		} 
+	});    
+</script>
+
+<script>
+      function multireadImage(input) {
+		let multi = document.getElementById("multi_img");
+
+		if(input.files) {
+			// console.log(input.files);
+
+			let fileArr = Array.from(input.files);
+			let $colDiv1 = document.createElement("div");
+        	let $colDiv2 = document.createElement("div");
+			$colDiv1.classList.add("column");
+			$colDiv2.classList.add("column");
+
+
+				fileArr.forEach((file, index) => {
+					let reader = new FileReader();
+
+					const $imgDiv = document.createElement("div");   
+					const $img = document.createElement("img");
+					$img.classList.add("image");
+					$imgDiv.appendChild($img);
+
+					reader.onload = e => {
+						$img.src = e.target.result;
+						
+						// $imgDiv.style.width = "200px";
+						// $imgDiv.style.height = "200px";
+					}
+
+					
+				if(index % 2 == 0) {
+					$colDiv1.appendChild($imgDiv);
+				} else {
+					$colDiv2.appendChild($imgDiv);
+				}
+
+				reader.readAsDataURL(file);
+		});
+
+		multi.appendChild($colDiv1);
+		multi.appendChild($colDiv2);
+
+
+
+	  }
+	}
+		const inputMultipleImage = document.getElementById("fileUpload")
+		inputMultipleImage.addEventListener("change", e => {
+			multireadImage(e.target)
+		});
+
+        
+
+</script>
+
+
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script type="text/javascript" charset="utf-8">
 
@@ -514,15 +676,25 @@
 
     // 매장정보 등록
     async function addStore() {
-		var frm	= $('form[name="f1"]');
+		const form = new FormData(document.querySelector("#f1"));
 
-        if( !validation('add') )	return;
-        if( !window.confirm("매장정보를 등록하시겠습니까?") )	return;
+		for(let i = 0; i< $("#fileUpload")[0].files.length; i++) {
+			form.append("file[]", $("#fileUpload")[0].files[i] || '');
+		}
+
+		for(let form_data of form.entries()) {
+			form_data[0], form_data[1];
+		}
+
+
+        // if( !validation('add') )	return;
+        // if( !window.confirm("매장정보를 등록하시겠습니까?") )	return;
+
 
         axios({
             url: `/store/standard/std02/update`,
             method: 'post',
-            data: frm.serialize(),
+            data: form,
         }).then(function (res) {
             if(res.data.code === 200) {
                 alert(res.data.msg);
@@ -673,4 +845,7 @@
 		return true;
 	}
 </script>
+</body>
+</head>
+</html>
 @stop

@@ -166,9 +166,17 @@ class std02Controller extends Controller
 
 	// 매장 등록/수정
 	public function update_store(Request $request){
+
+		// dd($request->all());
 		$id		= Auth('head')->user()->id;
 		$code	= 200;
 		$msg	= "매장정보가 정상적으로 반영되었습니다.";
+
+		$file[] = $request->input('file');
+
+		dd($file);
+		$store_cd = $request->input('store_cd');
+
 
 		try {
 			DB::beginTransaction();
@@ -231,6 +239,19 @@ class std02Controller extends Controller
 			];
 
 			DB::table('store')->updateOrInsert($where, $values);
+
+			// 이미지 저장
+
+			// foreach(){
+				DB::table('store_img')->insert([
+					'img_url' => $file,
+					'store_cd' => $store_cd,
+					'rt' => now(),
+					'admin_id' => $id
+	
+				]);
+
+			// }
 
 			DB::commit();
 

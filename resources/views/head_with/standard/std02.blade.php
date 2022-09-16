@@ -300,6 +300,7 @@ var columns = [
 
 	function formReset() {
         document.search.reset();
+        location.reload();
     }
 </script>
 

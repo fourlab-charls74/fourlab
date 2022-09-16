@@ -54,6 +54,7 @@
                                         </table>
                                         <div style="text-align:center;margin-top:7px;margin-bottom:-14px;">
                                             <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                                            <a href="#" id="search_sbtn2" onclick="Search2();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                                         </div>                                    
                                     </div>
                                 </div>
@@ -72,50 +73,99 @@
                         <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                     </div>
                     <a href="#" onclick="openSendMsgPopup()" id="send_msg_btn" class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;"> 알림 보내기</a>
-                    <a href="#" id="add_group_btn" class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;"> 그룹관리</a>
+                    <a href="#" onclick="openGroupPopup()" id="add_group_btn" class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;"> 그룹관리</a>
                 </div>
             </div>
             <div class="table-responsive">
                 <div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
+                <div id="div-gd2" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
             </div>
         </div>
     </div>
+    
 
 <script language="javascript">
-    var columns = [
-        {
-            headerName: '',
-            headerCheckboxSelection: true,
-            checkboxSelection: true,
-            width:28,
-            pinned:'left'
-        },
-        {headerName: "매장코드", field: "store_cd",width:100},
-        {headerName: "매장명", field: "store_nm",  width:200, cellClass: 'hd-grid-code'},
-        {headerName: "연락처", field: "mobile",  width:150, cellClass: 'hd-grid-code'},
-        // {headerName: "그룹명", field: "store_group", width: 150, cellClass: 'hd-grid-code'},
-        {width: 'auto'}
-    ];                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+    $(document).ready(function(){
+        $('#div-gd2').hide();
+        $('#search_sbtn2').hide();
 
+        $("input[name='div_store']").change(function(){
+            if($("input[name='div_store']:checked").val() == 'onceStore'){
+                $('#div-gd2').hide();
+                $('#div-gd').show();
+                $('#search_sbtn2').hide();
+                $('#search_sbtn').show();
+                Search();
+            }else if($("input[name='div_store']:checked").val() == 'groupStore'){
+                $('#div-gd2').show();
+                $('#div-gd').hide();
+                $('#search_sbtn2').show();
+                $('#search_sbtn').hide();
+                Search2();
+            }
+        });
+		
+    });
+
+        let columns = [
+            {headerName: '', headerCheckboxSelection: true, checkboxSelection: true, width:28, pinned:'left'},
+            {headerName: "매장코드", field: "store_cd",width:100, cellStyle: {'text-align':'center' }},
+            {headerName: "매장명", field: "store_nm",  width:200, cellClass: 'hd-grid-code'},
+            {headerName: "연락처", field: "mobile",  width:100, cellClass: 'hd-grid-code'},
+            {headerName: "그룹명", field: "store_group", width: 150, cellClass: 'hd-grid-code'},
+            {width: 'auto'}
+        ];
+    
+    
+        let g_columns = [
+            {headerName: '', headerCheckboxSelection: true, checkboxSelection: true, width:28, pinned:'left'},
+            {headerName: "그룹명", field: "group_nm",width:100, cellStyle: {'text-align':'center' }},
+            {headerName: "그룹코드", field: "group_cd", hide:true},
+            {width: 'auto'}
+        ];     
+        
 </script>
 
 <script type="text/javascript" charset="utf-8">
-    const pApp = new App('',{
-        gridId:"#div-gd",
-    });
     let gx;
+    let gx2;
+    const pApp = new App('',{ gridId:"#div-gd" });
+    const pApp2 = new App('',{ gridId:"#div-gd2" });
 
     $(document).ready(function() {
         pApp.ResizeGrid(420);
+        pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
-        pApp.BindSearchEnter();
+        gx.gridOptions.defaultColDef = {
+                suppressMenu: true,
+                resizable: false,
+                sortable: true,
+            };
         Search();
+    });
+
+    $(document).ready(function() {
+        pApp2.ResizeGrid(420);
+        pApp2.BindSearchEnter();
+        let gridDiv2 = document.querySelector(pApp2.options.gridId);
+        gx2 = new HDGrid(gridDiv2, g_columns);
+        gx2.gridOptions.defaultColDef = {
+                suppressMenu: true,
+                resizable: false,
+                sortable: true,
+            };
+        Search2();
     });
 
     function Search() {
         let data = $('form[name="search"]').serialize();
         gx.Request('/store/stock/stk32/search2', data);
+    }
+    
+    function Search2() {
+        let data2 = $('form[name="search"]').serialize();
+        gx2.Request('/store/stock/stk32/search2', data2);
     }
 
 </script>
@@ -125,16 +175,43 @@
         const rows = gx.getSelectedRows();
         let i;
         let store_cd = "";
+
+        const rows2 = gx2.getSelectedRows();
+        let j;
+        let group_nm = "";
+        
+        const rows3 = gx2.getSelectedRows();
+        let k;
+        let group_cd = "";
+
+        let check_radio = $('input[name=div_store]:checked').val();
+
+        console.log(check_radio);
+
         
         for (i=0; i<rows.length; i++) {
             store_cd += rows[i].store_cd+',';
         }
-
         const sc = store_cd.replace(/,\s*$/, "");
-
         
-        const url = '/store/stock/stk32/sendMsg?store_cd='+sc;
-        const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=600");
+        for (j=0; j<rows2.length; j++) {
+            group_nm += rows2[j].group_nm+',';
+        }
+        const sc2 = group_nm.replace(/,\s*$/, "");
+
+        for (k=0; k<rows3.length; k++) {
+            group_cd += rows2[k].group_cd+',';
+        }
+        const sc3 = group_cd.replace(/,\s*$/, "");
+
+        const url = '/store/stock/stk32/sendMsg?store_cd='+sc+'&group_nm='+sc2+'&group_cd='+sc3+'&check='+check_radio;
+        const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=615");
+    }
+
+    function openGroupPopup() {
+        const url = '/store/stock/stk32/group';
+        const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=500");
+
     }
 
 

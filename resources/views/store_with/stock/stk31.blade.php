@@ -203,7 +203,6 @@
         {headerName: "등록일시", field: "rt", type:"DateTimeType"},
         {headerName: "수정일시", field: "ut", type:"DateTimeType"},
         {headerName: "글번호", field: "ns_cd", hide:true },
-        {headerName: "매장구분", field: "store_type" },
         {width: 'auto'}
     ];
 

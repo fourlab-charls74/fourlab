@@ -278,12 +278,13 @@
 
     function openCodePopup(opt_kind_cd){
 
-        if(opt_kind_cd == '')
+        if(opt_kind_cd == ''){
             var url = '/head/standard/std01/create';
-        else
+            var stock = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=435");
+        }else{
             var url = '/head/standard/std01/show?opt_kind_cd=' + encodeURIComponent(opt_kind_cd);
-
-        var stock = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=568");
+            var stock = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=550");
+        }
     }
 
     // function Cmder(cmd) {

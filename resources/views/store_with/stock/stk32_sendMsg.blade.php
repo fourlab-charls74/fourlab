@@ -16,7 +16,7 @@
                 <div class="card shadow">
                     <div class="card-header mb-0" style="display:inline-block">
                         <a>수신처</a>
-                        <button onclick="Create();return false;" id="sendMsg_btn" class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">전송</button>
+                        <button type="button" onclick="Create()" id="sendMsg_btn" class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">전송</button>
                     </div>
                     <div style="display:inline-block;"></div>
                     <div class="card-body mt-1">
@@ -33,9 +33,15 @@
                                                     <th>수신처</th>
                                                     <td>
                                                         <div class="flax_box" name="sd" id="sd">
-                                                            @foreach($stores as $store)
-                                                                <span>{{$store->store_nm}},&nbsp;&nbsp;</span>
-                                                            @endforeach
+                                                            @if($store_cds != "")
+                                                                @foreach($stores as $store)
+                                                                    <span>{{$store->store_nm}}@if (!$loop->last),&nbsp; @endif</span>
+                                                                @endforeach
+                                                            @else
+                                                                @foreach($groupName as $gp)
+                                                                    <span>{{$gp->group_nm}}@if (!$loop->last),&nbsp; @endif</span>
+                                                                @endforeach
+                                                            @endif
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -68,6 +74,7 @@
                     <div style="font-size: 14px;display:inline-block">
                         <input type="checkbox" id="reservation_msg" name="reservation_msg" value="">&nbsp;
                         <label for="reservation_msg">예약발송</label>
+                       
                     </div>
                     
                     <div id="res_date" style="float:right;display:none">
@@ -89,23 +96,23 @@
                             <select name="rm_hour" id="rm_hour" class="form-control form-control-sm">
                             @for( $i=0; $i <= 23;$i++)
                                 @if($i < 10)
-                                    <option value="{{$i}}">0{{$i}}시</option>
+                                    <option value="0{{$i}}">0{{$i}}시</option>
                                 @else
                                     <option value="{{$i}}">{{$i}}시</option>
                                 @endif
-                                @endfor
+                            @endfor
                             </select>
                         </div>
                         
                         <div style="width:100px;display:inline-block;">
-                            <select name="rm_minite" id="rm_minute" class="form-control form-control-sm">
-                                @for($i=00; $i <= 59; $i++)
+                            <select name="rm_min" id="rm_min" class="form-control form-control-sm">
+                            @for($i=00; $i <= 59; $i++)
                                 @if($i < 10)
-                                <option value="{{$i}}">0{{$i}}분</option>
+                                <option value="0{{$i}}">0{{$i}}분</option>
                                 @else
                                 <option value="{{$i}}">{{$i}}분</option>
                                 @endif
-                                @endfor
+                            @endfor
                             </select>
                         </div>
                     </div>
@@ -124,21 +131,33 @@
             }
         });
     });
+
+
 </script>
 
 <script>
     function Create() {
 
             let frm = $('form[name=store]').serialize();
-            // let check = document.querySelector('input[name="reservation_msg"]').checked;
+            let check = document.querySelector('input[name="reservation_msg"]').checked;
         
             if ($('#content').val() === '') {
                 $('#content').focus();
                 alert('내용을 입력해 주세요.');
                 return false;
             }
-
+            
             frm += "&store_cds=" + "{{ @$store_cds }}";
+
+            frm += "&group_cds=" + "{{ @$group_cds }}";
+
+            ds += "&check=" + "{{ @$check }}"
+
+            console.log(ds);
+
+            frm += "&reservation_msg=" + $('[name=reservation_msg]').is(":checked");
+
+            console.log(frm);
 
             $.ajax({
                 method: 'post',
