@@ -8,6 +8,7 @@ use App\Components\Lib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Exception;
 
@@ -164,18 +165,15 @@ class std02Controller extends Controller
 		return response()->json(["code" => $code, "msg" => $msg]);
 	}
 
+	
 	// 매장 등록/수정
 	public function update_store(Request $request){
 
-		$id		= Auth('head')->user()->id;
-		$code	= 200;
-		$msg	= "매장정보가 정상적으로 반영되었습니다.";
-
-		$file[] = $request->input('file');
-
-		dd($file);
-		$store_cd = $request->input('store_cd');
-
+		$id			= Auth('head')->user()->id;
+		$code		= 200;
+		$msg		= "매장정보가 정상적으로 반영되었습니다.";
+		$store_cd 	= $request->input('store_cd');
+		$image 		= $request->file('file');
 
 		try {
 			DB::beginTransaction();
@@ -239,27 +237,39 @@ class std02Controller extends Controller
 
 			DB::table('store')->updateOrInsert($where, $values);
 
+
 			// 이미지 저장
+			$base_path = "/images/std02";
 
-			// foreach(){
-				DB::table('store_img')->insert([
-					'img_url' => $file,
-					'store_cd' => $store_cd,
-					'rt' => now(),
-					'admin_id' => $id
-	
-				]);
+			if (!Storage::disk('public')->exists($base_path)) {
+				Storage::disk('public')->makeDirectory($base_path);
+			}
+			if ($image != null &&  $image != "") {
+				foreach ($image as $key => $ig) {
+					$ig_cnt = $key + 1;
+					$file_name = sprintf("%s_%s.jpg", $store_cd, "$ig_cnt");
+					$save_file = sprintf("%s/%s", $base_path, $file_name);
+					Storage::disk('public')->putFileAs($base_path, $ig, $file_name);
 
-			// }
-
+					DB::table('store_img')->insert([
+						'img_url' => $save_file,
+						'store_cd' => $store_cd,
+						'seq' => $ig_cnt,
+						'rt' => now(),
+						'admin_id' => $id
+					]);
+				}
+			}
+			
 			DB::commit();
 
 			return response()->json(["code" => $code, "msg" => $msg, "store_cd" => $request->input('store_cd')]);
 
 		} catch(Exception $e) {
-
+			$msg = $e->getMessage();
 			DB::rollback();
-			return response()->json(["code" => '500', 'msg' => "에러가 발생했습니다. 잠시 후 다시시도 해주세요."]);
+			return response()->json(["code" => '500', 'msg' => $msg]);
+			// "에러가 발생했습니다. 잠시 후 다시시도 해주세요."
 
 		}
 	}

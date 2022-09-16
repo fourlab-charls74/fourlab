@@ -1,3 +1,31 @@
+Skip to content
+Search or jump to…
+Pull requests
+Issues
+Marketplace
+Explore
+ 
+@bigcastle5407 
+steve92son
+/
+bluewolf
+Private
+Code
+Issues
+Pull requests
+Actions
+Projects
+Security
+Insights
+bluewolf/resources/views/store_with/standard/std02_show.blade.php
+@uhyun-fe
+uhyun-fe fix(): 공지사항/알림 관련 코드 정리
+Latest commit 6265343 6 hours ago
+ History
+ 5 contributors
+@charls74@steve92son@madforre@uhyun-fe@bigcastle5407
+834 lines (768 sloc)  34.8 KB
+
 @extends('store_with.layouts.layout-nav')
 @php
     if($cmd != "update")	$title = "매장 등록";
@@ -26,7 +54,6 @@
     <style> 
         .required:after {content:" *"; color: red;}
         .table th {min-width:120px;}
-
         @media (max-width: 740px) {
             .table td {float: unset !important;width:100% !important;}
         }
@@ -575,27 +602,20 @@
 		center: new kakao.maps.LatLng(33.450701, 126.570667),
 		level: 4
 	};
-
 	var map = new kakao.maps.Map(mapContainer, mapOption); 
 	var geocoder = new kakao.maps.services.Geocoder();
 	let address = document.getElementById('addr1').value;
 	let store_nm = document.getElementById('store_nm').value;
-
 	geocoder.addressSearch(address, function(result, status) {
-
 		if (status === kakao.maps.services.Status.OK) {
-
 			var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-
 			var marker = new kakao.maps.Marker({
 				map: map,
 				position: coords
 			});
-
 			var infowindow = new kakao.maps.InfoWindow({
 				content: '<div style="width:150px;text-align:center;padding:6px 0;">'+store_nm+'</div>'
 			});
-
 			infowindow.open(map, marker);
 			map.setCenter(coords);
 		} 
@@ -605,78 +625,59 @@
 <script>
 	function multireadImage(input) {
 		let multi = document.getElementById("multi_img");
-
 		if(input.files) {
-
 			let fileArr = Array.from(input.files);
 			let $colDiv1 = document.createElement("div");
         	let $colDiv2 = document.createElement("div");
 			$colDiv1.classList.add("column");
 			$colDiv2.classList.add("column");
-
 			fileArr.forEach((file, index) => {
 				let reader = new FileReader();
-
 				const $imgDiv = document.createElement("div");   
 				const $img = document.createElement("img");
 				$img.classList.add("image");
 				$imgDiv.appendChild($img);
-
 				reader.onload = e => {
 					$img.src = e.target.result;
 					
 					// $imgDiv.style.width = "200px";
 					// $imgDiv.style.height = "200px";
 				}
-
 				if(index % 2 == 0) {
 					$colDiv1.appendChild($imgDiv);
 				} else {
 					$colDiv2.appendChild($imgDiv);
 				}
-
 				reader.readAsDataURL(file);
 			});
-
 			multi.appendChild($colDiv1);
 			multi.appendChild($colDiv2);
 		}
 	}
-
 	const inputMultipleImage = document.getElementById("fileUpload");
-
 	inputMultipleImage.addEventListener("change", e => {
 		multireadImage(e.target)
 	});        
-
 </script>
 
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script type="text/javascript" charset="utf-8">
-
     function Cmder(type) {
         if( type === "" )				addStore();
         else if( type === "update" )	updateStore();
         else if( type === "delete" )	deleteStore();
     }
-
     // 매장정보 등록
     async function addStore() {
 		const form = new FormData(document.querySelector("#f1"));
-
 		for(let i = 0; i< $("#fileUpload")[0].files.length; i++) {
 			form.append("file[]", $("#fileUpload")[0].files[i] || '');
 		}
-
 		for(let form_data of form.entries()) {
 			form_data[0], form_data[1];
 		}
-
-
         // if( !validation('add') )	return;
         // if( !window.confirm("매장정보를 등록하시겠습니까?") )	return;
-
-
         axios({
             url: `/store/standard/std02/update`,
             method: 'post',
@@ -694,14 +695,11 @@
             console.log(err);
         });
     }
-
     // 매장정보 수정
     async function updateStore() {
 		var frm	= $('form[name="f1"]');
-
 		if(!validation('update')) return;
         if(!window.confirm("매장정보를 수정하시겠습니까?")) return;
-
         axios({
             url: `/store/standard/std02/update`,
             method: 'post',
@@ -719,11 +717,9 @@
             console.log(err);
         });
     }
-
     // 매장정보 삭제
     async function deleteStore() {
         if(!window.confirm("매장정보를 삭제하시겠습니까?")) return;
-
         axios({
             url: `/store/standard/std02/delete/` + f1.storage_cd.value,
             method: 'delete',
@@ -740,28 +736,23 @@
             console.log(err);
         });
     }
-
     // 매장코드 중복체크
     async function checkCode() {
         const store_cd = $("[name=store_cd]").val().trim();
         if( store_cd === '' )	return alert("매장코드를 입력해주세요.");
-
         const response = await axios({ 
             url: `/store/standard/std02/check-code/${store_cd}`, 
             method: 'get' 
         });
         const {data: {code, msg}} = response;
-
         $("#dupcheck").text("* " + msg);
         $("#dupcheck").css("color", code === 200 ? "#00BB00" : "#ff0000");
         $("[name=store_only]").val(code === 200 ? "true" : "false");
     }
-
     // 창고코드값 변경 시 중복체크 false 변경
     function setDupCheckValue() {
         $("[name=storage_only]").val("false");
     }
-
     // 우편번호 검색하기
     function searchZipcode() {
         new daum.Postcode({
@@ -771,7 +762,6 @@
             }
         }).open();
     }
-
     // 우편번호 검색하기 - 사업자
     function searchBizZipcode() {
         new daum.Postcode({
@@ -781,7 +771,6 @@
             }
         }).open();
     }
-
 	// 저장 시 입력값 확인
 	const validation = (cmd) => {
 		if(cmd === "add"){
@@ -794,40 +783,33 @@
 			// 중복체크여부 검사
 			if($("[name='store_only']").val() !== "true") return alert("매장코드 중복체크를 해주세요.");
 		}
-
 		// 매장명칭 입력여부
 		if(f1.store_nm.value.trim() === '') {
 			f1.store_nm.focus();
 			return alert("매장명을 입력해주세요.");
 		}
-
 		// 매장명칭(약칭) 입력여부
 		if(f1.store_nm_s.value.trim() === '') {
 			f1.store_nm_s.focus();
 			return alert("매장명(약칭)을 입력해주세요.");
 		}
-
 		// 매장구분 선택여부
 		if(f1.store_type.selectedIndex == 0) {
 			f1.store_type.focus();
 			return alert("매장구분을 선택해주세요.");
 		}
-
 		// 매장종류 선택여부
 		if(f1.store_kind.selectedIndex == 0) {
 			f1.store_kind.focus();
 			return alert("매장종류를 선택해주세요.");
 		}
-
 		// 매장지역 선택여부
 		if(f1.store_area.selectedIndex == 0) {
 			f1.store_area.focus();
 			return alert("매장지역을 선택해주세요.");
 		}
-
 		// 주소 입력여부
 		if(f1.zipcode.value === '') return alert("주소를 입력해주세요.");
-
 		return true;
 	}
 </script>
