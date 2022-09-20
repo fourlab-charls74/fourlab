@@ -123,6 +123,7 @@ class std02Controller extends Controller
 	public function show($store_cd = '')
 	{
 		$store	= "";
+		$store_img	= "";
 		$grades = [];
 
 		if($store_cd != '') {
@@ -134,9 +135,21 @@ class std02Controller extends Controller
 			$store = DB::selectOne($sql, ["store_cd" => $store_cd]);
 		}
 
+		if($store_cd != '') {
+			$img_sql = "
+					select * from store_img
+					where store_cd = :store_cd
+			";
+
+			$store_img = DB::select($img_sql, ["store_cd" => $store_cd]);
+		}
+
+		// dd($store_img);
+
 		$values = [
 			"cmd"	=> $store_cd == '' ? "" : "update",
 			"store"	=> $store,
+			'store_img' => $store_img,
 			'store_types' => SLib::getCodes("STORE_TYPE"),
 			'store_kinds' => SLib::getCodes("STORE_KIND"),
 			'store_areas' => SLib::getCodes("STORE_AREA"),
@@ -174,6 +187,7 @@ class std02Controller extends Controller
 		$msg		= "매장정보가 정상적으로 반영되었습니다.";
 		$store_cd 	= $request->input('store_cd');
 		$image 		= $request->file('file');
+		$last_seq 	= "";
 
 		try {
 			DB::beginTransaction();
@@ -244,6 +258,7 @@ class std02Controller extends Controller
 			if (!Storage::disk('public')->exists($base_path)) {
 				Storage::disk('public')->makeDirectory($base_path);
 			}
+			$ig_cnt = "";
 			if ($image != null &&  $image != "") {
 				foreach ($image as $key => $ig) {
 					$ig_cnt = $key + 1;
@@ -251,15 +266,38 @@ class std02Controller extends Controller
 					$save_file = sprintf("%s/%s", $base_path, $file_name);
 					Storage::disk('public')->putFileAs($base_path, $ig, $file_name);
 
-					DB::table('store_img')->insert([
+					$insert_values = [
 						'img_url' => $save_file,
 						'store_cd' => $store_cd,
 						'seq' => $ig_cnt,
 						'rt' => now(),
 						'admin_id' => $id
-					]);
+					];
+					DB::table('store_img')->Insert($insert_values);
 				}
 			}
+
+			$last_seq = $ig_cnt;
+
+			if ($image != null &&  $image != "") {
+				foreach ($image as $key => $ig) {
+					$img_seq = $last_seq + 1;
+					$file_name = sprintf("%s_%s.jpg", $store_cd, "$img_seq");
+					$save_file = sprintf("%s/%s", $base_path, $file_name);
+					Storage::disk('public')->putFileAs($base_path, $ig, $file_name);
+
+					$update_values = [
+						'store_cd' => $store_cd,
+						'img_url' => $save_file,
+						'seq' => $img_seq,
+						'ut' => now(),
+						'admin_id' => $id
+					];
+					DB::table('store_img')->updateOrInsert($where,$update_values);
+					
+				}
+			}
+
 			
 			DB::commit();
 
@@ -273,6 +311,38 @@ class std02Controller extends Controller
 
 		}
 	}
+
+	public function del_img(Request $request)
+	{
+		$store_cd = $request->input('data_img');
+		$seq = $request->input('seq');
+		
+		try {
+            DB::beginTransaction();
+
+            $sql = "
+                delete 
+                from store_img
+                where store_cd = '$store_cd' and seq = $seq
+            ";
+
+            DB::delete($sql);
+
+            DB::commit();
+            $code = '200';
+            $msg = "";
+        } catch (Exception $e) {
+            DB::rollBack();
+            $code = 500;
+            $msg = $e->getMessage();
+        }
+
+        return response()->json([
+            "code" => $code,
+            "msg" => $msg
+        ]);
+	}
+
 
 	public function delete($com_id)
 	{

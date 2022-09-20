@@ -1,31 +1,3 @@
-Skip to content
-Search or jump to…
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@bigcastle5407 
-steve92son
-/
-bluewolf
-Private
-Code
-Issues
-Pull requests
-Actions
-Projects
-Security
-Insights
-bluewolf/resources/views/store_with/standard/std02_show.blade.php
-@uhyun-fe
-uhyun-fe fix(): 공지사항/알림 관련 코드 정리
-Latest commit 6265343 6 hours ago
- History
- 5 contributors
-@charls74@steve92son@madforre@uhyun-fe@bigcastle5407
-834 lines (768 sloc)  34.8 KB
-
 @extends('store_with.layouts.layout-nav')
 @php
     if($cmd != "update")	$title = "매장 등록";
@@ -65,13 +37,16 @@ Latest commit 6265343 6 hours ago
 			display: block;
 			width: 100%;
 		}
-		/* .image-label {
-			position: relative;
-			bottom: 50px;
-			left: 5px;
-			color: white;
-			text-shadow: 2px 2px 2px black;
-		} */
+		#img_div {
+		width: 660px;
+		min-height: 0px;
+		padding: 10px;
+		}
+
+		#img_div:empty:before {
+		color: #999;
+		font-size: .9em;
+		}
     </style>
 
 	<form name="f1" id="f1" enctype="multipart/form-data">
@@ -413,12 +388,6 @@ Latest commit 6265343 6 hours ago
 						</div>
 					</div>
 			
-		<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
-		<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
-		<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
-		<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
-		<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
-
 					<!-- 매장 정보 시작 -->
 					<div class="row">
 						<div class="col-12" style="padding-top:30px;font-size:18px;font-weight:bold;">+ 매장 정보</div>
@@ -432,35 +401,37 @@ Latest commit 6265343 6 hours ago
 										<tr>
 											<th>이미지</th>
 											<td colspan="3">
-												<div class="form-inline">
-													<input type="file" style = "display: inline-block" id="fileUpload"  multiple='multiple' accept="image/jpeg,image/gif,image/png"/>
-												</div>
 												<div style="text-align:center;" id="multi_img">
-													<!-- <img src="" alt="" id="img" name="img" style="width:50px;height:50px;"> -->
+													<input type='file' id='btnAdd' multiple='multiple' accept="image/jpeg,image/gif,image/png"/>
 												</div>
+												<div id='img_div'></div>
+												@if ($cmd == 'update')
+													@foreach(@$store_img as $src)
+														<div id='img_show_div' data-img="{{$src->seq}}" style="display:inline-block;position:relative;width:150px;height:120px;margin:5px;z-index:1">
+															<img src="{{$src->img_url}}" alt="" id="img_show" style="width:100%;height:100%;z-index:none">
+															<input type="button" value="x" onclick= "delete_img('{{$src->store_cd}}','{{$src->seq}}')" style="width:20px;height:20px;position:absolute;right:0px;top:0px;border:none;font-size:large;font-weight:bolder;background:none;color:black;padding-bottom:20px;">
+														</div>
+													@endforeach
+												@endif
 											</td>
 										</tr>
 										@if($cmd !== "")
-										<tr>
-											<th>지도</th>
-											<td style="width:100%;">
-												<div class="form-inline">
-													<div id="map" style="width:100%;height:400px;"></div>
-												</div>
-											</td>
-										</tr>
+											@if(@$store->store_type !== '11')
+												<tr>
+													<th>지도</th>
+													<td style="width:100%;">
+														<div class="form-inline">
+															<div id="map" style="width:100%;height:400px;"></div>
+														</div>
+													</td>
+												</tr>
+											@endif
 										@endif
 									</tbody>
 								</table>
 							</div>
 						</div>
 					</div>
-
-		<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
-		<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
-		<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
-		<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
-		<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
 
 					<div class="row">
 						<div class="col-12" style="padding-top:30px;font-size:18px;font-weight:bold;">+ 환경 정보</div>
@@ -595,7 +566,7 @@ Latest commit 6265343 6 hours ago
 </div>
 
 <!-- 지도 영역 -->
-<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=65bdbe35b21eabad4db595e6a9c785ec&libraries=services"></script>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=bc9223f1d1450a971d7c95c68824595d&libraries=services"></script>
 <script>
 	var mapContainer = document.getElementById('map');
 	var	mapOption = {
@@ -622,42 +593,112 @@ Latest commit 6265343 6 hours ago
 	});    
 </script>
 
+<!-- 이미지 -->
 <script>
-	function multireadImage(input) {
-		let multi = document.getElementById("multi_img");
-		if(input.files) {
-			let fileArr = Array.from(input.files);
-			let $colDiv1 = document.createElement("div");
-        	let $colDiv2 = document.createElement("div");
-			$colDiv1.classList.add("column");
-			$colDiv2.classList.add("column");
-			fileArr.forEach((file, index) => {
-				let reader = new FileReader();
-				const $imgDiv = document.createElement("div");   
-				const $img = document.createElement("img");
-				$img.classList.add("image");
-				$imgDiv.appendChild($img);
-				reader.onload = e => {
-					$img.src = e.target.result;
-					
-					// $imgDiv.style.width = "200px";
-					// $imgDiv.style.height = "200px";
-				}
-				if(index % 2 == 0) {
-					$colDiv1.appendChild($imgDiv);
-				} else {
-					$colDiv2.appendChild($imgDiv);
-				}
-				reader.readAsDataURL(file);
-			});
-			multi.appendChild($colDiv1);
-			multi.appendChild($colDiv2);
-		}
-	}
-	const inputMultipleImage = document.getElementById("fileUpload");
-	inputMultipleImage.addEventListener("change", e => {
-		multireadImage(e.target)
-	});        
+( imageView = function imageView(img_div, btn) {
+
+    var img_div = document.getElementById(img_div);
+    var btnAdd = document.getElementById(btn)
+    var sel_files = [];
+    
+    // 이미지와 체크 박스를 감싸고 있는 div 속성
+    var div_style = 'display:inline-block;position:relative;'
+                  + 'width:150px;height:120px;margin:5px;z-index:1';
+    // 미리보기 이미지 속성
+    var img_style = 'width:100%;height:100%;z-index:none';
+    // 이미지안에 표시되는 체크박스의 속성
+    var chk_style = 'width:20px;height:20px;position:absolute;right:0px;top:0px;border:none;font-size:large;'
+					+'font-weight:bolder;background:none;color:black;padding-bottom:20px;';
+  
+    btnAdd.onchange = function(e) {
+      var files = e.target.files;
+      var fileArr = Array.prototype.slice.call(files)
+      for (f of fileArr) {
+        imageLoader(f);
+      }
+    }  
+  
+    /*첨부된 이미지들을 배열에 넣고 미리보기 */
+    imageLoader = function(file) {
+      sel_files.push(file);
+      var reader = new FileReader();
+      reader.onload = function(ee){
+        let img = document.createElement('img')
+        img.setAttribute('style', img_style)
+        img.src = ee.target.result;
+        img_div.appendChild(makeDiv(img, file));
+      }
+      
+      reader.readAsDataURL(file);
+    }
+    
+    makeDiv = function(img, file){
+      var div = document.createElement('div')
+      div.setAttribute('style', div_style)
+      
+      var btn = document.createElement('input')
+      btn.setAttribute('type', 'button')
+      btn.setAttribute('value', 'x')
+      btn.setAttribute('delFile', file.name);
+      btn.setAttribute('style', chk_style);
+      btn.onclick = function(ev){
+        var ele = ev.srcElement;
+        var delFile = ele.getAttribute('delFile');
+        for (var i=0 ;i<sel_files.length; i++) {
+          if (delFile== sel_files[i].name) {
+            sel_files.splice(i, 1);      
+          }
+        }
+        
+        dt = new DataTransfer();
+        for (f in sel_files) {
+          var file = sel_files[f];
+          dt.items.add(file);
+        }
+        btnAdd.files = dt.files;
+        var p = ele.parentNode;
+        img_div.removeChild(p)
+      }
+      div.appendChild(img)
+      div.appendChild(btn)
+      return div
+    }
+  }
+)('img_div', 'btnAdd')
+
+</script>
+
+
+
+<script>
+	function delete_img(store_cd, seq){
+        let img_show = document.querySelectorAll("#img_show_div");
+
+		console.log(img_show);
+
+        if(confirm("선택한 사진을 삭제하시겠습니까?")){
+            $.ajax({
+                method: 'post',
+                url: '/store/standard/std02/del_img',
+                data: {data_img : store_cd, seq : seq},
+                success: function(data) {
+                    if (data.code == '200') {
+                        for (let i = 0;i<img_show.length;i++) {
+                            if (img_show[i].dataset.img == seq) {
+                                img_show[i].remove();
+                                break;
+                            }
+                        }
+                    } else {
+                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                    }
+                },
+                error: function(res, status, error) {
+                    console.log(error);
+                }
+            });
+        }
+    }
 </script>
 
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
@@ -669,15 +710,17 @@ Latest commit 6265343 6 hours ago
     }
     // 매장정보 등록
     async function addStore() {
-		const form = new FormData(document.querySelector("#f1"));
-		for(let i = 0; i< $("#fileUpload")[0].files.length; i++) {
-			form.append("file[]", $("#fileUpload")[0].files[i] || '');
+		let form = new FormData(document.querySelector("#f1"));
+		for(let i = 0; i< $("#btnAdd")[0].files.length; i++) {
+			form.append("file[]", $("#btnAdd")[0].files[i] || '');
 		}
 		for(let form_data of form.entries()) {
 			form_data[0], form_data[1];
 		}
-        // if( !validation('add') )	return;
-        // if( !window.confirm("매장정보를 등록하시겠습니까?") )	return;
+
+        if( !validation('add') )	return;
+        if( !window.confirm("매장정보를 등록하시겠습니까?") )	return;
+
         axios({
             url: `/store/standard/std02/update`,
             method: 'post',
@@ -697,13 +740,20 @@ Latest commit 6265343 6 hours ago
     }
     // 매장정보 수정
     async function updateStore() {
-		var frm	= $('form[name="f1"]');
+		// var frm	= $('form[name="f1"]');
+		let form = new FormData(document.querySelector("#f1"));
+
+		for (let i = 0; i< $("#btnAdd")[0].files.length; i++) {
+			form.append("file[]", $("#btnAdd")[0].files[i] || '');
+		}
+
 		if(!validation('update')) return;
         if(!window.confirm("매장정보를 수정하시겠습니까?")) return;
+
         axios({
             url: `/store/standard/std02/update`,
             method: 'post',
-            data: frm.serialize(),
+            data: form,
         }).then(function (res) {
             if(res.data.code === 200) {
                 alert(res.data.msg);
