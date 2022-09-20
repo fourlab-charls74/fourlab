@@ -60,7 +60,7 @@
                                                     <div class="btn-group ml-2">
                                                         <button class="btn btn-outline-primary apply-btn" type="button" onclick="upload();">적용</button>
                                                     </div>
-                                                    <a href="/sample/sample_store_sugi_batch.xlsx" class="ml-2" style="text-decoration: underline !important;">수기 일괄판매 양식 다운로드</a>
+                                                    <a href="/sample/sample_sugi_batch.xlsx" class="ml-2" style="text-decoration: underline !important;">수기 일괄판매 양식 다운로드</a>
                                                 </div>
                                             </td>
                                         </tr>
