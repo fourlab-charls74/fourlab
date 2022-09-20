@@ -13,7 +13,7 @@
             </div>
         </div>
         <div class="d-flex">
-            <a href="javascript:void(0);" onclick="return Validate(document.f1)" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 판매등록</a>
+            <a href="javascript:void(0);" onclick="return save();" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 판매등록</a>
             <a href="javascript:void(0);" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i> 닫기</a>
         </div>
     </div>
@@ -40,7 +40,7 @@
                                 <table class="table incont table-bordered" width="100%" cellspacing="0">
                                     <tbody>
                                         <tr>
-                                            <th class="required">판매매장</th>
+                                            <th class="required">주문매장</th>
                                             <td>
                                                 <div class="flax_box mr-2">
                                                     <div class="form-inline inline_btn_box w-100">
@@ -65,16 +65,6 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th>출고형태</th>
-                                            <td>
-                                                <div class="flax_box">
-                                                    <select name="ord_type" id="ord_type" class="form-control form-control-sm">
-                                                        @foreach(@$ord_types as $val)
-                                                            <option value="{{$val->code_id}}" @if($val->code_id == '14') selected @endif>{{$val->code_val}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </td>
                                             <th>입금은행</th>
                                             <td>
                                                 <div class="flax_box">
@@ -82,6 +72,16 @@
                                                         <option value="">선택하세요.</option>
                                                         @foreach($banks as $bank)
                                                             <option value="{{$bank->name}}">{{$bank->value}}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </td>
+                                            <th>출고형태</th>
+                                            <td>
+                                                <div class="flax_box">
+                                                    <select name="ord_type" id="ord_type" class="form-control form-control-sm" disabled>
+                                                        @foreach(@$ord_types as $val)
+                                                            <option value="{{$val->code_id}}" @if($val->code_id == '14') selected @endif>{{$val->code_val}}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -117,36 +117,45 @@
 </div>
 
 <!-- script -->
+<script src="https://unpkg.com/xlsx-style@0.8.13/dist/xlsx.full.min.js"></script>
 @include('store_with.stock.stk03_batch_js')
 <script language="javascript">
     let columns = [
-        // {headerCheckboxSelection: true, checkboxSelection: true,  width: 28},
-        {field: "result", headerName: "결과", width: 100, cellStyle: StyleLineHeight},
-        {field: "ord_no", headerName: "주문번호", width: 100, cellStyle: StyleLineHeight},
-        {field: "out_ord_no", headerName: "판매처 주문번호", width: 100, cellStyle: StyleLineHeight},
-        {field: "ord_date", headerName: "주문일", width: 100, cellStyle: StyleLineHeight},
+        {field: "result", headerName: "결과", width: 100, cellStyle: (params) => ({...StyleLineHeight, "color": params.value == '200' ? 'green' : 'red'}),
+            cellRenderer: (params) => params.value == null ? '' : params.value  == '200' ? '성공' : ('실패(' + (out_order_errors[params.value] || '') + ')')
+        },
+        // {field: "ord_no", headerName: "주문번호", width: 100, cellStyle: StyleLineHeight},
+        {field: "out_ord_no", headerName: "매장 주문번호", width: 100, cellStyle: StyleLineHeight},
+        {field: "ord_date", headerName: "주문일", width: 80, cellStyle: StyleLineHeight},
         {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: StyleLineHeight},
         {field: "goods_no", headerName: "상품번호", width: 60, cellStyle: StyleLineHeight},
-        {field: "goods_nm", headerName: "상품명", type: "HeadGoodsNameType", width: 227, wrapText: true, autoHeight: true},
-        {field: "goods_opt", headerName: "옵션", width: 130},
-        {field: "qty", headerName: "수량", width: 60, type: 'currencyType'},
-        {field: "price", headerName: "판매가", width: 60, type: 'currencyType'},
-        {field: "dlv_amt", headerName: "배송비", width: 60, type: 'currencyType'},
-        {field: "dlv_amt", headerName: "추가배송비", width: 60, type: 'currencyType'},
-        {field: "dlv_amt", headerName: "주문자 ID", width: 100},
-        {field: "dlv_amt", headerName: "주문자", width: 100},
-        {field: "dlv_amt", headerName: "주문자 전화", width: 100},
-        {field: "dlv_amt", headerName: "주문자 휴대전화", width: 100},
-        {field: "dlv_amt", headerName: "수령자", width: 100},
-        {field: "dlv_amt", headerName: "수령자 전화", width: 100},
-        {field: "dlv_amt", headerName: "수령자 휴대전화", width: 100},
-        {field: "dlv_amt", headerName: "수령 우편번호", width: 100},
-        {field: "dlv_amt", headerName: "수령 주소", width: 100},
-        {field: "dlv_amt", headerName: "배송메세지", width: 100},
-        {field: "dlv_amt", headerName: "택배업체", width: 100},
-        {field: "dlv_amt", headerName: "송장번호", width: 100},
-        {field: "dlv_amt", headerName: "출고메세지", width: 100},
-        {field: "dlv_amt", headerName: "판매수수료율", width: 100},
+        {field: "goods_nm", headerName: "상품명", type: "HeadGoodsNameType", width: 230, cellStyle: {"line-height": "30px"}},
+        {field: "goods_opt", headerName: "옵션", width: 180, cellStyle: {"line-height": "30px"}},
+        {field: "qty", headerName: "수량", width: 50, type: 'currencyType', cellStyle: {"line-height": "30px"}},
+        {field: "price", headerName: "판매가", width: 60, type: 'currencyType', cellStyle: {"line-height": "30px"}},
+        {field: "dlv_amt", headerName: "배송비", width: 60, type: 'currencyType', cellStyle: {"line-height": "30px"}},
+        {field: "add_dlv_amt", headerName: "추가배송비", width: 70, type: 'currencyType', cellStyle: {"line-height": "30px"}},
+        {field: "pay_type", headerName: "결제방법", width: 60, cellStyle: StyleLineHeight,
+            cellRenderer: (params) => params.value == 1 ? '현금' : '카드',
+        },
+        {field: "pay_date", headerName: "입금일자", width: 80, cellStyle: StyleLineHeight},
+        {field: "bank_inpnm", headerName: "입금자명", width: 60, cellStyle: StyleLineHeight},
+        {field: "user_id", headerName: "주문자 ID", width: 80, cellStyle: StyleLineHeight},
+        {field: "user_nm", headerName: "주문자", width: 60, cellStyle: StyleLineHeight},
+        {field: "phone", headerName: "주문자 전화", width: 80, cellStyle: StyleLineHeight},
+        {field: "mobile", headerName: "주문자 휴대전화", width: 100, cellStyle: StyleLineHeight},
+        {field: "r_nm", headerName: "수령자", width: 60, cellStyle: StyleLineHeight},
+        {field: "r_phone", headerName: "수령자 전화", width: 80, cellStyle: StyleLineHeight},
+        {field: "r_mobile", headerName: "수령자 휴대전화", width: 100, cellStyle: StyleLineHeight},
+        {field: "r_zipcode", headerName: "수령 우편번호", width: 100, cellStyle: StyleLineHeight},
+        {field: "r_addr1", headerName: "수령 주소", width: 170, cellStyle: {"line-height": "30px"},
+            cellRenderer: (params) => `${params.data.r_addr1 || ''} ${params.data.r_addr2 || ''}`
+        },
+        {field: "dlv_msg", headerName: "배송메세지", width: 130, cellStyle: {"line-height": "30px"}},
+        {field: "dlv_cd", headerName: "택배업체", width: 80, cellStyle: StyleLineHeight},
+        {field: "dlv_no", headerName: "송장번호", width: 80, cellStyle: StyleLineHeight},
+        {field: "dlv_comment", headerName: "출고메세지", width: 130, cellStyle: {"line-height": "30px"}},
+        {field: "fee_rate", headerName: "판매수수료율", width: 90, type: 'currencyType', cellStyle: {"line-height": "30px"}},
     ];
 </script>
 
@@ -160,29 +169,7 @@
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
-
-        // 파일선택 시 화면에 표기
-        $('#excel_file').on('change', function(e){
-            if (validateFile() === false) {
-                $('.custom-file-label').html("");
-                return;
-            }
-            $('.custom-file-label').html(this.files[0].name);
-        });
     });
-
-    // 선택파일형식 검사
-    const validateFile = () => {
-        const target = $('#excel_file')[0].files;
-
-        if (target.length > 1) return alert("파일은 1개만 올려주세요.");
-
-        if (target === null || target.length === 0) return alert("업로드할 파일을 선택해주세요.");
-
-        if (!/(.*?)\.(xlsx|XLSX)$/i.test(target[0].name)) return alert("Excel파일만 업로드해주세요.(xlsx)");
-
-        return true;
-    };
 
 </script>
 @stop

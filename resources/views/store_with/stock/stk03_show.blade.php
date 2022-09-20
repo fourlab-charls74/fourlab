@@ -131,7 +131,7 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th>출고메시지</th>
+                                                <th>배송메시지</th>
                                                 <td colspan="5">
                                                     <div class="flax_box">
                                                         <textarea name="dlv_msg" id="dlv_msg" class="form-control form-control-sm" cols="0" rows="0" value=""></textarea>

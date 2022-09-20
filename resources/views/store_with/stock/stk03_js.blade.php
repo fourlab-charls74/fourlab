@@ -1,5 +1,15 @@
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script>
+    const out_order_errors = {
+        '-100': "매장 주문번호 없음",
+        '-101': "상품코드 없음",
+        '-102': "상품코드 부정확",
+        '-103': "수량정보 부정확",
+        '-104': "판매가 부정확",
+        '-105': "재고 부족",
+        '500': "서버 오류",
+    };
+
     /**
      * 수기판매 등록
     */
@@ -91,8 +101,13 @@
             data: order_data,
             success: function (res) {
                 is_processing = false;
-                alert("저장되었습니다.");
-                document.location.href = '/head/order/ord01/' + res.ord_no;
+                if(res.code == '200') {
+                    alert("저장되었습니다.");
+                    opener.Search();
+                    document.location.href = '/head/order/ord01/' + res.ord_no;
+                } else {
+                    alert("저장에 실패했습니다.\n실패 사유 : " + out_order_errors[res.code]);
+                }
             },
             error: function(e) {
                 is_processing = false;
