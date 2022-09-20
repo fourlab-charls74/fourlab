@@ -5,6 +5,7 @@ namespace App\Http\Controllers\store\standard;
 use App\Components\SLib;
 use App\Http\Controllers\Controller;
 use App\Components\Lib;
+use App\Components\ULib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -187,7 +188,6 @@ class std02Controller extends Controller
 		$msg		= "매장정보가 정상적으로 반영되었습니다.";
 		$store_cd 	= $request->input('store_cd');
 		$image 		= $request->file('file');
-		$last_seq 	= "";
 
 		try {
 			DB::beginTransaction();
@@ -258,47 +258,63 @@ class std02Controller extends Controller
 			if (!Storage::disk('public')->exists($base_path)) {
 				Storage::disk('public')->makeDirectory($base_path);
 			}
-			$ig_cnt = "";
+
+			// if ($image != null &&  $image != "") {
+			// 	foreach ($image as $key => $ig) {
+			// 		$ig_cnt = $key + 1;
+					
+			// 		$file_name = sprintf("%s_%s.jpg", $store_cd, "$ig_cnt");
+			// 		$save_file = sprintf("%s/%s", $base_path, $file_name);
+			// 		Storage::disk('public')->putFileAs($base_path, $ig, $file_name);
+
+			// 		$insert_values = [
+			// 			'img_url' => $save_file,
+			// 			'store_cd' => $store_cd,
+			// 			'seq' => $ig_cnt,
+			// 			'rt' => now(),
+			// 			'admin_id' => $id
+			// 		];
+			// 		DB::table('store_img')->insert($insert_values);
+			// 	}
+			// }
+
+			$sql = "
+				select seq
+				from store_img
+				where store_cd = '$store_cd'
+				order by seq desc
+				limit 1
+			";
+			$res = DB::selectOne($sql);
+
+			$last_seq = 0;
+
+			if($res !== null) {
+				$last_seq = $res->seq;
+			}
+
 			if ($image != null &&  $image != "") {
-				foreach ($image as $key => $ig) {
-					$ig_cnt = $key + 1;
-					$file_name = sprintf("%s_%s.jpg", $store_cd, "$ig_cnt");
+				foreach ($image as $ig) {
+					$cnt = $last_seq + 1;
+					
+					$file_name = sprintf("%s_%s.jpg", $store_cd, "$cnt");
 					$save_file = sprintf("%s/%s", $base_path, $file_name);
 					Storage::disk('public')->putFileAs($base_path, $ig, $file_name);
 
 					$insert_values = [
 						'img_url' => $save_file,
 						'store_cd' => $store_cd,
-						'seq' => $ig_cnt,
+						'seq' => $cnt,
 						'rt' => now(),
 						'admin_id' => $id
 					];
-					DB::table('store_img')->Insert($insert_values);
+					DB::table('store_img')->insert($insert_values);
+					$last_seq++;
 				}
+				
 			}
 
-			$last_seq = $ig_cnt;
 
-			if ($image != null &&  $image != "") {
-				foreach ($image as $key => $ig) {
-					$img_seq = $last_seq + 1;
-					$file_name = sprintf("%s_%s.jpg", $store_cd, "$img_seq");
-					$save_file = sprintf("%s/%s", $base_path, $file_name);
-					Storage::disk('public')->putFileAs($base_path, $ig, $file_name);
-
-					$update_values = [
-						'store_cd' => $store_cd,
-						'img_url' => $save_file,
-						'seq' => $img_seq,
-						'ut' => now(),
-						'admin_id' => $id
-					];
-					DB::table('store_img')->updateOrInsert($where,$update_values);
-					
-				}
-			}
-
-			
 			DB::commit();
 
 			return response()->json(["code" => $code, "msg" => $msg, "store_cd" => $request->input('store_cd')]);
@@ -307,8 +323,7 @@ class std02Controller extends Controller
 			$msg = $e->getMessage();
 			DB::rollback();
 			return response()->json(["code" => '500', 'msg' => $msg]);
-			// "에러가 발생했습니다. 잠시 후 다시시도 해주세요."
-
+			// 에러가 발생했습니다. 잠시 후 다시시도 해주세요.
 		}
 	}
 
@@ -320,6 +335,14 @@ class std02Controller extends Controller
 		try {
             DB::beginTransaction();
 
+			$sel_sql = "
+				select img_url
+				from store_img
+				where store_cd = '$store_cd' and seq = $seq
+
+			";
+			$row = DB::selectOne($sel_sql);
+
             $sql = "
                 delete 
                 from store_img
@@ -327,6 +350,9 @@ class std02Controller extends Controller
             ";
 
             DB::delete($sql);
+			
+
+			ULib::deleteFile($row->img_url);
 
             DB::commit();
             $code = '200';

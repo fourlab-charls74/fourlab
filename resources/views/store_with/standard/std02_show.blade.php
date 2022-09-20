@@ -5,7 +5,6 @@
 @endphp
 @section('title', $title)
 @section('content')
-
 <div class="show_layout py-3 px-sm-3">
     <div class="page_tit d-flex justify-content-between">
         <div class="d-flex">
