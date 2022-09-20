@@ -131,18 +131,21 @@ CREATE TABLE `product_stock_hst` (
     `goods_no` INT(11) NOT NULL DEFAULT '0' COMMENT '상품번호',
     `prd_cd` VARCHAR(50) NOT NULL DEFAULT '0' COMMENT '상품코드',
     `goods_opt` VARCHAR(100) NOT NULL DEFAULT '' COMMENT '상품옵션명',
-    `store_cd` VARCHAR(30) NOT NULL DEFAULT '0' COMMENT '매장코드',
-    `type` VARCHAR(50) DEFAULT NULL COMMENT '분류',
-    `cost` DECIMAL(10,0) DEFAULT NULL COMMENT '원가',
+    `location_cd` VARCHAR(30) NOT NULL DEFAULT '0' COMMENT '매장코드 or 창고코드',
+    `location_type` VARCHAR(10) NOT NULL COMMENT '매장(STORE) / 창고(STORAGE)',
+    `type` VARCHAR(30) DEFAULT NULL COMMENT '분류 - code: product_stock_type', -- (주문(2) / 교환(5) / 환불(6) / 주문취소(7) / 재고조정(9) / 반품(11) / LOSS(14) / RT(15))
+    `price` INT(11) DEFAULT NULL COMMENT '판매가',
+    `wonga` DECIMAL(10,0) DEFAULT NULL COMMENT '원가',
     `qty` INT(11) DEFAULT NULL COMMENT '수량',
     `invoice_no` VARCHAR(20) DEFAULT NULL COMMENT '송장번호',
     `stock_state_date` VARCHAR(8) DEFAULT NULL COMMENT '재고상태일시',
     `com_id` VARCHAR(20) DEFAULT NULL COMMENT '업체ID',
     `ord_opt_no` INT(11) DEFAULT NULL COMMENT '주문옵션번호',
-    `uid` VARCHAR(50) DEFAULT NULL COMMENT '처리자',
-    `unm` VARCHAR(50) DEFAULT NULL COMMENT '처리자명',
+    `comment` VARCHAR(100) DEFAULT NULL COMMENT '메모',
     `rt` DATETIME DEFAULT NULL COMMENT '등록일시',
     `ut` DATETIME DEFAULT NULL COMMENT '변경일시',
+    `admin_id` VARCHAR(50) DEFAULT NULL COMMENT '처리자',
+    `admin_nm` VARCHAR(50) DEFAULT NULL COMMENT '처리자명',
     PRIMARY KEY (`idx`),
     KEY `goods_no` (`goods_no`,`goods_opt`),
     KEY `prd_cd` (`prd_cd`),
@@ -1996,6 +1999,18 @@ insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_va
 -- code_kind 데이터 추가 행사코드 : SR_REASON
 insert into `code_kind` (`code_kind_cd`, `code_kind_nm`, `code_kind_nm_eng`, `use_yn`, `type`, `seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('SR_REASON','[매장관리]반품사유','sr_reason','Y',NULL,'0','','본사_김용남',now(),now());
 
+-- code 데이터 추가 행사코드 : PRODUCT_STOCK_TYPE
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PRODUCT_STOCK_TYPE','2','주문','','','','Y','1','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PRODUCT_STOCK_TYPE','5','교환','','','','Y','2','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PRODUCT_STOCK_TYPE','6','환불','','','','Y','3','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PRODUCT_STOCK_TYPE','7','주문취소','','','','Y','4','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PRODUCT_STOCK_TYPE','9','재고조정','','','','Y','5','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PRODUCT_STOCK_TYPE','11','반품','','','','Y','6','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PRODUCT_STOCK_TYPE','14','LOSS','','','','Y','7','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PRODUCT_STOCK_TYPE','15','RT','','','','Y','8','ceduce','본사_김용남',now(),now());
+
+-- code_kind 데이터 추가 행사코드 : PRODUCT_STOCK_TYPE
+insert into `code_kind` (`code_kind_cd`, `code_kind_nm`, `code_kind_nm_eng`, `use_yn`, `type`, `seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PRODUCT_STOCK_TYPE','[매장관리]재고분류','product_stock_type','Y',NULL,'0','','본사_김용남',now(),now());
 --
 -- 테이블 데이터 추가 종료
 --
