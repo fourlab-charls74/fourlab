@@ -1606,7 +1606,7 @@ class Order
 						'type' => 2, // 재고분류 : 주문
 						'price' => $ord_price,
 						'wonga' => $wonga,
-						'qty' => $ord_qty,
+						'qty' => $ord_qty * -1,
 						'stock_state_date' => date('Ymd'),
 						'ord_opt_no' => $ord_opt_no,
 						'comment' => '수기판매',
@@ -1729,7 +1729,7 @@ class Order
 						'type' => 2, // 재고분류 : 주문
 						'price' => $ord_price,
 						'wonga' => $wonga,
-						'qty' => $ord_qty,
+						'qty' => $ord_qty * -1,
 						'stock_state_date' => date('Ymd'),
 						'ord_opt_no' => $ord_opt_no,
 						'comment' => '수기판매',
@@ -1841,4 +1841,132 @@ class Order
 
 		return $result_code;
 	}
+
+	/** 매장주문 삭제 */
+	function DeleteStoreOrder($ord_no)
+    {
+		$code = 1;
+
+		try {
+			DB::beginTransaction();
+
+            $user_id = "";
+            $pay_point = 0;
+
+            // 주문 정보 얻기
+            $sql = /** @lang text */
+                "
+                select 
+                    a.ord_no, a.ord_state, a.out_ord_no, a.sale_place, a.user_id
+                    , b.ord_opt_no, b.prd_cd, b.goods_no, b.goods_sub, b.goods_opt, b.qty, c.pay_point, a.store_cd
+                from order_mst a
+                    inner join order_opt b on a.ord_no = b.ord_no
+                    inner join payment c on a.ord_no = c.ord_no
+                where a.ord_no = :ord_no
+            ";
+            $rows = DB::select($sql, array("ord_no" => $ord_no));
+
+            foreach ($rows as $row) {
+                $ord_state = $row->ord_state;
+                $out_ord_no = $row->out_ord_no;
+                $sale_place = $row->sale_place;
+                $user_id = $row->user_id;
+
+                $ord_opt_no = $row->ord_opt_no;
+				$prd_cd = $row->prd_cd;
+                $goods_no = $row->goods_no;
+                $goods_sub = $row->goods_sub;
+                $goods_opt = $row->goods_opt;
+                $ord_qty = $row->qty;
+                $pay_point = $row->pay_point;
+				$store_cd = $row->store_cd;
+
+				// 출고요청일 때, 재고 환원
+                if ($ord_state >= 10) {
+					if ($store_cd != '') {				
+						DB::table('product_stock_store')
+							->where('prd_cd', '=', $prd_cd)
+							->where('store_cd', '=', $store_cd) 
+							->update([
+								'wqty' => DB::raw('wqty + ' . $ord_qty),
+								'ut' => now(),
+							]);
+						DB::table('product_stock')
+							->where('prd_cd', '=', $prd_cd)
+							->update([
+								'out_qty' => DB::raw('out_qty - ' . $ord_qty),
+								'qty' => DB::raw('qty + ' . $ord_qty),
+								'ut' => now(),
+							]);
+					} else {
+						DB::table('product_stock_storage')
+							->where('prd_cd', '=', $prd_cd)
+							->where('storage_cd', '=', DB::raw("(select storage_cd from storage where default_yn = 'Y')"))
+							->update([
+								'wqty' => DB::raw('wqty + ' . $ord_qty),
+								'ut' => now(),
+							]);
+						DB::table('product_stock')
+							->where('prd_cd', '=', $prd_cd)
+							->update([
+								'out_qty' => DB::raw('out_qty - ' . $ord_qty),
+								'qty' => DB::raw('qty + ' . $ord_qty),
+								'wqty' => DB::raw('wqty + ' . $ord_qty),
+								'ut' => now(),
+							]);
+					}
+	
+					DB::table("product_stock_hst")
+						->where("ord_opt_no", $ord_opt_no)
+						->delete();
+                }
+
+                DB::table("order_opt")
+                    ->where("ord_opt_no", $ord_opt_no)
+                    ->delete();
+
+                DB::table("order_opt_wonga")
+                    ->where("ord_opt_no", $ord_opt_no)
+                    ->delete();
+
+                DB::table("order_state")
+                    ->where("ord_opt_no", $ord_opt_no)
+                    ->delete();
+
+                DB::table("order_opt_addopt")
+                    ->where("ord_opt_no", $ord_opt_no)
+                    ->delete();
+            }
+
+            if ($user_id != "") {
+                DB::table("point_list")
+                    ->where("user_id", $user_id)
+                    ->where("ord_no", $ord_no)
+                    ->delete();
+
+                if ($pay_point > 0) {
+                    DB::table("member")
+                        ->where("user_id", $user_id)
+                        ->update([
+                            'point' => DB::raw("point + $pay_point")
+                        ]);
+                }
+            }
+
+            DB::table("payment")
+                ->where("ord_no", $ord_no)
+                ->delete();
+
+            DB::table("order_mst")
+                ->where("ord_no", $ord_no)
+                ->delete();
+
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+			$code = 0;
+        }
+
+		return $code;
+    }
 }

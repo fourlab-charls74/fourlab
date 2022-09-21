@@ -195,6 +195,7 @@ class stk03Controller extends Controller
             select
                 a.ord_no,
                 a.ord_opt_no,
+                a.ord_state as ord_state_cd,
                 ord_state.code_val as ord_state,
                 clm_state.code_val as clm_state,
                 pay_stat.code_val as pay_stat,
@@ -317,6 +318,40 @@ class stk03Controller extends Controller
                 "page_total" => count($result)
             ],
             "body" => $result,
+        ]);
+    }
+
+    /** 출고 전 주문삭제 */
+    public function del_order(Request $request)
+    {
+        $ord_nos = $request->input('ord_nos', []);
+        $user = [
+            'id' => Auth('head')->user()->id,
+            'name' => Auth('head')->user()->name
+        ];
+
+        $code = '200';
+        $msg = '';
+        $success_cnt = 0;
+
+        try {
+            $order = new Order($user);
+            foreach ($ord_nos as $ord_no) {
+                $success = $order->DeleteStoreOrder($ord_no);
+                $success_cnt += $success;
+            }
+        } catch(Exception $e) {
+            $code = '500';
+            $msg = $e->getMessage();
+        }
+
+        return response()->json([
+            'code' => $code, 
+            'msg' => $msg, 
+            'data' => [
+                'total_count' => count($ord_nos), 
+                'success_count' => $success_cnt
+            ],
         ]);
     }
 

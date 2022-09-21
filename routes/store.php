@@ -209,6 +209,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 매장주문
         Route::get('stk03', 'stk03Controller@index');
         Route::get('stk03/search', 'stk03Controller@search');
+        Route::delete('stk03', 'stk03Controller@del_order'); // 출고 전 주문삭제
         Route::get('stk03/create', 'stk03Controller@create');
         Route::post('stk03/save', 'stk03Controller@save');
         Route::get('stk03/batch-create', 'stk03Controller@batch_create');
