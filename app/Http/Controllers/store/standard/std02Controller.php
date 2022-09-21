@@ -145,7 +145,6 @@ class std02Controller extends Controller
 			$store_img = DB::select($img_sql, ["store_cd" => $store_cd]);
 		}
 
-		// dd($store_img);
 
 		$values = [
 			"cmd"	=> $store_cd == '' ? "" : "update",
@@ -188,6 +187,10 @@ class std02Controller extends Controller
 		$msg		= "매장정보가 정상적으로 반영되었습니다.";
 		$store_cd 	= $request->input('store_cd');
 		$image 		= $request->file('file');
+		$y 			= $request->input('y');
+		$x 			= $request->input('x');
+		$map_code 	= $y.', '.$x;
+	
 
 		try {
 			DB::beginTransaction();
@@ -246,7 +249,9 @@ class std02Controller extends Controller
 				'point_out_yn'	=> $request->input('point_out_yn'),
 				'reg_date'		=> now(),
 				'mod_date'		=> now(),
-				'admin_id'		=> $id
+				'admin_id'		=> $id,
+				'map_code'		=> $map_code
+				
 			];
 
 			DB::table('store')->updateOrInsert($where, $values);
@@ -258,25 +263,6 @@ class std02Controller extends Controller
 			if (!Storage::disk('public')->exists($base_path)) {
 				Storage::disk('public')->makeDirectory($base_path);
 			}
-
-			// if ($image != null &&  $image != "") {
-			// 	foreach ($image as $key => $ig) {
-			// 		$ig_cnt = $key + 1;
-					
-			// 		$file_name = sprintf("%s_%s.jpg", $store_cd, "$ig_cnt");
-			// 		$save_file = sprintf("%s/%s", $base_path, $file_name);
-			// 		Storage::disk('public')->putFileAs($base_path, $ig, $file_name);
-
-			// 		$insert_values = [
-			// 			'img_url' => $save_file,
-			// 			'store_cd' => $store_cd,
-			// 			'seq' => $ig_cnt,
-			// 			'rt' => now(),
-			// 			'admin_id' => $id
-			// 		];
-			// 		DB::table('store_img')->insert($insert_values);
-			// 	}
-			// }
 
 			$sql = "
 				select seq
@@ -300,16 +286,19 @@ class std02Controller extends Controller
 					$file_name = sprintf("%s_%s.jpg", $store_cd, "$cnt");
 					$save_file = sprintf("%s/%s", $base_path, $file_name);
 					Storage::disk('public')->putFileAs($base_path, $ig, $file_name);
-
-					$insert_values = [
-						'img_url' => $save_file,
-						'store_cd' => $store_cd,
-						'seq' => $cnt,
-						'rt' => now(),
-						'admin_id' => $id
-					];
-					DB::table('store_img')->insert($insert_values);
-					$last_seq++;
+					$jpg = ".jpg";
+					
+					if (strpos($file_name, $jpg) !== false) {
+						$insert_values = [
+							'img_url' => $save_file,
+							'store_cd' => $store_cd,
+							'seq' => $cnt,
+							'rt' => now(),
+							'admin_id' => $id
+						];
+						DB::table('store_img')->insert($insert_values);
+						$last_seq++;
+					}
 				}
 				
 			}

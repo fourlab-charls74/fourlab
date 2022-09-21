@@ -114,9 +114,9 @@
 								<span class="text_line">/</span>
 								<div class="form-inline-inner input_box" style="width:45%;">
 									<select name="ord_field" class="form-control form-control-sm">
-										<option value="a.store_nm" selected>매장명</option>
+										<option value="a.store_nm" >매장명</option>
 										<option value="a.store_cd" >매장코드</option>
-										<option value="a.reg_date" >등록일</option>
+										<option value="a.reg_date" selected>등록일</option>
 									</select>
 								</div>
 								<div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -124,8 +124,8 @@
 										<label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="" data-original-title="내림차순"><i class="bx bx-sort-down"></i></label>
 										<label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="" data-original-title="오름차순"><i class="bx bx-sort-up"></i></label>
 									</div>
-									<input type="radio" name="ord" id="sort_desc" value="desc">
-									<input type="radio" name="ord" id="sort_asc" value="asc" checked="">
+									<input type="radio" name="ord" id="sort_desc" value="desc" checked="">
+									<input type="radio" name="ord" id="sort_asc" value="asc" >
 								</div>
 							</div>
 
