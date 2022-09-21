@@ -131,7 +131,7 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th>출고메시지</th>
+                                                <th>배송메시지</th>
                                                 <td colspan="5">
                                                     <div class="flax_box">
                                                         <textarea name="dlv_msg" id="dlv_msg" class="form-control form-control-sm" cols="0" rows="0" value=""></textarea>
@@ -333,7 +333,7 @@
                                                 <th>적립금사용</th>
                                                 <td style="padding:0px 10px 0px 10px;">
                                                     <div class="flax_box" style="justify-content:flex-end;">
-                                                        <input type="text" id="point_amt" name="point_amt" class="form-control form-control-sm" placeholder="0" style="width:calc(40% - 10px);margin-right:10px;text-align: right;">
+                                                        <input type="text" id="point_amt" name="point_amt" class="form-control form-control-sm" placeholder="0" style="width:calc(40% - 10px);margin-right:10px;text-align: right;" readonly>
                                                         <span>원</span>
                                                     </div>
                                                 </td>

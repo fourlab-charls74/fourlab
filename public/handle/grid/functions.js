@@ -325,7 +325,7 @@ const StyleEditCell = {
     'border-right' : '1px solid #e0e7e7'
 };
 
-const StyleLineHight = {
+const StyleLineHeight = {
     'line-height': '30px',
     'text-align': 'center',
 };

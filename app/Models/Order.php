@@ -1429,6 +1429,7 @@ class Order
 
 	public function ProcStoreOrder($ord_opt_no = "", $point_flag = true, $sms_flag = true)
 	{
+		$result_code = 1;
 		$ord_no = $this->ord_no;
 		$where = " a.ord_no = '$ord_no' ";
 
@@ -1554,7 +1555,7 @@ class Order
 				// 출고요청 주문 처리
 
 				// 재고차감
-				if ($store_cd != '') {
+				if ($store_cd != '') {				
 					DB::table('product_stock_store')
 						->where('prd_cd', '=', $prd_cd)
 						->where('store_cd', '=', $store_cd) 
@@ -1565,6 +1566,7 @@ class Order
 					DB::table('product_stock')
 						->where('prd_cd', '=', $prd_cd)
 						->update([
+							'out_qty' => DB::raw('out_qty + ' . $ord_qty),
 							'qty' => DB::raw('qty - ' . $ord_qty),
 							'ut' => now(),
 						]);
@@ -1579,6 +1581,7 @@ class Order
 					DB::table('product_stock')
 						->where('prd_cd', '=', $prd_cd)
 						->update([
+							'out_qty' => DB::raw('out_qty + ' . $ord_qty),
 							'qty' => DB::raw('qty - ' . $ord_qty),
 							'wqty' => DB::raw('wqty - ' . $ord_qty),
 							'ut' => now(),
@@ -1656,14 +1659,31 @@ class Order
 						->where('store_cd', '=', $store_cd) 
 						->update([
 							'qty' => DB::raw('qty - ' . $ord_qty),
+							'wqty' => DB::raw('wqty - ' . $ord_qty),
 							'ut' => now(),
 						]);
-				} else {
+					DB::table('product_stock')
+						->where('prd_cd', '=', $prd_cd)
+						->update([
+							'out_qty' => DB::raw('out_qty + ' . $ord_qty),
+							'qty' => DB::raw('qty - ' . $ord_qty),
+							'ut' => now(),
+						]);
+				} else {	
 					DB::table('product_stock_storage')
 						->where('prd_cd', '=', $prd_cd)
 						->where('storage_cd', '=', DB::raw("(select storage_cd from storage where default_yn = 'Y')"))
 						->update([
 							'qty' => DB::raw('qty - ' . $ord_qty),
+							'wqty' => DB::raw('wqty - ' . $ord_qty),
+							'ut' => now(),
+						]);
+					DB::table('product_stock')
+						->where('prd_cd', '=', $prd_cd)
+						->update([
+							'out_qty' => DB::raw('out_qty + ' . $ord_qty),
+							'qty' => DB::raw('qty - ' . $ord_qty),
+							'wqty' => DB::raw('wqty - ' . $ord_qty),
 							'ut' => now(),
 						]);
 				}
@@ -1769,6 +1789,6 @@ class Order
 			$point->Order($add_point);
 		}
 
-		return 1;
+		return $result_code;
 	}
 }

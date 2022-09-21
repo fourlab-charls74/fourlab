@@ -54,6 +54,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stores/search-storetype', 'StoreController@search_storetype');
         Route::post('stores/search-storenm', 'StoreController@search_storenm');
         Route::post('stores/search-storenm-from-type', 'StoreController@search_storenm_from_type');
+        Route::get('stores/search-store-info/{store_cd?}', 'StoreController@search_store_info');
 
         // 상품코드 조회
         Route::get('prdcd/conds', 'goods@search_product_conditions');
@@ -212,6 +213,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk03/search', 'stk03Controller@search');
         Route::get('stk03/create', 'stk03Controller@create');
         Route::post('stk03/save', 'stk03Controller@save');
+        Route::get('stk03/batch-create', 'stk03Controller@batch_create');
+        Route::post('stk03/batch-import', 'stk03Controller@batch_import');
+        Route::put('stk03/batch-add', 'stk03Controller@batch_add');
 
         Route::get('stk11','stk11Controller@index');
 

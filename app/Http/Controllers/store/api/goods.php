@@ -310,6 +310,7 @@ class goods extends Controller
         $ord_field = $request->input('ord_field','g.goods_no');
 
         $store_cd   = $request->input("store_cd", "");
+        $ext_zero_qty = $request->input("ext_zero_qty", "");
 
         $orderby = sprintf("order by %s %s, s.prd_cd", $ord_field, $ord);
 
@@ -368,7 +369,16 @@ class goods extends Controller
         }
 
         $store_where = "";
-        if ($store_cd != "") $store_where .= " and ps.store_cd = '$store_cd'"; 
+        if ($store_cd != "") $store_where .= " and ps.store_cd = '$store_cd'";
+
+        $having = "";
+        if ($ext_zero_qty == "true") {
+            if ($store_cd != "") {
+                $having .= " and (sum(ps.wqty) != 0) ";
+            } else {
+                $where .= " and (s.wqty != 0) ";
+            }
+        }
 
         $page_size = $limit;
         $startno = ($page - 1) * $page_size;
@@ -387,6 +397,7 @@ class goods extends Controller
                         inner join product_stock_store ps on s.prd_cd = ps.prd_cd $store_where
                     where 1=1 $where
                     group by s.prd_cd
+                    having 1=1 $having
                 ) as c
 			";
             $row = DB::select($query);
@@ -456,9 +467,9 @@ class goods extends Controller
 				left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
 				left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
 				left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
-			where 1 = 1
-                $where
+			where 1=1 $where
             group by s.prd_cd
+            having 1=1 $having
             $orderby
 			$limit
 		";

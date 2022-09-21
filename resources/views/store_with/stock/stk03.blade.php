@@ -19,7 +19,7 @@
 					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
                     <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1" onclick="initSearch(['#store_no'])">검색조건 초기화</a>
                     <a href="javascript:void(0);" onclick="Add()" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>수기 등록</a>
-                    <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>수기 일괄등록</a>
+                    <a href="javascript:void(0);" onclick="AddBatch()" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>수기 일괄등록</a>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
 			</div>
@@ -384,7 +384,7 @@
         {field: "pay_type", headerName: "결제방법", width: 80, cellStyle: {'text-align': 'center'}},
         {field: "ord_type", headerName: "주문구분", width: 60, cellStyle: {'text-align': 'center'}},
         {field: "ord_kind", headerName: "출고구분", width: 60, cellStyle: StyleOrdKind},
-        {field: "store_nm", headerName: "주문매장", width: 100},
+        {field: "sale_place", headerName: "주문매장", width: 100},
         {field: "baesong_kind", headerName: "배송구분", width: 60},
         {field: "state", headerName: "처리현황", width: 120, editable: true, cellStyle: {'background-color': '#ffff99'}},
         {field: "memo", headerName: "메모", width: 120, editable: true, cellStyle: {'background-color': '#ffff99'}},
@@ -415,6 +415,12 @@
     function Add() {
         let url = '/store/stock/stk03/create';
         window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
+    }
+    
+    // 수기일괄등록 팝업오픈
+    function AddBatch() {
+        let url = '/store/stock/stk03/batch-create';
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1400,height=800");
     }
 </script>
 @stop
