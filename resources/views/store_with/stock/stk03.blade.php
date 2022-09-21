@@ -19,7 +19,7 @@
 					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
                     <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1" onclick="initSearch(['#store_no'])">검색조건 초기화</a>
                     <a href="javascript:void(0);" onclick="Add()" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>수기 등록</a>
-                    <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>수기 일괄등록</a>
+                    <a href="javascript:void(0);" onclick="AddBatch()" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>수기 일괄등록</a>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
 			</div>
@@ -351,6 +351,7 @@
 			<div class="filter_wrap">
 				<div class="d-flex justify-content-between">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
+                    <a href="#" onclick="delOrderBeforeRelease();" class="btn btn-sm btn-primary shadow-sm">출고 전 주문삭제</a>
 				</div>
 			</div>
 		</div>
@@ -361,7 +362,7 @@
 </div>
 <script language="javascript">
     let columns = [
-        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {'text-align': 'center'}},
+        // {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {'text-align': 'center'}},
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 28},
         {field: "ord_no", headerName: "주문번호", pinned: 'left', width: 120, cellStyle: StyleOrdNo, type: 'HeadOrderNoType',},
         {field: "ord_opt_no", headerName: "일련번호", pinned: 'left', width: 60, type: 'HeadOrderNoType', cellStyle: {'text-align': 'center'}},
@@ -384,7 +385,7 @@
         {field: "pay_type", headerName: "결제방법", width: 80, cellStyle: {'text-align': 'center'}},
         {field: "ord_type", headerName: "주문구분", width: 60, cellStyle: {'text-align': 'center'}},
         {field: "ord_kind", headerName: "출고구분", width: 60, cellStyle: StyleOrdKind},
-        {field: "store_nm", headerName: "주문매장", width: 100},
+        {field: "sale_place", headerName: "주문매장", width: 100},
         {field: "baesong_kind", headerName: "배송구분", width: 60},
         {field: "state", headerName: "처리현황", width: 120, editable: true, cellStyle: {'background-color': '#ffff99'}},
         {field: "memo", headerName: "메모", width: 120, editable: true, cellStyle: {'background-color': '#ffff99'}},
@@ -402,7 +403,11 @@
         pApp.ResizeGrid(275);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns);
+        gx = new HDGrid(gridDiv, columns, {
+            isRowSelectable : function(node){
+                return node.data.ord_state_cd < 30;
+            }
+        });
         Search();
     });
 
@@ -415,6 +420,39 @@
     function Add() {
         let url = '/store/stock/stk03/create';
         window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
+    }
+    
+    // 수기일괄등록 팝업오픈
+    function AddBatch() {
+        let url = '/store/stock/stk03/batch-create';
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1400,height=800");
+    }
+
+    // 출고 전 주문삭제
+    function delOrderBeforeRelease() {
+        const rows = gx.getSelectedRows();
+
+        if (rows.length === 0) return alert("삭제할 주문을 선택해주세요.");
+        if (!confirm("삭제된 주문은 다시 복원할 수 없습니다.\n해당 주문을 삭제하시겠습니까?")) return;
+
+        const ord_nos = rows.map(r => r.ord_no);
+
+        $.ajax({
+            async: true,
+            type: 'delete',
+            url: '/store/stock/stk03',
+            data: { ord_nos },
+            dataType:"json",
+            success: function (res) {
+                if(res.code === '200') {
+                    alert(`삭제가 완료되었습니다. (${res.data.success_count}/${res.data.total_count} 성공)`);
+                    Search();
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log(xhr.responseText);
+            }
+        });
     }
 </script>
 @stop

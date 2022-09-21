@@ -340,7 +340,7 @@
         }
 
         const url = `/store/api/store-goods/show/` + ff.store_no.value;
-        window.open(url, "_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1800,height=1000");
+        window.open(url, "_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1800,height=830");
     }
 
     /**

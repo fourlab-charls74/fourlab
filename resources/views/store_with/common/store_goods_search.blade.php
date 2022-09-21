@@ -208,6 +208,10 @@
                     <div class="fr_box">
                         <div class="box">
                             <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+                                <input type="checkbox" class="custom-control-input" name="ext_zero_qty" id="ext_zero_qty" value="Y" checked>
+                                <label class="custom-control-label font-weight-normal" for="ext_zero_qty">@if(@$store->store_cd == '') 창고재고 @else 매장재고 @endif 0 제외</label>
+                            </div>
+                            <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
                                 <input type="checkbox" class="custom-control-input" name="goods_img" id="goods_img" value="Y" checked>
                                 <label class="custom-control-label font-weight-light" for="goods_img">이미지출력</label>
                             </div>
@@ -235,22 +239,22 @@
  * 
  */
     const columns = [
-        {headerName: '#', pinned: 'left', type: 'NumType', width: 40, cellStyle: StyleLineHight},
+        {headerName: '#', pinned: 'left', type: 'NumType', width: 40, cellStyle: StyleLineHeight},
         {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, pinned: 'left', sort: null},
-        {field: "prd_cd", headerName: "상품코드", width: 120, pinned: 'left', cellStyle: StyleLineHight},
+        {field: "prd_cd", headerName: "상품코드", width: 120, pinned: 'left', cellStyle: StyleLineHeight},
         {
             field: "goods_no",
             headerName: "상품번호",
             width: 58,
             pinned: 'left',
-            cellStyle: (params) => ({...StyleGoodsNo(params), ...StyleLineHight}),
+            cellStyle: (params) => ({...StyleGoodsNo(params), ...StyleLineHeight}),
         },
         {field: "goods_type", headerName: "상품구분", width: 58, pinned: 'left', type: 'StyleGoodsTypeNM'},
         {field: "opt_kind_cd", hide: true},
-        {field: "opt_kind_nm", headerName: "품목", width:70, cellStyle: StyleLineHight},
-        {field: "brand", headerName: "브랜드", width: 70, cellStyle: StyleLineHight},
-        {field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: StyleLineHight},
-        {field: "img", headerName: "이미지", type: 'GoodsImageType', width: 50, cellStyle: StyleLineHight, surl:"{{config('shop.front_url')}}"},
+        {field: "opt_kind_nm", headerName: "품목", width:70, cellStyle: StyleLineHeight},
+        {field: "brand", headerName: "브랜드", width: 70, cellStyle: StyleLineHeight},
+        {field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: StyleLineHeight},
+        {field: "img", headerName: "이미지", type: 'GoodsImageType', width: 50, cellStyle: StyleLineHeight, surl:"{{config('shop.front_url')}}"},
         {field: "img", headerName: "이미지_url", hide: true},
         {field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', width: 230, cellStyle: {"line-height": "30px"}},
         {field: "goods_nm_eng", headerName: "상품명(영문)", width: 200, cellStyle: {"line-height": "30px"}},
@@ -276,13 +280,13 @@
         {field: "wonga", headerName: "원가", type: 'currencyType', width: 60, cellStyle: {"line-height": "30px"}},
         {field: "margin_rate", headerName: "마진율", type: 'percentType', width: 60, cellStyle: {"line-height": "30px"}},
         {field: "margin_amt", headerName: "마진액", type: 'numberType', width: 60, cellStyle: {"line-height": "30px"}},
-        {field: "org_nm", headerName: "원산지", cellStyle: StyleLineHight},
+        {field: "org_nm", headerName: "원산지", cellStyle: StyleLineHeight},
         {field: "com_nm", headerName: "업체", width: 80, cellStyle: {"line-height": "30px"}},
         {field: "full_nm", headerName: "대표카테고리", cellStyle: {"line-height": "30px"}},
         {field: "head_desc", headerName: "상단홍보글", cellStyle: {"line-height": "30px"}},
         {field: "make", headerName: "제조업체", cellStyle: {"line-height": "30px"}},
-        {field: "reg_dm", headerName: "등록일자", width: 120, cellStyle: StyleLineHight},
-        {field: "upd_dm", headerName: "수정일자", width: 120, cellStyle: StyleLineHight}
+        {field: "reg_dm", headerName: "등록일자", width: 120, cellStyle: StyleLineHeight},
+        {field: "upd_dm", headerName: "수정일자", width: 120, cellStyle: StyleLineHeight}
     ];
 
     const pApp = new App('', { gridId: "#div-gd" });
@@ -317,6 +321,7 @@
         if (isOpenerCallback('beforeSearchCallback')) opener.beforeSearchCallback(document);
         let data = $('form[name="search"]').serialize();
         data += '&store_cd=' + store_cd;
+        data += '&ext_zero_qty=' + $("[name=ext_zero_qty]").is(":checked");
         gx.Request('/store/api/store-goods', data, 1);
     };
     

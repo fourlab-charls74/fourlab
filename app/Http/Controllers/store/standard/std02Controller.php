@@ -5,6 +5,7 @@ namespace App\Http\Controllers\store\standard;
 use App\Components\SLib;
 use App\Http\Controllers\Controller;
 use App\Components\Lib;
+use App\Components\ULib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -123,6 +124,7 @@ class std02Controller extends Controller
 	public function show($store_cd = '')
 	{
 		$store	= "";
+		$store_img	= "";
 		$grades = [];
 
 		if($store_cd != '') {
@@ -134,9 +136,20 @@ class std02Controller extends Controller
 			$store = DB::selectOne($sql, ["store_cd" => $store_cd]);
 		}
 
+		if($store_cd != '') {
+			$img_sql = "
+					select * from store_img
+					where store_cd = :store_cd
+			";
+
+			$store_img = DB::select($img_sql, ["store_cd" => $store_cd]);
+		}
+
+
 		$values = [
 			"cmd"	=> $store_cd == '' ? "" : "update",
 			"store"	=> $store,
+			'store_img' => $store_img,
 			'store_types' => SLib::getCodes("STORE_TYPE"),
 			'store_kinds' => SLib::getCodes("STORE_KIND"),
 			'store_areas' => SLib::getCodes("STORE_AREA"),
@@ -174,6 +187,10 @@ class std02Controller extends Controller
 		$msg		= "매장정보가 정상적으로 반영되었습니다.";
 		$store_cd 	= $request->input('store_cd');
 		$image 		= $request->file('file');
+		$y 			= $request->input('y');
+		$x 			= $request->input('x');
+		$map_code 	= $y.', '.$x;
+	
 
 		try {
 			DB::beginTransaction();
@@ -232,7 +249,9 @@ class std02Controller extends Controller
 				'point_out_yn'	=> $request->input('point_out_yn'),
 				'reg_date'		=> now(),
 				'mod_date'		=> now(),
-				'admin_id'		=> $id
+				'admin_id'		=> $id,
+				'map_code'		=> $map_code
+				
 			];
 
 			DB::table('store')->updateOrInsert($where, $values);
@@ -244,23 +263,47 @@ class std02Controller extends Controller
 			if (!Storage::disk('public')->exists($base_path)) {
 				Storage::disk('public')->makeDirectory($base_path);
 			}
+
+			$sql = "
+				select seq
+				from store_img
+				where store_cd = '$store_cd'
+				order by seq desc
+				limit 1
+			";
+			$res = DB::selectOne($sql);
+
+			$last_seq = 0;
+
+			if($res !== null) {
+				$last_seq = $res->seq;
+			}
+
 			if ($image != null &&  $image != "") {
-				foreach ($image as $key => $ig) {
-					$ig_cnt = $key + 1;
-					$file_name = sprintf("%s_%s.jpg", $store_cd, "$ig_cnt");
+				foreach ($image as $ig) {
+					$cnt = $last_seq + 1;
+					
+					$file_name = sprintf("%s_%s.jpg", $store_cd, "$cnt");
 					$save_file = sprintf("%s/%s", $base_path, $file_name);
 					Storage::disk('public')->putFileAs($base_path, $ig, $file_name);
-
-					DB::table('store_img')->insert([
-						'img_url' => $save_file,
-						'store_cd' => $store_cd,
-						'seq' => $ig_cnt,
-						'rt' => now(),
-						'admin_id' => $id
-					]);
+					$jpg = ".jpg";
+					
+					if (strpos($file_name, $jpg) !== false) {
+						$insert_values = [
+							'img_url' => $save_file,
+							'store_cd' => $store_cd,
+							'seq' => $cnt,
+							'rt' => now(),
+							'admin_id' => $id
+						];
+						DB::table('store_img')->insert($insert_values);
+						$last_seq++;
+					}
 				}
+				
 			}
-			
+
+
 			DB::commit();
 
 			return response()->json(["code" => $code, "msg" => $msg, "store_cd" => $request->input('store_cd')]);
@@ -269,10 +312,52 @@ class std02Controller extends Controller
 			$msg = $e->getMessage();
 			DB::rollback();
 			return response()->json(["code" => '500', 'msg' => $msg]);
-			// "에러가 발생했습니다. 잠시 후 다시시도 해주세요."
-
+			// 에러가 발생했습니다. 잠시 후 다시시도 해주세요.
 		}
 	}
+
+	public function del_img(Request $request)
+	{
+		$store_cd = $request->input('data_img');
+		$seq = $request->input('seq');
+		
+		try {
+            DB::beginTransaction();
+
+			$sel_sql = "
+				select img_url
+				from store_img
+				where store_cd = '$store_cd' and seq = $seq
+
+			";
+			$row = DB::selectOne($sel_sql);
+
+            $sql = "
+                delete 
+                from store_img
+                where store_cd = '$store_cd' and seq = $seq
+            ";
+
+            DB::delete($sql);
+			
+
+			ULib::deleteFile($row->img_url);
+
+            DB::commit();
+            $code = '200';
+            $msg = "";
+        } catch (Exception $e) {
+            DB::rollBack();
+            $code = 500;
+            $msg = $e->getMessage();
+        }
+
+        return response()->json([
+            "code" => $code,
+            "msg" => $msg
+        ]);
+	}
+
 
 	public function delete($com_id)
 	{

@@ -123,7 +123,7 @@ class acc04Controller extends Controller
 					left outer join brand b on g.brand = b.brand
 					left outer join `code` c on c.code_kind_cd = 'g_goods_stat' and g.sale_stat_cl = c.code_id
 					left outer join `code` c2 on c2.code_kind_cd = 'g_goods_type' and g.goods_type = c2.code_id
-				where w.`ord_state_date` >= '$sdate' and w.ord_state_date <= '$edate' and w.`ord_state` in ( '10','60','61')
+				where w.`ord_state_date` >= '$sdate' and w.ord_state_date <= '$edate' and w.`ord_state` in ( '30','60','61')
 					and m.store_cd <> '' $where
 				group by m.store_cd
 			) as a on s.store_cd = a.store_cd

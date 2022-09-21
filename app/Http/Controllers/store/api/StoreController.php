@@ -89,4 +89,24 @@ class StoreController extends Controller {
         return response()->json(['code' => 200, 'head' => ['total' => count($result)], 'body' => $result]);
     }
 
+    /**
+     * 매장코드로 해당 매장 주문정보 조회
+     */
+    public function search_store_info($store_cd = '')
+    {
+        $sql = "
+            select *
+            from store
+            where store_cd = :store_cd
+        ";
+        $store = DB::selectOne($sql, ['store_cd' => $store_cd]);
+        
+        return response()->json([
+            'code' => 200,
+            'head' => [
+                'total' => 1
+            ],
+            'body' => $store
+        ]);
+    }
 }
