@@ -1431,6 +1431,10 @@ class Order
 	{
 		$result_code = 1;
 		$ord_no = $this->ord_no;
+
+		$admin_id = Auth('head')->user()->id;
+		$admin_nm = Auth('head')->user()->name;
+
 		$where = " a.ord_no = '$ord_no' ";
 
 		if ($ord_opt_no != "") $where .= " and a.ord_opt_no = '$ord_opt_no' ";
@@ -1588,6 +1592,29 @@ class Order
 						]);
 				}
 
+				$location_cd = $store_cd != '' ? $store_cd : DB::raw("(select storage_cd from storage where default_yn = 'Y')") ;
+				$location_type = $store_cd != '' ? 'STORE' : 'STORAGE';
+
+				// 재고이력 등록
+				DB::table('product_stock_hst')
+					->insert([
+						'goods_no' => $goods_no,
+						'prd_cd' => $prd_cd,
+						'goods_opt' => $goods_opt,
+						'location_cd' => $location_cd,
+						'location_type' => $location_type,
+						'type' => 2, // 재고분류 : 주문
+						'price' => $ord_price,
+						'wonga' => $wonga,
+						'qty' => $ord_qty,
+						'stock_state_date' => date('Ymd'),
+						'ord_opt_no' => $ord_opt_no,
+						'comment' => '수기판매',
+						'rt' => now(),
+						'admin_id' => $admin_id,
+						'admin_nm' => $admin_nm,
+					]);
+
 				// 모든 입금확인은 5 상태를 기록한다.
 				$order_opt_wonga = array(
 					"goods_no" => $goods_no,
@@ -1687,6 +1714,29 @@ class Order
 							'ut' => now(),
 						]);
 				}
+
+				$location_cd = $store_cd != '' ? $store_cd : DB::raw("(select storage_cd from storage where default_yn = 'Y')") ;
+				$location_type = $store_cd != '' ? 'STORE' : 'STORAGE';
+
+				// 재고이력 등록
+				DB::table('product_stock_hst')
+					->insert([
+						'goods_no' => $goods_no,
+						'prd_cd' => $prd_cd,
+						'goods_opt' => $goods_opt,
+						'location_cd' => $location_cd,
+						'location_type' => $location_type,
+						'type' => 2, // 재고분류 : 주문
+						'price' => $ord_price,
+						'wonga' => $wonga,
+						'qty' => $ord_qty,
+						'stock_state_date' => date('Ymd'),
+						'ord_opt_no' => $ord_opt_no,
+						'comment' => '수기판매',
+						'rt' => now(),
+						'admin_id' => $admin_id,
+						'admin_nm' => $admin_nm,
+					]);
 
 				// 모든 입금확인은 5 상태를 기록한다.
 				$order_opt_wonga = array(
