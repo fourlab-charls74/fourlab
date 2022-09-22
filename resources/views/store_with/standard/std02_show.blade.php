@@ -563,61 +563,68 @@
 </div>
 
 <!-- 지도 영역 -->
-<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=bc9223f1d1450a971d7c95c68824595d&libraries=services"></script>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ env('KAKAO_MAP_APIKEY') }}&libraries=services"></script>
 <script>
-	var mapContainer = document.getElementById('map');
-	var map_code = document.getElementById('map_code').value;
-	var map_cd = map_code.split(', ');
-
-	var	mapOption = {
-		center: new kakao.maps.LatLng(map_cd[0], map_cd[1]),
-		level: 4
-	};
-	var map = new kakao.maps.Map(mapContainer, mapOption); 
-	var geocoder = new kakao.maps.services.Geocoder();
-	let address = document.getElementById('addr1').value;
-	let store_nm = document.getElementById('store_nm').value;
-
-	//좌표 값에 마커와 인포윈도우 출력
-	var markerPosition  = new kakao.maps.LatLng(map_cd[0], map_cd[1]); 
-
-	var marker = new kakao.maps.Marker({
-		position: markerPosition
-	});
-
-	marker.setMap(map);
-
-	var iwContent = '<div style="width:150px;text-align:center;padding:6px 0;">'+store_nm+'</div>'
-		iwPosition = new kakao.maps.LatLng(map_cd[0], map_cd[1]);
-
-	var infowindow = new kakao.maps.InfoWindow({
-		position : iwPosition, 
-		content : iwContent 
-	});
+	// $(document).ready(function() {
+		var mapContainer = document.getElementById('map');
+		var input = document.getElementById('map_code');
+		var map_code = input ? input.value : '';
+		if (map_code !== '') {
+			var map_cd = map_code.split(', ');
+		}else {
+			var map_cd = [0,0]
+		}
 	
-	infowindow.open(map, marker); 
+		var	mapOption = {
+			center: new kakao.maps.LatLng(map_cd[0], map_cd[1]),
+			level: 4
+		};
+		var map = new kakao.maps.Map(mapContainer, mapOption); 
+		var geocoder = new kakao.maps.services.Geocoder();
+		let address = document.getElementById('addr1').value;
+		let store_nm = document.getElementById('store_nm').value;
+
+		//좌표 값에 마커와 인포윈도우 출력
+		var markerPosition  = new kakao.maps.LatLng(map_cd[0], map_cd[1]); 
+
+		var marker = new kakao.maps.Marker({
+			position: markerPosition
+		});
+
+		marker.setMap(map);
+
+		var iwContent = '<div style="width:150px;text-align:center;padding:6px 0;">'+store_nm+'</div>'
+			iwPosition = new kakao.maps.LatLng(map_cd[0], map_cd[1]);
+
+		var infowindow = new kakao.maps.InfoWindow({
+			position : iwPosition, 
+			content : iwContent 
+		});
+		
+		infowindow.open(map, marker); 
 
 
-	// 주소 값으로 키워드 검색 기능
-	geocoder.addressSearch(address, function(result, status) {
-		if (status === kakao.maps.services.Status.OK) {
-			var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-			var marker = new kakao.maps.Marker({
-				map: map,
-				position: coords
-			});
-			var infowindow = new kakao.maps.InfoWindow({
-				content: '<div style="width:150px;text-align:center;padding:6px 0;">'+store_nm+'</div>'
-			});
-			infowindow.open(map, marker);
-			map.setCenter(coords);
-		} 
-	});
-
+		// 주소 값으로 키워드 검색 기능
+		geocoder.addressSearch(address, function(result, status) {
+			if (status === kakao.maps.services.Status.OK) {
+				var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+				var marker = new kakao.maps.Marker({
+					map: map,
+					position: coords
+				});
+				var infowindow = new kakao.maps.InfoWindow({
+					content: '<div style="width:150px;text-align:center;padding:6px 0;">'+store_nm+'</div>'
+				});
+				infowindow.open(map, marker);
+				map.setCenter(coords);
+			} 
+		});
+// });
 </script>
 
 <!-- 이미지 -->
-<script>    
+<script>
+
 	$(document).ready(function() {
 		$("input:file[name='file']").change(function() {
 			var str = $(this).val();
@@ -634,86 +641,87 @@
 		if ($.inArray(ext, ['jpg']) == -1) {
 			alert(ext+'파일은 업로드 하실 수 없습니다.');
 			$("input:file[name='file']").val("");
-		} else {
-			( imageView = function imageView(img_div, btn) {
-
-				var img_div = document.getElementById(img_div);
-				var btnAdd = document.getElementById(btn)
-				var sel_files = [];
-
-				// 이미지와 체크 박스를 감싸고 있는 div 속성
-				var div_style = 'display:inline-block;position:relative;'
-							+ 'width:150px;height:120px;margin:5px;z-index:1';
-				// 미리보기 이미지 속성
-				var img_style = 'width:100%;height:100%;z-index:none';
-				// 이미지안에 표시되는 체크박스의 속성
-				var chk_style = 'width:20px;height:20px;position:absolute;right:0px;top:0px;border:none;font-size:large;'
-								+'font-weight:bolder;background:none;color:black;padding-bottom:20px;';
-
-				btnAdd.onchange = function(e) {
-					var files = e.target.files;
-					var fileArr = Array.prototype.slice.call(files)
-					for (f of fileArr) {
-						imageLoader(f);
-					}
-				}
-
-				/*첨부된 이미지들을 배열에 넣고 미리보기 */
-				imageLoader = function(file) {
-					sel_files.push(file);
-					var reader = new FileReader();
-					reader.onload = function(ee) {
-						let img = document.createElement('img')
-						img.setAttribute('style', img_style)
-						img.src = ee.target.result;
-						img_div.appendChild(makeDiv(img, file));
-					}
-					
-					reader.readAsDataURL(file);
-				}
-
-				makeDiv = function(img, file) {
-					var div = document.createElement('div');
-					div.setAttribute('style', div_style);
-					
-					var btn = document.createElement('input');
-					btn.setAttribute('type', 'button');
-					btn.setAttribute('value', 'x');
-					btn.setAttribute('delFile', file.name);
-					btn.setAttribute('style', chk_style);
-					btn.onclick = function(ev) {
-						var ele = ev.srcElement;
-						var delFile = ele.getAttribute('delFile');
-						for (var i=0 ;i<sel_files.length; i++) {
-							if (delFile== sel_files[i].name) {
-								sel_files.splice(i, 1);
-							}
-						}
-						
-						dt = new DataTransfer();
-
-						for (f in sel_files) {
-							var file = sel_files[f];
-							dt.items.add(file);
-						}
-						btnAdd.files = dt.files;
-						var p = ele.parentNode;
-						img_div.removeChild(p);
-					}
-					div.appendChild(img);
-					div.appendChild(btn);
-					return div;
-				}
-			}
-			)('img_div', 'btnAdd')
-		}
-	
-		//2. 파일명에 특수문자 체크
-		var pattern =   /[\{\}\/?,;:|*~`!^\+<>@\#$%&\\\=\'\"]/gi;
-		if(pattern.test(str) ){
-			alert('파일명에 특수문자를 제거해주세요.');
+			$('#img_div').remove();
+		}else{
+			
 		}
 	}
+
+	( imageView = function imageView(img_div, btn) {
+
+		var img_div = document.getElementById(img_div);
+		var btnAdd = document.getElementById(btn)
+		var sel_files = [];
+
+		// 이미지와 체크 박스를 감싸고 있는 div 속성
+		var div_style = 'display:inline-block;position:relative;'
+					+ 'width:150px;height:120px;margin:5px;z-index:1';
+		// 미리보기 이미지 속성
+		var img_style = 'width:100%;height:100%;z-index:none';
+		// 이미지안에 표시되는 체크박스의 속성
+		var chk_style = 'width:20px;height:20px;position:absolute;right:0px;top:0px;border:none;font-size:large;'
+						+'font-weight:bolder;background:none;color:black;padding-bottom:20px;';
+
+		btnAdd.onchange = function(e) {
+			var files = e.target.files;
+			var fileArr = Array.prototype.slice.call(files)
+			for (f of fileArr) {
+				imageLoader(f);
+			}
+		}
+
+		/*첨부된 이미지들을 배열에 넣고 미리보기 */
+		imageLoader = function(file) {
+			sel_files.push(file);
+			var reader = new FileReader();
+			reader.onload = function(ee) {
+				let img = document.createElement('img')
+				img.setAttribute('style', img_style)
+				img.src = ee.target.result;
+				img_div.appendChild(makeDiv(img, file));
+			}
+			
+			reader.readAsDataURL(file);
+		}
+
+		makeDiv = function(img, file) {
+			var div = document.createElement('div');
+			div.setAttribute('style', div_style);
+			
+			var btn = document.createElement('input');
+			btn.setAttribute('type', 'button');
+			btn.setAttribute('value', 'x');
+			btn.setAttribute('delFile', file.name);
+			btn.setAttribute('style', chk_style);
+			btn.onclick = function(ev) {
+				var ele = ev.srcElement;
+				var delFile = ele.getAttribute('delFile');
+				for (var i=0 ;i<sel_files.length; i++) {
+					if (delFile== sel_files[i].name) {
+						sel_files.splice(i, 1);
+					}
+				}
+				
+				dt = new DataTransfer();
+
+				for (f in sel_files) {
+					var file = sel_files[f];
+					dt.items.add(file);
+				}
+				btnAdd.files = dt.files;
+				var p = ele.parentNode;
+				img_div.removeChild(p);
+			}
+			div.appendChild(img);
+			div.appendChild(btn);
+
+			return div;
+		}		
+	}
+	)('img_div', 'btnAdd')
+
+
+	
 </script>
 
 <script>
@@ -782,7 +790,7 @@
 		form.append("x", res.x || '');
 
 		for(let form_data of form.entries()) {
-			(form_data[0], form_data[1]);
+			form_data[0], form_data[1];
 		}
 	
         if( !validation('add') )	return;
