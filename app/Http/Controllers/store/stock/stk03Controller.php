@@ -914,7 +914,7 @@ class stk03Controller extends Controller
             #####################################################
             $is_store_order = true;
             $order->SetOrdOptNo($ord_opt_no);
-            $order->CompleteOrderSugi("", $ord_state, $is_store_order);
+            $order->CompleteOrderSugi($ord_opt_no, $ord_state, $is_store_order);
 
             if ($ord_state == "10" || $ord_state == "30") {
 
