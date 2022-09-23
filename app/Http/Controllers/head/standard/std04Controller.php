@@ -673,6 +673,14 @@ class std04Controller extends Controller
 						$cate_result2 = 500;
 					}
 				}
+				
+				try {
+					DB::delete("delete from category_goods where cat_type = '$cat_type' and d_cat_cd = '$d_cat_cd'");
+					$cate_result3 = 200;
+				} catch(Exception $e){
+					$cate_result3 = 500;
+				}
+				
 
 				if($cate_result == 500){
 					$result_code = 0;
@@ -686,6 +694,12 @@ class std04Controller extends Controller
 					}else{
 						$result_code = 1;
 					}
+				}
+
+				if($cate_result3 == 500){
+					$result_code = 0;
+				}else{
+					$result_code = 1;
 				}
 
 			}else if($cnt > 1) {
@@ -737,8 +751,10 @@ class std04Controller extends Controller
 			{
 				// 카테고리 상품 삭제
 				$sql = "
-					DELETE FROM category_goods WHERE cat_type = '$cat_type' AND d_cat_cd LIKE '$d_cat_cd%'
+					DELETE FROM category_goods 
+					WHERE cat_type = '$cat_type' AND d_cat_cd = '$d_cat_cd'
 				";
+				
 				try {
 					DB::delete($sql);
 				   $category_goods_result = 200;
@@ -762,6 +778,7 @@ class std04Controller extends Controller
 				$sql = "
 					DELETE FROM category WHERE cat_type = '$cat_type' AND d_cat_cd LIKE '$d_cat_cd%'$add_sql
 				";
+
 				//debugSQL($sql);
 				try {
 					DB::delete($sql);
