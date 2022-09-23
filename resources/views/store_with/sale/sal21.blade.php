@@ -225,10 +225,10 @@
         {
             headerName: "매장판매",
             children: [
-                {field: "store_order_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "store_order_sh", headerName: "TAG금액", width: 70, type: "currencyType"},
-                {field: "store_order_price", headerName: "판매가금액", width: 70, type: "currencyType"},
-                {field: "store_order_wonga", headerName: "원가금액", width: 70, type: "currencyType"},
+                {field: "store_sale_qty", headerName: "수량", width: 50, type: "currencyType"},
+                {field: "store_sale_sh", headerName: "TAG금액", width: 70, type: "currencyType"},
+                {field: "store_sale_price", headerName: "판매가금액", width: 70, type: "currencyType"},
+                {field: "store_sale_wonga", headerName: "원가금액", width: 70, type: "currencyType"},
             ]
         },
         {
@@ -249,7 +249,6 @@
                 {field: "holding_wonga", headerName: "원가금액", width: 70, type: "currencyType"},
             ]
         },
-        {width: 'auto'}
     ];
 </script>
 <script type="text/javascript" charset="utf-8">

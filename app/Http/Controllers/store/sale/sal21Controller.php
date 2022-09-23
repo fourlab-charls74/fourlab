@@ -81,25 +81,78 @@ class sal21Controller extends Controller
                 g.goods_sh,
                 g.price,
                 g.wonga,
-                ifnull(ps.qty, 0) as store_qty, 
-                ifnull(ps.wqty, 0) as store_wqty,
-                sum(ifnull(o.qty, 0)) as sale_cnt
+                -- 매장입고
+				ifnull(store_in.qty, 0) as store_in_qty,
+                (ifnull(store_in.qty, 0) * g.goods_sh) as store_in_sh,
+                (ifnull(store_in.qty, 0) * g.price) as store_in_price,
+                (ifnull(store_in.qty, 0) * g.wonga) as store_in_wonga,
+                -- 매장반품
+				ifnull(store_return.qty, 0) as store_return_qty,
+                (ifnull(store_return.qty, 0) * g.goods_sh) as store_return_sh,
+                (ifnull(store_return.qty, 0) * g.price) as store_return_price,
+                (ifnull(store_return.qty, 0) * g.wonga) as store_return_wonga,
+                -- 이동입고
+				ifnull(rt_in.qty, 0) as rt_in_qty,
+                (ifnull(rt_in.qty, 0) * g.goods_sh) as rt_in_sh,
+                (ifnull(rt_in.qty, 0) * g.price) as rt_in_price,
+                (ifnull(rt_in.qty, 0) * g.wonga) as rt_in_wonga,
+                -- 이동출고
+				ifnull(rt_out.qty, 0) as rt_out_qty,
+                (ifnull(rt_out.qty, 0) * g.goods_sh) as rt_out_sh,
+                (ifnull(rt_out.qty, 0) * g.price) as rt_out_price,
+                (ifnull(rt_out.qty, 0) * g.wonga) as rt_out_wonga,
+                -- 매장판매
+				sum(ifnull(o.qty, 0)) as store_sale_qty,
+                (sum(ifnull(o.qty, 0)) * g.goods_sh) as store_sale_sh,
+                (sum(ifnull(o.qty, 0)) * g.price) as store_sale_price,
+                (sum(ifnull(o.qty, 0)) * g.wonga) as store_sale_wonga,
+                -- LOSS
+				ifnull(loss.qty, 0) as loss_qty,
+                (ifnull(loss.qty, 0) * g.goods_sh) as loss_sh,
+                (ifnull(loss.qty, 0) * g.price) as loss_price,
+                (ifnull(loss.qty, 0) * g.wonga) as loss_wonga
             from order_opt o
                 inner join product_code pc on pc.prd_cd = o.prd_cd
-                inner join product_stock_storage pss on pss.prd_cd = o.prd_cd and pss.storage_cd = (select storage_cd from storage where default_yn = 'Y')
-                inner join product_stock_store ps on ps.prd_cd = o.prd_cd and ps.store_cd = o.store_cd
                 inner join store on store.store_cd = o.store_cd
-                left outer join goods g on g.goods_no = o.goods_no
+                inner join goods g on g.goods_no = o.goods_no
                 left outer join brand b on b.brand = g.brand
-                left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
-                left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
                 left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
+                left outer join (
+                    select prd_cd, location_cd, sum(qty) as qty from product_stock_hst 
+                    where type = '1' and location_type = 'STORE'
+                        and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$sdate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= '$edate 23:59:59'
+                    group by location_cd, prd_cd
+                ) store_in on store_in.location_cd = o.store_cd and store_in.prd_cd = o.prd_cd
+                left outer join (
+					select prd_cd, location_cd, sum(qty) as qty from product_stock_hst 
+					where type = '11' and location_type = 'STORE'
+						and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '2022-09-20 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= '2022-09-23 23:59:59'
+					group by location_cd, prd_cd
+				) store_return on store_return.location_cd = o.store_cd and store_return.prd_cd = o.prd_cd
+                left outer join (
+					select prd_cd, location_cd, sum(qty) as qty from product_stock_hst 
+					where type = '15' and location_type = 'STORE' and qty > 0
+						and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '2022-09-20 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= '2022-09-23 23:59:59'
+					group by location_cd, prd_cd
+				) rt_in on rt_in.location_cd = o.store_cd and rt_in.prd_cd = o.prd_cd
+				left outer join (
+					select prd_cd, location_cd, sum(qty) as qty from product_stock_hst 
+					where type = '15' and location_type = 'STORE' and qty < 0
+						and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '2022-09-20 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= '2022-09-23 23:59:59'
+					group by location_cd, prd_cd
+				) rt_out on rt_out.location_cd = o.store_cd and rt_out.prd_cd = o.prd_cd
+                left outer join (
+                    select prd_cd, location_cd, sum(qty) as qty from product_stock_hst 
+                    where type = '14' and location_type = 'STORE'
+                        and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$sdate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= '$edate 23:59:59'
+                    group by location_cd, prd_cd
+                ) loss on loss.location_cd = o.store_cd and loss.prd_cd = o.prd_cd
             where 1=1
                 and o.ord_state = 30
                 and (o.clm_state = 90 or o.clm_state = -30 or o.clm_state = 0)
                 and o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59'
                 and ($store_where)
-                and store.store_type = '08'
+                $where
             group by o.store_cd, o.prd_cd
             order by o.store_cd
         ";

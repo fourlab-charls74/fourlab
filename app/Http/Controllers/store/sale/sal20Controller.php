@@ -11,8 +11,11 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Exception;
 
+const PRODUCT_STOCK_TYPE_LOSS = 14;		// 재고분류 : LOSS
+
 class sal20Controller extends Controller
 {
+
 	public function index(Request $request)
 	{
         $store_cd = $request->input('store_cd', '');
@@ -60,6 +63,7 @@ class sal20Controller extends Controller
                 inner join stock_check_product sp on sp.sc_cd = s.sc_cd
             where 1=1 $where
             group by s.sc_cd
+            order by s.sc_date desc
         ";
 
         $result = DB::select($sql);
@@ -78,6 +82,7 @@ class sal20Controller extends Controller
     {
         $data = $request->input('data', []);
         $admin_id = Auth('head')->user()->id;
+        $admin_nm = Auth('head')->user()->name;
 
         try {
             DB::beginTransaction();
@@ -92,8 +97,22 @@ class sal20Controller extends Controller
                         'admin_id' => $admin_id,
                     ]);
                 
-                $products = DB::table('stock_check_product')->select('prd_cd', 'qty')->where('sc_cd', '=', $d['sc_cd'])->get();
-
+                $sql = "
+                    select 
+                        s.prd_cd,
+                        s.qty,
+                        sum(s.store_qty - s.qty) as loss_qty,
+                        pc.goods_no,
+                        pc.goods_opt,
+                        g.price,
+                        g.wonga
+                    from stock_check_product s
+                        inner join product_code pc on pc.prd_cd = s.prd_cd
+                        inner join goods g on g.goods_no = pc.goods_no
+                    where sc_cd = :sc_cd
+                    group by sc_prd_cd
+                ";
+                $products = DB::select($sql, ['sc_cd' => $d['sc_cd']]);
                 foreach($products as $prd)
                 {
                     $original_wqty = DB::table('product_stock_store')->where('store_cd', '=', $d['store_cd'])->where('prd_cd', '=', $prd->prd_cd)->first()->wqty;
@@ -113,6 +132,26 @@ class sal20Controller extends Controller
                         ->update([
                             'qty' => DB::raw('qty - ' . $minus_qty),
                             'ut' => now(),
+                        ]);
+
+                    // 재고이력 등록
+                    DB::table('product_stock_hst')
+                        ->insert([
+                            'goods_no' => $prd->goods_no,
+                            'prd_cd' => $prd->prd_cd,
+                            'goods_opt' => $prd->goods_opt,
+                            'location_cd' => $d['store_cd'],
+                            'location_type' => 'STORE',
+                            'type' => PRODUCT_STOCK_TYPE_LOSS, // 재고분류 : LOSS
+                            'price' => $prd->price,
+                            'wonga' => $prd->wonga,
+                            'qty' => $prd->loss_qty,
+                            'stock_state_date' => date('Ymd'),
+                            'ord_opt_no' => '',
+                            'comment' => 'LOSS등록',
+                            'rt' => now(),
+                            'admin_id' => $admin_id,
+                            'admin_nm' => $admin_nm,
                         ]);
                 }
             }
