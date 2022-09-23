@@ -414,7 +414,7 @@
 											</td>
 										</tr>
 										@if($cmd !== "")
-                                            @if(@$store->store_type !== '11')
+                                            @if(@$store->store_type !== '11' && @$store->addr1 !== null)
 												<tr>
 													<th>지도</th>
 													<td style="width:100%;">
@@ -425,7 +425,18 @@
 													</td>
 												</tr>
 											@endif
+										@else
+											<tr style="display:none;">
+												<th>지도</th>
+												<td style="width:100%;">
+													<div class="form-inline">
+														<div id="map" style="width:100%;height:400px;"></div>
+														<input type="hidden" id="map_code" value="{{ @$store->map_code }}">
+													</div>
+												</td>
+											</tr>
 										@endif
+
 									</tbody>
 								</table>
 							</div>
@@ -563,17 +574,13 @@
 </div>
 
 <!-- 지도 영역 -->
-<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ env('KAKAO_MAP_APIKEY') }}&libraries=services"></script>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ @$map_key->code_val }}&libraries=services"></script>
 <script>
-	// $(document).ready(function() {
+	$(document).ready(function() {
 		var mapContainer = document.getElementById('map');
 		var input = document.getElementById('map_code');
 		var map_code = input ? input.value : '';
-		if (map_code !== '') {
-			var map_cd = map_code.split(', ');
-		}else {
-			var map_cd = [0,0]
-		}
+		var map_cd = map_code.split(', ');
 	
 		var	mapOption = {
 			center: new kakao.maps.LatLng(map_cd[0], map_cd[1]),
@@ -584,7 +591,7 @@
 		let address = document.getElementById('addr1').value;
 		let store_nm = document.getElementById('store_nm').value;
 
-		//좌표 값에 마커와 인포윈도우 출력
+		// 좌표 값에 마커와 인포윈도우 출력
 		var markerPosition  = new kakao.maps.LatLng(map_cd[0], map_cd[1]); 
 
 		var marker = new kakao.maps.Marker({
@@ -619,11 +626,11 @@
 				map.setCenter(coords);
 			} 
 		});
-// });
-</script>
 
-<!-- 이미지 -->
-<script>
+		
+});
+
+	// 이미지
 
 	$(document).ready(function() {
 		$("input:file[name='file']").change(function() {
@@ -763,19 +770,19 @@
 
 	// 주소로 위도/경도 조회
 	const getMapCode = () => {
-		var geocoder = new kakao.maps.services.Geocoder();
-		let address = document.getElementById('addr1').value;
-		return new Promise((resolve, reject) => {
-			geocoder.addressSearch(address, async function(result, status) {
-				if (status === await kakao.maps.services.Status.OK) {
-					// var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-					resolve({y: result[0].y, x: result[0].x});
-				} else {
-					reject(result);
-				}
+			var geocoder = new kakao.maps.services.Geocoder();
+			let address = document.getElementById('addr1').value;
+			return new Promise((resolve, reject) => {
+				geocoder.addressSearch(address, async function(result, status) {
+					if (status === await kakao.maps.services.Status.OK) {
+						resolve({y: result[0].y, x: result[0].x});
+					} else {
+						reject(result);
+					}
+				});
 			});
-		});
-	}
+		}
+		
     // 매장정보 등록
     async function addStore() {
 		let res = await getMapCode();
@@ -815,11 +822,16 @@
     }
     // 매장정보 수정
     async function updateStore() {
+		let res = await getMapCode();
+
 		let form = new FormData(document.querySelector("#f1"));
 
 		for (let i = 0; i< $("#btnAdd")[0].files.length; i++) {
 			form.append("file[]", $("#btnAdd")[0].files[i] || '');
 		}
+
+		form.append("y", res.y || '');
+		form.append("x", res.x || '');
 
 		if(!validation('update')) return;
         if(!window.confirm("매장정보를 수정하시겠습니까?")) return;

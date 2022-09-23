@@ -125,6 +125,7 @@ class std02Controller extends Controller
 	{
 		$store	= "";
 		$store_img	= "";
+		$map_key = "";
 		$grades = [];
 
 		if($store_cd != '') {
@@ -145,17 +146,26 @@ class std02Controller extends Controller
 			$store_img = DB::select($img_sql, ["store_cd" => $store_cd]);
 		}
 
+			$map_key_sql = "
+					select code_val
+					from code
+					where code_kind_cd = 'MAP_KEY'
+			";
 
+			$map_key = DB::selectOne($map_key_sql);
+		
 		$values = [
 			"cmd"	=> $store_cd == '' ? "" : "update",
 			"store"	=> $store,
 			'store_img' => $store_img,
+			'map_key' => $map_key,
 			'store_types' => SLib::getCodes("STORE_TYPE"),
 			'store_kinds' => SLib::getCodes("STORE_KIND"),
 			'store_areas' => SLib::getCodes("STORE_AREA"),
 			'grades' => SLib::getValidStoreGrades(),
 			'prioritys' => SLib::getCodes("PRIORITY")
 		];
+		
 
 		return view( Config::get('shop.store.view') . '/standard/std02_show',$values);
 	}
@@ -190,7 +200,7 @@ class std02Controller extends Controller
 		$y 			= $request->input('y');
 		$x 			= $request->input('x');
 		$map_code 	= $y.', '.$x;
-	
+
 
 		try {
 			DB::beginTransaction();
@@ -253,9 +263,9 @@ class std02Controller extends Controller
 				'map_code'		=> $map_code
 				
 			];
-
+			
 			DB::table('store')->updateOrInsert($where, $values);
-
+			
 
 			// 이미지 저장
 			$base_path = "/images/std02";
@@ -282,13 +292,16 @@ class std02Controller extends Controller
 			if ($image != null &&  $image != "") {
 				foreach ($image as $ig) {
 					$cnt = $last_seq + 1;
-					
-					$file_name = sprintf("%s_%s.jpg", $store_cd, "$cnt");
-					$save_file = sprintf("%s/%s", $base_path, $file_name);
-					Storage::disk('public')->putFileAs($base_path, $ig, $file_name);
-					$jpg = ".jpg";
-					
-					if (strpos($file_name, $jpg) !== false) {
+
+					$realName = $ig->getClientOriginalName();
+
+					$ext = explode('.',$realName);
+					if ($ext[1] == 'jpeg' || $ext[1] == 'jpg') {
+						$ext = "jpg";
+						$file_name = sprintf("%s_%s.%s", $store_cd, "$cnt",$ext);
+						$save_file = sprintf("%s/%s", $base_path, $file_name);
+
+						Storage::disk('public')->putFileAs($base_path, $ig, $file_name);
 						$insert_values = [
 							'img_url' => $save_file,
 							'store_cd' => $store_cd,
@@ -298,21 +311,23 @@ class std02Controller extends Controller
 						];
 						DB::table('store_img')->insert($insert_values);
 						$last_seq++;
+					} else {
+						return false;
 					}
 				}
 				
 			}
-
-
+			
 			DB::commit();
 
 			return response()->json(["code" => $code, "msg" => $msg, "store_cd" => $request->input('store_cd')]);
 
 		} catch(Exception $e) {
 			$msg = $e->getMessage();
+			//  "에러가 발생했습니다. 잠시 후 다시시도 해주세요.";
 			DB::rollback();
 			return response()->json(["code" => '500', 'msg' => $msg]);
-			// 에러가 발생했습니다. 잠시 후 다시시도 해주세요.
+			
 		}
 	}
 
