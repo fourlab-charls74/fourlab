@@ -5,9 +5,11 @@ namespace App\Http\Controllers\store\standard;
 use App\Components\SLib;
 use App\Http\Controllers\Controller;
 use App\Components\Lib;
+use App\Components\ULib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Exception;
 
@@ -122,6 +124,8 @@ class std02Controller extends Controller
 	public function show($store_cd = '')
 	{
 		$store	= "";
+		$store_img	= "";
+		$map_key = "";
 		$grades = [];
 
 		if($store_cd != '') {
@@ -133,15 +137,35 @@ class std02Controller extends Controller
 			$store = DB::selectOne($sql, ["store_cd" => $store_cd]);
 		}
 
+		if($store_cd != '') {
+			$img_sql = "
+					select * from store_img
+					where store_cd = :store_cd
+			";
+
+			$store_img = DB::select($img_sql, ["store_cd" => $store_cd]);
+		}
+
+			$map_key_sql = "
+					select code_val
+					from code
+					where code_kind_cd = 'MAP_KEY'
+			";
+
+			$map_key = DB::selectOne($map_key_sql);
+		
 		$values = [
 			"cmd"	=> $store_cd == '' ? "" : "update",
 			"store"	=> $store,
+			'store_img' => $store_img,
+			'map_key' => $map_key,
 			'store_types' => SLib::getCodes("STORE_TYPE"),
 			'store_kinds' => SLib::getCodes("STORE_KIND"),
 			'store_areas' => SLib::getCodes("STORE_AREA"),
 			'grades' => SLib::getValidStoreGrades(),
 			'prioritys' => SLib::getCodes("PRIORITY")
 		];
+		
 
 		return view( Config::get('shop.store.view') . '/standard/std02_show',$values);
 	}
@@ -164,11 +188,19 @@ class std02Controller extends Controller
 		return response()->json(["code" => $code, "msg" => $msg]);
 	}
 
+	
 	// 매장 등록/수정
 	public function update_store(Request $request){
-		$id		= Auth('head')->user()->id;
-		$code	= 200;
-		$msg	= "매장정보가 정상적으로 반영되었습니다.";
+
+		$id			= Auth('head')->user()->id;
+		$code		= 200;
+		$msg		= "매장정보가 정상적으로 반영되었습니다.";
+		$store_cd 	= $request->input('store_cd');
+		$image 		= $request->file('file');
+		$y 			= $request->input('y');
+		$x 			= $request->input('x');
+		$map_code 	= $y.', '.$x;
+
 
 		try {
 			DB::beginTransaction();
@@ -227,22 +259,120 @@ class std02Controller extends Controller
 				'point_out_yn'	=> $request->input('point_out_yn'),
 				'reg_date'		=> now(),
 				'mod_date'		=> now(),
-				'admin_id'		=> $id
+				'admin_id'		=> $id,
+				'map_code'		=> $map_code
+				
 			];
-
+			
 			DB::table('store')->updateOrInsert($where, $values);
+			
 
+			// 이미지 저장
+			$base_path = "/images/std02";
+
+			if (!Storage::disk('public')->exists($base_path)) {
+				Storage::disk('public')->makeDirectory($base_path);
+			}
+
+			$sql = "
+				select seq
+				from store_img
+				where store_cd = '$store_cd'
+				order by seq desc
+				limit 1
+			";
+			$res = DB::selectOne($sql);
+
+			$last_seq = 0;
+
+			if($res !== null) {
+				$last_seq = $res->seq;
+			}
+
+			if ($image != null &&  $image != "") {
+				foreach ($image as $ig) {
+					$cnt = $last_seq + 1;
+
+					$realName = $ig->getClientOriginalName();
+
+					$ext = explode('.',$realName);
+					if ($ext[1] == 'jpeg' || $ext[1] == 'jpg') {
+						$ext = "jpg";
+						$file_name = sprintf("%s_%s.%s", $store_cd, "$cnt",$ext);
+						$save_file = sprintf("%s/%s", $base_path, $file_name);
+
+						Storage::disk('public')->putFileAs($base_path, $ig, $file_name);
+						$insert_values = [
+							'img_url' => $save_file,
+							'store_cd' => $store_cd,
+							'seq' => $cnt,
+							'rt' => now(),
+							'admin_id' => $id
+						];
+						DB::table('store_img')->insert($insert_values);
+						$last_seq++;
+					} else {
+						return false;
+					}
+				}
+				
+			}
+			
 			DB::commit();
 
 			return response()->json(["code" => $code, "msg" => $msg, "store_cd" => $request->input('store_cd')]);
 
-		} catch(Exception $e){
-
+		} catch(Exception $e) {
+			$msg = $e->getMessage();
+			//  "에러가 발생했습니다. 잠시 후 다시시도 해주세요.";
 			DB::rollback();
-			return response()->json(["code" => '500', 'msg' => "에러가 발생했습니다. 잠시 후 다시시도 해주세요."]);
-
+			return response()->json(["code" => '500', 'msg' => $msg]);
+			
 		}
 	}
+
+	public function del_img(Request $request)
+	{
+		$store_cd = $request->input('data_img');
+		$seq = $request->input('seq');
+		
+		try {
+            DB::beginTransaction();
+
+			$sel_sql = "
+				select img_url
+				from store_img
+				where store_cd = '$store_cd' and seq = $seq
+
+			";
+			$row = DB::selectOne($sel_sql);
+
+            $sql = "
+                delete 
+                from store_img
+                where store_cd = '$store_cd' and seq = $seq
+            ";
+
+            DB::delete($sql);
+			
+
+			ULib::deleteFile($row->img_url);
+
+            DB::commit();
+            $code = '200';
+            $msg = "";
+        } catch (Exception $e) {
+            DB::rollBack();
+            $code = 500;
+            $msg = $e->getMessage();
+        }
+
+        return response()->json([
+            "code" => $code,
+            "msg" => $msg
+        ]);
+	}
+
 
 	public function delete($com_id)
 	{

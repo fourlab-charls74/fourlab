@@ -53,8 +53,8 @@
 														@if ($cmd == 'addcmd')
 														<button name="com_id_check" class="btn btn-sm btn-primary fs-12 px-1 ml-1" style="width:100px;" onclick="checkdup();return false;">중복확인</button>
 														@endif
-														<div><span id="checkdupmessage"></span></div>
 													</div>
+													<div><span id="checkdupmessage"></span></div>
 												</td>
 												<th class="required">비밀번호</th>
 												<td colspan="3">
@@ -285,7 +285,7 @@
 															<label class="custom-control-label" for="dlv_policy1">쇼핑몰 정책</label>
 														</div>
 														<div class="custom-control custom-radio">
-															<input type="radio" name="dlv_policy" id="dlv_policy2" class="custom-control-input" value="c" @if($company['dlv_policy']=="c" )checked="checked" @endif onclick="ShowPolicyLayer('c');">
+															<input type="radio" name="dlv_policy" id="dlv_policy2" class="custom-control-input" value="c" @if($company['dlv_policy'] == "c" )checked="checked" @endif onclick="ShowPolicyLayer('c');">
 															<label class="custom-control-label" for="dlv_policy2">업체 정책</label>
 														</div>
 													</div>
@@ -301,7 +301,7 @@
 													<div id="dlv_policy_company" style="display:@if($company['dlv_policy'] == 'c') inline @else none @endif;">
 														<div class="flax_box">
 															<div>
-																<input type="text" class="form-control form-control-sm" name="dlv_amt" value="{{ $company['dlv_amt'] }}" style="display:inline;width:50px;text-align:right" onkeyup="com(this);">원
+																<input type="text" class="form-control form-control-sm" name="dlv_amt" value=" {{ $company['dlv_amt'] }}" style="display:inline;width:50px;text-align:right" onkeyup="com(this);">원
 															</div>
 															<div>
 																[ <input type="text" class="form-control form-control-sm" name="free_dlv_amt_limit" value="{{ $company['free_dlv_amt_limit'] }}" style="display:inline;width:50px;text-align:right" onkeyup="com(this);">원 이상 무료배송 ]
@@ -312,7 +312,7 @@
 												<th>배송기간</th>
 												<td>
 													<div class="input_box flax_box">
-														<input type="text" class="form-control form-control-sm mr-2 text-right" name="dlv_day" value="{{ $company['dlv_day'] ? $company['dlv_day'] : 0 }}" maxlength="2" style="width:80px;text-aling:right;ime-mode:disabled;" onkeydown="onlynum(this);" onfocus="this.select()" /> 일
+														<input type="text" class="form-control form-control-sm mr-2 text-right" name="dlv_day" value="{{ $company['dlv_day'] ? $company['dlv_day'] : 0 }}" maxlength="2" style="width:80px;text-align:right;ime-mode:disabled;" onkeydown="onlynum(this);" onfocus="this.select()" /> 일
 													</div>
 												</td>
 											</tr>
@@ -1039,13 +1039,22 @@
 	var _cmd = '';
 
 	function SaveCmd(cmd) {
+		let dlv_amt = $('input[name=dlv_amt]').val();
+		let free_dlv_amt_limit = $('input[name=free_dlv_amt_limit]').val();
+
 		var f1 = $("form[name=f1]");
+
+		let frm = f1.serialize();
+
+		frm += "&dlv_amt=" + unComma(dlv_amt);
+
+		frm += "&free_dlv_amt_limit=" + unComma(free_dlv_amt_limit);
 
 		$.ajax({
 			async: true,
 			type: 'put',
 			url: '/head/standard/std02/comm',
-			data: $("form[name=f1]").serialize(),
+			data: frm,
 			success: function(data) {
 				cbSaveCmd(data);
 			},
@@ -1575,6 +1584,8 @@
 			});
 		}
 	};
+
+	
 </script>
 
 @stop

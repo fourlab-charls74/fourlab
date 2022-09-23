@@ -70,7 +70,7 @@
                                                     </div>
                                                 </td>
                                             </tr>
-                                            <tr>
+                                            <tr @if ($opt_kind_cd == '') style="display:none;" @endif>
                                                 <th>등록자</th>
                                                 <td>
                                                     <div class="flax_box">
@@ -78,15 +78,15 @@
                                                     </div>
                                                 </td>
                                             </tr>
-                                            <tr>
+                                            <tr @if ($opt_kind_cd == '') style="display:none;" @endif>
                                                 <th>등록일시</th>
                                                 <td>
                                                     <div class="flax_box">
-														<span id="regi_date">{{ @$opt->regi_date }}</span>
+                                                        <span id="regi_date">{{ @$opt->regi_date }}</span>
                                                     </div>
                                                 </td>
                                             </tr>
-                                            <tr>
+                                            <tr @if ($opt_kind_cd == '') style="display:none;" @endif>
                                                 <th>수정일시</th>
                                                 <td>
                                                     <div class="flax_box">

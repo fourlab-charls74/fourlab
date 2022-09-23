@@ -1,7 +1,6 @@
 @extends('head_with.layouts.layout')
 @section('title','템플릿')
 @section('content')
-
 <div class="page_tit">
     <h3 class="d-inline-flex">템플릿</h3>
     <div class="d-inline-flex location">
@@ -103,8 +102,8 @@
         <input type="hidden" name="cs_nm" value="{$admin_nm}">
         <div class="row">
             <div class="col-sm-6">
-                <div class="card_wrap">
-                    <div class="card shadow">
+                <div class="card_wrap h-100">
+                    <div class="card shadow h-100">
                         <div class="card-header mb-0">
                             <h5 class="m-0 font-weight-bold">상품 세부 정보</h5>
                         </div>
@@ -117,8 +116,8 @@
                 </div>
             </div>
             <div class="col-sm-6">
-                <div class="card_wrap">
-                    <div class="card shadow">
+                <div class="card_wrap h-100">
+                    <div class="card shadow h-100">
                         <div class="row_wrap">
                             <div class="card-header mb-0">
                                 <h5 class="m-0 font-weight-bold">템플릿 정보</h5>
@@ -253,7 +252,8 @@ var columns = [
     });
     let gx;
     $(document).ready(function() {
-        pApp.ResizeGrid(310); //280
+        pApp.ResizeGrid(275); //280
+        pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
         Search(1);

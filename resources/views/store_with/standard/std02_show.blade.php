@@ -4,7 +4,6 @@
 	else					$title = "매장 수정";
 @endphp
 @section('title', $title)
-
 @section('content')
 <div class="show_layout py-3 px-sm-3">
     <div class="page_tit d-flex justify-content-between">
@@ -26,13 +25,30 @@
     <style> 
         .required:after {content:" *"; color: red;}
         .table th {min-width:120px;}
-
         @media (max-width: 740px) {
             .table td {float: unset !important;width:100% !important;}
         }
+		#multi_img {
+			display: grid;
+			grid-template-columns: 1fr 1fr 1fr;
+		}
+		.image {
+			display: block;
+			width: 100%;
+		}
+		#img_div {
+		width: 660px;
+		min-height: 0px;
+		padding: 10px;
+		}
+
+		#img_div:empty:before {
+		color: #999;
+		font-size: .9em;
+		}
     </style>
 
-	<form name="f1" id="f1">
+	<form name="f1" id="f1" enctype="multipart/form-data">
 		<input type="hidden" name="cmd" id="cmd" value="{{ $cmd }}">
 		<div class="card_wrap aco_card_wrap">
 			<div class="card shadow">
@@ -370,11 +386,55 @@
 							</div>
 						</div>
 					</div>
+			
+					<!-- 매장 정보 시작 -->
+					<div class="row">
+						<div class="col-12" style="padding-top:30px;font-size:18px;font-weight:bold;">+ 매장 정보</div>
+					</div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="table-box-ty2 mobile">
+                                <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                    <tbody>
+										<tr>
+											<th>이미지</th>
+											<td colspan="3">
+												<div style="text-align:center;" id="multi_img">
+													<input type='file' id='btnAdd' name="file" multiple='multiple' accept=".jpg"/>
+												</div>
+												<div id='img_div'></div>
+												@if ($cmd == 'update')
+													@foreach(@$store_img as $src)
+														<div id='img_show_div' data-img="{{$src->seq}}" style="display:inline-block;position:relative;width:150px;height:120px;margin:5px;z-index:1">
+															<img src="{{$src->img_url}}" alt="" id="img_show" style="width:100%;height:100%;z-index:none">
+															<input type="button" value="x" onclick= "delete_img('{{$src->store_cd}}','{{$src->seq}}')" style="width:20px;height:20px;position:absolute;right:0px;top:0px;border:none;font-size:large;font-weight:bolder;background:none;color:black;padding-bottom:20px;">
+														</div>
+													@endforeach
+												@endif
+											</td>
+										</tr>
+										@if($cmd !== "")
+                                            @if(@$store->store_type !== '11' && @$store->addr1 !== null)
+												<tr>
+													<th>지도</th>
+													<td style="width:100%;">
+														<div class="form-inline">
+															<div id="map" style="width:100%;height:400px;"></div>
+															<input type="hidden" id="map_code" value="{{ @$store->map_code }}">
+														</div>
+													</td>
+												</tr>
+											@endif
+										@endif
 
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
 					<div class="row">
 						<div class="col-12" style="padding-top:30px;font-size:18px;font-weight:bold;">+ 환경 정보</div>
 					</div>
-
                     <div class="row">
                         <div class="col-12">
                             <div class="table-box-ty2 mobile">
@@ -503,26 +563,240 @@
 	</form>
 </div>
 
+<!-- 지도 영역 -->
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ @$map_key->code_val }}&libraries=services"></script>
+<script>
+	$(document).ready(function() {
+		var mapContainer = document.getElementById('map');
+		var input = document.getElementById('map_code');
+		var map_code = input ? input.value : '';
+		var map_cd = map_code.split(', ');
+	
+		var	mapOption = {
+			center: new kakao.maps.LatLng(map_cd[0], map_cd[1]),
+			level: 4
+		};
+		var map = new kakao.maps.Map(mapContainer, mapOption); 
+		var geocoder = new kakao.maps.services.Geocoder();
+		let address = document.getElementById('addr1').value;
+		let store_nm = document.getElementById('store_nm').value;
+
+		// 좌표 값에 마커와 인포윈도우 출력
+		var markerPosition  = new kakao.maps.LatLng(map_cd[0], map_cd[1]); 
+
+		var marker = new kakao.maps.Marker({
+			position: markerPosition
+		});
+
+		marker.setMap(map);
+
+		var iwContent = '<div style="width:150px;text-align:center;padding:6px 0;">'+store_nm+'</div>'
+			iwPosition = new kakao.maps.LatLng(map_cd[0], map_cd[1]);
+
+		var infowindow = new kakao.maps.InfoWindow({
+			position : iwPosition, 
+			content : iwContent 
+		});
+		
+		infowindow.open(map, marker); 
+
+
+		// 주소 값으로 키워드 검색 기능
+		geocoder.addressSearch(address, function(result, status) {
+			if (status === kakao.maps.services.Status.OK) {
+				var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+				var marker = new kakao.maps.Marker({
+					map: map,
+					position: coords
+				});
+				var infowindow = new kakao.maps.InfoWindow({
+					content: '<div style="width:150px;text-align:center;padding:6px 0;">'+store_nm+'</div>'
+				});
+				infowindow.open(map, marker);
+				map.setCenter(coords);
+			} 
+		});
+
+		
+});
+
+	// 이미지
+
+	$(document).ready(function() {
+		$("input:file[name='file']").change(function() {
+			var str = $(this).val();
+			var fileName = str.split('\\').pop().toLowerCase();
+	
+			checkFileName(fileName);
+		});
+	});
+ 
+	function checkFileName(str) {
+	
+		//1. 확장자 체크
+		var ext =  str.split('.').pop().toLowerCase();
+		if ($.inArray(ext, ['jpg']) == -1) {
+			alert(ext+'파일은 업로드 하실 수 없습니다.');
+			$("input:file[name='file']").val("");
+			$('#img_div').remove();
+		}else{
+			
+		}
+	}
+
+	( imageView = function imageView(img_div, btn) {
+
+		var img_div = document.getElementById(img_div);
+		var btnAdd = document.getElementById(btn)
+		var sel_files = [];
+
+		// 이미지와 체크 박스를 감싸고 있는 div 속성
+		var div_style = 'display:inline-block;position:relative;'
+					+ 'width:150px;height:120px;margin:5px;z-index:1';
+		// 미리보기 이미지 속성
+		var img_style = 'width:100%;height:100%;z-index:none';
+		// 이미지안에 표시되는 체크박스의 속성
+		var chk_style = 'width:20px;height:20px;position:absolute;right:0px;top:0px;border:none;font-size:large;'
+						+'font-weight:bolder;background:none;color:black;padding-bottom:20px;';
+
+		btnAdd.onchange = function(e) {
+			var files = e.target.files;
+			var fileArr = Array.prototype.slice.call(files)
+			for (f of fileArr) {
+				imageLoader(f);
+			}
+		}
+
+		/*첨부된 이미지들을 배열에 넣고 미리보기 */
+		imageLoader = function(file) {
+			sel_files.push(file);
+			var reader = new FileReader();
+			reader.onload = function(ee) {
+				let img = document.createElement('img')
+				img.setAttribute('style', img_style)
+				img.src = ee.target.result;
+				img_div.appendChild(makeDiv(img, file));
+			}
+			
+			reader.readAsDataURL(file);
+		}
+
+		makeDiv = function(img, file) {
+			var div = document.createElement('div');
+			div.setAttribute('style', div_style);
+			
+			var btn = document.createElement('input');
+			btn.setAttribute('type', 'button');
+			btn.setAttribute('value', 'x');
+			btn.setAttribute('delFile', file.name);
+			btn.setAttribute('style', chk_style);
+			btn.onclick = function(ev) {
+				var ele = ev.srcElement;
+				var delFile = ele.getAttribute('delFile');
+				for (var i=0 ;i<sel_files.length; i++) {
+					if (delFile== sel_files[i].name) {
+						sel_files.splice(i, 1);
+					}
+				}
+				
+				dt = new DataTransfer();
+
+				for (f in sel_files) {
+					var file = sel_files[f];
+					dt.items.add(file);
+				}
+				btnAdd.files = dt.files;
+				var p = ele.parentNode;
+				img_div.removeChild(p);
+			}
+			div.appendChild(img);
+			div.appendChild(btn);
+
+			return div;
+		}		
+	}
+	)('img_div', 'btnAdd')
+
+
+	
+</script>
+
+<script>
+	function delete_img(store_cd, seq){
+        let img_show = document.querySelectorAll("#img_show_div");
+
+        if(confirm("선택한 사진을 삭제하시겠습니까?")){
+            $.ajax({
+                method: 'post',
+                url: '/store/standard/std02/del_img',
+                data: {data_img : store_cd, seq : seq},
+                success: function(data) {
+                    if (data.code == '200') {
+                        for (let i = 0;i<img_show.length;i++) {
+                            if (img_show[i].dataset.img == seq) {
+                                img_show[i].remove();
+                                break;
+                            }
+                        }
+                    } else {
+                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                    }
+                },
+                error: function(res, status, error) {
+                    console.log(error);
+                }
+            });
+        }
+    }
+</script>
+
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script type="text/javascript" charset="utf-8">
-
     function Cmder(type) {
         if( type === "" )				addStore();
         else if( type === "update" )	updateStore();
         else if( type === "delete" )	deleteStore();
     }
 
+	// 주소로 위도/경도 조회
+	const getMapCode = () => {
+			var geocoder = new kakao.maps.services.Geocoder();
+			let address = document.getElementById('addr1').value;
+			return new Promise((resolve, reject) => {
+				geocoder.addressSearch(address, async function(result, status) {
+					if (status === await kakao.maps.services.Status.OK) {
+						resolve({y: result[0].y, x: result[0].x});
+					} else {
+						reject(result);
+					}
+				});
+			});
+		}
+		
     // 매장정보 등록
     async function addStore() {
-		var frm	= $('form[name="f1"]');
+		let res = await getMapCode();
 
+		let form = new FormData(document.querySelector("#f1"));
+		
+		for(let i = 0; i< $("#btnAdd")[0].files.length; i++) {
+			form.append("file[]", $("#btnAdd")[0].files[i] || '');
+		}
+
+		form.append("y", res.y || '');
+		form.append("x", res.x || '');
+
+		for(let form_data of form.entries()) {
+			form_data[0], form_data[1];
+		}
+	
         if( !validation('add') )	return;
         if( !window.confirm("매장정보를 등록하시겠습니까?") )	return;
 
         axios({
             url: `/store/standard/std02/update`,
             method: 'post',
-            data: frm.serialize(),
+            data: form,
         }).then(function (res) {
             if(res.data.code === 200) {
                 alert(res.data.msg);
@@ -536,10 +810,18 @@
             console.log(err);
         });
     }
-
     // 매장정보 수정
     async function updateStore() {
-		var frm	= $('form[name="f1"]');
+		let res = await getMapCode();
+
+		let form = new FormData(document.querySelector("#f1"));
+
+		for (let i = 0; i< $("#btnAdd")[0].files.length; i++) {
+			form.append("file[]", $("#btnAdd")[0].files[i] || '');
+		}
+
+		form.append("y", res.y || '');
+		form.append("x", res.x || '');
 
 		if(!validation('update')) return;
         if(!window.confirm("매장정보를 수정하시겠습니까?")) return;
@@ -547,7 +829,7 @@
         axios({
             url: `/store/standard/std02/update`,
             method: 'post',
-            data: frm.serialize(),
+            data: form,
         }).then(function (res) {
             if(res.data.code === 200) {
                 alert(res.data.msg);
@@ -561,11 +843,9 @@
             console.log(err);
         });
     }
-
     // 매장정보 삭제
     async function deleteStore() {
         if(!window.confirm("매장정보를 삭제하시겠습니까?")) return;
-
         axios({
             url: `/store/standard/std02/delete/` + f1.storage_cd.value,
             method: 'delete',
@@ -582,28 +862,23 @@
             console.log(err);
         });
     }
-
     // 매장코드 중복체크
     async function checkCode() {
         const store_cd = $("[name=store_cd]").val().trim();
         if( store_cd === '' )	return alert("매장코드를 입력해주세요.");
-
         const response = await axios({ 
             url: `/store/standard/std02/check-code/${store_cd}`, 
             method: 'get' 
         });
         const {data: {code, msg}} = response;
-
         $("#dupcheck").text("* " + msg);
         $("#dupcheck").css("color", code === 200 ? "#00BB00" : "#ff0000");
         $("[name=store_only]").val(code === 200 ? "true" : "false");
     }
-
     // 창고코드값 변경 시 중복체크 false 변경
     function setDupCheckValue() {
         $("[name=storage_only]").val("false");
     }
-
     // 우편번호 검색하기
     function searchZipcode() {
         new daum.Postcode({
@@ -613,7 +888,6 @@
             }
         }).open();
     }
-
     // 우편번호 검색하기 - 사업자
     function searchBizZipcode() {
         new daum.Postcode({
@@ -623,7 +897,6 @@
             }
         }).open();
     }
-
 	// 저장 시 입력값 확인
 	const validation = (cmd) => {
 		if(cmd === "add"){
@@ -636,40 +909,33 @@
 			// 중복체크여부 검사
 			if($("[name='store_only']").val() !== "true") return alert("매장코드 중복체크를 해주세요.");
 		}
-
 		// 매장명칭 입력여부
 		if(f1.store_nm.value.trim() === '') {
 			f1.store_nm.focus();
 			return alert("매장명을 입력해주세요.");
 		}
-
 		// 매장명칭(약칭) 입력여부
 		if(f1.store_nm_s.value.trim() === '') {
 			f1.store_nm_s.focus();
 			return alert("매장명(약칭)을 입력해주세요.");
 		}
-
 		// 매장구분 선택여부
 		if(f1.store_type.selectedIndex == 0) {
 			f1.store_type.focus();
 			return alert("매장구분을 선택해주세요.");
 		}
-
 		// 매장종류 선택여부
 		if(f1.store_kind.selectedIndex == 0) {
 			f1.store_kind.focus();
 			return alert("매장종류를 선택해주세요.");
 		}
-
 		// 매장지역 선택여부
 		if(f1.store_area.selectedIndex == 0) {
 			f1.store_area.focus();
 			return alert("매장지역을 선택해주세요.");
 		}
-
 		// 주소 입력여부
 		if(f1.zipcode.value === '') return alert("주소를 입력해주세요.");
-
 		return true;
 	}
 </script>

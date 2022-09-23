@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="page_tit">
-    <h3 class="d-inline-flex">받은 알림 보관함</h3>
+    <h3 class="d-inline-flex">{{ @$cmd == 'send' ? '보낸' : '받은' }} 알림 보관함</h3>
     <div class="d-inline-flex location">
         <span class="home"></span>
         <span>/ 매장관리</span>
@@ -21,7 +21,11 @@
                     
                     <a href="#" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
                     <a href="#" onclick="openMsgPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"> 알림전송</a>
-                    <a href="#" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"> 보낸알림 보관함</a>
+                    @if(@$cmd == 'receive')
+                        <a href="/store/stock/stk32?is_send_msg=true" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"> 보낸알림 보관함</a>
+                    @elseif(@$cmd == 'send')
+                        <a href="/store/stock/stk32" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"> 받은알림 보관함</a>
+                    @endif
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
             </div>
@@ -29,7 +33,7 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="formrow-firstname-input">받은 날짜</label>
+                            <label for="formrow-firstname-input">{{ @$cmd == 'send' ? '보낸' : '받은' }} 날짜</label>
                             <div class="form-inline">
                                 <div class="docs-datepicker form-inline-inner input_box">
                                     <div class="input-group">
@@ -59,9 +63,9 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                          <label for="">발신처</label>
+                          <label for="">{{ @$cmd == 'send' ? '수신' : '발신' }}처</label>
                           <div class="flax_box">
-                            <input type='text' class="form-control form-control-sm search-all search-enter" name='subject' value=''>
+                            <input type='text' class="form-control form-control-sm search-all search-enter" name='sender' value=''>
                           </div>
                         </div>
                     </div>
@@ -81,7 +85,7 @@
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box" style="width:24%;">
                                         <select name="limit" class="form-control form-control-sm">
-                                            <option value="10">20</option>
+                                            <option value="20">20</option>
                                             <option value="50">50</option>
                                             <option value="100">100</option>
                                             <option value="200">200</option>
@@ -91,7 +95,7 @@
                                     <div class="form-inline-inner input_box" style="width:45%;">
                                         <select name="ord_field" class="form-control form-control-sm">
                                             <option value="rt">등록일</option>
-                                            <option value="subject">제목</option>
+                                            <option value="content">내용</option>
                                         </select>
                                     </div>
                                     <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -124,7 +128,11 @@
                 <div class="fl_box">
                     <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                 </div>
-                <a href="#" id="msg_read_btn" class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;"> 읽음</a>
+                @if(@$cmd == 'send')
+                    <a href="#" id="msg_del_btn" onclick="msgDel()"class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;"> 삭제</a>
+                @elseif(@$cmd == 'receive')
+                    <a href="#" id="msg_read_btn" onclick="msgRead()" class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;"> 읽음</a>
+                @endif
                 <div class="fr_box">
 
                 </div>
@@ -136,26 +144,55 @@
 	</div>
 </div>
 <script language="javascript">
-    let columns = [
-        {
-            headerName: '',
-            headerCheckboxSelection: true,
-            checkboxSelection: true,
-            width:28,
-            pinned:'left'
-        },
-        {headerName: "발신처", field: "sender_type",width:400},
-        {headerName: "연락처", field: "sender_cd",  width:80, cellClass: 'hd-grid-code'},
-        {headerName: "내용", field: "content",  width:80, cellClass: 'hd-grid-code'},
-        {headerName: "받은 날짜", field: "rt", width: 130, cellClass: 'hd-grid-code'},
-        {headerName: "알림 번호", field: "msg_cd", hide: true},        
-        { width: 'auto' }
-    ];                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+    let columns = [];
+    if('{{ @$cmd }}' == 'send') {
+
+        columns = [
+            {
+                headerName: '',
+                headerCheckboxSelection: true,
+                checkboxSelection: true,
+                width:28,
+                pinned:'left'
+            },
+            {field: "receiver_cd", hide: true},
+            {headerName: "수신처", field: "receiver_nm", width:200,
+                cellRenderer: (params) => 
+                        params.data.first_receiver + (params.data.receiver_cnt > 1 ? `외 ${params.data.receiver_cnt - 1}개` : '')
+            },
+            {headerName: "내용", field: "content", width:300},
+            {headerName: "보낸 날짜", field: "rt", width:120},
+            //{headerName: "확인여부", field: "check_yn", width: 150, cellClass: 'hd-grid-code'},
+            {width: 'auto'}
+        ];                              
+    } else {
+    
+        columns = [
+            {
+                headerName: '',
+                headerCheckboxSelection: true,
+                checkboxSelection: true,
+                width:28,
+                pinned:'left'
+            },
+            {field: "sender_cd", hide: true},
+            {headerName: "발신처", field: "sender_nm", width:150},
+            {headerName: "연락처", field: "mobile", width: 80, cellClass: 'hd-grid-code'},
+            {headerName: "내용", field: "content", width: 300},
+            {headerName: "받은 날짜", field: "rt", width: 110, cellClass: 'hd-grid-code'},
+            {headerName: "확인여부", field: "check_yn", width: 110, cellClass: 'hd-grid-code',
+                cellStyle: (params) => ({color: params.data.check_yn == 'Y' ? 'green' : 'none'})
+            },
+            {headerName: "알림 번호", field: "msg_cd", hide: true},        
+            {width: 'auto'}
+        ];                              
+    }
 
 </script>
 
 <script type="text/javascript" charset="utf-8">
-    const pApp = new App('',{
+    const pApp = new App('', {
         gridId:"#div-gd",
     });
     let gx;
@@ -170,23 +207,89 @@
 
     function Search() {
         let data = $('form[name="search"]').serialize();
+        data += "&msg_type=" + "{{ @$cmd }}";
         gx.Request('/store/stock/stk32/search', data);
     }
 
-</script>
-
-<script>
     const initSearchInputs = () => {
         document.search.reset(); // 모든 일반 input 초기화
         $('#store_no').val(null).trigger('change'); // 브랜드 select2 박스 초기화
         location.reload();
     };
-</script>
 
-<script>
     function openMsgPopup() {
         const url = '/store/stock/stk32/create';
-        const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=1000");
+        const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=700");
     }
+
+    function msgRead() {
+        const rows = gx.getSelectedRows();
+
+        let msg_cd = "";
+        
+        for (let i=0; i<rows.length; i++) {
+            msg_cd += rows[i].msg_cd + ',';
+        }
+
+        msg_cd = msg_cd.replace(/,\s*$/, "");
+        let msg_cds = msg_cd.split(',');
+
+        if (rows.length == 0) return alert('적어도 하나 이상 선택해주세요.');
+
+        $.ajax({
+            method: 'put',
+            url: '/store/stock/stk32/msg_read',
+            data: {msg_cd : msg_cds},
+            dataType : 'json',
+            success: function(data) {
+                if (data.code == '200') {
+                    alert('선택한 알림이 읽음 처리 되었습니다.');
+                } else {
+                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                }
+            },
+            error: function(e) {
+                    // console.log(e.responseText)
+            }
+        });
+
+    }
+
+    function msgDel() {
+        const rows = gx.getSelectedRows();
+
+        let msg_cd = "";
+        
+        for (let i=0; i<rows.length; i++) {
+            msg_cd += rows[i].msg_cd + ',';
+        }
+
+        msg_cd = msg_cd.replace(/,\s*$/, "");
+        let msg_cds = msg_cd.split(',');
+
+        if (rows.length == 0) return alert('적어도 하나 이상 선택해주세요.');
+
+        if(confirm("삭제하시겠습니까?")) {
+            $.ajax({
+                method: 'post',
+                url: '/store/stock/stk32/msg_del',
+                data: {msg_cd : msg_cds},
+                dataType : 'json',
+                success: function(data) {
+                    if (data.code == 200) {
+                        alert('선택한 알림이 삭제 처리 되었습니다.');
+                        location.reload();
+                    } else {
+                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                    }
+                },
+                error: function(e) {
+                        // console.log(e.responseText)
+                }
+            });
+        }
+    }
+
 </script>
+
 @stop

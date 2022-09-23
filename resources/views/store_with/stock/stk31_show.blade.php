@@ -103,7 +103,6 @@
                                             <span style="color:red">※매장 미선택시 전체 매장 공지로 등록됩니다.</span>
                                             @endif
                                                
-                                            
                                         </td>
                                     </tr>
                                 </table>

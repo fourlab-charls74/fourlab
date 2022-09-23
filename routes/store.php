@@ -76,6 +76,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('std02/check-code/{storage_cd?}', 'std02Controller@check_code');
 
         Route::post('std02/update', 'std02Controller@update_store');
+        Route::post('std02/del_img', 'std02Controller@del_img');
+
 
         // 창고관리
         Route::get('std03', 'std03Controller@index');
@@ -301,10 +303,20 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         //알림
         Route::get('stk32','stk32Controller@index');
         Route::get('stk32/search', 'stk32Controller@search');
+        Route::get('stk32/search-receiver', 'stk32Controller@search_receiver');
+        Route::get('stk32/search_group', 'stk32Controller@search_group');
+        Route::get('stk32/search_group2{group_cd?}', 'stk32Controller@search_group2');
         Route::get('stk32/create', 'stk32Controller@create');
         Route::get('stk32/sendMsg', 'stk32Controller@sendMsg');
         Route::get('stk32/show/{no?}', 'stk32Controller@show');
         Route::get('stk32/msg{no?}', 'stk32Controller@msg');
+        Route::post('stk32/store', 'stk32Controller@store');
+        Route::put('stk32/msg_read', 'stk32Controller@msg_read');
+        Route::post('stk32/msg_del', 'stk32Controller@msg_del');
+        Route::get('stk32/group', 'stk32Controller@group');
+        Route::post('stk32/add_group', 'stk32Controller@add_group');
+        Route::post('stk32/mod_group', 'stk32Controller@mod_group');
+        Route::post('stk32/del_group', 'stk32Controller@del_group');
 
     });
 

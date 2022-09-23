@@ -65,7 +65,7 @@
                         <div class="form-group">
                             <label for="formrow-firstname-input">제목</label>
                             <div class="flax_box">
-                                <input type="text" name="que" class="form-control form-control-sm">
+                                <input type="text" name="que" id="que" class="form-control form-control-sm search-all search-enter">
                             </div>
                         </div>
                     </div>
@@ -73,7 +73,7 @@
                         <div class="form-group">
                             <label for="dlv_kind">내용</label>
                             <div class="flax_box">
-                                <input type="text" name="ans" class="form-control form-control-sm">
+                                <input type="text" name="ans" id="ans" class="form-control form-control-sm search-all search-enter">
                             </div>
                         </div>
                     </div>
@@ -172,6 +172,7 @@
     let gx;
     $(document).ready(function() {
         pApp.ResizeGrid(275);
+        pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
         Search(1);

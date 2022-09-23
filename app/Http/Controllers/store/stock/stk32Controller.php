@@ -15,33 +15,95 @@ use App\Models\Conf;
 
 class stk32Controller extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $mutable = Carbon::now();
         $sdate	= $mutable->sub(1, 'month')->format('Y-m-d');
+        $msg_type = $request->input("is_send_msg", "false");
+        $msg_types = $msg_type == 'true' ? 'send' : 'receive';
 
         $values = [
-            'store_types'	=> SLib::getCodes("STORE_TYPE"),
+            'cmd' => $msg_types,
+            'store_types' => SLib::getCodes("STORE_TYPE"),
             'sdate' => $sdate,
             'edate' => date("Y-m-d")
         ];
         return view(Config::get('shop.store.view') . '/stock/stk32', $values);
     }
 
+
     public function search(Request $request)
     {
-        $sdate = $request->input('sdate', Carbon::now()->sub(3, 'month')->format('Ymd'));
-        $edate = $request->input('edate', date("Ymd"));
-        $sender = $request->input('');
-        $content = $request->input('');
+        $r = $request->all();
+        $sdate = $request->input('sdate', Carbon::now()->sub(1, 'month')->format('Y-m-d'));
+        $edate = $request->input('edate', date("Y-m-d"));
+        $sender = $request->input('sender');
+        $content = $request->input('content');
+        $msg_type = $request->input("msg_type", "");
 
         $where = "";
         $orderby = "";
-        if ($sender != "") $where .= "";
-        if ($content != "") $where .= "";
+        if ($sender != "") $where .= "and sender_cd like '%" . $sender . "%'  ";
+        if ($content != "") $where .= " and content like '%" . Lib::quote($content) . "%' ";
+     
 
-        $sql = "";
+        // 로그인한 계정 // 추후 수정
+        $admin_type = 'H';
+        $admin_cd = 'HEAD';
 
+        // ordreby
+        // $ord = $r['ord'] ?? 'desc';
+        // $ord_field = $r['ord_field'] ?? "ms.rt";
+        // if($ord_field == '') $ord_field = 'ms.' . $ord_field;
+        // else $ord_field = 'ms.' . $ord_field;
+        // $orderby = sprintf("order by %s %s", $ord_field, $ord);
+
+         // pagination
+        $page = $r['page'] ?? 1;
+        if ($page < 1 or $page == "") $page = 1;
+        $page_size = $r['limit'] ?? 100;
+        $startno = ($page - 1) * $page_size;
+        $limit = " limit $startno, $page_size ";
+
+        if ($msg_type == 'send') {
+            $sql = 
+                "
+                select 
+                    m.msg_cd,
+                    md.receiver_type,
+                    group_concat(md.receiver_cd separator ', ') as receiver_cd,
+                    group_concat(if(md.receiver_type = 'S', s.store_nm, '본사') separator ', ') as receiver_nm,
+                    if(md.receiver_type = 'S', s.store_nm, '본사') as first_receiver,
+                    count(md.receiver_cd) as receiver_cnt,
+                    m.reservation_yn,
+                    m.reservation_date,
+                    m.content,
+                    m.rt
+                from msg_store m
+                    inner join msg_store_detail md on md.msg_cd = m.msg_cd
+                    left outer join store s on s.store_cd = md.receiver_cd
+                where m.sender_type = '$admin_type' and m.sender_cd = '$admin_cd' $where
+                group by m.msg_cd
+                $limit
+                ";
+        } else if ($msg_type == 'receive') {
+            $sql = "
+                select 
+                    m.msg_cd,
+                    m.sender_cd,
+                    if(m.sender_type = 'S', s.store_nm, '본사') as sender_nm,
+                    s.phone as mobile,
+                    m.content,
+                    md.rt,
+                    md.check_yn
+                from msg_store_detail md
+                    inner join msg_store m on m.msg_cd = md.msg_cd
+                    left outer join store s on s.store_cd = m.sender_cd
+                where md.receiver_type = '$admin_type' and md.receiver_cd = '$admin_cd' $where
+                group by md.msg_cd
+            ";
+        }
+       
         $result = DB::select($sql , ['sdate' => $sdate, 'edate' => $edate]);
         
         return response()->json([
@@ -53,62 +115,551 @@ class stk32Controller extends Controller
         ]);
     }
 
-    public function create()
-    {
 
-        return view( Config::get('shop.store.view') . '/stock/stk32_show');
+    public function search_receiver(Request $request)
+    {
+        $store_nm = $request->input('store_nm');
+        $div_store = $request->input('div_store');
+
+        // pagination
+        $page = $r['page'] ?? 1;
+        if ($page < 1 or $page == "") $page = 1;
+        $page_size = $r['limit'] ?? 100;
+        $startno = ($page - 1) * $page_size;
+        $limit = " limit $startno, $page_size ";
+
+        $where = "";
+        if($store_nm != "" && $div_store == 'onceStore') $where .= " and store_nm like '%" . $store_nm . "%' ";
+        if($store_nm != "" && $div_store == 'groupStore') $where .= " and group_nm like '%" . $store_nm . "%'";
+
+        if ($div_store == 'onceStore') {
+            $sql = 
+                "
+                select 
+                    store_cd,
+                    store_nm,
+                    mobile
+                from store
+                where 1=1 $where
+                ";
+        } elseif ($div_store == 'groupStore') {
+            $sql = 
+                "
+                select 
+                    group_nm,
+                    group_cd
+                from msg_group
+                where 1=1 $where
+                ";
+
+        }
+
+        $result = DB::select($sql);
+
+        return response()->json([
+            "code" => 200,
+            "head" => array(
+                "total" => count($result)
+            ),
+            "body" => $result
+        ]);
+
     }
 
-    public function sendMsg()
+
+    public function search3(Request $request)
+    {
+        $store_nm = $request->input('store_nm');
+        $div_store = $request->input('div_store');
+
+        // pagination
+        $page = $r['page'] ?? 1;
+        if ($page < 1 or $page == "") $page = 1;
+        $page_size = $r['limit'] ?? 100;
+        $startno = ($page - 1) * $page_size;
+        $limit = " limit $startno, $page_size ";
+
+        $where = "";
+        if($store_nm != "" && $div_store == 'onceStore') $where .= " and store_nm like '%" . $store_nm . "%' ";
+        if($store_nm != "" && $div_store == 'groupStore') $where .= " and group_nm like '%" . $store_nm . "%'";
+
+        if ($div_store == 'onceStore') {
+            $sql = 
+                "
+                select 
+                    store_cd,
+                    store_nm,
+                    mobile
+                from store
+                where 1=1 $where
+            ";
+        } elseif ($div_store == 'groupStore') {
+            $sql = 
+                "
+                select 
+                    group_nm,
+                    group_cd
+                from msg_group
+                where 1=1 $where
+            ";
+        }
+
+        $result = DB::select($sql);
+
+        return response()->json([
+            "code" => 200,
+            "head" => array(
+                "total" => count($result)
+            ),
+            "body" => $result
+        ]);
+
+    }
+
+
+    public function create()
+    {
+        return view( Config::get('shop.store.view') . '/stock/stk32_show');
+    }
+    
+
+    public function sendMsg(Request $request)
     {
         
         $mutable = Carbon::now();
         $sdate	= $mutable->sub(1, 'month')->format('Y-m-d');
+        $store_cds = $request->input('store_cd','');
+        $store_cd = explode(',',$store_cds);
+        $group_cds = $request->input('group_cd', '');
+        $group_cd = explode(',',$group_cds);
+        $group_nms = $request->input('group_nm', '');
+        $group_nm = explode(',',$group_nms);
+        
+        $stores = [];
+        foreach($store_cd as $store) {
+            $store_nm = 
+                "
+                select 
+                    store_cd,
+                    store_nm
+                from store
+                where store_cd in('$store');
+            ";
+            $sc = DB::selectOne($store_nm);
+            if ($sc != null) {
+                array_push($stores, $sc);
+            }
+        }
 
+        $groups = [];
+        foreach ($group_cd as $gc) {
+            $group_cd_data = 
+                "
+                select
+                    mg.group_cd,
+                    group_concat(mgs.store_cd separator ', ') as stores
+                from msg_group mg
+                left outer join msg_group_store mgs ON mgs.group_cd = mg.group_cd
+                where mgs.group_cd = '$gc'
+            ";
+            $sc2 = DB::selectOne($group_cd_data);
+            if ($sc2 != null) {
+                array_push($groups, $sc2);
+            }
+        }
+
+        $groupName = [];
+        foreach ($group_nm as $gn) {
+            $group_nm_data = 
+                "
+                select 
+                    group_nm,
+                    group_cd
+                    
+                from msg_group
+                where group_nm = '$gn'
+
+            ";
+            $sc3 = DB::selectOne($group_nm_data);
+            if ($sc3 != null) {
+                array_push($groupName, $sc3);
+            }
+        }
+          
         $values = [
-            'store_types'	=> SLib::getCodes("STORE_TYPE"),
+            'store_types' => SLib::getCodes("STORE_TYPE"),
             'sdate' => $sdate,
-            'edate' => date("Y-m-d")
+            'edate' => date("Y-m-d"),
+            'stores' => $stores,
+            'store_cds' => $store_cds,
+            'group_cds' => $group_cds,
+            'group_nms' => $group_nms,
+            'groups' => $groups,
+            'groupName' => $groupName
         ];
 
         return view( Config::get('shop.store.view') . '/stock/stk32_sendMsg', $values);
     }
 
-    public function show($no) 
+
+    public function store(Request $request)
     {
+       
+        $content = $request->input('content');
+        $reservation_yn = $request->input('reservation_yn');
+        $store_cds = $request->input('store_cds');
+        $store_cds = explode(',',$store_cds);
+        $reservation_msg = $request->input('reservation_msg');
+        $group_nms = $request->input('group_nms');
+        $group_nms = explode(',',$group_nms);
+        $group_cds = $request->input('group_cds');
+        $group_cds = explode(',',$group_cds);
+        $check = $request->input('check');
 
-        $sql = /** @lang text */
-            "
-            select * 
-            from msg_store_detail
-			where msg_cd = $no
-        ";
-        $result = DB::selectOne($sql,array("msg_cd" => $no));
+        $sender_type = "H";
+        $sender_cd = "HEAD";
+        $rm_date = $request->input('rm_date');
+        $rm_hour = $request->input('rm_hour');
+        $rm_min = $request->input('rm_min');
+        
+        if ($reservation_msg == 'true') {
+            $reservation_yn = "Y";
+            $reservation_date = "$rm_date"." $rm_hour:"."$rm_min:00";
+        } elseif ($reservation_msg == 'false') {
+            $reservation_yn = "N";
+            $reservation_date = "";
+        }
 
-        $values = [
-            'msg_cd' => $no,
-            'result' => $result,
-        ];
+        try {
+            DB::beginTransaction();
+           
+            $res = DB::table('msg_store')
+                ->insertGetId([
+                    'sender_type' => $sender_type,
+                    'sender_cd' => $sender_cd,
+                    'reservation_yn' => $reservation_yn,
+                    'reservation_date' => $reservation_date,
+                    'content' => $content,
+                    'rt' => now()
+                ]);
 
-        return view( Config::get('shop.store.view') . '/stock/stk32_show', $values);
+            if ($check == "onceStore") {
+                foreach ($store_cds as $sc) {
+                    DB::table('msg_store_detail')
+                        ->insert([
+                            'msg_cd' => $res,
+                            'receiver_type' => 'S',
+                            'receiver_cd' => $sc ,
+                            'check_yn' => 'N',
+                            'rt' => now()
+                        ]);
+                    }
+            } else {
+                $send = [];
+                foreach ($group_cds as $gc) {
+                    $result = 
+                        "
+                            select 
+                                store_cd
+                            from msg_group_store
+                            where group_cd = $gc
+                    ";
+                    $rs = DB::select($result);
+                    if ($rs != null) {
+                        array_push($send, $rs);
+                    }
+                }
+                $arr = array_merge(...array_values($send));
+                foreach ($arr as $r) {
+                    DB::table('msg_store_detail')
+                        ->insert([
+                            'msg_cd' => $res,
+                            'receiver_type' => 'S',
+                            'receiver_cd' => $r->store_cd ,
+                            'check_yn' => 'N',
+                            'rt' => now()
+                        ]);
+                }
+            }
+            DB::commit();
+            $code = '200';
+            $msg = "";
+        } catch (Exception $e) {
+            DB::rollBack();
+            $code = '500';
+            $msg = $e->getMessage();
+        }
+        return response()->json([
+            "code" => $code,
+            "msg" => $msg
+        ]);
     }
 
-    public function msg($no) 
+
+    public function msg_read(Request $request)
     {
+        $msg_cd = $request->input('msg_cd');
 
-        $sql = /** @lang text */
-            "
-            select * from msg_store
-			where msg_cd = $no
-         ";
-        $result = DB::selectOne($sql,array("msg_cd" => $no));
-
-        $values = [
-            'msg_cd' => $no,
-            'result' => $result,
+        $msg_store_detail = [
+            'check_yn' => 'Y',
+            'check_date' => now()
         ];
 
-        return view( Config::get('shop.store.view') . '/stock/stk32_msg', $values);
+        try {
+            DB::beginTransaction();
+
+            foreach ($msg_cd as $mc) {
+                DB::table('msg_store_detail')
+                    ->where('msg_cd', '=', $mc)
+                    ->update($msg_store_detail);
+            }
+
+            DB::commit();
+            $code = 200;
+            $msg = "";
+        } catch (Exception $e) {
+            DB::rollBack();
+            $code = 500;
+            $msg = $e->getMessage();
+        }
+        return response()->json([
+            "code" => $code,
+            "msg" => $msg
+        ]);
+
+    }
+
+
+    public function msg_del(Request $request)
+    {
+        $msg_cd = $request->input('msg_cd');
+
+        try {
+            DB::beginTransaction();
+
+            foreach ($msg_cd as $mc) {
+                DB::table('msg_store_detail')
+                    ->where('msg_cd', '=', $mc)
+                    ->delete();
+            }
+
+            DB::commit();
+            $code = 200;
+            $msg = "";
+        } catch (Exception $e) {
+            DB::rollBack();
+            $code = 500;
+            $msg = "실패!";
+        }
+
+        return response()->json([
+            "code" => $code,
+            "msg" => $msg
+        ]);
+
+        
+    }
+
+
+    public function group(Request $request)
+    {
+        
+        $mutable = Carbon::now();
+        $sdate = $mutable->sub(1, 'month')->format('Y-m-d');
+       
+        $values = [
+            'store_types' => SLib::getCodes("STORE_TYPE"),
+            'sdate' => $sdate,
+            'edate' => date("Y-m-d"),
+        ];
+
+        return view(Config::get('shop.store.view') . '/stock/stk32_group', $values);
+    }
+
+
+    public function search_group(Request $request)
+    {
+        $sql = 
+        "
+            select 
+                group_cd,
+                group_nm
+            from msg_group
+            
+        ";
+
+        $result = DB::select($sql);
+
+        return response()->json([
+            "code" => 200,
+            "head" => array(
+                "total" => count($result)
+            ),
+            "body" => $result
+        ]);
+    }
+
+
+    public function search_group2(Request $request)
+    {
+        $group_cd = $request->input('group_cd');
+
+        $sql = 
+        "
+            select 
+                m.group_cd,
+                m.store_cd,
+                s.store_nm
+            from msg_group_store m 
+            left outer join store s on s.store_cd = m.store_cd
+            inner join msg_group mg on m.group_cd = mg.group_cd
+            where m.group_cd = '$group_cd'
+            
+        ";
+
+        $result = DB::select($sql);
+
+        return response()->json([
+            "code" => 200,
+            "head" => array(
+                "total" => count($result)
+            ),
+            "body" => $result
+        ]);
+    }
+
+
+    public function add_group(Request $request)
+    {
+        $group_nm = $request->input('group_nm');
+        $store_cd = $request->input('store_cd');
+        $store_cd = explode(',',$store_cd);
+
+        try {
+            DB::beginTransaction();
+
+            $res = DB::table('msg_group')
+                ->insertGetId([
+                    'group_nm' => $group_nm,
+                    'account_cd' => 'HEAD',
+                    'rt' => now()
+                ]);
+
+            foreach ($store_cd as $sc) {
+                DB::table('msg_group_store')
+                    ->insert([
+                        'group_cd' => $res,
+                        'store_cd' => $sc,
+                        'rt' => now()
+                    ]);
+            }
+            DB::commit();
+            $code = '200';
+            $msg = "";
+        } catch (Exception $e) {
+            DB::rollBack();
+            $code = '500';
+            $msg = $e->getMessage();
+        }
+
+        return response()->json([
+            "code" => $code,
+            "msg" => $msg
+        ]);
+
+    }
+
+    public function mod_group(Request $request)
+    {
+        $group_nm = $request->input('group_nm');
+        $group_cd = $request->input('group_cd');
+        
+        $store_cd = $request->input('store_cd');
+        $store_cd = explode(',',$store_cd);
+        
+        $mod_store_cd = $request->input('mod_store_cd');
+        $mod_store_cd = explode(',',$mod_store_cd);
+        
+        $del_group_cd = $request->input('del_group_cd');
+        $del_group_cd = explode(',',$del_group_cd);
+
+        $add_store = $request->input('add_store');
+        $add_store = explode(',',$add_store);
+        
+        try {
+            DB::beginTransaction();
+            
+            DB::table('msg_group')
+                ->where('group_cd', '=', $group_cd)
+                ->update([
+                    'group_nm' => $group_nm
+                ]);
+
+            if ($add_store != null ) {
+                foreach ($add_store as $as) {
+                    DB::table('msg_group_store')
+                        ->insert([
+                            'group_cd' => $group_cd,
+                            'store_cd' => $as,
+                            'rt' => now()
+                        ]);
+                }
+            }
+
+            if ($del_group_cd != "") {
+                DB::table('msg_group_store')
+                    ->where('group_cd', '=', $group_cd)
+                    ->delete();
+            }
+
+            foreach ($store_cd as $sc) {
+                DB::table('msg_group_store')
+                    ->where('store_cd', '=', $sc)
+                    ->delete();
+            }
+
+            DB::commit();
+            $code = 200;
+            $msg = "";
+        } catch (Exception $e) {
+            DB::rollBack();
+            $code = 500;
+            $msg = $e->getMessage();
+        }
+        return response()->json([
+            "code" => $code,
+            "msg" => $msg
+        ]);
+    }
+
+
+    public function del_group(Request $request)
+    {
+        $group_cd = $request->input('group_cd');
+
+        try {
+            DB::beginTransaction();
+
+            DB::table('msg_group')
+                ->where('group_cd', '=', $group_cd)
+                ->delete();
+            
+            DB::table('msg_group_store')
+                ->where('group_cd', '=', $group_cd)
+                ->delete();
+                    
+            DB::commit();
+            $code = '200';
+            $msg = "";
+        } catch (Exception $e) {
+            DB::rollBack();
+            $code = '500';
+            $msg = $e->getMessage();
+        }
+        return response()->json([
+            "code" => $code,
+            "msg" => $msg
+        ]);
     }
 
 }
