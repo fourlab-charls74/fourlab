@@ -122,7 +122,7 @@
                             <div class="card-header mb-0">
                                 <h5 class="m-0 font-weight-bold">템플릿 정보</h5>
                             </div>
-                            <div class="card-body pt-3" >
+                            <div class="card-body pt-3">
                                 <div class="table-box-ty2 mobile">
                                     <table class="table incont table-bordered" id="dataTable" width="100%" cellspacing="0">
                                         <tbody>
@@ -500,10 +500,6 @@ var columns = [
         }
         return true;
     }
-
-    $(window).resize(function() {
-        $('#card').css('height', $(window).height() - 50 );
-    });
 
 </script>
 @stop

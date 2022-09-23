@@ -425,16 +425,6 @@
 													</td>
 												</tr>
 											@endif
-										@else
-											<tr style="display:none;">
-												<th>지도</th>
-												<td style="width:100%;">
-													<div class="form-inline">
-														<div id="map" style="width:100%;height:400px;"></div>
-														<input type="hidden" id="map_code" value="{{ @$store->map_code }}">
-													</div>
-												</td>
-											</tr>
 										@endif
 
 									</tbody>

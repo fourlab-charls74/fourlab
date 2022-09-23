@@ -172,6 +172,7 @@
     let gx;
     $(document).ready(function() {
         pApp.ResizeGrid(275);
+        pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
         Search(1);
@@ -245,14 +246,5 @@
         //console.log(data);
         gx.Request('/head/standard/std05/search', data, page);
     }
-</script>
-
-<script>
-    $('#que, #ans').keydown(function(key){
-        if(key.keyCode == 13 ){
-            Search(1);
-        }
-
-    });
 </script>
 @stop
