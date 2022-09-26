@@ -114,7 +114,6 @@ class std11Controller extends Controller
 		$limit_coupon_yn	= $req->input("limit_coupon_yn", "");
 		$limit_point_yn	    = $req->input("limit_point_yn", "");
 		$add_point_yn		= $req->input("add_point_yn", "");
-
         $where = "";
 
 		if ($name != "")			$where .= " and a.name like '$name%'";
@@ -124,9 +123,16 @@ class std11Controller extends Controller
 		if ($limit_point_yn != "")	$where .= " and a.limit_point_yn = '$limit_point_yn'";
 		if ($add_point_yn != "")	$where .= " and a.add_point_yn = '$add_point_yn'";
 
-		$sql = "
+        if($dc_range == 'A') {
+            $sql = "
+                select *
+                from ad_dc a
+                order by a.no desc
+            ";
+        }else{
+            $sql = "
 			select
-				a.name, a.use_yn, if(a.dc_range = 'G', '상품', '전체') as dc_range, dc_rate, dc_amt, date_from, date_to,
+				a.name, a.use_yn, a.dc_range, dc_rate, dc_amt, date_from, date_to,
 				limit_margin_rate, limit_coupon_yn, limit_point_yn, add_point_yn, add_point_rate, add_point_amt, admin_nm, rt, ut,
 				a.no
 			from ad_dc a
@@ -134,7 +140,8 @@ class std11Controller extends Controller
 				$where
 			order by a.no desc
         ";
-        
+        }
+		
         $rows = DB::select($sql);
 
         $collection = collect($rows);
@@ -295,17 +302,19 @@ class std11Controller extends Controller
         if( $com_nm    != "" )     $where .= " and com.com_nm like '%$com_nm%' ";
 
 		//멤버등급의 할인율
-        $sql = "select dc_ratio from user_group where group_no = '3'";
+        $ratio_sql = "select dc_ratio from user_group where group_no = '3'";
 
-        $row = DB::selectOne($sql);
-		$dc_ratio = $row->dc_ratio;
+        $row = DB::selectOne($ratio_sql);
+		$dc_ratio = 0;
+        if($row != null) $dc_ratio = $row->dc_ratio;
+
         //wonga
 		$sql = "
 			select
 				b.goods_no, b.goods_sub, ifnull( type.code_val, 'N/A') as goods_type,com.com_nm,opt.opt_kind_nm,
 				d.brand_nm, c.style_no,
 				' ' as img_view,if(c.img <> '',concat('$goods_img_url',replace(c.img,'$cfg_img_size_real','$cfg_img_size_list')),'') as img,
-				c.goods_nm, stat.code_val as sale_stat_cl, c.price, c.wonga, round(c.price*(1- if(c.limited_dc='Y',0,'$dc_ratio')/100)) as group_amt,
+				c.goods_nm, stat.code_val as sale_stat_cl, c.price, c.wonga, round(c.price*(1- if(c.limited_dc='Y',0,$dc_ratio)/100)) as group_amt,
 				ifnull(gc.coupon_dc_price, 0) as coupon_dc_price, if(c.prepoint_yn='N',0,c.point) as prepoint, '' as receive_amt,
 				round(c.price*(1- b.dc_rate/100) - b.dc_amt) as ptn_dc_amt, 
 				'' as group_diff_amt, '' as margin_diff_amt, 

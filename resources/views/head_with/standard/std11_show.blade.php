@@ -201,7 +201,7 @@
                                             <col width="*">
                                         </colgroup>
                                         <tbody>
-                                            <tr>
+                                            <tr id="brand_sale">
                                                 <th class="ty2">브랜드별 할인</th>
                                                 <td class="ty2" colspan="5">
                                                     <div class="filter_wrap_inner">
@@ -215,12 +215,12 @@
                                                             <a href="#" class="btn btn-sm btn-secondary brand-submit-btn">저장</a>
                                                         </div>
                                                     </div>
-                                                    <div class="table-responsive mt-1">
+                                                    <div class="table-responsive mt-1" >
                                                         <div id="brand-gd" style="height:120px; width:100%;" class="ag-theme-balham"></div>
                                                     </div>
                                                 </td>
                                             </tr>
-                                            <tr>
+                                            <tr id="goods_sale">
                                                 <th class="ty2">상품별 할인</th>
                                                 <td class="ty2" colspan="5">
                                                     <div class="filter_wrap_inner">
@@ -239,7 +239,7 @@
                                                     </div>
                                                 </td>
                                             </tr>
-                                            <tr>
+                                            <tr id="no_sale">
                                                 <th class="ty2">할인 제외 상품</th>
                                                 <td class="ty2" colspan="5">
                                                     <div class="filter_wrap_inner">
@@ -339,6 +339,29 @@ $('.submit-btn').click((e) => {
     });
 });
 </script>
+
+<!-- 범위 라디오버튼 클릭시 해당 그리드만 출력 -->
+<script>
+    $(document).ready(function(){
+        if($("input[name=dc_range]:checked").val() == "G"){
+                $('#brand_sale').hide();
+                $('#goods_sale').show();
+                $('#no_sale').hide();
+        }
+        $("input[name='dc_range']").click(function(){
+            if ($("input[name=dc_range]:checked").val() == "G") {
+                $('#brand_sale').hide();
+                $('#goods_sale').show();
+                $('#no_sale').hide();
+            } else {
+                $('#brand_sale').show();
+                $('#goods_sale').show();
+                $('#no_sale').show();
+            }
+        });
+    });
+</script>
+
 <!-- 수정일 경우만 로직 실행 -->
 @if (!empty($no))
 <script>

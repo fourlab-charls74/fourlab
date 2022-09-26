@@ -15,7 +15,6 @@ class std10Controller extends Controller
 {
     public function index()
     {
-
         $values = [
             'user_yn' => SLib::getCodes('G_USER_TYPE'),
             'types' => SLib::getCodes('G_AD_TYPE'),
@@ -27,12 +26,28 @@ class std10Controller extends Controller
 
     public function show($code = '')
     {
+
+        $query = "
+            select * 
+            from ad_dc
+        ";
+
+        $ad_sale = DB::select($query);
+        
+
         if (empty($code)) {
             $type    = "";
             $name    = "";
             $state    = "1";
+            $ad_sale = "";
         } else {
-            $sql = "select * from ad where ad = '$code'";
+
+            $sql = "
+                select * 
+                from ad 
+                where ad = '$code' 
+
+            ";
 
             $row = DB::selectOne($sql);
 
@@ -40,6 +55,7 @@ class std10Controller extends Controller
                 $type    = $row->type;
                 $name    = $row->name;
                 $state    = $row->state;
+                $dc_no = $row->dc_no;
             }
         }
 
@@ -48,8 +64,10 @@ class std10Controller extends Controller
             'type' => $type,
             'name' => $name,
             'state' => $state,
+            'dc_no' => $dc_no,
             'types' => SLib::getCodes('G_AD_TYPE'),
-            'states' => SLib::getCodes('IS_SHOW')
+            'states' => SLib::getCodes('IS_SHOW'),
+            'ad_sale' => $ad_sale
         ];
 
         return view(Config::get('shop.head.view') . '/standard/std10_show', $values);
@@ -110,7 +128,8 @@ class std10Controller extends Controller
         $values = [
             'type' => $req->input('type', ''),
             'name' => $req->input('name', ''),
-            'state' => $req->input('state', '')
+            'state' => $req->input('state', ''),
+            'dc_no' => $req->input('ad_sale', '')
         ];
         $values[$code === '' ? 'rt' : 'ut'] = now();
 

@@ -835,10 +835,12 @@
                 alert(res.data.msg);
                 opener.Search();
                 window.close();
-            } else {
+            } else if(res.data.msg === 500) {
                 console.log(res.data);
                 alert("수정 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-            }
+            }else {
+				alert("잘못된 형식의 이미지입니다.");
+			}
         }).catch(function (err) {
             console.log(err);
         });

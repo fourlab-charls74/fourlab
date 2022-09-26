@@ -19,7 +19,6 @@ class std02Controller extends Controller
 {
 	public function index() 
 	{
-	
 		$values = [
 			'store_types'	=> SLib::getCodes("STORE_TYPE"),	// 매장구분
 			'store_kinds'	=> SLib::getCodes("STORE_KIND"),	// 매장종류
@@ -292,13 +291,15 @@ class std02Controller extends Controller
 			if ($image != null &&  $image != "") {
 				foreach ($image as $ig) {
 					$cnt = $last_seq + 1;
+					$imgSize = getimagesize($ig);
+					$imageType = "";
+					if($imgSize[2] == 2){
+						$imageType = "jpg";
+					}
+					$imageType2 = $imgSize['mime'];
 
-					$realName = $ig->getClientOriginalName();
-
-					$ext = explode('.',$realName);
-					if ($ext[1] == 'jpeg' || $ext[1] == 'jpg') {
-						$ext = "jpg";
-						$file_name = sprintf("%s_%s.%s", $store_cd, "$cnt",$ext);
+					if ($imageType == "jpg" && $imageType2 == 'image/jpeg') {
+						$file_name = sprintf("%s_%s.jpg", $store_cd, "$cnt");
 						$save_file = sprintf("%s/%s", $base_path, $file_name);
 
 						Storage::disk('public')->putFileAs($base_path, $ig, $file_name);
@@ -311,8 +312,9 @@ class std02Controller extends Controller
 						];
 						DB::table('store_img')->insert($insert_values);
 						$last_seq++;
+
 					} else {
-						return false;
+						return ;
 					}
 				}
 				
@@ -323,10 +325,10 @@ class std02Controller extends Controller
 			return response()->json(["code" => $code, "msg" => $msg, "store_cd" => $request->input('store_cd')]);
 
 		} catch(Exception $e) {
-			$msg = $e->getMessage();
-			//  "에러가 발생했습니다. 잠시 후 다시시도 해주세요.";
+			$msg = "에러가 발생했습니다. 잠시 후 다시시도 해주세요.";
+			
 			DB::rollback();
-			return response()->json(["code" => '500', 'msg' => $msg]);
+			return response()->json(["code" => 300, 'msg' => $msg]);
 			
 		}
 	}

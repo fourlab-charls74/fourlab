@@ -110,6 +110,14 @@
         N: "시스템"
     };
 
+    const TYPE = {
+        KEYWORD : '키워드',
+        ETC : '기타',
+        EMAIL : '이메일',
+        BANNER : '배너',
+        AFFILIATE : '제휴'
+    }
+
     const columnDefs = [{ field: "user_yn", headerName: "유형",
             cellRenderer: (params) => {
                 if (params.value == "Y") {
@@ -120,7 +128,23 @@
         },
         {
             field: "type",
-            headerName: "광고구분"
+            headerName: "광고구분",
+            cellRenderer: (params) => {
+                if (params.value == "KEYWORD") {
+                    return TYPE.KEYWORD;
+                } else if (params.value == "ETC") {
+                    return TYPE.ETC;
+                } else if (params.value == "EMAIL") {
+                    return TYPE.EMAIL;
+                } else if (params.value == "BANNER") {
+                    return TYPE.BANNER;
+                } else if (params.value == "AFFILIATE") {
+                    return TYPE.AFFILIATE;
+                }
+                
+                return params.value;
+            }
+
         },
         {
             field: "ad",
@@ -173,12 +197,12 @@
 
     function openCodePopup(a) {
         const url = '/head/standard/std10/show/' + $(a).attr('data-code');
-        const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=600,height=400");
+        const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=600,height=440");
     }
 
     function openAddPopup() {
         const url = '/head/standard/std10/show/';
-        const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=600,height=400");
+        const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=600,height=440");
     }
 
     Search();

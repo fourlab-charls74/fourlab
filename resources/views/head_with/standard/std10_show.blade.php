@@ -74,6 +74,24 @@
                                                     </div>
 												</td>
 											</tr>
+											<tr>
+												<th>광고할인</th>
+												<td colspan="5">
+                                                    <div class="flax_box">
+                                                        <select name='ad_sale' class="form-control form-control-sm">
+                                                            <option value="">==선택==</option>
+                                                            @foreach($ad_sale as $as) 
+                                                                <option 
+                                                                    value="{{$as->no}}"
+                                                                    @if($as->no === $dc_no) selected @endif
+                                                                >
+                                                                    {{$as->name}}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+												</td>
+											</tr>
 										</tbody>
 									</table>
 								</div>
@@ -89,7 +107,7 @@
         @if ($code !== '')
         <a href="#" class="btn btn-sm btn-secondary delete-btn">삭제</a>
         @endif
-        <a href="#" class="btn btn-sm btn-secondary" onclick="window.close()">취소</a>
+        <a href="#" class="btn btn-sm btn-secondary" onclick="window.close()">닫기</a>
     </div>
 </div>
 
