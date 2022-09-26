@@ -111,6 +111,7 @@
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box" style="width:24%;">
                                     <select name="limit" class="form-control form-control-sm">
+                                        <option value="500">500</option>
                                         <option value="1000">1000</option>
                                         <option value="2000">2000</option>
                                         <option value="5000">5000</option>
@@ -119,17 +120,17 @@
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
-                                        <option value="goods_no">상품번호</option>
-                                        <option value="prd_cd">상품코드</option>
+                                        <option value="o.store_cd">매장코드</option>
+                                        <option value="o.prd_cd">상품코드</option>
                                     </select>
                                 </div>
                                 <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
                                     <div class="btn-group" role="group">
-                                        <label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="내림차순"><i class="bx bx-sort-down"></i></label>
-                                        <label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="오름차순"><i class="bx bx-sort-up"></i></label>
+                                        <label class="btn btn-secondary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="내림차순"><i class="bx bx-sort-down"></i></label>
+                                        <label class="btn btn-primary primary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="오름차순"><i class="bx bx-sort-up"></i></label>
                                     </div>
-                                    <input type="radio" name="ord" id="sort_desc" value="desc" checked="">
-                                    <input type="radio" name="ord" id="sort_asc" value="asc">
+                                    <input type="radio" name="ord" id="sort_desc" value="desc">
+                                    <input type="radio" name="ord" id="sort_asc" value="asc" checked="">
                                 </div>
                             </div>
                         </div>
@@ -163,7 +164,7 @@
     let AlignCenter = {"text-align": "center"};
     let columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: AlignCenter},
-        {field: "store_cd",	hide: true},
+        {field: "store_cd",	headerName: "매장코드", pinned: 'left', width: 60, cellStyle: AlignCenter},
         {field: "store_nm",	headerName: "매장명", pinned: 'left', width: 130},
         {field: "goods_no", headerName: "상품번호", pinned: 'left', width: 60, cellStyle: AlignCenter},
         {field: "prd_cd", headerName: "바코드", pinned: 'left', width: 120, cellStyle: AlignCenter},
@@ -181,9 +182,15 @@
             headerName: "이전재고",
             children: [
                 {field: "prev_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "prev_sh", headerName: "TAG금액", width: 70, type: "currencyType"},
-                {field: "prev_price", headerName: "판매가금액", width: 70, type: "currencyType"},
-                {field: "prev_wonga", headerName: "원가금액", width: 70, type: "currencyType"},
+                {field: "prev_sh", headerName: "TAG금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.prev_qty || 0) * params.data.goods_sh)
+                },
+                {field: "prev_price", headerName: "판매가금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.prev_qty || 0) * params.data.price)
+                },
+                {field: "prev_wonga", headerName: "원가금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.prev_qty || 0) * params.data.wonga)
+                },
             ]
         },
         {
@@ -244,9 +251,15 @@
             headerName: "기간재고",
             children: [
                 {field: "holding_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "holding_sh", headerName: "TAG금액", width: 70, type: "currencyType"},
-                {field: "holding_price", headerName: "판매가금액", width: 70, type: "currencyType"},
-                {field: "holding_wonga", headerName: "원가금액", width: 70, type: "currencyType"},
+                {field: "holding_sh", headerName: "TAG금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.holding_qty || 0) * params.data.goods_sh)
+                },
+                {field: "holding_price", headerName: "판매가금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.holding_qty || 0) * params.data.price)
+                },
+                {field: "holding_wonga", headerName: "원가금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.holding_qty || 0) * params.data.wonga)
+                },
             ]
         },
     ];

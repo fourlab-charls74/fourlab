@@ -13,6 +13,8 @@ use Exception;
 
 use App\Models\Conf;
 
+const PRODUCT_STOCK_TYPE_RETURN = 11;
+
 class stk30Controller extends Controller
 {
     public function index()
@@ -345,6 +347,7 @@ class stk30Controller extends Controller
     {
         $new_state = $request->input("new_state", "");
         $admin_id = Auth('head')->user()->id;
+        $admin_nm = Auth('head')->user()->name;
         $data = $request->input("data", []);
 
         try {
@@ -362,12 +365,18 @@ class stk30Controller extends Controller
                     
                     $sql = "
                         select
-                            sr_cd, 
-                            sr_prd_cd,
-                            prd_cd,
-                            return_qty
-                        from store_return_product
-                        where sr_cd = :sr_cd
+                            sr.sr_cd, 
+                            sr.sr_prd_cd,
+                            sr.prd_cd,
+                            sr.return_qty,
+                            pc.goods_opt,
+                            g.goods_no,
+                            g.price,
+                            g.wonga
+                        from store_return_product sr
+                            inner join product_code pc on pc.prd_cd = sr.prd_cd
+                            inner join goods g on g.goods_no = pc.goods_no
+                        where sr.sr_cd = :sr_cd
                     ";
                     $rows = DB::select($sql, ["sr_cd" => $d['sr_cd']]);
 
@@ -384,6 +393,26 @@ class stk30Controller extends Controller
                                     'ut' => now(),
                                 ]);
 
+                            // 재고이력 등록
+                            DB::table('product_stock_hst')
+                                ->insert([
+                                    'goods_no' => $row->goods_no,
+                                    'prd_cd' => $row->prd_cd,
+                                    'goods_opt' => $row->goods_opt,
+                                    'location_cd' => $d['store_cd'],
+                                    'location_type' => 'STORE',
+                                    'type' => PRODUCT_STOCK_TYPE_RETURN, // 재고분류 : 반품(출고)
+                                    'price' => $row->price,
+                                    'wonga' => $row->wonga,
+                                    'qty' => ($row->return_qty ?? 0) * -1,
+                                    'stock_state_date' => date('Ymd'),
+                                    'ord_opt_no' => '',
+                                    'comment' => '창고반품',
+                                    'rt' => now(),
+                                    'admin_id' => $admin_id,
+                                    'admin_nm' => $admin_nm,
+                                ]);
+
                             // 창고 재고 플러스
                             DB::table('product_stock_storage')
                                 ->where('prd_cd', '=', $row->prd_cd)
@@ -391,6 +420,26 @@ class stk30Controller extends Controller
                                 ->update([
                                     'wqty' => DB::raw('wqty + ' . ($row->return_qty ?? 0)),
                                     'ut' => now(),
+                                ]);
+                            
+                            // 재고이력 등록
+                            DB::table('product_stock_hst')
+                                ->insert([
+                                    'goods_no' => $row->goods_no,
+                                    'prd_cd' => $row->prd_cd,
+                                    'goods_opt' => $row->goods_opt,
+                                    'location_cd' => $d['storage_cd'],
+                                    'location_type' => 'STORAGE',
+                                    'type' => PRODUCT_STOCK_TYPE_RETURN, // 재고분류 : 반품(입고)
+                                    'price' => $row->price,
+                                    'wonga' => $row->wonga,
+                                    'qty' => $row->return_qty ?? 0,
+                                    'stock_state_date' => date('Ymd'),
+                                    'ord_opt_no' => '',
+                                    'comment' => '매장반품',
+                                    'rt' => now(),
+                                    'admin_id' => $admin_id,
+                                    'admin_nm' => $admin_nm,
                                 ]);
 
                             // product_stock -> 창고보유재고 플러스

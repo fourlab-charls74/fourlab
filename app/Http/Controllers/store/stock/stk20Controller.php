@@ -13,6 +13,8 @@ use Exception;
 
 use App\Models\Conf;
 
+const PRODUCT_STOCK_TYPE_STORE_RT = 15;
+
 class stk20Controller extends Controller
 {
     private $rt_states = [
@@ -208,6 +210,7 @@ class stk20Controller extends Controller
         $ori_state = 10;
         $new_state = 20;
         $admin_id = Auth('head')->user()->id;
+        $admin_nm = Auth('head')->user()->name;
         $data = $request->input("data", []);
         $exp_dlv_day = $request->input("exp_dlv_day", '');
 
@@ -217,6 +220,15 @@ class stk20Controller extends Controller
 			foreach($data as $d) {
                 if($d['idx'] == "") continue;
                 if($d['state'] != $ori_state) continue;
+
+                $sql = "
+                    select pc.prd_cd, pc.goods_no, pc.goods_opt, g.price, g.wonga
+                    from product_code pc
+                        inner join goods g on g.goods_no = pc.goods_no
+                    where prd_cd = :prd_cd
+                ";
+                $prd = DB::selectOne($sql, ['prd_cd' => $d['prd_cd']]);
+                if($prd == null) continue;
 
                 DB::table('product_stock_rotation')
                     ->where('idx', '=', $d['idx'])
@@ -233,43 +245,83 @@ class stk20Controller extends Controller
                 // 보내는 매장
                 // product_stock_store -> 보유재고 차감
                 DB::table('product_stock_store')
-                    ->where('prd_cd', '=', $d['prd_cd'])
+                    ->where('prd_cd', '=', $prd->prd_cd)
                     ->where('store_cd', '=', $d['dep_store_cd']) 
                     ->update([
                         'wqty' => DB::raw('wqty - ' . ($d['qty'] ?? 0)),
                         'ut' => now(),
+                    ]);
+                
+                // 재고이력 등록
+                DB::table('product_stock_hst')
+                    ->insert([
+                        'goods_no' => $prd->goods_no,
+                        'prd_cd' => $prd->prd_cd,
+                        'goods_opt' => $prd->goods_opt,
+                        'location_cd' => $d['dep_store_cd'],
+                        'location_type' => 'STORE',
+                        'type' => PRODUCT_STOCK_TYPE_STORE_RT, // 재고분류 : RT출고
+                        'price' => $prd->price,
+                        'wonga' => $prd->wonga,
+                        'qty' => ($d['qty'] ?? 0) * -1,
+                        'stock_state_date' => date('Ymd'),
+                        'ord_opt_no' => '',
+                        'comment' => 'RT출고',
+                        'rt' => now(),
+                        'admin_id' => $admin_id,
+                        'admin_nm' => $admin_nm,
                     ]);
 
                 // 받는 매장
                 // product_stock_store -> 재고 존재여부 확인 후 보유재고 플러스
                 $store_stock_cnt = 
                     DB::table('product_stock_store')
-                        ->where('prd_cd', '=', $d['prd_cd'])
+                        ->where('prd_cd', '=', $prd->prd_cd)
                         ->where('store_cd', '=', $d['store_cd'])
                         ->count();
                 if($store_stock_cnt < 1) {
                     // 해당 매장에 상품 기존재고가 없을 경우
                     DB::table('product_stock_store')
                         ->insert([
-                            'goods_no' => $d['goods_no'],
-                            'prd_cd' => $d['prd_cd'],
+                            'goods_no' => $prd->goods_no,
+                            'prd_cd' => $prd->prd_cd,
                             'store_cd' => $d['store_cd'],
                             'qty' => 0,
                             'wqty' => $d['qty'] ?? 0,
-                            'goods_opt' => $d['goods_opt'] ?? '',
+                            'goods_opt' => $prd->goods_opt,
                             'use_yn' => 'Y',
                             'rt' => now(),
                         ]);
                 } else {
                     // 해당 매장에 상품 기존재고가 이미 존재할 경우
                     DB::table('product_stock_store')
-                        ->where('prd_cd', '=', $d['prd_cd'])
+                        ->where('prd_cd', '=', $prd->prd_cd)
                         ->where('store_cd', '=', $d['store_cd']) 
                         ->update([
                             'wqty' => DB::raw('wqty + ' . ($d['qty'] ?? 0)),
                             'ut' => now(),
                         ]);
                 }
+
+                // 재고이력 등록
+                DB::table('product_stock_hst')
+                    ->insert([
+                        'goods_no' => $prd->goods_no,
+                        'prd_cd' => $prd->prd_cd,
+                        'goods_opt' => $prd->goods_opt,
+                        'location_cd' => $d['store_cd'],
+                        'location_type' => 'STORE',
+                        'type' => PRODUCT_STOCK_TYPE_STORE_RT, // 재고분류 : RT입고
+                        'price' => $prd->price,
+                        'wonga' => $prd->wonga,
+                        'qty' => $d['qty'] ?? 0,
+                        'stock_state_date' => date('Ymd'),
+                        'ord_opt_no' => '',
+                        'comment' => 'RT입고',
+                        'rt' => now(),
+                        'admin_id' => $admin_id,
+                        'admin_nm' => $admin_nm,
+                    ]);
             }
 
 			DB::commit();

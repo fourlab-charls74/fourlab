@@ -15,6 +15,8 @@ use Exception;
 
 use App\Models\Conf;
 
+const PRODUCT_STOCK_TYPE_STORAGE_RETURN = 11; // 상품반품
+const PRODUCT_STOCK_TYPE_STORAGE_MOVE = 16; // 상품이동
 
 class cs02Controller extends Controller
 {
@@ -133,6 +135,7 @@ class cs02Controller extends Controller
     {
         $new_state = 30;
         $admin_id = Auth('head')->user()->id;
+        $admin_nm = Auth('head')->user()->name;
         $data = $request->input("data", []);
 
         try {
@@ -149,12 +152,18 @@ class cs02Controller extends Controller
                 
                 $sql = "
                     select
-                        sgr_cd, 
-                        sgr_prd_cd,
-                        prd_cd,
-                        return_qty
-                    from storage_return_product
-                    where sgr_cd = :sgr_cd
+                        sr.sgr_cd, 
+                        sr.sgr_prd_cd,
+                        sr.prd_cd,
+                        sr.return_qty,
+                        pc.goods_opt,
+                        g.goods_no,
+                        g.price,
+                        g.wonga
+                    from storage_return_product sr
+                        inner join product_code pc on pc.prd_cd = sr.prd_cd
+                        inner join goods g on g.goods_no = pc.goods_no
+                    where sr.sgr_cd = :sgr_cd
                 ";
                 $rows = DB::select($sql, ["sgr_cd" => $d['sgr_cd']]);
 
@@ -168,16 +177,56 @@ class cs02Controller extends Controller
                             'wqty' => DB::raw('wqty - ' . ($row->return_qty ?? 0)),
                             'ut' => now(),
                         ]);
+
+                    // 재고이력 등록
+                    DB::table('product_stock_hst')
+                        ->insert([
+                            'goods_no' => $row->goods_no,
+                            'prd_cd' => $row->prd_cd,
+                            'goods_opt' => $row->goods_opt,
+                            'location_cd' => $d['storage_cd'],
+                            'location_type' => 'STORAGE',
+                            'type' => $d['target_type'] == 'S' ? PRODUCT_STOCK_TYPE_STORAGE_MOVE : PRODUCT_STOCK_TYPE_STORAGE_RETURN, // 재고분류 : 상품반품 or 상품이동
+                            'price' => $row->price,
+                            'wonga' => $row->wonga,
+                            'qty' => ($row->return_qty ?? 0) * -1,
+                            'stock_state_date' => date('Ymd'),
+                            'ord_opt_no' => '',
+                            'comment' => $d['target_type'] == 'S' ? '상품이동' : '상품반품',
+                            'rt' => now(),
+                            'admin_id' => $admin_id,
+                            'admin_nm' => $admin_nm,
+                        ]);
                     
                     if($d['target_type'] == 'S') {
                         // 상품을 반품받은 창고 재고 플러스
                         DB::table('product_stock_storage')
                             ->where('prd_cd', '=', $row->prd_cd)
-                            ->where('storage_cd', '=', $d['taret_cd'])
+                            ->where('storage_cd', '=', $d['target_cd'])
                             ->update([
                                 'qty' => DB::raw('qty + ' . ($row->return_qty ?? 0)),
                                 'wqty' => DB::raw('wqty + ' . ($row->return_qty ?? 0)),
                                 'ut' => now(),
+                            ]);
+
+                        // 재고이력 등록
+                        DB::table('product_stock_hst')
+                            ->insert([
+                                'goods_no' => $row->goods_no,
+                                'prd_cd' => $row->prd_cd,
+                                'goods_opt' => $row->goods_opt,
+                                'location_cd' => $d['target_cd'],
+                                'location_type' => 'STORAGE',
+                                'type' => PRODUCT_STOCK_TYPE_STORAGE_MOVE, // 재고분류 : 상품이동
+                                'price' => $row->price,
+                                'wonga' => $row->wonga,
+                                'qty' => $row->return_qty ?? 0,
+                                'stock_state_date' => date('Ymd'),
+                                'ord_opt_no' => '',
+                                'comment' => '상품이동',
+                                'rt' => now(),
+                                'admin_id' => $admin_id,
+                                'admin_nm' => $admin_nm,
                             ]);
                     } else if($d['target_type'] == 'C') {
                         // product_stock -> 재고 / 창고재고 / 입고수량 차감
@@ -337,6 +386,7 @@ class cs02Controller extends Controller
     public function add_storage_return(Request $request)
     {
         $admin_id = Auth('head')->user()->id;
+        $admin_nm = Auth('head')->user()->name;
         $sgr_type = $request->input("sgr_type", "G");
         $sgr_state = $sgr_type == "G" ? 10 : 30;
         $sgr_date = $request->input("sgr_date", date("Y-m-d"));
@@ -367,6 +417,15 @@ class cs02Controller extends Controller
                 ]);
 
             foreach($products as $product) {
+                $sql = "
+                    select pc.prd_cd, pc.goods_no, pc.goods_opt, g.price, g.wonga
+                    from product_code pc
+                        inner join goods g on g.goods_no = pc.goods_no
+                    where prd_cd = :prd_cd
+                ";
+                $prd = DB::selectOne($sql, ['prd_cd' => $product['prd_cd']]);
+                if($prd == null) continue;
+
                 DB::table('storage_return_product')
                     ->insert([
                         'sgr_cd' => $sgr_cd,
@@ -389,6 +448,26 @@ class cs02Controller extends Controller
                         'wqty' => DB::raw('wqty - ' . ($product['return_qty'] ?? 0)),
                         'ut' => now(),
                     ]);
+
+                    // 재고이력 등록
+                    DB::table('product_stock_hst')
+                    ->insert([
+                        'goods_no' => $prd->goods_no,
+                        'prd_cd' => $prd->prd_cd,
+                        'goods_opt' => $prd->goods_opt,
+                        'location_cd' => $storage_cd,
+                        'location_type' => 'STORAGE',
+                        'type' => $target_type == 'S' ? PRODUCT_STOCK_TYPE_STORAGE_MOVE : PRODUCT_STOCK_TYPE_STORAGE_RETURN, // 재고분류 : 상품반품 or 상품이동
+                        'price' => $prd->price,
+                        'wonga' => $prd->wonga,
+                        'qty' => ($product['return_qty'] ?? 0) * -1,
+                        'stock_state_date' => date('Ymd'),
+                        'ord_opt_no' => '',
+                        'comment' => $target_type == 'S' ? '상품이동' : '상품반품',
+                        'rt' => now(),
+                        'admin_id' => $admin_id,
+                        'admin_nm' => $admin_nm,
+                    ]);
                     
                     if($target_type == 'S') {
                         // 상품을 반품받은 창고 재고 플러스
@@ -399,6 +478,26 @@ class cs02Controller extends Controller
                             'qty' => DB::raw('qty + ' . ($product['return_qty'] ?? 0)),
                             'wqty' => DB::raw('wqty + ' . ($product['return_qty'] ?? 0)),
                             'ut' => now(),
+                        ]);
+                        
+                        // 재고이력 등록
+                        DB::table('product_stock_hst')
+                        ->insert([
+                            'goods_no' => $prd->goods_no,
+                            'prd_cd' => $prd->prd_cd,
+                            'goods_opt' => $prd->goods_opt,
+                            'location_cd' => $target_cd,
+                            'location_type' => 'STORAGE',
+                            'type' => PRODUCT_STOCK_TYPE_STORAGE_MOVE, // 재고분류 : 상품이동
+                            'price' => $prd->price,
+                            'wonga' => $prd->wonga,
+                            'qty' => $product['return_qty'] ?? 0,
+                            'stock_state_date' => date('Ymd'),
+                            'ord_opt_no' => '',
+                            'comment' => '상품이동',
+                            'rt' => now(),
+                            'admin_id' => $admin_id,
+                            'admin_nm' => $admin_nm,
                         ]);
                     } else if($target_type == 'C') {
                         // product_stock -> 재고 / 창고재고 / 입고수량 차감

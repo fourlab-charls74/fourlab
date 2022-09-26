@@ -631,16 +631,16 @@ class goods extends Controller
                 "
                 select count(*) as total
                 from product_stock_storage p
-                    inner join goods g on g.goods_no = p.goods_no
-                    inner join brand b on b.brand = g.brand
-                    inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
-                    inner join company com on com.com_id = g.com_id
-                    inner join category cat on cat.d_cat_cd = g.rep_cat_cd and cat.cat_type = 'DISPLAY'
-                    inner join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
-                    inner join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
-                    inner join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
-                    inner join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
-                    inner join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
+                    left outer join goods g on g.goods_no = p.goods_no
+                    left outer join brand b on b.brand = g.brand
+                    left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
+                    left outer join company com on com.com_id = g.com_id
+                    left outer join category cat on cat.d_cat_cd = g.rep_cat_cd and cat.cat_type = 'DISPLAY'
+                    left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
+                    left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
+                    left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
+                    left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
+                    left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
                 where p.storage_cd = '$storage_cd' $where
 			";
 
@@ -700,16 +700,16 @@ class goods extends Controller
                 p.wqty as storage_wqty,
                 '' as rel_qty
             from product_stock_storage p
-                inner join goods g on g.goods_no = p.goods_no
-                inner join brand b on b.brand = g.brand
-                inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
-                inner join company com on com.com_id = g.com_id
-                inner join category cat on cat.d_cat_cd = g.rep_cat_cd and cat.cat_type = 'DISPLAY'
-                inner join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
-                inner join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
-                inner join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
-                inner join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
-                inner join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
+                left outer join goods g on g.goods_no = p.goods_no
+                left outer join brand b on b.brand = g.brand
+                left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
+                left outer join company com on com.com_id = g.com_id
+                left outer join category cat on cat.d_cat_cd = g.rep_cat_cd and cat.cat_type = 'DISPLAY'
+                left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
+                left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
+                left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
+                left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
+                left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
             where p.storage_cd = '$storage_cd' $where
             $orderby
 			$limit
