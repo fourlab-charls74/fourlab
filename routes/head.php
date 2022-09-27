@@ -1120,6 +1120,16 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::get('sys04/get/{type}/{name}/{idx}', 'sys04Controller@get');
         Route::put('sys04/{type}/{name}/{idx}', 'sys04Controller@update');
         Route::delete('sys04/{type}/{name}/{idx}', 'sys04Controller@delete');
+
+        //환경설정2
+        Route::get('sys05', 'sys05Controller@index');
+        Route::post('sys05', 'sys05Controller@store');
+        Route::get('sys05/search', 'sys05Controller@search');
+        Route::get('sys05/create', 'sys05Controller@create');
+        Route::get('sys05/{type}/{name}/{idx}', 'sys05Controller@show');
+        Route::get('sys05/get/{type}/{name}/{idx}', 'sys05Controller@get');
+        Route::post('sys05/update', 'sys05Controller@update');
+        Route::delete('sys05/{type}/{name}/{idx}', 'sys05Controller@delete');
     });
 
     //XMD(개발작업)

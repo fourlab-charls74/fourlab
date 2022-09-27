@@ -39,7 +39,7 @@ class std10Controller extends Controller
             $type    = "";
             $name    = "";
             $state    = "1";
-            $ad_sale = "";
+            $dc_no = "";
         } else {
 
             $sql = "
@@ -58,6 +58,7 @@ class std10Controller extends Controller
                 $dc_no = $row->dc_no;
             }
         }
+ 
 
         $values = [
             'code' => $code,
