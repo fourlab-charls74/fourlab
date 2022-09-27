@@ -145,7 +145,7 @@ class sal20Controller extends Controller
                             'type' => PRODUCT_STOCK_TYPE_LOSS, // 재고분류 : LOSS
                             'price' => $prd->price,
                             'wonga' => $prd->wonga,
-                            'qty' => $prd->loss_qty,
+                            'qty' => ($prd->loss_qty) * -1,
                             'stock_state_date' => date('Ymd'),
                             'ord_opt_no' => '',
                             'comment' => 'LOSS등록',

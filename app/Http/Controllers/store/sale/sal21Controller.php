@@ -41,11 +41,11 @@ class sal21Controller extends Controller
 			$prd_cd = explode(',', $prd_cds);
 			$where .= " and (1!=1";
 			foreach($prd_cd as $cd) {
-				$where .= " or o.prd_cd = '" . Lib::quote($cd) . "' ";
+				$where .= " or p.prd_cd = '" . Lib::quote($cd) . "' ";
 			}
 			$where .= ")";
 		} else {
-			$where .= " and o.prd_cd != ''";
+			$where .= " and p.prd_cd != ''";
 		}
         if ($close_yn == 'N') {
             $where .= " and store.use_yn = 'Y' and (store.edate = '' or store.edate is null or store.edate >= date_format(now(), '%Y%m%d')) ";
@@ -56,9 +56,9 @@ class sal21Controller extends Controller
         // store_where
 		foreach($store_cds as $key => $cd) {
 			if ($key === 0) {
-				$store_where .= "o.store_cd = '$cd'";
+				$store_where .= "p.store_cd = '$cd'";
 			} else {
-				$store_where .= " or o.store_cd = '$cd'";
+				$store_where .= " or p.store_cd = '$cd'";
 			}
 		}
 		if (count($store_cds) < 1) {
@@ -67,9 +67,9 @@ class sal21Controller extends Controller
 
         // ordreby
         $ord = $request->input('ord', 'desc');
-        $ord_field = $request->input('ord_field', 'o.store_cd');
+        $ord_field = $request->input('ord_field', 'p.store_cd');
         $orderby = sprintf("order by %s %s", $ord_field, $ord);
-        if($ord_field == 'o.prd_cd') $orderby .= ", o.store_cd";
+        if($ord_field == 'p.prd_cd') $orderby .= ", p.store_cd";
 
         // pagination
         $page = $request->input('page', 1);
@@ -80,162 +80,56 @@ class sal21Controller extends Controller
 
         $sql = "
             select 
-                o.store_cd,
-                (select store_nm from store where store_cd = o.store_cd) as store_nm,
-                o.prd_cd,
+                p.store_cd, 
+                store.store_nm,
+                p.prd_cd, 
                 concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_sm,
                 pc.color,
                 pc.size,
-                o.goods_no,
+                g.goods_no,
                 b.brand_nm, 
                 g.style_no,
                 stat.code_val as sale_stat_cl, 
                 g.goods_nm,
-                o.goods_opt,
+                pc.goods_opt,
                 g.goods_sh,
                 g.price,
                 g.wonga,
-                -- 매장입고
-				ifnull(store_in.qty, 0) as store_in_qty,
-                (ifnull(store_in.qty, 0) * g.goods_sh) as store_in_sh,
-                (ifnull(store_in.qty, 0) * g.price) as store_in_price,
-                (ifnull(store_in.qty, 0) * g.wonga) as store_in_wonga,
-                -- 매장반품
-				(ifnull(store_return.qty, 0) * -1) as store_return_qty,
-                (ifnull(store_return.qty, 0) * g.goods_sh) as store_return_sh,
-                (ifnull(store_return.qty, 0) * g.price) as store_return_price,
-                (ifnull(store_return.qty, 0) * g.wonga) as store_return_wonga,
-                -- 이동입고
-				ifnull(rt_in.qty, 0) as rt_in_qty,
-                (ifnull(rt_in.qty, 0) * g.goods_sh) as rt_in_sh,
-                (ifnull(rt_in.qty, 0) * g.price) as rt_in_price,
-                (ifnull(rt_in.qty, 0) * g.wonga) as rt_in_wonga,
-                -- 이동출고
-				(ifnull(rt_out.qty, 0) * -1) as rt_out_qty,
-                (ifnull(rt_out.qty, 0) * g.goods_sh) as rt_out_sh,
-                (ifnull(rt_out.qty, 0) * g.price) as rt_out_price,
-                (ifnull(rt_out.qty, 0) * g.wonga) as rt_out_wonga,
-                -- 매장판매
-				sum(ifnull(o.qty, 0)) as store_sale_qty,
-                (sum(ifnull(o.qty, 0)) * g.goods_sh) as store_sale_sh,
-                (sum(ifnull(o.qty, 0)) * g.price) as store_sale_price,
-                (sum(ifnull(o.qty, 0)) * g.wonga) as store_sale_wonga,
-                -- LOSS
-				ifnull(loss.qty, 0) as loss_qty,
-                (ifnull(loss.qty, 0) * g.goods_sh) as loss_sh,
-                (ifnull(loss.qty, 0) * g.price) as loss_price,
-                (ifnull(loss.qty, 0) * g.wonga) as loss_wonga,
-                -- 현재재고
-                ps.wqty,
-                -- 기간재고
-                (ifnull(ps.wqty, 0) 
-					- ifnull(next_store_in.qty, 0)
-					- ifnull(next_store_return.qty, 0) 
-					- ifnull(next_rt_in.qty, 0) 
-					- ifnull(next_rt_out.qty, 0) 
-					+ sum(ifnull(next_sale.qty, 0)) 
-					+ ifnull(next_loss.qty, 0) 				
-				) as holding_qty,
-                -- 이전재고
-                ((ifnull(ps.wqty, 0) 
-					- ifnull(next_store_in.qty, 0)
-					- ifnull(next_store_return.qty, 0) 
-					- ifnull(next_rt_in.qty, 0) 
-					- ifnull(next_rt_out.qty, 0) 
-					+ sum(ifnull(next_sale.qty, 0)) 
-					+ ifnull(next_loss.qty, 0) 				
-				)
-					- ifnull(store_in.qty, 0)
-					- ifnull(store_return.qty, 0) 
-					- ifnull(rt_in.qty, 0) 
-					- ifnull(rt_out.qty, 0) 
-					+ sum(ifnull(o.qty, 0)) 
-					+ ifnull(loss.qty, 0) 				
-				) as prev_qty
-            from order_opt o
-                inner join product_code pc on pc.prd_cd = o.prd_cd
-                inner join product_stock_store ps on ps.store_cd = o.store_cd and ps.prd_cd = o.prd_cd
-                inner join store on store.store_cd = o.store_cd
-                inner join goods g on g.goods_no = o.goods_no
+                (p.wqty - sum(ifnull(_next.qty, 0)) - sum(ifnull(hst.qty, 0))) as prev_qty, -- 이전재고
+                sum(ifnull(store_in.qty, 0)) as store_in_qty, -- 매장입고
+                sum(ifnull(store_return.qty, 0)) * -1 as store_return_qty, -- 매장반품
+                sum(ifnull(rt_in.qty, 0)) as rt_in_qty, -- 이동입고
+                sum(ifnull(rt_out.qty, 0)) * -1 as rt_out_qty, -- 이동출고
+                sum(ifnull(sale.qty, 0)) * -1 as sale_qty, -- 매장판매
+                sum(ifnull(loss.qty, 0)) * -1 as loss_qty, -- loss
+                p.wqty - sum(ifnull(_next.qty, 0)) as term_qty, -- 기간재고
+                p.wqty as current_qty, -- 현재재고
+                '' as blank
+            from product_stock_store p
+                inner join product_code pc on pc.prd_cd = p.prd_cd
+                inner join goods g on g.goods_no = p.goods_no
+                inner join store on store.store_cd = p.store_cd
                 left outer join brand b on b.brand = g.brand
                 left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
-                -- 기간동안 재고이동
                 left outer join (
-                    select prd_cd, location_cd, sum(qty) as qty from product_stock_hst 
-                    where type = '1' and location_type = 'STORE'
-                        and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$sdate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= '$edate 23:59:59'
-                    group by location_cd, prd_cd
-                ) store_in on store_in.location_cd = o.store_cd and store_in.prd_cd = o.prd_cd
+                    select idx, prd_cd, location_cd, type, qty, stock_state_date
+                    from product_stock_hst
+                    where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '2022-09-27 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= '2022-09-27 23:59:59'
+                ) hst on hst.location_cd = p.store_cd and hst.prd_cd = p.prd_cd
+                left outer join product_stock_hst store_in on store_in.idx = hst.idx and store_in.type = '1'
+                left outer join product_stock_hst store_return on store_return.idx = hst.idx and store_return.type = '11'
+                left outer join product_stock_hst rt_in on rt_in.idx = hst.idx and rt_in.type = '15' and rt_in.qty > 0
+                left outer join product_stock_hst rt_out on rt_out.idx = hst.idx and rt_out.type = '15' and rt_out.qty < 0
+                left outer join product_stock_hst sale on sale.idx = hst.idx and (sale.type = '2' or sale.type = '5' or sale.type = '6') -- 주문&교환&환불
+                left outer join product_stock_hst loss on loss.idx = hst.idx and loss.type = '14'
                 left outer join (
-					select prd_cd, location_cd, sum(qty) as qty from product_stock_hst 
-					where type = '11' and location_type = 'STORE'
-						and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$sdate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= '$edate 23:59:59'
-					group by location_cd, prd_cd
-				) store_return on store_return.location_cd = o.store_cd and store_return.prd_cd = o.prd_cd
-                left outer join (
-					select prd_cd, location_cd, sum(qty) as qty from product_stock_hst 
-					where type = '15' and location_type = 'STORE' and qty > 0
-						and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$sdate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= '$edate 23:59:59'
-					group by location_cd, prd_cd
-				) rt_in on rt_in.location_cd = o.store_cd and rt_in.prd_cd = o.prd_cd
-				left outer join (
-					select prd_cd, location_cd, sum(qty) as qty from product_stock_hst 
-					where type = '15' and location_type = 'STORE' and qty < 0
-						and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$sdate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= '$edate 23:59:59'
-					group by location_cd, prd_cd
-				) rt_out on rt_out.location_cd = o.store_cd and rt_out.prd_cd = o.prd_cd
-                left outer join (
-                    select prd_cd, location_cd, sum(qty) as qty from product_stock_hst 
-                    where type = '14' and location_type = 'STORE'
-                        and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$sdate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= '$edate 23:59:59'
-                    group by location_cd, prd_cd
-                ) loss on loss.location_cd = o.store_cd and loss.prd_cd = o.prd_cd
-                -- 기간이후 재고이동
-                left outer join (
-					select prd_cd, location_cd, sum(qty) as qty from product_stock_hst 
-					where type = '1' and location_type = 'STORE'
-						and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
-					group by location_cd, prd_cd
-				) next_store_in on next_store_in.location_cd = o.store_cd and next_store_in.prd_cd = o.prd_cd
-				left outer join (
-					select prd_cd, location_cd, sum(qty) as qty from product_stock_hst 
-					where type = '11' and location_type = 'STORE'
-						and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
-					group by location_cd, prd_cd
-				) next_store_return on next_store_return.location_cd = o.store_cd and next_store_return.prd_cd = o.prd_cd
-                left outer join (
-					select prd_cd, location_cd, sum(qty) as qty from product_stock_hst 
-					where type = '15' and location_type = 'STORE' and qty > 0
-						and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
-					group by location_cd, prd_cd
-				) next_rt_in on next_rt_in.location_cd = o.store_cd and next_rt_in.prd_cd = o.prd_cd
-				left outer join (
-					select prd_cd, location_cd, sum(qty) as qty from product_stock_hst 
-					where type = '15' and location_type = 'STORE' and qty < 0
-						and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
-					group by location_cd, prd_cd
-				) next_rt_out on next_rt_out.location_cd = o.store_cd and next_rt_out.prd_cd = o.prd_cd
-                left outer join (
-					select prd_cd, location_cd, sum(qty) as qty from product_stock_hst 
-					where type = '14' and location_type = 'STORE'
-						and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >=  '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
-					group by location_cd, prd_cd
-				) next_loss on next_loss.location_cd = o.store_cd and next_loss.prd_cd = o.prd_cd
-                left outer join (
-					select prd_cd, store_cd, sum(qty) as qty from order_opt o
-					where o.ord_state = 30
-						and (o.clm_state = 90 or o.clm_state = -30 or o.clm_state = 0)
-						and o.ord_date >= '$next_edate 00:00:00' and o.ord_date <= now()
-					group by o.store_cd, o.prd_cd
-					order by o.store_cd
-				) next_sale on next_sale.store_cd = o.store_cd and next_sale.prd_cd = o.prd_cd
-            where 1=1
-                and o.ord_state = 30
-                and (o.clm_state = 90 or o.clm_state = -30 or o.clm_state = 0)
-                and o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59'
-                and ($store_where)
+                    select idx, prd_cd, location_cd, type, qty, stock_state_date
+                    from product_stock_hst
+                    where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '2022-09-28 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+                ) _next on _next.location_cd = p.store_cd and _next.prd_cd = p.prd_cd
+            where ($store_where)
                 $where
-            group by o.store_cd, o.prd_cd
+            group by p.store_cd, p.prd_cd
             $orderby
             $limit
         ";
@@ -248,19 +142,14 @@ class sal21Controller extends Controller
             $sql = "
                 select count(c.prd_cd) as total
                 from (
-                    select o.prd_cd
-                    from order_opt o
-                        inner join product_code pc on pc.prd_cd = o.prd_cd
-                        inner join product_stock_store ps on ps.store_cd = o.store_cd and ps.prd_cd = o.prd_cd
-                        inner join store on store.store_cd = o.store_cd
-                        inner join goods g on g.goods_no = o.goods_no
-                    where 1=1
-                        and o.ord_state = 30
-                        and (o.clm_state = 90 or o.clm_state = -30 or o.clm_state = 0)
-                        and o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59'
-                        and ($store_where)
+                    select p.prd_cd
+                    from product_stock_store p
+                        inner join product_code pc on pc.prd_cd = p.prd_cd
+                        inner join goods g on g.goods_no = p.goods_no
+                        inner join store on store.store_cd = p.store_cd
+                    where ($store_where)
                         $where
-                    group by o.store_cd, o.prd_cd
+                    group by p.store_cd, p.prd_cd
                 ) as c
             ";
 

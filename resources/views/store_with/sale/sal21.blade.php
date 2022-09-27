@@ -120,8 +120,8 @@
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
-                                        <option value="o.store_cd">매장코드</option>
-                                        <option value="o.prd_cd">상품코드</option>
+                                        <option value="p.store_cd">매장코드</option>
+                                        <option value="p.prd_cd">상품코드</option>
                                     </select>
                                 </div>
                                 <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -197,68 +197,104 @@
             headerName: "매장입고",
             children: [
                 {field: "store_in_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "store_in_sh", headerName: "TAG금액", width: 70, type: "currencyType"},
-                {field: "store_in_price", headerName: "판매가금액", width: 70, type: "currencyType"},
-                {field: "store_in_wonga", headerName: "원가금액", width: 70, type: "currencyType"},
+                {field: "store_in_sh", headerName: "TAG금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.store_in_qty || 0) * params.data.goods_sh)
+                },
+                {field: "store_in_price", headerName: "판매가금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.store_in_qty || 0) * params.data.goods_sh)
+                },
+                {field: "store_in_wonga", headerName: "원가금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.store_in_qty || 0) * params.data.goods_sh)
+                },
             ]
         },
         {
             headerName: "매장반품",
             children: [
                 {field: "store_return_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "store_return_sh", headerName: "TAG금액", width: 70, type: "currencyType"},
-                {field: "store_return_price", headerName: "판매가금액", width: 70, type: "currencyType"},
-                {field: "store_return_wonga", headerName: "원가금액", width: 70, type: "currencyType"},
+                {field: "store_return_sh", headerName: "TAG금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.store_return_qty || 0) * params.data.goods_sh)
+                },
+                {field: "store_return_price", headerName: "판매가금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.store_return_qty || 0) * params.data.goods_sh)
+                },
+                {field: "store_return_wonga", headerName: "원가금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.store_return_qty || 0) * params.data.goods_sh)
+                },
             ]
         },
         {
             headerName: "이동입고",
             children: [
                 {field: "rt_in_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "rt_in_sh", headerName: "TAG금액", width: 70, type: "currencyType"},
-                {field: "rt_in_price", headerName: "판매가금액", width: 70, type: "currencyType"},
-                {field: "rt_in_wonga", headerName: "원가금액", width: 70, type: "currencyType"},
+                {field: "rt_in_sh", headerName: "TAG금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.rt_in_qty || 0) * params.data.goods_sh)
+                },
+                {field: "rt_in_price", headerName: "판매가금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.rt_in_qty || 0) * params.data.goods_sh)
+                },
+                {field: "rt_in_wonga", headerName: "원가금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.rt_in_qty || 0) * params.data.goods_sh)
+                },
             ]
         },
         {
             headerName: "이동출고",
             children: [
                 {field: "rt_out_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "rt_out_sh", headerName: "TAG금액", width: 70, type: "currencyType"},
-                {field: "rt_out_price", headerName: "판매가금액", width: 70, type: "currencyType"},
-                {field: "rt_out_wonga", headerName: "원가금액", width: 70, type: "currencyType"},
+                {field: "rt_out_sh", headerName: "TAG금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.rt_out_qty || 0) * params.data.goods_sh)
+                },
+                {field: "rt_out_price", headerName: "판매가금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.rt_out_qty || 0) * params.data.goods_sh)
+                },
+                {field: "rt_out_wonga", headerName: "원가금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.rt_out_qty || 0) * params.data.goods_sh)
+                },
             ]
         },
         {
             headerName: "매장판매",
             children: [
-                {field: "store_sale_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "store_sale_sh", headerName: "TAG금액", width: 70, type: "currencyType"},
-                {field: "store_sale_price", headerName: "판매가금액", width: 70, type: "currencyType"},
-                {field: "store_sale_wonga", headerName: "원가금액", width: 70, type: "currencyType"},
+                {field: "sale_qty", headerName: "수량", width: 50, type: "currencyType"},
+                {field: "sale_sh", headerName: "TAG금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.sale_qty || 0) * params.data.goods_sh)
+                },
+                {field: "sale_price", headerName: "판매가금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.sale_qty || 0) * params.data.goods_sh)
+                },
+                {field: "sale_wonga", headerName: "원가금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.sale_qty || 0) * params.data.goods_sh)
+                },
             ]
         },
         {
             headerName: "LOSS",
             children: [
                 {field: "loss_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "loss_sh", headerName: "TAG금액", width: 70, type: "currencyType"},
-                {field: "loss_price", headerName: "판매가금액", width: 70, type: "currencyType"},
-                {field: "loss_wonga", headerName: "원가금액", width: 70, type: "currencyType"},
+                {field: "loss_sh", headerName: "TAG금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.loss_qty || 0) * params.data.goods_sh)
+                },
+                {field: "loss_price", headerName: "판매가금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.loss_qty || 0) * params.data.goods_sh)
+                },
+                {field: "loss_wonga", headerName: "원가금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.loss_qty || 0) * params.data.goods_sh)
+                },
             ]
         },
         {
             headerName: "기간재고",
             children: [
-                {field: "holding_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "holding_sh", headerName: "TAG금액", width: 70, type: "currencyType",
-                    cellRenderer: (params) => Comma((params.data.holding_qty || 0) * params.data.goods_sh)
+                {field: "term_qty", headerName: "수량", width: 50, type: "currencyType"},
+                {field: "term_sh", headerName: "TAG금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.term_qty || 0) * params.data.goods_sh)
                 },
-                {field: "holding_price", headerName: "판매가금액", width: 70, type: "currencyType",
-                    cellRenderer: (params) => Comma((params.data.holding_qty || 0) * params.data.price)
+                {field: "term_price", headerName: "판매가금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.term_qty || 0) * params.data.price)
                 },
-                {field: "holding_wonga", headerName: "원가금액", width: 70, type: "currencyType",
-                    cellRenderer: (params) => Comma((params.data.holding_qty || 0) * params.data.wonga)
+                {field: "term_wonga", headerName: "원가금액", width: 70, type: "currencyType",
+                    cellRenderer: (params) => Comma((params.data.term_qty || 0) * params.data.wonga)
                 },
             ]
         },
