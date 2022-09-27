@@ -478,7 +478,7 @@ class std02Controller extends Controller
 						'$sum_sell_type', '$dp_yn', '$store_type', '$store_nm', '$store_branch', '$store_area','$store_kind'
 					)
 				";
-				
+
 				try {
 					DB::insert($query);
 					$result_code = 1;

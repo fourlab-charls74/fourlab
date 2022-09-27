@@ -40,7 +40,7 @@
                                 <table class="table incont table-bordered" width="100%" cellspacing="0">
                                     <tbody>
                                         <tr>
-                                            <th class="required">주문매장</th>
+                                            <th>주문매장</th>
                                             <td>
                                                 <div class="flax_box mr-2">
                                                     <div class="form-inline inline_btn_box w-100">
@@ -99,6 +99,7 @@
                             </div>
                         </div>
                     </div>
+                    <p class="mt-1" style="color: red;">* 주문매장 미선택 시 상품이 창고에서 출고됩니다.</p>
                 </form>
             </div>
         </div>

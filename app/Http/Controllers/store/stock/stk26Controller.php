@@ -59,6 +59,7 @@ class stk26Controller extends Controller
                 inner join stock_check_product sp on sp.sc_cd = s.sc_cd
             where 1=1 $where
             group by s.sc_cd
+            order by s.sc_date desc
         ";
 
         $result = DB::select($sql);
@@ -145,12 +146,12 @@ class stk26Controller extends Controller
                 (s.price * (s.store_qty - s.qty)) as loss_price,
                 true as isEditable
             from stock_check_product s
-                inner join product_code pc on pc.prd_cd = s.prd_cd
-                inner join goods g on g.goods_no = pc.goods_no
-                inner join brand b on b.brand = g.brand
-                inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
-                inner join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
-                inner join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id,
+                left outer join product_code pc on pc.prd_cd = s.prd_cd
+                left outer join goods g on g.goods_no = pc.goods_no
+                left outer join brand b on b.brand = g.brand
+                left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
+                left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
+                left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id,
                 (select @rownum :=0) as r
             where s.sc_cd = :sc_cd
         ";

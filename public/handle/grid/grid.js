@@ -165,6 +165,7 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
                 width:200,
                 cellRenderer: function (params) {
                     if (params.value !== undefined) {
+                        if(params.data.goods_no == null) return '존재하지 않는 상품입니다.';
                         return '<a href="#" onclick="return openHeadProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
                     }
                 }

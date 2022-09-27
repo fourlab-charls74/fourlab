@@ -378,7 +378,7 @@
             let rows = gx.getSelectedRows();
             if(rows.length < 1) return alert("출고요청할 상품을 선택해주세요.");
 
-            let stores = $("[name=store_no]").val();
+            let stores = $("[name='store_no[]']").val();
             let emptyRow = rows.filter(r => {
                 for(let store_cd of stores) {
                     let q = r[store_cd + '_rel_qty'];
@@ -408,7 +408,7 @@
 
             const data = {
                 products: rows,
-                stores: $("[name=store_no]").val(),
+                stores: $("[name='store_no[]']").val(),
                 exp_dlv_day: $('[name=exp_dlv_day]').val(),
                 rel_order: $('[name=rel_order]').val(),
             };

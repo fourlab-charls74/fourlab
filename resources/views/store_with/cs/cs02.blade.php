@@ -191,20 +191,20 @@
                 return `<a href="javascript:void(0);" onclick="openDetailPopup(${params.value})">${params.value}</a>`;
             }
         },        
-        {field: "sgr_date", headerName: "반품일자", width: 100, cellStyle: {"text-align": "center"}},
+        {field: "sgr_date", headerName: "반품일자", width: 80, cellStyle: {"text-align": "center"}},
         {field: "sgr_type", hide: true},
-        {field: "sgr_type_nm", headerName: "반품구분", width: 80, cellStyle: (params) => ({"text-align": "center", "color": params.data.sgr_type == "B" ? "green" : "none"})},
+        {field: "sgr_type_nm", headerName: "반품구분", width: 60, cellStyle: (params) => ({"text-align": "center", "color": params.data.sgr_type == "B" ? "green" : "none"})},
         {field: "sgr_state", hide: true},
-        {field: "sgr_state_nm", headerName: "반품상태", width: 80, cellStyle: (params) => ({"text-align": "center", "color": params.data.sgr_state == "30" ? "red" : "none"})},
+        {field: "sgr_state_nm", headerName: "반품상태", width: 60, cellStyle: (params) => ({"text-align": "center", "color": params.data.sgr_state == "30" ? "red" : "none"})},
         {field: "storage_cd", hide: true},
         {field: "storage_nm", headerName: "창고명", width: 100, cellStyle: {"text-align": "center"}},
         {field: "target_type", hide: true},
         {field: "target_cd", hide: true},
-        {field: "target_nm", headerName: "공급/창고", width: 120, cellStyle: {"text-align": "center"},
+        {field: "target_nm", headerName: "공급/창고", width: 120,
             cellRenderer: (params) => (params.data.target_type == "C" ? "[공급] " : params.data.target_type == "S" ? "[창고] " : "") + params.value,
         }, // 반품이동처
-        {field: "sgr_qty", headerName: "반품수량", type: "currencyType", width: 100},
-        {field: "sgr_price", headerName: "반품금액", type: "currencyType", width: 100},
+        {field: "sgr_qty", headerName: "반품수량", type: "currencyType", width: 60},
+        {field: "sgr_price", headerName: "반품금액", type: "currencyType", width: 60},
         {field: "comment", headerName: "메모", width: 300},
         {width: "auto"}
 	];

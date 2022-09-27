@@ -467,7 +467,9 @@ class Order
 	*/
 	function __InsertOptWonga( $value ){
 
-		if( empty($this->ord_opt_no) )	trigger_error("Do SetOrdOptNo() method!!", E_USER_ERROR);
+		$order_opt_no = isset($value["ord_opt_no"]) ? $value["ord_opt_no"] : $this->ord_opt_no;
+
+		if( !isset($value["ord_opt_no"]) && empty($this->ord_opt_no) )	trigger_error("Do SetOrdOptNo() method!!", E_USER_ERROR);
 
 		$ord_wonga_no		= "";
 
@@ -510,7 +512,7 @@ class Order
 		$sql = "
 			select count(*) as cnt
 			from order_opt_wonga
-			where ord_opt_no = '$this->ord_opt_no'
+			where ord_opt_no = '$order_opt_no'
 				and ord_state = '$ord_state'
 		";
 		$rs = DB::selectOne($sql);
@@ -520,7 +522,7 @@ class Order
 			$ord_wonga_no	= DB::table('order_opt_wonga')->insertGetId([
 				'goods_no'			=> $goods_no,
 				'goods_sub'			=> $goods_sub,
-				'ord_opt_no'		=> $this->ord_opt_no,
+				'ord_opt_no'		=> $order_opt_no,
 				'goods_opt'			=> $goods_opt,
 				'qty'				=> $qty,
 				'wonga'				=> $wonga,
@@ -1488,13 +1490,23 @@ class Order
 			$this->SetOrdOptNo($ord_opt_no);
 
 			// 재고 처리된 주문건인지 확인
-			if($this->__IsFirstMinus() == false) return -1;
+			$sql = "
+				select count(*) as cnt
+				from order_opt_wonga
+				where ord_opt_no = '$ord_opt_no' and ord_state = '$ord_state'
+			";
+			$isFirstMinus = DB::selectOne($sql);
+			$cnt = $isFirstMinus == null ? 0 : $isFirstMinus->cnt;
+			if ($cnt > 0) {
+				return -1; // 이미 재고차감된 주문건
+			}
 
 			// 입금예정 상태의 주문 처리 : 넷텔러, 가상계좌
 			if ( $ord_state == ORD_STATE_PG_EXPECTED || $ord_state == ORD_STATE_PG_OK ) {
 
 				// 모든 입금확인은 5 상태를 기록한다.
 				$order_opt_wonga = array(
+					"ord_opt_no" => $ord_opt_no,
 					"goods_no" => $goods_no,
 					"goods_sub" => $goods_sub,
 					"goods_opt" => $goods_opt,
@@ -1521,6 +1533,7 @@ class Order
 				$this->__InsertOptWonga($order_opt_wonga);
 
 				$order_opt_wonga = array(
+					"ord_opt_no" => $ord_opt_no,
 					"goods_no" => $goods_no,
 					"goods_sub" => $goods_sub,
 					"goods_opt" => $goods_opt,
@@ -1607,7 +1620,7 @@ class Order
 						'price' => $ord_price,
 						'wonga' => $wonga,
 						'qty' => $ord_qty * -1,
-						'stock_state_date' => date('Ymd'),
+						'stock_state_date' => date_format(date_create($ord_date),"Ymd"),
 						'ord_opt_no' => $ord_opt_no,
 						'comment' => '수기판매',
 						'rt' => now(),
@@ -1617,6 +1630,7 @@ class Order
 
 				// 모든 입금확인은 5 상태를 기록한다.
 				$order_opt_wonga = array(
+					"ord_opt_no" => $ord_opt_no,
 					"goods_no" => $goods_no,
 					"goods_sub" => $goods_sub,
 					"goods_opt" => $goods_opt,
@@ -1643,6 +1657,7 @@ class Order
 				$this->__InsertOptWonga($order_opt_wonga);
 
 				$order_opt_wonga = array(
+					"ord_opt_no" => $ord_opt_no,
 					"goods_no" => $goods_no,
 					"goods_sub" => $goods_sub,
 					"goods_opt" => $goods_opt,
@@ -1730,7 +1745,7 @@ class Order
 						'price' => $ord_price,
 						'wonga' => $wonga,
 						'qty' => $ord_qty * -1,
-						'stock_state_date' => date('Ymd'),
+						'stock_state_date' => date_format(date_create($ord_date),"Ymd"),
 						'ord_opt_no' => $ord_opt_no,
 						'comment' => '수기판매',
 						'rt' => now(),
@@ -1740,6 +1755,7 @@ class Order
 
 				// 모든 입금확인은 5 상태를 기록한다.
 				$order_opt_wonga = array(
+					"ord_opt_no" => $ord_opt_no,
 					"goods_no" => $goods_no,
 					"goods_sub" => $goods_sub,
 					"goods_opt" => $goods_opt,
@@ -1769,6 +1785,7 @@ class Order
 				$this->PayOk(ORD_STATE_PG_OK);
 
 				$order_opt_wonga = array(
+					"ord_opt_no" => $ord_opt_no,
 					"goods_no" => $goods_no,
 					"goods_sub" => $goods_sub,
 					"goods_opt" => $goods_opt,
@@ -1795,6 +1812,7 @@ class Order
 				$this->__InsertOptWonga($order_opt_wonga);
 
 				$order_opt_wonga = array(
+					"ord_opt_no" => $ord_opt_no,
 					"goods_no" => $goods_no,
 					"goods_sub" => $goods_sub,
 					"goods_opt" => $goods_opt,
@@ -1827,16 +1845,6 @@ class Order
 				$this->DlvStart(ORD_STATE_DLV_START, $ord_kind);
 				$this->DlvProc(0, ORD_STATE_DLV_PROCESS);
 			}
-		}
-
-		/*************************************/
-		/******** 포인트 지급 설정된 경우 ******/
-		/*************************************/
-		if ($point_flag) {
-			// 포인트 지급
-			$point = new Point($this->user, "");
-			$point->SetOrdNo($this->ord_no);
-			$point->Order($add_point);
 		}
 
 		return $result_code;
