@@ -212,7 +212,6 @@
     // 일괄판매등록
     function save() {
         const store_cd = $("#store_no").val();
-        if(store_cd === null) return alert("주문매장을 선택해주세요.");
 
         let rows = gx.getRows();
         if(rows.length < 1) return alert("일괄판매할 주문건이 존재하지 않습니다.");

@@ -227,15 +227,15 @@
                                             <tr>
                                                 <th class="required">주문매장</th>
                                                 <td style="padding:0px 10px 0px 10px;">
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="flax_box mr-2" style="width: 307px;">
+                                                    <div class="d-flex flex-column pt-2 pb-1">
+                                                        <div class="flax_box mr-2 mb-1" style="width: 307px;">
                                                             <div class="form-inline inline_btn_box w-100">
                                                                 <input type='hidden' id="store_nm" name="store_nm">
                                                                 <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
                                                                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                                             </div>
                                                         </div>
-                                                        <p style="color: red;">* 주문매장 변경 시, 상품정보가 초기화됩니다.</p>
+                                                        <p style="color: red;">* 주문매장 미선택 시 상품이 창고에서 출고됩니다. / * 주문매장 변경 시에는 상품정보가 초기화됩니다.</p>
                                                     </div>
                                                 </td>
                                             </tr>
