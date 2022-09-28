@@ -17,6 +17,7 @@ class sys05Controller extends Controller
 
     public function index()
     {
+        $arr = ["name"];
         //상점 탭
         $sql_name = "select * from conf where type = 'shop' and name = 'name'";
         $name = DB::selectOne($sql_name);
@@ -51,7 +52,7 @@ class sys05Controller extends Controller
         $sql_sale_place = "select * from conf where type = 'shop' and name = 'sale_place'";
         $sale_place = DB::selectOne($sql_sale_place);
 
-        //주문탭
+        //주문 탭
         $sql_cash_use_yn = "select * from conf where type = 'shop' and name = 'cash_use_yn'";
         $cash_use_yn = DB::selectOne($sql_cash_use_yn);
 
@@ -63,6 +64,42 @@ class sys05Controller extends Controller
         $bank_nm = $bank_arr[0];
         $account_no = $bank_arr[1];
         $account_holder = $bank_arr[2];
+
+        //배송 탭
+        $sql_base_delivery_fee = "select * from conf where type = 'delivery' and name = 'base_delivery_fee'";
+        $base_delivery_fee = DB::selectOne($sql_base_delivery_fee);
+
+        $sql_add_delivery_fee = "select * from conf where type = 'delivery' and name = 'add_delivery_fee'";
+        $add_delivery_fee = DB::selectOne($sql_add_delivery_fee);
+
+        $sql_free_delivery_amt = "select * from conf where type = 'delivery' and name = 'free_delivery_amt'";
+        $free_delivery_amt = DB::selectOne($sql_free_delivery_amt);
+
+        $sql_wholesale_free_delivery_amt = "select * from conf where type = 'delivery' and name = 'wholesale_free_delivery_amt'";
+        $wholesale_free_delivery_amt = DB::selectOne($sql_wholesale_free_delivery_amt);
+
+        $sql_dlv_cd = "select * from conf where type = 'delivery' and name = 'dlv_cd'";
+        $dlv_cd = DB::selectOne($sql_dlv_cd);
+
+        //적립금 탭
+        $sql_estimate_point_yn = "select * from conf where type = 'point' and name = 'estimate_point_yn'";
+        $estimate_point = DB::selectOne($sql_estimate_point_yn);
+
+        $sql_join_point = "select * from conf where type = 'point' and name = 'join_point'";
+        $join_point = DB::selectOne($sql_join_point);
+
+        $sql_policy = "select * from conf where type = 'point' and name = 'policy'";
+        $policy = DB::selectOne($sql_policy);
+
+        $sql_ratio = "select * from conf where type = 'point' and name = 'ratio'";
+        $ratio = DB::selectOne($sql_ratio);
+    
+        $sql_return_yn = "select * from conf where type = 'point' and name = 'return_yn'";
+        $return_yn = DB::selectOne($sql_return_yn);
+
+        //카카오 탭
+        $sql_kakao_yn = "select * from conf where type = 'kakao' and name = 'kakao_yn'";
+        $kakao_yn = DB::selectOne($sql_kakao_yn);
 
         $values = [
             'name' => $name->value,
@@ -80,6 +117,17 @@ class sys05Controller extends Controller
             'bank_nm' => $bank_nm,
             'account_no' => $account_no,
             'account_holder' => $account_holder,
+            'base_delivery_fee' => $base_delivery_fee->value,
+            'add_delivery_fee' => $add_delivery_fee->value,
+            'free_delivery_amt' => $free_delivery_amt->value,
+            'wholesale_free_delivery_amt' => $wholesale_free_delivery_amt->value,
+            'dlv_cd' => $dlv_cd->value,
+            'estimate_point' => $estimate_point->value,
+            'join_point' => $join_point->value,
+            'policy' => $policy->value,
+            'ratio' => $ratio->value,
+            'return_yn' => $return_yn->value,
+            'kakao_yn' => $kakao_yn->value,
 
         ];
 
@@ -89,6 +137,10 @@ class sys05Controller extends Controller
 
     public function update(Request $request)
     {
+
+        $type = $request->input('type');
+
+        //상점 탭
         $name = $request->input('name');
         $s_code = $request->input('code');
         $phone = $request->input('phone');
@@ -101,11 +153,30 @@ class sys05Controller extends Controller
         $add_script = $request->input('add_script');
         $sale_place = $request->input('sale_place');
         $ut = now();
-        
-        
-        
+
+        //주문 탭
+        $cash_use_yn = $request->input('cash_use_yn');
+        $bank_nm = $request->input('bank_nm');
+        $account_no = $request->input('account_no');
+        $account_holder = $request->input('account_holder');
+
+        //배송 탭
+        $base_delivery_fee = $request->input('base_delivery_fee');
+        $add_delivery_fee = $request->input('add_delivery_fee');
+        $free_delivery_amt = $request->input('free_delivery_amt');
+        $wholesale_free_delivery_amt = $request->input('wholesale_free_delivery_amt');
+
+        //적립금 탭
+        $join_point = $request->input('join_point');
+        $policy = $request->input('policy');
+        $ratio = $request->input('ratio');
+        $return_yn = $request->input('return_yn');
+
+
         
         try {
+            if ($type == 'shop') {
+                // 상점 탭
                 $sql_name = "update conf set value='$name', mvalue='$name', ut = '$ut' where type='shop' and name='name'";
                 DB::update($sql_name);
 
@@ -138,7 +209,43 @@ class sys05Controller extends Controller
 
                 $sql_sale_place = "update conf set value='$sale_place', mvalue='$sale_place', ut = '$ut' where type='shop' and name='sale_place'";
                 DB::update($sql_sale_place);
-                
+            } elseif ($type == 'order') {
+                //주문 탭
+                $sql_cash_use_yn = "update conf set value='$cash_use_yn', mvalue='$cash_use_yn', ut = '$ut' where type='shop' and name='cash_use_yn'";
+                DB::update($sql_cash_use_yn);
+
+                $sql_bank = "update conf set value='$bank_nm|$account_no|$account_holder', mvalue='$bank_nm|$account_no|$account_holder', ut = '$ut' where type='bank' and name='info'";
+                DB::update($sql_bank);
+
+            } elseif ($type == 'delivery') {
+                //배송 탭
+                $sql_base_delivery_fee = "update conf set value='$base_delivery_fee', mvalue='$base_delivery_fee', ut = '$ut' where type='delivery' and name='base_delivery_fee'";
+                DB::update($sql_base_delivery_fee);
+
+                $sql_add_delivery_fee = "update conf set value='$add_delivery_fee', mvalue='$add_delivery_fee', ut = '$ut' where type='delivery' and name='add_delivery_fee'";
+                DB::update($sql_add_delivery_fee);
+
+                $sql_free_delivery_amt = "update conf set value='$free_delivery_amt', mvalue='$free_delivery_amt', ut = '$ut' where type='delivery' and name='free_delivery_amt'";
+                DB::update($sql_free_delivery_amt);
+
+                $sql_wholesale_free_delivery_amt = "update conf set value='$wholesale_free_delivery_amt', mvalue='$wholesale_free_delivery_amt', ut = '$ut' where type='delivery' and name='wholesale_free_delivery_amt'";
+                DB::update($sql_wholesale_free_delivery_amt);
+
+            } elseif ($type == 'point') {
+                //적립금 탭
+                $sql_join_point = "update conf set value='$join_point', mvalue='$join_point', ut = '$ut' where type='point' and name='join_point'";
+                DB::update($sql_join_point);
+
+                $sql_policy = "update conf set value='$policy', mvalue='$policy', ut = '$ut' where type='point' and name='policy'";
+                DB::update($sql_policy);
+
+                $sql_ratio = "update conf set value='$ratio', mvalue='$ratio', ut = '$ut' where type='point' and name='ratio'";
+                DB::update($sql_ratio);
+
+                $sql_join_point = "update conf set value='$return_yn', mvalue='$return_yn', ut = '$ut' where type='point' and name='return_yn'";
+                DB::update($sql_join_point);
+            }
+
 
                 DB::commit();
                 $code = '200';
