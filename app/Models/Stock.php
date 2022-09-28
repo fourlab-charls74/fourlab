@@ -206,7 +206,7 @@ class Stock
                                 and s.goods_opt = '$goods_opt'
                         ";
 
-                        $prd_stock = DB::select($sql);
+                        $prd_stock = DB::selectOne($sql);
                         $loc_qty = $prd_stock->qty;
                         if ($stock_minus_qty > $loc_qty) {
                             return -1;
@@ -565,6 +565,8 @@ class Stock
 
         $this->__IncreasePrdStockQty($qty);
 
+        $this->__IncreasePrdStockStorageQty($qty);
+
         if ($this->loc != '' && $this->loc != 'LOC') {
             $loc = $this->loc;
 
@@ -654,9 +656,7 @@ class Stock
                 and prd_cd = '$this->prd_cd'
                 and goods_opt = '$this->goods_opt'
         ");
-
         if ($affected_rows > 0) return $affected_rows;
-
         try {
             DB::table('product_stock')->insert([
                 'goods_no' => $this->goods_no,
@@ -668,7 +668,41 @@ class Stock
                 'rt' => now(),
                 'ut' => now(),
             ]);
+            return 1;
+        } catch (Exception $e) {
+            return 0;
+        }
+    }
 
+    private function __IncreasePrdStockStorageQty($qty)
+    {
+
+        $sql = "select * from `storage` where default_yn = 'Y'";
+        $result = DB::selectOne($sql);
+        $storage_cd = $result->storage_cd;
+
+        $affected_rows = DB::update("
+            update product_stock_storage set
+                wqty = wqty + $qty
+                , ut = now()
+            where goods_no = '$this->goods_no' 
+                and prd_cd = '$this->prd_cd'
+                and goods_opt = '$this->goods_opt'
+                and storage_cd = '$storage_cd'
+        ");
+        if ($affected_rows > 0) return $affected_rows;
+        try {
+            DB::table('product_stock_storage')->insert([
+                'goods_no' => $this->goods_no,
+                'prd_cd' => $this->prd_cd,
+                'goods_opt' => $this->goods_opt,
+                'qty' => '0',
+                'wqty' => $qty,
+                'use_yn' => 'Y',
+                'rt' => now(),
+                'ut' => now(),
+                'storage_cd' => $storage_cd
+            ]);
             return 1;
         } catch (Exception $e) {
             return 0;
@@ -685,7 +719,6 @@ class Stock
                 and prd_cd = '$prd_cd'
                 and goods_opt = '$goods_opt'
         ";
-
         return DB::update($sql);
     }
 
