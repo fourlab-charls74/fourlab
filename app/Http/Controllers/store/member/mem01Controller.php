@@ -270,4 +270,10 @@ class mem01Controller extends Controller
 		$str_order_by = sprintf(" order by %s %s ",$ord_field,$ord);
 		return [$where, $str_order_by, $join];
 	}
+
+	public function batch(){
+		$values = [];
+
+		return view( Config::get('shop.store.view') . '/member/mem01_batch', $values);
+	}
 }
