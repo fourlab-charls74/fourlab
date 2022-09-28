@@ -129,22 +129,7 @@
         {
             field: "type",
             headerName: "광고구분",
-            cellRenderer: (params) => {
-                if (params.value == "KEYWORD") {
-                    return TYPE.KEYWORD;
-                } else if (params.value == "ETC") {
-                    return TYPE.ETC;
-                } else if (params.value == "EMAIL") {
-                    return TYPE.EMAIL;
-                } else if (params.value == "BANNER") {
-                    return TYPE.BANNER;
-                } else if (params.value == "AFFILIATE") {
-                    return TYPE.AFFILIATE;
-                }
-                
-                return params.value;
-            }
-
+            cellRenderer: (params) => TYPE[params.value] || params.value,
         },
         {
             field: "ad",

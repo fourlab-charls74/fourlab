@@ -81,10 +81,7 @@
                                                         <select name='ad_sale' class="form-control form-control-sm">
                                                             <option value="">선택</option>
                                                             @foreach($ad_sale as $as) 
-                                                                <option 
-                                                                    value="{{$as->no}}"
-                                                                    @if($as->no === $dc_no) selected @endif
-                                                                >
+                                                                <option value="{{$as->no}}" @if($as->no === $dc_no) selected @endif>
                                                                     {{$as->name}}
                                                                 </option>
                                                             @endforeach

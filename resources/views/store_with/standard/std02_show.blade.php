@@ -798,14 +798,17 @@
             method: 'post',
             data: form,
         }).then(function (res) {
-            if(res.data.code === 200) {
+            if(res.data.code === '200') {
                 alert(res.data.msg);
                 opener.Search();
                 location.href = "/store/standard/std02/show/" + res.data.data.store_cd;;
-            } else {
+            } else if(res.data.code === '500') {
                 console.log(res.data);
-                alert("등록 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-            }
+                alert("수정 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+            } else if(res.data.code === '400') {
+                console.log(res.data);
+				alert("매장이미지 중 'jpg'형식이 아닌 파일이 존재합니다.\n이미지파일 확인 후 다시 등록해주세요.");
+			}
         }).catch(function (err) {
             console.log(err);
         });
@@ -831,15 +834,16 @@
             method: 'post',
             data: form,
         }).then(function (res) {
-            if(res.data.code === 200) {
+            if(res.data.code === '200') {
                 alert(res.data.msg);
                 opener.Search();
                 window.close();
-            } else if(res.data.msg === 500) {
+            } else if(res.data.code === '500') {
                 console.log(res.data);
                 alert("수정 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-            }else {
-				alert("잘못된 형식의 이미지입니다.");
+            } else if(res.data.code === '400') {
+                console.log(res.data);
+				alert("매장이미지 중 'jpg'형식이 아닌 파일이 존재합니다.\n이미지파일 확인 후 다시 등록해주세요.");
 			}
         }).catch(function (err) {
             console.log(err);

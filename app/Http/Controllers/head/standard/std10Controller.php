@@ -34,31 +34,27 @@ class std10Controller extends Controller
 
         $ad_sale = DB::select($query);
         
-
         if (empty($code)) {
-            $type    = "";
-            $name    = "";
-            $state    = "1";
-            $dc_no = "";
+            $type   = "";
+            $name   = "";
+            $state  = "1";
+            $dc_no  = "";
         } else {
-
             $sql = "
                 select * 
                 from ad 
                 where ad = '$code' 
-
             ";
 
             $row = DB::selectOne($sql);
 
             if (isset($row->type)) {
-                $type    = $row->type;
-                $name    = $row->name;
-                $state    = $row->state;
-                $dc_no = $row->dc_no;
+                $type   = $row->type;
+                $name   = $row->name;
+                $state  = $row->state;
+                $dc_no  = $row->dc_no;
             }
         }
- 
 
         $values = [
             'code' => $code,

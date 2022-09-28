@@ -26,7 +26,6 @@ class std02Controller extends Controller
 		];
 
 		return view( Config::get('shop.store.view') . '/standard/std02',$values);
-
 	}
 
 	public function search(Request $request)
@@ -192,7 +191,7 @@ class std02Controller extends Controller
 	public function update_store(Request $request){
 
 		$id			= Auth('head')->user()->id;
-		$code		= 200;
+		$code		= '200';
 		$msg		= "매장정보가 정상적으로 반영되었습니다.";
 		$store_cd 	= $request->input('store_cd');
 		$image 		= $request->file('file');
@@ -293,7 +292,7 @@ class std02Controller extends Controller
 					$cnt = $last_seq + 1;
 					$imgSize = getimagesize($ig);
 					$imageType = "";
-					if($imgSize[2] == 2){
+					if ($imgSize[2] == 2) {
 						$imageType = "jpg";
 					}
 					$imageType2 = $imgSize['mime'];
@@ -314,21 +313,20 @@ class std02Controller extends Controller
 						$last_seq++;
 
 					} else {
-						return ;
+						$msg = "매장이미지 중 'jpg'형식이 아닌 파일이 존재합니다.";
+						return response()->json(["code" => '400', 'msg' => $msg]);
 					}
 				}
 				
 			}
 			
 			DB::commit();
-
 			return response()->json(["code" => $code, "msg" => $msg, "store_cd" => $request->input('store_cd')]);
-
 		} catch(Exception $e) {
-			$msg = "에러가 발생했습니다. 잠시 후 다시시도 해주세요.";
-			
 			DB::rollback();
-			return response()->json(["code" => 300, 'msg' => $msg]);
+			$msg = $e->getMessage();
+			
+			return response()->json(["code" => '500', 'msg' => $msg]);
 			
 		}
 	}

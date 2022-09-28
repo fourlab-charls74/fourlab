@@ -114,6 +114,7 @@ class std11Controller extends Controller
 		$limit_coupon_yn	= $req->input("limit_coupon_yn", "");
 		$limit_point_yn	    = $req->input("limit_point_yn", "");
 		$add_point_yn		= $req->input("add_point_yn", "");
+
         $where = "";
 
 		if ($name != "")			$where .= " and a.name like '$name%'";
@@ -123,23 +124,23 @@ class std11Controller extends Controller
 		if ($limit_point_yn != "")	$where .= " and a.limit_point_yn = '$limit_point_yn'";
 		if ($add_point_yn != "")	$where .= " and a.add_point_yn = '$add_point_yn'";
 
-        if($dc_range == 'A') {
+        if ($dc_range == 'A') {
             $sql = "
                 select *
                 from ad_dc a
                 order by a.no desc
             ";
-        }else{
+        } else {
             $sql = "
-			select
-				a.name, a.use_yn, a.dc_range, dc_rate, dc_amt, date_from, date_to,
-				limit_margin_rate, limit_coupon_yn, limit_point_yn, add_point_yn, add_point_rate, add_point_amt, admin_nm, rt, ut,
-				a.no
-			from ad_dc a
-			where 1=1
-				$where
-			order by a.no desc
-        ";
+                select
+                    a.name, a.use_yn, a.dc_range, dc_rate, dc_amt, date_from, date_to,
+                    limit_margin_rate, limit_coupon_yn, limit_point_yn, add_point_yn, add_point_rate, add_point_amt, admin_nm, rt, ut,
+                    a.no
+                from ad_dc a
+                where 1=1
+                    $where
+                order by a.no desc
+            ";
         }
 		
         $rows = DB::select($sql);
