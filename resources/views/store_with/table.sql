@@ -639,6 +639,11 @@ CREATE TABLE `msg_group_store` (
 -- 브랜드에 '브랜드 단축코드' 추가
 ALTER TABLE `bizest_smart`.`brand` ADD COLUMN `br_cd` VARCHAR(3) NULL COMMENT '단축코드' AFTER `brand_nm_eng`;
 
+-- 회원에 오프라인 회원 일괄 등록 필드 추가
+ALTER TABLE `bizest_smart`.`member` ADD COLUMN `type` CHAR(1) NOT NULL DEFAULT 'N' COMMENT '회원가입 종류 - N : 일반, B : 일괄(XMD)' AFTER `prom_code`;
+ALTER TABLE `bizest_smart`.`member` ADD COLUMN `store_nm` VARCHAR(100) DEFAULT NULL COMMENT '회원가입 매장명' AFTER `type`;
+ALTER TABLE `bizest_smart`.`member` ADD COLUMN `store_cd` VARCHAR(30) DEFALUT NULL COMMENT '회원가입 매장코드' AFTER `store_nm`;
+
 --
 -- 기존 테이블 컬럼 추가 종료
 --

@@ -2,10 +2,10 @@
 @section('title','회원관리')
 @section('content')
 <div class="page_tit">
-	<h3 class="d-inline-flex">고객/수선관리</h3>
+	<h3 class="d-inline-flex">회원관리</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
-		<span>/ 회원관리</span>
+		<span>/ 고객/수선관리</span>
 	</div>
 </div>
 
@@ -17,6 +17,7 @@
 				<h4>검색</h4>
 				<div class="flax_box">
 					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+					<a href="#" onclick="Batch()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>데이터업로드</a>
 					<a href="#" onclick="document.search.reset()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
 					<div class="btn-group dropleftbtm mr-1">
 						<button type="button" class="btn btn-primary waves-light waves-effect dropdown-toggle btn-sm pr-1" data-toggle="dropdown" aria-expanded="false">
@@ -384,6 +385,7 @@
 		</div>
 		<div class="resul_btn_wrap mb-3">
 			<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+			<a href="#" onclick="Batch()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>데이터업로드</a>
 			<a href="#" onclick="document.search.reset()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
 			<div class="btn-group dropleftbtm mr-1">
 				<button type="button" class="btn btn-primary waves-light waves-effect dropdown-toggle btn-sm pr-1" data-toggle="dropdown" aria-expanded="false">
@@ -456,7 +458,7 @@ const pApp = new App('', {gridId: "#div-gd"});
 const gridDiv = document.querySelector(pApp.options.gridId);
 const gx = new HDGrid(gridDiv, columns);
 
-pApp.ResizeGrid(275);
+pApp.ResizeGrid(200);
 pApp.BindSearchEnter();
 
 function Search() {
@@ -530,9 +532,13 @@ if ($('.confirm-btn').length > 0){
 	});
 }
 
-function getToday()
-{
+function getToday(){
 	$('[name="mmdd"]').val('{{ $today }}');
+}
+
+function Batch(){
+	const url='/store/member/mem01/batch';
+	window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
 }
 
 //openSmsSend
