@@ -264,7 +264,7 @@ class sal21Controller extends Controller
                         left outer join (
                             select idx, prd_cd, location_cd, type, qty, stock_state_date
                             from product_stock_hst
-                            where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '2022-09-20 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= '2022-09-27 23:59:59'
+                            where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$sdate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= '$edate 23:59:59'
                         ) hst on hst.location_cd = p.store_cd and hst.prd_cd = p.prd_cd
                         left outer join product_stock_hst store_in on store_in.idx = hst.idx and store_in.type = '1'
                         left outer join product_stock_hst store_return on store_return.idx = hst.idx and store_return.type = '11'
@@ -275,7 +275,7 @@ class sal21Controller extends Controller
                         left outer join (
                             select idx, prd_cd, location_cd, type, qty, stock_state_date
                             from product_stock_hst
-                            where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '2022-09-28 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+                            where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
                         ) _next on _next.location_cd = p.store_cd and _next.prd_cd = p.prd_cd
                     where ($store_where)
                         $where
