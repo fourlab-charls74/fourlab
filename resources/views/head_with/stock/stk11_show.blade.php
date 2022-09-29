@@ -327,13 +327,13 @@
             valueFormatter: numberFormatter
         },
         {headerName: "원가(원, VAT포함)", field: "cost", width: 120, cellStyle:{'text-align': 'right'}, 
-            valueFormatter: currencyFormatter
+            valueFormatter: numberFormatter
         },
         {headerName: "총원가(원)", field: "total_cost", width: 96, cellStyle:{'text-align': 'right'}, 
-            valueFormatter: currencyFormatter
+            valueFormatter: numberFormatter
         },
         {headerName: "총원가(원, VAT별도)", field: "total_cost_novat", width: 134, cellStyle:{'text-align': 'right'}, 
-            valueFormatter: currencyFormatter
+            valueFormatter: numberFormatter
         },
         {headerName: "최근입고일자", field: "stock_date", width:96, cellStyle: {"text-align" : 'center'}},
         {headerName:"", field:"", width:"auto"}
