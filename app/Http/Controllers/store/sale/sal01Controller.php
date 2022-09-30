@@ -215,39 +215,88 @@ class sal01Controller extends Controller
 		return $data;
 	}
 
+	/**
+	 * 전체를 한번에 처리하는 방식
+	 */
 	public function update(Request $request)
 	{
-		ini_set('max_execution_time', '600');
+		ini_set('max_execution_time', '36000');
+		ini_set('max_input_vars' , 700000);
 		// set_time_limit(0);
 
-		$order = $request->input('data');
-		$order = (array)$order;
-
-		/**
-		 * 기존 tmp order에 ord_no가 없는 경우 insert, 있는 경우 update 처리
-		 */
-		DB::beginTransaction();
-		try {
-			$saved_type = $this->saveTmpOrder($order);
-		} catch (Exception $e) { // 임시 주문서 저장시 문제 발생한 경우 에러 처리
-			DB::rollback();
-			$code = -400;
-			return response()->json(['code'	=> $code]);
-		}
+		$orders = $request->input('data');
 		
-		if ($saved_type == "insert") {
-			$code = $this->insertOrder($order);
-		} else if ($saved_type == "update") {
-			$code = $this->updateOrder($order);
-			if ($code == -201) { // 주문 관련 테이블에 초기 데이터 값들이 존재하지 않을 경우 재삽입 처리
-				$code = $this->insertOrder($order);
-			}
-		}
+		$codes = [];
+		foreach ($orders as $order) {
+			$order = (array)$order;
 
-		($code == 200 || $code == 201) ? DB::commit() : DB::rollBack(); // 추가 또는 수정이 완료된 경우 commit하여 DB 반영
-		return response()->json(['code'	=> $code]);
+			/**
+			 * 기존 tmp order에 ord_no가 없는 경우 insert, 있는 경우 update 처리
+			 */
+			DB::beginTransaction();
+			try {
+				$saved_type = $this->saveTmpOrder($order);
+			} catch (Exception $e) { // 임시 주문서 저장시 문제 발생한 경우 에러 처리
+				DB::rollback();
+				$code = -400;
+				array_push($codes, $code);
+				break;
+			}
+
+			if ($saved_type == "insert") {
+				$code = $this->insertOrder($order);
+			} else if ($saved_type == "update") {
+				$code = $this->updateOrder($order);
+				if ($code == -201) { // 주문 관련 테이블에 초기 데이터 값들이 존재하지 않을 경우 재삽입 처리
+					$code = $this->insertOrder($order);
+				}
+			}
+
+			($code == 200 || $code == 201) ? DB::commit() : DB::rollBack(); // 추가 또는 수정이 완료된 경우 commit하여 DB 반영
+			array_push($codes, $code);
+		}
+		return response()->json(['codes' => $codes]);
 	}
 
+	/**
+	 * 데이터 1개당 처리하는 방식
+	 */
+	// public function update(Request $request)
+	// {
+	// 	ini_set('max_execution_time', '600');
+	// 	// set_time_limit(0);
+
+	// 	$order = $request->input('data');
+	// 	$order = (array)$order;
+
+	// 	/**
+	// 	 * 기존 tmp order에 ord_no가 없는 경우 insert, 있는 경우 update 처리
+	// 	 */
+	// 	DB::beginTransaction();
+	// 	try {
+	// 		$saved_type = $this->saveTmpOrder($order);
+	// 	} catch (Exception $e) { // 임시 주문서 저장시 문제 발생한 경우 에러 처리
+	// 		DB::rollback();
+	// 		$code = -400;
+	// 		return response()->json(['code'	=> $code]);
+	// 	}
+		
+	// 	if ($saved_type == "insert") {
+	// 		$code = $this->insertOrder($order);
+	// 	} else if ($saved_type == "update") {
+	// 		$code = $this->updateOrder($order);
+	// 		if ($code == -201) { // 주문 관련 테이블에 초기 데이터 값들이 존재하지 않을 경우 재삽입 처리
+	// 			$code = $this->insertOrder($order);
+	// 		}
+	// 	}
+
+	// 	($code == 200 || $code == 201) ? DB::commit() : DB::rollBack(); // 추가 또는 수정이 완료된 경우 commit하여 DB 반영
+	// 	return response()->json(['code'	=> $code]);
+	// }
+
+	/**
+	 * 임시주문데이터 저장
+	 */
 	public function saveTmpOrder($order)
 	{
 		$saved_type = "";
@@ -621,6 +670,7 @@ class sal01Controller extends Controller
 
 				list($usec, $sec) = explode(" ", microtime());
 				$f_ord_date = Carbon::parse($ord_date)->format("Ymd");
+				$f_ord_date_2 = Carbon::parse($ord_date)->format("Y-m-d H:i:s");
 
 				$ord_no_front = $f_ord_date != "" ? $f_ord_date . $store_cd : date("Ymd") . $store_cd; // 주문번호 앞 자리
 				$ord_no_back = round($usec * 1000000, 0); // 주문번호 맨 뒤 6자리 숫자에 해당
@@ -669,8 +719,9 @@ class sal01Controller extends Controller
 					"bank_inpnm" 	=> Lib::getValue($order, "bank_inpnm", ""),
 					"bank_code" 	=> Lib::getValue($order, "bank_code", ""),
 					"bank_number" 	=> Lib::getValue($order, "bank_number", ""),
-					"ord_dm"        => $f_ord_date,
-					"upd_dm"        => $f_ord_date
+					"ord_dm"        => $f_ord_date . "000000",
+					"pay_date"		=> $f_ord_date_2,
+					"upd_dm"        => $f_ord_date . "000000"
 				];
 				DB::table('payment')->insert($payment);
 				
@@ -1022,6 +1073,7 @@ class sal01Controller extends Controller
 				$updated_row = DB::table('order_opt')->where('ord_opt_no', $ord_opt_no)->first();
 				if ($updated_row == null) return $code = -201;
 
+
 				$ord_no = $updated_row->ord_no;
 
 				DB::table('order_mst')->where('ord_no', $ord_no)->update([
@@ -1058,6 +1110,8 @@ class sal01Controller extends Controller
 				if ($updated_row == null) return $code = -201;
 
 				$f_ord_date = Carbon::parse($ord_date)->format("YmdHis");
+				$f_ord_date_2 = Carbon::parse($ord_date)->format("Y-m-d H:i:s");
+
 				DB::table('payment')->where('ord_no', $ord_no)->update([
 					"pay_type" 		=> $pay_type,
 					"pay_nm" 		=> $order["user_nm"],
@@ -1066,8 +1120,9 @@ class sal01Controller extends Controller
 					"bank_inpnm" 	=> Lib::getValue($order, "bank_inpnm", ""),
 					"bank_code" 	=> Lib::getValue($order, "bank_code", ""),
 					"bank_number" 	=> Lib::getValue($order, "bank_number", ""),
-					"ord_dm"        => $f_ord_date,
-					"upd_dm"        => $f_ord_date
+					"ord_dm"        => $f_ord_date . "000000",
+					"pay_date"		=> $f_ord_date_2,
+					"upd_dm"        => $f_ord_date . "000000"
 				]);
 
 				$updated_row = DB::table('payment')->where('ord_no', $ord_no)->first();

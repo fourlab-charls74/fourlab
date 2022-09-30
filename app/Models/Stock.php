@@ -683,9 +683,10 @@ class Stock
 
         $affected_rows = DB::update("
             update product_stock_storage set
-                wqty = wqty + $qty
-                , ut = now()
-            where goods_no = '$this->goods_no' 
+                wqty = wqty + $qty,
+                qty = qty + $qty,
+                ut = now()
+            where goods_no = '$this->goods_no'
                 and prd_cd = '$this->prd_cd'
                 and goods_opt = '$this->goods_opt'
                 and storage_cd = '$storage_cd'
@@ -696,7 +697,7 @@ class Stock
                 'goods_no' => $this->goods_no,
                 'prd_cd' => $this->prd_cd,
                 'goods_opt' => $this->goods_opt,
-                'qty' => '0',
+                'qty' => $qty,
                 'wqty' => $qty,
                 'use_yn' => 'Y',
                 'rt' => now(),
