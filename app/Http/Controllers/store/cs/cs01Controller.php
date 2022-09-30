@@ -685,8 +685,8 @@ class cs01Controller extends Controller {
 				(s.cost_notax * s.qty) as total_cost_novat,
 				s.stock_date as stock_date		
 			from stock_product s inner join goods g
-					on s.goods_no = g.goods_no
-					inner join product_stock ps on s.prd_cd = ps.prd_cd
+				on s.goods_no = g.goods_no
+				inner join product_stock ps on s.prd_cd = ps.prd_cd
 			where stock_no = '$stock_no'
 			order by stock_prd_no asc
 		";
