@@ -99,9 +99,9 @@ class std07Controller extends Controller
 				sf.comment, 
 				sf.use_yn
 			from code cd
-				inner join store s on s.store_cd = :store_cd
+				inner join store s on s.store_cd = '$store_cd'
 				left outer join store_fee sf
-					on cd.code_id = sf.pr_code and sf.store_cd = s.store_cd and sf.idx in (select max(idx) from store_fee group by pr_code)
+					on cd.code_id = sf.pr_code and sf.store_cd = s.store_cd and sf.idx in (select max(idx) from store_fee where store_cd = '$store_cd' group by pr_code)
 				left outer join store_grade sg 
 					on sg.grade_cd = s.grade_cd 
 					and concat(sg.sdate, '-01 00:00:00') <= date_format(now(), '%Y-%m-%d 00:00:00') 
@@ -110,7 +110,7 @@ class std07Controller extends Controller
 			order by cd.code_seq
 		";
 
-		$rows = DB::select($sql, ["store_cd" => $store_cd]);
+		$rows = DB::select($sql);
 		return $rows;
 	}
 
