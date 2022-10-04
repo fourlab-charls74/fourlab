@@ -44,12 +44,19 @@ h1, h2, h3, h4, h5, h6 {font-size: inherit;}
 /* width */
 .w-10 {width: 10% !important;}
 
+/* height */
+.h-40 {height: 40px;}
+
 /* border */
-.b-gray {border: 2px solid #bbb;}
+.b-1-gray {border: 1px solid #bbb;}
+.b-2-gray {border: 2px solid #bbb;}
+.b-none {border: none !important;}
 
 /* border-radius */
 .br-1 {border-radius: 7px;}
 .br-2 {border-radius: 12px;}
+.br-3 {border-radius: 17px;}
+.br-50 {border-radius: 50%;}
 
 /* background-color */
 .bg-lightgray {background-color: #e2e2e2;}
@@ -82,16 +89,18 @@ h1, h2, h3, h4, h5, h6 {font-size: inherit;}
 /* input */
 .inp {min-height:30px;border: none;}
 .inp:focus {outline: none !important;}
+.inp::placeholder {color: #999999;font-size: inherit;}
 
 /* select */
-.pos-select {min-height: 40px;}
-/* .pos-select:focus {box-shadow: none;} */
+.sel {min-height: 40px;border: none;}
+.sel:focus {outline: none !important;}
 
 /* textarea */
 textarea::placeholder {color: #999;font-size: inherit;}
 
 /* etc */
 .noresize {resize: none;}
+.shadow-box {box-shadow: 0px 3px 5px -1px rgba(170, 170, 170, 0.68);}
 
 /* component */
 .ag-row {font-size: 16px !important;}
@@ -116,6 +125,8 @@ table.prd_info_table td {padding-right: 12px;text-align: right;font-weight: bold
     border: 1px solid #bbb;
     grid-template-columns: repeat(3, 100px) 140px;
     grid-template-rows: repeat(5, 77.5px);
+}
+.calculator-grid.product {
     grid-template-areas: 
         'a a a a'
         'b c d n'
@@ -123,7 +134,25 @@ table.prd_info_table td {padding-right: 12px;text-align: right;font-weight: bold
         'h i j p'
         'k l m q'
 }
+.calculator-grid.payment {
+    grid-template-areas: 
+        'a a a a'
+        'b c d n'
+        'e f g n'
+        'h i j n'
+        'k l m n'
+}
 .calculator-grid > .butt {
     font-weight: 500;
     border: 1px solid #bbb;
+    transition: 100ms;
+}
+.calculator-grid > .butt:active {
+    color: #ffffff;
+    background-color: #222222 !important;
+}
+table.search_table th {min-width: 15%;font-size: 1.1rem !important;font-weight: 400;}
+table.search_table td {width: 35%;}
+@media (max-width: 740px) {
+    table.search_table td {float: unset !important;width: 100% !important;}
 }
