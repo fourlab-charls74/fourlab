@@ -23,7 +23,7 @@
     <div class="card_wrap aco_card_wrap">
         <div class="card shadow">
             <div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
-                <a href="#">매장마진정보 변경내역</a>
+                <a href="#">매장마진정보 변경내역 ({{ @$pr_code->pr_code_cd }}-{{ @$pr_code->pr_code_nm }})</a>
                 <div>
                     <button type="button" onclick="addData();" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn"><i class="bx bx-plus"></i> 추가</button>
                     <button type="button" onclick="removeData();" class="btn btn-sm btn-outline-primary shadow-sm"><i class="bx bx-trash"></i> 삭제</button>
@@ -59,12 +59,12 @@
                 return {"text-align": "center", "background-color": params.data.use_yn === "A" ? "#ffff99" : ""};
             },
             cellRenderer: (params) => {
-                return `<input type="date" class="grid-date" value="${params.value ?? ''}" onchange="changeNodeData('sdate', this, '${params.rowIndex}')" ${params.data.use_yn === "A" ? '' : 'readonly'} />`;
+                return params.data.use_yn === "A" ? `<input type="date" class="grid-date" value="${params.value ?? ''}" onchange="changeNodeData('sdate', this, '${params.rowIndex}')" />` : params.data.sdate;
             }
         },
         {field: "edate", headerName: "종료일", width: 90, cellStyle: {"text-align": "center"},
             cellRenderer: (params) => {
-                return `<input type="date" class="grid-date" value="${params.value ?? ''}" readonly />`;
+                return params.data.use_yn === "A" ? `<input type="date" class="grid-date" value="${params.value ?? ''}" readonly />` : params.data.edate;
             }
         },
         {field: "store_fee", headerName: "매장수수료(%)", width: 120, type: "percentType", 
@@ -75,14 +75,14 @@
                 return params.data.use_yn === "A";
             }
         },
-        {field: "manager_fee", headerName: "중간관리수수료(%)", width: 120, type: "percentType", 
-            cellStyle: function(params) {
-                return {"background-color": params.data.use_yn === "A" ? "#ffff99" : ""};
-            }, 
-            editable: function(params) {
-                return params.data.use_yn === "A";
-            }
-        },
+        // {field: "manager_fee", headerName: "중간관리수수료(%)", width: 120, type: "percentType", 
+        //     cellStyle: function(params) {
+        //         return {"background-color": params.data.use_yn === "A" ? "#ffff99" : ""};
+        //     }, 
+        //     editable: function(params) {
+        //         return params.data.use_yn === "A";
+        //     }
+        // },
         {field: "comment", headerName: "메모", width: 235, 
             cellStyle: function(params) {
                 return {"background-color": params.data.use_yn === "A" ? "#ffff99" : ""};
@@ -139,10 +139,11 @@
             store_cd: store_cd,
             pr_code_cd: pr_code_cd,
             pr_code_nm: pr_code_nm,
-            sdate: getDateObjToStr(new Date()), // 오늘 날짜
+            // sdate: getDateObjToStr(new Date()), // 오늘 날짜
+            sdate: "0000-00-00",
             edate: '9999-12-31',
             store_fee: 0,
-            manager_fee: 0,
+            // manager_fee: 0,
             comment: '',
         };
 

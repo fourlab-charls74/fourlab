@@ -17,7 +17,7 @@
     </div>
 
     {{-- 메인화면 --}}
-    <div id="pos_main" class="flex-1 d-none justify-content-center align-items-center">
+    <div id="pos_main" class="flex-1 d-flex justify-content-center align-items-center">
         <div class="main-grid fc-white">
             <button type="button" class="butt fs-20 fw-sb bg-orange" style="grid-area:a;" onclick="return setScreen('pos_order');">
                 <i class="fa fa-shopping-bag d-block mb-3" aria-hidden="true" style="font-size:100px;"></i>
@@ -31,7 +31,7 @@
                     <li class="d-flex justify-content-between"><p>주문건수</p><p><span>0</span>건</p></li>
                 </ul>
             </div>
-            <button type="button" class="butt fs-14 fw-sb bg-blue" style="grid-area:c;">
+            <button type="button" class="butt fs-14 fw-sb bg-blue" style="grid-area:c;" onclick="return setScreen('pos_today')">
                 <i class="fa fa-search d-block mb-3" aria-hidden="true" style="font-size:50px;"></i>
                 당일판매내역
             </button>
@@ -63,10 +63,10 @@
     </div>
 
     {{-- 주문등록화면 --}}
-    <div id="pos_order" class="flex-1 d-flex">
+    <div id="pos_order" class="flex-1 d-none">
         <div class="flex-5 p-3">
             <div class="d-flex flex-column">
-                <button type="button" class="butt w-100 fs-12 bg-lightgray mb-3" style="height: 60px;"><i class="fa fa-search mr-2" aria-hidden="true"></i>상품 검색</button>
+                <button type="button" class="butt w-100 fc-white fs-14 br-1 bg-orange mb-3" style="height: 60px;" data-toggle="modal" data-target="#searchProductModal"><i class="fa fa-search mr-2" aria-hidden="true"></i>상품 검색</button>
                 <div class="d-flex mb-4">
                     <div class="table-responsive">
                         <div id="div-gd" class="ag-theme-balham" style="font-size: 18px;"></div>
@@ -209,11 +209,35 @@
             </div>
         </div>
     </div>
+
+    {{-- 당일판매내역화면 --}}
+    <div id="pos_today" class="flex-1 d-none align-items-center justify-content-center">
+        당일판매내역
+    </div>
 </div>
 
 {{-- MODAL --}}
 <div id="pos-modal">
-    <div class="modal fade" id="receiptNoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal fade" id="searchProductModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="fs-20 close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    {{-- <h5 class="mt-1 fs-12 fw-b">영수증번호</h5>
+                    <div class="d-flex flex-column align-items-center mt-5">
+                        <input type="text" class="inp mb-4 p-2 w-75 text-center fs-18 fw-sb" value="M0001202207010001" />
+                        <div class="d-flex justify-content-end w-100 fs-12">
+                            <button type="button" class="btn p-2 pl-5 pr-5 mr-2 fc-gray fw-sb" data-dismiss="modal">취소</button>
+                            <button type="button" class="btn p-2 pl-5 pr-5 text-light fw-sb bg-primary rounded-0">확인</button>
+                        </div>
+                    </div> --}}
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- <div class="modal fade" id="receiptNoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-body">
@@ -231,7 +255,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 </div>
 
 @include('store_with.pos.pos_js')
