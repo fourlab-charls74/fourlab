@@ -192,23 +192,25 @@
 	var GridData = [];
 
 	/**
-	 * @return {boolean}
+	 * 전체를 한번에 처리하는 방식 - 작업이 다 끝난 후 에러 파악 가능 / 속도가 2배이상 빠른 방식
 	 */
-	const Save = async () => {
+	const Save = () => {
 		var frm = $('form');
 		if (GridData.length === 0) {
 			alert('엑셀파일을 입력하여 주십시오.');
 			return false;
 		} else {
-			for (let i = 0; i<GridData.length; i++ ) {
-				let row = GridData[i];
-				let rowNode = gridOptions.api.getRowNode(i);
-				try {
-					const response = await axios({ 
-						url: '/store/sale/sal01/update', method: 'post', data: { data: row }
-					});
-					const { data } = response;
-					const code = data?.code;
+			const rows = GridData;
+			axios({
+                url: '/store/sale/sal01/update', method: 'post', data: { data: rows },
+				responseType: 'json'
+            }).then((response) => {
+				const { data } = response;
+				const codes = data?.codes;
+				for (let i = 0; i < codes.length; i++) {
+					let row = GridData[i];
+					let rowNode = gridOptions.api.getRowNode(i);
+					const code = codes[i];
 					if (code == 201) {
 						rowNode.setDataValue('result', "추가 완료");
 						gridOptions.api.applyTransaction({ update : [row] });
@@ -223,13 +225,55 @@
                         }
 						rowNode.setDataValue('result', result);
 					}
-				} catch (error) {
-					console.log(error);
 				}
-			}
-			alert("매장 판매일보가 등록(수정)되었습니다.");
+				alert("매장 판매일보가 등록(수정)되었습니다.");
+            }).catch((error) => {
+				console.log(error);
+			});
 		}
 	};
+
+	/**
+	 * 데이터 1개당 처리하는 방식 - 데이터별로 실시간 에러 파악 가능 / 일괄처리보다 속도가 느림
+	 */
+
+	// const Save = async () => {
+	// 	var frm = $('form');
+	// 	if (GridData.length === 0) {
+	// 		alert('엑셀파일을 입력하여 주십시오.');
+	// 		return false;
+	// 	} else {
+	// 		for (let i = 0; i<GridData.length; i++ ) {
+	// 			let row = GridData[i];
+	// 			let rowNode = gridOptions.api.getRowNode(i);
+	// 			try {
+	// 				const response = await axios({ 
+	// 					url: '/store/sale/sal01/update', method: 'post', data: { data: row }
+	// 				});
+	// 				const { data } = response;
+	// 				const code = data?.code;
+	// 				if (code == 201) {
+	// 					rowNode.setDataValue('result', "추가 완료");
+	// 					gridOptions.api.applyTransaction({ update : [row] });
+	// 				} else if (code == 200) {
+	// 					rowNode.setDataValue('result', "업데이트 완료");
+	// 					gridOptions.api.applyTransaction({ update : [row] });
+	// 				} else {
+	// 					if (out_order_errors.hasOwnProperty(code)) {
+    //                         result = "[" + code + "] " + out_order_errors[code];
+    //                     } else {
+    //                         result = "[" + code + "] ";
+    //                     }
+	// 					rowNode.setDataValue('result', result);
+	// 				}
+	// 			} catch (error) {
+	// 				console.log(error);
+	// 			}
+	// 		}
+	// 		alert("매장 판매일보가 등록(수정)되었습니다.");
+	// 	}
+	// };
+
 
 	// read the raw data and convert it to a XLSX workbook
 	function convertDataToWorkbook(data) {
