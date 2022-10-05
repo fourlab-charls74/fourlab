@@ -59,7 +59,7 @@ h1, h2, h3, h4, h5, h6 {font-size: inherit;}
 .br-50 {border-radius: 50%;}
 
 /* background-color */
-.bg-lightgray {background-color: #e2e2e2;}
+.bg-lightgray {background-color: #ededed;}
 .bg-gray {background-color: #646f7e;}
 .bg-red {background-color: #ED2939;}
 .bg-orange {background-color: #FE7C00;}
@@ -104,6 +104,10 @@ textarea::placeholder {color: #999;font-size: inherit;}
 
 /* component */
 .ag-row {font-size: 16px !important;}
+.ag-cell-focus, .ag-cell {
+    border: none !important;
+    background-color: unset !important;
+}
 .ag-header {min-height: 50px !important;}
 .ag-header-row {height: 50px !important;}
 .main-grid {
