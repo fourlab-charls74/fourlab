@@ -474,7 +474,7 @@
                                                             <th>당일배송 가능 지역</th>
                                                             <td>
                                                                 <div class="flax_box">
-                                                                <input type="text" class="input" name="day_delivery_zone" value="" maxlength="50" style="width: 30%;" />
+                                                                <input type="text" class="form-control form-control-sm" name="day_delivery_zone" value="" maxlength="50" style="width: 30%;" />
                                                                 </div>
                                                                 <div class="gray">* 당일배송 가능 지역을 입력하십시오. 지역이 여러곳인 경우에는 콤마(,)를 사용하여 입력하실 수 있습니다.  EX)서울,경기,대전</div>
                                                             </td>
@@ -814,7 +814,7 @@
                                                                 <td style="text-align:center;font-weight: bold;">메시지</td>
                                                             </tr>
                                                             <tr>
-                                                                <td style="text-align: left;"><label>회원 가입 인증 SMS 발송</label></td>
+                                                                <th>회원가입 인증 SMS 발송</th>
                                                                 <td style="text-align:center;">
                                                                     <label><input type="radio" name="auth_yn" value="Y" /> 발송함</label>
                                                                     <label><input type="radio" name="auth_yn" value="N" /> 발송안함</label>
@@ -826,7 +826,7 @@
                                                                 </td>
                                                             </tr>
                                                             <tr>
-                                                                <td style="text-align: left;"><label>회원 가입 축하 SMS 발송</label></td>
+                                                                <th>회원 가입 축하 SMS 발송</th>
                                                                 <td style="text-align:center;">
                                                                     <label><input type="radio" name="join_yn" value="Y" @if ($join_yn == 'Y') checked @endif/> 발송함</label>
                                                                     <label><input type="radio" name="join_yn" value="N" @if ($join_yn == 'N') checked @endif/> 발송안함</label>
@@ -838,7 +838,7 @@
                                                                 </td>
                                                             </tr>
                                                             <tr>
-                                                                <td width="15%" style="text-align: left;"><label>비밀번호 찾기 SMS 발송</label></td>
+                                                                <th>비밀번호 찾기 SMS 발송</th>
                                                                 <td style="text-align:center;">
                                                                     <label><input type="radio" name="passwd_yn" value="Y" @if ($passwd_yn == 'Y') checked @endif/> 발송함</label>
                                                                     <label><input type="radio" name="passwd_yn" value="N" @if ($passwd_yn == 'N') checked @endif/> 발송안함</label>
@@ -850,7 +850,7 @@
                                                             </tr>
 
                                                             <tr>
-                                                                <td rowspan="2" style="text-align: left;"><label>주문 완료 시 SMS 발송</label></td>
+                                                                <th rowspan="2"> 주문 완료 시 SMS 발송</th>
                                                                 <td rowspan="2" style="text-align:center;">
                                                                     <label><input type="radio" name="order_yn" value="Y" @if ($order_yn == 'Y') checked @endif/> 발송함</label>
                                                                     <label><input type="radio" name="order_yn" value="N" @if ($order_yn == 'N') checked @endif/> 발송안함</label>
@@ -869,7 +869,7 @@
                                                                 </td>
                                                             </tr>
                                                             <tr>
-                                                                <td style="text-align: left;"><label>결제 완료 시 SMS 발송</label></td>
+                                                                <th>결제 완료 시 SMS 발송</th>
                                                                 <td style="text-align:center;">
                                                                     <label><input type="radio" name="payment_yn" value="Y" @if ($payment_yn == 'Y') checked @endif /> 발송함</label>
                                                                     <label><input type="radio" name="payment_yn" value="N"  @if ($payment_yn == 'N') checked @endif /> 발송안함</label>
@@ -881,7 +881,7 @@
                                                                 </td>
                                                             </tr>
                                                             <tr>
-                                                                <td width="15%" style="text-align: left;"><label>출고 완료 시 SMS 발송</label></td>
+                                                                <th>출고 완료 시 SMS 발송</th>
                                                                 <td style="text-align:center;">
                                                                     <label><input type="radio" name="delivery_yn" value="Y" @if ($delivery_yn == 'Y') checked @endif /> 발송함</label>
                                                                     <label><input type="radio" name="delivery_yn" value="N" @if ($delivery_yn == 'N') checked @endif /> 발송안함</label>
@@ -893,7 +893,7 @@
                                                                 </td>
                                                             </tr>
                                                             <tr>
-                                                                <td width="15%" rowspan="2" style="text-align: left;"><label>환불 완료 시 SMS 발송</label></td>
+                                                                <th rowspan="2">환불 완료 시 SMS 발송</th>
                                                                 <td rowspan="2" style="text-align:center;">
                                                                     <label><input type="radio" name="refund_yn" value="Y" @if ($refund_yn == 'Y') checked @endif /> 발송함</label>
                                                                     <label><input type="radio" name="refund_yn" value="N" @if ($refund_yn == 'N') checked @endif /> 발송안함</label>
@@ -912,7 +912,7 @@
                                                                 </td>
                                                             </tr>
                                                             <tr>
-                                                                <td width="15%" rowspan="3" style="text-align: left;"><label>주문 취소 시 SMS 발송</label></td>
+                                                                <th rowspan="3" >주문 취소 시 SMS 발송</th>
                                                                 <td rowspan="3" style="text-align:center;">
                                                                     <label><input type="radio" name="cancel_yn" value="Y"  /> 발송함</label>
                                                                     <label><input type="radio" name="cancel_yn" value="N" /> 발송안함</label>
@@ -939,7 +939,7 @@
                                                             </tr>
 
                                                             <tr>
-                                                                <td width="15%" style="text-align: left;"><label>품절 시 SMS 발송</label></td>
+                                                                <th>품절 시 SMS 발송</th>
                                                                 <td style="text-align:center;">
                                                                     <label><input type="radio" name="out_of_stock_yn" value="Y" @if ($out_of_stock_yn == 'Y') checked @endif /> 발송함</label>
                                                                     <label><input type="radio" name="out_of_stock_yn" value="N" @if ($out_of_stock_yn == 'N') checked @endif /> 발송안함</label>
@@ -950,7 +950,7 @@
                                                                 </td>
                                                             </tr>
                                                             <tr>
-                                                                <td width="15%" style="text-align: left;"><label>생일쿠폰 SMS 발송</label></td>
+                                                                <th>생일쿠폰 SMS 발송</th>
                                                                 <td style="text-align:center;">
                                                                     <label><input type="radio" name="birth_yn" value="Y" /> 발송함</label>
                                                                     <label><input type="radio" name="birth_yn" value="N" /> 발송안함</label>
@@ -961,7 +961,7 @@
                                                                 </td>
                                                             </tr>
                                                             <tr>
-                                                                <td width="15%" style="text-align: left;"><label>웰컴백쿠폰 SMS 발송</label></td>
+                                                                <th>웰컴백 쿠폰 SMS 발송</th>
                                                                 <td style="text-align:center;">
                                                                     <label><input type="radio" name="welcome_yn" value="Y"  /> 발송함</label>
                                                                     <label><input type="radio" name="welcome_yn" value="N"  /> 발송안함</label>
@@ -1138,51 +1138,51 @@
                                                     </colgroup>
                                                     <tbody>
                                                         <tr>
-                                                            <td width="15%" style="text-align: left;"><label>신상품 기간</label></td>
+                                                            <th>신상품 기간</th>
                                                             <td width="35%">
                                                                 <input type="text" class="form-control form-control-sm" name="new_good_day" value="{{@$new_good_day}}" maxlength="3" style="width: 100px; text-align: right;display:inline">일
                                                             </td>
-                                                            <td width="15%" style="text-align: left;"><label>새글 기간</label></td>
+                                                            <th>새글 기간</th>
                                                             <td width="35%">
                                                                 <input type="text" class="form-control form-control-sm" name="new_data_day" value="{{@$new_data_day}}" maxlength="3" style="width: 100px; text-align: right;display:inline" />일
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td width="15%" style="text-align: left;"><label>카테고리 상품 출력 갯수</label></td>
+                                                            <th>카테고리 상품 출력 갯수</th>
                                                             <td>
                                                                 <input type="text" class="form-control form-control-sm" name="category_goods_cnt" value="{{@$category_goods_cnt}}" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
                                                             </td>
-                                                            <td width="15%" style="text-align: left;"><label>신상품 출력 갯수</label></td>
+                                                            <th>신상품 출력 갯수</th>
                                                             <td>
                                                                 <input type="text" class="form-control form-control-sm" name="newarrival_goods_cnt" value="{{@$newarrival_goods_cnt}}" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td width="15%" style="text-align: left;"><label>세일 상품 출력 갯수</label></td>
+                                                            <th>세일 상품 출력 갯수</th>
                                                             <td>
                                                                 <input type="text" class="form-control form-control-sm" name="onsale_goods_cnt" value="{{@$onsale_goods_cnt}}" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
                                                             </td>
-                                                            <td width="15%" style="text-align: left;"><label>브랜드샵 상품 출력 갯수</label></td>
+                                                            <th>브랜드샵 상품 출력 갯수</th>
                                                             <td>
                                                                 <input type="text" class="form-control form-control-sm" name="brandshop_goods_cnt" value="{{@$brandshop_goods_cnt}}" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td width="15%" style="text-align: left;"><label>베스트랭킹 상품 출력 갯수</label></td>
+                                                            <th>베스트랭킹 상품 출력 갯수</th>
                                                             <td>
                                                                 <input type="text" class="form-control form-control-sm" name="best_rank_goods_cnt" value="{{@$best_rank_goods_cnt}}" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
                                                             </td>
-                                                            <td width="15%" style="text-align: left;"><label>관련 상품 출력 갯수</label></td>
+                                                            <th>관련 상품 출력 갯수</th>
                                                             <td>
                                                                 <input type="text" class="form-control form-control-sm" name="relative_goods_cnt" value="{{@$relative_goods_cnt}}" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td width="15%" style="text-align: left;"><label>검색 상품 출력 갯수</label></td>
+                                                            <th>검색 상품 출력 갯수</th>
                                                             <td>
                                                                 <input type="text" class="form-control form-control-sm" name="search_goods_cnt" value="{{@$search_goods_cnt}}" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
                                                             </td>
-                                                            <td width="15%" style="text-align: left;"><label>검색 상품 정렬</label></td>
+                                                            <th>검색 상품 정렬</th>
                                                             <td>
                                                                 <select name="search_goods_sort" class="form-control form-control-sm"style="width:100px;">
                                                                     <option value="pop">판매량순</option>
@@ -1218,7 +1218,7 @@
                                                             <td style="text-align:center;font-weight: bold;">메일 HTML</td>
                                                         </tr>
                                                         <tr>
-                                                            <td width="15%" style="text-align: left;"><label>1:1문의 답변 시 메일 발송</label></td>
+                                                            <th>1:1문의 답변 시 메일 발송</th>
                                                             <td width="15%">
                                                                 <div class="flax_box">
                                                                     <div class="custom-control custom-radio">
@@ -1236,7 +1236,7 @@
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td width="15%" style="text-align: left;"><label>상품 문의 답변시 메일 발송</label></td>
+                                                            <th>상품 문의 답변시 메일 발송</th>
                                                             <td width="15%">
                                                                 <div class="flax_box">
                                                                     <div class="custom-control custom-radio">
@@ -1272,7 +1272,7 @@
                                                     </colgroup>
                                                     <tbody>
                                                         <tr>
-                                                            <td width="15%" style="text-align: left;"><label>휴면회원 설정 여부</label></td>
+                                                            <th>휴면회원 설정 여부</th>
                                                             <td width="15%">
                                                                 <div class="flax_box">
                                                                     <div class="custom-control custom-radio">
@@ -1322,9 +1322,9 @@
                                                     </colgroup>
                                                     <tbody>
                                                         <tr>
-                                                            <td width="15%" style="text-align: left;"><label>쇼핑몰 메인 공지사항</label></td>
+                                                            <th >쇼핑몰 메인 공지사항</td>
                                                             <td>
-                                                                <input type="text" class="input" name="main_notice" value="{{@$main_notice}}" maxlength="2" style="width: 100px;text-align:right" />개
+                                                                <input type="text" class="form-control form-control-sm" name="main_notice" value="{{@$main_notice}}" maxlength="2" style="width: 100px;text-align:right;display:inline" />개
                                                             </td>
                                                             <td width="15%" style="text-align: left;"><label>&nbsp;</label></td>
                                                             <td width="35%">
@@ -1351,19 +1351,19 @@
                                                     </colgroup>
                                                     <tbody>
                                                         <tr>
-                                                            <td width="15%" style="text-align: left;"><label>커뮤니티 메인 공지사항</label></td>
+                                                            <th>커뮤니티 메인 공지사항</th>
                                                             <td>
-                                                                <input type="text" class="input" name="community_main_notice" value="{{@$community_main_notice}}" maxlength="2" style="width: 100px;text-align:right" />개
+                                                                <input type="text"class="form-control form-control-sm" name="community_main_notice" value="{{@$community_main_notice}}" maxlength="2" style="width: 100px;text-align:right;display:inline" />개
                                                             </td>
-                                                            <td width="15%" style="text-align: left;"><label>커뮤니티 메인 상품문의</label></td>
+                                                            <th>커뮤니티 메인 상품문의</th>
                                                             <td>
-                                                                <input type="text" class="input" name="community_main_qa" value="{{@$community_main_qa}}" maxlength="2" style="width: 100px;text-align:right" />개
+                                                                <input type="text" class="form-control form-control-sm" name="community_main_qa" value="{{@$community_main_qa}}" maxlength="2" style="width: 100px;text-align:right;display:inline" />개
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td width="15%" style="text-align: left;"><label>커뮤니티 메인 상품평</label></td>
+                                                            <th>커뮤니티 메인 상품평</th>
                                                             <td>
-                                                                <input type="text" class="input" name="community_main_review" value="{{@$community_main_review}}" maxlength="2" style="width: 100px;text-align:right" />개
+                                                                <input type="text" class="form-control form-control-sm" name="community_main_review" value="{{@$community_main_review}}" maxlength="2" style="width: 100px;text-align:right;display:inline" />개
                                                             </td>
                                                             <td width="15%" style="text-align: left;"><label>&nbsp;</label></td>
                                                             <td>
@@ -1371,13 +1371,13 @@
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td width="15%" style="text-align: left;"><label>커뮤니티 상품문의 출력개수</label></td>
+                                                            <th>커뮤니티 상품문의 출력개수</th>
                                                             <td width="35%">
-                                                                <input type="text" class="input" name="community_goods_qa" value="{{@$community_goods_qa}}" maxlength="2" style="width: 100px; text-align: right;" />개
+                                                                <input type="text" class="form-control form-control-sm" name="community_goods_qa" value="{{@$community_goods_qa}}" maxlength="2" style="width: 100px; text-align: right;display:inline" />개
                                                             </td>
                                                             <td width="15%" style="text-align: left;"><label>커뮤니티 상품평 출력개수</label></td>
                                                             <td width="35%">
-                                                                <input type="text" class="input" name="community_goods_review" value="{{@$community_goods_review}}" maxlength="2" style="width: 100px; text-align: right;" />개
+                                                                <input type="text" class="form-control form-control-sm" name="community_goods_review" value="{{@$community_goods_review}}" maxlength="2" style="width: 100px; text-align: right;display:inline" />개
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -1400,9 +1400,9 @@
                                                     </colgroup>
                                                     <tbody>
                                                         <tr>
-                                                            <td width="15%" style="text-align: left;"><label>공지사항 리스트</label></td>
+                                                            <th>공지사항 리스트</th>
                                                             <td>
-                                                                <input type="text" class="input" name="notice" value="{{@$notice}}" maxlength="2" style="width: 100px;text-align:right" />개
+                                                                <input type="text" class="form-control form-control-sm" name="notice" value="{{@$notice}}" maxlength="2" style="width: 100px;text-align:right;display:inline" />개
                                                             </td>
                                                             <td width="15%" style="text-align: left;"><label>&nbsp;</label></td>
                                                             <td width="35%">
@@ -1424,9 +1424,374 @@
                 </form>
 
             </div>
-            <div class="tab-pane fade" id="admin" role="tabpanel" aria-labelledby="admin-tab">.ㅇㅇ</div>
-            <div class="tab-pane fade" id="mobile" role="tabpanel" aria-labelledby="mobile-tab">.ㅇㅇ</div>
-            <div class="tab-pane fade" id="image" role="tabpanel" aria-labelledby="image-tab">.ㅇㅇ</div>
+            <div class="tab-pane fade" id="admin" role="tabpanel" aria-labelledby="admin-tab">
+                <form name="admin" method="post">
+                    <div class="card_wrap aco_card_wrap">
+                        <div class="card shadow">
+                            <div class="card-body mt-1">
+                                <div class="card-header mb-0">
+                                    <h5 class="m-0 font-weight-bold">샵링커</h5>
+                                </div>
+                                <div class="row_wrap">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="table-box-ty2 mobile">
+                                                <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                                    <colgroup>
+                                                        <col width="150px">
+                                                    </colgroup>
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>로그인 아이디</th>
+                                                            <td>
+                                                                <div class="flax_box">
+                                                                    <input type='text' class="form-control form-control-sm w-100" name='shoplinker_id' value="{{@$shoplinker_id}}">
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>고객사 코드</th>
+                                                            <td>
+                                                                <div class="flax_box">
+                                                                    <input type='text' class="form-control form-control-sm w-100" name='shoplinker_user_id' value='{{@$shoplinker_user_id}}'>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><br><br>
+                                <div class="card-header mb-0">
+                                    <h5 class="m-0 font-weight-bold">사방넷</h5>
+                                </div>
+                                <div class="row_wrap">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="table-box-ty2 mobile">
+                                                <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                                    <colgroup>
+                                                        <col width="150px">
+                                                    </colgroup>
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>아이디</th>
+                                                            <td>
+                                                                <div class="flax_box">
+                                                                    <input type='text' class="form-control form-control-sm w-100" name='sabangnet_id' value="{{@$sabangnet_id}}">
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>인증키</th>
+                                                            <td>
+                                                                <div class="flax_box">
+                                                                    <input type='text' class="form-control form-control-sm w-100" name='sabangnet_key' value='{{@$sabangnet_key}}'>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><br><br>
+                                <div class="card-header mb-0">
+                                    <h5 class="m-0 font-weight-bold">I_PIN</h5>
+                                </div>
+                                <div class="row_wrap">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="table-box-ty2 mobile">
+                                                <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                                    <colgroup>
+                                                        <col width="150px">
+                                                    </colgroup>
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>아이핀 아이디</th>
+                                                            <td>
+                                                                <div class="flax_box">
+                                                                    <input type='text' class="form-control form-control-sm w-100" name='ipin_site_cd' value="{{@$ipin_site_cd}}">
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>아이핀 비밀번호</th>
+                                                            <td>
+                                                                <div class="flax_box">
+                                                                    <input type='text' class="form-control form-control-sm w-100" name='ipin_site_pw' value='{{@$ipin_site_pw}}'>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>아이핀 위변조 방지값</th>
+                                                            <td>
+                                                                <div class="flax_box">
+                                                                    <input type='text' class="form-control form-control-sm w-100" name='ipin_site_req' value='{{@$ipin_site_req}}'>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="text-align:center;">
+                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData_admin();" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="tab-pane fade" id="mobile" role="tabpanel" aria-labelledby="mobile-tab">
+                <form name="mobile" method="post">
+                    <div class="card_wrap aco_card_wrap">
+                        <div class="card shadow">
+                            <div class="card-body mt-1">
+                            <div class="card-header mb-0">
+                                    <h5 class="m-0 font-weight-bold">모바일</h5>
+                                </div>
+                                <div class="row_wrap">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="table-box-ty2 mobile">
+                                                <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                                    <colgroup>
+                                                        <col width="150px">
+                                                    </colgroup>
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>도메인</th>
+                                                            <td>
+                                                                <div class="flax_box">
+                                                                    <input type='text' class="form-control form-control-sm w-100" name='m_domain' value="">
+                                                                    <div class="gray">* 모바일 상점 도메인을 입력해 주십시오. "http://"는 생략합니다.  EX)m.domain.co.kr</div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><br><br>
+                                <div class="card-header mb-0">
+                                    <h5 class="m-0 font-weight-bold">출력 설정</h5>
+                                </div>
+                                <div class="row_wrap">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="table-box-ty2 mobile">
+                                                <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                                    <colgroup>
+                                                        <col width="150px">
+                                                    </colgroup>
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>카테고리 상품 출력 갯수</th>
+                                                            <td>
+                                                                <input type="text"  class="form-control form-control-sm" name="m_category_goods_cnt" value="" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
+                                                            </td>
+                                                            <th>신상품 출력 갯수</th>
+                                                            <td>
+                                                                <input type="text"  class="form-control form-control-sm" name="m_newarrival_goods_cnt" value="" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>세일 상품 출력 갯수</th>
+                                                            <td>
+                                                                <input type="text"  class="form-control form-control-sm" name="m_onsale_goods_cnt" value="" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
+                                                            </td>
+                                                            <th>브랜드샵 상품 출력 갯수</th>
+                                                            <td>
+                                                                <input type="text"  class="form-control form-control-sm" name="m_brandshop_goods_cnt" value="" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
+                                                            </td>
+                                                        </tr>
+
+
+                                                        <tr>
+                                                            <th>베스트랭킹 상품 출력 갯수</th>
+                                                            <td>
+                                                                <input type="text"  class="form-control form-control-sm" name="m_best_rank_goods_cnt" value="" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
+                                                            </td>
+                                                            <th>검색 상품 출력 갯수</th>
+                                                            <td>
+                                                                <input type="text"  class="form-control form-control-sm" name="m_search_goods_cnt" value="" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <th>앱 메인 롤링 배너</th>
+                                                            <td>
+                                                                <input type="text"  class="form-control form-control-sm" style="width:100%" name='app_main_banner_1' value=""/>
+                                                            </td>
+                                                            <th>앱 메인 기획전 배너</th>
+                                                            <td>
+                                                                <input type="text"  class="form-control form-control-sm" style="width:100%" name='app_main_banner_2' value=""/>
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <th>앱 메인 HOT PRODUCT</th>
+                                                            <td>
+                                                                <input type="text"  class="form-control form-control-sm" name='app_main_section_1' value=""/>
+                                                            </td>
+                                                            <th>앱 메인 MD PICK</th>
+                                                            <td>
+                                                                <input type="text"  class="form-control form-control-sm" name='app_main_section_2' value=""/>
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            
+                                                            <th>앱 메인 STEDY ITEM</th>
+                                                            <td>
+                                                                <input type="text"  class="form-control form-control-sm" name='app_main_section_3' value=""/>
+                                                            </td>
+                                                            <td width="15%" style="text-align: left;"><label>&nbsp;</label></td>
+                                                            <td>&nbsp;</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><br><br>
+                                
+                                <div style="text-align:center;">
+                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData_admin();" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="tab-pane fade" id="image" role="tabpanel" aria-labelledby="image-tab">
+                <form name="image" method="post">
+                    <div class="card_wrap aco_card_wrap">
+                        <div class="card shadow">
+                            <div class="card-body mt-1">
+                            <div class="card-header mb-0">
+                                    <h5 class="m-0 font-weight-bold">이미지 서버</h5>
+                                </div>
+                                <div class="row_wrap">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="table-box-ty2 mobile">
+                                                <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                                    <colgroup>
+                                                        <col width="150px">
+                                                    </colgroup>
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>이미지서버 사용 여부</th>
+                                                            <td>
+                                                                <div class="flax_box">
+                                                                    <div class="custom-control custom-radio">
+                                                                        <input type="radio" name="image_yn" id="image_y" class="custom-control-input" value="Y"/>
+                                                                        <label class="custom-control-label" for="image_y">사용함</label>
+                                                                    </div>&nbsp;&nbsp;&nbsp;
+                                                                    <div class="custom-control custom-radio">
+                                                                        <input type="radio" name="image_yn" id="image_n" class="custom-control-input" value="N" />
+                                                                        <label class="custom-control-label" for="image_n">사용안함</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="gray">* 별도의 이미지서버를 사용하는 경우에 "사용함"으로 설정하시기 바랍니다.</div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>이미지 도메인</th>
+                                                            <td>
+                                                                <div class="flax_box">
+                                                                    <input type='text' class="form-control form-control-sm w-100" name='domain' value="">
+                                                                    <div class="gray">* 별도의 이미지서버를 사용하는 경우, "http://"를 제외한 이미지 도메인을 입력해주십시오.  EX)image.domain.co.kr</div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><br><br>
+                                <div class="card-header mb-0">
+                                    <h5 class="m-0 font-weight-bold">이미지 자동 전송(FTP)</h5>
+                                </div>
+                                <div class="row_wrap">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="table-box-ty2 mobile">
+                                                <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                                    <colgroup>
+                                                        <col width="150px">
+                                                    </colgroup>
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>자동 전송 사용여부</th>
+                                                            <td>
+                                                                <div class="flax_box">
+                                                                    <div class="custom-control custom-radio">
+                                                                        <input type="radio" name="ftp_yn" id="ftp_y" class="custom-control-input" value="Y"/>
+                                                                        <label class="custom-control-label" for="ftp_y">사용함</label>
+                                                                    </div>&nbsp;&nbsp;&nbsp;
+                                                                    <div class="custom-control custom-radio">
+                                                                        <input type="radio" name="ftp_yn" id="ftp_n" class="custom-control-input" value="N"/>
+                                                                        <label class="custom-control-label" for="ftp_n">사용안함</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="gray">* 이미지 파일이 업로드 될 때 별도의 이미지 서버에 FTP 전송을 자동으로 수행합니다.</div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>FTP 주소</th>
+                                                            <td>
+                                                                <input type="text"  class="form-control form-control-sm" name="hostname" value=""/>
+                                                                <div class="gray">* 이미지(FTP) 서버의 도메인 또는 IP를 입력하십시오.</div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>사용자 ID</th>
+                                                            <td>
+                                                                <input type="text"  class="form-control form-control-sm" name="username" value=""/>
+                                                                <div class="gray">* 이미지(FTP) 서버에 접속할 수 있는 아이디를 입력하십시오.</div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>비밀번호</th>
+                                                            <td>
+                                                                <input type="text"  class="form-control form-control-sm" style="width:100%" name='password' value=""/>
+                                                                <div class="gray">* 이미지(FTP) 서버에 접속할 수 있는 비밀번호를 입력하십시오.</div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>디렉토리</th>
+                                                            <td>
+                                                                <input type="text"  class="form-control form-control-sm" name='aphome_dir' value=""/>
+                                                                <div class="gray">* 이미지(FTP) 서버의 초기 디렉토리를 입력하십시오.</div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><br><br>
+                                
+                                <div style="text-align:center;">
+                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData_admin();" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+
+
+            </div>
             <!-- <div class="tab-pane fade" id="naver_checkout" role="tabpanel" aria-labelledby="naver_checkout-tab">.ㅇㅇ</div> -->
             <!-- <div class="tab-pane fade" id="email" role="tabpanel" aria-labelledby="email-tab">.ㅇㅇ</div> -->
             <!-- <div class="tab-pane fade" id="api" role="tabpanel" aria-labelledby="api-tab">.ㅇㅇ</div> -->
@@ -1687,6 +2052,56 @@
                 success: function(data) {
                     if (data.code == '200') {
                         alert('게시물 정보가 수정되었습니다.');
+                        location.reload();
+                    } else {
+                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                        console.log(data);
+                    }
+                },
+                error: function(e) {
+                        console.log(e.responseText)
+                }
+            });
+
+    }
+
+    function updateData_admin() {
+    
+        let frm = $('form[name=admin]').serialize();
+        frm += "&type=admin";
+            $.ajax({
+                method: 'post',
+                url: '/head/system/sys05/update',
+                data: frm,
+                dataType: 'json',
+                success: function(data) {
+                    if (data.code == '200') {
+                        alert('서비스 정보가 수정되었습니다.');
+                        location.reload();
+                    } else {
+                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                        console.log(data);
+                    }
+                },
+                error: function(e) {
+                        console.log(e.responseText)
+                }
+            });
+
+    }
+
+    function updateData_image() {
+        
+        let frm = $('form[name=image]').serialize();
+        frm += "&type=image";
+            $.ajax({
+                method: 'post',
+                url: '/head/system/sys05/update',
+                data: frm,
+                dataType: 'json',
+                success: function(data) {
+                    if (data.code == '200') {
+                        alert('서비스 정보가 수정되었습니다.');
                         location.reload();
                     } else {
                         alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');

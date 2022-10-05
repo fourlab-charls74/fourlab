@@ -218,6 +218,23 @@ class sys05Controller extends Controller
         $sql_notice = "select * from conf where type = 'list_count' and name = 'notice'";
         $notice = DB::selectOne($sql_notice);
 
+        //서비스 탭
+
+        $sql_shoplinker_id = "select * from conf where type = 'api' and name = 'shoplinker_id'";
+        $shoplinker_id = DB::selectOne($sql_shoplinker_id);
+       
+        $sql_shoplinker_user_id = "select * from conf where type = 'api' and name = 'shoplinker_user_id'";
+        $shoplinker_user_id = DB::selectOne($sql_shoplinker_user_id);
+
+        $sql_sabangnet_id = "select * from conf where type = 'api' and name = 'sabangnet_id'";
+        $sabangnet_id = DB::selectOne($sql_sabangnet_id);
+
+        $sql_sabangnet_key = "select * from conf where type = 'api' and name = 'sabangnet_key'";
+        $sabangnet_key = DB::selectOne($sql_sabangnet_key);
+
+
+
+
 
     
 
@@ -294,6 +311,11 @@ class sys05Controller extends Controller
             'main_notice' => $main_notice->value,
             'notice' => $notice->value,
 
+            //서비스 탭
+            'sabangnet_id' => $sabangnet_id->value,
+            'sabangnet_key' => $sabangnet_key->value,
+            'shoplinker_id' => $shoplinker_id->value,
+            'shoplinker_user_id' => $shoplinker_user_id->value,
         ];
 
 
@@ -374,7 +396,20 @@ class sys05Controller extends Controller
         $counsel_yn = $request->input('counsel_yn');
         $goods_qa_yn = $request->input('goods_qa_yn');
 
-        
+        //게시물 탭
+        $community_goods_qa = $request->input('community_goods_qa');
+        $community_goods_review = $request->input('community_goods_review');
+        $community_main_notice = $request->input('community_main_notice');
+        $community_main_qa = $request->input('community_main_qa');
+        $community_main_review = $request->input('community_main_review');
+        $main_notice = $request->input('main_notice');
+        $notice = $request->input('notice');
+
+        $sabangnet_id = $request->input('sabangnet_id');
+        $sabangnet_key = $request->input('sabangnet_key');
+        $shoplinker_id = $request->input('shoplinker_id');
+        $shoplinker_user_id = $request->input('shoplinker_user_id');
+
         try {
             if ($type == 'shop') {
                 // 상점 탭
@@ -495,6 +530,7 @@ class sys05Controller extends Controller
                 DB::update($sql_refund_msg_cancel);
 
             } else if ($type == 'stock_reduction') {
+                //부가 기능 탭
                 $sql_ssl_yn = "update conf set value='$ssl_yn', ut = '$ut' where type='shop' and name='ssl_yn'";
                 DB::update($sql_ssl_yn);
 
@@ -541,9 +577,40 @@ class sys05Controller extends Controller
                 DB::update($sql_goods_qa_yn);
 
             } else if ($type == 'list_count') {
+                //게시물 탭
+                $sql_community_goods_qa = "update conf set value='$community_goods_qa', ut = '$ut' where type='list_count' and name='community_goods_qa'";
+                DB::update($sql_community_goods_qa);
 
+                $sql_community_goods_review = "update conf set value='$community_goods_review', ut = '$ut' where type='list_count' and name='community_goods_review'";
+                DB::update($sql_community_goods_review);
 
+                $sql_community_main_notice = "update conf set value='$community_main_notice', ut = '$ut' where type='list_count' and name='community_main_notice'";
+                DB::update($sql_community_main_notice);
 
+                $sql_community_main_qa = "update conf set value='$community_main_qa', ut = '$ut' where type='list_count' and name='community_main_qa'";
+                DB::update($sql_community_main_qa);
+
+                $sql_community_main_review = "update conf set value='$community_main_review', ut = '$ut' where type='list_count' and name='community_main_review'";
+                DB::update($sql_community_main_review);
+
+                $sql_main_notice = "update conf set value='$main_notice', ut = '$ut' where type='list_count' and name='main_notice'";
+                DB::update($sql_main_notice);
+
+                $sql_notice = "update conf set value='$notice', ut = '$ut' where type='list_count' and name='notice'";
+                DB::update($sql_notice);
+
+            } else if ($type == 'admin') {
+                $sql_sabangnet_id = "update conf set value='$sabangnet_id', ut = '$ut' where type='api' and name='sabangnet_id'";
+                DB::update($sql_sabangnet_id);
+
+                $sql_sabangnet_key = "update conf set value='$sabangnet_key', ut = '$ut' where type='api' and name='sabangnet_key'";
+                DB::update($sql_sabangnet_key);
+
+                $sql_shoplinker_id = "update conf set value='$shoplinker_id', ut = '$ut' where type='api' and name='shoplinker_id'";
+                DB::update($sql_shoplinker_id);
+               
+                $sql_shoplinker_user_id = "update conf set value='$shoplinker_user_id', ut = '$ut' where type='api' and name='shoplinker_user_id'";
+                DB::update($sql_shoplinker_user_id);
             }
 
 
