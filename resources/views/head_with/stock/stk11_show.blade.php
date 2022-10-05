@@ -243,6 +243,7 @@
 <script type="text/javascript" charset="utf-8">
 
     const STATE = "{{$state}}";
+    
 
     /**
      * ag-grid set field
@@ -265,6 +266,7 @@
     const currencyFormatter = (params) => { 
         const value = Math.round(params.value).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
         return isNaN(value) ? 0 : value;
+        
     };
 
     var columns= [
@@ -285,11 +287,11 @@
             checkboxSelection: params => checkIsEditable(params),
             cellStyle: params => checkIsEditable(params) ? null : { display: 'none'},
             width: 40, pinned:'left',
-            hide: params => {
-                const state = STATE; // 입고취소: -10, 입고대기: 10, 입고처리중: 20, 입고완료: 30
-                // 입고 대기이거나 입고 처리중인 경우에만 체크박스 표시 -> 삭제 가능하게함
-                return state == -10 || state == 30 ? false : true;
-            }
+            // hide: params => {
+            //     const state = STATE; // 입고취소: -10, 입고대기: 10, 입고처리중: 20, 입고완료: 30
+            //     // 입고 대기이거나 입고 처리중인 경우에만 체크박스 표시 -> 삭제 가능하게함
+            //     return state == -10 || state == 30 ? false : true;
+            // }
         },
         {field:"item" ,headerName:"품목",pinned:'left',width:96},
 
@@ -844,6 +846,7 @@
                 }).then((response) => {
                     if (response.data.code == 1) {
                         window.opener.Search();
+                        alert("입고취소 하였습니다.");
                         window.close();
                     } else {
                         alert("입고취소를 실패하였습니다. 다시 한번 시도하여 주십시오.");

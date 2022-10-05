@@ -151,7 +151,8 @@ class std02Controller extends Controller
 			";
 
 			$map_key = DB::selectOne($map_key_sql);
-		
+
+			
 		$values = [
 			"cmd"	=> $store_cd == '' ? "" : "update",
 			"store"	=> $store,
@@ -198,6 +199,7 @@ class std02Controller extends Controller
 		$y 			= $request->input('y');
 		$x 			= $request->input('x');
 		$map_code 	= $y.', '.$x;
+		$open_month_stock_yn = $request->input('open_month_stock_yn');
 
 
 		try {
@@ -258,7 +260,8 @@ class std02Controller extends Controller
 				'reg_date'		=> now(),
 				'mod_date'		=> now(),
 				'admin_id'		=> $id,
-				'map_code'		=> $map_code
+				'map_code'		=> $map_code,
+				'open_month_stock_yn' => $open_month_stock_yn
 				
 			];
 			

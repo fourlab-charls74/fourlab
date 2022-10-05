@@ -672,6 +672,9 @@ class stk10Controller extends Controller
 		$products = explode("\n", $data);
 		$buy_ord_date = date("Ymd");
 		$state = 10;
+		$buy_ord_date = explode(" ", now());
+		$buy_ord_date = str_replace('-','',$buy_ord_date[0]);
+		$user_id = Auth('head')->user()->id;
 		if(count($products) > 0){
 			try {
 				DB::beginTransaction();
@@ -682,23 +685,38 @@ class stk10Controller extends Controller
 					$goods_opt = $rows[2];
 					$qty = $rows[3];
 					$buy_unit_cost = $rows[4];
+					$opt_kind_nm = $rows[5];
+
 					if($goods_no > 0){
 						$qty = str_replace(",","",str_replace("\\","",trim($qty)));
 						$buy_unit_cost = str_replace(",","",str_replace("\\","",trim($buy_unit_cost)));
 						$buy_cost = $buy_unit_cost * $qty;
+
 						$sql = "
-							select style_no, com_id from goods where goods_no = '$goods_no' and goods_sub = '$goods_sub'
+							select style_no, com_id 
+							from goods 
+							where goods_no = '$goods_no' and goods_sub = '$goods_sub'
 						";
 						$row = DB::selectOne($sql);
+
 						$style_no = $row->style_no;
 						$com_id = $row->com_id;
 						$buy_ord_no = sprintf("%s_%s",$com_id,$buy_ord_date);
 							$sql = "
 							insert into buy_order_product
-							( buy_ord_no,style_no,goods_no,goods_sub,opt,qty,buy_unit_cost,buy_cost,state,buy_ord_date,rt,ut ) values
-							( '$buy_ord_no', '$style_no','$goods_no','$goods_sub','$goods_opt','$qty','$buy_unit_cost','$buy_cost','$state','$buy_ord_date',now(),now())
+							( buy_ord_no, com_id, item, style_no,goods_no,goods_sub,opt,qty,buy_unit_cost,buy_cost,state,buy_ord_date,rt,ut ) values
+							( '$buy_ord_no', '$com_id','$opt_kind_nm', '$style_no','$goods_no','$goods_sub','$goods_opt','$qty','$buy_unit_cost','$buy_cost','$state','$buy_ord_date',now(),now())
 						";
 						DB::insert($sql);
+						
+
+						$buy_ord_no2 = sprintf("%s_%s",$com_id,$buy_ord_date);
+						$sql2 = "
+							insert into buy_order ( buy_ord_no, buy_ord_date, com_id, item, id, rt ) 
+							values('$buy_ord_no2','$buy_ord_date', '$com_id', '$opt_kind_nm','$user_id', now() )
+						";
+						DB::insert($sql2);
+
 					}		
 				}
 				DB::commit();

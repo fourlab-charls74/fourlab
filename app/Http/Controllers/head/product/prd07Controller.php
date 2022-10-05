@@ -115,18 +115,18 @@ class prd07Controller extends Controller
 		$opt2 = preg_replace($patten, "", @$opt2);
 
 		// company, style_no 중복 검사
-		$sql = "
-			select count(*) as cnt from goods where com_id = '$com_id' and style_no = '" . @$style_no . "'
-		";
-		$result = DB::selectOne($sql);
-		$cnt = $result->cnt;
+		// $sql = "
+		// 	select count(*) as cnt from goods where com_id = '$com_id' and style_no = '" . @$style_no . "'
+		// ";
+		// $result = DB::selectOne($sql);
+		// $cnt = $result->cnt;
 
-		if ($cnt > 0) {
-			return response()->json([
-                "result" => 100, // 중복 : style_no, com_id
-				"msg" => "중복스타일넘버"
-            ]);
-		}
+		// if ($cnt > 0) {
+		// 	return response()->json([
+        //         "result" => 100, // 중복 : style_no, com_id
+		// 		"msg" => "중복스타일넘버"
+        //     ]);
+		// }
 
 		// 상품 클래스
 		$user = [

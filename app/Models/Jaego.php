@@ -30,6 +30,8 @@ class Jaego
     public function SetLoc($loc)
     {
         $this->loc = $loc;
+       
+        
     }
 
     public function Minus($stock)
@@ -44,6 +46,7 @@ class Jaego
         $ord_no = $stock->ord_no;                // 주문번호
         $ord_opt_no = $stock->ord_opt_no;    // 주문일련번호
 
+
         // Property Set
         $this->SetGoodsOpt($goods_no, $goods_sub, $goods_opt);
 
@@ -57,8 +60,8 @@ class Jaego
 			select com_id, com_type, goods_type, is_unlimited
 			from goods
 			where goods_no = '$goods_no' and goods_sub = '$goods_sub'
-    ";
-
+        ";
+        
         $row = DB::selectOne($sql);
         $com_id = $row->com_id;
         $com_type = $row->com_type;
@@ -214,7 +217,7 @@ class Jaego
                             and s.goods_opt = '$goods_opt'
                         ";
 
-                        $summary = DB::select($sql);
+                        $summary = DB::selectOne($sql);
                         $loc_qty = $summary->qty;
                         if ($stock_minus_qty > $loc_qty) {
                             return -1;
@@ -310,6 +313,7 @@ class Jaego
                     "ord_no" => $ord_no,
                     "ord_opt_no" => $ord_opt_no
                 );
+                
                 $this->__InsertHistory($history);
 
                 array_push($stocks,

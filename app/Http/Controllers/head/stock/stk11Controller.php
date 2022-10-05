@@ -46,7 +46,7 @@ class stk11Controller extends Controller {
 
 		if ($com_id != "") $where .= " and b.com_id = '" . Lib::quote($com_id) . "'";
 		if ($state != "") $where .= " and b.state = '" . Lib::quote($state) . "'";
-		if ($invoice_no != "") $where .= " and b.invoice_no = '" . Lib::quote($invoice_no) . "'";
+		if ($invoice_no != "") $where .= " and b.invoice_no like '%" . Lib::quote($invoice_no) . "%'";
 		
 		if ($com_nm != "") $where2 .= " and c.com_nm like '%" . Lib::quote($com_nm) . "%' ";
 		if ($user_name != "") $where2 .= " and u.name like '%" . Lib::quote($user_name) . "%' ";
@@ -554,8 +554,9 @@ class stk11Controller extends Controller {
 				$opt = $row->opt;
 				$cost_notax = $row->cost_notax;
 				$qty = $row->qty;
-
-				$stock = array(
+				
+				
+				$stock = (object) array(
 					"type" => 9,
 					"etc" => "입고 취소",
 					"qty" => $qty,
@@ -564,9 +565,12 @@ class stk11Controller extends Controller {
 					"goods_opt" => $opt,
 					"wonga" => $cost_notax,
 					"invoice_no" => $invoice_no,
+					"ord_no" => '',
+					"ord_opt_no" => '',
 				);
 				
 				$jaego->Minus( $stock );
+				
 				$sql = "
 					update stock_product set state = '-10'
 					where stock_no = '$stock_no' and goods_no = '$goods_no' and goods_sub = '$goods_sub'
@@ -578,7 +582,8 @@ class stk11Controller extends Controller {
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollBack();
-			return response()->json(['code' => -1, 'message' => "입고 취소를 실패하였습니다. 다시 한번 시도하여 주십시오."], 200);
+			$msg = $e->getMessage();
+			return response()->json(['code' => -1, 'message' => "입고 취소를 실패하였습니다. 다시 한번 시도하여 주십시오.", 'msg' => $msg], 200);
 		}
 
 		try {

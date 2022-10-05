@@ -550,6 +550,39 @@
 												</div>
 											</td>
 										</tr>
+										<tr>
+											<th>오픈 후 한달 재고보기 제외여부</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													@if ($cmd == "")
+														<div class="custom-control custom-radio">
+															<input type="radio" class="custom-control-input" id="open_month_stock_y" name="open_month_stock_yn" value="Y"/>
+															<label class="custom-control-label" for="open_month_stock_y">Y</label>
+														</div>
+														<div class="custom-control custom-radio">
+															<input type="radio" class="custom-control-input" id="open_month_stock_n" name="open_month_stock_yn" value="N" checked/>
+															<label class="custom-control-label" for="open_month_stock_n">N</label>
+														</div>
+													@else
+														<div class="custom-control custom-radio">
+															<input type="radio" class="custom-control-input" id="open_month_stock_y" name="open_month_stock_yn" value="Y" @if(@$store->open_month_stock_yn == 'Y') checked @endif/>
+															<label class="custom-control-label" for="open_month_stock_y">Y</label>
+														</div>
+														<div class="custom-control custom-radio">
+															<input type="radio" class="custom-control-input" id="open_month_stock_n" name="open_month_stock_yn" value="N" @if(@$store->open_month_stock_yn == 'N') checked @endif/>
+															<label class="custom-control-label" for="open_month_stock_n">N</label>
+														</div>
+
+													@endif
+												</div>
+											</td>
+											<th></th>
+											<td>
+												<div class="form-inline form-radio-box">
+													
+												</div>
+											</td>
+										</tr>
 									</tbody>
 								</table>
 							</div>

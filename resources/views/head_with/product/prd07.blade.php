@@ -443,7 +443,18 @@
                 children: [
                     {field: "option_kind", headerName: "옵션구분", editable: true, width: 200, cellStyle: CELL_STYLE.EDIT},
                     {field: "opt1", headerName: "옵션1", editable: true, width: 200, cellStyle: CELL_STYLE.EDIT},
-                    {field: "opt2", headerName: "옵션2", width: 200},
+                    {field: "opt2", headerName: "옵션2",width:200, 
+                        editable: params => {
+                            if (params.data.is_chk_opt_kind2 == true) {
+                                return true;
+                            }
+                        },
+                        cellStyle: params => {
+                            if (params.data.is_chk_opt_kind2 == true) {
+                                return CELL_STYLE.EDIT;
+                            }
+                        }
+                    },
                     {field: "opt_qty", headerName: "수량", editable: true, cellStyle: CELL_STYLE.EDIT},
                     {field: "opt_price", headerName: "옵션가격", width: 200, editable: true, cellStyle: CELL_STYLE.EDIT},
                 ]
@@ -518,7 +529,10 @@
         };
 
         const updateRow = (row) => {
-            gx.gridOptions.api.applyTransaction({update : [{...row}]});
+            // gx.gridOptions.api.applyTransaction({update : [{...row}]});
+
+            gx.gridOptions.api.applyTransaction({remove : [{...row}]});
+            gx.gridOptions.api.applyTransaction({add : [{...row}]});
         };
 
         const deleteRow = async (row) => { await gx.gridOptions.api.applyTransaction({remove : [{...row}]}); };
@@ -661,6 +675,15 @@
                     _("#option_kind").value = option_kind1 + "^" + option_kind2;
                 }
             }
+
+            $is_chk_opt_kind2 = "";
+            if($("#chk_option_kind2").is(":checked")){
+                $is_chk_opt_kind2 = true;
+            }else{
+                $is_chk_opt_kind2 = false;
+            }
+
+            row.is_chk_opt_kind2 = $is_chk_opt_kind2;
 
             row.option_kind	= _("#option_kind").value;
             row.tax_yn		= _("#tax_yn").value;		// 과세구분

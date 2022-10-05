@@ -342,7 +342,7 @@
             $('[name=search]').val(10);
             let data = $('form[name="search"]').serialize();
             gx.Request('/head/stock/stk10/buy/search', data, 1, (data) => {
-                console.log(data);
+                // console.log(data);
             });
         };
 
@@ -362,12 +362,15 @@
                         const goods_sub = obj.hasOwnProperty('goods_sub') ? obj.goods_sub : "";
                         const goods_opt = obj.hasOwnProperty('goods_opt') ? obj.goods_opt : "";
                         const qty = obj.hasOwnProperty('qty') ? obj.qty : "";
+                        const opt_kind_nm = obj.hasOwnProperty('opt_kind_nm') ? obj.opt_kind_nm : "";
+
+                        console.log(opt_kind_nm);
                         let buy_unit_cost = obj.hasOwnProperty('buy_unit_cost') ? obj.buy_unit_cost : "";
                         obj.hasOwnProperty('avg_wonga') && apply_avg_wonga_checked
                             ? buy_unit_cost = obj.avg_wonga
                             : null;
                         
-                        data_string += goods_no + "\t" + goods_sub + "\t" + goods_opt + "\t" + qty + "\t" + buy_unit_cost + "\n";
+                        data_string += goods_no + "\t" +  goods_sub + "\t" + goods_opt + "\t" + qty + "\t" + buy_unit_cost + "\t" + opt_kind_nm +"\n";
                     });
                     axios({
                         url: '/head/stock/stk10/buy/add',

@@ -267,7 +267,6 @@
                     <li><a href="/head/system/sys02">메뉴관리</a></li>
                     <li><a href="/head/system/sys03">그룹관리</a></li>
                     <li><a href="/head/system/sys04">환경설정</a></li>
-                    <li><a href="/head/system/sys05">환경설정2</a></li>
                 </ul>
             </li>
             @endif

@@ -18,7 +18,7 @@
 
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item">
-                <a class="nav-link" id="store-tab" data-toggle="tab" href="#store" role="tab" aria-controls="store" aria-selected="true">상점</a>
+                <a class="nav-link" id="shop-tab" data-toggle="tab" href="#shop" role="tab" aria-controls="shop" aria-selected="false">상점</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" id="order-tab" data-toggle="tab" href="#order" role="tab" aria-controls="order" aria-selected="false">주문</a>
@@ -47,12 +47,12 @@
             <li class="nav-item">
                 <a class="nav-link" id="sms-tab" data-toggle="tab" href="#sms" role="tab" aria-controls="sms" aria-selected="false">SMS</a>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
                 <a class="nav-link" id="naver_checkout-tab" data-toggle="tab" href="naver_checkout" role="tab" aria-controls="naver_checkout" aria-selected="false">네이버 체크아웃</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" id="email-tab" data-toggle="tab" href="#email" role="tab" aria-controls="email" aria-selected="false">이메일</a>
-            </li>
+            </li> -->
             <li class="nav-item">
                 <a class="nav-link" id="stock_reduction-tab" data-toggle="tab" href="#stock_reduction" role="tab" aria-controls="stock_reduction" aria-selected="false">부가기능</a>
             </li>
@@ -63,14 +63,14 @@
                 <a class="nav-link" id="admin-tab" data-toggle="tab" href="#admin" role="tab" aria-controls="admin" aria-selected="false">서비스</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="image-tab" data-toggle="tab" href="#image" role="tab" aria-controls="image" aria-selected="false">이미지</a>
+                <a class="nav-link" id="mobile-tab" data-toggle="tab" href="#mobile" role="tab" aria-controls="mobile" aria-selected="false">모바일</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="etc-tab" data-toggle="tab" href="#etc" role="tab" aria-controls="etc" aria-selected="false">기타</a>
+                <a class="nav-link" id="image-tab" data-toggle="tab" href="#image" role="tab" aria-controls="image" aria-selected="false">이미지</a>
             </li>
         </ul>
         <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade" id="store" role="tabpanel" aria-labelledby="store-tab">
+            <div class="tab-pane fade" id="shop" role="tabpanel" aria-labelledby="shop-tab">
                 <form name="shop" method="post">
                     <div class="card_wrap aco_card_wrap">
                         <div class="card shadow">
@@ -181,7 +181,7 @@
                                                             <th>판매처</th>
                                                             <td>
                                                                 <div class="flax_box">
-                                                                    <select name="sale_place" class="select" style="width: 200px;">
+                                                                    <select name="sale_place" class="form-control form-control-sm" style="width: 200px;">
                                                                         <option value=''>선택</option>
                                                                         <option value='{{@$sale_place}}' selected>{{@$sale_place}}</option>
                                                                     </select>
@@ -398,7 +398,7 @@
                                                             <th>주거래 택배업체</th>
                                                             <td>
                                                                 <div class="flax_box">
-                                                                    <select name="" class="select" style="width: 200px;">
+                                                                    <select name="" class="form-control form-control-sm" style="width: 200px;">
                                                                         <option value=''>선택</option>
                                                                         <option value='{{@$dlv_cd}}' selected>{{@$dlv_cd}}</option>
                                                                     </select>
@@ -747,7 +747,7 @@
                                     </div>
                                 </div><br><br>
                                 <div style="text-align:center;">
-                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData_delivery();" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
+                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData_kakao();" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
                                 </div>
                             </div>
                         </div>
@@ -776,18 +776,202 @@
                                                             <td>
                                                                 <div class="flax_box">
                                                                     <div class="custom-control custom-radio">
-                                                                        <input type="radio" name="kakao_yn" id="kakao_y" class="custom-control-input" value="Y" @if ($kakao_yn == 'Y') checked @endif/>
-                                                                        <label class="custom-control-label" for="kakao_y">사용함</label>
+                                                                        <input type="radio" name="sms_yn" id="sms_y" class="custom-control-input" value="Y" @if ($sms_yn == 'Y') checked @endif />
+                                                                        <label class="custom-control-label" for="sms_y">사용함</label>
                                                                     </div>&nbsp;&nbsp;&nbsp;
                                                                     <div class="custom-control custom-radio">
-                                                                        <input type="radio" name="kakao_yn" id="kakao_n" class="custom-control-input" value="N" @if ($kakao_yn == 'N') checked @endif/>
-                                                                        <label class="custom-control-label" for="kakao_n">사용안함</label>
+                                                                        <input type="radio" name="sms_yn" id="sms_n" class="custom-control-input" value="N" @if ($sms_yn == 'N') checked @endif/>
+                                                                        <label class="custom-control-label" for="sms_n">사용안함</label>
                                                                     </div>
                                                                 </div>
                                                                 <div class="gray">* SMS 사용 여부를 "사용안함"으로 설정하면 SMS가 발송되지 않으며, 아래의 "SMS 전송 설정" 항목의 설정된 조건들도 모두 무효화됩니다. </div>
                                                             </td>
                                                         </tr>
                                                         
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><br><br>
+                                <div class="card-header mb-0">
+                                    <h5 class="m-0 font-weight-bold">SMS 전송 설정</h5>
+                                </div>
+                                <div class="row_wrap">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="table-box-ty2 mobile">
+                                                <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                                    <colgroup>
+                                                        <col width="150px">
+                                                    </colgroup>
+                                                    <tbody>
+                                                        <div class="flax_box">
+                                                            <tr>
+                                                                <td width="15%" height="30" style="text-align:center;font-weight: bold;">항목</td>
+                                                                <td width="15%" style="text-align:center;font-weight: bold;">설정</td>
+                                                                <td width="10%" style="text-align:center;font-weight: bold;">구분</td>
+                                                                <td style="text-align:center;font-weight: bold;">메시지</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="text-align: left;"><label>회원 가입 인증 SMS 발송</label></td>
+                                                                <td style="text-align:center;">
+                                                                    <label><input type="radio" name="auth_yn" value="Y" /> 발송함</label>
+                                                                    <label><input type="radio" name="auth_yn" value="N" /> 발송안함</label>
+                                                                </td>
+                                                                <td >회원 가입 인증 SMS 발송 메시지 &nbsp;</td>
+                                                                <td>
+                                                                    <input type="text" name="auth_msg" class="form-control form-control-sm" value="" style="width: 100%;" />
+                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('auth_msg','[[SHOP_NAME]]인증번호 [[AUTH_NO]]를 입력해주세요.');">[[SHOP_NAME]]인증번호 [[AUTH_NO]]를 입력해주세요.</div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="text-align: left;"><label>회원 가입 축하 SMS 발송</label></td>
+                                                                <td style="text-align:center;">
+                                                                    <label><input type="radio" name="join_yn" value="Y" @if ($join_yn == 'Y') checked @endif/> 발송함</label>
+                                                                    <label><input type="radio" name="join_yn" value="N" @if ($join_yn == 'N') checked @endif/> 발송안함</label>
+                                                                </td>
+                                                                <td>&nbsp;</td>
+                                                                <td>
+                                                                    <input type="text" name="join_msg" class="form-control form-control-sm" value="{{@$join_msg}}" style="width: 100%;" />
+                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('join_msg','[[SHOP_NAME]][USER_NAME] 회원님의 가입을 진심으로 축하드립니다.');">[[SHOP_NAME]][USER_NAME] 회원님의 가입을 진심으로 축하드립니다.</div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td width="15%" style="text-align: left;"><label>비밀번호 찾기 SMS 발송</label></td>
+                                                                <td style="text-align:center;">
+                                                                    <label><input type="radio" name="passwd_yn" value="Y" @if ($passwd_yn == 'Y') checked @endif/> 발송함</label>
+                                                                    <label><input type="radio" name="passwd_yn" value="N" @if ($passwd_yn == 'N') checked @endif/> 발송안함</label>
+                                                                <td>&nbsp;</td>
+                                                                <td>
+                                                                    <input type="text" name="passwd_msg" class="form-control form-control-sm" value="{{@$passwd_msg}}" style="width: 100%;" />
+                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('passwd_msg','[[SHOP_NAME]][USER_NAME] 회원님의 비밀번호는 [PASSWD] 입니다.');">[[SHOP_NAME]][USER_NAME] 회원님의 비밀번호는 [PASSWD] 입니다.</div>
+                                                                </td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td rowspan="2" style="text-align: left;"><label>주문 완료 시 SMS 발송</label></td>
+                                                                <td rowspan="2" style="text-align:center;">
+                                                                    <label><input type="radio" name="order_yn" value="Y" @if ($order_yn == 'Y') checked @endif/> 발송함</label>
+                                                                    <label><input type="radio" name="order_yn" value="N" @if ($order_yn == 'N') checked @endif/> 발송안함</label>
+                                                                </td>
+                                                                <td>결제완료 상태</td>
+                                                                <td>
+                                                                    <input type="text" name="order_msg_pay" class="form-control form-control-sm" value="" style="width: 100%;"/>
+                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('order_msg_pay','[[SHOP_NAME]][USER_NAME] 고객님의 주문이 접수되었습니다.([ORDER_NO])');">[[SHOP_NAME]][USER_NAME] 고객님의 주문이 접수되었습니다.([ORDER_NO])</div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>미결제 상태</td>
+                                                                <td>
+                                                                    <input type="text" name="order_msg_not_pay" class="form-control form-control-sm" value="" style="width: 100%;"/>
+                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('order_msg_not_pay','[[SHOP_NAME]]입금계좌:[BANK] [ACCOUNT] 예금주:[DEPOSITOR] [ORDER_AMT]원');">[[SHOP_NAME]]입금계좌: [BANK] [ACCOUNT] 예금주:[DEPOSITOR] [ORDER_AMT]원</div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="text-align: left;"><label>결제 완료 시 SMS 발송</label></td>
+                                                                <td style="text-align:center;">
+                                                                    <label><input type="radio" name="payment_yn" value="Y" @if ($payment_yn == 'Y') checked @endif /> 발송함</label>
+                                                                    <label><input type="radio" name="payment_yn" value="N"  @if ($payment_yn == 'N') checked @endif /> 발송안함</label>
+                                                                </td>
+                                                                <td>&nbsp;</td>
+                                                                <td>
+                                                                    <input type="text" name="payment_msg"  class="form-control form-control-sm" value="{{@$payment_msg}}" style="width: 100%;"/>
+                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('payment_msg','[[SHOP_NAME]]입금이 확인되었습니다. 감사합니다.');">[[SHOP_NAME]]입금이 확인되었습니다. 감사합니다.</div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td width="15%" style="text-align: left;"><label>출고 완료 시 SMS 발송</label></td>
+                                                                <td style="text-align:center;">
+                                                                    <label><input type="radio" name="delivery_yn" value="Y" @if ($delivery_yn == 'Y') checked @endif /> 발송함</label>
+                                                                    <label><input type="radio" name="delivery_yn" value="N" @if ($delivery_yn == 'N') checked @endif /> 발송안함</label>
+                                                                </td>
+                                                                <td>&nbsp;</td>
+                                                                <td>
+                                                                    <input type="text" name="delivery_msg" class="form-control form-control-sm" value="{{@$delivery_msg}}" style="width: 100%;" />
+                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('delivery_msg','[[SHOP_NAME]][GOODS_NAME]..발송완료 [DELIVERY_NAME]([DELIVERY_NO])');">[[SHOP_NAME]][GOODS_NAME]..발송완료 [DELIVERY_NAME]([DELIVERY_NO])</div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td width="15%" rowspan="2" style="text-align: left;"><label>환불 완료 시 SMS 발송</label></td>
+                                                                <td rowspan="2" style="text-align:center;">
+                                                                    <label><input type="radio" name="refund_yn" value="Y" @if ($refund_yn == 'Y') checked @endif /> 발송함</label>
+                                                                    <label><input type="radio" name="refund_yn" value="N" @if ($refund_yn == 'N') checked @endif /> 발송안함</label>
+                                                                </td>
+                                                                <td>환불</td>
+                                                                <td>
+                                                                    <input type="text" name="refund_msg_complete" class="form-control form-control-sm" value="{{@$refund_msg_complete}}" style="width: 100%;" />
+                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('refund_msg_complete','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO] 주문건 환불처리되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO] 주문건 환불처리되었습니다.</div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>승인취소</td>
+                                                                <td>
+                                                                    <input type="text" name="refund_msg_cancel" class="form-control form-control-sm" value="{{@$refund_msg_cancel}}" style="width: 100%;"/>
+                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('refund_msg_cancel','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO] 주문건 승인취소되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO] 주문건 승인취소되었습니다.</div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td width="15%" rowspan="3" style="text-align: left;"><label>주문 취소 시 SMS 발송</label></td>
+                                                                <td rowspan="3" style="text-align:center;">
+                                                                    <label><input type="radio" name="cancel_yn" value="Y"  /> 발송함</label>
+                                                                    <label><input type="radio" name="cancel_yn" value="N" /> 발송안함</label>
+                                                                </td>
+                                                                <td>무통장&nbsp;</td>
+                                                                <td>
+                                                                    <input type="text" name="cancel_msg_bank"  class="form-control form-control-sm" value="" style="width: 100%;" />
+                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('cancel_msg_bank','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 취소 처리되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 취소 처리되었습니다.</div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>카드&nbsp;</td>
+                                                                <td>
+                                                                    <input type="text" name="cancel_msg_card" class="form-control form-control-sm" value="" style="width: 100%;" />
+                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('cancel_msg_card','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 승인취소되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 승인취소되었습니다.</div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>계좌이체&nbsp;</td>
+                                                                <td>
+                                                                    <input type="text" name="cancel_msg_transfer" class="form-control form-control-sm" value="" style="width: 100%;" />
+                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('cancel_msg_transfer','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 환불완료 처리되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 환불완료 처리되었습니다.</div>
+                                                                </td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td width="15%" style="text-align: left;"><label>품절 시 SMS 발송</label></td>
+                                                                <td style="text-align:center;">
+                                                                    <label><input type="radio" name="out_of_stock_yn" value="Y" @if ($out_of_stock_yn == 'Y') checked @endif /> 발송함</label>
+                                                                    <label><input type="radio" name="out_of_stock_yn" value="N" @if ($out_of_stock_yn == 'N') checked @endif /> 발송안함</label>
+                                                                <td>&nbsp;</td>
+                                                                <td>
+                                                                    <input type="text" name="out_of_stock_msg" class="form-control form-control-sm" value="{{@$out_of_stock_msg}}" style="width: 100%;" />
+                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('out_of_stock_msg','[[SHOP_NAME]]주문하신상품이 품절되었습니다.고객센터로 문의 바랍니다.');">[[SHOP_NAME]]주문하신상품이 품절되었습니다.고객센터로 문의 바랍니다.</div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td width="15%" style="text-align: left;"><label>생일쿠폰 SMS 발송</label></td>
+                                                                <td style="text-align:center;">
+                                                                    <label><input type="radio" name="birth_yn" value="Y" /> 발송함</label>
+                                                                    <label><input type="radio" name="birth_yn" value="N" /> 발송안함</label>
+                                                                <td>&nbsp;</td>
+                                                                <td>
+                                                                    <input type="text" name="birth_msg" class="form-control form-control-sm" value="" style="width: 100%;" />
+                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('birth_msg','[[SHOP_NAME]][USER_NAME] 고객님의 생일쿠폰이 발급되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님의 생일쿠폰이 발급되었습니다.</div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td width="15%" style="text-align: left;"><label>웰컴백쿠폰 SMS 발송</label></td>
+                                                                <td style="text-align:center;">
+                                                                    <label><input type="radio" name="welcome_yn" value="Y"  /> 발송함</label>
+                                                                    <label><input type="radio" name="welcome_yn" value="N"  /> 발송안함</label>
+                                                                <td>&nbsp;</td>
+                                                                <td>
+                                                                    <input type="text" name="welcome_msg" class="form-control form-control-sm" value="" style="width: 100%;" />
+                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('welcome_msg','[[SHOP_NAME]][USER_NAME] 고객님의 웰컴백쿠폰이 발급되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 웰컴백쿠폰이 발급되었습니다.</div>
+                                                                </td>
+                                                            </tr>
+                                                        </div>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -852,7 +1036,7 @@
                                     </div>
                                 </div>
                                 <div style="text-align:center;">
-                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData_delivery();" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
+                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData_sms();" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
                                 </div>
                             </div>
                         </div>
@@ -860,22 +1044,406 @@
                 </form>
 
             </div>
-            <div class="tab-pane fade" id="naver_checkout" role="tabpanel" aria-labelledby="naver_checkout-tab">.ㅇㅇ</div>
-            <div class="tab-pane fade" id="email" role="tabpanel" aria-labelledby="email-tab">.ㅇㅇ</div>
-            <div class="tab-pane fade" id="stock_reduction" role="tabpanel" aria-labelledby="stock_reduction-tab">.ㅇㅇ</div>
-            <div class="tab-pane fade" id="list_count" role="tabpanel" aria-labelledby="list_count-tab">.ㅇㅇ</div>
+            <div class="tab-pane fade" id="stock_reduction" role="tabpanel" aria-labelledby="stock_reduction-tab">
+                <form name="stock_reduction" method="post">
+                    <div class="card_wrap aco_card_wrap">
+                        <div class="card shadow">
+                            <div class="card-body mt-1">
+                                <div class="card-header mb-0">
+                                    <h5 class="m-0 font-weight-bold">기능 설정</h5>
+                                </div>
+                                <div class="row_wrap">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="table-box-ty2 mobile">
+                                                <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                                    <colgroup>
+                                                        <col width="150px">
+                                                    </colgroup>
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>최초 출력 메뉴</th>
+                                                            <td>
+                                                                <div class="flax_box">
+                                                                    <input type="text" name="init_url" class="form-control form-control-sm" value="" style="width: 100%;" />
+                                                                </div>
+                                                                <div class="gray">* 관리자 로그인 후 최초로 출력할 기본 메뉴를 지정합니다. 최근에 사용한 메뉴 내역이 있는 경우에는 최근 사용 메뉴가 자동으로 출력됩니다. </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>인증서버(HTTPS) 사용 여부</th>
+                                                            <td>
+                                                                <div class="flax_box">
+                                                                    <div class="custom-control custom-radio">
+                                                                        <input type="radio" name="ssl_yn" id="ssl_y" class="custom-control-input" value="Y" @if ($ssl_yn == 'Y') checked @endif />
+                                                                        <label class="custom-control-label" for="ssl_y">사용함</label>
+                                                                    </div>&nbsp;&nbsp;&nbsp;
+                                                                    <div class="custom-control custom-radio">
+                                                                        <input type="radio" name="ssl_yn" id="ssl_n" class="custom-control-input" value="N" @if ($ssl_yn == 'N') checked @endif/>
+                                                                        <label class="custom-control-label" for="ssl_n">사용안함</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="gray">* 보안 인증서를 사용할 수 있는 경우 "사용함"으로 설정하시기 바랍니다. </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>도매기능 사용 여부</th>
+                                                            <td>
+                                                                <div class="flax_box">
+                                                                    <div class="custom-control custom-radio">
+                                                                        <input type="radio" name="wholesale_yn" id="wholesale_y" class="custom-control-input" value="Y" @if ($wholesale_yn == 'Y') checked @endif/>
+                                                                        <label class="custom-control-label" for="wholesale_y">사용함</label>
+                                                                    </div>&nbsp;&nbsp;&nbsp;
+                                                                    <div class="custom-control custom-radio">
+                                                                        <input type="radio" name="wholesale_yn" id="wholesale_n" class="custom-control-input" value="N" @if ($wholesale_yn == 'N') checked @endif/>
+                                                                        <label class="custom-control-label" for="wholesale_n">사용안함</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="gray">* "<a href="#">회원/CRM > 회원그룹관리</a>" 메뉴에서 도매 회원 그룹을 생성할 수 있습니다. </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>상품평 승인 여부</th>
+                                                            <td>
+                                                                <div class="flax_box">
+                                                                    <div class="custom-control custom-radio">
+                                                                        <input type="radio" name="est_confirm_yn" id="est_confirm_y" class="custom-control-input" value="Y" @if ($est_confirm_yn == 'Y') checked @endif/>
+                                                                        <label class="custom-control-label" for="est_confirm_y">사용함</label>
+                                                                    </div>&nbsp;&nbsp;&nbsp;
+                                                                    <div class="custom-control custom-radio">
+                                                                        <input type="radio" name="est_confirm_yn" id="est_confirm_yn" class="custom-control-input" value="N" @if ($est_confirm_yn == 'N') checked @endif/>
+                                                                        <label class="custom-control-label" for="est_confirm_n">사용안함</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="gray">* 고객이 상품평 등록한 경우, 관리자의 승인 후 상품평 리스트에 노출하는 기능을 사용합니다. "사용안함"을 선택한 경우 상품평 등록 시 자동으로 노출됩니다. </div>
+                                                            </td>
+                                                        </tr>
+                                                        
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><br><br>
+                                <div class="card-header mb-0">
+                                    <h5 class="m-0 font-weight-bold">출력 설정</h5>
+                                </div>
+                                <div class="row_wrap">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="table-box-ty2 mobile">
+                                                <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                                    <colgroup>
+                                                        <col width="150px">
+                                                    </colgroup>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td width="15%" style="text-align: left;"><label>신상품 기간</label></td>
+                                                            <td width="35%">
+                                                                <input type="text" class="form-control form-control-sm" name="new_good_day" value="{{@$new_good_day}}" maxlength="3" style="width: 100px; text-align: right;display:inline">일
+                                                            </td>
+                                                            <td width="15%" style="text-align: left;"><label>새글 기간</label></td>
+                                                            <td width="35%">
+                                                                <input type="text" class="form-control form-control-sm" name="new_data_day" value="{{@$new_data_day}}" maxlength="3" style="width: 100px; text-align: right;display:inline" />일
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td width="15%" style="text-align: left;"><label>카테고리 상품 출력 갯수</label></td>
+                                                            <td>
+                                                                <input type="text" class="form-control form-control-sm" name="category_goods_cnt" value="{{@$category_goods_cnt}}" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
+                                                            </td>
+                                                            <td width="15%" style="text-align: left;"><label>신상품 출력 갯수</label></td>
+                                                            <td>
+                                                                <input type="text" class="form-control form-control-sm" name="newarrival_goods_cnt" value="{{@$newarrival_goods_cnt}}" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td width="15%" style="text-align: left;"><label>세일 상품 출력 갯수</label></td>
+                                                            <td>
+                                                                <input type="text" class="form-control form-control-sm" name="onsale_goods_cnt" value="{{@$onsale_goods_cnt}}" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
+                                                            </td>
+                                                            <td width="15%" style="text-align: left;"><label>브랜드샵 상품 출력 갯수</label></td>
+                                                            <td>
+                                                                <input type="text" class="form-control form-control-sm" name="brandshop_goods_cnt" value="{{@$brandshop_goods_cnt}}" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td width="15%" style="text-align: left;"><label>베스트랭킹 상품 출력 갯수</label></td>
+                                                            <td>
+                                                                <input type="text" class="form-control form-control-sm" name="best_rank_goods_cnt" value="{{@$best_rank_goods_cnt}}" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
+                                                            </td>
+                                                            <td width="15%" style="text-align: left;"><label>관련 상품 출력 갯수</label></td>
+                                                            <td>
+                                                                <input type="text" class="form-control form-control-sm" name="relative_goods_cnt" value="{{@$relative_goods_cnt}}" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td width="15%" style="text-align: left;"><label>검색 상품 출력 갯수</label></td>
+                                                            <td>
+                                                                <input type="text" class="form-control form-control-sm" name="search_goods_cnt" value="{{@$search_goods_cnt}}" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
+                                                            </td>
+                                                            <td width="15%" style="text-align: left;"><label>검색 상품 정렬</label></td>
+                                                            <td>
+                                                                <select name="search_goods_sort" class="form-control form-control-sm"style="width:100px;">
+                                                                    <option value="pop">판매량순</option>
+                                                                    <option value="new">신상품순</option>/
+                                                                    <option value="name_low">상품명순</option>
+                                                                    <option value="price_low">낮은가격순</option>
+                                                                    <option value="emt_high">상품평수순</option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><br><br>
+                                <div class="card-header mb-0">
+                                    <h5 class="m-0 font-weight-bold">메일 답변</h5>
+                                </div>
+                                <div class="row_wrap">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="table-box-ty2 mobile">
+                                                <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                                    <colgroup>
+                                                        <col width="150px">
+                                                    </colgroup>
+                                                    <tbody>
+                                                        <tr style="height:30px">
+                                                            <td width="15%" style="text-align:center;font-weight: bold;"><label>항목</label></td>
+                                                            <td width="15%" style="text-align:center;font-weight: bold;">설정</td>
+                                                            <td style="text-align:center;font-weight: bold;">메일 HTML</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td width="15%" style="text-align: left;"><label>1:1문의 답변 시 메일 발송</label></td>
+                                                            <td width="15%">
+                                                                <div class="flax_box">
+                                                                    <div class="custom-control custom-radio">
+                                                                        <input type="radio" name="counsel_yn" id="counsel_y" class="custom-control-input" value="Y"  @if ($counsel_yn == 'Y') checked @endif/>
+                                                                        <label class="custom-control-label" for="counsel_y">사용함</label>
+                                                                    </div>&nbsp;&nbsp;&nbsp;
+                                                                    <div class="custom-control custom-radio">
+                                                                        <input type="radio" name="counsel_yn" id="counsel_n" class="custom-control-input" value="N" @if ($counsel_yn == 'N') checked @endif/>
+                                                                        <label class="custom-control-label" for="counsel_n">사용안함</label>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="gray">* 1:1문의 답변 시 발송되는 메일의 스킨파일("front/{$theme}/skin/email/councel.html")은 변경/수정이 가능합니다.</div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td width="15%" style="text-align: left;"><label>상품 문의 답변시 메일 발송</label></td>
+                                                            <td width="15%">
+                                                                <div class="flax_box">
+                                                                    <div class="custom-control custom-radio">
+                                                                        <input type="radio" name="goods_qa_yn" id="goods_qa_y" class="custom-control-input" value="Y" @if ($goods_qa_yn == 'Y') checked @endif/>
+                                                                        <label class="custom-control-label" for="goods_qa_y">사용함</label>
+                                                                    </div>&nbsp;&nbsp;&nbsp;
+                                                                    <div class="custom-control custom-radio">
+                                                                        <input type="radio" name="goods_qa_yn" id="goods_qa_n" class="custom-control-input" value="N" @if ($goods_qa_yn == 'N') checked @endif/>
+                                                                        <label class="custom-control-label" for="goods_qa_n">사용안함</label>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="gray">* 상품 문의 답변 시 발송되는 메일의 스킨파일("front/{$theme}/skin/email/goods_qa.html")은 변경/수정이 가능합니다.</div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><br><br>
+                                <div class="card-header mb-0">
+                                    <h5 class="m-0 font-weight-bold">휴먼 회원 설정</h5>
+                                </div>
+                                <div class="row_wrap">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="table-box-ty2 mobile">
+                                                <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                                    <colgroup>
+                                                        <col width="150px">
+                                                    </colgroup>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td width="15%" style="text-align: left;"><label>휴면회원 설정 여부</label></td>
+                                                            <td width="15%">
+                                                                <div class="flax_box">
+                                                                    <div class="custom-control custom-radio">
+                                                                        <input type="radio" name="member_inactive_yn" id="member_inactive_y" class="custom-control-input" value="Y"/>
+                                                                        <label class="custom-control-label" for="member_inactive_y">사용함</label>
+                                                                    </div>&nbsp;&nbsp;&nbsp;
+                                                                    <div class="custom-control custom-radio">
+                                                                        <input type="radio" name="member_inactive_yn" id="member_inactive_n" class="custom-control-input" value="N"/>
+                                                                        <label class="custom-control-label" for="member_inactive_n">사용안함</label>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="gray">* 1년간 접속하지 않은 회원을 휴면회원으로 전환시킵니다.</div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><br><br>
+                                <div style="text-align:center;">
+                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData_stock_reduction();" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>  
+
+            </div>
+            <div class="tab-pane fade" id="list_count" role="tabpanel" aria-labelledby="list_count-tab">
+                <form name="list_count" method="post">
+                    <div class="card_wrap aco_card_wrap">
+                        <div class="card shadow">
+                            <div class="card-body mt-1">
+                                <div class="card-header mb-0">
+                                    <h5 class="m-0 font-weight-bold">쇼핑몰메인 출력개수</h5>
+                                </div>
+                                <div class="row_wrap">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="table-box-ty2 mobile">
+                                                <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                                    <colgroup>
+                                                        <col width="150px">
+                                                    </colgroup>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td width="15%" style="text-align: left;"><label>쇼핑몰 메인 공지사항</label></td>
+                                                            <td>
+                                                                <input type="text" class="input" name="main_notice" value="{{@$main_notice}}" maxlength="2" style="width: 100px;text-align:right" />개
+                                                            </td>
+                                                            <td width="15%" style="text-align: left;"><label>&nbsp;</label></td>
+                                                            <td width="35%">
+                                                                &nbsp;
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><br><br>
+
+                                <div class="card-header mb-0">
+                                    <h5 class="m-0 font-weight-bold">커뮤니티 출력개수</h5>
+                                </div>
+                                <div class="row_wrap">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="table-box-ty2 mobile">
+                                                <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                                    <colgroup>
+                                                        <col width="150px">
+                                                    </colgroup>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td width="15%" style="text-align: left;"><label>커뮤니티 메인 공지사항</label></td>
+                                                            <td>
+                                                                <input type="text" class="input" name="community_main_notice" value="{{@$community_main_notice}}" maxlength="2" style="width: 100px;text-align:right" />개
+                                                            </td>
+                                                            <td width="15%" style="text-align: left;"><label>커뮤니티 메인 상품문의</label></td>
+                                                            <td>
+                                                                <input type="text" class="input" name="community_main_qa" value="{{@$community_main_qa}}" maxlength="2" style="width: 100px;text-align:right" />개
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td width="15%" style="text-align: left;"><label>커뮤니티 메인 상품평</label></td>
+                                                            <td>
+                                                                <input type="text" class="input" name="community_main_review" value="{{@$community_main_review}}" maxlength="2" style="width: 100px;text-align:right" />개
+                                                            </td>
+                                                            <td width="15%" style="text-align: left;"><label>&nbsp;</label></td>
+                                                            <td>
+                                                                &nbsp;
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td width="15%" style="text-align: left;"><label>커뮤니티 상품문의 출력개수</label></td>
+                                                            <td width="35%">
+                                                                <input type="text" class="input" name="community_goods_qa" value="{{@$community_goods_qa}}" maxlength="2" style="width: 100px; text-align: right;" />개
+                                                            </td>
+                                                            <td width="15%" style="text-align: left;"><label>커뮤니티 상품평 출력개수</label></td>
+                                                            <td width="35%">
+                                                                <input type="text" class="input" name="community_goods_review" value="{{@$community_goods_review}}" maxlength="2" style="width: 100px; text-align: right;" />개
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><br><br>
+
+                                <div class="card-header mb-0">
+                                    <h5 class="m-0 font-weight-bold">고객센터 출력개수</h5>
+                                </div>
+                                <div class="row_wrap">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="table-box-ty2 mobile">
+                                                <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                                    <colgroup>
+                                                        <col width="150px">
+                                                    </colgroup>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td width="15%" style="text-align: left;"><label>공지사항 리스트</label></td>
+                                                            <td>
+                                                                <input type="text" class="input" name="notice" value="{{@$notice}}" maxlength="2" style="width: 100px;text-align:right" />개
+                                                            </td>
+                                                            <td width="15%" style="text-align: left;"><label>&nbsp;</label></td>
+                                                            <td width="35%">
+                                                                &nbsp;
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div><br><br>
+                                <div style="text-align:center;">
+                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData_notice();" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
             <div class="tab-pane fade" id="admin" role="tabpanel" aria-labelledby="admin-tab">.ㅇㅇ</div>
+            <div class="tab-pane fade" id="mobile" role="tabpanel" aria-labelledby="mobile-tab">.ㅇㅇ</div>
             <div class="tab-pane fade" id="image" role="tabpanel" aria-labelledby="image-tab">.ㅇㅇ</div>
-            <div class="tab-pane fade" id="etc" role="tabpanel" aria-labelledby="etc-tab">.ㅇㅇ</div>
+            <!-- <div class="tab-pane fade" id="naver_checkout" role="tabpanel" aria-labelledby="naver_checkout-tab">.ㅇㅇ</div> -->
+            <!-- <div class="tab-pane fade" id="email" role="tabpanel" aria-labelledby="email-tab">.ㅇㅇ</div> -->
             <!-- <div class="tab-pane fade" id="api" role="tabpanel" aria-labelledby="api-tab">.ㅇㅇ</div> -->
             <!-- <div class="tab-pane fade" id="coupon" role="tabpanel" aria-labelledby="coupon-tab">.ㅇㅇ</div> -->
-            <!-- <div class="tab-pane fade" id="pay" role="tabpanel" aria-labelledby="pay-tab">.ㅇㅇ</div>
-            <div class="tab-pane fade" id="stock" role="tabpanel" aria-labelledby="stock-tab">.ㅇㅇ</div> -->
+            <!-- <div class="tab-pane fade" id="pay" role="tabpanel" aria-labelledby="pay-tab">.ㅇㅇ</div> -->
+            <!-- <div class="tab-pane fade" id="stock" role="tabpanel" aria-labelledby="stock-tab">.ㅇㅇ</div> -->
         </div>
     </div>
 </div>
 
 <script>
+
+    $(document).ready(function(){
+        $('#shop-tab').trigger("click");  
+    }); 
+
+
     function updateData_shop() {
     
         let frm = $('form[name=shop]').serialize();
@@ -1019,6 +1587,106 @@
                 success: function(data) {
                     if (data.code == '200') {
                         alert('적립금 정보가 수정되었습니다.');
+                        location.reload();
+                    } else {
+                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                        console.log(data);
+                    }
+                },
+                error: function(e) {
+                        console.log(e.responseText)
+                }
+            });
+
+    }
+
+    function updateData_kakao() {
+    
+        let frm = $('form[name=kakao]').serialize();
+        frm += "&type=kakao";
+            $.ajax({
+                method: 'post',
+                url: '/head/system/sys05/update',
+                data: frm,
+                dataType: 'json',
+                success: function(data) {
+                    if (data.code == '200') {
+                        alert('KAKAO 정보가 수정되었습니다.');
+                        location.reload();
+                    } else {
+                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                        console.log(data);
+                    }
+                },
+                error: function(e) {
+                        console.log(e.responseText)
+                }
+            });
+
+    }
+
+    function updateData_sms() {
+    
+        let frm = $('form[name=sms]').serialize();
+        frm += "&type=sms";
+            $.ajax({
+                method: 'post',
+                url: '/head/system/sys05/update',
+                data: frm,
+                dataType: 'json',
+                success: function(data) {
+                    if (data.code == '200') {
+                        alert('SMS 정보가 수정되었습니다.');
+                        location.reload();
+                    } else {
+                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                        console.log(data);
+                    }
+                },
+                error: function(e) {
+                        console.log(e.responseText)
+                }
+            });
+
+    }
+
+    function updateData_stock_reduction() {
+    
+        let frm = $('form[name=stock_reduction]').serialize();
+        frm += "&type=stock_reduction";
+            $.ajax({
+                method: 'post',
+                url: '/head/system/sys05/update',
+                data: frm,
+                dataType: 'json',
+                success: function(data) {
+                    if (data.code == '200') {
+                        alert('부가기능 정보가 수정되었습니다.');
+                        location.reload();
+                    } else {
+                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                        console.log(data);
+                    }
+                },
+                error: function(e) {
+                        console.log(e.responseText)
+                }
+            });
+
+    }
+
+    function updateData_notice() {
+    
+        let frm = $('form[name=list_count]').serialize();
+        frm += "&type=list_count";
+            $.ajax({
+                method: 'post',
+                url: '/head/system/sys05/update',
+                data: frm,
+                dataType: 'json',
+                success: function(data) {
+                    if (data.code == '200') {
+                        alert('게시물 정보가 수정되었습니다.');
                         location.reload();
                     } else {
                         alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
