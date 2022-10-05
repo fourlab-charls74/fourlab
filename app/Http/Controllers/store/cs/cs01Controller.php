@@ -559,7 +559,7 @@ class cs01Controller extends Controller {
 				$qty = $row->qty;
 
 				$stock = array(
-					"type" => 9, // 여기
+					"type" => 9,
 					"etc" => "입고 취소",
 					"qty" => $qty,
 					"goods_no" => $goods_no,
@@ -580,7 +580,7 @@ class cs01Controller extends Controller {
 			
 			DB::commit();
 		} catch (Exception $e) {
-			dd($e);
+			// dd($e);
 			DB::rollBack();
 			return response()->json(['code' => -1, 'message' => "입고 취소를 실패하였습니다. 다시 한번 시도하여 주십시오."], 200);
 		}

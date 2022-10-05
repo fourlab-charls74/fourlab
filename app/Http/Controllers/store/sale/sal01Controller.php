@@ -167,9 +167,7 @@ class sal01Controller extends Controller
 	public function show()
 	{
 		$values = [];
-
 		$sale_kinds = SLib::getCodes("SALE_KIND");
-
 		return view( Config::get('shop.store.view') . '/sale/sal01_show',$values);
 	}
 
@@ -233,14 +231,13 @@ class sal01Controller extends Controller
 			/**
 			 * 기존 tmp order에 ord_no가 없는 경우 insert, 있는 경우 update 처리
 			 */
-			DB::beginTransaction();
+			// DB::beginTransaction();
 			try {
 				$saved_type = $this->saveTmpOrder($order);
 			} catch (Exception $e) { // 임시 주문서 저장시 문제 발생한 경우 에러 처리
-				DB::rollback();
+				// DB::rollback();
 				$code = -400;
-				array_push($codes, $code);
-				break;
+				goto pass_saved_order;
 			}
 
 			if ($saved_type == "insert") {
@@ -252,9 +249,11 @@ class sal01Controller extends Controller
 				}
 			}
 
-			($code == 200 || $code == 201) ? DB::commit() : DB::rollBack(); // 추가 또는 수정이 완료된 경우 commit하여 DB 반영
+			// ($code == 200 || $code == 201) ? DB::commit() : DB::rollBack(); // 추가 또는 수정이 완료된 경우 commit하여 DB 반영
+			pass_saved_order:
 			array_push($codes, $code);
 		}
+		
 		return response()->json(['codes' => $codes]);
 	}
 
@@ -816,7 +815,6 @@ class sal01Controller extends Controller
 				DB::table('__tmp_order')->where('ord_no', $tmp_ord_no)->update(['out_ord_opt_no' => $ord_opt_no]);
 				$code = 201;
 			} catch (Exception $e) {
-				dd($e);
 				$code = -410;
 			}
 			return $code;
