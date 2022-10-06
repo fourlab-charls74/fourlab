@@ -433,7 +433,7 @@
 
 	function SaveMemo(){
 		var data = new Array();
-		var selectedRowData = gx.gridOptions.api.getSelectedRows(); // 여기
+		var selectedRowData = gx.gridOptions.api.getSelectedRows();
 
 		selectedRowData.forEach( function(selectedRowData, index) {
 			// 기존 코드 - 메모내역을 변경 하지 않고 메모 저장시 저장 안되고 있으므로 조건 처리 해제

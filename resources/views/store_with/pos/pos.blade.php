@@ -11,7 +11,7 @@
         <div class="d-flex align-items-center">
             <p class="fw-b mr-5">[L0025] 롯데본점</p>
             <p class="fw-sb mr-4">2022년 09월 28일 00:00:00</p>
-            <button type="button" onclick="return setScreen('pos_main');" class="butt butt-close bg-trans" style="width:55px;height:50px;border-left:1px solid #999"><i class="fa fa-home" aria-hidden="true"></i></button>
+            <button type="button" id="home_btn" onclick="return setScreen('pos_main');" class="butt butt-close bg-trans" style="width:55px;height:50px;border-left:1px solid #999"><i class="fa fa-home" aria-hidden="true"></i></button>
             <button type="button" onclick="return window.close();" class="butt butt-close bg-trans" style="width:55px;height:50px;border-left:1px solid #999"><i class="fa fa-times" aria-hidden="true"></i></button>
         </div>
     </div>
@@ -75,27 +75,39 @@
                 <div class="d-flex mb-4">
                     <div class="flex-1 mr-4">
                         <div class="d-flex justify-content-between align-items-center fs-15 fw-b mb-3">
-                            <p>받을 금액</p>
-                            <p><strong class="fc-red fs-20 fw-b mr-1">2,234,000</strong>원</p>
+                            <p>총 주문금액</p>
+                            <p><strong id="total_order_amt" class="fc-red fs-20 fw-b mr-1">0</strong>원</p>
                         </div>
                         <div class="d-flex justify-content-between align-items-center fs-12 fw-sb mb-2">
                             <p>결제한 금액</p>
-                            <p><strong class="fw-b mr-1">0</strong>원</p>
+                            <p><strong id="payed_amt" class="fw-b mr-1">0</strong>원</p>
                         </div>
                         <div class="d-flex justify-content-between align-items-center fs-12 fw-sb">
                             <p>거스름돈</p>
-                            <p><strong class="fc-red fw-b mr-1">0</strong>원</p>
+                            <p><strong id=change_amt" class="fc-red fw-b mr-1">0</strong>원</p>
                         </div>
                     </div>
                     <div class="flex-2 d-flex">
-                        <button type="button" class="butt flex-1 fc-white fs-20 fw-sb br-2 bg-blue p-2 mr-3">신용카드</button>
-                        <button type="button" class="butt flex-1 fc-white fs-20 fw-sb br-2 bg-blue p-2 mr-3">현금</button>
-                        <button type="button" class="butt flex-1 fc-white fs-20 fw-sb br-2 bg-gray p-2">적립금사용</button>
+                        <button type="button" class="butt flex-1 fc-white fs-20 fw-b br-2 bg-blue p-2 mr-3" data-toggle="modal" data-target="#cardModal">
+                            <span id="card_amt">0</span>
+                            <input type="hidden" name="card_amt" value="0">
+                            <span class="d-block fs-14 fw-sb mt-1">신용카드</span>
+                        </button>
+                        <button type="button" class="butt flex-1 fc-white fs-20 fw-b br-2 bg-blue p-2 mr-3">
+                            <span id="cash_amt">0</span>
+                            <input type="hidden" name="cash_amt" value="0">
+                            <span class="d-block fs-14 fw-sb mt-1">현금</span>
+                        </button>
+                        <button type="button" class="butt flex-1 fc-white fs-20 fw-b br-2 bg-gray p-2">
+                            <span id="point_amt">0</span>
+                            <input type="hidden" name="point_amt" value="0">
+                            <span class="d-block fs-14 fw-sb mt-1">적립금</span>
+                        </button>
                     </div>
                 </div>
                 <div class="d-flex">
                     <div class="flex-1 d-flex mr-4">
-                        <button type="button" class="butt flex-1 fc-white fs-16 fw-sb br-1 bg-red p-4 mr-3" onclick="return setScreen('pos_main');">전체취소</button>
+                        <button type="button" class="butt flex-1 fc-white fs-16 fw-sb br-1 bg-red p-4 mr-3" onclick="return cancelOrder();">전체취소</button>
                         <button type="button" class="butt flex-1 fc-white fs-16 fw-sb br-1 bg-gray p-4">대기</button>
                     </div>
                     <div class="flex-2">
@@ -110,9 +122,9 @@
                 <p class="fc-red">202209270959523139</p>
             </div>
             <div class="d-flex mb-4">
-                <div class="flex-1 fw-sb b-gray p-4 mr-2" style="min-height:250px;">
+                <div class="flex-1 fw-sb b-2-gray p-4 mr-2" style="min-height:250px;">
                     {{-- <div class="d-flex justify-content-center align-items-center h-100 fc-gray fw-m">고객정보가 없습니다.</div> --}}
-                    <p class="fs-18 fw-b mb-3">홍길동 <span class="fs-16 fw-sb">(남, 2000.01.01)</span></p>
+                    <p class="fs-18 fw-b mb-3">홍길동 <span class="fs-16 fw-sb">(남, 2000.01.01)</span> <span class="fs-14 fw-m">- gildong123</span></p>
                     <div class="d-flex align-items-center fs-12 mb-2">
                         <p style="min-width: 80px;">연락처</p>
                         <p>010-0000-0000</p>
@@ -136,40 +148,40 @@
                 </div>
             </div>
             <div class="d-flex align-items-center mb-4">
-                <div class="d-flex b-gray mr-4" style="width:150px;height:150px;">
-                    <img src="http://newera5950.jpg3.kr/item/12359429_1.jpg" alt="" class="w-100">
+                <div class="d-flex b-2-gray mr-4" style="width:150px;height:150px;">
+                    <img src="" alt="" id="cur_img" class="w-100">
                 </div>
                 <div class="flex-1">
                     <ul class="fs-12 fw-sb">
                         <li class="d-flex justify-content-between mb-2">
                             <p class="fc-blue fw-b" style="min-width: 80px;">상품명</p>
-                            <p class="text-right">피엘라벤 우먼 아비스코 미드서머 자켓 Abisko Midsummer Jacket W (89826)</p>
+                            <p class="text-right" id="cur_goods_nm"></p>
                         </li>
                         <li class="d-flex justify-content-between mb-2">
                             <p class="fc-blue fw-b" style="min-width: 80px;">옵션명</p>
-                            <p class="text-right">Dark Olive.Dark Olive^36 (27~28 inch)</p>
+                            <p class="text-right" id="cur_goods_opt"></p>
                         </li>
                         <li class="d-flex justify-content-between">
                             <p class="fc-blue fw-b" style="min-width: 80px;">상품코드</p>
-                            <p class="text-right">F181WTR05CBOD36</p>
+                            <p class="text-right" id="cur_prd_cd"></p>
                         </li>
                     </ul>
                 </div>
             </div>
             <div class="d-flex">
-                <div class="flex-1 b-gray mr-4">
+                <div class="flex-1 b-2-gray mr-4">
                     <table class="prd_info_table w-100 fs-10" style="table-layout:fixed;">
                         <tr>
                             <th>수량</th>
-                            <td>0</td>
+                            <td id="cur_qty">-</td>
                         </tr> 
                         <tr>
                             <th>단가</th>
-                            <td>0</td>
+                            <td id="cur_price">-</td>
                         </tr> 
                         <tr>
-                            <th>소비자가</th>
-                            <td>0</td>
+                            <th>TAG가</th>
+                            <td id="cur_goods_sh">-</td>
                         </tr> 
                         <tr>
                             <th>판매유형</th>
@@ -186,24 +198,24 @@
                     </table>
                 </div>
                 <div class="flex-2 d-flex justify-content-end">
-                    <div class="calculator-grid fs-20">
-                        <input type="text" class="inp fc-black fs-20 fw-b text-right pr-3" style="grid-area:a;border:2px solid #bbb;">
-                        <button type="button" class="butt bg-white" style="grid-area:b;">1</button>
-                        <button type="button" class="butt bg-white" style="grid-area:c;">2</button>
-                        <button type="button" class="butt bg-white" style="grid-area:d;">3</button>
-                        <button type="button" class="butt bg-white" style="grid-area:e;">4</button>
-                        <button type="button" class="butt bg-white" style="grid-area:f;">5</button>
-                        <button type="button" class="butt bg-white" style="grid-area:g;">6</button>
-                        <button type="button" class="butt bg-white" style="grid-area:h;">7</button>
-                        <button type="button" class="butt bg-white" style="grid-area:i;">8</button>
-                        <button type="button" class="butt bg-white" style="grid-area:j;">9</button>
-                        <button type="button" class="butt bg-white" style="grid-area:k;">0</button>
-                        <button type="button" class="butt bg-white" style="grid-area:l;">00</button>
-                        <button type="button" class="butt bg-white" style="grid-area:m;">000</button>
-                        <button type="button" class="butt fs-14 bg-lightgray" style="grid-area:n;">clear</button>
-                        <button type="button" class="butt fs-14 bg-lightgray" style="grid-area:o;"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>
-                        <button type="button" class="butt fs-14 fc-white bg-gray" style="grid-area:p;">수량변경</button>
-                        <button type="button" class="butt fs-14 fc-white bg-gray" style="grid-area:q;">단가변경</button>
+                    <div id="product_calculator" class="calculator-grid product fs-20">
+                        <input type="text" id="product_press_amt" class="inp fc-black fs-20 fw-b text-right pr-3" style="grid-area:a;border:2px solid #bbb;" value="0">
+                        <button type="button" class="butt bg-white" value="1" style="grid-area:b;">1</button>
+                        <button type="button" class="butt bg-white" value="2" style="grid-area:c;">2</button>
+                        <button type="button" class="butt bg-white" value="3" style="grid-area:d;">3</button>
+                        <button type="button" class="butt bg-white" value="4" style="grid-area:e;">4</button>
+                        <button type="button" class="butt bg-white" value="5" style="grid-area:f;">5</button>
+                        <button type="button" class="butt bg-white" value="6" style="grid-area:g;">6</button>
+                        <button type="button" class="butt bg-white" value="7" style="grid-area:h;">7</button>
+                        <button type="button" class="butt bg-white" value="8" style="grid-area:i;">8</button>
+                        <button type="button" class="butt bg-white" value="9" style="grid-area:j;">9</button>
+                        <button type="button" class="butt bg-white" value="0" style="grid-area:k;">0</button>
+                        <button type="button" class="butt bg-white" value="00" style="grid-area:l;">00</button>
+                        <button type="button" class="butt bg-white" value="000" style="grid-area:m;">000</button>
+                        <button type="button" class="butt fs-14 bg-lightgray" value="removeAll" style="grid-area:n;">clear</button>
+                        <button type="button" class="butt fs-14 bg-lightgray" value="remove" style="grid-area:o;"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>
+                        <button type="button" class="butt fs-14 fc-white bg-gray" value="qty" style="grid-area:p;">수량변경</button>
+                        <button type="button" class="butt fs-14 fc-white bg-gray" value="price" style="grid-area:q;">단가변경</button>
                     </div>
                 </div>
             </div>
@@ -217,57 +229,94 @@
 </div>
 
 {{-- MODAL --}}
-<div id="pos-modal">
+<div id="pos-modal" class="show_layout">
+    {{-- 상품검색모달 --}}
     <div class="modal fade" id="searchProductModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 90%;">
             <div class="modal-content">
                 <div class="modal-body">
-                    <button type="button" class="fs-20 close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    {{-- <h5 class="mt-1 fs-12 fw-b">영수증번호</h5>
-                    <div class="d-flex flex-column align-items-center mt-5">
-                        <input type="text" class="inp mb-4 p-2 w-75 text-center fs-18 fw-sb" value="M0001202207010001" />
-                        <div class="d-flex justify-content-end w-100 fs-12">
-                            <button type="button" class="btn p-2 pl-5 pr-5 mr-2 fc-gray fw-sb" data-dismiss="modal">취소</button>
-                            <button type="button" class="btn p-2 pl-5 pr-5 text-light fw-sb bg-primary rounded-0">확인</button>
+                    <div class="card">
+                        <div class="card-header">
+                            <button type="button" class="fs-20 close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h5 class="mt-1 fs-14 fw-b">상품 검색</h5>
                         </div>
-                    </div> --}}
-                </div>
-            </div>
-        </div>
-    </div>
-    {{-- <div class="modal fade" id="receiptNoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <button type="button" class="fs-20 close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <h5 class="mt-1 fs-12 fw-b">영수증번호</h5>
-                    <div class="d-flex flex-column align-items-center mt-5">
-                        <input type="text" class="inp mb-4 p-2 w-75 text-center fs-18 fw-sb" value="M0001202207010001" />
-                        <div class="d-flex justify-content-end w-100 fs-12">
-                            <button type="button" class="btn p-2 pl-5 pr-5 mr-2 fc-gray fw-sb" data-dismiss="modal">취소</button>
-                            <button type="button" class="btn p-2 pl-5 pr-5 text-light fw-sb bg-primary rounded-0">확인</button>
+                        <div class="card-body b-none mt-4">
+                            <div class="d-flex align-items-center br-2 b-1-gray bg-white shadow-box p-2 pl-4 mb-3">
+                                <select name="search_prd_type" id="search_prd_type" class="sel fs-12" style="min-width: 120px;">
+                                    <option value="prd_cd">상품코드</option>
+                                    <option value="goods_nm">상품명</option>
+                                </select>
+                                <input type="text" class="flex-1 inp h-40 fs-12 mr-1" id="search_prd_keyword" name="search_prd_keyword" placeholder="검색어를 입력하세요">
+                                <button type="button" class="butt br-2 bg-lightgray p-3" onclick="return Search();"><i class="fa fa-search fc-black fs-10" aria-hidden="true"></i></button>
+                            </div>
+                            <div class="d-flex">
+                                <div class="table-responsive">
+                                    <div id="div-gd-product" class="ag-theme-balham" style="font-size: 18px;"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div> --}}
+    </div>
+    {{-- 신용카드모달 --}}
+    <div class="modal fade" id="cardModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 500px;">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-header">
+                            <button type="button" class="fs-20 close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h5 class="mt-1 fs-14 fw-b">신용카드 결제</h5>
+                        </div>
+                        <div class="card-body b-none mt-4">
+                            <div class="d-flex flex-column align-items-center">
+                                <div class="d-flex justify-content-between align-items-center fs-15 fw-b w-100 mb-3">
+                                    <p>남은 금액</p>
+                                    <p><strong class="fc-red fs-20 fw-b mr-1">2,234,000</strong>원</p>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center fs-12 fw-sb w-100">
+                                    <p>총 주문금액</p>
+                                    <p><strong class="fw-b mr-1">2,234,000</strong>원</p>
+                                </div>
+                                <div class="calculator-grid payment fs-20 mt-4">
+                                    <input type="text" class="inp fc-black fs-20 fw-b text-right pr-3" style="grid-area:a;border:2px solid #bbb;">
+                                    <button type="button" class="butt bg-white" style="grid-area:b;">1</button>
+                                    <button type="button" class="butt bg-white" style="grid-area:c;">2</button>
+                                    <button type="button" class="butt bg-white" style="grid-area:d;">3</button>
+                                    <button type="button" class="butt bg-white" style="grid-area:e;">4</button>
+                                    <button type="button" class="butt bg-white" style="grid-area:f;">5</button>
+                                    <button type="button" class="butt bg-white" style="grid-area:g;">6</button>
+                                    <button type="button" class="butt bg-white" style="grid-area:h;">7</button>
+                                    <button type="button" class="butt bg-white" style="grid-area:i;">8</button>
+                                    <button type="button" class="butt bg-white" style="grid-area:j;">9</button>
+                                    <button type="button" class="butt bg-white" style="grid-area:k;">0</button>
+                                    <button type="button" class="butt bg-white" style="grid-area:l;">00</button>
+                                    <button type="button" class="butt fs-14 bg-white" style="grid-area:m;"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>
+                                    <button type="button" class="butt fs-18 fc-white bg-blue" style="grid-area:n;" onclick="return setOrderPrice();">적용</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-@include('store_with.pos.pos_js')
-
 <script type="text/javascript" charset="utf-8">
-	const pApp = new App('', {gridId:"#div-gd"});
+	const pApp = new App('', {gridId: "#div-gd"});
 	let gx;
 
     let AlignCenter = {"text-align": "center"};
-    let LineHeight50 = {"line-height": "50px", "font-weight": "500"};
+    let LineHeight50 = {"line-height": "50px"};
     const columns = [
-        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {...AlignCenter, ...LineHeight50}},
+        // {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {...AlignCenter, ...LineHeight50}},
         {field: "prd_cd", hide: true},
         // {field: "img", headerName: "이미지", width: 50, cellStyle: {...AlignCenter, ...LineHeight50},
         //     cellRenderer: (params) => {
@@ -279,68 +328,99 @@
         //     }
         // },
         {field: "goods_nm", headerName: "상품명", width: "auto", cellStyle: LineHeight50, wrapText: true, autoHeight: true,
-            // cellRenderer: (params) => `<a href="javascript:void(0);" onclick="setGoodsInfo('${params.data.prd_cd}');">${params.value}</a>`,
+            // cellRenderer: (params) => `<a href="javascript:void(0);" onclick="setProductDetail('${params.data.prd_cd}');">${params.value}</a>`,
         },
         {field: "color", headerName: "컬러", width: 80, cellStyle: {...AlignCenter, ...LineHeight50}},
         {field: "size", headerName: "사이즈", width: 80, cellStyle: {...AlignCenter, ...LineHeight50}},
         {field: "qty", headerName: "수량", width: 80, type: "currencyType", cellStyle: LineHeight50},
         {field: "price", headerName: "단가", width: 100, type: "currencyType", cellStyle: LineHeight50},
         {field: "total", headerName: "금액", width: 120, type: "currencyType", cellStyle: {...LineHeight50, "font-size": "18px", "font-weight": "700"}},
+        {headerName: "삭제", width: 80, cellStyle: {...AlignCenter, ...LineHeight50},
+            cellRenderer: (params) => `<a href="javascript:void(0);" onclick="return removeProduct('${params.data.prd_cd}')"><i class="fa fa-trash fc-red fs-12" aria-hidden="true"></i></a>`,
+        }
+    ];
+
+    const pApp2 = new App('', {gridId: "#div-gd-product"});
+    let gx2;
+
+    const product_columns = [
+        {field: "prd_cd" , headerName: "바코드", width: 180, cellStyle: {...AlignCenter, ...LineHeight50}},
+        {field: "prd_cd_sm", headerName: "상품코드", width: 130, cellStyle: {...AlignCenter, ...LineHeight50}},
+        {field: "color", headerName: "컬러", width: 80, cellStyle: {...AlignCenter, ...LineHeight50}},
+        {field: "size", headerName: "사이즈", width: 80, cellStyle: {...AlignCenter, ...LineHeight50}},
+        {field: "goods_nm",	headerName: "상품명", width: "auto", cellStyle: LineHeight50,
+            cellRenderer: (params) => `<a href="javascript:void(0);" onclick="return addProduct('${params.data.prd_cd}')">${params.value}</a>`,
+        },
+        {field: "goods_opt", headerName: "옵션", width: 300, cellStyle: LineHeight50},
+        {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 100, cellStyle: LineHeight50},
+        {field: "price", headerName: "판매가", type: "currencyType", width: 100, cellStyle: LineHeight50},
     ];
 
 	$(document).ready(function() {
 		pApp.ResizeGrid(275, 560);
 		let gridDiv = document.querySelector(pApp.options.gridId);
-		gx = new HDGrid(gridDiv, columns);
+		gx = new HDGrid(gridDiv, columns, {
+            rowSelection: 'single',
+            suppressRowClickSelection: false,
+            onSelectionChanged: function(e) {
+                let goods = e.api.getSelectedRows();
+                if(goods.length > 0) {
+                    setProductDetail(goods[0].prd_cd);
+                } else {
+                    setProductDetail();
+                }
+                updateOrderValue();
+            }
+        });
 
-        gx.gridOptions.api.setRowData([{
-            prd_cd: "F182MSR03CBDG42",
-            img: "http://newera5950.jpg3.kr/item/12359429_1.jpg",
-            goods_nm: "피엘라벤 우먼 아비스코 미드서머 자켓 Abisko Midsummer Jacket W (89826)",
-            color: "BB",
-            size: "OS",
-            qty: 1,
-            price: 9999000,
-            total: 9999000
-        },{
-            prd_cd: "F182MSR03CBDG42",
-            img: "http://newera5950.jpg3.kr/item/12359429_1.jpg",
-            goods_nm: "피엘라벤 우먼 아비스코 미드서머 자켓 Abisko Midsummer Jacket W (89826)",
-            color: "BB",
-            size: "OS",
-            qty: 1,
-            price: 9999000,
-            total: 9999000
-        },{
-            prd_cd: "F182MSR03CBDG42",
-            img: "http://newera5950.jpg3.kr/item/12359429_1.jpg",
-            goods_nm: "피엘라벤 우먼 아비스코 미드서머 자켓 Abisko Midsummer Jacket W (89826)",
-            color: "BB",
-            size: "OS",
-            qty: 1,
-            price: 9999000,
-            total: 9999000
-        }]);
+		pApp2.ResizeGrid(275, 400);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+		let gridDiv2 = document.querySelector(pApp2.options.gridId);
+		gx2 = new HDGrid(gridDiv2, product_columns);
+
+
+        // ELEMENT EVENT
+        $("#search_prd_keyword").on("keypress", function (e) {
+            if(e.keyCode === 13) Search();
+        });
+        $('#searchProductModal').on('shown.bs.modal', function () {
+            $('#search_prd_keyword').trigger('focus');
+        })
+        $("#product_calculator").on({
+            click: function({target}) {
+                if(target.nodeName == "BUTTON") {
+                    let str = $("#product_press_amt").val().replaceAll(",", "");
+                    switch (target.value) {
+                        case 'remove':
+                            str = str.slice(0, str.length - 1); 
+                            break;
+                        case 'removeAll':
+                            str = ''; 
+                            break;
+                        case 'qty':
+                            updateOrderValue('cur_qty', str * 1);
+                            str = ''; 
+                            break;
+                            case 'price':
+                            updateOrderValue('cur_price', str * 1);
+                            str = ''; 
+                            break;
+                        default:
+                            str += target.value;
+                            break;
+                    }
+                    $("#product_press_amt").val(isNaN(str * 1) ? 0 : Comma(str * 1));
+                }
+            },
+            keyup: function(e) {
+                if((e.keyCode >= 48 && e.keyCode <= 57) || e.keyCode == 8 || (e.keyCode >= 37 && e.keyCode <= 40)) {
+                    let num = unComma(e.target.value);
+                    e.target.value = Comma(isNaN(num) ? 0 : num);
+                }
+            }
+        })
 	});
 </script>
 
-<script>
-    // function setGoodsInfo(prd_cd) {
-    //     // prd_cd 로 상품검색하기 추후 추가예정
-    //     // const test = {
-    //     //     prd_cd: "F182MSR03CBDG42",
-    //     //     img: "http://newera5950.jpg3.kr/item/12359429_1.jpg",
-    //     //     goods_nm: "피엘라벤 우먼 아비스코 미드서머 자켓 Abisko Midsummer Jacket W (89826)",
-    //     //     color: "BB",
-    //     //     size: "OS",
-    //     //     qty: 1,
-    //     //     price: 9999000,
-    //     //     total: 9999000
-    //     // };
-
-    //     $("#goods_box").removeClass("d-none").addClass("d-flex");
-    //     $("#no_goods_box").removeClass("d-flex").addClass("d-none");
-    // }
-</script>
+@include('store_with.pos.pos_js')
 
 @stop

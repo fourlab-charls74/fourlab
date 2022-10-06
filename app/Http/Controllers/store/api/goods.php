@@ -840,30 +840,32 @@ class goods extends Controller
             from product_code p
                 inner join goods g on g.goods_no = p.goods_no
             where 1=1 $where
-            $limit
         ";
 
         $result = DB::select($sql);
 
-        if ($page == 1) {
-            $sql = "
-                select count(*) as total
-                from product_code p
-                    inner join goods g on g.goods_no = p.goods_no
-                where 1=1 $where
-            ";
-            $row = DB::select($sql);
-            $total = $row[0]->total;
-            $page_cnt = (int)(($total - 1) / $page_size) + 1;
-        }
+        // if ($page == 1) {
+        //     $sql = "
+        //         select count(*) as total
+        //         from product_code p
+        //             inner join goods g on g.goods_no = p.goods_no
+        //         where 1=1 $where
+        //     ";
+        //     $row = DB::select($sql);
+        //     $total = $row[0]->total;
+        //     $page_cnt = (int)(($total - 1) / $page_size) + 1;
+        // }
 
         return response()->json([
             "code" => '200',
             "head" => [
-                "total" => $total,
-                "page" => $page,
-                "page_cnt" => $page_cnt,
-                "page_total" => count($result)
+                "total" => count($result),
+                "page" => 1,
+                "page_cnt" => 1,
+                "page_total" => 1,
+                // "page" => $page,
+                // "page_cnt" => $page_cnt,
+                // "page_total" => count($result)
             ],
             "body" => $result
         ]);

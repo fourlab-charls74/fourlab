@@ -1,7 +1,23 @@
--- 상품코드
+-- 원부자재 상품
+CREATE TABLE `product` (
+    `prd_cd` varchar(50) NOT NULL COMMENT '상품코드',
+    `prd_nm` VARCHAR(100) NOT NULL COMMENT '상품명',
+    `type` varchar(4) NOT NULL COMMENT '구분:일반(N),부자재(S),사은품(G) / code - prd_material_type',
+    `com_id` VARCHAR(30) NOT NULL COMMENT '공급업체',
+    `year` varchar(30) NOT NULL COMMENT '단위 code - prd_cd_unit',
+    `rt` datetime NOT NULL COMMENT '등록일',
+    `ut` datetime DEFAULT NULL COMMENT '수정일',
+    `admin_id` varchar(30) NOT NULL COMMENT '관리자아이디',
+    PRIMARY KEY (`prd_cd`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 원부자재 상품 코드
 CREATE TABLE `product_code` (
-    `prd_cd` varchar(20) NOT NULL COMMENT '상품코드',
-    `goods_no` int(11) NOT NULL COMMENT '상품번호',
+    `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT 'identify',
+    `prd_cd` varchar(50) NOT NULL COMMENT '상품코드',
+    `seq` int(2) unsigned zerofill NOT NULL COMMENT '상품코드 순서차수',
+    'img_url' varchar(255) COMMENT '이미지 주소',
+    `goods_no` int(11) COMMENT '상품번호',
     `goods_opt` varchar(100) NOT NULL COMMENT '상품옵션명',
     `brand` varchar(2) NOT NULL COMMENT '브랜드 code - prd_cd_brand',
     `year` varchar(3) NOT NULL COMMENT '년도 code - prd_cd_year',
@@ -9,13 +25,25 @@ CREATE TABLE `product_code` (
     `gender` char(1) NOT NULL COMMENT '성별 code - prd_cd_gender',
     `item` varchar(3) NOT NULL COMMENT '아이템 code - prd_cd_item',
     `opt` varchar(3) NOT NULL COMMENT '품목 code - prd_cd_opt',
-    `seq` int(2) unsigned zerofill NOT NULL COMMENT '상품코드 순서차수',
     `color` varchar(3) NOT NULL COMMENT '컬러옵션 code - prd_cd_color',
     `size` varchar(4) NOT NULL COMMENT '사이즈옵션 code - prd_cd_size',
+    `type` varchar(4) NOT NULL COMMENT '구분:일반(N),부자재(S),사은품(G) / code - prd_material_type',
     `rt` datetime NOT NULL COMMENT '등록일',
     `ut` datetime DEFAULT NULL COMMENT '수정일',
     `admin_id` varchar(30) NOT NULL COMMENT '관리자아이디',
-    PRIMARY KEY (`prd_cd`)
+    PRIMARY KEY (`idx`, `prd_cd`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 원부자재 상품 이미지
+CREATE TABLE `product_image` (
+    `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT 'identify',
+    `prd_cd` varchar(50) NOT NULL COMMENT '상품코드',
+    `seq` int(2) unsigned zerofill NOT NULL COMMENT '상품코드 순서차수',
+    `img_url` varchar(255) COMMENT '이미지 주소',
+    `rt` datetime NOT NULL COMMENT '등록일',
+    `ut` datetime DEFAULT NULL COMMENT '수정일',
+    `admin_id` varchar(30) NOT NULL COMMENT '관리자아이디',
+    PRIMARY KEY (`idx`, `prd_cd`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 오프라인 재고
