@@ -611,6 +611,10 @@ class sys05Controller extends Controller
                
                 $sql_shoplinker_user_id = "update conf set value='$shoplinker_user_id', ut = '$ut' where type='api' and name='shoplinker_user_id'";
                 DB::update($sql_shoplinker_user_id);
+            } else if ($type == 'mobile') {
+
+            } else if ($type == 'image') {
+                
             }
 
 

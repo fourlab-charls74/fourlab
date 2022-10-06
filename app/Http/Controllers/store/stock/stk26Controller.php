@@ -179,6 +179,7 @@ class stk26Controller extends Controller
         $products = $request->input("products", []);
         $admin_id = Auth('head')->user()->id;
 
+
         try {
             DB::beginTransaction();
 

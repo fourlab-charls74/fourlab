@@ -316,7 +316,7 @@
     // 상품 추가
     function addGoods() {
         const ff = document.f1;
-        if (ff.store_nm.value == '') {
+        if (ff.store_no.value == '') {
             $(".sch-store").click();
             return alert('매장을 선택해주세요.');
         }

@@ -282,6 +282,7 @@
             headerCheckboxSelection: params => {
                 const state = STATE; // 입고취소: -10, 입고대기: 10, 입고처리중: 20, 입고완료: 30
                 // 입고 대기이거나 입고 처리중인 경우에만 체크박스 표시 -> 삭제 가능하게함
+
                 return state == -10 || state == 30 ? false : true;
             },
             checkboxSelection: params => checkIsEditable(params),
@@ -341,6 +342,7 @@
         {headerName:"", field:"", width:"auto"}
     ];
 
+    
     /**
      * ag-grid init - 초기화 및 기타 logics
      */

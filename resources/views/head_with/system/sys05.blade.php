@@ -66,7 +66,7 @@
                 <a class="nav-link" id="mobile-tab" data-toggle="tab" href="#mobile" role="tab" aria-controls="mobile" aria-selected="false">모바일</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="image-tab" data-toggle="tab" href="#image" role="tab" aria-controls="image" aria-selected="false">이미지</a>
+                <a class="nav-link" id="image-tab" data-toggle="tab" href="#image" role="tab" aria-controls="image" aria-selected="false">이미지(FTP)</a>
             </li>
         </ul>
         <div class="tab-content" id="myTabContent">
@@ -92,7 +92,7 @@
                                                             <td>
                                                                 <div class="flax_box">
                                                                     <input type='text' class="form-control form-control-sm w-100" name='name' value="{{@$name}}">
-                                                                    <div class="gray">* 고객에게 주문, 클레임, 배송 처리 등 SMS가 발송되는 메시지 내용에 적용됩니다.</div>
+                                                                    <div style="color:gray;" >* 고객에게 주문, 클레임, 배송 처리 등 SMS가 발송되는 메시지 내용에 적용됩니다.</div>
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -101,7 +101,7 @@
                                                             <td>
                                                                 <div class="flax_box">
                                                                     <input type='text' class="form-control form-control-sm w-100" name='code' value='{{@$code}}'>
-                                                                    <div class="gray">* 상점 코드를 입력해 주십시오. 상점 코드는 영문 또는 숫자로 입력해주십시오.</div>
+                                                                    <div style="color:gray;">* 상점 코드를 입력해 주십시오. 상점 코드는 영문 또는 숫자로 입력해주십시오.</div>
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -110,7 +110,7 @@
                                                             <td>
                                                                 <div class="flax_box">
                                                                     <input type='text' class="form-control form-control-sm w-100" name='phone' value='{{@$phone}}'>
-                                                                    <div class="gray">* 상점 전화번호는 SMS 발송 시 회신 전화번호로 사용됩니다.</div>
+                                                                    <div style="color:gray;">* 상점 전화번호는 SMS 발송 시 회신 전화번호로 사용됩니다.</div>
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -119,7 +119,7 @@
                                                             <td>
                                                                 <div class="flax_box">
                                                                     <input type='text' class="form-control form-control-sm w-100" name='domain' value='{{@$s_domain}}'>
-                                                                    <div class="gray">* 상점 도메인을 입력해 주십시오. "http://"는 생략합니다.  EX)www.domain.co.kr</div>
+                                                                    <div style="color:gray;">* 상점 도메인을 입력해 주십시오. "http://"는 생략합니다.  EX)www.domain.co.kr</div>
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -128,7 +128,7 @@
                                                             <td>
                                                                 <div class="flax_box">
                                                                     <input type='text' class="form-control form-control-sm w-100" name='domain_bizest' value='{{@$a_domain}}'>
-                                                                    <div class="gray">* 외부 서비스 연동 시 관리자 도메인을 사용하게 되며, 기본값은 "bizest" 입니다. "http://"는 생략합니다.    EX)bizest.domain.co.kr</div>
+                                                                    <div style="color:gray;">* 외부 서비스 연동 시 관리자 도메인을 사용하게 되며, 기본값은 "bizest" 입니다. "http://"는 생략합니다.    EX)bizest.domain.co.kr</div>
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -137,7 +137,7 @@
                                                             <td>
                                                                 <div class="flax_box">
                                                                     <input type='text' class="form-control form-control-sm w-100" name='email' value='{{@$email}}'>
-                                                                    <div class="gray">* 메일 발송 시 발송자 이메일로 사용됩니다.</div>
+                                                                    <div style="color:gray;">* 메일 발송 시 발송자 이메일로 사용됩니다.</div>
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -146,7 +146,7 @@
                                                             <td>
                                                                 <div class="flax_box">
                                                                     <input type='text' class="form-control form-control-sm w-100" name='title' value='{{@$title}}'>
-                                                                    <div class="gray">* 상점의 모든 페이지의 기본 타이틀 태그로 사용됩니다.</div>
+                                                                    <div style="color:gray;">* 상점의 모든 페이지의 기본 타이틀 태그로 사용됩니다.</div>
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -155,7 +155,7 @@
                                                             <td>
                                                                 <div class="flax_box">
                                                                     <input type='text' class="form-control form-control-sm w-100" name='title_main' value='{{@$title_main}}'>
-                                                                    <div class="gray">* 쇼핑몰 메인 페이지의 타이틀 태그로 사용됩니다.</div>
+                                                                    <div style="color:gray;">* 쇼핑몰 메인 페이지의 타이틀 태그로 사용됩니다.</div>
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -164,7 +164,7 @@
                                                             <td>
                                                                 <div class="flax_box">
                                                                     <input type='text' class="form-control form-control-sm w-100" name='meta_tag' value='{{@$meta_tag}}'>
-                                                                    <div class="gray">* 쇼핑몰을 대표할 수 있는 키워드로 메타태그를 작성합니다.</div>
+                                                                    <div style="color:gray;">* 쇼핑몰을 대표할 수 있는 키워드로 메타태그를 작성합니다.</div>
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -173,7 +173,7 @@
                                                             <td>
                                                                 <div class="flax_box">
                                                                     <textarea rows="5" style="width: 100%;" name="add_script_content">{{@$add_script}}</textarea>
-                                                                    <div class="gray">* 공통 스크립트의 내용을 푸터에 삽입하여 전체 쇼핑몰에 적용되도록 설정합니다.</div>
+                                                                    <div style="color:gray;">* 공통 스크립트의 내용을 푸터에 삽입하여 전체 쇼핑몰에 적용되도록 설정합니다.</div>
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -186,7 +186,7 @@
                                                                         <option value='{{@$sale_place}}' selected>{{@$sale_place}}</option>
                                                                     </select>
                                                                 </div>
-                                                                <div class="gray">* 판매처를 선택해주십시오.</div>
+                                                                <div style="color:gray;">* 판매처를 선택해주십시오.</div>
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -226,7 +226,7 @@
                                                                 <div class="flax_box">
                                                                     <input type='text' class="form-control form-control-sm" name='' value="" style="width:150px;"> 일
                                                                 </div>
-                                                                <div class="gray">* 주문 완료 후 자동 취소 기간 동안 입금되지 않은 주문건은 자동으로 취소됩니다.</div>
+                                                                <div style="color:gray;">* 주문 완료 후 자동 취소 기간 동안 입금되지 않은 주문건은 자동으로 취소됩니다.</div>
                                                             </td>
                                                         </tr>
                                                         
@@ -263,7 +263,7 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                <div class="gray">* 현금영수증을 사용할 경우, "무통장 입금"으로 주문한 고객은 현금영수증을 신청할 수 있으며, 신청된 현금영수증은 입금 확인 시 자동으로 발행됩니다.</div>
+                                                                <div style="color:gray;">* 현금영수증을 사용할 경우, "무통장 입금"으로 주문한 고객은 현금영수증을 신청할 수 있으며, 신청된 현금영수증은 입금 확인 시 자동으로 발행됩니다.</div>
                                                             </td>
                                                         </tr>
                                                         
@@ -346,7 +346,7 @@
                                                                 <div class="flax_box">
                                                                     <input type='text' class="form-control form-control-sm" name='base_delivery_fee' value="{{@$base_delivery_fee}}" style="width:150px;">원
                                                                 </div>
-                                                                <div class="gray">* 기본 배송비를 입력합니다.</div>
+                                                                <div style="color:gray;">* 기본 배송비를 입력합니다.</div>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -355,7 +355,7 @@
                                                                 <div class="flax_box">
                                                                     <input type='text' class="form-control form-control-sm" name='add_delivery_fee' value="{{@$add_delivery_fee}}" style="width:150px;">원
                                                                 </div>
-                                                                <div class="gray">* 도서, 산간 지역으로 배송 시 추가로 발생하는 금액을 입력합니다.</div>
+                                                                <div style="color:gray;">* 도서, 산간 지역으로 배송 시 추가로 발생하는 금액을 입력합니다.</div>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -364,7 +364,7 @@
                                                                 <div class="flax_box">
                                                                     <input type='text' class="form-control form-control-sm" name='free_delivery_amt' value="{{@$free_delivery_amt}}" style="width:150px;">원
                                                                 </div>
-                                                                <div class="gray">* 고객이 배송비 무료 금액 이상 구매 시 무료로 배송을 합니다.</div>
+                                                                <div style="color:gray;">* 고객이 배송비 무료 금액 이상 구매 시 무료로 배송을 합니다.</div>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -373,7 +373,7 @@
                                                                 <div class="flax_box">
                                                                     <input type='text' class="form-control form-control-sm" name='wholesale_base_delivery_fee' value="" style="width:150px;">원
                                                                 </div>
-                                                                <div class="gray">* 도매 기본 배송비를 입력합니다.</div>
+                                                                <div style="color:gray;">* 도매 기본 배송비를 입력합니다.</div>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -382,7 +382,7 @@
                                                                 <div class="flax_box">
                                                                     <input type='text' class="form-control form-control-sm" name='wholesale_add_delivery_fee' value="" style="width:150px;">원
                                                                 </div>
-                                                                <div class="gray">* 도서,산간 지역으로 배송 시 추가로 발생하는 금액을 입력합니다.</div>
+                                                                <div style="color:gray;">* 도서,산간 지역으로 배송 시 추가로 발생하는 금액을 입력합니다.</div>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -391,7 +391,7 @@
                                                                 <div class="flax_box">
                                                                     <input type='text' class="form-control form-control-sm" name='wholesale_free_delivery_amt' value="{{@$wholesale_free_delivery_amt}}" style="width:150px;">원
                                                                 </div>
-                                                                <div class="gray">* 도매 고객이 배송비 무료 금액 이상 구매 시 무료로 배송을 합니다.</div>
+                                                                <div style="color:gray;">* 도매 고객이 배송비 무료 금액 이상 구매 시 무료로 배송을 합니다.</div>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -403,12 +403,12 @@
                                                                         <option value='{{@$dlv_cd}}' selected>{{@$dlv_cd}}</option>
                                                                     </select>
                                                                 </div>
-                                                                <div class="gray">* 주거래 택배업체를 선택하여 주십시오.</div>
+                                                                <div style="color:gray;">* 주거래 택배업체를 선택하여 주십시오.</div>
                                                             </td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
-                                                <div><h4>* 업체 별 배송비 설정은 "<a href="/head/standard/std02" target="_blank">기준정보 > 업체</a>"메뉴에서 업체별 배송비 정책을 설정할 수 있습니다.</h4></div>
+                                                <div><h4>* 업체 별 배송비 설정은 "<a href="/head/standard/std02" target="_blank">기준정보 > 업체 관리</a>"메뉴에서 업체별 배송비 정책을 설정할 수 있습니다.</h4></div>
                                             </div>
                                         </div>
                                     </div>
@@ -438,7 +438,7 @@
                                                                         <label class="custom-control-label" for="day_delivery_n">사용안함</label>
                                                                     </div>
                                                                 </div>
-                                                                <div class="gray">* 당일배송 기능의 사용여부를 선택하십시오.</div>
+                                                                <div style="color:gray;">* 당일배송 기능의 사용여부를 선택하십시오.</div>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -447,7 +447,7 @@
                                                                 <div class="flax_box">
                                                                     <input type='text' class="form-control form-control-sm" name='day_delivery_amt' value="" style="width:150px;">원
                                                                 </div>
-                                                                <div class="gray">* 고객이 당일배송을 선택할 경우 추가로 지불해야할 배송비를 입력합니다.</div>
+                                                                <div style="color:gray;">* 고객이 당일배송을 선택할 경우 추가로 지불해야할 배송비를 입력합니다.</div>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -467,7 +467,7 @@
                                                                         <label class="custom-control-label" for="day_delivery_type_a">전체상품</label>
                                                                     </div>
                                                                 </div>
-                                                                <div class="gray">* 당일배송이 가능한 상품유형을 선택하십시오.</div>
+                                                                <div style="color:gray;">* 당일배송이 가능한 상품유형을 선택하십시오.</div>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -476,7 +476,7 @@
                                                                 <div class="flax_box">
                                                                 <input type="text" class="form-control form-control-sm" name="day_delivery_zone" value="" maxlength="50" style="width: 30%;" />
                                                                 </div>
-                                                                <div class="gray">* 당일배송 가능 지역을 입력하십시오. 지역이 여러곳인 경우에는 콤마(,)를 사용하여 입력하실 수 있습니다.  EX)서울,경기,대전</div>
+                                                                <div style="color:gray;">* 당일배송 가능 지역을 입력하십시오. 지역이 여러곳인 경우에는 콤마(,)를 사용하여 입력하실 수 있습니다.  EX)서울,경기,대전</div>
                                                             </td>
                                                         </tr>
                                                   
@@ -517,7 +517,7 @@
                                                                 <div class="flax_box">
                                                                     <input type='text' class="form-control form-control-sm" name='base_delivery_fee' value="" style="width:150px;">원 이상
                                                                 </div>
-                                                                <div class="gray">* 고객이 적립한 적립금이 "사용 가능 적립금" 이상인 경우 적립금을 사용할 수 있습니다.</div>
+                                                                <div style="color:gray;">* 고객이 적립한 적립금이 "사용 가능 적립금" 이상인 경우 적립금을 사용할 수 있습니다.</div>
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -577,7 +577,7 @@
                                                                 <div class="flax_box">
                                                                     <input type='text' class="form-control form-control-sm" name='join_point' value="{{@$join_point}}" style="width:150px;">원
                                                                 </div>
-                                                                <div class="gray">* 쇼핑몰 회원으로 가입한 고객에게 지금할 적립금을 입력합니다.</div>
+                                                                <div style="color:gray;">* 쇼핑몰 회원으로 가입한 고객에게 지금할 적립금을 입력합니다.</div>
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -599,7 +599,7 @@
                                                     </colgroup>
                                                     <tbody>
                                                         <tr>
-                                                            <th rowspan="2">적립금 지급 방식</th>
+                                                            <th rowspan="2" width="200px">적립금 지급 방식</th>
                                                             <td>
                                                                 <div class="flax_box">
                                                                     <div class="custom-control custom-radio">
@@ -607,11 +607,11 @@
                                                                         <label class="custom-control-label" for="policy_s">쇼핑몰 기본 정책</label>
                                                                     </div>
                                                                 </div>
-                                                                <div class="gray">* 상품 구매 시 설정한 비율에 맞춰 고객에게 적립금을 지급 하도록 설정합니다.</div><br>
+                                                                <div style="color:gray;">* 상품 구매 시 설정한 비율에 맞춰 고객에게 적립금을 지급 하도록 설정합니다.</div><br>
                                                                 <div class="flax_box">
-                                                                    <input type='text' class="form-control form-control-sm" name='ratio' value="{{@$ratio}}" style="width:150px;">%
+                                                                    <input type='text' class="form-control form-control-sm" id='ratio' name='ratio' value="{{@$ratio}}" style="width:150px;">%
                                                                 </div>
-                                                                <div class="gray">* 상품 구매시 지급할 적립금의 비율을 입력합니다.</div>
+                                                                <div style="color:gray;">* 상품 구매시 지급할 적립금의 비율을 입력합니다.</div>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -622,7 +622,7 @@
                                                                         <label class="custom-control-label" for="policy_g">상품별 적립금 정책</label>
                                                                     </div>
                                                                 </div>
-                                                                <div class="gray">* 상품 구매시 상품에 설정된 적립금을 구매 고객에게 지급 하도록 설정합니다.</div>
+                                                                <div style="color:gray;">* 상품 구매시 상품에 설정된 적립금을 구매 고객에게 지급 하도록 설정합니다.</div>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -638,7 +638,7 @@
                                                                         <label class="custom-control-label" for="return_n">사용안함</label>
                                                                     </div>
                                                                 </div>
-                                                                <div class="gray">* 당일배송이 가능한 상품유형을 선택하십시오.</div>
+                                                                <div style="color:gray;">* 당일배송이 가능한 상품유형을 선택하십시오.</div>
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -672,7 +672,7 @@
                                                                         <label class="custom-control-label" for="day_delivery_n">사용안함</label>
                                                                     </div>
                                                                 </div>
-                                                                <div class="gray">* 상품 구매 고객이 후기를 작성할 경우 자동으로 적립금을 지금할 것인지 여부를 설정합니다.</div>
+                                                                <div style="color:gray;">* 상품 구매 고객이 후기를 작성할 경우 자동으로 적립금을 지금할 것인지 여부를 설정합니다.</div>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -681,7 +681,7 @@
                                                                 <div class="flax_box">
                                                                     <input type='text' class="form-control form-control-sm" name='estimate_point' value="" style="width:150px;">원
                                                                 </div>
-                                                                <div class="gray">* 상품 구매 고객이 후기를 작성했을 때 자동으로 지급할 적립금을 입력합니다.</div>
+                                                                <div style="color:gray;">* 상품 구매 고객이 후기를 작성했을 때 자동으로 지급할 적립금을 입력합니다.</div>
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -728,7 +728,7 @@
                                                                         <label class="custom-control-label" for="kakao_n">사용안함</label>
                                                                     </div>
                                                                 </div>
-                                                                <div class="gray">* KAKAO 사용 여부를 "사용안함"으로 설정하면 알림톡이 발송되지 않습니다.</div>
+                                                                <div style="color:gray;">* KAKAO 사용 여부를 "사용안함"으로 설정하면 알림톡이 발송되지 않습니다.</div>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -737,7 +737,7 @@
                                                                 <div class="flax_box">
                                                                     <input type='text' class="form-control form-control-sm" name='kakao_key' value="" style="width:200px;">
                                                                 </div>
-                                                                <div class="gray">* 카카오 알림톡 발송 키 입니다.</div>
+                                                                <div style="color:gray;">* 카카오 알림톡 발송 키 입니다.</div>
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -784,7 +784,7 @@
                                                                         <label class="custom-control-label" for="sms_n">사용안함</label>
                                                                     </div>
                                                                 </div>
-                                                                <div class="gray">* SMS 사용 여부를 "사용안함"으로 설정하면 SMS가 발송되지 않으며, 아래의 "SMS 전송 설정" 항목의 설정된 조건들도 모두 무효화됩니다. </div>
+                                                                <div style="color:gray;">* SMS 사용 여부를 "사용안함"으로 설정하면 SMS가 발송되지 않으며, 아래의 "SMS 전송 설정" 항목의 설정된 조건들도 모두 무효화됩니다. </div>
                                                             </td>
                                                         </tr>
                                                         
@@ -822,7 +822,7 @@
                                                                 <td >회원 가입 인증 SMS 발송 메시지 &nbsp;</td>
                                                                 <td>
                                                                     <input type="text" name="auth_msg" class="form-control form-control-sm" value="" style="width: 100%;" />
-                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('auth_msg','[[SHOP_NAME]]인증번호 [[AUTH_NO]]를 입력해주세요.');">[[SHOP_NAME]]인증번호 [[AUTH_NO]]를 입력해주세요.</div>
+                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('auth_msg','[[SHOP_NAME]]인증번호 [[AUTH_NO]]를 입력해주세요.');">[[SHOP_NAME]]인증번호 [[AUTH_NO]]를 입력해주세요.</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -834,7 +834,7 @@
                                                                 <td>&nbsp;</td>
                                                                 <td>
                                                                     <input type="text" name="join_msg" class="form-control form-control-sm" value="{{@$join_msg}}" style="width: 100%;" />
-                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('join_msg','[[SHOP_NAME]][USER_NAME] 회원님의 가입을 진심으로 축하드립니다.');">[[SHOP_NAME]][USER_NAME] 회원님의 가입을 진심으로 축하드립니다.</div>
+                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('join_msg','[[SHOP_NAME]][USER_NAME] 회원님의 가입을 진심으로 축하드립니다.');">[[SHOP_NAME]][USER_NAME] 회원님의 가입을 진심으로 축하드립니다.</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -845,7 +845,7 @@
                                                                 <td>&nbsp;</td>
                                                                 <td>
                                                                     <input type="text" name="passwd_msg" class="form-control form-control-sm" value="{{@$passwd_msg}}" style="width: 100%;" />
-                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('passwd_msg','[[SHOP_NAME]][USER_NAME] 회원님의 비밀번호는 [PASSWD] 입니다.');">[[SHOP_NAME]][USER_NAME] 회원님의 비밀번호는 [PASSWD] 입니다.</div>
+                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('passwd_msg','[[SHOP_NAME]][USER_NAME] 회원님의 비밀번호는 [PASSWD] 입니다.');">[[SHOP_NAME]][USER_NAME] 회원님의 비밀번호는 [PASSWD] 입니다.</div>
                                                                 </td>
                                                             </tr>
 
@@ -858,14 +858,14 @@
                                                                 <td>결제완료 상태</td>
                                                                 <td>
                                                                     <input type="text" name="order_msg_pay" class="form-control form-control-sm" value="" style="width: 100%;"/>
-                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('order_msg_pay','[[SHOP_NAME]][USER_NAME] 고객님의 주문이 접수되었습니다.([ORDER_NO])');">[[SHOP_NAME]][USER_NAME] 고객님의 주문이 접수되었습니다.([ORDER_NO])</div>
+                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('order_msg_pay','[[SHOP_NAME]][USER_NAME] 고객님의 주문이 접수되었습니다.([ORDER_NO])');">[[SHOP_NAME]][USER_NAME] 고객님의 주문이 접수되었습니다.([ORDER_NO])</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <td>미결제 상태</td>
                                                                 <td>
                                                                     <input type="text" name="order_msg_not_pay" class="form-control form-control-sm" value="" style="width: 100%;"/>
-                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('order_msg_not_pay','[[SHOP_NAME]]입금계좌:[BANK] [ACCOUNT] 예금주:[DEPOSITOR] [ORDER_AMT]원');">[[SHOP_NAME]]입금계좌: [BANK] [ACCOUNT] 예금주:[DEPOSITOR] [ORDER_AMT]원</div>
+                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('order_msg_not_pay','[[SHOP_NAME]]입금계좌:[BANK] [ACCOUNT] 예금주:[DEPOSITOR] [ORDER_AMT]원');">[[SHOP_NAME]]입금계좌: [BANK] [ACCOUNT] 예금주:[DEPOSITOR] [ORDER_AMT]원</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -877,7 +877,7 @@
                                                                 <td>&nbsp;</td>
                                                                 <td>
                                                                     <input type="text" name="payment_msg"  class="form-control form-control-sm" value="{{@$payment_msg}}" style="width: 100%;"/>
-                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('payment_msg','[[SHOP_NAME]]입금이 확인되었습니다. 감사합니다.');">[[SHOP_NAME]]입금이 확인되었습니다. 감사합니다.</div>
+                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('payment_msg','[[SHOP_NAME]]입금이 확인되었습니다. 감사합니다.');">[[SHOP_NAME]]입금이 확인되었습니다. 감사합니다.</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -889,7 +889,7 @@
                                                                 <td>&nbsp;</td>
                                                                 <td>
                                                                     <input type="text" name="delivery_msg" class="form-control form-control-sm" value="{{@$delivery_msg}}" style="width: 100%;" />
-                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('delivery_msg','[[SHOP_NAME]][GOODS_NAME]..발송완료 [DELIVERY_NAME]([DELIVERY_NO])');">[[SHOP_NAME]][GOODS_NAME]..발송완료 [DELIVERY_NAME]([DELIVERY_NO])</div>
+                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('delivery_msg','[[SHOP_NAME]][GOODS_NAME]..발송완료 [DELIVERY_NAME]([DELIVERY_NO])');">[[SHOP_NAME]][GOODS_NAME]..발송완료 [DELIVERY_NAME]([DELIVERY_NO])</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -901,14 +901,14 @@
                                                                 <td>환불</td>
                                                                 <td>
                                                                     <input type="text" name="refund_msg_complete" class="form-control form-control-sm" value="{{@$refund_msg_complete}}" style="width: 100%;" />
-                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('refund_msg_complete','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO] 주문건 환불처리되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO] 주문건 환불처리되었습니다.</div>
+                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('refund_msg_complete','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO] 주문건 환불처리되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO] 주문건 환불처리되었습니다.</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <td>승인취소</td>
                                                                 <td>
                                                                     <input type="text" name="refund_msg_cancel" class="form-control form-control-sm" value="{{@$refund_msg_cancel}}" style="width: 100%;"/>
-                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('refund_msg_cancel','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO] 주문건 승인취소되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO] 주문건 승인취소되었습니다.</div>
+                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('refund_msg_cancel','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO] 주문건 승인취소되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO] 주문건 승인취소되었습니다.</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -920,21 +920,21 @@
                                                                 <td>무통장&nbsp;</td>
                                                                 <td>
                                                                     <input type="text" name="cancel_msg_bank"  class="form-control form-control-sm" value="" style="width: 100%;" />
-                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('cancel_msg_bank','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 취소 처리되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 취소 처리되었습니다.</div>
+                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('cancel_msg_bank','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 취소 처리되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 취소 처리되었습니다.</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <td>카드&nbsp;</td>
                                                                 <td>
                                                                     <input type="text" name="cancel_msg_card" class="form-control form-control-sm" value="" style="width: 100%;" />
-                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('cancel_msg_card','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 승인취소되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 승인취소되었습니다.</div>
+                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('cancel_msg_card','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 승인취소되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 승인취소되었습니다.</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <td>계좌이체&nbsp;</td>
                                                                 <td>
                                                                     <input type="text" name="cancel_msg_transfer" class="form-control form-control-sm" value="" style="width: 100%;" />
-                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('cancel_msg_transfer','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 환불완료 처리되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 환불완료 처리되었습니다.</div>
+                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('cancel_msg_transfer','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 환불완료 처리되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 환불완료 처리되었습니다.</div>
                                                                 </td>
                                                             </tr>
 
@@ -946,7 +946,7 @@
                                                                 <td>&nbsp;</td>
                                                                 <td>
                                                                     <input type="text" name="out_of_stock_msg" class="form-control form-control-sm" value="{{@$out_of_stock_msg}}" style="width: 100%;" />
-                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('out_of_stock_msg','[[SHOP_NAME]]주문하신상품이 품절되었습니다.고객센터로 문의 바랍니다.');">[[SHOP_NAME]]주문하신상품이 품절되었습니다.고객센터로 문의 바랍니다.</div>
+                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('out_of_stock_msg','[[SHOP_NAME]]주문하신상품이 품절되었습니다.고객센터로 문의 바랍니다.');">[[SHOP_NAME]]주문하신상품이 품절되었습니다.고객센터로 문의 바랍니다.</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -957,7 +957,7 @@
                                                                 <td>&nbsp;</td>
                                                                 <td>
                                                                     <input type="text" name="birth_msg" class="form-control form-control-sm" value="" style="width: 100%;" />
-                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('birth_msg','[[SHOP_NAME]][USER_NAME] 고객님의 생일쿠폰이 발급되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님의 생일쿠폰이 발급되었습니다.</div>
+                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('birth_msg','[[SHOP_NAME]][USER_NAME] 고객님의 생일쿠폰이 발급되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님의 생일쿠폰이 발급되었습니다.</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -968,7 +968,7 @@
                                                                 <td>&nbsp;</td>
                                                                 <td>
                                                                     <input type="text" name="welcome_msg" class="form-control form-control-sm" value="" style="width: 100%;" />
-                                                                    <div class="gray" style="cursor: pointer;" onclick="applySMSMsg('welcome_msg','[[SHOP_NAME]][USER_NAME] 고객님의 웰컴백쿠폰이 발급되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 웰컴백쿠폰이 발급되었습니다.</div>
+                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('welcome_msg','[[SHOP_NAME]][USER_NAME] 고객님의 웰컴백쿠폰이 발급되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 웰컴백쿠폰이 발급되었습니다.</div>
                                                                 </td>
                                                             </tr>
                                                         </div>
@@ -1062,12 +1062,12 @@
                                                     </colgroup>
                                                     <tbody>
                                                         <tr>
-                                                            <th>최초 출력 메뉴</th>
+                                                            <th width="200px">최초 출력 메뉴</th>
                                                             <td>
                                                                 <div class="flax_box">
                                                                     <input type="text" name="init_url" class="form-control form-control-sm" value="" style="width: 100%;" />
                                                                 </div>
-                                                                <div class="gray">* 관리자 로그인 후 최초로 출력할 기본 메뉴를 지정합니다. 최근에 사용한 메뉴 내역이 있는 경우에는 최근 사용 메뉴가 자동으로 출력됩니다. </div>
+                                                                <div style="color:gray;">* 관리자 로그인 후 최초로 출력할 기본 메뉴를 지정합니다. 최근에 사용한 메뉴 내역이 있는 경우에는 최근 사용 메뉴가 자동으로 출력됩니다. </div>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -1083,7 +1083,7 @@
                                                                         <label class="custom-control-label" for="ssl_n">사용안함</label>
                                                                     </div>
                                                                 </div>
-                                                                <div class="gray">* 보안 인증서를 사용할 수 있는 경우 "사용함"으로 설정하시기 바랍니다. </div>
+                                                                <div style="color:gray;">* 보안 인증서를 사용할 수 있는 경우 "사용함"으로 설정하시기 바랍니다. </div>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -1099,7 +1099,7 @@
                                                                         <label class="custom-control-label" for="wholesale_n">사용안함</label>
                                                                     </div>
                                                                 </div>
-                                                                <div class="gray">* "<a href="#">회원/CRM > 회원그룹관리</a>" 메뉴에서 도매 회원 그룹을 생성할 수 있습니다. </div>
+                                                                <div style="color:gray;">* "<a href="/head/member/mem03">회원/CRM > 회원그룹관리</a>" 메뉴에서 도매 회원 그룹을 생성할 수 있습니다. </div>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -1115,7 +1115,7 @@
                                                                         <label class="custom-control-label" for="est_confirm_n">사용안함</label>
                                                                     </div>
                                                                 </div>
-                                                                <div class="gray">* 고객이 상품평 등록한 경우, 관리자의 승인 후 상품평 리스트에 노출하는 기능을 사용합니다. "사용안함"을 선택한 경우 상품평 등록 시 자동으로 노출됩니다. </div>
+                                                                <div style="color:gray;">* 고객이 상품평 등록한 경우, 관리자의 승인 후 상품평 리스트에 노출하는 기능을 사용합니다. "사용안함"을 선택한 경우 상품평 등록 시 자동으로 노출됩니다. </div>
                                                             </td>
                                                         </tr>
                                                         
@@ -1138,7 +1138,7 @@
                                                     </colgroup>
                                                     <tbody>
                                                         <tr>
-                                                            <th>신상품 기간</th>
+                                                            <th width="200px">신상품 기간</th>
                                                             <td width="35%">
                                                                 <input type="text" class="form-control form-control-sm" name="new_good_day" value="{{@$new_good_day}}" maxlength="3" style="width: 100px; text-align: right;display:inline">일
                                                             </td>
@@ -1232,7 +1232,7 @@
                                                                 </div>
                                                             </td>
                                                             <td>
-                                                                <div class="gray">* 1:1문의 답변 시 발송되는 메일의 스킨파일("front/{$theme}/skin/email/councel.html")은 변경/수정이 가능합니다.</div>
+                                                                <div style="color:gray;">* 1:1문의 답변 시 발송되는 메일의 스킨파일("front/{$theme}/skin/email/councel.html")은 변경/수정이 가능합니다.</div>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -1250,7 +1250,7 @@
                                                                 </div>
                                                             </td>
                                                             <td>
-                                                                <div class="gray">* 상품 문의 답변 시 발송되는 메일의 스킨파일("front/{$theme}/skin/email/goods_qa.html")은 변경/수정이 가능합니다.</div>
+                                                                <div style="color:gray;">* 상품 문의 답변 시 발송되는 메일의 스킨파일("front/{$theme}/skin/email/goods_qa.html")은 변경/수정이 가능합니다.</div>
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -1286,7 +1286,7 @@
                                                                 </div>
                                                             </td>
                                                             <td>
-                                                                <div class="gray">* 1년간 접속하지 않은 회원을 휴면회원으로 전환시킵니다.</div>
+                                                                <div style="color:gray;">* 1년간 접속하지 않은 회원을 휴면회원으로 전환시킵니다.</div>
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -1375,7 +1375,7 @@
                                                             <td width="35%">
                                                                 <input type="text" class="form-control form-control-sm" name="community_goods_qa" value="{{@$community_goods_qa}}" maxlength="2" style="width: 100px; text-align: right;display:inline" />개
                                                             </td>
-                                                            <td width="15%" style="text-align: left;"><label>커뮤니티 상품평 출력개수</label></td>
+                                                            <th>커뮤니티 상품평 출력개수</th>
                                                             <td width="35%">
                                                                 <input type="text" class="form-control form-control-sm" name="community_goods_review" value="{{@$community_goods_review}}" maxlength="2" style="width: 100px; text-align: right;display:inline" />개
                                                             </td>
@@ -1569,7 +1569,7 @@
                                                             <td>
                                                                 <div class="flax_box">
                                                                     <input type='text' class="form-control form-control-sm w-100" name='m_domain' value="">
-                                                                    <div class="gray">* 모바일 상점 도메인을 입력해 주십시오. "http://"는 생략합니다.  EX)m.domain.co.kr</div>
+                                                                    <div style="color:gray;">* 모바일 상점 도메인을 입력해 주십시오. "http://"는 생략합니다.  EX)m.domain.co.kr</div>
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -1592,7 +1592,7 @@
                                                     </colgroup>
                                                     <tbody>
                                                         <tr>
-                                                            <th>카테고리 상품 출력 갯수</th>
+                                                            <th width="200px">카테고리 상품 출력 갯수</th>
                                                             <td>
                                                                 <input type="text"  class="form-control form-control-sm" name="m_category_goods_cnt" value="" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
                                                             </td>
@@ -1700,7 +1700,7 @@
                                                                         <label class="custom-control-label" for="image_n">사용안함</label>
                                                                     </div>
                                                                 </div>
-                                                                <div class="gray">* 별도의 이미지서버를 사용하는 경우에 "사용함"으로 설정하시기 바랍니다.</div>
+                                                                <div style="color:gray;">* 별도의 이미지서버를 사용하는 경우에 "사용함"으로 설정하시기 바랍니다.</div>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -1708,7 +1708,7 @@
                                                             <td>
                                                                 <div class="flax_box">
                                                                     <input type='text' class="form-control form-control-sm w-100" name='domain' value="">
-                                                                    <div class="gray">* 별도의 이미지서버를 사용하는 경우, "http://"를 제외한 이미지 도메인을 입력해주십시오.  EX)image.domain.co.kr</div>
+                                                                    <div style="color:gray;">* 별도의 이미지서버를 사용하는 경우, "http://"를 제외한 이미지 도메인을 입력해주십시오.  EX)image.domain.co.kr</div>
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -1743,35 +1743,35 @@
                                                                         <label class="custom-control-label" for="ftp_n">사용안함</label>
                                                                     </div>
                                                                 </div>
-                                                                <div class="gray">* 이미지 파일이 업로드 될 때 별도의 이미지 서버에 FTP 전송을 자동으로 수행합니다.</div>
+                                                                <div style="color:gray;">* 이미지 파일이 업로드 될 때 별도의 이미지 서버에 FTP 전송을 자동으로 수행합니다.</div>
                                                             </td>
                                                         </tr>
                                                         <tr>
                                                             <th>FTP 주소</th>
                                                             <td>
                                                                 <input type="text"  class="form-control form-control-sm" name="hostname" value=""/>
-                                                                <div class="gray">* 이미지(FTP) 서버의 도메인 또는 IP를 입력하십시오.</div>
+                                                                <div style="color:gray;">* 이미지(FTP) 서버의 도메인 또는 IP를 입력하십시오.</div>
                                                             </td>
                                                         </tr>
                                                         <tr>
                                                             <th>사용자 ID</th>
                                                             <td>
                                                                 <input type="text"  class="form-control form-control-sm" name="username" value=""/>
-                                                                <div class="gray">* 이미지(FTP) 서버에 접속할 수 있는 아이디를 입력하십시오.</div>
+                                                                <div style="color:gray;">* 이미지(FTP) 서버에 접속할 수 있는 아이디를 입력하십시오.</div>
                                                             </td>
                                                         </tr>
                                                         <tr>
                                                             <th>비밀번호</th>
                                                             <td>
                                                                 <input type="text"  class="form-control form-control-sm" style="width:100%" name='password' value=""/>
-                                                                <div class="gray">* 이미지(FTP) 서버에 접속할 수 있는 비밀번호를 입력하십시오.</div>
+                                                                <div style="color:gray;">* 이미지(FTP) 서버에 접속할 수 있는 비밀번호를 입력하십시오.</div>
                                                             </td>
                                                         </tr>
                                                         <tr>
                                                             <th>디렉토리</th>
                                                             <td>
                                                                 <input type="text"  class="form-control form-control-sm" name='aphome_dir' value=""/>
-                                                                <div class="gray">* 이미지(FTP) 서버의 초기 디렉토리를 입력하십시오.</div>
+                                                                <div style="color:gray;">* 이미지(FTP) 서버의 초기 디렉토리를 입력하십시오.</div>
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -2127,6 +2127,7 @@
        account_no.value = "";
        
     }
+
 
 </script>
 
