@@ -852,6 +852,7 @@
                         window.close();
                     } else {
                         alert("입고취소를 실패하였습니다. 다시 한번 시도하여 주십시오.");
+                        console.log(response);
                     }
                 }).catch((error) => {});
             }

@@ -583,7 +583,7 @@ class stk11Controller extends Controller {
 		} catch (Exception $e) {
 			DB::rollBack();
 			$msg = $e->getMessage();
-			return response()->json(['code' => -1, 'message' => "입고 취소를 실패하였습니다. 다시 한번 시도하여 주십시오.", 'msg' => $msg], 200);
+			return response()->json(['code' => -1, 'message' => $msg], 200);
 		}
 
 		try {
@@ -596,7 +596,8 @@ class stk11Controller extends Controller {
 			DB::commit();
 		} catch(Exception $e) {
 			DB::rollBack();
-			return response()->json(['code' => -2, 'message' => "입고 취소를 실패하였습니다. 다시 한번 시도하여 주십시오."], 200);
+			$msg = $e->getMessage();
+			return response()->json(['code' => -2, 'message' => $msg], 200);
 		}
 
 		return response()->json(['code' => 1, 'message' => "입고가 취소되었습니다."], 200);

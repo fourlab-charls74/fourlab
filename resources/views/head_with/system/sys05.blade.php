@@ -13,7 +13,7 @@
 <div class="card shadow mb-1">
     <div class="card-body">
         <div style="text-align:right;">
-            <a href="/head/system/sys04" id="code_view" class="btn btn-sm btn-primary shadow-sm pl-2">코드별 보기</a>
+            <a href="/head/system/sys04" id="code_view" class="btn btn-sm btn-primary shadow-sm">코드별 보기</a>
         </div>
 
         <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -1866,51 +1866,50 @@
                 return false;
         }
             
-            $.ajax({
-                method: 'post',
-                url: '/head/system/sys05/update',
-                data: frm,
-                dataType: 'json',
-                success: function(data) {
-                    if (data.code == '200') {
-                        alert('상점 정보가 수정되었습니다.');
-                        location.reload();
-                    } else {
-                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                        console.log(data);
-                    }
-                },
-                error: function(e) {
-                        console.log(e.responseText)
+        $.ajax({
+            method: 'post',
+            url: '/head/system/sys05/update',
+            data: frm,
+            dataType: 'json',
+            success: function(data) {
+                if (data.code == '200') {
+                    alert('상점 정보가 수정되었습니다.');
+                    location.reload();
+                } else {
+                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                    console.log(data);
                 }
-            });
+            },
+            error: function(e) {
+                    console.log(e.responseText)
+            }
+        });
 
     }
 
     function updateData_order() {
     
         let frm = $('form[name=order]').serialize();
-        
         frm += "&type=order";
 
-            $.ajax({
-                method: 'post',
-                url: '/head/system/sys05/update',
-                data: frm,
-                dataType: 'json',
-                success: function(data) {
-                    if (data.code == '200') {
-                        alert('주문 정보가 수정되었습니다.');
-                        location.reload();
-                    } else {
-                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                        console.log(data);
-                    }
-                },
-                error: function(e) {
-                        console.log(e.responseText)
+        $.ajax({
+            method: 'post',
+            url: '/head/system/sys05/update',
+            data: frm,
+            dataType: 'json',
+            success: function(data) {
+                if (data.code == '200') {
+                    alert('주문 정보가 수정되었습니다.');
+                    location.reload();
+                } else {
+                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                    console.log(data);
                 }
-            });
+            },
+            error: function(e) {
+                    console.log(e.responseText)
+            }
+        });
 
     }
 
@@ -1919,24 +1918,25 @@
     
         let frm = $('form[name=delivery]').serialize();
         frm += "&type=delivery";
-            $.ajax({
-                method: 'post',
-                url: '/head/system/sys05/update',
-                data: frm,
-                dataType: 'json',
-                success: function(data) {
-                    if (data.code == '200') {
-                        alert('배송 정보가 수정되었습니다.');
-                        location.reload();
-                    } else {
-                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                        console.log(data);
-                    }
-                },
-                error: function(e) {
-                        console.log(e.responseText)
+
+        $.ajax({
+            method: 'post',
+            url: '/head/system/sys05/update',
+            data: frm,
+            dataType: 'json',
+            success: function(data) {
+                if (data.code == '200') {
+                    alert('배송 정보가 수정되었습니다.');
+                    location.reload();
+                } else {
+                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                    console.log(data);
                 }
-            });
+            },
+            error: function(e) {
+                    console.log(e.responseText)
+            }
+        });
 
     }
 
@@ -1944,24 +1944,25 @@
     
         let frm = $('form[name=point]').serialize();
         frm += "&type=point";
-            $.ajax({
-                method: 'post',
-                url: '/head/system/sys05/update',
-                data: frm,
-                dataType: 'json',
-                success: function(data) {
-                    if (data.code == '200') {
-                        alert('적립금 정보가 수정되었습니다.');
-                        location.reload();
-                    } else {
-                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                        console.log(data);
-                    }
-                },
-                error: function(e) {
-                        console.log(e.responseText)
+
+        $.ajax({
+            method: 'post',
+            url: '/head/system/sys05/update',
+            data: frm,
+            dataType: 'json',
+            success: function(data) {
+                if (data.code == '200') {
+                    alert('적립금 정보가 수정되었습니다.');
+                    location.reload();
+                } else {
+                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                    console.log(data);
                 }
-            });
+            },
+            error: function(e) {
+                    console.log(e.responseText)
+            }
+        });
 
     }
 
@@ -1969,24 +1970,25 @@
     
         let frm = $('form[name=kakao]').serialize();
         frm += "&type=kakao";
-            $.ajax({
-                method: 'post',
-                url: '/head/system/sys05/update',
-                data: frm,
-                dataType: 'json',
-                success: function(data) {
-                    if (data.code == '200') {
-                        alert('KAKAO 정보가 수정되었습니다.');
-                        location.reload();
-                    } else {
-                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                        console.log(data);
-                    }
-                },
-                error: function(e) {
-                        console.log(e.responseText)
+
+        $.ajax({
+            method: 'post',
+            url: '/head/system/sys05/update',
+            data: frm,
+            dataType: 'json',
+            success: function(data) {
+                if (data.code == '200') {
+                    alert('KAKAO 정보가 수정되었습니다.');
+                    location.reload();
+                } else {
+                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                    console.log(data);
                 }
-            });
+            },
+            error: function(e) {
+                    console.log(e.responseText)
+            }
+        });
 
     }
 
@@ -1994,24 +1996,25 @@
     
         let frm = $('form[name=sms]').serialize();
         frm += "&type=sms";
-            $.ajax({
-                method: 'post',
-                url: '/head/system/sys05/update',
-                data: frm,
-                dataType: 'json',
-                success: function(data) {
-                    if (data.code == '200') {
-                        alert('SMS 정보가 수정되었습니다.');
-                        location.reload();
-                    } else {
-                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                        console.log(data);
-                    }
-                },
-                error: function(e) {
-                        console.log(e.responseText)
+        
+        $.ajax({
+            method: 'post',
+            url: '/head/system/sys05/update',
+            data: frm,
+            dataType: 'json',
+            success: function(data) {
+                if (data.code == '200') {
+                    alert('SMS 정보가 수정되었습니다.');
+                    location.reload();
+                } else {
+                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                    console.log(data);
                 }
-            });
+            },
+            error: function(e) {
+                    console.log(e.responseText)
+            }
+        });
 
     }
 
@@ -2019,24 +2022,25 @@
     
         let frm = $('form[name=stock_reduction]').serialize();
         frm += "&type=stock_reduction";
-            $.ajax({
-                method: 'post',
-                url: '/head/system/sys05/update',
-                data: frm,
-                dataType: 'json',
-                success: function(data) {
-                    if (data.code == '200') {
-                        alert('부가기능 정보가 수정되었습니다.');
-                        location.reload();
-                    } else {
-                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                        console.log(data);
-                    }
-                },
-                error: function(e) {
-                        console.log(e.responseText)
+
+        $.ajax({
+            method: 'post',
+            url: '/head/system/sys05/update',
+            data: frm,
+            dataType: 'json',
+            success: function(data) {
+                if (data.code == '200') {
+                    alert('부가기능 정보가 수정되었습니다.');
+                    location.reload();
+                } else {
+                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                    console.log(data);
                 }
-            });
+            },
+            error: function(e) {
+                    console.log(e.responseText)
+            }
+        });
 
     }
 
@@ -2044,24 +2048,25 @@
     
         let frm = $('form[name=list_count]').serialize();
         frm += "&type=list_count";
-            $.ajax({
-                method: 'post',
-                url: '/head/system/sys05/update',
-                data: frm,
-                dataType: 'json',
-                success: function(data) {
-                    if (data.code == '200') {
-                        alert('게시물 정보가 수정되었습니다.');
-                        location.reload();
-                    } else {
-                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                        console.log(data);
-                    }
-                },
-                error: function(e) {
-                        console.log(e.responseText)
+
+        $.ajax({
+            method: 'post',
+            url: '/head/system/sys05/update',
+            data: frm,
+            dataType: 'json',
+            success: function(data) {
+                if (data.code == '200') {
+                    alert('게시물 정보가 수정되었습니다.');
+                    location.reload();
+                } else {
+                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                    console.log(data);
                 }
-            });
+            },
+            error: function(e) {
+                    console.log(e.responseText)
+            }
+        });
 
     }
 
@@ -2069,24 +2074,25 @@
     
         let frm = $('form[name=admin]').serialize();
         frm += "&type=admin";
-            $.ajax({
-                method: 'post',
-                url: '/head/system/sys05/update',
-                data: frm,
-                dataType: 'json',
-                success: function(data) {
-                    if (data.code == '200') {
-                        alert('서비스 정보가 수정되었습니다.');
-                        location.reload();
-                    } else {
-                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                        console.log(data);
-                    }
-                },
-                error: function(e) {
-                        console.log(e.responseText)
+
+        $.ajax({
+            method: 'post',
+            url: '/head/system/sys05/update',
+            data: frm,
+            dataType: 'json',
+            success: function(data) {
+                if (data.code == '200') {
+                    alert('서비스 정보가 수정되었습니다.');
+                    location.reload();
+                } else {
+                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                    console.log(data);
                 }
-            });
+            },
+            error: function(e) {
+                    console.log(e.responseText)
+            }
+        });
 
     }
 
@@ -2094,29 +2100,31 @@
         
         let frm = $('form[name=image]').serialize();
         frm += "&type=image";
-            $.ajax({
-                method: 'post',
-                url: '/head/system/sys05/update',
-                data: frm,
-                dataType: 'json',
-                success: function(data) {
-                    if (data.code == '200') {
-                        alert('서비스 정보가 수정되었습니다.');
-                        location.reload();
-                    } else {
-                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                        console.log(data);
-                    }
-                },
-                error: function(e) {
-                        console.log(e.responseText)
+
+        $.ajax({
+            method: 'post',
+            url: '/head/system/sys05/update',
+            data: frm,
+            dataType: 'json',
+            success: function(data) {
+                if (data.code == '200') {
+                    alert('서비스 정보가 수정되었습니다.');
+                    location.reload();
+                } else {
+                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                    console.log(data);
                 }
-            });
+            },
+            error: function(e) {
+                    console.log(e.responseText)
+            }
+        });
 
     }
 </script>
 
 <script>
+
     function remove1(){
        let bank_nm = document.getElementById('bank_nm');
        let account_no = document.getElementById('account_no');
@@ -2125,11 +2133,8 @@
        bank_nm.value = "";
        account_holder.value = "";
        account_no.value = "";
-       
     }
 
-
 </script>
-
    
 @stop

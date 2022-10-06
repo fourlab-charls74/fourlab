@@ -364,7 +364,7 @@
                         const qty = obj.hasOwnProperty('qty') ? obj.qty : "";
                         const opt_kind_nm = obj.hasOwnProperty('opt_kind_nm') ? obj.opt_kind_nm : "";
 
-                        console.log(opt_kind_nm);
+                        // console.log(opt_kind_nm);
                         let buy_unit_cost = obj.hasOwnProperty('buy_unit_cost') ? obj.buy_unit_cost : "";
                         obj.hasOwnProperty('avg_wonga') && apply_avg_wonga_checked
                             ? buy_unit_cost = obj.avg_wonga
