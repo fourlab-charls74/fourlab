@@ -173,26 +173,19 @@ class sal01Controller extends Controller
 
 	public function upload(Request $request)
 	{
+		$save_path = "data/store/sale/sal01/";
+		if (!Storage::disk('public')->exists($save_path)) {
+			Storage::disk('public')->makeDirectory($save_path);
+		}
 		if ( 0 < $_FILES['file']['error'] ) {
 			echo json_encode(array(
 				"code" => 500,
 				"errmsg" => 'Error: ' . $_FILES['file']['error']
 			));
-		}
-		else {
-			/**
-			 * DB 저장이 끝나면 디렉토리 생성(없을 경우) 및 파일 저장
-			 */
-			$save_path = "data/store/sale/sal01/";
-
-			if (!Storage::disk('public')->exists($save_path)) {
-				Storage::disk('public')->makeDirectory($save_path);
-			}
-
+		} else {
 			$file = sprintf("data/store/sale/sal01/%s", $_FILES['file']['name']);
 			$tmp_name = $_FILES['file']['tmp_name'];
 			move_uploaded_file($tmp_name, $file);
-
 			echo json_encode(array(
 				"code" => 200,
 				"file" => $file
