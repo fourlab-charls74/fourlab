@@ -390,7 +390,7 @@ SearchPrdcd.prototype.Search = function(e) {
             let is_contain = this[c + '_grid'].gridOptions.api.getPinnedTopRow(0).data.item === "포함";
             data += `&${c}_contain=${is_contain}`;
         });
-        this.grid.Request('/store/api/prdcd/search', data, 1);
+        this.grid.Request('/store/api/prdcd/search', data, -1);
     }
 
     if (event_type == 'keypress') {
