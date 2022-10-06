@@ -231,7 +231,7 @@ class sal01Controller extends Controller
 			/**
 			 * 기존 tmp order에 ord_no가 없는 경우 insert, 있는 경우 update 처리
 			 */
-			// DB::beginTransaction();
+			DB::beginTransaction();
 			try {
 				$saved_type = $this->saveTmpOrder($order);
 			} catch (Exception $e) { // 임시 주문서 저장시 문제 발생한 경우 에러 처리
@@ -249,7 +249,7 @@ class sal01Controller extends Controller
 				}
 			}
 
-			// ($code == 200 || $code == 201) ? DB::commit() : DB::rollBack(); // 추가 또는 수정이 완료된 경우 commit하여 DB 반영
+			($code == 200 || $code == 201) ? DB::commit() : DB::rollBack(); // 추가 또는 수정이 완료된 경우 commit하여 DB 반영
 			pass_saved_order:
 			array_push($codes, $code);
 		}
