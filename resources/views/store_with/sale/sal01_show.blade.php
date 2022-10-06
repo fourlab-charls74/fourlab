@@ -188,7 +188,6 @@
 		gridOptions.api.setRowData([]);
 	});
 
-
 	var GridData = [];
 
 	/**

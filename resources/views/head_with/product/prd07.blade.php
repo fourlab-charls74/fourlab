@@ -600,7 +600,7 @@
         const SHOP_POINT_RATIO = "{{$order_point_ratio}}";
         const apply = () => { // 적용
 
-            if (!applyValidation()) return false; // 여기
+            if (!applyValidation()) return false;
 
             let row = {};
             prd_cnt			    = _("#prd_cnt").value; // 상품수

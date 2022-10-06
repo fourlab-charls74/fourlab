@@ -65,6 +65,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
     // 포스
     Route::prefix("pos")->namespace('pos')->group(function () {
         Route::get('', 'PosController@index');
+        Route::get('search/{cmd?}', 'PosController@search_command');
     });
 
     //코드관리

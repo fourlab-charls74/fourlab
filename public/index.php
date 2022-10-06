@@ -9,6 +9,8 @@
 
 define('LARAVEL_START', microtime(true));
 
+// ini_set('memory_limit','512M'); // 주문데이터 테스트 업로드를 위한 메모리 사이즈 크기 제한 해제
+
 /*
 |--------------------------------------------------------------------------
 | Register The Auto Loader
