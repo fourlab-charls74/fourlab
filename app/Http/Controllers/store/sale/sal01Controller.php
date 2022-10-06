@@ -228,7 +228,7 @@ class sal01Controller extends Controller
 			try {
 				$saved_type = $this->saveTmpOrder($order);
 			} catch (Exception $e) { // 임시 주문서 저장시 문제 발생한 경우 에러 처리
-				// DB::rollback();
+				DB::rollback();
 				$code = -400;
 				goto pass_saved_order;
 			}
