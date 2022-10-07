@@ -232,12 +232,7 @@ class sys05Controller extends Controller
         $sql_sabangnet_key = "select * from conf where type = 'api' and name = 'sabangnet_key'";
         $sabangnet_key = DB::selectOne($sql_sabangnet_key);
 
-
-
-
-
-    
-
+        
         $values = [
             //상점 탭
             'name' => $name->value,
@@ -618,16 +613,16 @@ class sys05Controller extends Controller
             }
 
 
-                DB::commit();
-                $code = '200';
-                $msg = '';
-            } catch (Exception $e) {
-                $code = 500;
-                DB::rollBack();
-                $msg = $e->getMessage();
-            }
-            
-            return response()->json(['code' => $code, 'msg' => $msg]);
+            DB::commit();
+            $code = '200';
+            $msg = '';
+        } catch (Exception $e) {
+            $code = 500;
+            DB::rollBack();
+            $msg = $e->getMessage();
         }
+        
+        return response()->json(['code' => $code, 'msg' => $msg]);
+    }
    
 }

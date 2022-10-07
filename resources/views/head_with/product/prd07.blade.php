@@ -443,12 +443,8 @@
                 children: [
                     {field: "option_kind", headerName: "옵션구분", editable: true, width: 200, cellStyle: CELL_STYLE.EDIT},
                     {field: "opt1", headerName: "옵션1", editable: true, width: 200, cellStyle: CELL_STYLE.EDIT},
-                    {field: "opt2", headerName: "옵션2",width:200, 
-                        editable: params => {
-                            if (params.data.is_chk_opt_kind2 == true) {
-                                return true;
-                            }
-                        },
+                    {field: "opt2", headerName: "옵션2", width: 200, 
+                        editable: params => params.data.is_chk_opt_kind2 == true,
                         cellStyle: params => {
                             if (params.data.is_chk_opt_kind2 == true) {
                                 return CELL_STYLE.EDIT;
