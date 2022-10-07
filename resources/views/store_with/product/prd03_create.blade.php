@@ -1,0 +1,609 @@
+@extends('store_with.layouts.layout-nav')
+@section('title', '원부자재상품등록')
+@section('content')
+
+<div class="show_layout py-3 px-sm-3">
+	<div class="page_tit d-flex justify-content-between">
+		<div class="d-flex">
+			<h3 class="d-inline-flex">원부자재상품추가</h3>
+			<div class="d-inline-flex location">
+				<span class="home"></span>
+				<span>/ 원부자재상품관리</span>
+				<span>/ 추가</span>
+			</div>
+		</div>
+		<div class="d-flex">
+			<a href="javascript:void(0)" onclick="save();" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i>저장</a>
+			<a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i>닫기</a>
+		</div>
+	</div>
+
+	<style>
+		.required:after {
+			content: " *";
+			color: red;
+		}
+
+		.table th {
+			min-width: 120px;
+		}
+
+		@media (max-width: 740px) {
+			.table td {
+				float: unset !important;
+				width: 100% !important;
+			}
+		}
+
+		/* 상품코드 api로 검색시 code-filter 부분 제거 */
+		#SearchPrdcdModal .code-filter {
+			display: none;
+			padding-top: 5px;
+		}
+
+		#SearchPrdcdModal #search_prdcd_sbtn {
+			margin-top: 27px;
+		}
+	</style>
+
+	<form name="f1" id="f1">
+		<div class="card_wrap aco_card_wrap">
+			<div class="card shadow">
+				<div class="card-header mb-0">
+					<a href="#">원부자재상품 정보 입력</a>
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="col-12">
+							<div class="table-box-ty2 mobile">
+								<table class="table incont table-bordered" width="100%" cellspacing="0">
+									<tbody>
+										<tr>
+											<th class="required">구분</th>
+											<td style="width:35%;">
+												<div class="flax_box">
+													<select name='type' class="form-control form-control-sm">
+														<option value=''>선택</option>
+														@foreach ($types as $type)
+														<option value='{{ $type->code_id }}'>{{ $type->code_id }} : {{ $type->code_val }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
+											<th class="required">년도</th>
+											<td style="width:35%;">
+												<div class="flax_box">
+													<select name='year' class="form-control form-control-sm">
+														<option value=''>선택</option>
+														@foreach ($years as $year)
+														<option value='{{ $year->code_id }}'>{{ $year->code_id }} : {{ $year->code_val }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th class="required">시즌</th>
+											<td>
+												<div class="flax_box">
+													<select name='season' class="form-control form-control-sm">
+														<option value=''>선택</option>
+														@foreach ($seasons as $season)
+														<option value='{{ $season->code_id }}'>{{ $season->code_id }} : {{ $season->code_val }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
+											<th class="required">성별</th>
+											<td>
+												<div class="flax_box">
+													<select name='gender' class="form-control form-control-sm">
+														<option value=''>선택</option>
+														@foreach ($genders as $gender)
+														<option value='{{ $gender->code_id }}'>{{ $gender->code_id }} : {{ $gender->code_val }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th class="required">아이템</th>
+											<td>
+												<div class="flax_box">
+													<select name='item' class="form-control form-control-sm">
+														<option value=''>선택</option>
+														@foreach ($items as $item)
+														<option value='{{ $item->code_id }}'>{{ $item->code_id }} : {{ $item->code_val }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
+											<th class="required">품목</th>
+											<td>
+												<div class="flax_box">
+													<select name='opt' class="form-control form-control-sm">
+														<option value=''>선택</option>
+														@foreach ($opts as $opt)
+														<option value='{{ $opt->code_id }}'>{{ $opt->code_id }} : {{ $opt->code_val }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th class="required">칼라</th>
+											<td>
+												<div class="flax_box">
+													<select name='color' class="form-control form-control-sm">
+														<option value=''>선택</option>
+														@foreach ($colors as $color)
+														<option value='{{ $color->code_id }}'>{{ $color->code_id }} : {{ $color->code_val }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
+											<th class="required">사이즈</th>
+											<td>
+												<div class="flax_box">
+													<select name='size' class="form-control form-control-sm">
+														<option value=''>선택</option>
+														@foreach ($sizes as $size)
+														<option value='{{ $size->code_id }}'>{{ $size->code_id }} : {{ $size->code_val }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th class="required">원부자재명</th>
+											<td>
+												<div class="flax_box">
+													<input type='text' class="form-control form-control-sm" name='prd_nm' id="prd_nm" value=''>
+												</div>
+											</td>
+											<th class="required">공급업체(거래선)</th>
+											<td>
+												<div class="flax_box">
+													<select name='sup_com' class="form-control form-control-sm">
+														<option value=''>선택</option>
+														@foreach ($sup_coms as $com)
+														<option value='{{ $com->com_id }}'>{{ $com->com_id }} : {{ $com->com_nm }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th class="required">단위</th>
+											<td>
+												<div class="flax_box">
+													<select name='unit' class="form-control form-control-sm">
+														<option value=''>선택</option>
+														@foreach ($units as $unit)
+														<option value='{{ $unit->code_id }}'>{{ $unit->code_id }} : {{ $unit->code_val }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
+											<th class="required">상품코드</th>
+											<td>
+												<div class="form-inline-inner input-box w-100">
+													<div class="form-inline inline_btn_box">
+														<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm w-100 ac-style-no search-enter">
+														<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+													</div>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th>이미지</th>
+											<td colspan="3">
+												<div style="text-align:center;" id="multi_img">
+													<input type='file' id='btnAdd' name="file" multiple='multiple' accept=".jpg" />
+												</div>
+												<div id='img_div'></div>
+												@if(count($images) > 0)
+													@foreach(@$images as $image)
+													<div id='img_show_div' data-img="{{$image->seq}}" style="display:inline-block;position:relative;width:150px;height:120px;margin:5px;z-index:1">
+														<img src="{{$image->img_url}}" alt="" id="img_show" style="width:100%;height:100%;z-index:none">
+														<input type="button" value="x" onclick="delete_img('{{$image->prd_cd}}','{{$image->seq}}')" style="width:20px;height:20px;position:absolute;right:0px;top:0px;border:none;font-size:large;font-weight:bolder;background:none;color:black;padding-bottom:20px;">
+													</div>
+													@endforeach
+												@endif
+											</td>
+										</tr>
+								</table>
+
+								<div style="width:100%;padding-top:20px;text-align:center;">
+									<button type="button" class="btn btn-primary ml-2" onclick="add()">추가</button>
+								</div>
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="card">
+			<div class="card-header mb-0">
+				<a href="#">일괄저장목록</a>
+			</div>
+			<div class="card-body pt-2">
+				<div class="card-title">
+					<div class="filter_wrap">
+						<div class="fl_box px-0 mx-0">
+							<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span> 건</h6>
+						</div>
+						<div class="fr_box">
+							<a href="#" onclick="return deleteRows();" class="btn btn-sm btn-primary shadow-sm option-del-btn"><span class="fs-12">제거</span></a>
+						</div>
+					</div>
+				</div>
+				<div class="table-responsive">
+						<div id="div-gd" class="ag-theme-balham"></div>
+					</div>
+			</div>
+		</div>
+
+	</form>
+
+</div>
+
+<script>
+	const columns = [{
+			field: "chk",
+			headerName: '',
+			cellClass: 'hd-grid-code',
+			headerCheckboxSelection: true,
+			checkboxSelection: true,
+			width: 30,
+			pinned: 'left',
+			sort: null,
+		},
+		{
+			field: "type",
+			headerName: "구분",
+		},
+		{
+			field: "year",
+			headerName: "년도",
+		},
+		{
+			field: "season",
+			headerName: "시즌",
+		},
+		{
+			field: "gender",
+			headerName: "성별",
+		},
+		{
+			field: "item",
+			headerName: "아이템",
+		},
+		{
+			field: "image",
+			headerName: "이미지",
+			cellRenderer: (params) => `<img style="display:block; width: 100%; max-width: 30px; margin: 0 auto;" src="${params.data.image}">`
+		},
+		{
+			field: "image_url",
+			headerName: "이미지 경로",
+			hide: true
+		},
+		{
+			field: "opt",
+			headerName: "품목",
+		},
+		{
+			field: "color",
+			headerName: "칼라",
+		},
+		{
+			field: "size",
+			headerName: "사이즈",
+		},
+		{
+			field: "prd_nm",
+			headerName: "원부자재명",
+		},
+		{
+			field: "sup_com",
+			headerName: "공급업체(거래선)",
+		},
+		{
+			field: "unit",
+			headerName: "단위",
+		},
+		{
+			field: "prd_cd",
+			headerName: "상품코드",
+			width: 140,
+		},
+	];
+</script>
+<script type="text/javascript" charset="utf-8">
+	const pApp = new App('', {
+		gridId: "#div-gd",
+	});
+	let gx;
+
+	$(document).ready(function() {
+		pApp.ResizeGrid(705);
+		pApp.BindSearchEnter();
+		let gridDiv = document.querySelector(pApp.options.gridId);
+		gx = new HDGrid(gridDiv, columns);
+		gx.gridOptions.rowDragManaged = true;
+		gx.gridOptions.animateRows = true;
+	});
+
+	const addRow = (row) => {
+    	gx.gridOptions.api.applyTransaction({add : [{...row}]});
+		const count = gx.gridOptions.api.getDisplayedRowCount();
+		$('#gd-total').html(count);
+    };
+
+	const deleteRows = () => {
+		const rows = gx.getSelectedRows();
+		if (Array.isArray(rows) && !(rows.length > 0)) {
+			alert('선택된 항목이 없습니다.')
+			return false;
+		} else {
+			if (!confirm("선택한 상품을 수정 목록에서 삭제 하시겠습니까?")) return false;
+			rows.map(row => { gx.gridOptions.api.applyTransaction({remove : [row]}); });
+			const count = gx.gridOptions.api.getDisplayedRowCount();
+			$('#gd-total').html(count);
+		};
+	};
+
+	let added_base64_image = "";
+	
+	const add = () => {
+		// if (!validation()) return;
+		let image_file_obj = document.f1.file.files[0];
+		let row = {
+			type: document.f1.type.value,
+			year: document.f1.year.value,
+			season: document.f1.season.value,
+			gender: document.f1.gender.value,
+			item: document.f1.item.value,
+			image: added_base64_image,
+			opt: document.f1.opt.value,
+			color: document.f1.color.value,
+			size: document.f1.size.value,
+			prd_nm: document.f1.prd_nm.value,
+			sup_com: document.f1.sup_com.value,
+			unit: document.f1.unit.value,
+			year: document.f1.year.value,
+			prd_cd: document.f1.prd_cd.value,
+		};
+		addRow(row);
+	};
+
+	const validation = (cmd) => {
+		// 브랜드 선택 여부
+		if (f1.type.selectedIndex == 0) {
+			f1.type.focus();
+			return alert("구분을 선택해주세요.");
+		}
+
+		// 년도 선택여부
+		if (f1.year.selectedIndex == 0) {
+			f1.year.focus();
+			return alert("년도를 선택해주세요.");
+		}
+
+		// 시즌 선택여부
+		if (f1.season.selectedIndex == 0) {
+			f1.season.focus();
+			return alert("시즌을 선택해주세요.");
+		}
+
+		// 성별 선택여부
+		if (f1.gender.selectedIndex == 0) {
+			f1.gender.focus();
+			return alert("성별을 선택해주세요.");
+		}
+
+		// 아이템 선택여부
+		if (f1.item.selectedIndex == 0) {
+			f1.item.focus();
+			return alert("아이템을 선택해주세요.");
+		}
+
+		// 품목 선택여부
+		if (f1.opt.selectedIndex == 0) {
+			f1.opt.focus();
+			return alert("품목을 선택해주세요.");
+		}
+
+		// 칼라 선택여부
+		if (f1.color.selectedIndex == 0) {
+			f1.color.focus();
+			return alert("칼라를 선택해주세요.");
+		}
+
+		// 사이즈 선택여부
+		if (f1.size.selectedIndex == 0) {
+			f1.size.focus();
+			return alert("사이즈를 선택해주세요.");
+		}
+
+		// 원부자재명 입력여부
+		if (f1.prd_nm.value.trim() === '') {
+			f1.prd_nm.focus();
+			return alert("원부자재명을 입력해주세요.");
+		}
+
+		// 단위 선택여부
+		if (f1.unit.selectedIndex == 0) {
+			f1.unit.focus();
+			return alert("단위를 선택해주세요.");
+		}
+
+		// 상품코드 입력여부
+		if (f1.prd_cd.value.trim() === '') {
+			f1.prd_cd.focus();
+			return alert("원부자재명을 입력해주세요.");
+		}
+
+		return true;
+	}
+
+	function save() {
+		let rows = gx.getRows();
+		if (rows.length < 1) return alert("저장 목록에 정보를 입력해주세요.");
+
+		axios({
+			url: '/store/product/prd03/create',
+			method: 'post',
+			data: {
+				data: rows,
+			},
+		}).then(function(res) {
+			if (res.data.code === 200) {
+				alert("저장이 완료되었습니다.");
+			} else {
+				console.log(res.data);
+				alert("일괄 저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+			}
+		}).catch(function(err) {
+			console.log(err);
+		});
+	}
+
+	/**
+	 * 이미지 - 매장관리 구현된 이미지 참고하여 작업
+	 */
+	$(document).ready(function() {
+		$("input:file[name='file']").change(function() {
+			var str = $(this).val();
+			var fileName = str.split('\\').pop().toLowerCase();
+
+			checkFileName(fileName);
+		});
+	});
+
+	function checkFileName(str) {
+
+		//1. 확장자 체크
+		var ext = str.split('.').pop().toLowerCase();
+		if ($.inArray(ext, ['jpg']) == -1) {
+			alert(ext + '파일은 업로드 하실 수 없습니다.');
+			$("input:file[name='file']").val("");
+			$('#img_div').remove();
+		} else {
+
+		}
+	}
+	
+	(imageView = function imageView(img_div, btn) {
+
+		var img_div = document.getElementById(img_div);
+		var btnAdd = document.getElementById(btn)
+		var sel_files = [];
+
+		// 이미지와 체크 박스를 감싸고 있는 div 속성
+		var div_style = 'display:inline-block;position:relative;' +
+			'width:150px;height:120px;margin:5px;z-index:1';
+		// 미리보기 이미지 속성
+		var img_style = 'width:100%;height:100%;z-index:none';
+		// 이미지안에 표시되는 체크박스의 속성
+		var chk_style = 'width:20px;height:20px;position:absolute;right:0px;top:0px;border:none;font-size:large;' +
+			'font-weight:bolder;background:none;color:black;padding-bottom:20px;';
+
+		btnAdd.onchange = function(e) {
+			var files = e.target.files;
+			var fileArr = Array.prototype.slice.call(files)
+			for (f of fileArr) {
+				imageLoader(f);
+			}
+		}
+
+		/*첨부된 이미지들을 배열에 넣고 미리보기 */
+		imageLoader = function(file) {
+
+			// 이미지 한개만 미리 보기 되도록 고정
+			if (img_div.getElementsByTagName('div').length > 0) {
+				img_div.removeChild(img_div.getElementsByTagName('div')[0]);
+			}
+			
+			sel_files.push(file);
+			var reader = new FileReader();
+			reader.onload = function(ee) {
+				let img = document.createElement('img')
+				img.setAttribute('style', img_style)
+				img.src = ee.target.result;
+				added_base64_image = ee.target.result;
+				img_div.appendChild(makeDiv(img, file));
+			}
+
+			reader.readAsDataURL(file);
+		}
+
+		makeDiv = function(img, file) {
+			var div = document.createElement('div');
+			div.setAttribute('style', div_style);
+
+			var btn = document.createElement('input');
+			btn.setAttribute('type', 'button');
+			btn.setAttribute('value', 'x');
+			btn.setAttribute('delFile', file.name);
+			btn.setAttribute('style', chk_style);
+			btn.onclick = function(ev) {
+				var ele = ev.srcElement;
+				var delFile = ele.getAttribute('delFile');
+				for (var i = 0; i < sel_files.length; i++) {
+					if (delFile == sel_files[i].name) {
+						sel_files.splice(i, 1);
+					}
+				}
+
+				dt = new DataTransfer();
+
+				for (f in sel_files) {
+					var file = sel_files[f];
+					dt.items.add(file);
+				}
+				btnAdd.files = dt.files;
+				var p = ele.parentNode;
+				img_div.removeChild(p);
+			}
+			div.appendChild(img);
+			div.appendChild(btn);
+
+			return div;
+		}
+	})('img_div', 'btnAdd')
+
+	function delete_img(prd_cd, seq) {
+		let img_show = document.querySelectorAll("#img_show_div");
+
+		if (confirm("선택한 사진을 삭제하시겠습니까?")) {
+			$.ajax({
+				method: 'post',
+				url: '/store/standard/std02/del_img',
+				data: {
+					data_img: prd_cd,
+					seq: seq
+				},
+				success: function(data) {
+					if (data.code == '200') {
+						for (let i = 0; i < img_show.length; i++) {
+							if (img_show[i].dataset.img == seq) {
+								img_show[i].remove();
+								break;
+							}
+						}
+					} else {
+						alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+					}
+				},
+				error: function(res, status, error) {
+					console.log(error);
+				}
+			});
+		}
+	}
+</script>
+@stop
