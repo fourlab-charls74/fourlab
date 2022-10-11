@@ -176,10 +176,13 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('prd03/search','prd03Controller@search');
 
         Route::get('prd03/create', 'prd03Controller@showCreate');
+        Route::post('prd03/get-seq', 'prd03Controller@getSeq');
         Route::post('prd03/create', 'prd03Controller@create');
 
         Route::get('prd03/edit','prd03Controller@edit');
         Route::post('prd03/edit','prd03Controller@edit');
+
+        Route::post('prd03/del-img', 'prd03Controller@delImg');
     });
 
     // 생산입고관리

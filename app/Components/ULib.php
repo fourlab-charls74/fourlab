@@ -29,7 +29,7 @@ class ULib
         //저장
         Storage::disk('public')->put($save_file, base64_decode($image));
         
-        return sprintf('%s%s', '/storage', $save_file);
+        return sprintf('%s', $save_file);
     }
 
     public static function deleteFile($path) {

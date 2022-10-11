@@ -175,7 +175,7 @@
 										</tr>
 										<tr>
 											<th class="required">단위</th>
-											<td>
+											<td colspan="3">
 												<div class="flax_box">
 													<select name='unit' class="form-control form-control-sm">
 														<option value=''>선택</option>
@@ -183,15 +183,6 @@
 														<option value='{{ $unit->code_id }}'>{{ $unit->code_id }} : {{ $unit->code_val }}</option>
 														@endforeach
 													</select>
-												</div>
-											</td>
-											<th class="required">상품코드</th>
-											<td>
-												<div class="form-inline-inner input-box w-100">
-													<div class="form-inline inline_btn_box">
-														<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm w-100 ac-style-no search-enter">
-														<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-													</div>
 												</div>
 											</td>
 										</tr>
@@ -264,27 +255,7 @@
 		{
 			field: "type",
 			headerName: "구분",
-		},
-		{
-			field: "year",
-			headerName: "년도",
-		},
-		{
-			field: "season",
-			headerName: "시즌",
-		},
-		{
-			field: "gender",
-			headerName: "성별",
-		},
-		{
-			field: "item",
-			headerName: "아이템",
-		},
-		{
-			field: "image",
-			headerName: "이미지",
-			cellRenderer: (params) => `<img style="display:block; width: 100%; max-width: 30px; margin: 0 auto;" src="${params.data.image}">`
+			width: 70
 		},
 		{
 			field: "image_url",
@@ -294,31 +265,69 @@
 		{
 			field: "opt",
 			headerName: "품목",
+			width: 80
+		},
+		{
+			field: "image",
+			headerName: "이미지",
+			cellRenderer: (params) => `<img style="display:block; width: 100%; max-width: 30px; margin: 0 auto;" src="${params.data.image}">`
+		},
+		{
+			field: "prd_cd",
+			headerName: "원부자재코드",
+			width: 140,
 		},
 		{
 			field: "color",
 			headerName: "칼라",
+			cellRenderer: (params) => params.data.color.split(':')[1],
+			width: 80
 		},
 		{
 			field: "size",
 			headerName: "사이즈",
+			cellRenderer: (params) => params.data.size.split(':')[1],
+			width: 80
 		},
 		{
 			field: "prd_nm",
 			headerName: "원부자재명",
+			width: 100
+		},
+		{
+			field: "seq",
+			headerName: "순서",
+			width: 50
+		},
+		{
+			field: "year",
+			headerName: "년도",
+			width: 80
+		},
+		{
+			field: "season",
+			headerName: "시즌",
+			width: 80
+		},
+		{
+			field: "gender",
+			headerName: "성별",
+			width: 80
+		},
+		{
+			field: "item",
+			headerName: "아이템",
+			width: 80
 		},
 		{
 			field: "sup_com",
 			headerName: "공급업체(거래선)",
+			width: 120
 		},
 		{
 			field: "unit",
 			headerName: "단위",
-		},
-		{
-			field: "prd_cd",
-			headerName: "상품코드",
-			width: 140,
+			width: 120
 		},
 	];
 </script>
@@ -350,7 +359,10 @@
 			return false;
 		} else {
 			if (!confirm("선택한 상품을 수정 목록에서 삭제 하시겠습니까?")) return false;
-			rows.map(row => { gx.gridOptions.api.applyTransaction({remove : [row]}); });
+			rows.map(row => { 
+				added_rows.splice(row.idx, 1)
+				gx.gridOptions.api.applyTransaction({remove : [row]}); 
+			});
 			const count = gx.gridOptions.api.getDisplayedRowCount();
 			$('#gd-total').html(count);
 		};
@@ -358,30 +370,91 @@
 
 	let added_base64_image = "";
 	
-	const add = () => {
-		// if (!validation()) return;
-		let image_file_obj = document.f1.file.files[0];
-		let row = {
-			type: document.f1.type.value,
-			year: document.f1.year.value,
-			season: document.f1.season.value,
-			gender: document.f1.gender.value,
-			item: document.f1.item.value,
-			image: added_base64_image,
-			opt: document.f1.opt.value,
-			color: document.f1.color.value,
-			size: document.f1.size.value,
-			prd_nm: document.f1.prd_nm.value,
-			sup_com: document.f1.sup_com.value,
-			unit: document.f1.unit.value,
-			year: document.f1.year.value,
-			prd_cd: document.f1.prd_cd.value,
-		};
-		addRow(row);
+	let added_rows = [];
+	const add = async() => {
+		
+		if (!validation()) return;
+		const response = await axios({ url: `/store/product/prd03/get-seq`, method: 'post',
+			data: {
+				type: document.f1.type.value,
+				year: document.f1.year.value,
+				season: document.f1.season.value,
+				item: document.f1.item.value,
+				opt: document.f1.opt.value
+			}
+		});
+
+		const { seq, code } = response.data;
+		if (code == 200) {
+
+			const idx = added_rows.length;
+
+			const brand = document.f1.type.value;
+			let type = "";
+			if (brand == "SM") { 
+				type = "S";
+			} else if (brand == "PR") {
+				type = "G";
+			}
+			
+			const no_color_size_prd_cd = 
+				brand
+				+ document.f1.year.value
+				+ document.f1.season.value
+				+ document.f1.gender.value
+				+ document.f1.item.value
+				+ seq
+				+ document.f1.opt.value
+			;
+			const prd_cd = no_color_size_prd_cd + document.f1.color.value + document.f1.size.value;
+
+			added_rows.push({
+				idx: idx,
+				brand: brand,
+				type: type,
+				year: document.f1.year.value,
+				season: document.f1.season.value,
+				gender: document.f1.gender.value,
+				item: document.f1.item.value,
+				image: added_base64_image,
+				opt: document.f1.opt.value,
+				color: document.f1.color.value,
+				size: document.f1.size.value,
+				prd_nm: document.f1.prd_nm.value,
+				sup_com: document.f1.sup_com.value,
+				unit: document.f1.unit.value,
+				year: document.f1.year.value,
+				prd_cd: prd_cd,
+				seq: seq
+			});
+
+			let rows = {
+				idx: idx,
+				type: document.f1.type[document.f1.type.selectedIndex].text,
+				year: document.f1.year[document.f1.year.selectedIndex].text,
+				season: document.f1.season[document.f1.season.selectedIndex].text,
+				gender: document.f1.gender[document.f1.gender.selectedIndex].text,
+				item: document.f1.item[document.f1.item.selectedIndex].text,
+				image: added_base64_image,
+				opt: document.f1.opt[document.f1.opt.selectedIndex].text,
+				color: document.f1.color[document.f1.color.selectedIndex].text,
+				size: document.f1.size[document.f1.size.selectedIndex].text,
+				prd_nm: document.f1.prd_nm.value,
+				sup_com: document.f1.sup_com[document.f1.sup_com.selectedIndex].text,
+				unit: document.f1.unit[document.f1.unit.selectedIndex].text,
+				year: document.f1.year[document.f1.year.selectedIndex].text,
+				prd_cd: no_color_size_prd_cd,
+				seq: seq
+			};
+
+			addRow(rows);
+			
+		}
+
 	};
 
 	const validation = (cmd) => {
-		// 브랜드 선택 여부
+		// 구분 선택 여부
 		if (f1.type.selectedIndex == 0) {
 			f1.type.focus();
 			return alert("구분을 선택해주세요.");
@@ -441,17 +514,11 @@
 			return alert("단위를 선택해주세요.");
 		}
 
-		// 상품코드 입력여부
-		if (f1.prd_cd.value.trim() === '') {
-			f1.prd_cd.focus();
-			return alert("원부자재명을 입력해주세요.");
-		}
-
 		return true;
 	}
 
 	function save() {
-		let rows = gx.getRows();
+		let rows = added_rows;
 		if (rows.length < 1) return alert("저장 목록에 정보를 입력해주세요.");
 
 		axios({
@@ -463,6 +530,9 @@
 		}).then(function(res) {
 			if (res.data.code === 200) {
 				alert("저장이 완료되었습니다.");
+			} else if (res.data.code === -1) {
+				const prd_cd = res.data.prd_cd;
+				alert(`${prd_cd}는 중복되었거나 이미 존재하는 상품 코드입니다.\n중복을 제거하거나 상품 코드를 재확인 후 다시 시도해주세요.`);
 			} else {
 				console.log(res.data);
 				alert("일괄 저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
@@ -582,7 +652,7 @@
 		if (confirm("선택한 사진을 삭제하시겠습니까?")) {
 			$.ajax({
 				method: 'post',
-				url: '/store/standard/std02/del_img',
+				url: '/store/product/prd03/del_img',
 				data: {
 					data_img: prd_cd,
 					seq: seq
