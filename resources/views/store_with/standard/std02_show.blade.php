@@ -426,7 +426,6 @@
 												</tr>
 											@endif
 										@endif
-
 									</tbody>
 								</table>
 							</div>

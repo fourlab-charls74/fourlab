@@ -518,7 +518,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row_wrap">
+                                <div class="row_wrap code-filter">
                                     <div class="row">
                                         <div class="col-4 col-lg-2 p-1 pl-0 pl-lg-2">
                                             <div class="table-responsive">

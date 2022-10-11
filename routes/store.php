@@ -170,6 +170,16 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('prd02/batch-create', 'prd02Controller@batch_create');
         Route::post('prd02/upload', 'prd02Controller@upload');
         Route::put('prd02/show', 'prd02Controller@update');
+
+        // 원부자재 상품 관리
+        Route::get('prd03','prd03Controller@index');
+        Route::get('prd03/search','prd03Controller@search');
+
+        Route::get('prd03/create', 'prd03Controller@showCreate');
+        Route::post('prd03/create', 'prd03Controller@create');
+
+        Route::get('prd03/edit','prd03Controller@edit');
+        Route::post('prd03/edit','prd03Controller@edit');
     });
 
     // 생산입고관리

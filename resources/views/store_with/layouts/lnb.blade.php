@@ -19,7 +19,7 @@
                 <ul>
                     <li><a href="/head/product/prd01" target="_blank">(개)상품관리</a></li>
                     <li><a href="/store/product/prd02">(완)상품관리(재고)</a></li>
-                    <li><a href="/head/product/prd01" target="_blank">원부자재관리</a></li>
+                    <li><a href="/store/product/prd03">(개)원부자재상품관리</a></li>
                 </ul>
             </li>
             <li>
