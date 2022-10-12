@@ -339,6 +339,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('mem01','mem01Controller@index');
         Route::get('mem01/search', 'mem01Controller@search');
         Route::get('mem01/batch', 'mem01Controller@batch');
+        Route::post('mem01/upload',	'mem01Controller@upload');
     });
 
     // 영업관리
