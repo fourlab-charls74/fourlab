@@ -133,12 +133,12 @@ class Order
         return $ord_no;
     }
 
-    public function CompleteOrderSugi($ord_opt_no = "", $ord_state = "", $is_store_order = false)
+    public function CompleteOrderSugi($ord_opt_no = "", $ord_state = "", $is_store_order = false, $is_sugi = true)
 	{
 		if ( $ord_state != ORD_STATE_PG_EXPECTED ) {	// 출고요청, 출고완료 상태만 재고 차감 처리
 
 			if ($is_store_order == true) {
-				$result = $this->ProcStoreOrder($ord_opt_no, $point_flag = false, $sms_flag = false);
+				$result = $this->ProcStoreOrder($ord_opt_no, $point_flag = false, $sms_flag = false, $is_sugi);
 			} else {
 				$result = $this->ProcOrder($ord_opt_no, $point_flag = false, $sms_flag = false);
 			}
@@ -1429,7 +1429,7 @@ class Order
 	/////////////////////// 매장주문 //////////////////////
 	//////////////////////////////////////////////////////
 
-	public function ProcStoreOrder($ord_opt_no = "", $point_flag = true, $sms_flag = true)
+	public function ProcStoreOrder($ord_opt_no = "", $point_flag = true, $sms_flag = true, $is_sugi = true)
 	{
 		$result_code = 1;
 		$ord_no = $this->ord_no;
@@ -1622,7 +1622,7 @@ class Order
 						'qty' => $ord_qty * -1,
 						'stock_state_date' => date_format(date_create($ord_date),"Ymd"),
 						'ord_opt_no' => $ord_opt_no,
-						'comment' => '수기판매',
+						'comment' => $is_sugi ? '수기판매' : '매장판매',
 						'rt' => now(),
 						'admin_id' => $admin_id,
 						'admin_nm' => $admin_nm,
@@ -1747,7 +1747,7 @@ class Order
 						'qty' => $ord_qty * -1,
 						'stock_state_date' => date_format(date_create($ord_date),"Ymd"),
 						'ord_opt_no' => $ord_opt_no,
-						'comment' => '수기판매',
+						'comment' => $is_sugi ? '수기판매' : '매장판매',
 						'rt' => now(),
 						'admin_id' => $admin_id,
 						'admin_nm' => $admin_nm,

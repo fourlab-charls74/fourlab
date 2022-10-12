@@ -101,6 +101,7 @@ textarea::placeholder {color: #999;font-size: inherit;}
 /* etc */
 .noresize {resize: none;}
 .shadow-box {box-shadow: 0px 3px 5px -1px rgba(170, 170, 170, 0.68);}
+.curson-pointer {cursor: pointer;}
 
 /* component */
 .ag-row {font-size: 16px !important;}
@@ -122,13 +123,13 @@ textarea::placeholder {color: #999;font-size: inherit;}
         'f g e e'
 }
 table.prd_info_table tr:not(:last-child) {border-bottom: 1px solid #bbb;}
-table.prd_info_table th {padding: 1.23rem;text-align: center;background-color: #e2e2e2;}
-table.prd_info_table td {padding-right: 12px;text-align: right;font-weight: bold;}
+table.prd_info_table th {padding: 1.23rem;width: 100px;text-align: center;background-color: #e2e2e2;}
+table.prd_info_table td {text-align: right;font-weight: bold;}
 .calculator-grid {
     display: grid;
     border: 1px solid #bbb;
     grid-template-columns: repeat(3, 100px) 140px;
-    grid-template-rows: repeat(5, 77.5px);
+    grid-template-rows: repeat(5, 77.3px);
 }
 .calculator-grid.product {
     grid-template-areas: 
@@ -142,9 +143,9 @@ table.prd_info_table td {padding-right: 12px;text-align: right;font-weight: bold
     grid-template-areas: 
         'a a a a'
         'b c d n'
-        'e f g n'
-        'h i j n'
-        'k l m n'
+        'e f g o'
+        'h i j o'
+        'k l m o'
 }
 .calculator-grid > .butt {
     font-weight: 500;

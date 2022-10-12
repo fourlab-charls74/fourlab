@@ -66,7 +66,7 @@
     <div id="pos_order" class="flex-1 d-none">
         <div class="flex-5 p-3">
             <div class="d-flex flex-column">
-                <button type="button" class="butt w-100 fc-white fs-14 br-1 bg-orange mb-3" style="height: 60px;" data-toggle="modal" data-target="#searchProductModal"><i class="fa fa-search mr-2" aria-hidden="true"></i>상품 검색</button>
+                <button type="button" class="butt w-100 fc-white fs-14 br-1 bg-gray mb-3" style="height: 60px;" data-toggle="modal" data-target="#searchProductModal"><i class="fa fa-search mr-2" aria-hidden="true"></i>상품 검색</button>
                 <div class="d-flex mb-4">
                     <div class="table-responsive">
                         <div id="div-gd" class="ag-theme-balham" style="font-size: 18px;"></div>
@@ -84,25 +84,28 @@
                         </div>
                         <div class="d-flex justify-content-between align-items-center fs-12 fw-sb">
                             <p>거스름돈</p>
-                            <p><strong id=change_amt" class="fc-red fw-b mr-1">0</strong>원</p>
+                            <p><strong id="change_amt" class="fc-red fw-b mr-1">0</strong>원</p>
                         </div>
                     </div>
                     <div class="flex-2 d-flex">
-                        <button type="button" class="butt flex-1 fc-white fs-20 fw-b br-2 bg-blue p-2 mr-3" data-toggle="modal" data-target="#cardModal">
+                        <button type="button" class="butt flex-2 fc-white fs-20 fw-b br-2 bg-blue p-2 mr-3" data-toggle="modal" data-target="#payModal" data-title="신용카드 결제" data-pay-type="card_amt">
                             <span id="card_amt">0</span>
                             <input type="hidden" name="card_amt" value="0">
                             <span class="d-block fs-14 fw-sb mt-1">신용카드</span>
                         </button>
-                        <button type="button" class="butt flex-1 fc-white fs-20 fw-b br-2 bg-blue p-2 mr-3">
-                            <span id="cash_amt">0</span>
-                            <input type="hidden" name="cash_amt" value="0">
-                            <span class="d-block fs-14 fw-sb mt-1">현금</span>
-                        </button>
-                        <button type="button" class="butt flex-1 fc-white fs-20 fw-b br-2 bg-gray p-2">
-                            <span id="point_amt">0</span>
-                            <input type="hidden" name="point_amt" value="0">
-                            <span class="d-block fs-14 fw-sb mt-1">적립금</span>
-                        </button>
+                        <div class="flex-3 d-flex flex-column mr-3">
+                            <button type="button" class="butt flex-1 fc-white fs-20 fw-b br-2 bg-blue p-2 mb-3" data-toggle="modal" data-target="#payModal" data-title="현금 결제" data-pay-type="cash_amt">
+                                <span id="cash_amt">0</span>
+                                <input type="hidden" name="cash_amt" value="0">
+                                <span class="d-block fs-14 fw-sb mt-1">현금</span>
+                            </button>
+                            <button type="button" class="butt flex-1 fc-white fs-20 fw-b br-2 bg-gray p-2" data-toggle="modal" data-target="#payModal" data-title="적립금 사용" data-pay-type="point_amt">
+                                <span id="point_amt">0</span>
+                                <input type="hidden" name="point_amt" value="0">
+                                <span class="d-block fs-14 fw-sb mt-1">적립금</span>
+                            </button>
+                        </div>
+                        <button type="button" class="butt flex-2 fc-white fs-20 fw-b br-2 bg-mint p-2" onclick="return sale();">판매</button>
                     </div>
                 </div>
                 <div class="d-flex">
@@ -119,32 +122,34 @@
         <div class="flex-3 p-3">
             <div class="d-flex justify-content-between fs-16 fw-sb mt-2 mb-3">
                 <p>주문번호</p>
-                <p class="fc-red">202209270959523139</p>
+                <p id="ord_no" class="fc-red"></p>
             </div>
             <div class="d-flex mb-4">
-                <div class="flex-1 fw-sb b-2-gray p-4 mr-2" style="min-height:250px;">
-                    {{-- <div class="d-flex justify-content-center align-items-center h-100 fc-gray fw-m">고객정보가 없습니다.</div> --}}
-                    <p class="fs-18 fw-b mb-3">홍길동 <span class="fs-16 fw-sb">(남, 2000.01.01)</span> <span class="fs-14 fw-m">- gildong123</span></p>
-                    <div class="d-flex align-items-center fs-12 mb-2">
-                        <p style="min-width: 80px;">연락처</p>
-                        <p>010-0000-0000</p>
+                <div class="flex-1 position-relative fw-sb b-2-gray p-4 mr-2" style="min-height:250px;">
+                    <div id="no_user" class="d-flex justify-content-center align-items-center h-100 fc-gray fw-m">고객정보가 없습니다.</div>
+                    {{-- <div id="user">
+                        <p class="fs-18 fw-b mb-3"><span id="user_nm">홍길동</span> <span id="user_info" class="fs-16 fw-sb">(남, 2000.01.01)</span> <span id="user_id" class="fs-14 fw-m">- gildong123</span></p>
+                        <div class="d-flex align-items-center fs-12 mb-2">
+                            <p style="min-width: 80px;">연락처</p>
+                            <p id="user_phone"></p>
+                        </div>
+                        <div class="d-flex align-items-center fs-12 mb-2">
+                            <p style="min-width: 80px;">이메일</p>
+                            <p id="user_email"></p>
+                        </div>
+                        <div class="d-flex align-items-center fs-12 mb-2">
+                            <p style="min-width: 80px;">주소</p>
+                            <p id="user_address" class="fs-10"></p>
+                        </div>
+                        <div class="d-flex align-items-center fs-12">
+                            <p style="min-width: 80px;">적립금</p>
+                            <p id="user_point" class="fc-red fw-b">0</p>
+                        </div>
+                    </div> --}}
+                    <div class="d-flex" style="position:absolute;bottom:12px;right:12px;">
+                        <button type="button" onclick="return searchUser();" class="butt fc-white fs-10 fw-sb br-1 bg-gray pb-2 pt-2 pl-3 pr-3 mr-2">고객검색</button>
+                        <button type="button" onclick="return addUser();" class="butt fc-white fs-10 fw-sb br-1 bg-blue pb-2 pt-2 pl-3 pr-3">고객등록</button>
                     </div>
-                    <div class="d-flex align-items-center fs-12 mb-2">
-                        <p style="min-width: 80px;">이메일</p>
-                        <p>test@test.com</p>
-                    </div>
-                    <div class="d-flex align-items-center fs-12 mb-2">
-                        <p style="min-width: 80px;">주소</p>
-                        <p class="fs-10">경기도 성남시 판교역로 230 208-2호</p>
-                    </div>
-                    <div class="d-flex align-items-center fs-12">
-                        <p style="min-width: 80px;">적립금</p>
-                        <p class="fc-red fw-b">0</p>
-                    </div>
-                </div>
-                <div class="d-flex flex-column">
-                    <button type="button" class="butt flex-1 fc-white fs-14 fw-sb bg-gray p-4 mb-2">고객검색</button>
-                    <button type="button" class="butt flex-1 fc-white fs-14 fw-sb bg-gray p-4">고객등록</button>
                 </div>
             </div>
             <div class="d-flex align-items-center mb-4">
@@ -170,30 +175,42 @@
             </div>
             <div class="d-flex">
                 <div class="flex-1 b-2-gray mr-4">
-                    <table class="prd_info_table w-100 fs-10" style="table-layout:fixed;">
+                    <table class="prd_info_table w-100 fs-10">
                         <tr>
                             <th>수량</th>
-                            <td id="cur_qty">-</td>
+                            <td id="cur_qty" class="pr-3">-</td>
                         </tr> 
                         <tr>
                             <th>단가</th>
-                            <td id="cur_price">-</td>
+                            <td id="cur_price" class="pr-3">-</td>
                         </tr> 
                         <tr>
                             <th>TAG가</th>
-                            <td id="cur_goods_sh">-</td>
+                            <td id="cur_goods_sh" class="pr-3">-</td>
                         </tr> 
                         <tr>
                             <th>판매유형</th>
-                            <td>-</td>
+                            <td>
+                                <div class="d-flex pl-3 pr-1">
+                                    <select name="sale_type" id="sale_type" class="sel w-100" onchange="return updateOrderValue('sale_type', event.target.value);"></select>
+                                </div>
+                            </td>
                         </tr> 
                         <tr>
                             <th>행사명</th>
-                            <td>-</td>
+                            <td>
+                                <div class="d-flex pl-3 pr-1">
+                                    <select name="pr_code" id="pr_code" class="sel w-100" onchange="return updateOrderValue('pr_code', event.target.value)">
+                                        @foreach (@$pr_codes as $pr_code)
+                                            <option value="{{ $pr_code->pr_code }}">{{ $pr_code->pr_code_nm }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </td>
                         </tr> 
                         <tr>
                             <th>쿠폰</th>
-                            <td>-</td>
+                            <td class="pr-3">-</td>
                         </tr> 
                     </table>
                 </div>
@@ -263,7 +280,7 @@
         </div>
     </div>
     {{-- 신용카드모달 --}}
-    <div class="modal fade" id="cardModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal fade" id="payModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 500px;">
             <div class="modal-content">
                 <div class="modal-body">
@@ -272,33 +289,35 @@
                             <button type="button" class="fs-20 close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
-                            <h5 class="mt-1 fs-14 fw-b">신용카드 결제</h5>
+                            <h5 id="paymodal_title" class="mt-1 fs-14 fw-b"></h5>
+                            <input type="hidden" name="paymodal_paytype">
                         </div>
                         <div class="card-body b-none mt-4">
                             <div class="d-flex flex-column align-items-center">
                                 <div class="d-flex justify-content-between align-items-center fs-15 fw-b w-100 mb-3">
                                     <p>남은 금액</p>
-                                    <p><strong class="fc-red fs-20 fw-b mr-1">2,234,000</strong>원</p>
+                                    <p class="butt curson-pointer" onclick="return setDueAmt();"><strong id="due_amt" class="fc-red fs-20 fw-b mr-1">0</strong>원</p>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center fs-12 fw-sb w-100">
                                     <p>총 주문금액</p>
-                                    <p><strong class="fw-b mr-1">2,234,000</strong>원</p>
+                                    <p><strong id="total_order_amt2" class="fw-b mr-1">0</strong>원</p>
                                 </div>
-                                <div class="calculator-grid payment fs-20 mt-4">
-                                    <input type="text" class="inp fc-black fs-20 fw-b text-right pr-3" style="grid-area:a;border:2px solid #bbb;">
-                                    <button type="button" class="butt bg-white" style="grid-area:b;">1</button>
-                                    <button type="button" class="butt bg-white" style="grid-area:c;">2</button>
-                                    <button type="button" class="butt bg-white" style="grid-area:d;">3</button>
-                                    <button type="button" class="butt bg-white" style="grid-area:e;">4</button>
-                                    <button type="button" class="butt bg-white" style="grid-area:f;">5</button>
-                                    <button type="button" class="butt bg-white" style="grid-area:g;">6</button>
-                                    <button type="button" class="butt bg-white" style="grid-area:h;">7</button>
-                                    <button type="button" class="butt bg-white" style="grid-area:i;">8</button>
-                                    <button type="button" class="butt bg-white" style="grid-area:j;">9</button>
-                                    <button type="button" class="butt bg-white" style="grid-area:k;">0</button>
-                                    <button type="button" class="butt bg-white" style="grid-area:l;">00</button>
-                                    <button type="button" class="butt fs-14 bg-white" style="grid-area:m;"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>
-                                    <button type="button" class="butt fs-18 fc-white bg-blue" style="grid-area:n;" onclick="return setOrderPrice();">적용</button>
+                                <div id="payment_calculator" class="calculator-grid payment fs-20 mt-4">
+                                    <input type="text" id="pay_press_amt" class="inp fc-black fs-20 fw-b text-right pr-3" style="grid-area:a;border:2px solid #bbb;" value="0">
+                                    <button type="button" class="butt bg-white" value="1" style="grid-area:b;">1</button>
+                                    <button type="button" class="butt bg-white" value="2" style="grid-area:c;">2</button>
+                                    <button type="button" class="butt bg-white" value="3" style="grid-area:d;">3</button>
+                                    <button type="button" class="butt bg-white" value="4" style="grid-area:e;">4</button>
+                                    <button type="button" class="butt bg-white" value="5" style="grid-area:f;">5</button>
+                                    <button type="button" class="butt bg-white" value="6" style="grid-area:g;">6</button>
+                                    <button type="button" class="butt bg-white" value="7" style="grid-area:h;">7</button>
+                                    <button type="button" class="butt bg-white" value="8" style="grid-area:i;">8</button>
+                                    <button type="button" class="butt bg-white" value="9" style="grid-area:j;">9</button>
+                                    <button type="button" class="butt bg-white" value="0" style="grid-area:k;">0</button>
+                                    <button type="button" class="butt bg-white" value="00" style="grid-area:l;">00</button>
+                                    <button type="button" class="butt fs-14 bg-white" value="remove" style="grid-area:m;"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>
+                                    <button type="button" class="butt fs-14 bg-lightgray" value="removeAll" style="grid-area:n;">clear</button>
+                                    <button type="button" class="butt fs-18 fc-white bg-blue" value="active" style="grid-area:o;">적용</button>
                                 </div>
                             </div>
                         </div>
@@ -352,12 +371,16 @@
             cellRenderer: (params) => `<a href="javascript:void(0);" onclick="return addProduct('${params.data.prd_cd}')">${params.value}</a>`,
         },
         {field: "goods_opt", headerName: "옵션", width: 300, cellStyle: LineHeight50},
+        {field: "wqty", headerName: "매장수량", type: "currencyType", width: 100, cellStyle: LineHeight50},
         {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 100, cellStyle: LineHeight50},
         {field: "price", headerName: "판매가", type: "currencyType", width: 100, cellStyle: LineHeight50},
     ];
 
+    const sale_types = <?= json_encode(@$sale_types) ?>; // 판매유형
+    const pr_codes = <?= json_encode(@$pr_codes) ?>; // 행사명
+
 	$(document).ready(function() {
-		pApp.ResizeGrid(275, 560);
+		pApp.ResizeGrid(275, 470);
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns, {
             rowSelection: 'single',
@@ -384,7 +407,7 @@
         });
         $('#searchProductModal').on('shown.bs.modal', function () {
             $('#search_prd_keyword').trigger('focus');
-        })
+        });
         $("#product_calculator").on({
             click: function({target}) {
                 if(target.nodeName == "BUTTON") {
@@ -400,7 +423,7 @@
                             updateOrderValue('cur_qty', str * 1);
                             str = ''; 
                             break;
-                            case 'price':
+                        case 'price':
                             updateOrderValue('cur_price', str * 1);
                             str = ''; 
                             break;
@@ -417,7 +440,50 @@
                     e.target.value = Comma(isNaN(num) ? 0 : num);
                 }
             }
-        })
+        });
+        $('#payModal').on('show.bs.modal', function(e) {
+            let title = $(e.relatedTarget).data('title');
+            let paytype = $(e.relatedTarget).data('pay-type');
+            $(e.currentTarget).find('#paymodal_title').text(title);
+            $(e.currentTarget).find('[name=paymodal_paytype]').val(paytype);
+        });
+        $('#payModal').on('hide.bs.modal', function(e) {
+            $("#pay_press_amt").val(0);
+        });
+        $("#payment_calculator").on({
+            click: function(e) {
+                if(e.target.nodeName == "BUTTON") {
+                    let str = $("#pay_press_amt").val().replaceAll(",", "");
+                    switch (e.target.value) {
+                        case 'remove':
+                            str = str.slice(0, str.length - 1); 
+                            break;
+                        case 'removeAll':
+                            str = ''; 
+                            break;
+                        case 'active':
+                            let paytype = $('[name=paymodal_paytype]').val();
+                            updateOrderValue(paytype, str * 1);
+                            $('#payModal').modal('hide');
+                            str = ''; 
+                            break;
+                        default:
+                            str += e.target.value;
+                            break;
+                    }
+                    $("#pay_press_amt").val(isNaN(str * 1) ? 0 : Comma(str * 1));
+                }
+            },
+            keyup: function(e) {
+                if((e.keyCode >= 48 && e.keyCode <= 57) || e.keyCode == 8 || (e.keyCode >= 37 && e.keyCode <= 40)) {
+                    let num = unComma(e.target.value);
+                    e.target.value = Comma(isNaN(num) ? 0 : num);
+                } else if(e.keyCode == 13) {
+                    updateOrderValue('card_amt', str * 1);
+                    $('#payModal').modal('hide');
+                }
+            }
+        });
 	});
 </script>
 
