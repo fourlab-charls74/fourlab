@@ -53,7 +53,7 @@ class prd03Controller extends Controller
 	{
 		$page	= $request->input('page', 1);
 		if( $page < 1 or $page == "" )	$page = 1;
-		$limit	= $request->input('limit', 100);
+		$limit	= $request->input('limit', 500);
 
 		$type = $request->input("type");
 		$prd_nm	= $request->input("prd_nm");
@@ -111,6 +111,8 @@ class prd03Controller extends Controller
 				c7.code_val as color,
 				c8.code_val as size,
 				p.prd_nm as prd_nm,
+				p.price as price,
+				p.wonga as wonga,
 				pc.seq as seq,
 				c3.code_val as year,
 				c4.code_val as season,
@@ -122,7 +124,7 @@ class prd03Controller extends Controller
 				i.ut as ut				
 			from product p
 				inner join product_code pc on p.prd_cd = pc.prd_cd
-				inner join product_image i on p.prd_cd = i.prd_cd
+				left outer join product_image i on p.prd_cd = i.prd_cd
 				inner join company cp on p.com_id = cp.com_id
 				left outer join code c on c.code_kind_cd = 'PRD_MATERIAL_TYPE' and c.code_id = pc.brand
 				left outer join code c2 on c2.code_kind_cd = 'PRD_MATERIAL_OPT' and c2.code_id = pc.opt
@@ -133,7 +135,7 @@ class prd03Controller extends Controller
 				left outer join code c7 on c7.code_kind_cd = 'PRD_CD_COLOR' and c7.code_id = pc.color
 				left outer join code c8 on c8.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c8.code_id = pc.size
 				left outer join code c9 on c9.code_kind_cd = 'PRD_CD_UNIT' and c9.code_id = p.unit
-			where 1 = 1
+			where p.use_yn = 'Y'
 				$where
 			$orderby
 			$limit
@@ -144,10 +146,6 @@ class prd03Controller extends Controller
 		$result	= [];
 		while($row = $stmt->fetch(PDO::FETCH_ASSOC))
 		{
-			// // 이미지 경로 적용
-			// if($row["img"] != ""){
-			// 	$row["img"] = sprintf("%s%s",config("shop.image_svr"), $row["img"]);
-			// }
 			$result[] = $row;
 		}
 		return response()->json([
@@ -206,6 +204,9 @@ class prd03Controller extends Controller
 				$color = $row['color'];
 				$size = $row['size'];
 
+				$price = $row['price'];
+				$wonga = $row['wonga'];
+
 				$sup_com = $row['sup_com'];
 				$unit = $row['unit'];
 				$year = $row['year'];
@@ -221,18 +222,18 @@ class prd03Controller extends Controller
 
 				if ($result->count == 0) {
 
-					DB::table('product')->insert(
-						[
-							'prd_cd' => $prd_cd,
-							'prd_nm' => $prd_nm,
-							'type' => $type,
-							'com_id' => $sup_com,
-							'unit' => $unit,
-							'rt' => now(),
-							'ut' => now(),
-							'admin_id' => $admin_id
-						]
-					);
+					DB::table('product')->insert([
+						'prd_cd' => $prd_cd,
+						'prd_nm' => $prd_nm,
+						'type' => $type,
+						'price' => $price,
+						'wonga' => $wonga,
+						'com_id' => $sup_com,
+						'unit' => $unit,
+						'rt' => now(),
+						'ut' => now(),
+						'admin_id' => $admin_id
+					]);
 
 					/**
 					 * 원부자재 상품 이미지 저장 (단일 이미지)
@@ -241,38 +242,34 @@ class prd03Controller extends Controller
 					$save_path = "/images/prd03";
 					$img_url = ULib::uploadBase64img($save_path, $base64_src);
 		
-					DB::table('product_code')->insert(
-						[
-							'prd_cd' => $prd_cd,
-							'seq' => $seq,
-							'img_url' => $img_url,
-							'goods_no' => $goods_no,
-							'goods_opt'	=> $goods_opt,
-							'brand' => $brand,
-							'year' => $year,
-							'season' => $season,
-							'gender' => $gender,
-							'item' => $item,
-							'opt' => $opt,
-							'color' => $color,
-							'size' => $size,
-							'type' => $type,
-							'rt' => now(),
-							'ut' => now(),
-							'admin_id'	=> $admin_id
-						]
-					);
+					DB::table('product_code')->insert([
+						'prd_cd' => $prd_cd,
+						'seq' => $seq,
+						'img_url' => $img_url,
+						'goods_no' => $goods_no,
+						'goods_opt'	=> $goods_opt,
+						'brand' => $brand,
+						'year' => $year,
+						'season' => $season,
+						'gender' => $gender,
+						'item' => $item,
+						'opt' => $opt,
+						'color' => $color,
+						'size' => $size,
+						'type' => $type,
+						'rt' => now(),
+						'ut' => now(),
+						'admin_id'	=> $admin_id
+					]);
 					
-					DB::table('product_image')->insert(
-						[
-							'prd_cd' => $prd_cd,
-							'seq' => $seq,
-							'img_url' => $img_url,
-							'rt' => now(),
-							'ut' => now(),
-							'admin_id'	=> $admin_id
-						]
-					);
+					DB::table('product_image')->insert([
+						'prd_cd' => $prd_cd,
+						'seq' => $seq,
+						'img_url' => $img_url,
+						'rt' => now(),
+						'ut' => now(),
+						'admin_id'	=> $admin_id
+					]);
 
 				} else {
 					DB::rollback();
@@ -284,10 +281,156 @@ class prd03Controller extends Controller
 		} catch (\Exception $e) {
 			DB::rollback();
 			$code = 500;
-			// $msg = $e->getMessage();
 		}
 
 		return response()->json(["code" => $code]);
+	}
+
+	public function showEdit($product_code) {
+		$sql = "
+			select
+				c.code_val as type_nm,
+				c3.code_val as year,
+				c4.code_val as season,
+				c5.code_val as gender,
+				c6.code_val as item,
+				c2.code_val as opt,
+				c7.code_val as color,
+				c8.code_val as size,
+				p.prd_nm as prd_nm,
+				cp.com_nm as sup_com,
+				p.price as price,
+				p.wonga as wonga,
+				c9.code_id as unit_id,
+				pc.img_url as img_url,
+				p.prd_cd as prd_cd,
+				p.ut as rt,
+				p.ut as ut
+			from product p
+				inner join product_code pc on p.prd_cd = pc.prd_cd
+				left outer join product_image i on p.prd_cd = i.prd_cd
+				inner join company cp on p.com_id = cp.com_id
+				left outer join code c on c.code_kind_cd = 'PRD_MATERIAL_TYPE' and c.code_id = pc.brand
+				left outer join code c2 on c2.code_kind_cd = 'PRD_MATERIAL_OPT' and c2.code_id = pc.opt
+				left outer join code c3 on c3.code_kind_cd = 'PRD_CD_YEAR' and c3.code_id = pc.year
+				left outer join code c4 on c4.code_kind_cd = 'PRD_CD_SEASON' and c4.code_id = pc.season
+				left outer join code c5 on c5.code_kind_cd = 'PRD_CD_GENDER' and c5.code_id = pc.gender
+				left outer join code c6 on c6.code_kind_cd = 'PRD_CD_ITEM' and c6.code_id = pc.item
+				left outer join code c7 on c7.code_kind_cd = 'PRD_CD_COLOR' and c7.code_id = pc.color
+				left outer join code c8 on c8.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c8.code_id = pc.size
+				left outer join code c9 on c9.code_kind_cd = 'PRD_CD_UNIT' and c9.code_id = p.unit
+			where p.prd_cd = :prd_cd
+		";
+		$values = (array)DB::selectOne($sql, ['prd_cd' => $product_code]);
+		$values['units'] = SLib::getCodes("PRD_CD_UNIT");
+		return view( Config::get('shop.store.view') . '/product/prd03_edit', $values);
+	}
+
+	public function edit(Request $request) {
+		$admin_id = Auth('head')->user()->id;
+        $data = $request->input();
+
+		try {
+
+			DB::beginTransaction();
+
+			$prd_cd	= $data['prd_cd'];
+			$prd_nm	= $data['prd_nm'];
+			$price = $data['price'];
+			$wonga = $data['wonga'];
+			
+			$unit = $data['unit'];
+			$seq = $data['seq'];
+
+			/**
+			 * 원부자재 상품 이미지 수정
+			 */
+			$base64_src = $data['image'];
+			$save_path = "/images/prd03";
+			$img_url = "";
+
+			/**
+			 * 이미지 수정시 기존에 저장된 이미지가 있는지 확인
+			 */
+			$result = DB::table('product_image')->where([['prd_cd', '=', $prd_cd], ['seq', '=', $seq]])->first();
+			if ($result == null) {
+				/**
+				 * 기존에 저잗왼 이미지가 없는 경우 이미지 관련 insert 처리
+				 */
+				$img_url = ULib::uploadBase64img($save_path, $base64_src);
+
+				DB::table('product_image')->insert([
+					'prd_cd' => $prd_cd,
+					'seq' => $seq,
+					'img_url' => $img_url,
+					'rt' => now(),
+					'ut' => now(),
+					'admin_id'	=> $admin_id
+				]);
+
+			} else {
+				/**
+				 * 기존 저장된 이미지가 있는 경우 이미지 관련 update 처리
+				 */
+				$idx = $result->idx;
+				$img_url = $result->img_url;
+
+				if ($base64_src != "") { // 이미지를 수정한 경우에만 기존 이미지 삭제후 업데이트
+
+					ULib::deleteFile($img_url);
+					$img_url = ULib::uploadBase64img($save_path, $base64_src);
+
+					DB::table('product_image')->where('idx', '=', $idx)->update([
+						'img_url' => $img_url,
+						'ut' => now(),
+						'admin_id'	=> $admin_id
+					]);
+
+					DB::table('product_code')->where('prd_cd', '=', $prd_cd)->update([
+						'img_url' => $img_url,
+						'ut' => now(),
+						'admin_id'	=> $admin_id
+					]);
+
+				}
+			}
+
+			DB::table('product')->where('prd_cd', '=', $prd_cd)->update([
+				'prd_nm' => $prd_nm,
+				'price' => $price,
+				'wonga' => $wonga,
+				'unit' => $unit,
+				'ut' => now(),
+				'admin_id' => $admin_id
+			]);
+
+			$code = 200;
+			DB::commit();
+			
+		} catch (\Exception $e) {
+			$code = 500;
+			DB::rollback();
+		}
+
+		return response()->json(["code" => $code]);
+	}
+
+	public function delete($product_code) {
+		$admin_id = Auth('head')->user()->id;
+		try {
+			DB::beginTransaction();
+			DB::table('product')->where('prd_cd', '=', $product_code)->update([
+				'use_yn' => 'N',
+				'ut' => now(),
+				'admin_id' => $admin_id
+			]);
+            DB::commit();
+            $code = 200;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $code = 500;
+        }
+        return response()->json(["code" => $code]);
 	}
 
 	public function getSeq(Request $request) {
@@ -316,44 +459,39 @@ class prd03Controller extends Controller
 
 	public function delImg(Request $request)
 	{
-		$store_cd = $request->input('data_img');
+		$admin_id = Auth('head')->user()->id;
+		$prd_cd = $request->input('prd_cd');
 		$seq = $request->input('seq');
-		
+
 		try {
-            DB::beginTransaction();
+			DB::beginTransaction();
 
-			$sel_sql = "
-				select img_url
-				from store_img
-				where store_cd = '$store_cd' and seq = $seq
+			DB::table('product')->where('prd_cd', '=', $prd_cd)->update([
+				'ut' => now(),
+				'admin_id' => $admin_id
+			]);
 
-			";
-			$row = DB::selectOne($sel_sql);
+			DB::table('product_code')->where('prd_cd', '=', $prd_cd)->update([
+				'img_url' => "",
+				'ut' => now(),
+				'admin_id'	=> $admin_id
+			]);
 
-            $sql = "
-                delete 
-                from store_img
-                where store_cd = '$store_cd' and seq = $seq
-            ";
+			$result = DB::table('product_image')->where([['prd_cd', '=', $prd_cd], ['seq', '=', $seq]])->first();
+			$idx = $result->idx;
+			$img_url = $result->img_url;
 
-            DB::delete($sql);
-			
-
-			ULib::deleteFile($row->img_url);
+			ULib::deleteFile($img_url);
+			DB::table('product_image')->where('idx', '=', $idx)->delete();
 
             DB::commit();
-            $code = '200';
-            $msg = "";
+            $code = 200;
         } catch (\Exception $e) {
             DB::rollBack();
             $code = 500;
-            $msg = $e->getMessage();
         }
 
-        return response()->json([
-            "code" => $code,
-            "msg" => $msg
-        ]);
+        return response()->json(["code" => $code]);
 	}
 	
 }

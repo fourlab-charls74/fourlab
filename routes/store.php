@@ -180,9 +180,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('prd03/get-seq', 'prd03Controller@getSeq');
         Route::post('prd03/create', 'prd03Controller@create');
 
-        Route::get('prd03/edit','prd03Controller@edit');
+        Route::get('prd03/edit/{product_code}','prd03Controller@showEdit');
         Route::post('prd03/edit','prd03Controller@edit');
 
+        Route::get('prd03/delete/{product_code}','prd03Controller@delete');
         Route::post('prd03/del-img', 'prd03Controller@delImg');
     });
 

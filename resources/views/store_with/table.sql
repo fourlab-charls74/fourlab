@@ -2,9 +2,12 @@
 CREATE TABLE `product` (
     `prd_cd` varchar(50) NOT NULL COMMENT '상품코드',
     `prd_nm` VARCHAR(100) NOT NULL COMMENT '상품명',
+    `price` int(11) NOT NULL COMMENT '판매가',
+    `wonga` int(11) NOT NULL COMMENT '원가',
     `type` varchar(1) DEFAULT 'N' COMMENT '구분:일반(N),부자재(S),사은품(G)',
     `com_id` VARCHAR(30) NOT NULL COMMENT '공급업체',
     `unit` varchar(30) NOT NULL COMMENT '단위 code - prd_cd_unit',
+    `use_yn` char(1) DEFAULT 'Y' COMMENT '사용여부',
     `rt` datetime NOT NULL COMMENT '등록일',
     `ut` datetime DEFAULT NULL COMMENT '수정일',
     `admin_id` varchar(30) NOT NULL COMMENT '관리자아이디',

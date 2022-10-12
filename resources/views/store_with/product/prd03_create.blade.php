@@ -174,6 +174,20 @@
 											</td>
 										</tr>
 										<tr>
+											<th class="required">판매가</th>
+											<td>
+												<div class="flax_box">
+													<input type='text' class="form-control form-control-sm" name='price' id="price" value='' onkeyup="onlynum(this)">
+												</div>
+											</td>
+											<th class="required">원가</th>
+											<td>
+											<div class="flax_box">
+													<input type='text' class="form-control form-control-sm" name='wonga' id="wonga" value='' onkeyup="onlynum(this)">
+												</div>
+											</td>
+										</tr>
+										<tr>
 											<th class="required">단위</th>
 											<td colspan="3">
 												<div class="flax_box">
@@ -300,6 +314,18 @@
 			width: 50
 		},
 		{
+			field: "price",
+			headerName: "판매가",
+			type: 'currencyType',
+			width: 80
+		},
+		{
+			field: "wonga",
+			headerName: "원가",
+			type: 'currencyType',
+			width: 80
+		},
+		{
 			field: "year",
 			headerName: "년도",
 			width: 80
@@ -338,13 +364,28 @@
 	let gx;
 
 	$(document).ready(function() {
-		pApp.ResizeGrid(705);
+		pApp.ResizeGrid(647);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns);
 		gx.gridOptions.rowDragManaged = true;
 		gx.gridOptions.animateRows = true;
 	});
+
+	const onlyNum = (obj) => {
+		val = obj.value;
+		new_val = '';
+		for (i=0; i<val.length; i++) {
+			char = val.substring(i, i+1);
+			if (char < '0' || char > '9') {
+				alert('숫자만 입력가능 합니다.');
+				obj.value = new_val;
+				return;
+			} else {
+				new_val = new_val + char;
+			}
+		}
+	};
 
 	const addRow = (row) => {
     	gx.gridOptions.api.applyTransaction({add : [{...row}]});
@@ -425,7 +466,9 @@
 				unit: document.f1.unit.value,
 				year: document.f1.year.value,
 				prd_cd: prd_cd,
-				seq: seq
+				seq: seq,
+				price: document.f1.price.value,
+				wonga: document.f1.wonga.value
 			});
 
 			let rows = {
@@ -444,7 +487,9 @@
 				unit: document.f1.unit[document.f1.unit.selectedIndex].text,
 				year: document.f1.year[document.f1.year.selectedIndex].text,
 				prd_cd: no_color_size_prd_cd,
-				seq: seq
+				seq: seq,
+				price: document.f1.price.value,
+				wonga: document.f1.wonga.value
 			};
 
 			addRow(rows);
@@ -506,6 +551,18 @@
 		if (f1.prd_nm.value.trim() === '') {
 			f1.prd_nm.focus();
 			return alert("원부자재명을 입력해주세요.");
+		}
+
+		// 판매가 입력여부
+		if (f1.price.value.trim() === '') {
+			f1.price.focus();
+			return alert("판매가를 입력해주세요.");
+		}
+
+		// 원가 입력여부
+		if (f1.wonga.value.trim() === '') {
+			f1.wonga.focus();
+			return alert("원가를 입력해주세요.");
 		}
 
 		// 단위 선택여부
