@@ -370,7 +370,7 @@ class prd03Controller extends Controller
 
 			} else {
 				/**
-				 * 기존 저장된 이미지가 있는 경우 이미지 관련 update 처리
+				 * 기존에 저장된 이미지가 있는 경우 이미지 관련 update 처리
 				 */
 				$idx = $result->idx;
 				$img_url = $result->img_url;

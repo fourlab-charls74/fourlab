@@ -49,6 +49,36 @@ CREATE TABLE `product_image` (
     PRIMARY KEY (`idx`, `prd_cd`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- 원부자재 상품 입고 마스터
+CREATE TABLE `product_stock_order` (
+    `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT 'identify',
+    `prd_ord_no` varchar(50) NOT NULL COMMENT '입고번호(송장번호)',
+    `prd_ord_date` varchar(8) NOT NULL COMMENT '입고일자',
+    `prd_ord_type` char(1) COMMENT '입고구분:일반(N),부자재(S),사은품(G)',
+    `com_id` varchar(30) NOT NULL COMMENT '공급업체',
+    `state` varchar(5) DEFAULT 10 COMMENT '상태:입고대기(10),입고처리중(20),입고완료(30)',
+    `rt` datetime NOT NULL COMMENT '등록일',
+    `ut` datetime DEFAULT NULL COMMENT '수정일',
+    `admin_id` varchar(30) NOT NULL COMMENT '관리자아이디',
+    PRIMARY KEY (`idx`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 원부자재 상품 입고상품
+CREATE TABLE `product_stock_order_product` (
+    `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT 'identify',
+    `prd_stock_no` varchar(50) NOT NULL COMMENT '입고일련번호',
+    `com_id` varchar(30) NOT NULL COMMENT '공급업체',
+    `prd_cd` varchar(50) NOT NULL COMMENT '상품코드',
+    `prd_nm` VARCHAR(100) NOT NULL COMMENT '상품명',
+    `stock_qty` INT(11) DEFAULT NULL COMMENT '수량',
+    `stock_price` INT(11) DEFAULT NULL COMMENT '입고단가',
+    `stock_wonga` INT(11) DEFAULT NULL COMMENT '입고원가',
+    `rt` datetime NOT NULL COMMENT '등록일',
+    `ut` datetime DEFAULT NULL COMMENT '수정일',
+    `admin_id` varchar(30) NOT NULL COMMENT '관리자아이디',
+    PRIMARY KEY (`idx`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 -- 오프라인 재고
 CREATE TABLE `product_stock` (
     `goods_no` INT(11) NOT NULL DEFAULT '0' COMMENT '상품번호',
