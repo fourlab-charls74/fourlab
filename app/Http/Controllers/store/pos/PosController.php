@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Components\Lib;
 use App\Models\Conf;
 use App\Models\Order;
+use App\Models\Point;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -53,6 +54,9 @@ class PosController extends Controller
 				break;
 			case 'ordno':
 				$response = $this->get_ordno($request);
+				break;
+			case 'member':
+				$response = $this->search_member($request);
 				break;
             default:
                 $message = 'Command not found';
@@ -157,8 +161,167 @@ class PosController extends Controller
         ];
         $order = new Order($user, false);
         $ord_no = $order->GetNextOrdNo();
-
+        // $ord_no = '1234567890'; // test
         return response()->json(['code' => '200', 'ord_no' => $ord_no], 200);
+    }
+
+    /** 고객검색 */
+    public function search_member(Request $request)
+    {
+        $search_type = $request->input('search_type', 'user_nm');
+        $search_keyword = $request->input('search_keyword', '');
+
+        $where = "";
+        if ($search_keyword != '') {
+            if ($search_type == 'user_nm') {
+                $where .= " and m.name like '%$search_keyword%' ";
+            }
+        }
+
+        $page = $request->input('page', 1);
+        if ($page < 1 or $page == '') $page = 1;
+        $limit = 500;
+
+        $page_size = $limit;
+        $startno = ($page - 1) * $page_size;
+        $limit = " limit $startno, $page_size ";
+
+        $total = 0;
+        $page_cnt = 0;
+
+        $sql = " 
+            select 
+                m.user_id
+                , m.name as user_nm
+                , m.mobile
+                , m.email
+                , if(m.sex = 'F', '여', if(m.sex = 'M', '남', '-')) as gender
+                , m.yyyy
+                , m.mm
+                , m.dd
+                , m.point
+                , m.addr
+                , m.addr2
+            from member m
+            where 1=1 $where
+            order by (CASE WHEN ASCII(SUBSTRING(user_nm,1)) < 123 THEN 2 ELSE 1 END), user_nm
+            $limit
+        ";
+        $rows = DB::select($sql);
+
+        if ($page == 1) {
+            $sql = "
+                select count(*) as total
+                from member m
+                where 1=1 $where
+			";
+            $row = DB::selectOne($sql);
+            $total = $row->total;
+            $page_cnt = (int)(($total - 1) / $page_size) + 1;
+        }
+
+        return response()->json([
+            'code' => 200,
+            'head' => [
+                'total' => $total,
+                'page' => $page,
+                'page_cnt' => $page_cnt,
+                'page_total' => count($rows),
+            ],
+            'body' => $rows
+        ], 200);
+    }
+
+    /** 고객등록 */
+    public function add_member(Request $request)
+    {
+        $code = '200';
+        $msg = '';
+        $member = '';
+        
+        $data = (object) $request->all();
+        $admin_id = Auth('head')->user()->id;
+        $store_cd = STORE_CD;
+        $store_nm = '';
+        if ($store_cd != '') {
+            $row = DB::table('store')->select('store_nm')->where('store_cd', '=', $store_cd)->first();
+            if ($row != null) $store_nm = $row->store_nm;
+        }
+
+        // 연락처
+        $mobile = object_get($data, 'mobile1', '') . '-' . object_get($data, 'mobile2', '') . '-' . object_get($data, 'mobile3', '');
+
+        // 비밀번호 암호화
+        $conf = new Conf();
+        $encrypt_mode = $conf->getConfigValue("shop", "encrypt_mode");
+        $encrypt_key = "";
+        if ($encrypt_mode == "mhash") {
+            $encrypt_key = $conf->getConfigValue("shop", "encrypt_key");
+        }
+        // 매장에서 고객등록 시 초기비밀번호는 휴대폰 뒷자리 + '*' 로 설정합니다. -> 추후 개인변경 필요
+        $default_pw = object_get($data, 'mobile3', '') . '*';
+        $enc_pwd = Lib::get_enc_hash($default_pw, $encrypt_mode, $encrypt_key);
+
+        $user_id = object_get($data, 'user_id', '');
+
+        try {
+            DB::beginTransaction();
+
+            $values = [
+                'user_id' => $user_id,
+                'user_pw' => $enc_pwd,
+                'name' => object_get($data, 'name', ''),
+                'sex' => object_get($data, 'sex', ''),
+                'email' => object_get($data, 'email', ''),
+                'email_chk' => 'Y',
+                'zip' => object_get($data, 'zipcode', ''),
+                'addr' => object_get($data, 'addr1', ''),
+                'addr2' => object_get($data, 'addr2', ''),
+                'phone' => $mobile,
+                'mobile' => $mobile,
+                'rmobile' => strrev($mobile),
+                'regdate' => now(),
+                'lastdate' => now(),
+                'point' => 0,
+                'ypoint' => 0,
+                'yn' => 'Y',
+                'mobile_chk' => 'Y',
+                'yyyy_chk' => object_get($data, 'yyyy_chk', ''),
+                'yyyy' => object_get($data, 'yyyy', '0000'),
+                'mm' => sprintf("%02d", object_get($data, 'mm', '00')),
+                'dd' => sprintf("%02d", object_get($data, 'dd', '00')),
+                'out_yn' => 'N',
+                'memo' => object_get($data, 'memo', ''),
+                'pwd_reset_yn' => 'N',
+                'auth_type' => 'A',
+                'auth_yn' => 'Y',
+                'auth_key' => $admin_id,
+                'store_cd' => $store_cd,
+                'store_nm' => $store_nm,
+            ];
+
+            DB::table('member')->insert($values);
+            
+            $msg = "고객정보가 정상적으로 등록되었습니다.";
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollback();
+            $code = '500';
+            $msg = $e->getMessage();
+        }
+
+        if ($code == '200') {
+            $sql = "
+                select 
+                    user_id, name as user_nm, sex, if(sex = 'F', '여', if(sex = 'M', '남', '-')) as gender, 
+                    yyyy, mm, dd, phone, mobile, email, addr, addr2, point
+                from member
+                where user_id = '$user_id'
+            ";
+            $member = DB::selectOne($sql);
+        }
+
+        return response()->json(['code' => $code, 'msg' => $msg, 'user' => $member]);
     }
 
     /** 주문등록 (판매) */
@@ -195,6 +358,7 @@ class PosController extends Controller
         $cash_amt = $req->input("cash_amt", 0); // 현금결제금액
         $point_amt = $req->input("point_amt", 0); // 적립금결제금액
         $pay_type = $card_amt >= $cash_amt ? 2 : ($cash_amt >= $point_amt ? 1 : 4); // 결제방법 (무통장(현금)(1)/카드(2)/적립금(4))
+        $memo = $req->input("memo", "");
 
         $user_id = $req->input("user_id", ""); // 주문자 ID
         $user_nm = "비회원T";
@@ -411,7 +575,7 @@ class PosController extends Controller
                         'ord_type' => $ord_type,
                         'baesong_kind' => $goods->baesong_kind,
                         'ord_date' => $ord_date,
-                        'dlv_comment' => null,
+                        'dlv_comment' => $memo,
                         'admin_id' => $c_admin_id,
                         'coupon_no' => $coupon_no,
                         'com_coupon_ratio' => $com_rat,
@@ -458,7 +622,7 @@ class PosController extends Controller
                 'dlv_end_date' => DB::raw('NULL'),
                 'ord_type' => $ord_type,
                 'ord_kind' => $ord_kind,
-                'out_ord_no' => '',
+                'out_ord_no' => '0',
                 'store_cd' => $store_cd,
                 'sale_place' => $store_nm,
                 'chk_dlv_fee' => DB::raw('NULL'),

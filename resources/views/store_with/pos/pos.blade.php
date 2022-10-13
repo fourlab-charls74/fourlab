@@ -127,8 +127,8 @@
             <div class="d-flex mb-4">
                 <div class="flex-1 position-relative fw-sb b-2-gray p-4 mr-2" style="min-height:250px;">
                     <div id="no_user" class="d-flex justify-content-center align-items-center h-100 fc-gray fw-m">고객정보가 없습니다.</div>
-                    {{-- <div id="user">
-                        <p class="fs-18 fw-b mb-3"><span id="user_nm">홍길동</span> <span id="user_info" class="fs-16 fw-sb">(남, 2000.01.01)</span> <span id="user_id" class="fs-14 fw-m">- gildong123</span></p>
+                    <div id="user" class="d-none">
+                        <p class="fs-18 fw-b mb-3"><span id="user_nm"></span> <span id="user_info" class="fs-16 fw-sb"></span> <span class="fs-14 fw-m">- <span id="user_id_txt"></span></span></p>
                         <div class="d-flex align-items-center fs-12 mb-2">
                             <p style="min-width: 80px;">연락처</p>
                             <p id="user_phone"></p>
@@ -145,10 +145,10 @@
                             <p style="min-width: 80px;">적립금</p>
                             <p id="user_point" class="fc-red fw-b">0</p>
                         </div>
-                    </div> --}}
+                    </div>
                     <div class="d-flex" style="position:absolute;bottom:12px;right:12px;">
-                        <button type="button" onclick="return searchUser();" class="butt fc-white fs-10 fw-sb br-1 bg-gray pb-2 pt-2 pl-3 pr-3 mr-2">고객검색</button>
-                        <button type="button" onclick="return addUser();" class="butt fc-white fs-10 fw-sb br-1 bg-blue pb-2 pt-2 pl-3 pr-3">고객등록</button>
+                        <button type="button" class="butt fc-white fs-10 fw-sb br-1 bg-gray pb-2 pt-2 pl-3 pr-3 mr-2" data-toggle="modal" data-target="#searchMemberModal">고객검색</button>
+                        <button type="button" class="butt fc-white fs-10 fw-sb br-1 bg-blue pb-2 pt-2 pl-3 pr-3" data-toggle="modal" data-target="#addMemberModal">고객등록</button>
                     </div>
                 </div>
             </div>
@@ -279,6 +279,189 @@
             </div>
         </div>
     </div>
+    {{-- 고객등록모달 --}}
+    <div class="modal fade" id="addMemberModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-header">
+                            <button type="button" class="fs-20 close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h5 class="mt-1 fs-14 fw-b">고객 등록</h5>
+                        </div>
+                        <div class="card-body b-none">
+                            <form name="add_member">
+                                <table class="table incont table-bordered mt-2" id="dataTable" width="100%" cellspacing="0">
+                                    <colgroup>
+                                        <col width="120px">
+                                    </colgroup>
+                                    <tr>
+                                        <th class="required">아이디</th>
+                                        <td>
+                                            <div class="flax_box inline_btn_box" style="padding-right:75px;">
+                                                <input type="text" name="user_id" id="user_id" class="form-control form-control-sm">
+                                                <input type="hidden" name="user_id_check" id="user_id_check" value="N">
+                                                <a href="#" onclick="return checkUserId();" class="butt d-flex justify-content-center align-items-center fc-white fs-08 fw-sb br-05 bg-gray" style="width:70px;">중복확인</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="required">이름</th>
+                                        <td>
+                                            <div class="flax_box">
+                                                <input type="text" name="name" id="name" class="form-control form-control-sm" value="">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="required">성별</th>
+                                        <td>
+                                            <div class="form-inline form-radio-box">
+                                                <div class="custom-control custom-radio">
+                                                    <input type="radio" name="sex" id="sex_m" class="custom-control-input" value="M" checked>
+                                                    <label class="custom-control-label" for="sex_m">남자</label>
+                                                </div>
+                                                <div class="custom-control custom-radio">
+                                                    <input type="radio" name="sex" id="sex_f" class="custom-control-input" value="F">
+                                                    <label class="custom-control-label" for="sex_f">여자</label>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="required">휴대폰</th>
+                                        <td>
+                                            <div class="flax_box">
+                                                <div class="form-inline mr-0 mr-sm-1" style="width:100%;max-width:400px;vertical-align:top;">
+                                                    <div class="form-inline-inner input_box" style="width:30%;">
+                                                        <input type="text" name="mobile1" id="mobile1" class="form-control form-control-sm" maxlength="3" onkeyup="onlynum(this)">
+                                                    </div>
+                                                    <span class="text_line">-</span>
+                                                    <div class="form-inline-inner input_box" style="width:29%;">
+                                                        <input type="text" name="mobile2" id="mobile2" class="form-control form-control-sm" maxlength="4" onkeyup="onlynum(this)">
+                                                    </div>
+                                                    <span class="text_line">-</span>
+                                                    <div class="form-inline-inner input_box" style="width:29%;">
+                                                        <input type="text" name="mobile3" id="mobile3" class="form-control form-control-sm" maxlength="4" onkeyup="onlynum(this)">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>이메일</th>
+                                        <td>
+                                            <div class="flax_box">
+                                                <input type="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                                                    name="email" id="email" class="form-control form-control-sm">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>주소</th>
+                                        <td>
+                                            <div class="d-flex flex-column input_box flax_box address_box">
+                                                <div class="d-flex w-100 mb-2">
+                                                    <input type="text" id="zipcode" name="zipcode" class="flex-1 form-control form-control-sm mr-2" readonly="readonly">
+                                                    <a href="javascript:;" onclick="openFindAddress('zipcode', 'addr1')" class="butt d-flex justify-content-center align-items-center fc-white fs-08 fw-sb br-05 bg-navy" style="width:70px;">
+                                                        <i class="fas fa-search fa-sm text-white-50 mr-1"></i>
+                                                        검색
+                                                    </a>
+                                                </div>
+                                                <input type="text" id="addr1" name="addr1" class="form-control form-control-sm w-100 mb-2" readonly="readonly">
+                                                <input type="text" id="addr2" name="addr2" class="form-control form-control-sm w-100">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>생년월일</th>
+                                        <td>
+                                            <div class="flax_box">
+                                                <div class="form-inline mr-0 mr-sm-1 mb-1" style="width:100%;max-width:400px;vertical-align:top;">
+                                                    <div class="form-inline-inner input_box" style="width:30%;">
+                                                        <select name="yyyy" id="yyyy" class="form-control form-control-sm mr-1">
+                                                            <option value="">년도</option>
+                                                            @for($i = date("Y")-14; $i > date("Y")-114; $i--)
+                                                                <option value="{{$i}}">{{$i}}</option>
+                                                            @endfor
+                                                        </select>
+                                                    </div>
+                                                    <span class="text_line">-</span>
+                                                    <div class="form-inline-inner input_box" style="width:29%;">
+                                                        <select name="mm" id="mm" class="form-control form-control-sm mr-1">
+                                                            <option value="">월</option>
+                                                            @for($i = 1; $i <= 12; $i++)
+                                                                <option value="{{$i}}">{{$i}}</option>
+                                                            @endfor
+                                                        </select>
+                                                    </div>
+                                                    <span class="text_line">-</span>
+                                                    <div class="form-inline-inner input_box" style="width:29%;">
+                                                        <select name="dd" id="dd" class="form-control form-control-sm mr-1">
+                                                            <option value="">일</option>
+                                                            @for($i = 1; $i <= 31; $i++)
+                                                                <option value="{{$i}}">{{$i}}</option>
+                                                            @endfor
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-inline form-radio-box mt-1 mt-sm-0">
+                                                    <div class="custom-control custom-radio">
+                                                        <input type="radio" name="yyyy_chk" id="yyyy_chk_y" class="custom-control-input" value="Y" checked>
+                                                        <label class="custom-control-label" for="yyyy_chk_y">양력</label>
+                                                    </div>
+                                                    <div class="custom-control custom-radio">
+                                                        <input type="radio" name="yyyy_chk" id="yyyy_chk_n" class="custom-control-input" value="N">
+                                                        <label class="custom-control-label" for="yyyy_chk_n">음력</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </form>
+                            <div class="text-center w-100">
+                                <button type="button" onclick="return addMember();" class="butt fc-white fs-12 fw-sb br-1 bg-blue w-100 p-3">등록</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- 고객검색모달 --}}
+    <div class="modal fade" id="searchMemberModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-header">
+                            <button type="button" class="fs-20 close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h5 class="mt-1 fs-14 fw-b">고객 검색</h5>
+                        </div>
+                        <div class="card-body b-none mt-4">
+                            <div class="d-flex align-items-center br-2 b-1-gray bg-white shadow-box p-2 pl-4 mb-3">
+                                <select name="search_member_type" id="search_member_type" class="sel fs-12" style="min-width: 120px;">
+                                    <option value="user_nm">고객명</option>
+                                </select>
+                                <input type="text" class="flex-1 inp h-40 fs-12 mr-1" id="search_member_keyword" name="search_member_keyword" placeholder="검색어를 입력하세요">
+                                <button type="button" class="butt br-2 bg-lightgray p-3" onclick="return SearchMember();"><i class="fa fa-search fc-black fs-10" aria-hidden="true"></i></button>
+                            </div>
+                            <div class="d-flex">
+                                <div class="table-responsive">
+                                    <div id="div-gd-member" class="ag-theme-balham" style="font-size: 18px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     {{-- 신용카드모달 --}}
     <div class="modal fade" id="payModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 500px;">
@@ -376,6 +559,18 @@
         {field: "price", headerName: "판매가", type: "currencyType", width: 100, cellStyle: LineHeight50},
     ];
 
+    const pApp3 = new App('', {gridId: "#div-gd-member"});
+    let gx3;
+
+    const member_columns = [
+        {field: "user_id" , headerName: "아이디", width: 120, cellStyle: {...AlignCenter, ...LineHeight50},
+            cellRenderer: (params) => `<a href="javascript:void(0);" onclick="return setMember('${params.value}')">${params.value}</a>`,
+        },
+        {field: "user_nm" , headerName: "이름", width: 120, cellStyle: {...AlignCenter, ...LineHeight50}},
+        {field: "mobile" , headerName: "연락처", width: 160, cellStyle: {...AlignCenter, ...LineHeight50}},
+        {width: "auto"}
+    ];
+
     const sale_types = <?= json_encode(@$sale_types) ?>; // 판매유형
     const pr_codes = <?= json_encode(@$pr_codes) ?>; // 행사명
 
@@ -399,6 +594,10 @@
 		pApp2.ResizeGrid(275, 400);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 		let gridDiv2 = document.querySelector(pApp2.options.gridId);
 		gx2 = new HDGrid(gridDiv2, product_columns);
+
+		pApp3.ResizeGrid(275, 400);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+		let gridDiv3 = document.querySelector(pApp3.options.gridId);
+		gx3 = new HDGrid(gridDiv3, member_columns);
 
 
         // ELEMENT EVENT
@@ -441,6 +640,14 @@
                 }
             }
         });
+        
+        $("#search_member_keyword").on("keypress", function (e) {
+            if(e.keyCode === 13) SearchMember();
+        });
+        $('#searchMemberModal').on('shown.bs.modal', function () {
+            $('#search_member_keyword').trigger('focus');
+        });
+
         $('#payModal').on('show.bs.modal', function(e) {
             let title = $(e.relatedTarget).data('title');
             let paytype = $(e.relatedTarget).data('pay-type');
