@@ -154,6 +154,14 @@
     /** 수량 및 금액 변경 시 업데이트 */
     async function updateOrderValue(key = '', value = '') {
         if(key != '') {
+            if(['card_amt', 'cash_amt', 'point_amt'].includes(key)) {
+                if(key === 'point_amt') {
+                    let max_point = unComma($("#user_point").text());
+                    if(value > max_point) return alert(`보유적립금을 초과하여 사용할 수 없습니다.\n(보유적립금: ${max_point}원)`);
+                }
+                await $(`[name=${key}]`).val(value);
+            }
+
             let curRow = gx.getSelectedNodes();
             if(curRow.length > 0) {
                 let rowData = curRow[0].data;
@@ -169,9 +177,6 @@
                     curRow[0].setData({...rowData, pr_code: value});
                 }
             } 
-            if(['card_amt', 'cash_amt', 'point_amt'].includes(key)) {
-                await $(`[name=${key}]`).val(value);
-            }
         }
 
         let list = gx.getRows();

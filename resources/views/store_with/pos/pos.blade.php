@@ -422,6 +422,7 @@
                                     </tr>
                                 </table>
                             </form>
+                            <p class="fc-red fs-08 mb-2">* 고객 등록 시 비밀번호는 '휴대폰 뒷자리 + *' 로 초기화됩니다.</p>
                             <div class="text-center w-100">
                                 <button type="button" onclick="return addMember();" class="butt fc-white fs-12 fw-sb br-1 bg-blue w-100 p-3">등록</button>
                             </div>
