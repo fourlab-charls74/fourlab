@@ -66,6 +66,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
     Route::prefix("pos")->namespace('pos')->group(function () {
         Route::get('', 'PosController@index');
         Route::get('search/{cmd?}', 'PosController@search_command');
+        Route::post('save', 'PosController@save');
+        Route::post('add-member', 'PosController@add_member');
     });
 
     //코드관리
@@ -176,10 +178,14 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('prd03/search','prd03Controller@search');
 
         Route::get('prd03/create', 'prd03Controller@showCreate');
+        Route::post('prd03/get-seq', 'prd03Controller@getSeq');
         Route::post('prd03/create', 'prd03Controller@create');
 
-        Route::get('prd03/edit','prd03Controller@edit');
+        Route::get('prd03/edit/{product_code}','prd03Controller@showEdit');
         Route::post('prd03/edit','prd03Controller@edit');
+
+        Route::get('prd03/delete/{product_code}','prd03Controller@delete');
+        Route::post('prd03/del-img', 'prd03Controller@delImg');
     });
 
     // 생산입고관리
@@ -204,6 +210,17 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('cs02/batch','cs02Controller@batch_show'); // 상품반품이동 일괄등록
         Route::post('cs02/batch-import','cs02Controller@import_excel'); // 상품반품이동 엑셀파일 적용
         Route::post('cs02/batch-getgoods','cs02Controller@get_goods'); // 일괄적용 시 상품정보 조회
+
+        // 원부자재입고
+        Route::get('cs03', 'cs03Controller@index');
+        Route::get('cs03/search', 'cs03Controller@search');
+        Route::put('cs03/update', 'cs03Controller@changeState');
+        Route::delete('cs03/delete', 'cs03Controller@delete');
+        Route::prefix('cs03/buy')->group(function () {
+            Route::get('/', 'cs03Controller@showBuy');
+            Route::get('/search', 'cs03Controller@searchBuy');
+            Route::post('/add', 'cs03Controller@addBuy');
+        });
         
     });
 
@@ -336,6 +353,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('mem01','mem01Controller@index');
         Route::get('mem01/search', 'mem01Controller@search');
         Route::get('mem01/batch', 'mem01Controller@batch');
+        Route::post('mem01/upload',	'mem01Controller@upload');
     });
 
     // 영업관리

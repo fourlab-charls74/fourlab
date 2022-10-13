@@ -73,19 +73,31 @@
 
 <script language="javascript">
 	var columnDefs = [
-		{headerName: "#",		field: "num",		filter:true,width:50,valueGetter: function(params) {return params.node.rowIndex+1;},pinned:'left'},
-		{headerName:"고객코드",	field:"user_id",	width:75},
-		{headerName:"고객명",	field:"name",		width:75},
+		{headerName: "#",			field: "num",		filter:true,width:50,valueGetter: function(params) {return params.node.rowIndex+1;},pinned:'left'},
+		{headerName:"고객코드",		field:"user_code",	width:75},
+		{headerName:"고객명",		field:"user_nm",	width:75},
+		{headerName:"등급코드",		field:"grade_code",	width:75},
+		{headerName:"고객등급",		field:"grade_nm",	width:75},
+		{headerName:"성별",			field:"sex",		width:65},
+		{headerName:"모바일",		field:"mobile",		width:85},
+		{headerName:"이메일",		field:"email",		width:75},
+		{headerName:"적립금",		field:"point",		width:65},
+		{headerName:"총구매금액",	field:"ord_amt",	width:90},
+		{headerName:"총구매횟수",	field:"ord_cnt",	width:90},
+		{headerName:"최근구매일",	field:"last_ord_date",	width:90},
+		{headerName:"가입매장",		field:"store_nm",	width:120},
+		{headerName:"가입일",		field:"rt",			width:70},
+		{headerName:"생일",			field:"birth_date",	width:60},
+		{headerName:"우편번호",		field:"zip",		width:75},
+		{headerName:"주소1",		field:"addr",		width:150},
+		{headerName:"주소2",		field:"addr2",		width:150},
+		{headerName:"메모",			field:"memo",		width:150},
 	];
 
 	// let the grid know which columns to use
 	var gridOptions = {
 		columnDefs: columnDefs,
 		defaultColDef: {
-			// set every column width
-			//flex: 1,
-			//width: 100,
-			// make every column editable
 			editable: true,
 			resizable: true,
 			autoHeight: true,
@@ -100,24 +112,6 @@
 	var eGridDiv = document.querySelector('#div-gd');
 
 	new agGrid.Grid(eGridDiv, gridOptions);
-
-/*		
-	gridOptions.api.sizeColumnsToFit();
-	const remInPixel = parseFloat(getComputedStyle(document.documentElement).fontSize);
-	gridOptions.columnApi.getAllColumns().forEach(function (column) {
-		//gridOptions.columnApi.autoSizeColumn(column.colId, false);
-		//console.log(column.colDef.width);
-		if(column.colDef.width == undefined){
-			const hn = column.colDef.headerName;
-			const hnWidth = hn.length*3*remInPixel;
-			//console.log(hn + ' - ' + hnWidth);
-			gridOptions.columnApi.setColumnWidth(column.colId,hnWidth);
-		} else {
-		}
-		//console.log(column.colId);
-		//allColumnIds.push(column.colId);
-	});
-*/
 
 </script>
 <script type="text/javascript" charset="utf-8">
@@ -208,35 +202,47 @@
 
 		var columns	= {
 			'A':"no",
-			'B':"com_type_nm",
-			'C':"com_id",
-			'D':"com_nm",
-			'E':"store_kind_nm",
-			'F':"phone",
-			'G':"mobile",
-			'H':"fax",
-			'I':"zipcode",
-			'J':"addr",
-			'K':"sdate",
-			'L':"edate",
-			'M':"manager_nm",
-			'N':"manager_sdate",
-			'O':"manager_edate",
-			'P':"manager_deposit",
-			'Q':"manager_fee",
-			'R':"manager_sfee",
-			'S':"deposit_cash",
-			'T':"deposit_coll",
-			'U':"interior_cost",
-			'V':"interior_burden",
-			'W':"fee",
-			'X':"sale_fee",
-			'Y':"use_yn"
+			'B':"check",
+			'C':"user_code",
+			'D':"user_nm",
+			'E':"grade_code",
+			'F':"grade_nm",
+			'G':"sex",
+			'H':"age_p",
+			'I':"age",
+			'J':"card_no",
+			'K':"mobile",
+			'L':"email",
+			'M':"point",
+			'N':"use_point",
+			'O':"p_ord_amt",
+			'P':"ord_amt",
+			'Q':"p_use_point",
+			'R':"coupon_amt",
+			'S':"p_ord_cnt",
+			'T':"ord_cnt",
+			'U':"avg_ord_amt",
+			'V':"last_ord_date",
+			'W':"store_nm",
+			'X':"rt",
+			'Y':"sl_birth_chk",
+			'Z':"birth_date",
+			'AA':"married_date",
+			'AB':"tel_kind",
+			'AC':"tel_home",
+			'AD':"tel_office",
+			'AE':"zip",
+			'AF':"addr",
+			'AG':"addr2",
+			'AH':"o_zip",
+			'AI':"o_addr",
+			'AJ':"o_addr2",
+			'AK':"memo"
 		};
 
 
 		// start at the 2nd row - the first row are the headers
-		var rowIndex = 3;
+		var rowIndex = 4;
 
 		var rowData = [];
 
@@ -271,7 +277,7 @@
 		form_data.append('file', file_data);
 		form_data.append('_token', "{{ csrf_token() }}");
 		$.ajax({
-			url: '/head/xmd/code/code02/upload', // point to server-side PHP script
+			url: '/store/member/mem01/upload', // point to server-side PHP script
 			dataType: 'json',  // what to expect back from the PHP script, if anything
 			cache: false,
 			contentType: false,

@@ -13,18 +13,37 @@
 			</div>
 		</div>
 		<div class="d-flex">
-			<a href="javascript:void(0)" onclick="addPrdCd();" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i>저장</a>
-			{{-- <!--<a href="javascript:void(0)" onclick="Cmder('delete')" class="btn btn-primary mr-1"><i class="fas fa-trash fa-sm text-white-50 mr-1"></i>삭제</a>//--> --}}
-			<a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i>닫기</a>
+			<a href="javascript:void(0);" onclick="save();" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i>수정</a>
+			<a href="javascript:void(0);" onclick="del();" class="btn btn-outline-primary mr-1"><i class="far fa-trash-alt fs-12"></i> 삭제</a>
+			<a href="javascript:void(0);" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i>닫기</a>
 		</div>
 	</div>
 
-	<style> 
-		.required:after {content:" *"; color: red;}
-		.table th {min-width:120px;}
+	<style>
+		.required:after {
+			content: " *";
+			color: red;
+		}
+
+		.table th {
+			min-width: 120px;
+		}
 
 		@media (max-width: 740px) {
-			.table td {float: unset !important;width:100% !important;}
+			.table td {
+				float: unset !important;
+				width: 100% !important;
+			}
+		}
+
+		/* 상품코드 api로 검색시 code-filter 부분 제거 */
+		#SearchPrdcdModal .code-filter {
+			display: none;
+			padding-top: 5px;
+		}
+
+		#SearchPrdcdModal #search_prdcd_sbtn {
+			margin-top: 27px;
 		}
 	</style>
 
@@ -32,7 +51,7 @@
 		<div class="card_wrap aco_card_wrap">
 			<div class="card shadow">
 				<div class="card-header mb-0">
-					<a href="#">기본 정보</a>
+					<a href="#">원부자재상품 정보 입력</a>
 				</div>
 				<div class="card-body">
 					<div class="row">
@@ -41,263 +60,337 @@
 								<table class="table incont table-bordered" width="100%" cellspacing="0">
 									<tbody>
 										<tr>
-											<th class="required">브랜드</th>
+											<th class="">구분</th>
 											<td style="width:35%;">
-												<div class="flax_box">
-													<select name='brand' class="form-control form-control-sm">
-														<option value=''>선택</option>
-														@foreach ($brands as $brand)
-															<option value='{{ $brand->br_cd }}'>{{ $brand->br_cd }} : {{ $brand->brand_nm }}</option>
-														@endforeach
-													</select>
-												</div>
+												<div class="flax_box">{{$type_nm}}</div>
 											</td>
-											<th class="required">년도</th>
+											<th class="">년도</th>
 											<td style="width:35%;">
-												<div class="flax_box">
-													<select name='year' class="form-control form-control-sm">
-														<option value=''>선택</option>
-														@foreach ($years as $year)
-															<option value='{{ $year->code_id }}'>{{ $year->code_id }} : {{ $year->code_val }}</option>
-														@endforeach
-													</select>
-												</div>
+												<div class="flax_box">{{$year}}</div>
 											</td>
 										</tr>
 										<tr>
-											<th class="required">시즌</th>
+											<th class="">시즌</th>
 											<td>
-												<div class="flax_box">
-													<select name='season' class="form-control form-control-sm">
-														<option value=''>선택</option>
-														@foreach ($seasons as $season)
-															<option value='{{ $season->code_id }}'>{{ $season->code_id }} : {{ $season->code_val }}</option>
-														@endforeach
-													</select>
-												</div>
+												<div class="flax_box">{{$season}}</div>
 											</td>
-											<th class="required">성별</th>
+											<th class="">성별</th>
 											<td>
-												<div class="flax_box">
-													<select name='gender' class="form-control form-control-sm">
-														<option value=''>선택</option>
-														@foreach ($genders as $gender)
-															<option value='{{ $gender->code_id }}'>{{ $gender->code_id }} : {{ $gender->code_val }}</option>
-														@endforeach
-													</select>
-												</div>
+												<div class="flax_box">{{$gender}}</div>
 											</td>
 										</tr>
 										<tr>
-											<th class="required">아이템</th>
+											<th class="">아이템</th>
 											<td>
-												<div class="flax_box">
-													<select name='item' class="form-control form-control-sm">
-														<option value=''>선택</option>
-														@foreach ($items as $item)
-															<option value='{{ $item->code_id }}'>{{ $item->code_id }} : {{ $item->code_val }}</option>
-														@endforeach
-													</select>
-												</div>
+												<div class="flax_box">{{$item}}</div>
 											</td>
-											<th class="required">품목</th>
+											<th class="">품목</th>
 											<td>
-												<div class="flax_box">
-													<select name='opt' class="form-control form-control-sm">
-														<option value=''>선택</option>
-														@foreach ($opts as $opt)
-															<option value='{{ $opt->code_id }}'>{{ $opt->code_id }} : {{ $opt->code_val }}</option>
-														@endforeach
-													</select>
-												</div>
+												<div class="flax_box">{{$opt}}</div>
 											</td>
 										</tr>
 										<tr>
-											<th class="required">상품번호</th>
-											<td colspan="3">
+											<th class="">칼라</th>
+											<td>
+												<div class="flax_box">{{$color}}</div>
+											</td>
+											<th class="">사이즈</th>
+											<td>
+												<div class="flax_box">{{$size}}</div>
+											</td>
+										</tr>
+										<tr>
+											<th class="required">원부자재명</th>
+											<td>
+												<div class="flax_box">
+													<input type='text' class="form-control form-control-sm" name='prd_nm' id="prd_nm" value='{{$prd_nm}}'>
+												</div>
+											</td>
+											<th class="">공급업체(거래선)</th>
+											<td>
+												<div class="flax_box">{{$sup_com}}</div>
+											</td>
+										</tr>
+										<tr>
+											<th class="required">판매가</th>
+											<td>
+												<div class="flax_box">
+													<input type='text' class="form-control form-control-sm" name='price' id="price" value='{{$price}}' onkeyup="onlynum(this)">
+												</div>
+											</td>
+											<th class="required">원가</th>
+											<td>
 											<div class="flax_box">
-													<div class="form-inline-inner inline_btn_box">
-														<input type='text' class="form-control form-control-sm search-enter" style="width:100%;" name='goods_no' id='goods_no' value=''>
-														<a href="#" class="btn btn-sm btn-outline-primary sch-goods_no"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-													</div>
+													<input type='text' class="form-control form-control-sm" name='wonga' id="wonga" value='{{$wonga}}' onkeyup="onlynum(this)">
 												</div>
 											</td>
 										</tr>
-									</tbody>
+										<tr>
+											<th class="required">단위</th>
+											<td>
+												<div class="flax_box">
+													<select name='unit' class="form-control form-control-sm">
+														<option value=''>선택</option>
+														@foreach ($units as $unit)
+														<option value='{{ $unit->code_id }}' {{$unit->code_id == $unit_id ? "selected" : ""}}>
+															{{ $unit->code_id }} : {{ $unit->code_val }}
+														</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
+											<th class="">{{$ut != "" ? "수정일" : "등록일"}}</th>
+											<td>
+												<div class="flax_box">{{$ut != "" ? $ut : $rt}}</div>
+											</td>
+										</tr>
+										<tr>
+											<th>이미지</th>
+											<td colspan="3">
+												<div style="text-align:center;" id="multi_img">
+													<input type='file' id='btnAdd' name="file" multiple='multiple' accept=".jpg" />
+												</div>
+												<div id='img_div'></div>
+												@if($img_url != "")
+													<div id='img_show_div' data-img="" style="display:inline-block;position:relative;width:150px;height:120px;margin:5px;z-index:1">
+														<img src="{{$img_url}}" alt="" id="img_show" style="width:100%;height:100%;z-index:none">
+														<input type="button" value="x" onclick="delete_img('{{$prd_cd}}','01')" style="width:20px;height:20px;position:absolute;right:0px;top:0px;border:none;font-size:large;font-weight:bolder;background:none;color:black;padding-bottom:20px;">
+													</div>
+												@endif
+											</td>
+										</tr>
 								</table>
-
-								<div style="width:100%;padding-top:20px;text-align:center;">
-									<button type="button" class="btn btn-primary ml-2" onclick="getOption()">옵션불러오기</button>
-								</div>
-
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-
-		<div class="card">
-			<div class="card-header mb-0">
-				<a href="#">상품코드정보</a>
-			</div>
-			<div class="card-body pt-2">
-				<div class="card-title">
-					<div class="filter_wrap">
-						<div class="fl_box px-0 mx-0">
-							<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span> 건</h6>
-						</div>
-						<div class="fr_box">
-						</div>
-					</div>
-				</div>
-				<div class="table-responsive">
-					<div id="div-gd" class="ag-theme-balham"></div>
-				</div>
-			</div>
-		</div>
-
 	</form>
 
 </div>
-
-
-
-<script>
-	const columns = [
-		{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 30, pinned: 'left', sort: null,
-            checkboxSelection: function(params) {
-                return params.data.match_yn == '';
-            },
-		},
-		{field:"goods_no",	headerName: "상품번호",		width:72},
-		{field:"style_no",	headerName: "아이템코드",	width:72},
-		{field:"goods_nm",	headerName: "상품명",		width:250},
-		{field:"goods_opt",	headerName: "상품옵션",		width:200},
-		{field:"prd_cd1",	headerName: "상품코드",		width:120,
-			editable: function(params) {return params.data.match_yn !== 'Y';}, 
-			cellStyle: function(params) {return params.data.match_yn !== 'Y' ? {"background-color": "#ffFF99"} : {};}
-		},
-		{field:"color",		headerName: "컬러",			width:72,
-			editable: function(params) {return params.data.match_yn !== 'Y';}, 
-			cellStyle: function(params) {return params.data.match_yn !== 'Y' ? {"background-color": "#ffFF99"} : {};}
-		},
-		{field:"size",		headerName: "사이즈",		width:72,
-			editable: function(params) {return params.data.match_yn !== 'Y';}, 
-			cellStyle: function(params) {return params.data.match_yn !== 'Y' ? {"background-color": "#ffFF99"} : {};}
-		},
-		{field:"match_yn", headerName: "등록유무",		width:72},
-		{field:"brand",		headerName:"브랜드",		hide:true},
-		{field:"year",		headerName:"년도",			hide:true},
-		{field:"season",	headerName:"시즌",			hide:true},
-		{field:"gender",	headerName:"성별",			hide:true},
-		{field:"item",		headerName:"아이템",		hide:true},
-		{field:"opt",		headerName:"품목",			hide:true},
-		{field:"seq",		headerName:"순서차수",		hide:true},
-		{field: "", headerName:"", width:"auto"},
-	];
-</script>
 <script type="text/javascript" charset="utf-8">
 
-    const pApp = new App('', {
-        gridId: "#div-gd",
-    });
-	let gx;
-
-	$(document).ready(function() {
-		pApp.ResizeGrid(550);
-		pApp.BindSearchEnter();
-		let gridDiv = document.querySelector(pApp.options.gridId);
-		gx = new HDGrid(gridDiv, columns);
-		gx.gridOptions.rowDragManaged = true;
-		gx.gridOptions.animateRows = true;
-		//Search();
-	});
-	
-    function Search() {
-        let data = $('form[name="f1"]').serialize();
-        gx.Request('/store/product/prd02/prd-search/', data);
-    }
-
-	//상품옵션 불러오기
-	function getOption(){
-		var frm	= $('form[name="f1"]');
-
-		if(!validation()) return;
-
-		Search();
-	}
+	const onlyNum = (obj) => {
+		val = obj.value;
+		new_val = '';
+		for (i=0; i<val.length; i++) {
+			char = val.substring(i, i+1);
+			if (char < '0' || char > '9') {
+				alert('숫자만 입력가능 합니다.');
+				obj.value = new_val;
+				return;
+			} else {
+				new_val = new_val + char;
+			}
+		}
+	};
 
 	const validation = (cmd) => {
-		// 브랜드 선택 여부
-		if(f1.brand.selectedIndex == 0) {
-			f1.brand.focus();
-			return alert("브랜드를 선택해주세요.");
+
+		// 원부자재명 입력여부
+		if (f1.prd_nm.value.trim() === '') {
+			f1.prd_nm.focus();
+			return alert("원부자재명을 입력해주세요.");
 		}
 
-		// 년도 선택여부
-		if(f1.year.selectedIndex == 0) {
-			f1.year.focus();
-			return alert("년도를 선택해주세요.");
+		// 판매가 입력여부
+		if (f1.price.value.trim() === '') {
+			f1.price.focus();
+			return alert("판매가를 입력해주세요.");
 		}
 
-		// 시즌 선택여부
-		if(f1.season.selectedIndex == 0) {
-			f1.season.focus();
-			return alert("시즌을 선택해주세요.");
+		// 원가 입력여부
+		if (f1.wonga.value.trim() === '') {
+			f1.wonga.focus();
+			return alert("원가를 입력해주세요.");
 		}
 
-		// 성별 선택여부
-		if(f1.gender.selectedIndex == 0) {
-			f1.gender.focus();
-			return alert("성별을 선택해주세요.");
-		}
-
-		// 아이템 선택여부
-		if(f1.item.selectedIndex == 0) {
-			f1.item.focus();
-			return alert("아이템을 선택해주세요.");
-		}
-
-		// 품목 선택여부
-		if(f1.opt.selectedIndex == 0) {
-			f1.opt.focus();
-			return alert("품목을 선택해주세요.");
-		}
-
-		// 상품번호 입력여부
-		if(f1.goods_no.value.trim() === '') {
-			f1.goods_no.focus();
-			return alert("상품번호를 입력해주세요.");
+		// 단위 선택여부
+		if (f1.unit.selectedIndex == 0) {
+			f1.unit.focus();
+			return alert("단위를 선택해주세요.");
 		}
 
 		return true;
 	}
 
-	function addPrdCd(){
-		let rows	= gx.getSelectedRows();
-		if(rows.length < 1) return alert("저장할 상품코드 정보를 선택해주세요.");
-
-		//console.log(rows);
-
+	const PRD_CD = "{{$prd_cd}}";
+	let added_base64_image = "";
+	function save() {
 		axios({
-			url: '/store/product/prd02/add-product-code',
-			method: 'put',
+			url: '/store/product/prd03/edit',
+			method: 'post',
 			data: {
-				data: rows, 
+				prd_cd: PRD_CD,
+				prd_nm: document.f1.prd_nm.value,
+				price: document.f1.price.value,
+				wonga: document.f1.wonga.value,
+				image: added_base64_image,
+				unit: document.f1.unit.value,
+				seq: 01 // 단일 이미지로 일단 처리 - 01로 고정
 			},
-		}).then(function (res) {
-			if(res.data.code === 200) {
-				alert(res.data.msg);
-				opener.Search();
-				self.close();
+		}).then(function(res) {
+			if (res.data.code === 200) {
+				alert("수정이 완료되었습니다.");
+				window.opener.Search();
+				window.close();
 			} else {
 				console.log(res.data);
-				alert("상품코드 등록중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+				alert("수정 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
 			}
-		}).catch(function (err) {
+		}).catch(function(err) {
 			console.log(err);
 		});
+	}
+
+	async function del() {
+		if (!confirm("삭제 하시겠습니까?")) {
+			return false;
+		}
+		const response = await axios({ url: `/store/product/prd03/delete/${PRD_CD}`, method: 'get' });
+		const { code } = response.data;
+		if (code == 200) {
+			alert("삭제가 완료되었습니다.");
+			window.opener.Search();
+			window.close();
+		} else if (code == 500) {
+			alert("수정 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+		}
+	}
+
+	/**
+	 * 이미지 - 매장관리 구현된 이미지 참고하여 작업
+	 */
+	$(document).ready(function() {
+		$("input:file[name='file']").change(function() {
+			var str = $(this).val();
+			var fileName = str.split('\\').pop().toLowerCase();
+
+			checkFileName(fileName);
+		});
+	});
+
+	function checkFileName(str) {
+
+		//1. 확장자 체크
+		var ext = str.split('.').pop().toLowerCase();
+		if ($.inArray(ext, ['jpg']) == -1) {
+			alert(ext + '파일은 업로드 하실 수 없습니다.');
+			$("input:file[name='file']").val("");
+			$('#img_div').remove();
+		} else {
+
+		}
+	}
+	
+	(imageView = function imageView(img_div, btn) {
+
+		var img_div = document.getElementById(img_div);
+		var btnAdd = document.getElementById(btn)
+		var sel_files = [];
+
+		// 이미지와 체크 박스를 감싸고 있는 div 속성
+		var div_style = 'display:inline-block;position:relative;' +
+			'width:150px;height:120px;margin:5px;z-index:1';
+		// 미리보기 이미지 속성
+		var img_style = 'width:100%;height:100%;z-index:none';
+		// 이미지안에 표시되는 체크박스의 속성
+		var chk_style = 'width:20px;height:20px;position:absolute;right:0px;top:0px;border:none;font-size:large;' +
+			'font-weight:bolder;background:none;color:black;padding-bottom:20px;';
+
+		btnAdd.onchange = function(e) {
+			var files = e.target.files;
+			var fileArr = Array.prototype.slice.call(files)
+			for (f of fileArr) {
+				imageLoader(f);
+			}
+		}
+
+		/*첨부된 이미지들을 배열에 넣고 미리보기 */
+		imageLoader = function(file) {
+
+			// 이미지 한개만 미리 보기 되도록 고정
+			if (img_div.getElementsByTagName('div').length > 0) {
+				img_div.removeChild(img_div.getElementsByTagName('div')[0]);
+			}
+			
+			sel_files.push(file);
+			var reader = new FileReader();
+			reader.onload = function(ee) {
+				let img = document.createElement('img')
+				img.setAttribute('style', img_style)
+				img.src = ee.target.result;
+				added_base64_image = ee.target.result;
+				img_div.appendChild(makeDiv(img, file));
+			}
+
+			reader.readAsDataURL(file);
+		}
+
+		makeDiv = function(img, file) {
+			var div = document.createElement('div');
+			div.setAttribute('style', div_style);
+
+			var btn = document.createElement('input');
+			btn.setAttribute('type', 'button');
+			btn.setAttribute('value', 'x');
+			btn.setAttribute('delFile', file.name);
+			btn.setAttribute('style', chk_style);
+			btn.onclick = function(ev) {
+				var ele = ev.srcElement;
+				var delFile = ele.getAttribute('delFile');
+				for (var i = 0; i < sel_files.length; i++) {
+					if (delFile == sel_files[i].name) {
+						sel_files.splice(i, 1);
+					}
+				}
+
+				dt = new DataTransfer();
+
+				for (f in sel_files) {
+					var file = sel_files[f];
+					dt.items.add(file);
+				}
+				btnAdd.files = dt.files;
+				var p = ele.parentNode;
+				img_div.removeChild(p);
+			}
+			div.appendChild(img);
+			div.appendChild(btn);
+
+			return div;
+		}
+	})('img_div', 'btnAdd')
+
+	function delete_img(prd_cd, seq) {
+		let img_show = document.querySelectorAll("#img_show_div");
+		
+		if (confirm("선택한 사진을 삭제하시겠습니까?")) {
+			$.ajax({
+				method: 'post',
+				url: '/store/product/prd03/del-img',
+				data: {
+					prd_cd: prd_cd,
+					seq: seq
+				},
+				success: function(data) {
+					if (data.code == '200') {
+						for (let i = 0; i < img_show.length; i++) {
+							if (img_show[i].dataset.img == seq) {
+								img_show[i].remove();
+								break;
+							}
+						}
+					} else {
+						alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+					}
+				},
+				error: function(res, status, error) {
+					console.log(error);
+				}
+			});
+		}
 	}
 </script>
 @stop

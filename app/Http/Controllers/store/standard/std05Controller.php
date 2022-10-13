@@ -85,7 +85,7 @@ class std05Controller extends Controller
 			from code c
 				left outer join sale_type s
 					on s.sale_kind = c.code_id
-			where 
+			where
 				c.code_kind_cd = 'SALE_KIND' 
 				and c.use_yn = 'Y' 
 			order by c.code_id
@@ -117,6 +117,7 @@ class std05Controller extends Controller
 				left outer join sale_type_store s
 					on store.store_cd = s.store_cd and s.sale_type_cd = :sale_type_cd
 			where 1=1 $where
+			order by store.store_cd
 		";
 
 		$rows = DB::select($sql, ["sale_type_cd" => $sale_type_cd]);
@@ -205,17 +206,33 @@ class std05Controller extends Controller
 					'mod_date' => now(),
 					'admin_id' => $admin_id,
 				]);
-
+				
 			foreach($r['store_datas'] as $s) {
-				DB::table('sale_type_store')
+				$cnt = DB::table('sale_type_store')
 					->where("sale_type_cd", "=", $idx)
 					->where("store_cd", "=", $s['store_cd'])
-					->update([
+					->count();
+				if($cnt < 1) {
+					DB::table('sale_type_store')->insert([
+						'sale_type_cd' => $idx,
+						'store_cd' => $s['store_cd'],
+						'store_nm' => $s['store_nm'],
 						'sdate' => $s['sdate'] ?? ($s['use_yn'] == 'Y' ? date("Y-m-d") : null),
 						'edate' => $s['edate'] ?? ($s['use_yn'] == 'Y' ? '9999-12-31' : null),
 						'use_yn' => $s['use_yn'] ?? "N",
-						'mod_date' => now(),
+						'reg_date' => now(),
 					]);
+				} else {
+					DB::table('sale_type_store')
+						->where("sale_type_cd", "=", $idx)
+						->where("store_cd", "=", $s['store_cd'])
+						->update([
+							'sdate' => $s['sdate'] ?? ($s['use_yn'] == 'Y' ? date("Y-m-d") : null),
+							'edate' => $s['edate'] ?? ($s['use_yn'] == 'Y' ? '9999-12-31' : null),
+							'use_yn' => $s['use_yn'] ?? "N",
+							'mod_date' => now(),
+						]);
+				}
 			}
 
 			$msg = "정상적으로 저장되었습니다.";

@@ -276,4 +276,26 @@ class mem01Controller extends Controller
 
 		return view( Config::get('shop.store.view') . '/member/mem01_batch', $values);
 	}
+
+	public function upload(Request $request)
+	{
+
+		if ( 0 < $_FILES['file']['error'] ) {
+			echo json_encode(array(
+				"code" => 500,
+				"errmsg" => 'Error: ' . $_FILES['file']['error']
+			));
+		}
+		else {
+			//$file = sprintf("data/code02/%s", $_FILES['file']['name']);
+			$file = sprintf("data/store/mem01/%s", $_FILES['file']['name']);
+			move_uploaded_file($_FILES['file']['tmp_name'], $file);
+			echo json_encode(array(
+				"code" => 200,
+				"file" => $file
+			));
+		}
+
+	}
+
 }

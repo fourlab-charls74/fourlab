@@ -550,7 +550,7 @@ class prd02Controller extends Controller
 			$code = 200;
 			$msg = "상품코드 삭제가 완료되었습니다.";
 
-		} catch (Exception $e) {
+		} catch (\Exception $e) {
 			DB::rollback();
 			$code = 500;
 			$msg = $e->getMessage();
