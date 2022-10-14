@@ -172,7 +172,7 @@
                                                             <th>공통 스크립트</th>
                                                             <td>
                                                                 <div class="flax_box">
-                                                                    <textarea rows="5" style="width: 100%;" name="add_script_content">{{@$add_script}}</textarea>
+                                                                    <textarea rows="5" style="width: 100%;" name="add_script_content">{{@$add_script_content}}</textarea>
                                                                     <div style="color:gray;">* 공통 스크립트의 내용을 푸터에 삽입하여 전체 쇼핑몰에 적용되도록 설정합니다.</div>
                                                                 </div>
                                                             </td>
@@ -196,7 +196,7 @@
                                     </div>
                                 </div>
                                 <div style="text-align:center;">
-                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData_shop();" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
+                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData('shop');" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
                                 </div>
                             </div>
                         </div>
@@ -224,7 +224,7 @@
                                                             <th>자동 취소 기간</th>
                                                             <td>
                                                                 <div class="flax_box">
-                                                                    <input type='text' class="form-control form-control-sm" name='' value="" style="width:150px;"> 일
+                                                                    <input type='text' class="form-control form-control-sm" name='cancel_period' value="{{@$cancel_period}}" style="width:150px;text-align:right;"> 일
                                                                 </div>
                                                                 <div style="color:gray;">* 주문 완료 후 자동 취소 기간 동안 입금되지 않은 주문건은 자동으로 취소됩니다.</div>
                                                             </td>
@@ -315,7 +315,7 @@
                                     </div>
                                 </div>
                                 <div style="text-align:center;">
-                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData_order();" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
+                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData('order');" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
                                 </div>
                             </div>
                         </div>
@@ -344,7 +344,7 @@
                                                             <th>기본 배송비</th>
                                                             <td>
                                                                 <div class="flax_box">
-                                                                    <input type='text' class="form-control form-control-sm" name='base_delivery_fee' value="{{@$base_delivery_fee}}" style="width:150px;">원
+                                                                    <input type='text' class="form-control form-control-sm" name='base_delivery_fee' value="{{@$base_delivery_fee}}" style="width:150px;text-align:right;">원
                                                                 </div>
                                                                 <div style="color:gray;">* 기본 배송비를 입력합니다.</div>
                                                             </td>
@@ -353,7 +353,7 @@
                                                             <th>추가 배송비</th>
                                                             <td>
                                                                 <div class="flax_box">
-                                                                    <input type='text' class="form-control form-control-sm" name='add_delivery_fee' value="{{@$add_delivery_fee}}" style="width:150px;">원
+                                                                    <input type='text' class="form-control form-control-sm" name='add_delivery_fee' value="{{@$add_delivery_fee}}" style="width:150px;text-align:right;">원
                                                                 </div>
                                                                 <div style="color:gray;">* 도서, 산간 지역으로 배송 시 추가로 발생하는 금액을 입력합니다.</div>
                                                             </td>
@@ -362,7 +362,7 @@
                                                             <th>배송비 무료</th>
                                                             <td>
                                                                 <div class="flax_box">
-                                                                    <input type='text' class="form-control form-control-sm" name='free_delivery_amt' value="{{@$free_delivery_amt}}" style="width:150px;">원
+                                                                    <input type='text' class="form-control form-control-sm" name='free_delivery_amt' value="{{@$free_delivery_amt}}" style="width:150px;text-align:right;">원
                                                                 </div>
                                                                 <div style="color:gray;">* 고객이 배송비 무료 금액 이상 구매 시 무료로 배송을 합니다.</div>
                                                             </td>
@@ -371,7 +371,7 @@
                                                             <th>도매 기본 배송비</th>
                                                             <td>
                                                                 <div class="flax_box">
-                                                                    <input type='text' class="form-control form-control-sm" name='wholesale_base_delivery_fee' value="" style="width:150px;">원
+                                                                    <input type='text' class="form-control form-control-sm" name='wholesale_base_delivery_fee' value="{{@$wholesale_base_delivery_fee}}" style="width:150px;text-align:right;">원
                                                                 </div>
                                                                 <div style="color:gray;">* 도매 기본 배송비를 입력합니다.</div>
                                                             </td>
@@ -380,7 +380,7 @@
                                                             <th>도매 추가 배송비</th>
                                                             <td>
                                                                 <div class="flax_box">
-                                                                    <input type='text' class="form-control form-control-sm" name='wholesale_add_delivery_fee' value="" style="width:150px;">원
+                                                                    <input type='text' class="form-control form-control-sm" name='wholesale_add_delivery_fee' value="{{@$wholesale_add_delivery_fee}}" style="width:150px;text-align:right;">원
                                                                 </div>
                                                                 <div style="color:gray;">* 도서,산간 지역으로 배송 시 추가로 발생하는 금액을 입력합니다.</div>
                                                             </td>
@@ -389,7 +389,7 @@
                                                             <th>도매 배송비 무료</th>
                                                             <td>
                                                                 <div class="flax_box">
-                                                                    <input type='text' class="form-control form-control-sm" name='wholesale_free_delivery_amt' value="{{@$wholesale_free_delivery_amt}}" style="width:150px;">원
+                                                                    <input type='text' class="form-control form-control-sm" name='wholesale_free_delivery_amt' value="{{@$wholesale_free_delivery_amt}}" style="width:150px;text-align:right;">원
                                                                 </div>
                                                                 <div style="color:gray;">* 도매 고객이 배송비 무료 금액 이상 구매 시 무료로 배송을 합니다.</div>
                                                             </td>
@@ -430,11 +430,11 @@
                                                             <td>
                                                                 <div class="flax_box">
                                                                     <div class="custom-control custom-radio">
-                                                                        <input type="radio" name="day_delivery_yn" id="day_delivery_y" class="custom-control-input" value="Y"/>
+                                                                        <input type="radio" name="day_delivery_yn" id="day_delivery_y" class="custom-control-input" value="Y"  @if ($day_delivery_yn === 'Y') checked @endif/>
                                                                         <label class="custom-control-label" for="day_delivery_y">사용함</label>
                                                                     </div>&nbsp;&nbsp;&nbsp;
                                                                     <div class="custom-control custom-radio">
-                                                                        <input type="radio" name="day_delivery_yn" id="day_delivery_n" class="custom-control-input" value="N"/>
+                                                                        <input type="radio" name="day_delivery_yn" id="day_delivery_n" class="custom-control-input" value="N"/ @if ($day_delivery_yn === 'N') checked @endif>
                                                                         <label class="custom-control-label" for="day_delivery_n">사용안함</label>
                                                                     </div>
                                                                 </div>
@@ -445,7 +445,7 @@
                                                             <th>당일배송 배송비</th>
                                                             <td>
                                                                 <div class="flax_box">
-                                                                    <input type='text' class="form-control form-control-sm" name='day_delivery_amt' value="" style="width:150px;">원
+                                                                    <input type='text' class="form-control form-control-sm" name='day_delivery_amt' value="{{@$day_delivery_amt}}" style="width:150px;text-align:right;">원
                                                                 </div>
                                                                 <div style="color:gray;">* 고객이 당일배송을 선택할 경우 추가로 지불해야할 배송비를 입력합니다.</div>
                                                             </td>
@@ -455,15 +455,15 @@
                                                             <td>
                                                                 <div class="flax_box">
                                                                     <div class="custom-control custom-radio">
-                                                                        <input type="radio" name="day_delivery_type" id="day_delivery_type_s" class="custom-control-input" value="S"/>
+                                                                        <input type="radio" name="day_delivery_type" id="day_delivery_type_s" class="custom-control-input" value="S" @if ($day_delivery_type === 'S') checked @endif/>
                                                                         <label class="custom-control-label" for="day_delivery_type_s">매입상품</label>
                                                                     </div>&nbsp;&nbsp;&nbsp;
                                                                     <div class="custom-control custom-radio">
-                                                                        <input type="radio" name="day_delivery_type" id="day_delivery_type_p" class="custom-control-input" value="P"/>
+                                                                        <input type="radio" name="day_delivery_type" id="day_delivery_type_p" class="custom-control-input" value="P" @if ($day_delivery_type === 'P') checked @endif/>
                                                                         <label class="custom-control-label" for="day_delivery_type_p">위탁상품</label>
                                                                     </div>&nbsp;&nbsp;&nbsp;
                                                                     <div class="custom-control custom-radio">
-                                                                        <input type="radio" name="day_delivery_type" id="day_delivery_type_a" class="custom-control-input" value="A"/>
+                                                                        <input type="radio" name="day_delivery_type" id="day_delivery_type_a" class="custom-control-input" value="A" @if ($day_delivery_type === 'A') checked @endif/>
                                                                         <label class="custom-control-label" for="day_delivery_type_a">전체상품</label>
                                                                     </div>
                                                                 </div>
@@ -474,7 +474,7 @@
                                                             <th>당일배송 가능 지역</th>
                                                             <td>
                                                                 <div class="flax_box">
-                                                                <input type="text" class="form-control form-control-sm" name="day_delivery_zone" value="" maxlength="50" style="width: 30%;" />
+                                                                <input type="text" class="form-control form-control-sm" name="day_delivery_zone" value="{{@$day_delivery_zone}}" maxlength="50" style="width: 30%;" />
                                                                 </div>
                                                                 <div style="color:gray;">* 당일배송 가능 지역을 입력하십시오. 지역이 여러곳인 경우에는 콤마(,)를 사용하여 입력하실 수 있습니다.  EX)서울,경기,대전</div>
                                                             </td>
@@ -487,7 +487,7 @@
                                     </div>
                                 </div>
                                 <div style="text-align:center;">
-                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData_delivery();" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
+                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData('delivery');" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
                                 </div>
                             </div>
                         </div>
@@ -515,7 +515,7 @@
                                                             <th>사용 가능 적립금</th>
                                                             <td>
                                                                 <div class="flax_box">
-                                                                    <input type='text' class="form-control form-control-sm" name='base_delivery_fee' value="" style="width:150px;">원 이상
+                                                                    <input type='text' class="form-control form-control-sm" name='point_limit' value="{{@$point_limit}}" style="width:150px;text-align:right;">원 이상
                                                                 </div>
                                                                 <div style="color:gray;">* 고객이 적립한 적립금이 "사용 가능 적립금" 이상인 경우 적립금을 사용할 수 있습니다.</div>
                                                             </td>
@@ -547,8 +547,8 @@
                                                                         <label class="custom-control-label" for="p_give_type_g">상품가격 기준</label>
                                                                     </div>&nbsp;&nbsp;&nbsp;
                                                                     <div class="custom-control custom-radio">
-                                                                        <input type="radio" name="p_give_type" id="p_give_type_R" class="custom-control-input" value="R"/>
-                                                                        <label class="custom-control-label" for="day_delivery_n">구매금액 기준</label>
+                                                                        <input type="radio" name="p_give_type" id="p_give_type_r" class="custom-control-input" value="R"/>
+                                                                        <label class="custom-control-label" for="p_give_type_r">구매금액 기준</label>
                                                                     </div>
                                                                 </div>
                                                             </td>
@@ -575,7 +575,7 @@
                                                             <th>회원가입 축하 적립금</th>
                                                             <td>
                                                                 <div class="flax_box">
-                                                                    <input type='text' class="form-control form-control-sm" name='join_point' value="{{@$join_point}}" style="width:150px;">원
+                                                                    <input type='text' class="form-control form-control-sm" name='join_point' value="{{@$join_point}}" style="width:150px;text-align:right;">원
                                                                 </div>
                                                                 <div style="color:gray;">* 쇼핑몰 회원으로 가입한 고객에게 지금할 적립금을 입력합니다.</div>
                                                             </td>
@@ -609,7 +609,7 @@
                                                                 </div>
                                                                 <div style="color:gray;">* 상품 구매 시 설정한 비율에 맞춰 고객에게 적립금을 지급 하도록 설정합니다.</div><br>
                                                                 <div class="flax_box">
-                                                                    <input type='text' class="form-control form-control-sm" id='ratio' name='ratio' value="{{@$ratio}}" style="width:150px;">%
+                                                                    <input type='text' class="form-control form-control-sm" id='ratio' name='ratio' value="{{@$ratio}}" style="width:150px;text-align:right;">%
                                                                 </div>
                                                                 <div style="color:gray;">* 상품 구매시 지급할 적립금의 비율을 입력합니다.</div>
                                                             </td>
@@ -664,12 +664,12 @@
                                                             <td>
                                                                 <div class="flax_box">
                                                                     <div class="custom-control custom-radio">
-                                                                        <input type="radio" name="estimate_point_yn" id="estimate_point_y" class="custom-control-input" value="Y"/>
-                                                                        <label class="custom-control-label" for="day_delivery_y">사용함</label>
+                                                                        <input type="radio" name="estimate_point_yn" id="estimate_point_y" class="custom-control-input" value="Y" @if ($estimate_point_yn == 'Y') checked @endif />
+                                                                        <label class="custom-control-label" for="estimate_point_y">사용함</label>
                                                                     </div>&nbsp;&nbsp;&nbsp;
                                                                     <div class="custom-control custom-radio">
-                                                                        <input type="radio" name="estimate_point_yn" id="estimate_point_n" class="custom-control-input" value="N"/>
-                                                                        <label class="custom-control-label" for="day_delivery_n">사용안함</label>
+                                                                        <input type="radio" name="estimate_point_yn" id="estimate_point_n" class="custom-control-input" value="N" @if ($estimate_point_yn == 'N') checked @endif />
+                                                                        <label class="custom-control-label" for="estimate_point_n">사용안함</label>
                                                                     </div>
                                                                 </div>
                                                                 <div style="color:gray;">* 상품 구매 고객이 후기를 작성할 경우 자동으로 적립금을 지금할 것인지 여부를 설정합니다.</div>
@@ -679,7 +679,7 @@
                                                             <th>적립금 지급액</th>
                                                             <td>
                                                                 <div class="flax_box">
-                                                                    <input type='text' class="form-control form-control-sm" name='estimate_point' value="" style="width:150px;">원
+                                                                    <input type='text' class="form-control form-control-sm" name='estimate_point' value="{{@$estimate_point}}" style="width:150px;text-align:right;">원
                                                                 </div>
                                                                 <div style="color:gray;">* 상품 구매 고객이 후기를 작성했을 때 자동으로 지급할 적립금을 입력합니다.</div>
                                                             </td>
@@ -691,7 +691,7 @@
                                     </div>
                                 </div>
                                 <div style="text-align:center;">
-                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData_point();" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
+                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData('point');" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
                                 </div>
                             </div>
                         </div>
@@ -735,7 +735,7 @@
                                                             <th>KAKAO 발송키</th>
                                                             <td>
                                                                 <div class="flax_box">
-                                                                    <input type='text' class="form-control form-control-sm" name='kakao_key' value="" style="width:200px;">
+                                                                    <input type='text' class="form-control form-control-sm" name='sender_key' value="{{@$sender_key}}" style="width:200px;">
                                                                 </div>
                                                                 <div style="color:gray;">* 카카오 알림톡 발송 키 입니다.</div>
                                                             </td>
@@ -747,7 +747,7 @@
                                     </div>
                                 </div><br><br>
                                 <div style="text-align:center;">
-                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData_kakao();" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
+                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData('kakao');" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
                                 </div>
                             </div>
                         </div>
@@ -816,12 +816,12 @@
                                                             <tr>
                                                                 <th>회원가입 인증 SMS 발송</th>
                                                                 <td style="text-align:center;">
-                                                                    <label><input type="radio" name="auth_yn" value="Y" /> 발송함</label>
-                                                                    <label><input type="radio" name="auth_yn" value="N" /> 발송안함</label>
+                                                                    <label><input type="radio" name="auth_yn" value="Y" @if($auth_yn == 'Y') checked @endif/> 발송함</label>
+                                                                    <label><input type="radio" name="auth_yn" value="N" @if ($auth_yn == 'N') checked @endif/> 발송안함</label>
                                                                 </td>
                                                                 <td >회원 가입 인증 SMS 발송 메시지 &nbsp;</td>
                                                                 <td>
-                                                                    <input type="text" name="auth_msg" class="form-control form-control-sm" value="" style="width: 100%;" />
+                                                                    <input type="text" name="auth_msg" class="form-control form-control-sm" value="{{@$auth_msg}}" style="width: 100%;" />
                                                                     <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('auth_msg','[[SHOP_NAME]]인증번호 [[AUTH_NO]]를 입력해주세요.');">[[SHOP_NAME]]인증번호 [[AUTH_NO]]를 입력해주세요.</div>
                                                                 </td>
                                                             </tr>
@@ -857,14 +857,14 @@
                                                                 </td>
                                                                 <td>결제완료 상태</td>
                                                                 <td>
-                                                                    <input type="text" name="order_msg_pay" class="form-control form-control-sm" value="" style="width: 100%;"/>
+                                                                    <input type="text" name="order_msg_pay" class="form-control form-control-sm" value="{{@$order_msg_pay}}" style="width: 100%;"/>
                                                                     <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('order_msg_pay','[[SHOP_NAME]][USER_NAME] 고객님의 주문이 접수되었습니다.([ORDER_NO])');">[[SHOP_NAME]][USER_NAME] 고객님의 주문이 접수되었습니다.([ORDER_NO])</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <td>미결제 상태</td>
                                                                 <td>
-                                                                    <input type="text" name="order_msg_not_pay" class="form-control form-control-sm" value="" style="width: 100%;"/>
+                                                                    <input type="text" name="order_msg_not_pay" class="form-control form-control-sm" value="{{@$order_msg_not_pay}}" style="width: 100%;"/>
                                                                     <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('order_msg_not_pay','[[SHOP_NAME]]입금계좌:[BANK] [ACCOUNT] 예금주:[DEPOSITOR] [ORDER_AMT]원');">[[SHOP_NAME]]입금계좌: [BANK] [ACCOUNT] 예금주:[DEPOSITOR] [ORDER_AMT]원</div>
                                                                 </td>
                                                             </tr>
@@ -914,26 +914,26 @@
                                                             <tr>
                                                                 <th rowspan="3" >주문 취소 시 SMS 발송</th>
                                                                 <td rowspan="3" style="text-align:center;">
-                                                                    <label><input type="radio" name="cancel_yn" value="Y"  /> 발송함</label>
-                                                                    <label><input type="radio" name="cancel_yn" value="N" /> 발송안함</label>
+                                                                    <label><input type="radio" name="cancel_yn" value="Y" @if ($cancel_yn == 'Y') checked @endif /> 발송함</label>
+                                                                    <label><input type="radio" name="cancel_yn" value="N" @if ($cancel_yn == 'N') checked @endif/> 발송안함</label>
                                                                 </td>
                                                                 <td>무통장&nbsp;</td>
                                                                 <td>
-                                                                    <input type="text" name="cancel_msg_bank"  class="form-control form-control-sm" value="" style="width: 100%;" />
+                                                                    <input type="text" name="cancel_msg_bank"  class="form-control form-control-sm" value="{{@$cancel_msg_bank}}" style="width: 100%;" />
                                                                     <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('cancel_msg_bank','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 취소 처리되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 취소 처리되었습니다.</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <td>카드&nbsp;</td>
                                                                 <td>
-                                                                    <input type="text" name="cancel_msg_card" class="form-control form-control-sm" value="" style="width: 100%;" />
+                                                                    <input type="text" name="cancel_msg_card" class="form-control form-control-sm" value="{{@$cancel_msg_card}}" style="width: 100%;" />
                                                                     <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('cancel_msg_card','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 승인취소되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 승인취소되었습니다.</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <td>계좌이체&nbsp;</td>
                                                                 <td>
-                                                                    <input type="text" name="cancel_msg_transfer" class="form-control form-control-sm" value="" style="width: 100%;" />
+                                                                    <input type="text" name="cancel_msg_transfer" class="form-control form-control-sm" value="{{@$cancel_msg_transfer}}" style="width: 100%;" />
                                                                     <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('cancel_msg_transfer','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 환불완료 처리되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 환불완료 처리되었습니다.</div>
                                                                 </td>
                                                             </tr>
@@ -952,22 +952,22 @@
                                                             <tr>
                                                                 <th>생일쿠폰 SMS 발송</th>
                                                                 <td style="text-align:center;">
-                                                                    <label><input type="radio" name="birth_yn" value="Y" /> 발송함</label>
-                                                                    <label><input type="radio" name="birth_yn" value="N" /> 발송안함</label>
+                                                                    <label><input type="radio" name="birth_yn" value="Y" @if ($birth_yn == 'Y') checked @endif /> 발송함</label>
+                                                                    <label><input type="radio" name="birth_yn" value="N" @if ($birth_yn == 'N') checked @endif/> 발송안함</label>
                                                                 <td>&nbsp;</td>
                                                                 <td>
-                                                                    <input type="text" name="birth_msg" class="form-control form-control-sm" value="" style="width: 100%;" />
+                                                                    <input type="text" name="birth_msg" class="form-control form-control-sm" value="{{@$birth_msg}}" style="width: 100%;" />
                                                                     <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('birth_msg','[[SHOP_NAME]][USER_NAME] 고객님의 생일쿠폰이 발급되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님의 생일쿠폰이 발급되었습니다.</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <th>웰컴백 쿠폰 SMS 발송</th>
                                                                 <td style="text-align:center;">
-                                                                    <label><input type="radio" name="welcome_yn" value="Y"  /> 발송함</label>
-                                                                    <label><input type="radio" name="welcome_yn" value="N"  /> 발송안함</label>
+                                                                    <label><input type="radio" name="welcome_yn" value="Y"  @if ($welcome_yn == 'Y') checked @endif/> 발송함</label>
+                                                                    <label><input type="radio" name="welcome_yn" value="N"  @if ($welcome_yn == 'N') checked @endif/> 발송안함</label>
                                                                 <td>&nbsp;</td>
                                                                 <td>
-                                                                    <input type="text" name="welcome_msg" class="form-control form-control-sm" value="" style="width: 100%;" />
+                                                                    <input type="text" name="welcome_msg" class="form-control form-control-sm" value="{{@$welcome_msg}}" style="width: 100%;" />
                                                                     <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('welcome_msg','[[SHOP_NAME]][USER_NAME] 고객님의 웰컴백쿠폰이 발급되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 웰컴백쿠폰이 발급되었습니다.</div>
                                                                 </td>
                                                             </tr>
@@ -1036,7 +1036,7 @@
                                     </div>
                                 </div>
                                 <div style="text-align:center;">
-                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData_sms();" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
+                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData('sms');" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
                                 </div>
                             </div>
                         </div>
@@ -1065,7 +1065,7 @@
                                                             <th width="200px">최초 출력 메뉴</th>
                                                             <td>
                                                                 <div class="flax_box">
-                                                                    <input type="text" name="init_url" class="form-control form-control-sm" value="" style="width: 100%;" />
+                                                                    <input type="text" name="init_url" class="form-control form-control-sm" value="{{@$init_url}}" style="width: 100%;" />
                                                                 </div>
                                                                 <div style="color:gray;">* 관리자 로그인 후 최초로 출력할 기본 메뉴를 지정합니다. 최근에 사용한 메뉴 내역이 있는 경우에는 최근 사용 메뉴가 자동으로 출력됩니다. </div>
                                                             </td>
@@ -1276,11 +1276,11 @@
                                                             <td width="15%">
                                                                 <div class="flax_box">
                                                                     <div class="custom-control custom-radio">
-                                                                        <input type="radio" name="member_inactive_yn" id="member_inactive_y" class="custom-control-input" value="Y"/>
+                                                                        <input type="radio" name="member_inactive_yn" id="member_inactive_y" class="custom-control-input" value="Y" @if ($member_inactive_yn == 'Y') checked @endif/>
                                                                         <label class="custom-control-label" for="member_inactive_y">사용함</label>
                                                                     </div>&nbsp;&nbsp;&nbsp;
                                                                     <div class="custom-control custom-radio">
-                                                                        <input type="radio" name="member_inactive_yn" id="member_inactive_n" class="custom-control-input" value="N"/>
+                                                                        <input type="radio" name="member_inactive_yn" id="member_inactive_n" class="custom-control-input" value="N" @if ($member_inactive_yn == 'Y') checked @endif/>
                                                                         <label class="custom-control-label" for="member_inactive_n">사용안함</label>
                                                                     </div>
                                                                 </div>
@@ -1296,7 +1296,7 @@
                                     </div>
                                 </div><br><br>
                                 <div style="text-align:center;">
-                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData_stock_reduction();" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
+                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData('stock_reduction');" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
                                 </div>
                             </div>
                         </div>
@@ -1416,7 +1416,7 @@
                                     </div>
                                 </div><br><br>
                                 <div style="text-align:center;">
-                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData_notice();" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
+                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData('list_count');" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
                                 </div>
                             </div>
                         </div>
@@ -1540,7 +1540,7 @@
                                     </div>
                                 </div>
                                 <div style="text-align:center;">
-                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData_admin();" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
+                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData('admin');" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
                                 </div>
                             </div>
                         </div>
@@ -1568,7 +1568,7 @@
                                                             <th>도메인</th>
                                                             <td>
                                                                 <div class="flax_box">
-                                                                    <input type='text' class="form-control form-control-sm w-100" name='m_domain' value="">
+                                                                    <input type='text' class="form-control form-control-sm w-100" name='m_domain' value="{{$m_domain}}">
                                                                     <div style="color:gray;">* 모바일 상점 도메인을 입력해 주십시오. "http://"는 생략합니다.  EX)m.domain.co.kr</div>
                                                                 </div>
                                                             </td>
@@ -1594,21 +1594,21 @@
                                                         <tr>
                                                             <th width="200px">카테고리 상품 출력 갯수</th>
                                                             <td>
-                                                                <input type="text"  class="form-control form-control-sm" name="m_category_goods_cnt" value="" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
+                                                                <input type="text"  class="form-control form-control-sm" name="m_category_goods_cnt" value="{{@$m_category_goods_cnt}}" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
                                                             </td>
                                                             <th>신상품 출력 갯수</th>
                                                             <td>
-                                                                <input type="text"  class="form-control form-control-sm" name="m_newarrival_goods_cnt" value="" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
+                                                                <input type="text"  class="form-control form-control-sm" name="m_newarrival_goods_cnt" value="{{@$m_newarrival_goods_cnt}}" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
                                                             </td>
                                                         </tr>
                                                         <tr>
                                                             <th>세일 상품 출력 갯수</th>
                                                             <td>
-                                                                <input type="text"  class="form-control form-control-sm" name="m_onsale_goods_cnt" value="" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
+                                                                <input type="text"  class="form-control form-control-sm" name="m_onsale_goods_cnt" value="{{@$m_onsale_goods_cnt}}" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
                                                             </td>
                                                             <th>브랜드샵 상품 출력 갯수</th>
                                                             <td>
-                                                                <input type="text"  class="form-control form-control-sm" name="m_brandshop_goods_cnt" value="" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
+                                                                <input type="text"  class="form-control form-control-sm" name="m_brandshop_goods_cnt" value="{{@$m_brandshop_goods_cnt}}" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
                                                             </td>
                                                         </tr>
 
@@ -1616,33 +1616,33 @@
                                                         <tr>
                                                             <th>베스트랭킹 상품 출력 갯수</th>
                                                             <td>
-                                                                <input type="text"  class="form-control form-control-sm" name="m_best_rank_goods_cnt" value="" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
+                                                                <input type="text"  class="form-control form-control-sm" name="m_best_rank_goods_cnt" value="{{@$m_best_rank_goods_cnt}}" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
                                                             </td>
                                                             <th>검색 상품 출력 갯수</th>
                                                             <td>
-                                                                <input type="text"  class="form-control form-control-sm" name="m_search_goods_cnt" value="" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
+                                                                <input type="text"  class="form-control form-control-sm" name="m_search_goods_cnt" value="{{@$m_search_goods_cnt}}" maxlength="3" style="width: 100px;text-align:right;display:inline" />개
                                                             </td>
                                                         </tr>
 
                                                         <tr>
                                                             <th>앱 메인 롤링 배너</th>
                                                             <td>
-                                                                <input type="text"  class="form-control form-control-sm" style="width:100%" name='app_main_banner_1' value=""/>
+                                                                <input type="text"  class="form-control form-control-sm" style="width:100%" name='app_main_banner_1' value="{{@$app_main_banner_1}}"/>
                                                             </td>
                                                             <th>앱 메인 기획전 배너</th>
                                                             <td>
-                                                                <input type="text"  class="form-control form-control-sm" style="width:100%" name='app_main_banner_2' value=""/>
+                                                                <input type="text"  class="form-control form-control-sm" style="width:100%" name='app_main_banner_2' value="{{@$app_main_banner_2}}"/>
                                                             </td>
                                                         </tr>
 
                                                         <tr>
                                                             <th>앱 메인 HOT PRODUCT</th>
                                                             <td>
-                                                                <input type="text"  class="form-control form-control-sm" name='app_main_section_1' value=""/>
+                                                                <input type="text"  class="form-control form-control-sm" name='app_main_section_1' value="{{@$app_main_section_1}}"/>
                                                             </td>
                                                             <th>앱 메인 MD PICK</th>
                                                             <td>
-                                                                <input type="text"  class="form-control form-control-sm" name='app_main_section_2' value=""/>
+                                                                <input type="text"  class="form-control form-control-sm" name='app_main_section_2' value="{{@$app_main_section_2}}"/>
                                                             </td>
                                                         </tr>
 
@@ -1650,7 +1650,7 @@
                                                             
                                                             <th>앱 메인 STEDY ITEM</th>
                                                             <td>
-                                                                <input type="text"  class="form-control form-control-sm" name='app_main_section_3' value=""/>
+                                                                <input type="text"  class="form-control form-control-sm" name='app_main_section_3' value="{{@$app_main_section_3}}"/>
                                                             </td>
                                                             <td width="15%" style="text-align: left;"><label>&nbsp;</label></td>
                                                             <td>&nbsp;</td>
@@ -1663,7 +1663,7 @@
                                 </div><br><br>
                                 
                                 <div style="text-align:center;">
-                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData_admin();" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
+                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData('mobile');" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
                                 </div>
                             </div>
                         </div>
@@ -1692,11 +1692,11 @@
                                                             <td>
                                                                 <div class="flax_box">
                                                                     <div class="custom-control custom-radio">
-                                                                        <input type="radio" name="image_yn" id="image_y" class="custom-control-input" value="Y"/>
+                                                                        <input type="radio" name="image_yn" id="image_y" class="custom-control-input" value="Y" @if ($image_yn == 'Y') checked @endif/>
                                                                         <label class="custom-control-label" for="image_y">사용함</label>
                                                                     </div>&nbsp;&nbsp;&nbsp;
                                                                     <div class="custom-control custom-radio">
-                                                                        <input type="radio" name="image_yn" id="image_n" class="custom-control-input" value="N" />
+                                                                        <input type="radio" name="image_yn" id="image_n" class="custom-control-input" value="N" @if ($image_yn == 'N') checked @endif/>
                                                                         <label class="custom-control-label" for="image_n">사용안함</label>
                                                                     </div>
                                                                 </div>
@@ -1707,7 +1707,7 @@
                                                             <th>이미지 도메인</th>
                                                             <td>
                                                                 <div class="flax_box">
-                                                                    <input type='text' class="form-control form-control-sm w-100" name='domain' value="">
+                                                                    <input type='text' class="form-control form-control-sm w-100" name='i_domain' value="{{@$i_domain}}">
                                                                     <div style="color:gray;">* 별도의 이미지서버를 사용하는 경우, "http://"를 제외한 이미지 도메인을 입력해주십시오.  EX)image.domain.co.kr</div>
                                                                 </div>
                                                             </td>
@@ -1735,11 +1735,11 @@
                                                             <td>
                                                                 <div class="flax_box">
                                                                     <div class="custom-control custom-radio">
-                                                                        <input type="radio" name="ftp_yn" id="ftp_y" class="custom-control-input" value="Y"/>
+                                                                        <input type="radio" name="ftp_yn" id="ftp_y" class="custom-control-input" value="Y" @if ($ftp_yn == 'Y') checked @endif/>
                                                                         <label class="custom-control-label" for="ftp_y">사용함</label>
                                                                     </div>&nbsp;&nbsp;&nbsp;
                                                                     <div class="custom-control custom-radio">
-                                                                        <input type="radio" name="ftp_yn" id="ftp_n" class="custom-control-input" value="N"/>
+                                                                        <input type="radio" name="ftp_yn" id="ftp_n" class="custom-control-input" value="N" @if ($ftp_yn == 'N') checked @endif/>
                                                                         <label class="custom-control-label" for="ftp_n">사용안함</label>
                                                                     </div>
                                                                 </div>
@@ -1749,28 +1749,28 @@
                                                         <tr>
                                                             <th>FTP 주소</th>
                                                             <td>
-                                                                <input type="text"  class="form-control form-control-sm" name="hostname" value=""/>
+                                                                <input type="text"  class="form-control form-control-sm" name="hostname" value="{{@$hostname}}"/>
                                                                 <div style="color:gray;">* 이미지(FTP) 서버의 도메인 또는 IP를 입력하십시오.</div>
                                                             </td>
                                                         </tr>
                                                         <tr>
                                                             <th>사용자 ID</th>
                                                             <td>
-                                                                <input type="text"  class="form-control form-control-sm" name="username" value=""/>
+                                                                <input type="text"  class="form-control form-control-sm" name="username" value="{{@$username}}"/>
                                                                 <div style="color:gray;">* 이미지(FTP) 서버에 접속할 수 있는 아이디를 입력하십시오.</div>
                                                             </td>
                                                         </tr>
                                                         <tr>
                                                             <th>비밀번호</th>
                                                             <td>
-                                                                <input type="text"  class="form-control form-control-sm" style="width:100%" name='password' value=""/>
+                                                                <input type="text"  class="form-control form-control-sm" style="width:100%" name='password' value="{{@$password}}"/>
                                                                 <div style="color:gray;">* 이미지(FTP) 서버에 접속할 수 있는 비밀번호를 입력하십시오.</div>
                                                             </td>
                                                         </tr>
                                                         <tr>
                                                             <th>디렉토리</th>
                                                             <td>
-                                                                <input type="text"  class="form-control form-control-sm" name='aphome_dir' value=""/>
+                                                                <input type="text"  class="form-control form-control-sm" name='home_dir' value="{{@$home_dir}}"/>
                                                                 <div style="color:gray;">* 이미지(FTP) 서버의 초기 디렉토리를 입력하십시오.</div>
                                                             </td>
                                                         </tr>
@@ -1782,7 +1782,7 @@
                                 </div><br><br>
                                 
                                 <div style="text-align:center;">
-                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData_admin();" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
+                                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateData('image');" id="saveData"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
                                 </div>
                             </div>
                         </div>
@@ -1809,298 +1809,13 @@
     }); 
 
 
-    function updateData_shop() {
-    
-        let frm = $('form[name=shop]').serialize();
-
-        frm += "&type=shop";
-
-        if ($("input[name='name'").val() === '') {
-                $("input[name='name'").focus();
-                alert('상점 명을 입력해 주세요.');
-                return false;
-        }
-        if ($("input[name='code'").val() === '') {
-                $("input[name='code'").focus();
-                alert('상점 코드를 입력해 주세요.');
-                return false;
-        }
-        if ($("input[name='phone'").val() === '') {
-                $("input[name='phone'").focus();
-                alert('상점 전화번호를 입력해 주세요.');
-                return false;
-        }
-        if ($("input[name='domain'").val() === '') {
-                $("input[name='domain'").focus();
-                alert('상점 도메인을 입력해 주세요.');
-                return false;
-        }
-        if ($("input[name='domain_bizest'").val() === '') {
-                $("input[name='domain_bizest'").focus();
-                alert('관리자 도메인을 입력해 주세요.');
-                return false;
-        }
-        if ($("input[name='email'").val() === '') {
-                $("input[name='email'").focus();
-                alert('상점 이메일을 입력해 주세요.');
-                return false;
-        }
-        if ($("input[name='title'").val() === '') {
-                $("input[name='title'").focus();
-                alert('타이틀 문구를 입력해 주세요.');
-                return false;
-        }
-        if ($("input[name='title_main'").val() === '') {
-                $("input[name='title_main'").focus();
-                alert('메인 페이지 타이틀 문구를  입력해 주세요.');
-                return false;
-        }
-        if ($("input[name='meta_tag'").val() === '') {
-                $("input[name='meta_tag'").focus();
-                alert('메타 태그를 입력해 주세요.');
-                return false;
-        }
-        if ($("input[name='sale_place'").val() === '') {
-                $("input[name='sale_place'").focus();
-                alert('판매처를 선택해 주세요.');
-                return false;
-        }
-            
-        $.ajax({
-            method: 'post',
-            url: '/head/system/sys05/update',
-            data: frm,
-            dataType: 'json',
-            success: function(data) {
-                if (data.code == '200') {
-                    alert('상점 정보가 수정되었습니다.');
-                    location.reload();
-                } else {
-                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                    console.log(data);
-                }
-            },
-            error: function(e) {
-                    console.log(e.responseText)
-            }
-        });
-
-    }
-
-    function updateData_order() {
-    
-        let frm = $('form[name=order]').serialize();
-        frm += "&type=order";
-
-        $.ajax({
-            method: 'post',
-            url: '/head/system/sys05/update',
-            data: frm,
-            dataType: 'json',
-            success: function(data) {
-                if (data.code == '200') {
-                    alert('주문 정보가 수정되었습니다.');
-                    location.reload();
-                } else {
-                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                    console.log(data);
-                }
-            },
-            error: function(e) {
-                    console.log(e.responseText)
-            }
-        });
-
-    }
-
-
-    function updateData_delivery() {
-    
-        let frm = $('form[name=delivery]').serialize();
-        frm += "&type=delivery";
-
-        $.ajax({
-            method: 'post',
-            url: '/head/system/sys05/update',
-            data: frm,
-            dataType: 'json',
-            success: function(data) {
-                if (data.code == '200') {
-                    alert('배송 정보가 수정되었습니다.');
-                    location.reload();
-                } else {
-                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                    console.log(data);
-                }
-            },
-            error: function(e) {
-                    console.log(e.responseText)
-            }
-        });
-
-    }
-
-    function updateData_point() {
-    
-        let frm = $('form[name=point]').serialize();
-        frm += "&type=point";
-
-        $.ajax({
-            method: 'post',
-            url: '/head/system/sys05/update',
-            data: frm,
-            dataType: 'json',
-            success: function(data) {
-                if (data.code == '200') {
-                    alert('적립금 정보가 수정되었습니다.');
-                    location.reload();
-                } else {
-                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                    console.log(data);
-                }
-            },
-            error: function(e) {
-                    console.log(e.responseText)
-            }
-        });
-
-    }
-
-    function updateData_kakao() {
-    
-        let frm = $('form[name=kakao]').serialize();
-        frm += "&type=kakao";
-
-        $.ajax({
-            method: 'post',
-            url: '/head/system/sys05/update',
-            data: frm,
-            dataType: 'json',
-            success: function(data) {
-                if (data.code == '200') {
-                    alert('KAKAO 정보가 수정되었습니다.');
-                    location.reload();
-                } else {
-                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                    console.log(data);
-                }
-            },
-            error: function(e) {
-                    console.log(e.responseText)
-            }
-        });
-
-    }
-
-    function updateData_sms() {
-    
-        let frm = $('form[name=sms]').serialize();
-        frm += "&type=sms";
+    function updateData(type) {
+        let frm = $('form[name='+type+']').serialize();
         
-        $.ajax({
-            method: 'post',
-            url: '/head/system/sys05/update',
-            data: frm,
-            dataType: 'json',
-            success: function(data) {
-                if (data.code == '200') {
-                    alert('SMS 정보가 수정되었습니다.');
-                    location.reload();
-                } else {
-                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                    console.log(data);
-                }
-            },
-            error: function(e) {
-                    console.log(e.responseText)
-            }
-        });
-
-    }
-
-    function updateData_stock_reduction() {
-    
-        let frm = $('form[name=stock_reduction]').serialize();
-        frm += "&type=stock_reduction";
-
-        $.ajax({
-            method: 'post',
-            url: '/head/system/sys05/update',
-            data: frm,
-            dataType: 'json',
-            success: function(data) {
-                if (data.code == '200') {
-                    alert('부가기능 정보가 수정되었습니다.');
-                    location.reload();
-                } else {
-                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                    console.log(data);
-                }
-            },
-            error: function(e) {
-                    console.log(e.responseText)
-            }
-        });
-
-    }
-
-    function updateData_notice() {
-    
-        let frm = $('form[name=list_count]').serialize();
-        frm += "&type=list_count";
-
-        $.ajax({
-            method: 'post',
-            url: '/head/system/sys05/update',
-            data: frm,
-            dataType: 'json',
-            success: function(data) {
-                if (data.code == '200') {
-                    alert('게시물 정보가 수정되었습니다.');
-                    location.reload();
-                } else {
-                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                    console.log(data);
-                }
-            },
-            error: function(e) {
-                    console.log(e.responseText)
-            }
-        });
-
-    }
-
-    function updateData_admin() {
-    
-        let frm = $('form[name=admin]').serialize();
-        frm += "&type=admin";
-
-        $.ajax({
-            method: 'post',
-            url: '/head/system/sys05/update',
-            data: frm,
-            dataType: 'json',
-            success: function(data) {
-                if (data.code == '200') {
-                    alert('서비스 정보가 수정되었습니다.');
-                    location.reload();
-                } else {
-                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                    console.log(data);
-                }
-            },
-            error: function(e) {
-                    console.log(e.responseText)
-            }
-        });
-
-    }
-
-    function updateData_image() {
+        frm += "&type="+ type;
         
-        let frm = $('form[name=image]').serialize();
-        frm += "&type=image";
-
+        console.log(frm);
+    
         $.ajax({
             method: 'post',
             url: '/head/system/sys05/update',
@@ -2108,7 +1823,7 @@
             dataType: 'json',
             success: function(data) {
                 if (data.code == '200') {
-                    alert('서비스 정보가 수정되었습니다.');
+                    alert('정보 수정에 성공하였습니다.');
                     location.reload();
                 } else {
                     alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
@@ -2121,6 +1836,7 @@
         });
 
     }
+
 </script>
 
 <script>
@@ -2134,6 +1850,20 @@
        account_holder.value = "";
        account_no.value = "";
     }
+
+    $(document).ready(function(){
+       if ($('#policy_g').is(':checked')) {
+            $("input[name='ratio']").attr('readonly', true);
+       }
+        $("#policy_s").on('click',function(){
+            $("input[name='ratio']").attr('readonly', false);
+        });
+    
+        $("#policy_g").on('click',function(){
+            $("input[name='ratio']").attr('readonly', true);
+        });
+    });
+
 
 </script>
    

@@ -56,7 +56,7 @@
                 </div>    
             </div>
         
-            <div class="show_layout py-3 px-sm-3">
+            <div class="show_layout py-3 px-sm-0">
                 <div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
                     <div class="card-title">
                         <div class="filter_wrap">

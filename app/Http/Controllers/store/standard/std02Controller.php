@@ -51,7 +51,7 @@ class std02Controller extends Controller
 		if( $store_kind != "" )	$where .= " and a.store_kind = '$store_kind' ";
 		if( $store_area != "" )	$where .= " and a.store_area = '$store_area' ";
 		if( $store_nm != "" )	$where .= " and ( a.store_nm like '%" . Lib::quote($store_nm) . "%' or a.store_nm_s like '%" . Lib::quote($store_nm) . "%' ) ";
-		if( $store_cd != "" )	$where .= " and a.com_id = '" . Lib::quote($store_cd) . "' ";
+		if( $store_cd != "" )	$where .= " and a.store_cd like '%" . Lib::quote($store_cd) . "%' ";
 		if( $use_yn != "" )		$where .= " and a.use_yn = '$use_yn' ";
 
 		$page_size	= $limit;

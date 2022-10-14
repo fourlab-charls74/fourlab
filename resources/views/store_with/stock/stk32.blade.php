@@ -2,6 +2,7 @@
 @section('title','알림')
 @section('content')
 
+
 <div class="page_tit">
     <h3 class="d-inline-flex">{{ @$cmd == 'send' ? '보낸' : '받은' }} 알림 보관함</h3>
     <div class="d-inline-flex location">
@@ -161,9 +162,21 @@
                 cellRenderer: (params) => 
                         params.data.first_receiver + (params.data.receiver_cnt > 1 ? `외 ${params.data.receiver_cnt - 1}개` : '')
             },
-            {headerName: "내용", field: "content", width:300},
+            {headerName: "내용", field: "content", width:300,
+                cellRenderer: params => {
+                    let text = params.data.content;
+                    let cuttext = "";
+                    if (text.length > 30) {
+                        cuttext = text.substr(0,30) + "...";
+                    } else {
+                        cuttext = text;
+                    }
+                    return "<a href='#' id='contentArea' onclick='showContent(" + params.data.msg_cd +")'>"+cuttext+"</a>";
+                },
+            },
             {headerName: "보낸 날짜", field: "rt", width:120},
             //{headerName: "확인여부", field: "check_yn", width: 150, cellClass: 'hd-grid-code'},
+            {headerName: "알림 번호", field: "msg_cd", hide: true},    
             {width: 'auto'}
         ];                              
     } else {
@@ -179,7 +192,11 @@
             {field: "sender_cd", hide: true},
             {headerName: "발신처", field: "sender_nm", width:150},
             {headerName: "연락처", field: "mobile", width: 80, cellClass: 'hd-grid-code'},
-            {headerName: "내용", field: "content", width: 300},
+            {headerName: "내용", field: "content", width: 300,
+                cellRenderer: params => {
+                    return "<a href='#' onclick='showContent(" + params.data.msg_cd +")'>"+params.data.content+"</a>";
+                },
+            },
             {headerName: "받은 날짜", field: "rt", width: 110, cellClass: 'hd-grid-code'},
             {headerName: "확인여부", field: "check_yn", width: 110, cellClass: 'hd-grid-code',
                 cellStyle: (params) => ({color: params.data.check_yn == 'Y' ? 'green' : 'none'})
@@ -220,6 +237,11 @@
     function openMsgPopup() {
         const url = '/store/stock/stk32/create';
         const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=700");
+    }
+
+    function showContent(msg_cd) {
+        const url = '/store/stock/stk32/showContent?msg_type=' + '{{@$cmd}}&msg_cd=' + msg_cd;
+        const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=615");
     }
 
     function msgRead() {
@@ -291,5 +313,7 @@
     }
 
 </script>
+
+
 
 @stop

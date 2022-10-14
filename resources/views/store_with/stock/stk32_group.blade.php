@@ -62,7 +62,7 @@
 
                             <div class="filter_wrap">
                                 <div class="fl_box">
-                                    <h6 class="m-0 font-weight-bold">총 <span id="total" class="text-primary">0</span> 건</h6>
+                                    <h6 class="m-0 font-weight-bold">총 <span id="gd-group-total" class="text-primary">0</span> 건</h6>
                                 </div>
                             </div>
                             
@@ -116,16 +116,21 @@
         const pApp2 = new App('', { gridId: "#div-gd-group" });
 
         $(document).ready(function() {
-            pApp.ResizeGrid(200);
+            pApp.ResizeGrid(178);
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
             gx = new HDGrid(gridDiv, columns);
             gx.Request('/store/stock/stk32/search_group');
 
-            pApp2.ResizeGrid(200);
+            pApp2.ResizeGrid(275);
             pApp2.BindSearchEnter();
             let gridDiv2 = document.querySelector(pApp2.options.gridId);
-            gx2 = new HDGrid(gridDiv2, group_columns);
+            gx2 = new HDGrid(gridDiv2, group_columns, {
+                onCellValueChanged: (e) => {
+                e.node.setSelected(true);
+                
+            }
+            });
             gx2.Request('/store/stock/stk32/search_group2');
 
         });

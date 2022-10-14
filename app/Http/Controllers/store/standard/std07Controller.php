@@ -36,7 +36,7 @@ class std07Controller extends Controller
 		if($store_type != null) 
 			$where .= " and s.store_type = '$store_type'";
 		if($store_cd != null) 
-			$where .= " and s.store_cd = '$store_cd'";
+			$where .= " and s.store_cd like '%$store_cd%'";
 		if($store_nm != null) 
 			$where .= " and (s.store_nm like '%$store_nm%' or s.store_nm_s like '%$store_nm%')";
 		if($use_yn != null) 

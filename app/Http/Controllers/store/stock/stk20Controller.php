@@ -28,6 +28,7 @@ class stk20Controller extends Controller
     public function index()
 	{
 		$values = [
+            'store_types' => SLib::getCodes("STORE_TYPE"),
             'sdate'         => now()->sub(1, 'week')->format('Y-m-d'),
             'edate'         => date("Y-m-d"),
             'rt_states'    => $this->rt_states, // RT상태

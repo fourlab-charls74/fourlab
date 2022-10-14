@@ -97,7 +97,7 @@ class stk32Controller extends Controller
                     md.rt,
                     md.check_yn
                 from msg_store_detail md
-                    inner join msg_store m on m.msg_cd = md.msg_cd
+                    left outer join msg_store m on m.msg_cd = md.msg_cd
                     left outer join store s on s.store_cd = m.sender_cd
                 where md.receiver_type = '$admin_type' and md.receiver_cd = '$admin_cd' $where
                 group by md.msg_cd
@@ -155,7 +155,6 @@ class stk32Controller extends Controller
         }
 
         $result = DB::select($sql);
-
         return response()->json([
             "code" => 200,
             "head" => array(
@@ -205,6 +204,8 @@ class stk32Controller extends Controller
         }
 
         $result = DB::select($sql);
+
+     
 
         return response()->json([
             "code" => 200,
@@ -302,6 +303,92 @@ class stk32Controller extends Controller
     }
 
 
+    public function showContent(Request $request)
+    {
+        
+        $mutable = Carbon::now();
+        $sdate	= $mutable->sub(1, 'month')->format('Y-m-d');
+        $msg_cd = $request->input('msg_cd');
+        $msg_type = $request->input('msg_type');
+        // 로그인한 계정 // 추후 수정
+        $admin_type = 'H';
+        $admin_cd = 'HEAD';
+
+        $query = "
+            select content
+            from msg_store
+            where msg_cd = '$msg_cd'
+        ";
+
+        $res = DB::selectOne($query);
+
+        if ($msg_type == 'send') {
+            $sql = 
+                "
+                select 
+                    m.msg_cd,
+                    md.receiver_type,
+                    group_concat(md.receiver_cd separator ', ') as receiver_cd,
+                    group_concat(if(md.receiver_type = 'S', s.store_nm, '본사') separator ', ') as receiver_nm,
+                    if(md.receiver_type = 'S', s.store_nm, '본사') as first_receiver,
+                    count(md.receiver_cd) as receiver_cnt,
+                    m.reservation_yn,
+                    m.reservation_date,
+                    m.content,
+                    m.rt
+                from msg_store m
+                    inner join msg_store_detail md on md.msg_cd = m.msg_cd
+                    left outer join store s on s.store_cd = md.receiver_cd
+                where m.sender_type = '$admin_type' and m.sender_cd = '$admin_cd' and m.msg_cd = '$msg_cd'
+                group by m.msg_cd
+                ";
+        } else if ($msg_type == 'receive') {
+            $sql = "
+                select 
+                    m.msg_cd,
+                    m.sender_cd,
+                    if(m.sender_type = 'S', s.store_nm, '본사') as sender_nm,
+                    s.phone as mobile,
+                    m.content,
+                    md.rt,
+                    md.check_yn
+                from msg_store_detail md
+                    left outer join msg_store m on m.msg_cd = md.msg_cd
+                    left outer join store s on s.store_cd = m.sender_cd
+                where md.receiver_type = '$admin_type' and md.receiver_cd = '$admin_cd' and m.msg_cd = '$msg_cd'
+                group by md.msg_cd
+            ";
+        }
+       
+        $result = DB::selectOne($sql);
+       
+        if ($msg_type == 'send') {
+            $values = [
+                'store_types' => SLib::getCodes("STORE_TYPE"),
+                'msg_type' => $msg_type,
+                'sdate' => $sdate,
+                'edate' => date("Y-m-d"),
+                'msg_cd' => $msg_cd,
+                'content' => $res->content,
+                'first_receiver' => $result->first_receiver,
+                'receiver_cnt' => $result->receiver_cnt,
+            ];
+        } else if ($msg_type == 'receive') {
+            $values = [
+                'store_types' => SLib::getCodes("STORE_TYPE"),
+                'msg_type' => $msg_type,
+                'sdate' => $sdate,
+                'edate' => date("Y-m-d"),
+                'msg_cd' => $msg_cd,
+                'content' => $res->content,
+                'sender_nm' => $result->sender_nm
+            ];
+        }
+
+        return view( Config::get('shop.store.view') . '/stock/stk32_showContent', $values);
+    }
+
+
     public function store(Request $request)
     {
        
@@ -362,7 +449,7 @@ class stk32Controller extends Controller
                             select 
                                 store_cd
                             from msg_group_store
-                            where group_cd = $gc
+                            where group_cd = '$gc'
                     ";
                     $rs = DB::select($result);
                     if ($rs != null) {
@@ -433,6 +520,7 @@ class stk32Controller extends Controller
     public function msg_del(Request $request)
     {
         $msg_cd = $request->input('msg_cd');
+        
 
         try {
             DB::beginTransaction();
@@ -519,6 +607,8 @@ class stk32Controller extends Controller
 
         $result = DB::select($sql);
 
+        // dd(count($result));
+
         return response()->json([
             "code" => 200,
             "head" => array(
@@ -534,6 +624,8 @@ class stk32Controller extends Controller
         $group_nm = $request->input('group_nm');
         $store_cd = $request->input('store_cd');
         $store_cd = explode(',',$store_cd);
+
+        
 
         try {
             DB::beginTransaction();

@@ -46,7 +46,7 @@
                         <div class="form-group">
 							<label for="store_cd">매장코드</label>
                             <div class="form-inline">
-                                <input type="text" id="store_cd" name="store_cd" class="form-control form-control-sm w-100" />
+                                <input type="text" id="store_cd" name="store_cd" class="form-control form-control-sm w-100 search-enter" />
                             </div>
 						</div>
                     </div>
@@ -54,7 +54,7 @@
                         <div class="form-group">
 							<label for="store_nm">매장명</label>
                             <div class="form-inline">
-                                <input type="text" id="store_nm" name="store_nm" class="form-control form-control-sm w-100" />
+                                <input type="text" id="store_nm" name="store_nm" class="form-control form-control-sm w-100 search-enter" />
                             </div>
 						</div>
                     </div>

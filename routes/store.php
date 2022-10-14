@@ -336,6 +336,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk32/search_group2{group_cd?}', 'stk32Controller@search_group2');
         Route::get('stk32/create', 'stk32Controller@create');
         Route::get('stk32/sendMsg', 'stk32Controller@sendMsg');
+        Route::get('stk32/showContent', 'stk32Controller@showContent');
         Route::get('stk32/show/{no?}', 'stk32Controller@show');
         Route::get('stk32/msg{no?}', 'stk32Controller@msg');
         Route::post('stk32/store', 'stk32Controller@store');

@@ -58,7 +58,7 @@ class cs01Controller extends Controller {
 
 		if ($com_id != "") $where .= " and b.com_id = '" . Lib::quote($com_id) . "'";
 		if ($state != "") $where .= " and b.state = '" . Lib::quote($state) . "'";
-		if ($invoice_no != "") $where .= " and b.invoice_no = '" . Lib::quote($invoice_no) . "'";
+		if ($invoice_no != "") $where .= " and b.invoice_no like '%" . Lib::quote($invoice_no) . "%'";
 		
 		if ($com_nm != "") $where2 .= " and c.com_nm like '%" . Lib::quote($com_nm) . "%' ";
 		if ($user_name != "") $where2 .= " and u.name like '%" . Lib::quote($user_name) . "%' ";

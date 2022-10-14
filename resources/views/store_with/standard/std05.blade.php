@@ -43,7 +43,7 @@
                         <div class="form-group">
 							<label for="sale_type_nm">판매유형명</label>
                             <div class="form-inline">
-                                <input type="text" id="sale_type_nm" name="sale_type_nm" class="form-control form-control-sm w-100" />
+                                <input type="text" id="sale_type_nm" name="sale_type_nm" class="form-control form-control-sm w-100 search-enter" />
                             </div>
 						</div>
                     </div>
