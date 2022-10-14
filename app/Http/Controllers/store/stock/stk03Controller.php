@@ -21,7 +21,7 @@ class stk03Controller extends Controller
     public function index()
 	{
 		$values = [
-            'sdate'             => now()->sub(3, 'month')->format('Y-m-d'),
+            'sdate'             => now()->sub(1, 'month')->format('Y-m-d'),
             'edate'             => date("Y-m-d"),
             'style_no'          => '',
             'ord_states'        => SLib::getordStates(), // 주문상태
@@ -236,12 +236,12 @@ class stk03Controller extends Controller
                     o.ord_state,
                     o.clm_state,
                     pay.pay_stat,
-                    p.prd_cd,
+                    o.prd_cd,
                     g.goods_no,
                     g.style_no,
                     g.goods_type,
-                    g.goods_nm,
-                    p.goods_opt,
+                    o.goods_nm,
+                    o.goods_opt,
                     o.qty,
                     om.user_id,
                     om.user_nm,
@@ -267,8 +267,7 @@ class stk03Controller extends Controller
                     (select count(*) from order_opt where ord_no = o.ord_no and ord_opt_no != o.ord_opt_no and (ord_state > 10 or clm_state > 0)) as ord_opt_cnt
                 from order_opt o
                     inner join order_mst om on o.ord_no = om.ord_no
-                    inner join product_code p on o.prd_cd = p.prd_cd
-                    inner join goods g on p.goods_no = g.goods_no
+                    inner join goods g on o.goods_no = g.goods_no
                     left outer join payment pay on om.ord_no = pay.ord_no
                     left outer join claim c on c.ord_opt_no = o.ord_opt_no
                     left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
@@ -296,8 +295,7 @@ class stk03Controller extends Controller
                 select count(*) as total
                 from order_opt o
                     inner join order_mst om on o.ord_no = om.ord_no
-                    inner join product_code p on o.prd_cd = p.prd_cd
-                    inner join goods g on p.goods_no = g.goods_no
+                    inner join goods g on o.goods_no = g.goods_no
                     left outer join payment pay on om.ord_no = pay.ord_no
                     left outer join claim c on c.ord_opt_no = o.ord_opt_no
                     left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
