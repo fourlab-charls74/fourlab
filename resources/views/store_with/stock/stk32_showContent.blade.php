@@ -58,7 +58,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <textarea class="form-control" id="content" name="content" rows="10" style="margin:auto;resize: none;" readonly >{{@$content}}</textarea>
+                    <textarea class="form-control" id="content" name="content" rows="10" style="margin:auto;resize: none;background-color: transparent !important;" readonly >{{@$content}}</textarea>
                 </div><br>
             </div>
         </div>

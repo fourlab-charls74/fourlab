@@ -162,16 +162,9 @@
                 cellRenderer: (params) => 
                         params.data.first_receiver + (params.data.receiver_cnt > 1 ? `외 ${params.data.receiver_cnt - 1}개` : '')
             },
-            {headerName: "내용", field: "content", width:300,
+            {headerName: "내용", field: "content", width:300, cellStyle: {'text-overflow': 'ellipsis'},
                 cellRenderer: params => {
-                    let text = params.data.content;
-                    let cuttext = "";
-                    if (text.length > 30) {
-                        cuttext = text.substr(0,30) + "...";
-                    } else {
-                        cuttext = text;
-                    }
-                    return "<a href='#' id='contentArea' onclick='showContent(" + params.data.msg_cd +")'>"+cuttext+"</a>";
+                    return "<a href='#' id='contentArea' onclick='showContent(" + params.data.msg_cd +")'>"+params.value+"</a>";
                 },
             },
             {headerName: "보낸 날짜", field: "rt", width:120},
@@ -192,9 +185,9 @@
             {field: "sender_cd", hide: true},
             {headerName: "발신처", field: "sender_nm", width:150},
             {headerName: "연락처", field: "mobile", width: 80, cellClass: 'hd-grid-code'},
-            {headerName: "내용", field: "content", width: 300,
+            {headerName: "내용", field: "content", width: 300, cellStyle: {'text-overflow': 'ellipsis'},
                 cellRenderer: params => {
-                    return "<a href='#' onclick='showContent(" + params.data.msg_cd +")'>"+params.data.content+"</a>";
+                    return "<a href='#' onclick='showContent(" + params.data.msg_cd +")'>"+params.value+"</a>";
                 },
             },
             {headerName: "받은 날짜", field: "rt", width: 110, cellClass: 'hd-grid-code'},

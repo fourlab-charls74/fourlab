@@ -37,7 +37,7 @@
                                             <div class="form-group">
                                                 <label style="min-width:60px;">매장명</label>
                                                 <div class="flex_box">
-                                                    <input type='text' class="form-control form-control-sm search-all" onkeypress="searchSendStore.Search(event);" name='store_nm' value='{{@$store_nm}}'>
+                                                    <input type='text' class="form-control form-control-sm search-all" onkeypress="searchSendStore.Search(event);" name='store_nm'>
                                                 </div>
                                             </div>
                                         </div>
@@ -107,7 +107,6 @@
         if (event_type == 'keypress') {
             if (e.key && e.key == 'Enter') {
                 let data = $('form[name="search_send_store"]').serialize();
-                console.log(data);
                 this.grid.Request('/store/api/stores/search', data);
             } else {
                 return false;

@@ -223,7 +223,7 @@
                 width:100
             },
             {field: "code_val", headerName: "코드값1",
-                editable: function(params){ return (params.data !== undefined && params.data.editable === 'Y')? true:false; },
+                // editable: function(params){ return (params.data !== undefined && params.data.editable === 'Y')? true:false; },
                 editable: true,
                 cellClass:function(params){ return (params.data !== undefined && params.data.editable == 'Y')? ['hd-grid-edit']: [];},
                 width:120
