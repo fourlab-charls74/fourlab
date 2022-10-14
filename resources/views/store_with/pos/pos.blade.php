@@ -422,6 +422,7 @@
                                     </tr>
                                 </table>
                             </form>
+                            <p class="fc-red fs-08 mb-2">* 고객 등록 시 비밀번호는 '휴대폰 뒷자리 + *' 로 초기화됩니다.</p>
                             <div class="text-center w-100">
                                 <button type="button" onclick="return addMember();" class="butt fc-white fs-12 fw-sb br-1 bg-blue w-100 p-3">등록</button>
                             </div>
@@ -451,6 +452,7 @@
                                 <input type="text" class="flex-1 inp h-40 fs-12 mr-1" id="search_member_keyword" name="search_member_keyword" placeholder="검색어를 입력하세요">
                                 <button type="button" class="butt br-2 bg-lightgray p-3" onclick="return SearchMember();"><i class="fa fa-search fc-black fs-10" aria-hidden="true"></i></button>
                             </div>
+                            <p class="d-flex mb-2">* <span class="d-block ml-2 mr-1" style="width: 50px;height: 15px;background-color:#c9f9f9;"></span> : 본 매장 고객</p>
                             <div class="d-flex">
                                 <div class="table-responsive">
                                     <div id="div-gd-member" class="ag-theme-balham" style="font-size: 18px;"></div>
@@ -563,12 +565,12 @@
     let gx3;
 
     const member_columns = [
-        {field: "user_id" , headerName: "아이디", width: 120, cellStyle: {...AlignCenter, ...LineHeight50},
+        {field: "user_id" , headerName: "아이디", width: 120, cellStyle: (params) => ({...AlignCenter, ...LineHeight50, "background-color": params.data.store_member == 'Y' ? '#c9f9f9 !important' : 'none'}),
             cellRenderer: (params) => `<a href="javascript:void(0);" onclick="return setMember('${params.value}')">${params.value}</a>`,
         },
-        {field: "user_nm" , headerName: "이름", width: 120, cellStyle: {...AlignCenter, ...LineHeight50}},
-        {field: "mobile" , headerName: "연락처", width: 160, cellStyle: {...AlignCenter, ...LineHeight50}},
-        {width: "auto"}
+        {field: "user_nm" , headerName: "이름", width: 120, cellStyle: (params) => ({...AlignCenter, ...LineHeight50, "background-color": params.data.store_member == 'Y' ? '#c9f9f9 !important' : 'none'})},
+        {field: "mobile" , headerName: "연락처", width: 160, cellStyle: (params) => ({...AlignCenter, ...LineHeight50, "background-color": params.data.store_member == 'Y' ? '#c9f9f9 !important' : 'none'})},
+        {width: "auto", cellStyle: (params) => ({"background-color": params.data.store_member == 'Y' ? '#c9f9f9 !important' : 'none'})}
     ];
 
     const sale_types = <?= json_encode(@$sale_types) ?>; // 판매유형

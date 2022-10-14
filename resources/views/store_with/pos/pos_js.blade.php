@@ -78,6 +78,7 @@
         gx.gridOptions.api.forEachNode((node) => {
             if(node.data.prd_cd === prd_cd) {
                 node.setSelected(true);
+                updateOrderValue('sale_type', sale_types[0].sale_kind);
             }
         });
 
@@ -115,7 +116,7 @@
         $("#cur_img").attr('src', "{{config('shop.image_svr')}}" + "/" + goods.img);
         $("#cur_img").attr('alt', goods.goods_nm);
 
-        let isJsGoods = goods.price == goods.goods_sh;
+        let isJsGoods = goods.ori_price == goods.goods_sh;
 
         let sale_type = document.getElementById("sale_type");
         $(sale_type).find("option").remove();
@@ -154,6 +155,14 @@
     /** 수량 및 금액 변경 시 업데이트 */
     async function updateOrderValue(key = '', value = '') {
         if(key != '') {
+            if(['card_amt', 'cash_amt', 'point_amt'].includes(key)) {
+                if(key === 'point_amt') {
+                    let max_point = unComma($("#user_point").text());
+                    if(value > max_point) return alert(`보유적립금을 초과하여 사용할 수 없습니다.\n(보유적립금: ${max_point}원)`);
+                }
+                await $(`[name=${key}]`).val(value);
+            }
+
             let curRow = gx.getSelectedNodes();
             if(curRow.length > 0) {
                 let rowData = curRow[0].data;
@@ -164,14 +173,17 @@
                     $("#cur_price").text(Comma(value));
                     curRow[0].setData({...rowData, price: value, total: rowData.qty * value});
                 } else if(key === 'sale_type') {
-                    curRow[0].setData({...rowData, sale_type: value});
+                    let st = sale_types.find(s => s.sale_kind == value);
+                    let std_price = st.sale_apply === 'tag' ? rowData.goods_sh : rowData.ori_price;
+                    let discount_amt = st.sale_amt || 0;
+                    if(st.amt_kind === 'per') discount_amt = std_price * (unComma(st.sale_per || 0) / 100);
+
+                    $("#cur_price").text(Comma(std_price - discount_amt));
+                    curRow[0].setData({...rowData, sale_type: value, price: std_price - discount_amt, total: rowData.qty * (std_price - discount_amt)});
                 } else if(key === 'pr_code') {
                     curRow[0].setData({...rowData, pr_code: value});
                 }
             } 
-            if(['card_amt', 'cash_amt', 'point_amt'].includes(key)) {
-                await $(`[name=${key}]`).val(value);
-            }
         }
 
         let list = gx.getRows();

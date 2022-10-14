@@ -141,14 +141,14 @@
 		$.ajax({
 			async: true,
 			type: 'put',
-			url: '/head/xmd/code/code02/show',
+			url: '/store/member/mem01/show',
 			data: {
 				data : JSON.stringify(GridData),
 			},
 			success: function (data) {
 				if( data.code == "200" )
 				{
-					alert("매장 정보가 등록(수정)되었습니다.");
+					alert("회원 정보가 등록(수정)되었습니다.");
 					window.opener.Search();
 					self.close();
 				} 
