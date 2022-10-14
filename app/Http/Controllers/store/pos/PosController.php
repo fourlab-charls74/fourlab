@@ -21,11 +21,16 @@ class PosController extends Controller
 {
     public function index() 
     {
+        $store_cd = STORE_CD;
+        $today = date('Y-m-d');
         $sql = "
-            select idx as sale_type, sale_kind, sale_type_nm, sale_apply, amt_kind, sale_amt, sale_per
-            from sale_type
-            where use_yn = 'Y'
-            order by sale_kind
+            select 
+                s.idx as sale_type, s.sale_kind, s.sale_type_nm, 
+                s.sale_apply, s.amt_kind, s.sale_amt, s.sale_per
+            from sale_type_store ss
+                inner join sale_type s on s.idx = ss.sale_type_cd
+            where ss.store_cd = '$store_cd' and ss.use_yn = 'Y' and ss.sdate <= '$today 00:00:00' and ss.edate >= '$today 23:59:59'
+            order by s.sale_kind
         ";
         $sale_types = DB::select($sql);
 
@@ -109,6 +114,7 @@ class PosController extends Controller
                 , pc.size
                 , g.goods_nm
                 , g.price
+                , g.price as ori_price
                 , g.goods_sh
                 , ps.wqty
                 , if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
@@ -161,20 +167,21 @@ class PosController extends Controller
         ];
         $order = new Order($user, false);
         $ord_no = $order->GetNextOrdNo();
-        // $ord_no = '1234567890'; // test
+        
         return response()->json(['code' => '200', 'ord_no' => $ord_no], 200);
     }
 
     /** 고객검색 */
     public function search_member(Request $request)
     {
+        $store_cd = STORE_CD;
         $search_type = $request->input('search_type', 'user_nm');
         $search_keyword = $request->input('search_keyword', '');
 
         $where = "";
         if ($search_keyword != '') {
             if ($search_type == 'user_nm') {
-                $where .= " and m.name like '%$search_keyword%' ";
+                $where .= " and name like '%$search_keyword%' ";
             }
         }
 
@@ -191,20 +198,25 @@ class PosController extends Controller
 
         $sql = " 
             select 
-                m.user_id
-                , m.name as user_nm
-                , m.mobile
-                , m.email
-                , if(m.sex = 'F', '여', if(m.sex = 'M', '남', '-')) as gender
-                , m.yyyy
-                , m.mm
-                , m.dd
-                , m.point
-                , m.addr
-                , m.addr2
-            from member m
+                user_id
+                , name as user_nm
+                , mobile
+                , email
+                , if(sex = 'F', '여', if(sex = 'M', '남', '-')) as gender
+                , yyyy
+                , mm
+                , dd
+                , point
+                , addr
+                , addr2
+                , if(store_cd = '$store_cd', 'Y', 'N') as store_member
+            from member
             where 1=1 $where
-            order by (CASE WHEN ASCII(SUBSTRING(user_nm,1)) < 123 THEN 2 ELSE 1 END), user_nm
+            order by 
+                (case when store_cd = '$store_cd' then 1 else 2 end), 
+                (case when ASCII(substring(user_nm, 1)) < 123 then 2 else 1 end), 
+                user_nm, 
+                user_id
             $limit
         ";
         $rows = DB::select($sql);
@@ -212,7 +224,7 @@ class PosController extends Controller
         if ($page == 1) {
             $sql = "
                 select count(*) as total
-                from member m
+                from member
                 where 1=1 $where
 			";
             $row = DB::selectOne($sql);
@@ -357,11 +369,23 @@ class PosController extends Controller
         $card_amt = $req->input("card_amt", 0); // 카드결제금액
         $cash_amt = $req->input("cash_amt", 0); // 현금결제금액
         $point_amt = $req->input("point_amt", 0); // 적립금결제금액
-        $pay_type = $card_amt >= $cash_amt ? 2 : ($cash_amt >= $point_amt ? 1 : 4); // 결제방법 (무통장(현금)(1)/카드(2)/적립금(4))
         $memo = $req->input("memo", "");
 
+        $pay_type = 0; // 결제방법
+        if ($cash_amt > 0) {
+            if ($point_amt > 0) $pay_type = 5; // 무통장+적립금
+            else $pay_type = 1; // 무통장
+        } else {
+            if ($card_amt > 0) {
+                if ($point_amt > 0) $pay_type = 6; // 카드+적립금
+                else $pay_type = 2; // 카드
+            } else {
+                $pay_type = 4; // 적립금
+            }
+        }
+
         $user_id = $req->input("user_id", ""); // 주문자 ID
-        $user_nm = "비회원T";
+        $user_nm = "비회원";
         $phone = "";
         $mobile = "";
         $email = "";
