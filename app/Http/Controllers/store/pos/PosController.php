@@ -63,6 +63,9 @@ class PosController extends Controller
 			case 'member':
 				$response = $this->search_member($request);
 				break;
+			case 'order':
+				$response = $this->search_order_history($request);
+				break;
             default:
                 $message = 'Command not found';
                 $response = response()->json(['code' => 0, 'msg' => $message], 200);
@@ -800,6 +803,15 @@ class PosController extends Controller
             "msg" => $msg,
             "ord_no" => $ord_no,
         ]);
+    }
+
+    /** 판매내역조회 */
+    public function search_order_history(Request $request)
+    {
+        dd($request->all());
+
+        $sdate = now()->sub(3, 'month')->format('Y-m-d');
+        $edate = date("Y-m-d");
     }
 }
 

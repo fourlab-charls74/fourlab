@@ -12,6 +12,9 @@
             $("#home_btn").css("display", "none");
         } else {
             $("#home_btn").css("display", "inline-block");
+            if(idx === "pos_today") {
+                SearchOrder();
+            }
         }
     }
 
@@ -387,6 +390,15 @@
             indexed_array[n['name']] = n['value'];
         });
         return indexed_array;
+    }
+
+    /** 판매내역 조회 */
+    function SearchOrder() {
+        // let type = $("[name=search_member_type]").val();
+        // let keyword = $("[name=search_member_keyword]").val();
+
+        // let data = "search_type=" + type + "&search_keyword=" + keyword;
+        gx4.Request("/store/pos/search/order", "", 1);
     }
 
 </script>

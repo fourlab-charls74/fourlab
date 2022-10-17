@@ -125,7 +125,7 @@
                 <p id="ord_no" class="fc-red"></p>
             </div>
             <div class="d-flex mb-4">
-                <div class="flex-1 position-relative fw-sb b-2-gray p-4 mr-2" style="min-height:250px;">
+                <div class="flex-1 position-relative fw-sb b-2-gray p-4" style="min-height:250px;">
                     <div id="no_user" class="d-flex justify-content-center align-items-center h-100 fc-gray fw-m">고객정보가 없습니다.</div>
                     <div id="user" class="d-none">
                         <p class="fs-18 fw-b mb-3"><span id="user_nm"></span> <span id="user_info" class="fs-16 fw-sb"></span> <span class="fs-14 fw-m">- <span id="user_id_txt"></span></span></p>
@@ -240,8 +240,28 @@
     </div>
 
     {{-- 당일판매내역화면 --}}
-    <div id="pos_today" class="flex-1 d-none align-items-center justify-content-center">
-        당일판매내역
+    <div id="pos_today" class="flex-1 d-none flex-column p-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="m-0 fs-12 fw-b">총 <span id="gd-order-total" class="text-primary">0</span> 건</h6>
+            <div class="d-flex fs-10">
+                {{-- <select name="sdate" id="sdate" class="sel b-1-gray br-05 pl-2 mr-2" style="width:130px;">
+
+                </select> --}}
+                <select name="ord_field" id="ord_field" class="sel b-1-gray br-05 pl-2 mr-2" style="width:130px;">
+                    <option value="">최신순</option>
+                    <option value="">오래된순</option>
+                </select>
+                <select name="limit" id="limit" class="sel b-1-gray br-05 pl-2 mr-2" style="width:130px;">
+                    <option value="100">100개씩 보기</option>
+                    <option value="200">200개씩 보기</option>
+                    <option value="500">500개씩 보기</option>
+                </select>
+                <button type="button" class="butt fc-white br-05 bg-navy" style="width:80px;">검색</button>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <div id="div-gd-order" class="ag-theme-balham" style="font-size: 18px;"></div>
+        </div>
     </div>
 </div>
 
@@ -514,11 +534,13 @@
 </div>
 
 <script type="text/javascript" charset="utf-8">
+    let AlignCenter = {"text-align": "center"};
+    let LineHeight50 = {"line-height": "50px"};
+
+    // 주문등록화면 - 선택상품리스트
 	const pApp = new App('', {gridId: "#div-gd"});
 	let gx;
 
-    let AlignCenter = {"text-align": "center"};
-    let LineHeight50 = {"line-height": "50px"};
     const columns = [
         // {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {...AlignCenter, ...LineHeight50}},
         {field: "prd_cd", hide: true},
@@ -544,6 +566,7 @@
         }
     ];
 
+    // 주문등록화면 - 상품조회리스트
     const pApp2 = new App('', {gridId: "#div-gd-product"});
     let gx2;
 
@@ -561,16 +584,32 @@
         {field: "price", headerName: "판매가", type: "currencyType", width: 100, cellStyle: LineHeight50},
     ];
 
+    // 주문등록화면 - 고객조회리스트
     const pApp3 = new App('', {gridId: "#div-gd-member"});
     let gx3;
 
     const member_columns = [
-        {field: "user_id" , headerName: "아이디", width: 120, cellStyle: (params) => ({...AlignCenter, ...LineHeight50, "background-color": params.data.store_member == 'Y' ? '#c9f9f9 !important' : 'none'}),
+        {field: "user_id", headerName: "아이디", width: 120, cellStyle: (params) => ({...AlignCenter, ...LineHeight50, "background-color": params.data.store_member == 'Y' ? '#c9f9f9 !important' : 'none'}),
             cellRenderer: (params) => `<a href="javascript:void(0);" onclick="return setMember('${params.value}')">${params.value}</a>`,
         },
-        {field: "user_nm" , headerName: "이름", width: 120, cellStyle: (params) => ({...AlignCenter, ...LineHeight50, "background-color": params.data.store_member == 'Y' ? '#c9f9f9 !important' : 'none'})},
-        {field: "mobile" , headerName: "연락처", width: 160, cellStyle: (params) => ({...AlignCenter, ...LineHeight50, "background-color": params.data.store_member == 'Y' ? '#c9f9f9 !important' : 'none'})},
+        {field: "user_nm", headerName: "이름", width: 120, cellStyle: (params) => ({...AlignCenter, ...LineHeight50, "background-color": params.data.store_member == 'Y' ? '#c9f9f9 !important' : 'none'})},
+        {field: "mobile", headerName: "연락처", width: 160, cellStyle: (params) => ({...AlignCenter, ...LineHeight50, "background-color": params.data.store_member == 'Y' ? '#c9f9f9 !important' : 'none'})},
         {width: "auto", cellStyle: (params) => ({"background-color": params.data.store_member == 'Y' ? '#c9f9f9 !important' : 'none'})}
+    ];
+
+    // 당일판매내역 - 판매내역리스트
+    const pApp4 = new App('', {gridId: "#div-gd-order"});
+    let gx4;
+
+    const order_columns = [
+        {field: "ord_date", headerName: "주문일자", width: 200, cellStyle: {...AlignCenter, ...LineHeight50}},
+        {field: "ord_no", headerName: "주문번호", width: 300, cellStyle: {...AlignCenter, ...LineHeight50},
+            // cellRenderer: (params) => `<a href="javascript:void(0);" onclick="return setMember('${params.value}')">${params.value}</a>`,
+        },
+        {field: "user_id", headerName: "고객정보", width: 300, cellStyle: LineHeight50},
+        {field: "pay_type", headerName: "결제수단", width: 150, cellStyle: {...AlignCenter, ...LineHeight50}},
+        {field: "pay_amt", headerName: "결제금액", width: 150, type: "currencyType", cellStyle: {"font-weight": "700", ...LineHeight50}},
+        {width: "aut0"}
     ];
 
     const sale_types = <?= json_encode(@$sale_types) ?>; // 판매유형
@@ -600,6 +639,10 @@
 		pApp3.ResizeGrid(275, 400);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 		let gridDiv3 = document.querySelector(pApp3.options.gridId);
 		gx3 = new HDGrid(gridDiv3, member_columns);
+
+		pApp4.ResizeGrid(140);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+		let gridDiv4 = document.querySelector(pApp4.options.gridId);
+		gx4 = new HDGrid(gridDiv4, order_columns);
 
 
         // ELEMENT EVENT
@@ -693,6 +736,9 @@
                 }
             }
         });
+
+        // test
+        SearchOrder();
 	});
 </script>
 
