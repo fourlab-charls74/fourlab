@@ -232,7 +232,7 @@
 			</div>
 		</div>
 		<div class="table-responsive">
-			<div id="div-gd-rt" class="ag-theme-balham"></div>
+			<div id="div-gd-rt" class="ag-theme-balham" style="min-height: 300px;"></div>
 		</div>
 	</div>
 </div>
@@ -344,7 +344,7 @@
             }
         });
 
-        pApp3.ResizeGrid(275, 350);
+        pApp3.ResizeGrid(705);
         pApp3.BindSearchEnter();
         let gridDiv3 = document.querySelector(pApp3.options.gridId);
         gx3 = new HDGrid(gridDiv3, rt_columns);
