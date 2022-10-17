@@ -80,7 +80,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="required">주소</th>
+                                            <th>주소</th>
                                             <td colspan="3">
                                                 <div class="d-flex flex-column">
                                                     <div class="d-flex mb-2">
@@ -342,7 +342,7 @@
         }
 
         // 주소 입력여부
-        if(f1.zipcode.value === '') return alert("주소를 입력해주세요.");
+        // if(f1.zipcode.value === '') return alert("주소를 입력해주세요.");
 
         return true;
     }

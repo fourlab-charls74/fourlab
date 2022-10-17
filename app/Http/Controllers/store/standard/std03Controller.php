@@ -130,6 +130,7 @@ class std03Controller extends Controller
 		$default_yn = $request->input("default_yn", "N");
 		$comment = $request->input("comment", "");
 
+
 		try {
             DB::beginTransaction();
 
