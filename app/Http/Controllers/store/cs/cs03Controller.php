@@ -49,7 +49,7 @@ class cs03Controller extends Controller
 
 		$user_nm = $request->input("user_nm");
 
-		$limit = $request->input("limit", 100);
+		// $limit = $request->input("limit", 100);
 
 		$where = "";
 		if ($prd_cd != "") {
@@ -60,7 +60,6 @@ class cs03Controller extends Controller
 			}
 			$where .= ")";
 		}
-
 		
 		if ($state != "") $where .= " and p2.state = '" . Lib::quote($state) . "'";
 		if ($prd_ord_no != "") $where .= " and p1.prd_ord_no = '" . Lib::quote($prd_ord_no) . "'";
@@ -121,8 +120,8 @@ class cs03Controller extends Controller
 				left outer join `code` c3 on c3.code_kind_cd = 'PRD_CD_UNIT' and c3.code_id = p3.unit
 				left outer join mgr_user m on p2.admin_id = m.id
 			where 1=1 $where
-			order by p2.prd_ord_date desc, prd_ord_no desc
-			$limit
+			order by p2.prd_ord_date desc, p1.prd_ord_no desc, p1.prd_cd asc
+			-- $limit
 		";
 		$result = DB::select($sql);
 		return response()->json([
