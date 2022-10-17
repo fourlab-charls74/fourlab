@@ -229,6 +229,52 @@ class std51Controller extends Controller
         return response()->json(['code' => $code,"msg" => $msg]);
     }
 
+    public function data_mod($code,Request $request) {
+
+        $data_codes = json_decode($request->input("data"));
+
+
+        try {
+            DB::transaction(function () use (&$result, $code,$data_codes) {
+
+                $id = Auth::guard('head')->user()->id;
+                $name = Auth::guard('head')->user()->name;
+
+                for($i=0;$i<count($data_codes);$i++){
+
+                    $data = (array)$data_codes[$i];
+
+                    $data_code = [
+                        "code_kind_cd" => $code,
+                        "code_id" => $data['code_id'],
+                        "code_val" => isset($data['code_val'])? $data['code_val']:'',
+                        "code_val2" => isset($data['code_val2'])? $data['code_val2']:'',
+                        "code_val3" => isset($data['code_val3'])? $data['code_val3']:'',
+                        "code_val_eng" => isset($data['code_val_eng'])? $data['code_val_eng']:'',
+                        "use_yn" => "Y",
+                        "code_seq" => 0,
+                        "admin_id" => $id,
+                        "admin_nm" => $name,
+                        'ut' => DB::raw('now()')
+                    ];
+
+                    DB::table('code')
+                    ->where('code_kind_cd','=',$code)
+                    ->where('code_id', '=', $data['code_id'])
+                    ->update($data_code);
+
+                   
+                }
+            });
+            $code = 200;
+            $msg = "";
+        } catch (Exception $e) {
+            $code = 500;
+            $msg = $e->getMessage();
+        }
+        return response()->json(['code' => $code,"msg" => $msg]);
+    }
+
     public function data_del($code,Request $request) {
 
         $code_ids = $request->input('code_ids');

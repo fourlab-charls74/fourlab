@@ -90,6 +90,7 @@
                                     <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                                     <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataAdd();"><span class="fs-12">코드추가</span></a>
                                     <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataSave();"><span class="fs-12">코드저장</span></a>
+                                    <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataMod();"><span class="fs-12">코드수정</span></a>
                                     <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataDel();"><span class="fs-12">코드삭제</span></a>
                                     <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return ChangeSeq();"><span class="fs-12">순서변경</span></a>
                                 </div>
@@ -108,7 +109,7 @@
             @if ($code !== '')
                 <a href="javascript:Delete();;" class="btn btn-sm btn-secondary delete-btn">삭제</a>
             @endif
-            <a href="javascript:;" class="btn btn-sm btn-secondary" onclick="window.close()">취소</a>
+            <a href="javascript:;" class="btn btn-sm btn-secondary" onclick="window.close()">닫기</a>
         </div>
     </div>
     <script>
@@ -225,16 +226,21 @@
             {field: "code_val", headerName: "코드값1",
                 // editable: function(params){ return (params.data !== undefined && params.data.editable === 'Y')? true:false; },
                 editable: true,
+                cellStyle: {'background' : '#ffff99'},
                 cellClass:function(params){ return (params.data !== undefined && params.data.editable == 'Y')? ['hd-grid-edit']: [];},
                 width:120
             },
             {field: "code_val2", headerName: "코드값2",
                 editable: function(params){ return (params.data !== undefined && params.data.editable === 'Y')? true:false; },
+                editable: true,
+                cellStyle: {'background' : '#ffff99'},
                 cellClass:function(params){ return (params.data !== undefined && params.data.editable == 'Y')? ['hd-grid-edit']: [];},
                 width:120
             },
             {field: "code_val3", headerName: "코드값3",
                 editable: function(params){ return (params.data !== undefined && params.data.editable === 'Y')? true:false; },
+                editable: true,
+                cellStyle: {'background' : '#ffff99'},
                 cellClass:function(params){ return (params.data !== undefined && params.data.editable == 'Y')? ['hd-grid-edit']: [];},
                 width:120
             },
@@ -327,6 +333,36 @@
 				}
 			});
 		}
+
+        function DataMod(){
+
+            let checkRows = gx.getSelectedRows();
+
+            console.log(checkRows);
+
+            if(checkRows.length == 0 ){
+                alert('수정할 코드정보를 선택해 주십시오.');
+                return false;
+            }
+
+            $.ajax({
+                method: 'post',
+                url: '/store/standard/std51/' + code + '/mod',
+                data: {data:JSON.stringify(checkRows)},
+                dataType: 'json',
+                success: function (res) {
+                    if(res.code == '200'){
+                        Search();
+                    } else {
+                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                        console.log(res.msg);
+                    }
+                },
+                error: function(e) {
+                    console.log(e.responseText)
+                }
+            });
+        }
 
         /**
          * @return {boolean}

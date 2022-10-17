@@ -150,6 +150,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
         Route::get('std51/{code?}/search', 'std51Controller@data_search');
         Route::post('std51/{code?}/save', 'std51Controller@data_add');
+        Route::post('std51/{code?}/mod', 'std51Controller@data_mod');
         Route::post('std51/{code?}/del', 'std51Controller@data_del');
         Route::post('std51/{code?}/seq', 'std51Controller@data_seq');
 

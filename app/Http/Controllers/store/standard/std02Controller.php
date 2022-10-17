@@ -196,11 +196,11 @@ class std02Controller extends Controller
 		$msg		= "매장정보가 정상적으로 반영되었습니다.";
 		$store_cd 	= $request->input('store_cd');
 		$image 		= $request->file('file');
-		$y 			= $request->input('y');
-		$x 			= $request->input('x');
-		$map_code 	= $y.', '.$x;
+		// $y 			= $request->input('y');
+		// $x 			= $request->input('x');
+		// $map_code 	= $y.','.$x;
 		$open_month_stock_yn = $request->input('open_month_stock_yn');
-
+		
 
 		try {
 			DB::beginTransaction();
@@ -260,7 +260,7 @@ class std02Controller extends Controller
 				'reg_date'		=> now(),
 				'mod_date'		=> now(),
 				'admin_id'		=> $id,
-				'map_code'		=> $map_code,
+				'map_code'		=> $request->input('map_code'),
 				'open_month_stock_yn' => $open_month_stock_yn
 				
 			];
