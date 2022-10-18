@@ -392,11 +392,13 @@
                 rows: gx.getSelectedRows(),
                 state: f1.state.value,
                 sdate: f1.sdate.value,
-                invoice_no: f1.invoice_no.value
+                invoice_no: f1.invoice_no.value,
+                prd_ord_type: f1.prd_ord_type.value
             }
         }).then((response) => {
             if (response.status == 201) {
                 alert("저장되었습니다.");
+                window.opener.Search();
                 window.close();
             } else {
                 alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');

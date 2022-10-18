@@ -68,6 +68,7 @@ CREATE TABLE `product_stock_order_product` (
     `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT 'identify',
     `prd_ord_no` varchar(50) NOT NULL COMMENT '입고송장번호/반품번호',
     `com_id` varchar(30) NOT NULL COMMENT '공급업체',
+    `state` varchar(5) DEFAULT 10 COMMENT '상태:입고대기(10),입고처리중(20),입고완료(30),반품대기(-10),반품처리중(-20),반품완료(-30)',
     `prd_cd` varchar(50) NOT NULL COMMENT '상품코드',
     `prd_nm` VARCHAR(100) NOT NULL COMMENT '상품명',
     `qty` INT(11) DEFAULT NULL COMMENT '수량',

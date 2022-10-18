@@ -399,7 +399,7 @@
 			alert('선택된 항목이 없습니다.')
 			return false;
 		} else {
-			if (!confirm("선택한 상품을 수정 목록에서 삭제 하시겠습니까?")) return false;
+			if (!confirm("선택한 상품을 저장 목록에서 삭제 하시겠습니까?")) return false;
 			rows.map(row => { 
 				added_rows.splice(row.idx, 1)
 				gx.gridOptions.api.applyTransaction({remove : [row]}); 
