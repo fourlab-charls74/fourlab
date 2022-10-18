@@ -142,15 +142,14 @@
                     </div>
                     <div class="fr_box">
                         <select id='change_state' name='change_state' class="form-control form-control-sm" style='width:130px; display:inline'>
-                            <option value='10'>입고대기</option>
+                            <option value=''>선택</option>
                             <option value='20'>입고처리중</option>
                             <option value='30'>입고완료</option>
-                            <option value='-10'>반품대기</option>
                             <option value='-20'>반품처리중</option>
                             <option value='-30'>반품완료</option>
                         </select>
                         <a href="javascript:void(0);" onclick="changeState();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-sync fs-16 mr-1"></i>입고/반품 상태변경</a>
-                        <a href="#" onclick="del()" class="btn-sm btn btn-primary">입고삭제</a>
+                        <a href="#" onclick="del()" class="btn-sm btn btn-primary">입고/반품 삭제</a>
                     </div>
                 </div>
             </div>
@@ -167,11 +166,14 @@
             field: "chk",
             headerName: '',
             cellClass: 'hd-grid-code',
-            headerCheckboxSelection: true,
-            checkboxSelection: true,
+            headerCheckboxSelection: false,
+            checkboxSelection: (params) => {
+                const state = params.data.state;
+                return state == 10 || state == 20 || state == -10 || state == -20 ? true : false;
+            },
             width: 28,
             sort: null,
-            pinned: 'left'
+            pinned: 'left',
         },
         {
             field: "prd_ord_date",
@@ -315,69 +317,83 @@
     };
 
     const changeState = () => {
-        let arr;
         let state;
-        let buy_ord_prd_nos = [];
+        let prd_ord_nos = [];
+        let prd_cds = [];
+        let qties = [];
         const select = document.querySelector('#change_state');
         if (select.value) {
             state = select.value;
         } else {
-            alert('발주상태를 선택 해 주십시오.')
+            alert('입고/반품 상태를 선택 해 주십시오.');
+            document.search.change_state.focus();
             return false;
         };
-        arr = gx.getSelectedRows();
-        if (arr.length < 1) return alert('상태를 변경할 발주건을 선택해주세요.');
-        if (confirm('발주 상태를 변경하시겠습니까?')) {
+        const arr = gx.getSelectedRows();
+        if (arr.length < 1) return alert('상태를 변경할 항목을 선택해주세요.');
+        if (confirm('입고/반품 상태를 변경하시겠습니까?')) {
             if (Array.isArray(arr) && !(arr.length > 0)) {
                 alert('항목을 선택 해 주십시오.')
                 select.focus();
                 return false;
             } else {
-                arr.map((obj, idx) => {
-                    obj.hasOwnProperty('buy_ord_prd_no') ?
-                        buy_ord_prd_nos[idx] = obj.buy_ord_prd_no :
-                        null;
+                arr.map((row, idx) => {
+                    prd_ord_nos[idx] = row.prd_ord_no;
+                    prd_cds[idx] = row.prd_cd;
+                    qties[idx] = row.qty;
                 });
                 axios({
                     url: '/store/cs/cs03/update',
                     method: 'put',
                     data: {
                         state: state,
-                        buy_ord_prd_nos: buy_ord_prd_nos
+                        prd_ord_nos: prd_ord_nos,
+                        prd_cds: prd_cds,
+                        qties: qties
                     }
                 }).then((response) => {
-                    if (response.status == 200) Search();
+                    if (response.data.code == 200) {
+                        alert("입고/반품 상태가 변경되었습니다.");
+                        Search();
+                    } else {
+                        alert("상태 변경 중 에러가 발생했습니다. 잠시 후 다시 시도 해주세요.");
+                    }
                 }).catch((error) => {
-                    console.log(error.response.data);
+                    // console.log(error.response.data);
                 });
             };
         };
     };
 
     const del = () => {
-        let arr;
-        let buy_ord_prd_nos = [];
+        let prd_ord_nos = [];
+        let prd_cds = [];
         if (confirm('삭제하시겠습니까?')) {
-            arr = gx.getSelectedRows();
+            const arr = gx.getSelectedRows();
             if (Array.isArray(arr) && !(arr.length > 0)) {
                 alert('항목을 선택 해 주십시오.')
                 return false;
             } else {
-                arr.map((obj, idx) => {
-                    obj.hasOwnProperty('buy_ord_prd_no') ?
-                        buy_ord_prd_nos[idx] = obj.buy_ord_prd_no :
-                        null;
+                arr.map((row, idx) => {
+                    prd_ord_nos[idx] = row.prd_ord_no;
+                    prd_cds[idx] = row.prd_cd;
                 });
                 axios({
                     url: '/store/cs/cs03/delete',
                     method: 'delete',
                     data: {
-                        buy_ord_prd_nos: buy_ord_prd_nos
+                        prd_ord_nos: prd_ord_nos,
+                        prd_cds : prd_cds
                     }
                 }).then((response) => {
-                    if (response.status == 200) Search();
+                    if (response.data.code == 200) {
+                        alert("삭제되었습니다");
+                        Search();
+                    } else {
+                        alert("삭제중 에러가 발생했습니다. 잠시 후 다시시도 해주세요.");
+                    }
                 }).catch((error) => {
-                    console.log(error.response.data);
+                    // console.log(error.response.data);
                 });
             }
         };

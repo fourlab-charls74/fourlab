@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Exception;
 use PDO;
+use PhpParser\Node\Stmt\Continue_;
 
 class cs03Controller extends Controller
 {
@@ -96,7 +97,7 @@ class cs03Controller extends Controller
 			select  
 				p2.prd_ord_date as prd_ord_date,
 				p1.prd_ord_no as prd_ord_no,
-				p2.state as state,
+				p1.state as state,
 				cp.com_nm as sup_com_nm,
 				p1.prd_cd as prd_cd,
 				p1.prd_nm as prd_nm,
@@ -138,54 +139,263 @@ class cs03Controller extends Controller
   
     public function changeState(Request $request) {
 		$state = $request->input("state");
-		$prd_order_nos = $request->input("prd_order_nos");
-		$status = 200;
-		if(count($prd_order_nos) > 0){
+		$prd_ord_nos = $request->input("prd_ord_nos");
+		$prd_cds = $request->input("prd_cds");
+		$qties = $request->input("qties");
+		$code = 200;
+		if (count($prd_ord_nos) > 0) {
 			try {
-				for($i=0;$i<count($prd_order_nos);$i++){
-					$prd_order_no = trim($prd_order_nos[$i]);
-					if($prd_order_no > 0){
-						$sql = "
-							update product_stock_order set state = '$state' where prd_order_no = :prd_order_no
-						";
-						DB::delete($sql, ['prd_order_no' => $prd_order_no]);
+				for ($i = 0; $i < count($prd_ord_nos); $i++) {
+					$prd_ord_no = $prd_ord_nos[$i];
+					$prd_cd = $prd_cds[$i];
+					$qty = $qties[$i];
+
+					/**
+					 * 변경 전 상태 가져오기
+					 */
+					$sql = "
+						select state from product_stock_order_product
+						where prd_cd = :prd_cd
+					";
+					$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+					$prev_state = $row->state;
+
+					/**
+					 * 입고/반품 상태에 따른 수량변경
+					 */
+					switch ($state) {
+						case $prev_state: // 이전상태와 동일한 경우 수량변경 없음
+							break;
+						case "20": // 입고처리중
+							$sql = "
+								select in_qty, qty, wqty from product_stock
+								where prd_cd = :prd_cd
+							";
+							$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+							if ($row != null) {
+								$in_qty = $row->in_qty + $qty;
+								$qty = $row->qty + $qty;
+								$wqty = $row->wqty + $qty;
+								$sql = "
+									update product_stock set in_qty = :in_qty, qty = :qty, wqty = :wqty where prd_cd = :prd_cd
+								";
+								DB::update($sql, ['in_qty' => $in_qty, 'qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
+							}
+
+							$sql = "
+								select wqty from product_stock_storage
+								where prd_cd = :prd_cd
+							";
+							$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+							if ($row != null) {
+								$wqty = $row->wqty + $qty;
+								$sql = "
+									update product_stock_storage set wqty = :wqty where prd_cd = :prd_cd
+								";
+								DB::update($sql, ['wqty' => $wqty, 'prd_cd' => $prd_cd]);
+							}
+							break;
+						case "30": // 입고완료
+							if ($prev_state == "20") { // 기존에 입고가 처리중인 경우 storage의 qty도 입고수량만큼 증가.
+								$sql = "
+									select qty from product_stock_storage
+									where prd_cd = :prd_cd
+								";
+								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+								if ($row != null) {
+									$qty = $row->qty + $qty;
+									$sql = "
+										update product_stock_storage set qty = :qty where prd_cd = :prd_cd
+									";
+									DB::update($sql, ['qty' => $qty, 'prd_cd' => $prd_cd]);
+								}
+								break;
+							} else { // 기존 상태가 입고처리중이 아닌 경우 입고처리 후 증가.
+								$sql = "
+									select in_qty, qty, wqty from product_stock
+									where prd_cd = :prd_cd
+								";
+								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+								if ($row != null) {
+									$in_qty = $row->in_qty + $qty;
+									$qty = $row->qty + $qty;
+									$wqty = $row->wqty + $qty;
+									$sql = "
+										update product_stock set in_qty = :in_qty, qty = :qty, wqty = :wqty where prd_cd = :prd_cd
+									";
+									DB::update($sql, ['in_qty' => $in_qty, 'qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
+								}
+
+								$sql = "
+									select qty, wqty from product_stock_storage
+									where prd_cd = :prd_cd
+								";
+								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+								if ($row != null) {
+									$qty = $row->qty + $qty;
+									$wqty = $row->wqty + $qty;
+									$sql = "
+										update product_stock_storage set qty = :qty where prd_cd = :prd_cd
+									";
+									DB::update($sql, ['qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
+								}
+								break;
+							}
+						case "-20": // 반품처리중
+							$sql = "
+								select out_qty, qty, wqty from product_stock
+								where prd_cd = :prd_cd
+							";
+							$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+							if ($row != null) {
+								$out_qty = $row->out_qty + $qty;
+								$qty = $row->qty - $qty;
+								$wqty = $row->wqty - $qty;
+								$sql = "
+									update product_stock set out_qty = :out_qty, qty = :qty, wqty = :wqty where prd_cd = :prd_cd
+								";
+								DB::update($sql, ['out_qty' => $out_qty, 'qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
+							}
+
+							$sql = "
+								select wqty from product_stock_storage
+								where prd_cd = :prd_cd
+							";
+							$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+							if ($row != null) {
+								$wqty = $row->wqty - $qty;
+								$sql = "
+									update product_stock_storage set wqty = :wqty where prd_cd = :prd_cd
+								";
+								DB::update($sql, ['wqty' => $wqty, 'prd_cd' => $prd_cd]);
+							}
+							break;
+						case "-30": // 반품완료
+							if ($prev_state == "-20") { // 기존에 반품이 처리중인 경우 storage의 qty도 입고수량만큼 감소.
+								$sql = "
+									select qty from product_stock_storage
+									where prd_cd = :prd_cd
+								";
+								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+								if ($row != null) {
+									$qty = $row->qty - $qty;
+									$sql = "
+										update product_stock_storage set qty = :qty where prd_cd = :prd_cd
+									";
+									DB::update($sql, ['qty' => $qty, 'prd_cd' => $prd_cd]);
+								}
+								break;
+							} else { // 기존 상태가 반품처리중이 아닌 경우 반품처리 후 감소.
+								$sql = "
+									select out_qty, qty, wqty from product_stock
+									where prd_cd = :prd_cd
+								";
+								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+								if ($row != null) {
+									$out_qty = $row->out_qty + $qty;
+									$qty = $row->qty - $qty;
+									$wqty = $row->wqty - $qty;
+									$sql = "
+										update product_stock set out_qty = :out_qty, qty = :qty, wqty = :wqty where prd_cd = :prd_cd
+									";
+									DB::update($sql, ['out_qty' => $out_qty, 'qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
+								}
+
+								$sql = "
+									select qty, wqty from product_stock_storage
+									where prd_cd = :prd_cd
+								";
+								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+								if ($row != null) {
+									$qty = $row->qty - $qty;
+									$wqty = $row->wqty - $qty;
+									$sql = "
+										update product_stock_storage set qty = :qty where prd_cd = :prd_cd
+									";
+									DB::update($sql, ['qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
+								}
+								break;
+							}
+						default:
+							throw new Exception("unallowed state");
+							break;
 					}
+
+					/**
+					 * 입고/반품 상태변경
+					 */
+					$sql = "
+						update product_stock_order_product set state = :state where prd_ord_no = :prd_ord_no and prd_cd = :prd_cd
+					";
+					DB::update($sql, ['state' => $state, 'prd_ord_no' => $prd_ord_no, 'prd_cd' => $prd_cd]);
 				}
+				$code = 200;
 				DB::commit();
-				$msg = "입고 상태가 변경되었습니다.";
-			} catch(Exception $e) {
+			} catch (Exception $e) {
+				// dd($e->getMessage());
+				$code = 500;
 				DB::rollback();
-				$status = 500;
-				$msg = "입고 상태 변경 중 에러가 발생했습니다. 잠시 후 다시시도 해주세요.";
 			}
 		}
-		return response()->json(['code' => $status, 'msg' => $msg], $status);
+		return response()->json(['code' => $code]);
     }
 
     public function delete(Request $request) {
+
 		$prd_ord_nos = $request->input("prd_ord_nos");
-		$status = 200;
-		if(count($prd_ord_nos) > 0){
-			try {
-				DB::beginTransaction();
-				for($i=0;$i<count($prd_ord_nos);$i++){
-					$prd_ord_no = trim($prd_ord_nos[$i]);
-					if($prd_ord_no > 0){
+		$prd_cds = $request->input("prd_cds");
+		$code = 200;
+		if (count($prd_ord_nos) > 0) {
+			for ($i = 0; $i < count($prd_ord_nos); $i++) {
+				$prd_ord_no = $prd_ord_nos[$i];
+				$prd_cd = $prd_cds[$i];
+				try {
+					DB::beginTransaction();
+
+					/**
+					 * slave 테이블 - 상품코드에 해당되는 입고/반품번호 삭제
+					 */
+					$sql = "
+						delete p1 from product_stock_order_product p1
+						where p1.prd_ord_no = :prd_ord_no and p1.prd_cd = :prd_cd and p1.state in ('10', '-10')
+					";
+					DB::delete($sql, ['prd_ord_no' => $prd_ord_no, 'prd_cd' => $prd_cd]);
+
+					/**
+					 * slave 테이블에서 입고/반품번호와 일치하는 데이터가 전부 삭제된 경우 master도 삭제
+					 */
+					$sql = "
+						select count(*) as cnt from product_stock_order_product p1
+						where p1.prd_ord_no = :prd_ord_no and p2.state in ('10', '-10')
+					";
+					$result = DB::selectOne($sql, ['prd_ord_no' => $prd_ord_no]);
+					if ($result->cnt == 0) {
 						$sql = "
-							delete from product_stock_order where prd_ord_no = :prd_ord_no and state < 30
+							delete from product_stock_order p1
+							where p1.prd_ord_no = :prd_ord_no and p2.state in ('10', '-10')
 						";
 						DB::delete($sql, ['prd_ord_no' => $prd_ord_no]);
 					}
+
+					$code = 200;
+					DB::commit();
+				} catch (Exception $e) {
+					$code = 500;
+					DB::rollback();
 				}
-				DB::commit();
-				$msg = "삭제되었습니다.";
-			} catch(Exception $e) {
-				DB::rollback();
-				$status = 500;
-				$msg = "삭제중 에러가 발생했습니다. 잠시 후 다시시도 해주세요.";
 			}
 		}
-		return response()->json(['code' => $status, 'msg' => $msg], $status);
+		return response()->json(['code' => $code]);
     }
 
 	public function showBuy(Request $request) {
@@ -353,6 +563,7 @@ class cs03Controller extends Controller
 							'com_id' => $sup_com_id
 						],
 						[
+							'state' => $state,
 							'prd_nm' => $prd_nm,
 							'qty' => $qty,
 							'price' => $price,
@@ -393,6 +604,7 @@ class cs03Controller extends Controller
 							'com_id' => $sup_com_id
 						],
 						[
+							'state' => $state,
 							'prd_nm' => $prd_nm,
 							'qty' => $qty,
 							'price' => $price,
@@ -433,14 +645,3 @@ class cs03Controller extends Controller
 	}
 
 }
-
-
-// /**
-//  * 기존의 입고수량을 가져와서 추가하려는 입고수량과 합산
-//  */
-// $sql = "
-// 	select qty from product_stock_order_product
-// 	where prd_ord_no = :invoice_no and prd_cd = :prd_cd
-// ";
-// $result = DB::selectOne($sql, ['invoice_no' => $invoice_no, 'prd_cd' => $prd_cd]);
-// if ($result != null) $qty = $row->qty + $row['in_qty'];
