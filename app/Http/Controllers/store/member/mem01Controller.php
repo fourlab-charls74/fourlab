@@ -322,25 +322,26 @@ class mem01Controller extends Controller
 			{
 				$data		= (array)$datas[$i];
 	
-				$user_id	= $data['user_code'];
-				$name		= $data['user_nm'];
-				$group_code	= $data['grade_code'];			//01:일반회원, 02:실버회원, 03:골드회원, 04:VIP회원
+				$user_id	= trim($data['user_code']);
+				$user_pw	= "fjallraven";					//초기 비밀번호[???]
+				$name		= trim($data['user_nm']);
+				$group_code	= trim($data['grade_code']);			//01:일반회원, 02:실버회원, 03:골드회원, 04:VIP회원
 				$group_no	= "13";							//13:일반회원, 15:실버회원, 16:골드회원, 17:VIP회원
-				$group_nm	= $data['group_nm'];
-				$sex		= $data['sex'];
-				$mobile		= $data['mobile'];
-				$email		= $data['email'];
-				$point		= Lib::uncm($data['point']);
-				$ord_amt	= Lib::uncm($data['ord_amt']);
-				$ord_cnt	= Lib::uncm($data['ord_cnt']);
-				$last_ord_date	= $data['last_ord_date'] . " 00:00:00";
-				$store_nm	= $data['store_nm'];
-				$regdate	= $data['rt'];
-				$birth_date	= $data['birth_date'];
-				$zip		= $data['zip'];
-				$addr		= $data['addr'];
-				$addr2		= $data['addr2'];
-				$memo		= $data['memo'];
+				$group_nm	= trim($data['grade_nm']);
+				$sex		= trim($data['sex']);
+				$mobile		= trim($data['mobile']);
+				$email		= trim($data['email']);
+				$point		= Lib::uncm(trim($data['point']));
+				$ord_amt	= Lib::uncm(trim($data['ord_amt']));
+				$ord_cnt	= Lib::uncm(trim($data['ord_cnt']));
+				$last_ord_date	= trim($data['last_ord_date']) . " 00:00:00";
+				$store_nm	= trim($data['store_nm']);
+				$regdate	= trim($data['rt']) . " 00:00:00";
+				$birth_date	= trim($data['birth_date']);
+				$zip		= trim($data['zip']);
+				$addr		= trim($data['addr']);
+				$addr2		= trim($data['addr2']);
+				$memo		= trim($data['memo']);
 
 				//고객 등급 매치
 				switch ($group_code) {
@@ -354,130 +355,104 @@ class mem01Controller extends Controller
 						$group_no = "13";
 				}
 
+				//고객 성별 매치
+				if( $sex == '남' )		$sex = "M";
+				else if( $sex == '여' )	$sex = "F";
+				else					$sex = "";
+
+
 				$rmobile	= strrev($mobile);
 				$email_chk	= "N";
 
 				//매장코드 생성
+				$store_nm_l	= strpos($store_nm, "(");
+				if($store_nm_l){
+					$store_nm_org	= substr($store_nm, 0, $store_nm_l);
+				}else{
+					$store_nm_org	= $store_nm;
+				}
 
+				$store_cd	= "";
+				$sql	= " select store_cd from store where store_nm = :store_nm ";
+				$store	= DB::selectOne($sql, ['store_nm' => $store_nm_org]);
+
+				if($store != null)	$store_cd	= $store->store_cd;
+
+				//생년월일
+				$mm	= "";
+				$dd	= "";
+				if( $birth_date != "" ){
+					$birth_date	= explode("-", $birth_date);
+
+					$mm	= $birth_date[0];
+					$dd	= $birth_date[1];
+				}
+
+				$where	= [
+					'user_id'	=> $user_id
+				];
+
+				$values	= [
+					'user_pw'	=> $user_pw,
+					'name'		=> $name,
+					'sex'		=> $sex,
+					'email'		=> $email,
+					'email_chk'	=> $email_chk,
+					'zip'		=> $zip,
+					'addr'		=> $addr,
+					'addr2'		=> $addr2,
+					'mobile'	=> $mobile,
+					'rmobile'	=> $rmobile,
+					'regdate'	=> $regdate,
+					'point'		=> $point,
+					'yn'		=> 'Y',
+					'mm'		=> $mm,
+					'dd'		=> $dd,
+					'out_yn'	=> 'N',
+					'memo'		=> $memo,
+					'pwd_reset_yn'	=> 'N',
+					'auth_type'	=> 'A',
+					'auth_yn'	=> 'N',
+					'site'		=> 'HEAD_OFFICE',
+					'type'		=> 'B',
+					'store_nm'	=> $store_nm_l,
+					'store_cd'	=> $store_cd
+				];
 
 				//회원처리
+				DB::table('member')->updateOrInsert($where, $values);
+
+
 				//적립금 처리
+				if($point > 0){
+					$point_values	= [
+						'ord_no'		=> '',
+						'ord_opt_no'	=> '',
+						'point_nm'		=> '기존 시스템 포인트 등록',
+						'point'			=> $point,
+						'admin_id'		=> 'system',
+						'admin_nm'		=> '시스템',
+						'regi_date'		=> now(),
+						'point_st'		=> '적립',
+						'point_kind'	=> '12',
+						'point_status'	=> 'Y',
+						'point_date'	=> now()
+					];
+	
+					DB::table('point_list')->updateOrInsert($where, $point_values);
+				}
+
+
 				//member_stat 처리
-
-
-
-				$com_type			= "";
-				$com_type_nm		= $data["com_type_nm"];
-				$com_id				= $data["com_id"];
-				$com_nm				= $data["com_nm"];
-				$store_kind			= "";
-				$store_kind_nm		= $data["store_kind_nm"];
-				$phone				= $data["phone"];
-				$mobile				= $data["mobile"];
-				$fax				= $data["fax"];
-				$zipcode			= $data["zipcode"];
-				$addr				= $data["addr"];
-				$sdate				= $data["sdate"];
-				$edate				= $data["edate"];
-				$manager_nm			= $data["manager_nm"];
-				$manager_sdate		= $data["manager_sdate"];
-				$manager_edate		= $data["manager_edate"];
-				$manager_deposit	= Lib::uncm($data["manager_deposit"]);
-				$manager_fee		= Lib::uncm($data["manager_fee"]);
-				$manager_sfee		= Lib::uncm($data["manager_sfee"]);
-				$deposit_cash		= Lib::uncm($data["deposit_cash"]);
-				$deposit_coll		= Lib::uncm($data["deposit_coll"]);
-				$interior_cost		= Lib::uncm($data["interior_cost"]);
-				$interior_burden	= Lib::uncm($data["interior_burden"]);
-				$fee				= Lib::uncm($data["fee"]);
-				$sale_fee			= $data["sale_fee"];
-				$use_yn				= ($data["use_yn"] == "T")?"Y":"N";
-
-				if( $com_type_nm != "" ){
-					$query		= " select code_id as com_type from __tmp_code where code_kind_cd = 'com_type' and use_yn = 'Y' and code_val = :com_type_nm ";
-					$row		= DB::selectOne($query, ['com_type_nm' => $com_type_nm]);
-					$com_type	= $row->com_type;
-				}
-
-				if( $store_kind_nm != "" ){
-					$query		= " select code_id as store_kind from __tmp_code where code_kind_cd = 'store_kind' and use_yn = 'Y' and code_val = :store_kind_nm ";
-					$row		= DB::selectOne($query, ['store_kind_nm' => $store_kind_nm]);
-					$store_kind	= $row->store_kind;
-				}
-	
-				$query	= " select count(*) as cnt from __tmp_store where com_id = :com_id ";
-				$row	= DB::selectOne($query, ['com_id' => $com_id]);
-
-				$sql_data	= [
-					'com_id'			=> $com_id, 
-					'com_nm'			=> $com_nm, 
-					'com_type'			=> $com_type, 
-					'store_kind'		=> $store_kind, 
-					'phone'				=> $phone, 
-					'mobile'			=> $mobile, 
-					'fax'				=> $fax, 
-					'zipcode'			=> $zipcode, 
-					'addr'				=> $addr, 
-					'sdate'				=> $sdate, 
-					'edate'				=> $edate, 
-					'manager_nm'		=> $manager_nm, 
-					'manager_sdate'		=> $manager_sdate, 
-					'manager_edate'		=> $manager_edate, 
-					'manager_deposit'	=> $manager_deposit, 
-					'manager_fee'		=> $manager_fee, 
-					'manager_sfee'		=> $manager_sfee, 
-					'deposit_cash'		=> $deposit_cash, 
-					'deposit_coll'		=> $deposit_coll, 
-					'interior_cost'		=> $interior_cost, 
-					'interior_burden'	=> $interior_burden, 
-					'fee'				=> $fee, 
-					'sale_fee'			=> $sale_fee, 
-					'use_yn'			=> $use_yn, 
-					'admin_id'			=> $id, 
-					'admin_nm'			=> $name
+				$stat_values	= [
+					'ord_cnt'	=> $ord_cnt,
+					'ord_amt'	=> $ord_amt,
+					'ord_date'	=> $last_ord_date,
+					'rt'		=> now(),
+					'ut'		=> now()
 				];
-	
-				if( $row->cnt == 0 ){
-					$sql	= "
-						insert into __tmp_store( com_id, com_nm, com_type, store_kind, phone, mobile, fax, zipcode, addr, sdate, edate, manager_nm, manager_sdate, manager_edate, manager_deposit, manager_fee, manager_sfee, deposit_cash, deposit_coll, interior_cost, interior_burden, fee, sale_fee, use_yn, rt, admin_id, admin_nm )
-						values ( :com_id, :com_nm, :com_type, :store_kind, :phone, :mobile, :fax, :zipcode, :addr, :sdate, :edate, :manager_nm, :manager_sdate, :manager_edate, :manager_deposit, :manager_fee, :manager_sfee, :deposit_cash, :deposit_coll, :interior_cost, :interior_burden, :fee, :sale_fee, :use_yn, now(), :admin_id, :admin_nm )
-					";
-					DB::insert($sql, $sql_data);
-				}
-				else{
-					$sql	= "
-						update __tmp_store set
-							com_nm			= :com_nm, 
-							com_type		= :com_type, 
-							store_kind		= :store_kind, 
-							phone			= :phone, 
-							mobile			= :mobile, 
-							fax				= :fax, 
-							zipcode			= :zipcode, 
-							addr			= :addr, 
-							sdate			= :sdate, 
-							edate			= :edate, 
-							manager_nm		= :manager_nm, 
-							manager_sdate	= :manager_sdate, 
-							manager_edate	= :manager_edate, 
-							manager_deposit	= :manager_deposit, 
-							manager_fee		= :manager_fee, 
-							manager_sfee	= :manager_sfee, 
-							deposit_cash	= :deposit_cash, 
-							deposit_coll	= :deposit_coll, 
-							interior_cost	= :interior_cost, 
-							interior_burden	= :interior_burden, 
-							fee				= :fee, 
-							sale_fee		= :sale_fee, 
-							use_yn			= :use_yn,
-							admin_id		= :admin_id,
-							admin_nm		= :admin_nm,
-							ut				= now()
-						where
-							com_id	= :com_id
-					";
-					DB::update($sql, $sql_data);
-				}
+
+				DB::table('member_stat')->updateOrInsert($where, $stat_values);
 			}
 	
 			DB::commit();
@@ -489,8 +464,6 @@ class mem01Controller extends Controller
 			$result_code	= "500";
 			$result_msg		= "데이터 등록/수정 오류";
 		}
-
-
 
 		return response()->json([
 			"code"			=> $error_code,
