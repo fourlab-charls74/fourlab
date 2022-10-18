@@ -174,6 +174,11 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('prd02/upload', 'prd02Controller@upload');
         Route::put('prd02/show', 'prd02Controller@update');
 
+        Route::get('prd02/product_upload', 'prd02Controller@product_upload');
+        Route::post('prd02/get-seq', 'prd02Controller@getSeq');
+        Route::post('prd02/save_product', 'prd02Controller@save_product');
+        Route::post('prd02/del-img', 'prd02Controller@delImg');
+
         // 원부자재 상품 관리
         Route::get('prd03','prd03Controller@index');
         Route::get('prd03/search','prd03Controller@search');

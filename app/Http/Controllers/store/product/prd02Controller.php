@@ -5,6 +5,7 @@ namespace App\Http\Controllers\store\product;
 use App\Http\Controllers\Controller;
 use App\Components\Lib;
 use App\Components\SLib;
+use App\Components\ULib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -360,7 +361,6 @@ class prd02Controller extends Controller
 	public function add_product_code(Request $request){
 		$admin_id	= Auth('head')->user()->id;
         $datas		= $request->input("data", []);
-
         try {
             DB::beginTransaction();
 
@@ -368,6 +368,8 @@ class prd02Controller extends Controller
 
 				$prd_cd1	= $data['prd_cd1'];
 				$goods_no	= $data['goods_no'];
+				$goods_nm	= $data['goods_nm'];
+				$style_no	= $data['style_no'];
 				$brand		= $data['brand'];
 				$year		= $data['year'];
 				$season		= $data['season'];
@@ -414,8 +416,23 @@ class prd02Controller extends Controller
 						'rt'		=> now(),
 						'ut'		=> now()
 					]);
+				
+				DB::table('product')
+					->insert([
+						'prd_cd' 	=> $prd_cd,
+						'prd_nm' 	=> $goods_nm,
+						'style_no'	=> $style_no,
+						'tag_price'	=> 0,
+						'price'		=> 0,
+						'wonga'		=> 0,
+						'match_yn' 	=> 'Y',
+						'use_yn' 	=> 'Y',
+						'rt' 		=> now(),
+						'ut' 		=> now(),
+						'admin_id' 	=> $admin_id
+					]);
             }
-
+				
 			DB::commit();
 			$code = 200;
 			$msg = "상품코드 등록이 완료되었습니다.";
@@ -791,5 +808,226 @@ class prd02Controller extends Controller
 			"result_code" => $result_code
 		]);
 	}
-	
+
+	public function product_upload(Request $request)
+	{
+		$sup_coms = DB::table("company")->where('use_yn', '=', 'Y')->where('com_type', '=', '1')
+			->select('com_id', 'com_nm')->get()->all(); // 공급업체 리스트
+
+		$sql	= " select brand_nm, br_cd from brand where use_yn = 'Y' and br_cd <> '' ";
+		$brands	= DB::select($sql);
+		$values = [
+			'brands' 	=> $brands,
+			'brand' 	=> SLib::getCodes("PRD_CD_BRAND"),
+			'years'		=> SLib::getCodes("PRD_CD_YEAR"),
+			'seasons' 	=> SLib::getCodes("PRD_CD_SEASON"),
+			'genders' 	=> SLib::getCodes("PRD_CD_GENDER"),
+			'items'		=> SLib::getCodes("PRD_CD_ITEM"),
+			'opts' 		=> SLib::getCodes("PRD_CD_OPT"),
+			'colors' 	=> SLib::getCodes("PRD_CD_COLOR"),
+			'sizes'		=> SLib::getCodes("PRD_CD_SIZE_MATCH"),
+			'years'		=> SLib::getCodes("PRD_CD_YEAR"),
+			'sup_coms' 	=> $sup_coms,
+			'units' 	=> SLib::getCodes("PRD_CD_UNIT"),
+			'images' 	=> []
+		];
+
+		return view( Config::get('shop.store.view') . '/product/prd02_product_upload',$values);
+	}
+
+	public function save_product(Request $request){
+		$admin_id = Auth('head')->user()->id;
+        $data = $request->input("data");
+		$sel_data = $request->input("sel_data");
+
+
+		try {
+
+			DB::beginTransaction();
+
+			foreach($sel_data as $row) {
+
+				$brand 		= $row['brand'];
+				$year 		= $row['year'];
+				$season		= $row['season'];
+				$gender		= $row['gender'];
+				$item 		= $row['item'];
+				$opt 		= $row['opt'];
+				$color 		= $row['color'];
+				$size 		= $row['size'];
+				$prd_nm		= $row['prd_nm'];
+				$style_no 	= $row['style_no'];
+				$sup_com 	= $row['sup_com'];
+				
+				$seq 		= $row['seq'];
+				$price 		= $row['price'];
+				$wonga 		= $row['wonga'];
+				$tag_price 	= $row['tag_price'];
+
+				$brand 		= explode(' : ', $brand);
+				$year 		= explode(' : ', $year);
+				$season 	= explode(' : ', $season);
+				$gender 	= explode(' : ', $gender);
+				$item 		= explode(' : ', $item);
+				$opt 		= explode(' : ', $opt);
+				$color 		= explode(' : ', $color);
+				$size 		= explode(' : ', $size);
+				$sup_com 	= explode(' : ', $sup_com);
+
+				$unit = "";
+
+				$prd_cd	= $row['prd_cd'].$color[0].$size[0];
+				$goods_no = "";
+
+				$sql = "select count(*) as count from product where prd_cd = :prd_cd";
+				$result	= DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+				$size_sql = "select * from code where code_kind_cd = 'PRD_CD_SIZE_MATCH' and code_id = '$size[0]'";
+				$size_cd = DB::selectOne($size_sql)->code_val2;
+
+				$goods_opt = $color[1]."^".$size_cd;
+
+				if ($result->count == 0) {
+
+					DB::table('product')->insert([
+						'prd_cd' => $prd_cd,
+						'prd_nm' => $prd_nm,
+						'style_no' => $style_no,
+						'price' => $price,
+						'wonga' => $wonga,
+						'tag_price' => $tag_price,
+						'com_id' => $sup_com[0],
+						'unit' => $unit,
+						'rt' => now(),
+						'ut' => now(),
+						'admin_id' => $admin_id
+					]);
+
+					/**
+					 *  상품 이미지 저장 (단일 이미지)
+					 */
+					$base64_src = $row['image'];
+					$save_path = "/images/prd02";
+					$img_url = ULib::uploadBase64img($save_path, $base64_src);
+		
+					DB::table('product_code')->insert([
+						'prd_cd' => $prd_cd,
+						'seq' => $seq,
+						'img_url' => $img_url,
+						'goods_no' => $goods_no,
+						'goods_opt'	=> $goods_opt,
+						'brand' => $brand[0],
+						'year' => $year[0],
+						'season' => $season[0],
+						'gender' => $gender[0],
+						'item' => $item[0],
+						'opt' => $opt[0],
+						'color' => $color[0],
+						'size' => $size[0],
+						'rt' => now(),
+						'ut' => now(),
+						'admin_id'	=> $admin_id
+					]);
+					
+					DB::table('product_image')->insert([
+						'prd_cd' => $prd_cd,
+						'seq' => $seq,
+						'img_url' => $img_url,
+						'rt' => now(),
+						'ut' => now(),
+						'admin_id'	=> $admin_id
+					]);
+
+					DB::table('product_stock')->insert([
+						'goods_no' => $goods_no,
+						'prd_cd' => $prd_cd,
+						'in_qty' => 0,
+						'out_qty' => 0,
+						'qty' => 0,
+						'wqty' => 0,
+						'goods_opt' => $goods_opt,
+						'barcode' => $prd_cd,
+						'use_yn' => 'Y',
+						'rt' => now(),
+						'ut' => now()
+					]);
+
+				} else {
+					DB::rollback();
+					return response()->json(["code" => -1, "prd_cd" => $prd_cd]);
+				}
+			}
+			DB::commit();
+			$code = 200;
+			$msg = "성공";
+		} catch (\Exception $e) {
+			DB::rollback();
+			$msg = $e->getMessage();
+			$code = 500;
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg]);
+	}
+
+	public function getSeq(Request $request) {
+		$brand = $request->input('brand');
+		$year = $request->input('year');
+		$season = $request->input('season');
+		$item = $request->input('item');
+		$opt = $request->input('opt');
+
+		$sql = " 
+			select ifnull(max(seq),'00') as seq 
+			from product_code 
+			where 
+				brand = :brand
+				and year = :year
+				and season = :season
+				and item = :item
+				and opt = :opt
+		";
+		$result	= DB::selectOne($sql, ['brand' => $brand, 'year' => $year, 'season' => $season, 'item' => $item, 'opt' => $opt]);
+		$seq = $result->seq + 1;
+		if (strlen($seq) == "1") $seq = "0" . $seq;
+
+		return response()->json(['seq' => $seq , 'code' => 200]);
+	}
+
+	public function delImg(Request $request)
+	{
+		$admin_id = Auth('head')->user()->id;
+		$prd_cd = $request->input('prd_cd');
+		$seq = $request->input('seq');
+
+		try {
+			DB::beginTransaction();
+
+			DB::table('product')->where('prd_cd', '=', $prd_cd)->update([
+				'ut' => now(),
+				'admin_id' => $admin_id
+			]);
+
+			DB::table('product_code')->where('prd_cd', '=', $prd_cd)->update([
+				'img_url' => "",
+				'ut' => now(),
+				'admin_id'	=> $admin_id
+			]);
+
+			$result = DB::table('product_image')->where([['prd_cd', '=', $prd_cd], ['seq', '=', $seq]])->first();
+			$idx = $result->idx;
+			$img_url = $result->img_url;
+
+			ULib::deleteFile($img_url);
+			DB::table('product_image')->where('idx', '=', $idx)->delete();
+
+            DB::commit();
+            $code = 200;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $code = 500;
+        }
+
+        return response()->json(["code" => $code]);
+	}
+
 }

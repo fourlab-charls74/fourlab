@@ -1,5 +1,5 @@
 @extends('store_with.layouts.layout-nav')
-@section('title', '상품코드 등록')
+@section('title', '상품매칭 ')
 @section('content')
 
 
@@ -7,7 +7,7 @@
 <div class="show_layout py-3 px-sm-3">
 	<div class="page_tit d-flex justify-content-between">
 		<div class="d-flex">
-			<h3 class="d-inline-flex">상품코드 등록</h3>
+			<h3 class="d-inline-flex">상품매칭</h3>
 			<div class="d-inline-flex location">
 				<span class="home"></span>
 				<span>/ 상품관리</span>
