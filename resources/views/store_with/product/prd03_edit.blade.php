@@ -1,15 +1,15 @@
 @extends('store_with.layouts.layout-nav')
-@section('title', '원부자재상품등록')
+@section('title', '원부자재상품관리')
 @section('content')
 
 <div class="show_layout py-3 px-sm-3">
 	<div class="page_tit d-flex justify-content-between">
 		<div class="d-flex">
-			<h3 class="d-inline-flex">원부자재상품추가</h3>
+			<h3 class="d-inline-flex">원부자재상품수정</h3>
 			<div class="d-inline-flex location">
 				<span class="home"></span>
 				<span>/ 원부자재상품관리</span>
-				<span>/ 추가</span>
+				<span>/ 수정</span>
 			</div>
 		</div>
 		<div class="d-flex">
@@ -60,43 +60,9 @@
 								<table class="table incont table-bordered" width="100%" cellspacing="0">
 									<tbody>
 										<tr>
-											<th class="">구분</th>
-											<td style="width:35%;">
-												<div class="flax_box">{{$type_nm}}</div>
-											</td>
-											<th class="">년도</th>
-											<td style="width:35%;">
-												<div class="flax_box">{{$year}}</div>
-											</td>
-										</tr>
-										<tr>
-											<th class="">시즌</th>
-											<td>
-												<div class="flax_box">{{$season}}</div>
-											</td>
-											<th class="">성별</th>
-											<td>
-												<div class="flax_box">{{$gender}}</div>
-											</td>
-										</tr>
-										<tr>
-											<th class="">아이템</th>
-											<td>
-												<div class="flax_box">{{$item}}</div>
-											</td>
-											<th class="">품목</th>
-											<td>
-												<div class="flax_box">{{$opt}}</div>
-											</td>
-										</tr>
-										<tr>
-											<th class="">칼라</th>
-											<td>
-												<div class="flax_box">{{$color}}</div>
-											</td>
-											<th class="">사이즈</th>
-											<td>
-												<div class="flax_box">{{$size}}</div>
+											<th class="">상품코드</th>
+											<td colspan="3">
+												<div class="flax_box">{{$prd_cd}}</div>
 											</td>
 										</tr>
 										<tr>
@@ -218,6 +184,7 @@
 	const PRD_CD = "{{$prd_cd}}";
 	let added_base64_image = "";
 	function save() {
+		if (!validation()) return;
 		axios({
 			url: '/store/product/prd03/edit',
 			method: 'post',

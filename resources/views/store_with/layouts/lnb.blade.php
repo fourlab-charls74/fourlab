@@ -28,8 +28,7 @@
                     <li><a href="/store/cs/cs01">(완)상품입고</a></li>
                     <li><a href="/store/cs/cs02">(완)상품반품이동</a></li>
                     {{-- <li><a href="/partner/cs/cs02">상품반품이동 (일괄등록)</a></li> --}}
-                    <li><a href="/store/cs/cs03">(개)원부자재입고</a></li>
-                    <li><a href="/partner/cs/cs01">원부자재반품</a></li>
+                    <li><a href="/store/cs/cs03">(개)원부자재입고/반품</a></li>
                 </ul>
             </li>
             <li>
