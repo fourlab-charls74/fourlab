@@ -394,11 +394,65 @@
 
     /** 판매내역 조회 */
     function SearchOrder() {
-        // let type = $("[name=search_member_type]").val();
-        // let keyword = $("[name=search_member_keyword]").val();
+        let sdate = $("[name=ord_sdate]").val();
+        let edate = $("[name=ord_edate]").val();
+        let ord = $("#ord_field").val();
+        let limit = $("#limit").val();
 
-        // let data = "search_type=" + type + "&search_keyword=" + keyword;
-        gx4.Request("/store/pos/search/order", "", 1);
+        let data = "sdate=" + sdate + "&edate=" + edate + "&ord=" + ord + "&limit=" + limit;
+        gx4.Request("/store/pos/search/order", data, 1);
+    }
+
+    /** 판매내역 상세 조회 */
+    async function setOrderDetail(ord_no = '') {
+        if(ord_no === '') return;
+
+        let res = await axios({ method: "get", url: "/store/pos/search/order-detail?ord_no=" + ord_no });
+        if(res.status === 200) {
+            let data = res.data.data;
+            let ord = data[0];
+
+            $("#od_ord_no").text(ord.ord_no);
+            $("#od_ord_date").text(ord.ord_date);
+            $("#od_ord_amt").text(Comma(data.reduce((a,c) => (c.price * c.qty) + a, 0)));
+
+            let dc_amt = Comma(data.reduce((a,c) => ((c.sale_kind == '99' ? ((c.price * c.qty) - c.recv_amt) : c.sale_amount) * 1) + a, 0) * -1);
+            $("#od_dc_amt").text(dc_amt);
+            $("#od_point_amt").text(Comma(data.reduce((a,c) => (c.point_amt * 1) + a, 0) * -1));
+            $("#od_recv_amt").text(Comma(ord.total_recv_amt));
+
+            $("#od_pay_type").text(ord.pay_type_nm.replaceAll("무통장", "현금"));
+            $("#od_user_info").text(ord.user_nm + (ord.user_id ? ` (${ord.user_id})` : ''));
+            $("#od_phone").text(ord.mobile || "-");
+            $("#od_dlv_comment").text(ord.dlv_comment || "-");
+
+            let html = "";
+            for(let o of data) {
+                html += `
+                    <tr>
+                        <td class="pt-2 pb-2 pl-1">
+                            <div class="d-flex flex-column align-items-start fs-08 pr-2">
+                                <p class="fw-sb fs-09">${o.goods_nm}</p>
+                                <p class="fc-white br-05 bg-gray pl-2 pr-2 mt-1 mb-1">${o.prd_cd || '-'}</p>
+                                <p class="fc-navy">${o.goods_opt.replaceAll("^", " / ")}</p>
+                            </div>
+                        </td>
+                        <td class="text-center">${Comma(o.price)}</td>
+                        <td class="text-center">${o.qty}</td>
+                        <td class="pt-2 pb-2 pr-1">
+                            <div class="d-flex flex-column align-items-end">
+                                ${(o.sale_amount > 0 || o.sale_kind == '99') ? `    
+                                    <span class="fs-08 fw-sb br-05 bg-lightgray pl-2 pr-2">${o.sale_type}</span>
+                                    <del class="fc-gray fs-08">${Comma(o.qty * o.price)}</del>
+                                ` : ''}
+                                <p class="fw-sb">${Comma(o.recv_amt)}</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
+            $("#od_prd_list").html(html);
+        }
     }
 
 </script>

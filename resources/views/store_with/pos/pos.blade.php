@@ -241,26 +241,129 @@
 
     {{-- 당일판매내역화면 --}}
     <div id="pos_today" class="flex-1 d-none flex-column p-3">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <h6 class="m-0 fs-12 fw-b">총 <span id="gd-order-total" class="text-primary">0</span> 건</h6>
-            <div class="d-flex fs-10">
-                {{-- <select name="sdate" id="sdate" class="sel b-1-gray br-05 pl-2 mr-2" style="width:130px;">
-
-                </select> --}}
-                <select name="ord_field" id="ord_field" class="sel b-1-gray br-05 pl-2 mr-2" style="width:130px;">
-                    <option value="">최신순</option>
-                    <option value="">오래된순</option>
-                </select>
-                <select name="limit" id="limit" class="sel b-1-gray br-05 pl-2 mr-2" style="width:130px;">
-                    <option value="100">100개씩 보기</option>
-                    <option value="200">200개씩 보기</option>
-                    <option value="500">500개씩 보기</option>
-                </select>
-                <button type="button" class="butt fc-white br-05 bg-navy" style="width:80px;">검색</button>
+        <div class="d-flex">
+            <div class="flex-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="m-0 fs-12 fw-b">총 <span id="gd-order-total" class="text-primary">0</span> 건</h6>
+                    <div class="d-flex fs-08">
+                        <div class="d-flex align-items-center date-select-inbox mr-2">
+                            <div class="docs-datepicker form-inline-inner input_box" style="width: 130px;">
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm docs-date" name="ord_sdate" value="{{ @$today }}" autocomplete="off" disable>
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
+                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="docs-datepicker-container"></div>
+                            </div>
+                            <span class="text_line ml-2 mr-2">~</span>
+                            <div class="docs-datepicker form-inline-inner input_box" style="width:130px;">
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm docs-date" name="ord_edate" value="{{ @$today }}" autocomplete="off">
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="docs-datepicker-container"></div>
+                            </div>
+                        </div>
+                        <select name="ord_field" id="ord_field" class="sel b-1-gray br-05 pl-2 mr-2" style="width:130px;min-height:30px;">
+                            <option value="desc">최신순</option>
+                            <option value="asc">오래된순</option>
+                        </select>
+                        <select name="limit" id="limit" class="sel b-1-gray br-05 pl-2 mr-2" style="width:130px;min-height:30px;">
+                            <option value="100">100개씩 보기</option>
+                            <option value="200">200개씩 보기</option>
+                            <option value="500">500개씩 보기</option>
+                        </select>
+                        <button type="button" class="butt fc-white fs-10 br-05 bg-navy" style="width:80px;" onclick="return SearchOrder();">검색</button>
+                    </div>
+                </div>
+                <div class="flex-1 table-responsive">
+                    <div id="div-gd-order" class="ag-theme-balham" style="font-size: 18px;"></div>
+                </div>
             </div>
-        </div>
-        <div class="table-responsive">
-            <div id="div-gd-order" class="ag-theme-balham" style="font-size: 18px;"></div>
+            <div class="flex-2 d-flex justify-content-center">
+                <div class="d-flex flex-column justify-content-between w-100 h-100 p-5" style="min-width:300px;max-width:600px;border:7px solid #222;overflow:auto;">
+                    <div class="d-flex flex-column align-items-center mb-4">
+                        <div class="mb-5"><img src="/theme/{{config('shop.theme')}}/images/pc_logo_white.png" alt="" class="w-100"></div>
+                        <div class="d-flex flex-column w-100 fs-12 mb-5">
+                            <div class="d-flex justify-content-between">
+                                <p>주문번호</p>
+                                <p id="od_ord_no" class="fw-sb">-</p>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <p>주문일자</p>
+                                <p id="od_ord_date">-</p>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <p>매장명</p>
+                                <p>{{ @$store->store_nm }}</p>
+                            </div>
+                        </div>
+                        <table class="w-100 fs-10 b-1-gray mb-2" style="border-width:0 0 1px;">
+                            <colgroup>
+                                <col width="42%">
+                                <col width="20%">
+                                <col width="8%">
+                                <col width="30%">
+                            </colgroup>
+                            <thead>
+                                <tr class="b-1-gray" style="border-width:1px 0;">
+                                    <th class="fw-m pt-1 pb-1 pl-1">상품명</th>
+                                    <th class="text-center fw-m pt-1 pb-1">단가</th>
+                                    <th class="text-center fw-m pt-1 pb-1">수량</th>
+                                    <th class="text-right fw-m pt-1 pb-1 pr-1">금액</th>
+                                </tr>
+                            </thead>
+                            <tbody id="od_prd_list"></tbody>
+                        </table>
+                        <div class="d-flex flex-column w-100 fs-12 b-1-gray pb-2 mb-4" style="border-width: 0 0 1px;">
+                            <div class="d-flex justify-content-between mb-1">
+                                <p>주문합계</p>
+                                <p id="od_ord_amt">-</p>
+                            </div>
+                            <div class="d-flex justify-content-between fs-10 pl-2 mb-2">
+                                <p>&#8722; 판매할인금액</p>
+                                <p id="od_dc_amt">-</p>
+                            </div>
+                            <div class="d-flex justify-content-between fs-10 pl-2 mb-2">
+                                <p>&#8722; 적립금사용금액</p>
+                                <p id="od_point_amt">-</p>
+                            </div>
+                            <div class="d-flex justify-content-between fs-14 fw-b">
+                                <p>Total</p>
+                                <p id="od_recv_amt">-</p>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column w-100 fs-12 mb-4">
+                            <div class="d-flex justify-content-between mb-1">
+                                <p>결제수단</p>
+                                <p id="od_pay_type">-</p>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <p>주문자정보</p>
+                                <p id="od_user_info">-</p>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <p>주문자연락처</p>
+                                <p id="od_phone">-</p>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <p>특이사항</p>
+                                <p id="od_dlv_comment" class="text-right w-75">-</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <p class="fs-14 fw-b" style="border-bottom: 2px solid #222;">{{ @$store->store_nm }}</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -602,14 +705,21 @@
     let gx4;
 
     const order_columns = [
-        {field: "ord_date", headerName: "주문일자", width: 200, cellStyle: {...AlignCenter, ...LineHeight50}},
-        {field: "ord_no", headerName: "주문번호", width: 300, cellStyle: {...AlignCenter, ...LineHeight50},
-            // cellRenderer: (params) => `<a href="javascript:void(0);" onclick="return setMember('${params.value}')">${params.value}</a>`,
+        {field: "ord_date", headerName: "주문일자", width: 180, cellStyle: {...AlignCenter, ...LineHeight50}},
+        {field: "ord_no", headerName: "주문번호", width: 220, cellStyle: {...AlignCenter, ...LineHeight50},
+            // cellRenderer: (params) => `<a href="javascript:void(0);" onclick="return setOrderDetail('${params.value}')">${params.value}</a>`,
         },
-        {field: "user_id", headerName: "고객정보", width: 300, cellStyle: LineHeight50},
-        {field: "pay_type", headerName: "결제수단", width: 150, cellStyle: {...AlignCenter, ...LineHeight50}},
-        {field: "pay_amt", headerName: "결제금액", width: 150, type: "currencyType", cellStyle: {"font-weight": "700", ...LineHeight50}},
-        {width: "aut0"}
+        {field: "user_id", headerName: "고객명", width: 200, cellStyle: LineHeight50,
+            cellRenderer: (params) => `${params.data.user_nm}${params.data.user_id ? ` (${params.data.user_id})` : ''}`,
+        },
+        {field: "mobile", headerName: "고객연락처", width: 160, cellStyle: {...AlignCenter, ...LineHeight50}},
+        {field: "pay_type_nm", headerName: "결제수단", width: 150, cellStyle: {...AlignCenter, ...LineHeight50},
+            cellRenderer: (params) => params.value.replaceAll("무통장", "현금"),
+        },
+        {field: "recv_amt", headerName: "결제금액", width: 170, type: "currencyType", cellStyle: {"font-size": "1.1rem", "font-weight": "700", ...LineHeight50},
+            cellRenderer: (params) => Comma(params.value) + "원",
+        },
+        {width: "auto"}
     ];
 
     const sale_types = <?= json_encode(@$sale_types) ?>; // 판매유형
@@ -640,9 +750,18 @@
 		let gridDiv3 = document.querySelector(pApp3.options.gridId);
 		gx3 = new HDGrid(gridDiv3, member_columns);
 
-		pApp4.ResizeGrid(140);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+		pApp4.ResizeGrid(125);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 		let gridDiv4 = document.querySelector(pApp4.options.gridId);
-		gx4 = new HDGrid(gridDiv4, order_columns);
+		gx4 = new HDGrid(gridDiv4, order_columns, {
+            rowSelection: 'single',
+            suppressRowClickSelection: false,
+            onSelectionChanged: function(e) {
+                let order = e.api.getSelectedRows();
+                if(order.length > 0) {
+                    setOrderDetail(order[0].ord_no);
+                }
+            }
+        });
 
 
         // ELEMENT EVENT
@@ -736,9 +855,6 @@
                 }
             }
         });
-
-        // test
-        SearchOrder();
 	});
 </script>
 
