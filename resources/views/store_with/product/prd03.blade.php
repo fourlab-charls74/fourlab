@@ -171,67 +171,79 @@
 		}
 	</style>
 	<script language="javascript">
+
+		const DEFAULT = { lineHeight : "30px" };
+
 		const columns = [
 			{headerName: '#', pinned: 'left', type: 'NumType', width:40, cellStyle: {"line-height": "30px"}},
-			{field: "prd_cd", headerName: "상품코드", width:120, cellStyle: {"line-height": "30px"},
-				cellRenderer: function(params) {
-					if (params.value !== undefined) {
-						return '<a href="#" onclick="return EditProduct(\'' + params.value + '\',\'' + params.data.goods_no + '\');">' + params.value + '</a>';
-					}
-				}
-			},
-			{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}"},
-			{field: "img", headerName: "이미지_url", hide: true},
 			{
 				field: "prd_nm",
 				headerName: "원부자재명",
-				width: 100
+				width: 100,
+				cellStyle: DEFAULT
 			},
 			{
 				field: "type_nm",
 				headerName: "구분",
-				width: 70
+				width: 70,
+				cellStyle: DEFAULT
 			},
 			{
 				field: "opt",
 				headerName: "품목",
-				width: 80
+				width: 80,
+				cellStyle: DEFAULT
+			},
+			{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: DEFAULT, surl:"{{config('shop.front_url')}}"},
+			{field: "img", headerName: "이미지_url", hide: true},
+			{field: "prd_cd", headerName: "상품코드", width:120, cellStyle: DEFAULT,
+				cellRenderer: function(params) {
+					if (params.value !== undefined) {
+						return '<a href="#" onclick="return EditProduct(\'' + params.value + '\');">' + params.value + '</a>';
+					}
+				}
 			},
 			{
 				field: "color",
 				headerName: "칼라",
+				cellStyle: DEFAULT,
 				width: 80
 			},
 			{
 				field: "size",
 				headerName: "사이즈",
+				cellStyle: DEFAULT,
 				width: 80
 			},
 			{
 				field: "price",
 				headerName: "판매가",
 				type: 'currencyType',
+				cellStyle: DEFAULT,
 				width: 80
 			},
 			{
 				field: "wonga",
 				headerName: "원가",
 				type: 'currencyType',
+				cellStyle: DEFAULT,
 				width: 80
 			},
 			{
 				field: "unit",
 				headerName: "단위",
+				cellStyle: DEFAULT,
 				width: 120
 			},
 			{
 				field: "sup_com",
 				headerName: "공급업체(거래선)",
+				cellStyle: DEFAULT,
 				width: 120
 			},
-			{field: "rt", headerName: "등록일자", width:110, cellStyle: {"line-height": "30px"}},
-			{field: "ut", headerName: "수정일자", width:110, cellStyle: {"line-height": "30px"}},
-			{field: "nvl", headerName: "", width: "auto"}
+			{field: "rt", headerName: "등록일자", width:110, cellStyle: DEFAULT},
+			{field: "ut", headerName: "수정일자", width:110, cellStyle: DEFAULT},
+			{field: "nvl", headerName: "", cellStyle: DEFAULT, width: "auto"}
 		];
 
 		const pApp = new App('', {
@@ -265,7 +277,7 @@
 
 		function EditProduct(product_code) {
 			var url = '/store/product/prd03/edit/' + product_code;
-			var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1100,height=670");
+			var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1100,height=555");
 		}
 
 	</script>

@@ -331,7 +331,7 @@ class stk10Controller extends Controller
 						$sql = "
 							update buy_order_product set state = '$state' where buy_ord_prd_no = :buy_ord_prd_no
 						";
-						DB::delete($sql, ['buy_ord_prd_no' => $buy_ord_prd_no]);
+						DB::update($sql, ['buy_ord_prd_no' => $buy_ord_prd_no]);
 					}
 				}
 				DB::commit();

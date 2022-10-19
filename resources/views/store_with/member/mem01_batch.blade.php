@@ -141,7 +141,7 @@
 		$.ajax({
 			async: true,
 			type: 'put',
-			url: '/store/member/mem01/show',
+			url: '/store/member/mem01/batch',
 			data: {
 				data : JSON.stringify(GridData),
 			},

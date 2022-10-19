@@ -51,14 +51,15 @@ class prd03Controller extends Controller
 
 	public function search(Request $request)
 	{
-		$page	= $request->input('page', 1);
+		$page = $request->input('page', 1);
 		if( $page < 1 or $page == "" )	$page = 1;
-		$limit	= $request->input('limit', 500);
+		$limit = $request->input('limit', 500);
 
 		$type = $request->input("type");
 		$prd_nm	= $request->input("prd_nm");
 		$prd_cd = $request->input("prd_cd");
 		$com_id	= $request->input("com_cd");
+		$com_nm	= $request->input("com_nm");
 
 		$limit = $request->input("limit", 100);
 		$ord = $request->input('ord','desc');
@@ -78,6 +79,7 @@ class prd03Controller extends Controller
 		if ($type != "") $where .= " and pc.brand = '" . Lib::quote($type) . "'";
 		if ($prd_nm != "") $where .= " and p.prd_nm like '%" . Lib::quote($prd_nm) . "%' ";
 		if ($com_id != "") $where .= " and p.com_id = '" . Lib::quote($com_id) . "'";
+		if ($com_nm != "") $where .= " and cp.com_nm like '%" . Lib::quote($com_nm) . "%' ";
 
 		$page_size	= $limit;
 		$startno = ($page - 1) * $page_size;
@@ -93,7 +95,7 @@ class prd03Controller extends Controller
 					inner join product_code pc on p.prd_cd = pc.prd_cd
 					inner join product_image i on p.prd_cd = i.prd_cd
 					inner join company cp on p.com_id = cp.com_id
-				where 1=1 
+				where p.use_yn = 'Y' 
 					$where
 			";
 			$row	= DB::select($query);

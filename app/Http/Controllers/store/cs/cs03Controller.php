@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Exception;
 use PDO;
+use PhpParser\Node\Stmt\Continue_;
 
 class cs03Controller extends Controller
 {
@@ -34,698 +35,613 @@ class cs03Controller extends Controller
     }
 
     public function search(Request $request) {
-		/**
-		 * 설정값 얻기
-		 */
-        $conf = new Conf();
-        $cfg_img_size_list		= SLib::getCodesValue("G_IMG_SIZE","list");
-		$cfg_img_size_real		= SLib::getCodesValue("G_IMG_SIZE","real");
-        $cfg_domain_img			= $conf->getConfigValue("shop","domain_img");
-        if($cfg_domain_img != ""){
-			$goods_img_url = sprintf("http://%s",$cfg_domain_img);
-		} else {
-			$goods_img_url = "";
-		}
+		$page = $request->input('page', 1);
+		if( $page < 1 or $page == "" )	$page = 1;
+		$limit = $request->input('limit', 500);
 
-		/**
-		 * inputs
-		 */
-        $sdate = str_replace('-','',$request->input("sdate"));
-        $edate = str_replace('-','',$request->input("edate"));
-		$state = $request->input("buy_order_state");
-		$buy_ord_no = $request->input("buy_ord_no");
-		$brand_nm = $request->input("brand_nm");
-		$brand_cd = $request->input("brand_cd");
-		$com_type = $request->input("com_type");
-		$com_id = $request->input("com_cd");
-		
-		$style_no = $request->input("style_no");
-		$goods_stat = $request->input("goods_stat");
-		$ex_trash = $request->input("ex_trash");
-		$ex_soldout = $request->input("ex_soldout");
-		$goods_nm = $request->input("goods_nm");
-		$formula_type = $request->input("formula_type");
-		$formula_val = $request->input("formula_val");
-        $ord_field = $request->input("ord_field");
-		$ord = $request->input("ord");
-		$limit = $request->input("limit");
+		$state = $request->input("state");
 
-		/**
-		 * query 작성
-		 */
-		$where_a = " and buy_ord_date >= '$sdate' and buy_ord_date <= '$edate' ";
-		$where_p = "";
+		$prd_ord_no	= $request->input("prd_ord_no");
+		$prd_nm	= $request->input("prd_nm");
+		$prd_cd = $request->input("prd_cd");
 
-		if( $goods_nm != "" ){
-			$where_a .= " and g.goods_nm like '%$goods_nm%' ";
-			$where_p .= " and g.goods_nm like '%$goods_nm%' ";
-		}
-		if( $com_type != "" ){
-			$where_a .= " and c.com_type = '$com_type' ";
-		}
-		if( $com_id != "" ){
-			$where_a .= " and g.com_id = '$com_id' ";
-			$where_p .= " and g.com_id = '$com_id' ";
-		}
-		if( $buy_ord_no != "" ){
-			$where_a .= " and p.buy_ord_no = '$buy_ord_no'";
-		}
-		if( $state != "" ){
-			$where_a .= " and p.state = '$state'";
-		}
-		if( $goods_stat != "" ){
-			$where_a .= " and g.sale_stat_cl = '$goods_stat'";
-			$where_p .= " and g.sale_stat_cl = '$goods_stat'";
-		}
+		$com_id	= $request->input("com_cd");
+		$com_nm	= $request->input("com_nm");
 
-		$style_no = preg_replace("/\s/",",",$style_no);
-		$style_no = preg_replace("/,,/",",",$style_no);
-		$style_no = preg_replace("/\t/",",",$style_no);
-		$style_no = preg_replace("/,,/",",",$style_no);
-		$style_no = preg_replace("/\n/",",",$style_no);
-		$style_no = preg_replace("/,,/",",",$style_no);
+		$user_nm = $request->input("user_nm");
 
-		if( $style_no != "" ) {
-			$style_nos = explode(",",$style_no);
-			if(count($style_nos) > 1){
-				if(count($style_nos) > 500) array_splice($style_nos,500);
-				$in_style_nos = "";
-				for($i=0; $i<count($style_nos); $i++){
-					if(isset($style_nos[$i]) && $style_nos[$i] != ""){
-						$in_style_nos .= ($in_style_nos == "") ? "'$style_nos[$i]'" : ",'$style_nos[$i]'";
-					}
-				}
-				if($in_style_nos != "") {
-					$where_a .= " and g.style_no in ( $in_style_nos ) ";
-					$where_p .= " and g.style_no in ( $in_style_nos ) ";
-				}
-			} else {
-				$where_a .= " and g.style_no like '${style_no}%' ";
-				$where_p .= " and g.style_no like '${style_no}%' ";
+		// $limit = $request->input("limit", 100);
+
+		$where = "";
+		if ($prd_cd != "") {
+			$prd_cd = explode(',', $prd_cd);
+			$where .= " and (1!=1";
+			foreach ($prd_cd as $cd) {
+				$where .= " or p1.prd_cd = '" . Lib::quote($cd) . "' ";
 			}
+			$where .= ")";
 		}
+		
+		if ($state != "") $where .= " and p2.state = '" . Lib::quote($state) . "'";
+		if ($prd_ord_no != "") $where .= " and p1.prd_ord_no = '" . Lib::quote($prd_ord_no) . "'";
+		if ($prd_nm != "") $where .= " and p1.prd_nm like '%" . Lib::quote($prd_nm) . "%' ";
+		if ($com_id != "") $where .= " and p1.com_id = '" . Lib::quote($com_id) . "'";
+		if ($com_nm != "") $where .= " and cp.com_nm like '%" . Lib::quote($com_nm) . "%' ";
+		if ($user_nm != "") $where .= " and m.name like '%" . Lib::quote($user_nm) . "%' ";
 
-		if( $ex_trash == "Y" ){
-			$where_a .= " and g.sale_stat_cl > 0 ";
-			$where_p .= " and g.sale_stat_cl > 0 ";
-		}
+		$page_size	= $limit;
+		$startno = ($page - 1) * $page_size;
+		$limit = " limit $startno, $page_size ";
 
-		if( $ex_soldout == "Y" ){
-			$where_a .= " and a.qty > 0 ";
-		}
-
-		if( $brand_cd != "" ){
-			$where_a .= " and g.brand = '$brand_cd' ";
-			$where_p .= " and g.brand = '$brand_cd' ";
-		} else if ($brand_cd == "" && $brand_nm != "") {
-			$where_a .= " and g.brand ='$brand_cd'";
-			$where_p .= " and g.brand ='$brand_cd'";
-		}
-
-		if( $formula_val != "" ) {
-			$where_a .= "  and sale_qty $formula_type $formula_val ";
-		}
-
-		$price_cols = "";
-		$print_cols = "";
-		$group_cnt = 0;
-		$group_nos = array();
-		$sql = "
-			select
-				group_no,dc_ratio as margin
-			from user_group
-			where is_wholesale = 'Y'
-			order by dc_ratio asc
-		";
-		$rows = DB::select($sql);
-
-		foreach ($rows as $row) {
-			$group_no = $row->group_no;
-			$margin = $row->margin;
-			array_push($group_nos,array( "no" => $group_no, "margin" => $margin ));
-			$price_cols .= sprintf(" sum(if(p.group_no = %d,p.price,0)) as group_%d_price, \n",$group_no,$group_no);
-			$price_cols .= sprintf(" sum(if(p.group_no = %d,round((p.price - g.wonga)/p.price*100),0)) as group_%d_ratio, \n",$group_no,$group_no);
-			$price_cols .= sprintf(" sum(if(p.group_no = %d,round((g.price - p.price)/g.price*100),0)) as group_%d_dc_ratio, \n",$group_no,$group_no);
-			$print_cols .= sprintf(" %s as group_%d, \n",$group_no,$group_no);
-			$print_cols .= sprintf(" '%s' as group_%d_margin, \n",$margin,$group_no);
-			$print_cols .= sprintf(" p.group_%d_price as group_%d_price, \n",$group_no,$group_no);
-			$print_cols .= sprintf(" p.group_%d_ratio as group_%d_ratio, \n",$group_no,$group_no);
-			$print_cols .= sprintf(" p.group_%d_dc_ratio as group_%d_dc_ratio, \n",$group_no,$group_no);
-			$group_cnt++;
-		};
-
-		$page = $request->input("page", 1);
-		if ($page < 1 or $page == "") $page = 1;
-		$page_size = $limit;
-
-		if($ord_field == "sale_qty"){
-			$orderby = " order by sale_qty $ord ";
-		} else if($ord_field == "now_qty"){
-			$orderby = " order by a.qty $ord ";
-		} else if($ord_field == "goods_no"){
-			$orderby = " order by goods_no $ord,goods_opt ";
-		} else if($ord_field == "expect_day"){
-			$orderby = " order by expect_day $ord ";
-		} else {
-			$orderby = " order by buy_ord_prd_no $ord ";
-		}
-
-		$data_cnt = 0;
+		$total = 0;
 		$page_cnt = 0;
-		$sum_buy_qty = 0;
-		$sum_buy_cost = 0;
-		// 2번째 페이지 이후로는 데이터 갯수를 얻는 로직을 실행하지 않는다.
+
 		if ($page == 1) {
-			$sql =
+			$sql = /** @lang text */
 				"
-				select
-					count(*) as cnt,sum(p.qty) as qty, sum(p.buy_cost) as buy_cost
-				from
-					buy_order_product p inner join goods g on p.goods_no = g.goods_no and p.goods_sub = g.goods_sub
-					inner join goods_summary s on p.goods_no = s.goods_no and p.goods_sub = s.goods_sub and p.opt = s.goods_opt
-					inner join company c on g.com_id = c.com_id
-					left outer join goods_stock a on a.goods_no = s.goods_no and a.goods_sub = s.goods_sub and a.goods_opt = s.goods_opt
-					left outer join goods_sale_recent gsr
-							on ( a.goods_no = gsr.goods_no and a.goods_sub = gsr.goods_sub and a.goods_opt = gsr.goods_opt )
-				where
-					1 = 1 $where_a
+				select count(*) as total
+				from product_stock_order_product p1
+					inner join product_stock_order p2 on p1.prd_ord_no = p2.prd_ord_no
+					left outer join product p3 on p1.prd_cd = p3.prd_cd
+					left outer join product_code p4 on p3.prd_cd = p4.prd_cd
+					left outer join mgr_user m on p2.admin_id = m.id
+				where 1=1 $where
 			";
-
-			$result = DB::select($sql);
-			$row = $result[0];
-			$data_cnt = $row->cnt;
-			$sum_buy_qty = $row->qty;
-			$sum_buy_cost = round($row->buy_cost);
-
-			$page_cnt=(int)(($data_cnt-1)/$page_size) + 1;
-			if($page == 1){
-				$startno = ($page-1) * $page_size;
-			} else {
-				$startno = ($page-1) * $page_size;
-			}
-		} else {
-			$startno = ($page-1) * $page_size;
-		}
-		
-		$limit = " limit $startno,$page_size ";
-
-		$sql = "
-			select
-				'' as chk,
-				d.buy_ord_date,d.buy_ord_no,cd3.code_val as state,d.com_nm, d.opt_kind_cd,o.opt_kind_nm, b.brand_nm, d.style_no,d.org_nm,
-				d.goods_no, d.goods_sub,
-				'' as img_view, goods_nm,
-				cd2.code_val as sale_stat_cl,d.goods_opt,
-				ifnull(d.now_qty,0) as now_qty,
-				d.buy_qty,d.buy_unit_cost,d.buy_cost,
-				d.sale_qty1,d.sale_qty2,d.sale_qty3,d.sale_qty,
-				round(d.sale_qty/30,2) as avg_qty,
-				d.expect_day,
-				d.max_wonga,d.avg_wonga,
-				d.tot_wonga,
-				date_format(d.last_input_date,'%Y%m%d') as last_input_date,
-				d.price, 0 as margin_amt, 0 as margin_rate,
-				$print_cols
-				concat('$goods_img_url',replace(img,'$cfg_img_size_real','$cfg_img_size_list')) as img,
-				d.buy_ord_prd_no
-			from (
-				select
-					p.buy_ord_prd_no,p.buy_ord_date,p.buy_ord_no,p.state,g.goods_no, g.goods_sub, a.goods_opt,
-					g.brand,c.com_nm, g.opt_kind_cd,g.style_no,g.org_nm,
-					g.goods_nm as goods_nm,img,
-					g.sale_stat_cl,
-					s.wqty as now_qty, p.qty as buy_qty, p.buy_unit_cost,p.buy_cost,
-					a.stock_qty as stock_qty,a.req_date as req_date,
-					ifnull(a.maxwonga,g.wonga) as  max_wonga,
-					if(ifnull(a.totalwonga,0) > 0,if(s.wqty > 0, a.totalwonga/s.wqty,0),g.wonga) as avg_wonga,
-					g.price,g.goods_sh,
-					a.totalwonga as tot_wonga,
-					a.maxinputdate as last_input_date,
-					ifnull(gsr.sale_qty1,0) as sale_qty1,
-					ifnull(gsr.sale_qty2,0) as sale_qty2,
-					ifnull(gsr.sale_qty3,0) as sale_qty3,
-					ifnull(gsr.sale_qty,0) as sale_qty,
-					if(a.qty = 0,0,ifnull(round(a.qty/round(sale_qty/30,2),2),999999.00)) as expect_day
-				from buy_order_product p inner join goods g on p.goods_no = g.goods_no and p.goods_sub = g.goods_sub
-					inner join goods_summary s on p.goods_no = s.goods_no and p.goods_sub = s.goods_sub and p.opt = s.goods_opt
-					inner join company c on g.com_id = c.com_id
-					left outer join goods_stock a on a.goods_no = s.goods_no and a.goods_sub = s.goods_sub and a.goods_opt = s.goods_opt
-					left outer join goods_sale_recent gsr
-							on ( a.goods_no = gsr.goods_no and a.goods_sub = gsr.goods_sub and a.goods_opt = gsr.goods_opt )
-				where
-					1 = 1 $where_a
-				$orderby $limit
-			) d left outer join (
-					select
-						g.goods_no, g.goods_sub,
-						$price_cols
-						sum(if(p.price > 0,1,0)) as group_cnt
-					from goods g inner join goods_price p
-						on g.goods_no = p.goods_no and g.goods_sub = p.goods_sub
-					where 1=1 $where_p
-					group by g.goods_no,g.goods_sub
-				) p on d.goods_no = p.goods_no and d.goods_sub = p.goods_sub
-				inner join brand b on d.brand = b.brand
-				inner join opt o on d.opt_kind_cd = o.opt_kind_cd and o.opt_id = 'K'
-				left outer join code cd2 on cd2.code_kind_cd = 'G_GOODS_STAT' and d.sale_stat_cl = cd2.code_id
-				left outer join code cd3 on cd3.code_kind_cd = 'G_BUY_ORDER_STATE' and d.state = cd3.code_id
-			";
-
-		$rows = DB::select($sql);
-
-		foreach ($rows as $row) {
-			$row->margin_amt = $row->price - $row->avg_wonga;	// 마진
-			if( $row->price > 0 ) {
-				$row->margin_rate = round(($row->margin_amt / $row->price)*100);	// 마진율
-			}
-			if( $row->expect_day == "999999.00" ) {
-				$row->expect_day = "-";
-			}
+			$row = DB::select($sql);
+			$total = $row[0]->total;
+			$page_cnt = (int)(($total - 1) / $page_size) + 1;
 		}
 
+		$sql = /** @lang text */
+		"
+			select  
+				p2.prd_ord_date as prd_ord_date,
+				p1.prd_ord_no as prd_ord_no,
+				p1.state as state,
+				cp.com_nm as sup_com_nm,
+				p1.prd_cd as prd_cd,
+				p1.prd_nm as prd_nm,
+				c1.code_val as color,
+				c2.code_val as size,
+				c3.code_val as unit,
+				ifnull(p1.qty, 0) as qty,
+				ifnull(p1.price, 0) as price,
+				ifnull(p1.wonga, 0) as wonga,
+				p1.qty * p1.price as amount,
+				p2.rt as rt,
+				p2.ut as ut,
+				m.name as user_nm
+			from product_stock_order_product p1
+				inner join product_stock_order p2 on p1.prd_ord_no = p2.prd_ord_no
+				left outer join product p3 on p1.prd_cd = p3.prd_cd
+				left outer join product_code p4 on p3.prd_cd = p4.prd_cd
+				inner join company cp on p1.com_id = cp.com_id
+				left outer join `code` c1 on c1.code_kind_cd = 'PRD_CD_COLOR' and c1.code_id = p4.color
+				left outer join `code` c2 on c2.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c2.code_id = p4.size
+				left outer join `code` c3 on c3.code_kind_cd = 'PRD_CD_UNIT' and c3.code_id = p3.unit
+				left outer join mgr_user m on p2.admin_id = m.id
+			where 1=1 $where
+			order by p2.prd_ord_date desc, p1.prd_ord_no desc, p1.prd_cd asc
+			-- $limit
+		";
+		$result = DB::select($sql);
 		return response()->json([
-            "code" => 200,
-            "head" => array(
-                "total" => $data_cnt,
-                "page" => $page,
-                "page_cnt" => $page_cnt,
-                "page_total" => count($rows)
-            ),
-            "body" => $rows,
-			"sum_buy_info" => array(
-				"sum_buy_qty"	=> $sum_buy_qty,
-				"sum_buy_cost"	=> $sum_buy_cost
-			)
-        ]);
+			"code"	=> 200,
+			"head"	=> array(
+				"total"		=> $total,
+				"page"		=> $page,
+				"page_cnt"	=> $page_cnt,
+				"page_total"=> count($result)
+			),
+			"body"	=> $result
+		]);
     }
   
     public function changeState(Request $request) {
 		$state = $request->input("state");
-		$buy_ord_prd_nos = $request->input("buy_ord_prd_nos");
-		$status = 200;
-		if(count($buy_ord_prd_nos) > 0){
+		$prd_ord_nos = $request->input("prd_ord_nos");
+		$prd_cds = $request->input("prd_cds");
+		$qties = $request->input("qties");
+		$code = 200;
+		if (count($prd_ord_nos) > 0) {
 			try {
-				for($i=0;$i<count($buy_ord_prd_nos);$i++){
-					$buy_ord_prd_no = trim($buy_ord_prd_nos[$i]);
-					if($buy_ord_prd_no > 0){
-						$sql = "
-							update buy_order_product set state = '$state' where buy_ord_prd_no = :buy_ord_prd_no
-						";
-						DB::delete($sql, ['buy_ord_prd_no' => $buy_ord_prd_no]);
+				for ($i = 0; $i < count($prd_ord_nos); $i++) {
+					$prd_ord_no = $prd_ord_nos[$i];
+					$prd_cd = $prd_cds[$i];
+					$qty = $qties[$i];
+
+					/**
+					 * 변경 전 상태 가져오기
+					 */
+					$sql = "
+						select state from product_stock_order_product
+						where prd_cd = :prd_cd
+					";
+					$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+					$prev_state = $row->state;
+
+					/**
+					 * 입고/반품 상태에 따른 수량변경
+					 */
+					switch ($state) {
+						case $prev_state: // 이전상태와 동일한 경우 수량변경 없음
+							break;
+						case "20": // 입고처리중
+							$sql = "
+								select in_qty, qty, wqty from product_stock
+								where prd_cd = :prd_cd
+							";
+							$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+							if ($row != null) {
+								$in_qty = $row->in_qty + $qty;
+								$qty = $row->qty + $qty;
+								$wqty = $row->wqty + $qty;
+								$sql = "
+									update product_stock set in_qty = :in_qty, qty = :qty, wqty = :wqty where prd_cd = :prd_cd
+								";
+								DB::update($sql, ['in_qty' => $in_qty, 'qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
+							}
+
+							$sql = "
+								select wqty from product_stock_storage
+								where prd_cd = :prd_cd
+							";
+							$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+							if ($row != null) {
+								$wqty = $row->wqty + $qty;
+								$sql = "
+									update product_stock_storage set wqty = :wqty where prd_cd = :prd_cd
+								";
+								DB::update($sql, ['wqty' => $wqty, 'prd_cd' => $prd_cd]);
+							}
+							break;
+						case "30": // 입고완료
+							if ($prev_state == "20") { // 기존에 입고가 처리중인 경우 storage의 qty도 입고수량만큼 증가.
+								$sql = "
+									select qty from product_stock_storage
+									where prd_cd = :prd_cd
+								";
+								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+								if ($row != null) {
+									$qty = $row->qty + $qty;
+									$sql = "
+										update product_stock_storage set qty = :qty where prd_cd = :prd_cd
+									";
+									DB::update($sql, ['qty' => $qty, 'prd_cd' => $prd_cd]);
+								}
+								break;
+							} else { // 기존 상태가 입고처리중이 아닌 경우 입고처리 후 증가.
+								$sql = "
+									select in_qty, qty, wqty from product_stock
+									where prd_cd = :prd_cd
+								";
+								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+								if ($row != null) {
+									$in_qty = $row->in_qty + $qty;
+									$qty = $row->qty + $qty;
+									$wqty = $row->wqty + $qty;
+									$sql = "
+										update product_stock set in_qty = :in_qty, qty = :qty, wqty = :wqty where prd_cd = :prd_cd
+									";
+									DB::update($sql, ['in_qty' => $in_qty, 'qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
+								}
+
+								$sql = "
+									select qty, wqty from product_stock_storage
+									where prd_cd = :prd_cd
+								";
+								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+								if ($row != null) {
+									$qty = $row->qty + $qty;
+									$wqty = $row->wqty + $qty;
+									$sql = "
+										update product_stock_storage set qty = :qty where prd_cd = :prd_cd
+									";
+									DB::update($sql, ['qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
+								}
+								break;
+							}
+						case "-20": // 반품처리중
+							$sql = "
+								select out_qty, qty, wqty from product_stock
+								where prd_cd = :prd_cd
+							";
+							$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+							if ($row != null) {
+								$out_qty = $row->out_qty + $qty;
+								$qty = $row->qty - $qty;
+								$wqty = $row->wqty - $qty;
+								$sql = "
+									update product_stock set out_qty = :out_qty, qty = :qty, wqty = :wqty where prd_cd = :prd_cd
+								";
+								DB::update($sql, ['out_qty' => $out_qty, 'qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
+							}
+
+							$sql = "
+								select wqty from product_stock_storage
+								where prd_cd = :prd_cd
+							";
+							$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+							if ($row != null) {
+								$wqty = $row->wqty - $qty;
+								$sql = "
+									update product_stock_storage set wqty = :wqty where prd_cd = :prd_cd
+								";
+								DB::update($sql, ['wqty' => $wqty, 'prd_cd' => $prd_cd]);
+							}
+							break;
+						case "-30": // 반품완료
+							if ($prev_state == "-20") { // 기존에 반품이 처리중인 경우 storage의 qty도 입고수량만큼 감소.
+								$sql = "
+									select qty from product_stock_storage
+									where prd_cd = :prd_cd
+								";
+								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+								if ($row != null) {
+									$qty = $row->qty - $qty;
+									$sql = "
+										update product_stock_storage set qty = :qty where prd_cd = :prd_cd
+									";
+									DB::update($sql, ['qty' => $qty, 'prd_cd' => $prd_cd]);
+								}
+								break;
+							} else { // 기존 상태가 반품처리중이 아닌 경우 반품처리 후 감소.
+								$sql = "
+									select out_qty, qty, wqty from product_stock
+									where prd_cd = :prd_cd
+								";
+								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+								if ($row != null) {
+									$out_qty = $row->out_qty + $qty;
+									$qty = $row->qty - $qty;
+									$wqty = $row->wqty - $qty;
+									$sql = "
+										update product_stock set out_qty = :out_qty, qty = :qty, wqty = :wqty where prd_cd = :prd_cd
+									";
+									DB::update($sql, ['out_qty' => $out_qty, 'qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
+								}
+
+								$sql = "
+									select qty, wqty from product_stock_storage
+									where prd_cd = :prd_cd
+								";
+								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+								if ($row != null) {
+									$qty = $row->qty - $qty;
+									$wqty = $row->wqty - $qty;
+									$sql = "
+										update product_stock_storage set qty = :qty where prd_cd = :prd_cd
+									";
+									DB::update($sql, ['qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
+								}
+								break;
+							}
+						default:
+							throw new Exception("unallowed state");
+							break;
 					}
+
+					/**
+					 * 입고/반품 상태변경
+					 */
+					$sql = "
+						update product_stock_order_product set state = :state where prd_ord_no = :prd_ord_no and prd_cd = :prd_cd
+					";
+					DB::update($sql, ['state' => $state, 'prd_ord_no' => $prd_ord_no, 'prd_cd' => $prd_cd]);
 				}
+				$code = 200;
 				DB::commit();
-				$msg = "발주 상태가 변경되었습니다.";
-			} catch(Exception $e) {
+			} catch (Exception $e) {
+				// dd($e->getMessage());
+				$code = 500;
 				DB::rollback();
-				$status = 500;
-				$msg = "발주 상태 변경 중 에러가 발생했습니다. 잠시 후 다시시도 해주세요.";
 			}
 		}
-		return response()->json(['code' => $status, 'msg' => $msg], $status);
+		return response()->json(['code' => $code]);
     }
 
     public function delete(Request $request) {
-		$buy_ord_prd_nos = $request->input("buy_ord_prd_nos");
-		$status = 200;
-		if(count($buy_ord_prd_nos) > 0){
-			try {
-				DB::beginTransaction();
-				for($i=0;$i<count($buy_ord_prd_nos);$i++){
-					$buy_ord_prd_no = trim($buy_ord_prd_nos[$i]);
-					if($buy_ord_prd_no > 0){
+
+		$prd_ord_nos = $request->input("prd_ord_nos");
+		$prd_cds = $request->input("prd_cds");
+		$code = 200;
+		if (count($prd_ord_nos) > 0) {
+			for ($i = 0; $i < count($prd_ord_nos); $i++) {
+				$prd_ord_no = $prd_ord_nos[$i];
+				$prd_cd = $prd_cds[$i];
+				try {
+					DB::beginTransaction();
+
+					/**
+					 * slave 테이블 - 상품코드에 해당되는 입고/반품번호 삭제
+					 */
+					$sql = "
+						delete p1 from product_stock_order_product p1
+						where p1.prd_ord_no = :prd_ord_no and p1.prd_cd = :prd_cd and p1.state in ('10', '-10')
+					";
+					DB::delete($sql, ['prd_ord_no' => $prd_ord_no, 'prd_cd' => $prd_cd]);
+
+					/**
+					 * slave 테이블에서 입고/반품번호와 일치하는 데이터가 전부 삭제된 경우 master도 삭제
+					 */
+					$sql = "
+						select count(*) as cnt from product_stock_order_product p1
+						where p1.prd_ord_no = :prd_ord_no and p2.state in ('10', '-10')
+					";
+					$result = DB::selectOne($sql, ['prd_ord_no' => $prd_ord_no]);
+					if ($result->cnt == 0) {
 						$sql = "
-							delete from buy_order_product where buy_ord_prd_no = :buy_ord_prd_no and state < 30
+							delete from product_stock_order p1
+							where p1.prd_ord_no = :prd_ord_no and p2.state in ('10', '-10')
 						";
-						DB::delete($sql, ['buy_ord_prd_no' => $buy_ord_prd_no]);
+						DB::delete($sql, ['prd_ord_no' => $prd_ord_no]);
 					}
+
+					$code = 200;
+					DB::commit();
+				} catch (Exception $e) {
+					$code = 500;
+					DB::rollback();
 				}
-				DB::commit();
-				$msg = "삭제되었습니다.";
-			} catch(Exception $e) {
-				DB::rollback();
-				$status = 500;
-				$msg = "삭제중 에러가 발생했습니다. 잠시 후 다시시도 해주세요.";
 			}
 		}
-		return response()->json(['code' => $status, 'msg' => $msg], $status);
+		return response()->json(['code' => $code]);
     }
 
 	public function showBuy(Request $request) {
 		$immutable = CarbonImmutable::now();
-        $sdate	= $immutable->sub(3, 'month')->format('Y-m-d');
+        $sdate	= $immutable->format('Y-m-d');
         $values = [
-            'sdate'         => $sdate,
-            'edate'         => date("Y-m-d"),
-			'items' => SLib::getItems(),
-			'goods_stats' => SLib::getCodes('G_GOODS_STAT'),
-            'com_types'     => SLib::getCodes('G_COM_TYPE'),
-			'formula_types' => collect([">", "<", ">=", "<=", "=", "<>"]),
-            'month3' => (int)date("m"),
-            'month2' => (int)$immutable->sub(1, 'month')->format('m'),
-            'month1' => (int)$immutable->sub(2, 'month')->format('m'),
+            'sdate' => $sdate
         ];
         return view(Config::get('shop.store.view') . '/cs/cs03_show', $values);
 	}
 
 	public function searchBuy(Request $request) {
+		$page = $request->input('page', 1);
+		if( $page < 1 or $page == "" )	$page = 1;
+		$limit = $request->input('limit', 500);
 
-		/**
-		 * 설정값 얻기
-		 */
-        $conf = new Conf();
-        $cfg_img_size_list		= SLib::getCodesValue("G_IMG_SIZE","list");
-		$cfg_img_size_real		= SLib::getCodesValue("G_IMG_SIZE","real");
-        $cfg_domain_img			= $conf->getConfigValue("shop","domain_img");
-        if($cfg_domain_img != ""){
-			$goods_img_url = sprintf("http://%s",$cfg_domain_img);
-		} else {
-			$goods_img_url = "";
-		}
+		$type = $request->input("type");
+		$prd_nm	= $request->input("prd_nm");
+		$prd_cd = $request->input("prd_cd");
+		$com_id	= $request->input("com_cd");
+		$com_nm	= $request->input("com_nm");
 
-		/**
-		 * inputs
-		 */
-		$opt_kind_cd = $request->input("item");
-		$brand_nm = $request->input("brand_nm");
-		$brand_cd = $request->input("brand_cd");
-		$com_type = $request->input("com_type");
-		$com_id = $request->input("com_id");
-		$style_no = $request->input("style_no");
-		$style_nos = $request->input("style_nos");
-		$goods_stat = $request->input("goods_stat");
-		$ex_trash = $request->input("ex_trash");
-		$ex_soldout = $request->input("ex_soldout");
-		$goods_nm = $request->input("goods_nm");
-		$formula_type = $request->input("formula_type");
-		$formula_val = $request->input("formula_val");
-		$apply_avg_wonga = $request->input("apply_avg_wonga");
-        $ord_field = $request->input("ord_field");
-		$ord = $request->input("ord");
-		$limit = $request->input("limit");
+		$limit = $request->input("limit", 100);
+		$ord = $request->input('ord','desc');
+		$ord_field = $request->input('ord_field', 'p.prd_cd');
+		$orderby = sprintf("order by %s %s", $ord_field, $ord);
 
-		/**
-		 * query 작성
-		 */
 		$where = "";
-		$where_a = "";
-		$where_p = "";
-
-		if( $goods_nm != "" ){
-			$where_a .= " and g.goods_nm like '%$goods_nm%' ";
-			$where_p .= " and g.goods_nm like '%$goods_nm%' ";
-		}
-		if( $com_type != "" ){
-			$where_a .= " and c.com_type = '$com_type' ";
-		}
-		if( $com_id != "" ){
-			$where_a .= " and g.com_id = '$com_id' ";
-			$where_p .= " and g.com_id = '$com_id' ";
-		}
-		if( $opt_kind_cd != "" ){
-			$where_a .= " and g.opt_kind_cd = '$opt_kind_cd'";
-			$where_p .= " and g.opt_kind_cd = '$opt_kind_cd'";
-		}
-		if( $goods_stat != "" ){
-			$where_a .= " and g.sale_stat_cl = '$goods_stat'";
-			$where_p .= " and g.sale_stat_cl = '$goods_stat'";
-		}
-        if( $style_nos != "" ) {
-			$style_no = $style_nos;
-		}
-		$style_no = preg_replace("/\s/",",",$style_no);
-		$style_no = preg_replace("/,,/",",",$style_no);
-		$style_no = preg_replace("/\t/",",",$style_no);
-		$style_no = preg_replace("/,,/",",",$style_no);
-		$style_no = preg_replace("/\n/",",",$style_no);
-		$style_no = preg_replace("/,,/",",",$style_no);
-
-		if( $style_no != "" ) {
-			$style_nos = explode(",",$style_no);
-			if(count($style_nos) > 1){
-				if(count($style_nos) > 500) array_splice($style_nos,500);
-				$in_style_nos = "";
-				for($i=0; $i<count($style_nos); $i++){
-					if(isset($style_nos[$i]) && $style_nos[$i] != ""){
-						$in_style_nos .= ($in_style_nos == "") ? "'$style_nos[$i]'" : ",'$style_nos[$i]'";
-					}
-				}
-				if($in_style_nos != "") {
-					$where_a .= " and g.style_no in ( $in_style_nos ) ";
-					$where_p .= " and g.style_no in ( $in_style_nos ) ";
-				}
-			} else {
-				$where_a .= " and g.style_no like '$style_no%' ";
-				$where_p .= " and g.style_no like '$style_no%' ";
+		if ($prd_cd != "") {
+			$prd_cd = explode(',', $prd_cd);
+			$where .= " and (1!=1";
+			foreach ($prd_cd as $cd) {
+				$where .= " or p.prd_cd = '" . Lib::quote($cd) . "' ";
 			}
+			$where .= ")";
 		}
 
-		if( $ex_trash == "Y" ){
-			$where_a .= " and g.sale_stat_cl > 0 ";
-			$where_p .= " and g.sale_stat_cl > 0 ";
-		}
+		if ($type != "") $where .= " and pc.brand = '" . Lib::quote($type) . "'";
+		if ($prd_nm != "") $where .= " and p.prd_nm like '%" . Lib::quote($prd_nm) . "%' ";
+		if ($com_id != "") $where .= " and p.com_id = '" . Lib::quote($com_id) . "'";
+		if ($com_nm != "") $where .= " and cp.com_nm like '%" . Lib::quote($com_nm) . "%' ";
 
-		if( $ex_soldout == "Y" ){
-			$where_a .= " and a.qty > 0 ";
-		}
+		$page_size	= $limit;
+		$startno = ($page - 1) * $page_size;
+		$limit = " limit $startno, $page_size ";
 
-		if( $brand_cd != "" ){
-			$where_a .= " and g.brand = '$brand_cd' ";
-			$where_p .= " and g.brand = '$brand_cd' ";
-		} else if ($brand_cd == "" && $brand_nm != ""){
-			$where_a .= " and g.brand ='$brand_cd'";
-			$where_p .= " and g.brand ='$brand_cd'";
-		}
-
-		if( $formula_val != "" ) {
-			$where_a .= "  and sale_qty $formula_type $formula_val ";
-		}
-
-		$price_cols = "";
-		$print_cols = "";
-		$group_cnt = 0;
-		$group_nos = array();
-		$sql = "
-			select
-				group_no,dc_ratio as margin
-			from user_group
-			where is_wholesale = 'Y'
-			order by dc_ratio asc
-		";
-		$rows = DB::select($sql);
-
-		foreach ($rows as $row) {
-			$group_no = $row->group_no;
-			$margin = $row->margin;
-			array_push($group_nos,array( "no" => $group_no, "margin" => $margin ));
-			$price_cols .= sprintf(" sum(if(p.group_no = %d,p.price,0)) as group_%d_price, \n",$group_no,$group_no);
-			$price_cols .= sprintf(" sum(if(p.group_no = %d,round((p.price - g.wonga)/p.price*100),0)) as group_%d_ratio, \n",$group_no,$group_no);
-			$price_cols .= sprintf(" sum(if(p.group_no = %d,round((g.price - p.price)/g.price*100),0)) as group_%d_dc_ratio, \n",$group_no,$group_no);
-			$print_cols .= sprintf(" %s as group_%d, \n",$group_no,$group_no);
-			$print_cols .= sprintf(" '%s' as group_%d_margin, \n",$margin,$group_no);
-			$print_cols .= sprintf(" p.group_%d_price as group_%d_price, \n",$group_no,$group_no);
-			$print_cols .= sprintf(" p.group_%d_ratio as group_%d_ratio, \n",$group_no,$group_no);
-			$print_cols .= sprintf(" p.group_%d_dc_ratio as group_%d_dc_ratio, \n",$group_no,$group_no);
-			$group_cnt++;
-		};
-
-		$page = $request->input("page", 1);
-		if ($page < 1 or $page == "") $page = 1;
-		$page_size = $limit;
-
-		if($ord_field == "sale_qty"){
-			$orderby = " order by sale_qty $ord ";
-		} else if($ord_field == "now_qty"){
-			$orderby = " order by a.qty $ord ";
-		} else if($ord_field == "goods_no"){
-			$orderby = " order by goods_no $ord, goods_opt ";
-		} else if($ord_field == "req_date"){
-			$orderby = " order by a.req_date $ord ";
-		} else {
-			$orderby = " order by expect_day $ord, goods_no ";
-		}
-
-		$data_cnt = 0;
+		$total = 0;
 		$page_cnt = 0;
-		// 2번째 페이지 이후로는 데이터 갯수를 얻는 로직을 실행하지 않는다.
+
 		if ($page == 1) {
-			$sql =
+			$query	= /** @lang text */
 				"
-				select
-					count(*) as cnt
-				from goods g inner join goods_summary s on g.goods_no = s.goods_no and g.goods_sub = s.goods_sub
-					inner join company c on g.com_id = c.com_id
-					left outer join goods_stock a on a.goods_no = s.goods_no and a.goods_sub = s.goods_sub and a.goods_opt = s.goods_opt
-					left outer join goods_sale_recent gsr
-							on ( a.goods_no = gsr.goods_no and a.goods_sub = gsr.goods_sub and a.goods_opt = gsr.goods_opt )
-				where
-					1 = 1 $where_a
+				select count(*) as total from product p 
+					inner join product_code pc on p.prd_cd = pc.prd_cd
+					inner join product_image i on p.prd_cd = i.prd_cd
+					inner join company cp on p.com_id = cp.com_id
+				where p.use_yn = 'Y' 
+					$where
 			";
-
-			$result = DB::select($sql);
-			$row = $result[0];
-			$data_cnt = $row->cnt;
-
-			$page_cnt=(int)(($data_cnt-1)/$page_size) + 1;
-			if($page == 1){
-				$startno = ($page-1) * $page_size;
-			} else {
-				$startno = ($page-1) * $page_size;
-			}
-		} else {
-			$startno = ($page-1) * $page_size;
-		}
-		
-		$limit = "";
-		if($page_size < 9999){
-			$limit = " limit $startno,$page_size ";
+			$row	= DB::select($query);
+			$total	= $row[0]->total;
+			$page_cnt = (int)(($total - 1) / $page_size) + 1;
 		}
 
-		$sql = "
-				select
-					'' as chk, d.com_nm, d.opt_kind_cd,o.opt_kind_nm, b.brand_nm, d.style_no,d.org_nm,
-					d.goods_no, d.goods_sub,
-					'' as img_view, goods_nm,
-					cd2.code_val as sale_stat_cl,d.goods_opt,
-					d.wqty,
-					( d.sale_qty1 + d.sale_qty2 + d.sale_qty3 ) / 3 - ifnull(d.wqty,0) as exp_buy_qty,
-					0 as qty,
-					if('$apply_avg_wonga' = 'Y',avg_wonga,0) as buy_unit_cost,
-					0 as buy_cost,
-					d.sale_qty1,d.sale_qty2,d.sale_qty3,d.sale_qty,
-					round(d.sale_qty/30,2) as avg_qty,
-					d.expect_day,
-					d.max_wonga,
-					d.avg_wonga,
-					d.tot_wonga,
-					date_format(d.last_input_date,'%Y%m%d') as last_input_date,
-					d.price, 0 as margin_amt, 0 as margin_rate,
-					$print_cols
-					-- (d.price * d.wqty) as tot_sales,0 as tot_margin,
-					concat('$goods_img_url',replace(img,'$cfg_img_size_real','$cfg_img_size_list')) as img
-				from (
-					select
-						g.goods_no, g.goods_sub, s.goods_opt,
-						g.brand,c.com_nm, g.opt_kind_cd,g.style_no,g.org_nm, g.goods_nm,img,
-						g.sale_stat_cl,
-						s.wqty,
-						a.stock_qty as stock_qty,a.req_date as req_date,
-						ifnull(a.maxwonga,g.wonga) as  max_wonga,
-						if(ifnull(a.totalwonga,0) > 0,if(s.wqty > 0, a.totalwonga/s.wqty,0),g.wonga) as avg_wonga,
-						g.price,g.goods_sh,
-						ifnull(a.totalwonga,0) as tot_wonga,
-						a.maxinputdate as last_input_date,
-						ifnull(gsr.sale_qty1,0) as sale_qty1,
-						ifnull(gsr.sale_qty2,0) as sale_qty2,
-						ifnull(gsr.sale_qty3,0) as sale_qty3,
-						ifnull(gsr.sale_qty,0) as sale_qty,
-						if(a.qty = 0,0,ifnull(round(a.qty/round(sale_qty/30,2),2),999999.00)) as expect_day
-					from goods g inner join goods_summary s on g.goods_no = s.goods_no and g.goods_sub = s.goods_sub
-						inner join company c on g.com_id = c.com_id
-						left outer join goods_stock a on a.goods_no = s.goods_no and a.goods_sub = s.goods_sub and a.goods_opt = s.goods_opt
-						left outer join goods_sale_recent gsr
-								on ( a.goods_no = gsr.goods_no and a.goods_sub = gsr.goods_sub and a.goods_opt = gsr.goods_opt )
-					where
-						1 = 1 $where_a
-					$orderby $limit
-				) d left outer join (
-						select
-							g.goods_no, g.goods_sub,
-							$price_cols
-							sum(if(p.price > 0,1,0)) as group_cnt
-						from goods g inner join goods_price p
-							on g.goods_no = p.goods_no and g.goods_sub = p.goods_sub
-						where 1=1 $where_p
-						group by g.goods_no,g.goods_sub
-					) p on d.goods_no = p.goods_no and d.goods_sub = p.goods_sub
-					inner join brand b on d.brand = b.brand
-					inner join opt o on d.opt_kind_cd = o.opt_kind_cd and o.opt_id = 'K'
-					inner join code cd2 on ( cd2.code_kind_cd = 'G_GOODS_STAT' and d.sale_stat_cl = cd2.code_id )
-			";
-		$rows = DB::select($sql);
+		$query = /** @lang text */
+		"
+			select
+				cp.com_id as sup_com_id,
+				cp.com_nm as sup_com_nm,
+				p.prd_cd as prd_cd,
+				p.prd_nm as prd_nm,
+				pc.img_url as img,
+				c7.code_val as color,
+				c8.code_val as size,
+				c9.code_val as unit,
+				ifnull(ps.wqty, 0) as qty_1, 
+				ifnull(pss.qty, 0) as qty_2,
+				0 as in_qty,
+				ifnull(p.price, 0) as price,
+				ifnull(p.wonga, 0) as wonga,
+				0 as amount,
+				p.type as type
+			from product p
+				inner join product_code pc on p.prd_cd = pc.prd_cd
+				left outer join product_image i on p.prd_cd = i.prd_cd
+				inner join company cp on p.com_id = cp.com_id
+				left outer join product_stock ps on p.prd_cd = ps.prd_cd
+				left outer join product_stock_storage pss on p.prd_cd = pss.prd_cd
+				left outer join code c on c.code_kind_cd = 'PRD_MATERIAL_TYPE' and c.code_id = pc.brand
+				left outer join code c7 on c7.code_kind_cd = 'PRD_CD_COLOR' and c7.code_id = pc.color
+				left outer join code c8 on c8.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c8.code_id = pc.size
+				left outer join code c9 on c9.code_kind_cd = 'PRD_CD_UNIT' and c9.code_id = p.unit
+			where p.use_yn = 'Y'
+				$where
+			$orderby
+			$limit
+		";
 
-		foreach ($rows as $row) {
-			if( $row->exp_buy_qty < 0 ) $row->exp_buy_qty = 0;
-			$row->margin_amt = $row->price - $row->avg_wonga;	// 마진
-			if( $row->price > 0 ) {
-				$row->margin_rate = round(($row->margin_amt / $row->price)*100);	// 마진율
-			}
-			if( $row->expect_day == "999999.00" ) {
-				$row->expect_day = "-";
-			}
-		}
+		$rows = DB::select($query);
 
 		return response()->json([
-            "code" => 200,
-            "head" => array(
-                "total" => $data_cnt,
-                "page" => $page,
-                "page_cnt" => $page_cnt,
-                "page_total" => count($rows)
-            ),
-            "body" => $rows
-        ]);
+			"code"	=> 200,
+			"head"	=> array(
+				"total"		=> $total,
+				"page"		=> $page,
+				"page_cnt"	=> $page_cnt,
+				"page_total"=> count($rows)
+			),
+			"body"	=> $rows
+		]);
 	}
 
 	public function addBuy(Request $request) {
-		$data = $request->input('data');
-		$products = explode("\n", $data);
-		$buy_ord_date = date("Ymd");
-		$state = 10;
-		$buy_ord_date = explode(" ", now());
-		$buy_ord_date = str_replace('-','',$buy_ord_date[0]);
-		$user_id = Auth('head')->user()->id;
-		if(count($products) > 0){
-			try {
-				DB::beginTransaction();
-				for($i=0;$i<count($products);$i++){
-					$rows = explode("\t",$products[$i]);
-					$goods_no = $rows[0];
-					$goods_sub = $rows[1];
-					$goods_opt = $rows[2];
-					$qty = $rows[3];
-					$buy_unit_cost = $rows[4];
-					$opt_kind_nm = $rows[5];
 
-					if($goods_no > 0){
-						$qty = str_replace(",","",str_replace("\\","",trim($qty)));
-						$buy_unit_cost = str_replace(",","",str_replace("\\","",trim($buy_unit_cost)));
-						$buy_cost = $buy_unit_cost * $qty;
+		$data = $request->input('rows');
+		$invoice_no = $request->input('invoice_no');
+		$state = $request->input('state');
+		$prd_ord_date = $request->input('sdate', date("Y-m-d"));
+		$prd_ord_date = str_replace("-", "", $prd_ord_date);
+		$prd_ord_type = $request->input('prd_ord_type');
+		$admin_id = Auth('head')->user()->id;
 
-						$sql = "
-							select style_no, com_id 
-							from goods 
-							where goods_no = '$goods_no' and goods_sub = '$goods_sub'
-						";
-						$row = DB::selectOne($sql);
+		try {
 
-						$style_no = $row->style_no;
-						$com_id = $row->com_id;
-						$buy_ord_no = sprintf("%s_%s",$com_id,$buy_ord_date);
-							$sql = "
-							insert into buy_order_product
-							( buy_ord_no, com_id, item, style_no,goods_no,goods_sub,opt,qty,buy_unit_cost,buy_cost,state,buy_ord_date,rt,ut ) values
-							( '$buy_ord_no', '$com_id','$opt_kind_nm', '$style_no','$goods_no','$goods_sub','$goods_opt','$qty','$buy_unit_cost','$buy_cost','$state','$buy_ord_date',now(),now())
-						";
-						DB::insert($sql);
-						
+			DB::beginTransaction();
 
-						$buy_ord_no2 = sprintf("%s_%s",$com_id,$buy_ord_date);
-						$sql2 = "
-							insert into buy_order ( buy_ord_no, buy_ord_date, com_id, item, id, rt ) 
-							values('$buy_ord_no2','$buy_ord_date', '$com_id', '$opt_kind_nm','$user_id', now() )
-						";
-						DB::insert($sql2);
+			foreach ($data as $row) {
 
-					}		
+				$sup_com_id = $row['sup_com_id'];
+				$prd_cd = $row['prd_cd'];
+				$prd_nm = $row['prd_nm'];
+				
+				$qty = $row['in_qty'];
+				$price = $row['price'];
+				$wonga = $row['wonga'];
+
+				if ($state == 10) { // 구분이 입고인 경우 입고대기 처리
+
+					$kind = "in";
+
+					/**
+					 * 원부자재 상품 입고 master
+					 */
+					DB::table('product_stock_order')->updateOrInsert(
+						['prd_ord_no' => $invoice_no],
+						[
+							'kind' => $kind,
+							'prd_ord_date' => $prd_ord_date,
+							'prd_ord_type' => $prd_ord_type,
+							'com_id' => $sup_com_id, // 일단은 송장 내용중 가장 최근의 공급업체로 반영되고 있음
+							'state' => $state,
+							'rt' => now(),
+							'ut' => now(),
+							'admin_id' => $admin_id
+						]
+					);
+
+					/**
+					 * 원부자재 상품 입고 slave
+					 */
+					DB::table('product_stock_order_product')->updateOrInsert(
+						[
+							'prd_ord_no' => $invoice_no,
+							'prd_cd' => $prd_cd,
+							'com_id' => $sup_com_id
+						],
+						[
+							'state' => $state,
+							'prd_nm' => $prd_nm,
+							'qty' => $qty,
+							'price' => $price,
+							'wonga' => $wonga,
+							'rt' => now(),
+							'ut' => now(),
+							'admin_id' => $admin_id
+						]
+					);
+
+				} else if ($state == -10) { // 구분이 반품인 경우 반품대기 처리
+
+					$kind = "out";
+
+					/**
+					 * 원부자재 상품 입고 master
+					 */
+					DB::table('product_stock_order')->updateOrInsert(
+						['prd_ord_no' => $invoice_no],
+						[
+							'kind' => $kind,
+							'prd_ord_date' => $prd_ord_date,
+							'prd_ord_type' => $prd_ord_type,
+							'com_id' => $row['sup_com_id'], // 송장 내용중 가장 최근의 공급업체로 반영되고 있음
+							'state' => $state,
+							'rt' => now(),
+							'ut' => now(),
+							'admin_id' => $admin_id
+						]
+					);
+					/**
+					 * 원부자재 상품 입고 slave
+					 */
+					DB::table('product_stock_order_product')->updateOrInsert(
+						[
+							'prd_ord_no' => $invoice_no,
+							'prd_cd' => $prd_cd,
+							'com_id' => $sup_com_id
+						],
+						[
+							'state' => $state,
+							'prd_nm' => $prd_nm,
+							'qty' => $qty,
+							'price' => $price,
+							'wonga' => $wonga,
+							'rt' => now(),
+							'ut' => now(),
+							'admin_id' => $admin_id
+						]
+					);
+
 				}
-				DB::commit();
-				return response()->json(['message' => 'created'], 201);
-			} catch (Exception $e) {
-				DB::rollBack();
-				return response()->json(['message' => $e->getMessage()], 500);
+				
 			}
+			DB::commit();
+			return response()->json(['message' => 'created'], 201);
+		} catch (Exception $e) {
+			DB::rollBack();
+			return response()->json(['message' => $e->getMessage()], 500);
 		}
     }
+
+	public function getInvoiceNo($com_id) {
+		$prefix_invoice_no = sprintf("%s_%s_A", $com_id, date("ymd"));
+		$sql = "
+			select ifnull(max(prd_ord_no),0) as invoice_no from product_stock_order
+			where prd_ord_no like '$prefix_invoice_no%'
+		";
+		$row = DB::selectOne($sql);
+		$max_invoice_no = $row->invoice_no;
+		if ($max_invoice_no == "0") {
+			$seq = 1;
+		} else {
+			$seq = str_replace($prefix_invoice_no, "", $max_invoice_no);
+			$seq = $seq + 1;
+		}
+		$invoice_no = sprintf("%s%03d", $prefix_invoice_no, $seq);
+		return $invoice_no;
+	}
 
 }
