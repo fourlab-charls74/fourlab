@@ -840,7 +840,6 @@ class prd02Controller extends Controller
         $data = $request->input("data");
 		$sel_data = $request->input("sel_data");
 
-
 		try {
 
 			DB::beginTransaction();
@@ -908,12 +907,14 @@ class prd02Controller extends Controller
 					 */
 					$base64_src = $row['image'];
 					$save_path = "/images/prd02";
-					$img_url = ULib::uploadBase64img($save_path, $base64_src);
+
+					$unique_img_name = $prd_cd . $seq;
+
+					$img_url = ULib::uploadBase64img($save_path, $base64_src, $unique_img_name);
 		
 					DB::table('product_code')->insert([
 						'prd_cd' => $prd_cd,
 						'seq' => $seq,
-						'img_url' => $img_url,
 						'goods_no' => $goods_no,
 						'goods_opt'	=> $goods_opt,
 						'brand' => $brand[0],
@@ -1008,7 +1009,6 @@ class prd02Controller extends Controller
 			]);
 
 			DB::table('product_code')->where('prd_cd', '=', $prd_cd)->update([
-				'img_url' => "",
 				'ut' => now(),
 				'admin_id'	=> $admin_id
 			]);
