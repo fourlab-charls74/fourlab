@@ -44,10 +44,21 @@ class PosController extends Controller
         ";
         $pr_codes = DB::select($sql);
 
+        $sql = "
+            select store_cd, store_nm
+            from store
+            where store_cd = :store_cd
+        ";
+        $store = DB::selectOne($sql, ['store_cd' => $store_cd]);
+        if ($store == null) $store = (object) ['store_cd' => $store_cd, 'store_nm' => ''];
+
         $values = [
+            'today' => $today,
             'sale_types' => $sale_types,
             'pr_codes' => $pr_codes,
+            'store' => $store,
         ];
+
         return view(Config::get('shop.store.view') . '/pos/pos', $values);
     }
 
@@ -62,6 +73,12 @@ class PosController extends Controller
 				break;
 			case 'member':
 				$response = $this->search_member($request);
+				break;
+			case 'order':
+				$response = $this->search_order_history($request);
+				break;
+			case 'order-detail':
+				$response = $this->search_order_detail($request);
 				break;
             default:
                 $message = 'Command not found';
@@ -800,6 +817,92 @@ class PosController extends Controller
             "msg" => $msg,
             "ord_no" => $ord_no,
         ]);
+    }
+
+    /** 판매내역조회 */
+    public function search_order_history(Request $request)
+    {
+        $store_cd = STORE_CD;
+
+        $where = "";
+        $sdate = $request->input('sdate', now()->sub(1, 'month')->format('Y-m-d'));
+        $edate = $request->input('edate', date("Y-m-d"));
+        $where .= " and o.ord_date >= '$sdate 00:00:00' ";
+        $where .= " and o.ord_date <= '$edate 23:59:59' ";
+
+        $ord_field = "o.ord_date";
+        $ord = $request->input('ord', 'desc');
+        $orderby = sprintf("order by %s %s", $ord_field, $ord);
+
+        $page = $request->input('page', 1);
+        if ($page < 1 or $page == '') $page = 1;
+        $limit = $request->input('limit', 100);
+
+        $page_size = $limit;
+        $startno = ($page - 1) * $page_size;
+        $limit = " limit $startno, $page_size ";
+
+        $total = 0;
+        $page_cnt = 0;
+
+        $sql = "
+            select 
+                o.ord_no, o.ord_date, o.user_id, o.user_nm, o.phone, o.mobile, o.ord_amt, o.recv_amt,
+                o.ord_state, o.ord_type, o.ord_kind, o.clm_type, pay.pay_type, pt.code_val as pay_type_nm
+            from order_mst o
+                inner join payment pay on pay.ord_no = o.ord_no
+                inner join code pt on pt.code_kind_cd = 'G_PAY_TYPE' and pt.code_id = pay.pay_type
+            where o.store_cd = :store_cd $where
+            $orderby
+            $limit
+        ";
+        $rows = DB::select($sql, ['store_cd' => $store_cd]);
+
+        if ($page == 1) {
+            $sql = "
+                select count(*) as total
+                from order_mst o
+                    inner join payment pay on pay.ord_no = o.ord_no
+                    inner join code pt on pt.code_kind_cd = 'G_PAY_TYPE' and pt.code_id = pay.pay_type
+                where o.store_cd = :store_cd $where
+			";
+            $row = DB::selectOne($sql, ['store_cd' => $store_cd]);
+            $total = $row->total;
+            $page_cnt = (int)(($total - 1) / $page_size) + 1;
+        }
+
+        return response()->json([
+            'code' => 200,
+            'head' => [
+                'total' => $total,
+                'page' => $page,
+                'page_cnt' => $page_cnt,
+                'page_total' => count($rows),
+            ],
+            'body' => $rows
+        ], 200);
+    }
+
+    /** 판매내역 상세조회 */
+    public function search_order_detail(Request $request)
+    {
+        $ord_no = $request->input('ord_no', '');
+
+        $sql = "
+            select
+                o.ord_no, o.ord_opt_no, o.ord_date, o.prd_cd, o.goods_nm, o.goods_opt, o.pay_type, 
+                o.sale_kind, s.sale_type_nm as sale_type, s.amt_kind, if(s.amt_kind = 'per', round(o.price * o.qty / s.sale_per), s.sale_amt) as sale_amount,
+                pt.code_val as pay_type_nm, o.dlv_comment, o.price, o.qty, o.point_amt, o.dc_amt, o.recv_amt,
+                om.user_id, om.user_nm, om.phone, om.mobile, om.recv_amt as total_recv_amt
+            from order_opt o
+                inner join order_mst om on om.ord_no = o.ord_no
+                left outer join code pt on pt.code_kind_cd = 'G_PAY_TYPE' and pt.code_id = o.pay_type
+                left outer join sale_type s on s.sale_kind = o.sale_kind
+            where o.ord_no = :ord_no
+        ";
+        $rows = DB::select($sql, ['ord_no' => $ord_no]);
+
+        return response()->json(['code' => '200', 'data' => $rows], 200);
     }
 }
 

@@ -217,7 +217,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('cs02/batch-import','cs02Controller@import_excel'); // 상품반품이동 엑셀파일 적용
         Route::post('cs02/batch-getgoods','cs02Controller@get_goods'); // 일괄적용 시 상품정보 조회
 
-        // 원부자재입고
+        // 원부자재입고/반품
         Route::get('cs03', 'cs03Controller@index');
         Route::get('cs03/search', 'cs03Controller@search');
         Route::put('cs03/update', 'cs03Controller@changeState');
@@ -225,6 +225,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::prefix('cs03/buy')->group(function () {
             Route::get('/', 'cs03Controller@showBuy');
             Route::get('/search', 'cs03Controller@searchBuy');
+            Route::get('/get-invoice-no/{com_id}', 'cs03Controller@getInvoiceNo');
             Route::post('/add', 'cs03Controller@addBuy');
         });
         
