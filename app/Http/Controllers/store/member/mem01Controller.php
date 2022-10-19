@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\store\member;
 
 use App\Http\Controllers\Controller;
@@ -13,8 +12,15 @@ use App\Models\Conf;
 use App\Models\Point;
 use Exception;
 
+//ini_set("upload_max_filesize", "50M");
+//ini_set("post_max_size", "50M");
+//ini_set("memory_limit", "128M");
+//ini_set('max_execution_time', '60000');
+//ini_set("max_input_time", 360000);
+
 class mem01Controller extends Controller
 {
+
 	public function index($type='') {
 		$values = [
 			'mail'		=> SLib::getCodes('S_MAIL'),
@@ -300,6 +306,8 @@ class mem01Controller extends Controller
 
 	public function update(Request $request)
 	{
+
+
 		$error_code		= "200";
 		$result_code	= "";
 
@@ -314,9 +322,9 @@ class mem01Controller extends Controller
 			$error_code	= "400";
 		}
 
-        try 
-		{
-            DB::beginTransaction();
+        //try 
+		//{
+        //    DB::beginTransaction();
 
 			for( $i = 0; $i < count($datas); $i++ )
 			{
@@ -342,6 +350,16 @@ class mem01Controller extends Controller
 				$addr		= trim($data['addr']);
 				$addr2		= trim($data['addr2']);
 				$memo		= trim($data['memo']);
+
+				// 비밀번호 암호화
+				$conf = new Conf();
+				$encrypt_mode = $conf->getConfigValue("shop", "encrypt_mode");
+				$encrypt_key = "";
+				if ($encrypt_mode == "mhash") {
+					$encrypt_key = $conf->getConfigValue("shop", "encrypt_key");
+				}
+
+				$enc_pwd = Lib::get_enc_hash($user_pw, $encrypt_mode, $encrypt_key);
 
 				//고객 등급 매치
 				switch ($group_code) {
@@ -374,7 +392,8 @@ class mem01Controller extends Controller
 
 				$store_cd	= "";
 				$sql	= " select store_cd from store where store_nm = :store_nm ";
-				$store	= DB::selectOne($sql, ['store_nm' => $store_nm_org]);
+				//$store	= DB::selectOne($sql, ['store_nm' => $store_nm_org]);
+				$store	= DB::selectOne($sql, ['store_nm' => $store_nm]);
 
 				if($store != null)	$store_cd	= $store->store_cd;
 
@@ -393,7 +412,7 @@ class mem01Controller extends Controller
 				];
 
 				$values	= [
-					'user_pw'	=> $user_pw,
+					'user_pw'	=> $enc_pwd,
 					'name'		=> $name,
 					'sex'		=> $sex,
 					'email'		=> $email,
@@ -401,6 +420,7 @@ class mem01Controller extends Controller
 					'zip'		=> $zip,
 					'addr'		=> $addr,
 					'addr2'		=> $addr2,
+					'phone'		=> $mobile,
 					'mobile'	=> $mobile,
 					'rmobile'	=> $rmobile,
 					'regdate'	=> $regdate,
@@ -415,7 +435,7 @@ class mem01Controller extends Controller
 					'auth_yn'	=> 'N',
 					'site'		=> 'HEAD_OFFICE',
 					'type'		=> 'B',
-					'store_nm'	=> $store_nm_l,
+					'store_nm'	=> $store_nm,
 					'store_cd'	=> $store_cd
 				];
 
@@ -443,6 +463,16 @@ class mem01Controller extends Controller
 				}
 
 
+				//member_group 처리
+				$group_values	= [
+					'group_no'	=> $group_no,
+					'rt'		=> now(),
+					'ut'		=> now()
+				];
+
+				DB::table('user_group_member')->updateOrInsert($where, $group_values);
+
+
 				//member_stat 처리
 				$stat_values	= [
 					'ord_cnt'	=> $ord_cnt,
@@ -455,15 +485,15 @@ class mem01Controller extends Controller
 				DB::table('member_stat')->updateOrInsert($where, $stat_values);
 			}
 	
-			DB::commit();
-        }
-		catch(Exception $e) 
-		{
-            DB::rollback();
+		//	DB::commit();
+        //}
+		//catch(Exception $e) 
+		//{
+        //    DB::rollback();
 
-			$result_code	= "500";
-			$result_msg		= "데이터 등록/수정 오류";
-		}
+		//	$result_code	= "500";
+		//	$result_msg		= "데이터 등록/수정 오류";
+		//}
 
 		return response()->json([
 			"code"			=> $error_code,

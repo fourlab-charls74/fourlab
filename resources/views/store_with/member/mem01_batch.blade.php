@@ -148,7 +148,6 @@
 			success: function (data) {
 				if( data.code == "200" )
 				{
-					alert(data.result_code)
 					alert("회원 정보가 등록(수정)되었습니다.");
 					window.opener.Search();
 					self.close();
