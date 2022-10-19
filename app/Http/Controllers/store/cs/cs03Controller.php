@@ -108,8 +108,8 @@ class cs03Controller extends Controller
 				ifnull(p1.price, 0) as price,
 				ifnull(p1.wonga, 0) as wonga,
 				p1.qty * p1.price as amount,
-				p2.rt as rt,
-				p2.ut as ut,
+				p1.rt as rt,
+				p1.ut as ut,
 				m.name as user_nm
 			from product_stock_order_product p1
 				inner join product_stock_order p2 on p1.prd_ord_no = p2.prd_ord_no
@@ -335,7 +335,9 @@ class cs03Controller extends Controller
 					 * 입고/반품 상태변경
 					 */
 					$sql = "
-						update product_stock_order_product set state = :state where prd_ord_no = :prd_ord_no and prd_cd = :prd_cd
+						update product_stock_order_product 
+						set state = :state, ut = now()
+						where prd_ord_no = :prd_ord_no and prd_cd = :prd_cd
 					";
 					DB::update($sql, ['state' => $state, 'prd_ord_no' => $prd_ord_no, 'prd_cd' => $prd_cd]);
 				}
@@ -375,14 +377,14 @@ class cs03Controller extends Controller
 					 * slave 테이블에서 입고/반품번호와 일치하는 데이터가 전부 삭제된 경우 master도 삭제
 					 */
 					$sql = "
-						select count(*) as cnt from product_stock_order_product p1
-						where p1.prd_ord_no = :prd_ord_no and p2.state in ('10', '-10')
+						select count(*) as cnt from product_stock_order_product
+						where prd_ord_no = :prd_ord_no and state in ('10', '-10')
 					";
 					$result = DB::selectOne($sql, ['prd_ord_no' => $prd_ord_no]);
 					if ($result->cnt == 0) {
 						$sql = "
-							delete from product_stock_order p1
-							where p1.prd_ord_no = :prd_ord_no and p2.state in ('10', '-10')
+							delete from product_stock_order
+							where prd_ord_no = :prd_ord_no and state in ('10', '-10')
 						";
 						DB::delete($sql, ['prd_ord_no' => $prd_ord_no]);
 					}
