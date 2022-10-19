@@ -288,10 +288,10 @@
                 </div>
             </div>
             <div class="flex-2 d-flex justify-content-center">
-                <div class="d-flex flex-column justify-content-between w-100 h-100 p-5" style="min-width:300px;max-width:600px;border:7px solid #222;overflow:auto;">
+                <div class="d-flex flex-column justify-content-between w-100 h-100 p-5" style="min-width:300px;max-width:650px;border:7px solid #222;overflow:auto;">
                     <div class="d-flex flex-column align-items-center mb-4">
                         <div class="mb-5"><img src="/theme/{{config('shop.theme')}}/images/pc_logo_white.png" alt="" class="w-100"></div>
-                        <div class="d-flex flex-column w-100 fs-12 mb-5">
+                        <div class="d-flex flex-column w-100 fs-12 mb-4">
                             <div class="d-flex justify-content-between">
                                 <p>주문번호</p>
                                 <p id="od_ord_no" class="fw-sb">-</p>
@@ -307,10 +307,10 @@
                         </div>
                         <table class="w-100 fs-10 b-1-gray mb-2" style="border-width:0 0 1px;">
                             <colgroup>
-                                <col width="42%">
-                                <col width="20%">
-                                <col width="8%">
-                                <col width="30%">
+                                <col width="50%">
+                                <col width="15%">
+                                <col width="7%">
+                                <col width="28%">
                             </colgroup>
                             <thead>
                                 <tr class="b-1-gray" style="border-width:1px 0;">
@@ -325,7 +325,7 @@
                         <div class="d-flex flex-column w-100 fs-12 b-1-gray pb-2 mb-4" style="border-width: 0 0 1px;">
                             <div class="d-flex justify-content-between mb-1">
                                 <p>주문합계</p>
-                                <p id="od_ord_amt">-</p>
+                                <p id="od_ord_amt" class="fw-sb">-</p>
                             </div>
                             <div class="d-flex justify-content-between fs-10 pl-2 mb-2">
                                 <p>&#8722; 판매할인금액</p>
@@ -335,26 +335,26 @@
                                 <p>&#8722; 적립금사용금액</p>
                                 <p id="od_point_amt">-</p>
                             </div>
-                            <div class="d-flex justify-content-between fs-14 fw-b">
+                            <div class="d-flex justify-content-between fs-16 fw-b">
                                 <p>Total</p>
                                 <p id="od_recv_amt">-</p>
                             </div>
                         </div>
                         <div class="d-flex flex-column w-100 fs-12 mb-4">
                             <div class="d-flex justify-content-between mb-1">
-                                <p>결제수단</p>
+                                <p>[ 결제수단 ]</p>
                                 <p id="od_pay_type">-</p>
                             </div>
                             <div class="d-flex justify-content-between mb-1">
-                                <p>주문자정보</p>
+                                <p>[ 주문자정보 ]</p>
                                 <p id="od_user_info">-</p>
                             </div>
                             <div class="d-flex justify-content-between mb-1">
-                                <p>주문자연락처</p>
+                                <p>[ 주문자연락처 ]</p>
                                 <p id="od_phone">-</p>
                             </div>
                             <div class="d-flex justify-content-between">
-                                <p>특이사항</p>
+                                <p>[ 특이사항 ]</p>
                                 <p id="od_dlv_comment" class="text-right w-75">-</p>
                             </div>
                         </div>

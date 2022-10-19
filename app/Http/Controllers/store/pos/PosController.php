@@ -386,6 +386,10 @@ class PosController extends Controller
         $card_amt = $req->input("card_amt", 0); // 카드결제금액
         $cash_amt = $req->input("cash_amt", 0); // 현금결제금액
         $point_amt = $req->input("point_amt", 0); // 적립금결제금액
+        $total_amt = array_reduce($cart, function($c, $i) {
+            $c += $i['total'] * 1;
+            return $c;
+        }, 0);
         $memo = $req->input("memo", "");
 
         $pay_type = 0; // 결제방법
@@ -428,7 +432,6 @@ class PosController extends Controller
         
         $ord_amt = 0;
         $recv_amt = 0;
-        $point_amt = 0;
         $coupon_amt = 0;
         $dc_amt = 0;
         $pay_fee = 0;
@@ -480,12 +483,14 @@ class PosController extends Controller
             
             $order_opt = [];
 
+            $a_point_amt = 0;
+
             for ($i = 0; $i < count($cart); $i++) {
                 $goods_no = $cart[$i]['goods_no'] ?? '';
                 $goods_sub = $cart[$i]['goods_sub'] ?? '';
                 if(empty($goods_sub) || !is_numeric($goods_sub)) $goods_sub = 0;
                 $goods_type = $cart[$i]['goods_type_cd'] ?? '';
-                $goods_price = $cart[$i]['price'] ?? 0;
+                $goods_price = $cart[$i]['ori_price'] ?? 0;
                 $point = $cart[$i]['point'] ?? 0;
                 $prd_cd = $cart[$i]['prd_cd'] ?? '';
                 $goods_opt = $cart[$i]['goods_opt'] ?? '';
@@ -584,6 +589,14 @@ class PosController extends Controller
                 $a_ord_amt = $cart[$i]["total"] ?? 0;
                 $a_recv_amt = $a_ord_amt;
                 $ord_opt_dlv_amt = 0;
+                $c_dc_amt = $goods_price - $cart[$i]['price'];
+
+                $divided_point = round(($goods_price / $total_amt) * $point_amt, 0);
+                if ($i >= count($cart) - 1) {
+                    $divided_point = $point_amt - $a_point_amt;
+                } else {
+                    $a_point_amt += $divided_point;
+                }
 
                 array_push($order_opt, [
                         'goods_no' => $goods_no,
@@ -598,9 +611,9 @@ class PosController extends Controller
                         'price' => $goods_price,
                         'dlv_amt' => $ord_opt_dlv_amt,
                         'pay_type' => $pay_type,
-                        'point_amt' => 0,
+                        'point_amt' => $divided_point,
                         'coupon_amt' => 0,
-                        'dc_amt' => 0,
+                        'dc_amt' => $c_dc_amt,
                         'opt_amt' => $order_opt_amt,
                         'addopt_amt' => $order_addopt_amt,
                         'recv_amt' => $a_recv_amt,
@@ -628,9 +641,9 @@ class PosController extends Controller
                         'pr_code' => $pr_code,
                 ]);
                 $ord_amt += $order_opt[$i]["price"] * $order_opt[$i]["qty"];
-                $point_amt += 0;
+                // $point_amt += 0;
                 $coupon_amt += 0;
-                $dc_amt += 0;
+                // $dc_amt += 0;
                 // $dlv_amt += $ord_opt_dlv_amt;
                 $recv_amt += $order_opt[$i]["recv_amt"];
             }
@@ -656,7 +669,7 @@ class PosController extends Controller
                 'dc_amt' => $dc_amt,
                 'dlv_amt' => $dlv_amt,
                 'add_dlv_fee' => $add_dlv_fee,
-                'recv_amt' => $recv_amt + $dlv_amt + $add_dlv_fee - $point_amt - $coupon_amt - $dc_amt,
+                'recv_amt' => $recv_amt,
                 'dlv_msg' => '',
                 'ord_state' => $ord_state,
                 'upd_date' => DB::raw('now()'),
@@ -893,7 +906,7 @@ class PosController extends Controller
                 o.ord_no, o.ord_opt_no, o.ord_date, o.prd_cd, o.goods_nm, o.goods_opt, o.pay_type, 
                 o.sale_kind, s.sale_type_nm as sale_type, s.amt_kind, if(s.amt_kind = 'per', round(o.price * o.qty / s.sale_per), s.sale_amt) as sale_amount,
                 pt.code_val as pay_type_nm, o.dlv_comment, o.price, o.qty, o.point_amt, o.dc_amt, o.recv_amt,
-                om.user_id, om.user_nm, om.phone, om.mobile, om.recv_amt as total_recv_amt
+                om.user_id, om.user_nm, om.phone, om.mobile, om.point_amt as total_point_amt, om.recv_amt as total_recv_amt
             from order_opt o
                 inner join order_mst om on om.ord_no = o.ord_no
                 left outer join code pt on pt.code_kind_cd = 'G_PAY_TYPE' and pt.code_id = o.pay_type
