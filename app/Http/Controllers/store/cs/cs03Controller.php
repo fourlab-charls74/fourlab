@@ -62,7 +62,7 @@ class cs03Controller extends Controller
 			$where .= ")";
 		}
 		
-		if ($state != "") $where .= " and p2.state = '" . Lib::quote($state) . "'";
+		if ($state != "") $where .= " and p1.state = '" . Lib::quote($state) . "'";
 		if ($prd_ord_no != "") $where .= " and p1.prd_ord_no = '" . Lib::quote($prd_ord_no) . "'";
 		if ($prd_nm != "") $where .= " and p1.prd_nm like '%" . Lib::quote($prd_nm) . "%' ";
 		if ($com_id != "") $where .= " and p1.com_id = '" . Lib::quote($com_id) . "'";
