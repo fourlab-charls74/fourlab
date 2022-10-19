@@ -318,6 +318,9 @@ class mem01Controller extends Controller
         $opt				= Request("opt");
         $memo				= Request("memo");
         $taxpayer_yn		= Request("taxpayer_yn");
+        $type               = Request("type");
+        $store_nm           = Request("store_nm");
+        $store_cd           = Request("store_no");
 
         $auth_type			= Request("auth_type");
         $auth_yn			= Request("auth_yn");
@@ -381,14 +384,14 @@ class mem01Controller extends Controller
                 , point, ypoint, yn, mobile_chk, yyyy_chk
                 , yyyy, mm, dd, opt, out_yn, name_chk, wsale_status, taxpayer_yn, enjumin, anniv_date, anniv_type
                 , job, interest, memo, pwd_reset_yn, sex, recommend_id
-                , auth_type, auth_yn, auth_key
+                , auth_type, auth_yn, auth_key, store_nm, store_cd, type
             ) values (
                 '$user_id', '$enc_pwd', '$name', '', '$jumin', '$jumin1', '$enc_jumin2', '$email', '$email_chk'
                 , '$zip', '$addr', '$addr2', '$phone', '$mobile', '$rmobile', now()
                 , '0', '0', 'Y', '$mobile_chk', ''
                 , '$yyyy', '$mm', '$dd', '$opt', 'N', 'N', 'N', '$taxpayer_yn', '', '$anniv_date', ''
                 , '$job', '$interest', '$memo', 'N', '$sex', ''
-                , '$auth_type', '$auth_yn', '$auth_key'
+                , '$auth_type', '$auth_yn', '$auth_key', '$store_nm', '$store_cd', '$type'
             )
         ";
 
@@ -428,6 +431,9 @@ class mem01Controller extends Controller
         $memo				= Request("memo");
         $taxpayer_yn		= Request("taxpayer_yn","");            // 피엘라벤 사용안함
         $wsale_status		= Request("wsale_status", "");
+        $type               = Request("type");
+        $store_nm           = Request("store_nm", "");
+        $store_cd           = Request("store_no", "");
 
         $sql = "
             update member set
@@ -449,6 +455,9 @@ class mem01Controller extends Controller
                 , interest = '$interest'
                 , opt = '$opt'
                 , memo = '$memo'
+                , type = '$type'
+                , store_nm = '$store_nm'
+                , store_cd = '$store_cd'
             where user_id = '$user_id'
         ";
 
@@ -478,7 +487,7 @@ class mem01Controller extends Controller
                     ,name_chk = '', name_eng = '', job = '', married_yn = '', married_date = ''
                     ,rmobile = '', opt = '', wsale_status = '', taxpayer_yn = '', memo = ''
                     ,visit_cnt = '', jumin1 = '', jumin2 = ''
-                    ,sex='', auth_type='', auth_yn='', auth_key='', ipin='', foreigner='', mobile_cert_yn=''
+                    ,sex='', auth_type='', auth_yn='', auth_key='', ipin='', foreigner='', mobile_cert_yn='' , type='',store_nm='',store_cd=''
                 where user_id = '$user_id'
             ";
             DB::update($sql);

@@ -570,7 +570,15 @@
         {field:"opt_val" , headerName:"옵션", width:82  },
         {field:"goods_addopt" , headerName:"추가옵션", width:72  },
         {field:"qty" , headerName:"수량", width:46},
-        {field:"user_nm" , headerName:"주문자(아이디)", width:96  },
+        {field:"user_nm" , headerName:"주문자(아이디)", width:96,
+            cellRenderer: function(params) {
+                if(params.data.user_nm == '비회원()'){
+                    return params.data.user_nm;
+                } else {
+                    return '<a href="#" onclick="return openUserInfo(\'' + params.data.user_nm + '\');">' + params.value + '</a>';
+                }
+            }
+        },
         {field:"r_nm" , headerName:"수령자", width:60  },
         {field:"price" , headerName:"판매가", width:60, type: 'currencyType'  },
         {field:"sale_amt" , headerName:"쿠폰/할인", width:72, type: 'currencyType'  },
@@ -643,6 +651,16 @@
 
     function openClaimPopup(){
         const url='/head/cs/cs21';
+        const product=window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
+    }
+
+    function openUserInfo(user_nm){
+
+        var userinfo = user_nm;
+        var userinfo2 = userinfo.split('(');
+        var user_id = userinfo2[1].replace(')', '');
+        
+        const url='/head/member/mem01/show/edit/'+ user_id;
         const product=window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
     }
 

@@ -113,7 +113,7 @@ class mem01Controller extends Controller
 				'' as chkbox, a.user_id, a.name,
 				d.code_val as sex, concat(ifnull(a.yyyy, ''),ifnull(a.mm, ''),ifnull(a.dd, '')) as birth_day,
 				ifnull(a.jumin1, '') as jumin,
-				a.phone, a.mobile, a.email, a.point,
+				a.phone, a.mobile, a.email, a.point, a.store_nm,
 				date_format(a.regdate,'%y%m%d') as regdate,
 				a.lastdate as lastdate, a.visit_cnt,
 				a.auth_type, f.code_val as auth_type_str, a.auth_yn,
@@ -158,6 +158,7 @@ class mem01Controller extends Controller
 		$mmdd		= Request("mmdd");
 		$mail		= Request("mail");
 		$mobile_chk	= Request("mobile_chk");
+		$type		= Request("type");
 
 		$fr_ord_amt	= Lib::uncm(Request("cond_amt_from"));
 		$to_ord_amt	= Lib::uncm(Request("cond_amt_to"));
@@ -254,6 +255,10 @@ class mem01Controller extends Controller
 
 		if($auth_yn != ""){
 			$where .= " and a.auth_yn = '$auth_yn' ";
+		}
+		
+		if($type != ""){
+			$where .= " and a.type = '$type' ";
 		}
 
 		if($site != ""){

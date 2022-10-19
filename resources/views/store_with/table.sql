@@ -287,6 +287,8 @@ CREATE TABLE `store` (
     `rt_yn` char(1) DEFAULT 'Y' COMMENT '매장RT여부',
     `point_in_yn` char(1) DEFAULT 'N' COMMENT '적립금적립여부',
     `point_out_yn` char(1) DEFAULT 'N' COMMENT '적립금사용여부',
+    `map_code` varchar(100) COMMENT '맵 코드',
+    `open_month_stock` varchar(1) DEFAULT 'N' COMMENT '오픈 후 한 달 재고보기 제외여부'
     `reg_date` datetime DEFAULT NULL COMMENT '등록일',
     `mod_date` datetime DEFAULT NULL COMMENT '수정일',
     `admin_id` varchar(30) DEFAULT NULL COMMENT '관리자 아이디',

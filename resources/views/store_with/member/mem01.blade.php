@@ -80,20 +80,31 @@
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="">전화번호</label>
-							<div class="flax_box">
-								<input type="text" name="phone" id="phone" class="form-control form-control-sm search-enter">
-							</div>
-						</div>
-					</div>
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
 							<label for="">휴대전화</label>
 							<div class="flax_box">
 								<input type="text" name="mobile" id="mobile" class="form-control form-control-sm search-enter">
 							</div>
 						</div>
 					</div>
+					<div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="dlv_kind">회원가입 종류</label>
+                            <div class="form-inline form-radio-box">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="type" id="type_nb" class="custom-control-input" checked="" value="">
+                                    <label class="custom-control-label" for="type_nb">전체</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="type" id="type_n" class="custom-control-input" value="N">
+                                    <label class="custom-control-label" for="type_n">온라인</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="type" id="type_b" class="custom-control-input" value="B">
+                                    <label class="custom-control-label" for="type_b">오프라인</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 				</div>
 				<div class="search-area-ext row d-none align-items-center">
 					<div class="col-lg-4 inner-td">
@@ -433,15 +444,13 @@ var columns = [
 	{field:"name" , headerName:"이름"},
 	{field:"sex" , headerName:"성별", width:50},
 	{field:"birth_day" , headerName:"생년월일", width:75},
-	{field:"jumin" , headerName:"주민번호", width:75},
-	{field:"phone", headerName:"전화번호", width:100},
 	{field:"mobile" , headerName:"휴대전화", width:100},
 	{field:"email" , headerName:"이메일", width:150},
 	{field:"point" , headerName:"적립금", type: 'currencyType', width:60},
 	{field:"regdate" , headerName:"가입일", width:85},
+	{field:"store_nm" , headerName:"가입 매장명", width:85},
 	{field:"lastdate" , headerName:"최근로그인", width:125},
 	{field:"visit_cnt" , headerName:"로그인횟수", type: 'currencyType', width:85},
-	{field:"auth_type_str" , headerName:"인증방식", width:80},
 	{field:"auth_yn" , headerName:"인증여부", width:75 },
 	{field:"ord_date" , headerName:"최근주문일", width:125},
 	{field:"ord_cnt" , headerName:"구매수", type: 'currencyType', width:60},

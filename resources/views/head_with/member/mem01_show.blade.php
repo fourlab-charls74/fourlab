@@ -1,6 +1,8 @@
 @extends('head_with.layouts.layout-nav')
 @section('title','회원관리')
 @section('content')
+@include('store_with.layouts.modal')
+<script src="{{ URL::asset('/js/store_search.js?20220707')}}"></script>
 <script>
     //공통 선언
     const name = '{{@$user->name}}';
@@ -313,7 +315,7 @@
                                             <th>관심분야</th>
                                             <td>
                                                 <div class="txt_box">
-                                                    {{$interest}}
+                                                    {{@$interest}}
                                                 </div>
                                             </td>
                                         </tr>
@@ -439,7 +441,7 @@
                                             <th>적립금(사용)</th>
                                             <td>
                                                 <div class="txt_box">
-                                                    {{$use_point}}
+                                                    {{@$use_point}}
                                                 </div>
                                             </td>
                                         </tr>
@@ -460,6 +462,35 @@
                                             </td>
                                         </tr>
 //-->
+                                        <tr>
+                                            <th>회원가입 종류</th>
+                                            <td>
+                                                <div class="form-inline form-radio-box">
+                                                    <div class="custom-control custom-radio">
+                                                        <input type="radio" name="type" id="type_n" class="custom-control-input" value="N">
+                                                        <label class="custom-control-label" for="type_n">온라인</label>
+                                                    </div>
+                                                    <div class="custom-control custom-radio">
+                                                        <input type="radio" name="type" id="type_b" class="custom-control-input" value="B">
+                                                        <label class="custom-control-label" for="type_b">오프라인</label>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>주문매장</th>
+                                            <td style="padding:0px 10px 0px 10px;">
+                                                <div class="d-flex flex-column pt-2 pb-1">
+                                                    <div class="flax_box mr-2 mb-1" style="width: 307px;">
+                                                        <div class="form-inline inline_btn_box w-100">
+                                                            <input type='hidden' id="store_nm" name="store_nm">
+                                                            <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
+                                                            <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
                                         <tr>
                                             <th>회원그룹</th>
                                             <td>
@@ -1157,6 +1188,16 @@
                 }
             });
         });
+
+       
+	$(document).ready(function() {
+	
+
+        // 매장검색
+        $( ".sch-store" ).on("click", function() {
+            searchStore.Open(null);
+        });
+	});
     }
 </script>
 @stop
