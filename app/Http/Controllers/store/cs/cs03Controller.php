@@ -378,13 +378,13 @@ class cs03Controller extends Controller
 					 */
 					$sql = "
 						select count(*) as cnt from product_stock_order_product
-						where prd_ord_no = :prd_ord_no and state in ('10', '-10')
+						where prd_ord_no = :prd_ord_no
 					";
 					$result = DB::selectOne($sql, ['prd_ord_no' => $prd_ord_no]);
 					if ($result->cnt == 0) {
 						$sql = "
 							delete from product_stock_order
-							where prd_ord_no = :prd_ord_no and state in ('10', '-10')
+							where prd_ord_no = :prd_ord_no
 						";
 						DB::delete($sql, ['prd_ord_no' => $prd_ord_no]);
 					}
