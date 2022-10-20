@@ -884,8 +884,8 @@ class prd02Controller extends Controller
 				$size_sql = "select * from code where code_kind_cd = 'PRD_CD_SIZE_MATCH' and code_id = '$size[0]'";
 				$size_cd = DB::selectOne($size_sql)->code_val2;
 
-				$goods_opt = $color[1]."^".$size_cd;
-
+				// $goods_opt = $color[1]."^".$size_cd;
+				$goods_opt = "";
 				if ($result->count == 0) {
 
 					DB::table('product')->insert([

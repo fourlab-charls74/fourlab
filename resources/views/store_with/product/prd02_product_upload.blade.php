@@ -9,7 +9,7 @@
 			<div class="d-inline-flex location">
 				<span class="home"></span>
 				<span>/ 상품관리</span>
-				<span>/ 상품관리(재고)</span>
+				<span>/ 상품관리(코드)</span>
 			</div>
 		</div>
 		<div class="d-flex">
@@ -180,25 +180,24 @@
 													</select>
 												</div>
 											</td>
-
+											<th>TAG가</th>
+											<td>
+												<div class="flax_box">
+													<input type='text' class="form-control form-control-sm" name='tag_price' id="tag_price" value='' onkeyup="onlynum(this)">
+												</div>
+											</td>
+										</tr>
+                                        <tr>
 											<th>판매가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='price' id="price" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
-										</tr>
-                                        <tr>
 											<th>원가</th>
 											<td>
 											<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='wonga' id="wonga" value='' onkeyup="onlynum(this)">
-												</div>
-											</td>
-											<th>TAG가</th>
-											<td>
-												<div class="flax_box">
-													<input type='text' class="form-control form-control-sm" name='tag_price' id="tag_price" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
 										</tr>

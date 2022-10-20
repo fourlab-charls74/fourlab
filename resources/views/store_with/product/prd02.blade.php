@@ -2,7 +2,7 @@
 @section('title','상품')
 @section('content')
 	<div class="page_tit">
-		<h3 class="d-inline-flex">상품관리(재고)</h3>
+		<h3 class="d-inline-flex">상품관리(코드)</h3>
 		<div class="d-inline-flex location">
 			<span class="home"></span>
 			<span>/ 상품관리(재고)</span>
