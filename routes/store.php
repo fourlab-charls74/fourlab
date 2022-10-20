@@ -192,6 +192,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
         Route::get('prd03/delete/{product_code}','prd03Controller@delete');
         Route::post('prd03/del-img', 'prd03Controller@delImg');
+
+        // 상품재고관리
+        Route::get('prd04','prd04Controller@index');
     });
 
     // 생산입고관리
