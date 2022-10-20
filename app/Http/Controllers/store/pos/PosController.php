@@ -616,7 +616,7 @@ class PosController extends Controller
                         'dc_amt' => $c_dc_amt,
                         'opt_amt' => $order_opt_amt,
                         'addopt_amt' => $order_addopt_amt,
-                        'recv_amt' => $a_recv_amt,
+                        'recv_amt' => $a_recv_amt - $divided_point,
                         'p_ord_opt_no' => $p_ord_opt_no,
                         'md_id' => $goods->md_id,
                         'md_nm' => $goods->md_nm,
@@ -643,7 +643,7 @@ class PosController extends Controller
                 $ord_amt += $order_opt[$i]["price"] * $order_opt[$i]["qty"];
                 // $point_amt += 0;
                 $coupon_amt += 0;
-                // $dc_amt += 0;
+                $dc_amt += $c_dc_amt;
                 // $dlv_amt += $ord_opt_dlv_amt;
                 $recv_amt += $order_opt[$i]["recv_amt"];
             }
@@ -670,7 +670,6 @@ class PosController extends Controller
                 'dlv_amt' => $dlv_amt,
                 'add_dlv_fee' => $add_dlv_fee,
                 'recv_amt' => $recv_amt,
-                'dlv_msg' => '',
                 'ord_state' => $ord_state,
                 'upd_date' => DB::raw('now()'),
                 'dlv_end_date' => DB::raw('NULL'),
@@ -685,7 +684,7 @@ class PosController extends Controller
             
             $pay_stat = 0;
             $tno = '';
-            $pay_amt = $recv_amt + $dlv_amt + $add_dlv_fee - $point_amt - $coupon_amt - $dc_amt;
+            $pay_amt = $recv_amt;
 
             ##################################################
             #	부모 결제 정보 복사
@@ -809,11 +808,17 @@ class PosController extends Controller
             #####################################################
             #	포인트 지급
             #####################################################
+            
             if ($ord_state != "1") {
                 if ($point_flag === true) {
                     $point = new Point($user, $user_id);
                     $point->SetOrdNo($ord_no);
                     $point->Order($add_point);
+
+                    // 적립금 차감
+                    if ($point_amt > 0) {
+                        $point->Admin($point_amt, "PAY", "ORDER", "사용");
+                    }
                 }
             }
 

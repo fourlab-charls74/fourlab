@@ -8,7 +8,6 @@
         $("#" + idx).addClass("d-flex");
 
         if(idx === "pos_order") {
-            setNewOrdNo(true);
             $("#home_btn").css("display", "none");
         } else {
             $("#home_btn").css("display", "inline-block");
@@ -21,9 +20,9 @@
     /** 주문등록화면 초기화 */
     function initOrderScreen() {
         if(gx) {
-            setNewOrdNo();
             gx.gridOptions.api.setRowData([]);
             setProductDetail();
+            setMember();
             
             $("[name=card_amt]").val(0);
             $("[name=cash_amt]").val(0);
@@ -77,17 +76,22 @@
         let list = gx2.getRows();
         let goods = list.find(g => g.prd_cd === prd_cd);
 
-        gx.gridOptions.api.applyTransaction({add: [{...goods, qty: 1, total: 1 * goods.price, sale_type: sale_types[0].sale_kind, pr_code: pr_codes[0].pr_code}]});
-        gx.gridOptions.api.forEachNode((node) => {
-            if(node.data.prd_cd === prd_cd) {
-                node.setSelected(true);
-                updateOrderValue('sale_type', sale_types[0].sale_kind);
-            }
-        });
-
-        $('#searchProductModal').modal('hide');
-        $("#search_prd_keyword").val('');
-        gx2.setRows([]);
+        let same_goods = gx.getRows().find(g => g.prd_cd === prd_cd);
+        if(same_goods === undefined) {    
+            gx.gridOptions.api.applyTransaction({add: [{...goods, qty: 1, total: 1 * goods.price, sale_type: sale_types[0].sale_kind, pr_code: pr_codes[0].pr_code}]});
+            gx.gridOptions.api.forEachNode((node) => {
+                if(node.data.prd_cd === prd_cd) {
+                    node.setSelected(true);
+                    updateOrderValue('sale_type', sale_types[0].sale_kind);
+                }
+            });
+            
+            $('#searchProductModal').modal('hide');
+            $("#search_prd_keyword").val('');
+            gx2.setRows([]);
+        } else {
+            alert("이미 선택된 상품입니다.");
+        }
     }
 
     /** 우측 상품상세정보 조회 */
@@ -242,6 +246,7 @@
             if(res.data.code === '200') {
                 alert("주문이 정상적으로 등록되었습니다.");
                 initOrderScreen();
+                setNewOrdNo(true);
             } else if(res.data.code !== '500') {
                 alert(res.data.msg);
             } else {
@@ -278,6 +283,7 @@
             $("#no_user").removeClass("d-none");
             $("#no_user").addClass("d-flex");
             $("#user").addClass("d-none");
+            $("#user_id_txt").text('');
             return;
         }
 

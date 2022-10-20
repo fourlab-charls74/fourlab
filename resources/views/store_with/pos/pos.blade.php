@@ -763,6 +763,8 @@
             }
         });
 
+        setNewOrdNo(true);
+
 
         // ELEMENT EVENT
         $("#search_prd_keyword").on("keypress", function (e) {
@@ -773,9 +775,11 @@
         });
         $("#product_calculator").on({
             click: function({target}) {
-                if(target.nodeName == "BUTTON") {
+                let tg = target;
+                if(target.parentNode.nodeName == "BUTTON") tg = target.parentNode;
+                if(tg.nodeName == "BUTTON") {
                     let str = $("#product_press_amt").val().replaceAll(",", "");
-                    switch (target.value) {
+                    switch (tg.value) {
                         case 'remove':
                             str = str.slice(0, str.length - 1); 
                             break;
@@ -791,7 +795,7 @@
                             str = ''; 
                             break;
                         default:
-                            str += target.value;
+                            str += tg.value;
                             break;
                     }
                     $("#product_press_amt").val(isNaN(str * 1) ? 0 : Comma(str * 1));
@@ -823,9 +827,11 @@
         });
         $("#payment_calculator").on({
             click: function(e) {
-                if(e.target.nodeName == "BUTTON") {
+                let tg = e.target;
+                if(e.target.parentNode.nodeName == "BUTTON") tg = e.target.parentNode;
+                if(tg.nodeName == "BUTTON") {
                     let str = $("#pay_press_amt").val().replaceAll(",", "");
-                    switch (e.target.value) {
+                    switch (tg.value) {
                         case 'remove':
                             str = str.slice(0, str.length - 1); 
                             break;
@@ -839,7 +845,7 @@
                             str = ''; 
                             break;
                         default:
-                            str += e.target.value;
+                            str += tg.value;
                             break;
                     }
                     $("#pay_press_amt").val(isNaN(str * 1) ? 0 : Comma(str * 1));
