@@ -108,7 +108,7 @@ class prd03Controller extends Controller
 			select
 				c.code_val as type_nm,
 				c2.code_val as opt,
-				pc.img_url as img,
+				i.img_url as img,
 				p.prd_cd as prd_cd,
 				c7.code_val as color,
 				c8.code_val as size,
@@ -217,7 +217,7 @@ class prd03Controller extends Controller
 				$prd_cd	= $row['prd_cd'];
 
 				$goods_no = "";
-				$goods_opt = "";
+				$goods_opt = $color . "^" . $size;
 
 				$sql = "select count(*) as count from product where prd_cd = :prd_cd";
 				$result	= DB::selectOne($sql, ['prd_cd' => $prd_cd]);
@@ -242,12 +242,13 @@ class prd03Controller extends Controller
 					 */
 					$base64_src = $row['image'];
 					$save_path = "/images/prd03";
-					$img_url = ULib::uploadBase64img($save_path, $base64_src);
+					
+					$unique_img_name = $prd_cd . $seq;
+					$img_url = ULib::uploadBase64img($save_path, $base64_src, $unique_img_name);
 		
 					DB::table('product_code')->insert([
 						'prd_cd' => $prd_cd,
 						'seq' => $seq,
-						'img_url' => $img_url,
 						'goods_no' => $goods_no,
 						'goods_opt'	=> $goods_opt,
 						'brand' => $brand,
@@ -271,6 +272,29 @@ class prd03Controller extends Controller
 						'rt' => now(),
 						'ut' => now(),
 						'admin_id'	=> $admin_id
+					]);
+
+					DB::table('product_stock')->insert([
+						'prd_cd' => $prd_cd,
+						'in_qty' => 0,
+						'out_qty' => 0,
+						'qty' => 0,
+						'wqty' => 0,
+						'goods_opt' => $goods_opt,
+						'barcode' => $prd_cd,
+						'use_yn' => "Y",
+						'rt' => now(),
+						'ut' => now()
+					]);
+
+					DB::table('product_stock_storage')->insert([
+						'prd_cd' => $prd_cd,
+						'qty' => 0,
+						'wqty' => 0,
+						'goods_opt' => $goods_opt,
+						'use_yn' => "Y",
+						'rt' => now(),
+						'ut' => now()
 					]);
 
 				} else {
@@ -304,7 +328,7 @@ class prd03Controller extends Controller
 				p.price as price,
 				p.wonga as wonga,
 				c9.code_id as unit_id,
-				pc.img_url as img_url,
+				i.img_url as img_url,
 				p.prd_cd as prd_cd,
 				p.ut as rt,
 				p.ut as ut
@@ -350,6 +374,7 @@ class prd03Controller extends Controller
 			$base64_src = $data['image'];
 			$save_path = "/images/prd03";
 			$img_url = "";
+			$unique_img_name = $prd_cd . $seq;
 
 			/**
 			 * 이미지 수정시 기존에 저장된 이미지가 있는지 확인
@@ -359,7 +384,7 @@ class prd03Controller extends Controller
 				/**
 				 * 기존에 저잗왼 이미지가 없는 경우 이미지 관련 insert 처리
 				 */
-				$img_url = ULib::uploadBase64img($save_path, $base64_src);
+				$img_url = ULib::uploadBase64img($save_path, $base64_src, $unique_img_name);
 
 				DB::table('product_image')->insert([
 					'prd_cd' => $prd_cd,
@@ -380,7 +405,7 @@ class prd03Controller extends Controller
 				if ($base64_src != "") { // 이미지를 수정한 경우에만 기존 이미지 삭제후 업데이트
 
 					ULib::deleteFile($img_url);
-					$img_url = ULib::uploadBase64img($save_path, $base64_src);
+					$img_url = ULib::uploadBase64img($save_path, $base64_src, $unique_img_name);
 
 					DB::table('product_image')->where('idx', '=', $idx)->update([
 						'img_url' => $img_url,
@@ -389,7 +414,6 @@ class prd03Controller extends Controller
 					]);
 
 					DB::table('product_code')->where('prd_cd', '=', $prd_cd)->update([
-						'img_url' => $img_url,
 						'ut' => now(),
 						'admin_id'	=> $admin_id
 					]);
@@ -474,7 +498,6 @@ class prd03Controller extends Controller
 			]);
 
 			DB::table('product_code')->where('prd_cd', '=', $prd_cd)->update([
-				'img_url' => "",
 				'ut' => now(),
 				'admin_id'	=> $admin_id
 			]);

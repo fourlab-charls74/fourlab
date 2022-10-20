@@ -187,7 +187,7 @@
         },
         {
             field: "state",
-            headerName: "입고상태",
+            headerName: "상태",
             width: 72,
             cellRenderer: (params) => { // 상태:입고대기(10), 입고처리중(20), 입고완료(30), 반품대기(-10), 반품처리중(-20), 반품완료(-30)
                 const state = params.data.state;
@@ -329,19 +329,31 @@
             document.search.change_state.focus();
             return false;
         };
-        const arr = gx.getSelectedRows();
-        if (arr.length < 1) return alert('상태를 변경할 항목을 선택해주세요.');
+        const rows = gx.getSelectedRows();
+        if (rows.length < 1) return alert('상태를 변경할 항목을 선택해주세요.');
         if (confirm('입고/반품 상태를 변경하시겠습니까?')) {
-            if (Array.isArray(arr) && !(arr.length > 0)) {
+            if (Array.isArray(rows) && !(rows.length > 0)) {
                 alert('항목을 선택 해 주십시오.')
                 select.focus();
                 return false;
             } else {
-                arr.map((row, idx) => {
-                    prd_ord_nos[idx] = row.prd_ord_no;
-                    prd_cds[idx] = row.prd_cd;
-                    qties[idx] = row.qty;
-                });
+                for (let i=0; i < rows.length; i++ ) {
+                    const row = rows[i];
+                    if (row.state == 10 || row.state == 20) {
+                        if (state < 0) {
+                            alert('입고중인 상품은 입고 관련 상태만 변경하실 수 있습니다.\n선택 항목을 다시 확인해주세요.');
+                            return false;
+                        }
+                    } else if (row.state == -10 || row.state == -20) {
+                        if (state > 0) {
+                            alert('반품중인 상품은 반품 관련 상태만 변경하실 수 있습니다.\n선택 항목을 다시 확인해주세요.');
+                            return false;
+                        }
+                    }
+                    prd_ord_nos[i] = row.prd_ord_no;
+                    prd_cds[i] = row.prd_cd;
+                    qties[i] = row.qty;
+                }
                 axios({
                     url: '/store/cs/cs03/update',
                     method: 'put',
@@ -369,15 +381,21 @@
         let prd_ord_nos = [];
         let prd_cds = [];
         if (confirm('삭제하시겠습니까?')) {
-            const arr = gx.getSelectedRows();
-            if (Array.isArray(arr) && !(arr.length > 0)) {
+            const rows = gx.getSelectedRows();
+            if (Array.isArray(rows) && !(rows.length > 0)) {
                 alert('항목을 선택 해 주십시오.')
                 return false;
             } else {
-                arr.map((row, idx) => {
-                    prd_ord_nos[idx] = row.prd_ord_no;
-                    prd_cds[idx] = row.prd_cd;
-                });
+                let state = document.search.change_state;
+                for (let i=0; i < rows.length; i++ ) {
+                    const row = rows[i];
+                    if (row.state == 20 || row.state == -20) {
+                        alert('상태가 입고대기/반품대기인 경우에만 삭제 가능합니다.');
+                        return false;
+                    }
+                    prd_ord_nos[i] = row.prd_ord_no;
+                    prd_cds[i] = row.prd_cd;
+                }
                 axios({
                     url: '/store/cs/cs03/delete',
                     method: 'delete',

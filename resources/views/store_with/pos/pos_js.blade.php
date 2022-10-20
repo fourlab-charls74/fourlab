@@ -418,7 +418,7 @@
 
             let dc_amt = Comma(data.reduce((a,c) => ((c.sale_kind == '99' ? ((c.price * c.qty) - c.recv_amt) : c.sale_amount) * 1) + a, 0) * -1);
             $("#od_dc_amt").text(dc_amt);
-            $("#od_point_amt").text(Comma(data.reduce((a,c) => (c.point_amt * 1) + a, 0) * -1));
+            $("#od_point_amt").text(Comma(ord.total_point_amt));
             $("#od_recv_amt").text(Comma(ord.total_recv_amt));
 
             $("#od_pay_type").text(ord.pay_type_nm.replaceAll("무통장", "현금"));
@@ -434,7 +434,7 @@
                             <div class="d-flex flex-column align-items-start fs-08 pr-2">
                                 <p class="fw-sb fs-09">${o.goods_nm}</p>
                                 <p class="fc-white br-05 bg-gray pl-2 pr-2 mt-1 mb-1">${o.prd_cd || '-'}</p>
-                                <p class="fc-navy">${o.goods_opt.replaceAll("^", " / ")}</p>
+                                ${o.goods_opt.split("^").map(opt => `<p class="fc-gray fw-sb pl-3">&#8735; ${opt}</p>`).join("")}
                             </div>
                         </td>
                         <td class="text-center">${Comma(o.price)}</td>

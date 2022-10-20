@@ -62,7 +62,7 @@ class cs03Controller extends Controller
 			$where .= ")";
 		}
 		
-		if ($state != "") $where .= " and p2.state = '" . Lib::quote($state) . "'";
+		if ($state != "") $where .= " and p1.state = '" . Lib::quote($state) . "'";
 		if ($prd_ord_no != "") $where .= " and p1.prd_ord_no = '" . Lib::quote($prd_ord_no) . "'";
 		if ($prd_nm != "") $where .= " and p1.prd_nm like '%" . Lib::quote($prd_nm) . "%' ";
 		if ($com_id != "") $where .= " and p1.com_id = '" . Lib::quote($com_id) . "'";
@@ -469,7 +469,7 @@ class cs03Controller extends Controller
 				cp.com_nm as sup_com_nm,
 				p.prd_cd as prd_cd,
 				p.prd_nm as prd_nm,
-				pc.img_url as img,
+				i.img_url as img,
 				c7.code_val as color,
 				c8.code_val as size,
 				c9.code_val as unit,
@@ -490,7 +490,7 @@ class cs03Controller extends Controller
 				left outer join code c7 on c7.code_kind_cd = 'PRD_CD_COLOR' and c7.code_id = pc.color
 				left outer join code c8 on c8.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c8.code_id = pc.size
 				left outer join code c9 on c9.code_kind_cd = 'PRD_CD_UNIT' and c9.code_id = p.unit
-			where p.use_yn = 'Y'
+			where p.use_yn = 'Y' and p.type <> 'N'
 				$where
 			$orderby
 			$limit

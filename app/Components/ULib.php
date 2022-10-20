@@ -15,10 +15,15 @@ class ULib
      * return 
      *     업로드된 파일 경로 반환
      * */ 
-    public static function uploadBase64img($save_path, $src) {
+    public static function uploadBase64img($save_path, $src, $unique_img_name = "") {
         $image = preg_replace('/data:image\/(.*?);base64,/', '', $src);
         
-        $file_name = sprintf("%s.jpg", date('YmdHis'));
+        if ($unique_img_name != "") {
+            $file_name = sprintf("%s.jpg", $unique_img_name);
+        } else {
+            $file_name = sprintf("%s.jpg", date('YmdHis'));
+        }
+        
         $save_file = sprintf("%s/%s", $save_path, $file_name);
 
         /* 이미지를 저장할 경로 폴더가 없다면 생성 */

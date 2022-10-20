@@ -564,7 +564,7 @@ class sal01Controller extends Controller
 		
 		$order['com_rate'] = 0;
 		$order['ord_kind'] = 20;
-		$order['ord_type'] = 12;
+		$order['ord_type'] = 15; // 정상:15 (code 테이블 > code_kind_cd = 'G_ORD_TYPE')
 
 		$order_states = [5, 10, 30];
 		$order["ord_state"] = $order_states[2];
@@ -933,7 +933,7 @@ class sal01Controller extends Controller
 		
 		$order['com_rate'] = 0;
 		$order['ord_kind'] = 20;
-		$order['ord_type'] = 12;
+		$order['ord_type'] = 15; // 정상:15 (code 테이블 > code_kind_cd = 'G_ORD_TYPE')
 
 		$order_states = [5, 10, 30];
 		$order["ord_state"] = $order_states[2];
