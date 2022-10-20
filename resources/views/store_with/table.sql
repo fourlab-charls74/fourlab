@@ -699,6 +699,33 @@ CREATE TABLE `msg_group_store` (
     PRIMARY KEY (`group_cd`, `store_cd`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- 원부자재 출고
+CREATE TABLE `sproduct_stock_release` (
+    `idx` INT(11) NOT NULL AUTO_INCREMENT COMMENT '일련번호',
+    `type` VARCHAR(50) DEFAULT NULL COMMENT '분류 - code : REL_TYPE (요청분/일반 : R/G)',
+    `prd_cd` VARCHAR(50) NOT NULL DEFAULT '0' COMMENT '상품코드',
+    `price` int(11) NOT NULL COMMENT '판매가',
+    `wonga` int(11) NOT NULL COMMENT '원가',
+    `qty` INT(11) DEFAULT NULL COMMENT '수량',
+    `store_cd` VARCHAR(30) NOT NULL DEFAULT '0' COMMENT '수령매장코드',
+    `storage_cd` VARCHAR(30) NOT NULL DEFAULT '0' COMMENT '창고코드',
+    `state` INT(11) NOT NULL DEFAULT '0' COMMENT '상태(요청/접수/출고/입고(매장)/거부:10/20/30/40/-10)',
+    `exp_dlv_day` VARCHAR(8) DEFAULT NULL COMMENT '출고예정일자',
+    `rel_order` VARCHAR(30) DEFAULT NULL COMMENT '출고차수 - 출고예정일자 + code : REL_ORDER (01 - 25)',
+    `comment` VARCHAR(255) DEFAULT NULL COMMENT '출고메모(거부사유 등)',
+    `req_id` VARCHAR(50) DEFAULT NULL COMMENT '요청자',
+    `req_rt` DATETIME DEFAULT NULL COMMENT '요청일시',
+    `rec_id` VARCHAR(50) DEFAULT NULL COMMENT '접수자',
+    `rec_rt` DATETIME DEFAULT NULL COMMENT '접수일시',
+    `prc_id` VARCHAR(50) DEFAULT NULL COMMENT '처리자',
+    `prc_rt` DATETIME DEFAULT NULL COMMENT '처리일시',
+    `fin_id` VARCHAR(50) DEFAULT NULL COMMENT '완료자',
+    `fin_rt` DATETIME DEFAULT NULL COMMENT '완료일시',
+    `rt` DATETIME DEFAULT NULL COMMENT '등록일시',
+    `ut` DATETIME DEFAULT NULL COMMENT '변경일시',
+    PRIMARY KEY (`idx`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='상품재고 이동';
+
 --
 -- 기존 테이블 컬럼 추가 시작
 --

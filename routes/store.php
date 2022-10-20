@@ -286,6 +286,24 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk15/search','stk15Controller@search');
         Route::post('stk15/request-release', 'stk15Controller@request_release');
 
+        // 원부자재 출고
+        Route::get('stk16','stk16Controller@index');
+        Route::get('stk16/search','stk16Controller@search');
+        Route::post('stk16/receipt','stk16Controller@receipt'); // 접수
+        Route::post('stk16/release','stk16Controller@release'); // 출고
+        Route::post('stk16/receive','stk16Controller@receive'); // 매장입고
+        Route::post('stk16/reject','stk16Controller@reject'); // 거부
+
+        // 원부자재 - 요청분출고
+        Route::get('stk17','stk17Controller@index');
+        Route::get('stk17/search','stk17Controller@search');
+        Route::post('stk17/request-release', 'stk17Controller@request_release');
+
+        // 원부자재 - 일반출고
+        Route::get('stk18','stk18Controller@index');
+        Route::get('stk18/search','stk18Controller@search');
+        Route::post('stk18/request-release', 'stk18Controller@request_release');
+
         // 매장RT
         Route::get('stk20','stk20Controller@index');
         Route::get('stk20/search','stk20Controller@search');
@@ -306,6 +324,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk22/search-goods','stk22Controller@search_goods');
         Route::get('stk22/search-stock','stk22Controller@search_stock');
         Route::post('stk22/request-rt','stk22Controller@request_rt');
+
 
         // 매장별할인율적용조회
         Route::get('stk25','stk25Controller@index');

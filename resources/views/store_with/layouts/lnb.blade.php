@@ -29,7 +29,7 @@
                     <li><a href="/store/cs/cs01">(완)상품입고</a></li>
                     <li><a href="/store/cs/cs02">(완)상품반품이동</a></li>
                     {{-- <li><a href="/partner/cs/cs02">상품반품이동 (일괄등록)</a></li> --}}
-                    <li><a href="/store/cs/cs03">(개)원부자재입고/반품</a></li>
+                    <li><a href="/store/cs/cs03">(완)원부자재입고/반품</a></li>
                 </ul>
             </li>
             <li>
@@ -42,6 +42,7 @@
                     <li><a href="/store/stock/stk03">(완)매장주문</a></li>
                     <li><a href="/store/stock/stk11">(개)반품</a></li>
                     <li><a href="/store/stock/stk20">(완)매장RT</a></li>
+                    <li><a href="/store/stock/stk16">(개)원부자재출고</a></li>
                     <li><a href="#">매장주문 - 는 포스화면</a></li>
                     <li><a href="/store/stock/stk25">(완)매장별할인율적용조회</a></li>
                     <li><a href="/store/stock/stk26">(완)실사</a></li>
