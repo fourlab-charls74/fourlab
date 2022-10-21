@@ -348,6 +348,11 @@
             };
         });
 
+        function EditProduct(product_code) {
+			var url = '/store/product/prd03/edit/' + product_code;
+			var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1100,height=555");
+		}
+
         function Search() {
             if(!$("[name=store_no]").val()) return alert("요청매장을 선택 후 검색해주세요.");
             let data = $('form[name="search"]').serialize();
