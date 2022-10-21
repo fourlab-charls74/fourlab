@@ -65,6 +65,9 @@ class PosController extends Controller
     public function search_command(Request $request, $cmd)
     {
         switch ($cmd) {
+			case 'analysis':
+				$response = $this->search_analysis($request);
+				break;
 			case 'goods':
 				$response = $this->search_goods($request);
 				break;
@@ -85,6 +88,41 @@ class PosController extends Controller
                 $response = response()->json(['code' => 0, 'msg' => $message], 200);
 		};
 		return $response;
+    }
+
+    /** 매출분석 및 직전결제내역 조회 */
+    public function search_analysis(Request $request)
+    {
+        $today = date("Y-m-d");
+        $store_cd = STORE_CD;
+        $sql = "
+            select count(ord_no) as ord_cnt, sum(total_amt) as ord_amt, sum(total_qty) as ord_qty
+            from (
+                select o.ord_no, sum(o.ord_amt) as total_amt, sum(opt.qty) as total_qty
+                from order_mst o
+                    inner join order_opt opt on opt.ord_no = o.ord_no
+                where o.store_cd = '$store_cd'
+                    and o.ord_date >= '$today 00:00:00' and o.ord_date <= '$today 23:59:59'
+                group by o.ord_no
+            ) a
+        ";
+        $today_analysis = DB::selectOne($sql);
+
+        $sql = "
+            select ord_no, date_format(ord_date, '%H시 %i분') as ord_date, ord_amt, recv_amt, (point_amt * -1) as point_amt, (dc_amt * -1) as dc_amt
+            from order_mst
+            where store_cd = '$store_cd'
+                and ord_date >= '$today 00:00:00' and ord_date <= '$today 23:59:59'
+            order by ord_date desc
+            limit 0,1
+        ";
+        $prev_analysis = DB::selectOne($sql);
+
+        return response()->json([
+            'code' => '200',
+            'today_order' => $today_analysis,
+            'prev_order' => $prev_analysis,
+        ], 200);
     }
 
     /** 상품검색 */

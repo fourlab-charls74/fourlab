@@ -24,11 +24,11 @@
                 주문등록
             </button>
             <div class="d-flex flex-column fc-white fs-12 bg-brown p-1" style="grid-area:b;">
-                <p class="text-center fs-16 fw-sb p-4" style="border-bottom:2px solid #999;">매출분석</p>
+                <p class="text-center fs-16 fw-sb p-4" style="border-bottom:2px solid #999;">오늘 매출분석</p>
                 <ul class="p-3">
-                    <li class="d-flex justify-content-between fw-sb mb-2"><p>총 매출금액</p><p class="fc-red"><span>0</span>원</p></li>
-                    <li class="d-flex justify-content-between mb-2"><p>판매수량</p><p><span>0</span>개</p></li>
-                    <li class="d-flex justify-content-between"><p>주문건수</p><p><span>0</span>건</p></li>
+                    <li class="d-flex justify-content-between fs-14 fw-sb mb-2"><p>총 매출금액</p><p class="fc-red"><span id="to_ord_amt">0</span>원</p></li>
+                    <li class="d-flex justify-content-between mb-2"><p>판매수량</p><p><span id="to_qty">0</span>개</p></li>
+                    <li class="d-flex justify-content-between"><p>주문건수</p><p><span id="to_ord_cnt">0</span>건</p></li>
                 </ul>
             </div>
             <button type="button" class="butt fs-14 fw-sb bg-blue" style="grid-area:c;" onclick="return setScreen('pos_today')">
@@ -43,13 +43,14 @@
                 <div class="w-100">
                     <p class="text-center fs-16 fw-sb p-4" style="border-bottom:2px solid #999;">직전결제내역</p>
                     <ul class="p-3">
-                        <li class="d-flex justify-content-between fw-sb mb-2"><p>총 결제금액</p><p class="fc-red"><span>0</span>원</p></li>
-                        <li class="d-flex justify-content-between mb-2"><p>주문금액</p><p><span>0</span>개</p></li>
-                        <li class="d-flex justify-content-between mb-2"><p>할인금액</p><p><span>0</span>건</p></li>
-                        <li class="d-flex justify-content-between"><p>결제시간</p><p>00시 00분</p></li>
+                        <li class="d-flex justify-content-between fs-14 fw-sb mb-2"><p>총 결제금액</p><p class="fc-red"><span id="po_recv_amt">0</span>원</p></li>
+                        <li class="d-flex justify-content-between mb-2"><p>주문금액</p><p><span id="po_ord_amt">0</span>원</p></li>
+                        <li class="d-flex justify-content-between mb-2"><p>할인금액</p><p><span id="po_dc_amt">0</span>원</p></li>
+                        <li class="d-flex justify-content-between mb-2"><p>적립금사용</p><p><span id="po_point_amt">0</span>원</p></li>
+                        <li class="d-flex justify-content-between"><p>결제시간</p><p id="po_ord_date"></p></li>
                     </ul>
                 </div>
-                <button type="button" class="butt fc-navy fw-b bg-white m-2" style="height:60px;border-radius:12px;">영수증 조회</button>
+                <button type="button" class="butt fc-navy fw-b bg-white m-2" style="height:60px;border-radius:12px;" onclick="return viewPrevOrder();">영수증 조회</button>
             </div>
             <button type="button" class="butt fs-14 fw-sb bg-mint" style="grid-area:f;">
                 <i class="fa fa-bookmark d-block mb-3" aria-hidden="true" style="font-size:50px;"></i>
@@ -288,8 +289,8 @@
                 </div>
             </div>
             <div class="flex-2 d-flex justify-content-center">
-                <div class="d-flex flex-column justify-content-between w-100 h-100 p-5" style="min-width:300px;max-width:650px;border:7px solid #222;overflow:auto;">
-                    <div class="d-flex flex-column align-items-center mb-4">
+                <div class="d-flex flex-column justify-content-between w-100 h-100 p-5" style="min-width:300px;max-width:650px;max-height:890px;border:7px solid #222;overflow:auto;">
+                    <div class="d-flex flex-column align-items-center">
                         <div class="mb-5"><img src="/theme/{{config('shop.theme')}}/images/pc_logo_white.png" alt="" class="w-100"></div>
                         <div class="d-flex flex-column w-100 fs-12 mb-4">
                             <div class="d-flex justify-content-between">
@@ -360,7 +361,6 @@
                         </div>
                     </div>
                     <div class="d-flex justify-content-center">
-                        <p class="fs-14 fw-b" style="border-bottom: 2px solid #222;">{{ @$store->store_nm }}</p>
                     </div>
                 </div>
             </div>
@@ -764,6 +764,7 @@
         });
 
         setNewOrdNo(true);
+        getOrderAnalysisData();
 
 
         // ELEMENT EVENT

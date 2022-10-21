@@ -17,6 +17,35 @@
         }
     }
 
+    /** 매출분석 & 직전결제내역 데이터 조회 */
+    async function getOrderAnalysisData() {
+        const { status, data } = await axios({ 
+            url: '/store/pos/search/analysis',
+            method: 'get' 
+        });
+        
+        if(status === 200) {
+            $("#to_ord_amt").text(Comma(data.today_order?.ord_amt || 0));
+            $("#to_qty").text(Comma(data.today_order?.ord_qty || 0));
+            $("#to_ord_cnt").text(Comma(data.today_order?.ord_cnt));
+            
+            $("#po_recv_amt").text(Comma(data.prev_order?.recv_amt || 0));
+            $("#po_ord_amt").text(Comma(data.prev_order?.ord_amt || 0));
+            $("#po_dc_amt").text(Comma(data.prev_order?.dc_amt || 0));
+            $("#po_point_amt").text(Comma(data.prev_order?.point_amt || 0));
+            $("#po_ord_date").text(data.prev_order?.ord_date || '-');
+        }
+    }
+
+    /** 직전결제내역 영수증 조회 */
+    function viewPrevOrder() {
+        $("[name=ord_sdate]").val(getFormatDate(new Date()));
+        $("[name=ord_edate]").val(getFormatDate(new Date()));
+        $("#ord_field").val("desc").prop("selected", true);
+
+        setScreen("pos_today");
+    }
+
     /** 주문등록화면 초기화 */
     function initOrderScreen() {
         if(gx) {
@@ -85,7 +114,7 @@
                     updateOrderValue('sale_type', sale_types[0].sale_kind);
                 }
             });
-            
+
             $('#searchProductModal').modal('hide');
             $("#search_prd_keyword").val('');
             gx2.setRows([]);
@@ -459,6 +488,21 @@
             }
             $("#od_prd_list").html(html);
         }
+    }
+
+    /** ETC */
+
+    function leftPad(value) {
+        if (value >= 10) return value;
+        return `0${value}`;
+    }
+        
+    function getFormatDate(date, delimiter = '-') {
+        const year = date.getFullYear();
+        const month = leftPad(date.getMonth() + 1);
+        const day = leftPad(date.getDate());
+
+        return [year, month, day].join(delimiter);
     }
 
 </script>
