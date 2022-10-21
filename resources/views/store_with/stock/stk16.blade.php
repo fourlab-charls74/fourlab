@@ -379,7 +379,7 @@
             cellStyle: DEFAULT,
             width: 120
         },
-		{field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 350},
+		{field: "prd_nm",	headerName: "원부자재명", width: 350},
 		{field: "qty", headerName: "수량", type: "numberType",
             editable: function(params) {return params.data.state === 10;}, 
             cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};},

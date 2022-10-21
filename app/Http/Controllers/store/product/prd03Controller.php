@@ -123,7 +123,7 @@ class prd03Controller extends Controller
 				cp.com_nm as sup_com,
 				c9.code_val as unit,
 				i.rt as rt,
-				i.ut as ut				
+				i.ut as ut
 			from product p
 				inner join product_code pc on p.prd_cd = pc.prd_cd
 				left outer join product_image i on p.prd_cd = i.prd_cd
@@ -146,8 +146,7 @@ class prd03Controller extends Controller
 		$stmt	= $pdo->prepare($query);
 		$stmt->execute();
 		$result	= [];
-		while($row = $stmt->fetch(PDO::FETCH_ASSOC))
-		{
+		while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 			$result[] = $row;
 		}
 		return response()->json([
@@ -217,7 +216,7 @@ class prd03Controller extends Controller
 				$prd_cd	= $row['prd_cd'];
 
 				$goods_no = "";
-				$goods_opt = $color . "^" . $size;
+				$goods_opt = "";
 
 				$sql = "select count(*) as count from product where prd_cd = :prd_cd";
 				$result	= DB::selectOne($sql, ['prd_cd' => $prd_cd]);
@@ -292,6 +291,7 @@ class prd03Controller extends Controller
 						'qty' => 0,
 						'wqty' => 0,
 						'goods_opt' => $goods_opt,
+						'storage_cd' => DB::raw("(select storage_cd from storage where default_yn = 'Y')"),
 						'use_yn' => "Y",
 						'rt' => now(),
 						'ut' => now()
@@ -305,6 +305,7 @@ class prd03Controller extends Controller
 			DB::commit();
 			$code = 200;
 		} catch (\Exception $e) {
+			// dd($e);
 			DB::rollback();
 			$code = 500;
 		}

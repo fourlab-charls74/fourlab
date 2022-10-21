@@ -35,11 +35,8 @@ class stk16Controller extends Controller
             'rel_types'     => SLib::getCodes("REL_TYPE"), // 출고구분
             'rel_states'    => $this->rel_states, // 출고상태
             'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
-            'style_no'		=> "", // 스타일넘버
-            // 'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'), // 상품구분(2)
-            'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
-            // 'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
             'items'			=> SLib::getItems(), // 품목
+            'types' => SLib::getCodes("PRD_MATERIAL_TYPE") // 원부자재 구분
 		];
 
         return view(Config::get('shop.store.view') . '/stock/stk16', $values);

@@ -127,7 +127,6 @@ CREATE TABLE `product_stock_storage` (
     PRIMARY KEY (`goods_no`,`prd_cd`,`storage_cd`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='상품재고 물류별';
 
-
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values
 ('P_STOCK_TYPE','10','매입','','','','Y','0','ceduce','본사_김용남',now(),now()),
 ('P_STOCK_TYPE','20','주문','','','','Y','0','ceduce','본사_김용남',now(),now()),

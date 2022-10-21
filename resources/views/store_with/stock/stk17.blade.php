@@ -22,7 +22,6 @@
                         <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                     </div>
                 </div>
-
                 <div class="card-body">
                     <div class="row">
                         {{-- <div class="col-lg-4 inner-td">
@@ -63,9 +62,9 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="goods_nm">상품명</label>
+                                <label for="prd_nm">원부자재명</label>
                                 <div class="flax_box">
-                                    <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value=''>
+                                    <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='prd_nm' id="prd_nm" value=''>
                                 </div>
                             </div>
                         </div>
@@ -73,12 +72,25 @@
                     <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="item">품목</label>
+                                <label for="type">구분</label>
                                 <div class="flax_box">
-                                    <select name="item" class="form-control form-control-sm">
-                                        <option value="">전체</option>
-                                        @foreach ($items as $item)
-                                            <option value="{{ $item->cd }}">{{ $item->val }}</option>
+                                    <select name='type' class="form-control form-control-sm">
+                                        <option value=''>선택</option>
+                                        @foreach ($types as $type)
+                                        <option value='{{ $type->code_id }}'>{{ $type->code_id }} : {{ $type->code_val }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 inner-td">
+                            <div class="form-group">
+                                <label for="opt">품목</label>
+                                <div class="flax_box">
+                                    <select name='opt' class="form-control form-control-sm">
+                                        <option value=''>선택</option>
+                                        @foreach ($opts as $opt)
+                                        <option value='{{ $opt->code_id }}'>{{ $opt->code_id }} : {{ $opt->code_val }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -99,8 +111,8 @@
                                     <span class="text_line">/</span>
                                     <div class="form-inline-inner input_box" style="width:45%;">
                                         <select name="ord_field" class="form-control form-control-sm">
-                                            <option value="goods_no">상품번호</option>
-                                            <option value="prd_cd">상품코드</option>
+                                            <option value="p.prd_cd">상품코드</option>
+                                            <option value="p.price">판매가</option>
                                         </select>
                                     </div>
                                     <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -216,28 +228,35 @@
                 field: "color",
                 headerName: "칼라",
                 cellStyle: DEFAULT,
-                width: 80
+                width: 90
             },
             {
                 field: "size",
                 headerName: "사이즈",
                 cellStyle: DEFAULT,
-                width: 80
+                width: 90
             },
-            
             {
                 field: "unit",
                 headerName: "단위",
                 cellStyle: DEFAULT,
                 width: 120
             },
-            {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 250},
+            {field: "prd_nm", headerName: "원부자재명", width: 200},
             {
                 field: "price",
                 headerName: "판매가",
                 type: 'currencyType',
                 cellStyle: DEFAULT,
                 width: 80
+            },
+            {
+                field: "wonga",
+                headerName: "원가",
+                type: 'currencyType',
+                cellStyle: DEFAULT,
+                width: 80,
+                hide: true
             },
             {
                 headerName: '(대표)창고재고', // 대표창고의 재고를 조회
@@ -277,14 +296,20 @@
                     },
                 ],
             },
-            {field: "amount", headerName: "합계", type: 'currencyType', width:100},
+            {field: "amount", headerName: "합계", type: 'currencyType', width:100, valueGetter: (params) => calAmount(params)},
             {width: 'auto'}
         ];
+
+        const calAmount = (params) => {
+            const row = params.data;
+            const result = parseInt(row.price) * parseInt(row.rel_qty);
+            return isNaN(result) ? 0 : result;
+        };
 
         function setColumn(store) {
             if(!store) return;
 
-            columns[11].headerName = store.store_nm;
+            columns[13].headerName = store.store_nm;
             gx.gridOptions.api.setColumnDefs(columns);
 
             gx.gridOptions.columnApi.applyColumnState({
@@ -335,9 +360,9 @@
             }).then(function (res) {
                 if(res.data.code === 200) {
                     setColumn(res.data.body[0]);
-                    gx.Request('/store/stock/stk14/search', data, 1);
+                    gx.Request('/store/stock/stk17/search', data, 1);
                 } else {
-                    console.log(res.data);
+                    // console.log(res.data);
                 }
             }).catch(function (err) {
                 console.log(err);
@@ -371,22 +396,22 @@
             };
 
             axios({
-                url: '/store/stock/stk14/request-release',
+                url: '/store/stock/stk17/request-release',
                 method: 'post',
                 data: data,
             }).then(function (res) {
                 if(res.data.code === 200) {
-                    if(!confirm(res.data.msg + "\n출고요청을 계속하시겠습니까?")) {
+                    if(!confirm("요청분출고 요청이 정상적으로 등록되었습니다." + "\n출고요청을 계속하시겠습니까?")) {
                         location.href = "/store/stock/stk16";
                     } else {
                         Search();
                     }
                 } else {
-                    console.log(res.data);
+                    // console.log(res.data);
                     alert("출고요청 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
                 }
             }).catch(function (err) {
-                console.log(err);
+                // console.log(err);
             });
         }
     </script>
