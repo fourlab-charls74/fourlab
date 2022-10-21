@@ -83,9 +83,12 @@ class PosController extends Controller
 			case 'order-detail':
 				$response = $this->search_order_detail($request);
 				break;
+            case 'waiting':
+                $response = $this->search_waiting($request);
+                break;
             default:
                 $message = 'Command not found';
-                $response = response()->json(['code' => 0, 'msg' => $message], 200);
+                $response = response()->json(['code' => 0, 'msg' => $message], 404);
 		};
 		return $response;
     }
@@ -222,6 +225,7 @@ class PosController extends Controller
         ];
         $order = new Order($user, false);
         $ord_no = $order->GetNextOrdNo();
+        // $ord_no = 'test-order-no';
         
         return response()->json(['code' => '200', 'ord_no' => $ord_no], 200);
     }
@@ -431,7 +435,9 @@ class PosController extends Controller
         $memo = $req->input("memo", "");
 
         $pay_type = 0; // 결제방법
-        if ($cash_amt > 0) {
+        if ($ord_state == '1') {
+            $pay_type = 1; // 입금예정일 경우, 무통장결제 처리
+        } else if ($cash_amt > 0) {
             if ($point_amt > 0) $pay_type = 5; // 무통장+적립금
             else $pay_type = 1; // 무통장
         } else {
@@ -959,6 +965,63 @@ class PosController extends Controller
         $rows = DB::select($sql, ['ord_no' => $ord_no]);
 
         return response()->json(['code' => '200', 'data' => $rows], 200);
+    }
+
+    /** 대기내역 조회 */
+    public function search_waiting(Request $request)
+    {
+        $store_cd = STORE_CD;
+        $sdate = now()->sub(1, 'month')->format('Y-m-d');
+        $edate = date("Y-m-d");
+
+        $sql = "
+            select 
+                o.ord_no, o.ord_date, o.user_nm, o.ord_amt, 
+                o.recv_amt, o.ord_state, sum(opt.qty) as qty
+            from order_mst o
+                inner join order_opt opt on opt.ord_no = o.ord_no
+            where o.store_cd = :store_cd 
+                and o.ord_state = 1 
+                and o.ord_date >= '$sdate 00:00:00' 
+                and o.ord_date <= '$edate 23:59:59'
+            group by o.ord_no
+            order by o.ord_date desc
+        ";
+        $rows = DB::select($sql, ['store_cd' => $store_cd]);
+        
+        return response()->json([
+            'code' => '200', 
+            'head' => [
+                'total' => count($rows),
+                'page' => 1,
+                'page_cnt' => 1,
+                'page_total' => 1,
+            ],
+            'body' => $rows,
+        ], 200);
+    }
+
+    /** 대기내역 삭제 */
+    public function remove_waiting(Request $request)
+    {
+        $code = '200';
+        $msg = '';
+        $ord_no = $request->input('ord_no', '');
+        $user = [
+            'id' => Auth('head')->user()->id,
+            'name' => Auth('head')->user()->name,
+        ];
+
+        try {
+            $order = new Order($user);
+            $success = $order->DeleteStoreOrder($ord_no);
+            if ($success < 1) $code = '500';
+        } catch(Exception $e) {
+            $code = '500';
+            $msg = $e->getMessage();
+        }
+
+        return response()->json(['code' => $code, 'msg' => $msg], 200);
     }
 }
 

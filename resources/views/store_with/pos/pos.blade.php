@@ -9,7 +9,7 @@
     <div id="pos_header" class="d-flex justify-content-between align-items-center bg-white pl-3" style="border-bottom: 1px solid #999;">
         <h1 style="width:90px;"><img src="/theme/{{config('shop.theme')}}/images/pc_logo_white.png" alt="" class="w-100"></h1>
         <div class="d-flex align-items-center">
-            <p class="fw-b mr-5">[L0025] 롯데본점</p>
+            <p class="fw-b mr-5">[{{ @$store->store_cd }}] {{ @$store->store_nm }}</p>
             <p class="fw-sb mr-4">2022년 09월 28일 00:00:00</p>
             <button type="button" id="home_btn" onclick="return setScreen('pos_main');" class="butt butt-close bg-trans" style="width:55px;height:50px;border-left:1px solid #999"><i class="fa fa-home" aria-hidden="true"></i></button>
             <button type="button" onclick="return window.close();" class="butt butt-close bg-trans" style="width:55px;height:50px;border-left:1px solid #999"><i class="fa fa-times" aria-hidden="true"></i></button>
@@ -52,9 +52,9 @@
                 </div>
                 <button type="button" class="butt fc-navy fw-b bg-white m-2" style="height:60px;border-radius:12px;" onclick="return viewPrevOrder();">영수증 조회</button>
             </div>
-            <button type="button" class="butt fs-14 fw-sb bg-mint" style="grid-area:f;">
+            <button type="button" class="butt fs-14 fw-sb bg-mint" style="grid-area:f;" data-toggle="modal" data-target="#searchWaitingModal">
                 <i class="fa fa-bookmark d-block mb-3" aria-hidden="true" style="font-size:50px;"></i>
-                대기 1
+                대기 <span id="waiting_cnt">0</span>
             </button>
             <button type="button" class="butt fs-14 fw-sb bg-red" style="grid-area:g;">
                 <i class="fa fa-reply d-block mb-3" aria-hidden="true" style="font-size:50px;"></i>
@@ -112,7 +112,7 @@
                 <div class="d-flex">
                     <div class="flex-1 d-flex mr-4">
                         <button type="button" class="butt flex-1 fc-white fs-16 fw-sb br-1 bg-red p-4 mr-3" onclick="return cancelOrder();">전체취소</button>
-                        <button type="button" class="butt flex-1 fc-white fs-16 fw-sb br-1 bg-gray p-4">대기</button>
+                        <button type="button" class="butt flex-1 fc-white fs-16 fw-sb br-1 bg-gray p-4" onclick="return waitingForSale();">대기</button>
                     </div>
                     <div class="flex-2">
                         <textarea name="memo" id="memo" rows="2" class="w-100 h-100 fs-12 p-2 mr-2 noresize" placeholder="특이사항"></textarea>
@@ -370,6 +370,35 @@
 
 {{-- MODAL --}}
 <div id="pos-modal" class="show_layout">
+    {{-- 대기내역 검색 --}}
+    <div class="modal fade" id="searchWaitingModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 33%;min-width: 500px;">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-header">
+                            <button type="button" class="fs-20 close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h5 class="mt-1 fs-14 fw-b">대기 내역</h5>
+                        </div>
+                        <div class="card-body b-none mt-4">
+                            <div class="d-flex mb-3">
+                                <div class="table-responsive">
+                                    <div id="div-gd-waiting" class="ag-theme-balham" style="font-size: 18px;"></div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-center align-items-center fs-12">
+                                <button type="button" class="butt fc-white fw-sb br-05 bg-mint p-2 pl-4 pr-4 mr-2">선택</button>
+                                <button type="button" class="butt fc-white fw-sb br-05 bg-red p-2 pl-4 pr-4 mr-2" onclick="return removeWaiting();">삭제</button>
+                                <button type="button" class="butt fc-white fw-sb br-05 bg-gray p-2 pl-4 pr-4" data-dismiss="modal" aria-label="Close">취소</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     {{-- 상품검색모달 --}}
     <div class="modal fade" id="searchProductModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 90%;">
@@ -721,6 +750,19 @@
         },
         {width: "auto"}
     ];
+    
+    // 메인화면 - 대기내역
+    const pApp5 = new App('', {gridId: "#div-gd-waiting"});
+    let gx5;
+
+    const waiting_columns = [
+        {field: "ord_date", headerName: "대기일자", width: 180, cellStyle: {...AlignCenter, ...LineHeight50}},
+        {field: "user_nm", headerName: "고객명", width: 150, cellStyle: {...AlignCenter, ...LineHeight50}},
+        {field: "qty", headerName: "수량", width: 80, type: "currencyType", cellStyle: LineHeight50},
+        {field: "recv_amt", headerName: "결제금액", width: "auto", type: "currencyType", cellStyle: LineHeight50,
+            cellRenderer: (params) => Comma(params.value) + "원",
+        },
+    ];
 
     const sale_types = <?= json_encode(@$sale_types) ?>; // 판매유형
     const pr_codes = <?= json_encode(@$pr_codes) ?>; // 행사명
@@ -763,6 +805,14 @@
             }
         });
 
+        pApp5.ResizeGrid(275, 300);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+        let gridDiv5 = document.querySelector(pApp5.options.gridId);
+        gx5 = new HDGrid(gridDiv5, waiting_columns, {
+            rowSelection: 'single',
+            suppressRowClickSelection: false,
+        });
+
+        searchWaiting();
         setNewOrdNo(true);
         getOrderAnalysisData();
 

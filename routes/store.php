@@ -68,6 +68,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('search/{cmd?}', 'PosController@search_command');
         Route::post('save', 'PosController@save');
         Route::post('add-member', 'PosController@add_member');
+        Route::delete('remove-waiting', 'PosController@remove_waiting');
     });
 
     //코드관리

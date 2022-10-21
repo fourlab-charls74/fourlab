@@ -46,6 +46,35 @@
         setScreen("pos_today");
     }
 
+    /** 대기내역 조회 */
+    function searchWaiting() {
+        gx5.Request("/store/pos/search/waiting", "", -1, function(d) {
+            $("#waiting_cnt").text(d.head.total);
+        });
+    }
+
+    /** 주문대기 선택 (주문등록화면 적용) */
+    function selectWaiting() {
+        console.log("작업예정");
+    }
+
+    /** 주문대기 삭제 */
+    async function removeWaiting() {
+        let order = gx5.getSelectedRows();
+        if(order.length < 1) return;
+        if(!confirm("해당 주문대기내역을 삭제하시겠습니까?")) return;
+
+        order = order[0];
+
+        let res = await axios({ method: "delete", url: "/store/pos/remove-waiting?ord_no=" + order.ord_no });
+        if(res.data.code === '200') {
+            searchWaiting();
+        } else {
+            alert("해당 주문대기내역 삭제 중 오류가 발생했습니다.\n다시 시도해주세요.");
+            console.log(res);
+        }
+    }
+
     /** 주문등록화면 초기화 */
     function initOrderScreen() {
         if(gx) {
@@ -276,6 +305,7 @@
                 alert("주문이 정상적으로 등록되었습니다.");
                 initOrderScreen();
                 setNewOrdNo(true);
+                getOrderAnalysisData();
             } else if(res.data.code !== '500') {
                 alert(res.data.msg);
             } else {
@@ -295,6 +325,40 @@
         if(due_amt > 0) return alert("결제할 금액이 남아있습니다.");
         
         return true;
+    }
+
+    /** 대기 */
+    function waitingForSale() {
+        let cart = gx.getRows();
+        let memo = $("[name=memo]").val();
+        
+        axios({
+            async: true,
+            url: '/store/pos/save',
+            method: 'post',
+            dataType: "json",
+            data: {
+                ord_state: '1', // 입금예정 처리
+                card_amt: 0,
+                cash_amt: 0,
+                point_amt: 0,
+                cart,
+                memo,
+                user_id: $("#user_id_txt").text(),
+            },
+        }).then(function (res) {
+            if(res.data.code === '200') {
+                initOrderScreen();
+                setNewOrdNo(true);
+            } else if(res.data.code !== '500') {
+                alert(res.data.msg);
+            } else {
+                console.log(res);
+                alert("대기처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
     }
 
     /** 고객검색 */
