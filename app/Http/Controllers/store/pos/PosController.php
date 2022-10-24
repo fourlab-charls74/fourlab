@@ -15,7 +15,7 @@ use Carbon\Carbon;
 use Exception;
 
 // 테스트매장 -- 추후변경필요
-const STORE_CD = 'L0025';
+const STORE_CD = 'L0027';
 
 class PosController extends Controller
 {
@@ -105,7 +105,9 @@ class PosController extends Controller
                 from order_mst o
                     inner join order_opt opt on opt.ord_no = o.ord_no
                 where o.store_cd = '$store_cd'
-                    and o.ord_date >= '$today 00:00:00' and o.ord_date <= '$today 23:59:59'
+                    and o.ord_state >= 30
+                    and o.ord_date >= '$today 00:00:00' 
+                    and o.ord_date <= '$today 23:59:59'
                 group by o.ord_no
             ) a
         ";
@@ -115,7 +117,9 @@ class PosController extends Controller
             select ord_no, date_format(ord_date, '%H시 %i분') as ord_date, ord_amt, recv_amt, (point_amt * -1) as point_amt, (dc_amt * -1) as dc_amt
             from order_mst
             where store_cd = '$store_cd'
-                and ord_date >= '$today 00:00:00' and ord_date <= '$today 23:59:59'
+                and ord_state >= 30
+                and ord_date >= '$today 00:00:00' 
+                and ord_date <= '$today 23:59:59'
             order by ord_date desc
             limit 0,1
         ";
@@ -155,7 +159,6 @@ class PosController extends Controller
         $total = 0;
         $page_cnt = 0;
 
-        $goods_img_url = '';
         $cfg_img_size_real = "a_500";
         $cfg_img_size_list = "a_500";
 
@@ -395,7 +398,7 @@ class PosController extends Controller
         return response()->json(['code' => $code, 'msg' => $msg, 'user' => $member]);
     }
 
-    /** 주문등록 (판매) */
+    /** 주문등록 (판매 / 대기) */
     public function save(Request $req)
     {
         $code = '200';
@@ -409,7 +412,8 @@ class PosController extends Controller
             'name' => Auth('head')->user()->name,
         ];
 
-        $ord_no = "";
+        $ord_no = $req->input("ord_no", "");
+        $is_new = $ord_no == '';
         $p_ord_opt_no = $req->input("p_ord_opt_no", "");
         $ord_date = date('Y-m-d H:i:s');
         $ord_type = 15; // 출고형태 : 정상(15)
@@ -423,6 +427,7 @@ class PosController extends Controller
         }
 
         $cart = $req->input("cart"); // 상품정보
+        $removed_cart = $req->input("removed_cart"); // 삭제할 ord_opt_no 배열 (대기주문 판매처리 시 사용)
 
         $coupon_no = $req->input("coupon_no", "");
         $card_amt = $req->input("card_amt", 0); // 카드결제금액
@@ -530,6 +535,7 @@ class PosController extends Controller
             $a_point_amt = 0;
 
             for ($i = 0; $i < count($cart); $i++) {
+
                 $goods_no = $cart[$i]['goods_no'] ?? '';
                 $goods_sub = $cart[$i]['goods_sub'] ?? '';
                 if(empty($goods_sub) || !is_numeric($goods_sub)) $goods_sub = 0;
@@ -691,40 +697,73 @@ class PosController extends Controller
                 // $dlv_amt += $ord_opt_dlv_amt;
                 $recv_amt += $order_opt[$i]["recv_amt"];
             }
-
-            $order = new Order($user, true);
-            $ord_no = $order->ord_no;
-
+            
             if ($dlv_apply == 'Y' && $ord_amt < $free_dlv_amt) {
                 $dlv_amt = $base_dlv_amt;
             }
 
-            DB::table('order_mst')->insert([
-                'ord_no' => $ord_no,
-                'ord_date' =>$ord_date,
-                'user_id' => $user_id,
-                'user_nm' => $user_nm,
-                'phone' => $phone,
-                'mobile' => $mobile,
-                'email' => $email,
-                'ord_amt' => $ord_amt,
-                'point_amt' => $point_amt,
-                'coupon_amt' => $coupon_amt,
-                'dc_amt' => $dc_amt,
-                'dlv_amt' => $dlv_amt,
-                'add_dlv_fee' => $add_dlv_fee,
-                'recv_amt' => $recv_amt,
-                'ord_state' => $ord_state,
-                'upd_date' => DB::raw('now()'),
-                'dlv_end_date' => DB::raw('NULL'),
-                'ord_type' => $ord_type,
-                'ord_kind' => $ord_kind,
-                'out_ord_no' => '0',
-                'store_cd' => $store_cd,
-                'sale_place' => $store_nm,
-                'chk_dlv_fee' => DB::raw('NULL'),
-                'admin_id' => $c_admin_id
-            ]);
+            if ($is_new) {
+                $order = new Order($user, true);
+                $ord_no = $order->ord_no;
+
+                DB::table('order_mst')->insert([
+                    'ord_no' => $ord_no,
+                    'ord_date' =>$ord_date,
+                    'user_id' => $user_id,
+                    'user_nm' => $user_nm,
+                    'phone' => $phone,
+                    'mobile' => $mobile,
+                    'email' => $email,
+                    'ord_amt' => $ord_amt,
+                    'point_amt' => $point_amt,
+                    'coupon_amt' => $coupon_amt,
+                    'dc_amt' => $dc_amt,
+                    'dlv_amt' => $dlv_amt,
+                    'add_dlv_fee' => $add_dlv_fee,
+                    'recv_amt' => $recv_amt,
+                    'ord_state' => $ord_state,
+                    'upd_date' => DB::raw('now()'),
+                    'dlv_end_date' => DB::raw('NULL'),
+                    'ord_type' => $ord_type,
+                    'ord_kind' => $ord_kind,
+                    'out_ord_no' => '0',
+                    'store_cd' => $store_cd,
+                    'sale_place' => $store_nm,
+                    'chk_dlv_fee' => DB::raw('NULL'),
+                    'admin_id' => $c_admin_id
+                ]);
+            } else {
+                $order = new Order($user, false);
+                $order->SetOrdNo($ord_no);
+
+                DB::table('order_mst')
+                ->where('ord_no', '=', $ord_no)
+                ->update([
+                    'ord_date' =>$ord_date,
+                    'user_id' => $user_id,
+                    'user_nm' => $user_nm,
+                    'phone' => $phone,
+                    'mobile' => $mobile,
+                    'email' => $email,
+                    'ord_amt' => $ord_amt,
+                    'point_amt' => $point_amt,
+                    'coupon_amt' => $coupon_amt,
+                    'dc_amt' => $dc_amt,
+                    'dlv_amt' => $dlv_amt,
+                    'add_dlv_fee' => $add_dlv_fee,
+                    'recv_amt' => $recv_amt,
+                    'ord_state' => $ord_state,
+                    'upd_date' => DB::raw('now()'),
+                    'dlv_end_date' => DB::raw('NULL'),
+                    'ord_type' => $ord_type,
+                    'ord_kind' => $ord_kind,
+                    'out_ord_no' => '0',
+                    'store_cd' => $store_cd,
+                    'sale_place' => $store_nm,
+                    'chk_dlv_fee' => DB::raw('NULL'),
+                    'admin_id' => $c_admin_id
+                ]);
+            }
             
             $pay_stat = 0;
             $tno = '';
@@ -751,31 +790,69 @@ class PosController extends Controller
                 }
             }
 
-            DB::table('payment')->insert([
-                "ord_no"		=> $ord_no,
-                "pay_type" 		=> $pay_type,
-                "pay_nm" 		=> $user_nm,
-                "pay_amt" 		=> $pay_amt,
-                "pay_stat" 		=> $pay_stat,
-                "tno"           => $tno,
-                "bank_inpnm" 	=> '',
-                "bank_code" 	=> '',
-                "bank_number" 	=> '',
-                "card_msg"      => '',
-                "pay_ypoint"    => 0,
-                "pay_point"     => $point_amt,
-                "pay_baesong"   => $dlv_amt,
-                "coupon_amt"    => $coupon_amt,
-                "dc_amt"        => $dc_amt,
-                //"pay_fee"       => $pay_fee,
-                "ord_dm"        => DB::raw('date_format(now(),\'%Y%m%d%H%i%s\')'),
-                "upd_dm"        => DB::raw('date_format(now(),\'%Y%m%d%H%i%s\')'),
-            ]);
+            if ($is_new) {
+                DB::table('payment')->insert([
+                    "ord_no"		=> $ord_no,
+                    "pay_type" 		=> $pay_type,
+                    "pay_nm" 		=> $user_nm,
+                    "pay_amt" 		=> $pay_amt,
+                    "pay_stat" 		=> $pay_stat,
+                    "tno"           => $tno,
+                    "bank_inpnm" 	=> '',
+                    "bank_code" 	=> '',
+                    "bank_number" 	=> '',
+                    "card_msg"      => '',
+                    "pay_ypoint"    => 0,
+                    "pay_point"     => $point_amt,
+                    "pay_baesong"   => $dlv_amt,
+                    "coupon_amt"    => $coupon_amt,
+                    "dc_amt"        => $dc_amt,
+                    //"pay_fee"       => $pay_fee,
+                    "ord_dm"        => DB::raw('date_format(now(),\'%Y%m%d%H%i%s\')'),
+                    "upd_dm"        => DB::raw('date_format(now(),\'%Y%m%d%H%i%s\')'),
+                ]);
+            } else {
+                DB::table('payment')
+                ->where('ord_no', '=', $ord_no)
+                ->update([
+                    "pay_type" 		=> $pay_type,
+                    "pay_nm" 		=> $user_nm,
+                    "pay_amt" 		=> $pay_amt,
+                    "pay_point"     => $point_amt,
+                    "pay_baesong"   => $dlv_amt,
+                    "coupon_amt"    => $coupon_amt,
+                    "dc_amt"        => $dc_amt,
+                    //"pay_fee"       => $pay_fee,
+                    "ord_dm"        => DB::raw('date_format(now(),\'%Y%m%d%H%i%s\')'),
+                    "upd_dm"        => DB::raw('date_format(now(),\'%Y%m%d%H%i%s\')'),
+                ]);
+            }
+
+            // 주문대기건 판매처리 시, 삭제된 상품 처리
+            for ($i = 0; $i < count($removed_cart); $i++) {
+                DB::table("order_opt")
+                    ->where("ord_opt_no", $removed_cart[$i])
+                    ->delete();
+            }
 
             for ($i = 0; $i < count($order_opt); $i++) {
                 $order_opt[$i]["ord_no"] = $ord_no;
-                DB::table('order_opt')->insert($order_opt[$i]);
-                $ord_opt_no = DB::getPdo()->lastInsertId();
+                $ord_opt_no = '';
+                $new_ord_opt_no = true;
+
+                $o_ord_opt_no = $cart[$i]['ord_opt_no'] ?? '';
+
+                if ($o_ord_opt_no == '') {
+                    DB::table('order_opt')->insert($order_opt[$i]);
+                    $ord_opt_no = DB::getPdo()->lastInsertId();
+                } else {
+                    $new_ord_opt_no = false;
+
+                    DB::table('order_opt')
+                    ->where('ord_opt_no', '=', $o_ord_opt_no)
+                    ->update($order_opt[$i]);
+                    $ord_opt_no = $o_ord_opt_no;
+                }
     
                 $goods_addopt = Lib::getValue($cart[$i], "goods_addopt", "");
                 $a_goods_addopts = explode("^", $goods_addopt);
@@ -784,15 +861,29 @@ class PosController extends Controller
                     if (!empty($a_goods_addopt)) {
                         list($addopt_value, $addopt_goods_no, $addopt_goods_sub, $a_addopt_amt, $addopt_idx) = explode("|", $a_goods_addopt);
                         $a_addopt_amt = $a_addopt_amt * $order_opt[$i]["qty"];
-                        DB::table('order_opt_addopt')->insert([
-                            "ord_opt_no" => $ord_opt_no,
-                            "goods_no" => $order_opt[$i]["goods_no"],
-                            "goods_sub" => $order_opt[$i]["goods_sub"],
-                            "addopt_idx" => $addopt_idx,
-                            "addopt" => $addopt_value,
-                            "addopt_amt" => $a_addopt_amt,
-                            "addopt_qty" => $order_opt[$i]["qty"],
-                        ]);
+
+                        if ($new_ord_opt_no) {
+                            DB::table('order_opt_addopt')->insert([
+                                "ord_opt_no" => $ord_opt_no,
+                                "goods_no" => $order_opt[$i]["goods_no"],
+                                "goods_sub" => $order_opt[$i]["goods_sub"],
+                                "addopt_idx" => $addopt_idx,
+                                "addopt" => $addopt_value,
+                                "addopt_amt" => $a_addopt_amt,
+                                "addopt_qty" => $order_opt[$i]["qty"],
+                            ]);
+                        } else {
+                            DB::table('order_opt_addopt')
+                            ->where('ord_opt_no', '=', $ord_opt_no)
+                            ->update([
+                                "goods_no" => $order_opt[$i]["goods_no"],
+                                "goods_sub" => $order_opt[$i]["goods_sub"],
+                                "addopt_idx" => $addopt_idx,
+                                "addopt" => $addopt_value,
+                                "addopt_amt" => $a_addopt_amt,
+                                "addopt_qty" => $order_opt[$i]["qty"],
+                            ]);
+                        }
                     }
                 }
     
@@ -914,7 +1005,7 @@ class PosController extends Controller
             from order_mst o
                 inner join payment pay on pay.ord_no = o.ord_no
                 inner join code pt on pt.code_kind_cd = 'G_PAY_TYPE' and pt.code_id = pay.pay_type
-            where o.store_cd = :store_cd $where
+            where o.store_cd = :store_cd and o.ord_state >= 30 $where
             $orderby
             $limit
         ";
@@ -950,17 +1041,66 @@ class PosController extends Controller
     {
         $ord_no = $request->input('ord_no', '');
 
+        $cfg_img_size_real = "a_500";
+        $cfg_img_size_list = "a_500";
+
         $sql = "
             select
-                o.ord_no, o.ord_opt_no, o.ord_date, o.prd_cd, o.goods_nm, o.goods_opt, o.pay_type, 
-                o.sale_kind, s.sale_type_nm as sale_type, s.amt_kind, if(s.amt_kind = 'per', round(o.price * o.qty / s.sale_per), s.sale_amt) as sale_amount,
-                pt.code_val as pay_type_nm, o.dlv_comment, o.price, o.qty, o.point_amt, o.dc_amt, o.recv_amt,
-                om.user_id, om.user_nm, om.phone, om.mobile, om.point_amt as total_point_amt, om.recv_amt as total_recv_amt
+                o.ord_no
+                , o.ord_opt_no
+                , o.ord_date
+                , o.prd_cd
+                , o.goods_no
+                , g.goods_sub
+                , o.goods_nm
+                , o.goods_opt
+                , g.brand
+                , g.price
+                , g.price as ori_price
+                , g.goods_sh
+                , o.pay_type
+                , o.sale_kind
+                , s.sale_type_nm as sale_type
+                , s.amt_kind
+                , if(s.amt_kind = 'per', round(o.price * o.qty / s.sale_per), s.sale_amt) as sale_amount
+                , pt.code_val as pay_type_nm
+                , o.dlv_comment
+                , if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
+                    select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
+                    from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
+                )) as img
+                , o.qty
+                , o.point_amt
+                , o.dc_amt
+                , o.recv_amt
+                , om.user_id
+                , om.user_nm
+                , om.mobile
+                , m.email
+                , if(m.sex = 'F', '여', if(m.sex = 'M', '남', '-')) as gender
+                , m.yyyy
+                , m.mm
+                , m.dd
+                , m.point
+                , m.addr
+                , m.addr2
+                , om.point_amt as total_point_amt
+                , om.recv_amt as total_recv_amt
+                , om.ord_state
+                , pc.color
+                , pc.size
+                , '' as sale_type
+                , '' as pr_code
+                , '' as coupon_no
             from order_opt o
                 inner join order_mst om on om.ord_no = o.ord_no
+                inner join product_code pc on pc.prd_cd = o.prd_cd
+                left outer join goods g on g.goods_no = o.goods_no
                 left outer join code pt on pt.code_kind_cd = 'G_PAY_TYPE' and pt.code_id = o.pay_type
                 left outer join sale_type s on s.sale_kind = o.sale_kind
+                left outer join member m on m.user_id = om.user_id
             where o.ord_no = :ord_no
+            order by o.ord_opt_no
         ";
         $rows = DB::select($sql, ['ord_no' => $ord_no]);
 

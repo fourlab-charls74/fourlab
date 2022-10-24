@@ -2,6 +2,11 @@
 <script type="text/javascript">
     const BRAND_CODE = "F"; // 피엘라벤
 
+    const ORD_STATE = {
+        NEW: "new", // 신규주문
+        WAITING: "waiting", // 기존 대기주문
+    };
+
     /** 화면전환 */
     function setScreen(idx) {
         $("#pos > div:not(#pos_header)").removeClass("d-flex").addClass("d-none");
@@ -48,14 +53,12 @@
 
     /** 대기내역 조회 */
     function searchWaiting() {
+
+        // 대기처리 후 재조회 시 grid 깨짐현상 발생 -> 처리 필요
+
         gx5.Request("/store/pos/search/waiting", "", -1, function(d) {
             $("#waiting_cnt").text(d.head.total);
         });
-    }
-
-    /** 주문대기 선택 (주문등록화면 적용) */
-    function selectWaiting() {
-        console.log("작업예정");
     }
 
     /** 주문대기 삭제 */
@@ -75,12 +78,56 @@
         }
     }
 
+    /** 주문대기 적용 */
+    async function applyWaiting() {
+        let order = gx5.getSelectedRows();
+        if(order.length < 1) return;
+
+        order = order[0];
+        let res = await axios({ method: "get", url: "/store/pos/search/order-detail?ord_no=" + order.ord_no });
+
+        if(res.data.code === '200') {
+            $('#searchWaitingModal').modal('hide');
+            setScreen("pos_order");
+            $("[name=cur_ord_state]").val(ORD_STATE.WAITING);
+            
+            order = res.data.data[0];
+            $("#ord_no").text(order.ord_no);
+            $("#memo").val(order.dlv_comment);
+            setMember('', order);
+
+            for(let goods of res.data.data) {
+                await gx.gridOptions.api.applyTransaction({ 
+                    add: [{
+                        ...goods, 
+                        total: goods.qty * goods.price,
+                        sale_type: goods.sale_kind || sale_types[0].sale_kind, 
+                        pr_code: goods.pr_code || pr_codes[0].pr_code
+                    }],
+                });
+                await gx.gridOptions.api.forEachNode((node) => {
+                    if(node.data.prd_cd === goods.prd_cd) {
+                        node.setSelected(true);
+                        updateOrderValue('sale_type', goods.sale_kind || sale_types[0].sale_kind);
+                    }
+                });
+            }
+
+        } else {
+            console.log(res);
+            alert("주문 적용 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+        }
+    }
+
     /** 주문등록화면 초기화 */
     function initOrderScreen() {
         if(gx) {
             gx.gridOptions.api.setRowData([]);
             setProductDetail();
             setMember();
+
+            $("[name=cur_ord_state]").val(ORD_STATE.NEW);
+            $("[name=removed_goods]").val("");
             
             $("[name=card_amt]").val(0);
             $("[name=cash_amt]").val(0);
@@ -102,6 +149,7 @@
     function cancelOrder() {
         if(!confirm("해당주문건을 취소하시겠습니까?")) return;
         initOrderScreen();
+        if($("[name=cur_ord_state]").val() == ORD_STATE.WAITING) setNewOrdNo(true);
         setScreen('pos_main');
     }
 
@@ -136,7 +184,7 @@
 
         let same_goods = gx.getRows().find(g => g.prd_cd === prd_cd);
         if(same_goods === undefined) {    
-            gx.gridOptions.api.applyTransaction({add: [{...goods, qty: 1, total: 1 * goods.price, sale_type: sale_types[0].sale_kind, pr_code: pr_codes[0].pr_code}]});
+            gx.gridOptions.api.applyTransaction({ add: [{...goods, qty: 1, total: 1 * goods.price, sale_type: sale_types[0].sale_kind, pr_code: pr_codes[0].pr_code}] });
             gx.gridOptions.api.forEachNode((node) => {
                 if(node.data.prd_cd === prd_cd) {
                     node.setSelected(true);
@@ -214,6 +262,10 @@
         let list = gx.getRows();
         let goods = list.find(g => g.prd_cd === prd_cd);
 
+        if($("[name=cur_ord_state]").val() == ORD_STATE.WAITING) {
+            $("[name=removed_goods]").val(($("[name=removed_goods]").val() || "") + "," + (goods.ord_opt_no || ""));
+        }
+
         gx.gridOptions.api.applyTransaction({remove: [goods]});
     }
 
@@ -285,6 +337,13 @@
         let point_amt = $("[name=point_amt]").val() * 1;
         let cart = gx.getRows();
         let memo = $("[name=memo]").val();
+        let ord_no = "";
+        let removed_goods = [];
+
+        if($("[name=cur_ord_state]").val() == ORD_STATE.WAITING) {
+            ord_no = $("#ord_no").text();
+            removed_goods = $("[name=removed_goods]").val().split(",").filter(g => g !== '');
+        }
         
         axios({
             async: true,
@@ -292,11 +351,13 @@
             method: 'post',
             dataType: "json",
             data: {
+                ord_no,
                 ord_state: '30', // 출고완료 처리
                 card_amt,
                 cash_amt,
                 point_amt,
                 cart,
+                removed_cart: removed_goods,
                 memo,
                 user_id: $("#user_id_txt").text(),
             },
@@ -306,6 +367,7 @@
                 initOrderScreen();
                 setNewOrdNo(true);
                 getOrderAnalysisData();
+                searchWaiting();
             } else if(res.data.code !== '500') {
                 alert(res.data.msg);
             } else {
@@ -318,19 +380,30 @@
     }
 
     /** 주문등록 시 null check */
-    function validate() {
+    function validate(is_new = true) {
         if(gx.getRows().length < 1) return alert("판매할 상품을 선택해주세요.");
 
-        let due_amt = unComma($("#due_amt").text());
-        if(due_amt > 0) return alert("결제할 금액이 남아있습니다.");
+        if(is_new) {
+            let due_amt = unComma($("#due_amt").text());
+            if(due_amt > 0) return alert("결제할 금액이 남아있습니다.");
+        }
         
         return true;
     }
 
     /** 대기 */
-    function waitingForSale() {
+    function waiting() {
+        if(!validate(false)) return;
+
         let cart = gx.getRows();
         let memo = $("[name=memo]").val();
+        let ord_no = "";
+        let removed_goods = [];
+
+        if($("[name=cur_ord_state]").val() == ORD_STATE.WAITING) {
+            ord_no = $("#ord_no").text();
+            removed_goods = $("[name=removed_goods]").val().split(",").filter(g => g !== '');
+        }
         
         axios({
             async: true,
@@ -338,18 +411,22 @@
             method: 'post',
             dataType: "json",
             data: {
+                ord_no,
                 ord_state: '1', // 입금예정 처리
                 card_amt: 0,
                 cash_amt: 0,
                 point_amt: 0,
                 cart,
+                removed_cart: removed_goods,
                 memo,
                 user_id: $("#user_id_txt").text(),
             },
         }).then(function (res) {
+            console.log("등록완료", res);
             if(res.data.code === '200') {
                 initOrderScreen();
                 setNewOrdNo(true);
+                searchWaiting();
             } else if(res.data.code !== '500') {
                 alert(res.data.msg);
             } else {
@@ -387,17 +464,19 @@
             gx3.setRows([]);
         }
 
-        $("#user_nm").text(memb.user_nm);
-        $("#user_info").text(`(${memb.gender}, ${memb.yyyy ? `${memb.yyyy}.${memb.mm}.${memb.dd}` : '-'})`);
-        $("#user_id_txt").text(memb.user_id);
-        $("#user_phone").text(memb.mobile);
-        $("#user_email").text(memb.email || "-");
-        $("#user_address").text(memb.addr ? `${memb.addr} ${memb.addr2}` : "-");
-        $("#user_point").text(Comma(memb.point || 0));
-
-        $("#no_user").removeClass("d-flex");
-        $("#no_user").addClass("d-none");
-        $("#user").removeClass("d-none");
+        if(memb.user_id) {
+            $("#user_nm").text(memb.user_nm);
+            $("#user_info").text(`(${memb.gender}, ${memb.yyyy ? `${memb.yyyy}.${memb.mm}.${memb.dd}` : '-'})`);
+            $("#user_id_txt").text(memb.user_id);
+            $("#user_phone").text(memb.mobile);
+            $("#user_email").text(memb.email || "-");
+            $("#user_address").text(memb.addr ? `${memb.addr} ${memb.addr2}` : "-");
+            $("#user_point").text(Comma(memb.point || 0));
+    
+            $("#no_user").removeClass("d-flex");
+            $("#no_user").addClass("d-none");
+            $("#user").removeClass("d-none");
+        }
 
         if(user_id != '') {
             $('#searchMemberModal').modal('hide');

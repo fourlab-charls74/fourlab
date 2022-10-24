@@ -65,6 +65,10 @@
 
     {{-- 주문등록화면 --}}
     <div id="pos_order" class="flex-1 d-none">
+        {{-- cur_ord_state: new(신규), waiting(대기) --}}
+        <input type="hidden" name="cur_ord_state" value="new">
+        {{-- removed_goods: 주문대기 판매처리 시 삭제할 ord_opt_no배열 --}}
+        <input type="hidden" name="removed_goods" value="">
         <div class="flex-5 p-3">
             <div class="d-flex flex-column">
                 <button type="button" class="butt w-100 fc-white fs-14 br-1 bg-gray mb-3" style="height: 60px;" data-toggle="modal" data-target="#searchProductModal"><i class="fa fa-search mr-2" aria-hidden="true"></i>상품 검색</button>
@@ -112,7 +116,7 @@
                 <div class="d-flex">
                     <div class="flex-1 d-flex mr-4">
                         <button type="button" class="butt flex-1 fc-white fs-16 fw-sb br-1 bg-red p-4 mr-3" onclick="return cancelOrder();">전체취소</button>
-                        <button type="button" class="butt flex-1 fc-white fs-16 fw-sb br-1 bg-gray p-4" onclick="return waitingForSale();">대기</button>
+                        <button type="button" class="butt flex-1 fc-white fs-16 fw-sb br-1 bg-gray p-4" onclick="return waiting();">대기</button>
                     </div>
                     <div class="flex-2">
                         <textarea name="memo" id="memo" rows="2" class="w-100 h-100 fs-12 p-2 mr-2 noresize" placeholder="특이사항"></textarea>
@@ -389,7 +393,7 @@
                                 </div>
                             </div>
                             <div class="d-flex justify-content-center align-items-center fs-12">
-                                <button type="button" class="butt fc-white fw-sb br-05 bg-mint p-2 pl-4 pr-4 mr-2">선택</button>
+                                <button type="button" class="butt fc-white fw-sb br-05 bg-mint p-2 pl-4 pr-4 mr-2" onclick="return applyWaiting();">선택</button>
                                 <button type="button" class="butt fc-white fw-sb br-05 bg-red p-2 pl-4 pr-4 mr-2" onclick="return removeWaiting();">삭제</button>
                                 <button type="button" class="butt fc-white fw-sb br-05 bg-gray p-2 pl-4 pr-4" data-dismiss="modal" aria-label="Close">취소</button>
                             </div>
