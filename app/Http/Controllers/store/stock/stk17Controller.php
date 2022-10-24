@@ -91,7 +91,7 @@ class stk17Controller extends Controller
                 left outer join `code` c4 on c4.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c4.code_id = pc.size
                 left outer join `code` c5 on c5.code_kind_cd = 'PRD_CD_UNIT' and c5.code_id = p.unit
             where 
-                pss.storage_cd = (select storage_cd from storage where default_yn = 'Y') and p.type <> 'N' $where
+                pss.storage_cd = (select storage_cd from storage where default_yn = 'Y') $where
             $orderby
             $limit
         ";
@@ -110,7 +110,7 @@ class stk17Controller extends Controller
                     left outer join `code` c on c.code_kind_cd = 'PRD_MATERIAL_TYPE' and c.code_id = pc.brand
                     left outer join `code` c2 on c2.code_kind_cd = 'PRD_MATERIAL_OPT' and c2.code_id = pc.opt
                 where 
-                    pss.storage_cd = (select storage_cd from storage where default_yn = 'Y') and p.type <> 'N' $where
+                    pss.storage_cd = (select storage_cd from storage where default_yn = 'Y') $where
             ";
             $row = DB::selectOne($sql);
             $total = $row->total;
@@ -131,7 +131,6 @@ class stk17Controller extends Controller
 
     // 요청분출고 요청
     public function request_release(Request $request) {
-
         $release_type = 'R';
         $state = 10;
         $admin_id = Auth('head')->user()->id;
@@ -171,7 +170,6 @@ class stk17Controller extends Controller
             $code = 500;
 			DB::rollback();
 		}
-
         return response()->json(["code" => $code]);
     }
 }

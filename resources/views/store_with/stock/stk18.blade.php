@@ -62,27 +62,12 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="goods_nm">상품명</label>
+                            <label for="prd_nm">상품명</label>
                             <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value=''>
+                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='prd_nm' id="prd_nm" value=''>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="item">품목</label>
-                            <div class="flax_box">
-                                <select name="item" class="form-control form-control-sm">
-                                    <option value="">전체</option>
-                                    @foreach ($items as $item)
-                                        <option value="{{ $item->cd }}">{{ $item->val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="name">공급업체</label>
@@ -97,23 +82,52 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="type">구분</label>
+                            <div class="flax_box">
+                                <select name='type' class="form-control form-control-sm">
+                                    <option value=''>선택</option>
+                                    @foreach ($types as $type)
+                                    <option value='{{ $type->code_id }}'>{{ $type->code_id }} : {{ $type->code_val }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="opt">품목</label>
+                            <div class="flax_box">
+                                <select name='opt' class="form-control form-control-sm">
+                                    <option value=''>선택</option>
+                                    @foreach ($opts as $opt)
+                                    <option value='{{ $opt->code_id }}'>{{ $opt->code_id }} : {{ $opt->code_val }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="">자료수/정렬</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box" style="width:24%;">
                                     <select name="limit" class="form-control form-control-sm">
-                                        <option value="100">100</option>
-                                        <option value="500">500</option>
                                         <option value="1000">1000</option>
                                         <option value="2000">2000</option>
+                                        <option value="5000">5000</option>
+                                        <option value="10000">10000</option>
                                     </select>
                                 </div>
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
-                                        <option value="goods_no">상품번호</option>
-                                        <option value="prd_cd">상품코드</option>
+                                        <option value="p.prd_cd">상품코드</option>
+                                        <option value="p.price">판매가</option>
+                                        <option value="p.wonga">원가</option>
                                     </select>
                                 </div>
                                 <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -159,7 +173,9 @@
                         <select id='storage' name='storage' class="form-control form-control-sm"  style='width:160px;display:inline'>
                             <option value=''>선택</option>
                             @foreach ($storages as $storage)
-                                <option value='{{ $storage->storage_cd }}' @if($storage->default_yn == "Y") selected @endif>{{ $storage->storage_nm }} @if($storage->default_yn == "Y") (대표) @endif </option>
+                                @if ($storage->default_yn == "Y")
+                                <option value='{{ $storage->storage_cd }}' selected >{{ $storage->storage_nm }} (대표) </option>
+                                @endif
                             @endforeach
                         </select>
                     </div>
@@ -272,7 +288,7 @@
                         cellRenderer: function(params) {
                             let storage_cd = '{{ $storage->storage_cd }}';
                             let arr = params.data.storage_qty.filter(s => s.storage_cd === storage_cd);
-                            if(arr.length > 0) {
+                            if (arr.length > 0) {
                                 return arr[0].wqty;
                             }
                             return 0;
@@ -311,7 +327,7 @@
 	function Search() {
 		let data = $('form[name="search"]').serialize();
         data += "&ext_storage_qty=" + $("[name=ext_storage_qty]").is(":checked");
-		gx.Request('/store/stock/stk15/search', data, 1);
+		gx.Request('/store/stock/stk18/search', data, 1);
 	}
 
     // 출고요청
@@ -350,12 +366,12 @@
         };
 
         axios({
-            url: '/store/stock/stk15/request-release',
+            url: '/store/stock/stk18/request-release',
             method: 'post',
             data: data,
         }).then(function (res) {
             if(res.data.code === 200) {
-                if(!confirm(res.data.msg + "\n출고요청을 계속하시겠습니까?")) {
+                if (!confirm("일반출고 요청 및 접수가 정상적으로 등록되었습니다." + "\n출고요청을 계속하시겠습니까?")) {
                     location.href = "/store/stock/stk16";
                 } else {
                     Search();

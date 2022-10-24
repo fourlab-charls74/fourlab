@@ -377,8 +377,8 @@
         // 출고요청
         function requestRelease() {
             let rows = gx.getSelectedRows();
-            if(rows.length < 1) return alert("출고요청할 상품을 선택해주세요.");
-            if(rows.filter(r => !r.rel_qty || !r.rel_qty.trim() || r.rel_qty == 0 || isNaN(parseInt(r.rel_qty))).length > 0) return alert("선택한 상품의 배분수량을 입력해주세요.");
+            if (rows.length < 1) return alert("출고요청할 상품을 선택해주세요.");
+            if (rows.filter(r => !r.rel_qty || !r.rel_qty.trim() || r.rel_qty == 0 || isNaN(parseInt(r.rel_qty))).length > 0) return alert("선택한 상품의 배분수량을 입력해주세요.");
 
             let over_qty_rows = rows.filter(row => {
                 if(row.storage_wqty !== null) {
@@ -387,9 +387,9 @@
                 }
                 return true; // 상품재고가 없는경우
             });
-            if(over_qty_rows.length > 0) return alert(`창고의 보유재고보다 많은 수량을 요청하실 수 없습니다.\n상품코드 : ${over_qty_rows.map(o => o.prd_cd).join(", ")}`);
+            if (over_qty_rows.length > 0) return alert(`창고의 보유재고보다 많은 수량을 요청하실 수 없습니다.\n상품코드 : ${over_qty_rows.map(o => o.prd_cd).join(", ")}`);
 
-            if(!confirm("해당 상품을 출고요청하시겠습니까?")) return;
+            if (!confirm("해당 상품을 출고요청하시겠습니까?")) return;
 
             let store_cd = $("[name=store_no]").val();
 
@@ -405,8 +405,8 @@
                 method: 'post',
                 data: data,
             }).then(function (res) {
-                if(res.data.code === 200) {
-                    if(!confirm("요청분출고 요청이 정상적으로 등록되었습니다." + "\n출고요청을 계속하시겠습니까?")) {
+                if (res.data.code === 200) {
+                    if (!confirm("요청분출고 요청이 정상적으로 등록되었습니다." + "\n출고요청을 계속하시겠습니까?")) {
                         location.href = "/store/stock/stk16";
                     } else {
                         Search();

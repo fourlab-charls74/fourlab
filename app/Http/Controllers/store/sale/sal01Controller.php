@@ -944,7 +944,9 @@ class sal01Controller extends Controller
 		$order['sales_com_fee'] = $order['pay_fee'];
 		$store_cd = $order['store_cd'];
 		
-		$order['sale_place'] = $order['store_nm'];
+		// $order['sale_place'] = $order['store_nm'];
+		$order['sale_place'] = "HEAD_OFFICE";
+
 		$order['user_nm'] = $order['ord_nm'] ? $order['ord_nm']: "비회원";
 
 		$ord_date = $order["ord_date"];
