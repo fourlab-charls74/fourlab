@@ -354,7 +354,11 @@
 		}
 
         function Search() {
-            if(!$("[name=store_no]").val()) return alert("요청매장을 선택 후 검색해주세요.");
+            if(!$("[name=store_no]").val()) {
+                alert("요청매장을 선택 후 검색해주세요.");
+                $('.sch-store').click();
+                return false;
+            }
             let data = $('form[name="search"]').serialize();
             data += "&ext_storage_qty=" + $("[name=ext_storage_qty]").is(":checked");
 

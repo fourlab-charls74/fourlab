@@ -215,9 +215,6 @@ class prd03Controller extends Controller
 				$prd_nm	= $row['prd_nm'];
 				$prd_cd	= $row['prd_cd'];
 
-				$goods_no = "";
-				$goods_opt = "";
-
 				$sql = "select count(*) as count from product where prd_cd = :prd_cd";
 				$result	= DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
@@ -248,8 +245,7 @@ class prd03Controller extends Controller
 					DB::table('product_code')->insert([
 						'prd_cd' => $prd_cd,
 						'seq' => $seq,
-						'goods_no' => $goods_no,
-						'goods_opt'	=> $goods_opt,
+						'goods_no' => "",
 						'brand' => $brand,
 						'year' => $year,
 						'season' => $season,
@@ -279,7 +275,6 @@ class prd03Controller extends Controller
 						'out_qty' => 0,
 						'qty' => 0,
 						'wqty' => 0,
-						'goods_opt' => $goods_opt,
 						'barcode' => $prd_cd,
 						'use_yn' => "Y",
 						'rt' => now(),
@@ -290,7 +285,6 @@ class prd03Controller extends Controller
 						'prd_cd' => $prd_cd,
 						'qty' => 0,
 						'wqty' => 0,
-						'goods_opt' => $goods_opt,
 						'storage_cd' => DB::raw("(select storage_cd from storage where default_yn = 'Y')"),
 						'use_yn' => "Y",
 						'rt' => now(),

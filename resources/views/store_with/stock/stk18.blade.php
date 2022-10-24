@@ -62,28 +62,12 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="prd_nm">상품명</label>
+                            <label for="prd_nm">원부자재명</label>
                             <div class="flax_box">
                                 <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='prd_nm' id="prd_nm" value=''>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="name">공급업체</label>
-                            <div class="form-inline inline_select_box">
-                                <div class="form-inline-inner input-box w-100">
-                                    <div class="form-inline inline_btn_box">
-                                        <input type="hidden" id="com_cd" name="com_cd" />
-                                        <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="type">구분</label>
@@ -97,6 +81,8 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="opt">품목</label>
@@ -266,7 +252,7 @@
             cellStyle: DEFAULT,
             width: 120
         },
-        {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 250},
+        {field: "prd_nm", headerName: "원부자재명", width: 200},
         {
             field: "price",
             headerName: "판매가",
@@ -284,6 +270,7 @@
 		{headerName: "창고보유재고",
             children: [
                 @foreach (@$storages as $storage)
+                    @if ($storage->default_yn == "Y")
                     {field: '{{ $storage->storage_cd }}', headerName: '{{ $storage->storage_nm }}', type: "numberType",
                         cellRenderer: function(params) {
                             let storage_cd = '{{ $storage->storage_cd }}';
@@ -294,11 +281,12 @@
                             return 0;
                         }
                     },
+                    @endif
                 @endforeach
             ],
         },
 		{field: "rel_qty", headerName: "요청수량", type: "numberType", editable: true, cellStyle: {'background-color': '#ffff99'}},
-        {field: "amount", headerName: "합계", type: 'currencyType', width:100},
+        {field: "amount", headerName: "합계", type: 'currencyType', width:100, valueGetter: (params) => calAmount(params)},
         {width: 'auto'}
     ];
 </script>
@@ -330,22 +318,33 @@
 		gx.Request('/store/stock/stk18/search', data, 1);
 	}
 
+    function EditProduct(product_code) {
+        var url = '/store/product/prd03/edit/' + product_code;
+        var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1100,height=555");
+    }
+
+    const calAmount = (params) => {
+        const row = params.data;
+        const result = parseInt(row.price) * parseInt(row.rel_qty);
+        return isNaN(result) ? 0 : result;
+    };
+
     // 출고요청
     function requestRelease() {
         let rows = gx.getSelectedRows();
-        if(rows.length < 1) return alert("출고요청할 상품을 선택해주세요.");
-        if(rows.filter(r => !r.rel_qty || !r.rel_qty.trim() || r.rel_qty == 0 || isNaN(parseInt(r.rel_qty))).length > 0) return alert("선택한 상품의 요청수량을 입력해주세요.");
+        if (rows.length < 1) return alert("출고요청할 상품을 선택해주세요.");
+        if (rows.filter(r => !r.rel_qty || !r.rel_qty.trim() || r.rel_qty == 0 || isNaN(parseInt(r.rel_qty))).length > 0) return alert("선택한 상품의 요청수량을 입력해주세요.");
 
         let storage_cd = $('[name=storage]').val();
-        if(storage_cd === '') return alert("상품을 출고할 창고를 선택해주세요.");
+        if (storage_cd === '') return alert("상품을 출고할 창고를 선택해주세요.");
 
         let store_cd =$('[name=store]').val();
-        if(store_cd === '') return alert("상품을 보낼 매장을 선택해주세요.");
+        if (store_cd === '') return alert("상품을 보낼 매장을 선택해주세요.");
 
         let over_qty_rows = rows.filter(row => {
             let cur_storage = row.storage_qty.filter(s => s.storage_cd === storage_cd);
-            if(cur_storage.length > 0) {
-                if(cur_storage[0].wqty < parseInt(row.rel_qty)) {
+            if (cur_storage.length > 0) {
+                if (cur_storage[0].wqty < parseInt(row.rel_qty)) {
                     return true;
                 } else {
                     return false;
@@ -353,9 +352,9 @@
             }
             return true; // 상품재고가 없는경우
         });
-        if(over_qty_rows.length > 0) return alert(`선택하신 창고의 재고보다 많은 수량을 요청하실 수 없습니다.\n상품코드 : ${over_qty_rows.map(o => o.prd_cd).join(", ")}`);
+        if (over_qty_rows.length > 0) return alert(`선택하신 창고의 재고보다 많은 수량을 요청하실 수 없습니다.\n상품코드 : ${over_qty_rows.map(o => o.prd_cd).join(", ")}`);
 
-        if(!confirm("해당 상품을 출고요청하시겠습니까?")) return;
+        if (!confirm("해당 상품을 출고요청하시겠습니까?")) return;
 
         const data = {
             products: rows, 
@@ -370,18 +369,18 @@
             method: 'post',
             data: data,
         }).then(function (res) {
-            if(res.data.code === 200) {
+            if (res.data.code === 200) {
                 if (!confirm("일반출고 요청 및 접수가 정상적으로 등록되었습니다." + "\n출고요청을 계속하시겠습니까?")) {
                     location.href = "/store/stock/stk16";
                 } else {
                     Search();
                 }
             } else {
-                console.log(res.data);
+                // console.log(res.data);
                 alert("출고요청 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
             }
         }).catch(function (err) {
-            console.log(err);
+            // console.log(err);
         });
     }
 </script>

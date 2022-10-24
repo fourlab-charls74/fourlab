@@ -54,7 +54,6 @@ class stk18Controller extends Controller
             $where .= ")";
         }
 
-        if ($req['com_cd'] != null) $where .= " and g.com_id = '" .  Lib::quote($req['com_cd']) . "'";
         if ($req['type'] != "") $where .= " and pc.brand = '" . Lib::quote($req['type']) . "'";
         if ($req['opt'] != "") $where .= " and pc.opt = '" . Lib::quote($req['opt']) . "'";
 		if ($req['prd_nm'] != "") $where .= " and p.prd_nm like '%" . Lib::quote($req['prd_nm']) . "%' ";
@@ -119,8 +118,8 @@ class stk18Controller extends Controller
                 select count(c.prd_cd) as total
                 from (
                     select pss.prd_cd, count(pss.prd_cd)
-                    from product_stock_storage pss
-                        inner join product p on pss.prd_cd = p.prd_cd
+                    from product p
+                        inner join product_stock_storage pss on p.prd_cd = pss.prd_cd
                         inner join product_code pc on p.prd_cd = pc.prd_cd
                         left outer join `code` c on c.code_kind_cd = 'PRD_MATERIAL_TYPE' and c.code_id = pc.brand
                         left outer join `code` c2 on c2.code_kind_cd = 'PRD_MATERIAL_OPT' and c2.code_id = pc.opt
@@ -160,39 +159,31 @@ class stk18Controller extends Controller
 
     // 일반출고 요청 (요청과 동시에 접수완료 처리됩니다.)
     public function request_release(Request $request) {
-        $r = $request->all();
 
         $release_type = 'G';
         $state = 20;
         $admin_id = Auth('head')->user()->id;
-        $admin_nm = Auth('head')->user()->name;
+
         $storage_cd = $request->input("storage_cd", '');
         $store_cd = $request->input("store_cd", '');
         $exp_dlv_day = $request->input("exp_dlv_day", '');
         $rel_order = $request->input("rel_order", '');
+
         $data = $request->input("products", []);
 
         try {
+            
             DB::beginTransaction();
 
-			foreach($data as $d) {
+			foreach($data as $row) {
 
-                $sql = "
-                    select pc.prd_cd, pc.goods_no, pc.goods_opt, g.price, g.wonga
-                    from product_code pc
-                        inner join goods g on g.goods_no = pc.goods_no
-                    where prd_cd = :prd_cd
-                ";
-                $prd = DB::selectOne($sql, ['prd_cd' => $d['prd_cd']]);
-                if ($prd == null) continue;
-
-                DB::table('product_stock_release')
+                DB::table('sproduct_stock_release')
                     ->insert([
                         'type' => $release_type,
-                        'goods_no' => $prd->goods_no,
-                        'prd_cd' => $prd->prd_cd,
-                        'goods_opt' => $prd->goods_opt,
-                        'qty' => $d['rel_qty'] ?? 0,
+                        'prd_cd' => $row['prd_cd'],
+                        'price' => $row['price'],
+                        'wonga' => $row['wonga'],
+                        'qty' => $row['rel_qty'] ?? 0,
                         'store_cd' => $store_cd,
                         'storage_cd' => $storage_cd,
                         'state' => $state,
@@ -207,33 +198,31 @@ class stk18Controller extends Controller
     
                 // product_stock -> 창고보유재고 차감
                 DB::table('product_stock')
-                    ->where('prd_cd', '=', $prd->prd_cd)
+                    ->where('prd_cd', '=', $row['prd_cd'])
                     ->update([
-                        'wqty' => DB::raw('wqty - ' . ($d['rel_qty'] ?? 0)),
+                        'wqty' => DB::raw('wqty - ' . ($row['rel_qty'] ?? 0)),
                         'ut' => now(),
                     ]);
 
                 // product_stock_storage -> 보유재고 차감
                 DB::table('product_stock_storage')
-                    ->where('prd_cd', '=', $prd->prd_cd)
+                    ->where('prd_cd', '=', $row['prd_cd'])
                     ->where('storage_cd', '=', $storage_cd)
                     ->update([
-                        'wqty' => DB::raw('wqty - ' . ($d['rel_qty'] ?? 0)),
+                        'wqty' => DB::raw('wqty - ' . ($row['rel_qty'] ?? 0)),
                         'ut' => now(),
                     ]);
 
                 // // 재고이력 등록
                 // DB::table('product_stock_hst')
                 //     ->insert([
-                //         'goods_no' => $prd->goods_no,
-                //         'prd_cd' => $prd->prd_cd,
-                //         'goods_opt' => $prd->goods_opt,
+                //         'prd_cd' => $row['prd_cd'],
                 //         'location_cd' => $storage_cd,
                 //         'location_type' => 'STORAGE',
                 //         'type' => PRODUCT_STOCK_TYPE_STORAGE_OUT, // 재고분류 : (창고)출고
-                //         'price' => $prd->price,
-                //         'wonga' => $prd->wonga,
-                //         'qty' => ($d['rel_qty'] ?? 0) * -1,
+                //         'price' => $row['price'],
+                //         'wonga' => $row['wonga'],
+                //         'qty' => ($row['rel_qty'] ?? 0) * -1,
                 //         'stock_state_date' => date('Ymd'),
                 //         'ord_opt_no' => '',
                 //         'comment' => '창고출고',
@@ -246,28 +235,26 @@ class stk18Controller extends Controller
                 $store_stock_cnt = 
                     DB::table('product_stock_store')
                         ->where('store_cd', '=', $store_cd)
-                        ->where('prd_cd', '=', $prd->prd_cd)
+                        ->where('prd_cd', '=', $row['prd_cd'])
                         ->count();
-                if($store_stock_cnt < 1) {
+                if ($store_stock_cnt < 1) {
                     // 해당 매장에 상품 기존재고가 없을 경우
                     DB::table('product_stock_store')
                         ->insert([
-                            'goods_no' => $prd->goods_no,
-                            'prd_cd' => $prd->prd_cd,
+                            'prd_cd' => $row['prd_cd'],
                             'store_cd' => $store_cd,
                             'qty' => 0,
-                            'wqty' => $d['rel_qty'] ?? 0,
-                            'goods_opt' => $prd->goods_opt,
+                            'wqty' => $row['rel_qty'] ?? 0,
                             'use_yn' => 'Y',
                             'rt' => now(),
                         ]);
                 } else {
                     // 해당 매장에 상품 기존재고가 이미 존재할 경우
                     DB::table('product_stock_store')
-                        ->where('prd_cd', '=', $prd->prd_cd)
+                        ->where('prd_cd', '=', $row['prd_cd'])
                         ->where('store_cd', '=', $store_cd) 
                         ->update([
-                            'wqty' => DB::raw('wqty + ' . ($d['rel_qty'] ?? 0)),
+                            'wqty' => DB::raw('wqty + ' . ($row['rel_qty'] ?? 0)),
                             'ut' => now(),
                         ]);
                 }
@@ -275,14 +262,12 @@ class stk18Controller extends Controller
                 // // 재고이력 등록
 				// DB::table('product_stock_hst')
                 //     ->insert([
-                //         'goods_no' => $prd->goods_no,
-                //         'prd_cd' => $prd->prd_cd,
-                //         'goods_opt' => $prd->goods_opt,
+                //         'prd_cd' => $row['prd_cd'],
                 //         'location_cd' => $store_cd,
                 //         'location_type' => 'STORE',
                 //         'type' => PRODUCT_STOCK_TYPE_STORE_IN, // 재고분류 : (매장)입고
-                //         'price' => $prd->price,
-                //         'wonga' => $prd->wonga,
+                //         'price' => $row['price'],
+                //         'wonga' => $row['wonga'],
                 //         'qty' => $d['rel_qty'] ?? 0,
                 //         'stock_state_date' => date('Ymd'),
                 //         'ord_opt_no' => '',
@@ -291,6 +276,7 @@ class stk18Controller extends Controller
                 //         'admin_id' => $admin_id,
                 //         'admin_nm' => $admin_nm,
                 //     ]);
+
             }
             $code = 200;
 			DB::commit();
@@ -299,6 +285,6 @@ class stk18Controller extends Controller
             $code = 500;
 			DB::rollback();
 		}
-        return response()->json(["code" => $code, "msg" => $msg]);
+        return response()->json(["code" => $code]);
     }
 }

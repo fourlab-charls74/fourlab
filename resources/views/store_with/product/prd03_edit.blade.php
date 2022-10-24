@@ -118,7 +118,7 @@
 												</div>
 												<div id='img_div'></div>
 												@if($img_url != "")
-													<div id='img_show_div' data-img="" style="display:inline-block;position:relative;width:150px;height:120px;margin:5px;z-index:1">
+													<div id='img_show_div' data-img="" style="display:inline-block;position:relative;width:150px;height:150px;margin:5px;z-index:1">
 														<img src="{{$img_url}}" alt="" id="img_show" style="width:100%;height:100%;z-index:none">
 														<input type="button" value="x" onclick="delete_img('{{$prd_cd}}','01')" style="width:20px;height:20px;position:absolute;right:0px;top:0px;border:none;font-size:large;font-weight:bolder;background:none;color:black;padding-bottom:20px;">
 													</div>
@@ -259,7 +259,7 @@
 
 		// 이미지와 체크 박스를 감싸고 있는 div 속성
 		var div_style = 'display:inline-block;position:relative;' +
-			'width:150px;height:120px;margin:5px;z-index:1';
+			'width:120px;height:120px;margin:5px;z-index:1';
 		// 미리보기 이미지 속성
 		var img_style = 'width:100%;height:100%;z-index:none';
 		// 이미지안에 표시되는 체크박스의 속성
