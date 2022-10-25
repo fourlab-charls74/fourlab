@@ -64,7 +64,7 @@
                             <div class="form-group">
                                 <label for="prd_nm">원부자재명</label>
                                 <div class="flax_box">
-                                    <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='prd_nm' id="prd_nm" value=''>
+                                    <input type='text' class="form-control form-control-sm search-enter" name='prd_nm' id="prd_nm" value=''>
                                 </div>
                             </div>
                         </div>
@@ -75,7 +75,7 @@
                                 <label for="type">구분</label>
                                 <div class="flax_box">
                                     <select name='type' class="form-control form-control-sm">
-                                        <option value=''>선택</option>
+                                        <option value=''>전체</option>
                                         @foreach ($types as $type)
                                         <option value='{{ $type->code_id }}'>{{ $type->code_id }} : {{ $type->code_val }}</option>
                                         @endforeach
@@ -88,7 +88,7 @@
                                 <label for="opt">품목</label>
                                 <div class="flax_box">
                                     <select name='opt' class="form-control form-control-sm">
-                                        <option value=''>선택</option>
+                                        <option value=''>전체</option>
                                         @foreach ($opts as $opt)
                                         <option value='{{ $opt->code_id }}'>{{ $opt->code_id }} : {{ $opt->code_val }}</option>
                                         @endforeach
@@ -228,7 +228,7 @@
                 field: "color",
                 headerName: "칼라",
                 cellStyle: DEFAULT,
-                width: 90
+                width: 100
             },
             {
                 field: "size",
@@ -307,7 +307,7 @@
         };
 
         function setColumn(store) {
-            if(!store) return;
+            if (!store) return;
 
             columns[13].headerName = store.store_nm;
             gx.gridOptions.api.setColumnDefs(columns);
@@ -354,7 +354,7 @@
 		}
 
         function Search() {
-            if(!$("[name=store_no]").val()) {
+            if (!$("[name=store_no]").val()) {
                 alert("요청매장을 선택 후 검색해주세요.");
                 $('.sch-store').click();
                 return false;
@@ -367,7 +367,7 @@
                 method: 'post',
                 data: {store_cds: [$("[name=store_no]").val()]},
             }).then(function (res) {
-                if(res.data.code === 200) {
+                if (res.data.code === 200) {
                     setColumn(res.data.body[0]);
                     gx.Request('/store/stock/stk17/search', data, 1);
                 } else {
@@ -385,8 +385,8 @@
             if (rows.filter(r => !r.rel_qty || !r.rel_qty.trim() || r.rel_qty == 0 || isNaN(parseInt(r.rel_qty))).length > 0) return alert("선택한 상품의 배분수량을 입력해주세요.");
 
             let over_qty_rows = rows.filter(row => {
-                if(row.storage_wqty !== null) {
-                    if(row.storage_wqty < parseInt(row.rel_qty)) return true;
+                if (row.storage_wqty !== null) {
+                    if (row.storage_wqty < parseInt(row.rel_qty)) return true;
                     else return false;
                 }
                 return true; // 상품재고가 없는경우

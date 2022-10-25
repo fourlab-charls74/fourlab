@@ -254,7 +254,7 @@ class stk10Controller extends Controller
                 DB::table('product_stock')
                     ->where('prd_cd', '=', $prd->prd_cd)
                     ->update([
-                        'wqty' => DB::raw('wqty - ' . ($d['rel_qty'] ?? 0)),
+                        'wqty' => DB::raw('wqty - ' . ($d['qty'] ?? 0)),
                         'ut' => now(),
                     ]);
 

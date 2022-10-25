@@ -18,8 +18,8 @@ class stk17Controller extends Controller
             'today'         => date("Y-m-d"),
             'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
             'types'         => SLib::getCodes("PRD_MATERIAL_TYPE"), // 원부자재 구분
+            'opts'          => SLib::getCodes("PRD_MATERIAL_OPT"), // 원부자재 품목
             'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
-            'opts'          => SLib::getCodes("PRD_MATERIAL_OPT"),
             'rel_orders'    => SLib::getCodes("REL_ORDER"), // 출고차수
 		];
 
@@ -104,8 +104,8 @@ class stk17Controller extends Controller
             $sql = "
                 select
                     count(*) as total
-                from product_stock_storage pss
-                    inner join product p on pss.prd_cd = p.prd_cd
+                from product p
+                    inner join product_stock_storage pss on p.prd_cd = pss.prd_cd
                     inner join product_code pc on p.prd_cd = pc.prd_cd
                     left outer join `code` c on c.code_kind_cd = 'PRD_MATERIAL_TYPE' and c.code_id = pc.brand
                     left outer join `code` c2 on c2.code_kind_cd = 'PRD_MATERIAL_OPT' and c2.code_id = pc.opt
