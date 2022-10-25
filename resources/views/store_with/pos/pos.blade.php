@@ -10,7 +10,7 @@
         <h1 style="width:90px;"><img src="/theme/{{config('shop.theme')}}/images/pc_logo_white.png" alt="" class="w-100"></h1>
         <div class="d-flex align-items-center">
             <p class="fw-b mr-5">[{{ @$store->store_cd }}] {{ @$store->store_nm }}</p>
-            <p class="fw-sb mr-4">2022년 09월 28일 00:00:00</p>
+            <p id="clock" class="fw-sb mr-4" style="width: 230px;"></p>
             <button type="button" id="home_btn" onclick="return setScreen('pos_main');" class="butt butt-close bg-trans" style="width:55px;height:50px;border-left:1px solid #999"><i class="fa fa-home" aria-hidden="true"></i></button>
             <button type="button" onclick="return window.close();" class="butt butt-close bg-trans" style="width:55px;height:50px;border-left:1px solid #999"><i class="fa fa-times" aria-hidden="true"></i></button>
         </div>
@@ -821,6 +821,8 @@
         setNewOrdNo(true);
         getOrderAnalysisData();
 
+        getClock();
+        setInterval(getClock, 1000);
 
         // ELEMENT EVENT
         $("#search_prd_keyword").on("keypress", function (e) {
