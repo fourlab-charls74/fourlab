@@ -261,7 +261,7 @@
 			{field: "img", headerName: "이미지_url", hide: true},
 			{field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', width: 230, cellStyle: {"line-height": "30px"}},
 			{field: "sale_stat_cl", headerName: "상품상태", width:70, type: 'GoodsStateTypeLH50'},
-			{field: "goods_opt", headerName: "옵션", width:150, cellStyle: {"line-height": "30px"}, },
+			{field: "goods_opt", headerName: "옵션", width:150, cellStyle: {"line-height": "30px"}, hide:true },
 			{field: "product_cd", headerName: "코드일련", width:100, cellStyle: {"line-height": "30px"},
 				cellRenderer: function(params) {
 						let prd_cd = params.data.prd_cd;

@@ -804,14 +804,25 @@ class goods extends Controller
         $items_contain = $request->input('item_contain', '');
         $opt = $request->input('opt', []);
         $opt_contain = $request->input('opt_contain', '');
+        $match = $request->input('match');
 
         $page = $request->input('page', 1);
         $where = "";
 
         if($prd_cd != '') $where .= " and p.prd_cd like '%$prd_cd%'";
         if($goods_nm != '') $where .= " and p.prd_nm like '%$goods_nm%'";
-        $where .= "and pc.type = 'N'";
-        $where .= "and p.match_yn = 'N'";
+
+        //상품 매칭
+        if($match == 'false'){ 
+        } else {
+            $where .= "and pc.type = 'N'";
+        } 
+        //상품 매칭
+        if($match == 'false') {
+        } else {
+            $where .= "and p.match_yn = 'N'";
+        } 
+
         foreach(self::Conds as $key => $value)
         {
             if($key === 'item') $key = 'items';
@@ -836,19 +847,24 @@ class goods extends Controller
         $total = 0;
         $page_cnt = 0;
 
-        // $sql = "
-        //     select p.prd_cd, p.goods_no, g.goods_nm, p.goods_opt, p.color, p.size
-        //     from product_code p
-        //         inner join goods g on g.goods_no = p.goods_no
-        //     where 1=1 $where
-        // ";
+        if ($match == 'false') {
+            $sql = "
+                select p.prd_cd, p.goods_no, g.goods_nm, p.goods_opt, p.color, p.size
+                from product_code p
+                    inner join goods g on g.goods_no = p.goods_no
+                where 1=1 $where
+            ";
 
-        $sql = "
-            select pc.prd_cd, p.prd_nm, pc.goods_no, pc.goods_opt, pc.color, pc.size, p.match_yn
-            from product_code AS pc
-                inner join product AS p on pc.prd_cd = p.prd_cd
-            where 1=1 $where
-        ";
+        } else {
+            // 상품매칭
+            $sql = "
+                select pc.prd_cd, p.prd_nm, pc.goods_no, pc.goods_opt, pc.color, pc.size, p.match_yn
+                from product_code AS pc
+                    inner join product AS p on pc.prd_cd = p.prd_cd
+                where 1=1 $where
+            ";
+        }
+
 
         $result = DB::select($sql);
 
