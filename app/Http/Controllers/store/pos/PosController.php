@@ -99,9 +99,9 @@ class PosController extends Controller
         $today = date("Y-m-d");
         $store_cd = STORE_CD;
         $sql = "
-            select count(ord_no) as ord_cnt, sum(total_amt) as ord_amt, sum(total_qty) as ord_qty
+            select count(ord_no) as ord_cnt, sum(ord_amt) as ord_amt, sum(pay_amt) as pay_amt, sum(total_qty) as ord_qty
             from (
-                select o.ord_no, sum(o.ord_amt) as total_amt, sum(opt.qty) as total_qty
+                select o.ord_no, sum(o.ord_amt) as ord_amt, sum(o.recv_amt) as pay_amt, sum(opt.qty) as total_qty
                 from order_mst o
                     inner join order_opt opt on opt.ord_no = o.ord_no
                 where o.store_cd = '$store_cd'
@@ -1060,7 +1060,7 @@ class PosController extends Controller
                 , g.goods_sh
                 , o.pay_type
                 , o.sale_kind
-                , s.sale_type_nm as sale_type
+                , s.sale_type_nm
                 , s.amt_kind
                 , if(s.amt_kind = 'per', round(o.price * o.qty / s.sale_per), s.sale_amt) as sale_amount
                 , pt.code_val as pay_type_nm
