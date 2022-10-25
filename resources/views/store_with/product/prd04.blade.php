@@ -133,24 +133,29 @@
 				<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
 			</div>
 		</div>
-	</form>
 
-	<div id="filter-area" class="card shadow-none mb-0 ty2 last-card">
-		<div class="card-body">
-			<div class="card-title mb-3">
-				<div class="filter_wrap">
-					<div class="fl_box">
-						<h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
-					</div>
-					<div class="fr_box flex_box">
+		<div id="filter-area" class="card shadow-none mb-0 ty2 last-card">
+			<div class="card-body">
+				<div class="card-title mb-3">
+					<div class="filter_wrap">
+						<div class="fl_box">
+							<h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
+						</div>
+						<div class="fr_box">
+							<div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+								<input type="checkbox" class="custom-control-input" name="ext_store_qty" id="ext_store_qty" value="Y">
+								<label class="custom-control-label font-weight-normal" for="ext_store_qty">매장재고 0 제외</label>
+							</div>
+						</div>
 					</div>
 				</div>
-			</div>
-			<div class="table-responsive">
-				<div id="div-gd" style="min-height:300px;height:calc(100vh - 370px);width:100%;" class="ag-theme-balham gd-lh50 ty2"></div>
+				<div class="table-responsive">
+					<div id="div-gd" style="min-height:300px;height:calc(100vh - 370px);width:100%;" class="ag-theme-balham gd-lh50 ty2"></div>
+				</div>
 			</div>
 		</div>
-	</div>
+
+	</form>
 	<style>
 		/* 전시카테고리 상품 이미지 사이즈 픽스 */
 		.img {
@@ -158,6 +163,7 @@
 		}
 	</style>
 	<script language="javascript">
+		
 		const columns = [
 			{headerName: '#', pinned: 'left', type: 'NumType', width:40, cellStyle: {"line-height": "30px"}},
 			{field: "prd_cd", headerName: "상품코드", width:120, pinned: 'left', cellStyle: {"line-height": "30px"},
