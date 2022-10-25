@@ -130,6 +130,8 @@ class sal20Controller extends Controller
                     DB::table('product_stock')
                         ->where('prd_cd', '=', $prd->prd_cd)
                         ->update([
+                            'qty_wonga'	=> DB::raw('qty_wonga - ' . ($minus_qty * ($prd->wonga))),
+							'out_qty' => DB::raw('out_qty + ' . $minus_qty),
                             'qty' => DB::raw('qty - ' . $minus_qty),
                             'ut' => now(),
                         ]);

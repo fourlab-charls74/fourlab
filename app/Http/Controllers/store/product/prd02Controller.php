@@ -406,6 +406,7 @@ class prd02Controller extends Controller
 					->insert([
 						'goods_no'	=> $goods_no,
 						'prd_cd'	=> $prd_cd,
+						'qty_wonga'	=> 0,
 						'in_qty'	=> 0,
 						'out_qty'	=> 0,
 						'qty'		=> 0,
@@ -787,6 +788,7 @@ class prd02Controller extends Controller
 				->insert([
 					'goods_no'	=> $goods_no,
 					'prd_cd'	=> $prd_cd,
+					'qty_wonga'	=> 0,
 					'in_qty'	=> 0,
 					'out_qty'	=> 0,
 					'qty'		=> 0,
@@ -942,6 +944,7 @@ class prd02Controller extends Controller
 					DB::table('product_stock')->insert([
 						'goods_no' => $goods_no,
 						'prd_cd' => $prd_cd,
+						'qty_wonga'	=> 0,
 						'in_qty' => 0,
 						'out_qty' => 0,
 						'qty' => 0,
