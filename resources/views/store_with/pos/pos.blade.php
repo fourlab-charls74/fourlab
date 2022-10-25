@@ -26,16 +26,17 @@
             <div class="d-flex flex-column fc-white fs-12 bg-brown p-1" style="grid-area:b;">
                 <p class="text-center fs-16 fw-sb p-4" style="border-bottom:2px solid #999;">오늘 매출분석</p>
                 <ul class="p-3">
-                    <li class="d-flex justify-content-between fs-14 fw-sb mb-2"><p>총 매출금액</p><p class="fc-red"><span id="to_ord_amt">0</span>원</p></li>
-                    <li class="d-flex justify-content-between mb-2"><p>판매수량</p><p><span id="to_qty">0</span>개</p></li>
-                    <li class="d-flex justify-content-between"><p>주문건수</p><p><span id="to_ord_cnt">0</span>건</p></li>
+                    <li class="d-flex justify-content-between fs-14 fw-sb mb-2"><p>총매출액</p><p class="fc-red"><span id="to_pay_amt">0</span>원</p></li>
+                    <li class="d-flex justify-content-between mb-2"><p>주문금액</p><p><span id="to_ord_amt">0</span>원</p></li>
+                    <li class="d-flex justify-content-between mb-2"><p>주문건수</p><p><span id="to_ord_cnt">0</span>건</p></li>
+                    <li class="d-flex justify-content-between"><p>판매수량</p><p><span id="to_qty">0</span>개</p></li>
                 </ul>
             </div>
             <button type="button" class="butt fs-14 fw-sb bg-blue" style="grid-area:c;" onclick="return setScreen('pos_today')">
                 <i class="fa fa-search d-block mb-3" aria-hidden="true" style="font-size:50px;"></i>
                 당일판매내역
             </button>
-            <button type="button" class="butt fs-14 fw-sb bg-gray" style="grid-area:d;">
+            <button type="button" class="butt fs-14 fw-sb bg-gray" style="grid-area:d;" onclick="return alert('준비중입니다.');">
                 <i class="fa fa-plus-circle d-block mb-3" aria-hidden="true" style="font-size:50px;"></i>
                 부가기능
             </button>
@@ -56,7 +57,7 @@
                 <i class="fa fa-bookmark d-block mb-3" aria-hidden="true" style="font-size:50px;"></i>
                 대기 <span id="waiting_cnt">0</span>
             </button>
-            <button type="button" class="butt fs-14 fw-sb bg-red" style="grid-area:g;">
+            <button type="button" class="butt fs-14 fw-sb bg-red" style="grid-area:g;" onclick="return alert('준비중입니다.');">
                 <i class="fa fa-reply d-block mb-3" aria-hidden="true" style="font-size:50px;"></i>
                 환불
             </button>
@@ -914,6 +915,19 @@
                     updateOrderValue('card_amt', str * 1);
                     $('#payModal').modal('hide');
                 }
+            }
+        });
+
+        $('#searchWaitingModal').on('shown.bs.modal', async function () {
+            let list = gx5.getRows();
+            if(list.length > 0) {
+                await gx5.gridOptions.api.applyTransaction({
+                    remove: [list[0]]
+                });
+                await gx5.gridOptions.api.applyTransaction({
+                    add: [list[0]],
+                    addIndex: 0,
+                });
             }
         });
 	});

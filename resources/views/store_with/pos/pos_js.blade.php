@@ -31,6 +31,7 @@
         
         if(status === 200) {
             $("#to_ord_amt").text(Comma(data.today_order?.ord_amt || 0));
+            $("#to_pay_amt").text(Comma(data.today_order?.pay_amt || 0));
             $("#to_qty").text(Comma(data.today_order?.ord_qty || 0));
             $("#to_ord_cnt").text(Comma(data.today_order?.ord_cnt));
             
@@ -53,9 +54,6 @@
 
     /** 대기내역 조회 */
     function searchWaiting() {
-
-        // 대기처리 후 재조회 시 grid 깨짐현상 발생 -> 처리 필요
-
         gx5.Request("/store/pos/search/waiting", "", -1, function(d) {
             $("#waiting_cnt").text(d.head.total);
         });
@@ -620,7 +618,7 @@
                         <td class="pt-2 pb-2 pr-1">
                             <div class="d-flex flex-column align-items-end">
                                 ${(o.sale_amount > 0 || o.sale_kind == '99') ? `    
-                                    <span class="fs-08 fw-sb br-05 bg-lightgray pl-2 pr-2">${o.sale_type}</span>
+                                    <span class="fs-08 fw-sb br-05 bg-lightgray pl-2 pr-2">${o.sale_type_nm}</span>
                                     <del class="fc-gray fs-08">${Comma(o.qty * o.price)}</del>
                                 ` : ''}
                                 <p class="fw-sb">${Comma(o.recv_amt)}</p>
