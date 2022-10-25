@@ -2,7 +2,7 @@
     <div class="side_menu">
         <ul>
             <li>
-                <a href="javascript:;" class="arrow waves-effect"><i class="bx bx-package fs-18"></i><span>코드관리</span></a>
+                <a href="javascript:;" class="arrow waves-effect"><i class="bx bx-code-alt fs-18"></i><span>코드관리</span></a>
                 <ul>
                     <li><a href="/store/standard/std51">(임)공통코드관리</a></li>
                     <li><a href="/store/standard/std02">(완)매장관리</a></li>
@@ -15,7 +15,7 @@
                 </ul>
             </li>
             <li>
-                <a href="javascript:;" class="arrow"><i class="bx bx-shopping-bag fs-18"></i><span>상품관리</span></a>
+                <a href="javascript:;" class="arrow"><i class="bx bx-cube fs-18"></i><span>상품관리</span></a>
                 <ul>
                     <li><a href="/head/product/prd01" target="_blank">(개)상품관리</a></li>
                     <li><a href="/store/product/prd02">(완)상품관리(코드)</a></li>
@@ -33,7 +33,7 @@
                 </ul>
             </li>
             <li>
-                <a href="javascript:;" class="arrow"><i class="bx bx-task fs-18"></i><span>매장관리</span></a>
+                <a href="javascript:;" class="arrow"><i class="bx bx-store fs-18"></i><span>매장관리</span></a>
                 <ul>
                     <li><a href="/store/stock/stk01">(완)매장재고</a></li>
                     <!--<li><a href="/store/stock/stk02">(개)매장재고입출고</a></li>//-->
@@ -50,7 +50,7 @@
                     <li><a href="/store/stock/stk32">(완)매장 알림</a></li>
                 </ul>
             <li>
-                <a href="javascript:;" class="arrow"><i class="bx bx-line-chart fs-18"></i><span>고객/수선관리</span></a>
+                <a href="javascript:;" class="arrow"><i class="bx bx-user fs-18"></i><span>고객/수선관리</span></a>
                 <ul>
                     <li><a href="/store/member/mem01">(개)회원관리</a></li>
                     <li><a href="/store/standard/std11">(완)수선관리</a></li>
@@ -58,7 +58,7 @@
                 </ul>
             </li>
             <li>
-                <a href="javascript:;" class="arrow"><i class="bx bx-file fs-18"></i><span>정산/마감관리</span></a>
+                <a href="javascript:;" class="arrow"><i class="bx bx-calculator fs-18"></i><span>정산/마감관리</span></a>
                 <ul>
                     <li><a href="/store/account/acc04">매장판매처수수료</a></li>
                     <li><a href="/store/account/acc06">(개)매장중간관리자정산</a></li>
@@ -67,7 +67,7 @@
                 </ul>
             </li>
             <li>
-                <a href="javascript:;" class="arrow"><i class="bx bx-file fs-18"></i><span>영업관리</span></a>
+                <a href="javascript:;" class="arrow"><i class="bx bx-dollar-circle fs-18"></i><span>영업관리</span></a>
                 <ul>
                     <!--<li><a href="/store/sale/sal11">배분현황</a></li>//-->
                     <li><a href="/store/sale/sal17">(완)매장목표</a></li>
@@ -77,7 +77,7 @@
                 </ul>
             </li>
             <li>
-                <a href="javascript:;" class="arrow"><i class="bx bx-file fs-18"></i><span>경영관리</span></a>
+                <a href="javascript:;" class="arrow"><i class="bx bx-line-chart fs-18"></i><span>경영관리</span></a>
                 <ul>
                     <li><a href="/store/sale/sal01">(완)판매일보</a></li>
                     <li><a href="/store/sale/sal02">(완)월별판매집계표</a></li>
