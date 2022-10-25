@@ -86,6 +86,7 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::get('goods/show', 'goods@show');
         Route::get('goods/show/file/search', 'goods@file_search');
 
+
         //sms
         Route::get('sms/search', 'SmsController@search');
         Route::get('sms/{type}', 'SmsController@index');

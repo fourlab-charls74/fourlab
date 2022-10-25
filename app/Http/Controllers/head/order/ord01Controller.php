@@ -1475,6 +1475,8 @@ class ord01Controller extends Controller
 					inner join goods c on a.goods_no = c.goods_no and a.goods_sub = c.goods_sub $insql
 				where 1=1 $where
 			";
+
+            
 			$row = DB::selectOne($sql);
 			$total = $row->total;
 
@@ -1486,11 +1488,7 @@ class ord01Controller extends Controller
 			//$arr_header = null;
         }
 
-        $arr_header = array(
-            "total" => $total,
-            "page" => $page,
-            "page_cnt" => $page_cnt
-        );
+       
 
 		if($limit == -1){
 			$limit = "";
@@ -1669,8 +1667,14 @@ class ord01Controller extends Controller
 				$row->img = sprintf("%s%s",config("shop.image_svr"),$row->img);
 			}
 		}
+        $arr_header = array(
+            "total" => $total,
+            "page" => $page,
+            "page_cnt" => $page_cnt,
+            "page_total" => count($rows)
+        );
 
-        $arr_header['page_total'] = count($rows);
+        // $arr_header['page_total'] = count($rows);
 
         return response()->json([
             "code" => 200,

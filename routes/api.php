@@ -28,6 +28,7 @@ Route::get('prd01/{no}/get-option-stock', 'head\product\prd01Controller@get_opti
 Route::get('stk01/search', 'head\stock\stk01Controller@search');
 Route::get('stk20/search', 'head\stock\stk20Controller@search');
 
+
 Route::prefix("cafe24")->namespace('api\cafe24')->group(function () {
 
     Route::get('getToken', 'authController@getToken');

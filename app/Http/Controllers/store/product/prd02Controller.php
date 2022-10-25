@@ -157,6 +157,12 @@ class prd02Controller extends Controller
 		$cfg_img_size_real	= "a_500";
 		$cfg_img_size_list	 = "s_50";
 
+		$color_size = substr($prd_cd, 0, 11);
+		
+		
+		$color = substr($color_size, 0, 2);// 컬러
+		$size = substr($color_size, 2, strlen($color_size));//사이즈
+
 		$query = /** @lang text */
 		"
 			select
@@ -358,6 +364,36 @@ class prd02Controller extends Controller
 
 	}
 
+
+	public function prd_search_code(Request $request){
+		$prd_cd 	= $request->input('prd_cd');
+		$goods_no 	= $request->input('goods_no2');
+
+		$color_size = substr($prd_cd, 11, strlen($prd_cd));
+		$color = substr($color_size, 0, 2);// 컬러
+		$size = substr($color_size, 2, strlen($color_size));//사이즈
+
+
+	
+
+		$sql	= "
+			select prd_cd, prd_nm, '$goods_no' as goods_no, '$color' as color, '$size' as size, style_no, tag_price, price, wonga, com_id, match_yn
+			from product
+			where prd_cd like '$prd_cd%'
+		";
+
+		$result = DB::select($sql);
+
+		return response()->json([
+			"code"	=> 200,
+			"head"	=> array(
+				"total"		=> count($result),
+			),
+			"body" => $result
+		]);
+
+	}
+
 	public function add_product_code(Request $request){
 		$admin_id	= Auth('head')->user()->id;
         $datas		= $request->input("data", []);
@@ -436,6 +472,78 @@ class prd02Controller extends Controller
 			DB::commit();
 			$code = 200;
 			$msg = "상품코드 등록이 완료되었습니다.";
+
+		} catch (\Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+        return response()->json(["code" => $code, "msg" => $msg]);
+	}
+
+
+	public function add_product_product(Request $request){
+		$admin_id	= Auth('head')->user()->id;
+        $datas		= $request->input("data", []);
+
+        try {
+            DB::beginTransaction();
+
+			foreach($datas as $data) {
+
+				$prd_cd	= $data['prd_cd'];
+				$prd_nm = $data['prd_nm'];
+				$style_no = $data['style_no'];
+				$goods_no = $data['goods_no'];
+
+
+				$color = $data['color'];
+				$size = $data['size'];
+
+				$color_sql = "
+					select * from code where code_kind_cd = 'PRD_CD_COLOR' and code_id = '$color'
+				";
+				$color_val = DB::selectOne($color_sql);
+
+				$size_sql = "
+					select * from code where code_kind_cd = 'PRD_CD_SIZE_MATCH' and code_id = '$size'
+				";
+				$size_val = DB::selectOne($size_sql);
+
+
+				$goods_opt = $color_val->code_val.'^'.$size_val->code_val2;
+
+
+				$product_sql = "
+					update product 
+					set match_yn = 'Y'
+					where prd_cd = '$prd_cd'
+				";
+				
+				DB::update($product_sql);
+
+				$product_code_sql = "
+					update product_code
+					set goods_no = '$goods_no', goods_opt = '$goods_opt'
+					where prd_cd = '$prd_cd'
+				";
+				
+				DB::update($product_code_sql);
+				
+				$product_stock_sql = "
+					update product_stock 
+					set goods_no = '$goods_no', goods_opt = '$goods_opt'
+					where prd_cd = '$prd_cd'
+				";
+				
+				DB::update($product_stock_sql);
+
+            }
+				
+			DB::commit();
+			$code = 200;
+			$msg = "상품코드 매칭이 완료되었습니다.";
 
 		} catch (\Exception $e) {
 			DB::rollback();

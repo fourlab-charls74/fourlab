@@ -254,16 +254,37 @@
 				pinned: 'left',
 				cellStyle:StyleGoodsNo,
 			},
-			{field: "goods_type", headerName: "상품구분", width: 58, pinned: 'left', type: 'StyleGoodsTypeNM'},
 			{field: "opt_kind_nm", headerName: "품목", width:70, cellStyle: {"line-height": "30px"}},
 			{field: "brand_nm", headerName: "브랜드", cellStyle: {"line-height": "30px"}},
 			{field: "style_no", headerName: "스타일넘버", cellStyle: {"line-height": "30px"}},
 			{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}"},
 			{field: "img", headerName: "이미지_url", hide: true},
 			{field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', width: 230, cellStyle: {"line-height": "30px"}},
-			{field: "goods_nm_eng", headerName: "상품명(영문)", width: 230, cellStyle: {"line-height": "30px"}},
 			{field: "sale_stat_cl", headerName: "상품상태", width:70, type: 'GoodsStateTypeLH50'},
-			{field: "goods_opt", headerName: "옵션", width:150, cellStyle: {"line-height": "30px"}},
+			{field: "goods_opt", headerName: "옵션", width:150, cellStyle: {"line-height": "30px"}, },
+			{field: "product_cd", headerName: "코드일련", width:100, cellStyle: {"line-height": "30px"},
+				cellRenderer: function(params) {
+						let prd_cd = params.data.prd_cd;
+						let product_cd = prd_cd.substr(0, 11); 
+						return product_cd;
+					}
+			},
+			{field: "color", headerName: "컬러", width:100, cellStyle: {"line-height": "30px"},
+				cellRenderer: function(params) {
+					let prd_cd = params.data.prd_cd;
+					let color_size = prd_cd.substr(11);
+					let color = color_size.substr(0,2);
+					return color;
+				}
+			},
+			{field: "size", headerName: "사이즈", width:100, cellStyle: {"line-height": "30px"},
+				cellRenderer: function(params) {
+						let prd_cd = params.data.prd_cd;
+						let color_size = prd_cd.substr(11);
+						let size = color_size.substr(2);
+						return size;
+					}
+			},
 			{
 				field: "wqty", headerName: "창고재고", width:70, type: 'numberType', cellStyle: {"line-height": "30px"},
 				cellRenderer: function(params) {
@@ -287,9 +308,6 @@
 			{field: "margin_amt", headerName: "마진액", type: 'numberType', width:60, cellStyle: {"line-height": "30px"}},
 			{field: "org_nm", headerName: "원산지", cellStyle: {"line-height": "30px"}},
 			{field: "com_nm", headerName: "업체", width:84, cellStyle: {"line-height": "30px"}},
-			{field: "full_nm", headerName: "대표카테고리", cellStyle: {"line-height": "30px"}},
-			{field: "head_desc", headerName: "상단홍보글", cellStyle: {"line-height": "30px"}},
-			{field: "make", headerName: "제조업체", cellStyle: {"line-height": "30px"}},
 			{field: "reg_dm", headerName: "등록일자", width:110, cellStyle: {"line-height": "30px"}},
 			{field: "upd_dm", headerName: "수정일자", width:110, cellStyle: {"line-height": "30px"}}
 		];

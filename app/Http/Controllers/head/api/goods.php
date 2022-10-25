@@ -38,7 +38,6 @@ class goods extends Controller
     }
 
     public function search(Request $req) {
-
 		// 설정 값 얻기
 		$cfg_img_size_list		= SLib::getCodesValue("G_IMG_SIZE","list");
 		$cfg_img_size_real		= SLib::getCodesValue("G_IMG_SIZE","real");

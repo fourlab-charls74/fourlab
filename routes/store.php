@@ -59,6 +59,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 상품코드 조회
         Route::get('prdcd/conds', 'goods@search_product_conditions');
         Route::get('prdcd/search', 'goods@search_prdcd');
+        Route::get('prdcd/conds_code', 'goods@search_product_conditions_code');
+        Route::get('prdcd/search_code', 'goods@search_prdcd_code');
 
     });
 
@@ -165,7 +167,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
         Route::get('prd02/create', 'prd02Controller@create');
         Route::get('prd02/prd-search', 'prd02Controller@prd_search');
+        Route::get('prd02/prd-search-code', 'prd02Controller@prd_search_code');
         Route::put('prd02/add-product-code', 'prd02Controller@add_product_code');
+        Route::put('prd02/add-product-product', 'prd02Controller@add_product_product');
 
         Route::get('prd02/edit-goods-no/{product_code}/{goods_no}/', 'prd02Controller@edit_goods_no');
         Route::get('prd02/prd-edit-search', 'prd02Controller@prd_edit_search');

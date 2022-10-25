@@ -303,8 +303,9 @@ function SearchPrdcd(){
     this.grid = null;
 }
 
-SearchPrdcd.prototype.Open = async function(callback = null){
+SearchPrdcd.prototype.Open = async function(callback = null, match = false){
     if(this.grid === null){
+        this.isMatch = match === "match";
         this.SetGrid("#div-gd-prdcd");
         this.SetGridCond();
         // $("#SearchPrdcdModal").draggable();
@@ -318,16 +319,30 @@ SearchPrdcd.prototype.Open = async function(callback = null){
 SearchPrdcd.prototype.SetGrid = function(divId){
     let columns = [];
 
-    columns.push(
-        { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null },
-        { field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {"text-align": "center"} },
-        { field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"} },
-        { field: "goods_nm", headerName: "상품명", width: 400 },
-        { field: "goods_opt", headerName: "옵션", width: 300 },
-        { field: "color", headerName: "컬러", width: 60, cellStyle: {"text-align": "center"} },
-        { field: "size", headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"} },
-        { width: "auto" }
-    );
+    if (this.isMatch) {
+        columns.push(
+            { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null },
+            { field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {"text-align": "center"} },
+            { field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"} },
+            { field: "prd_nm", headerName: "상품명", width: 400 },
+            { field: "color", headerName: "컬러", width: 60, cellStyle: {"text-align": "center"} },
+            { field: "size", headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"} },
+            { field: "match_yn", headerName: '매칭여부', cellClass: 'hd-grid-code', width: 60},
+            { width: "auto" }
+            );
+    } else {
+        columns.push(
+            { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null },
+            { field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {"text-align": "center"} },
+            { field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"} },
+            { field: "goods_nm", headerName: "상품명", width: 400 },
+            { field: "goods_opt", headerName: "옵션", width: 300 },
+            { field: "color", headerName: "컬러", width: 60, cellStyle: {"text-align": "center"} },
+            { field: "size", headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"} },
+            { width: "auto" }
+            );
+    }
+
     this.grid = new HDGrid(document.querySelector( divId ), columns);
 };
 
