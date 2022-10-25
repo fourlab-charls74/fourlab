@@ -196,6 +196,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
         // 상품재고관리
         Route::get('prd04','prd04Controller@index');
+        Route::get('prd04/search','prd04Controller@search');
     });
 
     // 생산입고관리

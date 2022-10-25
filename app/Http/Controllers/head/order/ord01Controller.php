@@ -1473,9 +1473,6 @@ class ord01Controller extends Controller
 				from order_opt a
 					inner join order_mst b on a.ord_no = b.ord_no
 					inner join goods c on a.goods_no = c.goods_no and a.goods_sub = c.goods_sub $insql
-					left outer join payment d on b.ord_no = d.ord_no
-					inner join company e on a.sale_place = e.com_id and e.com_type = '4'
-					left outer join order_opt_memo h on a.ord_opt_no = h.ord_opt_no
 				where 1=1 $where
 			";
 			$row = DB::selectOne($sql);
