@@ -28,30 +28,38 @@
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
                             <div class="form-group">
-                                <label>출고일자</label>
-                                <div class="form-inline date-select-inbox">
-                                    <div class="docs-datepicker form-inline-inner input_box">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
-                                            <div class="input-group-append">
-                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="docs-datepicker-container"></div>
+                                <label>일자검색</label>
+                                <div class="d-flex">
+                                    <div class="flex_box w-25 mr-2">
+                                        <select name='date_type' class="form-control form-control-sm">
+                                            <option value='req_rt' selected>요청일자</option>
+                                            <option value='dlv_day'>출고일자</option>
+                                        </select>
                                     </div>
-                                    <span class="text_line">~</span>
-                                    <div class="docs-datepicker form-inline-inner input_box">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
-                                            <div class="input-group-append">
-                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
-                                                </button>
+                                    <div class="form-inline date-select-inbox w-75">
+                                        <div class="docs-datepicker form-inline-inner input_box">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
+                                                <div class="input-group-append">
+                                                    <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
+                                                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
                                             </div>
+                                            <div class="docs-datepicker-container"></div>
                                         </div>
-                                        <div class="docs-datepicker-container"></div>
+                                        <span class="text_line">~</span>
+                                        <div class="docs-datepicker form-inline-inner input_box">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
+                                                <div class="input-group-append">
+                                                    <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+                                                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="docs-datepicker-container"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -366,6 +374,7 @@
             editable: function(params) {return params.data.state === 10;}, 
             cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};},
         },
+        {field: "origin_qty", headerName: "수량", type: "numberType", hide: true},
         {field: "amount", headerName: "합계", type: 'currencyType', width: 80, valueGetter: (params) => calAmount(params)},
 		{field: "exp_dlv_day", headerName: "출고예정일자", cellStyle: {"text-align": "center"},
             // cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99", "text-align": "center"} : {"text-align": "center"};},
@@ -384,7 +393,7 @@
             // },
             cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {
-                return params.data.state === 10 ? params.value : params.data.dlv_day?.replaceAll("-", "") || '' + (params.value || '');
+                return params.data.state === 10 ? params.value : params.data.dlv_day?.replaceAll("-", "") + (params.value) || '' + (params.value || '');
             }
         },
         {field: "req_id", headerName: "요청자", cellStyle: {"text-align": "center"}},
@@ -453,6 +462,7 @@
         let rows = gx.getSelectedRows();
         if (rows.length < 1) return alert("접수처리할 항목을 선택해주세요.");
         if (rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 접수처리 가능합니다.");
+        if (rows.filter(r => r.qty > r.origin_qty).length > 0) return alert("");
         if (!confirm("선택한 항목을 접수처리하시겠습니까?")) return;
         axios({
             url: '/store/stock/stk16/receipt',
@@ -466,6 +476,9 @@
             if (res.data.code === 200) {
                 alert("접수처리가 정상적으로 완료되었습니다.");
                 Search();
+            } else if (res.data.code == -1) {
+                const prd_cd = res.data.prd_cd;
+                alert(`상품 코드 - ${prd_cd}\n입력하신 수량이 창고수량보다 크지 않아야만 접수처리가 가능합니다.`);
             } else {
                 // console.log(res.data);
                 alert("접수처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");

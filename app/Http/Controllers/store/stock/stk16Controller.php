@@ -53,10 +53,20 @@ class stk16Controller extends Controller
         // where
         $sdate = str_replace("-", "", Lib::quote($req['sdate']) ?? now()->sub(1, 'week')->format('Ymd'));
         $edate = str_replace("-", "", Lib::quote($req['edate']) ?? date("Ymd"));
-        $where .= "
-            and cast(if(psr.state > 20, psr.prc_rt, if(psr.state > 10, psr.exp_dlv_day, psr.req_rt)) as date) >= '$sdate' 
-            and cast(if(psr.state > 20, psr.prc_rt, if(psr.state > 10, psr.exp_dlv_day, psr.req_rt)) as date) <= '$edate'
-        ";
+
+        if ($req['date_type'] != "") {
+            if ($req['date_type'] == "req_rt") {
+                $where .= " 
+                    and cast(psr.req_rt as date) >= '$sdate'
+                    and cast(psr.req_rt as date) <= '$edate'
+                ";
+            } else if ($req['date_type'] == "dlv_day") {
+                $where .= " 
+                    and cast(psr.exp_dlv_day as date) >= '$sdate'
+                    and cast(psr.exp_dlv_day as date) <= '$edate'
+                ";
+            }
+        }
 
         if ($req['type'] != "") $where .= " and pc.brand = '" . Lib::quote($req['type']) . "'";
         if ($req['opt'] != "") $where .= " and pc.opt = '" . Lib::quote($req['opt']) . "'";
@@ -211,6 +221,17 @@ class stk16Controller extends Controller
                 $price = $row['price'];
                 $wonga = $row['wonga'];
 
+                $result = DB::table('product_stock_storage')
+                ->where('prd_cd', '=', $prd_cd)
+                ->where('storage_cd', '=', DB::raw("(select storage_cd from storage where default_yn = 'Y')"))
+                ->get()[0];
+                $storage_qty = $result->qty;
+
+                if ((int)$row['qty'] > $storage_qty) { // 창고수량보다 접수 수량이 많은 경우 에러처리
+                    DB::rollback();
+                    return response()->json(["code" => -1, "prd_cd" => $prd_cd]);
+                }
+                
                 DB::table('sproduct_stock_release')
                     ->where('idx', '=', $row['idx'])
                     ->update([
