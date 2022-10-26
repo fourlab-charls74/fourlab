@@ -80,11 +80,24 @@ class prd04Controller extends Controller
 			$in_store_sql	= " inner join product_stock_store pss on pc.prd_cd = pss.prd_cd ";
 
 			$where	.= " and (1!=1";
-
 			foreach($store_no as $store_cd) {
 				$where .= " or pss.store_cd = '" . Lib::quote($store_cd) . "' ";
 			}
+			$where	.= ")";
 
+			$store_qty_sql	= "pss.qty";
+		}
+
+		if( $store_no == "" && $store_type != "" ){
+			$in_store_sql	= " inner join product_stock_store pss on pc.prd_cd = pss.prd_cd ";
+
+			$sql	= " select store_cd from store where store_type = :store_type and use_yn = 'Y' ";
+			$result = DB::select($sql,['store_type' => $store_type]);
+
+			$where	.= " and (1!=1";
+			foreach($result as $row){
+				$where .= " or pss.store_cd = '" . Lib::quote($row->store_cd) . "' ";
+			}
 			$where	.= ")";
 
 			$store_qty_sql	= "pss.qty";
