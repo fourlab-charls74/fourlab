@@ -544,7 +544,7 @@ class Stock
         if ($row) {
             $stock_no = $row->no;
             $this->__SetStockNo($stock_no);
-            $this->__IncreaseGoodQty($qty);
+            $this->__IncreaseGoodQty($qty); // 매장관리용으로 작업하기 위해 삭제되어야함 2022-10-27
         } else {
             if ($wonga == "") {
                 $sql = "  -- PlusStockQty.2 --
@@ -560,13 +560,14 @@ class Stock
                     return 0;
                 }
             }
-            $this->__InsertGoodQty($wonga, $qty, $invoice_no);
+            $this->__InsertGoodQty($wonga, $qty, $invoice_no); // 매장관리용으로 작업하기 위해 삭제되어야함 2022-10-27
         }
 
         $this->__IncreasePrdStockQty($qty);
 
         $this->__IncreasePrdStockStorageQty($qty);
 
+        // goods_location 항목은 매장관리용이 아니므로 삭제되어야함 20221027
         if ($this->loc != '' && $this->loc != 'LOC') {
             $loc = $this->loc;
 
@@ -610,7 +611,7 @@ class Stock
             "ord_opt_no" => $ord_opt_no
         );
 
-        return $this->__InsertHistory($history);
+        return $this->__InsertHistory($history); // 매장관리용 product_stock_hst 로 대체해야함 20221027
     }
 
     private function __IncreaseGoodQty($qty)
@@ -648,6 +649,7 @@ class Stock
 
     private function __IncreasePrdStockQty($qty)
     {
+        // wqty 증가 업데이트는 창고용 컬럼이므로 수정해야됨 20221027
         $affected_rows = DB::update("
             update product_stock set
                 wqty = wqty + $qty
@@ -662,7 +664,7 @@ class Stock
                 'goods_no' => $this->goods_no,
                 'prd_cd' => $this->prd_cd,
                 'goods_opt' => $this->goods_opt,
-                'qty' => '0',
+                'qty' => '0', // qty는 입고시 등록되어야하므로 수정되어야함 20221027
                 'wqty' => $qty,
                 'use_yn' => 'Y',
                 'rt' => now(),

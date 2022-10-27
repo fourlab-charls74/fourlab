@@ -86,6 +86,29 @@
 					<div class="row">
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
+								<label for="store_type">매장구분</label>
+								<div class="flex_box">
+									<select name='store_type' class="form-control form-control-sm">
+										<option value=''>전체</option>
+										@foreach ($store_types as $store_type)
+											<option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
+										@endforeach
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-4 inner-td">
+							<div class="form-group">
+								<label>매장명</label>
+								<div class="form-inline inline_btn_box">
+									<input type='hidden' id="store_nm" name="store_nm">
+									<select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select" multiple></select>
+									<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-4 inner-td">
+							<div class="form-group">
 								<label for="name">공급업체(거래선)</label>
 								<div class="form-inline inline_select_box">
 									<div class="form-inline-inner input-box w-100">
@@ -98,6 +121,8 @@
 								</div>
 							</div>
 						</div>
+					</div>
+					<div class="row">
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
 								<label for="">자료수/정렬</label>
@@ -169,6 +194,7 @@
 			width: 30px;
 			height: 30px;
 		}
+
 	</style>
 	<script language="javascript">
 
@@ -230,6 +256,18 @@
 				width: 80
 			},
 			{
+				field: 'stock_qty',
+				headerName: '창고재고', 
+				type: "currencyType",
+				width: 80,
+			},
+			{
+				field: 'store_qty',
+				headerName: '매장재고', 
+				type: "currencyType",
+				width: 80,
+			},
+			{
 				field: "unit",
 				headerName: "단위",
 				cellStyle: DEFAULT,
@@ -253,6 +291,7 @@
 		let gx;
 		$(document).ready(function() {
 			gx = new HDGrid(gridDiv, columns);
+			gx.alwaysShowHorizontalScroll = true;
 			pApp.ResizeGrid(275);
 			pApp.BindSearchEnter();
 			Search();

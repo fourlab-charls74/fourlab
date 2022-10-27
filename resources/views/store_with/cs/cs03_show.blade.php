@@ -235,8 +235,7 @@
             width: 120,
             cellStyle: DEFAULT
         },
-        {field:"qty_1", headerName:"현재고", width:60, type:'numberType', cellStyle: DEFAULT},
-        {field:"qty_2", headerName:"창고재고", width:60, type:'numberType', cellStyle: DEFAULT},
+        {field:"stock_qty", headerName:"창고재고", width:60, type:'numberType', cellStyle: DEFAULT},
         {field:"in_qty", headerName:"입고수량", width:60, type:'numberType', cellStyle: { ...DEFAULT, ...YELLOW } , editable: true},
         {field:"price", headerName: "단가", width:84, type:'currencyType', cellStyle: { ...DEFAULT, ...{'text-align': 'right'}} },
         {field:"wonga", headerName: "원가", hide: true},
