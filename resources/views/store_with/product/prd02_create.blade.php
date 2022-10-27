@@ -275,16 +275,7 @@
 	const columns_code = [
 		{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 30, pinned: 'left', sort: null,
             checkboxSelection: function(params) {
-				let prd_cd = document.getElementById('prd_cd').value;
-				let color_size = prd_cd.substr(11);
-				let color_size2 = params.data.color + params.data.size;
-
-				
-				if( color_size == color_size2) {
-					return prd_cd == params.data.prd_cd;
-				}else{
-					return ""
-				}
+				return params.data.checkbox == true && params.data.is_product == 'Y';
             },
 		},
 		{field:"goods_no",	headerName: "상품번호",		width:72},
@@ -292,21 +283,23 @@
 		{field:"prd_nm", headerName: "상품명",			width:250},
 		{field:"goods_opt",	headerName: "상품옵션",		width:200},
 		{field:"prd_cd",	headerName: "상품코드",		width:120,
-			cellRenderer: function(params){
-				let prd_cd = document.getElementById('prd_cd').value;
-				let prd_cd1 = prd_cd.substr(0,11);
-				return prd_cd1
-			}
+			// cellRenderer: function(params){
+			// 	let prd_cd = document.getElementById('prd_cd').value;
+			// 	let prd_cd1 = prd_cd.substr(0,11);
+			// 	return prd_cd1
+			// }
 		},
 		{field:"color",		headerName: "컬러",			width:72},
 		{field:"size",		headerName: "사이즈",		width:72},
-		// {field:"", headerName: "알림",		width:120,
-		// 	cellRenderer: function(params) {
-		// 		// let prd_cd = document.getElementById('prd_cd').value;
-		// 		// let prd_cd1 = prd_cd.substr(11);
-		// 		// console.log(prd_cd1);
-		// 	}
-		// },
+		{field:"", headerName: "알림",		width:120,
+			cellRenderer: function(params) {
+				if(params.data.checkbox == false && params.data.is_product == 'Y' ) {
+					return "매칭할 수 없는 상품입니다."
+				}
+			},
+			cellStyle: {'color':'red'},
+
+		},
 		{field:"match_yn", headerName: "매칭여부",		width:72, hide:true},
 		{field:"seq",		headerName:"순서차수", hide:true},
 		{field: "", headerName:"", width:"auto"},
