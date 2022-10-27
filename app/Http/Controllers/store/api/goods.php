@@ -809,19 +809,13 @@ class goods extends Controller
         $page = $request->input('page', 1);
         $where = "";
 
-        if($prd_cd != '') $where .= " and p.prd_cd like '%$prd_cd%'";
-        if($goods_nm != '') $where .= " and p.prd_nm like '%$goods_nm%'";
+        if($prd_cd != '') $where .= " and pc.prd_cd like '%$prd_cd%'";
+        if($goods_nm != '') $where .= " and pc.prd_nm like '%$goods_nm%'";
 
         //상품 매칭
-        if($match == 'false'){ 
-        } else {
-            $where .= "and pc.type = 'N'";
-        } 
-        //상품 매칭
-        if($match == 'false') {
-        } else {
-            $where .= "and p.match_yn = 'N'";
-        } 
+        if($match != 'false') $where .= "and pc.type = 'N'";
+        if($match != 'false') $where .= "and p.match_yn = 'N'";
+        
 
         foreach(self::Conds as $key => $value)
         {
@@ -849,18 +843,17 @@ class goods extends Controller
 
         if ($match == 'false') {
             $sql = "
-                select p.prd_cd, p.goods_no, g.goods_nm, p.goods_opt, p.color, p.size
-                from product_code p
-                    inner join goods g on g.goods_no = p.goods_no
+                select pc.prd_cd, pc.goods_no, g.goods_nm, pc.goods_opt, pc.color, pc.size
+                from product_code pc
+                    inner join goods g on g.goods_no = pc.goods_no
                 where 1=1 $where
             ";
-
         } else {
             // 상품매칭
             $sql = "
                 select pc.prd_cd, p.prd_nm, pc.goods_no, pc.goods_opt, pc.color, pc.size, p.match_yn
                 from product_code AS pc
-                    inner join product AS p on pc.prd_cd = p.prd_cd
+                    inner join product p on pc.prd_cd = p.prd_cd
                 where 1=1 $where
             ";
         }

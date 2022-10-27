@@ -157,11 +157,11 @@ class prd02Controller extends Controller
 		$cfg_img_size_real	= "a_500";
 		$cfg_img_size_list	 = "s_50";
 
-		$color_size = substr($prd_cd, 0, 11);
+		// $color_size = substr($prd_cd, 0, 11);
 		
 		
-		$color = substr($color_size, 0, 2);// 컬러
-		$size = substr($color_size, 2, strlen($color_size));//사이즈
+		// $color = substr($color_size, 0, 2);// 컬러
+		// $size = substr($color_size, 2, strlen($color_size));//사이즈
 
 		$query = /** @lang text */
 		"
@@ -368,26 +368,81 @@ class prd02Controller extends Controller
 	public function prd_search_code(Request $request){
 		$prd_cd 	= $request->input('prd_cd');
 		$goods_no 	= $request->input('goods_no2');
+		
+		
+		$query = "
+			select
+				seq,color,size
+			from product_code
+			where prd_cd = '$prd_cd'
+		";
+		$res = DB::selectOne($query);
 
-		$color_size = substr($prd_cd, 11, strlen($prd_cd));
-		$color = substr($color_size, 0, 2);// 컬러
-		$size = substr($color_size, 2, strlen($color_size));//사이즈
+		$color = $res->color;
+		$size = $res->size;
+
+		$seq = $res->seq;
 
 
-	
+		$color_sql = "
+			select * from code where code_kind_cd = 'PRD_CD_COLOR' and code_id = '$color'
+		";
+		$color_val = DB::selectOne($color_sql);
 
-		$sql	= "
-			select prd_cd, prd_nm, '$goods_no' as goods_no, '$color' as color, '$size' as size, style_no, tag_price, price, wonga, com_id, match_yn
+		$size_sql = "
+			select * from code where code_kind_cd = 'PRD_CD_SIZE_MATCH' and code_id = '$size'
+		";
+		$size_val = DB::selectOne($size_sql);
+
+
+		$goods_opt = $color_val->code_val.'^'.$size_val->code_val2;
+
+
+		$sql = "
+			select 
+				distinct(p.prd_cd), g.goods_nm as prd_nm, g.style_no, p.goods_no, p.goods_opt, p.color, p.size, '' as seq, '' as yn
+			from product_code p
+				inner join goods_summary gs on p.goods_no = gs.goods_no
+				inner join goods g on g.goods_no = p.goods_no 
+			where p.goods_no = '$goods_no'
+
+			union all
+
+			select 
+				prd_cd, prd_nm , style_no ,'$goods_no' as goods_no, '$goods_opt' as goods_opt, '$color' as color, '$size' as size, '$seq' as seq, '' as yn
 			from product
 			where prd_cd like '$prd_cd%'
+			order by seq desc
+
 		";
 
+	// 	$sql = "
+	// 	select 
+	// 		distinct(p.prd_cd), g.goods_nm as prd_nm, g.style_no, p.goods_no, p.goods_opt, p.color, p.size, '' as seq, '' as yn
+	// 	from product_code p
+	// 		inner join goods_summary gs on p.goods_no = gs.goods_no
+	// 		inner join goods g on g.goods_no = p.goods_no 
+	// 	where p.goods_no = '$goods_no'
+
+	// 	union all
+
+	// 	select 
+	// 		p.prd_cd, p.prd_nm , p.style_no ,'$goods_no' as goods_no, '$goods_opt' as goods_opt, '$color' as color, '$size' as size, '$seq' as seq, '' as yn
+	// 	from product p 
+	// 		inner join product_code pc on pc.prd_cd = p.prd_cd
+	// 		inner join goods_summary g on g.goods_opt = pc.goods_opt
+	// 	where p.prd_cd like '$prd_cd%'
+	// 	order by seq desc
+
+	// ";
+
 		$result = DB::select($sql);
+
 
 		return response()->json([
 			"code"	=> 200,
 			"head"	=> array(
-				"total"		=> count($result),
+				"total" => count($result),
 			),
 			"body" => $result
 		]);
@@ -487,6 +542,7 @@ class prd02Controller extends Controller
 	public function add_product_product(Request $request){
 		$admin_id	= Auth('head')->user()->id;
         $datas		= $request->input("data", []);
+		$now		= now();
 
         try {
             DB::beginTransaction();
@@ -518,7 +574,7 @@ class prd02Controller extends Controller
 
 				$product_sql = "
 					update product 
-					set match_yn = 'Y'
+					set match_yn = 'Y', ut = 'now()'
 					where prd_cd = '$prd_cd'
 				";
 				
@@ -526,7 +582,7 @@ class prd02Controller extends Controller
 
 				$product_code_sql = "
 					update product_code
-					set goods_no = '$goods_no', goods_opt = '$goods_opt'
+					set goods_no = '$goods_no', goods_opt = '$goods_opt', ut = '$now'
 					where prd_cd = '$prd_cd'
 				";
 				
@@ -534,7 +590,7 @@ class prd02Controller extends Controller
 				
 				$product_stock_sql = "
 					update product_stock 
-					set goods_no = '$goods_no', goods_opt = '$goods_opt'
+					set goods_no = '$goods_no', goods_opt = '$goods_opt', ut = '$now'
 					where prd_cd = '$prd_cd'
 				";
 				

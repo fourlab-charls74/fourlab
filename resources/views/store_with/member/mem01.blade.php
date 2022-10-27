@@ -472,6 +472,7 @@ pApp.BindSearchEnter();
 
 function Search() {
 	let data = $('form[name="search"]').serialize();
+	console.log(data);
 	let user_group_data = "&user_group=" + $("[name='user_group']").val().join(",");
 	gx.Request('/store/member/mem01/search', data+user_group_data, 1);
 };

@@ -227,7 +227,7 @@
 									<div class="card-title">
 										<div class="filter_wrap">
 											<div class="fl_box px-0 mx-0">
-												<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span> 건</h6>
+												<h6 class="m-0 font-weight-bold">총 : <span id="gd-code-total" class="text-primary">0</span> 건</h6>
 											</div>
 											<div class="fr_box">
 											</div>
@@ -255,22 +255,13 @@
             },
 		},
 		{field:"goods_no",	headerName: "상품번호",		width:72},
-		{field:"style_no",	headerName: "아이템코드",	width:72},
+		{field:"style_no",	headerName: "스타일넘버",	width:72},
 		{field:"goods_nm",	headerName: "상품명",		width:250},
 		{field:"goods_opt",	headerName: "상품옵션",		width:200},
-		{field:"prd_cd1",	headerName: "상품코드",		width:120,
-			editable: function(params) {return params.data.match_yn !== 'Y';}, 
-			cellStyle: function(params) {return params.data.match_yn !== 'Y' ? {"background-color": "#ffFF99"} : {};}
-		},
-		{field:"color",		headerName: "컬러",			width:72,
-			editable: function(params) {return params.data.match_yn !== 'Y';}, 
-			cellStyle: function(params) {return params.data.match_yn !== 'Y' ? {"background-color": "#ffFF99"} : {};}
-		},
-		{field:"size",		headerName: "사이즈",		width:72,
-			editable: function(params) {return params.data.match_yn !== 'Y';}, 
-			cellStyle: function(params) {return params.data.match_yn !== 'Y' ? {"background-color": "#ffFF99"} : {};}
-		},
-		{field:"match_yn", headerName: "등록유무",		width:72},
+		{field:"prd_cd1",	headerName: "상품코드",		width:120},
+		{field:"color",		headerName: "컬러",			width:72},
+		{field:"size",		headerName: "사이즈",		width:72},
+		{field:"match_yn", headerName: "매칭여부",		width:72},
 		{field:"brand",		headerName:"브랜드",		hide:true},
 		{field:"year",		headerName:"년도",			hide:true},
 		{field:"season",	headerName:"시즌",			hide:true},
@@ -284,30 +275,42 @@
 	const columns_code = [
 		{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 30, pinned: 'left', sort: null,
             checkboxSelection: function(params) {
-                return params.data.match_yn == 'N';
+				let prd_cd = document.getElementById('prd_cd').value;
+				let color_size = prd_cd.substr(11);
+				let color_size2 = params.data.color + params.data.size;
+
+				
+				if( color_size == color_size2) {
+					return prd_cd == params.data.prd_cd;
+				}else{
+					return ""
+				}
             },
 		},
-		{field:"prd_cd",	headerName: "상품코드",		width:120,
-			editable: function(params) {return params.data.match_yn !== 'Y';}, 
-			cellStyle: function(params) {return params.data.match_yn !== 'Y' ? {"background-color": "#ffFF99"} : {};}
-		},
-		{field:"prd_nm", headerName: "상품명",			width:72},
-		{field:"goods_no",	headerName: "상품번호",		width:72, hide:true},
+		{field:"goods_no",	headerName: "상품번호",		width:72},
 		{field:"style_no", headerName: "스타일넘버",	width:72},
-		{field:"tag_price", headerName: "TAG 가",		width:72},
-		{field:"price", headerName: "판매가",			width:72},
-		{field:"wonga", headerName: "원가",				width:72},
-		{field:"com_id", headerName: "주문업체",		width:72},
-		{field:"match_yn", headerName: "매칭여부",		width:72},
-		{field:"color",		headerName: "컬러",			width:72,
-			editable: function(params) {return params.data.match_yn !== 'Y';}, 
-			cellStyle: function(params) {return params.data.match_yn !== 'Y' ? {"background-color": "#ffFF99"} : {};}
+		{field:"prd_nm", headerName: "상품명",			width:250},
+		{field:"goods_opt",	headerName: "상품옵션",		width:200},
+		{field:"prd_cd",	headerName: "상품코드",		width:120,
+			cellRenderer: function(params){
+				let prd_cd = document.getElementById('prd_cd').value;
+				let prd_cd1 = prd_cd.substr(0,11);
+				return prd_cd1
+			}
 		},
-		{field:"size",		headerName: "사이즈",		width:72,
-			editable: function(params) {return params.data.match_yn !== 'Y';}, 
-			cellStyle: function(params) {return params.data.match_yn !== 'Y' ? {"background-color": "#ffFF99"} : {};}
-		},
+		{field:"color",		headerName: "컬러",			width:72},
+		{field:"size",		headerName: "사이즈",		width:72},
+		// {field:"", headerName: "알림",		width:120,
+		// 	cellRenderer: function(params) {
+		// 		// let prd_cd = document.getElementById('prd_cd').value;
+		// 		// let prd_cd1 = prd_cd.substr(11);
+		// 		// console.log(prd_cd1);
+		// 	}
+		// },
+		{field:"match_yn", headerName: "매칭여부",		width:72, hide:true},
+		{field:"seq",		headerName:"순서차수", hide:true},
 		{field: "", headerName:"", width:"auto"},
+
 	];
 </script>
 <script type="text/javascript" charset="utf-8">

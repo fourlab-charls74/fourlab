@@ -148,6 +148,7 @@ class mem01Controller extends Controller
 		$sex		= Request("sex");
 		$age		= Request("age");
 		$user_group	= Request("user_group");
+		$store_nm 	= Request("store_nm");
 
 		$sdate		= Request("sdate");
 		$edate		= Request("edate");
@@ -207,7 +208,7 @@ class mem01Controller extends Controller
 
 		if($jumin != "")		$where .= " and a.jumin1 = '$jumin' ";
 		if($phone != "")		$where .= " and a.phone = '$phone' ";
-		if($mobile != "")		$where .= " and a.mobile = '$mobile' ";
+		if($mobile != "")		$where .= " and a.mobile like '$mobile%' ";
 		if($sex != "")			$where .= " and a.sex = '$sex'";
 		if($sdate != "")		$where .= " and a.regdate >= '$sdate' ";
 		if($edate != "")		$where .= " and a.regdate < DATE_ADD('$edate', INTERVAL 1 DAY) ";
@@ -215,6 +216,7 @@ class mem01Controller extends Controller
 		if($last_edate != "")	$where .= " and a.lastdate < DATE_ADD('$last_edate', INTERVAL 1 DAY) ";
 		if($ord_sdate != "")	$where .= " and e.ord_date >= '$ord_sdate 00:00:00' ";
 		if($ord_edate != "")	$where .= " and e.ord_date < DATE_ADD('$ord_edate 23:59:59', INTERVAL 1 DAY) ";
+		if($store_nm != "")		$where .= " and a.store_nm = '$store_nm'";
 
 		if($mail != "")			$where .= " and a.email_chk = '$mail' ";
 		if($mobile_chk != "")	$where .= " and a.mobile_chk = '$mobile_chk' ";
