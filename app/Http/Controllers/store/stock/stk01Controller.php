@@ -218,7 +218,7 @@ class stk01Controller extends Controller
 					from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
 				)) as img
 			from product_code p
-				inner join goods g on g.goods_no = p.goods_no
+				left outer join goods g on g.goods_no = p.goods_no
 				left outer join opt o on g.opt_kind_cd = o.opt_kind_cd
 				left outer join brand b on b.brand = g.brand
 			where p.prd_cd = :prd_cd

@@ -1848,6 +1848,7 @@ class Order
 				 */
 				$this->DlvStart(ORD_STATE_DLV_START, $ord_kind);
 				$this->DlvProc(0, ORD_STATE_DLV_PROCESS);
+				$this->DlvEnd($dlv_cd = "", $dlv_no = "", ORD_STATE_DLV_FINISH);
 			}
 		}
 
