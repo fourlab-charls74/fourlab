@@ -197,6 +197,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 상품재고관리
         Route::get('prd04','prd04Controller@index');
         Route::get('prd04/search','prd04Controller@search');
+
+        Route::get('prd04/batch', 'prd04Controller@batch');
+        Route::post('prd04/upload',	'prd04Controller@upload');
+        Route::put('prd04/batch', 'prd04Controller@update');
     });
 
     // 생산입고관리
