@@ -148,16 +148,16 @@ class cs03Controller extends Controller
 				for ($i = 0; $i < count($prd_ord_nos); $i++) {
 					$prd_ord_no = $prd_ord_nos[$i];
 					$prd_cd = $prd_cds[$i];
-					$qty = $qties[$i];
+					$change_qty = $qties[$i];
 
 					/**
 					 * 변경 전 상태 가져오기
 					 */
 					$sql = "
 						select state from product_stock_order_product
-						where prd_cd = :prd_cd
+						where prd_cd = :prd_cd and prd_ord_no = :prd_ord_no
 					";
-					$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+					$row = DB::selectOne($sql, ['prd_cd' => $prd_cd, 'prd_ord_no' => $prd_ord_no]);
 					$prev_state = $row->state;
 
 					/**
@@ -174,9 +174,10 @@ class cs03Controller extends Controller
 							$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
 							if ($row != null) {
-								$in_qty = $row->in_qty + $qty;
-								$qty = $row->qty + $qty;
-								$wqty = $row->wqty + $qty;
+								$in_qty = $row->in_qty + $change_qty;
+								$qty = $row->qty + $change_qty;
+								$wqty = $row->wqty + $change_qty;
+
 								$sql = "
 									update product_stock set in_qty = :in_qty, qty = :qty, wqty = :wqty where prd_cd = :prd_cd
 								";
@@ -190,7 +191,7 @@ class cs03Controller extends Controller
 							$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
 							if ($row != null) {
-								$wqty = $row->wqty + $qty;
+								$wqty = $row->wqty + $change_qty;
 								$sql = "
 									update product_stock_storage set wqty = :wqty where prd_cd = :prd_cd
 								";
@@ -206,7 +207,7 @@ class cs03Controller extends Controller
 								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
 								if ($row != null) {
-									$qty = $row->qty + $qty;
+									$qty = $row->qty + $change_qty;
 									$sql = "
 										update product_stock_storage set qty = :qty where prd_cd = :prd_cd
 									";
@@ -221,9 +222,10 @@ class cs03Controller extends Controller
 								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
 								if ($row != null) {
-									$in_qty = $row->in_qty + $qty;
-									$qty = $row->qty + $qty;
-									$wqty = $row->wqty + $qty;
+									$in_qty = $row->in_qty + $change_qty;
+									$qty = $row->qty + $change_qty;
+									$wqty = $row->wqty + $change_qty;
+									
 									$sql = "
 										update product_stock set in_qty = :in_qty, qty = :qty, wqty = :wqty where prd_cd = :prd_cd
 									";
@@ -237,10 +239,10 @@ class cs03Controller extends Controller
 								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
 								if ($row != null) {
-									$qty = $row->qty + $qty;
-									$wqty = $row->wqty + $qty;
+									$qty = $row->qty + $change_qty;
+									$wqty = $row->wqty + $change_qty;
 									$sql = "
-										update product_stock_storage set qty = :qty where prd_cd = :prd_cd
+										update product_stock_storage set qty = :qty, wqty = :wqty where prd_cd = :prd_cd
 									";
 									DB::update($sql, ['qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
 								}
@@ -254,9 +256,9 @@ class cs03Controller extends Controller
 							$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
 							if ($row != null) {
-								$out_qty = $row->out_qty + $qty;
-								$qty = $row->qty - $qty;
-								$wqty = $row->wqty - $qty;
+								$out_qty = $row->out_qty + $change_qty;
+								$qty = $row->qty - $change_qty;
+								$wqty = $row->wqty - $change_qty;
 								$sql = "
 									update product_stock set out_qty = :out_qty, qty = :qty, wqty = :wqty where prd_cd = :prd_cd
 								";
@@ -270,7 +272,7 @@ class cs03Controller extends Controller
 							$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
 							if ($row != null) {
-								$wqty = $row->wqty - $qty;
+								$wqty = $row->wqty - $change_qty;
 								$sql = "
 									update product_stock_storage set wqty = :wqty where prd_cd = :prd_cd
 								";
@@ -286,7 +288,7 @@ class cs03Controller extends Controller
 								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
 								if ($row != null) {
-									$qty = $row->qty - $qty;
+									$qty = $row->qty - $change_qty;
 									$sql = "
 										update product_stock_storage set qty = :qty where prd_cd = :prd_cd
 									";
@@ -301,9 +303,9 @@ class cs03Controller extends Controller
 								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
 								if ($row != null) {
-									$out_qty = $row->out_qty + $qty;
-									$qty = $row->qty - $qty;
-									$wqty = $row->wqty - $qty;
+									$out_qty = $row->out_qty + $change_qty;
+									$qty = $row->qty - $change_qty;
+									$wqty = $row->wqty - $change_qty;
 									$sql = "
 										update product_stock set out_qty = :out_qty, qty = :qty, wqty = :wqty where prd_cd = :prd_cd
 									";
@@ -317,10 +319,10 @@ class cs03Controller extends Controller
 								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
 								if ($row != null) {
-									$qty = $row->qty - $qty;
-									$wqty = $row->wqty - $qty;
+									$qty = $row->qty - $change_qty;
+									$wqty = $row->wqty - $change_qty;
 									$sql = "
-										update product_stock_storage set qty = :qty where prd_cd = :prd_cd
+										update product_stock_storage set qty = :qty, wqty = :wqty where prd_cd = :prd_cd
 									";
 									DB::update($sql, ['qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
 								}
@@ -344,7 +346,6 @@ class cs03Controller extends Controller
 				$code = 200;
 				DB::commit();
 			} catch (Exception $e) {
-				// dd($e->getMessage());
 				$code = 500;
 				DB::rollback();
 			}
@@ -473,8 +474,7 @@ class cs03Controller extends Controller
 				c7.code_val as color,
 				c8.code_val as size,
 				c9.code_val as unit,
-				ifnull(ps.wqty, 0) as qty_1, 
-				ifnull(pss.qty, 0) as qty_2,
+				ifnull(pss.wqty, 0) as stock_qty,
 				0 as in_qty,
 				ifnull(p.price, 0) as price,
 				ifnull(p.wonga, 0) as wonga,

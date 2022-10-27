@@ -478,7 +478,7 @@
                 Search();
             } else if (res.data.code == -1) {
                 const prd_cd = res.data.prd_cd;
-                alert(`상품 코드 - ${prd_cd}\n입력하신 수량이 창고수량보다 크지 않아야만 접수처리가 가능합니다.`);
+                alert(`상품 코드 - ${prd_cd}\n창고재고가 입력하신 수량보다 적은 경우 접수처리가 불가능합니다.\n창고재고를 다시 확인해주세요.`);
             } else {
                 // console.log(res.data);
                 alert("접수처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
