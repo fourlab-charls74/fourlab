@@ -260,7 +260,7 @@
             field: "wqty", headerName: "창고재고", width:70, type: 'numberType', cellStyle: {"line-height": "30px"},
             cellRenderer: function(params) {
                 if (params.value !== undefined) {
-                    return '<a href="#" onclick="return openHeadStock(' + params.data.goods_no + ',\'\');">' + params.value + '</a>';
+                    return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
                 }
             }
         },
@@ -268,7 +268,7 @@
             field: "wqty", headerName: "매장재고", width:70, type: 'numberType', cellStyle: {"line-height": "30px"},
             cellRenderer: function(params) {
                 if (params.value !== undefined) {
-                    return '<a href="#" onclick="return openHeadStock(' + params.data.goods_no + ',\'\');">' + params.value + '</a>';
+                    return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
                 }
             }
         },

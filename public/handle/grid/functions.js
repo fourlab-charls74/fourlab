@@ -35,6 +35,10 @@ function openHeadStock(goods_no,goods_opt){
     var url = '/head/stock/stk01/' + goods_no + '/' + goods_opt;
     var stock = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
 }
+function openStoreStock(prd_cd){
+    var url = '/store/stock/stk01/' + prd_cd;
+    var stock = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=900,height=768");
+}
 
 function openSmsSend(phone='', name='') {
     var url = '/head/api/sms/send?phone=' + phone + '&name=' + name;
