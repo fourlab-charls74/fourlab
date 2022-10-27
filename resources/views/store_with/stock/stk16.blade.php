@@ -24,35 +24,42 @@
 			</div>
 
 			<div class="card-body">
-                <input type='hidden' name='goods_nos' value='' />
 				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
                             <div class="form-group">
-                                <label>출고일자</label>
-                                <div class="form-inline date-select-inbox">
-                                    <div class="docs-datepicker form-inline-inner input_box">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
-                                            <div class="input-group-append">
-                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="docs-datepicker-container"></div>
+                                <label>일자검색</label>
+                                <div class="d-flex">
+                                    <div class="flex_box w-25 mr-2">
+                                        <select name='date_type' class="form-control form-control-sm">
+                                            <option value='req_rt' selected>요청일자</option>
+                                            <option value='dlv_day'>출고일자</option>
+                                        </select>
                                     </div>
-                                    <span class="text_line">~</span>
-                                    <div class="docs-datepicker form-inline-inner input_box">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
-                                            <div class="input-group-append">
-                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
-                                                </button>
+                                    <div class="form-inline date-select-inbox w-75">
+                                        <div class="docs-datepicker form-inline-inner input_box">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
+                                                <div class="input-group-append">
+                                                    <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
+                                                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
                                             </div>
+                                            <div class="docs-datepicker-container"></div>
                                         </div>
-                                        <div class="docs-datepicker-container"></div>
+                                        <span class="text_line">~</span>
+                                        <div class="docs-datepicker form-inline-inner input_box">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
+                                                <div class="input-group-append">
+                                                    <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+                                                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="docs-datepicker-container"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -65,7 +72,9 @@
                                 <select name='rel_type' class="form-control form-control-sm" style="width: 47%;">
                                     <option value=''>전체</option>
                                     @foreach ($rel_types as $rel_type)
+                                        @if ($rel_type->code_id == "R" || $rel_type->code_id == "G")
                                         <option value='{{ $rel_type->code_id }}'>{{ $rel_type->code_val }}</option>
+                                        @endif
                                     @endforeach
                                 </select>
                                 <span class="text_line" style="width: 6%; text-align: center;">/</span>
@@ -134,25 +143,23 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="goods_nm">상품명</label>
-                            <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value=''>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <div class="row search-area-ext d-none">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="item">품목</label>
+                            <label for="prd_nm">원부자재명</label>
                             <div class="flax_box">
-                                <select name="item" class="form-control form-control-sm">
-                                    <option value="">전체</option>
-                                    @foreach ($items as $item)
-                                        <option value="{{ $item->cd }}">{{ $item->val }}</option>
+                                <input type='text' class="form-control form-control-sm search-enter" name='prd_nm' id="prd_nm" value=''>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="type">구분</label>
+                            <div class="flax_box">
+                                <select name='type' class="form-control form-control-sm">
+                                    <option value=''>전체</option>
+                                    @foreach ($types as $type)
+                                    <option value='{{ $type->code_id }}'>{{ $type->code_id }} : {{ $type->code_val }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -160,37 +167,19 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="brand_cd">브랜드</label>
-                            <div class="form-inline inline_btn_box">
-                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="goods_nm_eng">상품명(영문)</label>
+                            <label for="opt">품목</label>
                             <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
+                                <select name='opt' class="form-control form-control-sm">
+                                    <option value=''>전체</option>
+                                    @foreach ($opts as $opt)
+                                    <option value='{{ $opt->code_id }}'>{{ $opt->code_id }} : {{ $opt->code_val }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="row search-area-ext d-none">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="name">공급업체</label>
-                            <div class="form-inline inline_select_box">
-                                <div class="form-inline-inner input-box w-100">
-                                    <div class="form-inline inline_btn_box">
-                                        <input type="hidden" id="com_cd" name="com_cd" />
-                                        <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="">자료수/정렬</label>
@@ -207,8 +196,9 @@
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
                                         <option value="req_rt">출고요청일</option>
-                                        <option value="goods_no">상품번호</option>
-                                        <option value="prd_cd">상품코드</option>
+                                        <option value="p.prd_cd">상품코드</option>
+                                        <option value="p.price">판매가</option>
+                                        <option value="p.wonga">원가</option>
                                     </select>
                                 </div>
                                 <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -335,7 +325,7 @@
         {
             field: "opt",
             headerName: "품목",
-            width: 80,
+            width: 70,
             cellStyle: DEFAULT
         },
         {field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: DEFAULT, surl:"{{config('shop.front_url')}}"},
@@ -347,17 +337,24 @@
                 }
             }
         },
+        {field: "prd_nm", headerName: "원부자재명", width: 120},
         {
             field: "color",
             headerName: "칼라",
             cellStyle: DEFAULT,
-            width: 80
+            width: 100
         },
         {
             field: "size",
             headerName: "사이즈",
             cellStyle: DEFAULT,
             width: 80
+        },
+        {
+            field: "unit",
+            headerName: "단위",
+            cellStyle: DEFAULT,
+            width: 120
         },
         {
             field: "price",
@@ -373,17 +370,12 @@
             cellStyle: DEFAULT,
             width: 80
         },
-        {
-            field: "unit",
-            headerName: "단위",
-            cellStyle: DEFAULT,
-            width: 120
-        },
-		{field: "prd_nm",	headerName: "원부자재명", width: 350},
 		{field: "qty", headerName: "수량", type: "numberType",
             editable: function(params) {return params.data.state === 10;}, 
             cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};},
         },
+        {field: "origin_qty", headerName: "수량", type: "numberType", hide: true},
+        {field: "amount", headerName: "합계", type: 'currencyType', width: 80, valueGetter: (params) => calAmount(params)},
 		{field: "exp_dlv_day", headerName: "출고예정일자", cellStyle: {"text-align": "center"},
             // cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99", "text-align": "center"} : {"text-align": "center"};},
             // cellRenderer: (params) => {
@@ -401,7 +393,7 @@
             // },
             cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {
-                return params.data.state === 10 ? params.value : params.data.dlv_day?.replaceAll("-", "") || '' + (params.value || '');
+                return params.data.state === 10 ? params.value : params.data.dlv_day?.replaceAll("-", "") + (params.value) || '' + (params.value || '');
             }
         },
         {field: "req_id", headerName: "요청자", cellStyle: {"text-align": "center"}},
@@ -416,9 +408,12 @@
             editable: function(params) {return params.data.state === 10;}, 
             cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};}
         },
+        {width: 'auto'}
 	];
 </script>
+
 <script type="text/javascript" charset="utf-8">
+
     let gx;
     const pApp = new App('', { gridId: "#div-gd" });
 
@@ -451,13 +446,24 @@
         node.setDataValue(fieldName, e.value);
     }
 
+    function EditProduct(product_code) {
+        var url = '/store/product/prd03/edit/' + product_code;
+        var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1100,height=555");
+    }
+
+    const calAmount = (params) => {
+        const row = params.data;
+        const result = parseInt(row.price) * parseInt(row.qty);
+        return isNaN(result) ? 0 : result;
+    };
+
     // 접수 (10 -> 20)
     function receipt() {
         let rows = gx.getSelectedRows();
-        if(rows.length < 1) return alert("접수처리할 항목을 선택해주세요.");
-        if(rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 접수처리 가능합니다.");
-        if(!confirm("선택한 항목을 접수처리하시겠습니까?")) return;
-
+        if (rows.length < 1) return alert("접수처리할 항목을 선택해주세요.");
+        if (rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 접수처리 가능합니다.");
+        if (rows.filter(r => r.qty > r.origin_qty).length > 0) return alert("");
+        if (!confirm("선택한 항목을 접수처리하시겠습니까?")) return;
         axios({
             url: '/store/stock/stk16/receipt',
             method: 'post',
@@ -467,89 +473,90 @@
                 rel_order: $("[name=exp_rel_order]").val(),
             },
         }).then(function (res) {
-            if(res.data.code === 200) {
-                alert(res.data.msg);
+            if (res.data.code === 200) {
+                alert("접수처리가 정상적으로 완료되었습니다.");
                 Search();
+            } else if (res.data.code == -1) {
+                const prd_cd = res.data.prd_cd;
+                alert(`상품 코드 - ${prd_cd}\n입력하신 수량이 창고수량보다 크지 않아야만 접수처리가 가능합니다.`);
             } else {
-                console.log(res.data);
+                // console.log(res.data);
                 alert("접수처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
             }
         }).catch(function (err) {
-            console.log(err);
+            // console.log(err);
         });
     }
 
     // 출고 (20 -> 30)
     function release() {
         let rows = gx.getSelectedRows();
-        if(rows.length < 1) return alert("출고처리할 항목을 선택해주세요.");
-        if(rows.filter(r => r.state !== 20).length > 0) return alert("'접수'상태의 항목만 출고처리 가능합니다.");
-        if(!confirm("선택한 항목을 출고처리하시겠습니까?")) return;
-
+        if (rows.length < 1) return alert("출고처리할 항목을 선택해주세요.");
+        if (rows.filter(r => r.state !== 20).length > 0) return alert("'접수'상태의 항목만 출고처리 가능합니다.");
+        if (!confirm("선택한 항목을 출고처리하시겠습니까?")) return;
         axios({
             url: '/store/stock/stk16/release',
             method: 'post',
             data: {data: rows},
         }).then(function (res) {
-            if(res.data.code === 200) {
-                alert(res.data.msg);
+            if (res.data.code === 200) {
+                alert("출고처리가 정상적으로 완료되었습니다.");
                 Search();
             } else {
-                console.log(res.data);
+                // console.log(res.data);
                 alert("출고처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
             }
         }).catch(function (err) {
-            console.log(err);
+            // console.log(err);
         });
     }
 
     // 매장입고 (30 -> 40)
     function receive() {
         let rows = gx.getSelectedRows();
-        if(rows.length < 1) return alert("매장입고처리할 항목을 선택해주세요.");
-        if(rows.filter(r => r.state !== 30).length > 0) return alert("'출고'상태의 항목만 매장입고처리 가능합니다.");
-        if(!confirm("선택한 항목을 매장입고처리하시겠습니까?")) return;
-
+        if (rows.length < 1) return alert("매장입고처리할 항목을 선택해주세요.");
+        if (rows.filter(r => r.state !== 30).length > 0) return alert("'출고'상태의 항목만 매장입고처리 가능합니다.");
+        if (!confirm("선택한 항목을 매장입고처리하시겠습니까?")) return;
         axios({
             url: '/store/stock/stk16/receive',
             method: 'post',
             data: {data: rows},
         }).then(function (res) {
-            if(res.data.code === 200) {
-                alert(res.data.msg);
+            if (res.data.code === 200) {
+                alert("매장입고처리가 정상적으로 완료되었습니다.");
                 Search();
             } else {
-                console.log(res.data);
+                // console.log(res.data);
                 alert("매장입고처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
             }
         }).catch(function (err) {
-            console.log(err);
+            // console.log(err);
         });
     }
 
     // 거부 (10 -> -10)
     function reject() {
         let rows = gx.getSelectedRows();
-        if(rows.length < 1) return alert("거부처리할 항목을 선택해주세요.");
-        if(rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 거부처리 가능합니다.");
-        if(rows.filter(r => !r.comment).length > 0) return alert("'메모'에 거부사유를 반드시 입력해주세요.");
-        if(!confirm("선택한 항목을 거부처리하시겠습니까?")) return;
-
+        if (rows.length < 1) return alert("거부처리할 항목을 선택해주세요.");
+        if (rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 거부처리 가능합니다.");
+        if (rows.filter(r => !r.comment).length > 0) return alert("'메모'에 거부사유를 반드시 입력해주세요.");
+        if (!confirm("선택한 항목을 거부처리하시겠습니까?")) return;
         axios({
             url: '/store/stock/stk16/reject',
             method: 'post',
             data: {data: rows},
         }).then(function (res) {
-            if(res.data.code === 200) {
-                alert(res.data.msg);
+            if (res.data.code === 200) {
+                alert("거부처리가 정상적으로 완료되었습니다.");
                 Search();
             } else {
-                console.log(res.data);
+                // console.log(res.data);
                 alert("거부처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
             }
         }).catch(function (err) {
-            console.log(err);
+            // console.log(err);
         });
     }
+
 </script>
 @stop

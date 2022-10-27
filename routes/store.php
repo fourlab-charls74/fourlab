@@ -201,6 +201,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 상품재고관리
         Route::get('prd04','prd04Controller@index');
         Route::get('prd04/search','prd04Controller@search');
+
+        Route::get('prd04/batch', 'prd04Controller@batch');
+        Route::post('prd04/upload',	'prd04Controller@upload');
+        Route::put('prd04/batch', 'prd04Controller@update');
     });
 
     // 생산입고관리
@@ -249,6 +253,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 매장재고
         Route::get('stk01','stk01Controller@index');
         Route::get('stk01/search','stk01Controller@search');
+        Route::get('stk01/{prd_cd?}','stk01Controller@show');
+        Route::get('stk01/search-stock/{cmd?}','stk01Controller@search_command');
 
         Route::get('stk02','stk02Controller@index');
 

@@ -271,6 +271,7 @@ class prd03Controller extends Controller
 
 					DB::table('product_stock')->insert([
 						'prd_cd' => $prd_cd,
+						'qty_wonga'	=> 0,
 						'in_qty' => 0,
 						'out_qty' => 0,
 						'qty' => 0,

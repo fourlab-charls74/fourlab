@@ -12,7 +12,8 @@ use Carbon\Carbon;
 
 class stk01Controller extends Controller
 {
-	public function index() {
+	public function index() 
+	{
 
 		$values = [
 			'code_kinds'	=> [],
@@ -185,5 +186,286 @@ class stk01Controller extends Controller
 			"body" => $rows
 		]);
 
+	}
+
+	/** 재고팝업 */
+	public function show($prd_cd)
+	{
+		$cfg_img_size_real = "a_500";
+		$cfg_img_size_list = "a_500";
+
+		$sql = "
+			select
+				p.prd_cd
+				, p.goods_no
+				, p.goods_opt
+				, p.color
+				, p.size
+				, g.goods_nm
+				, g.goods_nm_eng
+				, g.price
+				, g.wonga
+				, g.goods_sh
+				, g.style_no
+				, g.com_id
+				, g.com_nm
+				, g.opt_kind_cd
+				, o.opt_kind_nm
+				, g.brand
+				, b.brand_nm
+				, if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
+					select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
+					from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
+				)) as img
+			from product_code p
+				inner join goods g on g.goods_no = p.goods_no
+				left outer join opt o on g.opt_kind_cd = o.opt_kind_cd
+				left outer join brand b on b.brand = g.brand
+			where p.prd_cd = :prd_cd
+		";
+		$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+		$storages = DB::table("storage")
+			->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')
+			->where('use_yn', '=', 'Y')
+			->orderByDesc('default_yn')
+			->get();
+
+		$values = [
+			'sdate' => date('Y-m-d'),
+			'edate' => date('Y-m-d'),
+			'store_types' => SLib::getCodes("STORE_TYPE"), // 매장구분
+			'storages' => $storages, // 창고리스트
+			'prd' => $row,
+		];
+		return view(Config::get('shop.store.view') . '/stock/stk01_show', $values);
+	}
+
+	/** 재고팝업 현황조회 */
+	public function search_command(Request $request, $cmd)
+	{
+		switch ($cmd) {
+			case 'storage':
+				$response = $this->search_stock_storage($request);
+				break;
+			case 'store':
+				$response = $this->search_stock_store($request);
+				break;
+			case 'store-detail':
+				$response = $this->search_stock_store_detail($request);
+				break;
+            default:
+                $message = 'Command not found';
+                $response = response()->json(['code' => 0, 'msg' => $message], 404);
+		};
+		return $response;
+	}
+
+	public function search_stock_storage(Request $request)
+	{
+		$prd_cd = $request->input('prd_cd', '');
+		$sdate = $request->input('sdate', date('Y-m-d'));
+		$edate = $request->input('edate', date('Y-m-d'));
+
+		$sql = "
+			select p.prd_cd, s.storage_cd, s.storage_nm, ifnull(p.qty, 0) as qty, ifnull(p.wqty, 0) as wqty
+			from storage s
+				left outer join product_stock_storage p on p.storage_cd = s.storage_cd and p.prd_cd = :prd_cd
+			where s.use_yn = 'Y'
+		";
+		$rows = DB::select($sql, ['prd_cd' => $prd_cd]);
+
+		$sql = "
+			select ifnull(sum(qty), 0) as qty, ifnull(sum(wqty), 0) as wqty
+			from product_stock_storage
+			where prd_cd = :prd_cd
+		";
+		$total = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+		return response()->json([
+			'code' => 200,
+			'total' => $total,
+			'data' => $rows,
+		]);
+	}
+
+	public function search_stock_store(Request $request)
+	{
+		$prd_cd = $request->input('prd_cd', '');
+		$sdate = $request->input('sdate', date('Y-m-d'));
+		$edate = $request->input('edate', date('Y-m-d'));
+		$store_type = $request->input('store_type', '');
+		$store_cds = $request->input('store_no', []);
+
+		$rows = [];
+		if ($store_type != '' || $store_cds != '') {
+			$where = "";
+			if ($store_type != '') $where .= " and s.store_type = '$store_type' ";
+
+			$store_where = "";
+			foreach($store_cds as $key => $cd) {
+				if ($key === 0) {
+					$store_where .= "s.store_cd = '$cd'";
+				} else {
+					$store_where .= " or s.store_cd = '$cd'";
+				}
+			}
+			if (count($store_cds) < 1) {
+				$store_where = "1=1";
+			}
+			
+			$sql = "
+				select p.prd_cd, s.store_cd, s.store_nm, ifnull(p.qty, 0) as qty, ifnull(p.wqty, 0) as wqty
+				from store s
+					left outer join product_stock_store p on p.store_cd = s.store_cd and p.prd_cd = :prd_cd
+				where ($store_where) $where
+				order by p.wqty desc
+			";
+			$rows = DB::select($sql, ['prd_cd' => $prd_cd]);
+		}
+
+		$sql = "
+			select ifnull(sum(qty), 0) as qty, ifnull(sum(wqty), 0) as wqty
+			from product_stock_store
+			where prd_cd = :prd_cd
+		";
+		$total = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+		return response()->json([
+			'code' => 200,
+			'total' => $total,
+			'data' => $rows,
+		]);
+	}
+
+	public function search_stock_store_detail(Request $request)
+	{
+		$prd_cd = $request->input('prd_cd', '');
+		$sdate = $request->input('sdate', date('Y-m-d'));
+		$edate = $request->input('edate', date('Y-m-d'));
+		$next_edate = date("Y-m-d", strtotime("+1 day", strtotime($edate)));
+		$store_type = $request->input('store_type', '');
+		$store_cds = $request->input('store_no', []);
+		
+		$rows = [];
+		if ($prd_cd != '') {
+			$where = " and p.prd_cd = '$prd_cd' ";
+			if ($store_type) $where .= " and store.store_type = '$store_type' ";
+
+			// store_where
+			$store_where = "";
+			foreach($store_cds as $key => $cd) {
+				if ($key === 0) {
+					$store_where .= "p.store_cd = '$cd'";
+				} else {
+					$store_where .= " or p.store_cd = '$cd'";
+				}
+			}
+			if (count($store_cds) < 1) {
+				$store_where = "1=1";
+			}
+
+			$sql = "
+				select 
+					p.store_cd, 
+					store.store_nm,
+					p.prd_cd, 
+					(p.wqty - sum(ifnull(_next.qty, 0)) - sum(ifnull(hst.qty, 0))) as prev_qty,
+					sum(ifnull(store_in.qty, 0)) as store_in_qty,
+					sum(ifnull(store_return.qty, 0)) * -1 as store_return_qty,
+					sum(ifnull(rt_in.qty, 0)) as rt_in_qty,
+					sum(ifnull(rt_out.qty, 0)) * -1 as rt_out_qty,
+					sum(ifnull(sale.qty, 0)) * -1 as sale_qty,
+					sum(ifnull(loss.qty, 0)) * -1 as loss_qty,
+					p.wqty - sum(ifnull(_next.qty, 0)) as term_qty,
+					p.qty as qty,
+					p.wqty as wqty
+				from product_stock_store p
+					inner join product_code pc on pc.prd_cd = p.prd_cd
+					inner join store on store.store_cd = p.store_cd
+					left outer join (
+						select idx, prd_cd, location_cd, type, qty, stock_state_date
+						from product_stock_hst
+						where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$sdate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= '$edate 23:59:59'
+					) hst on hst.location_cd = p.store_cd and hst.prd_cd = p.prd_cd
+					left outer join product_stock_hst store_in on store_in.idx = hst.idx and store_in.type = '1'
+					left outer join product_stock_hst store_return on store_return.idx = hst.idx and store_return.type = '11'
+					left outer join product_stock_hst rt_in on rt_in.idx = hst.idx and rt_in.type = '15' and rt_in.qty > 0
+					left outer join product_stock_hst rt_out on rt_out.idx = hst.idx and rt_out.type = '15' and rt_out.qty < 0
+					left outer join product_stock_hst sale on sale.idx = hst.idx and (sale.type = '2' or sale.type = '5' or sale.type = '6') -- 주문&교환&환불
+					left outer join product_stock_hst loss on loss.idx = hst.idx and loss.type = '14'
+					left outer join (
+						select idx, prd_cd, location_cd, type, qty, stock_state_date
+						from product_stock_hst
+						where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+					) _next on _next.location_cd = p.store_cd and _next.prd_cd = p.prd_cd
+				where ($store_where) $where
+				group by p.store_cd, p.prd_cd
+				order by p.store_cd
+			";
+			$rows = DB::select($sql);
+
+			$sql = "
+				select
+					sum(prev_qty) as prev_qty,
+					sum(store_in_qty) as store_in_qty,
+					sum(store_return_qty) as store_return_qty,
+					sum(rt_in_qty) as rt_in_qty,
+					sum(rt_out_qty) as rt_out_qty,
+					sum(sale_qty) as sale_qty,
+					sum(loss_qty) as loss_qty,
+					sum(term_qty) as term_qty
+				from (
+					select 
+						p.store_cd, 
+						store.store_nm,
+						p.prd_cd, 
+						(p.wqty - sum(ifnull(_next.qty, 0)) - sum(ifnull(hst.qty, 0))) as prev_qty,
+						sum(ifnull(store_in.qty, 0)) as store_in_qty,
+						sum(ifnull(store_return.qty, 0)) * -1 as store_return_qty,
+						sum(ifnull(rt_in.qty, 0)) as rt_in_qty,
+						sum(ifnull(rt_out.qty, 0)) * -1 as rt_out_qty,
+						sum(ifnull(sale.qty, 0)) * -1 as sale_qty,
+						sum(ifnull(loss.qty, 0)) * -1 as loss_qty,
+						p.wqty - sum(ifnull(_next.qty, 0)) as term_qty,
+						p.wqty as current_qty
+					from product_stock_store p
+						inner join product_code pc on pc.prd_cd = p.prd_cd
+						inner join store on store.store_cd = p.store_cd
+						left outer join (
+							select idx, prd_cd, location_cd, type, qty, stock_state_date
+							from product_stock_hst
+							where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$sdate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= '$edate 23:59:59'
+						) hst on hst.location_cd = p.store_cd and hst.prd_cd = p.prd_cd
+						left outer join product_stock_hst store_in on store_in.idx = hst.idx and store_in.type = '1'
+						left outer join product_stock_hst store_return on store_return.idx = hst.idx and store_return.type = '11'
+						left outer join product_stock_hst rt_in on rt_in.idx = hst.idx and rt_in.type = '15' and rt_in.qty > 0
+						left outer join product_stock_hst rt_out on rt_out.idx = hst.idx and rt_out.type = '15' and rt_out.qty < 0
+						left outer join product_stock_hst sale on sale.idx = hst.idx and (sale.type = '2' or sale.type = '5' or sale.type = '6') -- 주문&교환&환불
+						left outer join product_stock_hst loss on loss.idx = hst.idx and loss.type = '14'
+						left outer join (
+							select idx, prd_cd, location_cd, type, qty, stock_state_date
+							from product_stock_hst
+							where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+						) _next on _next.location_cd = p.store_cd and _next.prd_cd = p.prd_cd
+					where ($store_where) $where
+					group by p.store_cd, p.prd_cd
+					order by p.store_cd
+				) c
+			";
+			$total_data = DB::selectOne($sql);
+		}
+
+		return response()->json([
+			'code' => 200,
+			'head' => [
+				'total' => count($rows),
+				'page' => 1,
+				'page_cnt' => 1,
+				'page_total' => 1,
+                'total_data' => $total_data
+			],
+			'body' => $rows,
+		]);
 	}
 }
