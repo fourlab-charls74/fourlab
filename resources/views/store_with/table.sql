@@ -87,6 +87,7 @@ CREATE TABLE `product_stock_order_product` (
 CREATE TABLE `product_stock` (
     `goods_no` INT(11) NOT NULL DEFAULT '0' COMMENT '상품번호',
     `prd_cd` VARCHAR(50) NOT NULL DEFAULT '0' COMMENT '상품코드',
+    `qty_wonga` bigint(11) default not null comment '총원가',
     `in_qty` INT(11) DEFAULT NULL COMMENT '입고수량',
     `out_qty` INT(11) DEFAULT NULL COMMENT '출고수량',
     `qty` INT(11) DEFAULT NULL COMMENT '보유재고',

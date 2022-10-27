@@ -1583,6 +1583,7 @@ class Order
 					DB::table('product_stock')
 						->where('prd_cd', '=', $prd_cd)
 						->update([
+							'qty_wonga'	=> DB::raw('qty_wonga - ' . ($ord_qty * $wonga)),
 							'out_qty' => DB::raw('out_qty + ' . $ord_qty),
 							'qty' => DB::raw('qty - ' . $ord_qty),
 							'ut' => now(),
@@ -1598,6 +1599,7 @@ class Order
 					DB::table('product_stock')
 						->where('prd_cd', '=', $prd_cd)
 						->update([
+							'qty_wonga'	=> DB::raw('qty_wonga - ' . ($ord_qty * $wonga)),
 							'out_qty' => DB::raw('out_qty + ' . $ord_qty),
 							'qty' => DB::raw('qty - ' . $ord_qty),
 							'wqty' => DB::raw('wqty - ' . $ord_qty),
@@ -1707,6 +1709,7 @@ class Order
 					DB::table('product_stock')
 						->where('prd_cd', '=', $prd_cd)
 						->update([
+							'qty_wonga'	=> DB::raw('qty_wonga - ' . ($ord_qty * $wonga)),
 							'out_qty' => DB::raw('out_qty + ' . $ord_qty),
 							'qty' => DB::raw('qty - ' . $ord_qty),
 							'ut' => now(),
@@ -1723,6 +1726,7 @@ class Order
 					DB::table('product_stock')
 						->where('prd_cd', '=', $prd_cd)
 						->update([
+							'qty_wonga'	=> DB::raw('qty_wonga - ' . ($ord_qty * $wonga)),
 							'out_qty' => DB::raw('out_qty + ' . $ord_qty),
 							'qty' => DB::raw('qty - ' . $ord_qty),
 							'wqty' => DB::raw('wqty - ' . $ord_qty),
@@ -1866,10 +1870,11 @@ class Order
                 "
                 select 
                     a.ord_no, a.ord_state, a.out_ord_no, a.sale_place, a.user_id
-                    , b.ord_opt_no, b.prd_cd, b.goods_no, b.goods_sub, b.goods_opt, b.qty, c.pay_point, a.store_cd
+                    , b.ord_opt_no, b.prd_cd, b.goods_no, b.goods_sub, b.goods_opt, b.qty, c.pay_point, a.store_cd, ifnull(g.wonga, 0) as wonga
                 from order_mst a
+					inner join payment c on a.ord_no = c.ord_no
                     inner join order_opt b on a.ord_no = b.ord_no
-                    inner join payment c on a.ord_no = c.ord_no
+					inner join goods g on g.goods_no = b.goods_no
                 where a.ord_no = :ord_no
             ";
             $rows = DB::select($sql, array("ord_no" => $ord_no));
@@ -1885,6 +1890,7 @@ class Order
                 $goods_no = $row->goods_no;
                 $goods_sub = $row->goods_sub;
                 $goods_opt = $row->goods_opt;
+				$wonga = $row->wonga;
                 $ord_qty = $row->qty;
                 $pay_point = $row->pay_point;
 				$store_cd = $row->store_cd;
@@ -1902,6 +1908,7 @@ class Order
 						DB::table('product_stock')
 							->where('prd_cd', '=', $prd_cd)
 							->update([
+								'qty_wonga'	=> DB::raw('qty_wonga + ' . ($ord_qty * $wonga)),
 								'out_qty' => DB::raw('out_qty - ' . $ord_qty),
 								'qty' => DB::raw('qty + ' . $ord_qty),
 								'ut' => now(),
@@ -1917,6 +1924,7 @@ class Order
 						DB::table('product_stock')
 							->where('prd_cd', '=', $prd_cd)
 							->update([
+								'qty_wonga'	=> DB::raw('qty_wonga + ' . ($ord_qty * $wonga)),
 								'out_qty' => DB::raw('out_qty - ' . $ord_qty),
 								'qty' => DB::raw('qty + ' . $ord_qty),
 								'wqty' => DB::raw('wqty + ' . $ord_qty),

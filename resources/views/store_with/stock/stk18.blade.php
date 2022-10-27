@@ -64,7 +64,7 @@
                         <div class="form-group">
                             <label for="prd_nm">원부자재명</label>
                             <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='prd_nm' id="prd_nm" value=''>
+                                <input type='text' class="form-control form-control-sm search-enter" name='prd_nm' id="prd_nm" value=''>
                             </div>
                         </div>
                     </div>
@@ -73,7 +73,7 @@
                             <label for="type">구분</label>
                             <div class="flax_box">
                                 <select name='type' class="form-control form-control-sm">
-                                    <option value=''>선택</option>
+                                    <option value=''>전체</option>
                                     @foreach ($types as $type)
                                     <option value='{{ $type->code_id }}'>{{ $type->code_id }} : {{ $type->code_val }}</option>
                                     @endforeach
@@ -88,7 +88,7 @@
                             <label for="opt">품목</label>
                             <div class="flax_box">
                                 <select name='opt' class="form-control form-control-sm">
-                                    <option value=''>선택</option>
+                                    <option value=''>전체</option>
                                     @foreach ($opts as $opt)
                                     <option value='{{ $opt->code_id }}'>{{ $opt->code_id }} : {{ $opt->code_val }}</option>
                                     @endforeach
@@ -237,15 +237,14 @@
             field: "color",
             headerName: "칼라",
             cellStyle: DEFAULT,
-            width: 80
+            width: 100
         },
         {
             field: "size",
             headerName: "사이즈",
             cellStyle: DEFAULT,
-            width: 80
+            width: 90
         },
-        
         {
             field: "unit",
             headerName: "단위",

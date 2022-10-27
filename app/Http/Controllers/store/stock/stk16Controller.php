@@ -27,126 +27,102 @@ class stk16Controller extends Controller
     ];
 
     public function index()
-	{
-		$values = [
-            'sdate'         => now()->sub(1, 'week')->format('Y-m-d'),
-            'edate'         => date("Y-m-d"),
-            'rel_orders'     => SLib::getCodes("REL_ORDER"), // 출고차수
-            'rel_types'     => SLib::getCodes("REL_TYPE"), // 출고구분
-            'rel_states'    => $this->rel_states, // 출고상태
-            'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
-            'items'			=> SLib::getItems(), // 품목
-            'types' => SLib::getCodes("PRD_MATERIAL_TYPE") // 원부자재 구분
-		];
+    {
+        $values = [
+            'sdate' => now()->sub(1, 'week')->format('Y-m-d'),
+            'edate' => date("Y-m-d"),
+            'rel_orders' => SLib::getCodes("REL_ORDER"), // 출고차수
+            'rel_types' => SLib::getCodes("REL_TYPE"), // 출고구분
+            'rel_states' => $this->rel_states, // 출고상태
+            'store_types' => SLib::getCodes("STORE_TYPE"), // 매장구분
+            'types' => SLib::getCodes("PRD_MATERIAL_TYPE"), // 원부자재 구분
+            'opts' => SLib::getCodes("PRD_MATERIAL_OPT") // 원부자재 품목
+        ];
 
         return view(Config::get('shop.store.view') . '/stock/stk16', $values);
-	}
+    }
 
     public function search(Request $request)
     {
-        $r = $request->all();
+        $req = $request->all();
 
-		$code = 200;
-		$where = "";
+        $code = 200;
+        $where = "";
         $orderby = "";
-        
+
         // where
-        $sdate = str_replace("-", "", $r['sdate'] ?? now()->sub(1, 'week')->format('Ymd'));
-        $edate = str_replace("-", "", $r['edate'] ?? date("Ymd"));
-        $where .= "
-            and cast(if(psr.state > 20, psr.prc_rt, if(psr.state > 10, psr.exp_dlv_day, psr.req_rt)) as date) >= '$sdate' 
-            and cast(if(psr.state > 20, psr.prc_rt, if(psr.state > 10, psr.exp_dlv_day, psr.req_rt)) as date) <= '$edate'
-        ";
-		if($r['rel_order'] != null)
-			$where .= " and psr.rel_order = '" . $r['rel_order'] . "'";
-		if($r['rel_type'] != null) 
-			$where .= " and psr.type = '" . $r['rel_type'] . "'";
-		if($r['state'] != null) 
-			$where .= " and psr.state = '" . $r['state'] . "'";
-        if($r['ext_done_state'] ?? '' != '')
+        $sdate = str_replace("-", "", Lib::quote($req['sdate']) ?? now()->sub(1, 'week')->format('Ymd'));
+        $edate = str_replace("-", "", Lib::quote($req['edate']) ?? date("Ymd"));
+
+        if ($req['date_type'] != "") {
+            if ($req['date_type'] == "req_rt") {
+                $where .= " 
+                    and cast(psr.req_rt as date) >= '$sdate'
+                    and cast(psr.req_rt as date) <= '$edate'
+                ";
+            } else if ($req['date_type'] == "dlv_day") {
+                $where .= " 
+                    and cast(psr.exp_dlv_day as date) >= '$sdate'
+                    and cast(psr.exp_dlv_day as date) <= '$edate'
+                ";
+            }
+        }
+
+        if ($req['type'] != "") $where .= " and pc.brand = '" . Lib::quote($req['type']) . "'";
+        if ($req['opt'] != "") $where .= " and pc.opt = '" . Lib::quote($req['opt']) . "'";
+        if ($req['prd_nm'] != "") $where .= " and p.prd_nm like '%" . Lib::quote($req['prd_nm']) . "%' ";
+
+        if ($req['rel_order'] != null)
+            $where .= " and psr.rel_order = '" . Lib::quote($req['rel_order']) . "'";
+        if ($req['rel_type'] != null)
+            $where .= " and psr.type = '" . Lib::quote($req['rel_type']) . "'";
+        if ($req['state'] != null)
+            $where .= " and psr.state = '" . Lib::quote($req['state']) . "'";
+        if ($req['ext_done_state'] ?? '' != '')
             $where .= " and psr.state != '40'";
-		if($r['store_type'] != null) 
-			$where .= " and s.store_type = '" . $r['store_type'] . "'";
-		if(isset($r['store_no'])) 
-			$where .= " and s.store_cd = '" . $r['store_no'] . "'";
-		if($r['prd_cd'] != null) {
-            $prd_cd = explode(',', $r['prd_cd']);
-			$where .= " and (1!=1";
-			foreach($prd_cd as $cd) {
-				$where .= " or psr.prd_cd = '" . Lib::quote($cd) . "' ";
-			}
-			$where .= ")";
-        }
-        if(isset($r['goods_stat'])) {
-            $goods_stat = $r['goods_stat'];
-            if(is_array($goods_stat)) {
-                if (count($goods_stat) == 1 && $goods_stat[0] != "") {
-                    $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat[0]) . "' ";
-                } else if (count($goods_stat) > 1) {
-                    $where .= " and g.sale_stat_cl in (" . join(",", $goods_stat) . ") ";
-                }
-            } else if($goods_stat != ""){
-                $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
+        if ($req['store_type'] != null)
+            $where .= " and s.store_type = '" . Lib::quote($req['store_type']) . "'";
+        if (isset($req['store_no']))
+            $where .= " and s.store_cd = '" . Lib::quote($req['store_no']) . "'";
+        if ($req['prd_cd'] != null) {
+            $prd_cd = explode(',', $req['prd_cd']);
+            $where .= " and (1!=1";
+            foreach ($prd_cd as $cd) {
+                $where .= " or psr.prd_cd = '" . Lib::quote($cd) . "' ";
             }
+            $where .= ")";
         }
-        if($r['style_no'] != null) 
-            $where .= " and g.style_no = '" . $r['style_no'] . "'";
-
-        $goods_no = $r['goods_no'];
-        $goods_nos = $request->input('goods_nos', '');
-        if($goods_nos != '') $goods_no = $goods_nos;
-        $goods_no = preg_replace("/\s/",",",$goods_no);
-        $goods_no = preg_replace("/\t/",",",$goods_no);
-        $goods_no = preg_replace("/\n/",",",$goods_no);
-        $goods_no = preg_replace("/,,/",",",$goods_no);
-
-        if($goods_no != ""){
-            $goods_nos = explode(",", $goods_no);
-            if(count($goods_nos) > 1) {
-                if(count($goods_nos) > 500) array_splice($goods_nos, 500);
-                $in_goods_nos = join(",", $goods_nos);
-                $where .= " and g.goods_no in ( $in_goods_nos ) ";
-            } else {
-                if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
-            }
-        }
-
-        if($r['com_cd'] != null) 
-            $where .= " and g.com_id = '" . $r['com_cd'] . "'";
-        if($r['item'] != null) 
-            $where .= " and g.opt_kind_cd = '" . $r['item'] . "'";
-        if(isset($r['brand_cd']))
-            $where .= " and g.brand = '" . $r['brand_cd'] . "'";
-        if($r['goods_nm'] != null) 
-            $where .= " and g.goods_nm like '%" . $r['goods_nm'] . "%'";
-        if($r['goods_nm_eng'] != null) 
-            $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
 
         // ordreby
-        $ord = $r['ord'] ?? 'desc';
-        $ord_field = $r['ord_field'] ?? "psr.req_rt";
-        if($ord_field == 'goods_no') $ord_field = 'g.' . $ord_field;
-        else $ord_field = 'psr.' . $ord_field;
+        $ord = $req['ord'] ?? 'desc';
+        $ord_field = $req['ord_field'] ?? "psr.req_rt";
         $orderby = sprintf("order by %s %s", $ord_field, $ord);
 
         // pagination
-        $page = $r['page'] ?? 1;
+        $page = $req['page'] ?? 1;
         if ($page < 1 or $page == "") $page = 1;
-        $page_size = $r['limit'] ?? 100;
+        $page_size = $req['limit'] ?? 100;
         $startno = ($page - 1) * $page_size;
         $limit = " limit $startno, $page_size ";
 
         // search
-		$sql = "
+        $sql = "
             select
                 psr.idx,
                 cast(if(psr.state < 30, psr.exp_dlv_day, psr.prc_rt) as date) as dlv_day,
-                c.code_val as rel_type, 
-                psr.goods_no, 
-                g.style_no, 
-                g.goods_nm, 
                 psr.prd_cd, 
-                psr.goods_opt, 
+                psr.prd_cd,
+                i.img_url as img,
+                p.prd_cd as prd_cd,
+                p.prd_nm as prd_nm,
+                c.code_val as type_nm,
+                c2.code_val as opt,
+                c3.code_val as color,
+                c4.code_val as size,
+                c5.code_val as unit,
+                c6.code_val as rel_type,
+                ifnull(p.price, 0) as price,
+                ifnull(p.wonga, 0) as wonga,
                 psr.qty,
                 psr.store_cd,
                 s.store_nm, 
@@ -164,26 +140,40 @@ class stk16Controller extends Controller
                 psr.prc_rt, 
                 psr.fin_id, 
                 psr.fin_rt
-            from product_stock_release psr
-                inner join goods g on g.goods_no = psr.goods_no
-                left outer join code c on c.code_kind_cd = 'REL_TYPE' and c.code_id = psr.type
+            from sproduct_stock_release psr
+                inner join product p on psr.prd_cd = p.prd_cd
+                inner join product_code pc on p.prd_cd = pc.prd_cd
+                left outer join product_image i on i.prd_cd = pc.prd_cd
+                left outer join `code` c on c.code_kind_cd = 'PRD_MATERIAL_TYPE' and c.code_id = pc.brand
+                left outer join `code` c2 on c2.code_kind_cd = 'PRD_MATERIAL_OPT' and c2.code_id = pc.opt
+                left outer join `code` c3 on c3.code_kind_cd = 'PRD_CD_COLOR' and c3.code_id = pc.color
+                left outer join `code` c4 on c4.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c4.code_id = pc.size
+                left outer join `code` c5 on c5.code_kind_cd = 'PRD_CD_UNIT' and c5.code_id = p.unit
+                left outer join `code` c6 on c6.code_kind_cd = 'REL_TYPE' and c6.code_id = psr.type
                 left outer join store s on s.store_cd = psr.store_cd
                 left outer join storage sg on sg.storage_cd = psr.storage_cd
             where 1=1 $where
             $orderby
             $limit
 		";
-		$result = DB::select($sql);
+        $result = DB::select($sql);
 
         // pagination
         $total = 0;
         $page_cnt = 0;
-        if($page == 1) {
+        if ($page == 1) {
             $sql = "
                 select count(*) as total
-                from product_stock_release psr
-                    inner join goods g on g.goods_no = psr.goods_no
-                    left outer join code c on c.code_kind_cd = 'REL_TYPE' and c.code_id = psr.type
+                from sproduct_stock_release psr
+                    inner join product p on psr.prd_cd = p.prd_cd
+                    inner join product_code pc on p.prd_cd = pc.prd_cd
+                    left outer join product_image i on i.prd_cd = pc.prd_cd
+                    left outer join `code` c on c.code_kind_cd = 'PRD_MATERIAL_TYPE' and c.code_id = pc.brand
+                    left outer join `code` c2 on c2.code_kind_cd = 'PRD_MATERIAL_OPT' and c2.code_id = pc.opt
+                    left outer join `code` c3 on c3.code_kind_cd = 'PRD_CD_COLOR' and c3.code_id = pc.color
+                    left outer join `code` c4 on c4.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c4.code_id = pc.size
+                    left outer join `code` c5 on c5.code_kind_cd = 'PRD_CD_UNIT' and c5.code_id = p.unit
+                    left outer join `code` c6 on c6.code_kind_cd = 'REL_TYPE' and c6.code_id = psr.type
                     left outer join store s on s.store_cd = psr.store_cd
                     left outer join storage sg on sg.storage_cd = psr.storage_cd
                 where 1=1 $where
@@ -195,20 +185,20 @@ class stk16Controller extends Controller
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
         }
 
-		return response()->json([
-			"code" => $code,
-			"head" => [
-				"total" => $total,
-				"page" => $page,
-				"page_cnt" => $page_cnt,
-				"page_total" => count($result)
-			],
-			"body" => $result
-		]);
+        return response()->json([
+            "code" => $code,
+            "head" => [
+                "total" => $total,
+                "page" => $page,
+                "page_cnt" => $page_cnt,
+                "page_total" => count($result)
+            ],
+            "body" => $result
+        ]);
     }
 
     // 접수 (10 -> 20)
-    public function receipt(Request $request) 
+    public function receipt(Request $request)
     {
         $ori_state = 10;
         $new_state = 20;
@@ -220,28 +210,36 @@ class stk16Controller extends Controller
         $rel_order = $request->input("rel_order", '');
 
         try {
+
             DB::beginTransaction();
 
-			foreach($data as $d) {
-                if($d['state'] != $ori_state) continue;
+            foreach ($data as $row) {
 
-                $sql = "
-                    select pc.prd_cd, pc.goods_no, pc.goods_opt, g.price, g.wonga
-                    from product_code pc
-                        inner join goods g on g.goods_no = pc.goods_no
-                    where prd_cd = :prd_cd
-                ";
-                $prd = DB::selectOne($sql, ['prd_cd' => $d['prd_cd']]);
-                if($prd == null) continue;
+                if ($row['state'] != $ori_state) continue;
 
-                DB::table('product_stock_release')
-                    ->where('idx', '=', $d['idx'])
+                $prd_cd = $row['prd_cd'];
+                $price = $row['price'];
+                $wonga = $row['wonga'];
+
+                $result = DB::table('product_stock_storage')
+                ->where('prd_cd', '=', $prd_cd)
+                ->where('storage_cd', '=', DB::raw("(select storage_cd from storage where default_yn = 'Y')"))
+                ->get()[0];
+                $storage_qty = $result->qty;
+
+                if ((int)$row['qty'] > $storage_qty) { // 창고수량보다 접수 수량이 많은 경우 에러처리
+                    DB::rollback();
+                    return response()->json(["code" => -1, "prd_cd" => $prd_cd]);
+                }
+                
+                DB::table('sproduct_stock_release')
+                    ->where('idx', '=', $row['idx'])
                     ->update([
-                        'qty' => $d['qty'] ?? 0,
+                        'qty' => $row['qty'] ?? 0,
                         'exp_dlv_day' => str_replace("-", "", $exp_dlv_day),
                         'rel_order' => $rel_order,
                         'state' => $new_state,
-                        'comment' => $d['comment'],
+                        'comment' => $row['comment'],
                         'rec_id' => $admin_id,
                         'rec_rt' => now(),
                         'ut' => now(),
@@ -249,33 +247,31 @@ class stk16Controller extends Controller
 
                 // product_stock -> 창고보유재고 차감
                 DB::table('product_stock')
-                    ->where('prd_cd', '=', $prd->prd_cd)
+                    ->where('prd_cd', '=', $prd_cd)
                     ->update([
-                        'wqty' => DB::raw('wqty - ' . ($d['rel_qty'] ?? 0)),
+                        'wqty' => DB::raw('wqty - ' . ($row['qty'] ?? 0)),
                         'ut' => now(),
                     ]);
 
                 // product_stock_storage -> 보유재고 차감
                 DB::table('product_stock_storage')
-                    ->where('prd_cd', '=', $prd->prd_cd)
-                    ->where('storage_cd', '=', $d['storage_cd'])
+                    ->where('prd_cd', '=', $prd_cd)
+                    ->where('storage_cd', '=', $row['storage_cd'])
                     ->update([
-                        'wqty' => DB::raw('wqty - ' . ($d['qty'] ?? 0)),
+                        'wqty' => DB::raw('wqty - ' . ($row['qty'] ?? 0)),
                         'ut' => now(),
                     ]);
 
                 // 재고이력 등록
                 // DB::table('product_stock_hst')
                 //     ->insert([
-                //         'goods_no' => $prd->goods_no,
-                //         'prd_cd' => $prd->prd_cd,
-                //         'goods_opt' => $prd->goods_opt,
-                //         'location_cd' => $d['storage_cd'],
+                //         'prd_cd' => $prd_cd,
+                //         'location_cd' => $row['storage_cd'],
                 //         'location_type' => 'STORAGE',
                 //         'type' => PRODUCT_STOCK_TYPE_STORAGE_OUT, // 재고분류 : (창고)출고
-                //         'price' => $prd->price,
-                //         'wonga' => $prd->wonga,
-                //         'qty' => ($d['qty'] ?? 0) * -1,
+                //         'price' => $price,
+                //         'wonga' => $wonga,
+                //         'qty' => ($row['qty'] ?? 0) * -1,
                 //         'stock_state_date' => date('Ymd'),
                 //         'ord_opt_no' => '',
                 //         'comment' => '창고출고',
@@ -285,31 +281,29 @@ class stk16Controller extends Controller
                 //     ]);
 
                 // product_stock_store -> 재고 존재여부 확인 후 보유재고 플러스
-                $store_stock_cnt = 
+                $store_stock_cnt =
                     DB::table('product_stock_store')
-                        ->where('store_cd', '=', $d['store_cd'])
-                        ->where('prd_cd', '=', $prd->prd_cd)
-                        ->count();
-                if($store_stock_cnt < 1) {
+                    ->where('store_cd', '=', $row['store_cd'])
+                    ->where('prd_cd', '=', $prd_cd)
+                    ->count();
+                if ($store_stock_cnt < 1) {
                     // 해당 매장에 상품 기존재고가 없을 경우
                     DB::table('product_stock_store')
                         ->insert([
-                            'goods_no' => $prd->goods_no,
-                            'prd_cd' => $prd->prd_cd,
-                            'store_cd' => $d['store_cd'],
+                            'prd_cd' => $prd_cd,
+                            'store_cd' => $row['store_cd'],
                             'qty' => 0,
-                            'wqty' => $d['qty'] ?? 0,
-                            'goods_opt' => $prd->goods_opt,
+                            'wqty' => $row['qty'] ?? 0,
                             'use_yn' => 'Y',
                             'rt' => now(),
                         ]);
                 } else {
                     // 해당 매장에 상품 기존재고가 이미 존재할 경우
                     DB::table('product_stock_store')
-                        ->where('prd_cd', '=', $prd->prd_cd)
-                        ->where('store_cd', '=', $d['store_cd']) 
+                        ->where('prd_cd', '=', $prd_cd)
+                        ->where('store_cd', '=', $row['store_cd'])
                         ->update([
-                            'wqty' => DB::raw('wqty + ' . ($d['qty'] ?? 0)),
+                            'wqty' => DB::raw('wqty + ' . ($row['qty'] ?? 0)),
                             'ut' => now(),
                         ]);
                 }
@@ -317,15 +311,13 @@ class stk16Controller extends Controller
                 // // 재고이력 등록
                 // DB::table('product_stock_hst')
                 //     ->insert([
-                //         'goods_no' => $prd->goods_no,
-                //         'prd_cd' => $prd->prd_cd,
-                //         'goods_opt' => $prd->goods_opt,
-                //         'location_cd' => $d['store_cd'],
+                //         'prd_cd' => $prd_cd,
+                //         'location_cd' => $row['store_cd'],
                 //         'location_type' => 'STORE',
                 //         'type' => PRODUCT_STOCK_TYPE_STORE_IN, // 재고분류 : (매장)입고
-                //         'price' => $prd->price,
-                //         'wonga' => $prd->wonga,
-                //         'qty' => $d['qty'] ?? 0,
+                //         'price' => $price,
+                //         'wonga' => $wonga,
+                //         'qty' => $row['qty'] ?? 0,
                 //         'stock_state_date' => date('Ymd'),
                 //         'ord_opt_no' => '',
                 //         'comment' => '매장입고',
@@ -333,36 +325,32 @@ class stk16Controller extends Controller
                 //         'admin_id' => $admin_id,
                 //         'admin_nm' => $admin_nm,
                 //     ]);
+
             }
-
-			DB::commit();
             $code = 200;
-            $msg = "접수처리가 정상적으로 완료되었습니다.";
-		} catch (Exception $e) {
-			DB::rollback();
-			$code = 500;
-			$msg = $e->getMessage();
-		}
+            DB::commit();
+        } catch (Exception $e) {
+            $code = 500;
+            DB::rollback();
+        }
 
-        return response()->json(["code" => $code, "msg" => $msg]);
+        return response()->json(["code" => $code]);
     }
 
     // 출고 (20 -> 30)
-    public function release(Request $request) 
-    {          
+    public function release(Request $request)
+    {
         $ori_state = 20;
         $new_state = 30;
         $admin_id = Auth('head')->user()->id;
         $data = $request->input("data", []);
-
         try {
             DB::beginTransaction();
+            foreach ($data as $row) {
+                if ($row['state'] != $ori_state) continue;
 
-			foreach($data as $d) {
-                if($d['state'] != $ori_state) continue;
-
-                DB::table('product_stock_release')
-                    ->where('idx', '=', $d['idx'])
+                DB::table('sproduct_stock_release')
+                    ->where('idx', '=', $row['idx'])
                     ->update([
                         'state' => $new_state,
                         'prc_id' => $admin_id,
@@ -372,24 +360,20 @@ class stk16Controller extends Controller
 
                 // product_stock_storage 창고 실재고 차감
                 DB::table('product_stock_storage')
-                    ->where('prd_cd', '=', $d['prd_cd'])
-                    ->where('storage_cd', '=', $d['storage_cd']) 
+                    ->where('prd_cd', '=', $row['prd_cd'])
+                    ->where('storage_cd', '=', $row['storage_cd'])
                     ->update([
-                        'qty' => DB::raw('qty - ' . ($d['qty'] ?? 0)),
+                        'qty' => DB::raw('qty - ' . ($row['qty'] ?? 0)),
                         'ut' => now(),
                     ]);
             }
-
-			DB::commit();
             $code = 200;
-            $msg = "출고처리가 정상적으로 완료되었습니다.";
-		} catch (Exception $e) {
-			DB::rollback();
-			$code = 500;
-			$msg = $e->getMessage();
-		}
-
-        return response()->json(["code" => $code, "msg" => $msg]);
+            DB::commit();
+        } catch (Exception $e) {
+            $code = 500;
+            DB::rollback();
+        }
+        return response()->json(["code" => $code]);
     }
 
     // 매장입고 (30 -> 40)
@@ -399,15 +383,12 @@ class stk16Controller extends Controller
         $new_state = 40;
         $admin_id = Auth('head')->user()->id;
         $data = $request->input("data", []);
-
         try {
             DB::beginTransaction();
-
-			foreach($data as $d) {
-                if($d['state'] != $ori_state) continue;
-
-                DB::table('product_stock_release')
-                    ->where('idx', '=', $d['idx'])
+            foreach ($data as $row) {
+                if ($row['state'] != $ori_state) continue;
+                DB::table('sproduct_stock_release')
+                    ->where('idx', '=', $row['idx'])
                     ->update([
                         'state' => $new_state,
                         'fin_id' => $admin_id,
@@ -417,60 +398,51 @@ class stk16Controller extends Controller
 
                 // product_stock_store 매장 실재고 플러스
                 DB::table('product_stock_store')
-                    ->where('prd_cd', '=', $d['prd_cd'])
-                    ->where('store_cd', '=', $d['store_cd']) 
+                    ->where('prd_cd', '=', $row['prd_cd'])
+                    ->where('store_cd', '=', $row['store_cd'])
                     ->update([
-                        'qty' => DB::raw('qty + ' . ($d['qty'] ?? 0)),
+                        'qty' => DB::raw('qty + ' . ($row['qty'] ?? 0)),
                         'ut' => now(),
                     ]);
             }
-
-			DB::commit();
             $code = 200;
-            $msg = "매장입고처리가 정상적으로 완료되었습니다.";
-		} catch (Exception $e) {
-			DB::rollback();
-			$code = 500;
-			$msg = $e->getMessage();
-		}
-
-        return response()->json(["code" => $code, "msg" => $msg]);
+            DB::commit();
+        } catch (Exception $e) {
+            $code = 500;
+            DB::rollback();
+            // $msg = $e->getMessage();
+        }
+        return response()->json(["code" => $code]);
     }
 
     // 거부 (10 -> -10)
-    public function reject(Request $request) 
+    public function reject(Request $request)
     {
         $ori_state = 10;
         $new_state = -10;
         $admin_id = Auth('head')->user()->id;
         $data = $request->input("data", []);
-
         try {
             DB::beginTransaction();
-
-			foreach($data as $d) {
-                if($d['state'] != $ori_state) continue;
-
-                DB::table('product_stock_release')
-                    ->where('idx', '=', $d['idx'])
+            foreach ($data as $row) {
+                if ($row['state'] != $ori_state) continue;
+                DB::table('sproduct_stock_release')
+                    ->where('idx', '=', $row['idx'])
                     ->update([
                         'state' => $new_state,
-                        'comment' => $d['comment'] ?? '',
+                        'comment' => $row['comment'] ?? '',
                         'fin_id' => $admin_id,
                         'fin_rt' => now(),
                         'ut' => now(),
                     ]);
             }
-
-			DB::commit();
             $code = 200;
-            $msg = "거부처리가 정상적으로 완료되었습니다.";
-		} catch (Exception $e) {
-			DB::rollback();
-			$code = 500;
-			$msg = $e->getMessage();
-		}
-
-        return response()->json(["code" => $code, "msg" => $msg]);
+            DB::commit();
+        } catch (Exception $e) {
+            $code = 500;
+            DB::rollback();
+            // $msg = $e->getMessage();
+        }
+        return response()->json(["code" => $code]);
     }
 }

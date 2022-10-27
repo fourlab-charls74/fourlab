@@ -24,13 +24,13 @@ class stk18Controller extends Controller
         $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')->orderBy('default_yn')->get();
 
 		$values = [
-            'today'         => date("Y-m-d"),
-            'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
-            'types'         => SLib::getCodes("PRD_MATERIAL_TYPE"), // 원부자재 구분
-            'opts'			=> SLib::getCodes("PRD_MATERIAL_OPT"),
-            'rel_orders'    => SLib::getCodes("REL_ORDER"), // 출고차수
-            'stores'        => $stores, // 매장리스트
-            'storages'      => $storages, // 창고리스트
+            'today' => date("Y-m-d"),
+            'store_types' => SLib::getCodes("STORE_TYPE"), // 매장구분
+            'types' => SLib::getCodes("PRD_MATERIAL_TYPE"), // 원부자재 구분
+            'opts' => SLib::getCodes("PRD_MATERIAL_OPT"),
+            'rel_orders' => SLib::getCodes("REL_ORDER"), // 출고차수
+            'stores' => $stores, // 매장리스트
+            'storages' => $storages, // 창고리스트
 		];
 
         return view(Config::get('shop.store.view') . '/stock/stk18', $values);
@@ -163,6 +163,7 @@ class stk18Controller extends Controller
         $release_type = 'G';
         $state = 20;
         $admin_id = Auth('head')->user()->id;
+        $admin_nm = Auth('head')->user()->name;
 
         $storage_cd = $request->input("storage_cd", '');
         $store_cd = $request->input("store_cd", '');
