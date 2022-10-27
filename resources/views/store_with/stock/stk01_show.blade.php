@@ -35,7 +35,7 @@
                             <tbody>
                             <tr>
                                 <td rowspan="3" class="img_box brln">
-                                    <img class="goods_img" src="{{config('shop.image_svr')}}/{{@$prd->img}}" alt="이미지" style="max-width: 120px; max-height: 120px;" />
+                                    <img class="goods_img" src="{{config('shop.image_svr')}}/{{@$prd->img}}" alt="이미지" style="min-width: 120px;max-width:120px; min-height: 120px;max-height:120px;" />
                                 </td>
                                 <th>상품코드</th>
                                 <td>{{ @$prd->prd_cd }}</td>
