@@ -265,148 +265,118 @@ class prd04Controller extends Controller
 				$tag_price	= Lib::uncm(trim($data['tag_price']));
 				$price		= Lib::uncm(trim($data['price']));
 
+				//창고 존재 유무 검토
+				$sql		= " select count(*) as tot from storage where storage_cd = :storage_cd ";
+				$storage	= DB::selectOne($sql, ['storage_cd' => $storage_cd]);
+
+				if( $storage->tot == 0 ){
+					$error_code		= "501";
+					$result_code	= "창고정보가 존재하지 않습니다. [" . $storage_cd . "]";
+
+					break;
+				}
+
+				//브랜드 존재 유무 검토
+				$brand	= "";
+				$sql	= " select br_cd from brand where brand_nm = :brand_nm ";
+				$result = DB::select($sql,['brand_nm' => $brand_nm]);
+				foreach($result as $row){
+					$brand	= $row->br_cd;
+				}
+				if( $brand == "" ){
+					$error_code		= "502";
+					$result_code	= "브랜드정보가 존재하지 않습니다. [" . $prd_cd . "]";
+
+					break;
+				}
+
 				//상품코드 존재 유무
-				$sql	= " select count(*) as tot from product_code where prd_cd = :prd_cd ";
+				$sql		= " select count(*) as tot from product_code where prd_cd = :prd_cd ";
+				$obj_prd_code	= DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
+				if( $obj_prd_code->tot == 0 ){
 
+					$where	= ['prd_cd'	=> $prd_cd];
 
+					//product 등록/수정
+					$values	= [
+						'prd_nm'	=> $prd_nm,
+						'style_no'	=> $style_no,
+						'tag_price'	=> $tag_price,
+						'price'		=> $price,
+						'wonga'		=> $wonga,
+						'type'		=> 'N',			//일반상품
+						'com_id'	=> 'alpen',		//
+						'unit'		=> '',
+						'match_yn'	=> 'N',
+						'rt'		=> now(),
+						'ut'		=> now(),
+						'admin_id'	=> $id
+					];
+					DB::table('product')->updateOrInsert($where, $values);
 
+					$year	= substr(str_replace($brand, "", $prd_cd), 0 ,2);
+					$season	= substr(str_replace($brand, "", $prd_cd), 2 ,1);
+					$gender	= substr(str_replace($brand, "", $prd_cd), 3 ,1);
+					$item	= substr(str_replace($brand, "", $prd_cd), 4 ,2);
+					$seq	= substr(str_replace($brand, "", $prd_cd), 6 ,2);
+					$opt	= substr(str_replace($brand, "", $prd_cd), 8 ,2);
 
+					//product_code 등록/수정
+					$values	= [
+						'prd_cd'	=> $prd_cd,
+						'goods_no'	=> '',
+						'goods_opt'	=> '',
+						'brand'		=> $brand,
+						'year'		=> $year,
+						'season'	=> $season,
+						'gender'	=> $gender,
+						'item'		=> $item,
+						'opt'		=> $opt,
+						'seq'		=> $seq,
+						'color'		=> $color,
+						'size'		=> $size,
+						'type'		=> 'N',			//일반상품
+						'rt'		=> now(),
+						'ut'		=> now(),
+						'admin_id'	=> $id
+					];
+					DB::table('product_code')->Insert($values);
 
-
-
-				// 비밀번호 암호화
-				$conf = new Conf();
-				$encrypt_mode = $conf->getConfigValue("shop", "encrypt_mode");
-				$encrypt_key = "";
-				if ($encrypt_mode == "mhash") {
-					$encrypt_key = $conf->getConfigValue("shop", "encrypt_key");
 				}
 
-				$enc_pwd = Lib::get_enc_hash($user_pw, $encrypt_mode, $encrypt_key);
-
-				//고객 등급 매치
-				switch ($group_code) {
-					case '02':
-						$group_no = "15"; break;
-					case '03':
-						$group_no = "16"; break;
-					case '04':
-						$group_no = "17"; break;
-					default:
-						$group_no = "13";
-				}
-
-				//고객 성별 매치
-				if( $sex == '남' )		$sex = "M";
-				else if( $sex == '여' )	$sex = "F";
-				else					$sex = "";
-
-
-				$rmobile	= strrev($mobile);
-				$email_chk	= "N";
-
-				//매장코드 생성
-				$store_nm_l	= strpos($store_nm, "(");
-				if($store_nm_l){
-					$store_nm_org	= substr($store_nm, 0, $store_nm_l);
-				}else{
-					$store_nm_org	= $store_nm;
-				}
-
-				$store_cd	= "";
-				$sql	= " select store_cd from store where store_nm = :store_nm ";
-				//$store	= DB::selectOne($sql, ['store_nm' => $store_nm_org]);
-				$store	= DB::selectOne($sql, ['store_nm' => $store_nm]);
-
-				if($store != null)	$store_cd	= $store->store_cd;
-
-				//생년월일
-				$mm	= "";
-				$dd	= "";
-				if( $birth_date != "" ){
-					$birth_date	= explode("-", $birth_date);
-
-					$mm	= $birth_date[0];
-					$dd	= $birth_date[1];
-				}
-
-				$where	= [
-					'user_id'	=> $user_id
-				];
+				//재고정보 처리
+				$where	= ['prd_cd'	=> $prd_cd];
 
 				$values	= [
-					'user_pw'	=> $enc_pwd,
-					'name'		=> $name,
-					'sex'		=> $sex,
-					'email'		=> $email,
-					'email_chk'	=> $email_chk,
-					'zip'		=> $zip,
-					'addr'		=> $addr,
-					'addr2'		=> $addr2,
-					'phone'		=> $mobile,
-					'mobile'	=> $mobile,
-					'rmobile'	=> $rmobile,
-					'regdate'	=> $regdate,
-					'point'		=> $point,
-					'yn'		=> 'Y',
-					'mm'		=> $mm,
-					'dd'		=> $dd,
-					'out_yn'	=> 'N',
-					'memo'		=> $memo,
-					'pwd_reset_yn'	=> 'N',
-					'auth_type'	=> 'A',
-					'auth_yn'	=> 'N',
-					'site'		=> 'HEAD_OFFICE',
-					'type'		=> 'B',
-					'store_nm'	=> $store_nm,
-					'store_cd'	=> $store_cd
-				];
-
-				//회원처리
-				DB::table('member')->updateOrInsert($where, $values);
-
-
-				//적립금 처리
-				if($point > 0){
-					$point_values	= [
-						'ord_no'		=> '',
-						'ord_opt_no'	=> '',
-						'point_nm'		=> '기존 시스템 포인트 등록',
-						'point'			=> $point,
-						'admin_id'		=> 'system',
-						'admin_nm'		=> '시스템',
-						'regi_date'		=> now(),
-						'point_st'		=> '적립',
-						'point_kind'	=> '12',
-						'point_status'	=> 'Y',
-						'point_date'	=> now()
-					];
-	
-					DB::table('point_list')->updateOrInsert($where, $point_values);
-				}
-
-
-				//member_group 처리
-				$group_values	= [
-					'group_no'	=> $group_no,
+					'goods_no'	=> '',
+					'qty_wonga'	=> $qty * $wonga,
+					'in_qty'	=> $qty,
+					'out_qty'	=> '0',
+					'qty'		=> $qty,
+					'wqty'		=> $qty,
+					'goods_opt'	=> '',
+					'barcode'	=> $prd_cd,
+					'use_yn'	=> 'Y',
 					'rt'		=> now(),
 					'ut'		=> now()
 				];
+				DB::table('product_stock')->updateOrInsert($where, $values);
 
-				DB::table('user_group_member')->updateOrInsert($where, $group_values);
+				//창고재고 정보 처리
+				$where	= ['prd_cd'	=> $prd_cd, 'storage_cd' => $storage_cd];
 
-
-				//member_stat 처리
-				$stat_values	= [
-					'ord_cnt'	=> $ord_cnt,
-					'ord_amt'	=> $ord_amt,
-					'ord_date'	=> $last_ord_date,
+				$values	= [
+					'goods_no'	=> '',
+					'qty'		=> $qty,
+					'wqty'		=> $qty,
+					'goods_opt'	=> '',
+					'use_yn'	=> 'Y',
 					'rt'		=> now(),
 					'ut'		=> now()
 				];
+				DB::table('product_stock_storage')->updateOrInsert($where, $values);
 
-				DB::table('member_stat')->updateOrInsert($where, $stat_values);
 			}
 	
 		//	DB::commit();
