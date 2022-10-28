@@ -400,7 +400,7 @@ class prd02Controller extends Controller
 
 		$sql = "
 			select 
-				distinct(p.prd_cd), g.goods_nm as prd_nm, g.style_no, p.goods_no, p.goods_opt, p.color, p.size, '' as seq, '' as yn
+				distinct(p.prd_cd), g.goods_nm as prd_nm, g.style_no, p.goods_no, p.goods_opt, p.color, p.size, '' as seq, '' as yn, 'N' as is_product
 			from product_code p
 				inner join goods_summary gs on p.goods_no = gs.goods_no
 				inner join goods g on g.goods_no = p.goods_no 
@@ -409,7 +409,7 @@ class prd02Controller extends Controller
 			union all
 
 			select 
-				prd_cd, prd_nm , style_no ,'$goods_no' as goods_no, '$goods_opt' as goods_opt, '$color' as color, '$size' as size, '$seq' as seq, '' as yn
+				prd_cd, prd_nm , style_no ,'$goods_no' as goods_no, '$goods_opt' as goods_opt, '$color' as color, '$size' as size, '$seq' as seq, '' as yn, 'Y' as is_product
 			from product
 			where prd_cd like '$prd_cd%'
 			order by seq desc
@@ -437,6 +437,86 @@ class prd02Controller extends Controller
 	// ";
 
 		$result = DB::select($sql);
+
+
+		$goods_opt_counts = collect($result)->groupBy('goods_opt')->map(function($row) {
+            return $row->count();
+        })->all();
+        $result = collect($result)->map(function($row) use ($goods_opt_counts) {
+            $goods_opt = $row->goods_opt;
+            $count = $goods_opt_counts[$goods_opt];
+            $row->checkbox = $count > 1 ? true : false;
+            return $row;
+        })->all();
+
+
+		// $goods_opts = [];
+		// foreach ($result as $row) {
+		// 	array_push($goods_opts, ['goods_opt' =>$row->goods_opt]);
+		// }
+		// $cnt = 0;
+		// foreach ($goods_opts as $g_opt) {
+		// 	$g = $g_opt['goods_opt'];
+
+		// 	if ($goods_opt == $g) {
+		// 		$cnt++;
+		// 	}
+		// }
+		// $match = "";
+		// if ($cnt > 1) {
+		// 	$match =  "is_match";
+		// } else{
+		// 	$match = "not_match";
+		// }
+
+		// array_push($result, ['match' =>$match]);
+
+		// dd($result);
+
+
+
+
+		// dd(collect($goods_opts)->groupBy('goods_opt');
+
+		// // $result = collect($result)->map(function ($row, $idx) use ($goods_opts) {
+
+		// // 	$duplicated = collect($goods_opts)->duplicates('goods_opt')->all();
+		// // 	$row->duplicated = $duplicated;
+		// // 	// $row->checked = count($duplicated) > 0 ? true : false;
+		// // 	return $row;
+		// // });
+
+		// // dd($result);
+
+
+		// // $i = 0;
+		// // foreach ($result as $row) {
+		// // 	// index가 같지 않고 이름이 같으면 중복
+
+		// // 	$goods_opt = $row->goods_opt;
+
+		// // 	$idx = array_search($goods_opt, $goods_opts);
+
+		// // 	dd($idx);
+
+		// 	// while (true) {
+		// 	// 	if ($idx == array_search($goods_opt, $goods_opts)) {
+		// 	// 		continue;
+		// 	// 	} else {
+		// 	// 		$idx = $i;
+		// 	// 		break;
+		// 	// 	}
+		// 	// }
+
+		// 	// 0번째  goods_opt가 opts 안에 2개 이상 있으면 중복됨. 따라서
+		// 	// checked = true
+		// 	$i++;
+		// }
+
+		// dd($result);
+		// // 상품 옵션이 중복되는 경우 체크박스 표시 true 아닌 경우 false
+		// // 
+
 
 
 		return response()->json([
