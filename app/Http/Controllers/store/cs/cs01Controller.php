@@ -321,7 +321,7 @@ class cs01Controller extends Controller {
 		$state					= $request->input("state");					//입고상태
 		$loc					= $request->input("loc");					//위치
 
-		$prd_cd = $request->input("prd_cd"); // 상품코드
+		// $prd_cd = $request->input("prd_cd"); // 상품코드
 
 		$data					= $request->input("data");
 

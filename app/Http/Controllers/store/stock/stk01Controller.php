@@ -199,7 +199,8 @@ class stk01Controller extends Controller
 				p.prd_cd
 				, p.goods_no
 				, p.goods_opt
-				, p.color
+				, p.color as color_cd
+				, c.code_val as color
 				, p.size
 				, g.goods_nm
 				, g.goods_nm_eng
@@ -221,6 +222,7 @@ class stk01Controller extends Controller
 				left outer join goods g on g.goods_no = p.goods_no
 				left outer join opt o on g.opt_kind_cd = o.opt_kind_cd
 				left outer join brand b on b.brand = g.brand
+				left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = p.color
 			where p.prd_cd = :prd_cd
 		";
 		$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);

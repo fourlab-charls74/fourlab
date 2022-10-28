@@ -272,10 +272,18 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
                 width:200,
                 cellRenderer: function (params) {
                     if (params.value !== undefined) {
-                        return '<a href="#" onclick="return openStore(\'' + params.data.store_cd + '\');">' + params.value + '</a>';
+                        return '<a href="javascript:void(0);" onclick="return openStore(\'' + params.data.store_cd + '\');">' + params.value + '</a>';
                     }
                 }
-            }
+            },
+            StoreOrderNoType:{
+                width:170,
+                cellRenderer: function(params) {
+                    if(params.value){
+                        return '<a href="javascript:void(0);" onclick="return openStoreOrder(\'' + params.data.ord_no + '\',\'' + params.data.ord_opt_no +'\');">'+ params.value +'</a>';
+                    }
+                }
+            },
         },
 
         components: {

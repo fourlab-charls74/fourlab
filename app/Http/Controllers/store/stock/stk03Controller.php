@@ -218,6 +218,7 @@ class stk03Controller extends Controller
                 ord_type.code_val as ord_type,
                 ord_kind.code_val as ord_kind,
                 a.store_cd,
+                ifnull(s.store_nm, '본사') as store_nm,
                 baesong_kind.code_val as baesong_kind,
                 a.dlv_no,
                 dlv_cd.code_val as dlv_cm,
@@ -284,6 +285,7 @@ class stk03Controller extends Controller
                 left outer join code gt on (a.goods_type = gt.code_id and gt.code_kind_cd = 'G_GOODS_TYPE')
                 left outer join code dlv_cd on (a.dlv_cd = dlv_cd.code_id and dlv_cd.code_kind_cd = 'DELIVERY')
                 left outer join code pay_stat on (a.pay_stat = pay_stat.code_id and pay_stat.code_kind_cd = 'G_PAY_STAT')
+                left outer join store s on s.store_cd = a.store_cd
         ";
         $result = DB::select($sql);
 
@@ -1273,5 +1275,565 @@ class stk03Controller extends Controller
         } else {
             return $tel;
         }
+    }
+
+    /** 
+     * 
+     * 주문상세내역 
+     * 
+     */
+    public function show($ord_no, $ord_opt_no = '')
+    {
+        if ($ord_opt_no == '') {
+            $sql = "
+				select max(ord_opt_no) as ord_opt_no
+				from order_opt
+				where ord_no = '$ord_no'
+			";
+            $row = DB::selectOne($sql);
+            if ($row != null) $ord_opt_no = $row->ord_opt_no;
+        }
+
+        $values = $this->_get($ord_no, $ord_opt_no);
+
+        $sql = "
+            select code_val id, code_val val
+            from code
+            where code_kind_cd = 'G_JAEGO_REASON' and use_yn = 'Y'
+            order by code_seq asc
+        ";
+        $values['jaego_reasons'] = DB::select($sql);
+
+        $values = array_merge($values, [
+            'cs_forms'		=> SLib::getCodes("CS_FORM2"),
+            'clm_reasons'	=> SLib::getCodes("G_CLM_REASON"),
+            'clm_states'	=> SLib::getCodes("G_CLM_STATE"),
+            'dlv_cds'		=> SLib::getCodes("DELIVERY"),
+			// 'refund_yn'		=> ''
+        ]);
+
+        return view(Config::get('shop.store.view') . '/stock/stk03_detail', $values);
+    }
+
+    private function _get($ord_no, $ord_opt_no = '') {
+
+        // 설정 값 얻기
+        $conf = new Conf();
+
+        $cfg_shop_name			= $conf->getConfigValue("shop","name");
+        $cfg_sms_yn				= $conf->getConfigValue("sms","sms_yn");
+        $cfg_delivery_yn		= $conf->getConfigValue("sms","delivery_yn");
+        $cfg_domain_bizest		= $conf->getConfigValue("shop","domain_bizest");
+        $cfg_img_size_detail	= SLib::getCodesValue("G_IMG_SIZE","detail");
+        $cfg_img_size_real		= SLib::getCodesValue("G_IMG_SIZE","real");
+        $cfg_bank_code			= SLib::getCodes("G_BANK_CODE");
+
+        // 현금영수증 사용여부 설정값 얻기
+        $cfg_cash_use_yn		= $conf->getConfigValue("shop","cash_use_yn", "N");
+        $isfind = false;
+
+        $values = [
+            'ord_no' => $ord_no,
+            'ord_opt_no' => $ord_opt_no,
+        ];
+
+        if($ord_opt_no == ''){
+            $sql = /** @lang text */
+                "
+				select max(ord_opt_no) as ord_opt_no
+				from order_opt
+				where ord_no = '$ord_no'
+			";
+            $row = DB::selectOne($sql);
+            $ord_opt_no = $row->ord_opt_no;
+        }
+
+        if ($ord_opt_no != "") {
+            ###################################################################
+            #	기본 주문정보
+            ###################################################################
+            $sql = " /* admin : order/ord01.php (1) */
+                select
+                    a.ord_no,date_format(b.ord_date,'%Y.%m.%d %H:%i:%s') ord_date, a.ord_kind
+                    , b.user_id, b.user_nm, b.phone, b.mobile, b.email
+                    , b.r_nm, b.r_phone, b.r_mobile, b.r_zipcode, b.r_addr1, b.r_addr2
+                    , b.dlv_msg, a.com_id, b.url, a.ord_state, ord_state.code_val ord_state_nm, a.ord_type, a.dlv_no /*송장번호*/
+                    , c.code_val dlv_cd /*택배사*/,c.code_val2 dlv_homepage
+                    , date_format(b.dlv_end_date,'%Y.%m.%d %H:%i:%s') mst_dlv_end_date, d.com_nm sale_place, b.sale_place sale_place_nm
+                    , 0 as tax, b.dlv_amt, b.add_dlv_fee, a.add_point
+                    , date_format(a.dlv_start_date,'%Y.%m.%d %H:%i:%s') dlv_start_date
+                    , date_format(a.dlv_proc_date,'%Y.%m.%d %H:%i:%s') dlv_proc_date
+                    , date_format(a.dlv_end_date,'%Y.%m.%d %H:%i:%s') dlv_end_date
+                    , date_format(b.upd_date,'%Y.%m.%d %H:%i:%s') upd_date, a.dlv_comment, a.p_ord_opt_no
+                    , company.com_type, com_type.code_val com_type_nm, company.com_nm, company.staff_nm1, company.last_login_date
+                    , company.staff_phone1, company.staff_hp1
+                    , company.zip_code, company.addr1, company.addr2
+                    , company.r_zip_code as com_r_zip_code, company.r_addr1 as com_r_addr1, company.r_addr2  as com_r_addr2
+                    , company.md_nm, company.memo as com_memo, a.price, a.dlv_pay_type
+                    , m.memo as member_memo, 'Y' as taxpayer_yn,mu.name as seller
+                    , a.store_cd, s.store_nm, a.pr_code, a.prd_cd
+                from order_opt a
+                    inner join order_mst b on a.ord_no = b.ord_no
+                    left outer join code c on c.code_kind_cd = 'DELIVERY' and a.dlv_cd = c.code_id
+                    left outer join company d on a.sale_place = d.com_id and d.com_type= '4'
+                    left outer join company company on a.com_id = company.com_id
+                    left outer join code com_type on com_type.code_kind_cd = 'G_COM_TYPE' and company.com_type = com_type.code_id
+                    left outer join code ord_state on ord_state.code_kind_cd = 'G_ORD_STATE' and a.ord_state = ord_state.code_id
+                    left outer join member m on b.user_id = m.user_id
+                    left outer join mgr_user mu on b.admin_id = mu.id
+                    left outer join store s on s.store_cd = a.store_cd
+                where a.ord_opt_no = :ord_opt_no
+            ";
+            $isfind = true;
+            $row = DB::selectOne($sql,array("ord_opt_no" => $ord_opt_no));
+
+            $row->dlv_pay_type = $row->dlv_pay_type == "P" ? "선불" : "착불";
+            $values['ord'] = $row;
+
+            if($ord_no === "ord_no"){
+                $ord_no = $row->ord_no;
+                $values["ord_no"] = $ord_no;
+            }
+        }
+
+        // 주문매장정보 조회
+        $store_cd = $row->store_cd;
+        $sql = "
+            select 
+                a.store_cd, a.store_nm_s as store_nm
+                , a.store_type, a.store_kind, a.zipcode, a.addr1, a.addr2
+                , c.code_val as store_type_nm, d.code_val as store_kind_nm
+            from store a
+                left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = a.store_type
+                left outer join code d on d.code_kind_cd = 'store_kind' and d.code_id = a.store_kind
+            where a.store_cd = '$store_cd'
+        ";
+        $store = DB::selectOne($sql);
+        $values['store'] = $store;
+
+        // 현금영수증 발행 내역
+        if($cfg_cash_use_yn == "Y"){
+            $sql = "
+				select *
+				from cash_history
+				where ord_no = '$ord_no'
+				order by rt desc
+            ";
+            $rows = DB::select($sql);
+            $values['cash_history_cnt'] = count($rows);
+            $values['cash_histories'] = $rows;
+        }
+
+        if ($isfind === false) return false;
+
+        ###################################################################
+        #	회원그룹 정보
+        ###################################################################
+        if (isset($values['ord']) && !empty($values['ord']->user_id) ) {
+            $user_id = $values['ord']->user_id;
+
+            $sql = /** @lang text */
+                "
+                select
+                    a.group_no, b.group_nm
+                from user_group_member a
+                    inner join user_group b on a.group_no = b.group_no
+                where a.user_id = '$user_id'
+                order by b.dc_ratio desc, b.point_ratio desc
+                limit 0,1
+            ";
+            $values['group'] = DB::selectOne($sql);
+        }
+
+        ###################################################################
+        #	부모 주문건
+        ###################################################################
+        if(isset($values['ord']) && !empty($values['ord']->p_ord_opt_no)) {
+            $p_ord_opt_no = $values['ord']->p_ord_opt_no;
+
+            $sql = " /* admin : order/ord01_detail.php (2) */
+                select ord_no from order_opt where ord_opt_no = '$p_ord_opt_no' order by ord_date desc
+            ";
+            $row = DB::selectOne($sql);
+
+            if (!empty($row->ord_no)) $values['p_ord_no'] = $row->ord_no;
+        }
+        ###################################################################
+        #	자식 주문건
+        ###################################################################
+        $sql = "select ord_no, ord_opt_no from order_opt where p_ord_opt_no = '$ord_opt_no'";
+
+        $row = DB::selectOne($sql);
+
+        if (!empty($row->ord_no)) {
+            $values['c_ord_no'] = $row->ord_no;
+            $values['c_ord_opt_no'] = $row->ord_opt_no;
+        }
+
+        ###################################################################
+        #	자식 주문건
+        ###################################################################
+        $sql = /** @lang text */
+            "
+            select
+                o.ord_opt_no, ord_state, o.clm_state
+                , if(ifnull(o.clm_state, 0) = 0
+                    , (select code_val from code where code_kind_cd = 'G_ORD_STATE' and code_id = o.ord_state)
+                    , (select code_val from code where code_kind_cd = 'G_CLM_STATE' and code_id = o.clm_state)
+                 ) as order_state
+                , o.ord_kind
+                , ord_kind.code_val as ord_kind_nm
+                , o.ord_type
+                , ord_type.code_val as ord_type_nm
+                , if(g.com_type = 1, g.com_type, o.com_id) as com_id
+                , if(g.com_type = 1, '$cfg_shop_name', cm.com_nm) as com_nm
+                , o.head_desc, o.goods_nm, g.goods_no, g.goods_sub, g.style_no, replace(g.img,'$cfg_img_size_real','$cfg_img_size_detail') as img
+                , o.goods_opt
+                , replace(o.goods_opt,'^',' : ') as opt_val
+                , o.qty,o.price
+                , ifnull(
+                    if( o.ord_state < 10, o.qty, (
+                            select sum(qty) from order_opt_wonga where ord_opt_no = o.ord_opt_no and ord_state = 10
+                        )
+                    ), 0
+                 ) as wqty
+                , ifnull(
+                    ( select sum(good_qty) from goods_summary
+                        where goods_no = g.goods_no and goods_sub = g.goods_sub and goods_opt = o.goods_opt
+                    ), 0
+                 ) as jaego_qty
+                , ifnull(
+                    ( select sum(wqty) from goods_summary
+                        where goods_no = g.goods_no and goods_sub = g.goods_sub and goods_opt = o.goods_opt
+                    ), 0
+                 ) as stock_qty
+                 , o.coupon_amt,o.dc_amt, o.dlv_amt, o.recv_amt
+                , c.refund_amt, o.add_point
+                , g.is_unlimited, g.goods_type
+                , o.opt_amt, o.addopt_amt, o.dlv_comment
+                ,( select point_status from point_list where ord_no = o.ord_no and ord_opt_no = o.ord_opt_no and point > 0 order by no desc limit 0,1 ) as point_status
+                , om.state, om.memo
+                , o.dlv_cd, o.dlv_no, dlv.code_val as dlv_nm, dlv.code_val2 as dlv_homepage
+                , '' as choice_class
+            from order_opt o
+                inner join goods g on g.goods_no = o.goods_no and g.goods_sub = o.goods_sub
+                inner join company cm on o.com_id = cm.com_id
+                left outer join claim c on o.ord_opt_no = c.ord_opt_no
+                left outer join code ord_type on ord_type.code_kind_cd = 'G_ORD_TYPE' and o.ord_type = ord_type.code_id
+                left outer join code ord_kind on ord_kind.code_kind_cd = 'G_ORD_KIND' and o.ord_kind = ord_kind.code_id
+                left outer join order_opt_memo om on o.ord_opt_no = om.ord_opt_no
+                left outer join code dlv on dlv.code_kind_cd = 'DELIVERY' and o.dlv_cd = dlv.code_id
+            where o.ord_no = '$ord_no' and g.goods_type <> 'O'
+            order by com_id, o.ord_opt_no desc
+        ";
+
+        $rows = DB::select($sql);
+
+        $sum_amt = 0;
+        $sum_qty = 0;
+        $sum_dlv_amt = 0;
+        $sum_coupon_amt = 0;
+        $sum_refund_amt = 0;
+        $sum_add_point = 0;
+
+        $sum_claim_amt = 0;			// 취소금액
+        $sum_normal_amt = 0;		// 유효금액
+
+        $pcom_id = "";
+        $pcom_idx = 0;
+        $com_cnt = 1;
+        $com_dlv_amt = 0;
+        $dlv_comment_cnt = 0;
+
+        $goods_no = "";
+        $goods_sub = "";
+        $choice_goods_type = "";
+
+        foreach($rows as $row) {
+            if($ord_opt_no == $row->ord_opt_no){
+                $values['goods_no'] = $row->goods_no;
+                $values['goods_sub'] = $row->goods_sub;
+                $choice_goods_type = $row->goods_type;
+                $row->choice_class = "choice";
+            }
+
+            $sum_amt		+= $row->qty * $row->price;
+            $sum_qty		+= $row->qty;
+            $sum_dlv_amt	+= $row->dlv_amt;
+            $sum_coupon_amt	+= $row->coupon_amt + $row->dc_amt;
+            $sum_refund_amt	+= $row->refund_amt;
+            $sum_add_point	+= $row->add_point;
+
+            if( $row->clm_state == 0 ){	// 클레임이 없는 경우에만 금액 가산
+                $sum_normal_amt += $row->qty * $row->price;
+            } else {
+                $sum_claim_amt += $row->qty * $row->price;
+                //$sum_claim_amt += $row->recv_amt;		// 클레임 금액은 상품가격에서 적립금, 쿠폰, 할인을 제외한
+            }
+
+            $sql2 = /** @lang text */
+                "
+                select addopt, addopt_amt, addopt_qty
+                from order_opt_addopt
+                where ord_opt_no = '$row->ord_opt_no'
+            ";
+
+            $row->a_addopts = DB::select($sql2);
+            if($row->dlv_comment != ""){
+                $dlv_comment_cnt++;
+            }
+
+            // 업체별 배송비 처리
+            if($pcom_id != $row->com_id){
+                $row->dlv_grp_amt = $com_dlv_amt;
+                $com_dlv_amt = $row->dlv_amt;
+            } else {
+                $com_dlv_amt += $row->dlv_amt;
+            }
+
+            $pcom_id = $row->com_id;
+        }
+
+        $values['ord_lists'] = $rows;
+
+        ###################################################################
+        #	결제정보
+        ###################################################################
+        $sql = " /* admin : order/ord01_detail.php (7) */
+            select
+                a.pay_type, pay_type.code_val pay_type_nm, '' as fintech, a.pay_amt, a.pay_point, a.pay_nm,
+                a.pay_stat, pay_stat.code_val pay_stat_nm, a.bank_inpnm, a.bank_code, a.bank_number,
+                a.card_code, a.card_isscode,
+                a.card_quota, a.card_appr_no,
+                date_format(a.card_appr_dm,'%Y.%m.%d %H:%i:%s') card_appr_dm, a.card_tid, a.tno, a.card_msg,
+                date_format(a.ord_dm,'%Y.%m.%d %H:%i:%s') ord_dm, date_format(a.upd_dm,'%Y.%m.%d %H:%i:%s') upd_dm,
+                a.pay_ypoint, a.pay_baesong, a.card_name, a.nointf, a.ghost_use, a.escw_use, a.tno,
+                a.st_cd, ifnull(a.coupon_amt,0) coupon_amt,
+                cr.bank_code as cr_bank_code,
+                ifnull(a.dc_amt,0) as dc_amt,
+                ifnull(a.cash_yn, 'N') as cash_yn, a.cash_date,
+                ifnull(a.tax_yn, 'N') as tax_yn, a.tax_date,
+                a.confirm_id, ma.name as confirm_nm, a.confirm_amt,
+                0 as pay_fee
+            from payment a
+                left outer join code pay_type on (a.pay_type = pay_type.code_id and pay_type.code_kind_cd = 'G_PAY_TYPE')
+                left outer join code pay_stat on (a.pay_stat = pay_stat.code_id and pay_stat.code_kind_cd = 'G_PAY_STATE')
+                left outer join common_return cr on cr.order_no = a.ord_no
+                left outer join mgr_user ma on a.confirm_id = ma.id
+            where a.ord_no = '$ord_no'
+        ";
+
+        $row = DB::selectOne($sql);
+
+        if(!empty($row->fintech)){
+            $row->pay_type_nm = sprintf("%s(%s)", $row->pay_type_nm, strtoupper($row->fintech));
+        }
+
+        if(isset($row->cr_bank_code) && isset($cfg_bank_code[$row->cr_bank_code])){
+            $row->bank_code = $cfg_bank_code[$row->cr_bank_code];
+        }
+
+        $values['pay'] = $row;
+        ###################################################################
+        #	해외 배송 정보
+        ###################################################################
+        if($choice_goods_type == "O") {
+            $sql = /** @lang text */
+                "
+                select c.code_val as local_ord_state_nm, a.local_state_date, a.comment, a.admin_nm, a.admin_id
+                from order_oversea_state a
+                    inner join code c on a.local_ord_state = c.code_id  and c.code_kind_cd = 'G_ORD_STATE'
+                where ord_opt_no = '$ord_opt_no'
+                order by ord_state_no
+            ";
+
+            $values['oversea_states'] = DB::select($sql);
+        }
+
+        ###################################################################
+        #	주문상태 정보
+        ###################################################################
+        if (isset($values['ord']) && $values['ord']->ord_state > 1) {
+            $sql = "
+                select
+                    a.p_ord_state
+                    , b.code_val as p_ord_state_nm
+                    , a.ord_state
+                    , c.code_val as ord_state_nm
+                    , a.admin_id
+                    , a.admin_nm
+                    , date_format(a.state_date,'%Y.%m.%d %H:%i:%s') as state_date
+                    , a.comment
+                from order_state a
+                    inner join code b on a.p_ord_state = b.code_id and b.code_kind_cd = 'G_ORD_STATE'
+                    inner join code c on a.ord_state = c.code_id and c.code_kind_cd = 'G_ORD_STATE'
+                where a.ord_opt_no = '$ord_opt_no'
+                order by state_date asc
+            ";
+
+            $values['state_logs'] = DB::select($sql);
+        }
+
+        ###################################################################
+        #	클레임 정보
+        ###################################################################
+        $claimInfoSql = " /* admin : order/ord01_detail.php (9) */
+            select
+                clm_no, clm_state
+                , clm_reason, refund_yn, refund_amt, refund_bank, refund_account, refund_nm, memo
+                , date_format(req_date,'%Y.%m.%d %H:%i:%s') as req_date
+                , date_format(proc_date,'%Y.%m.%d %H:%i:%s') as proc_date
+                , date_format(end_date,'%Y.%m.%d %H:%i:%s') as end_date
+                , req_nm,proc_nm,end_nm,date_format(last_up_date,'%Y.%m.%d %H:%i:%s') as last_up_date
+                , dlv_deduct
+            from claim
+            where
+                ord_opt_no = '$ord_opt_no'
+        ";
+
+        $values['claim_info'] = DB::selectOne($claimInfoSql);
+        $values['clm_state'] = empty($values['claim_info']->clm_state) ? 0 : $values['claim_info']->clm_state;
+        $values['ord_state'] = empty($values['claim_info']->ord_state) ? 0 : $values['claim_info']->ord_state;
+
+        ###################################################################
+        #	클레임 대상 리스트
+        ###################################################################
+        $array_claim = array();
+
+
+        $sql = "
+            select
+                o.goods_no, o.goods_sub, o.goods_sub, g.goods_type,
+                o.qty, o.price, o.goods_nm, o.clm_state,
+                d.clm_det_no, d.clm_qty, d.jaego_yn, d.jaego_reason, d.stock_state,
+                'Y' as stocked_yn,
+                if(ifnull(o.clm_state, 0) = 0
+                    , (select code_val from code where code_kind_cd = 'G_ORD_STATE' and code_id = o.ord_state)
+                    , (select code_val from code where code_kind_cd = 'G_CLM_STATE' and code_id = o.clm_state)
+                 ) as order_state
+                 , o.ord_state, o.clm_state
+            from order_opt o
+                inner join goods g on g.goods_no = o.goods_no and g.goods_sub = o.goods_sub
+                left outer join claim c on o.ord_opt_no = c.ord_opt_no
+                left outer join claim_detail d on c.clm_no = d.clm_no
+            where
+                o.ord_opt_no = '$ord_opt_no'
+        ";
+
+        $values['order_opt'] = DB::selectOne($sql);
+
+        ###################################################################
+        #	클레임 내역 리스트 변경 : CS유형, 주문상태, 클레임상태 추가
+        ###################################################################
+        $sql = "
+            select
+                a.memo_no, a.admin_id, a.admin_nm
+                , date_format(a.regi_date, '%y.%m.%d %H:%i:%s') as regi_date, a.memo
+                , cd.code_val as cs_form
+                , cd2.code_val as ord_state
+                , if(cd3.code_id is not null,cd3.code_val,cd2.code_val) as clm_state
+                , a.ord_opt_no
+                , '' as alt
+            from claim_memo a
+                inner join order_opt b on a.ord_opt_no = b.ord_opt_no
+                left outer join code cd on cd.code_kind_cd = 'CS_FORM2' and cd.code_id = a.cs_form
+                left outer join code cd2 on cd2.code_kind_cd = 'G_ORD_STATE' and cd2.code_id = a.ord_state
+                left outer join code cd3 on cd3.code_kind_cd = 'G_CLM_STATE' and cd3.code_id = a.clm_state
+            where b.ord_no = '$ord_no'
+            order by a.regi_date asc
+        ";
+        $rows = DB::select($sql);
+
+        foreach($rows as $idx => $row) {
+            $row->memo = str_replace("\n","<br>",$row->memo);
+
+            if( $ord_opt_no == $row->ord_opt_no ) {
+                $choice_class	= "choice";
+            }
+
+            $row->alt = ($idx % 2 == 1) ? "alt" : "";
+        }
+
+        $values['claim_memos'] = $rows;
+
+        if (isset($values['ord']) && $values['ord']->com_type == 2) {
+            $sql = " /* admin : order/ord01_detail.php (12) */
+                select
+                     etc_day,etc_amt, etc_memo, regi_date, admin_nm, '' as alt
+                from account_etc where ord_opt_no = '$ord_opt_no'
+            ";
+
+            $rows = DB::select($sql);
+
+            foreach($rows as $idx => $row) {
+                $row->alt = ($idx % 2 == 1) ? "alt" : "";
+            }
+
+            $values['account_etcs'] = $rows;
+        }
+
+        ###################################################################
+        #	유입정보
+        ###################################################################
+        $sql = "
+            select
+                ifnull(t.vt,0) as vt, t.vc,datediff(t.rt,t.lvd) as vp, t.pageview, t.referer,
+                e.code_val as type,	a.name, t.kw, t.point  , t.ad, o.referrer as track,
+                t.browser, t.domain, t.agent, m.mobile_yn
+            from order_track t
+                left join ad a on a.ad= t.ad
+                left outer join order_mst m on m.ord_no = t.ord_no
+                left outer join order_opt o on o.ord_no = t.ord_no
+                left outer join code e on e.code_id = a.type and e.code_kind_cd = 'G_AD_TYPE'
+            where o.ord_opt_no = '$ord_opt_no'
+        ";
+
+        $row = DB::selectOne($sql);
+
+        if (!empty($row->vt)){
+            $row->visit_time = sprintf("%02d:%02d",floor($row->vt/60), $row->vt % 60);
+        }
+
+        $values['track'] = $row;
+
+        ###################################################################
+        #	사은품 정보
+        ###################################################################
+        $sql = "
+            select a.no, a.ord_no, a.ord_opt_no,
+                ifnull(a.give_yn, 'N') as give_yn,
+                ifnull(a.give_date, '') as give_date,
+                ifnull(a.refund_no, '0') as refund_no,
+                ifnull(a.refund_yn, 'N') as refund_yn,
+                ifnull(a.refund_date, '') as refund_date,
+                a.admin_id, a.admin_nm, a.rt, a.ut,
+                b.no as gift_no, b.name,
+                ifnull(cd.code_val, '') as type_val,
+                ifnull(cd2.code_val, '') as kind_val,
+                b.type, b.kind, b.img, b.apply_amt,
+                g.goods_no, g.goods_sub, g.goods_nm,
+                '' as choice_class
+            from order_gift a
+                inner join gift b on a.gift_no = b.no
+                inner join order_opt c on c.ord_opt_no = a.ord_opt_no
+                inner join goods g on g.goods_no = c.goods_no and g.goods_sub = c.goods_sub
+                left outer join code cd on cd.code_kind_cd = 'G_GIFT_TYPE' and cd.code_id = b.type
+                left outer join code cd2 on cd2.code_kind_cd = 'G_GIFT_KIND' and cd2.code_id = b.kind
+            where a.ord_no = '$ord_no'
+            order by a.ord_opt_no desc
+        ";
+        $rows = DB::select($sql);
+
+        foreach($rows as $row){
+            if( $row->kind == "P" && $ord_opt_no == $row->ord_opt_no ) {
+                $row->choice_class	= "choice";
+            }
+
+            $row->goods_snm = mb_substr($row->goods_nm, 0, 28);
+        }
+
+        $values['gifts'] = $rows;
+
+        return $values;        
     }
 }

@@ -44,6 +44,7 @@ class prd03Controller extends Controller
 			'items'			=> SLib::getItems(),
 			'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
 			'is_unlimiteds'	=> SLib::getCodes('G_IS_UNLIMITED'),
+			'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
 		];
 
 		return view( Config::get('shop.store.view') . '/product/prd03',$values);
@@ -60,6 +61,9 @@ class prd03Controller extends Controller
 		$prd_cd = $request->input("prd_cd");
 		$com_id	= $request->input("com_cd");
 		$com_nm	= $request->input("com_nm");
+
+		$store_type	= $request->input("store_type", "");
+		$store_no	= $request->input("store_no", "");
 
 		$limit = $request->input("limit", 100);
 		$ord = $request->input('ord','desc');
@@ -81,6 +85,30 @@ class prd03Controller extends Controller
 		if ($com_id != "") $where .= " and p.com_id = '" . Lib::quote($com_id) . "'";
 		if ($com_nm != "") $where .= " and cp.com_nm like '%" . Lib::quote($com_nm) . "%' ";
 
+		$in_store_sql	= "";
+		if ($store_no != "") {
+			$in_store_sql	= " inner join product_stock_store psst on p.prd_cd = psst.prd_cd ";
+
+			$where	.= " and (1!=1";
+			foreach ($store_no as $store_cd) {
+				$where .= " or pss.store_cd = '" . Lib::quote($store_cd) . "' ";
+			}
+			$where	.= ")";
+		}
+
+		if ($store_no == "" && $store_type != "") {
+			$in_store_sql	= " inner join product_stock_store psst on p.prd_cd = psst.prd_cd ";
+
+			$sql	= " select store_cd from store where store_type = :store_type and use_yn = 'Y' ";
+			$result = DB::select($sql, ['store_type' => $store_type]);
+
+			$where	.= " and (1!=1";
+			foreach ($result as $row) {
+				$where .= " or psst.store_cd = '" . Lib::quote($row->store_cd) . "' ";
+			}
+			$where	.= ")";
+		}
+
 		$page_size	= $limit;
 		$startno = ($page - 1) * $page_size;
 		$limit = " limit $startno, $page_size ";
@@ -95,6 +123,7 @@ class prd03Controller extends Controller
 					inner join product_code pc on p.prd_cd = pc.prd_cd
 					inner join product_image i on p.prd_cd = i.prd_cd
 					inner join company cp on p.com_id = cp.com_id
+					$in_store_sql
 				where p.use_yn = 'Y' 
 					$where
 			";
@@ -115,6 +144,8 @@ class prd03Controller extends Controller
 				p.prd_nm as prd_nm,
 				p.price as price,
 				p.wonga as wonga,
+				ifnull(pss.wqty, 0) as stock_qty,
+				ifnull(pss2.wqty, 0) as store_qty,
 				pc.seq as seq,
 				c3.code_val as year,
 				c4.code_val as season,
@@ -127,7 +158,10 @@ class prd03Controller extends Controller
 			from product p
 				inner join product_code pc on p.prd_cd = pc.prd_cd
 				left outer join product_image i on p.prd_cd = i.prd_cd
+				left outer join product_stock_storage pss on p.prd_cd = pss.prd_cd
+				left outer join product_stock_store pss2 on p.prd_cd = pss2.prd_cd
 				inner join company cp on p.com_id = cp.com_id
+				$in_store_sql
 				left outer join code c on c.code_kind_cd = 'PRD_MATERIAL_TYPE' and c.code_id = pc.brand
 				left outer join code c2 on c2.code_kind_cd = 'PRD_MATERIAL_OPT' and c2.code_id = pc.opt
 				left outer join code c3 on c3.code_kind_cd = 'PRD_CD_YEAR' and c3.code_id = pc.year

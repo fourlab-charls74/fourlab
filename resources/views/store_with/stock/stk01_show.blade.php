@@ -58,7 +58,7 @@
                                 <th>상품명</th>
                                 <td colspan="2">{{ @$prd->goods_nm }}</td>
                                 <th>컬러/사이즈</th>
-                                <td>{{ @$prd->color }} / {{ @$prd->size }}</td>
+                                <td>{{ @$prd->color_cd == '00' ? '단일색상' : @$prd->color }} / {{ @$prd->size }}</td>
                             </tr>
                             <tr>
                                 <th>TAG가/판매가</th>
