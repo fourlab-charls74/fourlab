@@ -1192,7 +1192,7 @@ class ord01Controller extends Controller
                 , cd4.code_val as ord_state_nm
             from $order_mst a
                 left outer join $payment b on a.ord_no = b.ord_no
-                inner join company c on a.sale_place = c.com_id and c.com_type='4'
+                left outer join company c on a.sale_place = c.com_id and c.com_type='4'
                 left outer join code cd on cd.code_kind_cd = 'G_ORD_TYPE' and cd.code_id = a.ord_type
                 inner join code cd2 on cd2.code_kind_cd = 'G_ORD_KIND'  and cd2.code_id = a.ord_kind
                 left outer join code cd3 on cd3.code_kind_cd = 'G_PAY_TYPE'  and cd3.code_id = b.pay_type

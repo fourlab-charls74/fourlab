@@ -263,6 +263,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk03/batch-create', 'stk03Controller@batch_create');
         Route::post('stk03/batch-import', 'stk03Controller@batch_import');
         Route::put('stk03/batch-add', 'stk03Controller@batch_add');
+        Route::get('stk03/order/{ord_no}/{ord_opt_no?}', 'stk03Controller@show'); // 매장주문 상세
 
         Route::get('stk11','stk11Controller@index');
 

@@ -35,10 +35,6 @@ function openHeadStock(goods_no,goods_opt){
     var url = '/head/stock/stk01/' + goods_no + '/' + goods_opt;
     var stock = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
 }
-function openStoreStock(prd_cd){
-    var url = '/store/stock/stk01/' + prd_cd;
-    var stock = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=900,height=768");
-}
 
 function openSmsSend(phone='', name='') {
     var url = '/head/api/sms/send?phone=' + phone + '&name=' + name;
@@ -57,6 +53,15 @@ function openSchDetail(idx='') {
 function openSchPop(kwd) {
     const url = `https://devel.netpx.co.kr/app/product/search?q=${kwd}`;
     window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800")
+}
+
+function openStoreStock(prd_cd){
+    var url = '/store/stock/stk01/' + prd_cd;
+    var stock = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=900,height=768");
+}
+function openStoreOrder(ord_no,ord_opt_no){
+    var url = '/store/stock/stk03/order/' + ord_no + '/' + ord_opt_no;
+    var order = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
 }
 
 /**

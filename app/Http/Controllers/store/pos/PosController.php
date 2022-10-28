@@ -639,7 +639,7 @@ class PosController extends Controller
                 $a_ord_amt = $cart[$i]["total"] ?? 0;
                 $a_recv_amt = $a_ord_amt;
                 $ord_opt_dlv_amt = 0;
-                $c_dc_amt = $goods_price - $cart[$i]['price'];
+                $c_dc_amt = ($goods_price - $cart[$i]['price']) * $qty;
 
                 $divided_point = round(($goods_price / $total_amt) * $point_amt, 0);
                 if ($i >= count($cart) - 1) {
@@ -663,7 +663,7 @@ class PosController extends Controller
                         'pay_type' => $pay_type,
                         'point_amt' => $divided_point,
                         'coupon_amt' => 0,
-                        'dc_amt' => $c_dc_amt,
+                        'dc_amt' => $c_dc_amt > 0 ? $c_dc_amt : 0,
                         'opt_amt' => $order_opt_amt,
                         'addopt_amt' => $order_addopt_amt,
                         'recv_amt' => $a_recv_amt - $divided_point,
