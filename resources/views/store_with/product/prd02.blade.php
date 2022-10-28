@@ -256,36 +256,22 @@
 				pinned: 'left',
 				cellStyle:StyleGoodsNo,
 			},
-			{field: "opt_kind_nm", headerName: "품목", width:70, cellStyle: {"line-height": "30px"}},
-			{field: "brand_nm", headerName: "브랜드", cellStyle: {"line-height": "30px"}},
-			{field: "style_no", headerName: "스타일넘버", cellStyle: {"line-height": "30px"}},
+			{field: "opt_kind_nm", headerName: "품목", width:70, cellStyle: {"line-height": "30px", "text-align": "center"}},
+			{field: "brand_nm", headerName: "브랜드", cellStyle: {"line-height": "30px", "text-align": "center"}},
+			{field: "style_no", headerName: "스타일넘버", cellStyle: {"line-height": "30px", "text-align": "center"}},
 			{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}"},
 			{field: "img", headerName: "이미지_url", hide: true},
 			{field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', width: 230, cellStyle: {"line-height": "30px"}},
 			{field: "sale_stat_cl", headerName: "상품상태", width:70, type: 'GoodsStateTypeLH50'},
 			{field: "goods_opt", headerName: "옵션", width:150, cellStyle: {"line-height": "30px"}, hide:true },
-			{field: "product_cd", headerName: "코드일련", width:100, cellStyle: {"line-height": "30px"},
-				cellRenderer: function(params) {
-						let prd_cd = params.data.prd_cd;
-						let product_cd = prd_cd.substr(0, 11); 
-						return product_cd;
-					}
+			{field: "product_cd", headerName: "코드일련", width:100, cellStyle: {"line-height": "30px", "text-align": "center"},
+				cellRenderer: (params) => params.data.prd_cd.substr(0, 11),
 			},
-			{field: "color", headerName: "컬러", width:100, cellStyle: {"line-height": "30px"},
-				cellRenderer: function(params) {
-					let prd_cd = params.data.prd_cd;
-					let color_size = prd_cd.substr(11);
-					let color = color_size.substr(0,2);
-					return color;
-				}
+			{field: "color", headerName: "컬러", width:60, cellStyle: {"line-height": "30px", "text-align": "center"},
+				cellRenderer: (params) => params.data.prd_cd.substr(11).substr(0, 2),
 			},
-			{field: "size", headerName: "사이즈", width:100, cellStyle: {"line-height": "30px"},
-				cellRenderer: function(params) {
-						let prd_cd = params.data.prd_cd;
-						let color_size = prd_cd.substr(11);
-						let size = color_size.substr(2);
-						return size;
-					}
+			{field: "size", headerName: "사이즈", width:60, cellStyle: {"line-height": "30px", "text-align": "center"},
+				cellRenderer: (params) => params.data.prd_cd.substr(11).substr(2),
 			},
 			{
 				field: "wqty", headerName: "창고재고", width:70, type: 'numberType', cellStyle: {"line-height": "30px"},
