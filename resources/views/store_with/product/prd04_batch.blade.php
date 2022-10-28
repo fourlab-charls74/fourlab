@@ -157,6 +157,8 @@
 				else 
 				{
 					alert("데이터 등록(수정)이 실패하였습니다.");
+					alert(data.result_code);
+					console.log(data.result_code);
 				}
 			},
 			error: function(request, status, error) {
