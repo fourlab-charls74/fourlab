@@ -225,7 +225,8 @@ class stk16Controller extends Controller
                 ->where('prd_cd', '=', $prd_cd)
                 ->where('storage_cd', '=', DB::raw("(select storage_cd from storage where default_yn = 'Y')"))
                 ->get()[0];
-                $storage_qty = $result->qty;
+
+                $storage_qty = $result->wqty;
 
                 if ((int)$row['qty'] > $storage_qty) { // 창고수량보다 접수 수량이 많은 경우 에러처리
                     DB::rollback();

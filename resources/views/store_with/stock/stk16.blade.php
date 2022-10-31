@@ -462,7 +462,6 @@
         let rows = gx.getSelectedRows();
         if (rows.length < 1) return alert("접수처리할 항목을 선택해주세요.");
         if (rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 접수처리 가능합니다.");
-        if (rows.filter(r => r.qty > r.origin_qty).length > 0) return alert("");
         if (!confirm("선택한 항목을 접수처리하시겠습니까?")) return;
         axios({
             url: '/store/stock/stk16/receipt',
