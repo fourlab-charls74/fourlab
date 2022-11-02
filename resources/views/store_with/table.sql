@@ -87,6 +87,7 @@ CREATE TABLE `product_stock_order_product` (
 CREATE TABLE `product_stock` (
     `goods_no` INT(11) NOT NULL DEFAULT '0' COMMENT '상품번호',
     `prd_cd` VARCHAR(50) NOT NULL DEFAULT '0' COMMENT '상품코드',
+    `wonga` int(11) default not null comment '최근원가',
     `qty_wonga` bigint(11) default not null comment '총원가',
     `in_qty` INT(11) DEFAULT NULL COMMENT '입고수량',
     `out_qty` INT(11) DEFAULT NULL COMMENT '출고수량',
@@ -97,7 +98,8 @@ CREATE TABLE `product_stock` (
     `use_yn` CHAR(1) DEFAULT NULL COMMENT '사용여부',
     `rt` DATETIME DEFAULT NULL COMMENT '등록일시',
     `ut` DATETIME DEFAULT NULL COMMENT '변경일시',
-    PRIMARY KEY (`goods_no`,`prd_cd`)
+    PRIMARY KEY (`prd_cd`),
+    KEY `idx_goodsno` (`goods_no`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='상품재고';
 
 -- 오프라인 재고(매장)

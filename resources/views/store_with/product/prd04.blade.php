@@ -234,7 +234,8 @@ function EditProduct(product_code, goods_no) {
 }
 
 function AddStock(item){
-	if( item == 'storage' )	url = '/store/product/prd04/batch';
+	if( item == 'storage' )		url = '/store/product/prd04/batch';
+	else if( item == 'store' )	url = '/store/product/prd04/batch_store';
 
 	window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
 }

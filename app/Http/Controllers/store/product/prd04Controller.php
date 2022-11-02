@@ -350,6 +350,7 @@ class prd04Controller extends Controller
 
 				$values	= [
 					'goods_no'	=> '',
+					'wonga'		=> $wonga,
 					'qty_wonga'	=> $qty * $wonga,
 					'in_qty'	=> $qty,
 					'out_qty'	=> '0',
@@ -376,6 +377,154 @@ class prd04Controller extends Controller
 					'ut'		=> now()
 				];
 				DB::table('product_stock_storage')->updateOrInsert($where, $values);
+
+			}
+	
+		//	DB::commit();
+        //}
+		//catch(Exception $e) 
+		//{
+        //    DB::rollback();
+
+		//	$result_code	= "500";
+		//	$result_msg		= "데이터 등록/수정 오류";
+		//}
+
+		return response()->json([
+			"code"			=> $error_code,
+			"result_code"	=> $result_code
+		]);
+	}
+
+	public function batch_store(){
+		$values = [];
+
+		return view( Config::get('shop.store.view') . '/product/prd04_batch_store', $values);
+	}
+
+	public function upload_store(Request $request)
+	{
+
+		if ( 0 < $_FILES['file']['error'] ) {
+			echo json_encode(array(
+				"code" => 500,
+				"errmsg" => 'Error: ' . $_FILES['file']['error']
+			));
+		}
+		else {
+			//$file = sprintf("data/code02/%s", $_FILES['file']['name']);
+			$file = sprintf("data/store/prd04/%s", $_FILES['file']['name']);
+			move_uploaded_file($_FILES['file']['tmp_name'], $file);
+			echo json_encode(array(
+				"code" => 200,
+				"file" => $file
+			));
+		}
+
+	}
+
+	public function update_store(Request $request)
+	{
+
+
+		$error_code		= "200";
+		$result_code	= "";
+
+		$id		= Auth('head')->user()->id;
+		$name	= Auth('head')->user()->name;
+
+		$datas	= $request->input('data');
+		$datas	= json_decode($datas);
+
+		if( $datas == "" )
+		{
+			$error_code	= "400";
+		}
+
+        //try 
+		//{
+        //    DB::beginTransaction();
+
+			for( $i = 0; $i < count($datas); $i++ )
+			{
+				$data		= (array)$datas[$i];
+	
+				$store_cd	= trim($data['store_cd']);
+				$prd_cd_p	= trim($data['prd_cd_p']);
+				$prd_nm		= trim($data['prd_nm']);
+				$style_no	= trim($data['style_no']);
+				$color		= trim($data['color']);
+				$size		= trim($data['size']);
+				$qty		= Lib::uncm(trim($data['qty']));
+				$tag_price	= Lib::uncm(trim($data['tag_price']));
+				$price		= Lib::uncm(trim($data['price']));
+				$qty_wonga	= 0;
+				$wonga		= 0;
+				$in_qty		= 0;
+				$org_qty	= 0;
+
+				$prd_cd		= $prd_cd_p . $color . $size;
+
+				//매장 존재 유무 검토
+				$sql		= " select count(*) as tot from store where store_cd = :store_cd ";
+				$store	= DB::selectOne($sql, ['store_cd' => $store_cd]);
+
+				if( $store->tot == 0 ){
+					$error_code		= "501";
+					$result_code	= "매장정보가 존재하지 않습니다. [" . $store_cd . "]";
+
+					break;
+				}
+
+				//상품코드 존재 유무
+				$sql		= " select wonga, qty_wonga, in_qty, qty from product_stock where prd_cd = :prd_cd ";
+				$result = DB::select($sql, ['prd_cd' => $prd_cd]);
+
+				foreach($result as $row){
+					$qty_wonga	= $row->qty_wonga;
+					$wonga		= $row->wonga;
+
+					if( $qty_wonga > 0 )	$wonga = $qty_wonga / $row->qty;
+
+					$in_qty		= $row->in_qty;
+					$org_qty	= $row->qty;
+				}
+		
+				if( $wonga == 0 ){
+					$error_code		= "502";
+					$result_code	= "상품정보 혹은 원가정보가 존재하지 않습니다. [" . $prd_cd . "]";
+
+					break;
+				}
+
+				//재고정보 처리
+				$where	= ['prd_cd'	=> $prd_cd];
+
+				$values	= [
+					'wonga'		=> $wonga,
+					'qty_wonga'	=> $qty_wonga + $qty * $wonga,
+					'in_qty'	=> $in_qty + $qty,
+					'qty'		=> $org_qty + $qty,
+					'ut'		=> now()
+				];
+				DB::table('product_stock')
+					->where($where)
+					->update($values);
+				//DB::table('product_stock')->update($where, $values);
+
+				//매장재고 정보 처리
+				$where	= ['prd_cd'	=> $prd_cd, 'store_cd' => $store_cd];
+
+				$values	= [
+					'goods_no'	=> '',
+					'qty'		=> $qty,
+					'wqty'		=> $qty,
+					'goods_opt'	=> '',
+					'use_yn'	=> 'Y',
+					'rt'		=> now(),
+					'ut'		=> now()
+				];
+				DB::table('product_stock_store')->updateOrInsert($where, $values);
 
 			}
 	
