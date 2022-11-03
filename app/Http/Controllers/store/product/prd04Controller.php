@@ -349,14 +349,14 @@ class prd04Controller extends Controller
 				$where	= ['prd_cd'	=> $prd_cd];
 
 				$values	= [
-					'goods_no'	=> '',
+					//'goods_no'	=> '',
 					'wonga'		=> $wonga,
 					'qty_wonga'	=> $qty * $wonga,
 					'in_qty'	=> $qty,
 					'out_qty'	=> '0',
 					'qty'		=> $qty,
 					'wqty'		=> $qty,
-					'goods_opt'	=> '',
+					//'goods_opt'	=> '',
 					'barcode'	=> $prd_cd,
 					'use_yn'	=> 'Y',
 					'rt'		=> now(),
@@ -377,6 +377,196 @@ class prd04Controller extends Controller
 					'ut'		=> now()
 				];
 				DB::table('product_stock_storage')->updateOrInsert($where, $values);
+
+			}
+	
+		//	DB::commit();
+        //}
+		//catch(Exception $e) 
+		//{
+        //    DB::rollback();
+
+		//	$result_code	= "500";
+		//	$result_msg		= "데이터 등록/수정 오류";
+		//}
+
+		return response()->json([
+			"code"			=> $error_code,
+			"result_code"	=> $result_code
+		]);
+	}
+
+	public function batch_wonga(){
+		$values = [];
+
+		return view( Config::get('shop.store.view') . '/product/prd04_batch_wonga', $values);
+	}
+
+	public function upload_wonga(Request $request)
+	{
+
+		if ( 0 < $_FILES['file']['error'] ) {
+			echo json_encode(array(
+				"code" => 500,
+				"errmsg" => 'Error: ' . $_FILES['file']['error']
+			));
+		}
+		else {
+			//$file = sprintf("data/code02/%s", $_FILES['file']['name']);
+			$file = sprintf("data/store/prd04/%s", $_FILES['file']['name']);
+			move_uploaded_file($_FILES['file']['tmp_name'], $file);
+			echo json_encode(array(
+				"code" => 200,
+				"file" => $file
+			));
+		}
+
+	}
+
+	public function update_wonga(Request $request)
+	{
+
+
+		$error_code		= "200";
+		$result_code	= "";
+
+		$id		= Auth('head')->user()->id;
+		$name	= Auth('head')->user()->name;
+
+		$datas	= $request->input('data');
+		$datas	= json_decode($datas);
+
+		if( $datas == "" )
+		{
+			$error_code	= "400";
+		}
+
+        //try 
+		//{
+        //    DB::beginTransaction();
+
+			for( $i = 0; $i < count($datas); $i++ )
+			{
+				$data		= (array)$datas[$i];
+	
+				$prd_cd_p	= trim($data['prd_cd_p']);
+				$style_no	= trim($data['style_no']);
+				$prd_nm		= trim($data['prd_nm']);
+				$color		= trim($data['color']);
+				$size		= trim($data['size']);
+				$tag_price	= Lib::uncm(trim($data['tag_price']));
+				$price		= Lib::uncm(trim($data['price']));
+				$wonga		= Lib::uncm(trim($data['wonga']));
+				$store_qty	= Lib::uncm(trim($data['store_qty']));
+				$storage_qty	= Lib::uncm(trim($data['storage_qty']));
+				$tot_qty	= Lib::uncm(trim($data['tot_qty']));
+
+				$prd_cd		= $prd_cd_p . $color . $size;
+
+				if( $store_qty != 0 || $storage_qty != 0 ){
+					$sql	= " select count(*) as cnt from product_code where prd_cd = :prd_cd";
+					$product_code	= DB::selectOne($sql,['prd_cd' => $prd_cd]);
+
+					if( $product_code->cnt == 0 ){
+						// 상품코드 정보가 없을시
+
+						$brand	= "";
+						$sql	= " select br_cd, length(br_cd) as chk_len from brand where use_yn = 'Y' and br_cd <>'' order by length(br_cd) asc ";
+						$result = DB::select($sql);
+						foreach($result as $row){
+							if( substr($prd_cd, 0, $row->chk_len) == $row->br_cd ){
+								$brand	= $row->br_cd;
+							}
+						}
+
+						if( $brand == "" ){
+							$error_code		= "501";
+							$result_code	= "브랜드정보가 존재하지 않습니다. [" . $prd_cd . "]";
+		
+							break;
+						}
+
+						$year	= substr(str_replace($brand, "", $prd_cd), 0 ,2);
+						$season	= substr(str_replace($brand, "", $prd_cd), 2 ,1);
+						$gender	= substr(str_replace($brand, "", $prd_cd), 3 ,1);
+						$item	= substr(str_replace($brand, "", $prd_cd), 4 ,2);
+						$seq	= substr(str_replace($brand, "", $prd_cd), 6 ,2);
+						$opt	= substr(str_replace($brand, "", $prd_cd), 8 ,2);
+
+						//product_code 등록/수정
+						$values	= [
+							'prd_cd'	=> $prd_cd,
+							'goods_no'	=> '',
+							'goods_opt'	=> '',
+							'brand'		=> $brand,
+							'year'		=> $year,
+							'season'	=> $season,
+							'gender'	=> $gender,
+							'item'		=> $item,
+							'opt'		=> $opt,
+							'seq'		=> $seq,
+							'color'		=> $color,
+							'size'		=> $size,
+							'type'		=> 'N',			//일반상품
+							'rt'		=> now(),
+							'ut'		=> now(),
+							'admin_id'	=> $id
+						];
+						DB::table('product_code')->Insert($values);
+		
+					}
+
+					//product 등록/수정
+					$where	= ['prd_cd'	=> $prd_cd];
+					$values	= [
+						'prd_nm'	=> $prd_nm,
+						'style_no'	=> $style_no,
+						'tag_price'	=> $tag_price,
+						'price'		=> $price,
+						'wonga'		=> $wonga,
+						'type'		=> 'N',			//일반상품
+						'com_id'	=> 'alpen',		//
+						'unit'		=> '',
+						'match_yn'	=> 'N',
+						'rt'		=> now(),
+						'ut'		=> now(),
+						'admin_id'	=> $id
+					];
+					DB::table('product')->updateOrInsert($where, $values);
+
+					//재고정보 처리
+					$values	= [
+						//'goods_no'	=> '',
+						'wonga'		=> $wonga,
+						'qty_wonga'	=> '0',
+						'in_qty'	=> '0',
+						'out_qty'	=> '0',
+						'qty'		=> '0',
+						'wqty'		=> '0',
+						//'goods_opt'	=> '',
+						'barcode'	=> $prd_cd,
+						'use_yn'	=> 'Y',
+						'rt'		=> now(),
+						'ut'		=> now()
+					];
+					DB::table('product_stock')->updateOrInsert($where, $values);
+
+				}else{
+					//재고정보 초기화
+					$where	= ['prd_cd'	=> $prd_cd];
+
+					$values	= [
+						'wonga'		=> $wonga,
+						'in_qty'	=> '0',
+						'out_qty'	=> '0',
+						'qty'		=> '0',
+						'wqty'		=> '0',
+						'ut'		=> now()
+					];
+					DB::table('product_stock')
+						->where($where)
+						->update($values);
+				}
 
 			}
 	

@@ -1,5 +1,5 @@
 @extends('store_with.layouts.layout-nav')
-@section('title','2. 창고 재고 업로드')
+@section('title','원가/상품 업로드')
 @section('content')
 
 <script src="https://unpkg.com/xlsx-style@0.8.13/dist/xlsx.full.min.js"></script>
@@ -9,7 +9,7 @@
 		<div class="card_wrap aco_card_wrap">
 			<div class="card shadow">
 				<div class="card-header mb-0">
-					<a href="#">상품 재고 관리 - 2. 창고재고 업로드</a>
+					<a href="#">상품 재고 관리 - 1.원가/상품 업로드</a>
 				</div>
 				<div class="card-body mt-1">
 					<div class="row_wrap">
@@ -28,10 +28,9 @@
 													<input id="excelfile" type="file" name="excelfile" />
 													<a href="#" onclick="Upload();" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">자료 불러오기</a>
 													<span class="pl30">
-                                                        <br><br>
-                                                        ※ XMD >> 출고관리 >> 창고수불집계표에서 엑셀 다운로드 [엑셀 리스트 : 상단설명줄 및 제목줄 삭제, 품목소계 줄 삭제]<br>
-                                                        <strong style="color:#FF0000;">※ 재고 0인 상품자료 포함해서 엑셀등록 ( 재고등록시 원가 반영됨 )</strong>
-                                                    </span>
+														<br><br>
+														※ XMD >> 출고관리 >> 총재고현황에서 엑셀 다운로드
+													</span>
 												</td>
 											</tr>
 										</tbody>
@@ -56,7 +55,7 @@
 							<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
 						</div>
 						<div class="fr_box flax_box" style="font-size:12px;font-weight:700;color:#FF0000;">
-							※ 저장 - 신규데이터:신규등록, 기존데이터:업데이트 + product_stock 초기화 후 업데이트
+							※ 저장 - 신규데이터:신규등록, 기존데이터:원가업데이트 + 상품정보 등록
 						</div>
 					</div>
 				</div>
@@ -78,22 +77,18 @@
 <script language="javascript">
 	var columnDefs = [
 		{headerName: "#",			field: "num",		filter:true,width:50,valueGetter: function(params) {return params.node.rowIndex+1;},pinned:'left'},
-		{headerName:"창고코드",		field:"storage_cd", 	width:75},
-		{headerName:"창고명",		field:"storage_nm", 	width:80},
-		{headerName:"아이템", 		field:"style_no",   	width:75},
-		{headerName:"품목", 		field:"opt_kind_cd",	width:75},
-		{headerName:"브랜드",		field:"brand_nm",   	width:75},
 		{headerName:"코드일련",		field:"prd_cd_p", 		width:95},
+		{headerName:"아이템", 		field:"style_no",   	width:75},
 		{headerName:"상품명",		field:"prd_nm", 		width:180},
-		{headerName:"컬러",	    	field:"color_nm",		width:75},
 		{headerName:"컬러코드",		field:"color"   ,		width:75},
-        {headerName:"사이즈",   	field:"size",       	width:75},
-		{headerName:"상품코드", 	field:"prd_cd",     	width:120},
-		{headerName:"수량", 		field:"qty",        	width:58},
-		{headerName:"원가", 		field:"wonga",			width:58},
-		{headerName:"원가합",		field:"qty_wonga",  	width:68},
+		{headerName:"컬러",	    	field:"color_nm",		width:75},
+		{headerName:"사이즈",   	field:"size",       	width:75},
 		{headerName:"TAG가",		field:"tag_price",		width:68},
-		{headerName:"판매가",		field:"price",  		width:68}
+		{headerName:"판매가",		field:"price",  		width:68},
+		{headerName:"원가", 		field:"wonga",			width:58},
+		{headerName:"매장", 		field:"store_qty",     	width:58},
+		{headerName:"창고", 		field:"storage_qty",	width:58},
+		{headerName:"합계", 		field:"tot_qty",       	width:58}
 	];
 
 	// let the grid know which columns to use
@@ -143,7 +138,7 @@
 		$.ajax({
 			async: true,
 			type: 'put',
-			url: '/store/product/prd04/batch',
+			url: '/store/product/prd04/batch_wonga',
 			data: {
 				data : JSON.stringify(GridData),
 			},
@@ -205,34 +200,35 @@
 		var worksheet = workbook.Sheets[firstSheetName];
 
 		var columns	= {
-			'A':"storage_cd",
-			'B':"storage_nm",
-			'C':"style_no",
-			'D':"opt_kind_cd",
-			'E':"brand_nm",
-			'F':"prd_cd_p",
-			'G':"prd_nm",
-			'H':"com_id",
-			'I':"com_nm",
-			'J':"location",
-			'K':"kind",
-			'L':"color",
-			'M':"color_nm",
-			'N':"size",
-			'O':"prd_cd",
-			'P':"size_nm",
-			'Q':"memo",
-			'R':"qty",
-			'S':"wonga",
-			'T':"qty_wonga",
-			'U':"tag_price",
-			'V':"price",
-			'W':"qty_price"
+			'A':"prd_cd_p",
+			'B':"style_no",
+			'C':"prd_nm",
+			'D':"color",
+			'E':"color_nm",
+			'F':"size",
+			'G':"tag_price",
+			'H':"price",
+			'I':"wonga",
+			'J':"pro_qty",
+			'K':"pro_amt",
+			'L':"in_qty",
+			'M':"in_amt",
+			'N':"out_qty",
+			'O':"out_amt",
+			'P':"rt_qty",
+			'Q':"rt_amt",
+			'R':"sell_qty",
+			'S':"sell_amt",
+			'T':"loss_qty",
+			'U':"loss_amt",
+			'V':"store_qty",
+			'W':"storage_qty",
+			'X':"tot_qty"
 		};
 
 
 		// start at the 2nd row - the first row are the headers
-		var rowIndex = 1;
+		var rowIndex = 9;
 
 		var rowData = [];
 
@@ -267,7 +263,7 @@
 		form_data.append('file', file_data);
 		form_data.append('_token', "{{ csrf_token() }}");
 		$.ajax({
-			url: '/store/product/prd04/upload', // point to server-side PHP script
+			url: '/store/product/prd04/upload_wonga', // point to server-side PHP script
 			dataType: 'json',  // what to expect back from the PHP script, if anything
 			cache: false,
 			contentType: false,

@@ -1,5 +1,5 @@
 @extends('store_with.layouts.layout-nav')
-@section('title','매장 재고 업로드')
+@section('title','3. 매장 재고 업로드')
 @section('content')
 
 <script src="https://unpkg.com/xlsx-style@0.8.13/dist/xlsx.full.min.js"></script>
@@ -9,7 +9,7 @@
 		<div class="card_wrap aco_card_wrap">
 			<div class="card shadow">
 				<div class="card-header mb-0">
-					<a href="#">상품 재고 관리 - 매장재고 업로드</a>
+					<a href="#">상품 재고 관리 - 3. 매장재고 업로드</a>
 				</div>
 				<div class="card-body mt-1">
 					<div class="row_wrap">
@@ -56,7 +56,7 @@
 							<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
 						</div>
 						<div class="fr_box flax_box" style="font-size:12px;font-weight:700;color:#FF0000;">
-							※ 저장 - 신규데이터:신규등록, 기존데이터:신규업데이트 + product_stock 누적업데이트
+							※ 저장 - product_stock_store 전체 삭제 후 신규데이터:신규등록, 기존데이터:신규업데이트 + product_stock 누적업데이트
 						</div>
 					</div>
 				</div>
@@ -146,7 +146,7 @@
 				{
 					alert("창고재고가 등록(수정)되었습니다.");
 					window.opener.Search();
-					self.close();
+					//self.close();
 				} 
 				else 
 				{

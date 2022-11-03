@@ -19,8 +19,9 @@
 				<h4>검색</h4>
 				<div>
 					<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-					<a href="#" onclick="AddStock('storage');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 창고 재고 업로드</a>
-					<a href="#" onclick="AddStock('store');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 매장 재고 업로드</a>
+					<a href="#" onclick="AddStock('wonga');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 1. 원가/상품 업로드</a>
+					<a href="#" onclick="AddStock('storage');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 2. 창고 재고 업로드</a>
+					<a href="#" onclick="AddStock('store');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 3. 매장 재고 업로드</a>
 					<a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
@@ -129,8 +130,9 @@
 		</div>
 		<div class="resul_btn_wrap mb-3">
 			<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-			<a href="#" onclick="AddStock('storage');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 창고 재고 업로드</a>
-			<a href="#" onclick="AddStock('store');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 매장 재고 업로드</a>
+			<a href="#" onclick="AddStock('wonga');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 1. 원가/상품 업로드</a>
+			<a href="#" onclick="AddStock('storage');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i>2. 창고 재고 업로드</a>
+			<a href="#" onclick="AddStock('store');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i>3. 매장 재고 업로드</a>
 			<a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
 			<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
 		</div>
@@ -234,8 +236,9 @@ function EditProduct(product_code, goods_no) {
 }
 
 function AddStock(item){
-	if( item == 'storage' )		url = '/store/product/prd04/batch';
-	else if( item == 'store' )	url = '/store/product/prd04/batch_store';
+	if( item == 'wonga' )			url = '/store/product/prd04/batch_wonga';
+	else if( item == 'storage' )	url = '/store/product/prd04/batch';
+	else if( item == 'store' )		url = '/store/product/prd04/batch_store';
 
 	window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
 }

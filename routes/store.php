@@ -206,6 +206,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('prd04/upload',	'prd04Controller@upload');
         Route::put('prd04/batch', 'prd04Controller@update');
 
+        Route::get('prd04/batch_wonga', 'prd04Controller@batch_wonga');
+        Route::post('prd04/upload_wonga',	'prd04Controller@upload_wonga');
+        Route::put('prd04/batch_wonga', 'prd04Controller@update_wonga');
+
         Route::get('prd04/batch_store', 'prd04Controller@batch_store');
         Route::post('prd04/upload_store',	'prd04Controller@upload_store');
         Route::put('prd04/batch_store', 'prd04Controller@update_store');

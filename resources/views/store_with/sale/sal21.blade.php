@@ -115,6 +115,7 @@
                                         <option value="1000">1000</option>
                                         <option value="2000">2000</option>
                                         <option value="5000">5000</option>
+                                        <option value="-1">전체</option>
                                     </select>
                                 </div>
                                 <span class="text_line">/</span>
@@ -169,8 +170,8 @@
         {field: "store_cd",	headerName: "매장코드", pinned: 'left', width: 60, cellStyle: AlignCenter},
         {field: "store_nm",	headerName: "매장명", pinned: 'left', width: 130},
         {field: "goods_no", headerName: "상품번호", pinned: 'left', width: 60, cellStyle: AlignCenter},
-        {field: "prd_cd", headerName: "바코드", pinned: 'left', width: 120, cellStyle: AlignCenter},
-        {field: "prd_cd_sm", headerName: "상품코드", pinned: 'left', width: 100, cellStyle: AlignCenter},
+        {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: AlignCenter},
+        {field: "prd_cd_sm", headerName: "코드일련", pinned: 'left', width: 100, cellStyle: AlignCenter},
         {field: "color", headerName: "컬러", pinned: 'left', width: 50, cellStyle: AlignCenter},
         {field: "size", headerName: "사이즈", pinned: 'left', width: 50, cellStyle: AlignCenter},
         {field: "goods_nm", headerName: "상품명", width: 200},

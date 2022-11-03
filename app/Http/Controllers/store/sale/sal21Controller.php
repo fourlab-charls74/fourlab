@@ -78,6 +78,9 @@ class sal21Controller extends Controller
         $startno = ($page - 1) * $page_size;
         $limit = " limit $startno, $page_size ";
 
+        //전체 데이터 보기(임시)
+        if($page_size == -1)    $limit = "";
+
         $sql = "
             select 
                 p.store_cd, 
@@ -139,7 +142,7 @@ class sal21Controller extends Controller
                 p.wqty as current_qty
             from product_stock_store p
                 inner join product_code pc on pc.prd_cd = p.prd_cd
-                inner join goods g on g.goods_no = p.goods_no
+                left outer join goods g on g.goods_no = p.goods_no
                 inner join store on store.store_cd = p.store_cd
                 left outer join brand b on b.brand = g.brand
                 left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
@@ -259,7 +262,7 @@ class sal21Controller extends Controller
                         p.wqty as current_qty -- 현재재고
                     from product_stock_store p
                         inner join product_code pc on pc.prd_cd = p.prd_cd
-                        inner join goods g on g.goods_no = p.goods_no
+                        left outer join goods g on g.goods_no = p.goods_no
                         inner join store on store.store_cd = p.store_cd
                         left outer join (
                             select idx, prd_cd, location_cd, type, qty, stock_state_date
