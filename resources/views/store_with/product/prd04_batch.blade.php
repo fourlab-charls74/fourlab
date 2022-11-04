@@ -152,7 +152,7 @@
 				{
 					alert("창고재고가 등록(수정)되었습니다.");
 					window.opener.Search();
-					self.close();
+					//self.close();
 				} 
 				else 
 				{

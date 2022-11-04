@@ -22,18 +22,24 @@
 											<col width="30%">
 										</colgroup>
 										<tbody>
-											<tr>
-												<th>파일</th>
-												<td>
-													<input id="excelfile" type="file" name="excelfile" />
-													<a href="#" onclick="Upload();" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">자료 불러오기</a>
-													<span class="pl30">
-														<br><br>
-														※ XMD >> 출고관리 >> 매장재고현황2에서 엑셀 다운로드 [엑셀 리스트 : 상단설명줄 및 제목줄 삭제, 품목소계 줄 삭제]<br>
-														<strong style="color:#FF0000;">※ 재고 0인 상품자료 제외해서 엑셀등록</strong>
-													</span>
-												</td>
-											</tr>
+										<tr>
+											<th>파일</th>
+											<td>
+												<input id="excelfile" type="file" name="excelfile" />
+												<a href="#" onclick="Upload();" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">자료 불러오기</a>
+												<span class="pl30">
+													<br><br>
+													※ XMD >> 출고관리 >> 매장재고현황2에서 엑셀 다운로드 [엑셀 리스트 : 상단설명줄 및 제목줄 삭제, 품목소계 줄 삭제]<br>
+													<strong style="color:#FF0000;">※ 재고 0인 상품자료 제외해서 엑셀등록</strong>
+												</span>
+											</td>
+										</tr>
+										<tr>
+											<th>매장재고 초기화</th>
+											<td>
+												<input type="checkbox" name="init_chk" id="init_chk" value="Y"> 매장재고 초기화
+											</td>
+										</tr>
 										</tbody>
 									</table>
 								</div>
@@ -61,7 +67,7 @@
 					</div>
 				</div>
 				<div class="table-responsive">
-					<div id="div-gd" style="height:calc(100vh - 330px);width:100%;" class="ag-theme-balham"></div>
+					<div id="div-gd" style="height:calc(100vh - 372px);width:100%;" class="ag-theme-balham"></div>
 				</div>
 			</div>
 		</div>
@@ -134,17 +140,21 @@
 			return false;
 		}
 
+		if($("[name=init_chk]").is(":checked"))	init_chk = "Y";
+		else									init_chk = "";
+
 		$.ajax({
 			async: true,
 			type: 'put',
 			url: '/store/product/prd04/batch_store',
 			data: {
 				data : JSON.stringify(GridData),
+				init_chk : init_chk
 			},
 			success: function (data) {
 				if( data.code == "200" )
 				{
-					alert("창고재고가 등록(수정)되었습니다.");
+					alert("매장재고가 등록(수정)되었습니다.");
 					window.opener.Search();
 					//self.close();
 				} 

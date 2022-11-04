@@ -19,7 +19,7 @@
                 <ul>
                     <li><a href="/head/product/prd01" target="_blank">(개)상품관리</a></li>
                     <li><a href="/store/product/prd02">(완)상품관리(코드)</a></li>
-                    <li><a href="/store/product/prd04">(개)상품재고관리</a></li>
+                    <li><a href="/store/product/prd04">(완)상품재고관리</a></li>
                     <li><a href="/store/product/prd03">(완)원부자재상품관리</a></li>
                 </ul>
             </li>
@@ -35,7 +35,8 @@
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-store fs-18"></i><span>매장관리</span></a>
                 <ul>
-                    <li><a href="/store/stock/stk01">(완)매장재고</a></li>
+                    <li><a href="/store/product/prd04">(완)매장재고</a></li>
+                    <!--<li><a href="/store/stock/stk01">(완)매장재고</a></li>//-->
                     <!--<li><a href="/store/stock/stk02">(개)매장재고입출고</a></li>//-->
                     <li><a href="/store/stock/stk10">(완)출고</a></li>
                     <li><a href="/store/stock/stk30">(완)창고반품</a></li>

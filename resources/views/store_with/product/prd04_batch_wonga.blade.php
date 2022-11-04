@@ -145,9 +145,9 @@
 			success: function (data) {
 				if( data.code == "200" )
 				{
-					alert("창고재고가 등록(수정)되었습니다.");
+					alert("원가정보가 등록(수정)되었습니다.");
 					window.opener.Search();
-					self.close();
+					//self.close();
 				} 
 				else 
 				{

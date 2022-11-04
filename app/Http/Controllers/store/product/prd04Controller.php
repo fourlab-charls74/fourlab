@@ -248,6 +248,9 @@ class prd04Controller extends Controller
 		//{
         //    DB::beginTransaction();
 
+			$sql	= " delete from product_stock_storage ";
+			DB::delete($sql);
+
 			for( $i = 0; $i < count($datas); $i++ )
 			{
 				$data		= (array)$datas[$i];
@@ -322,11 +325,14 @@ class prd04Controller extends Controller
 					$seq	= substr(str_replace($brand, "", $prd_cd), 6 ,2);
 					$opt	= substr(str_replace($brand, "", $prd_cd), 8 ,2);
 
+					$goods_no	= "";
+					$goods_opt	= "";
+
 					//product_code 등록/수정
 					$values	= [
 						'prd_cd'	=> $prd_cd,
-						'goods_no'	=> '',
-						'goods_opt'	=> '',
+						'goods_no'	=> $goods_no,
+						'goods_opt'	=> $goods_opt,
 						'brand'		=> $brand,
 						'year'		=> $year,
 						'season'	=> $season,
@@ -343,6 +349,12 @@ class prd04Controller extends Controller
 					];
 					DB::table('product_code')->Insert($values);
 
+				}else{
+					$sql		= " select goods_no, goods_opt from product_code where prd_cd = :prd_cd ";
+					$obj_prd_code	= DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+					$goods_no	= $obj_prd_code->goods_no;
+					$goods_opt	= $obj_prd_code->goods_opt;
 				}
 
 				//재고정보 처리
@@ -368,10 +380,10 @@ class prd04Controller extends Controller
 				$where	= ['prd_cd'	=> $prd_cd, 'storage_cd' => $storage_cd];
 
 				$values	= [
-					'goods_no'	=> '',
+					'goods_no'	=> $goods_no,
 					'qty'		=> $qty,
 					'wqty'		=> $qty,
-					'goods_opt'	=> '',
+					'goods_opt'	=> $goods_opt,
 					'use_yn'	=> 'Y',
 					'rt'		=> now(),
 					'ut'		=> now()
@@ -557,6 +569,7 @@ class prd04Controller extends Controller
 
 					$values	= [
 						'wonga'		=> $wonga,
+						'qty_wonga'	=> '0',
 						'in_qty'	=> '0',
 						'out_qty'	=> '0',
 						'qty'		=> '0',
@@ -623,6 +636,7 @@ class prd04Controller extends Controller
 		$id		= Auth('head')->user()->id;
 		$name	= Auth('head')->user()->name;
 
+		$init_chk	= $request->input('init_chk');
 		$datas	= $request->input('data');
 		$datas	= json_decode($datas);
 
@@ -634,6 +648,11 @@ class prd04Controller extends Controller
         //try 
 		//{
         //    DB::beginTransaction();
+
+			if( $init_chk == "Y"){
+				$sql	= " delete from product_stock_store ";
+				DB::delete($sql);
+			}
 
 			for( $i = 0; $i < count($datas); $i++ )
 			{
@@ -667,7 +686,7 @@ class prd04Controller extends Controller
 				}
 
 				//상품코드 존재 유무
-				$sql		= " select wonga, qty_wonga, in_qty, qty from product_stock where prd_cd = :prd_cd ";
+				$sql		= " select goods_no, goods_opt, wonga, qty_wonga, in_qty, qty from product_stock where prd_cd = :prd_cd ";
 				$result = DB::select($sql, ['prd_cd' => $prd_cd]);
 
 				foreach($result as $row){
@@ -678,6 +697,9 @@ class prd04Controller extends Controller
 
 					$in_qty		= $row->in_qty;
 					$org_qty	= $row->qty;
+
+					$goods_no	= $row->goods_no;
+					$goods_opt	= $row->goods_opt;
 				}
 		
 				if( $wonga == 0 ){
@@ -706,10 +728,10 @@ class prd04Controller extends Controller
 				$where	= ['prd_cd'	=> $prd_cd, 'store_cd' => $store_cd];
 
 				$values	= [
-					'goods_no'	=> '',
+					'goods_no'	=> $goods_no,
 					'qty'		=> $qty,
 					'wqty'		=> $qty,
-					'goods_opt'	=> '',
+					'goods_opt'	=> $goods_opt,
 					'use_yn'	=> 'Y',
 					'rt'		=> now(),
 					'ut'		=> now()
@@ -722,10 +744,11 @@ class prd04Controller extends Controller
         //}
 		//catch(Exception $e) 
 		//{
-        //    DB::rollback();
+        //   DB::rollback();
 
 		//	$result_code	= "500";
-		//	$result_msg		= "데이터 등록/수정 오류";
+			//$result_msg		= "데이터 등록/수정 오류";
+		//	$result_msg = $e->getMessage();
 		//}
 
 		return response()->json([
