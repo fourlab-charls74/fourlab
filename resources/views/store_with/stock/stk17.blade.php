@@ -261,8 +261,20 @@
             {
                 headerName: '(대표)창고재고', // 대표창고의 재고를 조회
                 children: [
-                    {field: "storage_qty", headerName: "재고", type: 'currencyType'},
-                    {field: "storage_wqty", headerName: "보유재고", type: 'currencyType'},
+                    {field: "storage_qty", headerName: "재고", type: 'currencyType', 
+                        cellRenderer: function(params) {
+                            if (params.value !== undefined) {
+                                return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                            }
+                        }
+                    },
+                    {field: "storage_wqty", headerName: "보유재고", type: 'currencyType',
+                        cellRenderer: function(params) {
+                            if (params.value !== undefined) {
+                                return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                            }
+                        }
+                    },
                 ]
             },
             {
@@ -276,6 +288,11 @@
                         type: "currencyType",
                         hide: true,
                         width: 50,
+                        cellRenderer: function(params) {
+                            if (params.value !== undefined) {
+                                return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                            }
+                        }
                     },
                     {
                         field: 'store_wqty',
@@ -283,6 +300,11 @@
                         type: "currencyType",
                         hide: true,
                         width: 80,
+                        cellRenderer: function(params) {
+                            if (params.value !== undefined) {
+                                return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                            }
+                        }
                     },
                     {
                         field: 'rel_qty',

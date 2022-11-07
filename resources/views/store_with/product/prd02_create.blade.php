@@ -281,14 +281,12 @@
 		{field:"goods_no",	headerName: "상품번호",		width:72},
 		{field:"style_no", headerName: "스타일넘버",	width:72},
 		{field:"prd_nm", headerName: "상품명",			width:250},
-		{field:"goods_opt",	headerName: "상품옵션",		width:200},
-		{field:"prd_cd",	headerName: "상품코드",		width:120,
-			// cellRenderer: function(params){
-			// 	let prd_cd = document.getElementById('prd_cd').value;
-			// 	let prd_cd1 = prd_cd.substr(0,11);
-			// 	return prd_cd1
-			// }
+		{field:"goods_opt",	headerName: "상품옵션",		width:200,
+			cellRenderer:function(params){
+				return params.data.goods_opt
+			}
 		},
+		{field:"prd_cd",	headerName: "상품코드",		width:120},
 		{field:"color",		headerName: "컬러",			width:72},
 		{field:"size",		headerName: "사이즈",		width:72},
 		{field:"", headerName: "알림",		width:120,
@@ -345,6 +343,7 @@
 
     function Search_goods_code() {
         let data = $('form[name="f2"]').serialize();
+		console.log(data);
         gx2.Request('/store/product/prd02/prd-search-code/', data);
     }
 

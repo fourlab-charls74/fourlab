@@ -61,6 +61,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('prdcd/search', 'goods@search_prdcd');
         Route::get('prdcd/conds_code', 'goods@search_product_conditions_code');
         Route::get('prdcd/search_code', 'goods@search_prdcd_code');
+        
+        // 원부자재코드 조회
+        Route::get('prdcd/conds_sub', 'goods@search_product_sub_conditions');
+        Route::get('prdcd/search_sub', 'goods@search_prdcd_sub');
 
     });
 
@@ -183,6 +187,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('prd02/get-seq', 'prd02Controller@getSeq');
         Route::post('prd02/save_product', 'prd02Controller@save_product');
         Route::post('prd02/del-img', 'prd02Controller@delImg');
+        Route::post('prd02/sel_seq', 'prd02Controller@selSeq');
+        Route::post('prd02/change_seq', 'prd02Controller@changeSeq');
 
         // 원부자재 상품 관리
         Route::get('prd03','prd03Controller@index');

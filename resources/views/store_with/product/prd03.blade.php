@@ -42,7 +42,7 @@
 						<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
 						<a href="#" onclick="AddProduct();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
 						<a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
-						<a href="#" class="btn btn-sm btn-primary shadow-sm pl-2">원부자재관리</a>
+						<a href="/store/cs/cs03" class="btn btn-sm btn-primary shadow-sm pl-2">원부자재관리</a>
 						<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 					</div>
 				</div>
@@ -50,12 +50,12 @@
 					<div class="row">
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
-								<label>상품코드</label>
+								<label>원부자재코드</label>
 								<div class="form-inline">
 									<div class="form-inline-inner input-box w-100">
 										<div class="form-inline inline_btn_box">
-											<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm w-100 ac-style-no search-enter">
-											<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+											<input type='text' id="prd_cd_sub" name='prd_cd_sub' class="form-control form-control-sm w-100 ac-style-no search-enter">
+											<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd_sub"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 										</div>
 									</div>
 								</div>
@@ -109,7 +109,7 @@
 						</div>
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
-								<label for="name">공급업체(거래선)</label>
+								<label for="name">원부자재업체</label>
 								<div class="form-inline inline_select_box">
 									<div class="form-inline-inner input-box w-100">
 										<div class="form-inline inline_btn_box">
@@ -167,27 +167,31 @@
 				<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
 			</div>
 		</div>
-	</form>
 	<!-- DataTales Example -->
-	<form method="post" name="save" action="/head/stock/stk01">
-		@csrf
-		<div id="filter-area" class="card shadow-none mb-0 ty2 last-card">
-			<div class="card-body">
-				<div class="card-title mb-3">
-					<div class="filter_wrap">
-						<div class="fl_box">
-							<h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
-						</div>
-						<div class="fr_box flex_box">
+	<div id="filter-area" class="card shadow-none mb-0 ty2 last-card">
+		<div class="card-body">
+			<div class="card-title mb-3">
+				<div class="filter_wrap">
+					<div class="fl_box">
+						<h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
+					</div>
+					<div class="fr_box">
+						<div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+							<input type="checkbox" class="custom-control-input" name="ext_store_qty" id="ext_store_qty" value="Y">
+							<label class="custom-control-label font-weight-normal" for="ext_store_qty">매장재고 0 제외</label>
 						</div>
 					</div>
 				</div>
-				<div class="table-responsive">
-					<div id="div-gd" style="min-height:300px;height:calc(100vh - 370px);width:100%;" class="ag-theme-balham gd-lh50 ty2"></div>
-				</div>
+			</div>
+		</form>	
+				<form method="post" name="save" action="/head/stock/stk01">
+					@csrf
+					<div class="table-responsive">
+						<div id="div-gd" style="min-height:300px;height:calc(100vh - 370px);width:100%;" class="ag-theme-balham gd-lh50 ty2"></div>
+					</div>
+				</form>
 			</div>
 		</div>
-	</form>
 	<style>
 		/* 전시카테고리 상품 이미지 사이즈 픽스 */
 		.img {
@@ -222,7 +226,7 @@
 			},
 			{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: DEFAULT, surl:"{{config('shop.front_url')}}"},
 			{field: "img", headerName: "이미지_url", hide: true},
-			{field: "prd_cd", headerName: "상품코드", width:120, cellStyle: DEFAULT,
+			{field: "prd_cd", headerName: "원부자재코드", width:120, cellStyle: DEFAULT,
 				cellRenderer: function(params) {
 					if (params.value !== undefined) {
 						return '<a href="#" onclick="return EditProduct(\'' + params.value + '\');">' + params.value + '</a>';
@@ -238,6 +242,13 @@
 			{
 				field: "size",
 				headerName: "사이즈",
+				cellStyle: DEFAULT,
+				width: 80
+			},
+			{
+				field: "tag_price",
+				headerName: "Tag 가",
+				type: 'currencyType',
 				cellStyle: DEFAULT,
 				width: 80
 			},
@@ -260,12 +271,22 @@
 				headerName: '창고재고', 
 				type: "currencyType",
 				width: 80,
+				cellRenderer: function(params) {
+                if (params.value !== undefined) {
+                    return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                }
+            }
 			},
 			{
 				field: 'store_qty',
 				headerName: '매장재고', 
 				type: "currencyType",
 				width: 80,
+				cellRenderer: function(params) {
+                if (params.value !== undefined) {
+                    return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                }
+            }
 			},
 			{
 				field: "unit",

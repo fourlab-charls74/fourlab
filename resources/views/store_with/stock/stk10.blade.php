@@ -364,6 +364,15 @@
 		{field: "qty", headerName: "수량", type: "numberType",
             editable: function(params) {return params.data.state === 10;}, 
             cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};},
+            cellRenderer: function(params) {
+                if (params.data.state != 10) {
+                    if (params.value !== undefined) {
+                        return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                    }
+                } else {
+                    return params.data.qty
+                }
+            }
         },
 		{field: "exp_dlv_day", headerName: "출고예정일자", cellStyle: {"text-align": "center"},
             // cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99", "text-align": "center"} : {"text-align": "center"};},

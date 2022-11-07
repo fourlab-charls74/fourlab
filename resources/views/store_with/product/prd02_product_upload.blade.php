@@ -62,7 +62,7 @@
 											<th class="required">브랜드</th>
 											<td style="width:35%;">
 												<div class="flax_box">
-													<select name='brand' class="form-control form-control-sm">
+													<select name='brand' id='brand' class="form-control form-control-sm prd_code">
 														<option value=''>선택</option>
 														@foreach ($brands as $brand)
 														<option value='{{ $brand->br_cd }}'>{{ $brand->br_cd }} : {{ $brand->brand_nm }}</option>
@@ -73,7 +73,7 @@
 											<th class="required">년도</th>
 											<td style="width:35%;">
 												<div class="flax_box">
-													<select name='year' class="form-control form-control-sm">
+													<select name='year' id='year' class="form-control form-control-sm prd_code">
 														<option value=''>선택</option>
 														@foreach ($years as $year)
 														<option value='{{ $year->code_id }}'>{{ $year->code_id }} : {{ $year->code_val }}</option>
@@ -86,7 +86,7 @@
 											<th class="required">시즌</th>
 											<td>
 												<div class="flax_box">
-													<select name='season' class="form-control form-control-sm">
+													<select name='season' id='season' class="form-control form-control-sm prd_code">
 														<option value=''>선택</option>
 														@foreach ($seasons as $season)
 														<option value='{{ $season->code_id }}'>{{ $season->code_id }} : {{ $season->code_val }}</option>
@@ -97,7 +97,7 @@
 											<th class="required">성별</th>
 											<td>
 												<div class="flax_box">
-													<select name='gender' class="form-control form-control-sm">
+													<select name='gender' id='gender' class="form-control form-control-sm prd_code">
 														<option value=''>선택</option>
 														@foreach ($genders as $gender)
 														<option value='{{ $gender->code_id }}'>{{ $gender->code_id }} : {{ $gender->code_val }}</option>
@@ -110,7 +110,7 @@
 											<th class="required">아이템</th>
 											<td>
 												<div class="flax_box">
-													<select name='item' class="form-control form-control-sm">
+													<select name='item' id='item' class="form-control form-control-sm prd_code">
 														<option value=''>선택</option>
 														@foreach ($items as $item)
 														<option value='{{ $item->code_id }}'>{{ $item->code_id }} : {{ $item->code_val }}</option>
@@ -121,7 +121,7 @@
 											<th class="required">품목</th>
 											<td>
 												<div class="flax_box">
-													<select name='opt' class="form-control form-control-sm">
+													<select name='opt' id='opt' class="form-control form-control-sm prd_code">
 														<option value=''>선택</option>
 														@foreach ($opts as $opt)
 															<option value='{{ $opt->code_id }}'>{{ $opt->code_id }} : {{ $opt->code_val }}</option>
@@ -134,7 +134,11 @@
 											<th class="required">순서</th>
 											<td>
 												<div class="flax_box">
+<<<<<<< HEAD
 													<select name='seq' id='seq' class="form-control form-control-sm" onclick="sel_seq();" onchange="changeSelect();">
+=======
+													<select name='seq' id='seq' class="form-control form-control-sm" onclick="sel_seq();" onchange="chageSelect();">
+>>>>>>> 6987bce (fix : 원부자재 관련페이지 디버깅)
 													<!-- <option value=''>선택</option> -->
 													</select>
 												</div>
@@ -142,7 +146,7 @@
 											<th class="required">컬러</th>
 											<td>
 												<div class="flax_box">
-													<select name='color' class="form-control form-control-sm">
+													<select name='color' id='color' class="form-control form-control-sm">
 														<option value=''>선택</option>
 														@foreach ($colors as $color)
 														<option value='{{ $color->code_id }}'>{{ $color->code_id }} : {{ $color->code_val }}</option>
@@ -150,10 +154,12 @@
 													</select>
 												</div>
 											</td>
+										</tr>
+										<tr>
 											<th class="required">사이즈</th>
 											<td>
 												<div class="flax_box">
-													<select name='size' class="form-control form-control-sm">
+													<select name='size' id='size' class="form-control form-control-sm">
 														<option value=''>선택</option>
 														@foreach ($sizes as $size)
 														<option value='{{ $size->code_id }}'>{{ $size->code_id }} : {{ $size->code_val }}</option>
@@ -161,26 +167,25 @@
 													</select>
 												</div>
 											</td>
-										</tr>
-										<tr>
 											<th class="required">상품명</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='prd_nm' id="prd_nm" value=''>
 												</div>
 											</td>
+											
+										</tr>
+										<tr>
 											<th class="required">스타일넘버</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='style_no' id="style_no" value=''>
 												</div>
 											</td>
-										</tr>
-										<tr>
 											<th class="required">공급업체</th>
 											<td>
 												<div class="flax_box">
-													<select name='sup_com' class="form-control form-control-sm">
+													<select name='sup_com' id="sup_com" class="form-control form-control-sm">
 														<option value=''>선택</option>
 														@foreach ($sup_coms as $com)
 														<option value='{{ $com->com_id }}'>{{ $com->com_id }} : {{ $com->com_nm }}</option>
@@ -188,24 +193,32 @@
 													</select>
 												</div>
 											</td>
+										</tr>
+                                        <tr>
 											<th>TAG가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='tag_price' id="tag_price" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
-										</tr>
-                                        <tr>
 											<th>판매가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='price' id="price" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
+											
+										</tr>
+										<tr>
 											<th>원가</th>
 											<td>
-											<div class="flax_box">
+												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='wonga' id="wonga" value='' onkeyup="onlynum(this)">
+												</div>
+											</td>
+											<th></th>
+											<td>
+												<div class="flax_box">
 												</div>
 											</td>
 										</tr>
@@ -442,11 +455,11 @@
 
 		});
 
-		const { seq, code } = response.data;
+		const { code } = response.data;
 		if (code == 200) {
 
 			const idx = added_rows.length;
-
+			const seq = document.f1.seq.value;
 			const brand = document.f1.brand.value;
 			
 			const no_color_size_prd_cd = 
@@ -736,7 +749,6 @@
 			});
 		}
 	}
-
 	// 순서 이전 항목이 선택되어있지 않을때 순서 disable
 	// $(document).ready(function() {
 	// 	let brand = document.getElementById('brand').value;
@@ -825,7 +837,7 @@
 
 	
 	//순서에 신규생성이 아닌 값을 클릭시 하위 목록 자동 입력 및 비활성화하는 부분
-	function changeSelect() {
+	function chageSelect() {
 		let selectList = document.getElementById('seq');
 		let option_text = selectList.options[selectList.selectedIndex].text;
 		let prd_nm = option_text.split(' : ');

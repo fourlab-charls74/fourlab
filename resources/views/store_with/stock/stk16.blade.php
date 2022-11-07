@@ -373,6 +373,15 @@
 		{field: "qty", headerName: "수량", type: "numberType",
             editable: function(params) {return params.data.state === 10;}, 
             cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};},
+            cellRenderer: function(params) {
+                if (params.data.state != 10) {
+                    if (params.value !== undefined) {
+                        return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                    }
+                } else {
+                    return params.data.qty
+                }
+            }
         },
         {field: "origin_qty", headerName: "수량", type: "numberType", hide: true},
         {field: "amount", headerName: "합계", type: 'currencyType', width: 80, valueGetter: (params) => calAmount(params)},

@@ -370,6 +370,11 @@
         {field: "price", headerName: "판매가", type: "currencyType"},
         {field: "qty", headerName: "수량", type: "numberType",
             cellStyle: {"font-weight": "700"},
+            cellRenderer: function(params) {
+                    if (params.value !== undefined) {
+                        return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                    }
+            }
         },
         {field: "req_rt", headerName: "요청일시", width: 120, cellStyle: {"text-align": "center"}},
         {field: "rec_rt", headerName: "접수일시", width: 120, cellStyle: {"text-align": "center"}},

@@ -174,22 +174,29 @@
 											</td>
 										</tr>
 										<tr>
+											<th class="required">Tag 가</th>
+											<td>
+												<div class="flax_box">
+													<input type='text' class="form-control form-control-sm" name='tag_price' id="tag_price" value='' onkeyup="onlynum(this)">
+												</div>
+											</td>
 											<th class="required">판매가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='price' id="price" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
+											
+										</tr>
+										<tr>
 											<th class="required">원가</th>
 											<td>
 											<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='wonga' id="wonga" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
-										</tr>
-										<tr>
 											<th class="required">단위</th>
-											<td colspan="3">
+											<td>
 												<div class="flax_box">
 													<select name='unit' class="form-control form-control-sm">
 														<option value=''>선택</option>
@@ -312,6 +319,12 @@
 			field: "seq",
 			headerName: "순서",
 			width: 50
+		},
+		{
+			field: "tag_price",
+			headerName: "Tag 가",
+			type: 'currencyType',
+			width: 80
 		},
 		{
 			field: "price",
@@ -467,6 +480,7 @@
 				year: document.f1.year.value,
 				prd_cd: prd_cd,
 				seq: seq,
+				tag_price : document.f1.tag_price.value,
 				price: document.f1.price.value,
 				wonga: document.f1.wonga.value
 			});
@@ -488,6 +502,7 @@
 				year: document.f1.year[document.f1.year.selectedIndex].text,
 				prd_cd: no_color_size_prd_cd,
 				seq: seq,
+				tag_price : document.f1.tag_price.value,
 				price: document.f1.price.value,
 				wonga: document.f1.wonga.value
 			};
@@ -553,6 +568,12 @@
 			return alert("원부자재명을 입력해주세요.");
 		}
 
+		// Tag 가 입력여부
+		if (f1.tag_price.value.trim() === '') {
+			f1.tag_price.focus();
+			return alert("Tag 가를 입력해주세요.");
+		}
+
 		// 판매가 입력여부
 		if (f1.price.value.trim() === '') {
 			f1.price.focus();
@@ -587,6 +608,8 @@
 		}).then(function(res) {
 			if (res.data.code === 200) {
 				alert("저장이 완료되었습니다.");
+				opener.location.reload();
+    			window.close();
 			} else if (res.data.code === -1) {
 				const prd_cd = res.data.prd_cd;
 				alert(`${prd_cd}는 중복되었거나 이미 존재하는 상품 코드입니다.\n중복을 제거하거나 상품 코드를 재확인 후 다시 시도해주세요.`);

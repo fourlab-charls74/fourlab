@@ -851,10 +851,11 @@ class goods extends Controller
         } else {
             // 상품매칭
             $sql = "
-                select pc.prd_cd, p.prd_nm, pc.goods_no, pc.goods_opt, pc.color, pc.size, p.match_yn
+                select pc.prd_cd, p.prd_nm, pc.goods_no, pc.goods_opt, pc.color, pc.size, p.match_yn, pc.rt
                 from product_code AS pc
                     inner join product p on pc.prd_cd = p.prd_cd
                 where 1=1 $where
+                order by pc.rt desc
             ";
         }
 
@@ -887,7 +888,6 @@ class goods extends Controller
             "body" => $result
         ]);
     }
-
 
     /*********************************************************************************/
     /******************************** 원부자재코드 검색 관련 ******************************/
@@ -1005,5 +1005,4 @@ class goods extends Controller
             "body" => $result
         ]);
     }
-
 }

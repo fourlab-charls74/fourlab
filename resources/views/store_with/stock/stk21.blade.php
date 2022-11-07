@@ -271,16 +271,40 @@
             },
         },
         {field: "store_cd", hide: true},
-        {headerName: "(대표)창고재고",
+        {headerName: "창고재고",
             children: [
-                {field: "storage_qty", headerName: "재고", type: "currencyType", width: 60},
-                {field: "storage_wqty", headerName: "보유재고", type: "currencyType", width: 60},
+                {field: "storage_qty", headerName: "재고", type: "currencyType", width: 60, 
+                    cellRenderer: function(params) {
+                        if (params.value !== undefined) {
+                            return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                        }
+                    }
+                },
+                {field: "storage_wqty", headerName: "보유재고", type: "currencyType", width: 60,
+                    cellRenderer: function(params) {
+                        if (params.value !== undefined) {
+                            return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                        }
+                    }
+                },
             ]
         },
         {headerName: "매장재고",
             children: [
-                {field: "qty", headerName: "재고", type: "currencyType", width: 60},
-                {field: "wqty", headerName: "보유재고", type: "currencyType", width: 60},
+                {field: "qty", headerName: "재고", type: "currencyType", width: 60,
+                    cellRenderer: function(params) {
+                    if (params.value !== undefined) {
+                        return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                    }
+            }
+                },
+                {field: "wqty", headerName: "보유재고", type: "currencyType", width: 60,
+                    cellRenderer: function(params) {
+                    if (params.value !== undefined) {
+                        return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                    }
+            }
+                },
             ]
         },
         {field: "rt_qty", headerName: "RT수량", type: "numberType", editable: true, cellStyle: {"background-color": "#ffFF99"}},

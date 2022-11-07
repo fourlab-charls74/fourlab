@@ -328,6 +328,7 @@ SearchPrdcd.prototype.SetGrid = function(divId){
             { field: "color", headerName: "컬러", width: 60, cellStyle: {"text-align": "center"} },
             { field: "size", headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"} },
             { field: "match_yn", headerName: '매칭여부', cellClass: 'hd-grid-code', width: 60},
+            { field: "rt", headerName: '등록일', cellClass: 'hd-grid-code', width: 150, hide:true},
             { width: "auto" }
             );
     } else {
@@ -444,7 +445,148 @@ SearchPrdcd.prototype.Choice = function() {
     $('#SearchPrdcdModal').modal('toggle');
 };
 
+/**
+ * 원부자재코드검색
+ */
+
+const conds_sub = {
+    brand: '구분',
+    year: '년도',
+    season: '시즌',
+    gender: '성별',
+    item: '아이템',
+    opt: '품목'
+};
+function SearchPrdcd_sub(){
+    this.grid = null;
+}
+
+SearchPrdcd_sub.prototype.Open = async function(callback = null){
+    if(this.grid === null){
+        this.SetGrid("#div-gd-prdcd-sub");
+        this.SetGridCond();
+        this.callback = callback;
+    }
+    $('#SearchPrdcd_sub_Modal').modal({
+        keyboard: false
+    });
+};
+
+SearchPrdcd_sub.prototype.SetGrid = function(divId){
+    let columns = [];
+        columns.push(
+            { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null },
+            { field: "prd_cd", headerName: "원부자재코드", width: 120, cellStyle: {"text-align": "center"} },
+            { field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"} },
+            { field: "prd_nm", headerName: "상품명", width: 400 },
+            { field: "goods_opt", headerName: "옵션", width: 300 },
+            { field: "color", headerName: "컬러", width: 60, cellStyle: {"text-align": "center"} },
+            { field: "size", headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"} },
+            { width: "auto" }
+            );
+    this.grid = new HDGrid(document.querySelector( divId ), columns);
+};
+
+SearchPrdcd_sub.prototype.SetGridCond = async function() {
+    Object.keys(conds_sub).forEach( async (cond_title) => {
+        let columns = [];
+        
+        columns.push(
+            { field: "chk", headerName: '', cellClass: 'hd-grid-code', checkboxSelection: true, width: 28, sort: null },
+            { field: "item", headerName: conds_sub[cond_title], width: "auto",
+                cellStyle: (params) => (params.data.key || '') === 'contain' ? {"color": params.data.item === '포함' ? "green" : "red"} : '',
+                editable: (params) => (params.data.key || '') === 'contain',
+                cellRenderer: (params) => {
+                    if((params.data.key || '') === 'contain') return params.value;
+                    return `${(params.data.code_id || '') != '' ? `[${params.data.code_id}] ` : ''}${params.data.code_val || ''}`;
+                },
+                cellEditorSelector: function(params) {
+                    if((params.data.key || '') === 'contain') {
+                        return {
+                            component: 'agRichSelectCellEditor',
+                            params: { 
+                                values: ['포함', '미포함']
+                            },
+                        };
+                    }
+                    return false;
+                },
+            },
+        );
+
+        this[cond_title + '_grid'] = await new HDGrid(document.querySelector( "#div-gd-prdcd-sub-" + cond_title ), columns, {
+            pinnedTopRowData: [{item: "포함", key: "contain"}],
+            getRowStyle: (params) => {
+                if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#f2f2f2', 'border': 'none'};
+            },
+        });
+        document.querySelector( "#div-gd-prdcd-sub-" + cond_title ).style.height = '204px';
+    });
+    const { data: { body: res } } = await axios({ 
+        url: '/store/api/prdcd/conds_sub', 
+        method: 'get' 
+    });
+    Object.keys(res).forEach(r => {
+        this[r + '_grid'].gridOptions.api.setRowData(res[r]);
+    });
+}
+
+SearchPrdcd_sub.prototype.Search = function(e) {
+    const event_type = e?.type;
+
+    const request = () => {
+        let data = $('form[name="search_prdcd_sub"]').serialize();
+
+        Object.keys(conds_sub).forEach(c => {
+            let rows = this[c + '_grid'].getSelectedRows();
+            rows.forEach(r => {
+                data += `&${c}[]=${r.code_id}`;
+            });
+
+            let is_contain = this[c + '_grid'].gridOptions.api.getPinnedTopRow(0).data.item === "포함";
+            data += `&${c}_contain=${is_contain}`;
+            data += '&match='+this.isMatch;
+        });
+        this.grid.Request('/store/api/prdcd/search_sub', data, -1);
+    }
+
+    if (event_type == 'keypress') {
+        if (e.key && e.key == 'Enter') {
+            request();
+        } else {
+            return false;
+        }
+    } else {
+        request();
+    }
+};
+
+SearchPrdcd_sub.prototype.Choice = function() {
+    if(this.callback !== null){
+        this.callback(code, name);
+    } else {
+        let rows = this.grid.getSelectedRows();
+        if(rows.length < 1) return alert("항목을 선택해주세요.");
+        
+        if($('#prd_cd_sub').length > 0){
+            $('#prd_cd_sub').val(rows.map(r => r.prd_cd).join(","));
+        }
+    }
+
+    document.search_prdcd_sub.reset();
+    this.grid.setRows([]);
+    Object.keys(conds_sub).forEach(c => {
+        this[c + '_grid'].gridOptions.api.forEachNodeAfterFilter(node => {
+            node.setSelected(false);
+        });
+    });
+
+    $('#gd-prdcd-sub-total').html(0);
+    $('#SearchPrdcd_sub_Modal').modal('toggle');
+};
+
 let searchPrdcd = new SearchPrdcd();
+let searchPrdcd_sub = new SearchPrdcd_sub();
 
 $( document ).ready(function() {
     // 매장 검색 클릭 이벤트 바인딩 및 콜백 사용
@@ -460,6 +602,11 @@ $( document ).ready(function() {
     // 상품코드 검색 클릭 이벤트 바인딩 및 콜백 사용
     $(".sch-prdcd").on("click", function() {
         searchPrdcd.Open();
+    });
+
+    // 원부자재코드 검색 클릭 이벤트 바인딩 및 콜백 사용
+    $(".sch-prdcd_sub").on("click", function() {
+        searchPrdcd_sub.Open();
     });
 
     // 입고 내 송장번호 선택

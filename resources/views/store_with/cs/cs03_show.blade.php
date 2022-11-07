@@ -42,7 +42,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-lg-4 inner-td">
+                        <!-- <div class="col-lg-4 inner-td">
                             <div class="form-group">
 								<label for="com_nm">원부자재 업체</label>
 								<div class="form-inline inline_select_box">
@@ -55,8 +55,8 @@
 									</div>
 								</div>
 							</div>
-                        </div>
-                        <div class="col-lg-4 inner-td">
+                        </div> -->
+                        <div class="col-lg-6 inner-td">
                             <div class="form-group">
                                 <label for="prd_nm">원부자재명</label>
                                 <div class="flax_box">
@@ -64,7 +64,7 @@
                                 </div>
                             </div>
                         </div>
-						<div class="col-lg-4 inner-td">
+						<div class="col-lg-6 inner-td">
 							<div class="form-group">
 								<label>원부자재 코드</label>
 								<div class="form-inline">
@@ -117,6 +117,7 @@
                                     <table class="table incont table-bordered" width="100%" cellspacing="0">
                                         <tbody>
                                             <tr>
+<<<<<<< HEAD
                                                 <th class="required"><label for="invoice_no">원부자재 업체</label></th>
                                                 <td style="width:35%;">
                                                     <div class="form-inline inline_select_box">
@@ -124,6 +125,16 @@
                                                             <div class="flax_box">
                                                                 <input type="hidden" name="com_cd2" id="com_cd2" value="">
                                                                 <input type="text" class="form-control form-control-sm" name="com_code" id="com_code" value="" readonly>
+=======
+                                                <th class="required"><label for="invoice_no">공급업체</label></th>
+                                                <td style="width:35%;">
+                                                    <div class="form-inline inline_select_box">
+                                                        <div class="form-inline-inner input-box w-100">
+                                                            <div class="form-inline inline_btn_box">
+                                                                <input type="hidden" id="com_cd" name="com_cd" />
+                                                                <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
+                                                                <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+>>>>>>> 6987bce (fix : 원부자재 관련페이지 디버깅)
                                                             </div>
                                                         </div>
                                                     </div>
@@ -138,6 +149,9 @@
                                                         </select>
                                                     </div>
                                                 </td>
+                                               
+                                            </tr>
+                                            <tr>
                                                 <th class="required"><label for="sdate">일자</label></th>
                                                 <td style="width:35%;">
                                                     <div class="form-inline">
@@ -154,14 +168,14 @@
                                                         </div>
                                                     </div>
                                                 </td>
-                                            </tr>
-                                            <tr>
                                                 <th class="required"><label for="invoice_no">입고송장번호/반품번호</label></th>
                                                 <td style="width:35%;">
                                                     <div class="flax_box">
                                                         <input type="text" onfocus="return getInvoiceNo();" class="form-control form-control-sm" name="invoice_no" value="">
                                                     </div>
                                                 </td>
+                                            </tr>
+                                            <tr>
                                                 <th class="required"><label for="prd_ord_type">유형</label></th>
                                                 <td style="width:35%;">
                                                     <div class="flax_box">
@@ -171,6 +185,10 @@
                                                             <option value='G'>사은품</option>
                                                         </select>
                                                     </div>
+                                                </td>
+
+                                                <th></th>
+                                                <td style="width:35%;">
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -246,7 +264,13 @@
             width: 120,
             cellStyle: DEFAULT
         },
-        {field:"stock_qty", headerName:"창고재고", width:60, type:'numberType', cellStyle: DEFAULT},
+        {field:"stock_qty", headerName:"창고재고", width:60, type:'numberType', cellStyle: DEFAULT,
+            cellRenderer: function(params) {
+                if (params.value !== undefined) {
+                    return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                }
+            }
+        },
         {field:"in_qty", headerName:"입고수량", width:60, type:'numberType', cellStyle: { ...DEFAULT, ...YELLOW } , editable: true},
         {field:"price", headerName: "단가", width:84, type:'currencyType', cellStyle: { ...DEFAULT, ...{'text-align': 'right'}} },
         {field:"wonga", headerName: "원가", hide: true},
@@ -269,7 +293,11 @@
             getRowId: params => params.data.id,
             onCellValueChanged: params => evtAfterEdit(params),
         };
-        gx = new HDGrid(gridDiv, columns,options);
+        gx = new HDGrid(gridDiv, columns,options,{
+            onCellValueChanged: (e) => {
+                e.node.setSelected(true);
+            }
+        })
         Search();
     });
 
@@ -285,6 +313,7 @@
             const value = params.newValue;
 
             if (column_name == "in_qty") {
+                params.node.setSelected(true);
                 if (isNaN(value) == true || value == "" || parseInt(value) < 1) {
                     alert("1 이상의 숫자만 입력가능합니다.");
                     gxStartEditingCell(row_index, column_name);
@@ -324,7 +353,6 @@
 
     const getInvoiceNo = () => {
 	    const com_id = document.f1.com_cd2.value;
-
 	    let invoice_no = document.f1.invoice_no.value;
         if (invoice_no == '' && com_id != "") {
             axios({

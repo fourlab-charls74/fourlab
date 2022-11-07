@@ -91,7 +91,8 @@ class stk17Controller extends Controller
                 left outer join `code` c4 on c4.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c4.code_id = pc.size
                 left outer join `code` c5 on c5.code_kind_cd = 'PRD_CD_UNIT' and c5.code_id = p.unit
             where 
-                pss.storage_cd = (select storage_cd from storage where default_yn = 'Y') $where
+                pss.storage_cd = (select storage_cd from storage where default_yn = 'Y')  and p.type <> 'N'
+                $where
             $orderby
             $limit
         ";

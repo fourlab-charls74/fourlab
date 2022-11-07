@@ -375,7 +375,13 @@
         {field: "goods_type_nm", headerName:"상품구분", width: 60, cellStyle: StyleGoodsType},
         {field: "goods_nm", headerName: "상품명", width: 200, type: "HeadGoodsNameType"},
         {field: "opt_val", headerName: "옵션", width: 180},
-        {field: "qty", headerName: "수량", width: 50, type: "currencyType"},
+        {field: "qty", headerName: "수량", width: 50, type: "currencyType" ,
+            cellRenderer: function(params) {
+                    if (params.value !== undefined) {
+                        return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                    }
+            }
+        },
         {field: "user_nm", headerName: "주문자(아이디)", width: 120, cellStyle: {'text-align': 'center'}},
         {field: "r_nm", headerName: "수령자", width: 70, cellStyle: {'text-align': 'center'}},
         {field: "goods_price", headerName: "자사몰판매가", width: 90, type: "currencyType"},

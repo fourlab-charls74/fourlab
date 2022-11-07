@@ -58,12 +58,13 @@ class prd03Controller extends Controller
 
 		$type = $request->input("type");
 		$prd_nm	= $request->input("prd_nm");
-		$prd_cd = $request->input("prd_cd");
+		$prd_cd = $request->input("prd_cd_sub");
 		$com_id	= $request->input("com_cd");
 		$com_nm	= $request->input("com_nm");
 
 		$store_type	= $request->input("store_type", "");
 		$store_no	= $request->input("store_no", "");
+		$ext_store_qty = $request->input("ext_store_qty", "");
 
 		$limit = $request->input("limit", 100);
 		$ord = $request->input('ord','desc');
@@ -71,6 +72,7 @@ class prd03Controller extends Controller
 		$orderby = sprintf("order by %s %s", $ord_field, $ord);
 
 		$where = "";
+		$where2 = "";
 		if ($prd_cd != "") {
 			$prd_cd = explode(',', $prd_cd);
 			$where .= " and (1!=1";
@@ -79,35 +81,41 @@ class prd03Controller extends Controller
 			}
 			$where .= ")";
 		}
-
+		if ($ext_store_qty == "Y") $where2 .= "and pss2.wqty > 0";
 		if ($type != "") $where .= " and pc.brand = '" . Lib::quote($type) . "'";
 		if ($prd_nm != "") $where .= " and p.prd_nm like '%" . Lib::quote($prd_nm) . "%' ";
 		// if ($com_id != "") $where .= " and p.com_id = '" . Lib::quote($com_id) . "'";
 		if ($com_nm != "") $where .= " and cp.com_nm like '%" . Lib::quote($com_nm) . "%' ";
 
 		$in_store_sql	= "";
-		if ($store_no != "") {
-			$in_store_sql	= " inner join product_stock_store psst on p.prd_cd = psst.prd_cd ";
+		if( $store_no != "" ){
+			$in_store_sql	= " inner join product_stock_store pss3 on pc.prd_cd = pss3.prd_cd ";
 
 			$where	.= " and (1!=1";
-			foreach ($store_no as $store_cd) {
-				$where .= " or pss.store_cd = '" . Lib::quote($store_cd) . "' ";
+			foreach($store_no as $store_cd) {
+				$where .= " or pss3.store_cd = '" . Lib::quote($store_cd) . "' ";
 			}
 			$where	.= ")";
+
+			$store_qty_sql	= "pss.qty";
 		}
 
-		if ($store_no == "" && $store_type != "") {
-			$in_store_sql	= " inner join product_stock_store psst on p.prd_cd = psst.prd_cd ";
+		if( $store_no == "" && $store_type != "" ){
+			$in_store_sql	= " inner join product_stock_store pss3 on pc.prd_cd = pss3.prd_cd ";
 
 			$sql	= " select store_cd from store where store_type = :store_type and use_yn = 'Y' ";
-			$result = DB::select($sql, ['store_type' => $store_type]);
+			$result = DB::select($sql,['store_type' => $store_type]);
 
 			$where	.= " and (1!=1";
-			foreach ($result as $row) {
-				$where .= " or psst.store_cd = '" . Lib::quote($row->store_cd) . "' ";
+			foreach($result as $row){
+				$where .= " or pss3.store_cd = '" . Lib::quote($row->store_cd) . "' ";
 			}
 			$where	.= ")";
+
 		}
+
+		// $where3 = "";
+		// if ($store_no != "") $where3 .= "and pss.store_cd = '$store_no'";
 
 		$page_size	= $limit;
 		$startno = ($page - 1) * $page_size;
@@ -124,7 +132,7 @@ class prd03Controller extends Controller
 					inner join product_image i on p.prd_cd = i.prd_cd
 					inner join company cp on p.com_id = cp.com_id
 					$in_store_sql
-				where p.use_yn = 'Y' 
+				where p.use_yn = 'Y' and p.type <> 'N'
 					$where
 			";
 			$row	= DB::select($query);
@@ -142,6 +150,7 @@ class prd03Controller extends Controller
 				c7.code_val as color,
 				c8.code_val as size,
 				p.prd_nm as prd_nm,
+				p.tag_price as tag_price,
 				p.price as price,
 				p.wonga as wonga,
 				ifnull(pss.wqty, 0) as stock_qty,
@@ -171,8 +180,9 @@ class prd03Controller extends Controller
 				left outer join code c7 on c7.code_kind_cd = 'PRD_CD_COLOR' and c7.code_id = pc.color
 				left outer join code c8 on c8.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c8.code_id = pc.size
 				left outer join code c9 on c9.code_kind_cd = 'PRD_CD_UNIT' and c9.code_id = p.unit
-			where p.use_yn = 'Y'
+			where p.use_yn = 'Y' and p.type <> 'N' 
 				$where
+				$where2
 			$orderby
 			$limit
 		";
@@ -197,7 +207,7 @@ class prd03Controller extends Controller
 
 	public function showCreate(Request $request)
 	{
-		$sup_coms = DB::table("company")->where('use_yn', '=', 'Y')->where('com_type', '=', '1')
+		$sup_coms = DB::table("company")->where('use_yn', '=', 'Y')->where('com_type', '=', '6')
 			->select('com_id', 'com_nm')->get()->all(); // 공급업체 리스트
 		$values = [
 			'types' => SLib::getCodes("PRD_MATERIAL_TYPE"),
@@ -239,6 +249,7 @@ class prd03Controller extends Controller
 				$color = $row['color'];
 				$size = $row['size'];
 
+				$tag_price = $row['tag_price'];
 				$price = $row['price'];
 				$wonga = $row['wonga'];
 
@@ -258,6 +269,7 @@ class prd03Controller extends Controller
 						'prd_cd' => $prd_cd,
 						'prd_nm' => $prd_nm,
 						'type' => $type,
+						'tag_price' => $tag_price,
 						'price' => $price,
 						'wonga' => $wonga,
 						'com_id' => $sup_com,

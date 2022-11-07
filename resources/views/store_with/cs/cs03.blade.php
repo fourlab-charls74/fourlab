@@ -241,7 +241,12 @@
             field: "qty",
             headerName: "수량",
             width: 60,
-            type: 'numberType'
+            type: 'numberType',
+            cellRenderer: function(params) {
+                if (params.value !== undefined) {
+                    return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                }
+            }
         },
         {
             field: "price",

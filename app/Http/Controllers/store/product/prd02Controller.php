@@ -370,37 +370,41 @@ class prd02Controller extends Controller
 		$goods_no 	= $request->input('goods_no2');
 		
 		
-		$query = "
-			select
-				seq,color,size
-			from product_code
-			where prd_cd = '$prd_cd'
-		";
-		$res = DB::selectOne($query);
+		// $query = "
+		// 	select
+		// 		seq,color,size
+		// 	from product_code
+		// 	where prd_cd = '$prd_cd'
+		// ";
+		// $res = DB::selectOne($query);
 
-		$color = $res->color;
-		$size = $res->size;
+		// $color = $res->color;
+		// $size = $res->size;
+		// $seq = $res->seq;
+		
+		// $color_sql = "
+		// 	select * from code where code_kind_cd = 'PRD_CD_COLOR' and code_id = '$color'
+		// ";
+		// $color_val = DB::selectOne($color_sql);
 
-		$seq = $res->seq;
-
-
-		$color_sql = "
-			select * from code where code_kind_cd = 'PRD_CD_COLOR' and code_id = '$color'
-		";
-		$color_val = DB::selectOne($color_sql);
-
-		$size_sql = "
-			select * from code where code_kind_cd = 'PRD_CD_SIZE_MATCH' and code_id = '$size'
-		";
-		$size_val = DB::selectOne($size_sql);
+		// $size_sql = "
+		// 	select * from code where code_kind_cd = 'PRD_CD_SIZE_MATCH' and code_id = '$size'
+		// ";
+		// $size_val = DB::selectOne($size_sql);
 
 
-		$goods_opt = $color_val->code_val.'^'.$size_val->code_val2;
-
-
+		// $goods_opt = $color_val->code_val.'^'.$size_val->code_val2;
+		
+		
+		// select 
+		// 		prd_cd, prd_nm , style_no ,'$goods_no' as goods_no, '$goods_opt' as goods_opt, '$color' as color, '$size' as size, '$seq' as seq, 'Y' as is_product
+		// 	from product
+		// 	where prd_cd like '$prd_cd%'
+		// 	order by seq desc
+		
 		$sql = "
 			select 
-				distinct(p.prd_cd), g.goods_nm as prd_nm, g.style_no, p.goods_no, p.goods_opt, p.color, p.size, '' as seq, '' as yn, 'N' as is_product
+				distinct(p.prd_cd), g.goods_nm as prd_nm, g.style_no, p.goods_no, p.goods_opt, p.color, p.size, '' as seq, 'N' as is_product
 			from product_code p
 				inner join goods_summary gs on p.goods_no = gs.goods_no
 				inner join goods g on g.goods_no = p.goods_no 
@@ -408,36 +412,16 @@ class prd02Controller extends Controller
 
 			union all
 
-			select 
-				prd_cd, prd_nm , style_no ,'$goods_no' as goods_no, '$goods_opt' as goods_opt, '$color' as color, '$size' as size, '$seq' as seq, '' as yn, 'Y' as is_product
-			from product
-			where prd_cd like '$prd_cd%'
+			select
+				p.prd_cd, p.prd_nm, p.style_no, '$goods_no' as goods_no, '' as goods_opt, pc.color, pc.size, pc.seq, 'Y' as is_product
+			from product p
+				inner join product_code pc on pc.prd_cd = p.prd_cd
+			where p.prd_cd like '$prd_cd%'
 			order by seq desc
 
 		";
 
-	// 	$sql = "
-	// 	select 
-	// 		distinct(p.prd_cd), g.goods_nm as prd_nm, g.style_no, p.goods_no, p.goods_opt, p.color, p.size, '' as seq, '' as yn
-	// 	from product_code p
-	// 		inner join goods_summary gs on p.goods_no = gs.goods_no
-	// 		inner join goods g on g.goods_no = p.goods_no 
-	// 	where p.goods_no = '$goods_no'
-
-	// 	union all
-
-	// 	select 
-	// 		p.prd_cd, p.prd_nm , p.style_no ,'$goods_no' as goods_no, '$goods_opt' as goods_opt, '$color' as color, '$size' as size, '$seq' as seq, '' as yn
-	// 	from product p 
-	// 		inner join product_code pc on pc.prd_cd = p.prd_cd
-	// 		inner join goods_summary g on g.goods_opt = pc.goods_opt
-	// 	where p.prd_cd like '$prd_cd%'
-	// 	order by seq desc
-
-	// ";
-
 		$result = DB::select($sql);
-
 
 		$goods_opt_counts = collect($result)->groupBy('goods_opt')->map(function($row) {
             return $row->count();
@@ -450,81 +434,12 @@ class prd02Controller extends Controller
         })->all();
 
 
-		// $goods_opts = [];
-		// foreach ($result as $row) {
-		// 	array_push($goods_opts, ['goods_opt' =>$row->goods_opt]);
-		// }
-		// $cnt = 0;
-		// foreach ($goods_opts as $g_opt) {
-		// 	$g = $g_opt['goods_opt'];
-
-		// 	if ($goods_opt == $g) {
-		// 		$cnt++;
-		// 	}
-		// }
-		// $match = "";
-		// if ($cnt > 1) {
-		// 	$match =  "is_match";
-		// } else{
-		// 	$match = "not_match";
-		// }
-
-		// array_push($result, ['match' =>$match]);
-
-		// dd($result);
-
-
-
-
-		// dd(collect($goods_opts)->groupBy('goods_opt');
-
-		// // $result = collect($result)->map(function ($row, $idx) use ($goods_opts) {
-
-		// // 	$duplicated = collect($goods_opts)->duplicates('goods_opt')->all();
-		// // 	$row->duplicated = $duplicated;
-		// // 	// $row->checked = count($duplicated) > 0 ? true : false;
-		// // 	return $row;
-		// // });
-
-		// // dd($result);
-
-
-		// // $i = 0;
-		// // foreach ($result as $row) {
-		// // 	// index가 같지 않고 이름이 같으면 중복
-
-		// // 	$goods_opt = $row->goods_opt;
-
-		// // 	$idx = array_search($goods_opt, $goods_opts);
-
-		// // 	dd($idx);
-
-		// 	// while (true) {
-		// 	// 	if ($idx == array_search($goods_opt, $goods_opts)) {
-		// 	// 		continue;
-		// 	// 	} else {
-		// 	// 		$idx = $i;
-		// 	// 		break;
-		// 	// 	}
-		// 	// }
-
-		// 	// 0번째  goods_opt가 opts 안에 2개 이상 있으면 중복됨. 따라서
-		// 	// checked = true
-		// 	$i++;
-		// }
-
-		// dd($result);
-		// // 상품 옵션이 중복되는 경우 체크박스 표시 true 아닌 경우 false
-		// // 
-
-
-
 		return response()->json([
 			"code"	=> 200,
 			"head"	=> array(
 				"total" => count($result),
 			),
-			"body" => $result
+			"body" => $result,
 		]);
 
 	}
@@ -1060,15 +975,20 @@ class prd02Controller extends Controller
 		$sup_coms = DB::table("company")->where('use_yn', '=', 'Y')->where('com_type', '=', '1')
 			->select('com_id', 'com_nm')->get()->all(); // 공급업체 리스트
 
-		$sql	= " select brand_nm, br_cd from brand where use_yn = 'Y' and br_cd <> '' ";
+		$sql	= " select brand_nm, br_cd from brand where use_yn = 'Y' and br_cd <> '' order by field(brand_nm, '헤스트라', '프리머스', '한바그', '피엘라벤') desc, brand_nm asc";
 		$brands	= DB::select($sql);
+
+		$item_sql = "select code_id, code_val from code where code_kind_cd = 'prd_cd_item' order by code_val asc ";
+		$items = DB::select($item_sql);
+
+
 		$values = [
 			'brands' 	=> $brands,
 			'brand' 	=> SLib::getCodes("PRD_CD_BRAND"),
 			'years'		=> SLib::getCodes("PRD_CD_YEAR"),
 			'seasons' 	=> SLib::getCodes("PRD_CD_SEASON"),
 			'genders' 	=> SLib::getCodes("PRD_CD_GENDER"),
-			'items'		=> SLib::getCodes("PRD_CD_ITEM"),
+			'items'		=> $items,
 			'opts' 		=> SLib::getCodes("PRD_CD_OPT"),
 			'colors' 	=> SLib::getCodes("PRD_CD_COLOR"),
 			'sizes'		=> SLib::getCodes("PRD_CD_SIZE_MATCH"),
@@ -1275,6 +1195,65 @@ class prd02Controller extends Controller
         }
 
         return response()->json(["code" => $code]);
+	}
+
+	//상품코드등록 순서 출력하는 부분
+	public function selSeq(Request $request)
+	{
+
+		$prd_cd = $request->input('prd_cd', '');
+
+		try {
+			DB::beginTransaction();
+
+			$sql = "
+				select 
+					p.prd_cd, p.prd_nm , pc.seq
+				from product p 
+				inner join product_code pc on p.prd_cd = pc.prd_cd
+				where p.prd_cd like '$prd_cd%'
+				group by p.prd_nm
+				order by p.prd_cd asc
+			";
+
+			$result = DB::select($sql);
+            DB::commit();
+            $code = 200;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $code = 500;
+        }
+
+        return response()->json(["code" => $code, "result" => $result]);
+	}
+
+	//순서 선택시 자동완성
+	public function changeSeq(Request $request)
+	{
+
+		$prd_nm = $request->input('prd_nm', '');
+		$prd_seq = $request->input('prd_seq', '');
+
+		try {
+			DB::beginTransaction();
+
+			$sql = "
+				select 
+					*
+				from product
+				where prd_nm = '$prd_nm'
+				limit 1
+			";
+
+			$result = DB::select($sql);
+            DB::commit();
+            $code = 200;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $code = 500;
+        }
+
+        return response()->json(["code" => $code, "result" => $result]);
 	}
 
 }
