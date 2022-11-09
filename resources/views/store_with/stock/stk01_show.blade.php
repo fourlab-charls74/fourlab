@@ -188,11 +188,15 @@
 <script language="javascript">
     let AlignCenter = {"text-align": "center"};
 
+    let storage_cnt = '{{ count(@$storages) }}' * 1;
+    const storageLastWidth = 713 - (storage_cnt * 100);
+
     let storage_columns = [
         {field: "total_qty", headerName: "창고 총재고", width: 100, pinned: "left", cellStyle: AlignCenter},
         @foreach (@$storages as $storage)
-            {field: '{{ $storage->storage_cd }}', headerName: '{{ $storage->storage_nm }}', cellStyle: AlignCenter},
+            {field: '{{ $storage->storage_cd }}', headerName: '{{ $storage->storage_nm }}', cellStyle: AlignCenter, width: 100},
         @endforeach
+        {width: storageLastWidth > 0 ? storageLastWidth : 0},
     ];
 
     const pApp = new App('', { gridId: "#div-gd-storage-stock" });
@@ -281,7 +285,7 @@
                 width: 100,
             });
         }
-        const lastWidth = 720 - (stores.length * 100);
+        const lastWidth = 713 - (stores.length * 100);
         store_columns.push({ width: lastWidth > 0 ? lastWidth : 0 });
         gx2.gridOptions.api.setColumnDefs(store_columns);
     }
