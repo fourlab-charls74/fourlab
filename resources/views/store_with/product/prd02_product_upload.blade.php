@@ -134,11 +134,7 @@
 											<th class="required">순서</th>
 											<td>
 												<div class="flax_box">
-<<<<<<< HEAD
 													<select name='seq' id='seq' class="form-control form-control-sm" onclick="sel_seq();" onchange="changeSelect();">
-=======
-													<select name='seq' id='seq' class="form-control form-control-sm" onclick="sel_seq();" onchange="chageSelect();">
->>>>>>> 6987bce (fix : 원부자재 관련페이지 디버깅)
 													<!-- <option value=''>선택</option> -->
 													</select>
 												</div>
