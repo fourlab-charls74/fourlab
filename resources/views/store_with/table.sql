@@ -54,7 +54,7 @@ CREATE TABLE `product_image` (
 
 -- 상품 입고/반품 마스터
 CREATE TABLE `product_stock_order` (
-   
+   `stock_no` int(11) 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 상품 입고/반품 상품

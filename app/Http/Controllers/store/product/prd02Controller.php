@@ -369,39 +369,6 @@ class prd02Controller extends Controller
 		$prd_cd 	= $request->input('prd_cd');
 		$goods_no 	= $request->input('goods_no2');
 		
-		
-		// $query = "
-		// 	select
-		// 		seq,color,size
-		// 	from product_code
-		// 	where prd_cd = '$prd_cd'
-		// ";
-		// $res = DB::selectOne($query);
-
-		// $color = $res->color;
-		// $size = $res->size;
-		// $seq = $res->seq;
-		
-		// $color_sql = "
-		// 	select * from code where code_kind_cd = 'PRD_CD_COLOR' and code_id = '$color'
-		// ";
-		// $color_val = DB::selectOne($color_sql);
-
-		// $size_sql = "
-		// 	select * from code where code_kind_cd = 'PRD_CD_SIZE_MATCH' and code_id = '$size'
-		// ";
-		// $size_val = DB::selectOne($size_sql);
-
-
-		// $goods_opt = $color_val->code_val.'^'.$size_val->code_val2;
-		
-		
-		// select 
-		// 		prd_cd, prd_nm , style_no ,'$goods_no' as goods_no, '$goods_opt' as goods_opt, '$color' as color, '$size' as size, '$seq' as seq, 'Y' as is_product
-		// 	from product
-		// 	where prd_cd like '$prd_cd%'
-		// 	order by seq desc
-		
 		$sql = "
 			select 
 				distinct(p.prd_cd), g.goods_nm as prd_nm, g.style_no, p.goods_no, p.goods_opt, p.color, p.size, '' as seq, 'N' as is_product

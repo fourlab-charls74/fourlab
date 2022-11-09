@@ -131,7 +131,7 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="prd_cd">상품코드</label>
+                            <label for="prd_cd">원부자재코드</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input-box w-100">
                                     <div class="form-inline inline_btn_box">

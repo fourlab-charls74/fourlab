@@ -980,10 +980,17 @@ class goods extends Controller
         $page_cnt = 0;
 
         $sql = "
-                select pc.prd_cd, p.prd_nm, pc.goods_no, pc.goods_opt, pc.color, pc.size 
-                from product_code pc 
-                    inner join product p on p.prd_cd = pc.prd_cd
-                where 1=1 and pc.brand in('PR','SM')
+            select 
+                  pc.prd_cd
+                , p.prd_nm
+                , pc.goods_no
+                , concat(c.code_val, '^',d.code_val2) as goods_opt
+                , pc.color, pc.size
+            from product_code pc 
+                inner join product p on p.prd_cd = pc.prd_cd
+                inner join code c on pc.color = c.code_id
+                inner join code d on pc.size = d.code_id
+            where 1=1 and pc.brand in('PR','SM') and c.code_kind_cd = 'PRD_CD_COLOR' and d.code_kind_cd = 'PRD_CD_SIZE_MATCH'
             $where
         ";
       

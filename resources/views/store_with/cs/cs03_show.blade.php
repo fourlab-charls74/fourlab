@@ -42,7 +42,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <!-- <div class="col-lg-4 inner-td">
+                        <div class="col-lg-4 inner-td">
                             <div class="form-group">
 								<label for="com_nm">원부자재 업체</label>
 								<div class="form-inline inline_select_box">
@@ -55,8 +55,8 @@
 									</div>
 								</div>
 							</div>
-                        </div> -->
-                        <div class="col-lg-6 inner-td">
+                        </div>
+                        <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="prd_nm">원부자재명</label>
                                 <div class="flax_box">
@@ -64,7 +64,7 @@
                                 </div>
                             </div>
                         </div>
-						<div class="col-lg-6 inner-td">
+						<div class="col-lg-4 inner-td">
 							<div class="form-group">
 								<label>원부자재 코드</label>
 								<div class="form-inline">

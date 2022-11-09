@@ -745,27 +745,11 @@
 			});
 		}
 	}
-	// 순서 이전 항목이 선택되어있지 않을때 순서 disable
-	// $(document).ready(function() {
-	// 	let brand = document.getElementById('brand').value;
-	// 	let year = document.getElementById('year').value;
-	// 	let season = document.getElementById('season').value;
-	// 	let gender = document.getElementById('gender').value;
-	// 	let item = document.getElementById('item').value;
-	// 	let opt = document.getElementById('opt').value;
-
-	// 	if (brand != '' && year != '' && season != '' && gender != '' && item != '' && opt != '') {
-	// 		document.getElementById('seq').disabled = false;
-	// 	} else {
-	// 		document.getElementById('seq').disabled = true;
-	// 	}
-	// });
 
 	//순서 선택
 	let count = 0;
 	function sel_seq() {
 		count++;
-		console.log(count);
 		let brand = document.getElementById('brand').value;
 		let year = document.getElementById('year').value;
 		let season = document.getElementById('season').value;
@@ -775,7 +759,25 @@
 
 		let prd_cd = brand+year+season+gender+item;
 
-			// if(!validation_seq()) {
+		if (brand == "") {
+			$('#brand').focus();
+			alert('브랜드를 선택해주세요.');
+		} else if (year == "") {
+			$('#year').focus();
+			alert('년도를 선택해주세요.');
+		} else if (season == "") {
+			$('#season').focus();
+			alert('시즌을 선택해주세요.');
+		} else if (gender == "") {
+			$('#gender').focus();
+			alert('성별을 선택해주세요.');
+		} else if (item == "") {
+			$('#item').focus();
+			alert('아이템을 선택해주세요.');
+		} else if (opt == "") {
+			$('#opt').focus();
+			alert('품목을 선택해주세요.');
+		}
 			$.ajax({
 					method: 'post',
 					url: '/store/product/prd02/sel_seq',
@@ -784,7 +786,7 @@
 					},
 					success: function(data) {
 						if (data.code == '200') {
-							if(count == 1) {
+							if (count == 1) {
 								if (data.result == '') {
 									let sel = "<option value=''>선택</option>"
 									let option = "<option value='01'>01 : 신규 생성</option>"
@@ -814,6 +816,7 @@
 									$('#seq').append(new_save);
 								}
 							}
+						
 
 							$(document).on('change', '.prd_code', function(){
 								$('#seq').empty();
@@ -830,6 +833,8 @@
 					}
 				});
 		}
+
+	
 
 	
 	//순서에 신규생성이 아닌 값을 클릭시 하위 목록 자동 입력 및 비활성화하는 부분
