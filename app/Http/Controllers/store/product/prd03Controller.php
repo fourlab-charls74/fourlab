@@ -288,7 +288,7 @@ class prd03Controller extends Controller
 					$save_path = "";
 					if ($wonboo_cd == 'PR') {
 						$save_path = "/images/s_goods/pr/";
-					} else if($wonboo_cd == 'SM') {
+					} else if ($wonboo_cd == 'SM') {
 						$save_path = "/images/s_goods/sm/";
 					}
 
@@ -297,7 +297,6 @@ class prd03Controller extends Controller
 					$unique_img_name = $prd_cd . $seq;
 					$img_name = strtolower($unique_img_name);
 					$img_url = ULib::uploadBase64img($save_path, $base64_src, $img_name);
-
 		
 					DB::table('product_code')->insert([
 						'prd_cd' => $prd_cd,

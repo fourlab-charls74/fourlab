@@ -174,7 +174,7 @@
 											</td>
 										</tr>
 										<tr>
-											<th class="required">Tag 가</th>
+											<th class="required">Tag가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='tag_price' id="tag_price" value='' onkeyup="onlynum(this)">
@@ -322,7 +322,7 @@
 		},
 		{
 			field: "tag_price",
-			headerName: "Tag 가",
+			headerName: "Tag가",
 			type: 'currencyType',
 			width: 80
 		},
@@ -568,10 +568,10 @@
 			return alert("원부자재명을 입력해주세요.");
 		}
 
-		// Tag 가 입력여부
+		// Tag가 입력여부
 		if (f1.tag_price.value.trim() === '') {
 			f1.tag_price.focus();
-			return alert("Tag 가를 입력해주세요.");
+			return alert("Tag가를 입력해주세요.");
 		}
 
 		// 판매가 입력여부

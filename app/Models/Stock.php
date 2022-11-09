@@ -567,7 +567,6 @@ class Stock
 
         $this->__IncreasePrdStockStorageQty($qty);
 
-        // goods_location 항목은 매장관리용이 아니므로 삭제되어야함 20221027
         if ($this->loc != '' && $this->loc != 'LOC') {
             $loc = $this->loc;
 

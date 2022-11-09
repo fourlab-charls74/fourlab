@@ -370,7 +370,7 @@
                         return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
                     }
                 } else {
-                    return params.data.qty
+                    return params.data.qty;
                 }
             }
         },
