@@ -247,7 +247,7 @@
 			},
 			{
 				field: "tag_price",
-				headerName: "Tag 가",
+				headerName: "Tag가",
 				type: 'currencyType',
 				cellStyle: DEFAULT,
 				width: 80
@@ -272,10 +272,10 @@
 				type: "currencyType",
 				width: 80,
 				cellRenderer: function(params) {
-                if (params.value !== undefined) {
-                    return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
-                }
-            }
+					if (params.value !== undefined) {
+						return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+					}
+				}
 			},
 			{
 				field: 'store_qty',
@@ -283,10 +283,10 @@
 				type: "currencyType",
 				width: 80,
 				cellRenderer: function(params) {
-                if (params.value !== undefined) {
-                    return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
-                }
-            }
+                	if (params.value !== undefined) {
+						return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+					}
+				}
 			},
 			{
 				field: "unit",

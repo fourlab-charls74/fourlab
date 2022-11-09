@@ -117,7 +117,6 @@
                                     <table class="table incont table-bordered" width="100%" cellspacing="0">
                                         <tbody>
                                             <tr>
-<<<<<<< HEAD
                                                 <th class="required"><label for="invoice_no">원부자재 업체</label></th>
                                                 <td style="width:35%;">
                                                     <div class="form-inline inline_select_box">
@@ -125,7 +124,6 @@
                                                             <div class="flax_box">
                                                                 <input type="hidden" name="com_cd2" id="com_cd2" value="">
                                                                 <input type="text" class="form-control form-control-sm" name="com_code" id="com_code" value="" readonly>
-=======
                                                 <th class="required"><label for="invoice_no">공급업체</label></th>
                                                 <td style="width:35%;">
                                                     <div class="form-inline inline_select_box">
@@ -134,7 +132,6 @@
                                                                 <input type="hidden" id="com_cd" name="com_cd" />
                                                                 <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
                                                                 <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
->>>>>>> 6987bce (fix : 원부자재 관련페이지 디버깅)
                                                             </div>
                                                         </div>
                                                     </div>

@@ -833,7 +833,7 @@
 
 	
 	//순서에 신규생성이 아닌 값을 클릭시 하위 목록 자동 입력 및 비활성화하는 부분
-	function chageSelect() {
+	function changeSelect() {
 		let selectList = document.getElementById('seq');
 		let option_text = selectList.options[selectList.selectedIndex].text;
 		let prd_nm = option_text.split(' : ');

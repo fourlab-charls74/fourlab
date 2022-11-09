@@ -890,7 +890,7 @@ class goods extends Controller
     }
 
     /*********************************************************************************/
-    /******************************** 원부자재코드 검색 관련 ******************************/
+    /****************************** 원부자재코드 검색 관련 ****************************/
     /********************************************************************************/
 
     const Conds_sub = [
@@ -906,8 +906,7 @@ class goods extends Controller
     {
         $result = [];
 
-        foreach(self::Conds_sub as $key => $cond_cd)
-        {
+        foreach (self::Conds_sub as $key => $cond_cd) {
             $sql = "
                 select code_id, code_val
                 from code
@@ -958,15 +957,13 @@ class goods extends Controller
         if($prd_cd != '') $where .= " and pc.prd_cd like '$prd_cd%'";
         if($goods_nm != '') $where .= " and pc.prd_nm like '%$goods_nm%'";
 
-        foreach(self::Conds_sub as $key => $value)
-        {
-            if($key === 'item') $key = 'items';
-            if(count(${ $key }) > 0)
-            {
+        foreach (self::Conds_sub as $key => $value) {
+            if ($key === 'item') $key = 'items';
+            if (count(${ $key }) > 0) {
                 $where .= ${ $key . '_contain' } == 'true' ? " and (1!=1" : " and (1=1";
 
                 $col = $key === 'items' ? 'item' : $key;
-                foreach(${ $key } as $item) {
+                foreach (${ $key } as $item) {
                     if(${ $key . '_contain' } == 'true')
                         $where .= " or pc.$col = '$item'";
                     else
@@ -982,15 +979,14 @@ class goods extends Controller
         $total = 0;
         $page_cnt = 0;
         
-            $sql = "
-                select pc.prd_cd, p.prd_nm, pc.goods_no, pc.goods_opt, pc.color, pc.size 
-                from product_code pc 
-                    inner join product p on p.prd_cd = pc.prd_cd
-                where 1=1 and pc.brand = 'PR' or pc.brand = 'SM'
+        $sql = "
+            select pc.prd_cd, p.prd_nm, pc.goods_no, pc.goods_opt, pc.color, pc.size 
+            from product_code pc 
+                inner join product p on p.prd_cd = pc.prd_cd
+            where 1=1 and pc.brand = 'PR' or pc.brand = 'SM'
             $where
-            ";
+        ";
       
-
         $result = DB::select($sql);
 
         return response()->json([
