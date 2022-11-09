@@ -360,7 +360,7 @@
 		},
 		{
 			field: "sup_com",
-			headerName: "공급업체(거래선)",
+			headerName: "원부자재업체",
 			width: 120
 		},
 		{
@@ -566,6 +566,12 @@
 		if (f1.prd_nm.value.trim() === '') {
 			f1.prd_nm.focus();
 			return alert("원부자재명을 입력해주세요.");
+		}
+
+		// 원부자재 업체 입력여부
+		if (f1.sup_com.value.trim() === '') {
+			f1.sup_com.focus();
+			return alert("원부자재 업체를 선택해주세요.");
 		}
 
 		// Tag가 입력여부

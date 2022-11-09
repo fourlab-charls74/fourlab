@@ -54,25 +54,54 @@ CREATE TABLE `product_image` (
 
 -- 상품 입고/반품 마스터
 CREATE TABLE `product_stock_order` (
-   `stock_no` int(11) 
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `stock_no` int(11) NOT NULL AUTO_INCREMENT COMMENT '입고번호',
+  `stock_date` varchar(8) NOT NULL COMMENT '입고일자',
+  `invoice_no` varchar(20) DEFAULT NULL COMMENT '송장번호',
+  `stock_type` varchar(1) NOT NULL DEFAULT 'G' COMMENT '입고구분 - 일괄/발주:A,개별:G',
+  `area_type` varchar(1) NOT NULL DEFAULT 'D' COMMENT '지역 - 해외:O,국내:D',
+  `com_id` varchar(20) NOT NULL COMMENT '업체',
+  `item` varchar(20) NOT NULL COMMENT '품목',
+  `currency_unit` varchar(3) DEFAULT NULL COMMENT '화폐단위',
+  `exchange_rate` decimal(10,2) DEFAULT NULL COMMENT '환율',
+  `custom_amt` decimal(12,2) DEFAULT NULL COMMENT '신고금액',
+  `custom_tax` decimal(10,2) DEFAULT NULL COMMENT '통관비',
+  `custom_tax_rate` decimal(10,2) DEFAULT NULL COMMENT '통관세율',
+  `state` int(11) DEFAULT NULL COMMENT '상태(10:임시저장,20:입고)',
+  `loc` varchar(50) DEFAULT NULL COMMENT '위치',
+  `opts` mediumtext COMMENT '옵션',
+  `id` varchar(50) DEFAULT NULL COMMENT '작성자',
+  `rt` datetime DEFAULT NULL COMMENT '등록일',
+  `ut` datetime DEFAULT NULL COMMENT '최근수정일',
+  PRIMARY KEY (`stock_no`),
+  KEY `buy_ord_no` (`invoice_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='입고';noDB DEFAULT CHARSET=utf8;
 
 -- 상품 입고/반품 상품
-CREATE TABLE `sproduct_stock_order_product` (
-    `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT 'identify',
-    `prd_ord_no` varchar(50) NOT NULL COMMENT '입고송장번호/반품번호',
-    `com_id` varchar(30) NOT NULL COMMENT '공급업체',
-    `state` varchar(5) DEFAULT 10 COMMENT '상태:입고대기(10),입고처리중(20),입고완료(30),반품대기(-10),반품처리중(-20),반품완료(-30)',
-    `prd_cd` varchar(50) NOT NULL COMMENT '상품코드',
-    `prd_nm` VARCHAR(100) NOT NULL COMMENT '상품명',
-    `qty` INT(11) DEFAULT NULL COMMENT '수량',
-    `price` INT(11) DEFAULT NULL COMMENT '단가',
-    `wonga` INT(11) DEFAULT NULL COMMENT '원가',
-    `rt` datetime NOT NULL COMMENT '등록일',
-    `ut` datetime DEFAULT NULL COMMENT '수정일',
-    `admin_id` varchar(30) NOT NULL COMMENT '관리자아이디',
-    PRIMARY KEY (`idx`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE `product_stock_order_product` (
+  `stock_prd_no` int(11) NOT NULL AUTO_INCREMENT COMMENT '입고 상품 일련번호',
+  `stock_no` int(11) NOT NULL COMMENT '입고번호',
+  `invoice_no` varchar(50) NOT NULL COMMENT '송장번호',
+  `com_id` varchar(20) NOT NULL COMMENT '업체',
+  `item` varchar(20) NOT NULL COMMENT '품목',
+  `brand` varchar(100) NOT NULL COMMENT '브랜드',
+  `prd_cd` varchar(50) DEFAULT NULL COMMENT '상품코드',
+  `style_no` varchar(100) DEFAULT NULL COMMENT '스타일넘버',
+  `goods_no` int(11) NOT NULL COMMENT '상품번호',
+  `goods_sub` int(11) NOT NULL COMMENT '상품번호(보조)',
+  `opt_kor` varchar(100) DEFAULT NULL COMMENT '옵션(한국)',
+  `qty` int(11) DEFAULT NULL COMMENT '수량',
+  `unit_cost` decimal(10,2) DEFAULT NULL COMMENT '단가',
+  `cost_notax` decimal(10,0) DEFAULT NULL COMMENT '원가(VAT별도)',
+  `cost` decimal(10,0) DEFAULT NULL COMMENT '원가',
+  `state` int(11) DEFAULT NULL COMMENT '상태(10:임시저장,20:입고)',
+  `stock_date` varchar(8) DEFAULT NULL COMMENT '입고일자',
+  `id` varchar(8) DEFAULT NULL COMMENT '작성자',
+  `rt` datetime DEFAULT NULL COMMENT '등록일',
+  `ut` datetime DEFAULT NULL COMMENT '최근수정일',
+  PRIMARY KEY (`stock_prd_no`),
+  KEY `stock_no` (`stock_no`),
+  KEY `invoice_no` (`invoice_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='입고상품';
 
 -- 원부자재 상품 입고/반품 마스터
 CREATE TABLE `sproduct_stock_order` (
