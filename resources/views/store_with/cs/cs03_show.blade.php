@@ -44,12 +44,12 @@
                     <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-								<label for="com_nm">공급업체</label>
+								<label for="com_nm">원부자재 업체</label>
 								<div class="form-inline inline_select_box">
 									<div class="form-inline-inner input-box w-100">
 										<div class="form-inline inline_btn_box">
 											<input type="hidden" id="com_cd" name="com_cd" />
-											<input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
+											<input onchange="changeInput();" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
 											<a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 										</div>
 									</div>
@@ -58,7 +58,7 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="prd_nm">상품명</label>
+                                <label for="prd_nm">원부자재명</label>
                                 <div class="flax_box">
                                     <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" id="prd_nm" name='prd_nm' value=''>
                                 </div>
@@ -66,12 +66,12 @@
                         </div>
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
-								<label>상품코드</label>
+								<label>원부자재 코드</label>
 								<div class="form-inline">
 									<div class="form-inline-inner input-box w-100">
 										<div class="form-inline inline_btn_box">
-											<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm w-100 ac-style-no search-enter">
-											<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+											<input type='text' id="prd_cd_sub" name='prd_cd_sub' class="form-control form-control-sm w-100 ac-style-no search-enter">
+											<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd_sub"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 										</div>
 									</div>
 								</div>
@@ -117,6 +117,17 @@
                                     <table class="table incont table-bordered" width="100%" cellspacing="0">
                                         <tbody>
                                             <tr>
+                                                <th class="required"><label for="invoice_no">원부자재 업체</label></th>
+                                                <td style="width:35%;">
+                                                    <div class="form-inline inline_select_box">
+                                                        <div class="form-inline-inner input-box w-100">
+                                                            <div class="flax_box">
+                                                                <input type="hidden" name="com_cd2" id="com_cd2" value="">
+                                                                <input type="text" class="form-control form-control-sm" name="com_code" id="com_code" value="" readonly>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
                                                 <th class="required"><label for="state">구분</label></th>
                                                 <td style="width:35%;">
                                                     <div class="flax_box">
@@ -293,16 +304,27 @@
         return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     };
 
+
     function Search() {
+        
         $('[name=search]').val(10);
         let data = $('form[name="search"]').serialize();
         gx.Request('/store/cs/cs03/buy/search', data, 1, (data) => {
             // console.log(data);
         });
+        let com_nm = document.getElementById('com_nm').value;
+        let com_cd = document.getElementById('com_cd').value;
+
+        if(com_nm != ''){
+            document.getElementById('com_code').value = com_nm;
+            document.getElementById('com_cd2').value = com_cd;
+        }
     };
 
+
     const getInvoiceNo = () => {
-	    const com_id = document.search.com_cd.value;
+	    const com_id = document.f1.com_cd2.value;
+
 	    let invoice_no = document.f1.invoice_no.value;
         if (invoice_no == '' && com_id != "") {
             axios({
@@ -411,6 +433,38 @@
         var url = '/store/product/prd03/edit/' + product_code;
         var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1100,height=555");
     }
+
+    //원부자재 업체 검색
+    $( ".sch-sup-company" ).on("click", () => {
+        searchCompany.Open(null, '6', 'wonboo');
+    });
+
+
+    // function changeInput() {
+	// 	let com_nm = document.getElementById('com_nm');
+
+	// 	$.ajax({
+	// 		method: 'post',
+	// 		url: '/store/cs/cs03/buy/changeInput',
+	// 		data: {
+	// 			com_nm : com_nm
+	// 		},
+	// 		success: function(data) {
+	// 			if (data.code == '200') {
+    //                 document.getElementById('com_code').value = data.result;
+								
+    //             } else {
+    //                 alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+    //             }
+    //         },
+    //         error: function(res, status, error) {
+    //             console.log(error);
+    //         }
+    //     });
+    // }
+
+ 
+   
 
 </script>
 

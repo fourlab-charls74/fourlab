@@ -19,6 +19,8 @@ class company extends Controller
 		$com_nm = $req->input('com_nm', '');
 		$use_yn = $req->input('use_yn', '');
 		$com_type = $req->input('com_type', '');
+		$wonboo = $req->input('wonboo', '');
+
 
         $where = "";
 

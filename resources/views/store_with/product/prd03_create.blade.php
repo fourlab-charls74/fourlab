@@ -161,7 +161,7 @@
 													<input type='text' class="form-control form-control-sm" name='prd_nm' id="prd_nm" value=''>
 												</div>
 											</td>
-											<th class="required">공급업체(거래선)</th>
+											<th class="required">원부자재 업체</th>
 											<td>
 												<div class="flax_box">
 													<select name='sup_com' class="form-control form-control-sm">

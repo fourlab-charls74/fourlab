@@ -84,8 +84,8 @@ class stk16Controller extends Controller
             $where .= " and s.store_type = '" . Lib::quote($req['store_type']) . "'";
         if (isset($req['store_no']))
             $where .= " and s.store_cd = '" . Lib::quote($req['store_no']) . "'";
-        if ($req['prd_cd'] != null) {
-            $prd_cd = explode(',', $req['prd_cd']);
+        if ($req['prd_cd_sub'] != null) {
+            $prd_cd = explode(',', $req['prd_cd_sub']);
             $where .= " and (1!=1";
             foreach ($prd_cd as $cd) {
                 $where .= " or psr.prd_cd = '" . Lib::quote($cd) . "' ";
@@ -217,7 +217,7 @@ class stk16Controller extends Controller
 
                 if ($row['state'] != $ori_state) continue;
 
-                $prd_cd = $row['prd_cd'];
+                $prd_cd = $row['prd_cd_sub'];
                 $price = $row['price'];
                 $wonga = $row['wonga'];
 
@@ -361,7 +361,7 @@ class stk16Controller extends Controller
 
                 // product_stock_storage 창고 실재고 차감
                 DB::table('product_stock_storage')
-                    ->where('prd_cd', '=', $row['prd_cd'])
+                    ->where('prd_cd', '=', $row['prd_cd_sub'])
                     ->where('storage_cd', '=', $row['storage_cd'])
                     ->update([
                         'qty' => DB::raw('qty - ' . ($row['qty'] ?? 0)),
@@ -399,7 +399,7 @@ class stk16Controller extends Controller
 
                 // product_stock_store 매장 실재고 플러스
                 DB::table('product_stock_store')
-                    ->where('prd_cd', '=', $row['prd_cd'])
+                    ->where('prd_cd', '=', $row['prd_cd_sub'])
                     ->where('store_cd', '=', $row['store_cd'])
                     ->update([
                         'qty' => DB::raw('qty + ' . ($row['qty'] ?? 0)),

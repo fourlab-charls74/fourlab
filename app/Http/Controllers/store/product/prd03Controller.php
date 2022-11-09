@@ -82,7 +82,7 @@ class prd03Controller extends Controller
 
 		if ($type != "") $where .= " and pc.brand = '" . Lib::quote($type) . "'";
 		if ($prd_nm != "") $where .= " and p.prd_nm like '%" . Lib::quote($prd_nm) . "%' ";
-		if ($com_id != "") $where .= " and p.com_id = '" . Lib::quote($com_id) . "'";
+		// if ($com_id != "") $where .= " and p.com_id = '" . Lib::quote($com_id) . "'";
 		if ($com_nm != "") $where .= " and cp.com_nm like '%" . Lib::quote($com_nm) . "%' ";
 
 		$in_store_sql	= "";
@@ -270,11 +270,22 @@ class prd03Controller extends Controller
 					/**
 					 * 원부자재 상품 이미지 저장 (단일 이미지)
 					 */
+
+					$wonboo_cd = substr($prd_cd,0,2);
+
+					$save_path = "";
+					if ($wonboo_cd == 'PR') {
+						$save_path = "/images/s_goods/pr/";
+					} else if($wonboo_cd == 'SM') {
+						$save_path = "/images/s_goods/sm/";
+					}
+
 					$base64_src = $row['image'];
-					$save_path = "/images/prd03";
 					
 					$unique_img_name = $prd_cd . $seq;
-					$img_url = ULib::uploadBase64img($save_path, $base64_src, $unique_img_name);
+					$img_name = strtolower($unique_img_name);
+					$img_url = ULib::uploadBase64img($save_path, $base64_src, $img_name);
+
 		
 					DB::table('product_code')->insert([
 						'prd_cd' => $prd_cd,

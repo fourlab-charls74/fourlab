@@ -248,6 +248,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
             Route::get('/search', 'cs03Controller@searchBuy');
             Route::get('/get-invoice-no/{com_id}', 'cs03Controller@getInvoiceNo');
             Route::post('/add', 'cs03Controller@addBuy');
+            Route::post('/changeInput', 'cs03Controller@changeInput');
         });
         
     });

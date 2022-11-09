@@ -43,16 +43,18 @@ class cs03Controller extends Controller
 
 		$prd_ord_no	= $request->input("prd_ord_no");
 		$prd_nm	= $request->input("prd_nm");
-		$prd_cd = $request->input("prd_cd");
+		$prd_cd = $request->input("prd_cd_sub");
 
 		$com_id	= $request->input("com_cd");
 		$com_nm	= $request->input("com_nm");
 
 		$user_nm = $request->input("user_nm");
 
+
 		// $limit = $request->input("limit", 100);
 
 		$where = "";
+		$where1 = "";
 		if ($prd_cd != "") {
 			$prd_cd = explode(',', $prd_cd);
 			$where .= " and (1!=1";
@@ -65,8 +67,8 @@ class cs03Controller extends Controller
 		if ($state != "") $where .= " and p1.state = '" . Lib::quote($state) . "'";
 		if ($prd_ord_no != "") $where .= " and p1.prd_ord_no = '" . Lib::quote($prd_ord_no) . "'";
 		if ($prd_nm != "") $where .= " and p1.prd_nm like '%" . Lib::quote($prd_nm) . "%' ";
-		if ($com_id != "") $where .= " and p1.com_id = '" . Lib::quote($com_id) . "'";
-		if ($com_nm != "") $where .= " and cp.com_nm like '%" . Lib::quote($com_nm) . "%' ";
+		// if ($com_id != "") $where .= " and p1.com_id = '" . Lib::quote($com_id) . "'";
+		if ($com_nm != "") $where1 .= " and cp.com_nm like '%" . Lib::quote($com_nm) . "%' ";
 		if ($user_nm != "") $where .= " and m.name like '%" . Lib::quote($user_nm) . "%' ";
 
 		$page_size	= $limit;
@@ -80,8 +82,8 @@ class cs03Controller extends Controller
 			$sql = /** @lang text */
 				"
 				select count(*) as total
-				from product_stock_order_product p1
-					inner join product_stock_order p2 on p1.prd_ord_no = p2.prd_ord_no
+				from sproduct_stock_order_product p1
+					inner join sproduct_stock_order p2 on p1.prd_ord_no = p2.prd_ord_no
 					left outer join product p3 on p1.prd_cd = p3.prd_cd
 					left outer join product_code p4 on p3.prd_cd = p4.prd_cd
 					left outer join mgr_user m on p2.admin_id = m.id
@@ -111,8 +113,8 @@ class cs03Controller extends Controller
 				p1.rt as rt,
 				p1.ut as ut,
 				m.name as user_nm
-			from product_stock_order_product p1
-				inner join product_stock_order p2 on p1.prd_ord_no = p2.prd_ord_no
+			from sproduct_stock_order_product p1
+				inner join sproduct_stock_order p2 on p1.prd_ord_no = p2.prd_ord_no
 				left outer join product p3 on p1.prd_cd = p3.prd_cd
 				left outer join product_code p4 on p3.prd_cd = p4.prd_cd
 				inner join company cp on p1.com_id = cp.com_id
@@ -120,7 +122,7 @@ class cs03Controller extends Controller
 				left outer join `code` c2 on c2.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c2.code_id = p4.size
 				left outer join `code` c3 on c3.code_kind_cd = 'PRD_CD_UNIT' and c3.code_id = p3.unit
 				left outer join mgr_user m on p2.admin_id = m.id
-			where 1=1 $where
+			where 1=1 $where $where1
 			order by p2.prd_ord_date desc, p1.prd_ord_no desc, p1.prd_cd asc
 			-- $limit
 		";
@@ -154,7 +156,7 @@ class cs03Controller extends Controller
 					 * 변경 전 상태 가져오기
 					 */
 					$sql = "
-						select state from product_stock_order_product
+						select state from sproduct_stock_order_product
 						where prd_cd = :prd_cd and prd_ord_no = :prd_ord_no
 					";
 					$row = DB::selectOne($sql, ['prd_cd' => $prd_cd, 'prd_ord_no' => $prd_ord_no]);
@@ -337,7 +339,7 @@ class cs03Controller extends Controller
 					 * 입고/반품 상태변경
 					 */
 					$sql = "
-						update product_stock_order_product 
+						update sproduct_stock_order_product 
 						set state = :state, ut = now()
 						where prd_ord_no = :prd_ord_no and prd_cd = :prd_cd
 					";
@@ -369,7 +371,7 @@ class cs03Controller extends Controller
 					 * slave 테이블 - 상품코드에 해당되는 입고/반품번호 삭제
 					 */
 					$sql = "
-						delete p1 from product_stock_order_product p1
+						delete p1 from sproduct_stock_order_product p1
 						where p1.prd_ord_no = :prd_ord_no and p1.prd_cd = :prd_cd and p1.state in ('10', '-10')
 					";
 					DB::delete($sql, ['prd_ord_no' => $prd_ord_no, 'prd_cd' => $prd_cd]);
@@ -378,13 +380,13 @@ class cs03Controller extends Controller
 					 * slave 테이블에서 입고/반품번호와 일치하는 데이터가 전부 삭제된 경우 master도 삭제
 					 */
 					$sql = "
-						select count(*) as cnt from product_stock_order_product
+						select count(*) as cnt from sproduct_stock_order_product
 						where prd_ord_no = :prd_ord_no
 					";
 					$result = DB::selectOne($sql, ['prd_ord_no' => $prd_ord_no]);
 					if ($result->cnt == 0) {
 						$sql = "
-							delete from product_stock_order
+							delete from sproduct_stock_order
 							where prd_ord_no = :prd_ord_no
 						";
 						DB::delete($sql, ['prd_ord_no' => $prd_ord_no]);
@@ -417,7 +419,7 @@ class cs03Controller extends Controller
 
 		$type = $request->input("type");
 		$prd_nm	= $request->input("prd_nm");
-		$prd_cd = $request->input("prd_cd");
+		$prd_cd = $request->input("prd_cd_sub");
 		$com_id	= $request->input("com_cd");
 		$com_nm	= $request->input("com_nm");
 
@@ -438,7 +440,7 @@ class cs03Controller extends Controller
 
 		if ($type != "") $where .= " and pc.brand = '" . Lib::quote($type) . "'";
 		if ($prd_nm != "") $where .= " and p.prd_nm like '%" . Lib::quote($prd_nm) . "%' ";
-		if ($com_id != "") $where .= " and p.com_id = '" . Lib::quote($com_id) . "'";
+		// if ($com_id != "") $where .= " and p.com_id = '" . Lib::quote($com_id) . "'";
 		if ($com_nm != "") $where .= " and cp.com_nm like '%" . Lib::quote($com_nm) . "%' ";
 
 		$page_size	= $limit;
@@ -500,6 +502,7 @@ class cs03Controller extends Controller
 
 		return response()->json([
 			"code"	=> 200,
+			"com_nm" => $com_nm,
 			"head"	=> array(
 				"total"		=> $total,
 				"page"		=> $page,
@@ -541,7 +544,7 @@ class cs03Controller extends Controller
 					/**
 					 * 원부자재 상품 입고 master
 					 */
-					DB::table('product_stock_order')->updateOrInsert(
+					DB::table('sproduct_stock_order')->updateOrInsert(
 						['prd_ord_no' => $invoice_no],
 						[
 							'kind' => $kind,
@@ -558,7 +561,7 @@ class cs03Controller extends Controller
 					/**
 					 * 원부자재 상품 입고 slave
 					 */
-					DB::table('product_stock_order_product')->updateOrInsert(
+					DB::table('sproduct_stock_order_product')->updateOrInsert(
 						[
 							'prd_ord_no' => $invoice_no,
 							'prd_cd' => $prd_cd,
@@ -583,7 +586,7 @@ class cs03Controller extends Controller
 					/**
 					 * 원부자재 상품 입고 master
 					 */
-					DB::table('product_stock_order')->updateOrInsert(
+					DB::table('sproduct_stock_order')->updateOrInsert(
 						['prd_ord_no' => $invoice_no],
 						[
 							'kind' => $kind,
@@ -599,7 +602,7 @@ class cs03Controller extends Controller
 					/**
 					 * 원부자재 상품 입고 slave
 					 */
-					DB::table('product_stock_order_product')->updateOrInsert(
+					DB::table('sproduct_stock_order_product')->updateOrInsert(
 						[
 							'prd_ord_no' => $invoice_no,
 							'prd_cd' => $prd_cd,
@@ -631,7 +634,7 @@ class cs03Controller extends Controller
 	public function getInvoiceNo($com_id) {
 		$prefix_invoice_no = sprintf("%s_%s_A", $com_id, date("ymd"));
 		$sql = "
-			select ifnull(max(prd_ord_no),0) as invoice_no from product_stock_order
+			select ifnull(max(prd_ord_no),0) as invoice_no from sproduct_stock_order
 			where prd_ord_no like '$prefix_invoice_no%'
 		";
 		$row = DB::selectOne($sql);
@@ -645,5 +648,32 @@ class cs03Controller extends Controller
 		$invoice_no = sprintf("%s%03d", $prefix_invoice_no, $seq);
 		return $invoice_no;
 	}
+
+	// public function changeInput(Request $request) {
+
+	// 	$com_nm = $request->input('com_nm', '');
+
+	// 	try {
+	// 		DB::beginTransaction();
+
+	// 		$sql = "
+	// 			select 
+	// 				*
+	// 			from company
+	// 			where com_nm = '$com_nm'
+	// 			limit 1
+	// 		";
+
+	// 		$result = DB::select($sql);
+    //         DB::commit();
+    //         $code = 200;
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         $code = 500;
+    //     }
+
+    //     return response()->json(["code" => $code, "result" => $result]);
+
+	// }
 
 }

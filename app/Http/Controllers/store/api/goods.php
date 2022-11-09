@@ -887,4 +887,123 @@ class goods extends Controller
             "body" => $result
         ]);
     }
+
+
+    /*********************************************************************************/
+    /******************************** 원부자재코드 검색 관련 ******************************/
+    /********************************************************************************/
+
+    const Conds_sub = [
+        'brand' => 'BRAND',
+        'year' => 'YEAR',
+        'season' => 'SEASON',
+        'gender' => 'GENDER',
+        'item' => 'ITEM',
+        'opt' => 'OPT'
+    ];
+
+    public function search_product_sub_conditions()
+    {
+        $result = [];
+
+        foreach(self::Conds_sub as $key => $cond_cd)
+        {
+            $sql = "
+                select code_id, code_val
+                from code
+                where code_kind_cd = 'PRD_CD_$cond_cd'
+                order by code_seq
+            ";
+
+            if($key == 'brand') {
+                $sql = "
+                    select code_id, code_val
+                    from code
+                    where code_kind_cd = 'PRD_MATERIAL_TYPE'
+                ";
+            }
+            $result[$key] = DB::select($sql);
+        }
+
+        return response()->json([
+            "code" => '200',
+            "head" => [
+                "total" => 1,
+            ],
+            "body" => $result
+        ]);
+    }
+
+    public function search_prdcd_sub(Request $request)
+    {
+        $prd_cd = $request->input('prd_cd_sub', '');
+        $goods_nm = $request->input('goods_nm_sub', '');
+
+        $brand = $request->input('brand', []);
+        $brand_contain = $request->input('brand_contain', '');
+        $year = $request->input('year', []);
+        $year_contain = $request->input('year_contain', '');
+        $season = $request->input('season', []);
+        $season_contain = $request->input('season_contain', '');
+        $gender = $request->input('gender', []);
+        $gender_contain = $request->input('gender_contain', '');
+        $items = $request->input('item', []);
+        $items_contain = $request->input('item_contain', '');
+        $opt = $request->input('opt', []);
+        $opt_contain = $request->input('opt_contain', '');
+
+        $page = $request->input('page', 1);
+        $where = "";
+
+        if($prd_cd != '') $where .= " and pc.prd_cd like '$prd_cd%'";
+        if($goods_nm != '') $where .= " and pc.prd_nm like '%$goods_nm%'";
+
+        foreach(self::Conds_sub as $key => $value)
+        {
+            if($key === 'item') $key = 'items';
+            if(count(${ $key }) > 0)
+            {
+                $where .= ${ $key . '_contain' } == 'true' ? " and (1!=1" : " and (1=1";
+
+                $col = $key === 'items' ? 'item' : $key;
+                foreach(${ $key } as $item) {
+                    if(${ $key . '_contain' } == 'true')
+                        $where .= " or pc.$col = '$item'";
+                    else
+                        $where .= " and pc.$col != '$item'";
+                }
+                $where .= ")";
+            }
+        }
+
+        $page_size = 100;
+        $startno = ($page - 1) * $page_size;
+        $limit = " limit $startno, $page_size ";
+        $total = 0;
+        $page_cnt = 0;
+        
+            $sql = "
+                select pc.prd_cd, p.prd_nm, pc.goods_no, pc.goods_opt, pc.color, pc.size 
+                from product_code pc 
+                    inner join product p on p.prd_cd = pc.prd_cd
+                where 1=1 and pc.brand = 'PR' or pc.brand = 'SM'
+            $where
+            ";
+      
+
+        $result = DB::select($sql);
+
+        return response()->json([
+            "code" => '200',
+            "head" => [
+                "total" => count($result),
+                "page" => 1,
+                "page_cnt" => 1,
+                "page_total" => 1,
+              
+            ],
+            "body" => $result
+        ]);
+    }
+
 }

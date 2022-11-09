@@ -26,7 +26,6 @@ function formatNumber(params) {
 }
 
 function HDGrid(gridDiv , columns, optionMixin = {}){
-
     this.id = gridDiv.id.replace("div-", "");
     this.gridDiv = gridDiv;
     this.gridTotal = this.id + '-total';

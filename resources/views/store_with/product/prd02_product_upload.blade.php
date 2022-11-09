@@ -131,6 +131,14 @@
 											</td>
 										</tr>
 										<tr>
+											<th class="required">순서</th>
+											<td>
+												<div class="flax_box">
+													<select name='seq' id='seq' class="form-control form-control-sm" onclick="sel_seq();" onchange="changeSelect();">
+													<!-- <option value=''>선택</option> -->
+													</select>
+												</div>
+											</td>
 											<th class="required">컬러</th>
 											<td>
 												<div class="flax_box">
@@ -728,5 +736,150 @@
 			});
 		}
 	}
+
+	// 순서 이전 항목이 선택되어있지 않을때 순서 disable
+	// $(document).ready(function() {
+	// 	let brand = document.getElementById('brand').value;
+	// 	let year = document.getElementById('year').value;
+	// 	let season = document.getElementById('season').value;
+	// 	let gender = document.getElementById('gender').value;
+	// 	let item = document.getElementById('item').value;
+	// 	let opt = document.getElementById('opt').value;
+
+	// 	if (brand != '' && year != '' && season != '' && gender != '' && item != '' && opt != '') {
+	// 		document.getElementById('seq').disabled = false;
+	// 	} else {
+	// 		document.getElementById('seq').disabled = true;
+	// 	}
+	// });
+
+	//순서 선택
+	let count = 0;
+	function sel_seq() {
+		count++;
+		console.log(count);
+		let brand = document.getElementById('brand').value;
+		let year = document.getElementById('year').value;
+		let season = document.getElementById('season').value;
+		let gender = document.getElementById('gender').value;
+		let item = document.getElementById('item').value;
+		let opt = document.getElementById('opt').value;
+
+		let prd_cd = brand+year+season+gender+item;
+
+			// if(!validation_seq()) {
+			$.ajax({
+					method: 'post',
+					url: '/store/product/prd02/sel_seq',
+					data: {
+						prd_cd : prd_cd
+					},
+					success: function(data) {
+						if (data.code == '200') {
+							if(count == 1) {
+								if (data.result == '') {
+									let sel = "<option value=''>선택</option>"
+									let option = "<option value='01'>01 : 신규 생성</option>"
+									$('#seq').append(sel);
+									$('#seq').append(option);
+								} else {
+									let sel = "<option value=''>선택</option>"
+									$('#seq').append(sel);
+									let seq;
+									for(let i = 0; i < data.result.length; i++){
+										let pc = data.result[i].prd_cd;
+										seq = data.result[i].seq;
+										let option = "";
+										if (seq >= 10) {
+											option = '<option value='+ seq +'>'+ seq +' : '+ data.result[i].prd_nm +'</option>'
+										} else {
+											option = '<option value=0'+ seq +'>0'+ seq +' : '+ data.result[i].prd_nm +'</option>'
+										}
+										$('#seq').append(option);
+									}
+									let new_save = "";
+									if(seq >= 10){
+										new_save = '<option value='+ (seq+1) +'>'+ (seq+1) +' : 신규 생성</option>';
+									}else{
+										new_save = '<option value=0'+(seq+1) +'>0'+(seq+1) +' : 신규 생성</option>';
+									}
+									$('#seq').append(new_save);
+								}
+							}
+
+							$(document).on('change', '.prd_code', function(){
+								$('#seq').empty();
+								count = 0;
+							});
+
+							// count = 0;
+						} else {
+							alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+						}
+					},
+					error: function(res, status, error) {
+						console.log(error);
+					}
+				});
+		}
+
+	
+	//순서에 신규생성이 아닌 값을 클릭시 하위 목록 자동 입력 및 비활성화하는 부분
+	function changeSelect() {
+		let selectList = document.getElementById('seq');
+		let option_text = selectList.options[selectList.selectedIndex].text;
+		let prd_nm = option_text.split(' : ');
+
+		$.ajax({
+			method: 'post',
+			url: '/store/product/prd02/change_seq',
+			data: {
+				prd_nm : prd_nm[1],
+				prd_seq : prd_nm[0]
+			},
+			success: function(data) {
+				if (data.code == '200') {
+						if (prd_nm[1] != '신규 생성') {
+								document.getElementById('prd_nm').value = data.result[0].prd_nm;
+								document.getElementById('style_no').value = data.result[0].style_no;
+								document.getElementById('tag_price').value = data.result[0].tag_price;
+								document.getElementById('price').value = data.result[0].price;
+								document.getElementById('wonga').value = data.result[0].wonga;
+								document.getElementById('sup_com').value = data.result[0].com_id;
+								
+								document.getElementById('prd_nm').readOnly = true;
+								document.getElementById('style_no').readOnly = true;
+								document.getElementById('tag_price').readOnly = true;
+								document.getElementById('price').readOnly = true;
+								document.getElementById('wonga').readOnly = true;
+								document.getElementById('sup_com').disabled = true;
+
+							} else {
+								document.getElementById('prd_nm').value = '';
+								document.getElementById('style_no').value = '';
+								document.getElementById('tag_price').value = '';
+								document.getElementById('price').value = '';
+								document.getElementById('wonga').value = '';
+								document.getElementById('sup_com').value = '';
+
+
+								document.getElementById('prd_nm').readOnly = false;
+								document.getElementById('style_no').readOnly = false;
+								document.getElementById('tag_price').readOnly = false;
+								document.getElementById('price').readOnly = false;
+								document.getElementById('wonga').readOnly = false;
+								document.getElementById('sup_com').disabled = false;
+
+							}
+						} else {
+							alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+						}
+					},
+					error: function(res, status, error) {
+						console.log(error);
+					}
+				});
+		}
+
 </script>
 @stop

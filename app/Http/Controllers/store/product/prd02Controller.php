@@ -942,7 +942,7 @@ class prd02Controller extends Controller
 		";
 		DB::insert($sql);
 
-		$sql	= "
+		$sql	= "`
 			insert into goods_option ( goods_no,goods_sub,type,name,required_yn,use_yn,seq,option_no,rt,ut )
 			select * from (
 				select 

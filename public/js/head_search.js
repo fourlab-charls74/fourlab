@@ -770,8 +770,9 @@ function SearchCompany(){
     this.grid = null;
 }
 
-SearchCompany.prototype.Open = function(callback = null, type = ""){
+SearchCompany.prototype.Open = function(callback = null, type = "", wonboo = false){
     if(this.grid === null){
+        this.isWonboo = wonboo === "wonboo";
         this.type = type;
         this.SetGrid("#div-gd-company");
         //gxBrand = new HDGrid(document.querySelector("#div-gd-brand"), columnsBrand);
@@ -796,23 +797,45 @@ SearchCompany.prototype.Open = function(callback = null, type = ""){
 };
 
 SearchCompany.prototype.SetGrid = function(divId){
-    const columns = [
-        {field:"com_type_nm" , headerName:"업체구분",width:80},
-        {field:"com_id" , headerName:"업체코드",width:80},
-        {field:"com_nm" , headerName:"업체명",width:100},
-        {field:"biz_num" , headerName:"사업자번호",width:90},
-        {field:"md_nm" , headerName:"담당MD",width:70, hide:true},
-        {field:"com_type", headerName:"업체타입", hide:true},
-        {field:"baesong_kind", headerName:"배송업체", hide:true},
-        {field:"baesong_info", headerName:"배송지역", hide:true},
-        {field:"margin_type", headerName:"수수료타입", hide:true},
-        {field:"dlv_amt", headerName:"배송료", hide:true},
-        {field:"choice" , headerName:"선택",width:50,cellClass:'hd-grid-code',
-            cellRenderer: function (params) {
-                return '<a href="javascript:void(0);" onclick="return searchCompany.Choice(\'' + params.data.com_id + '\',\'' + params.data.com_nm + '\',\'' + params.data.com_type + '\',\'' + params.data.baesong_kind + '\',\'' + params.data.baesong_info + '\',\'' + params.data.margin_type + '\',\'' + params.data.dlv_amt + '\',\'' + params.data.com_type_nm + '\');">선택</a>';
-            }
-        },
-    ];
+    const columns = [];
+    if(this.isWonboo === true){
+        columns.push(
+            {field:"com_type_nm" , headerName:"업체구분",width:80},
+            {field:"com_id" , headerName:"업체코드",width:80},
+            {field:"com_nm" , headerName:"원부자재업체명",width:100},
+            {field:"biz_num" , headerName:"사업자번호",width:90},
+            {field:"md_nm" , headerName:"담당MD",width:70, hide:true},
+            {field:"com_type", headerName:"업체타입", hide:true},
+            {field:"baesong_kind", headerName:"배송업체", hide:true},
+            {field:"baesong_info", headerName:"배송지역", hide:true},
+            {field:"margin_type", headerName:"수수료타입", hide:true},
+            {field:"dlv_amt", headerName:"배송료", hide:true},
+            {field:"choice" , headerName:"선택",width:50,cellClass:'hd-grid-code',
+                cellRenderer: function (params) {
+                    return '<a href="javascript:void(0);" onclick="return searchCompany.Choice(\'' + params.data.com_id + '\',\'' + params.data.com_nm + '\',\'' + params.data.com_type + '\',\'' + params.data.baesong_kind + '\',\'' + params.data.baesong_info + '\',\'' + params.data.margin_type + '\',\'' + params.data.dlv_amt + '\',\'' + params.data.com_type_nm + '\');">선택</a>';
+                }
+            },
+        );
+
+    } else {
+        columns.push(
+            {field:"com_type_nm" , headerName:"업체구분",width:80},
+            {field:"com_id" , headerName:"업체코드",width:80},
+            {field:"com_nm" , headerName:"업체명",width:100},
+            {field:"biz_num" , headerName:"사업자번호",width:90},
+            {field:"md_nm" , headerName:"담당MD",width:70, hide:true},
+            {field:"com_type", headerName:"업체타입", hide:true},
+            {field:"baesong_kind", headerName:"배송업체", hide:true},
+            {field:"baesong_info", headerName:"배송지역", hide:true},
+            {field:"margin_type", headerName:"수수료타입", hide:true},
+            {field:"dlv_amt", headerName:"배송료", hide:true},
+            {field:"choice" , headerName:"선택",width:50,cellClass:'hd-grid-code',
+                cellRenderer: function (params) {
+                    return '<a href="javascript:void(0);" onclick="return searchCompany.Choice(\'' + params.data.com_id + '\',\'' + params.data.com_nm + '\',\'' + params.data.com_type + '\',\'' + params.data.baesong_kind + '\',\'' + params.data.baesong_info + '\',\'' + params.data.margin_type + '\',\'' + params.data.dlv_amt + '\',\'' + params.data.com_type_nm + '\');">선택</a>';
+                }
+            },
+        );
+    }
 
     this.grid = new HDGrid(document.querySelector( divId ), columns);
 };
@@ -820,6 +843,7 @@ SearchCompany.prototype.SetGrid = function(divId){
 SearchCompany.prototype.Search = function(){
     let data = $('form[name="search_company"]').serialize();
     data += "&com_type=" + this.type;
+    data += "&wonboo=" + this.isWonboo;
     const url = '/head/api/company/getlist/';
     this.grid.Request(url, data);
 };

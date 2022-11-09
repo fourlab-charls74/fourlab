@@ -80,7 +80,7 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
-                            <label for="com_nm">공급업체</label>
+                            <label for="com_nm">원부자재 업체</label>
                             <div class="form-inline inline_select_box">
                                 <div class="form-inline-inner input-box w-100">
                                     <div class="form-inline inline_btn_box">
@@ -94,12 +94,12 @@
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group">
-                            <label>상품코드</label>
+                            <label>원부자재코드</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input-box w-100">
                                     <div class="form-inline inline_btn_box">
-                                        <input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm w-100 ac-style-no search-enter">
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                        <input type='text' id="prd_cd_sub" name='prd_cd_sub' class="form-control form-control-sm w-100 ac-style-no search-enter">
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd_sub"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                     </div>
                                 </div>
                             </div>
@@ -416,6 +416,13 @@
             }
         };
     };
+
+    //원부자재 업체 검색
+    $( ".sch-sup-company" ).on("click", () => {
+        searchCompany.Open(null, '6', 'wonboo');
+    });
+
+    
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>

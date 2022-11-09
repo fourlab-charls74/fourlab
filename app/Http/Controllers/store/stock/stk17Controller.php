@@ -34,8 +34,8 @@ class stk17Controller extends Controller
         $where = "";
 
         // where
-        if ($req['prd_cd'] != null) {
-            $prd_cd = explode(',', $req['prd_cd']);
+        if ($req['prd_cd_sub'] != null) {
+            $prd_cd = explode(',', $req['prd_cd_sub']);
             $where .= " and (1!=1";
             foreach ($prd_cd as $cd) {
                 $where .= " or p.prd_cd = '" . Lib::quote($cd) . "' ";
@@ -110,7 +110,8 @@ class stk17Controller extends Controller
                     left outer join `code` c on c.code_kind_cd = 'PRD_MATERIAL_TYPE' and c.code_id = pc.brand
                     left outer join `code` c2 on c2.code_kind_cd = 'PRD_MATERIAL_OPT' and c2.code_id = pc.opt
                 where 
-                    pss.storage_cd = (select storage_cd from storage where default_yn = 'Y') $where
+                    pss.storage_cd = (select storage_cd from storage where default_yn = 'Y') and p.type <> 'N'
+                $where
             ";
             $row = DB::selectOne($sql);
             $total = $row->total;
@@ -149,7 +150,7 @@ class stk17Controller extends Controller
                 DB::table('sproduct_stock_release')
                     ->insert([
                         'type' => $release_type,
-                        'prd_cd' => $row['prd_cd'],
+                        'prd_cd' => $row['prd_cd_sub'],
                         'price' => $row['price'],
                         'wonga' => $row['wonga'],
                         'qty' => $row['rel_qty'] ?? 0,

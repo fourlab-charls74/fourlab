@@ -232,7 +232,11 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title mt-0" id="myModalLabel">업체 검색</h5>
+                    @if (@$isWonboo == true)
+                        <h5 class="modal-title mt-0" id="myModalLabel">원부자재업체 검색</h5>
+                    @else 
+                        <h5 class="modal-title mt-0" id="myModalLabel">업체 검색</h5>
+                    @endif
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -246,7 +250,11 @@
                                         <div class="row">
                                             <div class="col-lg-12 inner-td">
                                                 <div class="form-group">
-                                                    <label style="min-width:60px;">업체명</label>
+                                                    @if (@$isWonboo == true)
+                                                        <label style="min-width:60px;">원부자재업체명</label>
+                                                    @else
+                                                        <label style="min-width:60px;">업체명</label>
+                                                    @endif
                                                     <div class="flax_box">
                                                         <input type='text' class="form-control form-control-sm sch-company" name='com_nm' value=''>
                                                     </div>
@@ -267,12 +275,6 @@
                                         <div class="fl_box">
                                             <h6 class="m-0 font-weight-bold">총 : <span id="gd-company-total" class="text-primary">0</span> 건</h6>
                                         </div>
-                                        {{-- <div class="fr_box form-check-box">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" name="search_category_close" id="search_category_close" class="custom-control-input" value="Y" checked>
-                                                <label class="custom-control-label" for="search_category_close" value="30">선택 후 닫기</label>
-                                            </div>
-                                        </div> --}}
                                     </div>
                                 </div>
                                 <div class="table-responsive">
