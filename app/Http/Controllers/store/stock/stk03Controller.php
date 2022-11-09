@@ -1305,13 +1305,14 @@ class stk03Controller extends Controller
         $values['jaego_reasons'] = DB::select($sql);
 
         $values = array_merge($values, [
+            'today'         => date("Y-m-d"),
             'cs_forms'		=> SLib::getCodes("CS_FORM2"),
             'clm_reasons'	=> SLib::getCodes("G_CLM_REASON"),
             'clm_states'	=> SLib::getCodes("G_CLM_STATE"),
             'dlv_cds'		=> SLib::getCodes("DELIVERY"),
 			// 'refund_yn'		=> ''
         ]);
-
+        
         return view(Config::get('shop.store.view') . '/stock/stk03_detail', $values);
     }
 
@@ -1514,6 +1515,7 @@ class stk03Controller extends Controller
                 ,( select point_status from point_list where ord_no = o.ord_no and ord_opt_no = o.ord_opt_no and point > 0 order by no desc limit 0,1 ) as point_status
                 , om.state, om.memo
                 , o.dlv_cd, o.dlv_no, dlv.code_val as dlv_nm, dlv.code_val2 as dlv_homepage
+                , o.prd_cd, o.store_cd
                 , '' as choice_class
             from order_opt o
                 inner join goods g on g.goods_no = o.goods_no and g.goods_sub = o.goods_sub
@@ -1712,6 +1714,7 @@ class stk03Controller extends Controller
                     , (select code_val from code where code_kind_cd = 'G_CLM_STATE' and code_id = o.clm_state)
                  ) as order_state
                  , o.ord_state, o.clm_state
+                 , o.recv_amt, o.dc_amt, o.point_amt, o.coupon_amt
             from order_opt o
                 inner join goods g on g.goods_no = o.goods_no and g.goods_sub = o.goods_sub
                 left outer join claim c on o.ord_opt_no = c.ord_opt_no
@@ -1835,5 +1838,20 @@ class stk03Controller extends Controller
         $values['gifts'] = $rows;
 
         return $values;        
+    }
+
+    /** 매장환불처리 */
+    public function store_refund_save(Request $request)
+    {
+        $clm_reason = $request->input('store_clm_reason', '');
+        $clm_qty = $request->input('store_clm_reason', 0);
+        $refund_amt = $request->input('store_refund_amt', 0);
+        $refund_point_amt = $request->input('store_refund_point_amt', 0);
+        $refund_bank = $request->input('store_refund_bank', '');
+        $refund_nm = $request->input('store_refund_nm', '');
+        $refund_account = $request->input('store_refund_account', '');
+        $refund_memo = $request->input('store_refund_memo', '');
+
+        dd("stk03controller.php line.1855");
     }
 }

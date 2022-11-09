@@ -212,15 +212,15 @@
     const pinnedRowData = [{ store_cd: '합계' }];
     let store_detail_columns = [
         {field: "store_cd",	headerName: "매장코드", pinned: 'left', width: 60, cellStyle: AlignCenter},
-        {field: "store_nm",	headerName: "매장명", pinned: 'left', width: 133},
-        {field: "prev_qty", headerName: "이전재고", width: 77, type: "currencyType"},
-        {field: "store_in_qty", headerName: "매장입고", width: 77, type: "currencyType"},
-        {field: "store_return_qty", headerName: "매장반품", width: 77, type: "currencyType"},
-        {field: "rt_in_qty", headerName: "이동입고", width: 77, type: "currencyType"},
-        {field: "rt_out_qty", headerName: "이동출고", width: 77, type: "currencyType"},
-        {field: "sale_qty", headerName: "매장판매", width: 77, type: "currencyType"},
-        {field: "loss_qty", headerName: "LOSS", width: 77, type: "currencyType"},
-        {field: "term_qty", headerName: "기간재고", width: 77, type: "currencyType"},
+        {field: "store_nm",	headerName: "매장명", pinned: 'left', width: 140},
+        {field: "prev_qty", headerName: "이전재고", width: 74, type: "currencyType"},
+        {field: "store_in_qty", headerName: "매장입고", width: 74, type: "currencyType"},
+        {field: "store_return_qty", headerName: "매장반품", width: 74, type: "currencyType"},
+        {field: "rt_in_qty", headerName: "이동입고", width: 74, type: "currencyType"},
+        {field: "rt_out_qty", headerName: "이동출고", width: 74, type: "currencyType"},
+        {field: "sale_qty", headerName: "매장판매", width: 74, type: "currencyType"},
+        {field: "loss_qty", headerName: "LOSS", width: 74, type: "currencyType"},
+        {field: "term_qty", headerName: "기간재고", width: 74, type: "currencyType"},
     ];
 
     const pApp3 = new App('', { gridId: "#div-gd-store-stock-detail" });
