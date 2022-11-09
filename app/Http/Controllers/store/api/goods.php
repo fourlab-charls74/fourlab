@@ -986,7 +986,7 @@ class goods extends Controller
                 select pc.prd_cd, p.prd_nm, pc.goods_no, pc.goods_opt, pc.color, pc.size 
                 from product_code pc 
                     inner join product p on p.prd_cd = pc.prd_cd
-                where 1=1 and pc.brand = 'PR' or pc.brand = 'SM'
+                where 1=1 and pc.brand in('PR','SM')
             $where
             ";
       

@@ -52,6 +52,28 @@ CREATE TABLE `product_image` (
     PRIMARY KEY (`idx`, `prd_cd`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- 상품 입고/반품 마스터
+CREATE TABLE `product_stock_order` (
+   
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 상품 입고/반품 상품
+CREATE TABLE `sproduct_stock_order_product` (
+    `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT 'identify',
+    `prd_ord_no` varchar(50) NOT NULL COMMENT '입고송장번호/반품번호',
+    `com_id` varchar(30) NOT NULL COMMENT '공급업체',
+    `state` varchar(5) DEFAULT 10 COMMENT '상태:입고대기(10),입고처리중(20),입고완료(30),반품대기(-10),반품처리중(-20),반품완료(-30)',
+    `prd_cd` varchar(50) NOT NULL COMMENT '상품코드',
+    `prd_nm` VARCHAR(100) NOT NULL COMMENT '상품명',
+    `qty` INT(11) DEFAULT NULL COMMENT '수량',
+    `price` INT(11) DEFAULT NULL COMMENT '단가',
+    `wonga` INT(11) DEFAULT NULL COMMENT '원가',
+    `rt` datetime NOT NULL COMMENT '등록일',
+    `ut` datetime DEFAULT NULL COMMENT '수정일',
+    `admin_id` varchar(30) NOT NULL COMMENT '관리자아이디',
+    PRIMARY KEY (`idx`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 -- 원부자재 상품 입고/반품 마스터
 CREATE TABLE `sproduct_stock_order` (
     `prd_ord_no` varchar(50) NOT NULL COMMENT '입고송장번호/반품번호',
