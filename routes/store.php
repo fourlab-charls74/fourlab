@@ -176,8 +176,11 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::put('prd02/add-product-product', 'prd02Controller@add_product_product');
 
         Route::get('prd02/edit-goods-no/{product_code}/{goods_no}/', 'prd02Controller@edit_goods_no');
+        Route::get('prd02/edit-goods-no/{product_code}', 'prd02Controller@match_goods_no');
         Route::get('prd02/prd-edit-search', 'prd02Controller@prd_edit_search');
+        Route::get('prd02/prd-edit-match-search', 'prd02Controller@prd_edit_match_search');
         Route::put('prd02/del-product-code', 'prd02Controller@del_product_code');
+        Route::put('prd02/edit-match-product-code', 'prd02Controller@edit_match_product_code');
 
         Route::get('prd02/batch-create', 'prd02Controller@batch_create');
         Route::post('prd02/upload', 'prd02Controller@upload');
@@ -213,11 +216,11 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::put('prd04/batch', 'prd04Controller@update');
 
         Route::get('prd04/batch_wonga', 'prd04Controller@batch_wonga');
-        Route::post('prd04/upload_wonga',	'prd04Controller@upload_wonga');
+        Route::post('prd04/upload_wonga', 'prd04Controller@upload_wonga');
         Route::put('prd04/batch_wonga', 'prd04Controller@update_wonga');
 
         Route::get('prd04/batch_store', 'prd04Controller@batch_store');
-        Route::post('prd04/upload_store',	'prd04Controller@upload_store');
+        Route::post('prd04/upload_store', 'prd04Controller@upload_store');
         Route::put('prd04/batch_store', 'prd04Controller@update_store');
     });
 
