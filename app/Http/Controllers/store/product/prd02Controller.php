@@ -705,7 +705,7 @@ class prd02Controller extends Controller
 			inner join code c on a.size = c.code_val and c.code_kind_cd = 'PRD_CD_SIZE_MATCH'
 			inner join (
 				select goods_no, goods_opt from goods_summary 
-			) d on d.goods_no = :goods_no2 and d.goods_opt = concat(b.code_val,'^',c.code_val2) 
+			) d on d.goods_no = :goods_no2 and replace(d.goods_opt, ' ','') = replace(concat(b.code_val,'^',c.code_val2), ' ','') 
 			inner join goods g on g.goods_no = d.goods_no
 			where 
 				a.goods_no = 0 and a.prd_cd = :prd_cd
