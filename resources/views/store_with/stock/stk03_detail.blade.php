@@ -633,7 +633,7 @@
                                                         [[확정]]
                                                     @endif
                                                 </td>
-                                                <td><a href="/head/order/ord01/{{$ord_no}}/{{$ord_list->ord_opt_no}}">{{@$ord_list->order_state}}</a></td>
+                                                <td><a href="/store/stock/stk03/order/{{$ord_no}}/{{$ord_list->ord_opt_no}}">{{@$ord_list->order_state}}</a></td>
                                                 <td>
                                                     <a href="#" onClick="PopOrderGoods('{{$ord_no}}','{{$ord_list->ord_opt_no}}');return false;">{{@$ord_list->ord_kind_nm}}</a>/<br />
                                                     {{@$ord_list->ord_kind_nm}}
@@ -706,7 +706,7 @@
                             @if( @$c_ord_no != "" )
                             <span style="color:#FF0000;">*</span> 해당건의 자식 주문번호는 <span onClick="openHeadOrder('{{ $c_ord_no }}','{{ $c_ord_opt_no }}');" style="cursor:pointer;color:#0000FF;font-weight:700;">{{ @$c_ord_no }}</span> 입니다.&nbsp;&nbsp;
                             @endif
-                            @if (@$store && $order_opt->clm_state != "61")
+                            @if (@$store && ($order_opt->clm_state == "0" || $order_opt->clm_state == "1" || $order_opt->clm_state == "-30"))
                             <button class="btn-sm btn btn-primary store-refund-btn fs-12">매장환불</button>
                             @endif
                             <button class="btn-sm btn btn-secondary sms-send-btn fs-12">SMS 발송</button>
@@ -889,7 +889,7 @@
                                                         <a href="#" class="btn-sm btn btn-secondary refund-btn">환불</a>
                                                     </div>
                                                     <ul class="refund_input_list">
-                                                        <li>
+                                                        <li class="pl-0">
                                                             <span>환불금액</span>
                                                             <div class="cont"><input type="text" name="refund_amt" id="refund_amt" value="{{@number_format($claim_info->refund_amt)}}" readonly="readonly" class="form-control form-control-sm text-right"></div>
                                                         </li>
@@ -994,6 +994,8 @@
                                 <div class="card shadow">
                                     <div class="card-body m-0">
                                         <form name="store_refund">
+                                            <input type="hidden" name="ord_no" value="{{ @$ord_no }}">
+                                            <input type="hidden" name="ord_opt_no" value="{{ @$ord_opt_no }}">
                                             <div class="card-body">
                                                 <div class="row_wrap mb-2">
                                                     <div class="row">
@@ -1025,10 +1027,13 @@
                                                         </div>
                                                     </div>
                                                     <div class="row">
-                                                        <div class="col-lg-6 inner-td">
-                                                            <div class="form-group">
-                                                                <label class="required" style="min-width:80px;">환불수량</label>
-                                                                <div class="flex_box">
+                                                        <div class="col-lg-12 inner-td">
+                                                            <div class="form-group h-100">
+                                                                <label style="min-width:80px;">환불수량</label>
+                                                                <div class="d-flex align-items-center h-100">
+                                                                    <p class="fs-14"><span style="color: red;font-weight: 700;">{{ @$order_opt->qty }}</span>개 <span class="fs-12 ml-3">( 매장환불 시 해당상품의 모든수량이 환불처리됩니다. )</span></p>
+                                                                </div>
+                                                                {{-- <div class="flex_box">
                                                                     <select name="store_clm_qty" id="store_clm_qty" class="form-control form-control-sm">
                                                                         @for($i = 1; $i <= $order_opt->qty; $i++ )
                                                                             <option value="{{$i}}" @if($order_opt->clm_qty == $i) selected @endif>
@@ -1036,25 +1041,31 @@
                                                                             </option>
                                                                             @endfor
                                                                     </select>
-                                                                </div>
+                                                                </div> --}}
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="row">
                                                         <div class="col-lg-6 inner-td">
-                                                            <div class="form-group">
+                                                            <div class="form-group h-100">
                                                                 <label style="min-width:80px;">환불금액</label>
-                                                                <div class="flex_box">
-                                                                    <input type="text" name="store_refund_amt" id="store_refund_amt" value="{{ @number_format(@$order_opt->recv_amt / @$order_opt->qty) }}" readonly="readonly" class="form-control form-control-sm text-right">
+                                                                <div class="d-flex align-items-center h-100">
+                                                                    <p class="fs-14 text-right w-100">{{ @number_format(@$order_opt->recv_amt) }}원</p>
                                                                 </div>
+                                                                {{-- <div class="flex_box">
+                                                                    <input type="text" name="store_refund_amt" id="store_refund_amt" value="{{ @number_format(@$order_opt->recv_amt / @$order_opt->qty) }}" readonly="readonly" class="form-control form-control-sm text-right">
+                                                                </div> --}}
                                                             </div>
                                                         </div>
                                                         <div class="col-lg-6 inner-td">
-                                                            <div class="form-group">
+                                                            <div class="form-group h-100">
                                                                 <label style="min-width:80px;">환불포인트</label>
-                                                                <div class="flex_box">
-                                                                    <input type="text" name="store_refund_point_amt" id="store_refund_point_amt" value="{{ @number_format(@$order_opt->point_amt / @$order_opt->qty) }}" readonly="readonly" class="form-control form-control-sm text-right">
+                                                                <div class="d-flex align-items-center h-100">
+                                                                    <p class="fs-14 text-right w-100">{{ @number_format(@$order_opt->point_amt) }}원</p>
                                                                 </div>
+                                                                {{-- <div class="flex_box">
+                                                                    <input type="text" name="store_refund_point_amt" id="store_refund_point_amt" value="{{ @number_format(@$order_opt->point_amt / @$order_opt->qty) }}" readonly="readonly" class="form-control form-control-sm text-right">
+                                                                </div> --}}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1091,7 +1102,7 @@
                                                             <div class="form-group">
                                                                 <label style="min-width:80px;">메모</label>
                                                                 <div class="flex_box">
-                                                                    <input type="text" name="store_refund_memo" id="store_refund_memo" value="" class="form-control form-control-sm">
+                                                                    <input type="text" name="store_refund_memo" id="store_refund_memo" value="환불완료 (매장환불)" class="form-control form-control-sm">
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1387,7 +1398,7 @@
     });
 
     $('.search-btn').click((e) => {
-        location.href = "/head/order/ord01/" + $('#ord_no').val();
+        location.href = "/store/stock/stk03/order/" + $('#ord_no').val();
     });
 
     $('.dlv-comment-btn').click((e) => {
@@ -1451,24 +1462,32 @@
         });
     });
 
-    $('[name=store_clm_qty]').on("change", (e) => {
-        let qty = e.target.value * 1;
-        $("[name=store_refund_amt]").val(Comma('{{ @$order_opt->recv_amt / @$order_opt->qty }}' * qty));
-        $("[name=store_refund_point_amt]").val(Comma('{{ @$order_opt->point_amt / @$order_opt->qty }}' * qty));
-    });
+    // 매장환불 시, 해당상품수량 전체 환불하도록 함 (아래코드 주석처리)
+    // $('[name=store_clm_qty]').on("change", (e) => {
+    //     let qty = e.target.value * 1;
+    //     $("[name=store_refund_amt]").val(Comma('{{ @$order_opt->recv_amt / @$order_opt->qty }}' * qty));
+    //     $("[name=store_refund_point_amt]").val(Comma('{{ @$order_opt->point_amt / @$order_opt->qty }}' * qty));
+    // });
     
     $('.store-refund-save-btn').click(function(e) {
         e.preventDefault();
-        // return alert("환불작업중입니다.");
 
-        const frm = $("form[name=store_refund]");
+        if($("[name=store_clm_reason]").val() == '') return alert("환불사유를 선택해주세요.");
+
+        const frm = $("form[name=store_refund]");        
 
         axios({
             url: '/store/stock/stk03/order/store_refund',
             method: 'post',
             data: frm.serialize(),
         }).then(function (res) {
-            console.log(res);
+            if(res.data.code == 200) {
+                alert("매장환불처리가 정상적으로 완료되었습니다.");
+                location.reload();
+            } else {
+                alert(res.data.msg);
+                console.log(res);
+            }
         }).catch(function (err) {
             console.log(err);
         });
@@ -1746,7 +1765,7 @@
             success: function(data) {
                 alert("클레임 내용이 등록되었습니다.");
                 //location.reload();
-				location.href	= `/head/order/ord01/${ord_no}/${ord_opt_no}?refund_yn=${refund_yn}`;
+				location.href	= `/store/stock/stk03/order/${ord_no}/${ord_opt_no}?refund_yn=${refund_yn}`;
             },
             error: function(request, status, error) {
                 console.log("error")

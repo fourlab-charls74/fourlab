@@ -5,6 +5,10 @@ namespace App\Models;
 use App\Components\Lib;
 use Illuminate\Support\Facades\DB;
 
+const CLAIM_STATE_REFUND = 61; // 환불완료
+const CLAIM_CS_FORM = 01; // 클레임 cs
+const REFUND_PRODUCT_STOCK_TYPE = 6; // 환불 (code > PRODUCT_STOCK_TYPE)
+
 class Claim
 {
     private $user;
@@ -653,5 +657,231 @@ class Claim
         ";
 
         DB::update($sql);
+	}
+
+	/*
+ 		Function: AddClaimInStore
+ 		매장환불 시 클레임 등록 및 완료처리
+	*/
+	public function AddClaimInStore($claim)
+	{
+		if (empty($this->ord_opt_no)) trigger_error("Use SetOrdOptNo() method first !!", E_USER_ERROR);
+		
+		$success_code = 1;
+
+		$sql = "
+			select 
+				o.ord_no, o.ord_opt_no, o.prd_cd, o.goods_no, o.goods_sub, o.goods_opt
+				, o.qty, o.wonga, o.price, o.dc_amt, o.point_amt, o.recv_amt, o.ord_state
+				, o.coupon_amt, o.com_id, c.pay_fee as com_rate, o.ord_kind, o.ord_type
+				, o.com_coupon_ratio, o.coupon_no, o.sales_com_fee, o.dlv_amt, o.store_cd
+				, o.recv_amt as ref_amt, o.point_amt as refund_point_amt
+				, (o.price * o.qty) as refund_price, m.ord_amt as refund_amt
+			from order_opt o
+				inner join order_mst m on m.ord_no = o.ord_no
+				left outer join company c on o.com_id = c.com_id
+			where ord_opt_no = :ord_opt_no
+		";
+		$ord = DB::selectOne($sql, ['ord_opt_no' => $this->ord_opt_no]);
+
+		if ($ord == null) trigger_error("존재하지 않는 주문건입니다.", E_USER_ERROR);
+
+		$ord_wonga_no = $this->_updateStoreOrder($ord);
+		$clm_no = $this->_insertStoreClaim($claim, $ord);
+		$update_stock = $this->_updateStoreStockToRefund($ord);
+
+		if ($ord_wonga_no == 0 || $clm_no == 0 || $update_stock == 0) $success_code = 0;
+
+		return $success_code;
+	}
+
+	/*
+ 		Function: _updateStoreOrder
+ 		매장환불 시 order_opt 수정 및 order_opt_wonga 등록
+
+		Returns:
+			$ord_wonga_no
+	*/
+	public function _updateStoreOrder($ord)
+	{
+		// order_opt > clm_state 변경
+		DB::table('order_opt')
+			->where('ord_opt_no', '=', $this->ord_opt_no)
+			->update(['clm_state' => CLAIM_STATE_REFUND]);
+
+		// order_opt_wonga 등록 전 중복체크
+		$sql = "
+			select count(*) as cnt
+			from order_opt_wonga
+			where ord_opt_no = :ord_opt_no and ord_state = :ord_state
+		";
+		$rows = DB::selectOne($sql, ['ord_opt_no' => $this->ord_opt_no, 'ord_state' => CLAIM_STATE_REFUND]);
+		$ord_wonga_no = 0;
+
+		if ($rows->cnt < 1) {
+			// order_opt_wonga 등록
+			$ord_wonga_no = DB::table('order_opt_wonga')->insertGetId([
+				'goods_no'			=> $ord->goods_no,
+				'goods_sub'			=> $ord->goods_sub,
+				'ord_opt_no'		=> $ord->ord_opt_no,
+				'goods_opt'			=> $ord->goods_opt,
+				'qty'				=> $ord->qty,
+				'wonga'				=> $ord->wonga,
+				'price'				=> $ord->price,
+				'dlv_amt'			=> $ord->dlv_amt,
+				'dlv_ret_amt'		=> '',
+				'dlv_add_amt'		=> '',
+				'dlv_enc_amt'		=> '',
+				'recv_amt'			=> $ord->recv_amt,
+				'point_apply_amt'	=> $ord->point_amt,
+				'coupon_apply_amt'	=> $ord->coupon_amt,
+				'dc_apply_amt'		=> $ord->dc_amt,
+				'com_id'			=> $ord->com_id,
+				'com_rate'			=> $ord->com_rate,
+				'ord_state'			=> CLAIM_STATE_REFUND,
+				'ord_kind'			=> $ord->ord_kind,
+				'ord_type'			=> $ord->ord_type,
+				'invoice_no'		=> '',
+				'ord_state_date'	=> date('Ymd'),
+				'coupon_no'			=> $ord->coupon_no,
+				'com_coupon_ratio'	=> $ord->com_coupon_ratio,
+				'sales_com_fee'		=> $ord->sales_com_fee,
+				'prd_cd'			=> $ord->prd_cd,
+				'store_cd'			=> $ord->store_cd,
+			]);
+		}
+
+		return $ord_wonga_no;
+	}
+
+	/*
+ 		Function: _insertStoreClaim
+ 		매장환불 시 claim, claim_detail, claim_memo 등록
+
+		Returns:
+			$clm_no - 클레임 번호
+	*/
+	public function _insertStoreClaim($claim, $ord)
+	{
+		// claim 등록
+		$clm_no = DB::table('claim')->insertGetId([
+			'ord_opt_no' 		=> $this->ord_opt_no,
+			'clm_type' 			=> 2, // 환불 (code - G_CLM_TYPE)
+			'clm_state' 		=> CLAIM_STATE_REFUND, // 매장환불 시 클레임 완료처리
+			'clm_reason' 		=> $claim['clm_reason'],
+			'refund_no' 		=> $this->ord_opt_no,
+			'ref_amt' 			=> $ord->ref_amt,
+			'refund_yn' 		=> 'Y',
+			'refund_price' 		=> $ord->refund_price,
+			'refund_point_amt' 	=> $ord->refund_point_amt,
+			'refund_coupon_amt' => 0, // 추후 쿠폰기능 추가 시 수정
+			'refund_pay_fee' 	=> 0,
+			'refund_pay_fee_yn' => null,
+			'refund_tax_fee' 	=> 0,
+			'refund_etc_amt' 	=> 0,
+			'refund_gift_amt' 	=> 0,
+			'refund_amt' 		=> $ord->refund_amt,
+			'refund_bank' 		=> $claim['refund_bank'],
+			'refund_account' 	=> $claim['refund_account'],
+			'refund_nm' 		=> $claim['refund_nm'],
+			'memo' 				=> $claim['memo'],
+			'req_date' 			=> now(),
+			'req_nm' 			=> $this->user['name'],
+			'proc_date' 		=> now(),
+			'proc_nm' 			=> $this->user['name'],
+			'end_date' 			=> now(),
+			'end_nm' 			=> $this->user['name'],
+			'goods_no' 			=> $ord->goods_no,
+			'goods_sub' 		=> $ord->goods_sub,
+			'last_up_date' 		=> now(),
+		]);
+
+		// claim_detail 등록
+        DB::table('claim_detail')->insert([
+			'clm_no' 		=> $clm_no,
+			'ord_wonga_no' 	=> 0,
+			'clm_qty' 		=> $ord->qty,
+			'jaego_yn' 		=> 'Y',
+			'jaego_reason' 	=> '',
+			'stock_state' 	=> 1,
+        ]);
+
+		// claim_memo 등록
+        DB::table('claim_memo')->insert([
+			'ord_opt_no' 	=> $this->ord_opt_no,
+			'clm_no' 		=> $clm_no,
+			'ord_state' 	=> $ord->ord_state,
+			'clm_state' 	=> CLAIM_STATE_REFUND,
+			'cs_form' 		=> CLAIM_CS_FORM,
+			'memo' 			=> $claim['memo'],
+			'admin_id' 		=> $this->user['id'],
+			'admin_nm' 		=> $this->user['name'],
+			'regi_date' 	=> now(),
+        ]);
+
+		return $clm_no;
+	}
+
+	/*
+ 		Function: _updateStoreStockToRefund
+ 		매장환불 시 재고 업데이트 - product_stock, product_stock_store 수정 및 product_stock_hst 등록
+
+		Returns:
+			$success_code - 재고 업데이트 성공여부
+	*/
+	public function _updateStoreStockToRefund($ord)
+	{
+		$store_cd = $ord->store_cd;
+		$prd_cd = $ord->prd_cd;
+		$qty = $ord->qty;
+
+		if ($store_cd != '' && $store_cd != null && $prd_cd != '' && $prd_cd != null) {
+
+			// 매장재고 업데이트
+			$success_code = DB::table('product_stock_store')
+				->where('prd_cd', '=', $prd_cd)
+				->where('store_cd', '=', $store_cd) 
+				->update([
+					'qty' => DB::raw('qty + ' . $qty),
+					'wqty' => DB::raw('wqty + ' . $qty),
+					'ut' => now(),
+				]);
+			
+			if ($success_code < 1) return $success_code;
+
+			// 전체재고 업데이트
+			$success_code = DB::table('product_stock')
+				->where('prd_cd', '=', $prd_cd)
+				->update([
+					'qty_wonga'	=> DB::raw('qty_wonga + ' . ($qty * ($ord->wonga = 0))),
+					'out_qty' => DB::raw('out_qty - ' . $qty),
+					'qty' => DB::raw('qty + ' . $qty),
+					'ut' => now(),
+				]);
+
+			if ($success_code < 1) return $success_code;
+
+			// 재고이력 등록
+			$success_code = DB::table('product_stock_hst')
+				->insert([
+					'goods_no' => $ord->goods_no,
+					'prd_cd' => $prd_cd,
+					'goods_opt' => $ord->goods_opt,
+					'location_cd' => $store_cd,
+					'location_type' => 'STORE',
+					'type' => REFUND_PRODUCT_STOCK_TYPE,
+					'price' => $ord->price,
+					'wonga' => $ord->wonga,
+					'qty' => $qty,
+					'stock_state_date' => date('Ymd'),
+					'ord_opt_no' => $ord->ord_opt_no,
+					'comment' => '매장환불',
+					'rt' => now(),
+					'admin_id' => $this->user['id'],
+					'admin_nm' => $this->user['name'],
+				]);
+		}
+
+		return $success_code;
 	}
 }

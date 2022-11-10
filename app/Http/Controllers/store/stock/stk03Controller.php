@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Conf;
 use App\Models\Order;
 use App\Models\Point;
+use App\Models\Claim;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -1843,15 +1844,44 @@ class stk03Controller extends Controller
     /** 매장환불처리 */
     public function store_refund_save(Request $request)
     {
+        $ord_opt_no = $request->input('ord_opt_no', '');
         $clm_reason = $request->input('store_clm_reason', '');
-        $clm_qty = $request->input('store_clm_reason', 0);
-        $refund_amt = $request->input('store_refund_amt', 0);
-        $refund_point_amt = $request->input('store_refund_point_amt', 0);
         $refund_bank = $request->input('store_refund_bank', '');
         $refund_nm = $request->input('store_refund_nm', '');
         $refund_account = $request->input('store_refund_account', '');
         $refund_memo = $request->input('store_refund_memo', '');
+        
+        $code = 200;
+        $msg = '';
+        $user = [
+            'id' => Auth('head')->user()->id,
+            'name' => Auth('head')->user()->name
+        ];
 
-        dd("stk03controller.php line.1855");
+        try {
+            DB::beginTransaction();
+
+            $claim = new Claim($user);
+            $claim->SetOrdOptNo($ord_opt_no);
+
+            // 클레임상태 등록 및 재고업데이트
+            $success_code = $claim->AddClaimInStore([
+                'clm_reason' 		=> $clm_reason,
+                'refund_bank' 		=> $refund_bank,
+                'refund_account' 	=> $refund_account,
+                'refund_nm' 		=> $refund_nm,
+                'memo' 				=> $refund_memo,
+            ]);
+
+            if ($success_code < 1) $code = 500;
+            $msg = '매장환불처리가 완료되었습니다.';
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollback();
+            $code = 500;
+            $msg = $e->getMessage();
+        }
+
+        return response()->json(['code' => $code, 'msg' => $msg], $code);
     }
 }
