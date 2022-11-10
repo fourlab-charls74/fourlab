@@ -60,7 +60,7 @@
 								<table class="table incont table-bordered" width="100%" cellspacing="0">
 									<tbody>
 										<tr>
-											<th class="">상품코드</th>
+											<th class="">원부자재코드</th>
 											<td colspan="3">
 												<div class="flax_box">{{$prd_cd}}</div>
 											</td>
@@ -72,7 +72,7 @@
 													<input type='text' class="form-control form-control-sm" name='prd_nm' id="prd_nm" value='{{$prd_nm}}'>
 												</div>
 											</td>
-											<th class="">공급업체(거래선)</th>
+											<th class="">원부자재업체</th>
 											<td>
 												<div class="flax_box">{{$sup_com}}</div>
 											</td>
@@ -114,15 +114,13 @@
 											<th>이미지</th>
 											<td colspan="3">
 												<div style="text-align:center;" id="multi_img">
-													<input type='file' id='btnAdd' name="file" multiple='multiple' accept=".jpg" />
+													<input type='file' id='btnAdd' name="btnAdd" multiple='multiple' accept=".jpg" />
 												</div>
 												<div id='img_div'></div>
-												@if($img_url != "")
-													<div id='img_show_div' data-img="" style="display:inline-block;position:relative;width:150px;height:150px;margin:5px;z-index:1">
-														<img src="{{$img_url}}" alt="" id="img_show" style="width:100%;height:100%;z-index:none">
-														<input type="button" value="x" onclick="delete_img('{{$prd_cd}}','01')" style="width:20px;height:20px;position:absolute;right:0px;top:0px;border:none;font-size:large;font-weight:bolder;background:none;color:black;padding-bottom:20px;">
-													</div>
-												@endif
+												<div id='img_show_div' data-img="" style="display:inline-block;position:relative;width:150px;height:150px;margin:5px;z-index:1">
+													<img src="{{$img_url}}" alt="" id="img_show" style="width:100%;height:100%;z-index:none">
+													<input type="button" value="x" onclick="delete_img('{{$prd_cd}}','01')" style="width:20px;height:20px;position:absolute;right:0px;top:0px;border:none;font-size:large;font-weight:bolder;background:none;color:black;padding-bottom:20px;">
+												</div>
 											</td>
 										</tr>
 								</table>
@@ -183,6 +181,7 @@
 
 	const PRD_CD = "{{$prd_cd}}";
 	let added_base64_image = "";
+
 	function save() {
 		if (!validation()) return;
 		axios({
@@ -195,7 +194,9 @@
 				wonga: document.f1.wonga.value,
 				image: added_base64_image,
 				unit: document.f1.unit.value,
-				seq: 01 // 단일 이미지로 일단 처리 - 01로 고정
+				seq: 01, // 단일 이미지로 일단 처리 - 01로 고정
+				img: document.getElementById('img_show').src
+				
 			},
 		}).then(function(res) {
 			if (res.data.code === 200) {
@@ -280,6 +281,7 @@
 			// 이미지 한개만 미리 보기 되도록 고정
 			if (img_div.getElementsByTagName('div').length > 0) {
 				img_div.removeChild(img_div.getElementsByTagName('div')[0]);
+
 			}
 			
 			sel_files.push(file);
@@ -289,6 +291,9 @@
 				img.setAttribute('style', img_style)
 				img.src = ee.target.result;
 				added_base64_image = ee.target.result;
+				let div = document.querySelector("#img_show_div");
+				div.style.display = 'none';
+
 				img_div.appendChild(makeDiv(img, file));
 			}
 
@@ -332,6 +337,7 @@
 
 	function delete_img(prd_cd, seq) {
 		let img_show = document.querySelectorAll("#img_show_div");
+		console.log(img_show);
 		
 		if (confirm("선택한 사진을 삭제하시겠습니까?")) {
 			$.ajax({
@@ -342,13 +348,13 @@
 					seq: seq
 				},
 				success: function(data) {
-					if (data.code == '200') {
+					if (data.code == 200) {
 						for (let i = 0; i < img_show.length; i++) {
-							if (img_show[i].dataset.img == seq) {
 								img_show[i].remove();
 								break;
 							}
-						}
+
+						alert('이미지가 삭제되었습니다.');
 					} else {
 						alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
 					}

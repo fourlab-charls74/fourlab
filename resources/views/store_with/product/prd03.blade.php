@@ -78,7 +78,7 @@
 							<div class="form-group">
 								<label for="prd_nm">원부자재명</label>
 								<div class="flex_box">
-									<input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='prd_nm' id="prd_nm" value=''>
+									<input type='text' class="form-control form-control-sm search-enter" name='prd_nm' id="prd_nm" value=''>
 								</div>
 							</div>
 						</div>
@@ -141,7 +141,7 @@
 											<option value="prd_nm">원부자재명</option>
 											<option value="p.price">판매가</option>
 											<option value="p.wonga">원가</option>
-											<option value="i.rt">등록일자</option>
+											<option value="i.rt" selected>등록일자</option> 
 											<option value="i.ut">수정일자</option>
 										</select>
 									</div>
@@ -216,7 +216,16 @@
 				field: "type_nm",
 				headerName: "구분",
 				width: 70,
-				cellStyle: DEFAULT
+				cellStyle: DEFAULT,
+				cellRenderer: function(params){
+					if (params.value !== undefined) {
+						if (params.data.type_nm == '부자재') {
+							return "<p style=color:#009999>" + params.data.type_nm + "</p>";
+        				} else if (params.data.type_nm == '사은품') {
+							return "<p>" + params.data.type_nm + "</p>";
+						}
+    				}
+				}
 			},
 			{
 				field: "opt",

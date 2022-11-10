@@ -123,6 +123,36 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label for="">자료수/정렬</label>
+                            <div class="form-inline">
+                                <div class="form-inline-inner input_box" style="width:24%;">
+                                    <select name="limit" class="form-control form-control-sm">
+                                        <option value="500">500</option>
+                                        <option value="1000">1000</option>
+                                        <option value="2000">2000</option>
+                                    </select>
+                                </div>
+                                <span class="text_line">/</span>
+                                <div class="form-inline-inner input_box" style="width:45%;">
+                                    <select name="ord_field" class="form-control form-control-sm">
+                                        <option value="rt">등록일자</option>
+                                        <option value="ut">수정일자</option>
+                                        <option value="prd_ord_date">입고/반품일</option>
+                                    </select>
+                                </div>
+                                <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
+                                    <div class="btn-group" role="group">
+                                        <label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="내림차순"><i class="bx bx-sort-down"></i></label>
+                                        <label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="오름차순"><i class="bx bx-sort-up"></i></label>
+                                    </div>
+                                    <input type="radio" name="ord" id="sort_desc" value="desc" checked="">
+                                    <input type="radio" name="ord" id="sort_asc" value="asc">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -193,17 +223,17 @@
                 const state = params.data.state;
                 switch (state) {
                     case "10":
-                        return "입고대기";
+                        return "<p style=color:#52cddf>입고대기</p>";
                     case "20":
-                        return "입고처리중";
+                        return "<p style=color:#2099d8>입고처리중</p>";
                     case "30":
-                        return "입고완료";
+                        return "<p style=color:#1f71d2>입고완료</p>";
                     case "-10":
-                        return "반품대기";
+                        return "<p style=color:#eaa500>반품대기</p>";
                     case "-20":
-                        return "반품처리중";
+                        return "<p style=color:#dc6300>반품처리중</p>";
                     case "-30":
-                        return "반품완료";
+                        return "<p style=color:#d71000>반품완료</p>";
                 }
             }
         },
@@ -216,6 +246,13 @@
             field: "prd_cd",
             headerName: "원부자재코드",
             width: 130
+        },
+        {   field: "img",
+            headerName: "이미지", 
+            type: 'GoodsImageType', 
+            width:50,
+            cellStyle: {"line-height": "30px"}, 
+            surl:"{{config('shop.front_url')}}"
         },
         {
             field: "prd_nm",
@@ -244,7 +281,11 @@
             type: 'numberType',
             cellRenderer: function(params) {
                 if (params.value !== undefined) {
-                    return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                    if (params.data.state == '-10' || params.data.state == '-20' || params.data.state == '-30'){
+                        return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">-' + params.value + '</a>';
+                    } else {
+                        return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                    }
                 }
             }
         },
