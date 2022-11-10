@@ -200,7 +200,7 @@
 															</td>
 															<th class="required" style="text-align:center;vertical-align:middle;">상품번호</th>
 															<td>
-															<div class="flax_box">
+																<div class="flax_box">
 																	<div class="form-inline-inner inline_btn_box">
 																		<input type='text' class="form-control form-control-sm search-enter" style="width:100%;" name='goods_no2' id='goods_no2' value=''>
 																		<a href="#" class="btn btn-sm btn-outline-primary sch-goods_no2"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>

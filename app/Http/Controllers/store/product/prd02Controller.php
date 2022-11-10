@@ -575,26 +575,21 @@ class prd02Controller extends Controller
 
 	public function edit_goods_no($product_code, $goods_no, Request $request){
 
-		$sql	= "
-			select
-				brand, year, season, gender, item, opt, seq, color, size
-			from product_code
-			where
-				prd_cd = :prd_cd and goods_no = :goods_no
-		";
-		$product	= DB::selectOne($sql,['prd_cd' => $product_code, 'goods_no' => $goods_no]);
+		if( $goods_no != "" ){
+			$sql	= "
+				select
+					pc.prd_cd, pc.goods_no, g.goods_nm, g.style_no, pc.color, c1.code_val as color_nm,  pc.size, pc.goods_opt
+				from product_code pc
+				inner join goods g on g.goods_no = pc.goods_no
+				left outer join code c1 on c1.code_kind_cd = 'PRD_CD_COLOR' and c1.code_id = pc.color and c1.use_yn = 'Y'
+				where
+					pc.prd_cd = :prd_cd
+			";
+			$product	= DB::selectOne($sql,['prd_cd' => $product_code]);
+		}
 
-		$sql	= " select brand_nm, br_cd from brand where use_yn = 'Y' and br_cd <> '' ";
-		$brands	= DB::select($sql);
-		
 		$values = [
-			'brands'	=> $brands,
-			'years'		=> SLib::getCodes("PRD_CD_YEAR"),
-			'seasons'	=> SLib::getCodes("PRD_CD_SEASON"),
-			'genders'	=> SLib::getCodes("PRD_CD_GENDER"),
-			'items'		=> SLib::getCodes("PRD_CD_ITEM"),
-			'opts'		=> SLib::getCodes("PRD_CD_OPT"),
-			'product_code'	=> $product_code,
+			'prd_cd'	=> $product_code,
 			'goods_no'	=> $goods_no,
 			'product'	=> $product
 		];
@@ -604,63 +599,27 @@ class prd02Controller extends Controller
 	}
 
 	public function prd_edit_search(Request $request){
-		$product_code	= $request->input('product_code');
-
-		$brand		= $request->input('brand');
-		$year		= $request->input('year');
-		$season		= $request->input('season');
-		$gender		= $request->input('gender');
-		$item		= $request->input('item');
-		$opt		= $request->input('opt');
+		$prd_cd		= $request->input('prd_cd');
 		$goods_no	= $request->input('goods_no');
-		$goods_sub	= 0;
+
 		$prd_cd1	= "";
 		$seq		= "01";
 		$chk_prd_cd	= "";
 
 		$sql	= "
 			select
-				a.goods_no, b.style_no, b.goods_nm, a.goods_opt, '' as prd_cd1, '' as color, '' as size, if(ifnull(c.prd_cd,'') = '', '', 'Y') as match_yn,
-				'$brand' as brand, '$year' as year, '$season' as season, '$gender' as gender, '$item' as item, '$opt' as opt,
-				c.seq, c.prd_cd, if(ifnull(c.prd_cd,'') = '', '', '삭제') as del
+				a.goods_no, b.style_no, b.goods_nm, a.goods_opt, c.prd_cd,
+				concat(c.brand, c.year, c.season, c.gender, c.item, c.seq, c.opt) as prd_cd1, c.color, 
+				c.size, if(ifnull(c.prd_cd,'') = '', '', 'Y') as match_yn, if(ifnull(c.prd_cd,'') = '', '', '삭제') as del
 			from goods_summary a
 			inner join goods b on a.goods_no = b.goods_no and b.goods_sub = 0
 			left outer join product_code c on c.goods_no = a.goods_no and c.goods_opt = a.goods_opt
 			where
-				a.goods_no = :goods_no and a.goods_sub = :goods_sub
+				a.goods_no = :goods_no
 			order by a.seq
 		";
 
-		$result = DB::select($sql,[
-			'goods_no'	=> $goods_no, 
-			'goods_sub'	=> $goods_sub
-		]);
-
-		foreach($result as $row){
-
-			$row->seq	= $seq;
-
-			$goods_opt	= explode('^', $row->goods_opt);
-			$color		= strtolower(str_replace(" ", "", $goods_opt[0]));
-			$size		= isset($goods_opt[1]) ? $goods_opt[1] : "";
-
-			$sql		= " select code_id as color_cd from code where	code_kind_cd = 'PRD_CD_COLOR' and LOWER(replace(code_val,' ','')) = :color limit 1 ";
-			$color_cd	= DB::selectOne($sql, ["color" => $color])->color_cd;
-
-			if( $size != "" ){
-				$size		= strtolower(str_replace(" ", "", $goods_opt[1]));
-
-				$sql		= " select code_val as size_cd from code where	code_kind_cd = 'PRD_CD_SIZE_MATCH' and LOWER(replace(code_val2,' ','')) = :size limit 1 ";
-				$size_cd	= DB::selectOne($sql, ["size" => $size])->size_cd;
-			}
-			
-			$prd_cd1		= $brand . $year . $season . $gender . $item . $seq . $opt;
-
-			$row->prd_cd1	= $prd_cd1;
-			$row->color		= isset($color_cd) ? $color_cd : "";
-			$row->size		= isset($size_cd) ? $size_cd : "";
-
-		}
+		$result = DB::select($sql,['goods_no'	=> $goods_no]);
 
 		return response()->json([
 			"code"	=> 200,
@@ -677,17 +636,24 @@ class prd02Controller extends Controller
 		$prd_cd		= $request->input('prd_cd');
 		$goods_no	= $request->input('goods_no');
 
+
+		////
+		//		product_stock 재고 수량이 존재하면 삭제되지 않게 해야함(현재미적용)
+		////
+
 		try {
 			DB::beginTransaction();
 
+			DB::table('product')
+				->where('prd_cd', '=', $prd_cd)
+				->delete();
+
 			DB::table('product_code')
 				->where('prd_cd', '=', $prd_cd)
-				->where('goods_no', '=', $goods_no) 
 				->delete();
 
 			DB::table('product_stock')
 				->where('prd_cd', '=', $prd_cd)
-				->where('goods_no', '=', $goods_no) 
 				->delete();
 
 			DB::commit();
@@ -701,6 +667,125 @@ class prd02Controller extends Controller
 		}
 
         return response()->json(["code" => $code, "msg" => $msg]);
+	}
+
+	public function match_goods_no($product_code, Request $request){
+
+		$sql	= "
+			select
+				pc.prd_cd, pc.goods_no, p.prd_nm, p.style_no, pc.color, c1.code_val as color_nm,  pc.size, pc.goods_opt
+			from product_code pc
+			left outer join product p on p.prd_cd = pc.prd_cd
+			left outer join code c1 on c1.code_kind_cd = 'PRD_CD_COLOR' and c1.code_id = pc.color and c1.use_yn = 'Y'
+			where
+				pc.prd_cd = :prd_cd
+		";
+		$product	= DB::selectOne($sql,['prd_cd' => $product_code]);
+
+		$values = [
+			'prd_cd'	=> $product_code,
+			'product'	=> $product
+		];
+
+		return view( Config::get('shop.store.view') . '/product/prd02_edit_match',$values);
+
+	}
+
+	public function prd_edit_match_search(Request $request){
+		$prd_cd		= $request->input('prd_cd');
+		$goods_no	= $request->input('goods_no');
+
+		$sql	= "
+			select
+				d.goods_no, g.style_no, g.goods_nm, d.goods_opt, a.prd_cd,
+				concat(a.brand, a.year, a.season, a.gender, a.item, a.seq, a.opt) as prd_cd1, a.color, 
+				a.size, '' as match_yn
+			from product_code a
+			inner join code b on a.color = b.code_id and b.code_kind_cd = 'PRD_CD_COLOR'
+			inner join code c on a.size = c.code_val and c.code_kind_cd = 'PRD_CD_SIZE_MATCH'
+			inner join (
+				select goods_no, goods_opt from goods_summary 
+			) d on d.goods_no = :goods_no2 and replace(d.goods_opt, ' ','') = replace(concat(b.code_val,'^',c.code_val2), ' ','') 
+			inner join goods g on g.goods_no = d.goods_no
+			where 
+				a.goods_no = 0 and a.prd_cd = :prd_cd
+
+			union all
+
+			select
+				gs.goods_no, b.style_no, b.goods_nm, gs.goods_opt, c.prd_cd,
+				concat(c.brand, c.year, c.season, c.gender, c.item, c.seq, c.opt) as prd_cd1, c.color, 
+				c.size, if(ifnull(c.prd_cd,'') = '', '', 'Y') as match_yn
+			from goods_summary gs
+			inner join goods b on gs.goods_no = b.goods_no and b.goods_sub = 0
+			left outer join product_code c on c.goods_no = gs.goods_no and c.goods_opt = gs.goods_opt
+			where
+				gs.goods_no = :goods_no1
+		";
+
+		$result = DB::select($sql,['goods_no1' => $goods_no, 'goods_no2' => $goods_no, 'prd_cd' => $prd_cd]);
+
+		return response()->json([
+			"code"	=> 200,
+			"head"	=> array(
+				"total"		=> count($result),
+			),
+			"body" => $result
+		]);
+
+	}
+
+	public function edit_match_product_code(Request $request){
+
+		$admin_id	= Auth('head')->user()->id;
+        $datas		= $request->input("data", []);
+		$now		= now();
+
+        try {
+            DB::beginTransaction();
+
+			foreach($datas as $data) {
+
+				$prd_cd		= $data['prd_cd'];
+				$goods_no	= $data['goods_no'];
+				$goods_opt	= $data['goods_opt'];
+
+				// 상품 정보 수정
+				$sql	= " 
+					update product 
+						set match_yn = 'Y', ut = now()
+					where prd_cd = :prd_cd
+				";
+				DB::update($sql, ['prd_cd' => $prd_cd]);
+
+				$sql	= "
+					update product_code
+						set goods_no = :goods_no, goods_opt = :goods_opt, ut = now()
+					where prd_cd = :prd_cd
+				";
+				DB::update($sql, ['prd_cd' => $prd_cd, 'goods_no' => $goods_no, 'goods_opt' => $goods_opt]);
+				
+				$sql	= "
+					update product_stock 
+						set goods_no = :goods_no, goods_opt = :goods_opt, ut = now()
+					where prd_cd = :prd_cd
+				";
+				DB::update($sql, ['prd_cd' => $prd_cd, 'goods_no' => $goods_no, 'goods_opt' => $goods_opt]);
+
+            }
+				
+			DB::commit();
+			$code = 200;
+			$msg = "상품코드 매칭이 완료되었습니다.";
+
+		} catch (\Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+        return response()->json(["code" => $code, "msg" => $msg]);
+
 	}
 
 	public function batch_create(Request $request){

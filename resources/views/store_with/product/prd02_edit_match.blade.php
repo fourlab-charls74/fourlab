@@ -15,6 +15,7 @@
 			</div>
 		</div>
 		<div class="d-flex">
+			<a href="javascript:void(0)" onclick="addPrdCd();" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i>저장</a>
 			<a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i>닫기</a>
 		</div>
 	</div>
@@ -51,13 +52,18 @@
 											<th>상품번호</th>
 											<td style="width:35%;">
 												<div class="flax_box">
-													<input type="text" name="goods_no" id="goods_no" value="{{ $goods_no }}" class="form-control form-control-sm" readonly />
+													<div class="form-inline-inner inline_btn_box">
+														<input type='text' class="form-control form-control-sm search-enter" style="width:100%;" name='goods_no' id='goods_no' value=''>
+														<a href="#" class="btn btn-sm btn-outline-primary sch-goods_no"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+													</div>
 												</div>
 											</td>
 										</tr>
 										<tr>
 											<th>상품명</th>
-											<td colspan="3">{{ $product->goods_nm }}</td>
+											<td>{{ $product->prd_nm }}</td>
+											<th>아이템코드</th>
+											<td>{{ $product->style_no }}</td>
 										</tr>
 										<tr>
 											<th>색상</th>
@@ -65,14 +71,12 @@
 											<th>사이즈</th>
 											<td>{{ $product->size }}</td>
 										</tr>
-										<tr>
-											<th>상품옵션</th>
-											<td>{{ $product->goods_opt }}</td>
-											<th>아이템코드</th>
-											<td>{{ $product->style_no }}</td>
-										</tr>
 									</tbody>
 								</table>
+
+								<div style="width:100%;padding-top:20px;text-align:center;">
+									<button type="button" class="btn btn-primary ml-2" onclick="getOption()">옵션불러오기</button>
+								</div>
 
 							</div>
 						</div>
@@ -114,31 +118,20 @@
 	};
 
 	const columns = [
+		{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 30, pinned: 'left', sort: null,
+			checkboxSelection: function(params) {
+				return params.data.match_yn == '';
+			},
+		},
 		{field:"goods_no",	headerName: "상품번호",		width:72},
 		{field:"style_no",	headerName: "아이템코드",	width:72},
 		{field:"goods_nm",	headerName: "상품명",		width:250},
 		{field:"goods_opt",	headerName: "상품옵션",		width:200},
-		{field:"prd_cd1",	headerName: "상품코드",		width:120},
+		{field:"prd_cd1",	headerName: "코드일련",		width:120},
 		{field:"color",		headerName: "컬러",			width:72},
 		{field:"size",		headerName: "사이즈",		width:72},
 		{field:"match_yn",  headerName: "등록유무",		width:60, cellStyle:{'text-align':'center'}},
-		{field:"del",       headerName: "삭제",  		width:60, cellStyle:{'text-align':'center'},
-			cellRenderer: function(params) {
-				if (params.value !== undefined) {
-					if( params.value != ''){
-						return '<a href="#" onclick="return delPrdCd(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
-					}
-				}
-			}
-		},
-		{field:"brand",		headerName:"브랜드",		hide:true},
-		{field:"year",		headerName:"년도",			hide:true},
-		{field:"season",	headerName:"시즌",			hide:true},
-		{field:"gender",	headerName:"성별",			hide:true},
-		{field:"item",		headerName:"아이템",		hide:true},
-		{field:"opt",		headerName:"품목",			hide:true},
-		{field:"seq",		headerName:"순서차수",		hide:true},
-		{field:"prd_cd",	headerName:"상품코드",		hide:true},
+		{field:"prd_cd",	headerName: "상품코드", hide:true},
 		{field: "", headerName:"", width:"auto"},
 	];
 </script>
@@ -155,16 +148,16 @@
 		let gridDiv = document.querySelector(pApp.options.gridId);
 
 		let options = {
-            getRowStyle: (params) => {
-				console.log(params.data);
-                if (params.data.prd_cd == $("#prd_cd").val()) return CELL_COLOR.THISPRD;
-            }
-        }
+			getRowStyle: (params) => {
+				//console.log(params.data);
+				if (params.data.prd_cd == $("#prd_cd").val()) return CELL_COLOR.THISPRD;
+			}
+		}
 
 		gx = new HDGrid(gridDiv, columns, options);
 		gx.gridOptions.rowDragManaged = true;
 		gx.gridOptions.animateRows = true;
-		Search();
+		//Search();
 	});
 	
 	function Search() {
@@ -172,18 +165,38 @@
 
 		//console.log(data);
 
-		gx.Request('/store/product/prd02/prd-edit-search/', data);
+		gx.Request('/store/product/prd02/prd-edit-match-search/', data);
+	}
+	//상품옵션 불러오기
+	function getOption(){
+		var frm	= $('form[name="f1"]');
+
+		if(!validation()) return;
+
+		Search();
 	}
 
-	function delPrdCd(prd_cd){
-		if(!window.confirm("상품코드를 삭제하면 기존 재고 정보도 함께 삭제됩니다.\r\n삭제하시겠습니까?")) return;
+	const validation = (cmd) => {
+		// 상품번호 입력여부
+		if(f1.goods_no.value.trim() === '') {
+			f1.goods_no.focus();
+			return alert("상품번호를 입력해주세요.");
+		}
+
+		return true;
+	}
+
+	function addPrdCd(){
+		let rows	= gx.getSelectedRows();
+		if(rows.length < 1) return alert("저장할 상품코드 정보를 선택해주세요.");
+
+		//console.log(rows);
 
 		axios({
-			url: '/store/product/prd02/del-product-code',
+			url: '/store/product/prd02/edit-match-product-code',
 			method: 'put',
 			data: {
-				prd_cd : prd_cd, 
-				goods_no : $("#goods_no").val()
+				data: rows, 
 			},
 		}).then(function (res) {
 			if(res.data.code === 200) {
@@ -192,7 +205,7 @@
 				Search();
 			} else {
 				console.log(res.data);
-				alert("상품코드 삭제중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+				alert("상품코드 등록중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
 			}
 		}).catch(function (err) {
 			console.log(err);

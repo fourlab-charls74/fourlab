@@ -72,7 +72,7 @@ class prd04Controller extends Controller
             }
         }
 
-		if( $style_no != "" )	$where .= " and g.style_no like '" . Lib::quote($style_no) . "%' ";
+		if( $style_no != "" )	$where .= " and ( g.style_no like '" . Lib::quote($style_no) . "%' or p.style_no like '" . Lib::quote($style_no) . "%' ) ";
 		if( $goods_nm != "" ){
 			$where .= " and ( g.goods_nm like '%" . Lib::quote($goods_nm) . "%' or p.prd_nm like '%" . Lib::quote($goods_nm) . "%' ) ";
 		}
@@ -144,7 +144,8 @@ class prd04Controller extends Controller
 				pc.prd_cd
 				, '' as prd_cd_p
 				, if(pc.goods_no = 0, '', ps.goods_no) as goods_no
-				, brand.brand_nm, g.style_no
+				, brand.brand_nm
+				, if(pc.goods_no = 0, p.style_no, g.style_no) as style_no
 				, '' as img_view
 				, if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
 					select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
