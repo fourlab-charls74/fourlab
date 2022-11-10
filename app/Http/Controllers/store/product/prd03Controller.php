@@ -77,7 +77,7 @@ class prd03Controller extends Controller
 			$prd_cd = explode(',', $prd_cd);
 			$where .= " and (1!=1";
 			foreach($prd_cd as $cd) {
-				$where .= " or p.prd_cd = '" . Lib::quote($cd) . "' ";
+				$where .= " or p.prd_cd like '%" . Lib::quote($cd) . "%' ";
 			}
 			$where .= ")";
 		}
@@ -401,6 +401,7 @@ class prd03Controller extends Controller
 		";
 		$values = (array)DB::selectOne($sql, ['prd_cd' => $product_code]);
 		$values['units'] = SLib::getCodes("PRD_CD_UNIT");
+
 		return view( Config::get('shop.store.view') . '/product/prd03_edit', $values);
 	}
 
@@ -420,32 +421,45 @@ class prd03Controller extends Controller
 			$unit = $data['unit'];
 			$seq = $data['seq'];
 
+
 			/**
 			 * 원부자재 상품 이미지 수정
 			 */
+
+			$i_prd_cd = substr($prd_cd,0,2);
+
+			$save_path = "";
+			if ($i_prd_cd == 'PR') {
+				$save_path = "/images/s_goods/pr/";
+			} else if ($i_prd_cd == 'SM') {
+				$save_path = "/images/s_goods/sm/";
+			}
+
 			$base64_src = $data['image'];
-			$save_path = "/images/prd03";
-			$img_url = "";
+			
 			$unique_img_name = $prd_cd . $seq;
+			$img_name = strtolower($unique_img_name);
+			$img_url = "";
 
 			/**
 			 * 이미지 수정시 기존에 저장된 이미지가 있는지 확인
 			 */
 			$result = DB::table('product_image')->where([['prd_cd', '=', $prd_cd], ['seq', '=', $seq]])->first();
+
 			if ($result == null) {
 				/**
-				 * 기존에 저잗왼 이미지가 없는 경우 이미지 관련 insert 처리
+				 * 기존에 저장된 이미지가 없는 경우 이미지 관련 insert 처리
 				 */
-				$img_url = ULib::uploadBase64img($save_path, $base64_src, $unique_img_name);
-
-				DB::table('product_image')->insert([
-					'prd_cd' => $prd_cd,
-					'seq' => $seq,
-					'img_url' => $img_url,
-					'rt' => now(),
-					'ut' => now(),
-					'admin_id'	=> $admin_id
-				]);
+					$img_url = ULib::uploadBase64img($save_path, $base64_src, $img_name);
+	
+					DB::table('product_image')->insert([
+						'prd_cd' => $prd_cd,
+						'seq' => $seq,
+						'img_url' => $img_url,
+						'rt' => now(),
+						'ut' => now(),
+						'admin_id'	=> $admin_id
+					]);
 
 			} else {
 				/**
@@ -559,6 +573,7 @@ class prd03Controller extends Controller
 			$img_url = $result->img_url;
 
 			ULib::deleteFile($img_url);
+			
 			DB::table('product_image')->where('idx', '=', $idx)->delete();
 
             DB::commit();

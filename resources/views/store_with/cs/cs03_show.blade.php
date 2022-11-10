@@ -260,7 +260,7 @@
                 }
             }
         },
-        {field:"in_qty", headerName:"입고수량", width:60, type:'numberType', cellStyle: { ...DEFAULT, ...YELLOW } , editable: true},
+        {field:"in_qty", headerName:"수량", width:60, type:'numberType', cellStyle: { ...DEFAULT, ...YELLOW } , editable: true},
         {field:"price", headerName: "단가", width:84, type:'currencyType', cellStyle: { ...DEFAULT, ...{'text-align': 'right'}} },
         {field:"wonga", headerName: "원가", hide: true},
         {field:"amount", headerName: "금액", width:84, type:'currencyType', cellStyle: DEFAULT},
@@ -434,10 +434,13 @@
                 prd_ord_type: f1.prd_ord_type.value
             }
         }).then((response) => {
-            if (response.status == 201) {
+            console.log(response);
+            if (response.data.code == 201) {
                 alert("저장되었습니다.");
                 window.opener.Search();
                 window.close();
+            } else if (response.data.code == 202) {
+                alert('창고재고보다 수량이 많습니다. 수량을 수정해주세요.')    
             } else {
                 alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
             }

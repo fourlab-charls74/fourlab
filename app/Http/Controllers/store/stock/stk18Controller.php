@@ -45,11 +45,11 @@ class stk18Controller extends Controller
         $orderby = "";
 
         // where
-        if ($req['prd_cd'] != null) {
-            $prd_cd = explode(',', $req['prd_cd']);
+        if ($req['prd_cd_sub'] != null) {
+            $prd_cd = explode(',', $req['prd_cd_sub']);
             $where .= " and (1!=1";
             foreach ($prd_cd as $cd) {
-                $where .= " or p.prd_cd = '" . Lib::quote($cd) . "' ";
+                $where .= " or p.prd_cd like '%" . Lib::quote($cd) . "%' ";
             }
             $where .= ")";
         }
@@ -181,7 +181,7 @@ class stk18Controller extends Controller
                 DB::table('sproduct_stock_release')
                     ->insert([
                         'type' => $release_type,
-                        'prd_cd' => $row['prd_cd'],
+                        'prd_cd' => $row['prd_cd_sub'],
                         'price' => $row['price'],
                         'wonga' => $row['wonga'],
                         'qty' => $row['rel_qty'] ?? 0,
@@ -199,7 +199,7 @@ class stk18Controller extends Controller
     
                 // product_stock -> 창고보유재고 차감
                 DB::table('product_stock')
-                    ->where('prd_cd', '=', $row['prd_cd'])
+                    ->where('prd_cd', '=', $row['prd_cd_sub'])
                     ->update([
                         'wqty' => DB::raw('wqty - ' . ($row['rel_qty'] ?? 0)),
                         'ut' => now(),
@@ -207,7 +207,7 @@ class stk18Controller extends Controller
 
                 // product_stock_storage -> 보유재고 차감
                 DB::table('product_stock_storage')
-                    ->where('prd_cd', '=', $row['prd_cd'])
+                    ->where('prd_cd', '=', $row['prd_cd_sub'])
                     ->where('storage_cd', '=', $storage_cd)
                     ->update([
                         'wqty' => DB::raw('wqty - ' . ($row['rel_qty'] ?? 0)),
@@ -236,13 +236,13 @@ class stk18Controller extends Controller
                 $store_stock_cnt = 
                     DB::table('product_stock_store')
                         ->where('store_cd', '=', $store_cd)
-                        ->where('prd_cd', '=', $row['prd_cd'])
+                        ->where('prd_cd', '=', $row['prd_cd_sub'])
                         ->count();
                 if ($store_stock_cnt < 1) {
                     // 해당 매장에 상품 기존재고가 없을 경우
                     DB::table('product_stock_store')
                         ->insert([
-                            'prd_cd' => $row['prd_cd'],
+                            'prd_cd' => $row['prd_cd_sub'],
                             'store_cd' => $store_cd,
                             'qty' => 0,
                             'wqty' => $row['rel_qty'] ?? 0,
@@ -252,7 +252,7 @@ class stk18Controller extends Controller
                 } else {
                     // 해당 매장에 상품 기존재고가 이미 존재할 경우
                     DB::table('product_stock_store')
-                        ->where('prd_cd', '=', $row['prd_cd'])
+                        ->where('prd_cd', '=', $row['prd_cd_sub'])
                         ->where('store_cd', '=', $store_cd) 
                         ->update([
                             'wqty' => DB::raw('wqty + ' . ($row['rel_qty'] ?? 0)),

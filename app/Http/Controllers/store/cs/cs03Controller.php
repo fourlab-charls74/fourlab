@@ -50,8 +50,9 @@ class cs03Controller extends Controller
 
 		$user_nm = $request->input("user_nm");
 
-
-		// $limit = $request->input("limit", 100);
+		$ord_field = $request->input("ord_field",'p1.rt');
+		$ord = $request->input('ord','desc');
+		$orderby = sprintf("order by p1.%s %s", $ord_field, $ord);
 
 		$where = "";
 		$where1 = "";
@@ -59,7 +60,7 @@ class cs03Controller extends Controller
 			$prd_cd = explode(',', $prd_cd);
 			$where .= " and (1!=1";
 			foreach ($prd_cd as $cd) {
-				$where .= " or p1.prd_cd = '" . Lib::quote($cd) . "' ";
+				$where .= " or p1.prd_cd like '%" . Lib::quote($cd) . "%' ";
 			}
 			$where .= ")";
 		}
@@ -102,6 +103,7 @@ class cs03Controller extends Controller
 				p1.state as state,
 				cp.com_nm as sup_com_nm,
 				p1.prd_cd as prd_cd,
+				i.img_url as img,
 				p1.prd_nm as prd_nm,
 				c1.code_val as color,
 				c2.code_val as size,
@@ -117,14 +119,15 @@ class cs03Controller extends Controller
 				inner join sproduct_stock_order p2 on p1.prd_ord_no = p2.prd_ord_no
 				left outer join product p3 on p1.prd_cd = p3.prd_cd
 				left outer join product_code p4 on p3.prd_cd = p4.prd_cd
+				left outer join product_image i on p1.prd_cd = i.prd_cd
 				inner join company cp on p1.com_id = cp.com_id
 				left outer join `code` c1 on c1.code_kind_cd = 'PRD_CD_COLOR' and c1.code_id = p4.color
 				left outer join `code` c2 on c2.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c2.code_id = p4.size
 				left outer join `code` c3 on c3.code_kind_cd = 'PRD_CD_UNIT' and c3.code_id = p3.unit
 				left outer join mgr_user m on p2.admin_id = m.id
 			where 1=1 $where $where1
-			order by p2.prd_ord_date desc, p1.prd_ord_no desc, p1.prd_cd asc
-			-- $limit
+			$orderby
+			$limit
 		";
 		$result = DB::select($sql);
 		return response()->json([
@@ -433,7 +436,7 @@ class cs03Controller extends Controller
 			$prd_cd = explode(',', $prd_cd);
 			$where .= " and (1!=1";
 			foreach ($prd_cd as $cd) {
-				$where .= " or p.prd_cd = '" . Lib::quote($cd) . "' ";
+				$where .= " or p.prd_cd like '%" . Lib::quote($cd) . "%' ";
 			}
 			$where .= ")";
 		}
@@ -579,6 +582,8 @@ class cs03Controller extends Controller
 						]
 					);
 
+					$code = 201;
+
 				} else if ($state == -10) { // 구분이 반품인 경우 반품대기 처리
 
 					$kind = "out";
@@ -586,45 +591,53 @@ class cs03Controller extends Controller
 					/**
 					 * 원부자재 상품 입고 master
 					 */
-					DB::table('sproduct_stock_order')->updateOrInsert(
-						['prd_ord_no' => $invoice_no],
-						[
-							'kind' => $kind,
-							'prd_ord_date' => $prd_ord_date,
-							'prd_ord_type' => $prd_ord_type,
-							'com_id' => $row['sup_com_id'], // 송장 내용중 가장 최근의 공급업체로 반영되고 있음
-							'state' => $state,
-							'rt' => now(),
-							'ut' => now(),
-							'admin_id' => $admin_id
-						]
-					);
-					/**
-					 * 원부자재 상품 입고 slave
-					 */
-					DB::table('sproduct_stock_order_product')->updateOrInsert(
-						[
-							'prd_ord_no' => $invoice_no,
-							'prd_cd' => $prd_cd,
-							'com_id' => $sup_com_id
-						],
-						[
-							'state' => $state,
-							'prd_nm' => $prd_nm,
-							'qty' => $qty,
-							'price' => $price,
-							'wonga' => $wonga,
-							'rt' => now(),
-							'ut' => now(),
-							'admin_id' => $admin_id
-						]
-					);
+					if ($row['stock_qty'] >= $qty ) {
+						DB::table('sproduct_stock_order')->updateOrInsert(
+							['prd_ord_no' => $invoice_no],
+							[
+								'kind' => $kind,
+								'prd_ord_date' => $prd_ord_date,
+								'prd_ord_type' => $prd_ord_type,
+								'com_id' => $row['sup_com_id'], // 송장 내용중 가장 최근의 공급업체로 반영되고 있음
+								'state' => $state,
+								'rt' => now(),
+								'ut' => now(),
+								'admin_id' => $admin_id
+							]
+						);
+						/**
+						 * 원부자재 상품 입고 slave
+						 */
+						DB::table('sproduct_stock_order_product')->updateOrInsert(
+							[
+								'prd_ord_no' => $invoice_no,
+								'prd_cd' => $prd_cd,
+								'com_id' => $sup_com_id
+							],
+							[
+								'state' => $state,
+								'prd_nm' => $prd_nm,
+								'qty' => $qty,
+								'price' => $price,
+								'wonga' => $wonga,
+								'rt' => now(),
+								'ut' => now(),
+								'admin_id' => $admin_id
+							]
+						);
+
+						$code = 201;
+						
+					} else {
+						$code = 202;
+					}
+					
 
 				}
 				
 			}
 			DB::commit();
-			return response()->json(['message' => 'created'], 201);
+			return response()->json(['message' => 'created', 'code' => $code]);
 		} catch (Exception $e) {
 			DB::rollBack();
 			return response()->json(['message' => $e->getMessage()], 500);
