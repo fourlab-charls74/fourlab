@@ -367,6 +367,29 @@ class Point
         }
 	}
 
+	/*	
+		Function: ReturnPointToRefund
+		환불 시 사용한 포인트 환원
+	*/
+	public function ReturnPointToRefund($point)
+	{
+		$msg = 'REFUND';
+		$kind = 'REFUND';
+	
+		try {
+			DB::beginTransaction();
+
+			// 포인트 환원
+			$this->__Plus($point, $msg, $kind);	
+
+			DB::commit();
+			return true;
+		} catch(Exception $e) {
+            DB::rollBack();
+            return false;
+        }
+    }
+
 	/*
 		Function: DeleteUser
 		회원탈퇴 시 포인트 차감

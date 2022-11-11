@@ -660,49 +660,13 @@ class Claim
 	}
 
 	/*
- 		Function: AddClaimInStore
- 		매장환불 시 클레임 등록 및 완료처리
-	*/
-	public function AddClaimInStore($claim)
-	{
-		if (empty($this->ord_opt_no)) trigger_error("Use SetOrdOptNo() method first !!", E_USER_ERROR);
-		
-		$success_code = 1;
-
-		$sql = "
-			select 
-				o.ord_no, o.ord_opt_no, o.prd_cd, o.goods_no, o.goods_sub, o.goods_opt
-				, o.qty, o.wonga, o.price, o.dc_amt, o.point_amt, o.recv_amt, o.ord_state
-				, o.coupon_amt, o.com_id, c.pay_fee as com_rate, o.ord_kind, o.ord_type
-				, o.com_coupon_ratio, o.coupon_no, o.sales_com_fee, o.dlv_amt, o.store_cd
-				, o.recv_amt as ref_amt, o.point_amt as refund_point_amt
-				, (o.price * o.qty) as refund_price, m.ord_amt as refund_amt
-			from order_opt o
-				inner join order_mst m on m.ord_no = o.ord_no
-				left outer join company c on o.com_id = c.com_id
-			where ord_opt_no = :ord_opt_no
-		";
-		$ord = DB::selectOne($sql, ['ord_opt_no' => $this->ord_opt_no]);
-
-		if ($ord == null) trigger_error("존재하지 않는 주문건입니다.", E_USER_ERROR);
-
-		$ord_wonga_no = $this->_updateStoreOrder($ord);
-		$clm_no = $this->_insertStoreClaim($claim, $ord);
-		$update_stock = $this->_updateStoreStockToRefund($ord);
-
-		if ($ord_wonga_no == 0 || $clm_no == 0 || $update_stock == 0) $success_code = 0;
-
-		return $success_code;
-	}
-
-	/*
- 		Function: _updateStoreOrder
+ 		Function: UpdateStoreOrder
  		매장환불 시 order_opt 수정 및 order_opt_wonga 등록
 
 		Returns:
 			$ord_wonga_no
 	*/
-	public function _updateStoreOrder($ord)
+	public function UpdateStoreOrder($ord)
 	{
 		// order_opt > clm_state 변경
 		DB::table('order_opt')
@@ -755,13 +719,13 @@ class Claim
 	}
 
 	/*
- 		Function: _insertStoreClaim
+ 		Function: InsertStoreClaim
  		매장환불 시 claim, claim_detail, claim_memo 등록
 
 		Returns:
 			$clm_no - 클레임 번호
 	*/
-	public function _insertStoreClaim($claim, $ord)
+	public function InsertStoreClaim($claim, $ord)
 	{
 		// claim 등록
 		$clm_no = DB::table('claim')->insertGetId([
@@ -823,13 +787,13 @@ class Claim
 	}
 
 	/*
- 		Function: _updateStoreStockToRefund
+ 		Function: UpdateStoreStockToRefund
  		매장환불 시 재고 업데이트 - product_stock, product_stock_store 수정 및 product_stock_hst 등록
 
 		Returns:
 			$success_code - 재고 업데이트 성공여부
 	*/
-	public function _updateStoreStockToRefund($ord)
+	public function UpdateStoreStockToRefund($ord)
 	{
 		$store_cd = $ord->store_cd;
 		$prd_cd = $ord->prd_cd;

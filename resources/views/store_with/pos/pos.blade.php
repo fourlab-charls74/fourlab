@@ -50,6 +50,7 @@
                         <li class="d-flex justify-content-between mb-2"><p>적립금사용</p><p><span id="po_point_amt">0</span>원</p></li>
                         <li class="d-flex justify-content-between"><p>결제시간</p><p id="po_ord_date"></p></li>
                     </ul>
+                    <input type="hidden" name="po_ord_no" value="">
                 </div>
                 <button type="button" class="butt fc-navy fw-b bg-white m-2" style="height:60px;border-radius:12px;" onclick="return viewPrevOrder();">영수증 조회</button>
             </div>
@@ -57,7 +58,7 @@
                 <i class="fa fa-bookmark d-block mb-3" aria-hidden="true" style="font-size:50px;"></i>
                 대기 <span id="waiting_cnt">0</span>
             </button>
-            <button type="button" class="butt fs-14 fw-sb bg-red" style="grid-area:g;" onclick="return alert('준비중입니다.');">
+            <button type="button" class="butt fs-14 fw-sb bg-red" style="grid-area:g;" data-toggle="modal" data-target="#searchOrdNoModal">
                 <i class="fa fa-reply d-block mb-3" aria-hidden="true" style="font-size:50px;"></i>
                 환불
             </button>
@@ -376,7 +377,7 @@
 {{-- MODAL --}}
 <div id="pos-modal" class="show_layout">
     {{-- 대기내역 검색 --}}
-    <div class="modal fade" id="searchWaitingModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal fade" id="searchWaitingModal" tabindex="-1" role="dialog" aria-labelledby="searchWaitingModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 33%;min-width: 500px;">
             <div class="modal-content">
                 <div class="modal-body">
@@ -405,7 +406,7 @@
         </div>
     </div>
     {{-- 상품검색모달 --}}
-    <div class="modal fade" id="searchProductModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal fade" id="searchProductModal" tabindex="-1" role="dialog" aria-labelledby="searchProductModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 90%;">
             <div class="modal-content">
                 <div class="modal-body">
@@ -437,7 +438,7 @@
         </div>
     </div>
     {{-- 고객등록모달 --}}
-    <div class="modal fade" id="addMemberModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal fade" id="addMemberModal" tabindex="-1" role="dialog" aria-labelledby="addMemberModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-body">
@@ -590,7 +591,7 @@
         </div>
     </div>
     {{-- 고객검색모달 --}}
-    <div class="modal fade" id="searchMemberModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal fade" id="searchMemberModal" tabindex="-1" role="dialog" aria-labelledby="searchMemberModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-body">
@@ -622,7 +623,7 @@
         </div>
     </div>
     {{-- 신용카드모달 --}}
-    <div class="modal fade" id="payModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal fade" id="payModal" tabindex="-1" role="dialog" aria-labelledby="payModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 500px;">
             <div class="modal-content">
                 <div class="modal-body">
@@ -804,6 +805,30 @@
                                     </div>
                                 </form>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- 환불 시, 주문번호 검색모달 --}}
+    <div class="modal fade" id="searchOrdNoModal" tabindex="-1" role="dialog" aria-labelledby="searchOrdNoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-header">
+                            <button type="button" class="fs-20 close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h5 class="mt-1 fs-14 fw-b">판매내역 검색</h5>
+                        </div>
+                        <div class="card-body b-none mt-4">
+                            <div class="d-flex align-items-center fs-12 mb-4">
+                                <input type="text" id="search_ord_no" class="inp fs-14 fw-sb pl-2 w-100" style="height: 50px;border: solid #ED2939;border-width: 2px 0 2px 2px;" placeholder="주문번호로 검색">
+                                <button type="button" id="search_ord_no_btn" class="butt bg-red" style="width: 60px;height: 50px;"><i class="fa fa-search fc-white fs-14" aria-hidden="true"></i></button>
+                            </div>
+                            <div id="search_ord_no_result"></div>
                         </div>
                     </div>
                 </div>
@@ -1075,9 +1100,22 @@
             }
         });
 
+        $('#searchOrdNoModal').on('shown.bs.modal', function () {
+            $('#search_ord_no').trigger('focus');
+        });
         $(".store-refund-save-btn").on("click", function(e) {
             e.preventDefault();
-           refundStoreOrder(); 
+            refundStoreOrder(); 
+        });
+        
+        $("#search_ord_no").on("keyup", function(e) {
+            if(e.keyCode === 13) {
+                searchOrderByOrdNo(e.target.value);
+            }
+        });
+        $("#search_ord_no_btn").on("click", function(e) {
+            e.preventDefault();
+            searchOrderByOrdNo($("#search_ord_no").val());
         });
 	});
 </script>

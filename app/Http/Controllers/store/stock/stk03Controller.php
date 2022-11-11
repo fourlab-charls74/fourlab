@@ -1861,19 +1861,56 @@ class stk03Controller extends Controller
         try {
             DB::beginTransaction();
 
+            $sql = "
+			    select 
+                    o.ord_no, o.ord_opt_no, o.prd_cd, o.goods_no, o.goods_sub, o.goods_opt
+                    , o.qty, o.wonga, o.price, o.dc_amt, o.point_amt, o.recv_amt, o.ord_state
+                    , o.coupon_amt, o.com_id, c.pay_fee as com_rate, o.ord_kind, o.ord_type
+                    , o.com_coupon_ratio, o.coupon_no, o.sales_com_fee, o.dlv_amt, o.store_cd
+                    , o.recv_amt as ref_amt, o.point_amt as refund_point_amt
+                    , (o.price * o.qty) as refund_price, m.ord_amt as refund_amt
+                    , m.user_id
+                from order_opt o
+                    inner join order_mst m on m.ord_no = o.ord_no
+                    left outer join company c on o.com_id = c.com_id
+                where ord_opt_no = :ord_opt_no
+            ";
+            $ord = DB::selectOne($sql, ['ord_opt_no' => $ord_opt_no]);
+
+            if ($ord == null) throw new Exception("존재하지 않는 주문건입니다.");
+
+            $success_code = 1;
             $claim = new Claim($user);
             $claim->SetOrdOptNo($ord_opt_no);
 
-            // 클레임상태 등록 및 재고업데이트
-            $success_code = $claim->AddClaimInStore([
+            $clm = [
                 'clm_reason' 		=> $clm_reason,
                 'refund_bank' 		=> $refund_bank,
                 'refund_account' 	=> $refund_account,
                 'refund_nm' 		=> $refund_nm,
                 'memo' 				=> $refund_memo,
-            ]);
+            ];
 
-            if ($success_code < 1) $code = 500;
+            // 클레임상태 등록
+            $ord_wonga_no = $claim->UpdateStoreOrder($ord);
+            $clm_no = $claim->InsertStoreClaim($clm, $ord);
+
+            // 재고업데이트
+            $update_stock = $claim->UpdateStoreStockToRefund($ord);
+
+            if ($ord_wonga_no == 0 || $clm_no == 0 || $update_stock == 0) $success_code = 0;
+            if ($success_code < 1) {
+                $code = 500;
+                throw new Exception("환불처리 중 오류가 발생했습니다.");
+            }
+
+            // 포인트 환원
+            if($ord->user_id != null && $ord->refund_point_amt > 0) {
+                $point = new Point($user, $ord->user_id);
+                $point->SetOrdOptNo($ord->ord_opt_no);
+                $point->ReturnPointToRefund($ord->refund_point_amt);
+            }
+
             $msg = '매장환불처리가 완료되었습니다.';
             DB::commit();
         } catch (Exception $e) {

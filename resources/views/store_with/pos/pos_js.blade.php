@@ -16,9 +16,6 @@
             $("#home_btn").css("display", "none");
         } else {
             $("#home_btn").css("display", "inline-block");
-            if(idx === "pos_today") {
-                SearchOrder();
-            }
         }
     }
 
@@ -28,13 +25,14 @@
             url: '/store/pos/search/analysis',
             method: 'get' 
         });
-        
+
         if(status === 200) {
             $("#to_ord_amt").text(Comma(data.today_order?.ord_amt || 0));
             $("#to_pay_amt").text(Comma(data.today_order?.pay_amt || 0));
             $("#to_qty").text(Comma(data.today_order?.ord_qty || 0));
             $("#to_ord_cnt").text(Comma(data.today_order?.ord_cnt));
             
+            $("[name=po_ord_no]").val(data.prev_order?.ord_no || '');
             $("#po_recv_amt").text(Comma(data.prev_order?.recv_amt || 0));
             $("#po_ord_amt").text(Comma(data.prev_order?.ord_amt || 0));
             $("#po_dc_amt").text(Comma(data.prev_order?.dc_amt || 0));
@@ -50,6 +48,10 @@
         $("#ord_field").val("desc").prop("selected", true);
 
         setScreen("pos_today");
+
+        let ord_no = $("[name=po_ord_no]").val();
+        SearchOrder(ord_no);
+        setOrderDetail(ord_no);
     }
 
     /** 대기내역 조회 */
@@ -569,13 +571,15 @@
     }
 
     /** 판매내역 조회 */
-    function SearchOrder() {
+    function SearchOrder(ord_no = '') {
         let sdate = $("[name=ord_sdate]").val();
         let edate = $("[name=ord_edate]").val();
         let ord = $("#ord_field").val();
         let limit = $("#limit").val();
 
         let data = "sdate=" + sdate + "&edate=" + edate + "&ord=" + ord + "&limit=" + limit;
+
+        if(ord_no != '') data += "&ord_no=" + ord_no;
         gx4.Request("/store/pos/search/order", data, 1);
     }
 
@@ -639,7 +643,7 @@
         }
     }
 
-    /** 매장환불처리 */
+    /** 매장환불 모달 세팅*/
     function openRefundModal(ord_no, ord_opt_no, qty, amt, point_amt) {
         $("[name=ord_no]").val(ord_no);
         $("[name=ord_opt_no]").val(ord_opt_no);
@@ -658,6 +662,7 @@
         });
     }
 
+    /** 매장환불완료처리 */
     function refundStoreOrder() {
         if($("[name=store_clm_reason]").val() == '') return alert("환불사유를 선택해주세요.");
 
@@ -680,6 +685,42 @@
         }).catch(function (err) {
             console.log(err);
         });
+    }
+
+    /** 주문번호로 환불할 주문건 검색 */
+    async function searchOrderByOrdNo(ord_no) {
+        const { status, data } = await axios({ 
+            url: '/store/pos/search/order-by-ordno?ord_no=' + ord_no,
+            method: 'get' 
+        });
+
+        let html = "";
+        if(status == 200) {
+            if(data.code == 200 && data.ord_no != '') {
+                html = `
+                    <button type="button" class="butt d-flex align-items-center fs-12 bg-white" onclick="moveToOrderDetail('${data.ord_no}');">
+                        <i class="bx bx-receipt mr-2" aria-hidden="true"></i>
+                        <p class="fc-blue">${data.ord_no}</p>
+                    </button>
+                `;
+            } else {
+                html = `<p class="fc-gray fs-10">검색하신 주문번호에 해당하는 주문건이 존재하지 않습니다.</p>`;
+            }
+        } else {
+            html = `<p class="fc-gray fs-10">검색 중 오류 발생</p>`;
+        }
+        $("#search_ord_no_result").html(html);
+    }
+
+    /** 해당 주문건 상세로 이동 */
+    function moveToOrderDetail(ord_no) {
+        setScreen('pos_today');
+        SearchOrder(ord_no);
+        setOrderDetail(ord_no);
+
+        $('#searchOrdNoModal').modal('hide');
+        $("#search_ord_no").val('');
+        $("#search_ord_no_result").html('');
     }
 
     /** ETC */

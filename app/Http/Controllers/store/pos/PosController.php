@@ -84,6 +84,9 @@ class PosController extends Controller
 			case 'order-detail':
 				$response = $this->search_order_detail($request);
 				break;
+			case 'order-by-ordno':
+				$response = $this->search_order_by_ordno($request);
+				break;
             case 'waiting':
                 $response = $this->search_waiting($request);
                 break;
@@ -996,6 +999,9 @@ class PosController extends Controller
         $startno = ($page - 1) * $page_size;
         $limit = " limit $startno, $page_size ";
 
+        $ord_no = $request->input('ord_no', '');
+        if ($ord_no != '') $where = " and o.ord_no = '$ord_no' ";
+
         $total = 0;
         $page_cnt = 0;
 
@@ -1107,6 +1113,30 @@ class PosController extends Controller
         $rows = DB::select($sql, ['ord_no' => $ord_no]);
 
         return response()->json(['code' => '200', 'data' => $rows], 200);
+    }
+
+    /** 주문번호로 판매내역 검색 */
+    public function search_order_by_ordno(Request $request)
+    {
+        $code = 0;
+        $ord_no = '';
+        $keyword = $request->input('ord_no', '');
+
+        $sql = "
+            select ord_no
+            from order_mst
+            where ord_no = :ord_no and store_cd = :store_cd
+        ";
+        $ord = DB::selectOne($sql, ['ord_no' => $keyword, 'store_cd' => STORE_CD]);
+
+        if ($ord != null) {
+            $code = 200;
+            $ord_no = $ord->ord_no;
+        } else {
+            $code = 404;
+        }
+
+        return response()->json(['code' => $code, 'ord_no' => $ord_no]);
     }
 
     /** 대기내역 조회 */
