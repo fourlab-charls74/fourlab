@@ -346,7 +346,7 @@
                                 <p id="od_recv_amt">-</p>
                             </div>
                         </div>
-                        <div class="d-flex flex-column w-100 fs-12 mb-4">
+                        <div class="d-flex flex-column w-100 fs-12">
                             <div class="d-flex justify-content-between mb-1">
                                 <p>[ 결제수단 ]</p>
                                 <p id="od_pay_type">-</p>
@@ -668,6 +668,148 @@
             </div>
         </div>
     </div>
+    {{-- 매장환불 모달 --}}
+    <div id="StoreClaimModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="StoreClaimModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title mt-0" id="myModalLabel">매장환불</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body show_layout" style="background:#f5f5f5;">
+                    <div class="card_wrap search_cum_form write">
+                        <div class="card shadow">
+                            <div class="card-body m-0">
+                                <form name="store_refund">
+                                    <input type="hidden" name="ord_no" value="">
+                                    <input type="hidden" name="ord_opt_no" value="">
+                                    <div class="card-body">
+                                        <div class="row_wrap mb-2">
+                                            <div class="row">
+                                                <div class="col-lg-12 inner-td">
+                                                    <div class="form-group h-100">
+                                                        <label style="min-width:80px;">환불일자</label>
+                                                        <div class="d-flex align-items-center h-100">
+                                                            <p class="fs-09">{{ @$today }}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12 inner-td">
+                                                    <div class="form-group">
+                                                        <label class="required" style="min-width:80px;">환불사유</label>
+                                                        <div class="flex_box">
+                                                            <select name="store_clm_reason" id="store_clm_reason" class="form-control form-control-sm">
+                                                                <option value="">선택</option>
+                                                                @foreach(@$clm_reasons as $clm_reason)
+                                                                <option value="{{$clm_reason->code_id}}" @if (@$claim_info->clm_reason == $clm_reason->code_id) selected @endif
+                                                                    >
+                                                                    {{$clm_reason->code_val}}
+                                                                </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12 inner-td">
+                                                    <div class="form-group h-100">
+                                                        <label style="min-width:80px;">환불수량</label>
+                                                        <div class="d-flex align-items-center h-100">
+                                                            <p class="fs-09"><span style="color: red;font-weight: 700;" id="store_clm_qty"></span>개 <span class="fs-08 ml-3">( 매장환불 시 해당상품의 모든수량이 환불처리됩니다. )</span></p>
+                                                        </div>
+                                                        {{-- <div class="flex_box">
+                                                            <select name="store_clm_qty" id="store_clm_qty" class="form-control form-control-sm">
+                                                                @for($i = 1; $i <= $order_opt->qty; $i++ )
+                                                                    <option value="{{$i}}" @if($order_opt->clm_qty == $i) selected @endif>
+                                                                        {{$i}}
+                                                                    </option>
+                                                                    @endfor
+                                                            </select>
+                                                        </div> --}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6 inner-td">
+                                                    <div class="form-group h-100">
+                                                        <label style="min-width:80px;">환불금액</label>
+                                                        <div class="d-flex align-items-center h-100">
+                                                            <p class="fs-09 text-right w-100"><span id="store_refund_amt"></span>원</p>
+                                                        </div>
+                                                        {{-- <div class="flex_box">
+                                                            <input type="text" name="store_refund_amt" id="store_refund_amt" value="{{ @number_format(@$order_opt->recv_amt / @$order_opt->qty) }}" readonly="readonly" class="form-control form-control-sm text-right">
+                                                        </div> --}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6 inner-td">
+                                                    <div class="form-group h-100">
+                                                        <label style="min-width:80px;">환불포인트</label>
+                                                        <div class="d-flex align-items-center h-100">
+                                                            <p class="fs-09 text-right w-100"><span id="store_refund_point_amt"></span>원</p>
+                                                        </div>
+                                                        {{-- <div class="flex_box">
+                                                            <input type="text" name="store_refund_point_amt" id="store_refund_point_amt" value="{{ @number_format(@$order_opt->point_amt / @$order_opt->qty) }}" readonly="readonly" class="form-control form-control-sm text-right">
+                                                        </div> --}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6 inner-td">
+                                                    <div class="form-group">
+                                                        <label style="min-width:80px;">은행</label>
+                                                        <div class="flex_box">
+                                                            <input type="text" name="store_refund_bank" id="store_refund_bank" value="" class="form-control form-control-sm">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6 inner-td">
+                                                    <div class="form-group">
+                                                        <label style="min-width:80px;">예금주</label>
+                                                        <div class="flex_box">
+                                                            <input type="text" name="store_refund_nm" id="store_refund_nm" value="" class="form-control form-control-sm">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12 inner-td">
+                                                    <div class="form-group">
+                                                        <label style="min-width:80px;">환불계좌</label>
+                                                        <div class="flex_box">
+                                                            <input type="text" name="store_refund_account" id="store_refund_account" value="" class="form-control form-control-sm">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12 inner-td">
+                                                    <div class="form-group">
+                                                        <label style="min-width:80px;">메모</label>
+                                                        <div class="flex_box">
+                                                            <input type="text" name="store_refund_memo" id="store_refund_memo" value="" class="form-control form-control-sm">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-center mt-3">
+                                            <button class="btn-sm btn btn-primary store-refund-save-btn fs-09 mr-1">환불</button>
+                                            <button class="btn-sm btn btn-secondary fs-09" data-dismiss="modal" aria-label="Close">취소</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script type="text/javascript" charset="utf-8">
@@ -931,6 +1073,11 @@
                     addIndex: 0,
                 });
             }
+        });
+
+        $(".store-refund-save-btn").on("click", function(e) {
+            e.preventDefault();
+           refundStoreOrder(); 
         });
 	});
 </script>

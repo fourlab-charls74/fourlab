@@ -57,6 +57,7 @@ class PosController extends Controller
             'sale_types' => $sale_types,
             'pr_codes' => $pr_codes,
             'store' => $store,
+            'clm_reasons' => SLib::getCodes("G_CLM_REASON"),
         ];
 
         return view(Config::get('shop.store.view') . '/pos/pos', $values);
@@ -1073,6 +1074,7 @@ class PosController extends Controller
                 , o.point_amt
                 , o.dc_amt
                 , o.recv_amt
+                , o.clm_state
                 , om.user_id
                 , om.user_nm
                 , om.mobile

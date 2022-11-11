@@ -607,21 +607,29 @@
                 html += `
                     <tr>
                         <td class="pt-2 pb-2 pl-1">
-                            <div class="d-flex flex-column align-items-start fs-08 pr-2">
+                            <div class="position-relative d-flex flex-column align-items-start fs-08 pr-2">
                                 <p class="fw-sb fs-09">${o.goods_nm}</p>
                                 <p class="fc-white br-05 bg-gray pl-2 pr-2 mt-1 mb-1">${o.prd_cd || '-'}</p>
                                 ${o.goods_opt.split("^").map(opt => `<p class="fc-gray fw-sb pl-3">&#8735; ${opt}</p>`).join("")}
+                                ${o.clm_state == 61 ? `
+                                    <div class="position-absolute d-flex justify-content-center align-items-center fc-red fs-20 fw-b w-75" style="top:50%;left:50%;transform:translate(-50%, -50%);height:75px;border:3px solid #ED2939;text-shadow: -1px 0 #fff, 0 1px #fff, 1px 0 #fff, 0 -1px #fff;">환불완료</div>
+                                ` : ''}
                             </div>
                         </td>
                         <td class="text-center">${Comma(o.price)}</td>
-                        <td class="text-center">${o.qty}</td>
+                        <td>
+                            <div class="d-flex flex-column align-items-center justify-content-center h-100">
+                                <p>${o.qty}</p>
+                                ${o.clm_state != 61 && o.qty > 0 ? `<button type="button" class="butt fc-white fs-08 br-05 bg-red mt-1" style="width:60px;height:25px;" onclick="openRefundModal('${o.ord_no}', '${o.ord_opt_no}', ${o.qty}, ${o.recv_amt}, ${o.point_amt});">환불하기</button>` : ''}
+                            </div>
+                        </td>
                         <td class="pt-2 pb-2 pr-1">
                             <div class="d-flex flex-column align-items-end">
                                 ${(o.sale_amount > 0 || o.sale_kind == '99') ? `    
                                     <span class="fs-08 fw-sb br-05 bg-lightgray pl-2 pr-2">${o.sale_type_nm}</span>
                                     <del class="fc-gray fs-08">${Comma(o.qty * o.price)}</del>
                                 ` : ''}
-                                <p class="fw-sb">${Comma(o.recv_amt)}</p>
+                                <p class="fw-sb">${Comma(o.recv_amt + o.point_amt)}</p>
                             </div>
                         </td>
                     </tr>
@@ -629,6 +637,49 @@
             }
             $("#od_prd_list").html(html);
         }
+    }
+
+    /** 매장환불처리 */
+    function openRefundModal(ord_no, ord_opt_no, qty, amt, point_amt) {
+        $("[name=ord_no]").val(ord_no);
+        $("[name=ord_opt_no]").val(ord_opt_no);
+        $("#store_clm_qty").text(qty);
+        $("#store_refund_amt").text(Comma(amt));
+        $("#store_refund_point_amt").text(Comma(point_amt));
+
+        $("[name=store_clm_reason]").prop("selectedIndex", 0);
+        $("[name=store_refund_bank]").val('');
+        $("[name=store_refund_nm]").val('');
+        $("[name=store_refund_account]").val('');
+        $("[name=store_refund_memo]").val('환불완료 (매장환불)');
+
+        $('#StoreClaimModal').modal({
+            keyboard: false
+        });
+    }
+
+    function refundStoreOrder() {
+        if($("[name=store_clm_reason]").val() == '') return alert("환불사유를 선택해주세요.");
+
+        const frm = $("form[name=store_refund]");
+
+        axios({
+            url: '/store/stock/stk03/order/store_refund',
+            method: 'post',
+            data: frm.serialize(),
+        }).then(function (res) {
+            if(res.data.code == 200) {
+                alert("환불되었습니다.");
+                let ord_no = $("[name=ord_no]").val();
+                setOrderDetail(ord_no);
+                $('#StoreClaimModal').modal('hide');
+            } else {
+                alert(res.data.msg);
+                console.log(res);
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
     }
 
     /** ETC */
