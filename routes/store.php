@@ -335,6 +335,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk18','stk18Controller@index');
         Route::get('stk18/search','stk18Controller@search');
         Route::post('stk18/request-release', 'stk18Controller@request_release');
+        Route::get('stk18/chg-store-type', 'stk18Controller@change_store_type');
 
         // 매장RT
         Route::get('stk20','stk20Controller@index');

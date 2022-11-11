@@ -20,7 +20,7 @@ class stk18Controller extends Controller
 {
     public function index()
 	{
-        $stores = DB::table('store')->where('use_yn', '=', 'Y')->select('store_cd', 'store_nm')->get();
+        $stores = DB::table('store')->where('use_yn', '=', 'Y')->select('store_cd', 'store_nm')->get();//전체매장
         $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')->orderBy('default_yn')->get();
 
 		$values = [
@@ -29,7 +29,7 @@ class stk18Controller extends Controller
             'types' => SLib::getCodes("PRD_MATERIAL_TYPE"), // 원부자재 구분
             'opts' => SLib::getCodes("PRD_MATERIAL_OPT"),
             'rel_orders' => SLib::getCodes("REL_ORDER"), // 출고차수
-            'stores' => $stores, // 매장리스트
+            'stores' => $stores, // 전체 매장리스트
             'storages' => $storages, // 창고리스트
 		];
 
@@ -93,7 +93,7 @@ class stk18Controller extends Controller
                 '0' as amount
             from product p
                 inner join product_stock_storage pss on pss.prd_cd = p.prd_cd
-                inner join product_code pc on p.prd_cd = pc.prd_cd
+                inner join product_code pc on p.prd_cd = pc.prd_cd and pc.type <> 'N'
                 left outer join product_image i on p.prd_cd = i.prd_cd
                 inner join company cp on p.com_id = cp.com_id
                 left outer join `code` c on c.code_kind_cd = 'PRD_MATERIAL_TYPE' and c.code_id = pc.brand
@@ -120,7 +120,7 @@ class stk18Controller extends Controller
                     select pss.prd_cd, count(pss.prd_cd)
                     from product p
                         inner join product_stock_storage pss on p.prd_cd = pss.prd_cd
-                        inner join product_code pc on p.prd_cd = pc.prd_cd
+                        inner join product_code pc on p.prd_cd = pc.prd_cd and pc.type <> 'N'
                         left outer join `code` c on c.code_kind_cd = 'PRD_MATERIAL_TYPE' and c.code_id = pc.brand
                         left outer join `code` c2 on c2.code_kind_cd = 'PRD_MATERIAL_OPT' and c2.code_id = pc.opt
                     where 1=1 $where
@@ -181,7 +181,7 @@ class stk18Controller extends Controller
                 DB::table('sproduct_stock_release')
                     ->insert([
                         'type' => $release_type,
-                        'prd_cd' => $row['prd_cd_sub'],
+                        'prd_cd' => $row['prd_cd'],
                         'price' => $row['price'],
                         'wonga' => $row['wonga'],
                         'qty' => $row['rel_qty'] ?? 0,
@@ -199,7 +199,7 @@ class stk18Controller extends Controller
     
                 // product_stock -> 창고보유재고 차감
                 DB::table('product_stock')
-                    ->where('prd_cd', '=', $row['prd_cd_sub'])
+                    ->where('prd_cd', '=', $row['prd_cd'])
                     ->update([
                         'wqty' => DB::raw('wqty - ' . ($row['rel_qty'] ?? 0)),
                         'ut' => now(),
@@ -207,7 +207,7 @@ class stk18Controller extends Controller
 
                 // product_stock_storage -> 보유재고 차감
                 DB::table('product_stock_storage')
-                    ->where('prd_cd', '=', $row['prd_cd_sub'])
+                    ->where('prd_cd', '=', $row['prd_cd'])
                     ->where('storage_cd', '=', $storage_cd)
                     ->update([
                         'wqty' => DB::raw('wqty - ' . ($row['rel_qty'] ?? 0)),
@@ -236,13 +236,13 @@ class stk18Controller extends Controller
                 $store_stock_cnt = 
                     DB::table('product_stock_store')
                         ->where('store_cd', '=', $store_cd)
-                        ->where('prd_cd', '=', $row['prd_cd_sub'])
+                        ->where('prd_cd', '=', $row['prd_cd'])
                         ->count();
                 if ($store_stock_cnt < 1) {
                     // 해당 매장에 상품 기존재고가 없을 경우
                     DB::table('product_stock_store')
                         ->insert([
-                            'prd_cd' => $row['prd_cd_sub'],
+                            'prd_cd' => $row['prd_cd'],
                             'store_cd' => $store_cd,
                             'qty' => 0,
                             'wqty' => $row['rel_qty'] ?? 0,
@@ -252,7 +252,7 @@ class stk18Controller extends Controller
                 } else {
                     // 해당 매장에 상품 기존재고가 이미 존재할 경우
                     DB::table('product_stock_store')
-                        ->where('prd_cd', '=', $row['prd_cd_sub'])
+                        ->where('prd_cd', '=', $row['prd_cd'])
                         ->where('store_cd', '=', $store_cd) 
                         ->update([
                             'wqty' => DB::raw('wqty + ' . ($row['rel_qty'] ?? 0)),
@@ -288,4 +288,40 @@ class stk18Controller extends Controller
 		}
         return response()->json(["code" => $code]);
     }
+
+    function change_store_type(Request $request) {
+        $store_type = $request->input('store_type');
+        try {
+            DB::beginTransaction();
+
+            if ($store_type == null) {
+                $sql = "
+                    select 
+                        store_cd, store_nm
+                    from store
+                    where use_yn = 'Y'
+                ";
+            } else {
+                $sql = "
+                    select 
+                        store_cd, store_nm
+                    from store
+                    where use_yn = 'Y' and store_type = '$store_type'
+                ";
+            }
+           
+            $result = DB::select($sql);
+
+
+            $code = 200;
+			DB::commit();
+		} catch (Exception $e) {
+            // $msg = $e->getMessage();
+            $code = 500;
+			DB::rollback();
+		}
+        return response()->json(["code" => $code , "result" => $result]);
+    
+    }
+
 }

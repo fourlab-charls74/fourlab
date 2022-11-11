@@ -167,6 +167,18 @@
                     </div>
                     <div class="d-flex align-items-center mb-1 mb-lg-0">
                         <i class="fas fa-arrow-right fa-sm ml-2 mr-2" aria-hidden="true"></i>
+                        <span class="mr-1">매장구분</span>
+                        <div class="flex_box">
+                            <select name='store_type' id="store_type" class="form-control form-control-sm" onchange="change_store_type(this);">
+                                <option value=''>전체</option>
+                                @foreach ($store_types as $store_type)
+                                    <option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-1 mb-lg-0">
+                        <i class="fas fa-arrow-right fa-sm ml-2 mr-2" aria-hidden="true"></i>
                         <span class="mr-1">매장</span>
                         <select id='store' name='store' class="form-control form-control-sm"  style='width:160px;display:inline'>
                             <option value=''>선택</option>
@@ -338,6 +350,8 @@
         if (storage_cd === '') return alert("상품을 출고할 창고를 선택해주세요.");
 
         let store_cd =$('[name=store]').val();
+
+        console.log(store_cd);
         if (store_cd === '') return alert("상품을 보낼 매장을 선택해주세요.");
 
         let over_qty_rows = rows.filter(row => {
@@ -381,6 +395,55 @@
         }).catch(function (err) {
             // console.log(err);
         });
+    }
+
+  
+
+    /**
+     * 일반출고 매장구분 추가 후 매장 구분 선택시 해당되는 매장 출력
+     */
+    function change_store_type(e) {
+
+        let store_type = document.getElementById('store_type').value;
+
+        $.ajax({
+            method: 'get',
+            url: '/store/stock/stk18/chg-store-type',
+            data: {
+                store_type : store_type
+            },
+            success: function (res) {
+                if(res.code === 200) {
+                    $('#store').empty();
+                    $('#store').append("<option value=''>선택</option>");
+                    for(let i = 0; i <= res.result.length ; i++) {
+                        if(store_type == '06') {
+                            $('#store').append("<option value='" + res.result[i].store_cd +"'>" + res.result[i].store_nm + "</option>");
+                        } else if (store_type == '07') {
+                            $('#store').append("<option value='" + res.result[i].store_cd +"'>" + res.result[i].store_nm + "</option>");
+                        } else if (store_type == '08') {
+                            $('#store').append("<option value='" + res.result[i].store_cd +"'>" + res.result[i].store_nm + "</option>");
+                        } else if (store_type == '10') {
+                            $('#store').append("<option value='" + res.result[i].store_cd +"'>" + res.result[i].store_nm + "</option>");
+                        } else if (store_type == '11') {
+                            $('#store').append("<option value='" + res.result[i].store_cd +"'>" + res.result[i].store_nm + "</option>");
+                        } else if (store_type == '12') {
+                            $('#store').append("<option value='" + res.result[i].store_cd +"'>" + res.result[i].store_nm + "</option>");
+                        } else if (store_type == '13') {
+                            $('#store').append("<option value='" + res.result[i].store_cd +"'>" + res.result[i].store_nm + "</option>");
+                        } else if (store_type == '15') {
+                            $('#store').append("<option value='" + res.result[i].store_cd +"'>" + res.result[i].store_nm + "</option>");
+                        } else if (store_type == '') {
+                            $('#store').append("<option value='" + res.result[i].store_cd +"'>" + res.result[i].store_nm + "</option>");
+                        }
+                    }
+                }else {
+                }
+            },
+            error: function(error) {
+                console.log(error)
+            }
+        });        
     }
 </script>
 @stop

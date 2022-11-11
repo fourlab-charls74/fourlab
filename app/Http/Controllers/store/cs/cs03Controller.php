@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Exception;
+use Carbon\Carbon;
 use PDO;
 use PhpParser\Node\Stmt\Continue_;
 
@@ -148,6 +149,12 @@ class cs03Controller extends Controller
 		$prd_cds = $request->input("prd_cds");
 		$qties = $request->input("qties");
 		$code = 200;
+		$admin_id = Auth('head')->user()->id;
+		$admin_nm = Auth('head')->user()->name;
+		$date = Carbon::now()->timezone('Asia/Seoul')->format('Y-m-d');
+		$stock_state_date = str_replace("-", "", $date); 
+		$now = now();
+
 		if (count($prd_ord_nos) > 0) {
 			try {
 				for ($i = 0; $i < count($prd_ord_nos); $i++) {
@@ -211,12 +218,33 @@ class cs03Controller extends Controller
 								";
 								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
+								$res = "
+									select 
+										a.goods_no as goods_no,
+										a.goods_opt as goods_opt,
+										b.price as price,
+										b.wonga as wonga
+									from product_code a
+										inner join product b on a.prd_cd = b.prd_cd
+									where a.prd_cd = '$prd_cd'
+								";
+								$r = DB::selectOne($res);
+
 								if ($row != null) {
 									$qty = $row->qty + $change_qty;
+
 									$sql = "
 										update product_stock_storage set qty = :qty where prd_cd = :prd_cd
 									";
 									DB::update($sql, ['qty' => $qty, 'prd_cd' => $prd_cd]);
+
+									$query = "
+										insert into 
+										product_stock_hst(goods_no, prd_cd, goods_opt, location_type, type, price, wonga, qty, stock_state_date, comment, rt, admin_id, admin_nm) 
+										values('$r->goods_no', '$prd_cd', '$r->goods_opt', 'STORAGE', '1', '$r->price', '$r->wonga', '$change_qty', '$stock_state_date', '창고입고', '$now', '$admin_id', '$admin_nm')
+									";
+
+									DB::insert($query);
 								}
 								break;
 							} else { // 기존 상태가 입고처리중이 아닌 경우 입고처리 후 증가.
@@ -250,6 +278,7 @@ class cs03Controller extends Controller
 										update product_stock_storage set qty = :qty, wqty = :wqty where prd_cd = :prd_cd
 									";
 									DB::update($sql, ['qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
+								
 								}
 								break;
 							}
@@ -294,10 +323,31 @@ class cs03Controller extends Controller
 
 								if ($row != null) {
 									$qty = $row->qty - $change_qty;
+
 									$sql = "
 										update product_stock_storage set qty = :qty where prd_cd = :prd_cd
 									";
 									DB::update($sql, ['qty' => $qty, 'prd_cd' => $prd_cd]);
+
+									$res = "
+										select 
+											a.goods_no as goods_no,
+											a.goods_opt as goods_opt,
+											b.price as price,
+											b.wonga as wonga
+										from product_code a
+											inner join product b on a.prd_cd = b.prd_cd
+										where a.prd_cd = '$prd_cd'
+									";
+									$r = DB::selectOne($res);
+
+									$query = "
+										insert into 
+										product_stock_hst(goods_no, prd_cd, goods_opt, location_type, type, price, wonga, qty, stock_state_date, comment, rt, admin_id, admin_nm) 
+										values('$r->goods_no', '$prd_cd', '$r->goods_opt', 'STORAGE', '11', '$r->price', '$r->wonga', '-$change_qty', '$stock_state_date', '창고반품', '$now', '$admin_id', '$admin_nm')
+									";
+
+									DB::insert($query);
 								}
 								break;
 							} else { // 기존 상태가 반품처리중이 아닌 경우 반품처리 후 감소.
@@ -349,13 +399,15 @@ class cs03Controller extends Controller
 					DB::update($sql, ['state' => $state, 'prd_ord_no' => $prd_ord_no, 'prd_cd' => $prd_cd]);
 				}
 				$code = 200;
+				$msg = '성공';
 				DB::commit();
 			} catch (Exception $e) {
+				$msg = $e->getMessage();
 				$code = 500;
 				DB::rollback();
 			}
 		}
-		return response()->json(['code' => $code]);
+		return response()->json(['code' => $code, 'msg' => $msg]);
     }
 
     public function delete(Request $request) {

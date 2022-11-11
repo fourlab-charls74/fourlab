@@ -246,7 +246,7 @@
             {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 250},
             {field: "goods_opt", headerName: "옵션", width: 200},
             {
-                headerName: '(대표)창고재고', // 대표창고의 재고를 조회
+                headerName: '창고재고', // 대표창고의 재고를 조회
                 children: [
                     {field: "storage_qty", headerName: "재고", type: 'currencyType'},
                     {field: "storage_wqty", headerName: "보유재고", type: 'currencyType'},

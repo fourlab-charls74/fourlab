@@ -371,22 +371,35 @@ class prd02Controller extends Controller
 		
 		$sql = "
 			select 
-				distinct(p.prd_cd), g.goods_nm as prd_nm, g.style_no, p.goods_no, p.goods_opt, p.color, p.size, '' as seq, 'N' as is_product
-			from product_code p
-				inner join goods_summary gs on p.goods_no = gs.goods_no
-				inner join goods g on g.goods_no = p.goods_no 
-			where p.goods_no = '$goods_no'
+				distinct(a.prd_cd),e.goods_nm as prd_nm, e.style_no, a.goods_no, 
+				concat(c.code_val, '^',d.code_val2) as goods_opt, 
+				a.color, a.size, '' as seq , 'N' as is_product
+			from product_code a
+				left outer join goods_summary b on a.goods_no = b.goods_no
+				inner join code c on a.color = c.code_id
+				inner join code d on a.size = d.code_id
+				inner join goods e on e.goods_no = a.goods_no 
+			where c.code_kind_cd = 'PRD_CD_COLOR' and d.code_kind_cd = 'PRD_CD_SIZE_MATCH' and a.goods_no = '$goods_no'
 
 			union all
 
-			select
-				p.prd_cd, p.prd_nm, p.style_no, '$goods_no' as goods_no, '' as goods_opt, pc.color, pc.size, pc.seq, 'Y' as is_product
-			from product p
-				inner join product_code pc on pc.prd_cd = p.prd_cd
-			where p.prd_cd like '$prd_cd%'
-			order by seq desc
-
-		";
+				select
+					p.prd_cd, p.prd_nm, p.style_no, '$goods_no' as goods_no, concat(c.code_val, '^',d.code_val2) as goods_opt
+					, pc.color, pc.size, pc.seq, 'Y' as is_product
+				from product p
+					inner join product_code pc on pc.prd_cd = p.prd_cd
+					inner join code c on pc.color = c.code_id and c.code_kind_cd = 'PRD_CD_COLOR'
+					inner join code d on pc.size = d.code_id and d.code_kind_cd = 'PRD_CD_SIZE_MATCH'
+				where p.prd_cd like '$prd_cd%'
+				order by seq desc
+			";
+			
+			// select
+			// 	c.prd_cd, b.goods_nm, b.style_no, b.goods_no, a.goods_opt, c.color, c.size, c.seq, 'Y' as is_product
+			// from goods_summary a
+			// 	inner join goods b on b.goods_no = a.goods_no
+			// 	left outer join product_code c on c.goods_no = a.goods_no and c.goods_opt = a.goods_opt
+			// where c.prd_cd = '$prd_cd'
 
 		$result = DB::select($sql);
 

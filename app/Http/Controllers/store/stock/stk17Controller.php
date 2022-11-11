@@ -151,7 +151,7 @@ class stk17Controller extends Controller
                 DB::table('sproduct_stock_release')
                     ->insert([
                         'type' => $release_type,
-                        'prd_cd' => $row['prd_cd_sub'],
+                        'prd_cd' => $row['prd_cd'],
                         'price' => $row['price'],
                         'wonga' => $row['wonga'],
                         'qty' => $row['rel_qty'] ?? 0,
@@ -168,7 +168,7 @@ class stk17Controller extends Controller
             $code = 200;
 			DB::commit();
 		} catch (\Exception $e) {
-            // dd($e->getMessage());
+            // $msg = $e->getMessage();
             $code = 500;
 			DB::rollback();
 		}

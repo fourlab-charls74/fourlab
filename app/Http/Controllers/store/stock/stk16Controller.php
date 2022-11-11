@@ -70,10 +70,10 @@ class stk16Controller extends Controller
 
         if ($req['type'] != "") $where .= " and pc.brand = '" . Lib::quote($req['type']) . "'";
         if ($req['opt'] != "") $where .= " and pc.opt = '" . Lib::quote($req['opt']) . "'";
-        if ($req['prd_nm'] != "") $where .= " and p.prd_nm like '%" . Lib::quote($req['prd_nm']) . "%' ";
+        if ($req['prd_nm'] != "") $where .= " and p.prd_nm like '________%" . Lib::quote($req['prd_nm']) . "%' ";
 
         if ($req['rel_order'] != null)
-            $where .= " and psr.rel_order = '" . Lib::quote($req['rel_order']) . "'";
+            $where .= " and psr.rel_order like '%" . Lib::quote($req['rel_order']) . "'";
         if ($req['rel_type'] != null)
             $where .= " and psr.type = '" . Lib::quote($req['rel_type']) . "'";
         if ($req['state'] != null)
@@ -217,7 +217,7 @@ class stk16Controller extends Controller
 
                 if ($row['state'] != $ori_state) continue;
 
-                $prd_cd = $row['prd_cd_sub'];
+                $prd_cd = $row['prd_cd'];
                 $price = $row['price'];
                 $wonga = $row['wonga'];
 
@@ -331,6 +331,7 @@ class stk16Controller extends Controller
             $code = 200;
             DB::commit();
         } catch (Exception $e) {
+            // $msg = $e->getMessage();
             $code = 500;
             DB::rollback();
         }
@@ -344,10 +345,18 @@ class stk16Controller extends Controller
         $ori_state = 20;
         $new_state = 30;
         $admin_id = Auth('head')->user()->id;
+        $admin_nm = Auth('head')->user()->name;
         $data = $request->input("data", []);
+		$date = Carbon::now()->timezone('Asia/Seoul')->format('Y-m-d');
+		$stock_state_date = str_replace("-", "", $date); 
+		$now = now();
+
         try {
             DB::beginTransaction();
             foreach ($data as $row) {
+                $prd_cd = $row['prd_cd'];
+                $qty = $row['qty'];
+
                 if ($row['state'] != $ori_state) continue;
 
                 DB::table('sproduct_stock_release')
@@ -361,12 +370,33 @@ class stk16Controller extends Controller
 
                 // product_stock_storage 창고 실재고 차감
                 DB::table('product_stock_storage')
-                    ->where('prd_cd', '=', $row['prd_cd_sub'])
+                    ->where('prd_cd', '=', $prd_cd)
                     ->where('storage_cd', '=', $row['storage_cd'])
                     ->update([
-                        'qty' => DB::raw('qty - ' . ($row['qty'] ?? 0)),
+                        'qty' => DB::raw('qty - ' . ($qty ?? 0)),
                         'ut' => now(),
                     ]);
+
+                    $res = "
+                    select 
+                        a.goods_no as goods_no,
+                        a.goods_opt as goods_opt,
+                        b.price as price,
+                        b.wonga as wonga
+                    from product_code a
+                        inner join product b on a.prd_cd = b.prd_cd
+                    where a.prd_cd = '$prd_cd'
+                ";
+                $r = DB::selectOne($res);
+
+                $query = "
+                    insert into 
+                    product_stock_hst(goods_no, prd_cd, goods_opt, location_type, type, price, wonga, qty, stock_state_date, comment, rt, admin_id, admin_nm) 
+                    values('$r->goods_no', '$prd_cd', '$r->goods_opt', 'STORAGE', '17', '$r->price', '$r->wonga', '$qty', '$stock_state_date', '출고완료', '$now', '$admin_id', '$admin_nm')
+                ";
+
+                DB::insert($query);
+
             }
             $code = 200;
             DB::commit();
@@ -399,7 +429,7 @@ class stk16Controller extends Controller
 
                 // product_stock_store 매장 실재고 플러스
                 DB::table('product_stock_store')
-                    ->where('prd_cd', '=', $row['prd_cd_sub'])
+                    ->where('prd_cd', '=', $row['prd_cd'])
                     ->where('store_cd', '=', $row['store_cd'])
                     ->update([
                         'qty' => DB::raw('qty + ' . ($row['qty'] ?? 0)),

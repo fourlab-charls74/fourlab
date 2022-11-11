@@ -78,12 +78,13 @@
                                     @endforeach
                                 </select>
                                 <span class="text_line" style="width: 6%; text-align: center;">/</span>
-                                <select name='rel_order' class="form-control form-control-sm" style="width: 47%">
+                                <input type="text" id="rel_order" name="rel_order" class="form-control form-control-sm search-enter" style="width: 47%" value="">
+                                <!-- <select name='rel_order' class="form-control form-control-sm" style="width: 47%">
                                     <option value=''>전체</option>
                                     @foreach ($rel_orders as $rel_order)
                                         <option value='{{ $rel_order->code_id }}'>{{ $rel_order->code_val }}</option>
                                     @endforeach
-                                </select>
+                                </select> -->
                             </div>
 						</div>
 					</div>
@@ -98,7 +99,7 @@
                                     @endforeach
                                 </select>
                                 <div class="custom-control custom-checkbox form-check-box" style="min-width: 130px;">
-                                    <input type="checkbox" class="custom-control-input" name="ext_done_state" id="ext_done_state" value="Y">
+                                    <input type="checkbox" class="custom-control-input" name="ext_done_state" id="ext_done_state" value="Y" checked>
                                     <label class="custom-control-label font-weight-normal" for="ext_done_state">매장입고완료 제외</label>
                                 </div>
                             </div>

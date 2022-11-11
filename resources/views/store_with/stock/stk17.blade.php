@@ -259,7 +259,7 @@
                 hide: true
             },
             {
-                headerName: '(대표)창고재고', // 대표창고의 재고를 조회
+                headerName: '창고재고', // 대표창고의 재고를 조회
                 children: [
                     {field: "storage_qty", headerName: "재고", type: 'currencyType', 
                         cellRenderer: function(params) {
