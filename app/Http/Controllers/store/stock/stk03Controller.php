@@ -517,9 +517,13 @@ class stk03Controller extends Controller
         $ord_state = $data['ord_state']; // 주문상태
         $store_cd = $data['store_cd']; // 주문매장
         $store_nm = "본사"; // 주문매장명
+        $give_point = "N"; // 적립금지급 여부
         if ($store_cd != '') {
-            $row = DB::table('store')->select('store_nm')->where('store_cd', '=', $store_cd)->first();
-            if ($row != null) $store_nm = $row->store_nm;
+            $row = DB::table('store')->select('store_nm', 'point_in_yn')->where('store_cd', '=', $store_cd)->first();
+            if ($row != null) {
+                $store_nm = $row->store_nm;
+                $give_point = $row->point_in_yn;
+            }
         }
 
         $cart = $data['cart']; // 상품정보
@@ -564,7 +568,6 @@ class stk03Controller extends Controller
         $r_addr2 = $data['r_addr2']; // 수령 주소2
         $dlv_msg = $data['dlv_msg']; // 출고메시지
 
-        $give_point = $data['give_point']; // 적립금지급 여부
         $group_apply = $data['group_apply'];
         $dlv_cd = $data['dlv_cd']; // 출고완료시 택배업체
         $dlv_no = $data['dlv_no']; // 출고완료시 송장번호
