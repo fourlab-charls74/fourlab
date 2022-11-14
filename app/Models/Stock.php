@@ -39,13 +39,13 @@ class Stock
     {
         // Parameters
         $type = $stock['type'];                      // 입,출고 구분
-        $etc = $stock['etc'];                          // 사유
-        $goods_no = $stock['goods_no'];          // 상품번호
-        $prd_cd = $stock['prd_cd'];            // 상품 코드
-        $goods_opt = $stock['goods_opt'];      // 옵션
-        $qty = $stock['qty'];                          // 보유재고
-        $ord_no		= @$stock["ord_no"];				// 주문번호
-		$ord_opt_no	= @$stock["ord_opt_no"];			// 주문일련번호
+        $etc = $stock['etc'];                        // 사유
+        $goods_no = $stock['goods_no'];              // 상품번호
+        $prd_cd = $stock['prd_cd'];                  // 상품 코드
+        $goods_opt = $stock['goods_opt'];            // 옵션
+        $qty = $stock['qty'];                        // 보유재고
+        $ord_no		= @$stock["ord_no"];		     // 주문번호
+		$ord_opt_no	= @$stock["ord_opt_no"];		 // 주문일련번호
 
         // Property Set
         $this->SetPrdCd($prd_cd);

@@ -810,7 +810,12 @@ class goods extends Controller
         $where = "";
 
         if($prd_cd != '') $where .= " and pc.prd_cd like '%$prd_cd%'";
-        if($goods_nm != '') $where .= " and pc.prd_nm like '%$goods_nm%'";
+
+        if ($match == 'true') {
+            if($goods_nm != '') $where .= " and p.prd_nm like '%$goods_nm%'";
+        } else {
+            if($goods_nm != '') $where .= " and g.goods_nm like '%$goods_nm%'";
+        }
 
         //상품 매칭
         if($match != 'false') $where .= "and pc.type = 'N'";
@@ -852,7 +857,7 @@ class goods extends Controller
             // 상품매칭
             $sql = "
                 select pc.prd_cd, p.prd_nm, pc.goods_no, pc.goods_opt, pc.color, pc.size, p.match_yn, pc.rt
-                from product_code AS pc
+                from product_code pc
                     inner join product p on pc.prd_cd = p.prd_cd
                 where 1=1 $where
                 order by pc.rt desc

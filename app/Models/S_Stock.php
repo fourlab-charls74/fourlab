@@ -39,13 +39,13 @@ class Stock
     {
         // Parameters
         $type = $stock['type'];                      // 입,출고 구분
-        $etc = $stock['etc'];                          // 사유
-        $goods_no = $stock['goods_no'];          // 상품번호
-        $prd_cd = $stock['prd_cd'];            // 상품 코드
-        $goods_opt = $stock['goods_opt'];      // 옵션
-        $qty = $stock['qty'];                          // 보유재고
-        $ord_no		= @$stock["ord_no"];				// 주문번호
-		$ord_opt_no	= @$stock["ord_opt_no"];			// 주문일련번호
+        $etc = $stock['etc'];                        // 사유
+        $goods_no = $stock['goods_no'];              // 상품번호
+        $prd_cd = $stock['prd_cd'];                  // 상품 코드
+        $goods_opt = $stock['goods_opt'];            // 옵션
+        $qty = $stock['qty'];                        // 보유재고
+        $ord_no		= @$stock["ord_no"];		     // 주문번호
+		$ord_opt_no	= @$stock["ord_opt_no"];		 // 주문일련번호
 
         // Property Set
         $this->SetPrdCd($prd_cd);
@@ -544,7 +544,6 @@ class Stock
         if ($row) {
             $stock_no = $row->no;
             $this->__SetStockNo($stock_no);
-            // $this->__IncreaseGoodQty($qty); // 매장관리용으로 작업하기 위해 삭제되어야함 2022-10-27
         } else {
             if ($wonga == "") {
                 $sql = "  -- PlusStockQty.2 --
@@ -560,45 +559,11 @@ class Stock
                     return 0;
                 }
             }
-            // $this->__InsertGoodQty($wonga, $qty, $invoice_no); // 매장관리용으로 작업하기 위해 삭제되어야함 2022-10-27
         }
 
         $this->__IncreasePrdStockQty($qty);
 
         $this->__IncreasePrdStockStorageQty($qty);
-
-        // goods_location 항목은 매장관리용이 아니므로 삭제되어야함 20221027
-        // if ($this->loc != '' && $this->loc != 'LOC') {
-        //     $loc = $this->loc;
-
-        //     $rows = DB::selectOne("
-        //         select qty
-        //             from goods_location
-        //         where goods_no = '$goods_no' 
-        //             and goods_opt = '$goods_opt' 
-        //             and loc = '$loc'
-        //     ");
-
-        //     if ($rows) {
-        //         DB::update("
-        //             update goods_location 
-        //             set qty = qty + $qty
-        //                 , ut = now()
-        //             where goods_no = '$goods_no' 
-        //             and goods_opt = '$goods_opt' 
-        //             and loc = '$loc'
-        //         ");
-        //     } else {
-        //         DB::table('goods_location')->insert([
-        //             'goods_no' => $goods_no,
-        //             'goods_opt' => $goods_opt,
-        //             'loc' => $loc,
-        //             'qty' => $qty,
-        //             'rt' => now(),
-        //             'ut' => now()
-        //         ]);
-        //     }
-        // }
 
         $history = array(
             "type" => $type,
