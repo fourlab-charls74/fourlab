@@ -425,9 +425,13 @@ class PosController extends Controller
         $ord_state = $req->input("ord_state", ""); // 주문상태
         $store_cd = STORE_CD; // 주문매장
         $store_nm = '';
+        $give_point = "N"; // 적립금지급 여부
         if ($store_cd != '') {
-            $row = DB::table('store')->select('store_nm')->where('store_cd', '=', $store_cd)->first();
-            if ($row != null) $store_nm = $row->store_nm;
+            $row = DB::table('store')->select('store_nm', 'point_in_yn')->where('store_cd', '=', $store_cd)->first();
+            if ($row != null) {
+                $store_nm = $row->store_nm;
+                $give_point = $row->point_in_yn;
+            }
         }
 
         $cart = $req->input("cart"); // 상품정보
@@ -478,7 +482,6 @@ class PosController extends Controller
             }
         }
 
-        $give_point = "Y"; // 적립금지급 여부
         $group_apply = $req->input("group_apply", "");
         $dlv_apply = "N"; // 배송비적용 여부
         $add_dlv_fee = 0; // 추가배송비
@@ -949,10 +952,10 @@ class PosController extends Controller
             #####################################################
             
             if ($ord_state != "1") {
-                if ($point_flag === true) {
+                if ($point_flag === true && $user_id != null) {
                     $point = new Point($user, $user_id);
                     $point->SetOrdNo($ord_no);
-                    $point->Order($add_point);
+                    $point->StoreOrder();
 
                     // 적립금 차감
                     if ($point_amt > 0) {
