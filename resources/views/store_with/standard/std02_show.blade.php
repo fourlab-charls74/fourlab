@@ -583,10 +583,17 @@
 													@endif
 												</div>
 											</td>
-											<th></th>
+											<th>적립금지급여부</th>
 											<td>
 												<div class="form-inline form-radio-box">
-													
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="point_in_yn_Y" name="point_in_yn" value="Y" @if(@$store->point_in_yn == 'Y') checked @endif />
+														<label class="custom-control-label" for="point_in_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="point_in_yn_N" name="point_in_yn" value="N" @if(@$store->point_in_yn != 'Y') checked @endif />
+														<label class="custom-control-label" for="point_in_yn_N">N</label>
+													</div>
 												</div>
 											</td>
 										</tr>
