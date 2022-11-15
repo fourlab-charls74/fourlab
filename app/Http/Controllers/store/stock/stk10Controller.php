@@ -80,6 +80,17 @@ class stk10Controller extends Controller
 			}
 			$where .= ")";
         }
+        // 상품옵션 범위검색
+        $range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+        parse_str($r['prd_cd_range'] ?? '', $prd_cd_range);
+        foreach ($range_opts as $opt) {
+            $rows = $prd_cd_range[$opt] ?? [];
+            if (count($rows) > 0) {
+                $in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+                $opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+                $where .= " and pc.$opt $in_query ($opt_join) ";
+            }
+        }
         if(isset($r['goods_stat'])) {
             $goods_stat = $r['goods_stat'];
             if(is_array($goods_stat)) {
@@ -168,7 +179,8 @@ class stk10Controller extends Controller
                 psr.fin_id, 
                 psr.fin_rt
             from product_stock_release psr
-                inner join goods g on g.goods_no = psr.goods_no
+                inner join product_code pc on pc.prd_cd = psr.prd_cd
+                left outer join goods g on g.goods_no = psr.goods_no
                 left outer join code c on c.code_kind_cd = 'REL_TYPE' and c.code_id = psr.type
                 left outer join store s on s.store_cd = psr.store_cd
                 left outer join storage sg on sg.storage_cd = psr.storage_cd
@@ -185,7 +197,8 @@ class stk10Controller extends Controller
             $sql = "
                 select count(*) as total
                 from product_stock_release psr
-                    inner join goods g on g.goods_no = psr.goods_no
+                    inner join product_code pc on pc.prd_cd = psr.prd_cd
+                    left outer join goods g on g.goods_no = psr.goods_no
                     left outer join code c on c.code_kind_cd = 'REL_TYPE' and c.code_id = psr.type
                     left outer join store s on s.store_cd = psr.store_cd
                     left outer join storage sg on sg.storage_cd = psr.storage_cd

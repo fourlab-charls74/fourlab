@@ -600,6 +600,68 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+<!-- 상품옵션 범위검색 검색 -->
+<div id="SearchPrdcdRangeModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchPrdcdRangeModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 1200px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title mt-0" id="myModalLabel">상품옵션 범위검색</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body show_layout" style="background:#f5f5f5;">
+                <div class="card_wrap search_cum_form write">
+                    <div class="card shadow">
+                        <form name="search_prdcd_range" method="get" onsubmit="return false">
+                            <div class="card-body">
+                                <div class="row_wrap code-filter">
+                                    <div class="row">
+                                        <div class="col-4 col-lg-2 p-1 pl-0 pl-lg-2">
+                                            <div class="table-responsive">
+                                                <div id="div-gd-prdcd-range-brand" class="ag-theme-balham"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-lg-2 p-1">
+                                            <div class="table-responsive">
+                                                <div id="div-gd-prdcd-range-year" class="ag-theme-balham"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-lg-2 p-1">
+                                            <div class="table-responsive">
+                                                <div id="div-gd-prdcd-range-season" class="ag-theme-balham"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-lg-2 p-1">
+                                            <div class="table-responsive">
+                                                <div id="div-gd-prdcd-range-gender" class="ag-theme-balham"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-lg-2 p-1">
+                                            <div class="table-responsive">
+                                                <div id="div-gd-prdcd-range-item" class="ag-theme-balham"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-lg-2 p-1 pr-0 pr-lg-2">
+                                            <div class="table-responsive">
+                                                <div id="div-gd-prdcd-range-opt" class="ag-theme-balham"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="w-100 text-center mt-2">
+                                    <a href="#" onclick="return searchPrdcdRange.Reset();" class="btn btn-sm btn-outline-primary shadow-sm mr-1">검색조건 초기화</a>
+                                    <a href="#" onclick="return searchPrdcdRange.Choice();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-check fa-sm text-white-50 pr-1"></i>선택</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 
 <!-- 원부자재코드 검색 -->
 <div id="SearchPrdcd_sub_Modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchPrdcdModalLabel" aria-hidden="true">

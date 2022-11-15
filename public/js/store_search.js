@@ -448,6 +448,111 @@ SearchPrdcd.prototype.Choice = function() {
     $('#SearchPrdcdModal').modal('toggle');
 };
 
+let searchPrdcd = new SearchPrdcd();
+
+/**
+ * 상품옵션범위검색
+ */
+function SearchPrdcdRange(){
+    this.setGrid = false;
+}
+
+SearchPrdcdRange.prototype.Open = async function(callback = null, match = false){
+    if(this.setGrid === false) {
+        this.isMatch = match === "match";
+        this.SetGridCond();
+        this.callback = callback;
+        this.setGrid = true;
+    }
+    $('#SearchPrdcdRangeModal').modal({
+        keyboard: false
+    });
+};
+
+SearchPrdcdRange.prototype.SetGridCond = async function() {
+    Object.keys(conds).forEach( async (cond_title) => {
+        let columns = [];
+        
+        columns.push(
+            { field: "chk", headerName: '', cellClass: 'hd-grid-code', checkboxSelection: true, width: 28, sort: null },
+            { field: "item", headerName: conds[cond_title], width: "auto",
+                cellStyle: (params) => (params.data.key || '') === 'contain' ? {"color": params.data.item === '포함' ? "green" : "red"} : '',
+                editable: (params) => (params.data.key || '') === 'contain',
+                cellRenderer: (params) => {
+                    if((params.data.key || '') === 'contain') return params.value;
+                    return `${(params.data.code_id || '') != '' ? `[${params.data.code_id}] ` : ''}${params.data.code_val || ''}`;
+                },
+                cellEditorSelector: function(params) {
+                    if((params.data.key || '') === 'contain') {
+                        return {
+                            component: 'agRichSelectCellEditor',
+                            params: { 
+                                values: ['포함', '미포함']
+                            },
+                        };
+                    }
+                    return false;
+                },
+            },
+        );
+
+        this[cond_title + '_grid'] = await new HDGrid(document.querySelector( "#div-gd-prdcd-range-" + cond_title ), columns, {
+            pinnedTopRowData: [{item: "포함", key: "contain"}],
+            getRowStyle: (params) => {
+                if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#f2f2f2', 'border': 'none'};
+            },
+        });
+        document.querySelector( "#div-gd-prdcd-range-" + cond_title ).style.height = '204px';
+    });
+    const { data: { body: res } } = await axios({ 
+        url: '/store/api/prdcd/conds', 
+        method: 'get' 
+    });
+    Object.keys(res).forEach(r => {
+        this[r + '_grid'].gridOptions.api.setRowData(res[r]);
+    });
+}
+
+SearchPrdcdRange.prototype.Reset = function() {
+    Object.keys(conds).forEach(c => {
+        this[c + '_grid'].gridOptions.api.forEachNodeAfterFilter(node => {
+            node.setSelected(false);
+        });
+
+        this[c + '_grid'].gridOptions.api.setPinnedTopRowData([{item: "포함", key: "contain"}]);
+    });
+}
+
+SearchPrdcdRange.prototype.Choice = function() {
+    if(this.callback !== null){
+        this.callback(code, name);
+    } else {
+        let data = "";
+        let text = [];
+        Object.keys(conds).forEach(c => {
+            let rows = this[c + '_grid'].getSelectedRows();
+            rows.forEach(r => {
+                data += `&${c}[]=${r.code_id}`;
+            });
+            
+            let is_contain = this[c + '_grid'].gridOptions.api.getPinnedTopRow(0).data.item === "포함";
+            data += `&${c}_contain=${is_contain}`;
+            
+            if(rows.length > 0) text.push(conds[c] + "(" + rows.map(r => r.code_val).join(",") + ")" + (is_contain ? " 포함" : " 미포함"));
+        });
+        data += '&match='+this.isMatch;
+
+        if($('#prd_cd_range').length > 0){
+            $('#prd_cd_range').val(data);
+            $('#prd_cd_range_nm').val(text.join(" / "));
+        }
+    }
+
+    $('#SearchPrdcdRangeModal').modal('toggle');
+};
+
+let searchPrdcdRange = new SearchPrdcdRange();
+
 /**
  * 원부자재코드검색
  */
@@ -588,7 +693,6 @@ SearchPrdcd_sub.prototype.Choice = function() {
     $('#SearchPrdcd_sub_Modal').modal('toggle');
 };
 
-let searchPrdcd = new SearchPrdcd();
 let searchPrdcd_sub = new SearchPrdcd_sub();
 
 $( document ).ready(function() {
@@ -605,6 +709,11 @@ $( document ).ready(function() {
     // 상품코드 검색 클릭 이벤트 바인딩 및 콜백 사용
     $(".sch-prdcd").on("click", function() {
         searchPrdcd.Open();
+    });
+
+    // 상품옵션 범위검색 클릭 이벤트 바인딩 및 콜백 사용
+    $(".sch-prdcd-range").on("click", function() {
+        searchPrdcdRange.Open();
     });
 
     // 원부자재코드 검색 클릭 이벤트 바인딩 및 콜백 사용

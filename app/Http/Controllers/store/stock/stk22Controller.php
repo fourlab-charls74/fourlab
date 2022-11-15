@@ -53,6 +53,17 @@ class stk22Controller extends Controller
 			}
 			$where .= ")";
         }
+        // 상품옵션 범위검색
+        $range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+        parse_str($r['prd_cd_range'] ?? '', $prd_cd_range);
+        foreach ($range_opts as $opt) {
+            $rows = $prd_cd_range[$opt] ?? [];
+            if (count($rows) > 0) {
+                $in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+                $opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+                $where .= " and pc.$opt $in_query ($opt_join) ";
+            }
+        }
         if(isset($r['goods_stat'])) {
             $goods_stat = $r['goods_stat'];
             if(is_array($goods_stat)) {
@@ -137,6 +148,7 @@ class stk22Controller extends Controller
                 g.org_nm
             from goods g 
                 inner join product_stock p on g.goods_no = p.goods_no
+                inner join product_code pc on pc.prd_cd = p.prd_cd
                 left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
                 left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
                 left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
@@ -162,6 +174,7 @@ class stk22Controller extends Controller
                 select count(*) as total
                 from goods g 
                     inner join product_stock p on g.goods_no = p.goods_no
+                    inner join product_code pc on pc.prd_cd = p.prd_cd
                     left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
                     left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
                     left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id

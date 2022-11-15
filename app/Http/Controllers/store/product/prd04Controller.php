@@ -38,6 +38,7 @@ class prd04Controller extends Controller
 		$store_type	= $request->input("store_type", "");
 		$store_no	= $request->input("store_no", "");
 		$ext_store_qty	= $request->input("ext_store_qty", "");
+		$prd_cd_range_text = $request->input("prd_cd_range", '');
 
 		$ord		= $request->input('ord','desc');
 		$ord_field	= $request->input('ord_field','g.goods_no');
@@ -58,6 +59,17 @@ class prd04Controller extends Controller
 				$where .= " or pc.prd_cd = '" . Lib::quote($cd) . "' ";
 			}
 			$where .= ")";
+		}
+		// 상품옵션 범위검색
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				$in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc.$opt $in_query ($opt_join) ";
+			}
 		}
 
 		$goods_no	= preg_replace("/\s/",",",$goods_no);

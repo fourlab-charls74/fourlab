@@ -74,14 +74,15 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="goods_stat">상품상태</label>
-                            <div class="flax_box">
-                                <select name="goods_stat[]" id="goods_stat" class="form-control form-control-sm multi_select w-100" multiple>
-                                    <option value=''>전체</option>
-                                    @foreach ($goods_stats as $goods_stat)
-                                        <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
-                                    @endforeach
-                                </select>
+                            <label for="prd_cd">상품옵션 범위검색</label>
+                            <div class="form-inline">
+                                <div class="form-inline-inner input-box w-100">
+                                    <div class="form-inline inline_btn_box">
+                                        <input type='hidden' id="prd_cd_range" name='prd_cd_range'>
+                                        <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -111,6 +112,19 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
+                            <label for="goods_stat">상품상태</label>
+                            <div class="flax_box">
+                                <select name="goods_stat[]" id="goods_stat" class="form-control form-control-sm multi_select w-100" multiple>
+                                    <option value=''>전체</option>
+                                    @foreach ($goods_stats as $goods_stat)
+                                        <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
                             <label for="goods_nm_eng">상품명(영문)</label>
                             <div class="flax_box">
                                 <input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
@@ -131,6 +145,8 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="row search-area-ext d-none">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="">자료수/정렬</label>
