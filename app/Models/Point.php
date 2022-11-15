@@ -339,6 +339,93 @@ class Point
 	}
 
 	/*
+		Function: StoreOrder
+		매장주문 포인트 지급
+	*/
+	public function StoreOrder()
+	{
+		if(empty($this->user_id) || $this->user_id == "비회원") return false;
+
+        try {
+
+            $sql = "
+                select a.ord_opt_no, a.add_point 
+                from order_opt a
+                    inner join order_mst b on a.ord_no = b.ord_no
+                    inner join member c on b.user_id = c.user_id
+                where a.ord_no = '$this->ord_no'
+                    and a.add_point > 0
+                    and b.user_id <> ''
+            ";
+            $rows = DB::select($sql);
+
+            foreach ($rows as $row) {
+                $ord_opt_no = $row->ord_opt_no;
+                $point = $row->add_point;
+                $this->ord_opt_no = $ord_opt_no;
+
+				if ($point > 0) {
+		
+					$id = $this->user["id"];
+					$name = $this->user["name"];
+		
+					$point_status = "Y";
+					$msg = 'ORDER';
+					$kind = 'ORDER';
+					$expire_day = '';
+		
+					$state = $this->point_states["SAVE"];
+					$msg = (empty($this->point_msgs[$msg])) ? $msg : $this->point_msgs[$msg];
+					$kind = (empty($this->point_kinds[$kind])) ? $kind : $this->point_kinds[$kind];
+		
+					$cnt = DB::table('point_list')
+						->where("user_id",$this->user_id)
+						->where("ord_no",$this->ord_no)
+						->where("ord_opt_no",$this->ord_opt_no)
+						->count();
+
+					if ($cnt == 0) {
+						$expire_yn = '';
+						if (strlen($expire_day) == 8) {
+							$expire_yn = "N";
+						} else {
+							$expire_day = "";
+						}
+
+						DB::table('point_list')->insert([
+							'user_id' => $this->user_id,
+							'ord_no' => $this->ord_no,
+							'ord_opt_no' => $this->ord_opt_no,
+							'point_nm' => $msg,
+							'point' => $point,
+							'admin_id' => $id,
+							'admin_nm' => $name,
+							'point_st' => $state,
+							'point_kind' => $kind,
+							'point_status' => $point_status,
+							//'expire_day' => $expire_day,		사용안함
+							//'expire_yn' => $expire_yn,		사용안함
+							'regi_date' => DB::raw('now()'),
+							'point_date' => DB::raw('now()')
+						]);
+					}
+		
+					if ($point_status == "Y") {
+						DB::table('member')
+							->where("user_id", $this->user_id)
+							->update([
+								'point' => DB::raw("point + $point")
+							]);
+					}
+				}
+            }
+            return true;
+        } catch(Exception $e) {
+            return false;
+        }
+	}
+
+	/*
 		Function: Admin
 		관리자 포인트 관리
 
@@ -366,29 +453,6 @@ class Point
             return false;
         }
 	}
-
-	/*	
-		Function: ReturnPointToRefund
-		환불 시 사용한 포인트 환원
-	*/
-	public function ReturnPointToRefund($point)
-	{
-		$msg = 'REFUND';
-		$kind = 'REFUND';
-	
-		try {
-			DB::beginTransaction();
-
-			// 포인트 환원
-			$this->__Plus($point, $msg, $kind);	
-
-			DB::commit();
-			return true;
-		} catch(Exception $e) {
-            DB::rollBack();
-            return false;
-        }
-    }
 
 	/*
 		Function: DeleteUser
