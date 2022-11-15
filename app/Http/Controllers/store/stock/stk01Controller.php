@@ -227,6 +227,30 @@ class stk01Controller extends Controller
 		";
 		$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
+		if ($row->goods_no == '0') {
+			$sql = "
+				select 
+					p.prd_cd, p.prd_nm as goods_nm, p.style_no, p.tag_price as goods_sh
+					, p.price, p.wonga, p.type, p.com_id, c.com_nm, p.match_yn, p.use_yn
+					, pc.brand, b.brand_nm
+				from product p
+					inner join product_code pc on pc.prd_cd = p.prd_cd
+					left outer join company c on c.com_id = p.com_id
+					left outer join brand b on b.br_cd = pc.brand
+				where p.prd_cd = :prd_cd
+			";
+			$prd = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+			$row->goods_nm = $prd->goods_nm;
+			$row->style_no = $prd->style_no;
+			$row->goods_sh = $prd->goods_sh;
+			$row->wonga = $prd->wonga;
+			$row->price = $prd->price;
+			$row->com_id = $prd->com_id;
+			$row->com_nm = $prd->com_nm;
+			$row->brand = $prd->brand;
+			$row->brand_nm = $prd->brand_nm;
+		}
+
 		$storages = DB::table("storage")
 			->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')
 			->where('use_yn', '=', 'Y')
