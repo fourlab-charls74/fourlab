@@ -517,9 +517,13 @@ class stk03Controller extends Controller
         $ord_state = $data['ord_state']; // 주문상태
         $store_cd = $data['store_cd']; // 주문매장
         $store_nm = "본사"; // 주문매장명
+        $give_point = "N"; // 적립금지급 여부
         if ($store_cd != '') {
-            $row = DB::table('store')->select('store_nm')->where('store_cd', '=', $store_cd)->first();
-            if ($row != null) $store_nm = $row->store_nm;
+            $row = DB::table('store')->select('store_nm', 'point_in_yn')->where('store_cd', '=', $store_cd)->first();
+            if ($row != null) {
+                $store_nm = $row->store_nm;
+                $give_point = $row->point_in_yn;
+            }
         }
 
         $cart = $data['cart']; // 상품정보
@@ -564,7 +568,6 @@ class stk03Controller extends Controller
         $r_addr2 = $data['r_addr2']; // 수령 주소2
         $dlv_msg = $data['dlv_msg']; // 출고메시지
 
-        $give_point = $data['give_point']; // 적립금지급 여부
         $group_apply = $data['group_apply'];
         $dlv_cd = $data['dlv_cd']; // 출고완료시 택배업체
         $dlv_no = $data['dlv_no']; // 출고완료시 송장번호
@@ -1005,10 +1008,10 @@ class stk03Controller extends Controller
         #	포인트 지급
         #####################################################
         if ($ord_state != "1") {
-            if ($point_flag === true) {
+            if ($point_flag === true && $user_id != null) {
                 $point = new Point($user, $user_id);
                 $point->SetOrdNo($ord_no);
-                $point->Order($add_point);
+                $point->StoreOrder();
             }
         }
 
@@ -1867,7 +1870,7 @@ class stk03Controller extends Controller
                     , o.qty, o.wonga, o.price, o.dc_amt, o.point_amt, o.recv_amt, o.ord_state
                     , o.coupon_amt, o.com_id, c.pay_fee as com_rate, o.ord_kind, o.ord_type
                     , o.com_coupon_ratio, o.coupon_no, o.sales_com_fee, o.dlv_amt, o.store_cd
-                    , o.recv_amt as ref_amt, o.point_amt as refund_point_amt
+                    , o.recv_amt as ref_amt, o.point_amt as refund_point_amt, o.add_point
                     , (o.price * o.qty) as refund_price, m.ord_amt as refund_amt
                     , m.user_id
                 from order_opt o
@@ -1904,11 +1907,17 @@ class stk03Controller extends Controller
                 throw new Exception("환불처리 중 오류가 발생했습니다.");
             }
 
-            // 포인트 환원
+            // 포인트 환원 및 반납처리
             if($ord->user_id != null && $ord->refund_point_amt > 0) {
                 $point = new Point($user, $ord->user_id);
+                $point->SetOrdNo($ord->ord_no);
                 $point->SetOrdOptNo($ord->ord_opt_no);
-                $point->ReturnPointToRefund($ord->refund_point_amt);
+
+                // 포인트 환원
+                $point->Cancel($ord->refund_point_amt);
+                
+                // 포인트 반납(차감)
+                $point->Refund($ord->ord_opt_no, $ord->add_point, '61');
             }
 
             $msg = '매장환불처리가 완료되었습니다.';

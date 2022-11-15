@@ -255,7 +255,7 @@ class std02Controller extends Controller
 				'ostore_stock_yn'	=> $request->input('ostore_stock_yn'),
 				'sale_dist_yn'	=> $request->input('sale_dist_yn'),
 				'rt_yn'			=> $request->input('rt_yn'),
-				'point_in_yn'	=> $request->input('point_in_yn'),
+				'point_in_yn'	=> $request->input('point_in_yn', 'N'),
 				'point_out_yn'	=> $request->input('point_out_yn'),
 				'reg_date'		=> now(),
 				'mod_date'		=> now(),

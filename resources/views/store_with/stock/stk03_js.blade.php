@@ -104,7 +104,7 @@
                 if(res.code == '200') {
                     alert("저장되었습니다.");
                     opener.Search();
-                    document.location.href = '/head/order/ord01/' + res.ord_no;
+                    document.location.href = '/store/stock/stk03/order/' + res.ord_no;
                 } else {
                     alert("저장에 실패했습니다.\n실패 사유 : " + out_order_errors[res.code]);
                 }
