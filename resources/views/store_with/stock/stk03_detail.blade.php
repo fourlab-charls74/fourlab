@@ -240,7 +240,7 @@
                                             <tr>
                                                 <th>매장코드</th>
                                                 <td>
-                                                    <div class="txt_box">{{ @$store->store_cd }}</div>
+                                                    <div class="txt_box"><a href="javascript:void(0);" onclick="return openStorePopup('{{ @$store->store_cd }}');">{{ @$store->store_cd }}</a></div>
                                                 </td>
                                                 <th>매장명</th>
                                                 <td>
@@ -1484,6 +1484,7 @@
             if(res.data.code == 200) {
                 alert("매장환불처리가 정상적으로 완료되었습니다.");
                 location.reload();
+                window.opener.Search();
             } else {
                 alert(res.data.msg);
                 console.log(res);
@@ -1848,6 +1849,11 @@
             const url = `/head/order/ord01/${ord_no}/${ord_opt_no}/tax?tax_no=${tax_no}`;
 		    window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=900,height=700");
         }
+    }
+
+    function openStorePopup(store_cd) {
+        const url = `/store/standard/std02/show/${store_cd}`;
+        window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=900,height=700");
     }
 
     /*

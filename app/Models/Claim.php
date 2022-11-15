@@ -735,7 +735,7 @@ class Claim
 			'clm_reason' 		=> $claim['clm_reason'],
 			'refund_no' 		=> $this->ord_opt_no,
 			'ref_amt' 			=> $ord->ref_amt,
-			'refund_yn' 		=> 'Y',
+			'refund_yn' 		=> 'y',
 			'refund_price' 		=> $ord->refund_price,
 			'refund_point_amt' 	=> $ord->refund_point_amt,
 			'refund_coupon_amt' => 0, // 추후 쿠폰기능 추가 시 수정
