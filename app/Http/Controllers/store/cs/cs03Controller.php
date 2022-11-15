@@ -53,7 +53,12 @@ class cs03Controller extends Controller
 
 		$ord_field = $request->input("ord_field",'p1.rt');
 		$ord = $request->input('ord','desc');
-		$orderby = sprintf("order by p1.%s %s", $ord_field, $ord);
+		
+		if ($ord_field == 'prd_ord_date') {
+			$orderby = sprintf("order by p2.%s %s", $ord_field, $ord);
+		} else {
+			$orderby = sprintf("order by p1.%s %s", $ord_field, $ord);
+		}
 
 		$where = "";
 		$where1 = "";
@@ -61,7 +66,7 @@ class cs03Controller extends Controller
 			$prd_cd = explode(',', $prd_cd);
 			$where .= " and (1!=1";
 			foreach ($prd_cd as $cd) {
-				$where .= " or p1.prd_cd like '%" . Lib::quote($cd) . "%' ";
+				$where .= " or p1.prd_cd like '" . Lib::quote($cd) . "%' ";
 			}
 			$where .= ")";
 		}
@@ -115,7 +120,13 @@ class cs03Controller extends Controller
 				p1.qty * p1.price as amount,
 				p1.rt as rt,
 				p1.ut as ut,
-				m.name as user_nm
+				m.name as user_nm,
+				p1.req_id as req_id,
+				p1.req_rt as req_rt,
+				p1.prc_id as prc_id,
+				p1.prc_rt as prc_rt,
+				p1.fin_id as fin_id,
+				p1.fin_rt as fin_rt
 			from sproduct_stock_order_product p1
 				inner join sproduct_stock_order p2 on p1.prd_ord_no = p2.prd_ord_no
 				left outer join product p3 on p1.prd_cd = p3.prd_cd
@@ -185,6 +196,11 @@ class cs03Controller extends Controller
 							";
 							$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
+							$prc_sql = "
+								update sproduct_stock_order_product set prc_id = '$admin_nm' , prc_rt = '$now' where prd_ord_no = '$prd_ord_no'
+							";
+							DB::update($prc_sql);
+
 							if ($row != null) {
 								$in_qty = $row->in_qty + $change_qty;
 								$qty = $row->qty + $change_qty;
@@ -218,6 +234,11 @@ class cs03Controller extends Controller
 								";
 								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
+							$fin_sql = "
+								update sproduct_stock_order_product set fin_id = '$admin_nm' , fin_rt = '$now' where prd_ord_no = '$prd_ord_no'
+							";
+							DB::update($fin_sql);
+
 								$res = "
 									select 
 										a.goods_no as goods_no,
@@ -241,7 +262,7 @@ class cs03Controller extends Controller
 									$query = "
 										insert into 
 										product_stock_hst(goods_no, prd_cd, goods_opt, location_type, type, price, wonga, qty, stock_state_date, comment, rt, admin_id, admin_nm) 
-										values('$r->goods_no', '$prd_cd', '$r->goods_opt', 'STORAGE', '1', '$r->price', '$r->wonga', '$change_qty', '$stock_state_date', '창고입고', '$now', '$admin_id', '$admin_nm')
+										values('$r->goods_no', '$prd_cd', '$r->goods_opt', 'STORAGE', '1', '$r->price', '$r->wonga', '$change_qty', '$stock_state_date', '입고완료', '$now', '$admin_id', '$admin_nm')
 									";
 
 									DB::insert($query);
@@ -264,6 +285,16 @@ class cs03Controller extends Controller
 									";
 									DB::update($sql, ['in_qty' => $in_qty, 'qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
 								}
+
+								$prc_sql = "
+									update sproduct_stock_order_product set prc_id = '$admin_nm' , prc_rt = '$now' where prd_ord_no = '$prd_ord_no'
+								";
+								DB::update($prc_sql);
+
+								$fin_sql = "
+									update sproduct_stock_order_product set fin_id = '$admin_nm' , fin_rt = '$now' where prd_ord_no = '$prd_ord_no'
+								";
+								DB::update($fin_sql);
 
 								$sql = "
 									select qty, wqty from product_stock_storage
@@ -299,6 +330,11 @@ class cs03Controller extends Controller
 								DB::update($sql, ['out_qty' => $out_qty, 'qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
 							}
 
+							$prc_sql = "
+								update sproduct_stock_order_product set prc_id = '$admin_nm' , prc_rt = '$now' where prd_ord_no = '$prd_ord_no'
+							";
+							DB::update($prc_sql);
+
 							$sql = "
 								select wqty from product_stock_storage
 								where prd_cd = :prd_cd
@@ -321,6 +357,24 @@ class cs03Controller extends Controller
 								";
 								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
+								$prc_sql = "
+									update sproduct_stock_order_product set fin_id = '$admin_nm' , fin_rt = '$now' where prd_ord_no = '$prd_ord_no'
+								";
+								DB::update($prc_sql);
+								
+								$res = "
+									select 
+										a.goods_no as goods_no,
+										a.goods_opt as goods_opt,
+										b.price as price,
+										b.wonga as wonga
+									from product_code a
+										inner join product b on a.prd_cd = b.prd_cd
+									where a.prd_cd = '$prd_cd'
+								";
+
+								$r = DB::selectOne($res);
+
 								if ($row != null) {
 									$qty = $row->qty - $change_qty;
 
@@ -329,24 +383,11 @@ class cs03Controller extends Controller
 									";
 									DB::update($sql, ['qty' => $qty, 'prd_cd' => $prd_cd]);
 
-									$res = "
-										select 
-											a.goods_no as goods_no,
-											a.goods_opt as goods_opt,
-											b.price as price,
-											b.wonga as wonga
-										from product_code a
-											inner join product b on a.prd_cd = b.prd_cd
-										where a.prd_cd = '$prd_cd'
-									";
-									$r = DB::selectOne($res);
-
 									$query = "
 										insert into 
 										product_stock_hst(goods_no, prd_cd, goods_opt, location_type, type, price, wonga, qty, stock_state_date, comment, rt, admin_id, admin_nm) 
-										values('$r->goods_no', '$prd_cd', '$r->goods_opt', 'STORAGE', '11', '$r->price', '$r->wonga', '-$change_qty', '$stock_state_date', '창고반품', '$now', '$admin_id', '$admin_nm')
+										values('$r->goods_no', '$prd_cd', '$r->goods_opt', 'STORAGE', '11', '$r->price', '$r->wonga', '-$change_qty', '$stock_state_date', '반품완료', '$now', '$admin_id', '$admin_nm')
 									";
-
 									DB::insert($query);
 								}
 								break;
@@ -357,6 +398,19 @@ class cs03Controller extends Controller
 								";
 								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
+								$res = "
+									select 
+										a.goods_no as goods_no,
+										a.goods_opt as goods_opt,
+										b.price as price,
+										b.wonga as wonga
+									from product_code a
+										inner join product b on a.prd_cd = b.prd_cd
+									where a.prd_cd = '$prd_cd'
+								";
+
+								$r = DB::selectOne($res);
+
 								if ($row != null) {
 									$out_qty = $row->out_qty + $change_qty;
 									$qty = $row->qty - $change_qty;
@@ -366,6 +420,16 @@ class cs03Controller extends Controller
 									";
 									DB::update($sql, ['out_qty' => $out_qty, 'qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
 								}
+
+								$prc_sql = "
+									update sproduct_stock_order_product set prc_id = '$admin_nm' , prc_rt = '$now' where prd_ord_no = '$prd_ord_no'
+								";
+								DB::update($prc_sql);
+
+								$fin_sql = "
+									update sproduct_stock_order_product set fin_id = '$admin_nm' , fin_rt = '$now' where prd_ord_no = '$prd_ord_no'
+								";
+								DB::update($fin_sql);
 
 								$sql = "
 									select qty, wqty from product_stock_storage
@@ -380,6 +444,13 @@ class cs03Controller extends Controller
 										update product_stock_storage set qty = :qty, wqty = :wqty where prd_cd = :prd_cd
 									";
 									DB::update($sql, ['qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
+
+									$query = "
+										insert into 
+										product_stock_hst(goods_no, prd_cd, goods_opt, location_type, type, price, wonga, qty, stock_state_date, comment, rt, admin_id, admin_nm) 
+										values('$r->goods_no', '$prd_cd', '$r->goods_opt', 'STORAGE', '11', '$r->price', '$r->wonga', '-$change_qty', '$stock_state_date', '반품완료', '$now', '$admin_id', '$admin_nm')
+									";
+									DB::insert($query);
 								}
 								break;
 							}
@@ -488,7 +559,7 @@ class cs03Controller extends Controller
 			$prd_cd = explode(',', $prd_cd);
 			$where .= " and (1!=1";
 			foreach ($prd_cd as $cd) {
-				$where .= " or p.prd_cd like '%" . Lib::quote($cd) . "%' ";
+				$where .= " or p.prd_cd like '" . Lib::quote($cd) . "%' ";
 			}
 			$where .= ")";
 		}
@@ -577,6 +648,7 @@ class cs03Controller extends Controller
 		$prd_ord_date = str_replace("-", "", $prd_ord_date);
 		$prd_ord_type = $request->input('prd_ord_type');
 		$admin_id = Auth('head')->user()->id;
+		$admin_nm = Auth('head')->user()->name;
 
 		try {
 
@@ -628,9 +700,9 @@ class cs03Controller extends Controller
 							'qty' => $qty,
 							'price' => $price,
 							'wonga' => $wonga,
-							'rt' => now(),
+							'req_rt' => now(),
+							'req_id' => $admin_nm,
 							'ut' => now(),
-							'admin_id' => $admin_id
 						]
 					);
 
@@ -672,9 +744,9 @@ class cs03Controller extends Controller
 								'qty' => $qty,
 								'price' => $price,
 								'wonga' => $wonga,
-								'rt' => now(),
+								'req_rt' => now(),
+								'req_id' => $admin_nm,
 								'ut' => now(),
-								'admin_id' => $admin_id
 							]
 						);
 

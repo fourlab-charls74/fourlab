@@ -306,7 +306,7 @@
 		},
 		{
 			field: "prd_cd",
-			headerName: "상품코드",
+			headerName: "코드일련",
 			width: 140,
 		},
 		{

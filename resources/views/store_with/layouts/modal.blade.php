@@ -502,7 +502,7 @@
                             <div class="card-body">
                                 <div class="row_wrap mb-2">
                                     <div class="row">
-                                        <div class="col-lg-6 inner-td">
+                                        <div class="col-lg-4 inner-td">
                                             <div class="form-group">
                                                 <label style="min-width:80px;">상품코드</label>
                                                 <div class="flex_box">
@@ -510,11 +510,30 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-lg-6 inner-td">
+                                        <div class="col-lg-4 inner-td">
                                             <div class="form-group">
                                                 <label style="min-width:80px;">상품명</label>
                                                 <div class="flex_box">
                                                     <input type='text' class="form-control form-control-sm search-all" onkeypress="searchPrdcd.Search(event);" name='goods_nm' value=''>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 inner-td">
+                                            <div class="form-group">
+                                            <label for="formrow-email-input">매칭여부</label>
+                                                <div class="form-inline form-radio-box">
+                                                    <div class="custom-control custom-radio">
+                                                        <input type="radio" name="match_yn" value="A" id="match_all1" class="custom-control-input" >
+                                                        <label class="custom-control-label" for="match_all1">전체</label>
+                                                    </div>
+                                                    <div class="custom-control custom-radio">
+                                                        <input type="radio" name="match_yn" value="Y" id="match_y1" class="custom-control-input">
+                                                        <label class="custom-control-label" for="match_y1">Y</label>
+                                                    </div>
+                                                    <div class="custom-control custom-radio">
+                                                        <input type="radio" name="match_yn" value="N" id="match_n1" class="custom-control-input" checked>
+                                                        <label class="custom-control-label" for="match_n1">N</label>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

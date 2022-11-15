@@ -42,10 +42,14 @@ class prd04Controller extends Controller
 		$ord		= $request->input('ord','desc');
 		$ord_field	= $request->input('ord_field','g.goods_no');
 		$orderby	= sprintf("order by %s %s", $ord_field, $ord);
+		$match_yn = $request->input('match_yn1');
 
 		$where		= "";
 		$in_store_sql	= "";
 		$store_qty_sql	= "(ps.qty - ps.wqty)";
+
+		if($match_yn == 'Y') 	$where .= " and p.match_yn = 'Y'";
+		if($match_yn == 'N') 	$where .= " and p.match_yn = 'N'";
 
 		if( $prd_cd != "" ){
 			$prd_cd = explode(',', $prd_cd);
@@ -158,6 +162,7 @@ class prd04Controller extends Controller
 				, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
 				, if(pc.goods_no = 0, p.price, g.price) as price
 				, if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
+				,p.match_yn
 			from product_code pc
 			inner join product_stock ps on pc.prd_cd = ps.prd_cd
 			$in_store_sql

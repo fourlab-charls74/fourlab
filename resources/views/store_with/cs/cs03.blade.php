@@ -137,7 +137,7 @@
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
-                                        <option value="rt">등록일자</option>
+                                        <option value="req_rt">등록일자</option>
                                         <option value="ut">수정일자</option>
                                         <option value="prd_ord_date">입고/반품일</option>
                                     </select>
@@ -301,8 +301,26 @@
             width: 60,
             type: 'currencyType'
         },
+        // {
+        //     field: "user_nm",
+        //     headerName: "아이디",
+        //     width: 96
+        // },
+        // {
+        //     field: "rt",
+        //     headerName: "등록일자",
+        //     width: 110,
+        //     cellStyle: {
+        //         "line-height": "30px"
+        //     }
+        // },
         {
-            field: "rt",
+            field: "req_id",
+            headerName: "등록",
+            width: 96
+        },
+        {
+            field: "req_rt",
             headerName: "등록일자",
             width: 110,
             cellStyle: {
@@ -310,17 +328,30 @@
             }
         },
         {
-            field: "ut",
-            headerName: "수정일자",
+            field: "prc_id",
+            headerName: "처리중",
+            width: 96
+        },
+        {
+            field: "prc_rt",
+            headerName: "처리중일자",
             width: 110,
             cellStyle: {
                 "line-height": "30px"
             }
         },
         {
-            field: "user_nm",
-            headerName: "입고자",
+            field: "fin_id",
+            headerName: "완료",
             width: 96
+        },
+        {
+            field: "fin_rt",
+            headerName: "완료일자",
+            width: 110,
+            cellStyle: {
+                "line-height": "30px"
+            }
         },
         {
             width: "auto"

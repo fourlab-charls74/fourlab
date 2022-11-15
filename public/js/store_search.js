@@ -325,6 +325,7 @@ SearchPrdcd.prototype.SetGrid = function(divId){
             { field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {"text-align": "center"} },
             { field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"} },
             { field: "prd_nm", headerName: "상품명", width: 400 },
+            { field: "prd_cd1", headerName: "코드일련", width: 120, cellStyle: {"text-align": "center"} },
             { field: "color", headerName: "컬러", width: 60, cellStyle: {"text-align": "center"} },
             { field: "size", headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"} },
             { field: "match_yn", headerName: '매칭여부', cellClass: 'hd-grid-code', width: 60},
@@ -338,8 +339,10 @@ SearchPrdcd.prototype.SetGrid = function(divId){
             { field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"} },
             { field: "goods_nm", headerName: "상품명", width: 400 },
             { field: "goods_opt", headerName: "옵션", width: 300 },
+            { field: "prd_cd1", headerName: "코드일련", width: 120, cellStyle: {"text-align": "center"} },
             { field: "color", headerName: "컬러", width: 60, cellStyle: {"text-align": "center"} },
             { field: "size", headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"} },
+            { field: "match_yn", headerName: '매칭여부', cellClass: 'hd-grid-code', width: 60},
             { width: "auto" }
             );
     }
