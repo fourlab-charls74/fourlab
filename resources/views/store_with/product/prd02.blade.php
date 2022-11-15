@@ -164,7 +164,6 @@
 								<div class="form-inline">
 									<div class="form-inline-inner input_box" style="width:24%;">
 										<select name="limit" class="form-control form-control-sm">
-											<option value="100">100</option>
 											<option value="500">500</option>
 											<option value="1000">1000</option>
 											<option value="2000">2000</option>
@@ -173,8 +172,11 @@
 									<span class="text_line">/</span>
 									<div class="form-inline-inner input_box" style="width:45%;">
 										<select name="ord_field" class="form-control form-control-sm">
-											<option value="goods_no">상품번호</option>
-											<option value="goods_nm">상품명</option>
+											<option value="g.reg_dm">등록일</option>
+											<option value="g.upd_dm">수정일</option>
+											<option value="g.goods_no">상품번호</option>
+											<option value="g.goods_nm">상품명</option>
+											<option value="s.prd_cd">상품코드</option>
 										</select>
 									</div>
 									<div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -184,6 +186,50 @@
 										</div>
 										<input type="radio" name="ord" id="sort_desc" value="desc" checked="">
 										<input type="radio" name="ord" id="sort_asc" value="asc">
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-lg-4 inner-td">
+							<div class="form-group">
+								<label for="store_type">매장구분</label>
+								<div class="flex_box">
+									<select name='store_type' class="form-control form-control-sm">
+										<option value=''>전체</option>
+										@foreach ($store_types as $store_type)
+											<option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
+										@endforeach
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-4 inner-td">
+							<div class="form-group">
+								<label>매장명</label>
+								<div class="form-inline inline_btn_box">
+									<input type='hidden' id="store_nm" name="store_nm">
+									<select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select" multiple></select>
+									<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-4 inner-td">
+							<div class="form-group">
+							<label for="formrow-email-input">매칭여부</label>
+								<div class="form-inline form-radio-box">
+									<div class="custom-control custom-radio">
+										<input type="radio" name="match_yn1" value="A" id="match_all1" class="custom-control-input" checked>
+										<label class="custom-control-label" for="match_all1">전체</label>
+									</div>
+									<div class="custom-control custom-radio">
+										<input type="radio" name="match_yn1" value="Y" id="match_y1" class="custom-control-input">
+										<label class="custom-control-label" for="match_y1">Y</label>
+									</div>
+									<div class="custom-control custom-radio">
+										<input type="radio" name="match_yn1" value="N" id="match_n1" class="custom-control-input">
+										<label class="custom-control-label" for="match_n1">N</label>
 									</div>
 								</div>
 							</div>
@@ -297,7 +343,9 @@
 			{field: "org_nm", headerName: "원산지", cellStyle: {"line-height": "30px"}},
 			{field: "com_nm", headerName: "업체", width:84, cellStyle: {"line-height": "30px"}},
 			{field: "reg_dm", headerName: "등록일자", width:110, cellStyle: {"line-height": "30px"}},
-			{field: "upd_dm", headerName: "수정일자", width:110, cellStyle: {"line-height": "30px"}}
+			{field: "upd_dm", headerName: "수정일자", width:110, cellStyle: {"line-height": "30px"}},
+			{field: "match_yn", headerName: "매칭여부", width:60, hide:true}
+
 		];
 
 		const pApp = new App('', {
@@ -504,5 +552,6 @@
 				});
 			}
 		}
+
 	</script>
 @stop

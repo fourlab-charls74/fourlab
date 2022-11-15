@@ -125,7 +125,27 @@
 						</div>
 					</div>
 				</div>
-
+				<div class="row">
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+						<label for="formrow-email-input">매칭여부</label>
+							<div class="form-inline form-radio-box">
+								<div class="custom-control custom-radio">
+									<input type="radio" name="match_yn1" value="A" id="match_all" class="custom-control-input" checked>
+									<label class="custom-control-label" for="match_all">전체</label>
+								</div>
+								<div class="custom-control custom-radio">
+									<input type="radio" name="match_yn1" value="Y" id="match_y" class="custom-control-input">
+									<label class="custom-control-label" for="match_y">Y</label>
+								</div>
+								<div class="custom-control custom-radio">
+									<input type="radio" name="match_yn1" value="N" id="match_n" class="custom-control-input">
+									<label class="custom-control-label" for="match_n">N</label>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 		<div class="resul_btn_wrap mb-3">
@@ -206,6 +226,8 @@ const columns = [
 	{field: "goods_sh", headerName: "정상가", type: 'currencyType', cellStyle: {"line-height": "30px"}},
 	{field: "price", headerName: "판매가", type: 'currencyType', width:60, cellStyle: {"line-height": "30px"}},
 	{field: "wonga", headerName: "원가", type: 'currencyType', width:60, cellStyle: {"line-height": "30px"}},
+	{field: "match_yn", headerName: "매칭여부", width:60, hide:true},
+
 	{field: "", headerName: "", width:"auto"}
 ];
 

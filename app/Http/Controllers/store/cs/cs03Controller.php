@@ -197,7 +197,7 @@ class cs03Controller extends Controller
 							$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
 							$prc_sql = "
-								update sproduct_stock_order_product set prc_id = '$admin_nm' , prc_rt = '$now' where prd_cd = '$prd_cd' and prd_ord_no = '$prd_ord_no'
+								update sproduct_stock_order_product set prc_id = '$admin_nm' , prc_rt = '$now' where prd_ord_no = '$prd_ord_no'
 							";
 							DB::update($prc_sql);
 
@@ -235,7 +235,7 @@ class cs03Controller extends Controller
 								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
 							$fin_sql = "
-								update sproduct_stock_order_product set fin_id = '$admin_nm' , fin_rt = '$now' where prd_cd = '$prd_cd' and prd_ord_no = '$prd_ord_no'
+								update sproduct_stock_order_product set fin_id = '$admin_nm' , fin_rt = '$now' where prd_ord_no = '$prd_ord_no'
 							";
 							DB::update($fin_sql);
 
@@ -286,6 +286,16 @@ class cs03Controller extends Controller
 									DB::update($sql, ['in_qty' => $in_qty, 'qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
 								}
 
+								$prc_sql = "
+									update sproduct_stock_order_product set prc_id = '$admin_nm' , prc_rt = '$now' where prd_ord_no = '$prd_ord_no'
+								";
+								DB::update($prc_sql);
+
+								$fin_sql = "
+									update sproduct_stock_order_product set fin_id = '$admin_nm' , fin_rt = '$now' where prd_ord_no = '$prd_ord_no'
+								";
+								DB::update($fin_sql);
+
 								$sql = "
 									select qty, wqty from product_stock_storage
 									where prd_cd = :prd_cd
@@ -321,7 +331,7 @@ class cs03Controller extends Controller
 							}
 
 							$prc_sql = "
-								update sproduct_stock_order_product set prc_id = '$admin_nm' , prc_rt = '$now' where prd_cd = '$prd_cd' and prd_ord_no = '$prd_ord_no'
+								update sproduct_stock_order_product set prc_id = '$admin_nm' , prc_rt = '$now' where prd_ord_no = '$prd_ord_no'
 							";
 							DB::update($prc_sql);
 
@@ -348,7 +358,7 @@ class cs03Controller extends Controller
 								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
 								$prc_sql = "
-									update sproduct_stock_order_product set fin_id = '$admin_nm' , fin_rt = '$now' where prd_cd = '$prd_cd' and prd_ord_no = '$prd_ord_no'
+									update sproduct_stock_order_product set fin_id = '$admin_nm' , fin_rt = '$now' where prd_ord_no = '$prd_ord_no'
 								";
 								DB::update($prc_sql);
 								
@@ -410,6 +420,16 @@ class cs03Controller extends Controller
 									";
 									DB::update($sql, ['out_qty' => $out_qty, 'qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
 								}
+
+								$prc_sql = "
+									update sproduct_stock_order_product set prc_id = '$admin_nm' , prc_rt = '$now' where prd_ord_no = '$prd_ord_no'
+								";
+								DB::update($prc_sql);
+
+								$fin_sql = "
+									update sproduct_stock_order_product set fin_id = '$admin_nm' , fin_rt = '$now' where prd_ord_no = '$prd_ord_no'
+								";
+								DB::update($fin_sql);
 
 								$sql = "
 									select qty, wqty from product_stock_storage

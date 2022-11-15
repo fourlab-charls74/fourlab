@@ -40,6 +40,7 @@ class prd02Controller extends Controller
 			'style_no'		=> "",
 			'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
 			// 'com_types'     => SLib::getCodes('G_COM_TYPE'),
+			'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
 			'items'			=> SLib::getItems(),
 			'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
 			'is_unlimiteds'	=> SLib::getCodes('G_IS_UNLIMITED'),
@@ -64,6 +65,9 @@ class prd02Controller extends Controller
 		$goods_nm	= $request->input("goods_nm");
 		$goods_nm_eng	= $request->input("goods_nm_eng");
 
+		$store_type	= $request->input("store_type", "");
+		$store_no	= $request->input("store_no", "");
+
 		$prd_cd		= $request->input("prd_cd", "");
 		$com_id		= $request->input("com_cd");
 
@@ -74,7 +78,10 @@ class prd02Controller extends Controller
 		$limit		= $request->input("limit",100);
 		$ord		= $request->input('ord','desc');
 		$ord_field	= $request->input('ord_field','g.goods_no');
+
 		$orderby	= sprintf("order by %s %s", $ord_field, $ord);
+		$in_store_sql = "";
+		$match_yn = $request->input('match_yn1');
 
 		$where		= "";
 		if($prd_cd != "") {
@@ -85,6 +92,8 @@ class prd02Controller extends Controller
 			}
 			$where .= ")";
 		}
+		if($match_yn == 'Y') 	$where .= " and p.match_yn = 'Y'";
+		if($match_yn == 'N') 	$where .= " and p.match_yn = 'N'";
 		if($style_no != "")		$where .= " and g.style_no like '" . Lib::quote($style_no) . "%' ";
 		if($item != "")			$where .= " and g.opt_kind_cd = '" . Lib::quote($item) . "' ";
 		if($brand_cd != "") {
@@ -100,6 +109,29 @@ class prd02Controller extends Controller
 
 		if($head_desc != "")	$where .= " and g.head_desc like '%" . Lib::quote($head_desc) . "%' ";
 		if($ad_desc != "")		$where .= " and g.ad_desc like '%" . Lib::quote($ad_desc) . "%' ";
+
+		if( $store_no != "" ){
+			$in_store_sql	= " inner join product_stock_store pss on s.prd_cd = pss.prd_cd ";
+
+			$where	.= " and (1!=1";
+			foreach($store_no as $store_cd) {
+				$where .= " or pss.store_cd = '" . Lib::quote($store_cd) . "' ";
+			}
+			$where	.= ")";
+		}
+
+		if( $store_no == "" && $store_type != "" ){
+			$in_store_sql	= " inner join product_stock_store pss on s.prd_cd = pss.prd_cd ";
+
+			$sql	= " select store_cd from store where store_type = :store_type and use_yn = 'Y' ";
+			$result = DB::select($sql,['store_type' => $store_type]);
+
+			$where	.= " and (1!=1";
+			foreach($result as $row){
+				$where .= " or pss.store_cd = '" . Lib::quote($row->store_cd) . "' ";
+			}
+			$where	.= ")";
+		}
 
 		if( is_array($goods_stat)) {
 			if (count($goods_stat) == 1 && $goods_stat[0] != "") {
@@ -142,7 +174,9 @@ class prd02Controller extends Controller
 				"
 				select count(*) as total
 				from goods g inner join product_stock s on g.goods_no = s.goods_no 
+				$in_store_sql
 				left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
+				left outer join product p on p.prd_cd = s.prd_cd
 				where 1=1 
 					-- g.com_id = :com_id 
 					$where
@@ -211,7 +245,10 @@ class prd02Controller extends Controller
 				, g.goods_type as goods_type_cd
 				, com.com_type as com_type_d
 				, s.prd_cd , s.goods_opt
+				, p.match_yn
 			from goods g inner join product_stock s on g.goods_no = s.goods_no
+				$in_store_sql
+				left outer join product p on p.prd_cd = s.prd_cd
 				left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
 				left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
 				left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
@@ -383,24 +420,17 @@ class prd02Controller extends Controller
 
 			union all
 
-				select
-					p.prd_cd, p.prd_nm, p.style_no, '$goods_no' as goods_no, concat(c.code_val, '^',d.code_val2) as goods_opt
-					, pc.color, pc.size, pc.seq, 'Y' as is_product
-				from product p
-					inner join product_code pc on pc.prd_cd = p.prd_cd
-					inner join code c on pc.color = c.code_id and c.code_kind_cd = 'PRD_CD_COLOR'
-					inner join code d on pc.size = d.code_id and d.code_kind_cd = 'PRD_CD_SIZE_MATCH'
-				where p.prd_cd like '$prd_cd%'
-				order by seq desc
-			";
+			select
+				p.prd_cd, p.prd_nm, p.style_no, '$goods_no' as goods_no, concat(c.code_val, '^',d.code_val2) as goods_opt
+				, pc.color, pc.size, pc.seq, 'Y' as is_product
+			from product p
+				inner join product_code pc on pc.prd_cd = p.prd_cd
+				inner join code c on pc.color = c.code_id and c.code_kind_cd = 'PRD_CD_COLOR'
+				inner join code d on pc.size = d.code_id and d.code_kind_cd = 'PRD_CD_SIZE_MATCH'
+			where p.prd_cd like '$prd_cd%'
+			order by seq desc
+		";
 			
-			// select
-			// 	c.prd_cd, b.goods_nm, b.style_no, b.goods_no, a.goods_opt, c.color, c.size, c.seq, 'Y' as is_product
-			// from goods_summary a
-			// 	inner join goods b on b.goods_no = a.goods_no
-			// 	left outer join product_code c on c.goods_no = a.goods_no and c.goods_opt = a.goods_opt
-			// where c.prd_cd = '$prd_cd'
-
 		$result = DB::select($sql);
 
 		$goods_opt_counts = collect($result)->groupBy('goods_opt')->map(function($row) {

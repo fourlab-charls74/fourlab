@@ -806,6 +806,9 @@ class goods extends Controller
         $opt_contain = $request->input('opt_contain', '');
         $match = $request->input('match');
 
+        $match_yn = $request->input('match_yn');
+
+
         $page = $request->input('page', 1);
         $where = "";
 
@@ -819,7 +822,16 @@ class goods extends Controller
 
         //상품 매칭
         if($match != 'false') $where .= "and pc.type = 'N'";
-        if($match != 'false') $where .= "and p.match_yn = 'N'";
+
+        if($match != 'false') {
+            if($match_yn == 'Y') 	$where .= " and p.match_yn = 'Y'";
+		    if($match_yn == 'N') 	$where .= " and p.match_yn = 'N'";
+        }
+
+        if($match_yn == 'Y') 	$where .= " and p.match_yn = 'Y'";
+		if($match_yn == 'N') 	$where .= " and p.match_yn = 'N'";
+
+       
         
 
         foreach(self::Conds as $key => $value)
@@ -846,17 +858,28 @@ class goods extends Controller
         $total = 0;
         $page_cnt = 0;
 
+
+        $sql = "
+            select 
+                *
+            from product_code
+            where prd_cd = '$prd_cd'
+        ";
+
         if ($match == 'false') {
             $sql = "
-                select pc.prd_cd, pc.goods_no, g.goods_nm, pc.goods_opt, pc.color, pc.size
+                select pc.prd_cd, pc.goods_no, g.goods_nm, pc.goods_opt,concat(pc.brand,pc.year, pc.season, pc.gender, pc.item, pc.opt, pc.seq) as prd_cd1,
+                pc.color, pc.size, p.match_yn
                 from product_code pc
                     inner join goods g on g.goods_no = pc.goods_no
+                    inner join product p on pc.prd_cd = p.prd_cd
                 where 1=1 $where
             ";
         } else {
             // 상품매칭
             $sql = "
-                select pc.prd_cd, p.prd_nm, pc.goods_no, pc.goods_opt, pc.color, pc.size, p.match_yn, pc.rt
+                select pc.prd_cd, p.prd_nm, pc.goods_no, pc.goods_opt, concat(pc.brand,pc.year, pc.season, pc.gender, pc.item, pc.opt, pc.seq) as prd_cd1,
+                pc.color, pc.size, p.match_yn, pc.rt
                 from product_code pc
                     inner join product p on pc.prd_cd = p.prd_cd
                 where 1=1 $where

@@ -301,19 +301,19 @@
             width: 60,
             type: 'currencyType'
         },
-        {
-            field: "user_nm",
-            headerName: "아이디",
-            width: 96
-        },
-        {
-            field: "rt",
-            headerName: "등록일자",
-            width: 110,
-            cellStyle: {
-                "line-height": "30px"
-            }
-        },
+        // {
+        //     field: "user_nm",
+        //     headerName: "아이디",
+        //     width: 96
+        // },
+        // {
+        //     field: "rt",
+        //     headerName: "등록일자",
+        //     width: 110,
+        //     cellStyle: {
+        //         "line-height": "30px"
+        //     }
+        // },
         {
             field: "req_id",
             headerName: "등록",
