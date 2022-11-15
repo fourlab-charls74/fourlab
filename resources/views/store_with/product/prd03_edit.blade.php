@@ -183,6 +183,18 @@
 	let added_base64_image = "";
 
 	function save() {
+
+		let img = document.getElementById('img_show');
+		let img_ck = "";
+		if (img == null) {
+			img_ck = "img_null";
+		} else {
+			img_ck = "img_not_null";
+		}
+
+
+		console.log(img);
+
 		if (!validation()) return;
 		axios({
 			url: '/store/product/prd03/edit',
@@ -195,8 +207,7 @@
 				image: added_base64_image,
 				unit: document.f1.unit.value,
 				seq: 01, // 단일 이미지로 일단 처리 - 01로 고정
-				img: document.getElementById('img_show').src
-				
+				img: img_ck
 			},
 		}).then(function(res) {
 			if (res.data.code === 200) {
@@ -226,6 +237,16 @@
 			alert("수정 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
 		}
 	}
+
+	$(document).ready(function() {
+		let img_src = $("#img_show").attr("src");
+		
+		if (img_src == "") {
+			document.getElementById('img_show_div').style.display = 'none';
+		} else {
+			document.getElementById('img_show_div').style.display = '';
+		}
+	});
 
 	/**
 	 * 이미지 - 매장관리 구현된 이미지 참고하여 작업
@@ -334,7 +355,7 @@
 			return div;
 		}
 	})('img_div', 'btnAdd')
-
+	
 	function delete_img(prd_cd, seq) {
 		let img_show = document.querySelectorAll("#img_show_div");
 		console.log(img_show);

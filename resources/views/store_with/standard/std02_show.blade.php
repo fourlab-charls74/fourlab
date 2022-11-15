@@ -113,7 +113,7 @@
 													</select>
 												</div>
 											</td>
-											<th class="required">매장등급</th>
+											<th class="required">중간관리 수수료</th>
 											<td>
 												<div class="flex_box">
 													<select name='grade_cd' class="form-control form-control-sm">

@@ -49,7 +49,7 @@ class stk18Controller extends Controller
             $prd_cd = explode(',', $req['prd_cd_sub']);
             $where .= " and (1!=1";
             foreach ($prd_cd as $cd) {
-                $where .= " or p.prd_cd like '%" . Lib::quote($cd) . "%' ";
+                $where .= " or p.prd_cd like '" . Lib::quote($cd) . "%' ";
             }
             $where .= ")";
         }

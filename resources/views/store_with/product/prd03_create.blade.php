@@ -148,7 +148,7 @@
 													<select name='size' class="form-control form-control-sm">
 														<option value=''>선택</option>
 														@foreach ($sizes as $size)
-														<option value='{{ $size->code_id }}'>{{ $size->code_id }} : {{ $size->code_val }}</option>
+														<option value='{{ $size->code_id }}'>{{ $size->code_val }} : {{ $size->code_val2 }}</option>
 														@endforeach
 													</select>
 												</div>
@@ -295,7 +295,7 @@
 		},
 		{
 			field: "prd_cd",
-			headerName: "원부자재코드",
+			headerName: "원부자재코드일련",
 			width: 140,
 		},
 		{

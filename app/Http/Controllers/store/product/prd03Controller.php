@@ -77,7 +77,7 @@ class prd03Controller extends Controller
 			$prd_cd = explode(',', $prd_cd);
 			$where .= " and (1!=1";
 			foreach($prd_cd as $cd) {
-				$where .= " or p.prd_cd like '%" . Lib::quote($cd) . "%' ";
+				$where .= " or p.prd_cd like '" . Lib::quote($cd) . "%' ";
 			}
 			$where .= ")";
 		}
@@ -409,6 +409,7 @@ class prd03Controller extends Controller
 		$admin_id = Auth('head')->user()->id;
         $data = $request->input();
 
+
 		try {
 
 			DB::beginTransaction();
@@ -421,6 +422,7 @@ class prd03Controller extends Controller
 			$unit = $data['unit'];
 			$seq = $data['seq'];
 
+			$img = $data['img'];
 
 			/**
 			 * 원부자재 상품 이미지 수정
@@ -450,16 +452,26 @@ class prd03Controller extends Controller
 				/**
 				 * 기존에 저장된 이미지가 없는 경우 이미지 관련 insert 처리
 				 */
+				if ($img == "img_not_null") {
 					$img_url = ULib::uploadBase64img($save_path, $base64_src, $img_name);
-	
+
+					DB::table('product_image')->insert([
+							'prd_cd' => $prd_cd,
+							'seq' => $seq,
+							'img_url' => $img_url,
+							'rt' => now(),
+							'ut' => now(),
+							'admin_id'	=> $admin_id
+						]);
+				} else {
 					DB::table('product_image')->insert([
 						'prd_cd' => $prd_cd,
 						'seq' => $seq,
-						'img_url' => $img_url,
 						'rt' => now(),
 						'ut' => now(),
 						'admin_id'	=> $admin_id
 					]);
+				}
 
 			} else {
 				/**
