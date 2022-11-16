@@ -78,13 +78,24 @@ class cs01Controller extends Controller {
 				b.currency_unit,b.exchange_rate,b.custom_amt, b.custom_tax,b.custom_tax_rate,
 				s.qty, s.total_cost,
 				ifnull((select sum(qty) from stock_product_buy_order where stock_no = b.stock_no),0) as buy_order_qty,
-				u.name, b.rt, s.item_cds as item_cds
-			from stock_order b
+				s.item_cds as item_cds,
+			    b.req_id,
+				(select name from mgr_user where id = b.req_id) as req_nm, 
+                b.req_rt,
+                b.prc_id,
+				(select name from mgr_user where id = b.prc_id) as prc_nm, 
+                b.prc_rt, 
+                b.fin_id, 
+				(select name from mgr_user where id = b.fin_id) as fin_nm, 
+                b.fin_rt,
+				(select name from mgr_user where id = b.rej_id) as rej_nm, 
+                b.rej_rt
+			from product_stock_order b
 				inner join (
 					select p.stock_no,group_concat(distinct p.item) as item,
 					group_concat(distinct o.opt_kind_cd) as item_cds,
 					sum(p.qty) as qty, sum(cost * qty) as total_cost
-					from stock_order b inner join stock_product p on b.stock_no = p.stock_no
+					from product_stock_order b inner join product_stock_order_product p on b.stock_no = p.stock_no
 						left outer join opt o on p.item = o.opt_kind_nm
 					$where
 					group by p.stock_no
@@ -92,9 +103,8 @@ class cs01Controller extends Controller {
 				inner join company c on c.com_id = b.com_id
 				left outer join code ar on ar.code_kind_cd = 'g_buy_order_ar_type' and ar.code_id = b.area_type
 				left outer join code cd on cd.code_kind_cd = 'g_order_stock_state' and cd.code_id = b.state
-				left outer join mgr_user u on b.id = u.id
 			$where2
-			order by b.stock_date desc, b.rt desc
+			order by b.stock_date desc, b.req_rt desc
 		";
 
 		$rows = DB::select($sql);
@@ -135,8 +145,8 @@ class cs01Controller extends Controller {
 				select
 					b.invoice_no, b.stock_date, b.stock_type, b.area_type,
 					b.com_id, c.com_nm, b.item, b.currency_unit, b.exchange_rate,
-					b.custom_amt,b.custom_tax,b.custom_tax_rate, b.state, b.loc,b.opts, b.id
-				from stock_order b
+					b.custom_amt,b.custom_tax,b.custom_tax_rate, b.state, b.loc,b.opts, b.req_id
+				from product_stock_order b
 					inner join company c on c.com_id = b.com_id
 				where stock_no = '$stock_no'
 			";
@@ -344,8 +354,7 @@ class cs01Controller extends Controller {
 				$invoice_no = $this->getInvoiceNo($com_id);
 			}
 			// 등록
-
-			$stock_no = DB::table('stock_order')->insertGetId([
+			$params = [
 				'invoice_no'	=> $invoice_no, 
 				'stock_date'	=> $stock_date,
 				'stock_type'	=> $stock_type,
@@ -360,10 +369,25 @@ class cs01Controller extends Controller {
 				'state'			=> $state,
 				'loc'			=> $loc,
 				'opts'			=> $opts,
-				'id'			=> $id,
-				'rt'			=> now(),
+				'req_id'		=> $id,
+				'req_rt'		=> now(),
 				'ut'			=> now()
-			]);
+			];
+
+			if ($state >= 20) {
+				$params = array_merge($params, [
+					'prc_id'		=> $id,
+					'prc_rt'		=> now(),
+				]);
+			}
+			if ($state >= 30) {
+				$params = array_merge($params, [
+					'fin_id'		=> $id,
+					'fin_rt'		=> now(),
+				]);
+			}
+
+			$stock_no = DB::table('product_stock_order')->insertGetId($params);
 
 			$this->saveStockProduct(
 				"E", $stock_no, $invoice_no, $state, $loc, $stock_date, $com_id,
@@ -428,7 +452,7 @@ class cs01Controller extends Controller {
 		$opt_cnt 	= 0;
 
 		$sql = "
-			select state from stock_order
+			select state from product_stock_order
 			where stock_no = '$stock_no'
 		";
 
@@ -437,8 +461,17 @@ class cs01Controller extends Controller {
 		try {
 			if ($row->state < 30) { // 입고취소: -10, 입고대기: 10, 입고처리중: 20, 입고완료: 30
 				DB::beginTransaction();
+
+				$prc_set = "";
+				if ($row->state == 10 && $state >= 20) {
+					$prc_set = " prc_id = '$id', prc_rt = now(), ";
+				}
+				if ($row->state == 20 && $state >= 30) {
+					$prc_set = " fin_id = '$id', fin_rt = now(), ";
+				}
+
 				$sql = "
-					update stock_order set
+					update product_stock_order set
 						invoice_no = '${invoice_no}',
 						stock_date = '${stock_date}',
 						area_type = '${area_type}',
@@ -452,7 +485,7 @@ class cs01Controller extends Controller {
 						state = '${state}',
 						loc = '${loc}',
 						opts = '${opts}',
-						id = '${id}',
+						$prc_set
 						ut = now()
 					where stock_no = '$stock_no'
 				";
@@ -481,7 +514,7 @@ class cs01Controller extends Controller {
 	 */
 	public function delCmd($stock_no) { // 입고번호
 		$sql = "
-			select state from stock_order
+			select state from product_stock_order
 			where stock_no = '$stock_no'
 		";
 		$row = DB::selectOne($sql);
@@ -490,12 +523,12 @@ class cs01Controller extends Controller {
 			try {
 				DB::beginTransaction();
 				$sql = "
-					delete from stock_order
+					delete from product_stock_order
 					where stock_no = :stock_no
 				";
 				DB::delete($sql, ['stock_no' => $stock_no]);
 				$sql = "
-					delete from stock_product
+					delete from product_stock_order_product
 					where stock_no = :stock_no
 				";
 				DB::delete($sql, ['stock_no' => $stock_no]);
@@ -515,7 +548,7 @@ class cs01Controller extends Controller {
 	public function cancelCmd($stock_no) { // 입고번호
 
 		$sql = "
-			select * from stock_order where stock_no = '$stock_no' and state = 30
+			select * from product_stock_order where stock_no = '$stock_no' and state = 30
 		";
 
 		$row = DB::selectOne($sql);
@@ -544,7 +577,7 @@ class cs01Controller extends Controller {
 
 			$sql = "
 				select stock_no,invoice_no,goods_no,prd_cd,opt_kor as opt,unit_cost,cost_notax,qty
-				from stock_product
+				from product_stock_order_product
 				where stock_no = '$stock_no' and state = 30
 			";
 
@@ -571,7 +604,7 @@ class cs01Controller extends Controller {
 				
 				$s->Minus( $stock );
 				$sql = "
-					update stock_product set state = '-10'
+					update product_stock_order_product set state = '-10'
 					where stock_no = '$stock_no' and goods_no = '$goods_no' and prd_cd = '$prd_cd'
 							and opt_kor = '$opt' and cost_notax = '$cost_notax'
 				";
@@ -588,7 +621,8 @@ class cs01Controller extends Controller {
 		try {
 			DB::beginTransaction();
 			$sql = "
-				update stock_order set state = '-10'
+				update product_stock_order set 
+					state = '-10', rej_id = $id, rej_rt = now()
 				where stock_no = '$stock_no'
 			";
 			DB::update($sql);
@@ -602,7 +636,7 @@ class cs01Controller extends Controller {
 	}
 
 	/**
-	 * 입고 추가
+	 * 추가입고
 	 */
 	public function addStockCmd(Request $request) { // 입고번호, 데이터
 
@@ -616,7 +650,7 @@ class cs01Controller extends Controller {
 			select
 				invoice_no,state,loc,stock_date,com_id,currency_unit,exchange_rate,
 				custom_amt,custom_tax,custom_tax_rate
-			from stock_order
+			from product_stock_order
 			where stock_no = '$stock_no'
 		";
 		$row = DB::selectOne($sql);
@@ -640,7 +674,7 @@ class cs01Controller extends Controller {
 			try {
 				DB::beginTransaction();
 				$sql = "
-					update stock_order set
+					update product_stock_order set
 						opts = '${opts}',
 						ut = now()
 					where stock_no = '${stock_no}'
@@ -685,7 +719,7 @@ class cs01Controller extends Controller {
 				(s.cost * s.qty) as total_cost,
 				(s.cost_notax * s.qty) as total_cost_novat,
 				s.stock_date as stock_date		
-			from stock_product s inner join goods g
+			from product_stock_order_product s inner join goods g
 				on s.goods_no = g.goods_no
 				inner join product_stock ps on s.prd_cd = ps.prd_cd
 			where stock_no = '$stock_no'
@@ -703,7 +737,7 @@ class cs01Controller extends Controller {
 			DB::beginTransaction();
 			if ($type != "A") {
 				$sql = "
-					delete from stock_product
+					delete from product_stock_order_product
 					where stock_no = :stock_no
 				";
 				DB::delete($sql, ['stock_no' => $stock_no]);
@@ -743,7 +777,7 @@ class cs01Controller extends Controller {
 							if ($opt != "" && $qty > 0) {
 
 								$sql = "
-									insert into stock_product
+									insert into product_stock_order_product
 									( stock_no,invoice_no,com_id,item,brand,style_no, prd_cd, goods_no,goods_sub,opt_kor,
 										qty,unit_cost,cost_notax,cost,state,stock_date,id,rt,ut ) values
 									( '${stock_no}', '${invoice_no}',
@@ -885,6 +919,7 @@ class cs01Controller extends Controller {
 
 			// 임시조치 (상품정보가 없는 상품의 입고에 대한 논의 필요) - 최유현
 			$row->goods_nm = '상품정보 없음(입고x)';
+			$row->goods_no = null;
 			$row->total_stock_qty = 0;
 		}
 
@@ -957,7 +992,7 @@ class cs01Controller extends Controller {
 	public function getInvoiceNo($com_id) {
 		$prefix_invoice_no = sprintf("%s_%s_A",$com_id,date("ymd"));
 		$sql = "
-			select ifnull(max(invoice_no),0) as invoice_no from stock_order
+			select ifnull(max(invoice_no),0) as invoice_no from product_stock_order
 			where invoice_no like '$prefix_invoice_no%'
 		";
 		$row = DB::selectOne($sql);

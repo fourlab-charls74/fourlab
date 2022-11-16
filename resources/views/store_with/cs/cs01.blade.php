@@ -159,9 +159,17 @@
             { field: "qty", headerName: "수량", type:'currencyType', cellStyle: { 'font-weight': '700' } },
             { field: "total_cost", headerName: "총원가(원)", type:'currencyType' },
             // { field: "buy_order_qty", headerName: "발주 후 입고수", width: 110, type:'numberType', },
-            { field: "name", headerName: "입고자", width: 80, cellStyle:{ 'text-align': 'center' } },
-            { field: "rt", headerName: "최종수정일", width: 120, cellStyle:{ 'text-align': 'center' } },
-            { field: "", headerName:"", width: "auto" },
+            // { field: "name", headerName: "입고자", width: 80, cellStyle:{ 'text-align': 'center' } },
+            // { field: "rt", headerName: "최종수정일", width: 120, cellStyle:{ 'text-align': 'center' } },       {field: "req_id", headerName: "요청자", cellStyle: {"text-align": "center"}},
+            {field: "req_nm", headerName: "등록", width: 80, cellStyle: {"text-align": "center"}},
+            {field: "req_rt", headerName: "등록일시", width: 120, cellStyle: {"text-align": "center"}},
+            {field: "prc_nm", headerName: "처리중", width: 80, cellStyle: {"text-align": "center"}},
+            {field: "prc_rt", headerName: "처리중일시", width: 120, cellStyle: {"text-align": "center"}},
+            {field: "fin_nm", headerName: "완료", width: 80, cellStyle: {"text-align": "center"}},
+            {field: "fin_rt", headerName: "완료일시", width: 120, cellStyle: {"text-align": "center"}},
+            {field: "rej_nm", headerName: "취소", width: 80, cellStyle: {"text-align": "center"}},
+            {field: "rej_rt", headerName: "취소일시", width: 120, cellStyle: {"text-align": "center"}},
+            {width: "auto"},
         ];
 
         const pApp = new App('', {
