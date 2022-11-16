@@ -549,13 +549,14 @@
         const row_index = row.count - 1;
         const { qty, unit_cost, goods_no, style_no } = row;
 
-        if (isNaN(parseInt(goods_no))) {
-            gx.gridOptions.api.stopEditing(); // stop editing
-            alert(`스타일넘버 ${style_no}은 유효하지 않은 상품입니다. \n상품을 삭제후 다시등록해주세요.`);
-            const node = gx.gridOptions.api.getRowNode(row.count);
-            node.setSelected(true);
-            return false;
-        }
+        // 상품정보가 없는 상품의 입고에 대한 논의 필요 - 최유현
+        // if (isNaN(parseInt(goods_no))) {
+        //     gx.gridOptions.api.stopEditing(); // stop editing
+        //     alert(`스타일넘버 ${style_no}은 유효하지 않은 상품입니다. \n상품을 삭제후 다시등록해주세요.`);
+        //     const node = gx.gridOptions.api.getRowNode(row.count);
+        //     node.setSelected(true);
+        //     return false;
+        // }
 
         if (qty == "" || qty == 0) { // check qty
             gx.gridOptions.api.stopEditing(); // stop editing
