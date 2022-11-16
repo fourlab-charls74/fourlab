@@ -79,15 +79,14 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label>매장폐점여부</label>
-                            <div class="form-inline form-radio-box">
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="close_yn_N" name="close_yn" value="N" checked />
-                                    <label class="custom-control-label" for="close_yn_N">폐점제외</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="close_yn_Y" name="close_yn" value="Y"/>
-                                    <label class="custom-control-label" for="close_yn_Y">폐점만</label>
+                            <label for="prd_cd">상품옵션 범위검색</label>
+                            <div class="form-inline">
+                                <div class="form-inline-inner input-box w-100">
+                                    <div class="form-inline inline_btn_box">
+                                        <input type='hidden' id="prd_cd_range" name='prd_cd_range'>
+                                        <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -132,6 +131,23 @@
                                     </div>
                                     <input type="radio" name="ord" id="sort_desc" value="desc">
                                     <input type="radio" name="ord" id="sort_asc" value="asc" checked="">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label>매장폐점여부</label>
+                            <div class="form-inline form-radio-box">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" class="custom-control-input" id="close_yn_N" name="close_yn" value="N" checked />
+                                    <label class="custom-control-label" for="close_yn_N">폐점제외</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" class="custom-control-input" id="close_yn_Y" name="close_yn" value="Y"/>
+                                    <label class="custom-control-label" for="close_yn_Y">폐점만</label>
                                 </div>
                             </div>
                         </div>

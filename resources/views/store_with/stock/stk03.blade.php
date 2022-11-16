@@ -174,26 +174,13 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label>결제방법</label>
+                            <label for="prd_cd">상품옵션 범위검색</label>
                             <div class="form-inline">
-                                <div class="form-inline-inner w-100">
-                                    <div class="form-group flax_box">
-                                        <div style="width:calc(100% - 62px);">
-                                            <select name="stat_pay_type" class="form-control form-control-sm mr-2" style="width:100%;">
-                                                <option value="">전체</option>
-                                                @foreach ($stat_pay_types as $stat_pay_type)
-                                                    <option value='{{ $stat_pay_type->code_id }}'>
-                                                        {{ $stat_pay_type->code_val }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div style="height:30px;margin-left:5px;">
-                                            <div class="custom-control custom-switch date-switch-pos" data-toggle="tooltip" data-placement="top" data-original-title="복합결제 제외">
-                                                <input type="checkbox" class="custom-control-input" id="not_complex" name="not_complex" value="Y">
-                                                <label for="not_complex" data-on-label="ON" data-off-label="OFF" style="margin-top:2px;"></label>
-                                            </div>
-                                        </div>
+                                <div class="form-inline-inner input-box w-100">
+                                    <div class="form-inline inline_btn_box">
+                                        <input type='hidden' id="prd_cd_range" name='prd_cd_range'>
+                                        <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                     </div>
                                 </div>
                             </div>
@@ -328,6 +315,33 @@
                                         <input type="hidden" id="com_cd" name="com_cd" />
                                         <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
                                         <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label>결제방법</label>
+                            <div class="form-inline">
+                                <div class="form-inline-inner w-100">
+                                    <div class="form-group flax_box">
+                                        <div style="width:calc(100% - 62px);">
+                                            <select name="stat_pay_type" class="form-control form-control-sm mr-2" style="width:100%;">
+                                                <option value="">전체</option>
+                                                @foreach ($stat_pay_types as $stat_pay_type)
+                                                    <option value='{{ $stat_pay_type->code_id }}'>
+                                                        {{ $stat_pay_type->code_val }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div style="height:30px;margin-left:5px;">
+                                            <div class="custom-control custom-switch date-switch-pos" data-toggle="tooltip" data-placement="top" data-original-title="복합결제 제외">
+                                                <input type="checkbox" class="custom-control-input" id="not_complex" name="not_complex" value="Y">
+                                                <label for="not_complex" data-on-label="ON" data-off-label="OFF" style="margin-top:2px;"></label>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

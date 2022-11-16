@@ -14,7 +14,7 @@ use PDO;
 
 class goods extends Controller
 {
-	public function show()
+	public function show(Request $request)
 	{
         $mutable	= now();
         $sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
@@ -868,12 +868,21 @@ class goods extends Controller
 
         if ($match == 'false') {
             $sql = "
-                select pc.prd_cd, pc.goods_no, g.goods_nm, pc.goods_opt,concat(pc.brand,pc.year, pc.season, pc.gender, pc.item, pc.opt, pc.seq) as prd_cd1,
+                select 
+                pc.prd_cd
+                , pc.goods_no
+                , if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
+                , concat(c.code_val, '^',d.code_val2) as goods_opt
+                , concat(pc.brand,pc.year, pc.season, pc.gender
+                , pc.item, pc.opt, pc.seq) as prd_cd1,
                 pc.color, pc.size, p.match_yn
                 from product_code pc
-                    inner join goods g on g.goods_no = pc.goods_no
+                    left outer join goods g on g.goods_no = pc.goods_no
                     inner join product p on pc.prd_cd = p.prd_cd
-                where 1=1 $where
+                    inner join code c on pc.color = c.code_id
+			        inner join code d on pc.size = d.code_id
+                where 1=1 and c.code_kind_cd = 'PRD_CD_COLOR' and d.code_kind_cd = 'PRD_CD_SIZE_MATCH'
+                $where
             ";
         } else {
             // 상품매칭

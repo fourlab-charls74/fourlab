@@ -67,6 +67,7 @@ class stk03Controller extends Controller
         $ord            = $request->input('ord', 'desc');
         $ord_field      = $request->input('ord_field', 'o.ord_date');
         $page           = $request->input('page', 1);
+        $prd_cd_range_text = $request->input("prd_cd_range", '');
         if ($page < 1 or $page == '') $page = 1;
 
         // $mobile_yn      = $request->input('mobile_yn', '');  // 모바일 주문 여부
@@ -154,6 +155,19 @@ class stk03Controller extends Controller
                 $where .= " and o.prd_cd = '$prd_cd' ";
             }
         }
+
+        // 상품옵션 범위검색
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				$in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc.$opt $in_query ($opt_join) ";
+			}
+		}
+        
         if ($style_no != '') $where .= " and g.style_no like '$style_no%' ";
         if ($goods_no != '') {
             $goods_no = preg_replace("/\s/", ",", $goods_no);

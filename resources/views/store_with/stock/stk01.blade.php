@@ -87,11 +87,17 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="goods_nm_eng">상품명(영문)</label>
-                            <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
+                            <label for="prd_cd">상품옵션 범위검색</label>
+                            <div class="form-inline">
+                                <div class="form-inline-inner input-box w-100">
+                                    <div class="form-inline inline_btn_box">
+                                        <input type='hidden' id="prd_cd_range" name='prd_cd_range'>
+                                        <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -125,31 +131,6 @@
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group">
-                            <label for="brand_cd">브랜드</label>
-                            <div class="form-inline inline_btn_box">
-                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row search-area-ext d-none">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label for="name">공급업체</label>
-                            <div class="form-inline inline_select_box">
-                                <div class="form-inline-inner input-box w-100">
-                                    <div class="form-inline inline_btn_box">
-                                        <input type="hidden" id="com_cd" name="com_cd" />
-                                        <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
                             <label for="">자료수/정렬</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box" style="width:24%;">
@@ -175,6 +156,39 @@
                                     <input type="radio" name="ord" id="sort_desc" value="desc" checked="">
                                     <input type="radio" name="ord" id="sort_asc" value="asc">
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row search-area-ext d-none">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label for="name">공급업체</label>
+                            <div class="form-inline inline_select_box">
+                                <div class="form-inline-inner input-box w-100">
+                                    <div class="form-inline inline_btn_box">
+                                        <input type="hidden" id="com_cd" name="com_cd" />
+                                        <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label for="goods_nm_eng">상품명(영문)</label>
+                            <div class="flax_box">
+                                <input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label for="brand_cd">브랜드</label>
+                            <div class="form-inline inline_btn_box">
+                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
+                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                             </div>
                         </div>
                     </div>

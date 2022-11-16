@@ -290,7 +290,7 @@
 
     <div id="SearchGoodsNosModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchGoodsNosModalLabel" aria-hidden="true">
         <div class="modal-dialog" >
-            <div class="modal-content">
+            <div class="modal-content" style="width:600px">
                 <div class="modal-header">
                     <h5 class="modal-title mt-0" id="myModalLabel">상품 검색</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -523,16 +523,16 @@
                                             <label for="formrow-email-input">매칭여부</label>
                                                 <div class="form-inline form-radio-box">
                                                     <div class="custom-control custom-radio">
-                                                        <input type="radio" name="match_yn" value="A" id="match_all1" class="custom-control-input" >
-                                                        <label class="custom-control-label" for="match_all1">전체</label>
+                                                        <input type="radio" name="match_yn" value="A" id="match_all" class="custom-control-input">
+                                                        <label class="custom-control-label" for="match_all">전체</label>
                                                     </div>
                                                     <div class="custom-control custom-radio">
-                                                        <input type="radio" name="match_yn" value="Y" id="match_y1" class="custom-control-input">
-                                                        <label class="custom-control-label" for="match_y1">Y</label>
+                                                        <input type="radio" name="match_yn" value="Y" id="match_y" class="custom-control-input">
+                                                        <label class="custom-control-label" for="match_y">Y</label>
                                                     </div>
                                                     <div class="custom-control custom-radio">
-                                                        <input type="radio" name="match_yn" value="N" id="match_n1" class="custom-control-input" checked>
-                                                        <label class="custom-control-label" for="match_n1">N</label>
+                                                        <input type="radio" name="match_yn" value="N" id="match_n" class="custom-control-input" checked>
+                                                        <label class="custom-control-label" for="match_n">N</label>
                                                     </div>
                                                 </div>
                                             </div>

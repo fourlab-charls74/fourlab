@@ -312,7 +312,7 @@
 	let gx;
 
 	$(document).ready(function() {
-		pApp.ResizeGrid(550);
+		pApp.ResizeGrid(637);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns);
@@ -327,7 +327,7 @@
 	let gx2;
 
 	$(document).ready(function() {
-		pApp2.ResizeGrid(550);
+		pApp2.ResizeGrid(475);
 		pApp2.BindSearchEnter();
 		let gridDiv2 = document.querySelector(pApp2.options.gridId);
 		gx2 = new HDGrid(gridDiv2, columns_code);

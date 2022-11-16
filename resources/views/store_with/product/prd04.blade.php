@@ -113,16 +113,16 @@
 						<label for="formrow-email-input">매칭여부</label>
 							<div class="form-inline form-radio-box">
 								<div class="custom-control custom-radio">
-									<input type="radio" name="match_yn1" value="A" id="match_all" class="custom-control-input" checked>
-									<label class="custom-control-label" for="match_all">전체</label>
+									<input type="radio" name="match_yn1" value="A" id="match_all1" class="custom-control-input" checked>
+									<label class="custom-control-label" for="match_all1">전체</label>
 								</div>
 								<div class="custom-control custom-radio">
-									<input type="radio" name="match_yn1" value="Y" id="match_y" class="custom-control-input">
-									<label class="custom-control-label" for="match_y">Y</label>
+									<input type="radio" name="match_yn1" value="Y" id="match_y1" class="custom-control-input">
+									<label class="custom-control-label" for="match_y1">Y</label>
 								</div>
 								<div class="custom-control custom-radio">
-									<input type="radio" name="match_yn1" value="N" id="match_n" class="custom-control-input">
-									<label class="custom-control-label" for="match_n">N</label>
+									<input type="radio" name="match_yn1" value="N" id="match_n1" class="custom-control-input">
+									<label class="custom-control-label" for="match_n1">N</label>
 								</div>
 							</div>
 						</div>
@@ -216,7 +216,15 @@ const columns = [
 	{field: "style_no", headerName: "스타일넘버", cellStyle: {"line-height": "30px"}},
 	{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}"},
 	{field: "img", headerName: "이미지_url", hide: true},
-	{field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', width: 280, cellStyle: {"line-height": "30px"}},
+	{field: "goods_nm", headerName: "상품명", width: 280, cellStyle: {"line-height": "30px"},
+		cellRenderer: function (params) {
+			if (params.data.goods_no == '') {
+				return '<a href="#" onclick="return blank_goods_no();">' + params.value + '</a>';
+			} else {
+				return '<a href="#" onclick="return openHeadProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
+			}
+		}
+	},
 	{field: "prd_cd_p", headerName: "코드일련", width:100, cellStyle: {"line-height": "30px"},},
 	{field: "color", headerName: "컬러", width:58, cellStyle: {"line-height": "30px"}},
 	{field: "size", headerName: "사이즈", width:58, cellStyle: {"line-height": "30px"}},
@@ -256,6 +264,10 @@ $(document).ready(function() {
 	pApp.BindSearchEnter();
 	Search();
 });
+
+function blank_goods_no() {
+	alert('상품번호가 비어있는 상품입니다.');
+}
 
 function onCellValueChanged(e) {
 	e.node.setSelected(true);

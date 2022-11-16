@@ -263,7 +263,7 @@ class prd02Controller extends Controller
 				, p.match_yn
 			from goods g inner join product_stock s on g.goods_no = s.goods_no
 				$in_store_sql
-				inner join product_code pc on pc.prd_cd = s.prd_cd
+				left outer join product_code pc on pc.prd_cd = s.prd_cd
 				left outer join product p on p.prd_cd = s.prd_cd
 				left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
 				left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id

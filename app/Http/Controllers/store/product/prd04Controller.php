@@ -160,7 +160,7 @@ class prd04Controller extends Controller
 				pc.prd_cd
 				, '' as prd_cd_p
 				, if(pc.goods_no = 0, '', ps.goods_no) as goods_no
-				, brand.brand_nm
+				, b.brand_nm
 				, if(pc.goods_no = 0, p.style_no, g.style_no) as style_no
 				, '' as img_view
 				, if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
@@ -168,7 +168,8 @@ class prd04Controller extends Controller
 					from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
 				  )) as img
 				, if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
-				, pc.color, pc.size, pc.goods_opt
+				, pc.color, pc.size
+				, concat(c.code_val, '^',d.code_val2) as goods_opt
 				, ps.wqty
 				, $store_qty_sql as sqty
 				, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
@@ -181,8 +182,11 @@ class prd04Controller extends Controller
 			left outer join product p on p.prd_cd = pc.prd_cd
 			left outer join goods g on pc.goods_no = g.goods_no
 			left outer join brand brand on brand.brand = g.brand
+			inner join code c on pc.color = c.code_id
+			inner join code d on pc.size = d.code_id
+			inner join brand b on b.br_cd = pc.brand
 			where 
-				pc.type = 'N'
+				 c.code_kind_cd = 'PRD_CD_COLOR' and d.code_kind_cd = 'PRD_CD_SIZE_MATCH'
 				$where
 			$orderby
 			$limit

@@ -42,6 +42,7 @@ class stk01Controller extends Controller
         $brand_cd = $request->input("brand_cd");
         $goods_nm = $request->input("goods_nm");
         $goods_nm_eng = $request->input("goods_nm_eng");
+		$prd_cd_range_text = $request->input("prd_cd_range", '');
 
 		$com_id		= $request->input("com_cd");
 		$ext_store_qty = $request->input("ext_store_qty", "false");
@@ -53,6 +54,8 @@ class stk01Controller extends Controller
 		$ord = $request->input('ord','desc');
 		$ord_field = $request->input('ord_field','p.goods_no');
 		$orderby = sprintf("order by %s %s", $ord_field, $ord);
+
+		
 
 		$store_cds = $request->input('store_no') ?? [];
 		$store_where = "";
@@ -109,6 +112,19 @@ class stk01Controller extends Controller
         $goods_no = preg_replace("/\t/",",",$goods_no);
         $goods_no = preg_replace("/\n/",",",$goods_no);
         $goods_no = preg_replace("/,,/",",",$goods_no);
+
+		 // 상품옵션 범위검색
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				$in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc.$opt $in_query ($opt_join) ";
+			}
+		}
+
 
         if ( $goods_no != "" ) {
             $goods_nos = explode(",",$goods_no);
