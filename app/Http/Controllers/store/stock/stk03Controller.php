@@ -167,7 +167,6 @@ class stk03Controller extends Controller
 				$where .= " and pc.$opt $in_query ($opt_join) ";
 			}
 		}
-        
         if ($style_no != '') $where .= " and g.style_no like '$style_no%' ";
         if ($goods_no != '') {
             $goods_no = preg_replace("/\s/", ",", $goods_no);

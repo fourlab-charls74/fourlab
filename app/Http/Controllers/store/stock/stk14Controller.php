@@ -34,6 +34,7 @@ class stk14Controller extends Controller
 		$code = 200;
 		$where = "";
         $orderby = "";
+        $prd_cd_range_text = $request->input("prd_cd_range", '');
 
         // where
         if($r['prd_cd'] != null) {
@@ -67,6 +68,18 @@ class stk14Controller extends Controller
         $goods_no = preg_replace("/\n/",",",$goods_no);
         $goods_no = preg_replace("/,,/",",",$goods_no);
 
+        // 상품옵션 범위검색
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				$in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc.$opt $in_query ($opt_join) ";
+			}
+		}
+
         if($goods_no != ""){
             $goods_nos = explode(",", $goods_no);
             if(count($goods_nos) > 1) {
@@ -86,8 +99,8 @@ class stk14Controller extends Controller
             $where .= " and g.brand = '" . $r['brand_cd'] . "'";
         if($r['goods_nm'] != null) 
             $where .= " and g.goods_nm like '%" . $r['goods_nm'] . "%'";
-        if($r['goods_nm_eng'] != null) 
-            $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
+        // if($r['goods_nm_eng'] != null) 
+        //     $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
         if(($r['ext_storage_qty'] ?? 'false') == 'true')
             $where .= " and (p.wqty != '' and p.wqty != '0')";
 
@@ -130,6 +143,7 @@ class stk14Controller extends Controller
                 inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
                 inner join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
                 inner join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
+                left outer join product_code pc on pc.prd_cd = p.prd_cd
             where p.storage_cd = (select storage_cd from storage where default_yn = 'Y') $where
             $orderby
             $limit
@@ -148,6 +162,7 @@ class stk14Controller extends Controller
                     inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
                     inner join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
                     inner join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
+                    left outer join product_code pc on pc.prd_cd = p.prd_cd
                 where p.storage_cd = (select storage_cd from storage where default_yn = 'Y') $where
             ";
 

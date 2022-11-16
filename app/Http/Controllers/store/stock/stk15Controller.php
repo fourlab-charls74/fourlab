@@ -45,6 +45,7 @@ class stk15Controller extends Controller
 		$code = 200;
 		$where = "";
         $orderby = "";
+        $prd_cd_range_text = $request->input("prd_cd_range", '');
 
         // where
         if($r['prd_cd'] != null) {
@@ -97,12 +98,24 @@ class stk15Controller extends Controller
             $where .= " and g.brand = '" . $r['brand_cd'] . "'";
         if($r['goods_nm'] != null) 
             $where .= " and g.goods_nm like '%" . $r['goods_nm'] . "%'";
-        if($r['goods_nm_eng'] != null) 
-            $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
+        // if($r['goods_nm_eng'] != null) 
+        //     $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
 
         $having = "";
         if(($r['ext_storage_qty'] ?? 'false') == 'true')
             $having .= " and sum(p.wqty) > '0'";
+
+        // 상품옵션 범위검색
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				$in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc.$opt $in_query ($opt_join) ";
+			}
+		}
 
         // orderby
         $ord = $r['ord'] ?? 'desc';
@@ -138,6 +151,7 @@ class stk15Controller extends Controller
                 left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
                 left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
                 left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
+                left outer join product_code pc on pc.prd_cd = p.prd_cd
             where 1=1 $where
             group by p.prd_cd
             having 1=1 $having
@@ -154,13 +168,14 @@ class stk15Controller extends Controller
             $sql = "
                 select count(c.prd_cd) as total
                 from (
-                    select prd_cd, count(prd_cd)
+                    select p.prd_cd, count(p.prd_cd)
                     from product_stock_storage p
                         inner join goods g on p.goods_no = g.goods_no
                         left outer join brand b on b.brand = g.brand
                         left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
                         left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
                         left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
+                        left outer join product_code pc on pc.prd_cd = p.prd_cd
                     where 1=1 $where
                     group by p.prd_cd
                     having 1=1 $having

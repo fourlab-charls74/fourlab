@@ -65,7 +65,8 @@ class goods extends Controller
         $brand_nm = $request->input("brand_nm");
         $brand_cd = $request->input("brand_cd");
         $goods_nm = $request->input("goods_nm");
-        $goods_nm_eng = $request->input("goods_nm_eng");
+        // $goods_nm_eng = $request->input("goods_nm_eng");
+        $prd_cd_range_text = $request->input("prd_cd_range", '');
 
         $com_id = $request->input("com_cd");
 
@@ -95,7 +96,7 @@ class goods extends Controller
             $where .= " and g.brand = '" . Lib::quote($brand_cd) . "' ";
         }
         if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%' ";
-        if ($goods_nm_eng != "") $where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
+        // if ($goods_nm_eng != "") $where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
 
         if ($com_id != "") $where .= " and g.com_id = '" . Lib::quote($com_id) . "'";
 
@@ -119,6 +120,18 @@ class goods extends Controller
         $goods_no = preg_replace("/\t/",",",$goods_no);
         $goods_no = preg_replace("/\n/",",",$goods_no);
         $goods_no = preg_replace("/,,/",",",$goods_no);
+
+         // 상품옵션 범위검색
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				$in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc.$opt $in_query ($opt_join) ";
+			}
+		}
 
         if( $goods_no != "" ){
             $goods_nos = explode(",",$goods_no);
@@ -144,6 +157,7 @@ class goods extends Controller
                 select count(*) as total
                 from goods g inner join product_stock s on g.goods_no = s.goods_no 
 				left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
+                left outer join product_code pc on pc.prd_cd = s.prd_cd
                 where 1=1 
                     -- g.com_id = :com_id 
                     $where
@@ -215,6 +229,7 @@ class goods extends Controller
 				left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
 				left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
 				left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
+                left outer join product_code pc on pc.prd_cd = s.prd_cd
 			where 1 = 1
                 $where
             $orderby
@@ -297,7 +312,7 @@ class goods extends Controller
         $brand_nm = $request->input("brand_nm");
         $brand_cd = $request->input("brand_cd");
         $goods_nm = $request->input("goods_nm");
-        $goods_nm_eng = $request->input("goods_nm_eng");
+        // $goods_nm_eng = $request->input("goods_nm_eng");
 
         $prd_cd		= $request->input("prd_cd", "");
         $com_id = $request->input("com_cd");
@@ -313,6 +328,8 @@ class goods extends Controller
         $ext_zero_qty = $request->input("ext_zero_qty", "");
 
         $orderby = sprintf("order by %s %s, s.prd_cd", $ord_field, $ord);
+        $prd_cd_range_text = $request->input("prd_cd_range", '');
+
 
         $where = "";
         if($prd_cd != "") {
@@ -331,13 +348,24 @@ class goods extends Controller
             $where .= " and g.brand = '" . Lib::quote($brand_cd) . "' ";
         }
         if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%' ";
-        if ($goods_nm_eng != "") $where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
+        // if ($goods_nm_eng != "") $where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
 
         if ($com_id != "") $where .= " and g.com_id = '" . Lib::quote($com_id) . "'";
 
         if ($head_desc != "") $where .= " and g.head_desc like '%" . Lib::quote($head_desc) . "%' ";
         if ($ad_desc != "") $where .= " and g.ad_desc like '%" . Lib::quote($ad_desc) . "%' ";
 
+        // 상품옵션 범위검색
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				$in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc.$opt $in_query ($opt_join) ";
+			}
+		}
 
         if( is_array($goods_stat)) {
             if (count($goods_stat) == 1 && $goods_stat[0] != "") {
@@ -395,6 +423,7 @@ class goods extends Controller
                     from goods g 
                         inner join product_stock s on g.goods_no = s.goods_no 
                         inner join product_stock_store ps on s.prd_cd = ps.prd_cd $store_where
+                        left outer join product_code pc on pc.prd_cd = s.prd_cd
                     where 1=1 $where
                     group by s.prd_cd
                     having 1=1 $having
@@ -467,6 +496,7 @@ class goods extends Controller
 				left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
 				left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
 				left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
+                left outer join product_code pc on pc.prd_cd = s.prd_cd
 			where 1=1 $where
             group by s.prd_cd
             having 1=1 $having
@@ -550,7 +580,7 @@ class goods extends Controller
         $brand_nm = $request->input("brand_nm");
         $brand_cd = $request->input("brand_cd");
         $goods_nm = $request->input("goods_nm");
-        $goods_nm_eng = $request->input("goods_nm_eng");
+        // $goods_nm_eng = $request->input("goods_nm_eng");
 
         $prd_cd		= $request->input("prd_cd", "");
         $com_id = $request->input("com_cd");
@@ -565,6 +595,7 @@ class goods extends Controller
         $storage_cd   = $request->input("storage_cd", "");
 
         $orderby = sprintf("order by %s %s", $ord_field, $ord);
+        $prd_cd_range_text = $request->input("prd_cd_range", '');
 
         $where = "";
         if($prd_cd != "") {
@@ -583,7 +614,7 @@ class goods extends Controller
             $where .= " and g.brand = '" . Lib::quote($brand_cd) . "' ";
         }
         if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%' ";
-        if ($goods_nm_eng != "") $where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
+        // if ($goods_nm_eng != "") $where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
 
         if ($com_id != "") $where .= " and g.com_id = '" . Lib::quote($com_id) . "'";
 
@@ -603,6 +634,20 @@ class goods extends Controller
         if($goods_nos        != ""){
             $goods_no = $goods_nos;
         }
+
+        
+        // 상품옵션 범위검색
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				$in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc.$opt $in_query ($opt_join) ";
+			}
+		}
+
         $goods_no = preg_replace("/\s/",",",$goods_no);
         $goods_no = preg_replace("/\t/",",",$goods_no);
         $goods_no = preg_replace("/\n/",",",$goods_no);
@@ -641,6 +686,7 @@ class goods extends Controller
                     left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
                     left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
                     left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
+                    left outer join product_code pc on pc.prd_cd = p.prd_cd
                 where p.storage_cd = '$storage_cd' $where
 			";
 
@@ -710,6 +756,7 @@ class goods extends Controller
                 left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
                 left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
                 left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
+                left outer join product_code pc on pc.prd_cd = p.prd_cd
             where p.storage_cd = '$storage_cd' $where
             $orderby
 			$limit

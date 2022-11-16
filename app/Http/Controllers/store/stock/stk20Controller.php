@@ -49,6 +49,7 @@ class stk20Controller extends Controller
 		$code = 200;
 		$where = "";
         $orderby = "";
+        $prd_cd_range_text = $request->input("prd_cd_range", '');
         
         // where
         $sdate = str_replace("-", "", $r['sdate'] ?? now()->sub(1, 'week')->format('Ymd'));
@@ -104,6 +105,18 @@ class stk20Controller extends Controller
         $goods_no = preg_replace("/\t/",",",$goods_no);
         $goods_no = preg_replace("/\n/",",",$goods_no);
         $goods_no = preg_replace("/,,/",",",$goods_no);
+
+         // 상품옵션 범위검색
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				$in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc.$opt $in_query ($opt_join) ";
+			}
+		}
 
         if($goods_no != ""){
             $goods_nos = explode(",", $goods_no);
@@ -171,6 +184,7 @@ class stk20Controller extends Controller
                 psr.fin_rt
             from product_stock_rotation psr
                 inner join goods g on g.goods_no = psr.goods_no
+                left outer join product_code pc on pc.prd_cd = psr.prd_cd
             where 1=1 and psr.del_yn = 'N' $where
             $orderby
             $limit
@@ -185,6 +199,7 @@ class stk20Controller extends Controller
                 select count(*) as total
                 from product_stock_rotation psr
                     inner join goods g on g.goods_no = psr.goods_no
+                    left outer join product_code pc on pc.prd_cd = psr.prd_cd
                 where 1=1 $where
             ";
 

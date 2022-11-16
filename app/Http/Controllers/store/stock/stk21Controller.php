@@ -43,6 +43,7 @@ class stk21Controller extends Controller
 		$code = 200;
 		$where = "";
         $orderby = "";
+        $prd_cd_range_text = $request->input("prd_cd_range", '');
         
         // where
 		if($r['prd_cd'] != null) {
@@ -86,6 +87,18 @@ class stk21Controller extends Controller
                 if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
             }
         }
+        
+         // 상품옵션 범위검색
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				$in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc.$opt $in_query ($opt_join) ";
+			}
+		}
 
         if($r['com_cd'] != null) 
             $where .= " and g.com_id = '" . $r['com_cd'] . "'";
@@ -95,8 +108,8 @@ class stk21Controller extends Controller
             $where .= " and g.brand = '" . $r['brand_cd'] . "'";
         if($r['goods_nm'] != null) 
             $where .= " and g.goods_nm like '%" . $r['goods_nm'] . "%'";
-        if($r['goods_nm_eng'] != null) 
-            $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
+        // if($r['goods_nm_eng'] != null) 
+        //     $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
             
         // ordreby
         $ord = $r['ord'] ?? 'desc';
@@ -147,6 +160,7 @@ class stk21Controller extends Controller
                 left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
                 left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
                 left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
+                left outer join product_code pc on pc.prd_cd = p.prd_cd
             where 1=1 $where
             $orderby
             $limit
@@ -172,6 +186,7 @@ class stk21Controller extends Controller
                     left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
                     left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
                     left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
+                    left outer join product_code pc on pc.prd_cd = p.prd_cd
                 where 1=1 $where
             ";
 

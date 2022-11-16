@@ -42,12 +42,25 @@ class stk13Controller extends Controller
 		$where = "";
 		$store_where = "";
         $orderby = "";
+		$prd_cd_range_text = $request->input("prd_cd_range", '');
 		
 		$sdate = $r['sdate'] ?? '';
 		$edate = $r['edate'] ?? '';
 
         $store_cds = $r['store_no'] ?? [];
 
+		 // 상품옵션 범위검색
+		 $range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		 parse_str($prd_cd_range_text, $prd_cd_range);
+		 foreach ($range_opts as $opt) {
+			 $rows = $prd_cd_range[$opt] ?? [];
+			 if (count($rows) > 0) {
+				 $in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+				 $opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				 $where .= " and pc.$opt $in_query ($opt_join) ";
+			 }
+		 }
+		 
 		// store_where
 		foreach($store_cds as $key => $cd) {
 			if ($key === 0) {

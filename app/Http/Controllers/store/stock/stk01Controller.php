@@ -149,6 +149,7 @@ class stk01Controller extends Controller
                 "
 				select count(*) as total
 				from product_stock_store p
+					left outer join product_code pc on pc.prd_cd = p.prd_cd
 					left outer join goods g on p.goods_no = g.goods_no
 					left outer join store s on p.store_cd = s.store_cd
 				where 1=1 $where
@@ -164,14 +165,15 @@ class stk01Controller extends Controller
 		$sql = /** @lang text */
             "
 			select 
-				p.goods_no, goods_type, prd_cd, g.opt_kind_cd, opt_kind_nm, b.brand_nm, style_no, 
+				p.goods_no, goods_type, p.prd_cd, g.opt_kind_cd, opt_kind_nm, b.brand_nm, style_no, 
 				c.code_val as sale_stat_cl, ifnull( c2.code_val, 'N/A') as goods_type_nm,
 				if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
 					select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
 					from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
-				)) as img, goods_nm, goods_nm_eng, goods_opt, p.store_cd, store_nm, store_type, qty, wqty, p.rt, p.ut,
+				)) as img, goods_nm, goods_nm_eng, p.goods_opt, p.store_cd, store_nm, store_type, qty, wqty, p.rt, p.ut,
 				g.goods_sh, g.price
 			from product_stock_store p 
+				left outer join product_code pc on pc.prd_cd = p.prd_cd
 				left outer join goods g on p.goods_no = g.goods_no
 				left outer join store s on p.store_cd = s.store_cd
 				left outer join opt o on g.opt_kind_cd = o.opt_kind_cd

@@ -41,6 +41,8 @@ class stk12Controller extends Controller
 		$where = "";
         $orderby = "";
 
+        $prd_cd_range_text = $request->input("prd_cd_range", '');
+
         // where
 		if($r['prd_cd'] != null) {
             $prd_cd = explode(',', $r['prd_cd']);
@@ -87,6 +89,18 @@ class stk12Controller extends Controller
                 if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
             }
         }
+
+        // 상품옵션 범위검색
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				$in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc.$opt $in_query ($opt_join) ";
+			}
+		}
 
         if($r['com_cd'] != null) 
             $where .= " and g.com_id = '" . $r['com_cd'] . "'";
@@ -154,6 +168,7 @@ class stk12Controller extends Controller
                 $store_select_sql
                 '' as blank
             from product_stock_storage p
+                left outer join product_code pc on pc.prd_cd = p.prd_cd
                 inner join goods g on g.goods_no = p.goods_no
                 inner join brand b on b.brand = g.brand
                 inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
@@ -172,6 +187,7 @@ class stk12Controller extends Controller
             $sql = "
                 select count(*) as total
                 from product_stock_storage p
+                    left outer join product_code pc on pc.prd_cd = p.prd_cd
                     inner join goods g on g.goods_no = p.goods_no
                     inner join brand b on b.brand = g.brand
                     inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
