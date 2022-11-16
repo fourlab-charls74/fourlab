@@ -251,15 +251,19 @@
     const numberFormatter = (params) => {
         if (document.search.currency_unit.value == "KRW") {
             // console.log("원")
-            return Math.round(params.value)
-                .toString()
-                .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+            return KRWFormatter(params);
         } else {
             // console.log("외화")
             return parseFloat(params.value).toFixed(2).toString()
                     .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');;
         }
     };
+
+    const KRWFormatter = (params) => {
+        return Math.round(params.value)
+            .toString()
+            .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+    }
 
     // 기존에 공용으로 사용하던 화폐단위 type은 소수점을 전부 버리므로 반올림으로 커스텀하여 구현하였음
     const currencyFormatter = (params) => { 
@@ -320,13 +324,13 @@
             valueFormatter: numberFormatter
         },
         {headerName: "원가(원, VAT포함)", field: "cost", width: 120, cellStyle:{'text-align': 'right'}, 
-            valueFormatter: numberFormatter
+            valueFormatter: KRWFormatter
         },
         {headerName: "총원가(원)", field: "total_cost", width: 96, cellStyle:{'text-align': 'right'}, 
-            valueFormatter: numberFormatter
+            valueFormatter: KRWFormatter
         },
         {headerName: "총원가(원, VAT별도)", field: "total_cost_novat", width: 134, cellStyle:{'text-align': 'right'}, 
-            valueFormatter: numberFormatter
+            valueFormatter: KRWFormatter
         },
         {headerName: "최근입고일자", field: "stock_date", width:96, cellStyle: {"text-align" : 'center'}},
         {headerName:"", field:"", width:"auto"}
@@ -698,7 +702,7 @@
 		    cost = cost * (1 + custom_tax_rate / 100 );
 		    cost = parseInt(cost);
         };
-
+        
         total_cost = qty * cost;
         total_cost_novat = Math.round(total_cost/1.1,0); // 총원가 vat 별도
 

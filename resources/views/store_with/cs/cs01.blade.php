@@ -15,7 +15,10 @@
                     <h4>검색</h4>
                     <div>
                         <a href="#" id="search_sbtn" onclick="Search()" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+                        <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2" onclick="initSearch();">검색조건 초기화</a>
                         <a href="#" onclick="add();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
+                        <a href="javascript:void(0);" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>    
+                        <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                     </div>
                 </div>
                 <div class="card-body">
@@ -113,7 +116,10 @@
             </div>
             <div class="resul_btn_wrap mb-3">
                 <a href="#" id="search_sbtn" onclick="Search()" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2" onclick="initSearch();">검색조건 초기화</a>
                 <a href="#" onclick="add();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
+                <a href="javascript:void(0);" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>    
+                <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
             </div>
         </div>
         <div id="filter-area" class="card shadow-none mb-0 ty2 last-card">
@@ -140,21 +146,21 @@
             { field: "invoice_no", headerName: "송장번호", width: 120,
                 cellRenderer: (params) => `<a href="#" onClick="clickInvoiceNo(${params.data.stock_no})">${params.data.invoice_no}</a>`
             },
-            { field: "area_type", headerName: "입고지역", width: 100, cellStyle:{ 'text-align': 'center' } },
-            { field: "stock_date", headerName: "입고일자", width: 100, cellStyle:{ 'text-align': 'center' } },
-            { field: "state_nm", headerName: "입고상태", width: 100, cellStyle:{ 'text-align': 'center' } },
-            { field: "com_nm", headerName: "공급업체", width: 110 },
-            { field: "item", headerName: "품목", width: 100 },
-            { field: "currency_unit", headerName: "화폐단위", width: 110, cellStyle:{ 'text-align': 'center' } },
+            { field: "area_type", headerName: "입고지역", width: 80, cellStyle:{ 'text-align': 'center' } },
+            { field: "stock_date", headerName: "입고일자", width: 80, cellStyle:{ 'text-align': 'center' } },
+            { field: "state_nm", headerName: "입고상태", width: 80, cellStyle: StyleStockOrdState },
+            { field: "com_nm", headerName: "공급업체", width: 110, cellStyle: { 'text-align': 'center' } },
+            { field: "item", headerName: "품목", width: 90, cellStyle: { 'text-align': 'center' } },
+            { field: "currency_unit", headerName: "화폐단위", width: 80, cellStyle:{ 'text-align': 'center' } },
             { field: "exchange_rate", headerName: "환율", width: 80, cellStyle:{ 'text-align': 'right' }, type:'percentType' },
             { field: "custom_amt", headerName: "신고금액", width: 90, cellStyle:{ 'text-align': 'right' }, type:'percentType' },
             { field: "custom_tax", headerName: "통관비", width: 80, cellStyle:{ 'text-align': 'right' }, type:'currencyType' },
-            { field: "custom_tax_rate", headerName: "통관세율(%)", width: 130, cellStyle:{ 'text-align': 'right' }, type:'percentType' },
-            { field: "qty", headerName: "수량", type:'currencyType' },
+            { field: "custom_tax_rate", headerName: "통관세율(%)", width: 90, cellStyle:{ 'text-align': 'right' }, type:'percentType' },
+            { field: "qty", headerName: "수량", type:'currencyType', cellStyle: { 'font-weight': '700' } },
             { field: "total_cost", headerName: "총원가(원)", type:'currencyType' },
-            { field: "buy_order_qty", headerName: "발주 후 입고수", width: 120, type:'numberType', },
+            // { field: "buy_order_qty", headerName: "발주 후 입고수", width: 110, type:'numberType', },
             { field: "name", headerName: "입고자", width: 80, cellStyle:{ 'text-align': 'center' } },
-            { field: "rt", headerName: "최종수정일", width: 150, cellStyle:{ 'text-align': 'center' } },
+            { field: "rt", headerName: "최종수정일", width: 120, cellStyle:{ 'text-align': 'center' } },
             { field: "", headerName:"", width: "auto" },
         ];
 
