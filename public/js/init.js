@@ -132,7 +132,7 @@ $( document ).ready(function() {
             $( ".search-area-ext" ).addClass( "d-none");
         }
         if(pApp.options.grid_resize == true){
-            pApp.ResizeGrid(275);
+            pApp.ResizeGrid(pApp.options?.height || 275);
         }
     });
 

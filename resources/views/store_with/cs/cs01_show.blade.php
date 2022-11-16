@@ -348,7 +348,7 @@
     const pinnedRowData = [{ item: '합계', unit_total_cost: 0, cost: 0, total_cost: 0, count: 0 }];
     
     $(document).ready(() => {
-        pApp.ResizeGrid(275);
+        pApp.ResizeGrid(200);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         let options = {
@@ -702,7 +702,7 @@
 		    cost = cost * (1 + custom_tax_rate / 100 );
 		    cost = parseInt(cost);
         };
-        
+
         total_cost = qty * cost;
         total_cost_novat = Math.round(total_cost/1.1,0); // 총원가 vat 별도
 
