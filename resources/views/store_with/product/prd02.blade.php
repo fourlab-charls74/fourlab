@@ -152,14 +152,6 @@
 						</div>
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
-								<label for="goods_nm_eng">상품명(영문)</label>
-								<div class="flex_box">
-									<input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
-								</div>
-							</div>
-						</div>
-						<div class="col-lg-4 inner-td">
-							<div class="form-group">
 								<label for="name">공급업체</label>
 								<div class="form-inline inline_select_box">
 									<div class="form-inline-inner input-box w-100">
@@ -172,8 +164,6 @@
 								</div>
 							</div>
 						</div>
-					</div>
-					<div class="row search-area-ext d-none">
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
 								<label for="">자료수/정렬</label>
@@ -207,7 +197,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="row">
+					<div class="row search-area-ext d-none">
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
 								<label for="store_type">매장구분</label>
@@ -247,6 +237,16 @@
 										<input type="radio" name="match_yn1" value="N" id="match_n1" class="custom-control-input">
 										<label class="custom-control-label" for="match_n1">N</label>
 									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row search-area-ext d-none">
+						<div class="col-lg-4 inner-td">
+							<div class="form-group">
+								<label for="goods_nm_eng">상품명(영문)</label>
+								<div class="flex_box">
+									<input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
 								</div>
 							</div>
 						</div>

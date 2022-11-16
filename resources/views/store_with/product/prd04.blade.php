@@ -107,7 +107,26 @@
 						</div>
 					</div>
 				</div>
-				<div class="row search-area-ext d-none">
+				<div class="row">
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+						<label for="formrow-email-input">매칭여부</label>
+							<div class="form-inline form-radio-box">
+								<div class="custom-control custom-radio">
+									<input type="radio" name="match_yn1" value="A" id="match_all" class="custom-control-input" checked>
+									<label class="custom-control-label" for="match_all">전체</label>
+								</div>
+								<div class="custom-control custom-radio">
+									<input type="radio" name="match_yn1" value="Y" id="match_y" class="custom-control-input">
+									<label class="custom-control-label" for="match_y">Y</label>
+								</div>
+								<div class="custom-control custom-radio">
+									<input type="radio" name="match_yn1" value="N" id="match_n" class="custom-control-input">
+									<label class="custom-control-label" for="match_n">N</label>
+								</div>
+							</div>
+						</div>
+					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="">자료수/정렬</label>
@@ -136,27 +155,6 @@
 									</div>
 									<input type="radio" name="ord" id="sort_desc" value="desc" checked="">
 									<input type="radio" name="ord" id="sort_asc" value="asc">
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
-						<label for="formrow-email-input">매칭여부</label>
-							<div class="form-inline form-radio-box">
-								<div class="custom-control custom-radio">
-									<input type="radio" name="match_yn1" value="A" id="match_all" class="custom-control-input" checked>
-									<label class="custom-control-label" for="match_all">전체</label>
-								</div>
-								<div class="custom-control custom-radio">
-									<input type="radio" name="match_yn1" value="Y" id="match_y" class="custom-control-input">
-									<label class="custom-control-label" for="match_y">Y</label>
-								</div>
-								<div class="custom-control custom-radio">
-									<input type="radio" name="match_yn1" value="N" id="match_n" class="custom-control-input">
-									<label class="custom-control-label" for="match_n">N</label>
 								</div>
 							</div>
 						</div>
