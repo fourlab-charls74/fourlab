@@ -162,10 +162,10 @@
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box" style="width:24%;">
                                         <select name="limit" class="form-control form-control-sm">
-                                            <option value="100">100</option>
                                             <option value="500">500</option>
                                             <option value="1000">1000</option>
                                             <option value="2000">2000</option>
+                                            <option value="5000">5000</option>
                                         </select>
                                     </div>
                                     <span class="text_line">/</span>
@@ -216,7 +216,7 @@
                 </div>
             </div>
             <div class="table-responsive">
-                <div id="div-gd" style="height:calc(100vh - 50vh); width:100%;" class="ag-theme-balham"></div>
+                <div id="div-gd" class="ag-theme-balham"></div>
             </div>
         </div>
     </div>
@@ -287,7 +287,9 @@
         {field: "upd_dm", headerName: "수정일자", width:110, cellStyle: {"line-height": "30px"}}
     ];
 
-    const pApp = new App('', { gridId: "#div-gd" });
+    const pApp = new App('', { gridId: "#div-gd", height: 202 });
+    pApp.ResizeGrid(145);
+    pApp.BindSearchEnter();
     const gridDiv = document.querySelector(pApp.options.gridId);
     const gx = new HDGrid(gridDiv, columns, {onCellValueChanged: onCellValueChanged});
 

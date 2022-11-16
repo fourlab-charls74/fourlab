@@ -273,8 +273,8 @@ class cs01Controller extends Controller {
 				$response = $this->listProduct($stock_no);
 				break;
 			case 'getgood':
-				$style_no = $request->input("style_no");
-				$response = $this->getGood($style_no);
+				$prd_cd = $request->input("prd_cd");
+				$response = $this->getGood($prd_cd);
 				break;
 			case 'getinvoiceno':
 				$com_id = $request->input('com_id');
@@ -678,6 +678,7 @@ class cs01Controller extends Controller {
 						where goods_no = s.goods_no and prd_cd = s.prd_cd and goods_opt = s.opt_kor),concat('err:',ifnull(s.opt_kor, ''))) as opt_kor,
 				s.qty as qty,
 				ps.in_qty,
+				ps.qty as total_stock_qty,
 				s.unit_cost as unit_cost,
 				(s.unit_cost * s.qty) as unit_total_cost,
 				s.cost as cost,
@@ -839,43 +840,91 @@ class cs01Controller extends Controller {
 	/**
 	 * 상품 정보 얻기
 	 */
-	public function getGood($style_no) {
-
-		$cnt = 0;
-		$where = "";
+	public function getGood($prd_cd) {
 
 		$sql = "
-			select opt_kind_cd,brand,goods_no,goods_sub,goods_nm,com_type from goods
-			where style_no = '${style_no}' and sale_stat_cl > 0 ${where} limit 0,2
+			select 
+				pc.prd_cd
+				, pc.goods_no
+				, g.goods_nm
+				, g.style_no
+				, pc.goods_opt as opt_kor
+				, g.opt_kind_cd
+				, op.opt_kind_nm as item
+				, g.goods_sh
+				, g.wonga
+				, g.price
+				, g.com_id
+				, g.brand as brand_cd
+				, b.brand_nm as brand
+				, ps.qty as total_stock_qty
+			from product_code pc
+				left outer join product_stock ps on ps.prd_cd = pc.prd_cd
+				left outer join goods g on g.goods_no = pc.goods_no
+				left outer join brand b on b.brand = g.brand
+				left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
+			where pc.prd_cd = :prd_cd
 		";
-		$rows = DB::select($sql);
+		$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
-		$goods = (object)[];
-		foreach ($rows as $row) {
-			$goods->item = $row->opt_kind_cd;
-			$goods->brand = $row->brand;
-			$goods->goods_no = $row->goods_no;
-			$goods->goods_sub = $row->goods_sub;
-			$goods->goods_nm = $row->goods_nm;
-			$goods->com_type = $row->com_type;
-			$cnt++;
+		if ($row == null || $row->goods_no == '0') {
+			// $sql = "
+			// 	select 
+			// 		p.prd_cd, p.prd_nm as goods_nm, p.style_no, p.tag_price as goods_sh
+			// 		, p.price, p.wonga, p.type, p.com_id, c.com_nm, p.match_yn, p.use_yn
+			// 		, pc.brand as brand_cd, b.brand_nm as brand, ps.qty as total_stock_qty
+			// 		, pc.goods_opt as opt_kor, '0' as goods_no
+			// 	from product p
+			// 		inner join product_code pc on pc.prd_cd = p.prd_cd
+			// 		left outer join product_stock ps on ps.prd_cd = p.prd_cd
+			// 		left outer join company c on c.com_id = p.com_id
+			// 		left outer join brand b on b.br_cd = pc.brand
+			// 	where p.prd_cd = :prd_cd
+			// ";
+			// $row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+			// 임시조치 (상품정보가 없는 상품의 입고에 대한 논의 필요) - 최유현
+			$row->goods_nm = '상품정보 없음(입고x)';
+			$row->total_stock_qty = 0;
 		}
+
+		return response()->json(['code' => 1, 'good' => $row], 200);
+
+		// $cnt = 0;
+		// $where = "";
+
+		// $sql = "
+		// 	select opt_kind_cd,brand,goods_no,goods_sub,goods_nm,com_type 
+		// 	from goods
+		// 	where style_no = '${style_no}' and sale_stat_cl > 0 ${where} 
+		// 	limit 0,2
+		// ";
+
+		// $goods = (object)[];
+		// foreach ($rows as $row) {
+		// 	$goods->item = $row->opt_kind_cd;
+		// 	$goods->brand = $row->brand;
+		// 	$goods->goods_no = $row->goods_no;
+		// 	$goods->goods_sub = $row->goods_sub;
+		// 	$goods->goods_nm = $row->goods_nm;
+		// 	$goods->com_type = $row->com_type;
+		// 	$cnt++;
+		// }
 	
-		if ($cnt == 0) {
-			$error_msg = "상품없음";
-			return response()->json(['code' => 0, 'message' => $error_msg], 200);
-		} else if ($cnt > 1) {
-			$error_msg = "상품중복";
-			return response()->json(['code' => -1, 'message' => $error_msg], 200);
-		} else if ($cnt == 1) {
-			if ($goods->com_type == 1){
-				return response()->json(['code' => 1, 'good' => $goods], 200);
-			} else {
-				$error_msg = "입점상품";
-				return response()->json(['code' => -1, 'message' => $error_msg], 200);
-			}
-		}
-		
+		// if ($cnt == 0) {
+		// 	$error_msg = "상품없음";
+		// 	return response()->json(['code' => 0, 'message' => $error_msg], 200);
+		// } else if ($cnt > 1) {
+		// 	$error_msg = "상품중복";
+		// 	return response()->json(['code' => -1, 'message' => $error_msg], 200);
+		// } else if ($cnt == 1) {
+		// 	if ($goods->com_type == 1){
+		// 		return response()->json(['code' => 1, 'good' => $goods], 200);
+		// 	} else {
+		// 		$error_msg = "입점상품";
+		// 		return response()->json(['code' => -1, 'message' => $error_msg], 200);
+		// 	}
+		// }
 	}
 
 	/**

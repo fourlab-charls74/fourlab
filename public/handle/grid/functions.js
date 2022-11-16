@@ -266,6 +266,22 @@ function StyleClmState(params){
     }
 }
 
+function StyleStockOrdState(params) {
+    var state = {
+        "입고대기":"#222222",
+        "입고취소":"#ff0000",
+        "입고처리중":"#0000ff",
+        "입고완료":"#669900",
+    }
+
+    var color = state[params.value];
+    return {
+        color: color,
+        "text-align": "center",
+        "font-weight": '700'
+    };
+}
+
 var _styleOrdNoCnt = 0;
 var _styleColorIndex = -1;
 function StyleOrdNo(params){

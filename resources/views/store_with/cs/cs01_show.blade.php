@@ -196,7 +196,7 @@
                                     <div class="btn-group ml-2">
                                         <button class="btn btn-outline-primary apply-btn" type="button" onclick="upload();">적용</button>
                                     </div>
-                                    <a href="/sample/sample_receiving.xlsx" class="ml-2" style="text-decoration: underline !important;">샘플파일</a>
+                                    <a href="/sample/sample_store_stock_order.xlsx" class="ml-2" style="text-decoration: underline !important;">샘플파일</a>
                                 </div>
                             </div>
                         </div>
@@ -251,15 +251,19 @@
     const numberFormatter = (params) => {
         if (document.search.currency_unit.value == "KRW") {
             // console.log("원")
-            return Math.round(params.value)
-                .toString()
-                .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+            return KRWFormatter(params);
         } else {
             // console.log("외화")
             return parseFloat(params.value).toFixed(2).toString()
                     .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');;
         }
     };
+
+    const KRWFormatter = (params) => {
+        return Math.round(params.value)
+            .toString()
+            .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+    }
 
     // 기존에 공용으로 사용하던 화폐단위 type은 소수점을 전부 버리므로 반올림으로 커스텀하여 구현하였음
     const currencyFormatter = (params) => { 
@@ -268,7 +272,7 @@
     };
 
     var columns= [
-        {headerName: '#', pinned: 'left', type: 'NumType', width: 50,
+        {headerName: '#', pinned: 'left', type: 'NumType', width: 50, cellStyle: {'text-align': 'center'},
             cellRenderer: params => params.node.rowPinned == 'top' ? '' : params.data.count,
             sortingOrder: ['desc', 'asc', 'null'],
             comparator: (valueA, valueB, nodeA, nodeB, isInverted) => { // 번호순으로 정렬이 안되는 문제 수정
@@ -291,45 +295,47 @@
                 return state == -10 || state == 30 ? false : true;
             }
         },
-        {field:"item" ,headerName:"품목",pinned:'left',width:96},
+        {field:"item" ,headerName:"품목",pinned:'left',width:90, cellStyle: {'text-align': 'center'}},
 
         // 기존 서비스에서는 브랜드와 스타일 넘버도 수정이 가능하였지만, 논의 후 불필요한 것으로 판단되어 제거
-        {field:"brand" ,headerName:"브랜드",pinned:'left',width:96,
+        {field:"brand" ,headerName:"브랜드",pinned:'left',width:90, cellStyle: {'text-align': 'center'},
             // cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99'} : null ,
             // editable: params => checkIsEditable(params)
         },
-        {field:"style_no" ,headerName:"스타일넘버",pinned:'left',width:110,
+        {field:"style_no" ,headerName:"스타일넘버",pinned:'left',width:80, cellStyle: {'text-align': 'center'},
             // cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99'} : null ,
             // editable: params => checkIsEditable(params)
         },
         {headerName:"상품코드", field:"prd_cd", width: 120, pinned:'left', cellStyle:{'text-align': 'center'}},
         {field:"goods_nm", headerName:"상품명", type:"HeadGoodsNameType", width:250, pinned:'left'},
         {field:"opt_kor", headerName:"옵션", pinned:'left', width:200},
-        {field: "in_qty", headerName: "입고수량", type:'currencyType'},
-        {headerName: "수량", field: "qty", width: 60,
+        // {field: "in_qty", headerName: "입고수량", type:'currencyType'},
+        {field: "total_stock_qty", headerName: "현재재고", type:'currencyType', width: 60},
+        // {headerName: "수량", field: "qty", width: 60,
+        {headerName: "입고수량", field: "qty", width: 60,
             editable: params => checkIsEditable(params),
             cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99', textAlign: 'right'} : {textAlign: 'right'},
         },
-        {headerName: "단가", field: "unit_cost", width: 60,
+        {headerName: "단가", field: "unit_cost", width: 80,
             editable: params => checkIsEditable(params),
             cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99', textAlign: 'right'} : {textAlign: 'right'},
             valueFormatter: numberFormatter,
             cellRenderer: params => { return params.node.rowPinned == "top" ? "" : params.valueFormatted }
         },
-        {headerName: "금액", field: "unit_total_cost", width: 72, cellStyle:{'text-align': 'right'}, 
+        {headerName: "금액", field: "unit_total_cost", width: 80, cellStyle:{'text-align': 'right'}, 
             valueFormatter: numberFormatter
         },
         {headerName: "원가(원, VAT포함)", field: "cost", width: 120, cellStyle:{'text-align': 'right'}, 
-            valueFormatter: numberFormatter
+            valueFormatter: KRWFormatter
         },
-        {headerName: "총원가(원)", field: "total_cost", width: 96, cellStyle:{'text-align': 'right'}, 
-            valueFormatter: numberFormatter
+        {headerName: "총원가(원)", field: "total_cost", width: 90, cellStyle:{'text-align': 'right'}, 
+            valueFormatter: KRWFormatter
         },
-        {headerName: "총원가(원, VAT별도)", field: "total_cost_novat", width: 134, cellStyle:{'text-align': 'right'}, 
-            valueFormatter: numberFormatter
+        {headerName: "총원가(원, VAT별도)", field: "total_cost_novat", width: 130, cellStyle:{'text-align': 'right'}, 
+            valueFormatter: KRWFormatter
         },
-        {headerName: "최근입고일자", field: "stock_date", width:96, cellStyle: {"text-align" : 'center'}},
-        {headerName:"", field:"", width:"auto"}
+        {headerName: "최근입고일자", field: "stock_date", width:90, cellStyle: {"text-align" : 'center'}},
+        {width:"auto"}
     ];
 
     /**
@@ -344,7 +350,7 @@
     const pinnedRowData = [{ item: '합계', unit_total_cost: 0, cost: 0, total_cost: 0, count: 0 }];
     
     $(document).ready(() => {
-        pApp.ResizeGrid(275);
+        pApp.ResizeGrid(200);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         let options = {
@@ -564,8 +570,9 @@
             return false;
         }
 
-        const checked_opt = await checkOption(row); // check option
-        if (checked_opt == false) return false;
+        // 옵션체크
+        // const checked_opt = await checkOption(row);
+        // if (checked_opt == false) return false;
         
         return true;
     };
@@ -933,8 +940,8 @@
 		var worksheet = workbook.Sheets[firstSheetName];
 
 		var columns	= {
-			'A': 'goods_no',
-			'B': 'style_no',
+			'A': 'prd_cd',
+			'B': 'goods_no',
 			'C': 'opt_kor',
             'D': 'qty',
             'E': 'unit_cost',
@@ -942,18 +949,21 @@
 
 		var rowIndex = 5; // 엑셀 5번째 줄부터 시작 (샘플데이터 참고)
 
-        alert('상품을 순차적으로 불러오고 스타일 넘버를 검사합니다. \n다소 시간이 소요될 수 있습니다.'); // progress
+        alert('상품을 순차적으로 불러오고 있습니다. \n다소 시간이 소요될 수 있습니다.'); // progress
         let count = gx.gridOptions.api.getDisplayedRowCount();
 		while (worksheet['A' + rowIndex]) { // iterate over the worksheet pulling out the columns we're expecting
 			let row = {};
 			Object.keys(columns).forEach((column) => {
 				if(worksheet[column + rowIndex] !== undefined) {
-					row[columns[column]] = worksheet[column + rowIndex].w;
+                    if(column === 'E')
+					    row[columns[column]] = worksheet[column + rowIndex].v;
+                    else
+					    row[columns[column]] = worksheet[column + rowIndex].w;
 				}
 			});
             
             row.qty = row.qty ? row.qty : 0; // 수량
-            row.style_no = row.style_no ? row.style_no : "NONE";
+            row.goods_no = row.goods_no ? row.goods_no : "";
             row.unit_cost = row.unit_cost ? row.unit_cost : 0;  // 단가
             row.unit_total_cost = row.unit_total_cost ? row.unit_total_cost : 0;  // 금액
             row.opt_kor = row.opt_kor ? row.opt_kor : "";
@@ -962,13 +972,9 @@
             };
 
             gx.gridOptions.api.applyTransaction({add : [row]}); // 한 줄씩 import
-            
-            rowIndex++;
-            await getGood(row);
 
-            const ff = document.search;
-            const [ unit, exchange_rate, custom_tax_rate ] = [ ff.currency_unit.value, unComma(ff.exchange_rate.value), ff.custom_tax_rate.value ];
-            await calProduct(row, unit, exchange_rate, custom_tax_rate);
+            rowIndex++;
+            await getGood(row, !worksheet['A' + rowIndex]);
 		}
 	};
 
@@ -988,13 +994,13 @@
 		);
 	};
 
-    const getGood = async (row) => {
+    const getGood = async (row, is_last) => {
         const CMD = 'getgood';
         axios({
             cmd: CMD,
             url: COMMAND_URL,
             method: 'post',
-            data: { cmd: CMD, style_no: row.style_no }
+            data: { cmd: CMD, prd_cd: row.prd_cd }
         }).then(async (response) => {
             
             const code = response.data.code; // 0: 상품없음, -1: 상품중복 또는 입점상품, 1: 존재하는 상품
@@ -1010,6 +1016,14 @@
 
             await gx.gridOptions.api.applyTransaction({update : [checked_row]});
 
+            const ff = document.search;
+            const [ unit, exchange_rate, custom_tax_rate ] = [ 
+                ff.currency_unit.value, 
+                unComma(ff.exchange_rate.value), 
+                ff.custom_tax_rate.value 
+            ];
+            await calProduct(checked_row, unit, exchange_rate, custom_tax_rate);
+            if(is_last) updatePinnedRow();
         }).catch((error) => {
             console.log(error);
         });
