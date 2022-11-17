@@ -207,8 +207,11 @@ class stk01Controller extends Controller
 	}
 
 	/** 재고팝업 */
-	public function show($prd_cd)
+	public function show($prd_cd, Request $request)
 	{
+		$sdate = $request->input("date", '');
+		if($sdate == '') $sdate = date("Y-m-d");
+
 		$cfg_img_size_real = "a_500";
 		$cfg_img_size_list = "a_500";
 
@@ -276,8 +279,8 @@ class stk01Controller extends Controller
 			->get();
 
 		$values = [
-			'sdate' => date('Y-m-d'),
-			'edate' => date('Y-m-d'),
+			'sdate' => $sdate,
+			'edate' => $sdate,
 			'store_types' => SLib::getCodes("STORE_TYPE"), // 매장구분
 			'storages' => $storages, // 창고리스트
 			'prd' => $row,
@@ -393,7 +396,7 @@ class stk01Controller extends Controller
 		
 		$rows = [];
 		if ($prd_cd != '') {
-			$where = " and p.prd_cd like '$prd_cd'% ";
+			$where = " and p.prd_cd like '$prd_cd%' ";
 			if ($store_type) $where .= " and store.store_type = '$store_type' ";
 
 			// store_where

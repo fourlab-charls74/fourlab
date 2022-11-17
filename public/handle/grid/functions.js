@@ -55,8 +55,8 @@ function openSchPop(kwd) {
     window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800")
 }
 
-function openStoreStock(prd_cd){
-    var url = '/store/stock/stk01/' + prd_cd;
+function openStoreStock(prd_cd, date = ''){
+    var url = '/store/stock/stk01/' + prd_cd + '?date=' + date;
     var stock = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=900,height=768");
 }
 function openStoreOrder(ord_no,ord_opt_no){
