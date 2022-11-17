@@ -916,8 +916,7 @@ class cs01Controller extends Controller {
 			// ";
 			// $row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
-			// 임시조치 (상품정보가 없는 상품의 입고에 대한 논의 필요) - 최유현
-			$row->goods_nm = '상품정보 없음(입고x)';
+			$row->goods_nm = '상품정보 없음';
 			$row->goods_no = null;
 			$row->total_stock_qty = 0;
 		}
