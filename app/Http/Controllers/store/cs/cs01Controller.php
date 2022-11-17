@@ -5,7 +5,7 @@ namespace App\Http\Controllers\store\cs;
 use App\Components\Lib;
 use App\Components\SLib;
 use App\Http\Controllers\Controller;
-use App\Models\Stock;
+use App\Models\S_Stock;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
@@ -572,7 +572,7 @@ class cs01Controller extends Controller {
 			/**
 			 * 재고 등록(+)
 			 */
-			$s = new Stock($user);
+			$s = new S_Stock($user);
 			$s->SetLoc($loc);
 
 			$sql = "
@@ -613,7 +613,6 @@ class cs01Controller extends Controller {
 			
 			DB::commit();
 		} catch (Exception $e) {
-			// dd($e);
 			DB::rollBack();
 			return response()->json(['code' => -1, 'message' => "입고 취소를 실패하였습니다. 다시 한번 시도하여 주십시오."], 200);
 		}
@@ -838,7 +837,7 @@ class cs01Controller extends Controller {
 					'name' => $name
 				];
 				
-				$s = new Stock($user);
+				$s = new S_Stock($user);
 				$s->SetPrdCd($prd_cd);
 				$s->SetLoc($loc);
 				$s->Plus( array(

@@ -6,7 +6,7 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 
 // 2022-07-20 오프라인 stock 모델 추가
-class Stock 
+class S_Stock 
 {
     public $user;
     private $stock_no;        // 재고번호
@@ -355,25 +355,50 @@ class Stock
     private function __InsertHistory($data)
     {
         $user = $this->user;
-        return DB::table('goods_history')->insertGetId([
+
+        $sql = "select * from `storage` where default_yn = 'Y'";
+        $result = DB::selectOne($sql);
+        $storage_cd = $result == null ? '' : $result->storage_cd;
+
+        return DB::table('product_stock_hst')->insertGetId([
             'goods_no' => $this->goods_no,
-            'goods_sub' => 0,
+            'prd_cd' => $this->prd_cd,
             'goods_opt' => $this->goods_opt,
+            'location_cd' => $storage_cd,
+            'location_type' => 'STORAGE',
+            'type' => 1, // 재고분류 : 입고(창고입고)
+            'price' => $data["wonga"],
             'wonga' => $data["wonga"],
-            'type' => $data["type"],
-            'stock_state' => 1,
             'qty' => $data["qty"],
-            'loc' => $this->loc,
-            'etc' => $data["etc"],
-            'ord_opt_no' => $data["ord_opt_no"],
-            'invoice_no' => $data["invoice_no"],
-            'admin_id' => isset($user["id"])? $user["id"]:"",
-            'admin_nm' => isset($user["name"])? $user["name"]:"",
-            'com_id' => $data["com_id"],
-            'ord_no' => $data["ord_no"],
-            'stock_state_date' => date("Ymd"), // goods_history의 stock_state_date는 Ymd 형식으로 되어있음. now에서 Ymd로 수정 - 20220217
-            'regi_date' => now()
+            'invoice_no' => $data['invoice_no'],
+            'stock_state_date' => date('Ymd'),
+            'com_id' => $data['com_id'],
+            'ord_opt_no' => 0,
+            'comment' => '창고입고',
+            'rt' => now(),
+            'admin_id' => $user['id'] ?? '',
+            'admin_nm' => $user['name'] ?? '',
         ]);
+
+        // return DB::table('goods_history')->insertGetId([
+        //     'goods_no' => $this->goods_no,
+        //     'goods_sub' => 0,
+        //     'goods_opt' => $this->goods_opt,
+        //     'wonga' => $data["wonga"],
+        //     'type' => $data["type"],
+        //     'stock_state' => 1,
+        //     'qty' => $data["qty"],
+        //     'loc' => $this->loc,
+        //     'etc' => $data["etc"],
+        //     'ord_opt_no' => $data["ord_opt_no"],
+        //     'invoice_no' => $data["invoice_no"],
+        //     'admin_id' => isset($user["id"])? $user["id"]:"",
+        //     'admin_nm' => isset($user["name"])? $user["name"]:"",
+        //     'com_id' => $data["com_id"],
+        //     'ord_no' => $data["ord_no"],
+        //     'stock_state_date' => date("Ymd"), // goods_history의 stock_state_date는 Ymd 형식으로 되어있음. now에서 Ymd로 수정 - 20220217
+        //     'regi_date' => now()
+        // ]);
     }
 
     private function __DecreaseGoodQty($qty)
@@ -576,7 +601,7 @@ class Stock
             "ord_opt_no" => $ord_opt_no
         );
 
-        return $this->__InsertHistory($history); // 매장관리용 product_stock_hst 로 대체해야함 20221027
+        return $this->__InsertHistory($history);
     }
 
     private function __IncreaseGoodQty($qty)
