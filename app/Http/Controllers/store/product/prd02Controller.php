@@ -298,14 +298,15 @@ class prd02Controller extends Controller
 				pc.prd_cd
 				, if(pc.goods_no = 0, '' , ps.goods_no) as goods_no
 				, opt.opt_kind_nm
-				, brand.brand_nm
+				, b.brand_nm
 				, if(pc.goods_no = 0, p.style_no, g.style_no) as style_no
 				, if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
 							select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
 							from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
 						  )) as img
 				, if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
-				, stat.code_val as sale_stat_cl
+				, g.goods_nm_eng
+				, concat(c.code_val, '^',d.code_val2) as goods_opt
 				, ps.wqty
 				, (ps.qty - ps.wqty) as sqty
 				, g.goods_sh
@@ -324,7 +325,6 @@ class prd02Controller extends Controller
 				$in_store_sql
 				left outer join product p on p.prd_cd = pc.prd_cd
 				left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
-		 		left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
 				left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
 				left outer join company com on com.com_id = g.com_id
 				left outer join brand brand on brand.brand = g.brand
@@ -332,7 +332,10 @@ class prd02Controller extends Controller
 				left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
 				left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
 				left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
-			where 1 = 1
+				inner join code c on pc.color = c.code_id
+				inner join code d on pc.size = d.code_id
+				inner join brand b on b.br_cd = pc.brand
+			where 1 = 1 and c.code_kind_cd = 'PRD_CD_COLOR' and d.code_kind_cd = 'PRD_CD_SIZE_MATCH'
 				$where
 				$orderby
 				$limit

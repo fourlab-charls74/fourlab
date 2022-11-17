@@ -20,7 +20,7 @@
                     <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                     <a href="#" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
                     <a href="/store/stock/stk33/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
-                    <button id="download-list" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                    <button id="download-list" onclick="gx.Download();" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
                         <i class="bx bx-download fs-16"></i> 엑셀다운로드
                     </button>&nbsp;&nbsp;
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
@@ -160,10 +160,13 @@
         {headerName: "#", field: "num",type:'NumType', cellClass: 'hd-grid-code'},
         {headerName: "매출일", field: "admin_id",  width: 80, cellClass: 'hd-grid-code'},
         {headerName: "합계", field: "admin_nm",  width: 80, cellClass: 'hd-grid-code'},
-        {headerName: "밀레", field: "admin_nm",  width: 80, cellClass: 'hd-grid-code'},
-        {headerName: "노스페이스", field: "admin_nm",  width: 80, cellClass: 'hd-grid-code'},
-        {headerName: "K2", field: "admin_nm",  width: 80, cellClass: 'hd-grid-code'},
-        {headerName: "피엘라벤", field: "admin_nm",  width: 80, cellClass: 'hd-grid-code'},
+
+        @foreach($competitors as $com)
+
+            {headerName: "{{ $com->code_id }}", field: "code_id",  width: 80, cellClass: 'hd-grid-code'},
+
+        @endforeach
+
         {width: 'auto'}
     ];
 
@@ -199,20 +202,4 @@
 </script>
 
 
-<script>
-    $("#download-list").click(function(e){
-	e.preventDefault();
-	var fields = [];
-
-	$('#fields > option').each(function(){
-	  fields.push(this.value);
-	});
-
-	$("[name=fields]").val(fields.join(','));
-
-	$("[name=ord_state]").val('30');
-
-	$('[name=beasong_list]').submit();
-  });
-</script>
 @stop

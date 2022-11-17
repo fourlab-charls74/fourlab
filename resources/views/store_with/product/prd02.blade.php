@@ -101,6 +101,14 @@
 					<div class="row">
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
+								<label for="goods_nm_eng">상품명(영문)</label>
+								<div class="flex_box">
+									<input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-4 inner-td">
+							<div class="form-group">
 								<label for="goods_stat">상품상태</label>
 								<div class="flex_box">
 									<select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
@@ -125,15 +133,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-lg-4 inner-td">
-							<div class="form-group">
-								<label for="brand_cd">브랜드</label>
-								<div class="form-inline inline_btn_box">
-									<select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-									<a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-								</div>
-							</div>
-						</div>
+						
 					</div>
 					<div class="row">
 						<div class="col-lg-4 inner-td">
@@ -178,11 +178,11 @@
 									<span class="text_line">/</span>
 									<div class="form-inline-inner input_box" style="width:45%;">
 										<select name="ord_field" class="form-control form-control-sm">
-											<option value="g.reg_dm">등록일</option>
-											<option value="g.upd_dm">수정일</option>
+											<option value="pc.rt">등록일</option>
+											<option value="pc.ut">수정일</option>
 											<option value="g.goods_no">상품번호</option>
 											<option value="g.goods_nm">상품명</option>
-											<option value="s.prd_cd">상품코드</option>
+											<option value="pc.prd_cd">상품코드</option>
 										</select>
 									</div>
 									<div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -244,9 +244,10 @@
 					<div class="row search-area-ext d-none">
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
-								<label for="goods_nm_eng">상품명(영문)</label>
-								<div class="flex_box">
-									<input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
+								<label for="brand_cd">브랜드</label>
+								<div class="form-inline inline_btn_box">
+									<select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
+									<a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 								</div>
 							</div>
 						</div>
@@ -323,9 +324,33 @@
 			{field: "style_no", headerName: "스타일넘버", cellStyle: {"line-height": "30px", "text-align": "center"}},
 			{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}"},
 			{field: "img", headerName: "이미지_url", hide: true},
-			{field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', width: 230, cellStyle: {"line-height": "30px"}},
-			{field: "sale_stat_cl", headerName: "상품상태", width:70, type: 'GoodsStateTypeLH50'},
-			{field: "goods_opt", headerName: "옵션", width:150, cellStyle: {"line-height": "30px"}, hide:true },
+			{field: "goods_nm", headerName: "상품명", width: 230, cellStyle: {"line-height": "30px"},
+				cellRenderer: function (params) {
+					if (params.data.goods_no == '') {
+						return '<a href="#" onclick="return blank_goods_no();">' + params.value + '</a>';
+					} else {
+						return '<a href="#" onclick="return openHeadProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
+					}
+				}
+			},
+			{field: "goods_nm_eng", headerName: "상품명(영문)", width: 280, cellStyle: {"line-height": "30px"},
+				cellRenderer: function (params) {
+					if (params.data.goods_no == '') {
+						if(params.data.goods_nm_eng == null ) {
+							return '';					
+						} else{
+							return '<a href="#" onclick="return blank_goods_no();">' + params.value + '</a>';
+						}
+					} else {
+						if(params.data.goods_nm_eng == null ) {
+							return '';					
+						} else{
+							return '<a href="#" onclick="return openHeadProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
+						}
+					}
+				}
+			},
+			{field: "goods_opt", headerName: "옵션", width:150, cellStyle: {"line-height": "30px"}},
 			{field: "product_cd", headerName: "코드일련", width:100, cellStyle: {"line-height": "30px", "text-align": "center"},
 				cellRenderer: (params) => params.data.prd_cd.substr(0, 11),
 			},
@@ -462,6 +487,10 @@
 		function AddProducts() {
 			var url = '/store/product/prd02/batch-create';
 			var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1024,height=900");
+		}
+
+		function blank_goods_no() {
+			alert('상품번호가 비어있는 상품입니다.');
 		}
 
 		const EditProducts = () => {

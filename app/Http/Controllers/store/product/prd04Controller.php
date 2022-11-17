@@ -39,6 +39,7 @@ class prd04Controller extends Controller
 		$store_no	= $request->input("store_no", "");
 		$ext_store_qty	= $request->input("ext_store_qty", "");
 		$prd_cd_range_text = $request->input("prd_cd_range", '');
+		$goods_nm_eng	= $request->input("goods_nm_eng");
 
 		$ord		= $request->input('ord','desc');
 		$ord_field	= $request->input('ord_field','g.goods_no');
@@ -103,6 +104,7 @@ class prd04Controller extends Controller
 
 			$store_qty_sql	= "pss.qty";
 		}
+		if($goods_nm_eng != "")	$where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
 
 		if( $store_no == "" && $store_type != "" ){
 			$in_store_sql	= " inner join product_stock_store pss on pc.prd_cd = pss.prd_cd ";
@@ -168,6 +170,7 @@ class prd04Controller extends Controller
 					from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
 				  )) as img
 				, if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
+				, g.goods_nm_eng
 				, pc.color, pc.size
 				, concat(c.code_val, '^',d.code_val2) as goods_opt
 				, ps.wqty

@@ -110,6 +110,14 @@
 				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
+							<label for="goods_nm_eng">상품명(영문)</label>
+							<div class="flex_box">
+								<input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
 						<label for="formrow-email-input">매칭여부</label>
 							<div class="form-inline form-radio-box">
 								<div class="custom-control custom-radio">
@@ -222,6 +230,23 @@ const columns = [
 				return '<a href="#" onclick="return blank_goods_no();">' + params.value + '</a>';
 			} else {
 				return '<a href="#" onclick="return openHeadProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
+			}
+		}
+	},
+	{field: "goods_nm_eng", headerName: "상품명(영문)", width: 280, cellStyle: {"line-height": "30px"},
+		cellRenderer: function (params) {
+			if (params.data.goods_no == '') {
+				if(params.data.goods_nm_eng == null ) {
+					return '';					
+				} else{
+					return '<a href="#" onclick="return blank_goods_no();">' + params.value + '</a>';
+				}
+			} else {
+				if(params.data.goods_nm_eng == null ) {
+					return '';					
+				} else{
+					return '<a href="#" onclick="return openHeadProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
+				}
 			}
 		}
 	},

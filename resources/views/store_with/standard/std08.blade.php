@@ -115,6 +115,7 @@
         { field: "fee_10", headerName: "특판", width: 60, type: 'percentType', editable: true, cellStyle: YELLOW },
         { field: "fee_11", headerName: "용품", width: 60, type: 'percentType', editable: true, cellStyle: YELLOW },
         { field: "fee_12", headerName: "특약온라인", width: 90, type: 'percentType', editable: true, cellStyle: YELLOW },
+        { field: "fee_10_info", headerName: "특가기준(%)", width: 90, type: 'percentType', editable: true, cellStyle: YELLOW },
         { field: "bigo", headerName: "비고", width: 200, editable: true, cellStyle: YELLOW },
         { width: "auto" },
     ];

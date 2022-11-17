@@ -141,6 +141,43 @@
             </div>
             <div class="card shadow">
                 <div class="card-header mb-0">
+                    <a href="#">매장환경정보</a>
+                </div>
+                <div class="card-body mt-1">
+                    <div class="row_wrap">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="table-box-ty2 mobile">
+                                    <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                        <colgroup>
+                                            <col width="94px">
+                                        </colgroup>
+                                        <tbody>
+                                            <tr>
+                                                <th>원가 노출</th>
+                                                <td>
+                                                    <div class="form-inline form-radio-box">
+                                                        <div class="custom-control custom-radio">
+                                                            <input type="radio" name="store_wonga_yn" id="store_wonga_y" class="custom-control-input" value="Y" @if(@$user->store_wonga_yn != 'N') checked @endif/>
+                                                            <label class="custom-control-label" for="store_wonga_y">사용</label>
+                                                        </div>
+                                                        <div class="custom-control custom-radio">
+                                                            <input type="radio" name="store_wonga_yn" id="store_wonga_n" class="custom-control-input" value="N" @if(@$user->store_wonga_yn == 'N') checked @endif/>
+                                                            <label class="custom-control-label" for="store_wonga_n">미사용</label>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow">
+                <div class="card-header mb-0">
                     <a href="#">부가정보</a>
                 </div>
                 <div class="card-body mt-1">

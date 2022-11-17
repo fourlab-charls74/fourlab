@@ -822,6 +822,16 @@ class goods extends Controller
                     order by field(br_cd, 'F') desc, brand_nm asc
                 ";
             }
+
+            if($key == 'item') {
+                $sql = "
+                select 
+                    code_id, code_val
+                from code 
+                where code_kind_cd = 'prd_cd_item'
+                order by code_val asc
+                ";
+            }
             $result[$key] = DB::select($sql);
         }
 

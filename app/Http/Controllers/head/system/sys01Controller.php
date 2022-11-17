@@ -108,6 +108,7 @@ class sys01Controller extends Controller
 		$exttel			= $request->input('exttel');
 		$messenger		= $request->input('messenger');
 		$email			= $request->input('email');
+		$store_wonga_yn	= $request->input('store_wonga_yn');
 
 		$user_cnt	= DB::table('mgr_user')
 						->where('id', $id)->count();
@@ -124,6 +125,7 @@ class sys01Controller extends Controller
 				'ipto' => $ipto,
 				'md_yn' => $md_yn,
 				'use_yn' => $use_yn,
+				'store_wonga_yn' => $store_wonga_yn,
 				'part' => $part,
 				'posi' => $posi,
 				'tel' => $tel,
@@ -170,6 +172,7 @@ class sys01Controller extends Controller
 		$email		= $request->input('email');
 		$roles		= (object)json_decode($request->input('roles'));
 		$passwd_chg	= $request->input('passwd_chg');
+		$store_wonga_yn	= $request->input('store_wonga_yn');
 
 		$mgr_user = [
 			'grade'			=> $grade,
@@ -180,6 +183,7 @@ class sys01Controller extends Controller
 			'ipto'			=> $ipto,
 			'md_yn'			=> $md_yn,
 			'use_yn'		=> $use_yn,
+			'store_wonga_yn'=> $store_wonga_yn,
 			'part'			=> $part,
 			'posi'			=> $posi,
 			'tel'			=> $tel,
