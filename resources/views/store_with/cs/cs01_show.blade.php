@@ -227,6 +227,9 @@
             <div class="card-body">
                 <div class="card-title mb-3">
                     <div class="filter_wrap">
+                        <div class="fl_box">
+                            <p style="color: red;">* 상품정보가 존재하지 않는 상품은 입고처리되지 않습니다.</p>
+                        </div>
                         <div class="fr_box">
                             <a href="#" onclick="deleteRows();" class="btn-sm btn btn-primary" onfocus="this.blur()">상품삭제</a>
                             <a href="#" onclick="getSearchGoods();" class="btn-sm btn btn-primary" onfocus="this.blur()">상품 가져오기</a>
@@ -549,7 +552,6 @@
         const row_index = row.count - 1;
         const { qty, unit_cost, goods_no, style_no } = row;
 
-        // 상품정보가 없는 상품의 입고에 대한 논의 필요 - 최유현
         // if (isNaN(parseInt(goods_no))) {
         //     gx.gridOptions.api.stopEditing(); // stop editing
         //     alert(`스타일넘버 ${style_no}은 유효하지 않은 상품입니다. \n상품을 삭제후 다시등록해주세요.`);
