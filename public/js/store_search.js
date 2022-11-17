@@ -310,6 +310,10 @@ SearchPrdcd.prototype.Open = async function(callback = null, match = false){
         this.SetGridCond();
         // $("#SearchPrdcdModal").draggable();
         this.callback = callback;
+
+        if (this.isMatch == false) {
+            $("input:radio[name='match_yn']:radio[value='A']").prop('checked', true); 
+        }
     }
     $('#SearchPrdcdModal').modal({
         keyboard: false
@@ -324,7 +328,7 @@ SearchPrdcd.prototype.SetGrid = function(divId){
             { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null },
             { field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {"text-align": "center"} },
             { field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"} },
-            { field: "prd_nm", headerName: "상품명", width: 400 },
+            { field: "prd_nm", headerName: "상품명", width: 300 },
             { field: "prd_cd1", headerName: "코드일련", width: 120, cellStyle: {"text-align": "center"} },
             { field: "color", headerName: "컬러", width: 60, cellStyle: {"text-align": "center"} },
             { field: "size", headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"} },
@@ -337,8 +341,8 @@ SearchPrdcd.prototype.SetGrid = function(divId){
             { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null },
             { field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {"text-align": "center"} },
             { field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"} },
-            { field: "goods_nm", headerName: "상품명", width: 400 },
-            { field: "goods_opt", headerName: "옵션", width: 300 },
+            { field: "goods_nm", headerName: "상품명", width: 300 },
+            { field: "goods_opt", headerName: "옵션", width: 150 },
             { field: "prd_cd1", headerName: "코드일련", width: 120, cellStyle: {"text-align": "center"} },
             { field: "color", headerName: "컬러", width: 60, cellStyle: {"text-align": "center"} },
             { field: "size", headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"} },

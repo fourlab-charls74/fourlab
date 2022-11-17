@@ -124,7 +124,7 @@ class stk03Controller extends Controller
                 if ($ord_info_key == 'memo') {
                     $where .= " and (m.state like '%$ord_info_value%' or m.memo like '%$ord_info_value%') ";
                 } else if ($ord_info_key == 'o.dlv_end_date') {
-                    $where .= " and date_format($ord_info_keyl, '%Y%m%d') = $ord_info_value ";
+                    $where .= " and date_format($ord_info_key, '%Y%m%d') = $ord_info_value ";
                 } else if (in_array($ord_info_key, ['om.user_nm', 'om.user_id', 'om.r_nm', 'om.bank_inpnm'])) {
                     $where .= " and $ord_info_key = '$ord_info_value' ";
                 } else {
@@ -152,7 +152,7 @@ class stk03Controller extends Controller
                 $in_prd_cds = join(',', $prd_cds);
                 $where .= " and o.prd_cd in ($in_prd_cds) ";
             } else {
-                $where .= " and o.prd_cd = '$prd_cd' ";
+                $where .= " and o.prd_cd like '$prd_cd'% ";
             }
         }
 

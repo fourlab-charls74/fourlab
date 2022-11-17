@@ -56,7 +56,7 @@ class prd04Controller extends Controller
 			$prd_cd = explode(',', $prd_cd);
 			$where .= " and (1!=1";
 			foreach($prd_cd as $cd) {
-				$where .= " or pc.prd_cd = '" . Lib::quote($cd) . "' ";
+				$where .= " or pc.prd_cd like '" . Lib::quote($cd) . "%' ";
 			}
 			$where .= ")";
 		}
@@ -177,16 +177,16 @@ class prd04Controller extends Controller
 				, if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
 				,p.match_yn
 			from product_code pc
-			inner join product_stock ps on pc.prd_cd = ps.prd_cd
-			$in_store_sql
-			left outer join product p on p.prd_cd = pc.prd_cd
-			left outer join goods g on pc.goods_no = g.goods_no
-			left outer join brand brand on brand.brand = g.brand
-			inner join code c on pc.color = c.code_id
-			inner join code d on pc.size = d.code_id
-			inner join brand b on b.br_cd = pc.brand
+				inner join product_stock ps on pc.prd_cd = ps.prd_cd
+				$in_store_sql
+				left outer join product p on p.prd_cd = pc.prd_cd
+				left outer join goods g on pc.goods_no = g.goods_no
+				left outer join brand brand on brand.brand = g.brand
+				inner join code c on pc.color = c.code_id
+				inner join code d on pc.size = d.code_id
+				inner join brand b on b.br_cd = pc.brand
 			where 
-				 c.code_kind_cd = 'PRD_CD_COLOR' and d.code_kind_cd = 'PRD_CD_SIZE_MATCH'
+				c.code_kind_cd = 'PRD_CD_COLOR' and d.code_kind_cd = 'PRD_CD_SIZE_MATCH'
 				$where
 			$orderby
 			$limit

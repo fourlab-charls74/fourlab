@@ -84,7 +84,7 @@ class goods extends Controller
 			$prd_cd = explode(',', $prd_cd);
 			$where .= " and (1!=1";
 			foreach($prd_cd as $cd) {
-				$where .= " or s.prd_cd = '" . Lib::quote($cd) . "' ";
+				$where .= " or s.prd_cd like '" . Lib::quote($cd) . "%' ";
 			}
 			$where .= ")";
 		}
@@ -336,7 +336,7 @@ class goods extends Controller
 			$prd_cd = explode(',', $prd_cd);
 			$where .= " and (1!=1";
 			foreach($prd_cd as $cd) {
-				$where .= " or s.prd_cd = '" . Lib::quote($cd) . "' ";
+				$where .= " or s.prd_cd like '" . Lib::quote($cd) . "%' ";
 			}
 			$where .= ")";
 		}
@@ -602,7 +602,7 @@ class goods extends Controller
 			$prd_cd = explode(',', $prd_cd);
 			$where .= " and (1!=1";
 			foreach($prd_cd as $cd) {
-				$where .= " or p.prd_cd = '" . Lib::quote($cd) . "' ";
+				$where .= " or p.prd_cd like '" . Lib::quote($cd) . "%' ";
 			}
 			$where .= ")";
 		}
@@ -819,7 +819,7 @@ class goods extends Controller
                     from brand
                     where use_yn = 'Y'
                         and br_cd != ''
-                    order by field(br_cd, 'F') desc, br_cd
+                    order by field(br_cd, 'F') desc, brand_nm asc
                 ";
             }
             $result[$key] = DB::select($sql);

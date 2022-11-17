@@ -49,6 +49,7 @@
                     <li><a href="/store/stock/stk26">(완)실사</a></li>
                     <li><a href="/store/stock/stk31">(완)매장 공지사항</a></li>
                     <li><a href="/store/stock/stk32">(완)매장 알림</a></li>
+                    <li><a href="/store/stock/stk33">(개)동종업계매출관리</a></li>
                 </ul>
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-user fs-18"></i><span>고객/수선관리</span></a>

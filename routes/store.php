@@ -409,6 +409,15 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('stk32/mod_group', 'stk32Controller@mod_group');
         Route::post('stk32/del_group', 'stk32Controller@del_group');
 
+        //동종업계매출관리
+        Route::get('stk33','stk33Controller@index');
+        Route::get('stk33/search', 'stk33Controller@search');
+        Route::get('stk33/create', 'stk33Controller@create');
+        Route::get('stk33/{no}', 'stk33Controller@show');
+        Route::put('stk33/store', 'stk33Controller@store');
+        Route::put('stk33/edit/{no}', 'stk33Controller@update');
+        Route::post('stk33/del_store', 'stk33Controller@del_store');
+
     });
 
     // 고객관리

@@ -79,7 +79,7 @@ class stk01Controller extends Controller
 			$prd_cd = explode(',', $prd_cd);
 			$where .= " and (1!=1";
 			foreach($prd_cd as $cd) {
-				$where .= " or p.prd_cd = '" . $cd . "' ";
+				$where .= " or p.prd_cd like '" . $cd . "%' ";
 			}
 			$where .= ")";
 		}
@@ -393,7 +393,7 @@ class stk01Controller extends Controller
 		
 		$rows = [];
 		if ($prd_cd != '') {
-			$where = " and p.prd_cd = '$prd_cd' ";
+			$where = " and p.prd_cd like '$prd_cd'% ";
 			if ($store_type) $where .= " and store.store_type = '$store_type' ";
 
 			// store_where

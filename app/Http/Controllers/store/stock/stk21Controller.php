@@ -50,7 +50,7 @@ class stk21Controller extends Controller
             $prd_cd = explode(',', $r['prd_cd']);
 			$where .= " and (1!=1";
 			foreach($prd_cd as $cd) {
-				$where .= " or p.prd_cd = '" . Lib::quote($cd) . "' ";
+				$where .= " or p.prd_cd like '" . Lib::quote($cd) . "%' ";
 			}
 			$where .= ")";
         }
