@@ -20,6 +20,7 @@ class prd04Controller extends Controller
 	{
 
 		$values = [
+			'sdate'			=> date('Y-m-d'), 
             'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
 		];
 
@@ -31,6 +32,8 @@ class prd04Controller extends Controller
 		if( $page < 1 or $page == "" )	$page = 1;
 		$limit	= $request->input('limit', 100);
 
+		$sdate 		= $request->input("sdate", date("Y-m-d"));
+		$next_edate = date("Y-m-d", strtotime("+1 day", strtotime($sdate)));
 		$prd_cd		= $request->input("prd_cd", "");
 		$goods_no	= $request->input("goods_no", "");
 		$style_no	= $request->input("style_no");
@@ -43,12 +46,13 @@ class prd04Controller extends Controller
 
 		$ord		= $request->input('ord','desc');
 		$ord_field	= $request->input('ord_field','g.goods_no');
-		$orderby	= sprintf("order by %s %s", $ord_field, $ord);
+		$orderby	= sprintf("order by %s %s, pc.color", $ord_field, $ord);
 		$match_yn = $request->input('match_yn1');
 
 		$where		= "";
 		$in_store_sql	= "";
 		$store_qty_sql	= "(ps.qty - ps.wqty)";
+		$next_store_qty_sql = "";
 
 		if($match_yn == 'Y') 	$where .= " and p.match_yn = 'Y'";
 		if($match_yn == 'N') 	$where .= " and p.match_yn = 'N'";
@@ -96,13 +100,14 @@ class prd04Controller extends Controller
 		if( $store_no != "" ){
 			$in_store_sql	= " inner join product_stock_store pss on pc.prd_cd = pss.prd_cd ";
 
-			$where	.= " and (1!=1";
+			$where	.= " and ( 1<>1";
 			foreach($store_no as $store_cd) {
 				$where .= " or pss.store_cd = '" . Lib::quote($store_cd) . "' ";
 			}
 			$where	.= ")";
 
-			$store_qty_sql	= "pss.qty";
+			$next_store_qty_sql = " and _next_store.location_cd = pss.store_cd ";
+			$store_qty_sql	= "sum(pss.qty)";
 		}
 		if($goods_nm_eng != "")	$where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
 
@@ -112,20 +117,21 @@ class prd04Controller extends Controller
 			$sql	= " select store_cd from store where store_type = :store_type and use_yn = 'Y' ";
 			$result = DB::select($sql,['store_type' => $store_type]);
 
-			$where	.= " and (1!=1";
+			$where	.= " and ( 1<>1";
 			foreach($result as $row){
 				$where .= " or pss.store_cd = '" . Lib::quote($row->store_cd) . "' ";
 			}
 			$where	.= ")";
 
-			$store_qty_sql	= "pss.qty";
+			$next_store_qty_sql = " and _next_store.location_cd = pss.store_cd ";
+			$store_qty_sql	= "sum(pss.qty)";
 		}
 
-		if( $ext_store_qty == "Y" ){
-			if( $store_no == "" )	$where .= " and (ps.qty - ps.wqty) > 0 ";
-			else					$where .= " and pss.qty > 0 ";
+		if ( $ext_store_qty == "Y" ) {
+			$where .= " and $store_qty_sql > 0 ";
+			// if( $store_no == "" )	$where .= " and (ps.qty - ps.wqty) > 0 ";
+			// else					$where .= " and pss.qty > 0 ";
 		}
-
 
 		$page_size	= $limit;
 		$startno	= ($page - 1) * $page_size;
@@ -133,22 +139,54 @@ class prd04Controller extends Controller
 
 		$total		= 0;
 		$page_cnt	= 0;
+		$total_row  = [];
 
 		if( $page == 1 ){
 			$query	= /** @lang text */
 			"
 				select 
-					count(*) as total
-				from product_code pc
-				inner join product_stock ps on pc.prd_cd = ps.prd_cd
-				$in_store_sql
-				left outer join product p on p.prd_cd = pc.prd_cd
-				left outer join goods g on pc.goods_no = g.goods_no
-				where 1=1 
-					$where
+					count(prd_cd) as total,
+					sum(a.goods_sh) as total_goods_sh,
+					sum(a.price) as total_price,
+					sum(a.wqty) as total_wqty,
+					sum(a.sqty) as total_sqty
+				from (
+					select 
+						pc.prd_cd
+						, (ps.wqty - ifnull(_next_storage.qty, 0)) as wqty
+						, ($store_qty_sql - ifnull(_next_store.qty, 0)) as sqty
+						, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
+						, if(pc.goods_no = 0, p.price, g.price) as price
+					from product_code pc
+						inner join product_stock ps on pc.prd_cd = ps.prd_cd
+						$in_store_sql
+						left outer join product p on p.prd_cd = pc.prd_cd
+						left outer join goods g on pc.goods_no = g.goods_no
+						left outer join brand brand on brand.brand = g.brand
+						inner join code c on pc.color = c.code_id
+						inner join code d on pc.size = d.code_id
+						inner join brand b on b.br_cd = pc.brand
+						left outer join (
+							select prd_cd, sum(qty) as qty, stock_state_date
+							from product_stock_hst
+							where location_type = 'STORAGE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+							group by prd_cd
+						) _next_storage on _next_storage.prd_cd = ps.prd_cd
+						left outer join (
+							select prd_cd, sum(qty) as qty, location_cd, stock_state_date
+							from product_stock_hst
+							where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+							group by prd_cd
+						) _next_store on _next_store.prd_cd = ps.prd_cd $next_store_qty_sql
+					where 
+						c.code_kind_cd = 'PRD_CD_COLOR' and d.code_kind_cd = 'PRD_CD_SIZE_MATCH'
+						$where
+					group by pc.prd_cd
+				) a
 			";
 			$row	= DB::select($query);
 			$total	= $row[0]->total;
+			$total_row = $row[0];
 			$page_cnt = (int)(($total - 1) / $page_size) + 1;
 		}
 
@@ -168,13 +206,15 @@ class prd04Controller extends Controller
 				, if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
 					select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
 					from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
-				  )) as img
+				)) as img
 				, if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
 				, g.goods_nm_eng
 				, pc.color, pc.size
 				, concat(c.code_val, '^',d.code_val2) as goods_opt
-				, ps.wqty
-				, $store_qty_sql as sqty
+				-- , ps.wqty
+				-- , $store_qty_sql as sqty
+				, (ps.wqty - ifnull(_next_storage.qty, 0)) as wqty
+				, ($store_qty_sql - ifnull(_next_store.qty, 0)) as sqty
 				, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
 				, if(pc.goods_no = 0, p.price, g.price) as price
 				, if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
@@ -188,9 +228,22 @@ class prd04Controller extends Controller
 				inner join code c on pc.color = c.code_id
 				inner join code d on pc.size = d.code_id
 				inner join brand b on b.br_cd = pc.brand
+				left outer join (
+					select prd_cd, sum(qty) as qty, stock_state_date
+					from product_stock_hst
+					where location_type = 'STORAGE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+					group by prd_cd
+				) _next_storage on _next_storage.prd_cd = ps.prd_cd
+				left outer join (
+					select prd_cd, sum(qty) as qty, location_cd, stock_state_date
+					from product_stock_hst
+					where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+					group by prd_cd
+				) _next_store on _next_store.prd_cd = ps.prd_cd $next_store_qty_sql
 			where 
 				c.code_kind_cd = 'PRD_CD_COLOR' and d.code_kind_cd = 'PRD_CD_SIZE_MATCH'
 				$where
+			group by pc.prd_cd
 			$orderby
 			$limit
 		";
@@ -217,7 +270,8 @@ class prd04Controller extends Controller
 				"total"		=> $total,
 				"page"		=> $page,
 				"page_cnt"	=> $page_cnt,
-				"page_total"=> count($result)
+				"page_total"=> count($result),
+				'total_row'  => $total_row,
 			),
 			"body"	=> $result
 		]);
