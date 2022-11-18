@@ -281,7 +281,7 @@ class stk03Controller extends Controller
                     c.last_up_date,
                     (select count(*) from order_opt where ord_no = o.ord_no and ord_opt_no != o.ord_opt_no and (ord_state > 10 or clm_state > 0)) as ord_opt_cnt
                 from order_opt o
-                    inner join product_code pc on pc.goods_no = o.goods_no
+                    left outer join product_code pc on pc.prd_cd = o.prd_cd
                     inner join order_mst om on o.ord_no = om.ord_no
                     inner join goods g on o.goods_no = g.goods_no
                     left outer join payment pay on om.ord_no = pay.ord_no
@@ -311,7 +311,7 @@ class stk03Controller extends Controller
             $sql = "
                 select count(*) as total
                 from order_opt o
-                    inner join product_code pc on pc.goods_no = o.goods_no
+                    left outer join product_code pc on pc.prd_cd = o.prd_cd
                     inner join order_mst om on o.ord_no = om.ord_no
                     inner join goods g on o.goods_no = g.goods_no
                     left outer join payment pay on om.ord_no = pay.ord_no

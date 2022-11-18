@@ -19,7 +19,7 @@
                 <div class="flax_box">
                     <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                     <a href="#" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
-                    <a href="/store/stock/stk33/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
+                    <a href="#" onclick="add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
                     <button id="download-list" onclick="gx.Download();" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
                         <i class="bx bx-download fs-16"></i> 엑셀다운로드
                     </button>&nbsp;&nbsp;
@@ -157,22 +157,22 @@
 </div>
 <script language="javascript">
     let columns = [
-        {headerName: "#", field: "num",type:'NumType', cellClass: 'hd-grid-code'},
-        {headerName: "매출일", field: "admin_id",  width: 80, cellClass: 'hd-grid-code'},
-        {headerName: "합계", field: "admin_nm",  width: 80, cellClass: 'hd-grid-code'},
+        {headerName: "#", field: "num",type:'NumType', pinned:'left', cellClass: 'hd-grid-code'},
+        {headerName: "매출일", field: "sale_date", pinned:'left',  width: 80, cellClass: 'hd-grid-code'},
+        {headerName: "합계", field: "sale_amt",  pinned:'left', width: 80, cellClass: 'hd-grid-code'},
+        {field: "competitors",	headerName: "동종업계 매장",
+            children: [
+                @foreach($competitors as $com)
 
-        @foreach($competitors as $com)
+                    {headerName: "{{ $com->code_val }}", field: "{{$com->code_id}}",  width: 90, cellClass: 'hd-grid-code'},
 
-            {headerName: "{{ $com->code_id }}", field: "code_id",  width: 80, cellClass: 'hd-grid-code'},
-
-        @endforeach
+                @endforeach
+            ]
+        },
 
         {width: 'auto'}
     ];
 
-</script>
-
-<script type="text/javascript" charset="utf-8">
     const pApp = new App('',{
         gridId:"#div-gd",
     });
@@ -191,14 +191,18 @@
         gx.Request('/store/stock/stk33/search', data);
     }
 
-</script>
-
-<script>
     const initSearchInputs = () => {
         document.search.reset(); // 모든 일반 input 초기화
         $('#store_no').val(null).trigger('change'); // 브랜드 select2 박스 초기화
         location.reload();
     };
+
+
+    function add() {
+        const url = '/store/stock/stk33/create';
+        const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1000,height=700");
+    }
+
 </script>
 
 

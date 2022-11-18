@@ -413,10 +413,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk33','stk33Controller@index');
         Route::get('stk33/search', 'stk33Controller@search');
         Route::get('stk33/create', 'stk33Controller@create');
-        Route::get('stk33/{no}', 'stk33Controller@show');
-        Route::put('stk33/store', 'stk33Controller@store');
-        Route::put('stk33/edit/{no}', 'stk33Controller@update');
-        Route::post('stk33/del_store', 'stk33Controller@del_store');
+        Route::get('stk33/com_search', 'stk33Controller@com_search');
+        Route::post('stk33/save_amt', 'stk33Controller@save_amt');
 
     });
 
