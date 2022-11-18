@@ -226,7 +226,7 @@
 	.img {
 		height:30px;
 	}
-	.ag-row-level-1 {
+	.ag-row-level-0 {
 		background-color: #f6f6f6 !important;
 	}
 </style>
@@ -268,7 +268,12 @@
 				}
 			}
 		},
-		{field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: StyleLineHeight, rowGroup: true, hide: true},
+		{field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: StyleLineHeight, rowGroup: true, hide: true,
+			cellRenderer: function (params) {
+				if(params.value === undefined) return "";
+				return `<a href="javascript:void(0);" onclick="return OpenStockPopup('${params.value}', '${$("[name=sdate]").val() || ''}');">${params.value}</a>`;
+			}
+		},
 		{field: "color", headerName: "컬러", width: 55, cellStyle: StyleLineHeight},
 		{field: "size", headerName: "사이즈", width: 55, cellStyle: StyleLineHeight},
 		{field: "goods_opt", headerName: "옵션", width: 200},
@@ -325,7 +330,7 @@
 			// onCellValueChanged: onCellValueChanged,
 			pinnedTopRowData: pinnedRowData,
 			getRowStyle: (params) => {
-                if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee', 'border': 'none'};
+                if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee !important', 'border': 'none'};
             },
 			autoGroupColumnDef: basic_autoGroupColumnDef('코드일련'),
 			groupDefaultExpanded: 1,
@@ -399,6 +404,11 @@
 		else if( item == 'store' )		url = '/store/product/prd04/batch_store';
 
 		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
+	}
+
+	function OpenStockPopup(prd_cd_p, date) {
+		var url = `/store/product/prd04/stock/${prd_cd_p}?date=${date}`;
+		var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=900,height=800");
 	}
 
 </script>
