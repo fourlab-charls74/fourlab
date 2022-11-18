@@ -149,6 +149,7 @@
 								<span class="text_line">/</span>
 								<div class="form-inline-inner input_box" style="width:45%;">
 									<select name="ord_field" class="form-control form-control-sm">
+										<option value="prd_cd_p">코드일련</option>
 										<option value="pc.rt">등록일</option>
 										<option value="pc.prd_cd">상품코드</option>
 										<option value="pc.goods_no">상품번호</option>
@@ -225,32 +226,31 @@
 	.img {
 		height:30px;
 	}
+	.ag-row-level-1 {
+		background-color: #f6f6f6 !important;
+	}
 </style>
 <script language="javascript">
 	const pinnedRowData = [{ goods_nm: '', goods_sh: 0, price: 0, wqty: 0, sqty: 0 }];
 		
 	const columns = [
 		{headerName: '#', pinned: 'left', type: 'NumType', width:40, cellStyle: StyleLineHeight,
-			cellRenderer: function (params) {
-                if (params.node.rowPinned === 'top') {
-                    return "합계";
-                } else {
-                    return parseInt(params.value) + 1;
-                }
-            }
+			cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : parseInt(params.value) + 1,
 		},
-		{field: "prd_cd", headerName: "상품코드", width:120, pinned: 'left', cellStyle: StyleLineHeight,
+		{field: "prd_cd", headerName: "상품코드", width:120, cellStyle: StyleLineHeight,
 			cellRenderer: function(params) {
+				if (params.node.rowPinned === 'top') return "합계";
 				if (params.value !== undefined) {
 					return '<a href="#" onclick="return EditProduct(\'' + params.value + '\',\'' + params.data.goods_no + '\');">' + params.value + '</a>';
 				}
 			}
 		},
-		{field: "goods_no", headerName: "상품번호", width: 70, cellStyle: (params) => ({...StyleGoodsNo(params), "line-height": "30px"})},
-		{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}"},
+		{field: "goods_no", headerName: "상품번호", width: 70, cellStyle: StyleLineHeight},
+		{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, surl:"{{config('shop.front_url')}}"},
 		{field: "img", headerName: "이미지_url", hide: true},
-		{field: "goods_nm", headerName: "상품명", width: 280, cellStyle: {"line-height": "30px"},
+		{field: "goods_nm", headerName: "상품명", width: 270,
 			cellRenderer: function (params) {
+				if(params.value === undefined) return "";
 				if (params.data.goods_no == '') {
 					return '<a href="#" onclick="return blank_goods_no();">' + params.value + '</a>';
 				} else {
@@ -258,48 +258,45 @@
 				}
 			}
 		},
-		{field: "goods_nm_eng", headerName: "상품명(영문)", width: 280, cellStyle: {"line-height": "30px"},
+		{field: "goods_nm_eng", headerName: "상품명(영문)", width: 270,
 			cellRenderer: function (params) {
+				if(params.value === undefined) return "";
 				if (params.data.goods_no == '') {
-					if(params.data.goods_nm_eng == null ) {
-						return '';					
-					} else{
-						return '<a href="#" onclick="return blank_goods_no();">' + params.value + '</a>';
-					}
+					return params.data.goods_nm_eng == null ? "" : '<a href="#" onclick="return blank_goods_no();">' + params.value + '</a>';
 				} else {
-					if(params.data.goods_nm_eng == null ) {
-						return '';					
-					} else{
-						return '<a href="#" onclick="return openHeadProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
-					}
+					return params.data.goods_nm_eng == null ? "" : '<a href="#" onclick="return openHeadProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
 				}
 			}
 		},
-		{field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: StyleLineHeight},
+		{field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: StyleLineHeight, rowGroup: true, hide: true},
 		{field: "color", headerName: "컬러", width: 55, cellStyle: StyleLineHeight},
 		{field: "size", headerName: "사이즈", width: 55, cellStyle: StyleLineHeight},
-		{field: "goods_opt", headerName: "옵션", width: 200, cellStyle: {"line-height": "30px"}},
-		{field: "goods_sh", headerName: "TAG가", type: 'currencyType', width:85, cellStyle: {"line-height": "30px"}},
-		{field: "price", headerName: "판매가", type: 'currencyType', width:85, cellStyle: {"line-height": "30px"}},
-		{field: "wqty", headerName: "창고재고", width:70, type: 'currencyType', cellStyle: {"line-height": "30px"},
+		{field: "goods_opt", headerName: "옵션", width: 200},
+		{field: "goods_sh", headerName: "TAG가", type: 'currencyType', width:85, aggFunc: 'sum'},
+		{field: "price", headerName: "판매가", type: 'currencyType', width:85, aggFunc: 'sum'},
+		{field: "wqty", headerName: "창고재고", width:70, type: 'currencyType', 
+			aggFunc: (params) => {
+				return params.values.reduce((a,c) => a + (c * 1), 0);
+			},
 			cellRenderer: function(params) {
+				if(params.value === undefined) return "";
 				if (params.node.rowPinned === 'top') {
                     return params.value;
                 } else {
-					if (params.value !== undefined) {
-						return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\', \'' + $("[name=sdate]").val() + '\');">' + params.value + '</a>';
-					}
+					return '<a href="#" onclick="return openStoreStock(\'' + params.data?.prd_cd + '\', \'' + $("[name=sdate]").val() + '\');">' + params.value + '</a>';
                 }
 			}
 		},
-		{field: "sqty", headerName: "매장재고", width:70, type: 'currencyType', cellStyle: {"line-height": "30px"},
+		{field: "sqty", headerName: "매장재고", width:70, type: 'currencyType',
+			aggFunc: (params) => {
+				return params.values.reduce((a,c) => a + (c * 1), 0);
+			},
 			cellRenderer: function(params) {
+				if(params.value === undefined) return "";
 				if (params.node.rowPinned === 'top') {
 					return params.value;
 				} else {
-					if (params.value !== undefined) {
-						return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\', \'' + $("[name=sdate]").val() + '\');">' + params.value + '</a>';
-					}
+					return '<a href="#" onclick="return openStoreStock(\'' + params.data?.prd_cd + '\', \'' + $("[name=sdate]").val() + '\');">' + params.value + '</a>';
 				}
 			}
 		},
@@ -309,6 +306,15 @@
 		{width:"auto"}
 	];
 
+	const basic_autoGroupColumnDef = (headerName, width = 150) => ({
+		headerName: headerName,
+		headerClass: 'bizest',
+		minWidth: width,
+		maxWidth: width,
+		cellRenderer: 'agGroupCellRenderer',
+		pinned: 'left'
+	});
+
 	const pApp = new App('', {
 		gridId: "#div-gd",
 	});
@@ -316,12 +322,24 @@
 	let gx;
 	$(document).ready(function() {
 		gx = new HDGrid(gridDiv, columns, {
-			onCellValueChanged: onCellValueChanged,
+			// onCellValueChanged: onCellValueChanged,
 			pinnedTopRowData: pinnedRowData,
 			getRowStyle: (params) => {
                 if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee', 'border': 'none'};
             },
+			autoGroupColumnDef: basic_autoGroupColumnDef('코드일련'),
+			groupDefaultExpanded: 1,
+			suppressAggFuncInHeader: true,
+			animateRows: true,
+			suppressDragLeaveHidesColumns: true,
+			suppressMakeColumnVisibleAfterUnGroup: true,
+			// rowGroupPanelShow: 'always',
 		});
+		gx.gridOptions.defaultColDef = {
+			suppressMenu: true,
+			resizable: true,
+			sortable: true,
+		};
 		pApp.ResizeGrid(275);
 		pApp.BindSearchEnter();
 		Search();
@@ -335,7 +353,9 @@
 		e.node.setSelected(true);
 	}
 
-	function Search() {
+	async function Search() {
+		await setColumn();
+
 		let data = $('form[name="search"]').serialize();
 		gx.Request('/store/product/prd04/search', data, 1, function(e) {
 			const t = e.head.total_row;
@@ -346,6 +366,26 @@
 				sqty: Comma(t.total_sqty),
 			}]);
 		});
+	}
+
+	// 정렬 타입에 따른 column 업데이트
+	function setColumn() {
+		let ord_field = $("[name=ord_field]").val();
+		if(ord_field === "prd_cd_p") {
+			let prd_columns = columns.map(c => c.field === "prd_cd_p" 
+				? ({...c, rowGroup: true, hide: true, pinned: "left"}) 
+				: c.field === "color" || c.field === "size" ? ({...c, pinned: "left"})
+				: c.type === "NumType" ? ({...c, hide: true})
+				: c.field === "goods_no" ? ({...c, cellStyle: StyleLineHeight}) : c);
+			gx.gridOptions.api.setColumnDefs(prd_columns);
+		} else {
+			let prd_columns = columns.map(c => c.field === "prd_cd_p" 
+				? ({...c, rowGroup: false, hide: false, pinned: "auto"}) 
+				: c.field === "color" || c.field === "size" ? ({...c, pinned: "auto"}) 
+				: c.type === "NumType" ? ({...c, hide: false})
+				: c.field === "goods_no" ? ({...c, cellStyle: StyleGoodsNo}) : c);
+			gx.gridOptions.api.setColumnDefs(prd_columns);
+		}
 	}
 
 	function EditProduct(product_code, goods_no) {

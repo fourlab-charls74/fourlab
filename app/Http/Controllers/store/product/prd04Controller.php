@@ -45,8 +45,8 @@ class prd04Controller extends Controller
 		$goods_nm_eng	= $request->input("goods_nm_eng");
 
 		$ord		= $request->input('ord','desc');
-		$ord_field	= $request->input('ord_field','g.goods_no');
-		$orderby	= sprintf("order by %s %s, pc.color", $ord_field, $ord);
+		$ord_field	= $request->input('ord_field','prd_cd_p');
+		$orderby	= sprintf("order by %s %s, pc.color, pc.size", $ord_field, $ord);
 		$match_yn = $request->input('match_yn1');
 
 		$where		= "";
@@ -198,7 +198,7 @@ class prd04Controller extends Controller
 		"
 			select 
 				pc.prd_cd
-				, '' as prd_cd_p
+				, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
 				, if(pc.goods_no = 0, '', ps.goods_no) as goods_no
 				, b.brand_nm
 				, if(pc.goods_no = 0, p.style_no, g.style_no) as style_no
@@ -257,9 +257,8 @@ class prd04Controller extends Controller
 				$row["img"] = sprintf("%s%s",config("shop.image_svr"), $row["img"]);
 			}
 
-			$chk_len	= strlen($row['prd_cd']) - strlen($row['color']) - strlen($row['size']);
-			$row['prd_cd_p']	= substr($row['prd_cd'], 0, $chk_len);
-
+			// $chk_len	= strlen($row['prd_cd']) - strlen($row['color']) - strlen($row['size']);
+			// $row['prd_cd_p']	= substr($row['prd_cd'], 0, $chk_len);
 
 			$result[] = $row;
 		}

@@ -135,7 +135,7 @@ class stk13Controller extends Controller
 
         // orderby
         $ord = $r['ord'] ?? 'desc';
-        $ord_field = $r['ord_field'] ?? "o.store_cd";
+        $ord_field = $r['ord_field'] ?? "store_cd";
 		$ord_field = 'o.' . $ord_field;
         $orderby = sprintf("%s %s", $ord_field, $ord);
 
