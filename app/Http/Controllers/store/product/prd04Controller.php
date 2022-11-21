@@ -284,72 +284,70 @@ class prd04Controller extends Controller
 		$sdate = $request->input('date', date('Y-m-d'));
 		if($sdate == '') $sdate = date('Y-m-d');
 
-		$cfg_img_size_real	= "a_500";
-		$cfg_img_size_list	 = "s_50";
+		// $cfg_img_size_real	= "a_500";
+		// $cfg_img_size_list	 = "s_50";
 
-		$sql = "
-			select
-				p.prd_cd
-				, concat(p.brand, p.year, p.season, p.gender, p.item, p.seq, p.opt) as prd_cd_p
-				, p.goods_no
-				, p.color as color_cd
-				, c.code_val as color
-				, p.size
-				, g.goods_nm
-				, g.goods_nm_eng
-				, g.style_no
-				, g.com_id
-				, g.com_nm
-				, g.opt_kind_cd
-				, o.opt_kind_nm
-				, g.brand
-				, b.brand_nm
-				, if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
-					select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
-					from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
-				)) as img
-			from product_code p
-				left outer join goods g on g.goods_no = p.goods_no
-				left outer join opt o on g.opt_kind_cd = o.opt_kind_cd
-				left outer join brand b on b.brand = g.brand
-				left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = p.color
-			having prd_cd_p = :prd_cd_p
-		";
-		$rows = DB::select($sql, ['prd_cd_p' => $prd_cd_p]);
+		// $sql = "
+		// 	select
+		// 		p.prd_cd
+		// 		, concat(p.brand, p.year, p.season, p.gender, p.item, p.seq, p.opt) as prd_cd_p
+		// 		, p.goods_no
+		// 		, p.color as color_cd
+		// 		, c.code_val as color
+		// 		, p.size
+		// 		, g.goods_nm
+		// 		, g.goods_nm_eng
+		// 		, g.style_no
+		// 		, g.com_id
+		// 		, g.com_nm
+		// 		, g.opt_kind_cd
+		// 		, o.opt_kind_nm
+		// 		, g.brand
+		// 		, b.brand_nm
+		// 		, if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
+		// 			select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
+		// 			from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
+		// 		)) as img
+		// 	from product_code p
+		// 		left outer join goods g on g.goods_no = p.goods_no
+		// 		left outer join opt o on g.opt_kind_cd = o.opt_kind_cd
+		// 		left outer join brand b on b.brand = g.brand
+		// 		left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = p.color
+		// 	having prd_cd_p = :prd_cd_p
+		// ";
+		// $rows = DB::select($sql, ['prd_cd_p' => $prd_cd_p]);
 		
-		if (count($rows) > 0 && $rows[0]->goods_no == '0') {
-			$sql = "
-				select 
-					p.prd_cd, p.prd_nm as goods_nm, p.style_no, p.type, p.com_id, c.com_nm
-					, p.match_yn, p.use_yn, pc.brand, b.brand_nm
-					, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
-					, pc.color as color_cd
-					, col.code_val as color
-					, pc.size
-				from product p
-					inner join product_code pc on pc.prd_cd = p.prd_cd
-					left outer join company c on c.com_id = p.com_id
-					left outer join brand b on b.br_cd = pc.brand
-					left outer join code col on col.code_kind_cd = 'PRD_CD_COLOR' and col.code_id = pc.color
-				having prd_cd_p = :prd_cd_p
-			";
-			$rows = DB::select($sql, ['prd_cd_p' => $prd_cd_p]);
-		}
+		// if (count($rows) > 0 && $rows[0]->goods_no == '0') {
+		// 	$sql = "
+		// 		select 
+		// 			p.prd_cd, p.prd_nm as goods_nm, p.style_no, p.type, p.com_id, c.com_nm
+		// 			, p.match_yn, p.use_yn, pc.brand, b.brand_nm
+		// 			, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
+		// 			, pc.color as color_cd
+		// 			, col.code_val as color
+		// 			, pc.size
+		// 		from product p
+		// 			inner join product_code pc on pc.prd_cd = p.prd_cd
+		// 			left outer join company c on c.com_id = p.com_id
+		// 			left outer join brand b on b.br_cd = pc.brand
+		// 			left outer join code col on col.code_kind_cd = 'PRD_CD_COLOR' and col.code_id = pc.color
+		// 		having prd_cd_p = :prd_cd_p
+		// 	";
+		// 	$rows = DB::select($sql, ['prd_cd_p' => $prd_cd_p]);
+		// }
 
-		$colors = array_unique(array_map(function($row) {
-			return (object)['code' => $row->color_cd, 'name' => $row->color];
-		}, $rows), SORT_REGULAR);
+		// $colors = array_unique(array_map(function($row) {
+		// 	return (object)['code' => $row->color_cd, 'name' => $row->color];
+		// }, $rows), SORT_REGULAR);
 
-		$sizes = array_unique(array_map(function($row) {
-			return (object)['code' => $row->size];
-		}, $rows), SORT_REGULAR);
+		// $sizes = array_unique(array_map(function($row) {
+		// 	return (object)['code' => $row->size];
+		// }, $rows), SORT_REGULAR);
 		
 		$values = [
 			'prd_cd_p' => $prd_cd_p,
 			'sdate' => $sdate,
-			'prd' => $rows[0] ?? '',
-			'colors' => $colors,
-			'sizes' => $sizes,
+			// 'prd' => $rows[0] ?? '',
 			'store_types' => SLib::getCodes("STORE_TYPE"), // 매장구분
 		];
 
@@ -385,8 +383,8 @@ class prd04Controller extends Controller
 
 			$case_sql = "";
 			foreach ($sizes as $size) {
-				$case_sql .= " , sum(case when pc.size = '$size' then ps.qty end) as 'qty_$size' ";
-				$case_sql .= " , sum(case when pc.size = '$size' then ps.wqty end) as 'wqty_$size' ";
+				$case_sql .= " , sum(case when pc.size = '$size' then ps.qty end) as '" . str_replace('.', '', $size) . "_qty' ";
+				$case_sql .= " , sum(case when pc.size = '$size' then ps.wqty end) as '" . str_replace('.', '', $size) . "_wqty' ";
 			}
 
 			$sql = "
@@ -401,7 +399,7 @@ class prd04Controller extends Controller
 					, sum(ps.wqty) as wqty
 				from product_code pc
 					inner join store s
-					left outer join (
+					inner join (
 						select ps.prd_cd
 							, ps.store_cd
 							, (ps.qty - ifnull(hst.qty, 0)) as qty
@@ -416,19 +414,49 @@ class prd04Controller extends Controller
 					) ps on ps.store_cd = s.store_cd and ps.prd_cd = pc.prd_cd
 				where pc.prd_cd like '$prd_cd_p%' $where
 				group by pc.color, s.store_cd
-				order by pc.color, s.store_cd
+				order by pc.color, s.store_nm
 			";
-			$rows = DB::select($sql);
+			$store_rows = DB::select($sql);
+
+			$sql = "
+				select 
+					pc.color
+					, s.storage_cd
+					, s.storage_nm
+					, ps.prd_cd
+					, pc.color
+					$case_sql
+					, sum(ps.qty) as qty
+					, sum(ps.wqty) as wqty
+				from product_code pc
+					inner join storage s on s.use_yn = 'Y'
+					inner join (
+						select ps.prd_cd
+							, ps.storage_cd
+							, (ps.qty - ifnull(hst.qty, 0)) as qty
+							, (ps.wqty - ifnull(hst.qty, 0)) as wqty
+						from product_stock_storage ps
+							left outer join (
+								select prd_cd, sum(qty) as qty, location_cd, stock_state_date
+								from product_stock_hst
+								where location_type = 'STORAGE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+								group by prd_cd
+							) hst on hst.prd_cd = ps.prd_cd and hst.location_cd = ps.storage_cd	
+					) ps on ps.storage_cd = s.storage_cd and ps.prd_cd = pc.prd_cd
+				where pc.prd_cd like '$prd_cd_p%'
+				group by s.storage_cd, pc.color
+				order by s.storage_cd, pc.color
+			";
+			$storage_rows = DB::select($sql);
 
 			$values = [
 				'sizes' => $sizes,
-				'stores' => $rows,
+				'stores' => $store_rows,
+				'storages' => $storage_rows,
 			];
 		}
 
-		return response()->json([
-			'data' => $values,
-		], 200);
+		return response()->json([ 'data' => $values ], 200);
 	}
 
 	public function batch(){

@@ -983,6 +983,26 @@ class goods extends Controller
         ]);
     }
 
+    /** 코드일련으로 해당 상품의 컬러옵션 리스트 조회 */
+    public function search_color(Request $request)
+    {
+        $prd_cd_p = $request->input('prd_cd_p', '');
+        $colors = [];
+
+        if ($prd_cd_p != '') {
+            $sql = "
+                select p.color, c.code_val as color_nm
+                from product_code p
+                    inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = p.color
+                where p.prd_cd like '$prd_cd_p%'
+                group by p.color
+            ";
+            $colors = DB::select($sql);
+        }
+
+        return response()->json(['colors' => $colors]);
+    }
+
     /*********************************************************************************/
     /****************************** 원부자재코드 검색 관련 ****************************/
     /********************************************************************************/

@@ -226,8 +226,8 @@
 	.img {
 		height:30px;
 	}
-	.ag-row-level-0 {
-		background-color: #f6f6f6 !important;
+	.ag-row-level-1 {
+		background-color: #edf4fd !important;
 	}
 </style>
 <script language="javascript">
@@ -250,21 +250,21 @@
 		{field: "img", headerName: "이미지_url", hide: true},
 		{field: "goods_nm", headerName: "상품명", width: 270, aggFunc: "first",
 			cellRenderer: function (params) {
-				if(params.value === undefined) return "";
-				if (params.data?.goods_no == '') {
-					return '<a href="#" onclick="return blank_goods_no();">' + params.value + '</a>';
+				if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
+					return '<a href="javascript:void(0);" onclick="return blank_goods_no();">' + params.value + '</a>';
 				} else {
-					return '<a href="#" onclick="return openHeadProduct(\'' + params.data?.goods_no + '\');">' + params.value + '</a>';
+					let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
+					return '<a href="#" onclick="return openHeadProduct(\'' + goods_no + '\');">' + params.value + '</a>';
 				}
 			}
 		},
 		{field: "goods_nm_eng", headerName: "상품명(영문)", width: 270, aggFunc: "first",
 			cellRenderer: function (params) {
-				if(params.value === undefined) return "";
-				if (params.data?.goods_no == '') {
-					return '<a href="#" onclick="return blank_goods_no();">' + params.value + '</a>';
+				if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
+					return '<a href="javascript:void(0);" onclick="return blank_goods_no();">' + (params.value || '') + '</a>';
 				} else {
-					return params.value == null ? "" : '<a href="#" onclick="return openHeadProduct(\'' + params.data?.goods_no + '\');">' + params.value + '</a>';
+					let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
+					return '<a href="#" onclick="return openHeadProduct(\'' + goods_no + '\');">' + (params.value || '') + '</a>';
 				}
 			}
 		},
@@ -277,19 +277,21 @@
 		{field: "color", headerName: "컬러", width: 55, cellStyle: StyleLineHeight},
 		{field: "size", headerName: "사이즈", width: 55, cellStyle: StyleLineHeight},
 		{field: "goods_opt", headerName: "옵션", width: 200},
-		{field: "goods_sh", headerName: "TAG가", type: 'currencyType', width:85, aggFunc: 'sum'},
-		{field: "price", headerName: "판매가", type: 'currencyType', width:85, aggFunc: 'sum'},
+		{field: "goods_sh", headerName: "TAG가", type: 'currencyType', width:85, aggFunc: 'first'},
+		{field: "price", headerName: "판매가", type: 'currencyType', width:85, aggFunc: 'first'},
 		{field: "wqty", headerName: "창고재고", width:70, type: 'currencyType', 
 			aggFunc: (params) => {
 				return params.values.reduce((a,c) => a + (c * 1), 0);
 			},
 			cellRenderer: function(params) {
-				if(params.value === undefined) return "";
+				if (params.value === undefined) return "";
 				if (params.node.rowPinned === 'top') {
                     return params.value;
-                } else {
-					return '<a href="#" onclick="return openStoreStock(\'' + params.data?.prd_cd + '\', \'' + $("[name=sdate]").val() + '\');">' + params.value + '</a>';
-                }
+                } else if (params.data) {
+					return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + params.value + '</a>';
+                } else if (params.node.aggData) {
+					return `<a href="#" onclick="return OpenStockPopup('${params.node.key}', '${$("[name=sdate]").val() || ''}');">${params.value}</a>`;
+				}
 			}
 		},
 		{field: "sqty", headerName: "매장재고", width:70, type: 'currencyType',
@@ -297,11 +299,13 @@
 				return params.values.reduce((a,c) => a + (c * 1), 0);
 			},
 			cellRenderer: function(params) {
-				if(params.value === undefined) return "";
+				if (params.value === undefined) return "";
 				if (params.node.rowPinned === 'top') {
-					return params.value;
-				} else {
-					return '<a href="#" onclick="return openStoreStock(\'' + params.data?.prd_cd + '\', \'' + $("[name=sdate]").val() + '\');">' + params.value + '</a>';
+                    return params.value;
+                } else if (params.data) {
+					return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + params.value + '</a>';
+                } else if (params.node.aggData) {
+					return `<a href="#" onclick="return OpenStockPopup('${params.node.key}', '${$("[name=sdate]").val() || ''}');">${params.value}</a>`;
 				}
 			}
 		},

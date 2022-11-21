@@ -70,7 +70,7 @@
         </div>
     </div> --}}
     {{-- 검색 --}}
-    <div id="search-area" class="search_cum_form mb-4">
+    <div id="search-area" class="search_cum_form mb-2">
         <form name="search" method="get">
             <div class="card">
                 <div class="d-flex card-header justify-content-between">
@@ -103,7 +103,7 @@
                             <div class="form-group">
                                 <label for="store_cd">코드일련</label>
                                 <div class="form-inline">
-                                    <input type="text" class="form-control form-control-sm w-100" name="prd_cd_p" id="prd_cd_p" value="{{ @$prd->prd_cd_p }}">
+                                    <input type="text" class="form-control form-control-sm w-100" name="prd_cd_p" id="prd_cd_p" value="{{ @$prd_cd_p }}" readonly>
                                 </div>
                             </div>
                         </div>
@@ -127,7 +127,6 @@
                                 <label for="">컬러</label>
                                 <div class="flax_box">
                                     <select name='color' class="form-control form-control-sm">
-                                        <option value=''>전체</option>
                                     </select>
                                 </div>
                             </div>
@@ -161,17 +160,23 @@
     </div>
 </div>
 
+<style>
+    .ag-row-level-1 {
+		background-color: #edf4fd !important;
+	}
+</style>
+
 <script language="javascript">
     let AlignCenter = {"text-align": "center"};
 
     let storage_columns = [
-        {field: "color", headerName: "컬러", width: 60, cellStyle: AlignCenter, pinned: "left"},
         {field: "storage_cd", hide: true},
-        {field: "storage_nm", headerName: "창고명", width: 180, cellStyle: AlignCenter, pinned: "left"},
+        {field: "storage_nm", headerName: "창고명", width: 180, cellStyle: AlignCenter, pinned: "left", rowGroup: true, hide: true},
+        {field: "color", headerName: "컬러", width: 60, cellStyle: AlignCenter, pinned: "left"},
     ];
 
     let store_columns = [
-        {field: "color", headerName: "컬러", width: 60, cellStyle: AlignCenter, pinned: "left"},
+        {field: "color", headerName: "컬러", width: 60, cellStyle: AlignCenter, pinned: "left", rowGroup: true, hide: true},
         {field: "store_cd", hide: true},
         {field: "store_nm", headerName: "매장명", width: 180, pinned: "left"},
     ];
@@ -182,48 +187,130 @@
     const pApp2 = new App('', { gridId: "#div-gd-store-stock" });
 	let gx2;
 
+    const basic_autoGroupColumnDef = (headerName, width = 80) => ({
+		headerName: headerName,
+		headerClass: 'bizest',
+		minWidth: width,
+		maxWidth: width,
+		cellRenderer: 'agGroupCellRenderer',
+		pinned: 'left'
+	});
+
 	$(document).ready(function() {
-        pApp.ResizeGrid(275, 100);
+        pApp.ResizeGrid(275, 152);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         if (gridDiv !== null) {
-            gx = new HDGrid(gridDiv, storage_columns);
+            gx = new HDGrid(gridDiv, storage_columns, {
+                autoGroupColumnDef: basic_autoGroupColumnDef('창고명', 180),
+                groupDefaultExpanded: 0, // 0: close, 1: open
+                suppressAggFuncInHeader: true,
+                animateRows: true,
+                suppressMakeColumnVisibleAfterUnGroup: true,
+            });
         }
 
-        pApp2.ResizeGrid(275, 350);
+        pApp2.ResizeGrid(275, 315);
         pApp2.BindSearchEnter();
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
         if (gridDiv2 !== null) {
-            gx2 = new HDGrid(gridDiv2, store_columns);
+            gx2 = new HDGrid(gridDiv2, store_columns, {
+                autoGroupColumnDef: basic_autoGroupColumnDef('컬러'),
+                groupDefaultExpanded: 1, // 0: close, 1: open
+                suppressAggFuncInHeader: true,
+                animateRows: true,
+                suppressMakeColumnVisibleAfterUnGroup: true,
+            });
         }
 
-		Search();
+        $("[name=prd_cd_p]").on("change", function(e) {
+            getColors();
+        });
+
+        getColors();
+        Search();
 	});
 
+    async function getColors() {
+        let prd_cd_p = $("[name=prd_cd_p]").val();
+        let { data, status } = await axios({ url: "/store/api/product/color?prd_cd_p=" + prd_cd_p, method: "get" });
+        
+        if (status === 200) {
+            $("[name=color]").find("option").remove();
+            $("[name=color]").append(`<option value="">전체</option>`);
+            for (let opt of data.colors) {
+                $("[name=color]").append(`<option value="${opt.color}">[ ${opt.color} ] ${opt.color_nm}</option>`);
+            }
+        }
+    }
+
     async function Search() {
+        resetGrid();
         let params = $("form[name=search]").serialize();
         let { data, status } = await axios({ url: "/store/product/prd04/stock/search?" + params, method: "get" });
         if (status === 200) {
             const sizes = data.data.sizes;
             await setColumns(sizes);
+            gx.gridOptions.api.applyTransaction({ add: data.data.storages });
             gx2.gridOptions.api.applyTransaction({ add: data.data.stores });
         }
     }
 
     function setColumns(sizes) {
+        storage_columns.splice(3);
         store_columns.splice(3);
 
-        for(let i = 0; i < sizes.length; i++) {
-            store_columns.push({
-                field: stores[i].store_cd,
-                headerName: stores[i].store_nm,
-                cellStyle: AlignCenter,
-                width: 100,
+        let list = [];
+        for(let size of sizes) {
+            list.push({
+                headerName: size,
+                children: [
+                    {field: size.replaceAll(".", "") + "_qty", headerName: "실재고", maxWidth: 60, minWidth: 60, cellStyle: {"text-align": "right"},
+                        aggFunc: (params) => params.values.reduce((a,c) => a + (c * 1), 0),
+                        cellRenderer: (params) => {
+                            if (params.data !== undefined) {
+                                return params.data[size + "_qty"] < 1 ? '' : params.data[size + "_qty"];
+                            }
+                            else return params.value || 0;
+                        }
+                    },
+                    {field: size.replaceAll(".", "") + "_wqty", headerName: "보유재고", maxWidth: 65, minWidth: 65, cellStyle: {"text-align": "right"},
+                        aggFunc: (params) => params.values.reduce((a,c) => a + (c * 1), 0),
+                        cellRenderer: (params) => {
+                            if (params.data !== undefined) {
+                                return params.data[size + "_wqty"] < 1 ? '' : params.data[size + "_wqty"];
+                            } else {
+                                return params.value || 0;
+                            }
+                        }
+                    },        
+                ],
             });
         }
-        const lastWidth = 713 - (stores.length * 100);
-        store_columns.push({ width: lastWidth > 0 ? lastWidth : 0 });
+
+        list.push({
+            headerName: "합계",
+            children: [
+                {field: "qty", headerName: "실재고", type: "currencyType", maxWidth: 60, minWidth: 60, cellStyle: {"text-align": "right"}, pinned: "right",
+                    aggFunc: (params) => params.values.reduce((a,c) => a + (c * 1), 0),
+                },
+                {field: "wqty", headerName: "보유재고", type: "currencyType", maxWidth: 65, minWidth: 65, cellStyle: {"text-align": "right"}, pinned: "right",
+                    aggFunc: (params) => params.values.reduce((a,c) => a + (c * 1), 0),
+                },
+            ],
+        });
+        list.push({ width: "auto" });
+
+        storage_columns.push(...list.map(a => a));
+        store_columns.push(...list.map(a => a));
+        
+        gx.gridOptions.api.setColumnDefs(storage_columns);
         gx2.gridOptions.api.setColumnDefs(store_columns);
+    }
+
+    function resetGrid() {
+        gx.gridOptions.api.setRowData([]);
+        gx2.gridOptions.api.setRowData([]);
     }
 </script>
 @stop
