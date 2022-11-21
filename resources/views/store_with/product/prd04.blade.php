@@ -245,26 +245,26 @@
 				}
 			}
 		},
-		{field: "goods_no", headerName: "상품번호", width: 70, cellStyle: StyleLineHeight},
+		{field: "goods_no", headerName: "상품번호", width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
 		{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, surl:"{{config('shop.front_url')}}"},
 		{field: "img", headerName: "이미지_url", hide: true},
-		{field: "goods_nm", headerName: "상품명", width: 270,
+		{field: "goods_nm", headerName: "상품명", width: 270, aggFunc: "first",
 			cellRenderer: function (params) {
 				if(params.value === undefined) return "";
-				if (params.data.goods_no == '') {
+				if (params.data?.goods_no == '') {
 					return '<a href="#" onclick="return blank_goods_no();">' + params.value + '</a>';
 				} else {
-					return '<a href="#" onclick="return openHeadProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
+					return '<a href="#" onclick="return openHeadProduct(\'' + params.data?.goods_no + '\');">' + params.value + '</a>';
 				}
 			}
 		},
-		{field: "goods_nm_eng", headerName: "상품명(영문)", width: 270,
+		{field: "goods_nm_eng", headerName: "상품명(영문)", width: 270, aggFunc: "first",
 			cellRenderer: function (params) {
 				if(params.value === undefined) return "";
-				if (params.data.goods_no == '') {
-					return params.data.goods_nm_eng == null ? "" : '<a href="#" onclick="return blank_goods_no();">' + params.value + '</a>';
+				if (params.data?.goods_no == '') {
+					return '<a href="#" onclick="return blank_goods_no();">' + params.value + '</a>';
 				} else {
-					return params.data.goods_nm_eng == null ? "" : '<a href="#" onclick="return openHeadProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
+					return params.value == null ? "" : '<a href="#" onclick="return openHeadProduct(\'' + params.data?.goods_no + '\');">' + params.value + '</a>';
 				}
 			}
 		},
@@ -305,8 +305,8 @@
 				}
 			}
 		},
-		{field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: StyleLineHeight},
-		{field: "brand_nm", headerName: "브랜드", width: 70, cellStyle: StyleLineHeight},
+		{field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
+		{field: "brand_nm", headerName: "브랜드", width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
 		{field: "match_yn", headerName: "매칭여부", hide:true},
 		{width:"auto"}
 	];
@@ -333,7 +333,7 @@
                 if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee !important', 'border': 'none'};
             },
 			autoGroupColumnDef: basic_autoGroupColumnDef('코드일련'),
-			groupDefaultExpanded: 1,
+			groupDefaultExpanded: 0, // 0: close, 1: open
 			suppressAggFuncInHeader: true,
 			animateRows: true,
 			suppressDragLeaveHidesColumns: true,
@@ -407,8 +407,8 @@
 	}
 
 	function OpenStockPopup(prd_cd_p, date) {
-		var url = `/store/product/prd04/stock/${prd_cd_p}?date=${date}`;
-		var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=900,height=800");
+		var url = `/store/product/prd04/stock?prd_cd_p=${prd_cd_p}&date=${date}`;
+		var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1000,height=900");
 	}
 
 </script>

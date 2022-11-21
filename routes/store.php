@@ -210,7 +210,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 상품재고관리
         Route::get('prd04','prd04Controller@index');
         Route::get('prd04/search','prd04Controller@search');
-        Route::get('prd04/stock/{prd_cd_p?}','prd04Controller@show_stock');
+        Route::get('prd04/stock','prd04Controller@show_stock');
+        Route::get('prd04/stock/search','prd04Controller@search_stock');
 
         Route::get('prd04/batch', 'prd04Controller@batch');
         Route::post('prd04/upload',	'prd04Controller@upload');

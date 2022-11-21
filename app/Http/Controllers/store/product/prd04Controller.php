@@ -278,8 +278,9 @@ class prd04Controller extends Controller
 	}
 
 	/** show_stock: 옵션별 재고현황 팝업 */
-	public function show_stock($prd_cd_p, Request $request)
+	public function show_stock(Request $request)
 	{
+		$prd_cd_p = $request->input('prd_cd_p', '');
 		$sdate = $request->input('date', date('Y-m-d'));
 		if($sdate == '') $sdate = date('Y-m-d');
 
@@ -349,9 +350,85 @@ class prd04Controller extends Controller
 			'prd' => $rows[0] ?? '',
 			'colors' => $colors,
 			'sizes' => $sizes,
+			'store_types' => SLib::getCodes("STORE_TYPE"), // 매장구분
 		];
 
 		return view(Config::get('shop.store.view') . '/product/prd04_show', $values);		
+	}
+
+	/** search_stock: 옵션별 재고현황 검색 */
+	public function search_stock(Request $request)
+	{
+		$sdate = $request->input('sdate', date('Y-m-d'));
+		$next_edate = date("Y-m-d", strtotime("+1 day", strtotime($sdate)));
+		$prd_cd_p = $request->input('prd_cd_p', '');
+		$store_type = $request->input('store_type', '');
+		$color = $request->input('color', '');
+		if ($color != '') $prd_cd_p .= $color;
+
+		$values = [];
+
+		if ($prd_cd_p != '') {
+
+			// get sizes
+			$sql = "
+				select size 
+				from product_code
+				where prd_cd like '$prd_cd_p%'
+				group by size		
+			";
+			$sizes = array_map(function($row) {return $row->size;}, DB::select($sql));
+			
+			// get store stock
+			$where = "";
+			if ($store_type != '') $where .= " and s.store_type = '$store_type' ";
+
+			$case_sql = "";
+			foreach ($sizes as $size) {
+				$case_sql .= " , sum(case when pc.size = '$size' then ps.qty end) as 'qty_$size' ";
+				$case_sql .= " , sum(case when pc.size = '$size' then ps.wqty end) as 'wqty_$size' ";
+			}
+
+			$sql = "
+				select 
+					pc.color
+					, s.store_cd
+					, s.store_nm
+					, ps.prd_cd
+					, pc.color
+					$case_sql
+					, sum(ps.qty) as qty
+					, sum(ps.wqty) as wqty
+				from product_code pc
+					inner join store s
+					left outer join (
+						select ps.prd_cd
+							, ps.store_cd
+							, (ps.qty - ifnull(hst.qty, 0)) as qty
+							, (ps.wqty - ifnull(hst.qty, 0)) as wqty
+						from product_stock_store ps
+							left outer join (
+								select prd_cd, sum(qty) as qty, location_cd, stock_state_date
+								from product_stock_hst
+								where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+								group by prd_cd
+							) hst on hst.prd_cd = ps.prd_cd and hst.location_cd = ps.store_cd	
+					) ps on ps.store_cd = s.store_cd and ps.prd_cd = pc.prd_cd
+				where pc.prd_cd like '$prd_cd_p%' $where
+				group by pc.color, s.store_cd
+				order by pc.color, s.store_cd
+			";
+			$rows = DB::select($sql);
+
+			$values = [
+				'sizes' => $sizes,
+				'stores' => $rows,
+			];
+		}
+
+		return response()->json([
+			'data' => $values,
+		], 200);
 	}
 
 	public function batch(){
