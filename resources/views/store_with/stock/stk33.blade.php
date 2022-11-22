@@ -28,35 +28,23 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-lg-4 inner-td">
+                <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="formrow-firstname-input">매출월</label>
+							<label>매출월</label>
                             <div class="form-inline">
-                                <div class="docs-datepicker form-inline-inner input_box">
+								<div class="docs-datepicker form-inline-inner input_box w-100">
                                     <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-                                            <i class="fa fa-calendar" aria-hidden="true"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="docs-datepicker-container"></div>
-                                </div>
-                                <span class="text_line">~</span>
-                                <div class="docs-datepicker form-inline-inner input_box">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
+                                        <input type="text" class="form-control form-control-sm docs-date month" name="sdate" value="{{ @$sdate }}" autocomplete="off">
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                <i class="fa fa-calendar" aria-hidden="true"></i>
                                             </button>
                                         </div>
                                     </div>
                                     <div class="docs-datepicker-container"></div>
                                 </div>
                             </div>
-                        </div>
+						</div>
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
@@ -102,7 +90,6 @@
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box" style="width:24%;">
                                         <select name="limit" class="form-control form-control-sm">
-                                            <option value="100">100</option>
                                             <option value="500">500</option>
                                             <option value="1000">1000</option>
                                             <option value="2000">2000</option>
@@ -111,8 +98,8 @@
                                     <span class="text_line">/</span>
                                     <div class="form-inline-inner input_box" style="width:45%;">
                                         <select name="ord_field" class="form-control form-control-sm">
-                                            <option value="rt">등록일</option>
-                                            <option value="subject">제목</option>
+                                            <option value="cs.sale_date">매출일</option>
+                                            <option value="total_amt">합계</option>
                                         </select>
                                     </div>
                                     <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -159,12 +146,15 @@
     let columns = [
         {headerName: "#", field: "num",type:'NumType', pinned:'left', cellClass: 'hd-grid-code'},
         {headerName: "매출일", field: "sale_date", pinned:'left',  width: 80, cellClass: 'hd-grid-code'},
-        {headerName: "합계", field: "sale_amt",  pinned:'left', width: 80, cellClass: 'hd-grid-code'},
+        {headerName: "매장명", field: "store_nm",  pinned:'left', width: 110, cellClass: 'hd-grid-code'},
+        {headerName: "매장코드", field: "store_cd",  pinned:'left', width: 70, cellClass: 'hd-grid-code' , hide:true},
+        {headerName: "합계(원)", field: "total_amt",  pinned:'left', width: 100, cellClass: 'hd-grid-code', type:'currencyType', cellStyle: { 'font-weight': '700', background: '#eee' },},
+        
         {field: "competitors",	headerName: "동종업계 매장",
             children: [
                 @foreach($competitors as $com)
 
-                    {headerName: "{{ $com->code_val }}", field: "{{$com->code_id}}",  width: 90, cellClass: 'hd-grid-code'},
+                    {headerName: "{{ $com->code_val }}", field: "amt_{{$com->code_id}}",  width: 90, cellClass: 'hd-grid-code', type:'currencyType'},
 
                 @endforeach
             ]

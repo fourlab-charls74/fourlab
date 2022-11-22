@@ -79,7 +79,7 @@
             {headerName: "#", field: "num",type:'NumType', pinned:'left', cellClass: 'hd-grid-code'},
             {headerName: "동종업계코드", field: "competitor_cd", pinned:'left',  width: 85, cellClass: 'hd-grid-code'},
             {headerName: "동종업계명", field: "competitor_nm",  pinned:'left', width: 120, cellClass: 'hd-grid-code'},
-            {headerName: "매출액", field: "sale_amt",  pinned:'left', width: 100, cellClass: 'hd-grid-code', editable: true, cellStyle: {"background-color": "#ffFF99"}},
+            {headerName: "매출액", field: "sale_amt",  pinned:'left', width: 100, cellClass: 'hd-grid-code', editable: true, cellStyle: {"background-color": "#ffFF99"}, type:'currencyType'},
             {width: 'auto'}
         ];
 
@@ -120,30 +120,72 @@
             var month;
             $("#month").append("<option value=''>월</option>");
             for (var i = 1; i <= 12; i++) {
-            $("#month").append("<option value='" + i + "'>" + i + "</option>");
+                if(i < 10) {
+                    $("#month").append("<option value='"+ 0 + i + "'>0" + i + "</option>");
+                } else {
+                    $("#month").append("<option value='" + i + "'>" + i + "</option>");
+                }
             }
 
             var day;
             $("#day").append("<option value=''>일</option>");
             for (var i = 1; i <= 31; i++) {
-            $("#day").append("<option value='" + i + "'>" + i + "</option>");
+                if(i < 10) {
+                    $("#day").append("<option value='"+ 0 + + i + "'>0" + i + "</option>");
+                } else {
+                    $("#day").append("<option value='" + i + "'>" + i + "</option>");
+                }
             }
 
         }
 
         //매출액 저장
         function Save_amt() {
+            let year = document.getElementById('year').value;
+            let month = document.getElementById('month').value;
+            let day = document.getElementById('day').value;
+            let store_no = document.getElementById('store_no').value;
+
+
+            let date = year+'-'+month+'-'+day;
+
+            if (store_no === '') {
+                alert('매장을 선택해주세요');
+                return false;
+            }
+
+            if ($('#year').val() === '') {
+                $('#year').focus();
+                alert('매출년도를 선택해주세요');
+                return false;
+            }
+
+            if ($('#month').val() === '') {
+                $('#month').focus();
+                alert(' 매출월을 선택해주세요');
+                return false;
+            }
+            
+            if ($('#day').val() === '') {
+                $('#day').focus();
+                alert('매출일을 선택해주세요');
+                return false;
+            }
+
             if(!confirm("매출액을 저장하시겠습니까?")) return;
 
                 axios({
                     url: `/store/stock/stk33/save_amt`,
                     method: 'post',
                     data: {
-                        data: gx.getRows()
+                        data: gx.getRows(),
+                        date: date
                     },
                 }).then(function (res) {
                     if(res.data.code === 200) {
                         alert(res.data.msg);
+                        window.close();
+                        opener.parent.location.reload();
                     } else {
                         console.log(res.data.msg);
                         alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
