@@ -14,8 +14,10 @@
 
         if(idx === "pos_order") {
             $("#home_btn").css("display", "none");
+            $("#search_prd_keyword_out").trigger("focus");
         } else {
             $("#home_btn").css("display", "inline-block");
+            $("#search_prd_keyword_out").val('');
         }
     }
 
@@ -194,7 +196,10 @@
 
             $('#searchProductModal').modal('hide');
             $("#search_prd_keyword").val('');
+            $("#search_prd_keyword_out").val('');
             gx2.setRows([]);
+
+            $("#search_prd_keyword_out").trigger("focus");
         } else {
             alert("이미 선택된 상품입니다.");
         }

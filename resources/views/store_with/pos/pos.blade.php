@@ -73,7 +73,17 @@
         <input type="hidden" name="removed_goods" value="">
         <div class="flex-5 p-3">
             <div class="d-flex flex-column">
-                <button type="button" class="butt w-100 fc-white fs-14 br-1 bg-gray mb-3" style="height: 60px;" data-toggle="modal" data-target="#searchProductModal"><i class="fa fa-search mr-2" aria-hidden="true"></i>상품 검색</button>
+                {{-- <button type="button" class="butt w-100 fc-white fs-14 br-1 bg-gray mb-3" style="height: 60px;" data-toggle="modal" data-target="#searchProductModal"><i class="fa fa-search mr-2" aria-hidden="true"></i>상품 검색</button> --}}
+                <div class="butt w-100 br-1 mb-3 b-none">
+                    <div class="d-flex align-items-center br-2 b-1-gray bg-white shadow-box p-2 pl-4">
+                        <select name="search_prd_type_out" id="search_prd_type_out" class="sel fs-12" style="min-width: 120px;">
+                            <option value="prd_cd">상품코드</option>
+                            <option value="goods_nm">상품명</option>
+                        </select>
+                        <input type="text" class="flex-1 inp h-40 fs-12 mr-1" id="search_prd_keyword_out" name="search_prd_keyword_out" placeholder="검색어를 입력하세요">
+                        <button type="button" id="search_btn_out" class="butt br-2 bg-lightgray p-2 pl-3 pr-3"><i class="fa fa-search fc-black fs-10" aria-hidden="true"></i></button>
+                    </div>
+                </div>
                 <div class="d-flex mb-4">
                     <div class="table-responsive">
                         <div id="div-gd" class="ag-theme-balham" style="font-size: 18px;"></div>
@@ -992,6 +1002,20 @@
         setInterval(getClock, 1000);
 
         // ELEMENT EVENT
+        $("#search_prd_keyword_out").on("keypress", function (e) {
+            if(e.keyCode === 13) {
+                $("#search_prd_type").val($("#search_prd_type_out").val());
+                $("#search_prd_keyword").val(e.target.value);
+                $("#searchProductModal").modal("show");
+                Search();
+            }
+        });
+        $("#search_btn_out").on("click", function (e) {
+            $("#search_prd_type").val($("#search_prd_type_out").val());
+            $("#search_prd_keyword").val($("#search_prd_keyword_out").val());
+            $("#searchProductModal").modal("show");
+            Search();
+        });
         $("#search_prd_keyword").on("keypress", function (e) {
             if(e.keyCode === 13) Search();
         });
