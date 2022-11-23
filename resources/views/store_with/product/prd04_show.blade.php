@@ -167,6 +167,9 @@
 </style>
 
 <script language="javascript">
+    const setting_color = '{{ @$color }}';
+    const setting_size = '{{ @$size }}';
+
     let AlignCenter = {"text-align": "center"};
 
     let storage_columns = [
@@ -196,7 +199,7 @@
 		pinned: 'left'
 	});
 
-	$(document).ready(function() {
+	$(document).ready(async function() {
         pApp.ResizeGrid(275, 152);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
@@ -227,11 +230,11 @@
             getColors();
         });
 
-        getColors();
+        await getColors(setting_color);
         Search();
 	});
 
-    async function getColors() {
+    async function getColors(color = '') {
         let prd_cd_p = $("[name=prd_cd_p]").val();
         let { data, status } = await axios({ url: "/store/api/product/color?prd_cd_p=" + prd_cd_p, method: "get" });
         
@@ -239,7 +242,7 @@
             $("[name=color]").find("option").remove();
             $("[name=color]").append(`<option value="">전체</option>`);
             for (let opt of data.colors) {
-                $("[name=color]").append(`<option value="${opt.color}">[ ${opt.color} ] ${opt.color_nm}</option>`);
+                $("[name=color]").append(`<option value="${opt.color}" ${color === opt.color ? 'selected' : ''}>[ ${opt.color} ] ${opt.color_nm}</option>`);
             }
         }
     }
@@ -262,23 +265,26 @@
 
         let list = [];
         for(let size of sizes) {
+            let ss = size.replaceAll(".", "");
             list.push({
                 headerName: size,
                 children: [
-                    {field: size.replaceAll(".", "") + "_qty", headerName: "실재고", maxWidth: 60, minWidth: 60, cellStyle: {"text-align": "right"},
+                    {field: ss + "_qty", headerName: "실재고", maxWidth: 60, minWidth: 60, 
+                        cellStyle: (params) => ({"text-align": "right", "background-color": size === setting_size ? "#AAFF99" : "none"}),
                         aggFunc: (params) => params.values.reduce((a,c) => a + (c * 1), 0),
                         cellRenderer: (params) => {
                             if (params.data !== undefined) {
-                                return params.data[size + "_qty"] < 1 ? '' : params.data[size + "_qty"];
+                                return params.data[ss + "_qty"] < 1 ? '' : params.data[ss + "_qty"];
                             }
                             else return params.value || 0;
-                        }
+                        },
                     },
-                    {field: size.replaceAll(".", "") + "_wqty", headerName: "보유재고", maxWidth: 65, minWidth: 65, cellStyle: {"text-align": "right"},
+                    {field: ss + "_wqty", headerName: "보유재고", maxWidth: 65, minWidth: 65,
+                        cellStyle: (params) => ({"text-align": "right", "background-color": size === setting_size ? "#AAFF99" : "none"}),
                         aggFunc: (params) => params.values.reduce((a,c) => a + (c * 1), 0),
                         cellRenderer: (params) => {
                             if (params.data !== undefined) {
-                                return params.data[size + "_wqty"] < 1 ? '' : params.data[size + "_wqty"];
+                                return params.data[ss + "_wqty"] < 1 ? '' : params.data[ss + "_wqty"];
                             } else {
                                 return params.value || 0;
                             }

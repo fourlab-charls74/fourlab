@@ -149,7 +149,7 @@
 								<span class="text_line">/</span>
 								<div class="form-inline-inner input_box" style="width:45%;">
 									<select name="ord_field" class="form-control form-control-sm">
-										<option value="prd_cd_p">코드일련</option>
+										<option value="prd_cd_p">등록일(코드일련별)</option>
 										<option value="pc.rt">등록일</option>
 										<option value="pc.prd_cd">상품코드</option>
 										<option value="pc.goods_no">상품번호</option>
@@ -241,7 +241,7 @@
 			cellRenderer: function(params) {
 				if (params.node.rowPinned === 'top') return "합계";
 				if (params.value !== undefined) {
-					return '<a href="#" onclick="return EditProduct(\'' + params.value + '\',\'' + params.data.goods_no + '\');">' + params.value + '</a>';
+					return `<a href="javascript:void(0);" onclick="return OpenStockPopup('${params.data.prd_cd_p}', '${$("[name=sdate]").val() || ''}', '${params.data.color}', '${params.data.size}');">${params.value}</a>`;
 				}
 			}
 		},
@@ -397,11 +397,6 @@
 		}
 	}
 
-	function EditProduct(product_code, goods_no) {
-		var url = '/store/product/prd02/edit-goods-no/' + product_code + '/' + goods_no;
-		var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1100,height=900");
-	}
-
 	function AddStock(item){
 		if( item == 'wonga' )			url = '/store/product/prd04/batch_wonga';
 		else if( item == 'storage' )	url = '/store/product/prd04/batch';
@@ -410,8 +405,8 @@
 		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
 	}
 
-	function OpenStockPopup(prd_cd_p, date) {
-		var url = `/store/product/prd04/stock?prd_cd_p=${prd_cd_p}&date=${date}`;
+	function OpenStockPopup(prd_cd_p, date, color = '', size = '') {
+		var url = `/store/product/prd04/stock?prd_cd_p=${prd_cd_p}&date=${date}&color=${color}&size=${size}`;
 		var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1000,height=900");
 	}
 
