@@ -24,7 +24,7 @@ class cs01Controller extends Controller {
             'sdate' => $sdate,
             'edate' => date("Y-m-d"),
             'items' => SLib::getItems(),
-            'order_stock_states' => Slib::getCodes('G_ORDER_STOCK_STATE')
+            'order_stock_states' => Slib::getCodes('STOCK_ORDER_STATE')
         ];
         return view( Config::get('shop.store.view') . '/cs/cs01', $values);
     }
@@ -37,7 +37,7 @@ class cs01Controller extends Controller {
             'sdate' => $sdate,
             'edate' => date("Y-m-d"),
             'items' => SLib::getItems(),
-            'order_stock_states' => Slib::getCodes('G_ORDER_STOCK_STATE')
+            'order_stock_states' => Slib::getCodes('STOCK_ORDER_STATE')
         ];
         return view( Config::get('shop.store.view') . '/cs/cs01_choice', $values);
 	}
@@ -102,7 +102,7 @@ class cs01Controller extends Controller {
 				) s on b.stock_no = s.stock_no
 				inner join company c on c.com_id = b.com_id
 				left outer join code ar on ar.code_kind_cd = 'g_buy_order_ar_type' and ar.code_id = b.area_type
-				left outer join code cd on cd.code_kind_cd = 'g_order_stock_state' and cd.code_id = b.state
+				left outer join code cd on cd.code_kind_cd = 'STOCK_ORDER_STATE' and cd.code_id = b.state
 			$where2
 			order by b.stock_date desc, b.req_rt desc
 		";
@@ -186,42 +186,22 @@ class cs01Controller extends Controller {
 			}
 		}
 
-		$states = Slib::getCodes('G_ORDER_STOCK_STATE');
+		$states = Slib::getCodes('STOCK_ORDER_STATE');
 		$collection = $states->map(function ($item) {
 			return collect($item)->only(['code_id','code_val'])->all();
 		});
 
 		// 입고취소: -10, 입고대기: 10, 입고처리중: 20, 입고완료: 30
-		$states = $collection->reject(function ($item) {
-			$code_id = $item['code_id'];
-			return ($code_id == -10);
-		})->values();
+		// 원가확정: 40 (20221122 추가)
+		$states = [];
+		foreach ($collection as $stt) {
+			$cond = true;
+			if ($state < 0) $cond = $stt['code_id'] == -10;
+			if ($cond && $state > 0) $cond = $stt['code_id'] >= $state;
+			if ($cond && $state < 30) $cond = $stt['code_id'] < 40;
 
-		if ($state > 0 and $state < 30){
-			// 입고 대기나 입고 처리중인 경우 입고 완료를 제외한 모든 입고 상태 표시
-			$states = $collection->reject(function ($item) {
-				$code_id = $item['code_id'];
-				return ($code_id == -10); // 특정 조건을 제외한 모든 아이템을 리턴
-			})->values();
-
-		} else if ($cmd == "addcmd" && $state == 10) {
-			$states = $collection->filter(function ($item) {
-				$code_id = $item['code_id'];
-				return ($code_id == 10); // 특정 조건에 걸리는 아이템만 리턴
-			})->values();
-
-		} else if ($state < 0) {
-			$states = $collection->filter(function ($item) {
-				$code_id = $item['code_id'];
-				return ($code_id == -10);
-			})->values();
-
-		} else if ($state == 30) {
-			$states = $collection->filter(function ($item) {
-				$code_id = $item['code_id'];
-				return ($code_id == 30);
-			})->values();
-		};
+			if($cond) $states[] = $stt;
+		}
 
 		if ($opts != ""){
 			$col_opts = explode("\t", $opts);
@@ -459,7 +439,7 @@ class cs01Controller extends Controller {
 		$row = DB::selectOne($sql);
 
 		try {
-			if ($row->state < 30) { // 입고취소: -10, 입고대기: 10, 입고처리중: 20, 입고완료: 30
+			if ($row->state < 40) { // 입고취소: -10, 입고대기: 10, 입고처리중: 20, 입고완료: 30, 원가확정: 40
 				DB::beginTransaction();
 
 				$prc_set = "";
@@ -468,6 +448,9 @@ class cs01Controller extends Controller {
 				}
 				if ($row->state == 20 && $state >= 30) {
 					$prc_set = " fin_id = '$id', fin_rt = now(), ";
+				}
+				if ($row->state == 30 && $state == 40) {
+					$prc_set = " cfm_id = '$id', cfm_rt = now(), ";
 				}
 
 				$sql = "
@@ -734,7 +717,7 @@ class cs01Controller extends Controller {
 	public function saveStockProduct($type, $stock_no, $invoice_no, $state, $loc, $stock_date, $com_id, $currency_unit, $exchange_rate, $custom_tax_rate, $opt_cnt, $data) {
 		try {
 			DB::beginTransaction();
-			if ($type != "A") {
+			if ($type != "A") { // 추가입고
 				$sql = "
 					delete from product_stock_order_product
 					where stock_no = :stock_no
@@ -790,6 +773,10 @@ class cs01Controller extends Controller {
 							if ($state == 30) { // 입고 완료인 경우
 								$this->stockIn($goods_no, $prd_cd, $opt, $qty, $stock_no, $invoice_no, $cost, $loc);
 							}
+
+							if ($state == 40) { // 원가확정인 경우
+								$this->confirmWonga();
+							}
 						}
 					}
 				}
@@ -808,7 +795,7 @@ class cs01Controller extends Controller {
 	}
 
 	/**
-	 * 상품 입고
+	 * 상품 입고 (재고)
 	 */
 	public function stockIn($goods_no, $prd_cd, $opt, $qty, $stock_no, $invoice_no, $cost, $loc) {
 		/**
@@ -868,6 +855,14 @@ class cs01Controller extends Controller {
 			throw new Exception($fail_message);
 		}
 		
+	}
+
+	/**
+	 * 원가 확정
+	 */
+	public function confirmWonga()
+	{
+		// 원가확정 작업 필요
 	}
 
 	/**
