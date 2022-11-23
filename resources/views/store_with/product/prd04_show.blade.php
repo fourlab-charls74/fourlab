@@ -103,7 +103,12 @@
                             <div class="form-group">
                                 <label for="store_cd">코드일련</label>
                                 <div class="form-inline">
-                                    <input type="text" class="form-control form-control-sm w-100" name="prd_cd_p" id="prd_cd_p" value="{{ @$prd_cd_p }}" readonly>
+                                    <div class="form-inline-inner input-box w-100">
+                                        <div class="form-inline inline_btn_box">
+                                            <input type='text' id="prd_cd_p" name='prd_cd_p' value="{{ @$prd_cd_p }}" class="form-control form-control-sm w-100 ac-style-no search-enter">
+                                            <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-p"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

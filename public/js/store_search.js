@@ -303,9 +303,11 @@ function SearchPrdcd(){
     this.grid = null;
 }
 
-SearchPrdcd.prototype.Open = async function(callback = null, match = false){
+SearchPrdcd.prototype.Open = async function(callback = null, match = false, prd_cd_p = false){
     if(this.grid === null){
         this.isMatch = match === "match";
+        this.isPrdCdP = prd_cd_p;
+        if(this.isPrdCdP) this.SetModal();
         this.SetGrid("#div-gd-prdcd");
         this.SetGridCond();
         // $("#SearchPrdcdModal").draggable();
@@ -319,6 +321,15 @@ SearchPrdcd.prototype.Open = async function(callback = null, match = false){
         keyboard: false
     });
 };
+
+SearchPrdcd.prototype.SetModal = function() {
+    $("#SearchPrdcdModalLabel").text("코드일련 검색");
+    $("#search_prdcd_match").addClass("d-none");
+    $("#search_prdcd_code").addClass("col-lg-6");
+    $("#search_prdcd_name").addClass("col-lg-6");
+    $("#search_prdcd_code label").text("코드일련");
+    $("#select_prdcd_btn").addClass("d-none");
+}
 
 SearchPrdcd.prototype.SetGrid = function(divId){
     let columns = [];
@@ -335,7 +346,19 @@ SearchPrdcd.prototype.SetGrid = function(divId){
             { field: "match_yn", headerName: '매칭여부', cellClass: 'hd-grid-code', width: 60},
             { field: "rt", headerName: '등록일', cellClass: 'hd-grid-code', width: 150, hide:true},
             { width: "auto" }
-            );
+        );
+    } else if (this.isPrdCdP) {
+        columns.push(
+            { headerName: "선택", width: 60, cellStyle: {"text-align": "center"},
+                cellRenderer: (params) => `<a href="javascript:void(0);" onclick="return searchPrdcd.ChoiceOne('${params.data.prd_cd_p}');">선택</a>`,
+            },
+            { field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: {"text-align": "center"} },
+            { field: "goods_no", headerName: "상품번호", width: 70, cellStyle: {"text-align": "center"} },
+            { field: "style_no", headerName: "스타일넘버", width: 100, cellStyle: {"text-align": "center"} },
+            { field: "goods_nm", headerName: "상품명", width: 300 },
+            { field: "goods_nm_eng", headerName: "상품명(영문)", width: 280 },
+            { width: "auto" }
+        );
     } else {
         columns.push(
             { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null },
@@ -348,7 +371,7 @@ SearchPrdcd.prototype.SetGrid = function(divId){
             { field: "size", headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"} },
             { field: "match_yn", headerName: '매칭여부', cellClass: 'hd-grid-code', width: 60},
             { width: "auto" }
-            );
+        );
     }
 
     this.grid = new HDGrid(document.querySelector( divId ), columns);
@@ -414,7 +437,11 @@ SearchPrdcd.prototype.Search = function(e) {
             data += `&${c}_contain=${is_contain}`;
             data += '&match='+this.isMatch;
         });
-        this.grid.Request('/store/api/prdcd/search', data, -1);
+        if(this.isPrdCdP) {
+            this.grid.Request('/store/api/prdcd/search_p', data, -1);
+        } else {
+            this.grid.Request('/store/api/prdcd/search', data, -1);
+        }
     }
 
     if (event_type == 'keypress') {
@@ -451,6 +478,24 @@ SearchPrdcd.prototype.Choice = function() {
     $('#gd-prdcd-total').html(0);
     $('#SearchPrdcdModal').modal('toggle');
 };
+
+SearchPrdcd.prototype.ChoiceOne = function(value) {
+    let divId = this.isPrdCdP ? 'prd_cd_p' : 'prd_cd';
+    if($('#' + divId).length > 0) {
+        $('#' + divId).val(value).trigger("change");
+    }
+
+    document.search_prdcd.reset();
+    // this.grid.setRows([]);
+    // Object.keys(conds).forEach(c => {
+    //     this[c + '_grid'].gridOptions.api.forEachNodeAfterFilter(node => {
+    //         node.setSelected(false);
+    //     });
+    // });
+
+    // $('#gd-prdcd-total').html(0);
+    $('#SearchPrdcdModal').modal('toggle');
+}
 
 let searchPrdcd = new SearchPrdcd();
 
@@ -713,6 +758,11 @@ $( document ).ready(function() {
     // 상품코드 검색 클릭 이벤트 바인딩 및 콜백 사용
     $(".sch-prdcd").on("click", function() {
         searchPrdcd.Open();
+    });
+
+    // 코드일련 검색 클릭 이벤트 바인딩 및 콜백 사용
+    $(".sch-prdcd-p").on("click", function() {
+        searchPrdcd.Open(null, false, true);
     });
 
     // 상품옵션 범위검색 클릭 이벤트 바인딩 및 콜백 사용

@@ -888,8 +888,6 @@ class goods extends Controller
         if($match_yn == 'Y') 	$where .= " and p.match_yn = 'Y'";
 		if($match_yn == 'N') 	$where .= " and p.match_yn = 'N'";
 
-       
-        
 
         foreach(self::Conds as $key => $value)
         {
@@ -1001,6 +999,82 @@ class goods extends Controller
         }
 
         return response()->json(['colors' => $colors]);
+    }
+
+    /** 코드일련 검색 */
+    public function search_prdcd_p(Request $request)
+    {
+        $prd_cd_p = $request->input('prd_cd', '');
+        $goods_nm = $request->input('goods_nm', '');
+
+        $brand = $request->input('brand', []);
+        $brand_contain = $request->input('brand_contain', '');
+        $year = $request->input('year', []);
+        $year_contain = $request->input('year_contain', '');
+        $season = $request->input('season', []);
+        $season_contain = $request->input('season_contain', '');
+        $gender = $request->input('gender', []);
+        $gender_contain = $request->input('gender_contain', '');
+        $items = $request->input('item', []);
+        $items_contain = $request->input('item_contain', '');
+        $opt = $request->input('opt', []);
+        $opt_contain = $request->input('opt_contain', '');
+
+        $where = "";
+        $having = "";
+
+        if ($prd_cd_p != '') $having .= " and prd_cd_p like '$prd_cd_p%' ";
+        if ($goods_nm != '') $having .= " and goods_nm like '%$goods_nm%' ";
+        
+        foreach(self::Conds as $key => $value)
+        {
+            if($key === 'item') $key = 'items';
+            if(count(${ $key }) > 0)
+            {
+                $where .= ${ $key . '_contain' } == 'true' ? " and (1!=1" : " and (1=1";
+
+                $col = $key === 'items' ? 'item' : $key;
+                foreach(${ $key } as $item) {
+                    if(${ $key . '_contain' } == 'true')
+                        $where .= " or pc.$col = '$item'";
+                    else
+                        $where .= " and pc.$col != '$item'";
+                }
+                $where .= ")";
+            }
+        }
+
+        $sql = "
+            select
+                concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
+                , pc.prd_cd
+                , pc.goods_no
+                , ifnull(g.goods_nm, (select prd_nm from product p where p.prd_cd = pc.prd_cd)) as goods_nm
+                , g.goods_nm_eng
+                , ifnull(g.style_no, (select style_no from product p where p.prd_cd = pc.prd_cd)) as style_no
+            from product_code pc
+                left outer join goods g on g.goods_no = pc.goods_no
+            where 1=1 $where
+            group by prd_cd_p
+            having 1=1 $having
+            order by 
+                field(pc.brand, 'F') desc,
+                pc.year desc,
+                prd_cd_p
+        ";
+
+        $result = DB::select($sql);
+
+        return response()->json([
+            "code" => '200',
+            "head" => [
+                "total" => count($result),
+                "page" => 1,
+                "page_cnt" => 1,
+                "page_total" => 1,
+            ],
+            "body" => $result
+        ]);
     }
 
     /*********************************************************************************/
