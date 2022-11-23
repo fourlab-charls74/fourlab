@@ -66,7 +66,7 @@
                                 <label for="order_stock_state">입고상태</label> 
                                 <div class="flex_box">
                                     <select name="order_stock_state" class="form-control form-control-sm w-100">
-                                        <option value="">모두</option>
+                                        <option value="">전체</option>
                                         @foreach ($order_stock_states as $order_stock_state)
                                             <option value="{{ $order_stock_state->code_id }}">{{ $order_stock_state->code_val }}</option>
                                         @endforeach

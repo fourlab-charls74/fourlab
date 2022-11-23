@@ -32,17 +32,18 @@
                 <div class="d-flex card-header justify-content-between">
                     <h4>기본 정보</h4>
                     <div>
-                        @if ($state > 0 && $state < 30)
-                            <a href="#" onclick="cmder('{{$cmd}}')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>저장</a>
+                        @if ($state > 0 && $state < 40)
+                        <a href="javascript:void(0);" onclick="cmder('{{$cmd}}')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>저장</a>
                             @if ($stock_no != "" && $state < 30)
-                            <a href="#" onclick="cmder('delcmd')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx mr-1"></i>입고삭제</a>
+                            <a href="javascript:void(0);" onclick="cmder('delcmd')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx mr-1"></i>입고삭제</a>
                             @endif
-                        @elseif ($state == 30)
-                            <a href="#" onclick="cmder('addstockcmd')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx mr-1"></i>추가입고</a>
-                            <a href="#" onclick="cmder('cancelcmd')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx mr-1"></i>입고취소</a>
+                            @if ($state == 30)
+                            <a href="javascript:void(0);" onclick="cmder('addstockcmd')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx mr-1"></i>추가입고</a>
+                            <a href="javascript:void(0);" onclick="cmder('cancelcmd')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx mr-1"></i>입고취소</a>
+                            @endif
                         @endif
-                        <a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
-                        <a href="#" onclick="displayHelp()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx mr-1"></i>도움말</a>
+                        <a href="javascript:void(0);" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
+                        <a href="javascript:void(0);" onclick="displayHelp()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx mr-1"></i>도움말</a>
                     </div>
                 </div>
                 <div class="card-body">
@@ -78,14 +79,9 @@
                                 <label for="" class="required">입고상태</label>
                                 <div class="flex_box">
                                     <select name="state" class="form-control form-control-sm w-100">
-                                        <?php
-                                            $states->map(function ($item) use ($state) {
-                                                $selected = ($state == $item['code_id']) ? 'selected' : "";
-                                                $code_id = $item['code_id'];
-                                                $code_val = $item['code_val'];
-                                                echo "<option value='${code_id}' ${selected}>${code_val}</option>";
-                                            });
-                                        ?>
+                                        @foreach (@$states as $stt)
+                                            <option value="{{ $stt['code_id'] }}" {{ $state == $stt['code_id'] ? 'selected' : '' }}>{{ $stt['code_val'] }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
@@ -216,11 +212,18 @@
                 </div>
             </div>
             <div class="resul_btn_wrap mb-3">
-                <a href="#" onclick="cmder('addstockcmd')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx mr-1"></i>추가입고</a>
-                <a href="#" onclick="cmder('cancelcmd')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx mr-1"></i>입고취소</a>
-                <a href="#" onclick="cmder('{{$cmd}}')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>저장</a>
-                <a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
-                <a href="#" onclick="displayHelp()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx mr-1"></i>도움말</a>
+                @if ($state > 0 && $state < 40)
+                <a href="javascript:void(0);" onclick="cmder('{{$cmd}}')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>저장</a>
+                    @if ($stock_no != "" && $state < 30)
+                    <a href="javascript:void(0);" onclick="cmder('delcmd')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx mr-1"></i>입고삭제</a>
+                    @endif
+                    @if ($state == 30)
+                    <a href="javascript:void(0);" onclick="cmder('addstockcmd')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx mr-1"></i>추가입고</a>
+                    <a href="javascript:void(0);" onclick="cmder('cancelcmd')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx mr-1"></i>입고취소</a>
+                    @endif
+                @endif
+                <a href="javascript:void(0);" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
+                <a href="javascript:void(0);" onclick="displayHelp()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx mr-1"></i>도움말</a>
             </div>
         </div>
         <div id="filter-area" class="card shadow-none mb-0 ty2 last-card">
@@ -373,6 +376,7 @@
     });
 
     const checkIsEditable = (params) => {
+        if (params.column?.colId == 'unit_cost' && STATE > 0 && STATE < 40 && params.node.rowPinned != 'top') return true; 
         return params.data.hasOwnProperty('isEditable') && params.data.isEditable ? true : false;
     };
 

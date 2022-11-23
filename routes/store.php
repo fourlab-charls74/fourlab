@@ -40,7 +40,6 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('store-goods', 'goods@store_search'); // 매장별 상품검색
         Route::get('storage-goods/show/{storage_cd?}', 'goods@storage_show'); // 창고별 상품검색 화면 show
         Route::get('storage-goods', 'goods@storage_search'); // 창고별 상품검색
-        Route::get('product/color', 'goods@search_color'); // 코드일련으로 해당 상품의 컬러옵션 리스트 조회
 
         // 고객명 조회
         Route::get('members', 'MemberController@show');
@@ -67,6 +66,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('prdcd/conds_sub', 'goods@search_product_sub_conditions');
         Route::get('prdcd/search_sub', 'goods@search_prdcd_sub');
 
+        // 코드일련 조회
+        Route::get('product/color', 'goods@search_color'); // 코드일련으로 해당 상품의 컬러옵션 리스트 조회
+        Route::get('prdcd/search_p', 'goods@search_prdcd_p');
     });
 
     // 포스

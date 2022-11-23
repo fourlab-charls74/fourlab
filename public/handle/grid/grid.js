@@ -309,18 +309,18 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
         //onBodyScroll:onscroll,
         suppressColumnVirtualisation:true,
 
-        // 첫글자 영문입력 막기 - 엔터키로 edit하도록 유도
-        suppressKeyboardEvent: (params) => {
-            const key = params.event.key;
-            const allowSome = ['Enter', 'ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown', 'Tab', 'Escape', 'Delete'];
-            const allowClipBoard = ['c', 'v'];
-            const isCtrlKeyPressed = params.event.ctrlKey;
-            if ( allowSome.includes(key) || (isCtrlKeyPressed && allowClipBoard.includes(key)) ) {
-                return false;
-            } else {
-                return true;
-            }
-        },
+        // 첫글자 영문입력 막기 - 엔터키로 edit하도록 유도 // 임시주석처리 (2022-11-23 최유현)
+        // suppressKeyboardEvent: (params) => {
+        //     const key = params.event.key;
+        //     const allowSome = ['Enter', 'ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown', 'Tab', 'Escape', 'Delete'];
+        //     const allowClipBoard = ['c', 'v'];
+        //     const isCtrlKeyPressed = params.event.ctrlKey;
+        //     if ( allowSome.includes(key) || (isCtrlKeyPressed && allowClipBoard.includes(key)) ) {
+        //         return false;
+        //     } else {
+        //         return true;
+        //     }
+        // },
 
         onColumnVisible: function (params) {
             params.api.resetRowHeights();

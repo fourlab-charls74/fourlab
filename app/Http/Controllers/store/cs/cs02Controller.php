@@ -200,14 +200,33 @@ class cs02Controller extends Controller
                     
                     if($d['target_type'] == 'S') {
                         // 상품을 반품받은 창고 재고 플러스
-                        DB::table('product_stock_storage')
+                        $cnt = DB::table('product_stock_storage')
                             ->where('prd_cd', '=', $row->prd_cd)
                             ->where('storage_cd', '=', $d['target_cd'])
-                            ->update([
-                                'qty' => DB::raw('qty + ' . ($row->return_qty ?? 0)),
-                                'wqty' => DB::raw('wqty + ' . ($row->return_qty ?? 0)),
-                                'ut' => now(),
-                            ]);
+                            ->count();
+
+                        if ($cnt < 1) {
+                            DB::table('product_stock_storage')
+                                ->insert([
+                                    'prd_cd' => $row->prd_cd,
+                                    'goods_no' => $row->goods_no,
+                                    'storage_cd' => $d['target_cd'],
+                                    'qty' => $row->return_qty ?? 0,
+                                    'wqty' => $row->return_qty ?? 0,
+                                    'goods_opt' => $row->goods_opt,
+                                    'use_yn' => 'Y',
+                                    'rt' => now(),
+                                ]);
+                        } else {
+                            DB::table('product_stock_storage')
+                                ->where('prd_cd', '=', $row->prd_cd)
+                                ->where('storage_cd', '=', $d['target_cd'])
+                                ->update([
+                                    'qty' => DB::raw('qty + ' . ($row->return_qty ?? 0)),
+                                    'wqty' => DB::raw('wqty + ' . ($row->return_qty ?? 0)),
+                                    'ut' => now(),
+                                ]);
+                        }
 
                         // 재고이력 등록
                         DB::table('product_stock_hst')
@@ -343,12 +362,15 @@ class cs02Controller extends Controller
                 srp.sgr_prd_cd, 
                 srp.sgr_cd, 
                 srp.prd_cd,
+                concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p,
+                pc.color,
+                pc.size,
                 pc.goods_no,
                 ifnull(type.code_val, 'N/A') as goods_type,
                 op.opt_kind_nm,
                 b.brand_nm as brand, 
                 g.style_no, 
-                stat.code_val as sale_stat_cl, 
+                -- stat.code_val as sale_stat_cl, 
                 g.goods_nm,
                 pc.goods_opt,
                 g.goods_sh,
@@ -366,8 +388,8 @@ class cs02Controller extends Controller
                 left outer join brand b on b.brand = g.brand
                 left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
                 left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
-                left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id,
-                (select @rownum :=0) as r
+                -- left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
+                , (select @rownum :=0) as r
             where srp.sgr_cd = :sgr_cd
         ";
         $products = DB::select($sql, ['sgr_cd' => $sgr_cd]);
@@ -473,14 +495,33 @@ class cs02Controller extends Controller
                     
                     if($target_type == 'S') {
                         // 상품을 반품받은 창고 재고 플러스
-                        DB::table('product_stock_storage')
-                        ->where('prd_cd', '=', $product['prd_cd'])
-                        ->where('storage_cd', '=', $target_cd) 
-                        ->update([
-                            'qty' => DB::raw('qty + ' . ($product['return_qty'] ?? 0)),
-                            'wqty' => DB::raw('wqty + ' . ($product['return_qty'] ?? 0)),
-                            'ut' => now(),
-                        ]);
+                        $cnt = DB::table('product_stock_storage')
+                            ->where('prd_cd', '=', $product['prd_cd'])
+                            ->where('storage_cd', '=', $target_cd)
+                            ->count();
+
+                        if ($cnt < 1) {
+                            DB::table('product_stock_storage')
+                                ->insert([
+                                    'prd_cd' => $product['prd_cd'],
+                                    'goods_no' => $prd->goods_no,
+                                    'storage_cd' => $target_cd,
+                                    'qty' => $product['return_qty'] ?? 0,
+                                    'wqty' => $product['return_qty'] ?? 0,
+                                    'goods_opt' => $prd->goods_opt,
+                                    'use_yn' => 'Y',
+                                    'rt' => now(),
+                                ]);
+                        } else {
+                            DB::table('product_stock_storage')
+                                ->where('prd_cd', '=', $product['prd_cd'])
+                                ->where('storage_cd', '=', $target_cd)
+                                ->update([
+                                    'qty' => DB::raw('qty + ' . ($product['return_qty'] ?? 0)),
+                                    'wqty' => DB::raw('wqty + ' . ($product['return_qty'] ?? 0)),
+                                    'ut' => now(),
+                                ]);
+                        }
                         
                         // 재고이력 등록
                         DB::table('product_stock_hst')
@@ -651,7 +692,7 @@ class cs02Controller extends Controller
                     , g.style_no
                     , g.goods_nm
                     , g.goods_nm_eng
-                    , stat.code_val as sale_stat_cl
+                    -- , stat.code_val as sale_stat_cl
                     , g.price
                     , g.wonga
                     , g.goods_sh 
@@ -667,7 +708,7 @@ class cs02Controller extends Controller
                     left outer join product_stock_storage ps on s.prd_cd = ps.prd_cd and ps.storage_cd = '$storage_cd'
                     left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
                     left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
-                    left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
+                    -- left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
                     left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
                     left outer join company com on com.com_id = g.com_id
                     left outer join brand brand on brand.brand = g.brand

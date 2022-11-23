@@ -490,7 +490,7 @@
     <div class="modal-dialog" style="max-width: 1200px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title mt-0" id="myModalLabel">상품코드 검색</h5>
+                <h5 class="modal-title mt-0" id="SearchPrdcdModalLabel">상품코드 검색</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -502,7 +502,7 @@
                             <div class="card-body">
                                 <div class="row_wrap mb-2">
                                     <div class="row">
-                                        <div class="col-lg-4 inner-td">
+                                        <div class="col-lg-4 inner-td" id="search_prdcd_code">
                                             <div class="form-group">
                                                 <label style="min-width:80px;">상품코드</label>
                                                 <div class="flex_box">
@@ -510,7 +510,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-lg-4 inner-td">
+                                        <div class="col-lg-4 inner-td" id="search_prdcd_name">
                                             <div class="form-group">
                                                 <label style="min-width:80px;">상품명</label>
                                                 <div class="flex_box">
@@ -518,7 +518,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-lg-4 inner-td">
+                                        <div class="col-lg-4 inner-td" id="search_prdcd_match">
                                             <div class="form-group">
                                             <label for="formrow-email-input">매칭여부</label>
                                                 <div class="form-inline form-radio-box">
@@ -586,7 +586,7 @@
                                     <div class="filter_wrap">
                                         <h6 class="m-0 font-weight-bold">총 : <span id="gd-prdcd-total" class="text-primary">0</span> 건</h6>
                                     </div>
-                                    <a href="#" onclick="return searchPrdcd.Choice();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-check fa-sm text-white-50 pr-1"></i>선택</a>
+                                    <a href="#" onclick="return searchPrdcd.Choice();" class="btn btn-sm btn-primary shadow-sm" id="select_prdcd_btn"><i class="fas fa-check fa-sm text-white-50 pr-1"></i>선택</a>
                                 </div>
                             </div>
                             <div class="table-responsive">

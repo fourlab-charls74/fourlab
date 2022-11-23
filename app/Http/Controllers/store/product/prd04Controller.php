@@ -46,6 +46,7 @@ class prd04Controller extends Controller
 
 		$ord		= $request->input('ord','desc');
 		$ord_field	= $request->input('ord_field','prd_cd_p');
+		if ($ord_field == 'prd_cd_p') $ord_field = 'pc.rt';
 		$orderby	= sprintf("order by %s %s, pc.color, pc.size", $ord_field, $ord);
 		$match_yn = $request->input('match_yn1');
 
@@ -283,6 +284,8 @@ class prd04Controller extends Controller
 		$prd_cd_p = $request->input('prd_cd_p', '');
 		$sdate = $request->input('date', date('Y-m-d'));
 		if($sdate == '') $sdate = date('Y-m-d');
+		$color = $request->input('color', '');
+		$size = $request->input('size', '');
 
 		// $cfg_img_size_real	= "a_500";
 		// $cfg_img_size_list	 = "s_50";
@@ -347,6 +350,8 @@ class prd04Controller extends Controller
 		$values = [
 			'prd_cd_p' => $prd_cd_p,
 			'sdate' => $sdate,
+			'color' => $color ?? '',
+			'size' => $size ?? '',
 			// 'prd' => $rows[0] ?? '',
 			'store_types' => SLib::getCodes("STORE_TYPE"), // 매장구분
 		];

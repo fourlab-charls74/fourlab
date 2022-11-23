@@ -79,6 +79,7 @@
                         <select name="search_prd_type_out" id="search_prd_type_out" class="sel fs-12" style="min-width: 120px;">
                             <option value="prd_cd">상품코드</option>
                             <option value="goods_nm">상품명</option>
+                            <option value="style_no">스타일넘버</option>
                         </select>
                         <input type="text" class="flex-1 inp h-40 fs-12 mr-1" id="search_prd_keyword_out" name="search_prd_keyword_out" placeholder="검색어를 입력하세요">
                         <button type="button" id="search_btn_out" class="butt br-2 bg-lightgray p-2 pl-3 pr-3"><i class="fa fa-search fc-black fs-10" aria-hidden="true"></i></button>
@@ -432,6 +433,7 @@
                                 <select name="search_prd_type" id="search_prd_type" class="sel fs-12" style="min-width: 120px;">
                                     <option value="prd_cd">상품코드</option>
                                     <option value="goods_nm">상품명</option>
+                                    <option value="style_no">스타일넘버</option>
                                 </select>
                                 <input type="text" class="flex-1 inp h-40 fs-12 mr-1" id="search_prd_keyword" name="search_prd_keyword" placeholder="검색어를 입력하세요">
                                 <button type="button" class="butt br-2 bg-lightgray p-3" onclick="return Search();"><i class="fa fa-search fc-black fs-10" aria-hidden="true"></i></button>
@@ -870,11 +872,12 @@
         {field: "goods_nm", headerName: "상품명", width: "auto", cellStyle: LineHeight50, wrapText: true, autoHeight: true,
             // cellRenderer: (params) => `<a href="javascript:void(0);" onclick="setProductDetail('${params.data.prd_cd}');">${params.value}</a>`,
         },
-        {field: "color", headerName: "컬러", width: 80, cellStyle: {...AlignCenter, ...LineHeight50}},
-        {field: "size", headerName: "사이즈", width: 80, cellStyle: {...AlignCenter, ...LineHeight50}},
-        {field: "qty", headerName: "수량", width: 80, type: "currencyType", cellStyle: LineHeight50},
-        {field: "price", headerName: "단가", width: 100, type: "currencyType", cellStyle: LineHeight50},
-        {field: "total", headerName: "금액", width: 120, type: "currencyType", cellStyle: {...LineHeight50, "font-size": "18px", "font-weight": "700"}},
+        // {field: "prd_cd_sm", headerName: "코드일련", width: 130, cellStyle: {...AlignCenter, ...LineHeight50}},
+        {field: "color", headerName: "컬러", width: 180, cellStyle: {...LineHeight50}, wrapText: true, autoHeight: true},
+        {field: "size", headerName: "사이즈", width: 150, cellStyle: {...LineHeight50}, wrapText: true, autoHeight: true},
+        {field: "qty", headerName: "수량", width: 60, type: "currencyType", cellStyle: LineHeight50},
+        {field: "price", headerName: "단가", width: 80, type: "currencyType", cellStyle: LineHeight50},
+        {field: "total", headerName: "금액", width: 100, type: "currencyType", cellStyle: {...LineHeight50, "font-size": "18px", "font-weight": "700"}},
         {headerName: "삭제", width: 80, cellStyle: {...AlignCenter, ...LineHeight50},
             cellRenderer: (params) => `<a href="javascript:void(0);" onclick="return removeProduct('${params.data.prd_cd}')"><i class="fa fa-trash fc-red fs-12" aria-hidden="true"></i></a>`,
         }
@@ -885,14 +888,14 @@
     let gx2;
 
     const product_columns = [
-        {field: "prd_cd" , headerName: "바코드", width: 180, cellStyle: {...AlignCenter, ...LineHeight50}},
-        {field: "prd_cd_sm", headerName: "상품코드", width: 130, cellStyle: {...AlignCenter, ...LineHeight50}},
-        {field: "color", headerName: "컬러", width: 80, cellStyle: {...AlignCenter, ...LineHeight50}},
-        {field: "size", headerName: "사이즈", width: 80, cellStyle: {...AlignCenter, ...LineHeight50}},
+        {field: "prd_cd" , headerName: "상품코드", width: 180, cellStyle: {...AlignCenter, ...LineHeight50}},
+        {field: "prd_cd_sm", headerName: "코드일련", width: 130, cellStyle: {...AlignCenter, ...LineHeight50}},
+        {field: "color", headerName: "컬러", width: 180, cellStyle: {...LineHeight50}},
+        {field: "size", headerName: "사이즈", width: 150, cellStyle: {...LineHeight50}},
+        {field: "style_no", headerName: "스타일넘버", width: 100, cellStyle: {...AlignCenter, ...LineHeight50}},
         {field: "goods_nm",	headerName: "상품명", width: "auto", cellStyle: LineHeight50,
             cellRenderer: (params) => `<a href="javascript:void(0);" onclick="return addProduct('${params.data.prd_cd}')">${params.value}</a>`,
         },
-        {field: "goods_opt", headerName: "옵션", width: 300, cellStyle: LineHeight50},
         {field: "wqty", headerName: "매장수량", type: "currencyType", width: 100, cellStyle: LineHeight50},
         {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 100, cellStyle: LineHeight50},
         {field: "price", headerName: "판매가", type: "currencyType", width: 100, cellStyle: LineHeight50},
