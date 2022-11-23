@@ -146,9 +146,11 @@ class PosController extends Controller
         $where = "";
         if ($search_keyword != '') {
             if ($search_type == 'prd_cd') {
-                $where .= " and pc.prd_cd like '%$search_keyword%' ";
+                $where .= " and pc.prd_cd like '$search_keyword%' ";
             } else if ($search_type == 'goods_nm') {
                 $where .= " and g.goods_nm like '%$search_keyword%' ";
+            } else if ($search_type == 'style_no') {
+                $where .= " and g.style_no like '$search_keyword%' ";
             }
         }
 
@@ -170,14 +172,15 @@ class PosController extends Controller
             select 
                 pc.prd_cd
                 , concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_sm
+                , c.code_val as color
+                , size.code_val2 as size
                 , g.goods_no
                 , g.goods_sub
                 , g.goods_type as goods_type_cd
                 , pc.goods_opt
                 , pc.brand
-                , pc.color
-                , pc.size
                 , g.goods_nm
+                , g.style_no
                 , g.price
                 , g.price as ori_price
                 , g.goods_sh
@@ -192,6 +195,8 @@ class PosController extends Controller
             from product_code pc
                 inner join goods g on g.goods_no = pc.goods_no
                 inner join product_stock_store ps on ps.prd_cd = pc.prd_cd and ps.store_cd = '$store_cd'
+                inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = pc.color
+                inner join code size on size.code_kind_cd = 'PRD_CD_SIZE_MATCH' and size.code_val = pc.size
             where 1=1 $where
             order by (CASE WHEN pc.year = '99' THEN 0 ELSE 1 END) desc, pc.year desc
             $limit
