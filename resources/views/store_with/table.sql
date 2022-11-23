@@ -75,6 +75,8 @@ CREATE TABLE `product_stock_order` (
   `prc_rt` DATETIME DEFAULT NULL COMMENT '처리중일자',
   `fin_id` VARCHAR(50) DEFAULT NULL COMMENT '완료 id',
   `fin_rt` DATETIME DEFAULT NULL COMMENT '완료일자',
+  `cfm_id` VARCHAR(50) DEFAULT NULL COMMENT '원가확정 id',
+  `cfm_rt` DATETIME DEFAULT NULL COMMENT '원가확정일자',
   `rej_id` VARCHAR(50) DEFAULT NULL COMMENT '취소 id',
   `rej_rt` DATETIME DEFAULT NULL COMMENT '취소일자',
   `ut` datetime DEFAULT NULL COMMENT '최근수정일',
@@ -2194,6 +2196,17 @@ insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_va
 
 -- code_kind 데이터 추가 행사코드 : PRODUCT_STOCK_TYPE
 insert into `code_kind` (`code_kind_cd`, `code_kind_nm`, `code_kind_nm_eng`, `use_yn`, `type`, `seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PRODUCT_STOCK_TYPE','[매장관리]재고분류','product_stock_type','Y',NULL,'0','','본사_김용남',now(),now());
+
+-- code 데이터 추가 입고상태 : STOCK_ORDER_STATE
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('STOCK_ORDER_STATE','-10','입고취소','','','','Y','1','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('STOCK_ORDER_STATE','10','입고대기','','','','Y','2','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('STOCK_ORDER_STATE','20','입고처리중','','','','Y','3','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('STOCK_ORDER_STATE','30','입고완료','','','','Y','4','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('STOCK_ORDER_STATE','40','원가확정','','','','Y','5','ceduce','본사_김용남',now(),now());
+
+-- code_kind 데이터 추가 입고상태 : STOCK_ORDER_STATE
+insert into `code_kind` (`code_kind_cd`, `code_kind_nm`, `code_kind_nm_eng`, `use_yn`, `type`, `seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('STOCK_ORDER_STATE','[매장관리]입고상태','stock_order_state','Y',NULL,'0','','본사_김용남',now(),now());
+
 --
 -- 테이블 데이터 추가 종료
 --
