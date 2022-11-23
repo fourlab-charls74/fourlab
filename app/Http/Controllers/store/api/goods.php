@@ -742,6 +742,9 @@ class goods extends Controller
                 g.goods_type as goods_type_cd,
                 com.com_type as com_type_d,
                 p.goods_opt,
+                concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p,
+                pc.color,
+                pc.size,
                 p.qty as storage_qty,
                 p.wqty as storage_wqty,
                 '' as rel_qty
