@@ -106,8 +106,23 @@
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label for="user_name">입고자</label>
-                                <div class="flex_box">
-                                    <input type="text" class="form-control form-control-sm search-all search-enter" name="user_name" id="user_name" value="">
+                                <div class="form-inline">
+                                    <div class="form-inline-inner input_box" style="width: 35%;margin-right:1%;">
+                                        <div class="form-group">
+                                            <select name="user_name_type" id="user_name_type" class="form-control form-control-sm">
+                                                <option value="req_nm">등록자명</option>
+                                                <option value="prc_nm">처리중자명</option>
+                                                <option value="fin_nm">완료자명</option>
+                                                <option value="cfm_nm">원가확정자명</option>
+                                                <option value="rej_nm">취소자명</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-inline-inner input_box" style="width: 64%;">
+                                        <div class="form-group">
+                                            <input type='text' class="form-control form-control-sm search-all search-enter" id="user_name" name='user_name' value=''>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -167,6 +182,8 @@
             {field: "prc_rt", headerName: "처리중일시", width: 120, cellStyle: {"text-align": "center"}},
             {field: "fin_nm", headerName: "완료", width: 80, cellStyle: {"text-align": "center"}},
             {field: "fin_rt", headerName: "완료일시", width: 120, cellStyle: {"text-align": "center"}},
+            {field: "cfm_nm", headerName: "원가확정", width: 80, cellStyle: {"text-align": "center"}},
+            {field: "cfm_rt", headerName: "원가확정일시", width: 120, cellStyle: {"text-align": "center"}},
             {field: "rej_nm", headerName: "취소", width: 80, cellStyle: {"text-align": "center"}},
             {field: "rej_rt", headerName: "취소일시", width: 120, cellStyle: {"text-align": "center"}},
             {width: "auto"},

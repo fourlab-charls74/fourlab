@@ -249,7 +249,7 @@
 <script type="text/javascript" charset="utf-8">
 
     const STATE = "{{$state}}";
-
+    
     /**
      * ag-grid set field
      */
@@ -276,7 +276,7 @@
         const value = Math.round(params.value).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
         return isNaN(value) ? 0 : value;
     };
-
+    
     var columns= [
         {headerName: '#', pinned: 'left', type: 'NumType', width: 50, cellStyle: {'text-align': 'center'},
             cellRenderer: params => params.node.rowPinned == 'top' ? '' : params.data.count,
@@ -286,20 +286,12 @@
                 return (parseInt(valueA) > parseInt(valueB)) ? 1 : -1;
             },
         },
-        {field:"chk", headerName: '', cellClass: 'hd-grid-code',
-            headerCheckboxSelection: params => {
-                const state = STATE; // 입고취소: -10, 입고대기: 10, 입고처리중: 20, 입고완료: 30
-                // 입고 대기이거나 입고 처리중인 경우에만 체크박스 표시 -> 삭제 가능하게함
-                return state == -10 || state == 30 ? false : true;
-            },
-            checkboxSelection: params => checkIsEditable(params),
-            cellStyle: params => checkIsEditable(params) ? null : { display: 'none'},
-            width: 40, pinned:'left',
-            hide: params => {
-                const state = STATE; // 입고취소: -10, 입고대기: 10, 입고처리중: 20, 입고완료: 30
-                // 입고 대기이거나 입고 처리중인 경우에만 체크박스 표시 -> 삭제 가능하게함
-                return state == -10 || state == 30 ? false : true;
-            }
+        {field:"chk", headerName: '', cellClass: 'hd-grid-code', width: 28, pinned: "left",
+            // 입고취소: -10, 입고대기: 10, 입고처리중: 20, 입고완료: 30, 원가확정: 40
+            // 입고 대기이거나 입고 처리중인 경우에만 체크박스 표시 -> 삭제 가능하게함
+            headerCheckboxSelection: STATE > 0 && STATE < 30,
+            checkboxSelection: STATE > 0 && STATE < 30,
+            hide: !(STATE > 0 && STATE < 30),
         },
         {field:"item" ,headerName:"품목",pinned:'left',width:90, cellStyle: {'text-align': 'center'}},
 
@@ -316,7 +308,8 @@
         {field:"goods_nm", headerName:"상품명", type:"HeadGoodsNameType", width:250, pinned:'left'},
         {field:"opt_kor", headerName:"옵션", pinned:'left', width:200},
         // {field: "in_qty", headerName: "입고수량", type:'currencyType'},
-        {field: "total_stock_qty", headerName: "현재재고", type:'currencyType', width: 60},
+        {field: "total_stock_qty", headerName: "총재고", type:'currencyType', width: 60},
+        {field: "total_stock_wqty", headerName: "창고재고", type:'currencyType', width: 60},
         // {headerName: "수량", field: "qty", width: 60,
         {headerName: "입고수량", field: "qty", width: 60,
             editable: params => checkIsEditable(params),
@@ -508,7 +501,7 @@
         const ff = document.search;
         if( ff.com_id.value == "" ) {
             alert("공급처를 선택해 주십시오.");
-            $('.sch-company').click();
+            $('.sch-sup-company').click();
             return false;
         }
         if( ff.invoice_no.value == "" ) {
@@ -797,6 +790,8 @@
             }).catch((error) => { 
                 // console.log(error);
             });
+        } else if (invoice_no == '' && com_id == '') {
+            $('.sch-sup-company').click();
         }
     };
 

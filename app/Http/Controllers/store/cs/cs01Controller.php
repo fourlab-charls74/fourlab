@@ -52,17 +52,20 @@ class cs01Controller extends Controller {
 		$com_nm = $request->input("com_nm");
 		$state = $request->input("order_stock_state");
 		$user_name = $request->input("user_name");
+		$user_name_type = $request->input("user_name_type", "req_nm");
 
 		$where = "where b.stock_date >= '$sdate' and b.stock_date <= '$edate'";
 		$where2 = "where 1=1";
+		$having = "having 1=1";
 
 		if ($com_id != "") $where .= " and b.com_id = '" . Lib::quote($com_id) . "'";
 		if ($state != "") $where .= " and b.state = '" . Lib::quote($state) . "'";
 		if ($invoice_no != "") $where .= " and b.invoice_no like '%" . Lib::quote($invoice_no) . "%'";
 		
 		if ($com_nm != "") $where2 .= " and c.com_nm like '%" . Lib::quote($com_nm) . "%' ";
-		if ($user_name != "") $where2 .= " and u.name like '%" . Lib::quote($user_name) . "%' ";
 		if ($item != "") $where2 .= " and item_cds like '%" . Lib::quote($item) . "%' ";
+		
+		if ($user_name != "") $having .= " and $user_name_type like '%" . Lib::quote($user_name) . "%' ";
 
 		/**
 		 * 추후 입고 유저 롤에 대한 처리 필요
@@ -88,6 +91,10 @@ class cs01Controller extends Controller {
                 b.fin_id, 
 				(select name from mgr_user where id = b.fin_id) as fin_nm, 
                 b.fin_rt,
+                b.cfm_id, 
+				(select name from mgr_user where id = b.cfm_id) as cfm_nm, 
+                b.cfm_rt,
+				b.rej_id, 
 				(select name from mgr_user where id = b.rej_id) as rej_nm, 
                 b.rej_rt
 			from product_stock_order b
@@ -104,6 +111,7 @@ class cs01Controller extends Controller {
 				left outer join code ar on ar.code_kind_cd = 'g_buy_order_ar_type' and ar.code_id = b.area_type
 				left outer join code cd on cd.code_kind_cd = 'STOCK_ORDER_STATE' and cd.code_id = b.state
 			$where2
+			$having
 			order by b.stock_date desc, b.req_rt desc
 		";
 
