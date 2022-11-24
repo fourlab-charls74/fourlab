@@ -81,6 +81,8 @@ class prd02Controller extends Controller
 		$ord_field	= $request->input('ord_field','g.goods_no');
 
 		$orderby	= sprintf("order by %s %s", $ord_field, $ord);
+
+		dd($orderby);
 		$in_store_sql = "";
 		$match_yn = $request->input('match_yn1');
 
@@ -182,36 +184,56 @@ class prd02Controller extends Controller
 
 		$total		= 0;
 		$page_cnt	= 0;
+		$page_cnt	= 0;
 
 		if($page == 1) {
-			// $query	= /** @lang text */
-			// 	"
-			// 	select count(*) as total
-			// 	from goods g inner join product_stock s on g.goods_no = s.goods_no 
-			// 	$in_store_sql
-			// 	inner join product_code pc on pc.prd_cd = s.prd_cd
-			// 	left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
-			// 	left outer join product p on p.prd_cd = s.prd_cd
-			// 	where 1=1 
-			// 		-- g.com_id = :com_id 
+		
+			$query = "
+				select 
+					count(a.prd_cd) as total,
+					sum(a.goods_sh) as total_goods_sh,
+					sum(a.price) as total_price,
+					sum(a.wonga) as total_wonga,
+					sum(a.margin_amt) as total_margin_amt,
+					sum(a.wqty) as total_wqty,
+					sum(a.sqty) as total_sqty
+				from (
+					select 
+						pc.prd_cd
+						, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd1
+						, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
+						, if(pc.goods_no = 0, p.price, g.price) as price
+						, if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
+						, (g.price-g.wonga) as margin_amt
+						, ps.wqty
+						, (ps.qty - ps.wqty) as sqty
+					from product_code pc
+						inner join product_stock ps on ps.prd_cd = pc.prd_cd
+						left outer join goods g on g.goods_no = pc.goods_no
+						$in_store_sql
+						left outer join product p on p.prd_cd = pc.prd_cd
+					where 1 = 1
+					$where
+					group by pc.prd_cd
+				) a
+			";
+
+			// $query = "
+			// 	select
+			// 		count(*) as total
+			// 	from product_code pc
+			// 		inner join product_stock ps on pc.prd_cd = ps.prd_cd
+			// 		$in_store_sql
+			// 		left outer join product p on p.prd_cd = pc.prd_cd
+			// 		left outer join goods g on pc.goods_no = g.goods_no
+			// 		left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
+			// 	where 1=1
 			// 		$where
 			// ";
-
-			$query = "
-				select
-					count(*) as total
-				from product_code pc
-					inner join product_stock ps on pc.prd_cd = ps.prd_cd
-					$in_store_sql
-					left outer join product p on p.prd_cd = pc.prd_cd
-					left outer join goods g on pc.goods_no = g.goods_no
-					left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
-				where 1=1
-					$where
-			";
 			//$row = DB::select($query,['com_id' => $com_id]);
 			$row	= DB::select($query);
 			$total	= $row[0]->total;
+			$total_row = $row[0];
 			$page_cnt = (int)(($total - 1) / $page_size) + 1;
 		}
 
@@ -219,87 +241,17 @@ class prd02Controller extends Controller
 		$cfg_img_size_real	= "a_500";
 		$cfg_img_size_list	 = "s_50";
 
-		// $color_size = substr($prd_cd, 0, 11);
 		
-		
-		// $color = substr($color_size, 0, 2);// 컬러
-		// $size = substr($color_size, 2, strlen($color_size));//사이즈
-
-		// $query = /** @lang text */
-		// "
-		// 	select
-		// 		'' as blank
-		// 		, g.goods_no 
-		// 		, g.goods_sub
-		// 		, ifnull( type.code_val, 'N/A') as goods_type
-		// 		, com.com_nm
-		// 		, opt.opt_kind_nm
-		// 		, brand.brand_nm
-		// 		, cat.full_nm
-		// 		, g.style_no
-		// 		, g.head_desc
-		// 		, '' as img_view
-		// 		, if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
-		// 			select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
-		// 			from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
-		// 		  )) as img
-		// 		, g.goods_nm
-		// 		, g.goods_nm_eng
-		// 		, g.ad_desc
-		// 		, stat.code_val as sale_stat_cl
-		// 		, g.goods_sh
-		// 		, g.price
-		// 		, s.wqty
-		// 		, (s.qty - s.wqty) as sqty
-		// 		, g.wonga
-		// 		, (100/(g.price/(g.price-g.wonga))) as margin_rate
-		// 		, (g.price-g.wonga) as margin_amt
-		// 		, g.md_nm
-		// 		, bi.code_val as baesong_info
-		// 		, bk.code_val as baesong_kind
-		// 		, dpt.code_val as dlv_pay_type
-		// 		, g.baesong_price
-		// 		, g.point
-		// 		, g.org_nm
-		// 		, g.make
-		// 		, g.type
-		// 		, g.reg_dm
-		// 		, g.upd_dm
-		// 		, g.goods_location
-		// 		, g.sale_price
-		// 		, g.goods_type as goods_type_cd
-		// 		, com.com_type as com_type_d
-		// 		, s.prd_cd 
-		// 		, s.goods_opt
-		// 		, p.match_yn
-		// 	from goods g 
-		// 		inner join product_stock s on g.goods_no = s.goods_no
-		// 		$in_store_sql
-		// 		left outer join product_code pc on pc.prd_cd = s.prd_cd
-		// 		left outer join product p on p.prd_cd = s.prd_cd
-		// 		left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
-		// 		left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
-		// 		left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
-		// 		left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
-		// 		left outer join company com on com.com_id = g.com_id
-		// 		left outer join brand brand on brand.brand = g.brand
-		// 		left outer join category cat on cat.d_cat_cd = g.rep_cat_cd and cat.cat_type = 'DISPLAY'
-		// 		left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
-		// 		left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
-		// 		left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
-		// 	where 1 = 1
-		// 		$where
-		// 	$orderby
-		// 	$limit
-		// ";
 
 		$query = "
 			select 
 				pc.prd_cd
+				, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd1
 				, if(pc.goods_no = 0, '' , ps.goods_no) as goods_no
-				, opt.opt_kind_nm
 				, b.brand_nm
 				, if(pc.goods_no = 0, p.style_no, g.style_no) as style_no
+				, opt.opt_kind_nm
+				, pc.color, pc.size
 				, if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
 							select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
 							from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
@@ -309,9 +261,9 @@ class prd02Controller extends Controller
 				, concat(c.code_val, '^',d.code_val2) as goods_opt
 				, ps.wqty
 				, (ps.qty - ps.wqty) as sqty
-				, g.goods_sh
-				, g.price
-				, g.wonga
+				, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
+				, if(pc.goods_no = 0, p.price, g.price) as price
+				, if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
 				, (100/(g.price/(g.price-g.wonga))) as margin_rate
 				, (g.price-g.wonga) as margin_amt
 				, g.org_nm
@@ -336,9 +288,10 @@ class prd02Controller extends Controller
 				inner join code d on pc.size = d.code_val
 				inner join brand b on b.br_cd = pc.brand
 			where 1 = 1 and c.code_kind_cd = 'PRD_CD_COLOR' and d.code_kind_cd = 'PRD_CD_SIZE_MATCH'
-				$where
-				$orderby
-				$limit
+			$where
+			group by pc.prd_cd
+			$orderby
+			$limit
 		";
 		// dd($query);
 		//$result = DB::select($query,['com_id' => $com_id]);
@@ -363,7 +316,8 @@ class prd02Controller extends Controller
 				"total"		=> $total,
 				"page"		=> $page,
 				"page_cnt"	=> $page_cnt,
-				"page_total"=> count($result)
+				"page_total"=> count($result),
+				"total_row" => $total_row,
 			),
 			"body"	=> $result
 		]);
