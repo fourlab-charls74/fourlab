@@ -40,6 +40,9 @@ class cs03Controller extends Controller
 		if( $page < 1 or $page == "" )	$page = 1;
 		$limit = $request->input('limit', 500);
 
+		$sdate = $request->input('sdate', Carbon::now()->sub(1, 'month')->format('Y-m-d'));
+        $edate = $request->input('edate', date("Y-m-d"));
+
 		$state = $request->input("state");
 
 		$prd_ord_no	= $request->input("prd_ord_no");
@@ -49,6 +52,7 @@ class cs03Controller extends Controller
 		$com_id	= $request->input("com_cd");
 		$com_nm	= $request->input("com_nm");
 
+		$user_nm_state = $request->input("user_nm_state");
 		$user_nm = $request->input("user_nm");
 
 		$ord_field = $request->input("ord_field",'p1.rt');
@@ -70,13 +74,23 @@ class cs03Controller extends Controller
 			}
 			$where .= ")";
 		}
-		
+
+		if ($user_nm_state != '' && $user_nm != '') {
+			if ($user_nm_state == 'req_id') {
+				$where .= "and req_id = '$user_nm'";
+			} else if ($user_nm_state == 'prc_id') {
+				$where .= "and prc_id = '$user_nm'";
+			} else if ($user_nm_state == 'fin_id') {
+				$where .= "and fin_id = '$user_nm'";
+			}
+		}
+
 		if ($state != "") $where .= " and p1.state = '" . Lib::quote($state) . "'";
 		if ($prd_ord_no != "") $where .= " and p1.prd_ord_no = '" . Lib::quote($prd_ord_no) . "'";
 		if ($prd_nm != "") $where .= " and p1.prd_nm like '%" . Lib::quote($prd_nm) . "%' ";
 		// if ($com_id != "") $where .= " and p1.com_id = '" . Lib::quote($com_id) . "'";
 		if ($com_nm != "") $where1 .= " and cp.com_nm like '%" . Lib::quote($com_nm) . "%' ";
-		if ($user_nm != "") $where .= " and m.name like '%" . Lib::quote($user_nm) . "%' ";
+		// if ($user_nm != "") $where .= " and m.name like '%" . Lib::quote($user_nm) . "%' ";
 
 		$page_size	= $limit;
 		$startno = ($page - 1) * $page_size;
@@ -104,6 +118,7 @@ class cs03Controller extends Controller
 		$sql = /** @lang text */
 		"
 			select  
+				p2.rt as reg_date,
 				p2.prd_ord_date as prd_ord_date,
 				p1.prd_ord_no as prd_ord_no,
 				p1.state as state,
@@ -137,11 +152,12 @@ class cs03Controller extends Controller
 				left outer join `code` c2 on c2.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c2.code_id = p4.size
 				left outer join `code` c3 on c3.code_kind_cd = 'PRD_CD_UNIT' and c3.code_id = p3.unit
 				left outer join mgr_user m on p2.admin_id = m.id
-			where 1=1 $where $where1
+			where 1=1 and p2.rt >= :sdate and p2.rt < date_add(:edate, interval 1 day)
+			$where $where1
 			$orderby
 			$limit
 		";
-		$result = DB::select($sql);
+		$result = DB::select($sql, ['sdate' => $sdate, 'edate' => $edate]);
 		return response()->json([
 			"code"	=> 200,
 			"head"	=> array(

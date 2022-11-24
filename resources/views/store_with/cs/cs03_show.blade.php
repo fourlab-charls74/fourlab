@@ -157,7 +157,7 @@
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <th class="required"><label for="invoice_no">입고송장번호/반품번호</label></th>
+                                                <th class="required"><label for="invoice_no">입고/반품번호</label></th>
                                                 <td style="width:35%;">
                                                     <div class="flax_box">
                                                         <input type="text" onfocus="return getInvoiceNo();" class="form-control form-control-sm" name="invoice_no" value="">
@@ -227,7 +227,7 @@
             width: 100,
             cellStyle: DEFAULT
         },
-        {field: "prd_cd", headerName: "상품코드", width:120, cellStyle: DEFAULT,
+        {field: "prd_cd", headerName: "원부자재코드", width:120, cellStyle: DEFAULT,
             cellRenderer: function(params) {
                 if (params.value !== undefined) {
                     return '<a href="#" onclick="return EditProduct(\'' + params.value + '\');">' + params.value + '</a>';

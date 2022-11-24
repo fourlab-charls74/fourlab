@@ -76,8 +76,8 @@ class stk33Controller extends Controller
         $com = "";
         $t_amt = "";
         foreach($code_ids as $code_id) {
-            $com .= ", ifnull((select sale_amt from competitor_sale where competitor_cd = '$code_id'), 0 ) as 'amt_$code_id'";
-            // $com .= ", ifnull(case when cs.competitor_cd = '$code_id' then cs.sale_amt end, 0) as 'amt_$code_id'";
+            // $com .= ", ifnull((select sale_amt from competitor_sale where competitor_cd = '$code_id'), 0 ) as 'amt_$code_id'";
+            $com .= ", ifnull(sum(case when cs.competitor_cd = '$code_id' then cs.sale_amt end), 0) as 'amt_$code_id'";
             $t_amt .= ", sum(a.amt_$code_id) as amt_$code_id";
         }
 
@@ -177,11 +177,11 @@ class stk33Controller extends Controller
 
         $where = "";
 
-        // if($year != '' || $month != '' || $day != '') $where .= "and cs.sale_date = '$amt_date'";
+        if($year != '' || $month != '' || $day != '') $where .= "and cs.sale_date = '$amt_date'";
         if($store_no != '') $where .= "and cs.store_cd = '$store_no'";
 
         $query = "
-            select count(*) as cnt from competitor_sale where sale_date = '$amt_date'
+            select count(*) as cnt from competitor_sale where sale_date = '$amt_date' and store_cd = '$store_no'
         ";
 
         $res = DB::selectOne($query);
@@ -195,9 +195,9 @@ class stk33Controller extends Controller
                     , cs.sale_amt
                     , cs.sale_date
                 from code cd
-                    left outer join competitor com on cd.code_id = com.competitor_cd and com.store_cd = '$store_no'
+                    left outer join competitor com on cd.code_id = com.competitor_cd 
                     left outer join competitor_sale cs on cs.competitor_cd = com.competitor_cd
-                where cd.code_kind_cd = 'COMPETITOR' and cd.use_yn = 'Y'and com.use_yn = 'Y' and cs.sale_date = '$amt_date'
+                where cd.code_kind_cd = 'COMPETITOR' and cd.use_yn = 'Y'and com.use_yn = 'Y' and com.store_cd = '$store_no'
                 $where
             
             ";
@@ -208,19 +208,16 @@ class stk33Controller extends Controller
                 cd.code_id as competitor_cd
                 , cd.code_val as competitor_nm
                 , com.store_cd
-                , cs.sale_amt
-                , cs.sale_date
             from code cd
-                left outer join competitor com on cd.code_id = com.competitor_cd and com.store_cd = '$store_no'
-                left outer join competitor_sale cs on cs.competitor_cd = com.competitor_cd
-            where cd.code_kind_cd = 'COMPETITOR' and cd.use_yn = 'Y'and com.use_yn = 'Y'
-            $where
-        
+                left outer join competitor com on cd.code_id = com.competitor_cd
+            where cd.code_kind_cd = 'COMPETITOR' and cd.use_yn = 'Y' and com.use_yn = 'Y' and com.store_cd = '$store_no'
+            
         ";
 
         }
 
         $result = DB::select($sql);
+
 
         return response()->json([
             "code" => 200,
@@ -238,14 +235,11 @@ class stk33Controller extends Controller
         $data = $request->input('data');
         $date = $request->input('date');
         
-
-        
-        
         try {
             DB::beginTransaction();
-
+            
             foreach($data as $rows) {
-
+                
                 $where	= [
                     'store_cd' => $rows['store_cd'], 
                     'competitor_cd' => $rows['competitor_cd'],

@@ -36,13 +36,13 @@
                             <div class="form-group">
                                 <label for="amt_date">매출일자</label>
                                 <div >
-                                    <select name="year" id="year" class="form-control form-control-sm" style="width:120px;display:inline-block">
+                                    <select name="year" id="year" class="form-control form-control-sm" style="width:20%;display:inline-block">
                                     </select>&nbsp;년 &nbsp;&nbsp;
 
-                                    <select name="month" id="month" class="form-control form-control-sm" style="width:60px;display:inline-block">
+                                    <select name="month" id="month" class="form-control form-control-sm" style="width:10%;display:inline-block">
                                     </select>&nbsp;월&nbsp;&nbsp;
 
-                                    <select name="day" id="day" class="form-control form-control-sm" style="width:60px;display:inline-block">
+                                    <select name="day" id="day" class="form-control form-control-sm" style="width:10%;display:inline-block">
                                     </select>&nbsp;일
                                 </div>
                             </div>
@@ -79,8 +79,8 @@
             {headerName: "#", field: "num",type:'NumType', pinned:'left', cellClass: 'hd-grid-code'},
             {headerName: "동종업계코드", field: "competitor_cd", pinned:'left',  width: 85, cellClass: 'hd-grid-code'},
             {headerName: "동종업계명", field: "competitor_nm",  pinned:'left', width: 120, cellClass: 'hd-grid-code'},
-            {headerName: "매출액", field: "sale_amt",  pinned:'left', width: 100, cellClass: 'hd-grid-code', editable: true, cellStyle: {"background-color": "#ffFF99"}, type:'currencyType'},
-            {headerName: "매출액", field: "sale_date",  pinned:'left', width: 100, cellClass: 'hd-grid-code', hide:true},
+            {headerName: "매출액", field: "sale_amt",  pinned:'left', type: "numberType" ,width: 100, cellClass: 'hd-grid-code', editable: true, cellStyle: {"background-color": "#ffFF99"}, type:'currencyType'},
+            {headerName: "매출일자", field: "sale_date",  pinned:'left', width: 100, cellClass: 'hd-grid-code', hide:true},
             {width: 'auto'}
         ];
 
@@ -92,7 +92,17 @@
         $(document).ready(function() {
             pApp.ResizeGrid(205);
             let gridDiv = document.querySelector(pApp.options.gridId);
-            gx = new HDGrid(gridDiv, columns);
+            gx = new HDGrid(gridDiv, columns, {
+                onCellValueChanged: (e) => {
+                    e.node.setSelected(true);
+                    if (e.column.colId == "sale_amt") {
+                        if (isNaN(e.newValue) == true || e.newValue == "") {
+                            alert("숫자만 입력가능합니다.");
+                            gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                        }
+                    }
+                }
+            });
             pApp.BindSearchEnter();
             // Search();
         });
@@ -203,6 +213,7 @@
                         alert(res.data.msg);
                         // window.close();
                         // opener.parent.location.reload();
+                        opener.Search();
                     } else {
                         console.log(res.data.msg);
                         alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");

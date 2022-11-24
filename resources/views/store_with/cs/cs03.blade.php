@@ -54,7 +54,7 @@
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group">
-                            <label for="prd_ord_no">입고번호(송장번호)</label>
+                            <label for="prd_ord_no">입고/반품번호</label>
                             <div class="flax_box">
                                 <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" id="prd_ord_no" name='prd_ord_no' value=''>
                             </div>
@@ -107,7 +107,7 @@
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group">
-                            <label for="prd_nm">상품명</label>
+                            <label for="prd_nm">원부자재명</label>
                             <div class="flax_box">
                                 <input type='text' class="form-control form-control-sm search-enter" id="prd_nm" name='prd_nm' value=''>
                             </div>
@@ -118,8 +118,17 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label for="user_nm">입고자</label>
-                            <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm search-enter" id="user_nm" name='user_nm' value=''>
+                            <div class="form-inline">
+                                <div class="form-inline-inner input_box" style="width:24%;">
+                                    <select name="user_nm_state" id="user_nm_state" class="form-control form-control-sm" >
+                                        <option value="">선택</option>
+                                        <option value="req_id">등록</option>
+                                        <option value="prc_id">처리중</option>
+                                        <option value="fin_id">완료</option>
+                                    </select>
+                                </div>
+                                <span class="text_line">/</span>
+                                <input type='text' class="form-control form-control-sm search-enter" style="width:70%;" id="user_nm" name='user_nm' value=''>
                             </div>
                         </div>
                     </div>
@@ -206,13 +215,19 @@
             pinned: 'left',
         },
         {
+            field: "reg_date",
+            headerName: "등록일자",
+            width: 100,
+            hide:true
+        },
+        {
             field: "prd_ord_date",
             headerName: "일자",
             width: 100
         },
         {
             field: "prd_ord_no",
-            headerName: "입고번호",
+            headerName: "입고/반품번호",
             width: 120
         },
         {
