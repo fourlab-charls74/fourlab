@@ -158,7 +158,7 @@
 													<select name='size' id='size' class="form-control form-control-sm">
 														<option value=''>선택</option>
 														@foreach ($sizes as $size)
-														<option value='{{ $size->code_id }}'>{{ $size->code_id }} : {{ $size->code_val }}</option>
+														<option value='{{ $size->code_id }}'>{{ $size->code_val }} : {{ $size->code_val2 }}</option>
 														@endforeach
 													</select>
 												</div>

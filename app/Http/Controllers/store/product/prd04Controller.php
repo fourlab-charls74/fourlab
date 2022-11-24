@@ -99,7 +99,7 @@ class prd04Controller extends Controller
 			$where .= " and ( g.goods_nm like '%" . Lib::quote($goods_nm) . "%' or p.prd_nm like '%" . Lib::quote($goods_nm) . "%' ) ";
 		}
 		if( $store_no != "" ){
-			$in_store_sql	= " inner join product_stock_store pss on pc.prd_cd = pss.prd_cd ";
+			$in_store_sql	= " left outer join product_stock_store pss on pc.prd_cd = pss.prd_cd ";
 
 			$where	.= " and ( 1<>1";
 			foreach($store_no as $store_cd) {
@@ -113,7 +113,7 @@ class prd04Controller extends Controller
 		if($goods_nm_eng != "")	$where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
 
 		if( $store_no == "" && $store_type != "" ){
-			$in_store_sql	= " inner join product_stock_store pss on pc.prd_cd = pss.prd_cd ";
+			$in_store_sql	= " left outer join product_stock_store pss on pc.prd_cd = pss.prd_cd ";
 
 			$sql	= " select store_cd from store where store_type = :store_type and use_yn = 'Y' ";
 			$result = DB::select($sql,['store_type' => $store_type]);
@@ -165,7 +165,7 @@ class prd04Controller extends Controller
 						left outer join goods g on pc.goods_no = g.goods_no
 						left outer join brand brand on brand.brand = g.brand
 						inner join code c on pc.color = c.code_id
-						inner join code d on pc.size = d.code_id
+						inner join code d on pc.size = d.code_val
 						inner join brand b on b.br_cd = pc.brand
 						left outer join (
 							select prd_cd, sum(qty) as qty, stock_state_date
@@ -185,6 +185,8 @@ class prd04Controller extends Controller
 					group by pc.prd_cd
 				) a
 			";
+
+			// dd($query);
 			$row	= DB::select($query);
 			$total	= $row[0]->total;
 			$total_row = $row[0];
@@ -227,7 +229,7 @@ class prd04Controller extends Controller
 				left outer join goods g on pc.goods_no = g.goods_no
 				left outer join brand brand on brand.brand = g.brand
 				inner join code c on pc.color = c.code_id
-				inner join code d on pc.size = d.code_id
+				inner join code d on pc.size = d.code_val
 				inner join brand b on b.br_cd = pc.brand
 				left outer join (
 					select prd_cd, sum(qty) as qty, stock_state_date

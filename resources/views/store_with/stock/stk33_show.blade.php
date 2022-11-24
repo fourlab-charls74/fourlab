@@ -16,7 +16,7 @@
                 <div class="d-flex card-header justify-content-between">
                     <h4>기본 정보</h4>
                     <div>
-                        <a href="#" id="search_sbtn" onclick="Save_amt();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 저장</a>
+                        <a href="#" id="search_sbtn" onclick="Save_amt();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
                         <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                     </div>
                 </div>
@@ -52,7 +52,7 @@
             </div>
             <div class="resul_btn_wrap mb-3">
                 <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                <a href="#" id="search_sbtn" onclick="Save_amt();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 저장</a>    
+                <a href="#" id="search_sbtn" onclick="Save_amt();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>    
             </div>
         </div>
         <div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
@@ -80,6 +80,7 @@
             {headerName: "동종업계코드", field: "competitor_cd", pinned:'left',  width: 85, cellClass: 'hd-grid-code'},
             {headerName: "동종업계명", field: "competitor_nm",  pinned:'left', width: 120, cellClass: 'hd-grid-code'},
             {headerName: "매출액", field: "sale_amt",  pinned:'left', width: 100, cellClass: 'hd-grid-code', editable: true, cellStyle: {"background-color": "#ffFF99"}, type:'currencyType'},
+            {headerName: "매출액", field: "sale_date",  pinned:'left', width: 100, cellClass: 'hd-grid-code', hide:true},
             {width: 'auto'}
         ];
 
@@ -93,12 +94,28 @@
             let gridDiv = document.querySelector(pApp.options.gridId);
             gx = new HDGrid(gridDiv, columns);
             pApp.BindSearchEnter();
-            Search();
+            // Search();
         });
 
         function Search() {
             let data = $('form[name="search"]').serialize();
-            gx.Request('/store/stock/stk33/com_search', data);
+
+            let store_no = document.getElementById('store_no').value;
+            let year = document.getElementById('year').value;
+            let month = document.getElementById('month').value;
+            let day = document.getElementById('day').value;
+
+            if(store_no == '') {
+                alert('매장을 선택해주세요.');
+            } else if (year == '') {
+                alert('매출년도를 선택해주세요.')
+            } else if (month == '') {
+                alert('매출월을 선택해주세요.')
+            } else if (day == '') {
+                alert('매출일을 선택해주세요.')
+            } else {
+                gx.Request('/store/stock/stk33/com_search', data);
+            }
         }
 
         $(document).ready(function () {
@@ -184,8 +201,8 @@
                 }).then(function (res) {
                     if(res.data.code === 200) {
                         alert(res.data.msg);
-                        window.close();
-                        opener.parent.location.reload();
+                        // window.close();
+                        // opener.parent.location.reload();
                     } else {
                         console.log(res.data.msg);
                         alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");

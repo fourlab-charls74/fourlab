@@ -41,10 +41,11 @@ class stk33Controller extends Controller
         $store_nm = $request->input('store_nm', '');
         $store_type    = $request->input("store_type", '');
 
+
         $where = "";
         $orderby = "";
         if ($store_no != "") $where .= " and cs.store_cd like '%" . Lib::quote($store_no) . "%'";
-        // if ($store_type != "") $where .= " and store_type = '$store_type'";
+        if ($store_type != "") $where .= " and s.store_type = '$store_type'";
 
         // ordreby
         $ord = $r['ord'] ?? 'desc';
@@ -52,9 +53,15 @@ class stk33Controller extends Controller
         $orderby = sprintf("order by %s %s", $ord_field, $ord);
 
         // pagination
-        $page = $r['page'] ?? 1;
+        // $page = $r['page'] ?? 1;
+        // if ($page < 1 or $page == "") $page = 1;
+        // $page_size = $r['limit'] ?? 100;
+        // $startno = ($page - 1) * $page_size;
+        // $limit = " limit $startno, $page_size ";
+
+        $page = $request->input('page', 1);
         if ($page < 1 or $page == "") $page = 1;
-        $page_size = $r['limit'] ?? 100;
+        $page_size = $request->input('limit', 500);
         $startno = ($page - 1) * $page_size;
         $limit = " limit $startno, $page_size ";
 
@@ -67,19 +74,21 @@ class stk33Controller extends Controller
 
        
         $com = "";
+        $t_amt = "";
         foreach($code_ids as $code_id) {
-            // $com .= ", ifnull((select sale_amt from competitor_sale where competitor_cd = '$code_id' group by store_cd), 0 ) as '$code_id'";
-            $com .= ", ifnull(sum(case when cs.competitor_cd = '$code_id' then cs.sale_amt end), 0) as 'amt_$code_id'";
+            $com .= ", ifnull((select sale_amt from competitor_sale where competitor_cd = '$code_id'), 0 ) as 'amt_$code_id'";
+            // $com .= ", ifnull(case when cs.competitor_cd = '$code_id' then cs.sale_amt end, 0) as 'amt_$code_id'";
+            $t_amt .= ", sum(a.amt_$code_id) as amt_$code_id";
         }
 
-            $query =
-                "
+            $sql = "
                 select 
                     s.store_nm
                     , cs.sale_date
                     , sum(cs.sale_amt) as total_amt
                     , cs.store_cd
                     , cs.competitor_cd
+                    , s.store_type
                     $com
                 from competitor_sale cs
                     inner join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor'
@@ -89,17 +98,57 @@ class stk33Controller extends Controller
                 group by cs.sale_date, cs.store_cd
                 $orderby
                 $limit
-                
             ";
 
-            $result = DB::select($query);
+            $rows = DB::select($sql);
+            
+            
+            // pagination
+            $total = 0;
+            $total_data = '';
+            $page_cnt = 0;
+            if($page == 1) {
+                $query =
+                    "
+                    select
+                        count(a.store_nm) as total,
+                        sum(a.total_amt) as total_amt
+                        $t_amt
+                    from (
+                        select 
+                            s.store_nm
+                            , cs.sale_date
+                            , sum(cs.sale_amt) as total_amt
+                            , cs.store_cd
+                            , cs.competitor_cd
+                            , s.store_type
+                            $com
+                        from competitor_sale cs
+                            inner join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor'
+                            inner join store s on s.store_cd = cs.store_cd
+                        where 1=1 and sale_date like '$sdate%'
+                        $where
+                        group by cs.sale_date, cs.store_cd
+                        $orderby
+                        $limit
+                    ) a
+                ";
+            }
+            $row = DB::selectOne($query);
+            $total_data = $row;
+            $total = $row->total;
+            $page_cnt = (int)(($total - 1) / $page_size) + 1;
             
         return response()->json([
             "code" => 200,
             "head" => array(
-                "total" => count($result)
+                "total" => $total,
+                "page" => $page,
+                "page_cnt" => $page_cnt,
+                "page_total" => count($rows),
+                "total_data" => $total_data
             ),
-            "body" => $result
+            "body" => $rows
         ]);
     }
 
@@ -124,17 +173,52 @@ class stk33Controller extends Controller
         $month = $request->input('month', '');
         $day = $request->input('day', '');
 
-        $sql = "
+        $amt_date = $year.'-'.$month.'-'.$day;
+
+        $where = "";
+
+        // if($year != '' || $month != '' || $day != '') $where .= "and cs.sale_date = '$amt_date'";
+        if($store_no != '') $where .= "and cs.store_cd = '$store_no'";
+
+        $query = "
+            select count(*) as cnt from competitor_sale where sale_date = '$amt_date'
+        ";
+
+        $res = DB::selectOne($query);
+
+        if($res->cnt > 0 ) {
+            $sql = "
+                select 
+                    cd.code_id as competitor_cd
+                    , cd.code_val as competitor_nm
+                    , com.store_cd
+                    , cs.sale_amt
+                    , cs.sale_date
+                from code cd
+                    left outer join competitor com on cd.code_id = com.competitor_cd and com.store_cd = '$store_no'
+                    left outer join competitor_sale cs on cs.competitor_cd = com.competitor_cd
+                where cd.code_kind_cd = 'COMPETITOR' and cd.use_yn = 'Y'and com.use_yn = 'Y' and cs.sale_date = '$amt_date'
+                $where
+            
+            ";
+        } else {
+
+            $sql = "
             select 
                 cd.code_id as competitor_cd
                 , cd.code_val as competitor_nm
                 , com.store_cd
-                , com.use_yn
+                , cs.sale_amt
+                , cs.sale_date
             from code cd
                 left outer join competitor com on cd.code_id = com.competitor_cd and com.store_cd = '$store_no'
+                left outer join competitor_sale cs on cs.competitor_cd = com.competitor_cd
             where cd.code_kind_cd = 'COMPETITOR' and cd.use_yn = 'Y'and com.use_yn = 'Y'
+            $where
         
         ";
+
+        }
 
         $result = DB::select($sql);
 
@@ -153,22 +237,34 @@ class stk33Controller extends Controller
         $admin_id = Auth('head')->user()->id;
         $data = $request->input('data');
         $date = $request->input('date');
+        
 
+        
+        
         try {
             DB::beginTransaction();
 
             foreach($data as $rows) {
-                DB::table('competitor_sale')
-                    ->insert([
-                        'store_cd' => $rows['store_cd'],
-                        'competitor_cd' => $rows['competitor_cd'],
-                        'sale_date' => $date,
-                        'sale_amt' => $rows['sale_amt'] ?? 0,
-                        'admin_id' => $admin_id,
-                        'rt' => now()
-                    ]);
-            }
 
+                $where	= [
+                    'store_cd' => $rows['store_cd'], 
+                    'competitor_cd' => $rows['competitor_cd'],
+                    'sale_date' => $date
+                ];
+
+                $values	= [
+                    'store_cd' => $rows['store_cd'],
+                    'competitor_cd' => $rows['competitor_cd'],
+                    'sale_date' => $date,
+                    'sale_amt' => $rows['sale_amt'] ?? 0,
+                    'admin_id' => $admin_id,
+                    'rt' => now(),
+                    'ut' => now()
+                ];
+
+                DB::table('competitor_sale')
+                        ->updateOrInsert($where, $values);
+            }
             DB::commit();
             $code = 200;
             $msg = "매출액이 저장되었습니다.";
@@ -183,91 +279,4 @@ class stk33Controller extends Controller
         ]);
     }
 
-    public function update($no, Request $request)
-    {
-
-        $id =  Auth('head')->user()->id;
-
-        $subject = $request->input('subject');
-        $content = $request->input('content');
-        $store_cd = $request->input('store_no', '');
-        $ns_cd = $no;
-        $ut = DB::raw('now()');
-        $rt2 = DB::raw('now()');
-
-        if ($store_cd == null) {
-            $all_store_yn = "Y";
-        } else {
-            $all_store_yn = "N";
-        }
-
-        $notice_store = [
-            'subject' => $subject,
-            'content' => $content,
-            'all_store_yn' => $all_store_yn,
-            'ut' => $ut
-        ];
-
-        try {
-            DB::beginTransaction();
-
-            DB::table('notice_store')
-                ->where('ns_cd', '=', $ns_cd)
-                ->update($notice_store);
-
-            if ($store_cd != '') {
-                foreach ($store_cd as $sc) {
-                    DB::table('notice_store_detail')
-                        ->insert([
-                            'ns_cd' => $ns_cd,
-                            'store_cd' => $sc,
-                            'check_yn' => 'N',
-                            'rt' => $rt2
-                        ]);
-                }
-            }
-            DB::commit();
-            $code = 200;
-            $msg = "";
-        } catch (Exception $e) {
-            DB::rollBack();
-            $code = 500;
-            $msg = $e->getMessage();
-        }
-        return response()->json([
-            "code" => $code,
-            "msg" => $msg
-        ]);
-    }
-
-    public function del_store(Request $request)
-    {
-        $store_cd = $request->input('data_store');
-        $ns_cd = $request->input('ns_cd');
-
-        try {
-            DB::beginTransaction();
-
-            $sql = "
-                delete 
-                from notice_store_detail
-                where ns_cd = '$ns_cd' and store_cd = '$store_cd'
-            ";
-
-            DB::delete($sql);
-
-            DB::commit();
-            $code = '200';
-            $msg = "";
-        } catch (Exception $e) {
-            DB::rollBack();
-            $code = 500;
-            $msg = "실패!";
-        }
-
-        return response()->json([
-            "code" => $code,
-            "msg" => $msg
-        ]);
-    }
 }

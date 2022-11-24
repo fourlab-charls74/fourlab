@@ -75,7 +75,7 @@
                             <div class="form-group">
                                 <label for="good_types">동종업계</label>
                                 <div class="flax_box">
-                                    <select name='store_type' class="form-control form-control-sm search-enter">
+                                    <select name='competitor_type' class="form-control form-control-sm search-enter">
                                         <option value=''>전체</option>
                                     @foreach ($competitors as $competitor)
                                         <option value='{{ $competitor->code_id }}'>{{ $competitor->code_val }}</option>
@@ -143,18 +143,32 @@
 	</div>
 </div>
 <script language="javascript">
+
+const pinnedRowData = [{ store_nm : '합계' , "total_amt" : 0 , 
+
+    @foreach($competitors as $com)
+         amt_{{$com->code_id}} : 0,
+    @endforeach
+}];
+
+    
     let columns = [
-        {headerName: "#", field: "num",type:'NumType', pinned:'left', cellClass: 'hd-grid-code'},
+        {headerName: "#", field: "num",type:'NumType', pinned:'left', cellClass: 'hd-grid-code',
+            cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : parseInt(params.value) + 1,
+        },
         {headerName: "매출일", field: "sale_date", pinned:'left',  width: 80, cellClass: 'hd-grid-code'},
-        {headerName: "매장명", field: "store_nm",  pinned:'left', width: 110, cellClass: 'hd-grid-code'},
+        {headerName: "매장명", field: "store_nm",  pinned:'left', width: 110, cellClass: 'hd-grid-code',aggFunc: "first",
+            
+        },
         {headerName: "매장코드", field: "store_cd",  pinned:'left', width: 70, cellClass: 'hd-grid-code' , hide:true},
-        {headerName: "합계(원)", field: "total_amt",  pinned:'left', width: 100, cellClass: 'hd-grid-code', type:'currencyType', cellStyle: { 'font-weight': '700', background: '#eee' },},
-        
+        {headerName: "동종업계코드", field: "competitor_cd",  pinned:'left', width: 70, cellClass: 'hd-grid-code' , hide:true},
+        {headerName: "매장구분", field: "store_type",  pinned:'left', width: 70, cellClass: 'hd-grid-code', hide:true},
+        {headerName: "합계(원)", field: "total_amt",  pinned:'left', width: 100, cellClass: 'hd-grid-code', type:'currencyType', cellStyle: { 'font-weight': '700', background: '#eee', textAlign: 'right' },aggFunc: "first",},
         {field: "competitors",	headerName: "동종업계 매장",
             children: [
                 @foreach($competitors as $com)
 
-                    {headerName: "{{ $com->code_val }}", field: "amt_{{$com->code_id}}",  width: 90, cellClass: 'hd-grid-code', type:'currencyType'},
+                    {headerName: "{{ $com->code_val }}", field: "amt_{{$com->code_id}}",  width: 90, cellClass: 'hd-grid-code', type:'currencyType', cellStyle:{textAlign:'right'},aggFunc: "first"},
 
                 @endforeach
             ]
@@ -171,14 +185,31 @@
     $(document).ready(function() {
         pApp.ResizeGrid(265);
         let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns);
+        gx = new HDGrid(gridDiv, columns, {
+            pinnedTopRowData: pinnedRowData,
+			getRowStyle: (params) => {
+                if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee !important', 'border': 'none'};
+            },
+        });
         pApp.BindSearchEnter();
         Search();
     });
 
     function Search() {
         let data = $('form[name="search"]').serialize();
-        gx.Request('/store/stock/stk33/search', data);
+        gx.Request('/store/stock/stk33/search', data, 1, function(e){
+            let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
+            let total_data = e.head.total_data;
+
+            console.log(pinnedRow);
+            console.log(total_data);
+			if(pinnedRow && total_data != '') {
+				gx.gridOptions.api.setPinnedTopRowData([
+					{ ...pinnedRow.data, ...total_data }
+				]);
+			}
+        });
+
     }
 
     const initSearchInputs = () => {

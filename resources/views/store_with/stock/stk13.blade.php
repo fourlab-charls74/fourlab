@@ -129,7 +129,7 @@
                                     <div class="form-inline-inner input-box w-100">
                                         <div class="form-inline inline_btn_box">
                                             <input type='hidden' id="prd_cd_range" name='prd_cd_range'>
-                                            <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
+                                            <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' onclick="openApi();" class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
                                             <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                         </div>
                                     </div>
@@ -453,6 +453,10 @@
                 console.log(err);
             });
         }
+
+        function openApi() {
+			document.getElementsByClassName('sch-prdcd-range')[0].click();
+		}
 
     </script>
 @stop

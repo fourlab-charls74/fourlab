@@ -125,7 +125,7 @@ class prd02Controller extends Controller
 		if($ad_desc != "")		$where .= " and g.ad_desc like '%" . Lib::quote($ad_desc) . "%' ";
 
 		if( $store_no != "" ){
-			$in_store_sql	= " inner join product_stock_store pss on s.prd_cd = pss.prd_cd ";
+			$in_store_sql	= " left outer join product_stock_store pss on s.prd_cd = pss.prd_cd ";
 
 			$where	.= " and (1!=1";
 			foreach($store_no as $store_cd) {
@@ -135,7 +135,7 @@ class prd02Controller extends Controller
 		}
 
 		if( $store_no == "" && $store_type != "" ){
-			$in_store_sql	= " inner join product_stock_store pss on s.prd_cd = pss.prd_cd ";
+			$in_store_sql	= " left outer join product_stock_store pss on s.prd_cd = pss.prd_cd ";
 
 			$sql	= " select store_cd from store where store_type = :store_type and use_yn = 'Y' ";
 			$result = DB::select($sql,['store_type' => $store_type]);
@@ -333,7 +333,7 @@ class prd02Controller extends Controller
 				left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
 				left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
 				inner join code c on pc.color = c.code_id
-				inner join code d on pc.size = d.code_id
+				inner join code d on pc.size = d.code_val
 				inner join brand b on b.br_cd = pc.brand
 			where 1 = 1 and c.code_kind_cd = 'PRD_CD_COLOR' and d.code_kind_cd = 'PRD_CD_SIZE_MATCH'
 				$where
@@ -371,16 +371,22 @@ class prd02Controller extends Controller
 
 	public function create(Request $request)
 	{
-		$sql	= " select brand_nm, br_cd from brand where use_yn = 'Y' and br_cd <> '' ";
+		$sql	= " select brand_nm, br_cd from brand where use_yn = 'Y' and br_cd <> '' order by field(brand_nm, '헤스트라', '프리머스', '한바그', '피엘라벤') desc, brand_nm asc";
 		$brands	= DB::select($sql);
+
+		$item_sql	= " select code_id, code_val from code where code_kind_cd = 'prd_cd_item' order by code_val asc";
+		$items	= DB::select($item_sql);
+
+		$opt_sql	= " select code_id, code_val from code where code_kind_cd = 'prd_cd_opt' order by code_val asc";
+		$opts	= DB::select($opt_sql);
 		
 		$values = [
 			'brands'	=> $brands,
 			'years'		=> SLib::getCodes("PRD_CD_YEAR"),
 			'seasons'	=> SLib::getCodes("PRD_CD_SEASON"),
 			'genders'	=> SLib::getCodes("PRD_CD_GENDER"),
-			'items'		=> SLib::getCodes("PRD_CD_ITEM"),
-			'opts'		=> SLib::getCodes("PRD_CD_OPT"),
+			'items'		=> $items,
+			'opts'		=> $opts,
 		];
 
 		return view( Config::get('shop.store.view') . '/product/prd02_create',$values);
@@ -1152,16 +1158,22 @@ class prd02Controller extends Controller
 		$item_sql = "select code_id, code_val from code where code_kind_cd = 'prd_cd_item' order by code_val asc ";
 		$items = DB::select($item_sql);
 
+		$opt_sql = "select code_id, code_val from code where code_kind_cd = 'prd_cd_opt' order by code_val asc ";
+		$opts = DB::select($opt_sql);
+
+		$color_sql = "select code_id, code_val from code where code_kind_cd = 'prd_cd_color' order by code_id asc ";
+		$colors = DB::select($color_sql);
+
 
 		$values = [
 			'brands' 	=> $brands,
-			'brand' 	=> SLib::getCodes("PRD_CD_BRAND"),
+			// 'brand' 	=> SLib::getCodes("PRD_CD_BRAND"),
 			'years'		=> SLib::getCodes("PRD_CD_YEAR"),
 			'seasons' 	=> SLib::getCodes("PRD_CD_SEASON"),
 			'genders' 	=> SLib::getCodes("PRD_CD_GENDER"),
 			'items'		=> $items,
-			'opts' 		=> SLib::getCodes("PRD_CD_OPT"),
-			'colors' 	=> SLib::getCodes("PRD_CD_COLOR"),
+			'opts' 		=> $opts,
+			'colors' 	=> $colors,
 			'sizes'		=> SLib::getCodes("PRD_CD_SIZE_MATCH"),
 			'years'		=> SLib::getCodes("PRD_CD_YEAR"),
 			'sup_coms' 	=> $sup_coms,
