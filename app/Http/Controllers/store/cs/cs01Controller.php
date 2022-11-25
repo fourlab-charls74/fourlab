@@ -452,13 +452,13 @@ class cs01Controller extends Controller {
 
 				$prc_set = "";
 				if ($row->state == 10 && $state >= 20) {
-					$prc_set = " prc_id = '$id', prc_rt = now(), ";
+					$prc_set .= " prc_id = '$id', prc_rt = now(), ";
 				}
-				if ($row->state == 20 && $state >= 30) {
-					$prc_set = " fin_id = '$id', fin_rt = now(), ";
+				if (($row->state == 10 || $row->state == 20) && $state >= 30) {
+					$prc_set .= " fin_id = '$id', fin_rt = now(), ";
 				}
 				if ($row->state == 30 && $state == 40) {
-					$prc_set = " cfm_id = '$id', cfm_rt = now(), ";
+					$prc_set .= " cfm_id = '$id', cfm_rt = now(), ";
 				}
 
 				$sql = "
@@ -483,7 +483,7 @@ class cs01Controller extends Controller {
 				DB::update($sql);
 				$this->saveStockProduct(
 					"E", $stock_no, $invoice_no, $state, $loc, $stock_date, $com_id,
-					$currency_unit, $exchange_rate, $custom_tax_rate, $opt_cnt, $data
+					$currency_unit, $exchange_rate, $custom_tax_rate, $opt_cnt, $data, $row->state
 				);
 				DB::commit();
 			}
@@ -722,7 +722,7 @@ class cs01Controller extends Controller {
 	/**
 	 * 상품 입고
 	 */
-	public function saveStockProduct($type, $stock_no, $invoice_no, $state, $loc, $stock_date, $com_id, $currency_unit, $exchange_rate, $custom_tax_rate, $opt_cnt, $data) {
+	public function saveStockProduct($type, $stock_no, $invoice_no, $state, $loc, $stock_date, $com_id, $currency_unit, $exchange_rate, $custom_tax_rate, $opt_cnt, $data, $cur_state = '') {
 		try {
 			DB::beginTransaction();
 			if ($type != "A") { // 추가입고
@@ -779,11 +779,13 @@ class cs01Controller extends Controller {
 							}
 
 							if ($state == 30) { // 입고 완료인 경우
-								$this->stockIn($goods_no, $prd_cd, $opt, $qty, $stock_no, $invoice_no, $cost, $loc);
+								if ($cur_state < $state) {
+									$this->stockIn($goods_no, $prd_cd, $opt, $qty, $stock_no, $invoice_no, $cost, $loc);
+								}
 							}
 
 							if ($state == 40) { // 원가확정인 경우
-								$this->confirmWonga();
+								$this->confirmWonga($stock_no, $prd_cd, $qty, $cost);
 							}
 						}
 					}
@@ -847,12 +849,14 @@ class cs01Controller extends Controller {
 				));
 				/**
 				 * 재고확정 시 상품의 원가 변경
+				 * - 원가확정단계 추가 (20221123 최유현) => 아래코드 주석처리
 				 */
-				$sql = "
-					update goods set wonga = '${cost}'
-					where goods_no = '${goods_no}'
-				";
-				DB::update($sql);
+				// $sql = "
+				// 	update goods set wonga = '${cost}'
+				// 	where goods_no = '${goods_no}'
+				// ";
+				// DB::update($sql);
+
 				DB::commit();
 			} catch (Exception $e) {
 				DB::rollBack();	
@@ -868,9 +872,56 @@ class cs01Controller extends Controller {
 	/**
 	 * 원가 확정
 	 */
-	public function confirmWonga()
+	public function confirmWonga($stock_no, $prd_cd, $qty, $cost)
 	{
-		// 원가확정 작업 필요
+		$stock = DB::table('product_stock')->select('wonga', 'in_qty')->where('prd_cd', '=', $prd_cd)->first();
+		
+		try {
+			DB::beginTransaction();
+
+			if ($stock != null && ($stock->wonga != $cost)) {
+				// 1. 재고테이블 평균원가 및 재고총원가 값 업데이트
+				$total_old_wonga = ($stock->in_qty - $qty) * $stock->wonga;
+				$total_cur_wonga = $qty * $cost;
+				$total_wonga = $total_old_wonga + $total_cur_wonga;
+				$avg_wonga = round($total_wonga / ($stock->in_qty));
+				
+				$values = [
+					'wonga' => $avg_wonga,
+					'qty_wonga' => DB::raw('qty * ' . $avg_wonga),
+					'ut' => now(),
+				];
+				DB::table('product_stock')->where('prd_cd', '=', $prd_cd)->update($values);
+
+				// 2. 입고완료 ~ 원가확정 기간동안 판매된 주문건의 원가 값 업데이트
+				$fin_rt = DB::table('product_stock_order')->where('stock_no', '=', $stock_no)->value('fin_rt');
+				if ($fin_rt != null) {
+					$where = " where ord_date >= '$fin_rt' and ord_date <= now() and prd_cd = '$prd_cd' ";
+
+					$sql = "
+						update order_opt set
+							wonga = '$avg_wonga'
+						$where
+					";
+					DB::update($sql);
+
+					$orders = DB::select("select ord_opt_no from order_opt $where");
+					foreach ($orders as $ord) {
+						$sql = "
+							update order_opt_wonga set
+								wonga = '$avg_wonga'
+							where ord_opt_no = '$ord->ord_opt_no'
+						";
+						DB::update($sql);
+					}
+				}
+			}
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollBack();	
+			throw new Exception($e->getMessage());
+		}
 	}
 
 	/**

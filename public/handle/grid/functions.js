@@ -269,9 +269,10 @@ function StyleClmState(params){
 function StyleStockOrdState(params) {
     var state = {
         "입고대기":"#222222",
-        "입고취소":"#ff0000",
+        "입고취소":"#666666",
         "입고처리중":"#0000ff",
-        "입고완료":"#669900",
+        "입고완료":"#2aa876",
+        "원가확정":"#e8554e",
     }
 
     var color = state[params.value];

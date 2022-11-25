@@ -289,9 +289,6 @@ class prd04Controller extends Controller
 		$color = $request->input('color', '');
 		$size = $request->input('size', '');
 
-		// $cfg_img_size_real	= "a_500";
-		// $cfg_img_size_list	 = "s_50";
-
 		// $sql = "
 		// 	select
 		// 		p.prd_cd
@@ -320,27 +317,7 @@ class prd04Controller extends Controller
 		// 		left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = p.color
 		// 	having prd_cd_p = :prd_cd_p
 		// ";
-		// $rows = DB::select($sql, ['prd_cd_p' => $prd_cd_p]);
 		
-		// if (count($rows) > 0 && $rows[0]->goods_no == '0') {
-		// 	$sql = "
-		// 		select 
-		// 			p.prd_cd, p.prd_nm as goods_nm, p.style_no, p.type, p.com_id, c.com_nm
-		// 			, p.match_yn, p.use_yn, pc.brand, b.brand_nm
-		// 			, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
-		// 			, pc.color as color_cd
-		// 			, col.code_val as color
-		// 			, pc.size
-		// 		from product p
-		// 			inner join product_code pc on pc.prd_cd = p.prd_cd
-		// 			left outer join company c on c.com_id = p.com_id
-		// 			left outer join brand b on b.br_cd = pc.brand
-		// 			left outer join code col on col.code_kind_cd = 'PRD_CD_COLOR' and col.code_id = pc.color
-		// 		having prd_cd_p = :prd_cd_p
-		// 	";
-		// 	$rows = DB::select($sql, ['prd_cd_p' => $prd_cd_p]);
-		// }
-
 		// $colors = array_unique(array_map(function($row) {
 		// 	return (object)['code' => $row->color_cd, 'name' => $row->color];
 		// }, $rows), SORT_REGULAR);
@@ -383,6 +360,51 @@ class prd04Controller extends Controller
 				group by size		
 			";
 			$sizes = array_map(function($row) {return $row->size;}, DB::select($sql));
+
+			// get goods info
+			$cfg_img_size_real	= "a_500";
+			$cfg_img_size_list	 = "s_50";
+
+			$sql = "
+				select
+					concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
+					, pc.prd_cd
+					, pc.goods_no
+					, g.goods_nm
+					, g.goods_nm_eng
+					, g.style_no
+					, g.com_id
+					, g.com_nm
+					, g.brand
+					, b.brand_nm
+					, ifnull(g.style_no, (select style_no from product p where p.prd_cd = pc.prd_cd)) as style_no
+					, if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
+						select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
+						from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
+					)) as img
+				from product_code pc
+					left outer join goods g on g.goods_no = pc.goods_no
+					left outer join brand b on b.brand = g.brand
+				group by prd_cd_p
+				having prd_cd_p = :prd_cd_p
+			";
+			$prd = DB::selectOne($sql, ['prd_cd_p' => $prd_cd_p]);
+
+			if ($prd->goods_no == '0') {
+				$sql = "
+					select 
+						p.prd_cd, p.prd_nm as goods_nm, p.style_no, p.type, p.com_id, c.com_nm
+						, p.match_yn, p.use_yn, pc.brand, b.brand_nm
+						, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
+					from product p
+						inner join product_code pc on pc.prd_cd = p.prd_cd
+						left outer join company c on c.com_id = p.com_id
+						left outer join brand b on b.br_cd = pc.brand
+					group by prd_cd_p
+					having prd_cd_p = :prd_cd_p
+				";
+				$prd = DB::selectOne($sql, ['prd_cd_p' => $prd_cd_p]);
+			}
 			
 			// get store stock
 			$where = "";
@@ -458,6 +480,7 @@ class prd04Controller extends Controller
 
 			$values = [
 				'sizes' => $sizes,
+				'prd' => $prd,
 				'stores' => $store_rows,
 				'storages' => $storage_rows,
 			];

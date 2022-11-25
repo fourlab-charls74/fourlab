@@ -13,62 +13,6 @@
         </div>
     </div>
 
-    {{-- 상품정보 --}}
-    {{-- <div class="show_layout mb-4">
-        <div class="card shadow">
-            <div class="card-header mb-0">
-                <a href="#">상품정보</a>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <div class="table-box-ty2 mobile">
-                        <table class="table incont table-bordered" width="100%" cellspacing="0">
-                            <colgroup>
-                                <col width="120px"/>
-                                <col width="20%"/>
-                                <col width="30%"/>
-                                <col width="20%"/>
-                                <col width="30%"/>
-                            </colgroup>
-                            <tbody>
-                            <tr>
-                                <td rowspan="3" class="img_box brln">
-                                    @if (@$prd->img !== null)
-                                    <img class="goods_img" src="{{config('shop.image_svr')}}/{{@$prd->img}}" alt="이미지" style="min-width: 120px;max-width:120px; min-height: 120px;max-height:120px;" />
-                                    @else
-                                    <p class="d-flex align-items-center justify-content-center" style="min-width: 120px;max-width:120px; min-height: 120px;max-height:120px;">이미지 없음</p>
-                                    @endif
-                                </td>
-                                <th>코드일련</th>
-                                <td>{{ @$prd->prd_cd_p }}</td>
-                                <th>상품번호</th>
-                                <td>{{ @$prd->goods_no }}</td>
-                            </tr>
-                            <tr>
-                                <th>스타일넘버</th>
-                                <td>{{ @$prd->style_no }}</td>
-                                <th>공급처</th>
-                                <td>{{ @$prd->com_nm }}</td>
-                            </tr>
-                            <tr>
-                                <th>품목</th>
-                                <td>{{ @$prd->opt_kind_nm }}</td>
-                                <th>브랜드</th>
-                                <td>{{ @$prd->brand_nm }}</td>
-                            </tr>
-                            <tr>
-                                <th>상품명</th>
-                                <td colspan="2">{{ @$prd->goods_nm }}</td>
-                                <th>상품명(영문)</th>
-                                <td>{{ @$prd->goods_nm_eng }}</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> --}}
     {{-- 검색 --}}
     <div id="search-area" class="search_cum_form mb-2">
         <form name="search" method="get">
@@ -140,6 +84,62 @@
                 </div>
             </div>
         </form>
+    </div>
+    {{-- 상품정보 --}}
+    <div class="show_layout mb-2">
+        <div class="card shadow">
+            <div class="card-header mb-0">
+                <a href="#">상품정보</a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <div class="table-box-ty2 mobile">
+                        <table class="table incont table-bordered" width="100%" cellspacing="0">
+                            <colgroup>
+                                <col width="120px"/>
+                                <col width="20%"/>
+                                <col width="30%"/>
+                                <col width="20%"/>
+                                <col width="30%"/>
+                            </colgroup>
+                            <tbody>
+                            <tr>
+                                <td rowspan="3" class="img_box brln" id="prd_image">
+                                    @if (@$prd->img !== null)
+                                    <img class="goods_img" src="{{config('shop.image_svr')}}/{{@$prd->img}}" alt="이미지" style="min-width: 120px;max-width:120px; min-height: 120px;max-height:120px;" />
+                                    @else
+                                    <p class="d-flex align-items-center justify-content-center" style="min-width: 120px;max-width:120px; min-height: 120px;max-height:120px;">이미지 없음</p>
+                                    @endif
+                                </td>
+                                <th>코드일련</th>
+                                <td id="prd_prd_cd_p"></td>
+                                <th>상품번호</th>
+                                <td id="prd_goods_no"></td>
+                            </tr>
+                            <tr>
+                                <th>스타일넘버</th>
+                                <td id="prd_style_no"></td>
+                                <th>공급처</th>
+                                <td id="prd_com_nm"></td>
+                            </tr>
+                            <tr>
+                                <th>품목</th>
+                                <td id="prd_opt_kind_nm"></td>
+                                <th>브랜드</th>
+                                <td id="prd_brand_nm"></td>
+                            </tr>
+                            <tr>
+                                <th>상품명</th>
+                                <td colspan="2" id="prd_goods_nm"></td>
+                                <th>상품명(영문)</th>
+                                <td id="prd_goods_nm_eng"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     {{-- 창고/매장 재고현황 --}}
     <div class="show_layout">
@@ -258,10 +258,16 @@
         let { data, status } = await axios({ url: "/store/product/prd04/stock/search?" + params, method: "get" });
         if (status === 200) {
             const sizes = data.data.sizes;
+            setGoodsInfo(data.data.prd);
             await setColumns(sizes);
             gx.gridOptions.api.applyTransaction({ add: data.data.storages });
             gx2.gridOptions.api.applyTransaction({ add: data.data.stores });
         }
+    }
+
+    function setGoodsInfo(prd) {
+        console.log(prd);
+        // 상품정보 작업 필요
     }
 
     function setColumns(sizes) {
