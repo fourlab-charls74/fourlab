@@ -78,11 +78,11 @@ class prd02Controller extends Controller
 		$is_unlimited	= $request->input("is_unlimited");
 		$limit		= $request->input("limit",100);
 		$ord		= $request->input('ord','desc');
-		$ord_field	= $request->input('ord_field','g.goods_no');
+		$ord_field	= $request->input('ord_field','prd_cd1');
+		if ($ord_field == 'prd_cd1') $ord_field = 'pc.rt';
 
 		$orderby	= sprintf("order by %s %s", $ord_field, $ord);
 
-		dd($orderby);
 		$in_store_sql = "";
 		$match_yn = $request->input('match_yn1');
 
