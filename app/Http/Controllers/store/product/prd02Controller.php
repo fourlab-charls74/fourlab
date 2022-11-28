@@ -18,7 +18,7 @@ class prd02Controller extends Controller
 
 	public function index() 
 	{
-
+		
 		$mutable	= now();
 		$sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
 
@@ -187,7 +187,7 @@ class prd02Controller extends Controller
 		$page_cnt	= 0;
 
 		if($page == 1) {
-		
+		//깃 테스트용 주석
 			$query = "
 				select 
 					count(a.prd_cd) as total,
