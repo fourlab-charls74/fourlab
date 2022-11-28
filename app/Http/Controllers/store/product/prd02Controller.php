@@ -209,8 +209,8 @@ class prd02Controller extends Controller
 						, (ps.qty - ps.wqty) as sqty
 					from product_code pc
 						inner join product_stock ps on ps.prd_cd = pc.prd_cd
-						left outer join goods g on g.goods_no = pc.goods_no
 						$in_store_sql
+						left outer join goods g on g.goods_no = pc.goods_no
 						left outer join product p on p.prd_cd = pc.prd_cd
 					where 1 = 1
 					$where
@@ -218,19 +218,6 @@ class prd02Controller extends Controller
 				) a
 			";
 
-			// $query = "
-			// 	select
-			// 		count(*) as total
-			// 	from product_code pc
-			// 		inner join product_stock ps on pc.prd_cd = ps.prd_cd
-			// 		$in_store_sql
-			// 		left outer join product p on p.prd_cd = pc.prd_cd
-			// 		left outer join goods g on pc.goods_no = g.goods_no
-			// 		left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
-			// 	where 1=1
-			// 		$where
-			// ";
-			//$row = DB::select($query,['com_id' => $com_id]);
 			$row	= DB::select($query);
 			$total	= $row[0]->total;
 			$total_row = $row[0];
@@ -250,6 +237,7 @@ class prd02Controller extends Controller
 				, if(pc.goods_no = 0, '' , ps.goods_no) as goods_no
 				, b.brand_nm
 				, if(pc.goods_no = 0, p.style_no, g.style_no) as style_no
+				, '' as img_view
 				, opt.opt_kind_nm
 				, pc.color, pc.size
 				, if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
@@ -293,8 +281,6 @@ class prd02Controller extends Controller
 			$orderby
 			$limit
 		";
-		// dd($query);
-		//$result = DB::select($query,['com_id' => $com_id]);
 		$pdo	= DB::connection()->getPdo();
 		$stmt	= $pdo->prepare($query);
 		$stmt->execute();
@@ -308,8 +294,6 @@ class prd02Controller extends Controller
 			$result[] = $row;
 		}
 
-		//echo "<pre>$query</pre>";
-		//dd(array_keys ((array)$result[0]));
 		return response()->json([
 			"code"	=> 200,
 			"head"	=> array(
@@ -1121,7 +1105,6 @@ class prd02Controller extends Controller
 
 		$values = [
 			'brands' 	=> $brands,
-			// 'brand' 	=> SLib::getCodes("PRD_CD_BRAND"),
 			'years'		=> SLib::getCodes("PRD_CD_YEAR"),
 			'seasons' 	=> SLib::getCodes("PRD_CD_SEASON"),
 			'genders' 	=> SLib::getCodes("PRD_CD_GENDER"),
@@ -1187,7 +1170,6 @@ class prd02Controller extends Controller
 				$size_sql = "select * from code where code_kind_cd = 'PRD_CD_SIZE_MATCH' and code_id = '$size[0]'";
 				$size_cd = DB::selectOne($size_sql)->code_val2;
 
-				// $goods_opt = $color[1]."^".$size_cd;
 				$goods_opt = "";
 				if ($result->count == 0) {
 
