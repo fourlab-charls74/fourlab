@@ -1,6 +1,7 @@
 @extends('store_with.layouts.layout-nav')
 @section('title','상품 검색')
 @section('content')
+
 <style>
     .select2.select2-container .select2-selection {
         border: 1px solid rgb(210, 210, 210);
@@ -12,14 +13,16 @@
         padding: 0px 2px 1px;
         color: black;
     }
-
     /* 상품 이미지 사이즈 픽스 */
     .img {
         height:30px;
     }
-    
+    .ag-row-level-1 {
+		background-color: #edf4fd !important;
+	}
 </style>
-<script>
+
+{{-- <script>
     //멀티 셀렉트 박스2
     $(document).ready(function() {
         $('.multi_select').select2({
@@ -29,7 +32,8 @@
             closeOnSelect: false,
         });
     });
-</script>
+</script> --}}
+
 <div class="container-fluid py-3">
     <div class="page_tit d-flex align-items-center justify-content-between">
         <div>
@@ -40,8 +44,8 @@
             </div>
         </div>
         <div>
-            <a href="#" id="search_sbtn" onclick="selectMultiGoods()" class="btn btn-sm btn-primary shadow-sm">확인</a>
-            <a href="#" id="search_sbtn" onclick="window.close();" class="btn btn-sm btn-primary shadow-sm">닫기</a>
+            <a href="javascript:void(0);" onclick="selectMultiGoods()" class="btn btn-sm btn-primary shadow-sm">확인</a>
+            <a href="javascript:void(0);" onclick="window.close();" class="btn btn-sm btn-primary shadow-sm">닫기</a>
         </div>
     </div>
     <div id="search-area" class="search_cum_form">
@@ -97,7 +101,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-4 inner-td">
+                        {{-- <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="goods_stat">상품상태</label>
                                 <div class="flax_box">
@@ -109,7 +113,7 @@
                                     </select>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="item">품목</label>
@@ -132,16 +136,16 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <!-- <div class="col-lg-4 inner-td">
+                        <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="goods_nm_eng">상품명(영문)</label>
                                 <div class="flax_box">
                                     <input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
                                 </div>
                             </div>
-                        </div> -->
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="prd_cd">상품옵션 범위검색</label>
@@ -185,8 +189,8 @@
                                     <span class="text_line">/</span>
                                     <div class="form-inline-inner input_box" style="width:45%;">
                                         <select name="ord_field" class="form-control form-control-sm">
-                                            <option value="goods_no">상품번호</option>
-                                            <option value="goods_nm">상품명</option>
+                                            <option value="g.goods_no">상품번호</option>
+                                            <option value="g.goods_nm">상품명</option>
                                         </select>
                                     </div>
                                     <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -249,63 +253,118 @@
  * 
  */
     const columns = [
-        {headerName: '#', pinned: 'left', type: 'NumType', width:40, cellStyle: {"line-height": "30px"}},
-        {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, pinned: 'left', sort: null},
-        {field: "prd_cd", headerName: "상품코드", width:120, pinned: 'left', cellStyle: {"line-height": "30px"}},
-        {
-            field: "goods_no",
-            headerName: "상품번호",
-            width: 58,
-            pinned: 'left',
-            cellStyle:StyleGoodsNo,
+        // {headerName: '#', pinned: 'left', type: 'NumType', width: 40, cellStyle: StyleLineHeight},
+        // {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, pinned: 'left', sort: null},
+        {field: "prd_cd", headerName: "상품코드", width: 140, pinned: 'left', cellStyle: StyleLineHeight, checkboxSelection: true,
+            cellRenderer: (params) => params.value ??= '',
         },
-        {field: "goods_type", headerName: "상품구분", width: 58, pinned: 'left', type: 'StyleGoodsTypeNM'},
-        {field: "opt_kind_cd", headerName: "품목", width:70, cellStyle: {"line-height": "30px"}},
-        {field: "opt_kind_nm", headerName: "품목", width:70, cellStyle: {"line-height": "30px"}},
-        {field: "brand", headerName: "브랜드", cellStyle: {"line-height": "30px"}},
-        {field: "style_no", headerName: "스타일넘버", cellStyle: {"line-height": "30px"}},
-        {field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}"},
+        {field: "goods_no", headerName: "상품번호", width: 60, pinned: 'left', cellStyle: StyleLineHeight, aggFunc: "first"},
+        {field: "opt_kind_cd", hide: true},
+        {field: "opt_kind_nm", headerName: "품목", width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
+        {field: "brand_cd", hide: true},
+        {field: "brand", headerName: "브랜드", width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
+        {field: "style_no", headerName: "스타일넘버", width: 80, cellStyle: StyleLineHeight, aggFunc: "first"},
+        {field: "img", headerName: "이미지", type: 'GoodsImageType', width: 50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}"},
         {field: "img", headerName: "이미지_url", hide: true},
-        {field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', width: 230, cellStyle: {"line-height": "30px"}},
-        {field: "goods_nm_eng", headerName: "상품명(영문)", width: 230, cellStyle: {"line-height": "30px"}},
-        {field: "sale_stat_cl", headerName: "상품상태", width:70, type: 'GoodsStateTypeLH50'},
-        {field: "goods_opt", headerName: "옵션", width:150, cellStyle: {"line-height": "30px"}},
+        {field: "goods_nm", headerName: "상품명", width: 230, cellStyle: {"line-height": "30px"}, aggFunc: "first", 
+            cellRenderer: function (params) {
+				if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
+					return '<a href="javascript:void(0);" onclick="return alert(`상품번호가 비어있는 상품입니다.`);">' + params.value + '</a>';
+				} else {
+					let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
+					return '<a href="javascript:void(0);" onclick="return openHeadProduct(\'' + goods_no + '\');">' + params.value + '</a>';
+				}
+			}
+        },
+        {field: "goods_nm_eng", headerName: "상품명(영문)", width: 230, cellStyle: {"line-height": "30px"}, aggFunc: "first"},
+        {field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: StyleLineHeight, rowGroup: true, hide: true, checkboxSelection: true},
+        {field: "color", headerName: "컬러", width: 55, cellStyle: StyleLineHeight},
+        {field: "color_nm", hide: true},
+        {field: "size", headerName: "사이즈", width: 55, cellStyle: StyleLineHeight},
+        {field: "goods_opt", headerName: "옵션", width: 150, cellStyle: {"line-height": "30px"}},
+        {field: "total_qty", hide: true},
         {
-            field: "wqty", headerName: "창고재고", width:70, type: 'numberType', cellStyle: {"line-height": "30px"},
+            field: "sg_qty", headerName: "창고재고", width: 60, type: 'currencyType', cellStyle: {"line-height": "30px"},
+            aggFunc: (params) => {
+				return params.values.reduce((a,c) => a + (c * 1), 0);
+			},
             cellRenderer: function(params) {
-                if (params.value !== undefined) {
-                    return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                if (params.value === undefined) return "";
+				if (params.data) {
+					return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\');">' + params.value + '</a>';
+                } else if (params.node.aggData) {
+					return `<a href="#" onclick="return OpenStockPopup('${params.node.key}');">${params.value}</a>`;
+				} else {
+                    return '';
                 }
             }
         },
         {
-            field: "wqty", headerName: "매장재고", width:70, type: 'numberType', cellStyle: {"line-height": "30px"},
+            field: "s_qty", headerName: "매장재고", width: 60, type: 'currencyType', cellStyle: {"line-height": "30px"},
+            aggFunc: (params) => {
+				return params.values.reduce((a,c) => a + (c * 1), 0);
+			},
             cellRenderer: function(params) {
-                if (params.value !== undefined) {
-                    return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                if (params.value === undefined) return "";
+				if (params.data) {
+					return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\');">' + params.value + '</a>';
+                } else if (params.node.aggData) {
+					return `<a href="#" onclick="return OpenStockPopup('${params.node.key}');">${params.value}</a>`;
+				} else {
+                    return '';
                 }
             }
         },
-        {field: "normal_price", headerName: "정상가", type: 'currencyType', cellStyle: {"line-height": "30px"}},
-        {field: "price", headerName: "판매가", type: 'currencyType', width:60, cellStyle: {"line-height": "30px"}},
-        {field: "goods_sh", headerName: "TAG가", hide: true},
-        {field: "wonga", headerName: "원가", type: 'currencyType', width:60, cellStyle: {"line-height": "30px"}},
-        {field: "margin_rate", headerName: "마진율", type: 'percentType', width:60, cellStyle: {"line-height": "30px"}},
-        {field: "margin_amt", headerName: "마진액", type: 'numberType', width:60, cellStyle: {"line-height": "30px"}},
-        {field: "org_nm", headerName: "원산지", cellStyle: {"line-height": "30px"}},
-        {field: "com_nm", headerName: "업체", width:84, cellStyle: {"line-height": "30px"}},
-        {field: "full_nm", headerName: "대표카테고리", cellStyle: {"line-height": "30px"}},
-        {field: "head_desc", headerName: "상단홍보글", cellStyle: {"line-height": "30px"}},
-        {field: "make", headerName: "제조업체", cellStyle: {"line-height": "30px"}},
-        {field: "reg_dm", headerName: "등록일자", width:110, cellStyle: {"line-height": "30px"}},
-        {field: "upd_dm", headerName: "수정일자", width:110, cellStyle: {"line-height": "30px"}}
+        {field: "goods_sh", headerName: "TAG가", type: 'currencyType', width: 60, cellStyle: {"line-height": "30px"}, aggFunc: "first"},
+        {field: "price", headerName: "판매가", type: 'currencyType', width: 60, cellStyle: {"line-height": "30px"}, aggFunc: "first"},
+        {field: "wonga", headerName: "원가", type: 'currencyType', width: 60, cellStyle: {"line-height": "30px"}, aggFunc: "first"},
+        {field: "margin_rate", headerName: "마진율", type: 'percentType', width: 60, cellStyle: {"line-height": "30px"}, aggFunc: "first"},
+        {field: "margin_amt", headerName: "마진액", type: 'numberType', width: 60, cellStyle: {"line-height": "30px"}, aggFunc: "first"},
+        {field: "org_nm", headerName: "원산지", width: 80, cellStyle: StyleLineHeight, aggFunc: "first"},
+        {field: "com_id", hide: true},
+        {field: "com_nm", headerName: "공급업체", width: 100, cellStyle: StyleLineHeight, aggFunc: "first"},
+        {field: "make", headerName: "제조업체", width: 100, cellStyle: {"line-height": "30px"}, aggFunc: "first"},
+        {field: "reg_dm", headerName: "등록일자", width: 120, cellStyle: {"line-height": "30px"}},
+        // {field: "goods_type", headerName: "상품구분", width: 58, pinned: 'left', type: 'StyleGoodsTypeNM'},
+        // {field: "sale_stat_cl", headerName: "상품상태", width:70, type: 'GoodsStateTypeLH50'},
+        // {field: "full_nm", headerName: "대표카테고리", cellStyle: {"line-height": "30px"}},
+        // {field: "head_desc", headerName: "상단홍보글", cellStyle: {"line-height": "30px"}},
+        // {field: "upd_dm", headerName: "수정일자", width:110, cellStyle: {"line-height": "30px"}}
     ];
 
     const pApp = new App('', { gridId: "#div-gd", height: 202 });
-    pApp.ResizeGrid(145);
-    pApp.BindSearchEnter();
-    const gridDiv = document.querySelector(pApp.options.gridId);
-    const gx = new HDGrid(gridDiv, columns, {onCellValueChanged: onCellValueChanged});
+    let gx;
+
+    const basic_autoGroupColumnDef = (headerName, width = 150) => ({
+		headerName: headerName,
+		headerClass: 'bizest',
+		minWidth: width,
+		maxWidth: width,
+		cellRenderer: 'agGroupCellRenderer',
+		pinned: 'left'
+	});
+
+    $(document).ready(() => {
+        pApp.ResizeGrid(202);
+        pApp.BindSearchEnter();
+        const gridDiv = document.querySelector(pApp.options.gridId);
+        gx = new HDGrid(gridDiv, columns, {
+            onCellValueChanged: onCellValueChanged,
+            autoGroupColumnDef: basic_autoGroupColumnDef('코드일련'),
+			groupDefaultExpanded: 0, // 0: close, 1: open
+			suppressAggFuncInHeader: true,
+			animateRows: true,
+            groupSelectsChildren: true,
+			suppressDragLeaveHidesColumns: true,
+			suppressMakeColumnVisibleAfterUnGroup: true,
+        });
+
+        Search();
+
+        $("#goods_img").click(function() {
+            gx.gridOptions.columnApi.setColumnVisible("img", $("#goods_img").is(":checked"));
+        });
+    });
 
     function onCellValueChanged(e) {
         e.node.setSelected(true);
@@ -335,33 +394,32 @@
         gx.Request('/store/api/goods', data, 1);
     };
     
-    const openFileSearch = () => {
-        const url='/store/api/goods/show/file/search';
-        const product=window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=600");
-    }
+    // const openFileSearch = () => {
+    //     const url='/store/api/goods/show/file/search';
+    //     const product=window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=600");
+    // }
 
-    function fileSearch(rows) {
-        const goods_nos = [];
-            console.log(rows);
+    // function fileSearch(rows) {
+    //     const goods_nos = [];
+    //         console.log(rows);
 
-        rows.forEach((row) => {
-            console.log(row);
-            goods_nos.push(row.goods_no);
-        });
+    //     rows.forEach((row) => {
+    //         console.log(row);
+    //         goods_nos.push(row.goods_no);
+    //     });
 
-        const data = "goods_nos="+goods_nos.join(',');
+    //     const data = "goods_nos="+goods_nos.join(',');
 
-        gx.Request('/store/api/goods', data, 1);
-    }
-
-    Search();
-
-    $("#goods_img").click(function() {
-        gx.gridOptions.columnApi.setColumnVisible("img", $("#goods_img").is(":checked"));
-    });
+    //     gx.Request('/store/api/goods', data, 1);
+    // }
 
     function openApi() {
         document.getElementsByClassName('sch-prdcd-range')[0].click();
     }
+
+    function OpenStockPopup(prd_cd_p, date = '', color = '', size = '') {
+		var url = `/store/product/prd04/stock?prd_cd_p=${prd_cd_p}&date=${date}&color=${color}&size=${size}`;
+		var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1000,height=900");
+	}
 </script>
 @stop

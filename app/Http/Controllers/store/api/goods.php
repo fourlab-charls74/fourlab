@@ -57,7 +57,6 @@ class goods extends Controller
         $limit = $request->input('limit', 100);
 
         $prd_cd = $request->input("prd_cd", "");
-        $goods_stat = $request->input("goods_stat");
         $style_no = $request->input("style_no");
         $goods_no = $request->input("goods_no");
         $goods_nos = $request->input('goods_nos', '');       // 상품번호 textarea
@@ -65,26 +64,25 @@ class goods extends Controller
         $brand_nm = $request->input("brand_nm");
         $brand_cd = $request->input("brand_cd");
         $goods_nm = $request->input("goods_nm");
-        // $goods_nm_eng = $request->input("goods_nm_eng");
+        $goods_nm_eng = $request->input("goods_nm_eng");
         $prd_cd_range_text = $request->input("prd_cd_range", '');
-
+        
         $com_id = $request->input("com_cd");
+        
+        // $goods_stat = $request->input("goods_stat");
+        // $head_desc = $request->input("head_desc");
+        // $ad_desc = $request->input("ad_desc");
 
-        $head_desc = $request->input("head_desc");
-        $ad_desc = $request->input("ad_desc");
-
-        $limit = $request->input("limit",100);
-        $ord = $request->input('ord','desc');
-        $ord_field = $request->input('ord_field','g.goods_no');
-
-        $orderby = sprintf("order by %s %s", $ord_field, $ord);
+        $ord = $request->input('ord', 'desc');
+        $ord_field = $request->input('ord_field', 'g.goods_no');
+        $orderby = sprintf("order by %s %s, pc.color, pc.size", $ord_field, $ord);
 
         $where = "";
         if($prd_cd != "") {
 			$prd_cd = explode(',', $prd_cd);
 			$where .= " and (1!=1";
 			foreach($prd_cd as $cd) {
-				$where .= " or s.prd_cd like '" . Lib::quote($cd) . "%' ";
+				$where .= " or pc.prd_cd like '" . Lib::quote($cd) . "%' ";
 			}
 			$where .= ")";
 		}
@@ -96,22 +94,22 @@ class goods extends Controller
             $where .= " and g.brand = '" . Lib::quote($brand_cd) . "' ";
         }
         if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%' ";
-        // if ($goods_nm_eng != "") $where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
+        if ($goods_nm_eng != "") $where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
 
         if ($com_id != "") $where .= " and g.com_id = '" . Lib::quote($com_id) . "'";
 
-        if ($head_desc != "") $where .= " and g.head_desc like '%" . Lib::quote($head_desc) . "%' ";
-        if ($ad_desc != "") $where .= " and g.ad_desc like '%" . Lib::quote($ad_desc) . "%' ";
+        // if ($head_desc != "") $where .= " and g.head_desc like '%" . Lib::quote($head_desc) . "%' ";
+        // if ($ad_desc != "") $where .= " and g.ad_desc like '%" . Lib::quote($ad_desc) . "%' ";
 
-        if( is_array($goods_stat)) {
-            if (count($goods_stat) == 1 && $goods_stat[0] != "") {
-                $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat[0]) . "' ";
-            } else if (count($goods_stat) > 1) {
-                $where .= " and g.sale_stat_cl in (" . join(",", $goods_stat) . ") ";
-            }
-        } else if($goods_stat != ""){
-            $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
-        }
+        // if( is_array($goods_stat)) {
+        //     if (count($goods_stat) == 1 && $goods_stat[0] != "") {
+        //         $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat[0]) . "' ";
+        //     } else if (count($goods_stat) > 1) {
+        //         $where .= " and g.sale_stat_cl in (" . join(",", $goods_stat) . ") ";
+        //     }
+        // } else if($goods_stat != ""){
+        //     $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
+        // }
 
         if($goods_nos        != ""){
             $goods_no = $goods_nos;
@@ -153,14 +151,14 @@ class goods extends Controller
 
         if ($page == 1) {
             $query = /** @lang text */
-                "
+            "
                 select count(*) as total
-                from goods g inner join product_stock s on g.goods_no = s.goods_no 
-				left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
-                left outer join product_code pc on pc.prd_cd = s.prd_cd
-                where 1=1 
-                    -- g.com_id = :com_id 
-                    $where
+                from product_code pc
+                    inner join product_stock ps on ps.prd_cd = pc.prd_cd
+                    inner join goods g on g.goods_no = pc.goods_no
+                    inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c.code_id
+                    inner join code d on d.code_kind_cd = 'PRD_CD_SIZE_MATCH' and pc.size = d.code_val
+                where 1=1 $where
 			";
             //$row = DB::select($query,['com_id' => $com_id]);
             $row = DB::select($query);
@@ -172,80 +170,125 @@ class goods extends Controller
         $cfg_img_size_real = "a_500";
         $cfg_img_size_list = "s_50";
 
-        $query = /** @lang text */
-            "
-			select
-				'' as blank
-				, g.goods_no , g.goods_sub
-				, ifnull( type.code_val, 'N/A') as goods_type
-				, com.com_nm
-				, opt.opt_kind_nm
-				, brand.brand_nm as brand
-				, cat.full_nm
-				, g.style_no
-				, g.head_desc
-				, '' as img_view
+        // $query = /** @lang text */
+        //     "
+		// 	select
+		// 		'' as blank
+		// 		, g.goods_no , g.goods_sub
+		// 		, ifnull( type.code_val, 'N/A') as goods_type
+		// 		, com.com_nm
+		// 		, opt.opt_kind_nm
+		// 		, brand.brand_nm as brand
+		// 		, cat.full_nm
+		// 		, g.style_no
+		// 		, g.head_desc
+		// 		, '' as img_view
+		// 		, if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
+		// 			select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
+		// 			from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
+		// 		  )) as img
+		// 		, g.goods_nm
+		// 		, g.goods_nm_eng
+		// 		, g.ad_desc
+		// 		, stat.code_val as sale_stat_cl
+		// 		, g.normal_price
+		// 		, g.price
+		// 		 , ifnull(
+		// 			(select sum(wqty) from goods_summary where goods_no = g.goods_no and goods_sub = g.goods_sub), 0
+		// 		  ) as wqty
+		// 		, g.wonga
+		// 		, (100/(g.price/(g.price-g.wonga))) as margin_rate
+		// 		, (g.price-g.wonga) as margin_amt
+		// 		, g.md_nm
+		// 		, bi.code_val as baesong_info
+		// 		, bk.code_val as baesong_kind
+		// 		, dpt.code_val as dlv_pay_type
+		// 		, g.baesong_price
+		// 		, g.point
+		// 		, g.org_nm
+		// 		, g.make
+		// 		, g.type
+		// 		, g.reg_dm
+		// 		, g.upd_dm
+		// 		, g.goods_location
+		// 		, g.sale_price
+        //         , g.goods_sh 
+		// 		, g.goods_type as goods_type_cd
+		// 		, com.com_type as com_type_d
+		// 		, s.prd_cd , s.goods_opt
+		// 	from goods g inner join product_stock s on g.goods_no = s.goods_no
+		// 		left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
+		// 		left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
+		// 		left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
+		// 		left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
+		// 		left outer join company com on com.com_id = g.com_id
+		// 		left outer join brand brand on brand.brand = g.brand
+		// 		left outer join category cat on cat.d_cat_cd = g.rep_cat_cd and cat.cat_type = 'DISPLAY'
+		// 		left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
+		// 		left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
+		// 		left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
+        //         left outer join product_code pc on pc.prd_cd = s.prd_cd
+		// 	where 1 = 1
+        //         $where
+        //     $orderby
+		// 	$limit
+		// ";
+
+        $sql = "
+            select
+                pc.prd_cd
+                , concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
+                , pc.goods_no
+                , g.style_no
+                , g.opt_kind_cd
+                , opt.opt_kind_nm
 				, if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
 					select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
 					from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
 				  )) as img
-				, g.goods_nm
-				, g.goods_nm_eng
-				, g.ad_desc
-				, stat.code_val as sale_stat_cl
-				, g.normal_price
-				, g.price
-				 , ifnull(
-					(select sum(wqty) from goods_summary where goods_no = g.goods_no and goods_sub = g.goods_sub), 0
-				  ) as wqty
-				, g.wonga
-				, (100/(g.price/(g.price-g.wonga))) as margin_rate
-				, (g.price-g.wonga) as margin_amt
-				, g.md_nm
-				, bi.code_val as baesong_info
-				, bk.code_val as baesong_kind
-				, dpt.code_val as dlv_pay_type
-				, g.baesong_price
-				, g.point
-				, g.org_nm
-				, g.make
-				, g.type
-				, g.reg_dm
-				, g.upd_dm
-				, g.goods_location
-				, g.sale_price
-                , g.goods_sh 
-				, g.goods_type as goods_type_cd
-				, com.com_type as com_type_d
-				, s.prd_cd , s.goods_opt
-			from goods g inner join product_stock s on g.goods_no = s.goods_no
-				left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
-				left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
-				left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
-				left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
-				left outer join company com on com.com_id = g.com_id
-				left outer join brand brand on brand.brand = g.brand
-				left outer join category cat on cat.d_cat_cd = g.rep_cat_cd and cat.cat_type = 'DISPLAY'
-				left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
-				left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
-				left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
-                left outer join product_code pc on pc.prd_cd = s.prd_cd
-			where 1 = 1
-                $where
+                , g.goods_nm
+                , g.goods_nm_eng
+                , pc.brand as brand_cd
+                , b.brand_nm as brand
+                , pc.color, c.code_val as color_nm
+                , pc.size
+                , concat(c.code_val, '^', d.code_val2) as goods_opt
+                , (ps.qty - ps.wqty) as s_qty
+                , ps.wqty as sg_qty
+                , ps.qty as total_qty
+                , g.goods_sh
+                , g.price
+                , g.wonga
+                -- , ps.wonga
+                , (100 / (g.price / (g.price - g.wonga))) as margin_rate
+                , (g.price - g.wonga) as margin_amt
+                , g.org_nm
+                , g.com_id
+                , com.com_nm
+                , g.make
+                , pc.rt as reg_dm
+            from product_code pc
+                inner join product_stock ps on ps.prd_cd = pc.prd_cd
+                inner join goods g on g.goods_no = pc.goods_no
+                inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c.code_id
+                inner join code d on d.code_kind_cd = 'PRD_CD_SIZE_MATCH' and pc.size = d.code_val
+                left outer join company com on com.com_id = g.com_id
+                left outer join brand b on b.br_cd = pc.brand
+                left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
+            where 1=1 $where
+            group by pc.prd_cd
             $orderby
-			$limit
-		";
+            $limit
+        ";
 
         $pdo = DB::connection()->getPdo();
-        $stmt = $pdo->prepare($query);
+        $stmt = $pdo->prepare($sql);
         $stmt->execute();
         $result = [];
-        while($row = $stmt->fetch(PDO::FETCH_ASSOC))
-        {
-			if($row["img"] != ""){
-				$row["img"] = sprintf("%s%s",config("shop.image_svr"),$row["img"]);
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			if ($row["img"] != "") {
+				$row["img"] = sprintf("%s%s", config("shop.image_svr"), $row["img"]);
 			}
-
 			$result[] = $row;
         }
 
