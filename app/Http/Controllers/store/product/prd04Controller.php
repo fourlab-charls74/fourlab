@@ -27,7 +27,8 @@ class prd04Controller extends Controller
 		return view( Config::get('shop.store.view') . '/product/prd04',$values);
 	}
 
-	public function search(Request $request){
+	public function search(Request $request)
+	{
 		$page	= $request->input('page', 1);
 		if( $page < 1 or $page == "" )	$page = 1;
 		$limit	= $request->input('limit', 100);
@@ -212,7 +213,7 @@ class prd04Controller extends Controller
 				)) as img
 				, if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
 				, g.goods_nm_eng
-				, pc.color, pc.size
+				, pc.color, c.code_val as color_nm, pc.size
 				, concat(c.code_val, '^',d.code_val2) as goods_opt
 				-- , ps.wqty
 				-- , $store_qty_sql as sqty
@@ -344,6 +345,7 @@ class prd04Controller extends Controller
 		$sdate = $request->input('sdate', date('Y-m-d'));
 		$next_edate = date("Y-m-d", strtotime("+1 day", strtotime($sdate)));
 		$prd_cd_p = $request->input('prd_cd_p', '');
+		$o_prd_cd_p = $prd_cd_p;
 		$store_type = $request->input('store_type', '');
 		$color = $request->input('color', '');
 		if ($color != '') $prd_cd_p .= $color;
@@ -362,8 +364,8 @@ class prd04Controller extends Controller
 			$sizes = array_map(function($row) {return $row->size;}, DB::select($sql));
 
 			// get goods info
-			$cfg_img_size_real	= "a_500";
-			$cfg_img_size_list	 = "s_50";
+			$cfg_img_size_real = "a_500";
+			$cfg_img_size_list = "a_500";
 
 			$sql = "
 				select
@@ -377,6 +379,8 @@ class prd04Controller extends Controller
 					, g.com_nm
 					, g.brand
 					, b.brand_nm
+					, g.opt_kind_cd
+					, o.opt_kind_nm
 					, ifnull(g.style_no, (select style_no from product p where p.prd_cd = pc.prd_cd)) as style_no
 					, if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
 						select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
@@ -385,12 +389,13 @@ class prd04Controller extends Controller
 				from product_code pc
 					left outer join goods g on g.goods_no = pc.goods_no
 					left outer join brand b on b.brand = g.brand
+					left outer join opt o on g.opt_kind_cd = o.opt_kind_cd
 				group by prd_cd_p
 				having prd_cd_p = :prd_cd_p
 			";
-			$prd = DB::selectOne($sql, ['prd_cd_p' => $prd_cd_p]);
+			$prd = DB::selectOne($sql, ['prd_cd_p' => $o_prd_cd_p]);
 
-			if ($prd->goods_no == '0') {
+			if (!isset($prd) || $prd->goods_no == '0') {
 				$sql = "
 					select 
 						p.prd_cd, p.prd_nm as goods_nm, p.style_no, p.type, p.com_id, c.com_nm
@@ -403,7 +408,7 @@ class prd04Controller extends Controller
 					group by prd_cd_p
 					having prd_cd_p = :prd_cd_p
 				";
-				$prd = DB::selectOne($sql, ['prd_cd_p' => $prd_cd_p]);
+				$prd = DB::selectOne($sql, ['prd_cd_p' => $o_prd_cd_p]);
 			}
 			
 			// get store stock

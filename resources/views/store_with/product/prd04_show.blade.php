@@ -266,8 +266,21 @@
     }
 
     function setGoodsInfo(prd) {
-        console.log(prd);
-        // 상품정보 작업 필요
+        let img = "";
+        if (prd.img) {
+            img = `<img class="goods_img" src="{{config('shop.image_svr')}}/${prd.img}" alt="${prd.goods_nm}" style="min-width: 120px;max-width:120px; min-height: 120px;max-height:120px;" />`;
+        } else {
+            img = `<p class="d-flex align-items-center justify-content-center" style="min-width: 120px;max-width:120px; min-height: 120px;max-height:120px;">이미지 없음</p>`;
+        }
+        $("#prd_image").html(img);
+        $("#prd_prd_cd_p").text(prd.prd_cd_p ??= '');
+        $("#prd_goods_no").text(prd.goods_no ??= '');
+        $("#prd_style_no").text(prd.style_no ??= '');
+        $("#prd_com_nm").text(prd.com_nm ??= '');
+        $("#prd_opt_kind_nm").text(prd.opt_kind_nm ??= '');
+        $("#prd_brand_nm").text(prd.brand_nm ??= '');
+        $("#prd_goods_nm").text(prd.goods_nm ??= '');
+        $("#prd_goods_nm_eng").text(prd.goods_nm_eng ??= '');
     }
 
     function setColumns(sizes) {

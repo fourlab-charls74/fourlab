@@ -275,6 +275,7 @@
 			}
 		},
 		{field: "color", headerName: "컬러", width: 55, cellStyle: StyleLineHeight},
+		{field: "color_nm", headerName: "컬러명", width: 110, cellStyle: {"line-height": "30px"}},
 		{field: "size", headerName: "사이즈", width: 55, cellStyle: StyleLineHeight},
 		{field: "goods_opt", headerName: "옵션", width: 200},
 		{field: "goods_sh", headerName: "TAG가", type: 'currencyType', width:85, aggFunc: 'first'},
@@ -383,14 +384,14 @@
 		if(ord_field === "prd_cd_p") {
 			let prd_columns = columns.map(c => c.field === "prd_cd_p" 
 				? ({...c, rowGroup: true, hide: true, pinned: "left"}) 
-				: c.field === "color" || c.field === "size" ? ({...c, pinned: "left"})
+				: c.field === "color" || c.field === "size" || c.field === "color_nm" ? ({...c, pinned: "left"})
 				: c.type === "NumType" ? ({...c, hide: true})
 				: c.field === "goods_no" ? ({...c, cellStyle: StyleLineHeight}) : c);
 			gx.gridOptions.api.setColumnDefs(prd_columns);
 		} else {
 			let prd_columns = columns.map(c => c.field === "prd_cd_p" 
 				? ({...c, rowGroup: false, hide: false, pinned: "auto"}) 
-				: c.field === "color" || c.field === "size" ? ({...c, pinned: "auto"}) 
+				: c.field === "color" || c.field === "size" || c.field === "color_nm" ? ({...c, pinned: "auto"}) 
 				: c.type === "NumType" ? ({...c, hide: false})
 				: c.field === "goods_no" ? ({...c, cellStyle: StyleGoodsNo}) : c);
 			gx.gridOptions.api.setColumnDefs(prd_columns);
