@@ -215,7 +215,7 @@ class stk14Controller extends Controller
                         'state' => $state,
                         // 'exp_dlv_day' => str_replace("-", "", $exp_dlv_day),
                         // 'rel_order' => $rel_order,
-                        'req_id' => $admin_nm,
+                        'req_id' => $admin_id,
                         'req_rt' => now(),
                         'rt' => now(),
                     ]);

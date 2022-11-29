@@ -62,7 +62,7 @@ class stk10Controller extends Controller
 		$code = 200;
 		$where = "";
         $orderby = "";
-        
+
         // where
         $sdate = str_replace("-", "", $r['sdate'] ?? now()->sub(1, 'week')->format('Ymd'));
         $edate = str_replace("-", "", $r['edate'] ?? date("Ymd"));
@@ -71,7 +71,7 @@ class stk10Controller extends Controller
             and cast(if(psr.state > 20, psr.prc_rt, if(psr.state > 10, psr.exp_dlv_day, psr.req_rt)) as date) <= '$edate'
         ";
 		if($r['rel_order'] != null)
-			$where .= " and psr.rel_order = '%" . $r['rel_order'] . "%'";
+			$where .= " and psr.rel_order like '%" . $r['rel_order'] . "%'";
 		if($r['rel_type'] != null) 
 			$where .= " and psr.type = '" . $r['rel_type'] . "'";
 		if($r['state'] != null) 
@@ -170,6 +170,7 @@ class stk10Controller extends Controller
                 g.style_no, 
                 g.goods_nm, 
                 g.goods_nm_eng,
+                opt.opt_kind_nm,
                 pc.color,
                 pc.size,
                 psr.prd_cd, 
@@ -187,19 +188,24 @@ class stk10Controller extends Controller
                 psr.rel_order, 
                 psr.req_comment,
                 psr.comment,
-                psr.req_id, 
+                psr.req_id,
+                (select name from mgr_user where id = psr.req_id) as req_nm, 
                 psr.req_rt, 
                 psr.rec_id, 
+                (select name from mgr_user where id = psr.rec_id) as rec_nm, 
                 psr.rec_rt, 
                 psr.prc_id, 
+                (select name from mgr_user where id = psr.prc_id) as prc_nm, 
                 psr.prc_rt, 
                 psr.fin_id, 
+                (select name from mgr_user where id = psr.fin_id) as fin_nm, 
                 psr.fin_rt
             from product_stock_release psr
                 inner join product_code pc on pc.prd_cd = psr.prd_cd
                 inner join product_stock_storage pss on pss.prd_cd = psr.prd_cd and pss.storage_cd = psr.storage_cd
                 inner join product_stock_store pss2 on pss2.prd_cd = psr.prd_cd and pss2.store_cd = psr.store_cd
                 left outer join goods g on g.goods_no = psr.goods_no
+                left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
                 left outer join code c on c.code_kind_cd = 'REL_TYPE' and c.code_id = psr.type
                 left outer join store s on s.store_cd = psr.store_cd
                 left outer join storage sg on sg.storage_cd = psr.storage_cd
@@ -278,11 +284,11 @@ class stk10Controller extends Controller
                     ->update([
                         'qty' => $d['qty'] ?? 0,
                         'exp_dlv_day' => $exp_dlv_day_data,
-                        'rel_order' => $rel_order,
+                        'rel_order' => $exp_dlv_day_data . '-' . $rel_order,
                         'state' => $new_state,
                         'comment' => $d['comment'],
                         'req_comment' => $d['req_comment'],
-                        'rec_id' => $admin_nm,
+                        'rec_id' => $admin_id,
                         'rec_rt' => now(),
                         'ut' => now(),
                     ]);
@@ -406,7 +412,7 @@ class stk10Controller extends Controller
                     ->where('idx', '=', $d['idx'])
                     ->update([
                         'state' => $new_state,
-                        'prc_id' => $admin_nm,
+                        'prc_id' => $admin_id,
                         'prc_rt' => now(),
                         'ut' => now(),
                     ]);
@@ -452,7 +458,7 @@ class stk10Controller extends Controller
                     ->where('idx', '=', $d['idx'])
                     ->update([
                         'state' => $new_state,
-                        'fin_id' => $admin_nm,
+                        'fin_id' => $admin_id,
                         'fin_rt' => now(),
                         'ut' => now(),
                     ]);

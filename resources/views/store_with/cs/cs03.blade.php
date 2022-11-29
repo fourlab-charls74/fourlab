@@ -330,7 +330,7 @@
         //     }
         // },
         {
-            field: "req_id",
+            field: "req_nm",
             headerName: "등록",
             width: 96
         },
@@ -343,7 +343,7 @@
             }
         },
         {
-            field: "prc_id",
+            field: "prc_nm",
             headerName: "처리중",
             width: 96
         },
@@ -356,7 +356,7 @@
             }
         },
         {
-            field: "fin_id",
+            field: "fin_nm",
             headerName: "완료",
             width: 96
         },

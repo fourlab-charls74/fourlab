@@ -137,10 +137,13 @@ class cs03Controller extends Controller
 				p1.ut as ut,
 				m.name as user_nm,
 				p1.req_id as req_id,
+				(select name from mgr_user where id = p1.req_id) as req_nm, 
 				p1.req_rt as req_rt,
 				p1.prc_id as prc_id,
+				(select name from mgr_user where id = p1.prc_id) as prc_nm, 
 				p1.prc_rt as prc_rt,
 				p1.fin_id as fin_id,
+				(select name from mgr_user where id = psr.fin_id) as fin_nm, 
 				p1.fin_rt as fin_rt
 			from sproduct_stock_order_product p1
 				inner join sproduct_stock_order p2 on p1.prd_ord_no = p2.prd_ord_no
@@ -213,7 +216,7 @@ class cs03Controller extends Controller
 							$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
 							$prc_sql = "
-								update sproduct_stock_order_product set prc_id = '$admin_nm' , prc_rt = '$now' where prd_ord_no = '$prd_ord_no'
+								update sproduct_stock_order_product set prc_id = '$admin_id' , prc_rt = '$now' where prd_ord_no = '$prd_ord_no'
 							";
 							DB::update($prc_sql);
 
@@ -251,7 +254,7 @@ class cs03Controller extends Controller
 								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
 							$fin_sql = "
-								update sproduct_stock_order_product set fin_id = '$admin_nm' , fin_rt = '$now' where prd_ord_no = '$prd_ord_no'
+								update sproduct_stock_order_product set fin_id = '$admin_id' , fin_rt = '$now' where prd_ord_no = '$prd_ord_no'
 							";
 							DB::update($fin_sql);
 
@@ -303,12 +306,12 @@ class cs03Controller extends Controller
 								}
 
 								$prc_sql = "
-									update sproduct_stock_order_product set prc_id = '$admin_nm' , prc_rt = '$now' where prd_ord_no = '$prd_ord_no'
+									update sproduct_stock_order_product set prc_id = '$admin_id' , prc_rt = '$now' where prd_ord_no = '$prd_ord_no'
 								";
 								DB::update($prc_sql);
 
 								$fin_sql = "
-									update sproduct_stock_order_product set fin_id = '$admin_nm' , fin_rt = '$now' where prd_ord_no = '$prd_ord_no'
+									update sproduct_stock_order_product set fin_id = '$admin_id' , fin_rt = '$now' where prd_ord_no = '$prd_ord_no'
 								";
 								DB::update($fin_sql);
 
@@ -347,7 +350,7 @@ class cs03Controller extends Controller
 							}
 
 							$prc_sql = "
-								update sproduct_stock_order_product set prc_id = '$admin_nm' , prc_rt = '$now' where prd_ord_no = '$prd_ord_no'
+								update sproduct_stock_order_product set prc_id = '$admin_id' , prc_rt = '$now' where prd_ord_no = '$prd_ord_no'
 							";
 							DB::update($prc_sql);
 
@@ -374,7 +377,7 @@ class cs03Controller extends Controller
 								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
 								$prc_sql = "
-									update sproduct_stock_order_product set fin_id = '$admin_nm' , fin_rt = '$now' where prd_ord_no = '$prd_ord_no'
+									update sproduct_stock_order_product set fin_id = '$admin_id' , fin_rt = '$now' where prd_ord_no = '$prd_ord_no'
 								";
 								DB::update($prc_sql);
 								
@@ -438,12 +441,12 @@ class cs03Controller extends Controller
 								}
 
 								$prc_sql = "
-									update sproduct_stock_order_product set prc_id = '$admin_nm' , prc_rt = '$now' where prd_ord_no = '$prd_ord_no'
+									update sproduct_stock_order_product set prc_id = '$admin_id' , prc_rt = '$now' where prd_ord_no = '$prd_ord_no'
 								";
 								DB::update($prc_sql);
 
 								$fin_sql = "
-									update sproduct_stock_order_product set fin_id = '$admin_nm' , fin_rt = '$now' where prd_ord_no = '$prd_ord_no'
+									update sproduct_stock_order_product set fin_id = '$admin_id' , fin_rt = '$now' where prd_ord_no = '$prd_ord_no'
 								";
 								DB::update($fin_sql);
 
@@ -717,7 +720,7 @@ class cs03Controller extends Controller
 							'price' => $price,
 							'wonga' => $wonga,
 							'req_rt' => now(),
-							'req_id' => $admin_nm,
+							'req_id' => $admin_id,
 							'ut' => now(),
 						]
 					);
@@ -761,7 +764,7 @@ class cs03Controller extends Controller
 								'price' => $price,
 								'wonga' => $wonga,
 								'req_rt' => now(),
-								'req_id' => $admin_nm,
+								'req_id' => $admin_id,
 								'ut' => now(),
 							]
 						);
