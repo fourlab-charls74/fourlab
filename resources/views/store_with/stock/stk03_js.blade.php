@@ -250,8 +250,9 @@
     // 상품추가 시 팝업 오픈
      function AddGoods(){
         const store_cd = $("[name=store_no]").val();
-        const url = `/store/api/store-goods/show/${store_cd || ''}`;
-        window.open(url, "_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1800,height=830");
+        const url = `/store/api/goods/show?store_cd=${store_cd || 'ALL'}`;
+        window.open(url, "_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1800,height=1000");
+        
     }
 
     // 상품추가팝업 callback

@@ -36,10 +36,6 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('goods', 'goods@search');
         Route::get('goods/show', 'goods@show');
         Route::get('goods/show/file/search', 'goods@file_search');
-        Route::get('store-goods/show/{store_cd?}', 'goods@store_show'); // 매장별 상품검색 화면 show
-        Route::get('store-goods', 'goods@store_search'); // 매장별 상품검색
-        Route::get('storage-goods/show/{storage_cd?}', 'goods@storage_show'); // 창고별 상품검색 화면 show
-        Route::get('storage-goods', 'goods@storage_search'); // 창고별 상품검색
 
         // 고객명 조회
         Route::get('members', 'MemberController@show');

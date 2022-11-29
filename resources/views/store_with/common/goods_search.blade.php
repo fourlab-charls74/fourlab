@@ -1,5 +1,10 @@
+@php
+    $title = isset($store) ? '매장별 상품검색' : (isset($storage) ? '창고별 상품검색' : '상품검색');
+    $subTitle = isset($store) ? '- ' . $store->store_nm : (isset($storage) ? '- ' . $storage->storage_nm : '');
+@endphp
+
 @extends('store_with.layouts.layout-nav')
-@section('title','상품 검색')
+@section('title', $title)
 @section('content')
 
 <style>
@@ -37,10 +42,10 @@
 <div class="container-fluid py-3">
     <div class="page_tit d-flex align-items-center justify-content-between">
         <div>
-            <h3 class="d-inline-flex">상품 검색</h3>
+            <h3 class="d-inline-flex align-items-end">{{ $title }} <p class="fs-18 pl-2" style="color: #444;">{{ $subTitle }}</p></h3>
             <div class="d-inline-flex location">
                 <span class="home"></span>
-                <span>/ 상품 검색</span>
+                <span>/ {{ $title }}</span>
             </div>
         </div>
         <div>
@@ -225,6 +230,12 @@
                     </div>
                     <div class="fr_box">
                         <div class="box">
+                            @if ((isset($store) && @$store->store_cd !='ALL') || isset($storage))
+                            <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+                                <input type="checkbox" class="custom-control-input" name="ext_zero_qty" id="ext_zero_qty" value="Y" checked>
+                                <label class="custom-control-label font-weight-normal" for="ext_zero_qty">@if(isset($store) && @$store->store_cd !='ALL') 매장재고 @else 창고재고 @endif 0 제외</label>
+                            </div>
+                            @endif
                             <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
                                 <input type="checkbox" class="custom-control-input" name="goods_img" id="goods_img" value="Y" checked>
                                 <label class="custom-control-label font-weight-light" for="goods_img">이미지출력</label>
@@ -252,6 +263,18 @@
  * multiGoodsCallback : 그리드에서 상품을 선택 후 확인 버튼을 눌렀을 경우 발생. 선택된 항목 모두 전달
  * 
  */
+    const sum_values = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
+    const stock_render = (params) => {
+        if (params.value === undefined) return "";
+        if (params.data) {
+            return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\');">' + params.value + '</a>';
+        } else if (params.node.aggData) {
+            return `<a href="#" onclick="return OpenStockPopup('${params.node.key}');">${params.value}</a>`;
+        } else {
+            return '';
+        }
+    };
+
     const columns = [
         // {headerName: '#', pinned: 'left', type: 'NumType', width: 40, cellStyle: StyleLineHeight},
         // {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, pinned: 'left', sort: null},
@@ -283,38 +306,48 @@
         {field: "size", headerName: "사이즈", width: 55, cellStyle: StyleLineHeight},
         {field: "goods_opt", headerName: "옵션", width: 150, cellStyle: {"line-height": "30px"}},
         {field: "total_qty", hide: true},
-        {
-            field: "sg_qty", headerName: "창고재고", width: 60, type: 'currencyType', cellStyle: {"line-height": "30px"},
-            aggFunc: (params) => {
-				return params.values.reduce((a,c) => a + (c * 1), 0);
-			},
-            cellRenderer: function(params) {
-                if (params.value === undefined) return "";
-				if (params.data) {
-					return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\');">' + params.value + '</a>';
-                } else if (params.node.aggData) {
-					return `<a href="#" onclick="return OpenStockPopup('${params.node.key}');">${params.value}</a>`;
-				} else {
-                    return '';
-                }
-            }
-        },
-        {
-            field: "s_qty", headerName: "매장재고", width: 60, type: 'currencyType', cellStyle: {"line-height": "30px"},
-            aggFunc: (params) => {
-				return params.values.reduce((a,c) => a + (c * 1), 0);
-			},
-            cellRenderer: function(params) {
-                if (params.value === undefined) return "";
-				if (params.data) {
-					return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\');">' + params.value + '</a>';
-                } else if (params.node.aggData) {
-					return `<a href="#" onclick="return OpenStockPopup('${params.node.key}');">${params.value}</a>`;
-				} else {
-                    return '';
-                }
-            }
-        },
+        @if (isset($store) && @$store->store_cd !='ALL')
+            {
+                field: "sg_qty", headerName: "창고재고", width: 60, type: 'currencyType', cellStyle: {"line-height": "30px"}, 
+                aggFunc: sum_values, cellRenderer: stock_render,
+            },  
+            {
+                headerName: "매장재고",
+                children: [
+                    {
+                        field: "store_qty", headerName: "실재고", width: 60, type: 'currencyType', cellStyle: {"line-height": "30px"}, 
+                        aggFunc: sum_values, cellRenderer: stock_render,
+                    },
+                    {
+                        field: "store_wqty", headerName: "보유재고", width: 60, type: 'currencyType', cellStyle: {"line-height": "30px"}, 
+                        aggFunc: sum_values, cellRenderer: stock_render,
+                    }
+                ],
+            },
+        @elseif (isset($storage))
+            {
+                headerName: "창고재고",
+                children: [
+                    {
+                        field: "storage_qty", headerName: "실재고", width: 60, type: 'currencyType', cellStyle: {"line-height": "30px"}, 
+                        aggFunc: sum_values, cellRenderer: stock_render,
+                    },
+                    {
+                        field: "storage_wqty", headerName: "보유재고", width: 60, type: 'currencyType', cellStyle: {"line-height": "30px"}, 
+                        aggFunc: sum_values, cellRenderer: stock_render,
+                    }
+                ],
+            },
+        @else
+            {
+                field: "sg_qty", headerName: "창고재고", width: 60, type: 'currencyType', cellStyle: {"line-height": "30px"}, 
+                aggFunc: sum_values, cellRenderer: stock_render,
+            },
+            {
+                field: "s_qty", headerName: "매장재고", width: 60, type: 'currencyType', cellStyle: {"line-height": "30px"}, 
+                aggFunc: sum_values, cellRenderer: stock_render,
+            },  
+        @endif
         {field: "goods_sh", headerName: "TAG가", type: 'currencyType', width: 60, cellStyle: {"line-height": "30px"}, aggFunc: "first"},
         {field: "price", headerName: "판매가", type: 'currencyType', width: 60, cellStyle: {"line-height": "30px"}, aggFunc: "first"},
         {field: "wonga", headerName: "원가", type: 'currencyType', width: 60, cellStyle: {"line-height": "30px"}, aggFunc: "first"},
@@ -331,6 +364,9 @@
         // {field: "head_desc", headerName: "상단홍보글", cellStyle: {"line-height": "30px"}},
         // {field: "upd_dm", headerName: "수정일자", width:110, cellStyle: {"line-height": "30px"}}
     ];
+
+    const store_cd = '{{ @$store->store_cd }}';
+    const storage_cd = '{{ @$storage->storage_cd }}';
 
     const pApp = new App('', { gridId: "#div-gd", height: 202 });
     let gx;
@@ -391,6 +427,10 @@
     const Search = () => {
         if (isOpenerCallback('beforeSearchCallback')) opener.beforeSearchCallback(document);
         let data = $('form[name="search"]').serialize();
+        data += `&store_cd=${store_cd}&storage_cd=${storage_cd}`;
+        if($("[name=ext_zero_qty]").length > 0) {
+            data += '&ext_zero_qty=' + $("[name=ext_zero_qty]").is(":checked");
+        }
         gx.Request('/store/api/goods', data, 1);
     };
     

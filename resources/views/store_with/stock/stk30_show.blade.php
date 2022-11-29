@@ -160,20 +160,20 @@
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 29},
         {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
         {field: "goods_no", headerName: "상품번호", cellStyle: {"text-align": "center"}},
-        {field: "goods_type_nm", headerName: "상품구분", cellStyle: StyleGoodsType},
+        // {field: "goods_type_nm", headerName: "상품구분", cellStyle: StyleGoodsType},
         {field: "opt_kind_nm", headerName: "품목", width: 80, cellStyle: {"text-align": "center"}},
         {field: "brand", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
         {field: "style_no",	headerName: "스타일넘버", cellStyle: {"text-align": "center"}},
-        {field: "sale_stat_cl", headerName: "상품상태", cellStyle: StyleGoodsState},
-        {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 250},
-        {field: "goods_opt", headerName: "옵션", width: 240},
+        // {field: "sale_stat_cl", headerName: "상품상태", cellStyle: StyleGoodsState},
+        {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 280},
+        {field: "goods_opt", headerName: "옵션", width: 250},
         {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 70},
         {field: "price", headerName: "판매가", type: "currencyType", width: 70},
         {field: "return_price", headerName: "반품단가", width: 80, type: 'currencyType',
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
-        {field: "store_wqty", headerName: "매장보유재고", width: 100, type: 'currencyType'},
+        {field: "store_wqty", headerName: "매장보유재고", width: 90, type: 'currencyType'},
         {field: "qty", headerName: "반품수량", width: 60, type: 'currencyType', 
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
@@ -339,8 +339,8 @@
             return alert('매장을 선택해주세요.');
         }
 
-        const url = `/store/api/store-goods/show/` + ff.store_no.value;
-        window.open(url, "_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1800,height=830");
+        const url = `/store/api/goods/show?store_cd=` + ff.store_no.value;
+        window.open(url, "_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1800,height=1000");
     }
 
     /**

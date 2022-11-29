@@ -443,7 +443,7 @@
         {field: "goods_opt", headerName: "옵션", width: 130},
         {field: "goods_price", headerName: "판매단가", width: 60, type: 'currencyType'},
         {field: "price", headerName: "판매가", width: 60, type: 'currencyType', editable: true, cellStyle: {"background-color": "#ffff99"}, onCellValueChanged: EditAmt},
-        {field: "wqty", headerName: "창고재고", width: 60, type: 'currencyType'},
+        {field: "sg_qty", headerName: "창고재고", width: 60, type: 'currencyType'},
         {field: "store_wqty", headerName: "매장재고", width: 60, type: 'currencyType'},
         {field: "qty", headerName: "수량", width: 60, type: 'currencyType', editable: true, cellStyle: {"background-color": "#ffff99"}, onCellValueChanged: EditAmt},
         {field: "ord_amt", headerName: "주문액", width: 60, type: 'currencyType'},

@@ -343,7 +343,7 @@
 
     // 상품 추가
     function addGoods() {
-        const url = `/store/api/storage-goods/show/` + document.f1.storage_cd.value;
+        const url = `/store/api/goods/show?storage_cd=` + document.f1.storage_cd.value;
         window.open(url, "_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1800,height=1000");
     }
 
