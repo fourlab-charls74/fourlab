@@ -71,12 +71,9 @@
                                     @endforeach
                                 </select>
                                 <span class="text_line" style="width: 6%; text-align: center;">/</span>
-                                <select name='rel_order' class="form-control form-control-sm" style="width: 47%">
-                                    <option value=''>전체</option>
-                                    @foreach ($rel_orders as $rel_order)
-                                        <option value='{{ $rel_order->code_id }}'>{{ $rel_order->code_val }}</option>
-                                    @endforeach
-                                </select>
+                                <div class="form-inline-inner input_box">
+                                    <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='rel_order' id="rel_order" value="">
+                                </div>
                             </div>
 						</div>
 					</div>
@@ -91,7 +88,7 @@
                                     @endforeach
                                 </select>
                                 <div class="custom-control custom-checkbox form-check-box" style="min-width: 130px;">
-                                    <input type="checkbox" class="custom-control-input" name="ext_done_state" id="ext_done_state" value="Y">
+                                    <input type="checkbox" class="custom-control-input" name="ext_done_state" id="ext_done_state" value="Y" checked>
                                     <label class="custom-control-label font-weight-normal" for="ext_done_state">매장입고완료 제외</label>
                                 </div>
                             </div>
@@ -307,8 +304,8 @@
                         </div>
                         <div class="d-flex">
                             <select id='exp_rel_order' name='exp_rel_order' class="form-control form-control-sm mr-2"  style='width:70px;display:inline'>
-                                @foreach ($rel_orders as $rel_order)
-                                    <option value='{{ $rel_order->code_id }}'>{{ $rel_order->code_val }}</option>
+                                @foreach ($rel_order_res as $rel_order)
+                                    <option value='{{ $rel_order->code_val }}'>{{ $rel_order->code_val }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -373,8 +370,13 @@
         {field: "storage_nm", headerName: "창고", pinned: 'left', width: 100, cellStyle: {"text-align": "center"}},
         {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
 		{field: "style_no",	headerName: "스타일넘버", cellStyle: {"text-align": "center"}},
-		{field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 350},
-		{field: "goods_opt", headerName: "옵션", width: 350},
+		{field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 300},
+		{field: "goods_nm_eng",	headerName: "상품명(영문)", type: 'HeadGoodsNameType', width: 300},
+        {field: "color", headerName: "컬러", width: 70, cellStyle: {"text-align": "center"}},
+        {field: "size", headerName: "사이즈", width: 70, cellStyle: {"text-align": "center"}},
+		{field: "goods_opt", headerName: "옵션", width: 150},
+		{field: "storage_wqty", headerName: "창고재고", width: 60, cellStyle: {"text-align": "center"}},
+		{field: "store_wqty", headerName: "매장재고", width: 60, cellStyle: {"text-align": "center"}},
 		{field: "qty", headerName: "수량", type: "numberType",
             editable: function(params) {return params.data.state === 10;}, 
             cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};},
@@ -389,23 +391,18 @@
             }
         },
 		{field: "exp_dlv_day", headerName: "출고예정일자", cellStyle: {"text-align": "center"},
-            // cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99", "text-align": "center"} : {"text-align": "center"};},
-            // cellRenderer: (params) => {
-            //         return params.data.state === 10 ? `<input type="date" class="grid-date" value="${params.value ?? ''}" onchange="selectCurRow('exp_dlv_day', this, '${params.rowIndex}')" />` : params.value;
-            // }
+           cellRenderer: function(params) {
+                return params.data.dlv_day;
+           }
         },
 		{field: "rel_order", headerName: "출고차수", width: 100, 
-            // editable: function(params) {return params.data.state === 10;}, 
-            // cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99", "text-align": "center"} : {"text-align": "center"};},
-            // cellEditorSelector: function(params) {
-            //     return {
-            //         component: 'agRichSelectCellEditor',
-            //         params: { values: rel_orders.map(o => o.code_val) },
-            //     };
-            // },
             cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {
-                return params.data.state === 10 ? params.value : params.data.dlv_day?.replaceAll("-", "") || '' + (params.value || '');
+                if(params.data.state === 10) {
+                    return "";
+                }else {
+                    return params.data.exp_dlv_day_data + '-' + params.data.rel_order;
+                }
             }
         },
         {field: "req_id", headerName: "요청자", cellStyle: {"text-align": "center"}},
@@ -416,7 +413,11 @@
         {field: "prc_rt", headerName: "처리일시", width: 120, cellStyle: {"text-align": "center"}},
         {field: "fin_id", headerName: "완료(입고)자", cellStyle: {"text-align": "center"}},
         {field: "fin_rt", headerName: "완료(입고)일시", width: 120, cellStyle: {"text-align": "center"}},
-        {field: "comment", headerName: "메모", width: 300, 
+        {field: "req_comment", headerName: "요청메모", width: 300, 
+            editable: function(params) {return params.data.state === 10;}, 
+            cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};}
+        },
+        {field: "comment", headerName: "거부메모", width: 300, 
             editable: function(params) {return params.data.state === 10;}, 
             cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};}
         },

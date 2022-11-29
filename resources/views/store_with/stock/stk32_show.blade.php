@@ -43,7 +43,7 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th>이름</th>
+                                                <th>매장명</th>
                                                 <td>
                                                     <div class="flax_box">
                                                         <input type='text' class="form-control form-control-sm search-enter" name='store_nm' id="store_nm" >

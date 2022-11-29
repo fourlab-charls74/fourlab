@@ -184,19 +184,11 @@ class prd02Controller extends Controller
 
 		$total		= 0;
 		$page_cnt	= 0;
-		$page_cnt	= 0;
 
 		if($page == 1) {
-		//깃 테스트용 주석
 			$query = "
 				select 
-					count(a.prd_cd) as total,
-					sum(a.goods_sh) as total_goods_sh,
-					sum(a.price) as total_price,
-					sum(a.wonga) as total_wonga,
-					sum(a.margin_amt) as total_margin_amt,
-					sum(a.wqty) as total_wqty,
-					sum(a.sqty) as total_sqty
+					count(a.prd_cd) as total
 				from (
 					select 
 						pc.prd_cd
@@ -217,10 +209,8 @@ class prd02Controller extends Controller
 					group by pc.prd_cd
 				) a
 			";
-
 			$row	= DB::select($query);
 			$total	= $row[0]->total;
-			$total_row = $row[0];
 			$page_cnt = (int)(($total - 1) / $page_size) + 1;
 		}
 
@@ -247,6 +237,7 @@ class prd02Controller extends Controller
 				, if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
 				, g.goods_nm_eng
 				, concat(c.code_val, '^',d.code_val2) as goods_opt
+				, c.code_val as color_nm
 				, ps.wqty
 				, (ps.qty - ps.wqty) as sqty
 				, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
@@ -301,7 +292,6 @@ class prd02Controller extends Controller
 				"page"		=> $page,
 				"page_cnt"	=> $page_cnt,
 				"page_total"=> count($result),
-				"total_row" => $total_row,
 			),
 			"body"	=> $result
 		]);

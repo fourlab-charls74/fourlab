@@ -28,10 +28,20 @@ class stk10Controller extends Controller
 
     public function index()
 	{
+
+        $sql = "
+            select
+                *
+            from code
+            where code_kind_cd = 'rel_order' and code_id like 'R_%'
+        ";
+        $rel_order_res = DB::select($sql);
+
 		$values = [
             'sdate'         => now()->sub(1, 'week')->format('Y-m-d'),
             'edate'         => date("Y-m-d"),
             'rel_orders'     => SLib::getCodes("REL_ORDER"), // 출고차수
+            'rel_order_res' => $rel_order_res,
             'rel_types'     => SLib::getCodes("REL_TYPE"), // 출고구분
             'rel_states'    => $this->rel_states, // 출고상태
             'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
@@ -61,7 +71,7 @@ class stk10Controller extends Controller
             and cast(if(psr.state > 20, psr.prc_rt, if(psr.state > 10, psr.exp_dlv_day, psr.req_rt)) as date) <= '$edate'
         ";
 		if($r['rel_order'] != null)
-			$where .= " and psr.rel_order = '" . $r['rel_order'] . "'";
+			$where .= " and psr.rel_order = '%" . $r['rel_order'] . "%'";
 		if($r['rel_type'] != null) 
 			$where .= " and psr.type = '" . $r['rel_type'] . "'";
 		if($r['state'] != null) 
@@ -159,16 +169,23 @@ class stk10Controller extends Controller
                 psr.goods_no, 
                 g.style_no, 
                 g.goods_nm, 
+                g.goods_nm_eng,
+                pc.color,
+                pc.size,
                 psr.prd_cd, 
                 psr.goods_opt, 
                 psr.qty,
+                pss.wqty as storage_wqty,
+                pss2.wqty as store_wqty,
                 psr.store_cd,
                 s.store_nm, 
                 psr.storage_cd,
                 sg.storage_nm, 
                 psr.state, 
-                cast(psr.exp_dlv_day as date) as exp_dlv_day, 
+                -- cast(psr.exp_dlv_day as date) as exp_dlv_day, 
+                psr.exp_dlv_day as exp_dlv_day_data,
                 psr.rel_order, 
+                psr.req_comment,
                 psr.comment,
                 psr.req_id, 
                 psr.req_rt, 
@@ -180,6 +197,8 @@ class stk10Controller extends Controller
                 psr.fin_rt
             from product_stock_release psr
                 inner join product_code pc on pc.prd_cd = psr.prd_cd
+                inner join product_stock_storage pss on pss.prd_cd = psr.prd_cd and pss.storage_cd = psr.storage_cd
+                inner join product_stock_store pss2 on pss2.prd_cd = psr.prd_cd and pss2.store_cd = psr.store_cd
                 left outer join goods g on g.goods_no = psr.goods_no
                 left outer join code c on c.code_kind_cd = 'REL_TYPE' and c.code_id = psr.type
                 left outer join store s on s.store_cd = psr.store_cd
@@ -235,6 +254,10 @@ class stk10Controller extends Controller
         $exp_dlv_day = $request->input("exp_dlv_day", '');
         $rel_order = $request->input("rel_order", '');
 
+        $exp_day = str_replace("-", "", $exp_dlv_day);
+
+        $exp_dlv_day_data = substr($exp_day,2,6);
+
         try {
             DB::beginTransaction();
 
@@ -254,11 +277,12 @@ class stk10Controller extends Controller
                     ->where('idx', '=', $d['idx'])
                     ->update([
                         'qty' => $d['qty'] ?? 0,
-                        'exp_dlv_day' => str_replace("-", "", $exp_dlv_day),
+                        'exp_dlv_day' => $exp_dlv_day_data,
                         'rel_order' => $rel_order,
                         'state' => $new_state,
                         'comment' => $d['comment'],
-                        'rec_id' => $admin_id,
+                        'req_comment' => $d['req_comment'],
+                        'rec_id' => $admin_nm,
                         'rec_rt' => now(),
                         'ut' => now(),
                     ]);
@@ -369,6 +393,7 @@ class stk10Controller extends Controller
         $ori_state = 20;
         $new_state = 30;
         $admin_id = Auth('head')->user()->id;
+        $admin_nm = Auth('head')->user()->name;
         $data = $request->input("data", []);
 
         try {
@@ -381,7 +406,7 @@ class stk10Controller extends Controller
                     ->where('idx', '=', $d['idx'])
                     ->update([
                         'state' => $new_state,
-                        'prc_id' => $admin_id,
+                        'prc_id' => $admin_nm,
                         'prc_rt' => now(),
                         'ut' => now(),
                     ]);
@@ -414,6 +439,7 @@ class stk10Controller extends Controller
         $ori_state = 30;
         $new_state = 40;
         $admin_id = Auth('head')->user()->id;
+        $admin_nm = Auth('head')->user()->name;
         $data = $request->input("data", []);
 
         try {
@@ -426,7 +452,7 @@ class stk10Controller extends Controller
                     ->where('idx', '=', $d['idx'])
                     ->update([
                         'state' => $new_state,
-                        'fin_id' => $admin_id,
+                        'fin_id' => $admin_nm,
                         'fin_rt' => now(),
                         'ut' => now(),
                     ]);
@@ -472,6 +498,7 @@ class stk10Controller extends Controller
                     ->update([
                         'state' => $new_state,
                         'comment' => $d['comment'] ?? '',
+                        'req_comment' => $d['req_comment'] ?? '',
                         'fin_id' => $admin_id,
                         'fin_rt' => now(),
                         'ut' => now(),

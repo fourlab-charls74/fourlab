@@ -302,17 +302,13 @@
 	</style>
 	<script language="javascript">
 
-		const pinnedRowData = [{ goods_nm: '' , goods_sh: 0, price: 0, wonga: 0 , margin_amt : 0, wqty : 0, sqty : 0}];
+		// const pinnedRowData = [{ goods_nm: '' , goods_sh: 0, price: 0, wonga: 0 , margin_amt : 0, wqty : 0, sqty : 0}];
 
 		const columns = [
-			{headerName: '#', pinned: 'left', type: 'NumType', width:40, cellStyle: StyleLineHeight,
-				cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : parseInt(params.value) + 1,	
-			},
-			{field: "color", headerName: "컬러", width:60, cellStyle: StyleLineHeight},
-			{field: "size", headerName: "사이즈", width:60, cellStyle: StyleLineHeight},
+			{headerName: '#', pinned: 'left', type: 'NumType', width:40, cellStyle: StyleLineHeight},
+			
 			{field: "prd_cd", headerName: "상품코드", width:120, pinned: 'left', cellStyle: StyleLineHeight,
 				cellRenderer: function(params) {
-					if (params.node.rowPinned === 'top') return "합계";
 					if (params.value !== undefined) {
 						return '<a href="#" onclick="return EditProduct(\'' + params.value + '\',\'' + params.data.goods_no + '\');">' + params.value + '</a>';
 					}
@@ -342,6 +338,9 @@
 				}
 			},
 			{field: "prd_cd1", headerName: "코드일련", width:100, cellStyle: StyleLineHeight, rowGroup: true, hide: true},
+			{field: "color", headerName: "컬러", width:60},
+			{field: "color_nm", headerName: "컬러명", width:100},
+			{field: "size", headerName: "사이즈", width:60},
 			{field: "goods_opt", headerName: "옵션", width:200},
 			{field: "opt_kind_nm", headerName: "품목", width:70, cellStyle: {"line-height": "30px", "text-align": "center"}},
 			{field: "brand_nm", headerName: "브랜드", cellStyle: {"line-height": "30px", "text-align": "center"},aggFunc: "first"},
@@ -354,7 +353,6 @@
 				cellRenderer: function(params) {
 					if (params.value === undefined) return "";
 					if (params.node.rowPinned === 'top') {
-						return params.value;
 					} else if (params.data) {
 						return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + params.value + '</a>';
 					} else if (params.node.aggData) {
@@ -370,7 +368,6 @@
 					cellRenderer: function(params) {
 						if (params.value === undefined) return "";
 						if (params.node.rowPinned === 'top') {
-							return params.value;
 						} else if (params.data) {
 							return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + params.value + '</a>';
 						} else if (params.node.aggData) {
@@ -409,11 +406,6 @@
 
 		$(document).ready(function() {
 			gx = new HDGrid(gridDiv, columns, {
-				// onCellValueChanged: onCellValueChanged,
-				pinnedTopRowData: pinnedRowData,
-				getRowStyle: (params) => {
-					if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee !important', 'border': 'none'};
-				},
 				autoGroupColumnDef: basic_autoGroupColumnDef('코드일련'),
 				groupDefaultExpanded: 0, // 0: close, 1: open
 				suppressAggFuncInHeader: true,
@@ -440,17 +432,7 @@
 			await setColumn();
 
 			let data = $('form[name="search"]').serialize();
-			gx.Request('/store/product/prd02/search', data, 1, function(e) {
-				const t = e.head.total_row;
-				gx.gridOptions.api.setPinnedTopRowData([{ 
-					goods_sh: t.total_goods_sh, 
-					price: t.total_price, 
-					wonga: t.total_wonga,
-					margin_amt: t.total_margin_amt,
-					wqty: t.total_wqty,
-					sqty: t.total_sqty
-				}]);
-			});
+			gx.Request('/store/product/prd02/search', data, 1);
 		}
 
 		function setColumn() {
@@ -458,14 +440,14 @@
 		if(ord_field === "prd_cd1") {
 			let prd_columns = columns.map(c => c.field === "prd_cd1" 
 				? ({...c, rowGroup: true, hide: true, pinned: "left"}) 
-				: c.field === "color" || c.field === "size" ? ({...c, pinned: "left"})
+				: c.field === "color" || c.field === "size" || c.field === "color_nm" ? ({...c, pinned: "left"})
 				: c.type === "NumType" ? ({...c, hide: true})
 				: c.field === "goods_no" ? ({...c, cellStyle: StyleLineHeight}) : c);
 			gx.gridOptions.api.setColumnDefs(prd_columns);
 		} else {
 			let prd_columns = columns.map(c => c.field === "prd_cd1" 
 				? ({...c, rowGroup: false, hide: false, pinned: "auto"}) 
-				: c.field === "color" || c.field === "size" ? ({...c, pinned: "auto"}) 
+				: c.field === "color" || c.field === "size" || c.field === "color_nm" ? ({...c, pinned: "auto"}) 
 				: c.type === "NumType" ? ({...c, hide: false})
 				: c.field === "goods_no" ? ({...c, cellStyle: StyleGoodsNo}) : c);
 			gx.gridOptions.api.setColumnDefs(prd_columns);
@@ -663,6 +645,11 @@
 
 		function openApi() {
 			document.getElementsByClassName('sch-prdcd-range')[0].click();
+		}
+
+		function OpenStockPopup(prd_cd_p, date, color = '', size = '') {
+			var url = `/store/product/prd04/stock?prd_cd_p=${prd_cd_p}&date=${date}&color=${color}&size=${size}`;
+			var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1000,height=900");
 		}
 
 	</script>

@@ -190,6 +190,7 @@ class stk14Controller extends Controller
         $release_type = 'R';
         $state = 10;
         $admin_id = Auth('head')->user()->id;
+        $admin_nm = Auth('head')->user()->name;
         $store_cd = $request->input("store_cd", '');
         // $exp_dlv_day = $request->input("exp_dlv_day", '');
         // $rel_order = $request->input("rel_order", '');
@@ -214,7 +215,7 @@ class stk14Controller extends Controller
                         'state' => $state,
                         // 'exp_dlv_day' => str_replace("-", "", $exp_dlv_day),
                         // 'rel_order' => $rel_order,
-                        'req_id' => $admin_id,
+                        'req_id' => $admin_nm,
                         'req_rt' => now(),
                         'rt' => now(),
                     ]);
