@@ -537,6 +537,7 @@ class cs01Controller extends Controller {
 	 * 입고 취소
 	 */
 	public function cancelCmd($stock_no) { // 입고번호
+		$msg = '';
 
 		$sql = "
 			select * from product_stock_order where stock_no = '$stock_no' and state = 30
@@ -575,6 +576,14 @@ class cs01Controller extends Controller {
 			$rows = DB::select($sql);
 
 			foreach ($rows as $row) {
+				$sg_stock = DB::table('product_stock')->select('wqty')->where('prd_cd', $row->prd_cd)->first();
+				if ($sg_stock != null) {
+					if ($sg_stock->wqty < $row->qty) {
+						$msg = '창고재고가 부족한 상품이 존재하여 입고취소가 불가능합니다.';
+						throw new Exception($msg);
+					}
+				}
+
 				$invoice_no = $row->invoice_no;
 				$goods_no = $row->goods_no;
 				$prd_cd = $row->prd_cd;
@@ -605,7 +614,8 @@ class cs01Controller extends Controller {
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollBack();
-			return response()->json(['code' => -1, 'message' => "입고 취소를 실패하였습니다. 다시 한번 시도하여 주십시오."], 200);
+			if ($msg == '') $msg = '입고 취소를 실패하였습니다. 다시 한번 시도하여 주십시오.';
+			return response()->json(['code' => -1, 'message' => $msg], 200);
 		}
 
 		try {
