@@ -79,9 +79,14 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="goods_nm">상품명</label>
+                            <label for="item">품목</label>
                             <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value=''>
+                                <select name="item" class="form-control form-control-sm">
+                                    <option value="">전체</option>
+                                    @foreach ($items as $item)
+                                        <option value="{{ $item->cd }}">{{ $item->val }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -102,36 +107,22 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="item">품목</label>
+                            <label for="goods_nm">상품명</label>
                             <div class="flax_box">
-                                <select name="item" class="form-control form-control-sm">
-                                    <option value="">전체</option>
-                                    @foreach ($items as $item)
-                                        <option value="{{ $item->cd }}">{{ $item->val }}</option>
-                                    @endforeach
-                                </select>
+                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value=''>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="brand_cd">브랜드</label>
-                            <div class="form-inline inline_btn_box">
-                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <!-- <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="goods_nm_eng">상품명(영문)</label>
                             <div class="flax_box">
                                 <input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
                             </div>
                         </div>
-                    </div> -->
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="prd_cd">상품옵션 범위검색</label>
@@ -191,6 +182,17 @@
                         </div>
                     </div>
                 </div>
+                <div class="row search-area-ext d-none">
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="brand_cd">브랜드</label>
+                            <div class="form-inline inline_btn_box">
+                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
+                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 		</div>
 
@@ -228,6 +230,16 @@
                     </div>
                     <div class="d-flex align-items-center mb-1 mb-lg-0">
                         <i class="fas fa-arrow-right fa-sm ml-2 mr-2" aria-hidden="true"></i>
+                        <span class="mr-1">매장구분</span>
+                        <select id='store_type' name='store_type' class="form-control form-control-sm" onchange="chg_store_type();" style='width:160px;display:inline'>
+                            <option value=''>선택</option>
+                            @foreach ($store_types as $store_type)
+                                <option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="d-flex align-items-center mb-1 mb-lg-0">
+                        <i class="fas fa-arrow-right fa-sm ml-2 mr-2" aria-hidden="true"></i>
                         <span class="mr-1">매장</span>
                         <select id='store' name='store' class="form-control form-control-sm"  style='width:160px;display:inline'>
                             <option value=''>선택</option>
@@ -253,8 +265,8 @@
                     </div>
                     <div class="d-flex">
                         <select id='rel_order' name='rel_order' class="form-control form-control-sm mr-2"  style='width:70px;display:inline'>
-                            @foreach ($rel_orders as $rel_order)
-                                <option value='{{ $rel_order->code_id }}'>{{ $rel_order->code_val }}</option>
+                            @foreach ($rel_order_res as $rel_order)
+                                <option value='{{ $rel_order->code_val }}'>{{ $rel_order->code_val }}</option>
                             @endforeach
                         </select>
                         <a href="#" onclick="requestRelease();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>출고요청</a>
@@ -272,12 +284,14 @@
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
         {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
         {field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"}},
-        {field: "goods_type_nm", headerName: "상품구분", width: 60, cellStyle: StyleGoodsType},
         {field: "opt_kind_nm", headerName: "품목", width: 60, cellStyle: {"text-align": "center"}},
         {field: "brand_nm", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
 		{field: "style_no",	headerName: "스타일넘버", width:80, cellStyle: {"text-align": "center"}},
-		{field: "sale_stat_cl", headerName: "상품상태", width: 60, cellStyle: StyleGoodsState},
 		{field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 250},
+		{field: "goods_nm_eng",	headerName: "상품명(영문)", type: 'HeadGoodsNameType', width: 250},
+        {field: "prd_cd_p", headerName: "코드일련", width: 110, cellStyle: {"text-align": "center"}},
+		{field: "color", headerName: "컬러", width: 50, cellStyle: {"text-align": "center"}},
+		{field: "size", headerName: "사이즈", width: 50, cellStyle: {"text-align": "center"}},
 		{field: "goods_opt", headerName: "옵션", width: 200},
 		{headerName: "창고보유재고",
             children: [
@@ -384,6 +398,39 @@
 
     function openApi() {
         document.getElementsByClassName('sch-prdcd-range')[0].click();
+    }
+
+    // 매장구분 변경시 해당 매장 출력
+
+    function chg_store_type() {
+        let store_type = document.getElementById('store_type').value;
+
+        $.ajax({
+            method: 'post',
+            url: '/store/stock/stk15/chg-store-type',
+            data: {
+                'store_type':store_type
+                },
+            dataType: 'json',
+            success: function (res) {
+                if(res.code == 200){
+                    $('#store').empty();
+                    let select =  $("<option value=''>선택</option>");
+                    $('#store').append(select);
+
+                    for(let i = 0; i < res.stores.length; i++) {
+                        let option = $("<option value="+ res.stores[i].store_cd +">" + res.stores[i].store_nm + "</option>");
+                        $('#store').append(option);
+                    }
+
+                } else {
+                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                }
+            },
+            error: function(e) {
+                console.log(e.responseText)
+            }
+        });
     }
 </script>
 @stop

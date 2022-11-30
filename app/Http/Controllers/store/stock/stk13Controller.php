@@ -17,6 +17,14 @@ class stk13Controller extends Controller
 {
     public function index()
 	{
+		$sql = "
+			select
+				*
+			from code
+			where code_kind_cd = 'rel_order' and code_id like 'S_%'
+		";
+		$rel_order_res = DB::select($sql);
+		
         $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')->orderBy('default_yn')->get();
 
 		$values = [
@@ -27,8 +35,9 @@ class stk13Controller extends Controller
             'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
             'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
             'items'			=> SLib::getItems(), // 품목
-            'rel_orders'    => SLib::getCodes("REL_ORDER"), // 출고차수
+            // 'rel_orders'    => SLib::getCodes("REL_ORDER"), // 출고차수
             'storages'      => $storages, // 창고리스트
+			'rel_order_res'	=> $rel_order_res //판매분 출고차수
 		];
 
         return view(Config::get('shop.store.view') . '/stock/stk13', $values);
@@ -156,12 +165,11 @@ class stk13Controller extends Controller
 				pc.color,
 				pc.size,
 				o.goods_no,
-				ifnull(type.code_val, 'N/A') as goods_type_nm,
 				op.opt_kind_nm,
 				b.brand_nm, 
 				g.style_no,
-				stat.code_val as sale_stat_cl, 
 				g.goods_nm,
+				g.goods_nm_eng,
 				o.goods_opt,
 				ifnull(pss.qty, 0) as storage_qty,
 				ifnull(pss.wqty, 0) as storage_wqty,
@@ -179,8 +187,6 @@ class stk13Controller extends Controller
 				left outer join goods g on g.goods_no = o.goods_no
 				left outer join brand b on b.brand = g.brand
 				left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
-				left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
-				left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
 			where 1=1
 				and o.ord_state = 30
 				and (o.clm_state = 90 or o.clm_state = -30 or o.clm_state = 0)

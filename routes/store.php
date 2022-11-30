@@ -318,6 +318,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk15','stk15Controller@index');
         Route::get('stk15/search','stk15Controller@search');
         Route::post('stk15/request-release', 'stk15Controller@request_release');
+        Route::post('stk15/chg-store-type', 'stk15Controller@chg_store_type');
 
         // 원부자재 출고
         Route::get('stk16','stk16Controller@index');

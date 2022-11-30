@@ -161,12 +161,15 @@
             data: frm,
             dataType: 'json',
             success: function(data) {
-                if (data.code == '200') {
-                    alert('알림 전송에 성공하였습니다.');
+                if (data.code == 200) {
+                    alert(data.msg);
                     window.close();
+                    opener.close();
+                    opener.opener.Search();
+                } else if (data.code == 100) {
+                    alert(data.msg);
                 } else {
                     alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                    console.log(data);
                 }
             },
             error: function(e) {

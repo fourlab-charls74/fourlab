@@ -20,6 +20,14 @@ class stk15Controller extends Controller
 {
     public function index()
 	{
+        $sql = "
+			select
+				*
+			from code
+			where code_kind_cd = 'rel_order' and code_id like 'G_%'
+		";
+		$rel_order_res = DB::select($sql);
+
         $stores = DB::table('store')->where('use_yn', '=', 'Y')->select('store_cd', 'store_nm')->get();
         $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')->orderBy('default_yn')->get();
 
@@ -30,9 +38,10 @@ class stk15Controller extends Controller
             'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
             'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
             'items'			=> SLib::getItems(), // 품목
-            'rel_orders'    => SLib::getCodes("REL_ORDER"), // 출고차수
+            // 'rel_orders'    => SLib::getCodes("REL_ORDER"), // 출고차수
             'stores'        => $stores, // 매장리스트
             'storages'      => $storages, // 창고리스트
+            'rel_order_res' => $rel_order_res //일반출고 차수
 		];
 
         return view(Config::get('shop.store.view') . '/stock/stk15', $values);
@@ -143,6 +152,10 @@ class stk15Controller extends Controller
                 g.style_no, 
                 stat.code_val as sale_stat_cl, 
                 g.goods_nm, 
+                g.goods_nm_eng,
+                concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p,
+                pc.color,
+                pc.size,
                 p.goods_opt, 
                 '' as rel_qty
             from product_stock_storage p
@@ -213,8 +226,6 @@ class stk15Controller extends Controller
 
     // 일반출고 요청 (요청과 동시에 접수완료 처리됩니다.)
     public function request_release(Request $request) {
-        $r = $request->all();
-
         $release_type = 'G';
         $state = 20;
         $admin_id = Auth('head')->user()->id;
@@ -224,6 +235,8 @@ class stk15Controller extends Controller
         $exp_dlv_day = $request->input("exp_dlv_day", '');
         $rel_order = $request->input("rel_order", '');
         $data = $request->input("products", []);
+        $exp_day = str_replace("-", "", $exp_dlv_day);
+        $exp_dlv_day_data = substr($exp_day,2,6);
 
         try {
             DB::beginTransaction();
@@ -249,8 +262,8 @@ class stk15Controller extends Controller
                         'store_cd' => $store_cd,
                         'storage_cd' => $storage_cd,
                         'state' => $state,
-                        'exp_dlv_day' => str_replace("-", "", $exp_dlv_day),
-                        'rel_order' => $rel_order,
+                        'exp_dlv_day' => $exp_dlv_day_data,
+                        'rel_order' =>  $exp_dlv_day_data . '-' . $rel_order,
                         'req_id' => $admin_id,
                         'req_rt' => now(),
                         'rec_id' => $admin_id,
@@ -356,5 +369,43 @@ class stk15Controller extends Controller
 		}
 
         return response()->json(["code" => $code, "msg" => $msg]);
+    }
+
+    public function chg_store_type(Request $request)
+    {
+        $store_type = $request->input('store_type');
+
+        try {
+            DB::beginTransaction();
+
+            if ($store_type == '') {
+                $sql = "
+                    select 
+                        store_nm,
+                        store_cd
+                    from store
+                ";
+            } else {
+                $sql = "
+                    select 
+                        store_nm,
+                        store_cd
+                    from store
+                    where store_type = '$store_type'
+                ";
+            }
+			
+            $stores = DB::select($sql);
+
+			DB::commit();
+            $code = 200;
+            $msg = "";
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+        return response()->json(["code" => $code, "msg" => $msg, 'stores' => $stores]);
     }
 }

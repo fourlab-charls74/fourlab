@@ -1574,7 +1574,6 @@ class ord01Controller extends Controller
 				left outer join code pay_stat on (a.pay_stat = pay_stat.code_id and pay_stat.code_kind_cd = 'G_PAY_STAT')
 				left outer join code dlv_type on (a.dlv_type = dlv_type.code_id and dlv_type.code_kind_cd = 'G_G_DLV_TYPE')
 			";
-
 		} else if($cmd == "popup"){ // 주문검색 쿼리
 
 			$sql = " /* [$id][$ip] admin : order/ord01.php (2) */
@@ -1830,7 +1829,7 @@ class ord01Controller extends Controller
                     if($order_gift_no != ""){
 						//$gift = new Gift( $user );
 						$gift = new Gift();
-                        $gift->SetRefundGiftAmt($order_gift_no, $ord_opt_no, '0');
+                        $gift->SetRefundGiftAmt($order_gift_no, $ord_opt_no, '');
                         $gift->Refund( $ord_no, $ord_opt_no );
                     }
                 }

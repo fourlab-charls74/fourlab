@@ -114,16 +114,6 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="goods_nm">상품명</label>
-                                <div class="flax_box">
-                                    <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value=''>
-                                </div>
-                            </div>
-                        </div>                        
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
                                 <label for="prd_cd">상품옵션 범위검색</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input-box w-100">
@@ -135,13 +125,22 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>                    
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4 inner-td">
+                            <div class="form-group">
+                                <label for="goods_nm">상품명</label>
+                                <div class="flax_box">
+                                    <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value=''>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="brand_cd">브랜드</label>
-                                <div class="form-inline inline_btn_box">
-                                    <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-                                    <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                <label for="goods_nm_eng">상품명(영문)</label>
+                                <div class="flax_box">
+                                    <input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
                                 </div>
                             </div>
                         </div>
@@ -192,9 +191,10 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="goods_nm_eng">상품명(영문)</label>
-                                <div class="flax_box">
-                                    <input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
+                                <label for="brand_cd">브랜드</label>
+                                <div class="form-inline inline_btn_box">
+                                    <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
+                                    <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                 </div>
                             </div>
                         </div>
@@ -279,7 +279,7 @@
                         </div>
                         <div class="d-flex">
                             <select id='rel_order' name='rel_order' class="form-control form-control-sm mr-2"  style='width:70px;display:inline'>
-                                @foreach ($rel_orders as $rel_order)
+                                @foreach ($rel_order_res as $rel_order)
                                     <option value='{{ $rel_order->code_id }}'>{{ $rel_order->code_val }}</option>
                                 @endforeach
                             </select>
@@ -296,17 +296,16 @@
     <script language="javascript">
         let columns = [
             {field: "store_nm" , headerName: "매장", rowGroup: true, hide: true, width: 230, pinned: "left", checkboxSelection: true},
-            {field: "prd_cd_sm", headerName: "상품코드", width: 120, pinned: "left", cellStyle: {"text-align": "center"}, checkboxSelection: true},
             {field: "prd_cd" , headerName: "바코드", width: 110, cellStyle: {"text-align": "center"}},
+            {field: "prd_cd_sm", headerName: "코드일련", width: 120, pinned: "left", cellStyle: {"text-align": "center"}, checkboxSelection: true},
             {field: "color", headerName: "컬러", width: 50, cellStyle: {"text-align": "center"}},
             {field: "size", headerName: "사이즈", width: 50, cellStyle: {"text-align": "center"}},
             {field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"}},
-            {field: "goods_type_nm", headerName: "상품구분", width: 60, cellStyle: StyleGoodsTypeNM},
             {field: "opt_kind_nm", headerName: "품목", width: 60, cellStyle: {"text-align": "center"}},
             {field: "brand_nm", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
             {field: "style_no",	headerName: "스타일넘버", width: 80, cellStyle: {"text-align": "center"}},
-            {field: "sale_stat_cl", headerName: "상품상태", width: 60, cellStyle: StyleGoodsState},
             {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 250},
+            {field: "goods_nm_eng",	headerName: "상품명(영문)", type: 'HeadGoodsNameType', width: 250},
             {field: "goods_opt", headerName: "옵션", width: 200},
             {
                 headerName: '(대표)창고재고', // 대표창고의 재고를 조회

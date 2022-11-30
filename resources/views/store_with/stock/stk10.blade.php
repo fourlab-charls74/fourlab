@@ -165,7 +165,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row search-area-ext d-none">
+                <div class="row">
                     
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">

@@ -17,6 +17,14 @@ class stk12Controller extends Controller
 {
     public function index()
 	{
+        $sql = "
+            select
+                *
+            from code
+            where code_kind_cd = 'rel_order' and code_id like 'F_%'
+        ";
+        $rel_order_res = DB::select($sql);
+
         $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')->orderBy('default_yn')->get();
 
 		$values = [
@@ -26,8 +34,9 @@ class stk12Controller extends Controller
             'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
             // 'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
             'items'			=> SLib::getItems(), // 품목
-            'rel_orders'    => SLib::getCodes("REL_ORDER"), // 출고차수
+            // 'rel_orders'    => SLib::getCodes("REL_ORDER"), // 출고차수
             'storages'      => $storages, // 창고리스트
+            'rel_order_res' => $rel_order_res //초도출고차수
 		];
 
         return view(Config::get('shop.store.view') . '/stock/stk12', $values);
@@ -216,8 +225,6 @@ class stk12Controller extends Controller
 
     // 초도출고 요청 (요청과 동시에 접수완료 처리됩니다.)
     public function request_release(Request $request) {
-        $r = $request->all();
-
         $release_type = 'F';
         $state = 20;
         $admin_id = Auth('head')->user()->id;
@@ -226,6 +233,8 @@ class stk12Controller extends Controller
         $exp_dlv_day = $request->input("exp_dlv_day", '');
         $rel_order = $request->input("rel_order", '');
         $data = $request->input("products", []);
+        $exp_day = str_replace("-", "", $exp_dlv_day);
+        $exp_dlv_day_data = substr($exp_day,2,6);
         
         try {
             DB::beginTransaction();
@@ -258,8 +267,8 @@ class stk12Controller extends Controller
                             'store_cd' => $store_cd,
                             'storage_cd' => $storage_cd,
                             'state' => $state,
-                            'exp_dlv_day' => str_replace("-", "", $exp_dlv_day),
-                            'rel_order' => $rel_order,
+                            'exp_dlv_day' => $exp_dlv_day_data,
+                            'rel_order' =>  $exp_dlv_day_data . '-' . $rel_order,
                             'req_id' => $admin_id,
                             'req_rt' => now(),
                             'rec_id' => $admin_id,

@@ -749,6 +749,7 @@ class sal01Controller extends Controller
 					"baesong_kind" 	=> $order["baesong_kind"],
 
 					"dlv_comment" 	=> @$order["dlv_comment"],
+					"dlv_end_date"  => $ord_date,
 					"admin_id" 		=> $admin_id,
 					"sales_com_fee" => @$order["sales_com_fee"],
 					"ord_date"      => $ord_date,

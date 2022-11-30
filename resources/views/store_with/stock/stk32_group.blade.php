@@ -244,9 +244,12 @@
                 data: frm,
                 dataType: 'json',
                 success: function(data) {
-                    if (data.code == '200') {
+                    if (data.code == 200) {
                         alert('그룹추가에 성공하였습니다.');
                         location.reload();
+                    } else if (data.code == 100) {
+                        alter('그룹명이 같은 그룹이 있습니다. 다른 그룹명을 입력해주세요.');
+                        return false;
                     } else {
                         alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
                     }
@@ -291,8 +294,6 @@
             // frm += "&del_group_cd=" + del_group_arr.join(',');
             frm += "&add_store=" + add_newData.join(',');
             
-            console.log(frm);
-
             $.ajax({
                 method: 'post',
                 url: '/store/stock/stk32/mod_group',

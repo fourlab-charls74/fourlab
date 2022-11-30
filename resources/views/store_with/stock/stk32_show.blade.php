@@ -53,8 +53,8 @@
                                             </tbody>
                                         </table>
                                         <div style="text-align:center;margin-top:7px;margin-bottom:-14px;">
-                                            <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                                            <a href="#" id="search_sbtn2" onclick="Search2();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                                            <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 매장조회</a>
+                                            <a href="#" id="search_sbtn2" onclick="Search2();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 그룹조회</a>
                                         </div>                                    
                                     </div>
                                 </div>
@@ -112,7 +112,7 @@
         {headerName: "매장코드", field: "store_cd",width:100, cellStyle: {'text-align':'center' }},
         {headerName: "매장명", field: "store_nm",  width:200, cellClass: 'hd-grid-code'},
         {headerName: "연락처", field: "mobile",  width:100, cellClass: 'hd-grid-code'},
-        {headerName: "그룹명", field: "store_group", width: 150, cellClass: 'hd-grid-code'},
+        // {headerName: "그룹명", field: "store_group", width: 150, cellClass: 'hd-grid-code'},
         {width: 'auto'}
     ];
 
@@ -120,6 +120,7 @@
     let g_columns = [
         {headerName: '', headerCheckboxSelection: true, checkboxSelection: true, width:28, pinned:'left'},
         {headerName: "그룹명", field: "group_nm",width:100, cellStyle: {'text-align':'center' }},
+        {headerName: "그룹매장명", field: "group_store_nm",width:300, cellStyle: {'text-align':'center' }},
         {headerName: "그룹코드", field: "group_cd", hide:true},
         {width: 'auto'}
     ];     
@@ -183,9 +184,6 @@
 
         let check_radio = $('input[name=div_store]:checked').val();
 
-        console.log(check_radio);
-
-        
         for (let i=0; i<rows.length; i++) {
             store_cd += rows[i].store_cd + ',';
         }
@@ -201,8 +199,12 @@
         }
         const sc3 = group_cd.replace(/,\s*$/, "");
 
-        const url = '/store/stock/stk32/sendMsg?store_cd=' + sc + '&group_nm=' + sc2 + '&group_cd=' + sc3 + '&check=' + check_radio;
-        const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=615");
+        if(rows.length < 1 && rows2.length < 1) {
+            alert('적어도 한 개 이상의 매장을 선택해주세요');
+        } else {
+            const url = '/store/stock/stk32/sendMsg?store_cd=' + sc + '&group_nm=' + sc2 + '&group_cd=' + sc3 + '&check=' + check_radio;
+            const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=615");
+        }
     }
 
     function openGroupPopup() {
