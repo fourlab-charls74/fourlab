@@ -293,29 +293,37 @@
             checkboxSelection: STATE > 0 && STATE < 30,
             hide: !(STATE > 0 && STATE < 30),
         },
-        {field:"item" ,headerName:"품목",pinned:'left',width:90, cellStyle: {'text-align': 'center'}},
-
+        {headerName: "상품코드", field:"prd_cd", width: 120, pinned: 'left', cellStyle: StyleLineHeight},
+        {headerName: "상품번호", field:"goods_no", width: 70, pinned: 'left', cellStyle: StyleLineHeight},
+        {field: "goods_nm", headerName: "상품명", type: "HeadGoodsNameType", width: 180, pinned: 'left'},
+        {field: "goods_nm_eng", headerName:"상품명(영문)", width: 180},
+        {field: "prd_cd_p", headerName: "코드일련", width: 90, cellStyle: StyleLineHeight},
+        {field: "color", headerName: "컬러", width: 55, cellStyle: StyleLineHeight},
+        {field: "size", headerName: "사이즈", width: 55, cellStyle: StyleLineHeight},
+        {field: "opt_kor", headerName: "옵션", width: 150},
+        {field: "item" ,headerName: "품목", width: 70, cellStyle: StyleLineHeight},
         // 기존 서비스에서는 브랜드와 스타일 넘버도 수정이 가능하였지만, 논의 후 불필요한 것으로 판단되어 제거
-        {field:"brand" ,headerName:"브랜드",pinned:'left',width:90, cellStyle: {'text-align': 'center'},
+        {field:"brand" ,headerName:"브랜드", width: 70, cellStyle: StyleLineHeight,
             // cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99'} : null ,
             // editable: params => checkIsEditable(params)
         },
-        {field:"style_no" ,headerName:"스타일넘버",pinned:'left',width:80, cellStyle: {'text-align': 'center'},
+        {field:"style_no" ,headerName:"스타일넘버", width: 80, cellStyle: StyleLineHeight,
             // cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99'} : null ,
             // editable: params => checkIsEditable(params)
         },
-        {headerName:"상품코드", field:"prd_cd", width: 120, pinned:'left', cellStyle:{'text-align': 'center'}},
-        {field:"goods_nm", headerName:"상품명", type:"HeadGoodsNameType", width:250, pinned:'left'},
-        {field:"opt_kor", headerName:"옵션", pinned:'left', width:200},
-        // {field: "in_qty", headerName: "입고수량", type:'currencyType'},
         {field: "total_qty", headerName: "총재고", type:'currencyType', width: 60},
         {field: "sg_qty", headerName: "창고재고", type:'currencyType', width: 60},
-        // {headerName: "수량", field: "qty", width: 60,
-        {headerName: "입고수량", field: "qty", width: 60,
+        @if(@$state < 40)
+        {headerName: "수량(예정)", field: "exp_qty", width: 70,
             editable: params => checkIsEditable(params),
             cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99', textAlign: 'right'} : {textAlign: 'right'},
         },
-        {headerName: "단가", field: "unit_cost", width: 80,
+        @endif
+        {headerName: "수량(확정)", field: "qty", width: 70,
+            editable: params => checkIsEditable(params),
+            cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99', textAlign: 'right'} : {textAlign: 'right', color: '#2aa876', fontWeight: 'bold'},
+        },
+        {headerName: "단가", field: "unit_cost", width: 90,
             editable: params => checkIsEditable(params),
             cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99', textAlign: 'right'} : {textAlign: 'right'},
             valueFormatter: numberFormatter,
@@ -333,7 +341,9 @@
         {headerName: "총원가(원, VAT별도)", field: "total_cost_novat", width: 130, cellStyle:{'text-align': 'right'}, 
             valueFormatter: KRWFormatter
         },
-        {headerName: "최근입고일자", field: "stock_date", width:90, cellStyle: {"text-align" : 'center'}},
+        {field: "goods_sh", headerName: "TAG가", width: 70, type: "currencyType"},
+        {field: "price", headerName: "판매가", width: 70, type: "currencyType"},
+        {headerName: "최근입고일자", field: "stock_date", width: 90, cellStyle: StyleLineHeight},
         {width:"auto"}
     ];
 
@@ -346,7 +356,7 @@
     });
     let gx;
 
-    const pinnedRowData = [{ item: '합계', unit_total_cost: 0, cost: 0, total_cost: 0, count: 0 }];
+    const pinnedRowData = [{ prd_cd: '합계', unit_total_cost: 0, cost: 0, total_cost: 0, count: 0 }];
     
     $(document).ready(() => {
         pApp.ResizeGrid(200);
@@ -406,7 +416,7 @@
     var addRow = (row) => { // goods_api에서 opener 함수로 사용하기 위해 var로 선언
         const count = gx.gridOptions.api.getDisplayedRowCount();
         row = { ...row, 
-            item: row.opt_kind_nm, qty: 0, cost: 0, unit_cost: 0, unit_total_cost: 0, total_cost: 0, total_cost_novat: 0,
+            item: row.opt_kind_nm, qty: 0, exp_qty: 0, cost: 0, unit_cost: 0, unit_total_cost: 0, total_cost: 0, total_cost_novat: 0,
             isEditable: true, count: count + 1, opt_kor: row.goods_opt
         };
         gx.gridOptions.api.applyTransaction({add : [row]});
@@ -547,7 +557,7 @@
     const checkValidateData = async (row) => {
         
         const row_index = row.count - 1;
-        const { qty, unit_cost, goods_no, style_no } = row;
+        const { qty, exp_qty, unit_cost, goods_no, style_no } = row;
 
         // if (isNaN(parseInt(goods_no))) {
         //     gx.gridOptions.api.stopEditing(); // stop editing
@@ -556,10 +566,10 @@
         //     node.setSelected(true);
         //     return false;
         // }
-
-        if (qty == "" || qty == 0) { // check qty
+        
+        if ((qty || 0) == 0 && (exp_qty || 0) == 0) { // check qty
             gx.gridOptions.api.stopEditing(); // stop editing
-            alert('입고수량을 입력해 주십시오.');
+            alert('입고수량(확정) 또는 입고수량(예정)을 입력해 주십시오.');
             startEditingCell(row_index, 'qty');
             return false;
         }
@@ -682,10 +692,13 @@
         if (params.oldValue !== params.newValue) {
             const row = params.data;
             const ff = document.search;
+            if (params.column?.colId === "exp_qty") {
+                row.qty = row.exp_qty; // 수량(예정) 입력 시 수량(확정) 값 동일하게 입력
+            }
             if (row.goods_no > 0) {
                 const [ unit, exchange_rate, custom_tax_rate ] = [ ff.currency_unit.value, unComma(ff.exchange_rate.value), ff.custom_tax_rate.value ];
                 await calProduct(row, unit, exchange_rate, custom_tax_rate);
-                checkOption(row);
+                // checkOption(row);
             }
         }
         updatePinnedRow();
@@ -693,7 +706,9 @@
 
     const calProduct = async (row, unit, exchange_rate, custom_tax_rate) => {
 
-        const qty = row.qty ? parseInt(row.qty) : 0;
+        const qty = !!(row.qty != 0 && row.qty) ? parseInt(row.qty) 
+            : !!(row.exp_qty != 0 && row.exp_qty) ? parseInt(row.exp_qty) 
+            : 0;
         let unit_cost;
         unit_cost = row.unit_cost ? row.unit_cost : 0;
 
@@ -945,8 +960,9 @@
 			'A': 'prd_cd',
 			'B': 'goods_no',
 			'C': 'opt_kor',
-            'D': 'qty',
-            'E': 'unit_cost',
+            'D': 'exp_qty',
+            'E': 'qty',
+            'F': 'unit_cost',
 		};
 
 		var rowIndex = 5; // 엑셀 5번째 줄부터 시작 (샘플데이터 참고)
@@ -957,18 +973,19 @@
 			let row = {};
 			Object.keys(columns).forEach((column) => {
 				if(worksheet[column + rowIndex] !== undefined) {
-                    if(column === 'E')
+                    if(column === 'F')
 					    row[columns[column]] = worksheet[column + rowIndex].v;
                     else
 					    row[columns[column]] = worksheet[column + rowIndex].w;
 				}
 			});
             
-            row.qty = row.qty ? row.qty : 0; // 수량
-            row.goods_no = row.goods_no ? row.goods_no : "";
-            row.unit_cost = row.unit_cost ? row.unit_cost : 0;  // 단가
-            row.unit_total_cost = row.unit_total_cost ? row.unit_total_cost : 0;  // 금액
-            row.opt_kor = row.opt_kor ? row.opt_kor : "";
+            row.exp_qty ??= 0; // 수량(예정)
+            row.qty ??= 0; // 수량(확정)
+            row.goods_no ??= "";
+            row.unit_cost ??= 0;  // 단가
+            row.unit_total_cost ??= 0;  // 금액
+            row.opt_kor ??= "";
             row = { ...row, 
                 count: ++count, item: "", cost: 0, total_cost: 0, total_cost_novat: 0, isEditable: true, goods_no: "검사중..."
             };

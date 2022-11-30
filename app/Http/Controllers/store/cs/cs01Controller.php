@@ -79,8 +79,8 @@ class cs01Controller extends Controller {
 				b.stock_no, b.invoice_no, ar.code_val as area_type,
 				b.stock_date, cd.code_val as state_nm, c.com_nm, s.item,
 				b.currency_unit,b.exchange_rate,b.custom_amt, b.custom_tax,b.custom_tax_rate,
-				s.qty, s.total_cost,
-				ifnull((select sum(qty) from stock_product_buy_order where stock_no = b.stock_no),0) as buy_order_qty,
+				s.qty, s.exp_qty, s.total_cost,
+				-- ifnull((select sum(qty) from stock_product_buy_order where stock_no = b.stock_no),0) as buy_order_qty,
 				s.item_cds as item_cds,
 			    b.req_id,
 				(select name from mgr_user where id = b.req_id) as req_nm, 
@@ -99,9 +99,9 @@ class cs01Controller extends Controller {
                 b.rej_rt
 			from product_stock_order b
 				inner join (
-					select p.stock_no,group_concat(distinct p.item) as item,
+					select p.stock_no, group_concat(distinct p.item) as item,
 					group_concat(distinct o.opt_kind_cd) as item_cds,
-					sum(p.qty) as qty, sum(cost * qty) as total_cost
+					sum(p.qty) as qty, sum(p.exp_qty) as exp_qty, sum(cost * qty) as total_cost
 					from product_stock_order b inner join product_stock_order_product p on b.stock_no = p.stock_no
 						left outer join opt o on p.item = o.opt_kind_nm
 					$where
@@ -695,22 +695,39 @@ class cs01Controller extends Controller {
 	public function listProduct($stock_no) {
 		$sql = "
 			select
-				if(state = 30 or state = -10,'0','2') as chk,
-				stock_prd_no as stock_prd_no,
-				s.item,s.brand,s.style_no,s.goods_no,s.prd_cd,g.goods_nm, g.brand_nm,
-				ifnull(( select goods_opt from product_stock
-						where goods_no = s.goods_no and prd_cd = s.prd_cd and goods_opt = s.opt_kor),concat('err:',ifnull(s.opt_kor, ''))) as opt_kor,
-				s.qty as qty,
-				ps.in_qty,
-				ps.qty as total_stock_qty,
-				s.unit_cost as unit_cost,
-				(s.unit_cost * s.qty) as unit_total_cost,
-				s.cost as cost,
-				(s.cost * s.qty) as total_cost,
-				(s.cost_notax * s.qty) as total_cost_novat,
-				s.stock_date as stock_date		
-			from product_stock_order_product s inner join goods g
-				on s.goods_no = g.goods_no
+				if(state = 30 or state = -10,'0','2') as chk
+				, stock_prd_no as stock_prd_no
+				, s.item
+				, s.brand
+				, s.style_no
+				, s.goods_no
+				, s.prd_cd
+				, g.goods_nm
+				, g.goods_nm_eng
+				, g.brand_nm
+				, g.goods_sh
+				, g.price
+				, ifnull(
+					(select goods_opt from product_stock where goods_no = s.goods_no and prd_cd = s.prd_cd and goods_opt = s.opt_kor)
+					, concat('err:',ifnull(s.opt_kor, ''))
+				  ) as opt_kor
+				, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
+				, pc.color
+				, pc.size
+				, ifnull(s.exp_qty, 0) as exp_qty
+				, ifnull(s.qty, 0) as qty
+				, ps.in_qty
+				, ps.qty as total_qty
+				, ps.wqty as sg_qty
+				, s.unit_cost as unit_cost
+				, (s.unit_cost * s.qty) as unit_total_cost
+				, s.cost as cost
+				, (s.cost * s.qty) as total_cost
+				, (s.cost_notax * s.qty) as total_cost_novat
+				, date_format(s.stock_date, '%Y-%m-%d') as stock_date
+			from product_stock_order_product s
+				inner join product_code pc on pc.prd_cd = s.prd_cd
+				inner join goods g on s.goods_no = g.goods_no
 				inner join product_stock ps on s.prd_cd = ps.prd_cd
 			where stock_no = '$stock_no'
 			order by stock_prd_no asc
@@ -738,7 +755,7 @@ class cs01Controller extends Controller {
 				for ($i=0; $i<count($products); $i++) {
 
 					$row = $products[$i];
-					$stock_prd_no = $row['count'];
+					$stock_prd_no = $row['stock_prd_no'] ?? 0;
 
 					if ($type == "A" && $stock_prd_no > 0) {
 					} else {
@@ -747,7 +764,7 @@ class cs01Controller extends Controller {
 						$style_no = $row['style_no'];
 						$goods_no = $row['goods_no'];
 						$prd_cd = $row['prd_cd'];
-
+						
 						if ($goods_no > 0) {
 							$unit_cost = str_replace(",","",str_replace("\\","",$row['unit_cost']));
 							$cost = str_replace(",","",$row['cost']);
@@ -763,16 +780,17 @@ class cs01Controller extends Controller {
 							if ($opt == "") $opt = "NONE";
 
 							$qty = $row['qty'];
+							$exp_qty = $row['exp_qty'];
 
-							if ($opt != "" && $qty > 0) {
+							if ($opt != "" && ($qty > 0 || $exp_qty > 0)) {
 
 								$sql = "
 									insert into product_stock_order_product
 									( stock_no,invoice_no,com_id,item,brand,style_no, prd_cd, goods_no,goods_sub,opt_kor,
-										qty,unit_cost,cost_notax,cost,state,stock_date,id,rt,ut ) values
+										exp_qty,qty,unit_cost,cost_notax,cost,state,stock_date,id,rt,ut ) values
 									( '${stock_no}', '${invoice_no}',
 										'${com_id}', '${item}', '${brand}','${style_no}', '${prd_cd}', '${goods_no}','0','${opt}',
-										'${qty}','${unit_cost}','${cost_notax}','${cost}','${state}','${stock_date}','${id}',now(),now())
+										'${exp_qty}','${qty}','${unit_cost}','${cost_notax}','${cost}','${state}','${stock_date}','${id}',now(),now())
 								";
 
 								DB::insert($sql);
@@ -933,7 +951,11 @@ class cs01Controller extends Controller {
 			select 
 				pc.prd_cd
 				, pc.goods_no
+				, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
+				, pc.color
+				, pc.size
 				, g.goods_nm
+				, g.goods_nm_eng
 				, g.style_no
 				, pc.goods_opt as opt_kor
 				, g.opt_kind_cd
@@ -944,7 +966,8 @@ class cs01Controller extends Controller {
 				, g.com_id
 				, g.brand as brand_cd
 				, b.brand_nm as brand
-				, ps.qty as total_stock_qty
+				, ps.qty as total_qty
+				, ps.wqty as sg_qty
 			from product_code pc
 				left outer join product_stock ps on ps.prd_cd = pc.prd_cd
 				left outer join goods g on g.goods_no = pc.goods_no
@@ -972,46 +995,11 @@ class cs01Controller extends Controller {
 
 			$row->goods_nm = '상품정보 없음';
 			$row->goods_no = null;
-			$row->total_stock_qty = 0;
+			$row->total_qty = 0;
+			$row->sg_qty = 0;
 		}
 
 		return response()->json(['code' => 1, 'good' => $row], 200);
-
-		// $cnt = 0;
-		// $where = "";
-
-		// $sql = "
-		// 	select opt_kind_cd,brand,goods_no,goods_sub,goods_nm,com_type 
-		// 	from goods
-		// 	where style_no = '${style_no}' and sale_stat_cl > 0 ${where} 
-		// 	limit 0,2
-		// ";
-
-		// $goods = (object)[];
-		// foreach ($rows as $row) {
-		// 	$goods->item = $row->opt_kind_cd;
-		// 	$goods->brand = $row->brand;
-		// 	$goods->goods_no = $row->goods_no;
-		// 	$goods->goods_sub = $row->goods_sub;
-		// 	$goods->goods_nm = $row->goods_nm;
-		// 	$goods->com_type = $row->com_type;
-		// 	$cnt++;
-		// }
-	
-		// if ($cnt == 0) {
-		// 	$error_msg = "상품없음";
-		// 	return response()->json(['code' => 0, 'message' => $error_msg], 200);
-		// } else if ($cnt > 1) {
-		// 	$error_msg = "상품중복";
-		// 	return response()->json(['code' => -1, 'message' => $error_msg], 200);
-		// } else if ($cnt == 1) {
-		// 	if ($goods->com_type == 1){
-		// 		return response()->json(['code' => 1, 'good' => $goods], 200);
-		// 	} else {
-		// 		$error_msg = "입점상품";
-		// 		return response()->json(['code' => -1, 'message' => $error_msg], 200);
-		// 	}
-		// }
 	}
 
 	/**
