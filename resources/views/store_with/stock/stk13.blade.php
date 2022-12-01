@@ -178,12 +178,12 @@
                     <div class="row search-area-ext d-none">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="goods_stat">상품상태</label>
+                                <label for="item">품목</label>
                                 <div class="flax_box">
-                                    <select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
-                                        <option value=''>전체</option>
-                                        @foreach ($goods_stats as $goods_stat)
-                                            <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
+                                    <select name="item" class="form-control form-control-sm">
+                                        <option value="">전체</option>
+                                        @foreach ($items as $item)
+                                            <option value="{{ $item->cd }}">{{ $item->val }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -209,21 +209,6 @@
                                             <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row search-area-ext d-none">
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="item">품목</label>
-                                <div class="flax_box">
-                                    <select name="item" class="form-control form-control-sm">
-                                        <option value="">전체</option>
-                                        @foreach ($items as $item)
-                                            <option value="{{ $item->cd }}">{{ $item->val }}</option>
-                                        @endforeach
-                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -296,16 +281,16 @@
     <script language="javascript">
         let columns = [
             {field: "store_nm" , headerName: "매장", rowGroup: true, hide: true, width: 230, pinned: "left", checkboxSelection: true},
-            {field: "prd_cd" , headerName: "바코드", width: 110, cellStyle: {"text-align": "center"}},
-            {field: "prd_cd_sm", headerName: "코드일련", width: 120, pinned: "left", cellStyle: {"text-align": "center"}, checkboxSelection: true},
-            {field: "color", headerName: "컬러", width: 50, cellStyle: {"text-align": "center"}},
-            {field: "size", headerName: "사이즈", width: 50, cellStyle: {"text-align": "center"}},
+            {field: "prd_cd" , headerName: "상품코드",  pinned: "left", width: 150, cellStyle: {"text-align": "center"}, checkboxSelection: true},
             {field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"}},
             {field: "opt_kind_nm", headerName: "품목", width: 60, cellStyle: {"text-align": "center"}},
             {field: "brand_nm", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
             {field: "style_no",	headerName: "스타일넘버", width: 80, cellStyle: {"text-align": "center"}},
             {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 250},
             {field: "goods_nm_eng",	headerName: "상품명(영문)", type: 'HeadGoodsNameType', width: 250},
+            {field: "prd_cd_sm", headerName: "코드일련", width: 120, cellStyle: {"text-align": "center"}},
+            {field: "color", headerName: "컬러", width: 50, cellStyle: {"text-align": "center"}},
+            {field: "size", headerName: "사이즈", width: 50, cellStyle: {"text-align": "center"}},
             {field: "goods_opt", headerName: "옵션", width: 200},
             {
                 headerName: '(대표)창고재고', // 대표창고의 재고를 조회

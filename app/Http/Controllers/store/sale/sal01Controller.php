@@ -923,7 +923,7 @@ class sal01Controller extends Controller
 		 * 초기 값 설정
 		 */
 		$order['goods_sub'] = 0;
-		$order['out_ord_no'] = 0;
+		$order['out_ord_no'] = '';
 		$order['dlv_amt'] = 0;
 		$order['point_amt'] = 0;
 		$order['coupon_amt'] = 0;
