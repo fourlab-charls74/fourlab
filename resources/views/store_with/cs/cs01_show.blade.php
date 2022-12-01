@@ -48,7 +48,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-lg-6">
+                        <div class="col-lg-4">
                             <div class="form-group">
                                 <label for="com_nm" class="required">공급처</label>
                                 <div class="form-inline inline_select_box">
@@ -64,7 +64,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-6">
+                        <div class="col-lg-4">
                             <div class="form-group">
                                 <label for="invoice_no" class="required">송장번호</label>
                                 <div class="flex_box">
@@ -72,9 +72,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-6">
+                        <div class="col-lg-4">
                             <div class="form-group">
                                 <label for="" class="required">입고상태</label>
                                 <div class="flex_box">
@@ -86,11 +84,13 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-6">
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
                             <div class="form-group">
                                 <label for="formrow-firstname-input" class="required">입고일자</label>
                                 <div class="flex_box">
-                                    <div class="docs-datepicker form-inline-inner input_box">
+                                    <div class="docs-datepicker form-inline-inner input_box w-100">
                                         <div class="input-group">
                                         <?php $stock_date = substr($stock_date, 0, 4).'-'.substr($stock_date, 4, 2) . '-' . substr($stock_date, 6, 2); ?>
                                             <input type="text" class="form-control form-control-sm docs-date" id="stock_date" 
@@ -106,9 +106,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-6">
+                        <div class="col-lg-4">
                             <div class="form-group">
                                 <label for="f_sqty" class="required">환율</label>
                                 <div class="form-inline inline_select_box">
@@ -123,15 +121,15 @@
                                             ?>
                                         </select>
                                     </div>
-                                    <div class="form-inline-inner input-box w-25">
+                                    <div class="d-flex align-items-center form-inline-inner input-box w-75">
                                         <input readonly disabled type='text' class="form-control form-control-sm" name='exchange_rate' id='exchange_rate' 
                                             value='<?= $exchange_rate ? $exchange_rate : 0 ?>' style="width:100%;" onkeypress="checkFloat(this);" onkeyup="com3(this);calCustomTaxRate();" onfocus="this.select()">
+                                        <span class="ml-2">원</span>
                                     </div>
-                                    <span class="ml-2">원</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-6">
+                        <div class="col-lg-4">
                             <div class="form-group">
                                 <label for="custom_amt" class="required">(신고)금액</label>
                                 <div class="flex_box">
@@ -143,33 +141,53 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-6">
+                        <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="custom_tax">통관비</label>
+                                <label for="custom_total_amt" class="required">관세총액/관세율</label>
                                 <div class="flex_box">
-                                    <input id="custom_tax" type="text" class="form-control form-control-sm" name="custom_tax" value="<?= $custom_tax ? $custom_tax : 0 ?>"
-                                        onfocus="this.select()" onkeypress="checkFloat(this);" onkeyup="com(this);calCustomTaxRate();" <?=$currency_unit == "KRW" ? "readonly disabled" : ""?>
-                                    >
+                                    <input type="text" class="form-control form-control-sm w-75" id="custom_total_amt" name="custom_total_amt">
+                                    <div class="w-25 pl-2">
+                                        <input type="text" class="form-control form-control-sm" id="custom_rate" name="custom_rate" readonly>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-6">
+                        <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="custom_tax_rate">통관세율</label>
-                                <div class="form-inline inline_select_box">
-                                    <div class="form-inline-inner input-box w-25 mr-2">
-                                        <input readonly type='text' class="form-control form-control-sm" name='custom_tax_rate' id='custom_tax_rate' value='{{ $custom_tax_rate ? $custom_tax_rate : "" }}' style="width:100%;"
-                                            <?=$currency_unit == "KRW" ? "disabled" : ""?> onfocus="this.select()" onkeypress="checkFloat(this);"
-                                        >
+                                <label for="freight_amt" class="required">운임비/운임율</label>
+                                <div class="flex_box">
+                                    <input type="text" class="form-control form-control-sm w-75" id="freight_amt" name="freight_amt">
+                                    <div class="w-25 pl-2">
+                                        <input type="text" class="form-control form-control-sm" id="freight_rate" name="freight_rate" readonly>
                                     </div>
-                                    <span>%</span>
-                                    <a href="#" class="btn btn-sm btn-outline-primary shadow-sm ml-2" onclick="calExchange();" onfocus="this.blur()">환율 및 세율 적용</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label for="custom_tax" class="required">통관비/통관세율</label>
+                                <div class="flex_box">
+                                    <input type="text" class="form-control form-control-sm" id="custom_tax" name="custom_tax" value="<?= $custom_tax ? $custom_tax : 0 ?>"
+                                        onfocus="this.select()" onkeypress="checkFloat(this);" onkeyup="com(this);calCustomTaxRate();" <?=$currency_unit == "KRW" ? "readonly disabled" : ""?>
+                                        style="width:30%;"
+                                    >
+                                    <div class="form-inline inline_select_box pl-2" style="width:70%;">
+                                        <div class="d-flex align-items-center form-inline-inner input-box w-50">
+                                            <input readonly type='text' class="form-control form-control-sm mr-1" name='custom_tax_rate' id='custom_tax_rate' value='{{ $custom_tax_rate ? $custom_tax_rate : "" }}' style="width:100%;"
+                                                <?=$currency_unit == "KRW" ? "disabled" : ""?> onfocus="this.select()" onkeypress="checkFloat(this);"
+                                            >
+                                            <span>%</span>
+                                        </div>
+                                        <div class="w-50 pl-2">
+                                            <a href="#" class="btn btn-sm btn-outline-primary shadow-sm w-100" onclick="calExchange();" onfocus="this.blur()">환율/세율 적용</a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-6">
+                        <div class="col-lg-4">
                             <div class="form-group">
                                 <label for="area_type">위치</label>
                                 <div class="flex_box">
@@ -181,11 +199,11 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-6">
+                        <div class="col-lg-4">
                             <div class="form-group">
                                 <label for="f_sqty">파일</label>
                                 <div class="flex_box">
-                                    <div class="custom-file w-50">
+                                    <div class="custom-file" style="width: 70%;">
                                         <input name="excel_file" type="file" class="custom-file-input" id="excel_file">
                                         <label class="custom-file-label" for="file"></label>
                                     </div>
@@ -199,13 +217,14 @@
                     </div>
                 </div>
                 <div class="card mb-4" id="help" style="display: none;">
-                    <div class="d-flex card-header justify-content-between" >
+                    <div class="d-flex card-header justify-content-between pt-0" >
                         <fieldset class="FSHelp">
                             <legend class="Tip" style="font-size: 15px; color: blue;">도움말</legend>
                             <ul>
                                 <li>금액 = 단가 * 수량</li>
                                 <li>원가(원,VAT포함) = 단가 * ( 1 + 통관세율/100 ) * 환율 * 1.1</li>
                                 <li>총원가(원) = 원가(원,VAT포함) * 수량</li>
+                                <li style="color: red;">상품정보가 존재하지 않는 상품은 입고처리되지 않습니다.</li>
                             </ul>
                         </fieldset>
                     </div>
@@ -230,9 +249,6 @@
             <div class="card-body">
                 <div class="card-title mb-3">
                     <div class="filter_wrap">
-                        <div class="fl_box">
-                            <p style="color: red;">* 상품정보가 존재하지 않는 상품은 입고처리되지 않습니다.</p>
-                        </div>
                         <div class="fr_box">
                             <a href="#" onclick="deleteRows();" class="btn-sm btn btn-primary" onfocus="this.blur()">상품삭제</a>
                             <a href="#" onclick="getSearchGoods();" class="btn-sm btn btn-primary" onfocus="this.blur()">상품 가져오기</a>
@@ -332,7 +348,13 @@
         {headerName: "금액", field: "unit_total_cost", width: 80, cellStyle:{'text-align': 'right'}, 
             valueFormatter: numberFormatter
         },
-        {headerName: "원가(원, VAT포함)", field: "cost", width: 120, cellStyle:{'text-align': 'right'}, 
+        {headerName: "수입금액", field: "income_amt", width: 80, cellStyle:{'text-align': 'right'}, 
+            valueFormatter: KRWFormatter
+        },
+        {headerName: "총수입금액", field: "income_total_amt", width: 80, cellStyle:{'text-align': 'right'}, 
+            valueFormatter: KRWFormatter
+        },
+        {headerName: "개당원가(원, VAT포함)", field: "cost", width: 130, cellStyle:{'text-align': 'right'}, 
             valueFormatter: KRWFormatter
         },
         {headerName: "총원가(원)", field: "total_cost", width: 90, cellStyle:{'text-align': 'right'}, 
@@ -356,7 +378,7 @@
     });
     let gx;
 
-    const pinnedRowData = [{ prd_cd: '합계', unit_total_cost: 0, cost: 0, total_cost: 0, count: 0 }];
+    const pinnedRowData = [{ prd_cd: '합계', unit_total_cost: 0, cost: 0, total_cost: 0, count: 0, income_amt: 0, income_total_amt: 0 }];
     
     $(document).ready(() => {
         pApp.ResizeGrid(200);
@@ -416,7 +438,7 @@
     var addRow = (row) => { // goods_api에서 opener 함수로 사용하기 위해 var로 선언
         const count = gx.gridOptions.api.getDisplayedRowCount();
         row = { ...row, 
-            item: row.opt_kind_nm, qty: 0, exp_qty: 0, cost: 0, unit_cost: 0, unit_total_cost: 0, total_cost: 0, total_cost_novat: 0,
+            item: row.opt_kind_nm, qty: 0, exp_qty: 0, cost: 0, unit_cost: 0, unit_total_cost: 0, total_cost: 0, total_cost_novat: 0, income_amt: 0, income_total_amt: 0,
             isEditable: true, count: count + 1, opt_kor: row.goods_opt
         };
         gx.gridOptions.api.applyTransaction({add : [row]});
@@ -424,7 +446,7 @@
     };
 
     const updatePinnedRow = () => { // 총 금액, 원가, 총원가를 반영한 PinnedRow를 업데이트
-        let [ unit_total_cost, cost, total_cost, total_cost_novat ] = [ 0, 0, 0, 0 ];
+        let [ unit_total_cost, cost, total_cost, total_cost_novat, income_amt, income_total_amt ] = [ 0, 0, 0, 0, 0, 0 ];
         const rows = gx.getRows();
         if (rows && Array.isArray(rows) && rows.length > 0) {
             rows.map((row, idx) => {
@@ -432,11 +454,13 @@
                 cost += parseFloat(row.cost);
                 total_cost += parseFloat(row.total_cost);
                 total_cost_novat += parseFloat(row.total_cost_novat);
+                income_amt += parseFloat(row.income_amt);
+                income_total_amt += parseFloat(row.income_total_amt);
             })
         }
         let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
         gx.gridOptions.api.setPinnedTopRowData([
-            { ...pinnedRow.data, unit_total_cost: unit_total_cost, cost: cost, total_cost: total_cost, total_cost_novat: total_cost_novat }
+            { ...pinnedRow.data, unit_total_cost: unit_total_cost, cost: cost, total_cost: total_cost, total_cost_novat: total_cost_novat, income_amt: income_amt, income_total_amt: income_total_amt }
         ]);
     };
 
@@ -729,6 +753,8 @@
             cost: cost, // 원가 (원, VAT 포함)
             total_cost: total_cost, // 총원가 (원)
             total_cost_novat: total_cost_novat, // 총원가 (원, VAT 별도)
+            income_amt: 0, // 수입금액 (작업필요)
+            income_total_amt: 0, // 총수입금액 (작업필요)
         }] });
 
     };
@@ -987,7 +1013,7 @@
             row.unit_total_cost ??= 0;  // 금액
             row.opt_kor ??= "";
             row = { ...row, 
-                count: ++count, item: "", cost: 0, total_cost: 0, total_cost_novat: 0, isEditable: true, goods_no: "검사중..."
+                count: ++count, item: "", cost: 0, total_cost: 0, total_cost_novat: 0, income_amt: 0, income_total_amt: 0, isEditable: true, goods_no: "검사중..."
             };
 
             gx.gridOptions.api.applyTransaction({add : [row]}); // 한 줄씩 import
