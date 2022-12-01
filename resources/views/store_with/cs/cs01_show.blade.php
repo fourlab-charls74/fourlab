@@ -189,6 +189,14 @@
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group">
+                                <label for="bl_no">B/L No.</label>
+                                <div class="flex_box">
+                                    <input type="text" class="form-control form-control-sm" name="bl_no">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
                                 <label for="area_type">위치</label>
                                 <div class="flex_box">
                                     <select name="loc" class="form-control form-control-sm w-100">

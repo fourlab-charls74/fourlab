@@ -61,6 +61,7 @@
                             <label for="">반품창고</label>
                             <div class="d-flex">
                                 <select name='storage_cd' class="form-control form-control-sm">
+                                    <option value="">전체</option>
                                     @foreach (@$storages as $storage)
                                         <option value='{{ $storage->storage_cd }}'>{{ $storage->storage_nm }}</option>
                                     @endforeach

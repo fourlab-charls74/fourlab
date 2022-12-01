@@ -209,6 +209,7 @@
                             alert("해당 창고의 보유재고보다 많은 수량을 반품할 수 없습니다.");
                             gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
                         } else {
+                            e.node.setSelected(true);
                             e.data.total_return_price = parseInt(e.data.qty) * parseInt(e.data.return_price);
                             gx.gridOptions.api.updateRowData({update: [e.data]});
                             updatePinnedRow();
@@ -265,6 +266,9 @@
 
             let zero_qtys = rows.filter(r => r.qty < 1);
             if(zero_qtys.length > 0) return alert("반품수량이 0개인 항목이 존재합니다.");
+
+            let excess_qtys = rows.filter(r => r.qty > r.storage_wqty);
+            if(excess_qtys.length > 0) return alert("해당 창고의 보유재고보다 많은 수량을 반품할 수 없습니다.");
 
             if(!confirm("등록하시겠습니까?")) return;
 
