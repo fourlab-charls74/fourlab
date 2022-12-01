@@ -386,11 +386,8 @@
            }
         },
 		{field: "rel_order", headerName: "출고차수", width: 100, cellStyle: {"text-align": "center"}},
-        {field: "req_comment", headerName: "요청메모", width: 300, 
-            editable: function(params) {return params.data.state === 10;}, 
-            cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};}
-        },
-        {field: "comment", headerName: "거부메모", width: 300, 
+        {field: "req_comment", headerName: "매장메모", width: 300},
+        {field: "comment", headerName: "본사메모", width: 300, 
             editable: function(params) {return params.data.state === 10;}, 
             cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};}
         },

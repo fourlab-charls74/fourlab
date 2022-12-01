@@ -303,7 +303,7 @@
                     },
                 ],
             },
-            {field: "req_memo", headerName: "메모", width: 400, editable: true,cellStyle: {'background-color': '#ffff99'}},
+            {field: "req_comment", headerName: "매장메모", width: 300, editable: true,cellStyle: {'background-color': '#ffff99'}},
             {width: 'auto'}
         ];
 

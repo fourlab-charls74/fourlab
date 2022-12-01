@@ -217,7 +217,7 @@ class stk14Controller extends Controller
                         'store_cd' => $store_cd,
                         'storage_cd' => $storage_cd,
                         'state' => $state,
-                        'req_memo' => $d['req_memo'],
+                        'req_comment' => $d['req_comment'],
                         // 'exp_dlv_day' => str_replace("-", "", $exp_dlv_day),
                         // 'rel_order' => $rel_order,
                         'req_id' => $admin_id,

@@ -302,7 +302,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 초도출고
         Route::get('stk12','stk12Controller@index');
         Route::get('stk12/search','stk12Controller@search');
+        Route::get('stk12/stk12_batch','stk12Controller@batch_show'); // 엑셀 업로드
         Route::post('stk12/request-release', 'stk12Controller@request_release');
+        
 
         // 판매분출고
         Route::get('stk13','stk13Controller@index');

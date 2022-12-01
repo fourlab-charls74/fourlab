@@ -382,4 +382,10 @@ class stk12Controller extends Controller
 
         return response()->json(["code" => $code, "msg" => $msg]);
     }
+
+    public function batch_show()
+    {
+        $values = [];
+        return view(Config::get('shop.store.view') . '/stock/stk12_batch', $values);
+    }
 }

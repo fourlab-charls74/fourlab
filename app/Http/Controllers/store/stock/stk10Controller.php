@@ -504,7 +504,6 @@ class stk10Controller extends Controller
                     ->update([
                         'state' => $new_state,
                         'comment' => $d['comment'] ?? '',
-                        'req_comment' => $d['req_comment'] ?? '',
                         'fin_id' => $admin_id,
                         'fin_rt' => now(),
                         'ut' => now(),
