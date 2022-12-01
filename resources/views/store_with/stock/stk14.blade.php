@@ -256,12 +256,14 @@
             {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
             {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
             {field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"}},
-            {field: "goods_type_nm", headerName: "상품구분", width: 60, cellStyle: StyleGoodsType},
             {field: "opt_kind_nm", headerName: "품목", width: 60, cellStyle: {"text-align": "center"}},
             {field: "brand_nm", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
             {field: "style_no",	headerName: "스타일넘버", width: 80, cellStyle: {"text-align": "center"}},
-            {field: "sale_stat_cl", headerName: "상품상태", width: 60, cellStyle: StyleGoodsState},
             {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 250},
+            {field: "goods_nm_eng",	headerName: "상품명(영문)", type: 'HeadGoodsNameType', width: 250},
+            {field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: {"text-align": "center"}},
+            {field: "color",	headerName: "컬러", width: 60, cellStyle: {"text-align": "center"}},
+            {field: "size",	headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"}},
             {field: "goods_opt", headerName: "옵션", width: 200},
             {
                 headerName: '창고재고', // 대표창고의 재고를 조회
@@ -301,13 +303,14 @@
                     },
                 ],
             },
+            {field: "req_memo", headerName: "메모", width: 400, editable: true,cellStyle: {'background-color': '#ffff99'}},
             {width: 'auto'}
         ];
 
         function setColumn(store) {
             if(!store) return;
 
-            columns[11].headerName = store.store_nm;
+            columns[13].headerName = store.store_nm;
             gx.gridOptions.api.setColumnDefs(columns);
 
             gx.gridOptions.columnApi.applyColumnState({
@@ -370,6 +373,8 @@
         // 출고요청
         function requestRelease() {
             let rows = gx.getSelectedRows();
+
+            console.log(rows);
             if(rows.length < 1) return alert("출고요청할 상품을 선택해주세요.");
             if(rows.filter(r => !r.rel_qty || !r.rel_qty.trim() || r.rel_qty == 0 || isNaN(parseInt(r.rel_qty))).length > 0) return alert("선택한 상품의 배분수량을 입력해주세요.");
 

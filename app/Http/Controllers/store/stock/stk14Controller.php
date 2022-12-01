@@ -131,6 +131,11 @@ class stk14Controller extends Controller
                 g.style_no,
                 stat.code_val as sale_stat_cl,
                 g.goods_nm,
+                g.goods_nm_eng,
+                concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p,
+                pc.color,
+                pc.size,
+                g.goods_nm_eng,
                 p.goods_opt,
                 p.qty as storage_qty,
                 p.wqty as storage_wqty,
@@ -195,7 +200,6 @@ class stk14Controller extends Controller
         // $exp_dlv_day = $request->input("exp_dlv_day", '');
         // $rel_order = $request->input("rel_order", '');
         $data = $request->input("products", []);
-        
         $sql = "select storage_cd from storage where default_yn = 'Y'";
         $storage_cd = DB::selectOne($sql)->storage_cd;
 
@@ -213,6 +217,7 @@ class stk14Controller extends Controller
                         'store_cd' => $store_cd,
                         'storage_cd' => $storage_cd,
                         'state' => $state,
+                        'req_memo' => $d['req_memo'],
                         // 'exp_dlv_day' => str_replace("-", "", $exp_dlv_day),
                         // 'rel_order' => $rel_order,
                         'req_id' => $admin_id,
