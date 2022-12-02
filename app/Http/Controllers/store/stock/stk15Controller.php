@@ -107,8 +107,8 @@ class stk15Controller extends Controller
             $where .= " and g.brand = '" . $r['brand_cd'] . "'";
         if($r['goods_nm'] != null) 
             $where .= " and g.goods_nm like '%" . $r['goods_nm'] . "%'";
-        // if($r['goods_nm_eng'] != null) 
-        //     $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
+        if($r['goods_nm_eng'] != null) 
+            $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
 
         $having = "";
         if(($r['ext_storage_qty'] ?? 'false') == 'true')

@@ -36,7 +36,8 @@ class sal06Controller extends Controller
 			'edate'         => $edate,
 			'store_types'	=> $store_types,
 			'event_cds'		=> $event_cds,
-			'sale_kinds' 	=> $sale_kinds
+			'sale_kinds' 	=> $sale_kinds,
+			'items'			=> SLib::getItems(), // 품목
 		];
         return view( Config::get('shop.store.view') . '/sale/sal06', $values );
 	}
@@ -52,7 +53,8 @@ class sal06Controller extends Controller
 		$store_type = $request->input('store_type', "");
 		$store_cd = $request->input('store_cd', "");
 		$goods_no = $request->input('goods_no', "");
-		$goods_nm = $request->input("goods_nm");
+		$goods_nm = $request->input("goods_nm", "");
+		$goods_nm_eng = $request->input("goods_nm_eng", "");
         $brand_cd = $request->input("brand_cd");
 		$style_no = $request->input('style_no', "");
 
@@ -81,6 +83,7 @@ class sal06Controller extends Controller
 		}
 		
 		if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%'";
+		if ($goods_nm_eng != "") $where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%'";
 		if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%'";
 		if ($sale_kind != "") $where .= " and o.sale_kind = '" . Lib::quote($sale_kind) . "' ";
 

@@ -99,6 +99,16 @@
                             </div>
                         </div>
 					</div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="goods_nm_eng">상품명(영문)</label>
+							<div class="flex_box">
+								<input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
 					<div class="col-lg-4">
 						<div class="form-group">
 							<label for="style_no">스타일넘버/상품코드</label>
@@ -116,8 +126,19 @@
 							</div>
                         </div>
 					</div>
-				</div>
-				<div class="row">
+					<div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="item">품목</label>
+                            <div class="flax_box">
+                                <select name="item" class="form-control form-control-sm">
+                                    <option value="">전체</option>
+                                    @foreach ($items as $item)
+                                        <option value="{{ $item->cd }}">{{ $item->val }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
 					<div class="col-lg-4">
 						<div class="form-group">
                             <label for="brand_cd">브랜드</label>
@@ -127,7 +148,7 @@
                             </div>
                         </div>
 					</div>
-					<div class="col-lg-4">
+					{{-- <div class="col-lg-4">
 						<div class="form-group">
 							<label for="sale_yn">매출여부</label>
 							<div class="flex_box">
@@ -143,7 +164,7 @@
 								</div>
 							</div>
 						</div>
-					</div>
+					</div> --}}
 				</div>
 			</div>
 		</div>
@@ -215,7 +236,7 @@
 	});
 	let gx;
 	$(document).ready(function() {
-		pApp.ResizeGrid(265);
+		pApp.ResizeGrid(275);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns);
