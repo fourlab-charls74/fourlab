@@ -107,7 +107,7 @@ class mem01Controller extends Controller
                 a.job, a.interest, a.yn, a.memo, a.visit_cnt, a.opt, a.recommend_id,
                 b.ord_date, b.ord_cnt, b.ord_amt,
                 c.code_val as auth_type_nm, a.auth_type, a.auth_yn, a.auth_key, a.ipin, a.foreigner, a.mobile_cert_yn,
-                a.yyyy_chk, a.yyyy, a.mm, a.dd, a.sex
+                a.yyyy_chk, a.yyyy, a.mm, a.dd, a.sex, a.store_nm
             from $member_table a
                 left outer join member_stat b on a.user_id = b.user_id
                 left outer join code c on c.code_kind_cd = 'G_AUTH_TYPE' and c.code_id = a.auth_type

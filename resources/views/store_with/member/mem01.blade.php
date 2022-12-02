@@ -432,123 +432,123 @@
 </div>
 
 <script language="javascript">
-var columns = [
-	{
-		headerName: '',
-		headerCheckboxSelection: true,
-		checkboxSelection: true,
-		width:28,
-		pinned:'left'
-	},
-	{field:"user_id" , headerName:"아이디", pinned:'left', type:"HeadUserType", width:100  },
-	{field:"name" , headerName:"이름"},
-	{field:"sex" , headerName:"성별", width:50},
-	{field:"birth_day" , headerName:"생년월일", width:75},
-	{field:"mobile" , headerName:"휴대전화", width:100},
-	{field:"email" , headerName:"이메일", width:150},
-	{field:"point" , headerName:"적립금", type: 'currencyType', width:60},
-	{field:"regdate" , headerName:"가입일", width:85},
-	{field:"store_nm" , headerName:"가입 매장명", width:85},
-	{field:"lastdate" , headerName:"최근로그인", width:125},
-	{field:"visit_cnt" , headerName:"로그인횟수", type: 'currencyType', width:85},
-	{field:"auth_yn" , headerName:"인증여부", width:75 },
-	{field:"ord_date" , headerName:"최근주문일", width:125},
-	{field:"ord_cnt" , headerName:"구매수", type: 'currencyType', width:60},
-	{field:"ord_amt" , headerName:"구입금액", type: 'currencyType', width:75},
-	{field:"email_chk", headerName:"메일수신", width:75},
-	{field:"mobile_chk", headerName:"SMS수신", width:75},
-	{field:"yn" , headerName:"승인", width:50},
-	{field:"site" , headerName:"판매처", width:70},
-	{ width: "auto" }
-	
-];
+	var columns = [
+		{headerName:'', headerCheckboxSelection:true, checkboxSelection:true, width:28, pinned:'left'},
+		{field:"user_id", headerName:"아이디", pinned:'left', type:"HeadUserType", width:100},
+		{field:"name", headerName:"이름", width:70, cellStyle:{"text-align": "center"}},
+		{field:"sex", headerName:"성별", width:50},
+		{field:"birth_day", headerName:"생년월일", width:80},
+		{field:"mobile", headerName:"휴대전화", width:100, cellStyle:{"text-align":"center"}},
+		{field:"email", headerName:"이메일", width:150, cellStyle:{"text-align": "center"}},
+		{field:"point", headerName:"적립금", type:'currencyType', width:60},
+		{field:"regdate", headerName:"가입일", width:70, cellStyle:{"text-align": "center"}},
+		{field:"store_nm", headerName:"가입 매장명", width:170},
+		{field:"lastdate", headerName:"최근로그인", width:130},
+		{field:"visit_cnt", headerName:"로그인횟수", type:'currencyType', width:80},
+		{field:"auth_yn", headerName:"인증여부", width:70, cellStyle:{"text-align": "center"}},
+		{field:"ord_date", headerName:"최근주문일", width:125, cellStyle:{"text-align": "center"}},
+		{field:"ord_cnt", headerName:"구매수", type:'currencyType', width:60},
+		{field:"ord_amt", headerName:"구입금액", type:'currencyType', width:70},
+		{field:"email_chk", headerName:"메일수신", width:70, cellStyle:{"text-align": "center"}},
+		{field:"mobile_chk", headerName:"SMS수신", width:70, cellStyle:{"text-align": "center"}},
+		{field:"yn", headerName:"승인", width:50, cellStyle:{"text-align": "center"}},
+		{field:"site", headerName:"판매처", width:70, cellStyle:{"text-align": "center"}},
+		{width:"auto"}
+		
+	];
 
-const pApp = new App('', {gridId: "#div-gd"});
-const gridDiv = document.querySelector(pApp.options.gridId);
-const gx = new HDGrid(gridDiv, columns);
+	const pApp = new App('', {gridId: "#div-gd"});
+	const gridDiv = document.querySelector(pApp.options.gridId);
+	const gx = new HDGrid(gridDiv, columns);
 
-pApp.ResizeGrid(200);
-pApp.BindSearchEnter();
+	pApp.ResizeGrid(200);
+	pApp.BindSearchEnter();
 
-function Search() {
-	let data = $('form[name="search"]').serialize();
-	let user_group_data = "&user_group=" + $("[name='user_group']").val().join(",");
-	gx.Request('/store/member/mem01/search', data+user_group_data, 1);
-};
+	Search();
 
-function Download(fields) {
-	$('[name=fields]').val(fields);
-	let data = $('form[name="search"]').serialize();
-	location.href = '/head/member/mem01/download?' + data;
-}
+	function Search() {
+		let data = $('form[name="search"]').serialize();
+		let user_group_data = "&user_group=" + $("[name='user_group']").val().join(",");
+		gx.Request('/store/member/mem01/search', data+user_group_data, 1);
+	};
 
-$('.download-btn').click(function(){
-	const data = $('form[name="search"]').serialize();
-	const url='/head/member/mem01/download/show?' + data;
-	window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
-});
-
-$('.sms-btn').click(function(){
-	const rows = gx.getSelectedRows();
-
-	if (rows.length === 0) {
-		alert("메시지 보낼 유저를 선택해주세요.");
-		return;
+	function Download(fields) {
+		$('[name=fields]').val(fields);
+		let data = $('form[name="search"]').serialize();
+		location.href = '/head/member/mem01/download?' + data;
 	}
 
-	openSmsSend(rows[0].mobile, rows[0].name);
-});
-
-$('.point-btn').click(function(e){
-	const rows = gx.getSelectedRows();
-
-	if (rows.length === 0) {
-		alert("메시지 보낼 유저를 선택해주세요.");
-		return;
-	}
-	const user_ids = [];
-
-	rows.forEach(function(data){
-		user_ids.push(data.user_id);
+	$('.download-btn').click(function(){
+		const data = $('form[name="search"]').serialize();
+		const url='/head/member/mem01/download/show?' + data;
+		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
 	});
 
-	openAddPoint(user_ids.join(','));
-});
-
-$('.add-btn').click(function(e){
-	var url = '/head/member/mem01/show/add';
-	window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
-});
-
-$('.coupon-btn').click(function(){
-	const rows = gx.getSelectedRows();
-	const user_ids = rows.map((row) => row.user_id);
-	openCoupon(user_ids.join(','));
-});
-
-if ($('.confirm-btn').length > 0){
-	$('.confirm-btn').click(function(){
+	$('.sms-btn').click(function(){
 		const rows = gx.getSelectedRows();
 
 		if (rows.length === 0) {
-			alert("회원을 선택해주세요.");
+			alert("메시지 보낼 유저를 선택해주세요.");
 			return;
 		}
 
-		opener?.usersCallback?.(rows);
-
-		window.close();
+		openSmsSend(rows[0].mobile, rows[0].name);
 	});
-}
 
-function getToday(){
-	$('[name="mmdd"]').val('{{ $today }}');
-}
+	$('.point-btn').click(function(e){
+		const rows = gx.getSelectedRows();
 
-function Batch(){
-	const url='/store/member/mem01/batch';
-	window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
-}
+		if (rows.length === 0) {
+			alert("메시지 보낼 유저를 선택해주세요.");
+			return;
+		}
+		const user_ids = [];
+
+		rows.forEach(function(data){
+			user_ids.push(data.user_id);
+		});
+
+		openAddPoint(user_ids.join(','));
+	});
+
+	$('.add-btn').click(function(e){
+		var url = '/head/member/mem01/show/add';
+		window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
+	});
+
+	$('.coupon-btn').click(function(){
+		const rows = gx.getSelectedRows();
+		const user_ids = rows.map((row) => row.user_id);
+		openCoupon(user_ids.join(','));
+	});
+
+	if ($('.confirm-btn').length > 0){
+		$('.confirm-btn').click(function(){
+			const rows = gx.getSelectedRows();
+
+			if (rows.length === 0) {
+				alert("회원을 선택해주세요.");
+				return;
+			}
+
+			opener?.usersCallback?.(rows);
+
+			window.close();
+		});
+	}
+
+	function getToday(){
+		$('[name="mmdd"]').val('{{ $today }}');
+	}
+
+	function Batch(){
+		const url='/store/member/mem01/batch';
+		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
+	}
+
+	$( ".sch-store" ).on("click", function() {
+		searchStore.Open(null, "multiple");
+	});
 
 //openSmsSend
 </script>

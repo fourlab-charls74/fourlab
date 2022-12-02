@@ -382,6 +382,14 @@
                                             </td>
                                         </tr>
                                         <tr>
+                                            <th>가입매장</th>
+                                            <td>
+                                                <div class="txt_box">
+                                                    {{@$user->store_nm}}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
                                             <th>가입일</th>
                                             <td>
                                                 <div class="txt_box">

@@ -73,7 +73,7 @@ class mem01Controller extends Controller
 			$total = $row->cnt;
 
 			// 페이지 얻기
-			$page_cnt=(int)(($total - 1)/$page_size) + 1;
+			$page_cnt = (int)(($total - 1)/$page_size) + 1;
 			$startno = ($page - 1) * $page_size;
 		} else {
 			$startno = ($page - 1) * $page_size;
@@ -114,7 +114,7 @@ class mem01Controller extends Controller
 				d.code_val as sex, concat(ifnull(a.yyyy, ''),ifnull(a.mm, ''),ifnull(a.dd, '')) as birth_day,
 				ifnull(a.jumin1, '') as jumin,
 				a.phone, a.mobile, a.email, a.point, a.store_nm,
-				date_format(a.regdate,'%y%m%d') as regdate,
+				date_format(a.regdate,'%Y-%m-%d') as regdate,
 				a.lastdate as lastdate, a.visit_cnt,
 				a.auth_type, f.code_val as auth_type_str, a.auth_yn,
 				e.ord_date, e.ord_cnt, e.ord_amt,
@@ -148,7 +148,7 @@ class mem01Controller extends Controller
 		$sex		= Request("sex");
 		$age		= Request("age");
 		$user_group	= Request("user_group");
-		$store_nm 	= Request("store_nm");
+		$store_no 	= Request("store_no");
 
 		$sdate		= Request("sdate");
 		$edate		= Request("edate");
@@ -216,7 +216,14 @@ class mem01Controller extends Controller
 		if($last_edate != "")	$where .= " and a.lastdate < DATE_ADD('$last_edate', INTERVAL 1 DAY) ";
 		if($ord_sdate != "")	$where .= " and e.ord_date >= '$ord_sdate 00:00:00' ";
 		if($ord_edate != "")	$where .= " and e.ord_date < DATE_ADD('$ord_edate 23:59:59', INTERVAL 1 DAY) ";
-		if($store_nm != "")		$where .= " and a.store_nm = '$store_nm'";
+		if ( $store_no != "" ) {
+			$where	.= " and (1!=1";
+			foreach($store_no as $store_cd) {
+				$where .= " or a.store_cd = '$store_cd' ";
+
+			}
+			$where	.= ")";
+		}
 
 		if($mail != "")			$where .= " and a.email_chk = '$mail' ";
 		if($mobile_chk != "")	$where .= " and a.mobile_chk = '$mobile_chk' ";
