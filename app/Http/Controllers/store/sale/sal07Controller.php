@@ -30,11 +30,11 @@ class sal07Controller extends Controller
             'sdate'         => $sdate,
             'edate'         => date("Y-m-d"),
             'style_no'		=> "",
-            'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
 			'store_types'   => $store_types,
             'com_types'     => SLib::getCodes('G_COM_TYPE'),
             'items'			=> SLib::getItems(),
-            'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
+            // 'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
+            // 'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
 		];
         return view( Config::get('shop.store.view') . '/sale/sal07', $values);
 	}
@@ -48,12 +48,12 @@ class sal07Controller extends Controller
 
 		$store_type = $request->input('store_type');
 		$store_cd = $request->input('store_cd');
-		$prd_cd = $request->input('prd_cd');
+		$prd_cd = $request->input('prd_cd', '');
+		$prd_cd_range_text = $request->input("prd_cd_range", '');
 		$com_id = $request->input("com_cd");
 		$com_nm = $request->input("com_nm");
 		$com_type = $request->input("com_type");
 
-        $goods_stat = $request->input("goods_stat");
         $style_no = $request->input("style_no");
         $goods_no = $request->input("goods_no");
         $goods_nos = $request->input('goods_nos', '');       // 상품번호 textarea
@@ -62,9 +62,6 @@ class sal07Controller extends Controller
         $brand_cd = $request->input("brand_cd");
         $goods_nm = $request->input("goods_nm");
         $goods_nm_eng = $request->input("goods_nm_eng");
-
-        $type = $request->input("type");
-        $goods_type = $request->input("goods_type");
 
         $page = $request->input('page', 1);
 		if ( $page < 1 or $page == "" )	$page = 1;
@@ -78,7 +75,28 @@ class sal07Controller extends Controller
 		if ($com_type != "") $where .= " and g.com_type = '$com_type' ";
 		if ($store_type != "")	$where .= " and s.store_type = '" . $store_type . "' ";
 		if ($store_cd != "")	$where .= " and m.store_cd = '" . $store_cd . "' ";
-		if ($prd_cd != "")	$where .= " and o.prd_cd = '" . $prd_cd . "' ";
+
+		if ( $prd_cd != "" ) {
+			$prd_cd = explode(',', $prd_cd);
+			$where .= " and (1!=1";
+			foreach($prd_cd as $cd) {
+				$where .= " or o.prd_cd like '" . Lib::quote($cd) . "%' ";
+			}
+			$where .= ")";
+		}
+
+		// 상품옵션 범위검색
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				$in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc.$opt $in_query ($opt_join) ";
+			}
+		}
+
 		if ($com_id != "") $where .= " and g.com_id = '" . Lib::quote($com_id) . "'";
 		if ($com_nm != "") $where .= " and g.com_nm like '%" . Lib::quote($com_nm) . "%' ";
 
@@ -111,18 +129,6 @@ class sal07Controller extends Controller
 			}
 		}
 
-		if ($type != "") $where .= " and g.type = '" . Lib::quote($type) . "' ";
-		if ($goods_type != "") $where .= " and g.goods_type = '" . Lib::quote($goods_type) . "' ";
-		if (is_array($goods_stat)) {
-			if (count($goods_stat) == 1 && $goods_stat[0] != "") {
-				$where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat[0]) . "' ";
-			} else if (count($goods_stat) > 1) {
-				$where .= " and g.sale_stat_cl in (" . join(",", $goods_stat) . ") ";
-			}
-		} else if ($goods_stat != "") {
-			$where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
-		}
-
 		$page_size = $limit;
 		$startno = ($page - 1) * $page_size;
 		$limit = " limit $startno, $page_size ";
@@ -143,10 +149,10 @@ class sal07Controller extends Controller
 						inner join order_opt o on m.ord_no = o.ord_no 
 						inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
 						inner join goods g on o.goods_no = g.goods_no
+						inner join product_code pc on pc.prd_cd = o.prd_cd
 						left outer join store s on m.store_cd = s.store_cd
 						left outer join brand b on g.brand = b.brand
-						left outer join `code` c on c.code_kind_cd = 'g_goods_stat' and g.sale_stat_cl = c.code_id
-						left outer join `code` c2 on c2.code_kind_cd = 'g_goods_type' and g.goods_type = c2.code_id
+						left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
 					where w.`ord_state_date` >= '$sdate' and w.ord_state_date <= '$edate' and w.`ord_state` in ( '30','60','61') 
 						and o.prd_cd <> '' $where
 					group by o.prd_cd
@@ -171,16 +177,16 @@ class sal07Controller extends Controller
 				sum(w.wonga * w.qty) as sum_wonga,
 				sum(w.qty * w.price - w.wonga * w.qty) as sales_profit,
 				(sum(w.qty * w.price) / sum(w.qty * w.price - w.wonga * w.qty)) * 100 as profit_rate,
-				g.goods_type, c.code_val as sale_stat_cl_val, c2.code_val as goods_type_nm,
-				o.goods_no, g.brand, b.brand_nm, g.style_no, o.goods_opt, g.img, g.goods_nm, g.goods_nm_eng
+				o.goods_no, g.brand, b.brand_nm, g.style_no, o.goods_opt, g.img, g.goods_nm, g.goods_nm_eng,
+				opt.opt_kind_nm, pc.color, pc.size, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
 			from order_mst m 
 				inner join order_opt o on m.ord_no = o.ord_no 
 				inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
 				inner join goods g on o.goods_no = g.goods_no
+				inner join product_code pc on pc.prd_cd = o.prd_cd
 				left outer join store s on m.store_cd = s.store_cd
 				left outer join brand b on g.brand = b.brand
-				left outer join `code` c on c.code_kind_cd = 'g_goods_stat' and g.sale_stat_cl = c.code_id
-				left outer join `code` c2 on c2.code_kind_cd = 'g_goods_type' and g.goods_type = c2.code_id
+				left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
 			where w.`ord_state_date` >= '$sdate' and w.ord_state_date <= '$edate' and w.`ord_state` in ( '30','60','61') 
 				and o.prd_cd <> '' $where
 			group by o.prd_cd
