@@ -6,10 +6,14 @@
 <script src="https://unpkg.com/xlsx-style@0.8.13/dist/xlsx.full.min.js"></script>
 
 <style>
-    #help ul li {list-style: disc;list-style-position: inside;text-indent: -20px;padding-left: 20px;font-size: 13px;font-weight: 400;}
-    #help p {font-size: 14px;font-weight: 700;padding-bottom: 5px;}
+    #help legend { line-height: inherit; position: relative; width: 100%; left: 0; height: auto; z-index: 0;}
+    #help li { list-style: disc; margin-left: 25px; font-size: 13px; }
+    .wrong { color: #FF0000; }
     .form-control[readonly] {
         background: #eeeeee;
+    }
+    .form-control[readonly][name="custom_tax_rate"] {
+        background: white !important;
     }
 </style>
 <div class="py-3 px-sm-3">
@@ -44,7 +48,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-lg-4">
+                        <div class="col-lg-6">
                             <div class="form-group">
                                 <label for="com_nm" class="required">공급처</label>
                                 <div class="form-inline inline_select_box">
@@ -60,7 +64,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-6">
                             <div class="form-group">
                                 <label for="invoice_no" class="required">송장번호</label>
                                 <div class="flex_box">
@@ -68,7 +72,9 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
                             <div class="form-group">
                                 <label for="" class="required">입고상태</label>
                                 <div class="flex_box">
@@ -80,13 +86,11 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-4">
+                        <div class="col-lg-6">
                             <div class="form-group">
                                 <label for="formrow-firstname-input" class="required">입고일자</label>
                                 <div class="flex_box">
-                                    <div class="docs-datepicker form-inline-inner input_box w-100">
+                                    <div class="docs-datepicker form-inline-inner input_box">
                                         <div class="input-group">
                                         <?php $stock_date = substr($stock_date, 0, 4).'-'.substr($stock_date, 4, 2) . '-' . substr($stock_date, 6, 2); ?>
                                             <input type="text" class="form-control form-control-sm docs-date" id="stock_date" 
@@ -102,7 +106,9 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
                             <div class="form-group">
                                 <label for="f_sqty" class="required">환율</label>
                                 <div class="form-inline inline_select_box">
@@ -117,82 +123,53 @@
                                             ?>
                                         </select>
                                     </div>
-                                    <div class="d-flex align-items-center form-inline-inner input-box w-75">
+                                    <div class="form-inline-inner input-box w-25">
                                         <input readonly disabled type='text' class="form-control form-control-sm" name='exchange_rate' id='exchange_rate' 
                                             value='<?= $exchange_rate ? $exchange_rate : 0 ?>' style="width:100%;" onkeypress="checkFloat(this);" onkeyup="com3(this);calCustomTaxRate();" onfocus="this.select()">
-                                        <span class="ml-2">원</span>
                                     </div>
+                                    <span class="ml-2">원</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-6">
                             <div class="form-group">
                                 <label for="custom_amt" class="required">(신고)금액</label>
                                 <div class="flex_box">
-                                    <input type="text" class="form-control form-control-sm text-right" id="custom_amt" name="custom_amt" value="<?= $custom_amt ? $custom_amt : 0 ?>" readonly>
+                                    <input type="text" class="form-control form-control-sm" name="custom_amt" value="<?= $custom_amt ? $custom_amt : 0 ?>"
+                                        onfocus="this.select()" onkeypress="checkFloat(this);" onkeyup="com3(this);calCustomTaxRate();"
+                                    >
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-4">
+                        <div class="col-lg-6">
                             <div class="form-group">
-                                <label for="custom_total_amt" class="required">관세총액/관세율</label>
+                                <label for="custom_tax">통관비</label>
                                 <div class="flex_box">
-                                    <input type="text" class="form-control form-control-sm w-75" id="custom_total_amt" name="custom_total_amt" value="<?= @$custom_total_amt ? $custom_total_amt : 0 ?>"
-                                        onfocus="this.select()" onkeypress="checkFloat(this);" onkeyup="com3(this);calCustomTaxRate();" <?=$currency_unit == "KRW" ? "readonly disabled" : ""?>
+                                    <input id="custom_tax" type="text" class="form-control form-control-sm" name="custom_tax" value="<?= $custom_tax ? $custom_tax : 0 ?>"
+                                        onfocus="this.select()" onkeypress="checkFloat(this);" onkeyup="com(this);calCustomTaxRate();" <?=$currency_unit == "KRW" ? "readonly disabled" : ""?>
                                     >
-                                    <div class="d-flex align-items-center w-25 pl-2">
-                                        <input type="text" class="form-control form-control-sm text-right mr-1" id="custom_rate" name="custom_rate" value="<?= @$custom_rate ? $custom_rate : 0 ?>" readonly>
-                                        <span>%</span>
-                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-6">
                             <div class="form-group">
-                                <label for="freight_amt" class="required">운임비/운임율</label>
-                                <div class="flex_box">
-                                    <input type="text" class="form-control form-control-sm w-75" id="freight_amt" name="freight_amt" value="<?= @$freight_amt ? $freight_amt : 0 ?>"
-                                        onfocus="this.select()" onkeypress="checkFloat(this);" onkeyup="com3(this);calCustomTaxRate();" <?=$currency_unit == "KRW" ? "readonly disabled" : ""?>
-                                    >
-                                    <div class="d-flex align-items-center w-25 pl-2">
-                                        <input type="text" class="form-control form-control-sm text-right mr-1" id="freight_rate" name="freight_rate" value="<?= @$freight_rate ? $freight_rate : 0 ?>" readonly>
-                                        <span>%</span>
+                                <label for="custom_tax_rate">통관세율</label>
+                                <div class="form-inline inline_select_box">
+                                    <div class="form-inline-inner input-box w-25 mr-2">
+                                        <input readonly type='text' class="form-control form-control-sm" name='custom_tax_rate' id='custom_tax_rate' value='{{ $custom_tax_rate ? $custom_tax_rate : "" }}' style="width:100%;"
+                                            <?=$currency_unit == "KRW" ? "disabled" : ""?> onfocus="this.select()" onkeypress="checkFloat(this);"
+                                        >
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label for="custom_tax" class="required">통관비/통관세율</label>
-                                <div class="flex_box">
-                                    <input type="text" class="form-control form-control-sm" id="custom_tax" name="custom_tax" value="<?= $custom_tax ? $custom_tax : 0 ?>" readonly style="width:30%;">
-                                    <div class="form-inline inline_select_box pl-2" style="width:70%;">
-                                        <div class="d-flex align-items-center form-inline-inner input-box w-50">
-                                            <input type='text' class="form-control form-control-sm text-right mr-1" name='custom_tax_rate' id='custom_tax_rate' value='{{ $custom_tax_rate ? $custom_tax_rate : "" }}' style="width:100%;"
-                                                <?=$currency_unit == "KRW" ? "disabled" : ""?> onfocus="this.select()" onkeypress="checkFloat(this);" readonly
-                                            >
-                                            <span>%</span>
-                                        </div>
-                                        <div class="w-50 pl-2">
-                                            <a href="#" class="btn btn-sm btn-outline-primary shadow-sm w-100" onclick="calExchange();" onfocus="this.blur()">환율/세율 적용</a>
-                                        </div>
-                                    </div>
+                                    <span>%</span>
+                                    <a href="#" class="btn btn-sm btn-outline-primary shadow-sm ml-2" onclick="calExchange();" onfocus="this.blur()">환율 및 세율 적용</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label for="bl_no">B/L No.</label>
-                                <div class="flex_box">
-                                    <input type="text" class="form-control form-control-sm" name="bl_no">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-6">
                             <div class="form-group">
                                 <label for="area_type">위치</label>
                                 <div class="flex_box">
@@ -204,51 +181,33 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-6">
                             <div class="form-group">
                                 <label for="f_sqty">파일</label>
-                                <div class="d-flex">
-                                    <div class="custom-file w-100">
+                                <div class="flex_box">
+                                    <div class="custom-file w-50">
                                         <input name="excel_file" type="file" class="custom-file-input" id="excel_file">
                                         <label class="custom-file-label" for="file"></label>
                                     </div>
-                                    <div style="min-width: 120px;">
-                                        <div class="btn-group ml-2">
-                                            <button class="btn btn-outline-primary apply-btn" type="button" onclick="upload();">적용</button>
-                                        </div>
-                                        <a href="/sample/sample_store_stock_order.xlsx" class="ml-2" style="text-decoration: underline !important;">샘플파일</a>
+                                    <div class="btn-group ml-2">
+                                        <button class="btn btn-outline-primary apply-btn" type="button" onclick="upload();">적용</button>
                                     </div>
+                                    <a href="/sample/sample_store_stock_order.xlsx" class="ml-2" style="text-decoration: underline !important;">샘플파일</a>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div id="help" class="row" style="display: none;">
-                        <div class="col-lg-12">
-                            <div class="form-group">
-                                <label style="color: #0000ff;">도움말<i class="fa fa-question-circle ml-1" aria-hidden="true"></i></label>
-                                <div class="d-flex">
-                                    <div class="d-flex flex-column" style="width: 20%; min-width: 250px;">
-                                        <p>기본정보</p>
-                                        <ul>
-                                            <li>관세율 = 관세총액 &divide; (신고)금액</li>
-                                            <li>운임율 = 운임비 &divide; (신고)금액</li>
-                                            <li>통관비 = 관세총액 &plus; 운임비</li>
-                                            <li>통관세율 = 통관비 &divide; (신고)금액</li>
-                                        </ul>
-                                    </div>
-                                    <div class="d-flex flex-column">
-                                        <p>상품정보</p>
-                                        <ul>        
-                                            <li>금액 = 수량 x 단가</li>
-                                            <li>수입금액 = 환율 x 단가</li>
-                                            <li>총수입금액 = 환율 x 수량 x 단가</li>
-                                            <li>총원가 = 총수입금액 &plus; (총수입금액 x 통관세율)</li>
-                                            <li>개당원가 = 총원가 &divide; 수량</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                </div>
+                <div class="card mb-4" id="help" style="display: none;">
+                    <div class="d-flex card-header justify-content-between" >
+                        <fieldset class="FSHelp">
+                            <legend class="Tip" style="font-size: 15px; color: blue;">도움말</legend>
+                            <ul>
+                                <li>금액 = 단가 * 수량</li>
+                                <li>원가(원,VAT포함) = 단가 * ( 1 + 통관세율/100 ) * 환율 * 1.1</li>
+                                <li>총원가(원) = 원가(원,VAT포함) * 수량</li>
+                            </ul>
+                        </fieldset>
                     </div>
                 </div>
             </div>
@@ -271,6 +230,9 @@
             <div class="card-body">
                 <div class="card-title mb-3">
                     <div class="filter_wrap">
+                        <div class="fl_box">
+                            <p style="color: red;">* 상품정보가 존재하지 않는 상품은 입고처리되지 않습니다.</p>
+                        </div>
                         <div class="fr_box">
                             <a href="#" onclick="deleteRows();" class="btn-sm btn btn-primary" onfocus="this.blur()">상품삭제</a>
                             <a href="#" onclick="getSearchGoods();" class="btn-sm btn btn-primary" onfocus="this.blur()">상품 가져오기</a>
@@ -285,13 +247,11 @@
     </form>
 </div>
 <script type="text/javascript" charset="utf-8">
-
     const STATE = "{{$state}}";
     
     /**
      * ag-grid set field
      */
-
     const numberFormatter = (params) => {
         if (document.search.currency_unit.value == "KRW") {
             // console.log("원")
@@ -302,13 +262,11 @@
                     .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');;
         }
     };
-
     const KRWFormatter = (params) => {
         return Math.round(params.value)
             .toString()
             .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
     }
-
     // 기존에 공용으로 사용하던 화폐단위 type은 소수점을 전부 버리므로 반올림으로 커스텀하여 구현하였음
     const currencyFormatter = (params) => { 
         const value = Math.round(params.value).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
@@ -367,18 +325,23 @@
             valueFormatter: numberFormatter,
             cellRenderer: params => { return params.node.rowPinned == "top" ? "" : params.valueFormatted }
         },
-        {headerName: "금액", field: "unit_total_cost", width: 80, cellStyle:{'text-align': 'right'}, valueFormatter: numberFormatter},
-        {headerName: "수입금액(원)", field: "income_amt", width: 80, cellStyle:{'text-align': 'right'}, valueFormatter: KRWFormatter},
-        {headerName: "총수입금액(원)", field: "income_total_amt", width: 90, cellStyle:{'text-align': 'right'}, valueFormatter: KRWFormatter},
-        {headerName: "개당원가(원, VAT포함)", field: "cost", width: 130, cellStyle:{'text-align': 'right'}, valueFormatter: KRWFormatter},
-        {headerName: "총원가(원)", field: "total_cost", width: 90, cellStyle:{'text-align': 'right'}, valueFormatter: KRWFormatter},
-        {headerName: "총원가(원, VAT별도)", field: "total_cost_novat", width: 130, cellStyle:{'text-align': 'right'}, valueFormatter: KRWFormatter},
+        {headerName: "금액", field: "unit_total_cost", width: 80, cellStyle:{'text-align': 'right'}, 
+            valueFormatter: numberFormatter
+        },
+        {headerName: "원가(원, VAT포함)", field: "cost", width: 120, cellStyle:{'text-align': 'right'}, 
+            valueFormatter: KRWFormatter
+        },
+        {headerName: "총원가(원)", field: "total_cost", width: 90, cellStyle:{'text-align': 'right'}, 
+            valueFormatter: KRWFormatter
+        },
+        {headerName: "총원가(원, VAT별도)", field: "total_cost_novat", width: 130, cellStyle:{'text-align': 'right'}, 
+            valueFormatter: KRWFormatter
+        },
         {field: "goods_sh", headerName: "TAG가", width: 70, type: "currencyType"},
         {field: "price", headerName: "판매가", width: 70, type: "currencyType"},
         {headerName: "최근입고일자", field: "stock_date", width: 90, cellStyle: StyleLineHeight},
         {width:"auto"}
     ];
-
     /**
      * ag-grid init - 초기화 및 기타 logics
      */
@@ -387,8 +350,7 @@
         gridId: "#div-gd",
     });
     let gx;
-
-    const pinnedRowData = [{ prd_cd: '합계', unit_total_cost: 0, count: 0, income_amt: 0, income_total_amt: 0, cost: 0, total_cost: 0, total_cost_novat: 0 }];
+    const pinnedRowData = [{ prd_cd: '합계', unit_total_cost: 0, cost: 0, total_cost: 0, count: 0 }];
     
     $(document).ready(() => {
         pApp.ResizeGrid(200);
@@ -409,16 +371,13 @@
         const ff = document.search;
         if(ff.cmd.value == "editcmd") productListDraw();
     });
-
     const checkIsEditable = (params) => {
         if (params.column?.colId == 'unit_cost' && STATE > 0 && STATE < 40 && params.node.rowPinned != 'top') return true; 
         return params.data.hasOwnProperty('isEditable') && params.data.isEditable ? true : false;
     };
-
     const strNumToPrice = (price) => {
         return typeof price == 'string' ? price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : "";
     };
-
     const productListDraw = () => {
         var ff = document.search;
         const stock_no = ff.stock_no.value;
@@ -444,18 +403,17 @@
             console.log(error);
         });
     };
-
     var addRow = (row) => { // goods_api에서 opener 함수로 사용하기 위해 var로 선언
         const count = gx.gridOptions.api.getDisplayedRowCount();
         row = { ...row, 
-            item: row.opt_kind_nm, qty: 0, exp_qty: 0, cost: 0, unit_cost: 0, unit_total_cost: 0, total_cost: 0, total_cost_novat: 0, income_amt: 0, income_total_amt: 0, isEditable: true, count: count + 1, opt_kor: row.goods_opt
+            item: row.opt_kind_nm, qty: 0, exp_qty: 0, cost: 0, unit_cost: 0, unit_total_cost: 0, total_cost: 0, total_cost_novat: 0,
+            isEditable: true, count: count + 1, opt_kor: row.goods_opt
         };
         gx.gridOptions.api.applyTransaction({add : [row]});
         // $('#gx-total').html(count);
     };
-
     const updatePinnedRow = () => { // 총 금액, 원가, 총원가를 반영한 PinnedRow를 업데이트
-        let [ unit_total_cost, cost, total_cost, total_cost_novat, income_amt, income_total_amt ] = [ 0, 0, 0, 0, 0, 0 ];
+        let [ unit_total_cost, cost, total_cost, total_cost_novat ] = [ 0, 0, 0, 0 ];
         const rows = gx.getRows();
         if (rows && Array.isArray(rows) && rows.length > 0) {
             rows.map((row, idx) => {
@@ -463,20 +421,14 @@
                 cost += parseFloat(row.cost);
                 total_cost += parseFloat(row.total_cost);
                 total_cost_novat += parseFloat(row.total_cost_novat);
-                income_amt += parseFloat(row.income_amt);
-                income_total_amt += parseFloat(row.income_total_amt);
             })
         }
         let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
         gx.gridOptions.api.setPinnedTopRowData([
-            { ...pinnedRow.data, unit_total_cost: unit_total_cost, cost: cost, total_cost: total_cost, total_cost_novat: total_cost_novat, income_amt: income_amt, income_total_amt: income_total_amt }
+            { ...pinnedRow.data, unit_total_cost: unit_total_cost, cost: cost, total_cost: total_cost, total_cost_novat: total_cost_novat }
         ]);
-        $("#custom_amt").val(Comma(Math.round(income_total_amt)));
-        calCustomTaxRate();
     };
-
     const deleteRow = (row) => { gx.gridOptions.api.applyTransaction({remove : [row]}); };
-
     const deleteRows = () => {
         const ff = document.search;
         const state = STATE; // 입고취소: -10, 입고대기: 10, 입고처리중: 20, 입고완료: 30
@@ -493,20 +445,16 @@
             updatePinnedRow();
         };
     };
-
     /**
      * goods api logics - 상품 가져오기
      * window opener에서 콜백을 사용하려면 var로 선언해야 합니다.
      */
-
     var goodsCallback = (row) => {
         addRow(row);
     };
-
     var multiGoodsCallback = (rows) => {
         if (rows && Array.isArray(rows)) rows.map(row => addRow(row));
     };
-
     let goods_search_cmd = '';
     const getSearchGoods = () => {
         const ff = document.search;
@@ -519,19 +467,15 @@
         const url=`/store/api/goods/show`;
         const pop_up = window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1800,height=1000");
     };
-
     var beforeSearchCallback = (api_document) => {
         const [ search_form, api_search_form ] = [ document.search, api_document.search ];
         api_search_form.com_nm.value = search_form.com_nm.value;
         api_search_form.com_cd.value = search_form.com_id.value;
     };
-
     /**
      * form logics - 데이터 전송 및 벨리데이션
      */
-
     const COMMAND_URL = '/store/cs/cs01/comm';
-
     const cmder = async (cmd) => {
         if (cmd == "editcmd" || cmd == "addcmd" || cmd == "addstockcmd") {
             if (validate() && await validateData()) saveCmd(cmd); // validateData
@@ -541,7 +485,6 @@
             cancelCmd();
         }
     };
-
     const validate = () => {
         const ff = document.search;
         if( ff.com_id.value == "" ) {
@@ -564,26 +507,20 @@
             ff.stock_date.focus();
             return false;
         }
-        if( ff.currency_unit.value != "KRW" ) {
-            if( ff.exchange_rate.value == "" ) {
+        if( ff.currency_unit.value != "KRW"){
+            if( ff.exchange_rate.value == ""){
                 alert("환율를 입력해 주십시오.");
                 ff.exchange_rate.focus();
                 return false;
             }
-            if( ff.custom_total_amt.value == "" ) {
-                alert("관세총액을 입력해 주십시오.");
-                ff.custom_total_amt.focus();
-                return false;
-            }
-            if( ff.freight_amt.value == "" ) {
-                alert("운임비를 입력해 주십시오.");
-                ff.freight_amt.focus();
+            if( ff.custom_tax_rate.value == ""){
+                alert("통관세율를 입력해 주십시오.");
+                ff.custom_tax_rate.focus();
                 return false;
             }
         }
         return true;
     };
-
     const validateData = async (cmd) => {
         const rows = gx.getRows();
         let row;
@@ -593,11 +530,17 @@
         };
         return true;
     };
-
     const checkValidateData = async (row) => {
         
         const row_index = row.count - 1;
         const { qty, exp_qty, unit_cost, goods_no, style_no } = row;
+        // if (isNaN(parseInt(goods_no))) {
+        //     gx.gridOptions.api.stopEditing(); // stop editing
+        //     alert(`스타일넘버 ${style_no}은 유효하지 않은 상품입니다. \n상품을 삭제후 다시등록해주세요.`);
+        //     const node = gx.gridOptions.api.getRowNode(row.count);
+        //     node.setSelected(true);
+        //     return false;
+        // }
         
         if ((qty || 0) == 0 && (exp_qty || 0) == 0) { // check qty
             gx.gridOptions.api.stopEditing(); // stop editing
@@ -611,14 +554,12 @@
             startEditingCell(row_index, 'unit_cost');
             return false;
         }
-
         // 옵션체크
         // const checked_opt = await checkOption(row);
         // if (checked_opt == false) return false;
         
         return true;
     };
-
     const checkOption = async (row) => {
         const CMD = 'checkopt';
         const data = { cmd: CMD, goods_no: row.goods_no, prd_cd: row.prd_cd, opt: row.opt_kor };
@@ -634,15 +575,12 @@
         }
         return true;
     };
-
     const startEditingCell = (row_index, col_key) => {
         gx.gridOptions.api.startEditingCell({ rowIndex: row_index, colKey: col_key });
     };
-
     /*
         Function: unComma
             콤마 없애기
-
         Parameters:
             obj - object
     */
@@ -661,18 +599,15 @@
         
         return (outputNumber);
     }
-
     /*
         Function: com3
             콤마처리 ( 마이너스와 소수점 처리 )
-
         Parameters:
             obj - object
     */
     function com3(obj) {
         var str = obj.value;
         if ( str != null && str != "" ) {
-
             var retStr = "";
             var m = "";
             var dot = "";
@@ -700,15 +635,12 @@
             obj.value = "" + m + retStr + dot + "";
         }
     }
-
     /*
         Function: currency
             숫자만 입력
-
         Parameters:
             obj - text
     */
-
     function checkFloat(obj)
     {
         var keycode = event.keyCode;
@@ -718,7 +650,6 @@
             event.returnValue = false;
         }
     }
-
     var evtAfterEdit = async (params) => { // edit 가능한 셀 수정시 계산하고 고정 row를 업데이트합니다.
         // console.log(params);
         if (params.oldValue !== params.newValue) {
@@ -728,100 +659,78 @@
                 row.qty = row.exp_qty; // 수량(예정) 입력 시 수량(확정) 값 동일하게 입력
             }
             if (row.goods_no > 0) {
-                const [ unit, exchange_rate, custom_tax, custom_amt ] = [ ff.currency_unit.value, unComma(ff.exchange_rate.value), ff.custom_tax.value, ff.custom_amt.value ];
-                await calProduct(row, unit, exchange_rate, custom_tax, custom_amt);
+                const [ unit, exchange_rate, custom_tax_rate ] = [ ff.currency_unit.value, unComma(ff.exchange_rate.value), ff.custom_tax_rate.value ];
+                await calProduct(row, unit, exchange_rate, custom_tax_rate);
                 // checkOption(row);
             }
         }
         updatePinnedRow();
     };
-
-    const calProduct = async (row, unit, exchange_rate, custom_tax, custom_amt) => {
-
+    const calProduct = async (row, unit, exchange_rate, custom_tax_rate) => {
         const qty = !!(row.qty != 0 && row.qty) ? parseInt(row.qty) 
             : !!(row.exp_qty != 0 && row.exp_qty) ? parseInt(row.exp_qty) 
             : 0;
-        let unit_cost = row.unit_cost || 0;
-        let custom_tax_rate = unComma(custom_amt) > 0 ? unComma(custom_tax || '0') / unComma(custom_amt || '1') : 0;
-        
-        let income_amt = exchange_rate * unit_cost;
-        let income_total_amt = income_amt * qty;
-
-        let cost, total_cost;
+        let unit_cost;
+        unit_cost = row.unit_cost ? row.unit_cost : 0;
+        let cost, total_cost, total_cost_novat;
         if (unit == "KRW") {
-            cost = unit_cost;
-            total_cost = cost * qty;
-        } else {
-            total_cost = (income_total_amt + (income_total_amt * (custom_tax_rate))); // 총원가 = 총수입금액 + (총수입금액 * 통관세율)
-            if (unComma(custom_amt) < 1) total_cost = 0;
-            cost = total_cost / (qty || 1);
-        }
-        let total_cost_novat = total_cost / 1.1; // 총원가 vat 별도
-
+		    cost = unit_cost;
+	    } else {
+            cost = unit_cost * exchange_rate;
+		    cost = cost * (1 + custom_tax_rate / 100 );
+		    cost = parseInt(cost);
+        };
+        total_cost = qty * cost;
+        total_cost_novat = Math.round(total_cost/1.1,0); // 총원가 vat 별도
         await gx.gridOptions.api.applyTransaction({ update: [{...row,
             unit_total_cost: qty * unit_cost, // 금액
-            cost: Math.round(cost), // 원가 (원, VAT 포함)
-            total_cost: Math.round(total_cost), // 총원가 (원)
-            total_cost_novat: Math.round(total_cost_novat), // 총원가 (원, VAT 별도)
-            income_amt: Math.round(income_amt), // 수입금액
-            income_total_amt: Math.round(income_total_amt), // 총수입금액
+            cost: cost, // 원가 (원, VAT 포함)
+            total_cost: total_cost, // 총원가 (원)
+            total_cost_novat: total_cost_novat, // 총원가 (원, VAT 별도)
         }] });
-
     };
-
     const calExchange = async () => {
-
         var ff = document.search;
         var unit = ff.currency_unit.value;
         var exchange_rate = unComma(ff.exchange_rate.value);
-        var custom_tax = ff.custom_tax.value;
-        var custom_amt = ff.custom_amt.value;
-
+        var custom_tax_rate = ff.custom_tax_rate.value;
         const state = STATE; // 입고취소: -10, 입고대기: 10, 입고처리중: 20, 입고완료: 30
         // 입고 대기이거나 입고 처리중인 경우에만 환율 및 세율 적용 가능하게함
         
-        if (state == -10 || state >= 30) {
+        if (state == -10 || state == 30 ) {
         } else {
             const rows = gx.getRows();
             if (rows && Array.isArray(rows) && rows.length > 0) {
                 await rows.map((row, idx) => {
-                    calProduct(row, unit, exchange_rate, custom_tax, custom_amt);
+                    calProduct(row, unit, exchange_rate, custom_tax_rate);
                 })
                 updatePinnedRow();
             }
         }
-
     };
-
     const calCustomTaxRate = () => {
         
         var ff = document.search;
         var currency_unit = ff.currency_unit.value;
-
         if (currency_unit != "KRW") {
-            let exchange_rate = unComma(ff.exchange_rate.value || '0') || 0; // 환율
-            let custom_amt = unComma(ff.custom_amt.value || '0') || 0; // 신고금액
-            let custom_total_amt = unComma(ff.custom_total_amt.value || '0') || 0; // 관세총액
-            let freight_amt = unComma(ff.freight_amt.value || '0') || 0; // 운임비
-            // let custom_tax = unComma(ff.custom_tax.value || '0') || 0; // 통관비
-            let custom_tax = custom_total_amt + freight_amt; // 통관비
-            
-            let custom_rate = Number.parseFloat((custom_total_amt / (custom_amt || 1)) * 100).toFixed(2); // 관세율
-            let freight_rate = Number.parseFloat((freight_amt / (custom_amt || 1)) * 100).toFixed(2); // 운임율
-            // let custom_tax_rate = custom_tax / ( custom_amt * exchange_rate ) * 100; // 통관세율
-            let custom_tax_rate = Number.parseFloat((custom_tax / (custom_amt || 1)) * 100).toFixed(2); // 통관세율(관세+운임율)
-
-            ff.custom_rate.value = custom_rate; // 관세율 적용
-            ff.freight_rate.value = freight_rate; // 운임율 적용
-            ff.custom_tax.value = Comma(custom_tax); // 통관비 적용
-            ff.custom_tax_rate.value = custom_tax_rate; // 통관세율 적용
+            var exchange_rate = 0;
+            var custom_tax = 0;
+            var custom_tax_rate = 0;
+            var exchange_rate = unComma(ff.exchange_rate.value);
+            var custom_amt = unComma(ff.custom_amt.value);
+            if (unComma(ff.custom_tax.value) > 0) {
+                custom_tax = unComma(ff.custom_tax.value);
+            }
+            if (custom_amt > 0) {
+                custom_tax_rate = custom_tax / ( custom_amt * exchange_rate ) * 100;
+            } else {
+            }
+            ff.custom_tax_rate.value = Math.round(custom_tax_rate*100)/100;
         }
     };
-
     const getFormValue = (form, name) => {
         return (form.hasOwnProperty(name)) ? form[name].value : "";
     };
-
     const getInvoiceNo = () => {
         const ff = document.search;
 	    const com_id = ff.com_id.value;
@@ -844,12 +753,10 @@
             $('.sch-sup-company').click();
         }
     };
-
     const saveCmd = (cmd) => {
         if (confirm('저장하시겠습니까?')) {
             const ff = document.search;
             const data = gx.getRows();
-
             axios({
                 url: COMMAND_URL,
                 method: 'post',
@@ -865,14 +772,11 @@
                     state: getFormValue(ff, 'state'),
                     loc: getFormValue(ff, 'loc'),
                     area_type: getFormValue(ff, 'area_type'),
-                    custom_total_amt: getFormValue(ff, 'custom_total_amt'), // 관세총엑
-                    freight_amt: getFormValue(ff, 'freight_amt'), // 운임비
-                    custom_tax: getFormValue(ff, 'custom_tax'), // 통관비
-                    custom_tax_rate: getFormValue(ff, 'custom_tax_rate'), // 통관세율
-                    custom_amt: getFormValue(ff, 'custom_amt'), // 신고금액
-                    exchange_rate: getFormValue(ff, 'exchange_rate'), // 환율
-                    currency_unit: getFormValue(ff, 'currency_unit'), // 통화
-                    bl_no: getFormValue(ff, 'bl_no'),
+                    custom_tax_rate: getFormValue(ff, 'custom_tax_rate'),
+                    custom_amt: getFormValue(ff, 'custom_amt'),
+                    custom_tax: getFormValue(ff, 'custom_tax'),
+                    exchange_rate: getFormValue(ff, 'exchange_rate'),
+                    currency_unit: getFormValue(ff, 'currency_unit')
                 }
             }).then((response) => {
                 if (response.data.code == 1) {
@@ -886,7 +790,6 @@
             });
         };
     };
-
     const cancelCmd = () => {
         if (confirm('입고취소를 하시겠습니까?')) {
             const ff = document.search;
@@ -907,7 +810,6 @@
             }
         }
     };
-
     const delCmd = () => {
         if (confirm('정말로 삭제하시겠습니까?')) {
             const ff = document.search;
@@ -926,28 +828,22 @@
             }).catch((error) => { });
         }
     };
-
     const validateFile = () => {
         const target = $('#excel_file')[0].files;
-
         if (target.length > 1) {
             alert("파일은 1개만 올려주세요.");
             return false;
         }
-
         if (target === null || target.length === 0) {
             alert("업로드할 파일을 선택해주세요.");
             return false;
         }
-
         if (!/(.*?)\.(xlsx|XLSX)$/i.test(target[0].name)) {
             alert("Excel파일만 업로드해주세요.(xlsx)");
             return false;
         }
-
         return true;
     };
-
     $('#excel_file').change(function(e){
         if (validateFile() === false) {
             $('.custom-file-label').html("");
@@ -955,7 +851,6 @@
         }
         $('.custom-file-label').html(this.files[0].name);
     });
-
     /**
      * 아래부터 엑셀 관련 함수들
      * - read the raw data and convert it to a XLSX workbook
@@ -964,21 +859,16 @@
 		/* convert data to binary string */
 		data = new Uint8Array(data);
 		const arr = new Array();
-
 		for (let i = 0; i !== data.length; ++i) {
 			arr[i] = String.fromCharCode(data[i]);
 		}
-
 		const bstr = arr.join("");
-
 		return XLSX.read(bstr, {type: "binary"});
 	};
-
 	const makeRequest = (method, url, success, error) => {
 		var httpRequest = new XMLHttpRequest();
 		httpRequest.open("GET", url, true);
 		httpRequest.responseType = "arraybuffer";
-
 		httpRequest.open(method, url);
 		httpRequest.onload = () => {
 			success(httpRequest.response);
@@ -988,12 +878,9 @@
 		};
 		httpRequest.send();
 	};
-
 	const populateGrid = async (workbook) => {
-
 		var firstSheetName = workbook.SheetNames[0]; // our data is in the first sheet
 		var worksheet = workbook.Sheets[firstSheetName];
-
 		var columns	= {
 			'A': 'prd_cd',
 			'B': 'goods_no',
@@ -1002,9 +889,7 @@
             'E': 'qty',
             'F': 'unit_cost',
 		};
-
 		var rowIndex = 5; // 엑셀 5번째 줄부터 시작 (샘플데이터 참고)
-
         alert('상품을 순차적으로 불러오고 있습니다. \n다소 시간이 소요될 수 있습니다.'); // progress
         let count = gx.gridOptions.api.getDisplayedRowCount();
 		while (worksheet['A' + rowIndex]) { // iterate over the worksheet pulling out the columns we're expecting
@@ -1025,16 +910,13 @@
             row.unit_total_cost ??= 0;  // 금액
             row.opt_kor ??= "";
             row = { ...row, 
-                count: ++count, item: "", cost: 0, total_cost: 0, total_cost_novat: 0, income_amt: 0, income_total_amt: 0, isEditable: true, goods_no: "검사중..."
+                count: ++count, item: "", cost: 0, total_cost: 0, total_cost_novat: 0, isEditable: true, goods_no: "검사중..."
             };
-
             gx.gridOptions.api.applyTransaction({add : [row]}); // 한 줄씩 import
-
             rowIndex++;
             await getGood(row, !worksheet['A' + rowIndex]);
 		}
 	};
-
 	const importExcel = async (url) => {
 		await makeRequest('GET',
 			//'https://www.ag-grid.com/example-excel-import/OlymicData.xlsx',
@@ -1050,7 +932,6 @@
 			}
 		);
 	};
-
     const getGood = async (row, is_last) => {
         const CMD = 'getgood';
         axios({
@@ -1070,30 +951,25 @@
                 message = response.data.message;
                 checked_row = {...row, goods_no: message};
             }
-
             await gx.gridOptions.api.applyTransaction({update : [checked_row]});
-
             const ff = document.search;
-            const [ unit, exchange_rate, custom_tax, custom_amt ] = [ 
+            const [ unit, exchange_rate, custom_tax_rate ] = [ 
                 ff.currency_unit.value, 
                 unComma(ff.exchange_rate.value), 
-                ff.custom_tax.value, 
-                ff.custom_amt.value
+                ff.custom_tax_rate.value 
             ];
-            await calProduct(checked_row, unit, exchange_rate, custom_tax, custom_amt);
+            await calProduct(checked_row, unit, exchange_rate, custom_tax_rate);
             if(is_last) updatePinnedRow();
         }).catch((error) => {
             console.log(error);
         });
     };
-
 	const upload = () => {
 		const file_data = $('#excel_file').prop('files')[0];
 		const form_data = new FormData();
         form_data.append('cmd', 'import');
 		form_data.append('file', file_data);
 		form_data.append('_token', "{{ csrf_token() }}");
-
         axios({
             method: 'post',
             url: COMMAND_URL,
@@ -1115,53 +991,34 @@
         
 		return false;
 	};
-
-
     var displayHelp = () => {
         const h = document.getElementById("help");
         if (h.style.display == 'none') {
             h.style.display = '';
-            pApp.ResizeGrid(200);
         } else {
             h.style.display = 'none'
-            pApp.ResizeGrid(200);
         };
     };
-
     const _ = (selector) => {
         const result = document.querySelectorAll(selector);
         if (result == undefined) return result;
         return result.length > 1 ? result : result[0];
     };
-
     const changeUnit = (select) => {
-
         const ff = document.search;
-
         if (select.value == "KRW") {
             _("#exchange_rate").readOnly = true;
-            _("#custom_total_amt").readOnly = true;
-            _("#freight_amt").readOnly = true;
-
+            _("#custom_tax").readOnly = true;
             _("#exchange_rate").disabled = true;
-            _("#custom_total_amt").disabled = true;
-            _("#freight_amt").disabled = true;
+            _("#custom_tax").disabled = true;
         } else {
             _("#exchange_rate").readOnly = false;
-            _("#custom_total_amt").readOnly = false;
-            _("#freight_amt").readOnly = false;
-
+            _("#custom_tax").readOnly = false;
             _("#exchange_rate").disabled = false;
-            _("#custom_total_amt").disabled = false;
-            _("#freight_amt").disabled = false;
-
+            _("#custom_tax").disabled = false;
             ff.exchange_rate.focus();
         }
-
         gx.gridOptions.api.redrawRows();
-
     };
-
 </script>
-
 @stop
