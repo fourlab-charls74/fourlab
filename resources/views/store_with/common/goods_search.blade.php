@@ -267,9 +267,9 @@
     const stock_render = (params) => {
         if (params.value === undefined) return "";
         if (params.data) {
-            return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\');">' + params.value + '</a>';
+            return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\');">' + Comma(params.value) + '</a>';
         } else if (params.node.aggData) {
-            return `<a href="#" onclick="return OpenStockPopup('${params.node.key}');">${params.value}</a>`;
+            return `<a href="#" onclick="return OpenStockPopup('${params.node.key}');">${Comma(params.value)}</a>`;
         } else {
             return '';
         }

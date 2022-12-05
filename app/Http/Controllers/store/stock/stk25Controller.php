@@ -79,8 +79,8 @@ class stk25Controller extends Controller
 
         $sql = "
             select 
-                ow.ord_state,
-                if(ow.ord_state = 30, '출고완료', if(ow.ord_state = 61, '환불완료', if(ow.ord_state = 60, '교환완료', '-'))) as ord_state_nm,
+                o.ord_state as ord_state_cd,
+                ord_state.code_val as ord_state,
                 o.store_cd,
                 o.ord_opt_no,
                 o.ord_no,
@@ -89,14 +89,16 @@ class stk25Controller extends Controller
                 c.code_val as sale_kind_nm,
                 o.prd_cd,
                 o.goods_no,
-                g.goods_type,
-                gt.code_val as goods_type_nm,
                 op.opt_kind_nm,
                 b.brand_nm,
                 g.style_no,
                 stat.code_val as sale_stat_cl,
                 o.goods_nm,
+                g.goods_nm_eng,
                 o.goods_opt,
+                pc.color,
+                pc.size,
+                concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p,
                 (ow.qty * if(ow.ord_state = 61, -1, 1)) as qty,
                 o.price,
                 st.sale_per,
@@ -105,15 +107,16 @@ class stk25Controller extends Controller
             from order_opt_wonga ow
                 inner join order_opt o on o.ord_opt_no = ow.ord_opt_no
                 inner join order_mst om on om.ord_no = o.ord_no
+                inner join product_code pc on pc.prd_cd = o.prd_cd
                 inner join code c on c.code_kind_cd = 'sale_kind' and c.code_id = o.sale_kind
                 inner join goods g on g.goods_no = o.goods_no
-                inner join code gt on gt.code_kind_cd = 'G_GOODS_TYPE' and gt.code_id = g.goods_type
                 inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
                 inner join brand b on b.brand = g.brand
                 inner join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
                 left outer join sale_type st on st.sale_kind = o.sale_kind
+                left outer join code ord_state on (o.ord_state = ord_state.code_id and ord_state.code_kind_cd = 'G_ORD_STATE')
             where 1=1 
-                and o.ord_state = 30
+                and ow.ord_state = 30
                 and (o.clm_state = 90 or o.clm_state = -30 or o.clm_state = 0)
                 $where
             order by ow.ord_state_date
@@ -131,16 +134,16 @@ class stk25Controller extends Controller
             from order_opt_wonga ow
                 inner join order_opt o on o.ord_opt_no = ow.ord_opt_no
                 inner join order_mst om on om.ord_no = o.ord_no
+                inner join product_code pc on pc.prd_cd = o.prd_cd
                 inner join code c on c.code_kind_cd = 'sale_kind' and c.code_id = o.sale_kind
                 inner join goods g on g.goods_no = o.goods_no
-                inner join code gt on gt.code_kind_cd = 'G_GOODS_TYPE' and gt.code_id = g.goods_type
                 inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
                 inner join brand b on b.brand = g.brand
                 inner join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
                 left outer join sale_type st on st.sale_kind = o.sale_kind
                 left outer join sale_type_apply_store stas on stas.apply_date = '$sale_month' and stas.store_cd = '$store_cd'
             where 1=1 
-                and o.ord_state = 30
+                and ow.ord_state = 30
                 and (o.clm_state = 90 or o.clm_state = -30 or o.clm_state = 0)
                 $where
         ";
