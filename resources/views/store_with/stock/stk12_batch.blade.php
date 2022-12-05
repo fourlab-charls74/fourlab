@@ -12,11 +12,12 @@
             <div class="d-inline-flex location">
                 <span class="home"></span>
                 <span>/ 매장관리</span>
+                <span>/ 출고</span>
                 <span>/ 초도출고</span>
+                <span>/ 엑셀 업로드</span>
             </div>
         </div>
         <div class="d-flex">
-            <a href="javascript:void(0)" onclick="Save()" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
             <a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i> 닫기</a>
         </div>
     </div>
@@ -53,7 +54,7 @@
                                                     <div class="btn-group ml-2">
                                                         <button class="btn btn-outline-primary apply-btn" type="button" onclick="upload();">적용</button>
                                                     </div>
-                                                    <a href="/sample/sample_cs02.xlsx" class="ml-2" style="text-decoration: underline !important;">상품반품이동 등록양식 다운로드</a>
+                                                    <a href="/sample/sample_stk12.xlsx" class="ml-2" style="text-decoration: underline !important;">초도출고 등록양식 다운로드</a>
                                                 </div>
                                             </td>
                                         </tr>
@@ -65,69 +66,44 @@
                 </form>
             </div>
         </div>
-        <div class="card shadow mt-3 d-none" id="basic_info_form">
-            <div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
-                <a href="#">기본정보</a>
-            </div>
-            <div class="card-body">
-                <form name="f1">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="table-box-ty2 mobile">
-                                <table class="table incont table-bordered" width="100%" cellspacing="0">
-                                    <tbody>
-                                        <tr>
-                                            <th>반품일자</th>
-                                            <td>
-                                                <div class="form-inline">
-                                                    <p class="fs-14" id="sgr_date"></p>
-                                                </div>
-                                            </td>
-                                            <th>이동처</th>
-                                            <td>
-                                                <div class="form-inline">
-                                                    <p class="fs-14" id="target_nm"></p>
-                                                </div>
-                                            </td>
-                                            <th>반품번호</th>
-                                            <td>
-                                                <div class="form-inline">
-                                                    <p class="fs-14" id="sgr_idx"></p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th>반품창고</th>
-                                            <td>
-                                                <div class="form-inline">
-                                                    <p class="fs-14" id="storage_nm"></p>
-                                                </div>
-                                            </td>
-                                            <th>메모</th>
-                                            <td colspan="3">
-                                                <div class="form-inline">
-                                                    <p class="fs-14" id="comment"></p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+        <div class="card shadow mb-0 last-card pt-2 pt-sm-0">
+        <div class="card-body">
+            <div class="card-title">
+                <div class="filter_wrap">
+                    <div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
+                        <a href="#">상품정보</a>
+                    </div>
+                    <div class="d-flex flex-grow-1 flex-column flex-lg-row justify-content-end align-items-end align-items-lg-center">
+                        <div class="d-flex mr-1 mb-1 mb-lg-0">
+                            <span class="mr-1">출고예정일</span>
+                            <div class="docs-datepicker form-inline-inner input_box" style="width:130px;display:inline;">
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm docs-date bg-white" name="exp_dlv_day" value="{{ $today }}" autocomplete="off" readonly />
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="docs-datepicker-container"></div>
                             </div>
                         </div>
+                        <div class="d-flex">
+                            <select id='rel_order' name='rel_order' class="form-control form-control-sm mr-2"  style='width:70px;display:inline'>
+                                @foreach ($rel_order_res as $rel_order)
+                                    <option value='{{ $rel_order->code_val }}'>{{ $rel_order->code_val }}</option>
+                                @endforeach
+                            </select>
+                            <a href="#" onclick="requestRelease();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>출고요청</a>
+                        </div>
                     </div>
-                </form>
-            </div>
-        </div>
-        <div class="card shadow mt-3">
-            <div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
-                <a href="#">상품정보</a>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive mt-2">
-                    <div id="div-gd" class="ag-theme-balham"></div>
                 </div>
             </div>
+            <div class="table-responsive">
+                <div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
+            </div>
         </div>
+    </div>
     </div>
 </div>
 
@@ -135,78 +111,52 @@
     const pinnedRowData = [{ prd_cd: '합계', qty: 0, total_return_price: 0 }];
 
     let columns = [
-        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"},
-            cellRenderer: params => params.node.rowPinned == 'top' ? '' : params.data.count,
-            sortingOrder: ['desc', 'asc', 'null'],
-            comparator: (valueA, valueB, nodeA, nodeB, isInverted) => {
-                if (parseInt(valueA) == parseInt(valueB)) return 0;
-                return (parseInt(valueA) > parseInt(valueB)) ? 1 : -1;
-            },
-        },
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 29},
         {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
-        {field: "prd_cd_p", headerName: "코드일련", width: 90, cellStyle: {"text-align": "center"}},
-        {field: "color", headerName: "컬러", width: 60, cellStyle: {"text-align": "center"}},
-        {field: "size", headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"}},
+        // {field: "store_cd", headerName: "매장코드", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
+        {field: "store_nm", headerName: "출고매장", pinned: 'left', width: 100, cellStyle: {"text-align": "center"}},
         {field: "goods_no", headerName: "상품번호", width: 78, cellStyle: {"text-align": "center"}},
-        {field: "goods_type", headerName: "상품구분", width: 70, cellStyle: StyleGoodsTypeNM},
         {field: "opt_kind_nm", headerName: "품목", width: 70, cellStyle: {"text-align": "center"}},
         {field: "brand", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
         {field: "style_no",	headerName: "스타일넘버", width: 80, cellStyle: {"text-align": "center"}},
-        // {field: "sale_stat_cl", headerName: "상품상태", cellStyle: StyleGoodsState},
         {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 220},
+        {field: "goods_nm_eng",	headerName: "상품명(영문)", type: 'HeadGoodsNameType', width: 220},
+        {field: "prd_cd_p", headerName: "코드일련", width: 90, cellStyle: {"text-align": "center"}},
+        {field: "color", headerName: "컬러", width: 60, cellStyle: {"text-align": "center"}},
+        {field: "size", headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"}},
         {field: "goods_opt", headerName: "옵션", width: 200},
-        {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 70},
-        {field: "price", headerName: "판매가", type: "currencyType", width: 70},
-        {field: "return_price", headerName: "반품단가", width: 80, type: 'currencyType',
+        {field: "storage_qty", headerName: "창고재고", width: 60, type: 'currencyType'},
+        {field: "store_qty", headerName: "매장재고", width: 60, type: 'currencyType'},
+        {field: "qty", headerName: "배분수량", width: 60, type: 'currencyType', 
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
-        {field: "storage_wqty", headerName: "창고재고", width: 60, type: 'currencyType'},
-        {field: "qty", headerName: "반품수량", width: 60, type: 'currencyType', 
-            editable: (params) => checkIsEditable(params),
-            cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
-        },
-        {field: "total_return_price", headerName: "반품금액", width: 80, type: 'currencyType'},
     ];
 </script>
 
 <script type="text/javascript" charset="utf-8">
     let gx;
     const pApp = new App('', { gridId: "#div-gd" });
-    let basic_info = {};
 
     $(document).ready(function() {
         pApp.ResizeGrid(275, 450);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {
-            pinnedTopRowData: pinnedRowData,
-            getRowStyle: (params) => { // 고정된 row styling
-                if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#eee', 'border': 'none'};
-            },
-            getRowNodeId: (data) => data.hasOwnProperty('count') ? data.count : "0", // 업데이터 및 제거를 위한 식별 ID를 count로 할당
-            onCellValueChanged: (e) => {
-                if (e.column.colId === "return_price" || e.column.colId === "qty") {
-                    if (isNaN(e.newValue) == true || e.newValue == "") {
-                        alert("숫자만 입력가능합니다.");
-                        gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
-                    } else if(e.newValue < 0) {
-                        alert("음수는 입력할 수 없습니다.");
-                        gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
-                    } else {
-                        if(e.column.colId === "qty" && e.data.storage_wqty < parseInt(e.data.qty)) {
-                            alert("해당 창고의 보유재고보다 많은 수량을 반품할 수 없습니다.");
+                onCellValueChanged: (e) => {
+                    e.node.setSelected(true);
+                    if (e.column.colId.includes('rel_qty')) {
+                        if (isNaN(e.newValue) == true || e.newValue == "") {
+                            alert("숫자만 입력가능합니다.");
                             gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
                         } else {
-                            e.data.total_return_price = parseInt(e.data.qty) * parseInt(e.data.return_price);
-                            gx.gridOptions.api.updateRowData({update: [e.data]});
-                            updatePinnedRow();
+                            // let store_cd = e.column.colId.split("_")[0];
+                            // if(e.data[store_cd] === null) e.data[store_cd] = {};
+                            // e.data[store_cd][e.column.colId] = parseInt(e.newValue);
                         }
                     }
                 }
-            }
-        });
+            });
 
         $('#excel_file').on('change', function(e){
             if (validateFile() === false) {
@@ -276,14 +226,9 @@
 		var worksheet = workbook.Sheets[firstSheetName];
 
 		var excel_columns = {
-			'A': 'sgr_date',
-			'B': 'target_type',
-			'C': 'target_cd',
-            'D': 'storage_cd',
-            'E': 'comment',
-            'F': 'prd_cd',
-            'G': 'return_price',
-            'H': 'return_qty',
+			'A': 'store_cd',
+			'B': 'prd_cd',
+			'C': 'qty',
 		};
 
         var firstRowIndex = 6; // 엑셀 6행부터 시작 (샘플데이터 참고)
@@ -291,7 +236,7 @@
 
         let count = gx.gridOptions.api.getDisplayedRowCount();
         let rows = [];
-		while (worksheet['F' + rowIndex]) {
+		while (worksheet['C' + rowIndex]) {
 			let row = {};
 			Object.keys(excel_columns).forEach((column) => {
                 let item = worksheet[column + rowIndex];
@@ -328,8 +273,6 @@
 	};
 
     const upload = () => {
-        if(basic_info.sgr_date !== undefined && !confirm("새로 적용하시는 경우 기존정보는 저장되지 않습니다.\n적용하시겠습니까?")) return;
-        
 		const file_data = $('#excel_file').prop('files')[0];
         if(!file_data) return alert("적용할 파일을 선택해주세요.");
 
@@ -342,7 +285,7 @@
         
         axios({
             method: 'post',
-            url: '/store/cs/cs02/batch-import',
+            url: '/store/stock/stk12/batch-import',
             data: form_data,
             headers: {
                 "Content-Type": "multipart/form-data",
@@ -362,14 +305,60 @@
 		return false;
 	};
 
+     // 출고요청
+     function requestRelease() {
+            let rows = gx.getSelectedRows();
+
+            console.log(rows[0].qty);
+            if(rows.length < 1) return alert("출고요청할 상품을 선택해주세요.");
+
+            let storage_qty = "";
+            let over_qty = "";
+            for(let i = 0; i < rows.length; i++) {
+                storage_qty = rows[i].storage_qty;
+                over_qty = rows[i].qty;
+
+            }
+        
+            if(storage_qty < over_qty) return alert(`창고의 재고보다 많은 수량을 요청하실 수 없습니다`);
+            if(over_qty == 0) return alert(`배분수량을 0개를 요청할 수 없습니다. 1개 이상을 요청해주세요.`);
+
+            if(!confirm("해당 상품을 출고요청하시겠습니까?")) return;
+
+            const data = {
+                products: rows,
+                exp_dlv_day: $('[name=exp_dlv_day]').val(),
+                rel_order: $('[name=rel_order]').val(),
+            };
+
+            axios({
+                url: '/store/stock/stk12/request-release-excel',
+                method: 'post',
+                data: data,
+            }).then(function (res) {
+                if(res.data.code === 200) {
+                    if(!confirm(res.data.msg + "\n출고요청을 계속하시겠습니까?")) {
+                        window.close();
+                        opener.location.href = "/store/stock/stk10";
+                    } else {
+                        Search();
+                    }
+                } else {
+                    console.log(res.data);
+                    alert("출고요청 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+                }
+            }).catch(function (err) {
+                console.log(err);
+            });
+        }
+
     const getGood = async (rows, firstIndex) => {
 
         axios({
-            url: '/store/cs/cs02/batch-getgoods',
+            url: '/store/stock/stk12/batch-getgoods',
             method: 'post',
             data: { data: rows },
         }).then(async (res) => {
-            setBasicInfo({...res.data.head, ...rows[0]});
             let data = res.data.body.map(r => ({...r, qty: r.storage_wqty < r.qty ? r.storage_wqty : r.qty}));
             await gx.gridOptions.api.applyTransaction({add : data});
             updatePinnedRow();
@@ -378,61 +367,52 @@
         });
     };
 
-    function setBasicInfo(obj) {
-        basic_info = {...obj};
-        
-        $("#sgr_date").text(basic_info.sgr_date);
-        $("#sgr_idx").text(basic_info.sgr_idx);
-        $("#target_nm").text(basic_info.target_nm);
-        $("#storage_nm").text(basic_info.storage_nm);
-        $("#comment").text(basic_info.comment);
-
-        $("#basic_info_form").removeClass("d-none");
-        pApp.ResizeGrid(275, 370);
-    }
-
     // 상품반품 일괄등록
-    function Save() {
-        let rows = gx.getRows();
-        if(basic_info.sgr_date === undefined) return alert("일괄등록할 엑셀 파일을 적용해주세요.");
-        if(rows.length < 1) return alert("일괄등록할 상품이 존재하지 않습니다.");
+    // function Save() {
+    //     let rows = gx.getSelectedRows();
 
-        let sgr_date = basic_info.sgr_date;
-        let storage_cd = basic_info.storage_cd;
-        let target_type = basic_info.target_type;
-        let target_cd = basic_info.target_cd;
-        let comment = basic_info.comment;
+    //     console.log(rows);
+    //     if(rows.length < 1) return alert("일괄등록할 상품이 존재하지 않습니다.");
 
-        let zero_qtys = rows.filter(r => r.qty < 1);
-        if(zero_qtys.length > 0) return alert("반품수량이 0개인 항목이 존재합니다.");
+    //     let release_qtys = rows.filter(r => r.qty < 1);
+    //     if(release_qtys.length > 0) return alert("출고수량이 0개인 항목이 존재합니다.");
 
-        if(!confirm("일괄등록하시겠습니까?")) return;
+    //     if(!confirm("일괄등록하시겠습니까?")) return;
 
-        axios({
-            url: '/store/cs/cs02/add-storage-return',
-            method: 'put',
-            data: {
-                sgr_type: 'B',
-                sgr_date,
-                storage_cd,
-                target_type,
-                target_cd,
-                comment,
-                products: rows.map(r => ({ prd_cd: r.prd_cd, price: r.price, return_price: r.return_price, return_qty: r.qty })),
-            },
-        }).then(function (res) {
-            if(res.data.code === 200) {
-                alert(res.data.msg);
-                opener.Search();
-                window.close();
-            } else {
-                console.log(res.data);
-                alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-            }
-        }).catch(function (err) {
-            console.log(err);
-        });
-    }
+    //     axios({
+    //         url: '/store/stock/stk12/add-storage-return',
+    //         method: 'put',
+    //         data: {
+    //             products: rows.map(r => ({ 
+    //                                     prd_cd: r.prd_cd,
+    //                                     store_cd: r.store_cd, 
+    //                                     store_nm: r.store_nm, 
+    //                                     goods_no: r.goods_no, 
+    //                                     opt_kind_nm: r.opt_kind_nm,
+    //                                     brand: r.brand,
+    //                                     style_no: r.style_no,
+    //                                     goods_nm: r.goods_nm,
+    //                                     goods_nm_eng: r.goods_nm_eng,
+    //                                     prd_cd_p: r.prd_cd_p,
+    //                                     color: r.color,
+    //                                     size: r.size,
+    //                                     opt: r.opt,
+    //                                     qty: r.qty
+    //                                 })),
+    //         },
+    //     }).then(function (res) {
+    //         if(res.data.code === 200) {
+    //             alert(res.data.msg);
+    //             opener.Search();
+    //             window.close();
+    //         } else {
+    //             console.log(res.data);
+    //             alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+    //         }
+    //     }).catch(function (err) {
+    //         console.log(err);
+    //     });
+    // }
 
     const checkIsEditable = (params) => {
         return params.data.hasOwnProperty('isEditable') && params.data.isEditable ? true : false;

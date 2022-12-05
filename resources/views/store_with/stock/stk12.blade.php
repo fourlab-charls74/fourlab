@@ -448,7 +448,7 @@
 
         // 초도출고 엑셀 업로드 팝업 오픈
         const openBatchPopup = () => {
-            const url = '/store/stock/stk12_batch';
+            const url = '/store/stock/stk12/batch';
             window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=880");
         }
     </script>

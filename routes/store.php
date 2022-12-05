@@ -302,8 +302,13 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 초도출고
         Route::get('stk12','stk12Controller@index');
         Route::get('stk12/search','stk12Controller@search');
-        Route::get('stk12/stk12_batch','stk12Controller@batch_show'); // 엑셀 업로드
+        Route::get('stk12/batch','stk12Controller@batch_show'); // 엑셀 업로드
         Route::post('stk12/request-release', 'stk12Controller@request_release');
+        Route::post('stk12/request-release-excel', 'stk12Controller@request_release_excel');
+        Route::put('stk12/add-storage-return','stk12Controller@add_storage_return');
+        Route::put('stk12/update-storage-return','stk12Controller@update_storage_return'); 
+        Route::post('stk12/batch-import','stk12Controller@import_excel'); 
+        Route::post('stk12/batch-getgoods','stk12Controller@get_goods'); 
         
 
         // 판매분출고
