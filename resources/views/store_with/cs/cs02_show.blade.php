@@ -267,7 +267,7 @@
             let zero_qtys = rows.filter(r => r.qty < 1);
             if(zero_qtys.length > 0) return alert("반품수량이 0개인 항목이 존재합니다.");
 
-            let excess_qtys = rows.filter(r => r.qty > r.storage_wqty);
+            let excess_qtys = rows.filter(r => (r.qty * 1) > (r.storage_wqty * 1));
             if(excess_qtys.length > 0) return alert("해당 창고의 보유재고보다 많은 수량을 반품할 수 없습니다.");
 
             if(!confirm("등록하시겠습니까?")) return;
