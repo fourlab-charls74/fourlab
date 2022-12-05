@@ -1,14 +1,14 @@
 @extends('store_with.layouts.layout-nav')
-@php
-    $title = "매장실사등록";
-    if($cmd == "update") $title = "매장실사관리";
-@endphp
-@section('title', $title)
+@section('title', '매장실사일괄등록')
 @section('content')
+
+<!-- import excel lib -->
+<script src="https://unpkg.com/xlsx-style@0.8.13/dist/xlsx.full.min.js"></script>
+
 <div class="show_layout py-3 px-sm-3">
     <div class="page_tit d-flex justify-content-between">
         <div class="d-flex">
-            <h3 class="d-inline-flex">{{ $title }}</h3>
+            <h3 class="d-inline-flex">매장실사일괄등록</h3>
             <div class="d-inline-flex location">
                 <span class="home"></span>
                 <span>/ 매장관리</span>
@@ -16,9 +16,7 @@
             </div>
         </div>
         <div class="d-flex">
-            @if(@$cmd == 'add' or @$sc->sc_state == 'N')
-            <a href="javascript:void(0)" onclick="Save('{{ @$cmd }}')" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
-            @endif
+            <a href="javascript:void(0)" onclick="Save()" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
             <a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i> 닫기</a>
         </div>
     </div>
@@ -35,6 +33,40 @@
     <div class="card_wrap aco_card_wrap">
         <div class="card shadow">
             <div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
+                <a href="#">파일 업로드</a>
+            </div>
+            <div class="card-body">
+                <form name="f1">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="table-box-ty2 mobile">
+                                <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                    <tbody>
+                                        <tr>
+                                            <th>파일</th>
+                                            <td class="w-100">
+                                                <div class="flex_box">
+                                                    <div class="custom-file w-50">
+                                                        <input name="excel_file" type="file" class="custom-file-input" id="excel_file">
+                                                        <label class="custom-file-label" for="file"></label>
+                                                    </div>
+                                                    <div class="btn-group ml-2">
+                                                        <button class="btn btn-outline-primary apply-btn" type="button" onclick="upload();">적용</button>
+                                                    </div>
+                                                    <a href="/sample/sample_stk26.xlsx" class="ml-2" style="text-decoration: underline !important;">실사일괄등록양식 다운로드</a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="card shadow mt-3 d-none" id="basic_info_form">
+            <div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
                 <a href="#">기본정보</a>
             </div>
             <div class="card-body">
@@ -48,43 +80,19 @@
                                             <th class="required">실사일자</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    @if(@$cmd == 'add')
-                                                    <div class="docs-datepicker form-inline-inner input_box w-100">
-                                                        <div class="input-group">
-                                                            <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ @$sdate }}" autocomplete="off">
-                                                            <div class="input-group-append">
-                                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        <div class="docs-datepicker-container"></div>
-                                                    </div>
-                                                    @else
-                                                    <p class="fs-14">{{ $sc->sc_date }}</p>
-                                                    @endif
+                                                    <p class="fs-14" id="sc_date"></p>
                                                 </div>
                                             </td>
                                             <th class="required">매장</th>
                                             <td>
-                                                <div class="form-inline inline_select_box">
-                                                    @if(@$cmd == 'add')
-                                                    <div class="form-inline-inner input-box w-100">
-                                                        <div class="form-inline inline_btn_box">
-                                                            <input type='hidden' id="store_nm" name="store_nm">
-                                                            <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
-                                                            <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                                        </div>
-                                                    </div>
-                                                    @else
-                                                    <input type="text" name="store_nm" id="store_nm" value="{{ @$sc->store_nm }}" class="form-control form-control-sm w-100" readonly />
-                                                    @endif
+                                                <div class="form-inline">
+                                                    <p class="fs-14" id="store_nm"></p>
                                                 </div>
                                             </td>
                                             <th>실사코드</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    <p id="sc_cd" class="fs-14">@if(@$sc != null) {{ @$sc->sc_cd }} @else {{ @$new_sc_cd }} @endif</p>
+                                                    <p class="fs-14" id="new_sc_cd"></p>
                                                 </div>
                                             </td>
                                         </tr>
@@ -92,21 +100,13 @@
                                             <th class="required">담당자</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    @if(@$cmd == 'add')
-                                                    <div class="form-inline inline_btn_box w-100">
-                                                        <input type="hidden" id="md_id" name="md_id">
-                                                        <input type="text" id="md_nm" name="md_nm" class="form-control form-control-sm w-100 bg-white sch-md" readonly>
-                                                        <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-md"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                                    </div>
-                                                    @else
-                                                    <p class="fs-14">{{ $sc->md_nm }}</p>
-                                                    @endif
+                                                    <p class="fs-14" id="md_nm"></p>
                                                 </div>
                                             </td>
                                             <th>메모</th>
                                             <td colspan="3">
                                                 <div class="form-inline">
-                                                    <textarea name="comment" id="comment" class="w-100" rows="2">{{ @$sc->comment }}</textarea>
+                                                    <p class="fs-14" id="comment"></p>
                                                 </div>
                                             </td>
                                         </tr>
@@ -121,12 +121,9 @@
         <div class="card shadow mt-3">
             <div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
                 <a href="#">상품정보</a>
-                @if(@$cmd == 'add')
                 <div class="d-flex">
-                    <button type="button" onclick="addGoods();" class="btn btn-sm btn-primary shadow-sm mr-1" id="add_row_btn"><i class="bx bx-plus"></i> 상품추가</button>
                     <button type="button" onclick="delGoods();" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn"><i class="bx bx-trash"></i> 삭제</button>
                 </div>
-                @endif
             </div>
             <div class="card-body">
                 <div class="table-responsive mt-2">
@@ -138,8 +135,6 @@
 </div>
 
 <script language="javascript">
-    const cmd = '{{ @$cmd }}';
-    const now_state = '{{ @$sc->sc_state }}';
     const pinnedRowData = [{ prd_cd: '합계', store_wqty: 0, qty: 0, loss_qty: 0, loss_price: 0 }];
 
     let columns = [
@@ -178,6 +173,7 @@
 <script type="text/javascript" charset="utf-8">
     let gx;
     const pApp = new App('', { gridId: "#div-gd" });
+    let basic_info = {};
 
     $(document).ready(function() {
         pApp.ResizeGrid(275, 470);
@@ -206,97 +202,228 @@
                 }
             }
         });
-        if(cmd === 'update') GetProducts();
 
-        $("#store_no").on("change", function(e) {
-            gx.gridOptions.api.setRowData([]);
-            updatePinnedRow();
+        $('#excel_file').on('change', function(e){
+            if (validateFile() === false) {
+                $('.custom-file-label').html("");
+                return;
+            }
+            $('.custom-file-label').html(this.files[0].name);
         });
     });
 
-    // 등록된 상품리스트 가져오기
-    function GetProducts() {
-        let data = "sc_cd=" + '{{ @$sc->sc_cd }}';
-        gx.Request('/store/stock/stk26/search-check-products', data, -1, function(e) {
-            updatePinnedRow();
+    /**
+     * 아래부터 엑셀 관련 함수들
+     * - read the raw data and convert it to a XLSX workbook
+    */
+
+    const validateFile = () => {
+        const target = $('#excel_file')[0].files;
+
+        if (target.length > 1) {
+            alert("파일은 1개만 올려주세요.");
+            return false;
+        }
+        if (target === null || target.length === 0) {
+            alert("업로드할 파일을 선택해주세요.");
+            return false;
+        }
+        if (!/(.*?)\.(xlsx|XLSX)$/i.test(target[0].name)) {
+            alert("Excel파일만 업로드해주세요.(xlsx)");
+            return false;
+        }
+        return true;
+    };
+
+    const convertDataToWorkbook = (data) => {
+		/* convert data to binary string */
+		data = new Uint8Array(data);
+		const arr = new Array();
+
+		for (let i = 0; i !== data.length; ++i) {
+			arr[i] = String.fromCharCode(data[i]);
+		}
+
+		const bstr = arr.join("");
+
+		return XLSX.read(bstr, {type: "binary"});
+	};
+
+	const makeRequest = (method, url, success, error) => {
+		let httpRequest = new XMLHttpRequest();
+		httpRequest.open("GET", url, true);
+		httpRequest.responseType = "arraybuffer";
+
+		httpRequest.open(method, url);
+		httpRequest.onload = () => {
+			success(httpRequest.response);
+		};
+		httpRequest.onerror = () => {
+			error(httpRequest.response);
+		};
+		httpRequest.send();
+	};
+
+    const populateGrid = async (workbook) => {
+		let firstSheetName = workbook.SheetNames[0]; // our data is in the first sheet
+		let worksheet = workbook.Sheets[firstSheetName];
+
+        let sc_date = worksheet['C4']?.w;
+        let store_cd = worksheet['C5']?.w;
+        let md_id = worksheet['C6']?.w;
+        let comment = worksheet['C7']?.w;
+
+		let excel_columns = {
+			'B': 'prd_cd',
+			'C': 'qty',
+        };
+
+        let firstRowIndex = 10; // 엑셀 10행부터 시작 (샘플데이터 참고)
+		let rowIndex = firstRowIndex; 
+
+        let count = gx.gridOptions.api.getDisplayedRowCount();
+        let rows = [];
+		while (worksheet['B' + rowIndex]) {
+			let row = {};
+			Object.keys(excel_columns).forEach((column) => {
+                let item = worksheet[column + rowIndex];
+				if(item !== undefined && item.w) {
+					row[excel_columns[column]] = item.w;
+				}
+			});
+            
+            row.qty = row.qty || 0; // 실사재고 미입력 시 0 처리
+            row = { ...row, 
+                count: ++count, isEditable: true,
+            };
+            rows.push(row);
+            rowIndex++;
+		}
+        if(rows.length < 1) return alert("한 개 이상의 상품정보를 입력해주세요.");
+        rows = rows.filter(r => r.prd_cd);
+        let values = { data: rows, store_cd, md_id, sc_date, comment };
+        await getGood(values, firstRowIndex);
+	};
+
+    const importExcel = async (url) => {
+		await makeRequest('GET',
+			url,
+			// success
+			async (data) => {
+				const workbook = convertDataToWorkbook(data);
+				await populateGrid(workbook);
+			},
+			// error
+			(error) => {
+                console.log(error);
+			}
+		);
+	};
+
+    const upload = () => {
+        if(basic_info.sc_date !== undefined && !confirm("새로 적용하시는 경우 기존정보는 저장되지 않습니다.\n적용하시겠습니까?")) return;
+        
+		const file_data = $('#excel_file').prop('files')[0];
+        if(!file_data) return alert("적용할 파일을 선택해주세요.");
+
+		const form_data = new FormData();
+		form_data.append('file', file_data);
+		form_data.append('_token', "{{ csrf_token() }}");
+
+        alert("엑셀파일을 적용하고 있습니다. 잠시만 기다려주세요.");
+        
+        axios({
+            method: 'post',
+            url: '/store/stock/stk26/batch-import',
+            data: form_data,
+            headers: {
+                "Content-Type": "multipart/form-data",
+            }
+        }).then(async (res) => {
+            gx.gridOptions.api.setRowData([]);
+            if (res.data.code == 1) {
+                const file = res.data.file;
+                await importExcel("/" + file);
+            } else {
+                console.log(res.data.message);
+            }
+        }).catch((error) => {
+            console.log(error);
         });
+        
+		return false;
+	};
+
+    const getGood = async (values, firstIndex) => {
+        axios({
+            url: '/store/stock/stk26/batch-getgoods',
+            method: 'post',
+            data: values,
+        }).then(async (res) => {
+            if (res.data.code != 200) return alert(res.data.msg);
+
+            setBasicInfo(res.data.head);
+            await gx.gridOptions.api.applyTransaction({add : res.data.body});
+            updatePinnedRow();
+        }).catch((error) => {
+            console.log(error);
+        });
+    };
+
+    function setBasicInfo(obj) {
+        basic_info = {...obj};
+
+        $("#new_sc_cd").text(basic_info.new_sc_cd);
+        $("#sc_date").text(basic_info.sc_date);
+        $("#store_nm").text(basic_info.store?.store_nm);
+        $("#md_nm").text(basic_info.md?.name);
+        $("#comment").text(basic_info.comment);
+
+        $("#basic_info_form").removeClass("d-none");
+        pApp.ResizeGrid(275, 340);
     }
 
     // 실사 등록
-    function Save(cmd) {
-        if(!cmd) return;
-
-        let comment = document.f1.comment.value;
+    function Save() {
         let rows = gx.getRows();
+       
+        let sc_date = basic_info.sc_date;
+        let store_cd = basic_info.store?.store_cd;
+        let md_id = basic_info.md?.id;
+        let comment = basic_info.comment;
 
-        if(cmd === 'add') {
-            let sc_date = document.f1.sdate.value;
-            let store_cd = document.f1.store_no.value;
-            let md_id = document.f1.md_id.value;
+        if(!store_cd) return alert("매장정보가 올바르지 않습니다.");
+        if(rows.length < 1) return alert("실사등록할 상품을 선택해주세요.");
+        if(!md_id) return alert("담당자정보가 올바르지 않습니다.");
 
-            if(store_cd === '') {
-                $(".sch-store").click();
-                return alert("매장을 선택해주세요.");
+        if(!confirm("등록하시겠습니까?")) return;
+
+        axios({
+            url: '/store/stock/stk26/save',
+            method: 'put',
+            data: {
+                sc_date,
+                store_cd,
+                md_id,
+                comment,
+                products: rows.map(r => ({ prd_cd: r.prd_cd, price: r.price, qty: r.qty, store_qty: r.store_wqty })),
+            },
+        }).then(function (res) {
+            if(res.data.code === '200') {
+                alert("실사등록이 성공적으로 완료되었습니다.");
+                opener.Search();
+                window.close();
+            } else {
+                console.log(res.data);
+                alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
             }
-            if(rows.length < 1) return alert("실사등록할 상품을 선택해주세요.");
-            if($("[name=md_id]").val() === '') return alert("담당자를 선택해주세요.");
-
-            if(!confirm("등록하시겠습니까?")) return;
-
-            axios({
-                url: '/store/stock/stk26/save',
-                method: 'put',
-                data: {
-                    sc_date,
-                    store_cd,
-                    md_id,
-                    comment,
-                    products: rows.map(r => ({ prd_cd: r.prd_cd, price: r.price, qty: r.qty, store_qty: r.store_wqty })),
-                },
-            }).then(function (res) {
-                if(res.data.code === '200') {
-                    alert("실사등록이 성공적으로 완료되었습니다.");
-                    opener.Search();
-                    window.close();
-                } else {
-                    console.log(res.data);
-                    alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-                }
-            }).catch(function (err) {
-                console.log(err);
-            });
-        } else if(cmd === 'update') {
-            let sc_state = '{{ @$sc->sc_state }}';
-            let sc_cd = '{{ @$sc->sc_cd }}';
-
-            if(sc_state != 'N') return alert("매장LOSS등록 이전에만 수정가능합니다.");
-            if(!confirm("수정하시겠습니까?")) return;
-
-            axios({
-                url: '/store/stock/stk26/update',
-                method: 'put',
-                data: {
-                    sc_cd,
-                    comment,
-                    products: rows.map(r => ({ sc_prd_cd: r.sc_prd_cd, qty: r.qty })),
-                },
-            }).then(function (res) {
-                if(res.data.code === '200') {
-                    alert("실사정보 수정이 성공적으로 완료되었습니다.");
-                    opener.Search();
-                    window.close();
-                } else {
-                    console.log(res.data);
-                    alert("수정 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-                }
-            }).catch(function (err) {
-                console.log(err);
-            });
-        }
+        }).catch(function (err) {
+            console.log(err);
+        });
     }
 
     const checkIsEditable = (params) => {
-        return (cmd == 'add' || now_state == 'N') && params.data.hasOwnProperty('isEditable') && params.data.isEditable ? true : false;
+        return params.data.hasOwnProperty('isEditable') && params.data.isEditable ? true : false;
     };
 
     // 상품 삭제
@@ -310,60 +437,6 @@
         rows.filter((row, idx) => row.isEditable).map((row) => { deleteRow(row); });
         updatePinnedRow();
     };
-
-    /***************************************************************************/
-    /******************************** 상품 추가 관련 ****************************/
-    /***************************************************************************/
-
-    // 상품 추가
-    function addGoods() {
-        const ff = document.f1;
-        if (ff.store_no.value == '') {
-            $(".sch-store").click();
-            return alert('매장을 선택해주세요.');
-        }
-
-        const url = `/store/api/goods/show?store_cd=` + ff.store_no.value;
-        window.open(url, "_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1800,height=1000");
-    }
-
-    /**
-     * goods api logics - 상품 가져오기
-     * window opener에서 콜백을 사용하려면 var로 선언해야 합니다.
-     */
-
-    let callbaackRows = [];
-
-    var goodsCallback = (row) => {
-        addRow(row);
-        setStoreQty();
-    };
-    
-    var multiGoodsCallback = (rows) => {
-        if (rows && Array.isArray(rows)) rows.map(row => addRow(row));
-        setStoreQty();
-    };
-
-    var addRow = (row) => { // goods_api에서 opener 함수로 사용하기 위해 var로 선언
-        const count = gx.gridOptions.api.getDisplayedRowCount() + callbaackRows.length;
-        row = {
-            ...row, 
-            item: row.opt_kind_nm, 
-            goods_type_nm: row.goods_type,
-            qty: 0, 
-            loss_qty: (row.store_wqty * 1),
-            loss_price: (row.store_wqty * 1) * row.price,
-            isEditable: true,
-            count: count + 1,
-        };
-        callbaackRows.push(row);
-    };
-    
-    var setStoreQty = () => {
-        gx.gridOptions.api.applyTransaction({ add : callbaackRows });
-        callbaackRows = [];
-        updatePinnedRow();
-    }
 
     const updatePinnedRow = () => { // 총 반품금액, 반품수량을 반영한 PinnedRow를 업데이트
         let [ store_wqty, qty, loss_qty, loss_price ] = [ 0, 0, 0, 0 ];

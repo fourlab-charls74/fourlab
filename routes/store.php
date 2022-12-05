@@ -379,6 +379,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk26/search-check-products','stk26Controller@search_check_products');
         Route::put('stk26/save', 'stk26Controller@save');
         Route::put('stk26/update', 'stk26Controller@update');
+        Route::get('stk26/batch', 'stk26Controller@show_batch');
+        Route::post('stk26/batch-import', 'stk26Controller@import_excel');
+        Route::post('stk26/batch-getgoods', 'stk26Controller@get_goods');
         
         // 창고반품
         Route::get('stk30','stk30Controller@index');
