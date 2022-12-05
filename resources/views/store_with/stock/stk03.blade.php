@@ -174,13 +174,26 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="prd_cd">상품옵션 범위검색</label>
+                            <label>결제방법</label>
                             <div class="form-inline">
-                                <div class="form-inline-inner input-box w-100">
-                                    <div class="form-inline inline_btn_box">
-                                        <input type='hidden' id="prd_cd_range" name='prd_cd_range'>
-                                        <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' onclick="openApi();" class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                <div class="form-inline-inner w-100">
+                                    <div class="form-group flax_box">
+                                        <div style="width:calc(100% - 62px);">
+                                            <select name="stat_pay_type" class="form-control form-control-sm mr-2" style="width:100%;">
+                                                <option value="">전체</option>
+                                                @foreach ($stat_pay_types as $stat_pay_type)
+                                                    <option value='{{ $stat_pay_type->code_id }}'>
+                                                        {{ $stat_pay_type->code_val }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div style="height:30px;margin-left:5px;">
+                                            <div class="custom-control custom-switch date-switch-pos" data-toggle="tooltip" data-placement="top" data-original-title="복합결제 제외">
+                                                <input type="checkbox" class="custom-control-input" id="not_complex" name="not_complex" value="Y">
+                                                <label for="not_complex" data-on-label="ON" data-off-label="OFF" style="margin-top:2px;"></label>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -253,15 +266,35 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="goods_nm">상품명</label>
-                            <div class="flex_box">
-                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value=''>
+                            <label for="name">공급업체</label>
+                            <div class="form-inline inline_select_box">
+                                <div class="form-inline-inner input-box w-100">
+                                    <div class="form-inline inline_btn_box">
+                                        <input type="hidden" id="com_cd" name="com_cd" />
+                                        <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="row search-area-ext d-none">
                     <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="prd_cd">상품옵션 범위검색</label>
+                            <div class="form-inline">
+                                <div class="form-inline-inner input-box w-100">
+                                    <div class="form-inline inline_btn_box">
+                                        <input type='hidden' id="prd_cd_range" name='prd_cd_range'>
+                                        <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' onclick="openApi();" class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {{-- <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="goods_stat">상품상태</label>
                             <div class="flex_box">
@@ -273,7 +306,7 @@
                                 </select>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="item">품목</label>
@@ -300,6 +333,14 @@
                 <div class="row search-area-ext d-none">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
+                            <label for="goods_nm">상품명</label>
+                            <div class="flex_box">
+                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value=''>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
                             <label for="goods_nm_eng">상품명(영문)</label>
                             <div class="flex_box">
                                 <input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
@@ -308,41 +349,19 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="name">공급업체</label>
-                            <div class="form-inline inline_select_box">
-                                <div class="form-inline-inner input-box w-100">
-                                    <div class="form-inline inline_btn_box">
-                                        <input type="hidden" id="com_cd" name="com_cd" />
-                                        <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
+                            <label>온/오프라인 주문</label>
+                            <div class="form-inline form-radio-box">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" class="custom-control-input" id="sale_form_A" name="sale_form" value="" checked />
+                                    <label class="custom-control-label" for="sale_form_A">전체</label>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label>결제방법</label>
-                            <div class="form-inline">
-                                <div class="form-inline-inner w-100">
-                                    <div class="form-group flax_box">
-                                        <div style="width:calc(100% - 62px);">
-                                            <select name="stat_pay_type" class="form-control form-control-sm mr-2" style="width:100%;">
-                                                <option value="">전체</option>
-                                                @foreach ($stat_pay_types as $stat_pay_type)
-                                                    <option value='{{ $stat_pay_type->code_id }}'>
-                                                        {{ $stat_pay_type->code_val }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div style="height:30px;margin-left:5px;">
-                                            <div class="custom-control custom-switch date-switch-pos" data-toggle="tooltip" data-placement="top" data-original-title="복합결제 제외">
-                                                <input type="checkbox" class="custom-control-input" id="not_complex" name="not_complex" value="Y">
-                                                <label for="not_complex" data-on-label="ON" data-off-label="OFF" style="margin-top:2px;"></label>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" class="custom-control-input" id="sale_form_On" name="sale_form" value="On" />
+                                    <label class="custom-control-label" for="sale_form_On">온라인</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" class="custom-control-input" id="sale_form_Off" name="sale_form" value="Off" />
+                                    <label class="custom-control-label" for="sale_form_Off">오프라인</label>
                                 </div>
                             </div>
                         </div>

@@ -57,7 +57,7 @@ class stk03Controller extends Controller
         $style_no       = $request->input('style_no', '');
         $goods_no       = $request->input('goods_no', '');
         $goods_nm       = $request->input('goods_nm', '');
-        $goods_stat     = $request->input('goods_stat', []);
+        // $goods_stat     = $request->input('goods_stat', []);
         $item           = $request->input('item', '');
         $brand_cd       = $request->input('brand_cd', '');
         $goods_nm_eng   = $request->input('goods_nm_eng', '');
@@ -68,7 +68,10 @@ class stk03Controller extends Controller
         $ord_field      = $request->input('ord_field', 'o.ord_date');
         $page           = $request->input('page', 1);
         $prd_cd_range_text = $request->input("prd_cd_range", '');
+        $sale_form      = $request->input('sale_form', '');
         if ($page < 1 or $page == '') $page = 1;
+
+        $offline_store = 'HEAD_OFFICE';
 
         // $mobile_yn      = $request->input('mobile_yn', '');  // 모바일 주문 여부
         // $app_yn         = $request->input('app_yn', '');    // 앱 주문 여부
@@ -183,19 +186,22 @@ class stk03Controller extends Controller
             }
         }
         if ($goods_nm != '') $where .= " and g.goods_nm like '%$goods_nm%' ";
-        if (count($goods_stat) > 0) {
-            if (count($goods_stat) == 1 && $goods_stat[0] != '') {
-                $where .= " and g.sale_stat_cl = '" . $goods_stat[0] . "' ";
-            } else {
-                $in_goods_stats = join(',', $goods_stat);
-                $where .= " and g.sale_stat_cl in ($in_goods_stats) ";
-            }
-        }
+        // if (count($goods_stat) > 0) {
+        //     if (count($goods_stat) == 1 && $goods_stat[0] != '') {
+        //         $where .= " and g.sale_stat_cl = '" . $goods_stat[0] . "' ";
+        //     } else {
+        //         $in_goods_stats = join(',', $goods_stat);
+        //         $where .= " and g.sale_stat_cl in ($in_goods_stats) ";
+        //     }
+        // }
         if ($item != '') $where .= " and g.opt_kind_cd = '$item' ";
         if ($brand_cd != '') $where .= " and g.brand = '$brand_cd' ";
         if ($goods_nm_eng != '') $where .= " and g.goods_nm_eng like '%$goods_nm_eng%' ";
         if ($com_cd != '') $where .= " and g.com_id = '$com_cd' ";
         else if ($com_nm != '') $where .= " and g.com_nm = '$com_nm' ";
+
+        if ($sale_form == 'On') $where .= " and (o.store_cd is not null and o.store_cd <> '$offline_store') ";
+        else if ($sale_form == 'Off') $where .= " and (o.store_cd is null or o.store_cd = '$offline_store') ";
 
         // ordreby
         $orderby = sprintf("order by %s %s", $ord_field, $ord);
