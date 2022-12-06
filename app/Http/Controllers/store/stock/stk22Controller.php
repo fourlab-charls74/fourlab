@@ -49,7 +49,7 @@ class stk22Controller extends Controller
             $prd_cd = explode(',', $r['prd_cd']);
 			$where .= " and (1!=1";
 			foreach($prd_cd as $cd) {
-				$where .= " or p.prd_cd = '" . Lib::quote($cd) . "' ";
+				$where .= " or pc.prd_cd = '" . Lib::quote($cd) . "' ";
 			}
 			$where .= ")";
         }
@@ -64,20 +64,8 @@ class stk22Controller extends Controller
                 $where .= " and pc.$opt $in_query ($opt_join) ";
             }
         }
-        if(isset($r['goods_stat'])) {
-            $goods_stat = $r['goods_stat'];
-            if(is_array($goods_stat)) {
-                if (count($goods_stat) == 1 && $goods_stat[0] != "") {
-                    $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat[0]) . "' ";
-                } else if (count($goods_stat) > 1) {
-                    $where .= " and g.sale_stat_cl in (" . join(",", $goods_stat) . ") ";
-                }
-            } else if($goods_stat != ""){
-                $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
-            }
-        }
         if($r['style_no'] != null) 
-            $where .= " and g.style_no = '" . $r['style_no'] . "'";
+            $where .= " and if(pc.goods_no <> '0', g.style_no, p.style_no) = '" . $r['style_no'] . "'";
 
         $goods_no = $r['goods_no'];
         $goods_nos = $request->input('goods_nos', '');
@@ -111,9 +99,7 @@ class stk22Controller extends Controller
 
         // ordreby
         $ord = $r['ord'] ?? 'desc';
-        $ord_field = $r['ord_field'] ?? "g.goods_no";
-        if($ord_field == 'goods_no') $ord_field = 'g.' . $ord_field;
-        else $ord_field = 'p.' . $ord_field;
+        $ord_field = $r['ord_field'] ?? "pc.rt";
         $orderby = sprintf("order by %s %s", $ord_field, $ord);
 
         // pagination
@@ -126,39 +112,26 @@ class stk22Controller extends Controller
         // search goods
 		$sql = "
             select
-                g.goods_no,
-                g.goods_sub,
-                p.prd_cd,
-                p.goods_opt,
-                ifnull(type.code_val, 'N/A') as goods_type_nm,
-                com.com_nm,
-                opt.opt_kind_nm,
-                brand.brand_nm,
-                cat.full_nm,
-                g.style_no,
-                g.head_desc,
-                g.goods_nm,
-                g.goods_nm_eng,
-                stat.code_val as sale_stat_cl,
-                g.goods_sh,
-                g.price,
-                g.wonga,
-                (100/(g.price/(g.price-g.wonga))) as margin_rate,
-                (g.price-g.wonga) as margin_amt,
-                g.org_nm
-            from goods g 
-                inner join product_stock p on g.goods_no = p.goods_no
-                inner join product_code pc on pc.prd_cd = p.prd_cd
-                left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
-                left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
-                left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
-                left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
-                left outer join company com on com.com_id = g.com_id
-                left outer join brand brand on brand.brand = g.brand
-                left outer join category cat on cat.d_cat_cd = g.rep_cat_cd and cat.cat_type = 'DISPLAY'
-                left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
-                left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
-                left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
+                pc.prd_cd
+                , pc.goods_no
+                , opt.opt_kind_nm
+                , if(pc.goods_no <> '0', g.brand, pc.brand) as brand
+                , b.brand_nm
+                , if(pc.goods_no <> '0', g.style_no, p.style_no) as style_no
+                , if(pc.goods_no <> '0', g.goods_nm, p.prd_nm) as goods_nm
+                , if(pc.goods_no <> '0', g.goods_nm_eng, p.prd_nm) as goods_nm_eng
+                , concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
+                , pc.color
+                , pc.size
+                , pc.goods_opt
+                , if(pc.goods_no <> '0', g.goods_sh, p.tag_price) as goods_sh
+                , if(pc.goods_no <> '0', g.price, p.price) as price
+                , if(pc.goods_no <> '0', g.wonga, p.wonga) as wonga
+            from product_code pc
+                inner join product p on p.prd_cd = pc.prd_cd
+                inner join goods g on g.goods_no = pc.goods_no
+                left outer join brand b on b.br_cd = pc.brand
+                left outer join opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
             where 1=1 $where
             $orderby
             $limit
@@ -172,19 +145,9 @@ class stk22Controller extends Controller
         if($page == 1) {
             $sql = "
                 select count(*) as total
-                from goods g 
-                    inner join product_stock p on g.goods_no = p.goods_no
-                    inner join product_code pc on pc.prd_cd = p.prd_cd
-                    left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
-                    left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
-                    left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
-                    left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
-                    left outer join company com on com.com_id = g.com_id
-                    left outer join brand brand on brand.brand = g.brand
-                    left outer join category cat on cat.d_cat_cd = g.rep_cat_cd and cat.cat_type = 'DISPLAY'
-                    left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
-                    left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
-                    left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
+                from product_code pc
+                    inner join product p on p.prd_cd = pc.prd_cd
+                    inner join goods g on g.goods_no = pc.goods_no
                 where 1=1 $where
             ";
 
