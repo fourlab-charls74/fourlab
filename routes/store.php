@@ -406,7 +406,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk32','stk32Controller@index');
         Route::get('stk32/search', 'stk32Controller@search');
         Route::get('stk32/search-receiver', 'stk32Controller@search_receiver');
+        Route::get('stk32/search3', 'stk32Controller@search3');
         Route::get('stk32/search_group', 'stk32Controller@search_group');
+        Route::get('stk32/search_group_show', 'stk32Controller@search_group_show');
         Route::get('stk32/search_group2{group_cd?}', 'stk32Controller@search_group2');
         Route::get('stk32/create', 'stk32Controller@create');
         Route::get('stk32/sendMsg', 'stk32Controller@sendMsg');
@@ -417,7 +419,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::put('stk32/msg_read', 'stk32Controller@msg_read');
         Route::post('stk32/msg_del', 'stk32Controller@msg_del');
         Route::get('stk32/group', 'stk32Controller@group');
+        Route::get('stk32/group_show', 'stk32Controller@group_show');
         Route::post('stk32/add_group', 'stk32Controller@add_group');
+        Route::get('stk32/addGroup', 'stk32Controller@addGroup');
+        Route::get('stk32/addGroup', 'stk32Controller@addGroup_show');
         Route::post('stk32/mod_group', 'stk32Controller@mod_group');
         Route::post('stk32/del_group', 'stk32Controller@del_group');
 

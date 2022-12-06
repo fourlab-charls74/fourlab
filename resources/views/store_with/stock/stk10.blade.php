@@ -111,7 +111,7 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="store_no">매장</label>
+                            <label for="store_no">매장명</label>
                             <div class="form-inline inline_btn_box">
                                 <input type='hidden' id="store_nm" name="store_nm">
                                 <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
@@ -362,6 +362,7 @@
 		{field: "style_no",	headerName: "스타일넘버", cellStyle: {"text-align": "center"}},
 		{field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 300},
 		{field: "goods_nm_eng",	headerName: "상품명(영문)", type: 'HeadGoodsNameType', width: 300},
+        {field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: {"text-align": "center"}},
         {field: "color", headerName: "컬러", width: 70, cellStyle: {"text-align": "center"}},
         {field: "size", headerName: "사이즈", width: 70, cellStyle: {"text-align": "center"}},
 		{field: "goods_opt", headerName: "옵션", width: 150},

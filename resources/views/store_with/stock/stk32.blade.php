@@ -229,7 +229,7 @@
 
     function openMsgPopup() {
         const url = '/store/stock/stk32/create';
-        const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=700");
+        const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1100,height=700");
     }
 
     function showContent(msg_cd) {

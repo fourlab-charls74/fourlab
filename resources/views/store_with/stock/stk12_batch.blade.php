@@ -94,7 +94,8 @@
                                     <option value='{{ $rel_order->code_val }}'>{{ $rel_order->code_val }}</option>
                                 @endforeach
                             </select>
-                            <a href="#" onclick="requestRelease();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>출고요청</a>
+                            <a href="#" onclick="requestRelease();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>출고요청</a> &nbsp;&nbsp;
+                            <a href="#" onclick="onRemoveSelected();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>삭제</a>
                         </div>
                     </div>
                 </div>
@@ -142,21 +143,7 @@
         pApp.ResizeGrid(275, 450);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns, {
-                onCellValueChanged: (e) => {
-                    e.node.setSelected(true);
-                    if (e.column.colId.includes('rel_qty')) {
-                        if (isNaN(e.newValue) == true || e.newValue == "") {
-                            alert("숫자만 입력가능합니다.");
-                            gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
-                        } else {
-                            // let store_cd = e.column.colId.split("_")[0];
-                            // if(e.data[store_cd] === null) e.data[store_cd] = {};
-                            // e.data[store_cd][e.column.colId] = parseInt(e.newValue);
-                        }
-                    }
-                }
-            });
+        gx = new HDGrid(gridDiv, columns);
 
         $('#excel_file').on('change', function(e){
             if (validateFile() === false) {
@@ -166,6 +153,24 @@
             $('.custom-file-label').html(this.files[0].name);
         });
     });
+
+    // 엑셀업로드 선택한 행 삭제 기능
+    function onRemoveSelected() {
+        let selectedData = gx.getSelectedRows();
+        
+        if (selectedData.length > 0) {
+            selectedData = selectedData[0];
+        } else {
+            selectedData = {};
+        }
+
+        if (confirm('해당 상품을 삭제하시겠습니까?')){
+            gx.gridOptions.api.applyTransaction({ remove: [selectedData] });
+        }
+    }
+
+
+
 
     const validateFile = () => {
         const target = $('#excel_file')[0].files;
@@ -309,7 +314,6 @@
      function requestRelease() {
             let rows = gx.getSelectedRows();
 
-            console.log(rows[0].qty);
             if(rows.length < 1) return alert("출고요청할 상품을 선택해주세요.");
 
             let storage_qty = "";
@@ -367,53 +371,6 @@
         });
     };
 
-    // 상품반품 일괄등록
-    // function Save() {
-    //     let rows = gx.getSelectedRows();
-
-    //     console.log(rows);
-    //     if(rows.length < 1) return alert("일괄등록할 상품이 존재하지 않습니다.");
-
-    //     let release_qtys = rows.filter(r => r.qty < 1);
-    //     if(release_qtys.length > 0) return alert("출고수량이 0개인 항목이 존재합니다.");
-
-    //     if(!confirm("일괄등록하시겠습니까?")) return;
-
-    //     axios({
-    //         url: '/store/stock/stk12/add-storage-return',
-    //         method: 'put',
-    //         data: {
-    //             products: rows.map(r => ({ 
-    //                                     prd_cd: r.prd_cd,
-    //                                     store_cd: r.store_cd, 
-    //                                     store_nm: r.store_nm, 
-    //                                     goods_no: r.goods_no, 
-    //                                     opt_kind_nm: r.opt_kind_nm,
-    //                                     brand: r.brand,
-    //                                     style_no: r.style_no,
-    //                                     goods_nm: r.goods_nm,
-    //                                     goods_nm_eng: r.goods_nm_eng,
-    //                                     prd_cd_p: r.prd_cd_p,
-    //                                     color: r.color,
-    //                                     size: r.size,
-    //                                     opt: r.opt,
-    //                                     qty: r.qty
-    //                                 })),
-    //         },
-    //     }).then(function (res) {
-    //         if(res.data.code === 200) {
-    //             alert(res.data.msg);
-    //             opener.Search();
-    //             window.close();
-    //         } else {
-    //             console.log(res.data);
-    //             alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-    //         }
-    //     }).catch(function (err) {
-    //         console.log(err);
-    //     });
-    // }
-
     const checkIsEditable = (params) => {
         return params.data.hasOwnProperty('isEditable') && params.data.isEditable ? true : false;
     };
@@ -433,5 +390,7 @@
             { ...pinnedRow.data, qty: qty, total_return_price: total_return_price }
         ]);
     };
+
+   
 </script>
 @stop

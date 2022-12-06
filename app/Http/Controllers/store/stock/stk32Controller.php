@@ -118,49 +118,39 @@ class stk32Controller extends Controller
         ]);
     }
 
+    public function create()
+    {
+        $values = [
+            'store_types' => SLib::getCodes("STORE_TYPE"),
+        ];
+
+        return view( Config::get('shop.store.view') . '/stock/stk32_show', $values);
+    }
 
     public function search_receiver(Request $request)
     {
         $store_nm = $request->input('store_nm');
-        $div_store = $request->input('div_store');
+        $div_store = $request->input('store');
+
 
         // pagination
         $page = $r['page'] ?? 1;
         if ($page < 1 or $page == "") $page = 1;
-        $page_size = $r['limit'] ?? 100;
-        $startno = ($page - 1) * $page_size;
-        // $limit = " limit $startno, $page_size ";
 
         $where = "";
-        if($store_nm != "" && $div_store == 'onceStore') $where .= " and store_nm like '%" . $store_nm . "%' ";
-        if($store_nm != "" && $div_store == 'groupStore') $where .= " and group_nm like '%" . $store_nm . "%'";
+        if($store_nm != "" && $div_store == 'O') $where .= " and store_nm like '%" . $store_nm . "%' ";
 
-        if ($div_store == 'onceStore') {
             $sql = 
                 "
                 select 
                     store_cd,
                     store_nm,
-                    mobile
+                    mobile,
+                    '$div_store' as store
                 from store
                 where 1=1 $where
                 ";
-        } elseif ($div_store == 'groupStore') {
-            $sql = 
-                "
-                select 
-                    mg.group_nm,
-                    mg.group_cd,
-                    group_concat(s.store_nm) as group_store_nm
-                from msg_group mg
-                    inner join msg_group_store mgs on mgs.group_cd = mg.group_cd
-                    inner join store s on s.store_cd = mgs.store_cd
-                where 1=1 $where
-                group by mg.group_cd
-                ";
-
-        }
-
+       
         $result = DB::select($sql);
 
         return response()->json([
@@ -168,7 +158,7 @@ class stk32Controller extends Controller
             "head" => array(
                 "total" => count($result)
             ),
-            "body" => $result
+            "body" => $result,
         ]);
 
     }
@@ -176,49 +166,35 @@ class stk32Controller extends Controller
 
     public function search3(Request $request)
     {
-        $store_nm = $request->input('store_nm');
+        $group_nm = $request->input('group_nm');
         $div_store = $request->input('div_store');
 
-        // pagination
-        $page = $r['page'] ?? 1;
-        if ($page < 1 or $page == "") $page = 1;
-        $page_size = $r['limit'] ?? 100;
-        $startno = ($page - 1) * $page_size;
-        $limit = " limit $startno, $page_size ";
-
+       
         $where = "";
-        if($store_nm != "" && $div_store == 'onceStore') $where .= " and store_nm like '%" . $store_nm . "%' ";
-        if($store_nm != "" && $div_store == 'groupStore') $where .= " and group_nm like '%" . $store_nm . "%'";
+        if($group_nm != "") $where .= " and mg.group_nm like '%" . $group_nm . "%'";
 
-        if ($div_store == 'onceStore') {
             $sql = 
                 "
                 select 
-                    store_cd,
-                    store_nm,
-                    mobile
-                from store
+                    mg.group_nm,
+                    mg.group_cd,
+                    group_concat(s.store_nm) as group_store_nm,
+                    '$div_store' as store
+                from msg_group mg
+                    left outer join msg_group_store mgs on mgs.group_cd = mg.group_cd
+                    left outer join store s on s.store_cd = mgs.store_cd
                 where 1=1 $where
+                group by mg.group_cd
             ";
-        } elseif ($div_store == 'groupStore') {
-            $sql = 
-                "
-                select 
-                    group_nm,
-                    group_cd
-                from msg_group
-                where 1=1 $where
-            ";
-        }
 
         $result = DB::select($sql);
 
-     
+       
 
         return response()->json([
             "code" => 200,
             "head" => array(
-                "total" => count($result)
+				"total" => count($result)
             ),
             "body" => $result
         ]);
@@ -226,10 +202,7 @@ class stk32Controller extends Controller
     }
 
 
-    public function create()
-    {
-        return view( Config::get('shop.store.view') . '/stock/stk32_show');
-    }
+    
     
 
     public function sendMsg(Request $request)
@@ -631,6 +604,21 @@ class stk32Controller extends Controller
         return view(Config::get('shop.store.view') . '/stock/stk32_group', $values);
     }
 
+    public function group_show(Request $request)
+    {
+        
+        $mutable = Carbon::now();
+        $sdate = $mutable->sub(1, 'month')->format('Y-m-d');
+       
+        $values = [
+            'store_types' => SLib::getCodes("STORE_TYPE"),
+            'sdate' => $sdate,
+            'edate' => date("Y-m-d"),
+        ];
+
+        return view(Config::get('shop.store.view') . '/stock/stk32_group_show', $values);
+    }
+
 
     public function search_group(Request $request)
     {
@@ -687,6 +675,76 @@ class stk32Controller extends Controller
 
 
     public function add_group(Request $request)
+    {
+        $group_nm = $request->input('group_nm');
+        $store_cd = $request->input('store_cd');
+        $store_cd = explode(',',$store_cd);
+        $code = "";
+
+        try {
+            DB::beginTransaction();
+
+            $sql = "
+                select 
+                    * 
+                from msg_group
+                where group_nm = '$group_nm'
+            ";
+            $r = DB::select($sql);
+
+            if (count($r) > 0) {
+                $code = 100;
+
+            } else {
+                $res = DB::table('msg_group')
+                ->insertGetId([
+                    'group_nm' => $group_nm,
+                    'account_cd' => 'HEAD',
+                    'rt' => now()
+                ]);
+
+                foreach ($store_cd as $sc) {
+                    DB::table('msg_group_store')
+                        ->insert([
+                            'group_cd' => $res,
+                            'store_cd' => $sc,
+                            'rt' => now()
+                        ]);
+                }
+                $code = 200;
+            }
+
+           
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+            $code = '500';
+            $msg = $e->getMessage();
+        }
+
+        return response()->json([
+            "code" => $code,
+            "msg" => $msg
+        ]);
+
+    }
+
+    public function addGroup_show(Request $request)
+    {
+        
+        $mutable = Carbon::now();
+        $sdate = $mutable->sub(1, 'month')->format('Y-m-d');
+       
+        $values = [
+            'store_types' => SLib::getCodes("STORE_TYPE"),
+            'sdate' => $sdate,
+            'edate' => date("Y-m-d"),
+        ];
+
+        return view(Config::get('shop.store.view') . '/stock/stk32_addGroup', $values);
+    }
+
+    public function addGroup(Request $request)
     {
         $group_nm = $request->input('group_nm');
         $store_cd = $request->input('store_cd');
