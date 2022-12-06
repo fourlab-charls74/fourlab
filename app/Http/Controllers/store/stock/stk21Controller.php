@@ -131,7 +131,7 @@ class stk21Controller extends Controller
                 , if(pc.goods_no <> '0', g.wonga, p.wonga) as wonga
             from product_code pc
                 inner join product p on p.prd_cd = pc.prd_cd
-                inner join goods g on g.goods_no = pc.goods_no
+                left outer join goods g on g.goods_no = pc.goods_no
                 left outer join brand b on b.br_cd = pc.brand
                 left outer join opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
             where 1=1 $where
@@ -148,7 +148,6 @@ class stk21Controller extends Controller
                 select count(*) as total
                 from product_code pc
                     inner join product p on p.prd_cd = pc.prd_cd
-                    inner join goods g on g.goods_no = pc.goods_no
                 where 1=1 $where
             ";
 

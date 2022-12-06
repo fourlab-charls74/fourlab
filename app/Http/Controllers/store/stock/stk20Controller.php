@@ -83,18 +83,6 @@ class stk20Controller extends Controller
 			}
 			$where .= ")";
         }
-        if(isset($r['goods_stat'])) {
-            $goods_stat = $r['goods_stat'];
-            if(is_array($goods_stat)) {
-                if (count($goods_stat) == 1 && $goods_stat[0] != "") {
-                    $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat[0]) . "' ";
-                } else if (count($goods_stat) > 1) {
-                    $where .= " and g.sale_stat_cl in (" . join(",", $goods_stat) . ") ";
-                }
-            } else if($goods_stat != ""){
-                $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
-            }
-        }
         if($r['style_no'] != null) 
             $where .= " and g.style_no = '" . $r['style_no'] . "'";
 
@@ -143,8 +131,6 @@ class stk20Controller extends Controller
         // ordreby
         $ord = $r['ord'] ?? 'desc';
         $ord_field = $r['ord_field'] ?? "psr.req_rt";
-        if($ord_field == 'goods_no') $ord_field = 'g.' . $ord_field;
-        else $ord_field = 'psr.' . $ord_field;
         $orderby = sprintf("order by %s %s", $ord_field, $ord);
 
         // pagination
@@ -161,10 +147,15 @@ class stk20Controller extends Controller
                 psr.type,
                 psr.goods_no, 
                 g.style_no, 
-                g.goods_nm, 
+                g.goods_nm,
+                g.goods_nm_eng,
                 psr.prd_cd, 
+                pc.color,
+                pc.size,
+                concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p,
                 psr.goods_opt, 
                 g.price,
+                g.goods_sh,
                 psr.qty,
                 psr.dep_store_cd,
                 (select store_nm from store where store_cd = psr.dep_store_cd) as dep_store_nm,
@@ -183,8 +174,8 @@ class stk20Controller extends Controller
                 psr.fin_id, 
                 psr.fin_rt
             from product_stock_rotation psr
-                inner join goods g on g.goods_no = psr.goods_no
-                left outer join product_code pc on pc.prd_cd = psr.prd_cd
+                inner join product_code pc on pc.prd_cd = psr.prd_cd
+                left outer join goods g on g.goods_no = psr.goods_no
             where 1=1 and psr.del_yn = 'N' $where
             $orderby
             $limit
