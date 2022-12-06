@@ -402,6 +402,7 @@
             url: '/store/stock/stk26/save',
             method: 'put',
             data: {
+                sc_type: "B",
                 sc_date,
                 store_cd,
                 md_id,

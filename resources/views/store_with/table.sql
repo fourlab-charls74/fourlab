@@ -558,6 +558,7 @@ CREATE TABLE `stock_check` (
     `store_cd` varchar(30) NOT NULL COMMENT '매장코드 - store : store_cd',
     `md_id` varchar(30) DEFAULT NULL COMMENT '담당자',
     `sc_date` char(10) NOT NULL COMMENT '실사일자',
+    `sc_type` char(1) NOT NULL COMMENT '실사구분 - 일반(G)/일괄(B)',
     `sc_state` char(1) DEFAULT 'N' COMMENT 'LOSS처리상태 - Y / N',
     `comment` varchar(255) DEFAULT NULL COMMENT '메모',
     `rt` datetime DEFAULT NULL COMMENT '등록일자',

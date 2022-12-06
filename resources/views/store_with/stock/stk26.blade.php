@@ -124,18 +124,21 @@
 
 <script language="javascript">
     let columns = [
-        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
-        {field: "sc_date", headerName: "실사일자", width: 100, cellStyle: {"text-align": "center"}},
+        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {"text-align": "center"}},
+        {field: "sc_date", headerName: "실사일자", width: 80, cellStyle: {"text-align": "center"}},
         {field: "sc_cd", headerName: "실사코드", width: 100, cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {
                 return `<a href="javascript:void(0);" onclick="openDetailPopup(${params.value})">${params.value}</a>`;
             }
         },
-        {field: "store_cd", headerName: "매장코드", width: 100, cellStyle: {"text-align": "center"}},
-        {field: "store_nm", headerName: "매장명", width: 150},
-        {field: "loss_qty", headerName: "LOSS 총수량", width: 100, type: "currencyType"},
-        {field: "loss_price", headerName: "LOSS 총금액", width: 100, type: "currencyType"},
-        {field: "sc_state", headerName: "LOSS처리여부", width: 100, 
+        {field: "sc_type", headerName: "실사구분", width: 70, cellStyle: (params) => ({"text-align": "center", "color": params.value === 'B' ? '#2aa876' : 'none'}),
+            cellRenderer: (params) => params.value === 'G' ? '일반' : params.value === 'B' ? '일괄' : '-',
+        },
+        {field: "store_cd", headerName: "매장코드", width: 80, cellStyle: {"text-align": "center"}},
+        {field: "store_nm", headerName: "매장명", width: 170},
+        {field: "loss_qty", headerName: "LOSS 총수량", width: 80, type: "currencyType"},
+        {field: "loss_price", headerName: "LOSS 총금액", width: 80, type: "currencyType"},
+        {field: "sc_state", headerName: "LOSS처리여부", width: 90, 
             cellStyle: (params) => ({"text-align": "center", "color": params.value == "N" ? "red" : params.value == "Y" ? "green" : "none"}),
             cellRenderer: (params) => params.value === "Y" ? "등록" : "미등록",
         },

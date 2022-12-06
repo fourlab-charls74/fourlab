@@ -84,7 +84,7 @@
                                             <th>실사코드</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    <p id="sc_cd" class="fs-14">@if(@$sc != null) {{ @$sc->sc_cd }} @else {{ @$new_sc_cd }} @endif</p>
+                                                    <p id="sc_cd" class="fs-14">@if(@$sc != null) {{ @$sc->sc_cd }} ({{ @$sc->sc_type == 'G' ? '일반등록' : (@$sc->sc_type == 'B' ? '일괄등록' : '-') }}) @else {{ @$new_sc_cd }} @endif</p>
                                                 </div>
                                             </td>
                                         </tr>
@@ -247,6 +247,7 @@
                 url: '/store/stock/stk26/save',
                 method: 'put',
                 data: {
+                    sc_type: "G",
                     sc_date,
                     store_cd,
                     md_id,

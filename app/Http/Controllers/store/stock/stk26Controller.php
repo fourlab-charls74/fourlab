@@ -46,6 +46,7 @@ class stk26Controller extends Controller
         $sql = "
             select
                 s.sc_date,
+                s.sc_type,
                 s.sc_cd,
                 s.store_cd,
                 store.store_nm,
@@ -86,6 +87,7 @@ class stk26Controller extends Controller
             $sql = "
                 select
                     s.sc_date,
+                    s.sc_type,
                     s.sc_cd,
                     s.store_cd,
                     store.store_nm,
@@ -135,14 +137,14 @@ class stk26Controller extends Controller
                 g.goods_type,
                 op.opt_kind_nm,
                 b.brand_nm as brand, 
-                g.style_no, 
-                g.goods_nm,
-                g.goods_nm_eng,
+                if(g.goods_no <> '0', g.style_no, p.style_no) as style_no,
+                if(g.goods_no <> '0', g.goods_nm, p.prd_nm) as goods_nm,
+                if(g.goods_no <> '0', g.goods_nm_eng, p.prd_nm) as goods_nm_eng,
                 pc.goods_opt,
                 concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p,
                 pc.color,
                 pc.size,
-                g.goods_sh,
+                if(g.goods_no <> '0', g.goods_sh, p.tag_price) as goods_sh,
                 s.price,
                 s.qty,
                 s.store_qty as store_wqty, 
@@ -150,9 +152,10 @@ class stk26Controller extends Controller
                 (s.price * (s.store_qty - s.qty)) as loss_price,
                 true as isEditable
             from stock_check_product s
-                left outer join product_code pc on pc.prd_cd = s.prd_cd
+                inner join product_code pc on pc.prd_cd = s.prd_cd
+                inner join product p on p.prd_cd = s.prd_cd
                 left outer join goods g on g.goods_no = pc.goods_no
-                left outer join brand b on b.brand = g.brand
+                left outer join brand b on b.br_cd = pc.brand
                 left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
                 , (select @rownum :=0) as r
             where s.sc_cd = :sc_cd
@@ -174,13 +177,13 @@ class stk26Controller extends Controller
     // 실사등록
     public function save(Request $request)
     {
+        $sc_type = $request->input("sc_type", "G"); // 일반(G)/일괄(B)
         $sc_date = $request->input("sc_date", date("Y-m-d"));
         $store_cd = $request->input("store_cd", "");
         $md_id = $request->input("md_id", "");
         $comment = $request->input("comment", "");
         $products = $request->input("products", []);
         $admin_id = Auth('head')->user()->id;
-
 
         try {
             DB::beginTransaction();
@@ -190,6 +193,7 @@ class stk26Controller extends Controller
                     'store_cd' => $store_cd,
                     'md_id' => $md_id,
                     'sc_date' => $sc_date,
+                    'sc_type' => $sc_type,
                     'comment' => $comment,
                     'rt' => now(),
                     'admin_id' => $admin_id,
@@ -321,16 +325,15 @@ class stk26Controller extends Controller
                     , pc.goods_no
                     , opt.opt_kind_nm
                     , b.brand_nm as brand
-                    , g.style_no
-                    , g.goods_nm
-                    , g.goods_nm_eng
-                    , g.price
+                    , if(g.goods_no <> '0', g.style_no, p.style_no) as style_no
+                    , if(g.goods_no <> '0', g.goods_nm, p.prd_nm) as goods_nm
+                    , if(g.goods_no <> '0', g.goods_nm_eng, p.prd_nm) as goods_nm_eng
                     , concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
                     , pc.color
                     , pc.size
                     , pc.goods_opt
-                    , g.goods_sh
-                    , g.price
+                    , if(g.goods_no <> '0', g.goods_sh, p.tag_price) as goods_sh
+                    , if(g.goods_no <> '0', g.price, p.price) as price
                     , ifnull(pss.wqty, 0) as store_wqty
                     , '$qty' as qty
                     , (ifnull(pss.wqty, 0) - ifnull('$qty', 0)) as loss_qty
@@ -338,10 +341,11 @@ class stk26Controller extends Controller
                     , true as isEditable
                     , '$count' as count
                 from product_code pc
-                    inner join goods g on g.goods_no = pc.goods_no
+                    inner join product p on p.prd_cd = pc.prd_cd
+                    left outer join goods g on g.goods_no = pc.goods_no
                     left outer join product_stock_store pss on pss.prd_cd = pc.prd_cd and pss.store_cd = '$store_cd'
                     left outer join opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
-                    left outer join brand b on b.brand = g.brand
+                    left outer join brand b on b.br_cd = pc.brand
                 where pc.prd_cd = '$prd_cd'
                 limit 1
             ";
