@@ -267,8 +267,7 @@
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 30, cellStyle: {"text-align": "center"}},
         {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, sort: null, width: 28},
         {field: "dep_store_nm",	headerName: "보내는 매장", pinned: 'left', width: 140},
-        {field: "store_nm",	headerName: "받는 매장", pinned: 'left', width: 140, editable: true, 
-            cellStyle: {"background-color": "#ffFF99"},
+        {field: "store_nm",	headerName: "받는 매장", pinned: 'left', width: 140, editable: true, cellStyle: {"background-color": "#ffFF99"},
             cellEditorSelector: function(params) {
                 return {
                     component: 'agRichSelectCellEditor',
@@ -413,8 +412,23 @@
         let data = 'prd_cd=' + selected_prd.prd_cd + "&store_type=" + store_type;
 		gx2.Request('/store/stock/stk21/search-stock', data, -1, function(d) {
             $("#selected_prd_nm").html(`[${selected_prd.prd_cd}] ${selected_prd.goods_nm}`);
+            setReceiveStoreListOptions(d.body.map(r => ({ store_cd: r.dep_store_cd, store_nm: r.dep_store_nm })));
         });
     }
+
+	function setReceiveStoreListOptions(new_stores) {
+        let store_columns = stock_columns.map(c => c.field === 'store_nm' ? ({...c, 
+            cellEditorSelector: function(params) {
+                return {
+                    component: 'agRichSelectCellEditor',
+                    params: { 
+                        values: new_stores.map(s => s.store_nm)
+                    },
+                };
+            },
+        }) : c);
+        gx2.gridOptions.api.setColumnDefs(store_columns);
+	}
 
     // 최종RT리스트에 등록
     function AddRTToFinalTable() {
