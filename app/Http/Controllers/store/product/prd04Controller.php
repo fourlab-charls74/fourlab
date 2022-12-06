@@ -48,7 +48,7 @@ class prd04Controller extends Controller
 		$ord		= $request->input('ord','desc');
 		$ord_field	= $request->input('ord_field','prd_cd_p');
 		if ($ord_field == 'prd_cd_p') $ord_field = 'pc.rt';
-		$orderby	= sprintf("order by %s %s, pc.color, pc.size", $ord_field, $ord);
+		$orderby	= sprintf("order by %s %s, pc.prd_cd", $ord_field, $ord);
 		$match_yn = $request->input('match_yn1');
 
 		$where		= "";
@@ -166,7 +166,6 @@ class prd04Controller extends Controller
 						left outer join goods g on pc.goods_no = g.goods_no
 						left outer join brand brand on brand.brand = g.brand
 						inner join code c on pc.color = c.code_id
-						inner join code d on pc.size = d.code_val
 						inner join brand b on b.br_cd = pc.brand
 						left outer join (
 							select prd_cd, sum(qty) as qty, stock_state_date
@@ -181,7 +180,7 @@ class prd04Controller extends Controller
 							group by prd_cd
 						) _next_store on _next_store.prd_cd = ps.prd_cd $next_store_qty_sql
 					where 
-						c.code_kind_cd = 'PRD_CD_COLOR' and d.code_kind_cd = 'PRD_CD_SIZE_MATCH'
+						c.code_kind_cd = 'PRD_CD_COLOR'
 						$where
 					group by pc.prd_cd
 				) a
@@ -214,9 +213,7 @@ class prd04Controller extends Controller
 				, if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
 				, g.goods_nm_eng
 				, pc.color, c.code_val as color_nm, pc.size
-				, concat(c.code_val, '^',d.code_val2) as goods_opt
-				-- , ps.wqty
-				-- , $store_qty_sql as sqty
+				, pc.goods_opt
 				, (ps.wqty - ifnull(_next_storage.qty, 0)) as wqty
 				, ($store_qty_sql - ifnull(_next_store.qty, 0)) as sqty
 				, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
@@ -230,7 +227,6 @@ class prd04Controller extends Controller
 				left outer join goods g on pc.goods_no = g.goods_no
 				left outer join brand brand on brand.brand = g.brand
 				inner join code c on pc.color = c.code_id
-				inner join code d on pc.size = d.code_val
 				inner join brand b on b.br_cd = pc.brand
 				left outer join (
 					select prd_cd, sum(qty) as qty, stock_state_date
@@ -245,7 +241,7 @@ class prd04Controller extends Controller
 					group by prd_cd
 				) _next_store on _next_store.prd_cd = ps.prd_cd $next_store_qty_sql
 			where 
-				c.code_kind_cd = 'PRD_CD_COLOR' and d.code_kind_cd = 'PRD_CD_SIZE_MATCH'
+				c.code_kind_cd = 'PRD_CD_COLOR' 
 				$where
 			group by pc.prd_cd
 			$orderby

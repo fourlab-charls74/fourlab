@@ -71,7 +71,7 @@
                     </div>
                 </div>
                     <div class="row">
-                        <div class="col-lg-4 inner-td">
+                        {{-- <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="good_types">동종업계</label>
                                 <div class="flax_box">
@@ -83,7 +83,7 @@
                                     </select>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="">자료수/정렬</label>
