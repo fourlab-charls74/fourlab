@@ -152,7 +152,16 @@
         {field: "opt_kind_nm", headerName: "품목", width: 70, cellStyle: {"text-align": "center"}},
         {field: "brand", headerName: "브랜드", width: 70, cellStyle: {"text-align": "center"}},
         {field: "style_no",	headerName: "스타일넘버", width: 70, cellStyle: {"text-align": "center"}},
-        {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 200},
+        {field: "goods_nm",	headerName: "상품명", width: 200,
+            cellRenderer: (params) => {
+                if (params.data.goods_no === undefined) return '';
+                if (params.data.goods_no != '0') {
+                    return '<a href="javascript:void(0);" onclick="return openHeadProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
+                } else {
+                    return '<a href="javascript:void(0);" onclick="return alert(`상품번호가 없는 상품입니다.`);">' + params.value + '</a>';
+                }
+            }   
+        },
         {field: "goods_nm_eng",	headerName: "상품명(영문)", width: 200},
         {field: "prd_cd_p", headerName: "코드일련", width: 90, cellStyle: {"text-align": "center"}},
         {field: "color", headerName: "컬러", width: 50, cellStyle: {"text-align": "center"}},
