@@ -19,6 +19,9 @@
             @if(@$cmd == 'add' or @$sc->sc_state == 'N')
             <a href="javascript:void(0)" onclick="Save('{{ @$cmd }}')" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
             @endif
+            @if(@$cmd != 'add' and @$sc->sc_state == 'N')
+            <a href="javascript:void(0)" onclick="DelStockCheck('{{ @$sc->sc_cd }}')" class="btn btn-primary mr-1"><i class="fas fa-trash fa-sm text-white-50 mr-1"></i> 삭제</a>
+            @endif
             <a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i> 닫기</a>
         </div>
     </div>
@@ -392,5 +395,26 @@
             { ...pinnedRow.data, store_wqty: store_wqty, qty: qty, loss_qty: loss_qty, loss_price: loss_price }
         ]);
     };
+
+    const DelStockCheck = (sc_cd) => {
+        if (!sc_cd) return;
+        if (!confirm("실사정보를 삭제하시겠습니까?\n삭제된 실사정보는 되돌릴 수 없습니다.")) return;
+
+        axios({
+            url: '/store/stock/stk26/' + sc_cd,
+            method: 'delete',
+        }).then(function (res) {
+            if(res.data.code === '200') {
+                alert("실사정보가 삭제되었습니다.");
+                opener.Search();
+                window.close();
+            } else {
+                console.log(res.data);
+                alert(res.data.msg);
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
+    }
 </script>
 @stop

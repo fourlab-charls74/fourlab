@@ -63,7 +63,7 @@ class sal20Controller extends Controller
                 inner join stock_check_product sp on sp.sc_cd = s.sc_cd
             where 1=1 $where
             group by s.sc_cd
-            order by s.sc_date desc
+            order by s.sc_cd desc
         ";
 
         $result = DB::select($sql);
