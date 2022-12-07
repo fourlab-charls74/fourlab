@@ -88,6 +88,7 @@
                             <label for="">반품창고</label>
                             <div class="d-flex">
                                 <select name='storage_cd' class="form-control form-control-sm">
+                                    <option value="">전체</option>
                                     @foreach (@$storages as $storage)
                                         <option value='{{ $storage->storage_cd }}'>{{ $storage->storage_nm }}</option>
                                     @endforeach
@@ -186,11 +187,28 @@
 </div>
 
 <script language="javascript">
+
+    function StyleReturnState(params) {
+        let state = {
+            "10":"#222222", // 요청
+            "30":"#0000ff", // 이동
+            "40":"#2aa876", // 완료
+        }
+        if (params.value !== undefined) {
+            if (state[params.data.sr_state]) {
+                return {
+                    'color': state[params.data.sr_state],
+                    'text-align': 'center'
+                }
+            }
+        }
+    }
+
 	let columns = [
-        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: false, sort: null, width: 28,
-            checkboxSelection: function(params) {
-                return params.data.sr_state < 40;
-            },
+        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 28,
+            // checkboxSelection: function(params) {
+            //     return params.data.sr_state < 40;
+            // },
         },
         {field: "sr_cd", headerName: "반품코드", width: 100, cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {
@@ -199,7 +217,7 @@
         },
         {field: "sr_date", headerName: "반품일자", width: 100, cellStyle: {"text-align": "center"}},
         {field: "sr_state", hide: true},
-        {field: "sr_state_nm", headerName: "반품상태", width: 60, cellStyle: {"text-align": "center"}},
+        {field: "sr_state_nm", headerName: "반품상태", width: 60, cellStyle: StyleReturnState},
         {field: "sr_kind", hide: true},
         {field: "storage_cd", hide: true},
         {field: "storage_nm", headerName: "반품창고", width: 100, cellStyle: {"text-align": "center"}},
@@ -279,11 +297,10 @@
     function DelReturn() {
         let rows = gx.getSelectedRows();
         if(rows.length < 1) return alert("삭제할 항목을 선택해주세요.");
-
-        let wrong_list = rows.filter(r => r.sr_state != 10);
-        if(wrong_list.length > 0) return alert("'요청'상태의 항목만 삭제할 수 있습니다.");
-
         if(!confirm("삭제한 창고반품정보는 다시 되돌릴 수 없습니다.\n선택한 항목을 삭제하시겠습니까?")) return;
+        
+        let wrong_list = rows.filter(r => r.sr_state != 10);
+        if(wrong_list.length > 0 && !confirm("요청상태 이후의 경우, 재고가 매장으로 환원처리됩니다.\n환원된 재고는 되돌릴 수 없습니다.")) return;
 
         axios({
             url: '/store/stock/stk30/del-return',
