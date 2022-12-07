@@ -401,8 +401,9 @@
         if (!confirm("실사정보를 삭제하시겠습니까?\n삭제된 실사정보는 되돌릴 수 없습니다.")) return;
 
         axios({
-            url: '/store/stock/stk26/' + sc_cd,
+            url: '/store/stock/stk26',
             method: 'delete',
+            data: { sc_cds: [sc_cd] }
         }).then(function (res) {
             if(res.data.code === '200') {
                 alert("실사정보가 삭제되었습니다.");

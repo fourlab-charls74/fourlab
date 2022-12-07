@@ -266,22 +266,25 @@ class stk26Controller extends Controller
     }
 
     // 실사정보 삭제 (LOSS미등록시에만)
-    public function delete(Request $request, $sc_cd = '')
+    public function delete(Request $request)
     {
         $code = '';
         $msg = '';
-
+        $sc_cds = $request->input('sc_cds', []);
+        
         try {
             DB::beginTransaction();
 
-            if ($sc_cd == '') throw new Exception("삭제할 실사정보가 존재하지 않습니다.");
-
-            $sc_state = DB::table('stock_check')->where('sc_cd', $sc_cd)->value('sc_state');
-            if ($sc_state != 'N') throw new Exception("LOSS등록된 실사정보는 삭제할 수 없습니다.");
-
-            // 삭제
-            DB::table('stock_check')->where('sc_cd', $sc_cd)->delete();
-            DB::table('stock_check_product')->where('sc_cd', $sc_cd)->delete();
+            foreach ($sc_cds as $sc_cd) {
+                if ($sc_cd == '') throw new Exception("삭제할 실사정보가 존재하지 않는 항목이 있습니다.");
+    
+                $sc_state = DB::table('stock_check')->where('sc_cd', $sc_cd)->value('sc_state');
+                if ($sc_state != 'N') throw new Exception("LOSS등록된 실사정보는 삭제할 수 없습니다.");
+    
+                // 삭제
+                DB::table('stock_check')->where('sc_cd', $sc_cd)->delete();
+                DB::table('stock_check_product')->where('sc_cd', $sc_cd)->delete();
+            }
 
 			DB::commit();
             $code = '200';
