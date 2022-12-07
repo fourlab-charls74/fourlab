@@ -10,8 +10,12 @@
                     <span>/ 알림</span>
                 </div>
             </div>
+            <div style="float:right">
+                <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="Save();"> 저장</button>
+                <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="window.close()"> 닫기</button>
+            </div>
         </div>
-        <form name="detail">
+        <form name="group">
             <div class="card_wrap aco_card_wrap">
                 <div class="card shadow">
                     <div class="card-header mb-0">
@@ -36,7 +40,7 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th>매장명</th>
+                                                <th>매장</th>
                                                 <td>
                                                     <div class="form-inline inline_btn_box" style="display:inline-block; width:100%">
                                                         <select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select" multiple ></select>
@@ -75,7 +79,6 @@
         });
 
         let group_columns = [
-            {headerName: '', headerCheckboxSelection: true, checkboxSelection: true, width:28, pinned:'left'},
             {headerName: "매장코드", field: "store_cd", width: 70, cellStyle: {'text-align':'center'}},
             {headerName: "매장명", field: "store_nm",width:"auto"},
             {headerName: "삭제", width:60, cellStyle: {'text-align':'center'},
@@ -83,15 +86,19 @@
                     return `<a href='#' onclick="del_store_data('${params.data.store_cd}')">삭제</a>`;
                 },
             },
-            {headerName: "그룹코드", field: "group_cd",hide:true},
+            {headerName: "인덱스", field: "group_cd",hide:true},
             {width: "auto"},
         ];
 
         let gx;
+        let del_GroupData = [];
+        let del_StoreData = [];
+        let cur_group_cd = "";
+
         const pApp = new App('', { gridId: "#div-gd-group" });
 
         $(document).ready(function() {
-            pApp.ResizeGrid(500);
+            pApp.ResizeGrid(350);
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
             gx = new HDGrid(gridDiv, group_columns, {
@@ -101,15 +108,16 @@
             }
             });
             gx.Request('/store/stock/stk32/search_group2');
+
         });
 
         //매장 선택 후 추가 클릭 시 그리드에 반영
         
         let newData = [];
-        function addRow(){
-            let rows = gx.getRowCount();
+        let total = [];
 
-            console.log(rows);
+        function addRow(){
+            newData.length = 0;
             let store_cds = [];
             let store_nms = [];
             for (let sel_option of document.getElementById('store_no').options) {
@@ -118,7 +126,7 @@
                     store_nms.push(sel_option.innerText);
                 }
             }
-            
+
             for (let i = 0;i<store_cds.length;i++) {
                 newData.push({
                     store_cd:store_cds[i],
@@ -126,11 +134,60 @@
                 })
             }
 
+     
+            
+            total.push(
+                store_cds.length
+            )
+            
+            let sum = total.reduce((a,b) => (a+b));
+
             gx.gridOptions.api.applyTransaction({add:newData});
-            document.getElementById('cntStore').innerText = store_cds.length;
+            document.getElementById('cntStore').innerText = sum;
             $('#store_no').val(null).trigger('change');
+
+            // 그리드의 모든 행의 매장코드를 가져와서 같은 매장 코드가 있는지 비교하고 있으면 알림창으로 에러 출력
        }
 
+       // 그룹 저장
+       function Save() {
+            if ($('input[name="group_nm"]').val() === '') {
+                $('input[name="group_nm"]').focus();
+                alert('그룹명을 입력해 주세요.');
+                return false;
+            }
+            
+            let saveGroupData = [];
+                gx.gridOptions.api.forEachNode((obj,idx)=>{
+                    saveGroupData.push( obj.data.store_cd);
+            });
+        
+            let frm = $('form[name=group]').serialize();
+            
+            frm += "&store_cd=" + saveGroupData
+
+            $.ajax({
+                method: 'post',
+                url: '/store/stock/stk32/add_group',
+                data: frm,
+                dataType: 'json',
+                success: function(data) {
+                    if (data.code == 200) {
+                        alert('그룹추가에 성공하였습니다.');
+                        window.close();
+                    } else if (data.code == 100) {
+                        alert('그룹명이 같은 그룹이 있습니다. 다른 그룹명을 입력해주세요.');
+                        return false;
+                    } else {
+                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                    }
+                },
+                error: function(e) {
+                        console.log(e.responseText)
+                }
+            });
+
+       }
 
     </script>
 @stop

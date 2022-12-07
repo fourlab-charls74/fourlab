@@ -150,7 +150,7 @@
                 { field: 'last_recv_amt_{{$month["val"]}}', headerName: "전년", type: 'currencyMinusColorType', width:75, aggregation: true },
                 { field: 'recv_amt_{{$month["val"]}}', headerName: "금액", type: 'currencyMinusColorType', width:75, aggregation: true},
                 { field: 'progress_proj_amt_{{$month["val"]}}', headerName: "달성율(%)", type: 'currencyMinusColorType', aggregation: true,
-                    cellRenderer: params => goalProgress(params.data, '111')
+                    cellRenderer: params => goalProgress(params.data)
                 }
             ]
         },
@@ -168,13 +168,17 @@
 		let proj_amt = toInt(row[`proj_amt${prefix}`]);
 		let recv_amt = toInt(row[`recv_amt${prefix}`]);
 
-		if (progress > 100) return progress = 100; // 달성율 100 넘어가는 경우 100으로 고정
-		if (proj_amt <= recv_amt) return progress = 100; // 목표액보다 큰 경우 100 처리
+		// if (progress > 100) return progress = 100; // 달성율 100 넘어가는 경우 100으로 고정
+		// if (proj_amt <= recv_amt) return progress = 100; // 목표액보다 큰 경우 100 처리
+
+		// if (proj_amt == 0) return progress = 0; //목표액이 0이면 달성율도 0으로 표시
+
+		if (proj_amt == 0 && recv_amt == 0) return 0;
 
 		progress = ( recv_amt / proj_amt ) * 100;
-		progress = Math.round(progress * 10) / 10; // 소수점 첫째짜리까지 반올림 처리
+		progress = Math.round(progress * 10) / 1; // 소수점 첫째짜리까지 반올림 처리
 
-		if (progress == -Infinity) progress = 0;
+		// if (progress == -Infinity) progress = 0;
 
 		return progress;
 	};
