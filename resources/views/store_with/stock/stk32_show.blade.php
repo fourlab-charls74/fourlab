@@ -4,10 +4,10 @@
     
 <div class="py-3 px-sm-3">
     <div class="page_tit">
-        <h3 class="d-inline-flex">알림</h3>
+        <h3 class="d-inline-flex">알림전송</h3>
         <div class="d-inline-flex location">
             <span class="home"></span>
-            <span>/ 알림전송</span>
+            <span>/ 알림</span>
         </div>
     </div>
     <form method="get" name="search">
@@ -187,12 +187,12 @@
 
     function Search() {
         let data = $('form[name="search"]').serialize();
-        gx.Request('/store/stock/stk32/search-receiver', data);
+        gx.Request('/store/stock/stk32/search-store', data);
     }
     
     function Search2() {
         let data2 = $('form[name="search"]').serialize();
-        gx2.Request('/store/stock/stk32/search3', data2);
+        gx2.Request('/store/stock/stk32/search-groupstore', data2);
     }
 
 </script>

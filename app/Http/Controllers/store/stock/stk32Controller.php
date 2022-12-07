@@ -127,11 +127,11 @@ class stk32Controller extends Controller
         return view( Config::get('shop.store.view') . '/stock/stk32_show', $values);
     }
 
-    public function search_receiver(Request $request)
+    public function search_store(Request $request)
     {
         $store_nm = $request->input('store_nm');
         $div_store = $request->input('store');
-
+        $store_type = $request->input('store_type', "");
 
         // pagination
         $page = $r['page'] ?? 1;
@@ -139,14 +139,25 @@ class stk32Controller extends Controller
 
         $where = "";
         if($store_nm != "" && $div_store == 'O') $where .= " and store_nm like '%" . $store_nm . "%' ";
-
+       
+        $sql	= " select store_cd from store where store_type = :store_type and use_yn = 'Y' ";
+        $result = DB::select($sql,['store_type' => $store_type]);
+        if($store_type != "") {
+            $where	.= " and (1!=1";
+            foreach($result as $row){
+                $where .= " or s.store_cd = '" . Lib::quote($row->store_cd) . "' ";
+            }
+            $where	.= ")";
+        }
+          
             $sql = 
                 "
                 select 
                     store_cd,
                     store_nm,
                     mobile,
-                    '$div_store' as store
+                    '$div_store' as store,
+                    store_type
                 from store
                 where 1=1 $where
                 ";
@@ -164,7 +175,7 @@ class stk32Controller extends Controller
     }
 
 
-    public function search3(Request $request)
+    public function search_groupStore(Request $request)
     {
         $group_nm = $request->input('group_nm');
         $div_store = $request->input('div_store');
@@ -189,8 +200,6 @@ class stk32Controller extends Controller
 
         $result = DB::select($sql);
 
-       
-
         return response()->json([
             "code" => 200,
             "head" => array(
@@ -200,10 +209,6 @@ class stk32Controller extends Controller
         ]);
 
     }
-
-
-    
-    
 
     public function sendMsg(Request $request)
     {
@@ -654,15 +659,13 @@ class stk32Controller extends Controller
                 m.store_cd,
                 s.store_nm
             from msg_group_store m 
-            left outer join store s on s.store_cd = m.store_cd
-            inner join msg_group mg on m.group_cd = mg.group_cd
+                left outer join store s on s.store_cd = m.store_cd
+                inner join msg_group mg on m.group_cd = mg.group_cd
             where m.group_cd = '$group_cd'
             
         ";
 
         $result = DB::select($sql);
-
-        // dd(count($result));
 
         return response()->json([
             "code" => 200,
@@ -716,9 +719,10 @@ class stk32Controller extends Controller
 
            
             DB::commit();
+            $msg = '';
         } catch (Exception $e) {
             DB::rollBack();
-            $code = '500';
+            $code = 500;
             $msg = $e->getMessage();
         }
 
