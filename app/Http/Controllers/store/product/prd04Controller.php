@@ -830,7 +830,7 @@ class prd04Controller extends Controller
 						'type'		=> 'N',			//일반상품
 						'com_id'	=> 'alpen',		//
 						'unit'		=> '',
-						'match_yn'	=> 'N',
+						//'match_yn'	=> 'N',
 						'rt'		=> now(),
 						'ut'		=> now(),
 						'admin_id'	=> $id
