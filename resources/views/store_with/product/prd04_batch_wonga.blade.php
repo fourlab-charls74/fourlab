@@ -29,7 +29,8 @@
 													<a href="#" onclick="Upload();" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">자료 불러오기</a>
 													<span class="pl30">
 														<br><br>
-														※ XMD >> 출고관리 >> 총재고현황에서 엑셀 다운로드
+														※ XMD >> 출고관리 >> 총재고현황에서 엑셀 다운로드<br>
+														※ 데이터는 3번째줄부터 (제목줄 하단)<br>
 													</span>
 												</td>
 											</tr>
@@ -228,7 +229,7 @@
 
 
 		// start at the 2nd row - the first row are the headers
-		var rowIndex = 9;
+		var rowIndex = 3;
 
 		var rowData = [];
 
