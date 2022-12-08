@@ -73,7 +73,7 @@
                     <div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
                         <a href="#">상품정보</a>
                     </div>
-                    <div class="d-flex flex-grow-1 flex-column flex-lg-row justify-content-end align-items-end align-items-lg-center">
+                    <div class="d-flex flex-grow-1 flex-column flex-lg-row justify-content-end align-items-end align-items-lg-right">
                         <div class="d-flex mr-1 mb-1 mb-lg-0">
                             <span class="mr-1">출고예정일</span>
                             <div class="docs-datepicker form-inline-inner input_box" style="width:130px;display:inline;">
@@ -128,10 +128,7 @@
         {field: "goods_opt", headerName: "옵션", width: 200},
         {field: "storage_qty", headerName: "창고재고", width: 60, type: 'currencyType'},
         {field: "store_qty", headerName: "매장재고", width: 60, type: 'currencyType'},
-        {field: "qty", headerName: "배분수량", width: 60, type: 'currencyType', 
-            editable: (params) => checkIsEditable(params),
-            cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
-        },
+        {field: "qty", headerName: "배분수량", width: 60, type: 'currencyType', cellStyle: {"background-color": "#ffff99"}, editable:true},
     ];
 </script>
 
@@ -157,20 +154,19 @@
     // 엑셀업로드 선택한 행 삭제 기능
     function onRemoveSelected() {
         let selectedData = gx.getSelectedRows();
-        
+
         if (selectedData.length > 0) {
-            selectedData = selectedData[0];
+            if (confirm('해당 상품을 삭제하시겠습니까?')){
+                for(let i = 0; i < selectedData.length; i++){
+                        gx.gridOptions.api.applyTransaction({ remove: [selectedData[i]] });
+                }
+            }
         } else {
             selectedData = {};
+            alert('삭제할 상품을 선택해주세요.');
         }
 
-        if (confirm('해당 상품을 삭제하시겠습니까?')){
-            gx.gridOptions.api.applyTransaction({ remove: [selectedData] });
-        }
     }
-
-
-
 
     const validateFile = () => {
         const target = $('#excel_file')[0].files;
@@ -321,11 +317,11 @@
             for(let i = 0; i < rows.length; i++) {
                 storage_qty = rows[i].storage_qty;
                 over_qty = rows[i].qty;
-
+                
+                if(storage_qty < over_qty) return alert(`창고의 재고보다 많은 수량을 요청하실 수 없습니다`);
+                if(over_qty == 0) return alert(`배분수량을 0개를 요청할 수 없습니다. 1개 이상을 요청해주세요.`);
             }
         
-            if(storage_qty < over_qty) return alert(`창고의 재고보다 많은 수량을 요청하실 수 없습니다`);
-            if(over_qty == 0) return alert(`배분수량을 0개를 요청할 수 없습니다. 1개 이상을 요청해주세요.`);
 
             if(!confirm("해당 상품을 출고요청하시겠습니까?")) return;
 
@@ -341,12 +337,9 @@
                 data: data,
             }).then(function (res) {
                 if(res.data.code === 200) {
-                    if(!confirm(res.data.msg + "\n출고요청을 계속하시겠습니까?")) {
+                        alert('출고요청에 성공하였습니다.');
                         window.close();
                         opener.location.href = "/store/stock/stk10";
-                    } else {
-                        Search();
-                    }
                 } else {
                     console.log(res.data);
                     alert("출고요청 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
@@ -371,9 +364,9 @@
         });
     };
 
-    const checkIsEditable = (params) => {
-        return params.data.hasOwnProperty('isEditable') && params.data.isEditable ? true : false;
-    };
+    // const checkIsEditable = (params) => {
+    //     return params.data.hasOwnProperty('isEditable') && params.data.isEditable ? true : false;
+    // };
 
     const updatePinnedRow = () => { // 총 반품금액, 반품수량을 반영한 PinnedRow를 업데이트
         let [ qty, total_return_price ] = [ 0, 0 ];

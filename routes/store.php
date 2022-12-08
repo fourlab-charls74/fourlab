@@ -406,8 +406,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         //알림
         Route::get('stk32','stk32Controller@index');
         Route::get('stk32/search', 'stk32Controller@search');
-        Route::get('stk32/search-receiver', 'stk32Controller@search_receiver');
-        Route::get('stk32/search3', 'stk32Controller@search3');
+        Route::get('stk32/search-store', 'stk32Controller@search_store');
+        Route::get('stk32/search-groupstore', 'stk32Controller@search_groupStore');
         Route::get('stk32/search_group', 'stk32Controller@search_group');
         Route::get('stk32/search_group_show', 'stk32Controller@search_group_show');
         Route::get('stk32/search_group2{group_cd?}', 'stk32Controller@search_group2');
