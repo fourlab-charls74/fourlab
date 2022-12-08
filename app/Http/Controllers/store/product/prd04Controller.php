@@ -48,7 +48,7 @@ class prd04Controller extends Controller
 		$ord		= $request->input('ord','desc');
 		$ord_field	= $request->input('ord_field','prd_cd_p');
 		if ($ord_field == 'prd_cd_p') $ord_field = 'pc.rt';
-		$orderby	= sprintf("order by %s %s, pc.prd_cd", $ord_field, $ord);
+		$orderby	= sprintf("order by p.match_yn desc, %s %s, pc.prd_cd", $ord_field, $ord);	//22-12-08 매칭된 상품을 상단으로
 		$match_yn = $request->input('match_yn1');
 
 		$where		= "";
@@ -162,7 +162,7 @@ class prd04Controller extends Controller
 					from product_code pc
 						inner join product_stock ps on pc.prd_cd = ps.prd_cd
 						$in_store_sql
-						left outer join product p on p.prd_cd = pc.prd_cd
+						inner join product p on p.prd_cd = pc.prd_cd
 						left outer join goods g on pc.goods_no = g.goods_no
 						left outer join brand brand on brand.brand = g.brand
 						inner join code c on pc.color = c.code_id
