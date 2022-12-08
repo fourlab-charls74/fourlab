@@ -84,11 +84,11 @@
                                 </div>
                                 <div class="custom-control custom-radio">
                                     <input type="radio" class="custom-control-input" id="sc_state_Y" name="sc_state" value="Y" />
-                                    <label class="custom-control-label" for="sc_state_Y">Y</label>
+                                    <label class="custom-control-label" for="sc_state_Y">등록</label>
                                 </div>
                                 <div class="custom-control custom-radio">
                                     <input type="radio" class="custom-control-input" id="sc_state_N" name="sc_state" value="N" />
-                                    <label class="custom-control-label" for="sc_state_N">N</label>
+                                    <label class="custom-control-label" for="sc_state_N">미등록</label>
                                 </div>
                             </div>
                         </div>
@@ -113,6 +113,7 @@
 			<div class="filter_wrap">
 				<div class="d-flex justify-content-between">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
+                    <a href="javascript:void(0);" onclick="return DeleteStockCheck();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="fa fa-trash fa-sm mr-1"></i> 삭제</a>
 				</div>
 			</div>
 		</div>
@@ -125,6 +126,7 @@
 <script language="javascript">
     let columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {"text-align": "center"}},
+        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 28},
         {field: "sc_date", headerName: "실사일자", width: 80, cellStyle: {"text-align": "center"}},
         {field: "sc_cd", headerName: "실사코드", width: 100, cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {
@@ -185,6 +187,38 @@
         params += "&store_cd=" + $("[name=store_no]").val();
         params += "&sc_state=" + $("[name=sc_state]:checked").val();
         window.open(url + params, "_blank");
+    }
+
+    function DeleteStockCheck() {
+        let rows = gx.getSelectedRows();
+
+        let loss_rows = rows.filter(r => r.sc_state == 'Y');
+        if (loss_rows.length > 0) {
+            gx.gridOptions.api.forEachNode((node) => {
+                if (node.selected && node.data?.sc_state == 'Y') {
+                    node.setSelected(false);
+                }
+            });
+            return alert("LOSS등록된 실사정보는 삭제할 수 없습니다.");
+        }
+
+        if (!confirm("실사정보를 삭제하시겠습니까?\n삭제된 실사정보는 되돌릴 수 없습니다.")) return;
+
+        axios({
+            url: '/store/stock/stk26',
+            method: 'delete',
+            data: { sc_cds: rows.map(r => r.sc_cd) }
+        }).then(function (res) {
+            if(res.data.code === '200') {
+                alert("실사정보가 삭제되었습니다.");
+                Search();
+            } else {
+                console.log(res.data);
+                alert(res.data.msg);
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
     }
 </script>
 @stop

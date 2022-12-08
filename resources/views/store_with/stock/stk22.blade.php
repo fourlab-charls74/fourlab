@@ -246,18 +246,18 @@
         {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"},
             cellRenderer: (params) => `<a href="javascript:void(0);" onclick="SearchStock('${params.rowIndex}')">${params.value}</a>`,
         },
-        {field: "goods_no",	headerName: "상품번호", width: 70, cellStyle: {"text-align": "center"}, pinned: 'left'},
-        {field: "opt_kind_nm", headerName: "품목", width: 60, cellStyle: {"text-align": "center"}},
+        {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
+        {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
         {field: "brand_nm", headerName: "브랜드", width: 70, cellStyle: {"text-align": "center"}},
         {field: "style_no",	headerName: "스타일넘버", width: 70, cellStyle: {"text-align": "center"}},
         {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 150},
         {field: "goods_nm_eng", headerName: "상품명(영문)", width: 150},
-        {field: "prd_cd_p", headerName: "코드일련", width: 80, cellStyle: {"text-align": "center"}},
-        {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
-        {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
+        {field: "prd_cd_p", headerName: "코드일련", width: 90, cellStyle: {"text-align": "center"}},
         {field: "goods_opt", headerName: "옵션", width: 150},
         {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 60},
         {field: "price", headerName: "판매가", type: "currencyType", width: 60},
+        {field: "goods_no",	headerName: "상품번호", width: 70, cellStyle: {"text-align": "center"}},
+        {field: "opt_kind_nm", headerName: "품목", width: 60, cellStyle: {"text-align": "center"}},
 	];
 
     const stores = <?= json_encode(@$stores) ?> ;
