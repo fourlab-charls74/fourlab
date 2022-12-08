@@ -135,23 +135,6 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4">
-						<div class="form-group">
-							<label for="sale_yn">매출여부</label>
-							<div class="flex_box">
-								<div class="form-inline form-radio-box">
-									<div class="custom-control custom-radio">
-										<input type="radio" name="sale_yn" id="sale_y" value="Y" class="custom-control-input" checked/>
-										<label class="custom-control-label" for="sale_y">Y</label>
-									</div>
-									<div class="custom-control custom-radio">
-										<input type="radio" name="sale_yn" id="sale_n" value="N" class="custom-control-input"/>
-										<label class="custom-control-label" for="sale_n">N</label>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
 				</div>
 			</div>
 		</div>
@@ -221,11 +204,15 @@
 					proj_amt = toInt(proj_amt);
 					recv_amt = toInt(recv_amt);
 
-					if (progress > 100) return progress = 100; // 달성율 100 넘어가는 경우 100으로 고정
-					if (proj_amt <= recv_amt) return progress = 100; // 목표액보다 큰 경우 100 처리
+					// if (progress > 100) return progress = 100; // 달성율 100 넘어가는 경우 100으로 고정
+					// if (proj_amt <= recv_amt) return progress = 100; // 목표액보다 큰 경우 100 처리
 
 					progress = ( recv_amt / proj_amt ) * 100;
-					progress = Math.round(progress * 10) / 10; // 소수점 첫째짜리까지 반올림 처리
+					progress = Comma(Math.round(progress * 1)); // 소수점 첫째짜리까지 반올림 처리
+
+					if (params.data.proj_amt == 0) {
+						return 0;
+					}
 
 					if (progress == -Infinity) progress = 0;
 

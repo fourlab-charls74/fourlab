@@ -160,6 +160,10 @@
 
 	/**
 	 * ( 목표 - 결제금액 ) / 목표 * 100 = 달성율(%)
+	 * 
+	 * 	달성율 = 금액 / 목표금액 * 100 
+	 * 
+	 * 
 	 */
 	const goalProgress = (row, Ym) => {
 		let prefix = "";
@@ -171,14 +175,15 @@
 		// if (progress > 100) return progress = 100; // 달성율 100 넘어가는 경우 100으로 고정
 		// if (proj_amt <= recv_amt) return progress = 100; // 목표액보다 큰 경우 100 처리
 
-		// if (proj_amt == 0) return progress = 0; //목표액이 0이면 달성율도 0으로 표시
+		if (proj_amt == 0) return progress = 0; //목표액이 0이면 달성율도 0으로 표시
+		if (recv_amt == 0) return progress = 0; //목표액이 0이면 달성율도 0으로 표시
 
 		if (proj_amt == 0 && recv_amt == 0) return 0;
 
 		progress = ( recv_amt / proj_amt ) * 100;
-		progress = Math.round(progress * 10) / 1; // 소수점 첫째짜리까지 반올림 처리
+		progress = Math.round(progress * 1); // 소수점 첫째짜리까지 반올림 처리
 
-		// if (progress == -Infinity) progress = 0;
+		if (progress == -Infinity) progress = 0;
 
 		return progress;
 	};
@@ -210,7 +215,6 @@
         $('#is_searched').val(val);
     }
 	function Search() {
-	    console.log($('#is_searched').val());
 		if ($('#is_searched').val() === 'y') {
 			let data = $('form[name="search"]').serialize();
 			gx.Aggregation({ sum: "top" });
@@ -274,7 +278,9 @@
 					});
 
 					row['proj_amt'] = total_proj;
-					row[`progress_proj_amt_${Ym}`] = goalProgress(row, Ym);
+					// row[`progress_proj_amt_${Ym}`] = goalProgress(row, Ym);
+					// row[`progress_proj_amt_${Ym}`] = row[`proj_amt_{{$month["val"]}}`] / row[`recv_amt_{{$month["val"]}}`] * 100;
+					row[`progress_proj_amt_${Ym}`] = row[`proj_amt_{{$month["val"]}}`] / row[`recv_amt_{{$month["val"]}}`] * 100;
 
 					// 변경된 목표 저장
 					const response = await axios({

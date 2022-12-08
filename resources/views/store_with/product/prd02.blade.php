@@ -1,6 +1,13 @@
 @extends('store_with.layouts.layout')
 @section('title','상품')
 @section('content')
+<style>
+.ag-row-level-1 {
+		background-color: #edf4fd !important;
+	}
+
+</style>
+
 	<div class="page_tit">
 		<h3 class="d-inline-flex">상품관리(코드)</h3>
 		<div class="d-inline-flex location">
@@ -285,6 +292,12 @@
 							<span style="font-weight:500;line-height:30px;margin-left:5px;vertical-align:middle;" class="mr-1">로</span>
 							<a href="#" onclick="Save();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>매칭</a>
 						//-->
+							<div class="fr_box">
+								<div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+									<input type="checkbox" class="custom-control-input" name="ext_storage_qty" id="ext_storage_qty" value="Y">
+									<label class="custom-control-label font-weight-normal" for="ext_storage_qty">창고재고 0 제외</label>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -314,7 +327,9 @@
 					}
 				}
 			},
-			{field: "goods_no", headerName: "상품번호", width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
+			{field: "goods_no", headerName: "상품번호", pinned: 'left',width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
+			{field: "style_no", headerName: "스타일넘버", pinned: 'left', cellStyle: {"line-height": "30px", "text-align": "center"}, aggFunc: "first"},
+
 			{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}"},
 			{field: "img", headerName: "이미지_url", hide: true},
 			{field: "goods_nm", headerName: "상품명", width: 270, aggFunc: "first",
@@ -338,13 +353,13 @@
 				}
 			},
 			{field: "prd_cd1", headerName: "코드일련", width:100, cellStyle: StyleLineHeight, rowGroup: true, hide: true},
-			{field: "color", headerName: "컬러", width:60},
-			{field: "color_nm", headerName: "컬러명", width:100},
-			{field: "size", headerName: "사이즈", width:60},
-			{field: "goods_opt", headerName: "옵션", width:200},
-			{field: "opt_kind_nm", headerName: "품목", width:70, cellStyle: {"line-height": "30px", "text-align": "center"}},
+			{field: "color", headerName: "컬러", width:50, cellStyle: {"text-align": "center"}},
+			{field: "size", headerName: "사이즈", width:50, cellStyle: {"text-align": "center"}},
+			{field: "color_nm", headerName: "컬러명", width:90},
+			{field: "goods_opt", headerName: "옵션", width:190},
+			// {field: "opt_kind_nm", headerName: "품목", width:70, cellStyle: {"line-height": "30px", "text-align": "center"}},
 			{field: "brand_nm", headerName: "브랜드", cellStyle: {"line-height": "30px", "text-align": "center"},aggFunc: "first"},
-			{field: "style_no", headerName: "스타일넘버", cellStyle: {"line-height": "30px", "text-align": "center"}, aggFunc: "first"},
+			
 			
 			{field: "wqty", headerName: "창고재고", width:70,type: 'currencyType', cellStyle: {"line-height": "30px"},
 				aggFunc: (params) => {
@@ -430,8 +445,11 @@
 
 		async function Search() {
 			await setColumn();
-
+			let ischeck = $('#ext_storage_qty').is(':checked');
 			let data = $('form[name="search"]').serialize();
+			data += '&ext_storage_qty=' + ischeck;
+
+			console.log(data);
 			gx.Request('/store/product/prd02/search', data, 1);
 		}
 
@@ -440,14 +458,12 @@
 		if(ord_field === "prd_cd1") {
 			let prd_columns = columns.map(c => c.field === "prd_cd1" 
 				? ({...c, rowGroup: true, hide: true, pinned: "left"}) 
-				: c.field === "color" || c.field === "size" || c.field === "color_nm" ? ({...c, pinned: "left"})
 				: c.type === "NumType" ? ({...c, hide: true})
 				: c.field === "goods_no" ? ({...c, cellStyle: StyleLineHeight}) : c);
 			gx.gridOptions.api.setColumnDefs(prd_columns);
 		} else {
 			let prd_columns = columns.map(c => c.field === "prd_cd1" 
 				? ({...c, rowGroup: false, hide: false, pinned: "auto"}) 
-				: c.field === "color" || c.field === "size" || c.field === "color_nm" ? ({...c, pinned: "auto"}) 
 				: c.type === "NumType" ? ({...c, hide: false})
 				: c.field === "goods_no" ? ({...c, cellStyle: StyleGoodsNo}) : c);
 			gx.gridOptions.api.setColumnDefs(prd_columns);
@@ -482,35 +498,6 @@
 				alert("상품상태를 변경할 상품을 선택해 주십시오.");
 				return false;
 			}
-
-			if( confirm("선택된 상품의 상품상태를 변경하시겠습니까?") ){
-				$.ajax({
-					async: true,
-					type: 'put',
-					url: '/head/product/prd01/update/state',
-					data: {
-						"goods_no[]": goods_nos,
-						"chg_sale_stat": chg_sale_stat,
-					},
-					success: function(res) {
-						console.log(res);
-						if (res.code === 200) {
-							var fail = res.head.fail;
-							if (fail === 0) {
-								alert('상품상태를 변경하였습니다.');
-								Search(1);
-							} else {
-								alert(fail + ' 개의 상품이 재고부족으로 판매중 상태로 변경되지 않았습니다.\n해당 상품은 재고를 먼저 확인하신 후 판매중으로 상태 변경하시기 바랍니다.');
-							}
-						} else {
-							console.log(res);
-						}
-					},
-					error: function(request, status, error) {
-						console.log("error")
-					}
-				});
-			}
 		}
 
 		function AddProduct_upload() {
@@ -538,25 +525,6 @@
 			alert('상품번호가 비어있는 상품입니다.');
 		}
 
-		const EditProducts = () => {
-			const goods_nos = gx.gridOptions.api.getSelectedRows().map((row) => {
-				return row.goods_no + "_" + row.goods_sub;
-			});
-
-			const POP_URL = '/head/product/prd01/edit';
-			const target = "popForm";
-
-			const [ top, left, width, height ] = [ 100, 100, 1700, 1200 ];
-			const child_window = window.open(POP_URL, target, `toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=${top},left=${left},width=${width},height=${height}`);
-
-			const form = document.search;
-			form.action = POP_URL;
-			form.method = 'post';
-			form.target = target;
-			form.goods_nos.value = goods_nos;
-			form.submit();
-		};
-
 		function AddProductImages() {
 			var url = '/head/product/prd23';
 			var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1024,height=900");
@@ -567,80 +535,6 @@
 			if(goods_nos.length < 1) return alert("상품을 선택해주세요.");
 			var url = '/head/product/prd02/slider?goods_nos=' + goods_nos.join(",");
 			var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1024,height=900");
-		}
-
-		// 수정된 상품정보 저장
-		function SaveSelectedProducts() {
-			var data  = [];
-			for(row = 0;row < gx.gridOptions.api.getDisplayedRowCount();row++){
-				var rowNode = gx.gridOptions.api.getDisplayedRowAtIndex(row);
-				if(rowNode.selected == true){
-					data.push(
-						{
-							'goods_no': rowNode.data.goods_no,
-							'style_no':rowNode.data.style_no,
-							'head_desc':rowNode.data.head_desc,
-							'goods_nm':rowNode.data.goods_nm,
-							'ad_desc':rowNode.data.ad_desc,
-							'price':rowNode.data.price,
-							'goods_memo':rowNode.data.goods_memo,
-						}
-					)
-				}
-			}
-			if(data.length < 1) return alert("수정할 상품을 선택해주세요.");
-			if(!confirm("선택한 상품의 수정사항을 저장하시겠습니까?")) return;
-			$.ajax({
-				async: true,
-				type: 'post',
-				dataType:'json',
-				url: '/head/product/prd01/update',
-				data: {'data': data},
-				success: function (res) {
-					if(res.code == 200){
-						alert(res.msg);
-						Search();
-					} else {
-						alert(res.msg +"\n다시 시도하여 주십시오.");;
-						console.log(res);
-					}
-				},
-				error: function(e) {
-					console.log(e.responseText);
-				}
-			});
-		}
-
-		//휴지통 상품 삭제
-		function DeleteTrash(){
-			var data  = [];
-			const row = gx.getRows();
-
-			for( i = 0; i < row.length; i++ ) {
-				if( row[i]['sale_stat_cl'] == "휴지통"){
-					data.push(row[i]['goods_no']);
-				}
-			}
-
-			if( confirm("리스트에 있는 휴지통 상품을 삭제하시겠습니까?")){
-				$.ajax({
-					async: true,
-					type: 'post',
-					url: '/head/product/prd01/cleanup-trash',
-					data: { "datas" : data },
-					success: function (data) {
-						if( data.data == 0 )
-							alert("휴지통 상품삭제 처리되었습니다.\n단, 주문내역이 존재하는 휴지통 상품은 처리되지 않습니다.");
-						else
-							alert("상품삭제 중에 에러가 발생했습니다." + data.data);
-
-						Search();
-					},
-					error: function(request, status, error) {
-						console.log("error")
-					}
-				});
-			}
 		}
 
 		function openApi() {

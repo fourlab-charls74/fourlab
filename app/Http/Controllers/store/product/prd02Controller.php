@@ -64,7 +64,8 @@ class prd02Controller extends Controller
 		$brand_cd	= $request->input("brand_cd");
 		$goods_nm	= $request->input("goods_nm");
 		$goods_nm_eng	= $request->input("goods_nm_eng");
-
+		$ext_storage_qty = $request->input('ext_storage_qty');
+		
 		$store_type	= $request->input("store_type", "");
 		$store_no	= $request->input("store_no", "");
 
@@ -81,7 +82,7 @@ class prd02Controller extends Controller
 		$ord_field	= $request->input('ord_field','prd_cd1');
 		if ($ord_field == 'prd_cd1') $ord_field = 'pc.rt';
 
-		$orderby	= sprintf("order by %s %s", $ord_field, $ord);
+		$orderby	= sprintf("order by p.match_yn desc, %s %s, pc.prd_cd", $ord_field, $ord);
 
 		$in_store_sql = "";
 		$match_yn = $request->input('match_yn1');
@@ -159,6 +160,10 @@ class prd02Controller extends Controller
 			$where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
 		}
 
+		if($ext_storage_qty == 'true') {
+			$where .= "and (ps.qty - ps.wqty) > 0";
+		}
+
 		if($goods_nos != ""){
 			$goods_no	= $goods_nos;
 		}
@@ -201,9 +206,9 @@ class prd02Controller extends Controller
 						, (ps.qty - ps.wqty) as sqty
 					from product_code pc
 						inner join product_stock ps on ps.prd_cd = pc.prd_cd
+						inner join product p on p.prd_cd = pc.prd_cd
 						$in_store_sql
 						left outer join goods g on g.goods_no = pc.goods_no
-						left outer join product p on p.prd_cd = pc.prd_cd
 					where 1 = 1
 					$where
 					group by pc.prd_cd
@@ -252,9 +257,9 @@ class prd02Controller extends Controller
 				, p.match_yn
 			from product_code pc
 				inner join product_stock ps on ps.prd_cd = pc.prd_cd
+				inner join product p on p.prd_cd = pc.prd_cd
 				left outer join goods g on g.goods_no = pc.goods_no
 				$in_store_sql
-				left outer join product p on p.prd_cd = pc.prd_cd
 				left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
 				left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
 				left outer join company com on com.com_id = g.com_id
