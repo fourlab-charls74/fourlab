@@ -257,17 +257,17 @@
             headerName: "공급업체",
             width: 100
         },
-        {
-            field: "prd_cd",
-            headerName: "원부자재코드",
-            width: 130
-        },
         {   field: "img",
             headerName: "이미지", 
             type: 'GoodsImageType', 
             width:50,
             cellStyle: {"line-height": "30px"}, 
             surl:"{{config('shop.front_url')}}"
+        },
+        {
+            field: "prd_cd",
+            headerName: "원부자재코드",
+            width: 130
         },
         {
             field: "prd_nm",

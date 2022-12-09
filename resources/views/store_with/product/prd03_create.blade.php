@@ -270,7 +270,6 @@
 			headerCheckboxSelection: true,
 			checkboxSelection: true,
 			width: 30,
-			pinned: 'left',
 			sort: null,
 		},
 		{

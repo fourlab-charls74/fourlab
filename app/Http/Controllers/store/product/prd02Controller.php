@@ -1136,6 +1136,7 @@ class prd02Controller extends Controller
 				$color 		= $row['color'];
 				$size 		= $row['size'];
 				$prd_nm		= $row['prd_nm'];
+				$prd_nm_eng	= $row['prd_nm_eng']??'';
 				$style_no 	= $row['style_no'];
 				$sup_com 	= $row['sup_com'];
 				
@@ -1171,6 +1172,7 @@ class prd02Controller extends Controller
 					DB::table('product')->insert([
 						'prd_cd' => $prd_cd,
 						'prd_nm' => $prd_nm,
+						'prd_nm_eng' => $prd_nm_eng,
 						'style_no' => $style_no,
 						'price' => $price,
 						'wonga' => $wonga,

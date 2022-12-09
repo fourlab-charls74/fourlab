@@ -223,7 +223,7 @@ class prd04Controller extends Controller
 			from product_code pc
 				inner join product_stock ps on pc.prd_cd = ps.prd_cd
 				$in_store_sql
-				left outer join product p on p.prd_cd = pc.prd_cd
+				inner join product p on p.prd_cd = pc.prd_cd
 				left outer join goods g on pc.goods_no = g.goods_no
 				left outer join brand brand on brand.brand = g.brand
 				inner join code c on pc.color = c.code_id

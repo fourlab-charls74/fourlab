@@ -217,6 +217,7 @@
             },
             {field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: DEFAULT, surl:"{{config('shop.front_url')}}"},
             {field: "img", headerName: "이미지_url", hide: true},
+            {field: "prd_nm", headerName: "원부자재명", width: 200},
             {field: "prd_cd", headerName: "상품코드", width:120, cellStyle: DEFAULT,
                 cellRenderer: function(params) {
                     if (params.value !== undefined) {
@@ -242,7 +243,6 @@
                 cellStyle: DEFAULT,
                 width: 120
             },
-            {field: "prd_nm", headerName: "원부자재명", width: 200},
             {
                 field: "price",
                 headerName: "판매가",

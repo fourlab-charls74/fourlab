@@ -237,7 +237,7 @@
 		{headerName: '#', pinned: 'left', type: 'NumType', width:40, cellStyle: StyleLineHeight,
 			cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : parseInt(params.value) + 1,
 		},
-		{field: "prd_cd", headerName: "상품코드", width:120, cellStyle: StyleLineHeight,
+		{field: "prd_cd", headerName: "상품코드", pinned: 'left', width:120, cellStyle: StyleLineHeight,
 			cellRenderer: function(params) {
 				if (params.node.rowPinned === 'top') return "합계";
 				if (params.value !== undefined) {
@@ -245,7 +245,9 @@
 				}
 			}
 		},
-		{field: "goods_no", headerName: "상품번호", width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
+		{field: "goods_no", headerName: "상품번호", pinned: 'left', width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
+		{field: "style_no", headerName: "스타일넘버", pinned: 'left', width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
+
 		{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, surl:"{{config('shop.front_url')}}"},
 		{field: "img", headerName: "이미지_url", hide: true},
 		{field: "goods_nm", headerName: "상품명", width: 270, aggFunc: "first",
@@ -274,10 +276,11 @@
 				return `<a href="javascript:void(0);" onclick="return OpenStockPopup('${params.value}', '${$("[name=sdate]").val() || ''}');">${params.value}</a>`;
 			}
 		},
-		{field: "color", headerName: "컬러", width: 55, cellStyle: StyleLineHeight},
-		{field: "color_nm", headerName: "컬러명", width: 110, cellStyle: {"line-height": "30px"}},
-		{field: "size", headerName: "사이즈", width: 55, cellStyle: StyleLineHeight},
-		{field: "goods_opt", headerName: "옵션", width: 200},
+		{field: "color", headerName: "컬러", width: 50, cellStyle: StyleLineHeight},
+		{field: "color_nm", headerName: "컬러명", width: 90, cellStyle: {"line-height": "30px"}},
+		{field: "size", headerName: "사이즈", width: 50, cellStyle: StyleLineHeight},
+		{field: "goods_opt", headerName: "옵션", width: 190},
+		{field: "brand_nm", headerName: "브랜드", width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
 		{field: "goods_sh", headerName: "TAG가", type: 'currencyType', width:85, aggFunc: 'first'},
 		{field: "price", headerName: "판매가", type: 'currencyType', width:85, aggFunc: 'first'},
 		{field: "wqty", headerName: "창고재고", width:70, type: 'currencyType', 
@@ -310,8 +313,6 @@
 				}
 			}
 		},
-		{field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
-		{field: "brand_nm", headerName: "브랜드", width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
 		{field: "match_yn", headerName: "매칭여부", hide:true},
 		{width:"auto"}
 	];
@@ -384,14 +385,12 @@
 		if(ord_field === "prd_cd_p") {
 			let prd_columns = columns.map(c => c.field === "prd_cd_p" 
 				? ({...c, rowGroup: true, hide: true, pinned: "left"}) 
-				: c.field === "color" || c.field === "size" || c.field === "color_nm" ? ({...c, pinned: "left"})
 				: c.type === "NumType" ? ({...c, hide: true})
 				: c.field === "goods_no" ? ({...c, cellStyle: StyleLineHeight}) : c);
 			gx.gridOptions.api.setColumnDefs(prd_columns);
 		} else {
 			let prd_columns = columns.map(c => c.field === "prd_cd_p" 
 				? ({...c, rowGroup: false, hide: false, pinned: "auto"}) 
-				: c.field === "color" || c.field === "size" || c.field === "color_nm" ? ({...c, pinned: "auto"}) 
 				: c.type === "NumType" ? ({...c, hide: false})
 				: c.field === "goods_no" ? ({...c, cellStyle: StyleGoodsNo}) : c);
 			gx.gridOptions.api.setColumnDefs(prd_columns);

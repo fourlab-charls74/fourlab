@@ -163,21 +163,28 @@
 													</select>
 												</div>
 											</td>
-											<th class="required">상품명</th>
-											<td>
-												<div class="flax_box">
-													<input type='text' class="form-control form-control-sm" name='prd_nm' id="prd_nm" value=''>
-												</div>
-											</td>
-											
-										</tr>
-										<tr>
 											<th class="required">스타일넘버</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='style_no' id="style_no" value=''>
 												</div>
 											</td>
+										</tr>
+										<tr>
+											<th class="required">상품명</th>
+											<td>
+												<div class="flax_box">
+													<input type='text' class="form-control form-control-sm" name='prd_nm' id="prd_nm" value=''>
+												</div>
+											</td>
+											<th class="required">상품명(영문)</th>
+											<td>
+												<div class="flax_box">
+													<input type='text' class="form-control form-control-sm" name='prd_nm_eng' id="prd_nm_eng" value=''>
+												</div>
+											</td>
+										</tr>
+                                        <tr>
 											<th class="required">공급업체</th>
 											<td>
 												<div class="flax_box">
@@ -189,32 +196,24 @@
 													</select>
 												</div>
 											</td>
-										</tr>
-                                        <tr>
 											<th>TAG가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='tag_price' id="tag_price" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
+										</tr>
+										<tr>
 											<th>판매가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='price' id="price" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
-											
-										</tr>
-										<tr>
 											<th>원가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='wonga' id="wonga" value='' onkeyup="onlynum(this)">
-												</div>
-											</td>
-											<th></th>
-											<td>
-												<div class="flax_box">
 												</div>
 											</td>
 										</tr>
@@ -324,6 +323,11 @@
 		{
 			field: "prd_nm",
 			headerName: "상품명",
+			width: 100
+		},
+		{
+			field: "prd_nm_eng",
+			headerName: "상품명(영문)",
 			width: 100
 		},
 		{
@@ -482,6 +486,7 @@
 				color: document.f1.color.value,
 				size: document.f1.size.value,
 				prd_nm: document.f1.prd_nm.value,
+				prd_nm_eng: document.f1.prd_nm_eng.value,
 				style_no: document.f1.style_no.value,
 				sup_com: document.f1.sup_com.value,
 				year: document.f1.year.value,
@@ -504,6 +509,7 @@
 				color: document.f1.color[document.f1.color.selectedIndex].text,
 				size: document.f1.size[document.f1.size.selectedIndex].text,
 				prd_nm: document.f1.prd_nm.value,
+				prd_nm_eng: document.f1.prd_nm_eng.value,
 				style_no: document.f1.style_no.value,
 				sup_com: document.f1.sup_com[document.f1.sup_com.selectedIndex].text,
 				year: document.f1.year[document.f1.year.selectedIndex].text,
@@ -575,10 +581,16 @@
 			return alert("상품명을 입력해주세요.");
 		}
 
+		// 상품명(영문) 입력여부
+		if (f1.prd_nm_eng.value.trim() === '') {
+			f1.prd_nm_eng.focus();
+			return alert("상품명(영문)을 입력해주세요.");
+		}
+
 		// 스타일넘버 입력여부
 		if (f1.style_no.value.trim() === '') {
 			f1.style_no.focus();
-			return alert("상품명을 입력해주세요.");
+			return alert("스타일넘버를 입력해주세요.");
 		}
 
 		return true;
