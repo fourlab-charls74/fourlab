@@ -62,6 +62,8 @@ class sal03Controller extends Controller
         $brand_cd = $request->input("brand_cd");
         $goods_nm = $request->input("goods_nm");
         $goods_nm_eng = $request->input("goods_nm_eng");
+		$prd_cd_range_text = $request->input("prd_cd_range", '');
+		$best_worst = $request->input('best_worst');
 
         $type = $request->input("type");
         $goods_type = $request->input("goods_type");
@@ -70,9 +72,16 @@ class sal03Controller extends Controller
 		if ( $page < 1 or $page == "" )	$page = 1;
 		$limit = $request->input('limit', 100);
 
+		$orderby = '';
 		$ord = $request->input('ord','desc');
 		$ord_field = $request->input('ord_field','p.goods_no');
-		$orderby = sprintf("order by %s %s", $ord_field, $ord);
+		if ($best_worst == 'B') {
+			$orderby = sprintf("order by %s %s", "ord_qty", "desc");
+		} else if ($best_worst == 'W') {
+			$orderby = sprintf("order by %s %s", "ord_qty", "asc");
+		}else {
+			$orderby = sprintf("order by %s %s", $ord_field, $ord);
+		}
 
 		$where	= "";
 		if ($com_type != "") $where .= " and g.com_type = '$com_type' ";
@@ -81,7 +90,6 @@ class sal03Controller extends Controller
 		if ($prd_cd != "")	$where .= " and o.prd_cd = '" . $prd_cd . "' ";
 		if ($com_id != "") $where .= " and g.com_id = '" . Lib::quote($com_id) . "'";
 		if ($com_nm != "") $where .= " and g.com_nm like '%" . Lib::quote($com_nm) . "%' ";
-
 		if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%' ";
 		if ($item != "") $where .= " and g.opt_kind_cd = '" . Lib::quote($item) . "' ";
 		if ($brand_cd != "") {
@@ -99,6 +107,18 @@ class sal03Controller extends Controller
 		$goods_no = preg_replace("/\t/", ",", $goods_no);
 		$goods_no = preg_replace("/\n/", ",", $goods_no);
 		$goods_no = preg_replace("/,,/", ",", $goods_no);
+
+		// 상품옵션 범위검색
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				$in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc.$opt $in_query ($opt_join) ";
+			}
+		}
 
 		if ($goods_no != "") {
 			$goods_nos = explode(",", $goods_no);
@@ -121,74 +141,44 @@ class sal03Controller extends Controller
 			}
 		} else if ($goods_stat != "") {
 			$where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
-		}
+		} 
 
 		$page_size = $limit;
 		$startno = ($page - 1) * $page_size;
 		$limit = " limit $startno, $page_size ";
-
-		$total = 0;
-		$page_cnt = 0;
-
-		if ( $page == 1 ) {
-			$query = /** @lang text */
-            	"
-				select
-					count(a.cnt) as total
-				from
-				(
-					select 
-						o.prd_cd, count(*) as cnt
-					from order_mst m 
-						inner join order_opt o on m.ord_no = o.ord_no
-						inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
-						inner join goods g on o.goods_no = g.goods_no
-						left outer join store s on m.store_cd = s.store_cd
-						left outer join brand b on g.brand = b.brand
-						left outer join `code` c on c.code_kind_cd = 'g_goods_stat' and g.sale_stat_cl = c.code_id
-						left outer join `code` c2 on c2.code_kind_cd = 'g_goods_type' and g.goods_type = c2.code_id
-					where w.`ord_state_date` >= '$sdate' and w.ord_state_date <= '$edate' and w.`ord_state` in ( '30','60','61') 
-						and o.prd_cd <> ''
-						$where
-					group by o.prd_cd
-				) as a inner join product_stock ps on a.prd_cd = ps.prd_cd
-			";
-
-			$row = DB::selectOne($query);
-
-			if ($row) $total = $row->total;
-			$page_cnt = (int)(($total - 1) / $page_size) + 1;
-		}
 		
 		$sql = /** @lang text */
             "
 			select 
 				a.*, 
-				b.in_sum_qty, b.in_sum_amt,
-				ifnull(ps.qty, '0') as stock_qty, ifnull(ps.wqty, '0') as stock_wqty,
-				round((a.ord_qty / ifnull(b.in_sum_qty, '0') * 100), 2) as in_sale_rate,
-				round((a.ord_qty / ifnull(ps.wqty, '0') * 100), 2) as sale_rate
+				b.in_sum_qty,
+				b.in_sum_amt,
+				ifnull(ps.qty, '0') as stock_qty, 
+				ifnull(ps.wqty, '0') as stock_wqty,
+				ifnull(round((a.ord_qty / b.in_sum_qty) * 100),0) as in_sale_rate,
+				ifnull(round((a.ord_qty / ps.wqty) * 100),0) as sale_rate
 			from ( 
 					select 
 						o.prd_cd,
 						sum(w.qty) as ord_qty,
 						sum(w.recv_amt + w.point_apply_amt) as ord_amt,
 						avg(w.wonga) as wonga,
-						g.goods_type, c.code_val as sale_stat_cl_val, c2.code_val as goods_type_nm,
-						o.goods_no, g.brand, b.brand_nm, g.style_no, o.goods_opt, g.img, g.goods_nm, g.goods_nm_eng
+						g.goods_type,
+						o.goods_no, g.brand, b.brand_nm, g.style_no, o.goods_opt, g.img, g.goods_nm, g.goods_nm_eng,
+						concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color, pc.size
 					from order_mst m 
 						inner join order_opt o on m.ord_no = o.ord_no 
+						left outer join product_code pc on pc.prd_cd = o.prd_cd
 						inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
 						inner join goods g on o.goods_no = g.goods_no
 						left outer join store s on m.store_cd = s.store_cd
 						left outer join brand b on g.brand = b.brand
-						left outer join `code` c on c.code_kind_cd = 'g_goods_stat' and g.sale_stat_cl = c.code_id
-						left outer join `code` c2 on c2.code_kind_cd = 'g_goods_type' and g.goods_type = c2.code_id
 					where w.`ord_state_date` >= '$sdate' and w.ord_state_date <= '$edate' and w.`ord_state` in ( '30','60','61') 
 						and o.prd_cd <> '' $where
 					group by o.prd_cd
-				) as a inner join product_stock ps on a.prd_cd = ps.prd_cd left outer join 
-				( 
+				) as a 
+				inner join product_stock ps on a.prd_cd = ps.prd_cd 
+				left outer join ( 
 					select 
 						sp.prd_cd as prd_cd, 
 						sum(ps.in_qty) as in_sum_qty, sum(sp.cost) as in_sum_amt
@@ -202,13 +192,80 @@ class sal03Controller extends Controller
 
 		$result = DB::select($sql);
 
+
+		// pagination
+		$total = 0;
+		$total_data = '';
+		$page_cnt = 0;
+
+		if ( $page == 1 ) {
+			$query = /** @lang text */
+            	"
+				select
+					count(a.cnt) as total
+					, sum(a.ord_amt) as ord_amt
+					, sum(a.ord_qty) as ord_qty
+					, sum(a.in_sale_rate) as in_sale_rate
+					, sum(a.sale_rate) as sale_rate
+					, sum(b.in_sum_amt) as in_sum_amt
+					, sum(b.in_sum_qty) as in_sum_qty
+					, sum(ifnull(ps.qty, '0')) as stock_qty 
+					, sum(ifnull(ps.wqty, '0')) as stock_wqty
+				from
+				(
+					select 
+						o.prd_cd,
+						 count(*) as cnt,
+						sum(w.qty) as ord_qty,
+						sum(w.recv_amt + w.point_apply_amt) as ord_amt,
+						avg(w.wonga) as wonga,
+						g.goods_type,
+						o.goods_no, g.brand, b.brand_nm, g.style_no, o.goods_opt, g.img, g.goods_nm, g.goods_nm_eng,
+						concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color, pc.size,
+						round((w.qty / ps.in_qty) * 100) as in_sale_rate,
+						round((w.qty / ps.wqty) * 100) as sale_rate
+					from order_mst m 
+						inner join order_opt o on m.ord_no = o.ord_no
+						inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
+						left outer join product_code pc on pc.prd_cd = o.prd_cd
+						inner join product_stock ps on ps.prd_cd = pc.prd_cd 
+						inner join goods g on o.goods_no = g.goods_no
+						left outer join stock_product sp on sp.prd_cd = pc.prd_cd
+						left outer join store s on m.store_cd = s.store_cd
+						left outer join brand b on g.brand = b.brand
+					where w.`ord_state_date` >= '$sdate' and w.ord_state_date <= '$edate' and w.`ord_state` in ( '30','60','61') 
+						and o.prd_cd <> ''
+						$where
+					group by o.prd_cd
+				) as a 
+				inner join product_stock ps on a.prd_cd = ps.prd_cd
+				left outer join ( 
+					select 
+						sp.prd_cd as prd_cd, 
+						sum(ps.in_qty) as in_sum_qty,
+						sum(sp.cost) as in_sum_amt
+					from stock_product sp
+						inner join product_stock ps on sp.prd_cd = ps.prd_cd
+					group by sp.prd_cd
+				) as b on a.prd_cd = b.prd_cd
+			";
+
+			$row = DB::selectOne($query);
+			$total_data = $row;
+            $total = $row->total;
+
+			// if ($row) $total = $row->total;
+			$page_cnt = (int)(($total - 1) / $page_size) + 1;
+		}
+
 		return response()->json([
 			"code"	=> 200,
 			"head"	=> array(
 				"total"		=> $total,
 				"page"		=> $page,
 				"page_cnt"	=> $page_cnt,
-				"page_total"=> count($result)
+				"page_total"=> count($result),
+				"total_data" => $total_data
 			),
 			"body" => $result
 		]);
