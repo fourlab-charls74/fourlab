@@ -128,10 +128,8 @@ class cs01Controller extends Controller {
 
 	public function show(Request $request) 
 	{
-
-		$cmd = $request->input('cmd');
 		$stock_no = $request->input('stock_no');
-		$stock_date = date("Ymd");
+		$stock_date = date("Y-m-d");
 		$invoice_no = "";
 		$cmd = "addcmd";
 		$com_id = "";
@@ -151,7 +149,7 @@ class cs01Controller extends Controller {
 			$cmd = "editcmd";
 			$sql = "
 				select
-					b.invoice_no, b.stock_date, b.stock_type, b.area_type,
+					b.invoice_no, date_format(b.stock_date, '%Y-%m-%d'), b.stock_type, b.area_type,
 					b.com_id, c.com_nm, b.item, b.currency_unit, b.exchange_rate,
 					b.custom_amt,b.custom_tax,b.custom_tax_rate, b.state, b.loc,b.opts, b.req_id
 				from product_stock_order b
@@ -235,7 +233,7 @@ class cs01Controller extends Controller {
 			'opts' => $opts,
 			'opt_cnt' => count($col_opts),
 			"col_opts" => $col_opts,
-			"locs" => Slib::getCodes('G_STOCK_loc'),
+			"locs" => Slib::getCodes('G_STOCK_LOC'),
 			"loc" => $loc
         ];
 
