@@ -150,7 +150,7 @@
                                 <label for="tariff_amt" class="required">관세총액/관세율</label>
                                 <div class="flex_box">
                                     <input type="text" class="form-control form-control-sm text-right w-75" 
-                                        id="tariff_amt" name="tariff_amt" value="{{ @$tariff_amt ?? 0 }}"
+                                        id="tariff_amt" name="tariff_amt" value="{{ number_format(@$tariff_amt ?? 0) }}"
                                         onkeypress="checkFloat(event);" onkeyup="com3(this);calCustomTaxRate();" onfocus="this.select();" 
                                         {{ @$currency_unit == 'KRW' ? 'readonly disabled' : '' }}>
                                     <div class="d-flex align-items-center w-25 pl-2">
@@ -165,7 +165,7 @@
                                 <label for="freight_amt" class="required">운임비/운임율</label>
                                 <div class="flex_box">
                                     <input type="text" class="form-control form-control-sm text-right w-75" 
-                                        id="freight_amt" name="freight_amt" value="{{ @$freight_amt ?? 0 }}"
+                                        id="freight_amt" name="freight_amt" value="{{ number_format(@$freight_amt ?? 0) }}"
                                         onkeypress="checkFloat(event);" onkeyup="com3(this);calCustomTaxRate();" onfocus="this.select();" 
                                         {{ @$currency_unit == 'KRW' ? 'readonly disabled' : '' }}>
                                     <div class="d-flex align-items-center w-25 pl-2">
@@ -215,7 +215,7 @@
                             </div>
                         </div>
                     </div>
-                    <div id="help" class="row" style="display: none;">
+                    <div id="help" class="row mt-4" style="display: none;">
                         <div class="col-lg-12">
                             <div class="form-group">
                                 <label style="color: #0000ff;">도움말<i class="fa fa-question-circle ml-1" aria-hidden="true"></i></label>
@@ -223,6 +223,8 @@
                                     <div class="d-flex flex-column" style="width: 20%; min-width: 250px;">
                                         <p>기본정보</p>
                                         <ul>
+                                            <li style="color: #e8554e;">수량(확정)값으로 게산</li>
+                                            <li>(신고)금액 = 전체상품 총수입금액 합계</li>
                                             <li>관세율 = 관세총액 &divide; (신고)금액</li>
                                             <li>운임율 = 운임비 &divide; (신고)금액</li>
                                             <li>통관비 = 관세총액 &plus; 운임비</li>
@@ -232,6 +234,7 @@
                                     <div class="d-flex flex-column">
                                         <p>상품정보</p>
                                         <ul>        
+                                            <li style="color: #e8554e;">수량(확정)값이 0이면 수량(예정)값으로 게산</li>
                                             <li>금액 = 수량 x 단가</li>
                                             <li>수입금액 = 환율 x 단가</li>
                                             <li>총수입금액 = 환율 x 수량 x 단가</li>
@@ -537,7 +540,9 @@
     /** GRID 상단고정ROW 업데이트 */
     function updatePinnedRow() {
         const rows = gx.getRows();
+        const exchange_rate = unComma(document.search.exchange_rate.value || '0');
         let row = {};
+        
         if (rows.length > 0) {
             row = rows.reduce((a, c) => ({
                     exp_qty: a.exp_qty + Number.parseFloat(c.exp_qty),
@@ -548,14 +553,15 @@
                     cost: a.cost + Number.parseFloat(c.cost),
                     total_cost: a.total_cost + Number.parseFloat(c.total_cost),
                     total_cost_novat: a.total_cost_novat + Number.parseFloat(c.total_cost_novat),
-                }), { exp_qty: 0, qty: 0, unit_total_cost: 0, income_amt: 0, income_total_amt: 0, cost: 0, total_cost: 0, total_cost_novat: 0 }
+                    p_custom_amt: a.p_custom_amt + Number.parseFloat((exchange_rate * (c.qty || 0) * (c.unit_cost || 0))),
+                }), { exp_qty: 0, qty: 0, unit_total_cost: 0, income_amt: 0, income_total_amt: 0, cost: 0, total_cost: 0, total_cost_novat: 0, p_custom_amt: 0 }
             );
         }
 
         let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
         gx.gridOptions.api.setPinnedTopRowData([{ ...pinnedRow.data, ...row }]);
 
-        $("#custom_amt").val(Comma(Math.round(row.income_total_amt || 0)));
+        $("#custom_amt").val(Comma(Math.round(row.p_custom_amt || 0)));
     }
 
     /**********************************
@@ -696,7 +702,7 @@
         }
 
         const rows = gx.getRows();
-        for (let row in rows) {
+        for (let row of rows) {
             if (await checkPrdData(row) == false) return false;
         }
         return true;
@@ -902,7 +908,8 @@
             Object.keys(columns).forEach((column) => {
                 if(worksheet[column + rowIndex] !== undefined) {
                     ws = worksheet[column + rowIndex];
-                    row[columns[column]] = ws.t == 'n' ? ws.v : ws.w;
+                    if (column == 'F') row[columns[column]] = ws.v * 100;
+                    else row[columns[column]] = ws.t == 'n' ? ws.v : ws.w;
                 }
             });
             

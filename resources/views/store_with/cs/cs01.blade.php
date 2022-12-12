@@ -158,7 +158,7 @@
 
         var columns= [
             { field: "stock_no", headerName: "입고번호", width: 100, cellStyle:{ 'text-align': 'center' } },
-            { field: "invoice_no", headerName: "송장번호", width: 120,
+            { field: "invoice_no", headerName: "송장번호", width: 120, cellStyle:{ 'text-align': 'center' },
                 cellRenderer: (params) => `<a href="#" onClick="clickInvoiceNo(${params.data.stock_no})">${params.data.invoice_no}</a>`
             },
             { field: "area_type", headerName: "입고지역", width: 80, cellStyle:{ 'text-align': 'center' } },
@@ -167,10 +167,14 @@
             { field: "com_nm", headerName: "공급업체", width: 110, cellStyle: { 'text-align': 'center' } },
             { field: "item", headerName: "품목", width: 90, cellStyle: { 'text-align': 'center' } },
             { field: "currency_unit", headerName: "화폐단위", width: 80, cellStyle:{ 'text-align': 'center' } },
-            { field: "exchange_rate", headerName: "환율", width: 80, cellStyle:{ 'text-align': 'right' }, type:'currencyType' },
-            { field: "custom_amt", headerName: "신고금액", width: 90, cellStyle:{ 'text-align': 'right' }, type:'currencyType' },
-            { field: "custom_tax", headerName: "통관비", width: 80, cellStyle:{ 'text-align': 'right' }, type:'currencyType' },
-            { field: "custom_tax_rate", headerName: "통관세율(%)", width: 90, cellStyle:{ 'text-align': 'right' }, type:'percentType' },
+            { field: "exchange_rate", headerName: "환율", width: 80, type:'percentType' },
+            { field: "custom_amt", headerName: "신고금액", width: 90, type:'currencyType' },
+            { field: "tariff_amt", headerName: "관세총액", width: 80, type:'currencyType' },
+            { field: "tariff_rate", headerName: "관세율(%)", width: 80, type:'percentType' },
+            { field: "freight_amt", headerName: "운임비", width: 80, type:'currencyType' },
+            { field: "freight_rate", headerName: "운임율(%)", width: 80, type:'percentType' },
+            { field: "custom_tax", headerName: "통관비", width: 80, type:'currencyType' },
+            { field: "custom_tax_rate", headerName: "통관세율(%)", width: 80, type:'percentType' },
             { field: "exp_qty", headerName: "수량(예정)", type:'currencyType' },
             { field: "qty", headerName: "수량(확정)", type:'currencyType', cellStyle: { 'font-weight': '700' } },
             { field: "total_cost", headerName: "총원가(원)", type:'currencyType' },
