@@ -335,7 +335,7 @@
         {field: "prd_tariff_rate", headerName: "상품당 관세율(%)", width: 110,
             editable: params => checkIsEditable(params),
             cellStyle: params => ({backgroundColor: checkIsEditable(params) ? '#ffff99' : 'none', textAlign: 'right'}),
-            cellRenderer: params => params.node.rowPinned == "top" ? "" : Number.parseFloat(params.valueFormatted),
+            cellRenderer: params => params.node.rowPinned == "top" ? "" : Number.parseFloat(params.value || 0),
         },
         {field: "unit_total_cost", headerName: "금액", width: 80, cellStyle: StyleRight, valueFormatter: numberFormatter},
         {field: "income_amt", headerName: "수입금액(원)", width: 80, cellStyle: StyleRight, valueFormatter: KRWFormatter},
@@ -550,11 +550,10 @@
                     total_cost_novat: a.total_cost_novat + Number.parseFloat(c.total_cost_novat),
                 }), { exp_qty: 0, qty: 0, unit_total_cost: 0, income_amt: 0, income_total_amt: 0, cost: 0, total_cost: 0, total_cost_novat: 0 }
             );
-            console.log(row);
         }
 
         let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
-        gx.gridOptions.api.setPinnedTopRowData([{ ...pinnedRow.data, ...rows }]);
+        gx.gridOptions.api.setPinnedTopRowData([{ ...pinnedRow.data, ...row }]);
 
         $("#custom_amt").val(Comma(Math.round(row.income_total_amt || 0)));
     }
@@ -566,13 +565,14 @@
      /** 기본정보(환율/관세총액/운임비) 입력 시 세율계산 */
     async function calCustomTaxRate(calculate_prd = true) {
         const ff = document.search;
-        if (ff.currency_unit.value == "KRW") return;
+        const unit = ff.currency_unit.value;
+        if (unit == "KRW") return;
 
         const exchange_rate = unComma(ff.exchange_rate.value || '0') || 0; // 환율
         const tariff_amt = unComma(ff.tariff_amt.value || '0') || 0; // 관세총액
         const freight_amt = unComma(ff.freight_amt.value || '0') || 0; // 운임비
         const custom_tax = tariff_amt + freight_amt; // 통관비
-        const custom_amt = gx.getRows().reduce((a, c) => a + (c.income_total_amt * 1), 0); // (신고)금액
+        const custom_amt = gx.getRows().reduce((a, c) => a + (exchange_rate * (c.qty || 0) * (c.unit_cost || 0)), 0); // (신고)금액
 
         const tariff_rate = custom_amt < 1 ? 0 : Number.parseFloat((tariff_amt / custom_amt) * 100); // 관세율
         const freight_rate = custom_amt < 1 ? 0 : Number.parseFloat((freight_amt / custom_amt) * 100); // 운임율
@@ -583,7 +583,7 @@
         ff.custom_tax.value = Comma(custom_tax);
         ff.custom_tax_rate.value = custom_tax_rate.toFixed(2);
 
-        if (calculate_prd) await gx.getRows().forEach(async (row) => await calProduct(row, freight_amt, custom_amt));
+        if (calculate_prd) await gx.getRows().forEach(async (row) => await calProduct(row, unit, exchange_rate, freight_amt, custom_amt));
         updatePinnedRow();
     }
 
@@ -597,24 +597,25 @@
 
         await calProduct(row);
         updatePinnedRow();
-        calCustomTaxRate();
+        calCustomTaxRate(false);
     }
 
     /** 상품 개당 계산정보 적용 */
-    async function calProduct(row, freight_amt = 0, custom_amt = 0) {
+    async function calProduct(row, unit = "", exchange_rate = 0, freight_amt = 0, custom_amt = 0) {
         const ff = document.search;
 
-        const unit = ff.currency_unit.value; // 통화
-        const exchange_rate = unComma(ff.exchange_rate.value); // 환율
-        if (freight_amt == 0) freight_amt = unComma(ff.freight_amt.value); // 운임비
-        if (custom_amt == 0) custom_amt = gx.getRows().reduce((a, c) => a + (c.income_total_amt * 1), 0); // 신고금액
-        const freight_rate = custom_amt < 1 ? 0 : Number.parseFloat(freight_amt / custom_amt); // 운임율
-        
         const qty = !!(row.qty != 0 && row.qty) ? Number.parseInt(row.qty) 
             : !!(row.exp_qty != 0 && row.exp_qty) ? Number.parseInt(row.exp_qty) 
             : 0; // 수량
         const unit_cost = Number.parseFloat(row.unit_cost || 0); // 단가
         const prd_tariff_rate = Number.parseFloat(row.prd_tariff_rate || 0); // 상품당 관세율
+
+        if (unit == "") unit = ff.currency_unit.value; // 통화
+        if (exchange_rate == 0) exchange_rate = unComma(ff.exchange_rate.value || '0') || 0; // 환율
+        if (freight_amt == 0) freight_amt = unComma(ff.freight_amt.value || '0') || 0; // 운임비
+        if (custom_amt == 0) custom_amt = gx.getRows().reduce((a, c) => a + (exchange_rate * (qty || 0) * (unit_cost || 0)), 0); // 신고금액
+        const freight_rate = custom_amt < 1 ? 0 : Number.parseFloat(freight_amt / custom_amt); // 운임율
+        
         const income_amt = exchange_rate * unit_cost; // 수입금액
         const income_total_amt = income_amt * qty; // 총수입금액
 
@@ -882,19 +883,26 @@
 
         alert("상품을 순차적으로 불러오고 있습니다.\n다소 시간이 소요될 수 있습니다."); // progress
 
-        // 기본정보 적용 작업 필요 // 수정필요
+        // 기본정보 적용
+        const ff = document.search;
+        ff.com_id.value = com_id;
+        ff.bl_no.value = bl_no;
+        ff.stock_date.value = stock_date;
+        ff.exchange_rate.value = Comma(exchange_rate);
+        ff.tariff_amt.value = Comma(tariff_amt);
+        ff.freight_amt.value = Comma(freight_amt);
+        getInvoiceNo();
 
+        // 상품정보 적용
         let rowIndex = 13; // 엑셀 13행부터 시작 (샘플데이터 참고)
         let count = gx.gridOptions.api.getDisplayedRowCount();
         while (worksheet['B' + rowIndex]) { // iterate over the worksheet pulling out the columns we're expecting
             let row = {};
+            let ws;
             Object.keys(columns).forEach((column) => {
                 if(worksheet[column + rowIndex] !== undefined) {
-                    console.log(worksheet[column + rowIndex]); // 수정필요
-                    if(column === 'F')
-                        row[columns[column]] = worksheet[column + rowIndex].v;
-                    else
-                        row[columns[column]] = worksheet[column + rowIndex].w;
+                    ws = worksheet[column + rowIndex];
+                    row[columns[column]] = ws.t == 'n' ? ws.v : ws.w;
                 }
             });
             
@@ -903,11 +911,11 @@
             row.unit_cost ??= 0;  // 단가
             row.prd_tariff_rate ??= 0; // 상품당 관세율
             row = { ...row,
-                item: '', goods_no: "검사중...",
+                goods_no: "검사중...",
                 unit_total_cost: 0, income_amt: 0, income_total_amt: 0, cost: 0, total_cost: 0, total_cost_novat: 0, 
                 isEditable: true, count: ++count,
             };
-            gx.gridOptions.api.applyTransaction({add : [row]});
+            gx.gridOptions.api.applyTransaction({ add : [row] });
 
             rowIndex++;
             await getGood(row, !worksheet['B' + rowIndex]);
@@ -934,7 +942,12 @@
             }
 
             await gx.gridOptions.api.applyTransaction({ update : [checked_row] });
-            if(isLast) calCustomTaxRate();
+            if(isLast) {
+                calCustomTaxRate();
+                const com_id = document.search.com_id.value;
+                const { data : { body: coms } } = await axios({  url: `/head/api/company/getlist?com_id=${com_id}`, method: "get" });
+                if (coms.length > 0) document.search.com_nm.value = coms[0].com_nm;
+            }
         }).catch((error) => {
             console.log(error);
         });
