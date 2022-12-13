@@ -221,6 +221,7 @@
             width: 120,
             cellStyle: DEFAULT
         },
+        {field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}"},
         {
             field: "prd_nm",
             headerName: "원부자재명",
@@ -234,7 +235,6 @@
                 }
             }
         },
-        {field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}"},
         {
             field: "color",
             headerName: "칼라",

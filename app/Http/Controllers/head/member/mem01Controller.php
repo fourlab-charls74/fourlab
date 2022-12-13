@@ -432,8 +432,18 @@ class mem01Controller extends Controller
         $taxpayer_yn		= Request("taxpayer_yn","");            // 피엘라벤 사용안함
         $wsale_status		= Request("wsale_status", "");
         $type               = Request("type");
-        $store_nm           = Request("store_nm", "");
+        $store_nm           = "";
         $store_cd           = Request("store_no", "");
+        $store_chg          = Request("store_chg", "false"); // 가입매장변경여부
+
+        $store_sql = "";
+        if ($store_chg == 'true') {
+            $store_nm = DB::table('store')->where('store_cd', $store_cd)->value('store_nm');
+            $store_sql = "
+                , store_nm = '$store_nm'
+                , store_cd = '$store_cd'
+            ";
+        }
 
         $sql = "
             update member set
@@ -456,8 +466,7 @@ class mem01Controller extends Controller
                 , opt = '$opt'
                 , memo = '$memo'
                 , type = '$type'
-                , store_nm = '$store_nm'
-                , store_cd = '$store_cd'
+                $store_sql
             where user_id = '$user_id'
         ";
 

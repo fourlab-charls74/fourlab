@@ -367,6 +367,21 @@
                         </div>
                     </div>
                 </div>
+                <div class="row search-area-ext d-none">
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="sale_kind">판매유형</label>
+                            <div class="flex_box">
+                                <select name="sale_kind" class="form-control form-control-sm">
+                                    <option value="">전체</option>
+                                    @foreach (@$sale_kinds as $sale_kind)
+                                        <option value="{{ $sale_kind->code_id }}">{{ $sale_kind->code_val }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 		</div>
         
@@ -397,17 +412,20 @@
     let columns = [
         // {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {'text-align': 'center'}},
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 28},
-        {field: "ord_no", headerName: "주문번호", pinned: 'left', width: 120, cellStyle: StyleOrdNo, type: 'StoreOrderNoType',},
+        {field: "ord_no", headerName: "주문번호", pinned: 'left', width: 130, cellStyle: StyleOrdNo, type: 'StoreOrderNoType',},
         {field: "ord_opt_no", headerName: "일련번호", pinned: 'left', width: 60, type: 'StoreOrderNoType', cellStyle: {'text-align': 'center'}},
         {field: "ord_state", headerName: "주문상태", pinned: 'left', width: 70, cellStyle: StyleOrdState},
         {field: "clm_state", headerName: "클레임상태", pinned: 'left', width: 70, cellStyle: StyleClmState},
         {field: "pay_stat", headerName: "입금상태", pinned: 'left', width: 60, cellStyle: {'text-align': 'center'}},
-        {field: "prd_cd", headerName: "상품코드", width: 110, cellStyle: {'text-align': 'center'}},
+        {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {'text-align': 'center'}},
         {field: "goods_no", headerName: "상품번호", width: 70, cellStyle: {'text-align': 'center'}},
         {field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: {'text-align': 'center'}},
-        {field: "goods_type_nm", headerName:"상품구분", width: 60, cellStyle: StyleGoodsType},
-        {field: "goods_nm", headerName: "상품명", width: 200, type: "HeadGoodsNameType"},
-        {field: "opt_val", headerName: "옵션", width: 180},
+        {field: "goods_nm", headerName: "상품명", width: 150, type: "HeadGoodsNameType"},
+        {field: "goods_nm_eng", headerName: "상품명(영문)", width: 150},
+        {field: "prd_cd_p", headerName: "코드일련", width: 90, cellStyle: {"text-align": "center"}},
+        {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
+        {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
+        {field: "opt_val", headerName: "옵션", width: 130},
         {field: "qty", headerName: "수량", width: 50, type: "currencyType" ,
             cellRenderer: function(params) {
                     if (params.value !== undefined) {
@@ -419,6 +437,9 @@
         {field: "r_nm", headerName: "수령자", width: 70, cellStyle: {'text-align': 'center'}},
         {field: "goods_price", headerName: "자사몰판매가", width: 90, type: "currencyType"},
         {field: "price", headerName: "판매가", width: 60, type: "currencyType"},
+        {field: "dc_rate", headerName: "할인율(%)", width: 65, type: "currencyType"},
+        {field: "sale_kind_nm", headerName: "판매유형", width: 100, cellStyle: {"text-align": "center"}},
+        {field: "pr_code_nm", headerName: "행사구분", width: 60, cellStyle: {"text-align": "center"}},
         {field: "dlv_amt", headerName: "배송비", width: 60, type: "currencyType"},
         {field: "sales_com_fee", headerName: "판매수수료", width: 80, type: "currencyType"},
         {field: "pay_type", headerName: "결제방법", width: 80, cellStyle: {'text-align': 'center'}},

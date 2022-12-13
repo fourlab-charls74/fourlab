@@ -143,7 +143,7 @@ class cs03Controller extends Controller
 				(select name from mgr_user where id = p1.prc_id) as prc_nm, 
 				p1.prc_rt as prc_rt,
 				p1.fin_id as fin_id,
-				(select name from mgr_user where id = psr.fin_id) as fin_nm, 
+				(select name from mgr_user where id = p1.fin_id) as fin_nm, 
 				p1.fin_rt as fin_rt
 			from sproduct_stock_order_product p1
 				inner join sproduct_stock_order p2 on p1.prd_ord_no = p2.prd_ord_no

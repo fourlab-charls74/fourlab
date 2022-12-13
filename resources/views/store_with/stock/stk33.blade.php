@@ -201,8 +201,6 @@ const pinnedRowData = [{ store_nm : '합계' , "total_amt" : 0 ,
             let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
             let total_data = e.head.total_data;
 
-            console.log(pinnedRow);
-            console.log(total_data);
 			if(pinnedRow && total_data != '') {
 				gx.gridOptions.api.setPinnedTopRowData([
 					{ ...pinnedRow.data, ...total_data }

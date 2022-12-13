@@ -84,25 +84,26 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="prd_cd">상품옵션 범위검색</label>
+                            <div class="form-inline">
+                                <div class="form-inline-inner input-box w-100">
+                                    <div class="form-inline inline_btn_box">
+                                        <input type='hidden' id="prd_cd_range" name='prd_cd_range'>
+                                        <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' onclick="openApi();" class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label for="brand_cd">브랜드</label>
                             <div class="form-inline inline_btn_box">
                                 <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
                                 <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label for="goods_stat">상품상태</label>
-                            <div class="flax_box">
-                                <select id="goods_stat" name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
-                                    <option value=''>전체</option>
-                                    @foreach ($goods_stats as $goods_stat)
-                                        <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
-                                    @endforeach
-                                </select>
                             </div>
                         </div>
                     </div>
@@ -142,29 +143,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="search-area-ext d-none row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label for="name">업체</label>
-                            <div class="form-inline inline_select_box">
-                                <div class="form-inline-inner input-box w-25 pr-1">
-                                    <select id="com_type" name="com_type" class="form-control form-control-sm w-100">
-                                        <option value="">전체</option>
-                                        @foreach ($com_types as $com_type)
-                                            <option value="{{ $com_type->code_id }}">{{ $com_type->code_val }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="form-inline-inner input-box w-75">
-                                    <div class="form-inline inline_btn_box">
-                                        <input type="hidden" id="com_cd" name="com_cd" />
-                                        <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company search-all search-enter" style="width:100%;" autocomplete="off" />
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label for="item">품목</label>
@@ -178,29 +157,25 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label for="item">상품구분</label>
-                            <div class="flex_box">
-                                <select name='type' id="type" class="form-control form-control-sm" style="width: 47%">
-                                    <option value=''>전체</option>
-                                    <option value='N'>일반</option>
-                                    <option value='D'>납품</option>
-                                    <option value='E'>기획</option>
-                                </select>
-                                <span class="text_line" style="width: 6%; text-align: center;">/</span>
-                                <select name='goods_type' id="goods_type" class="form-control form-control-sm" style="width: 47%">
-                                    <option value=''>전체</option>
-                                    <option value='S'>매입</option>
-                                    <option value='I'>위탁매입</option>
-                                    <option value='P'>위탁판매</option>
-                                    <option value='O'>구매대행</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="search-area-ext d-none row">
+                    <div class="col-lg-4 inner-td">
+							<div class="form-group">
+							<label for="formrow-email-input">조회 기준</label>
+								<div class="form-inline form-radio-box">
+									<div class="custom-control custom-radio">
+										<input type="radio" name="best_worst" value="A" id="best_worst_all" class="custom-control-input" checked>
+										<label class="custom-control-label" for="best_worst_all">전체</label>
+									</div>
+									<div class="custom-control custom-radio">
+										<input type="radio" name="best_worst" value="B" id="best" class="custom-control-input">
+										<label class="custom-control-label" for="best">Best</label>
+									</div>
+									<div class="custom-control custom-radio">
+										<input type="radio" name="best_worst" value="W" id="worst" class="custom-control-input">
+										<label class="custom-control-label" for="worst">Worst</label>
+									</div>
+								</div>
+							</div>
+						</div>
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label for="">자료수/정렬</label>
@@ -218,6 +193,9 @@
                                     <select name="ord_field" class="form-control form-control-sm">
                                         <option value="goods_no">상품번호</option>
                                         <option value="prd_cd">상품코드</option>
+                                        <option value="qty">수량</option>
+                                        <option value="ord_amt">금액</option>
+                                        <option value="in_sale_rate">판매율</option>
                                     </select>
                                 </div>
                                 <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -257,35 +235,55 @@
 	</div>
 </div>
 <script language="javascript">
+
+    const pinnedRowData = [{ 
+                        prd_cd : '합계' 
+                        , "total_ord_amt" : 0 
+                        , "total_ord_qty" : 0
+                        , "in_sum_qty": 0 
+                        , "ord_amt" : 0 
+                        , "ord_qty" : 0
+                        , "in_sum_amt" : 0
+                        , "in_sale_rate" : 0
+                        , "total_sale_rate" : 0
+                        , "sale_rate" : 0
+                        , "stock_qty" : 0
+                        , "stock_wqty" : 0
+                        , "ex_sum_qty" : 0
+                    }];
+
 	var columns = [
-		{headerName: '#', pinned: 'left', type: 'NumType', width:40, cellStyle: {"line-height": "40px"}},
+		{headerName: '#', pinned: 'left', type: 'NumType', width:40, cellStyle: {"line-height": "30px"},
+            cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : parseInt(params.value) + 1,
+        },
 		{
             field: "goods_no",
             headerName: "상품번호",
             width: 58,
             pinned: 'left',
-            cellStyle: {"line-height": "40px"},
+            cellStyle: {"line-height": "30px"},
             cellRenderer: function (params) {
                 if (params.value) {
                     return `<a href="{{config('shop.front_url')}}/app/product/detail/${params.value}" target="_blank">${params.value}</a>`
                 }
             }
         },
-		{field: "goods_type_nm", headerName: "상품구분", width: 58, type: 'StyleGoodsTypeNM'},
-		{field: "prd_cd", headerName: "상품코드", cellStyle: {"line-height": "40px", 'text-align': 'center'}},
-		{field: "brand_nm", headerName: "브랜드", cellStyle: {"line-height": "40px"}},
-        {field: "style_no", headerName: "스타일넘버", width: 120, cellStyle: {"line-height": "40px", 'text-align': 'center'}},
-		{field: "sale_stat_cl_val", headerName: "상품상태", width:70, type: 'GoodsStateTypeLH50'},
-		{field: "img", headerName: "이미지", type: 'GoodsImageType', width:60, cellStyle: {"line-height": "40px"}, surl:"{{config('shop.front_url')}}"},
+		{field: "prd_cd", headerName: "상품코드", width:120, cellStyle: {"line-height": "30px", 'text-align': 'center'}},
+		{field: "brand_nm", headerName: "브랜드", cellStyle: {"line-height": "30px"}},
+        {field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: {"line-height": "30px", 'text-align': 'center'}},
+		{field: "img", headerName: "이미지", type: 'GoodsImageType', width:60, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}"},
         {field: "img", headerName: "이미지_url", hide: true},
-		{field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', cellStyle: {"line-height": "40px"}},
-		{field: "goods_nm_eng", headerName: "상품명(영문)", width: 230, cellStyle: {"line-height": "40px"}},
-		{field: "goods_opt", headerName: "옵션", cellStyle: {"line-height": "40px"}, width: 120},
+		{field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', cellStyle: {"line-height": "30px"}},
+		{field: "goods_nm_eng", headerName: "상품명(영문)", width: 230, cellStyle: {"line-height": "30px"}},
+		{field: "prd_cd_p", headerName: "코드일련", cellStyle: {"line-height": "30px",'text-align':'center'}, width: 100},
+		{field: "color", headerName: "컬러", cellStyle: {"line-height": "30px", 'text-align':'center'}, width: 50},
+		{field: "size", headerName: "사이즈", cellStyle: {"line-height": "30px", 'text-align':'center'}, width: 50},
+		{field: "goods_opt", headerName: "옵션", cellStyle: {"line-height": "30px"}, width: 120},
         {field: "in_warehouse",	headerName: "입고",
             children: [
                 {headerName: "수량", field: "in_sum_qty", type: 'numberType'},
                 {headerName: "금액", field: "in_sum_amt", type: 'currencyMinusColorType', width: 80},
-                {headerName: "판매율(%)", field: "in_sale_rate", cellStyle:{'text-align': 'right'}, type: 'percentType'}
+                {headerName: "판매율(%)", field: "in_sale_rate", cellStyle:{'text-align': 'right'}, type: 'currencyMinusColorType'}
             ]
         },
         {field: "ex_warehouse",	headerName: "출고",
@@ -298,14 +296,14 @@
             children: [
                 {headerName: "수량", field: "total_ord_qty", type: 'numberType'},
                 {headerName: "금액", field: "total_ord_amt", type: 'currencyMinusColorType', width: 80},
-                {headerName: "판매율(%)", field: "total_sale_rate", cellStyle:{'text-align': 'right'}, type: 'percentType'}
+                {headerName: "판매율(%)", field: "total_sale_rate", cellStyle:{'text-align': 'right'}, type: 'currencyMinusColorType'}
             ]
         },
         {field: "sale",	headerName: "기간판매",
             children: [
                 {headerName: "수량", field: "ord_qty", type: 'numberType'},
                 {headerName: "금액", field: "ord_amt", type: 'currencyMinusColorType', width: 80},
-                {headerName: "판매율(%)", field: "sale_rate", cellStyle:{'text-align': 'right'}, type: 'percentType'}
+                {headerName: "판매율(%)", field: "sale_rate", cellStyle:{'text-align': 'right'}, type: 'currencyMinusColorType'}
             ]
         },
         {field: "stock_qty", headerName: "매장재고", type: 'numberType'},
@@ -318,16 +316,37 @@
 		gridId:"#div-gd",
 	});
 	let gx;
+
 	$(document).ready(function() {
 		pApp.ResizeGrid(265);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
-		gx = new HDGrid(gridDiv, columns);
+       
+		gx = new HDGrid(gridDiv, columns, {
+            pinnedTopRowData: pinnedRowData,
+			getRowStyle: (params) => {
+                if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee !important', 'border': 'none'};
+            },
+        });
 		Search();
 	});
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/store/sale/sal03/search', data,1);
+		gx.Request('/store/sale/sal03/search', data,1, function(e) {
+            let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
+            let total_data = e.head.total_data;
+
+            if(pinnedRow && total_data != '') {
+				gx.gridOptions.api.setPinnedTopRowData([
+					{ ...pinnedRow.data, ...total_data }
+				]);
+			}
+        });
 	}
+
+    //상품범위검색 input창 클릭시 자동으로 상품옵션 범위검색 API 오픈
+    function openApi() {
+        document.getElementsByClassName('sch-prdcd-range')[0].click();
+    }
 </script>
 @stop

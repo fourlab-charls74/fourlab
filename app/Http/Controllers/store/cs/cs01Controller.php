@@ -77,8 +77,10 @@ class cs01Controller extends Controller {
 		$sql = "
 			select
 				b.stock_no, b.invoice_no, ar.code_val as area_type,
-				b.stock_date, cd.code_val as state_nm, c.com_nm, s.item,
+				date_format(b.stock_date, '%Y-%m-%d') as stock_date, 
+				cd.code_val as state_nm, c.com_nm, s.item,
 				b.currency_unit,b.exchange_rate,b.custom_amt, b.custom_tax,b.custom_tax_rate,
+				b.tariff_amt, b.tariff_rate, b.freight_amt, b.freight_rate,
 				s.qty, s.exp_qty, s.total_cost,
 				-- ifnull((select sum(qty) from stock_product_buy_order where stock_no = b.stock_no),0) as buy_order_qty,
 				s.item_cds as item_cds,
@@ -101,7 +103,7 @@ class cs01Controller extends Controller {
 				inner join (
 					select p.stock_no, group_concat(distinct p.item) as item,
 					group_concat(distinct o.opt_kind_cd) as item_cds,
-					sum(p.qty) as qty, sum(p.exp_qty) as exp_qty, sum(cost * qty) as total_cost
+					sum(p.qty) as qty, sum(p.exp_qty) as exp_qty, sum(total_cost) as total_cost
 					from product_stock_order b inner join product_stock_order_product p on b.stock_no = p.stock_no
 						left outer join opt o on p.item = o.opt_kind_nm
 					$where
@@ -128,11 +130,10 @@ class cs01Controller extends Controller {
 
 	public function show(Request $request) 
 	{
-
-		$cmd = $request->input('cmd');
 		$stock_no = $request->input('stock_no');
-		$stock_date = date("Ymd");
+		$stock_date = date("Y-m-d");
 		$invoice_no = "";
+		$bl_no = "";
 		$cmd = "addcmd";
 		$com_id = "";
 		$com_nm = "";
@@ -142,6 +143,10 @@ class cs01Controller extends Controller {
 		$custom_tax_rate =  "0.00";
 		$custom_amt = 0;
 		$custom_tax = 0;
+		$tariff_amt = 0;
+		$tariff_rate = 0;
+		$freight_amt = 0;
+		$freight_rate = 0;
 		$exchange_rate = "";
 		$currency_unit = "KRW";
 		$opts = "";
@@ -151,8 +156,9 @@ class cs01Controller extends Controller {
 			$cmd = "editcmd";
 			$sql = "
 				select
-					b.invoice_no, b.stock_date, b.stock_type, b.area_type,
+					b.invoice_no, b.bl_no, date_format(b.stock_date, '%Y-%m-%d') as stock_date, b.stock_type, b.area_type,
 					b.com_id, c.com_nm, b.item, b.currency_unit, b.exchange_rate,
+					b.tariff_amt, b.tariff_rate, b.freight_amt, b.freight_rate,
 					b.custom_amt,b.custom_tax,b.custom_tax_rate, b.state, b.loc,b.opts, b.req_id
 				from product_stock_order b
 					inner join company c on c.com_id = b.com_id
@@ -163,6 +169,7 @@ class cs01Controller extends Controller {
 			if ($row) {
 
 				$invoice_no = $row->invoice_no;
+				$bl_no = $row->bl_no;
 				$stock_date = $row->stock_date;
 				$area_type = $row->area_type;
 				$com_id = $row->com_id;
@@ -172,6 +179,10 @@ class cs01Controller extends Controller {
 				$custom_amt = $row->custom_amt;
 				$custom_tax = $row->custom_tax;
 				$custom_tax_rate = $row->custom_tax_rate;
+				$tariff_amt = $row->tariff_amt;
+				$tariff_rate = $row->tariff_rate;
+				$freight_amt = $row->freight_amt;
+				$freight_rate = $row->freight_rate;
 				$state = $row->state;
 				$loc = $row->loc;
 				$opts = $row->opts;
@@ -186,11 +197,9 @@ class cs01Controller extends Controller {
 				// }
 
 			} else {
-
 				$msg = '존재하지 않는 입고입니다.';
 				Lib::printMsg($msg, 'close');
 				exit;
-
 			}
 		}
 
@@ -220,6 +229,7 @@ class cs01Controller extends Controller {
         $values = [
 			'stock_no' => $stock_no,
 			'invoice_no' => $invoice_no,
+			'bl_no' => $bl_no,
 			'stock_date' => $stock_date,
 			'area_type' => $area_type,
 			'com_id' => $com_id,
@@ -231,11 +241,15 @@ class cs01Controller extends Controller {
 			"custom_amt" => Lib::cm($custom_amt),
 			"custom_tax" => Lib::cm($custom_tax),
 			"custom_tax_rate" => $custom_tax_rate,
+			"tariff_amt" => $tariff_amt,
+			"tariff_rate" => $tariff_rate,
+			"freight_amt" => $freight_amt,
+			"freight_rate" => $freight_rate,
 			'cmd' => $cmd,
 			'opts' => $opts,
 			'opt_cnt' => count($col_opts),
 			"col_opts" => $col_opts,
-			"locs" => Slib::getCodes('G_STOCK_loc'),
+			"locs" => Slib::getCodes('G_STOCK_LOC'),
 			"loc" => $loc
         ];
 
@@ -296,40 +310,38 @@ class cs01Controller extends Controller {
 	 * 입고 추가
 	 */
 	public function addCmd(Request $request) {
-
 		$id = Auth::guard('head')->user()->id;
-		str_replace('-','',$request->input("sdate"));
+
 		// Form
 		$invoice_no				= $request->input("invoice_no");			//송장번호
+		$bl_no					= $request->input("bl_no", "");				//통관번호 (B/L No.)
 		$stock_date				= str_replace('-','',$request->input("stock_date"));	//입고일자
-		$stock_type				= "A";										//입고구분
-		$area_type				= $request->input("area_type");				//입고지역
+		$stock_type				= "A";										//입고구분 (일괄/발주)
 		$com_id					= $request->input("com_id");				//공급처
 		$item					= "";										//품목
-		$currency_unit			= $request->input("currency_unit");			//화폐단위
-		$exchange_rate			= $request->input("exchange_rate");			//환율
-		$exchange_rate			= str_replace(",","",$exchange_rate);
-
-		$custom_amt				= $request->input("custom_amt");			//신고금액
-		$custom_amt				= str_replace(",","",$custom_amt);
-		$custom_tax				= $request->input("custom_tax");			//통관비
-		$custom_tax				= str_replace(",","",$custom_tax);
-		$custom_tax_rate		= $request->input("custom_tax_rate");		//통관세율
-
 		$state					= $request->input("state");					//입고상태
 		$loc					= $request->input("loc");					//위치
 
-		// $prd_cd = $request->input("prd_cd"); // 상품코드
-
+		$currency_unit			= $request->input("currency_unit");			//화폐단위
+		$exchange_rate			= $request->input("exchange_rate");			//환율
+		$exchange_rate			= str_replace(",","",$exchange_rate);
+		$custom_amt				= $request->input("custom_amt");			//신고금액
+		$custom_amt				= str_replace(",","",$custom_amt);
+		$tariff_amt				= $request->input("tariff_amt");			//관세총액
+		$tariff_amt				= str_replace(",","",$tariff_amt);
+		$freight_amt			= $request->input("freight_amt");			//운임비
+		$freight_amt			= str_replace(",","",$freight_amt);
+		$custom_tax				= intval($tariff_amt) + intval($freight_amt); //통관비
+		
+		
+		$area_type 				= ($currency_unit == "KRW") ? "D" : "O"; 	//입고지역
 		$data					= $request->input("data");
 
 		if ($currency_unit == "KRW") {
 			$exchange_rate = 0;
-			$custom_tax_rate = 0;
-		}
-
-		if ($area_type == "") {
-			$area_type = ($currency_unit == "KRW") ? "D" : "O";
+			$custom_amt = 0;
+			$tariff_amt = 0;
+			$freight_amt = 0;
 		}
 
 		$opts		= "";
@@ -338,12 +350,15 @@ class cs01Controller extends Controller {
 		$stock_no = 0;
 		try {
             DB::beginTransaction();
+
 			if ($invoice_no == "") {
 				$invoice_no = $this->getInvoiceNo($com_id);
 			}
+			
 			// 등록
 			$params = [
 				'invoice_no'	=> $invoice_no, 
+				'bl_no'			=> $bl_no, 
 				'stock_date'	=> $stock_date,
 				'stock_type'	=> $stock_type,
 				'area_type'		=> $area_type,
@@ -351,9 +366,13 @@ class cs01Controller extends Controller {
 				'item'			=> $item,
 				'currency_unit'	=> $currency_unit,
 				'exchange_rate'	=> $exchange_rate,
+				'tariff_amt'	=> $tariff_amt,
+				'tariff_rate'	=> round(($tariff_amt / $custom_amt) * 100, 2), // 관세율 = 관세총액 / 신고금액
+				'freight_amt'	=> $freight_amt,
+				'freight_rate'	=> round(($freight_amt / $custom_amt) * 100, 2), // 운임율 = 운임비 / 신고금액
 				'custom_amt'	=> $custom_amt,
-				'custom_tax'	=> $custom_tax,
-				'custom_tax_rate'	=> $custom_tax_rate,
+				'custom_tax'	=> $custom_tax, // 통관비 = 관세총액 + 운임비
+				'custom_tax_rate' => round(($custom_tax / $custom_amt) * 100, 2), // 통관세율 = 통관비 / 신고금액
 				'state'			=> $state,
 				'loc'			=> $loc,
 				'opts'			=> $opts,
@@ -376,11 +395,11 @@ class cs01Controller extends Controller {
 			}
 
 			$stock_no = DB::table('product_stock_order')->insertGetId($params);
+			
+			// 개별상품 입고처리
+			$params = array_merge($params, [ 'stock_no' => $stock_no ]);
+			$this->saveStockOrderProduct("E", $params, $data);
 
-			$this->saveStockProduct(
-				"E", $stock_no, $invoice_no, $state, $loc, $stock_date, $com_id,
-				$currency_unit, $exchange_rate, $custom_tax_rate, $opt_cnt, $data
-			);
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
@@ -726,6 +745,7 @@ class cs01Controller extends Controller {
 				, pc.size
 				, ifnull(s.exp_qty, 0) as exp_qty
 				, ifnull(s.qty, 0) as qty
+				, ifnull(s.prd_tariff_rate, 0) as prd_tariff_rate
 				, ps.in_qty
 				, ps.qty as total_qty
 				, ps.wqty as sg_qty
@@ -804,6 +824,107 @@ class cs01Controller extends Controller {
 								";
 
 								DB::insert($sql);
+							}
+
+							if ($state == 30) { // 입고 완료인 경우
+								if ($cur_state < $state) {
+									$this->stockIn($goods_no, $prd_cd, $opt, $qty, $stock_no, $invoice_no, $cost, $loc);
+								}
+							}
+
+							if ($state == 40) { // 원가확정인 경우
+								$this->confirmWonga($stock_no, $prd_cd, $qty, $cost);
+							}
+						}
+					}
+				}
+			}
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			$message = "상품 입고중 에러가 발생했습니다. 잠시 후 다시시도 해주세요.";
+			$code = -1;
+			if ($e->getPrevious()) {
+				$message = $e->getMessage();
+				$code = $e->getCode();
+			}
+			throw new Exception($message, $code, $e);
+		}
+	}
+
+	/**
+	 * 상품 입고 (NEW)
+	 * $type: 추가입고(A) / 기본(E) 
+	 */
+	public function saveStockOrderProduct($type, $values, $products, $cur_state = 0)
+	{
+		try {
+			DB::beginTransaction();
+			$stock_no = $values['stock_no'];
+			$invoice_no = $values['invoice_no'] ?? '';
+			$state = $values['state'] ?? 10;
+			$loc = $values['loc'] ?? '';
+
+			if ($type != "A") { // 추가입고
+				$sql = "
+					delete from product_stock_order_product
+					where stock_no = :stock_no
+				";
+				DB::delete($sql, ['stock_no' => $stock_no]);
+			}
+
+			if (count($products) > 0) {
+				$id = Auth::guard('head')->user()->id;
+
+				for ($i=0; $i<count($products); $i++) {
+					$row = $products[$i];
+					$stock_prd_no = $row['stock_prd_no'] ?? 0;
+
+					if ($type != "A" || $stock_prd_no <= 0) {
+						$item = $row['item'] ?? '';
+						$brand = $row['brand'] ?? '';
+						$prd_cd = $row['prd_cd'] ?? '';
+						$style_no = $row['style_no'] ?? '';
+						$goods_no = $row['goods_no'] ?? 0;
+						
+						if ($goods_no > 0) {
+							$exp_qty = $row['exp_qty'] ?? 0;
+							$qty = $row['qty'] ?? 0;
+							$unit_cost = str_replace(",","",str_replace("\\","",$row['unit_cost'])); // 단가
+							$prd_tariff_rate = round($row['prd_tariff_rate'] ?? 0, 2); // 상품별 관세율
+							$cost = str_replace(",","",$row['cost']);
+							$total_cost = str_replace(",","",$row['total_cost']);
+							$cost_notax = round($cost / 1.1);
+
+							$opt = array_key_exists('opt_kor', $row) ? trim($row['opt_kor']) : "NONE";
+							if ($opt == "") $opt = "NONE";
+
+							if ($opt != "" && ($qty > 0 || $exp_qty > 0)) {
+								$params = [
+									'stock_no' => $stock_no,
+									'invoice_no' => $invoice_no,
+									'com_id' => $values['com_id'] ?? '',
+									'item' => $item,
+									'brand' => $brand,
+									'prd_cd' => $prd_cd,
+									'style_no' => $style_no,
+									'goods_no' => $goods_no,
+									'goods_sub' => 0,
+									'opt_kor' => $opt,
+									'exp_qty' => $exp_qty,
+									'qty' => $qty,
+									'unit_cost' => $unit_cost,
+									'prd_tariff_rate' => $prd_tariff_rate,
+									'cost_notax' => $cost_notax,
+									'cost' => $cost,
+									'total_cost' => $total_cost,
+									'state' => $state,
+									'stock_date' => $values['stock_date'] ?? '',
+									'id' => $id,
+									'rt' => now(),
+									'ut' => now(),
+								];
+								DB::table('product_stock_order_product')->insert($params);
 							}
 
 							if ($state == 30) { // 입고 완료인 경우

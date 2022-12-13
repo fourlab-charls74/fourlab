@@ -61,10 +61,9 @@ class sal02Controller extends Controller
 		$store_cd = $request->input('store_cd', "");
 		$goods_no = $request->input('goods_no', "");
 		$goods_nm = $request->input('goods_nm', "");
-		$brand_cd = $request->input('brand', "");
+		$brand_cd = $request->input('brand_cd', "");
 		$style_no = $request->input('style_no', "");
 		$sale_yn = $request->input('sale_yn','Y');
-
 		// 판매 유형은 추후 반영 예정
 		$sell_type = $request->input('sell_type');
 
@@ -92,6 +91,8 @@ class sal02Controller extends Controller
 
 		if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%'";
 		if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%'";
+
+		if ($sell_type != "") $where .= "and o.sale_kind = '$sell_type'";
 
         $where2 = "";
         if ($sale_yn == "Y") $where2 .= " and qty is not null";

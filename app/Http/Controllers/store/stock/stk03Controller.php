@@ -32,6 +32,7 @@ class stk03Controller extends Controller
             'ord_kinds'         => SLib::getCodes('G_ord_KIND'), // 출고구분
             'goods_stats'	    => SLib::getCodes('G_GOODS_STAT'), // 상품상태
 			'items'			    => SLib::getItems(), // 품목
+            'sale_kinds'        => SLib::getUsedSaleKinds(),
 		];
 
         return view(Config::get('shop.store.view') . '/stock/stk03', $values);
@@ -69,6 +70,7 @@ class stk03Controller extends Controller
         $page           = $request->input('page', 1);
         $prd_cd_range_text = $request->input("prd_cd_range", '');
         $sale_form      = $request->input('sale_form', '');
+        $sale_kind      = $request->input('sale_kind', '');
         if ($page < 1 or $page == '') $page = 1;
 
         $offline_store = 'HEAD_OFFICE';
@@ -200,8 +202,10 @@ class stk03Controller extends Controller
         if ($com_cd != '') $where .= " and g.com_id = '$com_cd' ";
         else if ($com_nm != '') $where .= " and g.com_nm = '$com_nm' ";
 
-        if ($sale_form == 'On') $where .= " and (o.store_cd is not null and o.store_cd <> '$offline_store') ";
-        else if ($sale_form == 'Off') $where .= " and (o.store_cd is null or o.store_cd = '$offline_store') ";
+        if ($sale_form == 'Off') $where .= " and (o.store_cd is not null and o.store_cd <> '$offline_store') ";
+        else if ($sale_form == 'On') $where .= " and (o.store_cd is null or o.store_cd = '$offline_store') ";
+
+        if ($sale_kind != '') $where .= "and o.sale_kind = '$sale_kind' ";
 
         // ordreby
         $orderby = sprintf("order by %s %s", $ord_field, $ord);
@@ -222,9 +226,11 @@ class stk03Controller extends Controller
                 a.prd_cd,
                 a.goods_no,
                 a.style_no,
-                a.goods_type,
-                ifnull(gt.code_val, 'N/A') as goods_type_nm,
                 a.goods_nm,
+                a.goods_nm_eng,
+                a.prd_cd_p,
+                a.color,
+                a.size,
                 replace(a.goods_opt, '^', ' : ') as opt_val,
                 a.qty,
                 concat(a.user_nm, ' (', a.user_id, ')') as user_nm,
@@ -245,6 +251,12 @@ class stk03Controller extends Controller
                 a.state,
                 a.memo,
                 a.ord_date,
+                a.sale_kind,
+                sale_kind.code_val as sale_kind_nm,
+                st.amt_kind,
+                round((1 - ((a.price * a.qty) * (1 - if(st.amt_kind = 'per', st.sale_per, 0) / 100)) / a.goods_sh) * 100) as dc_rate,
+                a.pr_code,
+                pr_code.code_val as pr_code_nm,
                 a.pay_date,
                 a.dlv_end_date,
                 a.last_up_date,
@@ -260,15 +272,19 @@ class stk03Controller extends Controller
                     o.prd_cd,
                     g.goods_no,
                     g.style_no,
-                    g.goods_type,
+                    g.goods_nm_eng,
                     o.goods_nm,
                     o.goods_opt,
+                    concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p,
+                    pc.color,
+                    pc.size,
                     o.qty,
                     om.user_id,
                     om.user_nm,
                     om.r_nm,
                     om.sale_place,
                     g.price as goods_price,
+                    g.goods_sh,
                     o.price,
                     o.dlv_amt,
                     o.sales_com_fee,
@@ -281,6 +297,8 @@ class stk03Controller extends Controller
                     o.dlv_cd,
                     m.state,
                     m.memo,
+                    o.sale_kind,
+                    o.pr_code,
                     o.ord_date,
                     pay.pay_date,
                     o.dlv_end_date,
@@ -303,10 +321,12 @@ class stk03Controller extends Controller
                 left outer join code pay_type on (a.pay_type = pay_type.code_id and pay_type.code_kind_cd = 'G_PAY_TYPE')
                 left outer join code clm_state on (a.clm_state = clm_state.code_id and clm_state.code_kind_cd = 'G_CLM_STATE')
                 left outer join code baesong_kind on (a.dlv_baesong_kind = baesong_kind.code_id and baesong_kind.code_kind_cd = 'G_BAESONG_KIND')
-                left outer join code gt on (a.goods_type = gt.code_id and gt.code_kind_cd = 'G_GOODS_TYPE')
                 left outer join code dlv_cd on (a.dlv_cd = dlv_cd.code_id and dlv_cd.code_kind_cd = 'DELIVERY')
                 left outer join code pay_stat on (a.pay_stat = pay_stat.code_id and pay_stat.code_kind_cd = 'G_PAY_STAT')
                 left outer join store s on s.store_cd = a.store_cd
+                left outer join code sale_kind on (sale_kind.code_id = a.sale_kind and sale_kind.code_kind_cd = 'SALE_KIND')
+                left outer join code pr_code on (pr_code.code_id = a.pr_code and pr_code.code_kind_cd = 'PR_CODE')
+                left outer join sale_type st on st.sale_kind = a.sale_kind and st.use_yn = 'Y'
         ";
         $result = DB::select($sql);
 

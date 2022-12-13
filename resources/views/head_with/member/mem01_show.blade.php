@@ -384,8 +384,10 @@
                                         <tr>
                                             <th>가입매장</th>
                                             <td>
-                                                <div class="txt_box">
-                                                    {{@$user->store_nm}}
+                                                <div class="form-inline inline_btn_box">
+                                                    <input type='hidden' id="store_nm" name="store_nm" value="{{ @$user->store_nm }}">
+                                                    <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
+                                                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                                 </div>
                                             </td>
                                         </tr>
@@ -481,20 +483,6 @@
                                                     <div class="custom-control custom-radio">
                                                         <input type="radio" name="type" id="type_b" class="custom-control-input" value="B">
                                                         <label class="custom-control-label" for="type_b">오프라인</label>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th>주문매장</th>
-                                            <td style="padding:0px 10px 0px 10px;">
-                                                <div class="d-flex flex-column pt-2 pb-1">
-                                                    <div class="flax_box mr-2 mb-1" style="width: 307px;">
-                                                        <div class="form-inline inline_btn_box w-100">
-                                                            <input type='hidden' id="store_nm" name="store_nm">
-                                                            <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
-                                                            <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                                        </div>
                                                     </div>
                                                 </div>
                                             </td>
@@ -774,6 +762,8 @@
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
 <script>
+
+    const NOT_UPDATED_CODE = "NOT";
 
     function openFindAddress(zipName, addName) {
         new daum.Postcode({
@@ -1076,7 +1066,13 @@
 
             if (await Validate() === false) return;
 
-            const data = $('form[name="search"]').serialize();
+            let data = $('form[name="search"]').serialize();
+            let obj_data = $('form[name="search"]').serializeArray()
+                .reduce((a,c) => {
+                    a[c.name] = c.value;
+                    return a;
+                }, {});
+            data += `&store_chg=${obj_data.store_no !== NOT_UPDATED_CODE}`;
 
             $.ajax({
                 async: true,
@@ -1197,15 +1193,19 @@
             });
         });
 
-       
-	$(document).ready(function() {
-	
+        $(document).ready(function() {
+            // 매장검색
+            $( ".sch-store" ).on("click", function() {
+                searchStore.Open(null);
+            });
 
-        // 매장검색
-        $( ".sch-store" ).on("click", function() {
-            searchStore.Open(null);
+            // 가입매장 초기화
+            const store_nm = '{{ @$user->store_nm }}';
+            if(store_nm != '') {
+                const option = new Option(store_nm, NOT_UPDATED_CODE, true, true);
+                $('#store_no').append(option).trigger('change');
+            }
         });
-	});
     }
 </script>
 @stop
