@@ -170,6 +170,7 @@ CREATE TABLE `product_stock` (
 
 -- 오프라인 재고(매장)
 CREATE TABLE `product_stock_store` (
+    `idx` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'Identify',
     `goods_no` INT(11) NOT NULL DEFAULT '0' COMMENT '상품번호',
     `prd_cd` VARCHAR(50) NOT NULL DEFAULT '0' COMMENT '상품코드',
     `store_cd` VARCHAR(30) NOT NULL DEFAULT '0' COMMENT '매장코드',
@@ -179,11 +180,15 @@ CREATE TABLE `product_stock_store` (
     `use_yn` CHAR(1) DEFAULT NULL COMMENT '사용여부',
     `rt` DATETIME DEFAULT NULL COMMENT '등록일시',
     `ut` DATETIME DEFAULT NULL COMMENT '변경일시',
+    PRIMARY KEY (`idx`),
+    KEY `idx_prdcd` (`prd_cd`),
+    KEY `idx_store_cd` (`store_cd`)
     PRIMARY KEY (`goods_no`,`prd_cd`,`store_cd`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='상품재고 매장별';
 
 -- 오프라인 재고(물류)
 CREATE TABLE `product_stock_storage` (
+    `idx` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'Identify',
     `goods_no` INT(11) NOT NULL DEFAULT '0' COMMENT '상품번호',
     `prd_cd` VARCHAR(50) NOT NULL DEFAULT '0' COMMENT '상품코드',
     `storage_cd` VARCHAR(30) NOT NULL DEFAULT '0' COMMENT '창고코드',
@@ -193,7 +198,9 @@ CREATE TABLE `product_stock_storage` (
     `use_yn` CHAR(1) DEFAULT NULL COMMENT '사용여부',
     `rt` DATETIME DEFAULT NULL COMMENT '등록일시',
     `ut` DATETIME DEFAULT NULL COMMENT '변경일시',
-    PRIMARY KEY (`goods_no`,`prd_cd`,`storage_cd`)
+    PRIMARY KEY (`idx`),
+    KEY `idx_prdcd` (`prd_cd`),
+    KEY `idx_storage_cd` (`storage_cd`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='상품재고 물류별';
 
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values
