@@ -208,6 +208,10 @@
 					</div>
 					<div class="fr_box">
 						<div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+							<input type="checkbox" class="custom-control-input" name="ext_storage_qty" id="ext_storage_qty" value="Y">
+							<label class="custom-control-label font-weight-normal" for="ext_storage_qty">창고재고 0 제외</label>
+						</div>
+						<div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
 							<input type="checkbox" class="custom-control-input" name="ext_store_qty" id="ext_store_qty" value="Y">
 							<label class="custom-control-label font-weight-normal" for="ext_store_qty">매장재고 0 제외</label>
 						</div>
@@ -366,8 +370,10 @@
 
 	async function Search() {
 		await setColumn();
-
+		let ischeck = $('#ext_storage_qty').is(':checked');
 		let data = $('form[name="search"]').serialize();
+		data += '&ext_storage_qty=' + ischeck;
+		
 		gx.Request('/store/product/prd04/search', data, 1, function(e) {
 			const t = e.head.total_row;
 			gx.gridOptions.api.setPinnedTopRowData([{ 

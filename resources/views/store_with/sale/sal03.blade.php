@@ -178,24 +178,30 @@
 						</div>
                     <div class="col-lg-4">
                         <div class="form-group">
-                            <label for="">자료수/정렬</label>
+                            <label for="">순위/구분</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box" style="width:24%;">
                                     <select name="limit" class="form-control form-control-sm">
-                                        <option value="100">100</option>
-                                        <option value="500">500</option>
-                                        <option value="1000">1000</option>
-                                        <option value="2000">2000</option>
+                                        <option value="10">10위</option>
+                                        <option value="20">20위</option>
+                                        <option value="30">30위</option>
+                                        <option value="50">50위</option>
+                                        <option value="100">100위</option>
+                                        <option value="200">200위</option>
+                                        <option value="300">300위</option>
+                                        <option value="400">400위</option>
+                                        <option value="500">500위</option>
+                                        <option value="1000">1000위</option>
                                     </select>
                                 </div>
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
+                                        <option value='ord_qty'>수량</option>
+                                        <option value='total_sale_rate'>총판매율</option>
+                                        <option value='ord_amt'>기간판매금액</option>
                                         <option value="goods_no">상품번호</option>
                                         <option value="prd_cd">상품코드</option>
-                                        <option value="qty">수량</option>
-                                        <option value="ord_amt">금액</option>
-                                        <option value="in_sale_rate">판매율</option>
                                     </select>
                                 </div>
                                 <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">

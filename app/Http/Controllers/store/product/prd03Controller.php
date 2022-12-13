@@ -597,5 +597,46 @@ class prd03Controller extends Controller
 
         return response()->json(["code" => $code]);
 	}
+
+	//성별 변경 시 해당 성별의 사이즈 값 출력
+	public function change_gender(Request $request)
+	{
+		$gender = $request->input('gender');
+
+		$gen = '';
+		if($gender == 'M') {
+			$gen = 'MEN';
+		} else if ($gender == 'U') {
+			$gen = 'UNISEX';
+		} else if ($gender == 'W') {
+			$gen = 'WOMEN';
+		} else if ($gender == 'K') {
+			$gen = 'KIDS';
+		}
+
+		try {
+			DB::beginTransaction();
+
+			$sql = "
+				select
+					code_id, code_val
+				from code
+				where code_kind_cd = 'PRD_CD_SIZE_$gen'
+				order by field(code_id, '10', '10.5', '99') desc,
+				field(code_id, 'XL', 'XS', 'L2', 'X2') asc,
+				code_id desc
+			";
+
+			$result = DB::select($sql);
+
+            DB::commit();
+            $code = 200;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $code = 500;
+        }
+
+        return response()->json(["code" => $code, "result" => $result]);
+	}
 	
 }

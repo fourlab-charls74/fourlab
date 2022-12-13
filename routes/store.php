@@ -186,6 +186,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::put('prd02/show', 'prd02Controller@update');
 
         Route::get('prd02/product_upload', 'prd02Controller@product_upload');
+        Route::post('prd02/change-gender', 'prd02Controller@change_gender');
         Route::post('prd02/get-seq', 'prd02Controller@getSeq');
         Route::post('prd02/save_product', 'prd02Controller@save_product');
         Route::post('prd02/del-img', 'prd02Controller@delImg');
@@ -198,6 +199,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
         Route::get('prd03/create', 'prd03Controller@showCreate');
         Route::post('prd03/get-seq', 'prd03Controller@getSeq');
+        Route::post('prd03/change-gender', 'prd03Controller@change_gender');
         Route::post('prd03/create', 'prd03Controller@create');
 
         Route::get('prd03/edit/{product_code}','prd03Controller@showEdit');

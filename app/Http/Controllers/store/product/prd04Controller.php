@@ -42,6 +42,7 @@ class prd04Controller extends Controller
 		$store_type	= $request->input("store_type", "");
 		$store_no	= $request->input("store_no", "");
 		$ext_store_qty	= $request->input("ext_store_qty", "");
+		$ext_storage_qty	= $request->input("ext_storage_qty", "");
 		$prd_cd_range_text = $request->input("prd_cd_range", '');
 		$goods_nm_eng	= $request->input("goods_nm_eng");
 
@@ -133,6 +134,10 @@ class prd04Controller extends Controller
 			$where .= " and $store_qty_sql > 0 ";
 			// if( $store_no == "" )	$where .= " and (ps.qty - ps.wqty) > 0 ";
 			// else					$where .= " and pss.qty > 0 ";
+		}
+
+		if($ext_storage_qty == 'true') {
+			$where .= "and wqty > 0";
 		}
 
 		$page_size	= $limit;

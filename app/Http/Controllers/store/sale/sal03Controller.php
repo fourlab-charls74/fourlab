@@ -43,8 +43,8 @@ class sal03Controller extends Controller
 	{
 		$sdate = $request->input('sdate', now()->sub(1, 'month')->format('Ymd'));
 		$edate = $request->input('edate', date("Ymd"));
-		$sdate = str_replace("-", "", $sdate);
-		$edate = str_replace("-", "", $edate);
+		$sdate2 = str_replace("-", "", $sdate);
+		$edate2 = str_replace("-", "", $edate);
 
 		$store_type = $request->input('store_type');
 		$store_cd = $request->input('store_cd');
@@ -75,10 +75,11 @@ class sal03Controller extends Controller
 		$orderby = '';
 		$ord = $request->input('ord','desc');
 		$ord_field = $request->input('ord_field','p.goods_no');
+
 		if ($best_worst == 'B') {
-			$orderby = sprintf("order by %s %s", "ord_qty", "desc");
+			$orderby = sprintf("order by %s %s", $ord_field, "desc");
 		} else if ($best_worst == 'W') {
-			$orderby = sprintf("order by %s %s", "ord_qty", "asc");
+			$orderby = sprintf("order by %s %s", $ord_field, "asc");
 		}else {
 			$orderby = sprintf("order by %s %s", $ord_field, $ord);
 		}
@@ -150,16 +151,47 @@ class sal03Controller extends Controller
 		$sql = /** @lang text */
             "
 			select 
-				a.*, 
-				b.in_sum_qty,
-				b.in_sum_amt,
+				a.goods_no,
+				a.prd_cd,
+				a.brand,
+				a.brand_nm,
+				a.style_no,
+				a.goods_opt,
+				a.img,
+				a.goods_nm,
+				a.goods_nm_eng,
+				a.prd_cd_p,
+				a.color,
+				a.size,
+				
+				-- 입고
+				b.in_sum_qty as in_sum_qty,
+				b.in_sum_amt as in_sum_amt,
+				round((b.in_sum_qty / ps.qty) * 100) as in_sale_rate,
+
+				-- 출고
+				
+				
+				-- 총판매
+				ifnull(a.total_ord_qty,'0') as total_ord_qty,
+				ifnull(a.total_ord_amt ,'0') as total_ord_amt,
+				ifnull(round((a.total_ord_qty / ps.qty) * 100),0) as total_sale_rate,
+				
+				-- 기간판매
+				a.t_qty as ord_qty,
+				a.t_price as ord_amt,
+				ifnull(round((a.per_qty / ps.qty) * 100),0) as sale_rate
+
+				-- 매장재고, 창고재고
 				ifnull(ps.qty, '0') as stock_qty, 
 				ifnull(ps.wqty, '0') as stock_wqty,
-				ifnull(round((a.ord_qty / b.in_sum_qty) * 100),0) as in_sale_rate,
-				ifnull(round((a.ord_qty / ps.wqty) * 100),0) as sale_rate
 			from ( 
 					select 
+						sum(c.qty) as per_qty,
+						sum(c.price) as t_price,
 						o.prd_cd,
+						sum(w.qty) as total_ord_qty,
+						sum(o.recv_amt) as total_ord_amt,
 						sum(w.qty) as ord_qty,
 						sum(w.recv_amt + w.point_apply_amt) as ord_amt,
 						avg(w.wonga) as wonga,
@@ -169,19 +201,33 @@ class sal03Controller extends Controller
 					from order_mst m 
 						inner join order_opt o on m.ord_no = o.ord_no 
 						left outer join product_code pc on pc.prd_cd = o.prd_cd
-						inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
+						inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no 
 						inner join goods g on o.goods_no = g.goods_no
 						left outer join store s on m.store_cd = s.store_cd
 						left outer join brand b on g.brand = b.brand
-					where w.`ord_state_date` >= '$sdate' and w.ord_state_date <= '$edate' and w.`ord_state` in ( '30','60','61') 
-						and o.prd_cd <> '' $where
+						left outer join (
+							select 
+								w.qty as qty,
+								w.recv_amt as price,
+								m.ord_no as ord_no
+							from order_mst m
+								inner join order_opt o on m.ord_no = o.ord_no 
+								inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no 
+							where m.ord_date >= '$sdate2' and m.ord_date <= '$edate2'
+						) c on c.ord_no = o.ord_no
+					where 
+						-- w.`ord_state_date` >= '$sdate' and w.ord_state_date <= '$edate' and 
+						w.`ord_state` in ( '30','60','61') 
+						and o.prd_cd <> '' 
+						$where
 					group by o.prd_cd
 				) as a 
 				inner join product_stock ps on a.prd_cd = ps.prd_cd 
 				left outer join ( 
 					select 
 						sp.prd_cd as prd_cd, 
-						sum(ps.in_qty) as in_sum_qty, sum(sp.cost) as in_sum_amt
+						sum(ps.in_qty) as in_sum_qty,
+						sum(sp.cost) as in_sum_amt
 					from stock_product sp
 						inner join product_stock ps on sp.prd_cd = ps.prd_cd
 					group by sp.prd_cd
@@ -205,25 +251,32 @@ class sal03Controller extends Controller
 					count(a.cnt) as total
 					, sum(a.ord_amt) as ord_amt
 					, sum(a.ord_qty) as ord_qty
-					, sum(a.in_sale_rate) as in_sale_rate
 					, sum(a.sale_rate) as sale_rate
+					, sum(a.in_sale_rate) as in_sale_rate
 					, sum(b.in_sum_amt) as in_sum_amt
 					, sum(b.in_sum_qty) as in_sum_qty
 					, sum(ifnull(ps.qty, '0')) as stock_qty 
 					, sum(ifnull(ps.wqty, '0')) as stock_wqty
+					, sum(a.total_ord_qty) as total_ord_qty
+					, sum(a.total_ord_amt) as total_ord_amt
+					, sum(a.total_sale_rate) as total_sale_rate
 				from
 				(
 					select 
 						o.prd_cd,
-						 count(*) as cnt,
-						sum(w.qty) as ord_qty,
-						sum(w.recv_amt + w.point_apply_amt) as ord_amt,
+						count(*) as cnt,
+						sum(c.qty) as ord_qty,
+						sum(c.price) as ord_amt,
+						sum(w.qty) as total_ord_qty,
+						sum(o.recv_amt) as total_ord_amt,
 						avg(w.wonga) as wonga,
 						g.goods_type,
 						o.goods_no, g.brand, b.brand_nm, g.style_no, o.goods_opt, g.img, g.goods_nm, g.goods_nm_eng,
 						concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color, pc.size,
-						round((w.qty / ps.in_qty) * 100) as in_sale_rate,
-						round((w.qty / ps.wqty) * 100) as sale_rate
+						sum(ifnull(round((ps.in_qty / ps.qty) * 100),0)) as in_sale_rate,
+						sum(ifnull(round((w.qty / ps.qty) * 100),0)) as total_sale_rate,
+						sum(ifnull(round((c.qty / ps.qty) * 100),0)) as sale_rate
+
 					from order_mst m 
 						inner join order_opt o on m.ord_no = o.ord_no
 						inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
@@ -233,10 +286,24 @@ class sal03Controller extends Controller
 						left outer join stock_product sp on sp.prd_cd = pc.prd_cd
 						left outer join store s on m.store_cd = s.store_cd
 						left outer join brand b on g.brand = b.brand
-					where w.`ord_state_date` >= '$sdate' and w.ord_state_date <= '$edate' and w.`ord_state` in ( '30','60','61') 
+						left outer join (
+							select 
+								w.qty as qty,
+								w.recv_amt as price,
+								m.ord_no as ord_no
+							from order_mst m
+								inner join order_opt o on m.ord_no = o.ord_no 
+								inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no 
+							where m.ord_date >= '$sdate2' and m.ord_date <= '$edate2'
+						) c on c.ord_no = o.ord_no
+					where 
+						-- w.`ord_state_date` >= '$sdate' and w.ord_state_date <= '$edate' and 
+						w.`ord_state` in ( '30','60','61') 
 						and o.prd_cd <> ''
 						$where
-					group by o.prd_cd
+						group by o.prd_cd
+						$orderby 
+						$limit
 				) as a 
 				inner join product_stock ps on a.prd_cd = ps.prd_cd
 				left outer join ( 

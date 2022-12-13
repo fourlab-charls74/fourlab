@@ -97,7 +97,7 @@
 											<th class="required">성별</th>
 											<td>
 												<div class="flax_box">
-													<select name='gender' class="form-control form-control-sm">
+													<select name='gender' id="gender" class="form-control form-control-sm" onchange="change_gender()">
 														<option value=''>선택</option>
 														@foreach ($genders as $gender)
 														<option value='{{ $gender->code_id }}'>{{ $gender->code_id }} : {{ $gender->code_val }}</option>
@@ -145,11 +145,11 @@
 											<th class="required">사이즈</th>
 											<td>
 												<div class="flax_box">
-													<select name='size' class="form-control form-control-sm">
+													<select name='size' id="size" class="form-control form-control-sm">
 														<option value=''>선택</option>
-														@foreach ($sizes as $size)
+														<!-- @foreach ($sizes as $size)
 														<option value='{{ $size->code_id }}'>{{ $size->code_val }} : {{ $size->code_val2 }}</option>
-														@endforeach
+														@endforeach -->
 													</select>
 												</div>
 											</td>
@@ -398,6 +398,37 @@
 			}
 		}
 	};
+
+	//성별에 따라 사이즈 값 다르게 출력
+	function change_gender() {
+		let gender = $('#gender option:selected').val();
+		
+		$.ajax({
+			method: 'post',
+			url: '/store/product/prd03/change-gender',
+			data: {
+				gender : gender
+			},
+			success: function (res) {
+				if(res.code == 200) {
+					$('#size').empty();
+
+					let option = '';
+					let sel =''
+					for(let i = 0; i < res.result.length;i++) {
+						sel = "<option value=''>선택</option>"
+						option += '<option value='+ res.result[i].code_id +'>' + res.result[i].code_id + ' : ' + res.result[i].code_val+ '</option>';
+					}
+					$('#size').append(sel);
+					$('#size').append(option);
+					
+				}
+			},
+			error: function(request, status, error) {
+				console.log("error")
+			}
+		});
+	}
 
 	const addRow = (row) => {
     	gx.gridOptions.api.applyTransaction({add : [{...row}]});
