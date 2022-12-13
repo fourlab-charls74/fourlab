@@ -241,7 +241,7 @@ class prd02Controller extends Controller
 						  )) as img
 				, if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
 				, g.goods_nm_eng
-				, concat(c.code_val, '^',d.code_val2) as goods_opt
+				, pc.goods_opt
 				, c.code_val as color_nm
 				, ps.wqty
 				, (ps.qty - ps.wqty) as sqty
@@ -268,10 +268,9 @@ class prd02Controller extends Controller
 				left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
 				left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
 				left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
-				inner join code c on pc.color = c.code_id
-				inner join code d on pc.size = d.code_val
+				inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c.code_id
 				inner join brand b on b.br_cd = pc.brand
-			where 1 = 1 and c.code_kind_cd = 'PRD_CD_COLOR' and d.code_kind_cd = 'PRD_CD_SIZE_MATCH'
+			where 1 = 1
 			$where
 			group by pc.prd_cd
 			$orderby
