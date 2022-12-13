@@ -20,7 +20,7 @@
         <form method="get" name="search">
             <input type="hidden" name="cmd" value="{{ @$cmd }}">
             <input type="hidden" name='stock_no' value='{{ @$stock_no }}'>
-            <div class="card mb-3">
+            <div class="card mb-3" id="input-area">
                 <div class="card-header d-flex justify-content-between">
                     <h4>기본 정보</h4>
                     <div>
@@ -127,7 +127,6 @@
                                         <select id="currency_unit" name="currency_unit" class="form-control form-control-sm w-100" onchange="return changeUnit(this);">
                                             <?php
                                                 $currencies = ['KRW', 'USD', 'EUR', 'JPY', 'CNY', 'HKD'];
-                                                $currency_unit = 'USD'; // test code
                                                 collect($currencies)->map(function ($currency) use ($currency_unit) {
                                                     $selected = ($currency == $currency_unit) ? "selected" : "";
                                                     echo "<option value='${currency}' $selected>${currency}</option>";
@@ -450,6 +449,9 @@
 
         if (ele.value != "KRW") {
            document.search.exchange_rate.focus();
+        } else {
+            document.search.exchange_rate.value = 0;
+            calCustomTaxRate();
         }
        gx.gridOptions.api.redrawRows();
     }
@@ -458,6 +460,7 @@
     function displayHelp() {
         const help = document.getElementById("help");
         help.style.display = help.style.display === "none" ? "" : "none";
+        pApp.ResizeGrid(200, undefined, "input-area");
     }
 
     /**********************************
@@ -572,22 +575,24 @@
     async function calCustomTaxRate(calculate_prd = true) {
         const ff = document.search;
         const unit = ff.currency_unit.value;
-        if (unit == "KRW") return;
 
-        const exchange_rate = unComma(ff.exchange_rate.value || '0') || 0; // 환율
-        const tariff_amt = unComma(ff.tariff_amt.value || '0') || 0; // 관세총액
-        const freight_amt = unComma(ff.freight_amt.value || '0') || 0; // 운임비
-        const custom_tax = tariff_amt + freight_amt; // 통관비
-        const custom_amt = gx.getRows().reduce((a, c) => a + (exchange_rate * (c.qty || 0) * (c.unit_cost || 0)), 0); // (신고)금액
-
-        const tariff_rate = custom_amt < 1 ? 0 : Number.parseFloat((tariff_amt / custom_amt) * 100); // 관세율
-        const freight_rate = custom_amt < 1 ? 0 : Number.parseFloat((freight_amt / custom_amt) * 100); // 운임율
-        const custom_tax_rate = custom_amt < 1 ? 0 : Number.parseFloat((custom_tax / custom_amt) * 100); // 통관세율(관세+운임율)
-
-        ff.tariff_rate.value = tariff_rate.toFixed(2);
-        ff.freight_rate.value = freight_rate.toFixed(2);
-        ff.custom_tax.value = Comma(custom_tax);
-        ff.custom_tax_rate.value = custom_tax_rate.toFixed(2);
+        let exchange_rate = 0, freight_amt = 0, custom_amt = 0;
+        if (unit != "KRW") {
+            exchange_rate = unComma(ff.exchange_rate.value || '0') || 0; // 환율
+            const tariff_amt = unComma(ff.tariff_amt.value || '0') || 0; // 관세총액
+            freight_amt = unComma(ff.freight_amt.value || '0') || 0; // 운임비
+            const custom_tax = tariff_amt + freight_amt; // 통관비
+            custom_amt = gx.getRows().reduce((a, c) => a + (exchange_rate * (c.qty || 0) * (c.unit_cost || 0)), 0); // (신고)금액
+    
+            const tariff_rate = custom_amt < 1 ? 0 : Number.parseFloat((tariff_amt / custom_amt) * 100); // 관세율
+            const freight_rate = custom_amt < 1 ? 0 : Number.parseFloat((freight_amt / custom_amt) * 100); // 운임율
+            const custom_tax_rate = custom_amt < 1 ? 0 : Number.parseFloat((custom_tax / custom_amt) * 100); // 통관세율(관세+운임율)
+    
+            ff.tariff_rate.value = tariff_rate.toFixed(2);
+            ff.freight_rate.value = freight_rate.toFixed(2);
+            ff.custom_tax.value = Comma(custom_tax);
+            ff.custom_tax_rate.value = custom_tax_rate.toFixed(2);
+        }
 
         if (calculate_prd) await gx.getRows().forEach(async (row) => await calProduct(row, unit, exchange_rate, freight_amt, custom_amt));
         updatePinnedRow();
@@ -711,6 +716,7 @@
     /** 입고저장 전 값 체크 시 상품데이터 값 체크 */
     async function checkPrdData(row) {
         const rowIdx = row.count - 1;
+        const unit = document.search.currency_unit.value;
         const { exp_qty, qty, unit_cost, prd_tariff_rate } = row;
 
         if ((qty || 0) == 0 && (exp_qty || 0) == 0) { // check qty
@@ -725,7 +731,7 @@
             gx.gridOptions.api.startEditingCell({ rowIndex: rowIdx, colKey: 'unit_cost' });
             return false;
         }
-        if (prd_tariff_rate == "" || prd_tariff_rate == 0) { // check prd_tariff_rate
+        if (unit != "KRW" && (prd_tariff_rate == "" || prd_tariff_rate == 0)) { // check prd_tariff_rate
             alert("상품당 관세율을 입력해주세요.");
             gx.gridOptions.api.stopEditing(); // stop editing
             gx.gridOptions.api.startEditingCell({ rowIndex: rowIdx, colKey: 'prd_tariff_rate' });
@@ -894,9 +900,14 @@
         ff.com_id.value = com_id;
         ff.bl_no.value = bl_no;
         ff.stock_date.value = stock_date;
-        ff.exchange_rate.value = Comma(exchange_rate);
-        ff.tariff_amt.value = Comma(tariff_amt);
-        ff.freight_amt.value = Comma(freight_amt);
+        $("#currency_unit").val(currency_unit).prop("selected", true);
+
+        if (currency_unit != "KRW") {
+            ff.exchange_rate.value = Comma(exchange_rate);
+            ff.tariff_amt.value = Comma(tariff_amt);
+            ff.freight_amt.value = Comma(freight_amt);
+        }
+
         getInvoiceNo();
 
         // 상품정보 적용
@@ -916,7 +927,8 @@
             row.exp_qty ??= 0; // 수량(예정)
             row.qty ??= 0; // 수량(확정)
             row.unit_cost ??= 0;  // 단가
-            row.prd_tariff_rate ??= 0; // 상품당 관세율
+            if (currency_unit == "KRW") row.prd_tariff_rate = 0; // 상품당 관세율
+            else row.prd_tariff_rate ??= 0;
             row = { ...row,
                 goods_no: "검사중...",
                 unit_total_cost: 0, income_amt: 0, income_total_amt: 0, cost: 0, total_cost: 0, total_cost_novat: 0, 

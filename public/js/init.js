@@ -25,7 +25,7 @@ var App = function(id,options){
     };
 })(XMLHttpRequest.prototype.open);
 
-App.prototype.ResizeGrid  = function(grid_height_margin, height){
+App.prototype.ResizeGrid  = function(grid_height_margin, height, areaId = ''){
     this.options.grid_resize = true;
     if(grid_height_margin !== undefined){
         this.options.grid_height_margin = grid_height_margin;
@@ -40,8 +40,10 @@ App.prototype.ResizeGrid  = function(grid_height_margin, height){
     var minus_height = this.options.grid_height_margin;
     //console.log(minus_height);
 
-    if($('#search-area').length){
-        minus_height += $('#search-area').height();
+    if (areaId === '') areaId = "search-area";
+
+    if($('#' + areaId).length){
+        minus_height += $('#' + areaId).height();
     }
 
     if($('div.page-content').length){

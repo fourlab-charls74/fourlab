@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Exception;
 
+const KRW = 'KRW';
+
 class cs01Controller extends Controller {
 
     public function index(Request $request)
@@ -148,7 +150,7 @@ class cs01Controller extends Controller {
 		$freight_amt = 0;
 		$freight_rate = 0;
 		$exchange_rate = "";
-		$currency_unit = "KRW";
+		$currency_unit = KRW;
 		$opts = "";
 
 		if ($stock_no != "") {
@@ -334,10 +336,10 @@ class cs01Controller extends Controller {
 		$custom_tax				= intval($tariff_amt) + intval($freight_amt); //통관비
 		
 		
-		$area_type 				= ($currency_unit == "KRW") ? "D" : "O"; 	//입고지역
+		$area_type 				= ($currency_unit == KRW) ? "D" : "O"; 	//입고지역
 		$data					= $request->input("data");
 
-		if ($currency_unit == "KRW") {
+		if ($currency_unit == KRW) {
 			$exchange_rate = 0;
 			$custom_amt = 0;
 			$tariff_amt = 0;
@@ -354,6 +356,10 @@ class cs01Controller extends Controller {
 			if ($invoice_no == "") {
 				$invoice_no = $this->getInvoiceNo($com_id);
 			}
+
+			$tariff_rate = $currency_unit == KRW ? 0 : round(($tariff_amt / $custom_amt) * 100, 2); // 관세율 = 관세총액 / 신고금액
+			$freight_rate = $currency_unit == KRW ? 0 : round(($freight_amt / $custom_amt) * 100, 2); // 운임율 = 운임비 / 신고금액
+			$custom_tax_rate = $currency_unit == KRW ? 0 : round(($custom_tax / $custom_amt) * 100, 2); // 통관세율 = 통관비 / 신고금액
 			
 			// 등록
 			$params = [
@@ -367,12 +373,12 @@ class cs01Controller extends Controller {
 				'currency_unit'	=> $currency_unit,
 				'exchange_rate'	=> $exchange_rate,
 				'tariff_amt'	=> $tariff_amt,
-				'tariff_rate'	=> round(($tariff_amt / $custom_amt) * 100, 2), // 관세율 = 관세총액 / 신고금액
+				'tariff_rate'	=> $tariff_rate, 
 				'freight_amt'	=> $freight_amt,
-				'freight_rate'	=> round(($freight_amt / $custom_amt) * 100, 2), // 운임율 = 운임비 / 신고금액
+				'freight_rate'	=> $freight_rate, 
 				'custom_amt'	=> $custom_amt,
 				'custom_tax'	=> $custom_tax, // 통관비 = 관세총액 + 운임비
-				'custom_tax_rate' => round(($custom_tax / $custom_amt) * 100, 2), // 통관세율 = 통관비 / 신고금액
+				'custom_tax_rate' => $custom_tax_rate, 
 				'state'			=> $state,
 				'loc'			=> $loc,
 				'opts'			=> $opts,
@@ -446,13 +452,13 @@ class cs01Controller extends Controller {
 
 		$prd_cd = $request->input("prd_cd"); // 상품코드
 
-		if ($currency_unit == "KRW") {
+		if ($currency_unit == KRW) {
 			$exchange_rate = 0;
 			$custom_tax_rate = 0;
 		}
 
 		if ($area_type == "") {
-			$area_type = ($currency_unit == "KRW") ? "D" : "O";
+			$area_type = ($currency_unit == KRW) ? "D" : "O";
 		}
 
 		$opts		= "";
@@ -685,7 +691,7 @@ class cs01Controller extends Controller {
 			$custom_tax_rate = $row->custom_tax_rate;
 			$loc = $row->loc;
 
-			if ($currency_unit == "KRW") {
+			if ($currency_unit == KRW) {
 				$exchange_rate = 0;
 				$custom_tax_rate = 0;
 			}
@@ -798,7 +804,7 @@ class cs01Controller extends Controller {
 						if ($goods_no > 0) {
 							$unit_cost = str_replace(",","",str_replace("\\","",$row['unit_cost']));
 							$cost = str_replace(",","",$row['cost']);
-							if ($currency_unit == "KRW") {
+							if ($currency_unit == KRW) {
 								$cost = $unit_cost;
 								$cost_notax = round($cost / 1.1);
 							} else {
