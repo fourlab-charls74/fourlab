@@ -258,8 +258,8 @@
                     <a href="javascript:void(0);" onclick="cmder('cancelcmd')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx mr-1"></i>입고취소</a>
                     @endif
                 @endif
-                <a href="javascript:void(0);" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
-                <a href="javascript:void(0);" onclick="displayHelp()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx mr-1"></i>도움말</a>
+                <a href="javascript:void(0);" onclick="return gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
+                <a href="javascript:void(0);" onclick="return displayHelp();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx mr-1"></i>도움말</a>
             </div>
         </form>
         <div id="filter-area" class="card shadow-none mb-0 ty2">
@@ -300,10 +300,10 @@
         },
         {field: "chk", headerName: '', cellClass: 'hd-grid-code', width: 28, pinned: "left",
             // 입고취소: -10, 입고대기: 10, 입고처리중: 20, 입고완료: 30, 원가확정: 40
-            // 입고 대기이거나 입고 처리중인 경우에만 체크박스 표시 -> 삭제 가능하게함
-            headerCheckboxSelection: STATE > 0 && STATE < 30,
-            checkboxSelection: STATE > 0 && STATE < 30,
-            hide: !(STATE > 0 && STATE < 30),
+            headerCheckboxSelection: true,
+            checkboxSelection: (params) => STATE > 0 && STATE < 40 && (STATE != 30 || !params.data.stock_prd_no),
+            cellRenderer: (params) => '',
+            hide: !(STATE > 0 && STATE < 40),
         },
         {field: "prd_cd", headerName: "상품코드", width: 120, pinned: 'left', cellStyle: StyleCenter},
         {field: "goods_no", headerName: "상품번호", width: 70, pinned: 'left', cellStyle: StyleCenter},
@@ -366,6 +366,9 @@
             getRowStyle: (params) => params.node.rowPinned ? ({'font-weight': 'bold', 'background-color': '#eee', 'border': 'none'}) : false, // 상단고정row styling
             getRowNodeId: (data) => data.hasOwnProperty('count') ? data.count : "0", // 업데이터 및 제거를 위한 식별 ID를 count로 할당
             onCellValueChanged: (params) => onCellValueChanged(params),
+            isRowSelectable: (params) => {
+                return STATE > 0 && STATE < 40 && (STATE != 30 || !params.data.stock_prd_no);
+            },
         });
 
         if (CMD == "editcmd") productListDraw();
@@ -384,7 +387,12 @@
 
     /** 수정가능한 셀인지 판단 */
     function checkIsEditable(params) {
-        if (params.column?.colId == 'unit_cost' && STATE > 0 && STATE < 40 && params.node.rowPinned != 'top') return true; 
+        if (
+            (params.column?.colId == 'qty' || params.column?.colId == 'unit_cost' || params.column?.colId == 'prd_tariff_rate') 
+            && STATE > 0 
+            && STATE < 40 
+            && params.node.rowPinned != 'top'
+        ) return true; 
         return params.data.hasOwnProperty('isEditable') && params.data.isEditable ? true : false;
     }
 
@@ -582,8 +590,18 @@
             const tariff_amt = unComma(ff.tariff_amt.value || '0') || 0; // 관세총액
             freight_amt = unComma(ff.freight_amt.value || '0') || 0; // 운임비
             const custom_tax = tariff_amt + freight_amt; // 통관비
-            custom_amt = gx.getRows().reduce((a, c) => a + (exchange_rate * (c.qty || 0) * (c.unit_cost || 0)), 0); // (신고)금액
-    
+            custom_amt = gx.getRows().reduce((a, c) => {
+                let p_qty;
+                if (STATE < 30) {
+                    p_qty = !!(c.qty != 0 && c.qty) ? Number.parseInt(c.qty) 
+                        : !!(c.exp_qty != 0 && c.exp_qty) ? Number.parseInt(c.exp_qty) 
+                        : 0;
+                } else {
+                    p_qty = !!(c.qty != 0 && c.qty) ? Number.parseInt(c.qty) : 0;
+                }
+                return a + (exchange_rate * (p_qty || 0) * (c.unit_cost || 0));
+            }, 0); // (신고)금액
+            
             const tariff_rate = custom_amt < 1 ? 0 : Number.parseFloat((tariff_amt / custom_amt) * 100); // 관세율
             const freight_rate = custom_amt < 1 ? 0 : Number.parseFloat((freight_amt / custom_amt) * 100); // 운임율
             const custom_tax_rate = custom_amt < 1 ? 0 : Number.parseFloat((custom_tax / custom_amt) * 100); // 통관세율(관세+운임율)
@@ -615,18 +633,33 @@
     async function calProduct(row, unit = "", exchange_rate = 0, freight_amt = 0, custom_amt = 0) {
         const ff = document.search;
 
-        const qty = !!(row.qty != 0 && row.qty) ? Number.parseInt(row.qty) 
-            : !!(row.exp_qty != 0 && row.exp_qty) ? Number.parseInt(row.exp_qty) 
-            : 0; // 수량
+        let qty;
+        if (STATE < 30) {
+            qty = !!(row.qty != 0 && row.qty) ? Number.parseInt(row.qty) 
+                : !!(row.exp_qty != 0 && row.exp_qty) ? Number.parseInt(row.exp_qty) 
+                : 0; // 수량
+        } else {
+            qty = !!(row.qty != 0 && row.qty) ? Number.parseInt(row.qty) : 0;
+        }
         const unit_cost = Number.parseFloat(row.unit_cost || 0); // 단가
         const prd_tariff_rate = Number.parseFloat(row.prd_tariff_rate || 0); // 상품당 관세율
 
         if (unit == "") unit = ff.currency_unit.value; // 통화
         if (exchange_rate == 0) exchange_rate = unComma(ff.exchange_rate.value || '0') || 0; // 환율
         if (freight_amt == 0) freight_amt = unComma(ff.freight_amt.value || '0') || 0; // 운임비
-        if (custom_amt == 0) custom_amt = gx.getRows().reduce((a, c) => a + (exchange_rate * (qty || 0) * (unit_cost || 0)), 0); // 신고금액
+        if (custom_amt == 0) custom_amt = gx.getRows().reduce((a, c) => {
+            let p_qty;
+            if (STATE < 30) {
+                p_qty = !!(c.qty != 0 && c.qty) ? Number.parseInt(c.qty) 
+                    : !!(c.exp_qty != 0 && c.exp_qty) ? Number.parseInt(c.exp_qty) 
+                    : 0;
+            } else {
+                p_qty = !!(c.qty != 0 && c.qty) ? Number.parseInt(c.qty) : 0;
+            }
+            return a + (exchange_rate * (p_qty || 0) * (c.unit_cost || 0));
+        }, 0); // 신고금액
         const freight_rate = custom_amt < 1 ? 0 : Number.parseFloat(freight_amt / custom_amt); // 운임율
-        
+
         const income_amt = exchange_rate * unit_cost; // 수입금액
         const income_total_amt = income_amt * qty; // 총수입금액
 
@@ -895,12 +928,14 @@
 
         alert("상품을 순차적으로 불러오고 있습니다.\n다소 시간이 소요될 수 있습니다."); // progress
 
+        // 입고완료 이후 정보적용 처리 필요
+
         // 기본정보 적용
         const ff = document.search;
         ff.com_id.value = com_id;
         ff.bl_no.value = bl_no;
         ff.stock_date.value = stock_date;
-        $("#currency_unit").val(currency_unit).prop("selected", true);
+        $("#currency_unit").val(currency_unit).prop("selected", true).trigger("change");
 
         if (currency_unit != "KRW") {
             ff.exchange_rate.value = Comma(exchange_rate);
