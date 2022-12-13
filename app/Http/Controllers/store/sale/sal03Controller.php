@@ -165,12 +165,13 @@ class sal03Controller extends Controller
 				a.size,
 				
 				-- 입고
-				b.in_sum_qty as in_sum_qty,
-				b.in_sum_amt as in_sum_amt,
-				round((b.in_sum_qty / ps.qty) * 100) as in_sale_rate,
+				b.qty as in_sum_qty,
+				b.cost as in_sum_amt,
+				round((b.qty / ps.qty) * 100) as in_sale_rate,
 
 				-- 출고
-				
+				rel.qty as ex_sum_qty,
+				rel.prc_rt as ex_date,
 				
 				-- 총판매
 				ifnull(a.total_ord_qty,'0') as total_ord_qty,
@@ -178,13 +179,13 @@ class sal03Controller extends Controller
 				ifnull(round((a.total_ord_qty / ps.qty) * 100),0) as total_sale_rate,
 				
 				-- 기간판매
-				a.t_qty as ord_qty,
+				a.per_qty as ord_qty,
 				a.t_price as ord_amt,
-				ifnull(round((a.per_qty / ps.qty) * 100),0) as sale_rate
+				ifnull(round((a.per_qty / ps.qty) * 100),0) as sale_rate,
 
 				-- 매장재고, 창고재고
 				ifnull(ps.qty, '0') as stock_qty, 
-				ifnull(ps.wqty, '0') as stock_wqty,
+				ifnull(ps.wqty, '0') as stock_wqty
 			from ( 
 					select 
 						sum(c.qty) as per_qty,
@@ -216,7 +217,6 @@ class sal03Controller extends Controller
 							where m.ord_date >= '$sdate2' and m.ord_date <= '$edate2'
 						) c on c.ord_no = o.ord_no
 					where 
-						-- w.`ord_state_date` >= '$sdate' and w.ord_state_date <= '$edate' and 
 						w.`ord_state` in ( '30','60','61') 
 						and o.prd_cd <> '' 
 						$where
@@ -225,13 +225,22 @@ class sal03Controller extends Controller
 				inner join product_stock ps on a.prd_cd = ps.prd_cd 
 				left outer join ( 
 					select 
-						sp.prd_cd as prd_cd, 
-						sum(ps.in_qty) as in_sum_qty,
-						sum(sp.cost) as in_sum_amt
-					from stock_product sp
-						inner join product_stock ps on sp.prd_cd = ps.prd_cd
-					group by sp.prd_cd
+						p.prd_cd
+						, p.qty
+						, p.cost
+					from product_stock_order_product p
+						inner join product_stock ps on p.prd_cd = ps.prd_cd
+					where p.state = '30'
 				) as b on a.prd_cd = b.prd_cd
+				left outer join ( 
+					select 
+						psr.prd_cd,
+						psr.qty as qty,
+						left(psr.prc_rt, 10) as prc_rt
+					from product_stock_release psr
+						inner join product_stock ps on psr.prd_cd = ps.prd_cd
+					
+				) as rel on a.prd_cd = rel.prd_cd
 			$orderby 
 			$limit
 		";
@@ -249,17 +258,29 @@ class sal03Controller extends Controller
             	"
 				select
 					count(a.cnt) as total
-					, sum(a.ord_amt) as ord_amt
-					, sum(a.ord_qty) as ord_qty
-					, sum(a.sale_rate) as sale_rate
-					, sum(a.in_sale_rate) as in_sale_rate
-					, sum(b.in_sum_amt) as in_sum_amt
-					, sum(b.in_sum_qty) as in_sum_qty
-					, sum(ifnull(ps.qty, '0')) as stock_qty 
-					, sum(ifnull(ps.wqty, '0')) as stock_wqty
+					-- 입고
+					, sum(b.cost) as in_sum_amt
+					, sum(b.qty) as in_sum_qty
+					, sum(ifnull(round((b.qty / ps.qty) * 100), 0)) as in_sale_rate
+					
+					-- 출고
+					, sum(rel.qty) as ex_sum_qty
+
+					-- 총판매
 					, sum(a.total_ord_qty) as total_ord_qty
 					, sum(a.total_ord_amt) as total_ord_amt
-					, sum(a.total_sale_rate) as total_sale_rate
+					, sum(ifnull(round((a.w_qty / ps.qty) * 100),0)) as total_sale_rate
+					-- , sum(a.total_sale_rate) as total_sale_rate
+
+					-- 기간판매
+					, sum(a.ord_amt) as ord_amt
+					, sum(a.ord_qty) as ord_qty
+					, sum(ifnull(round((a.c_qty / ps.qty) * 100),0)) as sale_rate
+					-- , sum(a.sale_rate) as sale_rate
+
+					-- 매장재고, 창고재고
+					, sum(ifnull(ps.qty, '0')) as stock_qty 
+					, sum(ifnull(ps.wqty, '0')) as stock_wqty
 				from
 				(
 					select 
@@ -270,12 +291,11 @@ class sal03Controller extends Controller
 						sum(w.qty) as total_ord_qty,
 						sum(o.recv_amt) as total_ord_amt,
 						avg(w.wonga) as wonga,
+						sum(w.qty) as w_qty,
+						sum(c.qty) as c_qty,
 						g.goods_type,
 						o.goods_no, g.brand, b.brand_nm, g.style_no, o.goods_opt, g.img, g.goods_nm, g.goods_nm_eng,
-						concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color, pc.size,
-						sum(ifnull(round((ps.in_qty / ps.qty) * 100),0)) as in_sale_rate,
-						sum(ifnull(round((w.qty / ps.qty) * 100),0)) as total_sale_rate,
-						sum(ifnull(round((c.qty / ps.qty) * 100),0)) as sale_rate
+						concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color, pc.size
 
 					from order_mst m 
 						inner join order_opt o on m.ord_no = o.ord_no
@@ -297,7 +317,6 @@ class sal03Controller extends Controller
 							where m.ord_date >= '$sdate2' and m.ord_date <= '$edate2'
 						) c on c.ord_no = o.ord_no
 					where 
-						-- w.`ord_state_date` >= '$sdate' and w.ord_state_date <= '$edate' and 
 						w.`ord_state` in ( '30','60','61') 
 						and o.prd_cd <> ''
 						$where
@@ -308,13 +327,22 @@ class sal03Controller extends Controller
 				inner join product_stock ps on a.prd_cd = ps.prd_cd
 				left outer join ( 
 					select 
-						sp.prd_cd as prd_cd, 
-						sum(ps.in_qty) as in_sum_qty,
-						sum(sp.cost) as in_sum_amt
-					from stock_product sp
-						inner join product_stock ps on sp.prd_cd = ps.prd_cd
-					group by sp.prd_cd
+						p.prd_cd
+						, p.qty
+						, p.cost
+					from product_stock_order_product p
+						inner join product_stock ps on p.prd_cd = ps.prd_cd
+					where p.state = '30'
 				) as b on a.prd_cd = b.prd_cd
+				left outer join ( 
+					select 
+						psr.prd_cd,
+						psr.qty as qty,
+						left(psr.prc_rt, 10) as prc_rt
+					from product_stock_release psr
+						inner join product_stock ps on psr.prd_cd = ps.prd_cd
+					
+				) as rel on a.prd_cd = rel.prd_cd
 			";
 
 			$row = DB::selectOne($query);
