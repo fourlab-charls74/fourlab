@@ -195,7 +195,7 @@
                                     </select>
                                 </div>
                                 <span class="text_line">/</span>
-                                <div class="form-inline-inner input_box" style="width:45%;">
+                                <div class="form-inline-inner input_box" style="width:70%;">
                                     <select name="ord_field" class="form-control form-control-sm">
                                         <option value='ord_qty'>수량</option>
                                         <option value='total_sale_rate'>총판매율</option>
@@ -204,14 +204,14 @@
                                         <option value="prd_cd">상품코드</option>
                                     </select>
                                 </div>
-                                <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
+                                <!-- <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
                                     <div class="btn-group" role="group">
                                         <label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="내림차순"><i class="bx bx-sort-down"></i></label>
                                         <label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="오름차순"><i class="bx bx-sort-up"></i></label>
                                     </div>
                                     <input type="radio" name="ord" id="sort_desc" value="desc" checked="">
                                     <input type="radio" name="ord" id="sort_asc" value="asc">
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                     </div>
