@@ -355,10 +355,7 @@ class S_Stock
     private function __InsertHistory($data)
     {
         $user = $this->user;
-
-        $sql = "select * from `storage` where default_yn = 'Y'";
-        $result = DB::selectOne($sql);
-        $storage_cd = $result == null ? '' : $result->storage_cd;
+        $storage_cd = DB::table('storage')->where('default_yn', 'Y')->value('storage_cd');
 
         return DB::table('product_stock_hst')->insertGetId([
             'goods_no' => $this->goods_no,
@@ -367,7 +364,7 @@ class S_Stock
             'location_cd' => $storage_cd,
             'location_type' => 'STORAGE',
             'type' => 1, // 재고분류 : 입고(창고입고)
-            'price' => $data["wonga"],
+            'price' => $data["price"],
             'wonga' => $data["wonga"],
             'qty' => $data["qty"],
             'invoice_no' => $data['invoice_no'],
@@ -379,26 +376,6 @@ class S_Stock
             'admin_id' => $user['id'] ?? '',
             'admin_nm' => $user['name'] ?? '',
         ]);
-
-        // return DB::table('goods_history')->insertGetId([
-        //     'goods_no' => $this->goods_no,
-        //     'goods_sub' => 0,
-        //     'goods_opt' => $this->goods_opt,
-        //     'wonga' => $data["wonga"],
-        //     'type' => $data["type"],
-        //     'stock_state' => 1,
-        //     'qty' => $data["qty"],
-        //     'loc' => $this->loc,
-        //     'etc' => $data["etc"],
-        //     'ord_opt_no' => $data["ord_opt_no"],
-        //     'invoice_no' => $data["invoice_no"],
-        //     'admin_id' => isset($user["id"])? $user["id"]:"",
-        //     'admin_nm' => isset($user["name"])? $user["name"]:"",
-        //     'com_id' => $data["com_id"],
-        //     'ord_no' => $data["ord_no"],
-        //     'stock_state_date' => date("Ymd"), // goods_history의 stock_state_date는 Ymd 형식으로 되어있음. now에서 Ymd로 수정 - 20220217
-        //     'regi_date' => now()
-        // ]);
     }
 
     private function __DecreaseGoodQty($qty)
@@ -508,7 +485,7 @@ class S_Stock
         $this->SetGoodsOpt($goods_no, $goods_opt, $opt_price, $opt_name, $opt_seq);
 
         $sql = "
-			select com_id, is_unlimited, goods_type
+			select com_id, is_unlimited, goods_type, wonga, price
 			from goods
 			where goods_no = '$goods_no'
 		";
@@ -516,19 +493,37 @@ class S_Stock
         $com_id = $rows->com_id;
         $is_unlimited = $rows->is_unlimited;
         $goods_type = $rows->goods_type;
-
+        $goods_wonga = $rows->wonga;
+        $goods_price = $rows->price;
+        
         if ($goods_type == "S" || $goods_type == "I") {
             if ($ord_opt_no == "" || ($ord_opt_no != "" && $ord_state >= 30)) {
-                $this->PlusStockQty($goods_no, $prd_cd, $goods_opt, $qty, $type,
-                    $invoice_no, $etc, $wonga, $com_id, $ord_no, $ord_opt_no);
+                // $this->PlusStockQty($goods_no, $prd_cd, $goods_opt, $qty, $type,
+                    // $invoice_no, $etc, $wonga, $com_id, $ord_no, $ord_opt_no);   
 
-                // 입고완료시 입고처리
-                $this->PlusInQty($goods_no, $prd_cd, $goods_opt, $qty);
+                $this->SetPrdCd($prd_cd);
+                $this->SetGoodsOpt($goods_no, $goods_opt);
+
+                // 입고완료시 재고처리 (product_stock)
+                $this->PlusInQty($goods_no, $prd_cd, $goods_opt, $qty, $goods_wonga, $is_unlimited);
+                
+                // 입고완료시 재고처리 (product_stock_storage)
+                $this->__IncreasePrdStockStorageQty($goods_no, $prd_cd, $goods_opt, $qty);
+
+                // 재고처리 history 기록 (product_stock_hst)
+                $history = array(
+                    "type" => $type,
+                    "etc" => $etc,
+                    "qty" => $qty,
+                    "wonga" => $wonga,
+                    "price" => $goods_price,
+                    "invoice_no" => $invoice_no,
+                    "com_id" => $com_id,
+                    "ord_no" => $ord_no,
+                    "ord_opt_no" => $ord_opt_no
+                );
+                $this->__InsertHistory($history);
             }
-        }
-
-        if ($is_unlimited == "N") {
-            $this->PlusQty($goods_no, $prd_cd, $goods_opt, $qty);
         }
 
         //
@@ -547,7 +542,7 @@ class S_Stock
 
     public function PlusStockQty($goods_no, $prd_cd, $goods_opt, $qty, $type, $invoice_no = "INV_ADJUST", $etc = "", $wonga = "",
                                  $com_id = "", $ord_no = "", $ord_opt_no = "")
-    {
+    {        
         $where = "";
         if ($wonga != "") $where .= " and wonga = '$wonga' ";
 
@@ -666,35 +661,33 @@ class S_Stock
         }
     }
 
-    private function __IncreasePrdStockStorageQty($qty)
+    private function __IncreasePrdStockStorageQty($goods_no, $prd_cd, $goods_opt, $qty)
     {
-
-        $sql = "select * from `storage` where default_yn = 'Y'";
-        $result = DB::selectOne($sql);
-        $storage_cd = $result->storage_cd;
+        $storage_cd = DB::table('storage')->where('default_yn', 'Y')->value('storage_cd');
 
         $affected_rows = DB::update("
             update product_stock_storage set
-                wqty = wqty + $qty,
-                qty = qty + $qty,
-                ut = now()
-            where goods_no = '$this->goods_no'
-                and prd_cd = '$this->prd_cd'
-                and goods_opt = '$this->goods_opt'
+                wqty = wqty + $qty
+                , qty = qty + $qty
+                , ut = now()
+            where goods_no = '$goods_no'
+                and prd_cd = '$prd_cd'
+                and goods_opt = '$goods_opt'
                 and storage_cd = '$storage_cd'
         ");
         if ($affected_rows > 0) return $affected_rows;
+
         try {
             DB::table('product_stock_storage')->insert([
-                'goods_no' => $this->goods_no,
-                'prd_cd' => $this->prd_cd,
-                'goods_opt' => $this->goods_opt,
+                'goods_no' => $goods_no,
+                'prd_cd' => $prd_cd,
+                'storage_cd' => $storage_cd,
                 'qty' => $qty,
                 'wqty' => $qty,
+                'goods_opt' => $goods_opt,
                 'use_yn' => 'Y',
                 'rt' => now(),
                 'ut' => now(),
-                'storage_cd' => $storage_cd
             ]);
             return 1;
         } catch (Exception $e) {
@@ -702,31 +695,52 @@ class S_Stock
         }
     }
 
-    public function PlusQty($goods_no, $prd_cd, $goods_opt, $qty)
+    public function PlusInQty($goods_no, $prd_cd, $goods_opt, $qty, $wonga, $is_unlimited = "N")
     {
-        $sql = "
-            update product_stock 
-                set qty = qty + $qty 
-                    , ut = now()
-            where goods_no = '$goods_no' 
-                and prd_cd = '$prd_cd'
-                and goods_opt = '$goods_opt'
-        ";
-        return DB::update($sql);
-    }
+        $cnt = DB::table('product_stock')->where('prd_cd', $prd_cd)->count();
+        $result_code = 0;
 
-    public function PlusInQty($goods_no, $prd_cd, $goods_opt, $qty)
-    {
-        $sql = "
-            update product_stock 
-                set in_qty = in_qty + $qty 
+        if ($cnt > 0) {
+            $qty_sql = "";
+            if ($is_unlimited == "N") {
+                $qty_sql .= "
+                    , qty_wonga = qty_wonga + (wonga * $qty)
+                    , qty = qty + $qty
+                    , wqty = wqty + $qty
+                ";
+            }
+    
+            $sql = "
+                update product_stock set 
+                    in_qty = in_qty + $qty
+                    $qty_sql
                     , ut = now()
-            where goods_no = '$goods_no' 
-                and prd_cd = '$prd_cd'
-                and goods_opt = '$goods_opt'
-        ";
+                where goods_no = '$goods_no' 
+                    and prd_cd = '$prd_cd'
+                    and goods_opt = '$goods_opt'
+            ";
+    
+            $result_code = DB::update($sql);
+        } else {
+            $params = [
+                'prd_cd' => $prd_cd,
+                'goods_no' => $goods_no,
+                'wonga' => $wonga,
+                'qty_wonga' => $wonga * $qty,
+                'in_qty' => $qty,
+                'out_qty' => 0,
+                'qty' => $qty,
+                'wqty' => $qty,
+                'goods_opt' => $goods_opt,
+                'barcode' => $prd_cd,
+                'use_yn' => "Y",
+                'rt' => now(),
+                'ut' => now(),
+            ];
+            $result_code = DB::table('product_stock')->insert($params);
+        }
 
-        return DB::update($sql);
+        return $result_code;
     }
 
     public function GetStockQty($goods_no, $prd_cd, $goods_opt)

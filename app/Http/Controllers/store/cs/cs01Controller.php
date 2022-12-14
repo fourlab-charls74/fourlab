@@ -528,7 +528,6 @@ class cs01Controller extends Controller {
 			DB::rollback();
 			$message = "입고 수정시 에러가 발생하였습니다.";
 			$code = 0;
-			dd($e->getMessage());
 			if ($e = $e->getPrevious()) {
 				$message = $e->getMessage();
 				$code = $e->getCode();
@@ -576,26 +575,16 @@ class cs01Controller extends Controller {
 	 */
 	public function cancelCmd($stock_no) { // 입고번호
 		$msg = '';
-
-		$sql = "
-			select * from product_stock_order where stock_no = '$stock_no' and state = 30
-		";
-
-		$row = DB::selectOne($sql);
-		
-		if ($row) {
-			$loc = $row->loc;
-		} else {
-			$loc = '';
-		}
-
 		$id = Auth::guard('head')->user()->id;
 		$name = Auth::guard('head')->user()->name;
-
 		$user = [
 			'id' => $id,
 			'name' => $name
 		];
+
+		$row = DB::table('product_stock_order')->where('stock_no', $stock_no)->select('state', 'loc')->first();
+		$loc = '';
+		if ($row != null && $row->state == 30) $loc = $row->loc;
 
 		try {
 			DB::beginTransaction();
@@ -949,6 +938,11 @@ class cs01Controller extends Controller {
 							if ($state == 30) { // 입고 완료인 경우
 								if ($cur_state < $state) {
 									$this->stockIn($goods_no, $prd_cd, $opt, $qty, $stock_no, $invoice_no, $cost, $loc);
+								} else {
+									// product_stock_hst 에서 단가 수정
+									DB::table('product_stock_hst')
+										->where('prd_cd', $prd_cd)->where('invoice_no', $invoice_no)
+										->update([ 'wonga' => $cost ]);
 								}
 							}
 
