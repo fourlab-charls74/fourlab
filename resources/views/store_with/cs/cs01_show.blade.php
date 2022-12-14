@@ -523,7 +523,7 @@
         //     // 입고대기 or 입고처리중 => 기존에 저장했던 상품도 삭제가능
         // }
         gx.gridOptions.api.applyTransaction({ remove: rows });
-        calCustomTaxRate(false);
+        calCustomTaxRate();
     }
 
     /** 입고상세조회 시, 기존 상품 조회 */
@@ -629,8 +629,7 @@
         if (params.column?.colId === 'exp_qty') row.qty = row.exp_qty;
 
         await calProduct(row);
-        updatePinnedRow();
-        calCustomTaxRate(false);
+        calCustomTaxRate();
     }
 
     /** 상품 개당 계산정보 적용 */
@@ -780,7 +779,9 @@
     /** 입고저장 */
     const getFormValue = (form, key) => form.hasOwnProperty(key) ? form[key].value : '';
     function saveCmd(cmd) {
-        if (!confirm("저장하시겠습니까?")) return;
+        let confirm_msg = "저장하시겠습니까?";
+        if (cmd == 'addstockcmd') confirm_msg = "상품을 추가입고하시겠습니까?\n(기본정보는 수정되지 않습니다.)";
+        if (!confirm(confirm_msg)) return;
 
         const ff = document.search;
         const rows = gx.getRows();
