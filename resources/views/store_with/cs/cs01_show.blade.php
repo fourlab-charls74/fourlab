@@ -196,6 +196,7 @@
                                 </div>
                             </div>
                         </div>
+                        @if (@$state > 0 && @$state < 40)
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label for="f_sqty">파일</label>
@@ -213,6 +214,7 @@
                                 </div>
                             </div>
                         </div>
+                        @endif
                     </div>
                     <div id="help" class="row mt-4" style="display: none;">
                         <div class="col-lg-12">
@@ -265,10 +267,12 @@
         <div id="filter-area" class="card shadow-none mb-0 ty2">
             <div class="card-header d-flex justify-content-between">
                 <h4>상품 정보</h4>
+                @if (@$state > 0 && @$state < 40)
                 <div>
                     <a href="javascript:void(0);" onclick="return getSearchGoods();" class="btn-sm btn btn-primary" onfocus="this.blur();"><i class="fa fa-plus fa-sm mr-1"></i> 상품 추가</a>
                     <a href="javascript:void(0);" onclick="return deleteRows();" class="btn-sm btn btn-outline-primary" onfocus="this.blur();"><i class="fa fa-trash fa-sm mr-1"></i> 상품 삭제</a>
                 </div>
+                @endif
             </div>
             <div class="card-body pt-1">
                 <div class="table-responsive">
@@ -388,7 +392,7 @@
     /** 수정가능한 셀인지 판단 */
     function checkIsEditable(params) {
         if (
-            (params.column?.colId == 'qty' || params.column?.colId == 'unit_cost' || params.column?.colId == 'prd_tariff_rate') 
+            (params.column?.colId == 'unit_cost' || params.column?.colId == 'prd_tariff_rate') 
             && STATE > 0 
             && STATE < 40 
             && params.node.rowPinned != 'top'

@@ -560,6 +560,7 @@ class cs01Controller extends Controller {
 					where stock_no = :stock_no
 				";
 				DB::delete($sql, ['stock_no' => $stock_no]);
+
 				DB::commit();
 			} catch (Exception $e) {
 				DB::rollBack();
@@ -574,7 +575,9 @@ class cs01Controller extends Controller {
 	 * 입고 취소
 	 */
 	public function cancelCmd($stock_no) { // 입고번호
+		$code = 1;
 		$msg = '';
+
 		$id = Auth::guard('head')->user()->id;
 		$name = Auth::guard('head')->user()->name;
 		$user = [
@@ -589,13 +592,13 @@ class cs01Controller extends Controller {
 		try {
 			DB::beginTransaction();
 			/**
-			 * 재고 등록(+)
+			 * 재고 차감(-)
 			 */
 			$s = new S_Stock($user);
 			$s->SetLoc($loc);
 
 			$sql = "
-				select stock_no,invoice_no,goods_no,prd_cd,opt_kor as opt,unit_cost,cost_notax,qty
+				select stock_no,invoice_no,goods_no,prd_cd,opt_kor as opt,unit_cost,cost_notax,cost,qty
 				from product_stock_order_product
 				where stock_no = '$stock_no' and state = 30
 			";
@@ -615,51 +618,43 @@ class cs01Controller extends Controller {
 				$goods_no = $row->goods_no;
 				$prd_cd = $row->prd_cd;
 				$opt = $row->opt;
-				$cost_notax = $row->cost_notax;
+				$cost = $row->cost;
 				$qty = $row->qty;
 
 				$stock = array(
 					"type" => 9,
-					"etc" => "입고 취소",
+					"etc" => "입고취소",
 					"qty" => $qty,
 					"goods_no" => $goods_no,
 					"prd_cd" => $prd_cd,
 					"goods_opt" => $opt,
-					"wonga" => $cost_notax,
+					"wonga" => $cost,
 					"invoice_no" => $invoice_no,
 				);
-				
 				$s->Minus( $stock );
+				
 				$sql = "
 					update product_stock_order_product set state = '-10'
 					where stock_no = '$stock_no' and goods_no = '$goods_no' and prd_cd = '$prd_cd'
-							and opt_kor = '$opt' and cost_notax = '$cost_notax'
+							and opt_kor = '$opt' and cost = '$cost'
 				";
 				DB::update($sql);
 			}
-			
-			DB::commit();
-		} catch (Exception $e) {
-			DB::rollBack();
-			if ($msg == '') $msg = '입고 취소를 실패하였습니다. 다시 한번 시도하여 주십시오.';
-			return response()->json(['code' => -1, 'message' => $msg], 200);
-		}
 
-		try {
-			DB::beginTransaction();
 			$sql = "
 				update product_stock_order set 
-					state = '-10', rej_id = $id, rej_rt = now()
+					state = '-10', rej_id = '$id', rej_rt = now()
 				where stock_no = '$stock_no'
 			";
 			DB::update($sql);
-			DB::commit();
-		} catch(Exception $e) {
-			DB::rollBack();
-			return response()->json(['code' => -2, 'message' => "입고 취소를 실패하였습니다. 다시 한번 시도하여 주십시오."], 200);
-		}
 
-		return response()->json(['code' => 1, 'message' => "입고가 취소되었습니다."], 200);
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollBack();
+			$code = -1;
+			if ($msg == '') $msg = '입고 취소를 실패하였습니다. 다시 한번 시도하여 주십시오.';
+		}
+		return response()->json(['code' => $code, 'message' => $msg], 200);
 	}
 
 	/**
@@ -1002,7 +997,7 @@ class cs01Controller extends Controller {
 				$s->SetLoc($loc);
 				$s->Plus([
 					"type" => 1,
-					"etc" => "",
+					"etc" => "창고입고",
 					"qty" => $qty,
 					"goods_no" => $goods_no,
 					"prd_cd" => $prd_cd,
@@ -1037,8 +1032,6 @@ class cs01Controller extends Controller {
 	public function confirmWonga($stock_no, $prd_cd, $qty, $cost)
 	{
 		$stock = DB::table('product_stock')->select('wonga', 'in_qty')->where('prd_cd', '=', $prd_cd)->first();
-
-		// 입고완료 이후 수량확정 시 재고처리 작업 필요
 		
 		try {
 			DB::beginTransaction();
@@ -1057,7 +1050,7 @@ class cs01Controller extends Controller {
 				];
 				DB::table('product_stock')->where('prd_cd', '=', $prd_cd)->update($values);
 
-				// 2. 입고완료 ~ 원가확정 기간동안 판매된 주문건의 원가 값 업데이트
+				// 2. 입고완료 ~ 원가확정 기간동안 판매된 주문건(및 hst)의 원가 값 업데이트
 				$fin_rt = DB::table('product_stock_order')->where('stock_no', '=', $stock_no)->value('fin_rt');
 				if ($fin_rt != null) {
 					$where = " where ord_date >= '$fin_rt' and ord_date <= now() and prd_cd = '$prd_cd' ";
@@ -1077,6 +1070,11 @@ class cs01Controller extends Controller {
 							where ord_opt_no = '$ord->ord_opt_no'
 						";
 						DB::update($sql);
+
+						// product_stock_hst 에서 단가 수정
+						DB::table('product_stock_hst')
+							->where('prd_cd', $prd_cd)->where('ord_opt_no', $ord->ord_opt_no)
+							->update([ 'wonga' => $avg_wonga ]);
 					}
 				}
 			}
