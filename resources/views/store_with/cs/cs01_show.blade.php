@@ -27,15 +27,15 @@
                         @if (@$state > 0 && @$state < 40)
                         <a href="javascript:void(0);" onclick="cmder('{{ @$cmd }}')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>저장</a>
                             @if (@$stock_no != "" && @$state < 30)
-                            <a href="javascript:void(0);" onclick="cmder('delcmd')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx mr-1"></i>입고삭제</a>
+                            <a href="javascript:void(0);" onclick="cmder('delcmd')" class="btn btn-sm btn-primary shadow-sm pl-2">입고삭제</a>
                             @endif
                             @if ($state == 30)
-                            <a href="javascript:void(0);" onclick="cmder('addstockcmd')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx mr-1"></i>추가입고</a>
-                            <a href="javascript:void(0);" onclick="cmder('cancelcmd')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx mr-1"></i>입고취소</a>
+                            <a href="javascript:void(0);" onclick="cmder('addstockcmd')" class="btn btn-sm btn-primary shadow-sm pl-2">추가입고</a>
+                            <a href="javascript:void(0);" onclick="cmder('cancelcmd')" class="btn btn-sm btn-primary shadow-sm pl-2">입고취소</a>
                             @endif
                         @endif
                         <a href="javascript:void(0);" onclick="return gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
-                        <a href="javascript:void(0);" onclick="return displayHelp();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx mr-1"></i>도움말</a>
+                        <a href="javascript:void(0);" onclick="return displayHelp();" class="btn btn-sm btn-outline-primary shadow-sm pl-2">도움말</a>
                     </div>
                 </div>
                 <div class="card-body">
@@ -147,8 +147,8 @@
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label for="tariff_amt" class="required">관세총액/관세율</label>
-                                <div class="flex_box">
-                                    <input type="text" class="form-control form-control-sm text-right w-75" 
+                                <div class="flex_box align-items-start">
+                                    <input type="text" class="form-control form-control-sm text-right {{ @$state > 0 && @$state < 40 ? 'w-50' : 'w-75' }}" 
                                         id="tariff_amt" name="tariff_amt" value="{{ number_format(@$tariff_amt ?? 0) }}"
                                         onkeypress="checkFloat(event);" onkeyup="com3(this);calCustomTaxRate();" onfocus="this.select();" 
                                         {{ @$currency_unit == 'KRW' ? 'readonly disabled' : '' }}>
@@ -156,6 +156,11 @@
                                         <input type="text" class="form-control form-control-sm text-right mr-1" id="tariff_rate" name="tariff_rate" value="{{ @$tariff_rate ?? 0 }}" readonly>
                                         <span>%</span>
                                     </div>
+                                    @if (@$state > 0 && @$state < 40)
+                                    <div class="w-25 pl-2">
+                                        <a href="javascript:void(0);" onclick="return setPrdTariffRates();" class="btn btn-sm btn-outline-primary shadow-sm w-100">일괄적용</a>
+                                    </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -253,15 +258,15 @@
                 @if (@$state > 0 && @$state < 40)
                 <a href="javascript:void(0);" onclick="cmder('{{ @$cmd }}')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>저장</a>
                     @if (@$stock_no != "" && @$state < 30)
-                    <a href="javascript:void(0);" onclick="cmder('delcmd')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx mr-1"></i>입고삭제</a>
+                    <a href="javascript:void(0);" onclick="cmder('delcmd')" class="btn btn-sm btn-primary shadow-sm pl-2">입고삭제</a>
                     @endif
                     @if ($state == 30)
-                    <a href="javascript:void(0);" onclick="cmder('addstockcmd')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx mr-1"></i>추가입고</a>
-                    <a href="javascript:void(0);" onclick="cmder('cancelcmd')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx mr-1"></i>입고취소</a>
+                    <a href="javascript:void(0);" onclick="cmder('addstockcmd')" class="btn btn-sm btn-primary shadow-sm pl-2">추가입고</a>
+                    <a href="javascript:void(0);" onclick="cmder('cancelcmd')" class="btn btn-sm btn-primary shadow-sm pl-2">입고취소</a>
                     @endif
                 @endif
                 <a href="javascript:void(0);" onclick="return gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
-                <a href="javascript:void(0);" onclick="return displayHelp();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx mr-1"></i>도움말</a>
+                <a href="javascript:void(0);" onclick="return displayHelp();" class="btn btn-sm btn-outline-primary shadow-sm pl-2">도움말</a>
             </div>
         </form>
         <div id="filter-area" class="card shadow-none mb-0 ty2">
@@ -691,6 +696,18 @@
         });
     }
 
+    // 관세율 -> 상품당관세율 일괄적용
+    async function setPrdTariffRates() {
+        const tariff_rate = $("#tariff_rate").val();
+
+        await gx.gridOptions.api.applyTransaction({ 
+            update: gx.getRows().map(row => ({...row, prd_tariff_rate: tariff_rate})),
+        });
+
+        await gx.getRows().forEach(async (row) => await calProduct(row));
+        updatePinnedRow();
+    }
+
     /**********************************
      * 입고관리
      *********************************/
@@ -759,19 +776,21 @@
     async function checkPrdData(row) {
         const rowIdx = row.count - 1;
         const unit = document.search.currency_unit.value;
-        const { exp_qty, qty, unit_cost, prd_tariff_rate } = row;
+        const { exp_qty, qty, unit_cost, prd_tariff_rate, stock_prd_no } = row;
 
-        if ((qty || 0) == 0 && (exp_qty || 0) == 0) { // check qty
-            alert("입고수량(확정) 또는 입고수량(예정)을 입력해주세요.");
-            gx.gridOptions.api.stopEditing(); // stop editing
-            gx.gridOptions.api.startEditingCell({ rowIndex: rowIdx, colKey: 'qty' });
-            return false;
-        }
-        if (unit_cost == "" || unit_cost == 0) { // check unit_cost
-            alert("단가를 입력해주세요.");
-            gx.gridOptions.api.stopEditing(); // stop editing
-            gx.gridOptions.api.startEditingCell({ rowIndex: rowIdx, colKey: 'unit_cost' });
-            return false;
+        if (STATE != 30 || stock_prd_no != undefined) {
+            if ((qty || 0) == 0 && (exp_qty || 0) == 0) { // check qty
+                alert("입고수량(확정) 또는 입고수량(예정)을 입력해주세요.");
+                gx.gridOptions.api.stopEditing(); // stop editing
+                gx.gridOptions.api.startEditingCell({ rowIndex: rowIdx, colKey: 'qty' });
+                return false;
+            }
+            if (unit_cost == "" || unit_cost == 0) { // check unit_cost
+                alert("단가를 입력해주세요.");
+                gx.gridOptions.api.stopEditing(); // stop editing
+                gx.gridOptions.api.startEditingCell({ rowIndex: rowIdx, colKey: 'unit_cost' });
+                return false;
+            }
         }
         return true;
     }

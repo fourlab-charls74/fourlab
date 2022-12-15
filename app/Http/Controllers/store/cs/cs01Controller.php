@@ -532,6 +532,11 @@ class cs01Controller extends Controller {
 
 				// 개별상품 입고처리
 				$params = array_merge($params, [ 'stock_no' => $stock_no ]);
+				if ($cur_state == 30) {
+					$data = array_filter($data, function($row) {
+						return isset($row['stock_prd_no']);
+					});
+				}
 				$this->saveStockOrderProduct("E", $params, $data, $cur_state);
 
 				DB::commit();
