@@ -269,7 +269,7 @@ function StyleClmState(params){
 function StyleStockOrdState(params) {
     var state = {
         "입고대기":"#222222",
-        "입고취소":"#666666",
+        "입고취소":"#999999",
         "입고처리중":"#0000ff",
         "입고완료":"#2aa876",
         "원가확정":"#e8554e",
@@ -279,7 +279,8 @@ function StyleStockOrdState(params) {
     return {
         color: color,
         "text-align": "center",
-        "font-weight": '700'
+        "font-weight": '700',
+        "text-decoration": params.value == '입고취소' ? "line-through" : "none",
     };
 }
 
