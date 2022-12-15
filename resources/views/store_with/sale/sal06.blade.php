@@ -202,7 +202,7 @@
             }
         },
         { field: "store_type_nm", headerName: "매장구분", pinned:'left', width:90, cellStyle: { 'text-align': "center" } },
-        { field: "store_cd", headerName: "매장코드", pinned:'left', hide: true },
+        { field: "store_cd", headerName: "매장코드", pinned:'left', width:70, cellStyle: { 'text-align': "center" } },
         { field: "store_nm", headerName: "매장명", pinned:'left', type: 'StoreNameType', width: 250 },
         // {field: "",	headerName: "TAG가"},
         { field: "sale_kind", headerName: "판매유형",

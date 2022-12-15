@@ -188,7 +188,7 @@
 			}
 		},
 		{ field: "store_type_nm", headerName: "매장구분", pinned:'left', width:90, cellStyle: { 'text-align': "center" } },
-		{ field: "store_cd", headerName: "매장코드", pinned:'left', hide: true },
+		{ field: "store_cd", headerName: "매장코드", pinned:'left', width:70, cellStyle: { 'text-align': "center" } },
 		{ field: "store_nm", headerName: "매장명", pinned:'left', type: 'StoreNameType', width: 250 },
 		{ field: "proj_amt", headerName: "목표", pinned:'left', width:85, type: 'currencyType', aggregation:true },
         { field: "progress_proj_amt", headerName: "달성율(%)", pinned:'left', width:85, type: 'percentType',

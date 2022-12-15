@@ -119,7 +119,7 @@
             }
         },
         { field: "store_type_nm", headerName: "매장구분", pinned:'left', width:90, cellStyle: { 'text-align': "center" } },
-        { field: "scd", headerName: "매장코드", pinned:'left', hide: true },
+        { field: "scd", headerName: "매장코드", pinned:'left', width: 70, cellStyle: { 'text-align': "center" } },
         { field: "store_nm", headerName: "매장명", pinned:'left', type: 'StoreNameType', width: 250 },
         {
             field: "summary", headerName: "합계",

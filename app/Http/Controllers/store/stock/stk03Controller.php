@@ -618,7 +618,7 @@ class stk03Controller extends Controller
         $user = $data['user'];
 
         $out_ord_no = $data['out_ord_no'] ?? '';
-        $ord_date = $data['ord_date'] ?? date('Y-m-d');
+        $ord_date = $data['ord_date'] ?? date('Y-m-d H:i:s');
         $ord_date = date_format(date_create($ord_date), 'Y-m-d H:i:s');
         $fee_rate = $data['fee_rate'] ?? 0;
 
