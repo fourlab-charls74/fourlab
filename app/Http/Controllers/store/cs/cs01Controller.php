@@ -335,6 +335,10 @@ class cs01Controller extends Controller {
 		$freight_amt			= $request->input("freight_amt");			//운임비
 		$freight_amt			= str_replace(",","",$freight_amt);
 		$custom_tax				= intval($tariff_amt) + intval($freight_amt); //통관비 = 관세총액 + 운임비
+
+		$tariff_rate = 0;
+		$freight_rate = 0;
+		$custom_tax_rate = 0;
 		
 		$area_type 				= ($currency_unit == KRW) ? "D" : "O"; 		//입고지역
 		$data					= $request->input("data");
@@ -358,9 +362,11 @@ class cs01Controller extends Controller {
 				$invoice_no = $this->getInvoiceNo($com_id);
 			}
 
-			$tariff_rate = $currency_unit == KRW ? 0 : round(($tariff_amt / $custom_amt) * 100, 2); // 관세율 = 관세총액 / 신고금액
-			$freight_rate = $currency_unit == KRW ? 0 : round(($freight_amt / $custom_amt) * 100, 2); // 운임율 = 운임비 / 신고금액
-			$custom_tax_rate = $currency_unit == KRW ? 0 : round(($custom_tax / $custom_amt) * 100, 2); // 통관세율 = 통관비 / 신고금액
+			if ($currency_unit != KRW) {
+				$tariff_rate = $custom_amt < 1 ? 0 : round(($tariff_amt / $custom_amt) * 100, 2); // 관세율 = 관세총액 / 신고금액
+				$freight_rate = $custom_amt < 1 ? 0 : round(($freight_amt / $custom_amt) * 100, 2); // 운임율 = 운임비 / 신고금액
+				$custom_tax_rate = $custom_amt < 1 ? 0 : round(($custom_tax / $custom_amt) * 100, 2); // 통관세율 = 통관비 / 신고금액
+			}
 			
 			// 등록
 			$params = [
@@ -410,7 +416,7 @@ class cs01Controller extends Controller {
 			DB::commit();
 		} catch (Exception $e) {
 			DB::rollback();
-			$message = "입고 추가중 에러가 발생하였습니다.";
+			$message = "입고추가 중 에러가 발생하였습니다.";
 			$code = 0;
 			if ($e->getPrevious()) {
 				$message = $e->getMessage();
@@ -448,6 +454,10 @@ class cs01Controller extends Controller {
 		$freight_amt			= $request->input("freight_amt");			//운임비
 		$freight_amt			= str_replace(",","",$freight_amt);
 		$custom_tax				= intval($tariff_amt) + intval($freight_amt); //통관비 = 관세총액 + 운임비
+
+		$tariff_rate = 0;
+		$freight_rate = 0;
+		$custom_tax_rate = 0;
 		
 		$area_type				= ($currency_unit == KRW) ? "D" : "O"; 		//입고지역
 		$data					= $request->input("data");
@@ -470,9 +480,11 @@ class cs01Controller extends Controller {
 			if ($cur_state < 40) { // 입고취소: -10, 입고대기: 10, 입고처리중: 20, 입고완료: 30, 원가확정: 40
 				DB::beginTransaction();
 
-				$tariff_rate = $currency_unit == KRW ? 0 : round(($tariff_amt / $custom_amt) * 100, 2); // 관세율 = 관세총액 / 신고금액
-				$freight_rate = $currency_unit == KRW ? 0 : round(($freight_amt / $custom_amt) * 100, 2); // 운임율 = 운임비 / 신고금액
-				$custom_tax_rate = $currency_unit == KRW ? 0 : round(($custom_tax / $custom_amt) * 100, 2); // 통관세율 = 통관비 / 신고금액
+				if ($currency_unit != KRW) {
+					$tariff_rate = $custom_amt < 1 ? 0 : round(($tariff_amt / $custom_amt) * 100, 2); // 관세율 = 관세총액 / 신고금액
+					$freight_rate = $custom_amt < 1 ? 0 : round(($freight_amt / $custom_amt) * 100, 2); // 운임율 = 운임비 / 신고금액
+					$custom_tax_rate = $custom_amt < 1 ? 0 : round(($custom_tax / $custom_amt) * 100, 2); // 통관세율 = 통관비 / 신고금액
+				}
 				
 				// 수정
 				$params = [
@@ -685,13 +697,18 @@ class cs01Controller extends Controller {
 			$invoice_no = $row->invoice_no;
 			$state = $row->state;
 			$loc = $row->loc;
-			$stock_date = $row->stock_date;
+			// $stock_date = $row->stock_date;
+			$stock_date = date('Ymd');
 			$com_id = $row->com_id;
 			$currency_unit = $row->currency_unit;
 			$exchange_rate = $row->exchange_rate;
 			$tariff_amt = $row->tariff_amt;
 			$freight_amt = $row->freight_amt;
 			$custom_tax = $row->custom_tax;
+
+			$tariff_rate = 0;
+			$freight_rate = 0;
+			$custom_tax_rate = 0;
 
 			if ($currency_unit == KRW) {
 				$exchange_rate = 0;
@@ -700,9 +717,11 @@ class cs01Controller extends Controller {
 				$freight_amt = 0;
 			}
 
-			$tariff_rate = $currency_unit == KRW ? 0 : round(($tariff_amt / $custom_amt) * 100, 2); // 관세율 = 관세총액 / 신고금액
-			$freight_rate = $currency_unit == KRW ? 0 : round(($freight_amt / $custom_amt) * 100, 2); // 운임율 = 운임비 / 신고금액
-			$custom_tax_rate = $currency_unit == KRW ? 0 : round(($custom_tax / $custom_amt) * 100, 2); // 통관세율 = 통관비 / 신고금액	
+			if ($currency_unit != KRW) {
+				$tariff_rate = $custom_amt < 1 ? 0 : round(($tariff_amt / $custom_amt) * 100, 2); // 관세율 = 관세총액 / 신고금액
+				$freight_rate = $custom_amt < 1 ? 0 : round(($freight_amt / $custom_amt) * 100, 2); // 운임율 = 운임비 / 신고금액
+				$custom_tax_rate = $custom_amt < 1 ? 0 : round(($custom_tax / $custom_amt) * 100, 2); // 통관세율 = 통관비 / 신고금액
+			}
 
 			try {
 				DB::beginTransaction();	
@@ -951,7 +970,7 @@ class cs01Controller extends Controller {
 							}
 
 							if ($state == 30) { // 입고 완료인 경우
-								if ($cur_state < $state) {
+								if ($cur_state < $state || $type == 'A') {
 									$this->stockIn($goods_no, $prd_cd, $opt, $qty, $stock_no, $invoice_no, $cost, $loc);
 								} else {
 									// product_stock_hst 에서 단가 수정
@@ -962,7 +981,7 @@ class cs01Controller extends Controller {
 							}
 
 							if ($state == 40) { // 원가확정인 경우
-								$this->confirmWonga($stock_no, $prd_cd, $qty, $cost);
+								$this->confirmWonga($stock_no, $prd_cd, $qty, $cost, $invoice_no);
 							}
 						}
 					} else {
@@ -982,6 +1001,12 @@ class cs01Controller extends Controller {
 							'ut' => now(),
 						];
 						DB::table('product_stock_order_product')->where('stock_prd_no', $stock_prd_no)->update($params);
+
+						// product_stock_hst 에서 단가 수정
+						$prd_cd = $row['prd_cd'] ?? '';
+						DB::table('product_stock_hst')
+							->where('prd_cd', $prd_cd)->where('invoice_no', $invoice_no)
+							->update([ 'wonga' => $cost ]);
 					}
 				}
 			}
@@ -1066,7 +1091,7 @@ class cs01Controller extends Controller {
 	/**
 	 * 원가 확정
 	 */
-	public function confirmWonga($stock_no, $prd_cd, $qty, $cost)
+	public function confirmWonga($stock_no, $prd_cd, $qty, $cost, $invoice_no)
 	{
 		$stock = DB::table('product_stock')->select('wonga', 'in_qty')->where('prd_cd', '=', $prd_cd)->first();
 		
@@ -1114,6 +1139,11 @@ class cs01Controller extends Controller {
 							->update([ 'wonga' => $avg_wonga ]);
 					}
 				}
+
+				// 3. product_stock_hst 에서 창고입고 시 단가 수정
+				DB::table('product_stock_hst')
+				->where('prd_cd', $prd_cd)->where('invoice_no', $invoice_no)
+				->update([ 'wonga' => $cost ]);
 			}
 
 			DB::commit();

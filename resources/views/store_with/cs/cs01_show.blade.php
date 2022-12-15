@@ -270,7 +270,9 @@
                 @if (@$state > 0 && @$state < 40)
                 <div>
                     <a href="javascript:void(0);" onclick="return getSearchGoods();" class="btn-sm btn btn-primary" onfocus="this.blur();"><i class="fa fa-plus fa-sm mr-1"></i> 상품 추가</a>
+                    @if (@$state < 30)
                     <a href="javascript:void(0);" onclick="return deleteRows();" class="btn-sm btn btn-outline-primary" onfocus="this.blur();"><i class="fa fa-trash fa-sm mr-1"></i> 상품 삭제</a>
+                    @endif
                 </div>
                 @endif
             </div>
@@ -460,12 +462,12 @@
         _("#freight_amt").disabled = isKorean;
 
         if (ele.value != "KRW") {
-           document.search.exchange_rate.focus();
+            document.search.exchange_rate.focus();
         } else {
             document.search.exchange_rate.value = 0;
-            calCustomTaxRate();
         }
-       gx.gridOptions.api.redrawRows();
+        calCustomTaxRate();
+        gx.gridOptions.api.redrawRows();
     }
 
     /** 도움말 펼치기 */
@@ -743,6 +745,10 @@
         }
 
         const rows = gx.getRows();
+        if (rows.length < 1) {
+            alert("입고상품을 한 개 이상 등록해주세요.");
+            return false;
+        }
         for (let row of rows) {
             if (await checkPrdData(row) == false) return false;
         }
@@ -765,12 +771,6 @@
             alert("단가를 입력해주세요.");
             gx.gridOptions.api.stopEditing(); // stop editing
             gx.gridOptions.api.startEditingCell({ rowIndex: rowIdx, colKey: 'unit_cost' });
-            return false;
-        }
-        if (unit != "KRW" && (prd_tariff_rate == "" || prd_tariff_rate == 0)) { // check prd_tariff_rate
-            alert("상품당 관세율을 입력해주세요.");
-            gx.gridOptions.api.stopEditing(); // stop editing
-            gx.gridOptions.api.startEditingCell({ rowIndex: rowIdx, colKey: 'prd_tariff_rate' });
             return false;
         }
         return true;
