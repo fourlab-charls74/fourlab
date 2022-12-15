@@ -150,7 +150,7 @@
                                 <div class="flex_box align-items-start">
                                     <input type="text" class="form-control form-control-sm text-right {{ @$state > 0 && @$state < 40 ? 'w-50' : 'w-75' }}" 
                                         id="tariff_amt" name="tariff_amt" value="{{ number_format(@$tariff_amt ?? 0) }}"
-                                        onkeypress="checkFloat(event);" onkeyup="com3(this);calCustomTaxRate();" onfocus="this.select();" 
+                                        onkeypress="checkFloat(event);" onkeyup="com3(this);calCustomTaxRate(true, this.value);" onfocus="this.select();" 
                                         {{ @$currency_unit == 'KRW' ? 'readonly disabled' : '' }}>
                                     <div class="d-flex align-items-center w-25 pl-2">
                                         <input type="text" class="form-control form-control-sm text-right mr-1" id="tariff_rate" name="tariff_rate" value="{{ @$tariff_rate ?? 0 }}" readonly>
@@ -591,18 +591,16 @@
      *********************************/
 
      /** 기본정보(환율/관세총액/운임비) 입력 시 세율계산 */
-    async function calCustomTaxRate(calculate_prd = true) {
+    async function calCustomTaxRate(calculate_prd = true, tariff_amt = 0) {
         const ff = document.search;
         const unit = ff.currency_unit.value;
 
         let exchange_rate = 0, freight_amt = 0, custom_amt = 0;
         if (unit != "KRW") {
             exchange_rate = unComma(ff.exchange_rate.value || '0') || 0; // 환율
-            const tariff_amt = unComma(ff.tariff_amt.value || '0') || 0; // 관세총액
-            freight_amt = unComma(ff.freight_amt.value || '0') || 0; // 운임비
-            const custom_tax = tariff_amt + freight_amt; // 통관비
-            custom_amt = gx.getRows().reduce((a, c) => {
-                let p_qty;
+
+            let p_qty, income_total;
+            const rd = gx.getRows().reduce((a, c) => {
                 if (STATE < 30) {
                     p_qty = !!(c.qty != 0 && c.qty) ? Number.parseInt(c.qty) 
                         : !!(c.exp_qty != 0 && c.exp_qty) ? Number.parseInt(c.exp_qty) 
@@ -610,13 +608,23 @@
                 } else {
                     p_qty = !!(c.qty != 0 && c.qty) ? Number.parseInt(c.qty) : 0;
                 }
-                return a + (exchange_rate * (p_qty || 0) * (c.unit_cost || 0));
-            }, 0); // (신고)금액
+                income_total = (exchange_rate * (p_qty || 0) * (c.unit_cost || 0));
+                a[0] += income_total;
+                a[1] += income_total * (c.prd_tariff_rate / 100);
+                return a;
+            }, [0, 0]);
+
+            custom_amt = rd[0]; // (신고)금액
+            if (tariff_amt != 0) tariff_amt = unComma(tariff_amt || '0') || 0
+            else tariff_amt = rd[1] || unComma(ff.tariff_amt.value || '0') || 0; // 관세총액
+            freight_amt = unComma(ff.freight_amt.value || '0') || 0; // 운임비
+            const custom_tax = tariff_amt + freight_amt; // 통관비
             
             const tariff_rate = custom_amt < 1 ? 0 : Number.parseFloat((tariff_amt / custom_amt) * 100); // 관세율
             const freight_rate = custom_amt < 1 ? 0 : Number.parseFloat((freight_amt / custom_amt) * 100); // 운임율
             const custom_tax_rate = custom_amt < 1 ? 0 : Number.parseFloat((custom_tax / custom_amt) * 100); // 통관세율(관세+운임율)
     
+            ff.tariff_amt.value = Comma(Math.round(tariff_amt));
             ff.tariff_rate.value = tariff_rate.toFixed(2);
             ff.freight_rate.value = freight_rate.toFixed(2);
             ff.custom_tax.value = Comma(custom_tax);
@@ -798,12 +806,16 @@
     /** 입고저장 */
     const getFormValue = (form, key) => form.hasOwnProperty(key) ? form[key].value : '';
     function saveCmd(cmd) {
-        let confirm_msg = "저장하시겠습니까?";
-        if (cmd == 'addstockcmd') confirm_msg = "상품을 추가입고하시겠습니까?\n(기본정보는 수정되지 않습니다.)";
-        if (!confirm(confirm_msg)) return;
-
-        const ff = document.search;
         const rows = gx.getRows();
+
+        let confirm_msg = "저장하시겠습니까?";
+        if (cmd == 'addstockcmd') {
+            if (rows.filter(row => !row.stock_prd_no).length < 1) return alert("추가입고할 상품이 없습니다.");
+            confirm_msg = "상품을 추가입고하시겠습니까?";
+        }
+        if (!confirm(confirm_msg)) return;
+        
+        const ff = document.search;
         const data = {
             cmd: cmd,
             data: rows,

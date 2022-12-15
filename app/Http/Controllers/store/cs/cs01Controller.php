@@ -462,8 +462,6 @@ class cs01Controller extends Controller {
 		$area_type				= ($currency_unit == KRW) ? "D" : "O"; 		//입고지역
 		$data					= $request->input("data");
 
-		$prd_cd = $request->input("prd_cd"); // 상품코드
-
 		if ($currency_unit == KRW) {
 			$exchange_rate = 0;
 			$custom_amt = 0;
@@ -680,92 +678,92 @@ class cs01Controller extends Controller {
 	public function addStockCmd(Request $request) { // 입고번호, 데이터
 
 		$stock_no = $request->input('stock_no');
-		$data = $request->input('data');
+		$invoice_no				= $request->input("invoice_no");			//송장번호
+		$bl_no					= $request->input("bl_no", "");				//통관번호 (B/L No.)
+		$stock_date				= str_replace('-','',$request->input("stock_date")); //입고일자
+		$com_id					= $request->input("com_id");				//공급처
+		$item					= $request->input("item");					//품목
+		$loc					= $request->input("loc");					//위치
+		
+		$currency_unit			= $request->input("currency_unit");			//화폐단위
+		$exchange_rate			= $request->input("exchange_rate");			//환율
+		$exchange_rate			= str_replace(",", "", $exchange_rate);
+		$custom_amt				= $request->input("custom_amt");			//신고금액
+		$custom_amt				= str_replace(",","", $custom_amt);
+		$tariff_amt				= $request->input("tariff_amt");			//관세총액
+		$tariff_amt				= str_replace(",","",$tariff_amt);
+		$freight_amt			= $request->input("freight_amt");			//운임비
+		$freight_amt			= str_replace(",","",$freight_amt);
+		$custom_tax				= intval($tariff_amt) + intval($freight_amt); //통관비 = 관세총액 + 운임비
 
-		$custom_amt = $request->input("custom_amt"); //신고금액
-		$custom_amt = str_replace(",","", $custom_amt);
-	
+		$tariff_rate = 0;
+		$freight_rate = 0;
+		$custom_tax_rate = 0;
+
+		$area_type				= ($currency_unit == KRW) ? "D" : "O"; 		//입고지역
+		$data 					= $request->input('data');
+
+		if ($currency_unit == KRW) {
+			$exchange_rate = 0;
+			$custom_amt = 0;
+			$tariff_amt = 0;
+			$freight_amt = 0;
+		}
+
 		$opts		= "";
 		$opt_cnt 	= 0;
 
-		$sql = "
-			select
-				invoice_no, bl_no, state, loc, stock_date, com_id, currency_unit, exchange_rate,
-				tariff_amt, freight_amt, custom_amt, custom_tax
-			from product_stock_order
-			where stock_no = '$stock_no'
-		";
-		$row = DB::selectOne($sql);
+		$cur_state = DB::table('product_stock_order')->where('stock_no', $stock_no)->value('state');
 
-		if ($row->state == 30) { // 입고완료 시에만 추가입고 가능
-
-			$invoice_no = $row->invoice_no;
-			$state = $row->state;
-			$loc = $row->loc;
-			// $stock_date = $row->stock_date;
-			$stock_date = date('Ymd');
-			$com_id = $row->com_id;
-			$currency_unit = $row->currency_unit;
-			$exchange_rate = $row->exchange_rate;
-			$tariff_amt = $row->tariff_amt;
-			$freight_amt = $row->freight_amt;
-			$custom_tax = $row->custom_tax;
-
-			$tariff_rate = 0;
-			$freight_rate = 0;
-			$custom_tax_rate = 0;
-
-			if ($currency_unit == KRW) {
-				$exchange_rate = 0;
-				$custom_amt = 0;
-				$tariff_amt = 0;
-				$freight_amt = 0;
-			}
-
-			if ($currency_unit != KRW) {
-				$tariff_rate = $custom_amt < 1 ? 0 : round(($tariff_amt / $custom_amt) * 100, 2); // 관세율 = 관세총액 / 신고금액
-				$freight_rate = $custom_amt < 1 ? 0 : round(($freight_amt / $custom_amt) * 100, 2); // 운임율 = 운임비 / 신고금액
-				$custom_tax_rate = $custom_amt < 1 ? 0 : round(($custom_tax / $custom_amt) * 100, 2); // 통관세율 = 통관비 / 신고금액
-			}
-
-			try {
-				DB::beginTransaction();	
+		try {
+			if ($cur_state == 30) { // 입고완료 시에만 추가입고 가능
+				DB::beginTransaction();
+	
+				if ($currency_unit != KRW) {
+					$tariff_rate = $custom_amt < 1 ? 0 : round(($tariff_amt / $custom_amt) * 100, 2); // 관세율 = 관세총액 / 신고금액
+					$freight_rate = $custom_amt < 1 ? 0 : round(($freight_amt / $custom_amt) * 100, 2); // 운임율 = 운임비 / 신고금액
+					$custom_tax_rate = $custom_amt < 1 ? 0 : round(($custom_tax / $custom_amt) * 100, 2); // 통관세율 = 통관비 / 신고금액
+				}
 
 				$params = [
-					'tariff_rate'	=> $tariff_rate,
-					'freight_rate'	=> $freight_rate,
+					'invoice_no'	=> $invoice_no, 
+					'bl_no'			=> $bl_no, 
+					'stock_date'	=> $stock_date,
+					'area_type'		=> $area_type,
+					'com_id'		=> $com_id,
+					'currency_unit'	=> $currency_unit,
+					'exchange_rate'	=> $exchange_rate,
+					'tariff_amt'	=> $tariff_amt,
+					'tariff_rate'	=> $tariff_rate, 
+					'freight_amt'	=> $freight_amt,
+					'freight_rate'	=> $freight_rate, 
 					'custom_amt'	=> $custom_amt,
-					'custom_tax_rate' => $custom_tax_rate,
-					'opts' 	=> $opts,
-					'ut'	=> now(),
+					'custom_tax'	=> $custom_tax, 
+					'custom_tax_rate' => $custom_tax_rate, 
+					'state'			=> $cur_state,
+					'loc'			=> $loc,
+					'opts'			=> $opts,
+					'ut'			=> now(),
 				];
 				DB::table('product_stock_order')->where('stock_no', $stock_no)->update($params);
 
 				// 개별상품 입고처리
-				$values = [
-					'stock_no' => $stock_no,
-					'invoice_no' => $invoice_no,
-					'state' => $state,
-					'loc' => $loc,
-					'com_id' => $com_id,
-					'stock_date' => $stock_date,
-				];
+				$values = array_merge($params, [ 'stock_no' => $stock_no ]);
 				$this->saveStockOrderProduct("A", $values, $data);
 
 				DB::commit();
-			} catch(Exception $e) {
-				DB::rollBack();
-				$message = "입고 추가에 실패했습니다.";
-				$code = 0;
-				if ($e->getPrevious()) {
-					$message = $e->getMessage();
-					$code = $e->getCode();
-				}
-				return response()->json(['code' => $code, 'message' => $message], 200);
 			}
-
-			return response()->json(['code' => 1, 'message' => "입고 추가되었습니다."], 200);
+		} catch(Exception $e) {
+			DB::rollBack();
+			$message = "입고 추가에 실패했습니다.";
+			$code = 0;
+			if ($e->getPrevious()) {
+				$message = $e->getMessage();
+				$code = $e->getCode();
+			}
+			return response()->json(['code' => $code, 'message' => $message], 200);
 		}
+		return response()->json(['code' => 1, 'message' => "입고 추가되었습니다."], 200);
 	}
 
 	public function listProduct($stock_no) {
