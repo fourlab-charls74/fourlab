@@ -813,92 +813,6 @@ class cs01Controller extends Controller {
 
 	/**
 	 * 상품 입고
-	 */
-	// public function saveStockProduct($type, $stock_no, $invoice_no, $state, $loc, $stock_date, $com_id, $currency_unit, $exchange_rate, $custom_tax_rate, $opt_cnt, $data, $cur_state = '') {
-	// 	try {
-	// 		DB::beginTransaction();
-	// 		if ($type != "A") { // 추가입고
-	// 			$sql = "
-	// 				delete from product_stock_order_product
-	// 				where stock_no = :stock_no
-	// 			";
-	// 			DB::delete($sql, ['stock_no' => $stock_no]);
-	// 		}
-	// 		$products = $data;
-	// 		if (count($products) > 0) {
-	// 			$id = Auth::guard('head')->user()->id;
-	// 			for ($i=0; $i<count($products); $i++) {
-
-	// 				$row = $products[$i];
-	// 				$stock_prd_no = $row['stock_prd_no'] ?? 0;
-
-	// 				if ($type == "A" && $stock_prd_no > 0) {
-	// 				} else {
-	// 					$item = $row['item'];
-	// 					$brand = $row['brand'];
-	// 					$style_no = $row['style_no'];
-	// 					$goods_no = $row['goods_no'];
-	// 					$prd_cd = $row['prd_cd'];
-						
-	// 					if ($goods_no > 0) {
-	// 						$unit_cost = str_replace(",","",str_replace("\\","",$row['unit_cost']));
-	// 						$cost = str_replace(",","",$row['cost']);
-	// 						if ($currency_unit == KRW) {
-	// 							$cost = $unit_cost;
-	// 							$cost_notax = round($cost / 1.1);
-	// 						} else {
-	// 							$cost = round($unit_cost * $exchange_rate * ( 1 + $custom_tax_rate / 100));
-	// 							$cost_notax = round($cost / 1.1);
-	// 						}
-							
-	// 						$opt = array_key_exists('opt_kor', $row) ? trim($row['opt_kor']) : "NONE";
-	// 						if ($opt == "") $opt = "NONE";
-
-	// 						$qty = $row['qty'];
-	// 						$exp_qty = $row['exp_qty'];
-
-	// 						if ($opt != "" && ($qty > 0 || $exp_qty > 0)) {
-
-	// 							$sql = "
-	// 								insert into product_stock_order_product
-	// 								( stock_no,invoice_no,com_id,item,brand,style_no, prd_cd, goods_no,goods_sub,opt_kor,
-	// 									exp_qty,qty,unit_cost,cost_notax,cost,state,stock_date,id,rt,ut ) values
-	// 								( '${stock_no}', '${invoice_no}',
-	// 									'${com_id}', '${item}', '${brand}','${style_no}', '${prd_cd}', '${goods_no}','0','${opt}',
-	// 									'${exp_qty}','${qty}','${unit_cost}','${cost_notax}','${cost}','${state}','${stock_date}','${id}',now(),now())
-	// 							";
-
-	// 							DB::insert($sql);
-	// 						}
-
-	// 						if ($state == 30) { // 입고 완료인 경우
-	// 							if ($cur_state < $state) {
-	// 								$this->stockIn($goods_no, $prd_cd, $opt, $qty, $stock_no, $invoice_no, $cost, $loc);
-	// 							}
-	// 						}
-
-	// 						if ($state == 40) { // 원가확정인 경우
-	// 							$this->confirmWonga($stock_no, $prd_cd, $qty, $cost);
-	// 						}
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 		DB::commit();
-	// 	} catch (Exception $e) {
-	// 		DB::rollback();
-	// 		$message = "상품 입고중 에러가 발생했습니다. 잠시 후 다시시도 해주세요.";
-	// 		$code = -1;
-	// 		if ($e->getPrevious()) {
-	// 			$message = $e->getMessage();
-	// 			$code = $e->getCode();
-	// 		}
-	// 		throw new Exception($message, $code, $e);
-	// 	}
-	// }
-
-	/**
-	 * 상품 입고 (NEW)
 	 * $type: 추가입고(A) / 기본(E) 
 	 */
 	public function saveStockOrderProduct($type, $values, $products, $cur_state = 0)
@@ -1115,9 +1029,9 @@ class cs01Controller extends Controller {
 				];
 				DB::table('product_stock')->where('prd_cd', '=', $prd_cd)->update($values);
 
-				// 2. 입고완료 ~ 원가확정 기간동안 판매된 주문건(및 hst)의 원가 값 업데이트
 				$fin_rt = DB::table('product_stock_order')->where('stock_no', '=', $stock_no)->value('fin_rt');
 				if ($fin_rt != null) {
+					// 2. 입고완료 ~ 원가확정 기간동안 판매된 주문건(및 hst)의 원가 값 업데이트
 					$where = " where ord_date >= '$fin_rt' and ord_date <= now() and prd_cd = '$prd_cd' ";
 
 					$sql = "
@@ -1141,12 +1055,23 @@ class cs01Controller extends Controller {
 							->where('prd_cd', $prd_cd)->where('ord_opt_no', $ord->ord_opt_no)
 							->update([ 'wonga' => $avg_wonga ]);
 					}
+
+					// 3. 입고완료 ~ 원가확정 기간동안 매장으로 출고된 hst 로그 기록의 원가 값 업데이트
+					$fin_date = date('Ymd', strtotime($fin_rt));
+					$sql = "
+						update product_stock_hst set
+							wonga = '$avg_wonga'
+						where prd_cd = '$prd_cd' 
+							and ((type = '1' and location_type = 'STORE') or (type = '17' and location_type = 'STORAGE')) 
+							and stock_state_date >= '$fin_date' and stock_state_date <= '$fin_date'
+					";
+					DB::update($sql);
 				}
 
-				// 3. product_stock_hst 에서 창고입고 시 단가 수정
+				// 4. product_stock_hst 에서 창고입고 시 단가 수정
 				DB::table('product_stock_hst')
-				->where('prd_cd', $prd_cd)->where('invoice_no', $invoice_no)
-				->update([ 'wonga' => $cost ]);
+					->where('prd_cd', $prd_cd)->where('type', '1')->where('invoice_no', $invoice_no)
+					->update([ 'wonga' => $cost ]);
 			}
 
 			DB::commit();
