@@ -59,7 +59,6 @@ Login
 							<a href="">비밀번호찾기</a>
 						</li>
 					</ul>
-					{{$_SERVER['SERVER_NAME']}}
 					@if($_SERVER['SERVER_NAME'] != 'devel.fjallraven.co.kr')
 					<div class="pt50" style="font-size:15px;color:#FF0000;font-weight:bold;">
 						@if($_SERVER['SERVER_NAME'] == 'handle.fjallraven.co.kr')
