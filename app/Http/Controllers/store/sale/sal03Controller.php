@@ -77,18 +77,18 @@ class sal03Controller extends Controller
 		$ord_field = $request->input('ord_field','p.goods_no');
 
 		if ($best_worst == 'B') {
-			$orderby = sprintf("order by %s %s", $ord_field, "desc");
+			$orderby = sprintf("order by %s %s, total_sale_rate asc", $ord_field, "desc");
 		} else if ($best_worst == 'W') {
-			$orderby = sprintf("order by %s %s", $ord_field, "asc");
+			$orderby = sprintf("order by %s %s, total_sale_rate asc" , $ord_field, "asc");
 		}else {
-			$orderby = sprintf("order by %s %s", $ord_field, $ord);
+			$orderby = sprintf("order by %s %s, total_sale_rate asc", $ord_field, $ord);
 		}
 
 		$where	= "";
 		if ($com_type != "") $where .= " and g.com_type = '$com_type' ";
 		if ($store_type != "")	$where .= " and s.store_type = '" . $store_type . "' ";
 		if ($store_cd != "")	$where .= " and m.store_cd = '" . $store_cd . "' ";
-		if ($prd_cd != "")	$where .= " and o.prd_cd = '" . $prd_cd . "' ";
+		if ($prd_cd != "")	$where .= " and o.prd_cd like '" . $prd_cd . "%' ";
 		if ($com_id != "") $where .= " and g.com_id = '" . Lib::quote($com_id) . "'";
 		if ($com_nm != "") $where .= " and g.com_nm like '%" . Lib::quote($com_nm) . "%' ";
 		if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%' ";
@@ -174,9 +174,9 @@ class sal03Controller extends Controller
 				rel.prc_rt as ex_date,
 				
 				-- 총판매
-				ifnull(a.total_ord_qty,'0') as total_ord_qty,
+				ifnull(a.qty,'0') as total_ord_qty,
 				ifnull(a.total_ord_amt ,'0') as total_ord_amt,
-				ifnull(round((a.total_ord_qty / ps.qty) * 100),0) as total_sale_rate,
+				ifnull(round((a.qty / ps.qty) * 100),0) as total_sale_rate,
 				
 				-- 기간판매
 				a.per_qty as ord_qty,
@@ -191,9 +191,8 @@ class sal03Controller extends Controller
 						sum(c.qty) as per_qty,
 						sum(c.price) as t_price,
 						o.prd_cd,
-						sum(w.qty) as total_ord_qty,
+						sum(w.qty) as qty,
 						sum(o.recv_amt) as total_ord_amt,
-						sum(w.qty) as ord_qty,
 						sum(w.recv_amt + w.point_apply_amt) as ord_amt,
 						avg(w.wonga) as wonga,
 						g.goods_type,
@@ -218,7 +217,7 @@ class sal03Controller extends Controller
 						) c on c.ord_no = o.ord_no
 					where 
 						w.`ord_state` in ( '30','60','61') 
-						and o.prd_cd <> '' 
+						and o.prd_cd <> '' and o.ord_date >= '$sdate2' and o.ord_date <= '$edate2'
 						$where
 					group by o.prd_cd
 				) as a 
@@ -238,12 +237,11 @@ class sal03Controller extends Controller
 						psr.qty as qty,
 						left(psr.prc_rt, 10) as prc_rt
 					from product_stock_release psr
-						inner join product_stock ps on psr.prd_cd = ps.prd_cd
-					
 				) as rel on a.prd_cd = rel.prd_cd
 			$orderby 
 			$limit
 		";
+		
 
 		$result = DB::select($sql);
 
@@ -254,6 +252,7 @@ class sal03Controller extends Controller
 		$page_cnt = 0;
 
 		if ( $page == 1 ) {
+
 			$query = /** @lang text */
             	"
 				select
@@ -267,16 +266,14 @@ class sal03Controller extends Controller
 					, sum(rel.qty) as ex_sum_qty
 
 					-- 총판매
-					, sum(a.total_ord_qty) as total_ord_qty
+					, sum(a.qty) as total_ord_qty
 					, sum(a.total_ord_amt) as total_ord_amt
-					, sum(ifnull(round((a.w_qty / ps.qty) * 100),0)) as total_sale_rate
-					-- , sum(a.total_sale_rate) as total_sale_rate
+					, sum(ifnull(round((a.qty / ps.qty) * 100),0)) as total_sale_rate
 
 					-- 기간판매
-					, sum(a.ord_amt) as ord_amt
 					, sum(a.ord_qty) as ord_qty
-					, sum(ifnull(round((a.c_qty / ps.qty) * 100),0)) as sale_rate
-					-- , sum(a.sale_rate) as sale_rate
+					, sum(a.sum_ord_amt) as ord_amt
+					, sum(ifnull(round((a.sum_c_qty / ps.qty) * 100),0)) as sale_rate
 
 					-- 매장재고, 창고재고
 					, sum(ifnull(ps.qty, '0')) as stock_qty 
@@ -287,16 +284,11 @@ class sal03Controller extends Controller
 						o.prd_cd,
 						count(*) as cnt,
 						sum(c.qty) as ord_qty,
-						sum(c.price) as ord_amt,
-						sum(w.qty) as total_ord_qty,
+						sum(c.price) as sum_ord_amt,
+						sum(w.qty) as qty,
 						sum(o.recv_amt) as total_ord_amt,
-						avg(w.wonga) as wonga,
-						sum(w.qty) as w_qty,
-						sum(c.qty) as c_qty,
-						g.goods_type,
-						o.goods_no, g.brand, b.brand_nm, g.style_no, o.goods_opt, g.img, g.goods_nm, g.goods_nm_eng,
-						concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color, pc.size
-
+						sum(ifnull(round((w.qty / ps.qty) * 100),0)) as total_sale_rate, 
+						sum(c.qty) as sum_c_qty
 					from order_mst m 
 						inner join order_opt o on m.ord_no = o.ord_no
 						inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
@@ -319,9 +311,9 @@ class sal03Controller extends Controller
 					where 
 						w.`ord_state` in ( '30','60','61') 
 						and o.prd_cd <> ''
-						$where
+						$where and o.ord_date >= '$sdate2' and o.ord_date <= '$edate2'
 						group by o.prd_cd
-						$orderby 
+						$orderby
 						$limit
 				) as a 
 				inner join product_stock ps on a.prd_cd = ps.prd_cd
@@ -340,9 +332,9 @@ class sal03Controller extends Controller
 						psr.qty as qty,
 						left(psr.prc_rt, 10) as prc_rt
 					from product_stock_release psr
-						inner join product_stock ps on psr.prd_cd = ps.prd_cd
-					
 				) as rel on a.prd_cd = rel.prd_cd
+				$orderby
+				$limit
 			";
 
 			$row = DB::selectOne($query);
