@@ -612,6 +612,8 @@
 		}).then(function(res) {
 			if (res.data.code === 200) {
 				alert("저장이 완료되었습니다.");
+				window.close();
+				opener.Search();
 			} else if (res.data.code === -1) {
 				const prd_cd = res.data.prd_cd;
 				alert(`${prd_cd}는 중복되었거나 이미 존재하는 상품 코드입니다.\n중복을 제거하거나 상품 코드를 재확인 후 다시 시도해주세요.`);
@@ -897,6 +899,7 @@
 				if (data.code == '200') {
 						if (prd_nm[1] != '신규 생성') {
 								document.getElementById('prd_nm').value = data.result[0].prd_nm;
+								document.getElementById('prd_nm_eng').value = data.result[0].prd_nm_eng;
 								document.getElementById('style_no').value = data.result[0].style_no;
 								document.getElementById('tag_price').value = data.result[0].tag_price;
 								document.getElementById('price').value = data.result[0].price;
@@ -904,6 +907,7 @@
 								document.getElementById('sup_com').value = data.result[0].com_id;
 								
 								document.getElementById('prd_nm').readOnly = true;
+								document.getElementById('prd_nm_eng').readOnly = true;
 								document.getElementById('style_no').readOnly = true;
 								document.getElementById('tag_price').readOnly = true;
 								document.getElementById('price').readOnly = true;
@@ -912,6 +916,7 @@
 
 							} else {
 								document.getElementById('prd_nm').value = '';
+								document.getElementById('prd_nm_eng').value = '';
 								document.getElementById('style_no').value = '';
 								document.getElementById('tag_price').value = '';
 								document.getElementById('price').value = '';
@@ -920,6 +925,7 @@
 
 
 								document.getElementById('prd_nm').readOnly = false;
+								document.getElementById('prd_nm_eng').readOnly = false;
 								document.getElementById('style_no').readOnly = false;
 								document.getElementById('tag_price').readOnly = false;
 								document.getElementById('price').readOnly = false;

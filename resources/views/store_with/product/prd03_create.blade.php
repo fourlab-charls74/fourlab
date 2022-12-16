@@ -161,6 +161,15 @@
 													<input type='text' class="form-control form-control-sm" name='prd_nm' id="prd_nm" value=''>
 												</div>
 											</td>
+											<th class="required">원부자재명(영문)</th>
+											<td>
+												<div class="flax_box">
+													<input type='text' class="form-control form-control-sm" name='prd_nm_eng' id="prd_nm_eng" value=''>
+												</div>
+											</td>
+											
+										</tr>
+										<tr>
 											<th class="required">원부자재 업체</th>
 											<td>
 												<div class="flax_box">
@@ -172,29 +181,28 @@
 													</select>
 												</div>
 											</td>
-										</tr>
-										<tr>
 											<th class="required">Tag가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='tag_price' id="tag_price" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
+										</tr>
+										<tr>
 											<th class="required">판매가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='price' id="price" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
-											
-										</tr>
-										<tr>
 											<th class="required">원가</th>
 											<td>
 											<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='wonga' id="wonga" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
+										</tr>
+										<tr>
 											<th class="required">단위</th>
 											<td>
 												<div class="flax_box">
@@ -205,6 +213,9 @@
 														@endforeach
 													</select>
 												</div>
+											</td>
+											<th></th>
+											<td>
 											</td>
 										</tr>
 										<tr>
@@ -313,6 +324,11 @@
 			field: "prd_nm",
 			headerName: "원부자재명",
 			width: 100
+		},
+		{
+			field: "prd_nm_eng",
+			headerName: "원부자재명(영문)",
+			width: 110
 		},
 		{
 			field: "seq",
@@ -505,6 +521,7 @@
 				color: document.f1.color.value,
 				size: document.f1.size.value,
 				prd_nm: document.f1.prd_nm.value,
+				prd_nm_eng: document.f1.prd_nm_eng.value,
 				sup_com: document.f1.sup_com.value,
 				unit: document.f1.unit.value,
 				year: document.f1.year.value,
@@ -527,6 +544,7 @@
 				color: document.f1.color[document.f1.color.selectedIndex].text,
 				size: document.f1.size[document.f1.size.selectedIndex].text,
 				prd_nm: document.f1.prd_nm.value,
+				prd_nm_eng: document.f1.prd_nm_eng.value,
 				sup_com: document.f1.sup_com[document.f1.sup_com.selectedIndex].text,
 				unit: document.f1.unit[document.f1.unit.selectedIndex].text,
 				year: document.f1.year[document.f1.year.selectedIndex].text,
@@ -596,6 +614,12 @@
 		if (f1.prd_nm.value.trim() === '') {
 			f1.prd_nm.focus();
 			return alert("원부자재명을 입력해주세요.");
+		}
+
+		// 원부자재명(영문) 입력여부
+		if (f1.prd_nm_eng.value.trim() === '') {
+			f1.prd_nm_eng.focus();
+			return alert("원부자재명(영문)을 입력해주세요.");
 		}
 
 		// 원부자재 업체 입력여부

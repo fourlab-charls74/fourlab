@@ -29,7 +29,7 @@
 							<div class="form-inline date-select-inbox">
 								<div class="docs-datepicker form-inline-inner input_box">
 									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date month" id="sdate" name="sdate" value="{{ $sdate }}" onchange="return isSearch('');" autocomplete="off" disable>
+										<input type="text" class="form-control form-control-sm docs-date month" name="sdate" value="{{ $sdate }}" onchange="return isSearch('');" autocomplete="off" disable>
 										<div class="input-group-append">
 											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
 												<i class="fa fa-calendar" aria-hidden="true"></i>
@@ -41,7 +41,7 @@
 								<span class="text_line">~</span>
 								<div class="docs-datepicker form-inline-inner input_box">
 									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date month" id="edate" name="edate" value="{{ $edate }}" onchange="return isSearch('');"  autocomplete="off">
+										<input type="text" class="form-control form-control-sm docs-date month" name="edate" value="{{ $edate }}" onchange="return isSearch('');"  autocomplete="off">
 										<div class="input-group-append">
 											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
 												<i class="fa fa-calendar" aria-hidden="true"></i>
@@ -112,23 +112,15 @@
         { headerName: "#", field: "num", type:'NumType', pinned:'left', aggSum:"합계", cellStyle: { 'text-align': "center" },
             cellRenderer: function (params) {
                 if (params.node.rowPinned === 'top') {
-                    return "";
+                    return "합계";
                 } else {
                     return parseInt(params.value) + 1;
                 }
             }
         },
-        { field: "store_type_nm", headerName: "매장구분", pinned:'left', width:90, cellStyle: { 'text-align': "center" },
-			cellRenderer: function (params) {
-					if (params.node.rowPinned === 'top') {
-						return "합계";
-					} else {
-						return params.data.store_type_nm
-					}
-				},
-		},
+        { field: "store_type_nm", headerName: "매장구분", pinned:'left', width:90, cellStyle: { 'text-align': "center" } },
         { field: "scd", headerName: "매장코드", pinned:'left', hide: true },
-        { field: "store_nm", headerName: "매장명", pinned:'left', type: 'StoreNameType', width: 200},
+        { field: "store_nm", headerName: "매장명", pinned:'left', type: 'StoreNameType', width: 250 },
         {
             field: "summary", headerName: "합계",
             children: [
@@ -158,7 +150,7 @@
                 { field: 'last_recv_amt_{{$month["val"]}}', headerName: "전년", type: 'currencyMinusColorType', width:75, aggregation: true },
                 { field: 'recv_amt_{{$month["val"]}}', headerName: "금액", type: 'currencyMinusColorType', width:75, aggregation: true},
                 { field: 'progress_proj_amt_{{$month["val"]}}', headerName: "달성율(%)", type: 'currencyMinusColorType', aggregation: true,
-                    cellRenderer: params => goalProgress2(params.data)
+                    cellRenderer: params => goalProgress(params.data)
                 }
             ]
         },
@@ -174,57 +166,42 @@
 	 * 
 	 */
 	const goalProgress = (row, Ym) => {
+		let prefix = "";
 		let progress = 0;
-		let proj_amt = toInt(row[`proj_amt`]);
-		let recv_amt = toInt(row[`recv_amt`]);
+		if (Ym) prefix = `_${Ym}`;
+		let proj_amt = toInt(row[`proj_amt${prefix}`]);
+		let recv_amt = toInt(row[`recv_amt${prefix}`]);
+
+		// if (progress > 100) return progress = 100; // 달성율 100 넘어가는 경우 100으로 고정
+		// if (proj_amt <= recv_amt) return progress = 100; // 목표액보다 큰 경우 100 처리
 
 		if (proj_amt == 0) return progress = 0; //목표액이 0이면 달성율도 0으로 표시
-		if (recv_amt == 0) return progress = 0; //금액이 0이면 달성율도 0으로 표시
-		if (proj_amt == 0 && recv_amt == 0) return progress = 0;
+		if (recv_amt == 0) return progress = 0; //목표액이 0이면 달성율도 0으로 표시
 
-		progress = Comma(Math.round(( recv_amt / proj_amt ) * 100)); // 소수점 첫째짜리까지 반올림 처리
+		if (proj_amt == 0 && recv_amt == 0) return 0;
+
+		progress = ( recv_amt / proj_amt ) * 100;
+		progress = Comma(Math.round(progress * 1)); // 소수점 첫째짜리까지 반올림 처리
 
 		if (progress == -Infinity) progress = 0;
 
 		return progress;
 	};
-	
-	// const goalProgress2 = (row, Ym) => {
-	// 	let sdate = document.getElementById('sdate').value;
-	// 	let edate = document.getElementById('edate').value;
-	// 	let re_sdate = sdate.replace("-", "");
-	// 	let re_edate = edate.replace("-", "");
-		
 
-
-	// 	let proj_amt2 = toInt(row[`proj_amt_` + re_sdate]);
-	// 	let recv_amt2 = toInt(row[`recv_amt_` + re_sdate]);
-
-
-	// 	if (proj_amt2 == 0) return progress = 0; //목표액이 0이면 달성율도 0으로 표시
-	// 	if (recv_amt2 == 0) return progress = 0; //금액이 0이면 달성율도 0으로 표시
-
-	// 	if (proj_amt2 == 0 && recv_amt2 == 0) return progress = 0;
-
-	// 	progress2 = Comma(Math.round(( recv_amt2 / proj_amt2 ) * 100)); // 소수점 첫째짜리까지 반올림 처리
-
-	// 	if (progress2 == -Infinity) progress2 = 0;
-
-	// 	return progress2;
-	// };
-
-	
 	const pApp = new App('',{
 		gridId:"#div-gd",
 	});
-
 	let gx;
 	$(document).ready(function() {
 		pApp.ResizeGrid(265);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		let options = {
-			getRowStyle: (params) => params.node.rowPinned ? ({'font-weight': 'bold', 'background-color': '#eee', 'border': 'none'}) : false,
+			getRowStyle: (params) => {
+				if (params.node.rowPinned === 'top') {
+					return { 'background': '#eee' }
+				}
+			},
 			onCellValueChanged: params => evtAfterEdit(params)
 		}
 		gx = new HDGrid(gridDiv, columns, options);
@@ -241,15 +218,15 @@
 		if ($('#is_searched').val() === 'y') {
 			let data = $('form[name="search"]').serialize();
 			gx.Aggregation({ sum: "top" });
-			gx.Request('/store/sale/sal17/search', data, -1);
+			gx.Request('/store/sale/sal17/search', data, -1, (e) => afterSearch(e));
 		} else {
             isSearch('y');
 			$('form[name="search"]').submit();
 		}
 	}
 
-	// const afterSearch = (e) => {
-	// };
+	const afterSearch = (e) => {
+	};
 
 	const formReset = () => {
 		document.search.reset();
@@ -258,8 +235,6 @@
 	const startEditingCell = (row_index, col_key) => {
         gx.gridOptions.api.startEditingCell({ rowIndex: row_index, colKey: col_key });
     };
-
-	
 
 	const evtAfterEdit = async (params) => {
 
@@ -303,9 +278,11 @@
 					});
 
 					row['proj_amt'] = total_proj;
+					// row[`progress_proj_amt_${Ym}`] = goalProgress(row, Ym);
+					// row[`progress_proj_amt_${Ym}`] = row[`proj_amt_{{$month["val"]}}`] / row[`recv_amt_{{$month["val"]}}`] * 100;
 					row[`progress_proj_amt_${Ym}`] = row[`proj_amt_{{$month["val"]}}`] / row[`recv_amt_{{$month["val"]}}`] * 100;
 
-					//변경된 목표 저장
+					// 변경된 목표 저장
 					const response = await axios({
 						url: `/store/sale/sal17/update`, method: 'post',
 						data: { 'store_cd': row.scd, 'proj_amt': value, 'Ym': Ym }
@@ -314,7 +291,6 @@
 					if (data?.code == 200) {
 						gx.gridOptions.api.applyTransaction({ update: [row] });
 						gx.CalAggregation();
-						Search();
 						return true;
 					} else if (data?.code == 500) {
 						alert('목표 저장에 실패했습니다. 잠시후 다시 시도해주세요.');
@@ -323,29 +299,6 @@
 			}
 		}
 	};
-
-	function Save() {
-
-		if(!confirm("목표를 저장하시겠습니까?")) return;
-
-                axios({
-                    url: `/store/sale/sal17/update`,
-                    method: 'post',
-                    data: {
-						data: { 'store_cd': row.scd, 'proj_amt': value, 'Ym': Ym }
-                    },
-                }).then(function (res) {
-                    if(res.data.code === 200) {
-                        alert(res.data.msg);
-                        Search();
-                    } else {
-                        console.log(res.data.msg);
-                        alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-                    }
-                }).catch(function (err) {
-                    console.log(err);
-                });
-	}
 
 	const toInt = (value) => {
 		if (value == "" || value == NaN || value == null || value == undefined) return 0;

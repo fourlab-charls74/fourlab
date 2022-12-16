@@ -258,6 +258,7 @@ class prd03Controller extends Controller
 				$year = $row['year'];
 				
 				$prd_nm	= $row['prd_nm'];
+				$prd_nm_eng	= $row['prd_nm_eng'];
 				$prd_cd	= $row['prd_cd'];
 
 				$sql = "select count(*) as count from product where prd_cd = :prd_cd";
@@ -268,6 +269,7 @@ class prd03Controller extends Controller
 					DB::table('product')->insert([
 						'prd_cd' => $prd_cd,
 						'prd_nm' => $prd_nm,
+						'prd_nm_eng' => $prd_nm_eng,
 						'type' => $type,
 						'tag_price' => $tag_price,
 						'price' => $price,
