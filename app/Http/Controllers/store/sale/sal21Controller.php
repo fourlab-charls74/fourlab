@@ -107,6 +107,7 @@ class sal21Controller extends Controller
                 g.style_no,
                 stat.code_val as sale_stat_cl, 
                 g.goods_nm,
+                g.goods_nm_eng,
                 pc.goods_opt,
                 g.goods_sh,
                 g.price,
