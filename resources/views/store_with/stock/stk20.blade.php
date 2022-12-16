@@ -360,12 +360,23 @@
                 return rt_states[params.value];
             }
         },
+        {field: "dep_store_cd",	headerName: "매장코드", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
         {field: "dep_store_nm",	headerName: "보내는 매장", pinned: 'left', width: 150},
+        {field: "store_cd",	headerName: "매장코드", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
         {field: "store_nm",	headerName: "받는 매장", pinned: 'left', width: 150},
-        {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
+        {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 110, cellStyle: {"text-align": "center"}},
         {field: "goods_no",	headerName: "상품번호", width: 70, cellStyle: {"text-align": "center"}},
         {field: "style_no",	headerName: "스타일넘버", width: 70, cellStyle: {"text-align": "center"}},
-        {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 150},
+        {field: "goods_nm",	headerName: "상품명", width: 150,
+            cellRenderer: function (params) {
+                if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
+                    return '<a href="javascript:void(0);" onclick="return alert(`상품번호가 비어있는 상품입니다.`);">' + (params.value || '') + '</a>';
+                } else {
+                    let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
+                    return '<a href="#" onclick="return openHeadProduct(\'' + goods_no + '\');">' + (params.value || '') + '</a>';
+                }
+            }
+        },
         {field: "goods_nm_eng",	headerName: "상품명(영문)", width: 150},
         {field: "prd_cd_p",	headerName: "코드일련", width: 90, cellStyle: {"text-align": "center"}},
         {field: "color",	headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},

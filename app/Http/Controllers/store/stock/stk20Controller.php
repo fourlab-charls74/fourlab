@@ -146,16 +146,16 @@ class stk20Controller extends Controller
                 psr.idx,
                 psr.type,
                 psr.goods_no, 
-                g.style_no, 
-                g.goods_nm,
-                g.goods_nm_eng,
+                if(psr.goods_no > 0, g.style_no, p.style_no) as style_no,
+                if(psr.goods_no > 0, g.goods_nm, p.prd_nm) as goods_nm,
+                if(psr.goods_no > 0, g.goods_nm_eng, p.prd_nm_eng) as goods_nm_eng,
                 psr.prd_cd, 
                 pc.color,
                 pc.size,
                 concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p,
-                psr.goods_opt, 
-                g.price,
-                g.goods_sh,
+                if(psr.goods_no > 0, psr.goods_opt, pc.goods_opt) as goods_opt,
+                if(psr.goods_no > 0, g.price, p.price) as price,
+                if(psr.goods_no > 0, g.goods_sh, p.tag_price) as goods_sh,
                 psr.qty,
                 psr.dep_store_cd,
                 (select store_nm from store where store_cd = psr.dep_store_cd) as dep_store_nm,
@@ -175,6 +175,7 @@ class stk20Controller extends Controller
                 psr.fin_rt
             from product_stock_rotation psr
                 inner join product_code pc on pc.prd_cd = psr.prd_cd
+                inner join product p on p.prd_cd = psr.prd_cd
                 left outer join goods g on g.goods_no = psr.goods_no
             where 1=1 and psr.del_yn = 'N' $where
             $orderby

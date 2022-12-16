@@ -124,6 +124,7 @@ class stk21Controller extends Controller
                 , if(pc.goods_no <> '0', g.goods_nm_eng, p.prd_nm) as goods_nm_eng
                 , concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
                 , pc.color
+                , color.code_val as color_nm
                 , pc.size
                 , pc.goods_opt
                 , if(pc.goods_no <> '0', g.goods_sh, p.tag_price) as goods_sh
@@ -134,7 +135,8 @@ class stk21Controller extends Controller
                 left outer join goods g on g.goods_no = pc.goods_no
                 left outer join brand b on b.br_cd = pc.brand
                 left outer join opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
-            where 1=1 $where
+                left outer join code color on color.code_kind_cd = 'PRD_CD_COLOR' and color.code_id = pc.color
+            where pc.type = 'N' $where
             $orderby
             $limit
         ";

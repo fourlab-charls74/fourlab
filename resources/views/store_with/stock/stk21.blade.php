@@ -246,11 +246,22 @@
         {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"},
             cellRenderer: (params) => `<a href="javascript:void(0);" onclick="SearchStock('${params.rowIndex}')">${params.value}</a>`,
         },
+        {field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"}},
         {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
+        {field: "color_nm", headerName: "컬러명", width: 70},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
         {field: "brand_nm", headerName: "브랜드", width: 70, cellStyle: {"text-align": "center"}},
         {field: "style_no",	headerName: "스타일넘버", width: 70, cellStyle: {"text-align": "center"}},
-        {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 150},
+        {field: "goods_nm",	headerName: "상품명", width: 150,
+            cellRenderer: function (params) {
+                if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
+                    return '<a href="javascript:void(0);" onclick="return alert(`상품번호가 비어있는 상품입니다.`);">' + (params.value || '') + '</a>';
+                } else {
+                    let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
+                    return '<a href="#" onclick="return openHeadProduct(\'' + goods_no + '\');">' + (params.value || '') + '</a>';
+                }
+            }
+        },
         {field: "goods_nm_eng", headerName: "상품명(영문)", width: 150},
         {field: "prd_cd_p", headerName: "코드일련", width: 90, cellStyle: {"text-align": "center"}},
         {field: "goods_opt", headerName: "옵션", width: 150},
@@ -265,8 +276,10 @@
     let stock_columns = [
         {field: "prd_cd", hide: true},
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 30, cellStyle: {"text-align": "center"}},
-        {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, sort: null, width: 28},
+        {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, sort: null, width: 30},
+        {field: "dep_store_cd",	headerName: "매장코드", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
         {field: "dep_store_nm",	headerName: "보내는 매장", pinned: 'left', width: 140},
+        {field: "store_cd",	headerName: "매장코드", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
         {field: "store_nm",	headerName: "받는 매장", pinned: 'left', width: 140, editable: true, cellStyle: {"background-color": "#ffFF99"},
             cellEditorSelector: function(params) {
                 return {
@@ -280,14 +293,14 @@
         {field: "store_cd", hide: true},
         {headerName: "창고재고",
             children: [
-                {field: "storage_qty", headerName: "재고", type: "currencyType", width: 60, 
+                {field: "storage_qty", headerName: "재고", type: "currencyType", width: 65,
                     cellRenderer: function(params) {
                         if (params.value !== undefined) {
                             return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
                         }
                     }
                 },
-                {field: "storage_wqty", headerName: "보유재고", type: "currencyType", width: 60,
+                {field: "storage_wqty", headerName: "보유재고", type: "currencyType", width: 65,
                     cellRenderer: function(params) {
                         if (params.value !== undefined) {
                             return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
@@ -298,14 +311,14 @@
         },
         {headerName: "매장재고",
             children: [
-                {field: "qty", headerName: "재고", type: "currencyType", width: 60,
+                {field: "qty", headerName: "재고", type: "currencyType", width: 65,
                     cellRenderer: function(params) {
                     if (params.value !== undefined) {
                         return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
                     }
             }
                 },
-                {field: "wqty", headerName: "보유재고", type: "currencyType", width: 60,
+                {field: "wqty", headerName: "보유재고", type: "currencyType", width: 65,
                     cellRenderer: function(params) {
                     if (params.value !== undefined) {
                         return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
@@ -314,7 +327,7 @@
                 },
             ]
         },
-        {field: "rt_qty", headerName: "RT수량", type: "numberType", editable: true, cellStyle: {"background-color": "#ffFF99"}},
+        {field: "rt_qty", headerName: "RT수량", type: "currencyType", width: 65, editable: true, cellStyle: {"background-color": "#ffFF99"}},
         {field: "comment", headerName: "메모", width: 200, editable: true, cellStyle: {"background-color": "#ffFF99"}},
         {width: 'auto'}
     ];
@@ -322,7 +335,9 @@
     let rt_columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {"text-align": "center"}},
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, sort: null, width: 28},
+        {field: "dep_store_cd",	headerName: "매장코드", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
         {field: "dep_store_nm",	headerName: "보내는 매장", pinned: 'left', width: 140},
+        {field: "store_cd",	headerName: "매장코드", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
         {field: "store_nm",	headerName: "받는 매장", pinned: 'left', width: 140},
         {field: "rt_qty", headerName: "RT수량", type: "numberType", pinned: 'left', cellStyle: {"font-weight": "700"}},
         {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
@@ -330,9 +345,18 @@
         {field: "opt_kind_nm", headerName: "품목", width: 60, cellStyle: {"text-align": "center"}},
         {field: "brand_nm", headerName: "브랜드", width: 70, cellStyle: {"text-align": "center"}},
         {field: "style_no",	headerName: "스타일넘버", width: 70, cellStyle: {"text-align": "center"}},
-        {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 150},
+        {field: "goods_nm",	headerName: "상품명", width: 150,
+            cellRenderer: function (params) {
+                if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
+                    return '<a href="javascript:void(0);" onclick="return alert(`상품번호가 비어있는 상품입니다.`);">' + (params.value || '') + '</a>';
+                } else {
+                    let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
+                    return '<a href="#" onclick="return openHeadProduct(\'' + goods_no + '\');">' + (params.value || '') + '</a>';
+                }
+            }
+        },
         {field: "goods_nm_eng", headerName: "상품명(영문)", width: 150},
-        {field: "prd_cd_p", headerName: "코드일련", width: 80, cellStyle: {"text-align": "center"}},
+        {field: "prd_cd_p", headerName: "코드일련", width: 90, cellStyle: {"text-align": "center"}},
         {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
         {field: "goods_opt", headerName: "옵션", width: 150},
@@ -359,6 +383,13 @@
         pApp2.BindSearchEnter();
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
         gx2 = new HDGrid(gridDiv2, stock_columns, {
+            defaultColDef: {
+                suppressMenu: true,
+                resizable: false,
+                autoHeight: true,
+                suppressSizeToFit: false,
+                sortable:true,
+            },
             onCellValueChanged: (e) => {
                 e.node.setSelected(true);
                 if (e.column.colId == "rt_qty") {
@@ -371,6 +402,7 @@
                     let arr = stores.filter(s => s.store_nm === e.newValue);
                     if(arr.length > 0) {
                         e.data.store_cd = arr[0].store_cd;
+                        e.api.redrawRows({rowNodes:[e.node]});
                     }
                 }
             }
