@@ -171,6 +171,7 @@ class stk10Controller extends Controller
                 g.goods_nm, 
                 g.goods_nm_eng,
                 opt.opt_kind_nm,
+                brand.brand_nm as brand,
                 pc.color,
                 pc.size,
                 psr.prd_cd,
@@ -207,6 +208,7 @@ class stk10Controller extends Controller
                 inner join product_stock_store pss2 on pss2.prd_cd = psr.prd_cd and pss2.store_cd = psr.store_cd
                 left outer join goods g on g.goods_no = psr.goods_no
                 left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
+                left outer join brand on brand.brand = g.brand
                 left outer join code c on c.code_kind_cd = 'REL_TYPE' and c.code_id = psr.type
                 left outer join store s on s.store_cd = psr.store_cd
                 left outer join storage sg on sg.storage_cd = psr.storage_cd

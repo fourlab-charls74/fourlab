@@ -343,45 +343,48 @@
             },
         },
         // 출고일자 값 : 출고상태가 요청/접수 일때 -> 출고예정일자(exp_dlv_day) | 출고상태가 출고/입고 일때 -> 출고처리일자(prc_rt)
-        {field: "dlv_day", headerName: "출고일자", pinned: 'left', width: 110, cellStyle: {"text-align": "center"}, 
+        {field: "dlv_day", headerName: "출고일자", pinned: 'left', width: 80, cellStyle: {"text-align": "center"}, 
             cellRenderer: function(params) {
                return params.data.state > 0 ? (params.value || '') + (params.data.state < 30 ? ' (예정)' : '') : '';
             }
         },
-        {field: "state", headerName: "출고상태", pinned: 'left', cellStyle: StyleReleaseState,
+        {field: "state", headerName: "출고상태", pinned: 'left', cellStyle: StyleReleaseState, width: 60,
             cellRenderer: function(params) {
                 return rel_states[params.value];
             }
         },
-        {field: "rel_type",	headerName: "출고구분", pinned: 'left', width: 80, cellStyle: {"text-align": "center"}},
-        {field: "store_nm",	headerName: "매장", pinned: 'left', width: 100, cellStyle: {"text-align": "center"}},
+        {field: "rel_type",	headerName: "출고구분", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
+        {field: "store_cd",	headerName: "매장코드", pinned: 'left', width: 60, cellStyle: {"text-align": "center"}},
+        {field: "store_nm",	headerName: "매장", pinned: 'left', width: 140, cellStyle: {"text-align": "center"}},
+        {field: "storage_cd",	headerName: "창고코드", pinned: 'left', width: 60, cellStyle: {"text-align": "center"}},
         {field: "storage_nm", headerName: "창고", pinned: 'left', width: 100, cellStyle: {"text-align": "center"}},
         {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
-		{field: "goods_no",	headerName: "상품번호", cellStyle: {"text-align": "center"}},
-		{field: "opt_kind_nm",	headerName: "품목", cellStyle: {"text-align": "center"}},
+		{field: "goods_no",	headerName: "상품번호", width: 70, cellStyle: {"text-align": "center"}},
+		{field: "opt_kind_nm",	headerName: "품목", width: 80, cellStyle: {"text-align": "center"}},
+		{field: "brand", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
 		{field: "style_no",	headerName: "스타일넘버", cellStyle: {"text-align": "center"}},
-		{field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 300},
-		{field: "goods_nm_eng",	headerName: "상품명(영문)", type: 'HeadGoodsNameType', width: 300},
-        {field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: {"text-align": "center"}},
-        {field: "color", headerName: "컬러", width: 70, cellStyle: {"text-align": "center"}},
-        {field: "size", headerName: "사이즈", width: 70, cellStyle: {"text-align": "center"}},
-		{field: "goods_opt", headerName: "옵션", width: 150},
-		{field: "storage_wqty", headerName: "창고재고", width: 60, cellStyle: {"text-align": "center"}},
-		{field: "store_wqty", headerName: "매장재고", width: 60, cellStyle: {"text-align": "center"}},
-		{field: "qty", headerName: "수량", type: "numberType",
+		{field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 200},
+		{field: "goods_nm_eng",	headerName: "상품명(영문)", type: 'HeadGoodsNameType', width: 200},
+        {field: "prd_cd_p", headerName: "코드일련", width: 90, cellStyle: {"text-align": "center"}},
+        {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
+        {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
+		{field: "goods_opt", headerName: "옵션", width: 130},
+		{field: "storage_wqty", headerName: "창고재고", width: 60, type: "currencyType"},
+		{field: "store_wqty", headerName: "매장재고", width: 60, type: "currencyType"},
+		{field: "qty", headerName: "수량", type: "currencyType", width: 50,
             editable: function(params) {return params.data.state === 10;}, 
             cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};},
             cellRenderer: function(params) {
                 if (params.data.state != 10) {
                     if (params.value !== undefined) {
-                        return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                        return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + Comma(params.value) + '</a>';
                     }
                 } else {
                     return params.data.qty;
                 }
             }
         },
-		{field: "exp_dlv_day", headerName: "출고예정일자", cellStyle: {"text-align": "center"},
+		{field: "exp_dlv_day", headerName: "출고예정일자", cellStyle: {"text-align": "center"}, width: 90,
            cellRenderer: function(params) {
                 return params.data.dlv_day;
            }

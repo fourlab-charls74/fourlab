@@ -278,45 +278,53 @@
             </div>
         </div>
     </div>
+    <style>
+        .ag-row-level-1 {background-color: #f8f8f8 !important;}
+        .ag-row-selected {background-color: #b7e4ff !important;}
+    </style>
     <script language="javascript">
         let columns = [
-            {field: "store_nm" , headerName: "매장", rowGroup: true, hide: true, width: 230, pinned: "left", checkboxSelection: true},
+            {field: "store_nm" , headerName: "매장명", rowGroup: true, hide: true, width: 150, pinned: "left", checkboxSelection: true},
+            {field: "store_cd" , headerName: "매장코드", width: 70, pinned: "left", cellStyle: {"text-align": "center"}, 
+                aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+                cellRenderer: (params) => params.data ? '' : params.value,
+            },
             {field: "prd_cd" , headerName: "상품코드",  pinned: "left", width: 150, cellStyle: {"text-align": "center"}, checkboxSelection: true},
-            {field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"}},
-            {field: "opt_kind_nm", headerName: "품목", width: 60, cellStyle: {"text-align": "center"}},
+            {field: "goods_no", headerName: "상품번호", width: 70, cellStyle: {"text-align": "center"}},
+            {field: "opt_kind_nm", headerName: "품목", width: 70, cellStyle: {"text-align": "center"}},
             {field: "brand_nm", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
-            {field: "style_no",	headerName: "스타일넘버", width: 80, cellStyle: {"text-align": "center"}},
-            {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 250},
-            {field: "goods_nm_eng",	headerName: "상품명(영문)", type: 'HeadGoodsNameType', width: 250},
-            {field: "prd_cd_sm", headerName: "코드일련", width: 120, cellStyle: {"text-align": "center"}},
-            {field: "color", headerName: "컬러", width: 50, cellStyle: {"text-align": "center"}},
-            {field: "size", headerName: "사이즈", width: 50, cellStyle: {"text-align": "center"}},
-            {field: "goods_opt", headerName: "옵션", width: 200},
+            {field: "style_no",	headerName: "스타일넘버", width: 70, cellStyle: {"text-align": "center"}},
+            {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 200},
+            {field: "goods_nm_eng",	headerName: "상품명(영문)", type: 'HeadGoodsNameType', width: 200},
+            {field: "prd_cd_sm", headerName: "코드일련", width: 90, cellStyle: {"text-align": "center"}},
+            {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
+            {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
+            {field: "goods_opt", headerName: "옵션", width: 130},
             {
                 headerName: '(대표)창고재고', // 대표창고의 재고를 조회
                 children: [
-                    {field: "storage_qty", headerName: "재고", type: 'currencyType'},
-                    {field: "storage_wqty", headerName: "보유재고", type: 'currencyType'},
+                    {field: "storage_qty", headerName: "재고", type: 'currencyType', width: 60},
+                    {field: "storage_wqty", headerName: "보유재고", type: 'currencyType', width: 60},
                 ]
             },
             {
                 headerName: '판매',
                 children: [
-                    {field: "total_sale_cnt", headerName: "총판매수량", type: 'currencyType'},
-                    {field: "sale_cnt", headerName: "판매수량", type: 'currencyType'},
+                    {field: "total_sale_cnt", headerName: "총판매수량", type: 'currencyType', width: 70},
+                    {field: "sale_cnt", headerName: "판매수량", type: 'currencyType', width: 60},
                 ]
             },
             {
                 headerName: '매장재고',
                 children: [
-                    {field: "store_qty", headerName: "재고", type: 'currencyType'},
-                    {field: "store_wqty", headerName: "보유재고", type: 'currencyType'},
-                    {field: "exp_soldout_day", headerName: "소진예상일", cellStyle: {"text-align": "center"}},
+                    {field: "store_qty", headerName: "재고", type: 'currencyType', width: 60},
+                    {field: "store_wqty", headerName: "보유재고", type: 'currencyType', width: 60},
+                    {field: "exp_soldout_day", headerName: "소진예상일", cellStyle: {"text-align": "center"}, width: 80},
                     {
                         field: "rel_qty",
                         headerName: "배분수량",
                         type: "currencyType",
-                        width: 80,
+                        width: 60,
                         editable: true,
                         cellStyle: function(params) {return params.value ? {"background-color": "#ffff99"} : {}},
                         valueFormatter: formatNumber,
@@ -325,10 +333,11 @@
             },
         ];
 
-        const basic_autoGroupColumnDef = (headerName, minWidth = 230) => ({
+        const basic_autoGroupColumnDef = (headerName, minWidth = 230, maxWidth = 230) => ({
             headerName: headerName,
             headerClass: 'bizest',
             minWidth: minWidth,
+            maxWidth: maxWidth,
             cellRenderer: 'agGroupCellRenderer',
             pinned: 'left'
         });
@@ -342,7 +351,7 @@
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
             gx = new HDGrid(gridDiv, columns, {
-                autoGroupColumnDef: basic_autoGroupColumnDef('매장'),
+                autoGroupColumnDef: basic_autoGroupColumnDef('매장', 180, 180),
                 groupDefaultExpanded: 1,
                 rowSelection: 'multiple',
                 groupSelectsChildren: true,
@@ -383,13 +392,29 @@
         function setColumn() {
             let ord_field = $("[name=ord_field]").val();
             if(ord_field === "store_cd") {
-                let prd_columns = columns.map(c => c.field === "store_nm" ? ({...c, rowGroup: true, hide: true}) : c.field === "prd_cd_sm" ? ({...c, rowGroup: false, hide: false}) : c);
+                let prd_columns = columns.map(c => c.field === "store_nm" 
+                    ? ({...c, rowGroup: true, hide: true}) 
+                    : c.field === "prd_cd_sm" 
+                        ? ({...c, rowGroup: false, hide: false}) 
+                        : c.field === "prd_cd"
+                            ? ({...c, width: 150})
+                            : c
+                );
                 gx.gridOptions.api.setColumnDefs(prd_columns);
-                gx.gridOptions.api.setAutoGroupColumnDef(basic_autoGroupColumnDef('매장'));
+                gx.gridOptions.api.setAutoGroupColumnDef(basic_autoGroupColumnDef('매장', 180, 180));
             } else if(ord_field === "prd_cd") {
-                let prd_columns = columns.map(c => c.field === "store_nm" ? ({...c, rowGroup: false, hide: false}) : c.field === "prd_cd_sm" ? ({...c, rowGroup: true, hide: true}) : c);
+                let prd_columns = columns.map(c => c.field === "store_nm" 
+                    ? ({...c, rowGroup: false, hide: false}) 
+                    : c.field === "store_cd"
+                        ? ({...c, aggFunc: false, cellRenderer: (params) => params.value})
+                        : c.field === "prd_cd_sm" 
+                            ? ({...c, rowGroup: true, hide: true}) 
+                            : c.field === "prd_cd" 
+                                ? ({...c, checkboxSelection: false, width: 110}) 
+                                : c
+                );
                 gx.gridOptions.api.setColumnDefs(prd_columns);
-                gx.gridOptions.api.setAutoGroupColumnDef(basic_autoGroupColumnDef('상품코드', 120));
+                gx.gridOptions.api.setAutoGroupColumnDef(basic_autoGroupColumnDef('코드일련', 140, 140));
             }
         }
 
