@@ -153,29 +153,28 @@
         },
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 29},
         {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
-        {field: "prd_cd_p", headerName: "코드일련", width: 90, cellStyle: {"text-align": "center"}},
-        {field: "color", headerName: "컬러", width: 60, cellStyle: {"text-align": "center"}},
-        {field: "size", headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"}},
-        {field: "goods_no", headerName: "상품번호", width: 78, cellStyle: {"text-align": "center"}},
-        {field: "goods_type", headerName: "상품구분", width: 70, cellStyle: StyleGoodsTypeNM},
+        {field: "goods_no", headerName: "상품번호", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
         {field: "opt_kind_nm", headerName: "품목", width: 70, cellStyle: {"text-align": "center"}},
-        {field: "brand", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
-        {field: "style_no",	headerName: "스타일넘버", width: 80, cellStyle: {"text-align": "center"}},
-        // {field: "sale_stat_cl", headerName: "상품상태", cellStyle: StyleGoodsState},
-        {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 220},
-        {field: "goods_opt", headerName: "옵션", width: 200},
-        {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 70},
-        {field: "price", headerName: "판매가", type: "currencyType", width: 70},
-        {field: "return_price", headerName: "반품단가", width: 80, type: 'currencyType',
+        {field: "brand", headerName: "브랜드", width: 70, cellStyle: {"text-align": "center"}},
+        {field: "style_no",	headerName: "스타일넘버", width: 70, cellStyle: {"text-align": "center"}},
+        {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 200},
+        {field: "goods_nm_eng",	headerName: "상품명(영문)", width: 200},
+        {field: "prd_cd_p", headerName: "코드일련", width: 90, cellStyle: {"text-align": "center"}},
+        {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
+        {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
+        {field: "goods_opt", headerName: "옵션", width: 153},
+        {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 65},
+        {field: "price", headerName: "판매가", type: "currencyType", width: 65},
+        {field: "return_price", headerName: "반품단가", width: 70, type: 'currencyType',
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
-        {field: "storage_wqty", headerName: "창고재고", width: 60, type: 'currencyType'},
-        {field: "qty", headerName: "반품수량", width: 60, type: 'currencyType', 
+        {field: "storage_wqty", headerName: "창고재고", width: 65, type: 'currencyType'},
+        {field: "qty", headerName: "반품수량", width: 65, type: 'currencyType', 
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
-        {field: "total_return_price", headerName: "반품금액", width: 80, type: 'currencyType'},
+        {field: "total_return_price", headerName: "반품금액", width: 65, type: 'currencyType'},
     ];
 </script>
 
@@ -187,7 +186,7 @@
     let companies = <?= json_encode(@$companies) ?> ;
 
     $(document).ready(function() {
-        pApp.ResizeGrid(275, 470);
+        pApp.ResizeGrid(385);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {

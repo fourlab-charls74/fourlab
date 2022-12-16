@@ -197,7 +197,7 @@
         {field: "sgr_type_nm", headerName: "반품구분", width: 60, cellStyle: (params) => ({"text-align": "center", "color": params.data.sgr_type == "B" ? "#2aa876" : "none"})},
         {field: "sgr_state", hide: true},
         {field: "sgr_state_nm", headerName: "반품상태", width: 60, cellStyle: (params) => ({"text-align": "center", "color": params.data.sgr_state == "30" ? "#2aa876" : "#0000ff"})},
-        {field: "storage_cd", hide: true},
+        {field: "storage_cd", headerName: "창고코드", width: 70, cellStyle: {"text-align": "center"}},
         {field: "storage_nm", headerName: "창고명", width: 100, cellStyle: {"text-align": "center"}},
         {field: "target_type", hide: true},
         {field: "target_cd", hide: true},
