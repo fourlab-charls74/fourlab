@@ -114,6 +114,7 @@
         //매장 선택 후 추가 클릭 시 그리드에 반영
         
         let newData = [];
+        let storeData = [];
         let total = [];
 
         function addRow(){
@@ -132,16 +133,17 @@
                     store_cd:store_cds[i],
                     store_nm: store_nms[i]
                 })
+                storeData.push({
+                    store_cd:store_cds[i],
+                    store_nm: store_nms[i]
+                })
             }
-
-     
             
             total.push(
                 store_cds.length
             )
-            
+             
             let sum = total.reduce((a,b) => (a+b));
-
             gx.gridOptions.api.applyTransaction({add:newData});
             document.getElementById('cntStore').innerText = sum;
             $('#store_no').val(null).trigger('change');
