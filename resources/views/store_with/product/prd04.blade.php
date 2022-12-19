@@ -252,7 +252,9 @@
 		{field: "goods_no", headerName: "상품번호", pinned: 'left', width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
 		{field: "style_no", headerName: "스타일넘버", pinned: 'left', width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
 
-		{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, surl:"{{config('shop.front_url')}}"},
+		{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, surl:"{{config('shop.front_url')}}",
+			aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+		},
 		{field: "img", headerName: "이미지_url", hide: true},
 		{field: "goods_nm", headerName: "상품명", width: 270, aggFunc: "first",
 			cellRenderer: function (params) {

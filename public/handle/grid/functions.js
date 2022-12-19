@@ -357,6 +357,10 @@ const StyleLineHeight = {
     'text-align': 'center',
 };
 
+const setRowGroupExpanded = (e) => {
+    e.api.selectionController.lastSelectedNode.setExpanded(e.api.selectionController.lastSelectedNode.selected);
+}
+
 function unComma(txt) {
     if (txt && txt.replace) return txt.replace(/,/gi, '') * 1
 

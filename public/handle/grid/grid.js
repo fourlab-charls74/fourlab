@@ -182,7 +182,7 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
                 cellRenderer: function (params) {
                     if (params.value !== undefined && params.value !== "" && params.value !== null) {
                         let front_url   = params.colDef.surl;
-                        let img         = params.data.img;
+                        let img         = params.data ? params.data.img : params.value;
                         if (front_url == undefined) {
                             return '<a href="javascript:void(0);" onClick="return openSitePop(\'' + front_url + '\',\'' + params.data.goods_no + '\');"><img src="' + img + '" class="img" alt="" onerror="this.src=\'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\'"/></a>';
                         } else {

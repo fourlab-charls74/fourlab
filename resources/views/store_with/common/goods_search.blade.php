@@ -194,7 +194,9 @@
                                     <span class="text_line">/</span>
                                     <div class="form-inline-inner input_box" style="width:45%;">
                                         <select name="ord_field" class="form-control form-control-sm">
-                                            <option value="g.goods_no">상품번호</option>
+                                            <option value="pc.rt">등록일</option>
+                                            <option value="pc.prd_cd">상품코드</option>
+                                            <option value="pc.goods_no">상품번호</option>
                                             <option value="g.goods_nm">상품명</option>
                                         </select>
                                     </div>
@@ -287,7 +289,9 @@
         {field: "brand_cd", hide: true},
         {field: "brand", headerName: "브랜드", width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
         {field: "style_no", headerName: "스타일넘버", width: 80, cellStyle: StyleLineHeight, aggFunc: "first"},
-        {field: "img", headerName: "이미지", type: 'GoodsImageType', width: 50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}"},
+        {field: "img", headerName: "이미지", type: "GoodsImageType", width: 50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}",
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+        },
         {field: "img", headerName: "이미지_url", hide: true},
         {field: "goods_nm", headerName: "상품명", width: 230, cellStyle: {"line-height": "30px"}, aggFunc: "first", 
             cellRenderer: function (params) {
@@ -393,6 +397,7 @@
             groupSelectsChildren: true,
 			suppressDragLeaveHidesColumns: true,
 			suppressMakeColumnVisibleAfterUnGroup: true,
+            onSelectionChanged: setRowGroupExpanded,
         });
 
         Search();

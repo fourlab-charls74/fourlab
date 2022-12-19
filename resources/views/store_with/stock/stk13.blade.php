@@ -357,6 +357,8 @@
                 groupSelectsChildren: true,
                 suppressRowClickSelection: true,
                 suppressAggFuncInHeader: true,
+                animateRows: true,
+                onSelectionChanged: setRowGroupExpanded,
                 onCellValueChanged: (e) => {
                     e.node.setSelected(true);
                     if (e.column.colId === "rel_qty") {

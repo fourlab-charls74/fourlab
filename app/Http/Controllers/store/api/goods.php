@@ -90,9 +90,9 @@ class goods extends Controller
         // $ad_desc = $request->input("ad_desc");
 
         $ord = $request->input('ord', 'desc');
-        $ord_field = $request->input('ord_field', 'g.goods_no');
-        $orderby = sprintf("order by %s %s, pc.color, pc.size", $ord_field, $ord);
-
+        $ord_field = $request->input('ord_field', 'pc.rt');
+        $orderby = sprintf("order by %s %s, pc.prd_cd", $ord_field, $ord);
+        
         $where = "";
         if($prd_cd != "") {
 			$prd_cd = explode(',', $prd_cd);
