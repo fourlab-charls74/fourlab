@@ -1,4 +1,4 @@
-@extends('head_with.layouts.layout-nav')
+@extends('store_with.layouts.layout-nav')
 @section('title','SMS 관리')
 @section('content')
 <div class="container-fluid show_layout py-3">
@@ -85,6 +85,21 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="">매장회원적용</label>
+                                <div class="form-inline inline_select_box">
+                                    <div class="form-inline inline_btn_box w-100">
+                                        <input type='hidden' id="store_nm" name="store_nm">
+                                        <select id="store_no" name="store_no" class="form-control form-control-sm select2-store w-100"></select>
+                                        <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6"></div>
                     </div>
                     <div class="row">
                         <div class="col text-center mt-3">

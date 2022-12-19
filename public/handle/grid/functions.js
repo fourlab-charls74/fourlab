@@ -41,6 +41,11 @@ function openSmsSend(phone='', name='') {
     window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
 }
 
+function openMultiSmsSend(ids = '') {
+    var url = '/head/api/sms/send?ids=' + ids;
+    window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
+}
+
 function openSmsList(phone='', name='') {
     var url = '/head/api/sms/list?phone=' + phone + '&name=' + name;
     window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");

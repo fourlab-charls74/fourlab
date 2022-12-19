@@ -492,7 +492,8 @@
 			return;
 		}
 
-		openSmsSend(rows[0].mobile, rows[0].name);
+		// openSmsSend(rows[0].mobile, rows[0].name);
+		openMultiSmsSend(rows.map(row => row.user_id).join(","));
 	});
 
 	$('.point-btn').click(function(e){

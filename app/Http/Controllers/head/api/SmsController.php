@@ -21,16 +21,41 @@ class SmsController extends Controller
         $mutable = now();
         $sdate	= $mutable->sub(3, 'month')->format('Y-m-d');
 
+        $s_phone = $req->input('phone', '');
+        $s_name = $req->input('name', '');
+
+        $ids = $req->input('ids', '');
+        $users = [];
+        if ($ids != '') {
+            $ids = explode(',', $ids);
+            $where = array_reduce($ids, function($a, $c) {
+                $a .= " or user_id = '$c' ";
+                return $a;
+            }, '');
+            $sql = "
+                select user_id, name as s_name, phone as s_phone
+                from member
+                where 1<>1 $where
+            ";
+            $users = DB::select($sql);
+
+            if (count($users) == 1) {
+                $s_phone = $users[0]->s_phone;
+                $s_name = $users[0]->s_name;
+                $users = [];
+            }
+        }
+
         $values = [
             'sdate'         => $sdate,
             'edate'         => date("Y-m-d"),
-            'phone'         => $req->input('phone', ''),
             'name'          => $req->input('name', ''),
             'type'          => $type,
             'sms_yn'        => $conf->getConfigValue("sms","sms_yn"),
             'phone'         => $conf->getConfigValue("shop","phone"),
-            's_phone'       => $req->input('phone', ''),
-            's_name'       => $req->input('name', '')
+            's_phone'       => $s_phone,
+            's_name'        => $s_name,
+            'users'         => json_encode($users),
         ];
 
         return view( Config::get('shop.head.view') . "/common/sms_all", $values);
