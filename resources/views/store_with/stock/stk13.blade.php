@@ -246,6 +246,10 @@
                                 <input type="checkbox" class="custom-control-input" name="ext_storage_qty" id="ext_storage_qty" value="Y" checked>
                                 <label class="custom-control-label font-weight-normal" for="ext_storage_qty">창고재고 0 제외</label>
                             </div>
+                            <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+                                <input type="checkbox" class="custom-control-input" name="grid_expand" id="grid_expand" onchange="return setAllRowGroupExpanded(this.checked);" checked>
+                                <label class="custom-control-label font-weight-normal" for="grid_expand">항목펼쳐보기</label>
+                            </div>
                         </div>
                         <span class="d-none d-lg-block mr-2 tex-secondary">|</span>
                         <div class="d-flex mr-1 mb-1 mb-lg-0">
@@ -387,7 +391,9 @@
             
             let data = $('form[name="search"]').serialize();
             data += "&ext_storage_qty=" + $("[name=ext_storage_qty]").is(":checked");
-            gx.Request('/store/stock/stk13/search', data, -1);
+            gx.Request('/store/stock/stk13/search', data, -1, function(d) {
+                setAllRowGroupExpanded($("#grid_expand").is(":checked"));
+            });
         }
 
         // 정렬 타입에 따른 column 업데이트

@@ -215,6 +215,10 @@
 							<input type="checkbox" class="custom-control-input" name="ext_store_qty" id="ext_store_qty" value="Y">
 							<label class="custom-control-label font-weight-normal" for="ext_store_qty">매장재고 0 제외</label>
 						</div>
+						<div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+							<input type="checkbox" class="custom-control-input" name="grid_expand" id="grid_expand" onchange="return setAllRowGroupExpanded(this.checked);">
+							<label class="custom-control-label font-weight-normal" for="grid_expand">항목펼쳐보기</label>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -384,6 +388,7 @@
 				wqty: Comma(t.total_wqty),
 				sqty: Comma(t.total_sqty),
 			}]);
+			setAllRowGroupExpanded($("#grid_expand").is(":checked"));
 		});
 	}
 

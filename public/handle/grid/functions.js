@@ -361,6 +361,12 @@ const setRowGroupExpanded = (e) => {
     e.api.selectionController.lastSelectedNode.setExpanded(e.api.selectionController.lastSelectedNode.selected);
 }
 
+const setAllRowGroupExpanded = (expand = true) => {
+    if (!gx) return;
+    if (expand) gx.gridOptions.api.expandAll();
+    else gx.gridOptions.api.collapseAll();
+}
+
 function unComma(txt) {
     if (txt && txt.replace) return txt.replace(/,/gi, '') * 1
 

@@ -242,6 +242,10 @@
                                 <input type="checkbox" class="custom-control-input" name="goods_img" id="goods_img" value="Y" checked>
                                 <label class="custom-control-label font-weight-light" for="goods_img">이미지출력</label>
                             </div>
+                            <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+                                <input type="checkbox" class="custom-control-input" name="grid_expand" id="grid_expand" onchange="return setAllRowGroupExpanded(this.checked);">
+                                <label class="custom-control-label font-weight-light" for="grid_expand">항목펼쳐보기</label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -436,7 +440,9 @@
         if($("[name=ext_zero_qty]").length > 0) {
             data += '&ext_zero_qty=' + $("[name=ext_zero_qty]").is(":checked");
         }
-        gx.Request('/store/api/goods', data, 1);
+        gx.Request('/store/api/goods', data, 1, function(d) {
+            setAllRowGroupExpanded($("#grid_expand").is(":checked"));
+        });
     };
     
     // const openFileSearch = () => {
