@@ -127,12 +127,21 @@
         <div class="card shadow mt-3">
             <div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
                 <a href="#">상품정보</a>
-                @if(@$cmd == 'add')
-                <div class="d-flex">
-                    <button type="button" onclick="addGoods();" class="btn btn-sm btn-primary shadow-sm mr-1" id="add_row_btn"><i class="bx bx-plus"></i> 상품추가</button>
-                    <button type="button" onclick="delGoods();" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn"><i class="bx bx-trash"></i> 삭제</button>
+                <div class="d-flex align-items-center">
+                    @if(@$cmd == 'add' || @$sr->sr_state == '10')
+                    <div class="d-flex">
+                        <button type="button" onclick="return setAllQty(false);" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn">전체반품처리</button>
+                        <button type="button" onclick="return setAllQty(true);" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn">반품0개처리</button>
+                    </div>
+                    @endif
+                    @if(@$cmd == 'add')
+                    <span class="ml-1 mr-2">|</span>
+                    <div class="d-flex">
+                        <button type="button" onclick="return addGoods();" class="btn btn-sm btn-primary shadow-sm mr-1" id="add_row_btn"><i class="bx bx-plus"></i> 상품추가</button>
+                        <button type="button" onclick="return delGoods();" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn"><i class="bx bx-trash"></i> 삭제</button>
+                    </div>
+                    @endif
                 </div>
-                @endif
             </div>
             <div class="card-body">
                 <div class="table-responsive mt-2">
@@ -242,7 +251,7 @@
 
         let sr_reason = document.f1.sr_reason.value;
         let comment = document.f1.comment.value;
-        let rows = gx.getRows();
+        let rows = gx.getSelectedRows();
 
         if(cmd === 'add') {
             let sr_date = document.f1.sdate.value;
@@ -403,5 +412,16 @@
             { ...pinnedRow.data, qty: qty, total_return_price: total_return_price }
         ]);
     };
+
+    const setAllQty = (is_zero = false) => {
+        const rows = gx.getRows().map(row => ({
+            ...row, 
+            qty: is_zero ? 0 : row.store_wqty, 
+            total_return_price: is_zero ? 0 : parseInt(row.return_price) * parseInt(row.store_wqty),
+        }));
+        gx.gridOptions.api.applyTransaction({ update : rows });
+        gx.gridOptions.api.forEachNode(node => node.setSelected(!is_zero)); 
+        updatePinnedRow();
+    }
 </script>
 @stop
