@@ -40,7 +40,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-lg-4">
+                        <div class="col-lg-4 mb-2 mb-lg-0">
                             <div class="form-group">
                                 <label for="com_nm" class="required">공급처</label>
                                 <div class="form-inline inline_select_box">
@@ -56,7 +56,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-4 mb-2 mb-lg-0">
                             <div class="form-group">
                                 <label for="invoice_no" class="required">송장번호</label>
                                 <div class="flex_box">
@@ -74,7 +74,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-4">
+                        <div class="col-lg-4 mb-2 mb-lg-0">
                             <div class="form-group">
                                 <label for="formrow-firstname-input" class="required">입고일자</label>
                                 <div class="flex_box">
@@ -93,7 +93,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-4 mb-2 mb-lg-0">
                             <div class="form-group">
                                 <label for="" class="required">입고상태</label>
                                 <div class="flex_box">
@@ -119,11 +119,11 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-4">
+                        <div class="col-lg-4 mb-2 mb-lg-0">
                             <div class="form-group">
                                 <label for="f_sqty" class="required">환율</label>
                                 <div class="form-inline inline_select_box">
-                                    <div class="form-inline-inner input-box w-25 pr-2">
+                                    <div class="form-inline-inner input-box col col-6 col-sm-4 mx-auto p-0 pr-2">
                                         <select id="currency_unit" name="currency_unit" class="form-control form-control-sm w-100" onchange="return changeUnit(this);">
                                             <?php
                                                 $currencies = ['KRW', 'USD', 'EUR', 'JPY', 'CNY', 'HKD'];
@@ -134,7 +134,7 @@
                                             ?>
                                         </select>
                                     </div>
-                                    <div class="d-flex align-items-center form-inline-inner input-box w-75">
+                                    <div class="d-flex align-items-center form-inline-inner input-box col col-6 col-sm-8 mx-auto p-0">
                                         <input type='text' class="form-control form-control-sm text-right w-100"
                                             name='exchange_rate' id='exchange_rate' value="{{ @$exchange_rate ?? 0 }}"
                                             onkeypress="checkFloat(event);" onkeyup="com3(this);calCustomTaxRate();" onfocus="this.select()" 
@@ -144,20 +144,22 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-4 mb-2 mb-lg-0">
                             <div class="form-group">
                                 <label for="tariff_amt" class="required">관세총액/관세율</label>
                                 <div class="flex_box align-items-start">
-                                    <input type="text" class="form-control form-control-sm text-right {{ @$state > 0 && @$state < 40 ? 'w-50' : 'w-75' }}" 
-                                        id="tariff_amt" name="tariff_amt" value="{{ number_format(@$tariff_amt ?? 0) }}"
-                                        onkeypress="checkFloat(event);" onkeyup="com3(this);calCustomTaxRate(true, this.value);" onfocus="this.select();" 
-                                        {{ @$currency_unit == 'KRW' ? 'readonly disabled' : '' }}>
-                                    <div class="d-flex align-items-center w-25 pl-2">
+                                    <div class="col col-6 p-0 pr-2">
+                                        <input type="text" class="form-control form-control-sm text-right" 
+                                            id="tariff_amt" name="tariff_amt" value="{{ number_format(@$tariff_amt ?? 0) }}"
+                                            onkeypress="checkFloat(event);" onkeyup="com3(this);calCustomTaxRate(true, this.value);" onfocus="this.select();" 
+                                            {{ @$currency_unit == 'KRW' ? 'readonly disabled' : '' }}>
+                                    </div>
+                                    <div class="d-flex align-items-center col col-6 p-0 {{ @$state > 0 && @$state < 40 ? 'col-sm-3 pr-2' : '' }}">
                                         <input type="text" class="form-control form-control-sm text-right mr-1" id="tariff_rate" name="tariff_rate" value="{{ @$tariff_rate ?? 0 }}" readonly>
                                         <span>%</span>
                                     </div>
                                     @if (@$state > 0 && @$state < 40)
-                                    <div class="w-25 pl-2">
+                                    <div class="col col-12 col-sm-3 p-0 pt-2 pt-sm-0">
                                         <a href="javascript:void(0);" onclick="return setPrdTariffRates();" class="btn btn-sm btn-outline-primary shadow-sm w-100">일괄적용</a>
                                     </div>
                                     @endif
@@ -168,11 +170,13 @@
                             <div class="form-group">
                                 <label for="freight_amt" class="required">운임비/운임율</label>
                                 <div class="flex_box">
-                                    <input type="text" class="form-control form-control-sm text-right w-75" 
-                                        id="freight_amt" name="freight_amt" value="{{ number_format(@$freight_amt ?? 0) }}"
-                                        onkeypress="checkFloat(event);" onkeyup="com3(this);calCustomTaxRate();" onfocus="this.select();" 
+                                    <div class="col col-6 col-sm-8 p-0 pr-2">
+                                        <input type="text" class="form-control form-control-sm text-right" 
+                                            id="freight_amt" name="freight_amt" value="{{ number_format(@$freight_amt ?? 0) }}"
+                                            onkeypress="checkFloat(event);" onkeyup="com3(this);calCustomTaxRate();" onfocus="this.select();" 
                                         {{ @$currency_unit == 'KRW' ? 'readonly disabled' : '' }}>
-                                    <div class="d-flex align-items-center w-25 pl-2">
+                                    </div>
+                                    <div class="d-flex align-items-center col col-6 col-sm-4 p-0">
                                         <input type="text" class="form-control form-control-sm text-right mr-1" id="freight_rate" name="freight_rate" value="{{ @$freight_rate ?? 0 }}" readonly>
                                         <span>%</span>
                                     </div>
@@ -181,7 +185,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-4">
+                        <div class="col-lg-4 mb-2 mb-lg-0">
                             <div class="form-group">
                                 <label for="custom_amt" class="required">(신고)금액</label>
                                 <div class="flex_box">
@@ -189,12 +193,14 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-4 mb-2 mb-lg-0">
                             <div class="form-group">
                                 <label for="custom_tax" class="required">통관비/통관세율</label>
                                 <div class="flex_box">
-                                    <input type="text" class="form-control form-control-sm text-right w-75" id="custom_tax" name="custom_tax" value="{{ @$custom_tax ?? 0 }}" readonly>
-                                    <div class="d-flex align-items-center w-25 pl-2">
+                                    <div class="col col-6 col-sm-8 p-0 pr-2">
+                                        <input type="text" class="form-control form-control-sm text-right" id="custom_tax" name="custom_tax" value="{{ @$custom_tax ?? 0 }}" readonly>
+                                    </div>
+                                    <div class="d-flex align-items-center col col-6 col-sm-4 p-0">
                                         <input type="text" class="form-control form-control-sm text-right mr-1" id="custom_tax_rate" name="custom_tax_rate" value="{{ @$custom_tax_rate ?? 0 }}" readonly>
                                         <span>%</span>
                                     </div>
@@ -225,8 +231,8 @@
                         <div class="col-lg-12">
                             <div class="form-group">
                                 <label style="color: #0000ff;">도움말<i class="fa fa-question-circle ml-1" aria-hidden="true"></i></label>
-                                <div class="d-flex">
-                                    <div class="d-flex flex-column" style="width: 20%; min-width: 250px;">
+                                <div class="d-flex flex-column flex-md-row">
+                                    <div class="d-flex flex-column" style="width: 50%; min-width: 200px; max-width:300px;">
                                         <p>기본정보</p>
                                         <ul>
                                             <li style="color: #e8554e;">수량(확정)값으로 게산</li>
@@ -237,7 +243,7 @@
                                             <li>통관세율 = 통관비 &divide; (신고)금액</li>
                                         </ul>
                                     </div>
-                                    <div class="d-flex flex-column">
+                                    <div class="d-flex flex-column mt-3 mt-md-0">
                                         <p>상품정보</p>
                                         <ul>        
                                             <li style="color: #e8554e;">수량(확정)값이 0이면 수량(예정)값으로 게산</li>
@@ -267,6 +273,16 @@
                 @endif
                 <a href="javascript:void(0);" onclick="return gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
                 <a href="javascript:void(0);" onclick="return displayHelp();" class="btn btn-sm btn-outline-primary shadow-sm pl-2">도움말</a>
+                <div class="mt-2">
+                    @if (@$state > 0 && @$state < 40)
+                    <div>
+                        <a href="javascript:void(0);" onclick="return getSearchGoods();" class="btn-sm btn btn-primary" onfocus="this.blur();"><i class="fa fa-plus fa-sm mr-1"></i> 상품 추가</a>
+                        @if (@$state < 30)
+                        <a href="javascript:void(0);" onclick="return deleteRows();" class="btn-sm btn btn-outline-primary" onfocus="this.blur();"><i class="fa fa-trash fa-sm mr-1"></i> 상품 삭제</a>
+                        @endif
+                    </div>
+                    @endif
+                </div>
             </div>
         </form>
         <div id="filter-area" class="card shadow-none mb-0 ty2">
@@ -281,7 +297,7 @@
                 </div>
                 @endif
             </div>
-            <div class="card-body pt-1">
+            <div class="card-body pt-3 pt-lg-1">
                 <div class="table-responsive">
                     <div id="div-gd" class="ag-theme-balham"></div>
                 </div>
@@ -370,7 +386,7 @@
     }];
 
     $(document).ready(() => {
-        pApp.ResizeGrid(100);
+        pApp.ResizeGrid(100, window.screen.width >= 740 ? undefined : 400);
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {
             pinnedTopRowData: pinnedRowData,
@@ -479,7 +495,7 @@
     function displayHelp() {
         const help = document.getElementById("help");
         help.style.display = help.style.display === "none" ? "" : "none";
-        pApp.ResizeGrid(200, undefined, "input-area");
+        pApp.ResizeGrid(200, window.screen.width >= 740 ? undefined : 400, "input-area");
     }
 
     /**********************************

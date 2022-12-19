@@ -23,7 +23,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-lg-4">
+                        <div class="col-lg-4 mb-2 mb-lg-0">
                             <div class="form-group">
                                 <label for="formrow-firstname-input">입고일자</label>
                                 <div class="form-inline">
@@ -53,7 +53,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-4 mb-2 mb-lg-0">
                             <div class="form-group">
                                 <label for="invoice_no">송장번호</label>
                                 <div class="flex_box">
@@ -76,7 +76,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-4">
+                        <div class="col-lg-4 mb-2 mb-lg-0">
                             <div class="form-group">
                                 <label for="name">공급업체</label>
                                 <div class="form-inline inline_select_box">
@@ -90,7 +90,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-4 mb-2 mb-lg-0">
                             <div class="form-group">
                                 <label for="item">품목</label>
                                 <div class="flex_box">
