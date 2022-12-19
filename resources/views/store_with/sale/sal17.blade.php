@@ -158,7 +158,21 @@
                 { field: 'last_recv_amt_{{$month["val"]}}', headerName: "전년", type: 'currencyMinusColorType', width:75, aggregation: true },
                 { field: 'recv_amt_{{$month["val"]}}', headerName: "금액", type: 'currencyMinusColorType', width:75, aggregation: true},
                 { field: 'progress_proj_amt_{{$month["val"]}}', headerName: "달성율(%)", type: 'currencyMinusColorType', aggregation: true,
-                    cellRenderer: params => goalProgress2(params.data)
+                    cellRenderer: function(params) {
+						let progress = 0;
+						let proj_amt = toInt(params.data.proj_amt_{{$month['val']}});
+						let recv_amt = toInt(params.data.recv_amt_{{$month['val']}});
+
+						if (proj_amt == 0) return progress = 0; //목표액이 0이면 달성율도 0으로 표시
+						if (recv_amt == 0) return progress = 0;
+
+						if(proj_amt != null && recv_amt != null) {
+							progress = Comma(Math.round((recv_amt / proj_amt ) * 100));
+						}
+						if (progress == -Infinity) progress = 0;
+
+						return progress;
+					}
                 }
             ]
         },
@@ -173,10 +187,15 @@
 	 * 
 	 * 
 	 */
+
 	const goalProgress = (row, Ym) => {
+		let prefix = "";
 		let progress = 0;
-		let proj_amt = toInt(row[`proj_amt`]);
-		let recv_amt = toInt(row[`recv_amt`]);
+
+		if (Ym) prefix = `_${Ym}`;
+
+		let proj_amt = toInt(row[`proj_amt${prefix}`]);
+		let recv_amt = toInt(row[`recv_amt${prefix}`]);
 
 		if (proj_amt == 0) return progress = 0; //목표액이 0이면 달성율도 0으로 표시
 		if (recv_amt == 0) return progress = 0; //금액이 0이면 달성율도 0으로 표시
@@ -188,31 +207,6 @@
 
 		return progress;
 	};
-	
-	// const goalProgress2 = (row, Ym) => {
-	// 	let sdate = document.getElementById('sdate').value;
-	// 	let edate = document.getElementById('edate').value;
-	// 	let re_sdate = sdate.replace("-", "");
-	// 	let re_edate = edate.replace("-", "");
-		
-
-
-	// 	let proj_amt2 = toInt(row[`proj_amt_` + re_sdate]);
-	// 	let recv_amt2 = toInt(row[`recv_amt_` + re_sdate]);
-
-
-	// 	if (proj_amt2 == 0) return progress = 0; //목표액이 0이면 달성율도 0으로 표시
-	// 	if (recv_amt2 == 0) return progress = 0; //금액이 0이면 달성율도 0으로 표시
-
-	// 	if (proj_amt2 == 0 && recv_amt2 == 0) return progress = 0;
-
-	// 	progress2 = Comma(Math.round(( recv_amt2 / proj_amt2 ) * 100)); // 소수점 첫째짜리까지 반올림 처리
-
-	// 	if (progress2 == -Infinity) progress2 = 0;
-
-	// 	return progress2;
-	// };
-
 	
 	const pApp = new App('',{
 		gridId:"#div-gd",
@@ -323,29 +317,6 @@
 			}
 		}
 	};
-
-	function Save() {
-
-		if(!confirm("목표를 저장하시겠습니까?")) return;
-
-                axios({
-                    url: `/store/sale/sal17/update`,
-                    method: 'post',
-                    data: {
-						data: { 'store_cd': row.scd, 'proj_amt': value, 'Ym': Ym }
-                    },
-                }).then(function (res) {
-                    if(res.data.code === 200) {
-                        alert(res.data.msg);
-                        Search();
-                    } else {
-                        console.log(res.data.msg);
-                        alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-                    }
-                }).catch(function (err) {
-                    console.log(err);
-                });
-	}
 
 	const toInt = (value) => {
 		if (value == "" || value == NaN || value == null || value == undefined) return 0;
