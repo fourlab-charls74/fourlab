@@ -21,8 +21,8 @@
                     <div class="card shadow-none mb-0">
                         <div class="card-header mb-0 d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row">
                             <h5 class="m-0">그룹</h5>
+                            <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="delGroupData();">그룹삭제</button>
                         </div>
-                        
                         <div class="card-body shadow pt-2">
                         <div class="filter_wrap">
                                 <div class="fl_box">
@@ -39,6 +39,7 @@
                     <div class="card shadow-none mb-0">
                         <div class="card-header mb-0 d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row">
                             <h5 class="m-0">매장</h5>
+                            <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="delStoreData();">매장삭제</button>
                         </div>
                         
                         <div class="card-body shadow pt-2">
@@ -58,29 +59,21 @@
     </div>
     <script language="javascript">
         let columns = [
+            {headerName: '', headerCheckboxSelection: true, checkboxSelection: true, width:28, pinned:'left'},
             {headerName: "그룹명", field: "group_nm",width:120,
                 cellRenderer: function(params) {
                     return `<a href='javascript:void(0)' onclick='SearchDetail("${params.value}", "${params.data.group_nm}", "${params.data.group_cd}")'>${params.value}</a>`;
                 }
-            },
-            {headerName: "삭제", width: 60, cellStyle: {'text-align':'center'},
-                cellRenderer: function(params) {
-                    return `<a href='#' onclick="del_group_data('${params.data.group_cd}')">삭제</a>`;
-                },
             },
             {headerName: "인덱스", field: "group_cd", hide: true},
             {width: "auto"}
         ];
 
         let group_columns = [
+            {headerName: '', headerCheckboxSelection: true, checkboxSelection: true, width:28, pinned:'left'},
             {headerName: "매장코드", field: "store_cd", width: 70, cellStyle: {'text-align':'center'}},
             {headerName: "매장명", field: "store_nm",width:"auto"},
-            {headerName: "삭제", width:60, cellStyle: {'text-align':'center'},
-                cellRenderer: function(params) {
-                    return `<a href='#' onclick="del_store_data('${params.data.store_cd}')">삭제</a>`;
-                },
-            },
-            {headerName: "인덱스", field: "group_cd",hide:true},
+            {headerName: "그룹코드", field: "group_cd", hide:true},
             {width: "auto"},
         ];
 
@@ -141,6 +134,67 @@
             });
             
         });
+
+
+        //그룹관리에서 그룹데이터 삭제
+        function delGroupData() {
+            const rows = gx.getSelectedRows();
+
+            if (rows.length == 0) {
+                return alert('삭제할 그룹을 적어도 하나는 선택해주세요');
+            }
+
+            if(confirm('그룹을 삭제하면 매장목록도 같이 삭제됩니다.\n그래도 삭제하시겠습니까?')) {
+                $.ajax({
+                    method: 'post',
+                    url: '/store/stock/stk32/del_group',
+                    data: {rows : rows},
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.code == '200') {
+                            alert('그룹삭제에 성공하였습니다.');
+                            location.reload();
+                        } else {
+                            alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                        }
+                    },
+                    error: function(e) {
+                            console.log(e.responseText)
+                    }
+                });
+            }
+
+       }
+
+        //그룹관리에서 매장정보 삭제
+        function delStoreData() {
+            const rows2 = gx2.getSelectedRows();
+
+            if (rows2.length == 0) {
+                return alert('삭제할 매장을 적어도 하나는 선택해주세요');
+            }
+
+            if(confirm('해당 그룹의 선택된 매장을 삭제하시겠습니까?')) {
+                $.ajax({
+                    method: 'post',
+                    url: '/store/stock/stk32/del_store',
+                    data: {rows2 : rows2},
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.code == '200') {
+                            alert('매장삭제에 성공하였습니다.');
+                            location.reload();
+                        } else {
+                            alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                        }
+                    },
+                    error: function(e) {
+                            console.log(e.responseText)
+                    }
+                });
+            }
+           
+        }
 
         //그룹 추가 팝업
         function openGroupAdd() {

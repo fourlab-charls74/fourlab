@@ -145,7 +145,7 @@ class stk32Controller extends Controller
         if($store_type != "") {
             $where	.= " and (1!=1";
             foreach($result as $row){
-                $where .= " or s.store_cd = '" . Lib::quote($row->store_cd) . "' ";
+                $where .= " or store_cd = '" . Lib::quote($row->store_cd) . "' ";
             }
             $where	.= ")";
         }
@@ -867,27 +867,61 @@ class stk32Controller extends Controller
     }
 
 
+    //그룹 관리 그룹삭제
     public function del_group(Request $request)
     {
-        $group_cd = $request->input('group_cd');
+        $rows = $request->input('rows');
 
         try {
             DB::beginTransaction();
 
-            DB::table('msg_group')
-                ->where('group_cd', '=', $group_cd)
+            foreach($rows as $r) {
+                
+                DB::table('msg_group')
+                ->where('group_cd', '=', $r['group_cd'])
                 ->delete();
-            
-            DB::table('msg_group_store')
-                ->where('group_cd', '=', $group_cd)
+                
+                DB::table('msg_group_store')
+                ->where('group_cd', '=', $r['group_cd'])
                 ->delete();
-                    
+            }
+                
             DB::commit();
-            $code = '200';
+            $code = 200;
             $msg = "";
         } catch (Exception $e) {
             DB::rollBack();
-            $code = '500';
+            $code = 500;
+            $msg = $e->getMessage();
+        }
+        return response()->json([
+            "code" => $code,
+            "msg" => $msg
+        ]);
+    }
+
+    //그룹관리 그룹에 속한 매장 삭제
+    public function del_store(Request $request)
+    {
+        $rows2 = $request->input('rows2');
+
+        try {
+            DB::beginTransaction();
+
+            foreach($rows2 as $r) {
+                
+                DB::table('msg_group_store')
+                ->where('group_cd', '=', $r['group_cd'])
+                ->where('store_cd', '=', $r['store_cd'])
+                ->delete();
+            }
+                
+            DB::commit();
+            $code = 200;
+            $msg = "";
+        } catch (Exception $e) {
+            DB::rollBack();
+            $code = 500;
             $msg = $e->getMessage();
         }
         return response()->json([

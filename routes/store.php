@@ -428,6 +428,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk32/addGroup', 'stk32Controller@addGroup_show');
         Route::post('stk32/mod_group', 'stk32Controller@mod_group');
         Route::post('stk32/del_group', 'stk32Controller@del_group');
+        Route::post('stk32/del_store', 'stk32Controller@del_store');
 
         //동종업계매출관리
         Route::get('stk33','stk33Controller@index');

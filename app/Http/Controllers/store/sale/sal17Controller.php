@@ -209,19 +209,23 @@ class sal17Controller extends Controller
 		$store_cd = $request->input('store_cd');
 		$proj_amt = $request->input('proj_amt');
 		$Ym = $request->input('Ym');
+		$admin_id = Auth('head')->user()->id;
+		$admin_nm = Auth('head')->user()->name;
 		try {
-			DB::transaction(function () use ($store_cd, $proj_amt, $Ym) {
+			DB::transaction(function () use ($store_cd, $proj_amt, $Ym, $admin_id, $admin_nm) {
                 $cnt = DB::table('store_sales_projection')->where('store_cd', $store_cd)->where('ym', $Ym)->count();
                 if($cnt === 0){
                     DB::table('store_sales_projection')->insert([
                         "store_cd" => $store_cd,
                         "ym" => $Ym,
                         "amt" => $proj_amt,
-                        "uid" => "",
-                        "unm" => "",
+                        "uid" => $admin_id,
+                        "unm" => $admin_nm,
+						"rt"  => now(),
+						"ut"  => now()
                     ]);
                 } else {
-                    DB::table('store_sales_projection')->where('store_cd', $store_cd)->where('ym', $Ym)->update(['amt' => $proj_amt]);
+                    DB::table('store_sales_projection')->where('store_cd', $store_cd)->where('ym', $Ym)->update(['amt' => $proj_amt, 'ut' => now()]);
                 }
 			});
 			$code = 200;

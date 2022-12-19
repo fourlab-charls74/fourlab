@@ -10,6 +10,10 @@
                     <span>/ 알림전송</span>
                 </div>
             </div>
+            <div>
+                <button type="button" onclick="window.close()" id="close_btn" class="btn btn-sm btn-outline-primary shadow-sm mr-1" style="float:right;">닫기</button>
+                <button type="button" onclick="Create()" id="sendMsg_btn" class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">전송</button>
+            </div>
         </div>
 
         <form name="store">
@@ -17,7 +21,6 @@
                 <div class="card shadow">
                     <div class="card-header mb-0" style="display:inline-block">
                         <a>수신처</a>
-                        <button type="button" onclick="Create()" id="sendMsg_btn" class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">전송</button>
                     </div>
                     <div style="display:inline-block;"></div>
                     <div class="card-body mt-1">
