@@ -155,10 +155,7 @@ class std08Controller extends Controller
 
 	public function choice_index(Request $request)
 	{
-		$grade_idx = $request->input('grade_idx', '');
-		$grade_nm = DB::table('store_grade')->select('name')->where('idx', '=', $grade_idx)->first();
-		if($grade_nm != null) $grade_nm = $grade_nm->name;
-
+		$grade_nm = $request->input('grade_nm', '');
 		$values = [
 			"grade_nm" => $grade_nm,
 		];

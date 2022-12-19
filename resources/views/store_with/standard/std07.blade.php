@@ -155,9 +155,9 @@
         {field: "edate", headerName: "종료일", width: 90, cellStyle: {"text-align": "center"}},
         {field: "store_fee", headerName: "매장수수료(%)", width: 120, type: "percentType"},
         {field: "grade_cd", hide: true},
-        {field: "grade_nm", headerName: "매장등급", width: 100, cellStyle: {"text-align": "center"},
+        {field: "grade_nm", headerName: "매장등급", width: 80, cellStyle: {"text-align": "center"},
             cellRenderer: (params) => {
-                return `<a href='javascript:void(0)' onclick='showStoreGradePopup("${params.data.grade_idx}")'>${params.value}</a>`;
+                return `<a href='javascript:void(0)' onclick='showStoreGradePopup("${params.value || params.data.grade_cd}")'>${params.value || params.data.grade_cd}</a>`;
             }
         },
         // {field: "manager_fee", headerName: "중간관리수수료(%)", width: 120, type: "percentType"},
@@ -234,8 +234,8 @@
     }
     
     // 매장등급조회
-    function showStoreGradePopup(grade_idx = '') {
-        const url = "/store/standard/std08/choice?grade_idx=" + grade_idx;
+    function showStoreGradePopup(grade_nm = '') {
+        const url = "/store/standard/std08/choice?grade_nm=" + grade_nm;
         window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1200,height=710");
     }
 </script>
