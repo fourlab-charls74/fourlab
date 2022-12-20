@@ -1,9 +1,10 @@
--- 원부자재 상품
+-- 상품정보 ( 원부자재 상품 포함 )
 CREATE TABLE `product` (
     `prd_cd` varchar(50) NOT NULL COMMENT '상품코드',
     `prd_nm` VARCHAR(100) NOT NULL COMMENT '상품명',
-    `style_no` VARCHAR(50) NOT NUll CoMMENT '스타일 넘버',
-    `tag_price` int(11) COMENT 'tag가',
+    `prd_nm_eng` VARCHAR(100) NOT NULL COMMENT '상품명(영문)',
+    `style_no` VARCHAR(50) NOT NUll COMMENT '스타일 넘버',
+    `tag_price` int(11) COMMENT 'tag가',
     `price` int(11) NOT NULL COMMENT '판매가',
     `wonga` int(11) NOT NULL COMMENT '원가',
     `type` varchar(1) DEFAULT 'N' COMMENT '구분:일반(N),부자재(S),사은품(G)',
@@ -19,10 +20,7 @@ CREATE TABLE `product` (
 
 -- 원부자재 상품 코드
 CREATE TABLE `product_code` (
-    `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT 'identify',
     `prd_cd` varchar(50) NOT NULL COMMENT '상품코드',
-    `seq` int(2) unsigned zerofill NOT NULL COMMENT '상품코드 순서차수',
-    'img_url' varchar(255) COMMENT '이미지 주소',
     `goods_no` int(11) COMMENT '상품번호',
     `goods_opt` varchar(100) COMMENT '상품옵션명',
     `brand` varchar(2) NOT NULL COMMENT '브랜드 code - prd_cd_brand, prd_material_type',
@@ -31,13 +29,14 @@ CREATE TABLE `product_code` (
     `gender` char(1) NOT NULL COMMENT '성별 code - prd_cd_gender',
     `item` varchar(3) NOT NULL COMMENT '아이템 code - prd_cd_item',
     `opt` varchar(3) NOT NULL COMMENT '품목 code - prd_cd_opt, prd_material_opt',
+    `seq` int(2) unsigned zerofill NOT NULL COMMENT '상품코드 순서차수',
     `color` varchar(3) NOT NULL COMMENT '컬러옵션 code - prd_cd_color',
     `size` varchar(4) NOT NULL COMMENT '사이즈옵션 code - prd_cd_size',
     `type` varchar(1) DEFAULT 'N' COMMENT '구분:일반(N),부자재(S),사은품(G)',
     `rt` datetime NOT NULL COMMENT '등록일',
     `ut` datetime DEFAULT NULL COMMENT '수정일',
     `admin_id` varchar(30) NOT NULL COMMENT '관리자아이디',
-    PRIMARY KEY (`idx`, `prd_cd`)
+    PRIMARY KEY (`prd_cd`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 원부자재 상품 이미지
@@ -49,7 +48,8 @@ CREATE TABLE `product_image` (
     `rt` datetime NOT NULL COMMENT '등록일',
     `ut` datetime DEFAULT NULL COMMENT '수정일',
     `admin_id` varchar(30) NOT NULL COMMENT '관리자아이디',
-    PRIMARY KEY (`idx`, `prd_cd`)
+    PRIMARY KEY (`idx`),
+    KEY `idx_prdcd` (`prd_cd`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 상품 입고/반품 마스터
@@ -87,7 +87,7 @@ CREATE TABLE `product_stock_order` (
   `ut` datetime DEFAULT NULL COMMENT '최근수정일',
   PRIMARY KEY (`stock_no`),
   KEY `buy_ord_no` (`invoice_no`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='입고';noDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 상품 입고/반품 상품
 CREATE TABLE `product_stock_order_product` (
@@ -117,7 +117,7 @@ CREATE TABLE `product_stock_order_product` (
   PRIMARY KEY (`stock_prd_no`),
   KEY `stock_no` (`stock_no`),
   KEY `invoice_no` (`invoice_no`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='입고상품';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 원부자재 상품 입고/반품 마스터
 CREATE TABLE `sproduct_stock_order` (
@@ -150,18 +150,18 @@ CREATE TABLE `sproduct_stock_order_product` (
     `prc_rt` DATETIME DEFAULT NULL COMMENT '처리중일자',
     `fin_id` VARCHAR(50) DEFAULT NULL COMMENT '완료',
     `fin_rt` DATETIME DEFAULT NULL COMMENT '완료일자',
-    `rt` datetime NOT NULL COMMENT '등록일',
     `ut` datetime DEFAULT NULL COMMENT '수정일',
     `admin_id` varchar(30) NOT NULL COMMENT '관리자아이디',
-    PRIMARY KEY (`idx`)
+    PRIMARY KEY (`idx`),
+    KEY `idx_prdordno` (`prd_ord_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 오프라인 재고
 CREATE TABLE `product_stock` (
-    `goods_no` INT(11) NOT NULL DEFAULT '0' COMMENT '상품번호',
     `prd_cd` VARCHAR(50) NOT NULL DEFAULT '0' COMMENT '상품코드',
-    `wonga` int(11) default not null comment '최근원가',
-    `qty_wonga` bigint(11) default not null comment '총원가',
+    `goods_no` INT(11) NOT NULL DEFAULT '0' COMMENT '상품번호',
+    `wonga` int(11) not null comment '최근원가',
+    `qty_wonga` bigint(11) not null comment '총원가',
     `in_qty` INT(11) DEFAULT NULL COMMENT '입고수량',
     `out_qty` INT(11) DEFAULT NULL COMMENT '출고수량',
     `qty` INT(11) DEFAULT NULL COMMENT '보유재고',
@@ -189,8 +189,7 @@ CREATE TABLE `product_stock_store` (
     `ut` DATETIME DEFAULT NULL COMMENT '변경일시',
     PRIMARY KEY (`idx`),
     KEY `idx_prdcd` (`prd_cd`),
-    KEY `idx_store_cd` (`store_cd`)
-    PRIMARY KEY (`goods_no`,`prd_cd`,`store_cd`)
+    KEY `idx_storecd` (`store_cd`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='상품재고 매장별';
 
 -- 오프라인 재고(물류)
@@ -207,14 +206,8 @@ CREATE TABLE `product_stock_storage` (
     `ut` DATETIME DEFAULT NULL COMMENT '변경일시',
     PRIMARY KEY (`idx`),
     KEY `idx_prdcd` (`prd_cd`),
-    KEY `idx_storage_cd` (`storage_cd`)
+    KEY `idx_storagecd` (`storage_cd`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='상품재고 물류별';
-
-insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values
-('P_STOCK_TYPE','10','매입','','','','Y','0','ceduce','본사_김용남',now(),now()),
-('P_STOCK_TYPE','20','주문','','','','Y','0','ceduce','본사_김용남',now(),now()),
-('P_STOCK_TYPE','11','반품','','','','Y','0','ceduce','본사_김용남',now(),now()),
-('P_STOCK_TYPE','30','재고조정','','','','Y','0','ceduce','본사_김용남',now(),now());
 
 -- 오프라인 출고
 CREATE TABLE `product_stock_release` (
@@ -228,8 +221,8 @@ CREATE TABLE `product_stock_release` (
     `storage_cd` VARCHAR(30) NOT NULL DEFAULT '0' COMMENT '창고코드',
     `state` INT(11) NOT NULL DEFAULT '0' COMMENT '상태(요청/접수/출고/입고(매장)/거부:10/20/30/40/-10)',
     `exp_dlv_day` VARCHAR(8) DEFAULT NULL COMMENT '출고예정일자',
-    `rel_order` VARCHAR(30) DEFAULT NULL COMMENT '출고차수 - 출고예정일자 + code : REL_ORDER (01 - 25)',
-    `req_comment` VARCHAR(255) DEFAULT NULL COMMENT '요청메모',
+    `rel_order` VARCHAR(30) DEFAULT NULL COMMENT '출고차수 - 출고예정일자 + "-" + 출고구분 + code : REL_ORDER (01 - 10)',
+    `req_comment` VARCHAR(255) DEFAULT NULL COMMENT '요청메모 (매장메모)',
     `comment` VARCHAR(255) DEFAULT NULL COMMENT '출고메모(거부사유 등)',
     `req_id` VARCHAR(50) DEFAULT NULL COMMENT '요청자',
     `req_rt` DATETIME DEFAULT NULL COMMENT '요청일시',
@@ -242,7 +235,7 @@ CREATE TABLE `product_stock_release` (
     `rt` DATETIME DEFAULT NULL COMMENT '등록일시',
     `ut` DATETIME DEFAULT NULL COMMENT '변경일시',
     PRIMARY KEY (`idx`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='상품재고 이동';
+) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='상품출고';
 
 -- 오프라인 RT
 CREATE TABLE `product_stock_rotation` (
@@ -272,18 +265,17 @@ CREATE TABLE `product_stock_rotation` (
     PRIMARY KEY (`idx`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='상품재고 이동';
 
-
 -- 오프라인 재고(매장) 입출고
 CREATE TABLE `product_stock_hst` (
     `idx` INT(11) NOT NULL AUTO_INCREMENT COMMENT '일련번호',
     `goods_no` INT(11) NOT NULL DEFAULT '0' COMMENT '상품번호',
-    `prd_cd` VARCHAR(50) NOT NULL DEFAULT '0' COMMENT '상품코드',
+    `prd_cd` VARCHAR(50) NOT NULL COMMENT '상품코드',
     `goods_opt` VARCHAR(100) NOT NULL DEFAULT '' COMMENT '상품옵션명',
-    `location_cd` VARCHAR(30) NOT NULL DEFAULT '0' COMMENT '매장코드 or 창고코드',
+    `location_cd` VARCHAR(30) NOT NULL COMMENT '매장코드 or 창고코드',
     `location_type` VARCHAR(10) NOT NULL COMMENT '매장(STORE) / 창고(STORAGE)',
     `type` VARCHAR(30) DEFAULT NULL COMMENT '분류 - code: product_stock_type', -- (주문(2) / 교환(5) / 환불(6) / 주문취소(7) / 재고조정(9) / 반품(11) / LOSS(14) / RT(15))
     `price` INT(11) DEFAULT NULL COMMENT '판매가',
-    `wonga` DECIMAL(10,0) DEFAULT NULL COMMENT '원가',
+    `wonga` DECIMAL(10,0) DEFAULT NULL COMMENT '원가 - (수정해야함)',
     `qty` INT(11) DEFAULT NULL COMMENT '수량',
     `invoice_no` VARCHAR(20) DEFAULT NULL COMMENT '송장번호',
     `stock_state_date` VARCHAR(8) DEFAULT NULL COMMENT '재고상태일시',
@@ -301,26 +293,6 @@ CREATE TABLE `product_stock_hst` (
     KEY `stock_state_date` (`stock_state_date`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='상품재고 이력';
 
--- 입고
-ALTER TABLE `bizest_smart`.`stock_product` ADD COLUMN `prd_cd` VARCHAR(50) NULL COMMENT '상품코드' AFTER `brand`;
-
--- 주문에 '상품코드' 추가
-ALTER TABLE `bizest_smart`.`order_mst` ADD COLUMN `store_cd` VARCHAR(30) NULL COMMENT '매장코드' AFTER `out_ord_no`;
--- ALTER TABLE `bizest_smart`.`order_mst` ADD COLUMN `sale_kind` VARCHAR(30) NULL COMMENT '판매유형' AFTER `store_cd`;
--- ALTER TABLE `bizest_smart`.`order_mst` ADD COLUMN `pr_code` VARCHAR(30) NULL COMMENT '행사구분' AFTER `sale_kind`;
--- 위 2개 항목 order_msg => order_opt 변경 (2022-08-23)
-
-ALTER TABLE `bizest_smart`.`order_opt` ADD COLUMN `sale_kind` VARCHAR(30) NULL COMMENT '판매유형' AFTER `store_cd`;
-ALTER TABLE `bizest_smart`.`order_opt` ADD COLUMN `pr_code` VARCHAR(30) NULL COMMENT '행사구분' AFTER `sale_kind`;
-ALTER TABLE `bizest_smart`.`order_opt` ADD COLUMN `store_cd` VARCHAR(30) NULL COMMENT '매장코드' AFTER `prd_cd`;
-ALTER TABLE `bizest_smart`.`order_opt` ADD COLUMN `prd_cd` VARCHAR(50) NULL COMMENT '상품코드' AFTER `out_ord_opt_no`;
-
-ALTER TABLE `bizest_smart`.`order_opt_wonga` ADD COLUMN `prd_cd` VARCHAR(50) NULL COMMENT '상품코드' AFTER `tax_fee`;
-ALTER TABLE `bizest_smart`.`order_opt_wonga` ADD COLUMN `store_cd` VARCHAR(30) NULL COMMENT '매장코드' AFTER `prd_cd`;
-
-ALTER TABLE `bizest_smart`.`order_opt` ADD INDEX `idx_store_cd_orddate` (`store_cd`, `ord_date`);
-ALTER TABLE `bizest_smart`.`order_opt_wonga` ADD INDEX `idx_ord_state_date` (ord_state_date,ord_state,store_cd);
-
 -- 매장
 CREATE TABLE `store` (
     `store_cd` varchar(30) NOT NULL COMMENT '매장코드',
@@ -328,6 +300,7 @@ CREATE TABLE `store` (
     `store_nm_s` varchar(50) NOT NULL COMMENT '매장명(약칭)',
     `store_type` varchar(30) NOT NULL COMMENT '매장구분 - code : store_type',
     `store_kind` varchar(30) NOT NULL COMMENT '매장종류 - code : store_kind',
+    `grade_cd` varchar(2) NOT NULL COMMENT '매장등급 - code : store_grade : grade_cd',
     `store_area` varchar(30) NOT NULL COMMENT '지역코드 - code : store_area',
     `zipcode` varchar(7) DEFAULT NULL COMMENT '우편번호',
     `addr1` varchar(255) DEFAULT NULL COMMENT '주소1',
@@ -371,15 +344,14 @@ CREATE TABLE `store` (
     `point_in_yn` char(1) DEFAULT 'N' COMMENT '적립금적립여부',
     `point_out_yn` char(1) DEFAULT 'N' COMMENT '적립금사용여부',
     `map_code` varchar(100) COMMENT '맵 코드',
-    `open_month_stock` varchar(1) DEFAULT 'N' COMMENT '오픈 후 한 달 재고보기 제외여부'
+    `open_month_stock` varchar(1) DEFAULT 'N' COMMENT '오픈 후 한 달 재고보기 제외여부',
     `reg_date` datetime DEFAULT NULL COMMENT '등록일',
     `mod_date` datetime DEFAULT NULL COMMENT '수정일',
     `admin_id` varchar(30) DEFAULT NULL COMMENT '관리자 아이디',
     PRIMARY KEY (`store_cd`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
--- 매장에 '매장등급' 추가
-ALTER TABLE `bizest_smart`.`store` ADD COLUMN `grade_cd` varchar(2) NOT NULL COMMENT '매장등급 - store_grade : grade_cd' AFTER `store_kind`;
 
+-- 매장 목표
 CREATE TABLE `store_sales_projection` (
     `store_cd` varchar(30) NOT NULL COMMENT '매장코드',
     `ym` varchar(6) NOT NULL COMMENT '년월',
@@ -390,7 +362,6 @@ CREATE TABLE `store_sales_projection` (
     `ut` datetime DEFAULT NULL COMMENT '수정일',
     PRIMARY KEY (`store_cd`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 
 -- 창고
 CREATE TABLE `storage` (
@@ -414,7 +385,6 @@ CREATE TABLE `storage` (
     PRIMARY KEY (`storage_cd`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
 -- 동종업계
 CREATE TABLE `competitor` (
     `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT 'identify',
@@ -430,8 +400,21 @@ CREATE TABLE `competitor` (
     `mod_date` datetime DEFAULT NULL COMMENT '수정일자',
     `admin_id` varchar(30) DEFAULT NULL COMMENT '관리자아이디',
     PRIMARY KEY (`idx`)
-) ENGINE=InnoDB AUTO_INCREMENT=315 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- 동종업계 매출관리
+CREATE TABLE `competitor_sale` (
+  `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT '동종업계 매출 일련번호',
+  `store_cd` varchar(30) NOT NULL COMMENT '매장코드',
+  `competitor_cd` int(11) NOT NULL COMMENT '동종업계 번호 - competitor : idx',
+  `sale_date` varchar(10) NOT NULL COMMENT '매출일자 (yyyy-mm-dd)',
+  `sale_amt` int(11) NOT NULL COMMENT '동종업계 매출액',
+  `admin_id` varchar(50) DEFAULT NULL COMMENT '작성자',
+  `rt` datetime DEFAULT NULL COMMENT '등록일',
+  `ut` datetime DEFAULT NULL COMMENT '최근 수정일',
+  PRIMARY KEY (`idx`),
+  KEY `idx` (`idx`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 판매 유형 관리
 CREATE TABLE `sale_type` (
@@ -447,8 +430,7 @@ CREATE TABLE `sale_type` (
     `mod_date` datetime DEFAULT NULL COMMENT '수정일자',
     `admin_id` varchar(30) DEFAULT NULL COMMENT '관리자아이디',
     PRIMARY KEY (`idx`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
-
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 판매 유형 관리 - 매장
 CREATE TABLE `sale_type_store` (
@@ -489,9 +471,9 @@ CREATE TABLE `store_grade` (
     `name` VARCHAR(30) NOT NULL COMMENT '등급명',
     `sdate` VARCHAR(7) DEFAULT NULL COMMENT '시작월',
     `edate` VARCHAR(7) DEFAULT NULL COMMENT '종료월',
-    `amt1` INT DEFAULT NULL COMMENT '금액1',
+    `amt1` INT(11) DEFAULT NULL COMMENT '금액1',
     `fee1` DECIMAL(5,2) DEFAULT NULL COMMENT '수수료1',
-    `amt2` INT DEFAULT NULL COMMENT '금액2',
+    `amt2` INT(11) DEFAULT NULL COMMENT '금액2',
     `fee2` DECIMAL(5,2) DEFAULT NULL COMMENT '수수료2',
     `amt3` INT DEFAULT NULL COMMENT '금액3',
     `fee3` DECIMAL(5,2) DEFAULT NULL COMMENT '수수료3',
@@ -824,6 +806,27 @@ ALTER TABLE `bizest_smart`.`member` ADD COLUMN `type` CHAR(1) NOT NULL DEFAULT '
 ALTER TABLE `bizest_smart`.`member` ADD COLUMN `store_nm` VARCHAR(100) DEFAULT NULL COMMENT '회원가입 매장명' AFTER `type`;
 ALTER TABLE `bizest_smart`.`member` ADD COLUMN `store_cd` VARCHAR(30) DEFALUT NULL COMMENT '회원가입 매장코드' AFTER `store_nm`;
 
+-- 입고
+ALTER TABLE `bizest_smart`.`stock_product` ADD COLUMN `prd_cd` VARCHAR(50) NULL COMMENT '상품코드' AFTER `brand`;
+
+-- 주문에 '상품코드' 추가
+ALTER TABLE `bizest_smart`.`order_mst` ADD COLUMN `store_cd` VARCHAR(30) NULL COMMENT '매장코드' AFTER `out_ord_no`;
+-- ALTER TABLE `bizest_smart`.`order_mst` ADD COLUMN `sale_kind` VARCHAR(30) NULL COMMENT '판매유형' AFTER `store_cd`;
+-- ALTER TABLE `bizest_smart`.`order_mst` ADD COLUMN `pr_code` VARCHAR(30) NULL COMMENT '행사구분' AFTER `sale_kind`;
+-- 위 2개 항목 order_msg => order_opt 변경 (2022-08-23)
+
+ALTER TABLE `bizest_smart`.`order_opt` ADD COLUMN `sale_kind` VARCHAR(30) NULL COMMENT '판매유형' AFTER `store_cd`;
+ALTER TABLE `bizest_smart`.`order_opt` ADD COLUMN `pr_code` VARCHAR(30) NULL COMMENT '행사구분' AFTER `sale_kind`;
+ALTER TABLE `bizest_smart`.`order_opt` ADD COLUMN `store_cd` VARCHAR(30) NULL COMMENT '매장코드' AFTER `prd_cd`;
+ALTER TABLE `bizest_smart`.`order_opt` ADD COLUMN `prd_cd` VARCHAR(50) NULL COMMENT '상품코드' AFTER `out_ord_opt_no`;
+
+ALTER TABLE `bizest_smart`.`order_opt_wonga` ADD COLUMN `prd_cd` VARCHAR(50) NULL COMMENT '상품코드' AFTER `tax_fee`;
+ALTER TABLE `bizest_smart`.`order_opt_wonga` ADD COLUMN `store_cd` VARCHAR(30) NULL COMMENT '매장코드' AFTER `prd_cd`;
+
+ALTER TABLE `bizest_smart`.`order_opt` ADD INDEX `idx_store_cd_orddate` (`store_cd`, `ord_date`);
+ALTER TABLE `bizest_smart`.`order_opt_wonga` ADD INDEX `idx_ord_state_date` (ord_state_date,ord_state,store_cd);
+
+
 --
 -- 기존 테이블 컬럼 추가 종료
 --
@@ -831,6 +834,13 @@ ALTER TABLE `bizest_smart`.`member` ADD COLUMN `store_cd` VARCHAR(30) DEFALUT NU
 --
 -- 테이블 데이터 추가 시작
 --
+
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values
+('P_STOCK_TYPE','10','매입','','','','Y','0','ceduce','본사_김용남',now(),now()),
+('P_STOCK_TYPE','20','주문','','','','Y','0','ceduce','본사_김용남',now(),now()),
+('P_STOCK_TYPE','11','반품','','','','Y','0','ceduce','본사_김용남',now(),now()),
+('P_STOCK_TYPE','30','재고조정','','','','Y','0','ceduce','본사_김용남',now(),now());
+
 -- code_kind 데이터 추가 매장구분 : STORE_TYPE
 insert into `code_kind` (`code_kind_cd`, `code_kind_nm`, `code_kind_nm_eng`, `use_yn`, `type`, `seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('STORE_TYPE','[매장관리]매장구분','store type','Y','S','0','admin','본사_김용남',now(),now());
 
