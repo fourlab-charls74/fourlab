@@ -65,6 +65,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 코드일련 조회
         Route::get('product/color', 'goods@search_color'); // 코드일련으로 해당 상품의 컬러옵션 리스트 조회
         Route::get('prdcd/search_p', 'goods@search_prdcd_p');
+
+        // sms
+        Route::get('sms/{type}', 'SmsController@index');
+        Route::get('sms/search/member', 'SmsController@search_member');
     });
 
     // 포스

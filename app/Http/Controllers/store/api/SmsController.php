@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\head\api;
+namespace App\Http\Controllers\store\api;
 
 use App\Components\SLib;
 use App\Components\Lib;
@@ -21,19 +21,45 @@ class SmsController extends Controller
         $mutable = now();
         $sdate	= $mutable->sub(3, 'month')->format('Y-m-d');
 
+        $s_phone = $req->input('phone', '');
+        $s_name = $req->input('name', '');
+
+        $ids = $req->input('ids', '');
+        $users = [];
+        if ($ids != '') {
+            $ids = explode(',', $ids);
+            $where = array_reduce($ids, function($a, $c) {
+                $a .= " or user_id = '$c' ";
+                return $a;
+            }, '');
+            $sql = "
+                select user_id, name as s_name, phone as s_phone
+                from member
+                where 1<>1 $where
+            ";
+            $users = DB::select($sql);
+
+            if (count($users) == 1) {
+                $s_phone = $users[0]->s_phone;
+                $s_name = $users[0]->s_name;
+                $users = [];
+            }
+        }
+
         $values = [
             'sdate'         => $sdate,
             'edate'         => date("Y-m-d"),
-            'phone'         => $req->input('phone', ''),
             'name'          => $req->input('name', ''),
             'type'          => $type,
             'sms_yn'        => $conf->getConfigValue("sms","sms_yn"),
             'phone'         => $conf->getConfigValue("shop","phone"),
-            's_phone'       => $req->input('phone', ''),
-            's_name'       => $req->input('name', '')
+            's_phone'       => $s_phone,
+            's_name'        => $s_name,
+            'users'         => json_encode($users),
+            'store_areas'	=> SLib::getCodes("STORE_AREA"),
         ];
 
-        return view( Config::get('shop.head.view') . "/common/sms_all", $values);
+        return view( Config::get('shop.store.view') . "/common/sms_all", $values);
     }
 
     public function sendMsg(Request $req) {
@@ -149,6 +175,36 @@ class SmsController extends Controller
             "head" => $arr_header,
             "body" => $rows
         ]);
+    }
+
+    public function search_member(Request $req)
+    {
+        $store_cd = $req->input('store', '');
+        $area_cd = $req->input('area', '');
+        $result = [];
+
+        if ($store_cd != '') {
+            $store_nm = DB::table('store')->where('store_cd', $store_cd)->value('store_nm');
+            $sql = "
+                select user_id, name, phone
+                from member
+                where (store_cd = '$store_cd' or store_nm = '$store_nm')
+                    and name <> ''
+            ";
+            $result = DB::select($sql);
+        } else if ($area_cd != '') {
+            $sql = "
+                select m.user_id, m.name, m.phone, m.store_cd, m.store_nm
+                from member m
+                    inner join store s on 
+                        (s.store_cd = m.store_cd or s.store_nm = m.store_nm) 
+                        and s.store_area = '$area_cd'
+                where m.name <> ''
+            ";
+            $result = DB::select($sql);
+        }
+        
+        return response()->json(['code' => '200', 'msg' => '', 'data' => $result], 200);
     }
 
     /*

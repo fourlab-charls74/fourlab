@@ -32,8 +32,8 @@
         <div class="tab-pane show active" id="send" role="tabpanel" aria-labelledby="send-tab">
             <div id="send-area" class="card shadow mb-3">
                 <div class="card-body" style="border-top: none;">
-                    <div class="row mb-2 mb-lg-3">
-                        <div class="col-lg-4 inner-td">
+                    <div class="row mb-2 mb-sm-3">
+                        <div class="col-sm-4 inner-td">
                             <div class="form-group mb-0">
                                 <label for="type">송신자 : </label>
                                 <div class="flax_box">
@@ -41,7 +41,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4 inner-td">
+                        <div class="col-sm-4 inner-td mt-2 mt-sm-0">
                             <div class="form-group mb-0">
                                 <label for="type">수신자 : </label>
                                 <div class="flax_box">
@@ -49,7 +49,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4 inner-td">
+                        <div class="col-sm-4 inner-td mt-2 mt-sm-0">
                             <div class="form-group mb-0">
                                 <label for="type">수신자 휴대폰번호('-'포함) : </label>
                                 <div class="flax_box">
@@ -72,7 +72,36 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col mb-2 mb-lg-3">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>매장회원적용</label>
+                                <div class="d-flex align-items-center">
+                                    <div class="form-inline inline_btn_box w-100 mr-2">
+                                        <input type='hidden' id="store_nm" name="store_nm">
+                                        <select id="store_no" name="store_no" class="form-control form-control-sm select2-store w-100"></select>
+                                        <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                    </div>
+                                    <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm store-member-btn" style="min-width: 80px;">회원적용</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>지역회원적용</label>
+                                <div class="d-flex">
+                                    <select name='store_area' id="store_area" class="form-control form-control-sm mr-2">
+                                        <option value=''>전체</option>
+                                    @foreach (@$store_areas as $store_area)
+                                        <option value='{{ $store_area->code_id }}'>{{ $store_area->code_val }}</option>
+                                    @endforeach
+                                </select>
+                                <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm area-member-btn" style="min-width: 80px;">회원적용</a>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col mb-2 mb-sm-3">
                             <div>
                                 <a href="/multi.sms.xls" download>multi.sms.xls</a>
                             </div>
@@ -85,21 +114,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="">매장회원적용</label>
-                                <div class="form-inline inline_select_box">
-                                    <div class="form-inline inline_btn_box w-100">
-                                        <input type='hidden' id="store_nm" name="store_nm">
-                                        <select id="store_no" name="store_no" class="form-control form-control-sm select2-store w-100"></select>
-                                        <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6"></div>
                     </div>
                     <div class="row">
                         <div class="col text-center mt-3">
@@ -134,12 +148,12 @@
             <div id="search-area" class="search_cum_form">
                 <form method="get" name="search">
                     <div class="card shadow mb-3">
-                        <div class="card-body">
+                        <div class="card-body" style="border-top: none;">
                             <div class="row">
                                 <div class="col inner-td">
                                     <div class="form-group">
                                         <label for="user_yn">발송일자 : </label>
-                                        <div class="form-inline inline_input_box date-switch-wrap">
+                                        <div class="form-inline inline_input_box date-switch-wrap pr-0">
                                             <div class="docs-datepicker form-inline-inner" style="width:42%;">
                                                 <div class="input-group">
                                                     <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
@@ -151,7 +165,7 @@
                                                 </div>
                                                 <div class="docs-datepicker-container"></div>
                                             </div>
-                                            <span class="text_line">~</span>
+                                            <span class="text_line" style="width:5%;">~</span>
                                             <div class="docs-datepicker form-inline-inner" style="width:42%;">
                                                 <div class="input-group">
                                                     <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
@@ -163,7 +177,7 @@
                                                 </div>
                                                 <div class="docs-datepicker-container"></div>
                                             </div>
-                                            <div class="ml-1">
+                                            <div class="ml-0 ml-sm-2">
                                                 <a href="#" id="search_sbtn" class="btn btn-sm btn-primary shadow-sm search-btn">검색</a>
                                             </div>
                                         </div>
@@ -171,7 +185,7 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-6">
+                                <div class="col-sm-6 mb-2 mb-sm-0">
                                     <div class="form-group">
                                         <label for="user_yn">수신자 휴대전화 : </label>
                                         <div class="flax_box">
@@ -179,7 +193,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-sm-6">
                                     <div class="form-group">
                                         <label for="user_yn">수신자 : </label>
                                         <div class="flax_box">
@@ -194,10 +208,10 @@
             </div>
 
             <div class="card shadow mb-3">
-                <div class="card-body shadow">
+                <div class="card-body shadow" style="border-top: none;">
                     <div class="card-title form-inline">
                         <div class="filter_wrap">
-                            <div class="fl_box">
+                            <div class="fl_box" style="border-bottom: none;">
                                 <h6 class="m-0 font-weight-bold">총 : <span id="gd-list-total" class="text-primary">0</span> 건</h6>
                             </div>
                         </div>
@@ -233,6 +247,9 @@ const snedColumn = [
         checkboxSelection: true,
         width:28
 
+    },
+    {field: "idx", headerName: '#', type: 'NumType', width: 40, cellStyle: {"text-align": "center"},
+        cellRenderer: (params) => parseInt(params.value) + 1,
     },
     {field: "name", headerName: "수신자", width: 70, cellStyle: {"text-align": "center"}},
     {field: "phone", headerName: "휴대폰번호", cellStyle: {"text-align": "center"}},
@@ -364,7 +381,7 @@ $(".batch-msg-btn").on("click", function(e) {
     e.preventDefault();
     const msg = $("#msg").val();
     const rows = sendGx.getRows();
-    sendGx.gridOptions.api.applyTransaction({ update: rows.map(row => ({...row, msg})) });
+    sendGx.gridOptions.api.applyTransaction({ update: rows.map(row => ({...row, msg, byte: msg.bytes()})) });
     $("#gd-total").text(sendGx.getRows().length);
 });
 
@@ -390,6 +407,54 @@ $('.add-msg-btn').click((e) => {
         'byte'  : msg.bytes(),
         'idx'   : searchRows.length
     });
+});
+
+$(".store-member-btn").on("click", async function(e) {
+    e.preventDefault();
+
+    let store_cd = $("#store_no").val();
+    if (store_cd == null) return;
+
+    const { data: { code, data } } = await axios({ method: "get", url: "/store/api/sms/search/member?store=" + store_cd });
+    if (code == '200') {
+        if (data.length < 1) return alert("해당매장의 회원이 존재하지 않습니다.");
+        alert("다소 시간이 소요될 수 있습니다. 잠시만 기다려주세요.");
+        for (let user of data) {
+            addRow({
+                'name'  : user.name,
+                'phone' : user.phone,
+                'msg'   : '',
+                'byte'  : 0,
+                'idx'   : searchRows.length
+            });
+        }
+    } else {
+        alert("매장회원적용 시 에러가 발생했습니다. 다시 시도해주세요.");
+    }
+});
+
+$(".area-member-btn").on("click", async function(e) {
+    e.preventDefault();
+
+    let area_cd = $("#store_area").val();
+    if (area_cd == '') return;
+
+    const { data: { code, data } } = await axios({ method: "get", url: "/store/api/sms/search/member?area=" + area_cd });
+    if (code == '200') {
+        if (data.length < 1) return alert("해당지역의 회원이 존재하지 않습니다.");
+        alert("다소 시간이 소요될 수 있습니다. 잠시만 기다려주세요.");
+        for (let user of data) {
+            addRow({
+                'name'  : user.name,
+                'phone' : user.phone,
+                'msg'   : '',
+                'byte'  : 0,
+                'idx'   : searchRows.length
+            });
+        }
+    } else {
+        alert("지역회원적용 시 에러가 발생했습니다. 다시 시도해주세요.");
+    }
 });
 
 $('#file').change((e) => {
