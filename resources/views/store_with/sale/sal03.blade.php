@@ -257,62 +257,62 @@
                     }];
 
 	var columns = [
-		{headerName: '#', pinned: 'left', type: 'NumType', width:40, cellStyle: {"line-height": "30px"},
+		{headerName: '#', pinned: 'left', type: 'NumType', width: 40, cellStyle: StyleLineHeight,
             cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : parseInt(params.value) + 1,
         },
+		{field: "prd_cd", headerName: "상품코드", width: 120, pinned: "left", cellStyle: StyleLineHeight},
 		{
             field: "goods_no",
             headerName: "상품번호",
             width: 58,
             pinned: 'left',
-            cellStyle: {"line-height": "30px"},
+            cellStyle: StyleLineHeight,
             cellRenderer: function (params) {
                 if (params.value) {
                     return `<a href="{{config('shop.front_url')}}/app/product/detail/${params.value}" target="_blank">${params.value}</a>`
                 }
             }
         },
-		{field: "prd_cd", headerName: "상품코드", width:120, cellStyle: {"line-height": "30px", 'text-align': 'center'}},
-		{field: "brand_nm", headerName: "브랜드", cellStyle: {"line-height": "30px"}},
-        {field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: {"line-height": "30px", 'text-align': 'center'}},
-		{field: "img", headerName: "이미지", type: 'GoodsImageType', width:60, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}"},
+		{field: "brand_nm", headerName: "브랜드", cellStyle: StyleLineHeight, width: 70},
+        {field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: StyleLineHeight},
+		{field: "img", headerName: "이미지", type: 'GoodsImageType', width: 50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}"},
         {field: "img", headerName: "이미지_url", hide: true},
-		{field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', cellStyle: {"line-height": "30px"}},
-		{field: "goods_nm_eng", headerName: "상품명(영문)", width: 230, cellStyle: {"line-height": "30px"}},
-		{field: "prd_cd_p", headerName: "코드일련", cellStyle: {"line-height": "30px",'text-align':'center'}, width: 100},
-		{field: "color", headerName: "컬러", cellStyle: {"line-height": "30px", 'text-align':'center'}, width: 50},
-		{field: "size", headerName: "사이즈", cellStyle: {"line-height": "30px", 'text-align':'center'}, width: 50},
-		{field: "goods_opt", headerName: "옵션", cellStyle: {"line-height": "30px"}, width: 120},
+		{field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', cellStyle: {"line-height": "30px"}, width: 150},
+		{field: "goods_nm_eng", headerName: "상품명(영문)", width: 150, cellStyle: {"line-height": "30px"}},
+		{field: "prd_cd_p", headerName: "코드일련", cellStyle: StyleLineHeight, width: 90},
+		{field: "color", headerName: "컬러", cellStyle: StyleLineHeight, width: 55},
+		{field: "size", headerName: "사이즈", cellStyle: StyleLineHeight, width: 55},
+		{field: "goods_opt", headerName: "옵션", cellStyle: {"line-height": "30px"}, width: 130},
         {field: "in_warehouse",	headerName: "입고",
             children: [
-                {headerName: "수량", field: "in_sum_qty", type: 'numberType'},
-                {headerName: "금액", field: "in_sum_amt", type: 'currencyMinusColorType', width: 80},
-                {headerName: "판매율(%)", field: "in_sale_rate", cellStyle:{'text-align': 'right'}, type: 'currencyMinusColorType'}
+                {headerName: "수량", field: "in_sum_qty", type: 'numberType', width: 60},
+                {headerName: "금액", field: "in_sum_amt", type: 'currencyMinusColorType', width: 70},
+                {headerName: "판매율(%)", field: "in_sale_rate", cellStyle:{'text-align': 'right'}, type: 'currencyMinusColorType', width: 70}
             ]
         },
         {field: "ex_warehouse",	headerName: "출고",
             children: [
-                {headerName: "수량", field: "ex_sum_qty", type: 'numberType'},
-                {headerName: "최초출고일", field: "ex_date"},
+                {headerName: "수량", field: "ex_sum_qty", type: 'numberType', width: 60},
+                {headerName: "최초출고일", field: "ex_date", width: 70, cellStyle: StyleLineHeight},
             ]
         },
         {field: "total_sale", headerName: "총판매",
             children: [
-                {headerName: "수량", field: "total_ord_qty", type: 'numberType'},
-                {headerName: "금액", field: "total_ord_amt", type: 'currencyMinusColorType', width: 80},
-                {headerName: "판매율(%)", field: "total_sale_rate", cellStyle:{'text-align': 'right'}, type: 'currencyMinusColorType'}
+                {headerName: "수량", field: "total_ord_qty", type: 'numberType', width: 60},
+                {headerName: "금액", field: "total_ord_amt", type: 'currencyMinusColorType', width: 70},
+                {headerName: "판매율(%)", field: "total_sale_rate", cellStyle:{'text-align': 'right'}, type: 'currencyMinusColorType', width: 70}
             ]
         },
         {field: "sale",	headerName: "기간판매",
             children: [
-                {headerName: "수량", field: "ord_qty", type: 'numberType'},
-                {headerName: "금액", field: "ord_amt", type: 'currencyMinusColorType', width: 80},
-                {headerName: "판매율(%)", field: "sale_rate", cellStyle:{'text-align': 'right'}, type: 'currencyMinusColorType'}
+                {headerName: "수량", field: "ord_qty", type: 'numberType', width: 60},
+                {headerName: "금액", field: "ord_amt", type: 'currencyMinusColorType', width: 70},
+                {headerName: "판매율(%)", field: "sale_rate", cellStyle:{'text-align': 'right'}, type: 'currencyMinusColorType', width: 70}
             ]
         },
-        {field: "stock_qty", headerName: "매장재고", type: 'numberType'},
-        {field: "stock_wqty", headerName: "창고재고", type: 'numberType'},
-        {headerName: "", field: "nvl", width: "auto"}
+        {field: "stock_qty", headerName: "매장재고", type: 'numberType', width: 60},
+        {field: "stock_wqty", headerName: "창고재고", type: 'numberType', width: 60},
+        {width: "auto"}
 	];
 </script>
 <script type="text/javascript" charset="utf-8">

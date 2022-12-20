@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use PDO;
 
 class sal03Controller extends Controller
 {
@@ -147,6 +148,9 @@ class sal03Controller extends Controller
 		$page_size = $limit;
 		$startno = ($page - 1) * $page_size;
 		$limit = " limit $startno, $page_size ";
+
+		$cfg_img_size_real	= "a_500";
+		$cfg_img_size_list	 = "s_50";
 		
 		$sql = /** @lang text */
             "
@@ -158,6 +162,7 @@ class sal03Controller extends Controller
 				a.style_no,
 				a.goods_opt,
 				a.img,
+				a.img_view,
 				a.goods_nm,
 				a.goods_nm_eng,
 				a.prd_cd_p,
@@ -196,8 +201,13 @@ class sal03Controller extends Controller
 						sum(w.recv_amt + w.point_apply_amt) as ord_amt,
 						avg(w.wonga) as wonga,
 						g.goods_type,
-						o.goods_no, g.brand, b.brand_nm, g.style_no, o.goods_opt, g.img, g.goods_nm, g.goods_nm_eng,
+						o.goods_no, g.brand, b.brand_nm, g.style_no, o.goods_opt, g.goods_nm, g.goods_nm_eng,
 						concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color, pc.size
+						, '' as img_view
+						, if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
+							select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
+							from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
+						)) as img
 					from order_mst m 
 						inner join order_opt o on m.ord_no = o.ord_no 
 						left outer join product_code pc on pc.prd_cd = o.prd_cd
@@ -242,8 +252,16 @@ class sal03Controller extends Controller
 			$limit
 		";
 		
-
-		$result = DB::select($sql);
+		$pdo	= DB::connection()->getPdo();
+		$stmt	= $pdo->prepare($sql);
+		$stmt->execute();
+		$result	= [];
+		while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			if ($row["img"] != "") {
+				$row["img"] = sprintf("%s%s", config("shop.image_svr"), $row["img"]);
+			}
+			$result[] = $row;
+		}
 
 
 		// pagination
