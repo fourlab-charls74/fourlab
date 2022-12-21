@@ -824,7 +824,9 @@ class cs01Controller extends Controller {
 			$state = $values['state'] ?? 10;
 			$loc = $values['loc'] ?? '';
 
+			$ori_products = [];
 			if ($type != "A") { // 추가입고가 아닐때
+				$ori_products = DB::table('product_stock_order_product')->where('stock_no', $stock_no)->get()->toArray();
 				$sql = "
 					delete from product_stock_order_product
 					where stock_no = :stock_no
@@ -894,9 +896,17 @@ class cs01Controller extends Controller {
 									DB::table('product_stock_hst')
 										->where('prd_cd', $prd_cd)->where('invoice_no', $invoice_no)
 										->update([ 'wonga' => $cost ]);
+									
+									// 입고완료 이후 수량 변경 시 재고 업데이트
+									$plus_qty = array_filter($ori_products, function($p) use ($prd_cd, $qty) {return $p->prd_cd == $prd_cd && $p->qty != $qty;});
+									if ($plus_qty != null && count($plus_qty) > 0) {
+										$plus_qty = $plus_qty[0]->qty;
+										$plus_qty = $qty - $plus_qty;
+										$this->stockIn($goods_no, $prd_cd, $opt, $plus_qty, $stock_no, $invoice_no, $cost, $loc);
+									}
 								}
 							}
-
+							
 							if ($state == 40) { // 원가확정인 경우
 								$this->confirmWonga($stock_no, $prd_cd, $qty, $cost, $invoice_no);
 							}
@@ -946,7 +956,7 @@ class cs01Controller extends Controller {
 	public function stockIn($goods_no, $prd_cd, $opt, $qty, $stock_no, $invoice_no, $cost, $loc) {
 		/**
 		 * '입고완료' 라면 입고처리
-		 * 관련테이블 - product_stock, goods_good, goods_history, stock
+		 * 관련테이블 - product_stock, product_stock_storage, product_stock_hst
 		 */
 		$sql = "
 			select goods_no

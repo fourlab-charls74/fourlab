@@ -414,8 +414,14 @@
 
     /** 수정가능한 셀인지 판단 */
     function checkIsEditable(params) {
+        const cols = ['unit_cost', 'prd_tariff_rate'];
+
+        // 슈퍼관리자 권한설정 필요 (추후)
+        if (true) {
+            cols.push('qty');
+        }
         if (
-            (params.column?.colId == 'unit_cost' || params.column?.colId == 'prd_tariff_rate') 
+            (cols.includes(params.column?.colId || '')) 
             && STATE > 0 
             && STATE < 40 
             && params.node.rowPinned != 'top'
