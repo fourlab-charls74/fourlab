@@ -24,7 +24,7 @@
                 <div class="card-header d-flex justify-content-between">
                     <h4>기본 정보</h4>
                     <div>
-                        @if (@$state > 0 && @$state < 40)
+                        @if (@$super_admin == true || (@$state > 0 && @$state < 40))
                         <a href="javascript:void(0);" onclick="cmder('{{ @$cmd }}')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>저장</a>
                             @if (@$stock_no != "" && @$state < 30)
                             <a href="javascript:void(0);" onclick="cmder('delcmd')" class="btn btn-sm btn-primary shadow-sm pl-2">입고삭제</a>
@@ -261,7 +261,7 @@
                 </div>
             </div>
             <div class="resul_btn_wrap mb-3">
-                @if (@$state > 0 && @$state < 40)
+                @if (@$super_admin == true || (@$state > 0 && @$state < 40))
                 <a href="javascript:void(0);" onclick="cmder('{{ @$cmd }}')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>저장</a>
                     @if (@$stock_no != "" && @$state < 30)
                     <a href="javascript:void(0);" onclick="cmder('delcmd')" class="btn btn-sm btn-primary shadow-sm pl-2">입고삭제</a>
@@ -417,7 +417,8 @@
         const cols = ['unit_cost', 'prd_tariff_rate'];
 
         // 슈퍼관리자 권한설정 필요 (추후)
-        if (true) {
+    console.log("{{ @$super_admin }}");
+        if ('{{ @$super_admin }}' == 'true') {
             cols.push('qty');
         }
         if (

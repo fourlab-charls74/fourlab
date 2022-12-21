@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Storage;
 use Exception;
 
 const KRW = 'KRW';
+const SUPER_ADMIN_ID = 'sm_yh'; // test용 관리자 (최유현)
 
 class cs01Controller extends Controller {
 
@@ -154,6 +155,8 @@ class cs01Controller extends Controller {
 		$currency_unit = KRW;
 		$opts = "";
 
+		$admin_id = Auth::guard('head')->user()->id;
+
 		if ($stock_no != "") {
 			
 			$cmd = "editcmd";
@@ -253,7 +256,8 @@ class cs01Controller extends Controller {
 			'opt_cnt' => count($col_opts),
 			"col_opts" => $col_opts,
 			"locs" => Slib::getCodes('G_STOCK_LOC'),
-			"loc" => $loc
+			"loc" => $loc,
+			"super_admin" => ($admin_id === SUPER_ADMIN_ID ? 'true' : 'false')
         ];
 
         return view( Config::get('shop.store.view') . '/cs/cs01_show', $values);
@@ -412,7 +416,7 @@ class cs01Controller extends Controller {
 			
 			// 개별상품 입고처리
 			$params = array_merge($params, [ 'stock_no' => $stock_no ]);
-			$this->saveStockOrderProduct("E", $params, $data);
+			$this->saveStockOrderProduct("E", $params, $data, $id);
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -536,7 +540,7 @@ class cs01Controller extends Controller {
 						return isset($row['stock_prd_no']);
 					});
 				}
-				$this->saveStockOrderProduct("E", $params, $data, $cur_state);
+				$this->saveStockOrderProduct("E", $params, $data, $id, $cur_state);
 
 				DB::commit();
 			}
@@ -678,6 +682,8 @@ class cs01Controller extends Controller {
 	 */
 	public function addStockCmd(Request $request) { // 입고번호, 데이터
 
+		$id = Auth::guard('head')->user()->id;
+
 		$stock_no = $request->input('stock_no');
 		$invoice_no				= $request->input("invoice_no");			//송장번호
 		$bl_no					= $request->input("bl_no", "");				//통관번호 (B/L No.)
@@ -750,7 +756,7 @@ class cs01Controller extends Controller {
 
 				// 개별상품 입고처리
 				$values = array_merge($params, [ 'stock_no' => $stock_no ]);
-				$this->saveStockOrderProduct("A", $values, $data);
+				$this->saveStockOrderProduct("A", $values, $data, $id);
 
 				DB::commit();
 			}
@@ -816,7 +822,7 @@ class cs01Controller extends Controller {
 	 * 상품 입고
 	 * $type: 추가입고(A) / 기본(E) 
 	 */
-	public function saveStockOrderProduct($type, $values, $products, $cur_state = 0)
+	public function saveStockOrderProduct($type, $values, $products, $id, $cur_state = 0)
 	{
 		try {
 			DB::beginTransaction();
@@ -898,8 +904,8 @@ class cs01Controller extends Controller {
 										->where('prd_cd', $prd_cd)->where('invoice_no', $invoice_no)
 										->update([ 'wonga' => $cost ]);
 									
-									// 입고완료 이후 수량 변경 시 재고 업데이트
-									if (true) { // 슈퍼관리자 권한설정 필요 (추후)
+									// 입고완료 이후 수량 변경 시 재고 업데이트 (슈퍼권한)
+									if ($id == SUPER_ADMIN_ID) {
 										$plus_qty = array_filter($ori_products, function($p) use ($prd_cd, $qty) {return $p->prd_cd == $prd_cd && $p->qty != $qty;});
 										if ($plus_qty != null && count($plus_qty) > 0) {
 											$plus_qty = $plus_qty[0]->qty;
