@@ -157,10 +157,11 @@
         // ag-grid set
 
         var columns= [
-            { field: "stock_no", headerName: "입고번호", width: 100, cellStyle:{ 'text-align': 'center' } },
+            { field: "stock_no", headerName: "입고번호", width: 80, cellStyle:{ 'text-align': 'center' } },
             { field: "invoice_no", headerName: "송장번호", width: 120, cellStyle:{ 'text-align': 'center' },
                 cellRenderer: (params) => `<a href="#" onClick="clickInvoiceNo(${params.data.stock_no})">${params.data.invoice_no}</a>`
             },
+            { field: "bl_no", headerName: "B/L No.", width: 100, cellStyle:{ 'text-align': 'center' } },
             { field: "area_type", headerName: "입고지역", width: 80, cellStyle:{ 'text-align': 'center' } },
             { field: "stock_date", headerName: "입고일자", width: 80, cellStyle:{ 'text-align': 'center' } },
             { field: "state_nm", headerName: "입고상태", width: 80, cellStyle: StyleStockOrdState },

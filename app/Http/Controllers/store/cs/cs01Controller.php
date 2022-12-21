@@ -79,6 +79,7 @@ class cs01Controller extends Controller {
 		$sql = "
 			select
 				b.stock_no, b.invoice_no, ar.code_val as area_type,
+				b.bl_no,
 				date_format(b.stock_date, '%Y-%m-%d') as stock_date, 
 				cd.code_val as state_nm, c.com_nm, s.item,
 				b.currency_unit,b.exchange_rate,b.custom_amt, b.custom_tax,b.custom_tax_rate,
@@ -898,17 +899,19 @@ class cs01Controller extends Controller {
 										->update([ 'wonga' => $cost ]);
 									
 									// 입고완료 이후 수량 변경 시 재고 업데이트
-									$plus_qty = array_filter($ori_products, function($p) use ($prd_cd, $qty) {return $p->prd_cd == $prd_cd && $p->qty != $qty;});
-									if ($plus_qty != null && count($plus_qty) > 0) {
-										$plus_qty = $plus_qty[0]->qty;
-										$plus_qty = $qty - $plus_qty;
-										$this->stockIn($goods_no, $prd_cd, $opt, $plus_qty, $stock_no, $invoice_no, $cost, $loc);
+									if (true) { // 슈퍼관리자 권한설정 필요 (추후)
+										$plus_qty = array_filter($ori_products, function($p) use ($prd_cd, $qty) {return $p->prd_cd == $prd_cd && $p->qty != $qty;});
+										if ($plus_qty != null && count($plus_qty) > 0) {
+											$plus_qty = $plus_qty[0]->qty;
+											$plus_qty = $qty - $plus_qty;
+											$this->stockIn($goods_no, $prd_cd, $opt, $plus_qty, $stock_no, $invoice_no, $cost, $loc);
+										}
 									}
 								}
 							}
 							
 							if ($state == 40) { // 원가확정인 경우
-								$this->confirmWonga($stock_no, $prd_cd, $qty, $cost, $invoice_no);
+								$this->confirmWonga($stock_no, $prd_cd, $goods_no, $qty, $cost, $invoice_no);
 							}
 						}
 					} else {
@@ -1018,7 +1021,7 @@ class cs01Controller extends Controller {
 	/**
 	 * 원가 확정
 	 */
-	public function confirmWonga($stock_no, $prd_cd, $qty, $cost, $invoice_no)
+	public function confirmWonga($stock_no, $prd_cd, $goods_no, $qty, $cost, $invoice_no)
 	{
 		$stock = DB::table('product_stock')->select('wonga', 'in_qty')->where('prd_cd', '=', $prd_cd)->first();
 		
@@ -1039,9 +1042,12 @@ class cs01Controller extends Controller {
 				];
 				DB::table('product_stock')->where('prd_cd', '=', $prd_cd)->update($values);
 
+				// 2. 상품테이블 goods 원가값 업데이트
+				DB::table('goods')->where('goods_no', $goods_no)->update([ 'wonga' => $avg_wonga ]);
+
 				$fin_rt = DB::table('product_stock_order')->where('stock_no', '=', $stock_no)->value('fin_rt');
 				if ($fin_rt != null) {
-					// 2. 입고완료 ~ 원가확정 기간동안 판매된 주문건(및 hst)의 원가 값 업데이트
+					// 3. 입고완료 ~ 원가확정 기간동안 판매된 주문건(및 hst)의 원가 값 업데이트
 					$where = " where ord_date >= '$fin_rt' and ord_date <= now() and prd_cd = '$prd_cd' ";
 
 					$sql = "
@@ -1066,7 +1072,7 @@ class cs01Controller extends Controller {
 							->update([ 'wonga' => $avg_wonga ]);
 					}
 
-					// 3. 입고완료 ~ 원가확정 기간동안 매장으로 출고된 hst 로그 기록의 원가 값 업데이트
+					// 4. 입고완료 ~ 원가확정 기간동안 매장으로 출고된 hst 로그 기록의 원가 값 업데이트
 					$fin_date = date('Ymd', strtotime($fin_rt));
 					$sql = "
 						update product_stock_hst set
@@ -1078,7 +1084,7 @@ class cs01Controller extends Controller {
 					DB::update($sql);
 				}
 
-				// 4. product_stock_hst 에서 창고입고 시 단가 수정
+				// 5. product_stock_hst 에서 창고입고 시 단가 수정
 				DB::table('product_stock_hst')
 					->where('prd_cd', $prd_cd)->where('type', '1')->where('invoice_no', $invoice_no)
 					->update([ 'wonga' => $cost ]);

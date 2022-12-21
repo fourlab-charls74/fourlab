@@ -142,6 +142,7 @@ class sal01Controller extends Controller
 			left outer join __tmp_code e on e.code_kind_cd = 'stat_pay_type' and e.code_id = a.stat_pay_type
 			left outer join __tmp_code f on f.code_kind_cd = 'sell_type' and f.code_id = a.sell_type
 			left outer join __tmp_code g on g.code_kind_cd = 'event_cd' and g.code_id = a.event_cd
+			-- left outer join code g on g.code_kind_cd = 'PR_CODE' and g.code_id = a.event_cd
 			where 1=1 
 				and ( a.ord_date >= :sdate and a.ord_date < date_add(:edate,interval 1 day))
 				$where
@@ -216,7 +217,7 @@ class sal01Controller extends Controller
 		// set_time_limit(0);
 
 		$orders = $request->input('data');
-		
+
 		$codes = [];
 		foreach ($orders as $order) {
 			$order = (array)$order;
@@ -246,7 +247,7 @@ class sal01Controller extends Controller
 			pass_saved_order:
 			array_push($codes, $code);
 		}
-		
+
 		return response()->json(['codes' => $codes]);
 	}
 

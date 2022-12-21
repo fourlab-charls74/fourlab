@@ -239,7 +239,7 @@
 	}
 </style>
 <script language="javascript">
-	const pinnedRowData = [{ goods_nm: '', goods_sh: 0, price: 0, wqty: 0, sqty: 0 }];
+	const pinnedRowData = [{ goods_nm: '', goods_sh: 0, price: 0, wonga: 0, wqty: 0, sqty: 0 }];
 		
 	const columns = [
 		{headerName: '#', pinned: 'left', type: 'NumType', width:40, cellStyle: StyleLineHeight,
@@ -293,6 +293,9 @@
 		{field: "brand_nm", headerName: "브랜드", width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
 		{field: "goods_sh", headerName: "TAG가", type: 'currencyType', width:85, aggFunc: 'first'},
 		{field: "price", headerName: "판매가", type: 'currencyType', width:85, aggFunc: 'first'},
+		@if(true) // 슈퍼관리자 권한설정 필요 (추후)
+			{field: "wonga", headerName: "원가", type: 'currencyType', width:85, aggFunc: 'first'},
+		@endif
 		{field: "wqty", headerName: "창고재고", width:70, type: 'currencyType', 
 			aggFunc: (params) => {
 				return params.values.reduce((a,c) => a + (c * 1), 0);
@@ -383,8 +386,10 @@
 		gx.Request('/store/product/prd04/search', data, 1, function(e) {
 			const t = e.head.total_row;
 			gx.gridOptions.api.setPinnedTopRowData([{ 
-				goods_nm: '', goods_sh: t.total_goods_sh, 
+				goods_nm: '', 
+				goods_sh: t.total_goods_sh, 
 				price: t.total_price, 
+				wonga: t.total_wonga,
 				wqty: Comma(t.total_wqty),
 				sqty: Comma(t.total_sqty),
 			}]);
