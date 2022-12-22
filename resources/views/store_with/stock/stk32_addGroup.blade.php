@@ -177,6 +177,7 @@
                     if (data.code == 200) {
                         alert('그룹추가에 성공하였습니다.');
                         window.close();
+                        opener.location.reload();
                     } else if (data.code == 100) {
                         alert('그룹명이 같은 그룹이 있습니다. 다른 그룹명을 입력해주세요.');
                         return false;

@@ -803,32 +803,38 @@ class stk32Controller extends Controller
 
     }
 
-    public function mod_group(Request $request)
+    public function update(Request $request)
     {
         $group_nm = $request->input('group_nm');
         $group_cd = $request->input('group_cd');
-        
         $store_cd = $request->input('store_cd');
         $store_cd = explode(',',$store_cd);
-        
-        $mod_store_cd = $request->input('mod_store_cd');
-        $mod_store_cd = explode(',',$mod_store_cd);
-        
-        $del_group_cd = $request->input('del_group_cd');
-        $del_group_cd = explode(',',$del_group_cd);
+
+        // $del_group_cd = $request->input('del_group_cd');
+        // $del_group_cd = explode(',',$del_group_cd);
 
         $add_store = $request->input('add_store');
-        $add_store = explode(',',$add_store);
+
+        if($add_store != null) {
+            $add_store = explode(',',$add_store);
+        }
+
+        $del_store = $request->input('del_data');
+        if ($del_store != null) {
+            $del_store = explode(',',$del_store);
+        }
         
         try {
             DB::beginTransaction();
-            
+
+            //그룹명 변경 쿼리문
             DB::table('msg_group')
                 ->where('group_cd', '=', $group_cd)
                 ->update([
                     'group_nm' => $group_nm
                 ]);
 
+            //매장 추가할 때 
             if ($add_store != null ) {
                 foreach ($add_store as $as) {
                     DB::table('msg_group_store')
@@ -840,16 +846,14 @@ class stk32Controller extends Controller
                 }
             }
 
-            if ($del_group_cd != "") {
-                DB::table('msg_group_store')
-                    ->where('group_cd', '=', $group_cd)
-                    ->delete();
-            }
-
-            foreach ($store_cd as $sc) {
-                DB::table('msg_group_store')
-                    ->where('store_cd', '=', $sc)
-                    ->delete();
+            //삭제한 매장 저장
+            if ($del_store != null) {
+                foreach ($del_store as $ds) {
+                    DB::table('msg_group_store')
+                        ->where('group_cd', '=', $group_cd)
+                        ->where('store_cd', '=', $ds)
+                        ->delete();
+                }
             }
 
             DB::commit();
