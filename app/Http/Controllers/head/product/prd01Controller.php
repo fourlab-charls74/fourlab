@@ -256,6 +256,7 @@ class prd01Controller extends Controller
 					(select sum(wqty) from goods_summary where goods_no = g.goods_no and goods_sub = g.goods_sub), 0
 				  ) as wqty
 				, g.wonga
+				, g.goods_sh
 				, (100/(g.price/(g.price-g.wonga))) as margin_rate
 				, (g.price-g.wonga) as margin_amt
 				, g.md_nm

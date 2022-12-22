@@ -379,6 +379,7 @@
         {field: "ad_desc", headerName: "하단홍보글", editable: true, cellStyle: {"line-height": "40px", 'background' : '#ffff99'}},
         {field: "sale_stat_cl", headerName: "상품상태", width:70, type: 'GoodsStateTypeLH50'},
         {field: "normal_price", headerName: "정상가", type: 'currencyType', cellStyle: {"line-height": "40px"}},
+        {field: "goods_sh", headerName: "시중가(Tag가)", type: 'currencyType', cellStyle: {"line-height": "40px"}},
         {field: "price", headerName: "판매가", editable: true, type: 'currencyType', width:60, cellStyle: {"line-height": "40px", 'background' : '#ffff99'}},
         {field: "coupon_price", headerName: "쿠폰가", type: 'currencyType', width:60, cellStyle: {"line-height": "40px"}},
         {field: "sale_rate", headerName: "세일율(,%)", type: 'percentType', hide: true},
