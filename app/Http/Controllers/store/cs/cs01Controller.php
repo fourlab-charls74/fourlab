@@ -480,7 +480,7 @@ class cs01Controller extends Controller {
 		$cur_state = DB::table('product_stock_order')->where('stock_no', $stock_no)->value('state');
 
 		try {
-			if ($cur_state < 40) { // 입고취소: -10, 입고대기: 10, 입고처리중: 20, 입고완료: 30, 원가확정: 40
+			if ($cur_state < 40 || $id == SUPER_ADMIN_ID) { // 입고취소: -10, 입고대기: 10, 입고처리중: 20, 입고완료: 30, 원가확정: 40
 				DB::beginTransaction();
 
 				if ($currency_unit != KRW) {
@@ -774,6 +774,8 @@ class cs01Controller extends Controller {
 	}
 
 	public function listProduct($stock_no) {
+		/* $row->is_last: 가장 최근에 입고된 상품 여부 확인 (order by stock_no desc) */
+
 		$sql = "
 			select
 				if(state = 30 or state = -10,'0','2') as chk
@@ -807,6 +809,12 @@ class cs01Controller extends Controller {
 				, (s.cost * s.qty) as total_cost
 				, (s.cost_notax * s.qty) as total_cost_novat
 				, date_format(s.stock_date, '%Y-%m-%d') as stock_date
+				, ifnull((
+					select stock_prd_no 
+					from product_stock_order_product 
+					where state > 30 and prd_cd = s.prd_cd 
+					order by stock_no desc limit 1
+				  ), 0) = s.stock_prd_no as is_last
 			from product_stock_order_product s
 				inner join product_code pc on pc.prd_cd = s.prd_cd
 				inner join goods g on s.goods_no = g.goods_no
@@ -830,6 +838,12 @@ class cs01Controller extends Controller {
 			$invoice_no = $values['invoice_no'] ?? '';
 			$state = $values['state'] ?? 10;
 			$loc = $values['loc'] ?? '';
+
+			// 원가확정 이후 재원가확정 단계를 위한 기존데이터 백업
+			$stk_ord_products = [];
+			if ($state == 40 && $cur_state == $state && $id == SUPER_ADMIN_ID) {
+				$stk_ord_products = DB::table('product_stock_order_product')->select('prd_cd', 'qty', 'cost', 'prd_tariff_rate')->where('stock_no', $stock_no)->get()->toArray();
+			}
 
 			$ori_products = [];
 			if ($type != "A") { // 추가입고가 아닐때
@@ -895,29 +909,40 @@ class cs01Controller extends Controller {
 								DB::table('product_stock_order_product')->insert($params);
 							}
 
-							if ($state == 30) { // 입고 완료인 경우
-								if ($cur_state < $state || $type == 'A') {
-									$this->stockIn($goods_no, $prd_cd, $opt, $qty, $stock_no, $invoice_no, $cost, $loc);
-								} else {
-									// product_stock_hst 에서 단가 수정
-									DB::table('product_stock_hst')
-										->where('prd_cd', $prd_cd)->where('invoice_no', $invoice_no)
-										->update([ 'wonga' => $cost ]);
-									
-									// 입고완료 이후 수량 변경 시 재고 업데이트 (슈퍼권한)
-									if ($id == SUPER_ADMIN_ID) {
-										$plus_qty = array_filter($ori_products, function($p) use ($prd_cd, $qty) {return $p->prd_cd == $prd_cd && $p->qty != $qty;});
-										if ($plus_qty != null && count($plus_qty) > 0) {
-											$plus_qty = $plus_qty[0]->qty;
-											$plus_qty = $qty - $plus_qty;
-											$this->stockIn($goods_no, $prd_cd, $opt, $plus_qty, $stock_no, $invoice_no, $cost, $loc);
-										}
+							if ($state == 30 && ($cur_state < $state || $type == 'A')) {
+								// 최초 입고완료인 경우
+								$this->stockIn($goods_no, $prd_cd, $opt, $qty, $stock_no, $invoice_no, $cost, $loc);
+							} else if ($state >= 30 && $state <= 40) {
+								// 원가확정 이후 재원가확정 단계를 위한 기존데이터 백업
+								$ori_product_stock = [];
+								if ($state == 40 && $cur_state == $state && $id == SUPER_ADMIN_ID) {
+									$ori_product_stock = DB::table('product_stock')->select('wonga', 'in_qty')->where('prd_cd', $prd_cd)->first();
+								}
+
+								// product_stock_hst 에서 단가 수정
+								DB::table('product_stock_hst')
+									->where('prd_cd', $prd_cd)->where('type', '1')->where('invoice_no', $invoice_no)
+									->update([ 'wonga' => $cost ]);
+								
+								// 입고완료 이후 수량 변경 시 재고 업데이트 (슈퍼권한)
+								if ($id == SUPER_ADMIN_ID) {
+									$plus_qty = array_filter($ori_products, function($p) use ($prd_cd, $qty) {return $p->prd_cd == $prd_cd && $p->qty != $qty;});
+									if ($plus_qty != null && count($plus_qty) > 0) {
+										$plus_qty = $plus_qty[0]->qty;
+										$plus_qty = $qty - $plus_qty;
+										$this->stockIn($goods_no, $prd_cd, $opt, $plus_qty, $stock_no, $invoice_no, $cost, $loc);
 									}
 								}
-							}
-							
-							if ($state == 40) { // 원가확정인 경우
-								$this->confirmWonga($stock_no, $prd_cd, $goods_no, $qty, $cost, $invoice_no);
+
+								if ($state == 40 && $cur_state < $state) {
+									// 최초 원가확정인 경우
+									$this->confirmWonga($stock_no, $prd_cd, $goods_no, $qty, $cost, $invoice_no);
+								} else if ($state == 40 && $id == SUPER_ADMIN_ID) {
+									// 재원가확정
+									$stk_ord_product = array_filter($stk_ord_products, function($p) use ($prd_cd) {return $p->prd_cd == $prd_cd;});
+									if (count($stk_ord_product) > 0) $stk_ord_product = $stk_ord_product[0];
+									$this->updateConfirmedWonga($stock_no, $prd_cd, $goods_no, $qty, $cost, $prd_tariff_rate, $invoice_no, $ori_product_stock, $stk_ord_product);
+								}
 							}
 						}
 					} else {
@@ -1027,13 +1052,11 @@ class cs01Controller extends Controller {
 	/**
 	 * 원가 확정
 	 */
-	public function confirmWonga($stock_no, $prd_cd, $goods_no, $qty, $cost, $invoice_no)
+	private function confirmWonga($stock_no, $prd_cd, $goods_no, $qty, $cost, $invoice_no)
 	{
 		$stock = DB::table('product_stock')->select('wonga', 'in_qty')->where('prd_cd', '=', $prd_cd)->first();
 		
 		try {
-			DB::beginTransaction();
-
 			if ($stock != null && ($stock->wonga != $cost)) {
 				// 1. 재고테이블 평균원가 및 재고총원가 값 업데이트
 				$total_old_wonga = ($stock->in_qty - $qty) * $stock->wonga;
@@ -1051,54 +1074,112 @@ class cs01Controller extends Controller {
 				// 2. 상품테이블 goods 원가값 업데이트
 				DB::table('goods')->where('goods_no', $goods_no)->update([ 'wonga' => $avg_wonga ]);
 
-				$fin_rt = DB::table('product_stock_order')->where('stock_no', '=', $stock_no)->value('fin_rt');
-				if ($fin_rt != null) {
-					// 3. 입고완료 ~ 원가확정 기간동안 판매된 주문건(및 hst)의 원가 값 업데이트
-					$where = " where ord_date >= '$fin_rt' and ord_date <= now() and prd_cd = '$prd_cd' ";
+				// 3. 모든 판매된 주문건(및 hst)의 원가 값 업데이트
+				$sql = "
+					update order_opt set
+						wonga = '$avg_wonga'
+					where prd_cd = '$prd_cd'
+				";
+				DB::update($sql);
 
+				$orders = DB::select("select ord_opt_no from order_opt where prd_cd = '$prd_cd'");
+				foreach ($orders as $ord) {
 					$sql = "
-						update order_opt set
+						update order_opt_wonga set
 							wonga = '$avg_wonga'
-						$where
+						where ord_opt_no = '$ord->ord_opt_no'
 					";
 					DB::update($sql);
 
-					$orders = DB::select("select ord_opt_no from order_opt $where");
-					foreach ($orders as $ord) {
-						$sql = "
-							update order_opt_wonga set
-								wonga = '$avg_wonga'
-							where ord_opt_no = '$ord->ord_opt_no'
-						";
-						DB::update($sql);
-
-						// product_stock_hst 에서 단가 수정
-						DB::table('product_stock_hst')
-							->where('prd_cd', $prd_cd)->where('ord_opt_no', $ord->ord_opt_no)
-							->update([ 'wonga' => $avg_wonga ]);
-					}
-
-					// 4. 입고완료 ~ 원가확정 기간동안 매장으로 출고된 hst 로그 기록의 원가 값 업데이트
-					$fin_date = date('Ymd', strtotime($fin_rt));
-					$sql = "
-						update product_stock_hst set
-							wonga = '$avg_wonga'
-						where prd_cd = '$prd_cd' 
-							and ((type = '1' and location_type = 'STORE') or (type = '17' and location_type = 'STORAGE')) 
-							and stock_state_date >= '$fin_date' and stock_state_date <= '$fin_date'
-					";
-					DB::update($sql);
+					// product_stock_hst 에서 단가 수정
+					DB::table('product_stock_hst')
+						->where('prd_cd', $prd_cd)->where('ord_opt_no', $ord->ord_opt_no)
+						->update([ 'wonga' => $avg_wonga ]);
 				}
 
-				// 5. product_stock_hst 에서 창고입고 시 단가 수정
-				DB::table('product_stock_hst')
-					->where('prd_cd', $prd_cd)->where('type', '1')->where('invoice_no', $invoice_no)
-					->update([ 'wonga' => $cost ]);
+				// // ** hst 로그 업데이트 여부에 대한 논의필요
+				// // 4. 입고완료 ~ 원가확정 기간동안 매장으로 출고된 hst 로그 기록의 원가 값 업데이트
+				// $fin_date = date('Ymd', strtotime($fin_rt));
+				// $sql = "
+				// 	update product_stock_hst set
+				// 		wonga = '$avg_wonga'
+				// 	where prd_cd = '$prd_cd' 
+				// 		and ((type = '1' and location_type = 'STORE') or (type = '17' and location_type = 'STORAGE')) 
+				// 		and stock_state_date >= '$fin_date' and stock_state_date <= '$fin_date'
+				// ";
+				// DB::update($sql);
 			}
-
-			DB::commit();
 		} catch (Exception $e) {
-			DB::rollBack();	
+			throw new Exception($e->getMessage());
+		}
+	}
+
+	/**
+	 * 확정된 원가 업데이트 (원개재확정 - 슈퍼권한)
+	 */
+	private function updateConfirmedWonga($stock_no, $prd_cd, $goods_no, $qty, $cost, $prd_tariff_rate, $invoice_no, $ori_product_stock, $stk_ord_product)
+	{
+		$stock = DB::table('product_stock')->select('wonga', 'in_qty')->where('prd_cd', '=', $prd_cd)->first();
+		
+		try {
+			if (
+				$stock != null
+				&& ($stk_ord_product->qty != $qty
+					|| $stk_ord_product->cost != $cost
+					|| $stk_ord_product->prd_tariff_rate != $prd_tariff_rate)
+			) {
+				// 1. 재고테이블 평균원가 및 재고총원가 값 업데이트
+				$total_old_wonga = ($ori_product_stock->wonga * $ori_product_stock->in_qty) - ($stk_ord_product->qty * $stk_ord_product->cost);
+				$total_cur_wonga = $qty * $cost;
+				$total_wonga = $total_old_wonga + $total_cur_wonga;
+				$avg_wonga = round($total_wonga / $stock->in_qty);
+
+				$values = [
+					'wonga' => $avg_wonga,
+					'qty_wonga' => DB::raw('qty * ' . $avg_wonga),
+					'ut' => now(),
+				];
+				DB::table('product_stock')->where('prd_cd', '=', $prd_cd)->update($values);
+
+				// 2. 상품테이블 goods 원가값 업데이트
+				DB::table('goods')->where('goods_no', $goods_no)->update([ 'wonga' => $avg_wonga ]);
+
+				// 3. 모든 판매된 주문건(및 hst)의 원가 값 업데이트
+				$sql = "
+					update order_opt set
+						wonga = '$avg_wonga'
+					where prd_cd = '$prd_cd'
+				";
+				DB::update($sql);
+
+				$orders = DB::select("select ord_opt_no from order_opt where prd_cd = '$prd_cd'");
+				foreach ($orders as $ord) {
+					$sql = "
+						update order_opt_wonga set
+							wonga = '$avg_wonga'
+						where ord_opt_no = '$ord->ord_opt_no'
+					";
+					DB::update($sql);
+
+					// product_stock_hst 에서 단가 수정
+					DB::table('product_stock_hst')
+						->where('prd_cd', $prd_cd)->where('ord_opt_no', $ord->ord_opt_no)
+						->update([ 'wonga' => $avg_wonga ]);
+				}
+
+				// // ** hst 로그 업데이트 여부에 대한 논의필요
+				// // 4. 입고완료 ~ 원가확정 기간동안 매장으로 출고된 hst 로그 기록의 원가 값 업데이트
+				// $fin_date = date('Ymd', strtotime($fin_rt));
+				// $sql = "
+				// 	update product_stock_hst set
+				// 		wonga = '$avg_wonga'
+				// 	where prd_cd = '$prd_cd' 
+				// 		and ((type = '1' and location_type = 'STORE') or (type = '17' and location_type = 'STORAGE')) 
+				// 		and stock_state_date >= '$fin_date' and stock_state_date <= '$fin_date'
+				// ";
+				// DB::update($sql);
+			}
+		} catch (Exception $e) {
 			throw new Exception($e->getMessage());
 		}
 	}

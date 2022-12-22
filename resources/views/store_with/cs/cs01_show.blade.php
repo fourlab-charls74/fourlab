@@ -24,7 +24,7 @@
                 <div class="card-header d-flex justify-content-between">
                     <h4>기본 정보</h4>
                     <div>
-                        @if (@$super_admin == true || (@$state > 0 && @$state < 40))
+                        @if (@$super_admin == 'true' || (@$state > 0 && @$state < 40))
                         <a href="javascript:void(0);" onclick="cmder('{{ @$cmd }}')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>저장</a>
                             @if (@$stock_no != "" && @$state < 30)
                             <a href="javascript:void(0);" onclick="cmder('delcmd')" class="btn btn-sm btn-primary shadow-sm pl-2">입고삭제</a>
@@ -154,11 +154,11 @@
                                             onkeypress="checkFloat(event);" onkeyup="com3(this);calCustomTaxRate(true, this.value);" onfocus="this.select();" 
                                             {{ @$currency_unit == 'KRW' ? 'readonly disabled' : '' }}>
                                     </div>
-                                    <div class="d-flex align-items-center col col-6 p-0 {{ @$state > 0 && @$state < 40 ? 'col-sm-3 pr-2' : '' }}">
+                                    <div class="d-flex align-items-center col col-6 p-0 {{ (@$super_admin == 'true' || (@$state > 0 && @$state < 40)) ? 'col-sm-3 pr-2' : '' }}">
                                         <input type="text" class="form-control form-control-sm text-right mr-1" id="tariff_rate" name="tariff_rate" value="{{ @$tariff_rate ?? 0 }}" readonly>
                                         <span>%</span>
                                     </div>
-                                    @if (@$state > 0 && @$state < 40)
+                                    @if (@$super_admin == 'true' || (@$state > 0 && @$state < 40))
                                     <div class="col col-12 col-sm-3 p-0 pt-2 pt-sm-0">
                                         <a href="javascript:void(0);" onclick="return setPrdTariffRates();" class="btn btn-sm btn-outline-primary shadow-sm w-100">일괄적용</a>
                                     </div>
@@ -261,7 +261,7 @@
                 </div>
             </div>
             <div class="resul_btn_wrap mb-3">
-                @if (@$super_admin == true || (@$state > 0 && @$state < 40))
+                @if (@$super_admin == 'true' || (@$state > 0 && @$state < 40))
                 <a href="javascript:void(0);" onclick="cmder('{{ @$cmd }}')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>저장</a>
                     @if (@$stock_no != "" && @$state < 30)
                     <a href="javascript:void(0);" onclick="cmder('delcmd')" class="btn btn-sm btn-primary shadow-sm pl-2">입고삭제</a>
@@ -281,6 +281,8 @@
                         <a href="javascript:void(0);" onclick="return deleteRows();" class="btn-sm btn btn-outline-primary" onfocus="this.blur();"><i class="fa fa-trash fa-sm mr-1"></i> 상품 삭제</a>
                         @endif
                     </div>
+                    @elseif (@$super_admin == 'true' && @$state == 40)
+                    <p style="color:red;">* 가장 최근에 입고된 상품만 입고정보 수정이 가능합니다.</p>
                     @endif
                 </div>
             </div>
@@ -295,6 +297,8 @@
                     <a href="javascript:void(0);" onclick="return deleteRows();" class="btn-sm btn btn-outline-primary" onfocus="this.blur();"><i class="fa fa-trash fa-sm mr-1"></i> 상품 삭제</a>
                     @endif
                 </div>
+                @elseif (@$super_admin == 'true' && @$state == 40)
+                <p style="color:red;" class="fs-14">* 가장 최근에 입고된 상품만 입고정보 수정이 가능합니다.</p>
                 @endif
             </div>
             <div class="card-body pt-3 pt-lg-1">
@@ -415,18 +419,19 @@
     /** 수정가능한 셀인지 판단 */
     function checkIsEditable(params) {
         const cols = ['unit_cost', 'prd_tariff_rate'];
+        const super_admin = '{{ @$super_admin }}';
 
-        // 슈퍼관리자 권한설정 필요 (추후)
-    console.log("{{ @$super_admin }}");
-        if ('{{ @$super_admin }}' == 'true') {
-            cols.push('qty');
-        }
+        // 슈퍼관리자 권한설정
+        if (super_admin == 'true') cols.push('qty');
+
         if (
             (cols.includes(params.column?.colId || '')) 
             && STATE > 0 
-            && STATE < 40 
+            && STATE < (super_admin == 'true' ? 41 : 40)
+            && (STATE < 40 || params.data?.is_last == 1)
             && params.node.rowPinned != 'top'
         ) return true; 
+
         return params.data.hasOwnProperty('isEditable') && params.data.isEditable ? true : false;
     }
 
@@ -646,7 +651,7 @@
             const tariff_rate = custom_amt < 1 ? 0 : Number.parseFloat((tariff_amt / custom_amt) * 100); // 관세율
             const freight_rate = custom_amt < 1 ? 0 : Number.parseFloat((freight_amt / custom_amt) * 100); // 운임율
             const custom_tax_rate = custom_amt < 1 ? 0 : Number.parseFloat((custom_tax / custom_amt) * 100); // 통관세율(관세+운임율)
-    
+
             ff.tariff_amt.value = Comma(Math.round(tariff_amt));
             ff.tariff_rate.value = tariff_rate.toFixed(2);
             ff.freight_rate.value = freight_rate.toFixed(2);
