@@ -208,7 +208,7 @@
         const rows3 = gx2.getSelectedRows();
         let group_cd = "";
 
-        let check_radio = $('input[name=div_store]:checked').val();
+        let check_radio = $('input[name=store]:checked').val();
 
         for (let i=0; i<rows.length; i++) {
             store_cd += rows[i].store_cd + ',';

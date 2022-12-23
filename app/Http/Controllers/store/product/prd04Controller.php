@@ -41,8 +41,7 @@ class prd04Controller extends Controller
 		$goods_nm	= $request->input("goods_nm");
 		$store_type	= $request->input("store_type", "");
 		$store_no	= $request->input("store_no", "");
-		$ext_store_qty	= $request->input("ext_store_qty", "");
-		$ext_storage_qty	= $request->input("ext_storage_qty", "");
+		$ext_store_storage_qty	= $request->input("ext_store_storage_qty", "");
 		$prd_cd_range_text = $request->input("prd_cd_range", '');
 		$goods_nm_eng	= $request->input("goods_nm_eng");
 
@@ -130,14 +129,8 @@ class prd04Controller extends Controller
 			$store_qty_sql	= "sum(pss.qty)";
 		}
 
-		if ( $ext_store_qty == "Y" ) {
-			$where .= " and $store_qty_sql > 0 ";
-			// if( $store_no == "" )	$where .= " and (ps.qty - ps.wqty) > 0 ";
-			// else					$where .= " and pss.qty > 0 ";
-		}
-
-		if($ext_storage_qty == 'true') {
-			$where .= "and wqty > 0";
+		if($ext_store_storage_qty == 'Y') {
+			$where .= "and wqty > 0 or $store_qty_sql > 0";
 		}
 
 		$page_size	= $limit;
@@ -226,7 +219,7 @@ class prd04Controller extends Controller
 				, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
 				, if(pc.goods_no = 0, p.price, g.price) as price
 				, if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
-				,p.match_yn
+				, p.match_yn
 			from product_code pc
 				inner join product_stock ps on pc.prd_cd = ps.prd_cd
 				$in_store_sql

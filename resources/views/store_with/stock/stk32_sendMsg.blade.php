@@ -153,9 +153,7 @@
         
         frm += "&store_cds=" + "{{ @$store_cds }}";
         frm += "&group_cds=" + "{{ @$group_cds }}";
-
-        ds += "&check=" + "{{ @$check }}"
-
+        frm += "&check=" + "{{ @$check }}";
         frm += "&reservation_msg=" + $('[name=reservation_msg]').is(":checked");
 
         $.ajax({

@@ -43,8 +43,8 @@ class stk32Controller extends Controller
 
         $where = "";
         $orderby = "";
-        if ($sender != "") $where .= "and sender_cd like '%" . $sender . "%'  ";
-        if ($content != "") $where .= " and content like '%" . Lib::quote($content) . "%' ";
+        if ($sender != "") $where .= "and store_nm like '%" . Lib::quote($sender) . "%'  ";
+        if ($content != "") $where .= " and m.content like '%" . Lib::quote($content) . "%' ";
      
 
         // 로그인한 계정 // 추후 수정
@@ -72,8 +72,9 @@ class stk32Controller extends Controller
                     , msd.receiver_type
                     , group_concat(msd.receiver_cd separator ', ') as receiver_cd
                     , group_concat(if(msd.receiver_type = 'S', s.store_nm, '본사') separator ', ') as receiver_nm
-                    , if(msd.receiver_type = 'S', s.store_nm, '본사') as first_receiver
-                    , count(msd.receiver_cd) as receiver_cnt
+                    -- , if(msd.receiver_type = 'S', s.store_nm, '본사') as receiver
+                    -- , count(msd.receiver_cd) as receiver_cnt
+                    , s.store_nm
                     , msd.receiver_type
                     , m.reservation_yn
                     , m.reservation_date
@@ -221,6 +222,7 @@ class stk32Controller extends Controller
         $group_cd = explode(',',$group_cds);
         $group_nms = $request->input('group_nm', '');
         $group_nm = explode(',',$group_nms);
+        $check = $request->input('check');
         
         $stores = [];
         foreach($store_cd as $store) {
@@ -282,7 +284,9 @@ class stk32Controller extends Controller
             'group_cds' => $group_cds,
             'group_nms' => $group_nms,
             'groups' => $groups,
-            'groupName' => $groupName
+            'groupName' => $groupName,
+            'check' => $check
+
         ];
 
         return view( Config::get('shop.store.view') . '/stock/stk32_sendMsg', $values);
@@ -382,6 +386,7 @@ class stk32Controller extends Controller
         $reservation_yn = $request->input('reservation_yn');
         $store_cds = $request->input('store_cds');
         $store_cds = explode(',',$store_cds);
+
         $reservation_msg = $request->input('reservation_msg');
         $group_nms = $request->input('group_nms');
         $group_nms = explode(',',$group_nms);
@@ -418,7 +423,7 @@ class stk32Controller extends Controller
                         'rt' => now()
                     ]);
     
-                    if ($check == "onceStore") {
+                    if ($check == "O") {
                         foreach ($store_cds as $sc) {
                             DB::table('msg_store_detail')
                                 ->insert([
@@ -473,7 +478,7 @@ class stk32Controller extends Controller
                         'rt' => now()
                     ]);
     
-                    if ($check == "onceStore") {
+                    if ($check == "O") {
                         foreach ($store_cds as $sc) {
                             DB::table('msg_store_detail')
                                 ->insert([

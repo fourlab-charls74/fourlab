@@ -160,7 +160,7 @@
             {field: "receiver_cd", hide: true},
             {headerName: "수신처", field: "receiver_nm", width:200,
                 cellRenderer: (params) => 
-                        params.data.first_receiver + (params.data.receiver_cnt > 1 ? `외 ${params.data.receiver_cnt - 1}개` : '')
+                        params.data.receiver_nm
             },
             {headerName: "내용", field: "content", width:300, cellStyle: {'text-overflow': 'ellipsis'},
                 cellRenderer: params => {
