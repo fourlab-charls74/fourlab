@@ -13,7 +13,7 @@ use Exception;
 
 use App\Models\Conf;
 
-const PRODUCT_STOCK_TYPE_RETURN = 11;
+const PRODUCT_STOCK_TYPE_RETURN = 11; // 창고반품 (매장->창고)
 
 class stk30Controller extends Controller
 {
@@ -563,7 +563,7 @@ class stk30Controller extends Controller
                                 'qty' => ($prd->return_qty ?? 0) * -1,
                                 'stock_state_date' => date('Ymd'),
                                 'ord_opt_no' => '',
-                                'comment' => '창고반품삭제',
+                                'comment' => '매장반품삭제',
                                 'rt' => now(),
                                 'admin_id' => $admin_id,
                                 'admin_nm' => $admin_nm,

@@ -496,7 +496,7 @@ class stk12Controller extends Controller
         ]);
     }
 
-    // 초도출고 요청 (요청과 동시에 접수완료 처리됩니다.)
+    // 초도출고 요청 - 엑셀 (요청과 동시에 접수완료 처리됩니다.)
     public function request_release_excel(Request $request) {
         $release_type = 'F';
         $state = 20;

@@ -396,7 +396,7 @@ class S_Stock
             'stock_state_date' => date('Ymd'),
             'com_id' => $data['com_id'],
             'ord_opt_no' => 0,
-            'comment' => $data['etc'] ?? '창고입고',
+            'comment' => $data['etc'] ?? '입고취소',
             'rt' => now(),
             'admin_id' => $user['id'] ?? '',
             'admin_nm' => $user['name'] ?? '',

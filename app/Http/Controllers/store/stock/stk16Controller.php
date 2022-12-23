@@ -392,7 +392,7 @@ class stk16Controller extends Controller
                 $query = "
                     insert into 
                     product_stock_hst(goods_no, prd_cd, goods_opt, location_type, type, price, wonga, qty, stock_state_date, comment, rt, admin_id, admin_nm) 
-                    values('$r->goods_no', '$prd_cd', '$r->goods_opt', 'STORAGE', '17', '$r->price', '$r->wonga', '$qty', '$stock_state_date', '출고완료', '$now', '$admin_id', '$admin_nm')
+                    values('$r->goods_no', '$prd_cd', '$r->goods_opt', 'STORAGE', '17', '$r->price', '$r->wonga', '$qty', '$stock_state_date', '창고출고(원부자재)', '$now', '$admin_id', '$admin_nm')
                 ";
 
                 DB::insert($query);

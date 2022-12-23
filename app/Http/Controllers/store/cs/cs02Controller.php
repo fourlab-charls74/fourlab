@@ -15,7 +15,7 @@ use Exception;
 
 use App\Models\Conf;
 
-const PRODUCT_STOCK_TYPE_STORAGE_RETURN = 11; // 상품반품
+const PRODUCT_STOCK_TYPE_STORAGE_RETURN = 9; // 상품반품
 const PRODUCT_STOCK_TYPE_STORAGE_MOVE = 16; // 상품이동
 
 class cs02Controller extends Controller
@@ -186,7 +186,7 @@ class cs02Controller extends Controller
                             'goods_opt' => $row->goods_opt,
                             'location_cd' => $d['storage_cd'],
                             'location_type' => 'STORAGE',
-                            'type' => $d['target_type'] == 'S' ? PRODUCT_STOCK_TYPE_STORAGE_MOVE : PRODUCT_STOCK_TYPE_STORAGE_RETURN, // 재고분류 : 상품반품 or 상품이동
+                            'type' => $d['target_type'] == 'S' ? PRODUCT_STOCK_TYPE_STORAGE_MOVE : PRODUCT_STOCK_TYPE_STORAGE_RETURN, // 재고분류 : 상품이동 or 상품반품
                             'price' => $row->price,
                             'wonga' => $row->wonga,
                             'qty' => ($row->return_qty ?? 0) * -1,
@@ -481,7 +481,7 @@ class cs02Controller extends Controller
                         'goods_opt' => $prd->goods_opt,
                         'location_cd' => $storage_cd,
                         'location_type' => 'STORAGE',
-                        'type' => $target_type == 'S' ? PRODUCT_STOCK_TYPE_STORAGE_MOVE : PRODUCT_STOCK_TYPE_STORAGE_RETURN, // 재고분류 : 상품반품 or 상품이동
+                        'type' => $target_type == 'S' ? PRODUCT_STOCK_TYPE_STORAGE_MOVE : PRODUCT_STOCK_TYPE_STORAGE_RETURN, // 재고분류 : 상품이동 or 상품반품
                         'price' => $prd->price,
                         'wonga' => $prd->wonga,
                         'qty' => ($product['return_qty'] ?? 0) * -1,

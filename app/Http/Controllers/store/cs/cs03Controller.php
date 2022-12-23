@@ -281,7 +281,7 @@ class cs03Controller extends Controller
 									$query = "
 										insert into 
 										product_stock_hst(goods_no, prd_cd, goods_opt, location_type, type, price, wonga, qty, stock_state_date, comment, rt, admin_id, admin_nm) 
-										values('$r->goods_no', '$prd_cd', '$r->goods_opt', 'STORAGE', '1', '$r->price', '$r->wonga', '$change_qty', '$stock_state_date', '입고완료', '$now', '$admin_id', '$admin_nm')
+										values('$r->goods_no', '$prd_cd', '$r->goods_opt', 'STORAGE', '1', '$r->price', '$r->wonga', '$change_qty', '$stock_state_date', '창고입고(원부자재)', '$now', '$admin_id', '$admin_nm')
 									";
 
 									DB::insert($query);
@@ -405,7 +405,7 @@ class cs03Controller extends Controller
 									$query = "
 										insert into 
 										product_stock_hst(goods_no, prd_cd, goods_opt, location_type, type, price, wonga, qty, stock_state_date, comment, rt, admin_id, admin_nm) 
-										values('$r->goods_no', '$prd_cd', '$r->goods_opt', 'STORAGE', '11', '$r->price', '$r->wonga', '-$change_qty', '$stock_state_date', '반품완료', '$now', '$admin_id', '$admin_nm')
+										values('$r->goods_no', '$prd_cd', '$r->goods_opt', 'STORAGE', '9', '$r->price', '$r->wonga', '-$change_qty', '$stock_state_date', '창고반품(원부자재)', '$now', '$admin_id', '$admin_nm')
 									";
 									DB::insert($query);
 								}
@@ -467,7 +467,7 @@ class cs03Controller extends Controller
 									$query = "
 										insert into 
 										product_stock_hst(goods_no, prd_cd, goods_opt, location_type, type, price, wonga, qty, stock_state_date, comment, rt, admin_id, admin_nm) 
-										values('$r->goods_no', '$prd_cd', '$r->goods_opt', 'STORAGE', '11', '$r->price', '$r->wonga', '-$change_qty', '$stock_state_date', '반품완료', '$now', '$admin_id', '$admin_nm')
+										values('$r->goods_no', '$prd_cd', '$r->goods_opt', 'STORAGE', '9', '$r->price', '$r->wonga', '-$change_qty', '$stock_state_date', '창고반품(원부자재)', '$now', '$admin_id', '$admin_nm')
 									";
 									DB::insert($query);
 								}
