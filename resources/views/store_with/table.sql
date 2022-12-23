@@ -273,7 +273,7 @@ CREATE TABLE `product_stock_hst` (
     `goods_opt` VARCHAR(100) NOT NULL DEFAULT '' COMMENT '상품옵션명',
     `location_cd` VARCHAR(30) NOT NULL COMMENT '매장코드 or 창고코드',
     `location_type` VARCHAR(10) NOT NULL COMMENT '매장(STORE) / 창고(STORAGE)',
-    `type` VARCHAR(30) DEFAULT NULL COMMENT '분류 - code: product_stock_type', -- (주문(2) / 교환(5) / 환불(6) / 주문취소(7) / 재고조정(9) / 반품(11) / LOSS(14) / RT(15))
+    `type` VARCHAR(30) DEFAULT NULL COMMENT '분류 - code: product_stock_type', -- (입고(1) / 주문(2) / 교환(5) / 환불(6) / 주문취소(7) / 상품반품(9) / 반품(11) / LOSS(14) / RT(15) / 상품이동(16) / 출고(17))
     `price` INT(11) DEFAULT NULL COMMENT '판매가',
     `wonga` DECIMAL(10,0) DEFAULT NULL COMMENT '원가 - (수정해야함)',
     `qty` INT(11) DEFAULT NULL COMMENT '수량',
@@ -2215,7 +2215,7 @@ insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_va
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PRODUCT_STOCK_TYPE','5','교환','','','','Y','3','ceduce','본사_김용남',now(),now());
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PRODUCT_STOCK_TYPE','6','환불','','','','Y','4','ceduce','본사_김용남',now(),now());
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PRODUCT_STOCK_TYPE','7','주문취소','','','','Y','5','ceduce','본사_김용남',now(),now());
-insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PRODUCT_STOCK_TYPE','9','재고조정','','','','Y','6','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PRODUCT_STOCK_TYPE','9','상품반품','','','','Y','6','ceduce','본사_김용남',now(),now());
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PRODUCT_STOCK_TYPE','11','반품','','','','Y','7','ceduce','본사_김용남',now(),now());
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PRODUCT_STOCK_TYPE','14','LOSS','','','','Y','8','ceduce','본사_김용남',now(),now());
 insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('PRODUCT_STOCK_TYPE','15','RT','','','','Y','9','ceduce','본사_김용남',now(),now());
