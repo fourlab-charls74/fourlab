@@ -13,6 +13,7 @@
 			</div>
 		</div>
 		<div class="d-flex">
+			<a href="javascript:void(0)" onclick="openBatchPopup();" class="btn btn-primary mr-1"><i class="bx bx-plus fs-16"></i>일괄등록</a>
 			<a href="javascript:void(0)" onclick="save();" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i>저장</a>
 			<a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i>닫기</a>
 		</div>
@@ -273,117 +274,33 @@
 </div>
 
 <script>
-	const columns = [{
-			field: "chk",
-			headerName: '',
-			cellClass: 'hd-grid-code',
-			headerCheckboxSelection: true,
-			checkboxSelection: true,
-			width: 30,
-			pinned: 'left',
-			sort: null,
-		},
-		{
-			field: "brand",
-			headerName: "브랜드",
-			width: 70
-		},
-		{
-			field: "image_url",
-			headerName: "이미지 경로",
-			hide: true
-		},
-		{
-			field: "opt",
-			headerName: "품목",
-			width: 80
-		},
-		{
-			field: "image",
-			headerName: "이미지",
+	const columns = [
+		{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 30, pinned: 'left', sort: null},
+		{field: "brand", headerName: "브랜드", width: 70},
+		{field: "image_url", headerName: "이미지 경로", hide: true},
+		{field: "opt", headerName: "품목", width: 80},
+		{field: "image", headerName: "이미지",
 			cellRenderer: (params) => `<img style="display:block; width: 100%; max-width: 30px; margin: 0 auto;" src="${params.data.image}">`
 		},
-		{
-			field: "prd_cd",
-			headerName: "코드일련",
-			width: 140,
+		{field: "prd_cd", headerName: "코드일련", width: 140},
+		{field: "color", headerName: "컬러", width: 80,
+			cellRenderer: (params) => params.data.color.split(':')[1]
 		},
-		{
-			field: "color",
-			headerName: "컬러",
-			cellRenderer: (params) => params.data.color.split(':')[1],
-			width: 80
+		{field: "size", headerName: "사이즈", width: 80,
+			cellRenderer: (params) => params.data.size.split(':')[1]
 		},
-		{
-			field: "size",
-			headerName: "사이즈",
-			cellRenderer: (params) => params.data.size.split(':')[1],
-			width: 80
-		},
-		{
-			field: "prd_nm",
-			headerName: "상품명",
-			width: 100
-		},
-		{
-			field: "prd_nm_eng",
-			headerName: "상품명(영문)",
-			width: 100
-		},
-		{
-			field: "style_no",
-			headerName: "스타일넘버",
-			width: 100
-		},
-		{
-			field: "seq",
-			headerName: "순서",
-			width: 50
-		},
-		{
-			field: "price",
-			headerName: "판매가",
-			type: 'currencyType',
-			width: 80
-		},
-		{
-			field: "wonga",
-			headerName: "원가",
-			type: 'currencyType',
-			width: 80
-		},
-		{
-			field: "tag_price",
-			headerName: "tag가",
-			type: 'currencyType',
-			width: 80
-		},
-		{
-			field: "year",
-			headerName: "년도",
-			width: 80
-		},
-		{
-			field: "season",
-			headerName: "시즌",
-			width: 80
-		},
-		{
-			field: "gender",
-			headerName: "성별",
-			width: 80
-		},
-		{
-			field: "item",
-			headerName: "아이템",
-			width: 80
-		},
-		{
-			field: "sup_com",
-			headerName: "공급업체",
-			width: 120
-		},
-		
+		{field: "prd_nm", headerName: "상품명", width: 100},
+		{field: "prd_nm_eng", headerName: "상품명(영문)", width: 100},
+		{field: "style_no", headerName: "스타일넘버", width: 100},
+		{field: "seq", headerName: "순서", width: 50},
+		{field: "price", headerName: "판매가", type: 'currencyType', width: 80},
+		{field: "wonga", headerName: "원가", type: 'currencyType', width: 80},
+		{field: "tag_price", headerName: "tag가", type: 'currencyType', width: 80},
+		{field: "year", headerName: "년도", width: 80},
+		{field: "season", headerName: "시즌",width: 80},
+		{field: "gender", headerName: "성별", width: 80},
+		{field: "item", headerName: "아이템", width: 80},
+		{field: "sup_com", headerName: "공급업체", width: 120},
 	];
 </script>
 <script type="text/javascript" charset="utf-8">
@@ -822,7 +739,7 @@
 										$('#seq').append(option);
 									}
 									let new_save = "";
-									if(seq >= 10){
+									if(seq >= 9){
 										new_save = '<option value='+ (seq+1) +'>'+ (seq+1) +' : 신규 생성</option>';
 									}else{
 										new_save = '<option value=0'+(seq+1) +'>0'+(seq+1) +' : 신규 생성</option>';
@@ -941,6 +858,12 @@
 						console.log(error);
 					}
 				});
+		}
+
+		// 상품관리(코드) 엑셀 일괄등록 팝업 오픈
+		const openBatchPopup = () => {
+			const url = '/store/product/prd02/batch';
+			window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=800");
 		}
 
 </script>

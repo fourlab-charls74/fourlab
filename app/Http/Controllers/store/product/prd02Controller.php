@@ -9,6 +9,8 @@ use App\Components\ULib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use App\Models\Conf;
 use PDO;
@@ -1412,4 +1414,108 @@ class prd02Controller extends Controller
         return response()->json(["code" => $code, "result" => $result]);
 	}
 
+	public function batch_show()
+    {
+		$values = [];
+
+        return view(Config::get('shop.store.view') . '/product/prd02_batch', $values);
+    }
+
+	public function import_excel(Request $request) {
+		if (count($_FILES) > 0) {
+			if ( 0 < $_FILES['file']['error'] ) {
+				return response()->json(['code' => 0, 'message' => 'Error: ' . $_FILES['file']['error']], 200);
+			}
+			else {
+				$file = $request->file('file');
+				$now = date('YmdHis');
+				$user_id = Auth::guard('head')->user()->id;
+				$extension = $file->extension();
+	
+				$save_path = "data/product/prd02/";
+				$file_name = "${now}_${user_id}.${extension}";
+				
+				if (!Storage::disk('public')->exists($save_path)) {
+					Storage::disk('public')->makeDirectory($save_path);
+				}
+	
+				$file = sprintf("${save_path}%s", $file_name);
+				move_uploaded_file($_FILES['file']['tmp_name'], $file);
+	
+				return response()->json(['code' => 1, 'file' => $file], 200);
+			}
+		}
+	}
+
+	public function get_products(Request $request) {
+        $data = $request->input('data', []);
+        $result = [];
+
+        foreach($data as $key => $d)
+        {
+			$brand = $d['brand'];
+			$opt_kind_nm = $d['opt_kind_nm'];
+			$prd_cd_p = $d['prd_cd_p'];
+			$color = $d['color'];
+			$size = $d['size'];
+			$goods_nm = $d['goods_nm'];
+			$goods_nm_eng = $d['goods_nm_eng'];
+			$style_no = $d['style_no'];
+			$seq = $d['seq'];
+			$price = $d['price'];
+			$wonga = $d['wonga'];
+			$tag_price = $d['tag_price'];
+			$year = $d['year'];
+			$season = $d['season'];
+			$gender = $d['gender'];
+			$item = $d['item'];
+			$sup_com = $d['sup_com'];
+
+            $sql = "
+				select
+				 	'$brand' as brand
+					, '$opt_kind_nm' as opt_kind_nm
+				 	, '$prd_cd_p' as prd_cd_p
+					, '$color' as color
+					, '$size' as size
+					, '$goods_nm' as goods_nm
+					, '$goods_nm_eng' as goods_nm_eng
+					, '$style_no' as style_no
+					, '$seq' as seq
+					, '$price' as price
+					, '$wonga' as wonga
+					, '$tag_price' as tag_price
+					, '$year' as year
+					, '$season' as season
+					, '$gender' as gender
+					, '$item' as item
+					, '$sup_com' as sup_com
+				from product_code
+				limit 1
+
+            ";
+            $row = DB::selectOne($sql);
+            array_push($result, $row);
+        }
+
+        return response()->json([
+            "code" => 200,
+            "head" => [
+                "total" => count($result),
+                "page" => 1,
+                "page_cnt" => 1,
+                "page_total" => 1,
+            ],
+            "body" => $result
+        ]);
+    }
+
+	public function batch_products(Request $request) 
+	{
+		$data = $request->input("products", []);
+
+		dd($data);
+
+
+	}
 }

@@ -12,7 +12,7 @@
 		<h3 class="d-inline-flex">상품관리(코드)</h3>
 		<div class="d-inline-flex location">
 			<span class="home"></span>
-			<span>/ 상품관리(재고)</span>
+			<span>/ 상품관리(코드)</span>
 		</div>
 	</div>
 	<style>

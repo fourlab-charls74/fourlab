@@ -185,6 +185,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::put('prd02/del-product-code', 'prd02Controller@del_product_code');
         Route::put('prd02/edit-match-product-code', 'prd02Controller@edit_match_product_code');
 
+        Route::get('prd02/batch', 'prd02Controller@batch_show');
+        Route::post('prd02/batch-import', 'prd02Controller@import_excel');
         Route::get('prd02/batch-create', 'prd02Controller@batch_create');
         Route::post('prd02/upload', 'prd02Controller@upload');
         Route::put('prd02/show', 'prd02Controller@update');
@@ -196,6 +198,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('prd02/del-img', 'prd02Controller@delImg');
         Route::post('prd02/sel_seq', 'prd02Controller@selSeq');
         Route::post('prd02/change_seq', 'prd02Controller@changeSeq');
+        Route::post('prd02/batch-getproducts','prd02Controller@get_products'); 
+        Route::post('prd02/batch-products','prd02Controller@batch_products'); 
 
         // 원부자재 상품 관리
         Route::get('prd03','prd03Controller@index');
