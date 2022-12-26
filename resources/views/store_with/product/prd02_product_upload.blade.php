@@ -517,7 +517,6 @@
 		let rows = added_rows;
 		if (rows.length < 1) return alert("저장 목록에 정보를 입력해주세요.");
 		let sel_rows = gx.getSelectedRows();
-		console.log(sel_rows);
 
 		axios({
 			url: '/store/product/prd02/save_product',

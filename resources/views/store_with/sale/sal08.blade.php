@@ -25,7 +25,7 @@
 
 			<div class="card-body">
 				<div class="row">
-					<div class="col-lg-4">
+					<div class="col-lg-4 mb-2 mb-lg-0">
 						<div class="form-group">
 							<label for="good_types">판매기간</label>
 							<div class="form-inline date-select-inbox">
@@ -55,7 +55,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4">
+					<div class="col-lg-4 mb-2 mb-lg-0">
 						<div class="form-group">
 							<label for="store_type">매장구분</label>
 							<div class="flex_box">
@@ -79,7 +79,7 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-lg-4">
+					<div class="col-lg-4 mb-2 mb-lg-0">
 						<div class="form-group">
 							<label for="brand_cd">브랜드</label>
 							<div class="form-inline inline_btn_box">

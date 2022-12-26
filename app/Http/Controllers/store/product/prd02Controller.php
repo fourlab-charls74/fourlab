@@ -1164,8 +1164,8 @@ class prd02Controller extends Controller
 				$sql = "select count(*) as count from product where prd_cd = :prd_cd";
 				$result	= DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
-				$size_sql = "select * from code where code_kind_cd = 'PRD_CD_SIZE_MATCH' and code_id = '$size[0]'";
-				$size_cd = DB::selectOne($size_sql)->code_val2;
+				// $size_sql = "select * from code where code_kind_cd = 'PRD_CD_SIZE_MATCH' and code_id = '$size[0]'";
+				// $size_cd = DB::selectOne($size_sql)->code_val2;
 
 				$goods_opt = "";
 				if ($result->count == 0) {
@@ -1327,7 +1327,7 @@ class prd02Controller extends Controller
 				select 
 					p.prd_cd, p.prd_nm , pc.seq
 				from product p 
-				inner join product_code pc on p.prd_cd = pc.prd_cd
+					inner join product_code pc on p.prd_cd = pc.prd_cd
 				where p.prd_cd like '$prd_cd%'
 				group by p.prd_nm
 				order by p.prd_cd asc
@@ -1512,10 +1512,106 @@ class prd02Controller extends Controller
 
 	public function batch_products(Request $request) 
 	{
+		$admin_id = Auth('head')->user()->id;
 		$data = $request->input("products", []);
 
-		dd($data);
 
+		try {
 
+			DB::beginTransaction();
+
+			foreach ($data as $row) {
+				$brand = $row['brand'];
+				$opt_kind_nm = $row['opt_kind_nm'];
+				$prd_cd_p = $row['prd_cd_p'];
+				$color = $row['color'];
+				$size = $row['size'];
+				$goods_nm = $row['goods_nm'];
+				$goods_nm_eng = $row['goods_nm_eng'];
+				$style_no = $row['style_no'];
+				$seq = $row['seq'];
+				$price = $row['price'];
+				$wonga = $row['wonga'];
+				$tag_price = $row['tag_price'];
+				$year = $row['year'];
+				$season = $row['season'];
+				$gender = $row['gender'];
+				$item = $row['item'];
+				$sup_com = $row['sup_com'];
+				$prd_cd = $prd_cd_p.$color.$size;
+
+				$unit = "";
+				$goods_no = "";
+				$goods_opt = "";
+
+				$sql = "select count(*) as count from product where prd_cd = :prd_cd";
+				$result	= DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+				if ($result->count == 0) {
+
+					DB::table('product')->insert([
+						'prd_cd' => $prd_cd,
+						'prd_nm' => $goods_nm,
+						'prd_nm_eng' => $goods_nm_eng,
+						'style_no' => $style_no,
+						'price' => $price,
+						'wonga' => $wonga,
+						'tag_price' => $tag_price,
+						'com_id' => $sup_com,
+						'unit' => $unit,
+						'rt' => now(),
+						'ut' => now(),
+						'admin_id' => $admin_id
+					]);
+
+					DB::table('product_code')->insert([
+						'prd_cd' => $prd_cd,
+						'seq' => $seq,
+						'goods_no' => $goods_no,
+						'goods_opt'	=> $goods_opt,
+						'brand' => $brand,
+						'year' => $year,
+						'season' => $season,
+						'gender' => $gender,
+						'item' => $item,
+						'opt' => $opt_kind_nm,
+						'color' => $color,
+						'size' => $size,
+						'rt' => now(),
+						'ut' => now(),
+						'admin_id'	=> $admin_id
+					]);
+					
+					DB::table('product_stock')->insert([
+						'goods_no' => $goods_no,
+						'prd_cd' => $prd_cd,
+						'qty_wonga'	=> 0,
+						'in_qty' => 0,
+						'out_qty' => 0,
+						'qty' => 0,
+						'wqty' => 0,
+						'goods_opt' => $goods_opt,
+						'barcode' => $prd_cd,
+						'use_yn' => 'Y',
+						'rt' => now(),
+						'ut' => now()
+					]);
+				}else {
+					DB::rollback();
+					return response()->json(["code" => -1, "prd_cd" => $prd_cd]);
+				}
+
+			}
+		
+			DB::commit();
+			$code = 200;
+			$msg = "성공";
+		} catch (\Exception $e) {
+			DB::rollback();
+			$msg = $e->getMessage();
+			$code = 500;
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg]);
 	}
 }
