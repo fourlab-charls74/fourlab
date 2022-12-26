@@ -507,6 +507,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 창고수불집계표
         Route::get('sal22', 'sal22Controller@index');
         Route::get('sal22/search', 'sal22Controller@search');
+
+        // 본사수불집계표
+        Route::get('sal23', 'sal23Controller@index');
+        Route::get('sal23/search', 'sal23Controller@search');
     });
 
     Route::prefix("account")->namespace('account')->group(function () {
