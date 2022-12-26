@@ -610,7 +610,7 @@ CREATE TABLE `store_account_closed` (
     PRIMARY KEY (`idx`),
     UNIQUE KEY `store_cd` (`store_cd`,`sday`,`eday`),
     KEY `sdate` (`sday`,`eday`)
-) ENGINE=INNODB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='매장 마감'
+) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='매장 마감'
 
 
 CREATE TABLE `store_account_closed_list` (
