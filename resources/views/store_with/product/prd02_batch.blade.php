@@ -207,32 +207,31 @@
 		var worksheet = workbook.Sheets[firstSheetName];
 
 		var excel_columns = {
-			'A': 'brand',
-			'B': 'opt_kind_nm',
-			'C': 'img',
-			'D': 'prd_cd_p',
-			'E': 'color',
-			'F': 'size',
-			'G': 'goods_nm',
-			'H': 'goods_nm_eng',
-			'I': 'style_no',
-			'J': 'seq',
-			'K': 'price',
-			'L': 'wonga',
-			'M': 'tag_price',
-			'N': 'year',
-			'O': 'season',
-			'P': 'gender',
-			'Q': 'item',
-			'R': 'sup_com',
+			'A': 'prd_cd_p',
+			'B': 'brand',
+			'C': 'year',
+			'D': 'season',
+			'E': 'gender',
+			'F': 'item',
+			'G': 'seq',
+			'H': 'opt_kind_nm',
+			'I': 'color',
+			'J': 'size',
+			'K': 'goods_nm',
+			'L': 'goods_nm_eng',
+			'M': 'style_no',
+			'N': 'price',
+			'O': 'wonga',
+			'P': 'tag_price',
+			'Q': 'sup_com',
 		};
 
-        var firstRowIndex = 41; // 엑셀 6행부터 시작 (샘플데이터 참고)
+        var firstRowIndex = 6; // 엑셀 6행부터 시작 (샘플데이터 참고)
 		var rowIndex = firstRowIndex; 
 
         let count = gx.gridOptions.api.getDisplayedRowCount();
         let rows = [];
-		while (worksheet['R' + rowIndex]) {
+		while (worksheet['Q' + rowIndex]) {
 			let row = {};
 			Object.keys(excel_columns).forEach((column) => {
                 let item = worksheet[column + rowIndex];
@@ -327,12 +326,14 @@
                 data: data,
             }).then(function (res) {
                 if(res.data.code === 200) {
-                        alert('출고요청에 성공하였습니다.');
+                        alert('상품코드 일괄등록에 성공하였습니다.');
                         window.close();
-                        opener.location.href = "/store/stock/stk10";
+                } else if (res.data.code === -1) {
+                    const prd_cd = res.data.prd_cd;
+				    alert(`${prd_cd}는 중복되었거나 이미 존재하는 상품 코드입니다.\n중복을 제거하거나 상품 코드를 재확인 후 다시 시도해주세요.`);
                 } else {
                     console.log(res.data);
-                    alert("출고요청 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+                    alert("상품코드 일괄등록 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
                 }
             }).catch(function (err) {
                 console.log(err);
