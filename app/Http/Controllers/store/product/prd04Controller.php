@@ -994,40 +994,43 @@ class prd04Controller extends Controller
 				}
 		
 				if( $wonga == 0 ){
-					$error_code		= "502";
-					$result_code	= "상품정보 혹은 원가정보가 존재하지 않습니다. [" . $prd_cd . "]";
+					//$error_code		= "502";
+					//$result_code	= "상품정보 혹은 원가정보가 존재하지 않습니다. [" . $prd_cd . "]";
 
-					break;
+					//break;
+					$result_code	.= "|". $prd_cd;
+				}else{
+
+					//재고정보 처리
+					$where	= ['prd_cd'	=> $prd_cd];
+
+					$values	= [
+						'wonga'		=> $wonga,
+						'qty_wonga'	=> $qty_wonga + $qty * $wonga,
+						'in_qty'	=> $in_qty + $qty,
+						'qty'		=> $org_qty + $qty,
+						'ut'		=> now()
+					];
+					DB::table('product_stock')
+						->where($where)
+						->update($values);
+					//DB::table('product_stock')->update($where, $values);
+
+					//매장재고 정보 처리
+					$where	= ['prd_cd'	=> $prd_cd, 'store_cd' => $store_cd];
+
+					$values	= [
+						'goods_no'	=> $goods_no,
+						'qty'		=> $qty,
+						'wqty'		=> $qty,
+						'goods_opt'	=> $goods_opt,
+						'use_yn'	=> 'Y',
+						'rt'		=> now(),
+						'ut'		=> now()
+					];
+					DB::table('product_stock_store')->updateOrInsert($where, $values);
+
 				}
-
-				//재고정보 처리
-				$where	= ['prd_cd'	=> $prd_cd];
-
-				$values	= [
-					'wonga'		=> $wonga,
-					'qty_wonga'	=> $qty_wonga + $qty * $wonga,
-					'in_qty'	=> $in_qty + $qty,
-					'qty'		=> $org_qty + $qty,
-					'ut'		=> now()
-				];
-				DB::table('product_stock')
-					->where($where)
-					->update($values);
-				//DB::table('product_stock')->update($where, $values);
-
-				//매장재고 정보 처리
-				$where	= ['prd_cd'	=> $prd_cd, 'store_cd' => $store_cd];
-
-				$values	= [
-					'goods_no'	=> $goods_no,
-					'qty'		=> $qty,
-					'wqty'		=> $qty,
-					'goods_opt'	=> $goods_opt,
-					'use_yn'	=> 'Y',
-					'rt'		=> now(),
-					'ut'		=> now()
-				];
-				DB::table('product_stock_store')->updateOrInsert($where, $values);
 
 			}
 	

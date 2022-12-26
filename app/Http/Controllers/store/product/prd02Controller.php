@@ -84,7 +84,7 @@ class prd02Controller extends Controller
 		$ord_field	= $request->input('ord_field','prd_cd1');
 		if ($ord_field == 'prd_cd1') $ord_field = 'pc.rt';
 
-		$orderby	= sprintf("order by p.match_yn desc, %s %s, pc.prd_cd", $ord_field, $ord);
+		$orderby	= sprintf("order by p.match_yn desc, %s %s, pc.prd_cd ", $ord_field, $ord);
 
 		$in_store_sql = "";
 		$match_yn = $request->input('match_yn1');

@@ -154,7 +154,7 @@
 			success: function (data) {
 				if( data.code == "200" )
 				{
-					alert("매장재고가 등록(수정)되었습니다.");
+					alert("매장재고가 등록(수정)되었습니다." + data.result_code);
 					window.opener.Search();
 					//self.close();
 				} 
