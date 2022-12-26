@@ -569,6 +569,7 @@
             data: { cmd: 'product', stock_no: document.search.stock_no.value }
         }).then((res) => {
             let rows = res.hasOwnProperty('data') && res.data.hasOwnProperty('rows') ? res.data.rows : "";
+            const exchange_rate = unComma(document.search.exchange_rate.value || '0');
             if (rows && Array.isArray(rows)) {
                 rows = rows.map((row, idx) => {
                     if (STATE == 10 || STATE == 20) { 
@@ -578,10 +579,12 @@
                         row.isEditable = false;
                     }
                     row.count = idx + 1;
+                    row.income_amt = exchange_rate * row.unit_cost;
+                    row.income_total_amt = row.income_amt * row.qty;
                     return row;
                 });
                 gx.gridOptions.api.applyTransaction({ add : rows })
-                calCustomTaxRate();
+                calCustomTaxRate(false);
             }
         }).catch((error) => {
             console.log(error);
