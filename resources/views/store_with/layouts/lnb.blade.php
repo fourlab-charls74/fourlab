@@ -51,6 +51,14 @@
                     <li><a href="/store/stock/stk32">(완)매장 알림</a></li>
                     <li><a href="/store/stock/stk33">(개)동종업계매출관리</a></li>
                 </ul>
+            </li>
+            <li>
+                <a href="javascript:;" class="arrow"><i class="bx bx-cart fs-18"></i><span>주문/배송관리</span></a>
+                <ul>
+                    <li><a href="/store/order/ord02">(개)온라인 주문접수</a></li>
+                    <li><a href="/store/order/ord03">(개)온라인 배송처리</a></li>
+                </ul>
+            </li>
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-user fs-18"></i><span>고객/수선관리</span></a>
                 <ul>

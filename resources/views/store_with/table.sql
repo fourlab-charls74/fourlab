@@ -2235,6 +2235,16 @@ insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_va
 -- code_kind 데이터 추가 입고상태 : STOCK_ORDER_STATE
 insert into `code_kind` (`code_kind_cd`, `code_kind_nm`, `code_kind_nm_eng`, `use_yn`, `type`, `seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('STOCK_ORDER_STATE','[매장관리]입고상태','stock_order_state','Y',NULL,'0','','본사_김용남',now(),now());
 
+-- code 데이터 추가 온라인주문접수매장 : ONLINE_ORDER_STORE
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('ONLINE_ORDER_STORE','H0020','현대대전아울렛(피엘라벤)','','','','Y','1','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('ONLINE_ORDER_STORE','L0025','롯데본점(피엘라벤)','','','','Y','2','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('ONLINE_ORDER_STORE','L0027','롯데부산본점(피엘라벤)','','','','Y','3','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('ONLINE_ORDER_STORE','L0038','롯데이천아울렛(피엘라벤)','','','','Y','4','ceduce','본사_김용남',now(),now());
+insert into `code` (`code_kind_cd`, `code_id`, `code_val`, `code_val2`, `code_val3`, `code_val_eng`, `use_yn`, `code_seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('ONLINE_ORDER_STORE','L0048','롯데동부산아울렛(피엘라벤)','','','','Y','5','ceduce','본사_김용남',now(),now());
+
+-- code_kind 데이터 추가 온라인주문접수매장 : ONLINE_ORDER_STORE
+insert into `code_kind` (`code_kind_cd`, `code_kind_nm`, `code_kind_nm_eng`, `use_yn`, `type`, `seq`, `admin_id`, `admin_nm`, `rt`, `ut`) values('ONLINE_ORDER_STORE','[매장관리]온라인주문접수매장','online_order_store','Y',NULL,'0','','본사_김용남',now(),now());
+
 --
 -- 테이블 데이터 추가 종료
 --
