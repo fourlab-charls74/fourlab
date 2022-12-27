@@ -54,29 +54,17 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="store_type">매장구분</label>
+                            <label for="store_type">창고구분</label>
                             <div class="flex_box">
-                                <select name='store_type' class="form-control form-control-sm">
+                                <select name='storage_type' class="form-control form-control-sm">
                                     <option value=''>전체</option>
-                                    @foreach (@$store_types as $store_type)
-                                        <option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
+                                    @foreach (@$storage as $s)
+                                        <option value='{{ $s->storage_cd }}'>{{ $s->storage_nm }}</option>
                                     @endforeach
                                 </select>
                             </div>
 						</div>
                     </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label>매장</label>
-                            <div class="form-inline inline_btn_box">
-                                <input type='hidden' id="store_nm" name="store_nm">
-                                <select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select" multiple></select>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="prd_cd">상품옵션 범위검색</label>
@@ -91,6 +79,8 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="prd_cd">상품코드</label>
@@ -120,7 +110,7 @@
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
-                                        <option value="p.store_cd">매장코드</option>
+                                        <option value="p.storage_cd">창고코드</option>
                                         <option value="p.prd_cd">상품코드</option>
                                     </select>
                                 </div>
@@ -165,15 +155,27 @@
 
     let AlignCenter = {"text-align": "center"};
     let columns = [
-        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: AlignCenter},
+        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: AlignCenter,
+            cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : parseInt(params.value) + 1,
+        },
         {field: "storage_cd", headerName: "창고코드", pinned: 'left', width: 60, cellStyle: AlignCenter},
         {field: "storage_nm",	headerName: "창고명", pinned: 'left', width: 130},
         {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: AlignCenter},
         {field: "goods_no", headerName: "상품번호", pinned: 'left', width: 60, cellStyle: AlignCenter},
         {field: "brand_nm", headerName: "브랜드", width: 60, cellStyle: AlignCenter},
-        {field: "goods_nm", headerName: "상품명", width: 200, type: "HeadGoodsNameType"},
+        {field: "prd_nm", headerName: "상품명", width: 200,
+            cellRenderer: function (params) {
+                    if (params.value !== undefined) {
+                        if(params.data.goods_no == '0') { 
+                            return '<a href="javascript:void(0);" onclick="return alert(`상품번호가 비어있는 상품입니다.`);">' + params.value + '</a>';
+                        }
+                        
+                        return '<a href="#" onclick="return openHeadProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
+                    }
+                }
+        },
         {field: "goods_nm_eng", headerName: "상품명(영문)", width: 200},
-        {field: "prd_cd_sm", headerName: "코드일련", width: 100, cellStyle: AlignCenter},
+        {field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: AlignCenter},
         {field: "color", headerName: "컬러", width: 55, cellStyle: AlignCenter},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: AlignCenter},
         {field: "goods_opt", headerName: "옵션", width: 150},
@@ -184,54 +186,63 @@
             headerName: "이전재고",
             children: [
                 {field: "prev_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "prev_sh", headerName: "TAG금액", width: 80, type: "currencyType"},
-                {field: "prev_price", headerName: "판매가금액", width: 80, type: "currencyType"},
-                {field: "prev_wonga", headerName: "원가금액", width: 80, type: "currencyType"},
+                {field: "prev_sh", headerName: "Tag가", width: 80, type: "currencyType"},
+                {field: "prev_price", headerName: "판매가", width: 80, type: "currencyType"},
+                {field: "prev_wonga", headerName: "원가", width: 80, type: "currencyType"},
             ]
         },
         {
-            headerName: "창고입고",
+            headerName: "생산입고",
             children: [
                 {field: "storage_in_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "storage_in_sh", headerName: "TAG금액", width: 80, type: "currencyType"},
-                {field: "storage_in_price", headerName: "판매가금액", width: 80, type: "currencyType"},
-                {field: "storage_in_wonga", headerName: "원가금액", width: 80, type: "currencyType"},
+                {field: "storage_in_sh", headerName: "Tag가", width: 80, type: "currencyType"},
+                {field: "storage_in_price", headerName: "판매가", width: 80, type: "currencyType"},
+                {field: "storage_in_wonga", headerName: "원가", width: 80, type: "currencyType"},
             ]
         },
         {
-            headerName: "창고반품",
+            headerName: "생산반품",
             children: [
                 {field: "storage_return_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "storage_return_sh", headerName: "TAG금액", width: 80, type: "currencyType"},
-                {field: "storage_return_price", headerName: "판매가금액", width: 80, type: "currencyType"},
-                {field: "storage_return_wonga", headerName: "원가금액", width: 80, type: "currencyType"},
+                {field: "storage_return_sh", headerName: "Tag가", width: 80, type: "currencyType"},
+                {field: "storage_return_price", headerName: "판매가", width: 80, type: "currencyType"},
+                {field: "storage_return_wonga", headerName: "원가", width: 80, type: "currencyType"},
             ]
         },
         {
             headerName: "이동입고",
             children: [
                 {field: "rt_in_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "rt_in_sh", headerName: "TAG금액", width: 80, type: "currencyType"},
-                {field: "rt_in_price", headerName: "판매가금액", width: 80, type: "currencyType"},
-                {field: "rt_in_wonga", headerName: "원가금액", width: 80, type: "currencyType"},
+                {field: "rt_in_sh", headerName: "Tag가", width: 80, type: "currencyType"},
+                {field: "rt_in_price", headerName: "판매가", width: 80, type: "currencyType"},
+                {field: "rt_in_wonga", headerName: "원가", width: 80, type: "currencyType"},
             ]
         },
         {
             headerName: "이동출고",
             children: [
                 {field: "rt_out_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "rt_out_sh", headerName: "TAG금액", width: 80, type: "currencyType"},
-                {field: "rt_out_price", headerName: "판매가금액", width: 80, type: "currencyType"},
-                {field: "rt_out_wonga", headerName: "원가금액", width: 80, type: "currencyType"},
+                {field: "rt_out_sh", headerName: "Tag가", width: 80, type: "currencyType"},
+                {field: "rt_out_price", headerName: "판매가", width: 80, type: "currencyType"},
+                {field: "rt_out_wonga", headerName: "원가", width: 80, type: "currencyType"},
             ]
         },
         {
-            headerName: "매장판매",
+            headerName: "매장출고",
             children: [
                 {field: "sale_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "sale_sh", headerName: "TAG금액", width: 80, type: "currencyType"},
-                {field: "sale_price", headerName: "판매가금액", width: 80, type: "currencyType"},
-                {field: "sale_wonga", headerName: "원가금액", width: 80, type: "currencyType"},
+                {field: "sale_sh", headerName: "Tag가", width: 80, type: "currencyType"},
+                {field: "sale_price", headerName: "판매가", width: 80, type: "currencyType"},
+                {field: "sale_wonga", headerName: "원가", width: 80, type: "currencyType"},
+            ]
+        },
+        {
+            headerName: "매장반품",
+            children: [
+                {field: "sale_qty", headerName: "수량", width: 50, type: "currencyType"},
+                {field: "sale_sh", headerName: "Tag가", width: 80, type: "currencyType"},
+                {field: "sale_price", headerName: "판매가", width: 80, type: "currencyType"},
+                {field: "sale_wonga", headerName: "원가", width: 80, type: "currencyType"},
             ]
         },
         {
@@ -247,9 +258,9 @@
             headerName: "기간재고",
             children: [
                 {field: "term_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "term_sh", headerName: "TAG금액", width: 80, type: "currencyType"},
-                {field: "term_price", headerName: "판매가금액", width: 80, type: "currencyType"},
-                {field: "term_wonga", headerName: "원가금액", width: 80, type: "currencyType"},
+                {field: "term_sh", headerName: "Tag가", width: 80, type: "currencyType"},
+                {field: "term_price", headerName: "판매가", width: 80, type: "currencyType"},
+                {field: "term_wonga", headerName: "원가", width: 80, type: "currencyType"},
             ]
         },
     ];
