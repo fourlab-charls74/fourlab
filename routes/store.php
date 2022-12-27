@@ -447,6 +447,16 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
     });
 
+    // 주문/배송관리
+    Route::prefix("order")->namespace('order')->group(function () {
+
+        // 온라인 주문접수
+        Route::get('ord02','ord02Controller@index');
+
+        // 온라인 배송처리
+        Route::get('ord03','ord03Controller@index');
+    });
+
     // 고객관리
     Route::prefix("member")->namespace('member')->group(function () {
         Route::get('mem01','mem01Controller@index');
