@@ -568,9 +568,10 @@
             method: 'post',
             data: { cmd: 'product', stock_no: document.search.stock_no.value }
         }).then((res) => {
-            const rows = res.hasOwnProperty('data') && res.data.hasOwnProperty('rows') ? res.data.rows : "";
+            let rows = res.hasOwnProperty('data') && res.data.hasOwnProperty('rows') ? res.data.rows : "";
+            const exchange_rate = unComma(document.search.exchange_rate.value || '0');
             if (rows && Array.isArray(rows)) {
-                rows.map((row, idx) => {
+                rows = rows.map((row, idx) => {
                     if (STATE == 10 || STATE == 20) { 
                         // 입고 대기거나 입고 처리중인 경우 체크박스 표시, 상품 삭제를 가능하게 합니다.
                         row.isEditable = true;
@@ -578,9 +579,12 @@
                         row.isEditable = false;
                     }
                     row.count = idx + 1;
-                    gx.gridOptions.api.applyTransaction({ add : [row] })
+                    row.income_amt = exchange_rate * row.unit_cost;
+                    row.income_total_amt = row.income_amt * row.qty;
+                    return row;
                 });
-                calCustomTaxRate();
+                gx.gridOptions.api.applyTransaction({ add : rows })
+                calCustomTaxRate(false);
             }
         }).catch((error) => {
             console.log(error);

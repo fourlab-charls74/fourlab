@@ -790,10 +790,11 @@ class cs01Controller extends Controller {
 				, g.brand_nm
 				, g.goods_sh
 				, g.price
-				, ifnull(
-					(select goods_opt from product_stock where goods_no = s.goods_no and prd_cd = s.prd_cd and goods_opt = s.opt_kor)
-					, concat('err:',ifnull(s.opt_kor, ''))
-				  ) as opt_kor
+				-- , ifnull(
+				--	(select goods_opt from product_stock where goods_no = s.goods_no and prd_cd = s.prd_cd and goods_opt = s.opt_kor)
+				--	, concat('err:',ifnull(s.opt_kor, ''))
+				--  ) as opt_kor
+				, ps.goods_opt as opt_kor
 				, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
 				, pc.color
 				, pc.size
