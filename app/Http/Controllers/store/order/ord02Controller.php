@@ -87,38 +87,21 @@ class ord02Controller extends Controller
 		if ($item != '') $where2 .= " and g.opt_kind_cd = '$item' ";
 
 		$sql = "
-			select
-				a.store_cd, a.store_nm, a.store_type, st.code_val as store_type_nm
-				, a.pr_code, prc.code_val as pr_code_nm
-				, a.brand, b.brand_nm
-				, sum(a.sale_amt) as sale_amt
-				, sum(a.recv_amt) as recv_amt
-				, sum(a.wonga_amt) as wonga_amt
-				, sum(a.margin_amt) as margin_amt
-				, (sum(a.margin_amt) / sum(a.sale_amt) * 100) as margin_rate
+			select *
 			from (
 				select
-					o.ord_opt_no
-					, o.store_cd, s.store_nm, s.store_type
-					, o.prd_cd, pc.brand, o.pr_code
-					, (w.qty * w.price) as sale_amt
-					, w.recv_amt
-					, (w.qty * w.wonga) as wonga_amt
-					, (w.qty * (w.price - w.wonga)) as margin_amt
-					, o.ord_state, o.goods_no, o.ord_date, o.sale_kind
+					o.ord_no, o.ord_opt_no, o.ord_state
+					, o.prd_cd, o.qty, o.wonga, o.price, o.dc_amt, o.coupon_amt, o.recv_amt
+					, g.goods_no, g.style_no, g.goods_nm, g.goods_nm_eng, o.goods_opt
+					, concat(ifnull(m.user_nm, ''), '(', ifnull(m.user_id, ''), ')') as user_nm, m.r_nm
+					, o.store_cd, o.pr_code, p.pay_stat
 				from order_opt o
-					inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
-					inner join product_code pc on pc.prd_cd = o.prd_cd
-					inner join store s on s.store_cd = o.store_cd
-				where w.ord_state in ('30', '60', '61') and o.store_cd <> '' $where
+					inner join order_mst m on m.ord_no = o.ord_no
+					inner join goods g on g.goods_no = o.goods_no and g.goods_sub = o.goods_sub
+					left outer join payment p on p.ord_no = o.ord_no
 			) a
-				inner join code st on st.code_kind_cd = 'STORE_TYPE' and st.code_id = a.store_type
-				left outer join goods g on g.goods_no = a.goods_no
-				left outer join brand b on b.br_cd = a.brand
-				left outer join code prc on prc.code_kind_cd = 'PR_CODE' and prc.code_id = a.pr_code
-			where 1=1 $where2
-			group by a.store_cd, a.brand, a.pr_code
-			order by a.store_cd, a.brand, prc.code_seq
+				left outer join product_stock_store ps on ps.prd_cd = a.prd_cd and ps.store_cd in (select code_id as store_cd from code where code_kind_cd = 'ONLINE_ORDER_STORE')
+				left outer join product_stock_storage pss on pss.prd_cd = a.prd_cd and pss.storage_cd in ('A0009', 'C0006')
 		";
 		$result = DB::select($sql);
 

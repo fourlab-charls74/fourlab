@@ -91,16 +91,11 @@ class sal23Controller extends Controller
                 , sum(ifnull(stock_in.qty, 0)) * p.tag_price as stock_in_tag_price
                 , sum(ifnull(stock_in.qty, 0)) * p.price as stock_in_price
                 , sum(ifnull(stock_in.qty, 0)) * p.wonga as stock_in_wonga
-                -- 기간출고
+                -- 기간반품
                 , sum(ifnull(stock_return.qty, 0)) * -1 as stock_return_qty
                 , sum(ifnull(stock_return.qty, 0)) * p.tag_price * -1 as stock_return_tag_price
                 , sum(ifnull(stock_return.qty, 0)) * p.price * -1 as stock_return_price
                 , sum(ifnull(stock_return.qty, 0)) * p.wonga * -1 as stock_return_wonga
-                -- 판매
-                , 0 as sale_qty
-                , 0 as sale_tag_price
-                , 0 as sale_price
-                , 0 as sale_wonga
                 -- loss
                 , 0 as loss_qty
                 , 0 as loss_tag_price
@@ -117,7 +112,8 @@ class sal23Controller extends Controller
                 left outer join (		
                     select idx, qty, prd_cd
                     from product_stock_hst
-                    where location_type = 'STORAGE' 
+                    where location_type = 'STORAGE'
+                        and type not in (11,15,16,17)
                         and date_format(stock_state_date, '%Y-%m-%d %H:%i:%s') >= '$sdate 00:00:00' 
                         and date_format(stock_state_date, '%Y-%m-%d %H:%i:%s') <= '$edate 23:59:59'
                 ) hst on hst.prd_cd = ps.prd_cd
@@ -127,6 +123,7 @@ class sal23Controller extends Controller
                     select idx, qty, prd_cd
                     from product_stock_hst
                     where location_type = 'STORAGE'
+                        and type not in (11,15,16,17)
                         and date_format(stock_state_date, '%Y-%m-%d %H:%i:%s') >= '$next_edate 00:00:00' 
                         and date_format(stock_state_date, '%Y-%m-%d %H:%i:%s') <= now()
                 ) _next on _next.prd_cd = ps.prd_cd
@@ -136,6 +133,24 @@ class sal23Controller extends Controller
             $limit
         ";
         $rows = DB::select($sql);
+
+        foreach ($rows as $row) {
+            $sale_query = "
+                select
+                    sum(w.qty) * -1 as sale_qty
+                    , sum(w.qty) * $row->tag_price * -1 as sale_tag_price
+                    , sum(w.qty) * $row->price * -1 as sale_price
+                    , sum(w.qty) * $row->wonga * -1 as sale_wonga
+                from order_opt_wonga w
+                    inner join order_opt o on o.ord_opt_no = w.ord_opt_no
+                where w.ord_state in (30,60,61) and o.prd_cd = '$row->prd_cd'
+            ";
+            $sale = DB::selectOne($sale_query);
+            $row->sale_qty = $sale->sale_qty;
+            $row->sale_tag_price = $sale->sale_tag_price;
+            $row->sale_price = $sale->sale_price;
+            $row->sale_wonga = $sale->sale_wonga;
+        }
         
         // pagination
         $total = 0;
@@ -157,10 +172,6 @@ class sal23Controller extends Controller
                     , sum(stock_return_tag_price) as stock_return_tag_price
                     , sum(stock_return_price) as stock_return_price
                     , sum(stock_return_wonga) as stock_return_wonga
-                    , sum(sale_qty) as sale_qty
-                    , sum(sale_tag_price) as sale_tag_price
-                    , sum(sale_price) as sale_price
-                    , sum(sale_wonga) as sale_wonga
                     , sum(loss_qty) as loss_qty
                     , sum(loss_tag_price) as loss_tag_price
                     , sum(loss_price) as loss_price
@@ -185,16 +196,11 @@ class sal23Controller extends Controller
                         , sum(ifnull(stock_in.qty, 0)) * p.tag_price as stock_in_tag_price
                         , sum(ifnull(stock_in.qty, 0)) * p.price as stock_in_price
                         , sum(ifnull(stock_in.qty, 0)) * p.wonga as stock_in_wonga
-                        -- 기간출고
+                        -- 기간반품
                         , sum(ifnull(stock_return.qty, 0)) * -1 as stock_return_qty
                         , sum(ifnull(stock_return.qty, 0)) * p.tag_price * -1 as stock_return_tag_price
                         , sum(ifnull(stock_return.qty, 0)) * p.price * -1 as stock_return_price
                         , sum(ifnull(stock_return.qty, 0)) * p.wonga * -1 as stock_return_wonga
-                        -- 판매
-                        , 0 as sale_qty
-                        , 0 as sale_tag_price
-                        , 0 as sale_price
-                        , 0 as sale_wonga
                         -- loss
                         , 0 as loss_qty
                         , 0 as loss_tag_price
@@ -212,6 +218,7 @@ class sal23Controller extends Controller
                             select idx, qty, prd_cd
                             from product_stock_hst
                             where location_type = 'STORAGE' 
+                                and type not in (11,15,16,17)
                                 and date_format(stock_state_date, '%Y-%m-%d %H:%i:%s') >= '$sdate 00:00:00' 
                                 and date_format(stock_state_date, '%Y-%m-%d %H:%i:%s') <= '$edate 23:59:59'
                         ) hst on hst.prd_cd = ps.prd_cd
@@ -221,6 +228,7 @@ class sal23Controller extends Controller
                             select idx, qty, prd_cd
                             from product_stock_hst
                             where location_type = 'STORAGE'
+                                and type not in (11,15,16,17)
                                 and date_format(stock_state_date, '%Y-%m-%d %H:%i:%s') >= '$next_edate 00:00:00' 
                                 and date_format(stock_state_date, '%Y-%m-%d %H:%i:%s') <= now()
                         ) _next on _next.prd_cd = ps.prd_cd
@@ -229,6 +237,25 @@ class sal23Controller extends Controller
                 ) a
             ";
             $row = DB::selectOne($sql);
+
+            $sale_query = "
+                select
+                    sum(w.qty) * -1 as sale_qty
+                    , sum(w.qty) * -1 * p.tag_price as sale_tag_price
+                    , sum(w.qty) * -1 * p.price as sale_price
+                    , sum(w.qty) * -1 * p.wonga as sale_wonga
+                from order_opt_wonga w
+                    inner join order_opt o on o.ord_opt_no = w.ord_opt_no
+                    inner join product_code pc on pc.prd_cd = o.prd_cd
+                    inner join product p on p.prd_cd = o.prd_cd
+                where w.ord_state in (30,60,61) $where
+            ";
+            $sale = DB::selectOne($sale_query);
+            $row->sale_qty = $sale->sale_qty;
+            $row->sale_tag_price = $sale->sale_tag_price;
+            $row->sale_price = $sale->sale_price;
+            $row->sale_wonga = $sale->sale_wonga;
+
             $total_data = $row;
             $total = $row->total;
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
