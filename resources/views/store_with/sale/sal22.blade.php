@@ -54,7 +54,7 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="store_type">창고구분</label>
+                            <label for="store_type">창고명</label>
                             <div class="flex_box">
                                 <select name='storage_type' class="form-control form-control-sm">
                                     <option value=''>전체</option>

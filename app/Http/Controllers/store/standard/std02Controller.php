@@ -192,7 +192,7 @@ class std02Controller extends Controller
 	public function update_store(Request $request){
 
 		$id			= Auth('head')->user()->id;
-		$code		= '200';
+		$code		= 200;
 		$msg		= "매장정보가 정상적으로 반영되었습니다.";
 		$store_cd 	= $request->input('store_cd');
 		$image 		= $request->file('file');
@@ -304,7 +304,15 @@ class std02Controller extends Controller
 						$file_name = sprintf("%s_%s.jpg", $store_cd, "$cnt");
 						$save_file = sprintf("%s/%s", $base_path, $file_name);
 
-						Storage::disk('public')->putFileAs($base_path, $ig, $file_name);
+						$path = Storage::disk('public')->putFileAs($base_path, $ig, $file_name);
+
+						if ($file_name != "") {
+							$size = filesize($path);
+							if ($size > 2048000) {
+								return response()->json(["code" => 201]);
+							}
+						}
+
 						$insert_values = [
 							'img_url' => $save_file,
 							'store_cd' => $store_cd,
@@ -317,7 +325,7 @@ class std02Controller extends Controller
 
 					} else {
 						$msg = "매장이미지 중 'jpg'형식이 아닌 파일이 존재합니다.";
-						return response()->json(["code" => '400', 'msg' => $msg]);
+						return response()->json(["code" => 400, 'msg' => $msg]);
 					}
 				}
 				
@@ -329,7 +337,7 @@ class std02Controller extends Controller
 			DB::rollback();
 			$msg = $e->getMessage();
 			
-			return response()->json(["code" => '500', 'msg' => $msg]);
+			return response()->json(["code" => 500, 'msg' => $msg]);
 			
 		}
 	}
