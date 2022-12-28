@@ -953,7 +953,6 @@
 				alert("매장이미지 중 'jpg'형식이 아닌 파일이 존재합니다.\n이미지파일 확인 후 다시 등록해주세요.");
 			} else if(res.data.code === 201) {
 				alert("업로드 가능한 파일의 크기는 2MB입니다.\n2MB보다 작은 파일을 업로드해주세요");
-				location.reload();
 			}
         }).catch(function (err) {
             console.log(err);

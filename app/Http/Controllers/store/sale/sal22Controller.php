@@ -171,7 +171,7 @@ class sal22Controller extends Controller
                     from product_stock_hst
                     where location_type = 'STORAGE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$sdate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= '$edate 23:59:59'
                 ) hst on hst.location_cd = p.storage_cd and hst.prd_cd = p.prd_cd
-                left outer join product_stock_hst storage_in on storage_in.idx = hst.idx and storage_in.type = '1' -- 생산입고
+                left outer join product_stock_hst storage_in on storage_in.idx = hst.idx and storage_in.type = '1' and storage_in.location_type = 'STORAGE' -- 생산입고
                 left outer join product_stock_hst storage_return on storage_return.idx = hst.idx and storage_return.type = '11' -- 생산반품
                 left outer join product_stock_hst rt_in on rt_in.idx = hst.idx and rt_in.type = '15' and rt_in.qty > 0 -- 이동입고
                 left outer join product_stock_hst rt_out on rt_out.idx = hst.idx and rt_out.type = '15' and rt_out.qty < 0 -- 이동출고
