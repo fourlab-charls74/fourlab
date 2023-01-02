@@ -90,10 +90,10 @@ class sal23Controller extends Controller
                 , sum(ifnull(stock_in.qty, 0)) * p.price as stock_in_price
                 , sum(ifnull(stock_in.qty, 0)) * p.wonga as stock_in_wonga
                 -- 기간반품
-                , sum(ifnull(stock_return.qty, 0)) * -1 as stock_return_qty
-                , sum(ifnull(stock_return.qty, 0)) * p.tag_price * -1 as stock_return_tag_price
-                , sum(ifnull(stock_return.qty, 0)) * p.price * -1 as stock_return_price
-                , sum(ifnull(stock_return.qty, 0)) * p.wonga * -1 as stock_return_wonga
+                , sum(ifnull(stock_return.qty, 0)) as stock_return_qty
+                , sum(ifnull(stock_return.qty, 0)) * p.tag_price as stock_return_tag_price
+                , sum(ifnull(stock_return.qty, 0)) * p.price as stock_return_price
+                , sum(ifnull(stock_return.qty, 0)) * p.wonga as stock_return_wonga
                 -- loss
                 , 0 as loss_qty
                 , 0 as loss_tag_price
@@ -135,9 +135,6 @@ class sal23Controller extends Controller
             select
                 w.prd_cd
                 , ifnull(sum(w.qty), 0) * -1 as sale_qty
-                , ifnull(sum(w.qty), 0) * p.tag_price * -1 as sale_tag_price
-                , ifnull(sum(w.qty), 0) * p.price * -1 as sale_price
-                , ifnull(sum(w.qty), 0) * p.wonga * -1 as sale_wonga
             from order_opt_wonga w
                 inner join product p on p.prd_cd = w.prd_cd
                 inner join product_code pc on pc.prd_cd = w.prd_cd
@@ -169,7 +166,10 @@ class sal23Controller extends Controller
         $rows = array_map(function($row) use ($sale, $next_sale) {
             // 판매집계
             $cur_idx = array_search($row->prd_cd, array_column($sale, 'prd_cd'));
-            $row = (object) array_merge((array) $row, (array) $sale[$cur_idx]);
+            $row->sale_qty = $sale[$cur_idx]->sale_qty ?? 0;
+            $row->sale_tag_price = $row->sale_qty * $row->tag_price;
+            $row->sale_price = $row->sale_qty * $row->price;
+            $row->sale_wonga = $row->sale_qty * $row->wonga;
             // 기간재고 집계
             $cur_idx = array_search($row->prd_cd, array_column($next_sale, 'prd_cd'));
             $row->term_qty = ($row->term_qty * 1) + (($next_sale[$cur_idx]->sale_qty ?? 0) * 1);
@@ -220,10 +220,10 @@ class sal23Controller extends Controller
                         , sum(ifnull(stock_in.qty, 0)) * p.price as stock_in_price
                         , sum(ifnull(stock_in.qty, 0)) * p.wonga as stock_in_wonga
                         -- 기간반품
-                        , sum(ifnull(stock_return.qty, 0)) * -1 as stock_return_qty
-                        , sum(ifnull(stock_return.qty, 0)) * p.tag_price * -1 as stock_return_tag_price
-                        , sum(ifnull(stock_return.qty, 0)) * p.price * -1 as stock_return_price
-                        , sum(ifnull(stock_return.qty, 0)) * p.wonga * -1 as stock_return_wonga
+                        , sum(ifnull(stock_return.qty, 0)) as stock_return_qty
+                        , sum(ifnull(stock_return.qty, 0)) * p.tag_price as stock_return_tag_price
+                        , sum(ifnull(stock_return.qty, 0)) * p.price as stock_return_price
+                        , sum(ifnull(stock_return.qty, 0)) * p.wonga as stock_return_wonga
                         -- loss
                         , 0 as loss_qty
                         , 0 as loss_tag_price
