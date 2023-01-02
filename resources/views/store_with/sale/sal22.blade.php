@@ -151,7 +151,7 @@
 </div>
 
 <script language="javascript">
-    const pinnedRowData = [{ storage_cd: '합계' }];
+    const pinnedRowData = [{ storage_cd: '합계' , store_out_qty : 0}];
 
     let AlignCenter = {"text-align": "center"};
     let columns = [
@@ -230,19 +230,19 @@
         {
             headerName: "매장출고",
             children: [
-                {field: "sale_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "sale_sh", headerName: "Tag가", width: 80, type: "currencyType"},
-                {field: "sale_price", headerName: "판매가", width: 80, type: "currencyType"},
-                {field: "sale_wonga", headerName: "원가", width: 80, type: "currencyType"},
+                {field: "store_out_qty", headerName: "수량", width: 50, type: "currencyType"},
+                {field: "store_out_sh", headerName: "Tag가", width: 80, type: "currencyType"},
+                {field: "store_out_price", headerName: "판매가", width: 80, type: "currencyType"},
+                {field: "store_out_wonga", headerName: "원가", width: 80, type: "currencyType"},
             ]
         },
         {
             headerName: "매장반품",
             children: [
-                {field: "sale_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "sale_sh", headerName: "Tag가", width: 80, type: "currencyType"},
-                {field: "sale_price", headerName: "판매가", width: 80, type: "currencyType"},
-                {field: "sale_wonga", headerName: "원가", width: 80, type: "currencyType"},
+                {field: "store_return_qty", headerName: "수량", width: 50, type: "currencyType"},
+                {field: "store_return_sh", headerName: "Tag가", width: 80, type: "currencyType"},
+                {field: "store_return_price", headerName: "판매가", width: 80, type: "currencyType"},
+                {field: "store_return_wonga", headerName: "원가", width: 80, type: "currencyType"},
             ]
         },
         {
@@ -293,6 +293,7 @@
 		let data = $('form[name="search"]').serialize();
 		gx.Request('/store/sale/sal22/search', data, 1, function(d) {
             let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
+            console.log(pinnedRow);
             let total_data = d.head.total_data;
 			if(pinnedRow && total_data != '') {
 				gx.gridOptions.api.setPinnedTopRowData([
