@@ -131,49 +131,59 @@ class sal23Controller extends Controller
         ";
         $rows = DB::select($sql);
 
-        foreach ($rows as $row) {
-            $sale_query = "
-                select
-                    ifnull(sum(w.qty), 0) * -1 as sale_qty
-                    , ifnull(sum(w.qty), 0) * $row->tag_price * -1 as sale_tag_price
-                    , ifnull(sum(w.qty), 0) * $row->price * -1 as sale_price
-                    , ifnull(sum(w.qty), 0) * $row->wonga * -1 as sale_wonga
-                from order_opt_wonga w
-                where w.ord_state in (30,60,61) 
-                    and w.prd_cd = '$row->prd_cd'
-                    and w.ord_state_date >= '$sdate'
-                    and w.ord_state_date <= '$edate'
-            ";
-            $sale = DB::selectOne($sale_query);
-            $row->sale_qty = $sale->sale_qty;
-            $row->sale_tag_price = $sale->sale_tag_price;
-            $row->sale_price = $sale->sale_price;
-            $row->sale_wonga = $sale->sale_wonga;
+        $sale_query = "
+            select
+                w.prd_cd
+                , ifnull(sum(w.qty), 0) * -1 as sale_qty
+                , ifnull(sum(w.qty), 0) * p.tag_price * -1 as sale_tag_price
+                , ifnull(sum(w.qty), 0) * p.price * -1 as sale_price
+                , ifnull(sum(w.qty), 0) * p.wonga * -1 as sale_wonga
+            from order_opt_wonga w
+                inner join product p on p.prd_cd = w.prd_cd
+                inner join product_code pc on pc.prd_cd = w.prd_cd
+            where w.ord_state in (30,60,61) 
+                and w.ord_state_date >= '$sdate'
+                and w.ord_state_date <= '$edate'
+                $where   
+            group by w.prd_cd
+            $orderby
+        ";
+        $sale = DB::select($sale_query);
 
-            $term_query = "
-                select
-                    $row->term_qty + ifnull(sum(w.qty), 0) as term_qty
-                    , ($row->term_qty + ifnull(sum(w.qty), 0)) * $row->tag_price as term_tag_price
-                    , ($row->term_qty + ifnull(sum(w.qty), 0)) * $row->price as term_price
-                    , ($row->term_qty + ifnull(sum(w.qty), 0)) * $row->wonga as term_wonga
-                from order_opt_wonga w
-                where w.ord_state in (30,60,61) 
-                    and w.prd_cd = '$row->prd_cd'
-                    and w.ord_state_date >= '$next_edate'
-                    and w.ord_state_date <= '$now_date'
-            ";
-            $term = DB::selectOne($term_query);
-            $row->term_qty = $term->term_qty;
-            $row->term_tag_price = $term->term_tag_price;
-            $row->term_price = $term->term_price;
-            $row->term_wonga = $term->term_wonga;
+        $next_sale_query = "
+            select
+                w.prd_cd
+                , ifnull(sum(w.qty), 0) as sale_qty
+            from order_opt_wonga w
+                inner join product p on p.prd_cd = w.prd_cd
+                inner join product_code pc on pc.prd_cd = w.prd_cd
+            where w.ord_state in (30,60,61) 
+                and w.ord_state_date >= '$next_edate'
+                and w.ord_state_date <= '$now_date'
+                $where
+            group by w.prd_cd
+            $orderby
+        ";
+        $next_sale = DB::select($next_sale_query);
 
+        $rows = array_map(function($row) use ($sale, $next_sale) {
+            // 판매집계
+            $cur_idx = array_search($row->prd_cd, array_column($sale, 'prd_cd'));
+            $row = (object) array_merge((array) $row, (array) $sale[$cur_idx]);
+            // 기간재고 집계
+            $cur_idx = array_search($row->prd_cd, array_column($next_sale, 'prd_cd'));
+            $row->term_qty = ($row->term_qty * 1) + (($next_sale[$cur_idx]->sale_qty ?? 0) * 1);
+            $row->term_tag_price = $row->term_qty * $row->tag_price;
+            $row->term_price = $row->term_qty * $row->price;
+            $row->term_wonga = $row->term_qty * $row->wonga;
+            // 이전재고 집계
             $row->prev_qty = $row->term_qty - $row->loss_qty - $row->sale_qty - $row->stock_return_qty - $row->stock_in_qty;
             $row->prev_tag_price = $row->prev_qty * $row->tag_price;
             $row->prev_price = $row->prev_qty * $row->price;
             $row->prev_wonga = $row->prev_qty * $row->wonga;
-        }
-        
+            return $row;
+        }, $rows);
+
         // pagination
         $total = 0;
         $total_data = '';

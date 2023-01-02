@@ -168,7 +168,7 @@
         {
             headerName: "이전재고",
             children: [
-                {field: "prev_qty", headerName: "수량", width: 65, aggFunc: sumValuesFunc,
+                {field: "prev_qty", headerName: "수량", width: 65, aggFunc: sumValuesFunc, cellStyle: {"text-align": "right"},
                     cellRenderer: (params) => {
                         if (params.node.rowPinned === 'top') {
                             return Comma(params.value);
@@ -223,7 +223,7 @@
         {
             headerName: "기간재고",
             children: [
-                {field: "term_qty", headerName: "수량", width: 65, aggFunc: sumValuesFunc,
+                {field: "term_qty", headerName: "수량", width: 65, aggFunc: sumValuesFunc, cellStyle: {"text-align": "right"},
                     cellRenderer: (params) => {
                         if (params.node.rowPinned === 'top') {
                             return Comma(params.value);
