@@ -168,7 +168,17 @@
         {
             headerName: "이전재고",
             children: [
-                {field: "prev_qty", headerName: "수량", width: 65, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "prev_qty", headerName: "수량", width: 65, aggFunc: sumValuesFunc,
+                    cellRenderer: (params) => {
+                        if (params.node.rowPinned === 'top') {
+                            return Comma(params.value);
+                        } else if (params.data) {
+                            return `<a href="#" onclick="return OpenStockPopup('${params.data.prd_cd_p}', '${$("[name=sdate]").val() || ''}', '${params.data.color}', '${params.data.size}');">${Comma(params.value || 0)}</a>`;
+                        } else if (params.node.aggData) {
+                            return `<a href="#" onclick="return OpenStockPopup('${params.node.key}', '${$("[name=sdate]").val() || ''}');">${Comma(params.value || 0)}</a>`;
+                        }
+                    }
+                },
                 {field: "prev_tag_price", headerName: "TAG가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "prev_price", headerName: "판매가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "prev_wonga", headerName: "원가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
@@ -213,7 +223,17 @@
         {
             headerName: "기간재고",
             children: [
-                {field: "term_qty", headerName: "수량", width: 65, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "term_qty", headerName: "수량", width: 65, aggFunc: sumValuesFunc,
+                    cellRenderer: (params) => {
+                        if (params.node.rowPinned === 'top') {
+                            return Comma(params.value);
+                        } else if (params.data) {
+                            return `<a href="#" onclick="return OpenStockPopup('${params.data.prd_cd_p}', '${$("[name=edate]").val() || ''}', '${params.data.color}', '${params.data.size}');">${Comma(params.value || 0)}</a>`;
+                        } else if (params.node.aggData) {
+                            return `<a href="#" onclick="return OpenStockPopup('${params.node.key}', '${$("[name=edate]").val() || ''}');">${Comma(params.value || 0)}</a>`;
+                        }
+                    }
+                },
                 {field: "term_tag_price", headerName: "TAG가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "term_price", headerName: "판매가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "term_wonga", headerName: "원가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
@@ -240,7 +260,7 @@
 			animateRows: true,
         });
 
-        Search();
+        // Search();
     });
 
 	function Search() {
@@ -255,6 +275,11 @@
 				]);
 			}
         });
+	}
+
+    function OpenStockPopup(prd_cd_p, date, color = '', size = '') {
+		var url = `/store/product/prd04/stock?prd_cd_p=${prd_cd_p}&date=${date}&color=${color}&size=${size}`;
+		var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1000,height=900");
 	}
 </script>
 @stop
