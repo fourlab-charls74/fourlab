@@ -227,6 +227,8 @@
 
         if(rows.length < 1 && rows2.length < 1) {
             alert('적어도 한 개 이상의 매장을 선택해주세요');
+        } else if (rows2.length > 1) {  
+            alert('그룹알림전송은 1개의 그룹만 선택해주세요')
         } else {
             const url = '/store/stock/stk32/sendMsg?store_cd=' + sc + '&group_nm=' + sc2 + '&group_cd=' + sc3 + '&check=' + check_radio;
             const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=615");
@@ -238,6 +240,16 @@
         const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width= 1200,height=900");
 
     }
+
+    // 그룹매장으로 변경 시 search-enter가 먹히지 않아서 JS로 대체
+    var input = document.getElementById("group_nm");
+
+    input.addEventListener("keyup", function (event) {
+      if (event.keyCode === 13) {
+        event.preventDefault();
+        document.getElementById("search_sbtn2").click();
+      }
+    });
 
 </script>
 @stop

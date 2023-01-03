@@ -309,6 +309,7 @@
                     if (data.code == 200) {
                         alert('그룹수정에 성공하였습니다.');
                         location.reload();
+                        opener.location.reload();
                     } else {
                         alert('이미 같은 매장이 그룹에 포함되어 있습니다. \n한 그룹에 같은 매장은 추가할 수 없습니다.');
                     }

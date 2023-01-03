@@ -298,7 +298,7 @@
         gx = new HDGrid(gridDiv, columns, {
             pinnedTopRowData: pinnedRowData,
             getRowStyle: (params) => { // 고정된 row styling
-                if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#ffff77', 'border': 'none'};
+                if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#eee', 'border': 'none'};
             },
             groupSuppressAutoColumn: true,
 			suppressAggFuncInHeader: true,
