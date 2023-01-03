@@ -662,7 +662,10 @@ class mem01Controller extends Controller
                                 when '6' then d.card_name
                                 else d.bank_code
                             end bank_code,
-                            a.ord_state, a.clm_state, e.com_nm as sale_place, i.com_nm, c.price-c.wonga as prf,
+                            a.ord_state, a.clm_state, 
+                            -- e.com_nm as sale_place, 
+                            ifnull(e.com_nm, a.sale_place) as sale_place,
+                            i.com_nm, c.price-c.wonga as prf,
                             case a.ord_state
                                 when '-20' then null
                                 else d.upd_dm
@@ -672,7 +675,7 @@ class mem01Controller extends Controller
                             inner join order_mst b on a.ord_no = b.ord_no
                             inner join goods c on a.goods_no = c.goods_no and a.goods_sub = c.goods_sub
                             inner join payment d on b.ord_no = d.ord_no
-                            inner join company e on a.sale_place = e.com_id and e.com_type= '4'
+                            left outer join company e on a.sale_place = e.com_id and e.com_type= '4'
                             left outer join company i on c.com_id = i.com_id
                             left outer join coupon f on a.coupon_no = f.coupon_no
                         where b.user_id = '$user_id'
