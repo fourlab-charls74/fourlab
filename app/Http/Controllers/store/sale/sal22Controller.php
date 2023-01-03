@@ -142,7 +142,7 @@ class sal22Controller extends Controller
                 , sum(ifnull(rt_out.qty, 0)) * -1 * g.wonga as rt_out_wonga
 
                 -- 매장출고
-                , sum(ifnull(store_out.qty, 0)) * -1 as out_qty
+                , sum(ifnull(store_out.qty, 0)) * -1 as store_out_qty
                 , sum(ifnull(store_out.qty, 0)) * -1 * g.goods_sh as store_out_sh
                 , sum(ifnull(store_out.qty, 0)) * -1 * g.price as store_out_price
                 , sum(ifnull(store_out.qty, 0)) * -1 * g.wonga as store_out_wonga
@@ -194,7 +194,6 @@ class sal22Controller extends Controller
             $orderby
             $limit
         ";
-        // dd($sql);
         $rows = DB::select($sql);
 
 
