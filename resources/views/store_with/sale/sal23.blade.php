@@ -171,7 +171,7 @@
                 {field: "prev_qty", headerName: "수량", width: 65, aggFunc: sumValuesFunc, cellStyle: {"text-align": "right"},
                     cellRenderer: (params) => {
                         if (params.node.rowPinned === 'top') {
-                            return Comma(params.value);
+                            return Comma(params.value || 0);
                         } else if (params.data) {
                             return `<a href="#" onclick="return OpenStockPopup('${params.data.prd_cd_p}', '${$("[name=sdate]").val() || ''}', '${params.data.color}', '${params.data.size}');">${Comma(params.value || 0)}</a>`;
                         } else if (params.node.aggData) {
@@ -226,7 +226,7 @@
                 {field: "term_qty", headerName: "수량", width: 65, aggFunc: sumValuesFunc, cellStyle: {"text-align": "right"},
                     cellRenderer: (params) => {
                         if (params.node.rowPinned === 'top') {
-                            return Comma(params.value);
+                            return Comma(params.value || 0);
                         } else if (params.data) {
                             return `<a href="#" onclick="return OpenStockPopup('${params.data.prd_cd_p}', '${$("[name=edate]").val() || ''}', '${params.data.color}', '${params.data.size}');">${Comma(params.value || 0)}</a>`;
                         } else if (params.node.aggData) {
