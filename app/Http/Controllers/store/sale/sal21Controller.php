@@ -98,6 +98,7 @@ class sal21Controller extends Controller
             select 
                 p.store_cd, 
                 store.store_nm,
+                st.code_val as store_type_nm,
                 p.prd_cd, 
                 concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_sm,
                 pc.color,
@@ -158,6 +159,7 @@ class sal21Controller extends Controller
                 inner join product_code pc on pc.prd_cd = p.prd_cd
                 left outer join goods g on g.goods_no = p.goods_no
                 inner join store on store.store_cd = p.store_cd
+                inner join code st on st.code_kind_cd = 'STORE_TYPE' and st.code_id = store.store_type
                 left outer join brand b on b.brand = g.brand
                 left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
                 left outer join (
