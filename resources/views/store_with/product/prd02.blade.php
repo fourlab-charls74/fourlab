@@ -427,6 +427,7 @@
 
 		$(document).ready(function() {
 			gx = new HDGrid(gridDiv, columns, {
+				rollup: true,
 				autoGroupColumnDef: basic_autoGroupColumnDef('코드일련'),
 				groupDefaultExpanded: 0, // 0: close, 1: open
 				suppressAggFuncInHeader: true,

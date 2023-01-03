@@ -355,6 +355,7 @@
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
             gx = new HDGrid(gridDiv, columns, {
+                rollup: true,
                 autoGroupColumnDef: basic_autoGroupColumnDef('매장', 180, 180),
                 groupDefaultExpanded: 1,
                 rowSelection: 'multiple',

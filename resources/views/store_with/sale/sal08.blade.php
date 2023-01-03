@@ -234,6 +234,7 @@
             getRowStyle: (params) => { // 고정된 row styling
                 if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#ffff77', 'border': 'none'};
             },
+			rollup: true,
 			groupSuppressAutoColumn: true,
 			suppressAggFuncInHeader: true,
 			enableRangeSelection: true,

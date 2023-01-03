@@ -347,6 +347,7 @@
 			getRowStyle: (params) => {
                 if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee !important', 'border': 'none'};
             },
+			rollup: true,
 			autoGroupColumnDef: basic_autoGroupColumnDef('코드일련'),
 			groupDefaultExpanded: 0, // 0: close, 1: open
 			suppressAggFuncInHeader: true,

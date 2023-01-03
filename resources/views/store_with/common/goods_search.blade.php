@@ -394,6 +394,7 @@
         const gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {
             onCellValueChanged: onCellValueChanged,
+            rollup: true,
             autoGroupColumnDef: basic_autoGroupColumnDef('코드일련'),
 			groupDefaultExpanded: 0, // 0: close, 1: open
 			suppressAggFuncInHeader: true,
