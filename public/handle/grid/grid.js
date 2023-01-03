@@ -417,8 +417,8 @@ HDGrid.prototype.Request = function(url,data = '', page = -1, callback){
                             //console.log(params);
                             //console.log('getLastDisplayedRow :' + _gx.gridOptions.api.getLastDisplayedRow());
                             //console.log('rowtotal :' + rowtotal);
-                            _gx._Request();
-
+                            var rollup_callback = (data) => $("#grid_expand").length > 0 ? setAllRowGroupExpanded($("#grid_expand").is(":checked")) : '';
+                            _gx._Request(this.rollup ? rollup_callback : undefined);
                         }
                         // var rowtotal = gridOptions.api.getDisplayedRowCount();
                         // var rowHeight = 25;
@@ -486,7 +486,7 @@ HDGrid.prototype._Request = function(callback) {
                     _gx.total = _total;
                     _gx.gridOptions.api.setRowData(res.body);
                     _gx.page = parseInt(res.head.page) + 1;
-                    const rows = numberWithCommas(_gx.gridOptions.api.getDisplayedRowCount());
+                    const rows = numberWithCommas(_gx.gridOptions.rollup ? _gx.getChildRowCount() : _gx.gridOptions.api.getDisplayedRowCount());
                     $("#" + _gx.gridTotal).text(rows + ' / ' + numberWithCommas(_total));
 
                 } else {
@@ -496,7 +496,7 @@ HDGrid.prototype._Request = function(callback) {
                         //console.log('total ' + _total);
                         const ret = _gx.gridOptions.api.applyTransaction({ add: res.body });
                         _gx.page = parseInt(res.head.page) + 1;
-                        const rows = numberWithCommas(_gx.gridOptions.api.getDisplayedRowCount());
+                        const rows = numberWithCommas(_gx.gridOptions.rollup ? _gx.getChildRowCount() : _gx.gridOptions.api.getDisplayedRowCount());
                         $("#" + _gx.gridTotal).text(rows + ' / ' + numberWithCommas(_gx.total));
                     }
                 }
@@ -689,7 +689,7 @@ HDGrid.prototype.getRowNode = function (id) {
 };
 
 HDGrid.prototype.getRowCount = function () {
-    return this.gridOptions.api.getDisplayedRowCount();
+    return this.gridOptions.rollup ? this.getChildRowCount() : this.gridOptions.api.getDisplayedRowCount();
 };
 
 HDGrid.prototype.setRows = function (rows) {
@@ -707,4 +707,11 @@ HDGrid.prototype.deleteRows = function (rows) {
     return this.setRows([]);
 };
 
-
+// 최유현 - 롤업 시 child row의 count 조회
+HDGrid.prototype.getChildRowCount = function () {
+    var cnt = 0;
+    this.gridOptions.api.forEachNode(function(node) {
+        if (node.data) cnt++;
+    });
+    return cnt;
+};

@@ -157,7 +157,17 @@
         {headerName: '코드일련', showRowGroup: 'prd_cd_p', pinned: "left", cellRenderer: 'agGroupCellRenderer', minWidth: 150},
         {field: "prd_cd", headerName: "상품코드", pinned: "left", width: 130, cellStyle: AlignCenter},
         {field: "goods_no", headerName: "상품번호", pinned: "left", width: 70, cellStyle: AlignCenter, aggFunc: "first"},
-        {field: "goods_nm", headerName: "상품명", width: 170, aggFunc: "first"},
+        {field: "goods_nm", headerName: "상품명", width: 170, aggFunc: "first",
+            cellRenderer: function (params) {
+                if (params.data?.prd_cd === '합계') return '';
+				if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
+					return params.value;
+				} else {
+					let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
+					return '<a href="#" onclick="return openHeadProduct(\'' + goods_no + '\');">' + params.value + '</a>';
+				}
+			}
+        },
         {field: "goods_nm_eng", headerName: "상품명(영문)", width: 170, aggFunc: "first"},
         {field: "color", headerName: "컬러", width: 55, cellStyle: AlignCenter},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: AlignCenter},
@@ -254,13 +264,14 @@
             getRowStyle: (params) => { // 고정된 row styling
                 if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#eee', 'border': 'none'};
             },
+            rollup: true,
 			groupSuppressAutoColumn: true,
 			suppressAggFuncInHeader: true,
 			enableRangeSelection: true,
 			animateRows: true,
         });
 
-        // Search();
+        Search();
     });
 
 	function Search() {
