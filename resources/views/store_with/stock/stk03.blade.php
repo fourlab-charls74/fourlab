@@ -214,6 +214,7 @@
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
+                                        <option value="o.ord_date">주문일자</option>
                                         <option value="o.ord_no">주문번호</option>
                                         <option value="om.user_nm">주문자명</option>
                                         <option value="om.r_nm">수령자</option>
