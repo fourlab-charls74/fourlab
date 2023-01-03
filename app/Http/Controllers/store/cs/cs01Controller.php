@@ -1072,8 +1072,11 @@ class cs01Controller extends Controller {
 				];
 				DB::table('product_stock')->where('prd_cd', '=', $prd_cd)->update($values);
 
-				// 2. 상품테이블 goods 원가값 업데이트
+				// 2. 상품테이블 원가값 업데이트
+				// 2-1. goods 업데이트
 				DB::table('goods')->where('goods_no', $goods_no)->update([ 'wonga' => $avg_wonga ]);
+				// 2-2. product 업데이트
+				DB::table('product')->where('prd_cd', $prd_cd)->update([ 'wonga' => $avg_wonga ]);
 
 				// 3. 모든 판매된 주문건(및 hst)의 원가 값 업데이트
 				$sql = "
@@ -1142,8 +1145,11 @@ class cs01Controller extends Controller {
 				];
 				DB::table('product_stock')->where('prd_cd', '=', $prd_cd)->update($values);
 
-				// 2. 상품테이블 goods 원가값 업데이트
+				// 2. 상품테이블 원가값 업데이트
+				// 2-1. goods 업데이트
 				DB::table('goods')->where('goods_no', $goods_no)->update([ 'wonga' => $avg_wonga ]);
+				// 2-2. product 업데이트
+				DB::table('product')->where('prd_cd', $prd_cd)->update([ 'wonga' => $avg_wonga ]);
 
 				// 3. 모든 판매된 주문건(및 hst)의 원가 값 업데이트
 				$sql = "

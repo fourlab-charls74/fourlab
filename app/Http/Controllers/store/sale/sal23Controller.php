@@ -100,7 +100,7 @@ class sal23Controller extends Controller
                 , 0 as loss_price
                 , 0 as loss_wonga
                 -- 기간재고
-                , (ps.qty - sum(ifnull(next_stock_in.qty, 0)) + sum(ifnull(next_stock_return.qty, 0))) as term_qty
+                , (ps.qty - sum(ifnull(next_stock_in.qty, 0)) - sum(ifnull(next_stock_return.qty, 0))) as term_qty
             from product_stock ps
                 inner join product_code pc on pc.prd_cd = ps.prd_cd
                 inner join product p on p.prd_cd = ps.prd_cd
@@ -134,7 +134,7 @@ class sal23Controller extends Controller
         $sale_query = "
             select
                 w.prd_cd
-                , ifnull(sum(w.qty), 0) * -1 as sale_qty
+                , ifnull(sum(w.qty * if(w.ord_state = 30, -1, 1)), 0) as sale_qty
             from order_opt_wonga w
                 inner join product p on p.prd_cd = w.prd_cd
                 inner join product_code pc on pc.prd_cd = w.prd_cd
@@ -150,7 +150,7 @@ class sal23Controller extends Controller
         $next_sale_query = "
             select
                 w.prd_cd
-                , ifnull(sum(w.qty), 0) as sale_qty
+                , ifnull(sum(w.qty * if(w.ord_state = 30, 1, -1)), 0) as sale_qty
             from order_opt_wonga w
                 inner join product p on p.prd_cd = w.prd_cd
                 inner join product_code pc on pc.prd_cd = w.prd_cd
@@ -230,10 +230,10 @@ class sal23Controller extends Controller
                         , 0 as loss_price
                         , 0 as loss_wonga
                         -- 기간재고
-                        , (ps.qty - sum(ifnull(next_stock_in.qty, 0)) + sum(ifnull(next_stock_return.qty, 0))) as term_qty
-                        , (ps.qty - sum(ifnull(next_stock_in.qty, 0)) + sum(ifnull(next_stock_return.qty, 0))) * p.tag_price as term_tag_price
-                        , (ps.qty - sum(ifnull(next_stock_in.qty, 0)) + sum(ifnull(next_stock_return.qty, 0))) * p.price as term_price
-                        , (ps.qty - sum(ifnull(next_stock_in.qty, 0)) + sum(ifnull(next_stock_return.qty, 0))) * p.wonga as term_wonga
+                        , (ps.qty - sum(ifnull(next_stock_in.qty, 0)) - sum(ifnull(next_stock_return.qty, 0))) as term_qty
+                        , (ps.qty - sum(ifnull(next_stock_in.qty, 0)) - sum(ifnull(next_stock_return.qty, 0))) * p.tag_price as term_tag_price
+                        , (ps.qty - sum(ifnull(next_stock_in.qty, 0)) - sum(ifnull(next_stock_return.qty, 0))) * p.price as term_price
+                        , (ps.qty - sum(ifnull(next_stock_in.qty, 0)) - sum(ifnull(next_stock_return.qty, 0))) * p.wonga as term_wonga
                     from product_stock ps
                         inner join product_code pc on pc.prd_cd = ps.prd_cd
                         inner join product p on p.prd_cd = ps.prd_cd
@@ -265,10 +265,10 @@ class sal23Controller extends Controller
 
             $sale_query = "
                 select
-                    sum(ifnull(w.qty, 0)) * -1 as sale_qty
-                    , sum(ifnull(w.qty, 0) * p.tag_price) * -1 as sale_tag_price
-                    , sum(ifnull(w.qty, 0) * p.price) * -1 as sale_price
-                    , sum(ifnull(w.qty, 0) * p.wonga) * -1 as sale_wonga
+                    sum(ifnull(w.qty, 0) * if(w.ord_state = 30, -1, 1)) as sale_qty
+                    , sum(ifnull(w.qty, 0) * p.tag_price * if(w.ord_state = 30, -1, 1)) as sale_tag_price
+                    , sum(ifnull(w.qty, 0) * p.price * if(w.ord_state = 30, -1, 1)) as sale_price
+                    , sum(ifnull(w.qty, 0) * p.wonga * if(w.ord_state = 30, -1, 1)) as sale_wonga
                 from order_opt_wonga w
                     inner join product_code pc on pc.prd_cd = w.prd_cd
                     inner join product p on p.prd_cd = w.prd_cd
@@ -285,10 +285,10 @@ class sal23Controller extends Controller
 
             $term_query = "
                 select
-                    $total_row->term_qty + ifnull(sum(w.qty), 0) as term_qty
-                    , $total_row->term_tag_price + ifnull(sum(w.qty * p.tag_price), 0) as term_tag_price
-                    , $total_row->term_price + ifnull(sum(w.qty * p.price), 0) as term_price
-                    , $total_row->term_wonga + ifnull(sum(w.qty * p.wonga), 0) as term_wonga
+                    $total_row->term_qty + ifnull(sum(w.qty * if(w.ord_state = 30, 1, -1)), 0) as term_qty
+                    , $total_row->term_tag_price + ifnull(sum(w.qty * p.tag_price * if(w.ord_state = 30, 1, -1)), 0) as term_tag_price
+                    , $total_row->term_price + ifnull(sum(w.qty * p.price * if(w.ord_state = 30, 1, -1)), 0) as term_price
+                    , $total_row->term_wonga + ifnull(sum(w.qty * p.wonga * if(w.ord_state = 30, 1, -1)), 0) as term_wonga
                 from order_opt_wonga w
                     inner join product_code pc on pc.prd_cd = w.prd_cd
                     inner join product p on p.prd_cd = w.prd_cd
