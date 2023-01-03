@@ -33,6 +33,7 @@ class sal21Controller extends Controller
         $close_yn = $request->input('close_yn', 'N');
         $prd_cds = $request->input('prd_cd', '');
         $prd_cd_range_text = $request->input("prd_cd_range", '');
+        $ext_term_qty = $request->input('ext_term_qty', ''); // 기간재고 0 제외여부
 
         $where = "";
         $store_where = "";
@@ -77,6 +78,10 @@ class sal21Controller extends Controller
 				$where .= " and pc.$opt $in_query ($opt_join) ";
 			}
 		}
+
+        // having
+        $having = "";
+        if ($ext_term_qty === 'true') $having .= " having (p.wqty - sum(ifnull(_next.qty, 0)) > 0)";
 
         // ordreby
         $ord = $request->input('ord', 'desc');
@@ -181,6 +186,7 @@ class sal21Controller extends Controller
             where ($store_where)
                 $where
             group by p.store_cd, p.prd_cd
+            $having
             $orderby
             $limit
         ";
@@ -299,6 +305,7 @@ class sal21Controller extends Controller
                     where ($store_where)
                         $where
                     group by p.store_cd, p.prd_cd
+                    $having
                 ) as c
             ";
 

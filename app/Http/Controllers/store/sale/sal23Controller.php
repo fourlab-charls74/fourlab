@@ -32,6 +32,7 @@ class sal23Controller extends Controller
         $now_date = date('Ymd');
 		$prd_cd	= $request->input('prd_cd', ''); // 상품코드
 		$prd_cd_range_text = $request->input('prd_cd_range', ''); // 상품옵션범위
+        $ext_current_qty = $request->input('ext_current_qty', ''); // 현재재고 0 제외여부
 
         /** 검색조건 필터링 */
         $where = "";
@@ -57,6 +58,8 @@ class sal23Controller extends Controller
 				$where .= " and pc.$opt $in_query ($opt_join) ";
 			}
 		}
+
+        if ($ext_current_qty == 'true') $where .= " and ps.qty > 0 ";
 
         /** 데이터 정렬 */
         $ord = $request->input('ord', 'desc');
@@ -136,6 +139,7 @@ class sal23Controller extends Controller
                 w.prd_cd
                 , ifnull(sum(w.qty * if(w.ord_state = 30, -1, 1)), 0) as sale_qty
             from order_opt_wonga w
+                inner join product_stock ps on ps.prd_cd = w.prd_cd
                 inner join product p on p.prd_cd = w.prd_cd
                 inner join product_code pc on pc.prd_cd = w.prd_cd
             where w.ord_state in (30,60,61) 
@@ -152,6 +156,7 @@ class sal23Controller extends Controller
                 w.prd_cd
                 , ifnull(sum(w.qty * if(w.ord_state = 30, 1, -1)), 0) as sale_qty
             from order_opt_wonga w
+                inner join product_stock ps on ps.prd_cd = w.prd_cd
                 inner join product p on p.prd_cd = w.prd_cd
                 inner join product_code pc on pc.prd_cd = w.prd_cd
             where w.ord_state in (30,60,61) 
@@ -270,6 +275,7 @@ class sal23Controller extends Controller
                     , sum(ifnull(w.qty, 0) * p.price * if(w.ord_state = 30, -1, 1)) as sale_price
                     , sum(ifnull(w.qty, 0) * p.wonga * if(w.ord_state = 30, -1, 1)) as sale_wonga
                 from order_opt_wonga w
+                    inner join product_stock ps on ps.prd_cd = w.prd_cd
                     inner join product_code pc on pc.prd_cd = w.prd_cd
                     inner join product p on p.prd_cd = w.prd_cd
                 where w.ord_state in (30,60,61) 
@@ -290,6 +296,7 @@ class sal23Controller extends Controller
                     , $total_row->term_price + ifnull(sum(w.qty * p.price * if(w.ord_state = 30, 1, -1)), 0) as term_price
                     , $total_row->term_wonga + ifnull(sum(w.qty * p.wonga * if(w.ord_state = 30, 1, -1)), 0) as term_wonga
                 from order_opt_wonga w
+                    inner join product_stock ps on ps.prd_cd = w.prd_cd
                     inner join product_code pc on pc.prd_cd = w.prd_cd
                     inner join product p on p.prd_cd = w.prd_cd
                 where w.ord_state in (30,60,61)

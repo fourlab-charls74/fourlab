@@ -130,9 +130,15 @@
 			<div class="filter_wrap">
 				<div class="d-flex justify-content-between">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
-                    <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
-                        <input type="checkbox" class="custom-control-input" name="grid_expand" id="grid_expand" onchange="return setAllRowGroupExpanded(this.checked);" checked>
-                        <label class="custom-control-label font-weight-normal" for="grid_expand">항목펼쳐보기</label>
+                    <div class="d-flex">
+                        <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+                            <input type="checkbox" class="custom-control-input" name="ext_current_qty" id="ext_current_qty" value="Y" checked>
+                            <label class="custom-control-label font-weight-normal" for="ext_current_qty">현재재고 0 제외</label>
+                        </div>
+                        <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+                            <input type="checkbox" class="custom-control-input" name="grid_expand" id="grid_expand" onchange="return setAllRowGroupExpanded(this.checked);" checked>
+                            <label class="custom-control-label font-weight-normal" for="grid_expand">항목펼쳐보기</label>
+                        </div>
                     </div>
 				</div>
 			</div>
@@ -276,6 +282,7 @@
 
 	function Search() {
 		let data = $('form[name="search"]').serialize();
+        data += "&ext_current_qty=" + $("[name=ext_current_qty]").is(":checked");
 		gx.Request('/store/sale/sal23/search', data, 1, function(d) {
             setAllRowGroupExpanded($("#grid_expand").is(":checked"));
             let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
