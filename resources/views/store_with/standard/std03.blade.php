@@ -121,9 +121,10 @@
         {field: "use_yn", headerName: "창고사용", cellStyle: {"text-align": "center"}},
         {field: "stock_check_yn", headerName: "매장재고조회", cellStyle: {"text-align": "center"}},
         {field: "default_yn", headerName: "대표창고",
-            cellStyle: function(params) {
-                return {"text-align": "center", "background-color": params.value === "Y" ? "#FFACAC" : "none"};
-            }
+            cellStyle: (params) => ({"text-align": "center", "background-color": params.value === "Y" ? "#FFACAC" : "none"}),
+        },
+        {field: "online_yn", headerName: "온라인창고",
+            cellStyle: (params) => ({"text-align": "center", "background-color": params.value === "Y" ? "#FFACAC" : "none"}),
         },
         {field: "comment", headerName: "설명", width: 300},
         {width: "auto"}

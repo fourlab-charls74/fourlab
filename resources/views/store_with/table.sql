@@ -378,6 +378,7 @@ CREATE TABLE `storage` (
     `loss_yn` char(1) DEFAULT NULL COMMENT 'LOSS창고여부',
     `stock_check_yn` char(1) DEFAULT NULL COMMENT '매장재고조회여부',
     `default_yn` char(1) DEFAULT 'N' COMMENT '대표창고여부',
+    `online_yn` char(1) DEFAULT 'N' COMMENT '온라인창고여부',
     `comment` VARCHAR(255) DEFAULT NULL COMMENT '창고설명',
     `reg_date` datetime DEFAULT NULL COMMENT '등록일',
     `mod_date` datetime DEFAULT NULL COMMENT '수정일',

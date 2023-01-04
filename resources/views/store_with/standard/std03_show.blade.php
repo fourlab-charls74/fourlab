@@ -55,9 +55,13 @@
                                                         @if($cmd == "add") 
                                                         <button type="button" class="btn btn-primary mr-2" onclick="duplicateCheckStorageCode()">중복체크</button>
                                                         @endif
-                                                        <div class="custom-control custom-checkbox form-check-box">
+                                                        <div class="custom-control custom-checkbox form-check-box mr-2">
                                                             <input type="checkbox" id="default_yn" name="default_yn" value="Y" class="custom-control-input" @if($cmd == 'update' && @$storage->default_yn == 'Y') checked @endif />
                                                             <label class="custom-control-label fs-14" for="default_yn">대표창고</label>
+                                                        </div>
+                                                        <div class="custom-control custom-checkbox form-check-box">
+                                                            <input type="checkbox" id="online_yn" name="online_yn" value="Y" class="custom-control-input" @if($cmd == 'update' && @$storage->online_yn == 'Y') checked @endif />
+                                                            <label class="custom-control-label fs-14" for="online_yn">온라인창고</label>
                                                         </div>
                                                     </div>
                                                     <p id="dupcheck" class="pt-1"></p>
@@ -178,6 +182,7 @@
 <script type="text/javascript" charset="utf-8">
 
     const is_exit_default_storage = "{{ @$is_exit_default_storage }}";
+    const is_exit_online_storage = "{{ @$is_exit_online_storage }}";
 
     function Cmder(type) {
         if(type === "add") addStorage();
@@ -192,7 +197,10 @@
 
         if(f1.default_yn.checked && '{{ @$storage->default_yn }}' !== "Y" && is_exit_default_storage === 'true') {
             if(!confirm("해당 창고를 대표창고로 설정하실 경우, 기존에 대표창고로 설정된 창고는 대표창고에서 제외됩니다.")) return;
-        } 
+        }
+        if(f1.online_yn.checked && '{{ @$storage->online_yn }}' !== "Y" && is_exit_online_storage === 'true') {
+            if(!confirm("해당 창고를 온라인창고로 설정하실 경우, 기존에 온라인창고로 설정된 창고는 온라인창고에서 제외됩니다.")) return;
+        }
 
         axios({
             url: `/store/standard/std03/add`,
@@ -219,12 +227,18 @@
         if('{{ @$storage->default_yn }}' === "Y" && !f1.default_yn.checked) {
             return alert("대표창고를 해제할 수 없습니다.\n타 창고를 대표창고로 수정하면 자동으로 업데이트됩니다.");
         }
+        if('{{ @$storage->online_yn }}' === "Y" && !f1.online_yn.checked) {
+            return alert("온라인창고를 해제할 수 없습니다.\n타 창고를 온라인창고로 수정하면 자동으로 업데이트됩니다.");
+        }
         
-        if(!window.confirm("창고정보를 수정하시겠습니까?")) return;
-
         if(f1.default_yn.checked && '{{ @$storage->default_yn }}' !== "Y" && is_exit_default_storage === 'true') {
             if(!confirm("해당 창고를 대표창고로 설정하실 경우, 기존에 대표창고로 설정된 창고는 대표창고에서 제외됩니다.")) return;
         }
+        if(f1.online_yn.checked && '{{ @$storage->online_yn }}' !== "Y" && is_exit_online_storage === 'true') {
+            if(!confirm("해당 창고를 온라인창고로 설정하실 경우, 기존에 온라인창고로 설정된 창고는 온라인창고에서 제외됩니다.")) return;
+        }
+
+        if(!window.confirm("창고정보를 수정하시겠습니까?")) return;
 
         axios({
             url: `/store/standard/std03/update`,
@@ -281,6 +295,7 @@
             loss_yn: f1.loss_yn.value,
             stock_check_yn: f1.stock_check_yn.value,
             default_yn: f1.default_yn.checked ? 'Y' : 'N',
+            online_yn: f1.online_yn.checked ? 'Y' : 'N',
             comment: f1.comment.value,
         }
     }

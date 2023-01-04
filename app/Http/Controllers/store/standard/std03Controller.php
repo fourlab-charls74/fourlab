@@ -41,7 +41,7 @@ class std03Controller extends Controller
 			$where .= " and stock_check_yn = '$stock_check_yn'";
 
 		$sql = "
-			select storage_cd, storage_nm, phone, use_yn, stock_check_yn, default_yn, comment
+			select storage_cd, storage_nm, phone, use_yn, stock_check_yn, default_yn, online_yn, comment
 			from storage
 			where 1=1 $where
 			order by storage_cd
@@ -67,7 +67,7 @@ class std03Controller extends Controller
 
 		if($storage_cd != '') {
 			$sql = "
-				select storage_cd, storage_nm, storage_nm_s, zipcode, addr1, addr2, phone, fax, ceo, use_yn, loss_yn, stock_check_yn, default_yn, comment, reg_date, mod_date, admin_id
+				select storage_cd, storage_nm, storage_nm_s, zipcode, addr1, addr2, phone, fax, ceo, use_yn, loss_yn, stock_check_yn, default_yn, online_yn, comment, reg_date, mod_date, admin_id
 				from storage
 				where storage_cd = :storage_cd
 			";
@@ -76,11 +76,13 @@ class std03Controller extends Controller
 		}
 
 		$is_exit_default_storage = DB::table('storage')->where('default_yn', '=', 'Y')->count();
+		$is_exit_online_storage = DB::table('storage')->where('online_yn', '=', 'Y')->count();
 
 		$values = [
 			"cmd" => $storage_cd == '' ? "add" : "update",
 			"storage" => $storage,
 			"is_exit_default_storage" => $is_exit_default_storage > 0 ? 'true' : 'false',
+			"is_exit_online_storage" => $is_exit_online_storage > 0 ? 'true' : 'false',
 		];
 
 		return view(Config::get('shop.store.view') . '/standard/std03_show', $values);
@@ -128,6 +130,7 @@ class std03Controller extends Controller
 		$loss_yn = $request->input("loss_yn", "Y");
 		$stock_check_yn = $request->input("stock_check_yn", "Y");
 		$default_yn = $request->input("default_yn", "N");
+		$online_yn = $request->input("online_yn", "N");
 		$comment = $request->input("comment", "");
 
 
@@ -136,6 +139,9 @@ class std03Controller extends Controller
 
 			if($default_yn == 'Y') {
 				DB::table('storage')->update(['default_yn' => 'N']);
+			}
+			if($online_yn == 'Y') {
+				DB::table('storage')->update(['online_yn' => 'N']);
 			}
 			
 			DB::table('storage')->insert([
@@ -152,6 +158,7 @@ class std03Controller extends Controller
 				'loss_yn' => $loss_yn,
 				'stock_check_yn' => $stock_check_yn,
 				'default_yn' => $default_yn,
+				'online_yn' => $online_yn,
 				'comment' => $comment,
 				'reg_date' => now(),
 				'admin_id' => $admin_id,
@@ -187,6 +194,7 @@ class std03Controller extends Controller
 		$loss_yn = $request->input("loss_yn", "Y");
 		$stock_check_yn = $request->input("stock_check_yn", "Y");
 		$default_yn = $request->input("default_yn", "N");
+		$online_yn = $request->input("online_yn", "N");
 		$comment = $request->input("comment", "");
 
 		try {
@@ -195,6 +203,10 @@ class std03Controller extends Controller
 			if($default_yn == 'Y') {
 				DB::table('storage')->update(['default_yn' => 'N']);
 			}
+			if($online_yn == 'Y') {
+				DB::table('storage')->update(['online_yn' => 'N']);
+			}
+
 			DB::table('storage')
 				->where("storage_cd", "=", $storage_cd)
 				->update([
@@ -211,6 +223,7 @@ class std03Controller extends Controller
 					'loss_yn' => $loss_yn,
 					'stock_check_yn' => $stock_check_yn,
 					'default_yn' => $default_yn,
+					'online_yn' => $online_yn,
 					'comment' => $comment,
 					'mod_date' => now(),
 					'admin_id' => $admin_id,
