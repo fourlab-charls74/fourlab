@@ -88,45 +88,43 @@ class sal23Controller extends Controller
                 , p.price
                 , p.wonga
                 -- 기간입고
-                , sum(ifnull(stock_in.qty, 0)) as stock_in_qty
-                , sum(ifnull(stock_in.qty, 0)) * p.tag_price as stock_in_tag_price
-                , sum(ifnull(stock_in.qty, 0)) * p.price as stock_in_price
-                , sum(ifnull(stock_in.qty, 0)) * p.wonga as stock_in_wonga
+                , sum(if(hst.type = 1, ifnull(hst.qty, 0), 0)) as stock_in_qty
+                , sum(if(hst.type = 1, ifnull(hst.qty, 0), 0)) * p.tag_price as stock_in_tag_price
+                , sum(if(hst.type = 1, ifnull(hst.qty, 0), 0)) * p.price as stock_in_price
+                , sum(if(hst.type = 1, ifnull(hst.qty, 0), 0)) * p.wonga as stock_in_wonga
                 -- 기간반품
-                , sum(ifnull(stock_return.qty, 0)) as stock_return_qty
-                , sum(ifnull(stock_return.qty, 0)) * p.tag_price as stock_return_tag_price
-                , sum(ifnull(stock_return.qty, 0)) * p.price as stock_return_price
-                , sum(ifnull(stock_return.qty, 0)) * p.wonga as stock_return_wonga
+                , sum(if(hst.type = 9, ifnull(hst.qty, 0), 0)) as stock_return_qty
+                , sum(if(hst.type = 9, ifnull(hst.qty, 0), 0)) * p.tag_price as stock_return_tag_price
+                , sum(if(hst.type = 9, ifnull(hst.qty, 0), 0)) * p.price as stock_return_price
+                , sum(if(hst.type = 9, ifnull(hst.qty, 0), 0)) * p.wonga as stock_return_wonga
                 -- loss
-                , 0 as loss_qty
-                , 0 as loss_tag_price
-                , 0 as loss_price
-                , 0 as loss_wonga
+                , sum(if(hst.type = 14, ifnull(hst.qty, 0), 0)) as loss_qty
+                , sum(if(hst.type = 14, ifnull(hst.qty, 0), 0)) * p.tag_price as loss_tag_price
+                , sum(if(hst.type = 14, ifnull(hst.qty, 0), 0)) * p.price as loss_price
+                , sum(if(hst.type = 14, ifnull(hst.qty, 0), 0)) * p.wonga as loss_wonga
                 -- 기간재고
-                , (ps.qty - sum(ifnull(next_stock_in.qty, 0)) - sum(ifnull(next_stock_return.qty, 0))) as term_qty
+                , (ps.qty 
+                    - sum(if(_next.type = 1, ifnull(_next.qty, 0), 0)) 
+                    - sum(if(_next.type = 9, ifnull(_next.qty, 0), 0)) 
+                    - sum(if(_next.type = 14, ifnull(_next.qty, 0), 0))
+                ) as term_qty
             from product_stock ps
                 inner join product_code pc on pc.prd_cd = ps.prd_cd
                 inner join product p on p.prd_cd = ps.prd_cd
                 left outer join (		
-                    select idx, qty, prd_cd
+                    select idx, qty, prd_cd, location_type, type
                     from product_stock_hst
-                    where location_type = 'STORAGE'
-                        and type in (1,9)
+                    where ((type in (1,9) and location_type = 'STORAGE') or (type = 14 and location_type = 'STORE'))
                         and stock_state_date >= '$sdate'
                         and stock_state_date <= '$edate'
                 ) hst on hst.prd_cd = ps.prd_cd
-                left outer join product_stock_hst stock_in on stock_in.idx = hst.idx and stock_in.type = 1
-                left outer join product_stock_hst stock_return on stock_return.idx = hst.idx and stock_return.type = 9
                 left outer join (
-                    select idx, qty, prd_cd
+                    select idx, qty, prd_cd, location_type, type
                     from product_stock_hst
-                    where location_type = 'STORAGE'
-                        and type in (1,9)
+                    where ((type in (1,9) and location_type = 'STORAGE') or (type = 14 and location_type = 'STORE'))
                         and stock_state_date >= '$next_edate'
                         and stock_state_date <= '$now_date'
                 ) _next on _next.prd_cd = ps.prd_cd
-                left outer join product_stock_hst next_stock_in on next_stock_in.idx = _next.idx and next_stock_in.type = 1
-                left outer join product_stock_hst next_stock_return on next_stock_return.idx = _next.idx and next_stock_return.type = 9
             where 1=1 $where
             group by ps.prd_cd
             $orderby
@@ -220,48 +218,58 @@ class sal23Controller extends Controller
                         , p.price
                         , p.wonga
                         -- 기간입고
-                        , sum(ifnull(stock_in.qty, 0)) as stock_in_qty
-                        , sum(ifnull(stock_in.qty, 0)) * p.tag_price as stock_in_tag_price
-                        , sum(ifnull(stock_in.qty, 0)) * p.price as stock_in_price
-                        , sum(ifnull(stock_in.qty, 0)) * p.wonga as stock_in_wonga
+                        , sum(if(hst.type = 1, ifnull(hst.qty, 0), 0)) as stock_in_qty
+                        , sum(if(hst.type = 1, ifnull(hst.qty, 0), 0)) * p.tag_price as stock_in_tag_price
+                        , sum(if(hst.type = 1, ifnull(hst.qty, 0), 0)) * p.price as stock_in_price
+                        , sum(if(hst.type = 1, ifnull(hst.qty, 0), 0)) * p.wonga as stock_in_wonga
                         -- 기간반품
-                        , sum(ifnull(stock_return.qty, 0)) as stock_return_qty
-                        , sum(ifnull(stock_return.qty, 0)) * p.tag_price as stock_return_tag_price
-                        , sum(ifnull(stock_return.qty, 0)) * p.price as stock_return_price
-                        , sum(ifnull(stock_return.qty, 0)) * p.wonga as stock_return_wonga
+                        , sum(if(hst.type = 9, ifnull(hst.qty, 0), 0)) as stock_return_qty
+                        , sum(if(hst.type = 9, ifnull(hst.qty, 0), 0)) * p.tag_price as stock_return_tag_price
+                        , sum(if(hst.type = 9, ifnull(hst.qty, 0), 0)) * p.price as stock_return_price
+                        , sum(if(hst.type = 9, ifnull(hst.qty, 0), 0)) * p.wonga as stock_return_wonga
                         -- loss
-                        , 0 as loss_qty
-                        , 0 as loss_tag_price
-                        , 0 as loss_price
-                        , 0 as loss_wonga
+                        , sum(if(hst.type = 14, ifnull(hst.qty, 0), 0)) as loss_qty
+                        , sum(if(hst.type = 14, ifnull(hst.qty, 0), 0)) * p.tag_price as loss_tag_price
+                        , sum(if(hst.type = 14, ifnull(hst.qty, 0), 0)) * p.price as loss_price
+                        , sum(if(hst.type = 14, ifnull(hst.qty, 0), 0)) * p.wonga as loss_wonga
                         -- 기간재고
-                        , (ps.qty - sum(ifnull(next_stock_in.qty, 0)) - sum(ifnull(next_stock_return.qty, 0))) as term_qty
-                        , (ps.qty - sum(ifnull(next_stock_in.qty, 0)) - sum(ifnull(next_stock_return.qty, 0))) * p.tag_price as term_tag_price
-                        , (ps.qty - sum(ifnull(next_stock_in.qty, 0)) - sum(ifnull(next_stock_return.qty, 0))) * p.price as term_price
-                        , (ps.qty - sum(ifnull(next_stock_in.qty, 0)) - sum(ifnull(next_stock_return.qty, 0))) * p.wonga as term_wonga
+                        , (ps.qty 
+                            - sum(if(_next.type = 1, ifnull(_next.qty, 0), 0)) 
+                            - sum(if(_next.type = 9, ifnull(_next.qty, 0), 0)) 
+                            - sum(if(_next.type = 14, ifnull(_next.qty, 0), 0))
+                        ) as term_qty
+                        , (ps.qty 
+                            - sum(if(_next.type = 1, ifnull(_next.qty, 0), 0)) 
+                            - sum(if(_next.type = 9, ifnull(_next.qty, 0), 0)) 
+                            - sum(if(_next.type = 14, ifnull(_next.qty, 0), 0))
+                        ) * p.tag_price as term_tag_price
+                        , (ps.qty 
+                            - sum(if(_next.type = 1, ifnull(_next.qty, 0), 0)) 
+                            - sum(if(_next.type = 9, ifnull(_next.qty, 0), 0)) 
+                            - sum(if(_next.type = 14, ifnull(_next.qty, 0), 0))
+                        ) * p.price as term_price
+                        , (ps.qty 
+                            - sum(if(_next.type = 1, ifnull(_next.qty, 0), 0)) 
+                            - sum(if(_next.type = 9, ifnull(_next.qty, 0), 0)) 
+                            - sum(if(_next.type = 14, ifnull(_next.qty, 0), 0))
+                        ) * p.wonga as term_wonga
                     from product_stock ps
                         inner join product_code pc on pc.prd_cd = ps.prd_cd
                         inner join product p on p.prd_cd = ps.prd_cd
                         left outer join (		
-                            select idx, qty, prd_cd
+                            select idx, qty, prd_cd, location_type, type
                             from product_stock_hst
-                            where location_type = 'STORAGE'
-                                and type in (1,9)
+                            where ((type in (1,9) and location_type = 'STORAGE') or (type = 14 and location_type = 'STORE'))
                                 and stock_state_date >= '$sdate'
                                 and stock_state_date <= '$edate'
                         ) hst on hst.prd_cd = ps.prd_cd
-                        left outer join product_stock_hst stock_in on stock_in.idx = hst.idx and stock_in.type = 1
-                        left outer join product_stock_hst stock_return on stock_return.idx = hst.idx and stock_return.type = 9
                         left outer join (
-                            select idx, qty, prd_cd
+                            select idx, qty, prd_cd, location_type, type
                             from product_stock_hst
-                            where location_type = 'STORAGE'
-                                and type in (1,9)
+                            where ((type in (1,9) and location_type = 'STORAGE') or (type = 14 and location_type = 'STORE'))
                                 and stock_state_date >= '$next_edate'
                                 and stock_state_date <= '$now_date'
                         ) _next on _next.prd_cd = ps.prd_cd
-                        left outer join product_stock_hst next_stock_in on next_stock_in.idx = _next.idx and next_stock_in.type = 1
-                        left outer join product_stock_hst next_stock_return on next_stock_return.idx = _next.idx and next_stock_return.type = 9        
                     where 1=1 $where
                     group by ps.prd_cd
                 ) a
