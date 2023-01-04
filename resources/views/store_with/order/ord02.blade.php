@@ -79,7 +79,7 @@
                                 <select id="pay_stat" name='pay_stat' class="form-control form-control-sm" style="width: 47%;">
                                     <option value=''>전체</option>
                                     <option value="0">예정</option>
-                                    <option value="1">입금</option>
+                                    <option value="1" selected>입금</option>
                                 </select>
                             </div>
                         </div>
@@ -99,29 +99,6 @@
 							</div>
 						</div>
 					</div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="store_no">배송처</label>
-                            <div class="form-inline">
-                                <div class="form-inline-inner input_box w-25">
-                                    <div class="form-group">
-                                        <select name="dlv_place" id="dlv_place" class="form-control form-control-sm">
-                                            <option value="storage">창고</option>
-                                            <option value="store">매장</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div id="storage_search" class="form-inline w-75 pl-2">
-                                    <input type='text' id="storage_nm" name="storage_nm" class="form-control form-control-sm w-100" placeholder="창고명을 입력해주세요">
-                                </div>
-                                <div id="store_search" class="form-inline inline_btn_box w-75 pl-2 d-none">
-                                    <input type='hidden' id="store_nm" name="store_nm">
-                                    <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
-                                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="ord_info_key">주문정보</label>
@@ -156,8 +133,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label>결제방법</label>
@@ -185,6 +160,8 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="sale_kind">판매유형</label>
@@ -195,6 +172,20 @@
                                         <option value="{{ $sale_kind->code_id }}">{{ $sale_kind->code_val }}</option>
                                     @endforeach
                                 </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="name">공급업체</label>
+                            <div class="form-inline inline_select_box">
+                                <div class="form-inline-inner input-box w-100">
+                                    <div class="form-inline inline_btn_box">
+                                        <input type="hidden" id="com_cd" name="com_cd" />
+                                        <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -263,15 +254,23 @@
                             </div>
                         </div>
                     </div>
-					<div class="col-lg-4 inner-td">
+                    <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="name">공급업체</label>
-                            <div class="form-inline inline_select_box">
-                                <div class="form-inline-inner input-box w-100">
+                            <label for="item">품목/브랜드</label>
+                            <div class="form-inline">
+                                <div class="form-inline-inner select-box" style="width: 32%">
+                                    <select name="item" class="form-control form-control-sm w-100">
+                                        <option value="">전체</option>
+                                        @foreach ($items as $item)
+                                            <option value="{{ $item->cd }}">{{ $item->val }}</option>
+                                        @endforeach
+                                    </select>                                
+                                </div>
+                                <span class="text_line">/</span>
+                                <div class="form-inline-inner input-box" style="width:62%">
                                     <div class="form-inline inline_btn_box">
-                                        <input type="hidden" id="com_cd" name="com_cd" />
-                                        <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                        <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                     </div>
                                 </div>
                             </div>
@@ -310,30 +309,6 @@
 						</div>
 					</div>
                 </div>
-                <div class="row search-area-ext d-none">
-					<div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="item">품목</label>
-                            <div class="flax_box">
-                                <select name="item" class="form-control form-control-sm">
-                                    <option value="">전체</option>
-                                    @foreach ($items as $item)
-                                        <option value="{{ $item->cd }}">{{ $item->val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="brand_cd">브랜드</label>
-							<div class="form-inline inline_btn_box">
-								<select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-								<a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-							</div>
-						</div>
-					</div>
-				</div>
 			</div>
 		</div>
 		<div class="resul_btn_wrap mb-3">
@@ -352,6 +327,17 @@
 				<div class="fl_box">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
 				</div>
+                <div class="fr_box d-flex">
+                    <div class="d-flex">
+                        <span class="mr-2">출고차수 :</span>
+                        <select id='exp_rel_order' name='exp_rel_order' class="form-control form-control-sm mr-2"  style='width:90px;'>
+                            @foreach ($rel_orders as $rel_order)
+                                <option value='{{ $rel_order->code_val }}'>{{ $rel_order->code_val }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <a href="javascript:void(0);" onclick="return receiptOrder();" class="btn btn-sm btn-primary shadow-sm">온라인주문접수</a>
+                </div>
 			</div>
 		</div>
 		<div class="table-responsive">
@@ -365,24 +351,23 @@
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 28},
         {field: "ord_no", headerName: "주문번호", pinned: 'left', width: 130, cellStyle: StyleOrdNo, type: 'StoreOrderNoType'},
         {field: "ord_opt_no", headerName: "일련번호", pinned: 'left', width: 60, type: 'StoreOrderNoType', cellStyle: {'text-align': 'center'}},
-        {field: "ord_state", headerName: "주문상태", pinned: 'left', width: 70, cellStyle: StyleOrdState},
-        {field: "pay_stat", headerName: "입금상태", pinned: 'left', width: 55, cellStyle: {'text-align': 'center'}},
-        {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {'text-align': 'center'}},
-        {field: "goods_no", headerName: "상품번호", width: 70, cellStyle: {'text-align': 'center'}},
+        {field: "ord_state_nm", headerName: "주문상태", pinned: 'left', width: 70, cellStyle: StyleOrdState},
+        {field: "pay_stat_nm", headerName: "입금상태", pinned: 'left', width: 55, cellStyle: {'text-align': 'center'}},
+        {field: "prd_cd", headerName: "상품코드", width: 120, pinned: 'left', cellStyle: {'text-align': 'center'}},
+        {field: "goods_no", headerName: "상품번호", width: 70, pinned: 'left', cellStyle: {'text-align': 'center'}},
         {field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: {'text-align': 'center'}},
         {field: "goods_nm", headerName: "상품명", width: 150, type: "HeadGoodsNameType"},
         {field: "goods_nm_eng", headerName: "상품명(영문)", width: 150},
         {field: "prd_cd_p", headerName: "코드일련", width: 90, cellStyle: {"text-align": "center"}},
         {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
-        {field: "opt_val", headerName: "옵션", width: 130},
-        {field: "qty", headerName: "수량", width: 50, type: "currencyType" ,
-            cellRenderer: function(params) {
-                    if (params.value !== undefined) {
-                        return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
-                    }
-            }
-        },
+        {field: "goods_opt", headerName: "옵션", width: 130},
+        {field: "qty", headerName: "수량", width: 50, type: "currencyType"},
+        @foreach (@$dlv_locations as $loc)
+            {field: "{{ $loc->location_type }}_{{ $loc->location_cd }}_qty", headerName: "{{ $loc->location_nm }}", width: 100},
+        @endforeach
+        {field: "dlv_place", headerName: "배송처", width: 100},
+        {field: "comment", headerName: "접수메모", width: 120, editable: true, cellStyle: {'background-color': '#ffff99'}},
         {field: "user_nm", headerName: "주문자(아이디)", width: 120, cellStyle: {'text-align': 'center'}},
         {field: "r_nm", headerName: "수령자", width: 70, cellStyle: {'text-align': 'center'}},
         {field: "wonga", headerName: "원가", width: 60, type: "currencyType"},
@@ -394,19 +379,15 @@
         {field: "pr_code_nm", headerName: "행사구분", width: 60, cellStyle: {"text-align": "center"}},
         {field: "dlv_amt", headerName: "배송비", width: 60, type: "currencyType"},
         {field: "sales_com_fee", headerName: "판매수수료", width: 80, type: "currencyType"},
-        {field: "pay_type", headerName: "결제방법", width: 80, cellStyle: {'text-align': 'center'}},
-        {field: "ord_type", headerName: "주문구분", width: 60, cellStyle: {'text-align': 'center'}},
-        {field: "ord_kind", headerName: "출고구분", width: 60, cellStyle: StyleOrdKind},
-        {field: "sale_place", headerName: "판매처", width: 100},
-        {field: "state", headerName: "처리현황", width: 120},
-        {field: "memo", headerName: "메모", width: 120},
-        {field: "ord_date", headerName: "주문일시", width: 120, cellStyle: {'text-align': 'center'}},
-        {field: "pay_date", headerName: "입금일시", width: 120, cellStyle: {'text-align': 'center'}},
-        {field: "dlv_end_date", headerName: "배송일시", width: 120, cellStyle: {'text-align': 'center'}},
-        {field: "last_up_date", headerName: "클레임일시", width: 120, cellStyle: {'text-align': 'center'}},
-        {field: "_qty", headerName: "창고1", pinned: 'right', width: 80},
-        {field: "_qty", headerName: "매장1", pinned: 'right', width: 80},
-        {field: "dlv_place", headerName: "배송처", pinned: 'right', width: 100},
+        {field: "pay_type_nm", headerName: "결제방법", width: 80, cellStyle: {'text-align': 'center'}},
+        {field: "ord_type_nm", headerName: "주문구분", width: 60, cellStyle: {'text-align': 'center'}},
+        {field: "ord_kind_nm", headerName: "출고구분", width: 60, cellStyle: StyleOrdKind},
+        {field: "baesong_kind", headerName: "배송구분", width: 60, cellStyle: {'text-align': 'center'}},
+        {field: "sale_place_nm", headerName: "판매처", width: 100, cellStyle: {'text-align': 'center'}},
+        {field: "ord_date", headerName: "주문일시", width: 125, cellStyle: {'text-align': 'center'}},
+        {field: "pay_date", headerName: "입금일시", width: 125, cellStyle: {'text-align': 'center'}},
+        {field: "dlv_end_date", headerName: "배송일시", width: 125, cellStyle: {'text-align': 'center'}},
+        {field: "last_up_date", headerName: "클레임일시", width: 125, cellStyle: {'text-align': 'center'}},
     ];
 </script>
 
@@ -420,17 +401,17 @@
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns);
 
-		// Search();
-
-        $("[name=dlv_place]").on("change", function(e) {
-            $("#store_search").toggleClass("d-none", e.target.value === 'storage');
-            $("#storage_search").toggleClass("d-none", e.target.value === 'store');
-        });
+		Search();
 	});
 	
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/store/order/ord02/search', data, -1);
+		gx.Request('/store/order/ord02/search', data, 1);
 	}
+
+    // 주문접수
+    function receiptOrder() {
+        console.log("주문접수");
+    }
 </script>
 @stop

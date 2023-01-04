@@ -18,11 +18,17 @@ class ord03Controller extends Controller
 		$sdate = Carbon::now()->sub(4, 'week')->format("Y-m-d");
 		$edate = Carbon::now()->format("Y-m-d");
 
+		$sale_places_sql = "select com_id as id, com_nm as val from company where com_type = '4' and use_yn = 'Y' order by com_nm";
+		$sale_places = DB::select($sale_places_sql);
+
 		$values = [
-            'sdate'         => $sdate,
-			'edate'         => $edate,
-			'store_types'	=> SLib::getStoreTypes(), // 매장구분
-			'items'			=> SLib::getItems(), // 품목
+            'sdate'         	=> $sdate,
+			'edate'         	=> $edate,
+            'ord_states'        => SLib::getordStates(), // 주문상태
+			'sale_places'		=> $sale_places, // 판매처
+            'stat_pay_types'    => SLib::getCodes('G_STAT_PAY_TYPE'), // 결제방법
+			'items'			    => SLib::getItems(), // 품목
+            'sale_kinds'        => SLib::getUsedSaleKinds(),
 		];
         return view( Config::get('shop.store.view') . '/order/ord03', $values );
 	}

@@ -795,6 +795,35 @@ CREATE TABLE `sproduct_stock_release` (
     PRIMARY KEY (`idx`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='상품재고 이동';
 
+-- (온라인)주문접수
+CREATE TABLE `order_receipt` (
+    `or_cd` INT(11) NOT NULL AUTO_INCREMENT COMMENT '주문접수코드',
+    `type` CHAR(5) NOT NULL COMMENT '주문구분 (온라인/오프라인 : ON/OFF)',
+    `rel_order` VARCHAR(30) NOT NULL COMMENT '출고차수 - code(REL_ORDER) : O_01 ~ O_10',
+    `req_rt` DATETIME DEFAULT NULL COMMENT '접수일시',
+    `req_id` VARCHAR(50) DEFAULT NULL COMMENT '점수자',
+    `fin_rt` DATETIME DEFAULT NULL COMMENT '처리일시',
+    `fin_id` VARCHAR(50) DEFAULT NULL COMMENT '처리자',
+    `ut` DATETIME DEFAULT NULL COMMENT '수정일시',
+    PRIMARY KEY (`or_cd`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='주문접수';
+
+-- (온라인)주문접수 상품리스트
+CREATE TABLE `order_receipt_product` (
+    `or_prd_cd` INT(11) NOT NULL AUTO_INCREMENT COMMENT '주문접수일련코드',
+    `or_cd` INT(11) NOT NULL COMMENT '주문접수코드',
+    `ord_opt_no` INT(11) NOT NULL DEFAULT '0' COMMENT '주문일련번호',
+    `prd_cd` VARCHAR(50) NOT NULL DEFAULT '0' COMMENT '상품코드',
+    `qty` INT(11) NOT NULL COMMENT '상품수량',
+    `state` INT(11) NOT NULL COMMENT '상태(20(접수) / 30(처리) / -10(취소))',
+    `dlv_location_type` VARCHAR(10) NOT NULL COMMENT '매장(STORE) / 창고(STORAGE)',
+    `dlv_location_cd` VARCHAR(30) NOT NULL COMMENT '매장코드 or 창고코드',
+    `comment` VARCHAR(255) DEFAULT NULL COMMENT '메모',
+    `rt` DATETIME DEFAULT NULL COMMENT '등록일시',
+    `ut` DATETIME DEFAULT NULL COMMENT '수정일시',
+    PRIMARY KEY (`or_prd_cd`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='주문접수 상품리스트';
+
 --
 -- 기존 테이블 컬럼 추가 시작
 --
