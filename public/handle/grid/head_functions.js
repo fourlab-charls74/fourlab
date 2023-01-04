@@ -234,7 +234,7 @@ function StyleGoodsType(params) {
 
 function StyleGoodsTypeNM(params) {
     var state = {
-        위탁판매: "#ff0000",
+        위탁: "#ff0000",
         매입: "#669900",
         해외: "#0000FF"
     };
@@ -243,7 +243,8 @@ function StyleGoodsTypeNM(params) {
             var color = state[params.value];
             return {
                 color: color,
-                "text-align": "center"
+                "text-align": "center",
+                "line-height": "40px"
             };
         }
     }

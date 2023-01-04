@@ -259,11 +259,28 @@ class Product
 
 	function GetNextGoodsNo($goods_no = "")
 	{
-		DB::table('goods_no')->insert([
-			'rt' => DB::raw('now()'),
-			'ut' => DB::raw('now()')
-		]);
-		return  DB::getPdo()->lastInsertId();
+		/*
+		 * 23-01-04 : 양대성 goods 테이블로 변경
+		 */
+
+		// DB::table('goods_no')->insert([
+		// 	'rt' => DB::raw('now()'),
+		// 	'ut' => DB::raw('now()')
+		// ]);
+		// return  DB::getPdo()->lastInsertId();
+
+
+		$sql = "
+			select 
+				(goods_no + 1) as next_goods_no
+			from goods
+			order by goods_no desc
+			limit 1
+		";
+
+		$res = DB::selectOne($sql);
+		
+		return $res->next_goods_no;
 	}
 
 	public function Add($product)

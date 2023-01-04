@@ -84,7 +84,7 @@
                     <li><a href="/store/sale/sal18">(완)월별할인적용유형관리</a></li>
                     <li><a href="/store/sale/sal20">(완)매장LOSS등록</a></li>
                     <li><a href="/store/sale/sal21">(완)매장수불집계표</a></li>
-                    <li><a href="/store/sale/sal22">(개)창고수불집계표</a></li>
+                    <li><a href="/store/sale/sal22">(완)창고수불집계표</a></li>
                     <li><a href="/store/sale/sal23">(완)본사수불집계표</a></li>
                 </ul>
             </li>

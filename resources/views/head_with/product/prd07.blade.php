@@ -119,7 +119,7 @@
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="rep_cat_cd" class="required">대표카테고리</label>
+                                <label for="rep_cat_cd">대표카테고리</label>
                                 <div class="form-inline inline_btn_box">
                                     <input type="hidden" id="rep_cat_cd" name="rep_cat_cd" value=""/>
                                     <input class="w-100 form-control form-control-sm" id="rep_cat_nm" name="rep_cat_nm" value="" placeholder="변경할 카테고리 선택" readonly/>
@@ -218,7 +218,7 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="org_nm" class="required">원산지</label>
+                                <label for="org_nm">원산지</label>
                                 <div class="flex_box">
                                     <input type='text' class="form-control form-control-sm" id="org_nm" name='org_nm' value=''>
                                 </div>
@@ -270,10 +270,10 @@
                                     <input type="text" class="form-control form-control-sm mr-2" id="option_kind1" name="option_kind1" value="사이즈" onkeyup="checkOptionValue(this);" style="width: 100px"/>
                                     <span class="txt_box mr-2">~</span>
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" name="chk_option_kind2" id="chk_option_kind2" class="custom-control-input" onkeyup="checkOptionValue(this);"/>
+                                        <input type="checkbox" name="chk_option_kind2" id="chk_option_kind2" class="custom-control-input" checked/>
                                         <label class="custom-control-label" for="chk_option_kind2">&nbsp;</label>
                                     </div>
-                                    <input type="text" class="form-control form-control-sm" id="option_kind2" name="option_kind2" value="컬러" style="width: 100px" disabled/>
+                                    <input type="text" class="form-control form-control-sm" id="option_kind2" name="option_kind2" value="컬러" onkeyup="checkOptionValue(this);" style="width: 100px"/>
                                 </div>
                             </div>
                         </div>
@@ -284,9 +284,9 @@
                                 <label for="tax_yn" class="required">과세구분</label>
                                 <div class="flex_box">
                                     <select id="tax_yn" name="tax_yn" class="form-control form-control-sm">
-                                        @foreach ($tax_yn as $key => $val)
-                                        <option value='{{ $key }}'>{{ $val }}</option>
-                                        @endforeach
+                                            <option value=''>==과세 구분==</option>
+                                            <option value='Y' selected>과세</option>
+                                            <option value='N'>면세</option>
                                     </select>
                                 </div>
                             </div>
@@ -435,14 +435,21 @@
                 children: [
                     {field: "goods_sh", headerName: "시중가", type: 'currencyType', editable: true, cellStyle: CELL_STYLE.EDIT},
                     {field: "price", headerName: "판매가", type: 'currencyType', editable: true, cellStyle: CELL_STYLE.EDIT},
-                    {field: "margin_rate", headerName: "마진율(%)", width:84, type: 'percentType', editable: true, cellStyle: CELL_STYLE.EDIT},
-                    {field: "wonga", headerName: "원가", width: 60, type: 'percentType', editable: true, cellStyle: CELL_STYLE.EDIT},
+                    {field: "wonga", headerName: "원가", width: 60, type: 'currencyType', editable: true, cellStyle: CELL_STYLE.EDIT},
+                    {field: "margin_rate", headerName: "마진율(%)", width:84, type: 'percentType'},
                 ]
             },
             {headerName:"상품옵션", editable: true, cellStyle: CELL_STYLE.EDIT,
                 children: [
-                    {field: "option_kind", headerName: "옵션구분", editable: true, width: 200, cellStyle: CELL_STYLE.EDIT},
-                    {field: "opt1", headerName: "옵션1", editable: true, width: 200, cellStyle: CELL_STYLE.EDIT},
+                    {field: "option_kind", headerName: "옵션구분", width: 200},
+                    {field: "opt1", headerName: "옵션1", width: 200,
+                        editable: params => params.data.is_chk_opt_kind1 == true,
+                        cellStyle: params => {
+                            if (params.data.is_chk_opt_kind1 == true) {
+                                return CELL_STYLE.EDIT;
+                            }
+                        }
+                    },
                     {field: "opt2", headerName: "옵션2", width: 200, 
                         editable: params => params.data.is_chk_opt_kind2 == true,
                         cellStyle: params => {
@@ -499,11 +506,24 @@
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
             let options = {
-                onCellValueChanged: params => evtAfterEdit(params),
+                onCellValueChanged: params => onCellValueChanged(params),
                 getRowNodeId: (data) => data.idx // 업데이터 및 제거를 위한 식별 ID 할당
             };
             gx = new HDGrid(gridDiv, columns, options);
         });
+
+        // 판매가 원가 작성할 때 마진율값 자동입력
+        async function onCellValueChanged(params) {
+            if (params.oldValue == params.newValue) return;
+            const row = params.data;
+
+            if (row.price != null && row.wonga != null ) row.margin_rate = ((row.price - row.wonga)/row.price)*100;
+
+            await gx.gridOptions.api.applyTransaction({ 
+            update: [{...row}] 
+        });
+        }
+
 
         /**
          * ag-grid utils
@@ -680,6 +700,15 @@
             }
 
             row.is_chk_opt_kind2 = $is_chk_opt_kind2;
+           
+            $is_chk_opt_kind1 = "";
+            if($("#chk_option_kind1").is(":checked")){
+                $is_chk_opt_kind1 = true;
+            }else{
+                $is_chk_opt_kind1 = false;
+            }
+
+            row.is_chk_opt_kind1 = $is_chk_opt_kind1;
 
             row.option_kind	= _("#option_kind").value;
             row.tax_yn		= _("#tax_yn").value;		// 과세구분
@@ -797,38 +826,76 @@
             }
         };
 
+
+
         const changeOptionUse = (obj) => {
             const used = obj.value;
-            if (used == "N") {
+            // if (used == "N") {
+            //     $("input[name='option_kind1']").attr("disabled", true);
+            //     $("input[name='option_kind1']").attr("readonly", true);
+            //     $("input[name='option_kind1']").val("NONE");
+            //     $("input[name='chk_option_kind1']").attr("disabled", true);
+            //     $("input[name='chk_option_kind1']").attr("checked", false);
+            //     $("input[name='option_kind2']").attr("disabled", true);
+            //     $("input[name='option_kind2']").attr("readonly", true);
+            //     $("input[name='option_kind2']").val("NONE");
+            //     $("input[name='chk_option_kind2']").attr("disabled", true);
+            //     $("input[name='chk_option_kind2']").attr("checked", false);
+            // } else if (used == "Y") {
+            //     $("input[name='option_kind1']").attr("disabled", false);
+            //     $("input[name='option_kind1']").attr("readonly", false);
+            //     $("input[name='option_kind2']").attr("disabled", false);
+            //     $("input[name='option_kind2']").attr("readonly", false);
+            //     $("input[name='option_kind1']").val("사이즈");
+            //     $("input[name='option_kind1']").className = "input";
+            //     $("input[name='chk_option_kind1']").attr("disabled", false);
+            //     $("input[name='chk_option_kind1']").attr("checked", true);
+            //     $("input[name='option_kind2']").val("컬러");
+            //     $("input[name='chk_option_kind2']").attr("disabled", false);
+            //     $("input[name='chk_option_kind2']").attr("checked", true);
+            // }
+
+            if (used == 'Y') {
+                $("input[name='option_kind1']").attr("disabled", false);
+                $("input[name='option_kind1']").val("사이즈");
+                $("input[name='chk_option_kind1']").attr("disabled", false);
+                $("input[name='chk_option_kind1']").attr("checked", true);
+                $("input[name='option_kind2']").attr("disabled", false);
+                $("input[name='option_kind2']").val("컬러");
+                $("input[name='chk_option_kind2']").attr("disabled", false);
+                $("input[name='chk_option_kind2']").attr("checked", true);
+
+            } else {
                 $("input[name='option_kind1']").attr("disabled", true);
-                $("input[name='option_kind1']").attr("readonly", true);
                 $("input[name='option_kind1']").val("NONE");
                 $("input[name='chk_option_kind1']").attr("disabled", true);
                 $("input[name='chk_option_kind1']").attr("checked", false);
                 $("input[name='option_kind2']").attr("disabled", true);
-                $("input[name='option_kind2']").attr("readonly", true);
                 $("input[name='option_kind2']").val("NONE");
                 $("input[name='chk_option_kind2']").attr("disabled", true);
-                $("input[name='chk_option_kind2']").checked = false;
-            } else if (used == "Y") {
-                $("input[name='option_kind1']").attr("disabled", false);
-                $("input[name='option_kind1']").attr("readonly", false);
-                $("input[name='option_kind1']").val("사이즈");
-                $("input[name='option_kind1']").className = "input";
-                $("input[name='chk_option_kind1']").attr("disabled", false);
-                $("input[name='chk_option_kind1']").attr("checked", true);
-                $("input[name='option_kind2']").val("컬러");
-                $("input[name='chk_option_kind2']").attr("disabled", false);
+                $("input[name='chk_option_kind2']").attr("checked", false);
             }
         };
 
+        // $("#chk_option_kind1").bind("change", () => {
+        //     var checkbox1 = $("#chk_option_kind1")[0];
+        //     if (!checkbox1.checked) {
+        //         if (document.f1.is_option_use[0].checked) {
+        //             alert("옵션사용을 \"사용함\"으로 선택하셨기 때문에 적어도 한개의 옵션은 입력하셔야 합니다.");
+        //             checkbox1.checked = true;
+        //         }
+        //     }
+        // });
         $("#chk_option_kind1").bind("change", () => {
-            var checkbox1 = $("#chk_option_kind1")[0];
-            if (!checkbox1.checked) {
-                if (document.f1.is_option_use[0].checked) {
-                    alert("옵션사용을 \"사용함\"으로 선택하셨기 때문에 적어도 한개의 옵션은 입력하셔야 합니다.");
-                    checkbox1.checked = true;
-                }
+            if ($("#chk_option_kind1")[0].checked) {
+                $("input[name='option_kind1']").attr("disabled", false);
+                $("input[name='option_kind1']").attr("readonly", false);
+                $("input[name='option_kind1']").val("사이즈");
+                $("input[name='option_kind1']").focus();
+            } else {
+                $("input[name='option_kind1']").attr("disabled", true);
+                $("input[name='option_kind1']").attr("readonly", true);
+                $("input[name='option_kind1']").val("사이즈");
             }
         });
         $("#chk_option_kind2").bind("change", () => {
@@ -971,17 +1038,17 @@
                 return false;
             }
 
-            if (document.f1.rep_cat_cd.value == "") {
-                alert("대표카테고리를 입력해 주세요.");
-                popCategory('display');
-                return false;
-            }
+            // if (document.f1.rep_cat_cd.value == "") {
+            //     alert("대표카테고리를 입력해 주세요.");
+            //     popCategory('display');
+            //     return false;
+            // }
 
-            if (document.f1.org_nm.value == "") {
-                alert("원산지를 입력해 주세요.");
-                document.f1.org_nm.focus();
-                return false;
-            }
+            // if (document.f1.org_nm.value == "") {
+            //     alert("원산지를 입력해 주세요.");
+            //     document.f1.org_nm.focus();
+            //     return false;
+            // }
 
             if (document.f1.is_unlimited.value == "") {
                 alert("재고 수량 관리를 선택해 주세요.");
@@ -1150,97 +1217,97 @@
 
         };
 
-        const evtAfterEdit = (params) => {
-            if (params.oldValue !== params.newValue) {
-                row = params.data;
-                const column_name = params.column.colId;
-                const value = params.newValue;
-                switch (column_name) {
-                    case "goods_sh": // 시중가
-                        if (isNaN(value) == true || value == "" || parseFloat(value) < 0) {
-                            alert("숫자만 입력가능합니다.");
-                            startEditingCell(row.idx, column_name);
-                        } 
-                        // else if (value == "") { - 시중가는 필수 항목 x
-                        //     alert("시중가를 입력해주세요.");
-                        //     startEditingCell(row.idx, column_name);
-                        // }
-                        break;
-                    case "wonga": // 원가
-                        if (isNaN(value) == true || value == "" || parseFloat(value) < 0) {
-                            alert("숫자만 입력가능합니다.");
-                            startEditingCell(row.idx, column_name);
-                        } else if (value == "") {
-                            alert("원가를 입력해주세요.");
-                            startEditingCell(row.idx, column_name);
-                        }
-                        break;
-                    case "price": // 판매가
-                        if (isNaN(value) == true || value == "" || parseFloat(value) < 0) {
-                            alert("숫자만 입력가능합니다.");
-                            startEditingCell(row.idx, column_name);
-                        } else if (value == "") {
-                            alert("판매가를 입력해주세요.");
-                            startEditingCell(row.idx, column_name);
-                        } else {
-                            const ed_price = value;
-                            row = cmdPrice(row, ed_price, row.margin_rate); 
-                            if (row.point_yn == "Y") {
-                                if ( row.point_unit == "P" ) {
-                                    row.point_amt = value * row.point / 100;
-                                }
-                            }
-                        }
-                        break;
-                    case "margin_rate": // 마진율
-                        if (isNaN(value) == true || value == "" || parseFloat(value) < 0) {
-                            alert("숫자만 입력가능합니다.");
-                            startEditingCell(row.idx, column_name);
-                        } else if (value == "") {
-                            alert("마진율을 입력해 주세요.");
-                            startEditingCell(row.idx, column_name);
-                        } else {
-                            const ed_margin_rate = parseInt(value);
-                            if (ed_margin_rate > 100) {
-                                alert("마진율은 100을 넘을 수 없습니다.");
-                                startEditingCell(row.idx, column_name);
-                            } else {
-                                row = cmdPrice(row, row.price, ed_margin_rate);
-                            }
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                gx.gridOptions.api.applyTransaction({ update : [row] });
-            }
-        };
+        // const evtAfterEdit = (params) => {
+        //     if (params.oldValue !== params.newValue) {
+        //         row = params.data;
+        //         const column_name = params.column.colId;
+        //         const value = params.newValue;
+        //         switch (column_name) {
+        //             case "goods_sh": // 시중가
+        //                 if (isNaN(value) == true || value == "" || parseFloat(value) < 0) {
+        //                     alert("숫자만 입력가능합니다.");
+        //                     startEditingCell(row.idx, column_name);
+        //                 } 
+        //                 // else if (value == "") { - 시중가는 필수 항목 x
+        //                 //     alert("시중가를 입력해주세요.");
+        //                 //     startEditingCell(row.idx, column_name);
+        //                 // }
+        //                 break;
+        //             case "wonga": // 원가
+        //                 if (isNaN(value) == true || value == "" || parseFloat(value) < 0) {
+        //                     alert("숫자만 입력가능합니다.");
+        //                     startEditingCell(row.idx, column_name);
+        //                 } else if (value == "") {
+        //                     alert("원가를 입력해주세요.");
+        //                     startEditingCell(row.idx, column_name);
+        //                 }
+        //                 break;
+        //             case "price": // 판매가
+        //                 if (isNaN(value) == true || value == "" || parseFloat(value) < 0) {
+        //                     alert("숫자만 입력가능합니다.");
+        //                     startEditingCell(row.idx, column_name);
+        //                 } else if (value == "") {
+        //                     alert("판매가를 입력해주세요.");
+        //                     startEditingCell(row.idx, column_name);
+        //                 } else {
+        //                     const ed_price = value;
+        //                     row = cmdPrice(row, ed_price, row.margin_rate); 
+        //                     if (row.point_yn == "Y") {
+        //                         if ( row.point_unit == "P" ) {
+        //                             row.point_amt = value * row.point / 100;
+        //                         }
+        //                     }
+        //                 }
+        //                 break;
+        //             case "margin_rate": // 마진율
+        //                 if (isNaN(value) == true || value == "" || parseFloat(value) < 0) {
+        //                     alert("숫자만 입력가능합니다.");
+        //                     startEditingCell(row.idx, column_name);
+        //                 } else if (value == "") {
+        //                     alert("마진율을 입력해 주세요.");
+        //                     startEditingCell(row.idx, column_name);
+        //                 } else {
+        //                     const ed_margin_rate = parseInt(value);
+        //                     if (ed_margin_rate > 100) {
+        //                         alert("마진율은 100을 넘을 수 없습니다.");
+        //                         startEditingCell(row.idx, column_name);
+        //                     } else {
+        //                         row = cmdPrice(row, row.price, ed_margin_rate);
+        //                     }
+        //                 }
+        //                 break;
+        //             default:
+        //                 break;
+        //         }
+        //         gx.gridOptions.api.applyTransaction({ update : [row] });
+        //     }
+        // };
        
-        const cmdPrice = (row, price, margin_rate) => {
-            const com_type = row.com_type;
-            return calPrice(row, com_type, parseInt(price), margin_rate);
-        }
+        // const cmdPrice = (row, price, margin_rate) => {
+        //     const com_type = row.com_type;
+        //     return calPrice(row, com_type, parseInt(price), margin_rate);
+        // }
 
-        const calPrice = (row, com_type, price, margin_rate) => { // 행, 판매가, 마진율
+        // const calPrice = (row, com_type, price, margin_rate) => { // 행, 판매가, 마진율
 
-            let wonga = row.wonga;
+        //     let wonga = row.wonga;
 
-            if (com_type == 1) {	// 공급 업체인 경우
-                if ( row.price != price ) {
-                    margin_rate = ((price-wonga)/price)*100;
-                } else if ( row.margin_rate != margin_rate ) {
-                    price = parseInt(Math.round(wonga / (1-margin_rate/100)), 10);
-                }
-            } else { // 그 외의 경우
-                if ( price && wonga ) {
-                    margin_rate = parseFloat(((price - wonga) / price) * 100).toFixed(2);
-                }
-            }
+        //     if (com_type == 1) {	// 공급 업체인 경우
+        //         if ( row.price != price ) {
+        //             margin_rate = ((price-wonga)/price)*100;
+        //         } else if ( row.margin_rate != margin_rate ) {
+        //             price = parseInt(Math.round(wonga / (1-margin_rate/100)), 10);
+        //         }
+        //     } else { // 그 외의 경우
+        //         if ( price && wonga ) {
+        //             margin_rate = parseFloat(((price - wonga) / price) * 100).toFixed(2);
+        //         }
+        //     }
 
-            row = {...row, price: price, margin_rate: margin_rate, wonga: wonga }
+        //     row = {...row, price: price, margin_rate: margin_rate, wonga: wonga }
 
-            return row;
-        };
+        //     return row;
+        // };
 
 </script>
 

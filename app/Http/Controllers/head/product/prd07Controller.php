@@ -54,7 +54,6 @@ class prd07Controller extends Controller
 			'dlv_fee' => Lib::cm($cfg_dlv_fee),
 			'free_dlv_fee_limit' => Lib::cm($cfg_free_dlv_fee_limit),
 			'order_point_ratio'	=> $cfg_point_ratio,
-			'tax_yn' => ['' => "==과세 구분==", 'Y' => "과세", 'N' => "면세"]
 		];
 		return view(Config::get('shop.head.view') . '/product/prd07', $values);
 	}
@@ -413,7 +412,8 @@ class prd07Controller extends Controller
 			DB::rollback();
 			return response()->json([
                 "result" => 0,
-				"msg" => "시스템에러"
+				// "msg" => "시스템에러"
+				"msg" => $e->getMessage()
             ]);
 		}
 
