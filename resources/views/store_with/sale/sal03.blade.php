@@ -162,11 +162,7 @@
 							<label for="formrow-email-input">조회 기준</label>
 								<div class="form-inline form-radio-box">
 									<div class="custom-control custom-radio">
-										<input type="radio" name="best_worst" value="A" id="best_worst_all" class="custom-control-input" checked>
-										<label class="custom-control-label" for="best_worst_all">전체</label>
-									</div>
-									<div class="custom-control custom-radio">
-										<input type="radio" name="best_worst" value="B" id="best" class="custom-control-input">
+										<input type="radio" name="best_worst" value="B" id="best" class="custom-control-input" checked>
 										<label class="custom-control-label" for="best">Best</label>
 									</div>
 									<div class="custom-control custom-radio">
@@ -198,7 +194,7 @@
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
                                         <option value='ord_qty'>수량</option>
-                                        <option value='total_sale_rate'>총판매율</option>
+                                        {{--<option value='sale_rate'>기간판매율</option>--}}
                                         <option value='ord_amt'>기간판매금액</option>
                                     </select>
                                 </div>
@@ -248,7 +244,6 @@
                         , "ord_amt" : 0 
                         , "ord_qty" : 0
                         , "in_sum_amt" : 0
-                        , "in_sale_rate" : 0
                         , "total_sale_rate" : 0
                         , "sale_rate" : 0
                         , "stock_qty" : 0
@@ -336,7 +331,7 @@
 	});
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/store/sale/sal03/search', data,1, function(e) {
+		gx.Request('/store/sale/sal03/search', data,-1, function(e) {
             let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
             let total_data = e.head.total_data;
 
