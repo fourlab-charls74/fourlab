@@ -348,46 +348,172 @@
 
 <script language="javascript">
     let columns = [
-        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 28},
-        {field: "ord_no", headerName: "주문번호", pinned: 'left', width: 130, cellStyle: StyleOrdNo, type: 'StoreOrderNoType'},
-        {field: "ord_opt_no", headerName: "일련번호", pinned: 'left', width: 60, type: 'StoreOrderNoType', cellStyle: {'text-align': 'center'}},
-        {field: "ord_state_nm", headerName: "주문상태", pinned: 'left', width: 70, cellStyle: StyleOrdState},
-        {field: "pay_stat_nm", headerName: "입금상태", pinned: 'left', width: 55, cellStyle: {'text-align': 'center'}},
-        {field: "prd_cd", headerName: "상품코드", width: 120, pinned: 'left', cellStyle: {'text-align': 'center'}},
-        {field: "goods_no", headerName: "상품번호", width: 70, pinned: 'left', cellStyle: {'text-align': 'center'}},
-        {field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: {'text-align': 'center'}},
-        {field: "goods_nm", headerName: "상품명", width: 150, type: "HeadGoodsNameType"},
-        {field: "goods_nm_eng", headerName: "상품명(영문)", width: 150},
+        // {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 28},
+        {field: "ord_no", headerName: "주문번호", pinned: 'left', width: 130,
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+            cellRenderer: (params) => {
+                if (params.node.level != 0) return '';
+                let ord_no = params.data ? params.data.ord_no : params.node.aggData ? params.node.aggData.ord_no : '';
+                let ord_opt_no = params.data ? params.data.ord_opt_no : params.node.aggData ? params.node.aggData.ord_opt_no : '';
+                return '<a href="javascript:void(0);" onclick="return openStoreOrder(\'' + ord_no + '\',\'' + ord_opt_no +'\');">'+ params.value +'</a>';
+            }
+        },
+        {field: "ord_opt_no", headerName: "일련번호", pinned: 'left', width: 60, cellStyle: {'text-align': 'center'},
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+            cellRenderer: (params) => {
+                if (params.node.level != 0) return '';
+                let ord_no = params.data ? params.data.ord_no : params.node.aggData ? params.node.aggData.ord_no : '';
+                let ord_opt_no = params.data ? params.data.ord_opt_no : params.node.aggData ? params.node.aggData.ord_opt_no : '';
+                return '<a href="javascript:void(0);" onclick="return openStoreOrder(\'' + ord_no + '\',\'' + ord_opt_no +'\');">'+ params.value +'</a>';
+            }
+        },
+        {field: "ord_state_nm", headerName: "주문상태", pinned: 'left', width: 70, cellStyle: StyleOrdState,
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "pay_stat_nm", headerName: "입금상태", pinned: 'left', width: 55, cellStyle: {'text-align': 'center'},
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "goods_no", headerName: "상품번호", width: 70, cellStyle: {'text-align': 'center'}, pinned: "left",
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {'text-align': 'center'}, pinned: "left"},
         {field: "prd_cd_p", headerName: "코드일련", width: 90, cellStyle: {"text-align": "center"}},
-        {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
-        {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
-        {field: "goods_opt", headerName: "옵션", width: 130},
-        {field: "qty", headerName: "수량", width: 50, type: "currencyType"},
+        {field: "goods_no_group", rowGroup: true, hide: true},
+        // {headerName: "상품번호", width: 100, pinned: 'left', cellStyle: {'text-align': 'center'},
+        //     showRowGroup: 'goods_no_group', 
+        //     cellRenderer: 'agGroupCellRenderer', 
+        // },
+        {field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: {'text-align': 'center'}, 
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "goods_nm", headerName: "상품명", width: 150,
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+            cellRenderer: function (params) {
+                if (params.data?.prd_cd === '합계' || params.node.level != 0) return '';
+				if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
+					return params.value;
+				} else {
+					let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
+					return '<a href="#" onclick="return openHeadProduct(\'' + goods_no + '\');">' + params.value + '</a>';
+				}
+			}
+        },
+        {field: "goods_nm_eng", headerName: "상품명(영문)", width: 150,
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}, 
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}, 
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "goods_opt", headerName: "옵션", width: 130, 
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "qty", headerName: "수량", width: 50, type: "currencyType", aggFunc: "first"},
         @foreach (@$dlv_locations as $loc)
-            {field: "{{ $loc->location_type }}_{{ $loc->location_cd }}_qty", headerName: "{{ $loc->location_nm }}", width: 100},
+            {field: "{{ $loc->seq }}_{{ $loc->location_type }}_{{ $loc->location_cd }}_qty", headerName: "{{ $loc->location_nm }}", width: 100, type: "currencyType",
+                cellStyle: (params) => {
+                //     // const qtys = Object.keys(params.data)
+                //     //     .filter(k => k.indexOf('_qty') >= 0)
+                //     //     .map(k => ({key: k, value: params.data[k], seq: k.split("_")[0]}));
+                //     // 로직작업 필요
+                    if (!params.data) return '';
+                    return params.value == Math.max(...Object.keys(params.data).filter(k => k.indexOf('_qty') >= 0).map(k => params.data[k])) 
+                        ? ({ "background-color": "#FFDFDF" }) : '';
+                }
+            },
         @endforeach
-        {field: "dlv_place", headerName: "배송처", width: 100},
+        {field: "dlv_place", headerName: "배송처", width: 130},
         {field: "comment", headerName: "접수메모", width: 120, editable: true, cellStyle: {'background-color': '#ffff99'}},
-        {field: "user_nm", headerName: "주문자(아이디)", width: 120, cellStyle: {'text-align': 'center'}},
-        {field: "r_nm", headerName: "수령자", width: 70, cellStyle: {'text-align': 'center'}},
-        {field: "wonga", headerName: "원가", width: 60, type: "currencyType"},
-        {field: "goods_sh", headerName: "TAG가", width: 60, type: "currencyType"},
-        {field: "goods_price", headerName: "자사몰판매가", width: 85, type: "currencyType"},
-        {field: "price", headerName: "판매가", width: 60, type: "currencyType"},
-        {field: "dc_rate", headerName: "할인율(%)", width: 65, type: "currencyType"},
-        {field: "sale_kind_nm", headerName: "판매유형", width: 100, cellStyle: {"text-align": "center"}},
-        {field: "pr_code_nm", headerName: "행사구분", width: 60, cellStyle: {"text-align": "center"}},
-        {field: "dlv_amt", headerName: "배송비", width: 60, type: "currencyType"},
-        {field: "sales_com_fee", headerName: "판매수수료", width: 80, type: "currencyType"},
-        {field: "pay_type_nm", headerName: "결제방법", width: 80, cellStyle: {'text-align': 'center'}},
-        {field: "ord_type_nm", headerName: "주문구분", width: 60, cellStyle: {'text-align': 'center'}},
-        {field: "ord_kind_nm", headerName: "출고구분", width: 60, cellStyle: StyleOrdKind},
-        {field: "baesong_kind", headerName: "배송구분", width: 60, cellStyle: {'text-align': 'center'}},
-        {field: "sale_place_nm", headerName: "판매처", width: 100, cellStyle: {'text-align': 'center'}},
-        {field: "ord_date", headerName: "주문일시", width: 125, cellStyle: {'text-align': 'center'}},
-        {field: "pay_date", headerName: "입금일시", width: 125, cellStyle: {'text-align': 'center'}},
-        {field: "dlv_end_date", headerName: "배송일시", width: 125, cellStyle: {'text-align': 'center'}},
-        {field: "last_up_date", headerName: "클레임일시", width: 125, cellStyle: {'text-align': 'center'}},
+        {field: "user_nm", headerName: "주문자(아이디)", width: 120, cellStyle: {'text-align': 'center'},
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "r_nm", headerName: "수령자", width: 70, cellStyle: {'text-align': 'center'},
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "wonga", headerName: "원가", width: 60, type: "currencyType",
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "goods_sh", headerName: "TAG가", width: 60, type: "currencyType",
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "goods_price", headerName: "자사몰판매가", width: 85, type: "currencyType",
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "price", headerName: "판매가", width: 60, type: "currencyType",
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "dc_rate", headerName: "할인율(%)", width: 65, type: "currencyType",
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "sale_kind_nm", headerName: "판매유형", width: 100, cellStyle: {"text-align": "center"},
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "pr_code_nm", headerName: "행사구분", width: 60, cellStyle: {"text-align": "center"},
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "dlv_amt", headerName: "배송비", width: 60, type: "currencyType",
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "sales_com_fee", headerName: "판매수수료", width: 80, type: "currencyType",
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "pay_type_nm", headerName: "결제방법", width: 80, cellStyle: {'text-align': 'center'},
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "ord_type_nm", headerName: "주문구분", width: 60, cellStyle: {'text-align': 'center'},
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "ord_kind_nm", headerName: "출고구분", width: 60, cellStyle: StyleOrdKind,
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "baesong_kind", headerName: "배송구분", width: 60, cellStyle: {'text-align': 'center'},
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "sale_place_nm", headerName: "판매처", width: 100, cellStyle: {'text-align': 'center'},
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "ord_date", headerName: "주문일시", width: 125, cellStyle: {'text-align': 'center'},
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "pay_date", headerName: "입금일시", width: 125, cellStyle: {'text-align': 'center'},
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "dlv_end_date", headerName: "배송일시", width: 125, cellStyle: {'text-align': 'center'},
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "last_up_date", headerName: "클레임일시", width: 125, cellStyle: {'text-align': 'center'},
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
     ];
 </script>
 
@@ -399,7 +525,13 @@
 		pApp.ResizeGrid(275);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
-		gx = new HDGrid(gridDiv, columns);
+		gx = new HDGrid(gridDiv, columns, {
+            rollup: true,
+			groupSuppressAutoColumn: true,
+            groupDefaultExpanded: 1, // 0: close, 1: open
+			suppressAggFuncInHeader: true,
+			animateRows: true,
+        });
 
 		Search();
 	});

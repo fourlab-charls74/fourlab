@@ -22,9 +22,10 @@ class ord02Controller extends Controller
 		$sale_places = DB::select($sale_places_sql);
 
 		$dlv_locations_sql = "
-			select 'STORAGE' as location_type, storage_cd as location_cd, storage_nm as location_nm from storage where default_yn = 'Y' or online_yn = 'Y'
+			(select 'storage' as location_type, storage_cd as location_cd, storage_nm as location_nm, if(online_yn = 'Y', 0, 1) as seq from storage where online_yn = 'Y' or default_yn = 'Y')
 			union all
-			select 'STORE' as location_type, store_cd as location_cd, store_nm as location_nm from store where store_cd in (select code_id from code where code_kind_cd = 'ONLINE_ORDER_STORE')
+			(select 'store' as location_type, store_cd as location_cd, store_nm as location_nm, 2 as seq from store where store_cd in (select code_id from code where code_kind_cd = 'ONLINE_ORDER_STORE'))
+			order by seq, location_cd
 		";
 		$dlv_locations = DB::select($dlv_locations_sql);
 
@@ -97,8 +98,22 @@ class ord02Controller extends Controller
 		// }
 		// if ($item != '') $where2 .= " and g.opt_kind_cd = '$item' ";
 
+
+		$dlv_locations_sql = "
+			(select 'storage' as location_type, storage_cd as location_cd, storage_nm as location_nm, if(online_yn = 'Y', 0, 1) as seq from storage where online_yn = 'Y' or default_yn = 'Y')
+			union all
+			(select 'store' as location_type, store_cd as location_cd, store_nm as location_nm, 2 as seq from store where store_cd in (select code_id from code where code_kind_cd = 'ONLINE_ORDER_STORE'))
+			order by seq, location_cd
+		";
+		$dlv_locations = DB::select($dlv_locations_sql);
+		$qty_sql = "";
+		foreach ($dlv_locations as $loc) {
+			$qty_sql .= ", (select wqty from product_stock_$loc->location_type where " . $loc->location_type . "_cd = '$loc->location_cd' and prd_cd = pc.prd_cd) as "  . $loc->seq . "_" . $loc->location_type . "_" . $loc->location_cd . "_qty ";
+		}
+
 		$sql = "
 			select a.*
+				, if(a.goods_no_group < 2, null, a.goods_no) as goods_no_group
 				, os.code_val as ord_state_nm
 				, round((1 - ((a.price * a.qty) * (1 - if(st.amt_kind = 'per', st.sale_per, 0) / 100)) / a.goods_sh) * 100) as dc_rate
 				, sk.code_val as sale_kind_nm, pr.code_val as pr_code_nm
@@ -114,6 +129,15 @@ class ord02Controller extends Controller
 					, o.sale_place, o.store_cd, o.ord_state, o.clm_state, o.com_id, o.baesong_kind as dlv_baesong_kind, o.ord_date
 					, o.sale_kind, o.pr_code, o.sales_com_fee, o.ord_type, o.ord_kind, p.pay_stat
 					, concat(ifnull(m.user_nm, ''), '(', ifnull(m.user_id, ''), ')') as user_nm, m.r_nm
+					, (
+						select count(*)
+                        from product_code inpc
+							inner join code inc on inc.code_kind_cd = 'PRD_CD_COLOR' and inc.code_id = color
+							inner join code incs on incs.code_kind_cd = 'PRD_CD_SIZE_MEN' and incs.code_id = size
+                        where inpc.goods_no = o.goods_no
+							and inc.code_val = SUBSTRING_INDEX(o.goods_opt, '^', 1) and replace(incs.code_val, ' ', '') = replace(substring_index(o.goods_opt, '^', -1), ' ', '')
+					) as goods_no_group
+					$qty_sql
 				from order_opt o
 					inner join order_mst m on m.ord_no = o.ord_no
 					inner join goods g on g.goods_no = o.goods_no
@@ -136,8 +160,8 @@ class ord02Controller extends Controller
 					-- and o.sale_kind = ''
 					-- 상품 공급업체
 					-- 상품코드 / 스타일넘버 / 상품번호 / 품목 / 브랜드 / 상품옵션 / 상품명 / 상품명영문
-					and o.goods_no = '130658'
-				order by o.ord_date desc
+					-- and (o.goods_no = '130658' or o.goods_no = '130976')
+				order by o.ord_date desc, pc.prd_cd asc
 				limit 0, 100
 			) a
 				left outer join code sk on sk.code_kind_cd = 'SALE_KIND' and sk.code_id = a.sale_kind
