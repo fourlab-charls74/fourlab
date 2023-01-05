@@ -21,6 +21,7 @@ CREATE TABLE `product` (
 -- 원부자재 상품 코드
 CREATE TABLE `product_code` (
 	`prd_cd` varchar(50) NOT NULL COMMENT '상품코드',
+	`prd_cd_p` varchar(30) NOT NULL COMMENT '상품코드',
 	`goods_no` int(11) COMMENT '상품번호',
 	`goods_opt` varchar(100) COMMENT '상품옵션명',
 	`brand` varchar(2) NOT NULL COMMENT '브랜드 code - prd_cd_brand, prd_material_type',
@@ -36,7 +37,8 @@ CREATE TABLE `product_code` (
 	`rt` datetime NOT NULL COMMENT '등록일',
 	`ut` datetime DEFAULT NULL COMMENT '수정일',
 	`admin_id` varchar(30) NOT NULL COMMENT '관리자아이디',
-	PRIMARY KEY (`prd_cd`)
+	PRIMARY KEY (`prd_cd`),
+	KEY `idx_prdcdp` (`prd_cd_p`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 원부자재 상품 이미지
