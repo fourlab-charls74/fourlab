@@ -244,8 +244,6 @@
                         , "ord_amt" : 0 
                         , "ord_qty" : 0
                         , "in_sum_amt" : 0
-                        , "total_sale_rate" : 0
-                        , "sale_rate" : 0
                         , "stock_qty" : 0
                         , "stock_wqty" : 0
                         , "ex_sum_qty" : 0
