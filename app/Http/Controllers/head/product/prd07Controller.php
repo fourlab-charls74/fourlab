@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Option;
@@ -419,6 +420,254 @@ class prd07Controller extends Controller
 
 	}
 
+	public function batch_show()
+    {
+		$values = [];
+
+        return view(Config::get('shop.head.view') . '/product/prd07_batch', $values);
+    }
+
+	public function import_excel(Request $request) {
+		if (count($_FILES) > 0) {
+			if ( 0 < $_FILES['file']['error'] ) {
+				return response()->json(['code' => 0, 'message' => 'Error: ' . $_FILES['file']['error']], 200);
+			}
+			else {
+				$file = $request->file('file');
+				$now = date('YmdHis');
+				$user_id = Auth::guard('head')->user()->id;
+				$extension = $file->extension();
+	
+				$save_path = "data/product/prd07/";
+				$file_name = "${now}_${user_id}.${extension}";
+				
+				if (!Storage::disk('public')->exists($save_path)) {
+					Storage::disk('public')->makeDirectory($save_path);
+				}
+	
+				$file = sprintf("${save_path}%s", $file_name);
+				move_uploaded_file($_FILES['file']['tmp_name'], $file);
+	
+				return response()->json(['code' => 1, 'file' => $file], 200);
+			}
+		}
+	}
+
+	public function get_products(Request $request) {
+        $data = $request->input('data', []);
+        $result = [];
+
+        foreach($data as $key => $d)
+        {
+			$com_id = $d['com_id'];
+			$opt_kind_cd = $d['opt_kind_cd'];
+			$brand = $d['brand'];
+			$rep_cat_cd = $d['rep_cat_cd']??'';
+			$u_cat_cd = $d['u_cat_cd']??'';
+			$style_no = $d['style_no'];
+			$goods_nm = $d['goods_nm'];
+			$goods_nm_eng = $d['goods_nm_eng'];
+			$goods_sh = $d['goods_sh'];
+			$price = $d['price'];
+			$wonga = $d['wonga'];
+			$margin_rate = $d['margin_rate'];
+			$option_kind = $d['option_kind'];
+			$opt1 = $d['opt1']??'';
+			$opt2 = $d['opt2']??'';
+			$opt_qty = $d['opt_qty'];
+			$opt_price = $d['opt_price']??'';
+			$head_desc = $d['head_desc']??'';
+			$ad_desc = $d['ad_desc']??'';
+			$dlv_pay_type = $d['dlv_pay_type'];
+			$dlv_fee_cfg = $d['dlv_fee_cfg'];
+			$bae_yn = $d['bae_yn']??'';
+			$baesong_price = $d['baesong_price']??'';
+			$point_cfg = $d['point_cfg'];
+			$point_yn = $d['point_yn'];
+			$point = $d['point']??'';
+			$point_unit = $d['point_unit'];
+			$point_amt = $d['point_amt']??'';
+			$org_nm = $d['org_nm'];
+			$md_nm = $d['md_nm']??'';
+			$make = $d['make']??'';
+			$goods_cont = $d['goods_cont']??'';
+			$spec_desc = $d['spec_desc']??'';
+			$baesong_desc = $d['baesong_desc']??'';
+			$opinion = $d['opinion']??'';
+			$is_unlimited = $d['is_unlimited'];
+			$restock_yn = $d['restock_yn'];
+			$tax_yn = $d['tax_yn'];
+			$goods_location = $d['goods_location']??'';
+			$tags = $d['tags']??'';
+
+            $sql = "
+				select
+					'$com_id' as com_id,
+					'$opt_kind_cd' as opt_kind_cd,
+					'$brand' as brand,
+					'$rep_cat_cd' as rep_cat_cd,
+					'$u_cat_cd' as u_cat_cd,
+					'$style_no' as style_no,
+					'$goods_nm' as goods_nm,
+					'$goods_nm_eng' as goods_nm_eng,
+					'$goods_sh' as goods_sh,
+					'$price' as price,
+					'$wonga' as wonga,
+					'$margin_rate' as margin_rate,
+					'$option_kind' as option_kind,
+					'$opt1' as opt1,
+					'$opt2' as opt2,
+					'$opt_qty' as opt_qty,
+					'$opt_price' as opt_price,
+					'$head_desc' as head_desc,
+					'$ad_desc' as ad_desc,
+					'$dlv_pay_type' as dlv_pay_type,
+					'$dlv_fee_cfg' as dlv_fee_cfg,
+					'$bae_yn' as bae_yn,
+					'$baesong_price' as baesong_price,
+					'$point_cfg' as point_cfg,
+					'$point_yn' as point_yn,
+					'$point' as point,
+					'$point_unit' as point_unit,
+					'$point_amt' as point_amt,
+					'$org_nm' as org_nm,
+					'$md_nm' as md_nm,
+					'$make' as make,
+					'$goods_cont' as goods_cont,
+					'$spec_desc' as spec_desc,
+					'$baesong_desc' as baesong_desc,
+					'$opinion' as opinion,
+					'$is_unlimited' as is_unlimited,
+					'$restock_yn' as restock_yn,
+					'$tax_yn' as tax_yn,
+					'$goods_location' as goods_location,
+					'$tags' as tags
+				from goods
+				limit 1
+
+            ";
+            $row = DB::selectOne($sql);
+            array_push($result, $row);
+        }
+
+        return response()->json([
+            "code" => 200,
+            "head" => [
+                "total" => count($result),
+                "page" => 1,
+                "page_cnt" => 1,
+                "page_total" => 1,
+            ],
+            "body" => $result
+        ]);
+    }
+
+	public function batch_products(Request $request) 
+	{
+		$admin_id = Auth('head')->user()->id;
+		$data = $request->input("products", []);
+
+
+		try {
+
+			DB::beginTransaction();
+
+			foreach ($data as $row) {
+				$brand = $row['brand'];
+				$opt_kind_nm = $row['opt_kind_nm'];
+				$prd_cd_p = $row['prd_cd_p'];
+				$color = $row['color'];
+				$size = $row['size'];
+				$goods_nm = $row['goods_nm'];
+				$goods_nm_eng = $row['goods_nm_eng'];
+				$style_no = $row['style_no'];
+				$seq = $row['seq'];
+				$price = $row['price'];
+				$wonga = $row['wonga'];
+				$tag_price = $row['tag_price'];
+				$year = $row['year'];
+				$season = $row['season'];
+				$gender = $row['gender'];
+				$item = $row['item'];
+				$sup_com = $row['sup_com'];
+				$prd_cd = $prd_cd_p.$color.$size;
+
+				$unit = "";
+				$goods_no = "";
+				$goods_opt = "";
+
+				$sql = "select count(*) as count from product where prd_cd = :prd_cd";
+				$result	= DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+				if ($result->count == 0) {
+
+					DB::table('product')->insert([
+						'prd_cd' => $prd_cd,
+						'prd_nm' => $goods_nm,
+						'prd_nm_eng' => $goods_nm_eng,
+						'style_no' => $style_no,
+						'price' => $price,
+						'wonga' => $wonga,
+						'tag_price' => $tag_price,
+						'com_id' => $sup_com,
+						'unit' => $unit,
+						'rt' => now(),
+						'ut' => now(),
+						'admin_id' => $admin_id
+					]);
+
+					DB::table('product_code')->insert([
+						'prd_cd' => $prd_cd,
+						'seq' => $seq,
+						'goods_no' => $goods_no,
+						'goods_opt'	=> $goods_opt,
+						'brand' => $brand,
+						'year' => $year,
+						'season' => $season,
+						'gender' => $gender,
+						'item' => $item,
+						'opt' => $opt_kind_nm,
+						'color' => $color,
+						'size' => $size,
+						'rt' => now(),
+						'ut' => now(),
+						'admin_id'	=> $admin_id
+					]);
+					
+					DB::table('product_stock')->insert([
+						'goods_no' => $goods_no,
+						'prd_cd' => $prd_cd,
+						'qty_wonga'	=> 0,
+						'in_qty' => 0,
+						'out_qty' => 0,
+						'qty' => 0,
+						'wqty' => 0,
+						'goods_opt' => $goods_opt,
+						'barcode' => $prd_cd,
+						'use_yn' => 'Y',
+						'rt' => now(),
+						'ut' => now()
+					]);
+				}else {
+					DB::rollback();
+					return response()->json(["code" => -1, "prd_cd" => $prd_cd]);
+				}
+
+			}
+		
+			DB::commit();
+			$code = 200;
+			$msg = "성공";
+		} catch (\Exception $e) {
+			DB::rollback();
+			$msg = $e->getMessage();
+			$code = 500;
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg]);
+	}
+
+	
 
 
 }

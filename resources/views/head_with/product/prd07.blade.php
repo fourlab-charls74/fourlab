@@ -51,12 +51,18 @@
             <span class="home"></span>
             <span>/ 일괄등록 {{$goods_nos}} </span>
         </div>
+        <div class="d-inline" style="float: right;">
+            <a href="javascript:void(0)" onclick="openBatchPopup();" class="btn btn-primary mr-1"><i class="bx bx-plus fs-16"></i>엑셀업로드</a>
+        </div>
     </div>
     <form method="get" name="f1">
         <div id="search-area" class="search_cum_form">
             <div class="card mb-3">
                 <div class="d-flex card-header justify-content-between">
                     <h4>일괄 등록 품목</h4>
+                </div>
+                <div>
+
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -433,9 +439,9 @@
             {field: "goods_nm_eng", headerName: "상품영문명", width: 230, editable: true, cellStyle: CELL_STYLE.EDIT},
             {headerName:"가격", editable: true, cellStyle: CELL_STYLE.EDIT,
                 children: [
-                    {field: "goods_sh", headerName: "시중가", type: 'currencyType', editable: true, cellStyle: CELL_STYLE.EDIT},
-                    {field: "price", headerName: "판매가", type: 'currencyType', editable: true, cellStyle: CELL_STYLE.EDIT},
-                    {field: "wonga", headerName: "원가", width: 60, type: 'currencyType', editable: true, cellStyle: CELL_STYLE.EDIT},
+                    {field: "goods_sh", headerName: "시중가", type: 'numberType', editable: true, cellStyle: CELL_STYLE.EDIT},
+                    {field: "price", headerName: "판매가", type: 'numberType', editable: true, cellStyle: CELL_STYLE.EDIT},
+                    {field: "wonga", headerName: "원가", width: 60, type: 'numberType', editable: true, cellStyle: CELL_STYLE.EDIT},
                     {field: "margin_rate", headerName: "마진율(%)", width:84, type: 'percentType'},
                 ]
             },
@@ -506,7 +512,16 @@
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
             let options = {
-                onCellValueChanged: params => onCellValueChanged(params),
+                onCellValueChanged: (e) => {
+                    onCellValueChanged(e);
+
+                    if (e.column.colId == "goods_sh" || e.column.colId == 'price' || e.column.colId == 'wonga') {
+                        if (isNaN(e.newValue) == true || e.newValue == "") {
+                            alert("숫자만 입력가능합니다.");
+                            gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                        }
+                    }
+                },
                 getRowNodeId: (data) => data.idx // 업데이터 및 제거를 위한 식별 ID 할당
             };
             gx = new HDGrid(gridDiv, columns, options);
@@ -515,15 +530,14 @@
         // 판매가 원가 작성할 때 마진율값 자동입력
         async function onCellValueChanged(params) {
             if (params.oldValue == params.newValue) return;
-            const row = params.data;
-
+            let row = params.data;
+                
             if (row.price != null && row.wonga != null ) row.margin_rate = ((row.price - row.wonga)/row.price)*100;
 
             await gx.gridOptions.api.applyTransaction({ 
-            update: [{...row}] 
-        });
+                update: [{...row}] 
+            });
         }
-
 
         /**
          * ag-grid utils
@@ -830,30 +844,6 @@
 
         const changeOptionUse = (obj) => {
             const used = obj.value;
-            // if (used == "N") {
-            //     $("input[name='option_kind1']").attr("disabled", true);
-            //     $("input[name='option_kind1']").attr("readonly", true);
-            //     $("input[name='option_kind1']").val("NONE");
-            //     $("input[name='chk_option_kind1']").attr("disabled", true);
-            //     $("input[name='chk_option_kind1']").attr("checked", false);
-            //     $("input[name='option_kind2']").attr("disabled", true);
-            //     $("input[name='option_kind2']").attr("readonly", true);
-            //     $("input[name='option_kind2']").val("NONE");
-            //     $("input[name='chk_option_kind2']").attr("disabled", true);
-            //     $("input[name='chk_option_kind2']").attr("checked", false);
-            // } else if (used == "Y") {
-            //     $("input[name='option_kind1']").attr("disabled", false);
-            //     $("input[name='option_kind1']").attr("readonly", false);
-            //     $("input[name='option_kind2']").attr("disabled", false);
-            //     $("input[name='option_kind2']").attr("readonly", false);
-            //     $("input[name='option_kind1']").val("사이즈");
-            //     $("input[name='option_kind1']").className = "input";
-            //     $("input[name='chk_option_kind1']").attr("disabled", false);
-            //     $("input[name='chk_option_kind1']").attr("checked", true);
-            //     $("input[name='option_kind2']").val("컬러");
-            //     $("input[name='chk_option_kind2']").attr("disabled", false);
-            //     $("input[name='chk_option_kind2']").attr("checked", true);
-            // }
 
             if (used == 'Y') {
                 $("input[name='option_kind1']").attr("disabled", false);
@@ -1038,18 +1028,6 @@
                 return false;
             }
 
-            // if (document.f1.rep_cat_cd.value == "") {
-            //     alert("대표카테고리를 입력해 주세요.");
-            //     popCategory('display');
-            //     return false;
-            // }
-
-            // if (document.f1.org_nm.value == "") {
-            //     alert("원산지를 입력해 주세요.");
-            //     document.f1.org_nm.focus();
-            //     return false;
-            // }
-
             if (document.f1.is_unlimited.value == "") {
                 alert("재고 수량 관리를 선택해 주세요.");
                 return false;
@@ -1125,18 +1103,27 @@
                     return false;
                 }
 
+                if (row.goods_nm_eng == undefined || row.goods_nm_eng == "") {
+                    stopEditing();
+                    alert("상품영문명을 입력해 주세요.");
+                    startEditingCell(row.idx, 'goods_nm_eng');
+                    return false;
+                }
+
+                if (row.goods_sh == undefined || row.goods_sh == "" || row.goods_sh <= 0 || !isNumVal(parseInt(row.goods_sh))) {
+                    stopEditing();
+                    alert("시중가를 입력해 주세요.");
+                    startEditingCell(row.idx, 'goods_sh');
+                    return false;
+                }
+
                 if (row.price == undefined || row.price == "" || row.price <= 0 || !isNumVal(parseInt(row.price))) {
                     stopEditing();
                     alert("판매가를 입력해 주세요.");
                     startEditingCell(row.idx, 'price');
                     return false;
                 }
-                if (row.margin_rate == undefined || row.margin_rate == "" || row.margin_rate <= 0) {
-                    stopEditing();
-                    alert("마진율을 입력해 주세요.");
-                    startEditingCell(row.idx, 'margin_rate');
-                    return false;
-                }
+               
                 if (row.wonga == undefined || row.wonga == "" || row.wonga <= 0) {
                     stopEditing();
                     alert("원가를 입력해 주세요.");
@@ -1151,27 +1138,32 @@
                     return false;
                 }
                 var a_opt_kind = row.option_kind.split("^");
+
                 if (a_opt_kind.length > 2) {
                     stopEditing();
                     alert("옵션구분은 최대 2개까지만 입력 가능합니다.\nex) 사이즈^컬러");
                     startEditingCell(row.idx, 'option_kind');
                     return false;
                 }
-                if ( row.option_kind.indexOf("^") > -1 ) {
-                    if (row.opt1 == "" ) {
+
+                if (a_opt_kind.length == 2) {
+                    if (row.opt1 == undefined || row.opt1 == '') {
                         stopEditing();
                         alert("옵션1 항목에 옵션값을 입력 하십시오.");
                         startEditingCell(row.idx, 'opt1');
                         return false;
                     }
-                    if (row.opt2 == "" ) {
+    
+                    if (row.opt2 == undefined || row.opt2 == '') {
+                        stopEditing();
                         alert("옵션2 항목에 옵션값을 입력 하십시오.");
+                        startEditingCell(row.idx, 'opt2');
                         return false;
                     }
-                } else {
-                    if (row.opt1 == undefined || row.opt1 == "" ) {
+                } else if (a_opt_kind.length == 1 && row.option_kind != "NONE") {
+                    if (row.opt1 == undefined || row.opt1 == '') {
                         stopEditing();
-                        alert("옵션을 입력해 주세요.");
+                        alert("옵션1 항목에 옵션값을 입력 하십시오.");
                         startEditingCell(row.idx, 'opt1');
                         return false;
                     }
@@ -1308,6 +1300,12 @@
 
         //     return row;
         // };
+
+        // 상품관리-일괄등록 엑셀업로드 팝업 오픈
+		const openBatchPopup = () => {
+			const url = '/head/product/prd07/batch';
+			window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=800");
+		}
 
 </script>
 
