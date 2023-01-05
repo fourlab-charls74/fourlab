@@ -1,5 +1,5 @@
 @extends('head_with.layouts.layout-nav')
-@section('title','상품코드 일괄 등록')
+@section('title','상품코드 일괄 매칭')
 @section('content')
 
 <script src="https://unpkg.com/xlsx-style@0.8.13/dist/xlsx.full.min.js"></script>
@@ -7,7 +7,7 @@
 <div class="show_layout py-3 px-sm-3">
 	<div class="page_tit d-flex justify-content-between">
 		<div class="d-flex">
-			<h3 class="d-inline-flex">상품코드 일괄 등록</h3>
+			<h3 class="d-inline-flex">상품코드 일괄 매칭</h3>
 			<div class="d-inline-flex location">
 				<span class="home"></span>
 				<span>/ 상품관리</span>
@@ -160,14 +160,11 @@
 				data : JSON.stringify(GridData),
 			},
 			success: function (data) {
-				if( data.code == "200" )
-				{
+				if( data.code == "200" ){
 					alert("상품 매칭 데이터가 등록되었습니다.");
 					window.opener.Search();
 					self.close();
-				} 
-				else 
-				{
+				}else{
 					alert("데이터 등록이 실패하였습니다.");
 				}
 			},
@@ -237,7 +234,6 @@
 
 			rowData.push(row);
 
-
 			rowIndex++;
 		}
 
@@ -268,7 +264,7 @@
 					file = res.file;
 					//alert(file);
 					importExcel("/" + file);
-				} else {
+				}else{
 					alert('엑셀 파일 업로드 오류 입니다[1].');
 					console.log(res.errmsg);
 				}

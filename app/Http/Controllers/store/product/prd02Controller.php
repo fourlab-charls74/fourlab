@@ -498,6 +498,7 @@ class prd02Controller extends Controller
 				DB::table('product_code')
 					->insert([
 						'prd_cd'	=> $prd_cd,
+						'prd_cd_p'	=> $prd_cd1,
 						'goods_no'	=> $goods_no,
 						'goods_opt'	=> $goods_opt,
 						'brand'		=> $brand,
@@ -1014,7 +1015,7 @@ class prd02Controller extends Controller
 			$sql	= " delete from product_stock where prd_cd = :prd_cd ";
 			DB::delete($sql,['prd_cd' => $prd_cd]);
 	
-			if( substr($prd_cd, 0 , 2) != "HR" ){
+			if( substr($prd_cd, 0 , 2) != "HR" || substr($prd_cd, 0 , 2) != "TR" ){
 				$cd_cut_cnt	= "1";
 	
 				if( strlen($prd_cd) == 13 )	$size_cnt = 3;
@@ -1034,10 +1035,13 @@ class prd02Controller extends Controller
 			$opt	= substr($prd_cd, ($cd_cut_cnt+8), 2); 
 			$seq	= substr($prd_cd, ($cd_cut_cnt+6), 2); 
 			$color	= substr($prd_cd, ($cd_cut_cnt+10), 2); 
+
+			$prd_cd_p	= $brand . $year . $season . $gender . $item . $seq . $opt;
 	
 			DB::table('product_code')
 				->insert([
 					'prd_cd'	=> $prd_cd,
+					'prd_cd_p'	=> $prd_cd_p,
 					'goods_no'	=> $goods_no,
 					'goods_opt'	=> $goods_opt,
 					'brand'		=> $brand,
@@ -1194,22 +1198,25 @@ class prd02Controller extends Controller
 					$unique_img_name = $prd_cd . $seq;
 
 					$img_url = ULib::uploadBase64img($save_path, $base64_src, $unique_img_name);
+
+					$prd_cd_p	= $brand[0] . $year[0] . $season[0] . $gender[0] . $item[0] . $seq . $opt[0];
 		
 					DB::table('product_code')->insert([
-						'prd_cd' => $prd_cd,
-						'seq' => $seq,
-						'goods_no' => $goods_no,
+						'prd_cd'	=> $prd_cd,
+						'prd_cd_p'	=> $prd_cd_p,
+						'seq'		=> $seq,
+						'goods_no'	=> $goods_no,
 						'goods_opt'	=> $goods_opt,
-						'brand' => $brand[0],
-						'year' => $year[0],
-						'season' => $season[0],
-						'gender' => $gender[0],
-						'item' => $item[0],
-						'opt' => $opt[0],
-						'color' => $color[0],
-						'size' => $size[0],
-						'rt' => now(),
-						'ut' => now(),
+						'brand'		=> $brand[0],
+						'year'		=> $year[0],
+						'season'	=> $season[0],
+						'gender'	=> $gender[0],
+						'item'		=> $item[0],
+						'opt'		=> $opt[0],
+						'color'		=> $color[0],
+						'size'		=> $size[0],
+						'rt'		=> now(),
+						'ut'		=> now(),
 						'admin_id'	=> $admin_id
 					]);
 					
@@ -1550,35 +1557,36 @@ class prd02Controller extends Controller
 				if ($result->count == 0) {
 
 					DB::table('product')->insert([
-						'prd_cd' => $prd_cd,
-						'prd_nm' => $goods_nm,
-						'prd_nm_eng' => $goods_nm_eng,
-						'style_no' => $style_no,
-						'price' => $price,
-						'wonga' => $wonga,
-						'tag_price' => $tag_price,
-						'com_id' => $sup_com,
-						'unit' => $unit,
-						'rt' => now(),
-						'ut' => now(),
-						'admin_id' => $admin_id
+						'prd_cd'		=> $prd_cd,
+						'prd_nm'		=> $goods_nm,
+						'prd_nm_eng'	=> $goods_nm_eng,
+						'style_no'		=> $style_no,
+						'price'			=> $price,
+						'wonga'			=> $wonga,
+						'tag_price'		=> $tag_price,
+						'com_id'		=> $sup_com,
+						'unit'			=> $unit,
+						'rt'			=> now(),
+						'ut'			=> now(),
+						'admin_id'		=> $admin_id
 					]);
 
 					DB::table('product_code')->insert([
-						'prd_cd' => $prd_cd,
-						'seq' => $seq,
-						'goods_no' => $goods_no,
+						'prd_cd'	=> $prd_cd,
+						'prd_cd_p'	=> $prd_cd_p,
+						'seq'		=> $seq,
+						'goods_no'	=> $goods_no,
 						'goods_opt'	=> $goods_opt,
-						'brand' => $brand,
-						'year' => $year,
-						'season' => $season,
-						'gender' => $gender,
-						'item' => $item,
-						'opt' => $opt_kind_nm,
-						'color' => $color,
-						'size' => $size,
-						'rt' => now(),
-						'ut' => now(),
+						'brand'		=> $brand,
+						'year'		=> $year,
+						'season'	=> $season,
+						'gender'	=> $gender,
+						'item'		=> $item,
+						'opt'		=> $opt_kind_nm,
+						'color'		=> $color,
+						'size'		=> $size,
+						'rt'		=> now(),
+						'ut'		=> now(),
 						'admin_id'	=> $admin_id
 					]);
 					
