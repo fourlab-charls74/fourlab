@@ -421,6 +421,8 @@
         {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {'text-align': 'center'}},
         {field: "goods_no", headerName: "상품번호", width: 70, cellStyle: {'text-align': 'center'}},
         {field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: {'text-align': 'center'}},
+        {field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, surl:"{{config('shop.front_url')}}"},
+        {field: "img", headerName: "이미지_url"},
         {field: "goods_nm", headerName: "상품명", width: 150, type: "HeadGoodsNameType"},
         {field: "goods_nm_eng", headerName: "상품명(영문)", width: 150},
         {field: "prd_cd_p", headerName: "코드일련", width: 90, cellStyle: {"text-align": "center"}},

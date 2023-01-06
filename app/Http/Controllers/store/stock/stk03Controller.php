@@ -16,15 +16,21 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Exception;
+use PDO;
 
 class stk03Controller extends Controller
 {
     public function index()
 	{
+
+        $conf = new Conf();
+		$domain		= $conf->getConfigValue("shop", "domain");
+
 		$values = [
             'sdate'             => now()->sub(1, 'month')->format('Y-m-d'),
             'edate'             => date("Y-m-d"),
             'style_no'          => '',
+            'domain'		    => $domain,
             'ord_states'        => SLib::getordStates(), // 주문상태
             'clm_states'        => SLib::getCodes('G_CLM_STATE'), // 클레임상태
             'stat_pay_types'    => SLib::getCodes('G_STAT_PAY_TYPE'), // 결제방법
@@ -215,6 +221,9 @@ class stk03Controller extends Controller
         $startno = ($page - 1) * $page_size;
         $limit = " limit $startno, $page_size ";
 
+        $cfg_img_size_real	= "a_500";
+		$cfg_img_size_list	 = "s_50";
+
         $sql = "
             select
                 a.ord_no,
@@ -231,6 +240,7 @@ class stk03Controller extends Controller
                 a.prd_cd_p,
                 a.color,
                 a.size,
+                a.img,
                 replace(a.goods_opt, '^', ' : ') as opt_val,
                 a.qty,
                 concat(a.user_nm, ' (', a.user_id, ')') as user_nm,
@@ -278,6 +288,11 @@ class stk03Controller extends Controller
                     o.goods_nm,
                     o.goods_opt,
                     concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p,
+                    if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
+                        select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
+                        from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
+                    )) as img,
+                    '' as img_view,
                     pc.color,
                     pc.size,
                     o.qty,
@@ -331,7 +346,20 @@ class stk03Controller extends Controller
                 left outer join code pr_code on (pr_code.code_id = a.pr_code and pr_code.code_kind_cd = 'PR_CODE')
                 left outer join sale_type st on st.sale_kind = a.sale_kind and st.use_yn = 'Y'
         ";
-        $result = DB::select($sql);
+        // $result = DB::select($sql);
+
+        $pdo	= DB::connection()->getPdo();
+		$stmt	= $pdo->prepare($sql);
+		$stmt->execute();
+		$result	= [];
+		while($row2 = $stmt->fetch(PDO::FETCH_ASSOC))
+		{
+			if($row2["img"] != ""){
+				$row2["img"] = sprintf("%s%s",config("shop.image_svr"), $row2["img"]);
+			}
+
+			$result[] = $row2;
+		}
 
         // pagination
         $total = 0;

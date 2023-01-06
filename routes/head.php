@@ -364,6 +364,7 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         // 상품관리 - 일괄등록
         Route::get('prd07', 'prd07Controller@index');
         Route::post('prd07/enroll', 'prd07Controller@enroll');
+        Route::post('prd07/enroll2', 'prd07Controller@enroll2');
         Route::get('prd07/batch', 'prd07Controller@batch_show');
         Route::post('prd07/batch-import', 'prd07Controller@import_excel');
         Route::post('prd07/batch-getproducts','prd07Controller@get_products'); 

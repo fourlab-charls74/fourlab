@@ -92,12 +92,7 @@
         OK: { 'background': 'rgb(200,200,255)' },
         FAIL: { 'background': 'rgb(255,200,200)' }
     };
-    const resultStyle = (params) => {
-        let STYLE = {...DEFAULT_STYLE, 'text-align': 'center'};
-        if (params.data.result == undefined) return STYLE;
-        if (params.data.result == '100' || params.data.result == '0') return STYLE = {...STYLE, ...CELL_STYLE.FAIL} // 중복된 스타일 넘버거나 시스템 에러
-        if (params.data.result) return STYLE = {...STYLE, ...CELL_STYLE.OK} // 성공
-    };
+  
     const pinnedRowData = [{ prd_cd: '합계', qty: 0, total_return_price: 0 }];
 
     let columns= [
@@ -107,18 +102,18 @@
             {field: "brand", headerName: "브랜드", pinned: 'left'},
             {field: "rep_cat_cd", headerName: "대표카테고리", width: 100, pinned: 'left'},
             {field: "u_cat_cd", headerName: "용도카테고리", width: 100, pinned: 'left'},
-            {field: "style_no", headerName: "스타일넘버", width: 120, pinned: 'left', editable: true, cellStyle: CELL_STYLE.EDIT},
-            {field: "goods_nm", headerName: "상품명", width: 230, pinned: 'left', editable: true, cellStyle: CELL_STYLE.EDIT},
-            {field: "goods_nm_eng", headerName: "상품영문명", width: 230, editable: true, cellStyle: CELL_STYLE.EDIT},
-            {headerName:"가격", editable: true, cellStyle: CELL_STYLE.EDIT,
+            {field: "style_no", headerName: "스타일넘버", width: 120, pinned: 'left'},
+            {field: "goods_nm", headerName: "상품명", width: 230, pinned: 'left'},
+            {field: "goods_nm_eng", headerName: "상품영문명", width: 230},
+            {headerName:"가격",
                 children: [
-                    {field: "goods_sh", headerName: "시중가", type: 'currencyType', editable: true, cellStyle: CELL_STYLE.EDIT},
-                    {field: "price", headerName: "판매가", type: 'currencyType', editable: true, cellStyle: CELL_STYLE.EDIT},
-                    {field: "wonga", headerName: "원가", width: 60, type: 'currencyType', editable: true, cellStyle: CELL_STYLE.EDIT},
+                    {field: "goods_sh", headerName: "시중가", type: 'currencyType'},
+                    {field: "price", headerName: "판매가", type: 'currencyType'},
+                    {field: "wonga", headerName: "원가", width: 60, type: 'currencyType'},
                     {field: "margin_rate", headerName: "마진율(%)", width:84, type: 'percentType'},
                 ]
             },
-            {headerName:"상품옵션", editable: true, cellStyle: CELL_STYLE.EDIT,
+            {headerName:"상품옵션",
                 children: [
                     {field: "option_kind", headerName: "옵션구분", width: 200},
                     {field: "opt1", headerName: "옵션1", width: 200,
@@ -137,12 +132,12 @@
                             }
                         }
                     },
-                    {field: "opt_qty", headerName: "수량", editable: true, cellStyle: CELL_STYLE.EDIT},
-                    {field: "opt_price", headerName: "옵션가격", width: 200, editable: true, cellStyle: CELL_STYLE.EDIT},
+                    {field: "opt_qty", headerName: "수량"},
+                    {field: "opt_price", headerName: "옵션가격", width: 200},
                 ]
             },
-            {field: "head_desc", headerName: "상단홍보글", editable: true, cellStyle: CELL_STYLE.EDIT},
-            {field: "ad_desc", headerName: "하단홍보글", editable: true, cellStyle: CELL_STYLE.EDIT},
+            {field: "head_desc", headerName: "상단홍보글"},
+            {field: "ad_desc", headerName: "하단홍보글"},
             {field: "dlv_pay_type", headerName: "배송비지불"},
             {field: "dlv_fee_cfg", headerName: "배송비설정"},
             {field: "bae_yn", headerName: "배송비여부"},
@@ -159,15 +154,15 @@
             {field: "org_nm", headerName: "원산지"},
             {field: "md_nm", headerName: "MD"},
             {field: "make", headerName: "제조사"},
-            {field: "goods_cont", headerName: "상품상세", width: 240, editable: true, cellStyle: CELL_STYLE.EDIT},
-            {field: "spec_desc", headerName: "제품사양", editable: true, cellStyle: CELL_STYLE.EDIT},
-            {field: "baesong_desc", headerName: "예약/배송", editable: true, cellStyle: CELL_STYLE.EDIT},
-            {field: "opinion", headerName: "MD상품평", editable: true, cellStyle: CELL_STYLE.EDIT},
+            {field: "goods_cont", headerName: "상품상세", width: 240},
+            {field: "spec_desc", headerName: "제품사양"},
+            {field: "baesong_desc", headerName: "예약/배송"},
+            {field: "opinion", headerName: "MD상품평"},
             {field: "is_unlimited", headerName: "무한재고여부"},
             {field: "restock_yn", headerName: "재입고알림"},
             {field: "tax_yn", headerName: "과세구분"},
-            {field: "goods_location", headerName: "상품위치", editable: true, cellStyle: CELL_STYLE.EDIT},
-            {field: "tags", headerName: "상품태그", editable: true, cellStyle: CELL_STYLE.EDIT},
+            {field: "goods_location", headerName: "상품위치"},
+            {field: "tags", headerName: "상품태그"},
             {field: "com_type", hide: true},
             {field: "", headerName: "", width: "auto"}
         ];
@@ -216,23 +211,6 @@
         await gx.gridOptions.api.applyTransaction({ 
             update: [{...row}] 
         });
-    }
-
-    // 엑셀업로드 선택한 행 삭제 기능
-    function onRemoveSelected() {
-        let selectedData = gx.getSelectedRows();
-
-        if (selectedData.length > 0) {
-            if (confirm('해당 상품을 삭제하시겠습니까?')){
-                for(let i = 0; i < selectedData.length; i++){
-                        gx.gridOptions.api.applyTransaction({ remove: [selectedData[i]] });
-                }
-            }
-        } else {
-            selectedData = {};
-            alert('삭제할 상품을 선택해주세요.');
-        }
-
     }
 
     const validateFile = () => {
@@ -336,7 +314,7 @@
             'AN': 'tags',
 		};
 
-        var firstRowIndex = 16; // 엑셀 16행부터 시작 (샘플데이터 참고)
+        var firstRowIndex = 33; // 엑셀 33행부터 시작 (샘플데이터 참고)
 		var rowIndex = firstRowIndex; 
 
         let count = gx.gridOptions.api.getDisplayedRowCount();
@@ -353,7 +331,7 @@
             rowIndex++;
 		}
 
-        if(rows.length < 1) return alert("한 개 이상의 상품정보를 입력해주세요.");
+        // if(rows.length < 1) return alert("한 개 이상의 상품정보를 입력해주세요.");
         await getProducts(rows, firstRowIndex);
 	};
     
@@ -417,45 +395,18 @@
         });
     };
 
-    // function save() {
-    //         let rows = gx.getSelectedRows();
-
-    //         if(rows.length < 1) return alert("일괄등록할 상품을 선택해주세요.");
-
-
-    //         if(!confirm("선택한 상품을 등록하시겠습니까?")) return;
-
-    //         const data = {
-    //             products: rows
-    //         };
-
-    //         axios({
-    //             url: '/haed/product/prd07/batch-products',
-    //             method: 'post',
-    //             data: data,
-    //         }).then(function (res) {
-    //             if(res.data.code === 200) {
-    //                     alert('상품일괄등록에 성공하였습니다.');
-    //                     window.close();
-    //             } else {
-    //                 console.log(res.data);
-    //                 alert("상품일괄등록 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-    //             }
-    //         }).catch(function (err) {
-    //             console.log(err);
-    //         });
-    //     }
-
     const save = () => { // 일괄 등록
+        // if (validation()) {
             const data = gx.getRows();
             insertDB(data);
-        };
+        // };
+    };
 
     const insertDB = async (data) => {
         for (let i = 0; i < data.length; i++) {
             let row = data[i];
             const response = await axios({
-                url: '/head/product/prd07/enroll',
+                url: '/head/product/prd07/enroll2',
                 method: 'post',
                 data: { row: row }
             });
@@ -465,10 +416,22 @@
         }
     };
 
+    const getRowNode = (row) => {
+        return gx.gridOptions.api.getRowNode(row.idx);
+    };
+
     const updateRow = (row) => {
         gx.gridOptions.api.applyTransaction({remove : [{...row}]});
         gx.gridOptions.api.applyTransaction({add : [{...row}]});
     };
+
+    const resultStyle = (params) => {
+        let STYLE = {...DEFAULT_STYLE, 'text-align': 'center'};
+        if (params.data.result == undefined) return STYLE;
+        if (params.data.result == '100' || params.data.result == '0') return STYLE = {...STYLE, ...CELL_STYLE.FAIL} // 중복된 스타일 넘버거나 시스템 에러
+        if (params.data.result) return STYLE = {...STYLE, ...CELL_STYLE.OK} // 성공
+    };
+
 
 </script>
 @stop
