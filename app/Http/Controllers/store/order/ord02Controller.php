@@ -47,6 +47,9 @@ class ord02Controller extends Controller
 
 	public function search(Request $request)
 	{
+
+		$page = $request->input('page', 1);
+		$limit = $request->input('limit', 100);
 		// $sdate = $request->input('sdate', Carbon::now()->sub(1, 'week')->format("Ymd"));
 		// $edate = $request->input('edate', Carbon::now()->format("Ymd"));
 		// $sdate = str_replace('-', '', $sdate);
@@ -98,7 +101,12 @@ class ord02Controller extends Controller
 		// }
 		// if ($item != '') $where2 .= " and g.opt_kind_cd = '$item' ";
 
+		// pagination
+		$page_size = $limit;
+		$startno = ($page - 1) * $page_size;
+		$limit = " limit $startno, $page_size ";
 
+		// get list
 		$dlv_locations_sql = "
 			(select 'storage' as location_type, storage_cd as location_cd, storage_nm as location_nm, if(online_yn = 'Y', 0, 1) as seq from storage where online_yn = 'Y' or default_yn = 'Y')
 			union all
@@ -177,12 +185,45 @@ class ord02Controller extends Controller
 		";
 		$result = DB::select($sql);
 
-		return response()->json([
-			'code'	=> 200,
-			'head'	=> [
-				'total'	=> count($result)
-			],
-			'body' => $result
-		]);
+		// pagination
+		$total = 0;
+		$page_cnt = 0;
+		if($page == 1) {
+			$sql = "
+				select count(*) as total
+				from order_opt o
+					inner join order_mst m on m.ord_no = o.ord_no
+					inner join goods g on g.goods_no = o.goods_no
+				where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
+					and o.clm_state in (-30,1,90,0)
+					and o.ord_date >= '2022-01-01 00:00:00' and o.ord_date <= now()
+					-- and o.ord_no like '202201%'
+					and o.ord_state = 10
+					-- 입금상태
+					-- and o.sale_place = ''
+					-- 주문정보
+					-- 결제방법
+					-- and o.sale_kind = ''
+					-- 상품 공급업체
+					-- 상품코드 / 스타일넘버 / 상품번호 / 품목 / 브랜드 / 상품옵션 / 상품명 / 상품명영문
+					-- and (o.goods_no = '130658' or o.goods_no = '130976')
+			";
+
+			$row = DB::selectOne($sql);
+			$total = $row->total;
+			$page_cnt = (int)(($total - 1) / $page_size) + 1;
+		}
+
+        return response()->json([
+            "code" => 200,
+            "head" => [
+                "total" => $total,
+                "page" => $page,
+                "page_cnt" => $page_cnt,
+                "page_total" => count($result),
+				"dlv_locations" => $dlv_locations
+            ],
+            "body" => $result,
+        ]);
 	}
 }

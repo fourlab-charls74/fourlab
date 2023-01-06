@@ -486,7 +486,7 @@ HDGrid.prototype._Request = function(callback) {
                     _gx.total = _total;
                     _gx.gridOptions.api.setRowData(res.body);
                     _gx.page = parseInt(res.head.page) + 1;
-                    const rows = numberWithCommas(_gx.gridOptions.rollup ? _gx.getChildRowCount() : _gx.gridOptions.api.getDisplayedRowCount());
+                    const rows = numberWithCommas(_gx.gridOptions.rollup ? _gx.getRowCountForLevel(_gx.gridOptions.rollupCountLevel || -1) : _gx.gridOptions.api.getDisplayedRowCount());
                     $("#" + _gx.gridTotal).text(rows + ' / ' + numberWithCommas(_total));
 
                 } else {
@@ -496,7 +496,7 @@ HDGrid.prototype._Request = function(callback) {
                         //console.log('total ' + _total);
                         const ret = _gx.gridOptions.api.applyTransaction({ add: res.body });
                         _gx.page = parseInt(res.head.page) + 1;
-                        const rows = numberWithCommas(_gx.gridOptions.rollup ? _gx.getChildRowCount() : _gx.gridOptions.api.getDisplayedRowCount());
+                        const rows = numberWithCommas(_gx.gridOptions.rollup ? _gx.getRowCountForLevel(_gx.gridOptions.rollupCountLevel || -1) : _gx.gridOptions.api.getDisplayedRowCount());
                         $("#" + _gx.gridTotal).text(rows + ' / ' + numberWithCommas(_gx.total));
                     }
                 }
@@ -689,7 +689,7 @@ HDGrid.prototype.getRowNode = function (id) {
 };
 
 HDGrid.prototype.getRowCount = function () {
-    return this.gridOptions.rollup ? this.getChildRowCount() : this.gridOptions.api.getDisplayedRowCount();
+    return this.gridOptions.rollup ? this.getRowCountForLevel(this.gridOptions.rollupCountLevel || -1) : this.gridOptions.api.getDisplayedRowCount();
 };
 
 HDGrid.prototype.setRows = function (rows) {
@@ -707,11 +707,15 @@ HDGrid.prototype.deleteRows = function (rows) {
     return this.setRows([]);
 };
 
-// 최유현 - 롤업 시 child row의 count 조회
-HDGrid.prototype.getChildRowCount = function () {
+// 최유현 - 롤업 시 level param row의 count 조회
+HDGrid.prototype.getRowCountForLevel = function (level = 1) {
     var cnt = 0;
     this.gridOptions.api.forEachNode(function(node) {
-        if (node.data) cnt++;
+        if (level < 0) {
+            if (node.data) cnt++;
+        } else {
+            if (node.level === level - 1) cnt++;
+        }
     });
     return cnt;
 };

@@ -347,9 +347,11 @@
 </div>
 
 <script language="javascript">
+    let dlv_locations = [];
+
     let columns = [
-        // {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 28},
-        {field: "ord_no", headerName: "주문번호", pinned: 'left', width: 130,
+        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: (params) => params.node.level === 0, headerCheckboxSelection: true, sort: null, width: 28},
+        {field: "ord_no", headerName: "주문번호", pinned: 'left', width: 135,
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
             cellRenderer: (params) => {
                 if (params.node.level != 0) return '';
@@ -432,8 +434,9 @@
                 }
             },
         @endforeach
-        {field: "dlv_place", headerName: "배송처", width: 130},
-        {field: "comment", headerName: "접수메모", width: 120, editable: true, cellStyle: {'background-color': '#ffff99'}},
+        {field: "dlv_place_cd", headerName: "배송처코드", hide: true},
+        {field: "dlv_place", headerName: "배송처", width: 130, editable: true, cellStyle: (params) => ({'background-color': params.node.level == 0 ? '#ffff99' : params.node.level == 1 ? '#eeeeee' : 'none'})},
+        {field: "comment", headerName: "접수메모", width: 120, editable: true, cellStyle: (params) => ({'background-color': params.node.level == 0 ? '#ffff99' : params.node.level == 1 ? '#eeeeee' : 'none'})},
         {field: "user_nm", headerName: "주문자(아이디)", width: 120, cellStyle: {'text-align': 'center'},
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
@@ -526,11 +529,58 @@
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns, {
+            defaultColDef: {
+                suppressMenu: true,
+                resizable: false,
+                autoHeight: true,
+                suppressSizeToFit: false,
+                sortable:true,
+            },
             rollup: true,
+            rollupCountLevel: 1,
 			groupSuppressAutoColumn: true,
             groupDefaultExpanded: 1, // 0: close, 1: open
 			suppressAggFuncInHeader: true,
 			animateRows: true,
+            onCellValueChanged: (e) => {
+                if (e.column.colId === "dlv_place") {
+                    let arr = dlv_locations.filter(s => s.location_nm === e.newValue);
+                    if(arr.length > 0) {
+                        e.data.dlv_place_cd = arr[0].location_cd;
+                        if (e.node.parent.level >= 0) {
+                            e.node.parent.allLeafChildren
+                                .filter(c => c.data?.prd_cd !== e.data.prd_cd)
+                                .forEach(c => {
+                                    c.setDataValue('dlv_place', null);
+                                    c.setDataValue('dlv_place_cd', null);
+                                });
+
+                            e.node.parent.aggData.dlv_place = arr[0].location_nm;
+                            e.node.parent.aggData.dlv_place_cd = arr[0].location_cd;
+                            e.node.parent.aggData.comment = e.node.data.comment;
+                            e.api.redrawRows({ rowNodes:[e.node, e.node.parent] });
+                        } else {
+                            e.api.redrawRows({ rowNodes:[e.node] });
+                        }
+                    }
+                    e.node.data.goods_no_group === null ? e.node.setSelected(true) : e.node.parent.setSelected(true);
+                }
+                if (e.column.colId === "comment") {
+                    if (e.node.parent.level >= 0) {
+                        // let children = e.node.parent.allLeafChildren.filter(c => c.data?.prd_cd !== e.data.prd_cd);
+                        // gx.gridOptions.api.applyTransaction({ update: children.map(c => ({...c.data, comment: null})) });
+
+                        e.node.parent.aggData.comment = e.newValue;
+                        e.node.parent.aggData.dlv_place = e.node.data.dlv_place;
+                        e.node.parent.aggData.dlv_place_cd = e.node.data.dlv_place_cd;
+                        e.api.redrawRows({ rowNodes:[e.node.parent] });
+                    }
+                    e.node.data.goods_no_group === null ? e.node.setSelected(true) : e.node.parent.setSelected(true);
+                }
+            },
+            isRowSelectable: (params) => {
+                return params.aggData || params.data?.goods_no_group === null;
+            },
         });
 
 		Search();
@@ -538,7 +588,26 @@
 	
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/store/order/ord02/search', data, 1);
+		gx.Request('/store/order/ord02/search', data, 1, function(d) {
+            dlv_locations = d.head.dlv_locations;
+            setDlvPlaceListOptions(d.head.dlv_locations);
+        });
+	}
+
+    // 배송처 초기화
+    function setDlvPlaceListOptions(places) {
+        let dlv_places = columns.map(c => c.field === 'dlv_place' ? ({
+            ...c, 
+            cellEditorSelector: function(params) {
+                return {
+                    component: 'agRichSelectCellEditor',
+                    params: { 
+                        values: places.map(s => s.location_nm)
+                    },
+                };
+            },
+        }) : c);
+        gx.gridOptions.api.setColumnDefs(dlv_places);
 	}
 
     // 주문접수
