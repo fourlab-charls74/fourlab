@@ -434,6 +434,7 @@
                 }
             },
         @endforeach
+        {field: "dlv_place_type", headerName: "배송처타입", hide: true},
         {field: "dlv_place_cd", headerName: "배송처코드", hide: true},
         {field: "dlv_place", headerName: "배송처", width: 130, editable: true, cellStyle: (params) => ({'background-color': params.node.level == 0 ? '#ffff99' : params.node.level == 1 ? '#eeeeee' : 'none'})},
         {field: "comment", headerName: "접수메모", width: 120, editable: true, cellStyle: (params) => ({'background-color': params.node.level == 0 ? '#ffff99' : params.node.level == 1 ? '#eeeeee' : 'none'})},
@@ -557,6 +558,9 @@
 
                             e.node.parent.aggData.dlv_place = arr[0].location_nm;
                             e.node.parent.aggData.dlv_place_cd = arr[0].location_cd;
+                            e.node.parent.aggData.dlv_place_type = arr[0].location_type;
+                            e.node.parent.aggData.prd_cd = e.node.data.prd_cd;
+                            e.node.parent.aggData.prd_cd_p = e.node.data.prd_cd_p;
                             e.node.parent.aggData.comment = e.node.data.comment;
                             e.api.redrawRows({ rowNodes:[e.node, e.node.parent] });
                         } else {
@@ -573,6 +577,9 @@
                         e.node.parent.aggData.comment = e.newValue;
                         e.node.parent.aggData.dlv_place = e.node.data.dlv_place;
                         e.node.parent.aggData.dlv_place_cd = e.node.data.dlv_place_cd;
+                        e.node.parent.aggData.dlv_place_type = e.node.data.dlv_place_type;
+                        e.node.parent.aggData.prd_cd = e.node.data.prd_cd;
+                        e.node.parent.aggData.prd_cd_p = e.node.data.prd_cd_p;
                         e.api.redrawRows({ rowNodes:[e.node.parent] });
                     }
                     e.node.data.goods_no_group === null ? e.node.setSelected(true) : e.node.parent.setSelected(true);
@@ -612,7 +619,41 @@
 
     // 주문접수
     function receiptOrder() {
-        console.log("주문접수");
+        let rows = [];
+        gx.gridOptions.api.forEachNode(function(node) {
+            if ((node.aggData || node.data?.goods_no_group === null) && node.selected) {
+                rows.push(node.aggData || node.data);
+            }
+        });
+
+        // 수량보다 재고가 많은지 체크 필요
+        // 출고보류 주문은 출고처리중 변경 불가 처리
+        // 출고요청상태가 아닌 주문은 처리 불가
+
+        if(rows.length < 1) return alert("접수할 주문건을 선택해주세요.");
+        if(!confirm("선택한 주문건을 접수하시겠습니까?")) return;
+
+        console.log(rows);
+
+        axios({
+            url: '/store/order/ord02/receipt',
+            method: 'post',
+            data: { 
+                rel_order: $("#exp_rel_order").val(),
+                data: rows
+            },
+        }).then(function (res) {
+            console.log(res);
+            if(res.data.code === 200) {
+                // alert(res.data.msg);
+                // location.href = "/store/stock/stk20";
+            } else {
+                console.log(res.data);
+                alert("온라인주문접수 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
     }
 </script>
 @stop

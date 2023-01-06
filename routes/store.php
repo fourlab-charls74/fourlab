@@ -453,6 +453,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 온라인 주문접수
         Route::get('ord02','ord02Controller@index');
         Route::get('ord02/search','ord02Controller@search');
+        Route::post('ord02/receipt','ord02Controller@receipt');
 
         // 온라인 배송처리
         Route::get('ord03','ord03Controller@index');

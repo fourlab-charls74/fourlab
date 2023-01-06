@@ -5,6 +5,7 @@ namespace App\Http\Controllers\store\order;
 use App\Http\Controllers\Controller;
 use App\Components\Lib;
 use App\Components\SLib;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -225,5 +226,104 @@ class ord02Controller extends Controller
             ],
             "body" => $result,
         ]);
+	}
+
+	public function receipt(Request $request)
+	{
+		$user = [
+			'id'	=> Auth('head')->user()->id,
+			'name'	=> Auth('head')->user()->name
+		];
+		$ord_state = 20; // 출고처리중
+		$onoff_type = 'ON'; // 온라인/오프라인 타입 (온라인주문접수 메뉴에서 온라인으로 고정)
+		$rel_order = $request->input('rel_order', '');
+		$rows = $request->input('data', []);
+		$failed_rows = [];
+
+		try {
+            DB::beginTransaction();
+
+			$order = new Order($user);
+
+			// 신규형식 출고차수 설정
+			$rel_order = date('ymd') . "-" . $rel_order; // 신규형식 (000000-온라인01)
+			
+			// 구형식 출고차수 설정
+			$dlv_series_no = date('YmdH'); // 구형식 (0000000000)
+			$sql = "
+				select
+					dlv_series_no
+				from order_dlv_series
+				where dlv_day >= date_format(date_sub(now(),interval 1 day),'%Y%m%d')
+					and dlv_series_nm = '$dlv_series_no'
+				order by dlv_series_no desc limit 0,1
+			";
+			$series_row	= DB::selectOne($sql);
+			if ($series_row) {
+				$dlv_series_no = $row->dlv_series_no;
+			} else {
+				$dlv_series_no = DB::table('order_dlv_series')->insertGetId([
+					'dlv_series_nm'	=> $dlv_series_no,
+					'dlv_day'		=> date('Ymd'),
+					'regi_date'		=> now()
+				]);
+			}
+
+			// 온라인주문접수 등록
+			$or_cd = DB::table('order_receipt')->insertGetId([
+				'type' => $onoff_type,
+				'rel_order' => $rel_order,
+				'req_rt' => now(),
+				'req_id' => $user['id'],
+			]);
+			
+			foreach ($rows as $row) {
+				if (!isset($row['ord_no']) || !isset($row['ord_opt_no'])) {
+					array_push($failed_rows, $row['ord_no']);
+					continue;
+				}
+				$order->SetOrdOptNo($row['ord_opt_no'], $row['ord_no']);
+
+				// 재고검사 - 수정필요
+				if (true) {
+					// 출고처리중 처리
+					$state_log = [
+						'ord_no' => $row['ord_no'], 
+						'ord_state' => $ord_state, 
+						'comment' => "배송출고요청(온라인주문접수)", 
+						'admin_id' => $user['id'], 
+						'admin_nm' => $user['name']
+					];
+					$order->AddStateLog($state_log);
+					// order_opt 에 출고차수가 신규형식으로 들어가는지, 구형식으로 들어가는지 논의 필요
+					$order->DlvProc($dlv_series_no, $ord_state);
+
+					// 온라인주문접수 상품리스트 등록
+					DB::table('order_receipt_product')->insert([
+						'or_cd' => $or_cd,
+						'ord_opt_no' => $row['ord_opt_no'],
+						'prd_cd' => $row['prd_cd'],
+						'qty' => $row['qty'],
+						'state' => $ord_state,
+						'dlv_location_type' => strtoupper($row['dlv_place_type'] ?? ''),
+						'dlv_location_cd' => $row['dlv_place_cd'],
+						'comment' => $row['comment'],
+						'rt' => now(),
+					]);
+				} else {
+					array_push($failed_rows, $row['ord_no']);
+					continue;
+				}
+			}
+
+			DB::commit();
+			$code = 200;
+			$msg = "온라인주문이 정상적으로 접수되었습니다.";
+		} catch (Exception $e) {
+			DB::rollBack();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+		return response()->json(['code' => $code, 'msg' => $msg], $code);
 	}
 }
