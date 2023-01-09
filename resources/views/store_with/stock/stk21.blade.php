@@ -85,7 +85,7 @@
                                 <div class="form-inline-inner input-box w-100">
                                     <div class="form-inline inline_btn_box">
                                         <input type='hidden' id="prd_cd_range" name='prd_cd_range'>
-                                        <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' onclick="openApi();" class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
+                                        <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' onclick="openApi();" class="form-control form-control-sm w-100 ac-style-no sch-prdcd-range" readonly style="background-color: #fff;">
                                         <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                     </div>
                                 </div>
@@ -185,6 +185,10 @@
                 <div class="filter_wrap mt-2 pt-2">
                     <div class="d-flex justify-content-between">
                         <h6 class="m-0 font-weight-bold">총 : <span id="gd-product-total" class="text-primary">0</span>건</h6>
+                        <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+                            <input type="checkbox" class="custom-control-input" name="grid_expand" id="grid_expand" onchange="return setAllRowGroupExpanded(this.checked);" checked>
+                            <label class="custom-control-label font-weight-normal" for="grid_expand">항목펼쳐보기</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -240,19 +244,26 @@
 	</div>
 </div>
 
+<style>
+    .ag-row-level-1 {background-color: #f2f2f2 !important;}
+</style>
+
 <script language="javascript">
     let product_columns = [
         {field: "idx", hide: true},
+        {field: "prd_cd_p", headerName: "코드일련", rowGroup: true, hide: true},
+        {headerName: '코드일련', showRowGroup: 'prd_cd_p', pinned: "left", cellRenderer: 'agGroupCellRenderer', minWidth: 150},
         {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"},
-            cellRenderer: (params) => `<a href="javascript:void(0);" onclick="SearchStock('${params.rowIndex}')">${params.value}</a>`,
+            cellRenderer: (params) => {
+                if (!params.data) return '';
+                return `<a href="javascript:void(0);" onclick="SearchStock('${params.rowIndex}')">${params.value}</a>`;
+            }
         },
-        {field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"}},
-        {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
-        {field: "color_nm", headerName: "컬러명", width: 70},
-        {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
-        {field: "brand_nm", headerName: "브랜드", width: 70, cellStyle: {"text-align": "center"}},
-        {field: "style_no",	headerName: "스타일넘버", width: 70, cellStyle: {"text-align": "center"}},
-        {field: "goods_nm",	headerName: "상품명", width: 150,
+        {field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"}, aggFunc: "first"},
+        {field: "opt_kind_nm", headerName: "품목", width: 60, cellStyle: {"text-align": "center"}, aggFunc: "first"},
+        {field: "brand_nm", headerName: "브랜드", width: 70, cellStyle: {"text-align": "center"}, aggFunc: "first"},
+        {field: "style_no",	headerName: "스타일넘버", width: 70, cellStyle: {"text-align": "center"}, aggFunc: "first"},
+        {field: "goods_nm",	headerName: "상품명", width: 150, aggFunc: "first",
             cellRenderer: function (params) {
                 if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
                     return '<a href="javascript:void(0);" onclick="return alert(`상품번호가 비어있는 상품입니다.`);">' + (params.value || '') + '</a>';
@@ -262,13 +273,13 @@
                 }
             }
         },
-        {field: "goods_nm_eng", headerName: "상품명(영문)", width: 150},
-        {field: "prd_cd_p", headerName: "코드일련", width: 90, cellStyle: {"text-align": "center"}},
-        {field: "goods_opt", headerName: "옵션", width: 150},
-        {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 60},
-        {field: "price", headerName: "판매가", type: "currencyType", width: 60},
-        {field: "goods_no",	headerName: "상품번호", width: 70, cellStyle: {"text-align": "center"}},
-        {field: "opt_kind_nm", headerName: "품목", width: 60, cellStyle: {"text-align": "center"}},
+        {field: "goods_nm_eng", headerName: "상품명(영문)", width: 150, aggFunc: "first"},
+        {field: "goods_opt", headerName: "옵션", width: 150, aggFunc: "first"},
+        {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}, aggFunc: "first"},
+        {field: "color_nm", headerName: "컬러명", width: 70, aggFunc: "first"},
+        {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}, aggFunc: "first"},
+        {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 60, aggFunc: "first"},
+        {field: "price", headerName: "판매가", type: "currencyType", width: 60, aggFunc: "first"},
 	];
 
     const stores = <?= json_encode(@$stores) ?> ;
@@ -377,7 +388,13 @@
         pApp.ResizeGrid(450);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, product_columns);
+        gx = new HDGrid(gridDiv, product_columns, {
+            rollup: true,
+			groupSuppressAutoColumn: true,
+			suppressAggFuncInHeader: true,
+			enableRangeSelection: true,
+			animateRows: true,
+        });
 
         pApp2.ResizeGrid(450);
         pApp2.BindSearchEnter();
@@ -430,7 +447,9 @@
     // 상품검색
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/store/stock/stk21/search-goods', data, 1);
+		gx.Request('/store/stock/stk21/search-goods', data, 1, function(e) {
+            setAllRowGroupExpanded($("#grid_expand").is(":checked"));
+        });
 	}
 
     // 매장/창고별 재고검색
