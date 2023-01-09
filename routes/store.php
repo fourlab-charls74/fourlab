@@ -69,6 +69,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // sms
         Route::get('sms/{type}', 'SmsController@index');
         Route::get('sms/search/member', 'SmsController@search_member');
+
+        //판매유형검색
+        Route::get('sale/search_sell_type', 'goods@search_sell_type');
     });
 
     // 포스
@@ -523,6 +526,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 본사수불집계표
         Route::get('sal23', 'sal23Controller@index');
         Route::get('sal23/search', 'sal23Controller@search');
+      
+        // 일별 매출 통계
+        Route::get('sal24', 'sal24Controller@index');
+        Route::get('sal24/search', 'sal24Controller@search');
     });
 
     Route::prefix("account")->namespace('account')->group(function () {

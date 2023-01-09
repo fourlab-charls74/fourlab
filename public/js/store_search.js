@@ -744,6 +744,149 @@ SearchPrdcd_sub.prototype.Choice = function() {
 
 let searchPrdcd_sub = new SearchPrdcd_sub();
 
+
+// 판매유형 검색
+function SearchSellType(){
+    this.grid = null;
+}
+
+SearchSellType.prototype.Open = async function(callback = null, multiple_type = false){
+    if(this.grid === null){
+        this.isMultiple = multiple_type === "multiple";
+        this.SetGrid("#div-gd-selltype");
+        $("#SearchSellTypeModal").draggable();
+        if(this.isMultiple) $("#SearchSellTypeModal #search_selltype_cbtn").css("display", "block");
+        this.callback = callback;
+    }
+    $('#SearchSellTypeModal').modal({
+        keyboard: false
+    });
+};
+
+SearchSellType.prototype.SetGrid = function(divId){
+    let columns = [];
+
+    if(this.isMultiple) {
+        columns.push({ field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null });
+    }
+
+    columns.push(
+        { field:"code_id", headerName:"판매유형코드", width:100, cellStyle: { "text-align": "center" }, hide: true },
+        { field:"code_val", headerName:"판매유형명", width: "auto" },
+    );
+
+    if(!this.isMultiple) {
+        columns.push({ 
+            field:"choice", headerName:"선택", width:100, cellClass:'hd-grid-code',
+            cellRenderer: function (params) {
+                if (params.data.store_cd !== undefined) {
+                    return '<a href="javascript:void(0);" onclick="return searchSellType.Choice(\'' + params.data.code_id + '\',\'' + params.data.code_val + '\');">선택</a>';
+                }
+            }
+        });
+    }
+
+    this.grid = new HDGrid(document.querySelector( divId ), columns);
+};
+
+SearchSellType.prototype.Search = function(e) {
+    const event_type = e?.type;
+    if (event_type == 'keypress') {
+        if (e.key && e.key == 'Enter') {
+            let data = $('form[name="search_sell_type"]').serialize();
+            this.grid.Request('/store/api/sale/search_sell_type', data);
+        } else {
+            return false;
+        }
+    } else {
+        let data = $('form[name="search_sell_type"]').serialize();
+        this.grid.Request('/store/api/sale/search_sell_type', data);
+    }
+};
+
+SearchSellType.prototype.Choice = function(code,name){
+    if(this.callback !== null){
+        this.callback(code, name);
+    } else {
+        if($('#sell_type.select2-sellType').length > 0){
+            $('#sell_type').val(null);
+            const option = new Option(name, code, true, true);
+            $('#sell_type').append(option).trigger('change');
+        } else {
+            if($('#sell_type').length > 0){
+                $('#sell_type').val(code);
+            }
+            if($('#sell_nm').length > 0){
+                $('#sell_nm').val(name);
+            }
+        }
+        if($('#sell_type.select2-sellType').length > 0){
+            $('#sell_type').val(null);
+            const option = new Option(name, code, true, true);
+            $('#sell_type').append(option).trigger('change');
+        } else {
+            if($('#sell_type').length > 0){
+                $('#sell_type').val(code);
+            }
+            if($('#sell_nm').length > 0){
+                $('#sell_nm').val(name);
+            }
+        }
+    }
+    this.InitValue();
+    $('#SearchSellTypeModal').modal('toggle');
+};
+
+SearchSellType.prototype.ChoiceMultiple = function(){
+    let rows = this.grid.getSelectedRows();
+    if(this.callback !== null){
+        this.callback(rows);
+    } else {
+        let code_ids = rows.map(r => r.code_id);
+        let code_vals = rows.map(r => r.code_val);
+
+        if($('#sell_type.select2-sellType').length > 0){
+            for(let r of rows) {
+                if($("#sell_type").val().includes(r.code_id)) continue;
+                const option = new Option(r.code_id, r.code_val, true, true);
+                $('#sell_type').append(option).trigger('change');
+            }
+        } else {
+            if($('#sell_type').length > 0){
+                $('#sell_type').val(code_ids);
+            }
+            if($('#sell_type').length > 0){
+                $('#sell_type').val(code_vals);
+            }
+        }
+        if($('#sell_type.select2-sellType').length > 0){
+            for(let r of rows) {
+                if($("#sell_type").val().includes(r.code_id)) continue;
+                const option = new Option(r.code_id, r.code_val, true, true);
+                $('#sell_type').append(option).trigger('change');
+            }
+        } else {
+            if($('#sell_type').length > 0){
+                $('#sell_type').val(code_ids);
+            }
+            if($('#sell_type').length > 0){
+                $('#sell_type').val(code_vals);
+            }
+        }
+    }
+    this.InitValue();
+    $('#SearchSellTypeModal').modal('toggle');
+}
+
+SearchSellType.prototype.InitValue = () => {
+    document.search_sell_type.reset();
+    searchSellType.grid.setRows([]);
+    $('#gd-selltype-total').html(0);
+};
+
+
+let searchSellType = new SearchSellType();
+
 $( document ).ready(function() {
     // 매장 검색 클릭 이벤트 바인딩 및 콜백 사용
     $( ".sch-store" ).on("click", function() {
@@ -780,6 +923,11 @@ $( document ).ready(function() {
         let url = "/store/cs/cs01/choice";
 		window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1400,height=800");
     });
+
+     // 판매유형 검색
+     $( ".sch-sellType" ).on("click", function() {
+        searchSellType.Open();
+    });
 });
 
 /**
@@ -802,4 +950,6 @@ var initSearch = (select2 = [], form_name = "search") => { // 검색 초기화 �
     select2.map(key => {
         if ($(key).length > 0) $(key).val("").trigger('change'); // 전달받은 select2 박스 초기화
     });
+
+
 };

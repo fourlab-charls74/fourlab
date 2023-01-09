@@ -97,6 +97,7 @@
                     <li><a href="/store/sale/sal06">(완)매장상품별판매분석</a></li>
                     <li><a href="/store/sale/sal07">(완)상품별 이익현황</a></li>
                     <li><a href="/store/sale/sal08">(완)매장브랜드별판매분석</a></li>
+                    <li><a href="/store/sale/sal24">(개)일별 매출 통계</a></li>
                 </ul>
             </li>
         </ul>

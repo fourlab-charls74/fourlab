@@ -110,28 +110,25 @@
                     {field: "goods_sh", headerName: "시중가", type: 'currencyType'},
                     {field: "price", headerName: "판매가", type: 'currencyType'},
                     {field: "wonga", headerName: "원가", width: 60, type: 'currencyType'},
-                    {field: "margin_rate", headerName: "마진율(%)", width:84, type: 'percentType'},
+                    {field: "margin_rate", headerName: "마진율(%)", width:84, type: 'percentType',
+                        cellRenderer:function(params) {
+                            let price = params.data.price;
+                            let wonga = params.data.wonga;
+                            let margin_rate;
+                            if (price == "" || wonga == "") {
+                                margin_rate = ((price - wonga)/price) * 100;
+                            }
+
+                            return margin_rate;
+                        }
+                    },
                 ]
             },
             {headerName:"상품옵션",
                 children: [
                     {field: "option_kind", headerName: "옵션구분", width: 200},
-                    {field: "opt1", headerName: "옵션1", width: 200,
-                        editable: params => params.data.is_chk_opt_kind1 == true,
-                        cellStyle: params => {
-                            if (params.data.is_chk_opt_kind1 == true) {
-                                return CELL_STYLE.EDIT;
-                            }
-                        }
-                    },
-                    {field: "opt2", headerName: "옵션2", width: 200, 
-                        editable: params => params.data.is_chk_opt_kind2 == true,
-                        cellStyle: params => {
-                            if (params.data.is_chk_opt_kind2 == true) {
-                                return CELL_STYLE.EDIT;
-                            }
-                        }
-                    },
+                    {field: "opt1", headerName: "옵션1", width: 200},
+                    {field: "opt2", headerName: "옵션2", width: 200},
                     {field: "opt_qty", headerName: "수량"},
                     {field: "opt_price", headerName: "옵션가격", width: 200},
                 ]
@@ -208,9 +205,9 @@
             
         if (row.price != null && row.wonga != null ) row.margin_rate = ((row.price - row.wonga)/row.price)*100;
 
-        await gx.gridOptions.api.applyTransaction({ 
-            update: [{...row}] 
-        });
+        // await gx.gridOptions.api.applyTransaction({ 
+        //     update: [{...row}] 
+        // });
     }
 
     const validateFile = () => {
@@ -383,7 +380,6 @@
 	};
 
     const getProducts = async (rows, firstIndex) => {
-
         axios({
             url: '/head/product/prd07/batch-getproducts',
             method: 'post',
@@ -404,6 +400,7 @@
     };
 
     const insertDB = async (data) => {
+        const arr = [];
         for (let i = 0; i < data.length; i++) {
             let row = data[i];
             const response = await axios({
@@ -412,18 +409,11 @@
                 data: { row: row }
             });
             const { result, msg } = response.data;
-            row = { ...getRowNode(row).data, msg: msg, result: result };
-            updateRow(row);
+            row = { ...row, msg: msg, result: result };
+            arr.push(row);
         }
-    };
-
-    const getRowNode = (row) => {
-        return gx.gridOptions.api.getRowNode(row.idx);
-    };
-
-    const updateRow = (row) => {
-        gx.gridOptions.api.applyTransaction({update : [{...row}]});
-        // gx.gridOptions.api.applyTransaction({add : [{...row}]});
+        gx.gridOptions.api.setRowData([]);
+        await gx.gridOptions.api.applyTransaction({ add : arr });
     };
 
     const resultStyle = (params) => {

@@ -832,4 +832,42 @@ class goods extends Controller
             "body" => $result
         ]);
     }
+
+    //판매유형 검색
+    public function search_sell_type(Request $request)
+    {
+        $sell_nm= $request->input('sell_nm', '');
+
+        $page = $request->input('page', 1);
+        $where = "";
+
+        if($sell_nm != '') $where .= " and code_val like '$sell_nm%'";
+
+        $page_size = 100;
+        $startno = ($page - 1) * $page_size;
+        $limit = " limit $startno, $page_size ";
+        $total = 0;
+        $page_cnt = 0;
+
+        $sql = "
+            select
+                code_id, code_val
+            from code
+            where code_kind_cd = 'sale_kind'
+        ";
+      
+        $result = DB::select($sql);
+
+        return response()->json([
+            "code" => '200',
+            "head" => [
+                "total" => count($result),
+                "page" => 1,
+                "page_cnt" => 1,
+                "page_total" => 1,
+              
+            ],
+            "body" => $result
+        ]);
+    }
 }
