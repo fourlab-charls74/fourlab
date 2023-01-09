@@ -498,17 +498,6 @@ class prd07Controller extends Controller
 			$goods_location = $d['goods_location']??'';	//상품위치
 			$tags = $d['tags']??'';						//상품태그
 
-
-			$query = "
-				select 
-					'$tags' as tag
-				from goods_tags
-				limit 1
-			";
-			
-			$row2 = DB::selectOne($query);
-			
-
             $sql = "
 				select
 					'$com_id' as com_id,
@@ -551,7 +540,8 @@ class prd07Controller extends Controller
 					'$tax_yn' as tax_yn,
 					'$goods_location' as goods_location,
 					'$tags' as tags
-				from goods
+				from goods g
+				left outer join goods_tags gt on gt.goods_no = g.goods_no
 				limit 1
 
             ";
@@ -575,9 +565,6 @@ class prd07Controller extends Controller
 	public function enroll2(Request $request) 
 	{
 		$row = $request->input('row');
-
-		// dd($row);`
-
 		$row["goods_sh"] = array_key_exists('goods_sh', $row) ? $this->checkInt(Lib::Rq($row["goods_sh"])) : null;
 		$row["price"] = array_key_exists('price', $row) ? $this->checkInt(Lib::Rq($row["price"])) : null;
 
@@ -904,14 +891,17 @@ class prd07Controller extends Controller
 			DB::commit();
 			return response()->json([
 				"result" => 1,
-                "msg" => $goods_no."-".$goods_sub
+                "msg" => $goods_no."-".$goods_sub,
+				"code" => 200
             ]);
 		} catch (Exception $e) {
 			DB::rollback();
 			return response()->json([
                 "result" => 0,
-				// "msg" => "시스템에러"
-				"msg" => $e->getMessage()
+				"msg" => "시스템에러",
+				"code" => 500
+
+				// "msg" => $e->getMessage()
             ]);
 		}
 

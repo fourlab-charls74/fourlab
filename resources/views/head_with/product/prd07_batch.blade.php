@@ -315,11 +315,12 @@
 		};
 
         var firstRowIndex = 33; // 엑셀 33행부터 시작 (샘플데이터 참고)
-		var rowIndex = firstRowIndex; 
+		var rowIndex = firstRowIndex;
 
         let count = gx.gridOptions.api.getDisplayedRowCount();
         let rows = [];
-		while (worksheet['AN' + rowIndex]) {
+
+		while (worksheet['A' + rowIndex]) {
 			let row = {};
 			Object.keys(excel_columns).forEach((column) => {
                 let item = worksheet[column + rowIndex];
@@ -331,7 +332,7 @@
             rowIndex++;
 		}
 
-        // if(rows.length < 1) return alert("한 개 이상의 상품정보를 입력해주세요.");
+        if(rows.length < 1) return alert("한 개 이상의 상품정보를 입력해주세요.");
         await getProducts(rows, firstRowIndex);
 	};
     
@@ -421,8 +422,8 @@
     };
 
     const updateRow = (row) => {
-        gx.gridOptions.api.applyTransaction({remove : [{...row}]});
-        gx.gridOptions.api.applyTransaction({add : [{...row}]});
+        gx.gridOptions.api.applyTransaction({update : [{...row}]});
+        // gx.gridOptions.api.applyTransaction({add : [{...row}]});
     };
 
     const resultStyle = (params) => {
