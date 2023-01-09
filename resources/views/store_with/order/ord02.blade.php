@@ -182,7 +182,7 @@
                                 <div class="form-inline-inner input-box w-100">
                                     <div class="form-inline inline_btn_box">
                                         <input type="hidden" id="com_cd" name="com_cd" />
-                                        <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
+                                        <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter sch-sup-company" style="width:100%;" autocomplete="off" />
                                         <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                     </div>
                                 </div>
@@ -369,6 +369,9 @@
                 return '<a href="javascript:void(0);" onclick="return openStoreOrder(\'' + ord_no + '\',\'' + ord_opt_no +'\');">'+ params.value +'</a>';
             }
         },
+        {field: "ord_state", headerName: "주문상태코드", hide: true,
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+        },
         {field: "ord_state_nm", headerName: "주문상태", pinned: 'left', width: 70, cellStyle: StyleOrdState,
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
@@ -490,6 +493,9 @@
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
         },
+        {field: "ord_kind", headerName: "출고구분코드", hide: true,
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+        },
         {field: "ord_kind_nm", headerName: "출고구분", width: 60, cellStyle: StyleOrdKind,
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
@@ -548,12 +554,14 @@
                     let arr = dlv_locations.filter(s => s.location_nm === e.newValue);
                     if(arr.length > 0) {
                         e.data.dlv_place_cd = arr[0].location_cd;
+                        e.data.dlv_place_type = arr[0].location_type;
                         if (e.node.parent.level >= 0) {
                             e.node.parent.allLeafChildren
                                 .filter(c => c.data?.prd_cd !== e.data.prd_cd)
                                 .forEach(c => {
                                     c.setDataValue('dlv_place', null);
                                     c.setDataValue('dlv_place_cd', null);
+                                    c.setDataValue('dlv_place_type', null);
                                 });
 
                             e.node.parent.aggData.dlv_place = arr[0].location_nm;
@@ -626,14 +634,13 @@
             }
         });
 
-        // 수량보다 재고가 많은지 체크 필요
-        // 출고보류 주문은 출고처리중 변경 불가 처리
-        // 출고요청상태가 아닌 주문은 처리 불가
+        if(rows.filter(r => r.ord_state != 10).length > 0) return alert("출고요청 상태의 주문건만 접수가 가능합니다.");
+        if(rows.filter(r => r.ord_kind > 20).length > 0) return alert("출고보류중인 주문건은 접수할 수 없습니다.");
+        // if(rows.filter(r => r.qty > ???).length > 0) return alert("재고가 부족한 상품이 있습니다.\n확인 후 다시 접수해주세요.");
+        // console.log(rows);
 
         if(rows.length < 1) return alert("접수할 주문건을 선택해주세요.");
         if(!confirm("선택한 주문건을 접수하시겠습니까?")) return;
-
-        console.log(rows);
 
         axios({
             url: '/store/order/ord02/receipt',

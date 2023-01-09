@@ -37,7 +37,7 @@ class ord02Controller extends Controller
 			'edate'         	=> $edate,
             'ord_states'        => SLib::getordStates(), // 주문상태
 			'sale_places'		=> $sale_places, // 판매처
-            'stat_pay_types'    => SLib::getCodes('G_STAT_PAY_TYPE'), // 결제방법
+            'stat_pay_types'    => SLib::getCodes('G_PAY_TYPE'), // 결제방법
 			'items'			    => SLib::getItems(), // 품목
             'sale_kinds'        => SLib::getUsedSaleKinds(),
 			'rel_orders'		=> $rel_orders, // 온라인출고차수
@@ -48,59 +48,124 @@ class ord02Controller extends Controller
 
 	public function search(Request $request)
 	{
+		$sdate = $request->input('sdate', Carbon::now()->sub(1, 'week')->format("Ymd"));
+		$edate = $request->input('edate', Carbon::now()->format("Ymd"));
+		$ord_no = $request->input('ord_no', '');
+		$ord_state = $request->input('ord_state', ''); // 주문상태
+		$pay_stat = $request->input('pay_stat', ''); // 입금상태
+		$sale_place = $request->input('sale_place', ''); // 판매처
+		$ord_info_key = $request->input('ord_info_key', 'om.user_nm');
+		$ord_info_value = $request->input('ord_info_value', '');
+		$stat_pay_type = $request->input('stat_pay_type', ''); // 결제방법
+		$not_complex = $request->input('not_complex', 'N'); // 복합결제 제외여부
+		$sale_kind = $request->input('sale_kind', ''); // 판매유형
+		$com_id = $request->input('com_cd', '');
+		$prd_cd = $request->input('prd_cd', '');
+		$style_no = $request->input('style_no', '');
+		$goods_no = $request->input('goods_no', '');
+		$item = $request->input('item', '');
+		$brand_cd = $request->input('brand_cd', '');
+		$prd_cd_range_text = $request->input('prd_cd_range', '');
+		$goods_nm = $request->input('goods_nm', '');
+		$goods_nm_eng = $request->input('goods_nm_eng', '');
 
+		$ord_field = $request->input('ord_field', '');
+		$ord = $request->input('ord', '');
 		$page = $request->input('page', 1);
 		$limit = $request->input('limit', 100);
-		// $sdate = $request->input('sdate', Carbon::now()->sub(1, 'week')->format("Ymd"));
-		// $edate = $request->input('edate', Carbon::now()->format("Ymd"));
-		// $sdate = str_replace('-', '', $sdate);
-		// $edate = str_replace('-', '', $edate);
 
-		// $store_type = $request->input('store_type', ''); // 매장구분
-		// $store_no = $request->input('store_no', []); // 매장명 리스트
-        // $brand_cd = $request->input('brand_cd', ''); // 브랜드
-		// $goods_nm = $request->input('goods_nm', ''); // 상품명
-		// $goods_nm_eng = $request->input('goods_nm_eng', ''); // 상품명(영문)
-		// $prd_cd	= $request->input('prd_cd', ''); // 상품코드
-		// $prd_cd_range_text = $request->input('prd_cd_range', ''); // 상품옵션범위
-		// $item = $request->input('item', ''); // 품목
+		/** 검색조건 필터링 */
+		$where = "";
+		$prd_where = "";
 
-		// /** 검색조건 필터링 */
-		// $where = "";
-		// $where2 = "";
+		$where .= " and o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59' ";
+		if ($ord_no != '') $where .= " and o.ord_no like '" . $ord_no . "%' ";
+		if ($ord_state != '') $where .= " and o.ord_state = '" . $ord_state . "' ";
+		if ($pay_stat != '') $where .= " and p.pay_stat = '" . $pay_stat . "' ";
+		if ($sale_place != '') $where .= " and o.sale_place = '" . $sale_place . "' ";
+
+		// 주문정보검색
+		if ($ord_info_value != '') {
+			if (in_array($ord_info_key, ['om.mobile', 'om.phone', 'om.r_mobile', 'om.r_phone'])) {
+				$val = $this->__replaceTel($ord_info_value);
+				if (in_array($ord_info_key, ['om.mobile', 'om.phone', 'om.r_mobile'])) {
+					$where .= " and $ord_info_key = '$val' ";
+				} else {
+					$where .= " and $ord_info_key like '$val%' ";
+				}
+			} else {
+				if ($ord_info_key == 'memo') {
+					$where .= " and (m.state like '%$ord_info_value%' or m.memo like '%$ord_info_value%') ";
+				} else if ($ord_info_key == 'o.dlv_end_date') {
+					$where .= " and date_format($ord_info_key, '%Y%m%d') = $ord_info_value ";
+				} else if (in_array($ord_info_key, ['om.user_nm', 'om.user_id', 'om.r_nm', 'om.bank_inpnm'])) {
+					$where .= " and $ord_info_key = '$ord_info_value' ";
+				} else {
+					$where .= " and $ord_info_key like '$ord_info_value%' ";
+				}
+			}
+		}
+
+		// 결제방법
+		if ($stat_pay_type != '') {
+			if ($not_complex == 'Y') {
+				$where .= " and o.pay_type = '$stat_pay_type' ";
+			} else {
+				$where .= " and ((o.pay_type & $stat_pay_type) = $stat_pay_type) ";
+			}
+		}
 		
-		// $where .= " and w.ord_state_date >= '$sdate' and w.ord_state_date <= '$edate' ";
-		// if ($store_type != '') $where .= " and s.store_type = '$store_type' ";
-		// if (count($store_no) > 0) {
-		// 	$where .= " and (1<>1 ";
-		// 	foreach ($store_no as $store_cd) {
-		// 		$where .= " or o.store_cd = '$store_cd' ";
-		// 	}
-		// 	$where .= " ) ";
-		// }
-		// if ($brand_cd != '') $where2 .= " and b.brand = '$brand_cd' ";
-		// if ($goods_nm != '') $where2 .= " and g.goods_nm like '%$goods_nm%' ";
-		// if ($goods_nm_eng != '') $where2 .= " and g.goods_nm_eng like '%$goods_nm_eng%' ";
-		// if ($prd_cd != '') {
-		// 	$prd_cd = explode(',', $prd_cd);
-		// 	$where .= " and (1<>1 ";
-		// 	foreach ($prd_cd as $cd) {
-		// 		$where .= " or o.prd_cd like '$cd%' ";
-		// 	}
-		// 	$where .= " ) ";
-		// }
-		// // 상품옵션 범위검색
-		// parse_str($prd_cd_range_text, $prd_cd_range);
-		// $range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
-		// foreach ($range_opts as $opt) {
-		// 	$rows = $prd_cd_range[$opt] ?? [];
-		// 	if (count($rows) > 0) {
-		// 		$in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
-		// 		$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
-		// 		$where .= " and pc.`$opt $in_query` ($opt_join) ";
-		// 	}
-		// }
-		// if ($item != '') $where2 .= " and g.opt_kind_cd = '$item' ";
+		if ($sale_kind != '') $where .= " and o.sale_kind = '" . $sale_kind . "' ";
+		if ($com_id != '') $where .= " and g.com_id = '" . $com_id . "' ";
+
+		// 상품코드 검색
+		if ($prd_cd != '') {
+			$prd_cd = explode(',', $prd_cd);
+			$where .= " and (1<>1 ";
+			$prd_where .= " and (1<>1 ";
+			foreach ($prd_cd as $cd) {
+				$where .= " or pc.prd_cd like '$cd%' ";
+				$prd_where .= " or inpc.prd_cd like '$cd%' ";
+			}
+			$where .= ") ";
+			$prd_where .= ") ";
+		}
+
+		if ($style_no != '') $where .= " and g.style_no like '" . $style_no . "%' ";
+		if ($item != '') $where .= " and g.opt_kind_cd = '" . $item . "' ";
+		if ($brand_cd != '') $where .= " and g.brand = '" . $brand_cd . "' ";
+		if ($goods_nm != '') $where .= " and g.goods_nm like '%" . $goods_nm . "%' ";
+		if ($goods_nm_eng != '') $where .= " and g.goods_nm_eng like '%" . $goods_nm_eng . "%' ";
+
+		// 상품번호 검색
+        $goods_no = preg_replace("/\s/",",",$goods_no);
+        $goods_no = preg_replace("/\t/",",",$goods_no);
+        $goods_no = preg_replace("/\n/",",",$goods_no);
+        $goods_no = preg_replace("/,,/",",",$goods_no);
+
+        if($goods_no != ""){
+            $goods_nos = explode(",", $goods_no);
+            if(count($goods_nos) > 1) {
+                if(count($goods_nos) > 500) array_splice($goods_nos, 500);
+                $in_goods_nos = join(",", $goods_nos);
+                $where .= " and g.goods_no in ( $in_goods_nos ) ";
+            } else {
+                if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
+            }
+        }
+
+		// 상품옵션 범위검색
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				$in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc.$opt $in_query ($opt_join) ";
+				$prd_where .= " and inpc.$opt $in_query ($opt_join) ";
+			}
+		}
 
 		// pagination
 		$page_size = $limit;
@@ -129,6 +194,10 @@ class ord02Controller extends Controller
 				, ot.code_val as ord_type_nm, ok.code_val as ord_kind_nm
 				, bk.code_val as baesong_kind, com.com_nm as sale_place_nm
 				, pt.code_val as pay_type_nm, ps.code_val as pay_stat_nm
+				-- 각 재고별 대표배송처 초기화 작업 필요
+				-- , 'A0009' as dlv_place_cd
+				-- , '알펜곤지암물류' as dlv_place
+				-- , 'storage' as dlv_place_type
 			from (
 				select 
 					o.ord_no, o.ord_opt_no, o.goods_no, g.goods_nm, g.goods_nm_eng, g.style_no, o.goods_opt
@@ -137,20 +206,23 @@ class ord02Controller extends Controller
 					, o.pay_type, o.dlv_amt, o.point_amt, o.coupon_amt, o.dc_amt, o.recv_amt
 					, o.sale_place, o.store_cd, o.ord_state, o.clm_state, o.com_id, o.baesong_kind as dlv_baesong_kind, o.ord_date
 					, o.sale_kind, o.pr_code, o.sales_com_fee, o.ord_type, o.ord_kind, p.pay_stat
-					, concat(ifnull(m.user_nm, ''), '(', ifnull(m.user_id, ''), ')') as user_nm, m.r_nm
+					, concat(ifnull(om.user_nm, ''), '(', ifnull(om.user_id, ''), ')') as user_nm, om.r_nm
 					, (
 						select count(*)
                         from product_code inpc
 							inner join code inc on inc.code_kind_cd = 'PRD_CD_COLOR' and inc.code_id = color
 							inner join code incs on incs.code_kind_cd = 'PRD_CD_SIZE_MEN' and incs.code_id = size
                         where inpc.goods_no = o.goods_no
-							and inc.code_val = SUBSTRING_INDEX(o.goods_opt, '^', 1) and replace(incs.code_val, ' ', '') = replace(substring_index(o.goods_opt, '^', -1), ' ', '')
+							and inc.code_val = SUBSTRING_INDEX(o.goods_opt, '^', 1) 
+							and replace(incs.code_val, ' ', '') = replace(substring_index(o.goods_opt, '^', -1), ' ', '')
+							$prd_where
 					) as goods_no_group
 					$qty_sql
 				from order_opt o
-					inner join order_mst m on m.ord_no = o.ord_no
+					inner join order_mst om on om.ord_no = o.ord_no
 					inner join goods g on g.goods_no = o.goods_no
 					left outer join payment p on p.ord_no = o.ord_no
+					left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
 					left outer join (
 						select prd_cd, goods_no, brand, year, season, gender, item, seq, opt, color, size, c.code_val as color_nm, cs.code_val as size_nm
 						from product_code
@@ -159,17 +231,7 @@ class ord02Controller extends Controller
 					) pc on pc.goods_no = o.goods_no and pc.color_nm = SUBSTRING_INDEX(o.goods_opt, '^', 1) and replace(pc.size_nm, ' ', '') = replace(substring_index(o.goods_opt, '^', -1), ' ', '')
 				where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
 					and o.clm_state in (-30,1,90,0)
-					and o.ord_date >= '2022-01-01 00:00:00' and o.ord_date <= now()
-					-- and o.ord_no like '202201%'
-					and o.ord_state = 10
-					-- 입금상태
-					-- and o.sale_place = ''
-					-- 주문정보
-					-- 결제방법
-					-- and o.sale_kind = ''
-					-- 상품 공급업체
-					-- 상품코드 / 스타일넘버 / 상품번호 / 품목 / 브랜드 / 상품옵션 / 상품명 / 상품명영문
-					-- and (o.goods_no = '130658' or o.goods_no = '130976')
+					$where
 				order by o.ord_date desc, pc.prd_cd asc
 				limit 0, 100
 			) a
@@ -193,21 +255,19 @@ class ord02Controller extends Controller
 			$sql = "
 				select count(*) as total
 				from order_opt o
-					inner join order_mst m on m.ord_no = o.ord_no
+					inner join order_mst om on om.ord_no = o.ord_no
 					inner join goods g on g.goods_no = o.goods_no
+					left outer join payment p on p.ord_no = o.ord_no
+					left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
+					left outer join (
+						select prd_cd, goods_no, brand, year, season, gender, item, seq, opt, color, size, c.code_val as color_nm, cs.code_val as size_nm
+						from product_code
+							inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = color
+							inner join code cs on cs.code_kind_cd = 'PRD_CD_SIZE_MEN' and cs.code_id = size
+					) pc on pc.goods_no = o.goods_no and pc.color_nm = SUBSTRING_INDEX(o.goods_opt, '^', 1) and replace(pc.size_nm, ' ', '') = replace(substring_index(o.goods_opt, '^', -1), ' ', '')
 				where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
 					and o.clm_state in (-30,1,90,0)
-					and o.ord_date >= '2022-01-01 00:00:00' and o.ord_date <= now()
-					-- and o.ord_no like '202201%'
-					and o.ord_state = 10
-					-- 입금상태
-					-- and o.sale_place = ''
-					-- 주문정보
-					-- 결제방법
-					-- and o.sale_kind = ''
-					-- 상품 공급업체
-					-- 상품코드 / 스타일넘버 / 상품번호 / 품목 / 브랜드 / 상품옵션 / 상품명 / 상품명영문
-					-- and (o.goods_no = '130658' or o.goods_no = '130976')
+					$where
 			";
 
 			$row = DB::selectOne($sql);
@@ -326,4 +386,49 @@ class ord02Controller extends Controller
 		}
 		return response()->json(['code' => $code, 'msg' => $msg], $code);
 	}
+
+	/**
+     * 전화번호 숫자에 '-' 넣어서 반환
+     * - Parameters: $tel(전화번호)
+     * - Returns: String
+    */
+    private function __replaceTel($tel)
+    {
+        $tel = trim($tel);
+        if (strpos($tel, '-') === false) { 
+            $len = strlen($tel);
+            if ($len == 9) {
+                $patterns = array("/(\d{2})(\d{3})(\d{4})/");
+                $replace = array("\\1-\\2-\\3");
+                $tel = preg_replace($patterns, $replace, $tel);
+            } else if ($len == 10) {
+                if (substr($tel, 0, 2) == "02") {
+                    $patterns = array("/(\d{2})(\d{4})(\d{4})/");
+                    $replace = array("\\1-\\2-\\3");
+                    $tel = preg_replace($patterns, $replace, $tel);
+                } else {
+                    $patterns = array("/(\d{3})(\d{3})(\d{4})/");
+                    $replace = array("\\1-\\2-\\3");
+                    $tel = preg_replace($patterns, $replace, $tel);
+                }
+            } else if ($len == 11) {
+                if (substr($tel, 0, 4) == "0505") {
+                    $patterns = array("/(\d{4})(\d{3})(\d{4})/");
+                    $replace = array("\\1-\\2-\\3");
+                    $tel = preg_replace($patterns, $replace, $tel);
+                } else {
+                    $patterns = array("/(\d{3})(\d{4})(\d{4})/");
+                    $replace = array("\\1-\\2-\\3");
+                    $tel = preg_replace($patterns, $replace, $tel);
+                }
+            } else if ($len == 12) {
+                $patterns = array("/(\d{4})(\d{4})(\d{4})/");
+                $replace = array("\\1-\\2-\\3");
+                $tel = preg_replace($patterns, $replace, $tel);
+            }
+            return $tel;
+        } else {
+            return $tel;
+        }
+    }
 }
