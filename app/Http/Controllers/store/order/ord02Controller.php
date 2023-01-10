@@ -30,7 +30,7 @@ class ord02Controller extends Controller
 		";
 		$dlv_locations = DB::select($dlv_locations_sql);
 
-		$rel_orders = DB::table('code')->where('code_kind_cd', 'REL_ORDER')->where('code_id', 'like', 'O_%')->get();
+		$rel_orders = $this->_get_rel_orders();
 
 		$values = [
             'sdate'         	=> $sdate,
@@ -44,6 +44,24 @@ class ord02Controller extends Controller
 			'dlv_locations'		=> $dlv_locations, // 배송처
 		];
         return view( Config::get('shop.store.view') . '/order/ord02', $values );
+	}
+
+	// 출고 가능한 출고차수 리스트 조회
+	private function _get_rel_orders()
+	{
+		$rel_orders = DB::table('code')->where('code_kind_cd', 'REL_ORDER')->where('code_id', 'like', 'O_%')->select('code_val')->get()->toArray();
+		$rel_orders = array_map(function($r) { return $r->code_val; }, $rel_orders);
+
+		$today = date('ymd');
+		$sql = "
+			select substring_index(rel_order, '-', -1) as code_val
+			from order_receipt
+			where instr(rel_order, '$today') > 0
+		";
+		$used_orders = DB::select($sql);
+		$used_orders = array_map(function($r) { return $r->code_val; }, $used_orders);
+
+		return array_diff($rel_orders, $used_orders);
 	}
 
 	public function search(Request $request)
@@ -69,8 +87,8 @@ class ord02Controller extends Controller
 		$goods_nm = $request->input('goods_nm', '');
 		$goods_nm_eng = $request->input('goods_nm_eng', '');
 
-		$ord_field = $request->input('ord_field', '');
-		$ord = $request->input('ord', '');
+		$ord_field = $request->input('ord_field', 'o.ord_date');
+		$ord = $request->input('ord', 'desc');
 		$page = $request->input('page', 1);
 		$limit = $request->input('limit', 100);
 
@@ -167,6 +185,9 @@ class ord02Controller extends Controller
 			}
 		}
 
+		// order by
+        $orderby = sprintf("order by %s %s, pc.prd_cd asc", $ord_field, $ord);
+
 		// pagination
 		$page_size = $limit;
 		$startno = ($page - 1) * $page_size;
@@ -189,15 +210,11 @@ class ord02Controller extends Controller
 			select a.*
 				, if(a.goods_no_group < 2, null, a.goods_no) as goods_no_group
 				, os.code_val as ord_state_nm
-				, round((1 - ((a.price * a.qty) * (1 - if(st.amt_kind = 'per', st.sale_per, 0) / 100)) / a.goods_sh) * 100) as dc_rate
+				, round((1 - (a.price * (1 - if(st.amt_kind = 'per', st.sale_per, 0) / 100)) / a.goods_sh) * 100) as dc_rate
 				, sk.code_val as sale_kind_nm, pr.code_val as pr_code_nm
 				, ot.code_val as ord_type_nm, ok.code_val as ord_kind_nm
 				, bk.code_val as baesong_kind, com.com_nm as sale_place_nm
 				, pt.code_val as pay_type_nm, ps.code_val as pay_stat_nm
-				-- 각 재고별 대표배송처 초기화 작업 필요
-				-- , 'A0009' as dlv_place_cd
-				-- , '알펜곤지암물류' as dlv_place
-				-- , 'storage' as dlv_place_type
 			from (
 				select 
 					o.ord_no, o.ord_opt_no, o.goods_no, g.goods_nm, g.goods_nm_eng, g.style_no, o.goods_opt
@@ -210,10 +227,10 @@ class ord02Controller extends Controller
 					, (
 						select count(*)
                         from product_code inpc
-							inner join code inc on inc.code_kind_cd = 'PRD_CD_COLOR' and inc.code_id = color
-							inner join code incs on incs.code_kind_cd = 'PRD_CD_SIZE_MEN' and incs.code_id = size
+							inner join code inc on inc.code_kind_cd = 'PRD_CD_COLOR' and inc.code_id = inpc.color
+							inner join code incs on if(inpc.gender = 'M', incs.code_kind_cd = 'PRD_CD_SIZE_MEN', if(inpc.gender = 'W', incs.code_kind_cd = 'PRD_CD_SIZE_WOMEN', if(inpc.gender = 'U', incs.code_kind_cd = 'PRD_CD_SIZE_UNISEX', incs.code_kind_cd = 'PRD_CD_SIZE_MATCH' ))) and incs.code_id = inpc.size
                         where inpc.goods_no = o.goods_no
-							and inc.code_val = SUBSTRING_INDEX(o.goods_opt, '^', 1) 
+							and inc.code_val = substring_index(o.goods_opt, '^', 1) 
 							and replace(incs.code_val, ' ', '') = replace(substring_index(o.goods_opt, '^', -1), ' ', '')
 							$prd_where
 					) as goods_no_group
@@ -227,13 +244,13 @@ class ord02Controller extends Controller
 						select prd_cd, goods_no, brand, year, season, gender, item, seq, opt, color, size, c.code_val as color_nm, cs.code_val as size_nm
 						from product_code
 							inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = color
-							inner join code cs on cs.code_kind_cd = 'PRD_CD_SIZE_MEN' and cs.code_id = size
-					) pc on pc.goods_no = o.goods_no and pc.color_nm = SUBSTRING_INDEX(o.goods_opt, '^', 1) and replace(pc.size_nm, ' ', '') = replace(substring_index(o.goods_opt, '^', -1), ' ', '')
+							inner join code cs on if(gender = 'M', cs.code_kind_cd = 'PRD_CD_SIZE_MEN', if(gender = 'W', cs.code_kind_cd = 'PRD_CD_SIZE_WOMEN', if(gender = 'U', cs.code_kind_cd = 'PRD_CD_SIZE_UNISEX', cs.code_kind_cd = 'PRD_CD_SIZE_MATCH' ))) and cs.code_id = size
+					) pc on pc.goods_no = o.goods_no and pc.color_nm = substring_index(o.goods_opt, '^', 1) and replace(pc.size_nm, ' ', '') = replace(substring_index(o.goods_opt, '^', -1), ' ', '')
 				where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
 					and o.clm_state in (-30,1,90,0)
 					$where
-				order by o.ord_date desc, pc.prd_cd asc
-				limit 0, 100
+				$orderby
+				$limit
 			) a
 				left outer join code sk on sk.code_kind_cd = 'SALE_KIND' and sk.code_id = a.sale_kind
 				left outer join code pr on pr.code_kind_cd = 'PR_CODE' and pr.code_id = a.pr_code
@@ -258,18 +275,11 @@ class ord02Controller extends Controller
 					inner join order_mst om on om.ord_no = o.ord_no
 					inner join goods g on g.goods_no = o.goods_no
 					left outer join payment p on p.ord_no = o.ord_no
-					left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
-					left outer join (
-						select prd_cd, goods_no, brand, year, season, gender, item, seq, opt, color, size, c.code_val as color_nm, cs.code_val as size_nm
-						from product_code
-							inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = color
-							inner join code cs on cs.code_kind_cd = 'PRD_CD_SIZE_MEN' and cs.code_id = size
-					) pc on pc.goods_no = o.goods_no and pc.color_nm = SUBSTRING_INDEX(o.goods_opt, '^', 1) and replace(pc.size_nm, ' ', '') = replace(substring_index(o.goods_opt, '^', -1), ' ', '')
 				where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
 					and o.clm_state in (-30,1,90,0)
 					$where
 			";
-
+			
 			$row = DB::selectOne($sql);
 			$total = $row->total;
 			$page_cnt = (int)(($total - 1) / $page_size) + 1;
@@ -295,7 +305,7 @@ class ord02Controller extends Controller
 			'name'	=> Auth('head')->user()->name
 		];
 		$ord_state = 20; // 출고처리중
-		$onoff_type = 'ON'; // 온라인/오프라인 타입 (온라인주문접수 메뉴에서 온라인으로 고정)
+		$onoff_type = 'on'; // 온라인/오프라인 타입 (온라인주문접수 메뉴에서는 온라인으로 고정)
 		$rel_order = $request->input('rel_order', '');
 		$rows = $request->input('data', []);
 		$failed_rows = [];
@@ -336,7 +346,7 @@ class ord02Controller extends Controller
 				'req_rt' => now(),
 				'req_id' => $user['id'],
 			]);
-			
+
 			foreach ($rows as $row) {
 				if (!isset($row['ord_no']) || !isset($row['ord_opt_no'])) {
 					array_push($failed_rows, $row['ord_no']);
@@ -344,8 +354,18 @@ class ord02Controller extends Controller
 				}
 				$order->SetOrdOptNo($row['ord_opt_no'], $row['ord_no']);
 
-				// 재고검사 - 수정필요
-				if (true) {
+				// 재고검사
+				$stock_check = false;
+				if ($row['dlv_place_type'] === 'storage') {
+					$sql = DB::table('product_stock_storage')->where('storage_cd', $row['dlv_place_cd'])->where('prd_cd', $row['prd_cd']);
+					if ($sql->count() > 0) $stock_check = $sql->value('wqty') >= $row['qty'];
+				}
+				if ($row['dlv_place_type'] === 'store') {
+					$sql = DB::table('product_stock_store')->where('store_cd', $row['dlv_place_cd'])->where('prd_cd', $row['prd_cd']);
+					if ($sql->count() > 0) $stock_check = $sql->value('wqty') >= $row['qty'];
+				}
+				
+				if ($stock_check) {
 					// 출고처리중 처리
 					$state_log = [
 						'ord_no' => $row['ord_no'], 
@@ -355,7 +375,6 @@ class ord02Controller extends Controller
 						'admin_nm' => $user['name']
 					];
 					$order->AddStateLog($state_log);
-					// order_opt 에 출고차수가 신규형식으로 들어가는지, 구형식으로 들어가는지 논의 필요
 					$order->DlvProc($dlv_series_no, $ord_state);
 
 					// 온라인주문접수 상품리스트 등록
@@ -384,7 +403,8 @@ class ord02Controller extends Controller
 			$code = 500;
 			$msg = $e->getMessage();
 		}
-		return response()->json(['code' => $code, 'msg' => $msg], $code);
+		$rel_orders = $this->_get_rel_orders();
+		return response()->json(['code' => $code, 'msg' => $msg, 'failed_rows' => $failed_rows, 'rel_orders' => $rel_orders], $code);
 	}
 
 	/**

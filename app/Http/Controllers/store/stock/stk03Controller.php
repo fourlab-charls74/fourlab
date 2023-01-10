@@ -266,7 +266,7 @@ class stk03Controller extends Controller
                 a.sale_kind,
                 sale_kind.code_val as sale_kind_nm,
                 st.amt_kind,
-                round((1 - ((a.price * a.qty) * (1 - if(st.amt_kind = 'per', st.sale_per, 0) / 100)) / a.goods_sh) * 100) as dc_rate,
+                round((1 - (a.price * (1 - if(st.amt_kind = 'per', st.sale_per, 0) / 100)) / a.goods_sh) * 100) as dc_rate,
                 a.pr_code,
                 pr_code.code_val as pr_code_nm,
                 a.pay_date,

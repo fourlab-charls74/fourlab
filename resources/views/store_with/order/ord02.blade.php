@@ -204,6 +204,7 @@
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
+                                        <option value="o.ord_date">주문일자</option>
                                         <option value="o.ord_no">주문번호</option>
                                         <option value="om.user_nm">주문자명</option>
                                         <option value="om.r_nm">수령자</option>
@@ -332,7 +333,7 @@
                         <span class="mr-2">출고차수 :</span>
                         <select id='exp_rel_order' name='exp_rel_order' class="form-control form-control-sm mr-2"  style='width:90px;'>
                             @foreach ($rel_orders as $rel_order)
-                                <option value='{{ $rel_order->code_val }}'>{{ $rel_order->code_val }}</option>
+                                <option value='{{ $rel_order }}'>{{ $rel_order }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -427,13 +428,11 @@
         @foreach (@$dlv_locations as $loc)
             {field: "{{ $loc->seq }}_{{ $loc->location_type }}_{{ $loc->location_cd }}_qty", headerName: "{{ $loc->location_nm }}", width: 100, type: "currencyType",
                 cellStyle: (params) => {
-                //     // const qtys = Object.keys(params.data)
-                //     //     .filter(k => k.indexOf('_qty') >= 0)
-                //     //     .map(k => ({key: k, value: params.data[k], seq: k.split("_")[0]}));
-                //     // 로직작업 필요
-                    if (!params.data) return '';
-                    return params.value == Math.max(...Object.keys(params.data).filter(k => k.indexOf('_qty') >= 0).map(k => params.data[k])) 
-                        ? ({ "background-color": "#FFDFDF" }) : '';
+                    const default_place = getDefaultDlvPlace(params.data);
+                    return default_place && params.column.colId === default_place.key ? ({ "background-color": "#FFDFDF" }) : '';
+                },
+                onCellDoubleClicked: (e) => {
+                    if (e.data && e.value >= e.data.qty) e.node.setDataValue('dlv_place', "{{ $loc->location_nm }}");
                 }
             },
         @endforeach
@@ -563,13 +562,10 @@
                                     c.setDataValue('dlv_place_cd', null);
                                     c.setDataValue('dlv_place_type', null);
                                 });
-
+                            e.node.parent.aggData = {...e.node.data};
                             e.node.parent.aggData.dlv_place = arr[0].location_nm;
                             e.node.parent.aggData.dlv_place_cd = arr[0].location_cd;
                             e.node.parent.aggData.dlv_place_type = arr[0].location_type;
-                            e.node.parent.aggData.prd_cd = e.node.data.prd_cd;
-                            e.node.parent.aggData.prd_cd_p = e.node.data.prd_cd_p;
-                            e.node.parent.aggData.comment = e.node.data.comment;
                             e.api.redrawRows({ rowNodes:[e.node, e.node.parent] });
                         } else {
                             e.api.redrawRows({ rowNodes:[e.node] });
@@ -579,15 +575,8 @@
                 }
                 if (e.column.colId === "comment") {
                     if (e.node.parent.level >= 0) {
-                        // let children = e.node.parent.allLeafChildren.filter(c => c.data?.prd_cd !== e.data.prd_cd);
-                        // gx.gridOptions.api.applyTransaction({ update: children.map(c => ({...c.data, comment: null})) });
-
+                        e.node.parent.aggData = {...e.node.data};
                         e.node.parent.aggData.comment = e.newValue;
-                        e.node.parent.aggData.dlv_place = e.node.data.dlv_place;
-                        e.node.parent.aggData.dlv_place_cd = e.node.data.dlv_place_cd;
-                        e.node.parent.aggData.dlv_place_type = e.node.data.dlv_place_type;
-                        e.node.parent.aggData.prd_cd = e.node.data.prd_cd;
-                        e.node.parent.aggData.prd_cd_p = e.node.data.prd_cd_p;
                         e.api.redrawRows({ rowNodes:[e.node.parent] });
                     }
                     e.node.data.goods_no_group === null ? e.node.setSelected(true) : e.node.parent.setSelected(true);
@@ -606,10 +595,27 @@
 		gx.Request('/store/order/ord02/search', data, 1, function(d) {
             dlv_locations = d.head.dlv_locations;
             setDlvPlaceListOptions(d.head.dlv_locations);
+            gx.gridOptions.api.forEachNode(node => {
+                const obj = getDefaultDlvPlace(node.data);
+                if (obj) {
+                    node.data.dlv_place = d.head.dlv_locations.find(d => d.location_cd === obj.cd)?.location_nm;
+                    node.data.dlv_place_cd = obj.cd;
+                    node.data.dlv_place_type = obj.type;
+                }
+            });
+            gx.gridOptions.api.forEachNode(node => {
+                if (Array.isArray(node.allLeafChildren) && node.allLeafChildren.length > 0) {
+                    node.aggData.prd_cd = node.allLeafChildren.filter(d => d.data.dlv_place)[0]?.data.prd_cd;
+                    node.aggData.dlv_place = node.allLeafChildren.filter(d => d.data.dlv_place)[0]?.data.dlv_place || null;
+                    node.aggData.dlv_place_cd = node.allLeafChildren.filter(d => d.data.dlv_place)[0]?.data.dlv_place_cd;
+                    node.aggData.dlv_place_type = node.allLeafChildren.filter(d => d.data.dlv_place)[0]?.data.dlv_place_type;
+                }
+            });
+            gx.gridOptions.api.redrawRows();
         });
 	}
 
-    // 배송처 초기화
+    // 배송처 선택지 초기화
     function setDlvPlaceListOptions(places) {
         let dlv_places = columns.map(c => c.field === 'dlv_place' ? ({
             ...c, 
@@ -625,6 +631,27 @@
         gx.gridOptions.api.setColumnDefs(dlv_places);
 	}
 
+    // 배송처 default 값 반환
+    function getDefaultDlvPlace(data) {
+        if (!data) return data;
+        const full_key = (Object.keys(data)
+            .filter(k => k.indexOf('_qty') >= 0)
+            .map(k => ({ key: k, value: data[k], seq: k.split('_')[0] * 1 }))
+            .sort((a, b) => a.seq - b.seq)
+            .reduce((a, c, i, arr) => {
+                if ((!a.key && c.value >= data.qty) || (c.seq <= a.seq && c.value >= data.qty && c.value > a.value)) return c;
+                return a;
+            }, {})
+            .key) || '';
+        const key = full_key.split('_');
+        if (key.length < 3) return undefined;
+        return {
+            key: full_key,
+            type: key[1],
+            cd: key[2],
+        }
+    }
+
     // 주문접수
     function receiptOrder() {
         let rows = [];
@@ -634,12 +661,18 @@
             }
         });
 
+        // validation
+        if(rows.length < 1) return alert("접수할 주문건을 선택해주세요.");
         if(rows.filter(r => r.ord_state != 10).length > 0) return alert("출고요청 상태의 주문건만 접수가 가능합니다.");
         if(rows.filter(r => r.ord_kind > 20).length > 0) return alert("출고보류중인 주문건은 접수할 수 없습니다.");
-        // if(rows.filter(r => r.qty > ???).length > 0) return alert("재고가 부족한 상품이 있습니다.\n확인 후 다시 접수해주세요.");
-        // console.log(rows);
+        if(rows.filter(r => !r.dlv_place_cd).length > 0) return alert("배송처가 선택되지 않은 주문건이 있습니다.\n확인 후 다시 접수해주세요.");
+        const loss_rows = rows.filter(r => {
+            let dlv_key = Object.keys(r).filter(k => k.indexOf(r.dlv_place_cd) >= 0 && k.indexOf(r.dlv_place_type) >= 0);
+            if(dlv_key.length > 0) return r[dlv_key] < r.qty;
+            return false;
+        });
+        if(loss_rows.length > 0) return alert("재고가 부족한 상품이 있습니다.\n확인 후 다시 접수해주세요.");
 
-        if(rows.length < 1) return alert("접수할 주문건을 선택해주세요.");
         if(!confirm("선택한 주문건을 접수하시겠습니까?")) return;
 
         axios({
@@ -650,10 +683,16 @@
                 data: rows
             },
         }).then(function (res) {
-            console.log(res);
             if(res.data.code === 200) {
-                // alert(res.data.msg);
-                // location.href = "/store/stock/stk20";
+                if (res.data.failed_rows.length > 0) alert("온라인주문이 접수되었으나 재고부족 등의 사유로 접수처리에 실패한 주문건이 존재합니다.\n주문번호 확인 후 다시 시도해주세요.\n해당주문건 : " + res.data.failed_rows.join(", "));
+                else alert("온라인주문이 정상적으로 접수되었습니다.");
+
+                Search();
+                $("#exp_rel_order option").remove();
+                Object.keys(res.data.rel_orders).forEach(k => {
+                    $("#exp_rel_order").append(new Option(res.data.rel_orders[k], res.data.rel_orders[k], true, true));
+                });
+                $("#exp_rel_order").prop("selectedIndex", 0);
             } else {
                 console.log(res.data);
                 alert("온라인주문접수 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
