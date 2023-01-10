@@ -110,18 +110,7 @@
                     {field: "goods_sh", headerName: "시중가", type: 'currencyType'},
                     {field: "price", headerName: "판매가", type: 'currencyType'},
                     {field: "wonga", headerName: "원가", width: 60, type: 'currencyType'},
-                    {field: "margin_rate", headerName: "마진율(%)", width:84, type: 'percentType',
-                        cellRenderer:function(params) {
-                            let price = params.data.price;
-                            let wonga = params.data.wonga;
-                            let margin_rate;
-                            if (price == "" || wonga == "") {
-                                margin_rate = ((price - wonga)/price) * 100;
-                            }
-
-                            return margin_rate;
-                        }
-                    },
+                    {field: "margin_rate", headerName: "마진율(%)", width:84, type: 'percentType'},
                 ]
             },
             {headerName:"상품옵션",
@@ -388,6 +377,7 @@
             let data = res.data.body;
             await gx.gridOptions.api.applyTransaction({add : data});
         }).catch((error) => {
+            alert('엑셀 파일 적용 중 문제가 발생했습니다. \n필수값을 입력했는지 확인해주세요');
             console.log(error);
         });
     };
@@ -414,6 +404,7 @@
         }
         gx.gridOptions.api.setRowData([]);
         await gx.gridOptions.api.applyTransaction({ add : arr });
+        alert("상품일괄등록이 완료되었습니다.");
     };
 
     const resultStyle = (params) => {

@@ -870,4 +870,43 @@ class goods extends Controller
             "body" => $result
         ]);
     }
+
+
+    //행사코드 검색
+    public function search_prcode(Request $request)
+    {
+        $pr_code_nm= $request->input('pr_code_nm', '');
+
+        $page = $request->input('page', 1);
+        $where = "";
+
+        if($pr_code_nm != '') $where .= " and code_val like '$pr_code_nm%'";
+
+        $page_size = 100;
+        $startno = ($page - 1) * $page_size;
+        $limit = " limit $startno, $page_size ";
+        $total = 0;
+        $page_cnt = 0;
+
+        $sql = "
+            select
+                code_id, code_val
+            from code
+            where code_kind_cd = 'pr_code'
+        ";
+      
+        $result = DB::select($sql);
+
+        return response()->json([
+            "code" => '200',
+            "head" => [
+                "total" => count($result),
+                "page" => 1,
+                "page_cnt" => 1,
+                "page_total" => 1,
+              
+            ],
+            "body" => $result
+        ]);
+    }
 }

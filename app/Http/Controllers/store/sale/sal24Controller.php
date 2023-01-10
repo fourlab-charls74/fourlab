@@ -99,6 +99,43 @@ class sal24Controller extends Controller
 
         $inner_where = "";
 		$inner_where2	= "";	//매출
+		$where = "";
+
+		// 매장검색
+		if ( $store_cd != "" ) {
+			$where	.= " and (1!=1";
+			foreach($store_cd as $store_cd) {
+				$where .= " or o.store_cd = '$store_cd' ";
+
+			}
+			$where	.= ")";
+		}
+
+		//판매유형 검색
+		if ( $sell_type != "" ) {
+			$where	.= " and (1!=1";
+			foreach($sell_type as $sell_types) {
+				$where .= " or o.sale_kind = '$sell_types' ";
+
+			}
+			$where	.= ")";
+		}
+
+		//행사코드 검색
+		if ( $pr_code != "" ) {
+			$where	.= " and (1!=1";
+			foreach($pr_code as $pr_codes) {
+				$where .= " or o.pr_code = '$pr_codes' ";
+
+			}
+			$where	.= ")";
+		}
+
+		if ($online_yn == 'Y') {
+			$where .= "and o.store_cd != ''";
+		} else if ($online_yn == 'N') {
+			$where .= "and o.store_cd = ''";
+		}
 
         if($goods_nm != ""){
             $inner_where .= " and g.goods_nm like '%$goods_nm%' ";
@@ -213,6 +250,9 @@ class sal24Controller extends Controller
 						, sum(w.dc_apply_amt) as dc_amt
 						, sum(if( if(ifnull(g.tax_yn,'')='','Y', g.tax_yn) = 'Y', w.recv_amt + w.point_apply_amt - w.sales_com_fee, 0)) as taxation_amt
 						, sum(if( if(ifnull(g.tax_yn,'')='','Y', g.tax_yn) = 'Y', floor((w.recv_amt + w.point_apply_amt - w.sales_com_fee)/11), 0)) as tax_amt
+						, o.store_cd
+						, o.sale_kind
+						, o.pr_code
 					from order_opt o
 						inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
 						inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
@@ -222,6 +262,7 @@ class sal24Controller extends Controller
 						and w.ord_state in ('$ord_state',60,61)
 						and o.ord_state >= '$ord_state'
 						$inner_where2 $inner_where
+						$where
 					group by w.ord_state_date, w.ord_state
 				) b group by b.sale_date
 			) t on a.sale_date = t.sale_date left outer join (

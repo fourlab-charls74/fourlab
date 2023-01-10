@@ -129,7 +129,7 @@
                             </div>
 						</div>
 					</div>
-                    <div class="col-lg-4 inner-td">
+                    <!-- <div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="">행사코드</label>
 							<div class="flax_box">
@@ -140,6 +140,16 @@
 								@endforeach
 								</select>
 							</div>
+						</div>
+					</div> -->
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+							<label for="">행사코드</label>
+							<div class="form-inline inline_btn_box">
+                                <input type='hidden' id="pr_code_nm" name="pr_code_nm">
+                                <select id="pr_code" name="pr_code[]" class="form-control form-control-sm select2-prcode multi_select" multiple></select>
+                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-prcode"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                            </div>
 						</div>
 					</div>
                     <div class="col-lg-4 inner-td" style="margin-top: 20px;">
@@ -158,11 +168,6 @@
                         </div>
                     </div>
                 </div>
-
-
-
-
-
 
                 <div class="search-area-ext d-none row">
                     <div class="col-lg-4 inner-td">
@@ -620,6 +625,11 @@
         // 판매유형 다중검색
         $( ".sch-sellType" ).on("click", function() {
             searchSellType.Open(null, "multiple");
+        });
+      
+        // 행사코드 다중검색
+        $( ".sch-prcode" ).on("click", function() {
+            searchPrCode.Open(null, "multiple");
         });
     });
 

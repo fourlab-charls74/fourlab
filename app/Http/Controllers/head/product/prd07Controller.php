@@ -411,8 +411,8 @@ class prd07Controller extends Controller
 			DB::rollback();
 			return response()->json([
                 "result" => 0,
-				// "msg" => "시스템에러"
-				"msg" => $e->getMessage()
+				"msg" => "시스템에러"
+				// "msg" => $e->getMessage()
             ]);
 		}
 
@@ -454,6 +454,7 @@ class prd07Controller extends Controller
 	public function get_products(Request $request) {
         $data = $request->input('data', []);
         $result = [];
+		$code = "";
 
         foreach($data as $key => $d)
         {
@@ -469,10 +470,10 @@ class prd07Controller extends Controller
 			$price = $d['price'];						//판매가
 			$wonga = $d['wonga'];						//원가
 			$margin_rate = $d['margin_rate'];			//마진율
-			$option_kind = $d['option_kind'];			//옵션구분
+			$option_kind = $d['option_kind']??'';		//옵션구분
 			$opt1 = $d['opt1']??'';						//옵션1
 			$opt2 = $d['opt2']??'';						//옵션2
-			$opt_qty = $d['opt_qty'];					//수량
+			$opt_qty = $d['opt_qty']??'';				//수량
 			$opt_price = $d['opt_price']??'';			//옵션가격
 			$head_desc = $d['head_desc']??'';			//상단홍보글
 			$ad_desc = $d['ad_desc']??'';				//하단홍보글
@@ -540,17 +541,17 @@ class prd07Controller extends Controller
 					'$tax_yn' as tax_yn,
 					'$goods_location' as goods_location,
 					'$tags' as tags
-				from goods g
-				left outer join goods_tags gt on gt.goods_no = g.goods_no
+				from goods 
 				limit 1
 
             ";
             $row = DB::selectOne($sql);
             array_push($result, $row);
-        }
+			$code = 200;
+		}
 
         return response()->json([
-            "code" => 200,
+            "code" => $code,
             "head" => [
                 "total" => count($result),
                 "page" => 1,

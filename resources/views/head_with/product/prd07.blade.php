@@ -273,13 +273,13 @@
                                         <input type="checkbox" name="chk_option_kind1" id="chk_option_kind1" class="custom-control-input" checked>
                                         <label class="custom-control-label" for="chk_option_kind1">&nbsp;</label>
                                     </div>
-                                    <input type="text" class="form-control form-control-sm mr-2" id="option_kind1" name="option_kind1" value="사이즈" onkeyup="checkOptionValue(this);" style="width: 100px"/>
+                                    <input type="text" class="form-control form-control-sm mr-2" id="option_kind1" name="option_kind1" value="컬러" onkeyup="checkOptionValue(this);" style="width: 100px"/>
                                     <span class="txt_box mr-2">~</span>
                                     <div class="custom-control custom-checkbox">
                                         <input type="checkbox" name="chk_option_kind2" id="chk_option_kind2" class="custom-control-input" checked/>
                                         <label class="custom-control-label" for="chk_option_kind2">&nbsp;</label>
                                     </div>
-                                    <input type="text" class="form-control form-control-sm" id="option_kind2" name="option_kind2" value="컬러" onkeyup="checkOptionValue(this);" style="width: 100px"/>
+                                    <input type="text" class="form-control form-control-sm" id="option_kind2" name="option_kind2" value="사이즈" onkeyup="checkOptionValue(this);" style="width: 100px"/>
                                 </div>
                             </div>
                         </div>
@@ -797,18 +797,43 @@
             };
         };
 
+        // const insertDB = async (data) => {
+        //     for (let i = 0; i < data.length; i++) {
+        //         let row = data[i];
+        //         const response = await axios({
+        //             url: '/head/product/prd07/enroll',
+        //             method: 'post',
+        //             data: { row: row }
+        //         });
+        //         const { result, msg } = response.data;
+        //         row = { ...getRowNode(row).data, msg: msg, result: result };
+        //         // updateRow(row);
+        //         gx.gridOptions.api.applyTransaction({update : [{...row}]});
+
+        //         console.log(i == data.length - 1);
+        //         if(i == data.length - 1) {
+        //             break;
+        //             return alert("상품일괄등록이 완료되었습니다.");
+        //         }
+        //     }
+        // };
+
         const insertDB = async (data) => {
+            const arr = [];
             for (let i = 0; i < data.length; i++) {
                 let row = data[i];
                 const response = await axios({
-                    url: '/head/product/prd07/enroll',
+                    url: '/head/product/prd07/enroll2',
                     method: 'post',
                     data: { row: row }
                 });
                 const { result, msg } = response.data;
-                row = { ...getRowNode(row).data, msg: msg, result: result };
-                updateRow(row);
+                row = { ...row, msg: msg, result: result };
+                arr.push(row);
             }
+            gx.gridOptions.api.setRowData([]);
+            await gx.gridOptions.api.applyTransaction({ add : arr });
+            alert("상품일괄등록이 완료되었습니다.");
         };
 
         const resultStyle = (params) => {
@@ -847,11 +872,11 @@
 
             if (used == 'Y') {
                 $("input[name='option_kind1']").attr("disabled", false);
-                $("input[name='option_kind1']").val("사이즈");
+                $("input[name='option_kind1']").val("컬러");
                 $("input[name='chk_option_kind1']").attr("disabled", false);
                 $("input[name='chk_option_kind1']").attr("checked", true);
                 $("input[name='option_kind2']").attr("disabled", false);
-                $("input[name='option_kind2']").val("컬러");
+                $("input[name='option_kind2']").val("사이즈");
                 $("input[name='chk_option_kind2']").attr("disabled", false);
                 $("input[name='chk_option_kind2']").attr("checked", true);
 
@@ -880,24 +905,24 @@
             if ($("#chk_option_kind1")[0].checked) {
                 $("input[name='option_kind1']").attr("disabled", false);
                 $("input[name='option_kind1']").attr("readonly", false);
-                $("input[name='option_kind1']").val("사이즈");
+                $("input[name='option_kind1']").val("컬러");
                 $("input[name='option_kind1']").focus();
             } else {
                 $("input[name='option_kind1']").attr("disabled", true);
                 $("input[name='option_kind1']").attr("readonly", true);
-                $("input[name='option_kind1']").val("사이즈");
+                $("input[name='option_kind1']").val("컬러");
             }
         });
         $("#chk_option_kind2").bind("change", () => {
             if ($("#chk_option_kind2")[0].checked) {
                 $("input[name='option_kind2']").attr("disabled", false);
                 $("input[name='option_kind2']").attr("readonly", false);
-                $("input[name='option_kind2']").val("컬러");
+                $("input[name='option_kind2']").val("사이즈");
                 $("input[name='option_kind2']").focus();
             } else {
                 $("input[name='option_kind2']").attr("disabled", true);
                 $("input[name='option_kind2']").attr("readonly", true);
-                $("input[name='option_kind2']").val("컬러");
+                $("input[name='option_kind2']").val("사이즈");
             }
         });
 
@@ -1131,12 +1156,12 @@
                     return false;
                 }
 
-                if (row.option_kind == undefined || row.option_kind == "") {
-                    stopEditing();
-                    alert("옵션구분을 입력해 주세요.");
-                    startEditingCell(row.idx, 'option_kind');
-                    return false;
-                }
+                // if (row.option_kind == undefined || row.option_kind == "") {
+                //     stopEditing();
+                //     alert("옵션구분을 입력해 주세요.");
+                //     startEditingCell(row.idx, 'option_kind');
+                //     return false;
+                // }
                 var a_opt_kind = row.option_kind.split("^");
 
                 if (a_opt_kind.length > 2) {
@@ -1146,35 +1171,35 @@
                     return false;
                 }
 
-                if (a_opt_kind.length == 2) {
-                    if (row.opt1 == undefined || row.opt1 == '') {
-                        stopEditing();
-                        alert("옵션1 항목에 옵션값을 입력 하십시오.");
-                        startEditingCell(row.idx, 'opt1');
-                        return false;
-                    }
+                // if (a_opt_kind.length == 2) {
+                //     if (row.opt1 == undefined || row.opt1 == '') {
+                //         stopEditing();
+                //         alert("옵션1 항목에 옵션값을 입력 하십시오.");
+                //         startEditingCell(row.idx, 'opt1');
+                //         return false;
+                //     }
     
-                    if (row.opt2 == undefined || row.opt2 == '') {
-                        stopEditing();
-                        alert("옵션2 항목에 옵션값을 입력 하십시오.");
-                        startEditingCell(row.idx, 'opt2');
-                        return false;
-                    }
-                } else if (a_opt_kind.length == 1 && row.option_kind != "NONE") {
-                    if (row.opt1 == undefined || row.opt1 == '') {
-                        stopEditing();
-                        alert("옵션1 항목에 옵션값을 입력 하십시오.");
-                        startEditingCell(row.idx, 'opt1');
-                        return false;
-                    }
-                }
+                //     if (row.opt2 == undefined || row.opt2 == '') {
+                //         stopEditing();
+                //         alert("옵션2 항목에 옵션값을 입력 하십시오.");
+                //         startEditingCell(row.idx, 'opt2');
+                //         return false;
+                //     }
+                // } else if (a_opt_kind.length == 1 && row.option_kind != "NONE") {
+                //     if (row.opt1 == undefined || row.opt1 == '') {
+                //         stopEditing();
+                //         alert("옵션1 항목에 옵션값을 입력 하십시오.");
+                //         startEditingCell(row.idx, 'opt1');
+                //         return false;
+                //     }
+                // }
 
-                if (row.opt_qty == undefined || row.opt_qty == "") {
-                    stopEditing();
-                    alert("수량을 입력해 주세요.");
-                    startEditingCell(row.idx, 'opt_qty');
-                    return false;
-                }
+                // if (row.opt_qty == undefined || row.opt_qty == "") {
+                //     stopEditing();
+                //     alert("수량을 입력해 주세요.");
+                //     startEditingCell(row.idx, 'opt_qty');
+                //     return false;
+                // }
                 // 첫번째 옵션 갯수와 수량 갯수 비교
                 if (row.opt_qty != "") {
                     var a_opt1 = row.opt1?.split(",");

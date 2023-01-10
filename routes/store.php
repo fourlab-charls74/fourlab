@@ -72,6 +72,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
         //판매유형검색
         Route::get('sale/search_sell_type', 'goods@search_sell_type');
+        
+        //행사코드검색
+        Route::get('sale/search_prcode', 'goods@search_prcode');
     });
 
     // 포스
