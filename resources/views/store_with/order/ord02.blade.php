@@ -331,13 +331,23 @@
                 <div class="fr_box d-flex">
                     <div class="d-flex">
                         <span class="mr-2">출고차수 :</span>
-                        <select id='exp_rel_order' name='exp_rel_order' class="form-control form-control-sm mr-2"  style='width:90px;'>
+                        <select id='rel_order' name='rel_order' class="form-control form-control-sm mr-2"  style='width:90px;'>
                             @foreach (@$rel_orders as $rel_order)
                                 <option value='{{ $rel_order }}'>{{ $rel_order }}</option>
                             @endforeach
                         </select>
                     </div>
                     <a href="javascript:void(0);" onclick="return receiptOrder();" class="btn btn-sm btn-primary shadow-sm">온라인주문접수</a>
+                    <span class="ml-2 mr-2 text-secondary">|</span>
+                    <div class="d-flex">
+                        <span class="mr-2">출고구분 :</span>
+                        <select id='ord_kind' name='ord_kind' class="form-control form-control-sm mr-2"  style='width:120px;'>
+                            @foreach (@$ord_kinds as $ord_kind)
+                                <option value='{{ $ord_kind->code_id }}'>{{ $ord_kind->code_val }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <a href="javascript:void(0);" onclick="return updateOrdKind();" class="btn btn-sm btn-primary shadow-sm">출고구분변경</a>
                 </div>
 			</div>
 		</div>
@@ -379,6 +389,21 @@
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
         },
         {field: "pay_stat_nm", headerName: "입금상태", pinned: 'left', width: 55, cellStyle: {'text-align': 'center'},
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "ord_type_nm", headerName: "주문구분", width: 60, cellStyle: {'text-align': 'center'}, pinned: 'left',
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "ord_kind", headerName: "출고구분코드", hide: true,
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+        },
+        {field: "ord_kind_nm", headerName: "출고구분", width: 60, cellStyle: StyleOrdKind, pinned: 'left',
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "sale_place_nm", headerName: "판매처", width: 80, cellStyle: {'text-align': 'center'}, pinned: 'left',
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
         },
@@ -425,7 +450,7 @@
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
         },
-        {field: "qty", headerName: "수량", width: 50, type: "currencyType", aggFunc: "first"},
+        {field: "qty", headerName: "수량", width: 50, type: "currencyType", cellStyle: {"font-weight": "bold"}, aggFunc: "first"},
         @foreach (@$dlv_locations as $loc)
             {field: "{{ $loc->seq }}_{{ $loc->location_type }}_{{ $loc->location_cd }}_qty", headerName: "{{ $loc->location_nm }}", width: 100, type: "currencyType",
                 cellStyle: (params) => {
@@ -500,22 +525,7 @@
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
         },
-        {field: "ord_type_nm", headerName: "주문구분", width: 60, cellStyle: {'text-align': 'center'},
-            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
-			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
-        },
-        {field: "ord_kind", headerName: "출고구분코드", hide: true,
-            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
-        },
-        {field: "ord_kind_nm", headerName: "출고구분", width: 60, cellStyle: StyleOrdKind,
-            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
-			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
-        },
         {field: "baesong_kind", headerName: "배송구분", width: 60, cellStyle: {'text-align': 'center'},
-            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
-			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
-        },
-        {field: "sale_place_nm", headerName: "판매처", width: 100, cellStyle: {'text-align': 'center'},
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
         },
@@ -686,7 +696,7 @@
         });
 
         // validation
-        if(!$("#exp_rel_order").val()) return alert("출고차수를 선택해주세요.");
+        if(!$("#rel_order").val()) return alert("출고차수를 선택해주세요.");
         if(rows.length < 1) return alert("접수할 주문건을 선택해주세요.");
         if(rows.filter(r => r.ord_state != 10).length > 0) return alert("출고요청 상태의 주문건만 접수가 가능합니다.");
         if(rows.filter(r => r.ord_kind > 20).length > 0) return alert("출고보류중인 주문건은 접수할 수 없습니다.");
@@ -704,7 +714,7 @@
             url: '/store/order/ord02/receipt',
             method: 'post',
             data: { 
-                rel_order: $("#exp_rel_order").val(),
+                rel_order: $("#rel_order").val(),
                 data: rows
             },
         }).then(function (res) {
@@ -713,14 +723,49 @@
                 else alert("온라인주문이 정상적으로 접수되었습니다.");
 
                 Search();
-                $("#exp_rel_order option").remove();
+                $("#rel_order option").remove();
                 Object.keys(res.data.rel_orders).forEach(k => {
-                    $("#exp_rel_order").append(new Option(res.data.rel_orders[k], res.data.rel_orders[k], true, true));
+                    $("#rel_order").append(new Option(res.data.rel_orders[k], res.data.rel_orders[k], true, true));
                 });
-                $("#exp_rel_order").prop("selectedIndex", 0);
+                $("#rel_order").prop("selectedIndex", 0);
             } else {
                 console.log(res.data);
                 alert("온라인주문접수 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
+    }
+
+    // 출고구분변경
+    function updateOrdKind() {
+        let rows = [];
+        gx.gridOptions.api.forEachNode(function(node) {
+            if ((node.aggData || node.data?.goods_no_group === null) && node.selected) {
+                rows.push(node.aggData || node.data);
+            }
+        });
+
+        // validation
+        if(rows.length < 1) return alert("출고구분을 변경할 주문건을 선택해주세요.");
+        const ord_kind_nm = $("#ord_kind option:checked").text();
+
+        if(!confirm(`선택한 주문건의 출고구분을 '${ord_kind_nm}' 상태로 변경하시겠습니까?`)) return;
+
+        axios({
+            url: '/store/order/ord02/update/ord-kind',
+            method: 'post',
+            data: { 
+                ord_kind: $("#ord_kind").val(),
+                data: rows.map(r => r.ord_opt_no),
+            },
+        }).then(function (res) {
+            if(res.data.code === 200) {
+                alert("출고구분변경이 정상적으로 완료되었습니다.");
+                Search();
+            } else {
+                console.log(res.data);
+                alert("출고구분변경 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
             }
         }).catch(function (err) {
             console.log(err);

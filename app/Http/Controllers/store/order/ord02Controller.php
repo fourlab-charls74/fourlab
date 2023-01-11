@@ -41,6 +41,7 @@ class ord02Controller extends Controller
 			'items'			    => SLib::getItems(), // 품목
             'sale_kinds'        => SLib::getUsedSaleKinds(),
 			'rel_orders'		=> $rel_orders, // 온라인출고차수
+			'ord_kinds'			=> SLib::getCodes('G_ORD_KIND'), // 출고구분
 			'dlv_locations'		=> $dlv_locations, // 배송처
 		];
         return view( Config::get('shop.store.view') . '/order/ord02', $values );
@@ -305,6 +306,7 @@ class ord02Controller extends Controller
         ]);
 	}
 
+	// 온라인주문접수
 	public function receipt(Request $request)
 	{
 		$user = [
@@ -396,6 +398,9 @@ class ord02Controller extends Controller
 						'comment' => $row['comment'],
 						'rt' => now(),
 					]);
+
+					// 재고처리
+					$this->update_stock($user, $row, $ord_state);
 				} else {
 					array_push($failed_rows, $row['ord_no']);
 					continue;
@@ -412,6 +417,112 @@ class ord02Controller extends Controller
 		}
 		$rel_orders = $this->_get_rel_orders();
 		return response()->json(['code' => $code, 'msg' => $msg, 'failed_rows' => $failed_rows, 'rel_orders' => $rel_orders], $code);
+	}
+
+	// 주문접수 시 보유재고 차감처리
+	private function update_stock($user, $row, $ord_state)
+	{
+		$prd_cd = $row['prd_cd'] ?? '';
+		$goods_no = $row['goods_no'] ?? '';
+		$goods_opt = $row['goods_opt'] ?? '';
+		$ord_price = $row['price'] ?? '';
+		$ord_opt_no = $row['ord_opt_no'] ?? '';
+		$ord_qty = $row['qty'] ?? 0;
+		$wonga = $row['wonga'] ?? 0;
+		$location_type = strtoupper($row['dlv_place_type'] ?? '');
+		$location_cd = $row['dlv_place_cd'] ?? '';
+		
+		// 보유재고 차감
+		if ($location_type === 'STORE') {
+			DB::table('product_stock_store')
+				->where('prd_cd', '=', $prd_cd)
+				->where('store_cd', '=', $location_cd) 
+				->update([
+					'wqty' => DB::raw('wqty - ' . $ord_qty),
+					'ut' => now(),
+				]);
+			DB::table('product_stock')
+				->where('prd_cd', '=', $prd_cd)
+				->update([
+					'qty_wonga'	=> DB::raw('qty_wonga - ' . ($ord_qty * $wonga)),
+					'out_qty' => DB::raw('out_qty + ' . $ord_qty),
+					'qty' => DB::raw('qty - ' . $ord_qty),
+					'ut' => now(),
+				]);
+		} else if ($location_type === 'STORAGE') {
+			DB::table('product_stock_storage')
+				->where('prd_cd', '=', $prd_cd)
+				->where('storage_cd', '=', $location_cd)
+				->update([
+					'wqty' => DB::raw('wqty - ' . $ord_qty),
+					'ut' => now(),
+				]);
+			DB::table('product_stock')
+				->where('prd_cd', '=', $prd_cd)
+				->update([
+					'qty_wonga'	=> DB::raw('qty_wonga - ' . ($ord_qty * $wonga)),
+					'out_qty' => DB::raw('out_qty + ' . $ord_qty),
+					'qty' => DB::raw('qty - ' . $ord_qty),
+					'wqty' => DB::raw('wqty - ' . $ord_qty),
+					'ut' => now(),
+				]);
+		}
+
+		// 재고이력 등록
+		DB::table('product_stock_hst')
+			->insert([
+				'goods_no' => $goods_no,
+				'prd_cd' => $prd_cd,
+				'goods_opt' => $goods_opt,
+				'location_cd' => $location_cd,
+				'location_type' => $location_type,
+				'type' => 17, // 재고분류 : 출고
+				'price' => $ord_price,
+				'wonga' => $wonga,
+				'qty' => $ord_qty * -1,
+				'stock_state_date' => date('Ymd'),
+				'ord_opt_no' => $ord_opt_no,
+				'comment' => ($location_type === 'STORE' ? '매장' : '창고') . '출고(온라인배송)',
+				'rt' => now(),
+				'admin_id' => $user['id'],
+				'admin_nm' => $user['name'],
+			]);
+	}
+
+	// 출고구분변경
+	public function update_ord_kind(Request $request)
+	{
+		$ord_kind = $request->input('ord_kind', '');
+		$ord_opt_nos = $request->input('data', []);
+		$ord_opt_nos = implode(', ', $ord_opt_nos);
+
+		try {
+            DB::beginTransaction();
+
+			$sql = "
+				update order_opt
+					set ord_kind = '$ord_kind'
+				where ord_opt_no in ($ord_opt_nos)
+			";
+			DB::update($sql);
+
+			$sql = "
+				update order_opt_wonga
+					set ord_kind = '$ord_kind'
+				where ord_opt_no in ($ord_opt_nos)
+			";
+			DB::update($sql);
+
+			DB::commit();
+			$code = 200;
+			$msg = "출고구분변경이 정상적으로 완료되었습니다.";
+		} catch (Exception $e) {
+			DB::rollBack();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+		return response()->json(['code' => $code, 'msg' => $msg], $code);
 	}
 
 	/**
