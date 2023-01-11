@@ -16,7 +16,7 @@ class ord02Controller extends Controller
 {
 	public function index(Request $request) {
 
-		$sdate = Carbon::now()->sub(4, 'week')->format("Y-m-d");
+		$sdate = Carbon::now()->sub(3, 'day')->format("Y-m-d");
 		$edate = Carbon::now()->format("Y-m-d");
 
 		$sale_places_sql = "select com_id as id, com_nm as val from company where com_type = '4' and use_yn = 'Y' order by com_nm";
@@ -275,6 +275,13 @@ class ord02Controller extends Controller
 					inner join order_mst om on om.ord_no = o.ord_no
 					inner join goods g on g.goods_no = o.goods_no
 					left outer join payment p on p.ord_no = o.ord_no
+					left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
+					left outer join (
+						select prd_cd, goods_no, brand, year, season, gender, item, seq, opt, color, size, c.code_val as color_nm, cs.code_val as size_nm
+						from product_code
+							inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = color
+							inner join code cs on if(gender = 'M', cs.code_kind_cd = 'PRD_CD_SIZE_MEN', if(gender = 'W', cs.code_kind_cd = 'PRD_CD_SIZE_WOMEN', if(gender = 'U', cs.code_kind_cd = 'PRD_CD_SIZE_UNISEX', cs.code_kind_cd = 'PRD_CD_SIZE_MATCH' ))) and cs.code_id = size
+					) pc on pc.goods_no = o.goods_no and pc.color_nm = substring_index(o.goods_opt, '^', 1) and replace(pc.size_nm, ' ', '') = replace(substring_index(o.goods_opt, '^', -1), ' ', '')
 				where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
 					and o.clm_state in (-30,1,90,0)
 					$where

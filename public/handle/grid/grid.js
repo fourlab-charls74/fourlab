@@ -707,7 +707,7 @@ HDGrid.prototype.deleteRows = function (rows) {
     return this.setRows([]);
 };
 
-// 최유현 - 롤업 시 level param row의 count 조회
+// 롤업 시 level param row의 count 조회 (최유현)
 HDGrid.prototype.getRowCountForLevel = function (level = 1) {
     var cnt = 0;
     this.gridOptions.api.forEachNode(function(node) {
@@ -719,3 +719,11 @@ HDGrid.prototype.getRowCountForLevel = function (level = 1) {
     });
     return cnt;
 };
+
+// 방금 작업하던 셀에 포커스 (최유현)
+HDGrid.prototype.setFocusedWorkingCell = function () {
+    let cell = this.gridOptions.api.getFocusedCell();
+    if (cell) {
+        this.gridOptions.api.setFocusedCell( cell.rowIndex, cell.column );
+    }
+}

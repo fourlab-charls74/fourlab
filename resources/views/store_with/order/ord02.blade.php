@@ -195,10 +195,10 @@
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box" style="width:24%;">
                                     <select name="limit" class="form-control form-control-sm">
-                                        <option value="100">100</option>
                                         <option value="500">500</option>
                                         <option value="1000">1000</option>
                                         <option value="2000">2000</option>
+                                        <option value="5000">5000</option>
                                     </select>
                                 </div>
                                 <span class="text_line">/</span>
@@ -322,7 +322,7 @@
 </form>
 <!-- DataTales Example -->
 <div class="card shadow mb-0 last-card pt-2 pt-sm-0">
-	<div class="card-body">
+	<div class="card-body pb-2">
 		<div class="card-title">
 			<div class="filter_wrap">
 				<div class="fl_box">
@@ -344,6 +344,7 @@
 		<div class="table-responsive">
 			<div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
 		</div>
+        <p class="mt-2 fs-14 text-secondary">* 창고/매장의 재고cell을 더블클릭하면 해당 창고/매장이 배송처로 적용됩니다. ( <span class="text-primary font-weight-bold">창고</span> / <span class="text-danger font-weight-bold">매장</span> )</p>
 	</div>
 </div>
 
@@ -438,8 +439,19 @@
         @endforeach
         {field: "dlv_place_type", headerName: "배송처타입", hide: true},
         {field: "dlv_place_cd", headerName: "배송처코드", hide: true},
-        {field: "dlv_place", headerName: "배송처", width: 130, editable: true, cellStyle: (params) => ({'background-color': params.node.level == 0 ? '#ffff99' : params.node.level == 1 ? '#eeeeee' : 'none'})},
-        {field: "comment", headerName: "접수메모", width: 120, editable: true, cellStyle: (params) => ({'background-color': params.node.level == 0 ? '#ffff99' : params.node.level == 1 ? '#eeeeee' : 'none'})},
+        {field: "dlv_place", headerName: "배송처", width: 130, editable: true, 
+            cellStyle: (params) => {
+                return {
+                    'background-color': params.node.level == 0 ? '#ffff99' : params.node.level == 1 ? params.data?.dlv_place || params.data?.comment ? '#C5FF9D' : '#eeeeee' : 'none',
+                    'color': params.data ? (params.data?.dlv_place_type === 'store' ? '#ff0000' : '#0000ff') : (params.node.aggData?.dlv_place_type === 'store' ? '#ff0000' : '#0000ff'),
+                };
+            }
+        },
+        {field: "comment", headerName: "접수메모", width: 120, editable: true,
+            cellStyle: (params) => {
+                return {'background-color': params.node.level == 0 ? '#ffff99' : params.node.level == 1 ? params.data?.dlv_place || params.data?.comment ? '#C5FF9D' : '#eeeeee' : 'none'};
+            },
+        },
         {field: "user_nm", headerName: "주문자(아이디)", width: 120, cellStyle: {'text-align': 'center'},
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
@@ -527,11 +539,11 @@
 </script>
 
 <script type="text/javascript" charset="utf-8">
-	const pApp = new App('', { gridId:"#div-gd" });
+	const pApp = new App('', { gridId:"#div-gd", height: 285 });
 	let gx;
 
 	$(document).ready(function() {
-		pApp.ResizeGrid(275);
+		pApp.ResizeGrid(285);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns, {
@@ -558,26 +570,37 @@
                             e.node.parent.allLeafChildren
                                 .filter(c => c.data?.prd_cd !== e.data.prd_cd)
                                 .forEach(c => {
-                                    c.setDataValue('dlv_place', null);
-                                    c.setDataValue('dlv_place_cd', null);
-                                    c.setDataValue('dlv_place_type', null);
+                                    c.data.dlv_place = null;
+                                    c.data.dlv_place_cd = null;
+                                    c.data.dlv_place_type = null;
+                                    c.data.comment = undefined;
                                 });
                             e.node.parent.aggData = {...e.node.data};
                             e.node.parent.aggData.dlv_place = arr[0].location_nm;
                             e.node.parent.aggData.dlv_place_cd = arr[0].location_cd;
                             e.node.parent.aggData.dlv_place_type = arr[0].location_type;
-                            e.api.redrawRows({ rowNodes:[e.node, e.node.parent] });
+                            e.api.redrawRows({ rowNodes:[e.node, e.node.parent, ...e.node.parent.allLeafChildren] });
                         } else {
                             e.api.redrawRows({ rowNodes:[e.node] });
                         }
+                        gx.setFocusedWorkingCell();
                     }
                     e.node.data.goods_no_group === null ? e.node.setSelected(true) : e.node.parent.setSelected(true);
                 }
-                if (e.column.colId === "comment") {
+                if (e.column.colId === "comment" && e.oldValue !== e.newValue) {
                     if (e.node.parent.level >= 0) {
+                        e.node.parent.allLeafChildren
+                            .filter(c => c.data?.prd_cd != e.data.prd_cd)
+                            .forEach(c => {
+                                c.data.dlv_place = null;
+                                c.data.dlv_place_cd = null;
+                                c.data.dlv_place_type = null;
+                                c.data.comment = undefined;
+                            });
                         e.node.parent.aggData = {...e.node.data};
                         e.node.parent.aggData.comment = e.newValue;
-                        e.api.redrawRows({ rowNodes:[e.node.parent] });
+                        e.api.redrawRows({ rowNodes:[...e.node.parent.allLeafChildren, e.node.parent] });
+                        gx.setFocusedWorkingCell();
                     }
                     e.node.data.goods_no_group === null ? e.node.setSelected(true) : e.node.parent.setSelected(true);
                 }
@@ -612,6 +635,7 @@
                 }
             });
             gx.gridOptions.api.redrawRows();
+            gx.setFocusedWorkingCell();
         });
 	}
 
