@@ -12,5 +12,8 @@ return [
     ],
     'store' => [
         'view' => env('STORE_VIEW','store')
+    ],
+    'shop' => [
+        'view' => env('SHOP_VIEW','shop')
     ]
 ];

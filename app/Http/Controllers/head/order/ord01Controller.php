@@ -22,7 +22,7 @@ class ord01Controller extends Controller
 {
     public function index(Request $req) {
         $mutable = now();
-        $sdate	= $mutable->sub(3, 'month')->format('Y-m-d');
+        $sdate	= $mutable->sub(1, 'month')->format('Y-m-d');
 
 		$o = $req->input('o');
 		$ismt= $req->input('ismt');
