@@ -332,7 +332,7 @@
                     <div class="d-flex">
                         <span class="mr-2">출고차수 :</span>
                         <select id='exp_rel_order' name='exp_rel_order' class="form-control form-control-sm mr-2"  style='width:90px;'>
-                            @foreach ($rel_orders as $rel_order)
+                            @foreach (@$rel_orders as $rel_order)
                                 <option value='{{ $rel_order }}'>{{ $rel_order }}</option>
                             @endforeach
                         </select>
@@ -662,6 +662,7 @@
         });
 
         // validation
+        if(!$("#exp_rel_order").val()) return alert("출고차수를 선택해주세요.");
         if(rows.length < 1) return alert("접수할 주문건을 선택해주세요.");
         if(rows.filter(r => r.ord_state != 10).length > 0) return alert("출고요청 상태의 주문건만 접수가 가능합니다.");
         if(rows.filter(r => r.ord_kind > 20).length > 0) return alert("출고보류중인 주문건은 접수할 수 없습니다.");

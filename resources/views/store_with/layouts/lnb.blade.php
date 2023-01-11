@@ -40,7 +40,7 @@
                     <!--<li><a href="/store/stock/stk02">(개)매장재고입출고</a></li>//-->
                     <li><a href="/store/stock/stk10">(완)출고</a></li>
                     <li><a href="/store/stock/stk30">(완)창고반품</a></li>
-                    <li><a href="/store/stock/stk03">(완)매장주문</a></li>
+                    {{-- <li><a href="/store/stock/stk03">(완)매장주문</a></li> => 주문/배송관리 탭으로 이동 --}}
                     {{-- <li><a href="/store/stock/stk11">(개)반품</a></li> --}}
                     <li><a href="/store/stock/stk20">(완)매장RT</a></li>
                     <li><a href="/store/stock/stk16">(완)원부자재출고</a></li>
@@ -55,7 +55,8 @@
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-cart fs-18"></i><span>주문/배송관리</span></a>
                 <ul>
-                    <li><a href="/store/order/ord02">(개)온라인 주문접수</a></li>
+                    <li><a href="/store/order/ord01">(완)매장주문</a></li>
+                    <li><a href="/store/order/ord02">(완)온라인 주문접수</a></li>
                     <li><a href="/store/order/ord03">(개)온라인 배송처리</a></li>
                 </ul>
             </li>
