@@ -22,13 +22,26 @@ class ord01Controller extends Controller
 {
     public function index()
 	{
+        $date = $_GET['date']??'';
+        // $store_cd = $_GET['store_cd'];
+        // $sell_type = $_GET['sell_type'];
+        // $pr_code = $_GET['pr_code'];
 
         $conf = new Conf();
 		$domain		= $conf->getConfigValue("shop", "domain");
 
+        $todate = strtotime($date);
+        $todate = date('Y-m-d', $todate);
+
+        dd($todate);
+
+        $sdate = now()->sub(1, 'month')->format('Y-m-d');
+        $edate = date("Y-m-d");
+
+
 		$values = [
-            'sdate'             => now()->sub(1, 'month')->format('Y-m-d'),
-            'edate'             => date("Y-m-d"),
+            'sdate'             => $sdate,
+            'edate'             => $edate,
             'style_no'          => '',
             'domain'		    => $domain,
             'ord_states'        => SLib::getordStates(), // 주문상태
@@ -77,6 +90,7 @@ class ord01Controller extends Controller
         $prd_cd_range_text = $request->input("prd_cd_range", '');
         $sale_form      = $request->input('sale_form', '');
         $sale_kind      = $request->input('sale_kind', '');
+        $pr_code        = $request->input('pr_code', '');
         if ($page < 1 or $page == '') $page = 1;
 
         $offline_store = 'HEAD_OFFICE';
@@ -212,6 +226,16 @@ class ord01Controller extends Controller
         else if ($sale_form == 'On') $where .= " and (o.store_cd is null or o.store_cd = '$offline_store') ";
 
         if ($sale_kind != '') $where .= "and o.sale_kind = '$sale_kind' ";
+
+        //행사코드 검색
+		if ( $pr_code != "" ) {
+			$where	.= " and (1!=1";
+			foreach($pr_code as $pr_codes) {
+				$where .= " or o.pr_code = '$pr_codes' ";
+
+			}
+			$where	.= ")";
+		}
 
         // ordreby
         $orderby = sprintf("order by %s %s", $ord_field, $ord);

@@ -95,11 +95,12 @@ class sal24Controller extends Controller
         $store_cd       = $request->input('store_no');
         $sell_type      = $request->input('sell_type');
         $pr_code        = $request->input('pr_code');
-        $online_yn      = $request->input('online_yn');
+        $on_off_yn      = $request->input('on_off_yn');
 
         $inner_where = "";
 		$inner_where2	= "";	//매출
 		$where = "";
+
 
 		// 매장검색
 		if ( $store_cd != "" ) {
@@ -131,10 +132,10 @@ class sal24Controller extends Controller
 			$where	.= ")";
 		}
 
-		if ($online_yn == 'Y') {
-			$where .= "and o.store_cd != ''";
-		} else if ($online_yn == 'N') {
+		if ($on_off_yn == 'ON') {
 			$where .= "and o.store_cd = ''";
+		} else if ($on_off_yn == 'OFF') {
+			$where .= "and o.store_cd != ''";
 		}
 
         if($goods_nm != ""){

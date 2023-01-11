@@ -129,19 +129,6 @@
                             </div>
 						</div>
 					</div>
-                    <!-- <div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="">행사코드</label>
-							<div class="flax_box">
-								<select name='pr_code' class="form-control form-control-sm">
-									<option value=''>전체</option>
-								@foreach ($pr_codes as $pr_code)
-									<option value='{{ $pr_code->code_id }}'>{{ $pr_code->code_val }}</option>								
-								@endforeach
-								</select>
-							</div>
-						</div>
-					</div> -->
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
 							<label for="">행사코드</label>
@@ -157,12 +144,16 @@
                             <label for="">온라인/오프라인</label>
                             <div class="form-inline form-radio-box">
                                 <div class="custom-control custom-radio">
-                                    <input type="radio" name="online_yn" id="online_y" value="Y" class="custom-control-input" checked>
-                                    <label class="custom-control-label" for="online_y" value="Y">온라인</label>
+                                    <input type="radio" name="on_off_yn" id="on_off_all" value="ALL" class="custom-control-input" checked>
+                                    <label class="custom-control-label" for="on_off_all" value="ALL">전체</label>
                                 </div>
                                 <div class="custom-control custom-radio">
-                                    <input type="radio" name="online_yn" id="online_n" value="N" class="custom-control-input">
-                                    <label class="custom-control-label" for="online_n" value="N">오프라인</label>
+                                    <input type="radio" name="on_off_yn" id="on_off_on" value="ON" class="custom-control-input">
+                                    <label class="custom-control-label" for="on_off_on" value="ON">온라인</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="on_off_yn" id="on_off_off" value="OFF" class="custom-control-input">
+                                    <label class="custom-control-label" for="on_off_off" value="OFF">오프라인</label>
                                 </div>
                             </div>
                         </div>
@@ -315,7 +306,18 @@
             cellClass: 'hd-grid-code',
             pinned: 'left',
             aggSum: "합계",
-            aggAvg: "평균"
+            aggAvg: "평균",
+            cellRenderer:function(params) {
+                let store_cd = $('.select2-store').val();
+                let sell_type = $('.select2-sellType').val();
+                let pr_code = $('.select2-prcode').val();
+
+                if (params.value != '합계' && params.value != '평균') {
+                    return "<a href='/store/order/ord01?date=" + params.value + "&store_cd=" + store_cd + "&sell_type=" + sell_type + "&pr_code=" + pr_code + "'>"+ params.value +"</a>";
+                } else {
+                    return params.value;
+                }
+            }
         },
         {
             headerName: '매출액구분',
@@ -617,10 +619,10 @@
         gx = new HDGrid(gridDiv, columns, options);
         Search();
 
-        // 매장 다중검색
-        $( ".sch-store" ).on("click", function() {
-            searchStore.Open(null, "multiple");
-        });
+        // // 매장 다중검색
+        // $( ".sch-store" ).on("click", function() {
+        //     searchStore.Open(null, "multiple");
+        // });
 
         // 판매유형 다중검색
         $( ".sch-sellType" ).on("click", function() {
