@@ -20,12 +20,19 @@ use PDO;
 
 class ord01Controller extends Controller
 {
-    public function index()
+    public function index(Request $request)
 	{
-        $date = $_GET['date']??'';
-        $store_cd = $_GET['store_cd']??'';
-        $sell_type = $_GET['sell_type']??'';
-        $pr_code = $_GET['pr_code']??'';
+        // $date = $_GET['date']??'';
+        // $sell_type = $_GET['sell_type']??'';
+        // $pr_code = $_GET['pr_code']??'';
+
+        $date = $request->input('date');
+        $sell_type = $request->input('sell_type');
+        $store_cd = $request->input('store_cd', '');
+        $pr_code = $request->input('pr_code');
+
+
+        $pr_code_arr = explode(",", $pr_code);
 
 
         $conf = new Conf();
@@ -42,6 +49,32 @@ class ord01Controller extends Controller
             $edate = $todate;
         }
 
+        $pr_code_str = "";
+        foreach($pr_code_arr as $pc) {
+            $pr_code_str .= "'$pc',";
+        }
+
+        $pr_code = substr($pr_code_str,0,-1);
+        
+        $sql = "
+            select 
+                code_id, code_val
+            from code
+            where code_kind_cd = 'PR_CODE'
+            and code_id in ( $pr_code )
+        ";
+
+        $result = DB::select($sql);
+
+        $str = "";
+        $str2 = "";
+        foreach($result as $r){
+            $str .= $r->code_id.",";
+            $str2 .= $r->code_val.",";
+        }
+
+        $str = substr($str,0,-1);
+        $str2 = substr($str2,0,-1);
 
 		$values = [
             'sdate'             => $sdate,
@@ -56,12 +89,14 @@ class ord01Controller extends Controller
             'goods_stats'	    => SLib::getCodes('G_GOODS_STAT'), // 상품상태
 			'items'			    => SLib::getItems(), // 품목
             'sale_kinds'        => SLib::getUsedSaleKinds(),
-            'store_no'          => $store_cd,
+            'store'             => DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', '=', $store_cd)->first(),      
             'sell_type'         => $sell_type,
-            'pr_code'           => $pr_code,
+            'pr_code_id'        => $str,
+            'pr_code_val'       => $str2,
 		];
 
         return view(Config::get('shop.store.view') . '/order/ord01', $values);
+
 	}
 
     public function search(Request $request)

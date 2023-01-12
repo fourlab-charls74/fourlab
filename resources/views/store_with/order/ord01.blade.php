@@ -72,7 +72,7 @@
                         <div class="form-group">
                             <label for="store_no">주문매장</label>
                             <div class="form-inline inline_btn_box">
-                                <input type='hidden' id="store_nm" name="store_nm">
+                                <input type='hidden' id="store_nm" name="store_nm" value="{{ @$store->store_nm }}">
                                 <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
                                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                             </div>
@@ -201,40 +201,25 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="">자료수/정렬</label>
-                            <div class="form-inline">
-                                <div class="form-inline-inner input_box" style="width:24%;">
-                                    <select name="limit" class="form-control form-control-sm">
-                                        <option value="100">100</option>
-                                        <option value="500">500</option>
-                                        <option value="1000">1000</option>
-                                        <option value="2000">2000</option>
-                                    </select>
+                            <label>온/오프라인 주문</label>
+                            <div class="form-inline form-radio-box">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" class="custom-control-input" id="sale_form_A" name="sale_form" value="" checked />
+                                    <label class="custom-control-label" for="sale_form_A">전체</label>
                                 </div>
-                                <span class="text_line">/</span>
-                                <div class="form-inline-inner input_box" style="width:45%;">
-                                    <select name="ord_field" class="form-control form-control-sm">
-                                        <option value="o.ord_date">주문일자</option>
-                                        <option value="o.ord_no">주문번호</option>
-                                        <option value="om.user_nm">주문자명</option>
-                                        <option value="om.r_nm">수령자</option>
-                                        <option value="p.prd_cd">상품코드</option>
-                                        <option value="g.goods_nm">상품명</option>
-                                    </select>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" class="custom-control-input" id="sale_form_On" name="sale_form" value="On" />
+                                    <label class="custom-control-label" for="sale_form_On">온라인</label>
                                 </div>
-                                <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
-                                    <div class="btn-group" role="group">
-                                        <label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="내림차순"><i class="bx bx-sort-down"></i></label>
-                                        <label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="오름차순"><i class="bx bx-sort-up"></i></label>
-                                    </div>
-                                    <input type="radio" name="ord" id="sort_desc" value="desc" checked="">
-                                    <input type="radio" name="ord" id="sort_asc" value="asc">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" class="custom-control-input" id="sale_form_Off" name="sale_form" value="Off" />
+                                    <label class="custom-control-label" for="sale_form_Off">오프라인</label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="row search-area-ext d-none">
+                <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label>상품코드</label>
@@ -267,14 +252,34 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="name">공급업체</label>
-                            <div class="form-inline inline_select_box">
-                                <div class="form-inline-inner input-box w-100">
-                                    <div class="form-inline inline_btn_box">
-                                        <input type="hidden" id="com_cd" name="com_cd" />
-                                        <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                            <label for="">자료수/정렬</label>
+                            <div class="form-inline">
+                                <div class="form-inline-inner input_box" style="width:24%;">
+                                    <select name="limit" class="form-control form-control-sm">
+                                        <option value="100">100</option>
+                                        <option value="500">500</option>
+                                        <option value="1000">1000</option>
+                                        <option value="2000">2000</option>
+                                    </select>
+                                </div>
+                                <span class="text_line">/</span>
+                                <div class="form-inline-inner input_box" style="width:45%;">
+                                    <select name="ord_field" class="form-control form-control-sm">
+                                        <option value="o.ord_date">주문일자</option>
+                                        <option value="o.ord_no">주문번호</option>
+                                        <option value="om.user_nm">주문자명</option>
+                                        <option value="om.r_nm">수령자</option>
+                                        <option value="p.prd_cd">상품코드</option>
+                                        <option value="g.goods_nm">상품명</option>
+                                    </select>
+                                </div>
+                                <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
+                                    <div class="btn-group" role="group">
+                                        <label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="내림차순"><i class="bx bx-sort-down"></i></label>
+                                        <label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="오름차순"><i class="bx bx-sort-up"></i></label>
                                     </div>
+                                    <input type="radio" name="ord" id="sort_desc" value="desc" checked="">
+                                    <input type="radio" name="ord" id="sort_asc" value="asc">
                                 </div>
                             </div>
                         </div>
@@ -345,25 +350,6 @@
                             <label for="goods_nm_eng">상품명(영문)</label>
                             <div class="flex_box">
                                 <input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label>온/오프라인 주문</label>
-                            <div class="form-inline form-radio-box">
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="sale_form_A" name="sale_form" value="" checked />
-                                    <label class="custom-control-label" for="sale_form_A">전체</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="sale_form_On" name="sale_form" value="On" />
-                                    <label class="custom-control-label" for="sale_form_On">온라인</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="sale_form_Off" name="sale_form" value="Off" />
-                                    <label class="custom-control-label" for="sale_form_Off">오프라인</label>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -485,6 +471,9 @@
                 return node.data.ord_state_cd < 30;
             }
         });
+        initStore();
+        initPrCode();
+
         Search();
     });
 
@@ -541,10 +530,32 @@
             searchPrCode.Open(null, "multiple");
     });
 
+    function initStore() {
+        const store_cd = '{{ @$store->store_cd }}';
+        const store_nm = '{{ @$store->store_nm }}';
 
-    // $(document).ready(function(){
-	// 	$(".sch-prcode").trigger('click');
-	// 	$("#search_prcode_sbtn").trigger('click');
-	// });
+        if(store_cd != '') {
+            const option = new Option(store_nm, store_cd, true, true);
+            $('#store_no').append(option).trigger('change');
+        }
+    }
+
+    function initPrCode() {
+        let pr_code_id = '{{ @$pr_code_id}}';
+        let pr_code_val = '{{ @$pr_code_val}}';
+
+        let pr_code = pr_code_id.split(",");
+        let pr_code_nm = pr_code_val.split(",");
+
+
+        if (pr_code_id != '') {
+            for(let i = 0; i<pr_code.length;i++) {
+                if($("#pr_code").val().includes(pr_code[i])) continue;
+                const option = new Option(pr_code_nm[i], pr_code[i], true, true);
+                $('#pr_code').append(option).trigger('change');
+            }
+        }
+    }
+
 </script>
 @stop

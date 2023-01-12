@@ -158,6 +158,54 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-lg-4 inner-td" style="margin-top: 20px;">
+                        <div class="form-group">
+                            <label for="name">판매처</label>
+                            <div class="flax_box">
+                                <select name='sale_place' class="form-control form-control-sm">
+                                    <option value=''>전체</option>
+                                    @foreach ($sale_places as $sale_place)
+                                    <option value='{{ $sale_place->com_id }}' @if($com_nm == $sale_place->com_nm) selected @endif>{{ $sale_place->com_nm }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td" style="margin-top: 20px;">
+                        <div class="form-group">
+                            <label for="formrow-inputState">결제방법</label>
+                            <div class="form-inline form-check-box">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[0]" id="stat_pay_type_16" value="16" @if($stat_pay_type != '' and in_array('16', $stat_pay_type)) checked @endif>
+                                    <label class="custom-control-label" for="stat_pay_type_16">계좌이체</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[1]" id="stat_pay_type_32" value="32" @if($stat_pay_type != '' and in_array('32', $stat_pay_type)) checked @endif>
+                                    <label class="custom-control-label" for="stat_pay_type_32">핸드폰</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[2]" id="stat_pay_type_1" value="1" @if($stat_pay_type != '' and in_array('1', $stat_pay_type)) checked @endif>
+                                    <label class="custom-control-label" for="stat_pay_type_1">현금</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[3]" id="stat_pay_type_2" value="2" @if($stat_pay_type != '' and in_array('2', $stat_pay_type)) checked @endif>
+                                    <label class="custom-control-label" for="stat_pay_type_2">카드</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[4]" id="stat_pay_type_4" value="4" @if($stat_pay_type != '' and in_array('4', $stat_pay_type)) checked @endif>
+                                    <label class="custom-control-label" for="stat_pay_type_4">포인트</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[5]" id="stat_pay_type_8" value="8" @if($stat_pay_type != '' and in_array('8', $stat_pay_type)) checked @endif>
+                                    <label class="custom-control-label" for="stat_pay_type_8">쿠폰</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[6]" id="stat_pay_type_64" value="64" @if($stat_pay_type != '' and in_array('64', $stat_pay_type)) checked @endif>
+                                    <label class="custom-control-label" for="stat_pay_type_64">가상계좌</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="search-area-ext d-none row">
@@ -193,54 +241,7 @@
                     </div>
                 </div>
                 <div class="search-area-ext d-none row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="name">판매처</label>
-                            <div class="flax_box">
-                                <select name='sale_place' class="form-control form-control-sm">
-                                    <option value=''>전체</option>
-                                    @foreach ($sale_places as $sale_place)
-                                    <option value='{{ $sale_place->com_id }}' @if($com_nm == $sale_place->com_nm) selected @endif>{{ $sale_place->com_nm }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="formrow-inputState">결제방법</label>
-                            <div class="form-inline form-check-box">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[0]" id="stat_pay_type_16" value="16" @if($stat_pay_type != '' and in_array('16', $stat_pay_type)) checked @endif>
-                                    <label class="custom-control-label" for="stat_pay_type_16">계좌이체</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[1]" id="stat_pay_type_32" value="32" @if($stat_pay_type != '' and in_array('32', $stat_pay_type)) checked @endif>
-                                    <label class="custom-control-label" for="stat_pay_type_32">핸드폰</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[2]" id="stat_pay_type_1" value="1" @if($stat_pay_type != '' and in_array('1', $stat_pay_type)) checked @endif>
-                                    <label class="custom-control-label" for="stat_pay_type_1">현금</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[3]" id="stat_pay_type_2" value="2" @if($stat_pay_type != '' and in_array('2', $stat_pay_type)) checked @endif>
-                                    <label class="custom-control-label" for="stat_pay_type_2">카드</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[4]" id="stat_pay_type_4" value="4" @if($stat_pay_type != '' and in_array('4', $stat_pay_type)) checked @endif>
-                                    <label class="custom-control-label" for="stat_pay_type_4">포인트</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[5]" id="stat_pay_type_8" value="8" @if($stat_pay_type != '' and in_array('8', $stat_pay_type)) checked @endif>
-                                    <label class="custom-control-label" for="stat_pay_type_8">쿠폰</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[6]" id="stat_pay_type_64" value="64" @if($stat_pay_type != '' and in_array('64', $stat_pay_type)) checked @endif>
-                                    <label class="custom-control-label" for="stat_pay_type_64">가상계좌</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                   
                 </div>
             </div>
         </div>
