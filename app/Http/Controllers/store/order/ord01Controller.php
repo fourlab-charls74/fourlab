@@ -23,9 +23,10 @@ class ord01Controller extends Controller
     public function index()
 	{
         $date = $_GET['date']??'';
-        // $store_cd = $_GET['store_cd'];
-        // $sell_type = $_GET['sell_type'];
-        // $pr_code = $_GET['pr_code'];
+        $store_cd = $_GET['store_cd']??'';
+        $sell_type = $_GET['sell_type']??'';
+        $pr_code = $_GET['pr_code']??'';
+
 
         $conf = new Conf();
 		$domain		= $conf->getConfigValue("shop", "domain");
@@ -33,10 +34,13 @@ class ord01Controller extends Controller
         $todate = strtotime($date);
         $todate = date('Y-m-d', $todate);
 
-        dd($todate);
-
-        $sdate = now()->sub(1, 'month')->format('Y-m-d');
-        $edate = date("Y-m-d");
+        if($date == '') {
+            $sdate = now()->sub(1, 'month')->format('Y-m-d');
+            $edate = date("Y-m-d");
+        } else {
+            $sdate = $todate;
+            $edate = $todate;
+        }
 
 
 		$values = [
@@ -52,6 +56,9 @@ class ord01Controller extends Controller
             'goods_stats'	    => SLib::getCodes('G_GOODS_STAT'), // 상품상태
 			'items'			    => SLib::getItems(), // 품목
             'sale_kinds'        => SLib::getUsedSaleKinds(),
+            'store_no'          => $store_cd,
+            'sell_type'         => $sell_type,
+            'pr_code'           => $pr_code,
 		];
 
         return view(Config::get('shop.store.view') . '/order/ord01', $values);
@@ -59,11 +66,17 @@ class ord01Controller extends Controller
 
     public function search(Request $request)
     {
+
+
+        $store_no       = $request->input('store_no', '');
+        $sale_kind      = $request->input('sale_kind', '');
+        $pr_code        = $request->input('pr_code', '');
+
+
         $sdate          = $request->input('sdate', now()->sub(3, 'month')->format('Ymd'));
         $edate          = $request->input('edate', date('Ymd'));
         $nud            = $request->input('nud', ''); // 주문일자 검색여부
         $ord_no         = $request->input('ord_no', '');
-        $store_no       = $request->input('store_no', '');
         $ord_state      = $request->input('ord_state', '');
         $pay_state      = $request->input('pay_stat', '');
         $clm_state      = $request->input('clm_state', '');
@@ -89,8 +102,7 @@ class ord01Controller extends Controller
         $page           = $request->input('page', 1);
         $prd_cd_range_text = $request->input("prd_cd_range", '');
         $sale_form      = $request->input('sale_form', '');
-        $sale_kind      = $request->input('sale_kind', '');
-        $pr_code        = $request->input('pr_code', '');
+       
         if ($page < 1 or $page == '') $page = 1;
 
         $offline_store = 'HEAD_OFFICE';

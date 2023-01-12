@@ -376,7 +376,11 @@
                                 <select name="sale_kind" class="form-control form-control-sm">
                                     <option value="">전체</option>
                                     @foreach (@$sale_kinds as $sale_kind)
-                                        <option value="{{ $sale_kind->code_id }}">{{ $sale_kind->code_val }}</option>
+                                        @if ($sell_type == $sale_kind->code_id) 
+                                            <option value="{{ $sale_kind->code_id }}" selected>{{ $sale_kind->code_val }}</option>
+                                        @else
+                                            <option value="{{ $sale_kind->code_id }}">{{ $sale_kind->code_val }}</option>
+                                        @endif
                                     @endforeach
                                 </select>
                             </div>
@@ -395,12 +399,10 @@
                 </div>
             </div>
 		</div>
-        
         <div class="resul_btn_wrap mb-3">
             <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
             <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
         </div>
-
 	</div>
 </form>
 <!-- DataTales Example -->
@@ -538,5 +540,11 @@
     $( ".sch-prcode" ).on("click", function() {
             searchPrCode.Open(null, "multiple");
     });
+
+
+    // $(document).ready(function(){
+	// 	$(".sch-prcode").trigger('click');
+	// 	$("#search_prcode_sbtn").trigger('click');
+	// });
 </script>
 @stop
