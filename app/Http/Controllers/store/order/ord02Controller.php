@@ -209,13 +209,14 @@ class ord02Controller extends Controller
 
 		$sql = "
 			select a.*
-				, if(a.goods_no_group < 2, null, a.goods_no) as goods_no_group
+				, null as goods_no_group
 				, os.code_val as ord_state_nm
 				, round((1 - (a.price * (1 - if(st.amt_kind = 'per', st.sale_per, 0) / 100)) / a.goods_sh) * 100) as dc_rate
 				, sk.code_val as sale_kind_nm, pr.code_val as pr_code_nm
 				, ot.code_val as ord_type_nm, ok.code_val as ord_kind_nm
 				, bk.code_val as baesong_kind, com.com_nm as sale_place_nm
 				, pt.code_val as pay_type_nm, ps.code_val as pay_stat_nm
+				, if(a.goods_no_group < 2, null, a.ord_opt_no) as ord_opt_no_group
 			from (
 				select 
 					o.ord_no, o.ord_opt_no, o.goods_no, g.goods_nm, g.goods_nm_eng, g.style_no, o.goods_opt
@@ -272,20 +273,24 @@ class ord02Controller extends Controller
 		if($page == 1) {
 			$sql = "
 				select count(*) as total
-				from order_opt o
-					inner join order_mst om on om.ord_no = o.ord_no
-					inner join goods g on g.goods_no = o.goods_no
-					left outer join payment p on p.ord_no = o.ord_no
-					left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
-					left outer join (
-						select prd_cd, goods_no, brand, year, season, gender, item, seq, opt, color, size, c.code_val as color_nm, cs.code_val as size_nm
-						from product_code
-							inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = color
-							inner join code cs on if(gender = 'M', cs.code_kind_cd = 'PRD_CD_SIZE_MEN', if(gender = 'W', cs.code_kind_cd = 'PRD_CD_SIZE_WOMEN', if(gender = 'U', cs.code_kind_cd = 'PRD_CD_SIZE_UNISEX', cs.code_kind_cd = 'PRD_CD_SIZE_MATCH' ))) and cs.code_id = size
-					) pc on pc.goods_no = o.goods_no and pc.color_nm = substring_index(o.goods_opt, '^', 1) and replace(pc.size_nm, ' ', '') = replace(substring_index(o.goods_opt, '^', -1), ' ', '')
-				where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
-					and o.clm_state in (-30,1,90,0)
-					$where
+				from (
+					select o.ord_opt_no
+					from order_opt o
+						inner join order_mst om on om.ord_no = o.ord_no
+						inner join goods g on g.goods_no = o.goods_no
+						left outer join payment p on p.ord_no = o.ord_no
+						left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
+						left outer join (
+							select prd_cd, goods_no, brand, year, season, gender, item, seq, opt, color, size, c.code_val as color_nm, cs.code_val as size_nm
+							from product_code
+								inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = color
+								inner join code cs on if(gender = 'M', cs.code_kind_cd = 'PRD_CD_SIZE_MEN', if(gender = 'W', cs.code_kind_cd = 'PRD_CD_SIZE_WOMEN', if(gender = 'U', cs.code_kind_cd = 'PRD_CD_SIZE_UNISEX', cs.code_kind_cd = 'PRD_CD_SIZE_MATCH' ))) and cs.code_id = size
+						) pc on pc.goods_no = o.goods_no and pc.color_nm = substring_index(o.goods_opt, '^', 1) and replace(pc.size_nm, ' ', '') = replace(substring_index(o.goods_opt, '^', -1), ' ', '')
+					where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
+						and o.clm_state in (-30,1,90,0)
+						$where
+					group by o.ord_opt_no
+				) a
 			";
 			
 			$row = DB::selectOne($sql);
@@ -339,7 +344,7 @@ class ord02Controller extends Controller
 			";
 			$series_row	= DB::selectOne($sql);
 			if ($series_row) {
-				$dlv_series_no = $row->dlv_series_no;
+				$dlv_series_no = $series_row->dlv_series_no;
 			} else {
 				$dlv_series_no = DB::table('order_dlv_series')->insertGetId([
 					'dlv_series_nm'	=> $dlv_series_no,
@@ -395,7 +400,7 @@ class ord02Controller extends Controller
 						'state' => $ord_state,
 						'dlv_location_type' => strtoupper($row['dlv_place_type'] ?? ''),
 						'dlv_location_cd' => $row['dlv_place_cd'],
-						'comment' => $row['comment'],
+						'comment' => $row['comment'] ?? '',
 						'rt' => now(),
 					]);
 

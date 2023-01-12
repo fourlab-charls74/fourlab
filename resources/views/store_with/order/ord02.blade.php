@@ -372,6 +372,7 @@
                 return '<a href="javascript:void(0);" onclick="return openStoreOrder(\'' + ord_no + '\',\'' + ord_opt_no +'\');">'+ params.value +'</a>';
             }
         },
+        {field: "ord_opt_no_group", rowGroup: true, hide: true, rowGroupIndex: 0},
         {field: "ord_opt_no", headerName: "일련번호", pinned: 'left', width: 60, cellStyle: {'text-align': 'center'},
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
             cellRenderer: (params) => {
@@ -413,7 +414,7 @@
         },
         {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {'text-align': 'center'}, pinned: "left"},
         {field: "prd_cd_p", headerName: "코드일련", width: 90, cellStyle: {"text-align": "center"}},
-        {field: "goods_no_group", rowGroup: true, hide: true},
+        {field: "goods_no_group", rowGroup: true, hide: true, rowGroupIndex: 1},
         // {headerName: "상품번호", width: 100, pinned: 'left', cellStyle: {'text-align': 'center'},
         //     showRowGroup: 'goods_no_group', 
         //     cellRenderer: 'agGroupCellRenderer', 
@@ -559,7 +560,7 @@
 		gx = new HDGrid(gridDiv, columns, {
             defaultColDef: {
                 suppressMenu: true,
-                resizable: false,
+                resizable: true,
                 autoHeight: true,
                 suppressSizeToFit: false,
                 sortable:true,
@@ -567,7 +568,7 @@
             rollup: true,
             rollupCountLevel: 1,
 			groupSuppressAutoColumn: true,
-            groupDefaultExpanded: 1, // 0: close, 1: open
+            groupDefaultExpanded: 2,
 			suppressAggFuncInHeader: true,
 			animateRows: true,
             onCellValueChanged: (e) => {
