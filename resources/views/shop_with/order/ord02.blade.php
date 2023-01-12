@@ -195,10 +195,10 @@
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box" style="width:24%;">
                                     <select name="limit" class="form-control form-control-sm">
-                                        <option value="100">100</option>
                                         <option value="500">500</option>
                                         <option value="1000">1000</option>
                                         <option value="2000">2000</option>
+                                        <option value="5000">5000</option>
                                     </select>
                                 </div>
                                 <span class="text_line">/</span>
@@ -322,7 +322,7 @@
 </form>
 <!-- DataTales Example -->
 <div class="card shadow mb-0 last-card pt-2 pt-sm-0">
-	<div class="card-body">
+	<div class="card-body pb-2">
 		<div class="card-title">
 			<div class="filter_wrap">
 				<div class="fl_box">
@@ -331,19 +331,30 @@
                 <div class="fr_box d-flex">
                     <div class="d-flex">
                         <span class="mr-2">출고차수 :</span>
-                        <select id='exp_rel_order' name='exp_rel_order' class="form-control form-control-sm mr-2"  style='width:90px;'>
+                        <select id='rel_order' name='rel_order' class="form-control form-control-sm mr-2"  style='width:90px;'>
                             @foreach (@$rel_orders as $rel_order)
                                 <option value='{{ $rel_order }}'>{{ $rel_order }}</option>
                             @endforeach
                         </select>
                     </div>
                     <a href="javascript:void(0);" onclick="return receiptOrder();" class="btn btn-sm btn-primary shadow-sm">온라인주문접수</a>
+                    <span class="ml-2 mr-2 text-secondary">|</span>
+                    <div class="d-flex">
+                        <span class="mr-2">출고구분 :</span>
+                        <select id='ord_kind' name='ord_kind' class="form-control form-control-sm mr-2"  style='width:120px;'>
+                            @foreach (@$ord_kinds as $ord_kind)
+                                <option value='{{ $ord_kind->code_id }}'>{{ $ord_kind->code_val }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <a href="javascript:void(0);" onclick="return updateOrdKind();" class="btn btn-sm btn-primary shadow-sm">출고구분변경</a>
                 </div>
 			</div>
 		</div>
 		<div class="table-responsive">
 			<div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
 		</div>
+        <p class="mt-2 fs-14 text-secondary">* 창고/매장의 재고cell을 더블클릭하면 해당 창고/매장이 배송처로 적용됩니다. ( <span class="text-primary font-weight-bold">창고</span> / <span class="text-danger font-weight-bold">매장</span> )</p>
 	</div>
 </div>
 
@@ -378,6 +389,21 @@
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
         },
         {field: "pay_stat_nm", headerName: "입금상태", pinned: 'left', width: 55, cellStyle: {'text-align': 'center'},
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "ord_type_nm", headerName: "주문구분", width: 60, cellStyle: {'text-align': 'center'}, pinned: 'left',
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "ord_kind", headerName: "출고구분코드", hide: true,
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+        },
+        {field: "ord_kind_nm", headerName: "출고구분", width: 60, cellStyle: StyleOrdKind, pinned: 'left',
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+        {field: "sale_place_nm", headerName: "판매처", width: 80, cellStyle: {'text-align': 'center'}, pinned: 'left',
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
         },
@@ -424,7 +450,7 @@
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
         },
-        {field: "qty", headerName: "수량", width: 50, type: "currencyType", aggFunc: "first"},
+        {field: "qty", headerName: "수량", width: 50, type: "currencyType", cellStyle: {"font-weight": "bold"}, aggFunc: "first"},
         @foreach (@$dlv_locations as $loc)
             {field: "{{ $loc->seq }}_{{ $loc->location_type }}_{{ $loc->location_cd }}_qty", headerName: "{{ $loc->location_nm }}", width: 100, type: "currencyType",
                 cellStyle: (params) => {
@@ -438,8 +464,19 @@
         @endforeach
         {field: "dlv_place_type", headerName: "배송처타입", hide: true},
         {field: "dlv_place_cd", headerName: "배송처코드", hide: true},
-        {field: "dlv_place", headerName: "배송처", width: 130, editable: true, cellStyle: (params) => ({'background-color': params.node.level == 0 ? '#ffff99' : params.node.level == 1 ? '#eeeeee' : 'none'})},
-        {field: "comment", headerName: "접수메모", width: 120, editable: true, cellStyle: (params) => ({'background-color': params.node.level == 0 ? '#ffff99' : params.node.level == 1 ? '#eeeeee' : 'none'})},
+        {field: "dlv_place", headerName: "배송처", width: 130, editable: true, 
+            cellStyle: (params) => {
+                return {
+                    'background-color': params.node.level == 0 ? '#ffff99' : params.node.level == 1 ? params.data?.dlv_place || params.data?.comment ? '#C5FF9D' : '#eeeeee' : 'none',
+                    'color': params.data ? (params.data?.dlv_place_type === 'store' ? '#ff0000' : '#0000ff') : (params.node.aggData?.dlv_place_type === 'store' ? '#ff0000' : '#0000ff'),
+                };
+            }
+        },
+        {field: "comment", headerName: "접수메모", width: 120, editable: true,
+            cellStyle: (params) => {
+                return {'background-color': params.node.level == 0 ? '#ffff99' : params.node.level == 1 ? params.data?.dlv_place || params.data?.comment ? '#C5FF9D' : '#eeeeee' : 'none'};
+            },
+        },
         {field: "user_nm", headerName: "주문자(아이디)", width: 120, cellStyle: {'text-align': 'center'},
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
@@ -488,22 +525,7 @@
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
         },
-        {field: "ord_type_nm", headerName: "주문구분", width: 60, cellStyle: {'text-align': 'center'},
-            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
-			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
-        },
-        {field: "ord_kind", headerName: "출고구분코드", hide: true,
-            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
-        },
-        {field: "ord_kind_nm", headerName: "출고구분", width: 60, cellStyle: StyleOrdKind,
-            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
-			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
-        },
         {field: "baesong_kind", headerName: "배송구분", width: 60, cellStyle: {'text-align': 'center'},
-            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
-			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
-        },
-        {field: "sale_place_nm", headerName: "판매처", width: 100, cellStyle: {'text-align': 'center'},
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
         },
@@ -527,11 +549,11 @@
 </script>
 
 <script type="text/javascript" charset="utf-8">
-	const pApp = new App('', { gridId:"#div-gd" });
+	const pApp = new App('', { gridId:"#div-gd", height: 285 });
 	let gx;
 
 	$(document).ready(function() {
-		pApp.ResizeGrid(275);
+		pApp.ResizeGrid(285);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns, {
@@ -558,26 +580,37 @@
                             e.node.parent.allLeafChildren
                                 .filter(c => c.data?.prd_cd !== e.data.prd_cd)
                                 .forEach(c => {
-                                    c.setDataValue('dlv_place', null);
-                                    c.setDataValue('dlv_place_cd', null);
-                                    c.setDataValue('dlv_place_type', null);
+                                    c.data.dlv_place = null;
+                                    c.data.dlv_place_cd = null;
+                                    c.data.dlv_place_type = null;
+                                    c.data.comment = undefined;
                                 });
                             e.node.parent.aggData = {...e.node.data};
                             e.node.parent.aggData.dlv_place = arr[0].location_nm;
                             e.node.parent.aggData.dlv_place_cd = arr[0].location_cd;
                             e.node.parent.aggData.dlv_place_type = arr[0].location_type;
-                            e.api.redrawRows({ rowNodes:[e.node, e.node.parent] });
+                            e.api.redrawRows({ rowNodes:[e.node, e.node.parent, ...e.node.parent.allLeafChildren] });
                         } else {
                             e.api.redrawRows({ rowNodes:[e.node] });
                         }
+                        gx.setFocusedWorkingCell();
                     }
                     e.node.data.goods_no_group === null ? e.node.setSelected(true) : e.node.parent.setSelected(true);
                 }
-                if (e.column.colId === "comment") {
+                if (e.column.colId === "comment" && e.oldValue !== e.newValue) {
                     if (e.node.parent.level >= 0) {
+                        e.node.parent.allLeafChildren
+                            .filter(c => c.data?.prd_cd != e.data.prd_cd)
+                            .forEach(c => {
+                                c.data.dlv_place = null;
+                                c.data.dlv_place_cd = null;
+                                c.data.dlv_place_type = null;
+                                c.data.comment = undefined;
+                            });
                         e.node.parent.aggData = {...e.node.data};
                         e.node.parent.aggData.comment = e.newValue;
-                        e.api.redrawRows({ rowNodes:[e.node.parent] });
+                        e.api.redrawRows({ rowNodes:[...e.node.parent.allLeafChildren, e.node.parent] });
+                        gx.setFocusedWorkingCell();
                     }
                     e.node.data.goods_no_group === null ? e.node.setSelected(true) : e.node.parent.setSelected(true);
                 }
@@ -612,6 +645,7 @@
                 }
             });
             gx.gridOptions.api.redrawRows();
+            gx.setFocusedWorkingCell();
         });
 	}
 
@@ -662,7 +696,7 @@
         });
 
         // validation
-        if(!$("#exp_rel_order").val()) return alert("출고차수를 선택해주세요.");
+        if(!$("#rel_order").val()) return alert("출고차수를 선택해주세요.");
         if(rows.length < 1) return alert("접수할 주문건을 선택해주세요.");
         if(rows.filter(r => r.ord_state != 10).length > 0) return alert("출고요청 상태의 주문건만 접수가 가능합니다.");
         if(rows.filter(r => r.ord_kind > 20).length > 0) return alert("출고보류중인 주문건은 접수할 수 없습니다.");
@@ -680,7 +714,7 @@
             url: '/shop/order/ord02/receipt',
             method: 'post',
             data: { 
-                rel_order: $("#exp_rel_order").val(),
+                rel_order: $("#rel_order").val(),
                 data: rows
             },
         }).then(function (res) {
@@ -689,14 +723,49 @@
                 else alert("온라인주문이 정상적으로 접수되었습니다.");
 
                 Search();
-                $("#exp_rel_order option").remove();
+                $("#rel_order option").remove();
                 Object.keys(res.data.rel_orders).forEach(k => {
-                    $("#exp_rel_order").append(new Option(res.data.rel_orders[k], res.data.rel_orders[k], true, true));
+                    $("#rel_order").append(new Option(res.data.rel_orders[k], res.data.rel_orders[k], true, true));
                 });
-                $("#exp_rel_order").prop("selectedIndex", 0);
+                $("#rel_order").prop("selectedIndex", 0);
             } else {
                 console.log(res.data);
                 alert("온라인주문접수 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
+    }
+
+    // 출고구분변경
+    function updateOrdKind() {
+        let rows = [];
+        gx.gridOptions.api.forEachNode(function(node) {
+            if ((node.aggData || node.data?.goods_no_group === null) && node.selected) {
+                rows.push(node.aggData || node.data);
+            }
+        });
+
+        // validation
+        if(rows.length < 1) return alert("출고구분을 변경할 주문건을 선택해주세요.");
+        const ord_kind_nm = $("#ord_kind option:checked").text();
+
+        if(!confirm(`선택한 주문건의 출고구분을 '${ord_kind_nm}' 상태로 변경하시겠습니까?`)) return;
+
+        axios({
+            url: '/shop/order/ord02/update/ord-kind',
+            method: 'post',
+            data: { 
+                ord_kind: $("#ord_kind").val(),
+                data: rows.map(r => r.ord_opt_no),
+            },
+        }).then(function (res) {
+            if(res.data.code === 200) {
+                alert("출고구분변경이 정상적으로 완료되었습니다.");
+                Search();
+            } else {
+                console.log(res.data);
+                alert("출고구분변경 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
             }
         }).catch(function (err) {
             console.log(err);

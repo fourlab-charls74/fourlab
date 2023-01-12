@@ -472,6 +472,7 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         Route::get('ord02','ord02Controller@index');
         Route::get('ord02/search','ord02Controller@search');
         Route::post('ord02/receipt','ord02Controller@receipt');
+        Route::post('ord02/update/ord-kind','ord02Controller@update_ord_kind');
 
         // 온라인 배송처리
         Route::get('ord03','ord03Controller@index');
