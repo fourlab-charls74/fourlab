@@ -476,6 +476,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
         // 온라인 배송처리
         Route::get('ord03','ord03Controller@index');
+        Route::get('ord03/search','ord03Controller@search');
     });
 
     // 고객관리

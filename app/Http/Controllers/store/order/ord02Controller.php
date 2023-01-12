@@ -67,8 +67,8 @@ class ord02Controller extends Controller
 
 	public function search(Request $request)
 	{
-		$sdate = $request->input('sdate', Carbon::now()->sub(1, 'week')->format("Ymd"));
-		$edate = $request->input('edate', Carbon::now()->format("Ymd"));
+		$sdate = $request->input('sdate', Carbon::now()->sub(3, 'day')->format("Y-m-d"));
+		$edate = $request->input('edate', Carbon::now()->format("Y-m-d"));
 		$ord_no = $request->input('ord_no', '');
 		$ord_state = $request->input('ord_state', ''); // 주문상태
 		$pay_stat = $request->input('pay_stat', ''); // 입금상태
@@ -113,11 +113,7 @@ class ord02Controller extends Controller
 					$where .= " and $ord_info_key like '$val%' ";
 				}
 			} else {
-				if ($ord_info_key == 'memo') {
-					$where .= " and (m.state like '%$ord_info_value%' or m.memo like '%$ord_info_value%') ";
-				} else if ($ord_info_key == 'o.dlv_end_date') {
-					$where .= " and date_format($ord_info_key, '%Y%m%d') = $ord_info_value ";
-				} else if (in_array($ord_info_key, ['om.user_nm', 'om.user_id', 'om.r_nm', 'om.bank_inpnm'])) {
+				if (in_array($ord_info_key, ['om.user_nm', 'om.user_id', 'om.r_nm'])) {
 					$where .= " and $ord_info_key = '$ord_info_value' ";
 				} else {
 					$where .= " and $ord_info_key like '$ord_info_value%' ";
@@ -209,13 +205,13 @@ class ord02Controller extends Controller
 
 		$sql = "
 			select a.*
-				, null as goods_no_group
 				, os.code_val as ord_state_nm
 				, round((1 - (a.price * (1 - if(st.amt_kind = 'per', st.sale_per, 0) / 100)) / a.goods_sh) * 100) as dc_rate
 				, sk.code_val as sale_kind_nm, pr.code_val as pr_code_nm
 				, ot.code_val as ord_type_nm, ok.code_val as ord_kind_nm
 				, bk.code_val as baesong_kind, com.com_nm as sale_place_nm
 				, pt.code_val as pay_type_nm, ps.code_val as pay_stat_nm
+				, null as goods_no_group
 				, if(a.goods_no_group < 2, null, a.ord_opt_no) as ord_opt_no_group
 			from (
 				select 
@@ -241,7 +237,6 @@ class ord02Controller extends Controller
 					inner join order_mst om on om.ord_no = o.ord_no
 					inner join goods g on g.goods_no = o.goods_no
 					left outer join payment p on p.ord_no = o.ord_no
-					left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
 					left outer join (
 						select prd_cd, goods_no, brand, year, season, gender, item, seq, opt, color, size, c.code_val as color_nm, cs.code_val as size_nm
 						from product_code
@@ -279,7 +274,6 @@ class ord02Controller extends Controller
 						inner join order_mst om on om.ord_no = o.ord_no
 						inner join goods g on g.goods_no = o.goods_no
 						left outer join payment p on p.ord_no = o.ord_no
-						left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
 						left outer join (
 							select prd_cd, goods_no, brand, year, season, gender, item, seq, opt, color, size, c.code_val as color_nm, cs.code_val as size_nm
 							from product_code

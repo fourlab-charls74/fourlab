@@ -59,7 +59,7 @@
                         <div class="form-group">
                             <label for="ord_no">주문번호</label>
                             <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='ord_no' id="ord_no" value=''>
+                                <input type='text' class="form-control form-control-sm search-enter" name='ord_no' id="ord_no" value=''>
                             </div>
                         </div>
                     </div>
@@ -114,14 +114,6 @@
                                             <option value="om.r_nm">수령자</option>
                                             <option value="om.r_mobile">수령자핸드폰번호</option>
                                             <option value="om.r_phone">수령자전화번호</option>
-                                            <option value="om.bank_inpnm">입금자</option>
-                                            <option value="om.r_addr1">주소(동명)</option>
-                                            <option value="om.ord_amt">주문총금액</option>
-                                            <option value="o.recv_amt">단일주문금액</option>
-                                            <option value="o.dlv_end_date">배송일자</option>
-                                            <option value="om.dlv_msg">배송메세지</option>
-                                            <option value="o.dlv_no">송장번호</option>
-                                            <option value="memo">처리상태/메모</option>
                                         </select>
                                     </div>
                                 </div>
@@ -426,7 +418,7 @@
         {field: "goods_nm", headerName: "상품명", width: 150,
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
             cellRenderer: function (params) {
-                if (params.data?.prd_cd === '합계' || params.node.level != 0) return '';
+                if (params.node.level != 0) return '';
 				if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
 					return params.value;
 				} else {
@@ -538,14 +530,14 @@
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
         },
-        {field: "dlv_end_date", headerName: "배송일시", width: 125, cellStyle: {'text-align': 'center'},
-            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
-			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
-        },
-        {field: "last_up_date", headerName: "클레임일시", width: 125, cellStyle: {'text-align': 'center'},
-            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
-			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
-        },
+        // {field: "dlv_end_date", headerName: "배송일시", width: 125, cellStyle: {'text-align': 'center'},
+        //     aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+		// 	cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        // },
+        // {field: "last_up_date", headerName: "클레임일시", width: 125, cellStyle: {'text-align': 'center'},
+        //     aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+		// 	cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        // },
     ];
 </script>
 
@@ -617,7 +609,7 @@
                 }
             },
             isRowSelectable: (params) => {
-                return params.aggData || params.data?.goods_no_group === null;
+                return params.aggData || params.data?.ord_opt_no_group === null;
             },
         });
 
