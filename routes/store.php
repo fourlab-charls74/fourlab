@@ -547,6 +547,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 일별 매출 통계
         Route::get('sal24', 'sal24Controller@index');
         Route::get('sal24/search', 'sal24Controller@search');
+
+        //월별 매출 통계
+        Route::get('sal25', 'sal25Controller@index');
+        Route::get('sal25/search', 'sal25Controller@search');
     });
 
     Route::prefix("account")->namespace('account')->group(function () {

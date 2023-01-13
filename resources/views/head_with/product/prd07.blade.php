@@ -833,7 +833,10 @@
             }
             gx.gridOptions.api.setRowData([]);
             await gx.gridOptions.api.applyTransaction({ add : arr });
-            alert("상품일괄등록이 완료되었습니다.");
+            setTimeout(function() {
+                alert("상품일괄등록이 완료되었습니다.");
+            }, 1000);
+            
         };
 
         const resultStyle = (params) => {
