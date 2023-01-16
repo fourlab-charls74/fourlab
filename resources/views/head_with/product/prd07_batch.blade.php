@@ -382,29 +382,32 @@
         });
     };
 
-    const save = () => { // 일괄 등록
-        // if (validation()) {
+
+    const save = async () => { // 일괄 등록
             const data = gx.getRows();
-            insertDB(data);
-        // };
+            const arr = [];
+            for (let i = 0; i < data.length; i++) {
+                let row = data[i];
+                const response = await axios({
+                    url: '/head/product/prd07/enroll2',
+                    method: 'post',
+                    data: { row: row }
+                });
+                const { result, msg } = response.data;
+                row = { ...row, msg: msg, result: result };
+                arr.push(row);
+            }
+            gx.gridOptions.api.setRowData([]);
+            await gx.gridOptions.api.applyTransaction({ add : arr });
+
+            setTimeout(function() {
+                alert("상품일괄등록이 완료되었습니다.");
+            }, 1000);
+            
     };
 
     const insertDB = async (data) => {
-        const arr = [];
-        for (let i = 0; i < data.length; i++) {
-            let row = data[i];
-            const response = await axios({
-                url: '/head/product/prd07/enroll2',
-                method: 'post',
-                data: { row: row }
-            });
-            const { result, msg } = response.data;
-            row = { ...row, msg: msg, result: result };
-            arr.push(row);
-        }
-        gx.gridOptions.api.setRowData([]);
-        await gx.gridOptions.api.applyTransaction({ add : arr });
-        alert("상품일괄등록이 완료되었습니다.");
+       
     };
 
     const resultStyle = (params) => {

@@ -355,23 +355,16 @@
                     </div>
                 </div>
                 <div class="row search-area-ext d-none">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="sale_kind">판매유형</label>
-                            <div class="flex_box">
-                                <select name="sale_kind" class="form-control form-control-sm">
-                                    <option value="">전체</option>
-                                    @foreach (@$sale_kinds as $sale_kind)
-                                        @if ($sell_type == $sale_kind->code_id) 
-                                            <option value="{{ $sale_kind->code_id }}" selected>{{ $sale_kind->code_val }}</option>
-                                        @else
-                                            <option value="{{ $sale_kind->code_id }}">{{ $sale_kind->code_val }}</option>
-                                        @endif
-                                    @endforeach
-                                </select>
+                <div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="">판매유형</label>
+							<div class="form-inline inline_btn_box">
+                                <input type='hidden' id="sell_nm" name="sell_nm">
+                                <select id="sell_type" name="sell_type[]" class="form-control form-control-sm select2-sellType multi_select" multiple></select>
+                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-sellType"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                             </div>
-                        </div>
-                    </div>
+						</div>
+					</div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="">행사코드</label>
@@ -473,6 +466,11 @@
         });
         initStore();
         initPrCode();
+        initSellType()
+
+        @if($brand != '')
+            $("#brand_cd").select2({data:['{{ @$brand }}']??'', tags: true});
+        @endif
 
         Search();
     });
@@ -527,9 +525,15 @@
 
     // 행사코드 다중검색
     $( ".sch-prcode" ).on("click", function() {
-            searchPrCode.Open(null, "multiple");
+        searchPrCode.Open(null, "multiple");
     });
 
+     // 판매유형 다중검색
+     $( ".sch-sellType" ).on("click", function() {
+        searchSellType.Open(null, "multiple");
+    });
+
+    //일별매출통계에서 가져온 매장값을 바로 검색하는 기능
     function initStore() {
         const store_cd = '{{ @$store->store_cd }}';
         const store_nm = '{{ @$store->store_nm }}';
@@ -539,7 +543,8 @@
             $('#store_no').append(option).trigger('change');
         }
     }
-
+    
+    //일별매출통계에서 가져온 행사코드값을 바로 검색하는 기능
     function initPrCode() {
         let pr_code_id = '{{ @$pr_code_id}}';
         let pr_code_val = '{{ @$pr_code_val}}';
@@ -553,6 +558,24 @@
                 if($("#pr_code").val().includes(pr_code[i])) continue;
                 const option = new Option(pr_code_nm[i], pr_code[i], true, true);
                 $('#pr_code').append(option).trigger('change');
+            }
+        }
+    }
+
+    //일별매출통계에서 가져온 판매유형값을 바로 검색하는 기능
+    function initSellType() {
+        let sell_type_id = '{{ @$sell_type_id}}';
+        let sell_type_val = '{{ @$sell_type_val}}';
+
+        let sell_type = sell_type_id.split(",");
+        let sell_type_nm = sell_type_val.split(",");
+
+
+        if (sell_type_id != '') {
+            for(let i = 0; i<sell_type.length;i++) {
+                if($("#sell_type").val().includes(sell_type[i])) continue;
+                const option = new Option(sell_type_nm[i], sell_type[i], true, true);
+                $('#sell_type').append(option).trigger('change');
             }
         }
     }

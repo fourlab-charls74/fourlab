@@ -22,10 +22,6 @@ class ord01Controller extends Controller
 {
     public function index(Request $request)
 	{
-        // $date = $_GET['date']??'';
-        // $sell_type = $_GET['sell_type']??'';
-        // $pr_code = $_GET['pr_code']??'';
-
         $date = $request->input('date');
         $sell_type = $request->input('sell_type');
         $store_cd = $request->input('store_cd', '');
@@ -33,7 +29,7 @@ class ord01Controller extends Controller
 
 
         $pr_code_arr = explode(",", $pr_code);
-
+        $sell_type_arr = explode(",", $sell_type);
 
         $conf = new Conf();
 		$domain		= $conf->getConfigValue("shop", "domain");
@@ -42,13 +38,14 @@ class ord01Controller extends Controller
         $todate = date('Y-m-d', $todate);
 
         if($date == '') {
-            $sdate = now()->sub(1, 'month')->format('Y-m-d');
+            $sdate = now()->sub(1, 'week')->format('Y-m-d');
             $edate = date("Y-m-d");
         } else {
             $sdate = $todate;
             $edate = $todate;
         }
 
+        // 행사코드 쿼리스트링 받아온값을 보내주는 부분
         $pr_code_str = "";
         foreach($pr_code_arr as $pc) {
             $pr_code_str .= "'$pc',";
@@ -76,6 +73,36 @@ class ord01Controller extends Controller
         $str = substr($str,0,-1);
         $str2 = substr($str2,0,-1);
 
+        //판매유형 쿼리스트링 받아온값을 보내주는 부분
+        $sell_type_str = "";
+        foreach($sell_type_arr as $st) {
+            $sell_type_str .= "'$st',";
+        }
+
+        $sell_type = substr($sell_type_str,0,-1);
+        
+        $sql = "
+            select 
+                code_id, code_val
+            from code
+            where code_kind_cd = 'sale_kind'
+            and code_id in ( $sell_type )
+        ";
+
+        $result = DB::select($sql);
+
+        $sell_str = "";
+        $sell_str2 = "";
+        foreach($result as $r){
+            $sell_str .= $r->code_id.",";
+            $sell_str2 .= $r->code_val.",";
+        }
+
+        $sell_str = substr($sell_str,0,-1);
+        $sell_str2 = substr($sell_str2,0,-1);
+
+        $brand = $request->input('brand');
+
 		$values = [
             'sdate'             => $sdate,
             'edate'             => $edate,
@@ -93,6 +120,9 @@ class ord01Controller extends Controller
             'sell_type'         => $sell_type,
             'pr_code_id'        => $str,
             'pr_code_val'       => $str2,
+            'sell_type_id'      => $sell_str,
+            'sell_type_val'     => $sell_str2,
+            'brand'             => $brand
 		];
 
         return view(Config::get('shop.store.view') . '/order/ord01', $values);
@@ -106,8 +136,6 @@ class ord01Controller extends Controller
         $store_no       = $request->input('store_no', '');
         $sale_kind      = $request->input('sale_kind', '');
         $pr_code        = $request->input('pr_code', '');
-
-
         $sdate          = $request->input('sdate', now()->sub(3, 'month')->format('Ymd'));
         $edate          = $request->input('edate', date('Ymd'));
         $nud            = $request->input('nud', ''); // 주문일자 검색여부
@@ -137,6 +165,7 @@ class ord01Controller extends Controller
         $page           = $request->input('page', 1);
         $prd_cd_range_text = $request->input("prd_cd_range", '');
         $sale_form      = $request->input('sale_form', '');
+        $sell_type      = $request->input('sell_type');
        
         if ($page < 1 or $page == '') $page = 1;
 
@@ -279,6 +308,16 @@ class ord01Controller extends Controller
 			$where	.= " and (1!=1";
 			foreach($pr_code as $pr_codes) {
 				$where .= " or o.pr_code = '$pr_codes' ";
+
+			}
+			$where	.= ")";
+		}
+
+        //판매유형 검색
+		if ( $sell_type != "" ) {
+			$where	.= " and (1!=1";
+			foreach($sell_type as $sell_types) {
+				$where .= " or o.sale_kind = '$sell_types' ";
 
 			}
 			$where	.= ")";

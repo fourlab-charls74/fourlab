@@ -114,7 +114,7 @@
                             <label>매장명</label>
                             <div class="form-inline inline_btn_box">
                                 <input type='hidden' id="store_nm" name="store_nm">
-                                <select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select" multiple></select>
+                                <select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select"></select>
                                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                             </div>
                         </div>
@@ -144,8 +144,8 @@
                             <label for="">온라인/오프라인</label>
                             <div class="form-inline form-radio-box">
                                 <div class="custom-control custom-radio">
-                                    <input type="radio" name="on_off_yn" id="on_off_all" value="ALL" class="custom-control-input" checked>
-                                    <label class="custom-control-label" for="on_off_all" value="ALL">전체</label>
+                                    <input type="radio" name="on_off_yn" id="on_off_all" value="" class="custom-control-input" checked>
+                                    <label class="custom-control-label" for="on_off_all" value="">전체</label>
                                 </div>
                                 <div class="custom-control custom-radio">
                                     <input type="radio" name="on_off_yn" id="on_off_on" value="ON" class="custom-control-input">
@@ -312,9 +312,10 @@
                 let store_cd = $('.select2-store').val();
                 let sell_type = $('.select2-sellType').val();
                 let pr_code = $('.select2-prcode').val();
+                let brand = $('.select2-brand').val();
 
                 if (params.value != '합계' && params.value != '평균') {
-                    return "<a href='/store/order/ord01?date=" + params.value + "&store_cd=" + store_cd + "&sell_type=" + sell_type + "&pr_code=" + pr_code + "'>"+ params.value +"</a>";
+                    return "<a href='/store/order/ord01?date=" + params.value + "&store_cd=" + store_cd + "&sell_type=" + sell_type + "&pr_code=" + pr_code + "&brand=" + brand + "'>"+ params.value +"</a>";
                 } else {
                     return params.value;
                 }
@@ -604,7 +605,7 @@
     let gx;
     $(document).ready(function() {
         @if($brand != '')
-            $("#brand_cd").select2({data:['{{ $brand }}'], tags: true});
+            $("#brand_cd").select2({data:['{{ @$brand }}']??'', tags: true});
         @endif
 
         pApp.ResizeGrid(300);
@@ -618,6 +619,13 @@
             }
         };
         gx = new HDGrid(gridDiv, columns, options);
+
+        
+        initStore();
+        initPrCode();
+        initSellType()
+        onoffyn()
+        
         Search();
 
         // // 매장 다중검색
@@ -802,6 +810,66 @@
     @if( $pop_search == "Y" )
         Search();
     @endif
+
+    //월별매출통계에서 가져온 매장값을 바로 검색하는 기능
+    function initStore() {
+        const store_cd = '{{ @$store->store_cd }}';
+        const store_nm = '{{ @$store->store_nm }}';
+
+        if(store_cd != '') {
+            const option = new Option(store_nm, store_cd, true, true);
+            $('#store_no').append(option).trigger('change');
+        }
+    }
+    
+    //월별매출통계에서 가져온 행사코드값을 바로 검색하는 기능
+    function initPrCode() {
+        let pr_code_id = '{{ @$pr_code_id}}';
+        let pr_code_val = '{{ @$pr_code_val}}';
+
+        let pr_code = pr_code_id.split(",");
+        let pr_code_nm = pr_code_val.split(",");
+
+
+        if (pr_code_id != '') {
+            for(let i = 0; i<pr_code.length;i++) {
+                if($("#pr_code").val().includes(pr_code[i])) continue;
+                const option = new Option(pr_code_nm[i], pr_code[i], true, true);
+                $('#pr_code').append(option).trigger('change');
+            }
+        }
+    }
+
+    //월별매출통계에서 가져온 판매유형값을 바로 검색하는 기능
+    function initSellType() {
+        let sell_type_id = '{{ @$sell_type_id}}';
+        let sell_type_val = '{{ @$sell_type_val}}';
+
+        let sell_type = sell_type_id.split(",");
+        let sell_type_nm = sell_type_val.split(",");
+
+
+        if (sell_type_id != '') {
+            for(let i = 0; i<sell_type.length;i++) {
+                if($("#sell_type").val().includes(sell_type[i])) continue;
+                const option = new Option(sell_type_nm[i], sell_type[i], true, true);
+                $('#sell_type').append(option).trigger('change');
+            }
+        }
+    }
+
+    function onoffyn() {
+        let on_off_yn = '{{ @$on_off_yn }}';
+
+        if (on_off_yn == 'ON') {
+            $(":radio[name='on_off_yn'][value='ON']").attr('checked', true);
+        }else if (on_off_yn == 'OFF') {
+            $(":radio[name='on_off_yn'][value='OFF']").attr('checked', true);
+        } else {
+            $(":radio[name='on_off_yn'][value='']").attr('checked', true);
+        }
+
+    }
 </script>
 
 @stop

@@ -22,6 +22,71 @@ class sal24Controller extends Controller
         $sdate	 = $mutable->sub(1, 'month')->format('Y-m-d');
 		$edate	 = date("Y-m-d");
 
+		$sell_type = $req->input('sell_type');
+        $store_cd = $req->input('store_cd', '');
+        $pr_code = $req->input('pr_code');
+		$on_off_yn = $req->input('on_off_yn');
+
+		$pr_code_arr = explode(",", $pr_code);
+        $sell_type_arr = explode(",", $sell_type);
+
+		// 행사코드 쿼리스트링 받아온값을 보내주는 부분
+        $pr_code_str = "";
+        foreach($pr_code_arr as $pc) {
+            $pr_code_str .= "'$pc',";
+        }
+
+        $pr_code = substr($pr_code_str,0,-1);
+        
+        $sql = "
+            select 
+                code_id, code_val
+            from code
+            where code_kind_cd = 'PR_CODE'
+            and code_id in ( $pr_code )
+        ";
+
+        $result = DB::select($sql);
+
+        $str = "";
+        $str2 = "";
+        foreach($result as $r){
+            $str .= $r->code_id.",";
+            $str2 .= $r->code_val.",";
+        }
+
+        $str = substr($str,0,-1);
+        $str2 = substr($str2,0,-1);
+
+        //판매유형 쿼리스트링 받아온값을 보내주는 부분
+        $sell_type_str = "";
+        foreach($sell_type_arr as $st) {
+            $sell_type_str .= "'$st',";
+        }
+
+        $sell_type = substr($sell_type_str,0,-1);
+        
+        $sql = "
+            select 
+                code_id, code_val
+            from code
+            where code_kind_cd = 'sale_kind'
+            and code_id in ( $sell_type )
+        ";
+
+        $result = DB::select($sql);
+
+        $sell_str = "";
+        $sell_str2 = "";
+        foreach($result as $r){
+            $sell_str .= $r->code_id.",";
+            $sell_str2 .= $r->code_val.",";
+        }
+
+        $sell_str = substr($sell_str,0,-1);
+        $sell_str2 = substr($sell_str2,0,-1);
+
+
 		$req_sdate = $req->query("sdate");
 		$req_edate = $req->query("edate");
 		if($req_sdate != '') {
@@ -49,6 +114,7 @@ class sal24Controller extends Controller
 
 		$item = $req->input("item");
 		$brand = $req->input("brand");
+
 		$goods_nm = $req->input("goods_nm");
 		$stat_pay_type = $req->input("stat_pay_type");
 
@@ -72,8 +138,13 @@ class sal24Controller extends Controller
 			'goods_nm'		=> $goods_nm,
 			'stat_pay_type'	=> $stat_pay_type,
 			'com_nm'		=> $com_nm,
-            'sell_types'    => SLib::getCodes('sale_kind'),
-            'pr_codes'       => SLib::getCodes('pr_code')
+			'store'         => DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', '=', $store_cd)->first(),   
+			'sell_type'     => $sell_type,
+            'pr_code_id'    => $str,
+            'pr_code_val'   => $str2,
+            'sell_type_id'  => $sell_str,
+            'sell_type_val' => $sell_str2,
+			'on_off_yn'		=> $on_off_yn
         ];
         echo Config::get('shop.store.view');
         return view( Config::get('shop.store.view') . '/sale/sal24',$values);
@@ -132,6 +203,7 @@ class sal24Controller extends Controller
 			$where	.= ")";
 		}
 
+		//온/오프라인
 		if ($on_off_yn == 'ON') {
 			$where .= "and o.store_cd = ''";
 		} else if ($on_off_yn == 'OFF') {
@@ -254,6 +326,7 @@ class sal24Controller extends Controller
 						, o.store_cd
 						, o.sale_kind
 						, o.pr_code
+						, g.brand
 					from order_opt o
 						inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
 						inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
