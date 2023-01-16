@@ -99,7 +99,16 @@
                     <li><a href="/store/sale/sal07">(완)상품별 이익현황</a></li>
                     <li><a href="/store/sale/sal08">(완)매장브랜드별판매분석</a></li>
                     <li><a href="/store/sale/sal24">(완)일별 매출 통계</a></li>
-                    <li><a href="/store/sale/sal25">(개)월별 매출 통계</a></li>
+                    <li><a href="/store/sale/sal25">(완)월별 매출 통계</a></li>
+                    <li><a href="/store/sale/sal26">(완)매장별 매출 통계</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="javascript:;" class="arrow"><i class="bx bx-desktop fs-18"></i><span>시스템</span></a>
+                <ul>
+                    <li><a href="/store/system/sys01">(개)사용자관리</a></li>
+                    <li><a href="/store/system/sys02">(개)메뉴관리</a></li>
+                    <li><a href="/store/system/sys03">(개)그룹관리</a></li>
                 </ul>
             </li>
         </ul>

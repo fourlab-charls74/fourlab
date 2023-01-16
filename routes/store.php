@@ -551,6 +551,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         //월별 매출 통계
         Route::get('sal25', 'sal25Controller@index');
         Route::get('sal25/search', 'sal25Controller@search');
+
+        //판매처별 매출 통계
+        Route::get('sal26', 'sal26Controller@index');
+        Route::get('sal26/search', 'sal26Controller@search');
     });
 
     Route::prefix("account")->namespace('account')->group(function () {
@@ -587,6 +591,42 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::put('acc07/show_update', 'acc07Controller@show_update');
         Route::delete('acc07/show_delete', 'acc07Controller@show_delete');
         Route::post('acc07/show_close', 'acc07Controller@show_close');
+
+    });
+
+    Route::prefix("system")->namespace('system')->group(function () {
+        //사용자관리
+        Route::get('sys01', 'sys01Controller@index');
+        Route::post('sys01', 'sys01Controller@store');
+        Route::get('sys01/search', 'sys01Controller@search');
+        Route::get('sys01/create', 'sys01Controller@create');
+        Route::get('sys01/{code?}', 'sys01Controller@show');
+        Route::put('sys01/{code?}', 'sys01Controller@update');
+        Route::delete('sys01/{code}', 'sys01Controller@delete');
+
+        Route::get('sys01/{code?}/search', 'sys01Controller@group_search');
+
+        //메뉴관리
+        Route::get('sys02', 'sys02Controller@index');
+        Route::post('sys02', 'sys02Controller@store');
+        Route::get('sys02/search', 'sys02Controller@search');
+        Route::get('sys02/create', 'sys02Controller@create');
+        Route::get('sys02/{code?}', 'sys02Controller@show');
+        Route::put('sys02/{code?}', 'sys02Controller@update');
+        Route::delete('sys02/{code}', 'sys02Controller@delete');
+
+        Route::get('sys02/{code?}/search', 'sys02Controller@role_search');
+
+        //그룹관리
+        Route::get('sys03', 'sys03Controller@index');
+        Route::post('sys03', 'sys03Controller@store');
+        Route::get('sys03/search', 'sys03Controller@search');
+        Route::get('sys03/create', 'sys03Controller@create');
+        Route::get('sys03/{code?}', 'sys03Controller@show');
+        Route::put('sys03/{code?}', 'sys03Controller@update');
+        Route::delete('sys03/{code}', 'sys03Controller@delete');
+
+        Route::get('sys03/{code?}/search', 'sys03Controller@user_search');
 
     });
 

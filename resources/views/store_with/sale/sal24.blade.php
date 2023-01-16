@@ -213,7 +213,7 @@
                         <div class="form-group">
                             <label for="formrow-inputCity">품목</label>
                             <div class="flax_box">
-                                <select name='item' class="form-control form-control-sm">
+                                <select id='item' name='item' class="form-control form-control-sm">
                                     <option value=''>전체</option>
                                     @foreach ($items as $t)
                                     <option value='{{ $t->cd }}' @if($item == $t->cd) selected @endif>{{ $t->val }}</option>
@@ -235,7 +235,7 @@
                         <div class="form-group">
                             <label for="formrow-inputZip">상품명</label>
                             <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' value='{{ $goods_nm }}'>
+                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" id='goods_nm' name='goods_nm' value='{{ @$goods_nm }}'>
                             </div>
                         </div>
                     </div>
@@ -312,10 +312,13 @@
                 let store_cd = $('.select2-store').val();
                 let sell_type = $('.select2-sellType').val();
                 let pr_code = $('.select2-prcode').val();
-                let brand = $('.select2-brand').val();
+                let brand = $('.select2-brand').val()??'';
+                let goods_nm = $('#goods_nm').val();
+                let on_off_yn = $('[name=on_off_yn]:checked').val();
+                let item = $('#item').val();
 
                 if (params.value != '합계' && params.value != '평균') {
-                    return "<a href='/store/order/ord01?date=" + params.value + "&store_cd=" + store_cd + "&sell_type=" + sell_type + "&pr_code=" + pr_code + "&brand=" + brand + "'>"+ params.value +"</a>";
+                    return "<a href='/store/order/ord01?date=" + params.value + "&store_cd=" + store_cd + "&sell_type=" + sell_type + "&pr_code=" + pr_code + "&brand=" + brand + "&goods_nm=" + goods_nm + "&on_off_yn=" + on_off_yn + "&item=" + item + "'>"+ params.value +"</a>";
                 } else {
                     return params.value;
                 }

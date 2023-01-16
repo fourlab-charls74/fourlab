@@ -26,6 +26,8 @@ class sal24Controller extends Controller
         $store_cd = $req->input('store_cd', '');
         $pr_code = $req->input('pr_code');
 		$on_off_yn = $req->input('on_off_yn');
+		$store_nm = $req->input('store_nm');
+		$goods_nm = $req->input('goods_nm');
 
 		$pr_code_arr = explode(",", $pr_code);
         $sell_type_arr = explode(",", $sell_type);
@@ -115,7 +117,6 @@ class sal24Controller extends Controller
 		$item = $req->input("item");
 		$brand = $req->input("brand");
 
-		$goods_nm = $req->input("goods_nm");
 		$stat_pay_type = $req->input("stat_pay_type");
 
 		if($stat_pay_type != '') {
@@ -139,6 +140,7 @@ class sal24Controller extends Controller
 			'stat_pay_type'	=> $stat_pay_type,
 			'com_nm'		=> $com_nm,
 			'store'         => DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', '=', $store_cd)->first(),   
+			'store_nm'      => DB::table('store')->select('store_cd', 'store_nm')->where('store_nm', '=', $store_nm)->first(),   
 			'sell_type'     => $sell_type,
             'pr_code_id'    => $str,
             'pr_code_val'   => $str2,

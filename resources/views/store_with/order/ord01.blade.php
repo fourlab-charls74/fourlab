@@ -317,10 +317,14 @@
                         <div class="form-group">
                             <label for="item">품목</label>
                             <div class="flex_box">
-                                <select name="item" class="form-control form-control-sm">
+                                <select id="item" name="item" class="form-control form-control-sm">
                                     <option value="">전체</option>
                                     @foreach (@$items as $item)
-                                        <option value="{{ $item->cd }}">{{ $item->val }}</option>
+                                        @if ($item->cd == @$s_item)
+                                            <option value="{{ $item->cd }}" selected>{{ $item->val }}</option>
+                                        @else
+                                            <option value="{{ $item->cd }}">{{ $item->val }}</option>
+                                        @endif
                                     @endforeach
                                 </select>
                             </div>
@@ -341,7 +345,7 @@
                         <div class="form-group">
                             <label for="goods_nm">상품명</label>
                             <div class="flex_box">
-                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value=''>
+                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value='{{@$goods_nm}}'>
                             </div>
                         </div>
                     </div>
@@ -353,9 +357,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row search-area-ext d-none">
-                <div class="col-lg-4 inner-td">
+                    <div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="">판매유형</label>
 							<div class="form-inline inline_btn_box">
@@ -365,6 +367,8 @@
                             </div>
 						</div>
 					</div>
+                </div>
+                <div class="row search-area-ext d-none">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="">행사코드</label>
@@ -464,9 +468,11 @@
                 return node.data.ord_state_cd < 30;
             }
         });
+        
         initStore();
         initPrCode();
-        initSellType()
+        initSellType();
+        onoffyn();
 
         @if($brand != '')
             $("#brand_cd").select2({data:['{{ @$brand }}']??'', tags: true});
@@ -579,6 +585,20 @@
             }
         }
     }
+
+    function onoffyn() {
+        let on_off_yn = '{{ @$on_off_yn }}';
+
+        if (on_off_yn == 'ON') {
+            $(":radio[name='sale_form'][value='On']").attr('checked', true);
+        }else if (on_off_yn == 'OFF') {
+            $(":radio[name='sale_form'][value='Off']").attr('checked', true);
+        } else {
+            $(":radio[name='sale_form'][value='']").attr('checked', true);
+        }
+
+    }
+
 
 </script>
 @stop

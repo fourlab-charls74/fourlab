@@ -26,6 +26,9 @@ class ord01Controller extends Controller
         $sell_type = $request->input('sell_type');
         $store_cd = $request->input('store_cd', '');
         $pr_code = $request->input('pr_code');
+        $goods_nm = $request->input('goods_nm');
+        $on_off_yn = $request->input('on_off_yn');
+        $item = $request->input('item');
 
 
         $pr_code_arr = explode(",", $pr_code);
@@ -122,7 +125,10 @@ class ord01Controller extends Controller
             'pr_code_val'       => $str2,
             'sell_type_id'      => $sell_str,
             'sell_type_val'     => $sell_str2,
-            'brand'             => $brand
+            'brand'             => $brand,
+            'goods_nm'          => $goods_nm,
+            'on_off_yn'         => $on_off_yn,
+            's_item'            => $item
 		];
 
         return view(Config::get('shop.store.view') . '/order/ord01', $values);
