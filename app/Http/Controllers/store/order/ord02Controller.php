@@ -220,7 +220,7 @@ class ord02Controller extends Controller
 					, o.wonga, o.price, g.price as goods_price, g.goods_sh, o.qty
 					, o.pay_type, o.dlv_amt, o.point_amt, o.coupon_amt, o.dc_amt, o.recv_amt
 					, o.sale_place, o.store_cd, o.ord_state, o.clm_state, o.com_id, o.baesong_kind as dlv_baesong_kind, o.ord_date
-					, o.sale_kind, o.pr_code, o.sales_com_fee, o.ord_type, o.ord_kind, p.pay_stat
+					, o.sale_kind, o.pr_code, o.sales_com_fee, o.ord_type, o.ord_kind, p.pay_stat, p.pay_date
 					, concat(ifnull(om.user_nm, ''), '(', ifnull(om.user_id, ''), ')') as user_nm, om.r_nm
 					, (
 						select count(*)
@@ -377,6 +377,7 @@ class ord02Controller extends Controller
 					// 출고처리중 처리
 					$state_log = [
 						'ord_no' => $row['ord_no'], 
+						'ord_opt_no' => $row['ord_opt_no'], 
 						'ord_state' => $ord_state, 
 						'comment' => "배송출고요청(온라인주문접수)", 
 						'admin_id' => $user['id'], 

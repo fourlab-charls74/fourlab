@@ -31,7 +31,7 @@
 							<div class="form-inline date-select-inbox">
 								<div class="docs-datepicker form-inline-inner input_box">
 									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date" name="receipt_sdate" value="{{ @$sdate }}" autocomplete="off" disable>
+										<input type="text" class="form-control form-control-sm docs-date" name="receipt_sdate" value="{{ @$receipt_sdate }}" autocomplete="off" disable>
 										<div class="input-group-append">
 											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
 												<i class="fa fa-calendar" aria-hidden="true"></i>
@@ -71,7 +71,9 @@
                                     <div class="form-group">
                                         <select name="dlv_place_type" id="dlv_place_type" class="form-control form-control-sm">
                                             <option value="storage">창고</option>
+                                            @if (@$user_group === @$user_groups['HEAD'])
                                             <option value="store">매장</option>
+                                            @endif
                                         </select>
                                     </div>
                                 </div>
@@ -134,15 +136,12 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label>주문상태/배송방식</label>
+                            <label>접수상태/배송방식</label>
                             <div class="form-inline">
                                 <select name='ord_state' class="form-control form-control-sm" style="width: 47%;">
                                     <option value=''>전체</option>
-                                    @foreach (@$ord_states as $ord_state)
-                                        <option value='{{ $ord_state->code_id }}' @if($ord_state->code_id === '20') selected @endif>
-                                            {{ $ord_state->code_val }}
-                                        </option>
-                                    @endforeach
+                                    <option value='20' selected>주문접수</option>
+                                    <option value='30'>배송처리</option>
                                 </select>
                                 <span class="text_line">/</span>
                                 <select id="dlv_type" name='dlv_type' class="form-control form-control-sm" style="width: 47%;">
@@ -393,25 +392,29 @@
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
 				</div>
                 <div class="fr_box d-flex">
-                    {{-- <div class="d-flex">
-                        <span class="mr-2">출고차수 :</span>
-                        <select id='rel_order' name='rel_order' class="form-control form-control-sm mr-2"  style='width:90px;'>
-                            @foreach (@$rel_orders as $rel_order)
-                                <option value='{{ $rel_order }}'>{{ $rel_order }}</option>
+                    <div class="d-flex">
+                        <div class="custom-control custom-checkbox form-check-box mr-2">
+							<input type="checkbox" name="send_sms_yn" id="send_sms_yn" class="custom-control-input" checked="" value="Y">
+							<label class="custom-control-label text-left" for="send_sms_yn" style="line-height:27px;justify-content:left">배송 문자 발송</label>
+						</div>
+                        <select id='u_dlvs' name='u_dlvs' class="form-control form-control-sm mr-2" style='width:120px;'>
+                            <option value="">전체</option>
+                            @foreach (@$dlvs as $dlv)
+                                <option value='{{ $dlv->code_id }}'{{ $dlv->code_id === $dlv_cd ? 'selected' : '' }}>{{ $dlv->code_val }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <a href="javascript:void(0);" onclick="return receiptOrder();" class="btn btn-sm btn-primary shadow-sm">온라인주문접수</a>
+                    <a href="javascript:void(0);" onclick="return completeOrder();" class="btn btn-sm btn-primary shadow-sm">출고완료처리</a>
                     <span class="ml-2 mr-2 text-secondary">|</span>
                     <div class="d-flex">
                         <span class="mr-2">출고구분 :</span>
-                        <select id='ord_kind' name='ord_kind' class="form-control form-control-sm mr-2"  style='width:120px;'>
+                        <select id='ord_kind' name='ord_kind' class="form-control form-control-sm mr-2" style='width:120px;'>
                             @foreach (@$ord_kinds as $ord_kind)
                                 <option value='{{ $ord_kind->code_id }}'>{{ $ord_kind->code_val }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <a href="javascript:void(0);" onclick="return updateOrdKind();" class="btn btn-sm btn-primary shadow-sm">출고구분변경</a> --}}
+                    <a href="javascript:void(0);" onclick="return updateOrdKind();" class="btn btn-sm btn-primary shadow-sm">출고요청처리</a>
                 </div>
 			</div>
 		</div>
@@ -423,9 +426,9 @@
 
 <script language="javascript">
     let columns = [
-        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 28},
-        {field: "receipt_date", headerName: "접수일자", pinned: 'left', width: 80, cellStyle: {'text-align': 'center'}, cellRenderer: (params) => params.value.substring(0,10)},
+        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: (params) => params.data.state < 30, headerCheckboxSelection: true, sort: null, width: 28},
         {field: "rel_order", headerName: "출고차수", pinned: 'left', width: 100, cellStyle: {'text-align': 'center'}},
+        {field: "dlv_no", headerName: "송장번호", pinned: 'left', width: 120, editable: (params) => params.data.state < 30, cellStyle: (params) => ({'text-align': 'center', 'background-color': params.data.state < 30 ? '#ffff99' : 'none'})},
         {field: "dlv_location_cd", headerName: "배송처코드", pinned: 'left', width: 70, 
             cellStyle: (params) => ({'text-align': 'center', 'color': params.data.dlv_location_type === 'STORAGE' ? '#0000ff' : '#ff0000', 'background-color': params.data.dlv_location_type === 'STORAGE' ? '#D9E3FF' : '#FFE9E9'}),
         },
@@ -460,7 +463,20 @@
         {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
         {field: "goods_opt", headerName: "옵션", width: 130},
-        {field: "qty", headerName: "수량", width: 50, type: "currencyType", cellStyle: {"font-weight": "bold"}, aggFunc: "first"},
+        {field: "qty", headerName: "수량", width: 50, type: "currencyType", cellStyle: {"font-weight": "bold", 'background-color': '#D5FFDA'}, aggFunc: "first"},
+        @foreach (@$dlv_locations as $loc)
+            {field: "{{ $loc->seq }}_{{ $loc->location_type }}_{{ $loc->location_cd }}_qty", headerName: "{{ $loc->location_nm }}", width: 100, type: "currencyType",
+                cellStyle: (params) => (
+                    {
+                        'color': params.data.dlv_location_cd === '{{ $loc->location_cd }}' ? (params.data.dlv_location_type === 'STORAGE' ? '#0000ff' : '#ff0000') : 'none', 
+                        'background-color': params.data.dlv_location_cd === '{{ $loc->location_cd }}' ? (params.data.dlv_location_type === 'STORAGE' ? '#D9E3FF' : '#FFE9E9') : 'none'
+                    }
+                ),
+                onCellDoubleClicked: (e) => {
+                    if (e.data && e.value >= e.data.qty) e.node.setDataValue('dlv_place', "{{ $loc->location_nm }}");
+                }
+            },
+        @endforeach
         {field: "user_nm", headerName: "주문자(아이디)", width: 120, cellStyle: {'text-align': 'center'}},
         {field: "r_nm", headerName: "수령자", width: 70, cellStyle: {'text-align': 'center'}},
         {field: "wonga", headerName: "원가", width: 60, type: "currencyType"},
@@ -476,8 +492,9 @@
         {field: "baesong_kind", headerName: "배송구분", width: 60, cellStyle: {'text-align': 'center'}},
         {field: "ord_date", headerName: "주문일시", width: 125, cellStyle: {'text-align': 'center'}},
         {field: "pay_date", headerName: "입금일시", width: 125, cellStyle: {'text-align': 'center'}},
-        // {field: "dlv_end_date", headerName: "배송일시", width: 125, cellStyle: {'text-align': 'center'}},
-        // {field: "last_up_date", headerName: "클레임일시", width: 125, cellStyle: {'text-align': 'center'}},
+        {field: "req_nm", headerName: "접수자", width: 80, cellStyle: {'text-align': 'center'}},
+        {field: "receipt_date", headerName: "접수일시", width: 125, cellStyle: {'text-align': 'center'}},
+        {field: "receipt_comment", headerName: "접수메모", width: 150},
     ];
 </script>
 
@@ -489,11 +506,18 @@
 		pApp.ResizeGrid(275);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
-		gx = new HDGrid(gridDiv, columns);
+		gx = new HDGrid(gridDiv, columns, {
+            onCellValueChanged: (e) => {
+                e.node.setSelected(true);
+            },
+            isRowSelectable: (params) => {
+                return params.data.state < 30;
+            },
+        });
 
 		Search();
 
-        $("[name=dlv_place]").on("change", function(e) {
+        $("[name=dlv_place_type]").on("change", function(e) {
             $("#store_search").toggleClass("d-none", e.target.value === 'storage');
             $("#storage_search").toggleClass("d-none", e.target.value === 'store');
         });
@@ -503,5 +527,41 @@
 		let data = $('form[name="search"]').serialize();
 		gx.Request('/store/order/ord03/search', data, 1);
 	}
+
+    // 출고완료처리
+    function completeOrder() {
+        let rows = gx.getSelectedRows();
+
+        // validation
+        if(!$("#u_dlvs").val()) return alert("택배사를 선택해주세요.");
+        if(rows.length < 1) return alert("출고완료처리할 주문건을 선택해주세요.");
+        if(rows.filter(r => r.ord_state != 20).length > 0) return alert("출고처리중 상태의 주문건만 처리가 가능합니다.");
+        if(rows.filter(r => r.ord_kind > 20).length > 0) return alert("출고보류중인 주문건은 처리할 수 없습니다.");
+        if(rows.filter(r => !r.dlv_no).length > 0) return alert("송장번호가 입력되지 않은 주문건이 있습니다.\n확인 후 다시 처리해주세요.");
+
+        if(!confirm("선택한 주문건을 출고완료처리하시겠습니까?")) return;
+
+        axios({
+            url: '/store/order/ord03/complete',
+            method: 'post',
+            data: { 
+                send_sms_yn: $("#send_sms_yn:checked").val(),
+                u_dlvs: $("#u_dlvs").val(),
+                data: rows
+            },
+        }).then(function (res) {
+            if(res.data.code === 200) {
+                if (res.data.failed_rows.length > 0) alert("온라인주문이 출고완료되었으나 재고부족 등의 사유로 배송처리에 실패한 주문건이 존재합니다.\n주문번호 확인 후 다시 시도해주세요.\n해당주문건 : " + res.data.failed_rows.join(", "));
+                else alert("출고완료처리가 정상적으로 완료되었습니다.");
+
+                Search();
+            } else {
+                console.log(res.data);
+                alert("출고완료처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
+    }
 </script>
 @stop
