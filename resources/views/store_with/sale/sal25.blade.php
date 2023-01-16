@@ -289,7 +289,8 @@
                 let s_ord_type = $(".ord_type:checked").map(function() {return this.value;}).get().join(",");
                 let s_ord_state = $('[name=ord_state]:checked').val();
                 let s_item = $("[name=item]").val();
-                let s_brand = $(".select2-brand").val();
+                let s_brand = $(".select2-brand").val()??'';
+                console.log(s_brand);
                 let s_prd_nm = $("[name=goods_nm]").val();
                 let s_stat_pay_type = $(".stat_pay_type:checked").map(function() {return this.value;}).get().join(",");
                 let store_cd = $('.select2-store').val();

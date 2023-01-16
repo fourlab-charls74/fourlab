@@ -312,9 +312,10 @@
                 let store_cd = $('.select2-store').val();
                 let sell_type = $('.select2-sellType').val();
                 let pr_code = $('.select2-prcode').val();
+                let brand = $('.select2-brand').val();
 
                 if (params.value != '합계' && params.value != '평균') {
-                    return "<a href='/store/order/ord01?date=" + params.value + "&store_cd=" + store_cd + "&sell_type=" + sell_type + "&pr_code=" + pr_code + "'>"+ params.value +"</a>";
+                    return "<a href='/store/order/ord01?date=" + params.value + "&store_cd=" + store_cd + "&sell_type=" + sell_type + "&pr_code=" + pr_code + "&brand=" + brand + "'>"+ params.value +"</a>";
                 } else {
                     return params.value;
                 }
@@ -604,7 +605,7 @@
     let gx;
     $(document).ready(function() {
         @if($brand != '')
-            $("#brand_cd").select2({data:['{{ @$brand }}'], tags: true});
+            $("#brand_cd").select2({data:['{{ @$brand }}']??'', tags: true});
         @endif
 
         pApp.ResizeGrid(300);

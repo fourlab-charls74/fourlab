@@ -468,6 +468,10 @@
         initPrCode();
         initSellType()
 
+        @if($brand != '')
+            $("#brand_cd").select2({data:['{{ @$brand }}']??'', tags: true});
+        @endif
+
         Search();
     });
 

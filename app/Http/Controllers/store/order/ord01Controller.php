@@ -101,6 +101,8 @@ class ord01Controller extends Controller
         $sell_str = substr($sell_str,0,-1);
         $sell_str2 = substr($sell_str2,0,-1);
 
+        $brand = $request->input('brand');
+
 		$values = [
             'sdate'             => $sdate,
             'edate'             => $edate,
@@ -119,7 +121,8 @@ class ord01Controller extends Controller
             'pr_code_id'        => $str,
             'pr_code_val'       => $str2,
             'sell_type_id'      => $sell_str,
-            'sell_type_val'     => $sell_str2
+            'sell_type_val'     => $sell_str2,
+            'brand'             => $brand
 		];
 
         return view(Config::get('shop.store.view') . '/order/ord01', $values);
