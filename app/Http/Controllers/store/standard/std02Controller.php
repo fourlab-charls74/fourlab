@@ -261,7 +261,8 @@ class std02Controller extends Controller
 				'mod_date'		=> now(),
 				'admin_id'		=> $id,
 				'map_code'		=> $request->input('map_code'),
-				'open_month_stock_yn' => $open_month_stock_yn
+				'open_month_stock_yn' => $open_month_stock_yn,
+				'sale_place_match_yn' => $request->input('sale_place_match_yn')
 				
 			];
 			
