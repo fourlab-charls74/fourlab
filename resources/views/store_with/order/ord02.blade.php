@@ -691,7 +691,7 @@
         // validation
         if(!$("#rel_order").val()) return alert("출고차수를 선택해주세요.");
         if(rows.length < 1) return alert("접수할 주문건을 선택해주세요.");
-        // 입금예정인 주문건은 안됨처리 필요
+        if(rows.filter(r => r.pay_stat_nm != '입금').length > 0) return alert("입금완료된 주문건만 접수가 가능합니다.");
         if(rows.filter(r => r.ord_state != 10).length > 0) return alert("출고요청 상태의 주문건만 접수가 가능합니다.");
         if(rows.filter(r => r.ord_kind > 20).length > 0) return alert("출고보류중인 주문건은 접수할 수 없습니다.");
         if(rows.filter(r => !r.dlv_place_cd).length > 0) return alert("배송처가 선택되지 않은 주문건이 있습니다.\n확인 후 다시 접수해주세요.");

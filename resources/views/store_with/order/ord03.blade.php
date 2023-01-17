@@ -563,5 +563,36 @@
             console.log(err);
         });
     }
+
+    // 출고요청처리 (+출고구분변경)
+    function updateOrdKind() {
+        let rows = gx.getSelectedRows();
+
+        // validation
+        if(rows.length < 1) return alert("출고요청상태로 변경할 주문건을 선택해주세요.");
+        const ord_kind_nm = $("#ord_kind option:checked").text();
+
+        if(!confirm(`선택한 주문건의 출고구분을 '${ord_kind_nm}' 상태로 변경하고, 출고요청처리하시겠습니까?`)) return;
+
+        axios({
+            url: '/store/order/ord03/update/ord-kind',
+            method: 'post',
+            data: { 
+                ord_kind: $("#ord_kind").val(),
+                ord_opt_nos: rows.map(r => r.ord_opt_no),
+                or_prd_cds: rows.map(r => r.or_prd_cd),
+            },
+        }).then(function (res) {
+            if(res.data.code === 200) {
+                alert("출고요청처리가 정상적으로 완료되었습니다.");
+                Search();
+            } else {
+                console.log(res.data);
+                alert("출고요청처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
+    }
 </script>
 @stop

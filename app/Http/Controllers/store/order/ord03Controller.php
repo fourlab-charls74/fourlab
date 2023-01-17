@@ -23,8 +23,8 @@ class ord03Controller extends Controller
 
 		$user_group = 'HEAD'; // 추후 로직적용 필요
 
-		$sdate = Carbon::now()->sub(15, 'day')->format("Y-m-d");
-		$receipt_sdate = Carbon::now()->sub(4, 'day')->format("Y-m-d");
+		$sdate = Carbon::now()->sub(3, 'day')->format("Y-m-d");
+		$receipt_sdate = Carbon::now()->sub(3, 'day')->format("Y-m-d");
 		$edate = Carbon::now()->format("Y-m-d");
 
 		$sale_places_sql = "select com_id as id, com_nm as val from company where com_type = '4' and use_yn = 'Y' order by com_nm";
@@ -458,7 +458,7 @@ class ord03Controller extends Controller
 		return response()->json(['code' => $code, 'msg' => $msg, 'failed_rows' => $failed_rows], $code);
 	}
 
-	// 배송처리 시 실재고 차감처리
+	/** 배송처리 시 실재고 차감처리 */
 	private function update_stock($row)
 	{
 		$prd_cd = $row['prd_cd'] ?? '';
@@ -486,11 +486,163 @@ class ord03Controller extends Controller
 		}
 	}
 
-	/** 출고요청처리 (상태변경 및 출고구분변경 및 재고처리) */
-	public function update_ord_kind()
+	/** 
+	 * 출고요청처리 (상태변경 및 출고구분변경 및 재고처리)
+	 * (출고처리중 -> 출고요청)
+	 * */
+	public function update_ord_kind(Request $request)
 	{
-		// 출고요청으로 상태 돌려놓기
-		// 출고구분값 변경
-		// 보유재고 원래대로 돌려놓기
+		$user = [
+			'id'	=> Auth('head')->user()->id,
+			'name'	=> Auth('head')->user()->name
+		];
+		$ord_state = 10; //	출고요청
+		$ord_kind = $request->input('ord_kind', '');
+		$ord_opt_nos = $request->input('ord_opt_nos', []);
+		$ord_opt_nos = implode(', ', $ord_opt_nos);
+		$or_prd_cds = $request->input('or_prd_cds', []);
+
+		try {
+            DB::beginTransaction();
+
+			// 주문상태 및 출고구분값 변경
+			$sql = "
+				update order_opt set 
+					ord_kind = '$ord_kind'
+					, ord_state = '$ord_state'
+				where ord_opt_no in ($ord_opt_nos)
+			";
+			DB::update($sql);
+			$sql = "
+				update order_opt_wonga
+					set ord_kind = '$ord_kind'
+				where ord_opt_no in ($ord_opt_nos)
+			";
+			DB::update($sql);
+
+			// 차감된 재고 리셋처리
+			foreach ($or_prd_cds as $cd) {
+				$result = $this->reset_stock($user, $cd, $ord_state);
+				if ($result != 1) throw new Exception("재고처리 중 에러가 발생했습니다.");
+			}
+
+			// 온라인주문접수에서 제거
+			$or_prd_cds_join = implode(', ', $or_prd_cds);			
+			$sql = "
+				delete from order_receipt_product
+				where or_prd_cd in ($or_prd_cds_join)
+			";
+			DB::delete($sql);
+
+			foreach ($or_prd_cds as $cd) {
+				$sql = "
+					select count(*) as cnt, or_cd
+					from order_receipt_product
+					where or_prd_cd = '$cd'
+				";
+				$receipt_cnt = DB::selectOne($sql);
+				if ($receipt_cnt != null && $receipt_cnt->cnt < 1) {
+					$or_cd = $receipt_cnt->or_cd;
+					DB::table('order_receipt')->where('or_cd', $or_cd)->delete();
+				}
+			}
+
+			DB::commit();
+			$code = 200;
+			$msg = "출고구분변경 및 출고요청처리가 정상적으로 완료되었습니다.";
+		} catch (Exception $e) {
+			DB::rollBack();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+		return response()->json(['code' => $code, 'msg' => $msg], $code);
+	}
+
+	/** 출고요청처리 시, 보유재고차감 리셋 */
+	private function reset_stock($user, $or_prd_cd, $ord_state)
+	{
+		$sql = "
+			select orp.or_prd_cd, orp.ord_opt_no, orp.prd_cd, orp.qty
+				, orp.dlv_location_type, orp.dlv_location_cd
+				, pc.goods_no, pc.goods_opt, p.price, p.wonga
+			from order_receipt_product orp
+				inner join product_code pc on pc.prd_cd = orp.prd_cd
+				inner join product p on p.prd_cd = orp.prd_cd
+			where or_prd_cd = '$or_prd_cd'
+		";
+		$row = DB::selectOne($sql);
+		if ($row == null) return 0;
+
+		$ord_opt_no = $row->ord_opt_no;
+		$prd_cd = $row->prd_cd;
+		$goods_no = $row->goods_no;
+		$goods_opt = $row->goods_opt;
+		$price = $row->price;
+		$wonga = $row->wonga;
+		$ord_qty = $row->qty;
+		$location_type = $row->dlv_location_type;
+		$location_cd = $row->dlv_location_cd;
+
+		try {
+			// 차감된 보유재고 리셋
+			if ($location_type === 'STORE') {
+				DB::table('product_stock_store')
+					->where('prd_cd', '=', $prd_cd)
+					->where('store_cd', '=', $location_cd) 
+					->update([
+						'wqty' => DB::raw('wqty + ' . $ord_qty),
+						'ut' => now(),
+					]);
+				DB::table('product_stock')
+					->where('prd_cd', '=', $prd_cd)
+					->update([
+						'qty_wonga'	=> DB::raw('qty_wonga + ' . ($ord_qty * $wonga)),
+						'out_qty' => DB::raw('out_qty - ' . $ord_qty),
+						'qty' => DB::raw('qty + ' . $ord_qty),
+						'ut' => now(),
+					]);
+			} else if ($location_type === 'STORAGE') {
+				DB::table('product_stock_storage')
+					->where('prd_cd', '=', $prd_cd)
+					->where('storage_cd', '=', $location_cd)
+					->update([
+						'wqty' => DB::raw('wqty + ' . $ord_qty),
+						'ut' => now(),
+					]);
+				DB::table('product_stock')
+					->where('prd_cd', '=', $prd_cd)
+					->update([
+						'qty_wonga'	=> DB::raw('qty_wonga + ' . ($ord_qty * $wonga)),
+						'out_qty' => DB::raw('out_qty - ' . $ord_qty),
+						'qty' => DB::raw('qty + ' . $ord_qty),
+						'wqty' => DB::raw('wqty + ' . $ord_qty),
+						'ut' => now(),
+					]);
+			}
+
+			// 재고이력 등록
+			DB::table('product_stock_hst')
+				->insert([
+					'goods_no' => $goods_no,
+					'prd_cd' => $prd_cd,
+					'goods_opt' => $goods_opt,
+					'location_cd' => $location_cd,
+					'location_type' => $location_type,
+					'type' => 17, // 재고분류 : 출고 (취소)
+					'price' => $price,
+					'wonga' => $wonga,
+					'qty' => $ord_qty,
+					'stock_state_date' => date('Ymd'),
+					'ord_opt_no' => $ord_opt_no,
+					'comment' => ($location_type === 'STORE' ? '매장' : '창고') . '출고취소(온라인배송)',
+					'rt' => now(),
+					'admin_id' => $user['id'],
+					'admin_nm' => $user['name'],
+				]);
+			return 1;
+		} catch (Exception $e) {
+			return 0;
+		}
 	}
 }
