@@ -1,4 +1,4 @@
-@extends('head_with.layouts.layout')
+@extends('store_with.layouts.layout')
 @section('title','메뉴관리')
 @section('content')
 
@@ -105,7 +105,6 @@
                     return pid.toLowerCase();
                 }
             },
-        
         },
         {field: "state", headerName: "상태", cellClass: 'hd-grid-code'},
         {
@@ -159,20 +158,20 @@
 
     function Search() {
         let data = $('form[name="search"]').serialize();
-        gx.Request('/head/system/sys02/search', data);
+        gx.Request('/store/system/sys02/search', data);
     }
 
     function Add(a) {
         const cd = $(a).attr('data-code');
-        let url = '/head/system/sys02/create';
+        let url = '/store/system/sys02/create';
         if (cd !== '') {
-            url = '/head/system/sys02/create?entry=' + cd;
+            url = '/store/system/sys02/create?entry=' + cd;
         }
         window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=1000");
     }
 
     function Edit(a) {
-        let url = '/head/system/sys02/' + $(a).attr('data-code');
+        let url = '/store/system/sys02/' + $(a).attr('data-code');
         window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=1000");
     }
 </script>

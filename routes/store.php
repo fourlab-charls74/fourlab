@@ -629,6 +629,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::delete('sys03/{code}', 'sys03Controller@delete');
 
         Route::get('sys03/{code?}/search', 'sys03Controller@user_search');
+        Route::get('sys03/{code?}/menu-search', 'sys03Controller@menu_search');
 
     });
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\head\system;
+namespace App\Http\Controllers\store\system;
 
 use App\Http\Controllers\Controller;
 use App\Components\SLib;
@@ -37,7 +37,7 @@ class sys02Controller extends Controller
             "pmenus" => $pmenu
         ];
 
-        return view(Config::get('shop.head.view') . '/system/sys02', $values);
+        return view(Config::get('shop.store.view') . '/system/sys02', $values);
     }
 
     public function create()
@@ -81,7 +81,7 @@ class sys02Controller extends Controller
             'menu' => $menu,
             'pmenus' => $pmenu
         ];
-        return view(Config::get('shop.head.view') . '/system/sys02_show', $values);
+        return view(Config::get('shop.store.view') . '/system/sys02_show', $values);
     }
 
     public function show($code)
@@ -132,7 +132,7 @@ class sys02Controller extends Controller
             'pmenus' => $pmenu
         ];
 
-        return view(Config::get('shop.head.view') . '/system/sys02_show', $values);
+        return view(Config::get('shop.store.view') . '/system/sys02_show', $values);
     }
 
     public function search(Request $req)
@@ -222,7 +222,6 @@ class sys02Controller extends Controller
         $action = $request->input('action');
         $sys_menu = $request->input('sys_menu');
         $state = $request->input('state');
-
         $id = Auth::guard('head')->user()->id;
 
         $sql = "

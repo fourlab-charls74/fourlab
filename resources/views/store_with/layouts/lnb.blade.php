@@ -106,8 +106,8 @@
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-desktop fs-18"></i><span>시스템</span></a>
                 <ul>
-                    <li><a href="/store/system/sys01">(개)사용자관리</a></li>
-                    <li><a href="/store/system/sys02">(개)메뉴관리</a></li>
+                    <li><a href="/store/system/sys01">(완)사용자관리</a></li>
+                    <li><a href="/store/system/sys02">(완)메뉴관리</a></li>
                     <li><a href="/store/system/sys03">(개)그룹관리</a></li>
                 </ul>
             </li>
