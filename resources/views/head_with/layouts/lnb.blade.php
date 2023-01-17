@@ -270,6 +270,12 @@
                 </ul>
             </li>
             @endif
+            <li data-menu-kind="M" data-menu-id="classic" class="d-none">
+                <a href="javascript:;" class="arrow"><i class="bx bx-task fs-18"></i><span>(개)클래식</span></a>
+                <ul>
+                    <li data-menu-kind="M" data-menu-id="classic01" class="d-none"><a href="/head/classic/classic01">(개)공지사항</a></li>
+                </ul>
+            </li>
         </ul>
     </div>
 </nav>
@@ -285,6 +291,7 @@
         "promotion":"프로모션",
         "sales":"매출",
         "partner":"입점/정산",
+        "classic":"클래식",
     };
     $.ajax({
         type: "get",

@@ -1172,4 +1172,11 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
 
 	});
 
+    //[클래식]
+    Route::prefix("classic")->namespace('classic')->group(function () {
+        //클레임 내역
+        Route::get('classic01', 'classic01Controller@index');
+        Route::get('classic01/search', 'classic01Controller@search');
+    });
+
 });
