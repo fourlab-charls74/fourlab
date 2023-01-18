@@ -1,9 +1,9 @@
 @extends('head_with.layouts.layout')
-@section('title','클래식-공지사항')
+@section('title','클래식 공지사항')
 @section('content')
 
 <div class="page_tit">
-    <h3 class="d-inline-flex">(개)공지사항</h3>
+    <h3 class="d-inline-flex">(개)클래식 공지사항</h3>
     <div class="d-inline-flex location">
         <span class="home"></span>
         <span>/ 클래식</span>
@@ -57,10 +57,10 @@
                             <div class="form-group">
                                 <label for="">트레킹 이벤트 : </label>
                                 <div class="flax_box">
-                                    <select name='evt_mst' class="form-control form-control-sm">
+                                    <select name='evtTitle' class="form-control form-control-sm">
                                         <option value=''>전체</option>
                                         @foreach($evt_mst as $mst)
-                                        <option value='evt_mst'>{{$mst->title}} (<?php $sd = substr( $mst->start_date, 0, 8); echo $sd;?> ~ <?php  $ed = substr( $mst->end_date, 0, 8); echo $ed;?>)</option>
+                                        <option value='{{$mst->idx}}'>{{$mst->title}} (<?php $sd = substr( $mst->start_date, 0, 8); echo $sd;?> ~ <?php  $ed = substr( $mst->end_date, 0, 8); echo $ed;?>)</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -126,9 +126,12 @@
 	<script language="javascript">
         var columns = [
             {headerName: "#", field: "num",type:'NumType', cellClass: 'hd-grid-code'},
-            {headerName: "이벤트", field: "title", cellClass: 'hd-grid-code'},
-            {headerName: "이미지", field: "thumb_img", cellClass: 'hd-grid-code'},
-            {headerName: "제목", field: "subject",width:400,
+            {headerName: "이벤트", field: "title", width:200},
+            {headerName: "이미지", field: "thumb_img", cellClass: 'hd-grid-code',
+                cellRenderer: function(params) {
+                            return '<img style="width:50%; height:auto;" class="img" src="' + params.value +'"/>';
+                        }},
+            {headerName: "제목", field: "subject",width:500,
                 cellRenderer: function (params) {
                             if (params.value !== undefined) {
                                 return '<a href="#" onclick="return AddProducts(\'' + params.data.idx + '\');">' + params.value + '</a>';
@@ -156,106 +159,7 @@
 		}
 		
 		$(function(){
-			$('.ac-company2').autocomplete({
-				//keydown 됬을때 해당 값을 가지고 서버에서 검색함.
-				source : function(request, response) {
-					$.ajax({
-						method: 'get',
-						url: '/head/auto-complete/company',
-						data: { keyword : this.term },
-						success: function (data) {
-							response(data);
-						},
-						error: function(request, status, error) {
-							console.log("error")
-						}
-					});
-				},
-				minLength: 1,
-				autoFocus: true,
-				delay: 100,
-					select:function(event,ui){
-					//console.log(ui.item);
-					$("#com_id").val(ui.item.id);
-				}
-			});
-
-			$('.ac-goods_nm').autocomplete({
-				//keydown 됬을때 해당 값을 가지고 서버에서 검색함.
-				source : function(request, response) {
-					$.ajax({
-						method: 'get',
-						url: '/head/auto-complete/goods-nm',
-						data: { keyword : this.term },
-						success: function (data) {
-							response(data);
-						},
-						error: function(request, status, error) {
-							console.log("error")
-						}
-					});
-				},
-				minLength: 1,
-				autoFocus: true,
-				delay: 100
-			});
-
-
-			$(".ac-style-no2").autocomplete({
-				//keydown 됬을때 해당 값을 가지고 서버에서 검색함.
-				source : function(request, response) {
-					$.ajax({
-						method: 'get',
-						url: '/head/auto-complete/style-no2',
-						data: { keyword : this.term },
-						success: function (data) {
-							response(data);
-						},
-						error: function(request, status, error) {
-							console.log("error");
-							//console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
-						}
-					});
-				},
-				minLength: 1,
-				autoFocus: true,
-				delay: 100,
-			});
-
-			$(".company-add-btn").click((e) => {
-				e.preventDefault();
-
-				searchCompany.Open((code, name) => {
-					if (confirm("선택한 업체를 추가하시겠습니까?") === false) return;
-
-					$("#com_nm").val(name);
-					$("#com_id").val(code);
-					
-				});
-			});
-
-
 			Search();
-
 		});
     </script>
-    <script type="text/javascript" charset="utf-8">
-        function titleDateFormat(title, start, end) {
-            start = start.toString();
-            startDigit = start.length;
-            if(startDigit != 8) {
-                start = start.slice(0, 8);
-            }
-
-            end = end.toString();
-            endDigit = end.length;
-            if(endDigit != 8) {
-                end = end.slice(0, 8);
-            }
-            
-            return title+" ("+start+" ~ "+end+")";
-        }
-    </script>
-
-
 @stop
