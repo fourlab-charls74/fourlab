@@ -16,10 +16,11 @@ class ExcelExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
 {
     protected $query;
 
-    public function __construct($query, $headers = [])
+    public function __construct($query, $headers = [], $sizes = [])
     {
         $this->query = $query;
         $this->headers = $headers;
+        $this->sizes = $sizes;
     }
 
     public function headings(): array
@@ -44,22 +45,35 @@ class ExcelExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
         return collect(DB::select($this->query));
     }
 
-    public function getCsvSettings(): array
+    public function registerEvents(): array
     {
-        return [
-            'input_encoding' => 'UTF-8'
-        ];
-    }
-
-    public function registerEvents(): array{
         return [
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->getSheet()->getDelegate();
-                
                 $last = chr(64 + count($this->headers));
-                foreach (range('A', $last) as $columnId) {
-                    $sheet->getColumnDimension($columnId)->setAutoSize(true);
+                $lastnum = $this->collection()->count() + 1;
+                
+                foreach (range('A', $last) as $key => $columnId) {
+                    $size = $this->sizes[array_keys($this->headers)[$key] ?? ''] ?? 10;
+                    $sheet->getColumnDimension($columnId)->setAutoSize(false);
+                    $sheet->getColumnDimension($columnId)->setWidth($size);
                 }
+
+                $event->sheet->getDelegate()->getStyle('A1:' . $last . '1')
+                    ->getFill()
+                    ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                    ->getStartColor()
+                    ->setARGB('D6E2FF');
+
+                $event->sheet->getDelegate()->getStyle("A1:$last$lastnum")
+                    ->applyFromArray([
+                        'borders' => [
+                            'allBorders' => [
+                                'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                                'color' => ['argb' => '000000'],
+                            ],
+                        ],
+                    ]);
             }
         ];
     }

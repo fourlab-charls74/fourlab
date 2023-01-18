@@ -37,32 +37,40 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="ord_no">접수일자</label>
-							<div class="form-inline date-select-inbox">
-								<div class="docs-datepicker form-inline-inner input_box">
-									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date" name="receipt_sdate" value="{{ @$receipt_sdate }}" autocomplete="off" disable>
-										<div class="input-group-append">
-											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-												<i class="fa fa-calendar" aria-hidden="true"></i>
-											</button>
-										</div>
-									</div>
-									<div class="docs-datepicker-container"></div>
-								</div>
-								<span class="text_line">~</span>
-								<div class="docs-datepicker form-inline-inner input_box">
-									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date" name="receipt_edate" value="{{ @$edate }}" autocomplete="off">
-										<div class="input-group-append">
-											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-												<i class="fa fa-calendar" aria-hidden="true"></i>
-											</button>
-										</div>
-									</div>
-									<div class="docs-datepicker-container"></div>
-								</div>
-							</div>
+                            <label for="ord_no">일자검색</label>
+                            <div class="d-flex">
+                                <div class="flex_box w-25 mr-2">
+                                    <select name='search_date_stat' class="form-control form-control-sm">
+                                        <option value="receipt">접수일자</option>
+                                        <option value="order">주문일자</option>
+                                    </select>
+                                </div>
+                                <div class="form-inline date-select-inbox w-75">
+                                    <div class="docs-datepicker form-inline-inner input_box">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
+                                            <div class="input-group-append">
+                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
+                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="docs-datepicker-container"></div>
+                                    </div>
+                                    <span class="text_line">~</span>
+                                    <div class="docs-datepicker form-inline-inner input_box">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
+                                            <div class="input-group-append">
+                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="docs-datepicker-container"></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-lg-4 inner-td">
@@ -106,36 +114,6 @@
                     </div>
                 </div>
 				<div class="row">
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="good_types">주문일자</label>
-							<div class="form-inline date-select-inbox">
-								<div class="docs-datepicker form-inline-inner input_box">
-									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ @$sdate }}" autocomplete="off" disable>
-										<div class="input-group-append">
-											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-												<i class="fa fa-calendar" aria-hidden="true"></i>
-											</button>
-										</div>
-									</div>
-									<div class="docs-datepicker-container"></div>
-								</div>
-								<span class="text_line">~</span>
-								<div class="docs-datepicker form-inline-inner input_box">
-									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ @$edate }}" autocomplete="off">
-										<div class="input-group-append">
-											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-												<i class="fa fa-calendar" aria-hidden="true"></i>
-											</button>
-										</div>
-									</div>
-									<div class="docs-datepicker-container"></div>
-								</div>
-							</div>
-						</div>
-					</div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="ord_no">주문번호</label>
@@ -162,6 +140,33 @@
                                         </option>
                                     @endforeach
                                 </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label>결제방법</label>
+                            <div class="form-inline">
+                                <div class="form-inline-inner w-100">
+                                    <div class="form-group flax_box">
+                                        <div style="width:calc(100% - 62px);">
+                                            <select name="stat_pay_type" class="form-control form-control-sm mr-2" style="width:100%;">
+                                                <option value="">전체</option>
+                                                @foreach (@$stat_pay_types as $stat_pay_type)
+                                                    <option value='{{ $stat_pay_type->code_id }}'>
+                                                        {{ $stat_pay_type->code_val }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div style="height:30px;margin-left:5px;">
+                                            <div class="custom-control custom-switch date-switch-pos" data-toggle="tooltip" data-placement="top" data-original-title="복합결제 제외">
+                                                <input type="checkbox" class="custom-control-input" id="not_complex" name="not_complex" value="Y">
+                                                <label for="not_complex" data-on-label="ON" data-off-label="OFF" style="margin-top:2px;"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -236,62 +241,6 @@
                                     </div>
                                     <input type="radio" name="ord" id="sort_desc" value="desc" checked="">
                                     <input type="radio" name="ord" id="sort_asc" value="asc">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row search-area-ext d-none">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="sale_kind">판매유형</label>
-                            <div class="flex_box">
-                                <select name="sale_kind" class="form-control form-control-sm">
-                                    <option value="">전체</option>
-                                    @foreach (@$sale_kinds as $sale_kind)
-                                        <option value="{{ $sale_kind->code_id }}">{{ $sale_kind->code_val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label>결제방법</label>
-                            <div class="form-inline">
-                                <div class="form-inline-inner w-100">
-                                    <div class="form-group flax_box">
-                                        <div style="width:calc(100% - 62px);">
-                                            <select name="stat_pay_type" class="form-control form-control-sm mr-2" style="width:100%;">
-                                                <option value="">전체</option>
-                                                @foreach (@$stat_pay_types as $stat_pay_type)
-                                                    <option value='{{ $stat_pay_type->code_id }}'>
-                                                        {{ $stat_pay_type->code_val }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div style="height:30px;margin-left:5px;">
-                                            <div class="custom-control custom-switch date-switch-pos" data-toggle="tooltip" data-placement="top" data-original-title="복합결제 제외">
-                                                <input type="checkbox" class="custom-control-input" id="not_complex" name="not_complex" value="Y">
-                                                <label for="not_complex" data-on-label="ON" data-off-label="OFF" style="margin-top:2px;"></label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="name">공급업체</label>
-                            <div class="form-inline inline_select_box">
-                                <div class="form-inline-inner input-box w-100">
-                                    <div class="form-inline inline_btn_box">
-                                        <input type="hidden" id="com_cd" name="com_cd" />
-                                        <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter sch-sup-company" style="width:100%;" autocomplete="off" />
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -382,6 +331,35 @@
 							</div>
 						</div>
 					</div>
+                </div>
+                <div class="row search-area-ext d-none">
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="sale_kind">판매유형</label>
+                            <div class="flex_box">
+                                <select name="sale_kind" class="form-control form-control-sm">
+                                    <option value="">전체</option>
+                                    @foreach (@$sale_kinds as $sale_kind)
+                                        <option value="{{ $sale_kind->code_id }}">{{ $sale_kind->code_val }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="name">공급업체</label>
+                            <div class="form-inline inline_select_box">
+                                <div class="form-inline-inner input-box w-100">
+                                    <div class="form-inline inline_btn_box">
+                                        <input type="hidden" id="com_cd" name="com_cd" />
+                                        <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter sch-sup-company" style="width:100%;" autocomplete="off" />
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 			</div>
 		</div>
@@ -607,7 +585,8 @@
 
     // 배송목록 받기
     async function exportDlvList() {
-        location.href = "/store/order/ord03/download/dlv-list";
+        let data = $('form[name="search"]').serialize();
+        location.href = "/store/order/ord03/download/dlv-list?" + data;
     }
 </script>
 @stop
