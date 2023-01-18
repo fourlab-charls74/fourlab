@@ -598,7 +598,7 @@
 											</td>
 										</tr>
 										<tr>
-											<th>업체매칭여부</th>
+											<th>온라인업체매칭</th>
 											<td>
 												<div class="form-inline form-radio-box">
 													<div class="custom-control custom-radio">
@@ -611,9 +611,25 @@
 													</div>
 												</div>
 											</td>
-											<th></th>
-											<td>
-
+											<th id="com_select">업체선택</th>
+											<td id="com_select2">
+												<select name='com_id' id="com_id" class="form-control form-control-sm">
+													<option value=''>전체</option>
+													<!-- @foreach ($store_match as $sm)
+														@foreach ($select_match as $sel)
+															@if ($sel->com_id == $sm->com_id)
+																<option value='{{ $sm->com_id }}' @if(@$store->com_id == $sm->com_id) selected @endif disabled style="background: #d2d2d2;">{{ $sm->com_nm }}</option>
+															@else 
+																<option value='{{ $sm->com_id }}'>{{ $sm->com_nm }}</option>
+															@endif
+														@endforeach
+													@endforeach -->
+													@foreach ($store_match as $sm)
+														@foreach ($select_match as $sel)
+															<option value='{{ $sm->com_id }}' @if(@$store->com_id == $sm->com_id) selected @endif @if(@$sel->com_id == $sm->com_id) disabled style="background: #d2d2d2;" @endif  >{{ $sm->com_nm }}</option>
+														@endforeach
+													@endforeach
+												</select>
 											</td>
 										</tr>
 									</tbody>
@@ -621,8 +637,6 @@
 							</div>
 						</div>
 					</div>
-
-
 				</div>
 			</div>
 		</div>
@@ -901,6 +915,13 @@
 		
     // 매장정보 등록
     async function addStore() {
+		
+		// 매칭매장 선택
+		if ($("input[name='sale_place_match_yn']:checked").val() == 'Y' && $('#com_id').val() == '') {
+            
+            return alert('매칭할 업체를 선택해주세요.');
+        }
+
 		let res = await getMapCode();
 
 		let form = new FormData(document.querySelector("#f1"));
@@ -941,6 +962,13 @@
     }
     // 매장정보 수정
     async function updateStore() {
+
+		// 매칭매장 선택
+		if ($("input[name='sale_place_match_yn']:checked").val() == 'Y' && $('#com_id').val() == '') {
+					
+            return alert('매칭할 업체를 선택해주세요.');
+        }
+
 		let res = await getMapCode();
 
 		let form = new FormData(document.querySelector("#f1"));
@@ -1072,5 +1100,38 @@
 		if(f1.zipcode.value === '') return alert("주소를 입력해주세요.");
 		return true;
 	}
+
+	//온라인업체매칭
+    $(document).ready(function() {
+        if($("input[name='sale_place_match_yn']:checked").val() == 'Y'){
+            $('#com_select').show();
+            $('#com_select2').show();
+        } else {
+            $('#com_select').hide();
+            $('#com_select2').hide();
+        }
+
+        $("input[name='sale_place_match_yn']").change(function(){
+            let match = $("input[name='sale_place_match_yn']:checked").val();
+
+            if (match == 'Y') {
+                $('#com_select').show();
+            	$('#com_select2').show();
+            } else {
+                $('#com_select').hide();
+            	$('#com_select2').hide();
+            }
+
+        });
+
+
+		// if($('#com_id').attr("disabled") == ture) {
+			// $('#com_id').css('background', 'yellow');
+		// }
+		
+    });
+
+
+
 </script>
 @stop

@@ -533,21 +533,23 @@ class ord03Controller extends Controller
 
 			// 온라인주문접수에서 제거
 			$or_prd_cds_join = implode(', ', $or_prd_cds);			
+			$or_cds = DB::select("select or_cd, or_prd_cd from order_receipt_product where or_prd_cd in ($or_prd_cds_join)");
+
 			$sql = "
 				delete from order_receipt_product
 				where or_prd_cd in ($or_prd_cds_join)
 			";
 			DB::delete($sql);
 
-			foreach ($or_prd_cds as $cd) {
+			foreach ($or_cds as $cd) {
 				$sql = "
 					select count(*) as cnt, or_cd
 					from order_receipt_product
-					where or_prd_cd = '$cd'
+					where or_prd_cd = '$cd->or_prd_cd'
 				";
 				$receipt_cnt = DB::selectOne($sql);
 				if ($receipt_cnt != null && $receipt_cnt->cnt < 1) {
-					$or_cd = $receipt_cnt->or_cd;
+					$or_cd = $cd->or_cd;
 					DB::table('order_receipt')->where('or_cd', $or_cd)->delete();
 				}
 			}
