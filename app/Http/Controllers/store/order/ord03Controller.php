@@ -7,10 +7,12 @@ use App\Components\Lib;
 use App\Components\SLib;
 use App\Models\Conf;
 use App\Models\Order;
+use App\Exports\ExcelExport;
 use App\Models\SMS;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 
 const HEAD = 'HEAD';
@@ -644,5 +646,44 @@ class ord03Controller extends Controller
 		} catch (Exception $e) {
 			return 0;
 		}
+	}
+
+	/** 엑셀다운로드 */
+	public function download(Request $request, $cmd)
+	{
+		switch ($cmd) {
+			case 'dlv-list':
+				$response = $this->_get_dlv_list($request);
+				break;
+            default:
+                $message = 'Command not found';
+                $response = response()->json(['code' => 0, 'msg' => $message], 404);
+		};
+		return $response;
+	}
+
+	/** 배송목록받기 */
+	private function _get_dlv_list()
+	{
+		$sql = "select * from product_code limit 5";
+
+		$headers = [
+			'prd_cd' => '상품코드',
+			'goods_no' => '상품번호', 
+			'style_no' => '스타일넘버', 
+			'brand' => '브랜드', 
+			'com_nm' => '공급업체', 
+			'goods_nm' => '상품명', 
+			'goods_nm_eng' => '상품명(영문)', 
+			'prd_cd_p' => '코드일련', 
+			'color' => '컬러', 
+			'size' => '사이즈', 
+			'goods_opt' => '옵션명', 
+			'order_cnt' => '주문수', 
+			'order_qty' => '주문수량',
+			// 각 배송처 재고수량 필요 (작업중)
+		];
+		
+		return Excel::download(new ExcelExport($sql, $headers), date('YmdH').'_배송목록.csv', \Maatwebsite\Excel\Excel::CSV);
 	}
 }
