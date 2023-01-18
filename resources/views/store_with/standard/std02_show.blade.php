@@ -597,6 +597,25 @@
 												</div>
 											</td>
 										</tr>
+										<tr>
+											<th>업체매칭여부</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="sale_place_match_y" name="sale_place_match_yn" value="Y" @if(@$store->sale_place_match_yn == 'Y') checked @endif />
+														<label class="custom-control-label" for="sale_place_match_y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="sale_place_match_n" name="sale_place_match_yn" value="N" @if(@$store->sale_place_match_yn != 'Y') checked @endif />
+														<label class="custom-control-label" for="sale_place_match_n">N</label>
+													</div>
+												</div>
+											</td>
+											<th></th>
+											<td>
+
+											</td>
+										</tr>
 									</tbody>
 								</table>
 							</div>

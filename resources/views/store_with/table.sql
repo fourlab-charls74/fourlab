@@ -347,6 +347,7 @@ CREATE TABLE `store` (
 	`point_out_yn` char(1) DEFAULT 'N' COMMENT '적립금사용여부',
 	`map_code` varchar(100) COMMENT '맵 코드',
 	`open_month_stock` varchar(1) DEFAULT 'N' COMMENT '오픈 후 한 달 재고보기 제외여부',
+	`sale_place_match_yn` char(1) DEFAULT 'N' COMMENT '업체매칭여부',
 	`reg_date` datetime DEFAULT NULL COMMENT '등록일',
 	`mod_date` datetime DEFAULT NULL COMMENT '수정일',
 	`admin_id` varchar(30) DEFAULT NULL COMMENT '관리자 아이디',
@@ -873,6 +874,30 @@ CREATE TABLE `after_service` (
 	`as_cd` int(5) unsigned zerofill DEFAULT NULL COMMENT '수선처코드',
 	`as_place` varchar(20) DEFAULT NULL COMMENT '수선처명',
 	PRIMARY KEY (`idx`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+-- 메뉴관리
+CREATE TABLE `store_controller` (
+  `menu_no` int(11) NOT NULL AUTO_INCREMENT COMMENT '메뉴번호',
+  `entry` int(11) DEFAULT NULL COMMENT '상위메뉴ID',
+  `pid` varchar(30) DEFAULT NULL COMMENT '컨트롤러',
+  `seq` int(11) DEFAULT NULL COMMENT '순서',
+  `lev` int(11) DEFAULT NULL COMMENT '위치레벨',
+  `kor_nm` varchar(30) DEFAULT NULL COMMENT '한글이름',
+  `eng_nm` varchar(50) DEFAULT NULL COMMENT '영문이름',
+  `kind` varchar(10) DEFAULT NULL COMMENT '종류',
+  `id` varchar(15) DEFAULT NULL COMMENT '메뉴아이디',
+  `target` varchar(100) DEFAULT NULL COMMENT '사용자',
+  `action` varchar(100) DEFAULT NULL COMMENT '동작',
+  `btype` int(11) DEFAULT NULL COMMENT '게시판유형',
+  `state` smallint(6) DEFAULT NULL COMMENT '상태',
+  `sys_menu` char(1) DEFAULT NULL COMMENT '시스템메뉴',
+  `regi_date` datetime DEFAULT NULL COMMENT '등록일시',
+  `ut` datetime DEFAULT NULL COMMENT '수정일시',
+  `is_del` smallint(6) DEFAULT NULL COMMENT '삭제여부',
+  `is_part_role` char(1) DEFAULT NULL COMMENT '부분권한여부',
+  PRIMARY KEY (`menu_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

@@ -1,4 +1,4 @@
-@extends('head_with.layouts.layout-nav')
+@extends('store_with.layouts.layout-nav')
 @section('title','메뉴관리 상세')
 @section('content')
 <div class="show_layout py-3 px-sm-3">
@@ -231,12 +231,12 @@
 
         var frm = $('form[name="detail"]');
 
-        //console.log(frm.serialize());
+        console.log(frm.serialize());
 
         if (code == "") {
             $.ajax({
                 method: 'post',
-                url: '/head/system/sys02',
+                url: '/store/system/sys02',
                 data: frm.serialize(),
                 dataType: 'json',
                 success: function(res) {
@@ -267,7 +267,7 @@
 
             $.ajax({
                 method: 'put',
-                url: '/head/system/sys02/' + code,
+                url: '/store/system/sys02/' + code,
                 data: frm.serialize() + '&roles=' + JSON.stringify(roles),
                 dataType: 'json',
                 success: function(res) {
@@ -292,7 +292,7 @@
         if (confirm('삭제 하시겠습니까?')) {
             $.ajax({
                 method: 'delete',
-                url: '/head/system/sys02/' + code,
+                url: '/store/system/sys02/' + code,
                 dataType: 'json',
                 success: function(res) {
                     // console.log(response);
@@ -327,7 +327,7 @@
 
     function Search() {
         let data = '';
-        gx.Request('/head/system/sys02/' + code + '/search', data);
+        gx.Request('/store/system/sys02/' + code + '/search', data);
     }
 
     //ESC 누를때 창닫기

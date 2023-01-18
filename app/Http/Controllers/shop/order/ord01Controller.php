@@ -20,15 +20,95 @@ use PDO;
 
 class ord01Controller extends Controller
 {
-    public function index()
+    public function index(Request $request)
 	{
+        $date = $request->input('date');
+        $sell_type = $request->input('sell_type');
+        $store_cd = $request->input('store_cd', '');
+        $pr_code = $request->input('pr_code');
+        $goods_nm = $request->input('goods_nm');
+        $on_off_yn = $request->input('on_off_yn');
+        $item = $request->input('item');
+
+
+        $pr_code_arr = explode(",", $pr_code);
+        $sell_type_arr = explode(",", $sell_type);
 
         $conf = new Conf();
 		$domain		= $conf->getConfigValue("shop", "domain");
 
+        $todate = strtotime($date);
+        $todate = date('Y-m-d', $todate);
+
+        if($date == '') {
+            $sdate = now()->sub(1, 'week')->format('Y-m-d');
+            $edate = date("Y-m-d");
+        } else {
+            $sdate = $todate;
+            $edate = $todate;
+        }
+
+        // 행사코드 쿼리스트링 받아온값을 보내주는 부분
+        $pr_code_str = "";
+        foreach($pr_code_arr as $pc) {
+            $pr_code_str .= "'$pc',";
+        }
+
+        $pr_code = substr($pr_code_str,0,-1);
+        
+        $sql = "
+            select 
+                code_id, code_val
+            from code
+            where code_kind_cd = 'PR_CODE'
+            and code_id in ( $pr_code )
+        ";
+
+        $result = DB::select($sql);
+
+        $str = "";
+        $str2 = "";
+        foreach($result as $r){
+            $str .= $r->code_id.",";
+            $str2 .= $r->code_val.",";
+        }
+
+        $str = substr($str,0,-1);
+        $str2 = substr($str2,0,-1);
+
+        //판매유형 쿼리스트링 받아온값을 보내주는 부분
+        $sell_type_str = "";
+        foreach($sell_type_arr as $st) {
+            $sell_type_str .= "'$st',";
+        }
+
+        $sell_type = substr($sell_type_str,0,-1);
+        
+        $sql = "
+            select 
+                code_id, code_val
+            from code
+            where code_kind_cd = 'sale_kind'
+            and code_id in ( $sell_type )
+        ";
+
+        $result = DB::select($sql);
+
+        $sell_str = "";
+        $sell_str2 = "";
+        foreach($result as $r){
+            $sell_str .= $r->code_id.",";
+            $sell_str2 .= $r->code_val.",";
+        }
+
+        $sell_str = substr($sell_str,0,-1);
+        $sell_str2 = substr($sell_str2,0,-1);
+
+        $brand = $request->input('brand');
+
 		$values = [
-            'sdate'             => now()->sub(1, 'month')->format('Y-m-d'),
-            'edate'             => date("Y-m-d"),
+            'sdate'             => $sdate,
+            'edate'             => $edate,
             'style_no'          => '',
             'domain'		    => $domain,
             'ord_states'        => SLib::getordStates(), // 주문상태
@@ -39,18 +119,33 @@ class ord01Controller extends Controller
             'goods_stats'	    => SLib::getCodes('G_GOODS_STAT'), // 상품상태
 			'items'			    => SLib::getItems(), // 품목
             'sale_kinds'        => SLib::getUsedSaleKinds(),
+            'store'             => DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', '=', $store_cd)->first(),      
+            'sell_type'         => $sell_type,
+            'pr_code_id'        => $str,
+            'pr_code_val'       => $str2,
+            'sell_type_id'      => $sell_str,
+            'sell_type_val'     => $sell_str2,
+            'brand'             => $brand,
+            'goods_nm'          => $goods_nm,
+            'on_off_yn'         => $on_off_yn,
+            's_item'            => $item
 		];
 
         return view(Config::get('shop.shop.view') . '/order/ord01', $values);
+
 	}
 
     public function search(Request $request)
     {
+
+
+        $store_no       = $request->input('store_no', '');
+        $sale_kind      = $request->input('sale_kind', '');
+        $pr_code        = $request->input('pr_code', '');
         $sdate          = $request->input('sdate', now()->sub(3, 'month')->format('Ymd'));
         $edate          = $request->input('edate', date('Ymd'));
         $nud            = $request->input('nud', ''); // 주문일자 검색여부
         $ord_no         = $request->input('ord_no', '');
-        $store_no       = $request->input('store_no', '');
         $ord_state      = $request->input('ord_state', '');
         $pay_state      = $request->input('pay_stat', '');
         $clm_state      = $request->input('clm_state', '');
@@ -76,7 +171,8 @@ class ord01Controller extends Controller
         $page           = $request->input('page', 1);
         $prd_cd_range_text = $request->input("prd_cd_range", '');
         $sale_form      = $request->input('sale_form', '');
-        $sale_kind      = $request->input('sale_kind', '');
+        $sell_type      = $request->input('sell_type');
+       
         if ($page < 1 or $page == '') $page = 1;
 
         $offline_store = 'HEAD_OFFICE';
@@ -212,6 +308,26 @@ class ord01Controller extends Controller
         else if ($sale_form == 'On') $where .= " and (o.store_cd is null or o.store_cd = '$offline_store') ";
 
         if ($sale_kind != '') $where .= "and o.sale_kind = '$sale_kind' ";
+
+        //행사코드 검색
+		if ( $pr_code != "" ) {
+			$where	.= " and (1!=1";
+			foreach($pr_code as $pr_codes) {
+				$where .= " or o.pr_code = '$pr_codes' ";
+
+			}
+			$where	.= ")";
+		}
+
+        //판매유형 검색
+		if ( $sell_type != "" ) {
+			$where	.= " and (1!=1";
+			foreach($sell_type as $sell_types) {
+				$where .= " or o.sale_kind = '$sell_types' ";
+
+			}
+			$where	.= ")";
+		}
 
         // ordreby
         $orderby = sprintf("order by %s %s", $ord_field, $ord);
