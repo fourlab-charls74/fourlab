@@ -18,15 +18,16 @@ use Carbon\Carbon;
 const HEAD = 'HEAD';
 const STORAGE = 'STORAGE';
 
+const TEST_USER_GROUP = HEAD;
+
 /** 온라인 배송처리 */
 class ord03Controller extends Controller
 {
 	public function index(Request $request) {
 
-		$user_group = 'HEAD'; // 추후 로직적용 필요
+		$user_group = TEST_USER_GROUP; // 추후 로직적용 필요
 
 		$sdate = Carbon::now()->sub(3, 'day')->format("Y-m-d");
-		$receipt_sdate = Carbon::now()->sub(3, 'day')->format("Y-m-d");
 		$edate = Carbon::now()->format("Y-m-d");
 
 		$sale_places_sql = "select com_id as id, com_nm as val from company where com_type = '4' and use_yn = 'Y' order by com_nm";
@@ -42,7 +43,6 @@ class ord03Controller extends Controller
 
 		$values = [
             'sdate'         	=> $sdate,
-            'receipt_sdate'     => $receipt_sdate,
 			'edate'         	=> $edate,
 			'dlv_storages'		=> $dlv_storages, // 창고목록
 			'dlv_locations'		=> $dlv_locations, // 배송처
@@ -65,16 +65,15 @@ class ord03Controller extends Controller
 
 	public function search(Request $request)
 	{
-		$user_group = 'HEAD'; // 추후 로직적용 필요
+		$user_group = TEST_USER_GROUP; // 추후 로직적용 필요
 
-		$receipt_sdate = $request->input('receipt_sdate', Carbon::now()->sub(3, 'day')->format("Y-m-d"));
-		$receipt_edate = $request->input('receipt_edate', Carbon::now()->format("Y-m-d"));
+		$search_date_stat = $request->input('search_date_stat', 'receipt');
+		$sdate = $request->input('sdate', Carbon::now()->sub(3, 'day')->format("Y-m-d"));
+		$edate = $request->input('edate', Carbon::now()->format("Y-m-d"));
 		$rel_order = $request->input('rel_order', '');
 		$dlv_place_type = strtoupper($request->input('dlv_place_type', 'storage'));
 		$storage_cd = $request->input('storage_cd', '');
 		$store_cd = $request->input('store_no', '');
-		$sdate = $request->input('sdate', Carbon::now()->sub(3, 'day')->format("Y-m-d"));
-		$edate = $request->input('edate', Carbon::now()->format("Y-m-d"));
 		$ord_no = $request->input('ord_no', '');
 		$ord_state = $request->input('ord_state', '20'); // 접수상태
 		$dlv_type = $request->input('dlv_type', ''); // 배송방식
@@ -104,14 +103,18 @@ class ord03Controller extends Controller
 
 		if ($user_group === 'STORAGE') $where .= " and rcp.dlv_location_type = 'STORAGE' ";
 
-		$where .= " and rc.req_rt >= '$receipt_sdate 00:00:00' and rc.req_rt <= '$receipt_edate 23:59:59' ";
+		if ($search_date_stat === 'receipt') {
+			$where .= " and rc.req_rt >= '$sdate 00:00:00' and rc.req_rt <= '$edate 23:59:59' ";
+		} else if ($search_date_stat === 'order') {
+			$where .= " and o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59' ";
+		}
+
 		if ($rel_order != '') $where .= " and rc.rel_order like '" . $rel_order . "%' ";
 		if ($dlv_place_type === 'STORAGE' && $storage_cd != '') {
 			$where .= " and rcp.dlv_location_type = '" . $dlv_place_type . "' and rcp.dlv_location_cd = '" . $storage_cd . "' ";
 		} else if ($dlv_place_type === 'STORE' && $store_cd != '') {
 			$where .= " and rcp.dlv_location_type = '" . $dlv_place_type . "' and rcp.dlv_location_cd = '" . $store_cd . "' ";
 		}
-		$where .= " and o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59' ";
 		if ($ord_no != '') $where .= " and o.ord_no like '" . $ord_no . "%' ";
 		if ($ord_state != '') $where .= " and rcp.state = '" . $ord_state . "' ";
 		if ($dlv_type != '') $where .= " and om.dlv_type = '" . $dlv_type . "' ";
@@ -648,7 +651,7 @@ class ord03Controller extends Controller
 		}
 	}
 
-	/** 엑셀다운로드 */
+	/** 엑셀다운로드 모음 */
 	public function download(Request $request, $cmd)
 	{
 		switch ($cmd) {
@@ -663,9 +666,168 @@ class ord03Controller extends Controller
 	}
 
 	/** 배송목록받기 */
-	private function _get_dlv_list()
+	private function _get_dlv_list(Request $request)
 	{
-		$sql = "select * from product_code limit 5";
+		$user_group = TEST_USER_GROUP; // 추후 로직적용 필요
+
+		$search_date_stat = $request->input('search_date_stat', 'receipt');
+		$sdate = $request->input('sdate', Carbon::now()->sub(3, 'day')->format("Y-m-d"));
+		$edate = $request->input('edate', Carbon::now()->format("Y-m-d"));
+		$rel_order = $request->input('rel_order', '');
+		$dlv_place_type = strtoupper($request->input('dlv_place_type', 'storage'));
+		$storage_cd = $request->input('storage_cd', '');
+		$store_cd = $request->input('store_no', '');
+		$ord_no = $request->input('ord_no', '');
+		$ord_state = $request->input('ord_state', '20'); // 접수상태
+		$dlv_type = $request->input('dlv_type', ''); // 배송방식
+		$sale_place = $request->input('sale_place', ''); // 판매처
+		$ord_info_key = $request->input('ord_info_key', 'om.user_nm');
+		$ord_info_value = $request->input('ord_info_value', '');
+		$sale_kind = $request->input('sale_kind', ''); // 판매유형
+		$stat_pay_type = $request->input('stat_pay_type', ''); // 결제방법
+		$not_complex = $request->input('not_complex', 'N'); // 복합결제 제외여부
+		$com_id = $request->input('com_cd', '');
+		$prd_cd = $request->input('prd_cd', '');
+		$style_no = $request->input('style_no', '');
+		$goods_no = $request->input('goods_no', '');
+		$item = $request->input('item', '');
+		$brand_cd = $request->input('brand_cd', '');
+		$prd_cd_range_text = $request->input('prd_cd_range', '');
+		$goods_nm = $request->input('goods_nm', '');
+		$goods_nm_eng = $request->input('goods_nm_eng', '');
+
+		$ord_field = $request->input('ord_field', 'o.ord_date');
+		$ord = $request->input('ord', 'desc');
+		$page = $request->input('page', 1);
+		$limit = $request->input('limit', 100);
+
+		/** 검색조건 필터링 */
+		$where = "";
+
+		if ($user_group === 'STORAGE') $where .= " and rcp.dlv_location_type = 'STORAGE' ";
+
+		if ($search_date_stat === 'receipt') {
+			$where .= " and rc.req_rt >= '$sdate 00:00:00' and rc.req_rt <= '$edate 23:59:59' ";
+		} else if ($search_date_stat === 'order') {
+			$where .= " and o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59' ";
+		}
+
+		if ($rel_order != '') $where .= " and rc.rel_order like '" . $rel_order . "%' ";
+		if ($dlv_place_type === 'STORAGE' && $storage_cd != '') {
+			$where .= " and rcp.dlv_location_type = '" . $dlv_place_type . "' and rcp.dlv_location_cd = '" . $storage_cd . "' ";
+		} else if ($dlv_place_type === 'STORE' && $store_cd != '') {
+			$where .= " and rcp.dlv_location_type = '" . $dlv_place_type . "' and rcp.dlv_location_cd = '" . $store_cd . "' ";
+		}
+		if ($ord_no != '') $where .= " and o.ord_no like '" . $ord_no . "%' ";
+		if ($ord_state != '') $where .= " and rcp.state = '" . $ord_state . "' ";
+		if ($dlv_type != '') $where .= " and om.dlv_type = '" . $dlv_type . "' ";
+		if ($sale_place != '') $where .= " and o.sale_place = '" . $sale_place . "' ";
+
+		// 주문정보검색
+		if ($ord_info_value != '') {
+			if (in_array($ord_info_key, ['om.mobile', 'om.phone', 'om.r_mobile', 'om.r_phone'])) {
+				$val = $this->__replaceTel($ord_info_value);
+				if (in_array($ord_info_key, ['om.mobile', 'om.phone', 'om.r_mobile'])) {
+					$where .= " and $ord_info_key = '$val' ";
+				} else {
+					$where .= " and $ord_info_key like '$val%' ";
+				}
+			} else {
+				if (in_array($ord_info_key, ['om.user_nm', 'om.user_id', 'om.r_nm'])) {
+					$where .= " and $ord_info_key = '$ord_info_value' ";
+				} else {
+					$where .= " and $ord_info_key like '$ord_info_value%' ";
+				}
+			}
+		}
+
+		// 결제방법
+		if ($stat_pay_type != '') {
+			if ($not_complex == 'Y') {
+				$where .= " and o.pay_type = '$stat_pay_type' ";
+			} else {
+				$where .= " and ((o.pay_type & $stat_pay_type) = $stat_pay_type) ";
+			}
+		}
+		
+		if ($sale_kind != '') $where .= " and o.sale_kind = '" . $sale_kind . "' ";
+		if ($com_id != '') $where .= " and g.com_id = '" . $com_id . "' ";
+
+		// 상품코드 검색
+		if ($prd_cd != '') {
+			$prd_cd = explode(',', $prd_cd);
+			$where .= " and (1<>1 ";
+			foreach ($prd_cd as $cd) {
+				$where .= " or pc.prd_cd like '$cd%' ";
+			}
+			$where .= ") ";
+		}
+
+		if ($style_no != '') $where .= " and g.style_no like '" . $style_no . "%' ";
+		if ($item != '') $where .= " and g.opt_kind_cd = '" . $item . "' ";
+		if ($brand_cd != '') $where .= " and g.brand = '" . $brand_cd . "' ";
+		if ($goods_nm != '') $where .= " and g.goods_nm like '%" . $goods_nm . "%' ";
+		if ($goods_nm_eng != '') $where .= " and g.goods_nm_eng like '%" . $goods_nm_eng . "%' ";
+
+		// 상품번호 검색
+        $goods_no = preg_replace("/\s/",",",$goods_no);
+        $goods_no = preg_replace("/\t/",",",$goods_no);
+        $goods_no = preg_replace("/\n/",",",$goods_no);
+        $goods_no = preg_replace("/,,/",",",$goods_no);
+
+        if($goods_no != ""){
+            $goods_nos = explode(",", $goods_no);
+            if(count($goods_nos) > 1) {
+                if(count($goods_nos) > 500) array_splice($goods_nos, 500);
+                $in_goods_nos = join(",", $goods_nos);
+                $where .= " and g.goods_no in ( $in_goods_nos ) ";
+            } else {
+                if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
+            }
+        }
+
+		// 상품옵션 범위검색
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				$in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc.$opt $in_query ($opt_join) ";
+			}
+		}
+
+		// order by
+		$orderby = sprintf("order by %s %s", $ord_field, $ord);
+
+		$dlv_locations = $this->_get_dlv_locations($user_group);
+		$qty_sql = "";
+		foreach ($dlv_locations as $loc) {
+			$qty_sql .= ", ifnull((select qty from product_stock_$loc->location_type where " . $loc->location_type . "_cd = '$loc->location_cd' and prd_cd = pc.prd_cd), 0) as "  . $loc->seq . "_" . $loc->location_type . "_" . $loc->location_cd . "_qty ";
+		}
+
+		$sql = "
+			select 
+				o.goods_no, g.goods_nm, g.goods_nm_eng, g.style_no, o.goods_opt
+				, pc.prd_cd, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color, pc.size
+				, sum(o.qty) as order_qty, count(o.ord_opt_no) as order_cnt
+				, g.com_nm, b.brand_nm as brand
+				$qty_sql
+			from order_receipt_product rcp
+				inner join order_receipt rc on rc.or_cd = rcp.or_cd
+				inner join order_opt o on o.ord_opt_no = rcp.ord_opt_no
+				inner join order_mst om on om.ord_no = o.ord_no
+				inner join product_code pc on pc.prd_cd = rcp.prd_cd
+				inner join goods g on g.goods_no = o.goods_no
+				left outer join payment p on p.ord_no = o.ord_no
+				left outer join brand b on b.brand = g.brand
+			where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
+				and o.clm_state in (-30,1,90,0)
+				$where
+			group by rcp.prd_cd
+			$orderby
+		";
 
 		$headers = [
 			'prd_cd' => '상품코드',
@@ -681,9 +843,21 @@ class ord03Controller extends Controller
 			'goods_opt' => '옵션명', 
 			'order_cnt' => '주문수', 
 			'order_qty' => '주문수량',
-			// 각 배송처 재고수량 필요 (작업중)
 		];
-		
-		return Excel::download(new ExcelExport($sql, $headers), date('YmdH').'_배송목록.csv', \Maatwebsite\Excel\Excel::CSV);
+
+		foreach ($dlv_locations as $loc) {
+			$headers[$loc->seq . "_" . $loc->location_type . "_" . $loc->location_cd . "_qty"] = $loc->location_nm . "재고";
+		}
+
+		$sizes = [
+			'prd_cd' => 18,
+			'com_nm' => 15,
+			'goods_nm' => 50, 
+			'goods_nm_eng' => 50, 
+			'prd_cd_p' => 15,  
+			'goods_opt' => 30,
+		];
+
+		return Excel::download(new ExcelExport($sql, $headers, $sizes), date('YmdH').'_배송목록.xlsx', \Maatwebsite\Excel\Excel::XLSX);
 	}
 }
