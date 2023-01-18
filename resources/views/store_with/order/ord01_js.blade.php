@@ -277,7 +277,7 @@
             point_amt: 0,
             coupon_amt: 0,
             dc_amt: 0,
-            dlv_amt: base_dlv_fee,
+            dlv_amt: 0,
         }));
         gx.addRows(goods_list);
         EditAmtTable();

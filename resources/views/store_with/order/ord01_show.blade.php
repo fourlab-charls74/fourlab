@@ -160,7 +160,7 @@
                                                 <td style="padding:0px 10px 0px 10px;">
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio" onclick="CheckPoint(this);">
-                                                            <input type="radio" name="give_point" id="give_point_y" value="Y" class="custom-control-input">
+                                                            <input type="radio" name="give_point" id="give_point_y" value="Y" class="custom-control-input" checked>
                                                             <label class="custom-control-label" for="give_point_y">지급함</label>
                                                         </div>
                                                         <div class="custom-control custom-radio">

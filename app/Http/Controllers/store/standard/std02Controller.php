@@ -152,6 +152,37 @@ class std02Controller extends Controller
 
 			$map_key = DB::selectOne($map_key_sql);
 
+
+		//업체 셀렉트박스
+		//매칭되어있는 매장은 출력되지않게해야함
+
+		if ($store_cd != '') {
+			$match_sql = "
+						select
+							c.com_id
+							, c.com_nm
+						from company c
+						left outer join store s on s.com_id = c.com_id
+						where c.use_yn = 'Y'
+						order by c.com_nm asc
+			";
+
+			$store_match = DB::select($match_sql);
+
+		}
+
+		if ($store_cd != '') {
+			$select_sql = "
+					select 
+						com_id 
+					from store 
+					where com_id != ''
+			";
+
+			$select_match = DB::select($select_sql);
+
+		}
+
 			
 		$values = [
 			"cmd"	=> $store_cd == '' ? "" : "update",
@@ -162,7 +193,9 @@ class std02Controller extends Controller
 			'store_kinds' => SLib::getCodes("STORE_KIND"),
 			'store_areas' => SLib::getCodes("STORE_AREA"),
 			'grades' => SLib::getValidStoreGrades(),
-			'prioritys' => SLib::getCodes("PRIORITY")
+			'prioritys' => SLib::getCodes("PRIORITY"),
+			'store_match' => $store_match,
+			'select_match' => $select_match
 		];
 		
 
@@ -199,8 +232,14 @@ class std02Controller extends Controller
 		// $y 			= $request->input('y');
 		// $x 			= $request->input('x');
 		// $map_code 	= $y.','.$x;
-		$open_month_stock_yn = $request->input('open_month_stock_yn');
+
+		$sale_place_match_yn = $request->input('sale_place_match_yn');
 		
+		if ($sale_place_match_yn == 'Y') {
+			$com_id = $request->input('com_id');
+		} else {
+			$com_id = '';
+		}
 
 		try {
 			DB::beginTransaction();
@@ -257,12 +296,13 @@ class std02Controller extends Controller
 				'rt_yn'			=> $request->input('rt_yn'),
 				'point_in_yn'	=> $request->input('point_in_yn', 'N'),
 				'point_out_yn'	=> $request->input('point_out_yn'),
+				'com_id'		=> $com_id,
 				'reg_date'		=> now(),
 				'mod_date'		=> now(),
 				'admin_id'		=> $id,
 				'map_code'		=> $request->input('map_code'),
-				'open_month_stock_yn' => $open_month_stock_yn,
-				'sale_place_match_yn' => $request->input('sale_place_match_yn')
+				'open_month_stock_yn' => $request->input('open_month_stock_yn'),
+				'sale_place_match_yn' => $sale_place_match_yn
 				
 			];
 			
