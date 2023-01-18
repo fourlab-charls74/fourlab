@@ -1175,18 +1175,18 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
     //[클래식]
     Route::prefix("classic")->namespace('classic')->group(function () {
         //공지사항
-        Route::get('classic01', 'classic01Controller@index');
-        Route::get('classic01/search', 'classic01Controller@search');
+        Route::get('classic01', 'cls01Controller@index');
+        Route::get('classic01/search', 'cls01Controller@search');
         
         //작업중
-        Route::get('classic01/create', 'classic01Controller@create');
+        Route::get('classic01/create', 'cls01Controller@create');
+        Route::post('classic01/create', 'cls01Controller@save');
 
         //아직x
-        Route::post('classic01/create', 'classic01Controller@save');
-        Route::get('classic01/show/{idx?}', 'classic01Controller@show');
-        Route::get('classic01/event-pop', 'classic01Controller@event_list');
-        Route::get('classic01/event-search', 'classic01Controller@event_search');
-        Route::get('classic01/del', 'classic01Controller@destroy');
+        Route::get('classic01/show/{idx?}', 'cls01Controller@show');
+        Route::get('classic01/event-pop', 'cls01Controller@event_list');
+        Route::get('classic01/event-search', 'cls01Controller@event_search');
+        Route::get('classic01/del', 'cls01Controller@destroy');
     });
 
 });

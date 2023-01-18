@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
-class classic01Controller extends Controller
+class cls01Controller extends Controller
 {
 	public function index(Request $req) {
 		$today = date("Y-m-d");
@@ -32,7 +32,7 @@ class classic01Controller extends Controller
 			'edate'				=> $edate,
 			'evt_mst'			=> $evt_mst
 		];
-		return view( Config::get('shop.head.view') . '/classic/classic01',$values);
+		return view( Config::get('shop.head.view') . '/classic/cls01',$values);
 	}
 
 	public function search(Request $request){
@@ -115,14 +115,14 @@ class classic01Controller extends Controller
         $user->name = $name;
 		$user->email = $email;
 
-        return view( Config::get('shop.head.view') . '/classic/classic01_show',
+        return view( Config::get('shop.head.view') . '/classic/cls01_show',
             ['no' => '','user' => $user]
         );
     }
 
 
 	public function event_list(){
-		return view( Config::get('shop.head.view') . '/classic/classic01_event_show');
+		return view( Config::get('shop.head.view') . '/classic/cls01_event_show');
 	}
 
 
