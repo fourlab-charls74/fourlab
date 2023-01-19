@@ -131,25 +131,31 @@
                         </div>
                     </div>
                     <div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="">판매유형</label>
-							<div class="form-inline inline_btn_box">
-                                <input type='hidden' id="sell_nm" name="sell_nm">
-                                <select id="sell_type" name="sell_type[]" class="form-control form-control-sm select2-sellType multi_select" multiple></select>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-sellType"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                        <div class="form-group">
+                            <label for="sell_type">판매유형</label>
+                            <div class="flax_box">
+                                <select id="sell_type" name="sell_type[]" class="form-control form-control-sm multi_select w-100" multiple>
+                                    <option value=''>전체</option>
+                                    @foreach ($sale_kinds as $sale_kind)
+                                    <option value='{{ $sale_kind->code_id }}'>{{ $sale_kind->code_val }}</option>
+                                    @endforeach
+                                </select>
                             </div>
-						</div>
-					</div>
+                        </div>
+                    </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-							<label for="">행사코드</label>
-							<div class="form-inline inline_btn_box">
-                                <input type='hidden' id="pr_code_nm" name="pr_code_nm">
-                                <select id="pr_code" name="pr_code[]" class="form-control form-control-sm select2-prcode multi_select" multiple></select>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-prcode"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                            <label for="pr_code">행사코드</label>
+                            <div class="flax_box">
+                                <select id="pr_code" name="pr_code[]" class="form-control form-control-sm multi_select w-100" multiple>
+                                    <option value=''>전체</option>
+                                    @foreach ($pr_codes as $pr_code)
+                                    <option value='{{ $pr_code->code_id }}'>{{ $pr_code->code_val }}</option>
+                                    @endforeach
+                                </select>
                             </div>
-						</div>
-					</div>
+                        </div>
+                    </div>
                 </div>
                 <div class="search-area-ext d-none row">
                     <div class="col-lg-4 inner-td">
@@ -248,7 +254,18 @@
         </div>
     </div>
 </form>
-
+<!-- 차트 -->
+<div class="card shadow mb-1">
+    <div class="card-body">
+        <input type="hidden" id="chart-type" value="date">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="date-tab" data-toggle="tab" href="#home" role="tab" aria-controls="date" aria-selected="true">월별</a>
+            </li>
+        </ul>
+        <div id="opt_chart" style="height: 100%; min-height:300px;"></div>
+    </div>
+</div>
 <!-- DataTales Example -->
 <div id="filter-area" class="card shadow-none mb-4 ty2 last-card">
     <div class="card-body shadow">
@@ -279,6 +296,7 @@
         </ul>
     </div>
 </div>
+<script src="https://unpkg.com/ag-charts-community@2.1.0/dist/ag-charts-community.min.js"></script>
 <script language="javascript">
     var columns = [{
             headerName: "일자",
@@ -291,12 +309,11 @@
                 let s_ord_state = $('[name=ord_state]:checked').val();
                 let s_item = $("[name=item]").val();
                 let s_brand = $(".select2-brand").val()??'';
-                console.log(s_brand);
                 let s_prd_nm = $("[name=goods_nm]").val();
                 let s_stat_pay_type = $(".stat_pay_type:checked").map(function() {return this.value;}).get().join(",");
                 let store_cd = $('.select2-store').val();
-                let sell_type = $('.select2-sellType').val();
-                let pr_code = $('.select2-prcode').val();
+                let sell_type = $('#sell_type').val();
+                let pr_code = $('#pr_code').val();
                 let on_off_yn = $('[name=on_off_yn]:checked').val();
 				return '<a href="/store/sale/sal24?sdate='+ params.data.date + '&ord_type=' + s_ord_type + '&ord_state='+ s_ord_state + '&item='+ s_item + '&brand='+ s_brand + '&goods_nm='+ s_prd_nm + '&stat_pay_type='+ s_stat_pay_type + '&store_cd=' + store_cd + '&sell_type=' + sell_type + '&pr_code=' + pr_code + '&on_off_yn='+ on_off_yn + '" target="_new">'+ params.value+'</a>';
 			},
@@ -525,6 +542,8 @@
     ];
 </script>
 <script type="text/javascript" charset="utf-8">
+    let chart_data = null;
+
     const pApp = new App('', {
         gridId: "#div-gd",
     });
@@ -546,8 +565,8 @@
 
     // 판매유형 다중검색
     $( ".sch-sellType" ).on("click", function() {
-            searchSellType.Open(null, "multiple");
-        });
+        searchSellType.Open(null, "multiple");
+    });
       
     // 행사코드 다중검색
     $( ".sch-prcode" ).on("click", function() {
@@ -560,7 +579,70 @@
             "sum": "top",
             "avg": "top"
         });
-        gx.Request('/store/sale/sal25/search', data);
+        gx.Request('/store/sale/sal25/search', data, -1, function(data){
+            chart_data = data.body;
+            drawCanvas();
+        });
     }
+
+
+    function drawCanvas() {
+        $("#chart-type").val() == 'date'
+        drawCanvasByMonth();
+    }
+
+    function drawCanvasByMonth() {
+        $('#opt_chart').html('');
+
+        let beforeRowMonth = null;
+
+        chart_data.sort(function(a, b) {
+            if (a.date < b.date) {
+                return -1;
+            }
+            if (a.date > b.date) {
+                return 1;
+            }
+
+            return 0;
+        });
+
+        chart_data.forEach(function(row) {
+            if (beforeRowMonth !== row.date || beforeRowMonth === null) {
+                row.chart_x_str = row.date;
+                beforeRowMonth = row.date;
+                return;
+            }
+
+            row.chart_x_str = row.date;
+        });
+
+        var options = {
+            container: document.getElementById('opt_chart'),
+            title: {
+                text: "월별 매출 통계",
+            },
+            data: chart_data,
+            series: [{
+                type: 'column',
+                xKey: 'chart_x_str',
+                yKeys: ['sum_amt', 'sum_wonga'],
+                yNames: [' 매출액', '매출원가'],
+                grouped: true,
+                fills: ['#556ee6', '#2797f6'],
+                strokes: ['#556ee6', '#2797f6']
+                // highlightStyle : {
+                //   fill :
+                // }
+            }],
+        };
+        agCharts.AgChart.create(options);
+    }
+
+    function drawCanvasByTime() {
+        $('#opt_chart').html('차트를 생성할 수 없습니다.');
+    }
+
+
 </script>
 @stop

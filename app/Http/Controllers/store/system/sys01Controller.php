@@ -142,6 +142,7 @@ class sys01Controller extends Controller
                 $mgr_user = [
                     'grade' => $grade,
                     'id' => $id,
+                    'store_cd' => '',
                     'passwd' => DB::raw("CONCAT('*', UPPER(SHA1(UNHEX(SHA1('$passwd')))))"),
                     'pwchgperiod' => $pwchgperiod,
                     'name' => $name,
@@ -226,6 +227,7 @@ class sys01Controller extends Controller
             $mgr_user = [
                 'grade'			=> $grade,
                 'id'			=> $id,
+                'store_cd'      => '',
                 'pwchgperiod'	=> $pwchgperiod,
                 'name'			=> $name,
                 'ipfrom'		=> $ipfrom,

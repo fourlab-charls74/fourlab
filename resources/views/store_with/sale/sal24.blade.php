@@ -115,30 +115,36 @@
                             <div class="form-inline inline_btn_box">
                                 <input type='hidden' id="store_nm" name="store_nm">
                                 <select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select"></select>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16" style="line-height: 27px;"></i></a>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="">판매유형</label>
-							<div class="form-inline inline_btn_box">
-                                <input type='hidden' id="sell_nm" name="sell_nm">
-                                <select id="sell_type" name="sell_type[]" class="form-control form-control-sm select2-sellType multi_select" multiple></select>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-sellType"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                        <div class="form-group">
+                            <label for="sell_type">판매유형</label>
+                            <div class="flax_box">
+                                <select id="sell_type" name="sell_type[]" class="form-control form-control-sm multi_select w-100" multiple>
+                                    <option value=''>전체</option>
+                                    @foreach ($sale_kinds as $sale_kind)
+                                    <option value='{{ $sale_kind->code_id }}'>{{ $sale_kind->code_val }}</option>
+                                    @endforeach
+                                </select>
                             </div>
-						</div>
-					</div>
+                        </div>
+                    </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-							<label for="">행사코드</label>
-							<div class="form-inline inline_btn_box">
-                                <input type='hidden' id="pr_code_nm" name="pr_code_nm">
-                                <select id="pr_code" name="pr_code[]" class="form-control form-control-sm select2-prcode multi_select" multiple></select>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-prcode"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                            <label for="pr_code">행사코드</label>
+                            <div class="flax_box">
+                                <select id="pr_code" name="pr_code[]" class="form-control form-control-sm multi_select w-100" multiple>
+                                    <option value=''>전체</option>
+                                    @foreach ($pr_codes as $pr_code)
+                                    <option value='{{ $pr_code->code_id }}'>{{ $pr_code->code_val }}</option>
+                                    @endforeach
+                                </select>
                             </div>
-						</div>
-					</div>
+                        </div>
+                    </div>
                     <div class="col-lg-4 inner-td" style="margin-top: 20px;">
                         <div class="form-group">
                             <label for="">온라인/오프라인</label>
@@ -310,8 +316,8 @@
             aggAvg: "평균",
             cellRenderer:function(params) {
                 let store_cd = $('.select2-store').val();
-                let sell_type = $('.select2-sellType').val();
-                let pr_code = $('.select2-prcode').val();
+                let sell_type = $('#sell_type').val();
+                let pr_code = $('#pr_code').val();
                 let brand = $('.select2-brand').val()??'';
                 let goods_nm = $('#goods_nm').val();
                 let on_off_yn = $('[name=on_off_yn]:checked').val();

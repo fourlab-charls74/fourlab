@@ -624,8 +624,8 @@
 															@endif
 														@endforeach
 													@endforeach -->
-													@foreach ($store_match as $sm)
-														@foreach ($select_match as $sel)
+													@foreach ($select_match as $sel)
+														@foreach ($store_match as $sm)
 															<option value='{{ $sm->com_id }}' @if(@$store->com_id == $sm->com_id) selected @endif @if(@$sel->com_id == $sm->com_id) disabled style="background: #d2d2d2;" @endif  >{{ $sm->com_nm }}</option>
 														@endforeach
 													@endforeach
