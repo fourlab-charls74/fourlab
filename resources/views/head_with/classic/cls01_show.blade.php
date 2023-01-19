@@ -17,14 +17,19 @@
             <span>/ 공지사항</span>
         </div>
     </div>
-    <form method="get" name="f1">
+    <form method="post" name="f1">
         <div class="card_wrap aco_card_wrap">
             <div class="card">
                 <div class="card-header mb-0 justify-content-between d-flex">
                     <div></div>
                     <div>
+                        @if($type=='edit')
+                        <input type="button" class="btn btn-sm btn-primary shadow-sm" value="수정" onclick="Save();">
+                        <input type="button" class="btn btn-sm btn-primary shadow-sm" value="삭제" onclick="Destroy();">
+                        @else
                         <input type="button" class="btn btn-sm btn-primary shadow-sm" value="저장" onclick="Save();">
-                        <button href="#" onclick="location.href='/head/classic/classic01';return false;" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">목록</button>
+                        @endif
+                        <button href="#" onclick="location.href='/head/classic/cls01';return false;" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">목록</button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -43,13 +48,21 @@
                                             <th>작성자</th>
                                             <td>
                                                 <div class="input_box">
-                                                    <input type='text' class="form-control form-control-sm wd100" name='name' value='{{$user->name}}' required>
+                                                    @if ($type=='edit')  
+                                                    <input type='text' class="form-control form-control-sm wd100" name='name' value='{{$evt_notice[0]->admin_nm}}' required>
+                                                    @else 
+                                                    <input type='text' class="form-control form-control-sm wd100" name='name' value='{{$name}}' required>
+                                                    @endif
                                                 </div>
                                             </td>
                                             <th>이메일</th>
                                             <td>
                                                 <div class="input_box">
-                                                    <input type='text' class="form-control form-control-sm wd100" name='email' value='{{$user->email}}' required>
+                                                    @if ($type=='edit')
+                                                    <input type='text' class="form-control form-control-sm wd100" name='email' value='{{$evt_notice[0]->admin_email}}' required>
+                                                    @else
+                                                    <input type='text' class="form-control form-control-sm wd100" name='email' value='{{$email}}' required>
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>
@@ -58,7 +71,11 @@
                                             <td>
                                                 <div class="form-inline form-radio-box">
                                                     <div class="custom-control custom-radio">
+                                                        @if ($type=='edit')
+                                                        <input type="radio" name="useyn" id="useyn1" class="custom-control-input" value="Y" {{ (@$evt_notice[0]->use_yn=="Y") ? "checked" : "" }}/>
+                                                        @else
                                                         <input type="radio" name="useyn" id="useyn1" class="custom-control-input" value="Y" checked/>
+                                                        @endif
                                                         <label class="custom-control-label" for="useyn1">예</label>
                                                     </div>
                                                     <div class="custom-control custom-radio">
@@ -70,9 +87,12 @@
                                             <th>이벤트</th>
                                             <td>
                                                 <div class="input_box">
-                                                    <input type="hidden" name="evt_idx" value="">
                                                     <button onclick="select_event();return false;" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm mr-1" style="float:left;">선택</button>
-                                                    <div id="evt_nm" style="float:left;line-height:25px;"></div>
+                                                    @if ($type=='edit')
+                                                    <div id="evt_nm" style="float:left;line-height:25px;">{{$evt_notice[0]->title}}</div>
+                                                    @else
+                                                    <div id="evt_nm" style="float:left;line-height:25px;">피엘라벤 클래식 코리아 2022</div>                
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>
@@ -80,7 +100,11 @@
                                             <th>제목</th>
                                             <td colspan="3">
                                                 <div class="txt_box">
+                                                    @if ($type=='edit')
+                                                    <input type="text" class="form-control form-control-sm wd100" name="subject" value="{{$evt_notice[0]->subject}}">
+                                                    @else
                                                     <input type="text" class="form-control form-control-sm wd100" name="subject" value="">
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>
@@ -89,10 +113,15 @@
                                             <td>
                                                 <ul style="padding:0; list-style:none; margin:0; list-style:none;">
                                                     <li>
-                                                        <span id="preview_thumb_img" style="width:352px; height:352px; border:1px solid #b3b3b3; display:block;"></span>
+                                                        <span id="preview_thumb_img" style="width:352px; height:352px; border:1px solid #b3b3b3; display:block;">
+                                                        @if ($type=='edit')
+                                                        <img src="{{$evt_notice[0]->thumb_img}}" style="width:330px; height:330px;">
+                                                        @else
+                                                        @endif
+                                                        </span>
                                                     </li>
                                                     <li style="padding-top:5px;">
-                                                        <input type="file" name="file">
+                                                        <input type="file" name="title_file">
                                                     </li>
                                                 </ul>
                                             </td>
@@ -101,7 +130,11 @@
                                             <th>코멘트</th>
                                             <td colspan="3">
                                                 <div class="txt_box">
+                                                    @if ($type=='edit')
+                                                    <textarea name="comment" rows="5" style="width:100%">{{$evt_notice[0]->comment}}</textarea>
+                                                    @else
                                                     <textarea name="comment" rows="5" style="width:100%"></textarea>
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>
@@ -109,7 +142,11 @@
                                             <th>내용</th>
                                             <td colspan="3">
                                                 <div class="area_box">
+                                                    @if ($type=='edit')
+                                                    <textarea name="content" id="content" class="form-control editor1" style="display: none;">{{$evt_notice[0]->content}}</textarea>
+                                                    @else
                                                     <textarea name="content" id="content" class="form-control editor1" style="display: none;"></textarea>
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>
@@ -153,7 +190,7 @@
     });
 
     function select_event() {
-        const url = '/head/classic/classic01/event-pop';
+        const url = '/head/classic/cls01/event-pop';
         window.open(url, "_blank", "toolbar=no, scrollbars=yes, resizable=yes, status=yes, top=500, left=500, width=800, height=600");
     }
 
@@ -206,23 +243,43 @@
 		var f1 = $("form[name=f1]")[0];
 		var formData = new FormData(f1);
 
+        let evt_nm = document.getElementById('evt_nm').innerHTML;
+        formData.append('evt_nm', evt_nm);
+        // console.log(evt_nm);
+
+        
+        let type = "<?=$type?>";
+        formData.append('type', type);
+        console.log(type);
+
+        
+        let url = window.location.pathname;
+        url = url.split('/');
+        let idx = url[url.length - 1];
+        console.log(idx);
+
+        formData.append('idx', idx);
+
+
         $.ajax({
             method: 'post',
-            url: '/head/classic/classic01/create',
+            url: '/head/classic/cls01/create',
             processData: false,
             contentType: false,
             data: formData,
             success: function (data) {
-                var res = jQuery.parseJSON(data);
-                if(res.code == '200'){
-											alert('공지사항이 등록 되었습니다.');
-					                    document.location.href = '/head/classic/classic01'
+                // var res = jQuery.parseJSON(data);
+                if(data.code == 200){
+                    // console.log(data.code);
+                    // console.log(data.msg);
+					alert('공지사항이 등록 되었습니다.');
+					document.location.href = '/head/classic/cls01'
                 } else {
                     alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
                 }
             },
             error: function(res, status, error) {
-                res_err = jQuery.parseJSON(res.responseText);
+                // res_err = jQuery.parseJSON(res.responseText);
                 if(res_err.message){
                     alert(res_err.message);
                 }
@@ -240,7 +297,7 @@
     //     $.ajax({
     //         async: true,
     //         method: 'get',
-    //         url: '/head/classic/classic01/del',
+    //         url: '/head/classic/cls01/del',
     //         data: frm.serialize(),
     //         success: function (data) {
     //             var res = jQuery.parseJSON(data);
@@ -262,7 +319,7 @@
 
     function validatePhoto() 
 	{
-        console.log(target_file);
+        // console.log(target_file);
         if( target_file === null || target_file.length === 0 )
 		{
 			alert("업로드할 이미지를 선택해주세요.");
@@ -287,6 +344,7 @@
             style : "margin:10px",
             "data-type" : type
         });
+        $("#preview_thumb_img").empty();
         $("#preview_thumb_img").append(canvas);
 	}
 
@@ -307,10 +365,9 @@
     }
 
 	$(function() {
-		$("[name=file]").change(function() {
+		$("[name=title_file]").change(function() {
 			target_file = this.files;
 			if (validatePhoto() === false) return;
-			console.log("dddd");
 			var fr = new FileReader();
 			appendCanvas(330, 'c_80', 'a');
 

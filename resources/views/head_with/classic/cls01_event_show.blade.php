@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="show_layout py-3">
-	<form method="post" name="search">
+	<form method="get" name="search">
         <div class="card shadow">
             <div class="card-header mb-0">
                 <a href="#">트레킹 이벤트</a>
@@ -109,7 +109,7 @@
 
     function Search() {
         let data = $('form[name="search"]').serialize();
-        gx.Request('/head/classic/classic01/event-search', data);
+        gx.Request('/head/classic/clsc01/event-search', data);
     }
 </script>
 @stop
