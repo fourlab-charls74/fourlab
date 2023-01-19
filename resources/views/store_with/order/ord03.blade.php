@@ -18,6 +18,7 @@
 				<div class="flax_box">
 					<a href="javascript:void(0);" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
 					<a href="javascript:void(0);" onclick="initSearch()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
+                    <a href="javascript:void(0);" onclick="return openBatchPopup();" class="btn btn-sm btn-primary shadow-sm mr-1">택배송장 일괄입력</a>
                     <div class="btn-group dropleftbtm mr-1">
                         <button type="button" class="btn btn-primary waves-light waves-effect dropdown-toggle btn-sm pr-1" data-toggle="dropdown" aria-expanded="false">
                             <i class="fa fa-folder"></i> <i class="bx bx-chevron-down fs-12"></i>
@@ -365,6 +366,7 @@
 		<div class="resul_btn_wrap mb-3">
             <a href="javascript:void(0);" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
             <a href="javascript:void(0);" onclick="initSearch()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
+            <a href="javascript:void(0);" onclick="return openBatchPopup();" class="btn btn-sm btn-primary shadow-sm mr-1">택배송장 일괄입력</a>
             <div class="btn-group dropleftbtm mr-1">
                 <button type="button" class="btn btn-primary waves-light waves-effect dropdown-toggle btn-sm pr-1" data-toggle="dropdown" aria-expanded="false">
                     <i class="fa fa-folder"></i> <i class="bx bx-chevron-down fs-12"></i>
@@ -599,7 +601,12 @@
 
     // 택배송장목록 받기 팝업창 오픈
     function openDlvInvoicePopup() {
-        window.open('/store/order/ord03/show/invoice-list', '_blank', 'toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1000,height=768');
+        window.open('/store/order/ord03/show/invoice-list', '_blank', 'toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1000,height=720');
+    }
+
+    // 택배송장목록 받기 팝업창 오픈
+    function openBatchPopup() {
+        window.open('/store/order/ord03/show/batch', '_blank', 'toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1000,height=768');
     }
 
     // ord03_invoice.blade.php 에서 사용

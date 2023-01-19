@@ -656,6 +656,66 @@ class ord03Controller extends Controller
 		}
 	}
 
+	/** 팝업오픈 모음 */
+	public function show_popup(Request $request, $cmd)
+	{
+		switch ($cmd) {
+			case 'invoice-list':
+				$response = $this->show_invoice($request);
+				break;
+			case 'batch':
+				$response = $this->show_batch($request);
+				break;
+            default:
+                $message = 'Command not found';
+                $response = response()->json(['code' => 0, 'msg' => $message], 404);
+		};
+		return $response;
+	}
+
+	/** 택배송장목록받기 팝업 show */
+	public function show_invoice(Request $request)
+	{
+		$col_type = 'dlv_inv_dn_store';
+		$cnt = DB::table('columns')->where('type', $col_type)->count();
+		if ($cnt < 1) {
+			$sql = "
+				insert into columns 
+					( type, cn, name, seq, use_yn, use_seq, rt, ut )
+				select '$col_type' as type, cn, name, seq, use_yn, use_seq, now() as rt, now() as ut
+				from columns where type = 'dlv_inv_dn' 
+				order by use_seq
+			";
+			DB::insert($sql);
+		}
+
+		$sql = "select cn as name, name as value from columns where type = '$col_type' order by seq";
+		$columns = DB::select($sql);
+
+		$sql = "select cn as name, name as value from columns where type = '$col_type' and use_yn = 'Y' order by use_seq";
+		$fields = DB::select($sql);
+
+			$values = [
+			'columns' => $columns,
+			'fields' => $fields,
+		];
+
+		return view( Config::get('shop.store.view') . '/order/ord03_invoice', $values );
+	}
+
+	/** 택배송장일괄입력 팝업 show */
+	public function show_batch(Request $request)
+	{
+		$conf   = new Conf();
+        $cfg_dlv_cd = $conf->getConfigValue("delivery","dlv_cd");
+
+		$values = [
+			'dlv_cd' => $cfg_dlv_cd,
+			'dlvs' => SLib::getCodes('DELIVERY'), // 택배사목록
+		];
+		return view( Config::get('shop.store.view') . '/order/ord03_batch', $values );
+	}
+
 	/** 엑셀다운로드 모음 */
 	public function download(Request $request, $cmd)
 	{
@@ -870,36 +930,6 @@ class ord03Controller extends Controller
 		];
 
 		return Excel::download(new ExcelExport($sql, $headers, $sizes), date('YmdH').'_배송목록.xlsx', \Maatwebsite\Excel\Excel::XLSX);
-	}
-
-	/** 택배송장목록받기 팝업 show */
-	public function show_invoice(Request $request)
-	{
-		$col_type = 'dlv_inv_dn_store';
-		$cnt = DB::table('columns')->where('type', $col_type)->count();
-		if ($cnt < 1) {
-			$sql = "
-				insert into columns 
-					( type, cn, name, seq, use_yn, use_seq, rt, ut )
-				select '$col_type' as type, cn, name, seq, use_yn, use_seq, now() as rt, now() as ut
-				from columns where type = 'dlv_inv_dn' 
-				order by use_seq
-			";
-			DB::insert($sql);
-		}
-
-		$sql = "select cn as name, name as value from columns where type = '$col_type' order by seq";
-        $columns = DB::select($sql);
-
-        $sql = "select cn as name, name as value from columns where type = '$col_type' and use_yn = 'Y' order by use_seq";
-        $fields = DB::select($sql);
-
-  		$values = [
-			'columns' => $columns,
-            'fields' => $fields,
-		];
-
-		return view( Config::get('shop.store.view') . '/order/ord03_invoice', $values );
 	}
 
 	/** 택배송장목록받기 */
