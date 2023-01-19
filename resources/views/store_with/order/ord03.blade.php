@@ -24,10 +24,9 @@
                         </button>
                         <div class="dropdown-menu" style="">
                             <a class="dropdown-item d-flex align-items-center" href="javascript:void(0);" onclick="return exportDlvList();"><i class="bx bx-download fs-16 mr-1"></i> 배송목록 받기</a>
-                            <a class="dropdown-item d-flex align-items-center" href="javascript:void(0);"><i class="bx bx-download fs-16 mr-1"></i> 택배송장목록 받기</a>
+                            <a class="dropdown-item d-flex align-items-center" href="javascript:void(0);" onclick="return openDlvInvoicePopup();"><i class="bx bx-download fs-16 mr-1"></i> 택배송장목록 받기</a>
                             <a class="dropdown-item d-flex align-items-center" href="javascript:void(0);"><i class="bx bx-download fs-16 mr-1"></i> 판매처 택배송장목록 받기</a>
                         </div>
-                        <input type="hidden" name="data" id="data" value=""/>
                     </div>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
@@ -366,9 +365,18 @@
 		<div class="resul_btn_wrap mb-3">
             <a href="javascript:void(0);" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
             <a href="javascript:void(0);" onclick="initSearch()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
-            <a href="javascript:void(0);" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
+            <div class="btn-group dropleftbtm mr-1">
+                <button type="button" class="btn btn-primary waves-light waves-effect dropdown-toggle btn-sm pr-1" data-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-folder"></i> <i class="bx bx-chevron-down fs-12"></i>
+                </button>
+                <div class="dropdown-menu" style="">
+                    <a class="dropdown-item d-flex align-items-center" href="javascript:void(0);" onclick="return exportDlvList();"><i class="bx bx-download fs-16 mr-1"></i> 배송목록 받기</a>
+                    <a class="dropdown-item d-flex align-items-center" href="javascript:void(0);" onclick="return openDlvInvoicePopup();"><i class="bx bx-download fs-16 mr-1"></i> 택배송장목록 받기</a>
+                    <a class="dropdown-item d-flex align-items-center" href="javascript:void(0);"><i class="bx bx-download fs-16 mr-1"></i> 판매처 택배송장목록 받기</a>
+                </div>
+            </div>
             <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
-		</div>
+        </div>
 	</div>
 </form>
 <!-- DataTales Example -->
@@ -584,9 +592,19 @@
     }
 
     // 배송목록 받기
-    async function exportDlvList() {
-        let data = $('form[name="search"]').serialize();
+    function exportDlvList() {
+        let data = getFormSerializedData();
         location.href = "/store/order/ord03/download/dlv-list?" + data;
+    }
+
+    // 택배송장목록 받기 팝업창 오픈
+    function openDlvInvoicePopup() {
+        window.open('/store/order/ord03/show/invoice-list', '_blank', 'toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1000,height=768');
+    }
+
+    // ord03_invoice.blade.php 에서 사용
+    function getFormSerializedData() {
+        return $('form[name="search"]').serialize();
     }
 </script>
 @stop

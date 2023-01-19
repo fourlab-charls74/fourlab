@@ -479,6 +479,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('ord03/search','ord03Controller@search');
         Route::post('ord03/complete','ord03Controller@complete');
         Route::post('ord03/update/ord-kind','ord03Controller@update_ord_kind');
+        Route::get('ord03/show/invoice-list', 'ord03Controller@show_invoice');
         Route::get('ord03/download/{cmd}', 'ord03Controller@download');
     });
 

@@ -10,9 +10,13 @@ use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Events\AfterSheet;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
+use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
+use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 
-class ExcelExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithEvents
+class ExcelExport extends DefaultValueBinder implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithEvents, WithCustomValueBinder
 {
     protected $query;
 
@@ -47,13 +51,19 @@ class ExcelExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
 
     public function registerEvents(): array
     {
+        $alphabets = range('A', 'Z');
+        foreach (range('A', 'Z') as $val) {
+            if (count($alphabets) > count($this->headers)) break;
+            $alphabets = array_merge($alphabets, array_map(function($r) use ($val) { return $val . $r; }, range('A', 'Z')));
+        }
+
         return [
-            AfterSheet::class => function (AfterSheet $event) {
+            AfterSheet::class => function (AfterSheet $event) use ($alphabets) {
                 $sheet = $event->getSheet()->getDelegate();
-                $last = chr(64 + count($this->headers));
+                $last = $alphabets[count($this->headers) - 1];
                 $lastnum = $this->collection()->count() + 1;
                 
-                foreach (range('A', $last) as $key => $columnId) {
+                foreach (array_slice($alphabets, 0, count($this->headers)) as $key => $columnId) {
                     $size = $this->sizes[array_keys($this->headers)[$key] ?? ''] ?? 10;
                     $sheet->getColumnDimension($columnId)->setAutoSize(false);
                     $sheet->getColumnDimension($columnId)->setWidth($size);
@@ -76,5 +86,15 @@ class ExcelExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
                     ]);
             }
         ];
+    }
+
+    public function bindValue(Cell $cell, $value)
+    {
+        if (is_numeric($value)) {
+            $cell->setValueExplicit($value, DataType::TYPE_NUMERIC);
+            return true;
+        }
+
+        return parent::bindValue($cell, $value);
     }
 }
