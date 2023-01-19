@@ -902,6 +902,17 @@ CREATE TABLE `store_controller` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
+-- 그룹관리(메뉴권한)
+CREATE TABLE `store_group_authority` (
+  `group_no` int(11) NOT NULL DEFAULT '0' COMMENT '메뉴번호',
+  `wonga_yn` char(1) DEFAULT 'Y' COMMENT '원가보여주기',
+  `other_store_yn` char(1) DEFAULT 'Y' COMMENT '타매장감추기',
+  `release_price_yn` char(1) DEFAULT 'Y' COMMENT '출고가보여주기',
+  `pos_use_yn` char(1) DEFAULT 'Y' COMMENT 'POS 사용여부',
+  PRIMARY KEY (`group_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 
 
 

@@ -615,20 +615,9 @@
 											<td id="com_select2">
 												<select name='com_id' id="com_id" class="form-control form-control-sm">
 													<option value=''>전체</option>
-													<!-- @foreach ($store_match as $sm)
-														@foreach ($select_match as $sel)
-															@if ($sel->com_id == $sm->com_id)
-																<option value='{{ $sm->com_id }}' @if(@$store->com_id == $sm->com_id) selected @endif disabled style="background: #d2d2d2;">{{ $sm->com_nm }}</option>
-															@else 
-																<option value='{{ $sm->com_id }}'>{{ $sm->com_nm }}</option>
-															@endif
-														@endforeach
-													@endforeach -->
-													@foreach ($select_match as $sel)
 														@foreach ($store_match as $sm)
-															<option value='{{ $sm->com_id }}' @if(@$store->com_id == $sm->com_id) selected @endif @if(@$sel->com_id == $sm->com_id) disabled style="background: #d2d2d2;" @endif  >{{ $sm->com_nm }}</option>
+															<option value='{{ $sm->com_id }}' @if(@$store->com_id == $sm->com_id) selected @endif @if(@$sm->s_match != '') disabled style="background: #d2d2d2;" @endif>{{ $sm->com_nm }}</option>
 														@endforeach
-													@endforeach
 												</select>
 											</td>
 										</tr>
