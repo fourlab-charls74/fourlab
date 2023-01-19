@@ -77,7 +77,7 @@ class ord02Controller extends Controller
 		$ord_info_value = $request->input('ord_info_value', '');
 		$stat_pay_type = $request->input('stat_pay_type', ''); // 결제방법
 		$not_complex = $request->input('not_complex', 'N'); // 복합결제 제외여부
-		$sale_kind = $request->input('sale_kind', ''); // 판매유형
+		$sale_kind = $request->input('sale_kind', []); // 판매유형
 		$com_id = $request->input('com_cd', '');
 		$prd_cd = $request->input('prd_cd', '');
 		$style_no = $request->input('style_no', '');
@@ -129,8 +129,11 @@ class ord02Controller extends Controller
 				$where .= " and ((o.pay_type & $stat_pay_type) = $stat_pay_type) ";
 			}
 		}
-		
-		if ($sale_kind != '') $where .= " and o.sale_kind = '" . $sale_kind . "' ";
+
+		if (count($sale_kind) > 0) {
+			$sale_kind_join = join(',', array_map(function($s) { return "'$s'"; }, $sale_kind));
+			$where .= " and o.sale_kind in ($sale_kind_join) ";
+		}
 		if ($com_id != '') $where .= " and g.com_id = '" . $com_id . "' ";
 
 		// 상품코드 검색

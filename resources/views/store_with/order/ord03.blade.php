@@ -334,12 +334,12 @@
                 <div class="row search-area-ext d-none">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="sale_kind">판매유형</label>
-                            <div class="flex_box">
-                                <select name="sale_kind" class="form-control form-control-sm">
-                                    <option value="">전체</option>
+                            <label for="pr_code">판매유형</label>
+                            <div class="flax_box">
+                                <select id="sale_kind" name="sale_kind[]" class="form-control form-control-sm multi_select w-100" multiple>
+                                    <option value=''>전체</option>
                                     @foreach (@$sale_kinds as $sale_kind)
-                                        <option value="{{ $sale_kind->code_id }}">{{ $sale_kind->code_val }}</option>
+                                    <option value='{{ $sale_kind->code_id }}'>{{ $sale_kind->code_val }}</option>
                                     @endforeach
                                 </select>
                             </div>

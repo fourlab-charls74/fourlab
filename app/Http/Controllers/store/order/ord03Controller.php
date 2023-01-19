@@ -80,7 +80,7 @@ class ord03Controller extends Controller
 		$sale_place = $request->input('sale_place', ''); // 판매처
 		$ord_info_key = $request->input('ord_info_key', 'om.user_nm');
 		$ord_info_value = $request->input('ord_info_value', '');
-		$sale_kind = $request->input('sale_kind', ''); // 판매유형
+		$sale_kind = $request->input('sale_kind', []); // 판매유형
 		$stat_pay_type = $request->input('stat_pay_type', ''); // 결제방법
 		$not_complex = $request->input('not_complex', 'N'); // 복합결제 제외여부
 		$com_id = $request->input('com_cd', '');
@@ -147,7 +147,10 @@ class ord03Controller extends Controller
 			}
 		}
 		
-		if ($sale_kind != '') $where .= " and o.sale_kind = '" . $sale_kind . "' ";
+		if (count($sale_kind) > 0) {
+			$sale_kind_join = join(',', array_map(function($s) { return "'$s'"; }, $sale_kind));
+			$where .= " and o.sale_kind in ($sale_kind_join) ";
+		}
 		if ($com_id != '') $where .= " and g.com_id = '" . $com_id . "' ";
 
 		// 상품코드 검색
@@ -688,7 +691,7 @@ class ord03Controller extends Controller
 		$sale_place = $request->input('sale_place', ''); // 판매처
 		$ord_info_key = $request->input('ord_info_key', 'om.user_nm');
 		$ord_info_value = $request->input('ord_info_value', '');
-		$sale_kind = $request->input('sale_kind', ''); // 판매유형
+		$sale_kind = $request->input('sale_kind', []); // 판매유형
 		$stat_pay_type = $request->input('stat_pay_type', ''); // 결제방법
 		$not_complex = $request->input('not_complex', 'N'); // 복합결제 제외여부
 		$com_id = $request->input('com_cd', '');
@@ -755,7 +758,10 @@ class ord03Controller extends Controller
 			}
 		}
 		
-		if ($sale_kind != '') $where .= " and o.sale_kind = '" . $sale_kind . "' ";
+		if (count($sale_kind) > 0) {
+			$sale_kind_join = join(',', array_map(function($s) { return "'$s'"; }, $sale_kind));
+			$where .= " and o.sale_kind in ($sale_kind_join) ";
+		}
 		if ($com_id != '') $where .= " and g.com_id = '" . $com_id . "' ";
 
 		// 상품코드 검색
@@ -912,7 +918,7 @@ class ord03Controller extends Controller
 		$sale_place = $request->input('sale_place', ''); // 판매처
 		$ord_info_key = $request->input('ord_info_key', 'om.user_nm');
 		$ord_info_value = $request->input('ord_info_value', '');
-		$sale_kind = $request->input('sale_kind', ''); // 판매유형
+		$sale_kind = $request->input('sale_kind', []); // 판매유형
 		$stat_pay_type = $request->input('stat_pay_type', ''); // 결제방법
 		$not_complex = $request->input('not_complex', 'N'); // 복합결제 제외여부
 		$com_id = $request->input('com_cd', '');
@@ -979,7 +985,10 @@ class ord03Controller extends Controller
 			}
 		}
 		
-		if ($sale_kind != '') $where .= " and o.sale_kind = '" . $sale_kind . "' ";
+		if (count($sale_kind) > 0) {
+			$sale_kind_join = join(',', array_map(function($s) { return "'$s'"; }, $sale_kind));
+			$where .= " and o.sale_kind in ($sale_kind_join) ";
+		}
 		if ($com_id != '') $where .= " and g.com_id = '" . $com_id . "' ";
 
 		// 상품코드 검색
