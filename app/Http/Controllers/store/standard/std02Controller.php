@@ -156,32 +156,30 @@ class std02Controller extends Controller
 		//업체 셀렉트박스
 		//매칭되어있는 매장은 출력되지않게해야함
 
-		if ($store_cd != '') {
 			$match_sql = "
 						select
 							c.com_id
 							, c.com_nm
+							, s.com_id as s_match
 						from company c
-						left outer join store s on s.com_id = c.com_id
+						left outer join store s on s.com_id = c.com_id and s.com_id != ''
 						where c.use_yn = 'Y'
 						order by c.com_nm asc
 			";
 
 			$store_match = DB::select($match_sql);
 
-		}
+		// if ($store_cd != '') {
+		// 	$select_sql = "
+		// 			select 
+		// 				com_id 
+		// 			from store 
+		// 			where com_id != ''
+		// 	";
 
-		if ($store_cd != '') {
-			$select_sql = "
-					select 
-						com_id 
-					from store 
-					where com_id != ''
-			";
+		// 	$select_match = DB::select($select_sql);
 
-			$select_match = DB::select($select_sql);
-
-		}
+		// }
 
 			
 		$values = [
@@ -195,7 +193,6 @@ class std02Controller extends Controller
 			'grades' => SLib::getValidStoreGrades(),
 			'prioritys' => SLib::getCodes("PRIORITY"),
 			'store_match' => $store_match,
-			'select_match' => $select_match
 		];
 		
 

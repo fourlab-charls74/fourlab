@@ -23,7 +23,9 @@ class sal25Controller extends Controller
             'sdate' => $sdate,
             'edate' => date("Y-m-d"),
             'items' => SLib::getItems(),
-			'ord_types'     => SLib::getCodes('G_ORD_TYPE')
+			'ord_types'     => SLib::getCodes('G_ORD_TYPE'),
+			'sale_kinds'	=> SLib::getCodes('SALE_KIND'),
+			'pr_codes'		=> SLib::getCodes('PR_CODE'),
         ];
         return view( Config::get('shop.store.view') . '/sale/sal25',$values);
     }

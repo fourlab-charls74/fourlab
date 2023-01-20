@@ -54,6 +54,82 @@
             </div>
             <div class="card shadow">
                 <div class="card-header mb-0">
+                    <a href="#">메뉴권한</a>
+                </div>
+                <div class="card-body mt-1">
+                    <div class="row_wrap">
+                        <div class="row">
+                        <div class="col-12">
+                            <div class="table-box-ty2 mobile">
+                                <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                    <tbody>
+										<tr>
+											<th>원가 보여주기</th>
+											<td style="width:35%;">
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="wonga_y" name="wonga_yn" value="Y" @if(@$store_group_authority->wonga_yn == 'Y') checked @endif/>
+														<label class="custom-control-label" for="wonga_y">사용함</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="wonga_n" name="wonga_yn" value="N" @if(@$store_group_authority->wonga_yn == 'N') checked @endif/>
+														<label class="custom-control-label" for="wonga_n">사용안함</label>
+													</div>
+												</div>
+											</td>
+											<th>타매장 감추기</th>
+											<td style="width:35%;">
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="other_store_y" name="other_store_yn" value="Y" @if(@$store_group_authority->other_store_yn == 'Y') checked @endif/>
+														<label class="custom-control-label" for="other_store_y">사용함</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="other_store_n" name="other_store_yn" value="N" @if(@$store_group_authority->other_store_yn == 'N') checked @endif/>
+														<label class="custom-control-label" for="other_store_n">사용안함</label>
+													</div>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th>출고가 보여주기</th>
+											<td>
+                                                <div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="release_price_y" name="release_price_yn" value="Y" @if(@$store_group_authority->release_price_yn == 'Y') checked @endif/>
+														<label class="custom-control-label" for="release_price_y">사용함</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="release_price_n" name="release_price_yn" value="N" @if(@$store_group_authority->release_price_yn == 'N') checked @endif/>
+														<label class="custom-control-label" for="release_price_n">사용안함</label>
+													</div>
+												</div>
+											</td>
+											<th>POS 사용여부</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="pos_use_y" name="pos_use_yn" value="Y" @if(@$store_group_authority->pos_use_yn == 'Y') checked @endif/>
+														<label class="custom-control-label" for="pos_use_y">사용함</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="pos_use_n" name="pos_use_yn" value="N" @if(@$store_group_authority->pos_use_yn == 'N') checked @endif/>
+														<label class="custom-control-label" for="pos_use_n">사용안함</label>
+													</div>
+												</div>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow">
+                <div class="card-header mb-0">
                     <a href="#">그룹사용자</a>
                 </div>
                 <div class="card-body pt-2">
@@ -62,21 +138,7 @@
                         </div>
                     </div>
                     <div class="table-responsive">
-                        <div id="div-gd" style="height:250px;width:100%;" class="ag-theme-balham"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="card shadow">
-                <div class="card-header mb-0">
-                    <a href="#">메뉴 권한</a>
-                </div>
-                <div class="card-body pt-2">
-                    <div class="card-title">
-                        <div class="filter_wrap">
-                        </div>
-                    </div>
-                    <div class="table-responsive">
-                        <div id="div-gd2" style="height:250px;width:100%;" class="ag-theme-balham"></div>
+                        <div id="div-gd" style="height:300px;width:100%;" class="ag-theme-balham"></div>
                     </div>
                 </div>
             </div>
@@ -135,33 +197,6 @@
             hide: true
         },
     ];
-    const columns2 = [{
-            field: "role",
-            headerName: "권한",
-            cellRenderer: params => {
-                var input = document.createElement('input');
-                input.type = "checkbox";
-                input.checked = params.value;
-                input.addEventListener('click', function(event) {
-                    params.value = !params.value;
-                    params.node.data.role = (params.value) ? 1 : 0;
-                    params.node.data.editable = 'Y';
-                });
-                return input;
-            },
-            cellClass: 'hd-grid-code'
-        },
-        {
-            field: "pid",
-            headerName: "프로그램ID",
-            width: 150
-        },
-        {
-            field: "kor_nm",
-            headerName: "메뉴명",
-            width: 150
-        }
-    ];
 </script>
 
 <script>
@@ -189,7 +224,7 @@
         }
 
         var frm = $('form');
-        //console.log(frm.serialize());
+        console.log(frm.serialize());
 
         if (code == "") {
             $.ajax({
@@ -274,19 +309,13 @@
     const pApp = new App('', {
         gridId: "#div-gd",
     });
-    const pApp2 = new App('', {
-        gridId: "#div-gd2",
-    });
+   
     let gx;
-    let gx2;
 
     $(document).ready(function() {
         let gridDiv = document.querySelector(pApp.options.gridId);
-        let gridDiv2 = document.querySelector(pApp2.options.gridId);
         gx = new HDGrid(gridDiv, columns);
-        gx2 = new HDGrid(gridDiv2, columns2);
         Search();
-        Search2();
     });
 
     function Search() {
@@ -294,10 +323,6 @@
         gx.Request('/store/system/sys03/' + code + '/search', data);
     }
 
-    function Search2() {
-        let data = '';
-        gx2.Request('/store/system/sys03/' + code + '/menu-search', data);
-    }
 </script>
 
 @stop

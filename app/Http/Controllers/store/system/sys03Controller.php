@@ -45,9 +45,19 @@ class sys03Controller extends Controller
             ";
         $user = DB::selectOne($sql, array("code" => $code));
 
+        $query = "
+            select 
+                group_no, wonga_yn, other_store_yn, release_price_yn, pos_use_yn
+            from store_group_authority
+            where group_no = $code
+        ";
+
+        $store_group_authority = DB::selectOne($query);
+
         $values = [
             'code' => $code,
             'mgr_group' => $user,
+            'store_group_authority' => $store_group_authority,
         ];
 
         return view(Config::get('shop.store.view') . '/system/sys03_show', $values);
@@ -89,8 +99,13 @@ class sys03Controller extends Controller
         $group_no = $request->input('group_no');
         $group_nm = $request->input('group_nm');
         $group_nm_eng = $request->input('group_nm_eng');
+        $wonga_yn = $request->input('wonga_yn');
+        $other_store_yn = $request->input('other_store_yn');
+        $release_price_yn = $request->input('release_price_yn');
+        $pos_use_yn = $request->input('pos_use_yn');
 
         $id = Auth::guard('head')->user()->id;
+
 
         $user_cnt = DB::table('mgr_group')
             ->where('group_nm', $group_nm)->count();
@@ -105,12 +120,23 @@ class sys03Controller extends Controller
             ];
 
             try {
-                DB::transaction(function () use (&$result, $mgr_group) {
-                    DB::table('mgr_group')->insert($mgr_group);
-                });
+                DB::beginTransaction();
+
+                $groupno = DB::table('mgr_group')->insertGetId($mgr_group);
+
+                DB::table('store_group_authority')->insert([
+                    'group_no' => $groupno,
+                    'wonga_yn' => $wonga_yn,
+                    'other_store_yn' => $other_store_yn,
+                    'release_price_yn' => $release_price_yn,
+                    'pos_use_yn' => $pos_use_yn
+                ]);
+
+                DB::commit();
                 $code = 200;
                 $msg = "";
             } catch (Exception $e) {
+                DB::rollBack();
                 $code = 500;
                 $msg = $e->getMessage();
             }
@@ -209,25 +235,4 @@ class sys03Controller extends Controller
         ]);
     }
 
-
-    public function menu_search($code, Request $req)
-    {
-
-        $sql =
-            /** @lang text */
-            "
-            select
-                pid, kor_nm
-            from mgr_controller
-        ";
-        $rows = DB::select($sql, array("code" => $code));
-
-        return response()->json([
-            "code" => 200,
-            "head" => array(
-                "total" => count($rows)
-            ),
-            "body" => $rows
-        ]);
-    }
 }

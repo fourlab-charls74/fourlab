@@ -108,25 +108,30 @@
                             </div>
                         </div>
                     </div>
-
 					<div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="">판매유형</label>
-                                <div class="form-inline inline_btn_box">
-                                    <input type='hidden' id="sell_nm" name="sell_nm">
-                                    <select id="sell_type" name="sell_type[]" class="form-control form-control-sm select2-sellType multi_select" multiple></select>
-                                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-sellType"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                <label for="sell_type">판매유형</label>
+                                <div class="flax_box">
+                                    <select id="sell_type" name="sell_type[]" class="form-control form-control-sm multi_select w-100" multiple>
+                                        <option value=''>전체</option>
+                                        @foreach ($sale_kinds as $sale_kind)
+                                        <option value='{{ $sale_kind->code_id }}'>{{ $sale_kind->code_val }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="">행사코드</label>
-                                <div class="form-inline inline_btn_box">
-                                    <input type='hidden' id="pr_code_nm" name="pr_code_nm">
-                                    <select id="pr_code" name="pr_code[]" class="form-control form-control-sm select2-prcode multi_select" multiple></select>
-                                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-prcode"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                <label for="pr_code">행사코드</label>
+                                <div class="flax_box">
+                                    <select id="pr_code" name="pr_code[]" class="form-control form-control-sm multi_select w-100" multiple>
+                                        <option value=''>전체</option>
+                                        @foreach ($pr_codes as $pr_code)
+                                        <option value='{{ $pr_code->code_id }}'>{{ $pr_code->code_val }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -201,6 +206,15 @@
             </div>
         </div>
     </form>
+    <!-- 원형 차트 -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="card-title">
+                <h6 class="m-0 font-weight-bold">매장별 매출 통계</h6>
+            </div>
+            <div id="chart" style="min-height:300px"></div>
+        </div>
+    </div>
     <!-- DataTales Example -->
     <div id="filter-area" class="card shadow-none mb-4 ty2 last-card">
         <div class="card-body shadow">
@@ -231,6 +245,7 @@
             </ul>
         </div>
     </div>
+    <script src="https://unpkg.com/ag-charts-community@2.1.0/dist/ag-charts-community.min.js"></script>
     <script type="text/javascript" charset="utf-8">
         let columns = [
             {headerName: "매장명", field: "store_nm", pinned:'left', aggSum:"합계", aggAvg:"평균",width:170,
@@ -244,8 +259,8 @@
                     let s_brand = $("[name=brand_cd]").val() || '';
                     let s_goods_nm = $("[name=goods_nm]").val();
                     let store_cd = $('.select2-store').val();
-                    let sell_type = $('.select2-sellType').val();
-                    let pr_code = $('.select2-prcode').val();
+                    let sell_type = $('#sell_type').val();
+                    let pr_code = $('#pr_code').val();
                     return '<a href="/store/sale/sal24?store_cd='+ params.data.store_cd + '&sdate='+ s_date + '&edate='+ e_date + '&ord_type=' + s_ord_type + '&ord_state='+ s_ord_state + '&item='+ s_item + '&brand='+ s_brand + '&goods_nm='+ s_goods_nm + '&sell_type=' + sell_type + '&pr_code=' + pr_code + '" target="new">'+ params.value+'</a>';
                 }
             
@@ -310,8 +325,16 @@
             let gridDiv = document.querySelector(pApp.options.gridId);
             gx = new HDGrid(gridDiv, columns);
             Search();
-            
-
+        
+            // 판매유형 다중검색
+            $( ".sch-sellType" ).on("click", function() {
+                searchSellType.Open(null, "multiple");
+            });
+        
+            // 행사코드 다중검색
+            $( ".sch-prcode" ).on("click", function() {
+                searchPrCode.Open(null, "multiple");
+            });
         });
 
         function Search() {
@@ -320,18 +343,56 @@
                 "sum":"top",
                 "avg":"top"
             });
-            gx.Request('/store/sale/sal26/search', data);
+            gx.Request('/store/sale/sal26/search', data, -1, function(data){
+                chart_data = data.body;
+
+                darwCanvas();
+            });
         }
 
-        // 판매유형 다중검색
-        $( ".sch-sellType" ).on("click", function() {
-            searchSellType.Open(null, "multiple");
-        });
-      
-        // 행사코드 다중검색
-        $( ".sch-prcode" ).on("click", function() {
-            searchPrCode.Open(null, "multiple");
-        });
+       
+        function createChartData() {
+            if (chart_data.length === 0) return null;
+            const returnData = [];
+            let top_5 = chart_data.slice(0,5);
+            const keys = top_5;
+
+
+
+            //기본 데이터 생성
+            keys.forEach(function(data){
+
+                if (data === "평균" || data === "합계") return;
+
+                returnData.push({ label :data.store_nm,  value : data.sum_amt});
+
+            });
+
+            return returnData.filter(function(data){
+                if (data.value > 0) return true;
+                return false;
+            });
+        }
+
+        function darwCanvas() {
+            let chart_obj = createChartData();
+
+            var options = {
+                container: document.getElementById('chart'),
+                data: chart_obj,
+                series: [
+                {
+                    type: 'pie',
+                    angleKey: 'value',
+                    labelKey: 'label',
+                },
+                ],
+            };
+
+            $("#chart").html('');
+
+            agCharts.AgChart.create(options);
+        }
     </script>
 
 

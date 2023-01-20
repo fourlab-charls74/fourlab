@@ -479,6 +479,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('ord03/search','ord03Controller@search');
         Route::post('ord03/complete','ord03Controller@complete');
         Route::post('ord03/update/ord-kind','ord03Controller@update_ord_kind');
+        Route::get('ord03/show/{cmd}', 'ord03Controller@show_popup');
         Route::get('ord03/download/{cmd}', 'ord03Controller@download');
     });
 
@@ -630,7 +631,6 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::delete('sys03/{code}', 'sys03Controller@delete');
 
         Route::get('sys03/{code?}/search', 'sys03Controller@user_search');
-        Route::get('sys03/{code?}/menu-search', 'sys03Controller@menu_search');
 
     });
 
