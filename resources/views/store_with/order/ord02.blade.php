@@ -396,6 +396,10 @@
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
         },
+        {field: "sale_place", headerName: "판매처코드", hide: true,
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
         {field: "sale_place_nm", headerName: "판매처", width: 80, cellStyle: {'text-align': 'center'}, pinned: 'left',
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
@@ -713,7 +717,7 @@
             },
         }).then(function (res) {
             if(res.data.code === 200) {
-                if (res.data.failed_rows.length > 0) alert("온라인주문이 접수되었으나 재고부족 등의 사유로 접수처리에 실패한 주문건이 존재합니다.\n주문번호 확인 후 다시 시도해주세요.\n해당주문건 : " + res.data.failed_rows.join(", "));
+                if (res.data.failed_rows.length > 0) alert("온라인주문이 접수되었으나 재고부족, 온라인업체매칭안됨 등의 사유로 접수처리에 실패한 주문건이 존재합니다.\n주문번호 확인 후 다시 시도해주세요.\n해당주문건 : " + res.data.failed_rows.join(", "));
                 else alert("온라인주문이 정상적으로 접수되었습니다.");
 
                 Search();

@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
+const PRODUCT_STOCK_TYPE_STORAGE_OUT = 17; // (창고)출고
+const PRODUCT_STOCK_TYPE_STORE_RT = 15; // (매장)RT출고
+
 /** 온라인 주문접수 */
 class ord02Controller extends Controller
 {
@@ -359,7 +362,9 @@ class ord02Controller extends Controller
 			]);
 
 			foreach ($rows as $row) {
-				if (!isset($row['ord_no']) || !isset($row['ord_opt_no'])) {
+				$o_store_cd = '';
+				$store_info = DB::table('store')->select('store_cd', 'store_nm')->where('sale_place_match_yn', 'Y')->where('com_id', $row['sale_place'] ?? '')->first();
+				if ($store_info == null || !isset($row['ord_no']) || !isset($row['ord_opt_no'])) {
 					array_push($failed_rows, $row['ord_no']);
 					continue;
 				}
@@ -472,6 +477,8 @@ class ord02Controller extends Controller
 		}
 
 		// 재고이력 등록
+		// type : 창고 -> (온라인매장으로)출고 / 매장 -> (온라인매장으로)RT출고
+		// 재고를 받는 온라인매장의 재고이력처리는 ord03controller에서 진행
 		DB::table('product_stock_hst')
 			->insert([
 				'goods_no' => $goods_no,
@@ -479,13 +486,13 @@ class ord02Controller extends Controller
 				'goods_opt' => $goods_opt,
 				'location_cd' => $location_cd,
 				'location_type' => $location_type,
-				'type' => 17, // 재고분류 : 출고
+				'type' => ($location_type === 'STORE' ? PRODUCT_STOCK_TYPE_STORE_RT : PRODUCT_STOCK_TYPE_STORAGE_OUT), // 재고분류 : 매장RT출고(15) / 창고출고(17)
 				'price' => $ord_price,
 				'wonga' => $wonga,
 				'qty' => $ord_qty * -1,
 				'stock_state_date' => date('Ymd'),
 				'ord_opt_no' => $ord_opt_no,
-				'comment' => ($location_type === 'STORE' ? '매장' : '창고') . '출고(온라인배송)',
+				'comment' => ($location_type === 'STORE' ? '매장RT' : '창고') . '출고(온라인배송)',
 				'rt' => now(),
 				'admin_id' => $user['id'],
 				'admin_nm' => $user['name'],

@@ -15,6 +15,11 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 
+const PRODUCT_STOCK_TYPE_STORE_IN = 1; // (매장)입고
+const PRODUCT_STOCK_TYPE_STORE_SALE = 2; // (매장)주문
+const PRODUCT_STOCK_TYPE_STORE_RT = 15; // (매장)RT
+const PRODUCT_STOCK_TYPE_STORAGE_OUT = 17; // (창고)출고
+
 const HEAD = 'HEAD';
 const STORAGE = 'STORAGE';
 
@@ -416,7 +421,7 @@ class ord03Controller extends Controller
 						]);
 
 					// 재고처리
-					$this->update_stock($row);
+					$this->update_stock($row, $user);
 
 					// 배송문자발송
 					$msg_yn = "N";
@@ -467,12 +472,18 @@ class ord03Controller extends Controller
 	}
 
 	/** 배송처리 시 실재고 차감처리 */
-	private function update_stock($row)
+	private function update_stock($row, $user)
 	{
 		$prd_cd = $row['prd_cd'] ?? '';
+		$goods_no = $row['goods_no'] ?? '';
+		$goods_opt = $row['goods_opt'] ?? '';
+		$ord_price = $row['price'] ?? '';
+		$ord_opt_no = $row['ord_opt_no'] ?? '';
 		$ord_qty = $row['qty'] ?? 0;
+		$wonga = $row['wonga'] ?? 0;
 		$location_type = $row['dlv_location_type'] ?? '';
 		$location_cd = $row['dlv_location_cd'] ?? '';
+		$sale_place = $row['sale_place'] ?? '';
 		
 		// 실재고 차감
 		if ($location_type === 'STORE') {
@@ -492,6 +503,79 @@ class ord03Controller extends Controller
 					'ut' => now(),
 				]);
 		}
+
+		if ($sale_place == '') return;
+
+		// 온라인매장 입고 및 판매처리
+		$o_store_cd = '';
+		$store_info = DB::table('store')->select('store_cd', 'store_nm')->where('sale_place_match_yn', 'Y')->where('com_id', $sale_place)->first();
+		if ($store_info != null) $o_store_cd = $store_info->store_cd;
+
+		$stock_cnt = DB::table('product_stock_store')->where('prd_cd', '=', $prd_cd)->where('store_cd', '=', $o_store_cd)->count();
+		if ($stock_cnt < 1) {
+			DB::table('product_stock_store')
+				->insert([
+					'goods_no' => $goods_no,
+					'prd_cd' => $prd_cd,
+					'store_cd' => $o_store_cd,
+					'qty' => 0,
+					'wqty' => 0,
+					'goods_opt' => $goods_opt,
+					'use_yn' => 'Y',
+					'rt' => now(),
+				]);
+		} else {
+			DB::table('product_stock_store')
+				->where('prd_cd', '=', $prd_cd)
+				->where('store_cd', '=', $o_store_cd)
+				->update([
+					'ut' => now(),
+				]);
+		}
+
+		DB::table('product_stock')
+			->where('prd_cd', '=', $prd_cd)
+			->update([
+				'ut' => now(),
+			]);
+
+		DB::table('product_stock_hst')
+			->insert([
+				'goods_no' => $goods_no,
+				'prd_cd' => $prd_cd,
+				'goods_opt' => $goods_opt,
+				'location_cd' => $o_store_cd,
+				'location_type' => 'STORE',
+				'type' => ($location_type === 'STORE' ? PRODUCT_STOCK_TYPE_STORE_RT : PRODUCT_STOCK_TYPE_STORE_IN), // 재고분류 : 매장RT입고(15) / 매장입고(1)
+				'price' => $ord_price,
+				'wonga' => $wonga,
+				'qty' => $ord_qty,
+				'stock_state_date' => date('Ymd'),
+				'ord_opt_no' => $ord_opt_no,
+				'comment' => ($location_type === 'STORE' ? '매장RT' : '매장') . '입고(온라인배송)',
+				'rt' => now(),
+				'admin_id' => $user['id'],
+				'admin_nm' => $user['name'],
+			]);
+
+		DB::table('product_stock_hst')
+			->insert([
+				'goods_no' => $goods_no,
+				'prd_cd' => $prd_cd,
+				'goods_opt' => $goods_opt,
+				'location_cd' => $o_store_cd,
+				'location_type' => 'STORE',
+				'type' => PRODUCT_STOCK_TYPE_STORE_SALE, // 재고분류 : 매장주문(2)
+				'price' => $ord_price,
+				'wonga' => $wonga,
+				'qty' => $ord_qty * -1,
+				'stock_state_date' => date('Ymd'),
+				'ord_opt_no' => $ord_opt_no,
+				'comment' => '매장주문(온라인배송)',
+				'rt' => now(),
+				'admin_id' => $user['id'],
+				'admin_nm' => $user['name'],
+			]);
 	}
 
 	/** 
@@ -639,13 +723,13 @@ class ord03Controller extends Controller
 					'goods_opt' => $goods_opt,
 					'location_cd' => $location_cd,
 					'location_type' => $location_type,
-					'type' => 17, // 재고분류 : 출고 (취소)
+					'type' => ($location_type === 'STORE' ? PRODUCT_STOCK_TYPE_STORE_RT : PRODUCT_STOCK_TYPE_STORAGE_OUT), // 재고분류 : 매장RT출고취소(15) / 창고출고취소(17)
 					'price' => $price,
 					'wonga' => $wonga,
 					'qty' => $ord_qty,
 					'stock_state_date' => date('Ymd'),
 					'ord_opt_no' => $ord_opt_no,
-					'comment' => ($location_type === 'STORE' ? '매장' : '창고') . '출고취소(온라인배송)',
+					'comment' => ($location_type === 'STORE' ? '매장RT' : '창고') . '출고취소(온라인배송)',
 					'rt' => now(),
 					'admin_id' => $user['id'],
 					'admin_nm' => $user['name'],
