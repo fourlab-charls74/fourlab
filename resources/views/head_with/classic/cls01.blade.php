@@ -129,15 +129,14 @@
             {headerName: "이벤트", field: "title", width:200},
             {headerName: "이미지", field: "thumb_img", cellClass: 'hd-grid-code',
                 cellRenderer: function(params) {
-                            return '<img style="width:50%; height:auto;" class="img" src="' + params.value +'"/>';
+                            return '<img style="width:50%; height:auto;" class="img" src="' + params.data.thumb_img +'"/>';
                         }},
             {headerName: "제목", field: "subject",width:500,
                 cellRenderer: function (params) {
                             if (params.value !== undefined) {
                                 return '<a href="/head/classic/cls01/show/'+params.data.idx+'">' + params.value + '</a>';
-
                             }
-                        }},
+            }},
             {headerName: "작성자", field: "admin_nm", width:100},
             {headerName: "공개여부", field: "use_yn", cellClass: 'hd-grid-code'},
             {headerName: "등록일시", field: "regi_date", width:130},

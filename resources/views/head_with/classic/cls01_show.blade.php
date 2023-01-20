@@ -79,7 +79,11 @@
                                                         <label class="custom-control-label" for="useyn1">예</label>
                                                     </div>
                                                     <div class="custom-control custom-radio">
+                                                        @if ($type=='edit')
+                                                        <input type="radio" name="useyn" id="useyn2" class="custom-control-input" value="N" {{ (@$evt_notice[0]->use_yn=="N") ? "checked" : "" }}/>
+                                                        @else
                                                         <input type="radio" name="useyn" id="useyn2" class="custom-control-input" value="N"/>
+                                                        @endif
                                                         <label class="custom-control-label" for="useyn2">아니요</label>
                                                     </div>
                                                 </div>
@@ -87,11 +91,16 @@
                                             <th>이벤트</th>
                                             <td>
                                                 <div class="input_box">
+                                                    @if ($type=='edit')
+                                                    <input type="hidden" name="evt_idx" value="{{$evt_notice[0]->evt_idx}}">
+                                                    @else            
+                                                    <input type="hidden" name="evt_idx" value="">
+                                                    @endif
                                                     <button onclick="select_event();return false;" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm mr-1" style="float:left;">선택</button>
                                                     @if ($type=='edit')
                                                     <div id="evt_nm" style="float:left;line-height:25px;">{{$evt_notice[0]->title}}</div>
                                                     @else
-                                                    <div id="evt_nm" style="float:left;line-height:25px;">피엘라벤 클래식 코리아 2022</div>                
+                                                    <div id="evt_nm" style="float:left;line-height:25px;"></div>                
                                                     @endif
                                                 </div>
                                             </td>
@@ -115,7 +124,7 @@
                                                     <li>
                                                         <span id="preview_thumb_img" style="width:352px; height:352px; border:1px solid #b3b3b3; display:block;">
                                                         @if ($type=='edit')
-                                                        <img src="{{$evt_notice[0]->thumb_img}}" style="width:330px; height:330px;">
+                                                        <img src="{{$evt_notice[0]->thumb_img}}" style="width:352px; height:352px;">
                                                         @else
                                                         @endif
                                                         </span>
@@ -252,67 +261,84 @@
         formData.append('type', type);
         console.log(type);
 
-        
-        let url = window.location.pathname;
-        url = url.split('/');
-        let idx = url[url.length - 1];
-        console.log(idx);
-
-        formData.append('idx', idx);
-
+        if ( type=='add' ) {
+            $.ajax({
+                method: 'post',
+                url: '/head/classic/cls01/create',
+                processData: false,
+                contentType: false,
+                data: formData,
+                success: function (data) {
+                    // var res = jQuery.parseJSON(data);
+                    if(data.code == 200){
+                        // console.log(data.code);
+                        // console.log(data.msg);
+                        alert('공지사항이 등록 되었습니다.');
+                        document.location.href = '/head/classic/cls01'
+                    } else {
+                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                    }
+                },
+                error: function(res, status, error) {
+                    // res_err = jQuery.parseJSON(res.responseText);
+                    if(res_err.message){
+                        alert(res_err.message);
+                    }
+                    console.log(error);
+                }
+            });
+        } else if ( type == 'edit' ) {
+            $.ajax({
+                method: 'post',
+                url: '/head/classic/cls01/update/{{@$evt_notice[0]->idx}}',
+                processData: false,
+                contentType: false,
+                data: formData,
+                success: function (data) {
+                    // var res = jQuery.parseJSON(data);
+                    if(data.code == 200){
+                        alert('공지사항이 수정 되었습니다.');
+                        document.location.href = '/head/classic/cls01'
+                    } else {
+                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                    }
+                },
+                error: function(res, status, error) {
+                    // res_err = jQuery.parseJSON(res.responseText);
+                    if(res_err.message){
+                        alert(res_err.message);
+                    }
+                    console.log(error);
+                }
+            });
+        }
+    }
+    
+    function Destroy() {
+        var frm = $('form');
+		if(! confirm("삭제 하시겠습니까?")){
+			return false;
+		}
 
         $.ajax({
-            method: 'post',
-            url: '/head/classic/cls01/create',
-            processData: false,
-            contentType: false,
-            data: formData,
+            async: true,
+            method: 'get',
+            url: '/head/classic/cls01/del/{{@$evt_notice[0]->idx}}',
+            data: frm.serialize(),
             success: function (data) {
                 // var res = jQuery.parseJSON(data);
                 if(data.code == 200){
-                    // console.log(data.code);
-                    // console.log(data.msg);
-					alert('공지사항이 등록 되었습니다.');
-					document.location.href = '/head/classic/cls01'
+					alert('공지사항이 삭제되었습니다.');
+                    document.location.href = '/head/classic/cls01'
                 } else {
                     alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
                 }
             },
-            error: function(res, status, error) {
-                // res_err = jQuery.parseJSON(res.responseText);
-                if(res_err.message){
-                    alert(res_err.message);
-                }
-                console.log(error);
+            error: function(request, status, error) {
+                console.log("error")
             }
         });
     }
-    
-    // function Destroy() {
-    //     var frm = $('form');
-	// 	if(! confirm("삭제 하시겠습니까?")){
-	// 		return false;
-	// 	}
-
-    //     $.ajax({
-    //         async: true,
-    //         method: 'get',
-    //         url: '/head/classic/cls01/del',
-    //         data: frm.serialize(),
-    //         success: function (data) {
-    //             var res = jQuery.parseJSON(data);
-    //             if(res.code == '200'){
-	// 				alert('공지사항이 삭제되었습니다.');
-    //                 document.location.href = '/head/promotion/prm11'
-    //             } else {
-    //                 alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-    //             }
-    //         },
-    //         error: function(request, status, error) {
-    //             console.log("error")
-    //         }
-    //     });
-    // }
 
 
     let target_file = null;

@@ -4,30 +4,33 @@
 
 <div class="show_layout py-3">
 	<form method="get" name="search">
-        <div class="card shadow">
-            <div class="card-header mb-0">
-                <a href="#">트레킹 이벤트</a>
-            </div>
-            <div class="card-body mt-1">
-                <div class="row_wrap">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="table-box-ty2 mobile">
-                                <table class="table incont table-bordered" width="100%" cellspacing="0">
-                                    <colgroup>
-                                        <col width="30%">
-                                    </colgroup>
-                                    <tbody>
-                                        <tr>
-                                            <th>트레킹 제목</th>
-                                            <td>
-                                                <div class="input_box">
-                                                    <input type="text" name="s_title" class="form-control form-control-sm search-all">
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+        <!-- <input type="hidden" name="_token" value="BeO990XVmBSAPsl70eYvZSSdM18z8FThhXQDStZ0"> -->
+        <div class="card_wrap aco_card_wrap">
+            <div class="card shadow">
+                <div class="card-header mb-0">
+                    <a href="#">트레킹 이벤트</a>
+                </div>
+                <div class="card-body mt-1">
+                    <div class="row_wrap">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="table-box-ty2 mobile">
+                                    <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                        <colgroup>
+                                            <col width="30%">
+                                        </colgroup>
+                                        <tbody>
+                                            <tr>
+                                                <th>트레킹 제목</th>
+                                                <td>
+                                                    <div class="input_box">
+                                                        <input type="text" name="s_title" class="form-control form-control-sm search-all">
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -77,6 +80,7 @@
 			}
 		},
         {headerName: "이벤트 코드", field: "idx", hide:true },
+        { width: "auto" }
 	];
 
     //보기
@@ -97,19 +101,33 @@
     // var App = function(id,options){
     //     this.options = options;
     // };
+
+    // const pApp = new App('', { gridId: "#div-gd" });
+    // const gridDiv = document.querySelector(pApp.options.gridId);
+    // const gx = new HDGrid(gridDiv, columns);
+    // pApp.ResizeGrid();
+    // pApp.BindSearchEnter();
+
+    // $(function() {
+    //     Search();
+    // });
+
+    //기존
     const pApp = new App('', { gridId: "#div-gd" });
     let gx;
 
     $(document).ready(function() {
-        pApp.ResizeGrid();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
+        pApp.ResizeGrid();
+        pApp.BindSearchEnter();
         Search();
     });
 
     function Search() {
         let data = $('form[name="search"]').serialize();
-        gx.Request('/head/classic/clsc01/event-search', data);
+        // gx.Request('/head/classic/cls01/event-search', data);
+        gx.Request('/head/classic/cls01/event-search', data, 1);
     }
 </script>
 @stop
