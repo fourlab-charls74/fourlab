@@ -105,7 +105,7 @@
 											<th class="required">매장종류</th>
 											<td>
 												<div class="flex_box">
-													<select name='store_kind' class="form-control form-control-sm">
+													<select id='store_kind' name='store_kind' class="form-control form-control-sm">
 														<option value=''>전체</option>
 														@foreach ($store_kinds as $store_kind)
 															<option value='{{ $store_kind->code_id }}' @if(@$store->store_kind == $store_kind->code_id) selected @endif>{{ $store_kind->code_val }}</option>
@@ -609,16 +609,18 @@
 														<input type="radio" class="custom-control-input" id="sale_place_match_n" name="sale_place_match_yn" value="N" @if(@$store->sale_place_match_yn != 'Y') checked @endif />
 														<label class="custom-control-label" for="sale_place_match_n">N</label>
 													</div>
+													&nbsp;&nbsp;&nbsp;
+													<select name='com_id' id="com_id" class="form-control form-control-sm" style="width:70%;">
+														<option value=''>전체</option>
+															@foreach ($store_match as $sm)
+																<option value='{{ $sm->com_id }}' @if(@$store->com_id == $sm->com_id) selected @endif @if(@$sm->s_match != '') disabled style="background: #d2d2d2;" @endif>{{ $sm->com_nm }}</option>
+															@endforeach
+													</select>
 												</div>
 											</td>
-											<th id="com_select">업체선택</th>
-											<td id="com_select2">
-												<select name='com_id' id="com_id" class="form-control form-control-sm">
-													<option value=''>전체</option>
-														@foreach ($store_match as $sm)
-															<option value='{{ $sm->com_id }}' @if(@$store->com_id == $sm->com_id) selected @endif @if(@$sm->s_match != '') disabled style="background: #d2d2d2;" @endif>{{ $sm->com_nm }}</option>
-														@endforeach
-												</select>
+											<th></th>
+											<td>
+												
 											</td>
 										</tr>
 									</tbody>
@@ -891,28 +893,26 @@
 	const getMapCode = () => {
 			var geocoder = new kakao.maps.services.Geocoder();
 			let address = document.getElementById('addr1').value;
-			return new Promise((resolve, reject) => {
-				geocoder.addressSearch(address, async function(result, status) {
-					if (status === await kakao.maps.services.Status.OK) {
-						resolve({y: result[0].y, x: result[0].x});
-					} else {
-						reject(result);
-					}
+			let store_kind = $('select[name=store_kind] option:selected').val();
+			let store_type = $('select[name=store_type] option:selected').val();
+
+			// if (!address) return;
+			if (store_kind != 02 || store_type != 11) {
+				return new Promise((resolve, reject) => {
+					geocoder.addressSearch(address, async function(result, status) {
+						if (status === await kakao.maps.services.Status.OK) {
+							resolve({y: result[0].y, x: result[0].x});
+						} else {
+							reject(result);
+						}
+					});
 				});
-			});
+			}
 		}
 		
     // 매장정보 등록
     async function addStore() {
-		
-		// 매칭매장 선택
-		if ($("input[name='sale_place_match_yn']:checked").val() == 'Y' && $('#com_id').val() == '') {
-            
-            return alert('매칭할 업체를 선택해주세요.');
-        }
-
 		let res = await getMapCode();
-
 		let form = new FormData(document.querySelector("#f1"));
 		
 		for(let i = 0; i< $("#btnAdd")[0].files.length; i++) {
@@ -949,17 +949,10 @@
             console.log(err);
         });
     }
+
     // 매장정보 수정
     async function updateStore() {
-
-		// 매칭매장 선택
-		if ($("input[name='sale_place_match_yn']:checked").val() == 'Y' && $('#com_id').val() == '') {
-					
-            return alert('매칭할 업체를 선택해주세요.');
-        }
-
 		let res = await getMapCode();
-
 		let form = new FormData(document.querySelector("#f1"));
 
 		for (let i = 0; i< $("#btnAdd")[0].files.length; i++) {
@@ -975,7 +968,7 @@
         axios({
             url: `/store/standard/std02/update`,
             method: 'post',
-            data: form,
+            data: form
         }).then(function (res) {
             if(res.data.code === 200) {
                 alert(res.data.msg);
@@ -991,9 +984,10 @@
 				alert("업로드 가능한 파일의 크기는 2MB입니다.\n2MB보다 작은 파일을 업로드해주세요");
 			}
         }).catch(function (err) {
-            console.log(err);
-        });
+			console.log(err);
+		})
     }
+
     // 매장정보 삭제
     async function deleteStore() {
         if(!window.confirm("매장정보를 삭제하시겠습니까?")) return;
@@ -1085,6 +1079,12 @@
 			f1.store_area.focus();
 			return alert("매장지역을 선택해주세요.");
 		}
+
+		// 매칭매장 선택
+		if ($("input[name='sale_place_match_yn']:checked").val() == 'Y' && $('#com_id').val() == '') {
+			return alert('매칭할 업체를 선택해주세요.');
+		}
+
 		// 주소 입력여부
 		if(f1.zipcode.value === '') return alert("주소를 입력해주세요.");
 		return true;
@@ -1093,31 +1093,21 @@
 	//온라인업체매칭
     $(document).ready(function() {
         if($("input[name='sale_place_match_yn']:checked").val() == 'Y'){
-            $('#com_select').show();
-            $('#com_select2').show();
+            $('#com_id').show();
         } else {
-            $('#com_select').hide();
-            $('#com_select2').hide();
+            $('#com_id').hide();
         }
 
         $("input[name='sale_place_match_yn']").change(function(){
             let match = $("input[name='sale_place_match_yn']:checked").val();
 
             if (match == 'Y') {
-                $('#com_select').show();
-            	$('#com_select2').show();
+                $('#com_id').show();
             } else {
-                $('#com_select').hide();
-            	$('#com_select2').hide();
+                $('#com_id').hide();
             }
 
         });
-
-
-		// if($('#com_id').attr("disabled") == ture) {
-			// $('#com_id').css('background', 'yellow');
-		// }
-		
     });
 
 

@@ -354,10 +354,8 @@
         function createChartData() {
             if (chart_data.length === 0) return null;
             const returnData = [];
-            let top_5 = chart_data.slice(0,5);
-            const keys = top_5;
-
-
+            let column_cnt = chart_data.slice(0,10);
+            const keys = column_cnt;
 
             //기본 데이터 생성
             keys.forEach(function(data){
