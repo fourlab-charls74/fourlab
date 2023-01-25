@@ -129,7 +129,7 @@ class cls01Controller extends Controller
 		return view( Config::get('shop.head.view') . '/classic/cls01_event_show');
 	}
 
-	//이벤트 검색 (수정 중)
+
 	public function event_search(Request $request){
 		$stitle			= $request->input("s_title");
 
@@ -139,8 +139,6 @@ class cls01Controller extends Controller
 
 		$where = "";
 		if ( $stitle != "" ) $where .= " and a.title like '%" . Lib::quote($stitle) . "%' ";
-
-		// dd($where);
 
 		if ($page < 1 or $page == "") $page = 1;
 		$page_size = $limit;
@@ -256,7 +254,6 @@ class cls01Controller extends Controller
 		$subject		= $request->input("subject");
 		$comment		= $request->input("comment");
 		$content		= $request->input("content");
-		// dd($request->all());
 
 		$base_path = "/images/fjallraven_event/notice/thumb";
 
@@ -330,7 +327,6 @@ class cls01Controller extends Controller
 		";
 
 		$evt_notice = DB::select($notice_query);
-		// dd($evt_notice);
 
 		$values = [
 			'type'		 => $type,

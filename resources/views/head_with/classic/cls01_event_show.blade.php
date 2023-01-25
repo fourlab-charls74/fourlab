@@ -24,7 +24,7 @@
                                                 <th>트레킹 제목</th>
                                                 <td>
                                                     <div class="input_box">
-                                                        <input type="text" name="s_title" class="form-control form-control-sm search-all">
+                                                        <input type="text" name="s_title" class="form-control form-control-sm search-all" onkeypress="if(event.keyCode=='13'){event.preventDefault(); Search();}">
                                                     </div>
                                                 </td>
                                             </tr>
@@ -98,21 +98,6 @@
 	}
 </script>
 <script type="text/javascript" charset="utf-8">
-    // var App = function(id,options){
-    //     this.options = options;
-    // };
-
-    // const pApp = new App('', { gridId: "#div-gd" });
-    // const gridDiv = document.querySelector(pApp.options.gridId);
-    // const gx = new HDGrid(gridDiv, columns);
-    // pApp.ResizeGrid();
-    // pApp.BindSearchEnter();
-
-    // $(function() {
-    //     Search();
-    // });
-
-    //기존
     const pApp = new App('', { gridId: "#div-gd" });
     let gx;
 
@@ -126,7 +111,6 @@
 
     function Search() {
         let data = $('form[name="search"]').serialize();
-        // gx.Request('/head/classic/cls01/event-search', data);
         gx.Request('/head/classic/cls01/event-search', data, 1);
     }
 </script>

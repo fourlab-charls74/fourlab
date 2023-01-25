@@ -129,7 +129,7 @@
             {headerName: "이벤트", field: "title", width:200},
             {headerName: "이미지", field: "thumb_img", cellClass: 'hd-grid-code',
                 cellRenderer: function(params) {
-                            return '<img style="width:50%; height:auto;" class="img" src="' + params.data.thumb_img +'"/>';
+                            return '<img style=" height:100%; width:auto;" class="img" src="' + params.data.thumb_img +'"/>';
                         }},
             {headerName: "제목", field: "subject",width:500,
                 cellRenderer: function (params) {

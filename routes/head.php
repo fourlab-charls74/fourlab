@@ -1183,8 +1183,6 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::get('cls01/del/{idx?}', 'cls01Controller@delete');
         Route::get('cls01/show/{idx?}', 'cls01Controller@show');
         Route::get('cls01/event-pop', 'cls01Controller@event_list');
-        
-        //작업중
         Route::get('cls01/event-search', 'cls01Controller@event_search');
     });
 
