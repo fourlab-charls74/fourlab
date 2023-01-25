@@ -154,8 +154,29 @@ class sys03Controller extends Controller
         $group_nm = $request->input('group_nm');
         $group_nm_eng = $request->input('group_nm_eng');
         $roles = (object)json_decode($request->input('roles'));
+        $wonga_yn = $request->input('wonga_yn');
+        $other_store_yn = $request->input('other_store_yn');
+        $release_price_yn = $request->input('release_price_yn');
+        $pos_use_yn = $request->input('pos_use_yn');
+
 
         $admin_id = Auth::guard('head')->user()->id;
+
+        $store_group_authority = [
+            'group_no' => $code,
+            'wonga_yn' => $wonga_yn,
+            'other_store_yn' => $other_store_yn,
+            'release_price_yn' => $release_price_yn,
+            'pos_use_yn' => $pos_use_yn
+        ];
+
+        $store_group_authority_update = [
+            'wonga_yn' => $wonga_yn,
+            'other_store_yn' => $other_store_yn,
+            'release_price_yn' => $release_price_yn,
+            'pos_use_yn' => $pos_use_yn
+        ];
+
 
         $mgr_group = [
             'group_nm' => $group_nm,
@@ -165,7 +186,7 @@ class sys03Controller extends Controller
         ];
 
         try {
-            DB::transaction(function () use (&$result, $code, $mgr_group, $roles) {
+            DB::transaction(function () use (&$result, $code, $mgr_group, $roles, $store_group_authority,$store_group_authority_update) {
                 DB::table('mgr_group')
                     ->where('group_no', '=', $code)
                     ->update($mgr_group);
@@ -183,6 +204,26 @@ class sys03Controller extends Controller
                                 'id' => $id
                             ]);
                     }
+                }
+
+                $sql = "
+                    select
+                        group_no
+                    from store_group_authority
+                    where group_no = $code
+                ";
+
+                $res = DB::select($sql);
+
+                // dd($res);
+
+                if ($res == null) {
+                    
+                    DB::table('store_group_authority')->insert($store_group_authority);
+                } else {
+                    DB::table('store_group_authority')
+                        ->where('group_no', '=', $code)
+                        ->update($store_group_authority_update);
                 }
             });
             $code = 200;
