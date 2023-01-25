@@ -222,13 +222,23 @@ class cls01Controller extends Controller
 		try {
 			DB::beginTransaction();
 			
-			$sql= "
-					insert into evt_notice (
-						evt_idx, subject, comment, content, admin_id, admin_nm, admin_email, use_yn, regi_date, thumb_img
-					) values (
-						'$evt_idx', '$subject', '$comment', '$content', '$adminId', '$name', '$email', '$useyn', now(), '$title_img_url'
-					)
-			";
+			if(isset($title_img_url)){
+				$sql= "
+						insert into evt_notice (
+							evt_idx, subject, comment, content, admin_id, admin_nm, admin_email, use_yn, regi_date, thumb_img
+						) values (
+							'$evt_idx', '$subject', '$comment', '$content', '$adminId', '$name', '$email', '$useyn', now(), '$title_img_url'
+						)
+				";
+			} else {
+				$sql= "
+						insert into evt_notice (
+							evt_idx, subject, comment, content, admin_id, admin_nm, admin_email, use_yn, regi_date
+						) values (
+							'$evt_idx', '$subject', '$comment', '$content', '$adminId', '$name', '$email', '$useyn', now()
+						)
+				";
+			}
 	
 			DB::insert($sql);
 			DB::commit();
@@ -283,7 +293,7 @@ class cls01Controller extends Controller
 
 		try {
 			DB::beginTransaction();
-			if ( $img_file != null &&  $img_file != "" ){
+			if ( isset($title_img_url) ) {
 				$sql = "
 						update evt_notice set
 							admin_id='$adminId', evt_idx='$evt_idx', subject='$subject', comment='$comment', content='$content', admin_nm='$name', admin_email='$email', use_yn='$useyn', modi_date=now(), thumb_img='$title_img_url'
@@ -341,7 +351,7 @@ class cls01Controller extends Controller
 						->where('idx', $idx)
 						->value('thumb_img');
 			
-		if ( $beforeImg != null && $img_file != "" ) {
+		if ( $beforeImg != null && $beforeImg != "" ) {
 			$imgPathArr = explode('/', $beforeImg);
 			$cnt = count($imgPathArr);
 			Storage::disk('public')->delete($base_path.'/'.$imgPathArr[$cnt-1]);
@@ -356,6 +366,6 @@ class cls01Controller extends Controller
 			$code = 500;
 			$msg = $e->getMessage();
 		}
-        return response()->json(['code' => $code, 'message' => $msg]);
+        return response()->json(['code' => $code, 'message' => $msg], $code);
     }
 }

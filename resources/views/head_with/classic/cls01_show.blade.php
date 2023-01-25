@@ -259,7 +259,7 @@
         
         let type = "<?=$type?>";
         formData.append('type', type);
-        console.log(type);
+        // console.log(type);
 
         if ( type=='add' ) {
             $.ajax({
@@ -268,23 +268,17 @@
                 processData: false,
                 contentType: false,
                 data: formData,
-                success: function (data) {
-                    // var res = jQuery.parseJSON(data);
-                    if(data.code == 200){
-                        // console.log(data.code);
-                        // console.log(data.msg);
+                success: function (res) {
+                    if(res.code === 200) {
                         alert('공지사항이 등록 되었습니다.');
                         document.location.href = '/head/classic/cls01'
                     } else {
                         alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
                     }
                 },
-                error: function(res, status, error) {
-                    // res_err = jQuery.parseJSON(res.responseText);
-                    if(res_err.message){
-                        alert(res_err.message);
-                    }
-                    console.log(error);
+                error: function(request, status, error) {
+                    alert("에러가 발생했습니다.");
+                    console.log(request);
                 }
             });
         } else if ( type == 'edit' ) {
@@ -294,21 +288,17 @@
                 processData: false,
                 contentType: false,
                 data: formData,
-                success: function (data) {
-                    // var res = jQuery.parseJSON(data);
-                    if(data.code == 200){
+                success: function (res) {
+                    if(res.code === 200) {
                         alert('공지사항이 수정 되었습니다.');
                         document.location.href = '/head/classic/cls01'
                     } else {
                         alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
                     }
                 },
-                error: function(res, status, error) {
-                    // res_err = jQuery.parseJSON(res.responseText);
-                    if(res_err.message){
-                        alert(res_err.message);
-                    }
-                    console.log(error);
+                error: function(request, status, error) {
+                    alert("에러가 발생했습니다.");
+                    console.log(request);
                 }
             });
         }
@@ -325,9 +315,8 @@
             method: 'get',
             url: '/head/classic/cls01/del/{{@$evt_notice[0]->idx}}',
             data: frm.serialize(),
-            success: function (data) {
-                // var res = jQuery.parseJSON(data);
-                if(data.code == 200){
+            success: function (res) {
+                if(res.code === 200) {
 					alert('공지사항이 삭제되었습니다.');
                     document.location.href = '/head/classic/cls01'
                 } else {
@@ -335,11 +324,10 @@
                 }
             },
             error: function(request, status, error) {
-                console.log("error")
+                console.log(request);
             }
         });
     }
-
 
     let target_file = null;
 

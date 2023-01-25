@@ -25,7 +25,7 @@
                     <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="formrow-firstname-input">등록일 : </label>
+                                <label for="formrow-firstname-input">등록일</label>
                                 <div class="form-inline">
                                     <div class="docs-datepicker form-inline-inner input_box">
                                         <div class="input-group">
@@ -55,7 +55,7 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="">트레킹 이벤트 : </label>
+                                <label for="">트레킹 이벤트</label>
                                 <div class="flax_box">
                                     <select name='evtTitle' class="form-control form-control-sm">
                                         <option value=''>전체</option>
@@ -68,7 +68,7 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="">제목 : </label>
+                                <label for="">제목</label>
                                 <div class="flax_box">
                                     <input type='text' class="form-control form-control-sm search-all search-enter" name='subject' value=''>
                                 </div>
@@ -78,7 +78,7 @@
                     <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                            <label for="">내용 : </label>
+                            <label for="">내용</label>
                             <div class="flax_box">
                                 <input type='text' class="form-control form-control-sm search-all search-enter" name='content' value=''>
                             </div>
@@ -86,13 +86,46 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="">공개여부 : </label>
+                                <label for="">공개여부</label>
                                 <div class="flax_box">
                                     <select name='use_yn' class="form-control form-control-sm">
                                         <option value=''>전체</option>
                                         <option value='Y'>예</option>
                                         <option value='N'>아니요</option>
                                     </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 inner-td">
+                            <div class="form-group">
+                                <label for="item">자료수/정렬</label>
+                                <div class="form-inline">
+                                    <div class="form-inline-inner input_box" style="width:24%;">
+                                        <select name="limit" class="form-control form-control-sm">
+                                            <option value="10" >10</option>
+                                            <option value="20" >20</option>
+                                            <option value="30" >30</option>
+                                        </select>
+                                    </div>
+                                    <span class="text_line">/</span>
+                                    <div class="form-inline-inner input_box" style="width:45%;">
+                                        <select name="ord_field" class="form-control form-control-sm">
+                                            <option value="b.title" selected>이벤트</option>
+                                            <option value="a.subject" >제목</option>
+                                            <option value="a.admin_nm" >작성자</option>
+                                            <option value="a.use_yn" >공개여부</option>
+                                            <option value="a.regi_date" >등록일시</option>
+                                            <option value="e.cnt" >조회수</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
+                                        <div class="btn-group" role="group">
+                                            <label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="" data-original-title="내림차순"><i class="bx bx-sort-down"></i></label>
+                                            <label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="" data-original-title="오름차순"><i class="bx bx-sort-up"></i></label>
+                                        </div>
+                                        <input type="radio" name="ord" id="sort_desc" value="desc" checked="">
+                                        <input type="radio" name="ord" id="sort_asc" value="asc">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -129,7 +162,7 @@
             {headerName: "이벤트", field: "title", width:200},
             {headerName: "이미지", field: "thumb_img", cellClass: 'hd-grid-code',
                 cellRenderer: function(params) {
-                            return '<img style=" height:100%; width:auto;" class="img" src="' + params.data.thumb_img +'"/>';
+                            return '<img style=" width:50%; height:auto;" class="img" src="' + params.data.thumb_img +'"/>';
                         }},
             {headerName: "제목", field: "subject",width:500,
                 cellRenderer: function (params) {

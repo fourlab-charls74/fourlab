@@ -1185,5 +1185,4 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::get('cls01/event-pop', 'cls01Controller@event_list');
         Route::get('cls01/event-search', 'cls01Controller@event_search');
     });
-
 });

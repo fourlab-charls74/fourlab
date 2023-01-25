@@ -24,7 +24,7 @@
                                                 <th>트레킹 제목</th>
                                                 <td>
                                                     <div class="input_box">
-                                                        <input type="text" name="s_title" class="form-control form-control-sm search-all" onkeypress="if(event.keyCode=='13'){event.preventDefault(); Search();}">
+                                                        <input type="text" name="s_title" class="form-control form-control-sm search-all" onkeypress="EnterKey();">
                                                     </div>
                                                 </td>
                                             </tr>
@@ -42,7 +42,7 @@
 				<div class="card-title">
 					<div class="filter_wrap">
 						<div class="fl_box">
-							<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">7</span>건</h6>
+							<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary"></span>건</h6>
 						</div>
 					</div>
 				</div>
@@ -67,14 +67,9 @@
 		{headerName:"트레킹", field:"title", width:250},
 		{headerName:"참여",	field:"join_cnt", width:60,
             type:'numberType'},
-		{headerName:"시작일", field:"start_date", width:80},
-		{headerName:"마감일", field:"end_date", width:80},
-        {headerName: "보기", field: "view",	width:60,
-            cellRenderer: function(params) {
-				return `<a href="javascript:ViewEvent('` + params.data.idx + `')">` + "보기" + `</a>`;
-			}
-		},
-        {headerName: "선택", field: "slct",	width:60,
+		{headerName:"시작일", field:"start_date", width:80, cellClass: 'hd-grid-code'},
+		{headerName:"마감일", field:"end_date", width:80, cellClass: 'hd-grid-code'},
+        {headerName: "선택", field: "slct",	width:60, cellClass: 'hd-grid-code', 
             cellRenderer: function(params) {
 				return `<a href="javascript:SelectEvent('` + params.data.idx + `','` + params.data.title + `')">` + "선택" + `</a>`;
 			}
@@ -83,12 +78,6 @@
         { width: "auto" }
 	];
 
-    //보기
-	function ViewEvent(idx) {
-        // const url='주소' + idx;
-        // window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
-	}
-
     //선택
 	function SelectEvent(idx,nm) {
 		window.opener.document.f1.evt_idx.value = idx;
@@ -96,6 +85,14 @@
 
 		self.close();
 	}
+
+    //엔터키 검색
+    function EnterKey(){
+        if(event.keyCode=='13'){
+            event.preventDefault();
+            Search();
+        }
+    }
 </script>
 <script type="text/javascript" charset="utf-8">
     const pApp = new App('', { gridId: "#div-gd" });
@@ -111,7 +108,7 @@
 
     function Search() {
         let data = $('form[name="search"]').serialize();
-        gx.Request('/head/classic/cls01/event-search', data, 1);
+        gx.Request('/head/classic/cls01/event-search', data);
     }
 </script>
 @stop
