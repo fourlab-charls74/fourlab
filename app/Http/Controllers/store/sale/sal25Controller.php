@@ -17,11 +17,11 @@ class sal25Controller extends Controller
     public function index() {
 
         $mutable = Carbon::now();
-        $sdate	= sprintf("%s",$mutable->sub(6, 'month')->format('Y-m-d'));
+        $sdate	= sprintf("%s",$mutable->sub(6, 'month')->format('Y-m'));
 
         $values = [
             'sdate' => $sdate,
-            'edate' => date("Y-m-d"),
+            'edate' => date("Y-m"),
             'items' => SLib::getItems(),
 			'ord_types'     => SLib::getCodes('G_ORD_TYPE'),
 			'sale_kinds'	=> SLib::getCodes('SALE_KIND'),
@@ -32,8 +32,8 @@ class sal25Controller extends Controller
 
     public function search(Request $request){
 
-        $sdate = str_replace("-","",$request->input('sdate',Carbon::now()->sub(12, 'month')->format('Ymd')));
-        $edate = str_replace("-","",$request->input('edate',date("Ymd")));
+        $sdate = str_replace("-","",$request->input('sdate',Carbon::now()->sub(12, 'month')->format('Ym')));
+        $edate = str_replace("-","",$request->input('edate',date("Ym")));
 
         $brand_cd = $request->input("brand_cd", "");
         $goods_nm = $request->input("goods_nm");

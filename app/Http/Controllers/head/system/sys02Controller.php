@@ -225,16 +225,26 @@ class sys02Controller extends Controller
 
         $id = Auth::guard('head')->user()->id;
 
-        $sql = "
-            select
-                *
-            from mgr_controller
-            where menu_no = '$entry'
-        ";
+        if ($entry != null) {
+            if ($entry == 'entry_menu') {
+                $entry = 1;
+                $lev = 1;
+            } else {
+                $sql = "
+                    select
+                        *
+                    from mgr_controller
+                    where menu_no = '$entry'
+                ";
+                $result = DB::selectOne($sql);
+                $lev = $result->lev + 1;
+            }
+           
+        } else {
+            $entry = 1;
+            $lev = 0;
+        }
 
-        $result = DB::selectOne($sql);
-
-        $lev = $result->lev + 1;
 
         $user_cnt = DB::table('mgr_controller')
             ->where('pid', $pid)->count();
@@ -289,16 +299,22 @@ class sys02Controller extends Controller
 
         $id = Auth::guard('head')->user()->id;
 
-        $sql = "
-            select
-                *
-            from mgr_controller
-            where menu_no = '$entry'
-        ";
+        if ($entry == 'entry_menu') {
+            $entry = 1;
+            $lev = 1;
+        } else {
+            $sql = "
+                select
+                    *
+                from mgr_controller
+                where menu_no = '$entry'
+            ";
+    
+            $result = DB::selectOne($sql);
+    
+            $lev = $result->lev + 1;
+        }
 
-        $result = DB::selectOne($sql);
-
-        $lev = $result->lev + 1;
 
         $mgr_controller = [
             'entry' => $entry,

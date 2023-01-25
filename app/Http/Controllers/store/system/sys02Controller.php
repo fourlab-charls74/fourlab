@@ -66,7 +66,7 @@ class sys02Controller extends Controller
                 "
                 select *
                 from store_controller a
-                where entry = :entry and kind = 'M' order by seq            
+                where entry = :entry and kind = 'M' order by regi_date desc            
             ";
             $stmt2 = $pdo->prepare($sql);
             $stmt2->execute(["entry" => $row["menu_no"]]);
@@ -75,6 +75,8 @@ class sys02Controller extends Controller
                 $pmenu[] = $row2;
             }
         }
+
+        // dd($pmenu);
 
         $values = [
             'code' => '',
@@ -226,22 +228,58 @@ class sys02Controller extends Controller
         $id = Auth::guard('head')->user()->id;
 
         if ($entry != null) {
-
-            $sql = "
-                select
-                    *
-                from store_controller
-                where menu_no = '$entry'
-            ";
-
-            $result = DB::selectOne($sql);
-            $lev = $result->lev + 1;
-
+            if ($entry == 'entry_menu') {
+                $entry = 1;
+                $lev = 1;
+            } else {
+                $sql = "
+                    select
+                        *
+                    from store_controller
+                    where menu_no = '$entry'
+                ";
+                $result = DB::selectOne($sql);
+                $lev = $result->lev + 1;
+            }
+           
         } else {
-            $entry = 0;
+            $entry = 1;
             $lev = 0;
         }
 
+        
+        // if ($entry == 'entry_menu') {
+        //     $query = "
+        //         select
+        //             count(*) as cnt
+        //         from store_controller
+        //         where entry = 1
+        //     ";
+            
+        //     $res = DB::selectOne($query);
+
+        //     if ($res->cnt == 1) {
+        //         $seq = 1;
+        //     } else {
+        //         $seq = $res->cnt + 1;
+        //     }
+        // } else {
+        //     $query = "
+        //         select
+        //             count(*) as cnt
+        //         from store_controller
+        //         where entry = '$entry'
+        //     ";
+            
+        //     $res = DB::selectOne($query);
+
+        //     if ($res->cnt == 1) {
+        //         $seq = 1;
+        //     } else {
+        //         $seq = $res->cnt + 1;
+        //     }
+        // }
+       
         $user_cnt = DB::table('store_controller')
             ->where('pid', $pid)->count();
         if ($user_cnt == 0) {
@@ -249,6 +287,7 @@ class sys02Controller extends Controller
             $store_controller = [
                 'entry' => $entry,
                 'pid' => $pid,
+                // 'seq' => $seq,
                 'kor_nm' => $kor_nm,
                 'eng_nm' => $eng_nm,
                 'kind' => $kind,
@@ -295,16 +334,21 @@ class sys02Controller extends Controller
 
         $id = Auth::guard('head')->user()->id;
 
-        $sql = "
-            select
-                *
-            from store_controller
-            where menu_no = '$entry'
-        ";
-
-        $result = DB::selectOne($sql);
-
-        $lev = $result->lev + 1;
+        if ($entry == 'entry_menu') {
+            $entry = 1;
+            $lev = 1;
+        } else {
+            $sql = "
+                select
+                    *
+                from store_controller
+                where menu_no = '$entry'
+            ";
+    
+            $result = DB::selectOne($sql);
+    
+            $lev = $result->lev + 1;
+        }
 
         $store_controller = [
             'entry' => $entry,

@@ -52,6 +52,7 @@ class prd04Controller extends Controller
 		$match_yn = $request->input('match_yn1');
 
 		$where		= "";
+		$having = "";
 		$in_store_sql	= "";
 		$store_qty_sql	= "(ps.qty - ps.wqty)";
 		$next_store_qty_sql = "";
@@ -130,7 +131,7 @@ class prd04Controller extends Controller
 		}
 
 		if($ext_store_storage_qty == 'Y') {
-			$where .= "and wqty > 0 or $store_qty_sql > 0";
+			$having .= "having (wqty > 0 or $store_qty_sql > 0)";
 		}
 
 		$page_size	= $limit;
@@ -183,6 +184,7 @@ class prd04Controller extends Controller
 						c.code_kind_cd = 'PRD_CD_COLOR'
 						$where
 					group by pc.prd_cd
+					$having
 				) a
 			";
 
@@ -244,6 +246,7 @@ class prd04Controller extends Controller
 				c.code_kind_cd = 'PRD_CD_COLOR' 
 				$where
 			group by pc.prd_cd
+			$having
 			$orderby
 			$limit
 		";
