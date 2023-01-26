@@ -221,14 +221,20 @@ class Order
 
     }
 */
-    public function DlvProc($dlv_series_no, $ord_state = 10){
+    public function DlvProc($dlv_series_no, $ord_state = 10, $prd_cd = ''){
+		$values = [
+			'ord_state' => $ord_state,
+			'dlv_series_no' => $dlv_series_no,
+			'dlv_proc_date' => DB::raw('now()')
+		];
+
+		if ($prd_cd != '') {
+			$values = array_merge($values, ['prd_cd' => $prd_cd]);
+		}
+
         DB::table('order_opt')
             ->where("ord_opt_no", "=", $this->ord_opt_no)
-            ->update([
-                'ord_state' => $ord_state,
-                'dlv_series_no' => $dlv_series_no,
-                'dlv_proc_date' => DB::raw('now()')
-            ]);
+            ->update($values);
 
         $this->SetOrderState($ord_state);
     }
@@ -371,6 +377,7 @@ class Order
     public function DlvLog( $ord_state ){
 
         $log_flag = true;
+		$prd_cd = '';
 
         //
         //	order_opt_wonga 테이블에 ord_state : 30 상태인 건 체크하여 원가 로그 작성
@@ -378,11 +385,12 @@ class Order
         //
         if( $ord_state == ORD_STATE_DLV_FINISH )
         {
-            $sql = "select qty from order_opt where ord_opt_no = '$this->ord_opt_no'";
+            $sql = "select qty, prd_cd from order_opt where ord_opt_no = '$this->ord_opt_no'";
 
             $row = DB::selectOne($sql);
 
             $order_qty = $row->qty;
+			$prd_cd = $row->prd_cd;
 
             $sql = "
                 select sum(qty) as qty from order_opt_wonga where ord_opt_no = '$this->ord_opt_no' and ord_state = '$ord_state'
@@ -411,13 +419,13 @@ class Order
             goods_no, goods_sub, ord_opt_no, goods_opt, qty, wonga, price
             , dlv_amt, dlv_ret_amt, dlv_add_amt, dlv_enc_amt, dlv_pay_amt, recv_amt, point_apply_amt, coupon_apply_amt, dc_apply_amt
             , com_id, com_rate, ord_state, ord_kind, ord_type, invoice_no
-            , ord_state_date, coupon_no, com_coupon_ratio, sales_com_fee
+            , ord_state_date, coupon_no, com_coupon_ratio, sales_com_fee, prd_cd
             )
             select
             goods_no, goods_sub, ord_opt_no, goods_opt, qty, wonga, price
             , dlv_amt, dlv_ret_amt, dlv_add_amt, dlv_enc_amt, dlv_pay_amt, recv_amt, point_apply_amt, coupon_apply_amt, dc_apply_amt
             , com_id, com_rate, '$ord_state' ord_state, ord_kind, ord_type, invoice_no
-            , date_format(now(),'%Y%m%d') as ord_state_date, coupon_no, com_coupon_ratio, sales_com_fee
+            , date_format(now(),'%Y%m%d') as ord_state_date, coupon_no, com_coupon_ratio, sales_com_fee, '$prd_cd' as prd_cd
             from order_opt_wonga
             where ord_opt_no = '$this->ord_opt_no' and ord_state = '$pre_state'
         ";

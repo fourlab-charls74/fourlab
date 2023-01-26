@@ -12,6 +12,8 @@ use App\Models\SMS;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 
@@ -779,7 +781,7 @@ class ord03Controller extends Controller
 		$sql = "select cn as name, name as value from columns where type = '$col_type' and use_yn = 'Y' order by use_seq";
 		$fields = DB::select($sql);
 
-			$values = [
+		$values = [
 			'columns' => $columns,
 			'fields' => $fields,
 		];
@@ -790,12 +792,17 @@ class ord03Controller extends Controller
 	/** 택배송장일괄입력 팝업 show */
 	public function show_batch(Request $request)
 	{
+		$user_group = TEST_USER_GROUP; // 추후 로직적용 필요
+
 		$conf   = new Conf();
         $cfg_dlv_cd = $conf->getConfigValue("delivery","dlv_cd");
+
+		$dlv_locations = $this->_get_dlv_locations($user_group);
 
 		$values = [
 			'dlv_cd' => $cfg_dlv_cd,
 			'dlvs' => SLib::getCodes('DELIVERY'), // 택배사목록
+			'dlv_locations'	=> $dlv_locations, // 배송처
 		];
 		return view( Config::get('shop.store.view') . '/order/ord03_batch', $values );
 	}
@@ -1291,5 +1298,108 @@ class ord03Controller extends Controller
 			$msg = $e->getMessage();
 			return response()->json(['code' => $code, 'msg' => $msg], $code);
 		}
+	}
+
+	/** 택배송장일괄입력 엑셀파일 적용 */
+	public function batch_import(Request $request)
+	{
+		if (count($_FILES) > 0) {
+			if ( 0 < $_FILES['file']['error'] ) {
+				return response()->json(['code' => '0', 'message' => 'Error: ' . $_FILES['file']['error']], 200);
+			}
+			else {
+				$file = $request->file('file');
+				$now = date('YmdHis');
+				$user_id = Auth::guard('head')->user()->id;
+				$extension = $file->extension();
+	
+				$save_path = "data/store/ord03/";
+				$file_name = "${now}_${user_id}.${extension}";
+
+                if (!Storage::disk('public')->exists($save_path)) {
+					Storage::disk('public')->makeDirectory($save_path);
+				}
+	
+				$file = sprintf("${save_path}%s", $file_name);
+				move_uploaded_file($_FILES['file']['tmp_name'], $file);
+	
+				return response()->json(['code' => '1', 'file' => $file], 200);
+			}
+		}
+	}
+
+	/** 주문일련번호로 온라인주문접수목록 조회 */
+	public function batch_search_orders(Request $request)
+	{
+		$user_group = TEST_USER_GROUP; // 추후 로직적용 필요
+
+        $data = $request->input('data', []);
+		$opt_nos = join(',', array_map(function($row) { return $row['ord_opt_no'] ?? ''; }, $data));
+		$cols = array_column($data, 'dlv_no', 'ord_opt_no');
+
+		$dlv_locations = $this->_get_dlv_locations($user_group);
+		$qty_sql = "";
+		foreach ($dlv_locations as $loc) {
+			$qty_sql .= ", (select qty from product_stock_$loc->location_type where " . $loc->location_type . "_cd = '$loc->location_cd' and prd_cd = pc.prd_cd) as "  . $loc->seq . "_" . $loc->location_type . "_" . $loc->location_cd . "_qty ";
+		}
+
+		$sql = "
+			select a.*
+				, os.code_val as ord_state_nm
+				, round((1 - (a.price * (1 - if(st.amt_kind = 'per', st.sale_per, 0) / 100)) / a.goods_sh) * 100) as dc_rate
+				, sk.code_val as sale_kind_nm, pr.code_val as pr_code_nm
+				, ot.code_val as ord_type_nm, ok.code_val as ord_kind_nm
+				, bk.code_val as baesong_kind, com.com_nm as sale_place_nm
+				, pt.code_val as pay_type_nm, ps.code_val as pay_stat_nm
+				, mu.name as req_nm
+				, 0 as result
+			from (
+				select 
+					rcp.or_cd, rcp.or_prd_cd, rc.rel_order, rc.req_id, rcp.comment as receipt_comment
+					, rcp.state, rcp.dlv_location_type, rcp.dlv_location_cd, rcp.rt as receipt_date
+					, if(rcp.dlv_location_type = 'STORAGE', (select storage_nm from storage where storage_cd = rcp.dlv_location_cd), (select store_nm from store where store_cd = rcp.dlv_location_cd)) as dlv_location_nm
+					, o.ord_no, o.ord_opt_no, o.goods_no, g.goods_nm, g.goods_nm_eng, g.style_no, o.goods_opt
+					, pc.prd_cd, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color, pc.size
+					, o.wonga, o.price, g.price as goods_price, g.goods_sh, o.qty, o.dlv_no
+					, o.pay_type, o.dlv_amt, o.point_amt, o.coupon_amt, o.dc_amt, o.recv_amt
+					, o.sale_place, o.store_cd, o.ord_state, o.clm_state, o.com_id, o.baesong_kind as dlv_baesong_kind, o.ord_date
+					, o.sale_kind, o.pr_code, o.sales_com_fee, o.ord_type, o.ord_kind, p.pay_stat, p.pay_date
+					, concat(ifnull(om.user_nm, ''), '(', ifnull(om.user_id, ''), ')') as user_nm, om.r_nm
+					$qty_sql
+				from order_receipt_product rcp
+					inner join order_receipt rc on rc.or_cd = rcp.or_cd
+					inner join order_opt o on o.ord_opt_no = rcp.ord_opt_no
+					inner join order_mst om on om.ord_no = o.ord_no
+					inner join product_code pc on pc.prd_cd = rcp.prd_cd
+					inner join goods g on g.goods_no = o.goods_no
+					left outer join payment p on p.ord_no = o.ord_no
+				where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
+					and o.clm_state in (-30,1,90,0)
+					and o.ord_opt_no in ($opt_nos)
+				order by rc.or_cd desc
+			) a
+				left outer join code sk on sk.code_kind_cd = 'SALE_KIND' and sk.code_id = a.sale_kind
+				left outer join code pr on pr.code_kind_cd = 'PR_CODE' and pr.code_id = a.pr_code
+				left outer join code os on os.code_kind_cd = 'G_ORD_STATE' and os.code_id = a.ord_state
+				left outer join code ot on ot.code_kind_cd = 'G_ORD_TYPE' and ot.code_id = a.ord_type
+				left outer join code ok on ok.code_kind_cd = 'G_ORD_KIND' and ok.code_id = a.ord_kind
+				left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = a.dlv_baesong_kind
+				left outer join code pt on pt.code_kind_cd = 'G_PAY_TYPE' and pt.code_id = a.pay_type
+				left outer join code ps on ps.code_kind_cd = 'G_PAY_STAT' and ps.code_id = a.pay_stat
+				left outer join sale_type st on st.sale_kind = a.sale_kind and st.use_yn = 'Y'
+				left outer join company com on com.com_type = '4' and com.use_yn = 'Y' and com.com_id = a.sale_place
+				inner join mgr_user mu on mu.id = a.req_id
+		";
+		$result = DB::select($sql);
+
+		foreach ($result as $re) {
+			$re->dlv_no = $cols[$re->ord_opt_no] ?? '';
+		}
+
+		return response()->json([
+            "code" => 200,
+			"head" => [],
+            "body" => $result,
+        ]);
 	}
 }

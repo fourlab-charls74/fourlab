@@ -592,7 +592,7 @@
                         }
                         gx.setFocusedWorkingCell();
                     }
-                    e.node.data.goods_no_group === null ? e.node.setSelected(true) : e.node.parent.setSelected(true);
+                    e.node.data.ord_opt_no_group === null ? e.node.setSelected(true) : e.node.parent.setSelected(true);
                 }
                 if (e.column.colId === "comment" && e.oldValue !== e.newValue) {
                     if (e.node.parent.level >= 0) {
@@ -609,7 +609,7 @@
                         e.api.redrawRows({ rowNodes:[...e.node.parent.allLeafChildren, e.node.parent] });
                         gx.setFocusedWorkingCell();
                     }
-                    e.node.data.goods_no_group === null ? e.node.setSelected(true) : e.node.parent.setSelected(true);
+                    e.node.data.ord_opt_no_group === null ? e.node.setSelected(true) : e.node.parent.setSelected(true);
                 }
             },
             isRowSelectable: (params) => {

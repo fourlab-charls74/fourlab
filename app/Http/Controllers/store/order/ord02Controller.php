@@ -392,7 +392,7 @@ class ord02Controller extends Controller
 						'admin_nm' => $user['name']
 					];
 					$order->AddStateLog($state_log);
-					$order->DlvProc($dlv_series_no, $ord_state);
+					$order->DlvProc($dlv_series_no, $ord_state, $row['prd_cd'] ?? '');
 
 					// 온라인주문접수 상품리스트 등록
 					DB::table('order_receipt_product')->insert([
