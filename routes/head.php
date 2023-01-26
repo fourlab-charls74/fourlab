@@ -1184,5 +1184,8 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::get('cls01/show/{idx?}', 'cls01Controller@show');
         Route::get('cls01/event-pop', 'cls01Controller@event_list');
         Route::get('cls01/event-search', 'cls01Controller@event_search');
+
+        //숙소예약 관리
+        Route::get('cls02', 'cls02Controller@index');
     });
 });

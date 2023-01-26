@@ -273,7 +273,8 @@
             <li data-menu-kind="M" data-menu-id="classic" class="d-none">
                 <a href="javascript:;" class="arrow"><i class="bx bx-task fs-18"></i><span>(개)클래식</span></a>
                 <ul>
-                    <li data-menu-kind="M" data-menu-id="classic01" class="d-none"><a href="/head/classic/cls01">(개)공지사항</a></li>
+                    <li data-menu-kind="M" data-menu-id="cls01" class="d-none"><a href="/head/classic/cls01">(개)공지사항</a></li>
+                    <li data-menu-kind="M" data-menu-id="cls02" class="d-none"><a href="/head/classic/cls02">(개)숙소예약관리</a></li>
                 </ul>
             </li>
         </ul>
