@@ -68,6 +68,7 @@
                                                 <td>
                                                     <div class="flax_box">
                                                         <select name="entry" id="entry" class="form-control form-control-sm">
+                                                            <option value="entry_menu">상위메뉴</option>
                                                             @foreach($pmenus as $pmenu)
                                                                 <option value="{{$pmenu["menu_no"]}}" @if($pmenu["menu_no"] === @$menu->entry) selected @endif>
                                                                     @if($pmenu["lev"] === 2)&nbsp;&nbsp;&nbsp;&nbsp;> @endif{{$pmenu["kor_nm"]}}</option>

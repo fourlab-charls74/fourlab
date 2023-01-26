@@ -68,7 +68,7 @@
 											<td style="width:35%;">
 												<div class="form-inline form-radio-box">
 													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="wonga_y" name="wonga_yn" value="Y" @if(@$store_group_authority->wonga_yn == 'Y') checked @endif/>
+														<input type="radio" class="custom-control-input" id="wonga_y" name="wonga_yn" value="Y" checked @if(@$store_group_authority->wonga_yn == 'Y') checked @endif/>
 														<label class="custom-control-label" for="wonga_y">사용함</label>
 													</div>
 													<div class="custom-control custom-radio">
@@ -81,7 +81,7 @@
 											<td style="width:35%;">
 												<div class="form-inline form-radio-box">
 													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="other_store_y" name="other_store_yn" value="Y" @if(@$store_group_authority->other_store_yn == 'Y') checked @endif/>
+														<input type="radio" class="custom-control-input" id="other_store_y" name="other_store_yn" value="Y" checked @if(@$store_group_authority->other_store_yn == 'Y') checked @endif/>
 														<label class="custom-control-label" for="other_store_y">사용함</label>
 													</div>
 													<div class="custom-control custom-radio">
@@ -96,7 +96,7 @@
 											<td>
                                                 <div class="form-inline form-radio-box">
 													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="release_price_y" name="release_price_yn" value="Y" @if(@$store_group_authority->release_price_yn == 'Y') checked @endif/>
+														<input type="radio" class="custom-control-input" id="release_price_y" name="release_price_yn" value="Y" checked @if(@$store_group_authority->release_price_yn == 'Y') checked @endif/>
 														<label class="custom-control-label" for="release_price_y">사용함</label>
 													</div>
 													<div class="custom-control custom-radio">
@@ -109,7 +109,7 @@
 											<td>
 												<div class="form-inline form-radio-box">
 													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="pos_use_y" name="pos_use_yn" value="Y" @if(@$store_group_authority->pos_use_yn == 'Y') checked @endif/>
+														<input type="radio" class="custom-control-input" id="pos_use_y" name="pos_use_yn" value="Y" checked @if(@$store_group_authority->pos_use_yn == 'Y') checked @endif/>
 														<label class="custom-control-label" for="pos_use_y">사용함</label>
 													</div>
 													<div class="custom-control custom-radio">
@@ -119,6 +119,34 @@
 												</div>
 											</td>
 										</tr>
+                                        <tr>
+                                            <th>매장권한</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="auth_store_y" name="auth_store_yn" value="Y" @if(@$store_group_authority->pos_use_yn == 'Y') checked @endif/>
+														<label class="custom-control-label" for="auth_store_y">사용함</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="auth_store_n" name="auth_store_yn" value="N" checked @if(@$store_group_authority->pos_use_yn == 'N') checked @endif/>
+														<label class="custom-control-label" for="auth_store_n">사용안함</label>
+													</div>
+												</div>
+											</td>
+                                            <th>창고권한</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="auth_storage_y" name="auth_storage_yn" value="Y" @if(@$store_group_authority->pos_use_yn == 'Y') checked @endif/>
+														<label class="custom-control-label" for="auth_storage_y">사용함</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="auth_storage_n" name="auth_storage_yn" value="N" checked @if(@$store_group_authority->pos_use_yn == 'N') checked @endif/>
+														<label class="custom-control-label" for="auth_storage_n">사용안함</label>
+													</div>
+												</div>
+											</td>
+                                        </tr>
 									</tbody>
 								</table>
 							</div>

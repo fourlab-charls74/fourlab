@@ -909,6 +909,8 @@ CREATE TABLE `store_group_authority` (
   `other_store_yn` char(1) DEFAULT 'Y' COMMENT '타매장감추기',
   `release_price_yn` char(1) DEFAULT 'Y' COMMENT '출고가보여주기',
   `pos_use_yn` char(1) DEFAULT 'Y' COMMENT 'POS 사용여부',
+  `auth_store_yn` char(1) DEFAULT 'N' COMMENT '매장권한',
+  `auth_storage_yn` char(1) DEFAULT 'N' COMMENT '창고권한'
   PRIMARY KEY (`group_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

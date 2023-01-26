@@ -103,6 +103,8 @@ class sys03Controller extends Controller
         $other_store_yn = $request->input('other_store_yn');
         $release_price_yn = $request->input('release_price_yn');
         $pos_use_yn = $request->input('pos_use_yn');
+        $auth_store_yn = $request->input('auth_store_yn');
+        $auth_storage_yn = $request->input('auth_storage_yn');
 
         $id = Auth::guard('head')->user()->id;
 
@@ -129,7 +131,9 @@ class sys03Controller extends Controller
                     'wonga_yn' => $wonga_yn,
                     'other_store_yn' => $other_store_yn,
                     'release_price_yn' => $release_price_yn,
-                    'pos_use_yn' => $pos_use_yn
+                    'pos_use_yn' => $pos_use_yn,
+                    'auth_store_yn' => $auth_store_yn,
+                    'auth_storage_yn' => $auth_storage_yn
                 ]);
 
                 DB::commit();
@@ -158,7 +162,8 @@ class sys03Controller extends Controller
         $other_store_yn = $request->input('other_store_yn');
         $release_price_yn = $request->input('release_price_yn');
         $pos_use_yn = $request->input('pos_use_yn');
-
+        $auth_store_yn = $request->input('auth_store_yn');
+        $auth_storage_yn = $request->input('auth_storage_yn');
 
         $admin_id = Auth::guard('head')->user()->id;
 
@@ -167,14 +172,18 @@ class sys03Controller extends Controller
             'wonga_yn' => $wonga_yn,
             'other_store_yn' => $other_store_yn,
             'release_price_yn' => $release_price_yn,
-            'pos_use_yn' => $pos_use_yn
+            'pos_use_yn' => $pos_use_yn,
+            'auth_store_yn' => $auth_store_yn,
+            'auth_storage_yn' => $auth_storage_yn,
         ];
 
         $store_group_authority_update = [
             'wonga_yn' => $wonga_yn,
             'other_store_yn' => $other_store_yn,
             'release_price_yn' => $release_price_yn,
-            'pos_use_yn' => $pos_use_yn
+            'pos_use_yn' => $pos_use_yn,
+            'auth_store_yn' => $auth_store_yn,
+            'auth_storage_yn' => $auth_storage_yn,
         ];
 
 
