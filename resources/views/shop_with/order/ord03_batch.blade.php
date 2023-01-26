@@ -1,4 +1,4 @@
-@extends('store_with.layouts.layout-nav')
+@extends('shop_with.layouts.layout-nav')
 @section('title', '택배송장 일괄등록')
 @section('content')
 
@@ -306,7 +306,7 @@
         
         axios({
             method: 'post',
-            url: '/store/order/ord03/batch-import',
+            url: '/shop/order/ord03/batch-import',
             data: form_data,
             headers: {
                 "Content-Type": "multipart/form-data",
@@ -328,7 +328,7 @@
 
     const getOrders = async (rows, firstIndex) => {
         axios({
-            url: '/store/order/ord03/search-orders',
+            url: '/shop/order/ord03/search-orders',
             method: 'post',
             data: { data: rows },
         }).then(async (res) => {
@@ -353,7 +353,7 @@
         if(!confirm("일괄등록하신 주문건을 출고완료처리하시겠습니까?")) return;
 
         axios({
-            url: '/store/order/ord03/complete',
+            url: '/shop/order/ord03/complete',
             method: 'post',
             data: { 
                 send_sms_yn: $("#send_sms_yn:checked").val(),

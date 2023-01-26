@@ -26,7 +26,7 @@
                         <div class="dropdown-menu" style="">
                             <a class="dropdown-item d-flex align-items-center" href="javascript:void(0);" onclick="return exportDlvList();"><i class="bx bx-download fs-16 mr-1"></i> 배송목록 받기</a>
                             <a class="dropdown-item d-flex align-items-center" href="javascript:void(0);" onclick="return openDlvInvoicePopup();"><i class="bx bx-download fs-16 mr-1"></i> 택배송장목록 받기</a>
-                            <a class="dropdown-item d-flex align-items-center" href="javascript:void(0);"><i class="bx bx-download fs-16 mr-1"></i> 판매처 택배송장목록 받기</a>
+                            {{-- <a class="dropdown-item d-flex align-items-center" href="javascript:void(0);"><i class="bx bx-download fs-16 mr-1"></i> 판매처 택배송장목록 받기</a> --}}
                         </div>
                     </div>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
@@ -449,8 +449,8 @@
         {field: "ord_kind_nm", headerName: "출고구분", width: 60, cellStyle: StyleOrdKind},
         {field: "sale_place_nm", headerName: "판매처", width: 80, cellStyle: {'text-align': 'center'}},
         {field: "goods_no", headerName: "상품번호", width: 70, cellStyle: {'text-align': 'center'}},
-        {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {'text-align': 'center'}},
-        {field: "prd_cd_p", headerName: "코드일련", width: 90, cellStyle: {"text-align": "center"}},
+        {field: "prd_cd", headerName: "상품코드", width: 125, cellStyle: {'text-align': 'center'}},
+        {field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: {"text-align": "center"}},
         {field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: {'text-align': 'center'}},
         {field: "goods_nm", headerName: "상품명", width: 150,
             cellRenderer: function (params) {

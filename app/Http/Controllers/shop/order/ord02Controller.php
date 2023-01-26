@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
+const PRODUCT_STOCK_TYPE_STORAGE_OUT = 17; // (창고)출고
+const PRODUCT_STOCK_TYPE_STORE_RT = 15; // (매장)RT출고
+
 /** 온라인 주문접수 */
 class ord02Controller extends Controller
 {
@@ -67,8 +70,8 @@ class ord02Controller extends Controller
 
 	public function search(Request $request)
 	{
-		$sdate = $request->input('sdate', Carbon::now()->sub(1, 'week')->format("Ymd"));
-		$edate = $request->input('edate', Carbon::now()->format("Ymd"));
+		$sdate = $request->input('sdate', Carbon::now()->sub(3, 'day')->format("Y-m-d"));
+		$edate = $request->input('edate', Carbon::now()->format("Y-m-d"));
 		$ord_no = $request->input('ord_no', '');
 		$ord_state = $request->input('ord_state', ''); // 주문상태
 		$pay_stat = $request->input('pay_stat', ''); // 입금상태
@@ -77,7 +80,7 @@ class ord02Controller extends Controller
 		$ord_info_value = $request->input('ord_info_value', '');
 		$stat_pay_type = $request->input('stat_pay_type', ''); // 결제방법
 		$not_complex = $request->input('not_complex', 'N'); // 복합결제 제외여부
-		$sale_kind = $request->input('sale_kind', ''); // 판매유형
+		$sale_kind = $request->input('sale_kind', []); // 판매유형
 		$com_id = $request->input('com_cd', '');
 		$prd_cd = $request->input('prd_cd', '');
 		$style_no = $request->input('style_no', '');
@@ -113,11 +116,7 @@ class ord02Controller extends Controller
 					$where .= " and $ord_info_key like '$val%' ";
 				}
 			} else {
-				if ($ord_info_key == 'memo') {
-					$where .= " and (m.state like '%$ord_info_value%' or m.memo like '%$ord_info_value%') ";
-				} else if ($ord_info_key == 'o.dlv_end_date') {
-					$where .= " and date_format($ord_info_key, '%Y%m%d') = $ord_info_value ";
-				} else if (in_array($ord_info_key, ['om.user_nm', 'om.user_id', 'om.r_nm', 'om.bank_inpnm'])) {
+				if (in_array($ord_info_key, ['om.user_nm', 'om.user_id', 'om.r_nm'])) {
 					$where .= " and $ord_info_key = '$ord_info_value' ";
 				} else {
 					$where .= " and $ord_info_key like '$ord_info_value%' ";
@@ -133,8 +132,11 @@ class ord02Controller extends Controller
 				$where .= " and ((o.pay_type & $stat_pay_type) = $stat_pay_type) ";
 			}
 		}
-		
-		if ($sale_kind != '') $where .= " and o.sale_kind = '" . $sale_kind . "' ";
+
+		if (count($sale_kind) > 0) {
+			$sale_kind_join = join(',', array_map(function($s) { return "'$s'"; }, $sale_kind));
+			$where .= " and o.sale_kind in ($sale_kind_join) ";
+		}
 		if ($com_id != '') $where .= " and g.com_id = '" . $com_id . "' ";
 
 		// 상품코드 검색
@@ -209,21 +211,22 @@ class ord02Controller extends Controller
 
 		$sql = "
 			select a.*
-				, if(a.goods_no_group < 2, null, a.goods_no) as goods_no_group
 				, os.code_val as ord_state_nm
 				, round((1 - (a.price * (1 - if(st.amt_kind = 'per', st.sale_per, 0) / 100)) / a.goods_sh) * 100) as dc_rate
 				, sk.code_val as sale_kind_nm, pr.code_val as pr_code_nm
 				, ot.code_val as ord_type_nm, ok.code_val as ord_kind_nm
 				, bk.code_val as baesong_kind, com.com_nm as sale_place_nm
 				, pt.code_val as pay_type_nm, ps.code_val as pay_stat_nm
+				, null as goods_no_group
+				, if(a.goods_no_group < 2, null, a.ord_opt_no) as ord_opt_no_group
 			from (
 				select 
-					o.ord_no, o.ord_opt_no, o.goods_no, g.goods_nm, g.goods_nm_eng, g.style_no, o.goods_opt
+					o.ord_no, o.ord_opt_no, o.goods_no, g.goods_nm, g.goods_nm_eng, g.style_no, pc.goods_opt
 					, pc.prd_cd, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color, pc.size
 					, o.wonga, o.price, g.price as goods_price, g.goods_sh, o.qty
 					, o.pay_type, o.dlv_amt, o.point_amt, o.coupon_amt, o.dc_amt, o.recv_amt
 					, o.sale_place, o.store_cd, o.ord_state, o.clm_state, o.com_id, o.baesong_kind as dlv_baesong_kind, o.ord_date
-					, o.sale_kind, o.pr_code, o.sales_com_fee, o.ord_type, o.ord_kind, p.pay_stat
+					, o.sale_kind, o.pr_code, o.sales_com_fee, o.ord_type, o.ord_kind, p.pay_stat, p.pay_date
 					, concat(ifnull(om.user_nm, ''), '(', ifnull(om.user_id, ''), ')') as user_nm, om.r_nm
 					, (
 						select count(*)
@@ -240,9 +243,8 @@ class ord02Controller extends Controller
 					inner join order_mst om on om.ord_no = o.ord_no
 					inner join goods g on g.goods_no = o.goods_no
 					left outer join payment p on p.ord_no = o.ord_no
-					left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
 					left outer join (
-						select prd_cd, goods_no, brand, year, season, gender, item, seq, opt, color, size, c.code_val as color_nm, cs.code_val as size_nm
+						select prd_cd, goods_no, goods_opt, brand, year, season, gender, item, seq, opt, color, size, c.code_val as color_nm, cs.code_val as size_nm
 						from product_code
 							inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = color
 							inner join code cs on if(gender = 'M', cs.code_kind_cd = 'PRD_CD_SIZE_MEN', if(gender = 'W', cs.code_kind_cd = 'PRD_CD_SIZE_WOMEN', if(gender = 'U', cs.code_kind_cd = 'PRD_CD_SIZE_UNISEX', cs.code_kind_cd = 'PRD_CD_SIZE_MATCH' ))) and cs.code_id = size
@@ -266,26 +268,49 @@ class ord02Controller extends Controller
 		";
 		$result = DB::select($sql);
 
+		$result = array_reduce($result, function($a, $c) use ($qty_sql) {
+			if (!isset($c->prd_cd)) {
+				$sql = "
+						select 
+							pc.prd_cd, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
+							, pc.color, pc.size, o.ord_opt_no as ord_opt_no_group, 'N' as prd_match
+							$qty_sql
+						from order_opt o
+							inner join order_mst om on om.ord_no = o.ord_no
+							left outer join product_code pc on pc.goods_no = o.goods_no
+						where o.ord_opt_no = " . $c->ord_opt_no . "
+							and o.goods_no = " . $c->goods_no
+				;
+				$rows = DB::select($sql);
+				$rows = array_map(function($row) use ($c) { return array_merge((array) $c, (array) $row); }, $rows);
+				return array_merge($a, $rows);
+			}
+			return array_merge($a, [$c]);
+		}, []);
+
 		// pagination
 		$total = 0;
 		$page_cnt = 0;
 		if($page == 1) {
 			$sql = "
 				select count(*) as total
-				from order_opt o
-					inner join order_mst om on om.ord_no = o.ord_no
-					inner join goods g on g.goods_no = o.goods_no
-					left outer join payment p on p.ord_no = o.ord_no
-					left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
-					left outer join (
-						select prd_cd, goods_no, brand, year, season, gender, item, seq, opt, color, size, c.code_val as color_nm, cs.code_val as size_nm
-						from product_code
-							inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = color
-							inner join code cs on if(gender = 'M', cs.code_kind_cd = 'PRD_CD_SIZE_MEN', if(gender = 'W', cs.code_kind_cd = 'PRD_CD_SIZE_WOMEN', if(gender = 'U', cs.code_kind_cd = 'PRD_CD_SIZE_UNISEX', cs.code_kind_cd = 'PRD_CD_SIZE_MATCH' ))) and cs.code_id = size
-					) pc on pc.goods_no = o.goods_no and pc.color_nm = substring_index(o.goods_opt, '^', 1) and replace(pc.size_nm, ' ', '') = replace(substring_index(o.goods_opt, '^', -1), ' ', '')
-				where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
-					and o.clm_state in (-30,1,90,0)
-					$where
+				from (
+					select o.ord_opt_no
+					from order_opt o
+						inner join order_mst om on om.ord_no = o.ord_no
+						inner join goods g on g.goods_no = o.goods_no
+						left outer join payment p on p.ord_no = o.ord_no
+						left outer join (
+							select prd_cd, goods_no, brand, year, season, gender, item, seq, opt, color, size, c.code_val as color_nm, cs.code_val as size_nm
+							from product_code
+								inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = color
+								inner join code cs on if(gender = 'M', cs.code_kind_cd = 'PRD_CD_SIZE_MEN', if(gender = 'W', cs.code_kind_cd = 'PRD_CD_SIZE_WOMEN', if(gender = 'U', cs.code_kind_cd = 'PRD_CD_SIZE_UNISEX', cs.code_kind_cd = 'PRD_CD_SIZE_MATCH' ))) and cs.code_id = size
+						) pc on pc.goods_no = o.goods_no and pc.color_nm = substring_index(o.goods_opt, '^', 1) and replace(pc.size_nm, ' ', '') = replace(substring_index(o.goods_opt, '^', -1), ' ', '')
+					where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
+						and o.clm_state in (-30,1,90,0)
+						$where
+					group by o.ord_opt_no
+				) a
 			";
 			
 			$row = DB::selectOne($sql);
@@ -339,7 +364,7 @@ class ord02Controller extends Controller
 			";
 			$series_row	= DB::selectOne($sql);
 			if ($series_row) {
-				$dlv_series_no = $row->dlv_series_no;
+				$dlv_series_no = $series_row->dlv_series_no;
 			} else {
 				$dlv_series_no = DB::table('order_dlv_series')->insertGetId([
 					'dlv_series_nm'	=> $dlv_series_no,
@@ -357,7 +382,9 @@ class ord02Controller extends Controller
 			]);
 
 			foreach ($rows as $row) {
-				if (!isset($row['ord_no']) || !isset($row['ord_opt_no'])) {
+				$o_store_cd = '';
+				$store_info = DB::table('store')->select('store_cd', 'store_nm')->where('sale_place_match_yn', 'Y')->where('com_id', $row['sale_place'] ?? '')->first();
+				if ($store_info == null || !isset($row['ord_no']) || !isset($row['ord_opt_no'])) {
 					array_push($failed_rows, $row['ord_no']);
 					continue;
 				}
@@ -378,13 +405,14 @@ class ord02Controller extends Controller
 					// 출고처리중 처리
 					$state_log = [
 						'ord_no' => $row['ord_no'], 
+						'ord_opt_no' => $row['ord_opt_no'], 
 						'ord_state' => $ord_state, 
 						'comment' => "배송출고요청(온라인주문접수)", 
 						'admin_id' => $user['id'], 
 						'admin_nm' => $user['name']
 					];
 					$order->AddStateLog($state_log);
-					$order->DlvProc($dlv_series_no, $ord_state);
+					$order->DlvProc($dlv_series_no, $ord_state, $row['prd_cd'] ?? '');
 
 					// 온라인주문접수 상품리스트 등록
 					DB::table('order_receipt_product')->insert([
@@ -395,7 +423,7 @@ class ord02Controller extends Controller
 						'state' => $ord_state,
 						'dlv_location_type' => strtoupper($row['dlv_place_type'] ?? ''),
 						'dlv_location_cd' => $row['dlv_place_cd'],
-						'comment' => $row['comment'],
+						'comment' => $row['comment'] ?? '',
 						'rt' => now(),
 					]);
 
@@ -469,6 +497,8 @@ class ord02Controller extends Controller
 		}
 
 		// 재고이력 등록
+		// type : 창고 -> (온라인매장으로)출고 / 매장 -> (온라인매장으로)RT출고
+		// 재고를 받는 온라인매장의 재고이력처리는 ord03controller에서 진행
 		DB::table('product_stock_hst')
 			->insert([
 				'goods_no' => $goods_no,
@@ -476,13 +506,13 @@ class ord02Controller extends Controller
 				'goods_opt' => $goods_opt,
 				'location_cd' => $location_cd,
 				'location_type' => $location_type,
-				'type' => 17, // 재고분류 : 출고
+				'type' => ($location_type === 'STORE' ? PRODUCT_STOCK_TYPE_STORE_RT : PRODUCT_STOCK_TYPE_STORAGE_OUT), // 재고분류 : 매장RT출고(15) / 창고출고(17)
 				'price' => $ord_price,
 				'wonga' => $wonga,
 				'qty' => $ord_qty * -1,
 				'stock_state_date' => date('Ymd'),
 				'ord_opt_no' => $ord_opt_no,
-				'comment' => ($location_type === 'STORE' ? '매장' : '창고') . '출고(온라인배송)',
+				'comment' => ($location_type === 'STORE' ? '매장RT' : '창고') . '출고(온라인배송)',
 				'rt' => now(),
 				'admin_id' => $user['id'],
 				'admin_nm' => $user['name'],

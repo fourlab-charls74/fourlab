@@ -59,7 +59,7 @@
                         <div class="form-group">
                             <label for="ord_no">주문번호</label>
                             <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='ord_no' id="ord_no" value=''>
+                                <input type='text' class="form-control form-control-sm search-enter" name='ord_no' id="ord_no" value=''>
                             </div>
                         </div>
                     </div>
@@ -114,14 +114,6 @@
                                             <option value="om.r_nm">수령자</option>
                                             <option value="om.r_mobile">수령자핸드폰번호</option>
                                             <option value="om.r_phone">수령자전화번호</option>
-                                            <option value="om.bank_inpnm">입금자</option>
-                                            <option value="om.r_addr1">주소(동명)</option>
-                                            <option value="om.ord_amt">주문총금액</option>
-                                            <option value="o.recv_amt">단일주문금액</option>
-                                            <option value="o.dlv_end_date">배송일자</option>
-                                            <option value="om.dlv_msg">배송메세지</option>
-                                            <option value="o.dlv_no">송장번호</option>
-                                            <option value="memo">처리상태/메모</option>
                                         </select>
                                     </div>
                                 </div>
@@ -164,12 +156,12 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="sale_kind">판매유형</label>
-                            <div class="flex_box">
-                                <select name="sale_kind" class="form-control form-control-sm">
-                                    <option value="">전체</option>
+                            <label for="pr_code">판매유형</label>
+                            <div class="flax_box">
+                                <select id="sale_kind" name="sale_kind[]" class="form-control form-control-sm multi_select w-100" multiple>
+                                    <option value=''>전체</option>
                                     @foreach (@$sale_kinds as $sale_kind)
-                                        <option value="{{ $sale_kind->code_id }}">{{ $sale_kind->code_val }}</option>
+                                    <option value='{{ $sale_kind->code_id }}'>{{ $sale_kind->code_val }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -355,8 +347,13 @@
 			<div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
 		</div>
         <p class="mt-2 fs-14 text-secondary">* 창고/매장의 재고cell을 더블클릭하면 해당 창고/매장이 배송처로 적용됩니다. ( <span class="text-primary font-weight-bold">창고</span> / <span class="text-danger font-weight-bold">매장</span> )</p>
+        <p class="mt-1 fs-14 text-secondary">* <span class="text-danger">빨간색상의 상품코드</span>는 옵션이 매칭되지 않은 상품입니다.</p>
 	</div>
 </div>
+
+<style>
+    .ag-row-level-1 {background-color: #f2f2f2 !important;}
+</style>
 
 <script language="javascript">
     let dlv_locations = [];
@@ -372,6 +369,7 @@
                 return '<a href="javascript:void(0);" onclick="return openStoreOrder(\'' + ord_no + '\',\'' + ord_opt_no +'\');">'+ params.value +'</a>';
             }
         },
+        {field: "ord_opt_no_group", rowGroup: true, hide: true, rowGroupIndex: 0},
         {field: "ord_opt_no", headerName: "일련번호", pinned: 'left', width: 60, cellStyle: {'text-align': 'center'},
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
             cellRenderer: (params) => {
@@ -403,6 +401,10 @@
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
         },
+        {field: "sale_place", headerName: "판매처코드", hide: true,
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
         {field: "sale_place_nm", headerName: "판매처", width: 80, cellStyle: {'text-align': 'center'}, pinned: 'left',
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
@@ -411,9 +413,9 @@
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
         },
-        {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {'text-align': 'center'}, pinned: "left"},
-        {field: "prd_cd_p", headerName: "코드일련", width: 90, cellStyle: {"text-align": "center"}},
-        {field: "goods_no_group", rowGroup: true, hide: true},
+        {field: "prd_cd", headerName: "상품코드", width: 125, cellStyle: (params) => ({'text-align': 'center', 'color': params.data?.prd_match === 'N' ? '#ff0000' : 'none'}), pinned: "left"},
+        {field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: (params) => ({'text-align': 'center', 'color': params.data?.prd_match === 'N' ? '#ff0000' : 'none'})},
+        {field: "goods_no_group", rowGroup: true, hide: true, rowGroupIndex: 1},
         // {headerName: "상품번호", width: 100, pinned: 'left', cellStyle: {'text-align': 'center'},
         //     showRowGroup: 'goods_no_group', 
         //     cellRenderer: 'agGroupCellRenderer', 
@@ -425,7 +427,7 @@
         {field: "goods_nm", headerName: "상품명", width: 150,
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
             cellRenderer: function (params) {
-                if (params.data?.prd_cd === '합계' || params.node.level != 0) return '';
+                if (params.node.level != 0) return '';
 				if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
 					return params.value;
 				} else {
@@ -537,29 +539,29 @@
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
         },
-        {field: "dlv_end_date", headerName: "배송일시", width: 125, cellStyle: {'text-align': 'center'},
-            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
-			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
-        },
-        {field: "last_up_date", headerName: "클레임일시", width: 125, cellStyle: {'text-align': 'center'},
-            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
-			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
-        },
+        // {field: "dlv_end_date", headerName: "배송일시", width: 125, cellStyle: {'text-align': 'center'},
+        //     aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+		// 	cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        // },
+        // {field: "last_up_date", headerName: "클레임일시", width: 125, cellStyle: {'text-align': 'center'},
+        //     aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+		// 	cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        // },
     ];
 </script>
 
 <script type="text/javascript" charset="utf-8">
-	const pApp = new App('', { gridId:"#div-gd", height: 285 });
+	const pApp = new App('', { gridId:"#div-gd", height: 310 });
 	let gx;
 
 	$(document).ready(function() {
-		pApp.ResizeGrid(285);
+		pApp.ResizeGrid(310);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns, {
             defaultColDef: {
                 suppressMenu: true,
-                resizable: false,
+                resizable: true,
                 autoHeight: true,
                 suppressSizeToFit: false,
                 sortable:true,
@@ -567,7 +569,7 @@
             rollup: true,
             rollupCountLevel: 1,
 			groupSuppressAutoColumn: true,
-            groupDefaultExpanded: 1, // 0: close, 1: open
+            groupDefaultExpanded: 2,
 			suppressAggFuncInHeader: true,
 			animateRows: true,
             onCellValueChanged: (e) => {
@@ -595,7 +597,7 @@
                         }
                         gx.setFocusedWorkingCell();
                     }
-                    e.node.data.goods_no_group === null ? e.node.setSelected(true) : e.node.parent.setSelected(true);
+                    e.node.data.ord_opt_no_group === null ? e.node.setSelected(true) : e.node.parent.setSelected(true);
                 }
                 if (e.column.colId === "comment" && e.oldValue !== e.newValue) {
                     if (e.node.parent.level >= 0) {
@@ -612,11 +614,11 @@
                         e.api.redrawRows({ rowNodes:[...e.node.parent.allLeafChildren, e.node.parent] });
                         gx.setFocusedWorkingCell();
                     }
-                    e.node.data.goods_no_group === null ? e.node.setSelected(true) : e.node.parent.setSelected(true);
+                    e.node.data.ord_opt_no_group === null ? e.node.setSelected(true) : e.node.parent.setSelected(true);
                 }
             },
             isRowSelectable: (params) => {
-                return params.aggData || params.data?.goods_no_group === null;
+                return params.aggData || params.data?.ord_opt_no_group === null;
             },
         });
 
@@ -639,9 +641,18 @@
             gx.gridOptions.api.forEachNode(node => {
                 if (Array.isArray(node.allLeafChildren) && node.allLeafChildren.length > 0) {
                     node.aggData.prd_cd = node.allLeafChildren.filter(d => d.data.dlv_place)[0]?.data.prd_cd;
+                    node.aggData.prd_cd_p = node.allLeafChildren.filter(d => d.data.dlv_place)[0]?.data.prd_cd_p;
                     node.aggData.dlv_place = node.allLeafChildren.filter(d => d.data.dlv_place)[0]?.data.dlv_place || null;
                     node.aggData.dlv_place_cd = node.allLeafChildren.filter(d => d.data.dlv_place)[0]?.data.dlv_place_cd;
                     node.aggData.dlv_place_type = node.allLeafChildren.filter(d => d.data.dlv_place)[0]?.data.dlv_place_type;
+                    node.allLeafChildren
+                        .filter(c => c.data?.prd_cd !== node.aggData.prd_cd)
+                        .forEach(c => {
+                            c.data.dlv_place = null;
+                            c.data.dlv_place_cd = null;
+                            c.data.dlv_place_type = null;
+                            c.data.comment = undefined;
+                        });
                 }
             });
             gx.gridOptions.api.redrawRows();
@@ -698,6 +709,7 @@
         // validation
         if(!$("#rel_order").val()) return alert("출고차수를 선택해주세요.");
         if(rows.length < 1) return alert("접수할 주문건을 선택해주세요.");
+        if(rows.filter(r => r.pay_stat_nm != '입금').length > 0) return alert("입금완료된 주문건만 접수가 가능합니다.");
         if(rows.filter(r => r.ord_state != 10).length > 0) return alert("출고요청 상태의 주문건만 접수가 가능합니다.");
         if(rows.filter(r => r.ord_kind > 20).length > 0) return alert("출고보류중인 주문건은 접수할 수 없습니다.");
         if(rows.filter(r => !r.dlv_place_cd).length > 0) return alert("배송처가 선택되지 않은 주문건이 있습니다.\n확인 후 다시 접수해주세요.");
@@ -719,7 +731,7 @@
             },
         }).then(function (res) {
             if(res.data.code === 200) {
-                if (res.data.failed_rows.length > 0) alert("온라인주문이 접수되었으나 재고부족 등의 사유로 접수처리에 실패한 주문건이 존재합니다.\n주문번호 확인 후 다시 시도해주세요.\n해당주문건 : " + res.data.failed_rows.join(", "));
+                if (res.data.failed_rows.length > 0) alert("온라인주문이 접수되었으나 재고부족, 온라인업체매칭안됨 등의 사유로 접수처리에 실패한 주문건이 존재합니다.\n주문번호 확인 후 다시 시도해주세요.\n해당주문건 : " + res.data.failed_rows.join(", "));
                 else alert("온라인주문이 정상적으로 접수되었습니다.");
 
                 Search();
