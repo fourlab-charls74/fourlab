@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\head\classic;
 
-use App\Components\SLib;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Components\SLib;
 use App\Components\Lib;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -48,9 +48,16 @@ class cls01Controller extends Controller
 		$content 		= $request->input('content');
         $use_yn 		= $request->input('use_yn');
 
-		$limit			= $request->input("limit",100);
-		$head_desc		= $request->input("head_desc");
+		$ord_field 		= $request->input("ord_field",'a.redi_date');
+		$ord 			= $request->input("ord",'asc');
+
 		$page			= $request->input("page",1);
+		$page_size 		= $request->input("limit",10);
+
+		if ($page < 1 or $page == "") $page = 1;
+
+		$data_cnt = 0;
+        $page_cnt = 0;
 
 		$where = "";
 		if( $sdate != "" ) 		$where .= " and a.regi_date >= '$sdate' ";
@@ -60,11 +67,7 @@ class cls01Controller extends Controller
 		if ( $content != "" ) 	$where .= " and a.content like '%" . Lib::quote($content) . "%' ";
 		if ( $use_yn != "" ) 	$where .= " and a.use_yn = '$use_yn' ";
 
-
-		if ($page < 1 or $page == "") $page = 1;
-		$page_size = $limit;
-
-		if($page == 1) {
+		if($page == 1){
 			$sql = "
 					select 
 						count(*) as cnt
@@ -76,20 +79,13 @@ class cls01Controller extends Controller
 			$data_cnt = $row->cnt;
 
 			// 페이지 얻기
-			$page_cnt=(int)(($data_cnt-1)/$page_size) + 1;
-			if($page == 1){
-				$startno = ($page-1) * $page_size;
-			} else {
-				$startno = ($page-1) * $page_size;
-			}
+			$page_cnt=(int)(($data_cnt - 1)/$page_size) + 1;
+			$startno = ($page - 1) * $page_size;
+		}else{
+			$startno = ($page - 1) * $page_size;
 		}
 
-		$arr_header = array(
-					"total"		=>	$data_cnt,
-					"page_cnt"	=>	$page_cnt,
-					"page"		=>	$page,
-					"page_total"=>	$page_cnt
-		);
+		$arr_header = array("total"=>$data_cnt, "page_cnt"=>$page_cnt, "page"=>$page);
 
 		$sql = "
 				select 
@@ -97,7 +93,8 @@ class cls01Controller extends Controller
 				from evt_notice a
 					inner join evt_mst b on a.evt_idx = b.idx
 				where 1=1 $where
-				order by regi_date desc
+				order by $ord_field $ord 
+				limit $startno, $page_size
 		";
 
 		$result = DB::select($sql);
@@ -108,7 +105,6 @@ class cls01Controller extends Controller
 			"body" => $result
 		]);
 	}
-
 
 	public function create(Request $request){
 		if(isset($type)) {

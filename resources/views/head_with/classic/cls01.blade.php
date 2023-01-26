@@ -151,11 +151,11 @@
                 </div>
             </div>
             <div class="table-responsive">
-                <div id="div-gd" style="height:calc(100vh - 500px);min-height:300px;width:100%;" class="ag-theme-balham"></div>
+                <!-- <div id="div-gd" style="height:calc(100vh - 500px);min-height:300px;width:100%;" class="ag-theme-balham"></div> -->
+                <div id="div-gd" style="height:calc(100vh - 50vh); width:100%;" class="ag-theme-balham"></div>
             </div>
         </div>
     </div>
-
 	<script language="javascript">
         var columns = [
             {headerName: "#", field: "num",type:'NumType', cellClass: 'hd-grid-code'},
@@ -176,19 +176,20 @@
             {headerName: "조회수", field: "cnt", type:'numberType', cellClass: 'hd-grid-code'},
             { width: "auto" }
         ];
-    </script>
-    <script type="text/javascript" charset="utf-8">
+        
 		const pApp = new App('', { gridId: "#div-gd" });
 		const gridDiv = document.querySelector(pApp.options.gridId);
 		const gx = new HDGrid(gridDiv, columns);
 
-		pApp.ResizeGrid(265);
+		pApp.ResizeGrid(275);
         pApp.BindSearchEnter();
 
 		function Search() {
 			let data = $('form[name="search"]').serialize();
-            gx.Request('/head/classic/cls01/search', data,1);
+            gx.Request('/head/classic/cls01/search', data, 1);
 		}
+    </script>
+    <script type="text/javascript" charset="utf-8">
 		
 		$(function(){
 			Search();
