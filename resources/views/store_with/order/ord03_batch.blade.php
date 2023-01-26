@@ -104,8 +104,8 @@
 
 <script language="javascript">
     let columns = [
-        {field: "result", headerName: "처리결과", pinned: 'left', width: 100, cellStyle: (params) => ({...StyleLineHeight, "color": "white", "background-color": !params.value ? '#999999' : params.value == '200' ? '#00ff00' : '#ff0000'}),
-            cellRenderer: (params) => !params.value ? '미처리' : params.value  == '200' ? '성공' : ('실패(' + (out_order_errors[params.value] || '') + ')')
+        {field: "result", headerName: "처리결과", pinned: 'left', width: 100, cellStyle: (params) => ({...StyleLineHeight, "color": "white", "background-color": !params.value ? '#999999' : params.value == '200' ? '#4444ff' : '#ff4444'}),
+            cellRenderer: (params) => !params.value ? '미처리' : params.value  == '200' ? '성공' : ('실패')
         },
         {field: "rel_order", headerName: "출고차수", pinned: 'left', width: 100, cellStyle: {'text-align': 'center'}},
         {field: "dlv_no", headerName: "송장번호", pinned: 'left', width: 120, editable: (params) => params.data.state < 30, cellStyle: (params) => ({'text-align': 'center', 'background-color': params.data.state < 30 ? '#ffff99' : 'none'})},
@@ -187,12 +187,7 @@
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns, {
-            onCellValueChanged: (e) => {
-                e.node.setSelected(true);
-            },
-            isRowSelectable: (params) => {
-                return params.data.state < 30;
-            },
+            isRowSelectable: (params) => false,
         });
 
         $('#excel_file').on('change', function(e){
@@ -344,18 +339,18 @@
     };
 
     // 상품반품 일괄등록
-    function completeOrder() {
+    async function completeOrder() {
         let rows = gx.getRows();
-        console.log(rows);
+        rows = rows.filter(row => !row.result);
 
         // validation
         if(!$("#u_dlvs").val()) return alert("택배사를 선택해주세요.");
+        if(rows.length < 1) return alert("출고완료처리할 주문건을 등록해주세요.");
         if(rows.filter(r => r.ord_state != 20).length > 0) return alert("출고처리중 상태의 주문건만 처리가 가능합니다.");
         if(rows.filter(r => r.ord_kind > 20).length > 0) return alert("출고보류중인 주문건은 처리할 수 없습니다.");
         if(rows.filter(r => !r.dlv_no).length > 0) return alert("송장번호가 입력되지 않은 주문건이 있습니다.\n확인 후 다시 처리해주세요.");
 
         if(!confirm("일괄등록하신 주문건을 출고완료처리하시겠습니까?")) return;
-        return;
 
         axios({
             url: '/store/order/ord03/complete',
@@ -365,12 +360,22 @@
                 u_dlvs: $("#u_dlvs").val(),
                 data: rows
             },
-        }).then(function (res) {
+        }).then(async function (res) {
             if(res.data.code === 200) {
-                if (res.data.failed_rows.length > 0) alert("온라인주문이 출고완료되었으나 재고부족 등의 사유로 배송처리에 실패한 주문건이 존재합니다.\n주문번호 확인 후 다시 시도해주세요.\n해당주문건 : " + res.data.failed_rows.join(", "));
-                else alert("출고완료처리가 정상적으로 완료되었습니다.");
 
-                Search();
+                let results = rows.map(row => ({ ...row, result: res.data.failed_rows.includes(row.ord_no) ? 404 : 200 }));
+                
+                gx.gridOptions.api.setRowData([]);
+                await gx.gridOptions.api.applyTransaction({ add : results });
+                
+                setTimeout(() => {
+                    if(res.data.failed_rows.length < 1) {
+                        alert("모든 주문건이 정상적으로 출고완료처리되었습니다.");
+                    } else {
+                        alert("출고완료처리에 실패한 주문건이 있습니다. 처리결과 확인 후 다시 등록해주세요.");                
+                    }
+                    opener.Search();
+                }, 500);
             } else {
                 console.log(res.data);
                 alert("출고완료처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");

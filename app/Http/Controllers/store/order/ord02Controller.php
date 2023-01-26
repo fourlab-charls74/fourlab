@@ -221,7 +221,7 @@ class ord02Controller extends Controller
 				, if(a.goods_no_group < 2, null, a.ord_opt_no) as ord_opt_no_group
 			from (
 				select 
-					o.ord_no, o.ord_opt_no, o.goods_no, g.goods_nm, g.goods_nm_eng, g.style_no, o.goods_opt
+					o.ord_no, o.ord_opt_no, o.goods_no, g.goods_nm, g.goods_nm_eng, g.style_no, pc.goods_opt
 					, pc.prd_cd, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color, pc.size
 					, o.wonga, o.price, g.price as goods_price, g.goods_sh, o.qty
 					, o.pay_type, o.dlv_amt, o.point_amt, o.coupon_amt, o.dc_amt, o.recv_amt
@@ -244,7 +244,7 @@ class ord02Controller extends Controller
 					inner join goods g on g.goods_no = o.goods_no
 					left outer join payment p on p.ord_no = o.ord_no
 					left outer join (
-						select prd_cd, goods_no, brand, year, season, gender, item, seq, opt, color, size, c.code_val as color_nm, cs.code_val as size_nm
+						select prd_cd, goods_no, goods_opt, brand, year, season, gender, item, seq, opt, color, size, c.code_val as color_nm, cs.code_val as size_nm
 						from product_code
 							inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = color
 							inner join code cs on if(gender = 'M', cs.code_kind_cd = 'PRD_CD_SIZE_MEN', if(gender = 'W', cs.code_kind_cd = 'PRD_CD_SIZE_WOMEN', if(gender = 'U', cs.code_kind_cd = 'PRD_CD_SIZE_UNISEX', cs.code_kind_cd = 'PRD_CD_SIZE_MATCH' ))) and cs.code_id = size
@@ -267,6 +267,26 @@ class ord02Controller extends Controller
 				left outer join company com on com.com_type = '4' and com.use_yn = 'Y' and com.com_id = a.sale_place
 		";
 		$result = DB::select($sql);
+
+		$result = array_reduce($result, function($a, $c) use ($qty_sql) {
+			if (!isset($c->prd_cd)) {
+				$sql = "
+						select 
+							pc.prd_cd, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
+							, pc.color, pc.size, o.ord_opt_no as ord_opt_no_group
+							$qty_sql
+						from order_opt o
+							inner join order_mst om on om.ord_no = o.ord_no
+							left outer join product_code pc on pc.goods_no = o.goods_no
+						where o.ord_opt_no = " . $c->ord_opt_no . "
+							and o.goods_no = " . $c->goods_no
+				;
+				$rows = DB::select($sql);
+				$rows = array_map(function($row) use ($c) { return array_merge((array) $c, (array) $row); }, $rows);
+				return array_merge($a, $rows);
+			}
+			return array_merge($a, [$c]);
+		}, []);
 
 		// pagination
 		$total = 0;

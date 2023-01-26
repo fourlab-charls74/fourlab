@@ -350,6 +350,10 @@
 	</div>
 </div>
 
+<style>
+    .ag-row-level-1 {background-color: #f2f2f2 !important;}
+</style>
+
 <script language="javascript">
     let dlv_locations = [];
 
@@ -408,8 +412,8 @@
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
         },
-        {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {'text-align': 'center'}, pinned: "left"},
-        {field: "prd_cd_p", headerName: "코드일련", width: 90, cellStyle: {"text-align": "center"}},
+        {field: "prd_cd", headerName: "상품코드", width: 125, cellStyle: {'text-align': 'center'}, pinned: "left"},
+        {field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: {"text-align": "center"}},
         {field: "goods_no_group", rowGroup: true, hide: true, rowGroupIndex: 1},
         // {headerName: "상품번호", width: 100, pinned: 'left', cellStyle: {'text-align': 'center'},
         //     showRowGroup: 'goods_no_group', 
@@ -636,9 +640,18 @@
             gx.gridOptions.api.forEachNode(node => {
                 if (Array.isArray(node.allLeafChildren) && node.allLeafChildren.length > 0) {
                     node.aggData.prd_cd = node.allLeafChildren.filter(d => d.data.dlv_place)[0]?.data.prd_cd;
+                    node.aggData.prd_cd_p = node.allLeafChildren.filter(d => d.data.dlv_place)[0]?.data.prd_cd_p;
                     node.aggData.dlv_place = node.allLeafChildren.filter(d => d.data.dlv_place)[0]?.data.dlv_place || null;
                     node.aggData.dlv_place_cd = node.allLeafChildren.filter(d => d.data.dlv_place)[0]?.data.dlv_place_cd;
                     node.aggData.dlv_place_type = node.allLeafChildren.filter(d => d.data.dlv_place)[0]?.data.dlv_place_type;
+                    node.allLeafChildren
+                        .filter(c => c.data?.prd_cd !== node.aggData.prd_cd)
+                        .forEach(c => {
+                            c.data.dlv_place = null;
+                            c.data.dlv_place_cd = null;
+                            c.data.dlv_place_type = null;
+                            c.data.comment = undefined;
+                        });
                 }
             });
             gx.gridOptions.api.redrawRows();
