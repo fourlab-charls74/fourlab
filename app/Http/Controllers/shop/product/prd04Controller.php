@@ -146,9 +146,9 @@ class prd04Controller extends Controller
 			"
 				select 
 					count(prd_cd) as total,
-					sum(a.goods_sh) as total_goods_sh,
-					sum(a.price) as total_price,
-					sum(a.wonga) as total_wonga,
+					sum(a.goods_sh * a.wqty) as total_goods_sh,
+					sum(a.price * a.wqty) as total_price,
+					sum(a.wonga * a.wqty) as total_wonga,
 					sum(a.wqty) as total_wqty,
 					sum(a.sqty) as total_sqty
 				from (
@@ -158,7 +158,7 @@ class prd04Controller extends Controller
 						, ($store_qty_sql - ifnull(_next_store.qty, 0)) as sqty
 						, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
 						, if(pc.goods_no = 0, p.price, g.price) as price
-						, if(ps.wonga <> 0, ps.wonga, g.wonga) as wonga
+						, if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
 					from product_code pc
 						inner join product_stock ps on pc.prd_cd = ps.prd_cd
 						$in_store_sql
