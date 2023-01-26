@@ -347,6 +347,7 @@
 			<div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
 		</div>
         <p class="mt-2 fs-14 text-secondary">* 창고/매장의 재고cell을 더블클릭하면 해당 창고/매장이 배송처로 적용됩니다. ( <span class="text-primary font-weight-bold">창고</span> / <span class="text-danger font-weight-bold">매장</span> )</p>
+        <p class="mt-1 fs-14 text-secondary">* <span class="text-danger">빨간색상의 상품코드</span>는 옵션이 매칭되지 않은 상품입니다.</p>
 	</div>
 </div>
 
@@ -412,8 +413,8 @@
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
         },
-        {field: "prd_cd", headerName: "상품코드", width: 125, cellStyle: {'text-align': 'center'}, pinned: "left"},
-        {field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: {"text-align": "center"}},
+        {field: "prd_cd", headerName: "상품코드", width: 125, cellStyle: (params) => ({'text-align': 'center', 'color': params.data?.prd_match === 'N' ? '#ff0000' : 'none'}), pinned: "left"},
+        {field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: (params) => ({'text-align': 'center', 'color': params.data?.prd_match === 'N' ? '#ff0000' : 'none'})},
         {field: "goods_no_group", rowGroup: true, hide: true, rowGroupIndex: 1},
         // {headerName: "상품번호", width: 100, pinned: 'left', cellStyle: {'text-align': 'center'},
         //     showRowGroup: 'goods_no_group', 
@@ -550,11 +551,11 @@
 </script>
 
 <script type="text/javascript" charset="utf-8">
-	const pApp = new App('', { gridId:"#div-gd", height: 285 });
+	const pApp = new App('', { gridId:"#div-gd", height: 310 });
 	let gx;
 
 	$(document).ready(function() {
-		pApp.ResizeGrid(285);
+		pApp.ResizeGrid(310);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns, {

@@ -26,7 +26,7 @@
                         <div class="dropdown-menu" style="">
                             <a class="dropdown-item d-flex align-items-center" href="javascript:void(0);" onclick="return exportDlvList();"><i class="bx bx-download fs-16 mr-1"></i> 배송목록 받기</a>
                             <a class="dropdown-item d-flex align-items-center" href="javascript:void(0);" onclick="return openDlvInvoicePopup();"><i class="bx bx-download fs-16 mr-1"></i> 택배송장목록 받기</a>
-                            <a class="dropdown-item d-flex align-items-center" href="javascript:void(0);"><i class="bx bx-download fs-16 mr-1"></i> 판매처 택배송장목록 받기</a>
+                            {{-- <a class="dropdown-item d-flex align-items-center" href="javascript:void(0);"><i class="bx bx-download fs-16 mr-1"></i> 판매처 택배송장목록 받기</a> --}}
                         </div>
                     </div>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>

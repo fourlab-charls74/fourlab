@@ -273,7 +273,7 @@ class ord02Controller extends Controller
 				$sql = "
 						select 
 							pc.prd_cd, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
-							, pc.color, pc.size, o.ord_opt_no as ord_opt_no_group
+							, pc.color, pc.size, o.ord_opt_no as ord_opt_no_group, 'N' as prd_match
 							$qty_sql
 						from order_opt o
 							inner join order_mst om on om.ord_no = o.ord_no

@@ -57,7 +57,7 @@
                 <ul>
                     <li><a href="/store/order/ord01">(완)매장주문</a></li>
                     <li><a href="/store/order/ord02">(완)온라인 주문접수</a></li>
-                    <li><a href="/store/order/ord03">(개)온라인 배송처리</a></li>
+                    <li><a href="/store/order/ord03">(완)온라인 배송처리</a></li>
                 </ul>
             </li>
             <li>

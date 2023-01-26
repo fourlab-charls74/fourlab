@@ -473,9 +473,16 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         Route::get('ord02/search','ord02Controller@search');
         Route::post('ord02/receipt','ord02Controller@receipt');
         Route::post('ord02/update/ord-kind','ord02Controller@update_ord_kind');
-
+        
         // 온라인 배송처리
         Route::get('ord03','ord03Controller@index');
+        Route::get('ord03/search','ord03Controller@search');
+        Route::post('ord03/complete','ord03Controller@complete');
+        Route::post('ord03/update/ord-kind','ord03Controller@update_ord_kind');
+        Route::get('ord03/show/{cmd}', 'ord03Controller@show_popup');
+        Route::get('ord03/download/{cmd}', 'ord03Controller@download');
+        Route::post('ord03/batch-import', 'ord03Controller@batch_import');
+        Route::post('ord03/search-orders', 'ord03Controller@batch_search_orders');
     });
 
     // 고객관리
