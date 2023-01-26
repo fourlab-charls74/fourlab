@@ -136,7 +136,7 @@
 </div>
 
 <script language="javascript">
-    const pinnedRowData = [{ prd_cd: '합계', store_wqty: 0, qty: 0, loss_qty: 0, loss_price: 0 }];
+    const pinnedRowData = [{ prd_cd: '합계', qty: 0, total_return_price: 0 }];
 
     let columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"},
@@ -177,7 +177,8 @@
 <script type="text/javascript" charset="utf-8">
     let gx;
     const pApp = new App('', { gridId: "#div-gd" });
-    // let basic_info = {};
+
+    let basic_info = {};
 
     $(document).ready(function() {
         pApp.ResizeGrid(275, 470);
@@ -190,7 +191,7 @@
             },
             getRowNodeId: (data) => data.hasOwnProperty('count') ? data.count : "0", // 업데이터 및 제거를 위한 식별 ID를 count로 할당
             onCellValueChanged: (e) => {
-                if (e.column.colId === "qty") {
+                if (e.column.colId === "return_price" || e.column.colId === "qty") {
                     if (isNaN(e.newValue) == true || e.newValue == "") {
                         alert("숫자만 입력가능합니다.");
                         gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
@@ -198,14 +199,31 @@
                         alert("음수는 입력할 수 없습니다.");
                         gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
                     } else {
-                        e.data.loss_qty = parseInt(e.data.store_wqty) - parseInt(e.data.qty);
-                        e.data.loss_price = parseInt(e.data.price) * parseInt(e.data.loss_qty);
-                        gx.gridOptions.api.updateRowData({update: [e.data]});
-                        updatePinnedRow();
+                        if(e.column.colId === "qty" && e.data.store_wqty < parseInt(e.data.qty)) {
+                            alert("해당 매장의 보유재고보다 많은 수량을 반품할 수 없습니다.");
+                            gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                        } else {
+                            e.node.setSelected(true);
+                            e.data.total_return_price = parseInt(e.data.qty) * parseInt(e.data.return_price);
+                            gx.gridOptions.api.updateRowData({update: [e.data]});
+                            updatePinnedRow();
+                        }
                     }
                 }
             }
         });
+
+        //반품금액 업데이트
+        async function onCellValueChanged(params) {
+            if (params.oldValue == params.newValue) return;
+            let row = params.data;
+
+            if (row.retrun_price != null && row.qty != null ) row.total_return_price = (row.return_price * row.qty);
+
+            await gx.gridOptions.api.applyTransaction({ 
+                update: [{...row}] 
+            });
+        }
 
         $('#excel_file').on('change', function(e){
             if (validateFile() === false) {
@@ -278,9 +296,11 @@
         let sr_reason = worksheet['C10']?.w; //반품사유
         let comment = worksheet['C11']?.w;  //메모
 
+        basic_info = {sr_date, storage_cd, store_cd, sr_reason, comment};
+
 		let excel_columns = {
 			'B': 'prd_cd',
-			'C': 'return_qty',
+			'C': 'qty',
         };
 
         let firstRowIndex = 15; // 엑셀 10행부터 시작 (샘플데이터 참고)
@@ -297,7 +317,7 @@
 				}
 			});
             
-            row.qty = row.return_qty || 0; // 실사재고 미입력 시 0 처리
+            row.qty = row.qty || 0; // 실사재고 미입력 시 0 처리
             row = { ...row, 
                 count: ++count, isEditable: true,
             };
@@ -326,7 +346,6 @@
 	};
 
     const upload = () => {
-        // if(basic_info.sc_date !== undefined && !confirm("새로 적용하시는 경우 기존정보는 저장되지 않습니다.\n적용하시겠습니까?")) return;
         
 		const file_data = $('#excel_file').prop('files')[0];
         if(!file_data) return alert("적용할 파일을 선택해주세요.");
@@ -375,31 +394,16 @@
         });
     };
 
-    // function setBasicInfo(obj) {
-    //     basic_info = {...obj};
-
-    //     $("#new_sc_cd").text(basic_info.new_sc_cd);
-    //     $("#sc_date").text(basic_info.sc_date);
-    //     $("#store_nm").text(basic_info.store?.store_nm);
-    //     $("#md_nm").text(basic_info.md?.name);
-    //     $("#comment").text(basic_info.comment);
-
-    //     $("#basic_info_form").removeClass("d-none");
-    //     pApp.ResizeGrid(275, 340);
-    // }
 
     // 창고일괄반품 저장
     function Save() {
         let rows = gx.getRows();
-       
-        // let sc_date = basic_info.sc_date;
-        // let store_cd = basic_info.store?.store_cd;
-        // let md_id = basic_info.md?.id;
-        // let comment = basic_info.comment;
 
-        // if(!store_cd) return alert("매장정보가 올바르지 않습니다.");
-        // if(rows.length < 1) return alert("실사등록할 상품을 선택해주세요.");
-        // if(!md_id) return alert("담당자정보가 올바르지 않습니다.");
+        let sr_date = basic_info.sr_date;
+        let store_cd = basic_info.store_cd;
+        let storage_cd = basic_info.storage_cd;
+        let sr_reason = basic_info.sr_reason;
+        let comment = basic_info.comment;
 
         if(!confirm("등록하시겠습니까?")) return;
 
@@ -413,13 +417,15 @@
                 storage_cd,
                 sr_reason,
                 comment,
-                // products: rows.map(r => ({ prd_cd: r.prd_cd, price: r.price, qty: r.qty, store_qty: r.store_wqty })),
+                products: rows.map(r => ({ sr_cd : r.sr_cd, prd_cd : r.prd_cd, price : r.price, return_price : r.return_price, return_qty: r.qty, store_wqty : r.store_wqty })),
             },
         }).then(function (res) {
-            if(res.data.code === '200') {
+            if(res.data.code === 200) {
                 alert("창고일괄반품이 성공적으로 완료되었습니다.");
                 opener.Search();
                 window.close();
+            } else if (res.data.code === 501) {
+                alert("반품수량이 매장보유재고보다 많습니다. 반품수량을 수정해주세요.")
             } else {
                 console.log(res.data);
                 alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
@@ -446,20 +452,18 @@
     };
 
     const updatePinnedRow = () => { // 총 반품금액, 반품수량을 반영한 PinnedRow를 업데이트
-        let [ store_wqty, qty, loss_qty, loss_price ] = [ 0, 0, 0, 0 ];
+        let [ qty, total_return_price ] = [ 0, 0 ];
         const rows = gx.getRows();
         if (rows && Array.isArray(rows) && rows.length > 0) {
             rows.forEach((row, idx) => {
-                store_wqty += parseInt(row.store_wqty || 0);
-                qty += parseInt(row.qty || 0);
-                loss_qty += parseInt(row.loss_qty || 0);
-                loss_price += parseInt(row.loss_price || 0);
+                qty += parseFloat(row.qty);
+                total_return_price += parseFloat(row.total_return_price);
             });
         }
 
         let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
         gx.gridOptions.api.setPinnedTopRowData([
-            { ...pinnedRow.data, store_wqty: store_wqty, qty: qty, loss_qty: loss_qty, loss_price: loss_price }
+            { ...pinnedRow.data, qty: qty, total_return_price: total_return_price }
         ]);
     };
 </script>
