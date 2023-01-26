@@ -128,7 +128,9 @@ class ord01Controller extends Controller
             'brand'             => $brand,
             'goods_nm'          => $goods_nm,
             'on_off_yn'         => $on_off_yn,
-            's_item'            => $item
+            's_item'            => $item,
+            'sale_kinds'	=> SLib::getCodes('SALE_KIND'),
+			'pr_codes'		=> SLib::getCodes('PR_CODE')
 		];
 
         return view(Config::get('shop.shop.view') . '/order/ord01', $values);

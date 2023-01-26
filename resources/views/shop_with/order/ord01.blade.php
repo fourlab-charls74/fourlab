@@ -358,24 +358,30 @@
                         </div>
                     </div>
                     <div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="">판매유형</label>
-							<div class="form-inline inline_btn_box">
-                                <input type='hidden' id="sell_nm" name="sell_nm">
-                                <select id="sell_type" name="sell_type[]" class="form-control form-control-sm select2-sellType multi_select" multiple></select>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-sellType"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                        <div class="form-group">
+                            <label for="pr_code">판매유형</label>
+                            <div class="flax_box">
+                                <select id="sell_type" name="sell_type[]" class="form-control form-control-sm multi_select w-100" multiple>
+                                    <option value=''>전체</option>
+                                    @foreach ($sale_kinds as $sale_kind)
+                                    <option value='{{ $sale_kind->code_id }}'>{{ $sale_kind->code_val }}</option>
+                                    @endforeach
+                                </select>
                             </div>
-						</div>
-					</div>
+                        </div>
+                    </div>
                 </div>
                 <div class="row search-area-ext d-none">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="">행사코드</label>
-                            <div class="form-inline inline_btn_box">
-                                <input type='hidden' id="pr_code_nm" name="pr_code_nm">
-                                <select id="pr_code" name="pr_code[]" class="form-control form-control-sm select2-prcode multi_select" multiple></select>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-prcode"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                            <label for="pr_code">행사코드</label>
+                            <div class="flax_box">
+                                <select id="pr_code" name="pr_code[]" class="form-control form-control-sm multi_select w-100" multiple>
+                                    <option value=''>전체</option>
+                                    @foreach ($pr_codes as $pr_code)
+                                    <option value='{{ $pr_code->code_id }}'>{{ $pr_code->code_val }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                     </div>

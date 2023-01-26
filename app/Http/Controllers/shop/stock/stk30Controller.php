@@ -8,6 +8,8 @@ use App\Components\SLib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Exception;
 
@@ -591,6 +593,175 @@ class stk30Controller extends Controller
 			DB::commit();
             $code = 200;
             $msg = "삭제가 정상적으로 완료되었습니다.";
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+        return response()->json(["code" => $code, "msg" => $msg]);
+    }
+
+    public function show_batch()
+    {
+        return view(Config::get('shop.shop.view') . '/stock/stk30_batch');
+    }
+
+    /** 일괄등록 시 Excel 파일 저장 후 ag-grid(front)에 사용할 응답을 JSON으로 반환 */
+	public function import_excel(Request $request) {
+		if (count($_FILES) > 0) {
+			if ( 0 < $_FILES['file']['error'] ) {
+				return response()->json(['code' => 0, 'message' => 'Error: ' . $_FILES['file']['error']], 200);
+			}
+			else {
+				$file = $request->file('file');
+				$now = date('YmdHis');
+				$user_id = Auth::guard('head')->user()->id;
+				$extension = $file->extension();
+	
+				$save_path = "data/shop/stk30/";
+				$file_name = "${now}_${user_id}.${extension}";
+				
+				if (!Storage::disk('public')->exists($save_path)) {
+					Storage::disk('public')->makeDirectory($save_path);
+				}
+	
+				$file = sprintf("${save_path}%s", $file_name);
+				move_uploaded_file($_FILES['file']['tmp_name'], $file);
+	
+				return response()->json(['code' => 1, 'file' => $file], 200);
+			}
+		}
+	}
+
+    /** 일괄등록 상품 개별 조회 */
+    public function get_goods(Request $request) {
+        $sr_date = $request->input('sr_date', '');
+        $storage_cd = $request->input('storage_cd', '');
+        $store_cd = $request->input('store_cd', '');
+        $sr_reason = $request->input('sr_reason', '');
+        $comment = $request->input('comment', '');
+
+        $data = $request->input('data', []);
+        $result = [];
+        
+        $store = DB::table('store')->where('store_cd', $store_cd)->select('store_cd', 'store_nm')->first();
+        $storage = DB::table('storage')->where('storage_cd', $storage_cd)->select('storage_cd', 'storage_nm')->first();
+
+        if ($store == null || $storage== null || $sr_reason == null || $sr_date == null) {
+            return response()->json(['code' => 404, 'msg' => '창고반품 기본정보가 올바르지 않습니다. 반품일자/반품창고코드/매장코드/반품사유 항목을 확인해주세요.']);
+        }
+
+        foreach ($data as $key => $d) {
+            $prd_cd = $d['prd_cd'];
+            $qty = $d['qty'] ?? 0;
+            $count = $d['count'] ?? '';
+
+            $sql = "
+                select
+                    pc.prd_cd
+                    , pc.goods_no
+                    , opt.opt_kind_nm
+                    , b.brand_nm as brand
+                    , if(g.goods_no <> '0', g.style_no, p.style_no) as style_no
+                    , if(g.goods_no <> '0', g.goods_nm, p.prd_nm) as goods_nm
+                    , if(g.goods_no <> '0', g.goods_nm_eng, p.prd_nm) as goods_nm_eng
+                    , concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
+                    , pc.color
+                    , pc.size
+                    , pc.goods_opt
+                    , if(g.goods_no <> '0', g.goods_sh, p.tag_price) as goods_sh
+                    , if(g.goods_no <> '0', g.price, p.price) as price
+                    , p.price as return_price
+                    , pss.wqty as store_wqty
+                    , '$qty' as qty
+                    , (if(g.goods_no <> '0', g.price, p.price) * $qty) as total_return_price
+                    , true as isEditable
+                    , '$count' as count
+                from product_code pc
+                    inner join product p on p.prd_cd = pc.prd_cd
+                    left outer join goods g on g.goods_no = pc.goods_no
+                    left outer join product_stock_store pss on pss.prd_cd = pc.prd_cd and pss.store_cd = '$store_cd'
+                    left outer join opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
+                    left outer join brand b on b.br_cd = pc.brand
+                where pc.prd_cd = '$prd_cd'
+                limit 1
+            ";
+
+            $row = DB::selectOne($sql);
+            array_push($result, $row);
+        }
+
+        return response()->json([
+            "code" => 200,
+            "head" => [
+                "total" => count($result),
+                "page" => 1,
+                "page_cnt" => 1,
+                "page_total" => 1,
+            ],
+            "body" => $result
+        ]);
+    }
+
+    // 창고일괄반품 등록
+    public function save(Request $request)
+    {
+        $sr_kind = "G"; // 일반(G)/일괄(B)
+        $sr_date = $request->input("sr_date", date("Y-m-d"));
+        $store_cd = $request->input("store_cd", "");
+        $storage_cd = $request->input("storage_cd", "");
+        $sr_reason = $request->input("sr_reason", "");
+        $comment = $request->input("comment", "");
+        $products = $request->input("products", []);
+        $admin_id = Auth('head')->user()->id;
+        $sr_state = 10;
+
+        try {
+            DB::beginTransaction();
+
+            foreach($products as $product) {
+                if ($product['store_wqty'] < $product['return_qty']){
+                    $code = 501;
+                    $msg = '반품수량이 보유재고보다 많음';
+                }
+
+            }
+
+            $sr_cd = DB::table('store_return')
+                ->insertGetId([
+                    'storage_cd' => $storage_cd,
+                    'store_cd' => $store_cd,
+                    'sr_date' => $sr_date,
+                    'sr_kind' => $sr_kind,
+                    'sr_state' => $sr_state,
+                    'sr_reason' => $sr_reason,
+                    'comment' => $comment,
+                    'rt' => now(),
+                    'admin_id' => $admin_id,
+                ]);
+
+            foreach($products as $product) {
+                if ($product['store_wqty'] < $product['return_qty']) {
+                    $code = 501;
+                    $msg = '';
+                } else {
+                    DB::table('store_return_product')
+                        ->insert([
+                            'sr_cd' => $sr_cd,
+                            'prd_cd' => $product['prd_cd'],
+                            'price' => $product['price'],
+                            'return_price' => $product['return_price'],
+                            'return_qty' => $product['return_qty'],
+                            'rt' => now(),
+                            'admin_id' => $admin_id
+                        ]);
+
+                    DB::commit();
+                    $code = 200;
+                    $msg = '';
+                }
+            }
 		} catch (Exception $e) {
 			DB::rollback();
 			$code = 500;
