@@ -22,6 +22,8 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
     //Route::get('/login', 'LoginController@index')->name('login');
     Route::post('/login', 'LoginController@login');
     Route::get('/logout', 'LoginController@logout');
+    Route::get('/user/log', 'UserController@log');
+    Route::get('/user/log_search', 'UserController@searchlog');
 
     Route::prefix("auto-complete")->group(function () {
 
