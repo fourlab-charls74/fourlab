@@ -1,4 +1,4 @@
-@extends('store_with.layouts.layout-nav')
+@extends('shop_with.layouts.layout-nav')
 @section('title', '창고일괄반품')
 @section('content')
 
@@ -358,7 +358,7 @@
         
         axios({
             method: 'post',
-            url: '/store/stock/stk30/batch-import',
+            url: '/shop/stock/stk30/batch-import',
             data: form_data,
             headers: {
                 "Content-Type": "multipart/form-data",
@@ -380,7 +380,7 @@
 
     const getGood = async (values, firstIndex) => {
         axios({
-            url: '/store/stock/stk30/batch-getgoods',
+            url: '/shop/stock/stk30/batch-getgoods',
             method: 'post',
             data: values,
         }).then(async (res) => {
@@ -408,7 +408,7 @@
         if(!confirm("등록하시겠습니까?")) return;
 
         axios({
-            url: '/store/stock/stk30/save',
+            url: '/shop/stock/stk30/save',
             method: 'put',
             data: {
                 sr_kind: "B",

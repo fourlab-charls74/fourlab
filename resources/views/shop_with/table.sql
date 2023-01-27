@@ -875,7 +875,40 @@ CREATE TABLE `after_service` (
 	PRIMARY KEY (`idx`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- 메뉴관리
+CREATE TABLE `shop_controller` (
+  `menu_no` int(11) NOT NULL AUTO_INCREMENT COMMENT '메뉴번호',
+  `entry` int(11) DEFAULT NULL COMMENT '상위메뉴ID',
+  `pid` varchar(30) DEFAULT NULL COMMENT '컨트롤러',
+  `seq` int(11) DEFAULT NULL COMMENT '순서',
+  `lev` int(11) DEFAULT NULL COMMENT '위치레벨',
+  `kor_nm` varchar(30) DEFAULT NULL COMMENT '한글이름',
+  `eng_nm` varchar(50) DEFAULT NULL COMMENT '영문이름',
+  `kind` varchar(10) DEFAULT NULL COMMENT '종류',
+  `id` varchar(15) DEFAULT NULL COMMENT '메뉴아이디',
+  `target` varchar(100) DEFAULT NULL COMMENT '사용자',
+  `action` varchar(100) DEFAULT NULL COMMENT '동작',
+  `btype` int(11) DEFAULT NULL COMMENT '게시판유형',
+  `state` smallint(6) DEFAULT NULL COMMENT '상태',
+  `sys_menu` char(1) DEFAULT NULL COMMENT '시스템메뉴',
+  `regi_date` datetime DEFAULT NULL COMMENT '등록일시',
+  `ut` datetime DEFAULT NULL COMMENT '수정일시',
+  `is_del` smallint(6) DEFAULT NULL COMMENT '삭제여부',
+  `is_part_role` char(1) DEFAULT NULL COMMENT '부분권한여부',
+  PRIMARY KEY (`menu_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- 그룹관리(메뉴권한)
+CREATE TABLE `store_group_authority` (
+  `group_no` int(11) NOT NULL DEFAULT '0' COMMENT '메뉴번호',
+  `wonga_yn` char(1) DEFAULT 'Y' COMMENT '원가보여주기',
+  `other_store_yn` char(1) DEFAULT 'Y' COMMENT '타매장감추기',
+  `release_price_yn` char(1) DEFAULT 'Y' COMMENT '출고가보여주기',
+  `pos_use_yn` char(1) DEFAULT 'Y' COMMENT 'POS 사용여부',
+  `auth_store_yn` char(1) DEFAULT 'N' COMMENT '매장권한',
+  `auth_storage_yn` char(1) DEFAULT 'N' COMMENT '창고권한'
+  PRIMARY KEY (`group_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 

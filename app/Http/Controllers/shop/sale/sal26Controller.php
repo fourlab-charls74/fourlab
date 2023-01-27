@@ -23,7 +23,9 @@ class sal26Controller extends Controller
             'edate' => date("Y-m-d"),
             'items' => SLib::getItems(),
             'com_types'     => SLib::getCodes('G_COM_TYPE'),
-            'store_types'   => SLib::getCodes('STORE_TYPE')
+            'store_types'   => SLib::getCodes('STORE_TYPE'),
+			'sale_kinds'	=> SLib::getCodes('SALE_KIND'),
+			'pr_codes'		=> SLib::getCodes('PR_CODE'),
         ];
         return view( Config::get('shop.shop.view') . '/sale/sal26',$values);
     }

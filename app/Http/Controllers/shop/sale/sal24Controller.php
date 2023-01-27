@@ -142,6 +142,8 @@ class sal24Controller extends Controller
 			'store'         => DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', '=', $store_cd)->first(),   
 			'store_nm'      => DB::table('store')->select('store_cd', 'store_nm')->where('store_nm', '=', $store_nm)->first(),   
 			'sell_type'     => $sell_type,
+			'sale_kinds'	=> SLib::getCodes('SALE_KIND'),
+			'pr_codes'		=> SLib::getCodes('PR_CODE'),
             'pr_code_id'    => $str,
             'pr_code_val'   => $str2,
             'sell_type_id'  => $sell_str,
