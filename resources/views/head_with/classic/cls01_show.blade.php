@@ -49,9 +49,9 @@
                                             <td>
                                                 <div class="input_box">
                                                     @if ($type=='edit')  
-                                                    <input type='text' class="form-control form-control-sm wd100" name='name' value='{{$evt_notice[0]->admin_nm}}' required>
+                                                    <input type='text' class="form-control form-control-sm wd100" name='name' value='{{ $evt_notice[0]->admin_nm }}' required>
                                                     @else 
-                                                    <input type='text' class="form-control form-control-sm wd100" name='name' value='{{$name}}' required>
+                                                    <input type='text' class="form-control form-control-sm wd100" name='name' value='{{ $name }}' required>
                                                     @endif
                                                 </div>
                                             </td>
@@ -59,9 +59,9 @@
                                             <td>
                                                 <div class="input_box">
                                                     @if ($type=='edit')
-                                                    <input type='text' class="form-control form-control-sm wd100" name='email' value='{{$evt_notice[0]->admin_email}}' required>
+                                                    <input type='text' class="form-control form-control-sm wd100" name='email' value='{{ $evt_notice[0]->admin_email }}' required>
                                                     @else
-                                                    <input type='text' class="form-control form-control-sm wd100" name='email' value='{{$email}}' required>
+                                                    <input type='text' class="form-control form-control-sm wd100" name='email' value='{{ $email }}' required>
                                                     @endif
                                                 </div>
                                             </td>
@@ -72,7 +72,7 @@
                                                 <div class="form-inline form-radio-box">
                                                     <div class="custom-control custom-radio">
                                                         @if ($type=='edit')
-                                                        <input type="radio" name="useyn" id="useyn1" class="custom-control-input" value="Y" {{ (@$evt_notice[0]->use_yn=="Y") ? "checked" : "" }}/>
+                                                        <input type="radio" name="useyn" id="useyn1" class="custom-control-input" value="Y" {{ ($evt_notice[0]->use_yn=="Y") ? "checked" : "" }}/>
                                                         @else
                                                         <input type="radio" name="useyn" id="useyn1" class="custom-control-input" value="Y" checked/>
                                                         @endif
@@ -80,7 +80,7 @@
                                                     </div>
                                                     <div class="custom-control custom-radio">
                                                         @if ($type=='edit')
-                                                        <input type="radio" name="useyn" id="useyn2" class="custom-control-input" value="N" {{ (@$evt_notice[0]->use_yn=="N") ? "checked" : "" }}/>
+                                                        <input type="radio" name="useyn" id="useyn2" class="custom-control-input" value="N" {{ ($evt_notice[0]->use_yn=="N") ? "checked" : "" }}/>
                                                         @else
                                                         <input type="radio" name="useyn" id="useyn2" class="custom-control-input" value="N"/>
                                                         @endif
@@ -98,7 +98,7 @@
                                                     @endif
                                                     <button onclick="select_event();return false;" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm mr-1" style="float:left;">선택</button>
                                                     @if ($type=='edit')
-                                                    <div id="evt_nm" style="float:left;line-height:25px;">{{$evt_notice[0]->title}}</div>
+                                                    <div id="evt_nm" style="float:left;line-height:25px;">{{ $evt_notice[0]->title }}</div>
                                                     @else
                                                     <div id="evt_nm" style="float:left;line-height:25px;"></div>                
                                                     @endif
@@ -110,7 +110,7 @@
                                             <td colspan="3">
                                                 <div class="txt_box">
                                                     @if ($type=='edit')
-                                                    <input type="text" class="form-control form-control-sm wd100" name="subject" value="{{$evt_notice[0]->subject}}">
+                                                    <input type="text" class="form-control form-control-sm wd100" name="subject" value="{{ $evt_notice[0]->subject }}">
                                                     @else
                                                     <input type="text" class="form-control form-control-sm wd100" name="subject" value="">
                                                     @endif
@@ -124,7 +124,7 @@
                                                     <li>
                                                         <span id="preview_thumb_img" style="width:352px; height:352px; border:1px solid #b3b3b3; display:block;">
                                                         @if ($type=='edit')
-                                                        <img src="{{$evt_notice[0]->thumb_img}}" style="width:352px; height:352px;">
+                                                        <img src="{{ $evt_notice[0]->thumb_img }}" style="width:352px; height:352px;">
                                                         @else
                                                         @endif
                                                         </span>
@@ -140,7 +140,7 @@
                                             <td colspan="3">
                                                 <div class="txt_box">
                                                     @if ($type=='edit')
-                                                    <textarea name="comment" rows="5" style="width:100%">{{$evt_notice[0]->comment}}</textarea>
+                                                    <textarea name="comment" rows="5" style="width:100%">{{ $evt_notice[0]->comment }}</textarea>
                                                     @else
                                                     <textarea name="comment" rows="5" style="width:100%"></textarea>
                                                     @endif
@@ -152,7 +152,7 @@
                                             <td colspan="3">
                                                 <div class="area_box">
                                                     @if ($type=='edit')
-                                                    <textarea name="content" id="content" class="form-control editor1" style="display: none;">{{$evt_notice[0]->content}}</textarea>
+                                                    <textarea name="content" id="content" class="form-control editor1" style="display: none;">{{ $evt_notice[0]->content }}</textarea>
                                                     @else
                                                     <textarea name="content" id="content" class="form-control editor1" style="display: none;"></textarea>
                                                     @endif
@@ -254,14 +254,12 @@
 
         let evt_nm = document.getElementById('evt_nm').innerHTML;
         formData.append('evt_nm', evt_nm);
-        // console.log(evt_nm);
 
         
         let type = "<?=$type?>";
         formData.append('type', type);
-        // console.log(type);
 
-        if ( type=='add' ) {
+        if (type=='add') {
             $.ajax({
                 method: 'post',
                 url: '/head/classic/cls01/create',
@@ -281,7 +279,7 @@
                     console.log(request);
                 }
             });
-        } else if ( type == 'edit' ) {
+        } else if (type == 'edit') {
             $.ajax({
                 method: 'post',
                 url: '/head/classic/cls01/update/{{@$evt_notice[0]->idx}}',
@@ -306,7 +304,7 @@
     
     function Destroy() {
         var frm = $('form');
-		if(! confirm("삭제 하시겠습니까?")){
+		if (! confirm("삭제 하시겠습니까?")) {
 			return false;
 		}
 
@@ -316,7 +314,7 @@
             url: '/head/classic/cls01/del/{{@$evt_notice[0]->idx}}',
             data: frm.serialize(),
             success: function (res) {
-                if(res.code === 200) {
+                if (res.code === 200) {
 					alert('공지사항이 삭제되었습니다.');
                     document.location.href = '/head/classic/cls01'
                 } else {
@@ -331,19 +329,15 @@
 
     let target_file = null;
 
-    function validatePhoto() 
-	{
-        // console.log(target_file);
-        if( target_file === null || target_file.length === 0 )
-		{
-			alert("업로드할 이미지를 선택해주세요.");
-			return false;
-		}
+    function validatePhoto() {
+        // if (target_file === null || target_file.length === 0) {
+		// 	alert("업로드할 이미지를 선택해주세요.");
+		// 	return false;
+		// }
 
-        if( !/(.*?)\.(jpg|jpeg|png|gif|JPG|JPEG|PNG|GIF)$/i.test(target_file[0].name) )
-		{
-        alert("이미지 형식이 아닙니다.");
-        return false;
+        if(!/(.*?)\.(jpg|jpeg|png|gif|JPG|JPEG|PNG|GIF)$/i.test(target_file[0].name)) {
+            alert("이미지 형식이 아닙니다.");
+            return false;
         }
 
         return true;
@@ -362,8 +356,7 @@
         $("#preview_thumb_img").append(canvas);
 	}
 
-	function drawImage(e) 
-	{
+	function drawImage(e) {
         $('#preview_thumb_img canvas').each(function(idx) {
 			var size = this.width;
 			var canvas = this;

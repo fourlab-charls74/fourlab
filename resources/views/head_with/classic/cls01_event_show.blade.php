@@ -1,7 +1,6 @@
 @extends('head_with.layouts.layout-nav')
 @section('title','클래식 이벤트 검색')
 @section('content')
-
 <div class="show_layout py-3">
 	<form method="get" name="search">
         <!-- <input type="hidden" name="_token" value="BeO990XVmBSAPsl70eYvZSSdM18z8FThhXQDStZ0"> -->
@@ -59,23 +58,18 @@
 </div>
 <script language="javascript">
 	var columns = [
-		{headerName: "#", field: "num",	filter:true,width:50,
-            valueGetter: function(params) {
-                return params.node.rowIndex+1;
-                }, 
-            pinned:'left'},
-		{headerName:"트레킹", field:"title", width:250},
-		{headerName:"참여",	field:"join_cnt", width:60,
-            type:'numberType'},
-		{headerName:"시작일", field:"start_date", width:80, cellClass: 'hd-grid-code'},
-		{headerName:"마감일", field:"end_date", width:80, cellClass: 'hd-grid-code'},
-        {headerName: "선택", field: "slct",	width:60, cellClass: 'hd-grid-code', 
-            cellRenderer: function(params) {
-				return `<a href="javascript:SelectEvent('` + params.data.idx + `','` + params.data.title + `')">` + "선택" + `</a>`;
-			}
+		{headerName: "#", field: "num",	filter: true,width:50, pinned: 'left',
+            valueGetter: (params) => params.node.rowIndex+1
+        },
+		{headerName: "트레킹", field: "title", width: 250},
+		{headerName: "참여", field: "join_cnt", width: 60, type: 'numberType'},
+		{headerName: "시작일", field: "start_date", width: 80, cellClass: 'hd-grid-code'},
+		{headerName: "마감일", field: "end_date", width: 80, cellClass: 'hd-grid-code'},
+        {headerName: "선택", field: "slct",	width: 60, cellClass: 'hd-grid-code', 
+            cellRenderer: (params) => `<a href="javascript:SelectEvent('${params.data.idx}', '${params.data.title}')">선택</a>`  
 		},
-        {headerName: "이벤트 코드", field: "idx", hide:true },
-        { width: "auto" }
+        {headerName: "이벤트 코드", field: "idx", hide: true},
+        {width: "auto"}
 	];
 
     //선택
@@ -88,7 +82,7 @@
 
     //엔터키 검색
     function EnterKey(){
-        if(event.keyCode=='13'){
+        if (event.keyCode=='13') {
             event.preventDefault();
             Search();
         }

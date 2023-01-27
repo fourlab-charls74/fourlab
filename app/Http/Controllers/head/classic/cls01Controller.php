@@ -13,7 +13,8 @@ use Carbon\Carbon;
 
 class cls01Controller extends Controller
 {
-	public function index(Request $request) {
+	public function index(Request $request) 
+	{
 		$today = date("Y-m-d");
 		$edate = $today;
 		$sdate = date('Y-m-d', strtotime(-3 .'month'));
@@ -60,14 +61,14 @@ class cls01Controller extends Controller
         $page_cnt = 0;
 
 		$where = "";
-		if( $sdate != "" ) 		$where .= " and a.regi_date >= '$sdate' ";
-		if( $edate != "" ) 		$where .= " and a.regi_date < '$edate' ";
-		if( $evtidx != "" ) 	$where .= " and a.evt_idx = '$evtidx' ";
-		if ( $subject != "" ) 	$where .= " and a.subject like '%" . Lib::quote($subject) . "%' ";
-		if ( $content != "" ) 	$where .= " and a.content like '%" . Lib::quote($content) . "%' ";
-		if ( $use_yn != "" ) 	$where .= " and a.use_yn = '$use_yn' ";
+		if ($sdate != "") $where .= " and a.regi_date >= '$sdate' ";
+		if ($edate != "") $where .= " and a.regi_date < '$edate' ";
+		if ($evtidx != "") $where .= " and a.evt_idx = '$evtidx' ";
+		if ($subject != "") $where .= " and a.subject like '%" . Lib::quote($subject) . "%' ";
+		if ($content != "") $where .= " and a.content like '%" . Lib::quote($content) . "%' ";
+		if ($use_yn != "") $where .= " and a.use_yn = '$use_yn' ";
 
-		if($page == 1){
+		if ($page == 1) {
 			$sql = "
 					select 
 						count(*) as cnt
@@ -81,7 +82,7 @@ class cls01Controller extends Controller
 			// 페이지 얻기
 			$page_cnt=(int)(($data_cnt - 1)/$page_size) + 1;
 			$startno = ($page - 1) * $page_size;
-		}else{
+		} else {
 			$startno = ($page - 1) * $page_size;
 		}
 
@@ -107,11 +108,7 @@ class cls01Controller extends Controller
 	}
 
 	public function create(Request $request){
-		if(isset($type)) {
-			
-		} else {
-			$type = 'add';
-		}
+		if(! isset($type)) $type = 'add'; 
         $name =  Auth('head')->user()->name;
         $email =  Auth('head')->user()->email;
 
@@ -122,7 +119,7 @@ class cls01Controller extends Controller
 
 
 	public function event_list(Request $request){
-		return view( Config::get('shop.head.view') . '/classic/cls01_event_show');
+		return view( Config::get('shop.head.view') . '/classic/cls01_event_show' );
 	}
 
 
@@ -134,12 +131,12 @@ class cls01Controller extends Controller
 		$page			= $request->input("page",1);
 
 		$where = "";
-		if ( $stitle != "" ) $where .= " and a.title like '%" . Lib::quote($stitle) . "%' ";
+		if ($stitle != "") $where .= " and a.title like '%" . Lib::quote($stitle) . "%' ";
 
 		if ($page < 1 or $page == "") $page = 1;
 		$page_size = $limit;
 
-		if($page == 1) {
+		if ($page == 1) {
 			$sql = "
 					select 
 						count(*) as cnt
@@ -152,12 +149,8 @@ class cls01Controller extends Controller
 
 			// 페이지 얻기
 			$page_cnt=(int)(($data_cnt-1)/$page_size) + 1;
-
-			if($page == 1){
-				$startno = ($page-1) * $page_size;
-			} else {
-				$startno = ($page-1) * $page_size;
-			}
+			$startno = ($page-1) * $page_size;
+	
 		}
 
 		$arr_header = array(
@@ -201,11 +194,11 @@ class cls01Controller extends Controller
 		$base_path = "/images/fjallraven_event/notice/thumb";
 
 		/* 이미지를 저장할 경로 폴더가 없다면 생성 */
-		if(!Storage::disk('public')->exists($base_path)){
+		if (!Storage::disk('public')->exists($base_path)) {
 			Storage::disk('public')->makeDirectory($base_path);
 		}
 
-		if($img_file != null &&  $img_file != ""){
+		if ($img_file != null &&  $img_file != "") {
 			$file_ori_name = $img_file->getClientOriginalName();
 			$ext = substr($file_ori_name, strrpos($file_ori_name, '.') + 1);
 			$file_name = sprintf("%s_%s.".$ext, time(), 'thumb');
@@ -218,7 +211,7 @@ class cls01Controller extends Controller
 		try {
 			DB::beginTransaction();
 			
-			if(isset($title_img_url)){
+			if (isset($title_img_url)) {
 				$sql= "
 						insert into evt_notice (
 							evt_idx, subject, comment, content, admin_id, admin_nm, admin_email, use_yn, regi_date, thumb_img
@@ -249,7 +242,7 @@ class cls01Controller extends Controller
 		return response()->json(['code' => $code, 'message' => $msg], $code);
     }
 
-	public function update (Request $request, $idx){
+	public function update(Request $request, $idx){
 		$adminId 		= Auth('head')->user()->id;
 		$name			= $request->input("name");
 		$email			= $request->input("email");
@@ -268,12 +261,12 @@ class cls01Controller extends Controller
 			Storage::disk('public')->makeDirectory($base_path);
 		}
 
-		if ( $img_file != null &&  $img_file != "" ){
+		if ($img_file != null &&  $img_file != "") {
 			$beforeImg = DB::table('evt_notice')
 							->where('idx', $idx)
 							->value('thumb_img');
 			
-			if ( $beforeImg != null && $img_file != "" ) {
+			if ($beforeImg != null && $img_file != "") {
 				$imgPathArr = explode('/', $beforeImg);
 				$cnt = count($imgPathArr);
 				Storage::disk('public')->delete($base_path.'/'.$imgPathArr[$cnt-1]);
@@ -289,7 +282,7 @@ class cls01Controller extends Controller
 
 		try {
 			DB::beginTransaction();
-			if ( isset($title_img_url) ) {
+			if (isset($title_img_url)) {
 				$sql = "
 						update evt_notice set
 							admin_id='$adminId', evt_idx='$evt_idx', subject='$subject', comment='$comment', content='$content', admin_nm='$name', admin_email='$email', use_yn='$useyn', modi_date=now(), thumb_img='$title_img_url'
@@ -318,11 +311,7 @@ class cls01Controller extends Controller
 	}
 
 	public function show(Request $request, $idx) {
-		if(isset($type)) {
-			
-		} else {
-			$type = 'edit';
-		}
+		if (! isset($type)) $type = 'edit';
 
 		$notice_query = "
 				select 
@@ -338,7 +327,7 @@ class cls01Controller extends Controller
 			'type'		 => $type,
 			'evt_notice' => $evt_notice
 		];
-		return view( Config::get('shop.head.view') . '/classic/cls01_show',$values);
+		return view( Config::get('shop.head.view') . '/classic/cls01_show', $values );
 	}
 
 	public function delete($idx) {
@@ -347,7 +336,7 @@ class cls01Controller extends Controller
 						->where('idx', $idx)
 						->value('thumb_img');
 			
-		if ( $beforeImg != null && $beforeImg != "" ) {
+		if ($beforeImg != null && $beforeImg != "") {
 			$imgPathArr = explode('/', $beforeImg);
 			$cnt = count($imgPathArr);
 			Storage::disk('public')->delete($base_path.'/'.$imgPathArr[$cnt-1]);
