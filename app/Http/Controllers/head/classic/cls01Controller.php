@@ -26,9 +26,9 @@ class cls01Controller extends Controller
 		}
 		
 		$mst_query = "
-				select idx, title, start_date, end_date 
-				from evt_mst 
-				order by idx desc
+			select idx, title, start_date, end_date 
+			from evt_mst 
+			order by idx desc
 		";
 
 		$evt_mst = DB::select($mst_query);
@@ -41,7 +41,8 @@ class cls01Controller extends Controller
 		return view( Config::get('shop.head.view') . '/classic/cls01',$values);
 	}
 
-	public function search(Request $request){
+	public function search(Request $request)
+	{
 		$sdate			= $request->input('sdate').' 00:00:00';
 		$edate			= $request->input('edate').' 23:59:59';
 		$evtidx			= $request->input('evtTitle');
@@ -53,7 +54,7 @@ class cls01Controller extends Controller
 		$ord 			= $request->input("ord",'asc');
 
 		$page			= $request->input("page",1);
-		$page_size 		= $request->input("limit",10);
+		$page_size 		= $request->input("limit",50);
 
 		if ($page < 1 or $page == "") $page = 1;
 
@@ -107,7 +108,8 @@ class cls01Controller extends Controller
 		]);
 	}
 
-	public function create(Request $request){
+	public function create(Request $request)
+	{
 		if(! isset($type)) $type = 'add'; 
         $name =  Auth('head')->user()->name;
         $email =  Auth('head')->user()->email;
@@ -118,12 +120,14 @@ class cls01Controller extends Controller
     }
 
 
-	public function event_list(Request $request){
+	public function event_list(Request $request)
+	{
 		return view( Config::get('shop.head.view') . '/classic/cls01_event_show' );
 	}
 
 
-	public function event_search(Request $request){
+	public function event_search(Request $request)
+	{
 		$stitle			= $request->input("s_title");
 
 		$limit			= $request->input("limit",100);
@@ -177,7 +181,8 @@ class cls01Controller extends Controller
 		]);
 	}
 
-	public function save (Request $request){
+	public function save (Request $request)
+	{
 		$type			= $request->input("type");
 		$adminId 		= Auth('head')->user()->id;
 		$name			= $request->input("name");
@@ -242,7 +247,8 @@ class cls01Controller extends Controller
 		return response()->json(['code' => $code, 'message' => $msg], $code);
     }
 
-	public function update(Request $request, $idx){
+	public function update(Request $request, $idx)
+	{
 		$adminId 		= Auth('head')->user()->id;
 		$name			= $request->input("name");
 		$email			= $request->input("email");
@@ -310,7 +316,8 @@ class cls01Controller extends Controller
 
 	}
 
-	public function show(Request $request, $idx) {
+	public function show(Request $request, $idx)
+	{
 		if (! isset($type)) $type = 'edit';
 
 		$notice_query = "
@@ -330,7 +337,8 @@ class cls01Controller extends Controller
 		return view( Config::get('shop.head.view') . '/classic/cls01_show', $values );
 	}
 
-	public function delete($idx) {
+	public function delete($idx)
+	{
 		$base_path = "/images/fjallraven_event/notice/thumb";
 		$beforeImg = DB::table('evt_notice')
 						->where('idx', $idx)

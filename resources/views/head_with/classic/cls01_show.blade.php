@@ -1,5 +1,5 @@
 @extends('head_with.layouts.layout')
-@section('title','트레킹 공지사항')
+@section('title','클래식 공지사항')
 @section('content')
 
 <script type="text/javascript" src="/handle/editor/editor.js"></script>
@@ -11,7 +11,7 @@
 
 <div class="show_layout">
     <div class="page_tit">
-        <h3 class="d-inline-flex">트레킹 공지사항</h3>
+        <h3 class="d-inline-flex">클래식 공지사항</h3>
         <div class="d-inline-flex location">
             <span class="home"></span>
             <span>/ 공지사항</span>
