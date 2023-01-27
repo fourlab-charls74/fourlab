@@ -1,7 +1,6 @@
 @extends('head_with.layouts.layout')
 @section('title','클래식 숙소예약관리')
 @section('content')
-
 <div class="page_tit">
     <h3 class="d-inline-flex">(개)클래식 숙소예약관리</h3>
     <div class="d-inline-flex location">
@@ -19,56 +18,56 @@
                     <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
                     <a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm mr-1"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0 search_mode_wrap">
-                    <button type="button" class="btn btn-sm btn-outline-primary pr-1 waves-light waves-effect dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <i id="" class="search-btn-label fa fa-square fs-12"></i>
-                        <i class="bx bx-chevron-down fs-12"></i>
-                    </button>
-                    <div class="dropdown-menu" style="min-width:0">
-                        <a id="search-btn-minus" class="dropdown-item" data-search-type="minus" href="#"><i class="fa fa-minus-square"></i></a>
-                        <a id="search-btn" class="dropdown-item" href="#" data-search-type="default"><i class="fa fa-square"></i></a>
-                        <a id="search-btn-plus" class="dropdown-item" href="#" data-search-type="plus"><i class="fa fa-plus-square"></i></a>
+                        <button type="button" class="btn btn-sm btn-outline-primary pr-1 waves-light waves-effect dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            <i id="" class="search-btn-label fa fa-square fs-12"></i> <i class="bx bx-chevron-down fs-12"></i>
+                        </button>
+                        <div class="dropdown-menu" style="min-width:0">
+                            <a id="search-btn-minus" class="dropdown-item" data-search-type="minus" href="#"><i class="fa fa-minus-square"></i></a>
+                            <a id="search-btn" class="dropdown-item" href="#" data-search-type="default"><i class="fa fa-square"></i></a>
+                            <a id="search-btn-plus" class="dropdown-item" href="#" data-search-type="plus"><i class="fa fa-plus-square"></i></a>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="card-body">
-                <div class="row">
+				<div class="row">
                     <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="good_types">등록번호 :</label>
+						<div class="form-group">
+                            <label for="regist_number">등록번호</label>
                             <div class="flax_box">
-                                <input type="text" class="form-control form-control-sm search-all search-enter" name="regist_number" value="">
+								<input type="text" class="form-control form-control-sm search-all search-enter" name="regist_number" value="">
                             </div>
                         </div>
-                    </div>
+					</div>
                     <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="good_types">모바일 :</label>
+						<div class="form-group">
+                            <label for="mobile">모바일</label>
                             <div class="flax_box">
-                                <input type="text" class="form-control form-control-sm search-all search-enter" name="mobile" value="">
+								<input type="text" class="form-control form-control-sm search-all search-enter" name="mobile" value="">
                             </div>
                         </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
+					</div>
+					<div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="good_types">이메일 :</label>
+                            <label for="email">이메일</label>
                             <div class="flax_box">
-                                <input type="text" class="form-control form-control-sm search-all search-enter" name="email" value="">
+								<input type="text" class="form-control form-control-sm search-all search-enter" name="email" value="">
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-lg-4 inner-td">
+				<div class="row">
+					<div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="good_types">이름 :</label>
+                            <label for="name1">이름</label>
                             <div class="flax_box">
-                                <input type="text" class="form-control form-control-sm search-all search-enter" name="name1" value="">
+								<input type="text" class="form-control form-control-sm search-all search-enter" name="name1" value="">
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="">접수상태 :</label>
+                            <label for="state">접수상태</label>
                             <div class="flax_box">
                                 <select name="state" class="form-control form-control-sm">
                                     <option value="">전체</option>
@@ -83,7 +82,7 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="">전/후 예약일 :</label>
+                            <label>전/후 예약일</label>
                             <div class="flax_box">
                                 <select name="s_dm_date" class="form-control form-control-sm" style="width:49%;">
                                     <option value="">전체</option>
@@ -93,14 +92,14 @@
                                 </select>
                                 <select name="e_dm_date" class="form-control form-control-sm" style="margin-left:2%;width:49%;">
                                     <option value="">전체</option>
-                                        <option value="1020">10월 20일(10월 18일 출발그룹)</option>
-                                        <option value="1021">10월 21일(10월 19일 출발그룹)</option>
-                                        <option value="1022">10월 22일(10월 20일 출발그룹)</option>
+                                    <option value="1020">10월 20일(10월 18일 출발그룹)</option>
+                                    <option value="1021">10월 21일(10월 19일 출발그룹)</option>
+                                    <option value="1022">10월 22일(10월 20일 출발그룹)</option>
                                 </select>
                             </div>
                         </div>
                     </div>
-                </div>
+				</div>
             </div>
         </div>
         <div class="resul_btn_wrap mb-3">
@@ -147,42 +146,126 @@
     </div>
 </div>
 <script language="javascript">
-    var columns = [
-        {headerName: "#", field: "num",type:'NumType', cellClass: 'hd-grid-code'},
-        {headerName: "이벤트", field: "title", width:200},
-        {headerName: "이미지", field: "thumb_img", cellClass: 'hd-grid-code',
-            cellRenderer: function(params) {
-                        return '<img style=" width:50%; height:auto;" class="img" src="' + params.data.thumb_img +'"/>';
-                    }},
-        {headerName: "제목", field: "subject",width:500,
-            cellRenderer: function (params) {
-                        if (params.value !== undefined) {
-                            return '<a href="/head/classic/cls01/show/'+params.data.idx+'">' + params.value + '</a>';
-                        }
-        }},
-        {headerName: "작성자", field: "admin_nm", width:100},
-        {headerName: "공개여부", field: "use_yn", cellClass: 'hd-grid-code'},
-        {headerName: "등록일시", field: "regi_date", width:130},
-        {headerName: "조회수", field: "cnt", type:'numberType', cellClass: 'hd-grid-code'},
-        { width: "auto" }
-    ];
-    
-    const pApp = new App('', { gridId: "#div-gd" });
-    const gridDiv = document.querySelector(pApp.options.gridId);
-    const gx = new HDGrid(gridDiv, columns);
+    const defaultCellStyle = {
+        'text-align' : 'center',
+    };
 
-    pApp.ResizeGrid(275);
-    pApp.BindSearchEnter();
+	function StyleState(params){
+		var state = {
+			"확정완료":"#0000ff",
+			"접수완료":"#669900",
+			"접수대기":"#000000",
+			"접수중":"#000000",
+			"현장결제":"#0000e0"
+		}
+		if(state[params.value]){
+			var color = state[params.value];
+			return {
+				color:color,
+				'text-align': 'center',
+			}
+		}
+	}
+
+    var columns = [
+		{headerName: '', headerCheckboxSelection: true, checkboxSelection: true, width:28, pinned:'left',
+			cellStyle: {
+                "background":"#F5F7F7"
+            }
+		},
+		{headerName: '#', width:35, maxWidth: 100, cellStyle: defaultCellStyle, cellRenderer: 'loadingRenderer', pinned:'left', 
+			// it is important to have node.id here, so that when the id changes (which happens
+			// when the row is loaded) then the cell is refreshed.
+			valueGetter: 'node.id'
+		},
+        {headerName: "등록번호", field: "regist_number", width:120, cellStyle: defaultCellStyle, pinned:'left',
+            cellRenderer: (params) => `<a href="#" onClick="updateData('${params.value}')">${params.value}</a>`
+		},
+        {headerName: "이름", field: "name1", width:108},
+        {headerName: "성", field: "name2", width:84},
+        {headerName: "휴대폰", field: "mobile", width:96},
+        {headerName: "이메일", field: "email", width:150},
+        {headerName: "상태", field: "state_nm", width:72, cellStyle: StyleState},
+        {headerName: "전예약일", field: "s_dm_date_nm", width:84, cellStyle: defaultCellStyle},
+        {headerName: "전예약룸", field: "s_dm_type_nm", width:140},
+        {headerName: "후예약일", field: "e_dm_date_nm", width:84, cellStyle: defaultCellStyle},
+        {headerName: "후예약룸", field: "e_dm_type_nm", width:140},
+        {headerName: "확정", field: "confirm_yn", cellStyle: defaultCellStyle},
+        {headerName: "확정일", field: "confirm_dt", width:110, cellStyle: defaultCellStyle},
+        {headerName: "등록일", field: "reg_dt", width:110, cellStyle: defaultCellStyle},
+        {headerName: "수정일", field: "updt_dt", width:110, cellStyle: defaultCellStyle},
+        {headerName: "_상태", field: "state", hide:true},
+        {headerName: "", field: "", width:"auto"},
+    ];
+
+	function ChangeData() {
+		var checkRows = gx.gridOptions.api.getSelectedRows();
+
+		if (checkRows.length === 0) {
+            alert("수정하실 데이터를 선택해주세요.");
+            return;
+		}
+
+		if ($("#s_state").val() == "") {
+            alert("변경하실 상태를 선택해주세요.");
+            return;
+		}
+
+		if ($("#s_state").val() == "40" || $("#s_state").val() == "41") {
+			if(!confirm("확정완료/현장결제 상태로 변경하면 고객의 예약이 확정됩니다.")){
+				return;
+			}
+		}
+
+		if (confirm("선택하신 데이터의 상태를 변경하시겠습니까?")) {
+			$.ajax({
+				async: true,
+				type: 'put',
+				url: '/head/promotion/prm14/chg-state',
+				data: {
+					data : JSON.stringify(checkRows),
+                    s_state : $("#s_state").val()
+				},
+				success: function (data) {
+					if( data.code == "200" ){
+						alert("선택한 데이터의 상태가 수정 되었습니다.");
+						Search();
+					}else {
+						alert("선택한 데이터의 상태 수정이 실패하였습니다.");
+					}
+				},
+				error: function(request, status, error) {
+					alert("시스템 에러입니다. 관리자에게 문의하여 주십시요.");
+					console.log("error")
+				}
+			});
+        }
+	}
+
+	function updateData(regist_number){
+		const url='/head/classic/cls02/show/' + regist_number;
+		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
+	}
+
+</script>
+<script type="text/javascript" charset="utf-8">
+    const pApp = new App('',{
+        gridId:"#div-gd",
+    });
+    let gx;
+
+    $(document).ready(function() {
+        pApp.ResizeGrid(265);
+        pApp.BindSearchEnter();
+        let gridDiv = document.querySelector(pApp.options.gridId);
+        gx = new HDGrid(gridDiv, columns);
+        Search();
+    });
 
     function Search() {
         let data = $('form[name="search"]').serialize();
-        gx.Request('/head/classic/cls01/search', data, 1);
+        gx.Request('/head/classic/cls02/search', data, 1);
     }
-</script>
-<script type="text/javascript" charset="utf-8">
-    
-    $(function(){
-        Search();
-    });
+
 </script>
 @stop

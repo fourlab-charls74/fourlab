@@ -1187,5 +1187,7 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
 
         //숙소예약 관리
         Route::get('cls02', 'cls02Controller@index');
+        Route::get('cls02/search', 'cls02Controller@search');
+        Route::get('cls02/show/{rg_no?}', 'cls02Controller@show');
     });
 });

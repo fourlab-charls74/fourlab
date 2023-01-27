@@ -13,7 +13,8 @@ use Carbon\Carbon;
 
 class cls02Controller extends Controller
 {
-	public function index(Request $request) {
+	public function index(Request $request) 
+	{
 		// $today = date("Y-m-d");
 		// $edate = $today;
 		// $sdate = date('Y-m-d', strtotime(-3 .'month'));
@@ -31,336 +32,118 @@ class cls02Controller extends Controller
 		// ";
 
 		// $evt_mst = DB::select($mst_query);
-		$here = 'here';
+		// $here = 'here';
 
-		$values = [
-			'here' => $here
-		];
-		return view( Config::get('shop.head.view') . '/classic/cls02',$values);
+		// $values = [
+		// 	'here' => $here
+		// ];
+		// return view( Config::get('shop.head.view') . '/classic/cls02',$values);
+		return view( Config::get('shop.head.view') . '/classic/cls02');
 	}
 
-	// public function search(Request $request){
-	// 	$sdate			= $request->input('sdate').' 00:00:00';
-	// 	$edate			= $request->input('edate').' 23:59:59';
-	// 	$evtidx			= $request->input('evtTitle');
-	// 	$subject		= $request->input('subject');
-	// 	$content 		= $request->input('content');
-    //     $use_yn 		= $request->input('use_yn');
+	public function search(Request $request)
+	{
+		$regist_number	= $request->input('regist_number');
+		$mobile			= $request->input('mobile');
+		$email			= $request->input('email');
+		$name1			= $request->input('name1');
+		$state 			= $request->input('state');
+        $s_dm_date 		= $request->input('s_dm_date');
+        $e_dm_date 		= $request->input('e_dm_date');
 
-	// 	$ord_field 		= $request->input("ord_field",'a.redi_date');
-	// 	$ord 			= $request->input("ord",'asc');
+		$page			= $request->input("page",1);
+		$page_size 		= $request->input("limit",100);
 
-	// 	$page			= $request->input("page",1);
-	// 	$page_size 		= $request->input("limit",10);
+		if ($page < 1 or $page == "") $page = 1;
 
-	// 	if ($page < 1 or $page == "") $page = 1;
+		$total = 0;
+        $page_cnt = 0;
 
-	// 	$data_cnt = 0;
-    //     $page_cnt = 0;
+		$where = "";
+		if ($regist_number != "") $where .= " and a.regist_number like '%" . Lib::quote($regist_number) . "%' ";
+		if ($mobile != "") $where .= " and a.mobile like '%" . Lib::quote($mobile) . "%' ";
+		if ($email != "") $where .= " and a.email like '%" . Lib::quote($email) . "%' ";
+		if ($name1 != "") $where .= " and a.name1 like '%" . Lib::quote($name1) . "%' ";
+		if ($state != "") $where .= " and a.state = '$state' ";
+		if ($s_dm_date != "") $where .= " and a.s_dm_date = '$s_dm_date' ";
+		if ($e_dm_date != "") $where .= " and a.e_dm_date = '$e_dm_date' ";
 
-	// 	$where = "";
-	// 	if( $sdate != "" ) 		$where .= " and a.regi_date >= '$sdate' ";
-	// 	if( $edate != "" ) 		$where .= " and a.regi_date < '$edate' ";
-	// 	if( $evtidx != "" ) 	$where .= " and a.evt_idx = '$evtidx' ";
-	// 	if ( $subject != "" ) 	$where .= " and a.subject like '%" . Lib::quote($subject) . "%' ";
-	// 	if ( $content != "" ) 	$where .= " and a.content like '%" . Lib::quote($content) . "%' ";
-	// 	if ( $use_yn != "" ) 	$where .= " and a.use_yn = '$use_yn' ";
+		if ($page == 1) {
+			$sql = "
+				select 
+					count(*) as cnt
+				from classic_dm_reserve a
+				where 1=1 $where
+			";
+			$row = DB::selectOne($sql);
+			$total = $row->cnt;
 
-	// 	if($page == 1){
-	// 		$sql = "
-	// 				select 
-	// 					count(*) as cnt
-	// 				from evt_notice a
-	// 					inner join evt_mst b on a.evt_idx = b.idx
-	// 				where 1=1 $where
-	// 		";
-	// 		$row = DB::selectOne($sql);
-	// 		$data_cnt = $row->cnt;
+			// 페이지 얻기
+			$page_cnt=(int)(($total - 1)/$page_size) + 1;
+			$startno = ($page - 1) * $page_size;
+		} else {
+			$startno = ($page - 1) * $page_size;
+		}
 
-	// 		// 페이지 얻기
-	// 		$page_cnt=(int)(($data_cnt - 1)/$page_size) + 1;
-	// 		$startno = ($page - 1) * $page_size;
-	// 	}else{
-	// 		$startno = ($page - 1) * $page_size;
-	// 	}
+		$arr_header = array("total"=>$total, "page_cnt"=>$page_cnt, "page"=>$page);
 
-	// 	$arr_header = array("total"=>$data_cnt, "page_cnt"=>$page_cnt, "page"=>$page);
+		$sql = "
+			select 
+				a.regist_number, a.name1, a.name2, a.mobile, a.email, a.confirm_yn, a.confirm_dt, a.reg_dt, a.updt_dt
+				, ba.value1 as state_nm
+				, bb.value3 as s_dm_date_nm
+				, bc.value3 as s_dm_type_nm
+				, bd.value3 as e_dm_date_nm
+				, be.value3 as e_dm_type_nm
+			from classic_dm_reserve a
+				left outer join classic_code ba on ba.kind = 'dm_state' and a.state = ba.code
+				left outer join classic_code bb on bb.kind = 's_dm_date' and a.s_dm_date = bb.code
+				left outer join classic_code bc on bc.kind = 'dm_type' and a.s_dm_type = bc.code
+				left outer join classic_code bd on bd.kind = 'e_dm_date' and a.e_dm_date = bd.code
+				left outer join classic_code be on be.kind = 'dm_type' and a.e_dm_type = be.code
+			where 1=1 $where
+			order by a.reg_dt
+			limit $startno, $page_size
+		";
 
-	// 	$sql = "
-	// 			select 
-	// 				a.idx, b.title, a.thumb_img, a.subject, a.admin_nm, a.use_yn, a.regi_date, a.cnt
-	// 			from evt_notice a
-	// 				inner join evt_mst b on a.evt_idx = b.idx
-	// 			where 1=1 $where
-	// 			order by $ord_field $ord 
-	// 			limit $startno, $page_size
-	// 	";
+		$result = DB::select($sql);
 
-	// 	$result = DB::select($sql);
+		return response()->json([
+			"code" => 200,
+			"head" => $arr_header,
+			"body" => $result
+		]);
+	}
 
-	// 	return response()->json([
-	// 		"code" => 200,
-	// 		"head" => $arr_header,
-	// 		"body" => $result
-	// 	]);
-	// }
+	//상세페이지 select box ( 예약 숫자 & 예약 가능 숫자 ) 작업 중
+	public function show(Request $request, $rg_no) 
+	{
+		$cnt_query = "
+			select
+				a.code, a.value1
+			from classic_code a
+			where
+				a.kind = 'dm_type'
+		";
+		$cnts = DB::select($cnt_query);
 
-	// public function create(Request $request){
-	// 	if(isset($type)) {
-			
-	// 	} else {
-	// 		$type = 'add';
-	// 	}
-    //     $name =  Auth('head')->user()->name;
-    //     $email =  Auth('head')->user()->email;
+		$reserve_query = "
+			select 
+				a.passwd, a.name1, a.name2, a.mobile, a.email, a.regist_number
+				, a.state
+				, a.s_dm_date, a.s_dm_type
+				, a.e_dm_date, a.e_dm_type
+			from classic_dm_reserve a
+			where a.regist_number = '$rg_no'
+		";
 
-    //     return view( Config::get('shop.head.view') . '/classic/cls01_show',
-    //         ['name' => $name, 'email' => $email, 'type' => $type]
-    //     );
-    // }
+		$reserve_detail = DB::selectOne($reserve_query);
 
+		$values = [
+			'reserve' 	=> $reserve_detail,
+			'cnts' 		=> $cnts
+		];
 
-	// public function event_list(Request $request){
-	// 	return view( Config::get('shop.head.view') . '/classic/cls01_event_show');
-	// }
-
-
-	// public function event_search(Request $request){
-	// 	$stitle			= $request->input("s_title");
-
-	// 	$limit			= $request->input("limit",100);
-	// 	$head_desc		= $request->input("head_desc");
-	// 	$page			= $request->input("page",1);
-
-	// 	$where = "";
-	// 	if ( $stitle != "" ) $where .= " and a.title like '%" . Lib::quote($stitle) . "%' ";
-
-	// 	if ($page < 1 or $page == "") $page = 1;
-	// 	$page_size = $limit;
-
-	// 	if($page == 1) {
-	// 		$sql = "
-	// 				select 
-	// 					count(*) as cnt
-	// 				from evt_mst a
-	// 				where 1=1 $where
-	// 		";
-
-	// 		$row = DB::selectOne($sql);
-	// 		$data_cnt = $row->cnt;
-
-	// 		// 페이지 얻기
-	// 		$page_cnt=(int)(($data_cnt-1)/$page_size) + 1;
-
-	// 		if($page == 1){
-	// 			$startno = ($page-1) * $page_size;
-	// 		} else {
-	// 			$startno = ($page-1) * $page_size;
-	// 		}
-	// 	}
-
-	// 	$arr_header = array(
-	// 		"total"		=>	$data_cnt,
-	// 		"page_cnt"	=>	$page_cnt,
-	// 		"page"		=>	$page,
-	// 		"page_total"=>	$page_cnt
-	// 	);
-
-	// 	$sql = "
-	// 			select 
-	// 				a.idx, a.title, a.join_cnt, a.start_date, a.end_date
-	// 			from evt_mst a
-	// 			where 1=1 $where
-	// 			order by idx desc
-	// 	";
-
-	// 	$result = DB::select($sql);
-
-	// 	return response()->json([
-	// 		"code" => 200,
-	// 		"head" => $arr_header,
-	// 		"body" => $result
-	// 	]);
-	// }
-
-	// public function save (Request $request){
-	// 	$type			= $request->input("type");
-	// 	$adminId 		= Auth('head')->user()->id;
-	// 	$name			= $request->input("name");
-	// 	$email			= $request->input("email");
-	// 	$useyn			= $request->input("useyn");
-	// 	$evt_idx		= $request->input("evt_idx");
-	// 	$evt_nm 		= $request->input("evt_nm");
-	// 	$img_file 		= $request->file("title_file");
-	// 	$subject		= $request->input("subject");
-	// 	$comment		= $request->input("comment");
-	// 	$content		= $request->input("content");
-	// 	$idx            = $request->input("idx");
-
-	// 	$base_path = "/images/fjallraven_event/notice/thumb";
-
-	// 	/* 이미지를 저장할 경로 폴더가 없다면 생성 */
-	// 	if(!Storage::disk('public')->exists($base_path)){
-	// 		Storage::disk('public')->makeDirectory($base_path);
-	// 	}
-
-	// 	if($img_file != null &&  $img_file != ""){
-	// 		$file_ori_name = $img_file->getClientOriginalName();
-	// 		$ext = substr($file_ori_name, strrpos($file_ori_name, '.') + 1);
-	// 		$file_name = sprintf("%s_%s.".$ext, time(), 'thumb');
-	// 		$save_file = sprintf("%s/%s", $base_path, $file_name);
-	// 		$title_img_url = $save_file;
-
-	// 		Storage::disk('public')->putFileAs($base_path, $img_file, $file_name);
-	// 	}
-
-	// 	try {
-	// 		DB::beginTransaction();
-			
-	// 		if(isset($title_img_url)){
-	// 			$sql= "
-	// 					insert into evt_notice (
-	// 						evt_idx, subject, comment, content, admin_id, admin_nm, admin_email, use_yn, regi_date, thumb_img
-	// 					) values (
-	// 						'$evt_idx', '$subject', '$comment', '$content', '$adminId', '$name', '$email', '$useyn', now(), '$title_img_url'
-	// 					)
-	// 			";
-	// 		} else {
-	// 			$sql= "
-	// 					insert into evt_notice (
-	// 						evt_idx, subject, comment, content, admin_id, admin_nm, admin_email, use_yn, regi_date
-	// 					) values (
-	// 						'$evt_idx', '$subject', '$comment', '$content', '$adminId', '$name', '$email', '$useyn', now()
-	// 					)
-	// 			";
-	// 		}
-	
-	// 		DB::insert($sql);
-	// 		DB::commit();
-
-	// 		$code = 200;
-	// 		$msg = "add success";
-	// 	} catch(Exception $e) {
-	// 		DB::rollback();
-	// 		$code = 500;
-	// 		$msg = $e->getMessage();
-	// 	}
-	// 	return response()->json(['code' => $code, 'message' => $msg], $code);
-    // }
-
-	// public function update (Request $request, $idx){
-	// 	$adminId 		= Auth('head')->user()->id;
-	// 	$name			= $request->input("name");
-	// 	$email			= $request->input("email");
-	// 	$useyn			= $request->input("useyn");
-	// 	$evt_idx		= $request->input("evt_idx");
-	// 	$evt_nm 		= $request->input("evt_nm");
-	// 	$img_file 		= $request->file("title_file");
-	// 	$subject		= $request->input("subject");
-	// 	$comment		= $request->input("comment");
-	// 	$content		= $request->input("content");
-
-	// 	$base_path = "/images/fjallraven_event/notice/thumb";
-
-	// 	/* 이미지를 저장할 경로 폴더가 없다면 생성 */
-	// 	if(!Storage::disk('public')->exists($base_path)){
-	// 		Storage::disk('public')->makeDirectory($base_path);
-	// 	}
-
-	// 	if ( $img_file != null &&  $img_file != "" ){
-	// 		$beforeImg = DB::table('evt_notice')
-	// 						->where('idx', $idx)
-	// 						->value('thumb_img');
-			
-	// 		if ( $beforeImg != null && $img_file != "" ) {
-	// 			$imgPathArr = explode('/', $beforeImg);
-	// 			$cnt = count($imgPathArr);
-	// 			Storage::disk('public')->delete($base_path.'/'.$imgPathArr[$cnt-1]);
-	// 		}
-	// 		$file_ori_name = $img_file->getClientOriginalName();
-	// 		$ext = substr($file_ori_name, strrpos($file_ori_name, '.') + 1);
-	// 		$file_name = sprintf("%s_%s.".$ext, time(), 'thumb');
-	// 		$save_file = sprintf("%s/%s", $base_path, $file_name);
-	// 		$title_img_url = $save_file;
-
-	// 		Storage::disk('public')->putFileAs($base_path, $img_file, $file_name);
-	// 	}
-
-	// 	try {
-	// 		DB::beginTransaction();
-	// 		if ( isset($title_img_url) ) {
-	// 			$sql = "
-	// 					update evt_notice set
-	// 						admin_id='$adminId', evt_idx='$evt_idx', subject='$subject', comment='$comment', content='$content', admin_nm='$name', admin_email='$email', use_yn='$useyn', modi_date=now(), thumb_img='$title_img_url'
-	// 					where idx = '$idx'
-	// 			";
-	// 		} else {
-	// 			$sql = "
-	// 					update evt_notice set
-	// 						admin_id='$adminId', evt_idx='$evt_idx', subject='$subject', comment='$comment', content='$content', admin_nm='$name', admin_email='$email', use_yn='$useyn', modi_date=now()
-	// 					where idx = '$idx'
-	// 			";
-	// 		}
-	
-	// 		DB::update($sql);
-	// 		DB::commit();
-
-	// 		$code = 200;
-	// 		$msg = "update success";
-	// 	} catch(Exception $e) {
-	// 		DB::rollback();
-	// 		$code = 500;
-	// 		$msg = $e->getMessage();
-	// 	}
-	// 	return response()->json(['code' => $code, 'message' => $msg], $code);
-
-	// }
-
-	// public function show(Request $request, $idx) {
-	// 	if(isset($type)) {
-			
-	// 	} else {
-	// 		$type = 'edit';
-	// 	}
-
-	// 	$notice_query = "
-	// 			select 
-	// 				a.idx, a.admin_nm, a.admin_email, a.use_yn, a.evt_idx, b.title, a.subject, a.thumb_img, a.comment, a.content
-	// 			from evt_notice a
-	// 				inner join evt_mst b on a.evt_idx = b.idx
-	// 			where a.idx = '$idx'
-	// 	";
-
-	// 	$evt_notice = DB::select($notice_query);
-
-	// 	$values = [
-	// 		'type'		 => $type,
-	// 		'evt_notice' => $evt_notice
-	// 	];
-	// 	return view( Config::get('shop.head.view') . '/classic/cls01_show',$values);
-	// }
-
-	// public function delete($idx) {
-	// 	$base_path = "/images/fjallraven_event/notice/thumb";
-	// 	$beforeImg = DB::table('evt_notice')
-	// 					->where('idx', $idx)
-	// 					->value('thumb_img');
-			
-	// 	if ( $beforeImg != null && $beforeImg != "" ) {
-	// 		$imgPathArr = explode('/', $beforeImg);
-	// 		$cnt = count($imgPathArr);
-	// 		Storage::disk('public')->delete($base_path.'/'.$imgPathArr[$cnt-1]);
-	// 	}
-
-	// 	try {
-	// 		DB::table('evt_notice')->where('idx', $idx)->delete();
-	// 		$code = 200;
-	// 		$msg  = "delete success";
-	// 	} catch (Exception $e) {
-	// 		DB::rollback();
-	// 		$code = 500;
-	// 		$msg = $e->getMessage();
-	// 	}
-    //     return response()->json(['code' => $code, 'message' => $msg], $code);
-    // }
+		return view( Config::get('shop.head.view') . '/classic/cls02_show', $values );
+	}
 }
