@@ -914,6 +914,23 @@ CREATE TABLE `store_group_authority` (
   PRIMARY KEY (`group_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--  로그관리
+CREATE TABLE `store_log` (
+  `menu_no` int(11) DEFAULT NULL COMMENT '메뉴번호',
+  `pid` varchar(20) DEFAULT NULL COMMENT '프로그램ID',
+  `cmd` varchar(20) DEFAULT NULL COMMENT '명령',
+  `menu_nm` varchar(255) DEFAULT NULL COMMENT '메뉴명',
+  `exec_time` float DEFAULT NULL COMMENT '사용시간',
+  `id` varchar(15) DEFAULT NULL COMMENT '아이디',
+  `ip` varchar(30) DEFAULT NULL COMMENT 'ip',
+  `name` varchar(20) DEFAULT NULL COMMENT '관리자명',
+  `log_time` datetime DEFAULT NULL COMMENT '로그시간',
+  KEY `log_time` (`log_time`),
+  KEY `id` (`id`),
+  KEY `name` (`name`),
+  KEY `pid` (`pid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='관리자 로그정보';
+
 
 
 
