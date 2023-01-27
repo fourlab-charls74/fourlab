@@ -319,6 +319,7 @@
                 ],
             },
             {field: "amount", headerName: "합계", type: 'currencyType', width:100, valueGetter: (params) => calAmount(params)},
+            {field: "req_comment", headerName: "매장메모", width: 300, editable: true,cellStyle: {'background-color': '#ffff99'}},
             {width: 'auto'}
         ];
 
