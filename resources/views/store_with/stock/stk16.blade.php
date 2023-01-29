@@ -406,6 +406,11 @@
                 return params.data.state === 10 ? params.value : params.data.dlv_day?.replaceAll("-", "") + (params.value) || '' + (params.value || '');
             }
         },
+        {field: "req_comment", headerName: "매장메모", width: 300},
+        {field: "comment", headerName: "본사메모", width: 300, 
+            editable: function(params) {return params.data.state === 10;}, 
+            cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};}
+        },
         {field: "req_id", headerName: "요청자", cellStyle: {"text-align": "center"}},
         {field: "req_rt", headerName: "요청일시", width: 120, cellStyle: {"text-align": "center"}},
         {field: "rec_id", headerName: "접수자", cellStyle: {"text-align": "center"}},
@@ -414,10 +419,7 @@
         {field: "prc_rt", headerName: "처리일시", width: 120, cellStyle: {"text-align": "center"}},
         {field: "fin_id", headerName: "완료(입고)자", cellStyle: {"text-align": "center"}},
         {field: "fin_rt", headerName: "완료(입고)일시", width: 120, cellStyle: {"text-align": "center"}},
-        {field: "comment", headerName: "메모", width: 300, 
-            editable: function(params) {return params.data.state === 10;}, 
-            cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};}
-        },
+        
         {width: 'auto'}
 	];
 </script>

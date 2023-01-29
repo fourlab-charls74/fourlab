@@ -22,6 +22,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
     //Route::get('/login', 'LoginController@index')->name('login');
     Route::post('/login', 'LoginController@login');
     Route::get('/logout', 'LoginController@logout');
+    Route::get('/user/log', 'UserController@log');
+    Route::get('/user/log_search', 'UserController@searchlog');
 
     Route::prefix("auto-complete")->group(function () {
 
@@ -580,6 +582,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
         // 매장판매수수료
         Route::get('acc04', 'acc04Controller@index');
+        Route::get('acc04/search', 'acc04Controller@search');
 
         // 기타재반자료
         Route::get('acc05', 'acc05Controller@index');

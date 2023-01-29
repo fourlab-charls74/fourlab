@@ -141,7 +141,7 @@ class stk17Controller extends Controller
         $data = $request->input("products", []);
         // $exp_dlv_day = $request->input("exp_dlv_day", '');
         // $rel_order = $request->input("rel_order", '');
-        
+
         $sql = "select storage_cd from storage where default_yn = 'Y'";
         $storage_cd = DB::selectOne($sql)->storage_cd;
 
@@ -158,8 +158,7 @@ class stk17Controller extends Controller
                         'store_cd' => $store_cd,
                         'storage_cd' => $storage_cd,
                         'state' => $state,
-                        // 'exp_dlv_day' => str_replace("-", "", $exp_dlv_day),
-                        // 'rel_order' => $rel_order,
+                        'req_comment' => $row['req_comment'],
                         'req_id' => $admin_id,
                         'req_rt' => now(),
                         'rt' => now(),

@@ -55,7 +55,7 @@ class cs03Controller extends Controller
 		$user_nm_state = $request->input("user_nm_state");
 		$user_nm = $request->input("user_nm");
 
-		$ord_field = $request->input("ord_field",'p1.rt');
+		$ord_field = $request->input("ord_field", 'p1.req_rt');
 		$ord = $request->input('ord','desc');
 		
 		if ($ord_field == 'prd_ord_date') {
@@ -133,7 +133,7 @@ class cs03Controller extends Controller
 				ifnull(p1.price, 0) as price,
 				ifnull(p1.wonga, 0) as wonga,
 				p1.qty * p1.price as amount,
-				p1.rt as rt,
+				p1.req_rt as rt,
 				p1.ut as ut,
 				m.name as user_nm,
 				p1.req_id as req_id,

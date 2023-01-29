@@ -244,26 +244,26 @@
 </div>
 <script language="javascript">
 	var columns = [
-		{headerName: '#', pinned: 'left', type: 'NumType', width:40, cellStyle: StyleLineHeight},
-        {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: StyleLineHeight, pinned: 'left'},
-		{field: "goods_no", headerName: "상품번호", width: 58, pinned: 'left', cellStyle: StyleLineHeight,
+		{headerName: '#', pinned: 'left', type: 'NumType', width:40},
+        {field: "prd_cd", headerName: "상품코드", width: 120, pinned: 'left'},
+		{field: "goods_no", headerName: "상품번호", width: 58, pinned: 'left',
             cellRenderer: function (params) {
                 if (params.value) {
                     return `<a href="{{config('shop.front_url')}}/app/product/detail/${params.value}" target="_blank">${params.value}</a>`
                 }
             }
         },
-        {field: "opt_kind_nm", headerName: "품목", width: 60, cellStyle: StyleLineHeight},
-		{field: "brand_nm", headerName: "브랜드", width: 80, cellStyle: StyleLineHeight},
-        {field: "style_no", headerName: "스타일넘버", width: 80, cellStyle: StyleLineHeight},
-		{field: "img", headerName: "이미지", type: 'GoodsImageType', width: 50, cellStyle: StyleLineHeight, surl:"{{config('shop.front_url')}}"},
+        {field: "opt_kind_nm", headerName: "품목", width: 60},
+		{field: "brand_nm", headerName: "브랜드", width: 80},
+        {field: "style_no", headerName: "스타일넘버", width: 80},
+		{field: "img", headerName: "이미지", type: 'GoodsImageType', width: 50, surl:"{{config('shop.front_url')}}"},
         {field: "img", headerName: "이미지_url", hide: true},
-		{field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', width: 150, cellStyle: {"line-height": "30px"}},
-		{field: "goods_nm_eng", headerName: "상품명(영문)", width: 150, cellStyle: {"line-height": "30px"}},
-        {field: "prd_cd_p", headerName: "코드일련", width:90, cellStyle: StyleLineHeight},
-        {field: "color", headerName: "컬러", width:55, cellStyle: StyleLineHeight},
-        {field: "size", headerName: "사이즈", width:55, cellStyle: StyleLineHeight},
-		{field: "goods_opt", headerName: "옵션", cellStyle: {"line-height": "30px"}, width: 120},
+		{field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', width: 150},
+		{field: "goods_nm_eng", headerName: "상품명(영문)", width: 150},
+        {field: "prd_cd_p", headerName: "코드일련", width:90},
+        {field: "color", headerName: "컬러", width:55},
+        {field: "size", headerName: "사이즈", width:55},
+		{field: "goods_opt", headerName: "옵션", width: 120},
         // {field: "",	headerName: "TAG가"},
         {field: "s",	headerName: "판매현황",
             children: [
