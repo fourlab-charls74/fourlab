@@ -141,7 +141,7 @@
 			</div>
 		</div>
         <div class="table-responsive">
-			<div id="div-gd" style="height: calc(100vh - 434.031px); width: 100%;" class="ag-theme-balham"></div>
+			<div id="div-gd" style="height: calc(100vh - 20vh); width: 100%;" class="ag-theme-balham"></div>
         </div>
     </div>
 </div>
@@ -221,7 +221,7 @@
 			$.ajax({
 				async: true,
 				type: 'put',
-				url: '/head/promotion/prm14/chg-state',
+				url: '/head/classic/cls02/chg-state',
 				data: {
 					data : JSON.stringify(checkRows),
                     s_state : $("#s_state").val()

@@ -1189,5 +1189,7 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::get('cls02', 'cls02Controller@index');
         Route::get('cls02/search', 'cls02Controller@search');
         Route::get('cls02/show/{rg_no?}', 'cls02Controller@show');
+        // Route::put('prm13/show/{order_no}/{user_code}', 'prm13Controller@update');
+        Route::put('cls02/chg-state', 'cls02Controller@state_update');
     });
 });

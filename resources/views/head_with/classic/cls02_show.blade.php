@@ -1,4 +1,4 @@
-@extends('head_with.layouts.layout')
+@extends('head_with.layouts.layout-nav')
 @section('title','클래식 숙소예약 상세내역')
 @section('content')
 <form name="info" method="post" action="/head/promotion/prm14/update">
@@ -55,11 +55,11 @@
 						    <div class="col-sm-6 form-group">
 							    <select class="form-control" id="s_dm_type" name="s_dm_type">
 								    <option value="">* 객실타입</option>
-                                    @foreach(@$cnts as $cnt)
-                                        @if($cnt->code == 0)
-                                        <option value="{{ $cnt->code }}" style="display: block;" @if(@$reserve->s_dm_type == @$cnt->code) selected @endif>{{ $cnt-> value1 }}</option>
+                                    @foreach(@$sdms as $sdm)
+                                        @if(@$sdm->dm_type == 0)
+                                        <option value="{{ $sdm->dm_type }}" style="display: block;" @if(@$reserve->s_dm_type == @$sdm->dm_type) selected @endif>{{ $sdm-> value1 }}</option>
                                         @else
-                                        <option value="{{ $cnt->code }}" style="display: block;" @if(@$reserve->s_dm_type == @$cnt->code) selected @endif>{{ $cnt-> value1 }} &lpar; 예약숫자 &sol; 가능숫자 &rpar;</option>
+                                        <option value="{{$sdm->dm_type }}" style="display: block;" @if(@$reserve->s_dm_type == @$sdm->dm_type) selected @endif @if($sdm->reserve_cnt >= $sdm->dm_cnt) style="color: rgb(204, 204, 204);" disabled @endif>{{ $sdm->value1 }} &lpar; {{ $sdm->reserve_cnt }} &sol; {{ $sdm->dm_cnt }} &rpar;</option>
                                         @endif
                                     @endforeach
                                 </select>
