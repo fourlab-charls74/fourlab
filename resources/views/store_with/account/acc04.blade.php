@@ -34,7 +34,7 @@
 				<h4>검색</h4>
 				<div class="flax_box">
 					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-					<a href="#" onclick="initSearch()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
+					<a href="#" onclick="initSearch(['#store_no', '#sale_kind'])" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
 			</div>
@@ -100,7 +100,6 @@
                             <label for="pr_code">판매유형</label>
                             <div class="flax_box">
                                 <select id="sale_kind" name="sale_kind[]" class="form-control form-control-sm multi_select w-100" multiple>
-                                    <option value=''>전체</option>
                                     @foreach (@$sale_kinds as $sale_kind)
                                     <option value='{{ $sale_kind->code_id }}' @if (@$sale_kind_id == $sale_kind->code_id) selected @endif>{{ $sale_kind->code_val }}</option>
                                     @endforeach
@@ -108,7 +107,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 inner-td">
+                    {{-- <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="brand_cd">브랜드</label>
                             <div class="form-inline inline_btn_box">
@@ -116,7 +115,7 @@
                                 <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="sale_yn">매출여부</label>
@@ -160,8 +159,8 @@
 	</div>
 </div>
 <script language="javascript">
-    var columns = [
-        { headerName: "#", field: "num", type: 'NumType', pinned: 'left', aggSum: "합계", aggAvg: "평균", cellStyle: { 'text-align': "center" },
+    const columns = [
+        { headerName: "#", field: "num", type: 'NumType', pinned: 'left', aggSum: "합계", cellStyle: { 'text-align': "center" },
 			cellRenderer: (params) => params.node.rowPinned === 'top' ? '합계' : (parseInt(params.value) + 1),
         },
         { field: "store_type_nm", headerName: "매장구분", pinned: 'left', width: 70, cellStyle: { 'text-align': "center" } },
@@ -169,38 +168,39 @@
         { field: "store_nm", headerName: "매장명", pinned: 'left', type: 'StoreNameType', width: 150 },
         { headerName: "매출",
             children: [
-                { headerName: "소계", field: "sales_total", type: 'numberType', width:100, headerClass: "merged-cell" },
+                { headerName: "소계", field: "sales_total", type: 'numberType', width: 100, headerClass: "merged-cell", aggregation: true },
 				@foreach (@$pr_codes as $pr_code)
-                { headerName: "{{ @$pr_code->code_val }}", field: "sales_{{ @$pr_code->code_id }}", type: 'numberType', width:100, headerClass: "merged-cell" },
+                { headerName: "{{ @$pr_code->code_val }}", field: "sales_{{ @$pr_code->code_id }}", type: 'numberType', width: 100, headerClass: "merged-cell", aggregation: true},
 				@endforeach
-                { headerName: "기타", field: "sales_etc", type: 'numberType', width:100, headerClass: "merged-cell" },
+                { headerName: "기타", field: "sales_etc", type: 'numberType', width: 100, headerClass: "merged-cell", aggregation: true },
             ]
         },
-        { field: "wonga_total", headerName: "원가", width: 80, type: 'currencyMinusColorType' },
-        { field: "sales_profit", headerName: "매출이익", type: 'currencyMinusColorType' }, // 매출이익 = 결제금액 - 원가 합계금액
-        { field: "profit_rate",	headerName: "이익율(%)", type: 'percentType' }, // 매출이익 분의 매출액 = 이익율
+        // { field: "sale_qty", headerName: "판매상품수량", width: 100, hide: true, type: 'currencyType' },
+        { field: "wonga_total", headerName: "원가", width: 100, type: 'currencyMinusColorType', aggregation: true },
+        { field: "sales_profit", headerName: "매출이익", width: 100, type: 'currencyMinusColorType', aggregation: true }, // 매출이익 = 결제금액 - 원가 합계금액
+        { field: "profit_rate",	headerName: "이익율(%)", width: 80, type: 'percentType' }, // 매출이익 분의 매출액 = 이익율
         { headerName: "수수료",
             children: [
-                { headerName: "수수료합계", field: "fee", type: 'numberType', width:100, headerClass: "merged-cell" },
-                { headerName: "임대관리비", field: "fee", type: 'numberType', width:100, headerClass: "merged-cell" },
+                { headerName: "수수료합계", field: "total_fee", type: 'numberType', width: 100, headerClass: "merged-cell", aggregation: true },
+                { headerName: "임대관리비", field: "management_fee", type: 'numberType', width: 100, headerClass: "merged-cell", aggregation: true },
 				@foreach (@$pr_codes as $pr_code)
-                { headerName: "{{ @$pr_code->code_val }}", field: "sales_fee_{{ @$pr_code->code_id }}", type: 'numberType', width: 100,
+                { headerName: "{{ @$pr_code->code_val }}",
                     children: [
-                        { headerName: "수수료율", field: "fee", type: 'numberType',width: 60 },
-                        { headerName: "수수료", field: "fee", type: 'numberType',width: 100 },
+                        { headerName: "수수료율", field: "{{ @$pr_code->code_id }}_fee_rate", type: 'percentType', width: 60 },
+                        { headerName: "수수료", field: "{{ @$pr_code->code_id }}_fee", type: 'numberType', width: 100, aggregation: true },
                     ]
                 },
 				@endforeach
-                { headerName: "기타", field: "fee", type: 'numberType',width:100,
+                { headerName: "기타",
                     children: [
-                        { headerName: "수수료율", field: "fee", type: 'numberType', width: 60 },
-                        { headerName: "수수료", field: "fee", type: 'numberType', width: 100 },
+                        { headerName: "수수료율", field: "etc_fee_rate", type: 'percentType', width: 60 },
+                        { headerName: "수수료", field: "etc_fee", type: 'numberType', width: 100, aggregation: true },
                     ]
                 },
             ]
         },
-        { field: "sales_profit", headerName: "매출이익-수수료", type: 'currencyMinusColorType' }, // 매출이익 = 결제금액 - 원가 합계금액
-        { field: "profit_rate",	headerName: "수수료제외이익율(%)", type:'percentType' }, // 매출이익 분의 매출액 = 이익율
+        { field: "sales_real_profit", headerName: "매출이익-수수료", type: 'currencyMinusColorType', width: 100, aggregation: true },
+        { field: "real_profit_rate", headerName: "수수료제외이익율(%)", type: 'percentType', width: 120 },
         { width: "auto" }
     ];
 
@@ -213,13 +213,26 @@
 		pApp.ResizeGrid(265);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
-		gx = new HDGrid(gridDiv, columns);
+		gx = new HDGrid(gridDiv, columns, {
+            getRowStyle: (params) => { // 고정된 row styling
+                if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#eee', 'border': 'none'};
+            },
+		});
+
+		gx.Aggregation({
+            "sum": "top",
+        });
 
 		Search();
+
+		//매장 다중 선택
+		$(".sch-store").on("click", function() {
+			searchStore.Open(null, "multiple");
+        });
 	});
 
 	function Search() {
-		let data = $('form[name="search"]').serialize();
+		const data = $('form[name="search"]').serialize();
 		gx.Request('/store/account/acc04/search', data, -1);
 	}
 

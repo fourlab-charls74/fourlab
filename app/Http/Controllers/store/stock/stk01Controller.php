@@ -14,7 +14,6 @@ class stk01Controller extends Controller
 {
 	public function index() 
 	{
-
 		$values = [
 			'code_kinds'	=> [],
             'style_no'		=> "",
@@ -391,6 +390,7 @@ class stk01Controller extends Controller
 		$sdate = $request->input('sdate', date('Y-m-d'));
 		$edate = $request->input('edate', date('Y-m-d'));
 		$next_edate = date("Y-m-d", strtotime("+1 day", strtotime($edate)));
+		$now_date = date('Ymd');
 		$store_type = $request->input('store_type', '');
 		$store_cds = $request->input('store_no', []);
 		

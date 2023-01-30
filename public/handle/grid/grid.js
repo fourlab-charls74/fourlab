@@ -541,8 +541,17 @@ HDGrid.prototype.CalAggregation = function(){ // 2022-07-08 동적으로 컬럼 
                 if (column.hasOwnProperty('children')) {
                     for (let j = 0; j < column.children.length; j++) {
                         let column2 = column.children[j];
-                        if(column2.aggregation === true){
-                            sumRow[column2.field] = 0;
+                        if (column2.hasOwnProperty('children')) {
+                            for (let k = 0; k < column2.children.length; k++) {
+                                let column3 = column2.children[k];
+                                if(column3.aggregation === true){
+                                    sumRow[column3.field] = 0;
+                                }
+                            }
+                        } else {
+                            if(column2.aggregation === true){
+                                sumRow[column2.field] = 0;
+                            }
                         }
                     }
                 }
