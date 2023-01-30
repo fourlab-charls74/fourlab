@@ -66,7 +66,7 @@
                 </form>
             </div>
         </div>
-        <!-- <div class="card shadow mt-3 d-none" id="basic_info_form">
+        <div class="card shadow mt-3 d-none" id="basic_info_form">
             <div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
                 <a href="#">기본정보</a>
             </div>
@@ -78,34 +78,40 @@
                                 <table class="table incont table-bordered" width="100%" cellspacing="0">
                                     <tbody>
                                         <tr>
-                                            <th class="required">실사일자</th>
+                                            <th class="required">반품일자</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    <p class="fs-14" id="sc_date"></p>
+                                                    <p class="fs-14" id="sr_date"></p>
                                                 </div>
                                             </td>
-                                            <th class="required">매장</th>
+                                            <th class="required">반품매장</th>
                                             <td>
                                                 <div class="form-inline">
                                                     <p class="fs-14" id="store_nm"></p>
                                                 </div>
                                             </td>
-                                            <th>실사코드</th>
+                                            <th>반품코드</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    <p class="fs-14" id="new_sc_cd"></p>
+                                                    <p class="fs-14" id="new_sr_cd"></p>
                                                 </div>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="required">담당자</th>
+                                            <th class="required">반품창고</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    <p class="fs-14" id="md_nm"></p>
+                                                    <p class="fs-14" id="storage_nm"></p>
+                                                </div>
+                                            </td>
+                                            <th class="required">반품사유</th>
+                                            <td>
+                                                <div class="form-inline">
+                                                    <p class="fs-14" id="sr_reason"></p>
                                                 </div>
                                             </td>
                                             <th>메모</th>
-                                            <td colspan="3">
+                                            <td>
                                                 <div class="form-inline">
                                                     <p class="fs-14" id="comment"></p>
                                                 </div>
@@ -118,7 +124,7 @@
                     </div>
                 </form>
             </div>
-        </div> -->
+        </div>
         <div class="card shadow mt-3">
             <div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
                 <a href="#">상품정보</a>
@@ -386,13 +392,33 @@
         }).then(async (res) => {
             if (res.data.code != 200) return alert(res.data.msg);
 
-            // setBasicInfo(res.data.head);
+            setBasicInfo(res.data.data);
             await gx.gridOptions.api.applyTransaction({add : res.data.body});
             updatePinnedRow();
         }).catch((error) => {
             console.log(error);
         });
     };
+
+     function setBasicInfo(obj) {
+
+        let new_sr_cd = {{ @$new_sr_cd }};
+        let sr_date = basic_info.sr_date;
+        let store_cd = obj.store_nm
+        let storage_cd = obj.storage_nm;
+        let sr_reason = obj.sr_reason;
+        let comment = basic_info.comment;
+
+        $("#new_sr_cd").text(new_sr_cd);
+        $("#sr_date").text(sr_date);
+        $("#store_nm").text(store_cd);
+        $("#storage_nm").text(storage_cd);
+        $("#sr_reason").text(sr_reason);
+        $("#comment").text(comment);
+
+        $("#basic_info_form").removeClass("d-none");
+        pApp.ResizeGrid(275, 340);
+    }
 
 
     // 창고일괄반품 저장

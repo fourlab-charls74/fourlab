@@ -333,7 +333,7 @@
                                                 <th>적립금사용</th>
                                                 <td style="padding:0px 10px 0px 10px;">
                                                     <div class="flax_box" style="justify-content:flex-end;">
-                                                        <input type="text" id="point_amt" name="point_amt" class="form-control form-control-sm" placeholder="0" style="width:calc(40% - 10px);margin-right:10px;text-align: right;" readonly>
+                                                        <input type="text" id="point_amt" name="point_amt" class="form-control form-control-sm" placeholder="0" style="width:calc(40% - 10px);margin-right:10px;text-align: right;">
                                                         <span>원</span>
                                                     </div>
                                                 </td>
@@ -439,7 +439,7 @@
         {headerCheckboxSelection: true, checkboxSelection: true,  width: 28},
         {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {"text-align": "center"}},
         {field: "goods_no", hide: true},
-        {field: "goods_nm", headerName: "상품명", type: "HeadGoodsNameType", width: 227, wrapText: true, autoHeight: true},
+        {field: "goods_nm", headerName: "상품명", type: "HeadGoodsNameType", width: 400, wrapText: true, autoHeight: true},
         {field: "goods_opt", headerName: "옵션", width: 130},
         {field: "goods_price", headerName: "판매단가", width: 60, type: 'currencyType'},
         {field: "price", headerName: "판매가", width: 60, type: 'currencyType', editable: true, cellStyle: {"background-color": "#ffff99"}, onCellValueChanged: EditAmt},
@@ -447,16 +447,16 @@
         {field: "store_wqty", headerName: "매장재고", width: 60, type: 'currencyType'},
         {field: "qty", headerName: "수량", width: 60, type: 'currencyType', editable: true, cellStyle: {"background-color": "#ffff99"}, onCellValueChanged: EditAmt},
         {field: "ord_amt", headerName: "주문액", width: 60, type: 'currencyType'},
-        {field: "point_amt", headerName: "(-)적립금", width: 60, type: 'currencyType',
+        {field: "point_amt", headerName: "(-)적립금", width: 60, type: 'currencyType', hide:true
             // editable: true, cellStyle: {"background-color": "#ffff99"}, onCellValueChanged: EditAmt
         },
-        {field: "coupon_amt", headerName: "(-)쿠폰", width: 60, type: 'currencyType',
+        {field: "coupon_amt", headerName: "(-)쿠폰", width: 60, type: 'currencyType', hide:true
             // editable: true, cellStyle: {"background-color": "#ffff99"}, onCellValueChanged: EditAmt
         },
-        {field: "dc_amt", headerName: "(-)할인", width: 60, type: 'currencyType',
+        {field: "dc_amt", headerName: "(-)할인", width: 60, type: 'currencyType', hide:true
             // editable: true, cellStyle: {"background-color": "#ffff99"}, onCellValueChanged: EditAmt
         },
-        {field: "dlv_amt", headerName: "(+)배송비", width: 60, type: 'currencyType',
+        {field: "dlv_amt", headerName: "(+)배송비", width: 60, type: 'currencyType', hide:true
             // editable: true, cellStyle: {"background-color": "#ffff99"}, onCellValueChanged: EditAmt
         },
     ];
