@@ -604,7 +604,22 @@ class stk30Controller extends Controller
 
     public function show_batch()
     {
-        return view(Config::get('shop.store.view') . '/stock/stk30_batch');
+        $sql = "
+            select 
+                sr_cd
+            from store_return
+            order by sr_cd desc
+            limit 1
+        ";
+        $row = DB::selectOne($sql);
+        if($row == null) $new_sr_cd = 1;
+        else $new_sr_cd = $row->sr_cd + 1;
+
+        $values = [
+            'new_sr_cd' => $new_sr_cd
+        ];
+
+        return view(Config::get('shop.store.view') . '/stock/stk30_batch', $values);
     }
 
     /** 일괄등록 시 Excel 파일 저장 후 ag-grid(front)에 사용할 응답을 JSON으로 반환 */
@@ -692,6 +707,34 @@ class stk30Controller extends Controller
             array_push($result, $row);
         }
 
+
+        $sql = "
+            select 
+                store_nm
+            from store
+            where store_cd = :store_cd
+        ";
+
+        $store_nm = DB::selectOne($sql,['store_cd' => $store_cd]);
+
+        $sql = "
+            select 
+                storage_nm
+            from storage
+            where storage_cd = :storage_cd
+        ";
+
+        $storage_nm = DB::selectOne($sql,['storage_cd' => $storage_cd]);
+        
+        $sql = "
+            select 
+                code_val
+            from code
+            where code_kind_cd = 'SR_REASON' and code_id = :sr_reason
+        ";
+
+        $sr_reason = DB::selectOne($sql,['sr_reason' => $sr_reason]);
+
         return response()->json([
             "code" => 200,
             "head" => [
@@ -700,7 +743,12 @@ class stk30Controller extends Controller
                 "page_cnt" => 1,
                 "page_total" => 1,
             ],
-            "body" => $result
+            "body" => $result,
+            "data" => [
+                'store_nm' => $store_nm->store_nm,
+                'storage_nm' => $storage_nm->storage_nm,
+                'sr_reason' => $sr_reason->code_val
+            ]
         ]);
     }
 
