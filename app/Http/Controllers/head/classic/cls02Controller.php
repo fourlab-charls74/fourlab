@@ -92,66 +92,104 @@ class cls02Controller extends Controller
 		]);
 	}
 
-	//상세페이지 select box ( 예약 숫자 & 예약 가능 숫자 ) 작업 중
 	public function show(Request $request, $rg_no) 
 	{
-		//기존
-		$cnt_query = "
+		$state_query = "
 			select
 				cc.code, cc.value1
-			from classic_code cc	
-			where
-				cc.kind = 'dm_type'
+			from classic_code cc
+			where cc.kind = 'dm_state'
+			order by cc.code
 		";
-		$cnts = DB::select($cnt_query);
-
-		//new
-		$s_dm_date = DB::table('classic_dm_reserve')
-                        -> where('regist_number', $rg_no)
-                        -> value('s_dm_date');
-
-		$e_dm_date = DB::table('classic_dm_reserve')
-                        -> where('regist_number', $rg_no)
-                        -> value('e_dm_date');
-
-		$dm_date_query = "
-			select
-				cd.dm_type, cd.dm_cnt, cd.reserve_cnt
-				, b.value1
-			from classic_dm cd
-				inner join classic_code b on cd.dm_type = b.code
-			where
-				cd.dm_date = :dm_date
-			order by cd.dm_type
-		";
-
-		$sdms = DB::select($dm_date_query, ['dm_date' => $s_dm_date]);
-
-		$edms = DB::select($dm_date_query, ['dm_date' => $e_dm_date]);
+		$states = DB::select($state_query);
 
 		$reserve_query = "
 			select 
-				cdr.passwd, cdr.name1, cdr.name2, cdr.mobile, cdr.email, cdr.regist_number
-				, cdr.state
-				, cdr.s_dm_date, cdr.s_dm_type
-				, cdr.e_dm_date, cdr.e_dm_type
+				cdr.passwd, cdr.name1, cdr.name2, cdr.mobile, cdr.email, cdr.regist_number, cdr.state, cdr.s_dm_date, cdr.s_dm_type, cdr.e_dm_date, cdr.e_dm_type
+				, cc.value1 as s_type_nm
+				, ccd.value1 as e_type_nm
 			from classic_dm_reserve cdr
-			where cdr.regist_number = '$rg_no'
+				right outer join classic_code cc on cc.kind = 'dm_type' and cc.code = cdr.s_dm_type
+				right outer join classic_code ccd on ccd.kind = 'dm_type' and ccd.code = cdr.e_dm_type
+			where cdr.regist_number = :rg_num
 		";
+		$reserve = DB::selectOne($reserve_query, ['rg_num' => $rg_no]);
 
-		$reserve_detail = DB::selectOne($reserve_query);
+
+		$date_query = "
+			select 
+				cd.dm_type, cc.value1, cd.dm_date, cd.dm_cnt, cd.reserve_cnt
+			from classic_dm cd
+				inner join classic_code cc on cc.kind='dm_type' and cc.code = cd.dm_type
+		";
+		$dms = DB::select($date_query);
+
+		$rsv_date_query = "
+			select cc.code, cc.value3
+			from classic_code cc
+			where cc.kind like '%_dm_date'
+		";
+		$rsv_date = DB::select($rsv_date_query);
+
+		$room_status_query = "
+			select 
+				cd.dm_type, cd.dm_date, cd.dm_cnt, cd.reserve_cnt
+				, cc.value3
+				, ccd.value1
+			from classic_dm cd
+				inner join classic_code cc on cc.kind like '%_dm_date' and cd.dm_date = cc.code
+				inner join classic_code ccd on ccd.kind = 'dm_type' and cd.dm_type = ccd.code
+		";
+		$room_status = DB::select($room_status_query);
 
 		$values = [
-			'reserve' 	=> $reserve_detail,
-			'cnts' 		=> $cnts,
-			'sdms'		=> $sdms,
-			'edms'		=> $edms,
+			'states'		=> $states,
+			'reserve' 		=> $reserve,
+			'dms'			=> $dms,
+			'rsv_date'		=> $rsv_date,
+			'room_status'	=> $room_status
 		];
 
 		return view( Config::get('shop.head.view') . '/classic/cls02_show', $values );
 	}
+
 	public function state_update(Request $request) 
 	{
-		
+		$error_code	= "200";
+		$result_msg	= "";
+
+		$datas	= $request->input('data');
+		$datas	= json_decode($datas);
+		$s_state = $request->input('s_state');
+
+        try {
+            DB::beginTransaction();
+
+			for( $i = 0; $i < count($datas); $i++ )
+			{
+				$data = (array)$datas[$i];
+				$regist_number = $data["regist_number"];
+
+				$sql = "
+					update classic_dm_reserve set
+						state = :s_state
+					where regist_number = :regist_number
+				";
+
+				DB::update($sql, ['s_state' => $s_state, 'regist_number' => $regist_number]);
+			}
+
+			DB::commit();
+        } catch(Exception $e) {
+            DB::rollback();
+
+			$error_code	= "500";
+			$result_msg	= "데이터 업데이트 오류";
+		}
+
+		return response()->json([
+			"code"			=> $error_code,
+			"result_msg"	=> $result_msg
+		]);
 	}
 }

@@ -227,10 +227,10 @@
                     s_state : $("#s_state").val()
 				},
 				success: function (data) {
-					if( data.code == "200" ){
+					if(data.code == "200") {
 						alert("선택한 데이터의 상태가 수정 되었습니다.");
 						Search();
-					}else {
+					}else{
 						alert("선택한 데이터의 상태 수정이 실패하였습니다.");
 					}
 				},
