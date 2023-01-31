@@ -918,7 +918,7 @@ CREATE TABLE `store_group_authority` (
 CREATE TABLE `store_log` (
   `menu_no` int(11) DEFAULT NULL COMMENT '메뉴번호',
   `pid` varchar(20) DEFAULT NULL COMMENT '프로그램ID',
-  `cmd` varchar(20) DEFAULT NULL COMMENT '명령',
+  `cmd` varchar(100) DEFAULT NULL COMMENT '명령어',
   `menu_nm` varchar(255) DEFAULT NULL COMMENT '메뉴명',
   `exec_time` float DEFAULT NULL COMMENT '사용시간',
   `id` varchar(15) DEFAULT NULL COMMENT '아이디',
