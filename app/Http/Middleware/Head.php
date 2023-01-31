@@ -84,8 +84,9 @@ class Head
 
                         if($menu){
                             $log = [
+                                'menu_no' => $menu['menu_no'],
                                 'pid' => $pid,
-                                'cmd' => $controller,
+                                'cmd' => $uri,
                                 'menu_nm' => $menu["kor_nm"],
                                 'exec_time' => 0,
                                 'id' => $id,

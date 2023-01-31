@@ -81,9 +81,14 @@
         var columns = [
             {headerName: "로그시간", field: "log_time",width:150,cellClass:'hd-grid-code'},
             {headerName: "메뉴번호", field: "menu_no"},
+            {headerName: "PID", field: "pid",
+                cellRenderer:function(params) {
+                    let pid = params.data.pid
+                    return pid.toLowerCase();
+                }
+            },
             {headerName: "메뉴명", field: "menu_nm",width:200},
-            {headerName: "명령어", field: "cmd"},
-            {headerName: "프로그램고유번호", field: "PID"},
+            {headerName: "URI", field: "cmd", width:250},
             {headerName: "이름", field: "name"},
             {headerName: "IP", field: "ip",width:100}
         ];

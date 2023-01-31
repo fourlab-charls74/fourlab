@@ -80,6 +80,7 @@
     <script language="javascript">
         var columns = [
             {headerName: "로그시간", field: "log_time",width:150,cellClass:'hd-grid-code'},
+            {headerName: "메뉴번호", field: "menu_no"},
             {headerName: "PID", field: "pid",
                 cellRenderer(params) {
                     let pid = params.data.pid;
@@ -87,7 +88,7 @@
                 }
             },
             {headerName: "메뉴명", field: "menu_nm",width:200},
-            {headerName: "명령어", field: "cmd", width:200},
+            {headerName: "URI", field: "cmd", width:250},
             {headerName: "이름", field: "name"},
             {headerName: "ID", field: "id",width:70},
             {headerName: "IP", field: "ip",width:100}
