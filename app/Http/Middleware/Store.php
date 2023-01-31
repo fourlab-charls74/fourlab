@@ -27,6 +27,7 @@ class Store
                 $name = Auth::guard('head')->user()->name;
 
                 $action = $request->route()->action;
+                $uri = $request->route()->uri;
 
                  $white_controllers = [
                     "LOGIN" => 1,
@@ -58,8 +59,9 @@ class Store
 
                         if($menu) {
                             $log = [
+                                'menu_no' => $menu['menu_no'],
                                 'pid' => $pid,
-                                'cmd' => $controller,
+                                'cmd' => $uri,
                                 'menu_nm' => $menu["kor_nm"],
                                 'exec_time' => 0,
                                 'id' => $id,

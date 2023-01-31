@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class Shop
 {
@@ -26,6 +27,7 @@ class Shop
                 $name = Auth::guard('head')->user()->name;
 
                 $action = $request->route()->action;
+                $uri = $request->route()->uri;
 
                  $white_controllers = [
                     "LOGIN" => 1,
@@ -57,8 +59,9 @@ class Shop
 
                         if($menu) {
                             $log = [
+                                'menu_no' => $menu['menu_no'],
                                 'pid' => $pid,
-                                'cmd' => $controller,
+                                'cmd' => $uri,
                                 'menu_nm' => $menu["kor_nm"],
                                 'exec_time' => 0,
                                 'id' => $id,

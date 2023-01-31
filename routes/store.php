@@ -641,6 +641,12 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
         Route::get('sys03/{code?}/search', 'sys03Controller@user_search');
 
+        //로그
+        Route::get('sys04', 'sys04Controller@index');
+        Route::get('sys04/search', 'sys04Controller@search');
+
+        
+
     });
 
 });
