@@ -101,6 +101,7 @@
                     <li><a href="/store/sale/sal24">(완)일별 매출 통계</a></li>
                     <li><a href="/store/sale/sal25">(완)월별 매출 통계</a></li>
                     <li><a href="/store/sale/sal26">(완)매장별 매출 통계</a></li>
+                    <li><a href="/store/sale/sal27">(개)품번별종합분석현황</a></li>
                 </ul>
             </li>
             <li>
@@ -109,7 +110,7 @@
                     <li><a href="/store/system/sys01">(완)사용자관리</a></li>
                     <li><a href="/store/system/sys02">(완)메뉴관리</a></li>
                     <li><a href="/store/system/sys03">(완)그룹관리</a></li>
-                    <li><a href="/store/system/sys04">(개)로그</a></li>
+                    <li><a href="/store/system/sys04">(완)로그</a></li>
                 </ul>
             </li>
         </ul>
