@@ -1,7 +1,7 @@
 @extends('head_with.layouts.layout-nav')
 @section('title','클래식 숙소예약 상세내역')
 @section('content')
-<form name="info" method="post" action="/head/classic/cls02/update">
+<form name="info" method="post">
     <input type="HIDDEN" name="regist_number" value="{{ $reserve->regist_number }}">
     <input type="hidden" name="_token" value="">
     <div class="show_layout py-3">
@@ -45,21 +45,33 @@
 						    <div class="col-sm-6 form-group">
 							    <select class="form-control" id="s_dm_date" name="s_dm_date" onchange="chgDmType('s','e');">
 								    <option value="">* 숙박일</option>
-                                    <option value="1017" class="s_chk_date 1017" @if(@$reserve->s_dm_date == 1017) selected @endif>10월 17일(10월 18일 출발그룹)</option>
-                                    <option value="1018" class="s_chk_date 1018" @if(@$reserve->s_dm_date == 1018) selected @endif>10월 18일(10월 19일 출발그룹)</option>
-                                    <option value="1019" class="s_chk_date 1019" @if(@$reserve->s_dm_date == 1019) selected @endif>10월 19일(10월 20일 출발그룹)</option>
+                                    @foreach($rsv_date as $date)
+                                        @if($date->code < 1020)
+                                        <option value="{{ $date->code }}" class="s_chk_date {{ $date->code }}" @if($reserve->s_dm_date == $date->code) selected @endif>{{ $date->value1 }}</option>
+                                        @endif
+                                    @endforeach
                                 </select>
 						    </div>
 						    <div class="col-sm-6 form-group">
 							    <select class="form-control" id="s_dm_type" name="s_dm_type">
 								    <option value="">* 객실타입</option>
                                     @foreach($dms as $dm)
+                                    <option value="{{ $dm->dm_type }}" class="s_chk s_type_{{ $dm->dm_date }}" 
+                                        @if($reserve->s_dm_type == $dm->dm_type) selected @endif style="display: block;
+                                        @if($dm->dm_type == 0) " @endif
+                                        @if($dm->dm_type != 0 && ($dm->reserve_cnt >= $dm->dm_cnt)) color: rgb(204, 204, 204);" disabled @endif
+                                    >
+                                        {{ $dm->value1 }}
+                                        @if($dm->dm_type != 0) &lpar; {{ $dm->reserve_cnt }} &sol; {{ $dm->dm_cnt }} &rpar; @endif
+                                    </option>
+                                    @endforeach
+                                    <!-- @foreach($dms as $dm)
                                         @if($dm->dm_type == 0)
                                         <option value="{{ $dm->dm_type }}" style="display: block;" class="s_chk s_type_{{ $dm->dm_date }}" @if($reserve->s_dm_type == $dm->dm_type) selected @endif>{{ $dm->value1 }}</option>
                                         @else
-                                        <option value="{{ $dm->dm_type }}" style="display: block;" class="s_chk s_type_{{ $dm->dm_date }}" @if($reserve->s_dm_type == $dm->dm_type) selected @endif @if($dm->reserve_cnt >= $dm->dm_cnt) disabled @endif>{{ $dm->value1 }} &lpar; {{ $dm->reserve_cnt }} &sol; {{ $dm->dm_cnt }} &rpar;</option>
+                                        <option value="{{ $dm->dm_type }}" style="display: block; @if($dm->reserve_cnt >= $dm->dm_cnt) color: rgb(204, 204, 204); @endif" class="s_chk s_type_{{ $dm->dm_date }}" @if($reserve->s_dm_type == $dm->dm_type) selected @endif @if($dm->reserve_cnt >= $dm->dm_cnt) disabled @endif>{{ $dm->value1 }} &lpar; {{ $dm->reserve_cnt }} &sol; {{ $dm->dm_cnt }} &rpar;</option>
                                         @endif
-                                    @endforeach
+                                    @endforeach -->
                                 </select>
 						    </div>
                             <div class="col-sm-12 form-group">
@@ -68,20 +80,25 @@
 						    <div class="col-sm-6 form-group">
 							    <select class="form-control" id="e_dm_date" name="e_dm_date" onchange="chgDmType('e','e');">
 								    <option value="">* 숙박일</option>
-                                    <option value="1020" class="e_chk_date 1020" @if(@$reserve->e_dm_date == 1020) selected @endif>10월 20일(10월 18일 출발그룹)</option>
-                                    <option value="1021" class="e_chk_date 1021" @if(@$reserve->e_dm_date == 1021) selected @endif>10월 21일(10월 19일 출발그룹)</option>
-                                    <option value="1022" class="e_chk_date 1022" @if(@$reserve->e_dm_date == 1022) selected @endif>10월 22일(10월 20일 출발그룹)</option>
+                                    @foreach($rsv_date as $date)
+                                        @if($date->code >= 1020)
+                                        <option value="{{ $date->code }}" class="e_chk_date {{ $date->code }}" @if($reserve->e_dm_date == $date->code) selected @endif>{{ $date->value1 }}</option>
+                                        @endif
+                                    @endforeach
                                 </select>
 						    </div>
                             <div class="col-sm-6 form-group">
                                 <select class="form-control" id="e_dm_type" name="e_dm_type">
                                     <option value="">* 객실타입</option>
                                     @foreach($dms as $dm)
-                                        @if($dm->dm_type == 0)
-                                        <option value="{{ $dm->dm_type }}" style="display: block;" class="e_chk e_type_{{ $dm->dm_date }}" @if($reserve->e_dm_type == $dm->dm_type) selected @endif>{{ $dm->value1 }}</option>
-                                        @else
-                                        <option value="{{ $dm->dm_type }}" style="display: block;" class="e_chk e_type_{{ $dm->dm_date }}" @if($reserve->e_dm_type == $dm->dm_type) selected @endif @if($dm->reserve_cnt >= $dm->dm_cnt) disabled @endif>{{ $dm->value1 }} &lpar; {{ $dm->reserve_cnt }} &sol; {{ $dm->dm_cnt }} &rpar;</option>
-                                        @endif
+                                    <option value="{{ $dm->dm_type }}" class="e_chk e_type_{{ $dm->dm_date }}" 
+                                        @if($reserve->e_dm_type == $dm->dm_type) selected @endif style="display: block;
+                                        @if($dm->dm_type == 0) " @endif
+                                        @if($dm->dm_type != 0 && ($dm->reserve_cnt >= $dm->dm_cnt)) color: rgb(204, 204, 204);" disabled @endif
+                                    >
+                                        {{ $dm->value1 }}
+                                        @if($dm->dm_type != 0) &lpar; {{ $dm->reserve_cnt }} &sol; {{ $dm->dm_cnt }} &rpar; @endif
+                                    </option>
                                     @endforeach
                                 </select>
 						    </div>
@@ -102,111 +119,27 @@
                                             <td style="border:1px solid #DDDDDD;" value="{{ $date->code }}">{{ $date->value3 }}</td>
                                             @endforeach
                                         </tr>
-                                        
+
+                                        @foreach(@$table as $t)
                                         <tr style="text-align:center;height:25px;">
-                                            <td style="padding-left:5px;border:1px solid #DDDDDD;text-align:left;">디럭스더블룸 60,000원[원룸형 16평, 최대인원2, 퀸베드1]</td>
-                                            <td style="border:1px solid #DDDDDD;">4</td>
-                                            @foreach($room_status as $room)
-                                                @if($room->dm_type == '1')
-                                                    @if($room->reserve_cnt < $room->dm_cnt)
-                                                    <td style="border:1px solid #DDDDDD;">{{ $room->reserve_cnt }}</td>
+                                            <td style="padding-left:5px;border:1px solid #DDDDDD;text-align:left;">
+                                                {{ $t->room_nm }}
+                                            </td>
+                                            <td style="border:1px solid #DDDDDD;">{{ $t->dm_cnt }}</td>
+                                            @foreach(@$dm_dates as $date)
+                                                <td 
+                                                    @if ($t->{'reserve_' . $date->dm_date} < $t->dm_cnt)
+                                                    style="border:1px solid #DDDDDD; "
                                                     @else
-                                                    <td style="border:1px solid #DDDDDD; background-color:#E87D81; ">{{ $room->reserve_cnt }}</td>
+                                                    style="border:1px solid #DDDDDD; background-color:#E87D81; "
                                                     @endif
-                                                @endif
+                                                >
+                                                    {{ $t->{'reserve_' . $date->dm_date} }}
+                                                </td>
                                             @endforeach
                                         </tr>
-                                        <tr style="text-align:center;height:25px;">
-                                            <td style="padding-left:5px;border:1px solid #DDDDDD;text-align:left;">디럭스 패밀리 트윈룸 70,000원[원룸형 16평, 최대인원3, 퀸베드1, 싱글1]</td>
-                                            <td style="border:1px solid #DDDDDD;">6</td>
-                                            @foreach($room_status as $room)
-                                                @if($room->dm_type == '2')
-                                                    @if($room->reserve_cnt < $room->dm_cnt)
-                                                    <td style="border:1px solid #DDDDDD;">{{ $room->reserve_cnt }}</td>
-                                                    @else
-                                                    <td style="border:1px solid #DDDDDD; background-color:#E87D81; ">{{ $room->reserve_cnt }}</td>
-                                                    @endif
-                                                @endif
-                                            @endforeach
-                                        </tr>
-                                        <tr style="text-align:center;height:25px;">
-                                            <td style="padding-left:5px;border:1px solid #DDDDDD;text-align:left;">디럭스 트리플룸 105,000원[원룸형 16평, 최대인원4, 퀸2, 싱글1]</td>
-                                            <td style="border:1px solid #DDDDDD;">4</td>
-                                            @foreach($room_status as $room)
-                                                @if($room->dm_type == '3')
-                                                    @if($room->reserve_cnt < $room->dm_cnt)
-                                                    <td style="border:1px solid #DDDDDD;">{{ $room->reserve_cnt }}</td>
-                                                    @else
-                                                    <td style="border:1px solid #DDDDDD; background-color:#E87D81; ">{{ $room->reserve_cnt }}</td>
-                                                    @endif
-                                                @endif
-                                            @endforeach
-                                        </tr>
-                                        <tr style="text-align:center;height:25px;">
-                                            <td style="padding-left:5px;border:1px solid #DDDDDD;text-align:left;">주니어스위트룸 160,000원[거실겸 침실 +1룸, 20평, 최대인원5, 퀸베드2]</td>
-                                            <td style="border:1px solid #DDDDDD;">8</td>
-                                            @foreach($room_status as $room)
-                                                @if($room->dm_type == '4')
-                                                    @if($room->reserve_cnt < $room->dm_cnt)
-                                                    <td style="border:1px solid #DDDDDD;">{{ $room->reserve_cnt }}</td>
-                                                    @else
-                                                    <td style="border:1px solid #DDDDDD; background-color:#E87D81; ">{{ $room->reserve_cnt }}</td>
-                                                    @endif
-                                                @endif
-                                            @endforeach
-                                        </tr>
-                                        <tr style="text-align:center;height:25px;">
-                                            <td style="padding-left:5px;border:1px solid #DDDDDD;text-align:left;">프리미어 스위트룸 160,000원[거실겸 침실 + 1룸, 34평, 최대인원6, 퀸베드2]</td>
-                                            <td style="border:1px solid #DDDDDD;">4</td>
-                                            @foreach($room_status as $room)
-                                                @if($room->dm_type == '5')
-                                                    @if($room->reserve_cnt < $room->dm_cnt)
-                                                    <td style="border:1px solid #DDDDDD;">{{ $room->reserve_cnt }}</td>
-                                                    @else
-                                                    <td style="border:1px solid #DDDDDD; background-color:#E87D81; ">{{ $room->reserve_cnt }}</td>
-                                                    @endif
-                                                @endif
-                                            @endforeach
-                                        </tr>
-                                        <tr style="text-align:center;height:25px;">
-                                            <td style="padding-left:5px;border:1px solid #DDDDDD;text-align:left;">애월 스위트룸 160,000원[거실 + 2룸, 45평, 최대인원6, 퀸베드2]</td>
-                                            <td style="border:1px solid #DDDDDD;">1</td>
-                                            @foreach($room_status as $room)
-                                                @if($room->dm_type == '6')
-                                                    @if($room->reserve_cnt < $room->dm_cnt)
-                                                    <td style="border:1px solid #DDDDDD;">{{ $room->reserve_cnt }}</td>
-                                                    @else
-                                                    <td style="border:1px solid #DDDDDD; background-color:#E87D81; ">{{ $room->reserve_cnt }}</td>
-                                                    @endif
-                                                @endif
-                                            @endforeach
-                                        </tr>
-                                        <tr style="text-align:center;height:25px;">
-                                            <td style="padding-left:5px;border:1px solid #DDDDDD;text-align:left;">로얄슈페리어 스위트 180,000원[거실겸 침실+1룸, 34평, 최대인원 4, 퀸베드2]</td>
-                                            <td style="border:1px solid #DDDDDD;">3</td>
-                                            @foreach($room_status as $room)
-                                                @if($room->dm_type == '7')
-                                                    @if($room->reserve_cnt < $room->dm_cnt)
-                                                    <td style="border:1px solid #DDDDDD;">{{ $room->reserve_cnt }}</td>
-                                                    @else
-                                                    <td style="border:1px solid #DDDDDD; background-color:#E87D81; ">{{ $room->reserve_cnt }}</td>
-                                                    @endif
-                                                @endif
-                                            @endforeach
-                                        </tr>
-                                        <tr style="text-align:center;height:25px;">
-                                            <td style="padding-left:5px;border:1px solid #DDDDDD;text-align:left;">로얄그랜드 스위트 180,000원[거실겸 침실 + 1룸, 45평, 최대인원4, 퀸베드2]</td>
-                                            <td style="border:1px solid #DDDDDD;">5</td>
-                                            @foreach($room_status as $room)
-                                                @if($room->dm_type == '8')
-                                                    @if($room->reserve_cnt < $room->dm_cnt)
-                                                    <td style="border:1px solid #DDDDDD;">{{ $room->reserve_cnt }}</td>
-                                                    @else
-                                                    <td style="border:1px solid #DDDDDD; background-color:#E87D81; ">{{ $room->reserve_cnt }}</td>
-                                                    @endif
-                                                @endif
-                                            @endforeach
-                                        </tr>
+                                        @endforeach
+
 								    </tbody>
                                 </table>
 						    </div>
@@ -216,13 +149,13 @@
 		    </div>
 	    </div>
         <div class="resul_btn_wrap mt-3 d-block">
-            <a href="javascript:;" class="btn btn-sm btn-primary" onclick="save()">수정</a>
+            <a href="javascript:;" class="btn btn-sm btn-primary" onclick="Save()">수정</a>
             <a href="javascript:;" class="btn btn-sm btn-primary" onclick="window.close()">닫기</a>
         </div>
     </div>
 </form>
 <script>
-function save(){
+function Save(){
 
 	ff	= document.info;
 
@@ -307,9 +240,31 @@ function save(){
 	ret = confirm("예약정보를 수정 하시겠습니까?");
 
 	if( ret ){
-		ff.submit();
-	}
+        var frm = $('form[name="info"]');
 
+        let e_dm_type = $("select[name=e_dm_type] option:selected").val();
+        let s_dm_type = $("select[name=s_dm_type] option:selected").val();
+
+        $.ajax({
+            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+            method: 'post',
+            url: '/head/classic/cls02/update',
+            data: frm.serialize() + '&e_dm_type=' + e_dm_type + '&s_dm_type=' + s_dm_type,
+            dataType: 'json',
+            success: function (res) {
+                if(res.code === 200) {
+                    alert('예약정보가 수정 되었습니다.');
+                    window.opener.Search();
+                } else {
+                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                }
+            },
+            error: function(request, status, error) {
+                alert("에러가 발생했습니다.");
+                console.log(status);
+            }
+        });
+	}
 }
 
 function chgDmType(type, init){

@@ -313,7 +313,6 @@ class cls01Controller extends Controller
 			$msg = $e->getMessage();
 		}
 		return response()->json(['code' => $code, 'message' => $msg], $code);
-
 	}
 
 	public function show(Request $request, $idx)

@@ -118,16 +118,17 @@ class cls02Controller extends Controller
 
 		$date_query = "
 			select 
-				cd.dm_type, cc.value1, cd.dm_date, cd.dm_cnt, cd.reserve_cnt
+				cd.dm_type, cc.code, cc.value1, cd.dm_date, cd.dm_cnt, cd.reserve_cnt
 			from classic_dm cd
 				inner join classic_code cc on cc.kind='dm_type' and cc.code = cd.dm_type
 		";
 		$dms = DB::select($date_query);
 
 		$rsv_date_query = "
-			select cc.code, cc.value3
+			select 
+				cc.code, cc.value3, cc.value1
 			from classic_code cc
-			where cc.kind like '%_dm_date'
+			where cc.kind in ('s_dm_date', 'e_dm_date')
 		";
 		$rsv_date = DB::select($rsv_date_query);
 
@@ -142,12 +143,41 @@ class cls02Controller extends Controller
 		";
 		$room_status = DB::select($room_status_query);
 
+		///////////////////////////////////////////////////////////yh
+
+		$dm_date_sql = "
+			select dm_date 
+			from classic_dm
+			group by dm_date
+		";
+		$dm_dates = DB::select($dm_date_sql);
+
+		$dm_sql = "";
+		foreach ($dm_dates as $dm_date) {
+			$d = $dm_date->dm_date;
+			$dm_sql .= " , sum(if(d.dm_date = '$d', d.reserve_cnt, 0)) as 'reserve_$d' ";
+		}
+
+		$sql = "
+			select c.code as room_cd, c.value1 as room_nm, d.dm_date, d.dm_cnt
+				$dm_sql
+			from classic_code c
+				left outer join classic_dm d on d.dm_type = c.code
+			where c.kind = 'dm_type' and c.code <> '0'
+			group by c.code
+		";
+		$table = DB::select($sql);
+
+		///////////////////////////////////////////////////////////
+
 		$values = [
 			'states'		=> $states,
 			'reserve' 		=> $reserve,
 			'dms'			=> $dms,
 			'rsv_date'		=> $rsv_date,
-			'room_status'	=> $room_status
+			'room_status'	=> $room_status,
+			'table'			=> $table,
+			'dm_dates'		=> $dm_dates,
 		];
 
 		return view( Config::get('shop.head.view') . '/classic/cls02_show', $values );
@@ -191,5 +221,120 @@ class cls02Controller extends Controller
 			"code"			=> $error_code,
 			"result_msg"	=> $result_msg
 		]);
+	}
+
+	public function update(Request $request)
+	{
+		$regist_number	= $request->input("regist_number");
+		$passwd			= $request->input("passwd");
+		$state			= $request->input("state");
+		$name1			= $request->input("name1");
+		$name2			= $request->input("name2");
+		$mobile			= $request->input("mobile");
+		$email			= $request->input("email");
+		
+		$s_dm_date 		= $request->input("s_dm_date");
+		$s_dm_type 		= $request->input("s_dm_type");
+		
+		$e_dm_date 		= $request->input("e_dm_date");
+		$e_dm_type 		= $request->input("e_dm_type");
+
+		$prev_s_dm_type_query	= "
+			select s_dm_type 
+			from classic_dm_reserve 
+			where regist_number = :regist_number
+		";
+		$prev_s_dm_type = DB::select($prev_s_dm_type_query, ['regist_number' => $regist_number]);
+
+		$prev_s_dm_date_query	= "
+			select s_dm_date 
+			from classic_dm_reserve 
+			where regist_number = :regist_number
+		";
+		$prev_s_dm_date = DB::select($prev_s_dm_date_query, ['regist_number' => $regist_number]);
+
+		$prev_e_dm_type_query	= "
+			select e_dm_type 
+			from classic_dm_reserve 
+			where regist_number = :regist_number
+		";
+		$prev_e_dm_type = DB::select($prev_e_dm_type_query, ['regist_number' => $regist_number]);
+
+		$prev_e_dm_date_query	= "
+			select e_dm_date 
+			from classic_dm_reserve 
+			where regist_number = :regist_number
+		";
+		$prev_e_dm_date = DB::select($prev_e_dm_date_query, ['regist_number' => $regist_number]);
+
+		try {
+			DB::beginTransaction();
+
+			$dm_minus_sql = "
+				update classic_dm set
+					reserve_cnt = reserve_cnt - 1
+				where dm_type = :dm_type and dm_date = :dm_date
+			";
+
+			$dm_plus_sql = "
+				update classic_dm set
+					reserve_cnt = reserve_cnt + 1
+				where dm_type = :dm_type and dm_date = :dm_date
+			";
+
+			if($s_dm_date != $prev_s_dm_date) {
+
+			} 
+			if($s_dm_type != $prev_s_dm_type && $e_dm_type != $prev_e_dm_type) {
+				$sql = "
+					update classic_dm_reserve set 
+						name1 = '$name1', name2 = '$name2', mobile = '$mobile', email = '$email', passwd = '$passwd', state = '$state', s_dm_date = '$s_dm_date', s_dm_type = '$s_dm_type', e_dm_date = '$e_dm_date', e_dm_type = '$e_dm_type', updt_dt = now()
+					where regist_number = :regist_number
+				";
+
+				DB::update($dm_minus_sql, ['dm_type' => $prev_s_dm_type, 'dm_date' => $prev_s_dm_date]);
+				DB::update($dm_minus_sql, ['dm_type' => $prev_e_dm_type, 'dm_date' => $prev_e_dm_date]);
+
+				DB::update($dm_plus_sql, ['dm_type' => $s_dm_type, 'dm_date' => $s_dm_date]);
+				DB::update($dm_plus_sql, ['dm_type' => $e_dm_type, 'dm_date' => $e_dm_date]);
+
+			} else if($s_dm_type == $prev_s_dm_type && $e_dm_type != $prev_e_dm_type) {
+				$sql = "
+					update classic_dm_reserve set 
+						name1 = '$name1', name2 = '$name2', mobile = '$mobile', email = '$email', passwd = '$passwd', state = '$state', s_dm_date = '$s_dm_date', e_dm_date = '$e_dm_date', e_dm_type = '$e_dm_type', updt_dt = now()
+					where regist_number = :regist_number
+				";
+
+				DB::update($dm_minus_sql, ['dm_type' => $prev_e_dm_type, 'dm_date' => $prev_e_dm_date]);
+				DB::update($dm_plus_sql, ['dm_type' => $e_dm_type, 'dm_date' => $e_dm_date]);
+
+			} else if($s_dm_type != $prev_s_dm_type && $e_dm_type == $prev_e_dm_type) {
+				$sql = "
+					update classic_dm_reserve set 
+						name1 = '$name1', name2 = '$name2', mobile = '$mobile', email = '$email', passwd = '$passwd', state = '$state', s_dm_date = '$s_dm_date', s_dm_type = '$s_dm_type', e_dm_date = '$e_dm_date', updt_dt = now()
+					where regist_number = :regist_number
+				";
+
+				DB::update($dm_minus_sql, ['dm_type' => $prev_s_dm_type, 'dm_date' => $prev_s_dm_date]);
+				DB::update($dm_plus_sql, ['dm_type' => $s_dm_type, 'dm_date' => $s_dm_date]);
+			} else {
+				$sql = "
+					update classic_dm_reserve set 
+						name1 = '$name1', name2 = '$name2', mobile = '$mobile', email = '$email', passwd = '$passwd', state = '$state', s_dm_date = '$s_dm_date', e_dm_date = '$e_dm_date', updt_dt = now()
+					where regist_number = :regist_number
+				";
+			}
+	
+			DB::update($sql, ['regist_number' => $regist_number]);
+			DB::commit();
+
+			$code = 200;
+			$msg = "update success";
+		} catch(Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+		return response()->json(['code' => $code, 'message' => $msg], $code);
 	}
 }
