@@ -213,9 +213,9 @@
             headerName: "출고",
             children: [
                 {field: "release_first_date", headerName: "최초출고일", width: 100, aggFunc: sumValuesFunc},
-                {field: "release", headerName: "출고", width: 60, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "return", headerName: "반품", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "total_release", headerName: "총출고", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "release_qty", headerName: "출고", width: 60, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "return_qty", headerName: "반품", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "total_release_qty", headerName: "총출고", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
         {

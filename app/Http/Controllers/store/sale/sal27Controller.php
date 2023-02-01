@@ -32,10 +32,22 @@ class sal27Controller extends Controller
 
 	public function search(Request $request)
 	{
+        $prd_cd = $request->input('prd_cd');
         $store_cd = $request->input('store_cd');
         $prd_cd_range_text = $request->input("prd_cd_range", '');
 
+
         $where = "";
+
+       // 상품코드 검색
+       if ($prd_cd != '') {
+        $prd_cd = explode(',', $prd_cd);
+        $where .= " and (1<>1 ";
+        foreach ($prd_cd as $cd) {
+            $where .= " or pc.prd_cd like '$cd%' ";
+        }
+        $where .= ") ";
+    }
 
         // 매장검색
         if ( $store_cd != "" ) {
@@ -75,13 +87,39 @@ class sal27Controller extends Controller
                 , p.tag_price
                 , p.price
                 , p.wonga
+                , psop.qty as order_qty
+                , ( p.tag_price * psop.qty ) as order_tag_price
+                , ( p.price * psop.qty ) as order_price
+                , ( p.wonga * psop.qty ) as order_wonga
+                , hst.rt as release_first_date
+                , psr.qty as release_qty
+                , srp.return_qty as return_qty
+                , ( psr.qty - srp.return_qty) as total_release_qty
             from product_code pc
-            inner join product p on p.prd_cd = pc.prd_cd
-            inner join code c1 on c1.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c1.code_id
-            left outer join goods g on g.goods_no = pc.goods_no
-            left outer join brand b on b.br_cd = pc.brand
-            left outer join code c on c.code_kind_cd = 'PRD_CD_ITEM' and c.code_id = pc.item
+                inner join product p on p.prd_cd = pc.prd_cd
+                inner join code c1 on c1.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c1.code_id
+                left outer join goods g on g.goods_no = pc.goods_no
+                left outer join brand b on b.br_cd = pc.brand
+                left outer join code c on c.code_kind_cd = 'PRD_CD_ITEM' and c.code_id = pc.item
+                left outer join (select
+                                    sum(qty) as qty
+                                    ,prd_cd
+                                from product_stock_order_product
+                                group by prd_cd
+                            ) psop on psop.prd_cd = p.prd_cd
+                left outer join (select 
+                                    h.prd_cd
+                                    , h.rt 
+                                from product_stock_hst h
+                                    inner join product_code pcd on pcd.prd_cd = h.prd_cd
+                                where h.prd_cd = pcd.prd_cd and h.type = 17 
+                                order by h.rt asc
+                            ) hst on hst.prd_cd = pc.prd_cd
+                left outer join product_stock_release psr on psr.prd_cd = pc.prd_cd and psr.state >= 30
+                left outer join store_return_product srp on srp.prd_cd = pc.prd_cd
+            where 1=1 and p.style_no != ''
             $where
+            -- group by g.goods_no
         
         ";
 

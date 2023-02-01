@@ -53,7 +53,7 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="id">매장명</label>
+                                <label for="id">메뉴명</label>
                                 <div class="flex_box">
                                     <input type='text' class="form-control form-control-sm search-enter" name='menu_nm' id="menu_nm" value=''>
                                 </div>
