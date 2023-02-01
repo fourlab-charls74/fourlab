@@ -37,6 +37,7 @@ class std08Controller extends Controller
 		
 		$sql = "
 			select *
+				, if(fee_10_info_over_yn = 'Y', '초과', '이상') as fee_10_info_over_yn_nm
 			from store_grade sg
 			$where
 			order by seq asc
@@ -82,6 +83,7 @@ class std08Controller extends Controller
 							unset($row['idx']);
 							unset($row['added']);
 							unset($row['editable']);
+							unset($row['fee_10_info_over_yn_nm']);
 
 							if ($result->cnt > 0) {
 								$row['edate'] = "9999-99";
@@ -118,6 +120,7 @@ class std08Controller extends Controller
 						unset($row['idx']); 
 						unset($row['added']);
 						unset($row['editable']);
+						unset($row['fee_10_info_over_yn_nm']);
 
 						if ($result->cnt > 0) {
 							$result = DB::selectOne($sql);

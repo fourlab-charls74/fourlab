@@ -498,6 +498,7 @@ CREATE TABLE `store_grade` (
 	`fee_11` DECIMAL(5,2) DEFAULT NULL COMMENT '(용품)수수료',
 	`fee_12` DECIMAL(5,2) DEFAULT NULL COMMENT '(특판온라인)수수료',
 	`fee_10_info` DECIMAL(5,2) DEFAULT NULL COMMENT '특가기준(%)',
+	`fee_10_info_over_yn` CHAR(1) DEFAULT 'N' COMMENT '특가기준(%) 초과여부(이상:’N’, 초과:‘Y’)',
 	`id` VARCHAR(30) DEFAULT NULL COMMENT '작성자',
 	`bigo` VARCHAR(255) DEFAULT NULL COMMENT '비고',
 	`rt` DATETIME DEFAULT NULL COMMENT '등록일자',
