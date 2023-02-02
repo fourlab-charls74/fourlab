@@ -963,6 +963,8 @@ ALTER TABLE `bizest_smart`.`order_opt` ADD COLUMN `prd_cd` VARCHAR(50) NULL COMM
 ALTER TABLE `bizest_smart`.`order_opt` ADD COLUMN `store_cd` VARCHAR(30) NULL COMMENT '매장코드' AFTER `prd_cd`;
 ALTER TABLE `bizest_smart`.`order_opt` ADD COLUMN `sale_kind` VARCHAR(30) NULL COMMENT '판매유형' AFTER `store_cd`;
 ALTER TABLE `bizest_smart`.`order_opt` ADD COLUMN `pr_code` VARCHAR(30) NULL COMMENT '행사구분' AFTER `sale_kind`;
+ALTER TABLE `bizest_smart`.`order_opt` ADD COLUMN `dlv_place_type` VARCHAR(10) NULL COMMENT '발송처타입(온라인주문)' AFTER `pr_code`;
+ALTER TABLE `bizest_smart`.`order_opt` ADD COLUMN `dlv_place_cd` VARCHAR(30) NULL COMMENT '발송처코드(온라인주문)' AFTER `dlv_place_type`;
 
 ALTER TABLE `bizest_smart`.`order_opt_wonga` ADD COLUMN `prd_cd` VARCHAR(50) NULL COMMENT '상품코드' AFTER `tax_fee`;
 ALTER TABLE `bizest_smart`.`order_opt_wonga` ADD COLUMN `store_cd` VARCHAR(30) NULL COMMENT '매장코드' AFTER `prd_cd`;
