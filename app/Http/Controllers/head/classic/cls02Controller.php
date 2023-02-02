@@ -94,16 +94,16 @@ class cls02Controller extends Controller
 
 	public function show(Request $request, $rg_no) 
 	{
-		$state_query = "
+		$state_sql = "
 			select
 				cc.code, cc.value1
 			from classic_code cc
 			where cc.kind = 'dm_state'
 			order by cc.code
 		";
-		$states = DB::select($state_query);
+		$states = DB::select($state_sql);
 
-		$reserve_query = "
+		$reserve_sql = "
 			select 
 				cdr.passwd, cdr.name1, cdr.name2, cdr.mobile, cdr.email, cdr.regist_number, cdr.state, cdr.s_dm_date, cdr.s_dm_type, cdr.e_dm_date, cdr.e_dm_type
 				, cc.value1 as s_type_nm
@@ -111,42 +111,29 @@ class cls02Controller extends Controller
 			from classic_dm_reserve cdr
 				right outer join classic_code cc on cc.kind = 'dm_type' and cc.code = cdr.s_dm_type
 				right outer join classic_code ccd on ccd.kind = 'dm_type' and ccd.code = cdr.e_dm_type
-			where cdr.regist_number = :rg_num
+			where cdr.regist_number = :regist_number
 		";
-		$reserve = DB::selectOne($reserve_query, ['rg_num' => $rg_no]);
+		$reserve = DB::selectOne($reserve_sql, ['regist_number' => $rg_no]);
 
-
-		$date_query = "
-			select 
-				cd.dm_type, cc.code, cc.value1, cd.dm_date, cd.dm_cnt, cd.reserve_cnt
-			from classic_dm cd
-				inner join classic_code cc on cc.kind='dm_type' and cc.code = cd.dm_type
-		";
-		$dms = DB::select($date_query);
-
-		$rsv_date_query = "
+		$dates_sql = "
 			select 
 				cc.code, cc.value3, cc.value1
 			from classic_code cc
 			where cc.kind in ('s_dm_date', 'e_dm_date')
 		";
-		$rsv_date = DB::select($rsv_date_query);
+		$dates = DB::select($dates_sql);
 
-		$room_status_query = "
+		$types_sql = "
 			select 
-				cd.dm_type, cd.dm_date, cd.dm_cnt, cd.reserve_cnt
-				, cc.value3
-				, ccd.value1
+				cd.dm_type, cc.code, cc.value1, cd.dm_date, cd.dm_cnt, cd.reserve_cnt
 			from classic_dm cd
-				inner join classic_code cc on cc.kind like '%_dm_date' and cd.dm_date = cc.code
-				inner join classic_code ccd on ccd.kind = 'dm_type' and cd.dm_type = ccd.code
+				inner join classic_code cc on cc.kind='dm_type' and cc.code = cd.dm_type
 		";
-		$room_status = DB::select($room_status_query);
-
-		///////////////////////////////////////////////////////////yh
+		$types = DB::select($types_sql);
 
 		$dm_date_sql = "
-			select dm_date 
+			select 
+				dm_date 
 			from classic_dm
 			group by dm_date
 		";
@@ -166,18 +153,15 @@ class cls02Controller extends Controller
 			where c.kind = 'dm_type' and c.code <> '0'
 			group by c.code
 		";
-		$table = DB::select($sql);
-
-		///////////////////////////////////////////////////////////
+		$dm_status = DB::select($sql);
 
 		$values = [
 			'states'		=> $states,
 			'reserve' 		=> $reserve,
-			'dms'			=> $dms,
-			'rsv_date'		=> $rsv_date,
-			'room_status'	=> $room_status,
-			'table'			=> $table,
+			'dates'			=> $dates,
+			'types'			=> $types,
 			'dm_dates'		=> $dm_dates,
+			'dm_status'		=> $dm_status,
 		];
 
 		return view( Config::get('shop.head.view') . '/classic/cls02_show', $values );
@@ -239,36 +223,30 @@ class cls02Controller extends Controller
 		$e_dm_date 		= $request->input("e_dm_date");
 		$e_dm_type 		= $request->input("e_dm_type");
 
-		$prev_s_dm_type_query	= "
-			select s_dm_type 
+		$prev_query	= "
+			select 
+				s_dm_date
+				, s_dm_type
+				, e_dm_date
+				, e_dm_type
 			from classic_dm_reserve 
 			where regist_number = :regist_number
 		";
-		$prev_s_dm_type = DB::select($prev_s_dm_type_query, ['regist_number' => $regist_number]);
+		$prev = DB::selectOne($prev_query, ['regist_number' => $regist_number]);
 
-		$prev_s_dm_date_query	= "
-			select s_dm_date 
-			from classic_dm_reserve 
-			where regist_number = :regist_number
-		";
-		$prev_s_dm_date = DB::select($prev_s_dm_date_query, ['regist_number' => $regist_number]);
-
-		$prev_e_dm_type_query	= "
-			select e_dm_type 
-			from classic_dm_reserve 
-			where regist_number = :regist_number
-		";
-		$prev_e_dm_type = DB::select($prev_e_dm_type_query, ['regist_number' => $regist_number]);
-
-		$prev_e_dm_date_query	= "
-			select e_dm_date 
-			from classic_dm_reserve 
-			where regist_number = :regist_number
-		";
-		$prev_e_dm_date = DB::select($prev_e_dm_date_query, ['regist_number' => $regist_number]);
+		$prev_sdate = $prev->s_dm_date;
+		$prev_stype = $prev->s_dm_type;
+		$prev_edate = $prev->e_dm_date;
+		$prev_etype = $prev->e_dm_type;
 
 		try {
 			DB::beginTransaction();
+
+			$sql = "
+				update classic_dm_reserve set 
+					name1 = :name1, name2 = :name2, mobile = :mobile, email = :email, passwd = :passwd, state = :state, s_dm_date = :s_dm_date, s_dm_type = :s_dm_type, e_dm_date = :e_dm_date, e_dm_type = :e_dm_type, updt_dt = now()
+				where regist_number = :regist_number
+			";
 
 			$dm_minus_sql = "
 				update classic_dm set
@@ -282,50 +260,17 @@ class cls02Controller extends Controller
 				where dm_type = :dm_type and dm_date = :dm_date
 			";
 
-			if($s_dm_date != $prev_s_dm_date) {
-
-			} 
-			if($s_dm_type != $prev_s_dm_type && $e_dm_type != $prev_e_dm_type) {
-				$sql = "
-					update classic_dm_reserve set 
-						name1 = '$name1', name2 = '$name2', mobile = '$mobile', email = '$email', passwd = '$passwd', state = '$state', s_dm_date = '$s_dm_date', s_dm_type = '$s_dm_type', e_dm_date = '$e_dm_date', e_dm_type = '$e_dm_type', updt_dt = now()
-					where regist_number = :regist_number
-				";
-
-				DB::update($dm_minus_sql, ['dm_type' => $prev_s_dm_type, 'dm_date' => $prev_s_dm_date]);
-				DB::update($dm_minus_sql, ['dm_type' => $prev_e_dm_type, 'dm_date' => $prev_e_dm_date]);
-
+			if($prev_stype != $s_dm_type || ($prev_sdate != $s_dm_date)&&($prev_stype == $s_dm_type)){
+				DB::update($dm_minus_sql, ['dm_type' => $prev_stype, 'dm_date' => $prev_sdate]);
 				DB::update($dm_plus_sql, ['dm_type' => $s_dm_type, 'dm_date' => $s_dm_date]);
-				DB::update($dm_plus_sql, ['dm_type' => $e_dm_type, 'dm_date' => $e_dm_date]);
-
-			} else if($s_dm_type == $prev_s_dm_type && $e_dm_type != $prev_e_dm_type) {
-				$sql = "
-					update classic_dm_reserve set 
-						name1 = '$name1', name2 = '$name2', mobile = '$mobile', email = '$email', passwd = '$passwd', state = '$state', s_dm_date = '$s_dm_date', e_dm_date = '$e_dm_date', e_dm_type = '$e_dm_type', updt_dt = now()
-					where regist_number = :regist_number
-				";
-
-				DB::update($dm_minus_sql, ['dm_type' => $prev_e_dm_type, 'dm_date' => $prev_e_dm_date]);
-				DB::update($dm_plus_sql, ['dm_type' => $e_dm_type, 'dm_date' => $e_dm_date]);
-
-			} else if($s_dm_type != $prev_s_dm_type && $e_dm_type == $prev_e_dm_type) {
-				$sql = "
-					update classic_dm_reserve set 
-						name1 = '$name1', name2 = '$name2', mobile = '$mobile', email = '$email', passwd = '$passwd', state = '$state', s_dm_date = '$s_dm_date', s_dm_type = '$s_dm_type', e_dm_date = '$e_dm_date', updt_dt = now()
-					where regist_number = :regist_number
-				";
-
-				DB::update($dm_minus_sql, ['dm_type' => $prev_s_dm_type, 'dm_date' => $prev_s_dm_date]);
-				DB::update($dm_plus_sql, ['dm_type' => $s_dm_type, 'dm_date' => $s_dm_date]);
-			} else {
-				$sql = "
-					update classic_dm_reserve set 
-						name1 = '$name1', name2 = '$name2', mobile = '$mobile', email = '$email', passwd = '$passwd', state = '$state', s_dm_date = '$s_dm_date', e_dm_date = '$e_dm_date', updt_dt = now()
-					where regist_number = :regist_number
-				";
 			}
-	
-			DB::update($sql, ['regist_number' => $regist_number]);
+
+			if($prev_etype != $e_dm_type || ($prev_edate != $e_dm_date)&&($prev_etype == $e_dm_type)){
+				DB::update($dm_minus_sql, ['dm_type' => $prev_etype, 'dm_date' => $prev_edate]);
+				DB::update($dm_plus_sql, ['dm_type' => $e_dm_type, 'dm_date' => $e_dm_date]);
+			}
+
+			DB::update($sql, ['regist_number' => $regist_number, 'name1' => $name1, 'name2' => $name2, 'mobile' => $mobile, 'email' => $email, 'passwd' => $passwd, 'state' => $state, 's_dm_date' => $s_dm_date, 's_dm_type' => $s_dm_type, 'e_dm_date' => $e_dm_date, 'e_dm_type' => $e_dm_type]);
 			DB::commit();
 
 			$code = 200;

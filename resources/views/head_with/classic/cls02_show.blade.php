@@ -45,7 +45,7 @@
 						    <div class="col-sm-6 form-group">
 							    <select class="form-control" id="s_dm_date" name="s_dm_date" onchange="chgDmType('s','e');">
 								    <option value="">* 숙박일</option>
-                                    @foreach($rsv_date as $date)
+                                    @foreach($dates as $date)
                                         @if($date->code < 1020)
                                         <option value="{{ $date->code }}" class="s_chk_date {{ $date->code }}" @if($reserve->s_dm_date == $date->code) selected @endif>{{ $date->value1 }}</option>
                                         @endif
@@ -54,24 +54,20 @@
 						    </div>
 						    <div class="col-sm-6 form-group">
 							    <select class="form-control" id="s_dm_type" name="s_dm_type">
-								    <option value="">* 객실타입</option>
-                                    @foreach($dms as $dm)
-                                    <option value="{{ $dm->dm_type }}" class="s_chk s_type_{{ $dm->dm_date }}" 
-                                        @if($reserve->s_dm_type == $dm->dm_type) selected @endif style="display: block;
-                                        @if($dm->dm_type == 0) " @endif
-                                        @if($dm->dm_type != 0 && ($dm->reserve_cnt >= $dm->dm_cnt)) color: rgb(204, 204, 204);" disabled @endif
-                                    >
-                                        {{ $dm->value1 }}
-                                        @if($dm->dm_type != 0) &lpar; {{ $dm->reserve_cnt }} &sol; {{ $dm->dm_cnt }} &rpar; @endif
-                                    </option>
-                                    @endforeach
-                                    <!-- @foreach($dms as $dm)
-                                        @if($dm->dm_type == 0)
-                                        <option value="{{ $dm->dm_type }}" style="display: block;" class="s_chk s_type_{{ $dm->dm_date }}" @if($reserve->s_dm_type == $dm->dm_type) selected @endif>{{ $dm->value1 }}</option>
+								    <option value="">* 객실타입</option>  
+                                    @foreach($types as $type)
+                                        @if($type->dm_type == 0)
+                                            <option value="{{ $type->dm_type }}" style="display: block;" class="s_chk s_type_{{ $type->dm_date }}" 
+                                            @if($reserve->s_dm_type == $type->dm_type) selected @endif
+                                            >{{ $type->value1 }}</option>
                                         @else
-                                        <option value="{{ $dm->dm_type }}" style="display: block; @if($dm->reserve_cnt >= $dm->dm_cnt) color: rgb(204, 204, 204); @endif" class="s_chk s_type_{{ $dm->dm_date }}" @if($reserve->s_dm_type == $dm->dm_type) selected @endif @if($dm->reserve_cnt >= $dm->dm_cnt) disabled @endif>{{ $dm->value1 }} &lpar; {{ $dm->reserve_cnt }} &sol; {{ $dm->dm_cnt }} &rpar;</option>
+                                            <option value="{{ $type->dm_type }}" style="display: block; 
+                                            @if($type->reserve_cnt >= $type->dm_cnt) color: rgb(204, 204, 204); @endif" class="s_chk s_type_{{ $type->dm_date }}" 
+                                            @if($reserve->s_dm_type == $type->dm_type) selected @endif 
+                                            @if($type->reserve_cnt >= $type->dm_cnt) disabled @endif
+                                            >{{ $type->value1 }} &lpar; {{ $type->reserve_cnt }} &sol; {{ $type->dm_cnt }} &rpar;</option>
                                         @endif
-                                    @endforeach -->
+                                    @endforeach
                                 </select>
 						    </div>
                             <div class="col-sm-12 form-group">
@@ -80,7 +76,7 @@
 						    <div class="col-sm-6 form-group">
 							    <select class="form-control" id="e_dm_date" name="e_dm_date" onchange="chgDmType('e','e');">
 								    <option value="">* 숙박일</option>
-                                    @foreach($rsv_date as $date)
+                                    @foreach($dates as $date)
                                         @if($date->code >= 1020)
                                         <option value="{{ $date->code }}" class="e_chk_date {{ $date->code }}" @if($reserve->e_dm_date == $date->code) selected @endif>{{ $date->value1 }}</option>
                                         @endif
@@ -90,15 +86,18 @@
                             <div class="col-sm-6 form-group">
                                 <select class="form-control" id="e_dm_type" name="e_dm_type">
                                     <option value="">* 객실타입</option>
-                                    @foreach($dms as $dm)
-                                    <option value="{{ $dm->dm_type }}" class="e_chk e_type_{{ $dm->dm_date }}" 
-                                        @if($reserve->e_dm_type == $dm->dm_type) selected @endif style="display: block;
-                                        @if($dm->dm_type == 0) " @endif
-                                        @if($dm->dm_type != 0 && ($dm->reserve_cnt >= $dm->dm_cnt)) color: rgb(204, 204, 204);" disabled @endif
-                                    >
-                                        {{ $dm->value1 }}
-                                        @if($dm->dm_type != 0) &lpar; {{ $dm->reserve_cnt }} &sol; {{ $dm->dm_cnt }} &rpar; @endif
-                                    </option>
+                                    @foreach($types as $type)
+                                        @if($type->dm_type == 0)
+                                            <option value="{{ $type->dm_type }}" style="display: block;" class="e_chk e_type_{{ $type->dm_date }}" 
+                                            @if($reserve->e_dm_type == $type->dm_type) selected @endif
+                                            >{{ $type->value1 }}</option>
+                                        @else
+                                            <option value="{{ $type->dm_type }}" style="display: block; 
+                                            @if($type->reserve_cnt >= $type->dm_cnt) color: rgb(204, 204, 204); @endif" class="e_chk e_type_{{ $type->dm_date }}" 
+                                            @if($reserve->e_dm_type == $type->dm_type) selected @endif 
+                                            @if($type->reserve_cnt >= $type->dm_cnt) disabled @endif
+                                            >{{ $type->value1 }} &lpar; {{ $type->reserve_cnt }} &sol; {{ $type->dm_cnt }} &rpar;</option>
+                                        @endif
                                     @endforeach
                                 </select>
 						    </div>
@@ -115,12 +114,12 @@
                                         <tr style="text-align:center;height:30px;background-color:#F1F1F1;">
                                             <td style="border:1px solid #DDDDDD;">룸타입</td>
                                             <td style="border:1px solid #DDDDDD;">예약가능수</td>
-                                            @foreach($rsv_date as $date)
+                                            @foreach($dates as $date)
                                             <td style="border:1px solid #DDDDDD;" value="{{ $date->code }}">{{ $date->value3 }}</td>
                                             @endforeach
                                         </tr>
 
-                                        @foreach(@$table as $t)
+                                        @foreach(@$dm_status as $t)
                                         <tr style="text-align:center;height:25px;">
                                             <td style="padding-left:5px;border:1px solid #DDDDDD;text-align:left;">
                                                 {{ $t->room_nm }}
@@ -254,6 +253,7 @@ function Save(){
             success: function (res) {
                 if(res.code === 200) {
                     alert('예약정보가 수정 되었습니다.');
+                    location.reload();
                     window.opener.Search();
                 } else {
                     alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
