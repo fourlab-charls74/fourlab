@@ -402,7 +402,7 @@ class ord03Controller extends Controller
 						'admin_nm' => $user['name']
 					];
 					$order->AddStateLog($state_log);
-					$order->DlvEnd($dlv_cd, $dlv_no, $ord_state);
+					$order->DlvEnd($dlv_cd, $dlv_no, $ord_state, $row['dlv_location_type'], $row['dlv_location_cd']);
 					$order->DlvLog($ord_state);
 
 					// 온라인주문접수 업데이트정보 변경

@@ -328,12 +328,15 @@ class Order
       See Also:
         <__MasterOrdState>
     */
-    public function DlvEnd($dlv_cd, $dlv_no, $ord_state = ORD_STATE_DLV_FINISH ){
+    public function DlvEnd($dlv_cd, $dlv_no, $ord_state = ORD_STATE_DLV_FINISH, $dlv_place_type = null, $dlv_place_cd = null)
+	{
         DB::table("order_opt")->where('ord_opt_no', $this->ord_opt_no)->update([
             'ord_state' => $ord_state,
             'dlv_cd' => $dlv_cd,
             'dlv_no' => $dlv_no,
-            'dlv_end_date' => now()
+            'dlv_end_date' => now(),
+			'dlv_place_type' => $dlv_place_type,
+			'dlv_place_cd' => $dlv_place_cd
         ]);
 
         $this->__MasterOrdState($ord_state);
