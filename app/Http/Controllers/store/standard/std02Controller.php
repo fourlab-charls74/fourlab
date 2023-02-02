@@ -79,15 +79,18 @@ class std02Controller extends Controller
 				c.code_val as store_type_nm,
 				d.code_val as store_kind_nm,
 				e.code_val as store_area_nm,
-				sg.name as grade_nm
+				if(sg.name <> '', sg.name, a.grade_cd) as grade_nm
 			from store a
 			left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = a.store_type
 			left outer join code d on d.code_kind_cd = 'store_kind' and d.code_id = a.store_kind
 			left outer join code e on e.code_kind_cd = 'store_area' and e.code_id = a.store_area
-			left outer join store_grade sg on a.grade_cd = sg.grade_cd
+			left outer join (
+				select grade_cd, name, sdate, edate
+				from store_grade
+				where concat(sdate, '-01 00:00:00') <= date_format(now(), '%Y-%m-%d 00:00:00') 
+					and concat(edate, '-31 23:59:59') >= date_format(now(), '%Y-%m-%d 00:00:00') 
+			) sg on a.grade_cd = sg.grade_cd
 			where 1=1 
-				and concat(sg.sdate, '-01 00:00:00') <= date_format(now(), '%Y-%m-%d 00:00:00') 
-				and concat(sg.edate, '-31 23:59:59') >= date_format(now(), '%Y-%m-%d 00:00:00') 
 				$where
 			$orderby
 			$limit
@@ -231,11 +234,17 @@ class std02Controller extends Controller
 		// $map_code 	= $y.','.$x;
 
 		$sale_place_match_yn = $request->input('sale_place_match_yn');
-		
 		if ($sale_place_match_yn == 'Y') {
 			$com_id = $request->input('com_id');
 		} else {
 			$com_id = '';
+		}
+
+		$account_yn = $request->input('account_yn', 'N');
+		if ($account_yn == 'Y') {
+			$grade_cd = $request->input('grade_cd');
+		} else {
+			$grade_cd = null;
 		}
 
 		try {
@@ -251,7 +260,7 @@ class std02Controller extends Controller
 				'store_type'	=> $request->input('store_type'),
 				'store_kind'	=> $request->input('store_kind'),
 				'store_area'	=> $request->input('store_area'),
-				'grade_cd'		=> $request->input('grade_cd'),
+				'grade_cd'		=> $grade_cd,
 				'zipcode'		=> $request->input('zipcode'),
 				'addr1'			=> $request->input('addr1'),
 				'addr2'			=> $request->input('addr2'),
@@ -299,8 +308,8 @@ class std02Controller extends Controller
 				'admin_id'		=> $id,
 				'map_code'		=> $request->input('map_code'),
 				'open_month_stock_yn' => $request->input('open_month_stock_yn'),
-				'sale_place_match_yn' => $sale_place_match_yn
-				
+				'sale_place_match_yn' => $sale_place_match_yn,
+				'account_yn' => $account_yn,				
 			];
 			
 			DB::table('store')->updateOrInsert($where, $values);
