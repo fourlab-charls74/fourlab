@@ -52,7 +52,7 @@ Login
 
                     <ul class="list_link">
                         <li>
-                            <a href="">회원가입</a>
+                            <a href="#" onClick="openPopup();">회원가입</a>
                         </li>
                         <li>
                             <a href="">아이디찾기</a>
@@ -80,4 +80,10 @@ Login
             </div>
         </div>
     </div>
+    <script type="text/javascript" charset="utf-8">
+    function openPopup() {
+        let url = '/head/signUp';
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
+    }
+    </script>
     @endsection
