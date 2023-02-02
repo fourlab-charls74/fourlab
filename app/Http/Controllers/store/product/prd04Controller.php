@@ -131,7 +131,7 @@ class prd04Controller extends Controller
 		}
 
 		if($ext_store_storage_qty == 'Y') {
-			$having .= "having (wqty > 0 or $store_qty_sql > 0)";
+			$having .= "having (wqty) > 0 or (hqty - hwqty) > 0";
 		}
 
 		$page_size	= $limit;
@@ -160,6 +160,8 @@ class prd04Controller extends Controller
 						, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
 						, if(pc.goods_no = 0, p.price, g.price) as price
 						, if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
+						, ps.qty as hqty
+						, ps.wqty as hwqty
 					from product_code pc
 						inner join product_stock ps on pc.prd_cd = ps.prd_cd
 						$in_store_sql
@@ -188,7 +190,6 @@ class prd04Controller extends Controller
 				) a
 			";
 
-			// dd($query);
 			$row	= DB::select($query);
 			$total	= $row[0]->total;
 			$total_row = $row[0];
@@ -222,6 +223,8 @@ class prd04Controller extends Controller
 				, if(pc.goods_no = 0, p.price, g.price) as price
 				, if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
 				, p.match_yn
+				, ps.qty as hqty
+				, ps.wqty as hwqty
 			from product_code pc
 				inner join product_stock ps on pc.prd_cd = ps.prd_cd
 				$in_store_sql

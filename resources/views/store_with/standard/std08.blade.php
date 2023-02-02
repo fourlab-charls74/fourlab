@@ -115,7 +115,22 @@
         { field: "fee_10", headerName: "특판", width: 60, type: 'percentType', editable: true, cellStyle: YELLOW },
         { field: "fee_11", headerName: "용품", width: 60, type: 'percentType', editable: true, cellStyle: YELLOW },
         { field: "fee_12", headerName: "특약온라인", width: 90, type: 'percentType', editable: true, cellStyle: YELLOW },
-        { field: "fee_10_info", headerName: "특가기준(%)", width: 90, type: 'percentType', editable: true, cellStyle: YELLOW },
+        { headerName: "특가기준",
+            children: [
+                { field: "fee_10_info", headerName: "기준(%)", width: 80, type: 'percentType', editable: true, cellStyle: YELLOW },
+                { field: "fee_10_info_over_yn", hide: true },
+                { field: "fee_10_info_over_yn_nm", headerName: "이상/초과", width: 60, editable: true, cellStyle: {...CENTER, ...YELLOW},
+                    cellEditorSelector: function(params) {
+                        return {
+                            component: 'agRichSelectCellEditor',
+                            params: { 
+                                values: ['이상', '초과']
+                            },
+                        };
+                    },
+                },
+            ]
+        },
         { field: "bigo", headerName: "비고", width: 200, editable: true, cellStyle: YELLOW },
         { width: "auto" },
     ];
@@ -131,7 +146,13 @@
         pApp.ResizeGrid(275);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns);
+        gx = new HDGrid(gridDiv, columns, {
+            onCellValueChanged: (e) => {
+                if (e.column.colId == "fee_10_info_over_yn_nm") {
+                    e.data.fee_10_info_over_yn = e.newValue === '초과' ? 'Y' : 'N';
+                }
+            }
+        });
         gx.gridOptions.rowDragManaged = true;
         gx.gridOptions.animateRows = true;
         Search();

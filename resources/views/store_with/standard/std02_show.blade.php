@@ -89,42 +89,29 @@
 													<input type="text" name="store_nm_s" id="store_nm_s" value="{{ @$store->store_nm_s }}" class="form-control form-control-sm w-100" />
 												</div>
 											</td>
-											<th class="required">매장구분</th>
+											<th class="required">매장구분/매장종류</th>
 											<td>
-												<div class="flex_box">
-													<select name='store_type' class="form-control form-control-sm">
-														<option value=''>전체</option>
-														@foreach ($store_types as $store_type)
-															<option value='{{ $store_type->code_id }}' @if(@$store->store_type == $store_type->code_id) selected @endif>{{ $store_type->code_val }}</option>
-														@endforeach
-													</select>
+												<div class="d-flex align-items-center">
+													<div class="flex_box w-100">
+														<select name='store_type' class="form-control form-control-sm">
+															<option value=''>전체</option>
+															@foreach ($store_types as $store_type)
+																<option value='{{ $store_type->code_id }}' @if(@$store->store_type == $store_type->code_id) selected @endif>{{ $store_type->code_val }}</option>
+															@endforeach
+														</select>
+													</div>
+													<span class="mr-2 ml-2">/</span>
+													<div class="flex_box w-100">
+														<select id='store_kind' name='store_kind' class="form-control form-control-sm">
+															<option value=''>전체</option>
+															@foreach ($store_kinds as $store_kind)
+																<option value='{{ $store_kind->code_id }}' @if(@$store->store_kind == $store_kind->code_id) selected @endif>{{ $store_kind->code_val }}</option>
+															@endforeach
+														</select>
+													</div>
 												</div>
 											</td>
                                         </tr>
-										<tr>
-											<th class="required">매장종류</th>
-											<td>
-												<div class="flex_box">
-													<select id='store_kind' name='store_kind' class="form-control form-control-sm">
-														<option value=''>전체</option>
-														@foreach ($store_kinds as $store_kind)
-															<option value='{{ $store_kind->code_id }}' @if(@$store->store_kind == $store_kind->code_id) selected @endif>{{ $store_kind->code_val }}</option>
-														@endforeach
-													</select>
-												</div>
-											</td>
-											<th class="required">중간관리 수수료</th>
-											<td>
-												<div class="flex_box">
-													<select name='grade_cd' class="form-control form-control-sm">
-														<option value=''>미등록</option>
-														@foreach ($grades as $grade)
-															<option value='{{ $grade->code_id }}' @if(@$store->grade_cd == $grade->code_id) selected @endif>{{ $grade->code_val }}</option>
-														@endforeach
-													</select>
-												</div>
-											</td>
-										</tr>
 										<tr>
 											<th class="required">주소</th>
 											<td colspan="3">
@@ -618,9 +605,25 @@
 													</select>
 												</div>
 											</td>
-											<th></th>
+											<th>정산관리여부(+수수료등급)</th>
 											<td>
-												
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="account_y" name="account_yn" value="Y" @if(@$store->account_yn == 'Y') checked @endif />
+														<label class="custom-control-label" for="account_y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="account_n" name="account_yn" value="N" @if(@$store->account_yn != 'Y') checked @endif />
+														<label class="custom-control-label" for="account_n">N</label>
+													</div>
+													&nbsp;&nbsp;&nbsp;
+													<select name='grade_cd' id="grade_cd" class="form-control form-control-sm" style="width: 70%;">
+														<option value=''>미등록</option>
+														@foreach ($grades as $grade)
+															<option value='{{ $grade->code_id }}' @if(@$store->grade_cd == $grade->code_id) selected @endif>{{ $grade->code_val }}</option>
+														@endforeach
+													</select>
+												</div>
 											</td>
 										</tr>
 									</tbody>
@@ -1090,27 +1093,27 @@
 		return true;
 	}
 
-	//온라인업체매칭
+	//온라인업체매칭 & 정산관리여부
     $(document).ready(function() {
-        if($("input[name='sale_place_match_yn']:checked").val() == 'Y'){
-            $('#com_id').show();
-        } else {
-            $('#com_id').hide();
-        }
+		showSelectBox('sale_place_match_yn', 'com_id');
+		showSelectBox('account_yn', 'grade_cd');
 
         $("input[name='sale_place_match_yn']").change(function(){
-            let match = $("input[name='sale_place_match_yn']:checked").val();
+			showSelectBox('sale_place_match_yn', 'com_id');
+        });
 
-            if (match == 'Y') {
-                $('#com_id').show();
-            } else {
-                $('#com_id').hide();
-            }
-
+        $("input[name='account_yn']").change(function(){
+			showSelectBox('account_yn', 'grade_cd');
         });
     });
 
-
+	function showSelectBox(radio_id, select_id) {
+        if($(`input[name='${radio_id}']:checked`).val() == 'Y'){
+            $('#' + select_id).show();
+        } else {
+            $('#' + select_id).hide();
+        }
+	}
 
 </script>
 @stop

@@ -17,7 +17,7 @@ class sys04Controller extends Controller
 
     public function index(){
 
-        $sdate	= now()->sub(1, 'month')->format('Y-m-d');
+        $sdate	= now()->sub(1, 'week')->format('Y-m-d');
 
         $values = [
             'sdate' => $sdate,
