@@ -24,7 +24,7 @@
 				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="good_types">일자 / 기간</label>
+							<label for="date_period">일자 / 기간</label>
 							<div class="form-inline date-select-inbox">
 								<div class="docs-datepicker form-inline-inner input_box">
 									<div class="input-group">
@@ -38,7 +38,7 @@
 									<div class="docs-datepicker-container"></div>
 								</div>
                                 <span class="text_line">/</span>
-                                <select id="dlv_type" name='dlv_type' class="form-control form-control-sm" style="width: 47%;">
+                                <select id="period" name='period' class="form-control form-control-sm" style="width: 47%;">
                                     <option value='1'>1개월</option>
                                     <option value='3'>3개월</option>
                                     <option value='6'>6개월</option>
@@ -94,9 +94,9 @@
                             <div class="form-inline">
                                 <div class="form-inline-inner input-box w-100">
                                     <div class="form-inline inline_btn_box">
-                                        <input type='hidden' id="prd_cd_range" name='prd_cd_range'>
-                                        <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' onclick="openApi();" class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                        <input type='hidden' id="storage_range" name='storage_range'>
+                                        <input type='text' id="storage_range_nm" name='storage_range_nm' onclick="openApi();" class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-storage-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                     </div>
                                 </div>
                             </div>
@@ -150,6 +150,12 @@
 				<div class="fl_box">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
 				</div>
+                <div class="d-flex justify-content-end">
+					<div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+						<input type="checkbox" class="custom-control-input" name="grid_expand" id="grid_expand" onchange="return setAllRowGroupExpanded(this.checked);" checked>
+						<label class="custom-control-label font-weight-normal" for="grid_expand">항목펼쳐보기</label>
+					</div>
+				</div>
 			</div>
 		</div>
 		<div class="table-responsive">
@@ -158,37 +164,41 @@
 	</div>
 </div>
 <style>
-    .hd-grid-red {
-        color: red;
-    }
+	.ag-row-level-1 {background-color: #ffffcc !important;}
+	.ag-row-level-2 {background-color: #f2f2f2 !important;}
+	.ag-row-level-3 {background-color: #e2e2e2 !important;}
 </style>
+
 <script type="text/javascript" charset="utf-8">
 
-    const pinnedRowData = [{ brand: 'total' }];
+    const pinnedRowData = [{ br_cd: 'total', tag_price: 0, price: 0, wonga: 0,
+                            order_qty: 0, order_tag_price: 0, order_price: 0, order_wonga: 0, 
+                            release_qty: 0, release_qty: 0, return_qty: 0, total_release_qty: 0, sale_qty: 0,
+                            sale_tag_price: 0, sale_price: 0, sale_recv_amt: 0, sale_wonga: 0, sale_rate: 0,
+                            sale_discount_rate: 0, storage_stock_qty: 0, store_stock_qty: 0, total_stock_qty: 0
+    }];
     const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
 
 	let columns = [
-        { headerName: "#", field: "num", type:'NumType', pinned:'left', aggSum:"합계", cellStyle: { 'text-align': "center" },
-            cellRenderer: function (params) {
-                if (params.node.rowPinned === 'top') {
-                    return "";
-                } else {
-                    return parseInt(params.value) + 1;
-                }
-            }
+        { field: "item_nm", headerName: "품목명", pinned:'left', width:50, cellStyle: { 'text-align': "center" }, rowGroup: true, hide: true},
+        { field: "brand_nm", headerName: "브랜드명", width:90, rowGroup: true, hide: true},
+        { field: "prd_cd_p", headerName: "상품코드일련", width:120, rowGroup: true, hide: true },
+
+        { field: "item", headerName: "품목", width:80, pinned:'left',
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.value == 'total' ? '합계' : params.node.level == 0 ? params.value : '',
         },
-        { field: "item", headerName: "품목", pinned:'left', width:50, cellStyle: { 'text-align': "center" },
-			cellRenderer: function (params) {
-					if (params.node.rowPinned === 'top') {
-						return "합계";
-					} else {
-						return params.data.item
-					}
-				},
-		},
-        { field: "item_nm", headerName: "품목명", width:80, pinned:'left'},
-        { field: "brand_nm", headerName: "브랜드명", width:90},
-        { field: "prd_cd", headerName: "상품코드", width:120},
+        {headerName: '품목명', showRowGroup: 'item_nm', cellRenderer: 'agGroupCellRenderer', minWidth: 115},
+        { field: "br_cd", headerName: "브랜드", width:80,
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.value == 'total' ? '합계' : params.node.level == 1 ? params.value : '',
+        },
+        {headerName: '브랜드명', showRowGroup: 'brand_nm', cellRenderer: 'agGroupCellRenderer', minWidth: 115},
+        {headerName: '상품코드일련', showRowGroup: 'prd_cd_p', cellRenderer: 'agGroupCellRenderer', minWidth: 150},
+        { field: "prd_cd", headerName: "상품코드", width:120,
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.value == 'total' ? '합계' : params.node.level == 3 ? params.value : '',
+        },
         { field: "style_no", headerName: "스타일넘버", width:80},
         { field: "goods_nm", headerName: "상품명", width:250},
         { field: "goods_nm_eng", headerName: "상품명(영문)", width:250},
@@ -196,10 +206,10 @@
         { field: "color_nm", headerName: "컬러명", width:80},
         { field: "size", headerName: "사이즈", width:50},
         { field: "goods_opt", headerName: "옵션", width:100},
-        { field: "tag_price", headerName: "Tag가", width:80, type: 'currencyType'},
-        { field: "price", headerName: "현재가", width:80, type: 'currencyType'},
-        { field: "wonga", headerName: "원가", width:80, type: 'currencyType'},
-        { field: "order_amt", headerName: "발주량", width:100},
+        { field: "tag_price", headerName: "Tag가", width:80, type: 'currencyType',aggFunc: sumValuesFunc},
+        { field: "price", headerName: "현재가", width:80, type: 'currencyType',aggFunc: sumValuesFunc},
+        { field: "wonga", headerName: "원가", width:80, type: 'currencyType',aggFunc: sumValuesFunc},
+        { field: "order_amt", headerName: "발주량", width:100,type: 'currencyType', aggFunc: sumValuesFunc},
         {
             headerName: "입고",
             children: [
@@ -212,7 +222,7 @@
         {
             headerName: "출고",
             children: [
-                {field: "release_first_date", headerName: "최초출고일", width: 100, aggFunc: sumValuesFunc},
+                {field: "release_first_date", headerName: "최초출고일", width: 100},
                 {field: "release_qty", headerName: "출고", width: 60, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "return_qty", headerName: "반품", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "total_release_qty", headerName: "총출고", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
@@ -226,7 +236,7 @@
                 {field: "sale_price", headerName: "현재가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "sale_recv_amt", headerName: "실판매가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "sale_wonga", headerName: "원가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "sa_rate", headerName: "판매율", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "sale_rate", headerName: "판매율", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "sale_discount_rate", headerName: "할인율", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
@@ -235,10 +245,21 @@
             children: [
                 {field: "storage_stock_qty", headerName: "창고", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "store_stock_qty", headerName: "매장", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "total_stock_qty", headerName: "총재고", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "total_stock_qty", headerName: "총재고", width: 80, type: "currencyType", aggFunc: sumValuesFunc, 
+                    // cellRenderer:function(params) {
+                    //     let storage_stock = params.data.storage_stock_qty;
+                    //     let store_stock = params.data.store_stock_qty;
+                    //     return storage_stock + store_stock;
+                    // }
+                },
             ]
         },
-       
+        @foreach($months as $index => $month)
+        {
+            field: "{{$month["val"]}}", headerName: "{{$month["fmt"]}}",
+            
+        },
+        @endforeach
         { field: "", headerName: "", width: "auto"}
     ];
 
@@ -246,23 +267,33 @@
 	const pApp = new App('',{
 		gridId:"#div-gd",
 	});
-
 	let gx;
+
 	$(document).ready(function() {
-		pApp.ResizeGrid(265);
+		pApp.ResizeGrid(275);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
-		let options = {
-			getRowStyle: (params) => params.node.rowPinned ? ({'font-weight': 'bold', 'background-color': '#eee', 'border': 'none'}) : false,
-		}
-		gx = new HDGrid(gridDiv, columns, options);
-        Search();
+		gx = new HDGrid(gridDiv, columns, {
+			pinnedTopRowData: pinnedRowData,
+            getRowStyle: (params) => { // 고정된 row styling
+                if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background-color': '#eee', 'border': 'none'};
+            },
+			rollup: true,
+			groupSuppressAutoColumn: true,
+			suppressAggFuncInHeader: true,
+			enableRangeSelection: true,
+			animateRows: true,
+		});
+
+		Search();
 	});
 
 	function Search() {
         let data = $('form[name="search"]').serialize();
-        gx.Aggregation({ sum: "top" });
-        gx.Request('/store/sale/sal27/search', data, -1);
+        gx.Request('/store/sale/sal27/search', data, -1, function(e) {
+            setAllRowGroupExpanded($("#grid_expand").is(":checked"));
+            updatePinnedRow();
+        });
 	}
 
     // 검색조건 초기화
@@ -275,6 +306,48 @@
         document.getElementsByClassName('sch-prdcd-range')[0].click();
     }
 
+
+    const updatePinnedRow = () => {
+        let [ tag_price, price, wonga, order_qty, order_tag_price, order_price, order_wonga
+            , release_qty, return_qty, total_release_qty, sale_qty, sale_tag_price, sale_price
+            , sale_recv_amt, sale_wonga, sale_rate, sale_discount_rate, storage_stock_qty
+            , store_stock_qty, total_stock_qty ] = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
+        const rows = gx.getRows();
+
+        if (rows && Array.isArray(rows) && rows.length > 0) {
+            rows.forEach((row, idx) => {
+                tag_price += parseInt(row?.tag_price || 0);
+                price += parseInt(row?.price || 0);
+                wonga += parseInt(row?.wonga || 0);
+                order_qty += parseInt(row?.order_qty || 0);
+                order_tag_price += parseInt(row?.order_tag_price || 0);
+                order_price += parseInt(row?.order_price || 0);
+                order_wonga += parseInt(row?.order_wonga || 0);
+                release_qty += parseInt(row?.release_qty || 0);
+                return_qty += parseInt(row?.return_qty || 0);
+                total_release_qty += parseInt(row?.total_release_qty || 0);
+                sale_qty += parseInt(row?.sale_qty || 0);
+                sale_tag_price += parseInt(row?.sale_tag_price || 0);
+                sale_price += parseInt(row?.sale_price || 0);
+                sale_recv_amt += parseInt(row?.sale_recv_amt || 0);
+                sale_wonga += parseInt(row?.sale_wonga || 0);
+                sale_rate += parseInt(row?.sale_rate || 0);
+                sale_discount_rate += parseInt(row?.sale_discount_rate || 0);
+                storage_stock_qty += parseInt(row?.storage_stock_qty || 0);
+                store_stock_qty += parseInt(row?.store_stock_qty || 0);
+                total_stock_qty += parseInt(row?.total_stock_qty || 0);
+                
+            });
+        }
+        let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
+        gx.gridOptions.api.setPinnedTopRowData([
+            { ...pinnedRow.data, tag_price: tag_price, price: price, wonga: wonga, order_qty: order_qty, order_tag_price: order_tag_price, order_price: order_price
+                , order_wonga: order_wonga, release_qty: release_qty, return_qty: return_qty, total_release_qty: total_release_qty, sale_qty: sale_qty, sale_tag_price: sale_tag_price
+                , sale_price: sale_price, sale_recv_amt: sale_recv_amt, sale_wonga: sale_wonga, sale_rate: sale_rate, sale_discount_rate: sale_discount_rate
+                , storage_stock_qty: storage_stock_qty, store_stock_qty: store_stock_qty, total_stock_qty: total_stock_qty
+            }
+        ]);
+    };
 
 
 </script>
