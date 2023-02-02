@@ -71,7 +71,7 @@
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-calculator fs-18"></i><span>정산/마감관리</span></a>
                 <ul>
-                    <li><a href="/shop/account/acc04">매장판매처수수료</a></li>
+                    <li><a href="/shop/account/acc04">매장별매출현황</a></li>
                     <li><a href="/shop/account/acc06">(개)매장중간관리자정산</a></li>
                     <li><a href="/shop/account/acc07">(완)매장중간관리자마감정산</a></li>
                     <li><a href="/shop/account/acc05">(완)기타재반자료</a></li>

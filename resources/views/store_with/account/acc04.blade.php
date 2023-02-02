@@ -1,5 +1,5 @@
 @extends('store_with.layouts.layout')
-@section('title','매장판매수수료')
+@section('title','매장별매출현황')
 @section('content')
 <style>
 	/* 기본옵션 ag grid 3단 가운데 정렬 css 적용 */
@@ -19,7 +19,7 @@
 	}
 </style>
 <div class="page_tit">
-	<h3 class="d-inline-flex">매장판매처수수료</h3>
+	<h3 class="d-inline-flex">매장별매출현황</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
 		<span>매장관리</span>
