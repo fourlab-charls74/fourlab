@@ -90,15 +90,11 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="prd_cd">창고검색조건</label>
-                            <div class="form-inline">
-                                <div class="form-inline-inner input-box w-100">
-                                    <div class="form-inline inline_btn_box">
-                                        <input type='hidden' id="storage_range" name='storage_range'>
-                                        <input type='text' id="storage_range_nm" name='storage_range_nm' onclick="openApi();" class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-storage-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
-                                </div>
+                            <label>창고명</label>
+                            <div class="form-inline inline_btn_box">
+                                <input type='hidden' id="storage_nm" name="storage_nm">
+                                <select id="storage_no" name="storage_no[]" class="form-control form-control-sm select2-storage multi_select"  multiple></select>
+                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-storage"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                             </div>
                         </div>
                     </div>
@@ -179,88 +175,76 @@
     }];
     const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
 
-	let columns = [
-        { field: "item_nm", headerName: "품목명", pinned:'left', width:50, cellStyle: { 'text-align': "center" }, rowGroup: true, hide: true},
+	var columns = [
+        { field: "item_nm", headerName: "품목명", pinned:'left', maxWidth:20, cellStyle: { 'text-align': "center" }, rowGroup: true, hide: true},
         { field: "brand_nm", headerName: "브랜드명", width:90, rowGroup: true, hide: true},
         { field: "prd_cd_p", headerName: "상품코드일련", width:120, rowGroup: true, hide: true },
 
-        { field: "item", headerName: "품목", width:80, pinned:'left',
+        { field: "item", headerName: "품목", width:60, pinned:'left',cellStyle: { 'text-align': "center" },
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.value == 'total' ? '합계' : params.node.level == 0 ? params.value : '',
         },
-        {headerName: '품목명', showRowGroup: 'item_nm', cellRenderer: 'agGroupCellRenderer', minWidth: 115},
-        { field: "br_cd", headerName: "브랜드", width:80,
+        {headerName: '품목명', showRowGroup: 'item_nm', cellRenderer: 'agGroupCellRenderer', width: 130, pinned:'left'},
+        { field: "br_cd", headerName: "브랜드", pinned:'left', width:60,
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.value == 'total' ? '합계' : params.node.level == 1 ? params.value : '',
         },
-        {headerName: '브랜드명', showRowGroup: 'brand_nm', cellRenderer: 'agGroupCellRenderer', minWidth: 115},
-        {headerName: '상품코드일련', showRowGroup: 'prd_cd_p', cellRenderer: 'agGroupCellRenderer', minWidth: 150},
-        { field: "prd_cd", headerName: "상품코드", width:120,
+        {headerName: '브랜드명', showRowGroup: 'brand_nm', pinned:'left', cellRenderer: 'agGroupCellRenderer', width: 120, pinned:'left'},
+        {headerName: '상품코드일련', showRowGroup: 'prd_cd_p', cellRenderer: 'agGroupCellRenderer', width: 130, pinned:'left'},
+        { field: "prd_cd", headerName: "상품코드", width:120, pinned:'left',
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.value == 'total' ? '합계' : params.node.level == 3 ? params.value : '',
         },
-        { field: "style_no", headerName: "스타일넘버", width:80},
-        { field: "goods_nm", headerName: "상품명", width:250},
-        { field: "goods_nm_eng", headerName: "상품명(영문)", width:250},
-        { field: "color", headerName: "컬러", width:50},
-        { field: "color_nm", headerName: "컬러명", width:80},
-        { field: "size", headerName: "사이즈", width:50},
-        { field: "goods_opt", headerName: "옵션", width:100},
-        { field: "tag_price", headerName: "Tag가", width:80, type: 'currencyType',aggFunc: sumValuesFunc},
-        { field: "price", headerName: "현재가", width:80, type: 'currencyType',aggFunc: sumValuesFunc},
-        { field: "wonga", headerName: "원가", width:80, type: 'currencyType',aggFunc: sumValuesFunc},
-        { field: "order_amt", headerName: "발주량", width:100,type: 'currencyType', aggFunc: sumValuesFunc},
+        { field: "goods_no", headerName: "상품번호", minWidth: 70},
+        { field: "goods_nm", headerName: "상품명", minWidth:250},
+        { field: "goods_nm_eng", headerName: "상품명(영문)", minWidth:250},
+        { field: "color", headerName: "컬러", minWidth:50},
+        { field: "color_nm", headerName: "컬러명", minWidth:80},
+        { field: "size", headerName: "사이즈", minWidth:50},
+        { field: "goods_opt", headerName: "옵션", minWidth:100},
+        { field: "tag_price", headerName: "Tag가", minWidth:80, type: 'currencyType',aggFunc: sumValuesFunc},
+        { field: "price", headerName: "현재가", minWidth:80, type: 'currencyType',aggFunc: sumValuesFunc},
+        { field: "wonga", headerName: "원가", minWidth:80, type: 'currencyType',aggFunc: sumValuesFunc},
+        { field: "order_amt", headerName: "발주량", minWidth:100,type: 'currencyType', aggFunc: sumValuesFunc},
         {
             headerName: "입고",
             children: [
-                {field: "order_qty", headerName: "수량", width: 60, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "order_tag_price", headerName: "TAG가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "order_price", headerName: "현재가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "order_wonga", headerName: "원가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "order_qty", headerName: "수량", minWidth: 60, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "order_tag_price", headerName: "TAG가", minWidth: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "order_price", headerName: "현재가", minWidth: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "order_wonga", headerName: "원가", minWidth: 80, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
         {
             headerName: "출고",
             children: [
-                {field: "release_first_date", headerName: "최초출고일", width: 100},
-                {field: "release_qty", headerName: "출고", width: 60, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "return_qty", headerName: "반품", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "total_release_qty", headerName: "총출고", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "release_first_date", headerName: "최초출고일", minWidth: 100},
+                {field: "release_qty", headerName: "출고", minWidth: 60, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "return_qty", headerName: "반품", minWidth: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "total_release_qty", headerName: "총출고", minWidth: 80, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
         {
             headerName: "판매",
             children: [
-                {field: "sale_qty", headerName: "수량", width: 60, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "sale_tag_price", headerName: "TAG가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "sale_price", headerName: "현재가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "sale_recv_amt", headerName: "실판매가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "sale_wonga", headerName: "원가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "sale_rate", headerName: "판매율", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "sale_discount_rate", headerName: "할인율", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "sale_qty", headerName: "수량", minWidth: 60, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "sale_tag_price", headerName: "TAG가", minWidth: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "sale_price", headerName: "현재가", minWidth: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "sale_recv_amt", headerName: "실판매가", minWidth: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "sale_wonga", headerName: "원가", minWidth: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "sale_rate", headerName: "판매율", minWidth: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "sale_discount_rate", headerName: "할인율", minWidth: 80, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
         {
             headerName: "재고",
             children: [
-                {field: "storage_stock_qty", headerName: "창고", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "store_stock_qty", headerName: "매장", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "total_stock_qty", headerName: "총재고", width: 80, type: "currencyType", aggFunc: sumValuesFunc, 
-                    // cellRenderer:function(params) {
-                    //     let storage_stock = params.data.storage_stock_qty;
-                    //     let store_stock = params.data.store_stock_qty;
-                    //     return storage_stock + store_stock;
-                    // }
-                },
+                {field: "storage_stock_qty", headerName: "창고", minWidth: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "store_stock_qty", headerName: "매장", minWidth: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "total_stock_qty", headerName: "총재고", minWidth: 80, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
-        @foreach($months as $index => $month)
-        {
-            field: "{{$month["val"]}}", headerName: "{{$month["fmt"]}}",
-            
-        },
-        @endforeach
-        { field: "", headerName: "", width: "auto"}
+        // { headerName: "", field: "", width: "auto" }
     ];
 
 	
@@ -284,17 +268,63 @@
 			enableRangeSelection: true,
 			animateRows: true,
 		});
-
-		Search();
+        
+        Search();
 	});
+    
+    var mutable_cols = [];
 
 	function Search() {
         let data = $('form[name="search"]').serialize();
         gx.Request('/store/sale/sal27/search', data, -1, function(e) {
-            setAllRowGroupExpanded($("#grid_expand").is(":checked"));
             updatePinnedRow();
+            formatMonth(e);
+            setAllRowGroupExpanded($("#grid_expand").is(":checked"));
         });
 	}
+
+
+    const formatMonth = async (e) => {
+		months = e.head.months;
+        month = months.length;
+		setMutableColumns(month);
+	};
+
+    const setMutableColumns = (month) => {
+		gx.gridOptions.api.setColumnDefs([]);
+		mutable_cols = [];
+		columns.map(col => {
+			mutable_cols.push(col);
+		});
+
+        // console.log(mutable_cols);
+		mutable_cols.push(MonthColumns(month));
+		mutable_cols.push({ headerName: "", field: "", width: "auto" });
+		gx.gridOptions.api.setColumnDefs(mutable_cols);
+		// autoSizeColumns(gx, ["nvl"]);
+		// gx.CalAggregation();
+	};
+
+    const MonthColumns = (month) => {
+        let col = { fields: "month", headerName: "기간", children: [] };
+        for (let i = 0; i < month; i++) {
+            const month_field = months[i].val;
+            const month_headerName = months[i].fmt;
+            autoSizeColumns(gx, [""]);
+            let add_col = {field: month_field, headerName: month_headerName, minWidth: 80, type: "currencyType", aggFunc: sumValuesFunc};
+            col.children.push(add_col)
+        }
+        return col;
+	};
+
+    const autoSizeColumns = (grid, except = [], skipHeader = false) => {
+		const allColumnIds = [];
+		gx.gridOptions.columnApi.getAllColumns().forEach((column) => {
+			if (except.includes(column.getId())) return;
+			allColumnIds.push(column.getId());
+		});
+		gx.gridOptions.columnApi.autoSizeColumns(allColumnIds, skipHeader);
+	};
 
     // 검색조건 초기화
     const formReset = () => {
@@ -349,6 +379,10 @@
         ]);
     };
 
+     // 매장 검색 클릭 이벤트 바인딩 및 콜백 사용
+     $( ".sch-storage" ).on("click", function() {
+        searchStorage.Open();
+    });
 
 </script>
 @stop

@@ -56,6 +56,51 @@ $( document ).ready(function() {
             }
         }
     });
+
+
+    $('.select2-storage').select2({
+        ajax: {
+            url: "/store/auto-complete/storage",
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    type:'select2',
+                    keyword: params.term, // search term
+                    page: params.page
+                };
+            },
+            cache: true
+        },
+        width:'100%',
+        placeholder: '',
+        allowClear: true,
+        minimumInputLength: 1,
+        templateResult: function (state) {
+            if (!state.id) {
+                return state.text;
+            }
+            if(state.img !== undefined && state.img !== ""){
+                var $state = $(
+                    '<span><img src="' + state.img + '" style="width:50px" onError="this.src=\'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\'"/> ' + '[' + state.id +  '] '  + state.text + '</span>'
+                );
+            } else {
+                var $state = $(
+                    '<span>' + '[' + state.id +  '] ' + state.text + '</span>'
+                );
+            }
+            return $state;
+        },
+        //templateSelection: formatRepoSelection,
+        language: {
+            // You can find all of the options in the language files provided in the
+            // build. They all must be functions that return the string that should be
+            // displayed.
+            inputTooShort: function () {
+                return "한글자 이상 입력해 주세요.";
+            }
+        }
+    });
     
 });
 
@@ -211,6 +256,160 @@ SearchStore.prototype.InitValue = () => {
 
 
 let searchStore = new SearchStore();
+
+//창고검색
+function SearchStorage(){
+    this.grid = null;
+}
+
+SearchStorage.prototype.Open = async function(callback = null, multiple_type = false){
+    if(this.grid === null){
+        this.isMultiple = multiple_type === "multiple";
+        this.SetGrid("#div-gd-storage");
+        // this.SetStoreTypeSelect();
+        $("#SearchStorageModal").draggable();
+        if(this.isMultiple) $("#SearchStorageModal #search_storage_cbtn").css("display", "block");
+        this.callback = callback;
+    }
+    $('#SearchStorageModal').modal({
+        keyboard: false
+    });
+};
+
+// 매장구분 세팅
+// SearchStorage.prototype.SetStoreTypeSelect = async function(){
+//     const { data: { body: types } } = await axios({ 
+//         url: `/store/api/stores/search-storetype`, 
+//         method: 'get' 
+//     });
+//     for(let type of types) {
+//         $("#search_store_type").append(`<option value="${type.code_id}">${type.code_val}</option>`);
+//     }
+// }
+
+SearchStorage.prototype.SetGrid = function(divId){
+    let columns = [];
+
+    if(this.isMultiple) {
+        columns.push({ field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null });
+    }
+
+    columns.push(
+        { field:"storage_cd", headerName:"창고코드", width:100, cellStyle: { "text-align": "center" }, hide: true },
+        { field:"storage_nm", headerName:"창고명", width: "auto" },
+    );
+
+    if(!this.isMultiple) {
+        columns.push({ 
+            field:"choice", headerName:"선택", width:100, cellClass:'hd-grid-code',
+            cellRenderer: function (params) {
+                if (params.data.storage_cd !== undefined) {
+                    return '<a href="javascript:void(0);" onclick="return searchStorage.Choice(\'' + params.data.storage_cd + '\',\'' + params.data.storage_nm + '\');">선택</a>';
+                }
+            }
+        });
+    }
+
+    this.grid = new HDGrid(document.querySelector( divId ), columns);
+};
+
+SearchStorage.prototype.Search = function(e) {
+    const event_type = e?.type;
+    if (event_type == 'keypress') {
+        if (e.key && e.key == 'Enter') {
+            let data = $('form[name="search_storage"]').serialize();
+            this.grid.Request('/store/api/storage/search', data);
+        } else {
+            return false;
+        }
+    } else {
+        let data = $('form[name="search_storage"]').serialize();
+        this.grid.Request('/store/api/storage/search', data);
+    }
+};
+
+SearchStorage.prototype.Choice = function(code,name){
+    if(this.callback !== null){
+        this.callback(code, name);
+    } else {
+        if($('#storage_no.select2-storage').length > 0){
+            $('#storage_no').val(null);
+            const option = new Option(name, code, true, true);
+            $('#storage_no').append(option).trigger('change');
+        } else {
+            if($('#storage_no').length > 0){
+                $('#storage_no').val(code);
+            }
+            if($('#storage_nm').length > 0){
+                $('#storage_nm').val(name);
+            }
+        }
+        if($('#storage_cd.select2-storage').length > 0){
+            $('#storage_cd').val(null);
+            const option = new Option(name, code, true, true);
+            $('#storage_cd').append(option).trigger('change');
+        } else {
+            if($('#storage_cd').length > 0){
+                $('#storage_cd').val(code);
+            }
+            if($('#storage_nm').length > 0){
+                $('#storage_nm').val(name);
+            }
+        }
+    }
+    this.InitValue();
+    $('#SearchStorageModal').modal('toggle');
+};
+
+// SearchStorage.prototype.ChoiceMultiple = function(){
+//     let rows = this.grid.getSelectedRows();
+//     if(this.callback !== null){
+//         this.callback(rows);
+//     } else {
+//         let store_cds = rows.map(r => r.store_cd);
+//         let store_nms = rows.map(r => r.store_nm);
+
+//         if($('#store_no.select2-store').length > 0){
+//             for(let r of rows) {
+//                 if($("#store_no").val().includes(r.store_cd)) continue;
+//                 const option = new Option(r.store_nm, r.store_cd, true, true);
+//                 $('#store_no').append(option).trigger('change');
+//             }
+//         } else {
+//             if($('#store_no').length > 0){
+//                 $('#store_no').val(store_cds);
+//             }
+//             if($('#store_nm').length > 0){
+//                 $('#store_nm').val(store_nms);
+//             }
+//         }
+//         if($('#store_cd.select2-store').length > 0){
+//             for(let r of rows) {
+//                 if($("#store_cd").val().includes(r.store_cd)) continue;
+//                 const option = new Option(r.store_nm, r.store_cd, true, true);
+//                 $('#store_cd').append(option).trigger('change');
+//             }
+//         } else {
+//             if($('#store_cd').length > 0){
+//                 $('#store_cd').val(store_cds);
+//             }
+//             if($('#store_nm').length > 0){
+//                 $('#store_nm').val(store_nms);
+//             }
+//         }
+//     }
+//     this.InitValue();
+//     $('#SearchStoreModal').modal('toggle');
+// }
+
+SearchStorage.prototype.InitValue = () => {
+    document.search_store.reset();
+    searchStorage.grid.setRows([]);
+    $('#gd-storage-total').html(0);
+};
+
+
+let searchStorage = new SearchStorage();
 
 /**
  * 담당자 (MD) 검색
@@ -1037,6 +1236,11 @@ $( document ).ready(function() {
         searchStore.Open();
     });
 
+    // 매장 검색 클릭 이벤트 바인딩 및 콜백 사용
+    $( ".sch-storage" ).on("click", function() {
+        searchStorage.Open();
+    });
+
     // 담당자 검색 클릭 이벤트 바인딩 및 콜백 사용
     $( ".sch-md" ).on("click", function() {
         searchMd.Open();
@@ -1092,6 +1296,7 @@ var initSearch = (select2 = [], form_name = "search") => { // 검색 초기화 �
     if ($('#cat_cd').length > 0) $('#cat_cd').val("").trigger('change'); // 카테고리 select2 박스 초기화
     if ($('#com_cd').length > 0) $('#com_cd').val("").trigger('change'); // 업체 select2 박스 초기화
     if ($('#store_cd').length > 0) $('#store_cd').val("").trigger('change'); // 매장명 select2 박스 초기화
+    if ($('#storage_cd').length > 0) $('#storage_cd').val("").trigger('change'); // 매장명 select2 박스 초기화
     if ($('#goods_stat').length > 0) $('#goods_stat').val("").trigger('change'); // 상품상태 select2 박스 초기화
     if ($('#sell_type').length > 0) $('#sell_type').val("").trigger('change'); // 판매유형 select2 박스 초기화
     if ($('#pr_code').length > 0) $('#pr_code').val("").trigger('change'); // 행사코드 select2 박스 초기화

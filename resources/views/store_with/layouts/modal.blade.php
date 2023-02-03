@@ -161,6 +161,74 @@
     </div><!-- /.modal -->
 
 
+    <div id="SearchStorageModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchStorageModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title mt-0" id="myModalLabel">매장 검색</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body show_layout" style="background:#f5f5f5;">
+                    <div class="card_wrap search_cum_form write">
+                        <div class="card shadow">
+                            <form name="search_storage" method="get" onsubmit="return false">
+                                <div class="card-body">
+                                    <div class="row_wrap">
+                                        <div class="row">
+                                            <div class="col-lg-12 inner-td">
+                                                <!-- <div class="form-group">
+                                                    <label style="min-width:80px;">매장구분</label>
+                                                    <div class="flax_box">
+														<select name='store_type' class="form-control form-control-sm" id="search_store_type">
+															<option value=''>전체</option>
+														</select>
+													</div>
+                                                </div> -->
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12 inner-td">
+                                                <div class="form-group">
+                                                    <label style="min-width:80px;">창고명</label>
+                                                    <div class="flex_box">
+                                                        <input type='text' class="form-control form-control-sm search-all" onkeypress="searchStorage.Search(event);" name='storage_nm' value=''>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="resul_btn_wrap" style="padding-top:7px;text-align:right;display:block;">
+                                        <a href="javascript:void(0);" id="search_storage_sbtn" onclick="return searchStorage.Search();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="card shadow mb-1 pt-0">
+                            <div class="card-body m-0">
+                                <div class="card-title">
+                                    <div class="filter_wrap">
+                                        <div class="fl_box">
+                                            <h6 class="m-0 font-weight-bold">총 : <span id="gd-storage-total" class="text-primary">0</span> 건</h6>
+                                        </div>
+                                        <div class="fr_box">
+                                            <a href="javascript:void(0);" id="search_storage_cbtn" onclick="return searchStorage.ChoiceMultiple();" class="btn btn-sm btn-primary shadow-sm" style="display: none"><i class="fas fa-check fa-sm text-white-50"></i> 선택</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <div id="div-gd-storage" style="width:100%;height:300px;" class="ag-theme-balham"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
     <div id="SearchCategoryModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchCategoryModalLabel"
      aria-hidden="true">
     <div class="modal-dialog" style="max-width:850px;">

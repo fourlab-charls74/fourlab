@@ -109,4 +109,96 @@ class StoreController extends Controller {
             'body' => $store
         ]);
     }
+
+    /**
+     * 창고명 선택 화면 랜더링
+     */
+    public function storage_show()
+    {
+        return view(Config::get('shop.store.view') . "/common/storage");
+    }
+
+    /**
+     * 검색
+     */
+    public function storage_search(Request $request)
+    {
+        $storage_cd = $request->input('storage_cd');
+        $storage_nm = $request->input('storage_nm');
+        $where = "";
+
+        $sql = "
+            select storage_cd, storage_nm 
+            from storage 
+            where storage_nm like '%" . Lib::quote($storage_nm) . "%'
+                and storage_cd like '%" . Lib::quote($storage_cd) . "%'
+                $where
+        ";
+        $rows = DB::select($sql);
+
+        return response()->json([
+            "code" => 200,
+            "head" => array(
+                "total" => count($rows)
+            ),
+            "body" => $rows
+        ]);
+    }
+
+    /**
+     * 매장구분 목록조회
+     */
+    // public function search_storetype(Request $request)
+    // {
+    //     $store_types = SLib::getCodes("STORE_TYPE");
+    //     return response()->json(['code' => 200, 'body' => $store_types]);
+    // }
+
+    /**
+     * 매장코드로 매장명 조회
+     */
+    public function search_storagenm(Request $request)
+    {
+        $storage_cds = $request->input("storage_cds", []);
+        $result = [];
+
+        foreach($storage_cds as $storage_cd) {
+            $storage = DB::table("storage")->where('store_cd', '=', $storage_cd)->select('storage_cd', 'storage_nm')->get();
+            array_push($result, $storage[0]);
+        }
+
+        return response()->json(['code' => 200, 'head' => ['total' => count($result)], 'body' => $result]);
+    }
+
+    /**
+     * 매장구분으로 매장명 조회
+     */
+    // public function search_storagenm_from_type(Request $request)
+    // {
+    //     $store_type = $request->input("store_type", '');
+    //     $result = DB::table('store')->where('store_type', '=', $store_type)->select('store_cd', 'store_nm')->get();
+        
+    //     return response()->json(['code' => 200, 'head' => ['total' => count($result)], 'body' => $result]);
+    // }
+
+    /**
+     * 매장코드로 해당 매장 주문정보 조회
+     */
+    public function search_storage_info($storage_cd = '')
+    {
+        $sql = "
+            select *
+            from storage
+            where storage_cd = :storage_cd
+        ";
+        $store = DB::selectOne($sql, ['store_cd' => $storage_cd]);
+        
+        return response()->json([
+            'code' => 200,
+            'head' => [
+                'total' => 1
+            ],
+            'body' => $store
+        ]);
+    }
 }

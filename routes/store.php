@@ -29,6 +29,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
         // 매장명 조회 (자동완성)
         Route::get('/store', 'AutoCompleteController@store');
+       
+        // 창고명 조회 (자동완성)
+        Route::get('/storage', 'AutoCompleteController@storage');
 
     });
 
@@ -53,6 +56,13 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('stores/search-storenm', 'StoreController@search_storenm');
         Route::post('stores/search-storenm-from-type', 'StoreController@search_storenm_from_type');
         Route::get('stores/search-store-info/{store_cd?}', 'StoreController@search_store_info');
+        
+        // 창고명 조회
+        Route::get('storage', 'StoreController@storage_show');
+        Route::get('storage/search', 'StoreController@storage_search');
+        Route::post('storage/search-storagenm', 'StoreController@search_storagenm');
+        Route::post('storage/search-storagenm-from-type', 'StoreController@search_storagenm_from_type');
+        Route::get('storage/search-storage-info/{storage_cd?}', 'StoreController@search_storage_info');
 
         // 상품코드 조회
         Route::get('prdcd/conds', 'goods@search_product_conditions');
