@@ -15,7 +15,29 @@ class cls02Controller extends Controller
 {
 	public function index(Request $request) 
 	{
-		return view( Config::get('shop.head.view') . '/classic/cls02');
+		$state_sql = "
+			select
+				cc.code, cc.value1
+			from classic_code cc
+			where cc.kind = 'dm_state'
+			order by cc.code
+		";
+		$states = DB::select($state_sql);
+
+		$dates_sql = "
+			select 
+				cc.code, cc.value3, cc.value1
+			from classic_code cc
+			where cc.kind in ('s_dm_date', 'e_dm_date')
+		";
+		$dates = DB::select($dates_sql);
+
+		$values = [
+			'states'		=> $states,
+			'dates'			=> $dates,
+		];
+
+		return view( Config::get('shop.head.view') . '/classic/cls02', $values);
 	}
 
 	public function search(Request $request)
@@ -172,9 +194,8 @@ class cls02Controller extends Controller
 		$error_code	= "200";
 		$result_msg	= "";
 
-		$datas	= $request->input('data');
-		$datas	= json_decode($datas);
-		$s_state = $request->input('s_state');
+		$datas		= json_decode($request->input('data'));
+		$s_state  	= $request->input('s_state');
 
         try {
             DB::beginTransaction();
@@ -244,7 +265,17 @@ class cls02Controller extends Controller
 
 			$sql = "
 				update classic_dm_reserve set 
-					name1 = :name1, name2 = :name2, mobile = :mobile, email = :email, passwd = :passwd, state = :state, s_dm_date = :s_dm_date, s_dm_type = :s_dm_type, e_dm_date = :e_dm_date, e_dm_type = :e_dm_type, updt_dt = now()
+					name1 = :name1
+					, name2 = :name2
+					, mobile = :mobile
+					, email = :email
+					, passwd = :passwd
+					, state = :state
+					, s_dm_date = :s_dm_date
+					, s_dm_type = :s_dm_type
+					, e_dm_date = :e_dm_date
+					, e_dm_type = :e_dm_type
+					, updt_dt = now()
 				where regist_number = :regist_number
 			";
 

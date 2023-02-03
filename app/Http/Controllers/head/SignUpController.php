@@ -14,7 +14,6 @@ use Illuminate\Validation\ValidationException;
 
 class SignUpController extends Controller
 {
-    //
     public function index()
     {
         $user = (object)[
@@ -32,9 +31,9 @@ class SignUpController extends Controller
         return view( Config::get('shop.head.view') . '/auth/sign_up_show', $values);
     }
 
+	//회원가입
     public function store(Request $request)
 	{
-
 		$grade			= $request->input('grade');
 		$id				= $request->input('id');
 		$passwd			= $request->input('passwd');
@@ -44,6 +43,7 @@ class SignUpController extends Controller
 		$ipto			= $request->input('ipto');
 		$md_yn			= $request->input('md_yn');
 		$use_yn			= $request->input('use_yn');
+		$confirm_yn		= $request->input('confirm_yn');
 		$part			= $request->input('part');
 		$posi			= $request->input('posi');
 		$tel			= $request->input('tel');
@@ -67,6 +67,7 @@ class SignUpController extends Controller
 				'ipto' => $ipto,
 				'md_yn' => $md_yn,
 				'use_yn' => $use_yn,
+				'confirm_yn' => $confirm_yn,
 				'store_wonga_yn' => $store_wonga_yn,
 				'part' => $part,
 				'posi' => $posi,
@@ -93,5 +94,36 @@ class SignUpController extends Controller
 		}
 
 		return response()->json(['code' => $code, 'msg' => $msg]);
+	}
+
+	//아이디 중복 확인
+	public function checkid($id = '')
+	{
+		$code = 0;
+
+		$query = "
+			select 
+				count(id) cnt 
+			from mgr_user 
+			where id = :id 
+		";
+
+		$rs = DB::select($query, [
+			'id' => $id
+		]);
+
+		$id_cnt = $rs[0]->cnt;
+
+
+		if ($id_cnt == 0) {
+			$code = 1;
+		} else {
+			$code = 0;
+		}
+
+		return response()->json([
+			"code" => 200,
+			"id_code" => $code
+		]);
 	}
 }

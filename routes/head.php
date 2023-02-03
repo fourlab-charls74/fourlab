@@ -27,10 +27,11 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
     Route::post('/login', 'LoginController@login');
     Route::get('/logout', 'LoginController@logout');
 
-    //----회원가입
+    // 회원가입
     Route::get('/signUp', 'SignUpController@index');
     Route::post('/signUp/store', 'SignUpController@store');
-    //----
+    Route::put('/signUp/checkid/{id?}', 'SignUpController@checkid');
+    
 
     Route::get('/user', 'UserController@index');
     Route::post('/user/store', 'UserController@store');

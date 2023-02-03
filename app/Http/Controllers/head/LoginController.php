@@ -82,21 +82,4 @@ class LoginController extends Controller
         $request->session()->invalidate();
         return redirect('/head');
     }
-
-    public function show()
-    {
-        $user = (object)[
-            'id' => '',
-            'passwd' => '',
-            'grade' => 'U',
-            'iptype' => 'A'
-        ];
-
-        $values = [
-            'user' => $user
-        ];
-
-        return view( Config::get('shop.head.view') . '/auth/sign_up_show', $values);
-    }
-    
 }

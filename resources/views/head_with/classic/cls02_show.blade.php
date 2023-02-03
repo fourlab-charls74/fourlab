@@ -265,7 +265,7 @@ function Save(){
 }
 
 function chgDmType(type, init){
-	ff	= document.info;
+	const ff = document.info;
 
 	$("." + type + "_chk").css("display","none");
 
