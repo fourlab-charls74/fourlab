@@ -39,8 +39,28 @@ class acc06Controller extends Controller
 		$pr_codes = $this->_get_prcodes();
 		$pr_codes = array_map(function($c) { return $c->code_id; }, $pr_codes);
 
+		// 검색조건 필터링
+		$where = "";
+		if ($store_type != '') $where .= " and s.store_type = '" . Lib::quote($store_type) . "'";
+        if ($store_kind != '') $where .= " and s.store_kind = '". Lib::quote($store_kind) . "'";
+        if ($store_cd != '') $where .= " and s.store_cd = '" . Lib::quote($store_cd) . "'";
+		
+        // 행사코드별 매출구분
+        $pr_codes = $this->_get_prcodes();
+        $pr_codes_query = "";
+        foreach ($pr_codes as $item) {
+            $key = $item->code_id;
+            $pr_codes_query .= ", sum(if(ww.online_yn = 'N' and oo.pr_code = '$key', ww.recv_amt, 0)) as sales_" . $key . "_amt";
+        }
+
 		$sql = "
 			select a.*
+				, if(a.fee_amt_JS1 < 0, 0, a.fee_amt_JS1) as fee_amt_JS1
+				, if(a.fee_amt_JS2 < 0, 0, a.fee_amt_JS2) as fee_amt_JS2
+				, if(a.fee_amt_JS3 < 0, 0, a.fee_amt_JS3) as fee_amt_JS3
+				, if(a.fee_amt_TG < 0, 0, a.fee_amt_TG) as fee_amt_TG
+				, if(a.fee_amt_YP < 0, 0, a.fee_amt_YP) as fee_amt_YP
+				, if(a.fee_amt_OL < 0, 0, a.fee_amt_OL) as fee_amt_OL
 				, (a.fee_amt_JS1 + a.fee_amt_JS2 + a.fee_amt_JS3 + a.fee_amt_TG + a.fee_amt_YP + a.fee_amt_OL) as fee_amt
 			from (
 				select w.*, sg.*
@@ -69,7 +89,7 @@ class acc06Controller extends Controller
 					) as fee_amt_JS3
 					, round(w.ord_TG_amt * (sg.fee_10 / 100)) as fee_amt_TG
 					, round(w.ord_YP_amt * (sg.fee_11 / 100)) as fee_amt_YP
-					, 0 as fee_amt_OL -- 온라인 작업중
+					, round(w.ord_OL_amt * (sg.fee_12 / 100)) as fee_amt_OL
 				from store s
 					inner join code st on st.code_kind_cd = 'STORE_TYPE' and st.code_id = s.store_type
 					inner join (
@@ -79,63 +99,63 @@ class acc06Controller extends Controller
 							and concat(edate, '-31 23:59:59') >= date_format(now(), '%Y-%m-%d 00:00:00') 
 					) sg on sg.grade_cd = s.grade_cd
 					left outer join (
-						select oo.store_cd as ord_store_cd
+						select ww.store_cd as ord_store_cd
 							, sum(ww.qty) as sale_qty
 							, sum(ww.qty * ww.wonga) as wonga_amt
-							, sum(ww.recv_amt) as sales_amt
-							, sum(if(oo.pr_code = 'JS', ww.recv_amt, 0)) as sales_JS_amt
-							, sum(if(oo.pr_code = 'GL', ww.recv_amt, 0)) as sales_GL_amt
-							, sum(if(oo.pr_code = 'J1', ww.recv_amt, 0)) as sales_J1_amt
-							, sum(if(oo.pr_code = 'J2', ww.recv_amt, 0)) as sales_J2_amt
+							, sum(if(ww.online_yn = 'N', ww.recv_amt, 0)) as sales_amt
+							$pr_codes_query
 							, sum(if(
-								g.brand not in (select code_id from code where code_kind_cd = 'YP_BRAND') 
+								ww.online_yn = 'N'
+									and g.brand not in (select code_id from code where code_kind_cd = 'YP_BRAND') 
 									and if(ss.fee_10_info_over_yn = 'Y', ((1 - (oo.price / g.goods_sh)) * 100) <= ss.fee_10_info, ((1 - (oo.price / g.goods_sh)) * 100) < ss.fee_10_info)
 								, ww.recv_amt
 								, 0
 							)) as ord_JS_amt -- 정상
 							, sum(if(
-								g.brand not in (select code_id from code where code_kind_cd = 'YP_BRAND') 
+								ww.online_yn = 'N'
+									and g.brand not in (select code_id from code where code_kind_cd = 'YP_BRAND') 
 									and if(ss.fee_10_info_over_yn = 'Y', ((1 - (oo.price / g.goods_sh)) * 100) > ss.fee_10_info, ((1 - (oo.price / g.goods_sh)) * 100) >= ss.fee_10_info)
 								, ww.recv_amt
 								, 0
 							)) as ord_TG_amt -- 특가
-							, sum(if(g.brand in (select code_id from code where code_kind_cd = 'YP_BRAND'), ww.recv_amt, 0)) as ord_YP_amt -- 용품
-							, sum(0) as ord_OL_amt -- 온라인
-						from order_opt_wonga ww
+							, sum(if(ww.online_yn = 'N' and g.brand in (select code_id from code where code_kind_cd = 'YP_BRAND'), ww.recv_amt, 0)) as ord_YP_amt -- 용품
+							, sum(if(ww.online_yn = 'Y', ww.recv_amt, 0)) as ord_OL_amt -- 온라인
+						from (
+							(
+								select www.ord_opt_no, www.goods_no, www.qty, www.wonga, www.price, www.recv_amt, www.ord_state, www.ord_kind, www.ord_type, www.ord_state_date, www.prd_cd, www.store_cd, 'N' as online_yn
+								from order_opt_wonga www
+								where www.ord_state in (30,60,61) 
+									and www.ord_state_date >= '$f_sdate'
+									and www.ord_state_date <= '$f_edate'
+							)
+							union all
+							(
+								select www.ord_opt_no, www.goods_no, www.qty, www.wonga, www.price, www.recv_amt, www.ord_state, www.ord_kind, www.ord_type, www.ord_state_date, www.prd_cd, ooo.dlv_place_cd as store_cd, 'Y' as online_yn
+								from order_opt_wonga www
+									inner join order_opt ooo on ooo.ord_opt_no = www.ord_opt_no
+								where ooo.dlv_place_type = 'STORE' 
+									and ooo.dlv_place_cd <> ''
+									and www.ord_state in (30,60,61) 
+									and www.ord_state_date >= '$f_sdate'
+									and www.ord_state_date <= '$f_edate'
+							)
+						) ww
 							inner join order_opt oo on oo.ord_opt_no = ww.ord_opt_no
 							inner join goods g on g.goods_no = oo.goods_no
 							inner join (
 								select sss.store_cd, ssg.fee_10_info, ssg.fee_10_info_over_yn
 								from store sss
 									inner join store_grade ssg on ssg.grade_cd = sss.grade_cd
-							) ss on ss.store_cd = oo.store_cd
-						where ww.ord_state in (30,60,61) 
-							and ww.ord_state_date >= '$f_sdate'
-							and ww.ord_state_date <= '$f_edate'
-						group by oo.store_cd
+							) ss on ss.store_cd = ww.store_cd
+						group by ww.store_cd
 					) w on w.ord_store_cd = s.store_cd
-				where s.account_yn = 'Y'
+				where s.account_yn = 'Y' $where
 				order by w.sales_amt desc
 			) a
 		";
 		$result = DB::select($sql);
 
 		// 아래 작업중입니다. - 최유현
-        // /**
-        //  * 검색조건 필터링
-        //  */
-        // $where = "";
-        // if ($store_type) $where .= " and c.code_id = " . Lib::quote($store_type);
-        // if ($store_kind != "") $where .= " and s.store_kind = '". Lib::quote($store_kind) . "'";
-        // if ($store_cd != "") $where .= " and s.store_cd = '" . Lib::quote($store_cd) . "'";
-		
-        // // 행사코드별 매출구분
-        // $pr_codes = $this->_get_prcodes();
-        // $pr_codes_query = "";
-        // foreach ($pr_codes as $item) {
-        //     $key = $item->code_id;
-        //     $pr_codes_query .= "sum(if(o.pr_code = '$key', o.price * o.qty, 0)) as amt_$key,";
-        // }
 
         // /**
         //  * 특가 -> 행사, 특가(온라인) -> 균일로 우선 적용해놓았음 
@@ -184,8 +204,6 @@ class acc06Controller extends Controller
 		// 	where 1=1 $where and sg.sdate <= '$sdate' and sg.edate >= '$sdate'
         //     order by a.ord_amt desc
 		// ";
-
-        // $result = DB::select($sql);
 
         return response()->json([
             'code'	=> 200,

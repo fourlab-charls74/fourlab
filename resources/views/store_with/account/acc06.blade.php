@@ -151,42 +151,42 @@
 					// valueGetter: (params) => sumSaleFees(params),
 					headerClass: "merged-cell"
 				},
-                { headerName: "정상",
+                { headerName: "정상1",
                     children: [
                         { headerName: "수수료율", field: "fee1", type: 'percentType', width: 60 },
-                        { headerName: "수수료", field: "fee_amt_JS1", type: 'currencyMinusColorType', width: 100 },
+                        { headerName: "수수료", field: "fee_amt_JS1", type: 'currencyType', width: 100 },
                     ]
                 },
                 { headerName: "정상2",
                     children: [
                         { headerName: "수수료율", field: "fee2", type: 'percentType', width: 60 },
-                        { headerName: "수수료", field: "fee_amt_JS2", type: 'currencyMinusColorType', width: 100 },
+                        { headerName: "수수료", field: "fee_amt_JS2", type: 'currencyType', width: 100 },
                     ]
                 },
                 { headerName: "정상3",
                     children: [
                         { headerName: "수수료율", field: "fee3", type: 'percentType', width: 60 },
-                        { headerName: "수수료", field: "fee_amt_JS3", type: 'currencyMinusColorType', width: 100 },
+                        { headerName: "수수료", field: "fee_amt_JS3", type: 'currencyType', width: 100 },
                     ]
                 },
-                { headerName: "특가",
+                { headerName: "특판",
 					// 행사로 해놓았음 추후 특가 반영 필요 (미구현)
                     children: [
                         { headerName: "수수료율", field: "fee_10", type: 'percentType', width: 60 },
-                        { headerName: "수수료", field: "fee_amt_TG", type: 'currencyMinusColorType', width: 100 },
+                        { headerName: "수수료", field: "fee_amt_TG", type: 'currencyType', width: 100 },
                     ]
                 },
                 { headerName: "용품",
                     children: [
                         { headerName: "수수료율", field: "fee_11", type: 'percentType', width: 60 },
-                        { headerName: "수수료", field: "fee_amt_YP", type: 'currencyMinusColorType', width: 100 },
+                        { headerName: "수수료", field: "fee_amt_YP", type: 'currencyType', width: 100 },
                     ]
                 },
-                { headerName: "특가(온라인)",
+                { headerName: "특약(온라인)",
 					// 균일로 해놓았음 추후 특가 반영 필요 (미구현)
                     children: [
                         { headerName: "수수료율", field: "fee_12", type: 'percentType', width: 60 },
-                        { headerName: "수수료", field: "fee_amt_OL", type: 'currencyMinusColorType', width: 100 },
+                        { headerName: "수수료", field: "fee_amt_OL", type: 'currencyType', width: 100 },
                     ]
                 },
             ]
@@ -196,7 +196,7 @@
 			valueFormatter: (params) => formatNumber(params),
 			valueGetter: (params) => sumFeeExtra(params)
 		},
-        { headerName: "", field: "nvl", width: "auto" }
+        { width: "auto" }
     ];
 </script>
 <script type="text/javascript" charset="utf-8">
