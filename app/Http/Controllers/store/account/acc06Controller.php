@@ -13,25 +13,13 @@ use Carbon\Carbon;
 class acc06Controller extends Controller
 {
     public function index(Request $request) {
-        // $sdate = Carbon::now()->startOfMonth()->format("Y-m-d"); // 이번 달 기준
-        // $edate = Carbon::now()->format("Y-m-d"); // 현재
-        $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 저번 달 기준 - 테스트용
-
-        $store_types = SLib::getStoreTypes();
-
-        $sql = "select 
-            code_id, code_val 
-            from `code` 
-            where code_kind_cd = 'pr_code'
-            order by code_seq asc
-        ";
-        $pr_codes = DB::select($sql);
+        $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 저번 달 기준
 
         $values = [
             'sdate'         => $sdate,
-            'store_types'	=> $store_types,
+            'store_types'	=> SLib::getStoreTypes(),
             'store_kinds'	=> SLib::getCodes("STORE_KIND"),
-            'pr_codes'      => $pr_codes
+            'pr_codes'      => $this->_get_prcodes()
         ];
 
         return view( Config::get('shop.store.view') . '/account/acc06', $values );
@@ -47,89 +35,179 @@ class acc06Controller extends Controller
         $store_type = $request->input('store_type', "");
         $store_kind = $request->input('store_kind', "");
         $store_cd = $request->input('store_cd', "");
+		
+		$pr_codes = $this->_get_prcodes();
+		$pr_codes = array_map(function($c) { return $c->code_id; }, $pr_codes);
 
-        /**
-         * 검색조건 필터링
-         */
-        $where = "";
-        if ($store_type) $where .= " and c.code_id = " . Lib::quote($store_type);
-        if ($store_kind != "") $where .= " and s.store_kind = '". Lib::quote($store_kind) . "'";
-        if ($store_cd != "") $where .= " and s.store_cd = '" . Lib::quote($store_cd) . "'";
-
-        $sql = "select 
-            code_id, code_val 
-            from `code` 
-            where code_kind_cd = 'pr_code'
-            order by code_seq asc
-        ";
-        $pr_codes = DB::select($sql);
-
-        // 행사코드별 매출구분
-        $pr_codes_query = "";
-        foreach ($pr_codes as $item) {
-            $key = $item->code_id;
-            $pr_codes_query .= "sum(if(o.pr_code = '$key', o.price * o.qty, 0)) as amt_$key,";
-        }
-
-        /**
-         * 특가 -> 행사, 특가(온라인) -> 균일로 우선 적용해놓았음 
-         * 미구현된 두 항목은 추후 반영이 필요함
-         */
-        $sql = /** @lang text */
-            "
-			select 
-                s.store_nm, c.code_val as store_type_nm, 
-                round(if(amt_js > sg.amt1, sg.amt1 * fee1/100, amt_js * fee1/100 )) as fee_amt_js1,
-                round(if(amt_js > sg.amt1 and amt_js > sg.amt2, (sg.amt2 - sg.amt1) * fee2/100, 0)) as fee_amt_js2,
-                round(if(amt_js > sg.amt1 and amt_js > sg.amt2 and amt_js > sg.amt3, (amt_js - sg.amt2) * fee3/100, 0)) as fee_amt_js3,
-                round(amt_gl * sg.fee_10/100) as fee_amt_gl,
-                round(amt_j1 * sg.fee_10/100) as fee_amt_j1,
-                round(amt_j2 * sg.fee_11/100) as fee_amt_j2,
-                sg.*, a.*, b.extra_total
-			from store s 
-                left outer join (
-                    select
-                        m.store_cd,count(*) as cnt,
-                        $pr_codes_query
-                        sum(o.price*o.qty) as ord_amt
-                    from order_mst m
-                        inner join order_opt o on m.ord_no = o.ord_no
-                        inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
-                        inner join goods g on o.goods_no = g.goods_no
-                        left outer join store s on m.store_cd = s.store_cd
-                        left outer join brand b on g.brand = b.brand
-                        left outer join `code` c on c.code_kind_cd = 'g_goods_stat' and g.sale_stat_cl = c.code_id
-                        left outer join `code` c2 on c2.code_kind_cd = 'g_goods_type' and g.goods_type = c2.code_id
-                    where w.ord_state_date >= '$f_sdate' and w.ord_state_date <= '$f_edate'
-                        and m.store_cd <> ''
-                    group by m.store_cd
-			    ) as a on s.store_cd = a.store_cd
-				left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = s.store_type
-                left outer join store_grade sg on sg.grade_cd = s.grade_cd
-                left outer join (
-                    select 
-                        e.store_cd as scd,
-                        sum(e.extra_amt) as extra_total
-                    from store_account_extra as e
-                        left outer join `code` c3 on c3.code_kind_cd = 'g_acc_extra_type' and c3.code_id = e.type
-                    where ymonth = date_format('$sdate', '%Y%m')
-                    group by e.store_cd
-                ) b on s.store_cd = b.scd
-			where 1=1 $where and sg.sdate <= '$sdate' and sg.edate >= '$sdate'
-            order by a.ord_amt desc
+		$sql = "
+			select a.*
+				, (a.fee_amt_JS1 + a.fee_amt_JS2 + a.fee_amt_JS3 + a.fee_amt_TG + a.fee_amt_YP + a.fee_amt_OL) as fee_amt
+			from (
+				select w.*, sg.*
+					, s.store_cd, s.store_nm, s.manager_nm
+					, s.store_type, st.code_val as store_type_nm
+					, round(
+						if(w.ord_JS_amt > sg.amt1
+							, sg.amt1 * (sg.fee1 / 100)
+							, w.ord_JS_amt * (sg.fee1 / 100)
+						)
+					) as fee_amt_JS1
+					, round(
+						if(w.ord_JS_amt > sg.amt2
+							, (sg.amt2 - sg.amt1) * (sg.fee2 / 100)
+							, if(w.ord_JS_amt > sg.amt1
+								, (w.ord_JS_amt - sg.amt1) * (sg.fee2 / 100)
+								, 0
+							)
+						)
+					) as fee_amt_JS2
+					, round(
+						if(w.ord_JS_amt > sg.amt2
+							, (w.ord_JS_amt - sg.amt2) * (sg.fee3 / 100)
+							, 0
+						)
+					) as fee_amt_JS3
+					, round(w.ord_TG_amt * (sg.fee_10 / 100)) as fee_amt_TG
+					, round(w.ord_YP_amt * (sg.fee_11 / 100)) as fee_amt_YP
+					, 0 as fee_amt_OL -- 온라인 작업중
+				from store s
+					inner join code st on st.code_kind_cd = 'STORE_TYPE' and st.code_id = s.store_type
+					inner join (
+						select grade_cd, name as grade_nm, fee1, amt1, fee2, amt2, fee3, fee_10, fee_11, fee_12, fee_10_info, fee_10_info_over_yn
+						from store_grade
+						where concat(sdate, '-01 00:00:00') <= date_format(now(), '%Y-%m-%d 00:00:00') 
+							and concat(edate, '-31 23:59:59') >= date_format(now(), '%Y-%m-%d 00:00:00') 
+					) sg on sg.grade_cd = s.grade_cd
+					left outer join (
+						select oo.store_cd as ord_store_cd
+							, sum(ww.qty) as sale_qty
+							, sum(ww.qty * ww.wonga) as wonga_amt
+							, sum(ww.recv_amt) as sales_amt
+							, sum(if(oo.pr_code = 'JS', ww.recv_amt, 0)) as sales_JS_amt
+							, sum(if(oo.pr_code = 'GL', ww.recv_amt, 0)) as sales_GL_amt
+							, sum(if(oo.pr_code = 'J1', ww.recv_amt, 0)) as sales_J1_amt
+							, sum(if(oo.pr_code = 'J2', ww.recv_amt, 0)) as sales_J2_amt
+							, sum(if(
+								g.brand not in (select code_id from code where code_kind_cd = 'YP_BRAND') 
+									and if(ss.fee_10_info_over_yn = 'Y', ((1 - (oo.price / g.goods_sh)) * 100) <= ss.fee_10_info, ((1 - (oo.price / g.goods_sh)) * 100) < ss.fee_10_info)
+								, ww.recv_amt
+								, 0
+							)) as ord_JS_amt -- 정상
+							, sum(if(
+								g.brand not in (select code_id from code where code_kind_cd = 'YP_BRAND') 
+									and if(ss.fee_10_info_over_yn = 'Y', ((1 - (oo.price / g.goods_sh)) * 100) > ss.fee_10_info, ((1 - (oo.price / g.goods_sh)) * 100) >= ss.fee_10_info)
+								, ww.recv_amt
+								, 0
+							)) as ord_TG_amt -- 특가
+							, sum(if(g.brand in (select code_id from code where code_kind_cd = 'YP_BRAND'), ww.recv_amt, 0)) as ord_YP_amt -- 용품
+							, sum(0) as ord_OL_amt -- 온라인
+						from order_opt_wonga ww
+							inner join order_opt oo on oo.ord_opt_no = ww.ord_opt_no
+							inner join goods g on g.goods_no = oo.goods_no
+							inner join (
+								select sss.store_cd, ssg.fee_10_info, ssg.fee_10_info_over_yn
+								from store sss
+									inner join store_grade ssg on ssg.grade_cd = sss.grade_cd
+							) ss on ss.store_cd = oo.store_cd
+						where ww.ord_state in (30,60,61) 
+							and ww.ord_state_date >= '$f_sdate'
+							and ww.ord_state_date <= '$f_edate'
+						group by oo.store_cd
+					) w on w.ord_store_cd = s.store_cd
+				where s.account_yn = 'Y'
+				order by w.sales_amt desc
+			) a
 		";
+		$result = DB::select($sql);
 
-        $result = DB::select($sql);
+		// 아래 작업중입니다. - 최유현
+        // /**
+        //  * 검색조건 필터링
+        //  */
+        // $where = "";
+        // if ($store_type) $where .= " and c.code_id = " . Lib::quote($store_type);
+        // if ($store_kind != "") $where .= " and s.store_kind = '". Lib::quote($store_kind) . "'";
+        // if ($store_cd != "") $where .= " and s.store_cd = '" . Lib::quote($store_cd) . "'";
+		
+        // // 행사코드별 매출구분
+        // $pr_codes = $this->_get_prcodes();
+        // $pr_codes_query = "";
+        // foreach ($pr_codes as $item) {
+        //     $key = $item->code_id;
+        //     $pr_codes_query .= "sum(if(o.pr_code = '$key', o.price * o.qty, 0)) as amt_$key,";
+        // }
+
+        // /**
+        //  * 특가 -> 행사, 특가(온라인) -> 균일로 우선 적용해놓았음 
+        //  * 미구현된 두 항목은 추후 반영이 필요함
+        //  */
+        // $sql = /** @lang text */
+        //     "
+		// 	select 
+        //         s.store_nm, c.code_val as store_type_nm, 
+        //         round(if(amt_js > sg.amt1, sg.amt1 * fee1/100, amt_js * fee1/100 )) as fee_amt_js1,
+        //         round(if(amt_js > sg.amt1 and amt_js > sg.amt2, (sg.amt2 - sg.amt1) * fee2/100, 0)) as fee_amt_js2,
+        //         round(if(amt_js > sg.amt1 and amt_js > sg.amt2 and amt_js > sg.amt3, (amt_js - sg.amt2) * fee3/100, 0)) as fee_amt_js3,
+        //         round(amt_gl * sg.fee_10/100) as fee_amt_gl,
+        //         round(amt_j1 * sg.fee_10/100) as fee_amt_j1,
+        //         round(amt_j2 * sg.fee_11/100) as fee_amt_j2,
+        //         sg.*, a.*, b.extra_total
+		// 	from store s 
+        //         left outer join (
+        //             select
+        //                 m.store_cd,count(*) as cnt,
+        //                 $pr_codes_query
+        //                 sum(o.price*o.qty) as ord_amt
+        //             from order_mst m
+        //                 inner join order_opt o on m.ord_no = o.ord_no
+        //                 inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
+        //                 inner join goods g on o.goods_no = g.goods_no
+        //                 left outer join store s on m.store_cd = s.store_cd
+        //                 left outer join brand b on g.brand = b.brand
+        //                 left outer join `code` c on c.code_kind_cd = 'g_goods_stat' and g.sale_stat_cl = c.code_id
+        //                 left outer join `code` c2 on c2.code_kind_cd = 'g_goods_type' and g.goods_type = c2.code_id
+        //             where w.ord_state_date >= '$f_sdate' and w.ord_state_date <= '$f_edate'
+        //                 and m.store_cd <> ''
+        //             group by m.store_cd
+		// 	    ) as a on s.store_cd = a.store_cd
+		// 		left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = s.store_type
+        //         left outer join store_grade sg on sg.grade_cd = s.grade_cd
+        //         left outer join (
+        //             select 
+        //                 e.store_cd as scd,
+        //                 sum(e.extra_amt) as extra_total
+        //             from store_account_extra as e
+        //                 left outer join `code` c3 on c3.code_kind_cd = 'g_acc_extra_type' and c3.code_id = e.type
+        //             where ymonth = date_format('$sdate', '%Y%m')
+        //             group by e.store_cd
+        //         ) b on s.store_cd = b.scd
+		// 	where 1=1 $where and sg.sdate <= '$sdate' and sg.edate >= '$sdate'
+        //     order by a.ord_amt desc
+		// ";
+
+        // $result = DB::select($sql);
 
         return response()->json([
             'code'	=> 200,
             'head'	=> array(
-                'total'	=> count($result)
+                'total'	=> count($result),
+				'date' => Carbon::parse($sdate)->format("Y년 m월"),
             ),
             'body' => $result
         ]);
 
     }
+
+	private function _get_prcodes()
+	{
+		$sql = "
+			select code_id, code_val 
+            from `code` 
+            where code_kind_cd = 'PR_CODE'
+            order by code_seq asc
+        ";
+        return DB::select($sql);
+	}
 
     public function show($store_cd, $sdate)
 	{

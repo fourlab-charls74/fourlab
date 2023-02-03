@@ -109,8 +109,9 @@
 	<div class="card-body">
 		<div class="card-title">
 			<div class="filter_wrap">
-				<div class="fl_box">
+				<div class="fl_box flex_box">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
+					<p id="current_date" class="ml-2 text-danger fs-16"></p>
 				</div>
 			</div>
 		</div>
@@ -120,86 +121,72 @@
 	</div>
 </div>
 <script language="javascript">
-    var columns = [
-        { headerName: "#", field: "num", type:'NumType', pinned:'left', cellStyle: { 'text-align': "center" },
-            cellRenderer: function (params) {
-                if (params.node.rowPinned === 'top') {
-                    return "합계";
-                } else {
-                    return parseInt(params.value) + 1;
-                }
-            }
+	const CENTER = { 'text-align': 'center' };
+    let columns = [
+        { headerName: "#", field: "num", type: 'NumType', pinned: 'left', width: 40, cellStyle: CENTER,
+			cellRenderer: (params) => params.node.rowPinned === 'top' ? '합계' : parseInt(params.value) + 1,
         },
-        { field: "store_type_nm", headerName: "매장구분", pinned:'left', width:90, cellStyle: { 'text-align': "center" } },
-        { field: "store_cd", headerName: "매장코드", pinned:'left', hide: true },
-        { field: "store_nm", headerName: "매장명", pinned:'left', type: 'StoreNameType', width: 250 },
-        { field: "", headerName: "매니저", pinned:'left',width: 70 },
-        { field: "name", headerName: "등급", pinned:'left', width: 100},
-        { field: "sale_status", headerName: "매출",
+        { field: "store_type_nm", headerName: "매장구분", pinned: 'left', width: 80, cellStyle: CENTER },
+        { field: "store_cd", headerName: "매장코드", pinned: 'left', width: 60, cellStyle: CENTER },
+        { field: "store_nm", headerName: "매장명", pinned: 'left', type: 'StoreNameType', width: 150 },
+        { field: "manager_nm", headerName: "매니저", pinned: 'left', width: 60, cellStyle: CENTER },
+        { field: "grade_nm", headerName: "등급", pinned: 'left', width: 60, cellStyle: CENTER },
+        { headerName: "매출",
 			children: [
-				{ headerName: "소계", field: "ord_amt", type: 'currencyMinusColorType', width: 100,
-					headerClass: "merged-cell",
+				{ field: "sales_amt", headerName: "소계", width: 100, headerClass: "merged-cell", type: 'currencyMinusColorType',
 					cellRenderer: (params) => {
-						if ( params.value != undefined ) {
-							return '<a href="#" onClick="popDetail(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>';
-						} else {
-							return 0;
-						}
+						if (params.value == undefined) return 0;
+						return '<a href="#" onClick="popDetail(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>';
 					}
 				},
 				@foreach (@$pr_codes as $pr_code)
-				{ 
-					headerName: "{{ $pr_code->code_val }}", field: "amt_{{ $pr_code->code_id }}", 
-					type: 'currencyMinusColorType', width: 100,
-					headerClass: "merged-cell",
-				 },
+				{ field: "sales_{{ $pr_code->code_id }}_amt", headerName: "{{ $pr_code->code_val }}", type: 'currencyMinusColorType', width: 100, headerClass: "merged-cell" },
 				@endforeach
 			]
         },
-        { field: "sale_fee", headerName: "수수료",
+        { headerName: "수수료",
             children: [
-                { headerName: "소계", field: "s1", width:100,
-					type: 'currencyMinusColorType', 
-					valueFormatter: (params) => formatNumber(params),
-					valueGetter: (params) => sumSaleFees(params),
+                { headerName: "소계", field: "fee_amt", type: 'currencyMinusColorType', width: 100,
+					// valueFormatter: (params) => formatNumber(params),
+					// valueGetter: (params) => sumSaleFees(params),
 					headerClass: "merged-cell"
 				},
-                { headerName: "정상", field: "s2", type: 'numberType', width:100,
+                { headerName: "정상",
                     children: [
-                        { headerName: "수수료율", field: "fee1", type: 'percentType', width:100 },
-                        { headerName: "수수료", field: "fee_amt_js1", type: 'currencyMinusColorType', width:100 },
+                        { headerName: "수수료율", field: "fee1", type: 'percentType', width: 60 },
+                        { headerName: "수수료", field: "fee_amt_JS1", type: 'currencyMinusColorType', width: 100 },
                     ]
                 },
-                { headerName: "정상2", field: "s3", type: 'numberType', width:100,
+                { headerName: "정상2",
                     children: [
-                        { headerName: "수수료율", field: "fee2", type: 'percentType', width:100 },
-                        { headerName: "수수료", field: "fee_amt_js2", type: 'currencyMinusColorType', width:100 },
+                        { headerName: "수수료율", field: "fee2", type: 'percentType', width: 60 },
+                        { headerName: "수수료", field: "fee_amt_JS2", type: 'currencyMinusColorType', width: 100 },
                     ]
                 },
-                { headerName: "정상3", field: "s4", type: 'numberType', width:100,
+                { headerName: "정상3",
                     children: [
-                        { headerName: "수수료율", field: "fee3", type: 'percentType', width:100 },
-                        { headerName: "수수료", field: "fee_amt_js3", type: 'currencyMinusColorType', width:100 },
+                        { headerName: "수수료율", field: "fee3", type: 'percentType', width: 60 },
+                        { headerName: "수수료", field: "fee_amt_JS3", type: 'currencyMinusColorType', width: 100 },
                     ]
                 },
-                { headerName: "특가", field: "s5", type: 'numberType', width:100,
+                { headerName: "특가",
 					// 행사로 해놓았음 추후 특가 반영 필요 (미구현)
                     children: [
-                        { headerName: "수수료율", field: "fee_10", type: 'percentType', width:100 },
-                        { headerName: "수수료", field: "fee_amt_gl", type: 'currencyMinusColorType', width:100 },
+                        { headerName: "수수료율", field: "fee_10", type: 'percentType', width: 60 },
+                        { headerName: "수수료", field: "fee_amt_TG", type: 'currencyMinusColorType', width: 100 },
                     ]
                 },
-                { headerName: "용품", field: "s6", type: 'numberType', width:100,
+                { headerName: "용품",
                     children: [
-                        { headerName: "수수료율", field: "fee_11", type: 'percentType', width:100 },
-                        { headerName: "수수료", field: "fee_amt_j2", type: 'currencyMinusColorType', width:100 },
+                        { headerName: "수수료율", field: "fee_11", type: 'percentType', width: 60 },
+                        { headerName: "수수료", field: "fee_amt_YP", type: 'currencyMinusColorType', width: 100 },
                     ]
                 },
-                { headerName: "특가(온라인)", field: "s7", type: 'numberType', width:100,
+                { headerName: "특가(온라인)",
 					// 균일로 해놓았음 추후 특가 반영 필요 (미구현)
                     children: [
-                        { headerName: "수수료율", field: "fee_12", type: 'percentType', width:100 },
-                        { headerName: "수수료", field: "fee_amt_j1", type: 'currencyMinusColorType', width:100 },
+                        { headerName: "수수료율", field: "fee_12", type: 'percentType', width: 60 },
+                        { headerName: "수수료", field: "fee_amt_OL", type: 'currencyMinusColorType', width: 100 },
                     ]
                 },
             ]
@@ -215,6 +202,7 @@
 <script type="text/javascript" charset="utf-8">
 	const pApp = new App('',{
 		gridId:"#div-gd",
+		height: 265
 	});
 	let gx;
 	$(document).ready(function() {
@@ -227,7 +215,9 @@
 
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/store/account/acc06/search', data, -1);
+		gx.Request('/store/account/acc06/search', data, -1, function(d) {
+			$("#current_date").text("( " + d.head.date + " )");
+		});
 	}
 
 	const sumSaleFees = (params) => {

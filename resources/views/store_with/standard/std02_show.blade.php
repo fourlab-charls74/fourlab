@@ -893,29 +893,30 @@
     }
 
 	// 주소로 위도/경도 조회
-	const getMapCode = () => {
-			var geocoder = new kakao.maps.services.Geocoder();
-			let address = document.getElementById('addr1').value;
-			let store_kind = $('select[name=store_kind] option:selected').val();
-			let store_type = $('select[name=store_type] option:selected').val();
+	// const getMapCode = () => {
+	// 		var geocoder = new kakao.maps.services.Geocoder();
+	// 		let address = document.getElementById('addr1').value;
 
-			// if (!address) return;
-			if (store_kind != 02 || store_type != 11) {
-				return new Promise((resolve, reject) => {
-					geocoder.addressSearch(address, async function(result, status) {
-						if (status === await kakao.maps.services.Status.OK) {
-							resolve({y: result[0].y, x: result[0].x});
-						} else {
-							reject(result);
-						}
-					});
-				});
-			}
-		}
+	// 		let store_kind = $('select[name=store_kind] option:selected').val();
+	// 		let store_type = $('select[name=store_type] option:selected').val();
+
+	// 		if (!address) return;
+	// 		if (store_kind !== 02 || store_type !== 11) {
+	// 			return new Promise((resolve, reject) => {
+	// 				geocoder.addressSearch(address, async function(result, status) {
+	// 					if (status === await kakao.maps.services.Status.OK) {
+	// 						resolve({y: result[0].y, x: result[0].x});
+	// 					} else {
+	// 						reject(result);
+	// 					}
+	// 				});
+	// 			});
+	// 		}
+	// 	}
 		
     // 매장정보 등록
     async function addStore() {
-		let res = await getMapCode();
+		// let res = await getMapCode();
 		let form = new FormData(document.querySelector("#f1"));
 		
 		for(let i = 0; i< $("#btnAdd")[0].files.length; i++) {
@@ -928,6 +929,8 @@
 		for(let form_data of form.entries()) {
 			form_data[0], form_data[1];
 		}
+
+		
 	
         if( !validation('add') )	return;
         if( !window.confirm("매장정보를 등록하시겠습니까?") )	return;
@@ -955,15 +958,17 @@
 
     // 매장정보 수정
     async function updateStore() {
-		let res = await getMapCode();
+		let map_code = $('#map_code').val();
+
+		// if (map_code != '') {
+		// 	const map = await getMapCode();
+		// }
+
 		let form = new FormData(document.querySelector("#f1"));
 
 		for (let i = 0; i< $("#btnAdd")[0].files.length; i++) {
 			form.append("file[]", $("#btnAdd")[0].files[i] || '');
 		}
-
-		// form.append("y", res.y || '');
-		// form.append("x", res.x || '');
 
 		if(!validation('update')) return;
         if(!window.confirm("매장정보를 수정하시겠습니까?")) return;

@@ -580,7 +580,7 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         Route::delete('acc03/show_delete', 'acc03Controller@show_delete');
         Route::post('acc03/show_close', 'acc03Controller@show_close');
 
-        // 매장판매수수료
+        // 매장별매출현황
         Route::get('acc04', 'acc04Controller@index');
 
         // 기타재반자료
