@@ -155,8 +155,7 @@
 </form>
 <script>
 function Save(){
-
-	ff	= document.info;
+	const ff = document.info;
 
 	if( ff.passwd.value == "" ){
 		alert("비밀번호는 반드시 입력해야 합니다.");
@@ -200,7 +199,7 @@ function Save(){
 		return false;
 	}
 
-	var exptext	= /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/;
+	const exptext = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/;
 	if( exptext.test(ff.email.value) != true ){
 		alert("이메일 형식이 올바르지 않습니다.");
 		ff.email.focus();
@@ -236,10 +235,8 @@ function Save(){
 		return false;
 	}
 
-	ret = confirm("예약정보를 수정 하시겠습니까?");
-
-	if( ret ){
-        var frm = $('form[name="info"]');
+	if( confirm("예약정보를 수정 하시겠습니까?") ){
+        let frm = $('form[name="info"]');
 
         let e_dm_type = $("select[name=e_dm_type] option:selected").val();
         let s_dm_type = $("select[name=s_dm_type] option:selected").val();

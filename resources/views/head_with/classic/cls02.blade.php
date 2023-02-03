@@ -71,11 +71,9 @@
                             <div class="flax_box">
                                 <select name="state" class="form-control form-control-sm">
                                     <option value="">전체</option>
-                                    <option value="10">접수대기</option>
-                                    <option value="20">접수중</option>
-                                    <option value="30">접수완료</option>
-                                    <option value="40">확정완료</option>
-                                    <option value="41">현장결제</option>
+                                    @foreach($states as $state)
+                                    <option value="{{ $state->code }}">{{ $state->value1 }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -86,15 +84,19 @@
                             <div class="flax_box">
                                 <select name="s_dm_date" class="form-control form-control-sm" style="width:49%;">
                                     <option value="">전체</option>
-                                    <option value="1017">10월 17일(10월 18일 출발그룹)</option>
-                                    <option value="1018">10월 18일(10월 19일 출발그룹)</option>
-                                    <option value="1019">10월 19일(10월 20일 출발그룹)</option>
+                                    @foreach($dates as $date)
+                                        @if($date->code < 1020)
+                                        <option value="{{ $date->code }}">{{ $date->value1 }}</option>
+                                        @endif
+                                    @endforeach
                                 </select>
                                 <select name="e_dm_date" class="form-control form-control-sm" style="margin-left:2%;width:49%;">
                                     <option value="">전체</option>
-                                    <option value="1020">10월 20일(10월 18일 출발그룹)</option>
-                                    <option value="1021">10월 21일(10월 19일 출발그룹)</option>
-                                    <option value="1022">10월 22일(10월 20일 출발그룹)</option>
+                                    @foreach($dates as $date)
+                                        @if($date->code >= 1020)
+                                        <option value="{{ $date->code }}">{{ $date->value1 }}</option>
+                                        @endif
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -123,17 +125,15 @@
 		<div class="card-title">
 			<div class="filter_wrap">
 				<div class="fl_box">
-					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">134</span>건</h6>
+					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
 				</div>
                 <div class="fr_box flax_box" style="color:#FF0000;font-weight:bold;">
 					<div class="mr-1">
-						<select id="s_state" name="s_state" class="form-control form-control-sm">
+						<select id="s_state" name="s_state" class="form-control form-control-sm" style="width: 100px;">
 							<option value="">전체</option>
-                            <option value="10">접수대기</option>
-                            <option value="20">접수중</option>
-                            <option value="30">접수완료</option>
-                            <option value="40">확정완료</option>
-                            <option value="41">현장결제</option>
+                            @foreach($states as $state)
+                            <option value="{{ $state->code }}">{{ $state->value1 }}</option>
+                            @endforeach
                         </select>
 					</div>
 					<a href="#" onclick="ChangeData()" class="btn-sm btn btn-primary">선택 상태 변경</a>
@@ -167,7 +167,7 @@
 		}
 	}
 
-    var columns = [
+    let columns = [
 		{headerName: '', headerCheckboxSelection: true, checkboxSelection: true, width:28, pinned:'left',
 			cellStyle: {
                 "background":"#F5F7F7"
@@ -201,23 +201,23 @@
 	function ChangeData() {
 		var checkRows = gx.gridOptions.api.getSelectedRows();
 
-		if (checkRows.length === 0) {
+		if( checkRows.length === 0 ){
             alert("수정하실 데이터를 선택해주세요.");
             return;
 		}
 
-		if ($("#s_state").val() == "") {
+		if( $("#s_state").val() == "" ){
             alert("변경하실 상태를 선택해주세요.");
             return;
 		}
 
-		if ($("#s_state").val() == "40" || $("#s_state").val() == "41") {
+		if( $("#s_state").val() == "40" || $("#s_state").val() == "41" ) {
 			if(!confirm("확정완료/현장결제 상태로 변경하면 고객의 예약이 확정됩니다.")){
 				return;
 			}
 		}
 
-		if (confirm("선택하신 데이터의 상태를 변경하시겠습니까?")) {
+		if( confirm("선택하신 데이터의 상태를 변경하시겠습니까?") ) {
 			$.ajax({
 				async: true,
 				type: 'put',
