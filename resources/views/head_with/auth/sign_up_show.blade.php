@@ -217,7 +217,7 @@
             </div>
             <div class="table-responsive">
                 @if($code == '')
-                    <p>* 그룹정보는 사용자를 등록한 후, 상세페이지에서 설정할 수 있습니다.</p>
+                    <p>* 그룹정보는 관리자 승인 후, 상세페이지에서 설정할 수 있습니다.</p>
                 @endif
             </div>
         </div>
@@ -264,7 +264,7 @@
             return false;
         }
 
-        if (!confirm('저장하시겠습니까?')) {
+        if (!confirm('가입하시겠습니까?')) {
             return false;
         }
 
@@ -303,14 +303,13 @@
             return false;
         }
         
-        let Id = $("[name=id]").val();
+        const Id = $("[name=id]").val();
 
 		$.ajax({
             async: true,
             type: 'put',
             url: '/head/signUp/checkid/' + Id,
             success: function(data) {
-                //console.log(data);
                 cbcheckdup(data);
             },
             complete: function() {

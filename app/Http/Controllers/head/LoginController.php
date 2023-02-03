@@ -29,11 +29,9 @@ class LoginController extends Controller
         ]);
 
         $user = Head::where('id','=',$request->email)
-            ->where('use_yn','=','Y')
             ->first();
-
-        if($user){
-
+    
+        if($user->use_yn == 'Y'){
             $password =  $request->password;
             $user = Head::where('id','=',$request->email)
                 ->where('use_yn','=','Y')
@@ -54,7 +52,7 @@ class LoginController extends Controller
 
                 return redirect('/head/order/ord01');
             } else {
-                return $this->sendFailedLoginResponse($request);
+                return $this->sendFailedLoginResponse($request, 1);
                 //return redirect('/head/login');
             }
 
@@ -66,14 +64,31 @@ class LoginController extends Controller
 //                return redirect('/head/login');
 //            }
         } else {
+            //관리자 승인 안된 ID일 경우    
+            if($user->confirm_yn == 'N'){
+                $password =  $request->password;
+                $user = Head::where('id','=',$request->email)
+                        ->where('confirm_yn','=','N')
+                        ->where('passwd','=',DB::raw("CONCAT('*', UPPER(SHA1(UNHEX(SHA1('$password')))))"))
+                        ->first();
+                if($user){
+                    return $this->sendFailedLoginResponse($request, 2);
+                } 
+            }
         }
-        return $this->sendFailedLoginResponse($request);
+        return $this->sendFailedLoginResponse($request, 1);
     }
-
-    protected function sendFailedLoginResponse(Request $request)
+ 
+    protected function sendFailedLoginResponse(Request $request, $code)
     {
+        if($code == 1) { 
+            $msg = '회원정보를 정확하게 입력해 주세요.';
+        } else if($code == 2){
+            $msg = '관리자 승인 후 로그인 할 수 있습니다.';
+        }
+
         throw ValidationException::withMessages([
-            'email' => ['회원정보를 정확하게 입력해 주세요.'],
+            'email' => [$msg],
         ]);
     }
 

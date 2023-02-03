@@ -31,7 +31,6 @@ class SignUpController extends Controller
         return view( Config::get('shop.head.view') . '/auth/sign_up_show', $values);
     }
 
-	//회원가입
     public function store(Request $request)
 	{
 		$grade			= $request->input('grade');
@@ -61,21 +60,22 @@ class SignUpController extends Controller
 				'grade' => $grade,
 				'id' => $id,
 				'passwd' => DB::raw("CONCAT('*', UPPER(SHA1(UNHEX(SHA1('$passwd')))))"),
-				'pwchgperiod' => $pwchgperiod,
 				'name' => $name,
 				'ipfrom' => $ipfrom,
 				'ipto' => $ipto,
 				'md_yn' => $md_yn,
 				'use_yn' => $use_yn,
 				'confirm_yn' => $confirm_yn,
-				'store_wonga_yn' => $store_wonga_yn,
 				'part' => $part,
 				'posi' => $posi,
 				'tel' => $tel,
 				'exttel' => $exttel,
 				'messenger' => $messenger,
 				'email' => $email,
-				'pwchgdate' => now(),
+				'regi_date' => now(),
+				// 'store_wonga_yn' => $store_wonga_yn,
+				// 'pwchgperiod' => $pwchgperiod,
+				// 'pwchgdate' => now(),
 			];
 
 			try {
@@ -96,7 +96,6 @@ class SignUpController extends Controller
 		return response()->json(['code' => $code, 'msg' => $msg]);
 	}
 
-	//아이디 중복 확인
 	public function checkid($id = '')
 	{
 		$code = 0;
