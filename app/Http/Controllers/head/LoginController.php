@@ -83,13 +83,20 @@ class LoginController extends Controller
     {
         if($code == 1) { 
             $msg = '회원정보를 정확하게 입력해 주세요.';
+
+            throw ValidationException::withMessages([
+                'email' => [$msg],
+            ]);
+            
         } else if($code == 2){
             $msg = '관리자 승인 후 로그인 할 수 있습니다.';
-        }
+            $code = $code;
 
-        throw ValidationException::withMessages([
-            'email' => [$msg],
-        ]);
+            throw ValidationException::withMessages([
+                'email' => [$msg],
+                'code' => [$code],
+            ]);
+        }
     }
 
     public function logout(Request $request){

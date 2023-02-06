@@ -38,12 +38,18 @@ Login
                         </li>
                     </ul>
                     @if( $errors->has('email') )
-                        <div class="btn_wra text-warning pt-4">
-                            @foreach( $errors->get('email') as $err )
-                                {{ $err  }}
+                        <div class="btn_wra pt-4
+                            @if( $errors->has('code') )
+                                text-danger font-weight-bold">
+                            @else
+                                text-warning">
+                            @endif
+                            @foreach( $errors->get('email') as $err)
+                                {{ $err }}
                             @endforeach
-                    </div>
+                        </div>
                     @endif
+
                     <div class="btn_wrap">
                         <button type="submit" class="btn btn-primary d-block wd100 font-weight-bold brnone">
                             {{ __('LOGIN') }}
@@ -55,10 +61,10 @@ Login
                             <a href="#" onClick="openPopup();">회원가입</a>
                         </li>
                         <li>
-                            <a href="">아이디찾기</a>
+                            <a href="#" onClick="openMessage();">아이디찾기</a>
                         </li>
                         <li>
-                            <a href="">비밀번호찾기</a>
+                            <a href="#" onClick="openMessage();">비밀번호찾기</a>
                         </li>
                     </ul>
 
@@ -83,7 +89,11 @@ Login
     <script type="text/javascript" charset="utf-8">
     function openPopup() {
         let url = '/head/signUp';
-        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1024,height=900");
+    }
+
+    function openMessage() {
+        alert('시스템 관리자에게 문의하시길 바랍니다.');
     }
     </script>
     @endsection
