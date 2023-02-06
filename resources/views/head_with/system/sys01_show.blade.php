@@ -131,6 +131,21 @@
                                                     </div>
                                                 </td>
                                             </tr>
+                                            <tr>
+                                                <th>승인여부</th>
+                                                <td>
+                                                    <div class="form-inline form-radio-box">
+                                                        <div class="custom-control custom-radio">
+                                                            <input type="radio" name="confirm_yn" id="confirm_y" class="custom-control-input" value="Y" @if(@$user->confirm_yn != 'N') checked @endif/>
+                                                            <label class="custom-control-label" for="confirm_y">승인</label>
+                                                        </div>
+                                                        <div class="custom-control custom-radio">
+                                                            <input type="radio" name="confirm_yn" id="confirm_n" class="custom-control-input" value="N" @if(@$user->confirm_yn == 'N') checked @endif />
+                                                            <label class="custom-control-label" for="confirm_n">미승인</label>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>

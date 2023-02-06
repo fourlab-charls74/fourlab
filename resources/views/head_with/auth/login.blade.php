@@ -38,12 +38,12 @@ Login
                         </li>
                     </ul>
                     @if( $errors->has('email') )
-                        <div class="btn_wra pt-4
-                            @if( $errors->has('code') )
-                                text-danger font-weight-bold">
-                            @else
-                                text-warning">
-                            @endif
+                    <div class="btn_wra pt-4
+                        @if( $errors->has('code') && in_array(@$errors->first('code'), [2]) )
+                        text-danger font-weight-bold">
+                        @else
+                        text-warning">
+                        @endif
                             @foreach( $errors->get('email') as $err)
                                 {{ $err }}
                             @endforeach
@@ -88,8 +88,8 @@ Login
     </div>
     <script type="text/javascript" charset="utf-8">
     function openPopup() {
-        let url = '/head/signUp';
-        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1024,height=900");
+        let url = '/head/sign_up';
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=840,height=660");
     }
 
     function openMessage() {

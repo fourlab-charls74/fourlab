@@ -132,6 +132,12 @@
             cellClass: 'hd-grid-code'
         },
         {
+            field: "regi_date",
+            headerName: "가입일",
+            width: 150,
+            cellClass: 'hd-grid-code'
+        },
+        {
             width: 'auto'
         }
     ];

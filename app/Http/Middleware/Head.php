@@ -38,11 +38,11 @@ class Head
 
 
         $path = $request->getPathInfo();
-        if($is_loin === false && ($path != "/head/login" && strpos($path, "/head/signUp")  === false && strpos($path, "head/api/sabangnet")  === false) && Auth::guard('head')->check() == false){
+        if($is_loin === false && ($path != "/head/login" && strpos($path, "/head/sign_up")  === false && strpos($path, "head/api/sabangnet")  === false) && Auth::guard('head')->check() == false){
             return redirect('/head/login');
         } else {
 
-			if( $path != "/head/login" && strpos($path, "/head/signUp")  === false && strpos($path, "head/api/sabangnet")  === false )
+			if( $path != "/head/login" && strpos($path, "/head/sign_up")  === false && strpos($path, "head/api/sabangnet")  === false )
 			{
 				$id		=  Auth::guard('head')->user()->id;
 				$name	=  Auth::guard('head')->user()->name;

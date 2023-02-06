@@ -28,9 +28,9 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
     Route::get('/logout', 'LoginController@logout');
 
     // 회원가입
-    Route::get('/signUp', 'SignUpController@index');
-    Route::post('/signUp/store', 'SignUpController@store');
-    Route::put('/signUp/checkid/{id?}', 'SignUpController@checkid');
+    Route::get('/sign_up', 'SignUpController@index');
+    Route::post('/sign_up/store', 'SignUpController@store');
+    Route::put('/sign_up/checkid/{id?}', 'SignUpController@checkid');
     
 
     Route::get('/user', 'UserController@index');

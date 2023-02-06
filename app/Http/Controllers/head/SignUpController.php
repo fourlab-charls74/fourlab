@@ -33,23 +33,15 @@ class SignUpController extends Controller
 
     public function store(Request $request)
 	{
-		$grade			= $request->input('grade');
 		$id				= $request->input('id');
 		$passwd			= $request->input('passwd');
-		$pwchgperiod	= $request->input('pwchgperiod');
 		$name			= $request->input('name');
-		$ipfrom			= $request->input('ipfrom');
-		$ipto			= $request->input('ipto');
-		$md_yn			= $request->input('md_yn');
-		$use_yn			= $request->input('use_yn');
-		$confirm_yn		= $request->input('confirm_yn');
 		$part			= $request->input('part');
 		$posi			= $request->input('posi');
 		$tel			= $request->input('tel');
 		$exttel			= $request->input('exttel');
 		$messenger		= $request->input('messenger');
 		$email			= $request->input('email');
-		$store_wonga_yn	= $request->input('store_wonga_yn');
 
 		$user_cnt	= DB::table('mgr_user')
 						->where('id', $id)->count();
@@ -57,15 +49,13 @@ class SignUpController extends Controller
 		if( $user_cnt == 0 ){
 
 			$mgr_user = [
-				'grade' => $grade,
+				'grade' => 'U',
 				'id' => $id,
 				'passwd' => DB::raw("CONCAT('*', UPPER(SHA1(UNHEX(SHA1('$passwd')))))"),
 				'name' => $name,
-				'ipfrom' => $ipfrom,
-				'ipto' => $ipto,
-				'md_yn' => $md_yn,
-				'use_yn' => $use_yn,
-				'confirm_yn' => $confirm_yn,
+				'md_yn' => 'N',
+				'use_yn' => 'N',
+				'confirm_yn' => 'N',
 				'part' => $part,
 				'posi' => $posi,
 				'tel' => $tel,
@@ -73,9 +63,6 @@ class SignUpController extends Controller
 				'messenger' => $messenger,
 				'email' => $email,
 				'regi_date' => now(),
-				// 'store_wonga_yn' => $store_wonga_yn,
-				// 'pwchgperiod' => $pwchgperiod,
-				// 'pwchgdate' => now(),
 			];
 
 			try {

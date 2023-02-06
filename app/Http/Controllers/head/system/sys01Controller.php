@@ -102,6 +102,7 @@ class sys01Controller extends Controller
 		$ipto			= $request->input('ipto');
 		$md_yn			= $request->input('md_yn');
 		$use_yn			= $request->input('use_yn');
+		$confirm_yn		= $request->input('confirm_yn');
 		$part			= $request->input('part');
 		$posi			= $request->input('posi');
 		$tel			= $request->input('tel');
@@ -125,6 +126,7 @@ class sys01Controller extends Controller
 				'ipto' => $ipto,
 				'md_yn' => $md_yn,
 				'use_yn' => $use_yn,
+				'confirm_yn' => $confirm_yn,
 				'store_wonga_yn' => $store_wonga_yn,
 				'part' => $part,
 				'posi' => $posi,
@@ -164,6 +166,7 @@ class sys01Controller extends Controller
 		$ipto		= $request->input('ipto');
 		$md_yn		= $request->input('md_yn');
 		$use_yn		= $request->input('use_yn');
+		$confirm_yn	= $request->input('confirm_yn');
 		$part		= $request->input('part');
 		$posi		= $request->input('posi');
 		$tel		= $request->input('tel');
@@ -183,6 +186,7 @@ class sys01Controller extends Controller
 			'ipto'			=> $ipto,
 			'md_yn'			=> $md_yn,
 			'use_yn'		=> $use_yn,
+			'confirm_yn'	=> $confirm_yn,
 			'store_wonga_yn'=> $store_wonga_yn,
 			'part'			=> $part,
 			'posi'			=> $posi,
