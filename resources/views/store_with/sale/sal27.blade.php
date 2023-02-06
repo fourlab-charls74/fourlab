@@ -1,12 +1,12 @@
 @extends('store_with.layouts.layout')
-@section('title','품번별종합분석현황')
+@section('title','품번별종합분석현황(기간)')
 @section('content')
 <div class="page_tit">
-	<h3 class="d-inline-flex">품번별종합분석현황</h3>
+	<h3 class="d-inline-flex">품번별종합분석현황(기간)</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
 		<span>/ 경영관리</span>
-		<span>/ 품번별종합분석현황</span>
+		<span>/ 품번별종합분석현황(기간)</span>
 	</div>
 </div>
 <form method="get" name="search">

@@ -49,7 +49,8 @@
                     <li><a href="/store/stock/stk26">(완)실사</a></li>
                     <li><a href="/store/stock/stk31">(완)매장 공지사항</a></li>
                     <li><a href="/store/stock/stk32">(완)매장 알림</a></li>
-                    <li><a href="/store/stock/stk33">(완)동종업계매출관리</a></li>
+                    <li><a href="/store/stock/stk33">(완)일별동종업계매출관리</a></li>
+                    <li><a href="/store/stock/stk34">(개)월별동종업계매출관리</a></li>
                 </ul>
             </li>
             <li>
@@ -101,7 +102,7 @@
                     <li><a href="/store/sale/sal24">(완)일별 매출 통계</a></li>
                     <li><a href="/store/sale/sal25">(완)월별 매출 통계</a></li>
                     <li><a href="/store/sale/sal26">(완)매장별 매출 통계</a></li>
-                    <li><a href="/store/sale/sal27">(개)품번별종합분석현황</a></li>
+                    <li><a href="/store/sale/sal27">(개)품번별종합분석현황(기간)</a></li>
                 </ul>
             </li>
             <li>

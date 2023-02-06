@@ -13,7 +13,7 @@ use Exception;
 
 use App\Models\Conf;
 
-class stk33Controller extends Controller
+class stk34Controller extends Controller
 {
     public function index()
     {
@@ -26,7 +26,7 @@ class stk33Controller extends Controller
             'sdate' => $sdate,
             'edate' => date("Y-m-d")
         ];
-        return view(Config::get('shop.store.view') . '/stock/stk33', $values);
+        return view(Config::get('shop.store.view') . '/stock/stk34', $values);
     }
 
     // 검색
@@ -154,7 +154,7 @@ class stk33Controller extends Controller
         ];
         
 
-        return view(Config::get('shop.store.view') . '/stock/stk33_show', $values);
+        return view(Config::get('shop.store.view') . '/stock/stk34_show', $values);
     }
 
 

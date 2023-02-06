@@ -1,13 +1,13 @@
 @extends('store_with.layouts.layout')
-@section('title','일별동종업계매출관리')
+@section('title','월별동종업계매출관리')
 @section('content')
 
 <div class="page_tit">
-    <h3 class="d-inline-flex">일별동종업계매출관리</h3>
+    <h3 class="d-inline-flex">월별동종업계매출관리</h3>
     <div class="d-inline-flex location">
         <span class="home"></span>
         <span>/ 매장관리</span>
-        <span>/ 일별동종업계매출관리</span>
+        <span>/ 월별동종업계매출관리</span>
     </div>
 </div>
 
@@ -208,7 +208,7 @@ const pinnedRowData = [{ store_nm : '합계' , "total_amt" : 0 ,
 
     function Search() {
         let data = $('form[name="search"]').serialize();
-        gx.Request('/store/stock/stk33/search', data, 1, function(e){
+        gx.Request('/store/stock/stk34/search', data, 1, function(e){
             let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
             let total_data = e.head.total_data;
 
@@ -229,7 +229,7 @@ const pinnedRowData = [{ store_nm : '합계' , "total_amt" : 0 ,
 
 
     function add() {
-        const url = '/store/stock/stk33/create';
+        const url = '/store/stock/stk34/create';
         const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1000,height=700");
     }
 

@@ -460,12 +460,19 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('stk32/del_group', 'stk32Controller@del_group');
         Route::post('stk32/del_store', 'stk32Controller@del_store');
 
-        //동종업계매출관리
+        //일별동종업계매출관리
         Route::get('stk33','stk33Controller@index');
         Route::get('stk33/search', 'stk33Controller@search');
         Route::get('stk33/create', 'stk33Controller@create');
         Route::get('stk33/com_search', 'stk33Controller@com_search');
         Route::post('stk33/save_amt', 'stk33Controller@save_amt');
+
+        //월별동종업계매출관리
+        Route::get('stk34','stk34Controller@index');
+        Route::get('stk34/search', 'stk34Controller@search');
+        Route::get('stk34/create', 'stk34Controller@create');
+        Route::get('stk34/com_search', 'stk34Controller@com_search');
+        Route::post('stk34/save_amt', 'stk34Controller@save_amt');
 
     });
 

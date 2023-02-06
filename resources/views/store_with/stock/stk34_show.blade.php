@@ -1,10 +1,10 @@
 @extends('store_with.layouts.layout-nav')
-@section('title','일별동종업계매출관리')
+@section('title','월별동종업계매출관리')
 @section('content')
 
 <div class="py-3 px-sm-3">
     <div class="page_tit">
-        <h3 class="d-inline-flex">일별동종업계매출관리 추가</h3>
+        <h3 class="d-inline-flex">월별동종업계매출관리 추가</h3>
         <div class="d-inline-flex location">
             <span class="home"></span>
             <span>/ 매장관리</span>
@@ -124,7 +124,7 @@
             } else if (day == '') {
                 alert('매출일을 선택해주세요.')
             } else {
-                gx.Request('/store/stock/stk33/com_search', data);
+                gx.Request('/store/stock/stk34/com_search', data);
             }
         }
 
@@ -202,7 +202,7 @@
             if(!confirm("매출액을 저장하시겠습니까?")) return;
 
                 axios({
-                    url: `/store/stock/stk33/save_amt`,
+                    url: `/store/stock/stk34/save_amt`,
                     method: 'post',
                     data: {
                         data: gx.getRows(),
