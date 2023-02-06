@@ -170,7 +170,6 @@
                     ]
                 },
                 { headerName: "특판",
-					// 행사로 해놓았음 추후 특가 반영 필요 (미구현)
                     children: [
                         { headerName: "수수료율", field: "fee_10", type: 'percentType', width: 60 },
                         { headerName: "수수료", field: "fee_amt_TG", type: 'currencyType', width: 100 },
@@ -183,7 +182,6 @@
                     ]
                 },
                 { headerName: "특약(온라인)",
-					// 균일로 해놓았음 추후 특가 반영 필요 (미구현)
                     children: [
                         { headerName: "수수료율", field: "fee_12", type: 'percentType', width: 60 },
                         { headerName: "수수료", field: "fee_amt_OL", type: 'currencyType', width: 100 },
@@ -200,11 +198,9 @@
     ];
 </script>
 <script type="text/javascript" charset="utf-8">
-	const pApp = new App('',{
-		gridId:"#div-gd",
-		height: 265
-	});
+	const pApp = new App('', { gridId:"#div-gd", height: 265 });
 	let gx;
+	
 	$(document).ready(function() {
 		pApp.ResizeGrid(265);
 		pApp.BindSearchEnter();
@@ -234,8 +230,8 @@
 	};
 
 	function popDetail(store_cd) {
-		let sdate	= $('input[name="sdate"]').val();
-		const url	='/store/account/acc06/show/' + store_cd + '/' + sdate;
+		const sdate = $('input[name="sdate"]').val();
+		const url = '/store/account/acc06/show/' + store_cd + '/' + sdate;
 		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=800");
 	}
 

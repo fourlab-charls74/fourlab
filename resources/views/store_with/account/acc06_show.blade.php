@@ -1,26 +1,18 @@
 @extends('store_with.layouts.layout-nav')
-@section('title','매장중간관리자정산 - 상세')
+@section('title','매장중간관리자정산 - ' . @$store_nm)
 @section('content')
-
-<style>
-	.custm_btn{
-		height:30px;
-		font-size:14px !important;
-		letter-spacing:2px;
-		color:#FFFFFF !important;
-		padding:0px 15px 0px 15px;
-	}	
-</style>
 
 <form method="post" name="search">
 	<div id="search-area" class="search_cum_form">
 		<div class="card mb-3">
 			<div class="d-flex card-header justify-content-between">
-				<h4>매장중간관리자정산 - 상세</h4>
+				<h4>매장중간관리자정산 - {{ @$store_nm }}</h4>
 				<div class="flex_box">
-					<a href="#" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1">검색</a>
-					<a href="#" @if( $acc_idx == '')onclick="Closed();"@endif class="btn btn-sm btn-outline-primary shadow-sm mr-1 closed_btn" @if( $acc_idx != '') disabled style="background-color:#DBDBDB;" @endif>마감추가</a>
-					<a href="#" onclick="gridDownload();" class="btn btn-sm btn-outline-primary shadow-sm">자료받기</a>
+					<a href="javascript:void(0);" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+					@if($acc_idx == '')
+					<a href="javascript:void(0);" onclick="return Closed();" class="btn btn-sm btn-outline-primary shadow-sm mr-1 closed_btn"><i class="fas fa-plus fa-sm"></i> 마감추가</a>
+					@endif
+					<a href="javascript:void(0);" onclick="gridDownload();" class="btn btn-sm btn-outline-primary shadow-sm"><i class="fas fa-download fa-sm"></i> 자료받기</a>
 				</div>
 			</div>
 			<div class="card-body">
@@ -127,10 +119,11 @@
 			</div>
 		</div>
 		<div class="resul_btn_wrap mb-3">
-			<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-			<a href="#" @if( $acc_idx == '')onclick="Closed();"@endif class="btn btn-sm btn-outline-primary shadow-sm mr-1 closed_btn" @if( $acc_idx != '') disabled style="background-color:#DBDBDB;" @endif>마감추가</a>
-			<a href="#" onclick="gridDownload();" class="btn btn-sm btn-outline-primary shadow-sm">자료받기</a>
-			<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
+			<a href="javascript:void(0);" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+			@if($acc_idx == '')
+			<a href="javascript:void(0);" onclick="return Closed();" class="btn btn-sm btn-outline-primary shadow-sm mr-1 closed_btn"><i class="fas fa-plus fa-sm"></i> 마감추가</a>
+			@endif
+			<a href="javascript:void(0);" onclick="gridDownload();" class="btn btn-sm btn-outline-primary shadow-sm"><i class="fas fa-download fa-sm"></i> 자료받기</a>
 		</div>
 	</div>
 </form>
@@ -166,59 +159,50 @@
 </div>
 
 <script language="javascript">
-	var columns = [
-		{field: "num", headerName: "#", type:'NumType', pinned: 'left', aggSum:"합계",
-			cellStyle: { 'text-align': "center" },
-			cellRenderer: function (params) {
-                if (params.node.rowPinned === 'top') {
-                    return "합계";
-                } else {
-                    return parseInt(params.value) + 1;
-                }
-            }
+	const CENTER = { 'text-align': 'center' };
+	const columns = [
+		{field: "num", headerName: "#", type: 'NumType', pinned: 'left', aggSum: "합계", cellStyle: CENTER, width: 40,
+			cellRenderer: (params) => params.node.rowPinned === 'top' ? '합계' : parseInt(params.value) + 1,
 		},
-		{field: "type",			headerName: "구분",			width:80, pinned: 'left'},
-		{field: "state_date",	headerName: "일자",			width:80, pinned: 'left'},
-		{field: "ord_no",		headerName: "주문번호",		width:130, pinned: 'left'},
-		{field: "ord_opt_no",	headerName: "일련번호",		width:80, type:'HeadOrdOptNoType', pinned: 'left'},
-		{field: "multi_order",	headerName: "복수",			width:70, 
-			cellRenderer: function(params){
-				if( params.value == "Y" ){
-					return '<a href="#" onclick="return openHeadOrderOpt(\'' + params.data.ord_opt_no +'\');">'+ params.value +'</a>';
-				}
-			},
-			cellStyle: function(params){
-				return params.value === 'Y' ? {"background-color": "yellow"} : {};
-			},
-			pinned: 'left'
+		{field: "sale_type", headerName: "매출구분", width: 55, pinned: 'left', cellStyle: CENTER},
+		{field: "state_date", headerName: "일자", width: 80, pinned: 'left', cellStyle: CENTER},
+		{field: "ord_no", headerName: "주문번호", width: 140, pinned: 'left'},
+		{field: "ord_opt_no", headerName: "일련번호", width: 60, cellStyle: CENTER, type: 'StoreOrderNoType', pinned: 'left'},
+		{field: "multi_order", headerName: "복수주문", width: 60, pinned: 'left',
+			cellStyle: (params) => ({ ...CENTER, "background-color": params.value === 'Y' ? "#ffff99" : "none" }),
+			cellRenderer: (params) => params.node.rowPinned === 'top' 
+				? '' : params.value === 'Y' 
+					? `<a href="javascript:void(0);" onclick="return openStoreOrder('${params.data.ord_opt_no}');">${params.value}</a>` : "-",
 		},
-		{field: "coupon_nm",	headerName: "쿠폰",			width:70, pinned: 'left'},
-		{field: "goods_nm",		headerName: "상품명",		width:150, type:'HeadGoodsNameType'},
-		{field: "opt_nm",		headerName: "옵션",			width:70},
-		{field: "style_no",		headerName: "스타일넘버",	width:90},
-		{field: "",				headerName: "상품코드",		width:90},
-		{field: "opt_type",		headerName: "출고형태",		width:90},
-		{field: "",				headerName: "행사구분",		width:90},
-		{field: "store_nm",		headerName: "매장",		width:100},
-		{field: "user_nm",		headerName: "주문자",		width:80},
-		{field: "pay_type",		headerName: "결제방법",		width:90},
-		{field: "tax_yn",		headerName: "과세",			width:70},
-		{field: "qty",			headerName: "수량",			width:70, type: 'currencyType'},
-		{field: "sale_amt",		headerName: "판매금액",		width:90, type: 'currencyType', aggregation:true},
-		// {field: "recv_amt",		headerName: "판매금액",		width:90, type: 'currencyType'},
-		{field: "clm_amt",		headerName: "클레임금액",	width:90, type: 'currencyType', aggregation:true},
-		{field: "dc_apply_amt",	headerName: "할인금액",		width:90, type: 'currencyType', aggregation:true},
-		{field: "dlv_amt",		headerName: "배송비",		width:80, type: 'currencyType', aggregation:true},
-		{field: "",		headerName: "소계",		width:80, type: 'currencyType', aggregation:true},
-		{field: "ord_state",	headerName: "주문상태",		width:90},
-		{field: "clm_state",	headerName: "클레임상태",	width:90},
-		{field: "ord_date",		headerName: "주문일",		width:80},
-		{field: "dlv_end_date",	headerName: "배송완료일",	width:90},
-		{field: "clm_end_date",	headerName: "클레임완료일",	width:90},
-		{field: "bigo",			headerName: "비고",			width:120},
-		{field: "nvl", headerName: "", width: "auto"}
+		{field: "prd_cd", headerName: "상품코드", width: 125, cellStyle: CENTER},
+		{field: "goods_no", headerName: "상품번호",	width: 70, cellStyle: CENTER},
+		{field: "style_no",	headerName: "스타일넘버", width: 70, cellStyle: CENTER},
+		{field: "goods_nm", headerName: "상품명", width: 180, type: 'HeadGoodsNameType'},
+		{field: "prd_cd_p", headerName: "코드일련",	width: 100, cellStyle: CENTER},
+		{field: "color", headerName: "컬러", width: 55, cellStyle: CENTER},
+		{field: "size", headerName: "사이즈", width: 55, cellStyle: CENTER},
+		{field: "goods_opt", headerName: "옵션", width: 150},
+		{field: "qty", headerName: "수량", width: 50, type: 'currencyType', aggregation: true},
+		{field: "sale_amt",	headerName: "판매금액",	width: 90, type: 'currencyType', aggregation: true},
+		{field: "clm_amt", headerName: "클레임금액", width: 90, type: 'currencyType', aggregation: true},
+		{field: "ord_type_nm", headerName: "주문구분", width: 60, cellStyle: CENTER},
+		{field: "pr_code_nm", headerName: "행사구분", width: 60, cellStyle: CENTER},
+		{field: "store_cd",	headerName: "매장코드", width: 70, cellStyle: CENTER},
+		{field: "store_nm",	headerName: "매장명", width: 100},
+		{field: "user_nm", headerName: "주문자", width: 60, cellStyle: CENTER},
+		{field: "pay_type_nm",	headerName: "결제방법",	width: 70, cellStyle: CENTER},
+		{field: "tax_yn", headerName: "과세", width: 40, cellStyle: CENTER},
+		// {field: "dc_apply_amt", headerName: "할인금액",	width: 90, type: 'currencyType', aggregation: true},
+		// {field: "coupon_nm", headerName: "쿠폰", width: 70, pinned: 'left'},
+		// {field: "dlv_amt", headerName: "배송비", width: 80, type: 'currencyType', aggregation: true},
+		// {field: "",	headerName: "소계",		width: 80, type: 'currencyType', aggregation:true},
+		{field: "ord_state_nm", headerName: "주문상태", width: 70, cellStyle: StyleOrdState},
+		{field: "clm_state_nm",headerName: "클레임상태", width: 70, cellStyle: StyleClmState},
+		{field: "ord_date",	headerName: "주문일", width: 80, cellStyle: CENTER},
+		{field: "dlv_end_date", headerName: "배송완료일", width: 80},
+		{field: "clm_end_date", headerName: "클레임완료일",	width: 80},
+		{width: "auto"}
 	];
-
 </script>
 <script type="text/javascript" charset="utf-8">
 	const pApp = new App('',{
@@ -242,7 +226,7 @@
         let options = {
 			getRowStyle: (params) => {
 				if (params.node.rowPinned === 'top') {
-					return { 'background': '#eee' }
+					return { 'background': '#eee', 'font-weight': 'bold' }
 				}
 			}
         };
