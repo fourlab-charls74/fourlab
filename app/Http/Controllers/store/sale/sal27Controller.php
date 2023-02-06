@@ -89,15 +89,16 @@ class sal27Controller extends Controller
 
         $sql = "
             select
-                a.item, a.item_nm, a.brand_nm, a.br_cd, a.prd_cd, a.prd_cd_p, a.goods_nm, a.goods_nm_eng, a.color, a.size, a.goods_no
-                , sum(a.tag_price) as tag_price
-                , sum(a.price) as price
-                , sum(a.wonga) as wonga
+                a.item, a.item_nm, a.brand_nm, a.br_cd, a.prd_cd, a.prd_cd_p, a.goods_nm, a.goods_nm_eng, a.color, a.size, a.goods_no, a.color_nm, a.goods_opt
+                , a.tag_price as tag_price
+                , a.price as price
+                , a.wonga as wonga
+                , sum(a.order_amt) as order_amt
                 , sum(a.order_qty) as order_qty
                 , sum(a.order_tag_price) as order_tag_price
                 , sum(a.order_price) as order_price
                 , sum(a.order_wonga) as order_wonga
-                , sum(a.release_qty) as release_qty
+                , a.release_qty as release_qty
                 , sum(a.total_release_qty) as total_release_qty
                 , a.storage_stock_qty as storage_stock_qty
                 , sum(a.store_stock_qty) as store_stock_qty
@@ -121,6 +122,7 @@ class sal27Controller extends Controller
                     , p.tag_price
                     , p.price
                     , p.wonga
+                    , psop2.qty as order_amt
                     , psop.qty as order_qty
                     , ( p.tag_price * psop.qty ) as order_tag_price
                     , ( p.price * psop.qty ) as order_price
@@ -129,12 +131,20 @@ class sal27Controller extends Controller
                     , psr.qty as release_qty
                     , srp.return_qty as return_qty
                     , ( psr.qty - srp.return_qty) as total_release_qty
-                    , pss.wqty as storage_stock_qty
-                    , pss2.wqty as store_stock_qty
+                    , ifnull(pss.wqty, 0) as storage_stock_qty
+                    , ifnull(pss2.wqty, 0) as store_stock_qty
                 from product_code pc
                     inner join product p on p.prd_cd = pc.prd_cd
                     inner join code c1 on c1.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c1.code_id
                     left outer join product_stock_order_product psop on psop.prd_cd = pc.prd_cd
+                    left outer join (
+                                    select 
+                                        qty
+                                        , state
+                                        , prd_cd
+                                    from product_stock_order_product
+                                    where state >= 10
+                    ) psop2 on psop2.prd_cd = pc.prd_cd
                     left outer join goods g on g.goods_no = pc.goods_no
                     left outer join brand b on b.br_cd = pc.brand
                     left outer join code c on c.code_kind_cd = 'PRD_CD_ITEM' and c.code_id = pc.item
@@ -147,7 +157,7 @@ class sal27Controller extends Controller
                                     where h.prd_cd = pcd.prd_cd and h.type = 17 
                                     order by h.rt asc
                     ) hst on hst.prd_cd = pc.prd_cd
-                    left outer join product_stock_release psr on psr.prd_cd = pc.prd_cd and psr.state >= 30
+                    left outer join product_stock_release psr on psr.prd_cd = pc.prd_cd
                     left outer join store_return_product srp on srp.prd_cd = pc.prd_cd
                     left outer join product_stock_storage pss on pss.prd_cd = pc.prd_cd
                     left outer join product_stock_store pss2 on pss2.prd_cd = pc.prd_cd
@@ -156,7 +166,7 @@ class sal27Controller extends Controller
                 $where
             ) a
             where 1=1
-            group by a.item, a.brand_nm
+            group by a.item, a.brand_nm, a.prd_cd
             order by a.item
         
         ";

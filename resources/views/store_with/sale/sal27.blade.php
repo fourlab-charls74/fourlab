@@ -112,9 +112,9 @@
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
+                                        <option value="pc.prd_cd">상품코드</option>
                                         <option value="g.goods_no">상품번호</option>
                                         <option value="g.goods_nm">상품명</option>
-                                        <option value="pc.prd_cd">상품코드</option>
                                     </select>
                                 </div>
                                 <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -167,7 +167,7 @@
 
 <script type="text/javascript" charset="utf-8">
 
-    const pinnedRowData = [{ br_cd: 'total', tag_price: 0, price: 0, wonga: 0,
+    const pinnedRowData = [{ br_cd: 'total', tag_price: 0, price: 0, wonga: 0, order_amt: 0,
                             order_qty: 0, order_tag_price: 0, order_price: 0, order_wonga: 0, 
                             release_qty: 0, release_qty: 0, return_qty: 0, total_release_qty: 0, sale_qty: 0,
                             sale_tag_price: 0, sale_price: 0, sale_recv_amt: 0, sale_wonga: 0, sale_rate: 0,
@@ -196,8 +196,26 @@
 			cellRenderer: (params) => params.value == 'total' ? '합계' : params.node.level == 3 ? params.value : '',
         },
         { field: "goods_no", headerName: "상품번호", minWidth: 70},
-        { field: "goods_nm", headerName: "상품명", minWidth:250},
-        { field: "goods_nm_eng", headerName: "상품명(영문)", minWidth:250},
+        { field: "goods_nm", headerName: "상품명", minWidth:250,
+            cellRenderer: function (params) {
+                if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
+                    return '<a href="javascript:void(0);" onclick="return blank_goods_no();">' + (params.value || '') + '</a>';
+                } else {
+                    let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
+                    return '<a href="#" onclick="return openHeadProduct(\'' + goods_no + '\');">' + (params.value || '') + '</a>';
+                }
+            }
+        },
+        { field: "goods_nm_eng", headerName: "상품명(영문)", minWidth:250,
+            cellRenderer: function (params) {
+                if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
+                    return '<a href="javascript:void(0);" onclick="return blank_goods_no();">' + (params.value || '') + '</a>';
+                } else {
+                    let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
+                    return '<a href="#" onclick="return openHeadProduct(\'' + goods_no + '\');">' + (params.value || '') + '</a>';
+                }
+            }
+        },
         { field: "color", headerName: "컬러", minWidth:50},
         { field: "color_nm", headerName: "컬러명", minWidth:80},
         { field: "size", headerName: "사이즈", minWidth:50},
@@ -338,10 +356,10 @@
 
 
     const updatePinnedRow = () => {
-        let [ tag_price, price, wonga, order_qty, order_tag_price, order_price, order_wonga
+        let [ tag_price, price, wonga, order_amt, order_qty, order_tag_price, order_price, order_wonga
             , release_qty, return_qty, total_release_qty, sale_qty, sale_tag_price, sale_price
             , sale_recv_amt, sale_wonga, sale_rate, sale_discount_rate, storage_stock_qty
-            , store_stock_qty, total_stock_qty ] = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
+            , store_stock_qty, total_stock_qty ] = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
         const rows = gx.getRows();
 
         if (rows && Array.isArray(rows) && rows.length > 0) {
@@ -349,6 +367,7 @@
                 tag_price += parseInt(row?.tag_price || 0);
                 price += parseInt(row?.price || 0);
                 wonga += parseInt(row?.wonga || 0);
+                order_amt += parseInt(row?.order_amt || 0);
                 order_qty += parseInt(row?.order_qty || 0);
                 order_tag_price += parseInt(row?.order_tag_price || 0);
                 order_price += parseInt(row?.order_price || 0);
@@ -371,7 +390,7 @@
         }
         let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
         gx.gridOptions.api.setPinnedTopRowData([
-            { ...pinnedRow.data, tag_price: tag_price, price: price, wonga: wonga, order_qty: order_qty, order_tag_price: order_tag_price, order_price: order_price
+            { ...pinnedRow.data, tag_price: tag_price, price: price, wonga: wonga, order_amt: order_amt, order_qty: order_qty, order_tag_price: order_tag_price, order_price: order_price
                 , order_wonga: order_wonga, release_qty: release_qty, return_qty: return_qty, total_release_qty: total_release_qty, sale_qty: sale_qty, sale_tag_price: sale_tag_price
                 , sale_price: sale_price, sale_recv_amt: sale_recv_amt, sale_wonga: sale_wonga, sale_rate: sale_rate, sale_discount_rate: sale_discount_rate
                 , storage_stock_qty: storage_stock_qty, store_stock_qty: store_stock_qty, total_stock_qty: total_stock_qty
