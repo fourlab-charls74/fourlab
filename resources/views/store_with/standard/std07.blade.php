@@ -157,7 +157,7 @@
         {field: "grade_cd", hide: true},
         {field: "grade_nm", headerName: "매장등급", width: 80, cellStyle: {"text-align": "center"},
             cellRenderer: (params) => {
-                return `<a href='javascript:void(0)' onclick='showStoreGradePopup("${params.value || params.data.grade_cd}")'>${params.value || params.data.grade_cd}</a>`;
+                return `<a href='javascript:void(0)' onclick='showStoreGradePopup("${params.value || params.data.grade_cd}")'>${params.value || params.data.grade_cd || ''}</a>`;
             }
         },
         // {field: "manager_fee", headerName: "중간관리수수료(%)", width: 120, type: "percentType"},
