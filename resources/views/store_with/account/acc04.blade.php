@@ -182,7 +182,7 @@
         { headerName: "수수료",
             children: [
                 { headerName: "수수료합계", field: "total_fee", type: 'numberType', width: 100, headerClass: "merged-cell", aggregation: true },
-                { headerName: "임대관리비", field: "management_fee", type: 'numberType', width: 100, headerClass: "merged-cell", aggregation: true },
+                // { headerName: "임대관리비", field: "management_fee", type: 'numberType', width: 100, headerClass: "merged-cell", aggregation: true },
 				@foreach (@$pr_codes as $pr_code)
                 { headerName: "{{ @$pr_code->code_val }}",
                     children: [

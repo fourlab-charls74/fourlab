@@ -29,6 +29,7 @@ class acc06Controller extends Controller
     {
         $sdate = $request->input('sdate', now()->format("Y-m"));
 
+		$f_month = Carbon::parse($sdate)->format("Ym");
         $f_sdate = Carbon::parse($sdate)->firstOfMonth()->format("Ymd");
         $f_edate = Carbon::parse($sdate)->lastOfMonth()->format("Ymd");
 
@@ -61,7 +62,12 @@ class acc06Controller extends Controller
 				, if(a.fee_amt_TG < 0, 0, a.fee_amt_TG) as fee_amt_TG
 				, if(a.fee_amt_YP < 0, 0, a.fee_amt_YP) as fee_amt_YP
 				, if(a.fee_amt_OL < 0, 0, a.fee_amt_OL) as fee_amt_OL
-				, (a.fee_amt_JS1 + a.fee_amt_JS2 + a.fee_amt_JS3 + a.fee_amt_TG + a.fee_amt_YP + a.fee_amt_OL) as fee_amt
+				, if((a.fee_amt_JS1 + a.fee_amt_JS2 + a.fee_amt_JS3 + a.fee_amt_TG + a.fee_amt_YP + a.fee_amt_OL) < 0
+					, 0, (a.fee_amt_JS1 + a.fee_amt_JS2 + a.fee_amt_JS3 + a.fee_amt_TG + a.fee_amt_YP + a.fee_amt_OL)
+				) as fee_amt
+				, if((a.fee_amt_JS1 + a.fee_amt_JS2 + a.fee_amt_JS3 + a.fee_amt_TG + a.fee_amt_YP + a.fee_amt_OL + a.extra_amt) < 0
+					, 0, (a.fee_amt_JS1 + a.fee_amt_JS2 + a.fee_amt_JS3 + a.fee_amt_TG + a.fee_amt_YP + a.fee_amt_OL + a.extra_amt)
+				) as total_fee_amt
 			from (
 				select w.*, sg.*
 					, s.store_cd, s.store_nm, s.manager_nm
@@ -90,6 +96,7 @@ class acc06Controller extends Controller
 					, round(w.ord_TG_amt * (sg.fee_10 / 100)) as fee_amt_TG
 					, round(w.ord_YP_amt * (sg.fee_11 / 100)) as fee_amt_YP
 					, round(w.ord_OL_amt * (sg.fee_12 / 100)) as fee_amt_OL
+					, ifnull(ae.extra_amt, 0) as extra_amt
 				from store s
 					inner join code st on st.code_kind_cd = 'STORE_TYPE' and st.code_id = s.store_type
 					inner join (
@@ -149,6 +156,12 @@ class acc06Controller extends Controller
 							) ss on ss.store_cd = ww.store_cd
 						group by ww.store_cd
 					) w on w.ord_store_cd = s.store_cd
+					left outer join (
+						select store_cd, sum(extra_amt) as extra_amt
+						from store_account_extra
+						where ymonth = '$f_month'
+						group by store_cd
+				   ) ae on ae.store_cd = s.store_cd
 				where s.account_yn = 'Y' $where
 				order by w.sales_amt desc
 			) a
@@ -156,6 +169,36 @@ class acc06Controller extends Controller
 		$result = DB::select($sql);
 
 		// 아래 작업중입니다. - 최유현
+
+		// -- 판매처 수수료
+		// , if(a.sale_place_fee_amt_JS < 0, 0, a.sale_place_fee_amt_JS) as sale_place_fee_amt_JS
+		// , if(a.sale_place_fee_amt_GL < 0, 0, a.sale_place_fee_amt_GL) as sale_place_fee_amt_GL
+		// , if(a.sale_place_fee_amt_J1 < 0, 0, a.sale_place_fee_amt_J1) as sale_place_fee_amt_J1
+		// , if(a.sale_place_fee_amt_J2 < 0, 0, a.sale_place_fee_amt_J2) as sale_place_fee_amt_J2
+		// , if((a.sale_place_fee_amt_JS + a.sale_place_fee_amt_GL + a.sale_place_fee_amt_J1 + a.sale_place_fee_amt_J2) < 0
+		// 	, 0, (a.sale_place_fee_amt_JS + a.sale_place_fee_amt_GL + a.sale_place_fee_amt_J1 + a.sale_place_fee_amt_J2)
+		// ) as sale_place_fee_amt
+		// -- 중간관리자 수수료
+
+		// left outer join (
+		// 	select idx, store_cd, pr_code
+		// 		, sum(if(pr_code = 'JS', store_fee, 0)) as sale_place_fee_rate_JS
+		// 		, sum(if(pr_code = 'GL', store_fee, 0)) as sale_place_fee_rate_GL
+		// 		, sum(if(pr_code = 'J1', store_fee, 0)) as sale_place_fee_rate_J1
+		// 		, sum(if(pr_code = 'J2', store_fee, 0)) as sale_place_fee_rate_J2
+		// 	from store_fee 
+		// 	where idx in (select max(idx) from store_fee group by store_cd, pr_code)
+		// 	group by store_cd
+		// ) sf on sf.store_cd = s.store_cd
+
+		// , sf.sale_place_fee_rate_JS
+		// , sf.sale_place_fee_rate_GL
+		// , sf.sale_place_fee_rate_J1
+		// , sf.sale_place_fee_rate_J2
+		// , round(ifnull(w.sales_JS_amt, 0) * ifnull(sf.sale_place_fee_rate_JS, 0) / 100) as sale_place_fee_amt_JS
+		// , round(ifnull(w.sales_GL_amt, 0) * ifnull(sf.sale_place_fee_rate_GL, 0) / 100) as sale_place_fee_amt_GL
+		// , round(ifnull(w.sales_J1_amt, 0) * ifnull(sf.sale_place_fee_rate_J1, 0) / 100) as sale_place_fee_amt_J1
+		// , round(ifnull(w.sales_J2_amt, 0) * ifnull(sf.sale_place_fee_rate_J2, 0) / 100) as sale_place_fee_amt_J2
 
         // $sql = /** @lang text */
         //     "
