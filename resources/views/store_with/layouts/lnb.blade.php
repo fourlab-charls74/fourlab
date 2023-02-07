@@ -10,8 +10,8 @@
                     <li><a href="/store/standard/std04">(완)동종업계관리</a></li>
                     <li><a href="/store/standard/std05">(완)판매유형관리</a></li>
                     <!--<li><a href="/store/standard/std06">(개)매장영업담당자관리</a></li>//-->
-                    <li><a href="/store/standard/std07">(완)매장마진관리</a></li>
-                    <li><a href="/store/standard/std08">(완)매장등급관리</a></li>
+                    <li><a href="/store/standard/std07">(완)판매처수수료관리</a></li>
+                    <li><a href="/store/standard/std08">(완)판매수수료코드관리</a></li>
                 </ul>
             </li>
             <li>
