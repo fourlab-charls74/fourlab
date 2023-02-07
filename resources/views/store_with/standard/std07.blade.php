@@ -1,9 +1,9 @@
 @extends('store_with.layouts.layout')
-@section('title','매장마진관리')
+@section('title','판매처수수료관리')
 
 @section('content')
 <div class="page_tit">
-    <h3 class="d-inline-flex">매장마진관리</h3>
+    <h3 class="d-inline-flex">판매처수수료관리</h3>
     <div class="d-inline-flex location">
         <span class="home"></span>
         <span>/ 코드관리</span>
@@ -145,8 +145,8 @@
                 return params.value || 'N';
             }
         },
-        {field: "pr_code_cd", headerName: "행사코드", width: 60, cellStyle: {"text-align": "center"}},
-        {field: "pr_code_nm", headerName: "행사명", width: 60, cellStyle: {"text-align": "center"},
+        {field: "pr_code_cd", headerName: "코드", width: 60, cellStyle: {"text-align": "center"}},
+        {field: "pr_code_nm", headerName: "수수료명", width: 60, cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {
                 return `<a href='javascript:void(0)' onclick='showDetailPopup("${params.data.store_cd}", "${params.data.pr_code_cd}")'>${params.value}</a>`;
             }
