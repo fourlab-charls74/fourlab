@@ -108,17 +108,6 @@
 											</td>
 										</tr>
 										<tr>
-											<th class="required">아이템</th>
-											<td>
-												<div class="flax_box">
-													<select name='item' id='item' class="form-control form-control-sm prd_code">
-														<option value=''>선택</option>
-														@foreach ($items as $item)
-														<option value='{{ $item->code_id }}'>{{ $item->code_id }} : {{ $item->code_val }}</option>
-														@endforeach
-													</select>
-												</div>
-											</td>
 											<th class="required">품목</th>
 											<td>
 												<div class="flax_box">
@@ -126,6 +115,17 @@
 														<option value=''>선택</option>
 														@foreach ($opts as $opt)
 															<option value='{{ $opt->code_id }}'>{{ $opt->code_id }} : {{ $opt->code_val }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
+											<th class="required">하위품목</th>
+											<td>
+												<div class="flax_box">
+													<select name='item' id='item' class="form-control form-control-sm prd_code">
+														<option value=''>선택</option>
+														@foreach ($items as $item)
+														<option value='{{ $item->code_id }}'>{{ $item->code_id }} : {{ $item->code_val }}</option>
 														@endforeach
 													</select>
 												</div>
@@ -279,6 +279,7 @@
 		{field: "brand", headerName: "브랜드", width: 70},
 		{field: "image_url", headerName: "이미지 경로", hide: true},
 		{field: "opt", headerName: "품목", width: 80},
+		{field: "item", headerName: "하위품목", width: 80},
 		{field: "image", headerName: "이미지",
 			cellRenderer: (params) => `<img style="display:block; width: 100%; max-width: 30px; margin: 0 auto;" src="${params.data.image}">`
 		},
@@ -299,7 +300,6 @@
 		{field: "year", headerName: "년도", width: 80},
 		{field: "season", headerName: "시즌",width: 80},
 		{field: "gender", headerName: "성별", width: 80},
-		{field: "item", headerName: "아이템", width: 80},
 		{field: "sup_com", headerName: "공급업체", width: 120},
 	];
 </script>

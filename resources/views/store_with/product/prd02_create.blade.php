@@ -118,17 +118,6 @@
 														</td>
 													</tr>
 													<tr>
-														<th class="required" style="text-align:center;vertical-align:middle;">아이템</th>
-														<td>
-															<div class="flax_box">
-																<select name='item' class="form-control form-control-sm">
-																	<option value=''>선택</option>
-																	@foreach ($items as $item)
-																		<option value='{{ $item->code_id }}'>{{ $item->code_id }} : {{ $item->code_val }}</option>
-																	@endforeach
-																</select>
-															</div>
-														</td>
 														<th class="required" style="text-align:center;vertical-align:middle;">품목</th>
 														<td>
 															<div class="flax_box">
@@ -136,6 +125,17 @@
 																	<option value=''>선택</option>
 																	@foreach ($opts as $opt)
 																		<option value='{{ $opt->code_id }}'>{{ $opt->code_id }} : {{ $opt->code_val }}</option>
+																	@endforeach
+																</select>
+															</div>
+														</td>
+														<th class="required" style="text-align:center;vertical-align:middle;">하위품목</th>
+														<td>
+															<div class="flax_box">
+																<select name='item' class="form-control form-control-sm">
+																	<option value=''>선택</option>
+																	@foreach ($items as $item)
+																		<option value='{{ $item->code_id }}'>{{ $item->code_id }} : {{ $item->code_val }}</option>
 																	@endforeach
 																</select>
 															</div>
@@ -240,7 +240,7 @@
 							</div>		
 						</div>	
 					</div>
-				</div>
+				</div>하위품목
 			</div>
 		</form>
 	</div>
@@ -266,8 +266,8 @@
 		{field:"year",		headerName:"년도",			hide:true},
 		{field:"season",	headerName:"시즌",			hide:true},
 		{field:"gender",	headerName:"성별",			hide:true},
-		{field:"item",		headerName:"아이템",		hide:true},
 		{field:"opt",		headerName:"품목",			hide:true},
+		{field:"item",		headerName:"하위품목",		hide:true},
 		{field:"seq",		headerName:"순서차수",		hide:true},
 		{field: "", headerName:"", width:"auto"},
 	];
@@ -397,16 +397,16 @@
 			return alert("성별을 선택해주세요.");
 		}
 
-		// 아이템 선택여부
-		if(f1.item.selectedIndex == 0) {
-			f1.item.focus();
-			return alert("아이템을 선택해주세요.");
-		}
-
 		// 품목 선택여부
 		if(f1.opt.selectedIndex == 0) {
 			f1.opt.focus();
 			return alert("품목을 선택해주세요.");
+		}
+
+		// 하위품목 선택여부
+		if(f1.item.selectedIndex == 0) {
+			f1.item.focus();
+			return alert("하위품목을 선택해주세요.");
 		}
 
 		return true;
