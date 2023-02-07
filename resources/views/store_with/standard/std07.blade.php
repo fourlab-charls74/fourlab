@@ -105,7 +105,7 @@
     <div class="col-lg-9">
         <div class="card shadow-none mb-0">
             <div class="card-header mb-0 d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row">
-                <h5 class="m-0 mb-3 mb-sm-2"><span id="select_store_nm"></span>매장별 마진정보</h5>
+                <h5 class="m-0 mb-3 mb-sm-2">매장별 판매처수수료정보<span id="select_store_nm"></span></h5>
                 <div class="d-flex align-items-center justify-content-center justify-content-sm-end">
                     {{-- <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateStoreFee()"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
                     <button type="button" class="btn btn-sm btn-outline-primary shadow-sm" onclick="resetStoreFee()">전체 초기화</button> --}}
@@ -220,7 +220,7 @@
         cur_store_cd = store_cd;
         cur_store_nm = store_nm;
         gx2.Request("/store/standard/std07/search-store-fee/" + store_cd, "", -1, function(d) {
-            $("#select_store_nm").text(`${store_nm} - `);
+            $("#select_store_nm").text(` - ${store_nm}`);
             gx2.gridOptions.api.forEachNode(function(node) {
                 if(node.data.use_yn === 'Y') node.setSelected(true);
             });
