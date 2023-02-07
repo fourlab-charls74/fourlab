@@ -464,6 +464,20 @@ CREATE TABLE `sale_type_store` (
 	PRIMARY KEY (`idx`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
+-- 판매 유형 관리 - 브랜드
+CREATE TABLE `sale_type_brand` (
+	`idx` int(11) NOT NULL AUTO_INCREMENT COMMENT 'identify',
+	`sale_type_cd` varchar(30) NOT NULL COMMENT '판매유형 idx',
+	`brand` varchar(30) NOT NULL COMMENT '브랜드',
+	`brand_nm` varchar(100) NOT NULL COMMENT '브랜드명',
+	`sdate` char(10) DEFAULT NULL COMMENT '시작일 (yyyy-mm-dd)',
+	`edate` char(10) DEFAULT NULL COMMENT '종료일 (yyyy-mm-dd)',
+	`use_yn` char(1) NOT NULL DEFAULT 'N' COMMENT '사용여부',
+	`reg_date` datetime DEFAULT NULL COMMENT '등록일자',
+	`mod_date` datetime DEFAULT NULL COMMENT '수정일자',
+	PRIMARY KEY (`idx`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
 -- 매장마진관리
 CREATE TABLE `store_fee` (
 	`idx` int(11) NOT NULL AUTO_INCREMENT COMMENT 'identify',
