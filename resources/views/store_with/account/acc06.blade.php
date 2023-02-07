@@ -207,7 +207,9 @@
 				},
             ]
         },
-        { field: "extra_amt", headerName: "기타재반", type: 'currencyMinusColorType', width: 70 },
+        { field: "extra_amt", headerName: "기타재반", type: 'currencyMinusColorType', width: 70,
+			cellRenderer: (params) => params.value == 0 ? 0 : '<a href="javascript:void(0);" onClick="openExtraAmtPopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>'
+		},
         { field: "total_fee_amt", headerName: "수수료합계", type: 'currencyMinusColorType', width: 100,
 			cellStyle: {"font-weight": "bold", "color": "#dd0000"},
 			// valueFormatter: (params) => formatNumber(params),
@@ -248,15 +250,24 @@
 		return isNaN(sum) ? 0 : sum;
 	};
 
+	// 판매내역 상세
 	function openDetailPopup(store_cd) {
 		const sdate = $('input[name="sdate"]').val();
 		const url = '/store/account/acc06/show/' + store_cd + '/' + sdate;
 		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=800");
 	}
 
+	// 특약(온라인) 판매내역 상세
 	function openOnlineFeePopup(store_cd) {
 		const sdate = $('input[name="sdate"]').val();
 		const url = '/store/account/acc06/show-online?store_cd=' + store_cd + '&sdate=' + sdate;
+		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=800");
+	}
+
+	// 기타재반자료 상세
+	function openExtraAmtPopup(store_cd) {
+		const sdate = $('input[name="sdate"]').val();
+		const url = '/store/account/acc06/show-extra?store_cd=' + store_cd + '&sdate=' + sdate;
 		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=800");
 	}
 
