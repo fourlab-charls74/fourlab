@@ -31,7 +31,7 @@ class LoginController extends Controller
         $user = Head::where('id','=',$request->email)
             ->first();
     
-        if($user->use_yn == 'Y'){
+        if($user!=null && $user->use_yn == 'Y'){
             $password =  $request->password;
             $user = Head::where('id','=',$request->email)
                 ->where('use_yn','=','Y')
@@ -65,7 +65,7 @@ class LoginController extends Controller
 //            }
         } else {
             //관리자 승인 안된 ID일 경우    
-            if($user->confirm_yn == 'N'){
+            if($user!=null && $user->confirm_yn == 'N'){
                 $password =  $request->password;
                 $user = Head::where('id','=',$request->email)
                         ->where('confirm_yn','=','N')

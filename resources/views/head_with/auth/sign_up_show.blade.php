@@ -39,9 +39,9 @@
                                                 <td>
                                                     <div class="d-flex flex-column">
                                                         <div class="d-flex">
-                                                            <input type='text' class="form-control form-control-sm search-enter w-50 mr-2" style="max-width:280px;" name='id' id="id" autocomplete="off" />
+                                                            <input type='text' class="form-control form-control-sm search-enter w-100 mr-2" style="max-width:280px;" name='id' id="id" autocomplete="off" />
                                                             <input type="hidden" name="id_chk">
-                                                            <button name="id_check" class="btn btn-primary" onclick="checkdup();return false;">중복확인</button>
+                                                            <button name="id_check" class="btn btn-primary" style="min-width: 80px;" onclick="checkdup();return false;">중복확인</button>
                                                         </div>
                                                         <span id="checkdupmessage"></span>
                                                     </div>
@@ -52,9 +52,9 @@
                                                 <td>
                                                     <div class="d-flex flex-column">
                                                         <div class="form-inline">
-                                                            <input type='password' class="form-control form-control-sm w-100" name='passwd' id="passwd" autocomplete="new-password" />
+                                                            <input type='password' class="form-control form-control-sm w-100" style="max-width: 280px;" name='passwd' id="passwd" autocomplete="new-password" />
                                                         </div>
-                                                        <span style="color:red; letter-spacing:0px;" id="passwdchkmessage">공백 없이 6~12자이며 영문과 숫자를 포함해야 합니다.</span>
+                                                        <span class="mt-1" style="color:red; letter-spacing:0px; line-height: 1.5;" id="passwdchkmessage">공백 없이 6~12자이며 영문과 숫자를 포함해야 합니다.</span>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -63,9 +63,9 @@
                                                 <td>
                                                     <div class="d-flex flex-column">
                                                         <div class="form-inline">
-                                                            <input type='password' class="form-control form-control-sm w-100" name='pwchk' id="pwchk" autocomplete="new-password" />
+                                                            <input type='password' class="form-control form-control-sm w-100" style="max-width: 280px;" name='pwchk' id="pwchk" autocomplete="new-password" />
                                                         </div>
-                                                        <span class="letter-spacing:0px;" id="pwchkmessage"></span>
+                                                        <span class="mt-1" style="letter-spacing:0px; line-height: 1.5;" id="pwchkmessage"></span>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -73,7 +73,7 @@
                                                 <th class="required">이름</th>
                                                 <td>
                                                     <div class="form-inline">
-                                                        <input type='text' class="form-control form-control-sm search-enter w-100" name='name' id="name">
+                                                        <input type='text' class="form-control form-control-sm search-enter w-100" style="max-width: 280px;" name='name' id="name">
                                                     </div>
                                                 </td>
                                             </tr>
