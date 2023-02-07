@@ -1,9 +1,9 @@
 @extends('head_with.layouts.layout-nav')
 @section('title','회원가입 상세')
 @section('content')
-<div class="show_layout py-3 px-sm-3 container-fluid">
+<div class="show_layout py-3 px-sm-3">
     <div class="page_tit mb-3 d-flex align-items-center justify-content-between">
-        <div>
+        <div class="d-flex">
             <h3 class="d-inline-flex">회원가입</h3>
             <div class="d-inline-flex location">
                 <span class="home"></span>
@@ -11,6 +11,13 @@
             </div>
         </div>
     </div>
+    <style> 
+        .required:after {content:" *"; color: red;}
+        .table th {min-width:120px;}
+        @media (max-width: 740px) {
+            .table td {float: unset !important;width:100% !important;}
+        }
+    </style>
     <form name="detail">
         <div class="card_wrap aco_card_wrap">
             <div class="card shadow">
@@ -20,7 +27,7 @@
                 <div class="card-body mt-1">
                     <div class="row_wrap">
                         <div class="row">
-                            <div class="col-sm-12">
+                            <div class="col-12">
                                 <div class="table-box-ty2 mobile">
                                     <table class="table incont table-bordered" width="100%" cellspacing="0">
                                         <colgroup>
@@ -28,39 +35,45 @@
                                         </colgroup>
                                         <tbody>
                                             <tr>
-                                                <th>아이디</th>
+                                                <th class="required">아이디</th>
                                                 <td>
-                                                    <div class="flax_box">
-                                                        <input type='text' class="form-control form-control-sm search-enter w-25" name='id' id="id" autocomplete="off" />
-                                                        <input type="hidden" name="id_chk">
-														<button name="id_check" class="btn btn-sm btn-primary fs-12 px-1 ml-1" style="width:75px;" onclick="checkdup();return false;">중복확인</button>
+                                                    <div class="d-flex flex-column">
+                                                        <div class="d-flex">
+                                                            <input type='text' class="form-control form-control-sm search-enter w-50 mr-2" style="max-width:280px;" name='id' id="id" autocomplete="off" />
+                                                            <input type="hidden" name="id_chk">
+                                                            <button name="id_check" class="btn btn-primary" onclick="checkdup();return false;">중복확인</button>
+                                                        </div>
+                                                        <span id="checkdupmessage"></span>
                                                     </div>
-                                                    <div><span id="checkdupmessage"></span></div>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th>비밀번호</th>
+                                                <th class="required">비밀번호</th>
                                                 <td>
-                                                    <div class="flax_box">
-                                                        <input type='password' class="form-control form-control-sm w-25" name='passwd' id="passwd" autocomplete="new-password" />
+                                                    <div class="d-flex flex-column">
+                                                        <div class="form-inline">
+                                                            <input type='password' class="form-control form-control-sm w-100" name='passwd' id="passwd" autocomplete="new-password" />
+                                                        </div>
+                                                        <span style="color:red; letter-spacing:0px;" id="passwdchkmessage">공백 없이 6~12자이며 영문과 숫자를 포함해야 합니다.</span>
                                                     </div>
-                                                    <p class="fs-12" style="color:red;" id="passwdchkmessage">* 비밀번호는 공백 없이 6~12자이며 영문과 숫자가 조합되어야 합니다.</p>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th>비밀번호 확인</th>
+                                                <th class="required">비밀번호 확인</th>
                                                 <td>
-                                                    <div class="flax_box">
-                                                        <input type='password' class="form-control form-control-sm w-25" name='pwchk' id="pwchk" autocomplete="new-password" />
+                                                    <div class="d-flex flex-column">
+                                                        <div class="form-inline">
+                                                            <input type='password' class="form-control form-control-sm w-100" name='pwchk' id="pwchk" autocomplete="new-password" />
+                                                        </div>
+                                                        <span class="letter-spacing:0px;" id="pwchkmessage"></span>
                                                     </div>
-                                                    <p class="fs-12" id="pwchkmessage"></p>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th>이름</th>
+                                                <th class="required">이름</th>
                                                 <td>
-                                                    <div class="flax_box">
-                                                        <input type='text' class="form-control form-control-sm search-enter w-25" name='name' id="name">
+                                                    <div class="form-inline">
+                                                        <input type='text' class="form-control form-control-sm search-enter w-100" name='name' id="name">
                                                     </div>
                                                 </td>
                                             </tr>
@@ -79,52 +92,49 @@
                 <div class="card-body mt-1">
                     <div class="row_wrap">
                         <div class="row">
-                            <div class="col-sm-12">
+                            <div class="col-12">
                                 <div class="table-box-ty2 mobile">
                                     <table class="table incont table-bordered" width="100%" cellspacing="0">
-                                        <colgroup>
+                                        <!-- <colgroup>
                                             <col width="110px">
-                                        </colgroup>
+                                        </colgroup> -->
                                         <tbody>
                                             <tr>
                                                 <th>부서</th>
-                                                <td>
-                                                    <div class="flax_box">
-                                                        <input type='text' class="form-control form-control-sm search-all" name='part' id='part'>
+                                                <td style="width:35%;">
+                                                    <div class="form-inline">
+                                                        <input type='text' class="form-control form-control-sm search-all w-100" name='part' id='part'>
                                                     </div>
                                                 </td>
                                                 <th>직책</th>
-                                                <td>
-                                                    <div class="flax_box">
-                                                        <input type='text' class="form-control form-control-sm search-enter" name='posi' id="posi">
+                                                <td style="width:35%;">
+                                                    <div class="form-inline">
+                                                        <input type='text' class="form-control form-control-sm search-enter w-100" name='posi' id="posi">
                                                     </div>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <th>연락처/내선</th>
                                                 <td>
-                                                    <div class="flax_box">
-                                                        <input type='text' class="form-control form-control-sm search-enter w-25" name='tel' id="tel">
-                                                        <span class="text_line p-1">/</span>
-                                                        <input type='text' class="form-control form-control-sm w-25" name='exttel' id="exttel">
+                                                    <div class="d-flex align-items-center">
+                                                        <input type='text' class="form-control form-control-sm search-enter w-50" name='tel' id="tel">
+                                                        <span class="text_line mr-2 ml-2">/</span>
+                                                        <input type='text' class="form-control form-control-sm w-50" name='exttel' id="exttel">
                                                     </div>
                                                 </td>
                                                 <th>메신저</th>
                                                 <td>
                                                     <div class="flax_box">
-                                                        <input type='text' class="form-control form-control-sm" name='messenger' id="messenger">
+                                                        <input type='text' class="form-control form-control-sm w-100" name='messenger' id="messenger">
                                                     </div>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <th>이메일</th>
-                                                <td>
+                                                <td colspan="3">
                                                     <div class="flax_box">
-                                                        <input type='text' class="form-control form-control-sm search-enter" name='email' id="email">
+                                                        <input type='text' class="form-control form-control-sm search-enter w-100" name='email' id="email">
                                                     </div>
-                                                </td>
-                                                <th></th>
-                                                <td>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -203,7 +213,7 @@
         if (code == "") {
             $.ajax({
                 method: 'post',
-                url: '/head/sign_up/store',
+                url: '/head/sign-up/store',
                 data: frm.serialize(),
                 dataType: 'json',
                 success: function(res) {
@@ -247,7 +257,7 @@
 		$.ajax({
             async: true,
             type: 'put',
-            url: '/head/sign_up/checkid/' + Id,
+            url: '/head/sign-up/checkid/' + Id,
             success: function(data) {
                 cbcheckdup(data);
             },
@@ -290,10 +300,10 @@
         $("#pwchk").keyup(function(){
             if($("#passwd").val() != "" || $("#pwchk").val() != ""){
                 if($("#passwd").val() == $("#pwchk").val()){
-                    $('#pwchkmessage').html('* 비밀번호가 일치합니다.');
+                    $('#pwchkmessage').html('비밀번호가 일치합니다.');
                     $('#pwchkmessage').css('color', 'blue');
                 }else{
-                    $('#pwchkmessage').html('* 비밀번호를 똑같이 입력해주세요.');
+                    $('#pwchkmessage').html('비밀번호를 똑같이 입력해주세요.');
                     $('#pwchkmessage').css('color', 'red');
                 }
             }

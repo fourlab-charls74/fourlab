@@ -88,8 +88,8 @@ Login
     </div>
     <script type="text/javascript" charset="utf-8">
     function openPopup() {
-        let url = '/head/sign_up';
-        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=840,height=660");
+        let url = '/head/sign-up';
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=800,height=660");
     }
 
     function openMessage() {
