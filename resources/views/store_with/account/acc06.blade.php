@@ -130,27 +130,38 @@
         { field: "store_cd", headerName: "매장코드", pinned: 'left', width: 60, cellStyle: CENTER },
         { field: "store_nm", headerName: "매장명", pinned: 'left', type: 'StoreNameType', width: 150 },
         { field: "manager_nm", headerName: "매니저", pinned: 'left', width: 60, cellStyle: CENTER },
-        { field: "grade_nm", headerName: "등급", pinned: 'left', width: 60, cellStyle: CENTER },
+        { field: "grade_nm", headerName: "수수료등급", pinned: 'left', width: 70, cellStyle: CENTER },
         { headerName: "매출",
 			children: [
-				{ field: "sales_amt", headerName: "소계", width: 100, headerClass: "merged-cell", type: 'currencyMinusColorType',
-					cellRenderer: (params) => {
-						if (params.value == undefined) return 0;
-						return '<a href="#" onClick="popDetail(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>';
-					}
-				},
 				@foreach (@$pr_codes as $pr_code)
 				{ field: "sales_{{ $pr_code->code_id }}_amt", headerName: "{{ $pr_code->code_val }}", type: 'currencyMinusColorType', width: 100, headerClass: "merged-cell" },
 				@endforeach
+				{ field: "sales_amt", headerName: "소계", width: 100, headerClass: "merged-cell", type: 'currencyMinusColorType',
+					cellRenderer: (params) => {
+						if (params.value == undefined) return 0;
+						return '<a href="#" onClick="openDetailPopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>';
+					}
+				},
 			]
         },
-        { headerName: "수수료",
+        // { headerName: "판매처 수수료",
+        //     children: [
+		// 		@foreach (@$pr_codes as $pr_code)
+        //         { headerName: "{{ @$pr_code->code_val }}",
+        //             children: [
+        //                 { headerName: "수수료율", field: "sale_place_fee_rate_{{ @$pr_code->code_id }}", type: 'percentType', width: 60 },
+        //                 { headerName: "수수료", field: "sale_place_fee_amt_{{ @$pr_code->code_id }}", type: 'numberType', width: 100 },
+        //             ]
+        //         },
+		// 		@endforeach
+		// 		{ headerName: "소계", field: "sale_place_fee_amt", type: 'currencyMinusColorType', width: 100,
+		// 			cellStyle: {"font-weight": "bold"},
+		// 			headerClass: "merged-cell"
+		// 		},
+        //     ]
+        // },
+        { headerName: "중간관리자 수수료",
             children: [
-                { headerName: "소계", field: "fee_amt", type: 'currencyMinusColorType', width: 100,
-					// valueFormatter: (params) => formatNumber(params),
-					// valueGetter: (params) => sumSaleFees(params),
-					headerClass: "merged-cell"
-				},
                 { headerName: "정상1",
                     children: [
                         { headerName: "수수료율", field: "fee1", type: 'percentType', width: 60 },
@@ -184,15 +195,25 @@
                 { headerName: "특약(온라인)",
                     children: [
                         { headerName: "수수료율", field: "fee_12", type: 'percentType', width: 60 },
-                        { headerName: "수수료", field: "fee_amt_OL", type: 'currencyType', width: 100 },
+                        { headerName: "수수료", field: "fee_amt_OL", type: 'currencyType', width: 100,
+							cellRenderer: (params) => params.value == 0 ? 0 : '<a href="javascript:void(0);" onClick="openOnlineFeePopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>'
+						},
                     ]
                 },
+				{ headerName: "소계", field: "fee_amt", type: 'currencyMinusColorType', width: 100,
+					headerClass: "merged-cell"
+					// valueFormatter: (params) => formatNumber(params),
+					// valueGetter: (params) => sumSaleFees(params),
+				},
             ]
         },
-        { field: "extra_total", headerName: "기타재반", type: 'currencyMinusColorType' },
-        { field: "", headerName: "수수료+기타재반", type: 'currencyMinusColorType',
-			valueFormatter: (params) => formatNumber(params),
-			valueGetter: (params) => sumFeeExtra(params)
+        { field: "extra_amt", headerName: "기타재반", type: 'currencyMinusColorType', width: 70,
+			cellRenderer: (params) => params.value == 0 ? 0 : '<a href="javascript:void(0);" onClick="openExtraAmtPopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>'
+		},
+        { field: "total_fee_amt", headerName: "수수료합계", type: 'currencyMinusColorType', width: 100,
+			cellStyle: {"font-weight": "bold", "color": "#dd0000"},
+			// valueFormatter: (params) => formatNumber(params),
+			// valueGetter: (params) => sumFeeExtra(params)
 		},
         { width: "auto" }
     ];
@@ -229,9 +250,24 @@
 		return isNaN(sum) ? 0 : sum;
 	};
 
-	function popDetail(store_cd) {
+	// 판매내역 상세
+	function openDetailPopup(store_cd) {
 		const sdate = $('input[name="sdate"]').val();
 		const url = '/store/account/acc06/show/' + store_cd + '/' + sdate;
+		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=800");
+	}
+
+	// 특약(온라인) 판매내역 상세
+	function openOnlineFeePopup(store_cd) {
+		const sdate = $('input[name="sdate"]').val();
+		const url = '/store/account/acc06/show-online?store_cd=' + store_cd + '&sdate=' + sdate;
+		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=800");
+	}
+
+	// 기타재반자료 상세
+	function openExtraAmtPopup(store_cd) {
+		const sdate = $('input[name="sdate"]').val();
+		const url = '/store/account/acc06/show-extra?store_cd=' + store_cd + '&sdate=' + sdate;
 		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=800");
 	}
 
