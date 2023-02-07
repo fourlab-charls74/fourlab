@@ -84,8 +84,8 @@ class stk33Controller extends Controller
                     , s.store_type
                     $com
                 from competitor_sale cs
-                    inner join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor'
-                    inner join store s on s.store_cd = cs.store_cd
+                    left outer join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor'
+                    left outer join store s on s.store_cd = cs.store_cd
                 where 1=1 and sale_date >= '$sdate' and sale_date <= '$edate'
                 $where
                 group by cs.sale_date, cs.store_cd
@@ -117,8 +117,8 @@ class stk33Controller extends Controller
                             , s.store_type
                             $com
                         from competitor_sale cs
-                            inner join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor'
-                            inner join store s on s.store_cd = cs.store_cd
+                            left outer join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor'
+                            left outer join store s on s.store_cd = cs.store_cd
                         where 1=1 and sale_date >= '$sdate' and sale_date <= '$edate'
                         $where
                         group by cs.sale_date, cs.store_cd
