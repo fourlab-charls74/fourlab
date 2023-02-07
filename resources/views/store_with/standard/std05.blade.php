@@ -61,7 +61,7 @@
                                 </div>
                                 <div class="custom-control custom-radio">
                                     <input type="radio" class="custom-control-input" id="sale_apply_T" name="sale_apply" value="tag" />
-                                    <label class="custom-control-label" for="sale_apply_T">Tag가</label>
+                                    <label class="custom-control-label" for="sale_apply_T">정상가</label>
                                 </div>
                             </div>
 						</div>
@@ -168,7 +168,7 @@
     // 등록/상세 팝업창 오픈
     function openPopup(sale_type_cd = '') {
         const url = "/store/standard/std05/show/" + sale_type_cd;
-        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=900,height=900");
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=900,height=1200");
     }
 </script>
 @stop

@@ -134,6 +134,34 @@ class std05Controller extends Controller
 		]);
 	}
 
+	// 판매유형별 브랜드 조회
+	public function search_brand(Request $request, $sale_type_cd = '')
+	{
+		$code = 200;
+
+		$sql = "
+			select brand.brand, brand.brand_nm, b.use_yn, b.sdate, b.edate
+			from brand
+				left outer join sale_type_brand b
+					on brand.brand = b.brand and b.sale_type_cd = :sale_type_cd
+			where 1 = 1
+			order by brand.brand_type,brand.brand_nm
+		";
+
+        $rows = DB::select($sql, ["sale_type_cd" => $sale_type_cd]);
+
+        return response()->json([
+			"code" => $code,
+			"head" => [
+				"total" => count($rows),
+				"page" => 1,
+				"page_cnt" => 1,
+				"page_total" => 1
+			],
+			"body" => $rows
+		]);
+	}
+
 	// 판매유형정보 등록
 	public function add_sale_type(Request $request)
 	{
@@ -170,6 +198,16 @@ class std05Controller extends Controller
 				]);
 			}
 
+			foreach($r['brand_datas'] as $b) {
+				DB::table('sale_type_brand')->insert([
+					'sale_type_cd' => $idx,
+					'brand' => $b['brand'],
+					'brand_nm' => $b['brand_nm'],
+					'use_yn' => $b['use_yn'] ?? "N",
+					'reg_date' => now(),
+				]);
+			}
+	
 			$msg = "정상적으로 저장되었습니다.";
 			DB::commit();
 		} catch (Exception $e) {
@@ -230,6 +268,30 @@ class std05Controller extends Controller
 							'sdate' => $s['sdate'] ?? ($s['use_yn'] == 'Y' ? date("Y-m-d") : null),
 							'edate' => $s['edate'] ?? ($s['use_yn'] == 'Y' ? '9999-12-31' : null),
 							'use_yn' => $s['use_yn'] ?? "N",
+							'mod_date' => now(),
+						]);
+				}
+			}
+
+			foreach($r['brand_datas'] as $b) {
+				$cnt = DB::table('sale_type_brand')
+					->where("sale_type_cd", "=", $idx)
+					->where("brand", "=", $b['brand'])
+					->count();
+				if($cnt < 1) {
+					DB::table('sale_type_brand')->insert([
+						'sale_type_cd' => $idx,
+						'brand' => $b['brand'],
+						'brand_nm' => $b['brand_nm'],
+						'use_yn' => $b['use_yn'] ?? "N",
+						'reg_date' => now(),
+					]);
+				} else {
+					DB::table('sale_type_brand')
+						->where("sale_type_cd", "=", $idx)
+						->where("brand", "=", $b['brand'])
+						->update([
+							'use_yn' => $b['use_yn'] ?? "N",
 							'mod_date' => now(),
 						]);
 				}

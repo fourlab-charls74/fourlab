@@ -131,6 +131,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('std05/search', 'std05Controller@search');
         Route::get('std05/show/{sale_type_cd?}', 'std05Controller@show');
         Route::get('std05/search-store/{sale_type_cd?}', 'std05Controller@search_store');
+        Route::get('std05/search-brand/{sale_type_cd?}', 'std05Controller@search_brand');
 
         Route::post('std05/add', 'std05Controller@add_sale_type');
         Route::put('std05/update', 'std05Controller@update_sale_type');

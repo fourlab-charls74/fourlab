@@ -82,7 +82,7 @@
                                                     </div>
                                                     <div class="custom-control custom-radio">
                                                         <input type="radio" class="custom-control-input" id="sale_apply_T" name="sale_apply" value="tag" @if(@$sale_type->sale_apply == 'tag') checked @endif />
-                                                        <label class="custom-control-label" for="sale_apply_T">Tag가</label>
+                                                        <label class="custom-control-label" for="sale_apply_T">정상가</label>
                                                     </div>
                                                 </div>
                                             </td>
@@ -132,6 +132,22 @@
 				</div>
 			</div>
 		</div>
+        <div class="card_wrap aco_card_wrap">
+			<div class="card shadow">
+				<div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
+					<a href="#">브랜드 정보</a>
+				</div>
+				<div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="table-responsive">
+                                <div id="div-gd-brand" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
+                            </div>
+                        </div>
+                    </div>
+				</div>
+			</div>
+		</div>
 		<div class="card_wrap aco_card_wrap">
 			<div class="card shadow">
 				<div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
@@ -164,6 +180,17 @@
 </div>
 
 <script language="javascript">
+    let brand_columns = [
+        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, maxWidth: 100, cellStyle: {"text-align": "center"}},
+        {field: "use_yn", headerName: "사용", cellStyle: {"text-align": "center"}, pinned: "left",
+            cellRenderer: function(params) {
+                return `<input type="checkbox" onclick="changeUseYnVal2(event, '${params.rowIndex}')" style="width:15px;height:15px;" ${params.value === 'Y' ? "checked" : ""} />`;
+        }},
+        {field: "brand", headerName: "브랜드코드", width: 100},
+        {field: "brand_nm", headerName: "브랜드명", width: 200},
+        {headerName: "", width: "auto"},
+    ];
+
     let columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
         {field: "use_yn", headerName: "사용", cellStyle: {"text-align": "center"}, pinned: "left",
@@ -187,11 +214,13 @@
 </script>
 
 <script type="text/javascript" charset="utf-8">
-    let gx;
+    let gx, gx2;
     const pApp = new App('', { gridId: "#div-gd" });
+    const pApp2 = new App('', { gridId: "#div-gd-brand" });
 
     $(document).ready(function() {
-        pApp.ResizeGrid(480);
+        // 매장정보
+        pApp.ResizeGrid(850);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {
@@ -201,7 +230,21 @@
                 e.node.setSelected(true);
             }
         });
+
+        // 브랜드정보
+        pApp2.ResizeGrid(850);
+        pApp2.BindSearchEnter();
+        let gridDiv2 = document.querySelector(pApp2.options.gridId);
+        gx2 = new HDGrid(gridDiv2, brand_columns, {
+            onCellValueChanged: (e) => {
+                e.node.data.use_yn = 'Y';
+                gx2.gridOptions.api.updateRowData({update: [e.node.data]});
+                e.node.setSelected(true);
+            }
+        });
+
         Search();
+        brandSearch();
 
         setAmtKindText();
     });
@@ -217,9 +260,26 @@
         });
     }
 
+    // 브랜드정보 검색
+    function brandSearch() {
+        let sale_type_cd = "{{ @$sale_type->idx }}";
+        gx2.Request("/store/standard/std05/search-brand/" + sale_type_cd, "", -1, function(d) {
+            gx2.gridOptions.api.forEachNodeAfterFilter(node => {
+                if(node.data.use_yn === 'Y') node.setSelected(true);
+            });
+        });
+    }
+
     // 매장별 사용여부 변경
     function changeUseYnVal(e, rowIndex) {
         const node = gx.getRowNode(rowIndex);
+        node.data.use_yn = e.target.checked ? 'Y' : 'N';
+        node.setSelected(e.target.checked);
+    }
+
+    // 브랜드별 사용여부 변경
+    function changeUseYnVal2(e, rowIndex) {
+        const node = gx2.getRowNode(rowIndex);
         node.data.use_yn = e.target.checked ? 'Y' : 'N';
         node.setSelected(e.target.checked);
     }
@@ -251,6 +311,7 @@
                     location.href = "/store/standard/std05/show/" + res.data.data.sale_type_cd;
                 } else {
                     Search();
+                    brandSearch();
                 }
             } else {
                 console.log(res.data);
@@ -305,6 +366,7 @@
             sale_per: f1.amt_kind.value === 'per' ? unComma(f1.sale_val.value) : '',
             use_yn: f1.use_yn.value,
             store_datas: gx.getRows(),
+            brand_datas: gx2.getRows(),
         }
     }
 
