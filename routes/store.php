@@ -616,6 +616,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('acc06/show/{store_cd}/{sdate}', 'acc06Controller@show');
         Route::get('acc06/show-search', 'acc06Controller@show_search');
         Route::put('acc06/show', 'acc06Controller@closed');
+        Route::get('acc06/show-online', 'acc06Controller@show_online');
+        Route::get('acc06/show-online/search', 'acc06Controller@search_online');
 
         // 매장중간관리자 - 마감
         Route::get('acc07', 'acc07Controller@index');

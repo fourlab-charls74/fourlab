@@ -12,7 +12,8 @@ use Carbon\Carbon;
 
 class acc06Controller extends Controller
 {
-    public function index(Request $request) {
+    public function index(Request $request) 
+	{
         $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 저번 달 기준
 
         $values = [
@@ -785,4 +786,90 @@ class acc06Controller extends Controller
 		]);
 	}
 
+	/** 특약(온라인) 상세판매내역 팝업 */
+	public function show_online(Request $request)
+	{
+		$sdate = $request->input('sdate', now()->format('Y-m'));
+		$store_cd = $request->input('store_cd', '');
+		$store_nm = '';
+
+		if ($store_cd != '') $store_nm = DB::table('store')->where('store_cd', $store_cd)->value('store_nm');
+
+		$values = [
+			'sdate' => $sdate,
+			'store_cd' => $store_cd,
+			'store_nm' => $store_nm,
+		];
+		return view( Config::get('shop.store.view') . '/account/acc06_online', $values );
+	}
+
+	/** 특약(온라인) 상세판매내역 조회 */
+	public function search_online(Request $request)
+	{
+		$sdate = $request->input('sdate', now()->format("Y-m"));
+        $store_cd = $request->input('store_no', '');
+
+        $f_sdate = Carbon::parse($sdate)->firstOfMonth()->format("Ymd");
+        $f_edate = Carbon::parse($sdate)->lastOfMonth()->format("Ymd");
+
+		$sql = "
+			select a.*
+				, act.code_val as sale_type
+				, odt.code_val as ord_type_nm
+				, prc.code_val as pr_code_nm
+				, pyt.code_val as pay_type_nm
+				, if((select count(*) from order_opt where ord_no = a.ord_no) > 1, 'Y', '') as multi_order
+				, 'Y' as tax_yn -- 과세여부 추후 값 변경 필요
+				, ods.code_val as ord_state_nm
+				, cls.code_val as clm_state_nm
+			from (
+				select o.ord_no, w.ord_opt_no
+					, w.ord_state_date, date_format(w.ord_state_date, '%Y-%m-%d') as state_date, date_format(o.ord_date, '%Y-%m-%d') as ord_date
+					, w.ord_state, o.clm_state, date_format(o.dlv_end_date, '%Y-%m-%d') as dlv_end_date
+					, if(w.ord_state in ('60','61'), (
+						select date_format(max(end_date),'%Y-%m-%d') as clm_end_date 
+						from claim
+						where ord_opt_no = w.ord_opt_no
+					), '') as clm_end_date
+					, o.dlv_place_cd as store_cd, w.prd_cd, w.goods_no, w.goods_opt, w.qty, w.wonga, w.price, w.recv_amt, w.ord_kind, w.ord_type
+					, if(w.ord_state = '30', w.recv_amt, 0) as sale_amt
+					, if(w.ord_state in ('60', '61'), w.recv_amt, 0) as clm_amt
+					, if(w.ord_state = '30', 0, 0) as dc_apply_amt -- 할인금액 추후 값 변경 필요
+					, o.pr_code, s.store_nm, p.pay_type, m.user_nm
+					, g.style_no, g.goods_nm, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color, pc.size
+				from order_opt_wonga w
+					inner join order_opt o on o.ord_opt_no = w.ord_opt_no
+					inner join order_mst m on m.ord_no = o.ord_no
+					inner join payment p on p.ord_no = o.ord_no
+					inner join store s on s.store_cd = o.dlv_place_cd
+					inner join goods g on g.goods_no = w.goods_no
+					left outer join product_code pc on pc.prd_cd = w.prd_cd
+				where w.ord_state in (30,60,61)
+					and w.ord_state_date >= :sdate
+					and w.ord_state_date <= :edate
+					and o.dlv_place_type = 'STORE'
+					and o.dlv_place_cd = :store_cd
+			) a
+				left outer join code act on act.code_kind_cd = 'G_ACC_TYPE' and act.code_id = a.ord_state
+				left outer join code odt on odt.code_kind_cd = 'G_ORD_TYPE' and odt.code_id = a.ord_type
+				left outer join code pyt on pyt.code_kind_cd = 'G_PAY_TYPE' and pyt.code_id = a.pay_type
+				left outer join code ods on ods.code_kind_cd = 'G_ORD_STATE' and ods.code_id = a.ord_state
+				left outer join code cls on cls.code_kind_cd = 'G_CLM_STATE' and cls.code_id = a.clm_state
+				left outer join code prc on prc.code_kind_cd = 'PR_CODE' and prc.code_id = a.pr_code
+		";
+
+		if ($store_cd != '') {
+			$result = DB::select($sql, ['store_cd' => $store_cd, 'sdate' => $f_sdate, 'edate' => $f_edate]);
+		} else {
+			$result = [];
+		}
+
+		return response()->json([
+			"code"	=> 200,
+			"head"	=> array(
+				"total"	=> count($result),
+			),
+			"body" => $result
+		]);
+	}
 }
