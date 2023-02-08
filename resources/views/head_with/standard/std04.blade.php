@@ -102,11 +102,11 @@
                                     </div>
                                     <div class="custom-control custom-radio">
                                         <input type="radio" name="cat_auth" id="sch_cat_auth_a" class="custom-control-input" value="A">
-                                        <label class="custom-control-label" for="sch_cat_auth_a">전체</label>
+                                        <label class="custom-control-label" for="sch_cat_auth_a">전체(A)</label>
                                     </div>
                                     <div class="custom-control custom-radio">
                                         <input type="radio" name="cat_auth" id="sch_cat_auth_g" class="custom-control-input" value="G">
-                                        <label class="custom-control-label" for="sch_cat_auth_g">그룹</label>
+                                        <label class="custom-control-label" for="sch_cat_auth_g">그룹(G)</label>
                                     </div>
                                 </div>
                             </div>
@@ -219,10 +219,18 @@
             field: "sort_opt",
             headerName: "정렬",
             width: 75,
+            cellRenderer: function(params) {
+				if(params.value === 'M') return "수동"
+				if(params.value === 'A') return "자동"
+			}
         },
         {
             field: "auth",
             headerName: "권한",
+            cellRenderer: function(params) {
+				if(params.value === 'A') return "전체"
+				if(params.value === 'G') return "그룹"
+			}
         },
         {
             headerName: "조회수",

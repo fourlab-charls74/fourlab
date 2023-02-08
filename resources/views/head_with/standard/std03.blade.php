@@ -479,7 +479,7 @@
 			//editable: true,
 			cellRenderer: function(params) {
 				if(params.value === 'S') return "시스템"
-				else if(params.value === 'U') return "유저"
+				if(params.value === 'U') return "유저"
 			}
 		},
 		{

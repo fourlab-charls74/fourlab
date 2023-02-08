@@ -169,11 +169,11 @@
                                                         <div class="form-inline form-radio-box">
                                                             <div class="custom-control custom-radio">
                                                                 <input type="radio" name="auth" id="auth_a" class="custom-control-input" value="A" @IF($auth != "G") checked @ENDIF>
-                                                                <label class="custom-control-label" for="auth_a" onclick="GroupArea(false);">전체</label>
+                                                                <label class="custom-control-label" for="auth_a" onclick="GroupArea(false);">전체(A)</label>
                                                             </div>
                                                             <div class="custom-control custom-radio">
                                                                 <input type="radio" name="auth" id="auth_g" class="custom-control-input" value="G" @IF($auth == "G") checked @ENDIF>
-                                                                <label class="custom-control-label" for="auth_g" onclick="GroupArea(true);">그룹</label>
+                                                                <label class="custom-control-label" for="auth_g" onclick="GroupArea(true);">그룹(G)</label>
                                                             </div>
                                                         </div>
                                                     </div>
