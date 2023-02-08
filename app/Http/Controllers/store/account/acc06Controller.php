@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Exception;
 
 class acc06Controller extends Controller
 {
@@ -267,6 +268,7 @@ class acc06Controller extends Controller
         return DB::select($sql);
 	}
 
+	/** 상세판매내역 팝업 */
     public function show($store_cd, $sdate)
 	{
 		$store_nm	= "";
@@ -300,6 +302,7 @@ class acc06Controller extends Controller
 		return view( Config::get('shop.store.view') . '/account/acc06_show', $values );
 	}
 
+	/** 상세판매내역 조회 */
 	public function show_search(Request $request)
 	{
         $sdate = $request->input('sdate', now()->format("Y-m"));
@@ -545,24 +548,23 @@ class acc06Controller extends Controller
 
 	}
 
+	/** 마감추가 */
 	public function closed(Request $request)
 	{
+		dd("개발중입니다.");
 		$store_cd = $request->input('store_cd');
 
 		$sdate = $request->input('sdate', now()->format("Y-m"));
-        // $f_sdate = Carbon::parse($sdate)->firstOfMonth()->subMonth()->format("Ymd");
-        // $f_edate = Carbon::parse($sdate)->lastOfMonth()->subMonth()->format("Ymd");
-
-        // 테스트용
         $f_sdate = Carbon::parse($sdate)->firstOfMonth()->format("Ymd");
         $f_edate = Carbon::parse($sdate)->lastOfMonth()->format("Ymd");
 
-		$id		= auth('head')->user()->id;
-		$name	= auth('head')->user()->name;
-        $code	= "000";
-        $msg	= "";
+		$id	= auth('head')->user()->id;
+		$name = auth('head')->user()->name;
+        $code = "000";
+        $msg = "";
 
-		/*
+		/** 
+			<에러코드 구분>
 			999 : 알수 없는 에러
 			000 : 성공
 			100 : 부정확한 요청입니다.
@@ -570,18 +572,20 @@ class acc06Controller extends Controller
 			200 : 자료등록시 오류
 		*/
 
-		if(strlen($f_sdate) != 8 && strlen($f_edate) != 8 && $store_cd != ""){
+		if (strlen($f_sdate) != 8 && strlen($f_edate) != 8 && $store_cd != "") {
 			return response()->json(["code"	=> "100", "msg"	=> "부정확한 요청입니다."]);
 		}
 
 		$sql = "
-			select count(*) as cnt from store_account_closed
-			where store_cd = :store_cd and sday = :sday and eday = :eday limit 0,1
+			select count(*) as cnt 
+			from store_account_closed
+			where store_cd = :store_cd and sday = :sday and eday = :eday 
+			limit 0,1
 		";
-		$row	= DB::selectOne($sql, ['store_cd' => $store_cd, 'sday' => $f_sdate, 'eday' => $f_edate]);
-		$cnt	= $row->cnt;
+		$row = DB::selectOne($sql, ['store_cd' => $store_cd, 'sday' => $f_sdate, 'eday' => $f_edate]);
+		$cnt = $row->cnt;
 
-		if( $cnt > 0 ){
+		if ($cnt > 0) {
 			return response()->json(["code"	=> "110", "msg"	=> "이미 마감처리된 내역이 존재합니다."]);
 		}
 
@@ -589,13 +593,13 @@ class acc06Controller extends Controller
 			// start transaction
 			DB::beginTransaction();
 
-			$sql	= "
+			$sql = "
 				delete from store_account_closed_list
 				where store_cd = :store_cd and sday = :sday and eday = :eday
 			";
 			DB::delete($sql, ['store_cd' => $store_cd, 'sday' => $f_sdate, 'eday' => $f_edate]);
 
-			$sql	= "
+			$sql = "
 				insert into store_account_closed_list
 				(
 					acc_idx, store_cd, sday, eday,
@@ -770,19 +774,15 @@ class acc06Controller extends Controller
 
 			DB::commit();
 
-		} catch(\exception $e) {
-
-			// dd($e);
-
+		} catch(Exception $e) {
 			DB::rollback();
-			$code	= "999";
-			$msg	= $e->getmessage();
-
+			$code = "999";
+			$msg = $e->getmessage();
 		}
 
 		return response()->json([
-			"code"	=> $code,
-			"msg"	=> $msg
+			"code" => $code,
+			"msg" => $msg
 		]);
 	}
 

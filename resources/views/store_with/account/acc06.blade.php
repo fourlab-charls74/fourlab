@@ -41,7 +41,7 @@
 
 			<div class="card-body">
 				<div class="row">
-					<div class="col-lg-4">
+					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="sdate">판매기간(판매연월)</label>
 							<div class="docs-datepicker flex_box">
@@ -57,7 +57,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4">
+					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="store_type">매장구분</label>
 							<div class="flex_box">
@@ -70,7 +70,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4">
+					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="store_kind">매장종류</label>
 							<div class="flex_box">
@@ -85,7 +85,7 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-lg-4">
+					<div class="col-lg-4 inner-td">
 						<div class="form-group">
                             <label for="store_cd">매장명</label>
 							<div class="form-inline inline_btn_box">
@@ -196,7 +196,7 @@
                     children: [
                         { headerName: "수수료율", field: "fee_12", type: 'percentType', width: 60 },
                         { headerName: "수수료", field: "fee_amt_OL", type: 'currencyType', width: 100,
-							cellRenderer: (params) => params.value == 0 ? 0 : '<a href="javascript:void(0);" onClick="openOnlineFeePopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>'
+							cellRenderer: (params) => ['0', null].includes(params.value) ? 0 : '<a href="javascript:void(0);" onClick="openOnlineFeePopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>'
 						},
                     ]
                 },
@@ -208,7 +208,7 @@
             ]
         },
         { field: "extra_amt", headerName: "기타재반", type: 'currencyMinusColorType', width: 70,
-			cellRenderer: (params) => params.value == 0 ? 0 : '<a href="javascript:void(0);" onClick="openExtraAmtPopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>'
+			cellRenderer: (params) => ['0', null].includes(params.value) ? 0 : '<a href="javascript:void(0);" onClick="openExtraAmtPopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>'
 		},
         { field: "total_fee_amt", headerName: "수수료합계", type: 'currencyMinusColorType', width: 100,
 			cellStyle: {"font-weight": "bold", "color": "#dd0000"},

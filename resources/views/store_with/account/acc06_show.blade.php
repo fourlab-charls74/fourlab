@@ -17,7 +17,7 @@
 			</div>
 			<div class="card-body">
 				<div class="row">
-					<div class="col-lg-4">
+					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="sdate">판매일자</label>
 							<div class="docs-datepicker flex_box">
@@ -33,7 +33,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4">
+					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="store_no">매장명</label>
 							<div class="form-inline inline_btn_box">
@@ -43,7 +43,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4">
+					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="ord_state">주문상태</label>
 							<div class="flex_box">
@@ -60,7 +60,7 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-lg-4">
+					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="clm_state">클레임상태</label>
 							<div class="flex_box">
@@ -75,7 +75,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4">
+					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="stat_pay_type">결제방법</label>
 							<div class="form-inline">
@@ -102,7 +102,7 @@
 							</div>
                         </div>
 					</div>
-					<div class="col-lg-4">
+					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 						<label for="ord_type">주문구분</label>
 							<div class="flex_box">
