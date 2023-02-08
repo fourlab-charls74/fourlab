@@ -295,6 +295,7 @@
     function Cmder(type) {
         if(!validation(type)) return;
         if(!window.confirm("판매유형 정보를 저장하시겠습니까?")) return;
+        alert("다소 시간이 소요될 수 있습니다. 잠시만 기다려주세요.");
 
         let url = '/store/standard/std05/' + type;
         let method = type === 'add' ? 'post' : 'put';
