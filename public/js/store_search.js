@@ -495,8 +495,8 @@ const conds = {
     year: '년도',
     season: '시즌',
     gender: '성별',
-    item: '아이템',
-    opt: '품목'
+    opt: '품목',
+    item: '하위품목'
 };
 function SearchPrdcd(){
     this.grid = null;
@@ -810,8 +810,8 @@ const conds_sub = {
     year: '년도',
     season: '시즌',
     gender: '성별',
-    item: '아이템',
-    opt: '품목'
+    opt: '품목',
+    item: '하위품목'
 };
 function SearchPrdcd_sub(){
     this.grid = null;

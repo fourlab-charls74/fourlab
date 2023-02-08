@@ -705,14 +705,14 @@
                                                 <div id="div-gd-prdcd-range-gender" class="ag-theme-balham"></div>
                                             </div>
                                         </div>
-                                        <div class="col-4 col-lg-2 p-1">
-                                            <div class="table-responsive">
-                                                <div id="div-gd-prdcd-range-item" class="ag-theme-balham"></div>
-                                            </div>
-                                        </div>
                                         <div class="col-4 col-lg-2 p-1 pr-0 pr-lg-2">
                                             <div class="table-responsive">
                                                 <div id="div-gd-prdcd-range-opt" class="ag-theme-balham"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 col-lg-2 p-1">
+                                            <div class="table-responsive">
+                                                <div id="div-gd-prdcd-range-item" class="ag-theme-balham"></div>
                                             </div>
                                         </div>
                                     </div>
