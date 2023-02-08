@@ -94,11 +94,11 @@
 								</div>
 								<div class="custom-control custom-radio">
 									<input type="radio" name="brand_type" id="sch_brand_type_y" class="custom-control-input" value="S">
-									<label class="custom-control-label" for="sch_brand_type_y">S</label>
+									<label class="custom-control-label" for="sch_brand_type_y">시스템(S)</label>
 								</div>
 								<div class="custom-control custom-radio">
 									<input type="radio" name="brand_type" id="sch_brand_type_n" class="custom-control-input" value="U">
-									<label class="custom-control-label" for="sch_brand_type_n">U</label>
+									<label class="custom-control-label" for="sch_brand_type_n">유저(U)</label>
 								</div>
 							</div>
 						</div>
@@ -237,11 +237,11 @@
 														<div class="form-inline form-radio-box">
 															<div class="custom-control custom-radio">
 																<input type="radio" name="brand_type" id="brand_type_s" class="custom-control-input" value="S" checked>
-																<label class="custom-control-label" for="brand_type_s">S</label>
+																<label class="custom-control-label" for="brand_type_s">시스템(S)</label>
 															</div>
 															<div class="custom-control custom-radio">
 																<input type="radio" name="brand_type" id="brand_type_u" class="custom-control-input" value="U">
-																<label class="custom-control-label" for="brand_type_u">U</label>
+																<label class="custom-control-label" for="brand_type_u">유저(U)</label>
 															</div>
 														</div>
 													</div>
@@ -477,6 +477,10 @@
 			width: 50,
 			cellStyle: StyleGoodsTypeNM,
 			//editable: true,
+			cellRenderer: function(params) {
+				if(params.value === 'S') return "시스템"
+				else if(params.value === 'U') return "유저"
+			}
 		},
 		{
 			field: "brand",
