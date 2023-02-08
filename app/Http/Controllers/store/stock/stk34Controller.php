@@ -165,27 +165,28 @@ class stk34Controller extends Controller
                     cd.code_id as competitor_cd
                     , cd.code_val as competitor_nm
                     , com.store_cd
-                    , cs.sale_amt
+                    , cs.sale_amt as sale_amt
                     , cs.sale_date
                 from code cd
                     left outer join competitor com on cd.code_id = com.competitor_cd 
                     left outer join competitor_sale cs on cs.competitor_cd = com.competitor_cd
                 where cd.code_kind_cd = 'COMPETITOR' and cd.use_yn = 'Y'and com.use_yn = 'Y' and com.store_cd = '$store_no'
                 $where
+                group by cs.competitor_cd
             
             ";
         } else {
 
             $sql = "
-            select 
-                cd.code_id as competitor_cd
-                , cd.code_val as competitor_nm
-                , com.store_cd
-            from code cd
-                left outer join competitor com on cd.code_id = com.competitor_cd
-            where cd.code_kind_cd = 'COMPETITOR' and cd.use_yn = 'Y' and com.use_yn = 'Y' and com.store_cd = '$store_no'
-            
-        ";
+                select 
+                    cd.code_id as competitor_cd
+                    , cd.code_val as competitor_nm
+                    , com.store_cd
+                from code cd
+                    left outer join competitor com on cd.code_id = com.competitor_cd
+                where cd.code_kind_cd = 'COMPETITOR' and cd.use_yn = 'Y' and com.use_yn = 'Y' and com.store_cd = '$store_no'
+                
+            ";
 
         }
 
@@ -211,37 +212,34 @@ class stk34Controller extends Controller
         $day = $request->input('day');
 
 
-        dd($data);
-        
         try {
             DB::beginTransaction();
-            
+
+            $day_arr = [ '00','01','02','03','04','05','06','07','08','09','10'
+                        ,'11','12','13','14','15','16','17','18','19','20'
+                        ,'21','22','23','24','25','26','27','28','29','30','31'];
+
+
             foreach($data as $rows) {
-                
-                for($i = 1; $i <= $day; $i++){
+                $store_cd = $rows['store_cd'];
+                $competitor_cd = $rows['competitor_cd'];
+
+                dd($rows);
+
+                $values = [
+                    'store_cd' => $store_cd,
+                    'competitor_cd' => $competitor_cd,
+                    // 'sale_date' => ,
+                    // 'sale_amt' => ,
+                    'admin_id' => $admin_id,
+                    'rt' => now(),
+                    'ut' => now()
+
+                ];
 
 
-                    $where	= [
-                        'store_cd' => $rows['store_cd'], 
-                        'competitor_cd' => $rows['competitor_cd'],
-                        'sale_date' => $date
-                    ];
 
-
-                    $values	= [
-                        'store_cd' => $rows['store_cd'],
-                        'competitor_cd' => $rows['competitor_cd'],
-                        'sale_date' => $date,
-                        'sale_amt_'.$i => $rows['sale_amt_'.$i],
-                        'admin_id' => $admin_id,
-                        'rt' => now(),
-                        'ut' => now()
-                    ];
-
-                }
-
-                DB::table('competitor_sale')
-                        ->updateOrInsert($where, $values);
+                DB::table('competitor_sale')->insert($values);
             }
             DB::commit();
             $code = 200;

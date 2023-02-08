@@ -104,10 +104,19 @@
                 onCellValueChanged: (e) => {
                     // e.node.setSelected(true);
                     for (let i = 1; i <= sale_date;i++) {
-                        if (e.column.colId == "sale_amt_" + i) {
-                            if (isNaN(e.newValue) == true) {
-                                alert("숫자만 입력가능합니다.");
-                                gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                        if (i<10) {
+                            if (e.column.colId == "sale_amt_0" + i) {
+                                if (isNaN(e.newValue) == true) {
+                                    alert("숫자만 입력가능합니다.");
+                                    gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                                }
+                            }
+                        } else {
+                            if (e.column.colId == "sale_amt_" + i) {
+                                if (isNaN(e.newValue) == true) {
+                                    alert("숫자만 입력가능합니다.");
+                                    gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                                }
                             }
                         }
                     }
@@ -179,6 +188,9 @@
         function Save_amt() {
             let store_no = document.getElementById('store_no').value;
             let date = document.getElementById('date').value;
+            let data = gx.getRows();
+
+            console.log(data);
 
             if (store_no === '') {
                 alert('매장을 선택해주세요');
