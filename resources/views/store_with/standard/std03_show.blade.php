@@ -70,18 +70,18 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="required">창고명칭</th>
+                                            <th class="required">창고명</th>
                                             <td>
                                                 <div class="form-inline">
                                                     <input type="text" name="storage_nm" id="storage_nm" value="{{ @$storage->storage_nm }}" class="form-control form-control-sm w-100" />
                                                 </div>
                                             </td>
-                                            <th class="required">창고명칭(약칭)</th>
+                                            <!-- <th class="required">창고명칭(약칭)</th>
                                             <td>
                                                 <div class="form-inline">
                                                     <input type="text" name="storage_nm_s" id="storage_nm_s" value="{{ @$storage->storage_nm_s }}" class="form-control form-control-sm w-100" />
                                                 </div>
-                                            </td>
+                                            </td> -->
                                         </tr>
                                         <tr>
                                             <th>주소</th>
@@ -183,6 +183,7 @@
 
     const is_exit_default_storage = "{{ @$is_exit_default_storage }}";
     const is_exit_online_storage = "{{ @$is_exit_online_storage }}";
+    let storage_nm = "{{ @$storage->storage_nm }}";
 
     function Cmder(type) {
         if(type === "add") addStorage();
@@ -193,7 +194,7 @@
     // 창고정보 등록
     async function addStorage() {
         if(!validation('add')) return;
-        if(!window.confirm("창고정보를 등록하시겠습니까?")) return;
+        if(!window.confirm("[" + storage_nm + "] 에 대한 정보를 등록하시겠습니까?")) return;
 
         if(f1.default_yn.checked && '{{ @$storage->default_yn }}' !== "Y" && is_exit_default_storage === 'true') {
             if(!confirm("해당 창고를 대표창고로 설정하실 경우, 기존에 대표창고로 설정된 창고는 대표창고에서 제외됩니다.")) return;
@@ -222,6 +223,7 @@
 
     // 창고정보 수정
     async function updateStorage() {
+        
         if(!validation('update')) return;
 
         if('{{ @$storage->default_yn }}' === "Y" && !f1.default_yn.checked) {
@@ -236,10 +238,11 @@
         }
         if(f1.online_yn.checked && '{{ @$storage->online_yn }}' !== "Y" && is_exit_online_storage === 'true') {
             if(!confirm("해당 창고를 온라인창고로 설정하실 경우, 기존에 온라인창고로 설정된 창고는 온라인창고에서 제외됩니다.")) return;
+            if('{{ @$storage->default_yn }}' === "Y") alert("대표창고 [" + storage_nm + "] 이/가 대표창고 및 온라인 창고로 수정됩니다.");
         }
 
-        if(!window.confirm("창고정보를 수정하시겠습니까?")) return;
-
+        if(!window.confirm("[" + storage_nm + "] 에 대한 정보를 수정하시겠습니까?")) return;
+        
         axios({
             url: `/store/standard/std03/update`,
             method: 'put',
@@ -284,7 +287,7 @@
         return {
             storage_cd: f1.storage_cd.value,
             storage_nm: f1.storage_nm.value,
-            storage_nm_s: f1.storage_nm_s.value,
+            // storage_nm_s: f1.storage_nm_s.value,
             zipcode: f1.zipcode.value,
             addr1: f1.addr1.value,
             addr2: f1.addr2.value,
@@ -351,10 +354,10 @@
         }
 
         // 창고명칭(약칭) 입력여부
-        if(f1.storage_nm_s.value.trim() === '') {
-            f1.storage_nm_s.focus();
-            return alert("창고명칭(약칭)을 입력해주세요.");
-        }
+        // if(f1.storage_nm_s.value.trim() === '') {
+        //     f1.storage_nm_s.focus();
+        //     return alert("창고명칭(약칭)을 입력해주세요.");
+        // }
 
         // 주소 입력여부
         // if(f1.zipcode.value === '') return alert("주소를 입력해주세요.");

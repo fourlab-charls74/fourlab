@@ -63,7 +63,7 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-							<label>매장재고조회</label>
+							<label>매장조회여부</label>
                             <div class="form-inline form-radio-box">
                                 <div class="custom-control custom-radio">
                                     <input type="radio" class="custom-control-input" id="stock_check_yn_A" name="stock_check_yn" value="" checked />
@@ -119,7 +119,7 @@
         {field: "storage_nm", headerName: "창고명", width: 200},
         {field: "phone", headerName: "전화번호", width: 120, cellStyle: {"text-align": "center"}},
         {field: "use_yn", headerName: "창고사용", cellStyle: {"text-align": "center"}},
-        {field: "stock_check_yn", headerName: "매장재고조회", cellStyle: {"text-align": "center"}},
+        {field: "stock_check_yn", headerName: "매장조회여부", cellStyle: {"text-align": "center"}},
         {field: "default_yn", headerName: "대표창고",
             cellStyle: (params) => ({"text-align": "center", "background-color": params.value === "Y" ? "#FFACAC" : "none"}),
         },

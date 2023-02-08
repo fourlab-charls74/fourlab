@@ -119,7 +119,7 @@ class std03Controller extends Controller
 		$admin_id = Auth('head')->user()->id;
 		$storage_cd = $request->input("storage_cd", "");
 		$storage_nm = $request->input("storage_nm", "");
-		$storage_nm_s = $request->input("storage_nm_s", "");
+		// $storage_nm_s = $request->input("storage_nm_s", "");
 		$zipcode = $request->input("zipcode", "");
 		$addr1 = $request->input("addr1", "");
 		$addr2 = $request->input("addr2", "");
@@ -147,7 +147,7 @@ class std03Controller extends Controller
 			DB::table('storage')->insert([
 				'storage_cd' => $storage_cd,
 				'storage_nm' => $storage_nm,
-				'storage_nm_s' => $storage_nm_s,
+				// 'storage_nm_s' => $storage_nm_s,
 				'zipcode' => $zipcode,
 				'addr1' => $addr1,
 				'addr2' => $addr2,
@@ -183,7 +183,7 @@ class std03Controller extends Controller
 		$admin_id = Auth('head')->user()->id;
 		$storage_cd = $request->input("storage_cd", "");
 		$storage_nm = $request->input("storage_nm", "");
-		$storage_nm_s = $request->input("storage_nm_s", "");
+		// $storage_nm_s = $request->input("storage_nm_s", "");
 		$zipcode = $request->input("zipcode", "");
 		$addr1 = $request->input("addr1", "");
 		$addr2 = $request->input("addr2", "");
@@ -212,7 +212,7 @@ class std03Controller extends Controller
 				->update([
 					'storage_cd' => $storage_cd,
 					'storage_nm' => $storage_nm,
-					'storage_nm_s' => $storage_nm_s,
+					// 'storage_nm_s' => $storage_nm_s,
 					'zipcode' => $zipcode,
 					'addr1' => $addr1,
 					'addr2' => $addr2,
