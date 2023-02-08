@@ -132,7 +132,8 @@
 				</div>
 			</div>
 		</div>
-        <div class="card_wrap aco_card_wrap">
+        <!-- 2023.02.08 김나영 추후 작업 -->
+        <div class="card_wrap aco_card_wrap" hidden>
 			<div class="card shadow">
 				<div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
 					<a href="#">브랜드 정보</a>
@@ -220,7 +221,7 @@
 
     $(document).ready(function() {
         // 매장정보
-        pApp.ResizeGrid(850);
+        pApp.ResizeGrid(570);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {
@@ -232,7 +233,7 @@
         });
 
         // 브랜드정보
-        pApp2.ResizeGrid(850);
+        pApp2.ResizeGrid(570);
         pApp2.BindSearchEnter();
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
         gx2 = new HDGrid(gridDiv2, brand_columns, {

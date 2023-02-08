@@ -168,7 +168,7 @@
     // 등록/상세 팝업창 오픈
     function openPopup(sale_type_cd = '') {
         const url = "/store/standard/std05/show/" + sale_type_cd;
-        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=900,height=1200");
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=900,height=900");
     }
 </script>
 @stop
