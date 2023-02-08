@@ -77,12 +77,14 @@ class std03Controller extends Controller
 
 		$is_exit_default_storage = DB::table('storage')->where('default_yn', '=', 'Y')->count();
 		$is_exit_online_storage = DB::table('storage')->where('online_yn', '=', 'Y')->count();
+		$prev_default_storage = DB::table('storage')->where('default_yn', '=', 'Y')->value('storage_nm');
 
 		$values = [
 			"cmd" => $storage_cd == '' ? "add" : "update",
 			"storage" => $storage,
 			"is_exit_default_storage" => $is_exit_default_storage > 0 ? 'true' : 'false',
 			"is_exit_online_storage" => $is_exit_online_storage > 0 ? 'true' : 'false',
+			"prev_default_storage" => $prev_default_storage != "" ? $prev_default_storage : '',
 		];
 
 		return view(Config::get('shop.store.view') . '/standard/std03_show', $values);
