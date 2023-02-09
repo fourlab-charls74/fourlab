@@ -822,6 +822,7 @@ class acc06Controller extends Controller
 				, 'Y' as tax_yn -- 과세여부 추후 값 변경 필요
 				, ods.code_val as ord_state_nm
 				, cls.code_val as clm_state_nm
+				, com.com_nm as sale_place_nm
 			from (
 				select o.ord_no, w.ord_opt_no
 					, w.ord_state_date, date_format(w.ord_state_date, '%Y-%m-%d') as state_date, date_format(o.ord_date, '%Y-%m-%d') as ord_date
@@ -835,7 +836,7 @@ class acc06Controller extends Controller
 					, if(w.ord_state = '30', w.recv_amt, 0) as sale_amt
 					, if(w.ord_state in ('60', '61'), w.recv_amt, 0) as clm_amt
 					, if(w.ord_state = '30', 0, 0) as dc_apply_amt -- 할인금액 추후 값 변경 필요
-					, o.pr_code, s.store_nm, p.pay_type, m.user_nm
+					, o.pr_code, o.sale_place, s.store_nm, p.pay_type, m.user_nm
 					, g.style_no, g.goods_nm, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color, pc.size
 				from order_opt_wonga w
 					inner join order_opt o on o.ord_opt_no = w.ord_opt_no
@@ -856,6 +857,7 @@ class acc06Controller extends Controller
 				left outer join code ods on ods.code_kind_cd = 'G_ORD_STATE' and ods.code_id = a.ord_state
 				left outer join code cls on cls.code_kind_cd = 'G_CLM_STATE' and cls.code_id = a.clm_state
 				left outer join code prc on prc.code_kind_cd = 'PR_CODE' and prc.code_id = a.pr_code
+				left outer join company com on com.com_id = a.sale_place
 		";
 
 		if ($store_cd != '') {

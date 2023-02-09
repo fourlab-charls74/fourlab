@@ -94,6 +94,7 @@
 		{field: "clm_amt", headerName: "클레임금액", width: 90, type: 'currencyType', aggregation: true},
 		{field: "ord_type_nm", headerName: "주문구분", width: 60, cellStyle: CENTER},
 		{field: "pr_code_nm", headerName: "행사구분", width: 60, cellStyle: CENTER},
+		{field: "sale_place_nm", headerName: "판매처", width: 80, cellStyle: CENTER},
 		{field: "store_cd",	headerName: "배송매장코드", width: 80, cellStyle: CENTER},
 		{field: "store_nm",	headerName: "배송매장명", width: 100},
 		{field: "user_nm", headerName: "주문자", width: 60, cellStyle: CENTER},

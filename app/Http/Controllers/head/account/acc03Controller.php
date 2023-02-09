@@ -52,7 +52,7 @@ class acc03Controller extends Controller
 				a.sale_net_taxation_amt, a.sale_net_taxfree_amt,a.sale_net_amt,a.tax_amt,
 				a.fee, a.fee_dc_amt, a.fee_net, a.acc_amt, a.allot_amt,
 
-				date_format(a.tax_day,'%Y%m%d') as tax_day,
+				-- date_format(a.tax_day,'%Y%m%d') as tax_day,
 				date_format(a.pay_day,'%Y%m%d') as pay_day,
 				a.idx,a.com_id,a.sday,a.eday
 			from
