@@ -9,7 +9,7 @@
                     <li><a href="/shop/standard/std03">(완)창고관리</a></li>
                     <li><a href="/shop/standard/std04">(완)동종업계관리</a></li>
                     <li><a href="/shop/standard/std05">(완)판매유형관리</a></li>
-                    <!--<li><a href="/shop/standard/std06">(개)매장영업담당자관리</a></li>//-->
+                    {{--<!--<li><a href="/shop/standard/std06">(개)매장영업담당자관리</a></li>//-->--}}
                     <li><a href="/shop/standard/std07">(완)매장마진관리</a></li>
                     <li><a href="/shop/standard/std08">(완)매장등급관리</a></li>
                 </ul>

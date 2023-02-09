@@ -69,6 +69,7 @@
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
 								<label>상품코드</label>
+								<!-- 주석날리기 -->
 								<!-- <div class="form-inline">
 									<div class="form-inline-inner input-box w-100">
 										<div class="form-inline inline_btn_box">
