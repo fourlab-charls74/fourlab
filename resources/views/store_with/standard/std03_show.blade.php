@@ -183,26 +183,49 @@
 
     const is_exit_default_storage = "{{ @$is_exit_default_storage }}";
     const is_exit_online_storage = "{{ @$is_exit_online_storage }}";
-    let storage_nm = "{{ @$storage->storage_nm }}";
     let prev_default_storage = "{{ @$prev_default_storage }}";
+    let storage_nm = "";
 
     function Cmder(type) {
-        if(type === "add") addStorage();
-        else if(type === "update") updateStorage();
-        else if(type === "delete") deleteStorage();
+        if(type === "add") {
+            storage_nm = $("#storage_nm").val();
+            addStorage();
+        } else if(type === "update") {
+            storage_nm = "{{ @$storage->storage_nm }}";
+            updateStorage();
+        } else if(type === "delete") {
+            storage_nm = "{{ @$storage->storage_nm }}";
+            deleteStorage();
+        }
     }
 
     // 창고정보 등록
     async function addStorage() {
         if(!validation('add')) return;
-        if(!window.confirm("[" + storage_nm + "] 에 대한 정보를 등록하시겠습니까?")) return;
+        let storage_cd = $("#storage_cd").val();
+        let alertmsg = "입력하신 내용을 확인해주세요.\n\n창고코드 : " + storage_cd + "\n창고명 : " + storage_nm;
+        if($("#addr1").val() != "" || $("#addr2").val() != "") alertmsg += "\n주소 : "
+        if($("#addr1").val() != "") alertmsg += $("#addr1").val() + " ";
+        if($("#addr2").val() != "") alertmsg += $("#addr2").val() + " ";
+        if($("#phone").val() != "") alertmsg += "\n전화번호 : " + $("#phone").val();
+        if($("#fax").val() != "") alertmsg += "\nFAX번호 : " + $("#fax").val();
+        if($("#ceo").val() != "") alertmsg += "\n대표자명 : " + $("#ceo").val();
+        if($('input[name="use_yn"]:checked')) alertmsg += "\n창고사용여부 : " + $('input[name="use_yn"]:checked').val();
+        if($('input[name="loss_yn"]:checked')) alertmsg += "\nLOSS창고여부 : " + $('input[name="loss_yn"]:checked').val();
+        if($('input[name="stock_check_yn"]:checked')) alertmsg += "\n매장재고조회여부 : " + $('input[name="stock_check_yn"]:checked').val();
+        if($("#comment").val() != "") alertmsg += "\n설명 : " + $("#comment").val();
 
-        if(f1.default_yn.checked && '{{ @$storage->default_yn }}' !== "Y" && is_exit_default_storage === 'true') {
-            if(!confirm("해당 창고를 대표창고로 설정하실 경우, 기존에 대표창고로 설정된 창고는 대표창고에서 제외됩니다.")) return;
+        
+        if(f1.default_yn.checked && '{{ @$storage->default_yn }}' !== "Y" && is_exit_default_storage === 'true' && prev_default_storage != "") {
+            if(!confirm("[" + storage_nm + "] 를 대표창고로 설정하실 경우, 기존에 대표창고로 설정된 [" + prev_default_storage + "] 는 대표창고에서 제외됩니다.")) return;
         }
         if(f1.online_yn.checked && '{{ @$storage->online_yn }}' !== "Y" && is_exit_online_storage === 'true') {
             if(!confirm("해당 창고를 온라인창고로 설정하실 경우, 기존에 온라인창고로 설정된 창고는 온라인창고에서 제외됩니다.")) return;
         }
+
+        if(!window.confirm(alertmsg)) return;
+
+        if(!window.confirm("[" + storage_nm + "] 에 대한 정보를 등록하시겠습니까?")) return;
 
         axios({
             url: `/store/standard/std03/add`,
@@ -224,7 +247,6 @@
 
     // 창고정보 수정
     async function updateStorage() {
-        
         if(!validation('update')) return;
 
         if('{{ @$storage->default_yn }}' === "Y" && !f1.default_yn.checked) {
@@ -263,7 +285,7 @@
 
     // 창고정보 삭제
     async function deleteStorage() {
-        if(!window.confirm("해당 창고정보를 삭제하시겠습니까?")) return;
+        if(!window.confirm("[" + storage_nm + "] 에 대한 정보를 삭제하시겠습니까?")) return;
 
         axios({
             url: `/store/standard/std03/delete/` + f1.storage_cd.value,
@@ -347,10 +369,10 @@
             if($("[name='storage_only']").val() !== "true") return alert("창고코드를 중복체크해주세요.");
         }
 
-        // 창고명칭 입력여부
+        // 창고명 입력여부
         if(f1.storage_nm.value.trim() === '') {
             f1.storage_nm.focus();
-            return alert("창고명칭을 입력해주세요.");
+            return alert("창고명을 입력해주세요.");
         }
 
         // 창고명칭(약칭) 입력여부
