@@ -87,7 +87,7 @@ class acc07Controller extends Controller
         $idx = $request->input('idx');
         $sql = "
             select
-                a.reg_date, a.closed_date, a.closed_yn,
+                a.rt, a.closed_date, a.closed_yn,
                 a.store_cd, c.store_nm, c.store_type,
                 a.sday, a.eday, a.admin_id, a.admin_nm
             from store_account_closed a inner join store c on a.store_cd = c.store_cd
@@ -99,7 +99,7 @@ class acc07Controller extends Controller
 			$sday = $row->sday;
 			$eday = $row->eday;
 			$store_nm = $row->store_nm;
-			$reg_date = $row->reg_date;
+			$rt = $row->rt;
 			$closed_date = $row->closed_date;
 			$closed_yn = $row->closed_yn;
 			$admin_nm = $row->admin_nm;
@@ -107,7 +107,7 @@ class acc07Controller extends Controller
 			$sday = "";
 			$eday = "";
 			$store_nm = "";
-			$reg_date = "";
+			$rt = "";
 			$closed_date = "";
 			$closed_yn = "";
 			$admin_nm = "";
@@ -118,7 +118,7 @@ class acc07Controller extends Controller
 			"sday"			=> $sday,
 			"eday"			=> $eday,
 			"store_nm"		=> $store_nm,
-			"reg_date"		=> $reg_date,
+			"rt"		=> $rt,
 			"closed_date"	=> $closed_date,
 			"closed_yn"		=> $closed_yn,
 			"admin_nm"		=> $admin_nm
@@ -157,7 +157,7 @@ class acc07Controller extends Controller
 					where
 						ord_opt_no = o.ord_opt_no),''
 				) as clm_end_date,
-				w.bigo, g.goods_no, g.goods_sub, w.idx, w.acc_idx
+				w.memo, g.goods_no, g.goods_sub, w.idx, w.acc_idx
 			from
 				store_account_closed closed
 				inner join store_account_closed_list w on w.acc_idx = closed.idx
@@ -227,7 +227,7 @@ class acc07Controller extends Controller
 				$fee_net 		= str_replace(",", "", $fields[9]);
 
 				$acc_amt 		= str_replace(",", "", $fields[10]);
-				$bigo	 		= str_replace(",", "", $fields[11]);
+				$memo	 		= str_replace(",", "", $fields[11]);
 				$idx	 		= str_replace(",", "", $fields[12]);
 
 				$sql = "
@@ -241,7 +241,7 @@ class acc07Controller extends Controller
 						fee_ratio				= :fee_ratio,
 						fee						= :fee,
 						fee_net	 				= :fee_net,
-						bigo					= :bigo,
+						memo					= :memo,
 						acc_amt					= :acc_amt
 					where
 						idx = :idx
@@ -258,7 +258,7 @@ class acc07Controller extends Controller
 						'fee_ratio' => $fee_ratio,
 						'fee' => $fee,
 						'fee_net' => $fee_net,
-						'bigo' => $bigo,
+						'memo' => $memo,
 						'acc_amt' => $acc_amt,
 						'idx' => $idx
 					]

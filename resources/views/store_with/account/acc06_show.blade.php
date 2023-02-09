@@ -247,21 +247,25 @@
 	}
 
 	function Closed() {
-		if(confirm('해당 내용을 마감내역에 추가 하시겠습니까?')){
+		const store_cd = document.search.store_no.value;
+		const store_nm = document.search.store_nm.value;
+		const sdate = document.search.sdate.value;
 
+		if(confirm(`${sdate} [ ${store_nm} ] 정산내용을 마감내역에 추가하시겠습니까?`)) {
 			$.ajax({
 				async: false,
 				type: 'put',
-				url: '/store/account/acc06/show',
+				url: '/store/account/acc06/closed',
 				data: {
-					store_cd : document.search.store_no.value,
-					sdate : document.search.sdate.value
+					store_cd : store_cd,
+					sdate : sdate
 				},
 				success: function(data) {
-					cbClosed(data);
+					// cbClosed(data);
 				},
 				error: function(request, status, error) {
 					console.log("error")
+					alert("개발중입니다.");
 				}
 			});
 

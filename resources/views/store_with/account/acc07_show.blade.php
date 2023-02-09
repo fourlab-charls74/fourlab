@@ -71,10 +71,10 @@
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="reg_date">등록일</label>
+                                <label for="rt">등록일</label>
                                 <div class="flex_box">
                                     <div class="form-control-sm text">
-                                        {{ $reg_date }}
+                                        {{ $rt }}
                                     </div>
                                 </div>
                             </div>

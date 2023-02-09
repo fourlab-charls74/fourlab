@@ -551,15 +551,15 @@ class acc06Controller extends Controller
 	/** 마감추가 */
 	public function closed(Request $request)
 	{
-		dd("개발중입니다.");
 		$store_cd = $request->input('store_cd');
 
 		$sdate = $request->input('sdate', now()->format("Y-m"));
+		$nowdate = now()->format("Ymd");
         $f_sdate = Carbon::parse($sdate)->firstOfMonth()->format("Ymd");
         $f_edate = Carbon::parse($sdate)->lastOfMonth()->format("Ymd");
 
-		$id	= auth('head')->user()->id;
-		$name = auth('head')->user()->name;
+		$admin_id	= auth('head')->user()->id;
+		$admin_nm = auth('head')->user()->name;
         $code = "000";
         $msg = "";
 
@@ -567,13 +567,18 @@ class acc06Controller extends Controller
 			<에러코드 구분>
 			999 : 알수 없는 에러
 			000 : 성공
-			100 : 부정확한 요청입니다.
+			100 : 부정확한 요청
 			110 : 마감처리된 내역
 			200 : 자료등록시 오류
 		*/
 
-		if (strlen($f_sdate) != 8 && strlen($f_edate) != 8 && $store_cd != "") {
-			return response()->json(["code"	=> "100", "msg"	=> "부정확한 요청입니다."]);
+		if (strlen($f_sdate) != 8 || strlen($f_edate) != 8 || $store_cd == "") {
+			return response()->json(["code"	=> "100", "msg"	=> "판매일자/매장정보가 부정확한 값입니다."]);
+		}
+
+		$account_yn = DB::table('store')->where('store_cd', $store_cd)->value('account_yn');
+		if ($account_yn != 'Y') {
+			return response()->json(["code"	=> "100", "msg"	=> "헤딩 메징은 정산관리가 허용되지 않은 매장입니다."]);
 		}
 
 		$sql = "
@@ -589,188 +594,310 @@ class acc06Controller extends Controller
 			return response()->json(["code"	=> "110", "msg"	=> "이미 마감처리된 내역이 존재합니다."]);
 		}
 
+		dd("test중입니다.");
 		try {
 			// start transaction
 			DB::beginTransaction();
 
-			$sql = "
-				delete from store_account_closed_list
-				where store_cd = :store_cd and sday = :sday and eday = :eday
-			";
-			DB::delete($sql, ['store_cd' => $store_cd, 'sday' => $f_sdate, 'eday' => $f_edate]);
+			// 1. store_account_closed 에 새로운 마감 추가
+			$acc_idx = DB::table('store_account_closed')->insertGetId([
+				'store_cd' => $store_cd,
+				'sday' => $f_sdate,
+				'eday' => $f_edate,
+				'admin_id' => $admin_id,
+				'admin_nm' => $admin_nm,
+				'rt' => now(),
+			]);
 
+			// 2. store_account_closed_list 에 1에서 추가한 마감의 상세판매내역정보를 추가
+			/*
+				dc_amt : TAG가 - 판매가
+				coupon_amt : order_opt_wonga 의 coupon_apply_amt
+			*/
 			$sql = "
 				insert into store_account_closed_list
 				(
-					acc_idx, store_cd, sday, eday,
-					type, ord_opt_no, state_date,
-
-					qty, sale_amt, clm_amt, sale_fee,
-					sale_clm_amt, dc_amt, coupon_amt, dlv_amt,
-
-					sale_net_taxation_amt, sale_net_taxfree_amt, sale_net_amt, tax_amt,
-
-					fee_ratio, fee, fee_dc_amt, allot_amt, etc_amt, fee_net, acc_amt, bigo
+					acc_idx, type, sale_type, ord_opt_no, state_date, qty
+					, sale_amt, clm_amt, dc_amt, coupon_amt, allot_amt, dlv_amt
+					, sale_net_taxation_amt, sale_net_taxfree_amt, sale_net_amt
+					, tax_amt, fee_ratio, fee, memo
+					, sale_fee, sale_clm_amt, etc_amt, fee_dc_amt, fee_net, acc_amt
 				)
-				select
-					0 as acc_idx, '$store_cd' as store_cd, '$f_sdate' as sday, '$f_edate' as eday,
-					w.type, w.ord_opt_no, w.state_date,
-
-					w.qty as qty, w.sale_amt, w.clm_amt, w.fee as sale_fee,
-					0 as sale_clm_amt, w.dc_apply_amt, w.coupon_apply_amt, w.dlv_amt,
-
-					( w.sale_net_amt + w.dlv_amt + w.etc_amt ) as sale_net_taxation_amt,
-					'0' as sale_net_taxfree_amt,
-					( w.sale_net_amt + w.dlv_amt + w.etc_amt ) as sale_net_amt,
-					floor(( w.sale_net_amt + w.dlv_amt ) / 11) as tax_amt,
-
-					/* 본사 수수료 */
-					round(w.fee_ratio, 2) as fee_ratio,
-					w.fee,
-					w.dc_apply_amt as fee_dc_amt,
-					/*( w.coupon_apply_amt - w.allot_amt ) as fee_allot_amt, */
-					( w.allot_amt ) as fee_allot_amt,
-					w.etc_amt as fee_etc_amt,
-					( w.fee - w.dc_apply_amt ) as fee_net_amt,
-
-					/* 정산 금액 */
-					(( w.sale_net_amt + w.dlv_amt + w.etc_amt ) - ( w.fee - w.dc_apply_amt ) ) as acc_amt,
-
-					'' as bigo
-				from
-				(
-					select
-						ord_opt_no
-						, round(sum(type)) as type
-						, max(state_date) as state_date
-						, sum(qty) as qty, sum(sale_qty) as sale_qty
-						, sum(sale_amt) as sale_amt, sum(clm_amt) as clm_amt
-						, sum(coupon_apply_amt) as coupon_apply_amt
-						, sum(/*dc_apply_amt*/ 0) as dc_apply_amt
-						, sum(sale_amt + clm_amt - dc_apply_amt - ( coupon_apply_amt - allot_amt) ) as sale_net_amt
-						, sum(dlv_amt) as dlv_amt
-						, sum(wonga) as wonga, sum(fee_ratio) as fee_ratio, sum(fee) as fee
-						, sum(etc_amt) as etc_amt
-						, sum(allot_amt) as allot_amt
-						, sum(com_coupon_apply_amt) as com_coupon_apply_amt
-					from
-					(
-						select
-							e.ord_opt_no,0 as type, max(e.etc_day) as state_date,0 as qty, 0 as sale_qty,
-							0 as sale_amt, 0 as clm_amt, 0 as coupon_apply_amt, 0 as dc_apply_amt,
-							0 as dlv_amt, 0 as wonga, 0 as fee_ratio, 0 as fee, 0 as allot_amt, sum(e.etc_amt) as etc_amt,
-							0 as com_coupon_apply_amt
-						from
-							store_account_etc e inner join order_opt o on e.ord_opt_no = o.ord_opt_no
-						where
-							e.etc_day >= '$f_sdate' and e.etc_day <= '$f_edate' and o.store_cd = '$store_cd'
-						group by
-							e.ord_opt_no
-
-						union all
-
-						select
-							ord_opt_no, type, state_date, qty, sale_qty,
-							sale_amt, clm_amt, coupon_apply_amt, dc_apply_amt,
-							( a.dlv_amt + dlv_ref_amt ) as dlv_amt, wonga, fee_ratio,
-							round(( sale_amt + clm_amt ) * fee_ratio / 100) as fee,
-							( coupon_apply_amt - coupon_allot_amt ) as allot_amt,
-
-							/* 클레임 발생으로 쿠폰적용 금액이 (-) 인 경우 0 으로..
-							if (
-								coupon_apply_amt <= 0,
-								0,
-								( coupon_apply_amt - com_coupon_apply_amt )
-							) as allot_amt, */
-
-							0 as etc_amt,
-							com_coupon_apply_amt
-						from
-						(
-							select
-								ord_opt_no, store_cd
-								, sum(distinct(if(ord_state = 30,30,ord_state))) as type
-								, max(ord_state_date) as state_date
-								, sum(qty) as qty
-								, sum(if(ord_state = 30, qty,0)) as sale_qty
-								, sum(if(ord_state = 30, price*qty, 0)) as sale_amt
-								, sum(if(ord_state in (60, 61), price*qty, 0)) as clm_amt
-								, sum(if(ord_state = 30, coupon_apply_amt, -1 * coupon_apply_amt)) as coupon_apply_amt
-								, sum(if(ord_state = 30, coupon_allot_amt, -1 * coupon_allot_amt)) as coupon_allot_amt
-								, sum(if(ord_state = 30, /*dc_apply_amt*/ 0, -1 * /*dc_apply_amt*/ 0)) as dc_apply_amt
-								, sum(if(ord_state = 30, dlv_amt, -1 * dlv_amt)) as dlv_amt
-								, sum(dlv_ref_amt) as dlv_ref_amt
-								, round(wonga * qty) as wonga
-								, round(100 * (1 - max(wonga) / max(price)), 2) as fee_ratio
-								, sum(com_coupon_apply_amt) as com_coupon_apply_amt
-							from
-							(
-								select
-									w.ord_opt_no, w.store_cd, o.ord_no, w.ord_state_date, w.ord_state,
-									if(w.ord_state = 30, w.qty, w.qty * -1) as qty,
-									abs(w.price) as price, abs(w.wonga) as wonga, w.coupon_apply_amt,ifnull( /*w.dc_apply_amt*/ 0,0) as dc_apply_amt,
-									round(if(ifnull(w.com_coupon_ratio, 0) > 1,ifnull(w.com_coupon_ratio, 0) / 100,ifnull(w.com_coupon_ratio, 0))
-										* ifnull(w.coupon_apply_amt, 0)) as coupon_allot_amt,
-									ifnull(w.dlv_amt, 0) as dlv_amt,
-									ifnull(w.dlv_ret_amt, 0) + ifnull(w.dlv_add_amt, 0) - ifnull(w.dlv_enc_amt, 0) as dlv_ref_amt,
-									/* 업체 쿠폰 부담 금액 ( 2010.10.07 추가 ) */
-									round(
-										if( ifnull(w.com_coupon_ratio, 0) > 1, ifnull(w.com_coupon_ratio, 0) / 100, ifnull(w.com_coupon_ratio, 0) ) * w.coupon_apply_amt
-									) as com_coupon_apply_amt
-								from
-									order_opt o inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
-								where
-									w.ord_state_date >= '$f_sdate'
-									and w.ord_state_date <= '$f_edate'
-									and w.ord_state in (30,60,61)
-									and w.store_cd = '$store_cd'
-									and o.ord_state >= 30 /* 결제 오류 발생시 order_opt_wonga 가 자료가 입력 되는 경우 처리 */
+				select :acc_idx as acc_idx
+					, b.type, b.sale_type, b.ord_opt_no, b.state_date, b.qty
+					, b.sale_amt, b.clm_amt, b.dc_amt, b.coupon_amt, b.allot_amt, b.dlv_amt
+					, if(b.tax_yn = 'Y', b.sale_amt, 0) as sale_net_taxation_amt
+					, if(b.tax_yn = 'N', b.sale_amt, 0) as sale_net_taxfree_amt
+					, (b.sale_amt - b.clm_amt) as sale_net_amt
+					, round(b.sale_amt / 1.1) as tax_amt
+					, b.fee_ratio
+					, round((b.sale_amt - b.clm_amt) * b.fee_ratio / 100) as fee
+					, '' as memo
+					-- 아래는 사용안함
+					, 0 as sale_fee
+					, 0 as sale_clm_amt
+					, 0 as etc_amt
+					, 0 as fee_dc_amt
+					, 0 as fee_net
+					, 0 as acc_amt
+				from (
+					select a.ord_state as type
+						, a.sale_type as sale_type
+						, a.ord_opt_no as ord_opt_no
+						, a.ord_state_date as state_date
+						, a.qty as qty
+						, if(a.ord_state = 30 and a.sale_type <> 'OL', a.recv_amt, 0) as sale_amt
+						, if(a.ord_state = 30, 0, a.recv_amt) as clm_amt
+						, (a.goods_sh - a.price) as dc_amt
+						, a.coupon_apply_amt as coupon_amt
+						, 0 as allot_amt -- (본사부담)쿠폰금액 추후 수정필요
+						, a.dlv_amt as dlv_amt
+						, a.tax_yn
+						, if(a.sale_type = 'JS', 0,
+							if(a.sale_type = 'TG', a.fee_10,
+								if(a.sale_type = 'YP', a.fee_11,
+									if(a.sale_type = 'OL', a.fee_12, 0)
+								)
 							)
-							a group by ord_opt_no, store_cd
-						)
-						a inner join store s on a.store_cd = s.store_cd
-					)
-					a group by ord_opt_no
-				)
-					w inner join order_opt o on o.ord_opt_no = w.ord_opt_no
-					inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
+						) as fee_ratio
+					from (
+						select w.ord_opt_no, w.goods_no, w.qty, w.price, w.recv_amt, w.ord_state
+							, w.ord_state_date, w.prd_cd, w.store_cd
+							, w.coupon_apply_amt, w.dlv_amt
+							, if(w.online_yn = 'Y', 'OL'
+								, if(g.brand in (select code_id from code where code_kind_cd = 'YP_BRAND'), 'YP'
+									, if(if(s.fee_10_info_over_yn = 'Y', ((1 - (w.price / g.goods_sh)) * 100) > s.fee_10_info, ((1 - (w.price / g.goods_sh)) * 100) >= s.fee_10_info), 'TG'
+										, 'JS'
+									)
+								)
+							) as sale_type
+							, g.goods_sh, g.tax_yn, s.fee_10, s.fee_11, s.fee_12
+						from (
+							(
+								select ww.ord_opt_no, ww.goods_no, ww.qty, ww.price, ww.recv_amt, ww.ord_state
+									, ww.ord_state_date, ww.prd_cd, ww.store_cd, 'N' as online_yn
+									, ww.coupon_apply_amt, ww.dlv_amt
+								from order_opt_wonga ww
+								where ww.store_cd = :store_cd1
+									and ww.ord_state_date >= :sdate1
+									and ww.ord_state_date <= :edate1
+									and ww.ord_state >= 30
+									and ww.ord_state in (30,60,61)
+							)
+							union all
+							(
+								select ww.ord_opt_no, ww.goods_no, ww.qty, ww.price, ww.recv_amt, ww.ord_state
+									, ww.ord_state_date, ww.prd_cd, ooo.dlv_place_cd as store_cd, 'Y' as online_yn
+									, 0 as coupon_apply_amt, ww.dlv_amt
+								from order_opt_wonga ww
+								inner join order_opt ooo on ooo.ord_opt_no = ww.ord_opt_no
+								where ooo.dlv_place_type = 'STORE'
+									and ooo.dlv_place_cd = :store_cd2
+									and ww.ord_state_date >= :sdate2
+									and ww.ord_state_date <= :edate2
+									and ww.ord_state >= 30
+									and ww.ord_state in (30,60,61)
+							)
+						) w
+							inner join goods g on g.goods_no = w.goods_no
+							inner join (
+								select ss.store_cd, sg.*
+								from store ss
+									inner join (
+										select grade_cd, name as grade_nm, fee_10, fee_11, fee_12, fee_10_info, fee_10_info_over_yn
+										from store_grade
+										where concat(replace(sdate, '-', ''), '01') <= :nowdate1
+											and concat(replace(edate, '-', ''), '31') >= :nowdate2
+									) sg on sg.grade_cd = ss.grade_cd
+							) s on s.store_cd = w.store_cd
+						order by w.ord_opt_no
+					) a
+				) b
 			";
+			DB::select($sql
+				, [
+					'acc_idx' => $acc_idx, 'nowdate1' => $nowdate, 'nowdate2' => $nowdate
+					, 'store_cd1' => $store_cd, 'sdate1' => $f_sdate, 'edate1' => $f_edate
+					, 'store_cd2' => $store_cd, 'sdate2' => $f_sdate, 'edate2' => $f_edate
+				]);
 
-			DB::insert($sql);
+			// 3. store_account_closed 에 상세판매내역의 총합계정보 업데이트
+			$sql = "";
+			// DB::update($sql);
 
-			$sql	= "
-				insert into store_account_closed
-				(
-					store_cd,sday,eday,
-					sale_amt, clm_amt, sale_fee, dc_amt, coupon_amt, dlv_amt,
-					sale_net_taxation_amt, sale_net_taxfree_amt, sale_net_amt, tax_amt,
-					fee, fee_dc_amt, allot_amt, etc_amt, fee_net, acc_amt,
-					closed_yn, admin_id, admin_nm, reg_date, upd_date
-				)
-				select
-					store_cd,sday,eday,
-					sum(sale_amt) as sale_amt, sum(clm_amt), sum(sale_fee), sum(dc_amt), sum(coupon_amt),sum(dlv_amt),
-					sum(sale_net_taxation_amt), sum(sale_net_taxfree_amt), sum(sale_net_amt),sum(tax_amt),
-					sum(fee), sum(fee_dc_amt), sum(allot_amt), sum(etc_amt), sum(fee_net), sum(acc_amt),
-					'N', :id, :name, now() as reg_date, now() as upd_date
-				from
-					store_account_closed_list
-				where
-					store_cd = :store_cd and sday = :sday and eday = :eday
-				group by
-					store_cd,sday,eday
-			";
-			DB::insert($sql, ['id' => $id, 'name' => $name, 'store_cd' => $store_cd, 'sday' => $f_sdate, 'eday' => $f_edate]);
 
-			$acc_idx = @DB::table('store_account_closed')->latest('idx')->first()->idx;
+			// $sql = "
+			// 	insert into store_account_closed_list
+			// 	(
+			// 		acc_idx, store_cd, sday, eday,
+			// 		type, ord_opt_no, state_date,
 
-			$sql	= "
-				update store_account_closed_list set
-					acc_idx = :acc_idx
-				where
-					store_cd = :store_cd and sday = :sday and eday = :eday
-			";
-			DB::update($sql, ['acc_idx' => $acc_idx, 'store_cd' => $store_cd, 'sday' => $f_sdate, 'eday' => $f_edate]);
+			// 		qty, sale_amt, clm_amt, sale_fee,
+			// 		sale_clm_amt, dc_amt, coupon_amt, dlv_amt,
+
+			// 		sale_net_taxation_amt, sale_net_taxfree_amt, sale_net_amt, tax_amt,
+
+			// 		fee_ratio, fee, fee_dc_amt, allot_amt, etc_amt, fee_net, acc_amt, bigo
+			// 	)
+			// 	select
+			// 		0 as acc_idx, '$store_cd' as store_cd, '$f_sdate' as sday, '$f_edate' as eday,
+			// 		w.type, w.ord_opt_no, w.state_date,
+
+			// 		w.qty as qty, w.sale_amt, w.clm_amt, w.fee as sale_fee,
+			// 		0 as sale_clm_amt, w.dc_apply_amt, w.coupon_apply_amt, w.dlv_amt,
+
+			// 		( w.sale_net_amt + w.dlv_amt + w.etc_amt ) as sale_net_taxation_amt,
+			// 		'0' as sale_net_taxfree_amt,
+			// 		( w.sale_net_amt + w.dlv_amt + w.etc_amt ) as sale_net_amt,
+			// 		floor(( w.sale_net_amt + w.dlv_amt ) / 11) as tax_amt,
+
+			// 		/* 본사 수수료 */
+			// 		round(w.fee_ratio, 2) as fee_ratio,
+			// 		w.fee,
+			// 		w.dc_apply_amt as fee_dc_amt,
+			// 		/*( w.coupon_apply_amt - w.allot_amt ) as fee_allot_amt, */
+			// 		( w.allot_amt ) as fee_allot_amt,
+			// 		w.etc_amt as fee_etc_amt,
+			// 		( w.fee - w.dc_apply_amt ) as fee_net_amt,
+
+			// 		/* 정산 금액 */
+			// 		(( w.sale_net_amt + w.dlv_amt + w.etc_amt ) - ( w.fee - w.dc_apply_amt ) ) as acc_amt,
+
+			// 		'' as bigo
+			// 	from
+			// 	(
+			// 		select
+			// 			ord_opt_no
+			// 			, round(sum(type)) as type
+			// 			, max(state_date) as state_date
+			// 			, sum(qty) as qty, sum(sale_qty) as sale_qty
+			// 			, sum(sale_amt) as sale_amt, sum(clm_amt) as clm_amt
+			// 			, sum(coupon_apply_amt) as coupon_apply_amt
+			// 			, sum(/*dc_apply_amt*/ 0) as dc_apply_amt
+			// 			, sum(sale_amt + clm_amt - dc_apply_amt - ( coupon_apply_amt - allot_amt) ) as sale_net_amt
+			// 			, sum(dlv_amt) as dlv_amt
+			// 			, sum(wonga) as wonga, sum(fee_ratio) as fee_ratio, sum(fee) as fee
+			// 			, sum(etc_amt) as etc_amt
+			// 			, sum(allot_amt) as allot_amt
+			// 			, sum(com_coupon_apply_amt) as com_coupon_apply_amt
+			// 		from
+			// 		(
+			// 			select
+			// 				e.ord_opt_no,0 as type, max(e.etc_day) as state_date,0 as qty, 0 as sale_qty,
+			// 				0 as sale_amt, 0 as clm_amt, 0 as coupon_apply_amt, 0 as dc_apply_amt,
+			// 				0 as dlv_amt, 0 as wonga, 0 as fee_ratio, 0 as fee, 0 as allot_amt, sum(e.etc_amt) as etc_amt,
+			// 				0 as com_coupon_apply_amt
+			// 			from
+			// 				store_account_etc e inner join order_opt o on e.ord_opt_no = o.ord_opt_no
+			// 			where
+			// 				e.etc_day >= '$f_sdate' and e.etc_day <= '$f_edate' and o.store_cd = '$store_cd'
+			// 			group by
+			// 				e.ord_opt_no
+
+			// 			union all
+
+			// 			select
+			// 				ord_opt_no, type, state_date, qty, sale_qty,
+			// 				sale_amt, clm_amt, coupon_apply_amt, dc_apply_amt,
+			// 				( a.dlv_amt + dlv_ref_amt ) as dlv_amt, wonga, fee_ratio,
+			// 				round(( sale_amt + clm_amt ) * fee_ratio / 100) as fee,
+			// 				( coupon_apply_amt - coupon_allot_amt ) as allot_amt,
+
+			// 				/* 클레임 발생으로 쿠폰적용 금액이 (-) 인 경우 0 으로..
+			// 				if (
+			// 					coupon_apply_amt <= 0,
+			// 					0,
+			// 					( coupon_apply_amt - com_coupon_apply_amt )
+			// 				) as allot_amt, */
+
+			// 				0 as etc_amt,
+			// 				com_coupon_apply_amt
+			// 			from
+			// 			(
+			// 				select
+			// 					ord_opt_no, store_cd
+			// 					, sum(distinct(if(ord_state = 30,30,ord_state))) as type
+			// 					, max(ord_state_date) as state_date
+			// 					, sum(qty) as qty
+			// 					, sum(if(ord_state = 30, qty,0)) as sale_qty
+			// 					, sum(if(ord_state = 30, price*qty, 0)) as sale_amt
+			// 					, sum(if(ord_state in (60, 61), price*qty, 0)) as clm_amt
+			// 					, sum(if(ord_state = 30, coupon_apply_amt, -1 * coupon_apply_amt)) as coupon_apply_amt
+			// 					, sum(if(ord_state = 30, coupon_allot_amt, -1 * coupon_allot_amt)) as coupon_allot_amt
+			// 					, sum(if(ord_state = 30, /*dc_apply_amt*/ 0, -1 * /*dc_apply_amt*/ 0)) as dc_apply_amt
+			// 					, sum(if(ord_state = 30, dlv_amt, -1 * dlv_amt)) as dlv_amt
+			// 					, sum(dlv_ref_amt) as dlv_ref_amt
+			// 					, round(wonga * qty) as wonga
+			// 					, round(100 * (1 - max(wonga) / max(price)), 2) as fee_ratio
+			// 					, sum(com_coupon_apply_amt) as com_coupon_apply_amt
+			// 				from
+			// 				(
+			// 					select
+			// 						w.ord_opt_no, w.store_cd, o.ord_no, w.ord_state_date, w.ord_state,
+			// 						if(w.ord_state = 30, w.qty, w.qty * -1) as qty,
+			// 						abs(w.price) as price, abs(w.wonga) as wonga, w.coupon_apply_amt,ifnull( /*w.dc_apply_amt*/ 0,0) as dc_apply_amt,
+			// 						round(if(ifnull(w.com_coupon_ratio, 0) > 1,ifnull(w.com_coupon_ratio, 0) / 100,ifnull(w.com_coupon_ratio, 0))
+			// 							* ifnull(w.coupon_apply_amt, 0)) as coupon_allot_amt,
+			// 						ifnull(w.dlv_amt, 0) as dlv_amt,
+			// 						ifnull(w.dlv_ret_amt, 0) + ifnull(w.dlv_add_amt, 0) - ifnull(w.dlv_enc_amt, 0) as dlv_ref_amt,
+			// 						/* 업체 쿠폰 부담 금액 ( 2010.10.07 추가 ) */
+			// 						round(
+			// 							if( ifnull(w.com_coupon_ratio, 0) > 1, ifnull(w.com_coupon_ratio, 0) / 100, ifnull(w.com_coupon_ratio, 0) ) * w.coupon_apply_amt
+			// 						) as com_coupon_apply_amt
+			// 					from
+			// 						order_opt o inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
+			// 					where
+			// 						w.ord_state_date >= '$f_sdate'
+			// 						and w.ord_state_date <= '$f_edate'
+			// 						and w.ord_state in (30,60,61)
+			// 						and w.store_cd = '$store_cd'
+			// 						and o.ord_state >= 30 /* 결제 오류 발생시 order_opt_wonga 가 자료가 입력 되는 경우 처리 */
+			// 				)
+			// 				a group by ord_opt_no, store_cd
+			// 			)
+			// 			a inner join store s on a.store_cd = s.store_cd
+			// 		)
+			// 		a group by ord_opt_no
+			// 	)
+			// 		w inner join order_opt o on o.ord_opt_no = w.ord_opt_no
+			// 		inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
+			// ";
+
+			// DB::insert($sql);
+
+			// $sql	= "
+			// 	insert into store_account_closed
+			// 	(
+			// 		store_cd,sday,eday,
+			// 		sale_amt, clm_amt, sale_fee, dc_amt, coupon_amt, dlv_amt,
+			// 		sale_net_taxation_amt, sale_net_taxfree_amt, sale_net_amt, tax_amt,
+			// 		fee, fee_dc_amt, allot_amt, etc_amt, fee_net, acc_amt,
+			// 		closed_yn, admin_id, admin_nm, reg_date, upd_date
+			// 	)
+			// 	select
+			// 		store_cd,sday,eday,
+			// 		sum(sale_amt) as sale_amt, sum(clm_amt), sum(sale_fee), sum(dc_amt), sum(coupon_amt),sum(dlv_amt),
+			// 		sum(sale_net_taxation_amt), sum(sale_net_taxfree_amt), sum(sale_net_amt),sum(tax_amt),
+			// 		sum(fee), sum(fee_dc_amt), sum(allot_amt), sum(etc_amt), sum(fee_net), sum(acc_amt),
+			// 		'N', :id, :name, now() as reg_date, now() as upd_date
+			// 	from
+			// 		store_account_closed_list
+			// 	where
+			// 		store_cd = :store_cd and sday = :sday and eday = :eday
+			// 	group by
+			// 		store_cd,sday,eday
+			// ";
+			// DB::insert($sql, ['id' => $id, 'name' => $name, 'store_cd' => $store_cd, 'sday' => $f_sdate, 'eday' => $f_edate]);
+
+			// $acc_idx = @DB::table('store_account_closed')->latest('idx')->first()->idx;
+
+			// $sql	= "
+			// 	update store_account_closed_list set
+			// 		acc_idx = :acc_idx
+			// 	where
+			// 		store_cd = :store_cd and sday = :sday and eday = :eday
+			// ";
+			// DB::update($sql, ['acc_idx' => $acc_idx, 'store_cd' => $store_cd, 'sday' => $f_sdate, 'eday' => $f_edate]);
 
 			DB::commit();
 
