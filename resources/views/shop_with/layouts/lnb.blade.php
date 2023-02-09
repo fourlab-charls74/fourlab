@@ -4,31 +4,31 @@
             <li>
                 <a href="javascript:;" class="arrow waves-effect"><i class="bx bx-code-alt fs-18"></i><span>코드관리</span></a>
                 <ul>
-                    <li><a href="/shop/standard/std51">(임)공통코드관리</a></li>
+                    {{--<!--<li><a href="/shop/standard/std51">(임)공통코드관리</a></li>-->--}}
                     <li><a href="/shop/standard/std02">(완)매장관리</a></li>
-                    <li><a href="/shop/standard/std03">(완)창고관리</a></li>
-                    <li><a href="/shop/standard/std04">(완)동종업계관리</a></li>
-                    <li><a href="/shop/standard/std05">(완)판매유형관리</a></li>
+                    {{--<!-- <li><a href="/shop/standard/std03">(완)창고관리</a></li> -->--}}
+                    {{--<!-- <li><a href="/shop/standard/std04">(완)동종업계관리</a></li> -->--}}
+                    {{--<!-- <li><a href="/shop/standard/std05">(완)판매유형관리</a></li> -->--}}
                     {{--<!--<li><a href="/shop/standard/std06">(개)매장영업담당자관리</a></li>//-->--}}
-                    <li><a href="/shop/standard/std07">(완)매장마진관리</a></li>
-                    <li><a href="/shop/standard/std08">(완)매장등급관리</a></li>
+                    {{--<!-- <li><a href="/shop/standard/std07">(완)매장마진관리</a></li> -->--}}
+                    {{--<!-- <li><a href="/shop/standard/std08">(완)매장등급관리</a></li> -->--}}
                 </ul>
             </li>
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-cube fs-18"></i><span>상품관리</span></a>
                 <ul>
                     <li><a href="/head/product/prd01" target="_blank">상품관리</a></li>
-                    <li><a href="/shop/product/prd02">(완)상품관리(코드)</a></li>
+                    {{--<!-- <li><a href="/shop/product/prd02">(완)상품관리(코드)</a></li> -->--}}
                     <li><a href="/shop/product/prd04">(완)상품재고관리</a></li>
-                    <li><a href="/shop/product/prd03">(완)원부자재상품관리</a></li>
+                    {{--<!-- <li><a href="/shop/product/prd03">(완)원부자재상품관리</a></li> -->--}}
                 </ul>
             </li>
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-task fs-18"></i><span>생산입고관리</span></a>
                 <ul>
-                    <li><a href="/shop/cs/cs01">(완)상품입고</a></li>
-                    <li><a href="/shop/cs/cs02">(완)상품반품이동</a></li>
-                    {{-- <li><a href="/partner/cs/cs02">상품반품이동 (일괄등록)</a></li> --}}
+                    {{--<!-- <li><a href="/shop/cs/cs01">(완)상품입고</a></li> -->--}}
+                    {{--<!-- <li><a href="/shop/cs/cs02">(완)상품반품이동</a></li> -->--}}
+                    {{-- <!-- <li><a href="/partner/cs/cs02">상품반품이동 (일괄등록)</a></li> --> --}}
                     <li><a href="/shop/cs/cs03">(완)원부자재입고/반품</a></li>
                 </ul>
             </li>
@@ -36,17 +36,17 @@
                 <a href="javascript:;" class="arrow"><i class="bx bx-store fs-18"></i><span>매장관리</span></a>
                 <ul>
                     <li><a href="/shop/product/prd04">(완)매장재고</a></li>
-                    <!--<li><a href="/shop/stock/stk01">(완)매장재고</a></li>//-->
-                    <!--<li><a href="/shop/stock/stk02">(개)매장재고입출고</a></li>//-->
+                    {{--<!--<li><a href="/shop/stock/stk01">(완)매장재고</a></li>//-->--}}
+                    {{--<!--<li><a href="/shop/stock/stk02">(개)매장재고입출고</a></li>//-->--}}
                     <li><a href="/shop/stock/stk10">(완)출고</a></li>
                     <li><a href="/shop/stock/stk30">(완)창고반품</a></li>
                     {{-- <li><a href="/shop/stock/stk03">(완)매장주문</a></li> => 주문/배송관리 탭으로 이동 --}}
-                    {{-- <li><a href="/shop/stock/stk11">(개)반품</a></li> --}}
+                    {{--<!-- <li><a href="/shop/stock/stk11">(개)반품</a></li> -->--}}
                     <li><a href="/shop/stock/stk20">(완)매장RT</a></li>
                     <li><a href="/shop/stock/stk16">(완)원부자재출고</a></li>
                     <li><a href="#">매장주문 - 는 포스화면</a></li>
                     <li><a href="/shop/stock/stk25">(완)매장별할인율적용조회</a></li>
-                    <li><a href="/shop/stock/stk26">(완)실사</a></li>
+                    {{--<!-- <li><a href="/shop/stock/stk26">(완)실사</a></li> -->--}}
                     <li><a href="/shop/stock/stk31">(완)매장 공지사항</a></li>
                     <li><a href="/shop/stock/stk32">(완)매장 알림</a></li>
                     <li><a href="/shop/stock/stk33">(완)동종업계매출관리</a></li>
@@ -56,7 +56,7 @@
                 <a href="javascript:;" class="arrow"><i class="bx bx-cart fs-18"></i><span>주문/배송관리</span></a>
                 <ul>
                     <li><a href="/shop/order/ord01">(완)매장주문</a></li>
-                    <li><a href="/shop/order/ord02">(완)온라인 주문접수</a></li>
+                    {{--<!-- <li><a href="/shop/order/ord02">(완)온라인 주문접수</a></li> -->--}}
                     <li><a href="/shop/order/ord03">(완)온라인 배송처리</a></li>
                 </ul>
             </li>
@@ -65,28 +65,28 @@
                 <ul>
                     <li><a href="/shop/member/mem01">(완)회원관리</a></li>
                     <li><a href="/shop/standard/std11">(완)수선관리</a></li>
-                    <li><a href="/head/promotion/prm10" target="_blank">(완)쿠폰</a></li>
+                    {{--<!-- <li><a href="/head/promotion/prm10" target="_blank">(완)쿠폰</a></li> -->--}}
                 </ul>
             </li>
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-calculator fs-18"></i><span>정산/마감관리</span></a>
                 <ul>
-                    <li><a href="/shop/account/acc04">매장별매출현황</a></li>
-                    <li><a href="/shop/account/acc06">(개)매장중간관리자정산</a></li>
+                    {{--<!-- <li><a href="/shop/account/acc04">매장별매출현황</a></li> -->--}}
+                    {{--<!-- <li><a href="/shop/account/acc06">(개)매장중간관리자정산</a></li> -->--}}
                     <li><a href="/shop/account/acc07">(완)매장중간관리자마감정산</a></li>
-                    <li><a href="/shop/account/acc05">(완)기타재반자료</a></li>
+                    {{--<!-- <li><a href="/shop/account/acc05">(완)기타재반자료</a></li> -->--}}
                 </ul>
             </li>
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-dollar-circle fs-18"></i><span>영업관리</span></a>
                 <ul>
-                    <!--<li><a href="/shop/sale/sal11">배분현황</a></li>//-->
-                    <li><a href="/shop/sale/sal17">(완)매장목표</a></li>
-                    <li><a href="/shop/sale/sal18">(완)월별할인적용유형관리</a></li>
-                    <li><a href="/shop/sale/sal20">(완)매장LOSS등록</a></li>
+                    {{--<!--<li><a href="/shop/sale/sal11">배분현황</a></li>//-->--}}
+                    {{--<!-- <li><a href="/shop/sale/sal17">(완)매장목표</a></li> -->--}}
+                    {{--<!-- <li><a href="/shop/sale/sal18">(완)월별할인적용유형관리</a></li> -->--}}
+                    {{--<!-- <li><a href="/shop/sale/sal20">(완)매장LOSS등록</a></li> -->--}}
                     <li><a href="/shop/sale/sal21">(완)매장수불집계표</a></li>
-                    <li><a href="/shop/sale/sal22">(완)창고수불집계표</a></li>
-                    <li><a href="/shop/sale/sal23">(완)본사수불집계표</a></li>
+                    {{--<!-- <li><a href="/shop/sale/sal22">(완)창고수불집계표</a></li> -->--}}
+                    {{--<!-- <li><a href="/shop/sale/sal23">(완)본사수불집계표</a></li> -->--}}
                 </ul>
             </li>
             <li>
@@ -100,17 +100,17 @@
                     <li><a href="/shop/sale/sal08">(완)매장브랜드별판매분석</a></li>
                     <li><a href="/shop/sale/sal24">(완)일별 매출 통계</a></li>
                     <li><a href="/shop/sale/sal25">(완)월별 매출 통계</a></li>
-                    <li><a href="/shop/sale/sal26">(완)매장별 매출 통계</a></li>
+                    {{--<!-- <li><a href="/shop/sale/sal26">(완)매장별 매출 통계</a></li> -->--}}
                 </ul>
             </li>
-            <li>
+            {{--<!-- <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-desktop fs-18"></i><span>시스템</span></a>
                 <ul>
                     <li><a href="/shop/system/sys01">(완)사용자관리</a></li>
                     <li><a href="/shop/system/sys02">(완)메뉴관리</a></li>
                     <li><a href="/shop/system/sys03">(완)그룹관리</a></li>
                 </ul>
-            </li>
+            </li> -->--}}
         </ul>
 
     </div>
