@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Exception;
 
 use App\Models\Conf;
+use Mockery\Undefined;
 
 class stk34Controller extends Controller
 {
@@ -153,27 +154,35 @@ class stk34Controller extends Controller
         if($store_no != '') $where .= "and cs.store_cd = '$store_no'";
         if($date != '') $where .= "and cs.sale_date like '$date%'";
 
-        $query = "
-            select count(*) as cnt from competitor_sale where sale_date like '$date%' and store_cd = '$store_no'
+        $sql = "
+            select 
+                store_cd
+                , competitor_cd
+                , sale_date
+                , sale_amt
+            from competitor_sale
+            where sale_date like '$date%' and store_cd = '$store_no' and sale_amt > 0
         ";
 
-        $res = DB::selectOne($query);
+        $result = DB::select($sql);
 
-        if($res->cnt > 0 ) {
+        dd($result);
+
+       
+        if(count($result) > 0 ) {
+       
             $sql = "
                 select 
                     cd.code_id as competitor_cd
                     , cd.code_val as competitor_nm
                     , com.store_cd
-                    , cs.sale_amt as sale_amt
+                    , cs.sale_amt
                     , cs.sale_date
                 from code cd
                     left outer join competitor com on cd.code_id = com.competitor_cd 
                     left outer join competitor_sale cs on cs.competitor_cd = com.competitor_cd
                 where cd.code_kind_cd = 'COMPETITOR' and cd.use_yn = 'Y'and com.use_yn = 'Y' and com.store_cd = '$store_no'
                 $where
-                group by cs.competitor_cd
-            
             ";
         } else {
 
@@ -189,9 +198,9 @@ class stk34Controller extends Controller
             ";
 
         }
-
+        
+        
         $result = DB::select($sql);
-
 
         return response()->json([
             "code" => 200,
@@ -224,22 +233,30 @@ class stk34Controller extends Controller
                 $store_cd = $rows['store_cd'];
                 $competitor_cd = $rows['competitor_cd'];
 
-                dd($rows);
+                $size = sizeof($rows);
 
-                $values = [
-                    'store_cd' => $store_cd,
-                    'competitor_cd' => $competitor_cd,
-                    // 'sale_date' => ,
-                    // 'sale_amt' => ,
-                    'admin_id' => $admin_id,
-                    'rt' => now(),
-                    'ut' => now()
+                // if ($size > 3) {
+                    for ($i = 1; $i <= $day; $i++) {
 
-                ];
+                        $where	= [
+                            'store_cd' => $store_cd, 
+                            'competitor_cd' => $competitor_cd,
+                            'sale_date' => $date.'-'.$day_arr[$i]
+                        ];
 
-
-
-                DB::table('competitor_sale')->insert($values);
+                        $values = [
+                            'store_cd' => $store_cd,
+                            'competitor_cd' => $competitor_cd,
+                            'sale_date' => $date.'-'.$day_arr[$i],
+                            'sale_amt' => $rows['sale_amt_'.$day_arr[$i]]??0,
+                            'admin_id' => $admin_id,
+                            'rt' => now(),
+                            'ut' => now()
+                        ];
+                        
+                        DB::table('competitor_sale')->updateOrInsert($where, $values);;
+                    }
+                // }
             }
             DB::commit();
             $code = 200;

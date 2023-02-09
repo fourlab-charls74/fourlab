@@ -80,14 +80,9 @@
 </div>
 <script type="text/javascript" charset="utf-8">
     let columns = [
-            {headerName: "#", field: "num",type:'NumType', pinned:'left', cellClass: 'hd-grid-code'},
-            {headerName: "동종업계코드", field: "competitor_cd", pinned:'left',  width: 85, cellClass: 'hd-grid-code'},
-            {headerName: "동종업계명", field: "competitor_nm",  pinned:'left', width: 120, cellClass: 'hd-grid-code'},
-            // {headerName: "매출액", field: "sale_amt",  pinned:'left', type: "numberType" ,width: 100, cellClass: 'hd-grid-code', editable: true, cellStyle: {"background-color": "#ffFF99"}, type:'currencyType'},
-            {headerName: "매출일자", field: "sale_date",  pinned:'left', width: 100, cellClass: 'hd-grid-code', hide:true},
-
-
-            {width: 'auto'}
+            {headerName: "#", field: "num",type:'NumType', pinned:'left', width: 30, cellClass: 'hd-grid-code'},
+            {headerName: "코드", field: "competitor_cd", pinned:'left',  width: 40, cellClass: 'hd-grid-code'},
+            {headerName: "동종업계명", field: "competitor_nm",  pinned:'left', width: 97, cellClass: 'hd-grid-code'},
         ];
 
         const pApp = new App('',{
@@ -97,6 +92,7 @@
         var mutable_cols = [];
         let date = "";
         let sale_date;
+        let in_val = [];
         $(document).ready(function() {
             pApp.ResizeGrid(205);
             let gridDiv = document.querySelector(pApp.options.gridId);
@@ -120,6 +116,9 @@
                             }
                         }
                     }
+
+                    // console.log(e.column.colId,e.data.competitor_cd, e.newValue);
+                    // console.log(e);
                 }
             });
             pApp.BindSearchEnter();
@@ -178,7 +177,7 @@
                     day_headerName = i +'일';
                     day_field = 'sale_amt_' + i;
                 }
-                let add_col = {field: day_field, headerName: day_headerName, minWidth: 100, type: "currencyType" , editable:true, cellStyle: {"background-color": "#ffFF99"}};
+                let add_col = {field: day_field, headerName: day_headerName, minWidth: 60, type: "currencyType" , editable:true, cellStyle: {"background-color": "#ffFF99","text-align": "right"}};
                 col.children.push(add_col)
             }
             return col;
@@ -189,8 +188,6 @@
             let store_no = document.getElementById('store_no').value;
             let date = document.getElementById('date').value;
             let data = gx.getRows();
-
-            console.log(data);
 
             if (store_no === '') {
                 alert('매장을 선택해주세요');
@@ -204,7 +201,7 @@
                     url: `/store/stock/stk34/save_amt`,
                     method: 'post',
                     data: {
-                        data: gx.getRows(),
+                        data: data,
                         date: date,
                         day: sale_date,
                     },
@@ -212,6 +209,7 @@
                     if(res.data.code === 200) {
                         alert(res.data.msg);
                         opener.Search();
+                        Search();
                     } else {
                         console.log(res.data.msg);
                         alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
