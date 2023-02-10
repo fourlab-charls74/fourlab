@@ -637,10 +637,10 @@ CREATE TABLE `store_account_closed` (
 	`rt` datetime DEFAULT NULL COMMENT '등록일시',
 	`ut` datetime DEFAULT NULL COMMENT '수정일시',
 	`sale_fee` int(11) DEFAULT '0' COMMENT '판매 수수료',
-	`etc_amt` int(11) DEFAULT NULL COMMENT '기타정산액',
+	`etc_amt` int(11) DEFAULT '0' COMMENT '기타정산액',
 	`fee_dc_amt` int(11) DEFAULT '0' COMMENT '수수료할인',
 	`fee_net` int(11) DEFAULT '0' COMMENT '수수료총계',
-	`acc_amt` int(11) DEFAULT NULL COMMENT '정산금액',
+	`acc_amt` int(11) DEFAULT '0' COMMENT '정산금액',
 	PRIMARY KEY (`idx`),
 	UNIQUE KEY `store_cd` (`store_cd`,`sday`,`eday`),
 	KEY `sdate` (`sday`,`eday`)

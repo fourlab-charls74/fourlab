@@ -183,8 +183,11 @@
 		{field: "size", headerName: "사이즈", width: 55, cellStyle: CENTER},
 		{field: "goods_opt", headerName: "옵션", width: 150},
 		{field: "qty", headerName: "수량", width: 50, type: 'currencyType', aggregation: true},
-		{field: "sale_amt",	headerName: "판매금액",	width: 90, type: 'currencyType', aggregation: true},
-		{field: "clm_amt", headerName: "클레임금액", width: 90, type: 'currencyType', aggregation: true},
+		{field: "goods_sh", headerName: "정상가", width: 70, type: 'currencyType'},
+		{field: "price", headerName: "판매단가", width: 70, type: 'currencyType'},
+		{field: "dc_amt", headerName: "할인금액",	width: 90, type: 'currencyType', aggregation: true},
+		{field: "sale_amt",	headerName: "판매금액",	width: 90, type: 'currencyType', aggregation: true, cellStyle: (params) => ({"background-color": params.node.rowPinned === 'top' ? "none" : "#D9E3FF"})},
+		{field: "clm_amt", headerName: "클레임금액", width: 90, type: 'currencyType', aggregation: true, cellStyle: (params) => ({"background-color": params.node.rowPinned === 'top' ? "none" : "#D9E3FF"})},
 		{field: "ord_type_nm", headerName: "주문구분", width: 60, cellStyle: CENTER},
 		{field: "pr_code_nm", headerName: "행사구분", width: 60, cellStyle: CENTER},
 		{field: "store_cd",	headerName: "매장코드", width: 70, cellStyle: CENTER},
@@ -192,14 +195,13 @@
 		{field: "user_nm", headerName: "주문자", width: 60, cellStyle: CENTER},
 		{field: "pay_type_nm",	headerName: "결제방법",	width: 70, cellStyle: CENTER},
 		{field: "tax_yn", headerName: "과세", width: 40, cellStyle: CENTER},
-		// {field: "dc_apply_amt", headerName: "할인금액",	width: 90, type: 'currencyType', aggregation: true},
 		// {field: "coupon_nm", headerName: "쿠폰", width: 70, pinned: 'left'},
 		// {field: "dlv_amt", headerName: "배송비", width: 80, type: 'currencyType', aggregation: true},
 		// {field: "",	headerName: "소계",		width: 80, type: 'currencyType', aggregation:true},
 		{field: "ord_state_nm", headerName: "주문상태", width: 70, cellStyle: StyleOrdState},
 		{field: "clm_state_nm",headerName: "클레임상태", width: 70, cellStyle: StyleClmState},
-		{field: "ord_date",	headerName: "주문일", width: 80, cellStyle: CENTER},
-		{field: "dlv_end_date", headerName: "배송완료일", width: 80},
+		{field: "ord_date",	headerName: "출고완료일", width: 80, cellStyle: CENTER},
+		// {field: "dlv_end_date", headerName: "배송완료일", width: 80},
 		{field: "clm_end_date", headerName: "클레임완료일",	width: 80},
 		{width: "auto"}
 	];
@@ -262,6 +264,7 @@
 				},
 				success: function(data) {
 					// cbClosed(data);
+					alert("개발중입니다.");
 				},
 				error: function(request, status, error) {
 					console.log("error")

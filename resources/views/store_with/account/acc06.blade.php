@@ -123,25 +123,26 @@
 <script language="javascript">
 	const CENTER = { 'text-align': 'center' };
     let columns = [
-        { headerName: "#", field: "num", type: 'NumType', pinned: 'left', width: 40, cellStyle: CENTER,
+        { headerName: "#", field: "num", type: 'NumType', pinned: 'left', width: 30, cellStyle: CENTER,
 			cellRenderer: (params) => params.node.rowPinned === 'top' ? '합계' : parseInt(params.value) + 1,
         },
-        { field: "store_type_nm", headerName: "매장구분", pinned: 'left', width: 80, cellStyle: CENTER },
-        { field: "store_cd", headerName: "매장코드", pinned: 'left', width: 60, cellStyle: CENTER },
+        { field: "store_type_nm", headerName: "매장구분", pinned: 'left', width: 70, cellStyle: CENTER },
+        { field: "store_cd", headerName: "매장코드", pinned: 'left', width: 55, cellStyle: CENTER },
         { field: "store_nm", headerName: "매장명", pinned: 'left', type: 'StoreNameType', width: 150 },
-        { field: "manager_nm", headerName: "매니저", pinned: 'left', width: 60, cellStyle: CENTER },
-        { field: "grade_nm", headerName: "수수료등급", pinned: 'left', width: 70, cellStyle: CENTER },
+        { field: "manager_nm", headerName: "매니저", pinned: 'left', width: 55, cellStyle: CENTER },
+        { field: "grade_nm", headerName: "수수료등급", pinned: 'left', width: 65, cellStyle: CENTER },
         { headerName: "매출",
 			children: [
 				@foreach (@$pr_codes as $pr_code)
-				{ field: "sales_{{ $pr_code->code_id }}_amt", headerName: "{{ $pr_code->code_val }}", type: 'currencyMinusColorType', width: 100, headerClass: "merged-cell" },
+				{ field: "sales_{{ $pr_code->code_id }}_amt", headerName: "{{ $pr_code->code_val }}", type: 'currencyType', width: 90, headerClass: "merged-cell" },
 				@endforeach
-				{ field: "sales_amt", headerName: "소계", width: 100, headerClass: "merged-cell", type: 'currencyMinusColorType',
+				{ field: "sales_amt", headerName: "매출합계", width: 90, headerClass: "merged-cell", type: 'currencyType',
 					cellRenderer: (params) => {
 						if (params.value == undefined) return 0;
 						return '<a href="#" onClick="openDetailPopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>';
 					}
 				},
+				{ field: "sales_amt_except_vat", headerName: "매출합계(-VAT)", width: 90, headerClass: "merged-cell", type: 'currencyType', cellStyle: {"background-color": "#ededed"} },
 			]
         },
         // { headerName: "판매처 수수료",
@@ -164,44 +165,51 @@
             children: [
                 { headerName: "정상1",
                     children: [
+                        { headerName: "매출액(-VAT)", field: "ord_JS1_amt_except_vat", type: 'currencyType', width: 90 },
                         { headerName: "수수료율", field: "fee1", type: 'percentType', width: 60 },
-                        { headerName: "수수료", field: "fee_amt_JS1", type: 'currencyType', width: 100 },
+                        { headerName: "수수료", field: "fee_amt_JS1", type: 'currencyType', width: 90 },
                     ]
                 },
                 { headerName: "정상2",
                     children: [
+						{ headerName: "매출액(-VAT)", field: "ord_JS2_amt_except_vat", type: 'currencyType', width: 90 },
                         { headerName: "수수료율", field: "fee2", type: 'percentType', width: 60 },
-                        { headerName: "수수료", field: "fee_amt_JS2", type: 'currencyType', width: 100 },
+                        { headerName: "수수료", field: "fee_amt_JS2", type: 'currencyType', width: 90 },
                     ]
                 },
                 { headerName: "정상3",
                     children: [
+						{ headerName: "매출액(-VAT)", field: "ord_JS3_amt_except_vat", type: 'currencyType', width: 90 },
                         { headerName: "수수료율", field: "fee3", type: 'percentType', width: 60 },
-                        { headerName: "수수료", field: "fee_amt_JS3", type: 'currencyType', width: 100 },
+                        { headerName: "수수료", field: "fee_amt_JS3", type: 'currencyType', width: 90 },
                     ]
                 },
-                { headerName: "특판",
+                { headerName: "특가",
                     children: [
+						{ headerName: "매출액(-VAT)", field: "ord_TG_amt_except_vat", type: 'currencyType', width: 90 },
                         { headerName: "수수료율", field: "fee_10", type: 'percentType', width: 60 },
-                        { headerName: "수수료", field: "fee_amt_TG", type: 'currencyType', width: 100 },
+                        { headerName: "수수료", field: "fee_amt_TG", type: 'currencyType', width: 90 },
                     ]
                 },
                 { headerName: "용품",
                     children: [
+						{ headerName: "매출액(-VAT)", field: "ord_YP_amt_except_vat", type: 'currencyType', width: 90 },
                         { headerName: "수수료율", field: "fee_11", type: 'percentType', width: 60 },
-                        { headerName: "수수료", field: "fee_amt_YP", type: 'currencyType', width: 100 },
+                        { headerName: "수수료", field: "fee_amt_YP", type: 'currencyType', width: 90 },
                     ]
                 },
-                { headerName: "특약(온라인)",
+                { headerName: "특가(온라인)",
                     children: [
+						{ headerName: "매출액(-VAT)", field: "ord_OL_amt_except_vat", type: 'currencyType', width: 90 },
                         { headerName: "수수료율", field: "fee_12", type: 'percentType', width: 60 },
-                        { headerName: "수수료", field: "fee_amt_OL", type: 'currencyType', width: 100,
+                        { headerName: "수수료", field: "fee_amt_OL", type: 'currencyType', width: 90,
 							cellRenderer: (params) => ['0', null].includes(params.value) ? 0 : '<a href="javascript:void(0);" onClick="openOnlineFeePopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>'
 						},
                     ]
                 },
-				{ headerName: "소계", field: "fee_amt", type: 'currencyMinusColorType', width: 100,
-					headerClass: "merged-cell"
+				{ headerName: "수수료 소계", field: "fee_amt", type: 'currencyMinusColorType', width: 90,
+					headerClass: "merged-cell",
+					cellStyle: {"background-color": "#ededed"}
 					// valueFormatter: (params) => formatNumber(params),
 					// valueGetter: (params) => sumSaleFees(params),
 				},

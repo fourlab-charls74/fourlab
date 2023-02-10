@@ -34,6 +34,7 @@ class acc06Controller extends Controller
 		$f_month = Carbon::parse($sdate)->format("Ym");
         $f_sdate = Carbon::parse($sdate)->firstOfMonth()->format("Ymd");
         $f_edate = Carbon::parse($sdate)->lastOfMonth()->format("Ymd");
+		$nowdate = now()->format("Ymd");
 
         $store_type = $request->input('store_type', "");
         $store_kind = $request->input('store_kind', "");
@@ -53,7 +54,7 @@ class acc06Controller extends Controller
         $pr_codes_query = "";
         foreach ($pr_codes as $item) {
             $key = $item->code_id;
-            $pr_codes_query .= ", sum(if(ww.online_yn = 'N' and oo.pr_code = '$key', ww.recv_amt, 0)) as sales_" . $key . "_amt";
+            $pr_codes_query .= ", sum(if(ww.online_yn = 'N' and oo.pr_code = '$key', ww.sale_price, 0)) as sales_" . $key . "_amt";
         }
 
 		$sql = "
@@ -71,101 +72,96 @@ class acc06Controller extends Controller
 					, 0, (a.fee_amt_JS1 + a.fee_amt_JS2 + a.fee_amt_JS3 + a.fee_amt_TG + a.fee_amt_YP + a.fee_amt_OL + a.extra_amt)
 				) as total_fee_amt
 			from (
-				select w.*, sg.*
-					, s.store_cd, s.store_nm, s.manager_nm
-					, s.store_type, st.code_val as store_type_nm
-					, round(
-						if(w.ord_JS_amt > sg.amt1
-							, sg.amt1 * (sg.fee1 / 100)
-							, w.ord_JS_amt * (sg.fee1 / 100)
-						)
-					) as fee_amt_JS1
-					, round(
-						if(w.ord_JS_amt > sg.amt2
-							, (sg.amt2 - sg.amt1) * (sg.fee2 / 100)
-							, if(w.ord_JS_amt > sg.amt1
-								, (w.ord_JS_amt - sg.amt1) * (sg.fee2 / 100)
-								, 0
-							)
-						)
-					) as fee_amt_JS2
-					, round(
-						if(w.ord_JS_amt > sg.amt2
-							, (w.ord_JS_amt - sg.amt2) * (sg.fee3 / 100)
-							, 0
-						)
-					) as fee_amt_JS3
-					, round(w.ord_TG_amt * (sg.fee_10 / 100)) as fee_amt_TG
-					, round(w.ord_YP_amt * (sg.fee_11 / 100)) as fee_amt_YP
-					, round(w.ord_OL_amt * (sg.fee_12 / 100)) as fee_amt_OL
-					, ifnull(ae.extra_amt, 0) as extra_amt
-				from store s
-					inner join code st on st.code_kind_cd = 'STORE_TYPE' and st.code_id = s.store_type
-					inner join (
-						select grade_cd, name as grade_nm, fee1, amt1, fee2, amt2, fee3, fee_10, fee_11, fee_12, fee_10_info, fee_10_info_over_yn
-						from store_grade
-						where concat(sdate, '-01 00:00:00') <= date_format(now(), '%Y-%m-%d 00:00:00') 
-							and concat(edate, '-31 23:59:59') >= date_format(now(), '%Y-%m-%d 00:00:00') 
-					) sg on sg.grade_cd = s.grade_cd
-					left outer join (
-						select ww.store_cd as ord_store_cd
-							, sum(ww.qty) as sale_qty
-							, sum(ww.qty * ww.wonga) as wonga_amt
-							, sum(if(ww.online_yn = 'N', ww.recv_amt, 0)) as sales_amt
-							$pr_codes_query
-							, sum(if(
-								ww.online_yn = 'N'
-									and g.brand not in (select code_id from code where code_kind_cd = 'YP_BRAND') 
-									and if(ss.fee_10_info_over_yn = 'Y', ((1 - (oo.price / g.goods_sh)) * 100) <= ss.fee_10_info, ((1 - (oo.price / g.goods_sh)) * 100) < ss.fee_10_info)
-								, ww.recv_amt
-								, 0
-							)) as ord_JS_amt -- 정상
-							, sum(if(
-								ww.online_yn = 'N'
-									and g.brand not in (select code_id from code where code_kind_cd = 'YP_BRAND') 
-									and if(ss.fee_10_info_over_yn = 'Y', ((1 - (oo.price / g.goods_sh)) * 100) > ss.fee_10_info, ((1 - (oo.price / g.goods_sh)) * 100) >= ss.fee_10_info)
-								, ww.recv_amt
-								, 0
-							)) as ord_TG_amt -- 특가
-							, sum(if(ww.online_yn = 'N' and g.brand in (select code_id from code where code_kind_cd = 'YP_BRAND'), ww.recv_amt, 0)) as ord_YP_amt -- 용품
-							, sum(if(ww.online_yn = 'Y', ww.recv_amt, 0)) as ord_OL_amt -- 온라인
-						from (
-							(
-								select www.ord_opt_no, www.goods_no, www.qty, www.wonga, www.price, www.recv_amt, www.ord_state, www.ord_kind, www.ord_type, www.ord_state_date, www.prd_cd, www.store_cd, 'N' as online_yn
-								from order_opt_wonga www
-								where www.ord_state in (30,60,61) 
-									and www.ord_state_date >= '$f_sdate'
-									and www.ord_state_date <= '$f_edate'
-							)
-							union all
-							(
-								select www.ord_opt_no, www.goods_no, www.qty, www.wonga, www.price, www.recv_amt, www.ord_state, www.ord_kind, www.ord_type, www.ord_state_date, www.prd_cd, ooo.dlv_place_cd as store_cd, 'Y' as online_yn
-								from order_opt_wonga www
-									inner join order_opt ooo on ooo.ord_opt_no = www.ord_opt_no
-								where ooo.dlv_place_type = 'STORE' 
-									and ooo.dlv_place_cd <> ''
-									and www.ord_state in (30,60,61) 
-									and www.ord_state_date >= '$f_sdate'
-									and www.ord_state_date <= '$f_edate'
-							)
-						) ww
-							inner join order_opt oo on oo.ord_opt_no = ww.ord_opt_no
-							inner join goods g on g.goods_no = oo.goods_no
-							inner join (
-								select sss.store_cd, ssg.fee_10_info, ssg.fee_10_info_over_yn
-								from store sss
-									inner join store_grade ssg on ssg.grade_cd = sss.grade_cd
-							) ss on ss.store_cd = ww.store_cd
-						group by ww.store_cd
-					) w on w.ord_store_cd = s.store_cd
-					left outer join (
-						select store_cd, sum(extra_amt) as extra_amt
-						from store_account_extra
-						where ymonth = '$f_month'
-						group by store_cd
-				   ) ae on ae.store_cd = s.store_cd
-				where s.account_yn = 'Y' $where
-				order by w.sales_amt desc
+				select b.*
+					, round(b.sales_amt / 1.1) as sales_amt_except_vat
+					, round(b.ord_JS1_amt / 1.1) as ord_JS1_amt_except_vat
+					, round(b.ord_JS2_amt / 1.1) as ord_JS2_amt_except_vat
+					, round(b.ord_JS3_amt / 1.1) as ord_JS3_amt_except_vat
+					, round(b.ord_TG_amt / 1.1) as ord_TG_amt_except_vat
+					, round(b.ord_YP_amt / 1.1) as ord_YP_amt_except_vat
+					, round(b.ord_OL_amt / 1.1) as ord_OL_amt_except_vat
+					, round((b.ord_JS1_amt / 1.1) * b.fee1 / 100) as fee_amt_JS1
+					, round((b.ord_JS2_amt / 1.1) * b.fee2 / 100) as fee_amt_JS2
+					, round((b.ord_JS3_amt / 1.1) * b.fee3 / 100) as fee_amt_JS3
+					, round(b.ord_TG_amt * b.fee_10 / 100) as fee_amt_TG
+					, round(b.ord_YP_amt * b.fee_11 / 100) as fee_amt_YP
+					, round(b.ord_OL_amt * b.fee_12 / 100) as fee_amt_OL
+				from (
+					select w.*, sg.*
+						, s.store_cd, s.store_nm, s.manager_nm
+						, s.store_type, st.code_val as store_type_nm
+						, if(w.ord_JS_amt > sg.amt1, sg.amt1, w.ord_JS_amt) as ord_JS1_amt
+						, if(w.ord_JS_amt > sg.amt2, sg.amt2 - sg.amt1, if(w.ord_JS_amt > sg.amt1, w.ord_JS_amt - sg.amt1, 0)) as ord_JS2_amt
+						, if(w.ord_JS_amt > sg.amt2, w.ord_JS_amt - sg.amt2, 0) as ord_JS3_amt
+						, ifnull(ae.extra_amt, 0) as extra_amt
+					from store s
+						inner join code st on st.code_kind_cd = 'STORE_TYPE' and st.code_id = s.store_type
+						inner join (
+							select grade_cd, name as grade_nm, fee1, round(amt1 * 1.1) as amt1, fee2, round(amt2 * 1.1) as amt2, fee3, fee_10, fee_11, fee_12, fee_10_info, fee_10_info_over_yn
+							from store_grade
+							where concat(replace(sdate, '-', ''), '01') <= '$nowdate'
+								and concat(replace(edate, '-', ''), '31') >= '$nowdate'
+						) sg on sg.grade_cd = s.grade_cd
+						left outer join (
+							select ww.store_cd as ord_store_cd
+								, sum(if(ww.online_yn = 'N', ww.sale_price, 0)) as sales_amt -- 매출합계
+								$pr_codes_query
+								, sum(if(
+									ww.online_yn = 'N'
+										and g.brand not in (select code_id from code where code_kind_cd = 'YP_BRAND') 
+										and if(ss.fee_10_info_over_yn = 'Y', ((1 - (oo.price / g.goods_sh)) * 100) <= ss.fee_10_info, ((1 - (oo.price / g.goods_sh)) * 100) < ss.fee_10_info)
+									, ww.sale_price
+									, 0
+								)) as ord_JS_amt -- 정상
+								, sum(if(
+									ww.online_yn = 'N'
+										and g.brand not in (select code_id from code where code_kind_cd = 'YP_BRAND') 
+										and if(ss.fee_10_info_over_yn = 'Y', ((1 - (oo.price / g.goods_sh)) * 100) > ss.fee_10_info, ((1 - (oo.price / g.goods_sh)) * 100) >= ss.fee_10_info)
+									, ww.sale_price
+									, 0
+								)) as ord_TG_amt -- 특가
+								, sum(if(ww.online_yn = 'N' and g.brand in (select code_id from code where code_kind_cd = 'YP_BRAND'), ww.sale_price, 0)) as ord_YP_amt -- 용품
+								, sum(if(ww.online_yn = 'Y', ww.sale_price, 0)) as ord_OL_amt -- 온라인
+							from (
+								(
+									select www.ord_opt_no, www.goods_no, www.qty, www.price, (www.qty * www.price) as sale_price, www.ord_state, www.ord_kind, www.ord_type, www.ord_state_date, www.prd_cd, www.store_cd, 'N' as online_yn
+									from order_opt_wonga www
+									where www.ord_state >= 30
+										and www.ord_state in (30,60,61) 
+										and www.ord_state_date >= '$f_sdate'
+										and www.ord_state_date <= '$f_edate'
+								)
+								union all
+								(
+									select www.ord_opt_no, www.goods_no, www.qty, www.price, (www.qty * www.price) as sale_price, www.ord_state, www.ord_kind, www.ord_type, www.ord_state_date, www.prd_cd, ooo.dlv_place_cd as store_cd, 'Y' as online_yn
+									from order_opt_wonga www
+										inner join order_opt ooo on ooo.ord_opt_no = www.ord_opt_no
+									where ooo.dlv_place_type = 'STORE' 
+										and ooo.dlv_place_cd <> ''
+										and www.ord_state >= 30
+										and www.ord_state in (30,60,61) 
+										and www.ord_state_date >= '$f_sdate'
+										and www.ord_state_date <= '$f_edate'
+								)
+							) ww
+								inner join order_opt oo on oo.ord_opt_no = ww.ord_opt_no
+								inner join goods g on g.goods_no = oo.goods_no
+								inner join (
+									select sss.store_cd, ssg.fee_10_info, ssg.fee_10_info_over_yn
+									from store sss
+										inner join store_grade ssg on ssg.grade_cd = sss.grade_cd
+								) ss on ss.store_cd = ww.store_cd
+							group by ww.store_cd
+						) w on w.ord_store_cd = s.store_cd
+						left outer join (
+							select store_cd, sum(extra_amt) as extra_amt
+							from store_account_extra
+							where ymonth = '$f_month'
+							group by store_cd
+					   ) ae on ae.store_cd = s.store_cd
+					where s.account_yn = 'Y' $where
+					order by w.sales_amt desc
+				) b
 			) a
 		";
 		$result = DB::select($sql);
@@ -337,25 +333,25 @@ class acc06Controller extends Controller
 				, odt.code_val as ord_type_nm
 				, prc.code_val as pr_code_nm
 				, pyt.code_val as pay_type_nm
-				, if((select count(*) from order_opt where ord_no = a.ord_no) > 1, 'Y', '') as multi_order
-				, 'Y' as tax_yn -- 과세여부 추후 값 변경 필요
 				, ods.code_val as ord_state_nm
 				, cls.code_val as clm_state_nm
 			from (
 				select o.ord_no, w.ord_opt_no
 					, w.ord_state_date, date_format(w.ord_state_date, '%Y-%m-%d') as state_date, date_format(o.ord_date, '%Y-%m-%d') as ord_date
 					, w.ord_state, o.clm_state, date_format(o.dlv_end_date, '%Y-%m-%d') as dlv_end_date
-					, if(w.ord_state in ('60','61'), (
+					, if(w.ord_state in (60,61), (
 						select date_format(max(end_date),'%Y-%m-%d') as clm_end_date 
 						from claim
 						where ord_opt_no = w.ord_opt_no
 					), '') as clm_end_date
-					, w.store_cd, w.prd_cd, w.goods_no, w.goods_opt, w.qty, w.wonga, w.price, w.recv_amt, w.ord_kind, w.ord_type
-					, if(w.ord_state = '30', w.recv_amt, 0) as sale_amt
-					, if(w.ord_state in ('60', '61'), w.recv_amt, 0) as clm_amt
-					, if(w.ord_state = '30', 0, 0) as dc_apply_amt -- 할인금액 추후 값 변경 필요
+					, w.store_cd, w.prd_cd, w.goods_no, w.goods_opt, w.qty, w.price, w.ord_kind, w.ord_type
+					, if(w.ord_state = 30, (w.qty * w.price), 0) as sale_amt
+					, if(w.ord_state in (60,61), (w.qty * w.price), 0) as clm_amt
+					, ((g.goods_sh - abs(w.price)) * w.qty * -1) as dc_amt
 					, o.pr_code, s.store_nm, p.pay_type, m.user_nm
-					, g.style_no, g.goods_nm, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color, pc.size
+					, g.style_no, g.goods_nm, g.tax_yn, g.goods_sh
+					, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color, pc.size
+					, if((select count(*) from order_opt where ord_no = o.ord_no) > 1, 'Y', '') as multi_order -- 복수주문여부
 				from order_opt_wonga w
 					inner join order_opt o on o.ord_opt_no = w.ord_opt_no
 					inner join order_mst m on m.ord_no = o.ord_no
@@ -363,7 +359,8 @@ class acc06Controller extends Controller
 					inner join store s on s.store_cd = w.store_cd
 					inner join goods g on g.goods_no = w.goods_no
 					left outer join product_code pc on pc.prd_cd = w.prd_cd
-				where w.ord_state in (30,60,61)
+				where w.ord_state >= 30
+					and w.ord_state in (30,60,61)
 					and w.ord_state_date >= :sdate
 					and w.ord_state_date <= :edate
 					and w.store_cd = :store_cd
@@ -376,6 +373,8 @@ class acc06Controller extends Controller
 				left outer join code cls on cls.code_kind_cd = 'G_CLM_STATE' and cls.code_id = a.clm_state
 				left outer join code prc on prc.code_kind_cd = 'PR_CODE' and prc.code_id = a.pr_code
 		";
+		
+		$result = DB::select($sql, ['store_cd' => $store_cd, 'sdate' => $f_sdate, 'edate' => $f_edate]);
 
 		// 아래 참고하여 작업중입니다. - 최유현
 		// $d_sql	= "
@@ -536,8 +535,6 @@ class acc06Controller extends Controller
 		// 		w.state_date, o.ord_opt_no
 		// ";
 
-		$result = DB::select($sql, ['store_cd' => $store_cd, 'sdate' => $f_sdate, 'edate' => $f_edate]);
-
 		return response()->json([
 			"code"	=> 200,
 			"head"	=> array(
@@ -578,7 +575,7 @@ class acc06Controller extends Controller
 
 		$account_yn = DB::table('store')->where('store_cd', $store_cd)->value('account_yn');
 		if ($account_yn != 'Y') {
-			return response()->json(["code"	=> "100", "msg"	=> "헤딩 메징은 정산관리가 허용되지 않은 매장입니다."]);
+			return response()->json(["code"	=> "100", "msg"	=> "해당 매장은 정산관리가 허용되지 않은 매장입니다."]);
 		}
 
 		$sql = "
@@ -610,10 +607,6 @@ class acc06Controller extends Controller
 			]);
 
 			// 2. store_account_closed_list 에 1에서 추가한 마감의 상세판매내역정보를 추가
-			/*
-				dc_amt : TAG가 - 판매가
-				coupon_amt : order_opt_wonga 의 coupon_apply_amt
-			*/
 			$sql = "
 				insert into store_account_closed_list
 				(
@@ -626,14 +619,13 @@ class acc06Controller extends Controller
 				select :acc_idx as acc_idx
 					, b.type, b.sale_type, b.ord_opt_no, b.state_date, b.qty
 					, b.sale_amt, b.clm_amt, b.dc_amt, b.coupon_amt, b.allot_amt, b.dlv_amt
-					, if(b.tax_yn = 'Y', b.sale_amt, 0) as sale_net_taxation_amt
-					, if(b.tax_yn = 'N', b.sale_amt, 0) as sale_net_taxfree_amt
+					, if(b.tax_yn = 'Y', (b.sale_amt - b.clm_amt), 0) as sale_net_taxation_amt
+					, if(b.tax_yn = 'N', (b.sale_amt - b.clm_amt), 0) as sale_net_taxfree_amt
 					, (b.sale_amt - b.clm_amt) as sale_net_amt
-					, round(b.sale_amt / 1.1) as tax_amt
+					, round((b.sale_amt - b.clm_amt) / 10) as tax_amt
 					, b.fee_ratio
 					, round((b.sale_amt - b.clm_amt) * b.fee_ratio / 100) as fee
 					, '' as memo
-					-- 아래는 사용안함
 					, 0 as sale_fee
 					, 0 as sale_clm_amt
 					, 0 as etc_amt
@@ -646,22 +638,23 @@ class acc06Controller extends Controller
 						, a.ord_opt_no as ord_opt_no
 						, a.ord_state_date as state_date
 						, a.qty as qty
-						, if(a.ord_state = 30 and a.sale_type <> 'OL', a.recv_amt, 0) as sale_amt
-						, if(a.ord_state = 30, 0, a.recv_amt) as clm_amt
-						, (a.goods_sh - a.price) as dc_amt
+						, if(a.ord_state = 30 and a.sale_type <> 'OL', a.sale_price, 0) as sale_amt
+						, if(a.ord_state = 30, 0, a.sale_price) as clm_amt
+						, ((a.goods_sh - abs(a.price)) * a.qty * -1) as dc_amt
 						, a.coupon_apply_amt as coupon_amt
 						, 0 as allot_amt -- (본사부담)쿠폰금액 추후 수정필요
 						, a.dlv_amt as dlv_amt
 						, a.tax_yn
-						, if(a.sale_type = 'JS', 0,
-							if(a.sale_type = 'TG', a.fee_10,
-								if(a.sale_type = 'YP', a.fee_11,
-									if(a.sale_type = 'OL', a.fee_12, 0)
-								)
-							)
-						) as fee_ratio
+						, 0 as fee_ratio
+						--	, if(a.sale_type = 'JS', 0,
+						--		if(a.sale_type = 'TG', a.fee_10,
+						--			if(a.sale_type = 'YP', a.fee_11,
+						--				if(a.sale_type = 'OL', a.fee_12, 0)
+						--			)
+						--		)
+						--	) as fee_ratio
 					from (
-						select w.ord_opt_no, w.goods_no, w.qty, w.price, w.recv_amt, w.ord_state
+						select w.ord_opt_no, w.goods_no, w.qty, w.price, w.sale_price, w.ord_state
 							, w.ord_state_date, w.prd_cd, w.store_cd
 							, w.coupon_apply_amt, w.dlv_amt
 							, if(w.online_yn = 'Y', 'OL'
@@ -674,7 +667,7 @@ class acc06Controller extends Controller
 							, g.goods_sh, g.tax_yn, s.fee_10, s.fee_11, s.fee_12
 						from (
 							(
-								select ww.ord_opt_no, ww.goods_no, ww.qty, ww.price, ww.recv_amt, ww.ord_state
+								select ww.ord_opt_no, ww.goods_no, ww.qty, ww.price, (ww.qty * ww.price) as sale_price, ww.ord_state
 									, ww.ord_state_date, ww.prd_cd, ww.store_cd, 'N' as online_yn
 									, ww.coupon_apply_amt, ww.dlv_amt
 								from order_opt_wonga ww
@@ -686,7 +679,7 @@ class acc06Controller extends Controller
 							)
 							union all
 							(
-								select ww.ord_opt_no, ww.goods_no, ww.qty, ww.price, ww.recv_amt, ww.ord_state
+								select ww.ord_opt_no, ww.goods_no, ww.qty, ww.price, (ww.qty * ww.price) as sale_price, ww.ord_state
 									, ww.ord_state_date, ww.prd_cd, ooo.dlv_place_cd as store_cd, 'Y' as online_yn
 									, 0 as coupon_apply_amt, ww.dlv_amt
 								from order_opt_wonga ww
@@ -714,15 +707,35 @@ class acc06Controller extends Controller
 					) a
 				) b
 			";
-			DB::select($sql
+			DB::insert($sql
 				, [
 					'acc_idx' => $acc_idx, 'nowdate1' => $nowdate, 'nowdate2' => $nowdate
 					, 'store_cd1' => $store_cd, 'sdate1' => $f_sdate, 'edate1' => $f_edate
 					, 'store_cd2' => $store_cd, 'sdate2' => $f_sdate, 'edate2' => $f_edate
 				]);
 
-			// 3. store_account_closed 에 상세판매내역의 총합계정보 업데이트
-			$sql = "";
+			// 3. store_account_extra 에 기타재반자료정보 추가 -- 기타재반자료 작업 이후 작업예정
+
+			// 4. store_account_closed 에 상세판매내역의 총합계정보 업데이트 -- 3번작업 완료 후 4번에도 반영필요
+			// 아래코드 작업중입니다.
+			$sql = "
+				select
+					sum(c.sale_amt) as sale_amt
+					, sum(c.clm_amt) as clm_amt
+					, sum(c.dc_amt) as dc_amt
+					, sum(c.coupon_amt) as coupon_amt
+					, sum(c.allot_amt) as allot_amt
+					, sum(c.dlv_amt) as dlv_amt
+					, sum(c.sale_net_taxation_amt) as sale_net_taxation_amt
+					, sum(c.sale_net_taxfree_amt) as sale_net_taxfree_amt
+					, sum(c.sale_net_amt) as sale_net_amt
+					, sum(c.tax_amt) as tax_amt
+					-- 정상123 / 특가 / 용품 / 특가(온라인) 수수료합계
+					, 0 as fee -- 수수료합계
+					, now() as ut
+				from store_account_closed_list c
+				where acc_idx = 12
+			";
 			// DB::update($sql);
 
 
