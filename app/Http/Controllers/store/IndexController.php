@@ -10,9 +10,18 @@ use Illuminate\Support\Facades\DB;
 
 class IndexController extends Controller
 {
-    //
+    
     public function index() {
-        return view(Config::get('shop.store.view'). '/index');
+
+
+
+        $values = [
+
+
+        ];
+
+
+        return view(Config::get('shop.store.view'). '/index',$values);
     }
 }
 

@@ -18,6 +18,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
     //Route::Redirect("/","//dashboard");
     Route::get('/', 'IndexController@index');
+    Route::get('/search', 'IndexController@search');
     Route::get('/login', 'LoginController@index');
     //Route::get('/login', 'LoginController@index')->name('login');
     Route::post('/login', 'LoginController@login');

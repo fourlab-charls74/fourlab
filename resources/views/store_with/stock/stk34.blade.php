@@ -110,8 +110,9 @@
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
-                                        <option value="cs.sale_date">매출일</option>
-                                        <option value="total_amt">매출액</option>
+                                        <option value="cs.sale_date">매출월</option>
+                                        <option value="cs.sale_amt">매출액</option>
+                                        <option value="s.store_cd">매장코드</option>
                                     </select>
                                 </div>
                                 <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -174,7 +175,7 @@ const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
     let columns = [
         {headerName: "매출월", field: "sale_date", rowGroup: true, hide:true},
         {headerName: "매장명", field: "store_nm", rowGroup: true, hide:true},
-        {headerName: '매출월', showRowGroup: 'sale_date', cellRenderer: 'agGroupCellRenderer', width: 130, pinned:'left'},
+        {headerName: '매출월', showRowGroup: 'sale_date', cellRenderer: 'agGroupCellRenderer', width: 130, pinned:'left', sortable: false},
         { field: "store_cd", headerName: "매장코드", pinned:'left', width:60, cellStyle: { 'text-align': "center" },
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.value == 'total' ? '합계' : params.node.level == 1 ? params.value : '',

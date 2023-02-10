@@ -424,7 +424,7 @@ CREATE TABLE `competitor` (
 CREATE TABLE `competitor_sale` (
   `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT '동종업계 매출 일련번호',
   `store_cd` varchar(30) NOT NULL COMMENT '매장코드',
-  `competitor_cd` varchar(50) NOT NULL COMMENT '동종업계 번호 - competitor : idx',
+  `competitor_cd` int(11) NOT NULL COMMENT '동종업계 번호 - competitor : idx',
   `sale_date` varchar(10) NOT NULL COMMENT '매출일자 (yyyy-mm-dd)',
   `sale_amt` int(11) NOT NULL COMMENT '동종업계 매출액',
   `admin_id` varchar(50) DEFAULT NULL COMMENT '작성자',
