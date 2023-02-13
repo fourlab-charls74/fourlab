@@ -26,8 +26,6 @@
                                         <div class="card-body mt-1">
                                             
                                             일별매출통계 그래프 자리
-                                            @include('store_with.sale.sal24_chart')
-                                            
                                         </div>
                                     </div>
                                 </div>

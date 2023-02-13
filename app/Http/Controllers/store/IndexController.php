@@ -23,5 +23,5 @@ class IndexController extends Controller
 
         return view(Config::get('shop.store.view'). '/index',$values);
     }
-}
 
+}
