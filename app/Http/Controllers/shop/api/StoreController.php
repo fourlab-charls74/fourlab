@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\store\api;
+namespace App\Http\Controllers\shop\api;
 
 use App\Http\Controllers\Controller;
 use App\Components\Lib;
@@ -18,7 +18,7 @@ class StoreController extends Controller {
      */
     public function show()
     {
-        return view(Config::get('shop.store.view') . "/common/store");
+        return view(Config::get('shop.shop.view') . "/common/store");
     }
 
     /**

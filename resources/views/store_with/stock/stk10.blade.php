@@ -64,15 +64,15 @@
 						<div class="form-group">
 							<label for="rel_order">출고구분/차수</label>
                             <div class="flex_box">
-                                <select name='rel_type' class="form-control form-control-sm" style="width: 47%;">
+                                <select name='rel_type' class="form-control form-control-sm" style="width:37%;">
                                     <option value=''>전체</option>
                                     @foreach ($rel_types as $rel_type)
                                         <option value='{{ $rel_type->code_id }}'>{{ $rel_type->code_val }}</option>
                                     @endforeach
                                 </select>
-                                <span class="text_line" style="width: 6%; text-align: center;">/</span>
-                                <div class="form-inline-inner input_box">
-                                    <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='rel_order' id="rel_order" value="">
+                                <span class="text_line" style="text-align: center; width: 5%">/</span>
+                                <div class="form-inline-inner input_box" style="width: 58%">
+                                    <input type='text' class="form-control form-control-sm search-enter" name='rel_order' id="rel_order" value="">
                                 </div>
                             </div>
 						</div>

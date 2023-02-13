@@ -103,7 +103,9 @@ class stk32Controller extends Controller
                 from msg_store_detail md
                     left outer join msg_store m on m.msg_cd = md.msg_cd
                     left outer join store s on s.store_cd = m.sender_cd
-                where md.receiver_type = '$admin_type' and md.receiver_cd = '$admin_cd' $where
+                where md.receiver_type = '$admin_type' and md.receiver_cd = '$admin_cd'
+                and m.rt >= :sdate and m.rt < date_add(:edate, interval 1 day)
+                $where
                 group by md.msg_cd
             ";
         }

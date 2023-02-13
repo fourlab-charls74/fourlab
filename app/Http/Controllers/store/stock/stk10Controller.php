@@ -70,8 +70,9 @@ class stk10Controller extends Controller
             and cast(if(psr.state > 20, psr.prc_rt, if(psr.state > 10, psr.exp_dlv_day, psr.req_rt)) as date) >= '$sdate' 
             and cast(if(psr.state > 20, psr.prc_rt, if(psr.state > 10, psr.exp_dlv_day, psr.req_rt)) as date) <= '$edate'
         ";
+
 		if($r['rel_order'] != null)
-			$where .= " and psr.rel_order like '%" . $r['rel_order'] . "%'";
+			$where .= " and psr.rel_order like '%" . $r['rel_order'] . "'";
 		if($r['rel_type'] != null) 
 			$where .= " and psr.type = '" . $r['rel_type'] . "'";
 		if($r['state'] != null) 

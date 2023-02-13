@@ -58,7 +58,7 @@ class cs03Controller extends Controller
 		$user_nm_state = $request->input("user_nm_state");
 		$user_nm = $request->input("user_nm");
 
-		$ord_field = $request->input("ord_field",'p1.rt');
+		$ord_field = $request->input("ord_field", 'p1.req_rt');
 		$ord = $request->input('ord','desc');
 		
 		if ($ord_field == 'prd_ord_date') {
@@ -69,6 +69,7 @@ class cs03Controller extends Controller
 
 		$where = "";
 		$where1 = "";
+		$having = "";
 		if ($prd_cd != "") {
 			$prd_cd = explode(',', $prd_cd);
 			$where .= " and (1!=1";
@@ -80,11 +81,11 @@ class cs03Controller extends Controller
 
 		if ($user_nm_state != '' && $user_nm != '') {
 			if ($user_nm_state == 'req_id') {
-				$where .= "and req_id = '$user_nm'";
+				$having = "having req_nm = '$user_nm'";
 			} else if ($user_nm_state == 'prc_id') {
-				$where .= "and prc_id = '$user_nm'";
+				$having = "having prc_nm = '$user_nm'";
 			} else if ($user_nm_state == 'fin_id') {
-				$where .= "and fin_id = '$user_nm'";
+				$having= "having fin_nm = '$user_nm'";
 			}
 		}
 
@@ -111,7 +112,7 @@ class cs03Controller extends Controller
 					left outer join product p3 on p1.prd_cd = p3.prd_cd
 					left outer join product_code p4 on p3.prd_cd = p4.prd_cd
 					left outer join mgr_user m on p2.admin_id = m.id
-				where 1=1 $where
+				where 1=1 
 			";
 			$row = DB::select($sql);
 			$total = $row[0]->total;
@@ -136,7 +137,7 @@ class cs03Controller extends Controller
 				ifnull(p1.price, 0) as price,
 				ifnull(p1.wonga, 0) as wonga,
 				p1.qty * p1.price as amount,
-				p1.rt as rt,
+				p1.req_rt as rt,
 				p1.ut as ut,
 				m.name as user_nm,
 				p1.req_id as req_id,
@@ -160,10 +161,13 @@ class cs03Controller extends Controller
 				left outer join mgr_user m on p2.admin_id = m.id
 			where 1=1 and p2.rt >= :sdate and p2.rt < date_add(:edate, interval 1 day)
 			$where $where1
+			$having
 			$orderby
 			$limit
 		";
+
 		$result = DB::select($sql, ['sdate' => $sdate, 'edate' => $edate]);
+
 		return response()->json([
 			"code"	=> 200,
 			"head"	=> array(
