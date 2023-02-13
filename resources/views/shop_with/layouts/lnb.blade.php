@@ -17,21 +17,21 @@
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-cube fs-18"></i><span>상품관리</span></a>
                 <ul>
-                    <li><a href="/head/product/prd01" target="_blank">상품관리</a></li>
+                    {{--<!-- <li><a href="/head/product/prd01" target="_blank">상품관리</a></li> -->--}}
                     {{--<!-- <li><a href="/shop/product/prd02">(완)상품관리(코드)</a></li> -->--}}
                     <li><a href="/shop/product/prd04">(완)상품재고관리</a></li>
                     {{--<!-- <li><a href="/shop/product/prd03">(완)원부자재상품관리</a></li> -->--}}
                 </ul>
             </li>
-            <li>
+            {{--<!-- <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-task fs-18"></i><span>생산입고관리</span></a>
                 <ul>
-                    {{--<!-- <li><a href="/shop/cs/cs01">(완)상품입고</a></li> -->--}}
-                    {{--<!-- <li><a href="/shop/cs/cs02">(완)상품반품이동</a></li> -->--}}
-                    {{-- <!-- <li><a href="/partner/cs/cs02">상품반품이동 (일괄등록)</a></li> --> --}}
+                    <li><a href="/shop/cs/cs02">(완)상품반품이동</a></li>
+                    <li><a href="/shop/cs/cs01">(완)상품입고</a></li>
+                    <li><a href="/partner/cs/cs02">상품반품이동 (일괄등록)</a></li>
                     <li><a href="/shop/cs/cs03">(완)원부자재입고/반품</a></li>
                 </ul>
-            </li>
+            </li> -->--}}
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-store fs-18"></i><span>매장관리</span></a>
                 <ul>
@@ -92,11 +92,11 @@
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-line-chart fs-18"></i><span>경영관리</span></a>
                 <ul>
-                    <li><a href="/shop/sale/sal01">(완)판매일보</a></li>
+                    {{--<!-- <li><a href="/shop/sale/sal01">(완)판매일보</a></li> -->--}}
                     <li><a href="/shop/sale/sal02">(완)월별판매집계표</a></li>
                     <li><a href="/shop/sale/sal03">(완)기간별 Best/Worst 판매현황</a></li>
                     <li><a href="/shop/sale/sal06">(완)매장상품별판매분석</a></li>
-                    <li><a href="/shop/sale/sal07">(완)상품별 이익현황</a></li>
+                    {{--<!-- <li><a href="/shop/sale/sal07">(완)상품별 이익현황</a></li> -->--}}
                     <li><a href="/shop/sale/sal08">(완)매장브랜드별판매분석</a></li>
                     <li><a href="/shop/sale/sal24">(완)일별 매출 통계</a></li>
                     <li><a href="/shop/sale/sal25">(완)월별 매출 통계</a></li>
