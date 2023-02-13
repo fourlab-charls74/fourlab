@@ -346,6 +346,12 @@ class stk30Controller extends Controller
 			$org_opt	= $data["org_opt"];
 			$org_cd		= $data["org_cd"];
 
+			// 23. 02. 13 ny 상품매칭 오류 수정 작업 중
+			// if($goods_no == null || $goods_no == "" || cd == null || cd == "") {
+			// 	$error_code = "402";	//매칭안됨
+			// 	break;
+			// }
+
 			$sql	= " 
 				select count(*) as cnt from goods_xmd 
 				where 
@@ -365,7 +371,8 @@ class stk30Controller extends Controller
 				where
 					cd = '" . Lib::quote($org_cd) . "' and goods_no = '$goods_no' and goods_opt = '" . Lib::quote($org_opt) . "'
 			";
-			DB::update($sql);
+			$is_update = DB::update($sql);
+			dd($is_update);
 
 			$sql	= "
 				update goods_summary set
