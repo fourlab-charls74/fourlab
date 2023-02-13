@@ -164,7 +164,7 @@
 		{field: "num", headerName: "#", type: 'NumType', pinned: 'left', aggSum: "합계", cellStyle: CENTER, width: 40,
 			cellRenderer: (params) => params.node.rowPinned === 'top' ? '합계' : parseInt(params.value) + 1,
 		},
-		{field: "sale_type", headerName: "매출구분", width: 55, pinned: 'left', cellStyle: CENTER},
+		{field: "sale_type", headerName: "매출구분", width: 55, pinned: 'left', cellStyle: (params) => ({...CENTER, "color": params.data.ord_state != 30 ? "#dd0000" : "none"})},
 		{field: "state_date", headerName: "일자", width: 80, pinned: 'left', cellStyle: CENTER},
 		{field: "ord_no", headerName: "주문번호", width: 140, pinned: 'left'},
 		{field: "ord_opt_no", headerName: "일련번호", width: 60, cellStyle: CENTER, type: 'StoreOrderNoType', pinned: 'left'},
@@ -199,9 +199,9 @@
 		// {field: "dlv_amt", headerName: "배송비", width: 80, type: 'currencyType', aggregation: true},
 		// {field: "",	headerName: "소계",		width: 80, type: 'currencyType', aggregation:true},
 		{field: "ord_state_nm", headerName: "주문상태", width: 70, cellStyle: StyleOrdState},
-		{field: "clm_state_nm",headerName: "클레임상태", width: 70, cellStyle: StyleClmState},
 		{field: "ord_date",	headerName: "출고완료일", width: 80, cellStyle: CENTER},
 		// {field: "dlv_end_date", headerName: "배송완료일", width: 80},
+		{field: "clm_state_nm",headerName: "클레임상태", width: 70, cellStyle: StyleClmState},
 		{field: "clm_end_date", headerName: "클레임완료일",	width: 80},
 		{width: "auto"}
 	];

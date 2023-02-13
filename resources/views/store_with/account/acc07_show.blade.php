@@ -1,36 +1,36 @@
 @extends('store_with.layouts.layout-nav')
-@section('title','마감 - 상세')
+@section('title','마감상세내역')
 @section('content')
 
 <style>
     .text { box-sizing: border-box; margin-top: 1px;}
     .form-control-sm { padding: 0.25rem 0.5rem; }
-    #gd {
-        text-overflow: initial;
-    }
+    #gd {text-overflow: initial;}
 </style>
 
 <div class="py-3 px-sm-3">
     <div class="page_tit">
-        <h3 class="d-inline-flex">마감</h3>
+        <h3 class="d-inline-flex">마감상세내역(개발중)</h3>
         <div class="d-inline-flex location">
-            <span class="home">/</span>
-            <span>/ 입점&정산 / 마감 / 마감상세내역</span>
+            <span class="home"></span>
+            <span>/ 매장관리</span>
+            <span>/ 정산/마감관리</span>
+            <span>/ 마감상세내역</span>
         </div>
     </div>
     <form method="get" name="search">
-        <input type="hidden" name="idx" value="{{ $idx }}"/>
+        <input type="hidden" name="idx" value="{{ @$closed->idx }}"/>
         <div id="search-area" class="search_cum_form">
             <div class="card mb-3">
                 <div class="d-flex card-header justify-content-between">
                     <h4>검색</h4>
                     <div>
-                        <a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 다운로드</a>
-                        @if($closed_yn !== 'Y')
-                            <a href="#" onclick="setAccountClose()" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>마감완료</a>
-                            <a href="#" onclick="removeAll()" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>삭제</a>
+                        @if(@$closed->closed_yn !== 'Y')
+                        <a href="#" onclick="setAccountClose()" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-check mr-1"></i>마감완료</a>
+                        <a href="#" onclick="removeAll()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-trash mr-1"></i>마감삭제</a>
+                        @else
+                        <a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 정산서 다운로드</a>
                         @endif
-                        <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                     </div>
                 </div>
                 <div class="card-body">
@@ -40,29 +40,29 @@
                                 <label for="">마감대상일자</label>
                                 <div class="flex_box">
                                     <div class="form-control-sm text">
-                                        {{ $sday }}
+                                        {{ @$closed->sday }}
                                         <span class="text_line">~</span>
-                                        {{ $eday }}
+                                        {{ @$closed->eday }}
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="store_nm">매장</label>
+                                <label for="store_nm">매장/매니저</label>
                                 <div class="flex_box">
                                     <div class="form-control-sm text">
-                                        {{ $store_nm }}
+                                        {{ @$closed->store_nm }} / {{ @$closed->manager_nm ?? '-' }}
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="closed_yn">마감여부</label>
+                                <label for="closed_yn">마감상태</label>
                                 <div class="flex_box">
                                     <div class="form-control-sm text">
-                                        {{ $closed_yn }}
+                                        {{ @$closed->closed_yn == 'Y' ? '마감완료' : '마감추가' }}
                                     </div>
                                 </div>
                             </div>
@@ -74,7 +74,7 @@
                                 <label for="rt">등록일</label>
                                 <div class="flex_box">
                                     <div class="form-control-sm text">
-                                        {{ $rt }}
+                                        {{ @$closed->rt }}
                                     </div>
                                 </div>
                             </div>
@@ -84,7 +84,7 @@
                                 <label for="closed_date">마감일</label>
                                 <div class="flex_box">
                                     <div class="form-control-sm text">
-                                        {{ $closed_date }}
+                                        {{ @$closed->closed_date ?? '-' }}
                                     </div>
                                 </div>
                             </div>
@@ -94,7 +94,7 @@
                                 <label for="admin_nm">처리자</label>
                                 <div class="flex_box">
                                     <div class="form-control-sm text">
-                                        {{ $admin_nm }}
+                                        {{ @$closed->admin_nm }}
                                     </div>
                                 </div>
                             </div>
@@ -103,22 +103,25 @@
                 </div>
             </div>
             <div class="resul_btn_wrap mb-3">
-                <a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 다운로드</a>
-                <a href="#" onclick="setAccountClose()" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>마감완료</a>
-                <a href="#" onclick="removeAll()" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>삭제</a>
-                <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
+                @if(@$closed->closed_yn !== 'Y')
+                <a href="#" onclick="setAccountClose()" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-check mr-1"></i>마감완료</a>
+                <a href="#" onclick="removeAll()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-trash mr-1"></i>마감삭제</a>
+                @else
+                <a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 정산서 다운로드</a>
+                @endif
             </div>
         </div>
         <div id="filter-area" class="card shadow-none mb-0 ty2 last-card">
             <div class="card-body">
-                @if($closed_yn !== 'Y')
-                    <div class="card-title mb-3">
+                @if(@$closed->closed_yn !== 'Y')
+                    <div class="card-title mb-2">
                         <div class="filter_wrap">
                             <div class="fl_box">
+                                <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span>건</h6>
                             </div>
                             <div class="fr_box">
                                 <div class="flax_box">
-                                    <a href="#" onclick="updateData();" class="btn-sm btn btn-primary">저장</a>
+                                    <a href="#" onclick="updateData();" class="btn-sm btn btn-primary"><i class="bx bx-save mr-1"></i> 저장</a>
                                 </div>
                             </div>
                         </div>
@@ -128,10 +131,29 @@
                     <div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
                 </div>
             </div>
+            <div class="card-body">
+                @if(@$closed->closed_yn !== 'Y')
+                    <div class="card-title mb-2">
+                        <div class="filter_wrap">
+                            <div class="fl_box">
+                                <h6 class="m-0 font-weight-bold">특약(온라인) (총 <span id="gd-total-online" class="text-primary">0</span>건)</h6>
+                            </div>
+                            <div class="fr_box">
+                                <div class="flax_box">
+                                    <a href="#" onclick="updateData();" class="btn-sm btn btn-primary"><i class="bx bx-save mr-1"></i> 저장</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+                <div class="table-responsive">
+                    <div id="div-gd-online" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
+                </div>
+            </div>
         </div>
     </form>
 
-    <div class="card shadow">
+    {{-- <div class="card shadow">
         <div class="card-body">
             <div class="card-title">
                 <h6 class="m-0 font-weight-bold text-primary fas fa-question-circle"> Help</h6>
@@ -146,13 +168,125 @@
                 <li><strong><font color="red">배송비, 기타 정산액, 비고 수정 후 저장 버튼을 클릭하셔야 합니다.</font></strong></li>
             </ul>
         </div>
-    </div>
-
+    </div> --}}
 </div>
 
-
-
 <script type="text/javascript" charset="utf-8">
+	const CENTER = { 'text-align': 'center' };
+    const columns = [
+		{field: "account_idx", headerName: "마감일련", pinned: 'left', cellStyle: CENTER, width: 70,
+			cellRenderer: (params) => params.node.rowPinned === 'top' ? '합계' : parseInt(params.value) + 1,
+		},
+        {field: "type", headerName: "매출구분", width: 55, pinned: 'left', cellStyle: (params) => ({...CENTER, "color": params.data.ord_state != 30 ? "#dd0000" : "none"})},
+		{field: "state_date", headerName: "일자", width: 80, pinned: 'left', cellStyle: CENTER},
+		{field: "ord_no", headerName: "주문번호", width: 140, pinned: 'left'},
+		{field: "ord_opt_no", headerName: "일련번호", width: 60, cellStyle: CENTER, type: 'StoreOrderNoType', pinned: 'left'},
+		{field: "multi_order", headerName: "복수주문", width: 60, pinned: 'left',
+			cellStyle: (params) => ({ ...CENTER, "background-color": params.value === 'Y' ? "#ffff99" : "none" }),
+			cellRenderer: (params) => params.node.rowPinned === 'top' 
+				? '' : params.value === 'Y' 
+					? `<a href="javascript:void(0);" onclick="return openStoreOrder('${params.data.ord_opt_no}');">${params.value}</a>` : "-",
+		},
+        {field: "store_cd",	headerName: "매장코드", width: 70, cellStyle: CENTER},
+		{field: "store_nm",	headerName: "매장명", width: 100},
+        {field: "prd_cd", headerName: "상품코드", width: 125, cellStyle: CENTER},
+		{field: "goods_no", headerName: "상품번호",	width: 70, cellStyle: CENTER},
+		{field: "style_no",	headerName: "스타일넘버", width: 70, cellStyle: CENTER},
+		{field: "goods_nm", headerName: "상품명", width: 180, type: 'HeadGoodsNameType'},
+		{field: "prd_cd_p", headerName: "코드일련",	width: 100, cellStyle: CENTER},
+		{field: "color", headerName: "컬러", width: 55, cellStyle: CENTER},
+		{field: "size", headerName: "사이즈", width: 55, cellStyle: CENTER},
+		{field: "goods_opt", headerName: "옵션", width: 150},
+		{field: "tax_yn", headerName: "과세", width: 40, cellStyle: CENTER},
+
+        // 아래 작업중입니다. - 최유현
+
+        // {field: "ord_type_nm", headerName: "주문구분", width: 60, cellStyle: CENTER},
+		// {field: "pr_code_nm", headerName: "행사구분", width: 60, cellStyle: CENTER},
+        // {field: "user_nm", headerName: "주문자", width: 60, cellStyle: CENTER},
+		// {field: "pay_type_nm",	headerName: "결제방법",	width: 70, cellStyle: CENTER},
+		// {field: "qty", headerName: "수량", width: 50, type: 'currencyType', aggregation: true},
+		// { field: "sale_amt", headerName: "판매금액", width: 90, type: "currencyType", aggregation: true },
+		// { field: "clm_amt", headerName: "클레임금액", width: 90, type: "currencyType", aggregation: true },
+		// { field: "dc_amt", headerName: "할인금액", width: 90, type: "currencyType", aggregation: true },
+		// { headerName: "쿠폰금액",
+		// 	children: [
+		// 		{ field: "coupon_com_amt", headerName: "업체부담", width: 90, type: "currencyType", aggregation: true },
+		// 		{ field: "allot_amt", headerName: "본사부담", width: 90, type: "currencyType", aggregation: true },
+		// 	]
+        // },
+		// { field: "dlv_amt", headerName: "배송비", width: 90, type: "currencyType", aggregation: true },
+		// // { field: "etc_amt", headerName: "기타정산액", width: 90, type: "currencyType", aggregation: true },
+        // { headerName: "매출",
+		// 	children: [
+		// 		{ field: "sale_type", headerName: "구분", width: 90, type: "currencyType", aggregation: true },
+		// 		{ field: "sale_JS", headerName: "정상", width: 90, type: "currencyType", aggregation: true },
+		// 		{ field: "sale_TG", headerName: "특가", width: 90, type: "currencyType", aggregation: true },
+		// 		{ field: "sale_YP", headerName: "용품", width: 90, type: "currencyType", aggregation: true },
+		// 		{ field: "sale_net_amt", headerName: "매출합계", width: 90, type: "currencyType", aggregation: true },
+		// 		{ field: "sales_amt_except_vat", headerName: "매출합계(-VAT)", width: 90, type: "currencyType", aggregation: true },
+		// 	]
+        // },
+		// {field: "ord_state_nm", headerName: "주문상태", width: 70, cellStyle: StyleOrdState},
+		// {field: "ord_date",	headerName: "출고완료일", width: 80, cellStyle: CENTER},
+		// {field: "clm_state_nm",headerName: "클레임상태", width: 70, cellStyle: StyleClmState},
+		// {field: "clm_end_date", headerName: "클레임완료일",	width: 80},
+		// {width: "auto"}
+    ];
+    const online_columns = [];
+
+    const pApp = new App('', { gridId: "#div-gd" });
+    const pApp2 = new App('', { gridId: "#div-gd-online" });
+    let gx, gx2;
+
+    $(document).ready(function() {
+        pApp.ResizeGrid(465);
+        pApp.BindSearchEnter();
+        let gridDiv = document.querySelector(pApp.options.gridId);
+        gx = new HDGrid(gridDiv, columns, {
+            getRowStyle: (params) => {
+                if (params.node.rowPinned === 'top') {
+                    return { 'background': '#eee' }
+                }
+            },
+            // getRowNodeId: (data) => data.hasOwnProperty('index') ? data.index : "0",
+            // onCellValueChanged: (params) => evtAfterEdit(params),
+            // onPinnedRowDataChanged: (params) => {
+            //     initTopRowData(params);
+			// }
+        });
+
+        pApp2.ResizeGrid(650);
+        pApp2.BindSearchEnter();
+        let gridDiv2 = document.querySelector(pApp2.options.gridId);
+        gx2 = new HDGrid(gridDiv2, columns_d, {
+            // getRowStyle: (params) => {
+            //     if (params.node.rowPinned === 'top') {
+            //         return { 'background': '#eee' }
+            //     }
+            // },
+            // getRowNodeId: (data) => data.hasOwnProperty('index') ? data.index : "0",
+            // onCellValueChanged: (params) => evtAfterEdit(params),
+            // onPinnedRowDataChanged: (params) => {
+            //     initTopRowData(params);
+			// }
+        });
+        
+        Search();
+    });
+
+    function Search() {
+        let data = $('form[name="search"]').serialize();
+        gx.Aggregation({ "sum": "top" });
+        gx.Request('/store/account/acc07/show-search/except-online', data, -1);
+    };
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     const CELL_STYLE = {
         EDIT: { 'background': '#DEEDB6', 'color': '#FF0000', 'font-weight': 'bold' }
@@ -165,7 +299,7 @@
     }
     
     // ag-grid set field
-    var columns = [
+    var columns_d = [
 		{field: "num",			headerName: "#", type:'NumType', pinned: 'left'},
 		{field: "type",			headerName: "구분",			width:80, pinned: 'left', cellStyle: { 'text-align': 'center' }},
 		{field: "state_date",	headerName: "일자",			width:80, pinned: 'left'},
@@ -306,30 +440,7 @@
 
     // logics
 
-    const pApp = new App('', {
-        gridId: "#div-gd",
-    });
-    let gx;
 
-    $(document).ready(function() {
-        pApp.ResizeGrid(275);
-        pApp.BindSearchEnter();
-        let gridDiv = document.querySelector(pApp.options.gridId);
-        let options = {
-            getRowStyle: (params) => {
-                if (params.node.rowPinned === 'top') {
-                    return { 'background': '#eee' }
-                }
-            },
-            getRowNodeId: (data) => data.hasOwnProperty('index') ? data.index : "0",
-            onCellValueChanged: (params) => evtAfterEdit(params),
-            onPinnedRowDataChanged: (params) => {
-                initTopRowData(params);
-			}
-        };
-        gx = new HDGrid(gridDiv, columns, options);
-        Search();
-    });
     
     const initTopRowData = () => {
         let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
@@ -338,13 +449,6 @@
         ]);
     };
 
-    function Search() {
-        let data = $('form[name="search"]').serialize();
-        gx.Aggregation({ "sum": "top" });
-        gx.Request(`/store/account/acc07/show_search`, data, -1, () => {
-            // callback
-        });
-    };
 
     const evtAfterEdit = async (params) => {
         const bool = await validation(params);

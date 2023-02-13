@@ -3,27 +3,28 @@
 namespace App\Http\Controllers\store\account;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Components\Lib;
 use App\Components\SLib;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
-use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Exception;
 
 class acc07Controller extends Controller
 {
     public function index()
     {
         $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m");
-		$store_types = SLib::getStoreTypes();
+
         $values = [ 
 			'sdate' => $sdate, 
-			'store_types' => $store_types,
+			'store_types' => SLib::getStoreTypes(),
 			'store_kinds' => SLib::getCodes("STORE_KIND")
 		];
-        return view( Config::get('shop.store.view') . '/account/acc07', $values);
+
+        return view( Config::get('shop.store.view') . '/account/acc07', $values );
     }
 
     public function search(Request $request)
@@ -33,41 +34,32 @@ class acc07Controller extends Controller
         $f_sdate = Carbon::parse($sdate)->firstOfMonth()->format("Ymd");
         $f_edate = Carbon::parse($sdate)->lastOfMonth()->format("Ymd");
 
-		$store_type = $request->input('store_type', "");
-        $store_kind = $request->input('store_kind', "");
-        $store_cd = $request->input("store_cd");
-		$closed_yn = $request->input("closed_yn");
+        $store_type = $request->input('store_type', '');
+        $store_kind = $request->input('store_kind', '');
+        $store_cd = $request->input('store_cd', '');
+		$closed_yn = $request->input('closed_yn', '');
 
-		/**
-         * 검색조건 필터링
-         */
-        $where = "";
-        if ($store_type) $where .= " and c.code_id = " . Lib::quote($store_type);
-        if ($store_kind != "") $where .= " and b.store_kind = '". Lib::quote($store_kind) . "'";
-		if ($closed_yn != "") $where .= " and a.closed_yn = '" . Lib::quote($closed_yn) . "'";
-        if ($store_cd != "") $where .= " and a.store_cd = '" . Lib::quote($store_cd) . "'";
+		// 검색조건 필터링
+		$where = "";
+		if ($store_type != '') $where .= " and s.store_type = '" . Lib::quote($store_type) . "'";
+        if ($store_kind != '') $where .= " and s.store_kind = '". Lib::quote($store_kind) . "'";
+        if ($store_cd != '') $where .= " and s.store_cd = '" . Lib::quote($store_cd) . "'";
+        if ($closed_yn != '') $where .= " and c.closed_yn = '" . Lib::quote($closed_yn) . "'";
 
-        $sql = "
-			select
-				a.closed_yn,concat_ws('~',a.sday,a.eday) as closed_day,
-				b.store_nm,
-				a.sale_amt, a.clm_amt, a.dc_amt,
-				( a.coupon_amt - a.allot_amt ) as coupon_com_amt,
-				a.dlv_amt, a.etc_amt,
-				a.sale_net_taxation_amt, a.sale_net_taxfree_amt, a.sale_net_amt, a.tax_amt,
-				a.fee, a.fee_dc_amt, a.fee_net, a.acc_amt, a.allot_amt,
-
-				-- date_format(a.tax_day,'%Y%m%d') as tax_day,
-				date_format(a.pay_day,'%Y%m%d') as pay_day,
-				a.idx, a.store_cd, a.sday, a.eday
-			from
-				store_account_closed a inner join store b on ( a.store_cd = b.store_cd )
-				left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = b.store_type
-				left outer join tax t on a.tax_no = t.idx
-			where
-				a.sday >= '20110101' and a.sday <= '$f_edate' and a.eday >= '$f_sdate' $where
-			order by
-				a.acc_amt desc
+		$sql = "
+			select c.idx, c.store_cd, c.sday, c.eday, c.sale_amt, c.clm_amt, c.dc_amt
+				, c.coupon_amt, c.allot_amt, (c.coupon_amt - c.allot_amt) as coupon_com_amt, c.dlv_amt
+				, c.sale_net_taxation_amt, c.sale_net_taxfree_amt, c.sale_net_amt, c.tax_amt
+				, (c.sale_net_amt - c.tax_amt) as sales_amt_except_vat
+				, c.fee_JS1, c.fee_JS2, c.fee_JS3, c.fee_TG, c.fee_YP, c.fee_OL, c.fee, c.extra_amt
+				, (c.fee_JS1 + c.fee_JS2 + c.fee_JS3 + c.fee_TG + c.fee_YP + c.fee_OL) as fee_amt
+				, c.closed_yn, c.closed_date, date_format(c.pay_day, '%Y-%m-%d') as pay_day, c.tax_no, c.admin_nm, c.rt
+				, s.store_nm, s.manager_nm
+			from store_account_closed c
+				inner join store s on s.store_cd = c.store_cd
+			where c.sday = '$f_sdate' and c.eday = '$f_edate'
+				$where
+			order by c.idx desc
 		";
 
         $rows = DB::select($sql);
@@ -79,53 +71,66 @@ class acc07Controller extends Controller
             ),
             "body" => $rows
         ]);
-
     }
 
-    public function show(Request $request)
+    public function show(Request $request, $idx)
     {
-        $idx = $request->input('idx');
-        $sql = "
-            select
-                a.rt, a.closed_date, a.closed_yn,
-                a.store_cd, c.store_nm, c.store_type,
-                a.sday, a.eday, a.admin_id, a.admin_nm
-            from store_account_closed a inner join store c on a.store_cd = c.store_cd
-            where a.idx = '$idx'
-        ";
-        $row = DB::selectOne($sql);
-
-        if ($row) {
-			$sday = $row->sday;
-			$eday = $row->eday;
-			$store_nm = $row->store_nm;
-			$rt = $row->rt;
-			$closed_date = $row->closed_date;
-			$closed_yn = $row->closed_yn;
-			$admin_nm = $row->admin_nm;
-		} else {
-			$sday = "";
-			$eday = "";
-			$store_nm = "";
-			$rt = "";
-			$closed_date = "";
-			$closed_yn = "";
-			$admin_nm = "";
-		}
+		$sql = "
+			select c.idx, c.store_cd, s.store_nm, s.manager_nm, c.sday, c.eday, c.closed_yn, c.closed_date, c.rt, c.admin_nm
+			from store_account_closed c
+				inner join store s on s.store_cd = c.store_cd
+			where c.idx = :idx
+		";
+        $row = DB::selectOne($sql, ['idx' => $idx]);
 
         $values = [
-            "idx"			=> $idx,
-			"sday"			=> $sday,
-			"eday"			=> $eday,
-			"store_nm"		=> $store_nm,
-			"rt"		=> $rt,
-			"closed_date"	=> $closed_date,
-			"closed_yn"		=> $closed_yn,
-			"admin_nm"		=> $admin_nm
+			"closed" => $row,
         ];
 
         return view( Config::get('shop.store.view') . '/account/acc07_show', $values);
     }
+
+    public function search_command(Request $request, $cmd)
+    {
+        switch ($cmd) {
+			case 'except-online':
+				$response = $this->search_except_online($request);
+				break;
+			case 'online':
+				$response = $this->search_online($request);
+				break;
+            default:
+                $message = 'Command not found';
+                $response = response()->json(['code' => 0, 'msg' => $message], 404);
+		};
+		return $response;
+    }
+
+	public function search_except_online(Request $request)
+	{
+		$idx = $request->input('idx', '');
+		if ($idx == '') return response()->json(['code' => 400, 'msg' => '부정확한 요청입니다.'], 404);
+
+		// 아래 쿼리문 작업중입니다. - 최유현
+		$sql = "
+			select *, c.idx as account_idx
+			from store_account_closed_list c
+				inner join store_account_closed ac on ac.idx = c.acc_idx
+				inner join store s on s.store_cd = ac.store_cd
+				inner join order_opt o on o.ord_opt_no = c.ord_opt_no
+				inner join goods g on g.goods_no = o.goods_no
+			where c.acc_idx = :acc_idx
+		";
+		$rows = DB::select($sql, ['acc_idx' => $idx]);
+
+		return response()->json([
+            "code" => 200,
+            "head" => [
+                "total" => count($rows)
+			],
+            "body" => $rows
+        ]);
+	}
 
     public function show_search(Request $request)
     {
