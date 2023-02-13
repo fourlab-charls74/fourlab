@@ -18,7 +18,7 @@
         <div class="d-flex">
             <a href="javascript:void(0)" onclick="Cmder('{{ $cmd }}')" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i>저장</a>
             {{-- <!--<a href="javascript:void(0)" onclick="Cmder('delete')" class="btn btn-primary mr-1"><i class="fas fa-trash fa-sm text-white-50 mr-1"></i>삭제</a>//--> --}}
-            <a href="javascript:void(0)" onclick="@if($cmd == 'update') href='/shop' @else window.close(); @endif" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i>닫기</a>
+            <a href="@if($cmd == 'update') /shop @else # @endif" onclick="@if($cmd != 'update') window.close(); @endif" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i>닫기</a>
         </div>
     </div>
 
