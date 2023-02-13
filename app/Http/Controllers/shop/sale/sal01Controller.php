@@ -26,52 +26,55 @@ class sal01Controller extends Controller
 	//
 	public function index() {
 
-        $mutable	= now();
-        $sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
+        // $mutable	= now();
+        // $sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
 
-		//매장구분
-		$sql		= " 
-			select 
-			* from __tmp_code 
-			where 
-				code_kind_cd = 'com_type' and use_yn = 'Y' order by code_seq 
-		";
-		$com_types	= DB::select($sql);
+		// //매장구분
+		// $sql		= " 
+		// 	select 
+		// 	* from __tmp_code 
+		// 	where 
+		// 		code_kind_cd = 'com_type' and use_yn = 'Y' order by code_seq 
+		// ";
+		// $com_types	= DB::select($sql);
 
-		//행사구분
-		$sql	= "
-			select
-			* from __tmp_code
-			where
-				code_kind_cd = 'event_cd' and use_yn = 'Y' order by code_seq
-		";
-		$event_cds	= DB::select($sql);
+		// //행사구분
+		// $sql	= "
+		// 	select
+		// 	* from __tmp_code
+		// 	where
+		// 		code_kind_cd = 'event_cd' and use_yn = 'Y' order by code_seq
+		// ";
+		// $event_cds	= DB::select($sql);
 
-		//판매유형
-		$sql	= "
-			select
-			* from __tmp_code
-			where
-				code_kind_cd = 'sell_type' and use_yn = 'Y' order by code_seq
-		";
-		$sell_types	= DB::select($sql);
-
-
-
-		$sql		= " select * from __tmp_code_kind order by code_kind_nm ";
-		$code_kinds	= DB::select($sql);
+		// //판매유형
+		// $sql	= "
+		// 	select
+		// 	* from __tmp_code
+		// 	where
+		// 		code_kind_cd = 'sell_type' and use_yn = 'Y' order by code_seq
+		// ";
+		// $sell_types	= DB::select($sql);
 
 
-		$values = [
-            'sdate'         => $sdate,
-            'edate'         => date("Y-m-d"),
-			'com_types'		=> $com_types,
-			'event_cds'		=> $event_cds,
-			'sell_types'	=> $sell_types,
-			'code_kinds'	=> $code_kinds,
-		];
 
-		return view( Config::get('shop.shop.view') . '/sale/sal01',$values);
+		// $sql		= " select * from __tmp_code_kind order by code_kind_nm ";
+		// $code_kinds	= DB::select($sql);
+
+
+		// $values = [
+        //     'sdate'         => $sdate,
+        //     'edate'         => date("Y-m-d"),
+		// 	'com_types'		=> $com_types,
+		// 	'event_cds'		=> $event_cds,
+		// 	'sell_types'	=> $sell_types,
+		// 	'code_kinds'	=> $code_kinds,
+		// ];
+
+		// return view( Config::get('shop.shop.view') . '/sale/sal01',$values);
+
+		/* shop 미사용 메뉴 메인페이지로 리다이렉트 */
+        return redirect('/shop');
 	}
 
 	public function search(Request $request)

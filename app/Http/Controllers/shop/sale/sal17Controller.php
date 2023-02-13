@@ -15,58 +15,61 @@ class sal17Controller extends Controller
 	//
 	public function index(Request $request)
 	{
-		$is_searched = $request->input('is_searched', 'y');
-        $sdate = $request->input('sdate', now()->startOfMonth()->subMonth()->format("Y-m"));
-        $edate = $request->input('edate', now()->format("Y-m"));
-        $store_type = $request->input('store_type', "");
-        $store_cd = $request->input('store_cd', "");
+		// $is_searched = $request->input('is_searched', 'y');
+        // $sdate = $request->input('sdate', now()->startOfMonth()->subMonth()->format("Y-m"));
+        // $edate = $request->input('edate', now()->format("Y-m"));
+        // $store_type = $request->input('store_type', "");
+        // $store_cd = $request->input('store_cd', "");
 
-		// 매장구분
-		$sql = /** @lang text */
-            " 
-			select *
-			from code
-			where 
-				code_kind_cd = 'store_type' and use_yn = 'Y' order by code_seq 
-		";
-		$store_types = DB::select($sql);
-
-		$months = [];
-		$sd = Carbon::parse($sdate);
-        while($sd <= Carbon::parse($edate)){
-            //$months[] = [ "val" => $sd->format("Y-m"), "fmt" => $sd->format("Y-m") ];
-            $months[] = [ "val" => $sd->format("Ym"), "fmt" => $sd->format("Y-m") ];
-            $sd->addMonth();
-        }
-
-        // // 행사구분 - 추후 논의사항
-		// $sql = "
+		// // 매장구분
+		// $sql = /** @lang text */
+        //     " 
 		// 	select *
-		// 	from __tmp_code
-		// 	where
-		// 		code_kind_cd = 'event_cd' and use_yn = 'Y' order by code_seq
+		// 	from code
+		// 	where 
+		// 		code_kind_cd = 'store_type' and use_yn = 'Y' order by code_seq 
 		// ";
-		// $event_cds = DB::select($sql);
+		// $store_types = DB::select($sql);
 
-		// // 판매유형 - 추후 논의사항
-		// $sql = "
-		// 	select *
-		// 	from __tmp_code
-		// 	where
-		// 		code_kind_cd = 'sell_type' and use_yn = 'Y' order by code_seq
-		// ";
-		$sell_types	= DB::select($sql);
+		// $months = [];
+		// $sd = Carbon::parse($sdate);
+        // while($sd <= Carbon::parse($edate)){
+        //     //$months[] = [ "val" => $sd->format("Y-m"), "fmt" => $sd->format("Y-m") ];
+        //     $months[] = [ "val" => $sd->format("Ym"), "fmt" => $sd->format("Y-m") ];
+        //     $sd->addMonth();
+        // }
 
-		$values = [
-            'sdate'         => $sdate,
-            'edate'         => $edate,
-			'months'	    => $months,
-			'store_types'	=> $store_types,
-			'is_searched' 	=> $is_searched
-			// 'event_cds'	=> $event_cds,
-			// 'sell_types'	=> $sell_types
-		];
-        return view( Config::get('shop.shop.view') . '/sale/sal17', $values);
+        // // // 행사구분 - 추후 논의사항
+		// // $sql = "
+		// // 	select *
+		// // 	from __tmp_code
+		// // 	where
+		// // 		code_kind_cd = 'event_cd' and use_yn = 'Y' order by code_seq
+		// // ";
+		// // $event_cds = DB::select($sql);
+
+		// // // 판매유형 - 추후 논의사항
+		// // $sql = "
+		// // 	select *
+		// // 	from __tmp_code
+		// // 	where
+		// // 		code_kind_cd = 'sell_type' and use_yn = 'Y' order by code_seq
+		// // ";
+		// $sell_types	= DB::select($sql);
+
+		// $values = [
+        //     'sdate'         => $sdate,
+        //     'edate'         => $edate,
+		// 	'months'	    => $months,
+		// 	'store_types'	=> $store_types,
+		// 	'is_searched' 	=> $is_searched
+		// 	// 'event_cds'	=> $event_cds,
+		// 	// 'sell_types'	=> $sell_types
+		// ];
+        // return view( Config::get('shop.shop.view') . '/sale/sal17', $values);
+
+		/* shop 미사용 메뉴 메인페이지로 리다이렉트 */
+        return redirect('/shop');
 	}
 
 	public function search(Request $request)

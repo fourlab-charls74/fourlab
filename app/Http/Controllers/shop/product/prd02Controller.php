@@ -20,35 +20,38 @@ class prd02Controller extends Controller
 
 	public function index() 
 	{
-		
-		$mutable	= now();
-		$sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
 
-		$event_cds	= [];
-		//판매유형
-		$sell_types	= [];
-		$code_kinds	= [];
+		// $mutable	= now();
+		// $sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
 
-		$conf = new Conf();
-		$domain		= $conf->getConfigValue("shop", "domain");
+		// $event_cds	= [];
+		// //판매유형
+		// $sell_types	= [];
+		// $code_kinds	= [];
 
-		$values = [
-			'sdate'         => $sdate,
-			'edate'         => date("Y-m-d"),
-			'event_cds'		=> $event_cds,
-			'sell_types'	=> $sell_types,
-			'code_kinds'	=> $code_kinds,
-			'domain'		=> $domain,
-			'style_no'		=> "",
-			'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
-			// 'com_types'     => SLib::getCodes('G_COM_TYPE'),
-			'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
-			'items'			=> SLib::getItems(),
-			'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
-			'is_unlimiteds'	=> SLib::getCodes('G_IS_UNLIMITED'),
-		];
+		// $conf = new Conf();
+		// $domain		= $conf->getConfigValue("shop", "domain");
 
-		return view( Config::get('shop.shop.view') . '/product/prd02',$values);
+		// $values = [
+		// 	'sdate'         => $sdate,
+		// 	'edate'         => date("Y-m-d"),
+		// 	'event_cds'		=> $event_cds,
+		// 	'sell_types'	=> $sell_types,
+		// 	'code_kinds'	=> $code_kinds,
+		// 	'domain'		=> $domain,
+		// 	'style_no'		=> "",
+		// 	'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
+		// 	// 'com_types'     => SLib::getCodes('G_COM_TYPE'),
+		// 	'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
+		// 	'items'			=> SLib::getItems(),
+		// 	'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
+		// 	'is_unlimiteds'	=> SLib::getCodes('G_IS_UNLIMITED'),
+		// ];
+
+		// return view( Config::get('shop.shop.view') . '/product/prd02',$values);
+
+		/* shop 미사용 메뉴 메인페이지로 리다이렉트 */
+        return redirect('/shop');
 	}
 
 	public function search(Request $request)

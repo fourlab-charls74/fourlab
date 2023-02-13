@@ -18,15 +18,18 @@ class sal20Controller extends Controller
 
 	public function index(Request $request)
 	{
-        $store_cd = $request->input('store_cd', '');
-        $values = [
-            'sdate' => $request->input('sdate', now()->sub(1, 'week')->format('Y-m-d')),
-            'edate' => $request->input('edate', date('Y-m-d')),
-            'sc_cd' => $request->input('sc_cd', ''),
-            'store' => DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', '=', $store_cd)->first(),
-            'sc_state' => $request->input('sc_state', ''),
-		];
-        return view(Config::get('shop.shop.view') . '/sale/sal20', $values);
+        // $store_cd = $request->input('store_cd', '');
+        // $values = [
+        //     'sdate' => $request->input('sdate', now()->sub(1, 'week')->format('Y-m-d')),
+        //     'edate' => $request->input('edate', date('Y-m-d')),
+        //     'sc_cd' => $request->input('sc_cd', ''),
+        //     'store' => DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', '=', $store_cd)->first(),
+        //     'sc_state' => $request->input('sc_state', ''),
+		// ];
+        // return view(Config::get('shop.shop.view') . '/sale/sal20', $values);
+
+        /* shop 미사용 메뉴 메인페이지로 리다이렉트 */
+        return redirect('/shop');
 	}
 
     public function search(Request $request)

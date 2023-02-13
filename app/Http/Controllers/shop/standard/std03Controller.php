@@ -17,8 +17,11 @@ class std03Controller extends Controller
 {
 	public function index()
 	{
-		$values = [];
-		return view(Config::get('shop.shop.view') . '/standard/std03', $values);
+		// $values = [];
+		// return view(Config::get('shop.shop.view') . '/standard/std03', $values);
+
+		/* shop 미사용 메뉴 메인페이지로 리다이렉트 */
+        return redirect('/shop');
 	}
 
 	public function search(Request $request)

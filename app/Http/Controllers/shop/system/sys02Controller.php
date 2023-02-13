@@ -17,27 +17,30 @@ class sys02Controller extends Controller
 {
     public function index()
     {
-        $sql =
-            /** @lang text */
-            "
-            select * from shop_controller a
-			where entry = 1 and is_del = 0 and state >= 0
-			order by seq
-            ";
+        // $sql =
+        //     /** @lang text */
+        //     "
+        //     select * from shop_controller a
+		// 	where entry = 1 and is_del = 0 and state >= 0
+		// 	order by seq
+        //     ";
 
-        $pdo = DB::connection()->getPdo();
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute();
-        $pmenu = [];
-        while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
-            $pmenu[] = $row;
-        }
+        // $pdo = DB::connection()->getPdo();
+        // $stmt = $pdo->prepare($sql);
+        // $stmt->execute();
+        // $pmenu = [];
+        // while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+        //     $pmenu[] = $row;
+        // }
 
-        $values = [
-            "pmenus" => $pmenu
-        ];
+        // $values = [
+        //     "pmenus" => $pmenu
+        // ];
 
-        return view(Config::get('shop.shop.view') . '/system/sys02', $values);
+        // return view(Config::get('shop.shop.view') . '/system/sys02', $values);
+
+        /* shop 미사용 메뉴 메인페이지로 리다이렉트 */
+        return redirect('/shop');
     }
 
     public function create()

@@ -14,31 +14,34 @@ class acc04Controller extends Controller
 {
     public function index(Request $request) {
 
-        $sdate = Carbon::now()->startOfMonth()->format("Y-m-d"); // 이번 달 기준
-        $edate = Carbon::now()->format("Y-m-d");
+        // $sdate = Carbon::now()->startOfMonth()->format("Y-m-d"); // 이번 달 기준
+        // $edate = Carbon::now()->format("Y-m-d");
 
-        $store_types = SLib::getStoreTypes();
-        $sale_kind_id = $request->input('sale_kind_id', "");
+        // $store_types = SLib::getStoreTypes();
+        // $sale_kind_id = $request->input('sale_kind_id', "");
 
-        $sale_kinds = SLib::getUsedSaleKinds();
+        // $sale_kinds = SLib::getUsedSaleKinds();
 
-        // 행사구분 - 추후 논의사항
-        $sql = "
-			select *
-			from __tmp_code
-			where
-				code_kind_cd = 'event_cd' and use_yn = 'Y' order by code_seq
-		";
-        $event_cds = DB::select($sql);
+        // // 행사구분 - 추후 논의사항
+        // $sql = "
+		// 	select *
+		// 	from __tmp_code
+		// 	where
+		// 		code_kind_cd = 'event_cd' and use_yn = 'Y' order by code_seq
+		// ";
+        // $event_cds = DB::select($sql);
 
-        $values = [
-            'sdate'         => $sdate,
-            'edate'         => $edate,
-            'store_types'	=> $store_types,
-            'event_cds'		=> $event_cds,
-            'sale_kinds' 	=> $sale_kinds
-        ];
-        return view( Config::get('shop.shop.view') . '/account/acc04', $values );
+        // $values = [
+        //     'sdate'         => $sdate,
+        //     'edate'         => $edate,
+        //     'store_types'	=> $store_types,
+        //     'event_cds'		=> $event_cds,
+        //     'sale_kinds' 	=> $sale_kinds
+        // ];
+        // return view( Config::get('shop.shop.view') . '/account/acc04', $values );
+        
+        /* shop 미사용 메뉴 메인페이지로 리다이렉트 */
+        return redirect('/shop');
     }
 
     public function search(Request $request)

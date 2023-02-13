@@ -19,35 +19,38 @@ class ord02Controller extends Controller
 {
 	public function index(Request $request) {
 
-		$sdate = Carbon::now()->sub(3, 'day')->format("Y-m-d");
-		$edate = Carbon::now()->format("Y-m-d");
+		// $sdate = Carbon::now()->sub(3, 'day')->format("Y-m-d");
+		// $edate = Carbon::now()->format("Y-m-d");
 
-		$sale_places_sql = "select com_id as id, com_nm as val from company where com_type = '4' and use_yn = 'Y' order by com_nm";
-		$sale_places = DB::select($sale_places_sql);
+		// $sale_places_sql = "select com_id as id, com_nm as val from company where com_type = '4' and use_yn = 'Y' order by com_nm";
+		// $sale_places = DB::select($sale_places_sql);
 
-		$dlv_locations_sql = "
-			(select 'storage' as location_type, storage_cd as location_cd, storage_nm as location_nm, if(online_yn = 'Y', 0, 1) as seq from storage where online_yn = 'Y' or default_yn = 'Y')
-			union all
-			(select 'store' as location_type, store_cd as location_cd, store_nm as location_nm, 2 as seq from store where store_cd in (select code_id from code where code_kind_cd = 'ONLINE_ORDER_STORE'))
-			order by seq, location_cd
-		";
-		$dlv_locations = DB::select($dlv_locations_sql);
+		// $dlv_locations_sql = "
+		// 	(select 'storage' as location_type, storage_cd as location_cd, storage_nm as location_nm, if(online_yn = 'Y', 0, 1) as seq from storage where online_yn = 'Y' or default_yn = 'Y')
+		// 	union all
+		// 	(select 'store' as location_type, store_cd as location_cd, store_nm as location_nm, 2 as seq from store where store_cd in (select code_id from code where code_kind_cd = 'ONLINE_ORDER_STORE'))
+		// 	order by seq, location_cd
+		// ";
+		// $dlv_locations = DB::select($dlv_locations_sql);
 
-		$rel_orders = $this->_get_rel_orders();
+		// $rel_orders = $this->_get_rel_orders();
 
-		$values = [
-            'sdate'         	=> $sdate,
-			'edate'         	=> $edate,
-            'ord_states'        => SLib::getordStates(), // 주문상태
-			'sale_places'		=> $sale_places, // 판매처
-            'stat_pay_types'    => SLib::getCodes('G_PAY_TYPE'), // 결제방법
-			'items'			    => SLib::getItems(), // 품목
-            'sale_kinds'        => SLib::getUsedSaleKinds(),
-			'rel_orders'		=> $rel_orders, // 온라인출고차수
-			'ord_kinds'			=> SLib::getCodes('G_ORD_KIND'), // 출고구분
-			'dlv_locations'		=> $dlv_locations, // 배송처
-		];
-        return view( Config::get('shop.shop.view') . '/order/ord02', $values );
+		// $values = [
+        //     'sdate'         	=> $sdate,
+		// 	'edate'         	=> $edate,
+        //     'ord_states'        => SLib::getordStates(), // 주문상태
+		// 	'sale_places'		=> $sale_places, // 판매처
+        //     'stat_pay_types'    => SLib::getCodes('G_PAY_TYPE'), // 결제방법
+		// 	'items'			    => SLib::getItems(), // 품목
+        //     'sale_kinds'        => SLib::getUsedSaleKinds(),
+		// 	'rel_orders'		=> $rel_orders, // 온라인출고차수
+		// 	'ord_kinds'			=> SLib::getCodes('G_ORD_KIND'), // 출고구분
+		// 	'dlv_locations'		=> $dlv_locations, // 배송처
+		// ];
+        // return view( Config::get('shop.shop.view') . '/order/ord02', $values );
+
+		/* shop 미사용 메뉴 메인페이지로 리다이렉트 */
+        return redirect('/shop');
 	}
 
 	// 출고 가능한 출고차수 리스트 조회

@@ -14,21 +14,24 @@ class acc05Controller extends Controller
 {
     public function index(Request $request) {
 
-        $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 이번 달 기준
+        // $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 이번 달 기준
 
-        $store_types = SLib::getStoreTypes();
-        $sale_kinds = SLib::getUsedSaleKinds();
-        $dynamic_cols = SLib::getCodes('G_ACC_EXTRA_TYPE')->groupBy('code_val2'); // code_val2를 상위 카테고리로 사용
+        // $store_types = SLib::getStoreTypes();
+        // $sale_kinds = SLib::getUsedSaleKinds();
+        // $dynamic_cols = SLib::getCodes('G_ACC_EXTRA_TYPE')->groupBy('code_val2'); // code_val2를 상위 카테고리로 사용
         
-        $values = [
-            'sdate' => $sdate,
-            'store_types' => $store_types,
-            'store_kinds'	=> SLib::getCodes("STORE_KIND"),
-            'sale_kinds' => $sale_kinds,
-            'dynamic_cols' => $dynamic_cols,
-        ];
+        // $values = [
+        //     'sdate' => $sdate,
+        //     'store_types' => $store_types,
+        //     'store_kinds'	=> SLib::getCodes("STORE_KIND"),
+        //     'sale_kinds' => $sale_kinds,
+        //     'dynamic_cols' => $dynamic_cols,
+        // ];
 
-        return view( Config::get('shop.shop.view') . '/account/acc05', $values );
+        // return view( Config::get('shop.shop.view') . '/account/acc05', $values );
+
+        /* shop 미사용 메뉴 메인페이지로 리다이렉트 */
+        return redirect('/shop');
     }
 
     public function search(Request $request)

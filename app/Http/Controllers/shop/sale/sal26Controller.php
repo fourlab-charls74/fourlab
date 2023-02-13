@@ -15,19 +15,22 @@ class sal26Controller extends Controller
     // 업체별 매출 통계
     public function index() {
 
-        $mutable = Carbon::now();
-        $sdate	= $mutable->sub(3, 'month')->format('Y-m-d');
+        // $mutable = Carbon::now();
+        // $sdate	= $mutable->sub(3, 'month')->format('Y-m-d');
 
-        $values = [
-            'sdate' => $sdate,
-            'edate' => date("Y-m-d"),
-            'items' => SLib::getItems(),
-            'com_types'     => SLib::getCodes('G_COM_TYPE'),
-            'store_types'   => SLib::getCodes('STORE_TYPE'),
-			'sale_kinds'	=> SLib::getCodes('SALE_KIND'),
-			'pr_codes'		=> SLib::getCodes('PR_CODE'),
-        ];
-        return view( Config::get('shop.shop.view') . '/sale/sal26',$values);
+        // $values = [
+        //     'sdate' => $sdate,
+        //     'edate' => date("Y-m-d"),
+        //     'items' => SLib::getItems(),
+        //     'com_types'     => SLib::getCodes('G_COM_TYPE'),
+        //     'store_types'   => SLib::getCodes('STORE_TYPE'),
+		// 	'sale_kinds'	=> SLib::getCodes('SALE_KIND'),
+		// 	'pr_codes'		=> SLib::getCodes('PR_CODE'),
+        // ];
+        // return view( Config::get('shop.shop.view') . '/sale/sal26',$values);
+
+		/* shop 미사용 메뉴 메인페이지로 리다이렉트 */
+        return redirect('/shop');
     }
 
     public function search(Request $request){

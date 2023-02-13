@@ -21,15 +21,18 @@ class cs01Controller extends Controller {
 
     public function index(Request $request)
 	{
-        $immutable = CarbonImmutable::now();
-        $sdate = $immutable->sub(6, 'month')->format('Y-m-d');
-        $values = [
-            'sdate' => $sdate,
-            'edate' => date("Y-m-d"),
-            'items' => SLib::getItems(),
-            'order_stock_states' => Slib::getCodes('STOCK_ORDER_STATE')
-        ];
-        return view( Config::get('shop.shop.view') . '/cs/cs01', $values);
+        // $immutable = CarbonImmutable::now();
+        // $sdate = $immutable->sub(6, 'month')->format('Y-m-d');
+        // $values = [
+        //     'sdate' => $sdate,
+        //     'edate' => date("Y-m-d"),
+        //     'items' => SLib::getItems(),
+        //     'order_stock_states' => Slib::getCodes('STOCK_ORDER_STATE')
+        // ];
+        // return view( Config::get('shop.shop.view') . '/cs/cs01', $values);
+
+		/* shop 미사용 메뉴 메인페이지로 리다이렉트 */
+        return redirect('/shop');
     }
 
 	public function choice_index()

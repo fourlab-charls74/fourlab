@@ -14,29 +14,32 @@ class sal07Controller extends Controller
 {
 	public function index() 
 	{
-        $mutable	= now();
-        $sdate		= $mutable->sub(1, 'month')->format('Y-m-d');
+        // $mutable	= now();
+        // $sdate		= $mutable->sub(1, 'month')->format('Y-m-d');
 
-		// 매장구분
-		$sql = " 
-			select *
-			from code
-			where 
-				code_kind_cd = 'store_type' and use_yn = 'Y' order by code_seq 
-		";
-		$store_types = DB::select($sql);
+		// // 매장구분
+		// $sql = " 
+		// 	select *
+		// 	from code
+		// 	where 
+		// 		code_kind_cd = 'store_type' and use_yn = 'Y' order by code_seq 
+		// ";
+		// $store_types = DB::select($sql);
 
-		$values = [
-            'sdate'         => $sdate,
-            'edate'         => date("Y-m-d"),
-            'style_no'		=> "",
-			'store_types'   => $store_types,
-            'com_types'     => SLib::getCodes('G_COM_TYPE'),
-            'items'			=> SLib::getItems(),
-            // 'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
-            // 'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
-		];
-        return view( Config::get('shop.shop.view') . '/sale/sal07', $values);
+		// $values = [
+        //     'sdate'         => $sdate,
+        //     'edate'         => date("Y-m-d"),
+        //     'style_no'		=> "",
+		// 	'store_types'   => $store_types,
+        //     'com_types'     => SLib::getCodes('G_COM_TYPE'),
+        //     'items'			=> SLib::getItems(),
+        //     // 'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
+        //     // 'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
+		// ];
+        // return view( Config::get('shop.shop.view') . '/sale/sal07', $values);
+
+		/* shop 미사용 메뉴 메인페이지로 리다이렉트 */
+        return redirect('/shop');
 	}
 
 	public function search(Request $request)

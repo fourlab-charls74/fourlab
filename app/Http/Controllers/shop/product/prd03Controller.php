@@ -19,35 +19,38 @@ class prd03Controller extends Controller
 	public function index() 
 	{
 
-		$mutable	= now();
-		$sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
+		// $mutable	= now();
+		// $sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
 
-		$event_cds	= [];
-		//판매유형
-		$sell_types	= [];
-		$code_kinds	= [];
+		// $event_cds	= [];
+		// //판매유형
+		// $sell_types	= [];
+		// $code_kinds	= [];
 
-		$conf = new Conf();
-		$domain		= $conf->getConfigValue("shop", "domain");
+		// $conf = new Conf();
+		// $domain		= $conf->getConfigValue("shop", "domain");
 
-		$values = [
-			'sdate'         => $sdate,
-			'edate'         => date("Y-m-d"),
-			'event_cds'		=> $event_cds,
-			'sell_types'	=> $sell_types,
-			'code_kinds'	=> $code_kinds,
-			'domain'		=> $domain,
-			'style_no'		=> "",
-			'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
-			'types' => SLib::getCodes("PRD_MATERIAL_TYPE"),
-			// 'com_types'     => SLib::getCodes('G_COM_TYPE'),
-			'items'			=> SLib::getItems(),
-			'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
-			'is_unlimiteds'	=> SLib::getCodes('G_IS_UNLIMITED'),
-			'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
-		];
+		// $values = [
+		// 	'sdate'         => $sdate,
+		// 	'edate'         => date("Y-m-d"),
+		// 	'event_cds'		=> $event_cds,
+		// 	'sell_types'	=> $sell_types,
+		// 	'code_kinds'	=> $code_kinds,
+		// 	'domain'		=> $domain,
+		// 	'style_no'		=> "",
+		// 	'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
+		// 	'types' => SLib::getCodes("PRD_MATERIAL_TYPE"),
+		// 	// 'com_types'     => SLib::getCodes('G_COM_TYPE'),
+		// 	'items'			=> SLib::getItems(),
+		// 	'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
+		// 	'is_unlimiteds'	=> SLib::getCodes('G_IS_UNLIMITED'),
+		// 	'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
+		// ];
 
-		return view( Config::get('shop.shop.view') . '/product/prd03',$values);
+		// return view( Config::get('shop.shop.view') . '/product/prd03',$values);
+
+		/* shop 미사용 메뉴 메인페이지로 리다이렉트 */
+        return redirect('/shop');
 	}
 
 	public function search(Request $request)

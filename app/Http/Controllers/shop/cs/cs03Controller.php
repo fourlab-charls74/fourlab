@@ -19,20 +19,23 @@ use PhpParser\Node\Stmt\Continue_;
 class cs03Controller extends Controller
 {
     public function index(Request $request) {
-        $immutable = CarbonImmutable::now();
-        $sdate = $immutable->sub(1, 'month')->format('Y-m-d');
-        $values = [
-            'sdate'         => $sdate,
-            'edate'         => date("Y-m-d"),
-            'goods_stats' => SLib::getCodes('G_GOODS_STAT'),
-            'com_types'     => SLib::getCodes('G_COM_TYPE'),
-            'buy_order_states' => SLib::getCodes('G_BUY_ORDER_STATE'),
-            'formula_types' => collect([">", "<", ">=", "<=", "=", "<>"]),
-            'month3' => (int)date("m"),
-            'month2' => (int)$immutable->sub(1, 'month')->format('m'),
-            'month1' => (int)$immutable->sub(2, 'month')->format('m'),
-        ];
-        return view(Config::get('shop.shop.view') . '/cs/cs03', $values);
+        // $immutable = CarbonImmutable::now();
+        // $sdate = $immutable->sub(1, 'month')->format('Y-m-d');
+        // $values = [
+        //     'sdate'         => $sdate,
+        //     'edate'         => date("Y-m-d"),
+        //     'goods_stats' => SLib::getCodes('G_GOODS_STAT'),
+        //     'com_types'     => SLib::getCodes('G_COM_TYPE'),
+        //     'buy_order_states' => SLib::getCodes('G_BUY_ORDER_STATE'),
+        //     'formula_types' => collect([">", "<", ">=", "<=", "=", "<>"]),
+        //     'month3' => (int)date("m"),
+        //     'month2' => (int)$immutable->sub(1, 'month')->format('m'),
+        //     'month1' => (int)$immutable->sub(2, 'month')->format('m'),
+        // ];
+        // return view(Config::get('shop.shop.view') . '/cs/cs03', $values);
+
+		/* shop 미사용 메뉴 메인페이지로 리다이렉트 */
+        return redirect('/shop');
     }
 
     public function search(Request $request) {

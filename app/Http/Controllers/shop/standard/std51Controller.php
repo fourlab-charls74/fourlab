@@ -15,10 +15,13 @@ use Exception;
 class std51Controller extends Controller
 {
     public function index() {
-        $values = [
-            'section_types' => SLib::getCodes('G_SECTION_TYPE'),
-        ];
-        return view( Config::get('shop.shop.view') . '/standard/std51',$values);
+        // $values = [
+        //     'section_types' => SLib::getCodes('G_SECTION_TYPE'),
+        // ];
+        // return view( Config::get('shop.shop.view') . '/standard/std51',$values);
+
+        /* shop 미사용 메뉴 메인페이지로 리다이렉트 */
+        return redirect('/shop');
     }
 
     public function create(){

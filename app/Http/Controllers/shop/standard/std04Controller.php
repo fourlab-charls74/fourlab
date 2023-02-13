@@ -17,10 +17,13 @@ class std04Controller extends Controller
 {
 	public function index()
 	{
-		$values = [
-			"store_types" => SLib::getCodes("STORE_TYPE"),
-		];
-		return view(Config::get('shop.shop.view') . '/standard/std04', $values);
+		// $values = [
+		// 	"store_types" => SLib::getCodes("STORE_TYPE"),
+		// ];
+		// return view(Config::get('shop.shop.view') . '/standard/std04', $values);
+
+		/* shop 미사용 메뉴 메인페이지로 리다이렉트 */
+        return redirect('/shop');
 	}
 
 	public function search(Request $request)

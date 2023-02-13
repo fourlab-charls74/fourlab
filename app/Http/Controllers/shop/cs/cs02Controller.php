@@ -22,21 +22,24 @@ class cs02Controller extends Controller
 {
     public function index()
 	{
-        $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')->orderByDesc('default_yn')->get();
-        $sup_coms = DB::table("company")->where('use_yn', '=', 'Y')->where('com_type', '=', '1')->select('com_id', 'com_nm')->get();
+        // $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')->orderByDesc('default_yn')->get();
+        // $sup_coms = DB::table("company")->where('use_yn', '=', 'Y')->where('com_type', '=', '1')->select('com_id', 'com_nm')->get();
 
-		$values = [
-            'sdate'         => now()->sub(1, 'week')->format('Y-m-d'),
-            'edate'         => date("Y-m-d"),
-            'storages'      => $storages, // 창고 리스트
-            'sup_coms'      => $sup_coms, // 공급업체 리스트
-            'style_no'		=> "", // 스타일넘버
-            'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
-            'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
-            'items'			=> SLib::getItems(), // 품목
-		];
+		// $values = [
+        //     'sdate'         => now()->sub(1, 'week')->format('Y-m-d'),
+        //     'edate'         => date("Y-m-d"),
+        //     'storages'      => $storages, // 창고 리스트
+        //     'sup_coms'      => $sup_coms, // 공급업체 리스트
+        //     'style_no'		=> "", // 스타일넘버
+        //     'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
+        //     'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
+        //     'items'			=> SLib::getItems(), // 품목
+		// ];
 
-        return view(Config::get('shop.shop.view') . '/cs/cs02', $values);
+        // return view(Config::get('shop.shop.view') . '/cs/cs02', $values);
+        
+        /* shop 미사용 메뉴 메인페이지로 리다이렉트 */
+        return redirect('/shop');
 	}
 
     public function search(Request $request)

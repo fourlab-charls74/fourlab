@@ -13,28 +13,31 @@ use Carbon\Carbon;
 class acc06Controller extends Controller
 {
     public function index(Request $request) {
-        // $sdate = Carbon::now()->startOfMonth()->format("Y-m-d"); // 이번 달 기준
-        // $edate = Carbon::now()->format("Y-m-d"); // 현재
-        $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 저번 달 기준 - 테스트용
+        // // $sdate = Carbon::now()->startOfMonth()->format("Y-m-d"); // 이번 달 기준
+        // // $edate = Carbon::now()->format("Y-m-d"); // 현재
+        // $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 저번 달 기준 - 테스트용
 
-        $store_types = SLib::getStoreTypes();
+        // $store_types = SLib::getStoreTypes();
 
-        $sql = "select 
-            code_id, code_val 
-            from `code` 
-            where code_kind_cd = 'pr_code'
-            order by code_seq asc
-        ";
-        $pr_codes = DB::select($sql);
+        // $sql = "select 
+        //     code_id, code_val 
+        //     from `code` 
+        //     where code_kind_cd = 'pr_code'
+        //     order by code_seq asc
+        // ";
+        // $pr_codes = DB::select($sql);
 
-        $values = [
-            'sdate'         => $sdate,
-            'store_types'	=> $store_types,
-            'store_kinds'	=> SLib::getCodes("STORE_KIND"),
-            'pr_codes'      => $pr_codes
-        ];
+        // $values = [
+        //     'sdate'         => $sdate,
+        //     'store_types'	=> $store_types,
+        //     'store_kinds'	=> SLib::getCodes("STORE_KIND"),
+        //     'pr_codes'      => $pr_codes
+        // ];
 
-        return view( Config::get('shop.shop.view') . '/account/acc06', $values );
+        // return view( Config::get('shop.shop.view') . '/account/acc06', $values );
+
+		/* shop 미사용 메뉴 메인페이지로 리다이렉트 */
+        return redirect('/shop');
     }
 
     public function search(Request $request)

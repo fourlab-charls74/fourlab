@@ -15,17 +15,20 @@ class stk01Controller extends Controller
 	public function index() 
 	{
 
-		$values = [
-			'code_kinds'	=> [],
-            'style_no'		=> "",
-            'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
-            'store_types'	=> SLib::getStoreTypes(),
-			// 'com_types'     => SLib::getCodes('G_COM_TYPE'),
-            'items'			=> SLib::getItems(),
-            'goods_types'	=> SLib::getCodes('G_GOODS_TYPE')
-		];
+		// $values = [
+		// 	'code_kinds'	=> [],
+        //     'style_no'		=> "",
+        //     'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
+        //     'store_types'	=> SLib::getStoreTypes(),
+		// 	// 'com_types'     => SLib::getCodes('G_COM_TYPE'),
+        //     'items'			=> SLib::getItems(),
+        //     'goods_types'	=> SLib::getCodes('G_GOODS_TYPE')
+		// ];
 
-		return view( Config::get('shop.shop.view') . '/stock/stk01',$values);
+		// return view( Config::get('shop.shop.view') . '/stock/stk01',$values);
+
+		/* shop 미사용 메뉴 메인페이지로 리다이렉트 */
+        return redirect('/shop');
 	}
 
 	public function search(Request $request)

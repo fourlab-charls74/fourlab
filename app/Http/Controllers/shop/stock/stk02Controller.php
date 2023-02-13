@@ -13,28 +13,30 @@ use Carbon\Carbon;
 class stk02Controller extends Controller
 {
 
-	//
 	public function index() {
 
-        $mutable	= now();
-        $sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
+        // $mutable	= now();
+        // $sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
 
-        $com_types	= [];
-        $event_cds	= [];
-        //판매유형
-        $sell_types	= [];
-        $code_kinds	= [];
+        // $com_types	= [];
+        // $event_cds	= [];
+        // //판매유형
+        // $sell_types	= [];
+        // $code_kinds	= [];
 
-		$values = [
-            'sdate'         => $sdate,
-            'edate'         => date("Y-m-d"),
-			'com_types'		=> $com_types,
-			'event_cds'		=> $event_cds,
-			'sell_types'	=> $sell_types,
-			'code_kinds'	=> $code_kinds,
-		];
+		// $values = [
+        //     'sdate'         => $sdate,
+        //     'edate'         => date("Y-m-d"),
+		// 	'com_types'		=> $com_types,
+		// 	'event_cds'		=> $event_cds,
+		// 	'sell_types'	=> $sell_types,
+		// 	'code_kinds'	=> $code_kinds,
+		// ];
 
-		return view( Config::get('shop.shop.view') . '/stock/stk02',$values);
+		// return view( Config::get('shop.shop.view') . '/stock/stk02',$values);
+
+		/* shop 미사용 메뉴 메인페이지로 리다이렉트 */
+		return redirect('/shop');
 	}
 
 	public function search(Request $request)
