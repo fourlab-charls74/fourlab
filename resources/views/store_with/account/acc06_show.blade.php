@@ -142,7 +142,7 @@
 		</div>
 	</div>
 </div>
-<div class="card shadow">
+{{-- <div class="card shadow">
 	<div class="card-body">
 		<div class="card-title">
 			<h6 class="m-0 font-weight-bold text-primary fas fa-question-circle"> Help</h6>
@@ -156,7 +156,7 @@
 			<li>카드수수료 등 수수료 부담의 주체가 귀사에 있으므로 입점업체의 경우 매출 신고 시에 해당 매출금액에 대하여 현금성으로 신고</li>
 		</ul>
 	</div>
-</div>
+</div> --}}
 
 <script language="javascript">
 	const CENTER = { 'text-align': 'center' };
@@ -207,9 +207,7 @@
 	];
 </script>
 <script type="text/javascript" charset="utf-8">
-	const pApp = new App('',{
-		gridId:"#div-gd",
-	});
+	const pApp = new App('', { gridId:"#div-gd" });
 	let gx;
 
 	$(document).ready(function() {
@@ -222,7 +220,7 @@
         document.search.store_nm.value = "{{ @$store_nm ? @$store_nm : '' }}";
 
 		// ag-grid 설정
-		pApp.ResizeGrid(275);
+		pApp.ResizeGrid(100);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
         let options = {

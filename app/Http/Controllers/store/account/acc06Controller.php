@@ -225,8 +225,8 @@ class acc06Controller extends Controller
 		$store_nm	= "";
 		$acc_idx	= "";
 
-        $f_sdate = Carbon::parse($sdate)->firstOfMonth()->subMonth()->format("Ymd");
-        $f_edate = Carbon::parse($sdate)->lastOfMonth()->subMonth()->format("Ymd");
+        $f_sdate = Carbon::parse($sdate)->firstOfMonth()->format("Ymd");
+        $f_edate = Carbon::parse($sdate)->lastOfMonth()->format("Ymd");
 
 		if( $store_cd != "" ) $store_nm = DB::table('store')->where('store_cd', $store_cd)->value('store_nm');
 
@@ -238,7 +238,7 @@ class acc06Controller extends Controller
 		$row = DB::selectOne($sql, ['store_cd' => $store_cd, 'sday' => $f_sdate, 'eday' => $f_edate]);
 
 		if (!empty($row)) $acc_idx = $row->idx;
-
+		
 		$values = [
 			'sdate'			 => $sdate,
 			'store_cd'		 => $store_cd,
