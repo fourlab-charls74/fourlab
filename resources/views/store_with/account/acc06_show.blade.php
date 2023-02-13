@@ -186,8 +186,8 @@
 		{field: "goods_sh", headerName: "정상가", width: 70, type: 'currencyType'},
 		{field: "price", headerName: "판매단가", width: 70, type: 'currencyType'},
 		{field: "dc_amt", headerName: "할인금액",	width: 90, type: 'currencyType', aggregation: true},
-		{field: "sale_amt",	headerName: "판매금액",	width: 90, type: 'currencyType', aggregation: true, cellStyle: (params) => ({"background-color": params.node.rowPinned === 'top' ? "none" : "#D9E3FF"})},
-		{field: "clm_amt", headerName: "클레임금액", width: 90, type: 'currencyType', aggregation: true, cellStyle: (params) => ({"background-color": params.node.rowPinned === 'top' ? "none" : "#D9E3FF"})},
+		{field: "sale_amt",	headerName: "판매금액",	width: 90, type: 'currencyType', aggregation: true, cellStyle: (params) => ({"background-color": params.node.rowPinned === 'top' ? "none" : "#E9EFFF"})},
+		{field: "clm_amt", headerName: "클레임금액", width: 90, type: 'currencyType', aggregation: true, cellStyle: (params) => ({"background-color": params.node.rowPinned === 'top' ? "none" : "#E9EFFF"})},
 		{field: "ord_type_nm", headerName: "주문구분", width: 60, cellStyle: CENTER},
 		{field: "pr_code_nm", headerName: "행사구분", width: 60, cellStyle: CENTER},
 		{field: "store_cd",	headerName: "매장코드", width: 70, cellStyle: CENTER},
@@ -253,53 +253,51 @@
 		const store_nm = document.search.store_nm.value;
 		const sdate = document.search.sdate.value;
 
-		if(confirm(`${sdate} [ ${store_nm} ] 정산내용을 마감내역에 추가하시겠습니까?`)) {
-			$.ajax({
-				async: false,
-				type: 'put',
-				url: '/store/account/acc06/closed',
-				data: {
-					store_cd : store_cd,
-					sdate : sdate
-				},
-				success: function(data) {
-					// cbClosed(data);
-					alert("개발중입니다.");
-				},
-				error: function(request, status, error) {
-					console.log("error")
-					alert("개발중입니다.");
-				}
-			});
+		if(!confirm(`${sdate} [ ${store_nm} ] 정산내용을 마감내역에 추가하시겠습니까?`)) return;
 
-		}
+		$.ajax({
+			async: false,
+			type: 'put',
+			url: '/store/account/acc06/closed',
+			data: {
+				store_cd : store_cd,
+				sdate : sdate
+			},
+			success: function(data) {
+				cbClosed(data);
+			},
+			error: function(request, status, error) {
+				console.log("error")
+			}
+		});
 	}
 
 	function cbClosed(data){
 		/*
-		999 : 알수 없는 에러
-		000 : 성공
-		100 : 부정확한 요청입니다.
-		110 : 마감처리된 내역
-		200 : 자료등록시 오류
+			<에러코드 구분>
+			000 : 성공
+			100 : 부정확한 요청
+			110 : 마감처리된 내역
+			999 : 자료등록 시 오류
 		*/
 
-		var results	= {
-			"000":"마감내역을 추가하였습니다.",
-			"100":"부정확한 요청입니다.",
-			"110":"이미 마감처리된 내역입니다.",
-			"200":"자료 등록 시 오류가 발생하였습니다. 다시 처리해 주십시오.",
-			"999":"마감내역을 추가하였습니다."
+		const results = {
+			"000": "마감내역을 정상적으로 추가완료했습니다.",
+			"100": "부정확한 요청입니다.",
+			"110": "이미 마감처리된 내역입니다.",
+			"999": "마감내역을 추가하였습니다."
 		}
 
-		var ret	= data.code;
+		const ret = data.code;
+		const msg = data.msg;
 
-		if( ret == "000" ){
-			alert('마감내역을 추가하였습니다.');
+		if (ret === "000") {
+			alert(results[ret]);
 			location.reload();
 			opener.Search();
 		} else {
-			alert(results[ret]);
+			alert(results[ret] + (ret === "100" ? `\n${msg}` : ""));
+			console.log(data);
 		}
 	}
 </script>
