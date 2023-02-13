@@ -49,7 +49,8 @@
                     {{--<!-- <li><a href="/shop/stock/stk26">(완)실사</a></li> -->--}}
                     <li><a href="/shop/stock/stk31">(완)매장 공지사항</a></li>
                     <li><a href="/shop/stock/stk32">(완)매장 알림</a></li>
-                    <li><a href="/shop/stock/stk33">(완)동종업계매출관리</a></li>
+                    <li><a href="/shop/stock/stk33">(완)일별동종업계매출관리</a></li>
+                    <li><a href="/shop/stock/stk34">(개)월별동종업계매출관리</a></li>
                 </ul>
             </li>
             <li>

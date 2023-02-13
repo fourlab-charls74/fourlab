@@ -168,14 +168,14 @@
 				<div class="d-flex justify-content-between">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
                     <div class="d-flex">
-                        <div class="d-flex">
+                        <!-- <div class="d-flex">
                             <select id='chg_return_state' name='chg_return_state' class="form-control form-control-sm mr-1" style='width:70px;display:inline'>
                                 <option value="30">이동</option>
                                 <option value="40">완료</option>
                             </select>
                         </div>
                         <a href="javascript:void(0);" onclick="ChangeState()" class="btn btn-sm btn-primary">상태변경</a>
-                        <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
+                        <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span> -->
                         <a href="javascript:void(0);" onclick="DelReturn()" class="btn btn-sm btn-outline-primary">삭제</a>
                     </div>
 				</div>

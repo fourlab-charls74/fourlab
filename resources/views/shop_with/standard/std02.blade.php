@@ -23,7 +23,8 @@
 
 			<div class="card-body">
 				<div class="row">
-					<div class="col-lg-4 inner-td">
+					<!-- 필요없는 검색조건 -양대성- -->
+					<!-- <div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="good_types">매장구분 :</label>
 							<div class="flax_box">
@@ -35,7 +36,7 @@
 								</select>
 							</div>
 						</div>
-					</div>
+					</div> -->
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="">매장종류 :</label>
@@ -57,9 +58,6 @@
 							</div>
 						</div>
 					</div>
-				</div>
-
-				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="">매장코드 :</label>
@@ -68,6 +66,8 @@
 							</div>
 						</div>
 					</div>
+				</div>
+				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="">매장지역 :</label>
@@ -96,8 +96,6 @@
 							</div>
 						</div>
 					</div>
-				</div>
-				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="item">자료수/정렬 :</label>
@@ -127,9 +125,11 @@
 									<input type="radio" name="ord" id="sort_asc" value="asc" >
 								</div>
 							</div>
-
 						</div>
 					</div>
+				</div>
+				<div class="row">
+				
 				</div>
 
 			</div>

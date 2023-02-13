@@ -626,8 +626,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 매장중간관리자 - 마감
         Route::get('acc07', 'acc07Controller@index');
         Route::get('acc07/search', 'acc07Controller@search');
-        Route::get('acc07/show', 'acc07Controller@show');
-        Route::get('acc07/show_search', 'acc07Controller@show_search');
+        Route::get('acc07/show/{idx}', 'acc07Controller@show');
+        Route::get('acc07/show-search/{cmd}', 'acc07Controller@search_command');
         Route::put('acc07/show_update', 'acc07Controller@show_update');
         Route::delete('acc07/show_delete', 'acc07Controller@show_delete');
         Route::post('acc07/show_close', 'acc07Controller@show_close');

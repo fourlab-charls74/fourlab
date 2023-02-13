@@ -124,7 +124,7 @@ class acc06Controller extends Controller
 								, sum(if(ww.online_yn = 'Y', ww.sale_price, 0)) as ord_OL_amt -- 온라인
 							from (
 								(
-									select www.ord_opt_no, www.goods_no, www.qty, www.price, (www.qty * www.price) as sale_price, www.ord_state, www.ord_kind, www.ord_type, www.ord_state_date, www.prd_cd, www.store_cd, 'N' as online_yn
+									select www.ord_opt_no, www.goods_no, www.qty, www.price, (www.qty * www.price * if(www.ord_state = 30, 1, -1)) as sale_price, www.ord_state, www.ord_kind, www.ord_type, www.ord_state_date, www.prd_cd, www.store_cd, 'N' as online_yn
 									from order_opt_wonga www
 									where www.ord_state >= 30
 										and www.ord_state in (30,60,61) 
@@ -133,7 +133,7 @@ class acc06Controller extends Controller
 								)
 								union all
 								(
-									select www.ord_opt_no, www.goods_no, www.qty, www.price, (www.qty * www.price) as sale_price, www.ord_state, www.ord_kind, www.ord_type, www.ord_state_date, www.prd_cd, ooo.dlv_place_cd as store_cd, 'Y' as online_yn
+									select www.ord_opt_no, www.goods_no, www.qty, www.price, (www.qty * www.price * if(www.ord_state = 30, 1, -1)) as sale_price, www.ord_state, www.ord_kind, www.ord_type, www.ord_state_date, www.prd_cd, ooo.dlv_place_cd as store_cd, 'Y' as online_yn
 									from order_opt_wonga www
 										inner join order_opt ooo on ooo.ord_opt_no = www.ord_opt_no
 									where ooo.dlv_place_type = 'STORE' 
@@ -292,8 +292,8 @@ class acc06Controller extends Controller
 				, cls.code_val as clm_state_nm
 			from (
 				select o.ord_no, w.ord_opt_no
-					, w.ord_state_date, date_format(w.ord_state_date, '%Y-%m-%d') as state_date, date_format(o.ord_date, '%Y-%m-%d') as ord_date
-					, w.ord_state, o.clm_state, date_format(o.dlv_end_date, '%Y-%m-%d') as dlv_end_date
+					, w.ord_state_date, date_format(w.ord_state_date, '%Y-%m-%d') as state_date, if(w.ord_state = 30, date_format(o.ord_date, '%Y-%m-%d'), '') as ord_date
+					, w.ord_state, w.ord_state as clm_state, date_format(o.dlv_end_date, '%Y-%m-%d') as dlv_end_date
 					, if(w.ord_state in (60,61), (
 						select date_format(max(end_date),'%Y-%m-%d') as clm_end_date 
 						from claim
@@ -301,7 +301,7 @@ class acc06Controller extends Controller
 					), '') as clm_end_date
 					, w.store_cd, w.prd_cd, w.goods_no, w.goods_opt, w.qty, w.price, w.ord_kind, w.ord_type
 					, if(w.ord_state = 30, (w.qty * w.price), 0) as sale_amt
-					, if(w.ord_state in (60,61), (w.qty * w.price), 0) as clm_amt
+					, if(w.ord_state in (60,61), (w.qty * w.price * -1), 0) as clm_amt
 					, ((g.goods_sh - abs(w.price)) * w.qty * -1) as dc_amt
 					, o.pr_code, s.store_nm, p.pay_type, m.user_nm
 					, g.style_no, g.goods_nm, g.tax_yn, g.goods_sh
@@ -414,12 +414,12 @@ class acc06Controller extends Controller
 				select :acc_idx as acc_idx
 					, b.type, b.sale_type, b.ord_opt_no, b.state_date, b.qty
 					, b.sale_amt, b.clm_amt, b.dc_amt, b.coupon_amt, b.allot_amt, b.dlv_amt
-					, if(b.tax_yn = 'Y', (b.sale_amt - b.clm_amt), 0) as sale_net_taxation_amt
-					, if(b.tax_yn = 'N', (b.sale_amt - b.clm_amt), 0) as sale_net_taxfree_amt
-					, (b.sale_amt - b.clm_amt) as sale_net_amt
-					, round((b.sale_amt - b.clm_amt) / 10) as tax_amt
+					, if(b.tax_yn = 'Y', (b.sale_amt + b.clm_amt), 0) as sale_net_taxation_amt
+					, if(b.tax_yn = 'N', (b.sale_amt + b.clm_amt), 0) as sale_net_taxfree_amt
+					, (b.sale_amt + b.clm_amt) as sale_net_amt
+					, round((b.sale_amt + b.clm_amt) / 10) as tax_amt
 					, b.fee_ratio
-					, round((b.sale_amt - b.clm_amt) * b.fee_ratio / 100) as fee
+					, round((b.sale_amt + b.clm_amt) * b.fee_ratio / 100) as fee
 					, '' as memo
 					, 0 as sale_fee
 					, 0 as sale_clm_amt
@@ -462,7 +462,7 @@ class acc06Controller extends Controller
 							, g.goods_sh, g.tax_yn, s.fee_10, s.fee_11, s.fee_12
 						from (
 							(
-								select ww.ord_opt_no, ww.goods_no, ww.qty, ww.price, (ww.qty * ww.price) as sale_price, ww.ord_state
+								select ww.ord_opt_no, ww.goods_no, ww.qty, ww.price, (ww.qty * ww.price * if(ww.ord_state = 30, 1, -1)) as sale_price, ww.ord_state
 									, ww.ord_state_date, ww.prd_cd, ww.store_cd, 'N' as online_yn
 									, ww.coupon_apply_amt, ww.dlv_amt
 								from order_opt_wonga ww
@@ -474,7 +474,7 @@ class acc06Controller extends Controller
 							)
 							union all
 							(
-								select ww.ord_opt_no, ww.goods_no, ww.qty, ww.price, (ww.qty * ww.price) as sale_price, ww.ord_state
+								select ww.ord_opt_no, ww.goods_no, ww.qty, ww.price, (ww.qty * ww.price * if(ww.ord_state = 30, 1, -1)) as sale_price, ww.ord_state
 									, ww.ord_state_date, ww.prd_cd, ooo.dlv_place_cd as store_cd, 'Y' as online_yn
 									, 0 as coupon_apply_amt, ww.dlv_amt
 								from order_opt_wonga ww

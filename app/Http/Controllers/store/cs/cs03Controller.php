@@ -66,6 +66,7 @@ class cs03Controller extends Controller
 
 		$where = "";
 		$where1 = "";
+		$having = "";
 		if ($prd_cd != "") {
 			$prd_cd = explode(',', $prd_cd);
 			$where .= " and (1!=1";
@@ -77,11 +78,11 @@ class cs03Controller extends Controller
 
 		if ($user_nm_state != '' && $user_nm != '') {
 			if ($user_nm_state == 'req_id') {
-				$where .= "and req_id = '$user_nm'";
+				$having = "having req_nm = '$user_nm'";
 			} else if ($user_nm_state == 'prc_id') {
-				$where .= "and prc_id = '$user_nm'";
+				$having = "having prc_nm = '$user_nm'";
 			} else if ($user_nm_state == 'fin_id') {
-				$where .= "and fin_id = '$user_nm'";
+				$having = "having fin_nm = '$user_nm'";
 			}
 		}
 
@@ -157,6 +158,7 @@ class cs03Controller extends Controller
 				left outer join mgr_user m on p2.admin_id = m.id
 			where 1=1 and p2.rt >= :sdate and p2.rt < date_add(:edate, interval 1 day)
 			$where $where1
+			$having
 			$orderby
 			$limit
 		";

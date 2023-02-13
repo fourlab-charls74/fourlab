@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\store\stock;
+namespace App\Http\Controllers\shop\stock;
 
 use App\Http\Controllers\Controller;
 use App\Components\Lib;
@@ -27,7 +27,7 @@ class stk34Controller extends Controller
             'sdate' => $sdate,
             'edate' => date("Y-m")
         ];
-        return view(Config::get('shop.store.view') . '/stock/stk34', $values);
+        return view(Config::get('shop.shop.view') . '/stock/stk34', $values);
     }
 
     // 검색
@@ -139,7 +139,7 @@ class stk34Controller extends Controller
         ];
 
 
-        return view(Config::get('shop.store.view') . '/stock/stk34_show', $values);
+        return view(Config::get('shop.shop.view') . '/stock/stk34_show', $values);
     }
 
 

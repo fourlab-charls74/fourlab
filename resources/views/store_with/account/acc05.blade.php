@@ -5,8 +5,8 @@
 	<h3 class="d-inline-flex">기타재반자료</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
-		<span>매장관리</span>
-		<span>/ 경영관리</span>
+		<span>/ 매장관리</span>
+		<span>/ 정산/마감관리</span>
 	</div>
 </div>
 <form method="get" name="search">

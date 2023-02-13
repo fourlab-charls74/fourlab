@@ -1,13 +1,13 @@
 @extends('shop_with.layouts.layout')
-@section('title','동종업계매출관리')
+@section('title','일별동종업계매출관리')
 @section('content')
 
 <div class="page_tit">
-    <h3 class="d-inline-flex">동종업계매출관리</h3>
+    <h3 class="d-inline-flex">일별동종업계매출관리</h3>
     <div class="d-inline-flex location">
         <span class="home"></span>
         <span>/ 매장관리</span>
-        <span>/ 동종업계매출관리</span>
+        <span>/ 일별동종업계매출관리</span>
     </div>
 </div>
 
@@ -28,48 +28,60 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-							<label>매출월</label>
-                            <div class="form-inline">
-								<div class="docs-datepicker form-inline-inner input_box w-100">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date month" name="sdate" value="{{ @$sdate }}" autocomplete="off">
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                                <i class="fa fa-calendar" aria-hidden="true"></i>
-                                            </button>
+                    <div class="col-lg-4 inner-td">
+                            <div class="form-group">
+                                <label for="good_types">매출기간</label>
+                                <div class="form-inline date-select-inbox">
+                                    <div class="docs-datepicker form-inline-inner input_box">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
+                                            <div class="input-group-append">
+                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
+                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
                                         </div>
+                                        <div class="docs-datepicker-container"></div>
                                     </div>
-                                    <div class="docs-datepicker-container"></div>
+                                    <span class="text_line">~</span>
+                                    <div class="docs-datepicker form-inline-inner input_box">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
+                                            <div class="input-group-append">
+                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="docs-datepicker-container"></div>
+                                    </div>
                                 </div>
                             </div>
-						</div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="good_types">매장구분</label>
-                            <div class="flax_box">
-                                <select name='store_type' class="form-control form-control-sm search-enter">
-                                    <option value=''>전체</option>
-                                @foreach ($store_types as $store_type)
-                                    <option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
-                                @endforeach
-                                </select>
+                        </div>
+                        <div class="col-lg-4 inner-td">
+                            <div class="form-group">
+                                <label for="good_types">매장구분</label>
+                                <div class="flax_box">
+                                    <select name='store_type' class="form-control form-control-sm search-enter">
+                                        <option value=''>전체</option>
+                                    @foreach ($store_types as $store_type)
+                                        <option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
+                                    @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 inner-td">
+                            <div class="form-group">
+                                <label for="store_no">매장명</label>
+                                <div class="form-inline inline_btn_box search-enter" >
+                                    <input type='hidden' id="store_nm" name="store_nm">
+                                    <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
+                                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="store_no">매장명</label>
-                            <div class="form-inline inline_btn_box search-enter" >
-                                <input type='hidden' id="store_nm" name="store_nm">
-                                <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                     <div class="row">
                         {{-- <div class="col-lg-4 inner-td">
                             <div class="form-group">
@@ -118,7 +130,7 @@
             </div>
         <div class="resul_btn_wrap mb-3">
             <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-            <a href="/shop/stock/stk33/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
+            <a href="/store/stock/stk33/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
             <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
         </div>
     </div>
@@ -196,7 +208,7 @@ const pinnedRowData = [{ store_nm : '합계' , "total_amt" : 0 ,
 
     function Search() {
         let data = $('form[name="search"]').serialize();
-        gx.Request('/shop/stock/stk33/search', data, 1, function(e){
+        gx.Request('/store/stock/stk33/search', data, 1, function(e){
             let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
             let total_data = e.head.total_data;
 
@@ -217,7 +229,7 @@ const pinnedRowData = [{ store_nm : '합계' , "total_amt" : 0 ,
 
 
     function add() {
-        const url = '/shop/stock/stk33/create';
+        const url = '/store/stock/stk33/create';
         const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1000,height=700");
     }
 

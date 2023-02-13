@@ -87,7 +87,7 @@ class acc07Controller extends Controller
         $idx = $request->input('idx');
         $sql = "
             select
-                a.reg_date, a.closed_date, a.closed_yn,
+                a.rt, a.closed_date, a.closed_yn,
                 a.store_cd, c.store_nm, c.store_type,
                 a.sday, a.eday, a.admin_id, a.admin_nm
             from store_account_closed a inner join store c on a.store_cd = c.store_cd
@@ -99,7 +99,7 @@ class acc07Controller extends Controller
 			$sday = $row->sday;
 			$eday = $row->eday;
 			$store_nm = $row->store_nm;
-			$reg_date = $row->reg_date;
+			$reg_date = $row->rt;
 			$closed_date = $row->closed_date;
 			$closed_yn = $row->closed_yn;
 			$admin_nm = $row->admin_nm;
@@ -157,7 +157,7 @@ class acc07Controller extends Controller
 					where
 						ord_opt_no = o.ord_opt_no),''
 				) as clm_end_date,
-				w.bigo, g.goods_no, g.goods_sub, w.idx, w.acc_idx
+				w.memo, g.goods_no, g.goods_sub, w.idx, w.acc_idx
 			from
 				store_account_closed closed
 				inner join store_account_closed_list w on w.acc_idx = closed.idx
