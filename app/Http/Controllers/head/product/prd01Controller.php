@@ -102,6 +102,7 @@ class prd01Controller extends Controller
         $limit = $request->input('limit', 100);
 
         $goods_stat = $request->input("goods_stat");
+		$except_trash = $request->input("except_trash");
         $style_no = $request->input("style_no");
         $goods_no = $request->input("goods_no");
         $goods_nos = $request->input('goods_nos', '');       // 상품번호 textarea
@@ -194,6 +195,7 @@ class prd01Controller extends Controller
 		if( $sale_yn != "" )	$where .= " and g.sale_yn = '$sale_yn' ";
 		if( $coupon_yn != "" )	$where .= " and gc.price > 0 ";
 		if( $sale_type != "" )	$where .= " and g.sale_type = '" . Lib::quote($sale_type) . "' ";
+		if( $except_trash == "Y") $where .= "and g.sale_stat_cl > -90";
 
         $page_size = $limit;
         $startno = ($page - 1) * $page_size;
