@@ -79,15 +79,34 @@
                         </div>
                     </div>
                     <div class="col-lg-4 inner-td">
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <label for="goods_stat">상품상태</label>
-                            <div class="flax_box">
+                            <div class="flax_box" style="width:45%">
                                 <select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
                                     <option value=''>전체</option>
                                     @foreach ($goods_stats as $goods_stat)
                                     <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
                                     @endforeach
                                 </select>
+                            </div>
+                            <div class="custom-control custom-checkbox form-check-box" style="min-width: 100px;">
+                                <input type="checkbox" class="custom-control-input" name="ext_done_state" id="ext_done_state" value="Y">
+                                <label class="custom-control-label font-weight-normal" for="ext_done_state">완료상태 제외</label>
+                            </div>
+                        </div> -->
+                        <div class="form-group">
+                            <label for="goods_stat">상품상태</label>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
+                                    <option value=''>전체</option>
+                                    @foreach ($goods_stats as $goods_stat)
+                                    <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
+                                    @endforeach
+                                </select>
+                                <div class="custom-control custom-checkbox form-check-box" style="min-width: 100px;margin-left:10px">
+                                    <input type="checkbox" class="custom-control-input" name="except_trash" id="except_trash" value="Y" checked>
+                                    <label class="custom-control-label font-weight-normal" for="except_trash">휴지통 제외</label>
+                                </div>
                             </div>
                         </div>
                     </div>
