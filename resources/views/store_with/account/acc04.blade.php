@@ -163,8 +163,8 @@
         { headerName: "#", field: "num", type: 'NumType', pinned: 'left', aggSum: "합계", cellStyle: { 'text-align': "center" },
 			cellRenderer: (params) => params.node.rowPinned === 'top' ? '합계' : (parseInt(params.value) + 1),
         },
-        { field: "store_type_nm", headerName: "매장구분", pinned: 'left', width: 70, cellStyle: { 'text-align': "center" } },
         { field: "store_cd", headerName: "매장코드", pinned: 'left', width: 60, cellStyle: { 'text-align': "center" } },
+        { field: "store_type_nm", headerName: "매장구분", pinned: 'left', width: 70, cellStyle: { 'text-align': "center" } },
         { field: "store_nm", headerName: "매장명", pinned: 'left', type: 'StoreNameType', width: 150 },
         { headerName: "매출",
             children: [

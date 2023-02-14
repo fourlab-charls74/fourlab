@@ -132,8 +132,8 @@
     let store_list_columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
 		{field: "store_type", hide: true},
-		{field: "store_type_nm", headerName: "매장구분", width: 80, cellStyle: {"text-align": "center"}},
 		{field: "store_cd", headerName: "매장코드", width: 80, cellStyle: {"text-align": "center"}},
+		{field: "store_type_nm", headerName: "매장구분", width: 80, cellStyle: {"text-align": "center"}},
 		{field: "store_nm", headerName: "매장명", width: 200,
             cellRenderer: function(params) {
                 return `<a href="/store/stock/stk25?store_cd=${params.data.store_cd}&sale_month=${$("[name=sdate]").val()}">${params.value}</a>`;
