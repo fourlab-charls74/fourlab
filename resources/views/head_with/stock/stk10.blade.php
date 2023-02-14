@@ -229,6 +229,10 @@
                             <h6 class="m-0 font-weight-bold">총 원가금액 <span id="sum_buy_cost" class="text-primary">0</span>원</h6>
                         </div>
                         <div class="fr_box">
+                            <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+                                <input type="checkbox" class="custom-control-input" name="goods_img" id="goods_img" value="Y" checked>
+                                <label class="custom-control-label font-weight-light" for="goods_img">이미지출력</label>
+                            </div>
                             <select id='change_buy_order_state' name='state' class="form-control form-control-sm" style='width:130px; display:inline'>
                                 <option value=''>선택</option>
                                 @foreach ($buy_order_states as $buy_order_state)
@@ -247,6 +251,12 @@
             </div>
         </div>
     </form>
+    <style>
+        /* 전시카테고리 상품 이미지 사이즈 픽스 */
+        .img {
+            height:30px;
+        }
+    </style>
     <script type="text/javascript" charset="utf-8">
 
         // ag-grid set
@@ -261,19 +271,14 @@
             {field:"brand_nm" ,headerName:"브랜드",pinned:'left',width:84},
             {field:"style_no" ,headerName:"스타일넘버",pinned:'left',width:96},
             {field:"org_nm" ,headerName:"원산지",pinned:'left',width:84},
-            // {field:"img" , headerName:"이미지",
-            //     cellRenderer: function(params) {
-            //         if (params.value !== undefined && params.data.img != "") {
-            //             return '<img src="{{config('shop.image_svr')}}' + params.data.img + '"/>';
-            //         }
-            //     }
-            // },
             {headerName:"상품코드",
                 children: [
                     {headerName: "번호", field: "goods_no", width: 46, pinned:'left', cellStyle:{'text-align': 'right'}},
                     {headerName: "보조", field: "goods_sub", width: 34, pinned:'left', cellStyle:{'text-align': 'center'}}
                 ]
             },
+            {field:"img", headerName:"이미지", type:'GoodsImageType', pinned:'left', width:50},
+            {field:"img", headerName:"이미지_url", hide:true},
             {field:"goods_nm" , headerName:"상품명", type:"HeadGoodsNameType", width:220, pinned:'left'},
             {field:"sale_stat_cl" ,headerName:"상태",width:58,cellStyle:StyleGoodsState, pinned:'left'},
             {field:"goods_opt" ,headerName:"옵션",width:100,
@@ -441,6 +446,10 @@
                 }
             };
         };
+
+        $("#goods_img").click(function() {
+            gx.gridOptions.columnApi.setColumnVisible("img", $("#goods_img").is(":checked"));
+        });
 
     </script>
 
