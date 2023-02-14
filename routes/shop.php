@@ -95,7 +95,8 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         Route::get('std02/search', 'std02Controller@search');
         Route::get('std02/show/{store_cd?}', 'std02Controller@show');
         Route::get('std02/check-code/{storage_cd?}', 'std02Controller@check_code');
-
+        Route::get('std02/charge/{store_cd?}', 'std02Controller@charge');
+        Route::get('std02/charge_search', 'std02Controller@charge_search');
         Route::post('std02/update', 'std02Controller@update_store');
         Route::post('std02/del_img', 'std02Controller@del_img');
 

@@ -179,7 +179,7 @@
 													<input type="text" name="email" id="email" value="{{ @$store->email }}" class="form-control form-control-sm w-100" />
 												</div>
 											</td>
-											<th>기본수수료</th>
+											<th>점포수수료</th>
 											<td>
 												<div class="form-inline">
 													<input type="text" name="fee" id="fee" value="{{ @$store->fee }}" class="form-control form-control-sm w-100" />
@@ -187,7 +187,7 @@
 											</td>
 										</tr>
 										<tr>
-											<th>판매수수료율</th>
+											<!-- <th>판매수수료율</th>
 											<td>
 												<div class="d-flex flex-column">
 													<div class="d-flex" style="width:100%;line-height:30px;">
@@ -195,7 +195,7 @@
 														%
 													</div>
 												</div>
-											</td>
+											</td> -->
 											<th>중간관리여부</th>
 											<td>
 												<div class="form-inline form-radio-box">
@@ -208,6 +208,10 @@
 														<label class="custom-control-label" for="md_manage_yn_N">N</label>
 													</div>
 												</div>
+											</td>
+											<th></th>
+											<td>
+
 											</td>
 										</tr>
 										<tr>
@@ -448,6 +452,28 @@
 													</div>
 												</div>
 											</td>
+											<th>정산관리여부(+수수료등급)</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="account_y" name="account_yn" value="Y" @if(@$store->account_yn == 'Y') checked @endif />
+														<label class="custom-control-label" for="account_y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="account_n" name="account_yn" value="N" @if(@$store->account_yn != 'Y') checked @endif />
+														<label class="custom-control-label" for="account_n">N</label>
+													</div>
+													&nbsp;&nbsp;&nbsp;
+													<select name='grade_cd' id="grade_cd" class="form-control form-control-sm" style="width: 70%;">
+														<option value=''>미등록</option>
+														@foreach ($grades as $grade)
+															<option value='{{ $grade->code_id }}' @if(@$store->grade_cd == $grade->code_id) selected @endif>{{ $grade->code_val }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
+										</tr>
+										<tr>
 											<th>경비관리</th>
 											<td style="width:35%;">
 												<div class="form-inline form-radio-box">
@@ -461,8 +487,6 @@
 													</div>
 												</div>
 											</td>
-										</tr>
-										<tr>
 											<th>출고우선순위</th>
 											<td>
 												<div class="flex_box">
@@ -474,6 +498,8 @@
 													</select>
 												</div>
 											</td>
+										</tr>
+										<tr>
 											<th>동종업계정보입력</th>
 											<td>
 												<div class="form-inline form-radio-box">
@@ -487,8 +513,6 @@
 													</div>
 												</div>
 											</td>
-										</tr>
-										<tr>
 											<th>POS 사용여부</th>
 											<td>
 												<div class="form-inline form-radio-box">
@@ -502,6 +526,8 @@
 													</div>
 												</div>
 											</td>
+										</tr>
+										<tr>
 											<th>타매장재고조회</th>
 											<td>
 												<div class="form-inline form-radio-box">
@@ -515,8 +541,6 @@
 													</div>
 												</div>
 											</td>
-										</tr>
-										<tr>
 											<th>판매분배분여부</th>
 											<td>
 												<div class="form-inline form-radio-box">
@@ -530,6 +554,8 @@
 													</div>
 												</div>
 											</td>
+										</tr>
+										<tr>
 											<th>매장RT여부</th>
 											<td>
 												<div class="form-inline form-radio-box">
@@ -543,8 +569,6 @@
 													</div>
 												</div>
 											</td>
-										</tr>
-										<tr>
 											<th>오픈 후 한달 재고보기 제외여부</th>
 											<td>
 												<div class="form-inline form-radio-box">
@@ -570,6 +594,8 @@
 													@endif
 												</div>
 											</td>
+										</tr>
+										<tr>
 											<th>적립금지급여부</th>
 											<td>
 												<div class="form-inline form-radio-box">
@@ -583,8 +609,6 @@
 													</div>
 												</div>
 											</td>
-										</tr>
-										<tr>
 											<th>온라인업체매칭</th>
 											<td>
 												<div class="form-inline form-radio-box">
@@ -602,26 +626,6 @@
 															@foreach ($store_match as $sm)
 																<option value='{{ $sm->com_id }}' @if(@$store->com_id == $sm->com_id) selected @endif @if(@$sm->s_match != '') disabled style="background: #d2d2d2;" @endif>{{ $sm->com_nm }}</option>
 															@endforeach
-													</select>
-												</div>
-											</td>
-											<th>정산관리여부(+수수료등급)</th>
-											<td>
-												<div class="form-inline form-radio-box">
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="account_y" name="account_yn" value="Y" @if(@$store->account_yn == 'Y') checked @endif />
-														<label class="custom-control-label" for="account_y">Y</label>
-													</div>
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="account_n" name="account_yn" value="N" @if(@$store->account_yn != 'Y') checked @endif />
-														<label class="custom-control-label" for="account_n">N</label>
-													</div>
-													&nbsp;&nbsp;&nbsp;
-													<select name='grade_cd' id="grade_cd" class="form-control form-control-sm" style="width: 70%;">
-														<option value=''>미등록</option>
-														@foreach ($grades as $grade)
-															<option value='{{ $grade->code_id }}' @if(@$store->grade_cd == $grade->code_id) selected @endif>{{ $grade->code_val }}</option>
-														@endforeach
 													</select>
 												</div>
 											</td>
@@ -691,7 +695,6 @@
 		// 	} 
 		// });
 
-		
 });
 
 	// 이미지
@@ -971,6 +974,13 @@
 		}
 
 		if(!validation('update')) return;
+		
+		if ($('input[name=account_yn]:checked').val() == 'Y' && f1.grade_cd.selectedIndex == 0) {
+				return alert('수수료 등급을 선택해주세요.');
+			
+		}
+
+
         if(!window.confirm("매장정보를 수정하시겠습니까?")) return;
 
         axios({

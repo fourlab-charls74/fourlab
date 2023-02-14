@@ -35,7 +35,6 @@ class std02Controller extends Controller
 		$limit	= $request->input('limit', 100);
 
 		$store_type	= $request->input("store_type");
-
 		$store_kind	= $request->input("store_kind");
 		$store_area	= $request->input("store_area");
 		$store_nm	= $request->input("store_nm");
@@ -64,28 +63,11 @@ class std02Controller extends Controller
 
 		if( $page == 1 ){
 			$query	= "
-				select 
-					count(*) as total
-				from (
-					select
-						a.*,
-						c.code_val as store_type_nm,
-						d.code_val as store_kind_nm,
-						e.code_val as store_area_nm,
-						sg.name as grade_nm
-					from store a
-					left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = a.store_type
-					left outer join code d on d.code_kind_cd = 'store_kind' and d.code_id = a.store_kind
-					left outer join code e on e.code_kind_cd = 'store_area' and e.code_id = a.store_area
-					left outer join store_grade sg on a.grade_cd = sg.grade_cd
-					where 1=1 
-						and concat(sg.sdate, '-01 00:00:00') <= date_format(now(), '%Y-%m-%d 00:00:00') 
-						and concat(sg.edate, '-31 23:59:59') >= date_format(now(), '%Y-%m-%d 00:00:00') 
-						$where
-					$orderby
-					$limit
-				) t
+				select count(*) as total
+				from store a
+				where 1=1 $where
 			";
+			//$row = DB::select($query,['com_id' => $com_id]);
 			$row		= DB::select($query);
 			$total		= $row[0]->total;
 			$page_cnt	= (int)(($total - 1) / $page_size) + 1;
@@ -97,15 +79,18 @@ class std02Controller extends Controller
 				c.code_val as store_type_nm,
 				d.code_val as store_kind_nm,
 				e.code_val as store_area_nm,
-				sg.name as grade_nm
+				if(sg.name <> '', sg.name, a.grade_cd) as grade_nm
 			from store a
 			left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = a.store_type
 			left outer join code d on d.code_kind_cd = 'store_kind' and d.code_id = a.store_kind
 			left outer join code e on e.code_kind_cd = 'store_area' and e.code_id = a.store_area
-			left outer join store_grade sg on a.grade_cd = sg.grade_cd
+			left outer join (
+				select grade_cd, name, sdate, edate
+				from store_grade
+				where concat(sdate, '-01 00:00:00') <= date_format(now(), '%Y-%m-%d 00:00:00') 
+					and concat(edate, '-31 23:59:59') >= date_format(now(), '%Y-%m-%d 00:00:00') 
+			) sg on a.grade_cd = sg.grade_cd
 			where 1=1 
-				and concat(sg.sdate, '-01 00:00:00') <= date_format(now(), '%Y-%m-%d 00:00:00') 
-				and concat(sg.edate, '-31 23:59:59') >= date_format(now(), '%Y-%m-%d 00:00:00') 
 				$where
 			$orderby
 			$limit
@@ -170,6 +155,35 @@ class std02Controller extends Controller
 
 			$map_key = DB::selectOne($map_key_sql);
 
+
+		//업체 셀렉트박스
+		//매칭되어있는 매장은 출력되지않게해야함
+
+			$match_sql = "
+						select
+							c.com_id
+							, c.com_nm
+							, s.com_id as s_match
+						from company c
+						left outer join store s on s.com_id = c.com_id and s.com_id != ''
+						where c.use_yn = 'Y'
+						order by c.com_nm asc
+			";
+
+			$store_match = DB::select($match_sql);
+
+		// if ($store_cd != '') {
+		// 	$select_sql = "
+		// 			select 
+		// 				com_id 
+		// 			from store 
+		// 			where com_id != ''
+		// 	";
+
+		// 	$select_match = DB::select($select_sql);
+
+		// }
+
 			
 		$values = [
 			"cmd"	=> $store_cd == '' ? "" : "update",
@@ -180,15 +194,12 @@ class std02Controller extends Controller
 			'store_kinds' => SLib::getCodes("STORE_KIND"),
 			'store_areas' => SLib::getCodes("STORE_AREA"),
 			'grades' => SLib::getValidStoreGrades(),
-			'prioritys' => SLib::getCodes("PRIORITY")
+			'prioritys' => SLib::getCodes("PRIORITY"),
+			'store_match' => $store_match,
 		];
+		
 
-		if($values["cmd"] == "") {
-			return redirect('/shop');
-		} else if($values["cmd"] == "update"){
-			return view( Config::get('shop.shop.view') . '/standard/std02_show',$values);
-		}
-
+		return view( Config::get('shop.shop.view') . '/standard/std02_show',$values);
 	}
 
 	// 매장코드 중복체크
@@ -221,8 +232,20 @@ class std02Controller extends Controller
 		// $y 			= $request->input('y');
 		// $x 			= $request->input('x');
 		// $map_code 	= $y.','.$x;
-		$open_month_stock_yn = $request->input('open_month_stock_yn');
-		$cmd 		= $request->input('cmd');
+
+		$sale_place_match_yn = $request->input('sale_place_match_yn');
+		if ($sale_place_match_yn == 'Y') {
+			$com_id = $request->input('com_id');
+		} else {
+			$com_id = '';
+		}
+
+		$account_yn = $request->input('account_yn', 'N');
+		if ($account_yn == 'Y') {
+			$grade_cd = $request->input('grade_cd');
+		} else {
+			$grade_cd = null;
+		}
 
 		try {
 			DB::beginTransaction();
@@ -231,92 +254,64 @@ class std02Controller extends Controller
 				'store_cd'	=> $request->input('store_cd')
 			];
 
-			if( $cmd == "" ){
-				$values	= [
-					'store_nm'		=> $request->input('store_nm'),
-					'store_nm_s'	=> $request->input('store_nm_s'),
-					'store_type'	=> $request->input('store_type'),
-					'store_kind'	=> $request->input('store_kind'),
-					'store_area'	=> $request->input('store_area'),
-					'grade_cd'		=> $request->input('grade_cd'),
-					'zipcode'		=> $request->input('zipcode'),
-					'addr1'			=> $request->input('addr1'),
-					'addr2'			=> $request->input('addr2'),
-					'phone'			=> $request->input('phone'),
-					'fax'			=> $request->input('fax'),
-					'mobile'		=> $request->input('mobile'),
-					'manager_nm'	=> $request->input('manager_nm'),
-					'manager_mobile'=> $request->input('manager_mobile'),
-					'email'			=> $request->input('email'),
-					'fee'			=> $request->input('fee'),
-					'sale_fee'		=> $request->input('sale_fee'),
-					'md_manage_yn'	=> $request->input('md_manage_yn'),
-					'bank_no'		=> $request->input('bank_no'),
-					'bank_nm'		=> $request->input('bank_nm'),
-					'depositor'		=> $request->input('depositor'),
-					'deposit_cash'	=> $request->input('deposit_cash'),
-					'deposit_coll'	=> $request->input('deposit_coll'),
-					'loss_rate'		=> $request->input('loss_rate'),
-					'sdate'			=> $request->input('sdate'),
-					'edate'			=> $request->input('edate'),
-					'use_yn'		=> $request->input('use_yn'),
-					'ipgo_yn'		=> $request->input('ipgo_yn'),
-					'vat_yn'		=> $request->input('vat_yn'),
-					'biz_no'		=> $request->input('biz_no'),
-					'biz_nm'		=> $request->input('biz_nm'),
-					'biz_ceo'		=> $request->input('biz_ceo'),
-					'biz_zipcode'	=> $request->input('biz_zipcode'),
-					'biz_addr1'		=> $request->input('biz_addr1'),
-					'biz_addr2'		=> $request->input('biz_addr2'),
-					'biz_uptae'		=> $request->input('biz_uptae'),
-					'biz_upjong'	=> $request->input('biz_upjong'),
-					'manage_type'	=> $request->input('manage_type'),
-					'exp_manage_yn'	=> $request->input('exp_manage_yn'),
-					'priority'		=> $request->input('priority'),
-					'competitor_yn'	=> $request->input('competitor_yn'),
-					'pos_yn'		=> $request->input('pos_yn'),
-					'ostore_stock_yn'	=> $request->input('ostore_stock_yn'),
-					'sale_dist_yn'	=> $request->input('sale_dist_yn'),
-					'rt_yn'			=> $request->input('rt_yn'),
-					'point_in_yn'	=> $request->input('point_in_yn', 'N'),
-					'point_out_yn'	=> $request->input('point_out_yn'),
-					'reg_date'		=> now(),
-					'mod_date'		=> now(),
-					'admin_id'		=> $id,
-					'map_code'		=> $request->input('map_code'),
-					'open_month_stock_yn' => $open_month_stock_yn
-					
-				];
-			}else if( $cmd == "update" ){
-				$values	= [
-					'store_nm'		=> $request->input('store_nm'),
-					'store_nm_s'	=> $request->input('store_nm_s'),
-					'store_type'	=> $request->input('store_type'),
-					'store_kind'	=> $request->input('store_kind'),
-					'store_area'	=> $request->input('store_area'),
-					'zipcode'		=> $request->input('zipcode'),
-					'addr1'			=> $request->input('addr1'),
-					'addr2'			=> $request->input('addr2'),
-					'phone'			=> $request->input('phone'),
-					'fax'			=> $request->input('fax'),
-					'mobile'		=> $request->input('mobile'),
-					'manager_nm'	=> $request->input('manager_nm'),
-					'manager_mobile'=> $request->input('manager_mobile'),
-					'email'			=> $request->input('email'),
-					'fee'			=> $request->input('fee'),
-					'bank_no'		=> $request->input('bank_no'),
-					'bank_nm'		=> $request->input('bank_nm'),
-					'depositor'		=> $request->input('depositor'),
-					'sdate'			=> $request->input('sdate'),
-					'edate'			=> $request->input('edate'),
-					'reg_date'		=> now(),
-					'mod_date'		=> now(),
-					'admin_id'		=> $id,
-					'map_code'		=> $request->input('map_code'),
-				];
-			}
+			$values	= [
+				'store_nm'		=> $request->input('store_nm'),
+				'store_nm_s'	=> $request->input('store_nm_s'),
+				'store_type'	=> $request->input('store_type'),
+				'store_kind'	=> $request->input('store_kind'),
+				'store_area'	=> $request->input('store_area'),
+				'grade_cd'		=> $grade_cd,
+				'zipcode'		=> $request->input('zipcode'),
+				'addr1'			=> $request->input('addr1'),
+				'addr2'			=> $request->input('addr2'),
+				'phone'			=> $request->input('phone'),
+				'fax'			=> $request->input('fax'),
+				'mobile'		=> $request->input('mobile'),
+				'manager_nm'	=> $request->input('manager_nm'),
+				'manager_mobile'=> $request->input('manager_mobile'),
+				'email'			=> $request->input('email'),
+				'fee'			=> $request->input('fee'),
+				'sale_fee'		=> $request->input('sale_fee'),
+				'md_manage_yn'	=> $request->input('md_manage_yn'),
+				'bank_no'		=> $request->input('bank_no'),
+				'bank_nm'		=> $request->input('bank_nm'),
+				'depositor'		=> $request->input('depositor'),
+				'deposit_cash'	=> $request->input('deposit_cash'),
+				'deposit_coll'	=> $request->input('deposit_coll'),
+				'loss_rate'		=> $request->input('loss_rate'),
+				'sdate'			=> $request->input('sdate'),
+				'edate'			=> $request->input('edate'),
+				'use_yn'		=> $request->input('use_yn'),
+				'ipgo_yn'		=> $request->input('ipgo_yn'),
+				'vat_yn'		=> $request->input('vat_yn'),
+				'biz_no'		=> $request->input('biz_no'),
+				'biz_nm'		=> $request->input('biz_nm'),
+				'biz_ceo'		=> $request->input('biz_ceo'),
+				'biz_zipcode'	=> $request->input('biz_zipcode'),
+				'biz_addr1'		=> $request->input('biz_addr1'),
+				'biz_addr2'		=> $request->input('biz_addr2'),
+				'biz_uptae'		=> $request->input('biz_uptae'),
+				'biz_upjong'	=> $request->input('biz_upjong'),
+				'manage_type'	=> $request->input('manage_type'),
+				'exp_manage_yn'	=> $request->input('exp_manage_yn'),
+				'priority'		=> $request->input('priority'),
+				'competitor_yn'	=> $request->input('competitor_yn'),
+				'pos_yn'		=> $request->input('pos_yn'),
+				'ostore_stock_yn'	=> $request->input('ostore_stock_yn'),
+				'sale_dist_yn'	=> $request->input('sale_dist_yn'),
+				'rt_yn'			=> $request->input('rt_yn'),
+				'point_in_yn'	=> $request->input('point_in_yn', 'N'),
+				'point_out_yn'	=> $request->input('point_out_yn'),
+				'com_id'		=> $com_id,
+				'reg_date'		=> now(),
+				'mod_date'		=> now(),
+				'admin_id'		=> $id,
+				'map_code'		=> $request->input('map_code'),
+				'open_month_stock_yn' => $request->input('open_month_stock_yn'),
+				'sale_place_match_yn' => $sale_place_match_yn,
+				'account_yn' => $account_yn,				
+			];
 			
-	
 			DB::table('store')->updateOrInsert($where, $values);
 			
 
@@ -453,6 +448,71 @@ class std02Controller extends Controller
 			$code = 500;
 		}
 		return response()->json(['code' => $code]);
+	}
+
+	public function charge($store_cd) {
+
+		$sql = "
+			select
+				store_nm
+				, store_cd
+			from store
+			where store_cd = '$store_cd'
+		";
+
+		$store = DB::selectOne($sql);
+
+		$values = [
+			'store_nm' => $store->store_nm,
+			'store_cd' => $store->store_cd
+		];
+
+		return view( Config::get('shop.shop.view') . '/standard/std02_charge',$values);
+
+	}
+
+	public function charge_search(Request $request) {
+		$store_cd = $request->input("store_cd");
+
+		$sql = "
+			select 
+				sf.idx, 
+				cd.code_id as pr_code_cd, 
+				cd.code_val as pr_code_nm, 
+				s.store_cd, 
+				sf.store_fee,
+				s.grade_cd,
+				sg.idx as grade_idx,
+				sg.name as grade_nm,
+				sf.sdate, 
+				sf.edate, 
+				sf.comment, 
+				sf.use_yn
+			from code cd
+				inner join store s on s.store_cd = '$store_cd'
+				left outer join store_fee sf
+					on cd.code_id = sf.pr_code and sf.store_cd = s.store_cd and sf.idx in (select max(idx) from store_fee where store_cd = '$store_cd' group by pr_code)
+				left outer join store_grade sg 
+					on sg.grade_cd = s.grade_cd 
+					and concat(sg.sdate, '-01 00:00:00') <= date_format(now(), '%Y-%m-%d 00:00:00') 
+					and concat(sg.edate, '-31 23:59:59') >= date_format(now(), '%Y-%m-%d 00:00:00')			
+			where cd.code_kind_cd = 'PR_CODE' and cd.use_yn = 'Y'
+			order by cd.code_seq
+		";
+
+		$result = DB::select($sql);
+
+		return response()->json([
+			"head" => [
+				"total" => count($result),
+				"page" => 1,
+				"page_cnt" => 1,
+				"page_total" => 1
+			],
+			"body" => $result
+		]);
+
+
 	}
 
 }

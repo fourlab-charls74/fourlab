@@ -450,4 +450,69 @@ class std02Controller extends Controller
 		return response()->json(['code' => $code]);
 	}
 
+	public function charge($store_cd) {
+
+		$sql = "
+			select
+				store_nm
+				, store_cd
+			from store
+			where store_cd = '$store_cd'
+		";
+
+		$store = DB::selectOne($sql);
+
+		$values = [
+			'store_nm' => $store->store_nm,
+			'store_cd' => $store->store_cd
+		];
+
+		return view( Config::get('shop.store.view') . '/standard/std02_charge',$values);
+
+	}
+
+	public function charge_search(Request $request) {
+		$store_cd = $request->input("store_cd");
+
+		$sql = "
+			select 
+				sf.idx, 
+				cd.code_id as pr_code_cd, 
+				cd.code_val as pr_code_nm, 
+				s.store_cd, 
+				sf.store_fee,
+				s.grade_cd,
+				sg.idx as grade_idx,
+				sg.name as grade_nm,
+				sf.sdate, 
+				sf.edate, 
+				sf.comment, 
+				sf.use_yn
+			from code cd
+				inner join store s on s.store_cd = '$store_cd'
+				left outer join store_fee sf
+					on cd.code_id = sf.pr_code and sf.store_cd = s.store_cd and sf.idx in (select max(idx) from store_fee where store_cd = '$store_cd' group by pr_code)
+				left outer join store_grade sg 
+					on sg.grade_cd = s.grade_cd 
+					and concat(sg.sdate, '-01 00:00:00') <= date_format(now(), '%Y-%m-%d 00:00:00') 
+					and concat(sg.edate, '-31 23:59:59') >= date_format(now(), '%Y-%m-%d 00:00:00')			
+			where cd.code_kind_cd = 'PR_CODE' and cd.use_yn = 'Y'
+			order by cd.code_seq
+		";
+
+		$result = DB::select($sql);
+
+		return response()->json([
+			"head" => [
+				"total" => count($result),
+				"page" => 1,
+				"page_cnt" => 1,
+				"page_total" => 1
+			],
+			"body" => $result
+		]);
+
+
+	}
+
 }

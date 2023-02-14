@@ -25,7 +25,7 @@
 				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="good_types">매장구분 :</label>
+							<label for="good_types">매장구분</label>
 							<div class="flax_box">
 								<select name='store_type' class="form-control form-control-sm">
 									<option value=''>전체</option>
@@ -38,7 +38,7 @@
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="">매장종류 :</label>
+							<label for="">매장종류</label>
 							<div class="flax_box">
 								<select name='store_kind' class="form-control form-control-sm">
 									<option value=''>전체</option>
@@ -51,7 +51,7 @@
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="">매장명 :</label>
+							<label for="">매장명</label>
 							<div class="flax_box">
 								<input type='text' class="form-control form-control-sm search-enter" name='store_nm' value=''>
 							</div>
@@ -60,17 +60,17 @@
 				</div>
 
 				<div class="row">
-					<div class="col-lg-4 inner-td">
+					<!-- <div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="">매장코드 :</label>
 							<div class="flax_box">
 								<input type='text' class="form-control form-control-sm search-enter" name='store_cd' value=''>
 							</div>
 						</div>
-					</div>
+					</div> -->
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="">매장지역 :</label>
+							<label for="">매장지역</label>
 							<div class="flax_box">
 								<select name='store_area' class="form-control form-control-sm">
 									<option value=''>전체</option>
@@ -96,11 +96,9 @@
 							</div>
 						</div>
 					</div>
-				</div>
-				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="item">자료수/정렬 :</label>
+							<label for="item">자료수/정렬</label>
 							<div class="form-inline">
 								<div class="form-inline-inner input_box" style="width:24%;">
 									<select name="limit" class="form-control form-control-sm">
@@ -127,11 +125,9 @@
 									<input type="radio" name="ord" id="sort_asc" value="asc" >
 								</div>
 							</div>
-
 						</div>
 					</div>
 				</div>
-
 			</div>
 		</div>
 
@@ -166,10 +162,10 @@
 				return '<a href="#" onClick="popDetail(\''+ params.data.store_cd +'\')">'+ params.value+'</a>'
 			}
 		},
-		{headerName:"매장명",		field:"store_nm", type: 'StoreNameType'},
 		{headerName:"매장구분",		field:"store_type_nm",	width:90, cellStyle:{"text-align":"center"}},
 		{headerName:"매장종류",		field:"store_kind_nm",	width:100, cellStyle:{"text-align":"center"}},
-		{headerName:"매장등급",		field:"grade_nm",	width:100, cellStyle:{"text-align":"center"}},
+		{headerName:"매장명",		field:"store_nm", type: 'StoreNameType'},
+		{headerName:"매니저수수료등급",		field:"grade_nm",	width:110, cellStyle:{"text-align":"center"}},
 		{headerName:"전화",			field:"phone",			width:100},
 		{headerName:"모바일",		field:"mobile",			width:100},
 		{headerName:"FAX",			field:"fax",			width:100},
@@ -185,7 +181,15 @@
 			{headerName:"매장",		field:"deposit_cash",	width:72, type: 'currencyType'},
 			{headerName:"담보",		field:"deposit_coll",	width:72, type: 'currencyType'},
 		]},
-		{headerName:"기본수수료",	field:"fee",			width:80, type: 'currencyType'},
+		{headerName:"점포수수료",	field:"fee", width:80, type: 'currencyType',
+			cellRenderer:function(params) {
+				if (params.data.fee == 0 || params.data.fee == null) {
+					return 0;
+				} else {
+					return '<a href="#" onClick="chargePopup(\''+ params.data.store_cd +'\')">'+ Comma(params.data.fee)+'</a>'
+				}
+			}
+		},
 		{headerName:"판매수수료율",	field:"sale_fee",		width:84, cellStyle:{"text-align":"right"}},
 		{headerName:"사용여부",		field:"use_yn",			width:60, cellStyle:{"text-align":"center"}},
 		{headerName:"",				field:"",				width:"auto"}
@@ -200,6 +204,12 @@
 	function popDetail(store_cd){
 		const url='/store/standard/std02/show/' + store_cd;
 		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
+	}
+
+	//점포수수료 팝업
+	function chargePopup(store_cd){
+		const url='/store/standard/std02/charge/' + store_cd;
+		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1000,height=350");
 	}
 
 </script>
