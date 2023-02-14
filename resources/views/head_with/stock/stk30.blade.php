@@ -206,6 +206,7 @@
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
 				</div>
 				<div class="fr_box flax_box">
+					<a href="#" onclick="DeleteData()" class="btn-sm btn btn-primary shadow-sm pl-2 mr-1">상품매칭 삭제</a>
 					<a href="#" onclick="ChangeData()" class="btn-sm btn btn-primary">옵션 및 코드 변경</a>
 				</div>
 			</div>
@@ -289,7 +290,7 @@
 
         if( not_matched_cnt != 0)
         {
-            alert("선택하신 데이터 중 XMD코드와 매칭되어 있지 않은 데이터가 있습니다. XMD코드와 매칭 후에 변경할 수 있습니다.");
+            alert("선택한 데이터 중 XMD코드와 매칭되어 있지 않은 데이터가 있습니다. XMD코드와 매칭 후에 변경할 수 있습니다.");
 			return;
         }
         else
@@ -297,7 +298,7 @@
             if(confirm("옵션을 수정하면 기존에 연결된 매칭 데이터가 초기화 됩니다.\r\n선택하신 데이터를 수정하시겠습니까?")) 
             {
 
-                console.log(JSON.stringify(checkRows));
+                // console.log(JSON.stringify(checkRows));
 
                 $.ajax({
                 	async: true,
@@ -314,6 +315,59 @@
                 			alert("이미 존재하는 코드 혹은 옵션 데이터 입니다.");
                 		}else{
                 			alert("데이터 수정이 실패하였습니다.");
+                		}
+                	},
+                	error: function(request, status, error) {
+                		alert("시스템 에러입니다. 관리자에게 문의하여 주십시요.");
+                		console.log("error")
+                	}
+                });
+            }
+        }
+	}
+
+    function DeleteData()
+	{
+		var checkRows = gx.gridOptions.api.getSelectedRows();
+        var not_matched_cnt	= 0;
+
+		if( checkRows.length === 0 )
+		{
+            alert("삭제할 데이터를 선택해주세요.");
+            return;
+		}
+        
+        checkRows.forEach((selectedRow, index) => {
+			if( selectedRow.cd == "" || selectedRow.cd == null )
+			{
+                not_matched_cnt++;
+			}
+		});
+
+        if( not_matched_cnt != 0)
+        {
+            alert("선택한 데이터 중 XMD코드와 매칭되어 있지 않은 데이터가 있습니다. 매칭되어 있지 않은 데이터는 삭제하실 수 없습니다.");
+			return;
+        }
+        else
+        {
+            if(confirm("확인 버튼을 누르면 상품매칭 데이터가 삭제됩니다.\r\n삭제하시겠습니까?")) 
+            {
+                $.ajax({
+                	async: true,
+                	type: 'put',
+                	url: '/head/stock/stk30/delete',
+                	data: {
+                		data : JSON.stringify(checkRows),
+                	},
+                	success: function (data) {
+                		if( data.code == "200" ){
+                			alert("선택한 데이터가 삭제 되었습니다.");
+                			Search();
+                		}else if( data.code == "401" ){
+                			alert("이미 존재하지 않는 코드 혹은 옵션 데이터입니다.");
+                		}else{
+                			alert("데이터 삭제에 실패하였습니다.");
                 		}
                 	},
                 	error: function(request, status, error) {

@@ -346,11 +346,6 @@ class stk30Controller extends Controller
 			$org_opt	= $data["org_opt"];
 			$org_cd		= $data["org_cd"];
 
-			// 23. 02. 13 ny 상품매칭 오류 수정 작업 중
-			// if($goods_no == null || $goods_no == "" || cd == null || cd == "") {
-			// 	$error_code = "402";	//매칭안됨
-			// 	break;
-			// }
 
 			$sql	= " 
 				select count(*) as cnt from goods_xmd 
@@ -364,15 +359,34 @@ class stk30Controller extends Controller
 				break;
 			}
 
-			$sql	= "
-				update goods_xmd set
-					cd			= '" . Lib::quote($cd) . "',
-					goods_opt	= '" . Lib::quote($goods_opt) . "'
-				where
+
+			$sql	= " 
+				select count(*) as cnt from goods_xmd 
+				where 
 					cd = '" . Lib::quote($org_cd) . "' and goods_no = '$goods_no' and goods_opt = '" . Lib::quote($org_opt) . "'
 			";
-			$is_update = DB::update($sql);
-			dd($is_update);
+			$row	= DB::selectOne($sql);
+
+			//기존 매칭 데이터 업데이트
+			if( $row->cnt != 0 ){
+				$sql	= "
+					update goods_xmd set
+						cd			= '" . Lib::quote($cd) . "',
+						goods_opt	= '" . Lib::quote($goods_opt) . "',
+						ut			= now()
+					where
+						cd = '" . Lib::quote($org_cd) . "' and goods_no = '$goods_no' and goods_opt = '" . Lib::quote($org_opt) . "'
+				";
+				DB::update($sql);
+
+			//신규 매칭
+			} else {
+				$sql	= "
+					insert into goods_xmd (cd, goods_no, goods_sub, goods_opt, rt)
+					values ('" . Lib::quote($cd) . "', '$goods_no', '0', '" . Lib::quote($goods_opt) . "', now())
+				";
+				DB::insert($sql);
+			}
 
 			$sql	= "
 				update goods_summary set
@@ -395,6 +409,57 @@ class stk30Controller extends Controller
 		DB::commit();
 
 
+		return response()->json([
+			"code" => $error_code,
+			"result_code" => $result_code
+		]);
+
+	}
+
+	public function select_delete(Request $request)
+	{
+		$error_code		= "200";
+		$result_code	= "";
+
+        $datas	= $request->input('data');
+		$datas	= json_decode($datas);
+
+		if( $datas == "" )
+		{
+			$error_code	= "400";
+		}
+
+		DB::beginTransaction();
+		
+		for( $i = 0; $i < count($datas); $i++ )
+		{
+			$data	= (array)$datas[$i];
+
+			$goods_no	= $data["goods_no"];
+			$cd			= $data["cd"];
+			$goods_opt	= $data["goods_opt"];
+
+			$sql	= " 
+				select count(*) as cnt from goods_xmd 
+				where 
+					cd = '" . Lib::quote($cd) . "' and goods_no = '$goods_no' and goods_opt = '" . Lib::quote($goods_opt) . "'
+			";
+			$row	= DB::selectOne($sql);
+
+			if( $row->cnt == 0 ){
+				$error_code	= "401";	//해당 데이터 없음
+				break;
+			}
+
+			$sql = " 
+				delete from goods_xmd 
+				where 
+					cd = '$cd' and goods_no = '$goods_no' and goods_opt = '" . Lib::quote($goods_opt) . "'
+			";
+			DB::delete($sql);
+		}
+
+		DB::commit();
 
 		return response()->json([
 			"code" => $error_code,

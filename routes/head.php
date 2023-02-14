@@ -512,6 +512,7 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         // XMD 상품 매칭
         Route::get('stk30', 'stk30Controller@index');
         Route::put('stk30', 'stk30Controller@select_update');
+        Route::put('stk30/delete', 'stk30Controller@select_delete');
         Route::get('stk30/search', 'stk30Controller@search');
         Route::get('stk30/show', 'stk30Controller@show');
         Route::put('stk30/show', 'stk30Controller@update');
