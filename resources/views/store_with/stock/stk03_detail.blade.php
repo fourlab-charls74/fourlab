@@ -882,9 +882,9 @@
                                                 <td colspan="5">
                                                     <div class="order_num_search">
                                                         <select name="refund_yn" id="refund_yn" class="form-control form-control-sm">
-                                                            <option value="n" @if( (@$claim_info->clm_state != 1 and @$claim_info->refund_yn == "n") or (@$claim_info->clm_state == 1 and $refund_yn == "n") ) selected @endif>환불안함</option>
-                                                            <option value="o" @if( (@$claim_info->clm_state != 1 and @$claim_info->refund_yn == "o") or (@$claim_info->clm_state == 1 and $refund_yn == "o") ) selected @endif>환불함(오픈마켓)</option>
-                                                            <option value="y" @if( (@$claim_info->clm_state != 1 and @$claim_info->refund_yn == "y") or (@$claim_info->clm_state == 1 and $refund_yn == "y") ) selected @endif>환불함</option>
+                                                            <option value="n" @if( (@$claim_info->clm_state != 1 and @$claim_info->refund_yn == "n") or (@$claim_info->clm_state == 1 and @$refund_yn == "n") ) selected @endif>환불안함</option>
+                                                            <option value="o" @if( (@$claim_info->clm_state != 1 and @$claim_info->refund_yn == "o") or (@$claim_info->clm_state == 1 and @$refund_yn == "o") ) selected @endif>환불함(오픈마켓)</option>
+                                                            <option value="y" @if( (@$claim_info->clm_state != 1 and @$claim_info->refund_yn == "y") or (@$claim_info->clm_state == 1 and @$refund_yn == "y") ) selected @endif>환불함</option>
                                                         </select>
                                                         <a href="#" class="btn-sm btn btn-secondary refund-btn">환불</a>
                                                     </div>

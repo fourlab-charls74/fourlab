@@ -185,9 +185,9 @@
 		{field: "qty", headerName: "수량", width: 50, type: 'currencyType', aggregation: true},
 		{field: "goods_sh", headerName: "정상가", width: 70, type: 'currencyType'},
 		{field: "price", headerName: "판매단가", width: 70, type: 'currencyType'},
-		{field: "dc_amt", headerName: "할인금액",	width: 90, type: 'currencyType', aggregation: true},
 		{field: "sale_amt",	headerName: "판매금액",	width: 90, type: 'currencyType', aggregation: true, cellStyle: (params) => ({"background-color": params.node.rowPinned === 'top' ? "none" : "#E9EFFF"})},
 		{field: "clm_amt", headerName: "클레임금액", width: 90, type: 'currencyType', aggregation: true, cellStyle: (params) => ({"background-color": params.node.rowPinned === 'top' ? "none" : "#E9EFFF"})},
+		{field: "dc_amt", headerName: "할인금액",	width: 90, type: 'currencyType', aggregation: true},
 		{field: "ord_type_nm", headerName: "주문구분", width: 60, cellStyle: CENTER},
 		{field: "pr_code_nm", headerName: "행사구분", width: 60, cellStyle: CENTER},
 		{field: "store_cd",	headerName: "매장코드", width: 70, cellStyle: CENTER},
@@ -252,6 +252,7 @@
 		const sdate = document.search.sdate.value;
 
 		if(!confirm(`${sdate} [ ${store_nm} ] 정산내용을 마감내역에 추가하시겠습니까?`)) return;
+		alert("다소 시간이 소요될 수 있습니다. 잠시만 기다려주세요.");
 
 		$.ajax({
 			async: false,
@@ -283,7 +284,7 @@
 			"000": "마감내역을 정상적으로 추가완료했습니다.",
 			"100": "부정확한 요청입니다.",
 			"110": "이미 마감처리된 내역입니다.",
-			"999": "마감내역을 추가하였습니다."
+			"999": "마감정보추가 시 오류가 발생했습니다."
 		}
 
 		const ret = data.code;

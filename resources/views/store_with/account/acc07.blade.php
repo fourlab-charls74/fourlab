@@ -301,7 +301,7 @@
 
 	function Search() {
         let data = $('form[name="search"]').serialize();
-        gx.Aggregation({ "sum": "top" });
+        // gx.Aggregation({ "sum": "top" });
         gx.Request('/store/account/acc07/search', data, -1);
     }
 

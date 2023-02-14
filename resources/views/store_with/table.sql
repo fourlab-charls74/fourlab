@@ -676,7 +676,7 @@ CREATE TABLE `store_account_closed_list` (
 	`sale_net_taxation_amt` int(11) DEFAULT '0' COMMENT '과세',
 	`sale_net_taxfree_amt` int(11) DEFAULT '0' COMMENT '비과세',
 	`sale_net_amt` int(11) DEFAULT '0' COMMENT '매출액',
-	`tax_amt` int(11) DEFAULT '0' COMMENT '부가세',
+	`tax_amt` decimal(10,2) DEFAULT '0' COMMENT '부가세',
 	`fee_ratio` float DEFAULT '0' COMMENT '판매유형별 중간관리자 수수료율(%)',
 	`fee` int(11) DEFAULT '0' COMMENT '판매유형별 중간관리자 수수료',
 	`memo` varchar(255) DEFAULT NULL COMMENT '메모',
