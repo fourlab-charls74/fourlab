@@ -26,8 +26,7 @@
                         <div class="dropdown-menu dropdown-menu-right">
                             <a class="dropdown-item" href="/shop/user"><i class="bx bx-user font-size-16 align-middle mr-1"></i> Profile</a>
                             <a class="dropdown-item" href="/shop/user/log"><i class="bx bx-wallet font-size-16 align-middle mr-1"></i> My Log</a>
-                            <!-- 23. 02. 13 김나영 url주소 추후 수정 -->
-                            <a class="dropdown-item" href="/shop/standard/std02/show/H0021"><i class="bx bx-store font-size-16 align-middle mr-1"></i> My Store</a>
+                            <a class="dropdown-item" href="/shop/standard/std02/show/{{ auth('head')->user()->store_cd }}"><i class="bx bx-store font-size-16 align-middle mr-1"></i> My Store</a>
                             <a class="dropdown-item d-block" href="#"><span class="badge badge-success float-right">11</span><i class="bx bx-wrench font-size-16 align-middle mr-1"></i> Settings</a>
                             <a class="dropdown-item" href="#"><i class="bx bx-lock-open font-size-16 align-middle mr-1"></i> Lock screen</a>
                             <div class="dropdown-divider"></div>
