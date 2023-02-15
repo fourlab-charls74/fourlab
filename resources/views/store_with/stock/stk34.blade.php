@@ -173,7 +173,12 @@ const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
 
     
     let columns = [
-        {headerName: "매출월", field: "sale_date", rowGroup: true, hide:true},
+        {headerName: "매출월", field: "sale_date", rowGroup: true, hide:true,
+            cellRenderer:function(params) {
+                if(params.value === undefined) return "";
+                return '<a href="/store/stock/stk33?date='+ params.value + '">'+ params.value +'</a>';
+            }
+        },
         {headerName: "매장명", field: "store_nm", rowGroup: true, hide:true},
         {headerName: '매출월', showRowGroup: 'sale_date', cellRenderer: 'agGroupCellRenderer', width: 130, pinned:'left', sortable: false},
         { field: "store_cd", headerName: "매장코드", pinned:'left', width:60, cellStyle: { 'text-align': "center" },

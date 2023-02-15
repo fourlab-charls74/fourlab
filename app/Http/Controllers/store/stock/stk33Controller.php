@@ -10,21 +10,38 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Exception;
+use DateTime;
 
 use App\Models\Conf;
 
 class stk33Controller extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+
         $mutable = Carbon::now();
         $sdate = $mutable->sub(1, 'week')->format('Y-m-d');
+
+
+        $req_sdate = $request->query("date");
+		$req_edate = $request->query("edate");
+
+		if($req_sdate != '') {
+			if($req_edate != '') {
+				$sdate = $req_sdate;
+				$edate = $req_edate;
+			} else {
+				$sdate = new DateTime($req_sdate . "-01");
+				$edate = $sdate->format('Y-m-t');
+				$sdate = $sdate->format('Y-m-d');
+			}
+		}
 
         $values = [
             'store_types' => SLib::getCodes("STORE_TYPE"),
             'competitors' => SLib::getCodes("COMPETITOR"),
             'sdate' => $sdate,
-            'edate' => date("Y-m-d")
+            'edate' => $edate,
         ];
         return view(Config::get('shop.store.view') . '/stock/stk33', $values);
     }
