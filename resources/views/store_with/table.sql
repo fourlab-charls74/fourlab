@@ -714,6 +714,7 @@ CREATE TABLE `store_account_extra` (
 	`ymonth` VARCHAR(6) NOT NULL COMMENT '정산연월',
 	`rt` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '등록일시',
 	`type` VARCHAR(10) NOT NULL DEFAULT '' COMMENT 'code - G_ACC_EXTRA_TYPE',
+	`prd_cd` VARCHAR(50) DEFAULT NULL COMMENT '원부자재코드 (type이 ’S’ or ‘G’ 일 때, 해당 부자재 or 사은품의 원부자재코드)',
 	`extra_amt` INT(11) DEFAULT NULL COMMENT '기타재반자료액',
 	PRIMARY KEY (`idx`),
 	KEY `store_cd` (`store_cd`, `ymonth`, `type`)

@@ -74,7 +74,7 @@
                 <ul>
                     <li><a href="/store/account/acc04">(개)매장별매출현황</a></li>
                     <li><a href="/store/account/acc06">(완)매장중간관리자정산</a></li>
-                    <li><a href="/store/account/acc07">(개)매장중간관리자마감정산</a></li>
+                    <li><a href="/store/account/acc07">(완)매장중간관리자마감정산</a></li>
                     <li><a href="/store/account/acc05">(개)기타재반자료</a></li>
                 </ul>
             </li>

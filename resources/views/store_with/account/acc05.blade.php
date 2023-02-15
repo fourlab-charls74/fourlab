@@ -12,7 +12,6 @@
 <form method="get" name="search">
 	<div id="search-area" class="search_cum_form">
 		<div class="card mb-3">
-
 			<div class="d-flex card-header justify-content-between">
 				<h4>검색</h4>
 				<div class="flax_box">
@@ -90,7 +89,7 @@
 <!-- DataTales Example -->
 <div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
 	<div class="card-body shadow">
-        <div class="card-title mb-3">
+        <div class="card-title mb-2">
 			<div class="filter_wrap">
 				<div class="fl_box">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
@@ -106,72 +105,109 @@
 	</div>
 </div>
 <script language="javascript">
-
 	const YELLOW = {'background-color': "#ffff99"};
-
-	const emptyToZero = (params) => {
-		if (params.value === "" || params.value === undefined | params.value === null) {
-        	return 0;
-        }
-	};
-
-    var columns = [
-		{ field: "chk", headerName: '', cellClass: 'hd-grid-code', checkboxSelection: true, width: 40, pinned: 'left', sort: null },
-        { headerName: "#", field: "num", type:'NumType', pinned:'left', cellStyle: { 'text-align': "center" },
-            cellRenderer: function (params) {
-                if (params.node.rowPinned === 'top') {
-                    return "합계";
-                } else {
-                    return parseInt(params.value) + 1;
-                }
-            }
+	const CENTER = { 'text-align': 'center' };
+    const columns = [
+		{ field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28 },
+		{ headerName: "#", field: "num", type: 'NumType', pinned: 'left', width: 30, cellStyle: CENTER,
+			cellRenderer: (params) => params.node.rowPinned === 'top' ? '합계' : parseInt(params.value) + 1,
         },
-        { field: "store_type_nm", headerName: "매장구분", pinned:'left', width:90, cellStyle: { 'text-align': "center" } },
-        { field: "store_cd", headerName: "매장코드", pinned:'left', hide: true },
-        { field: "store_nm", headerName: "매장명", pinned:'left', type: 'StoreNameType', width: 180 },
-		@foreach($dynamic_cols as $group_nm => $children)
-		{ field: "{{$group_nm}}", headerName: "{{$group_nm}}",
+        { field: "store_cd", headerName: "매장코드", pinned: 'left', width: 57, cellStyle: CENTER },
+        { field: "store_type_nm", headerName: "매장구분", pinned: 'left', width: 70, cellStyle: CENTER },
+        { field: "store_nm", headerName: "매장명", pinned: 'left', type: 'StoreNameType', width: 150 },
+		@foreach ($extra_cols as $group_nm => $children)
+		{ headerName: "{{ $group_nm }}",
 			children: [
-				{ headerName: "소계", field: "{{$group_nm}}_sum", 
-					type: 'currencyType', width:100, valueFormatter: (params) => formatNumber(params),
-					valueGetter: (params) => sumChildren(params, @php echo json_encode($children); @endphp)
-				},
-			@foreach($children as $child)
-				{ headerName: "{{$child->code_val}}", field: "{{$child->code_id}}_code",
-					type: 'currencyType', editable: true, width:100, valueFormatter: (params) => formatNumber(params),
-					cellStyle: YELLOW
-				},
-			@endforeach
+				@foreach ($children as $child)
+					{ headerName: "{{ $child->code_val }}", field: "{{ $child->code_id }}_amt", type: 'currencyType', editable: true, width: 100, cellStyle: YELLOW },
+					@if (in_array($child->code_id, ['P1', 'M3']))
+					{ headerName: "{{ $child->code_val }}(-VAT)", field: "{{ $child->code_id }}_novat", type: 'currencyType', width: 100,
+						cellRenderer: (params) => Math.round((params.data["{{ $child->code_id }}"] || 0) / 1.1),
+					},
+					@endif
+				@endforeach
+				@if (!in_array($group_nm, ['마일리지', '기타운영경비']))
+				{ headerName: "소계", field: "{{ $group_nm }}_sum", type: 'currencyType', width: 100 },
+				@endif
 			]
         },
+		@if ($group_nm === '관리')
+		{ headerName: "부자재",
+			children: [
+				@foreach ($expandables as $exp)
+					{ headerName: "{{ $exp->prd_nm }}", field: "{{ $exp->prd_cd }}_amt", type: 'currencyType', editable: true, width: 100, cellStyle: YELLOW },
+				@endforeach
+				{ headerName: "소계", field: "expandables_sum", type: 'currencyType', width: 100 },
+			]
+        },
+		{ headerName: "사은품",
+			children: [
+				@foreach ($gifts as $gift)
+					{ headerName: "{{ $gift->prd_nm }}", field: "{{ $gift->prd_cd }}_amt", type: 'currencyType', editable: true, width: 100, cellStyle: YELLOW },
+				@endforeach
+				{ headerName: "소계", field: "gifts_sum", type: 'currencyType', width: 100 },
+			]
+        },
+		@endif
 		@endforeach
-        { headerName: "", field: "nvl", width: "auto" }
+		{ field: "total", headerName: "총합계", type: 'currencyType', width: 100 },
+        { width: "auto" }
     ];
-
 </script>
 <script type="text/javascript" charset="utf-8">
-
+	const pApp = new App('', { gridId: "#div-gd" });
+	let gx;
 	let current_Ym = "";
 
-	const pApp = new App('',{
-		gridId:"#div-gd",
-	});
-	let gx;
 	$(document).ready(function() {
 		pApp.ResizeGrid(275);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns);
-		gx.gridOptions.onCellValueChanged = params => evtAfterEdit(params);
+		gx.gridOptions.defaultColDef = {
+			suppressMenu: true,
+			resizable: false,
+			sortable: true,
+		};
+		// gx.gridOptions.onCellValueChanged = params => evtAfterEdit(params);
 		Search();
 	});
 
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/store/account/acc05/search', data, -1, () => {
+		gx.Request('/store/account/acc05/search', data, -1, (d) => {
 			current_Ym = (document.search.sdate.value).replace("-", "");
+			setColumns(d.head.gifts, d.head.expandables);
 		});
 	}
+
+	function setColumns(gifts, expandables) {
+		const cols = columns.reduce((a, c) => {
+			let col = {...c};
+			if(col.headerName === '부자재') {
+				col.children = expandables.map(exp => ({ headerName: exp.prd_nm, field: exp.prd_cd + "_amt", type: 'currencyType', editable: true, width: 100, cellStyle: YELLOW}))
+					.concat({ headerName: "소계", field: "expandables_sum", type: 'currencyType', width: 100 });
+			}
+			if(col.headerName === '사은품') {
+				col.children = gifts.map(gf => ({ headerName: gf.prd_nm, field: gf.prd_cd + "_amt", type: 'currencyType', editable: true, width: 100, cellStyle: YELLOW}))
+					.concat({ headerName: "소계", field: "gifts_sum", type: 'currencyType', width: 100 });
+			}
+			a.push(col);
+			return a;
+		}, []);
+
+		gx.gridOptions.api.setColumnDefs([]);
+		gx.gridOptions.api.setColumnDefs(cols);
+    }
+
+	////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////
 
 	const sumChildren = (params, children) => {
 		const row = params.data;

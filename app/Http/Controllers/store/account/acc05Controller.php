@@ -9,23 +9,39 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Exception;
 
+// 기타재반자료
 class acc05Controller extends Controller
 {
     public function index(Request $request) {
 
-        $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 이번 달 기준
+        $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 저번 달 기준
+        // $sdate = Carbon::now()->startOfMonth()->format("Y-m"); // 테스트용
+        $f_sdate = Carbon::parse($sdate)->firstOfMonth()->format("Y-m-d H:i:s");
+        $f_edate = Carbon::parse($sdate)->lastOfMonth()->format("Y-m-d H:i:s");
 
-        $store_types = SLib::getStoreTypes();
-        $sale_kinds = SLib::getUsedSaleKinds();
-        $dynamic_cols = SLib::getCodes('G_ACC_EXTRA_TYPE')->groupBy('code_val2'); // code_val2를 상위 카테고리로 사용
-        
+        $extra_cols = SLib::getCodes('STORE_ACC_EXTRA_TYPE')->groupBy('code_val2'); // code_val2를 상위 카테고리로 사용
+
+        $sql = "
+            select r.prd_cd, p.prd_nm, p.type
+            from sproduct_stock_release r
+                inner join store s on s.store_cd = r.store_cd and s.account_yn = 'Y'
+                inner join product p on p.prd_cd = r.prd_cd and p.type = :type
+            where r.fin_rt >= '$f_sdate' and r.fin_rt <= '$f_edate'
+            group by r.prd_cd
+        ";
+        $gifts = DB::select($sql, ['type' => 'G']); // 사은품
+        $expandables = DB::select($sql, ['type' => 'S']); // 부자재(소모품)
+
         $values = [
             'sdate' => $sdate,
-            'store_types' => $store_types,
-            'store_kinds'	=> SLib::getCodes("STORE_KIND"),
-            'sale_kinds' => $sale_kinds,
-            'dynamic_cols' => $dynamic_cols,
+            'store_types' => SLib::getStoreTypes(),
+			'store_kinds' => SLib::getCodes("STORE_KIND"),
+            'sale_kinds' => SLib::getUsedSaleKinds(),
+            'extra_cols' => $extra_cols,
+            'gifts' => $gifts,
+            'expandables' => $expandables,
         ];
 
         return view( Config::get('shop.store.view') . '/account/acc05', $values );
@@ -33,72 +49,78 @@ class acc05Controller extends Controller
 
     public function search(Request $request)
     {
-        $sdate = $request->input('sdate', now()->format("Y-m"));
-        $sdate = Lib::quote(str_replace("-", "", $sdate));
+        $sdate = $request->input('sdate', Carbon::now()->startOfMonth()->subMonth()->format("Ym"));
+        $f_sdate = Carbon::parse($sdate)->firstOfMonth()->format("Y-m-d H:i:s");
+        $f_edate = Carbon::parse($sdate)->lastOfMonth()->format("Y-m-d H:i:s");
+        $sdate = Lib::quote(str_replace('-', '', $sdate));
 
-        $store_type = $request->input('store_type', "");
-        $store_kind = $request->input('store_kind', "");
-        $store_cd = $request->input('store_cd', "");
+        $store_type = $request->input('store_type', '');
+        $store_kind = $request->input('store_kind', '');
+        $store_cd = $request->input('store_cd', '');
 
-        /**
-         * 검색조건 필터링
-         */
+        $sql = "
+            select r.prd_cd, p.prd_nm, p.type
+            from sproduct_stock_release r
+                inner join store s on s.store_cd = r.store_cd and s.account_yn = 'Y'
+                inner join product p on p.prd_cd = r.prd_cd and p.type = :type
+            where r.fin_rt >= '$f_sdate' and r.fin_rt <= '$f_edate'
+            group by r.prd_cd
+        ";
+        $gifts = DB::select($sql, ['type' => 'G']); // 사은품
+        $expandables = DB::select($sql, ['type' => 'S']); // 부자재(소모품)
+        $extra_types = SLib::getCodes('STORE_ACC_EXTRA_TYPE')->groupBy('code_val2')->toArray(); // 사은품/부자재 외 기타재반
+
+        // 검색조건 필터링
         $where = "";
-        if ($store_type) $where .= " and c.code_id = " . Lib::quote($store_type);
-        if ($store_kind != "") $where .= " and s.store_kind = '". Lib::quote($store_kind) . "'";
-        if ($store_cd != "") $where .= " and s.store_cd = '" . Lib::quote($store_cd) . "'";
+        if ($store_type != '') $where .= " and s.store_type = " . Lib::quote($store_type);
+        if ($store_kind != '') $where .= " and s.store_kind = '". Lib::quote($store_kind) . "'";
+        if ($store_cd != '') $where .= " and s.store_cd = '" . Lib::quote($store_cd) . "'";
 
-        /**
-         * 기타재반자료구분 쿼리 추가
-         */
-        $extra_types = SLib::getCodes('G_ACC_EXTRA_TYPE');
+        // 기타재반타입별 쿼리문 생성
+        $extra_sql = join('', array_map(function($key, $value) {
+            $query = join('', array_map(function($v) {
+                return ", sum(if(e.type = '" . $v->code_id . "', e.extra_amt, null)) as " . $v->code_id . "_amt";
+            }, $value));
+            $query .= ", sum(if(e.type in (" . join(',', array_map(function($val) { return "'" . $val->code_id . "'"; }, $value)) . "), e.extra_amt, null)) as " . $key . "_sum";
+            return $query;
+        }, array_keys($extra_types), $extra_types));
 
-        $extra_types_query = $extra_types->reduce((function ($carry, $item) 
-        {
-            $query = $carry[0];
-            $group_nm = $carry[1];
-            
-            $type = $item->code_id;
-            if ($group_nm != $item->code_val2) {
-                $group_nm = $item->code_val2;
-                $query = $query . "sum(if(c2.code_val2 = '$group_nm', e.extra_amt, 0)) as ${group_nm}_sum, ";
-            }
+        // 사은품 쿼리문 생성
+        $extra_sql .= join('', array_map(function($value) {
+            return ", sum(if(e.type = '" . $value->type . "' and e.prd_cd = '" . $value->prd_cd . "', e.extra_amt, null)) as " . $value->prd_cd . "_amt";
+        }, $gifts));
+        $extra_sql .= ", sum(if(e.type = 'G', e.extra_amt, null)) as gifts_sum";
+        
+        // 부자재(소모품) 쿼리문 생성
+        $extra_sql .= join('', array_map(function($value) {
+            return ", sum(if(e.type = '" . $value->type . "' and e.prd_cd = '" . $value->prd_cd . "', e.extra_amt, null)) as " . $value->prd_cd . "_amt";
+        }, $expandables));
+        $extra_sql .= ", sum(if(e.type = 'S', e.extra_amt, null)) as expandables_sum";
 
-            $query = $query . "sum(if(e.type = '$type', e.extra_amt, 0)) as ${type}_code, ";
-            return [$query, $group_nm];
-        }), ["", ""]);
-        $extra_types_query = $extra_types_query[0];
-
-        $sql = /** @lang text */
-        "
-			select s.store_cd, s.store_nm, c.code_val as store_type_nm, a.* 
+        $sql = "
+            select s.store_cd, s.store_nm, s.store_type, c.code_val as store_type_nm, e.*
             from store s
-                left outer join `code` c on c.code_kind_cd = 'store_type' and c.code_id = s.store_type
-                left outer join 
-                (
-                    select 
-                        e.ymonth as ymonth,
-                        $extra_types_query
-                        e.store_cd as scd
-                    from store_account_extra as e
-                        left outer join `code` c2 on c2.code_kind_cd = 'g_acc_extra_type' and c2.code_id = e.type
-                    where 1=1 and ymonth = '$sdate'
+                left outer join (
+                    select e.store_cd as store
+                        $extra_sql
+                    from store_account_extra e
+                    where e.ymonth = :ymonth
                     group by e.store_cd
-                ) as a on s.store_cd = a.scd
-            where 1=1 $where
-            order by s.store_cd
-		";
-
-        $result = DB::select($sql);
+                ) e on e.store = s.store_cd
+                left outer join code c on c.code_kind_cd = 'STORE_TYPE' and c.code_id = s.store_type
+            where s.account_yn = 'Y' $where
+        ";
+        $result = DB::select($sql, ['ymonth' => $sdate]);
 
         return response()->json([
             'code'	=> 200,
-            'head'	=> array(
-                'total'	=> count($result)
-            ),
+            'head'	=> [
+                'total'	=> count($result),
+                'gifts' => $gifts,
+                'expandables' => $expandables,
+            ],
             'body' => $result
         ]);
-
     }
 
 	public function save(Request $request)
@@ -151,5 +173,4 @@ class acc05Controller extends Controller
 		}
 		return response()->json([]);
 	}
-
 }
