@@ -19,13 +19,16 @@ class std02Controller extends Controller
 {
 	public function index() 
 	{
-		$values = [
-			'store_types'	=> SLib::getCodes("STORE_TYPE"),	// 매장구분
-			'store_kinds'	=> SLib::getCodes("STORE_KIND"),	// 매장종류
-			'store_areas'	=> SLib::getCodes("STORE_AREA")		// 매장지역
-		];
+		// $values = [
+		// 	'store_types'	=> SLib::getCodes("STORE_TYPE"),	// 매장구분
+		// 	'store_kinds'	=> SLib::getCodes("STORE_KIND"),	// 매장종류
+		// 	'store_areas'	=> SLib::getCodes("STORE_AREA")		// 매장지역
+		// ];
 
-		return view( Config::get('shop.shop.view') . '/standard/std02',$values);
+		// return view( Config::get('shop.shop.view') . '/standard/std02',$values);
+
+		/* shop 미사용 메뉴 메인페이지로 리다이렉트 */
+        return redirect('/shop');
 	}
 
 	public function search(Request $request)

@@ -15,16 +15,19 @@ class sal08Controller extends Controller
 {
 	public function index(Request $request) {
 
-		$sdate = Carbon::now()->sub(4, 'week')->format("Y-m-d");
-		$edate = Carbon::now()->format("Y-m-d");
+		// $sdate = Carbon::now()->sub(4, 'week')->format("Y-m-d");
+		// $edate = Carbon::now()->format("Y-m-d");
 
-		$values = [
-            'sdate'         => $sdate,
-			'edate'         => $edate,
-			'store_types'	=> SLib::getStoreTypes(), // 매장구분
-			'items'			=> SLib::getItems(), // 품목
-		];
-        return view( Config::get('shop.shop.view') . '/sale/sal08', $values );
+		// $values = [
+        //     'sdate'         => $sdate,
+		// 	'edate'         => $edate,
+		// 	'store_types'	=> SLib::getStoreTypes(), // 매장구분
+		// 	'items'			=> SLib::getItems(), // 품목
+		// ];
+        // return view( Config::get('shop.shop.view') . '/sale/sal08', $values );
+		
+		/* shop 미사용 메뉴 메인페이지로 리다이렉트 */
+        return redirect('/shop');
 	}
 
 	public function search(Request $request)

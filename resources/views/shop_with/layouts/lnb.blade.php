@@ -1,28 +1,28 @@
 <nav>
     <div class="side_menu">
         <ul>
-            <li>
+            {{--<!-- <li>
                 <a href="javascript:;" class="arrow waves-effect"><i class="bx bx-code-alt fs-18"></i><span>코드관리</span></a>
                 <ul>
-                    {{--<!--<li><a href="/shop/standard/std51">(임)공통코드관리</a></li>-->--}}
+                    <li><a href="/shop/standard/std51">(임)공통코드관리</a></li>
                     <li><a href="/shop/standard/std02">(완)매장관리</a></li>
-                    {{--<!-- <li><a href="/shop/standard/std03">(완)창고관리</a></li> -->--}}
-                    {{--<!-- <li><a href="/shop/standard/std04">(완)동종업계관리</a></li> -->--}}
-                    {{--<!-- <li><a href="/shop/standard/std05">(완)판매유형관리</a></li> -->--}}
-                    {{--<!--<li><a href="/shop/standard/std06">(개)매장영업담당자관리</a></li>//-->--}}
-                    {{--<!-- <li><a href="/shop/standard/std07">(완)매장마진관리</a></li> -->--}}
-                    {{--<!-- <li><a href="/shop/standard/std08">(완)매장등급관리</a></li> -->--}}
+                    <li><a href="/shop/standard/std03">(완)창고관리</a></li>
+                    <li><a href="/shop/standard/std04">(완)동종업계관리</a></li>
+                    <li><a href="/shop/standard/std05">(완)판매유형관리</a></li>
+                    <li><a href="/shop/standard/std06">(개)매장영업담당자관리</a></li>
+                    <li><a href="/shop/standard/std07">(완)매장마진관리</a></li>
+                    <li><a href="/shop/standard/std08">(완)매장등급관리</a></li>
                 </ul>
-            </li>
-            <li>
+            </li> -->--}}
+            {{--<!-- <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-cube fs-18"></i><span>상품관리</span></a>
                 <ul>
-                    {{--<!-- <li><a href="/head/product/prd01" target="_blank">상품관리</a></li> -->--}}
-                    {{--<!-- <li><a href="/shop/product/prd02">(완)상품관리(코드)</a></li> -->--}}
+                    <li><a href="/head/product/prd01" target="_blank">상품관리</a></li>
+                    <li><a href="/shop/product/prd02">(완)상품관리(코드)</a></li>
                     <li><a href="/shop/product/prd04">(완)상품재고관리</a></li>
-                    {{--<!-- <li><a href="/shop/product/prd03">(완)원부자재상품관리</a></li> -->--}}
+                    <li><a href="/shop/product/prd03">(완)원부자재상품관리</a></li>
                 </ul>
-            </li>
+            </li> -->--}}
             {{--<!-- <li>
                 <a href="javascript:;" class="arrow"><i class="bx bx-task fs-18"></i><span>생산입고관리</span></a>
                 <ul>
@@ -98,7 +98,7 @@
                     <li><a href="/shop/sale/sal03">(완)기간별 Best/Worst 판매현황</a></li>
                     <li><a href="/shop/sale/sal06">(완)매장상품별판매분석</a></li>
                     {{--<!-- <li><a href="/shop/sale/sal07">(완)상품별 이익현황</a></li> -->--}}
-                    <li><a href="/shop/sale/sal08">(완)매장브랜드별판매분석</a></li>
+                    {{--<!-- <li><a href="/shop/sale/sal08">(완)매장브랜드별매출분석</a></li> -->--}}
                     <li><a href="/shop/sale/sal24">(완)일별 매출 통계</a></li>
                     <li><a href="/shop/sale/sal25">(완)월별 매출 통계</a></li>
                     {{--<!-- <li><a href="/shop/sale/sal26">(완)매장별 매출 통계</a></li> -->--}}

@@ -18,13 +18,15 @@ class prd04Controller extends Controller
 
 	public function index() 
 	{
+		// $values = [
+		// 	'sdate'			=> date('Y-m-d'), 
+        //     'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
+		// ];
 
-		$values = [
-			'sdate'			=> date('Y-m-d'), 
-            'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
-		];
+		// return view( Config::get('shop.shop.view') . '/product/prd04',$values);
 
-		return view( Config::get('shop.shop.view') . '/product/prd04',$values);
+		/* shop 미사용 메뉴 메인페이지로 리다이렉트 */
+        return redirect('/shop');
 	}
 
 	public function search(Request $request)
