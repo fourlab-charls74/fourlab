@@ -40,13 +40,12 @@
                             </div>
 						</div>
                     </div>
-                    <div class="col-lg-4 inner-td">
+                    <div class="col-lg-4 inner-td d-none">
                         <div class="form-group">
 							<label>매장</label>
-                            <div class="form-inline inline_btn_box">
-                                <input type='hidden' id="store_nm" name="store_nm" value="{{ @$store->store_nm }}">
-                                <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                            <div class="flax_box">
+                                <input type='hidden' id="store_nm" name="store_nm">
+                                <input type='hidden' id="store_no" name="store_no" value="{{ auth('head')->user()->store_cd }}" class="form-control form-control-sm" readonly>
                             </div>
 						</div>
                     </div>

@@ -103,20 +103,23 @@ class stk31Controller extends Controller
     public function create(Request $request)
     {
 
-        $name =  Auth('head')->user()->name;
-        $no = $request->input('ns_cd');
+        // $name =  Auth('head')->user()->name;
+        // $no = $request->input('ns_cd');
 
-        $user = new \stdClass();
-        $user->name = $name;
-        $user->subject = '';
-        $user->content = '';
-        $user->ns_cd = $no;
-        $user->store_cd = '';
-        $user->store_nm = '';
+        // $user = new \stdClass();
+        // $user->name = $name;
+        // $user->subject = '';
+        // $user->content = '';
+        // $user->ns_cd = $no;
+        // $user->store_cd = '';
+        // $user->store_nm = '';
 
-        $values = ['no' => $no, 'user' => $user];
+        // $values = ['no' => $no, 'user' => $user];
 
-        return view(Config::get('shop.shop.view') . '/stock/stk31_show', $values);
+        // return view(Config::get('shop.shop.view') . '/stock/stk31_show', $values);
+
+        /* blade내의 추가 버튼 삭제 => 해당 페이지로 리다이렉트 */
+        return redirect('/shop/stock/stk31');
     }
 
     public function show($no)
@@ -143,6 +146,7 @@ class stk31Controller extends Controller
             'user' => $user,
             'storeCode' => $storeCodes
         ];
+
 
         return view(Config::get('shop.shop.view') . '/stock/stk31_show', $values);
     }

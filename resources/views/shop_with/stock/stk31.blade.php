@@ -19,7 +19,7 @@
                 <div class="flax_box">
                     <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                     <a href="#" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
-                    <a href="/shop/stock/stk31/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
+                    {{--<a href="/shop/stock/stk31/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>--}}
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
             </div>
@@ -77,70 +77,69 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                        <label for="">내용</label>
-                        <div class="flax_box">
-                            <input type='text' class="form-control form-control-sm search-all search-enter" name='content' value=''>
-                        </div>
+                            <label for="">내용</label>
+                            <div class="flax_box">
+                                <input type='text' class="form-control form-control-sm search-all search-enter" name='content' value=''>
+                            </div>
                         </div>
                     </div>
                 </div>
-                    <div class="row">
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="good_types">매장구분</label>
-                                <div class="flax_box">
-                                    <select name='store_type' class="form-control form-control-sm search-enter">
-                                        <option value=''>전체</option>
-                                    @foreach ($store_types as $store_type)
-                                        <option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
-                                    @endforeach
+                <div class="row">
+                {{--<div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="good_types">매장구분</label>
+                            <div class="flax_box">
+                                <select name='store_type' class="form-control form-control-sm search-enter">
+                                    <option value=''>전체</option>
+                                @foreach ($store_types as $store_type)
+                                    <option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
+                                @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>--}}
+                    <div class="col-lg-4 inner-td d-none">
+                        <div class="form-group">
+                            <label for="store_no">매장</label>
+                            <div class="flax_box">
+                                <input type='hidden' id="store_nm" name="store_nm">
+                                <input type='hidden' id="store_no" name="store_no" value="{{ auth('head')->user()->store_cd }}" class="form-control form-control-sm" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="">자료수/정렬</label>
+                            <div class="form-inline">
+                                <div class="form-inline-inner input_box" style="width:24%;">
+                                    <select name="limit" class="form-control form-control-sm">
+                                        <option value="100">100</option>
+                                        <option value="500">500</option>
+                                        <option value="1000">1000</option>
+                                        <option value="2000">2000</option>
                                     </select>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="store_no">매장</label>
-                                <div class="form-inline inline_btn_box search-enter" >
-                                    <input type='hidden' id="store_nm" name="store_nm">
-                                    <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
-                                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                <span class="text_line">/</span>
+                                <div class="form-inline-inner input_box" style="width:45%;">
+                                    <select name="ord_field" class="form-control form-control-sm">
+                                        <option value="rt">등록일</option>
+                                        <option value="subject">제목</option>
+                                    </select>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="">자료수/정렬</label>
-                                <div class="form-inline">
-                                    <div class="form-inline-inner input_box" style="width:24%;">
-                                        <select name="limit" class="form-control form-control-sm">
-                                            <option value="100">100</option>
-                                            <option value="500">500</option>
-                                            <option value="1000">1000</option>
-                                            <option value="2000">2000</option>
-                                        </select>
+                                <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
+                                    <div class="btn-group" role="group">
+                                        <label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="내림차순"><i class="bx bx-sort-down"></i></label>
+                                        <label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="오름차순"><i class="bx bx-sort-up"></i></label>
                                     </div>
-                                    <span class="text_line">/</span>
-                                    <div class="form-inline-inner input_box" style="width:45%;">
-                                        <select name="ord_field" class="form-control form-control-sm">
-                                            <option value="rt">등록일</option>
-                                            <option value="subject">제목</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
-                                        <div class="btn-group" role="group">
-                                            <label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="내림차순"><i class="bx bx-sort-down"></i></label>
-                                            <label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="오름차순"><i class="bx bx-sort-up"></i></label>
-                                        </div>
-                                        <input type="radio" name="ord" id="sort_desc" value="desc" checked="">
-                                        <input type="radio" name="ord" id="sort_asc" value="asc">
-                                    </div>
+                                    <input type="radio" name="ord" id="sort_desc" value="desc" checked="">
+                                    <input type="radio" name="ord" id="sort_asc" value="asc">
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
         <div class="resul_btn_wrap mb-3">
             <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
             <a href="/shop/stock/stk31/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
