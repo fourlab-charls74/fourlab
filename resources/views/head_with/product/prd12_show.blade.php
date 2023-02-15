@@ -451,18 +451,31 @@
         const folder_columns = [
             {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null, cellStyle: {"background":"#F5F7F7"}},
             {field: "d_cat_cd", headerName: "코드",width:100},
-            {field: "d_cat_nm", headerName: "폴더명",width:200,rowDrag: true,
-                editable: function(params){ return (params.data !== undefined && params.data.editable === 'Y')? true:false; },
+            {field: "d_cat_nm", headerName: "폴더명",width:200,rowDrag: true, editable: true, cellStyle: {'background' : '#ffff99'},
+                // editable: function(params){ return (params.data !== undefined && params.data.editable === 'Y')? true:false; },
                 cellClass:function(params){ return (params.data !== undefined && params.data.editable == 'Y')? ['hd-grid-edit']: [];},
                 cellRenderer: function (params) {
-                    if (params.data !== undefined && params.data.editable !== 'Y') {
-                        return `<a href="javascript:void(0);" onclick="return SearchCategoryGoods('${params.data.d_cat_cd}');">${params.value}</a>`;
-                    } else {
-                        return params.value;
-                    }
+                    // if (params.data !== undefined && params.data.editable !== 'Y') {
+                    //     return `<a href="javascript:void(0);" onclick="return SearchCategoryGoods('${params.data.d_cat_cd}');">${params.value}</a>`;
+                    // } else {
+                    //     return params.value;
+                    // }
+                    return `<a href="javascript:void(0);" onclick="return SearchCategoryGoods('${params.data.d_cat_cd}');">${params.value}</a>`;
                 }
             },
-            {field: "use_yn", headerName: "사용여부",width:72},
+            {field: "use_yn", headerName: "사용여부",width:72, editable: true, cellStyle: {'background' : '#ffff99'},
+                cellEditorSelector: function(params) {
+                    addEventListener('click', function(event) {
+                        params.node.data.editable = 'Y';
+                    });
+                    return {
+                        component: 'agRichSelectCellEditor',
+                        params: { 
+                            values: ['Y', 'N']
+                        },
+                    };
+                },
+            },
             {field: "tpl_kind", headerName: "템플릿",width:60},
             {field: "sale_yn", headerName: "세일",width:60},
             {field: "reg_dm", headerName: "헤더",width:60},

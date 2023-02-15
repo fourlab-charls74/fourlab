@@ -617,9 +617,12 @@ class prd12Controller extends Controller
         ]);
     }
 
+    // 230214 ny - 폴더명, 사용여부 editable 수정 작업 중
     public function folder_save($code,Request $request) {
 
         $folders = json_decode($request->input('data'));
+        //dd
+        // dd($folders);
 
         try {
             DB::transaction(function () use (&$result, $code,$folders) {
@@ -647,6 +650,7 @@ class prd12Controller extends Controller
                         'd_cat_nm' => $folders[$i]->d_cat_nm,
                         'p_d_cat_cd' => $p_d_cat_cd,
                         'use_yn' => 'Y',
+                        // 'use_yn' => $folders[$i]->use_yn,
                         'admin_id' => $id,
                         'admin_nm' => $name,
                         'regi_date' => DB::raw('now()'),
@@ -654,6 +658,10 @@ class prd12Controller extends Controller
                         'seq' => 0,
                     ];
                     DB::table('category')->insert($category);
+
+                    // 230214 ny - 폴더명, 사용여부 editable 수정 작업 중
+                    // $where = [ 'd_cat_cd' => $d_cat_cd ];
+                    // DB::table('category')->updateOrInsert($where, $category);
                 }
             });
             $code = 200;
