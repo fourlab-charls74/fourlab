@@ -201,8 +201,11 @@ class std02Controller extends Controller
 			'store_match' => $store_match,
 		];
 		
-
-		return view( Config::get('shop.shop.view') . '/standard/std02_show',$values);
+		if($values["cmd"] == "") {
+			return redirect('/shop');
+		} else if($values["cmd"] == "update"){
+			return view( Config::get('shop.shop.view') . '/standard/std02_show',$values);
+		}
 	}
 
 	// 매장코드 중복체크
@@ -235,6 +238,7 @@ class std02Controller extends Controller
 		// $y 			= $request->input('y');
 		// $x 			= $request->input('x');
 		// $map_code 	= $y.','.$x;
+		$cmd 		= $request->input('cmd');
 
 		$sale_place_match_yn = $request->input('sale_place_match_yn');
 		if ($sale_place_match_yn == 'Y') {
@@ -257,63 +261,92 @@ class std02Controller extends Controller
 				'store_cd'	=> $request->input('store_cd')
 			];
 
-			$values	= [
-				'store_nm'		=> $request->input('store_nm'),
-				'store_nm_s'	=> $request->input('store_nm_s'),
-				'store_type'	=> $request->input('store_type'),
-				'store_kind'	=> $request->input('store_kind'),
-				'store_area'	=> $request->input('store_area'),
-				'grade_cd'		=> $grade_cd,
-				'zipcode'		=> $request->input('zipcode'),
-				'addr1'			=> $request->input('addr1'),
-				'addr2'			=> $request->input('addr2'),
-				'phone'			=> $request->input('phone'),
-				'fax'			=> $request->input('fax'),
-				'mobile'		=> $request->input('mobile'),
-				'manager_nm'	=> $request->input('manager_nm'),
-				'manager_mobile'=> $request->input('manager_mobile'),
-				'email'			=> $request->input('email'),
-				'fee'			=> $request->input('fee'),
-				'sale_fee'		=> $request->input('sale_fee'),
-				'md_manage_yn'	=> $request->input('md_manage_yn'),
-				'bank_no'		=> $request->input('bank_no'),
-				'bank_nm'		=> $request->input('bank_nm'),
-				'depositor'		=> $request->input('depositor'),
-				'deposit_cash'	=> $request->input('deposit_cash'),
-				'deposit_coll'	=> $request->input('deposit_coll'),
-				'loss_rate'		=> $request->input('loss_rate'),
-				'sdate'			=> $request->input('sdate'),
-				'edate'			=> $request->input('edate'),
-				'use_yn'		=> $request->input('use_yn'),
-				'ipgo_yn'		=> $request->input('ipgo_yn'),
-				'vat_yn'		=> $request->input('vat_yn'),
-				'biz_no'		=> $request->input('biz_no'),
-				'biz_nm'		=> $request->input('biz_nm'),
-				'biz_ceo'		=> $request->input('biz_ceo'),
-				'biz_zipcode'	=> $request->input('biz_zipcode'),
-				'biz_addr1'		=> $request->input('biz_addr1'),
-				'biz_addr2'		=> $request->input('biz_addr2'),
-				'biz_uptae'		=> $request->input('biz_uptae'),
-				'biz_upjong'	=> $request->input('biz_upjong'),
-				'manage_type'	=> $request->input('manage_type'),
-				'exp_manage_yn'	=> $request->input('exp_manage_yn'),
-				'priority'		=> $request->input('priority'),
-				'competitor_yn'	=> $request->input('competitor_yn'),
-				'pos_yn'		=> $request->input('pos_yn'),
-				'ostore_stock_yn'	=> $request->input('ostore_stock_yn'),
-				'sale_dist_yn'	=> $request->input('sale_dist_yn'),
-				'rt_yn'			=> $request->input('rt_yn'),
-				'point_in_yn'	=> $request->input('point_in_yn', 'N'),
-				'point_out_yn'	=> $request->input('point_out_yn'),
-				'com_id'		=> $com_id,
-				'reg_date'		=> now(),
-				'mod_date'		=> now(),
-				'admin_id'		=> $id,
-				'map_code'		=> $request->input('map_code'),
-				'open_month_stock_yn' => $request->input('open_month_stock_yn'),
-				'sale_place_match_yn' => $sale_place_match_yn,
-				'account_yn' => $account_yn,				
-			];
+			if( $cmd == "" ){
+				$values	= [
+					'store_nm'		=> $request->input('store_nm'),
+					'store_nm_s'	=> $request->input('store_nm_s'),
+					'store_type'	=> $request->input('store_type'),
+					'store_kind'	=> $request->input('store_kind'),
+					'store_area'	=> $request->input('store_area'),
+					'grade_cd'		=> $grade_cd,
+					'zipcode'		=> $request->input('zipcode'),
+					'addr1'			=> $request->input('addr1'),
+					'addr2'			=> $request->input('addr2'),
+					'phone'			=> $request->input('phone'),
+					'fax'			=> $request->input('fax'),
+					'mobile'		=> $request->input('mobile'),
+					'manager_nm'	=> $request->input('manager_nm'),
+					'manager_mobile'=> $request->input('manager_mobile'),
+					'email'			=> $request->input('email'),
+					'fee'			=> $request->input('fee'),
+					'sale_fee'		=> $request->input('sale_fee'),
+					'md_manage_yn'	=> $request->input('md_manage_yn'),
+					'bank_no'		=> $request->input('bank_no'),
+					'bank_nm'		=> $request->input('bank_nm'),
+					'depositor'		=> $request->input('depositor'),
+					'deposit_cash'	=> $request->input('deposit_cash'),
+					'deposit_coll'	=> $request->input('deposit_coll'),
+					'loss_rate'		=> $request->input('loss_rate'),
+					'sdate'			=> $request->input('sdate'),
+					'edate'			=> $request->input('edate'),
+					'use_yn'		=> $request->input('use_yn'),
+					'ipgo_yn'		=> $request->input('ipgo_yn'),
+					'vat_yn'		=> $request->input('vat_yn'),
+					'biz_no'		=> $request->input('biz_no'),
+					'biz_nm'		=> $request->input('biz_nm'),
+					'biz_ceo'		=> $request->input('biz_ceo'),
+					'biz_zipcode'	=> $request->input('biz_zipcode'),
+					'biz_addr1'		=> $request->input('biz_addr1'),
+					'biz_addr2'		=> $request->input('biz_addr2'),
+					'biz_uptae'		=> $request->input('biz_uptae'),
+					'biz_upjong'	=> $request->input('biz_upjong'),
+					'manage_type'	=> $request->input('manage_type'),
+					'exp_manage_yn'	=> $request->input('exp_manage_yn'),
+					'priority'		=> $request->input('priority'),
+					'competitor_yn'	=> $request->input('competitor_yn'),
+					'pos_yn'		=> $request->input('pos_yn'),
+					'ostore_stock_yn'	=> $request->input('ostore_stock_yn'),
+					'sale_dist_yn'	=> $request->input('sale_dist_yn'),
+					'rt_yn'			=> $request->input('rt_yn'),
+					'point_in_yn'	=> $request->input('point_in_yn', 'N'),
+					'point_out_yn'	=> $request->input('point_out_yn'),
+					'com_id'		=> $com_id,
+					'reg_date'		=> now(),
+					'mod_date'		=> now(),
+					'admin_id'		=> $id,
+					'map_code'		=> $request->input('map_code'),
+					'open_month_stock_yn' => $request->input('open_month_stock_yn'),
+					'sale_place_match_yn' => $sale_place_match_yn,
+					'account_yn' => $account_yn,				
+				];
+			} else if( $cmd == "update" ){
+				$values	= [
+					'store_nm'		=> $request->input('store_nm'),
+					'store_nm_s'	=> $request->input('store_nm_s'),
+					'store_type'	=> $request->input('store_type'),
+					'store_kind'	=> $request->input('store_kind'),
+					'store_area'	=> $request->input('store_area'),
+					'zipcode'		=> $request->input('zipcode'),
+					'addr1'			=> $request->input('addr1'),
+					'addr2'			=> $request->input('addr2'),
+					'phone'			=> $request->input('phone'),
+					'fax'			=> $request->input('fax'),
+					'mobile'		=> $request->input('mobile'),
+					'manager_nm'	=> $request->input('manager_nm'),
+					'manager_mobile'=> $request->input('manager_mobile'),
+					'email'			=> $request->input('email'),
+					'fee'			=> $request->input('fee'),
+					'bank_no'		=> $request->input('bank_no'),
+					'bank_nm'		=> $request->input('bank_nm'),
+					'depositor'		=> $request->input('depositor'),
+					'sdate'			=> $request->input('sdate'),
+					'edate'			=> $request->input('edate'),
+					'reg_date'		=> now(),
+					'mod_date'		=> now(),
+					'admin_id'		=> $id,
+					'map_code'		=> $request->input('map_code'),
+				];
+			}
 			
 			DB::table('store')->updateOrInsert($where, $values);
 			

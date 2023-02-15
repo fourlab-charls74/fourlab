@@ -18,7 +18,7 @@
         <div class="d-flex">
             <a href="javascript:void(0)" onclick="Cmder('{{ $cmd }}')" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i>저장</a>
             {{-- <!--<a href="javascript:void(0)" onclick="Cmder('delete')" class="btn btn-primary mr-1"><i class="fas fa-trash fa-sm text-white-50 mr-1"></i>삭제</a>//--> --}}
-            <a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i>닫기</a>
+			<a href="@if($cmd == 'update') /shop @else # @endif" onclick="@if($cmd != 'update') window.close(); @endif" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i>닫기</a>
         </div>
     </div>
 
@@ -78,7 +78,7 @@
 											<th class="required">매장명</th>
 											<td style="width:35%;">
 												<div class="form-inline">
-													<input type="text" name="store_nm" id="store_nm" value="{{ @$store->store_nm }}" class="form-control form-control-sm w-100" />
+													<input type="text" name="store_nm" id="store_nm" value="{{ @$store->store_nm }}" class="form-control form-control-sm w-100" @if($cmd == "update") readonly @endif />
 												</div>
 											</td>
                                         </tr>
@@ -86,14 +86,14 @@
 											<th class="required">매장명(약칭)</th>
 											<td style="width:35%;">
 												<div class="form-inline">
-													<input type="text" name="store_nm_s" id="store_nm_s" value="{{ @$store->store_nm_s }}" class="form-control form-control-sm w-100" />
+													<input type="text" name="store_nm_s" id="store_nm_s" value="{{ @$store->store_nm_s }}" class="form-control form-control-sm w-100" @if($cmd == "update") readonly @endif />
 												</div>
 											</td>
 											<th class="required">매장구분/매장종류</th>
 											<td>
 												<div class="d-flex align-items-center">
 													<div class="flex_box w-100">
-														<select name='store_type' class="form-control form-control-sm">
+														<select name='store_type' class="form-control form-control-sm" @if($cmd == "update") readonly onFocus="this.initialSelect=this.selectedIndex;" onChange="this.selectedIndex=this.initialSelect" @endif >
 															<option value=''>전체</option>
 															@foreach ($store_types as $store_type)
 																<option value='{{ $store_type->code_id }}' @if(@$store->store_type == $store_type->code_id) selected @endif>{{ $store_type->code_val }}</option>
@@ -102,7 +102,7 @@
 													</div>
 													<span class="mr-2 ml-2">/</span>
 													<div class="flex_box w-100">
-														<select id='store_kind' name='store_kind' class="form-control form-control-sm">
+														<select id='store_kind' name='store_kind' class="form-control form-control-sm" @if($cmd == "update") readonly onFocus="this.initialSelect=this.selectedIndex;" onChange="this.selectedIndex=this.initialSelect" @endif >
 															<option value=''>전체</option>
 															@foreach ($store_kinds as $store_kind)
 																<option value='{{ $store_kind->code_id }}' @if(@$store->store_kind == $store_kind->code_id) selected @endif>{{ $store_kind->code_val }}</option>
@@ -112,6 +112,21 @@
 												</div>
 											</td>
                                         </tr>
+										@if($cmd != "update")
+										<tr>
+											<th class="required">중간관리 수수료</th>
+											<td>
+												<div class="flex_box">
+													<select name='grade_cd' class="form-control form-control-sm">
+														<option value=''>미등록</option>
+														@foreach ($grades as $grade)
+															<option value='{{ $grade->code_id }}' @if(@$store->grade_cd == $grade->code_id) selected @endif>{{ $grade->code_val }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
+										</tr>
+										@endif 
 										<tr>
 											<th class="required">주소</th>
 											<td colspan="3">
@@ -182,12 +197,13 @@
 											<th>점포수수료</th>
 											<td>
 												<div class="form-inline">
-													<input type="text" name="fee" id="fee" value="{{ @$store->fee }}" class="form-control form-control-sm w-100" />
+													<input type="text" name="fee" id="fee" value="{{ @$store->fee }}" class="form-control form-control-sm w-100"  @if($cmd == "update") readonly @endif />
 												</div>
 											</td>
 										</tr>
+										@if($cmd != "update")
 										<tr>
-											<!-- <th>판매수수료율</th>
+											<th>판매수수료율</th>
 											<td>
 												<div class="d-flex flex-column">
 													<div class="d-flex" style="width:100%;line-height:30px;">
@@ -195,7 +211,7 @@
 														%
 													</div>
 												</div>
-											</td> -->
+											</td>
 											<th>중간관리여부</th>
 											<td>
 												<div class="form-inline form-radio-box">
@@ -209,11 +225,8 @@
 													</div>
 												</div>
 											</td>
-											<th></th>
-											<td>
-
-											</td>
 										</tr>
+										@endif
 										<tr>
 											<th>은행명/계좌/예금주</th>
 											<td colspan="3">
@@ -226,6 +239,7 @@
 												</div>
 											</td>
 										</tr>
+										@if($cmd != "update")
 										<tr>
 											<th>매장보증금</th>
 											<td>
@@ -240,20 +254,22 @@
 												</div>
 											</td>
 										</tr>
+										@endif
 										<tr>
 											<th>오픈일</th>
 											<td>
 												<div class="form-inline">
-													<input type="text" name="sdate" id="sdate" value="{{ @$store->sdate }}" class="form-control form-control-sm w-100" />
+													<input type="text" name="sdate" id="sdate" value="{{ @$store->sdate }}" class="form-control form-control-sm w-100" @if($cmd == "update") readonly @endif />
 												</div>
 											</td>
 											<th>종료일</th>
 											<td>
 												<div class="form-inline">
-													<input type="text" name="edate" id="edate" value="{{ @$store->edate }}" class="form-control form-control-sm w-100" />
+													<input type="text" name="edate" id="edate" value="{{ @$store->edate }}" class="form-control form-control-sm w-100" @if($cmd == "update") readonly @endif />
 												</div>
 											</td>
 										</tr>
+										@if($cmd != "update")
 										<tr>
 											<th>로스인정률</th>
 											<td>
@@ -306,6 +322,7 @@
 												</div>
 											</td>
 										</tr>
+										@endif
 
 									</tbody>
                                 </table>
@@ -313,6 +330,7 @@
                         </div>
                     </div>
 
+					@if($cmd != "update")
 					<div class="row">
 						<div class="col-12" style="padding-top:30px;font-size:18px;font-weight:bold;">+ 사업자 정보</div>
 					</div>
@@ -377,7 +395,7 @@
 							</div>
 						</div>
 					</div>
-			
+					@endif
 					<!-- 매장 정보 시작 -->
 					<div class="row">
 						<div class="col-12" style="padding-top:30px;font-size:18px;font-weight:bold;">+ 매장 정보</div>
@@ -430,6 +448,7 @@
 							</div>
 						</div>
 					</div>
+					@if($cmd != "update")
 					<div class="row">
 						<div class="col-12" style="padding-top:30px;font-size:18px;font-weight:bold;">+ 환경 정보</div>
 					</div>
@@ -452,28 +471,6 @@
 													</div>
 												</div>
 											</td>
-											<th>정산관리여부(+수수료등급)</th>
-											<td>
-												<div class="form-inline form-radio-box">
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="account_y" name="account_yn" value="Y" @if(@$store->account_yn == 'Y') checked @endif />
-														<label class="custom-control-label" for="account_y">Y</label>
-													</div>
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="account_n" name="account_yn" value="N" @if(@$store->account_yn != 'Y') checked @endif />
-														<label class="custom-control-label" for="account_n">N</label>
-													</div>
-													&nbsp;&nbsp;&nbsp;
-													<select name='grade_cd' id="grade_cd" class="form-control form-control-sm" style="width: 70%;">
-														<option value=''>미등록</option>
-														@foreach ($grades as $grade)
-															<option value='{{ $grade->code_id }}' @if(@$store->grade_cd == $grade->code_id) selected @endif>{{ $grade->code_val }}</option>
-														@endforeach
-													</select>
-												</div>
-											</td>
-										</tr>
-										<tr>
 											<th>경비관리</th>
 											<td style="width:35%;">
 												<div class="form-inline form-radio-box">
@@ -487,6 +484,8 @@
 													</div>
 												</div>
 											</td>
+										</tr>
+										<tr>
 											<th>출고우선순위</th>
 											<td>
 												<div class="flex_box">
@@ -498,8 +497,6 @@
 													</select>
 												</div>
 											</td>
-										</tr>
-										<tr>
 											<th>동종업계정보입력</th>
 											<td>
 												<div class="form-inline form-radio-box">
@@ -513,6 +510,8 @@
 													</div>
 												</div>
 											</td>
+										</tr>
+										<tr>
 											<th>POS 사용여부</th>
 											<td>
 												<div class="form-inline form-radio-box">
@@ -526,8 +525,6 @@
 													</div>
 												</div>
 											</td>
-										</tr>
-										<tr>
 											<th>타매장재고조회</th>
 											<td>
 												<div class="form-inline form-radio-box">
@@ -541,6 +538,8 @@
 													</div>
 												</div>
 											</td>
+										</tr>
+										<tr>
 											<th>판매분배분여부</th>
 											<td>
 												<div class="form-inline form-radio-box">
@@ -554,8 +553,6 @@
 													</div>
 												</div>
 											</td>
-										</tr>
-										<tr>
 											<th>매장RT여부</th>
 											<td>
 												<div class="form-inline form-radio-box">
@@ -569,6 +566,8 @@
 													</div>
 												</div>
 											</td>
+										</tr>
+										<tr>
 											<th>오픈 후 한달 재고보기 제외여부</th>
 											<td>
 												<div class="form-inline form-radio-box">
@@ -594,8 +593,6 @@
 													@endif
 												</div>
 											</td>
-										</tr>
-										<tr>
 											<th>적립금지급여부</th>
 											<td>
 												<div class="form-inline form-radio-box">
@@ -609,32 +606,13 @@
 													</div>
 												</div>
 											</td>
-											<th>온라인업체매칭</th>
-											<td>
-												<div class="form-inline form-radio-box">
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="sale_place_match_y" name="sale_place_match_yn" value="Y" @if(@$store->sale_place_match_yn == 'Y') checked @endif />
-														<label class="custom-control-label" for="sale_place_match_y">Y</label>
-													</div>
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="sale_place_match_n" name="sale_place_match_yn" value="N" @if(@$store->sale_place_match_yn != 'Y') checked @endif />
-														<label class="custom-control-label" for="sale_place_match_n">N</label>
-													</div>
-													&nbsp;&nbsp;&nbsp;
-													<select name='com_id' id="com_id" class="form-control form-control-sm" style="width:70%;">
-														<option value=''>전체</option>
-															@foreach ($store_match as $sm)
-																<option value='{{ $sm->com_id }}' @if(@$store->com_id == $sm->com_id) selected @endif @if(@$sm->s_match != '') disabled style="background: #d2d2d2;" @endif>{{ $sm->com_nm }}</option>
-															@endforeach
-													</select>
-												</div>
-											</td>
 										</tr>
 									</tbody>
 								</table>
 							</div>
 						</div>
 					</div>
+					@endif
 				</div>
 			</div>
 		</div>
@@ -695,6 +673,7 @@
 		// 	} 
 		// });
 
+		
 });
 
 	// 이미지
@@ -889,6 +868,8 @@
 
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script type="text/javascript" charset="utf-8">
+	let cmd = "{{ $cmd }}";
+
     function Cmder(type) {
         if( type === "" )				addStore();
         else if( type === "update" )	updateStore();
@@ -896,31 +877,27 @@
     }
 
 	// 주소로 위도/경도 조회
-	// const getMapCode = () => {
-	// 		var geocoder = new kakao.maps.services.Geocoder();
-	// 		let address = document.getElementById('addr1').value;
-
-	// 		let store_kind = $('select[name=store_kind] option:selected').val();
-	// 		let store_type = $('select[name=store_type] option:selected').val();
-
-	// 		if (!address) return;
-	// 		if (store_kind !== 02 || store_type !== 11) {
-	// 			return new Promise((resolve, reject) => {
-	// 				geocoder.addressSearch(address, async function(result, status) {
-	// 					if (status === await kakao.maps.services.Status.OK) {
-	// 						resolve({y: result[0].y, x: result[0].x});
-	// 					} else {
-	// 						reject(result);
-	// 					}
-	// 				});
-	// 			});
-	// 		}
-	// 	}
+	const getMapCode = () => {
+			var geocoder = new kakao.maps.services.Geocoder();
+			let address = document.getElementById('addr1').value;
+			return new Promise((resolve, reject) => {
+				geocoder.addressSearch(address, async function(result, status) {
+					if (status === await kakao.maps.services.Status.OK) {
+						resolve({y: result[0].y, x: result[0].x});
+					} else {
+						reject(result);
+					}
+				});
+			});
+		}
 		
     // 매장정보 등록
     async function addStore() {
-		// let res = await getMapCode();
+		let res = await getMapCode();
+
 		let form = new FormData(document.querySelector("#f1"));
+
+		form.append("cmd", cmd);
 		
 		for(let i = 0; i< $("#btnAdd")[0].files.length; i++) {
 			form.append("file[]", $("#btnAdd")[0].files[i] || '');
@@ -956,35 +933,28 @@
             console.log(err);
         });
     }
-
     // 매장정보 수정
     async function updateStore() {
-		let map_code = $('#map_code').val();
-
-		// if (map_code != '') {
-		// 	const map = await getMapCode();
-		// }
+		let res = await getMapCode();
 
 		let form = new FormData(document.querySelector("#f1"));
+		
+		form.append("cmd", cmd);
 
 		for (let i = 0; i< $("#btnAdd")[0].files.length; i++) {
 			form.append("file[]", $("#btnAdd")[0].files[i] || '');
 		}
 
+		// form.append("y", res.y || '');
+		// form.append("x", res.x || '');
+
 		if(!validation('update')) return;
-		
-		if ($('input[name=account_yn]:checked').val() == 'Y' && f1.grade_cd.selectedIndex == 0) {
-				return alert('수수료 등급을 선택해주세요.');
-			
-		}
-
-
         if(!window.confirm("매장정보를 수정하시겠습니까?")) return;
 
         axios({
             url: `/shop/standard/std02/update`,
             method: 'post',
-            data: form
+            data: form,
         }).then(function (res) {
             if(res.data.code === 200) {
                 alert(res.data.msg);
@@ -1000,10 +970,9 @@
 				alert("업로드 가능한 파일의 크기는 2MB입니다.\n2MB보다 작은 파일을 업로드해주세요");
 			}
         }).catch(function (err) {
-			console.log(err);
-		})
+            console.log(err);
+        });
     }
-
     // 매장정보 삭제
     async function deleteStore() {
         if(!window.confirm("매장정보를 삭제하시겠습니까?")) return;
@@ -1095,38 +1064,9 @@
 			f1.store_area.focus();
 			return alert("매장지역을 선택해주세요.");
 		}
-
-		// 매칭매장 선택
-		if ($("input[name='sale_place_match_yn']:checked").val() == 'Y' && $('#com_id').val() == '') {
-			return alert('매칭할 업체를 선택해주세요.');
-		}
-
 		// 주소 입력여부
 		if(f1.zipcode.value === '') return alert("주소를 입력해주세요.");
 		return true;
 	}
-
-	//온라인업체매칭 & 정산관리여부
-    $(document).ready(function() {
-		showSelectBox('sale_place_match_yn', 'com_id');
-		showSelectBox('account_yn', 'grade_cd');
-
-        $("input[name='sale_place_match_yn']").change(function(){
-			showSelectBox('sale_place_match_yn', 'com_id');
-        });
-
-        $("input[name='account_yn']").change(function(){
-			showSelectBox('account_yn', 'grade_cd');
-        });
-    });
-
-	function showSelectBox(radio_id, select_id) {
-        if($(`input[name='${radio_id}']:checked`).val() == 'Y'){
-            $('#' + select_id).show();
-        } else {
-            $('#' + select_id).hide();
-        }
-	}
-
 </script>
 @stop
