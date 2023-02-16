@@ -130,8 +130,8 @@
                 <div class="d-flex align-items-center">
                     @if(@$cmd == 'add' || @$sr->sr_state == '10')
                     <div class="d-flex">
-                        <button type="button" onclick="return setAllQty(false);" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn">전체반품처리</button>
-                        <button type="button" onclick="return setAllQty(true);" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn">반품0개처리</button>
+                        <button type="button" onclick="return setAllQty(false);" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn">전체재고반품처리</button>
+                        <button type="button" onclick="return setAllQty(true);" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn">반품재고초기화</button>
                     </div>
                     @endif
                     @if(@$cmd == 'add')
