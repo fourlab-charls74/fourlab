@@ -12,6 +12,7 @@
 </div>
 
 <form method="get" name="search">
+<input type='hidden' id="store_no" name="store_no" value="{{ auth('head')->user()->store_cd }}">
     <div id="search-area" class="search_cum_form">
         <div class="card mb-3">
             <div class="d-flex card-header justify-content-between">
@@ -85,28 +86,6 @@
                     </div>
                 </div>
                 <div class="row">
-                {{--<div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="good_types">매장구분</label>
-                            <div class="flax_box">
-                                <select name='store_type' class="form-control form-control-sm search-enter">
-                                    <option value=''>전체</option>
-                                @foreach ($store_types as $store_type)
-                                    <option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
-                                @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>--}}
-                    <div class="col-lg-4 inner-td d-none">
-                        <div class="form-group">
-                            <label for="store_no">매장</label>
-                            <div class="flax_box">
-                                <input type='hidden' id="store_nm" name="store_nm">
-                                <input type='hidden' id="store_no" name="store_no" value="{{ auth('head')->user()->store_cd }}" class="form-control form-control-sm" readonly>
-                            </div>
-                        </div>
-                    </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="">자료수/정렬</label>

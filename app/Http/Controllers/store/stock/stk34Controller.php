@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Exception;
-
 use App\Models\Conf;
 use Mockery\Undefined;
 
@@ -19,7 +18,7 @@ class stk34Controller extends Controller
     public function index()
     {
         $mutable = Carbon::now();
-        $sdate = $mutable->sub(5, 'month')->format('Y-m');
+        $sdate = $mutable->sub(1, 'month')->format('Y-m');
 
         $values = [
             'store_types' => SLib::getCodes("STORE_TYPE"),
@@ -69,7 +68,7 @@ class stk34Controller extends Controller
                 from competitor_sale cs
                     left outer join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor'
                     left outer join store s on s.store_cd = cs.store_cd
-                where 1=1 and sale_date >= '$sdate' and sale_date <= '$edate' and cs.sale_amt > 0
+                where 1=1 and cs.sale_date >= '$sdate-01' and cs.sale_date <= '$edate-31' and cs.sale_amt > 0
                 $where
                 group by date_format(cs.sale_date, '%Y-%m'), cs.store_cd, cs.competitor_cd
                 $orderby
@@ -77,7 +76,6 @@ class stk34Controller extends Controller
             ";
 
             $rows = DB::select($sql);
-            
             
             // pagination
             $total = 0;
@@ -102,7 +100,7 @@ class stk34Controller extends Controller
                         from competitor_sale cs
                             left outer join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor'
                             left outer join store s on s.store_cd = cs.store_cd
-                        where 1=1 and sale_date >= '$sdate' and sale_date <= '$edate' and cs.sale_amt > 0
+                        where 1=1 and cs.sale_date >= '$sdate-01' and cs.sale_date <= '$edate-31' and cs.sale_amt > 0
                         $where
                         group by date_format(cs.sale_date, '%Y-%m'), cs.store_cd, cs.competitor_cd
                         $orderby
@@ -150,9 +148,18 @@ class stk34Controller extends Controller
         $day = (int)$request->input('day');
 
         $where = "";
+        $sale_amt = "";
 
         if($store_no != '') $where .= "and cs.store_cd = '$store_no'";
         if($date != '') $where .= "and cs.sale_date like '$date%'";
+
+        for ($i = 1; $i<=$day; $i++) {
+            if ($i < 10) {
+                $sale_amt .= ",sum(if(right(cs.sale_date,2) = '0$i',cs.sale_amt,0)) as sale_amt_0$i ";
+            } else {
+                $sale_amt .= ",sum(if(right(cs.sale_date,2) = '$i',cs.sale_amt,0)) as sale_amt_$i ";
+            }
+        }
 
         $sql = "
             select 
@@ -165,23 +172,40 @@ class stk34Controller extends Controller
         ";
 
         $result = DB::select($sql);
-
+        
        
         if(count($result) > 0 ) {
-       
+
             $sql = "
-                select 
-                    cd.code_id as competitor_cd
-                    , cd.code_val as competitor_nm
-                    , com.store_cd
-                    , cs.sale_amt
-                    , cs.sale_date
-                from code cd
-                    left outer join competitor com on cd.code_id = com.competitor_cd 
-                    left outer join competitor_sale cs on cs.competitor_cd = com.competitor_cd
-                where cd.code_kind_cd = 'COMPETITOR' and cd.use_yn = 'Y'and com.use_yn = 'Y' and com.store_cd = '$store_no'
-                $where
+                select
+                    cs.competitor_cd
+                    , cs.store_cd
+                    , c.code_val as competitor_nm
+                    $sale_amt
+                from competitor_sale cs
+                    left outer join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor'
+                where cs.store_cd = '$store_no' and cs.sale_date >= '$date-01' and cs.sale_date <= '$date-31'
+                group by cs.competitor_cd
+                
             ";
+
+            // $sql = "
+            // select cs.*
+            // from competitor c
+            //     inner join (
+            //         select csa.store_cd, csa.competitor_cd, cd.code_val as competitor_nm
+            //             , sum(if(sale_date = '2023-02-01', sale_amt, 0)) as sale_amt_01
+            //             , sum(if(sale_date = '2023-02-02', sale_amt, 0)) as sale_amt_02
+            //             , sum(if(sale_date = '2023-02-03', sale_amt, 0)) as sale_amt_03
+            //         from competitor_sale csa
+            //             inner join store s on s.store_cd = csa.store_cd
+            //             inner join code cd on cd.code_id = csa.competitor_cd and cd.code_kind_cd = 'COMPETITOR'
+            //         where csa.store_cd = 'H0021' and csa.sale_date >= '2023-02-01' and csa.sale_date <= '2023-02-31'
+            //         group by csa.store_cd, csa.competitor_cd
+            //     ) cs on cs.store_cd = c.store_cd and cs.competitor_cd = c.competitor_cd
+            // where c.use_yn = 'Y'
+            // ";
+
         } else {
 
             $sql = "
@@ -246,7 +270,7 @@ class stk34Controller extends Controller
                             'store_cd' => $store_cd,
                             'competitor_cd' => $competitor_cd,
                             'sale_date' => $date.'-'.$day_arr[$i],
-                            'sale_amt' => $rows['sale_amt_'.$day_arr[$i]]??0,
+                            'sale_amt' => $rows['sale_amt_'.$day_arr[$i]]??'',
                             'admin_id' => $admin_id,
                             'rt' => now(),
                             'ut' => now()

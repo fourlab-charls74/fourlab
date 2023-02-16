@@ -11,6 +11,7 @@
 </div>
 <div id="search-area" class="search_cum_form">
     <form method="get" name="search">
+    <input type='hidden' id="store_no" name="store_no" value="{{ auth('head')->user()->store_cd }}">
         <div class="card mb-3">
             <div class="d-flex card-header justify-content-between">
                 <h4>검색</h4>
@@ -37,15 +38,6 @@
                                     </div>
                                     <div class="docs-datepicker-container"></div>
                                 </div>
-                            </div>
-						</div>
-                    </div>
-                    <div class="col-lg-4 inner-td d-none">
-                        <div class="form-group">
-							<label>매장</label>
-                            <div class="flax_box">
-                                <input type='hidden' id="store_nm" name="store_nm">
-                                <input type='hidden' id="store_no" name="store_no" value="{{ auth('head')->user()->store_cd }}" class="form-control form-control-sm" readonly>
                             </div>
 						</div>
                     </div>

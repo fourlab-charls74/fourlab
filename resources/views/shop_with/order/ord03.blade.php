@@ -10,6 +10,7 @@
 	</div>
 </div>
 <form method="get" name="search">
+<!-- <input type='hidden' id="store_no" name="store_no" value="{{ auth('head')->user()->store_cd }}"> -->
 	<div id="search-area" class="search_cum_form">
 		<div class="card mb-3">
 
@@ -78,37 +79,6 @@
                             <label for="ord_no">출고차수</label>
                             <div class="flax_box">
                                 <input type='text' class="form-control form-control-sm search-enter" name='rel_order' id="rel_order" value=''>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="store_no">배송처</label>
-                            <div class="form-inline">
-                                <div class="form-inline-inner input_box w-25">
-                                    <div class="form-group">
-                                        <select name="dlv_place_type" id="dlv_place_type" class="form-control form-control-sm">
-                                            <option value="storage">창고</option>
-                                            @if (@$user_group === @$user_groups['HEAD'])
-                                            <option value="store">매장</option>
-                                            @endif
-                                        </select>
-                                    </div>
-                                </div>
-                                <div id="storage_search" class="form-inline w-75 pl-2">
-                                    {{-- <input type='text' id="storage_nm" name="storage_nm" class="form-control form-control-sm w-100" placeholder="창고명을 입력해주세요"> --}}
-                                    <select name='storage_cd' id="storage_cd" class="form-control form-control-sm w-100">
-                                        <option value=''>전체</option>
-                                        @foreach (@$dlv_storages as $dlv_storage)
-                                        <option value='{{ $dlv_storage->storage_cd }}'>{{ $dlv_storage->storage_nm }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div id="store_search" class="form-inline inline_btn_box w-75 pl-2 d-none">
-                                    <input type='hidden' id="store_nm" name="store_nm">
-                                    <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
-                                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -273,28 +243,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="item">품목/브랜드</label>
-                            <div class="form-inline">
-                                <div class="form-inline-inner select-box" style="width: 32%">
-                                    <select name="item" class="form-control form-control-sm w-100">
-                                        <option value="">전체</option>
-                                        @foreach ($items as $item)
-                                            <option value="{{ $item->cd }}">{{ $item->val }}</option>
-                                        @endforeach
-                                    </select>                                
-                                </div>
-                                <span class="text_line">/</span>
-                                <div class="form-inline-inner input-box" style="width:62%">
-                                    <div class="form-inline inline_btn_box">
-                                        <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 				</div>
 				<div class="row search-area-ext d-none">
 					<div class="col-lg-4 inner-td">
@@ -339,20 +287,6 @@
                                     <option value='{{ $sale_kind->code_id }}'>{{ $sale_kind->code_val }}</option>
                                     @endforeach
                                 </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="name">공급업체</label>
-                            <div class="form-inline inline_select_box">
-                                <div class="form-inline-inner input-box w-100">
-                                    <div class="form-inline inline_btn_box">
-                                        <input type="hidden" id="com_cd" name="com_cd" />
-                                        <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter sch-sup-company" style="width:100%;" autocomplete="off" />
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -473,9 +407,7 @@
         @endforeach
         {field: "user_nm", headerName: "주문자(아이디)", width: 120, cellStyle: {'text-align': 'center'}},
         {field: "r_nm", headerName: "수령자", width: 70, cellStyle: {'text-align': 'center'}},
-        {field: "wonga", headerName: "원가", width: 60, type: "currencyType"},
         {field: "goods_sh", headerName: "TAG가", width: 60, type: "currencyType"},
-        {field: "goods_price", headerName: "자사몰판매가", width: 85, type: "currencyType"},
         {field: "price", headerName: "판매가", width: 60, type: "currencyType"},
         {field: "dc_rate", headerName: "할인율(%)", width: 65, type: "currencyType"},
         {field: "sale_kind_nm", headerName: "판매유형", width: 100, cellStyle: {"text-align": "center"}},
