@@ -8,28 +8,18 @@ use App\Components\SLib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Exception;
 
 // 기타재반자료
 class acc05Controller extends Controller
 {
-    public function index(Request $request) {
-
+    public function index(Request $request) 
+    {
         $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 저번 달 기준
-        $f_sdate = Carbon::parse($sdate)->firstOfMonth()->format("Y-m-d H:i:s");
-        $f_edate = Carbon::parse($sdate)->lastOfMonth()->format("Y-m-d H:i:s");
-
         $extra_cols = SLib::getCodes('STORE_ACC_EXTRA_TYPE')->groupBy('code_val2'); // code_val2를 상위 카테고리로 사용
-
-        $sql = "
-            select r.prd_cd, p.prd_nm, p.type
-            from sproduct_stock_release r
-                inner join store s on s.store_cd = r.store_cd and s.account_yn = 'Y'
-                inner join product p on p.prd_cd = r.prd_cd and p.type = :type
-            where r.fin_rt >= '$f_sdate' and r.fin_rt <= '$f_edate'
-            group by r.prd_cd
-        ";
 
         $values = [
             'sdate' => $sdate,
@@ -183,5 +173,46 @@ class acc05Controller extends Controller
 		}
 
 		return response()->json(["code" => $code, "msg" => $msg]);
+	}
+
+    /** 기타재반자료 일괄등록 팝업오픈 */
+    public function show_batch()
+    {
+        $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 저번 달 기준
+        $extra_cols = SLib::getCodes('STORE_ACC_EXTRA_TYPE')->groupBy('code_val2'); // code_val2를 상위 카테고리로 사용
+
+        $values = [
+            'sdate' => $sdate,
+            'extra_cols' => $extra_cols,
+        ];
+
+        return view( Config::get('shop.store.view') . '/account/acc05_batch', $values );
+    }
+
+    /** 일괄등록 시 Excel 파일 저장 후 ag-grid(front)에 사용할 응답을 JSON으로 반환 */
+	public function import_excel(Request $request) {
+		if (count($_FILES) > 0) {
+			if ( 0 < $_FILES['file']['error'] ) {
+				return response()->json(['code' => 0, 'message' => 'Error: ' . $_FILES['file']['error']], 200);
+			}
+			else {
+				$file = $request->file('file');
+				$now = date('YmdHis');
+				$user_id = Auth::guard('head')->user()->id;
+				$extension = $file->extension();
+	
+				$save_path = "data/store/acc05/";
+				$file_name = "${now}_${user_id}.${extension}";
+				
+				if (!Storage::disk('public')->exists($save_path)) {
+					Storage::disk('public')->makeDirectory($save_path);
+				}
+	
+				$file = sprintf("${save_path}%s", $file_name);
+				move_uploaded_file($_FILES['file']['tmp_name'], $file);
+	
+				return response()->json(['code' => 1, 'file' => $file], 200);
+			}
+		}
 	}
 }

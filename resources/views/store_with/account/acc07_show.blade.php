@@ -17,9 +17,9 @@
         <h3 class="d-inline-flex">마감상세내역</h3>
         <div class="d-inline-flex location">
             <span class="home"></span>
-            <span>/ 매장관리</span>
+            <span>매장관리</span>
             <span>/ 정산/마감관리</span>
-            <span>/ 마감상세내역</span>
+            <span>/ 매장중간관리자정산마감</span>
         </div>
     </div>
     <form method="get" name="search">

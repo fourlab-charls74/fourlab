@@ -22,7 +22,7 @@
 	<h3 class="d-inline-flex">매장별매출현황</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
-		<span>/ 매장관리</span>
+		<span>매장관리</span>
 		<span>/ 정산/마감관리</span>
 	</div>
 </div>

@@ -5,7 +5,7 @@
 	<h3 class="d-inline-flex">기타재반자료</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
-		<span>/ 매장관리</span>
+		<span>매장관리</span>
 		<span>/ 정산/마감관리</span>
 	</div>
 </div>
@@ -17,6 +17,7 @@
 				<div class="flax_box">
 					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
 					<a href="#" onclick="initSearch()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
+					<a href="#" onclick="return openBatchPopup();" class="btn btn-sm btn-primary mr-1 shadow-sm"><i class="fas fa-plus fa-sm text-white-50 mr-1"></i> 자료일괄등록</a>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
 			</div>
@@ -81,8 +82,9 @@
 		</div>
 		<div class="resul_btn_wrap mb-3">
 			<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-			<input type="reset" id="search_reset" value="검색조건 초기화" class="btn btn-sm btn-outline-primary shadow-sm" onclick="initSearch()">
-			<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
+			<a href="#" onclick="initSearch()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
+			<a href="#" onclick="return openBatchPopup();" class="btn btn-sm btn-primary mr-1 shadow-sm"><i class="fas fa-plus fa-sm text-white-50 mr-1"></i> 자료일괄등록</a>
+			<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 		</div>
 	</div>
 </form>
@@ -95,7 +97,7 @@
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
 				</div>
 				<div class="fr_box">
-					<a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return updateExtraData();"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 선택매장 자료저장</a>
+					<a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return updateExtraData();"><i class="fas fa-save fa-sm mr-1"></i> 선택매장 자료저장</a>
 				</div>
 			</div>
 		</div>
@@ -134,8 +136,8 @@
 			]
         },
 		@if ($group_nm === '관리')
-		{ headerName: "부자재" },
 		{ headerName: "사은품" },
+		{ headerName: "부자재" },
 		@endif
 		@endforeach
 		{ field: "total", headerName: "총합계", type: 'currencyType', width: 100 },
@@ -241,6 +243,12 @@
             alert("에러가 발생했습니다. 관리자에게 문의해주세요.");
             console.log(err);
         });
+	}
+
+	// 자료일괄등록 팝업오픈
+	function openBatchPopup() {
+		const url = '/store/account/acc05/show-batch';
+		window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=2100,height=1200");
 	}
 </script>
 @stop
