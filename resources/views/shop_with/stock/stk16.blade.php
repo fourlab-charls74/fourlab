@@ -67,9 +67,9 @@
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="rel_order">출고구분/차수</label>
+							<label for="rel_order">출고구분</label>
                             <div class="flex_box">
-                                <select name='rel_type' class="form-control form-control-sm" style="width: 47%;">
+                                <select name='rel_type' class="form-control form-control-sm">
                                     <option value=''>전체</option>
                                     @foreach ($rel_types as $rel_type)
                                         @if ($rel_type->code_id == "R" || $rel_type->code_id == "G")
@@ -77,14 +77,6 @@
                                         @endif
                                     @endforeach
                                 </select>
-                                <span class="text_line" style="width: 6%; text-align: center;">/</span>
-                                <input type="text" id="rel_order" name="rel_order" class="form-control form-control-sm search-enter" style="width: 47%" value="">
-                                <!-- <select name='rel_order' class="form-control form-control-sm" style="width: 47%">
-                                    <option value=''>전체</option>
-                                    @foreach ($rel_orders as $rel_order)
-                                        <option value='{{ $rel_order->code_id }}'>{{ $rel_order->code_val }}</option>
-                                    @endforeach
-                                </select> -->
                             </div>
 						</div>
 					</div>
@@ -106,44 +98,6 @@
 						</div>
 					</div>
 				</div>
-                <div class="row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="store_type">매장구분</label>
-                            <div class="flex_box">
-                                <select name='store_type' class="form-control form-control-sm">
-                                    <option value=''>전체</option>
-                                    @foreach ($store_types as $store_type)
-                                        <option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="store_no">매장</label>
-                            <div class="form-inline inline_btn_box">
-                                <input type='hidden' id="store_nm" name="store_nm">
-                                <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="prd_cd">원부자재코드</label>
-                            <div class="form-inline">
-                                <div class="form-inline-inner input-box w-100">
-                                    <div class="form-inline inline_btn_box">
-                                        <input type='text' id="prd_cd_sub" name='prd_cd_sub' class="form-control form-control-sm w-100 ac-style-no search-enter">
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd_sub"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <div class="row search-area-ext d-none">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
@@ -183,6 +137,20 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
+                            <label for="prd_cd">원부자재코드</label>
+                            <div class="form-inline">
+                                <div class="form-inline-inner input-box w-100">
+                                    <div class="form-inline inline_btn_box">
+                                        <input type='text' id="prd_cd_sub" name='prd_cd_sub' class="form-control form-control-sm w-100 ac-style-no search-enter">
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd_sub"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td"></div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
                             <label for="">자료수/정렬</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box" style="width:24%;">
@@ -199,7 +167,7 @@
                                         <option value="req_rt">출고요청일</option>
                                         <option value="p.prd_cd">상품코드</option>
                                         <option value="p.price">판매가</option>
-                                        <option value="p.wonga">원가</option>
+                                        <!-- <option value="p.wonga">원가</option> -->
                                     </select>
                                 </div>
                                 <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -360,13 +328,6 @@
         {
             field: "price",
             headerName: "판매가",
-            type: 'currencyType',
-            cellStyle: DEFAULT,
-            width: 80
-        },
-        {
-            field: "wonga",
-            headerName: "원가",
             type: 'currencyType',
             cellStyle: DEFAULT,
             width: 80

@@ -39,16 +39,6 @@
                         </div> --}}
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="store_cd">요청매장</label>
-                                <div class="form-inline inline_btn_box">
-                                    <input type='hidden' id="store_nm" name="store_nm">
-                                    <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
-                                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
                                 <label for="prd_cd">원부자재코드</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input-box w-100">
@@ -68,8 +58,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="type">구분</label>
@@ -83,6 +71,8 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="opt">품목</label>
@@ -96,6 +86,7 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-lg-4 inner-td"></div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="">자료수/정렬</label>
@@ -368,6 +359,8 @@
                 resizable: false,
                 sortable: true,
             };
+
+            Search();
         });
 
         function EditProduct(product_code) {
@@ -376,18 +369,14 @@
 		}
 
         function Search() {
-            if (!$("[name=store_no]").val()) {
-                alert("요청매장을 선택 후 검색해주세요.");
-                $('.sch-store').click();
-                return false;
-            }
             let data = $('form[name="search"]').serialize();
             data += "&ext_storage_qty=" + $("[name=ext_storage_qty]").is(":checked");
 
             axios({
                 url: '/shop/api/stores/search-storenm',
                 method: 'post',
-                data: {store_cds: [$("[name=store_no]").val()]},
+                // data: {store_cds: [$("[name=store_no]").val()]},
+                data: data,
             }).then(function (res) {
                 if (res.data.code === 200) {
                     setColumn(res.data.body[0]);

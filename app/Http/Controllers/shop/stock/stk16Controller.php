@@ -72,7 +72,7 @@ class stk16Controller extends Controller
         if ($req['opt'] != "") $where .= " and pc.opt = '" . Lib::quote($req['opt']) . "'";
         if ($req['prd_nm'] != "") $where .= " and p.prd_nm like '________%" . Lib::quote($req['prd_nm']) . "%' ";
 
-        if ($req['rel_order'] != null)
+        if ( isset($req['rel_order']) && $req['rel_order'] != null)
             $where .= " and psr.rel_order like '%" . Lib::quote($req['rel_order']) . "'";
         if ($req['rel_type'] != null)
             $where .= " and psr.type = '" . Lib::quote($req['rel_type']) . "'";
@@ -80,10 +80,16 @@ class stk16Controller extends Controller
             $where .= " and psr.state = '" . Lib::quote($req['state']) . "'";
         if ($req['ext_done_state'] ?? '' != '')
             $where .= " and psr.state != '40'";
-        if ($req['store_type'] != null)
+        if ( isset($req['store_type']) && $req['store_type'] != null)
             $where .= " and s.store_type = '" . Lib::quote($req['store_type']) . "'";
-        if (isset($req['store_no']))
-            $where .= " and s.store_cd = '" . Lib::quote($req['store_no']) . "'";
+
+        // if (isset($req['store_no']))
+        //     $where .= " and s.store_cd = '" . Lib::quote($req['store_no']) . "'";
+        
+        $store_cd = Auth('head')->user()->store_cd;
+        if (isset($store_cd))
+            $where .= " and s.store_cd = '" . Lib::quote($store_cd) . "'";
+
         if ($req['prd_cd_sub'] != null) {
             $prd_cd = explode(',', $req['prd_cd_sub']);
             $where .= " and (1!=1";
