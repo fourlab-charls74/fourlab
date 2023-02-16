@@ -54,31 +54,6 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="store_type">매장구분</label>
-                            <div class="flex_box">
-                                <select name='store_type' class="form-control form-control-sm">
-                                    <option value=''>전체</option>
-                                    @foreach (@$store_types as $store_type)
-                                        <option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-						</div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label>매장</label>
-                            <div class="form-inline inline_btn_box">
-                                <input type='hidden' id="store_nm" name="store_nm">
-                                <select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select" multiple></select>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
                             <label for="prd_cd">상품옵션 범위검색</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input-box w-100">
@@ -100,6 +75,9 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="row">
+                    
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="">자료수/정렬</label>
@@ -127,23 +105,6 @@
                                     </div>
                                     <input type="radio" name="ord" id="sort_desc" value="desc">
                                     <input type="radio" name="ord" id="sort_asc" value="asc" checked="">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label>매장폐점여부</label>
-                            <div class="form-inline form-radio-box">
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="close_yn_N" name="close_yn" value="N" checked />
-                                    <label class="custom-control-label" for="close_yn_N">폐점제외</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="close_yn_Y" name="close_yn" value="Y"/>
-                                    <label class="custom-control-label" for="close_yn_Y">폐점만</label>
                                 </div>
                             </div>
                         </div>
@@ -211,7 +172,6 @@
         {field: "color", headerName: "컬러", width: 55, cellStyle: AlignCenter},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: AlignCenter},
         {field: "goods_opt", headerName: "옵션", width: 150},
-        {field: "wonga", headerName: "원가", width: 100, type: "currencyType"},
         {field: "goods_sh", headerName: "TAG가", width: 100, type: "currencyType"},
         {field: "price", headerName: "판매가", width: 100, type: "currencyType"},
         {
@@ -220,7 +180,6 @@
                 {field: "prev_qty", headerName: "수량", width: 60, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "prev_sh", headerName: "TAG금액", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "prev_price", headerName: "판매가금액", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "prev_wonga", headerName: "원가금액", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
         {
@@ -229,7 +188,6 @@
                 {field: "store_in_qty", headerName: "수량", width: 60, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "store_in_sh", headerName: "TAG금액", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "store_in_price", headerName: "판매가금액", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "store_in_wonga", headerName: "원가금액", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
         {
@@ -238,7 +196,6 @@
                 {field: "store_return_qty", headerName: "수량", width: 60, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "store_return_sh", headerName: "TAG금액", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "store_return_price", headerName: "판매가금액", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "store_return_wonga", headerName: "원가금액", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
         {
@@ -247,7 +204,6 @@
                 {field: "rt_in_qty", headerName: "수량", width: 60, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "rt_in_sh", headerName: "TAG금액", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "rt_in_price", headerName: "판매가금액", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "rt_in_wonga", headerName: "원가금액", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
         {
@@ -256,7 +212,6 @@
                 {field: "rt_out_qty", headerName: "수량", width: 60, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "rt_out_sh", headerName: "TAG금액", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "rt_out_price", headerName: "판매가금액", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "rt_out_wonga", headerName: "원가금액", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
         {
@@ -265,7 +220,6 @@
                 {field: "sale_qty", headerName: "수량", width: 60, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "sale_sh", headerName: "TAG금액", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "sale_price", headerName: "판매가금액", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "sale_wonga", headerName: "원가금액", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
         {
@@ -274,7 +228,6 @@
                 {field: "loss_qty", headerName: "수량", width: 60, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "loss_sh", headerName: "TAG금액", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "loss_price", headerName: "판매가금액", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "loss_wonga", headerName: "원가금액", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
         {
@@ -283,7 +236,6 @@
                 {field: "term_qty", headerName: "수량", width: 60, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "term_sh", headerName: "TAG금액", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "term_price", headerName: "판매가금액", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "term_wonga", headerName: "원가금액", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
     ];

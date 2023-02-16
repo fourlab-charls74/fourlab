@@ -52,30 +52,6 @@
                             </div>
                         </div>
 					</div>
-					<div class="col-lg-4">
-						<div class="form-group">
-							<label for="">매장구분</label>
-							<div class="flex_box">
-								<select name='store_type' class="form-control form-control-sm">
-									<option value=''>전체</option>
-									@foreach ($store_types as $store_type)
-										<option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
-									@endforeach
-								</select>
-							</div>
-						</div>
-					</div>
-					<div class="col-lg-4">
-						<div class="form-group">
-							<label for="store_cd">매장명</label>
-							<div class="form-inline inline_btn_box">
-								<select id="store_cd" name="store_cd" class="form-control form-control-sm select2-store"></select>
-								<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-							</div>
-						</div>
-					</div>
-				</div>
-                <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label for="prd_cd">상품코드</label>
@@ -98,16 +74,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label for="brand_cd">브랜드</label>
-                            <div class="form-inline inline_btn_box">
-                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+				</div>
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
@@ -144,19 +111,6 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label for="item">품목</label>
-                            <div class="flax_box">
-                                <select name="item" class="form-control form-control-sm">
-                                    <option value="">전체</option>
-                                    @foreach ($items as $item)
-                                        <option value="{{ $item->cd }}">{{ $item->val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
                     <div class="col-lg-4 inner-td">
 							<div class="form-group">
 							<label for="formrow-email-input">조회 기준</label>

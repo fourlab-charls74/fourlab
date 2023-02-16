@@ -20,9 +20,8 @@ use Exception;
 
 class mem01Controller extends Controller
 {
-	private $store_cd = 'L0025';
-
-	public function index($type='') {
+	public function index($type='') 
+	{
 		$values = [
 			'mail'		=> SLib::getCodes('S_MAIL'),
 			'mobile'	=> SLib::getCodes('G_MOBILE'),
@@ -150,7 +149,7 @@ class mem01Controller extends Controller
 		$age		= Request("age");
 		$user_group	= Request("user_group");
 		// $store_no 	= Request("store_no");
-		$store_cd 	= $this->store_cd;
+		$store_cd 	= Auth('head')->user()->store_cd;
 
 		$sdate		= Request("sdate");
 		$edate		= Request("edate");

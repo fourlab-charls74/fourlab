@@ -42,13 +42,16 @@ class sal03Controller extends Controller
 
 	public function search(Request $request)
 	{
+		
+
 		$sdate = $request->input('sdate', now()->sub(1, 'month')->format('Ymd'));
 		$edate = $request->input('edate', date("Ymd"));
 		$sdate2 = str_replace("-", "", $sdate);
 		$edate2 = str_replace("-", "", $edate);
 
 		$store_type = $request->input('store_type');
-		$store_cd = $request->input('store_cd');
+		// $store_cd = $request->input('store_cd');
+		$store_cd = Auth('head')->user()->store_cd;
 		$prd_cd = $request->input('prd_cd');
 		$com_id = $request->input("com_cd");
 		$com_nm = $request->input("com_nm");
