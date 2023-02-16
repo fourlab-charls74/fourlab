@@ -47,10 +47,10 @@
                             <li><a href="/head/stock/stk35">재고 비교 모니터링</a></li>
                         </ul>
                     </li>
-                    
+
                     <!-- <li data-menu-kind="P" data-menu-id="stk03" class="d-none"><a href="/head/stock/stk03">입출고현황</a></li>
                     <li><a href="/head/stock/stk04">입출고내역</a></li> -->
-                    
+
                     <li data-menu-kind="P" data-menu-id="stk20" class="d-none"><a href="/head/stock/stk20">상품별 판매율</a></li>
                 </ul>
             </li>
@@ -154,14 +154,14 @@
                         <ul>
                             <li data-menu-kind="P" data-menu-id="prm30" class="d-none"><a href="/head/promotion/prm30">검색어</a></li>
                             <li data-menu-kind="P" data-menu-id="prm31" class="d-none"><a href="/head/promotion/prm31">검색내역</a></li>
-                            
+
                             <li><a href="/head/promotion/prm32">검색 바로가기</a></li>
-                            
+
                         </ul>
                     </li>
                 </ul>
             </li>
-            
+
             <li>
                 <a href="javascript:;" class="arrow"><i class="bx bxs-group fs-18"></i><span>커뮤니티</span></a>
                 <ul>
@@ -275,6 +275,7 @@
                 <ul>
                     <li data-menu-kind="M" data-menu-id="cls01" class="d-none"><a href="/head/classic/cls01">(완)공지사항</a></li>
                     <li data-menu-kind="M" data-menu-id="cls02" class="d-none"><a href="/head/classic/cls02">(완)숙소예약관리</a></li>
+                    <li data-menu-kind="M" data-menu-id="cls03" class="d-none"><a href="/head/classic/cls03">(개)트래킹 명단 관리</a></li>
                 </ul>
             </li>
         </ul>
