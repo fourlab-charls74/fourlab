@@ -51,7 +51,8 @@ class stk30Controller extends Controller
         $storage_cd = $request->input("storage_cd", "");
         $store_type = $request->input("store_type", "");
         $store_nm   = $request->input("store_nm", "");
-        $store_no   = $request->input("store_no", "");
+        // $store_no   = $request->input("store_no", "");
+        $store_cd   = Auth('head')->user()->store_cd;
         
         // where
         $sdate = str_replace("-", "", $sdate);
@@ -64,7 +65,8 @@ class stk30Controller extends Controller
         if($sr_reason != "")    $where .= " and sr.sr_reason = '" . $sr_reason . "'";
         if($storage_cd != "")   $where .= " and sr.storage_cd = '" . $storage_cd . "'";
         if($store_type != "")   $where .= " and store.store_type = '" . $store_type . "'";
-        if($store_no != "")     $where .= " and sr.store_cd = '" . $store_no . "'";
+        // if($store_no != "")     $where .= " and sr.store_cd = '" . $store_no . "'";
+        if($store_cd != "")     $where .= " and sr.store_cd = '" . $store_cd . "'";
 
         // ordreby
         $ord_field  = $request->input("ord_field", "sr.sr_cd");
@@ -142,7 +144,7 @@ class stk30Controller extends Controller
     }
 
     // 창고반품 등록 & 상세팝업 오픈
-    public function show($sr_cd = '') 
+    public function show($sr_cd) 
     {
         $sr = '';
         $new_sr_cd = '';
@@ -246,6 +248,9 @@ class stk30Controller extends Controller
 		]);
     }
 
+        /* 
+            2023.02.16 김나영 - 사용하지 않음
+
     // 창고반품 등록
     public function add_store_return(Request $request)
     {
@@ -347,6 +352,7 @@ class stk30Controller extends Controller
 
         return response()->json(["code" => $code, "msg" => $msg]);
     }
+        */
 
     // 창고반품 상태변경
     public function update_return_state(Request $request)
@@ -484,6 +490,9 @@ class stk30Controller extends Controller
         return response()->json(["code" => $code, "msg" => $msg]);
     }
 
+        /* 
+            2023.02.16 김나영 - 사용하지 않음
+
     // 창고반품 삭제
     public function del_return(Request $request)
     {
@@ -607,7 +616,8 @@ class stk30Controller extends Controller
         return view(Config::get('shop.shop.view') . '/stock/stk30_batch');
     }
 
-    /** 일괄등록 시 Excel 파일 저장 후 ag-grid(front)에 사용할 응답을 JSON으로 반환 */
+
+    // 일괄등록 시 Excel 파일 저장 후 ag-grid(front)에 사용할 응답을 JSON으로 반환
 	public function import_excel(Request $request) {
 		if (count($_FILES) > 0) {
 			if ( 0 < $_FILES['file']['error'] ) {
@@ -634,7 +644,7 @@ class stk30Controller extends Controller
 		}
 	}
 
-    /** 일괄등록 상품 개별 조회 */
+    // 일괄등록 상품 개별 조회
     public function get_goods(Request $request) {
         $sr_date = $request->input('sr_date', '');
         $storage_cd = $request->input('storage_cd', '');
@@ -770,4 +780,5 @@ class stk30Controller extends Controller
 
         return response()->json(["code" => $code, "msg" => $msg]);
     }
+        */
 }

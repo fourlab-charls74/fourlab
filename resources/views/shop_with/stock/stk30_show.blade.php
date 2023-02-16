@@ -16,9 +16,6 @@
             </div>
         </div>
         <div class="d-flex">
-            @if(@$cmd == 'add' or @$sr->sr_state == '10')
-            <a href="javascript:void(0)" onclick="Save('{{ @$cmd }}')" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
-            @endif
             <a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i> 닫기</a>
         </div>
     </div>
@@ -102,7 +99,7 @@
                                             <th class="required">반품사유</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    <select name='sr_reason' class="form-control form-control-sm w-100">
+                                                    <select name='sr_reason' class="form-control form-control-sm w-100" @if(@$cmd == 'update') disabled @endif>
                                                         @foreach ($sr_reasons as $sr_reason)
                                                         <option value='{{ $sr_reason->code_id }}' @if(@$cmd == 'update' && $sr->sr_reason == $sr_reason->code_id) selected @endif>{{ $sr_reason->code_val }}</option>
                                                         @endforeach
@@ -112,7 +109,7 @@
                                             <th>메모</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    <textarea name="comment" id="comment" class="w-100" rows="2">{{ @$sr->comment }}</textarea>
+                                                    <textarea name="comment" id="comment" class="w-100" rows="2" readonly disabled>{{ @$sr->comment }}</textarea>
                                                 </div>
                                             </td>
                                         </tr>
@@ -166,7 +163,6 @@
                 return (parseInt(valueA) > parseInt(valueB)) ? 1 : -1;
             },
         },
-        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 29},
         {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
         {field: "goods_no", headerName: "상품번호", width: 70, cellStyle: {"text-align": "center"}},
         {field: "opt_kind_nm", headerName: "품목", width: 70, cellStyle: {"text-align": "center"}},
@@ -243,87 +239,6 @@
         gx.Request('/shop/stock/stk30/search-return-products', data, -1, function(e) {
             updatePinnedRow();
         });
-    }
-
-    // 상품반품 등록
-    function Save(cmd) {
-        if(!cmd) return;
-
-        let sr_reason = document.f1.sr_reason.value;
-        let comment = document.f1.comment.value;
-        let rows = gx.getSelectedRows();
-
-        if(cmd === 'add') {
-            let sr_date = document.f1.sdate.value;
-            let storage_cd = document.f1.storage_cd.value;
-            let store_cd = document.f1.store_no.value;
-
-            if(store_cd === '') {
-                $(".sch-store").click();
-                return alert("매장을 선택해주세요.");
-            }
-            if(rows.length < 1) return alert("반품등록할 상품을 선택해주세요.");
-
-            let zero_qtys = rows.filter(r => r.qty < 1);
-            if(zero_qtys.length > 0) return alert("반품수량이 0개인 항목이 존재합니다.");
-
-            let excess_qtys = rows.filter(r => (r.qty * 1) > (r.store_wqty * 1));
-            if(excess_qtys.length > 0) return alert("해당 매장의 보유재고보다 많은 수량을 반품할 수 없습니다.");
-
-            if(!confirm("등록하시겠습니까?")) return;
-
-            axios({
-                url: '/shop/stock/stk30/add-store-return',
-                method: 'put',
-                data: {
-                    sr_date,
-                    storage_cd,
-                    store_cd,
-                    sr_reason,
-                    comment,
-                    products: rows.map(r => ({ prd_cd: r.prd_cd, price: r.price, return_price: r.return_price, return_qty: r.qty })),
-                },
-            }).then(function (res) {
-                if(res.data.code === 200) {
-                    alert(res.data.msg);
-                    opener.Search();
-                    window.close();
-                } else {
-                    console.log(res.data);
-                    alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-                }
-            }).catch(function (err) {
-                console.log(err);
-            });
-        } else if(cmd === 'update') {
-            let sr_state = '{{ @$sr->sr_state }}';
-            let sr_cd = '{{ @$sr->sr_cd }}';
-
-            if('{{ @$sr->sr_state }}' != 10) return alert("창고반품이 '요청'상태일떄만 수정가능합니다.");
-            if(!confirm("수정하시겠습니까?")) return;
-
-            axios({
-                url: '/shop/stock/stk30/update-store-return',
-                method: 'put',
-                data: {
-                    sr_cd,
-                    sr_reason,
-                    comment,
-                    products: rows.map(r => ({ sr_prd_cd: r.sr_prd_cd, return_price: r.return_price, return_qty: r.qty })),
-                },
-            }).then(function (res) {
-                if(res.data.code === 200) {
-                    alert(res.data.msg);
-                    opener.Search();
-                    window.close();
-                } else {
-                    console.log(res.data);
-                    alert("수정 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-                }
-            }).catch(function (err) {
-                console.log(err);
-            });
-        }
     }
 
     const checkIsEditable = (params) => {
