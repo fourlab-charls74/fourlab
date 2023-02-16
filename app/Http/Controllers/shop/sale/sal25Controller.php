@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use PDO;
 use Carbon\Carbon;
 
@@ -15,6 +16,9 @@ class sal25Controller extends Controller
 {
     // 월별 매출 통계
     public function index() {
+
+		//로그인한 아이디의 매칭된 매장을 불러옴
+		$user_store	= Auth('head')->user()->store_cd;
 
         $mutable = Carbon::now();
         $sdate	= sprintf("%s",$mutable->sub(6, 'month')->format('Y-m'));
@@ -26,6 +30,7 @@ class sal25Controller extends Controller
 			'ord_types'     => SLib::getCodes('G_ORD_TYPE'),
 			'sale_kinds'	=> SLib::getCodes('SALE_KIND'),
 			'pr_codes'		=> SLib::getCodes('PR_CODE'),
+			'user_store'	=> $user_store
         ];
         return view( Config::get('shop.shop.view') . '/sale/sal25',$values);
     }

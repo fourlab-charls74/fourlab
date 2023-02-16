@@ -8,6 +8,7 @@ use App\Components\SLib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Exception;
 
@@ -28,6 +29,8 @@ class stk10Controller extends Controller
 
     public function index()
 	{
+        //로그인한 아이디의 매칭된 매장을 불러옴
+        $user_store	= Auth('head')->user()->store_cd;
 
         $sql = "
             select
@@ -40,7 +43,7 @@ class stk10Controller extends Controller
 		$values = [
             'sdate'         => now()->sub(1, 'week')->format('Y-m-d'),
             'edate'         => date("Y-m-d"),
-            'rel_orders'     => SLib::getCodes("REL_ORDER"), // 출고차수
+            // 'rel_orders'     => SLib::getCodes("REL_ORDER"), // 출고차수
             'rel_order_res' => $rel_order_res,
             'rel_types'     => SLib::getCodes("REL_TYPE"), // 출고구분
             'rel_states'    => $this->rel_states, // 출고상태
@@ -50,6 +53,7 @@ class stk10Controller extends Controller
             'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
             // 'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
             'items'			=> SLib::getItems(), // 품목
+            'user_store'    => $user_store,
 		];
 
         return view(Config::get('shop.shop.view') . '/stock/stk10', $values);
@@ -71,16 +75,12 @@ class stk10Controller extends Controller
             and cast(if(psr.state > 20, psr.prc_rt, if(psr.state > 10, psr.exp_dlv_day, psr.req_rt)) as date) <= '$edate'
         ";
 
-		if($r['rel_order'] != null)
-			$where .= " and psr.rel_order like '%" . $r['rel_order'] . "'";
 		if($r['rel_type'] != null) 
 			$where .= " and psr.type = '" . $r['rel_type'] . "'";
 		if($r['state'] != null) 
 			$where .= " and psr.state = '" . $r['state'] . "'";
         if($r['ext_done_state'] ?? '' != '')
             $where .= " and psr.state != '40'";
-		if($r['store_type'] != null) 
-			$where .= " and s.store_type = '" . $r['store_type'] . "'";
 		if(isset($r['store_no'])) 
 			$where .= " and s.store_cd = '" . $r['store_no'] . "'";
 		if($r['prd_cd'] != null) {
@@ -136,12 +136,6 @@ class stk10Controller extends Controller
             }
         }
 
-        if($r['com_cd'] != null) 
-            $where .= " and g.com_id = '" . $r['com_cd'] . "'";
-        if($r['item'] != null) 
-            $where .= " and g.opt_kind_cd = '" . $r['item'] . "'";
-        if(isset($r['brand_cd']))
-            $where .= " and g.brand = '" . $r['brand_cd'] . "'";
         if($r['goods_nm'] != null) 
             $where .= " and g.goods_nm like '%" . $r['goods_nm'] . "%'";
         if($r['goods_nm_eng'] != null) 

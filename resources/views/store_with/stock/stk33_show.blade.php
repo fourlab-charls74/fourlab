@@ -1,10 +1,10 @@
 @extends('store_with.layouts.layout-nav')
-@section('title','일별동종업계매출관리')
+@section('title','동종업계매출관리')
 @section('content')
 
 <div class="py-3 px-sm-3">
     <div class="page_tit">
-        <h3 class="d-inline-flex">일별동종업계매출관리 추가</h3>
+        <h3 class="d-inline-flex">동종업계매출관리 추가</h3>
         <div class="d-inline-flex location">
             <span class="home"></span>
             <span>/ 매장관리</span>
@@ -34,16 +34,19 @@
                         </div>
                         <div class="col-lg-6 inner-td">
                             <div class="form-group">
-                                <label for="amt_date">매출일자</label>
-                                <div >
-                                    <select name="year" id="year" class="form-control form-control-sm" style="width:20%;display:inline-block">
-                                    </select>&nbsp;년 &nbsp;&nbsp;
-
-                                    <select name="month" id="month" class="form-control form-control-sm" style="width:10%;display:inline-block">
-                                    </select>&nbsp;월&nbsp;&nbsp;
-
-                                    <select name="day" id="day" class="form-control form-control-sm" style="width:10%;display:inline-block">
-                                    </select>&nbsp;일
+                                <label for="formrow-firstname-input">매출기간</label>
+                                <div class="form-inline">
+                                    <div class="docs-datepicker form-inline-inner input_box w-100">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control form-control-sm docs-date month" id="date" name="date" value="{{ $date }}" autocomplete="off">
+                                            <div class="input-group-append">
+                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable="">
+                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="docs-datepicker-container"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -76,144 +79,136 @@
 </div>
 <script type="text/javascript" charset="utf-8">
     let columns = [
-            {headerName: "#", field: "num",type:'NumType', pinned:'left', cellClass: 'hd-grid-code'},
-            {headerName: "동종업계코드", field: "competitor_cd", pinned:'left',  width: 85, cellClass: 'hd-grid-code'},
-            {headerName: "동종업계명", field: "competitor_nm",  pinned:'left', width: 120, cellClass: 'hd-grid-code'},
-            {headerName: "매출액", field: "sale_amt",  pinned:'left', type: "numberType" ,width: 100, cellClass: 'hd-grid-code', editable: true, cellStyle: {"background-color": "#ffFF99"}, type:'currencyType'},
-            {headerName: "매출일자", field: "sale_date",  pinned:'left', width: 100, cellClass: 'hd-grid-code', hide:true},
-            {width: 'auto'}
+            {headerName: "#", field: "num",type:'NumType', pinned:'left', width: 30, cellClass: 'hd-grid-code'},
+            {headerName: "코드", field: "competitor_cd", pinned:'left',  width: 40, cellClass: 'hd-grid-code'},
+            {headerName: "동종업계명", field: "competitor_nm",  pinned:'left', width: 97, cellClass: 'hd-grid-code'},
         ];
 
         const pApp = new App('',{
             gridId:"#div-gd",
         });
         let gx;
-
+        var mutable_cols = [];
+        let date = "";
+        let sale_date;
+        let in_val = [];
         $(document).ready(function() {
             pApp.ResizeGrid(205);
             let gridDiv = document.querySelector(pApp.options.gridId);
             gx = new HDGrid(gridDiv, columns, {
                 onCellValueChanged: (e) => {
-                    e.node.setSelected(true);
-                    if (e.column.colId == "sale_amt") {
-                        if (isNaN(e.newValue) == true || e.newValue == "") {
-                            alert("숫자만 입력가능합니다.");
-                            gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                    // e.node.setSelected(true);
+                    for (let i = 1; i <= sale_date;i++) {
+                        if (i<10) {
+                            if (e.column.colId == "sale_amt_0" + i) {
+                                if (isNaN(e.newValue) == true) {
+                                    alert("숫자만 입력가능합니다.");
+                                    gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                                }
+                            }
+                        } else {
+                            if (e.column.colId == "sale_amt_" + i) {
+                                if (isNaN(e.newValue) == true) {
+                                    alert("숫자만 입력가능합니다.");
+                                    gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                                }
+                            }
                         }
                     }
+
+                    // console.log(e.column.colId,e.data.competitor_cd, e.newValue);
+                    // console.log(e);
                 }
             });
             pApp.BindSearchEnter();
-            // Search();
         });
+
+       
 
         function Search() {
             let data = $('form[name="search"]').serialize();
 
             let store_no = document.getElementById('store_no').value;
-            let year = document.getElementById('year').value;
-            let month = document.getElementById('month').value;
-            let day = document.getElementById('day').value;
+            date = document.getElementById('date').value;
+
+            let date_format = date.split('-');
+
+            //매출기간의 월에 따라 일수 구하기
+            sale_date = new Date(date_format[0],date_format[1],0).getDate();
+
+            data += "&day=" + sale_date;
 
             if(store_no == '') {
                 alert('매장을 선택해주세요.');
-            } else if (year == '') {
-                alert('매출년도를 선택해주세요.')
-            } else if (month == '') {
-                alert('매출월을 선택해주세요.')
-            } else if (day == '') {
-                alert('매출일을 선택해주세요.')
             } else {
-                gx.Request('/store/stock/stk33/com_search', data);
+                gx.Request('/store/stock/stk33/com_search', data, -1, function(e) {
+                    formatDate(e);
+                });
             }
         }
 
-        $(document).ready(function () {
-            setDateBox();
-        });
-
-        // select box 연도 , 월 표시
-        function setDateBox() {
-            var dt = new Date();
-            var year = "";
-            var com_year = dt.getFullYear();
-
-            $("#year").append("<option value=''>년도</option>");
-
-            for (var y = com_year; y >= (com_year - 50); y--) {
-            $("#year").append("<option value='" + y + "'>" + y + "</option>");
-            }
-
-            var month;
-            $("#month").append("<option value=''>월</option>");
-            for (var i = 1; i <= 12; i++) {
-                if(i < 10) {
-                    $("#month").append("<option value='"+ 0 + i + "'>0" + i + "</option>");
-                } else {
-                    $("#month").append("<option value='" + i + "'>" + i + "</option>");
-                }
-            }
-
-            var day;
-            $("#day").append("<option value=''>일</option>");
-            for (var i = 1; i <= 31; i++) {
-                if(i < 10) {
-                    $("#day").append("<option value='"+ 0 + + i + "'>0" + i + "</option>");
-                } else {
-                    $("#day").append("<option value='" + i + "'>" + i + "</option>");
-                }
-            }
-
+        const formatDate = async (e) => {
+            days = e.head.day;
+            setMutableColumns(days);
         }
+
+        const setMutableColumns = (days) => {
+            gx.gridOptions.api.setColumnDefs([]);
+            mutable_cols = [];
+            columns.map(col => {
+                mutable_cols.push(col);
+            });
+
+            mutable_cols.push(dayColumns(days));
+            mutable_cols.push({ headerName: "", field: "", width: "auto" });
+            gx.gridOptions.api.setColumnDefs(mutable_cols);
+        };
+
+        const dayColumns = (days) => {
+            let col = { fields: "year_month", headerName: date, children: [] };
+            for (let i = 1; i <= days; i++) {
+                let day_field = "";
+                let day_headerName = "";
+                if (i < 10) {
+                    day_headerName = '0'+ i +'일';
+                    day_field = 'sale_amt_0' + i;
+                } else{
+                    day_headerName = i +'일';
+                    day_field = 'sale_amt_' + i;
+                }
+                let add_col = {field: day_field, headerName: day_headerName, minWidth: 60, type: "currencyType" , editable:true, cellStyle: {"background-color": "#ffFF99","text-align": "right"}};
+                col.children.push(add_col)
+            }
+            return col;
+        };
 
         //매출액 저장
         function Save_amt() {
-            let year = document.getElementById('year').value;
-            let month = document.getElementById('month').value;
-            let day = document.getElementById('day').value;
             let store_no = document.getElementById('store_no').value;
-
-
-            let date = year+'-'+month+'-'+day;
+            let date = document.getElementById('date').value;
+            let data = gx.getRows();
 
             if (store_no === '') {
                 alert('매장을 선택해주세요');
                 return false;
             }
 
-            if ($('#year').val() === '') {
-                $('#year').focus();
-                alert('매출년도를 선택해주세요');
-                return false;
-            }
-
-            if ($('#month').val() === '') {
-                $('#month').focus();
-                alert(' 매출월을 선택해주세요');
-                return false;
-            }
-            
-            if ($('#day').val() === '') {
-                $('#day').focus();
-                alert('매출일을 선택해주세요');
-                return false;
-            }
 
             if(!confirm("매출액을 저장하시겠습니까?")) return;
 
                 axios({
-                    url: `/store/stock/stk33/save_amt`,
+                    url: `/store/stock/stk34/save_amt`,
                     method: 'post',
                     data: {
-                        data: gx.getRows(),
-                        date: date
+                        data: data,
+                        date: date,
+                        day: sale_date,
                     },
                 }).then(function (res) {
                     if(res.data.code === 200) {
                         alert(res.data.msg);
-                        // window.close();
-                        // opener.parent.location.reload();
                         opener.Search();
+                        Search();
                     } else {
                         console.log(res.data.msg);
                         alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");

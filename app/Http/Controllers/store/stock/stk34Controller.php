@@ -178,12 +178,12 @@ class stk34Controller extends Controller
 
             $sql = "
                 select
-                    cs.competitor_cd
+                    c.code_id as competitor_cd
                     , cs.store_cd
                     , c.code_val as competitor_nm
                     $sale_amt
                 from competitor_sale cs
-                    left outer join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor'
+                    left outer join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor' and c.use_yn = 'Y'
                 where cs.store_cd = '$store_no' and cs.sale_date >= '$date-01' and cs.sale_date <= '$date-31'
                 group by cs.competitor_cd
                 

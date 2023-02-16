@@ -123,28 +123,13 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-12 inner-td">
-                            <div class="form-group">
-                                <label for="">매장구분</label>
-                                <div class="flax_box">
-                                    <select name='store_type' class="form-control form-control-sm">
-                                        <option value=''>전체</option>
-                                        @foreach (@$store_types as $store_type)
-                                            <option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
+                    <div class="row" style="display:none">
                         <div class="col-lg-12 inner-td">
                             <div class="form-group">
                                 <label for="store_cd">매장명</label>
                                 <div class="form-inline inline_btn_box">
                                     <input type='hidden' id="store_nm" name="store_nm">
-                                    <select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select" multiple></select>
+                                    <select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select"></select>
                                     <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                 </div>
                             </div>
@@ -174,10 +159,12 @@
                 <div class="table-responsive mb-1">
                     <div id="div-gd-storage-stock" class="ag-theme-balham"></div>
                 </div>
+                @if($ostore_stock_yn == 'Y') 
                 <h6 class="fs-16 mt-3">[ 매장 현재 재고 ]</h6>
                 <div class="table-responsive mb-1">
                     <div id="div-gd-store-stock" class="ag-theme-balham"></div>
                 </div>
+                @endif
                 <h6 class="fs-16 mt-3">[ 매장 기간 재고 ] <span style="font-size: 12px;"> - 조회일자 반영</span></h6>
                 <div class="table-responsive">
                     <div id="div-gd-store-stock-detail" class="ag-theme-balham"></div>
@@ -196,7 +183,6 @@
     const storageLastWidth = 713 - (storage_cnt * 100);
 
     let storage_columns = [
-        {field: "total_qty", headerName: "창고 총재고", width: 100, pinned: "left", cellStyle: AlignCenter},
         @foreach (@$storages as $storage)
             {field: '{{ $storage->storage_cd }}', headerName: '{{ $storage->storage_nm }}', cellStyle: AlignCenter, width: 100},
         @endforeach
@@ -268,6 +254,11 @@
         }
 
         let data = $("form[name=search]").serialize();
+
+        @if($user_store != '')
+            $("#store_no").select2({data:['{{ @$user_store }}']??'', tags: true});
+        @endif
+
         search_storage_stock(data);
         Search();
 

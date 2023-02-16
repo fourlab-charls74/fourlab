@@ -19,9 +19,6 @@
 				<h4>검색</h4>
 				<div>
 					<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-					<a href="#" onclick="AddStock('wonga');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 1. 원가/상품 업로드</a>
-					<a href="#" onclick="AddStock('storage');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 2. 창고 재고 업로드</a>
-					<a href="#" onclick="AddStock('store');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 3. 매장 재고 업로드</a>
 					<a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
@@ -72,31 +69,16 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="store_type">매장구분</label>
-							<div class="flex_box">
-								<select name='store_type' class="form-control form-control-sm">
-									<option value=''>전체</option>
-									@foreach ($store_types as $store_type)
-										<option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
-									@endforeach
-								</select>
-							</div>
-						</div>
-					</div>
-					<div class="col-lg-4 inner-td">
+					<div class="col-lg-4 inner-td" style="display:none">
 						<div class="form-group">
 							<label>매장명</label>
 							<div class="form-inline inline_btn_box">
 								<input type='hidden' id="store_nm" name="store_nm">
-								<select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select" multiple></select>
+								<select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select"></select>
 								<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 							</div>
 						</div>
 					</div>
-				</div>
-				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="prd_cd">상품옵션 범위검색</label>
@@ -111,6 +93,26 @@
 							</div>
 						</div>
 					</div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="style_no">스타일넘버/상품번호</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input_box">
+									<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="">
+								</div>
+								<span class="text_line">/</span>
+								<div class="form-inline-inner input-box" style="width:47%">
+									<div class="form-inline-inner inline_btn_box">
+										<input type='text' class="form-control form-control-sm w-100 search-enter" name='goods_no' id='goods_no' value=''>
+										<a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 						<label for="formrow-email-input">매칭여부</label>
@@ -164,32 +166,11 @@
 						</div>
 					</div>
 				</div>
-				<div class="row search-area-ext d-none">
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="style_no">스타일넘버/상품번호</label>
-							<div class="form-inline">
-								<div class="form-inline-inner input_box">
-									<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="">
-								</div>
-								<span class="text_line">/</span>
-								<div class="form-inline-inner input-box" style="width:47%">
-									<div class="form-inline-inner inline_btn_box">
-										<input type='text' class="form-control form-control-sm w-100 search-enter" name='goods_no' id='goods_no' value=''>
-										<a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
+				
 			</div>
 		</div>
 		<div class="resul_btn_wrap mb-3">
 			<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-			<a href="#" onclick="AddStock('wonga');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 1. 원가/상품 업로드</a>
-			<a href="#" onclick="AddStock('storage');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i>2. 창고 재고 업로드</a>
-			<a href="#" onclick="AddStock('store');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i>3. 매장 재고 업로드</a>
 			<a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
 			<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
 		</div>
@@ -204,8 +185,8 @@
 					</div>
 					<div class="fr_box">
 						<div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
-							<input type="checkbox" class="custom-control-input" name="ext_store_storage_qty" id="ext_store_storage_qty" value="Y">
-							<label class="custom-control-label font-weight-normal" for="ext_store_storage_qty">창고재고/매장재고 0 제외</label>
+							<input type="checkbox" class="custom-control-input" name="ext_store_qty" id="ext_store_qty" value="Y">
+							<label class="custom-control-label font-weight-normal" for="ext_store_qty">매장재고 0 제외</label>
 						</div>
 						<div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
 							<input type="checkbox" class="custom-control-input" name="grid_expand" id="grid_expand" onchange="return setAllRowGroupExpanded(this.checked);">
@@ -285,24 +266,6 @@
 		{field: "brand_nm", headerName: "브랜드", width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
 		{field: "goods_sh", headerName: "TAG가", type: 'currencyType', width: 100, aggFunc: 'first'},
 		{field: "price", headerName: "판매가", type: 'currencyType', width: 100, aggFunc: 'first'},
-		@if(true) // 슈퍼관리자 권한설정 필요 (추후)
-			{field: "wonga", headerName: "원가", type: 'currencyType', width: 100, aggFunc: 'first'},
-		@endif
-		{field: "wqty", headerName: "창고재고", width:70, type: 'currencyType', 
-			aggFunc: (params) => {
-				return params.values.reduce((a,c) => a + (c * 1), 0);
-			},
-			cellRenderer: function(params) {
-				if (params.value === undefined) return "";
-				if (params.node.rowPinned === 'top') {
-                    return params.value;
-                } else if (params.data) {
-					return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + Comma(params.value) + '</a>';
-                } else if (params.node.aggData) {
-					return `<a href="#" onclick="return OpenStockPopup('${params.node.key}', '${$("[name=sdate]").val() || ''}');">${Comma(params.value)}</a>`;
-				}
-			}
-		},
 		{field: "sqty", headerName: "매장재고", width:70, type: 'currencyType',
 			aggFunc: (params) => {
 				return params.values.reduce((a,c) => a + (c * 1), 0);
@@ -312,7 +275,7 @@
 				if (params.node.rowPinned === 'top') {
                     return params.value;
                 } else if (params.data) {
-					return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + Comma(params.value) + '</a>';
+					return '<a href="#" onclick="return OpenStoreStockPopup(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + Comma(params.value) + '</a>';
                 } else if (params.node.aggData) {
 					return `<a href="#" onclick="return OpenStockPopup('${params.node.key}', '${$("[name=sdate]").val() || ''}');">${Comma(params.value)}</a>`;
 				}
@@ -359,6 +322,11 @@
 		};
 		pApp.ResizeGrid(275);
 		pApp.BindSearchEnter();
+
+		@if($user_store != '')
+            $("#store_no").select2({data:['{{ @$user_store }}']??'', tags: true});
+        @endif
+
 		Search();
 	});
 
@@ -372,9 +340,11 @@
 
 	async function Search() {
 		await setColumn();
-		let ischeck = $('#ext_storage_qty').is(':checked');
+		let ischeck = $('#ext_store_qty').is(':checked');
+
+		console.log(ischeck);
 		let data = $('form[name="search"]').serialize();
-		data += '&ext_storage_qty=' + ischeck;
+		data += '&ext_store_qty=' + ischeck;
 		
 		gx.Request('/shop/product/prd04/search', data, 1, function(e) {
 			const t = e.head.total_row;
@@ -408,16 +378,13 @@
 		}
 	}
 
-	function AddStock(item){
-		if( item == 'wonga' )			url = '/shop/product/prd04/batch_wonga';
-		else if( item == 'storage' )	url = '/shop/product/prd04/batch';
-		else if( item == 'store' )		url = '/shop/product/prd04/batch_store';
-
-		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
-	}
-
 	function OpenStockPopup(prd_cd_p, date, color = '', size = '') {
 		var url = `/shop/product/prd04/stock?prd_cd_p=${prd_cd_p}&date=${date}&color=${color}&size=${size}`;
+		var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1000,height=900");
+	}
+
+	function OpenStoreStockPopup(prd_cd, date) {
+		var url = `/shop/stock/stk01/${prd_cd}?date=${date}`;
 		var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1000,height=900");
 	}
 

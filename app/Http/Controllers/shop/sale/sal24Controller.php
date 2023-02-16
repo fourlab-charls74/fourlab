@@ -8,14 +8,19 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use PDO;
 use Carbon\Carbon;
 use DateTime;
+
 
 class sal24Controller extends Controller
 {
     // 일별 매출 통계
     public function index(Request $req) {
+		
+		//로그인한 아이디의 매칭된 매장을 불러옴
+		$user_store	= Auth('head')->user()->store_cd;
 
         //return '일별매출통계';
         $mutable = Carbon::now();
@@ -148,7 +153,8 @@ class sal24Controller extends Controller
             'pr_code_val'   => $str2,
             'sell_type_id'  => $sell_str,
             'sell_type_val' => $sell_str2,
-			'on_off_yn'		=> $on_off_yn
+			'on_off_yn'		=> $on_off_yn,
+			'user_store'	=> $user_store
         ];
         echo Config::get('shop.shop.view');
         return view( Config::get('shop.shop.view') . '/sale/sal24',$values);

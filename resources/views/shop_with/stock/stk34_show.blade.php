@@ -1,10 +1,10 @@
 @extends('shop_with.layouts.layout-nav')
-@section('title','월별동종업계매출관리')
+@section('title','동종업계매출관리')
 @section('content')
 
 <div class="py-3 px-sm-3">
     <div class="page_tit">
-        <h3 class="d-inline-flex">월별동종업계매출관리 추가</h3>
+        <h3 class="d-inline-flex">동종업계매출관리 추가</h3>
         <div class="d-inline-flex location">
             <span class="home"></span>
             <span>/ 매장관리</span>
@@ -23,7 +23,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-lg-6 inner-td">
+                        <div class="col-lg-6 inner-td" style="display:none">
                             <div class="form-group">
                                 <label for="store_no">매장명</label>
                                 <div class="form-inline inline_btn_box search-enter" >
@@ -122,6 +122,10 @@
                 }
             });
             pApp.BindSearchEnter();
+
+            @if($user_store != '')
+                $("#store_no").select2({data:['{{ @$user_store }}']??'', tags: true});
+            @endif
         });
 
        

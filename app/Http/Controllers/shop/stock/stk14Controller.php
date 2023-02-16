@@ -8,12 +8,16 @@ use App\Components\SLib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class stk14Controller extends Controller
 {
     public function index()
 	{
+        //로그인한 아이디의 매칭된 매장을 불러옴
+        $user_store	= Auth('head')->user()->store_cd;
+
 		$values = [
             'today'         => date("Y-m-d"),
             'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
@@ -22,6 +26,7 @@ class stk14Controller extends Controller
             'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
             'items'			=> SLib::getItems(), // 품목
             'rel_orders'    => SLib::getCodes("REL_ORDER"), // 출고차수
+            'user_store'    => $user_store
 		];
 
         return view(Config::get('shop.shop.view') . '/stock/stk14', $values);
@@ -93,10 +98,10 @@ class stk14Controller extends Controller
 
         // if($r['com_cd'] != null) 
         //     $where .= " and g.com_id = '" . $r['com_cd'] . "'";
-        if($r['item'] != null) 
-            $where .= " and g.opt_kind_cd = '" . $r['item'] . "'";
-        if(isset($r['brand_cd']))
-            $where .= " and g.brand = '" . $r['brand_cd'] . "'";
+        // if($r['item'] != null) 
+        //     $where .= " and g.opt_kind_cd = '" . $r['item'] . "'";
+        // if(isset($r['brand_cd']))
+        //     $where .= " and g.brand = '" . $r['brand_cd'] . "'";
         if($r['goods_nm'] != null) 
             $where .= " and g.goods_nm like '%" . $r['goods_nm'] . "%'";
         // if($r['goods_nm_eng'] != null) 
@@ -108,7 +113,7 @@ class stk14Controller extends Controller
         $ord = $r['ord'] ?? 'desc';
         $ord_field = $r['ord_field'] ?? "g.goods_no";
         if($ord_field == 'goods_no') $ord_field = 'g.' . $ord_field;
-        else $ord_field = 'psr.' . $ord_field;
+        else $ord_field =  $ord_field;
         $orderby = sprintf("order by %s %s", $ord_field, $ord);
 
         // pagination

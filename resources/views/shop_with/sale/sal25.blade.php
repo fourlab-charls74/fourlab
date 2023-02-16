@@ -120,7 +120,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4 inner-td">
+                    <div class="col-lg-4 inner-td" style="display:none">
                         <div class="form-group">
                             <label>매장명</label>
                             <div class="form-inline inline_btn_box">
@@ -156,30 +156,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="search-area-ext d-none row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="formrow-inputCity">품목</label>
-                            <div class="flax_box">
-                                <select name='item' class="form-control form-control-sm">
-                                    <option value=''>전체</option>
-                                    @foreach ($items as $item)
-                                    <option value='{{ $item->cd }}'>{{ $item->val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="formrow-inputState">브랜드</label>
-                            <div class="form-inline inline_btn_box">
-                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
-                        </div>
-                    </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="formrow-inputZip">상품명</label>
@@ -189,7 +165,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="search-area-ext d-none row">
+                <div class="search-area-ext d-none row" style="margin-top: 30px">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="formrow-inputState">결제방법</label>
@@ -225,7 +201,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 inner-td">
+                    <div class="col-lg-4 inner-td" style="display:none">
                         <div class="form-group">
                             <label for="">온라인/오프라인</label>
                             <div class="form-inline form-radio-box">
@@ -389,7 +365,8 @@
             headerName: "매출원가",
             field: "sum_wonga",
             type: 'currencyType',
-            aggregation: true
+            aggregation: true,
+            hide:true
         },
         {
             headerName: "마진율",
@@ -409,13 +386,15 @@
                     headerName: "세전",
                     field: "margin1",
                     type: 'currencyType',
-                    aggregation: true
+                    aggregation: true,
+                    hide:true
                 },
                 {
                     headerName: "세후",
                     field: "margin2",
                     type: 'currencyType',
-                    aggregation: true
+                    aggregation: true,
+                    hide:true
                 },
             ]
         },
@@ -626,11 +605,11 @@
             series: [{
                 type: 'column',
                 xKey: 'chart_x_str',
-                yKeys: ['sum_amt', 'sum_wonga'],
-                yNames: [' 매출액', '매출원가'],
+                yKeys: ['sum_amt'],
+                yNames: [' 매출액'],
                 grouped: true,
-                fills: ['#556ee6', '#2797f6'],
-                strokes: ['#556ee6', '#2797f6']
+                fills: ['#556ee6'],
+                strokes: ['#556ee6']
                 // highlightStyle : {
                 //   fill :
                 // }

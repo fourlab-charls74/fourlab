@@ -8,23 +8,40 @@ use App\Components\SLib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Exception;
 use App\Models\Conf;
 use Mockery\Undefined;
 
+
 class stk34Controller extends Controller
 {
+    
     public function index()
     {
+        //로그인한 아이디의 매칭된 매장을 불러옴
+		$user_store	= Auth('head')->user()->store_cd;
         $mutable = Carbon::now();
         $sdate = $mutable->sub(1, 'month')->format('Y-m');
+        $edate = date("Y-m");
+
+        $sql = "
+            select 
+                competitor_yn
+            from store
+            where store_cd = '$user_store' 
+        ";
+
+        $competitor_yn = DB::selectOne($sql);
 
         $values = [
             'store_types' => SLib::getCodes("STORE_TYPE"),
             'competitors' => SLib::getCodes("COMPETITOR"),
             'sdate' => $sdate,
-            'edate' => date("Y-m")
+            'edate' => $edate,
+            'user_store' => $user_store,
+            'competitor_yn' => $competitor_yn->competitor_yn
         ];
         return view(Config::get('shop.shop.view') . '/stock/stk34', $values);
     }
@@ -128,12 +145,13 @@ class stk34Controller extends Controller
 
     public function create()
     {
-
+        $user_store	= Auth('head')->user()->store_cd;
         $mutable = Carbon::now();
         $date = $mutable->now()->format('Y-m');
 
         $values = [
             'date' => $date,
+            'user_store' => $user_store
         ];
 
 
@@ -178,12 +196,12 @@ class stk34Controller extends Controller
 
             $sql = "
                 select
-                    cs.competitor_cd
+                    c.code_id as competitor_cd
                     , cs.store_cd
                     , c.code_val as competitor_nm
                     $sale_amt
                 from competitor_sale cs
-                    left outer join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor'
+                    left outer join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor' and c.use_yn = 'Y'
                 where cs.store_cd = '$store_no' and cs.sale_date >= '$date-01' and cs.sale_date <= '$date-31'
                 group by cs.competitor_cd
                 

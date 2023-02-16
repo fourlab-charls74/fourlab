@@ -8,6 +8,7 @@ use App\Components\SLib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class stk01Controller extends Controller
@@ -15,20 +16,20 @@ class stk01Controller extends Controller
 	public function index() 
 	{
 
-		// $values = [
-		// 	'code_kinds'	=> [],
-        //     'style_no'		=> "",
-        //     'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
-        //     'store_types'	=> SLib::getStoreTypes(),
-		// 	// 'com_types'     => SLib::getCodes('G_COM_TYPE'),
-        //     'items'			=> SLib::getItems(),
-        //     'goods_types'	=> SLib::getCodes('G_GOODS_TYPE')
-		// ];
+		$values = [
+			'code_kinds'	=> [],
+            'style_no'		=> "",
+            'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
+            'store_types'	=> SLib::getStoreTypes(),
+			// 'com_types'     => SLib::getCodes('G_COM_TYPE'),
+            'items'			=> SLib::getItems(),
+            'goods_types'	=> SLib::getCodes('G_GOODS_TYPE')
+		];
 
-		// return view( Config::get('shop.shop.view') . '/stock/stk01',$values);
+		return view( Config::get('shop.shop.view') . '/stock/stk01',$values);
 
 		/* shop 미사용 메뉴 메인페이지로 리다이렉트 */
-        return redirect('/shop');
+        // return redirect('/shop');
 	}
 
 	public function search(Request $request)
@@ -212,6 +213,20 @@ class stk01Controller extends Controller
 	/** 재고팝업 */
 	public function show($prd_cd, Request $request)
 	{
+		$user_store	= Auth('head')->user()->store_cd;
+
+		$sql = "
+			select
+				ostore_stock_yn
+			from store
+			where store_cd = '$user_store'
+		";
+
+		$ostore_stock_yn = DB::selectOne($sql);
+
+
+
+
 		$sdate = $request->input("date", '');
 		if($sdate == '') $sdate = date("Y-m-d");
 
@@ -278,7 +293,7 @@ class stk01Controller extends Controller
 		$storages = DB::table("storage")
 			->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')
 			->where('use_yn', '=', 'Y')
-			->orderByDesc('default_yn')
+			->where('default_yn', '=', 'Y')
 			->get();
 
 		$values = [
@@ -287,6 +302,8 @@ class stk01Controller extends Controller
 			'store_types' => SLib::getCodes("STORE_TYPE"), // 매장구분
 			'storages' => $storages, // 창고리스트
 			'prd' => $row,
+			'user_store' => $user_store,
+			'ostore_stock_yn' => $ostore_stock_yn->ostore_stock_yn
 		];
 		return view(Config::get('shop.shop.view') . '/stock/stk01_show', $values);
 	}
@@ -321,7 +338,7 @@ class stk01Controller extends Controller
 			select p.prd_cd, s.storage_cd, s.storage_nm, ifnull(p.qty, 0) as qty, ifnull(p.wqty, 0) as wqty
 			from storage s
 				left outer join product_stock_storage p on p.storage_cd = s.storage_cd and p.prd_cd = :prd_cd
-			where s.use_yn = 'Y'
+			where s.use_yn = 'Y' and s.default_yn = 'Y'
 		";
 		$rows = DB::select($sql, ['prd_cd' => $prd_cd]);
 
@@ -368,7 +385,7 @@ class stk01Controller extends Controller
 				select p.prd_cd, s.store_cd, s.store_nm, ifnull(p.qty, 0) as qty, ifnull(p.wqty, 0) as wqty
 				from store s
 					left outer join product_stock_store p on p.store_cd = s.store_cd and p.prd_cd = :prd_cd
-				where ($store_where) $where
+				where 1=1 $where and store_type = '08'
 				order by p.wqty desc
 			";
 			$rows = DB::select($sql, ['prd_cd' => $prd_cd]);

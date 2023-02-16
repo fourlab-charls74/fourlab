@@ -9,6 +9,7 @@ use App\Components\ULib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\Conf;
 use PDO;
@@ -18,9 +19,14 @@ class prd04Controller extends Controller
 
 	public function index() 
 	{
+		//로그인한 아이디의 매칭된 매장을 불러옴
+		$user_store	= Auth('head')->user()->store_cd;
+
+
 		$values = [
 			'sdate'			=> date('Y-m-d'), 
             'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
+			'user_store'	=> $user_store
 		];
 
 		return view( Config::get('shop.shop.view') . '/product/prd04',$values);
@@ -40,7 +46,7 @@ class prd04Controller extends Controller
 		$goods_nm	= $request->input("goods_nm");
 		$store_type	= $request->input("store_type", "");
 		$store_no	= $request->input("store_no", "");
-		$ext_store_storage_qty	= $request->input("ext_store_storage_qty", "");
+		$ext_store_qty	= $request->input("ext_store_qty", "");
 		$prd_cd_range_text = $request->input("prd_cd_range", '');
 		$goods_nm_eng	= $request->input("goods_nm_eng");
 
@@ -129,9 +135,10 @@ class prd04Controller extends Controller
 			$store_qty_sql	= "sum(pss.qty)";
 		}
 
-		if($ext_store_storage_qty == 'Y') {
-			$having .= "having (wqty) > 0 or (hqty - hwqty) > 0";
+		if($ext_store_qty == 'true') {
+			$having .= "having sqty > 0";
 		}
+
 
 		$page_size	= $limit;
 		$startno	= ($page - 1) * $page_size;
@@ -188,6 +195,7 @@ class prd04Controller extends Controller
 					$having
 				) a
 			";
+
 
 			$row	= DB::select($query);
 			$total	= $row[0]->total;
@@ -252,6 +260,7 @@ class prd04Controller extends Controller
 			$orderby
 			$limit
 		";
+
 		$pdo	= DB::connection()->getPdo();
 		$stmt	= $pdo->prepare($query);
 		$stmt->execute();

@@ -19,7 +19,9 @@
                 <div class="flax_box">
                     <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                     <a href="#" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
-                    <a href="#" onclick="add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
+                    @if ($competitor_yn == 'Y')
+                        <a href="#" onclick="add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
+                    @endif
                     <button id="download-list" onclick="gx.Download();" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
                         <i class="bx bx-download fs-16"></i> 엑셀다운로드
                     </button>&nbsp;&nbsp;
@@ -58,20 +60,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="good_types">매장구분</label>
-                                <div class="flax_box">
-                                    <select name='store_type' class="form-control form-control-sm search-enter">
-                                        <option value=''>전체</option>
-                                    @foreach ($store_types as $store_type)
-                                        <option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
-                                    @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 inner-td">
+                        <div class="col-lg-4 inner-td" style="display:none">
                             <div class="form-group">
                                 <label for="store_no">매장명</label>
                                 <div class="form-inline inline_btn_box search-enter" >
@@ -81,21 +70,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        {{-- <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="good_types">동종업계</label>
-                                <div class="flax_box">
-                                    <select name='competitor_type' class="form-control form-control-sm search-enter">
-                                        <option value=''>전체</option>
-                                    @foreach ($competitors as $competitor)
-                                        <option value='{{ $competitor->code_id }}'>{{ $competitor->code_val }}</option>
-                                    @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div> --}}
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="">자료수/정렬</label>
@@ -125,6 +99,21 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
+                        {{-- <div class="col-lg-4 inner-td">
+                            <div class="form-group">
+                                <label for="good_types">동종업계</label>
+                                <div class="flax_box">
+                                    <select name='competitor_type' class="form-control form-control-sm search-enter">
+                                        <option value=''>전체</option>
+                                    @foreach ($competitors as $competitor)
+                                        <option value='{{ $competitor->code_id }}'>{{ $competitor->code_val }}</option>
+                                    @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div> --}}
                     </div>
                 </div>
             </div>
@@ -203,6 +192,11 @@ const pinnedRowData = [{ store_nm : '합계' , "total_amt" : 0 ,
             },
         });
         pApp.BindSearchEnter();
+
+        @if($store_cd != '')
+            $("#store_no").select2({data:['{{ @$store_cd }}']??'', tags: true});
+        @endif
+
         Search();
     });
 
@@ -229,7 +223,7 @@ const pinnedRowData = [{ store_nm : '합계' , "total_amt" : 0 ,
 
 
     function add() {
-        const url = '/store/stock/stk33/create';
+        const url = '/shop/stock/stk33/create';
         const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1000,height=700");
     }
 
