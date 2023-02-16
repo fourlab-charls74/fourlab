@@ -20,6 +20,7 @@ use Exception;
 
 class mem01Controller extends Controller
 {
+	private $store_cd = 'L0025';
 
 	public function index($type='') {
 		$values = [
@@ -148,7 +149,8 @@ class mem01Controller extends Controller
 		$sex		= Request("sex");
 		$age		= Request("age");
 		$user_group	= Request("user_group");
-		$store_no 	= Request("store_no");
+		// $store_no 	= Request("store_no");
+		$store_cd 	= $this->store_cd;
 
 		$sdate		= Request("sdate");
 		$edate		= Request("edate");
@@ -216,14 +218,16 @@ class mem01Controller extends Controller
 		if($last_edate != "")	$where .= " and a.lastdate < DATE_ADD('$last_edate', INTERVAL 1 DAY) ";
 		if($ord_sdate != "")	$where .= " and e.ord_date >= '$ord_sdate 00:00:00' ";
 		if($ord_edate != "")	$where .= " and e.ord_date < DATE_ADD('$ord_edate 23:59:59', INTERVAL 1 DAY) ";
-		if ( $store_no != "" ) {
-			$where	.= " and (1!=1";
-			foreach($store_no as $store_cd) {
-				$where .= " or a.store_cd = '$store_cd' ";
+		// if ( $store_no != "" ) {
+		// 	$where	.= " and (1!=1";
+		// 	foreach($store_no as $store_cd) {
+		// 		$where .= " or a.store_cd = '$store_cd' ";
 
-			}
-			$where	.= ")";
-		}
+		// 	}
+		// 	$where	.= ")";
+		// }
+		if ( $store_cd != "" )	$where	.= " and a.store_cd = '$store_cd'";
+			
 
 		if($mail != "")			$where .= " and a.email_chk = '$mail' ";
 		if($mobile_chk != "")	$where .= " and a.mobile_chk = '$mobile_chk' ";
