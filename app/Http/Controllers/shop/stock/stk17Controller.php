@@ -61,7 +61,9 @@ class stk17Controller extends Controller
         $limit = " limit $startno, $page_size ";
 
         // search
-        $store_cd = Lib::quote($req['store_no']);
+        $store_cd = Auth('head')->user()->store_cd;
+        $store_cd = Lib::quote( $store_cd );
+            
 		$sql = /** @lang text */ "
             select
                 c.code_val as type_nm,
