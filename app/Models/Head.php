@@ -23,7 +23,7 @@ class Head extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'id', 'name', 'passwd',
+        'id', 'name', 'passwd', 'store_cd',
     ];
 
     /**
