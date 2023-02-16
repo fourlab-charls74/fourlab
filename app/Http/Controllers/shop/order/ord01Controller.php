@@ -141,7 +141,8 @@ class ord01Controller extends Controller
     {
 
 
-        $store_no       = $request->input('store_no', '');
+        // $store_no       = $request->input('store_no', '');
+        $store_cd       = Auth('head')->user()->store_cd;
         $sale_kind      = $request->input('sale_kind', '');
         $pr_code        = $request->input('pr_code', '');
         $sdate          = $request->input('sdate', now()->sub(3, 'month')->format('Ymd'));
@@ -207,7 +208,8 @@ class ord01Controller extends Controller
             $where .= " and o.ord_date <= '$edate 23:59:59' ";
         }
         if ($ord_no != '') $where .= " and o.ord_no = '$ord_no' ";
-        if ($store_no != '') $where .= " and o.store_cd = '$store_no' ";
+        // if ($store_no != '') $where .= " and o.store_cd = '$store_no' ";
+        if ($store_cd != '') $where .= " and o.store_cd = '$store_cd' ";
         if ($ord_state != '') $where .= " and o.ord_state = '$ord_state' ";
         if ($pay_state != '') $where .= " and pay.pay_stat = '$pay_state' ";
         // 클레임상태
@@ -571,6 +573,9 @@ class ord01Controller extends Controller
         ";
         $pay_types = DB::select($sql);
 
+        $store_cd = Auth('head')->user()->store_cd;
+        $store_nm = DB::table('store')->where("store_cd", $store_cd)->value('store_nm');
+
         $conf = new Conf();
 
         $values = [
@@ -583,6 +588,8 @@ class ord01Controller extends Controller
                 'add_dlv_fee'   => $conf->getConfigValue('delivery', 'add_delivery_fee'), 
                 'free_dlv_amt'  => $conf->getConfigValue('delivery', 'free_delivery_amt'),
             ],
+            'store_cd'      => $store_cd,
+            'store_nm'      => $store_nm,
         ];
         return view(Config::get('shop.shop.view') . '/order/ord01_show', $values);
     }
@@ -1240,6 +1247,9 @@ class ord01Controller extends Controller
         ";
         $pay_types = DB::select($sql);
 
+        $store_cd = Auth('head')->user()->store_cd;
+        $store_nm = DB::table('store')->where("store_cd", $store_cd)->value('store_nm');
+
         $conf = new Conf();
 
         $values = [
@@ -1252,6 +1262,8 @@ class ord01Controller extends Controller
                 'add_dlv_fee'   => $conf->getConfigValue('delivery', 'add_delivery_fee'), 
                 'free_dlv_amt'  => $conf->getConfigValue('delivery', 'free_delivery_amt'),
             ],
+            'store_cd'      => $store_cd,
+            'store_nm'      => $store_nm,
         ];
         return view(Config::get('shop.shop.view') . '/order/ord01_batch', $values);
     }

@@ -46,7 +46,7 @@
                                                         <input type="text" name="user_id" id="user_id" value='{{@$ord->user_id}}' class="form-control form-control-sm mr-1" style="width:260px;">
                                                         <a href="#" onclick="GetUserInfo(document.f1.user_id.value)" class="btn btn-sm btn-primary shadow-sm fs-12 mr-1">회원정보 불러오기</a>
                                                         <a href="#" onclick="SameInfo();" class="btn btn-sm btn-primary shadow-sm fs-12 mr-1">수령자정보 동일</a>
-                                                        <a href="#" onclick="PopSearchOrder();" class="btn btn-sm btn-primary shadow-sm fs-12">기존 주문정보 불러오기</a>
+                                                        {{--<!-- <a href="#" onclick="PopSearchOrder();" class="btn btn-sm btn-primary shadow-sm fs-12">기존 주문정보 불러오기</a> -->--}}
                                                         <div id="p_ord_no" class="p-2"></div>
                                                     </div>
                                                 </td>
@@ -229,13 +229,9 @@
                                                 <td style="padding:0px 10px 0px 10px;">
                                                     <div class="d-flex flex-column pt-2 pb-1">
                                                         <div class="flax_box mr-2 mb-1" style="width: 307px;">
-                                                            <div class="form-inline inline_btn_box w-100">
-                                                                <input type='hidden' id="store_nm" name="store_nm">
-                                                                <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
-                                                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                                            </div>
+                                                            <input type='hidden' id="store_no" name="store_no" value="{{$store_cd}}">
+                                                            <input type='text' id="store_nm" name="store_nm" class="form-control form-control-sm mt-1 mt-sm-0" value="{{$store_nm}}" readonly>
                                                         </div>
-                                                        <p style="color: red;">* 주문매장 미선택 시 상품이 창고에서 출고됩니다. / * 주문매장 변경 시에는 상품정보가 초기화됩니다.</p>
                                                     </div>
                                                 </td>
                                             </tr>
