@@ -12,7 +12,8 @@ use Carbon\Carbon;
 
 class sal02Controller extends Controller
 {
-	public function index() {
+	public function index() 
+	{
 
 		// $sdate = Carbon::now()->startOfMonth()->format("Y-m"); // 이번 달 기준
 		$sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 1달전 기준 (테스트 용)
@@ -58,7 +59,8 @@ class sal02Controller extends Controller
 		$sdate = $request->input('sdate', now()->format("Y-m"));
 		$list_type = $request->input('list_type', "qty");
 		$store_type = $request->input('store_type', "");
-		$store_cd = $request->input('store_cd', "");
+		// $store_cd = $request->input('store_cd', "");
+		$store_cd = Auth('head')->user()->store_cd;
 		$goods_no = $request->input('goods_no', "");
 		$goods_nm = $request->input('goods_nm', "");
 		$brand_cd = $request->input('brand_cd', "");

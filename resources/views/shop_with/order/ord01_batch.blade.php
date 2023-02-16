@@ -43,11 +43,8 @@
                                             <th>주문매장</th>
                                             <td>
                                                 <div class="flax_box mr-2">
-                                                    <div class="form-inline inline_btn_box w-100">
-                                                        <input type='hidden' id="store_nm" name="store_nm">
-                                                        <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
-                                                        <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                                    </div>
+                                                    <input type='hidden' id="store_no" name="store_no" value="{{$store_cd}}">
+                                                    <input type='text' id="store_nm" name="store_nm" class="form-control form-control-sm mt-1 mt-sm-0" value="{{$store_nm}}" readonly>
                                                 </div>
                                             </td>
                                             <th class="required">파일</th>

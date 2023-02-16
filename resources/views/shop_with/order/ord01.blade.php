@@ -70,18 +70,6 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="store_no">주문매장</label>
-                            <div class="form-inline inline_btn_box">
-                                <input type='hidden' id="store_nm" name="store_nm" value="{{ @$store->store_nm }}">
-                                <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
                             <label>주문/입금상태</label>
                             <div class="form-inline">
                                 <select name='ord_state' class="form-control form-control-sm" style="width: 47%;">
@@ -101,6 +89,8 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label>클레임상태</label>
@@ -136,8 +126,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="ord_info_key">주문정보</label>
@@ -172,6 +160,8 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label>결제방법</label>
@@ -201,27 +191,6 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label>온/오프라인 주문</label>
-                            <div class="form-inline form-radio-box">
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="sale_form_A" name="sale_form" value="" checked />
-                                    <label class="custom-control-label" for="sale_form_A">전체</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="sale_form_On" name="sale_form" value="On" />
-                                    <label class="custom-control-label" for="sale_form_On">온라인</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="sale_form_Off" name="sale_form" value="Off" />
-                                    <label class="custom-control-label" for="sale_form_Off">오프라인</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
                             <label>상품코드</label>
                             <div class="flex_box">
                                 <input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
@@ -242,6 +211,27 @@
                                         <input type='text' class="form-control form-control-sm w-100 search-enter" name='goods_no' id='goods_no' value=''>
                                         <a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label>온/오프라인 주문</label>
+                            <div class="form-inline form-radio-box">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" class="custom-control-input" id="sale_form_A" name="sale_form" value="Off" checked />
+                                    <label class="custom-control-label" for="sale_form_A">전체</label>
+                                </div>
+                                <div class="custom-control custom-radio" hidden>
+                                    <input type="radio" class="custom-control-input" id="sale_form_On" name="sale_form" value="On" />
+                                    <label class="custom-control-label" for="sale_form_On">온라인</label>
+                                </div>
+                                <div class="custom-control custom-radio" hidden>
+                                    <input type="radio" class="custom-control-input" id="sale_form_Off" name="sale_form" value="Off" />
+                                    <label class="custom-control-label" for="sale_form_Off">오프라인</label>
                                 </div>
                             </div>
                         </div>
@@ -296,47 +286,6 @@
                             </div>
                         </div>
                     </div>
-                    {{-- <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="goods_stat">상품상태</label>
-                            <div class="flex_box">
-                                <select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
-                                    <option value=''>전체</option>
-                                    @foreach (@$goods_stats as $goods_stat)
-                                        <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div> --}}
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="item">품목</label>
-                            <div class="flex_box">
-                                <select id="item" name="item" class="form-control form-control-sm">
-                                    <option value="">전체</option>
-                                    @foreach (@$items as $item)
-                                        @if ($item->cd == @$s_item)
-                                            <option value="{{ $item->cd }}" selected>{{ $item->val }}</option>
-                                        @else
-                                            <option value="{{ $item->cd }}">{{ $item->val }}</option>
-                                        @endif
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="brand_cd">브랜드</label>
-                            <div class="form-inline inline_btn_box">
-                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row search-area-ext d-none">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="goods_nm">상품명</label>
@@ -353,6 +302,21 @@
                             </div>
                         </div>
                     </div>
+                    {{-- <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="goods_stat">상품상태</label>
+                            <div class="flex_box">
+                                <select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
+                                    <option value=''>전체</option>
+                                    @foreach (@$goods_stats as $goods_stat)
+                                        <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div> --}}
+                </div>
+                <div class="row search-area-ext d-none">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="pr_code">판매유형</label>
@@ -366,8 +330,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row search-area-ext d-none">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="pr_code">행사코드</label>
@@ -435,7 +397,6 @@
         },
         {field: "user_nm", headerName: "주문자(아이디)", width: 120, cellStyle: {'text-align': 'center'}},
         {field: "r_nm", headerName: "수령자", width: 70, cellStyle: {'text-align': 'center'}},
-        {field: "wonga", headerName: "원가", width: 60, type: "currencyType"},
         {field: "goods_sh", headerName: "TAG가", width: 60, type: "currencyType"},
         {field: "goods_price", headerName: "자사몰판매가", width: 85, type: "currencyType"},
         {field: "price", headerName: "판매가", width: 60, type: "currencyType"},

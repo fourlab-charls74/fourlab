@@ -51,7 +51,8 @@ class sal06Controller extends Controller
 		$edate = str_replace("-", "", $edate);
 
 		$store_type = $request->input('store_type', "");
-		$store_cd = $request->input('store_cd', "");
+		// $store_cd = $request->input('store_cd', "");
+		$store_cd = Auth('head')->user()->store_cd;
 		$goods_no = $request->input('goods_no', "");
 		$goods_nm = $request->input("goods_nm", "");
 		$goods_nm_eng = $request->input("goods_nm_eng", "");

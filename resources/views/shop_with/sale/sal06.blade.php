@@ -56,30 +56,6 @@
 					</div>
 					<div class="col-lg-4">
 						<div class="form-group">
-							<label for="store_type">매장구분</label>
-							<div class="flex_box">
-								<select name='store_type' class="form-control form-control-sm">
-									<option value=''>전체</option>
-									@foreach ($store_types as $store_type)
-										<option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
-									@endforeach
-								</select>
-							</div>
-						</div>
-					</div>
-					<div class="col-lg-4">
-						<div class="form-group">
-                            <label for="store_cd">매장명</label>
-							<div class="form-inline inline_btn_box">
-								<select id="store_cd" name="store_cd" class="form-control form-control-sm select2-store"></select>
-								<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-							</div>
-                        </div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-lg-4">
-						<div class="form-group">
 							<label for="">판매유형</label>
 							<div class="flex_box">
 								<select name='sale_kind' class="form-control form-control-sm">
@@ -91,24 +67,6 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4">
-						<div class="form-group">
-                            <label for="formrow-email-input">상품명</label>
-                            <div class="flex_box">
-                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' value=''>
-                            </div>
-                        </div>
-					</div>
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="goods_nm_eng">상품명(영문)</label>
-							<div class="flex_box">
-								<input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="row">
 					<div class="col-lg-4">
 						<div class="form-group">
 							<label for="style_no">스타일넘버/상품코드</label>
@@ -126,29 +84,27 @@
 							</div>
                         </div>
 					</div>
-					<div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="item">품목</label>
-                            <div class="flax_box">
-                                <select name="item" class="form-control form-control-sm">
-                                    <option value="">전체</option>
-                                    @foreach ($items as $item)
-                                        <option value="{{ $item->cd }}">{{ $item->val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+				</div>
+				<div class="row">
 					<div class="col-lg-4">
 						<div class="form-group">
-                            <label for="brand_cd">브랜드</label>
-                            <div class="form-inline inline_btn_box">
-                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                            <label for="formrow-email-input">상품명</label>
+                            <div class="flex_box">
+                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' value=''>
                             </div>
                         </div>
 					</div>
-					{{-- <div class="col-lg-4">
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="goods_nm_eng">상품명(영문)</label>
+							<div class="flex_box">
+								<input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
+							</div>
+						</div>
+					</div>
+				</div>
+				{{-- <div class="row">
+					<div class="col-lg-4">
 						<div class="form-group">
 							<label for="sale_yn">매출여부</label>
 							<div class="flex_box">
@@ -164,8 +120,8 @@
 								</div>
 							</div>
 						</div>
-					</div> --}}
-				</div>
+					</div>
+				</div> --}}
 			</div>
 		</div>
 		<div class="resul_btn_wrap mb-3">
@@ -219,13 +175,8 @@
                 { headerName: "매출액", field: "amt", width: 90, type: 'currencyMinusColorType' },
                 { headerName: "할인", field: "discount", width: 80, type: 'currencyMinusColorType' },
                 { headerName: "결제금액", field: "recv_amt", type: 'currencyMinusColorType' }, // 판매금액 + 포인트 합친게 결제(주문) 금액.
-                { headerName: "매장수수료", field: "", cellRenderer: (params) => 0, type: 'currencyMinusColorType' }, // 0 처리
-                { headerName: "중간관리수수료", field: "", cellRenderer: (params) => 0, type: 'currencyMinusColorType' }, // 0 처리
             ]
         },
-        { field: "sum_wonga", headerName: "원가", width: 80, type: 'currencyMinusColorType' },
-        { field: "sales_profit", headerName: "매출이익", type: 'currencyMinusColorType' }, // 매출이익 = 결제금액 - 원가 합계금액
-        { field: "profit_rate",	headerName: "이익율(%)", type:'percentType' }, // 매출이익 분의 매출액 = 이익율
         { headerName: "", field: "nvl", width: "auto" }
     ];
 

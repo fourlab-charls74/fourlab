@@ -29,7 +29,8 @@ class sal21Controller extends Controller
         $edate = $request->input('edate', date('Y-m-d'));
         $next_edate = date("Y-m-d", strtotime("+1 day", strtotime($edate)));
         $store_type = $request->input('store_type', '');
-        $store_cds = $request->input('store_no', []);
+        // $store_cds = $request->input('store_no', []);
+        $store_cd = Auth('head')->user()->store_cd;
         $close_yn = $request->input('close_yn', 'N');
         $prd_cds = $request->input('prd_cd', '');
         $prd_cd_range_text = $request->input("prd_cd_range", '');
@@ -56,16 +57,20 @@ class sal21Controller extends Controller
         }
 
         // store_where
-		foreach($store_cds as $key => $cd) {
-			if ($key === 0) {
-				$store_where .= "p.store_cd = '$cd'";
-			} else {
-				$store_where .= " or p.store_cd = '$cd'";
-			}
-		}
-		if (count($store_cds) < 1) {
-			$store_where = "1=1";
-		}
+		// foreach($store_cds as $key => $cd) {
+		// 	if ($key === 0) {
+		// 		$store_where .= "p.store_cd = '$cd'";
+		// 	} else {
+		// 		$store_where .= " or p.store_cd = '$cd'";
+		// 	}
+		// }
+
+		// if (count($store_cds) < 1) {
+		// 	$store_where = "1=1";
+		// }
+        
+        if ($store_cd != '') $store_where .= "p.store_cd = '$store_cd' ";
+
 
         // 상품옵션 범위검색
 		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
