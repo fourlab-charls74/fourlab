@@ -30,7 +30,11 @@ const TEST_USER_GROUP = HEAD;
 /** 온라인 배송처리 */
 class ord03Controller extends Controller
 {
-	public function index(Request $request) {
+	private $store_cd = 'L0025';
+	private $dlv_place_type = 'store';
+
+	public function index(Request $request) 
+	{
 
 		$user_group = TEST_USER_GROUP; // 추후 로직적용 필요
 
@@ -72,15 +76,18 @@ class ord03Controller extends Controller
 
 	public function search(Request $request)
 	{
+
 		$user_group = TEST_USER_GROUP; // 추후 로직적용 필요
 
 		$search_date_stat = $request->input('search_date_stat', 'receipt');
 		$sdate = $request->input('sdate', Carbon::now()->sub(3, 'day')->format("Y-m-d"));
 		$edate = $request->input('edate', Carbon::now()->format("Y-m-d"));
 		$rel_order = $request->input('rel_order', '');
-		$dlv_place_type = strtoupper($request->input('dlv_place_type', 'storage'));
+		// $dlv_place_type = strtoupper($request->input('dlv_place_type', 'storage'));
+		$dlv_place_type = strtoupper($this->dlv_place_type);
 		$storage_cd = $request->input('storage_cd', '');
-		$store_cd = $request->input('store_no', '');
+		// $store_cd = $request->input('store_no', '');
+		$store_cd = $this->store_cd;
 		$ord_no = $request->input('ord_no', '');
 		$ord_state = $request->input('ord_state', '20'); // 접수상태
 		$dlv_type = $request->input('dlv_type', ''); // 배송방식
@@ -310,10 +317,14 @@ class ord03Controller extends Controller
 		$dlv_locations = [];
 
 		if ($user_group === HEAD) {
+			// $dlv_locations_sql = "
+			// 	(select 'storage' as location_type, storage_cd as location_cd, storage_nm as location_nm, if(online_yn = 'Y', 0, 1) as seq from storage where online_yn = 'Y' or default_yn = 'Y')
+			// 	union all
+			// 	(select 'store' as location_type, store_cd as location_cd, store_nm as location_nm, 2 as seq from store where store_cd in (select code_id from code where code_kind_cd = 'ONLINE_ORDER_STORE'))
+			// 	order by seq, location_cd
+			// ";
 			$dlv_locations_sql = "
-				(select 'storage' as location_type, storage_cd as location_cd, storage_nm as location_nm, if(online_yn = 'Y', 0, 1) as seq from storage where online_yn = 'Y' or default_yn = 'Y')
-				union all
-				(select 'store' as location_type, store_cd as location_cd, store_nm as location_nm, 2 as seq from store where store_cd in (select code_id from code where code_kind_cd = 'ONLINE_ORDER_STORE'))
+				select 'store' as location_type, store_cd as location_cd, store_nm as location_nm, 2 as seq from store where store_cd in (select code_id from code where code_kind_cd = 'ONLINE_ORDER_STORE') and store_cd='$this->store_cd'
 				order by seq, location_cd
 			";
 			$dlv_locations = DB::select($dlv_locations_sql);

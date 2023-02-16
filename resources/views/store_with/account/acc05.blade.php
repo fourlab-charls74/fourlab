@@ -23,7 +23,7 @@
 
 			<div class="card-body">
 				<div class="row">
-					<div class="col-lg-4">
+					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="sdate">판매기간(판매연월)</label>
 							<div class="docs-datepicker flex_box">
@@ -39,7 +39,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4">
+					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="store_type">매장구분</label>
 							<div class="flex_box">
@@ -52,7 +52,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4">
+					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="store_kind">매장종류</label>
 							<div class="flex_box">
@@ -67,7 +67,7 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-lg-4">
+					<div class="col-lg-4 inner-td">
 						<div class="form-group">
                             <label for="store_cd">매장명</label>
 							<div class="form-inline inline_btn_box">
@@ -95,7 +95,7 @@
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
 				</div>
 				<div class="fr_box">
-					<a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataEdit();"><span class="fs-12">선택 매장 수정</span></a>
+					<a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return updateExtraData();"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 선택매장 자료저장</a>
 				</div>
 			</div>
 		</div>
@@ -119,35 +119,23 @@
 		{ headerName: "{{ $group_nm }}",
 			children: [
 				@foreach ($children as $child)
-					{ headerName: "{{ $child->code_val }}", field: "{{ $child->code_id }}_amt", type: 'currencyType', editable: true, width: 100, cellStyle: YELLOW },
+					{ headerName: "{{ $child->code_val }}", field: "{{ $child->code_id }}_amt", type: 'currencyType', width: 100, 
+						editable: "{{ $child->code_id }}" !== 'E3', cellStyle: "{{ $child->code_id }}" !== 'E3' ? YELLOW : {}
+					},
 					@if (in_array($child->code_id, ['P1', 'M3']))
-					{ headerName: "{{ $child->code_val }}(-VAT)", field: "{{ $child->code_id }}_novat", type: 'currencyType', width: 100,
-						cellRenderer: (params) => Math.round((params.data["{{ $child->code_id }}"] || 0) / 1.1),
+					{ headerName: "{{ $child->code_val }}(-VAT)", field: "{{ $child->code_id }}_novat", type: 'currencyType', width: 105,
+						cellRenderer: (params) => Math.round((params.data["{{ $child->code_id }}_amt"] || 0) / 1.1),
 					},
 					@endif
 				@endforeach
 				@if (!in_array($group_nm, ['마일리지', '기타운영경비']))
-				{ headerName: "소계", field: "{{ $group_nm }}_sum", type: 'currencyType', width: 100 },
+				{ headerName: "소계", field: "{{ str_split($children[0]->code_id ?? '')[0] }}_sum", type: 'currencyType', width: 100 },
 				@endif
 			]
         },
 		@if ($group_nm === '관리')
-		{ headerName: "부자재",
-			children: [
-				@foreach ($expandables as $exp)
-					{ headerName: "{{ $exp->prd_nm }}", field: "{{ $exp->prd_cd }}_amt", type: 'currencyType', editable: true, width: 100, cellStyle: YELLOW },
-				@endforeach
-				{ headerName: "소계", field: "expandables_sum", type: 'currencyType', width: 100 },
-			]
-        },
-		{ headerName: "사은품",
-			children: [
-				@foreach ($gifts as $gift)
-					{ headerName: "{{ $gift->prd_nm }}", field: "{{ $gift->prd_cd }}_amt", type: 'currencyType', editable: true, width: 100, cellStyle: YELLOW },
-				@endforeach
-				{ headerName: "소계", field: "gifts_sum", type: 'currencyType', width: 100 },
-			]
-        },
+		{ headerName: "부자재" },
+		{ headerName: "사은품" },
 		@endif
 		@endforeach
 		{ field: "total", headerName: "총합계", type: 'currencyType', width: 100 },
@@ -157,26 +145,55 @@
 <script type="text/javascript" charset="utf-8">
 	const pApp = new App('', { gridId: "#div-gd" });
 	let gx;
-	let current_Ym = "";
 
 	$(document).ready(function() {
 		pApp.ResizeGrid(275);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
-		gx = new HDGrid(gridDiv, columns);
+		gx = new HDGrid(gridDiv, columns, {
+			onCellValueChanged: (e) => {
+				if (e.oldValue !== e.newValue) {
+					const val = e.newValue;
+					if (isNaN(val) || val == '' || parseFloat(val) < 0) {
+						alert("숫자만 입력가능합니다.");
+						e.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+					} else {
+						const group_cd = e.column.colId.split("")[0];
+
+						// E1(온라인RT), E2(온라인반송)은 소계에 포함시키지 않습니다. (because, E3(온라인) = E1 - E2)
+						if (['E1', 'E2'].includes(e.column.colId.split("_")[0])) {
+							e.data['E3_amt'] = e.data['E1_amt'] - e.data['E2_amt'];
+						}
+
+						// 각 소계 계산
+						e.data[group_cd + "_sum"] 
+							= Object.keys(e.data).reduce((a,c) => (
+								(c.split("")[0] === group_cd && c.split("_").slice(-1)[0] === "amt" && !['E1', 'E2'].includes(c.split("_")[0])) 
+									? (e.data[c] * 1) : 0
+							) + a, 0);
+
+						// 총합계 계산
+						e.data.total = Object.keys(e.data).reduce((a,c) => (c.split("_").slice(-1)[0] === "sum" ? (e.data[c] * 1) : 0) + a, 0);
+
+						e.api.redrawRows({ rowNodes: [e.node] });
+						e.node.setSelected(true);
+						gx.setFocusedWorkingCell();
+					}
+				}
+			}
+		});
 		gx.gridOptions.defaultColDef = {
 			suppressMenu: true,
 			resizable: false,
 			sortable: true,
 		};
-		// gx.gridOptions.onCellValueChanged = params => evtAfterEdit(params);
+
 		Search();
 	});
 
 	function Search() {
 		let data = $('form[name="search"]').serialize();
 		gx.Request('/store/account/acc05/search', data, -1, (d) => {
-			current_Ym = (document.search.sdate.value).replace("-", "");
 			setColumns(d.head.gifts, d.head.expandables);
 		});
 	}
@@ -185,12 +202,12 @@
 		const cols = columns.reduce((a, c) => {
 			let col = {...c};
 			if(col.headerName === '부자재') {
-				col.children = expandables.map(exp => ({ headerName: exp.prd_nm, field: exp.prd_cd + "_amt", type: 'currencyType', editable: true, width: 100, cellStyle: YELLOW}))
-					.concat({ headerName: "소계", field: "expandables_sum", type: 'currencyType', width: 100 });
+				col.children = expandables.map(exp => ({ headerName: exp.prd_nm, field: exp.type + "_" + exp.prd_cd + "_amt", type: 'currencyType', editable: true, width: 100, cellStyle: YELLOW}))
+					.concat({ headerName: "소계", field: "S_sum", type: 'currencyType', width: 100 });
 			}
 			if(col.headerName === '사은품') {
-				col.children = gifts.map(gf => ({ headerName: gf.prd_nm, field: gf.prd_cd + "_amt", type: 'currencyType', editable: true, width: 100, cellStyle: YELLOW}))
-					.concat({ headerName: "소계", field: "gifts_sum", type: 'currencyType', width: 100 });
+				col.children = gifts.map(gf => ({ headerName: gf.prd_nm, field: gf.type + "_" + gf.prd_cd + "_amt", type: 'currencyType', editable: true, width: 100, cellStyle: YELLOW}))
+					.concat({ headerName: "소계", field: "G_sum", type: 'currencyType', width: 100 });
 			}
 			a.push(col);
 			return a;
@@ -200,82 +217,30 @@
 		gx.gridOptions.api.setColumnDefs(cols);
     }
 
-	////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////
+	// 선택매장 자료저장
+	function updateExtraData() {
+		let rows = gx.getSelectedRows();
+		if (rows.length < 1) return alert("자료저장할 매장을 선택해주세요.");
 
-	const sumChildren = (params, children) => {
-		const row = params.data;
-		let total_str = 0;
-		total_str = children.reduce((prev, curr) => {
-			let id = curr.code_id;
-			let value = row[`${id}_code`];
-			if (value === null) value = 0;
-			return prev += parseInt(value);
-		}, total_str)
-		return isNaN(total_str) ? 0 : total_str;
-	};
+		if (!confirm("선택매장의 자료를 저장하시겠습니까?")) return;
+		alert("다소 시간이 소요될 수 있습니다. 잠시만 기다려주세요.");
 
-	async function DataEdit() {
-		let arr = [];
-        let rows = gx.getSelectedRows();
-        for (let i=0; i < rows.length; i++) {
-            let row = rows[i];
-			let regExp = /.+(?=_code)/i;
-			
-			const code_ids = Object.keys(row)
-				.filter(key => key.match(regExp))
-				.map(key => key.split('_code')[0]);
-			const code_amts = code_ids.map(id => row[`${id}_code`] ? row[`${id}_code`] : 0);
-
-			arr.push({
-				codes: code_ids,
-				amts: code_amts,
-				store_cd: row.store_cd,
-				ymonth: row.ymonth ? row.ymonth : current_Ym
-			});
-        }
-		
-        try {
-            const response = await axios({ 
-                url: '/store/account/acc05/save',
-                method: 'post', 
-                data: { selected_data: arr } 
-            });
-            const { data } = response;
-            if (data?.code == 200) {
-				alert('저장되었습니다.');
+		axios({
+            url: '/store/account/acc05/save',
+            method: 'post',
+            data: { data: rows }
+        }).then((res) => {
+            if (res.data.code === "200") {
+                alert("자료가 정상적으로 저장되었습니다.");
                 Search();
             } else {
-                alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                alert("자료저장 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+                console.log(res);
             }
-        } catch (error) {
-            // console.log(error);
-        }
-    }
-
-	const evtAfterEdit = (params) => {
-		if (params.oldValue !== params.newValue) {
-			row = params.data;
-			const rowNode = params.node;
-			const column_name = params.column.colId;
-			const value = params.newValue;
-			if (isNaN(value) == true || value == "" || parseFloat(value) < 0) {
-				alert("숫자만 입력가능합니다.");
-				startEditingCell(params.rowIndex, column_name);
-			}
-			rowNode.setSelected(true);
-		}
-	};
-
-    const startEditingCell = (row_index, col_key) => {
-        gx.gridOptions.api.startEditingCell({ rowIndex: row_index, colKey: col_key });
-    };
-
+        }).catch((err) => {
+            alert("에러가 발생했습니다. 관리자에게 문의해주세요.");
+            console.log(err);
+        });
+	}
 </script>
 @stop

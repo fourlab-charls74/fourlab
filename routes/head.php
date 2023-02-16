@@ -31,7 +31,7 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
     Route::get('/sign-up', 'SignUpController@index');
     Route::post('/sign-up/store', 'SignUpController@store');
     Route::put('/sign-up/checkid/{id?}', 'SignUpController@checkid');
-    
+
 
     Route::get('/user', 'UserController@index');
     Route::post('/user/store', 'UserController@store');
@@ -373,8 +373,8 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::post('prd07/enroll2', 'prd07Controller@enroll2');
         Route::get('prd07/batch', 'prd07Controller@batch_show');
         Route::post('prd07/batch-import', 'prd07Controller@import_excel');
-        Route::post('prd07/batch-getproducts','prd07Controller@get_products'); 
-        Route::post('prd07/batch-products','prd07Controller@batch_products'); 
+        Route::post('prd07/batch-getproducts','prd07Controller@get_products');
+        Route::post('prd07/batch-products','prd07Controller@batch_products');
 
         Route::get('prd08', 'prd08Controller@index');
         Route::get('prd09', 'prd09Controller@index');
@@ -1198,5 +1198,13 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::get('cls02/show/{rg_no?}', 'cls02Controller@show');
         Route::put('cls02/chg-state', 'cls02Controller@state_update');
         Route::post('cls02/update', 'cls02Controller@update');
+
+        //트래킹 명단 관리
+        Route::get('cls03', 'cls03Controller@index');
+        Route::put('cls03', 'cls03Controller@change_state');
+        Route::get('cls03/search', 'cls03Controller@search');
+        Route::get('cls03/show/{order_no}', 'cls03Controller@show');
+        Route::get('cls03/show/{order_no}/{user_code}', 'cls03Controller@show_user');
+        Route::put('cls03/show/{order_no}/{user_code}', 'cls03Controller@show_update');
     });
 });

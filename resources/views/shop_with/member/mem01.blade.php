@@ -70,16 +70,6 @@
 				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="store_cd">매장명</label>
-							<div class="form-inline inline_btn_box">
-								<input type='hidden' id="store_nm" name="store_nm">
-								<select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select" multiple></select>
-								<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-							</div>
-						</div>
-					</div>
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
 							<label for="">휴대전화</label>
 							<div class="flax_box">
 								<input type="text" name="mobile" id="mobile" class="form-control form-control-sm search-enter">
