@@ -709,17 +709,31 @@ CREATE TABLE `store_account_etc` (
 
 -- 매장기타재반자료
 CREATE TABLE `store_account_extra` (
-	`idx` int(11) NOT NULL AUTO_INCREMENT COMMENT 'identify',
-	`store_cd` VARCHAR(30) NOT NULL DEFAULT '' COMMENT '매장코드',
+	`idx` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'identify',
 	`ymonth` VARCHAR(6) NOT NULL COMMENT '정산연월',
-	`type` VARCHAR(10) NOT NULL DEFAULT '' COMMENT 'code - G_ACC_EXTRA_TYPE',
-	`prd_cd` VARCHAR(50) DEFAULT NULL COMMENT '원부자재코드 (type이 ’S’ or ‘G’ 일 때, 해당 부자재 or 사은품의 원부자재코드)',
-	`extra_amt` INT(11) DEFAULT NULL COMMENT '기타재반자료액',
-	`rt` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '등록일시',
-	`ut` DATETIME DEFAULT NULL COMMENT '수정일시',
+	`store_cd` VARCHAR(30) NOT NULL COMMENT '매장코드',
+	`extra_amt` INT(11) DEFAULT 0 COMMENT '기타재반자료 총합계',
+	`admin_id` VARCHAR(30) DEFAULT NULL COMMENT '관리자아이디',
+	`rt` DATETIME DEFAULT NULL COMMENT '등록일자',
+	`ut` DATETIME DEFAULT NULL COMMENT '수정일자',
 	PRIMARY KEY (`idx`),
-	KEY `store_cd` (`store_cd`, `ymonth`, `type`)
+	KEY `ymonth` (`ymonth`, `store_cd`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='매장기타재반자료'
+
+-- 매장기타재반자료 내역
+CREATE TABLE `store_account_extra_list` (
+	`idx` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'identify',
+	`ext_idx` INT(11) NOT NULL COMMENT 'store_account_extra : idx',
+	`type` VARCHAR(10) NOT NULL COMMENT 'code : STORE_ACC_EXTRA_TYPE',
+	`prd_cd` VARCHAR(50) DEFAULT NULL COMMENT '원부자재코드 (type이 ’S’ or ‘G’ 일 때, 해당 사은품/소모품의 원부자재코드)',
+	`prd_nm` VARCHAR(100) DEFAULT NULL COMMENT '원부자재명 (type이 ’S’ or ‘G’ 일 때, 해당 사은품/소모품의 원부자재명)',
+	`extra_amt` INT(11) DEFAULT 0 COMMENT '기타재반자료금액',
+	`admin_id` VARCHAR(30) DEFAULT NULL COMMENT '관리자아이디',
+	`rt` DATETIME DEFAULT NULL COMMENT '등록일자',
+	`ut` DATETIME DEFAULT NULL COMMENT '수정일자',
+	PRIMARY KEY (`idx`),
+	KEY `ext_idx` (`ext_idx`, `type`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='매장기타재반자료 내역'
 
 -- 월별할인유형적용관리 - 판매유형별
 CREATE TABLE `sale_type_apply` (
