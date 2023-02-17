@@ -112,7 +112,6 @@
                                     <span class="text_line">/</span>
                                     <div class="form-inline-inner input_box" style="width:45%;">
                                         <select name="ord_field" class="form-control form-control-sm">
-                                            <option value="prd_cd_p">등록일(코드일련별)</option>
                                             <option value="goods_no">상품번호</option>
                                             <option value="prd_cd">상품코드</option>
                                         </select>
@@ -125,6 +124,22 @@
                                         <input type="radio" name="ord" id="sort_desc" value="desc" checked="">
                                         <input type="radio" name="ord" id="sort_asc" value="asc">
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4" style="display:none">
+                            <div class="form-group">
+                                <label for="good_types">검색일자</label>
+                                <div class="docs-datepicker flex_box">
+                                    <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ @$today }}" autocomplete="off">
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
+                                                <i class="fa fa-calendar" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="docs-datepicker-container"></div>
                                 </div>
                             </div>
                         </div>
@@ -192,9 +207,21 @@
     </style>
     <script language="javascript">
         const pinnedRowData = [{ goods_nm: ''}];
+        const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
+        const stock_render = (params) => {
+            if (params.value === undefined) return "";
+            if (params.value === null) params.value = 0;
+            if (params.data) {
+                return '<a href="#" onclick="return OpenStoreStockPopup(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + Comma(params.value) + '</a>';
+            } else if (params.node.aggData) {
+                return `<a href="#" onclick="return OpenStockPopup('${params.node.key}', '${$("[name=sdate]").val() || ''}');">${Comma(params.value)}</a>`;
+            } else {
+                return '';
+            }
+        };
+
         let columns = [
-            {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
-            {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"},
+            {field: "prd_cd", headerName: "상품코드", pinned: 'left', width:120, cellStyle: StyleLineHeight, checkboxSelection: true,
                 cellRenderer: function(params) {
                     if (params.node.rowPinned === 'top') return "합계";
                     if (params.value !== undefined) {
@@ -226,7 +253,7 @@
                     }
                 }
             },
-            {field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: StyleLineHeight, rowGroup: true, hide: true,
+            {field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: StyleLineHeight, rowGroup: true, hide: true, checkboxSelection: true,
                 cellRenderer: function (params) {
                     if(params.value === undefined) return "";
                     return `<a href="javascript:void(0);" onclick="return OpenStockPopup('${params.value}', '${$("[name=sdate]").val() || ''}');">${params.value}</a>`;
@@ -238,8 +265,8 @@
             {
                 headerName: '창고재고', // 대표창고의 재고를 조회
                 children: [
-                    {field: "storage_qty", headerName: "재고", type: 'currencyType'},
-                    {field: "storage_wqty", headerName: "보유재고", type: 'currencyType'},
+                    {field: "storage_qty", headerName: "재고", type: 'currencyType', aggFunc: sumValuesFunc, cellRenderer: stock_render,},
+                    {field: "storage_wqty", headerName: "보유재고", type: 'currencyType', aggFunc: sumValuesFunc, cellRenderer: stock_render,},
                 ]
             },
             {
@@ -253,6 +280,8 @@
                         type: "currencyType",
                         hide: true,
                         width: 50,
+                        aggFunc: sumValuesFunc,
+                        cellRenderer: stock_render,
                     },
                     {
                         field: 'store_wqty',
@@ -260,6 +289,9 @@
                         type: "currencyType",
                         hide: true,
                         width: 80,
+                        aggFunc: sumValuesFunc,
+                        cellRenderer: stock_render,
+
                     },
                     {
                         field: 'rel_qty',
@@ -280,7 +312,7 @@
         function setColumn(store) {
             if(!store) return;
 
-            columns[13].headerName = store.store_nm;
+            columns[12].headerName = store.store_nm;
             gx.gridOptions.api.setColumnDefs(columns);
 
             gx.gridOptions.columnApi.applyColumnState({
@@ -327,6 +359,8 @@
                 animateRows: true,
                 suppressDragLeaveHidesColumns: true,
                 suppressMakeColumnVisibleAfterUnGroup: true,
+                onSelectionChanged: setRowGroupExpanded,
+                groupSelectsChildren: true,
             });
             gx.gridOptions.defaultColDef = {
                 suppressMenu: true,
@@ -342,7 +376,7 @@
         });
 
         async function Search() {
-            await setColumn();
+            await setColumn2();
             if(!$("[name=store_no]").val()) return alert("요청매장을 선택 후 검색해주세요.");
             let data = $('form[name="search"]').serialize();
             data += "&ext_storage_qty=" + $("[name=ext_storage_qty]").is(":checked");
@@ -363,7 +397,7 @@
             });
         }
 
-        function setColumn() {
+        function setColumn2() {
             let ord_field = $("[name=ord_field]").val();
             if(ord_field === "prd_cd_p") {
                 let prd_columns = columns.map(c => c.field === "prd_cd_p" 
@@ -435,5 +469,16 @@
         function blank_goods_no() {
             alert('상품번호가 비어있는 상품입니다.');
         }
+
+        function OpenStockPopup(prd_cd_p, date, color = '', size = '') {
+            var url = `/shop/product/prd04/stock?prd_cd_p=${prd_cd_p}&date=${date}&color=${color}&size=${size}`;
+            var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1000,height=900");
+        }
+
+        function OpenStoreStockPopup(prd_cd, date) {
+            var url = `/shop/stock/stk01/${prd_cd}?date=${date}`;
+            var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1000,height=900");
+        }
+
     </script>
 @stop

@@ -18,6 +18,7 @@ class stk14Controller extends Controller
         //로그인한 아이디의 매칭된 매장을 불러옴
         $user_store	= Auth('head')->user()->store_cd;
 
+
 		$values = [
             'today'         => date("Y-m-d"),
             'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
@@ -113,7 +114,7 @@ class stk14Controller extends Controller
         $ord = $r['ord'] ?? 'desc';
         $ord_field = $r['ord_field'] ?? "g.goods_no";
         if($ord_field == 'goods_no') $ord_field = 'g.' . $ord_field;
-        else $ord_field =  $ord_field;
+        else $ord_field = 'psr.' . $ord_field;
         $orderby = sprintf("order by %s %s", $ord_field, $ord);
 
         // pagination

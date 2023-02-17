@@ -1,4 +1,4 @@
-@extends('store_with.layouts.layout')
+@extends('shop_with.layouts.layout')
 @section('content')
 <!-- 메인페이지 4분할 
     왼쪽 상단 - 일별 매출통계/매장별 매출통계의 차트를 탭으로 구성

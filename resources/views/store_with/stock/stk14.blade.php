@@ -128,6 +128,22 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-lg-4" style="display:none">
+                            <div class="form-group">
+                                <label for="good_types">검색일자</label>
+                                <div class="docs-datepicker flex_box">
+                                    <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ @$today }}" autocomplete="off">
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
+                                                <i class="fa fa-calendar" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="docs-datepicker-container"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -185,25 +201,73 @@
             </div>
         </div>
     </div>
+    <style>
+        .ag-row-level-1 {
+            background-color: #edf4fd !important;
+        }
+    </style>
     <script language="javascript">
+        const pinnedRowData = [{ goods_nm: ''}];
+        const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
+        const stock_render = (params) => {
+            if (params.value === undefined) return "";
+            if (params.value === null) params.value = 0;
+            if (params.data) {
+                return '<a href="#" onclick="return OpenStoreStockPopup(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + Comma(params.value) + '</a>';
+            } else if (params.node.aggData) {
+                return `<a href="#" onclick="return OpenStockPopup('${params.node.key}', '${$("[name=sdate]").val() || ''}');">${Comma(params.value)}</a>`;
+            } else {
+                return '';
+            }
+        };
+
         let columns = [
-            {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
-            {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
-            {field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"}},
+            {field: "prd_cd", headerName: "상품코드", pinned: 'left', width:150, cellStyle: StyleLineHeight, checkboxSelection: true,
+                cellRenderer: function(params) {
+                    if (params.node.rowPinned === 'top') return "합계";
+                    if (params.value !== undefined) {
+                        return `<a href="javascript:void(0);" onclick="return OpenStockPopup('${params.data.prd_cd_p}', '${$("[name=sdate]").val() || ''}', '${params.data.color}', '${params.data.size}');">${params.value}</a>`;
+                    }
+                }
+            },
+            {field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"}, aggFunc: "first"},
             {field: "opt_kind_nm", headerName: "품목", width: 60, cellStyle: {"text-align": "center"}},
             {field: "brand_nm", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
-            {field: "style_no",	headerName: "스타일넘버", width: 80, cellStyle: {"text-align": "center"}},
-            {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 250},
-            {field: "goods_nm_eng",	headerName: "상품명(영문)", type: 'HeadGoodsNameType', width: 250},
-            {field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: {"text-align": "center"}},
+            {field: "style_no",	headerName: "스타일넘버", width: 80, cellStyle: {"text-align": "center"}, aggFunc: "first"},
+            {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 250, aggFunc: "first",
+                cellRenderer: function (params) {
+                    if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
+                        return '<a href="javascript:void(0);" onclick="return blank_goods_no();">' + params.value + '</a>';
+                    } else {
+                        let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
+                        return '<a href="#" onclick="return openHeadProduct(\'' + goods_no + '\');">' + params.value + '</a>';
+                    }
+                }
+            },
+            {field: "goods_nm_eng",	headerName: "상품명(영문)", type: 'HeadGoodsNameType', width: 250, aggFunc: "first",
+                cellRenderer: function (params) {
+                    if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
+                        return '<a href="javascript:void(0);" onclick="return blank_goods_no();">' + params.value + '</a>';
+                    } else {
+                        let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
+                        return '<a href="#" onclick="return openHeadProduct(\'' + goods_no + '\');">' + params.value + '</a>';
+                    }
+                }
+            },
+            {field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: StyleLineHeight, rowGroup: true, hide: true, checkboxSelection: true,
+                cellRenderer: function (params) {
+                    if(params.value === undefined) return "";
+                    return `<a href="javascript:void(0);" onclick="return OpenStockPopup('${params.value}', '${$("[name=sdate]").val() || ''}');">${params.value}</a>`;
+                }
+            },
             {field: "color",	headerName: "컬러", width: 60, cellStyle: {"text-align": "center"}},
             {field: "size",	headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"}},
             {field: "goods_opt", headerName: "옵션", width: 200},
             {
                 headerName: '창고재고', // 대표창고의 재고를 조회
                 children: [
-                    {field: "storage_qty", headerName: "재고", type: 'currencyType'},
-                    {field: "storage_wqty", headerName: "보유재고", type: 'currencyType'},
+                    {field: "storage_qty", headerName: "재고", type: 'currencyType', aggFunc: sumValuesFunc, cellRenderer: stock_render,},
+                    {field: "storage_wqty", headerName: "보유재고", type: 'currencyType', aggFunc: sumValuesFunc, cellRenderer: stock_render,},
                 ]
             },
             {
@@ -217,6 +281,8 @@
                         type: "currencyType",
                         hide: true,
                         width: 50,
+                        aggFunc: sumValuesFunc,
+                        cellRenderer: stock_render,
                     },
                     {
                         field: 'store_wqty',
@@ -224,6 +290,9 @@
                         type: "currencyType",
                         hide: true,
                         width: 80,
+                        aggFunc: sumValuesFunc,
+                        cellRenderer: stock_render,
+
                     },
                     {
                         field: 'rel_qty',
@@ -244,7 +313,7 @@
         function setColumn(store) {
             if(!store) return;
 
-            columns[13].headerName = store.store_nm;
+            columns[12].headerName = store.store_nm;
             gx.gridOptions.api.setColumnDefs(columns);
 
             gx.gridOptions.columnApi.applyColumnState({
@@ -258,6 +327,15 @@
         }
     </script>
     <script type="text/javascript" charset="utf-8">
+        const basic_autoGroupColumnDef = (headerName, width = 150) => ({
+            headerName: headerName,
+            headerClass: 'bizest',
+            minWidth: width,
+            maxWidth: width,
+            cellRenderer: 'agGroupCellRenderer',
+            pinned: 'left'
+        });
+
         let gx;
         const pApp = new App('', { gridId: "#div-gd" });
 
@@ -274,7 +352,16 @@
                             gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
                         }
                     }
-                }
+                },
+                rollup: true,
+                autoGroupColumnDef: basic_autoGroupColumnDef('코드일련'),
+                groupDefaultExpanded: 0, // 0: close, 1: open
+                suppressAggFuncInHeader: true,
+                animateRows: true,
+                suppressDragLeaveHidesColumns: true,
+                suppressMakeColumnVisibleAfterUnGroup: true,
+                onSelectionChanged: setRowGroupExpanded,
+                groupSelectsChildren: true,
             });
             gx.gridOptions.defaultColDef = {
                 suppressMenu: true,
@@ -283,7 +370,8 @@
             };
         });
 
-        function Search() {
+        async function Search() {
+            await setColumn2();
             if(!$("[name=store_no]").val()) return alert("요청매장을 선택 후 검색해주세요.");
             let data = $('form[name="search"]').serialize();
             data += "&ext_storage_qty=" + $("[name=ext_storage_qty]").is(":checked");
@@ -302,6 +390,23 @@
             }).catch(function (err) {
                 console.log(err);
             });
+        }
+
+        function setColumn2() {
+            let ord_field = $("[name=ord_field]").val();
+            if(ord_field === "prd_cd_p") {
+                let prd_columns = columns.map(c => c.field === "prd_cd_p" 
+                    ? ({...c, rowGroup: true, hide: true, pinned: "left"}) 
+                    : c.type === "NumType" ? ({...c, hide: true})
+                    : c.field === "goods_no" ? ({...c, cellStyle: StyleLineHeight}) : c);
+                gx.gridOptions.api.setColumnDefs(prd_columns);
+            } else {
+                let prd_columns = columns.map(c => c.field === "prd_cd_p" 
+                    ? ({...c, rowGroup: false, hide: false, pinned: "auto"}) 
+                    : c.type === "NumType" ? ({...c, hide: false})
+                    : c.field === "goods_no" ? ({...c, cellStyle: StyleGoodsNo}) : c);
+                gx.gridOptions.api.setColumnDefs(prd_columns);
+            }
         }
 
         // 출고요청
@@ -355,5 +460,20 @@
         function openApi() {
 			document.getElementsByClassName('sch-prdcd-range')[0].click();
 		}
+
+        function blank_goods_no() {
+            alert('상품번호가 비어있는 상품입니다.');
+        }
+
+        function OpenStockPopup(prd_cd_p, date, color = '', size = '') {
+            var url = `/store/product/prd04/stock?prd_cd_p=${prd_cd_p}&date=${date}&color=${color}&size=${size}`;
+            var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1000,height=900");
+        }
+
+        function OpenStoreStockPopup(prd_cd, date) {
+            var url = `/store/stock/stk01/${prd_cd}?date=${date}`;
+            var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1000,height=900");
+        }
+
     </script>
 @stop

@@ -32,7 +32,7 @@
                                                 <td>
                                                     <div class="flax_box" name="sd" id="sd">
                                                         @if($msg_type == 'send')
-                                                            <span>{{@$first_receiver}}외 {{@$receiver_cnt-1}}개</span>
+                                                            <span>{{@$receiver_nm}}</span>
                                                         @else
                                                             <span>{{@$sender_nm}}</span>
                                                         @endif
