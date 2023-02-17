@@ -646,9 +646,9 @@ class prd12Controller extends Controller
                         $d_cat_cd = $folders[$i]->d_cat_cd;
 
                         $sql = "
-                            UPDATE category SET
+                            update category set
                                 d_cat_nm = :d_cat_nm, use_yn = :use_yn, upd_date = now()
-                            WHERE cat_type = 'PLAN' AND d_cat_cd = :d_cat_cd
+                            where cat_type = 'PLAN' and d_cat_cd = :d_cat_cd
                         ";
                         DB::update($sql, ['d_cat_nm' => $folders[$i]->d_cat_nm, 'use_yn' => $folders[$i]->use_yn, 'd_cat_cd' => $d_cat_cd]);
 
