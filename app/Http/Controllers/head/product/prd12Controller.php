@@ -617,12 +617,9 @@ class prd12Controller extends Controller
         ]);
     }
 
-    // 230214 ny - 폴더명, 사용여부 editable 수정 작업 중
     public function folder_save($code,Request $request) {
 
         $folders = json_decode($request->input('data'));
-        //dd
-        // dd($folders);
 
         try {
             DB::transaction(function () use (&$result, $code,$folders) {
@@ -636,32 +633,51 @@ class prd12Controller extends Controller
                 $cat_type = 'PLAN';
 
                 for($i=0;$i<count($folders);$i++){
-                    $d_cat_cd = DB::table('category')
-                        ->where('cat_type','=',$cat_type)
-                        ->where('p_d_cat_cd','=',$p_d_cat_cd)
-                        ->select(DB::raw('ifnull(max(right(d_cat_cd,3)),0)+1 as next_d_cat_cd'))
-                        ->value('next_d_cat_cd');
 
-                    $d_cat_cd = sprintf("%03d%03d", $p_d_cat_cd, $d_cat_cd);
+                    //존재여부 확인
+                    $sql = "
+                        select exists 
+                            (select * from category where (d_cat_cd = :d_cat_cd)) as 'exists'
+                    ";
+                    $result = DB::selectOne($sql, ["d_cat_cd" => $folders[$i]->d_cat_cd])->exists;
 
-                    $category = [
-                        'cat_type' => $cat_type,
-                        'd_cat_cd' => $d_cat_cd,
-                        'd_cat_nm' => $folders[$i]->d_cat_nm,
-                        'p_d_cat_cd' => $p_d_cat_cd,
-                        'use_yn' => 'Y',
-                        // 'use_yn' => $folders[$i]->use_yn,
-                        'admin_id' => $id,
-                        'admin_nm' => $name,
-                        'regi_date' => DB::raw('now()'),
-                        'upd_date' => DB::raw('now()'),
-                        'seq' => 0,
-                    ];
-                    DB::table('category')->insert($category);
+                        //기존데이터 update
+                    if ($result != 0) {
+                        $d_cat_cd = $folders[$i]->d_cat_cd;
 
-                    // 230214 ny - 폴더명, 사용여부 editable 수정 작업 중
-                    // $where = [ 'd_cat_cd' => $d_cat_cd ];
-                    // DB::table('category')->updateOrInsert($where, $category);
+                        $sql = "
+                            UPDATE category SET
+                                d_cat_nm = :d_cat_nm, use_yn = :use_yn, upd_date = now()
+                            WHERE cat_type = 'PLAN' AND d_cat_cd = :d_cat_cd
+                        ";
+                        DB::update($sql, ['d_cat_nm' => $folders[$i]->d_cat_nm, 'use_yn' => $folders[$i]->use_yn, 'd_cat_cd' => $d_cat_cd]);
+
+                        //신규데이터 insert
+                    } else if ( $folders[$i]->d_cat_cd == null ) {
+                        $d_cat_cd = DB::table('category')
+                            ->where('cat_type','=',$cat_type)
+                            ->where('p_d_cat_cd','=',$p_d_cat_cd)
+                            ->select(DB::raw('ifnull(max(right(d_cat_cd,3)),0)+1 as next_d_cat_cd'))
+                            ->value('next_d_cat_cd');
+
+                        $d_cat_cd = sprintf("%03d%03d", $p_d_cat_cd, $d_cat_cd);
+
+                        $category = [
+                            'cat_type' => $cat_type,
+                            'd_cat_cd' => $d_cat_cd,
+                            'd_cat_nm' => $folders[$i]->d_cat_nm,
+                            'p_d_cat_cd' => $p_d_cat_cd,
+                            // 'use_yn' => 'Y',
+                            'use_yn' => $folders[$i]->use_yn,
+                            'admin_id' => $id,
+                            'admin_nm' => $name,
+                            'regi_date' => DB::raw('now()'),
+                            'upd_date' => DB::raw('now()'),
+                            'seq' => 0,
+                        ];
+
+                        DB::table('category')->insert($category);
+                    }
                 }
             });
             $code = 200;

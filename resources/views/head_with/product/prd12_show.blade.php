@@ -460,6 +460,9 @@
                     // } else {
                     //     return params.value;
                     // }
+                    addEventListener('click', function(event) {
+                        params.node.data.editable = 'Y';
+                    });
                     return `<a href="javascript:void(0);" onclick="return SearchCategoryGoods('${params.data.d_cat_cd}');">${params.value}</a>`;
                 }
             },
