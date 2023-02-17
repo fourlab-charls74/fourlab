@@ -17,7 +17,7 @@
             </div>
         </div>
         <div class="d-flex">
-            <a href="javascript:void(0)" onclick="Save()" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
+            <a href="javascript:void(0)" onclick="return Save();" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
             <a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i> 닫기</a>
         </div>
     </div>
@@ -211,6 +211,37 @@
 		gx.gridOptions.api.setColumnDefs(cols);
     }
 
+    // 일괄입력정보 저장
+    function Save() {
+        let rows = gx.getRows();
+        if (rows.length < 1) return alert('일괄등록할 자료를 한 건 이상 등록해주세요.');
+
+        const sdate = $("#sdate").val();
+        if (!confirm(`[${sdate}] 기타재반자료를 일괄등록하시겠습니까?`)) return;
+        
+        axios({
+            url: '/store/account/acc05/save',
+            method: 'post',
+            data: {
+                type: 'B',
+                sdate: sdate,
+                data: rows,
+            },
+        }).then((res) => {
+            if (res.data.code === "200") {
+                alert("자료가 정상적으로 저장되었습니다.");
+                opener.Search(sdate);
+                self.close();
+            } else {
+                alert("자료저장 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+                console.log(res);
+            }
+        }).catch((err) => {
+            alert("에러가 발생했습니다. 관리자에게 문의해주세요.");
+            console.log(err);
+        });
+    }
+
     /** 
      * 엑셀 관련 함수
      * - read the raw data and convert it to a XLSX workbook
@@ -283,7 +314,7 @@
 			let row = {};
 			Object.keys(excel_columns).forEach((column) => {
                 let item = worksheet[column + rowIndex];
-				if (item !== undefined && item.v) {
+				if (item !== undefined) {
                     if (excel_columns[column] === 'G') {
                         p = g_types.filter(g => g.colId === column)?.[0];
                         if (p) row[`G_${p.prd_cd || p.colId}_amt`] = item.v;
@@ -402,46 +433,6 @@
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-    // 실사 등록
-    function Save() {
-        let rows = gx.getRows();
-       
-        let sc_date = basic_info.sc_date;
-        let store_cd = basic_info.store?.store_cd;
-        let md_id = basic_info.md?.id;
-        let comment = basic_info.comment;
-
-        if(!store_cd) return alert("매장정보가 올바르지 않습니다.");
-        if(rows.length < 1) return alert("실사등록할 상품을 선택해주세요.");
-        if(!md_id) return alert("담당자정보가 올바르지 않습니다.");
-
-        if(!confirm("등록하시겠습니까?")) return;
-
-        axios({
-            url: '/store/stock/stk26/save',
-            method: 'put',
-            data: {
-                sc_type: "B",
-                sc_date,
-                store_cd,
-                md_id,
-                comment,
-                products: rows.map(r => ({ prd_cd: r.prd_cd, price: r.price, qty: r.qty, store_qty: r.store_wqty })),
-            },
-        }).then(function (res) {
-            if(res.data.code === '200') {
-                alert("실사등록이 성공적으로 완료되었습니다.");
-                opener.Search();
-                window.close();
-            } else {
-                console.log(res.data);
-                alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-            }
-        }).catch(function (err) {
-            console.log(err);
-        });
-    }
 
     const checkIsEditable = (params) => {
         return params.data.hasOwnProperty('isEditable') && params.data.isEditable ? true : false;

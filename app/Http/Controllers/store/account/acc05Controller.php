@@ -115,6 +115,8 @@ class acc05Controller extends Controller
 
 	public function save(Request $request)
 	{
+        $save_type = $request->input('type', 'G'); // G: 일반, B: 일괄
+        $sdate = $request->input('sdate', '');
 		$data = $request->input('data');
 
         $code = "200";
