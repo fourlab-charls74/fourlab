@@ -383,8 +383,6 @@ class ord01Controller extends Controller
                 a.ord_date,
                 a.sale_kind,
                 sale_kind.code_val as sale_kind_nm,
-                st.amt_kind,
-                round((1 - (a.price * (1 - if(st.amt_kind = 'per', st.sale_per, 0) / 100)) / a.goods_sh) * 100) as dc_rate,
                 a.pr_code,
                 pr_code.code_val as pr_code_nm,
                 a.pay_date,
@@ -439,7 +437,9 @@ class ord01Controller extends Controller
                     pay.pay_date,
                     o.dlv_end_date,
                     c.last_up_date,
-                    (select count(*) from order_opt where ord_no = o.ord_no and ord_opt_no != o.ord_opt_no and (ord_state > 10 or clm_state > 0)) as ord_opt_cnt
+                    (select count(*) from order_opt where ord_no = o.ord_no and ord_opt_no != o.ord_opt_no and (ord_state > 10 or clm_state > 0)) as ord_opt_cnt,
+                    st.amt_kind,
+                    round((1 - (o.price * (1 - if(st.amt_kind = 'per', st.sale_per, 0) / 100)) / g.goods_sh) * 100) as dc_rate
                 from order_opt o
                     left outer join product_code pc on pc.prd_cd = o.prd_cd
                     inner join order_mst om on o.ord_no = om.ord_no
@@ -447,6 +447,7 @@ class ord01Controller extends Controller
                     left outer join payment pay on om.ord_no = pay.ord_no
                     left outer join claim c on c.ord_opt_no = o.ord_opt_no
                     left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
+                    left outer join sale_type st on st.sale_kind = o.sale_kind and st.use_yn = 'Y'
                 where 1=1 $where
                 $orderby
                 $limit
@@ -462,7 +463,6 @@ class ord01Controller extends Controller
                 left outer join store s on s.store_cd = a.store_cd
                 left outer join code sale_kind on (sale_kind.code_id = a.sale_kind and sale_kind.code_kind_cd = 'SALE_KIND')
                 left outer join code pr_code on (pr_code.code_id = a.pr_code and pr_code.code_kind_cd = 'PR_CODE')
-                left outer join sale_type st on st.sale_kind = a.sale_kind and st.use_yn = 'Y'
         ";
         // $result = DB::select($sql);
 
