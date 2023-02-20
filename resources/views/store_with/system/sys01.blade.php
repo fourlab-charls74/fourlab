@@ -69,20 +69,9 @@
                             </div>
 						</div>
                     </div>
-                    <!-- <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-							<label for="store_cd">매장코드</label>
-                            <div class="form-inline">
-                                <input type="text" id="store_cd" name="store_cd" class="form-control form-control-sm w-100 search-enter" />
-                            </div>
-						</div>
-                    </div> -->
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
 							<label for="store_nm">매장명</label>
-                            <!-- <div class="form-inline">
-                                <input type="text" id="store_nm" name="store_nm" class="form-control form-control-sm w-100 search-enter" />
-                            </div> -->
                             <div class="form-inline inline_btn_box">
 								<input type='hidden' id="store_nm" name="store_nm">
 								<select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select" multiple></select>
