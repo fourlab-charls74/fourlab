@@ -109,6 +109,8 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-lg-4 inner-td" style="display:none" >
                         <div class="form-group">
                             <label>매장명</label>
@@ -177,6 +179,8 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-lg-4 inner-td" style="margin-top: 20px;">
                         <div class="form-group">
                             <label for="formrow-inputState">결제방법</label>
@@ -262,7 +266,7 @@
         </div>
     </div>
 </div>
-<div class="card shadow mb-4">
+<div class="card shadow mb-0">
     <div class="card-body">
         <div class="card-title">
             <h6 class="m-0 font-weight-bold text-primary fas fa-question-circle"> Help</h6>
@@ -860,5 +864,4 @@
 
     }
 </script>
-
 @stop
