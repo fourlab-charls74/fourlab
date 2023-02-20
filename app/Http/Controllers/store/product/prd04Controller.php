@@ -130,7 +130,7 @@ class prd04Controller extends Controller
 			$store_qty_sql	= "sum(pss.qty)";
 		}
 
-		if($ext_store_storage_qty == 'Y') {
+		if($ext_store_storage_qty == 'true') {
 			$having .= "having (wqty) > 0 or (hqty - hwqty) > 0";
 		}
 

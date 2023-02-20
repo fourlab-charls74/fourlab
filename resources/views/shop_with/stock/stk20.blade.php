@@ -211,44 +211,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="name">공급업체</label>
-                            <div class="form-inline inline_select_box">
-                                <div class="form-inline-inner input-box w-100">
-                                    <div class="form-inline inline_btn_box">
-                                        <input type="hidden" id="com_cd" name="com_cd" />
-                                        <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row search-area-ext d-none">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="item">품목</label>
-                            <div class="flax_box">
-                                <select name="item" class="form-control form-control-sm">
-                                    <option value="">전체</option>
-                                    @foreach ($items as $item)
-                                        <option value="{{ $item->cd }}">{{ $item->val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="brand_cd">브랜드</label>
-                            <div class="form-inline inline_btn_box">
-                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 		</div>
@@ -269,7 +231,7 @@
 				<div class="d-flex justify-content-between">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
                     <div class="d-flex">
-                        <!-- <div class="d-flex mr-2 mb-1 mb-lg-0">
+                        <div class="d-flex mr-2 mb-1 mb-lg-0">
                             <span class="mr-1">출고예정일</span>
                             <div class="docs-datepicker form-inline-inner input_box" style="width:130px;display:inline;">
                                 <div class="input-group">
@@ -282,12 +244,12 @@
                                 </div>
                                 <div class="docs-datepicker-container"></div>
                             </div>
-                        </div> -->
-                        <!-- <a href="javascript:void(0);" onclick="receipt()" class="btn btn-sm btn-primary shadow-sm">접수</a>
+                        </div>
+                        <a href="javascript:void(0);" onclick="receipt()" class="btn btn-sm btn-primary shadow-sm">접수</a>
                         <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
-                        <a href="javascript:void(0);" onclick="release()" class="btn btn-sm btn-primary shadow-sm mr-1">처리</a> -->
+                        <a href="javascript:void(0);" onclick="release()" class="btn btn-sm btn-primary shadow-sm mr-1">처리</a>
                         <a href="javascript:void(0);" onclick="receive()" class="btn btn-sm btn-primary shadow-sm mr-1">완료</a>
-                        <!-- <a href="javascript:void(0);" onclick="reject()" class="btn btn-sm btn-primary shadow-sm">거부</a> -->
+                        <a href="javascript:void(0);" onclick="reject()" class="btn btn-sm btn-primary shadow-sm">거부</a>
                         <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
                         <a href="javascript:void(0);" onclick="remove()" class="btn btn-sm btn-outline-primary shadow-sm">삭제</a>
                     </div>
@@ -437,6 +399,12 @@
     // 접수 (10 -> 20)
     function receipt() {
         let rows = gx.getSelectedRows();
+        let user_store = '{{$user_store}}';
+        let user_store_nm = '{{$store_nm}}';
+
+        for(let i = 0; i < rows.length; i++){
+            if(rows[i].dep_store_cd != user_store) return alert('보내는 매장이 ' + user_store_nm + '인 매장만 접수가 가능합니다.');
+        }
         if(rows.length < 1) return alert("접수처리할 항목을 선택해주세요.");
         if(rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 접수처리 가능합니다.");
         if(!confirm("선택한 항목을 접수처리하시겠습니까?")) return;
@@ -465,6 +433,12 @@
     // 출고 (20 -> 30)
     function release() {
         let rows = gx.getSelectedRows();
+        let user_store = '{{$user_store}}';
+        let user_store_nm = '{{$store_nm}}';
+
+        for(let i = 0; i < rows.length; i++){
+            if(rows[i].dep_store_cd != user_store) return alert('보내는 매장이 ' + user_store_nm + '인 매장만 출고가 가능합니다.')
+        }
         if(rows.length < 1) return alert("출고처리할 항목을 선택해주세요.");
         if(rows.filter(r => r.state !== 20).length > 0) return alert("'접수'상태의 항목만 출고처리 가능합니다.");
         if(!confirm("선택한 항목을 출고처리하시겠습니까?")) return;
@@ -489,6 +463,12 @@
     // 매장입고 (30 -> 40)
     function receive() {
         let rows = gx.getSelectedRows();
+        let user_store = '{{$user_store}}';
+        let user_store_nm = '{{$store_nm}}';
+
+        for(let i = 0; i < rows.length; i++){
+            if(rows[i].store_cd != user_store) return alert('받는 매장이 ' + user_store_nm + '인 매장만 매장입고처리가 가능합니다.')
+        }
         if(rows.length < 1) return alert("매장입고처리할 항목을 선택해주세요.");
         if(rows.filter(r => r.state !== 30).length > 0) return alert("'출고'상태의 항목만 매장입고처리 가능합니다.");
         if(!confirm("선택한 항목을 매장입고처리하시겠습니까?")) return;
@@ -513,6 +493,12 @@
     // 거부 (10 -> -10)
     function reject() {
         let rows = gx.getSelectedRows();
+        let user_store = '{{$user_store}}';
+        let user_store_nm = '{{$store_nm}}';
+
+        for(let i = 0; i < rows.length; i++){
+            if(rows[i].dep_store_cd != user_store) return alert('보내는 매장이 ' + user_store_nm + '인 매장만 거부가 가능합니다.');
+        }
         if(rows.length < 1) return alert("거부처리할 항목을 선택해주세요.");
         if(rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 거부처리 가능합니다.");
         if(rows.filter(r => !r.rec_comment).length > 0) return alert("'접수메모'에 거부사유를 반드시 입력해주세요.");
@@ -538,8 +524,13 @@
     // 삭제 (RT 삭제)
     function remove(idx) {
         let rows;
+        let user_store = '{{$user_store}}';
+        let user_store_nm = '{{$store_nm}}';
+
+        
         if(!idx) {
             rows = gx.getSelectedRows();
+           
             if(rows.length < 1) {
                 return alert("삭제할 RT를 선택해주세요.");
             }
@@ -548,6 +539,9 @@
             }
         } else{
             rows = [{idx}];
+        }
+        for(let i = 0; i < rows.length; i++){
+            if(rows[i].store_cd != user_store) return alert('받는 매장이 ' + user_store_nm + '인 매장만 삭제가 가능합니다.')
         }
         if(!confirm("선택한 항목을 삭제하시겠습니까?")) return;
 

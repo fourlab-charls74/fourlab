@@ -8,6 +8,7 @@ use App\Components\SLib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Exception;
 
@@ -23,6 +24,7 @@ class stk22Controller extends Controller
         $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')->orderByDesc('default_yn')->get();
 
 		$values = [
+            'today'         => date("Y-m-d"),
             'rel_orders'     => SLib::getCodes("REL_ORDER"), // 출고차수
             'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
             'style_no'		=> "", // 스타일넘버
@@ -88,12 +90,12 @@ class stk22Controller extends Controller
             }
         }
 
-        if($r['com_cd'] != null) 
-            $where .= " and g.com_id = '" . $r['com_cd'] . "'";
-        if($r['item'] != null) 
-            $where .= " and g.opt_kind_cd = '" . $r['item'] . "'";
-        if(isset($r['brand_cd']))
-            $where .= " and g.brand = '" . $r['brand_cd'] . "'";
+        // if($r['com_cd'] != null) 
+        //     $where .= " and g.com_id = '" . $r['com_cd'] . "'";
+        // if($r['item'] != null) 
+        //     $where .= " and g.opt_kind_cd = '" . $r['item'] . "'";
+        // if(isset($r['brand_cd']))
+        //     $where .= " and g.brand = '" . $r['brand_cd'] . "'";
         if($r['goods_nm'] != null) 
             $where .= " and g.goods_nm like '%" . $r['goods_nm'] . "%'";
         if($r['goods_nm_eng'] != null) 
@@ -174,6 +176,19 @@ class stk22Controller extends Controller
     // 매장/창고별 상품재고 검색
     public function search_stock(Request $request)
     {
+
+        //로그인한 아이디의 매칭된 매장을 불러옴
+		$user_store	= Auth('head')->user()->store_cd;
+
+        $sql = "
+            select
+                store_nm
+            from store
+            where store_cd = '$user_store'
+        ";
+
+        $store_nm = DB::selectOne($sql);
+
 		$code = 200;
 		$prd_cd = $request->input("prd_cd", '');
         $store_type = $request->input("store_type", '');
@@ -188,11 +203,14 @@ class stk22Controller extends Controller
                 ifnull(ps.qty, 0) as qty, 
                 ifnull(ps.wqty, 0) as wqty,
                 ifnull(pss.qty, 0) as storage_qty, 
-                ifnull(pss.wqty, 0) as storage_wqty
+                ifnull(pss.wqty, 0) as storage_wqty,
+                '$user_store' as store_cd,
+                '$store_nm->store_nm' as store_nm
+
             from store s
                 left outer join product_stock_store ps on s.store_cd = ps.store_cd and ps.prd_cd = '$prd_cd'
                 left outer join product_stock_storage pss on pss.storage_cd = (select storage_cd from storage where default_yn = 'Y') and pss.prd_cd = '$prd_cd'
-            where s.use_yn = 'Y' $where
+            where s.use_yn = 'Y' and s.store_type = '08' and s.rt_yn = 'Y'
 		";
 
 		$result = DB::select($sql);

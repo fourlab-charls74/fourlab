@@ -152,8 +152,10 @@
         columns = [
             {
                 headerName: '',
-                headerCheckboxSelection: true,
-                checkboxSelection: true,
+                checkboxSelection: (params) => {
+                    const check_yn = params.data.check_yn;
+                    return check_yn != 'Y'? true : false;
+                },
                 width:28,
                 pinned:'left'
             },
@@ -168,7 +170,10 @@
                 },
             },
             {headerName: "보낸 날짜", field: "rt", width:120},
-            //{headerName: "확인여부", field: "check_yn", width: 150, cellClass: 'hd-grid-code'},
+            {headerName: "확인여부", field: "check_yn", width: 70, cellClass: 'hd-grid-code',
+                cellStyle: (params) => ({color: params.data.check_yn == 'Y' ? 'blue' : 'red'})
+            },
+            {headerName: "확인날짜", field: "check_date", width:130, cellClass: 'hd-grid-code'},    
             {headerName: "알림 번호", field: "msg_cd", hide: true},    
             {width: 'auto'}
         ];                              
@@ -177,8 +182,10 @@
         columns = [
             {
                 headerName: '',
-                headerCheckboxSelection: true,
-                checkboxSelection: true,
+                checkboxSelection: (params) => {
+                    const check_yn = params.data.check_yn;
+                    return check_yn != 'Y'? true : false;
+                },
                 width:28,
                 pinned:'left'
             },
@@ -192,7 +199,7 @@
             },
             {headerName: "받은 날짜", field: "rt", width: 110, cellClass: 'hd-grid-code'},
             {headerName: "확인여부", field: "check_yn", width: 110, cellClass: 'hd-grid-code',
-                cellStyle: (params) => ({color: params.data.check_yn == 'Y' ? 'green' : 'none'})
+                cellStyle: (params) => ({color: params.data.check_yn == 'Y' ? 'blue' : 'red'})
             },
             {headerName: "알림 번호", field: "msg_cd", hide: true},        
             {width: 'auto'}
@@ -250,7 +257,7 @@
         let msg_cds = msg_cd.split(',');
 
         if (rows.length == 0) return alert('적어도 하나 이상 선택해주세요.');
-
+ 
         $.ajax({
             method: 'put',
             url: '/shop/stock/stk32/msg_read',
@@ -262,6 +269,7 @@
                 } else {
                     alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
                 }
+                Search();
             },
             error: function(e) {
                     // console.log(e.responseText)

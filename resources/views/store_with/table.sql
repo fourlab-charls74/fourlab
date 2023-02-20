@@ -792,6 +792,7 @@ CREATE TABLE `msg_store` (
 	`reservation_yn` char(1) NOT NULL COMMENT '예약발송여부',
 	`reservation_date` varchar(20) DEFAULT NULL COMMENT '예약발송일 (0000-00-00 00:00:00)',
 	`content` mediumtext DEFAULT NULL COMMENT '알림 내용',
+	`del_yn` char(1) DEFAULT 'N' NOT NULL COMMENT '알림 삭제',
 	`rt` datetime DEFAULT NULL COMMENT '등록일자 (발신일자)',
 	PRIMARY KEY (`msg_cd`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

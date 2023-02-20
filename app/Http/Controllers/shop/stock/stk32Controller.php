@@ -8,6 +8,7 @@ use App\Components\SLib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Exception;
 
@@ -48,8 +49,12 @@ class stk32Controller extends Controller
      
 
         // 로그인한 계정 // 추후 수정
-        $admin_type = 'H';
-        $admin_cd = 'HEAD';
+        $user_store = Auth('head')->user()->store_cd;
+        if ($user_store == 'L0025') {
+            $admin_type = 'H';
+        } else {
+            $admin_type = 'S';
+        }
 
         //ordreby
         $ord = $r['ord'] ?? 'desc';
@@ -71,11 +76,13 @@ class stk32Controller extends Controller
                     m.msg_cd
                     , msd.receiver_type
                     , group_concat(msd.receiver_cd separator ', ') as receiver_cd
-                    , group_concat(if(msd.receiver_type = 'S', s.store_nm, '본사') separator ', ') as receiver_nm
+                    , s.store_nm as receiver_nm
                     -- , if(msd.receiver_type = 'S', s.store_nm, '본사') as receiver
                     -- , count(msd.receiver_cd) as receiver_cnt
                     , s.store_nm
                     , msd.receiver_type
+                    , msd.check_yn
+                    , msd.check_date
                     , m.reservation_yn
                     , m.reservation_date
                     , m.content
@@ -83,8 +90,8 @@ class stk32Controller extends Controller
                 from msg_store m 
                     left outer join msg_store_detail msd on msd.msg_cd = m.msg_cd
                     left outer join store s on s.store_cd = msd.receiver_cd
-                where m.sender_type = '$admin_type' and m.sender_cd = '$admin_cd'
-                and m.rt >= :sdate and m.rt < date_add(:edate, interval 1 day)
+                where m.sender_type = '$admin_type' and m.sender_cd = '$user_store'
+                and m.rt >= :sdate and m.rt < date_add(:edate, interval 1 day) and m.del_yn = 'N'
                 $where
                 group by m.rt
                 $orderby
@@ -95,7 +102,7 @@ class stk32Controller extends Controller
                 select 
                     m.msg_cd,
                     m.sender_cd,
-                    if(m.sender_type = 'S', s.store_nm, '본사') as sender_nm,
+                    s.store_nm as sender_nm,
                     s.phone as mobile,
                     m.content,
                     md.rt,
@@ -103,8 +110,8 @@ class stk32Controller extends Controller
                 from msg_store_detail md
                     left outer join msg_store m on m.msg_cd = md.msg_cd
                     left outer join store s on s.store_cd = m.sender_cd
-                where md.receiver_type = '$admin_type' and md.receiver_cd = '$admin_cd'
-                and m.rt >= :sdate and m.rt < date_add(:edate, interval 1 day)
+                where md.receiver_type = '$admin_type' and md.receiver_cd = '$user_store'
+                and m.rt >= :sdate and m.rt < date_add(:edate, interval 1 day) and m.del_yn = 'N'
                 $where
                 group by md.msg_cd
             ";
@@ -162,7 +169,7 @@ class stk32Controller extends Controller
                     '$div_store' as store,
                     store_type
                 from store
-                where 1=1 $where
+                where 1=1 and store_type = '08' $where
                 ";
        
         $result = DB::select($sql);
@@ -177,42 +184,6 @@ class stk32Controller extends Controller
 
     }
 
-
-    public function search_groupStore(Request $request)
-    {
-        $group_nm = $request->input('group_nm');
-        $div_store = $request->input('div_store');
-
-       
-        $where = "";
-        if($group_nm != "") $where .= " and mg.group_nm like '%" . $group_nm . "%'";
-
-            $sql = 
-                "
-                select 
-                    mg.group_nm,
-                    mg.group_cd,
-                    group_concat(s.store_nm) as group_store_nm,
-                    '$div_store' as store
-                from msg_group mg
-                    left outer join msg_group_store mgs on mgs.group_cd = mg.group_cd
-                    left outer join store s on s.store_cd = mgs.store_cd
-                where 1=1 $where
-                group by mg.group_cd
-            ";
-
-        $result = DB::select($sql);
-
-        return response()->json([
-            "code" => 200,
-            "head" => array(
-				"total" => count($result)
-            ),
-            "body" => $result
-        ]);
-
-    }
-
     public function sendMsg(Request $request)
     {
         
@@ -220,10 +191,6 @@ class stk32Controller extends Controller
         $sdate	= $mutable->sub(1, 'month')->format('Y-m-d');
         $store_cds = $request->input('store_cd','');
         $store_cd = explode(',',$store_cds);
-        $group_cds = $request->input('group_cd', '');
-        $group_cd = explode(',',$group_cds);
-        $group_nms = $request->input('group_nm', '');
-        $group_nm = explode(',',$group_nms);
         $check = $request->input('check');
         
         $stores = [];
@@ -242,40 +209,7 @@ class stk32Controller extends Controller
             }
         }
 
-        $groups = [];
-        foreach ($group_cd as $gc) {
-            $group_cd_data = 
-                "
-                select
-                    mg.group_cd,
-                    group_concat(mgs.store_cd separator ', ') as stores
-                from msg_group mg
-                left outer join msg_group_store mgs ON mgs.group_cd = mg.group_cd
-                where mgs.group_cd = '$gc'
-            ";
-            $sc2 = DB::selectOne($group_cd_data);
-            if ($sc2 != null) {
-                array_push($groups, $sc2);
-            }
-        }
-
-        $groupName = [];
-        foreach ($group_nm as $gn) {
-            $group_nm_data = 
-                "
-                select 
-                    group_nm,
-                    group_cd
-                    
-                from msg_group
-                where group_nm = '$gn'
-
-            ";
-            $sc3 = DB::selectOne($group_nm_data);
-            if ($sc3 != null) {
-                array_push($groupName, $sc3);
-            }
-        }
+       
           
         $values = [
             'store_types' => SLib::getCodes("STORE_TYPE"),
@@ -283,10 +217,6 @@ class stk32Controller extends Controller
             'edate' => date("Y-m-d"),
             'stores' => $stores,
             'store_cds' => $store_cds,
-            'group_cds' => $group_cds,
-            'group_nms' => $group_nms,
-            'groups' => $groups,
-            'groupName' => $groupName,
             'check' => $check
 
         ];
@@ -303,9 +233,12 @@ class stk32Controller extends Controller
         $msg_cd = $request->input('msg_cd');
         $msg_type = $request->input('msg_type');
         // 로그인한 계정 // 추후 수정
-        $admin_type = 'H';
-        $admin_cd = 'HEAD';
-
+        $user_store = Auth('head')->user()->store_cd;
+        if ($user_store == 'L0025') {
+            $admin_type = 'H';
+        } else {
+            $admin_type = 'S';
+        }
         $query = "
             select content
             from msg_store
@@ -320,10 +253,8 @@ class stk32Controller extends Controller
                 select 
                     m.msg_cd,
                     md.receiver_type,
-                    group_concat(md.receiver_cd separator ', ') as receiver_cd,
-                    group_concat(if(md.receiver_type = 'S', s.store_nm, '본사') separator ', ') as receiver_nm,
-                    if(md.receiver_type = 'S', s.store_nm, '본사') as first_receiver,
-                    count(md.receiver_cd) as receiver_cnt,
+                    md.receiver_cd as receiver_cd,
+                    s.store_nm as receiver_nm,
                     m.reservation_yn,
                     m.reservation_date,
                     m.content,
@@ -331,7 +262,7 @@ class stk32Controller extends Controller
                 from msg_store m
                     inner join msg_store_detail md on md.msg_cd = m.msg_cd
                     left outer join store s on s.store_cd = md.receiver_cd
-                where m.sender_type = '$admin_type' and m.sender_cd = '$admin_cd' and m.msg_cd = '$msg_cd'
+                where m.sender_type = '$admin_type' and m.sender_cd = '$user_store' and m.msg_cd = '$msg_cd'
                 group by m.msg_cd
                 ";
         } else if ($msg_type == 'receive') {
@@ -339,7 +270,7 @@ class stk32Controller extends Controller
                 select 
                     m.msg_cd,
                     m.sender_cd,
-                    if(m.sender_type = 'S', s.store_nm, '본사') as sender_nm,
+                    s.store_nm as sender_nm,
                     s.phone as mobile,
                     m.content,
                     md.rt,
@@ -347,7 +278,7 @@ class stk32Controller extends Controller
                 from msg_store_detail md
                     left outer join msg_store m on m.msg_cd = md.msg_cd
                     left outer join store s on s.store_cd = m.sender_cd
-                where md.receiver_type = '$admin_type' and md.receiver_cd = '$admin_cd' and m.msg_cd = '$msg_cd'
+                where md.receiver_type = '$admin_type' and md.receiver_cd = '$user_store' and m.msg_cd = '$msg_cd'
                 group by md.msg_cd
             ";
         }
@@ -362,8 +293,8 @@ class stk32Controller extends Controller
                 'edate' => date("Y-m-d"),
                 'msg_cd' => $msg_cd,
                 'content' => $res->content,
-                'first_receiver' => $result->first_receiver,
-                'receiver_cnt' => $result->receiver_cnt,
+                'receiver_nm' => $result->receiver_nm
+
             ];
         } else if ($msg_type == 'receive') {
             $values = [
@@ -396,8 +327,14 @@ class stk32Controller extends Controller
         $group_cds = explode(',',$group_cds);
         $check = $request->input('check');
 
-        $sender_type = "H";
-        $sender_cd = "HEAD";
+        $sender_cd = Auth('head')->user()->store_cd;
+
+        if($sender_cd == 'L0025') {
+            $sender_type = "H";
+        } else {
+            $sender_type = "S";
+        }
+
         $rm_date = $request->input('rm_date');
         $rm_hour = $request->input('rm_hour');
         $rm_min = $request->input('rm_min');
@@ -430,7 +367,7 @@ class stk32Controller extends Controller
                             DB::table('msg_store_detail')
                                 ->insert([
                                     'msg_cd' => $res,
-                                    'receiver_type' => 'S',
+                                    'receiver_type' => $sender_type,
                                     'receiver_cd' => $sc ,
                                     'check_yn' => 'N',
                                     'rt' => now()
@@ -456,7 +393,7 @@ class stk32Controller extends Controller
                             DB::table('msg_store_detail')
                                 ->insert([
                                     'msg_cd' => $res,
-                                    'receiver_type' => 'S',
+                                    'receiver_type' => $sender_type,
                                     'receiver_cd' => $r->store_cd ,
                                     'check_yn' => 'N',
                                     'rt' => now()
@@ -485,7 +422,7 @@ class stk32Controller extends Controller
                             DB::table('msg_store_detail')
                                 ->insert([
                                     'msg_cd' => $res,
-                                    'receiver_type' => 'S',
+                                    'receiver_type' => $sender_type,
                                     'receiver_cd' => $sc ,
                                     'check_yn' => 'N',
                                     'rt' => now()
@@ -511,7 +448,7 @@ class stk32Controller extends Controller
                             DB::table('msg_store_detail')
                                 ->insert([
                                     'msg_cd' => $res,
-                                    'receiver_type' => 'S',
+                                    'receiver_type' => $sender_type,
                                     'receiver_cd' => $r->store_cd ,
                                     'check_yn' => 'N',
                                     'rt' => now()
@@ -579,8 +516,8 @@ class stk32Controller extends Controller
 
             foreach ($msg_cd as $mc) {
                 DB::table('msg_store')
-                    ->where('msg_cd', '=', $mc)
-                    ->delete();
+                    ->where('msg_cd','=', $mc)
+                    ->update(['del_yn' => 'Y']);
             }
 
             DB::commit();
@@ -589,147 +526,6 @@ class stk32Controller extends Controller
         } catch (Exception $e) {
             DB::rollBack();
             $code = 500;
-            $msg = "실패!";
-        }
-
-        return response()->json([
-            "code" => $code,
-            "msg" => $msg
-        ]);
-
-        
-    }
-
-
-    public function group(Request $request)
-    {
-        
-        $mutable = Carbon::now();
-        $sdate = $mutable->sub(1, 'month')->format('Y-m-d');
-       
-        $values = [
-            'store_types' => SLib::getCodes("STORE_TYPE"),
-            'sdate' => $sdate,
-            'edate' => date("Y-m-d"),
-        ];
-
-        return view(Config::get('shop.shop.view') . '/stock/stk32_group', $values);
-    }
-
-    public function group_show(Request $request)
-    {
-        
-        $mutable = Carbon::now();
-        $sdate = $mutable->sub(1, 'month')->format('Y-m-d');
-       
-        $values = [
-            'store_types' => SLib::getCodes("STORE_TYPE"),
-            'sdate' => $sdate,
-            'edate' => date("Y-m-d"),
-        ];
-
-        return view(Config::get('shop.shop.view') . '/stock/stk32_group_show', $values);
-    }
-
-
-    public function search_group(Request $request)
-    {
-        $sql = 
-        "
-            select 
-                group_cd,
-                group_nm
-            from msg_group
-            
-        ";
-
-        $result = DB::select($sql);
-
-        return response()->json([
-            "code" => 200,
-            "head" => array(
-                "total" => count($result)
-            ),
-            "body" => $result
-        ]);
-    }
-
-
-    public function search_group2(Request $request)
-    {
-        $group_cd = $request->input('group_cd');
-
-        $sql = 
-        "
-            select 
-                m.group_cd,
-                m.store_cd,
-                s.store_nm
-            from msg_group_store m 
-                left outer join store s on s.store_cd = m.store_cd
-                inner join msg_group mg on m.group_cd = mg.group_cd
-            where m.group_cd = '$group_cd'
-            
-        ";
-
-        $result = DB::select($sql);
-
-        return response()->json([
-            "code" => 200,
-            "head" => array(
-                "total" => count($result)
-            ),
-            "body" => $result
-        ]);
-    }
-
-
-    public function add_group(Request $request)
-    {
-        $group_nm = $request->input('group_nm');
-        $store_cd = $request->input('store_cd');
-        $store_cd = explode(',',$store_cd);
-        $code = "";
-
-        try {
-            DB::beginTransaction();
-
-            $sql = "
-                select 
-                    * 
-                from msg_group
-                where group_nm = '$group_nm'
-            ";
-            $r = DB::select($sql);
-
-            if (count($r) > 0) {
-                $code = 100;
-
-            } else {
-                $res = DB::table('msg_group')
-                ->insertGetId([
-                    'group_nm' => $group_nm,
-                    'account_cd' => 'HEAD',
-                    'rt' => now()
-                ]);
-
-                foreach ($store_cd as $sc) {
-                    DB::table('msg_group_store')
-                        ->insert([
-                            'group_cd' => $res,
-                            'store_cd' => $sc,
-                            'rt' => now()
-                        ]);
-                }
-                $code = 200;
-            }
-
-           
-            DB::commit();
-            $msg = '';
-        } catch (Exception $e) {
-            DB::rollBack();
-            $code = 500;
             $msg = $e->getMessage();
         }
 
@@ -738,76 +534,7 @@ class stk32Controller extends Controller
             "msg" => $msg
         ]);
 
-    }
-
-    public function addGroup_show(Request $request)
-    {
         
-        $mutable = Carbon::now();
-        $sdate = $mutable->sub(1, 'month')->format('Y-m-d');
-       
-        $values = [
-            'store_types' => SLib::getCodes("STORE_TYPE"),
-            'sdate' => $sdate,
-            'edate' => date("Y-m-d"),
-        ];
-
-        return view(Config::get('shop.shop.view') . '/stock/stk32_addGroup', $values);
-    }
-
-    public function addGroup(Request $request)
-    {
-        $group_nm = $request->input('group_nm');
-        $store_cd = $request->input('store_cd');
-        $store_cd = explode(',',$store_cd);
-        $code = "";
-
-        try {
-            DB::beginTransaction();
-
-            $sql = "
-                select 
-                    * 
-                from msg_group
-                where group_nm = '$group_nm'
-            ";
-            $r = DB::select($sql);
-
-            if (count($r) > 0) {
-                $code = 100;
-
-            } else {
-                $res = DB::table('msg_group')
-                ->insertGetId([
-                    'group_nm' => $group_nm,
-                    'account_cd' => 'HEAD',
-                    'rt' => now()
-                ]);
-
-                foreach ($store_cd as $sc) {
-                    DB::table('msg_group_store')
-                        ->insert([
-                            'group_cd' => $res,
-                            'store_cd' => $sc,
-                            'rt' => now()
-                        ]);
-                }
-                $code = 200;
-            }
-
-           
-            DB::commit();
-        } catch (Exception $e) {
-            DB::rollBack();
-            $code = '500';
-            $msg = $e->getMessage();
-        }
-
-        return response()->json([
-            "code" => $code,
-            "msg" => $msg
-        ]);
-
     }
 
     public function update(Request $request)
@@ -863,70 +590,6 @@ class stk32Controller extends Controller
                 }
             }
 
-            DB::commit();
-            $code = 200;
-            $msg = "";
-        } catch (Exception $e) {
-            DB::rollBack();
-            $code = 500;
-            $msg = $e->getMessage();
-        }
-        return response()->json([
-            "code" => $code,
-            "msg" => $msg
-        ]);
-    }
-
-
-    //그룹 관리 그룹삭제
-    public function del_group(Request $request)
-    {
-        $rows = $request->input('rows');
-
-        try {
-            DB::beginTransaction();
-
-            foreach($rows as $r) {
-                
-                DB::table('msg_group')
-                ->where('group_cd', '=', $r['group_cd'])
-                ->delete();
-                
-                DB::table('msg_group_store')
-                ->where('group_cd', '=', $r['group_cd'])
-                ->delete();
-            }
-                
-            DB::commit();
-            $code = 200;
-            $msg = "";
-        } catch (Exception $e) {
-            DB::rollBack();
-            $code = 500;
-            $msg = $e->getMessage();
-        }
-        return response()->json([
-            "code" => $code,
-            "msg" => $msg
-        ]);
-    }
-
-    //그룹관리 그룹에 속한 매장 삭제
-    public function del_store(Request $request)
-    {
-        $rows2 = $request->input('rows2');
-
-        try {
-            DB::beginTransaction();
-
-            foreach($rows2 as $r) {
-                
-                DB::table('msg_group_store')
-                ->where('group_cd', '=', $r['group_cd'])
-                ->where('store_cd', '=', $r['store_cd'])
-                ->delete();
-            }
-                
             DB::commit();
             $code = 200;
             $msg = "";

@@ -372,9 +372,11 @@
 
 	async function Search() {
 		await setColumn();
-		let ischeck = $('#ext_storage_qty').is(':checked');
+		let ischeck = $('#ext_store_storage_qty').is(':checked');
 		let data = $('form[name="search"]').serialize();
-		data += '&ext_storage_qty=' + ischeck;
+		data += '&ext_store_storage_qty=' + ischeck;
+
+		console.log(ischeck);
 		
 		gx.Request('/store/product/prd04/search', data, 1, function(e) {
 			const t = e.head.total_row;
