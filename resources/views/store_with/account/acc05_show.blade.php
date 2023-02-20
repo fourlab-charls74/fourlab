@@ -41,7 +41,7 @@
                 <a href="#">기본정보</a>
             </div>
             <div class="card-body">
-                <form name="f1">
+                <form name="search">
                     <div class="row">
                         <div class="col-12">
                             <div class="table-box-ty2 mobile">
@@ -50,7 +50,8 @@
                                         <tr>
                                             <th>판매기간(판매연월)</th>
                                             <td class="w-100">
-                                                <div class="docs-datepicker flex_box">
+                                                <div class="docs-datepicker w-100 flex_box">
+                                                    @if (@$cmd === 'add')
                                                     <div class="input-group" style="max-width:300px;">
                                                         <input type="text" id="sdate" class="form-control form-control-sm docs-date month" name="sdate" value="{{ $sdate }}" autocomplete="off">
                                                         <div class="input-group-append">
@@ -60,6 +61,11 @@
                                                         </div>
                                                     </div>
                                                     <div class="docs-datepicker-container"></div>
+                                                    <a href="javascript:void(0)" onclick="return Search();" class="btn btn-outline-primary ml-2">적용</a>
+                                                    @else
+                                                    <input type="hidden" name="sdate" value="{{ @$sdate }}">
+                                                    <p class="fs-14 font-weight-bold">{{ @$sdate_str }}</p>
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>
@@ -73,7 +79,7 @@
         </div>
         <div class="card shadow mt-3">
             <div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
-                <a href="#">기타재반정보</a>
+                <a href="#">기타재반자료</a>
             </div>
             <div class="card-body">
                 <div class="table-responsive mt-2">
@@ -85,44 +91,43 @@
 </div>
 
 <script language="javascript">
+    const CMD = "{{ @$cmd }}";
+    
 	const YELLOW = {'background-color': "#ffff99"};
 	const CENTER = { 'text-align': 'center' };
     const columns = [
 		{ headerName: "#", field: "num", type: 'NumType', pinned: 'left', width: 30, cellStyle: CENTER,
-			cellRenderer: (params) => params.node.rowPinned === 'top' ? '합계' : parseInt(params.value) + 1,
+			cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : parseInt(params.value) + 1,
         },
         { field: "store_cd", headerName: "매장코드", pinned: 'left', width: 57, cellStyle: CENTER },
-        // { field: "store_type_nm", headerName: "매장구분", pinned: 'left', width: 70, cellStyle: CENTER },
         { field: "store_nm", headerName: "매장명", pinned: 'left', type: 'StoreNameType', width: 170 },
 		@foreach ($extra_cols as $group_nm => $children)
 		{ headerName: "{{ $group_nm }}",
 			children: [
 				@foreach ($children as $child)
 					{ headerName: "{{ $child->code_val }}", field: "{{ $child->code_id }}_amt", type: 'currencyType', width: 100, 
-						editable: "{{ $child->code_id }}" !== 'E3', cellStyle: "{{ $child->code_id }}" !== 'E3' ? YELLOW : {},
-                        cellRenderer: (params) => params.value ? Comma(params.value) : '',
+						editable: "{{ $child->code_id }}" !== 'E3', cellStyle: (params) => "{{ $child->code_id }}" !== 'E3' && params.node.rowPinned !== 'top' ? YELLOW : {},
+                        cellRenderer: (params) => params.value !== null ? Comma(params.value) : (CMD === 'add' ? '' : 0),
 					},
 					@if (in_array($child->code_id, ['P1', 'M3']))
 					{ headerName: "{{ $child->code_val }}(-VAT)", field: "{{ $child->code_id }}_novat", type: 'currencyType', width: 105,
-						cellRenderer: (params) => Math.round((params.data["{{ $child->code_id }}_amt"] || 0) / 1.1) || '',
+						cellRenderer: (params) => params.data["{{ $child->code_id }}_amt"] ? Comma(Math.round((params.data["{{ $child->code_id }}_amt"] || 0) / 1.1)) : (CMD === 'add' ? '' : 0),
 					},
 					@endif
 				@endforeach
 				@if (!in_array($group_nm, ['마일리지', '기타운영경비']))
 				{ headerName: "소계", field: "{{ str_split($children[0]->code_id ?? '')[0] }}_sum", type: 'currencyType', width: 100,
-                    cellRenderer: (params) => params.value ? Comma(params.value) : '',
+                    cellRenderer: (params) => params.value !== null ? Comma(params.value) : (CMD === 'add' ? '' : 0),
                 },
 				@endif
 			]
         },
 		@if ($group_nm === '관리')
-		{ headerName: "사은품" },
-		{ headerName: "부자재" },
+		{ headerName: "사은품", field: "gifts" },
+		{ headerName: "소모품", field: "expandables" },
 		@endif
 		@endforeach
-		{ field: "total", headerName: "총합계", type: 'currencyType', width: 100,
-            cellRenderer: (params) => params.value ? Comma(params.value) : '',
-        },
+		{ field: "total", headerName: "총합계", type: 'currencyType', width: 100 },
         { width: "auto" }
     ];
 </script>
@@ -130,13 +135,19 @@
 <script type="text/javascript" charset="utf-8">
     const pApp = new App('', { gridId: "#div-gd" });
     let gx;
+
     let is_file_applied = false;
+    let applied_date = "{{ @$sdate }}";
 
     $(document).ready(function() {
-        pApp.ResizeGrid(330);
+        pApp.ResizeGrid(320);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns, {
+            pinnedTopRowData: [{ store_cd: "합계" }],
+            getRowStyle: (params) => { // 고정된 row styling
+                if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#eee'};
+            },
 			onCellValueChanged: (e) => {
 				if (e.oldValue !== e.newValue) {
 					const val = e.newValue;
@@ -155,14 +166,17 @@
 						e.data[group_cd + "_sum"] 
 							= Object.keys(e.data).reduce((a,c) => (
 								(c.split("")[0] === group_cd && c.split("_").slice(-1)[0] === "amt" && !['E1', 'E2'].includes(c.split("_")[0])) 
-									? (e.data[c] * 1) : 0
+									? ['P1', 'M3'].includes(c.split("_")[0])
+                                        ? Math.round(e.data[c] * 1 / 1.1) 
+                                        : (e.data[c] * 1) 
+                                    : 0
 							) + a, 0);
 
 						// 총합계 계산
 						e.data.total = Object.keys(e.data).reduce((a,c) => (c.split("_").slice(-1)[0] === "sum" ? (e.data[c] * 1) : 0) + a, 0);
 
 						e.api.redrawRows({ rowNodes: [e.node] });
-						e.node.setSelected(true);
+                        updatePinnedRow();
 						gx.setFocusedWorkingCell();
 					}
 				}
@@ -174,25 +188,64 @@
 			sortable: true,
 		};
 
-        $('#excel_file').on('change', function(e){
-            if (validateFile() === false) {
-                $('.custom-file-label').html("");
-                return;
-            }
-            $('.custom-file-label').html(this.files[0].name);
-        });
+        // $('#excel_file').on('change', function(e){
+        //     if (validateFile() === false) {
+        //         $('.custom-file-label').html("");
+        //         return;
+        //     }
+        //     $('.custom-file-label').html(this.files[0].name);
+        // });
+
+        if (CMD === 'update') Search();
+        updatePinnedRow();
     });
 
-    function setColumns(gifts, expandables) {
+    function Search() {
+        let data = $('form[name="search"]').serialize();
+        data += "&cmd=" + CMD;
+
+		gx.Request('/store/account/acc05/show-search', data, -1, function(e) {
+            if (e.code === 200) {
+                setColumns(e.head);
+                is_file_applied = true;
+                if (CMD === 'add') applied_date = $("#sdate").val();
+                updatePinnedRow();
+            } else {
+                alert(e.head.msg);
+                console.log(e);
+            }
+        });
+    }
+
+    function setColumns({gifts, expandables}) {
 		const cols = columns.reduce((a, c) => {
 			let col = {...c};
-			if(col.headerName === '부자재') {
-				col.children = expandables.map(exp => ({ headerName: exp.prd_nm, field: exp.type + "_" + (exp.prd_cd || exp.colId) + "_amt", type: 'currencyType', editable: true, width: 100, cellStyle: YELLOW }))
-					.concat({ headerName: "소계", field: "S_sum", type: 'currencyType', width: 100, cellRenderer: (params) => params.value ? Comma(params.value) : '' });
+			if(col.field === 'gifts') {
+				col.children = gifts.map(gf => ({ 
+                        headerName: gf.prd_nm, 
+                        field: "G_" + gf.prd_cd + "_amt", 
+                        type: 'currencyType', editable: true, width: 100, 
+                        cellStyle: (params) => params.node.rowPinned !== 'top' ? YELLOW : {}, 
+                        cellRenderer: (params) => params.value !== null ? Comma(params.value) : (CMD === 'add' ? '' : 0) 
+                    })).concat({ 
+                        headerName: "소계", 
+                        field: "G_sum", 
+                        type: 'currencyType', width: 100, 
+                        cellRenderer: (params) => params.value !== null ? Comma(params.value) : (CMD === 'add' ? '' : 0) 
+                    });
 			}
-			if(col.headerName === '사은품') {
-				col.children = gifts.map(gf => ({ headerName: gf.prd_nm, field: gf.type + "_" + (gf.prd_cd || gf.colId) + "_amt", type: 'currencyType', editable: true, width: 100, cellStyle: YELLOW }))
-					.concat({ headerName: "소계", field: "G_sum", type: 'currencyType', width: 100, cellRenderer: (params) => params.value ? Comma(params.value) : '' });
+            if(col.field === 'expandables') {
+				col.children = expandables.map(exp => ({ 
+                    headerName: exp.prd_nm, 
+                    field: "S_" + exp.prd_cd  + "_amt", 
+                    type: 'currencyType', editable: true, width: 100, 
+                    cellStyle: (params) => params.node.rowPinned !== 'top' ? YELLOW : {}, 
+                    cellRenderer: (params) => params.value !== null ? Comma(params.value) : (CMD === 'add' ? '' : 0) 
+                })).concat({ 
+                    headerName: "소계", 
+                    field: "S_sum", type: 'currencyType', width: 100, 
+                    cellRenderer: (params) => params.value !== null ? Comma(params.value) : (CMD === 'add' ? '' : 0) 
+                });
 			}
 			a.push(col);
 			return a;
@@ -202,26 +255,22 @@
 		gx.gridOptions.api.setColumnDefs(cols);
     }
 
-    // 일괄입력정보 저장
+    // 저장
     function Save() {
         let rows = gx.getRows();
-        if (rows.length < 1) return alert('일괄등록할 자료를 한 건 이상 등록해주세요.');
+        if (rows.length < 1 || !is_file_applied) return alert("저장할 자료를 적용해주세요.");
 
-        const sdate = $("#sdate").val();
-        if (!confirm(`[${sdate}] 기타재반자료를 일괄등록하시겠습니까?`)) return;
-        
-        axios({
+		if (!confirm(`[${applied_date}]의 기타재반자료를 저장하시겠습니까?`)) return;
+		alert("다소 시간이 소요될 수 있습니다. 잠시만 기다려주세요.");
+
+		axios({
             url: '/store/account/acc05/save',
             method: 'post',
-            data: {
-                type: 'B',
-                sdate: sdate,
-                data: rows,
-            },
+            data: { cmd: CMD, data: rows, sdate: applied_date }
         }).then((res) => {
             if (res.data.code === "200") {
                 alert("자료가 정상적으로 저장되었습니다.");
-                opener.Search(sdate);
+                opener.Search();
                 self.close();
             } else {
                 alert("자료저장 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
@@ -232,6 +281,42 @@
             console.log(err);
         });
     }
+
+    const updatePinnedRow = () => {
+        let cols = gx.gridOptions.columnApi.columnController.columnDefs
+            .reduce((a,c) => {
+                let result = [];
+                if(c.children && c.children.length > 0) result = result.concat(c.children);
+                return a.concat(result).concat(c);
+            }, [])
+            .map(c => ({ field: c.field, value: 0 }))
+            .filter(c => !['num', 'store_cd', 'store_nm', 'gifts', 'expandables', undefined].includes(c.field));
+
+        const rows = gx.getRows();
+        if (rows && Array.isArray(rows) && rows.length > 0) {
+            rows.forEach((row, idx) => {
+                cols.forEach((col) => {
+                    col.value += parseFloat(row[col.field] || 0);
+                });
+            });
+        }
+
+        cols = cols.reduce((a,c) => {
+            a[c.field] = c.value;
+            return a;
+        }, {});
+
+        let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
+        gx.gridOptions.api.setPinnedTopRowData([
+            { ...pinnedRow.data, ...cols }
+        ]);
+    };
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////// 아래 작업중 ////////////////////////////////////////////
 
     /** 
      * 엑셀 관련 함수
@@ -439,24 +524,6 @@
 
         rows.filter((row, idx) => row.isEditable).map((row) => { deleteRow(row); });
         updatePinnedRow();
-    };
-
-    const updatePinnedRow = () => { // 총 반품금액, 반품수량을 반영한 PinnedRow를 업데이트
-        let [ store_wqty, qty, loss_qty, loss_price ] = [ 0, 0, 0, 0 ];
-        const rows = gx.getRows();
-        if (rows && Array.isArray(rows) && rows.length > 0) {
-            rows.forEach((row, idx) => {
-                store_wqty += parseInt(row.store_wqty || 0);
-                qty += parseInt(row.qty || 0);
-                loss_qty += parseInt(row.loss_qty || 0);
-                loss_price += parseInt(row.loss_price || 0);
-            });
-        }
-
-        let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
-        gx.gridOptions.api.setPinnedTopRowData([
-            { ...pinnedRow.data, store_wqty: store_wqty, qty: qty, loss_qty: loss_qty, loss_price: loss_price }
-        ]);
     };
 </script>
 @stop

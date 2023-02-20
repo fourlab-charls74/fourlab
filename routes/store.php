@@ -615,7 +615,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('acc05', 'acc05Controller@index');
         Route::get('acc05/search', 'acc05Controller@search');
         Route::get('acc05/show', 'acc05Controller@show');
-        // Route::post('acc05/save', 'acc05Controller@save');
+        Route::get('acc05/show-search', 'acc05Controller@show_search');
+        Route::post('acc05/save', 'acc05Controller@save');
         // Route::get('acc05/show-batch', 'acc05Controller@show_batch');
         // Route::post('acc05/batch-import', 'acc05Controller@import_excel');
 

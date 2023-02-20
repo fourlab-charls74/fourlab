@@ -133,7 +133,7 @@
 
 	// 기타재반상세팝업 오픈
 	function openExtraPopup(date = '') {
-		const url = '/store/account/acc05/show' + (date !== '' ? 'date=' + date : '');
+		const url = '/store/account/acc05/show' + (date !== '' ? '?date=' + date : '');
 		window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=2100,height=1200");
 	}
 </script>

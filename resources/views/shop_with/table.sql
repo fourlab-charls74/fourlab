@@ -715,7 +715,6 @@ CREATE TABLE `store_account_extra` (
 	`extra_amt` INT(11) DEFAULT 0 COMMENT '기타재반자료 총합계',
 	`admin_id` VARCHAR(30) DEFAULT NULL COMMENT '관리자아이디',
 	`rt` DATETIME DEFAULT NULL COMMENT '등록일자',
-	`ut` DATETIME DEFAULT NULL COMMENT '수정일자',
 	PRIMARY KEY (`idx`),
 	KEY `ymonth` (`ymonth`, `store_cd`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='매장기타재반자료'
@@ -728,9 +727,6 @@ CREATE TABLE `store_account_extra_list` (
 	`prd_cd` VARCHAR(50) DEFAULT NULL COMMENT '원부자재코드 (type이 ’S’ or ‘G’ 일 때, 해당 사은품/소모품의 원부자재코드)',
 	`prd_nm` VARCHAR(100) DEFAULT NULL COMMENT '원부자재명 (type이 ’S’ or ‘G’ 일 때, 해당 사은품/소모품의 원부자재명)',
 	`extra_amt` INT(11) DEFAULT 0 COMMENT '기타재반자료금액',
-	`admin_id` VARCHAR(30) DEFAULT NULL COMMENT '관리자아이디',
-	`rt` DATETIME DEFAULT NULL COMMENT '등록일자',
-	`ut` DATETIME DEFAULT NULL COMMENT '수정일자',
 	PRIMARY KEY (`idx`),
 	KEY `ext_idx` (`ext_idx`, `type`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='매장기타재반자료 내역'

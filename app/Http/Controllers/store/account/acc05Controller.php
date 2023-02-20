@@ -33,6 +33,8 @@ class acc05Controller extends Controller
     {
         $sdate = $request->input('sdate', Carbon::now()->startOfMonth()->subMonth()->format("Ym"));
         $sdate = Lib::quote(str_replace('-', '', $sdate));
+        $edate = $request->input('edate', Carbon::now()->startOfMonth()->subMonth()->format("Ym"));
+        $edate = Lib::quote(str_replace('-', '', $edate));
         $extra_types = SLib::getCodes('STORE_ACC_EXTRA_TYPE')->groupBy('code_val2')->toArray(); // 사은품/소모품 외 기타재반
 
         $extra_sql = "";
@@ -70,7 +72,7 @@ class acc05Controller extends Controller
                     $extra_sql
                 from store_account_extra e
                     inner join store_account_extra_list el on el.ext_idx = e.idx
-                where e.ymonth >= '$sdate' and e.ymonth <= '$sdate'
+                where e.ymonth >= '$sdate' and e.ymonth <= '$edate'
                 group by e.ymonth, e.store_cd
             ) a
             group by a.ymonth
@@ -84,149 +86,193 @@ class acc05Controller extends Controller
             ],
             'body' => $result
         ]);
-
-        ////////////////////////////////////////////////////////////////////
-
-        // $sdate = $request->input('sdate', Carbon::now()->startOfMonth()->subMonth()->format("Ym"));
-        // $f_sdate = Carbon::parse($sdate)->firstOfMonth()->format("Y-m-d H:i:s");
-        // $f_edate = Carbon::parse($sdate)->lastOfMonth()->format("Y-m-d H:i:s");
-        // $sdate = Lib::quote(str_replace('-', '', $sdate));
-
-        // $sql = "
-        //     select r.prd_cd, p.prd_nm, p.type
-        //     from sproduct_stock_release r
-        //         inner join store s on s.store_cd = r.store_cd and s.account_yn = 'Y'
-        //         inner join product p on p.prd_cd = r.prd_cd and p.type = :type
-        //     where r.fin_rt >= '$f_sdate' and r.fin_rt <= '$f_edate'
-        //     group by r.prd_cd
-        // ";
-        // $gifts = DB::select($sql, ['type' => 'G']); // 사은품
-        // $expandables = DB::select($sql, ['type' => 'S']); // 부자재(소모품)
-        // $extra_types = SLib::getCodes('STORE_ACC_EXTRA_TYPE')->groupBy('code_val2')->toArray(); // 사은품/부자재 외 기타재반
-
-        // // 검색조건 필터링
-        // $where = "";
-        // if ($store_type != '') $where .= " and s.store_type = " . Lib::quote($store_type);
-        // if ($store_kind != '') $where .= " and s.store_kind = '". Lib::quote($store_kind) . "'";
-        // if ($store_cd != '') $where .= " and s.store_cd = '" . Lib::quote($store_cd) . "'";
-
-        // // 기타재반타입별 쿼리문 생성
-        // $extra_sql = join('', array_map(function($key, $value) {
-        //     $gruop_cd = str_split($value[0]->code_id ?? '')[0];
-        //     $query = join('', array_map(function($v) {
-        //         return ", sum(if(e.type = '" . $v->code_id . "', e.extra_amt, null)) as " . $v->code_id . "_amt";
-        //     }, $value));
-        //     $types = array_map(function($val) { return "'" . $val->code_id . "'"; }, $value);
-        //     // E1(온라인RT), E2(온라인반송)은 소계에 포함시키지 않습니다. (because, E3(온라인) = E1 - E2)
-        //     if ($gruop_cd === 'E') $types = array_map(function($val) { return "'" . $val->code_id . "'"; }, array_filter($value, function($t) { return !in_array($t->code_id, ['E1', 'E2']); }));
-        //     $query .= ", sum(if(e.type in (" . join(',', $types) . "), e.extra_amt, null)) as " . $gruop_cd . "_sum";
-        //     return $query;
-        // }, array_keys($extra_types), $extra_types));
-
-        // // 사은품 쿼리문 생성
-        // $extra_sql .= join('', array_map(function($value) {
-        //     return ", sum(if(e.type = '" . $value->type . "' and e.prd_cd = '" . $value->prd_cd . "', e.extra_amt, null)) as " . $value->type . "_" . $value->prd_cd . "_amt";
-        // }, $gifts));
-        // $extra_sql .= ", sum(if(e.type = 'G', e.extra_amt, null)) as G_sum";
-        
-        // // 부자재(소모품) 쿼리문 생성
-        // $extra_sql .= join('', array_map(function($value) {
-        //     return ", sum(if(e.type = '" . $value->type . "' and e.prd_cd = '" . $value->prd_cd . "', e.extra_amt, null)) as " . $value->type . "_" . $value->prd_cd . "_amt";
-        // }, $expandables));
-        // $extra_sql .= ", sum(if(e.type = 'S', e.extra_amt, null)) as S_sum";
-
-        // $sql = "
-        //     select s.store_cd, s.store_nm, s.store_type, c.code_val as store_type_nm, '$sdate' as ymonth, e.*
-        //     from store s
-        //         left outer join (
-        //             select e.store_cd as store
-        //                 $extra_sql
-        //                 , sum(if(e.type not in ('E1', 'E2'), e.extra_amt, 0)) as total
-        //             from store_account_extra e
-        //             where e.ymonth = '$sdate'
-        //             group by e.store_cd
-        //         ) e on e.store = s.store_cd
-        //         left outer join code c on c.code_kind_cd = 'STORE_TYPE' and c.code_id = s.store_type
-        //     where s.account_yn = 'Y' $where
-        // ";
-        // $result = DB::select($sql);
     }
 
     public function show(Request $request)
     {
         $cmd = $request->input('date') === null ? 'add' : 'update';
-        $sdate = $request->input('sdate', Carbon::now()->startOfMonth()->subMonth()->format("Ym"));
+        $sdate = $request->input('date', '');
+        if ($sdate === '') $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m");
+        else $sdate = substr_replace($sdate, '-', 4, 0);
         $extra_cols = SLib::getCodes('STORE_ACC_EXTRA_TYPE')->groupBy('code_val2'); // code_val2를 상위 카테고리로 사용
 
         $values = [
             'cmd' => $cmd,
             'sdate' => $sdate,
+            'sdate_str' => Carbon::parse($sdate)->format("Y년 m월"),
             'extra_cols' => $extra_cols,
         ];
 
         return view( Config::get('shop.store.view') . '/account/acc05_show', $values );
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////// 아래 작업중 ////////////////////////////////////////////
+    public function show_search(Request $request)
+    {
+        $cmd = $request->input('cmd', 'add');
+        $sdate = $request->input('sdate', Carbon::now()->startOfMonth()->subMonth()->format("Y-m"));
 
-	public function save(Request $request)
+        // 유효성 검사
+        $sql = "
+            select count(*) as total
+            from store_account_extra
+            where ymonth = :sdate
+        ";
+        $cnt = DB::selectOne($sql, ['sdate' => Lib::quote(str_replace('-', '', $sdate))])->total;
+
+        if ($cmd === 'add' && $cnt > 0) {
+            return response()->json(['code' => 400, 'head' => [
+                'total' => 0, 
+                'sdate' => $sdate, 
+                'msg' => '해당연월의 기타재반자료정보가 이미 존재합니다.'
+            ]]);
+        } else if ($cmd === 'update' && $cnt < 1) {
+            return response()->json(['code' => 400, 'head' => [
+                'total' => 0, 
+                'sdate' => $sdate, 
+                'msg' => '해당연월의 기타재반자료정보가 존재하지 않습니다.'
+            ]]);
+        }
+
+        // 해당연월의 원부자재정보 조회
+        $f_sdate = Carbon::parse($sdate)->firstOfMonth()->format("Y-m-d H:i:s");
+        $f_edate = Carbon::parse($sdate)->lastOfMonth()->format("Y-m-d H:i:s");
+        $sdate = Lib::quote(str_replace('-', '', $sdate));
+
+        $sql = "
+            select r.prd_cd, p.prd_nm, p.type
+            from sproduct_stock_release r
+                inner join store s on s.store_cd = r.store_cd and s.account_yn = 'Y'
+                inner join product p on p.prd_cd = r.prd_cd and p.type = :type
+            where r.fin_rt >= '$f_sdate' and r.fin_rt <= '$f_edate'
+            group by r.prd_cd
+        ";
+        $gifts = DB::select($sql, ['type' => 'G']); // 사은품
+        $expandables = DB::select($sql, ['type' => 'S']); // 소모품
+        $extra_types = SLib::getCodes('STORE_ACC_EXTRA_TYPE')->groupBy('code_val2')->toArray(); // 사은품/소모품 외 기타재반
+
+        // 기타재반 항목별 쿼리문 생성
+        $extra_sql = "";
+        foreach ($extra_types as $key => $types) {
+            foreach ($types as $type) {
+                $extra_sql .= ", sum(if(el.type = '" . $type->code_id . "', el.extra_amt, null)) as " . $type->code_id . "_amt";
+            }
+
+            $group_cd = str_split($types[0]->code_id ?? '')[0];
+            $types_arr = $group_cd === 'E' 
+                ? array_filter($types, function($t) { return !in_array($t->code_id, ['E1', 'E2']); }) // E1(온라인RT), E2(온라인반송)은 소계에 포함시키지 않습니다. (because, E3(온라인) = E1 - E2)
+                : $types;
+            $types_str = array_map(function($t) { return "'" . $t->code_id . "'"; }, $types_arr);
+
+            // 마일리지(P1)와 본사수선비(M3)의 경우, 세금을 제한 값을 합계로 조회합니다.
+            $extra_sql .= ", sum(if(el.type in (" . join(',', $types_str) . "), if(el.type in ('P1', 'M3'), round(el.extra_amt / 1.1), el.extra_amt), null)) as " . $group_cd . "_sum";
+        }
+
+        // 사은품 쿼리문 생성
+        $extra_sql .= join('', array_map(function($value) {
+            return ", sum(if(el.type = 'G' and (el.prd_cd = '" . $value->prd_cd . "' or el.prd_nm = '" . $value->prd_nm . "'), el.extra_amt, null)) as G_" . $value->prd_cd . "_amt";
+        }, $gifts));
+        $extra_sql .= ", sum(if(el.type = 'G', el.extra_amt, null)) as G_sum";
+        
+        // 소모품 쿼리문 생성
+        $extra_sql .= join('', array_map(function($value) {
+            return ", sum(if(el.type = 'S' and (el.prd_cd = '" . $value->prd_cd . "' or el.prd_nm = '" . $value->prd_nm . "'), el.extra_amt, null)) as S_" . $value->prd_cd . "_amt";
+        }, $expandables));
+        $extra_sql .= ", sum(if(el.type = 'S', el.extra_amt, null)) as S_sum";
+
+        // search
+        $sql = "
+            select s.store_cd, s.store_nm, s.store_type, e.*
+            from store s
+                left outer join (
+                    select e.idx as ext_idx, e.ymonth, e.store_cd as e_store_cd
+                        , e.extra_amt as total
+                        $extra_sql
+                    from store_account_extra e
+                        inner join store_account_extra_list el on el.ext_idx = e.idx
+                    where e.ymonth = :sdate
+                    group by e.store_cd
+                ) e on e.e_store_cd = s.store_cd
+            where s.account_yn = 'Y'
+            order by s.store_cd
+        ";
+        $result = DB::select($sql, ['sdate' => $sdate]);
+
+        return response()->json([
+            'code'	=> 200,
+            'head'	=> [
+                'total'	=> count($result),
+                'gifts' => $gifts,
+                'expandables' => $expandables,
+            ],
+            'body' => $result
+        ]);
+    }
+
+    public function save(Request $request)
 	{
+        $cmd = $request->input('cmd', 'add');
         $save_type = $request->input('type', 'G'); // G: 일반, B: 일괄
-        $sdate = $request->input('sdate', '');
 		$data = $request->input('data');
+        $sdate = $request->input('sdate', '');
+        $sdate = Lib::quote(str_replace('-', '', $sdate));
 
         $code = "200";
 		$msg = "";
+        $admin_id = Auth('head')->user()->id;
 
 		try {
 			DB::beginTransaction();
-			
+
             foreach ($data as $extra) {
-                $amts = array_filter($extra, function($key) { 
+                $amts = array_filter($extra, function($key) {
                     $key_arr = (explode('_', $key));
                     return end($key_arr) === 'amt';
                 }, ARRAY_FILTER_USE_KEY);
+                $ymonth = $extra['ymonth'] ?? $sdate;
+                $store_cd = $extra['store_cd'];
+
+                // 타입별정보 가공
+                $extra_list = [];
+                $total_amt = 0;
 
                 foreach ($amts as $key => $value) {
-                    $ymonth = $extra['ymonth'];
-                    $store_cd = $extra['store_cd'];
                     $type = explode('_', $key)[0];
-                    $prd_cd = '';
+                    $prd_cd = null;
+                    if (in_array($type, ['S', 'G'])) $prd_cd = explode('_', $key)[1];
 
-                    $rows = DB::table('store_account_extra')
-                        ->where('store_cd', $store_cd)->where('ymonth', $ymonth)->where('type', $type);
-                    if (in_array($type, ['S', 'G'])) {
-                        $prd_cd = explode('_', $key)[1];
-                        $rows = $rows->where('prd_cd', $prd_cd);
-                    }
-                    $rows = $rows->get();
+                    array_push($extra_list, [
+                        'type' => $type,
+                        'prd_cd' => $prd_cd,
+                        'prd_nm' => null,
+                        'extra_amt' => $value ?? 0,
+                    ]);
 
-                    if ($rows->count() < 1) {
-                        // save
-                        DB::table('store_account_extra')->insert([
-                            'store_cd' => $store_cd,
-                            'ymonth' => $ymonth,
-                            'type' => $type,
-                            'prd_cd' => ($prd_cd == '' ? null : $prd_cd),
-                            'extra_amt' => $value,
-                            'rt' => now(),
-                        ]);
-                    } else {
-                        // update
-                        $idx = $rows->first()->idx;
-                        DB::table('store_account_extra')->where('idx', $idx)->update([
-                            'extra_amt' => $value,
-                            'ut' => now(),
-                        ]);
-                    }
+                    // 총합계 계산
+                    if (!in_array($type, ['P1', 'E1', 'E2', 'M3'])) $total_amt += $value ?? 0;
+                    if (in_array($type, ['P1', 'M3'])) $total_amt += round(($value ?? 0) / 1.1);
                 }
+
+                // 기존정보가 있을경우 삭제
+                $originals = DB::table('store_account_extra')->where('ymonth', $ymonth)->where('store_cd', $store_cd);
+                if ($originals->count() > 0) {
+                    $del_idx = $originals->first()->idx;
+                    $originals->delete();
+                    DB::table('store_account_extra_list')->where('ext_idx', $del_idx)->delete();
+                }
+
+                // 등록
+                $ext_idx = DB::table('store_account_extra')->insertGetId([
+                    'ymonth' => $ymonth,
+                    'store_cd' => $store_cd,
+                    'extra_amt' => $total_amt,
+                    'admin_id' => $admin_id,
+                    'rt' => now(),
+                ]);
+                $extra_list = array_map(function($e) use ($ext_idx) { return array_merge($e, ['ext_idx' => $ext_idx]); }, $extra_list);
+                DB::table('store_account_extra_list')->insert($extra_list);
             }
 
-			DB::commit();
+            DB::commit();
 			$msg = "기타재반자료가 정상적으로 저장되었습니다.";
 		} catch(Exception $e) {
 			DB::rollback();
@@ -235,7 +281,13 @@ class acc05Controller extends Controller
 		}
 
 		return response()->json(["code" => $code, "msg" => $msg]);
-	}
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////// 아래 작업중 ////////////////////////////////////////////
 
     /** 기타재반자료 일괄등록 팝업오픈 */
     public function show_batch()
