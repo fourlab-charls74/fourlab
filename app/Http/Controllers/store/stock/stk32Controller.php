@@ -106,6 +106,8 @@ class stk32Controller extends Controller
                 where md.receiver_type = '$admin_type' and md.receiver_cd = '$admin_cd' $where
                 group by md.msg_cd
             ";
+
+            dd($sql);
         }
        
         $result = DB::select($sql , ['sdate' => $sdate, 'edate' => $edate]);

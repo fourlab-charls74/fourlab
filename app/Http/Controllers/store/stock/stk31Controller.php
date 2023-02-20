@@ -34,8 +34,8 @@ class stk31Controller extends Controller
 
         $r = $request->all();
 
-        $sdate = $request->input('sdate', Carbon::now()->sub(3, 'month')->format('Ymd'));
-        $edate = $request->input('edate', date("Ymd"));
+        $sdate = $request->input('sdate', Carbon::now()->sub(3, 'month')->format('Y-m-d'));
+        $edate = $request->input('edate', date("Y-m-d"));
         $subject = $request->input('subject', '');
         $content = $request->input('content', '');
         $store_no = $request->input('store_no', '');
@@ -52,8 +52,8 @@ class stk31Controller extends Controller
         // ordreby
         $ord = $r['ord'] ?? 'desc';
         $ord_field = $r['ord_field'] ?? "s.rt";
-        if ($ord_field == 'subject') $ord_field = 's.' . $ord_field;
-        else $ord_field = 's.' . $ord_field;
+        if ($ord_field == 'subject') $ord_field = $ord_field;
+        else $ord_field = $ord_field;
         $orderby = sprintf("order by %s %s", $ord_field, $ord);
 
         // pagination

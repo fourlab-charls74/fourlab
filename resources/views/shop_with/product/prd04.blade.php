@@ -165,6 +165,16 @@
 							</div>
 						</div>
 					</div>
+					<div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label>창고명</label>
+                            <div class="form-inline inline_btn_box">
+                                <input type='hidden' id="storage_nm" name="storage_nm">
+                                <select id="storage_no" name="storage_no[]" class="form-control form-control-sm select2-storage multi_select"  multiple></select>
+                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-storage"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                            </div>
+                        </div>
+                    </div>
 				</div>
 				
 			</div>
@@ -387,6 +397,11 @@
 		var url = `/shop/stock/stk01/${prd_cd}?date=${date}`;
 		var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1000,height=900");
 	}
+
+	// 매장 검색 클릭 이벤트 바인딩 및 콜백 사용
+	$( ".sch-storage" ).on("click", function() {
+        searchStorage.Open();
+    });
 
 </script>
 

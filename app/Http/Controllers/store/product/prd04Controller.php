@@ -44,6 +44,7 @@ class prd04Controller extends Controller
 		$ext_store_storage_qty	= $request->input("ext_store_storage_qty", "");
 		$prd_cd_range_text = $request->input("prd_cd_range", '');
 		$goods_nm_eng	= $request->input("goods_nm_eng");
+		$storage_cd = $request->input('storage_no');
 
 		$ord		= $request->input('ord','desc');
 		$ord_field	= $request->input('ord_field','prd_cd_p');
@@ -68,6 +69,17 @@ class prd04Controller extends Controller
 			}
 			$where .= ")";
 		}
+
+		// 창고검색
+        if ( $storage_cd != "" ) {
+            $where	.= " and (1!=1";
+            foreach($storage_cd as $storage_cd) {
+                $where .= " or storage_cd = '$storage_cd' ";
+
+            }
+            $where	.= ")";
+        }
+
 		// 상품옵션 범위검색
 		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
 		parse_str($prd_cd_range_text, $prd_cd_range);
@@ -162,6 +174,7 @@ class prd04Controller extends Controller
 						, if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
 						, ps.qty as hqty
 						, ps.wqty as hwqty
+						, pss2.storage_cd as storage_cd
 					from product_code pc
 						inner join product_stock ps on pc.prd_cd = ps.prd_cd
 						$in_store_sql
@@ -182,6 +195,7 @@ class prd04Controller extends Controller
 							where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
 							group by prd_cd
 						) _next_store on _next_store.prd_cd = ps.prd_cd $next_store_qty_sql
+						left outer join product_stock_storage pss2 on pss2.prd_cd = pc.prd_cd
 					where 
 						c.code_kind_cd = 'PRD_CD_COLOR'
 						$where
@@ -225,6 +239,7 @@ class prd04Controller extends Controller
 				, p.match_yn
 				, ps.qty as hqty
 				, ps.wqty as hwqty
+				, pss2.storage_cd as storage_cd
 			from product_code pc
 				inner join product_stock ps on pc.prd_cd = ps.prd_cd
 				$in_store_sql
@@ -245,6 +260,7 @@ class prd04Controller extends Controller
 					where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
 					group by prd_cd
 				) _next_store on _next_store.prd_cd = ps.prd_cd $next_store_qty_sql
+				left outer join product_stock_storage pss2 on pss2.prd_cd = pc.prd_cd
 			where 
 				c.code_kind_cd = 'PRD_CD_COLOR' 
 				$where
@@ -253,6 +269,7 @@ class prd04Controller extends Controller
 			$orderby
 			$limit
 		";
+		
 		$pdo	= DB::connection()->getPdo();
 		$stmt	= $pdo->prepare($query);
 		$stmt->execute();

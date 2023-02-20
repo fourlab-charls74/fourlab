@@ -276,16 +276,6 @@ SearchStorage.prototype.Open = async function(callback = null, multiple_type = f
     });
 };
 
-// 매장구분 세팅
-// SearchStorage.prototype.SetStoreTypeSelect = async function(){
-//     const { data: { body: types } } = await axios({ 
-//         url: `/store/api/stores/search-storetype`, 
-//         method: 'get' 
-//     });
-//     for(let type of types) {
-//         $("#search_store_type").append(`<option value="${type.code_id}">${type.code_val}</option>`);
-//     }
-// }
 
 SearchStorage.prototype.SetGrid = function(divId){
     let columns = [];
