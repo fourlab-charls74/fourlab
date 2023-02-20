@@ -128,9 +128,12 @@ class sys01Controller extends Controller
 		$email			= $request->input('email');
 		$store_wonga_yn	= $request->input('store_wonga_yn');
 
-		$user_cnt	= DB::table('mgr_user')
-						->where('id', $id)->count();
-
+		$user_cnt	    = DB::table('mgr_user')
+						    ->where('id', $id)->count();
+        
+        $store_nm       = DB::table('store')
+                            ->where('store_cd', $store_cd)->value('store_nm');
+    
 		if( $user_cnt == 0 ){
 
             if ($grade == 'P') {
@@ -138,6 +141,7 @@ class sys01Controller extends Controller
                     'grade' => $grade,
                     'id' => $id,
                     'store_cd' => $store_cd,
+                    'store_nm' => $store_nm,
                     'passwd' => DB::raw("CONCAT('*', UPPER(SHA1(UNHEX(SHA1('$passwd')))))"),
                     'pwchgperiod' => $pwchgperiod,
                     'name' => $name,
@@ -198,31 +202,35 @@ class sys01Controller extends Controller
 
 	public function update($code, Request $request)
 	{
-		$grade		= $request->input('grade');
-        $store_cd   = $request->input('store_no');
-		$id			= $request->input('id');
-		$passwd		= $request->input('passwd');
+		$grade		    = $request->input('grade');
+        $store_cd       = $request->input('store_no');
+		$id			    = $request->input('id');
+		$passwd		    = $request->input('passwd');
 		$pwchgperiod	= $request->input('pwchgperiod');
-		$name		= $request->input('name');
-		$ipfrom		= $request->input('ipfrom');
-		$ipto		= $request->input('ipto');
-		$md_yn		= $request->input('md_yn');
-		$use_yn		= $request->input('use_yn');
-		$part		= $request->input('part');
-		$posi		= $request->input('posi');
-		$tel		= $request->input('tel');
-		$exttel		= $request->input('exttel');
-		$messenger	= $request->input('messenger');
-		$email		= $request->input('email');
-		$roles		= (object)json_decode($request->input('roles'));
-		$passwd_chg	= $request->input('passwd_chg');
+		$name		    = $request->input('name');
+		$ipfrom		    = $request->input('ipfrom');
+		$ipto		    = $request->input('ipto');
+		$md_yn		    = $request->input('md_yn');
+		$use_yn		    = $request->input('use_yn');
+		$part		    = $request->input('part');
+		$posi		    = $request->input('posi');
+		$tel		    = $request->input('tel');
+		$exttel		    = $request->input('exttel');
+		$messenger	    = $request->input('messenger');
+		$email		    = $request->input('email');
+		$roles		    = (object)json_decode($request->input('roles'));
+		$passwd_chg	    = $request->input('passwd_chg');
 		$store_wonga_yn	= $request->input('store_wonga_yn');
+
+        $store_nm       = DB::table('store')
+                            ->where('store_cd', $store_cd)->value('store_nm');   
 
         if ($grade == 'P') {
             $mgr_user = [
                 'grade'			=> $grade,
                 'id'			=> $id,
                 'store_cd'      => $store_cd,
+                'store_nm'      => $store_nm,
                 'pwchgperiod'	=> $pwchgperiod,
                 'name'			=> $name,
                 'ipfrom'		=> $ipfrom,
@@ -244,6 +252,7 @@ class sys01Controller extends Controller
                 'grade'			=> $grade,
                 'id'			=> $id,
                 'store_cd'      => '',
+                'store_nm'      => '',
                 'pwchgperiod'	=> $pwchgperiod,
                 'name'			=> $name,
                 'ipfrom'		=> $ipfrom,
