@@ -129,6 +129,15 @@ class stk31Controller extends Controller
         $user = DB::table('notice_store')->where('ns_cd', "=", $no)->first();
         $user->name = $user->admin_nm;
 
+
+        //여기 수정 중!!!!!!
+        $sql = "
+            update notice_store set
+                cnt = cnt + 1
+            where ns_cd = $no
+        ";
+        DB::update($sql);
+
         $sql = "
             select
                 d.check_yn,

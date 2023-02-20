@@ -18,7 +18,7 @@
                 <div class="card-header mb-0 justify-content-between d-flex">
                     <div></div>
                     <div>
-                        <button type="button" href="#" onclick="history.back();" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"> 목록</button>
+                        <button type="button" onclick="document.location.href='/shop/stock/stk31';" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">목록</button>
                     </div>
                 </div>
                 <div class="card-body">

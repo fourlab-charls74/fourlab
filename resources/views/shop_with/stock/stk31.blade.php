@@ -157,27 +157,6 @@
         {headerName: "이름", field: "admin_nm",  width: 80, cellClass: 'hd-grid-code'},
         {headerName: "이메일", field: "admin_email", width: 130, cellClass: 'hd-grid-code'},
         {headerName: "조회수", field: "cnt", type:'numberType',width: 50, cellClass: 'hd-grid-code'},
-        {headerName: "전체 공지 여부", field: "all_store_yn",width: 90, cellClass: 'hd-grid-code',
-            cellStyle: params => {
-                if(params.data.all_store_yn == 'Y'){
-                    return {color:'red'}
-                }else{
-                    return {color:'blue'}
-                }
-            },
-            cellRenderer: function(params){
-                if(params.data.stores == null){
-                    return params.data.all_store_yn = "Y";
-                }else{
-                    return params.data.all_store_yn = "N";
-                }
-            }
-        },
-        {headerName: "공지매장", field: "store_nm", width: 340, cellClass: 'hd-grid-code',
-            cellRenderer: function(params) {
-                return params.data.stores;
-            }
-        },
         {headerName: "등록일시", field: "rt", type:"DateTimeType"},
         {headerName: "수정일시", field: "ut", type:"DateTimeType"},
         {headerName: "글번호", field: "ns_cd", hide:true },
