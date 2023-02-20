@@ -148,7 +148,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 inner-td"></div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="">자료수/정렬</label>

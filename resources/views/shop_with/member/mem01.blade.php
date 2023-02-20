@@ -95,6 +95,19 @@
                             </div>
                         </div>
                     </div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="">인증방식</label>
+							<div class="flax_box">
+								<select name="auth_type" id="auth_type" class="form-control form-control-sm">
+									<option value="">전체</option>
+									@foreach($auth_type as $val)
+										<option value="{{$val->code_id}}">{{$val->code_val}}</option>
+									@endforeach
+								</select>
+							</div>
+						</div>
+					</div>
 				</div>
 				<div class="search-area-ext row d-none align-items-center">
 					<div class="col-lg-4 inner-td">
@@ -334,19 +347,6 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="">인증방식</label>
-							<div class="flax_box">
-								<select name="auth_type" id="auth_type" class="form-control form-control-sm">
-									<option value="">전체</option>
-									@foreach($auth_type as $val)
-										<option value="{{$val->code_id}}">{{$val->code_val}}</option>
-									@endforeach
-								</select>
-							</div>
-						</div>
-					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="item">자료수/정렬</label>

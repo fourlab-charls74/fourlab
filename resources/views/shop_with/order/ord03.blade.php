@@ -82,8 +82,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-				<div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="ord_no">주문번호</label>
@@ -92,6 +90,8 @@
                             </div>
                         </div>
                     </div>
+                </div>
+				<div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label>접수상태/배송방식</label>
@@ -140,8 +140,6 @@
                             </div>
                         </div>
                     </div>
-				</div>
-                <div class="row">
                     <div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="formrow-inputZip">판매처</label>
@@ -155,6 +153,8 @@
 							</div>
 						</div>
 					</div>
+				</div>
+                <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="ord_info_key">주문정보</label>
@@ -243,8 +243,6 @@
                             </div>
                         </div>
                     </div>
-				</div>
-				<div class="row search-area-ext d-none">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="prd_cd">상품옵션 범위검색</label>
@@ -259,6 +257,8 @@
 							</div>
 						</div>
 					</div>
+				</div>
+				<div class="row search-area-ext d-none">
                     <div class="col-lg-4 inner-td">
 						<div class="form-group">
                             <label for="formrow-email-input">상품명</label>
@@ -275,8 +275,6 @@
 							</div>
 						</div>
 					</div>
-                </div>
-                <div class="row search-area-ext d-none">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="pr_code">판매유형</label>
