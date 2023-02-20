@@ -20,7 +20,8 @@ class sys01Controller extends Controller
         $values = [
             'section_types' => SLib::getCodes('G_SECTION_TYPE'),
             'types' => SLib::getCodes('G_AD_TYPE'),
-            'states' => SLib::getCodes('IS_SHOW')
+            'states' => SLib::getCodes('IS_SHOW'),
+            "store_types" => SLib::getCodes("STORE_TYPE"),
         ];
         return view(Config::get('shop.store.view') . '/system/sys01', $values);
     }
@@ -67,16 +68,31 @@ class sys01Controller extends Controller
 
         $name        = $req->input('name', '');
         $part        = $req->input('part', '');
+        $grade	     = $req->input('grade', '');
+        $store_type  = $req->input("store_type", '');
+		$store_no    = $req->input("store_no", '');
 
         $where = "";
 
-        if ($name != "")        $where .= " and name like '%" . Lib::quote($name) . "%' ";
-        if ($part != "")        $where .= " and part like '%" . Lib::quote($part) . "%' ";
-
+        if ($name != "")        $where .= " and mu.name like '%" . Lib::quote($name) . "%' ";
+        if ($part != "")        $where .= " and mu.part like '%" . Lib::quote($part) . "%' ";
+        if ($grade != "")  		$where .= " and mu.grade = '" . Lib::quote($grade) . "' ";
+        if ($store_type != "")  $where .= " and s.store_type = '" . Lib::quote($store_type) . "' ";
+		if ($store_no != "") {
+            $where .= " and ( 1<>1";
+            foreach($store_no as $store_cd) {
+                $where .= " or mu.store_cd = '" . Lib::quote($store_cd) . "' ";
+            }
+            $where	.= ")";
+        }
+        
         $sql =
 			/** @lang text */
             "
-            select * from mgr_user 
+            select mu.*, s.store_nm as store_nm, c.code_val as store_type
+            from mgr_user mu
+                left outer join store s on s.store_cd = mu.store_cd
+                left outer join code c on c.code_kind_cd = 'STORE_TYPE' and c.code_id = s.store_type
 			where 1=1 $where
         ";
 

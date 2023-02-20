@@ -40,6 +40,69 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="name">등급</label>
+                            <div class="form-inline form-radio-box">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="grade" id="grade" class="custom-control-input" checked="" value="">
+                                    <label class="custom-control-label" for="grade">전체</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="grade" id="grade_s" class="custom-control-input" value="S" />
+                                    <label class="custom-control-label" for="grade_s">시스템관리</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="grade" id="grade_m" class="custom-control-input" value="M" />
+                                    <label class="custom-control-label" for="grade_m">회사마스터</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="grade" id="grade_u" class="custom-control-input" value="U" />
+                                    <label class="custom-control-label" for="grade_u">일반유저</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="grade" id="grade_p" class="custom-control-input" value="P" />
+                                    <label class="custom-control-label" for="grade_p">매장</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+							<label for="store_type">매장구분</label>
+                            <div class="form-inline">
+                                <select name="store_type" id="store_type" class="form-control form-control-sm w-100">
+                                    <option value="">전체</option>
+                                    @foreach (@$store_types as $type)
+                                        <option value="{{ $type->code_id }}">{{ $type->code_val }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+						</div>
+                    </div>
+                    <!-- <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+							<label for="store_cd">매장코드</label>
+                            <div class="form-inline">
+                                <input type="text" id="store_cd" name="store_cd" class="form-control form-control-sm w-100 search-enter" />
+                            </div>
+						</div>
+                    </div> -->
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+							<label for="store_nm">매장명</label>
+                            <!-- <div class="form-inline">
+                                <input type="text" id="store_nm" name="store_nm" class="form-control form-control-sm w-100 search-enter" />
+                            </div> -->
+                            <div class="form-inline inline_btn_box">
+								<input type='hidden' id="store_nm" name="store_nm">
+								<select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select" multiple></select>
+								<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+							</div>
+						</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -87,6 +150,33 @@
             field: "grade",
             headerName: "등급",
             width: 100,
+            cellClass: 'hd-grid-code',
+            cellRenderer: function(params) {
+				if(params.value === 'S') return "시스템관리"
+				else if(params.value === 'M') return "회사마스터"
+				else if(params.value === 'U') return "일반유저"
+				else if(params.value === 'P') return "매장"
+                else return params.value
+			}
+        },
+        {
+            field: "store_cd",
+            headerName: "매장코드",
+            width: 60,
+            cellStyle: {"text-align": "center"},
+            cellClass: 'hd-grid-code'
+        },
+        {
+            field: "store_type",
+            headerName: "매장구분",
+            width: 80,
+            cellStyle: {"text-align": "center"},
+            cellClass: 'hd-grid-code'
+        },
+        {
+            field: "store_nm",
+            headerName: "매장명",
+            width: 140,
             cellClass: 'hd-grid-code'
         },
         {
@@ -117,7 +207,12 @@
             field: "iptype",
             headerName: "IP타입",
             width: 100,
-            cellClass: 'hd-grid-code'
+            cellClass: 'hd-grid-code',
+            cellRenderer: function(params) {
+				if(params.value === 'A') return "모두"
+				else if(params.value === 'L') return "제한"
+                else return params.value
+			}
         },
         {
             field: "visit_ip",
