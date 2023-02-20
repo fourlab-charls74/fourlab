@@ -156,7 +156,6 @@ class sal24Controller extends Controller
 			'on_off_yn'		=> $on_off_yn,
 			'user_store'	=> $user_store
         ];
-        echo Config::get('shop.shop.view');
         return view( Config::get('shop.shop.view') . '/sale/sal24',$values);
     }
 
