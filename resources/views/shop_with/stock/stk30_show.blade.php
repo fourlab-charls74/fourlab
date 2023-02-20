@@ -176,15 +176,9 @@
         {field: "goods_opt", headerName: "옵션", width: 130},
         {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 65},
         {field: "price", headerName: "판매가", type: "currencyType", width: 65},
-        {field: "return_price", headerName: "반품단가", width: 70, type: 'currencyType',
-            editable: (params) => checkIsEditable(params),
-            cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
-        },
+        {field: "return_price", headerName: "반품단가", width: 70, type: 'currencyType'},
         {field: "store_wqty", headerName: "매장보유재고", width: 90, type: 'currencyType'},
-        {field: "qty", headerName: "반품수량", width: 60, type: 'currencyType', 
-            editable: (params) => checkIsEditable(params),
-            cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
-        },
+        {field: "qty", headerName: "반품수량", width: 60, type: 'currencyType'},
         {field: "total_return_price", headerName: "반품금액", width: 80, type: 'currencyType'},
     ];
 </script>
@@ -240,10 +234,6 @@
             updatePinnedRow();
         });
     }
-
-    const checkIsEditable = (params) => {
-        return (cmd == 'add' || now_state == '10') && params.data.hasOwnProperty('isEditable') && params.data.isEditable ? true : false;
-    };
 
     // 상품 삭제
     const deleteRow = (row) => { gx.gridOptions.api.applyTransaction({remove : [row]}); };
