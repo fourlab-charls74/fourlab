@@ -43,27 +43,14 @@
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="name">등급</label>
-                            <div class="form-inline form-radio-box">
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="grade" id="grade" class="custom-control-input" checked="" value="">
-                                    <label class="custom-control-label" for="grade">전체</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="grade" id="grade_s" class="custom-control-input" value="S" />
-                                    <label class="custom-control-label" for="grade_s">시스템관리</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="grade" id="grade_m" class="custom-control-input" value="M" />
-                                    <label class="custom-control-label" for="grade_m">회사마스터</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="grade" id="grade_u" class="custom-control-input" value="U" />
-                                    <label class="custom-control-label" for="grade_u">일반유저</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="grade" id="grade_p" class="custom-control-input" value="P" />
-                                    <label class="custom-control-label" for="grade_p">매장</label>
-                                </div>
+                            <div class="form-inline">
+                                <select name="grade" id="grade" class="form-control form-control-sm w-100">
+                                    <option value="">전체</option>
+                                    <option value="S">시스템관리</option>
+                                    <option value="M">회사마스터</option>
+                                    <option value="U">일반유저</option>
+                                    <option value="P">매장</option>
+                                </select>
                             </div>
                         </div>
                     </div>
