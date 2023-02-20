@@ -238,8 +238,6 @@
 </div>
 <script language="javascript">
 
-    const DEFAULT = { lineHeight : "30px" };
-
     let rel_states = <?= json_encode(@$rel_states) ?> ;
     let rel_orders = <?= json_encode(@$rel_orders) ?> ;
 
@@ -288,17 +286,16 @@
             field: "type_nm",
             headerName: "구분",
             width: 70,
-            cellStyle: DEFAULT
         },
         {
             field: "opt",
             headerName: "품목",
             width: 70,
-            cellStyle: DEFAULT
         },
-        {field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: DEFAULT, surl:"{{config('shop.front_url')}}"},
+        {field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, 
+            surl:"{{config('shop.front_url')}}"},
         {field: "img", headerName: "이미지_url", hide: true},
-        {field: "prd_cd", headerName: "상품코드", width:120, cellStyle: DEFAULT,
+        {field: "prd_cd", headerName: "상품코드", width:120, 
             cellRenderer: function(params) {
                 if (params.value !== undefined) {
                     return '<a href="#" onclick="return EditProduct(\'' + params.value + '\');">' + params.value + '</a>';
@@ -309,26 +306,22 @@
         {
             field: "color",
             headerName: "칼라",
-            cellStyle: DEFAULT,
             width: 100
         },
         {
             field: "size",
             headerName: "사이즈",
-            cellStyle: DEFAULT,
             width: 80
         },
         {
             field: "unit",
             headerName: "단위",
-            cellStyle: DEFAULT,
             width: 120
         },
         {
             field: "price",
             headerName: "판매가",
             type: 'currencyType',
-            cellStyle: DEFAULT,
             width: 80
         },
 		{field: "qty", headerName: "수량", type: "numberType",
