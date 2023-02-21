@@ -96,7 +96,7 @@
 					{ headerName: "{{ $child->code_val }}", field: "{{ $child->code_id }}_amt", type: 'currencyType', width: 100 },
 					@if (in_array($child->code_id, ['P1', 'M3']))
 					{ headerName: "{{ $child->code_val }}(-VAT)", field: "{{ $child->code_id }}_novat", type: 'currencyType', width: 105,
-						cellRenderer: (params) => Math.round((params.data["{{ $child->code_id }}_amt"] || 0) / 1.1),
+						cellRenderer: (params) => params.data["{{ $child->code_id }}_amt"] ? Comma(Math.round((params.data["{{ $child->code_id }}_amt"] || 0) / 1.1)) : 0,
 					},
 					@endif
 				@endforeach

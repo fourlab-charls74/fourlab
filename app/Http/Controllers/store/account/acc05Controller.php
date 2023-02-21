@@ -53,7 +53,7 @@ class acc05Controller extends Controller
                 : $types;
             $types_str = array_map(function($t) { return "'" . $t->code_id . "'"; }, $types_arr);
 
-            $extra_sql .= ", sum(if(el.type in (" . join(',', $types_str) . "), el.extra_amt, null)) as " . $group_cd . "_sum";
+            $extra_sql .= ", sum(if(el.type in (" . join(',', $types_str) . "), if(el.type in ('P1', 'M3'), round(el.extra_amt / 1.1), el.extra_amt), null)) as " . $group_cd . "_sum";
             $sum_extra_sql .= ", sum(" . $group_cd . "_sum) as " . $group_cd . "_sum";
         }
 
@@ -179,9 +179,12 @@ class acc05Controller extends Controller
         }, $expandables));
         $extra_sql .= ", sum(if(el.type = 'S', el.extra_amt, null)) as S_sum";
 
+        $f_sdate = Carbon::parse($f_sdate)->firstOfMonth()->format("Ymd");
+        $f_edate = Carbon::parse($f_edate)->lastOfMonth()->format("Ymd");
+
         // search
         $sql = "
-            select s.store_cd, s.store_nm, s.store_type, e.*
+            select s.store_cd, s.store_nm, s.store_type, e.*, c.*
             from store s
                 left outer join (
                     select e.idx as ext_idx, e.ymonth, e.store_cd as e_store_cd
@@ -192,11 +195,16 @@ class acc05Controller extends Controller
                     where e.ymonth = :sdate
                     group by e.store_cd
                 ) e on e.e_store_cd = s.store_cd
+                left outer join (
+					select c.store_cd as c_store_cd, c.closed_yn
+                    from store_account_closed c
+                    where c.sday = :f_sdate and c.eday = :f_edate
+                ) c on c.c_store_cd = s.store_cd
             where s.account_yn = 'Y'
             order by s.store_cd
         ";
-        $result = DB::select($sql, ['sdate' => $sdate]);
-
+        $result = DB::select($sql, ['sdate' => $sdate, 'f_sdate' => $f_sdate, 'f_edate' => $f_edate]);
+        
         return response()->json([
             'code'	=> 200,
             'head'	=> [
