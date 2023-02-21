@@ -300,12 +300,27 @@
                         hide: true,
                         width: 80,
                         editable: true,
-                        cellStyle: {'background-color': '#ffff99'},
-                        valueFormatter: formatNumber
+                        // cellStyle: {'background-color': '#ffff99'},
+                        valueFormatter: formatNumber,
+                        cellStyle: params => {
+                            if (params.node.level == 0) {
+                                return {};
+                            } else {
+                                return { 'background': '#ffff99' };
+                            }
+                        }
                     },
                 ],
             },
-            {field: "req_comment", headerName: "매장메모", width: 300, editable: true,cellStyle: {'background-color': '#ffff99'}},
+            {field: "req_comment", headerName: "매장메모", width: 300, editable: true,
+                cellStyle: params => {
+                    if (params.node.level == 0) {
+                        return {};
+                    } else {
+                        return { 'background': '#ffff99' };
+                    }
+                }
+            },
             {width: 'auto'}
         ];
 

@@ -40,11 +40,13 @@ class stk32Controller extends Controller
         $sender = $request->input('sender');
         $content = $request->input('content');
         $msg_type = $request->input("msg_type", "");
+        $read_yn = $request->input('read_yn');
 
         $where = "";
         $orderby = "";
         if ($sender != "") $where .= "and store_nm like '%" . Lib::quote($sender) . "%'  ";
         if ($content != "") $where .= " and m.content like '%" . Lib::quote($content) . "%' ";
+        if ($read_yn != "") $where .= "and md.check_yn = '$read_yn'";
      
 
         // 로그인한 계정 // 추후 수정
@@ -69,20 +71,21 @@ class stk32Controller extends Controller
             $sql = "
                 select 
                     m.msg_cd
-                    , msd.receiver_type
-                    , group_concat(msd.receiver_cd separator ', ') as receiver_cd
-                    , group_concat(if(msd.receiver_type = 'S', s.store_nm, '본사') separator ', ') as receiver_nm
+                    , md.receiver_type
+                    , group_concat(md.receiver_cd separator ', ') as receiver_cd
+                    , group_concat(if(md.receiver_type = 'S', s.store_nm, '본사') separator ', ') as receiver_nm
                     -- , if(msd.receiver_type = 'S', s.store_nm, '본사') as receiver
                     -- , count(msd.receiver_cd) as receiver_cnt
                     , s.store_nm
-                    , msd.receiver_type
+                    , md.receiver_type
                     , m.reservation_yn
                     , m.reservation_date
                     , m.content
                     , m.rt
+                    , md.check_yn
                 from msg_store m 
-                    left outer join msg_store_detail msd on msd.msg_cd = m.msg_cd
-                    left outer join store s on s.store_cd = msd.receiver_cd
+                    left outer join msg_store_detail md on md.msg_cd = m.msg_cd
+                    left outer join store s on s.store_cd = md.receiver_cd
                 where m.sender_type = '$admin_type' and m.sender_cd = '$admin_cd'
                 and m.rt >= :sdate and m.rt < date_add(:edate, interval 1 day)
                 $where
@@ -106,8 +109,6 @@ class stk32Controller extends Controller
                 where md.receiver_type = '$admin_type' and md.receiver_cd = '$admin_cd' $where
                 group by md.msg_cd
             ";
-
-            dd($sql);
         }
        
         $result = DB::select($sql , ['sdate' => $sdate, 'edate' => $edate]);
@@ -321,13 +322,15 @@ class stk32Controller extends Controller
                     m.msg_cd,
                     md.receiver_type,
                     group_concat(md.receiver_cd separator ', ') as receiver_cd,
-                    group_concat(if(md.receiver_type = 'S', s.store_nm, '본사') separator ', ') as receiver_nm,
+                    group_concat(if(md.receiver_type = 'S', concat(s.store_nm, '( ', md.check_yn , ' )'), '본사') separator ', ') as receiver_nm,
                     if(md.receiver_type = 'S', s.store_nm, '본사') as first_receiver,
                     count(md.receiver_cd) as receiver_cnt,
                     m.reservation_yn,
                     m.reservation_date,
                     m.content,
-                    m.rt
+                    m.rt,
+                    md.check_yn,
+                    s.store_nm
                 from msg_store m
                     inner join msg_store_detail md on md.msg_cd = m.msg_cd
                     left outer join store s on s.store_cd = md.receiver_cd
@@ -353,7 +356,25 @@ class stk32Controller extends Controller
         }
        
         $result = DB::selectOne($sql);
-       
+
+        $receiver_nm = $result->receiver_nm??'';
+        $receiver_nm = explode(', ',$receiver_nm);
+
+
+        $sql = "
+            select 
+                m.msg_cd,
+                md.receiver_type,
+                md.check_yn,
+                s.store_nm
+            from msg_store m
+                inner join msg_store_detail md on md.msg_cd = m.msg_cd
+                left outer join store s on s.store_cd = md.receiver_cd
+            where m.sender_type = '$admin_type' and m.sender_cd = '$admin_cd' and m.msg_cd = '$msg_cd'
+        ";
+
+        $store = DB::select($sql);
+
         if ($msg_type == 'send') {
             $values = [
                 'store_types' => SLib::getCodes("STORE_TYPE"),
@@ -364,6 +385,10 @@ class stk32Controller extends Controller
                 'content' => $res->content,
                 'first_receiver' => $result->first_receiver,
                 'receiver_cnt' => $result->receiver_cnt,
+                'receiver_nm' => $receiver_nm,
+                'store_nm' => $result->store_nm,
+                'check_yn' => $result->check_yn,
+                'store' => $store
             ];
         } else if ($msg_type == 'receive') {
             $values = [
@@ -373,7 +398,8 @@ class stk32Controller extends Controller
                 'edate' => date("Y-m-d"),
                 'msg_cd' => $msg_cd,
                 'content' => $res->content,
-                'sender_nm' => $result->sender_nm
+                'sender_nm' => $result->sender_nm,
+                'store' => $store
             ];
         }
 

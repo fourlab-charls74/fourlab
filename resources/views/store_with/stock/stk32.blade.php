@@ -82,6 +82,25 @@
                     <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
+                            <label for="formrow-email-input">알림확인여부</label>
+                                <div class="form-inline form-radio-box">
+                                    <div class="custom-control custom-radio">
+                                        <input type="radio" name="read_yn" value="" id="read_all" class="custom-control-input" checked>
+                                        <label class="custom-control-label" for="read_all">전체</label>
+                                    </div>
+                                    <div class="custom-control custom-radio">
+                                        <input type="radio" name="read_yn" value="Y" id="read_y" class="custom-control-input">
+                                        <label class="custom-control-label" for="read_y">Y</label>
+                                    </div>
+                                    <div class="custom-control custom-radio">
+                                        <input type="radio" name="read_yn" value="N" id="read_n" class="custom-control-input">
+                                        <label class="custom-control-label" for="read_n">N</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 inner-td">
+                            <div class="form-group">
                                 <label for="">자료수/정렬</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box" style="width:24%;">
@@ -134,9 +153,6 @@
                 @elseif(@$cmd == 'receive')
                     <a href="#" id="msg_read_btn" onclick="msgRead()" class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;"> 읽음</a>
                 @endif
-                <div class="fr_box">
-
-                </div>
             </div>
         </div>
 		<div class="table-responsive">

@@ -30,15 +30,36 @@
                                             <tr>
                                                 <th>{{ @$msg_type == 'send' ? '수신처' : '발신처' }}</th>
                                                 <td>
-                                                    <div class="flax_box" name="sd" id="sd">
+                                                    <div class="d-inline-block" name="sd" id="sd">
                                                         @if($msg_type == 'send')
-                                                            <span>{{@$first_receiver}}외 {{@$receiver_cnt-1}}개</span>
+                                                            @if ($receiver_cnt-1 == 0)
+                                                                <span style="vertical-align:middle">{{@$first_receiver}}</span>
+                                                            @else
+                                                                <span style="vertical-align:middle">{{@$first_receiver}} 외 {{@$receiver_cnt-1}}개</span>
+                                                            @endif
                                                         @else
                                                             <span>{{@$sender_nm}}</span>
                                                         @endif
                                                     </div>
+                                                    @if($msg_type == 'send')
+                                                        <a href="#" style="float:right" onclick="showStore();" class="btn btn-lg btn-outline-primary mr-1">더보기</a>
+                                                    @endif
                                                 </td>
                                             </tr>
+                                            @if($msg_type == 'send')
+                                                <tr id="showStore">
+                                                    <th></th>
+                                                    <td>
+                                                        @foreach ($store as $s)
+                                                            @if ($s->check_yn == 'Y') 
+                                                                <span style="color:green;">{{ $s->store_nm }}( {{ $s->check_yn }} )     </span>
+                                                            @else
+                                                                <span style="color:red;">{{ $s->store_nm }}( {{ $s->check_yn }} )     </span>
+                                                            @endif
+                                                        @endforeach
+                                                    </td>
+                                                </tr>
+                                            @endif
                                         </tbody>
                                     </table>
                                 </div>
@@ -64,5 +85,21 @@
         </div>
     </div>
 
+<script>
 
+    $(document).ready(function(){
+        $('#showStore').hide();
+    }); 
+
+    let cnt = 0;
+    function showStore() {
+        cnt++;
+        $('#showStore').show();
+
+        if (cnt%2 == 0) {
+            $('#showStore').hide();
+        }
+    }
+
+</script>
 @stop

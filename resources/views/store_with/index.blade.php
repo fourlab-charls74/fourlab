@@ -6,11 +6,12 @@
     왼쪽 하단 - 공지사항
     오른쪽 하단 - 알리미
 -->
+   
     <div class="row">
         <div class="col-lg-6">
             <div class="card shadow-none mb-3">
                 <div class="card-title">
-                    <div class="filter_wrap" style="width: 100%; height:390px; padding:10px 10px 10px 10px;">
+                    <div class="filter_wrap" style="width: 100%; height:100%; padding:10px 10px 10px 10px;">
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
                             <li class="nav-item">
                                 <a class="nav-link" id="bar-tab" data-toggle="tab" href="#bar" role="tab" aria-controls="bar" aria-selected="false">일별 매출</a>
@@ -24,13 +25,8 @@
                                 <div class="card_wrap aco_card_wrap">
                                     <div class="card shadow">
                                         <div class="card shadow mb-1">
-                                            <div id="filter-area" class="card shadow-none mb-4 ty2 last-card">
-                                                <div class="card-body shadow">
-                                                    <div class="table-responsive">
-                                                        <div id="opt_chart" style="height: 100%; width:auto"></div>
-                                                        <div id="div-gd-chart1" style="display:none;" class="ag-theme-balham"></div>
-                                                    </div>
-                                                </div>
+                                            <div class="chart-container" style="position: relative; height:auto; width:auto">
+                                                <canvas id="myChart"></canvas>
                                             </div>
                                         </div>
                                     </div>
@@ -55,7 +51,7 @@
         <div class="col-lg-6">
             <div class="card shadow-none mb-3">
                 <div class="card-title">
-                    <div class="filter_wrap" style="width: 100%; height:390px;">
+                    <div class="filter_wrap" style="width: 100%; height:100%;">
                         <div style="text-align:center; padding-top: 200px">
 
                             <h5>자주 사용하는 메뉴 COMMING SOON</h5>
@@ -65,11 +61,10 @@
                 </div>
             </div>
         </div>
-
         <div class="col-lg-6">
             <div class="card shadow-none mb-3">
                 <div class="card-title">
-                    <div class="filter_wrap" style="width: 100%; height:390px;">
+                    <div class="filter_wrap" style="width: 100%; height:100%;">
                         <div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
                             <div class="card-body shadow">
                                 <div class="card-title">
@@ -77,6 +72,7 @@
                                         <div class="fl_box">
                                             <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                                         </div>
+                                        <a href="#" id="msg_del_btn" onclick="notice()"class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">더보기</a>
                                         <div class="fr_box">
 
                                         </div>
@@ -94,7 +90,7 @@
         <div class="col-lg-6">
             <div class="card shadow-none mb-3">
                 <div class="card-title">
-                    <div class="filter_wrap" style="width: 100%; height:390px;">
+                    <div class="filter_wrap" style="width: 100%; height:100%;">
                         <div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
                             <div class="card-body shadow">
                                 <div class="card-title">
@@ -102,6 +98,7 @@
                                         <div class="fl_box">
                                             <h6 class="m-0 font-weight-bold">총 <span id="gd-alarm-total" class="text-primary">0</span> 건</h6>
                                         </div>
+                                        <a href="#" id="msg_del_btn" onclick="msg()"class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">더보기</a>
                                     </div>
                                 </div>
                                 <div class="table-responsive">
@@ -118,16 +115,14 @@
 <!-- 공지사항 -->
 <script language="javascript">
     let columns = [
-        {headerName: "#", field: "num",type:'NumType', cellClass: 'hd-grid-code'},
-        {headerName: "제목", field: "subject", width: 400,
+        {headerName: "제목", field: "subject", width: 300,
             cellRenderer: function(params) {
                 return '<a href="/store/stock/stk31/' + params.data.ns_cd +'" rel="noopener">'+ params.value+'</a>';
             }
         },
-        {headerName: "ID", field: "admin_id",  width: 80, cellClass: 'hd-grid-code'},
-        {headerName: "이름", field: "admin_nm",  width: 80, cellClass: 'hd-grid-code'},
-        {headerName: "이메일", field: "admin_email", width: 130, cellClass: 'hd-grid-code'},
+        {headerName: "이름", field: "admin_nm",  width: 60, cellClass: 'hd-grid-code'},
         {headerName: "조회수", field: "cnt", type:'numberType',width: 50, cellClass: 'hd-grid-code'},
+        {headerName: "등록일시", field: "rt", type:"DateTimeType"},
         {headerName: "전체 공지 여부", field: "all_store_yn",width: 90, cellClass: 'hd-grid-code',
             cellStyle: params => {
                 if(params.data.all_store_yn == 'Y'){
@@ -149,8 +144,6 @@
                 return params.data.stores;
             }
         },
-        {headerName: "등록일시", field: "rt", type:"DateTimeType"},
-        {headerName: "수정일시", field: "ut", type:"DateTimeType"},
         {headerName: "글번호", field: "ns_cd", hide:true },
         {width: 'auto'}
     ];
@@ -164,7 +157,7 @@
     let gx;
 
     $(document).ready(function() {
-        pApp.ResizeGrid(1000);
+        pApp.ResizeGrid(800);
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
         pApp.BindSearchEnter();
@@ -205,7 +198,7 @@
     let gx2;
 
     $(document).ready(function() {
-        pApp2.ResizeGrid(1000);
+        pApp2.ResizeGrid(800);
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
         gx2 = new HDGrid(gridDiv2, columns2);
         pApp2.BindSearchEnter();
@@ -232,97 +225,171 @@
 </script>
 <script src="https://unpkg.com/ag-charts-community@2.1.0/dist/ag-charts-community.min.js"></script>
 <script language="javascript">
-    var columns3 = [
-    ];
+    // var columns3 = [
+    // ];
 </script>
 <script type="text/javascript" charset="utf-8">
-    let chart_data = null;
+    // let chart_data = null;
 
-    const pApp3 = new App('', {
-        gridId: "#div-gd-chart1",
-    });
-    let gx3;
-    $(document).ready(function() {
-        pApp3.ResizeGrid(1000);
-        pApp3.BindSearchEnter();
-        let gridDiv3 = document.querySelector(pApp3.options.gridId);
-        let options = {
-            getRowStyle: (params) => {
-                if (params.node.rowPinned === 'top') {
-                    return { 'background': '#eee' }
-                }
-            }
-        };
-        gx3 = new HDGrid(gridDiv3, columns3, options);
+    // const pApp3 = new App('', {
+    //     gridId: "#div-gd-chart1",
+    // });
+    // let gx3;
+    // $(document).ready(function() {
+    //     pApp3.ResizeGrid(1000);
+    //     pApp3.BindSearchEnter();
+    //     let gridDiv3 = document.querySelector(pApp3.options.gridId);
+    //     let options = {
+    //         getRowStyle: (params) => {
+    //             if (params.node.rowPinned === 'top') {
+    //                 return { 'background': '#eee' }
+    //             }
+    //         }
+    //     };
+    //     gx3 = new HDGrid(gridDiv3, columns3, options);
         
-        Search3();
+    //     Search3();
 
-    });
+    // });
 
-    function Search3() {
-        //$('[name=ord_state]').val(10);
+    // function Search3() {
+    //     //$('[name=ord_state]').val(10);
 
-        let data = $('form[name="search"]').serialize();
+    //     let data = $('form[name="search"]').serialize();
 
-        // console.log(data);
+    //     // console.log(data);
 
 
-        gx3.Request('/store/main_chart1', data, -1, function(data) {
-            chart_data = data.body;
-            drawCanvas();
-        });
+    //     gx3.Request('/store/main_chart1', data, -1, function(data) {
+    //         chart_data = data.body;
+    //         drawCanvas();
+    //     });
+    // }
+
+    // function drawCanvas() {
+    //     drawCanvasByDate();
+    // }
+
+    // function drawCanvasByDate() {
+    //     $('#opt_chart').html('');
+
+    //     let beforeRowMonth = null;
+
+    //     chart_data.sort(function(a, b) {
+    //         if (a.date < b.date) {
+    //             return -1;
+    //         }
+    //         if (a.date > b.date) {
+    //             return 1;
+    //         }
+
+    //         return 0;
+    //     });
+
+    //     chart_data.forEach(function(row) {
+    //         if (beforeRowMonth !== row.month || beforeRowMonth === null) {
+    //             row.chart_x_str = row.month + "." + row.day;
+    //             beforeRowMonth = row.month;
+    //             return;
+    //         }
+
+    //         row.chart_x_str = row.day;
+    //     });
+
+    //     var options = {
+    //         container: document.getElementById('opt_chart'),
+    //         title: {
+    //             text: "일별 매출 통계",
+    //         },
+    //         data: chart_data,
+    //         series: [{
+    //             type: 'column',
+    //             xKey: 'chart_x_str',
+    //             yKeys: ['sum_amt', 'sum_wonga'],
+    //             yNames: [' 매출액', '매출원가'],
+    //             grouped: true,
+    //             fills: ['#556ee6', '#2797f6'],
+    //             strokes: ['#556ee6', '#2797f6']
+    //             // highlightStyle : {
+    //             //   fill :
+    //             // }
+    //         }],
+    //     };
+    //     agCharts.AgChart.create(options);
+    // }
+
+    function notice() {
+        window.location.href = "/store/stock/stk31";
     }
 
-    function drawCanvas() {
-        drawCanvasByDate();
+    function msg() {
+        window.location.href = "/store/stock/stk32";
     }
 
-    function drawCanvasByDate() {
-        $('#opt_chart').html('');
+</script>
 
-        let beforeRowMonth = null;
+<!-- 차트 -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-        chart_data.sort(function(a, b) {
-            if (a.date < b.date) {
-                return -1;
-            }
-            if (a.date > b.date) {
-                return 1;
-            }
+<script>
+  const ctx = document.getElementById('myChart');
 
-            return 0;
-        });
 
-        chart_data.forEach(function(row) {
-            if (beforeRowMonth !== row.month || beforeRowMonth === null) {
-                row.chart_x_str = row.month + "." + row.day;
-                beforeRowMonth = row.month;
-                return;
-            }
+  let edate = '{{$edate}}';
+  let sdate = '{{$sdate}}';
 
-            row.chart_x_str = row.day;
-        });
+  let all_date = getDatesStartToLast(sdate, edate);
 
-        var options = {
-            container: document.getElementById('opt_chart'),
-            title: {
-                text: "일별 매출 통계",
-            },
-            data: chart_data,
-            series: [{
-                type: 'column',
-                xKey: 'chart_x_str',
-                yKeys: ['sum_amt', 'sum_wonga'],
-                yNames: [' 매출액', '매출원가'],
-                grouped: true,
-                fills: ['#556ee6', '#2797f6'],
-                strokes: ['#556ee6', '#2797f6']
-                // highlightStyle : {
-                //   fill :
-                // }
-            }],
-        };
-        agCharts.AgChart.create(options);
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      datasets: [{
+        label: '매출액', 
+        data: [
+            {x: all_date[0], y: 10},
+            {x: all_date[1], y: 10},
+            {x: all_date[2], y: 10},
+            {x: all_date[3], y: 10},
+            {x: all_date[4], y: 10},
+            {x: all_date[5], y: 10},
+            {x: all_date[6], y: 10},
+            {x: all_date[7], y: 10},
+        ],
+        borderWidth: 3
+      },{
+        label: '매출원가',
+        data: [
+            {x: all_date[0], y: 10},
+            {x: all_date[1], y: 10},
+            {x: all_date[2], y: 10},
+            {x: all_date[3], y: 10},
+            {x: all_date[4], y: 10},
+            {x: all_date[5], y: 10},
+            {x: all_date[6], y: 10},
+            {x: all_date[7], y: 10},
+        ],
+        borderWidth: 3
+    }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+    function getDatesStartToLast(sdate, edate) {
+        var regex = RegExp(/^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/);
+        if(!(regex.test(sdate) && regex.test(edate))) return "Not Date Format";
+        var result = [];
+        var curDate = new Date(sdate);
+        while(curDate <= new Date(edate)) {
+            result.push(curDate.toISOString().split("T")[0]);
+            curDate.setDate(curDate.getDate() + 1);
+        }
+        return result;
     }
 
 </script>

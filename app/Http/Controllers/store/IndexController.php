@@ -14,11 +14,13 @@ class IndexController extends Controller
     
     public function index() {
 
-
+        $mutable = Carbon::now();
+        $sdate = $mutable->sub(1, 'week')->format('Y-m-d');
+        $edate = date("Y-m-d");
 
         $values = [
-
-
+            'sdate' => $sdate,
+            'edate' => $edate
         ];
 
 
@@ -53,7 +55,7 @@ class IndexController extends Controller
             where s.rt >= '$sdate' and s.rt < date_add( '$edate', interval 1 day) 
             group by s.ns_cd
             order by s.rt desc
-            limit 0, 100 
+            limit 0, 5
         ";
 
         $result = DB::select($sql); 
@@ -86,6 +88,8 @@ class IndexController extends Controller
                 left outer join store s on s.store_cd = m.sender_cd
             where md.receiver_type = 'H' and md.receiver_cd = 'HEAD' 
             group by md.msg_cd
+            order by md.rt desc
+            limit 0, 5
         
         ";
 
