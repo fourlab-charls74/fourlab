@@ -30,17 +30,14 @@ class stk20Controller extends Controller
 	{
         //로그인한 아이디의 매칭된 매장을 불러옴
         $user_store	= Auth('head')->user()->store_cd;
+        $store_nm = Auth('head')->user()->store_nm;
+        $rt_yn    = SLib::getStoreProp($user_store)->rt_yn;
 
-
-        $sql = "
-            select
-                store_nm
-            from store
-            where store_cd = '$user_store'
-        ";
-
-        $store_nm = DB::selectOne($sql);
-        $store_nm = $store_nm->store_nm;
+        //rt권한에 따라 페이지 접속 차단
+        if($rt_yn != 'Y') {
+            printMsg('RT권한이 없습니다.', 'back');
+            exit;
+        }
 
 		$values = [
             'store_types' => SLib::getCodes("STORE_TYPE"),

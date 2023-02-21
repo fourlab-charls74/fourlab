@@ -140,4 +140,16 @@ class SLib
         return $sale_kinds;
     }
 
+    /* 매장특성정보 */
+    public static function getStoreProp($no)
+    {
+        $sql = "
+            select 
+                s.manage_type, s.account_yn, s.exp_manage_yn, s.priority, s.competitor_yn, s.pos_yn, s.ostore_stock_yn, s.sale_dist_yn, s.rt_yn, s.open_month_stock_yn, s.point_in_yn, s.sale_place_match_yn
+            from store s
+            where s.store_cd = :store_cd
+        ";
+        return DB::selectOne($sql, ['store_cd'=>$no]);
+    }
+
 }
