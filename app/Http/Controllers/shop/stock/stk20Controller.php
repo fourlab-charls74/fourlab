@@ -35,7 +35,7 @@ class stk20Controller extends Controller
 
         //rt권한에 따라 페이지 접속 차단
         if($rt_yn != 'Y') {
-            printMsg('RT권한이 없습니다.', 'back');
+            Lib::printMsg('RT권한이 없습니다.', 'back');
             exit;
         }
 
