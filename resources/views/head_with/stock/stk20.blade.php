@@ -282,80 +282,86 @@
         </div>
     </form>
     <script language="javascript">
-		const cstmCellStyle = {
-			'line-height' : '40px',
-		};
-
-        var columns= [
-                {field:"goods_no" ,headerName:"상품코드",pinned:'left',width:58, cellStyle:cstmCellStyle},
-                {field:"style_no" ,headerName:"스타일넘버",pinned:'left',width:84, cellStyle:cstmCellStyle},
-                {field:"img2",headerName:"img2",hide:true},
-                {field:"img" , headerName:"이미지", width:46,
-                    cellRenderer: function(params) {
-                        if (params.value !== undefined && params.data.img != "") {
-                            return '<img src="{{config('shop.image_svr')}}' + params.data.img + '" style="height:40px;" />';
+		var columns= [
+            {field:"goods_no" ,headerName:"상품코드",pinned:'left',width:58},
+            {field:"style_no" ,headerName:"스타일넘버",pinned:'left',width:84},
+            {field:"img2",headerName:"img2",hide:true},
+            {field:"img" , headerName:"이미지", width:46,
+                cellRenderer: function(params) {
+                    if (params.value !== undefined && params.data.img != "") {
+                        return '<img src="{{config('shop.image_svr')}}' + params.data.img + '" style="height:40px;" />';
+                    }
+                }
+            },
+            {field:"goods_nm" ,headerName:"상품명",pinned:'left', type:"HeadGoodsNameType", width:200},
+            {field:"head_desc" ,headerName:"상단홍보글", width:84},
+            {field:"goods_nm_eng" ,headerName:"상품명(영문)", width:96},
+            {field:"opt_kind_nm" ,headerName:"품목", width:84},
+            {field:"brand_nm" ,headerName:"브랜드", width:84 },
+            {field:"style_no" ,headerName:"스타일넘버", width:96 },
+            {field:"goods_type_nm",headerName:"상품구분",width:72, 
+                cellStyle: function(params) {
+                    var state = { 위탁: "#ff0000", 매입: "#669900", 해외: "#0000FF" };
+                    if (params.value !== undefined) {
+                        if (state[params.value]) {
+                            var color = state[params.value];
+                            return { color: color, "text-align": "center" };
                         }
                     }
-                },
-                {field:"goods_nm" ,headerName:"상품명",pinned:'left', type:"HeadGoodsNameType", width:200, cellStyle:cstmCellStyle},
-                {field:"head_desc" ,headerName:"상단홍보글", width:84, cellStyle:cstmCellStyle},
-                {field:"goods_nm_eng" ,headerName:"상품명(영문)", width:96, cellStyle:cstmCellStyle},
-                {field:"opt_kind_nm" ,headerName:"품목", width:84, cellStyle:cstmCellStyle},
-                {field:"brand_nm" ,headerName:"브랜드", width:84, cellStyle:cstmCellStyle },
-                {field:"style_no" ,headerName:"스타일넘버", width:96, cellStyle:cstmCellStyle },
-                {field:"goods_type_nm",headerName:"상품구분",width:72, cellStyle:StyleGoodsTypeNM},
-                {field:"is_unlimited_nm",headerName:"재고구분",width:72, cellStyle:cstmCellStyle},
-                {field:"com_nm",headerName:"업체",width:84, cellStyle:cstmCellStyle},
-                {field:"sale_stat_cl_nm" ,headerName:"상태",width:84,cellStyle:StyleGoodsState},
-                {field:"wonga" ,headerName:"원가", type: 'currencyType', width:60, cellStyle:cstmCellStyle},
-                {field:"goods_opt" ,headerName:"옵션",width:150, cellStyle:cstmCellStyle,
-                    cellRenderer: function(params) {
-                            return '<a href="#" onclick="return openHeadStock(' + params.data.goods_no + ',\'' + params.value +'\');">' + params.value + '</a>';
-                    }
-                },
-                {field:"good_qty",headerName:"온라인재고",type:'numberType', width:84, cellStyle:cstmCellStyle},
-                {field:"wqty",headerName:"보유재고",type:'numberType', width:72, cellStyle:cstmCellStyle},
-                {headerName:"판매수",
-                    children: [
-                        {headerName: "{{$month1}} 월", field: "sale_qty1",type:'currencyType',width:60, cellStyle:cstmCellStyle},
-                        {headerName: "{{$month2}} 월", field: "sale_qty2",type:'currencyType',width:60, cellStyle:cstmCellStyle},
-                        {headerName: "{{$month3}} 월", field: "sale_qty3",type:'currencyType',width:60, cellStyle:cstmCellStyle},
-                        {headerName: "최근30일", field: "sale_qty",type:'currencyType', width:84, cellStyle:cstmCellStyle},
-                        {headerName: "할인판매수", field: "dc_sale_qty",type:'currencyType'},
-                        {headerName: "소매", field: "sale_ord_type_12_qty",type:'currencyType'},
-                        {headerName: "도매", field: "sale_ord_type_13_qty",type:'currencyType'},
-                        {headerName: "쿠팡(로켓)", field: "sale_ord_type_roket_qty",type:'currencyType'},
-                        {headerName: "납품", field: "sale_ord_type_17_qty",type:'currencyType'},
-                        {field:"avg_qty",headerName:"일평균판매수",type:'percentType'},
-                        {headerName: "수량", field: "sale_sum_qty",type:'currencyType'},
-                        {headerName: "금액", field: "sale_sum_amt",type:'currencyType'},
-                        {headerName: "판매상위20%(금액)", field: "top20p_sale_amt",cellClass:'hd-grid-code',},
-                    ]
-                },
-                {field:"expect_day",headerName:"소진예상일",type:'percentType'},
-                {headerName:"클레임",
-                    children: [
-                        {headerName: "수량", field: "clm_qty",type:'currencyType'},
-                        {headerName: "상품불량", field: "clm_5_qty",type:'currencyType'},
-                        {headerName: "품절", field: "clm_4_qty",type:'currencyType'},
-                    ]
-                },
+                }
+            },
+            {field:"is_unlimited_nm",headerName:"재고구분",width:72},
+            {field:"com_nm",headerName:"업체",width:84},
+            {field:"sale_stat_cl_nm" ,headerName:"상태",width:84,cellStyle:StyleGoodsState},
+            {field:"wonga" ,headerName:"원가", type: 'currencyType', width:60},
+            {field:"goods_opt" ,headerName:"옵션",width:150,
+                cellRenderer: function(params) {
+                        return '<a href="#" onclick="return openHeadStock(' + params.data.goods_no + ',\'' + params.value +'\');">' + params.value + '</a>';
+                }
+            },
+            {field:"good_qty",headerName:"온라인재고",type:'numberType', width:84},
+            {field:"wqty",headerName:"보유재고",type:'numberType', width:72},
+            {headerName:"판매수",
+                children: [
+                    {headerName: "{{$month1}} 월", field: "sale_qty1",type:'currencyType',width:60},
+                    {headerName: "{{$month2}} 월", field: "sale_qty2",type:'currencyType',width:60},
+                    {headerName: "{{$month3}} 월", field: "sale_qty3",type:'currencyType',width:60},
+                    {headerName: "최근30일", field: "sale_qty",type:'currencyType', width:84},
+                    {headerName: "할인판매수", field: "dc_sale_qty",type:'currencyType'},
+                    {headerName: "소매", field: "sale_ord_type_12_qty",type:'currencyType'},
+                    {headerName: "도매", field: "sale_ord_type_13_qty",type:'currencyType'},
+                    {headerName: "쿠팡(로켓)", field: "sale_ord_type_roket_qty",type:'currencyType'},
+                    {headerName: "납품", field: "sale_ord_type_17_qty",type:'currencyType'},
+                    {field:"avg_qty",headerName:"일평균판매수",type:'percentType'},
+                    {headerName: "수량", field: "sale_sum_qty",type:'currencyType'},
+                    {headerName: "금액", field: "sale_sum_amt",type:'currencyType'},
+                    {headerName: "판매상위20%(금액)", field: "top20p_sale_amt",cellClass:'hd-grid-code',},
+                ]
+            },
+            {field:"expect_day",headerName:"소진예상일",type:'percentType'},
+            {headerName:"클레임",
+                children: [
+                    {headerName: "수량", field: "clm_qty",type:'currencyType'},
+                    {headerName: "상품불량", field: "clm_5_qty",type:'currencyType'},
+                    {headerName: "품절", field: "clm_4_qty",type:'currencyType'},
+                ]
+            },
 
             {field:"price",headerName:"판매가",type:'currencyType',filter: 'agNumberColumnFilter' ,filter:true},
-                {field:"wonga",headerName: "원가",type:'currencyType'},
-                {field:"margin_amt",headerName:"마진",type:'currencyType'},
-                {field:"margin_rate",headerName:"마진율",type:'percentType'},
-                {field:"totalwonga",headerName:"현재고총원가",type:'currencyType'},
-                {field:"tot_sales",headerName:"예상총매출액",type:'currencyType'},
-                {field:"tot_margin",headerName:"예상총마진",type:'currencyType'},
-                {field:"goods_sh",headerName:"시중가격",type:'currencyType'},
-                {field:"new_product_day",headerName:"신상품적용일",type:'DayType'},
-                {field:"max_ord_date",headerName:"최종판매일자",type:'DayType'},
-                {field:"maxinputdate",headerName:"최종입고일자",type:'DayType'},
-                {field:"stock_qty",headerName:"입고수량",type:'numberType'},
-                {field:"stock_buy_qty",headerName:"발주수량",type:'numberType'},
-                {field:"req_date",headerName:"최근출시일자",type:'DayType'},
-                {field:"nvl",headerName:" "}
+            {field:"wonga",headerName: "원가",type:'currencyType'},
+            {field:"margin_amt",headerName:"마진",type:'currencyType'},
+            {field:"margin_rate",headerName:"마진율",type:'percentType'},
+            {field:"totalwonga",headerName:"현재고총원가",type:'currencyType'},
+            {field:"tot_sales",headerName:"예상총매출액",type:'currencyType'},
+            {field:"tot_margin",headerName:"예상총마진",type:'currencyType'},
+            {field:"goods_sh",headerName:"시중가격",type:'currencyType'},
+            {field:"new_product_day",headerName:"신상품적용일",type:'DayType'},
+            {field:"max_ord_date",headerName:"최종판매일자",type:'DayType'},
+            {field:"maxinputdate",headerName:"최종입고일자",type:'DayType'},
+            {field:"stock_qty",headerName:"입고수량",type:'numberType'},
+            {field:"stock_buy_qty",headerName:"발주수량",type:'numberType'},
+            {field:"req_date",headerName:"최근출시일자",type:'DayType'},
+            {field:"nvl",headerName:" "}
 
             ];
 
@@ -432,7 +438,7 @@
         };
         gx = new HDGrid(gridDiv, columns,options);
         //console.log(gx.gridOptions);
-        //Search();
+        Search();
 
         gx.gridOptions.columnApi.setColumnVisible('img',$("#img").is(":checked"));
 
