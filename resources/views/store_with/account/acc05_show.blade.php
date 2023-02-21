@@ -61,7 +61,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="docs-datepicker-container"></div>
-                                                    <a href="javascript:void(0)" onclick="return Search();" class="btn btn-outline-primary ml-2">적용</a>
+                                                    <a href="javascript:void(0)" onclick="return Search(true);" class="btn btn-outline-primary ml-2">적용</a>
                                                     @else
                                                     <input type="hidden" name="sdate" value="{{ @$sdate }}">
                                                     <p class="fs-14 font-weight-bold">{{ @$sdate_str }}</p>
@@ -77,14 +77,19 @@
                 </form>
             </div>
         </div>
-        <div class="card shadow mt-3">
+        <div class="card shadow mt-3 pb-2">
             <div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
                 <a href="#">기타재반자료</a>
+                <div class="fl_box">
+                    <button type="button" onclick="return openUploadModal();" class="btn btn-outline-primary mr-1"><i class="fas fa-plus fa-sm mr-1"></i> 엑셀일괄업로드</button>
+                    <button type="button" onclick="return openUploadModal({});" class="btn btn-outline-primary mr-1"><i class="fas fa-plus fa-sm mr-1"></i> 엑셀일괄업로드(원부자재포함)</button>
+                </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive mt-2">
                     <div id="div-gd" class="ag-theme-balham"></div>
                 </div>
+                <p class="mt-2 text-success">* 해당연월에 <u class="font-weight-bold">마감완료처리</u>된 매장의 기타재반자료는 수정할 수 없습니다.</p>
             </div>
         </div>
     </div>
@@ -93,11 +98,22 @@
 <script language="javascript">
     const CMD = "{{ @$cmd }}";
     
-	const YELLOW = {'background-color': "#ffff99"};
+    const CLOSED_STATUS = { 'Y': '마감완료', 'N': '마감추가' };
+	const YELLOW = { 'background-color': "#ffff99" };
 	const CENTER = { 'text-align': 'center' };
+    const setEditable = (params, cond = true) => cond && params.data.closed_yn !== 'Y';
+
     const columns = [
 		{ headerName: "#", field: "num", type: 'NumType', pinned: 'left', width: 30, cellStyle: CENTER,
 			cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : parseInt(params.value) + 1,
+        },
+        { field: "closed_yn", headerName: "마감상태", pinned: 'left', width: 57,
+            cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : (CLOSED_STATUS[params.value] || '-'),
+            cellStyle: (params) => ({
+                ...CENTER, 
+                "background-color": params.value === 'Y' ? '#E2FFE0' : params.value === 'N' ? '#FFE9E9' : 'none',
+                "color": params.value === 'Y' ? '#0BAC00' : params.value === 'N' ? '#ff0000' : 'none'
+            }),
         },
         { field: "store_cd", headerName: "매장코드", pinned: 'left', width: 57, cellStyle: CENTER },
         { field: "store_nm", headerName: "매장명", pinned: 'left', type: 'StoreNameType', width: 170 },
@@ -106,7 +122,8 @@
 			children: [
 				@foreach ($children as $child)
 					{ headerName: "{{ $child->code_val }}", field: "{{ $child->code_id }}_amt", type: 'currencyType', width: 100, 
-						editable: "{{ $child->code_id }}" !== 'E3', cellStyle: (params) => "{{ $child->code_id }}" !== 'E3' && params.node.rowPinned !== 'top' ? YELLOW : {},
+						editable: (params) => setEditable(params, "{{ $child->code_id }}" !== 'E3' && params.node.rowPinned !== 'top'), 
+                        cellStyle: (params) => setEditable(params, "{{ $child->code_id }}" !== 'E3' && params.node.rowPinned !== 'top') ? YELLOW : {},
                         cellRenderer: (params) => params.value !== null ? Comma(params.value) : (CMD === 'add' ? '' : 0),
 					},
 					@if (in_array($child->code_id, ['P1', 'M3']))
@@ -140,7 +157,7 @@
     let applied_date = "{{ @$sdate }}";
 
     $(document).ready(function() {
-        pApp.ResizeGrid(320);
+        pApp.ResizeGrid(340);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns, {
@@ -200,7 +217,11 @@
         updatePinnedRow();
     });
 
-    function Search() {
+    function Search(applied = false) {
+        if (applied && gx.getRows().length > 0) {
+            if (!confirm("적용 시, 기존에 작성되었던 정보는 저장되지 않습니다.\n해당 판매기간을 적용하시겠습니까?")) return;
+        }
+
         let data = $('form[name="search"]').serialize();
         data += "&cmd=" + CMD;
 
@@ -224,8 +245,9 @@
 				col.children = gifts.map(gf => ({ 
                         headerName: gf.prd_nm, 
                         field: "G_" + gf.prd_cd + "_amt", 
-                        type: 'currencyType', editable: true, width: 100, 
-                        cellStyle: (params) => params.node.rowPinned !== 'top' ? YELLOW : {}, 
+                        type: 'currencyType', width: 100, 
+                        editable: (params) => setEditable(params, params.node.rowPinned !== 'top'),
+                        cellStyle: (params) => setEditable(params, params.node.rowPinned !== 'top') ? YELLOW : {}, 
                         cellRenderer: (params) => params.value !== null ? Comma(params.value) : (CMD === 'add' ? '' : 0) 
                     })).concat({ 
                         headerName: "소계", 
@@ -238,8 +260,9 @@
 				col.children = expandables.map(exp => ({ 
                     headerName: exp.prd_nm, 
                     field: "S_" + exp.prd_cd  + "_amt", 
-                    type: 'currencyType', editable: true, width: 100, 
-                    cellStyle: (params) => params.node.rowPinned !== 'top' ? YELLOW : {}, 
+                    type: 'currencyType', width: 100, 
+                    editable: (params) => setEditable(params, params.node.rowPinned !== 'top'),
+                    cellStyle: (params) => setEditable(params, params.node.rowPinned !== 'top') ? YELLOW : {}, 
                     cellRenderer: (params) => params.value !== null ? Comma(params.value) : (CMD === 'add' ? '' : 0) 
                 })).concat({ 
                     headerName: "소계", 
@@ -282,6 +305,7 @@
         });
     }
 
+    // 합계 row 업데이트
     const updatePinnedRow = () => {
         let cols = gx.gridOptions.columnApi.columnController.columnDefs
             .reduce((a,c) => {
@@ -311,6 +335,11 @@
             { ...pinnedRow.data, ...cols }
         ]);
     };
+
+    // 일괄업로드모달 오픈 (with_sproduct: 원부자재포함여부)
+    function openUploadModal(with_sproduct = false) {
+        alert("개발중입니다.");
+    }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////////
