@@ -45,6 +45,7 @@ class stk30Controller extends Controller
 		$s_brand_cd		= $request->input("s_brand_cd");		// 브랜드
 		$s_site			= $request->input("s_site");			// 판매사이트
 		$s_match		= $request->input("s_match");			// 매칭여부
+		$s_xmd_cd		= $request->input("s_xmd_cd");			// xmd 코드
 
         $limit			= $request->input("limit",100);
         $ord			= $request->input('ord','desc');
@@ -93,6 +94,8 @@ class stk30Controller extends Controller
 			else					$where .= " and x.goods_no is null";
 		}
 
+		if( $s_xmd_cd != "" )		$where .= " and x.cd like '%" . Lib::quote($s_xmd_cd) . "%' ";
+
         $page_size = $limit;
         $startno = ($page - 1) * $page_size;
         $limit = " limit $startno, $page_size ";
@@ -121,7 +124,7 @@ class stk30Controller extends Controller
 			select
 				'' as state, opt.opt_kind_nm, brand.brand_nm,g.goods_no,g.style_no,
 				stat.code_val as sale_stat_cl_val,
-				g.goods_nm,gs.goods_opt, gs.good_qty as qty, x.cd, gs.goods_opt as org_opt, x.cd as org_cd
+				g.goods_nm, g.goods_nm_eng, gs.goods_opt, gs.good_qty as qty, x.cd, gs.goods_opt as org_opt, x.cd as org_cd
 			from goods g
 			$join
 			inner join goods_summary gs on g.goods_no = gs.goods_no and g.goods_sub = gs.goods_sub

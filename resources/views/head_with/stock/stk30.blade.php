@@ -29,6 +29,14 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
+                            <label for="s_xmd_cd">XMD 코드</label>
+                            <div class="flax_box">
+                                <input type='text' class="form-control form-control-sm search-enter" name='s_xmd_cd' id="s_xmd_cd" value=''>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
                             <label for="good_types">상품구분 :</label>
                             <div class="flax_box">
 								<select name='s_goods_type' class="form-control form-control-sm">
@@ -60,7 +68,9 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div>  
+                </div>
+                <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="name">스타일넘버/상품코드 :</label>
@@ -71,20 +81,16 @@
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input-box" style="width:47%">
                                     <div class="form-inline-inner inline_btn_box">
-                                        <input type='text' class="form-control form-control-sm w-100" name='s_goods_no' id='s_goods_no' value=''>
+                                        <input type='text' class="form-control form-control-sm w-100 search-enter" name='s_goods_no' id='s_goods_no' value=''>
                                         <a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos" data-name="s_goods_no"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="name">업체 :</label>
-
                             <div class="form-inline inline_select_box">
                                 <div class="form-inline-inner input-box w-25 pr-1">
                                     <select id="s_com_type" name="s_com_type" class="form-control form-control-sm w-100">
@@ -116,19 +122,18 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="name">브랜드 :</label>
                             <div class="form-inline inline_btn_box">
                                 <select id="s_brand_cd" name="s_brand_cd" class="form-control form-control-sm select2-brand"></select>
-                                <a href="#" class="btn btn-sm btn-secondary sch-brand">...</a>
+                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-lg-4 inner-td">
+                    <div class="col-lg-4 inner-td" hidden>
                         <div class="form-group">
                             <label for="">판매처 :</label>
                             <div class="flax_box">
@@ -236,6 +241,7 @@
 		},
 		{field: "sale_stat_cl_val", headerName: "상품상태", width:58, type:'GoodsStateType'},
 		{field: "goods_nm", headerName: "상품명", width: 400, type:'HeadGoodsNameType'},
+        {field: "goods_nm_eng", headerName: "상품명(영문)", width: 400, type:'HeadGoodsNameType'},
 		{field: "goods_opt", headerName: "옵션", width: 170, editable: true, cellStyle:{"background-color":"#FFFF99"}, onCellValueChanged:checkData},
 		{field: "qty", headerName: "재고수", width:46, type:'numberType',
 			cellRenderer: function(params) {
