@@ -48,7 +48,7 @@ class acc07Controller extends Controller
 
 		$sql = "
 			select c.idx, c.store_cd, c.sday, c.eday, c.sale_amt, c.clm_amt, c.dc_amt
-				, c.coupon_amt, c.allot_amt, (c.coupon_amt - c.allot_amt) as coupon_com_amt, c.dlv_amt
+				, c.coupon_amt, c.allot_amt, (c.coupon_amt - c.allot_amt) as coupon_com_amt, c.dlv_amt, c.etc_amt
 				, c.sale_net_taxation_amt, c.sale_net_taxfree_amt, c.sale_net_amt, c.tax_amt
 				, (c.sale_net_amt - c.tax_amt) as sales_amt_except_vat
 				, c.fee_JS1, c.fee_JS2, c.fee_JS3, c.fee_TG, c.fee_YP, c.fee_OL, c.fee, c.extra_amt
@@ -124,7 +124,7 @@ class acc07Controller extends Controller
 					, o.ord_no, c.ord_opt_no, ac.store_cd, s.store_nm
 					, o.prd_cd, o.goods_no, o.goods_nm, o.goods_opt
 					, c.qty, c.sale_amt, c.clm_amt, c.dc_amt, c.coupon_amt, c.allot_amt
-					, (c.coupon_amt - c.allot_amt) as coupon_com_amt, c.dlv_amt
+					, (c.coupon_amt - c.allot_amt) as coupon_com_amt, c.dlv_amt, c.etc_amt
 					, c.sale_net_taxation_amt, c.sale_net_taxfree_amt, c.sale_type
 					, if(c.sale_type = 'JS', '정상', if(c.sale_type = 'TG', '특가', if(c.sale_type = 'YP', '용품', ''))) as sale_type_nm
 					, if(c.sale_type = 'JS', c.sale_net_amt, 0)as sale_JS

@@ -88,7 +88,7 @@
         { field: "ymonth", headerName: "판매연월", pinned: 'left', width: 70, cellStyle: {...CENTER, "text-decoration": "underline"},
 			cellRenderer: (params) => `<a href="javascript:void(0);" onclick="return openExtraPopup('${params.value}');">${params.value.slice(0,4) + '-' + params.value.slice(4,6)}</a>`,
 		},
-		{ field: "total_amt", headerName: "총합계", type: 'currencyType', width: 100, cellStyle: {"background-color": "#ededed", "font-weight": "bold"} },
+		{ field: "total_amt", headerName: "총합계", type: 'currencyType', width: 100, pinned: 'left', cellStyle: {"background-color": "#ededed", "font-weight": "bold"} },
 		@foreach ($extra_cols as $group_nm => $children)
 		{ headerName: "{{ $group_nm }}",
 			children: [

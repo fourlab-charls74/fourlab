@@ -39,6 +39,7 @@ class acc06Controller extends Controller
         $store_type = $request->input('store_type', "");
         $store_kind = $request->input('store_kind', "");
         $store_cd = $request->input('store_cd', "");
+        $closed_yn = $request->input('closed_yn', "");
 		
 		$pr_codes = $this->_get_prcodes();
 		$pr_codes = array_map(function($c) { return $c->code_id; }, $pr_codes);
@@ -48,6 +49,11 @@ class acc06Controller extends Controller
 		if ($store_type != '') $where .= " and s.store_type = '" . Lib::quote($store_type) . "'";
         if ($store_kind != '') $where .= " and s.store_kind = '". Lib::quote($store_kind) . "'";
         if ($store_cd != '') $where .= " and s.store_cd = '" . Lib::quote($store_cd) . "'";
+		$closed_where = "";
+		if ($closed_yn != '') {
+			if ($closed_yn == 'Z') $closed_where .= " and c.closed_yn is null ";
+			else $closed_where .= " and c.closed_yn = '" . Lib::quote($closed_yn) . "'";
+		}
 		
         // 행사코드별 매출구분
         $pr_codes = $this->_get_prcodes();
@@ -72,7 +78,7 @@ class acc06Controller extends Controller
 					, 0, (a.fee_amt_JS1 + a.fee_amt_JS2 + a.fee_amt_JS3 + a.fee_amt_TG + a.fee_amt_YP + a.fee_amt_OL + a.extra_amt)
 				) as total_fee_amt
 			from (
-				select b.*
+				select b.*, c.*
 					, round(b.sales_amt / 1.1) as sales_amt_except_vat
 					, round(b.ord_JS1_amt / 1.1) as ord_JS1_amt_except_vat
 					, round(b.ord_JS2_amt / 1.1) as ord_JS2_amt_except_vat
@@ -162,6 +168,12 @@ class acc06Controller extends Controller
 					where s.account_yn = 'Y' $where
 					order by w.sales_amt desc
 				) b
+					left outer join (
+						select store_cd as c_store_cd, closed_yn
+						from store_account_closed
+						where sday = '$f_sdate' and eday = '$f_edate'
+					) c on c.c_store_cd = b.store_cd
+				where 1=1 $closed_where
 			) a
 		";
 		$result = DB::select($sql);
@@ -224,6 +236,7 @@ class acc06Controller extends Controller
 	{
 		$store_nm	= "";
 		$acc_idx	= "";
+		$closed_yn	= "";
 
         $f_sdate = Carbon::parse($sdate)->firstOfMonth()->format("Ymd");
         $f_edate = Carbon::parse($sdate)->lastOfMonth()->format("Ymd");
@@ -231,13 +244,16 @@ class acc06Controller extends Controller
 		if( $store_cd != "" ) $store_nm = DB::table('store')->where('store_cd', $store_cd)->value('store_nm');
 
 		$sql = "
-			select idx
+			select idx, closed_yn
 			from store_account_closed
 			where store_cd = :store_cd and sday = :sday and eday = :eday
 		";
 		$row = DB::selectOne($sql, ['store_cd' => $store_cd, 'sday' => $f_sdate, 'eday' => $f_edate]);
 
-		if (!empty($row)) $acc_idx = $row->idx;
+		if (!empty($row)) {
+			$acc_idx = $row->idx;
+			$closed_yn = $row->closed_yn;
+		}
 		
 		$values = [
 			'sdate'			 => $sdate,
@@ -247,7 +263,8 @@ class acc06Controller extends Controller
 			'clm_states'	 => SLib::getCodes('G_CLM_STATE'),
 			'stat_pay_types' => SLib::getCodes('G_STAT_PAY_TYPE'),
 			'ord_types'		 => SLib::getCodes('G_ORD_TYPE'),
-			'acc_idx'		 => $acc_idx
+			'acc_idx'		 => $acc_idx,
+			'closed_yn'		 => $closed_yn,
 		];
 
 		return view( Config::get('shop.store.view') . '/account/acc06_show', $values );

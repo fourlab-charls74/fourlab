@@ -6,7 +6,14 @@
 	<div id="search-area" class="search_cum_form">
 		<div class="card mb-3">
 			<div class="d-flex card-header justify-content-between">
-				<h4>매장중간관리자정산 - {{ @$store_nm }}</h4>
+				<h4>
+					매장중간관리자정산 - {{ @$store_nm }}
+					@if (@$closed_yn == 'Y')
+					<span class="ml-2 p-1 pl-2 pr-2 fs-14 text-white bg-success rounded">마감완료</span>
+					@elseif (@$closed_yn == 'N')
+					<span class="ml-2 p-1 pl-2 pr-2 fs-14 text-white bg-danger rounded">마감추가</span>
+					@endif
+				</h4>
 				<div class="flex_box">
 					<a href="javascript:void(0);" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
 					@if($acc_idx == '')

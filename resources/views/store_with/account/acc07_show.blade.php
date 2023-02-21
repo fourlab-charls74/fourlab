@@ -230,7 +230,7 @@
 			]
         },
 		{field: "dlv_amt", headerName: "배송비", width: 90, type: "currencyType", aggregation: true},
-		// {field: "etc_amt", headerName: "기타정산액", width: 90, type: "currencyType", aggregation: true},
+		{field: "etc_amt", headerName: "기타정산액", width: 90, type: "currencyType", aggregation: true},
         {field: "sale_net_taxation_amt", headerName: "과세", width: 90, type: "currencyType", aggregation: true},
 		{field: "sale_net_taxfree_amt", headerName: "비과세", width: 50, type: "currencyType", aggregation: true},
         {headerName: "매출", field: "sales",
@@ -275,7 +275,7 @@
             else window.close();
         }
 
-        pApp.ResizeGrid(465, 350);
+        pApp.ResizeGrid(480, 425);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {
@@ -294,7 +294,7 @@
 			// }
         });
 
-        pApp2.ResizeGrid(710, 205);
+        pApp2.ResizeGrid(550, 250);
         pApp2.BindSearchEnter();
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
         gx2 = new HDGrid(gridDiv2, online_columns, {

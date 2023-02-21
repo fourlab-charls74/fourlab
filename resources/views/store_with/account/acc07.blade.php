@@ -25,7 +25,7 @@
 
 			<div class="card-body">
 				<div class="row">
-					<div class="col-lg-4">
+					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="sdate">마감연월</label>
 							<div class="docs-datepicker flex_box">
@@ -41,7 +41,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4">
+					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="store_type">매장구분</label>
 							<div class="flex_box">
@@ -54,7 +54,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4">
+					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="store_kind">매장종류</label>
 							<div class="flex_box">
@@ -69,7 +69,7 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-lg-4">
+					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="store_cd">매장명</label>
 							<div class="form-inline inline_btn_box">
@@ -78,7 +78,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4">
+					<div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="closed_yn">마감상태</label>
                             <div class="flax_box">
@@ -135,20 +135,27 @@
 </div> --}}
 
 <script type="text/javascript" charset="utf-8">
+	const CLOSED_STATUS = { 'Y': '마감완료', 'N': '마감추가' };
 	const CENTER = { 'text-align': 'center' };
+
 	const columns = [
 		{ field: "num", headerName: "#", type: 'NumType', pinned: 'left', aggSum: "합계", cellStyle: CENTER, width: 40,
 			cellRenderer: (params) => params.node.rowPinned === 'top' ? '합계' : parseInt(params.value) + 1,
 		},
-		{ field: "closed_yn", headerName: "마감상태", width: 60, pinned: 'left', cellStyle: (params) => ({...CENTER, "color": params.value == "Y" ? "#ff0000" : ""}),
-			cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : params.value === "Y" ? "마감완료" : "마감추가",
-		},
+		{ field: "closed_yn", headerName: "마감상태", pinned: 'left', width: 57,
+            cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : (CLOSED_STATUS[params.value] || '-'),
+            cellStyle: (params) => ({
+                ...CENTER, 
+                "background-color": params.value === 'Y' ? '#E2FFE0' : params.value === 'N' ? '#FFE9E9' : 'none',
+                "color": params.value === 'Y' ? '#0BAC00' : params.value === 'N' ? '#ff0000' : 'none'
+            }),
+        },
 		{ field: "closed_day", headerName: "마감대상기간", pinned: 'left', width: 140, cellStyle: {...CENTER, "text-decoration": "underline"},
 			cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : `<a href="javascript:void(0);" onclick="return openDetailPopup('${params.data.idx}');">${params.data.sday} ~ ${params.data.eday}</a>`,
 		},
         { field: "store_cd", headerName: "매장코드", pinned: 'left', width: 55, cellStyle: CENTER },
         { field: "store_nm", headerName: "매장명", pinned: 'left', width: 150 },
-        { field: "manager_nm", headerName: "매니저", width: 55, cellStyle: CENTER },
+        { field: "manager_nm", headerName: "매니저", pinned: 'left', width: 55, cellStyle: CENTER },
 		{ field: "sale_amt", headerName: "판매금액", width: 90, type: "currencyType", aggregation: true },
 		{ field: "clm_amt", headerName: "클레임금액", width: 90, type: "currencyType", aggregation: true },
 		{ field: "dc_amt", headerName: "할인금액", width: 90, type: "currencyType", aggregation: true },
@@ -159,7 +166,7 @@
 			]
         },
 		{ field: "dlv_amt", headerName: "배송비", width: 90, type: "currencyType", aggregation: true },
-		// { field: "etc_amt", headerName: "기타정산액", width: 90, type: "currencyType", aggregation: true },
+		{ field: "etc_amt", headerName: "기타정산액", width: 90, type: "currencyType", aggregation: true },
         { headerName: "매출",
 			children: [
 				{ field: "sale_net_taxation_amt", headerName: "과세", width: 90, type: "currencyType", aggregation: true },

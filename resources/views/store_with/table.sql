@@ -622,6 +622,7 @@ CREATE TABLE `store_account_closed` (
 	`coupon_amt` int(11) DEFAULT '0' COMMENT '쿠폰금액',
 	`allot_amt` int(11) DEFAULT '0' COMMENT '(본사부담)쿠폰금액',
 	`dlv_amt` int(11) DEFAULT '0' COMMENT '배송비',
+	`etc_amt` int(11) DEFAULT '0' COMMENT '기타정산액',
 	`sale_net_taxation_amt` int(11) DEFAULT '0' COMMENT '과세',
 	`sale_net_taxfree_amt` int(11) DEFAULT '0' COMMENT '비과세',
 	`sale_net_amt` int(11) DEFAULT '0' COMMENT '매출금액',
@@ -649,7 +650,6 @@ CREATE TABLE `store_account_closed` (
 	`rt` datetime DEFAULT NULL COMMENT '등록일시',
 	`ut` datetime DEFAULT NULL COMMENT '수정일시',
 	`sale_fee` int(11) DEFAULT '0' COMMENT '판매 수수료',
-	`etc_amt` int(11) DEFAULT '0' COMMENT '기타정산액',
 	`fee_dc_amt` int(11) DEFAULT '0' COMMENT '수수료할인',
 	`fee_net` int(11) DEFAULT '0' COMMENT '수수료총계',
 	`acc_amt` int(11) DEFAULT '0' COMMENT '정산금액',
@@ -673,6 +673,7 @@ CREATE TABLE `store_account_closed_list` (
 	`coupon_amt` int(11) DEFAULT '0' COMMENT '쿠폰금액',
 	`allot_amt` int(11) DEFAULT '0' COMMENT '(본사부담)쿠폰금액',
 	`dlv_amt` int(11) DEFAULT '0' COMMENT '배송비',
+	`etc_amt` int(11) DEFAULT '0' COMMENT '기타정산액',
 	`sale_net_taxation_amt` int(11) DEFAULT '0' COMMENT '과세',
 	`sale_net_taxfree_amt` int(11) DEFAULT '0' COMMENT '비과세',
 	`sale_net_amt` int(11) DEFAULT '0' COMMENT '매출액',
@@ -682,7 +683,6 @@ CREATE TABLE `store_account_closed_list` (
 	`memo` varchar(255) DEFAULT NULL COMMENT '메모',
 	`sale_fee` int(11) DEFAULT '0' COMMENT '판매 수수료',
 	`sale_clm_amt` int(11) DEFAULT NULL COMMENT '판매 + 클레임',
-	`etc_amt` int(11) DEFAULT NULL COMMENT '기타정산액',
 	`fee_dc_amt` int(11) DEFAULT '0' COMMENT '세금할인액',
 	`fee_net` int(11) DEFAULT NULL COMMENT '수수료',
 	`acc_amt` int(11) DEFAULT '0' COMMENT '정산금액',
@@ -692,18 +692,20 @@ CREATE TABLE `store_account_closed_list` (
 
 -- 기타정산
 CREATE TABLE `store_account_etc` (
-	`no` INT(11) NOT NULL AUTO_INCREMENT COMMENT '일련번호',
+	`idx` INT(11) NOT NULL AUTO_INCREMENT COMMENT '일련번호',
+	`acc_list_idx` VARCHAR(6) DEFAULT NULL COMMENT '정산일련번호 (store_account_closed_list : idx)',
 	`ymonth` VARCHAR(6) DEFAULT NULL COMMENT '정산연월',
 	`etc_day` VARCHAR(8) DEFAULT NULL COMMENT '기타정산일자',
 	`store_cd` VARCHAR(30) NOT NULL DEFAULT '' COMMENT '매장코드',
-	`ord_no` VARCHAR(20) DEFAULT NULL COMMENT '주문번호',
 	`ord_opt_no` INT(11) DEFAULT NULL COMMENT '주문일련번호',
 	`etc_amt` INT(11) DEFAULT NULL COMMENT '기타정산액',
-	`etc_memo` MEDIUMTEXT COMMENT '기타정산메모',
+	`etc_memo` varchar(255) DEFAULT NULL COMMENT '기타정산메모',
 	`admin_id` VARCHAR(20) DEFAULT NULL COMMENT '관리자아이디',
 	`admin_nm` VARCHAR(20) DEFAULT NULL COMMENT '관리자명',
-	`regi_date` DATETIME DEFAULT NULL COMMENT '등록일시',
-	PRIMARY KEY (`no`),
+	`rt` DATETIME DEFAULT NULL COMMENT '등록일자',
+	`ut` DATETIME DEFAULT NULL COMMENT '수정일자',
+	PRIMARY KEY (`idx`),
+	KEY `acc_list_idx` (`acc_list_idx`),
 	KEY `idx_etc_day` (`etc_day`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='매장 기타정산액';
 
