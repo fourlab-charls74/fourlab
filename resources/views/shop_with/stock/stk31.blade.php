@@ -12,7 +12,6 @@
 </div>
 
 <form method="get" name="search">
-<input type='hidden' id="store_no" name="store_no" value="{{ auth('head')->user()->store_cd }}">
     <div id="search-area" class="search_cum_form">
         <div class="card mb-3">
             <div class="d-flex card-header justify-content-between">

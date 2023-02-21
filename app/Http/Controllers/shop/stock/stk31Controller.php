@@ -38,7 +38,7 @@ class stk31Controller extends Controller
         $edate = $request->input('edate', date("Ymd"));
         $subject = $request->input('subject', '');
         $content = $request->input('content', '');
-        $store_no = $request->input('store_no', '');
+        $store_no = Auth('head')->user()->store_cd;
         $store_nm = $request->input('store_nm', '');
         $store_type    = $request->input("store_type", '');
 
@@ -46,7 +46,14 @@ class stk31Controller extends Controller
         $orderby = "";
         if ($subject != "") $where .= " and s.subject like '%" . Lib::quote($subject) . "%' ";
         if ($content != "") $where .= " and s.content like '%" . Lib::quote($content) . "%' ";
-        if ($store_no != "") $where .= " and d.store_cd like '%" . Lib::quote($store_no) . "%'  or s.all_store_yn = 'Y'";
+
+        if ($store_no != "") {
+            $where .= " and d.store_cd like '%" . Lib::quote($store_no) . "%'  or s.all_store_yn = 'Y'";
+        } else {
+            $where .= " and s.all_store_yn = 'Y'";
+        }
+        
+
         if ($store_type != "") $where .= " and a.store_type = '$store_type' or s.all_store_yn = 'Y'";
 
         // ordreby
