@@ -163,6 +163,17 @@ header .top_inner_box .top_link_btn li a.notice em{position:absolute;border:1px 
 header .top_inner_box .logout_btn{display:block;float:left;width:46px;height:70px;margin-left:10px;}
 header .top_inner_box .logout_btn a{display:block;width:100%;height:70px;padding:10px;background:url(../images/top_right_logout.png) no-repeat center center;}
 
+/* 23.02.21 ny 수정중 */
+header .top_inner_box h1.shop-title {
+    text-align: center;
+    color: #B31D1F;
+    font-family: arial, sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 0px;
+    margin-bottom: 1px;
+}
+
 nav{position:fixed;left:0px;top:70px;background:#1c1e2a;width:210px;height:calc(100% - 70px);overflow-y:auto;}
 
 #content{margin-left:210px;}
@@ -563,6 +574,16 @@ footer a:active{color:#fff !important;}
     header .top_inner_box .logout_btn a{background-size:auto 17px !important;padding:0 8px;box-sizing:border-box;}
     header .top_inner_box .top_link_btn li a.notice{height:50px;}
     header .top_inner_box .top_link_btn li a.notice em{border:1px solid #2e2f3c;}
+    /* 23.02.21 ny 수정중 */
+    header .top_inner_box h1.shop-title {
+        text-align: center;
+        color: #B31D1F;
+        font-family: arial, sans-serif;
+        font-size: 12px;
+        /* font-weight: bold; */
+        margin-top: 0px;
+        margin-bottom: 1px;
+    }
 
     nav{display:none !important;}
     .mobile-side nav{position:absolute !important;display:block !important;z-index:1001 !important;top:50px;height:calc(100% - 50px);}
@@ -639,6 +660,7 @@ footer a:active{color:#fff !important;}
 .order_num_search a{position: absolute;right:0px;top:50%;width:65px;
     transform: translateY(-50%);-webkit-transform: translateY(-50%);
 }
+
 
 /*
 .refund_input_list{margin-top:15px;}
