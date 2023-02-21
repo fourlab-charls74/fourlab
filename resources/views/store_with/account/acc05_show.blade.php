@@ -101,7 +101,7 @@
     const CLOSED_STATUS = { 'Y': '마감완료', 'N': '마감추가' };
 	const YELLOW = { 'background-color': "#ffff99" };
 	const CENTER = { 'text-align': 'center' };
-    const setEditable = (params, cond = true) => cond && params.data.closed_yn !== 'Y';
+    const setEditable = (params, cond = true) => cond && params.node.rowPinned !== 'top' && params.data.closed_yn !== 'Y';
 
     const columns = [
 		{ headerName: "#", field: "num", type: 'NumType', pinned: 'left', width: 30, cellStyle: CENTER,
@@ -122,8 +122,8 @@
 			children: [
 				@foreach ($children as $child)
 					{ headerName: "{{ $child->code_val }}", field: "{{ $child->code_id }}_amt", type: 'currencyType', width: 100, 
-						editable: (params) => setEditable(params, "{{ $child->code_id }}" !== 'E3' && params.node.rowPinned !== 'top'), 
-                        cellStyle: (params) => setEditable(params, "{{ $child->code_id }}" !== 'E3' && params.node.rowPinned !== 'top') ? YELLOW : {},
+						editable: (params) => setEditable(params, "{{ $child->code_id }}" !== 'E3'), 
+                        cellStyle: (params) => setEditable(params, "{{ $child->code_id }}" !== 'E3') ? YELLOW : {},
                         cellRenderer: (params) => params.value !== null ? Comma(params.value) : (CMD === 'add' ? '' : 0),
 					},
 					@if (in_array($child->code_id, ['P1', 'M3']))
@@ -246,8 +246,8 @@
                         headerName: gf.prd_nm, 
                         field: "G_" + gf.prd_cd + "_amt", 
                         type: 'currencyType', width: 100, 
-                        editable: (params) => setEditable(params, params.node.rowPinned !== 'top'),
-                        cellStyle: (params) => setEditable(params, params.node.rowPinned !== 'top') ? YELLOW : {}, 
+                        editable: (params) => setEditable(params),
+                        cellStyle: (params) => setEditable(params) ? YELLOW : {}, 
                         cellRenderer: (params) => params.value !== null ? Comma(params.value) : (CMD === 'add' ? '' : 0) 
                     })).concat({ 
                         headerName: "소계", 
@@ -261,8 +261,8 @@
                     headerName: exp.prd_nm, 
                     field: "S_" + exp.prd_cd  + "_amt", 
                     type: 'currencyType', width: 100, 
-                    editable: (params) => setEditable(params, params.node.rowPinned !== 'top'),
-                    cellStyle: (params) => setEditable(params, params.node.rowPinned !== 'top') ? YELLOW : {}, 
+                    editable: (params) => setEditable(params),
+                    cellStyle: (params) => setEditable(params) ? YELLOW : {}, 
                     cellRenderer: (params) => params.value !== null ? Comma(params.value) : (CMD === 'add' ? '' : 0) 
                 })).concat({ 
                     headerName: "소계", 

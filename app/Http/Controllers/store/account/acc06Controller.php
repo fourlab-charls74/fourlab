@@ -60,7 +60,7 @@ class acc06Controller extends Controller
         $pr_codes_query = "";
         foreach ($pr_codes as $item) {
             $key = $item->code_id;
-            $pr_codes_query .= ", sum(if(ww.online_yn = 'N' and oo.pr_code = '$key', ww.sale_price, 0)) as sales_" . $key . "_amt";
+            $pr_codes_query .= ", sum(if(ww.online_yn = 'N' and oo.pr_code = '$key', ww.recv_amt, 0)) as sales_" . $key . "_amt";
         }
 
 		$sql = "
@@ -110,27 +110,28 @@ class acc06Controller extends Controller
 						) sg on sg.grade_cd = s.grade_cd
 						left outer join (
 							select ww.store_cd as ord_store_cd
-								, sum(if(ww.online_yn = 'N', ww.sale_price, 0)) as sales_amt -- 매출합계
+								, sum(if(ww.online_yn = 'N', ww.recv_amt, 0)) as sales_amt -- 매출합계
 								$pr_codes_query
 								, sum(if(
 									ww.online_yn = 'N'
 										and g.brand not in (select code_id from code where code_kind_cd = 'YP_BRAND') 
 										and if(ss.fee_10_info_over_yn = 'Y', ((1 - (oo.price / g.goods_sh)) * 100) <= ss.fee_10_info, ((1 - (oo.price / g.goods_sh)) * 100) < ss.fee_10_info)
-									, ww.sale_price
+									, ww.recv_amt
 									, 0
 								)) as ord_JS_amt -- 정상
 								, sum(if(
 									ww.online_yn = 'N'
 										and g.brand not in (select code_id from code where code_kind_cd = 'YP_BRAND') 
 										and if(ss.fee_10_info_over_yn = 'Y', ((1 - (oo.price / g.goods_sh)) * 100) > ss.fee_10_info, ((1 - (oo.price / g.goods_sh)) * 100) >= ss.fee_10_info)
-									, ww.sale_price
+									, ww.recv_amt
 									, 0
 								)) as ord_TG_amt -- 특가
-								, sum(if(ww.online_yn = 'N' and g.brand in (select code_id from code where code_kind_cd = 'YP_BRAND'), ww.sale_price, 0)) as ord_YP_amt -- 용품
-								, sum(if(ww.online_yn = 'Y', ww.sale_price, 0)) as ord_OL_amt -- 온라인
+								, sum(if(ww.online_yn = 'N' and g.brand in (select code_id from code where code_kind_cd = 'YP_BRAND'), ww.recv_amt, 0)) as ord_YP_amt -- 용품
+								, sum(if(ww.online_yn = 'Y', ww.recv_amt, 0)) as ord_OL_amt -- 온라인
 							from (
 								(
-									select www.ord_opt_no, www.goods_no, www.qty, www.price, (www.qty * www.price * if(www.ord_state = 30, 1, -1)) as sale_price, www.ord_state, www.ord_kind, www.ord_type, www.ord_state_date, www.prd_cd, www.store_cd, 'N' as online_yn
+									select www.ord_opt_no, www.goods_no, www.qty, www.price, www.recv_amt, www.ord_state, www.ord_kind, www.ord_type, www.ord_state_date, www.prd_cd, www.store_cd, 'N' as online_yn
+										-- , (www.qty * www.price * if(www.ord_state = 30, 1, -1)) as sale_price
 									from order_opt_wonga www
 									where www.ord_state >= 30
 										and www.ord_state in (30,60,61) 
@@ -139,7 +140,8 @@ class acc06Controller extends Controller
 								)
 								union all
 								(
-									select www.ord_opt_no, www.goods_no, www.qty, www.price, (www.qty * www.price * if(www.ord_state = 30, 1, -1)) as sale_price, www.ord_state, www.ord_kind, www.ord_type, www.ord_state_date, www.prd_cd, ooo.dlv_place_cd as store_cd, 'Y' as online_yn
+									select www.ord_opt_no, www.goods_no, www.qty, www.price, www.recv_amt, www.ord_state, www.ord_kind, www.ord_type, www.ord_state_date, www.prd_cd, ooo.dlv_place_cd as store_cd, 'Y' as online_yn
+										-- , (www.qty * www.price * if(www.ord_state = 30, 1, -1)) as sale_price
 									from order_opt_wonga www
 										inner join order_opt ooo on ooo.ord_opt_no = www.ord_opt_no
 									where ooo.dlv_place_type = 'STORE' 
@@ -316,10 +318,14 @@ class acc06Controller extends Controller
 						from claim
 						where ord_opt_no = w.ord_opt_no
 					), '') as clm_end_date
-					, w.store_cd, w.prd_cd, w.goods_no, w.goods_opt, w.qty, w.price, w.ord_kind, w.ord_type
+					, w.store_cd, w.prd_cd, w.goods_no, w.goods_opt, w.qty, w.price
+					, w.ord_kind, w.ord_type
 					, if(w.ord_state = 30, (w.qty * w.price), 0) as sale_amt
-					, if(w.ord_state in (60,61), (w.qty * w.price * -1), 0) as clm_amt
-					, ((g.goods_sh - abs(w.price)) * w.qty * -1) as dc_amt
+					, if(w.ord_state = 30, 0, (w.qty * w.price * -1)) as clm_amt
+					-- , ((g.goods_sh - abs(w.price)) * w.qty * -1) as dc_amt
+					, (w.dc_apply_amt * if(w.ord_state = 30 and w.recv_amt > 0, -1, 1)) as dc_amt
+					, (w.coupon_apply_amt * if(w.ord_state = 30, -1, 1)) as coupon_amt
+					, (w.recv_amt * if(w.ord_state = 30, 1, -1)) as recv_amt
 					, o.pr_code, s.store_nm, p.pay_type, m.user_nm
 					, g.style_no, g.goods_nm, g.tax_yn, g.goods_sh
 					, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color, pc.size

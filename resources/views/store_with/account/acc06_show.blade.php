@@ -191,10 +191,14 @@
 		{field: "goods_opt", headerName: "옵션", width: 150},
 		{field: "qty", headerName: "수량", width: 50, type: 'currencyType', aggregation: true},
 		{field: "goods_sh", headerName: "정상가", width: 70, type: 'currencyType'},
-		{field: "price", headerName: "판매단가", width: 70, type: 'currencyType'},
-		{field: "sale_amt",	headerName: "판매금액",	width: 90, type: 'currencyType', aggregation: true, cellStyle: (params) => ({"background-color": params.node.rowPinned === 'top' ? "none" : "#E9EFFF"})},
-		{field: "clm_amt", headerName: "클레임금액", width: 90, type: 'currencyType', aggregation: true, cellStyle: (params) => ({"background-color": params.node.rowPinned === 'top' ? "none" : "#E9EFFF"})},
-		{field: "dc_amt", headerName: "할인금액",	width: 90, type: 'currencyType', aggregation: true},
+		{field: "price", headerName: "판매가", width: 70, type: 'currencyType'},
+		{field: "sale_amt",	headerName: "판매금액",	width: 90, type: 'currencyType', aggregation: true}, // 판매금액 = 수량 * 판매가
+		{field: "clm_amt", headerName: "클레임금액", width: 90, type: 'currencyType', aggregation: true}, // 클레임금액 = 수량 * 판매가
+		{field: "dc_amt", headerName: "할인금액",	width: 90, type: 'currencyType', aggregation: true}, // 할인금액 = dc_apply_amt
+		{field: "coupon_amt", headerName: "쿠폰금액",	width: 90, type: 'currencyType', aggregation: true}, // 쿠폰금액 = coupon_apply_amt
+		{field: "recv_amt", headerName: "매출금액",	width: 90, type: 'currencyType', aggregation: true, 
+			cellStyle: (params) => ({"background-color": params.node.rowPinned === 'top' ? "none" : "#E9EFFF"})
+		},
 		{field: "ord_type_nm", headerName: "주문구분", width: 60, cellStyle: CENTER},
 		{field: "pr_code_nm", headerName: "행사구분", width: 60, cellStyle: CENTER},
 		{field: "store_cd",	headerName: "매장코드", width: 70, cellStyle: CENTER},

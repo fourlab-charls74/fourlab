@@ -197,7 +197,8 @@
 
 <script type="text/javascript" charset="utf-8">
 	const CENTER = { 'text-align': 'center' };
-    const EDITABLE = (params) => ({ "background-color": params.node.rowPinned === 'top' ? 'none' : '#ffff99' });
+    const SET_YELLOW = (params) => ({ "background-color": params.node.rowPinned === 'top' ? 'none' : '#ffff99' });
+    const SET_EDITABLE = (params, cond = true) => cond && params.node.rowPinned !== 'top';
     
     const columns = [
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28},
@@ -229,8 +230,8 @@
 				{field: "allot_amt", headerName: "본사부담", width: 90, type: "currencyType", aggregation: true },
 			]
         },
-		{field: "dlv_amt", headerName: "배송비", width: 90, type: "currencyType", aggregation: true},
-		{field: "etc_amt", headerName: "기타정산액", width: 90, type: "currencyType", aggregation: true},
+		{field: "dlv_amt", headerName: "배송비", width: 90, type: "currencyType", aggregation: true, cellStyle: SET_YELLOW, editable: SET_EDITABLE},
+		{field: "etc_amt", headerName: "기타정산액", width: 90, type: "currencyType", aggregation: true, cellStyle: SET_YELLOW, editable: SET_EDITABLE},
         {field: "sale_net_taxation_amt", headerName: "과세", width: 90, type: "currencyType", aggregation: true},
 		{field: "sale_net_taxfree_amt", headerName: "비과세", width: 50, type: "currencyType", aggregation: true},
         {headerName: "매출", field: "sales",
@@ -248,7 +249,7 @@
 		{field: "ord_date",	headerName: "출고완료일", width: 80, cellStyle: CENTER},
 		{field: "clm_state_nm",headerName: "클레임상태", width: 70, cellStyle: StyleClmState},
 		{field: "clm_end_date", headerName: "클레임완료일",	width: 80},
-		{field: "memo", headerName: "메모",	width: 200, editable: (params) => params.node.rowPinned === 'top' ? false : true, cellStyle: EDITABLE},
+		{field: "memo", headerName: "메모",	width: 200, editable: (params) => params.node.rowPinned === 'top' ? false : true, cellStyle: SET_YELLOW},
     ];
 
     const online_columns = columns.map((col, i) => {
