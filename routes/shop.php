@@ -421,7 +421,10 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         Route::get('stk31','stk31Controller@index');
         Route::get('stk31/search', 'stk31Controller@search');
         // Route::get('stk31/create', 'stk31Controller@create');
-        Route::get('stk31/{no}', 'stk31Controller@show');
+        Route::get('stk31/notice/{no}', 'stk31Controller@show');
+        Route::get('stk31/popup_chk', 'stk31Controller@popup_chk');
+        Route::get('stk31/popup_notice/{no}', 'stk31Controller@show_notice');
+        Route::put('stk31/notice_read', 'stk31Controller@notice_read');
         // Route::put('stk31/store', 'stk31Controller@store');
         // Route::put('stk31/edit/{no}', 'stk31Controller@update');
         // Route::post('stk31/del_store', 'stk31Controller@del_store');
@@ -442,6 +445,7 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         Route::post('stk32/store', 'stk32Controller@store');
         Route::put('stk32/msg_read', 'stk32Controller@msg_read');
         Route::post('stk32/msg_del', 'stk32Controller@msg_del');
+        Route::get('stk32/popup_chk', 'stk32Controller@popup_chk');
         Route::get('stk32/group', 'stk32Controller@group');
         Route::get('stk32/group_show', 'stk32Controller@group_show');
         Route::post('stk32/add_group', 'stk32Controller@add_group');
