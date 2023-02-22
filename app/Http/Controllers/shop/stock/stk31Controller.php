@@ -202,7 +202,8 @@ class stk31Controller extends Controller
         $store_cd = $request->input('store_cd');
 
         $notice_store_detail = [
-            'check_yn' => 'Y'
+            'check_yn' => 'Y',
+            'check_date' => now()
         ];
 
         try {

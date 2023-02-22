@@ -1018,7 +1018,9 @@ ALTER TABLE `bizest_smart`.`order_opt_wonga` ADD INDEX `idx_prdcd` (`prd_cd`);
 
 
 ALTER TABLE `bizest_smart`.`mgr_user` ADD COLUMN `confirm_yn` CHAR(1) NULL COMMENT '승인여부' AFTER `md_yn`; 
-ALTER TABLE `bizest_smart`.`mgr_user` ADD COLUMN `store_nm` VARCHAR(100) NULL COMMENT '매장명' AFTER `store_cd`; 
+ALTER TABLE `bizest_smart`.`mgr_user` ADD COLUMN `store_nm` VARCHAR(100) NULL COMMENT '매장명' AFTER `store_cd`;
+
+ALTER TABLE `bizest_smart`.`notice_store_detail` ADD COLUMN `check_date` DATETIME NULL COMMENT '공지사항확인일시' AFTER `check_yn`;
 
 --
 -- 기존 테이블 컬럼 추가 종료
