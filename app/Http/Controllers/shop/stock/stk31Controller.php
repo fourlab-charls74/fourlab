@@ -141,7 +141,7 @@ class stk31Controller extends Controller
         return view(Config::get('shop.shop.view') . '/stock/stk31_show', $values);
     }
 
-    public function notice(Request $request)
+    public function popup_chk(Request $request)
     {
         $store_cd	= $request->input("store_cd");
 
