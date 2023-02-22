@@ -10,6 +10,12 @@
                     <span>/ 알림 보기</span>
                 </div>
             </div>
+            @if ($msg_type == 'pop')
+            <div class="flax_box">
+                <button type="button" onclick="msgRead()" class="btn btn-sm btn-primary shadow-sm mr-1">읽음</button>
+                <button type="button" onclick="window.close()" class="btn btn-sm btn-outline-primary shadow-sm mr-1">닫기</button>
+            </div>
+            @endif
         </div>
         <div class="card_wrap aco_card_wrap">
             <div class="card shadow">
@@ -64,5 +70,31 @@
         </div>
     </div>
 
+    <script type="text/javascript" charset="utf-8">
+        function msgRead() {
+            let msg_cd = "{{$msg_cd}}";
+            let store_cd = "{{$store_cd}}";
+
+            $.ajax({
+                method: 'put',
+                url: '/shop/stock/stk32/msg_read',
+                data: { 
+                    msg_cd : msg_cd, 
+                    store_cd : store_cd
+                },
+                success: function(data) {
+                    if (data.code == '200') {
+                        alert('읽음 처리 되었습니다.');
+                        window.close();
+                    } else {
+                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                    }
+                },
+                error: function(e) {
+                        // console.log(e.responseText)
+                }
+            });
+        }
+    </script>
 
 @stop
