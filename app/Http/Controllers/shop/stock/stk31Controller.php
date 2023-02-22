@@ -106,38 +106,11 @@ class stk31Controller extends Controller
         ]);
     }
 
-        /* 
-            2023.02.16 김나영 - 사용하지 않음
-
-    // 추가
-    public function create(Request $request)
-    {
-
-        $name =  Auth('head')->user()->name;
-        $no = $request->input('ns_cd');
-
-        $user = new \stdClass();
-        $user->name = $name;
-        $user->subject = '';
-        $user->content = '';
-        $user->ns_cd = $no;
-        $user->store_cd = '';
-        $user->store_nm = '';
-
-        $values = ['no' => $no, 'user' => $user];
-
-        return view(Config::get('shop.shop.view') . '/stock/stk31_show', $values);
-
-    }
-        */
-
     public function show($no)
     {
         $user = DB::table('notice_store')->where('ns_cd', "=", $no)->first();
         $user->name = $user->admin_nm;
-
-
-        //여기 수정 중!!!!!!
+        
         $sql = "
             update notice_store set
                 cnt = cnt + 1
@@ -162,15 +135,121 @@ class stk31Controller extends Controller
         $values = [
             'no' => $no,
             'user' => $user,
-            'storeCode' => $storeCodes
+            'storeCode' => $storeCodes,
         ];
-
 
         return view(Config::get('shop.shop.view') . '/stock/stk31_show', $values);
     }
 
-        /* 
-            2023.02.16 김나영 - 사용하지 않음
+    public function notice(Request $request)
+    {
+        $store_cd	= $request->input("store_cd");
+
+        $sql = "
+            select ns_cd
+                from notice_store_detail
+            where store_cd = :store_cd and check_yn = 'N' and rt >= date_add(now(), interval -1 month)
+            order by rt desc
+        ";
+
+        $nos = DB::select($sql, ['store_cd'=>$store_cd]);
+
+        return response()->json([
+			"code" => 200,
+            "nos"  => $nos
+		]);
+    }
+
+    public function show_notice($no)
+    {
+        $user = DB::table('notice_store')->where('ns_cd', "=", $no)->first();
+        $user->name = $user->admin_nm;
+        $store_cd = Auth('head')->user()->store_cd;
+
+        $sql = "
+            update notice_store set
+                cnt = cnt + 1
+            where ns_cd = $no
+        ";
+        DB::update($sql);
+
+        $sql = "
+            select
+                d.check_yn,
+                d.ns_cd,
+                s.ns_cd,
+                d.store_cd,
+                store.store_nm
+            from notice_store s 
+                left outer join notice_store_detail d on s.ns_cd = d.ns_cd
+                left outer join store on store.store_cd = d.store_cd
+            where s.ns_cd = '$no' and d.store_cd = '$store_cd'
+        ";
+        $storeCodes = DB::selectOne($sql);
+
+        $values = [
+            'no' => $no,
+            'user' => $user,
+            'storeCode' => $storeCodes,
+        ];  
+
+        return view(Config::get('shop.shop.view') . '/stock/stk31_show_pop', $values);
+    }
+
+    public function notice_read(Request $request)
+    {
+        $ns_cd = $request->input('ns_cd');
+        $store_cd = $request->input('store_cd');
+
+        $notice_store_detail = [
+            'check_yn' => 'Y'
+        ];
+
+        try {
+            DB::beginTransaction();
+
+            DB::table('notice_store_detail')
+                ->where([
+                    ['ns_cd', '=', $ns_cd],
+                    ['store_cd', '=', $store_cd]
+                ])
+                ->update($notice_store_detail);
+
+            DB::commit();
+            $code = 200;
+            $msg = "";
+        } catch (Exception $e) {
+            DB::rollBack();
+            $code = 500;
+            $msg = $e->getMessage();
+        }
+        return response()->json([
+            "code" => $code,
+            "msg" => $msg
+        ]);
+    }
+    
+    /* 2023.02.16 김나영 - 사용하지 않음
+    // 추가
+    public function create(Request $request)
+    {
+
+        $name =  Auth('head')->user()->name;
+        $no = $request->input('ns_cd');
+
+        $user = new \stdClass();
+        $user->name = $name;
+        $user->subject = '';
+        $user->content = '';
+        $user->ns_cd = $no;
+        $user->store_cd = '';
+        $user->store_nm = '';
+
+        $values = ['no' => $no, 'user' => $user];
+
+        return view(Config::get('shop.shop.view') . '/stock/stk31_show', $values);
+
+    }
 
     public function store(Request $request)
     {
