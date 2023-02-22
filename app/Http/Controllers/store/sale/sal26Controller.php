@@ -209,6 +209,7 @@ class sal26Controller extends Controller
         ";
 
         $result = DB::select($sql);
+		
 
         foreach($result as $row){
             // $row->sum_amt = $row->sum_recv_amt + $row->sum_point_amt - $row->sum_fee_amt;
