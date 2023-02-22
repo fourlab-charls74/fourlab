@@ -10,36 +10,36 @@
     <div class="row">
         <div class="col-lg-6">
             <div class="card shadow-none mb-3">
-                <div class="card-title">
-                    <div class="filter_wrap" style="width: 100%; height:100%; padding:10px 10px 10px 10px;">
-                        <ul class="nav nav-tabs" id="myTab" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link" id="bar-tab" data-toggle="tab" href="#bar" role="tab" aria-controls="bar" aria-selected="false">일별 매출</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="pie-tab" data-toggle="tab" href="#pie" role="tab" aria-controls="pie" aria-selected="false">매장별 매출</a>
-                            </li>
-                        </ul>
-                        <div class="tab-content" id="myTabContent">
-                            <div class="tab-pane fade" id="bar" role="tabpanel" aria-labelledby="bar-tab">
-                                <div class="card_wrap aco_card_wrap">
-                                    <div class="card shadow">
-                                        <div class="card shadow mb-1">
-                                            <div class="chart-container" style="position: relative; height:auto; width:auto">
-                                                <canvas id="myChart"></canvas>
-                                            </div>
+                <div class="filter_wrap" style="width: 100%; height:100%; padding:10px 10px 10px 10px;">
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link" id="bar-tab" data-toggle="tab" href="#bar" role="tab" aria-controls="bar" aria-selected="false">일별 매출</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="pie-tab" data-toggle="tab" href="#pie" role="tab" aria-controls="pie" aria-selected="false">매장별 매출</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade" id="bar" role="tabpanel" aria-labelledby="bar-tab">
+                            <div class="card_wrap aco_card_wrap">
+                                <div class="card shadow">
+                                    <div class="card shadow mb-1">
+                                        <div class="chart-container" style="height:30vw; width:42vw">
+                                            <canvas id="myChart" ></canvas>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane fade" id="pie" role="tabpanel" aria-labelledby="pie-tab">
-                                <div class="card_wrap aco_card_wrap">
-                                    <div class="card shadow">
-                                        <div class="card-body mt-1">
-                                            
-                                            매장별매출통계 그래프 자리
-                                            
+                        </div>
+                        <div class="tab-pane fade" id="pie" role="tabpanel" aria-labelledby="pie-tab">
+                            <div class="card_wrap aco_card_wrap">
+                                <div class="card shadow">
+                                    <div class="card-body mt-1">
+                                        
+                                        <div class="chart-container" style="height:30vw; width:42vw">
+                                            <canvas id="myChart2" ></canvas>
                                         </div>
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -48,22 +48,17 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-6">
+        <div class="col-lg-6" >
             <div class="card shadow-none mb-3">
-                <div class="card-title">
-                    <div class="filter_wrap" style="width: 100%; height:100%;">
-                        <div style="text-align:center; padding-top: 200px">
+                <div style="text-align:center; width:100%; height:100%">
 
-                            <h5>자주 사용하는 메뉴 COMMING SOON</h5>
-                        
-                        </div>
-                    </div>
+                    <h5>자주 사용하는 메뉴 COMMING SOON</h5>
+                
                 </div>
             </div>
         </div>
         <div class="col-lg-6">
             <div class="card shadow-none mb-3">
-                <div class="card-title">
                     <div class="filter_wrap" style="width: 100%; height:100%;">
                         <div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
                             <div class="card-body shadow">
@@ -84,26 +79,23 @@
                             </div>
                         </div>
                     </div>
-                </div>
             </div>
         </div>
-        <div class="col-lg-6">
+        <div class="col-lg-6" >
             <div class="card shadow-none mb-3">
-                <div class="card-title">
-                    <div class="filter_wrap" style="width: 100%; height:100%;">
-                        <div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
-                            <div class="card-body shadow">
-                                <div class="card-title">
-                                    <div class="filter_wrap">
-                                        <div class="fl_box">
-                                            <h6 class="m-0 font-weight-bold">총 <span id="gd-alarm-total" class="text-primary">0</span> 건</h6>
-                                        </div>
-                                        <a href="#" id="msg_del_btn" onclick="msg()"class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">더보기</a>
+                <div class="filter_wrap" style="width: 100%; height:100%;">
+                    <div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
+                        <div class="card-body shadow">
+                            <div class="card-title">
+                                <div class="filter_wrap">
+                                    <div class="fl_box">
+                                        <h6 class="m-0 font-weight-bold">총 <span id="gd-alarm-total" class="text-primary">0</span> 건</h6>
                                     </div>
+                                    <a href="#" id="msg_del_btn" onclick="msg()"class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">더보기</a>
                                 </div>
-                                <div class="table-responsive">
-                                    <div id="div-gd-alarm" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
-                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <div id="div-gd-alarm" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
                             </div>
                         </div>
                     </div>
@@ -157,7 +149,7 @@
     let gx;
 
     $(document).ready(function() {
-        pApp.ResizeGrid(800);
+        pApp.ResizeGrid(275, 450);
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
         pApp.BindSearchEnter();
@@ -198,7 +190,7 @@
     let gx2;
 
     $(document).ready(function() {
-        pApp2.ResizeGrid(800);
+        pApp2.ResizeGrid(275, 450);
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
         gx2 = new HDGrid(gridDiv2, columns2);
         pApp2.BindSearchEnter();
@@ -221,103 +213,6 @@
         const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=615");
     }
 
-
-</script>
-<script src="https://unpkg.com/ag-charts-community@2.1.0/dist/ag-charts-community.min.js"></script>
-<script language="javascript">
-    // var columns3 = [
-    // ];
-</script>
-<script type="text/javascript" charset="utf-8">
-    // let chart_data = null;
-
-    // const pApp3 = new App('', {
-    //     gridId: "#div-gd-chart1",
-    // });
-    // let gx3;
-    // $(document).ready(function() {
-    //     pApp3.ResizeGrid(1000);
-    //     pApp3.BindSearchEnter();
-    //     let gridDiv3 = document.querySelector(pApp3.options.gridId);
-    //     let options = {
-    //         getRowStyle: (params) => {
-    //             if (params.node.rowPinned === 'top') {
-    //                 return { 'background': '#eee' }
-    //             }
-    //         }
-    //     };
-    //     gx3 = new HDGrid(gridDiv3, columns3, options);
-        
-    //     Search3();
-
-    // });
-
-    // function Search3() {
-    //     //$('[name=ord_state]').val(10);
-
-    //     let data = $('form[name="search"]').serialize();
-
-    //     // console.log(data);
-
-
-    //     gx3.Request('/store/main_chart1', data, -1, function(data) {
-    //         chart_data = data.body;
-    //         drawCanvas();
-    //     });
-    // }
-
-    // function drawCanvas() {
-    //     drawCanvasByDate();
-    // }
-
-    // function drawCanvasByDate() {
-    //     $('#opt_chart').html('');
-
-    //     let beforeRowMonth = null;
-
-    //     chart_data.sort(function(a, b) {
-    //         if (a.date < b.date) {
-    //             return -1;
-    //         }
-    //         if (a.date > b.date) {
-    //             return 1;
-    //         }
-
-    //         return 0;
-    //     });
-
-    //     chart_data.forEach(function(row) {
-    //         if (beforeRowMonth !== row.month || beforeRowMonth === null) {
-    //             row.chart_x_str = row.month + "." + row.day;
-    //             beforeRowMonth = row.month;
-    //             return;
-    //         }
-
-    //         row.chart_x_str = row.day;
-    //     });
-
-    //     var options = {
-    //         container: document.getElementById('opt_chart'),
-    //         title: {
-    //             text: "일별 매출 통계",
-    //         },
-    //         data: chart_data,
-    //         series: [{
-    //             type: 'column',
-    //             xKey: 'chart_x_str',
-    //             yKeys: ['sum_amt', 'sum_wonga'],
-    //             yNames: [' 매출액', '매출원가'],
-    //             grouped: true,
-    //             fills: ['#556ee6', '#2797f6'],
-    //             strokes: ['#556ee6', '#2797f6']
-    //             // highlightStyle : {
-    //             //   fill :
-    //             // }
-    //         }],
-    //     };
-    //     agCharts.AgChart.create(options);
-    // }
-
     function notice() {
         window.location.href = "/store/stock/stk31";
     }
@@ -325,7 +220,6 @@
     function msg() {
         window.location.href = "/store/stock/stk32";
     }
-
 </script>
 
 <!-- 차트 -->
@@ -338,6 +232,8 @@
   let edate = '{{$edate}}';
   let sdate = '{{$sdate}}';
 
+  let chartData = <?= json_encode($result)?>;
+
   let all_date = getDatesStartToLast(sdate, edate);
 
   new Chart(ctx, {
@@ -346,32 +242,36 @@
       datasets: [{
         label: '매출액', 
         data: [
-            {x: all_date[0], y: 10},
-            {x: all_date[1], y: 10},
-            {x: all_date[2], y: 10},
-            {x: all_date[3], y: 10},
-            {x: all_date[4], y: 10},
-            {x: all_date[5], y: 10},
-            {x: all_date[6], y: 10},
-            {x: all_date[7], y: 10},
+            {x: all_date[0], y: chartData[7].sum_amt},
+            {x: all_date[1], y: chartData[8].sum_amt},
+            {x: all_date[2], y: chartData[9].sum_amt},
+            {x: all_date[3], y: chartData[10].sum_amt},
+            {x: all_date[4], y: chartData[11].sum_amt},
+            {x: all_date[5], y: chartData[12].sum_amt},
+            {x: all_date[6], y: chartData[13].sum_amt},
+            {x: all_date[7], y: chartData[14].sum_amt},
         ],
         borderWidth: 3
       },{
         label: '매출원가',
         data: [
-            {x: all_date[0], y: 10},
-            {x: all_date[1], y: 10},
-            {x: all_date[2], y: 10},
-            {x: all_date[3], y: 10},
-            {x: all_date[4], y: 10},
-            {x: all_date[5], y: 10},
-            {x: all_date[6], y: 10},
-            {x: all_date[7], y: 10},
+            {x: all_date[0], y: chartData[7].sum_wonga},
+            {x: all_date[1], y: chartData[8].sum_wonga},
+            {x: all_date[2], y: chartData[9].sum_wonga},
+            {x: all_date[3], y: chartData[10].sum_wonga},
+            {x: all_date[4], y: chartData[11].sum_wonga},
+            {x: all_date[5], y: chartData[12].sum_wonga},
+            {x: all_date[6], y: chartData[13].sum_wonga},
+            {x: all_date[7], y: chartData[14].sum_wonga},
         ],
         borderWidth: 3
     }]
     },
     options: {
+      responsive: true,
+      legend:{
+        align : 'end'
+      },
       scales: {
         y: {
           beginAtZero: true
@@ -391,6 +291,33 @@
         }
         return result;
     }
+
+
+    const ctx2 = document.getElementById('myChart2');
+
+    new Chart(ctx2, {
+    type: 'pie',
+    data: {
+        labels: [
+            'Red',
+            'Blue',
+            'Yellow'
+        ],
+        datasets: [{
+            label: 'My First Dataset',
+            data: [300, 50, 100],
+            backgroundColor: [
+            'rgb(255, 99, 132)',
+            'rgb(54, 162, 235)',
+            'rgb(255, 205, 86)'
+            ],
+            hoverOffset: 4
+        }]
+    },
+  });
+
+
+
 
 </script>
 

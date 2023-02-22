@@ -373,6 +373,7 @@ class sal24Controller extends Controller
 		";
 
 		$rows = DB::select($sql);
+
 		$result = collect($rows)->map(function ($row) {
 
 			$sale_date		= $row->date;
