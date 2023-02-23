@@ -179,16 +179,7 @@ class stk22Controller extends Controller
 
         //로그인한 아이디의 매칭된 매장을 불러옴
 		$user_store	= Auth('head')->user()->store_cd;
-        $store_nm   = Auth('head')->user()->store_nm;
-
-        // $sql = "
-        //     select
-        //         store_nm
-        //     from store
-        //     where store_cd = '$user_store'
-        // ";
-
-        // $store_nm = DB::selectOne($sql);
+        $user_store_nm   = Auth('head')->user()->store_nm;
 
 		$code = 200;
 		$prd_cd = $request->input("prd_cd", '');
@@ -206,7 +197,7 @@ class stk22Controller extends Controller
                 ifnull(pss.qty, 0) as storage_qty, 
                 ifnull(pss.wqty, 0) as storage_wqty,
                 '$user_store' as store_cd,
-                '$store_nm' as store_nm
+                '$user_store_nm' as store_nm
 
             from store s
                 left outer join product_stock_store ps on s.store_cd = ps.store_cd and ps.prd_cd = '$prd_cd'

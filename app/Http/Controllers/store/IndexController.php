@@ -18,7 +18,7 @@ class IndexController extends Controller
         $sdate = $mutable->sub(1, 'week')->format('Y-m-d');
         $edate = date("Y-m-d");
 
-        $startdate = $mutable->sub(7, 'day')->format('Ymd');
+        $startdate = $mutable->sub(1, 'week')->format('Ymd');
         $enddate = date("Ymd");
 
         $sql = "
@@ -165,7 +165,7 @@ class IndexController extends Controller
             , (t.recv_amt_10 + t.recv_amt_60 + t.recv_amt_61 ) as sum_recv_amt
             , (t.point_amt_10 + t.point_amt_60 + t.point_amt_61 ) as sum_point_amt
             , (t.fee_amt_10 + t.fee_amt_60 + t.fee_amt_61) as sum_fee_amt
-                            ,(t.recv_amt_10 + t.recv_amt_60 + t.recv_amt_61 ) + (t.point_amt_10 + t.point_amt_60 + t.point_amt_61 ) - (t.fee_amt_10 + t.fee_amt_60 + t.fee_amt_61) as sum_amt
+            ,(t.recv_amt_10 + t.recv_amt_60 + t.recv_amt_61 ) + (t.point_amt_10 + t.point_amt_60 + t.point_amt_61 ) - (t.fee_amt_10 + t.fee_amt_60 + t.fee_amt_61) as sum_amt
             , (t.wonga_10 + t.wonga_60 + t.wonga_61) as sum_wonga
             , (t.coupon_amt_10 + t.coupon_amt_60 + t.coupon_amt_61) as sum_coupon_amt
             , (t.dc_amt_10 + t.dc_amt_60 + t.dc_amt_61) as sum_dc_amt
@@ -227,8 +227,8 @@ class IndexController extends Controller
                         inner join company c on w.com_id = c.com_id
                         inner join store s on s.store_cd = o.store_cd
                     where
-                        w.ord_state_date >= '20221122' 
-                        and w.ord_state_date <= '20230222' and w.ord_state in (10,60,61)
+                        w.ord_state_date >= '$startdate' 
+                        and w.ord_state_date <= '$enddate' and w.ord_state in (10,60,61)
                         and o.ord_state >= 10
                         and (  o.ord_type = '5'  or  o.ord_type = '4'  or  o.ord_type = '3'  or  o.ord_type = '13'  or  o.ord_type = '12'  or  o.ord_type = '17'  or  o.ord_type = '14'  or  o.ord_type = '15'  or o.ord_type = '0'  or  o.ord_type = '16'  )   
                         group by store_cd,ord_state

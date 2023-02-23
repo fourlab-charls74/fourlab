@@ -25,15 +25,8 @@ class stk34Controller extends Controller
         $mutable = Carbon::now();
         $sdate = $mutable->sub(1, 'month')->format('Y-m');
         $edate = date("Y-m");
+        $competitor_yn = SLib::getStoreProp($user_store)->competitor_yn;
 
-        $sql = "
-            select 
-                competitor_yn
-            from store
-            where store_cd = '$user_store' 
-        ";
-
-        $competitor_yn = DB::selectOne($sql);
 
         $values = [
             'store_types' => SLib::getCodes("STORE_TYPE"),
@@ -41,7 +34,7 @@ class stk34Controller extends Controller
             'sdate' => $sdate,
             'edate' => $edate,
             'user_store' => $user_store,
-            'competitor_yn' => $competitor_yn->competitor_yn
+            'competitor_yn' => $competitor_yn
         ];
         return view(Config::get('shop.shop.view') . '/stock/stk34', $values);
     }

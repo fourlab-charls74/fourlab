@@ -19,6 +19,8 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
     //Route::Redirect("/","//dashboard");
     Route::get('/', 'IndexController@index');
     Route::get('/login', 'LoginController@index');
+    Route::get('/main', 'IndexController@main');
+    Route::get('/main_alarm', 'IndexController@main_alarm');
     //Route::get('/login', 'LoginController@index')->name('login');
     Route::post('/login', 'LoginController@login');
     Route::get('/logout', 'LoginController@logout');

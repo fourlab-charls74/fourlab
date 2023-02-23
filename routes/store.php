@@ -20,7 +20,6 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
     Route::get('/', 'IndexController@index');
     Route::get('/main', 'IndexController@main');
     Route::get('/main_alarm', 'IndexController@main_alarm');
-    Route::post('/chart', 'IndexController@chart');
     // Route::get('/search', 'IndexController@search');
     Route::get('/login', 'LoginController@index');
     //Route::get('/login', 'LoginController@index')->name('login');

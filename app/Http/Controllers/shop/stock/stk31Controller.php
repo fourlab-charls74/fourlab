@@ -106,7 +106,7 @@ class stk31Controller extends Controller
         ]);
     }
 
-    public function show($no)
+    public function show2($no)
     {
         $user = DB::table('notice_store')->where('ns_cd', "=", $no)->first();
         $user->name = $user->admin_nm;
@@ -136,6 +136,34 @@ class stk31Controller extends Controller
             'no' => $no,
             'user' => $user,
             'storeCode' => $storeCodes,
+        ];
+
+        return view(Config::get('shop.shop.view') . '/stock/stk31_show', $values);
+    }
+
+    public function show($no)
+    {
+        $user = DB::table('notice_store')->where('ns_cd', "=", $no)->first();
+        $user->name = $user->admin_nm;
+
+        $sql = "
+            select
+                d.check_yn,
+                d.ns_cd,
+                s.ns_cd,
+                d.store_cd,
+                store.store_nm
+            from notice_store s 
+                left outer join notice_store_detail d on s.ns_cd = d.ns_cd
+                left outer join store on store.store_cd = d.store_cd
+            where s.ns_cd = $no
+        ";
+        $storeCodes = DB::select($sql);
+
+        $values = [
+            'no' => $no,
+            'user' => $user,
+            'storeCode' => $storeCodes
         ];
 
         return view(Config::get('shop.shop.view') . '/stock/stk31_show', $values);

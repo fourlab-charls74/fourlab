@@ -24,6 +24,9 @@
                             <div class="card_wrap aco_card_wrap">
                                 <div class="card shadow">
                                     <div class="card shadow mb-1">
+                                        <div style="margin-top:10px; margin-right:10px">
+                                            <a href="#" id="msg_del_btn" onclick="sale_amt_days()"class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">더보기</a>
+                                        </div>
                                         <div class="chart-container" style="height:30vw; width:42vw">
                                             <canvas id="myChart" ></canvas>
                                         </div>
@@ -35,7 +38,7 @@
                             <div class="card_wrap aco_card_wrap">
                                 <div class="card shadow">
                                     <div class="card-body mt-1">
-                                        
+                                        <a href="#" id="msg_del_btn" onclick="sale_amt_store()"class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">더보기</a>
                                         <div class="chart-container" style="height:30vw; width:42vw">
                                             <canvas id="myChart2" ></canvas>
                                         </div>
@@ -220,6 +223,16 @@
     function msg() {
         window.location.href = "/store/stock/stk32";
     }
+
+    function sale_amt_store() {
+        window.location.href = "/store/sale/sal26";
+    }
+   
+    function sale_amt_days() {
+        window.location.href = "/store/sale/sal24";
+    }
+
+
 </script>
 
 <!-- 차트 -->
@@ -270,7 +283,7 @@
     options: {
       responsive: true,
       legend:{
-        align : 'end'
+        position : 'right'
       },
       scales: {
         y: {
@@ -292,33 +305,60 @@
         return result;
     }
 
+    let pieChartData = <?= json_encode($pieResult)?>;
 
     const ctx2 = document.getElementById('myChart2');
 
     new Chart(ctx2, {
-    type: 'pie',
-    data: {
-        labels: [
-            'Red',
-            'Blue',
-            'Yellow'
-        ],
-        datasets: [{
-            label: 'My First Dataset',
-            data: [300, 50, 100],
-            backgroundColor: [
-            'rgb(255, 99, 132)',
-            'rgb(54, 162, 235)',
-            'rgb(255, 205, 86)'
+        type: 'pie',
+        data: {
+            labels: [
+                pieChartData[0].store_nm,
+                pieChartData[1].store_nm,
+                pieChartData[2].store_nm,
+                pieChartData[3].store_nm,
+                pieChartData[4].store_nm,
+                pieChartData[5].store_nm,
+                pieChartData[6].store_nm,
+                pieChartData[7].store_nm,
+                pieChartData[8].store_nm,
+                pieChartData[9].store_nm,
             ],
-            hoverOffset: 4
-        }]
-    },
-  });
-
-
-
-
+            datasets: [{
+                label: '매출액',
+                data: [
+                pieChartData[0].sum_amt,
+                pieChartData[1].sum_amt,
+                pieChartData[2].sum_amt,
+                pieChartData[3].sum_amt,
+                pieChartData[4].sum_amt,
+                pieChartData[5].sum_amt,
+                pieChartData[6].sum_amt,
+                pieChartData[7].sum_amt,
+                pieChartData[8].sum_amt,
+                pieChartData[9].sum_amt,
+                ],
+                backgroundColor: [
+                    'rgb(255, 99, 132)',
+                    'rgb(54, 162, 235)',
+                    'rgb(255, 205, 86)',
+                    'rgb(130, 36, 227)',
+                    'rgb(129, 215, 66)',
+                    'rgb(57, 233, 215)',
+                    'rgb(144, 141, 135)',
+                    'rgb(221, 51, 51)',
+                    'rgb(33, 145, 51)',
+                    'rgb(249, 213, 158)'
+                ],
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            legend: {
+                position: 'right',
+            }
+        }
+    });
 </script>
 
 @stop

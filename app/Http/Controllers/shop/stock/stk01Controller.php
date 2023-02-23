@@ -215,17 +215,7 @@ class stk01Controller extends Controller
 	{
 		$user_store	= Auth('head')->user()->store_cd;
 
-		$sql = "
-			select
-				ostore_stock_yn
-			from store
-			where store_cd = '$user_store'
-		";
-
-		$ostore_stock_yn = DB::selectOne($sql);
-
-
-
+		$ostore_stock_yn = SLib::getStoreProp($user_store)->ostore_stock_yn;
 
 		$sdate = $request->input("date", '');
 		if($sdate == '') $sdate = date("Y-m-d");
@@ -303,7 +293,7 @@ class stk01Controller extends Controller
 			'storages' => $storages, // 창고리스트
 			'prd' => $row,
 			'user_store' => $user_store,
-			'ostore_stock_yn' => $ostore_stock_yn->ostore_stock_yn
+			'ostore_stock_yn' => $ostore_stock_yn
 		];
 		return view(Config::get('shop.shop.view') . '/stock/stk01_show', $values);
 	}

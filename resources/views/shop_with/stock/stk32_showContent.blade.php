@@ -70,7 +70,7 @@
         </div>
     </div>
 
-    <script type="text/javascript" charset="utf-8">
+<script type="text/javascript" charset="utf-8">
         function msgRead() {
             let msg_cd = "{{$msg_cd}}";
 
