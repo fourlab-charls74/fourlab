@@ -86,8 +86,8 @@
     let grade = "{{Auth('head')->user()->grade}}";
         
     $(document).ready(function(){
-        // openNoticePopup();
-        // openMsgPopup();
+        openNoticePopup();
+        openMsgPopup();
     }); 
     
     function openNoticePopup() {
