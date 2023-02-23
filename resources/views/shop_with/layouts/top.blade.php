@@ -9,8 +9,10 @@
             </ul>
         </div>
         @if (auth('head')->user()->store_cd !== '' && auth('head')->user()->grade === 'P')
-        <div class="d-flex">
-            <h1 class="shop-title">{{auth('head')->user()->store_nm}} ({{auth('head')->user()->store_cd}})</h1>
+        <div class="d-inline-flex location">
+            <span class="shop-title">{{auth('head')->user()->store_nm}}</span>
+            <span class="shop-title2" style="color:gray; text-shadow:none;"> &nbsp; / &nbsp;</span>
+            <span class="shop-title2">{{auth('head')->user()->store_cd}}</span>
         </div>
         @endif
         <div class="d-flex">
