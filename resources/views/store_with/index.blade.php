@@ -9,41 +9,30 @@
    
     <div class="row">
         <div class="col-lg-6">
-            <div class="card shadow-none mb-3">
-                <div class="filter_wrap" style="width: 100%; height:100%; padding:10px 10px 10px 10px;">
+            <div class="card shadow mb-3">
+                <div class="card-body">
                     <ul class="nav nav-tabs" id="myTab" role="tablist">
-                        <li class="nav-item">
+                        <li class="nav-item" role="presentation">
                             <a class="nav-link" id="bar-tab" data-toggle="tab" href="#bar" role="tab" aria-controls="bar" aria-selected="false">일별 매출</a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" role="presentation">
                             <a class="nav-link" id="pie-tab" data-toggle="tab" href="#pie" role="tab" aria-controls="pie" aria-selected="false">매장별 매출</a>
                         </li>
                     </ul>
                     <div class="tab-content" id="myTabContent">
                         <div class="tab-pane fade" id="bar" role="tabpanel" aria-labelledby="bar-tab">
-                            <div class="card_wrap aco_card_wrap">
-                                <div class="card shadow">
-                                    <div class="card shadow mb-1">
-                                        <div style="margin-top:10px; margin-right:10px">
-                                            <a href="#" id="msg_del_btn" onclick="sale_amt_days()"class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">더보기</a>
-                                        </div>
-                                        <div class="chart-container" style="height:30vw; width:42vw">
-                                            <canvas id="myChart" ></canvas>
-                                        </div>
-                                    </div>
+                            <div class="card shadow mb-1">
+                                <div style="margin-top:10px; margin-right:10px">
+                                    <a href="#" id="msg_del_btn" onclick="sale_amt_days()"class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">더보기</a>
                                 </div>
+                                <canvas id="myChart"></canvas>
                             </div>
                         </div>
                         <div class="tab-pane fade" id="pie" role="tabpanel" aria-labelledby="pie-tab">
-                            <div class="card_wrap aco_card_wrap">
-                                <div class="card shadow">
-                                    <div class="card-body mt-1">
-                                        <a href="#" id="msg_del_btn" onclick="sale_amt_store()"class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">더보기</a>
-                                        <div class="chart-container" style="height:30vw; width:42vw">
-                                            <canvas id="myChart2" ></canvas>
-                                        </div>
-                                        
-                                    </div>
+                            <div class="card-body mt-1">
+                                <a href="#" id="msg_del_btn" onclick="sale_amt_store()"class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">더보기</a>
+                                <div class="chart-container" style="position:relative; height:30vh; width:42vw">
+                                    <canvas id="myChart2" ></canvas>
                                 </div>
                             </div>
                         </div>
@@ -152,7 +141,7 @@
     let gx;
 
     $(document).ready(function() {
-        pApp.ResizeGrid(275, 450);
+        pApp.ResizeGrid(275, 200);
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
         pApp.BindSearchEnter();
@@ -193,7 +182,7 @@
     let gx2;
 
     $(document).ready(function() {
-        pApp2.ResizeGrid(275, 450);
+        pApp2.ResizeGrid(275, 200);
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
         gx2 = new HDGrid(gridDiv2, columns2);
         pApp2.BindSearchEnter();
@@ -237,7 +226,7 @@
 
 <!-- 차트 -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 <script>
   const ctx = document.getElementById('myChart');
 
@@ -253,43 +242,43 @@
     type: 'bar',
     data: {
       datasets: [{
-        label: '매출액', 
-        data: [
-            {x: all_date[0], y: chartData[7].sum_amt},
-            {x: all_date[1], y: chartData[8].sum_amt},
-            {x: all_date[2], y: chartData[9].sum_amt},
-            {x: all_date[3], y: chartData[10].sum_amt},
-            {x: all_date[4], y: chartData[11].sum_amt},
-            {x: all_date[5], y: chartData[12].sum_amt},
-            {x: all_date[6], y: chartData[13].sum_amt},
-            {x: all_date[7], y: chartData[14].sum_amt},
-        ],
-        borderWidth: 3
-      },{
-        label: '매출원가',
-        data: [
-            {x: all_date[0], y: chartData[7].sum_wonga},
-            {x: all_date[1], y: chartData[8].sum_wonga},
-            {x: all_date[2], y: chartData[9].sum_wonga},
-            {x: all_date[3], y: chartData[10].sum_wonga},
-            {x: all_date[4], y: chartData[11].sum_wonga},
-            {x: all_date[5], y: chartData[12].sum_wonga},
-            {x: all_date[6], y: chartData[13].sum_wonga},
-            {x: all_date[7], y: chartData[14].sum_wonga},
-        ],
-        borderWidth: 3
-    }]
+            label: '매출액', 
+            data: [
+                {x: all_date[0], y: chartData[7].sum_amt},
+                {x: all_date[1], y: chartData[8].sum_amt},
+                {x: all_date[2], y: chartData[9].sum_amt},
+                {x: all_date[3], y: chartData[10].sum_amt},
+                {x: all_date[4], y: chartData[11].sum_amt},
+                {x: all_date[5], y: chartData[12].sum_amt},
+                {x: all_date[6], y: chartData[13].sum_amt},
+                {x: all_date[7], y: chartData[14].sum_amt},
+            ],
+            borderWidth: 3
+        },{
+            label: '매출원가',
+            data: [
+                {x: all_date[0], y: chartData[7].sum_wonga},
+                {x: all_date[1], y: chartData[8].sum_wonga},
+                {x: all_date[2], y: chartData[9].sum_wonga},
+                {x: all_date[3], y: chartData[10].sum_wonga},
+                {x: all_date[4], y: chartData[11].sum_wonga},
+                {x: all_date[5], y: chartData[12].sum_wonga},
+                {x: all_date[6], y: chartData[13].sum_wonga},
+                {x: all_date[7], y: chartData[14].sum_wonga},
+            ],
+            borderWidth: 3
+        }]
     },
     options: {
-      responsive: true,
-      legend:{
-        position : 'right'
-      },
-      scales: {
-        y: {
-          beginAtZero: true
+        responsive: true,
+        legend:{
+            position : 'right'
+        },
+        scales: {
+            y: {
+            beginAtZero: true
+            }
         }
-      }
     }
   });
 
@@ -318,11 +307,11 @@
                 pieChartData[2].store_nm,
                 pieChartData[3].store_nm,
                 pieChartData[4].store_nm,
-                pieChartData[5].store_nm,
-                pieChartData[6].store_nm,
-                pieChartData[7].store_nm,
-                pieChartData[8].store_nm,
-                pieChartData[9].store_nm,
+                // pieChartData[5].store_nm,
+                // pieChartData[6].store_nm,
+                // pieChartData[7].store_nm,
+                // pieChartData[8].store_nm,
+                // pieChartData[9].store_nm,
             ],
             datasets: [{
                 label: '매출액',
@@ -332,11 +321,11 @@
                 pieChartData[2].sum_amt,
                 pieChartData[3].sum_amt,
                 pieChartData[4].sum_amt,
-                pieChartData[5].sum_amt,
-                pieChartData[6].sum_amt,
-                pieChartData[7].sum_amt,
-                pieChartData[8].sum_amt,
-                pieChartData[9].sum_amt,
+                // pieChartData[5].sum_amt,
+                // pieChartData[6].sum_amt,
+                // pieChartData[7].sum_amt,
+                // pieChartData[8].sum_amt,
+                // pieChartData[9].sum_amt,
                 ],
                 backgroundColor: [
                     'rgb(255, 99, 132)',
@@ -344,11 +333,11 @@
                     'rgb(255, 205, 86)',
                     'rgb(130, 36, 227)',
                     'rgb(129, 215, 66)',
-                    'rgb(57, 233, 215)',
-                    'rgb(144, 141, 135)',
-                    'rgb(221, 51, 51)',
-                    'rgb(33, 145, 51)',
-                    'rgb(249, 213, 158)'
+                    // 'rgb(57, 233, 215)',
+                    // 'rgb(144, 141, 135)',
+                    // 'rgb(221, 51, 51)',
+                    // 'rgb(33, 145, 51)',
+                    // 'rgb(249, 213, 158)'
                 ],
                 hoverOffset: 4
             }]

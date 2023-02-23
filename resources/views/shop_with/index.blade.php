@@ -6,19 +6,15 @@
     왼쪽 하단 - 공지사항
     오른쪽 하단 - 알리미
 -->
-<div class="row">
+    <div class="row">
         <div class="col-lg-6">
-            <div class="card shadow-none mb-3">
-                <div class="filter_wrap" style="width: 100%; height:100%; padding:10px 10px 10px 10px;">
-                    <div class="card shadow">
-                        <div class="card shadow mb-1">
-                            <div style="margin-top:10px; margin-right:10px">
-                                <a href="#" id="msg_del_btn" onclick="sale_amt_days()"class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">더보기</a>
-                            </div>
-                            <div class="chart-container" style="height:30vw; width:42vw">
-                                <canvas id="myChart" ></canvas>
-                            </div>
+            <div class="card shadow mb-3">
+                <div class="card-body">
+                    <div class="card shadow mb-1">
+                        <div style="margin-top:10px; margin-right:10px">
+                            <a href="#" id="msg_del_btn" onclick="sale_amt_days()"class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">더보기</a>
                         </div>
+                        <canvas id="myChart" ></canvas>
                     </div>
                 </div>
             </div>
@@ -190,7 +186,7 @@
     let gx;
 
     $(document).ready(function() {
-        pApp.ResizeGrid(275, 450);
+        pApp.ResizeGrid(275, 200);
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
         pApp.BindSearchEnter();
@@ -233,7 +229,7 @@
     let gx2;
 
     $(document).ready(function() {
-        pApp2.ResizeGrid(275, 450);
+        pApp2.ResizeGrid(275, 200);
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
         gx2 = new HDGrid(gridDiv2, columns2);
         pApp2.BindSearchEnter();
