@@ -80,11 +80,11 @@
                                     </div>
                                     <div class="custom-control custom-radio">
                                         <input type="radio" name="sort_opt" id="sch_sort_opt_m" class="custom-control-input" value="M">
-                                        <label class="custom-control-label" for="sch_sort_opt_m">수동(M)</label>
+                                        <label class="custom-control-label" for="sch_sort_opt_m">수동</label>
                                     </div>
                                     <div class="custom-control custom-radio">
                                         <input type="radio" name="sort_opt" id="sch_sort_opt_a" class="custom-control-input" value="A">
-                                        <label class="custom-control-label" for="sch_sort_opt_a">자동(A)</label>
+                                        <label class="custom-control-label" for="sch_sort_opt_a">자동</label>
                                     </div>
                                 </div>
                             </div>
@@ -102,11 +102,11 @@
                                     </div>
                                     <div class="custom-control custom-radio">
                                         <input type="radio" name="cat_auth" id="sch_cat_auth_a" class="custom-control-input" value="A">
-                                        <label class="custom-control-label" for="sch_cat_auth_a">전체(A)</label>
+                                        <label class="custom-control-label" for="sch_cat_auth_a">전체</label>
                                     </div>
                                     <div class="custom-control custom-radio">
                                         <input type="radio" name="cat_auth" id="sch_cat_auth_g" class="custom-control-input" value="G">
-                                        <label class="custom-control-label" for="sch_cat_auth_g">그룹(G)</label>
+                                        <label class="custom-control-label" for="sch_cat_auth_g">그룹</label>
                                     </div>
                                 </div>
                             </div>
@@ -125,11 +125,11 @@
                                     </div>
                                     <div class="custom-control custom-radio">
                                         <input type="radio" name="use_yn" id="sch_use_yn_y" class="custom-control-input" value="Y" checked>
-                                        <label class="custom-control-label" for="sch_use_yn_y">Y</label>
+                                        <label class="custom-control-label" for="sch_use_yn_y">사용</label>
                                     </div>
                                     <div class="custom-control custom-radio">
                                         <input type="radio" name="use_yn" id="sch_use_yn_n" class="custom-control-input" value="N">
-                                        <label class="custom-control-label" for="sch_use_yn_n">N</label>
+                                        <label class="custom-control-label" for="sch_use_yn_n">미사용</label>
                                     </div>
                                 </div>
                             </div>
@@ -218,18 +218,22 @@
         {
             field: "sort_opt",
             headerName: "정렬",
-            width: 75,
+            width: 45,
+            cellStyle: {'text-align':'center'},
             cellRenderer: function(params) {
 				if(params.value === 'M') return "수동"
-				if(params.value === 'A') return "자동"
+				else if(params.value === 'A') return "자동"
+                else return params.value
 			}
         },
         {
             field: "auth",
             headerName: "권한",
+            width: 45,
+            cellStyle: {'text-align':'center'},
             cellRenderer: function(params) {
 				if(params.value === 'A') return "전체"
-				if(params.value === 'G') return "그룹"
+				else if(params.value === 'G') return "그룹"
 			}
         },
         {
@@ -251,6 +255,13 @@
         {
             field: "use_yn",
             headerName: "사용여부",
+            width: 58,
+            cellStyle: {'text-align':'center'},
+            cellRenderer: function(params) {
+				if(params.value === 'Y') return "사용"
+				else if(params.value === 'N') return "미사용"
+                else return params.value
+			}
         },
         {
             field: "com_nm",
@@ -311,7 +322,7 @@
 	});
 	*/
 	const gx = new HDGrid(gridDiv, columns);
-	console.log(gx.gridOptions);
+	// console.log(gx.gridOptions);
 	pApp.ResizeGrid(275);
 
     var _isloading = false;

@@ -45,11 +45,11 @@
                                 </div>
                                 <div class="custom-control custom-radio">
                                     <input type="radio" name="use_yn" id="sch_use_yn_y" class="custom-control-input" value="y">
-                                    <label class="custom-control-label" for="sch_use_yn_y">Y</label>
+                                    <label class="custom-control-label" for="sch_use_yn_y">사용</label>
                                 </div>
                                 <div class="custom-control custom-radio">
                                     <input type="radio" name="use_yn" id="sch_use_yn_n" class="custom-control-input" value="n">
-                                    <label class="custom-control-label" for="sch_use_yn_n">N</label>
+                                    <label class="custom-control-label" for="sch_use_yn_n">미사용</label>
                                 </div>
                             </div>
                         </div>
@@ -117,14 +117,21 @@
         {
             field: "goods_cnt",
             headerName: "상품갯수",
-            width:72,
+            width:58,
             editable: true,
+            cellStyle: {'text-align':'right'},
         },
         {
             field: "use_yn",
             headerName: "사용여부",
-            width:72,
+            width:58,
             editable: true,
+            cellStyle: {'text-align':'center'},
+            cellRenderer: function(params) {
+				if(params.value == 'Y') return "사용"
+				else if(params.value == 'N') return "미사용"
+                else return params.value
+			}
         },
         {
             field: "regi_date",

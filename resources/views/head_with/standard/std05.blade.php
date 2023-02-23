@@ -156,11 +156,22 @@
             field: "show_yn",
             headerName: "공개여부",
             width:58,
+            cellStyle: {'text-align':'center'},
+            cellRenderer: function(params) {
+				if(params.value === 'Y') return "공개"
+				else if(params.value === 'N') return "비공개"
+                else return params.value
+			}
         },
         {
             field: "best_yn",
             headerName: "베스트여부",
             width:70,
+            cellStyle: {'text-align':'center'},
+            cellRenderer: function(params) {
+				if(params.value === 'Y') return "베스트"
+                else return params.value
+			}
         },
         { field: "", headerName: "", width: "auto" }
     ];

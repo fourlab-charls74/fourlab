@@ -197,10 +197,31 @@ var columns = [
         {field:"md_nm",headerName:"담당MD"},
         {field:"settle_nm",headerName:"정산담당자"},
         {field:"pay_fee",headerName:"판매수수료율"},
-        {field:"margin_type",headerName:"수수료적용방식"},
-        {field:"site_yn",headerName:"본사판매처"},
-        {field:"api_yn",headerName:"API연동"},
-        {field:"use_yn",headerName:"사용여부"},
+        {field:"margin_type",headerName:"수수료적용방식", width: 100},
+        {field:"site_yn",headerName:"본사판매처", width: 75,
+            cellStyle: {'text-align':'center'},
+            cellRenderer: function(params) {
+				if(params.value == 'Y') return "사용"
+				else if(params.value == 'N') return "미사용"
+                else return params.value
+			}
+        },
+        {field:"api_yn",headerName:"API연동", width:75,
+            cellStyle: {'text-align':'center'},
+            cellRenderer: function(params) {
+				if(params.value == 'Y') return "사용"
+				else if(params.value == 'N') return "미사용"
+                else return params.value
+			}
+        },
+        {field:"use_yn",headerName:"사용여부", width:75,
+            cellStyle: {'text-align':'center'},
+            cellRenderer: function(params) {
+				if(params.value == 'Y') return "사용"
+				else if(params.value == 'N') return "미사용"
+                else return params.value
+			}
+        },
         {field:"biz_type",headerName:"CS사업자구분"},
         {field:"cs_nm",headerName:"CS담당자"},
         {field:"cs_email",headerName:"CS담당자 이메일"},

@@ -75,11 +75,11 @@
 								</div>
 								<div class="custom-control custom-radio">
 									<input type="radio" name="use_yn" id="sch_use_yn_y" class="custom-control-input" value="Y">
-									<label class="custom-control-label" for="sch_use_yn_y">Y</label>
+									<label class="custom-control-label" for="sch_use_yn_y">사용</label>
 								</div>
 								<div class="custom-control custom-radio">
 									<input type="radio" name="use_yn" id="sch_use_yn_n" class="custom-control-input" value="N">
-									<label class="custom-control-label" for="sch_use_yn_n">N</label>
+									<label class="custom-control-label" for="sch_use_yn_n">미사용</label>
 								</div>
 							</div>
 						</div>
@@ -94,11 +94,11 @@
 								</div>
 								<div class="custom-control custom-radio">
 									<input type="radio" name="brand_type" id="sch_brand_type_y" class="custom-control-input" value="S">
-									<label class="custom-control-label" for="sch_brand_type_y">시스템(S)</label>
+									<label class="custom-control-label" for="sch_brand_type_y">시스템</label>
 								</div>
 								<div class="custom-control custom-radio">
 									<input type="radio" name="brand_type" id="sch_brand_type_n" class="custom-control-input" value="U">
-									<label class="custom-control-label" for="sch_brand_type_n">유저(U)</label>
+									<label class="custom-control-label" for="sch_brand_type_n">유저</label>
 								</div>
 							</div>
 						</div>
@@ -479,7 +479,7 @@
 			//editable: true,
 			cellRenderer: function(params) {
 				if(params.value === 'S') return "시스템"
-				if(params.value === 'U') return "유저"
+				else if(params.value === 'U') return "유저"
 			}
 		},
 		{
@@ -500,14 +500,21 @@
 		{
 			field: "goods_cnt",
 			headerName: "상품수",
-			width: 70,
+			width: 50,
 			//editable: true,
+			cellStyle: {'text-align':'right'},
 		},
 		{
 			field: "use_yn",
 			headerName: "사용여부",
-			width: 80,
+			width: 60,
 			//editable: true,
+			cellStyle: {'text-align':'center'},
+            cellRenderer: function(params) {
+				if(params.value == 'Y') return "사용"
+				else if(params.value == 'N') return "미사용"
+                else return params.value
+			}
 		},
 		{
 			field: "regi_date",

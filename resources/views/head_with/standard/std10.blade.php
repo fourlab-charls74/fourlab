@@ -147,7 +147,13 @@
         {
             field: "state",
             headerName: "상태",
-            width:46
+            width:46,
+            cellStyle: {'text-align':'center'},
+            cellRenderer: function(params) {
+				if(params.value === 'Y') return "사용"
+				else if(params.value === 'N') return "미사용"
+                else return params.value
+			}
         },
         {
             field: "rt",

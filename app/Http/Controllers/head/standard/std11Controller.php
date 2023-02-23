@@ -117,9 +117,9 @@ class std11Controller extends Controller
 
         $where = "";
 
-		if ($name != "")			$where .= " and a.name like '$name%'";
+		if ($name != "")			$where .= " and a.name like '%$name%'";
 		if ($use_yn != "")			$where .= " and a.use_yn = '$use_yn'";
-		if ($dc_range != "")		$where .= " and a.dc_range = '$dc_range'";
+		if ($dc_range == "G")		$where .= " and a.dc_range = '$dc_range'";
 		if ($limit_coupon_yn != "")	$where .= " and a.limit_coupon_yn = '$limit_coupon_yn'";
 		if ($limit_point_yn != "")	$where .= " and a.limit_point_yn = '$limit_point_yn'";
 		if ($add_point_yn != "")	$where .= " and a.add_point_yn = '$add_point_yn'";
@@ -128,6 +128,8 @@ class std11Controller extends Controller
             $sql = "
                 select *
                 from ad_dc a
+                where 1=1
+                    $where
                 order by a.no desc
             ";
         } else {

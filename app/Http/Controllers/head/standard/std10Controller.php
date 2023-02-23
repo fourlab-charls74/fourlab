@@ -81,20 +81,20 @@ class std10Controller extends Controller
 
         if ($type != "")        $where .= " and type = '$type'";
         if ($user_yn != "")        $where .= " and user_yn = '$user_yn'";
-        if ($name != "")        $where .= " and name like '$name%' ";
+        if ($name != "")        $where .= " and name like '%$name%' ";
         if ($state != "")        $where .= " and state = '$state' ";
 
         $sql = "
-        select  
-            user_yn, 
-            type, 
-            ad, 
-            name,  
-            if(state = 1, '사용', '미사용') as state,
-            rt, 
-            ut
-        from ad
-        where 1=1 $where
+            select  
+                user_yn, 
+                type, 
+                ad, 
+                name,  
+                if(state = 1, '사용', '미사용') as state,
+                rt, 
+                ut
+            from ad
+            where 1=1 $where
         ";
 
         $rows = DB::select($sql);

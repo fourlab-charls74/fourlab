@@ -48,11 +48,11 @@
                                 </div>
                                 <div class="custom-control custom-radio">
                                     <input type="radio" name="use_yn" id="sch_use_yn_y" class="custom-control-input" value="y">
-                                    <label class="custom-control-label" for="sch_use_yn_y">Y</label>
+                                    <label class="custom-control-label" for="sch_use_yn_y">사용</label>
                                 </div>
                                 <div class="custom-control custom-radio">
                                     <input type="radio" name="use_yn" id="sch_use_yn_n" class="custom-control-input" value="n">
-                                    <label class="custom-control-label" for="sch_use_yn_n">N</label>
+                                    <label class="custom-control-label" for="sch_use_yn_n">미사용</label>
                                 </div>
                             </div>
                         </div>
@@ -175,11 +175,11 @@
                                                         <div class="form-inline form-radio-box">
                                                             <div class="custom-control custom-radio">
                                                                 <input type="radio" name="use_yn" id="use_yn_y" class="custom-control-input" value="Y" checked>
-                                                                <label class="custom-control-label" for="use_yn_y">Y</label>
+                                                                <label class="custom-control-label" for="use_yn_y">사용</label>
                                                             </div>
                                                             <div class="custom-control custom-radio">
                                                                 <input type="radio" name="use_yn" id="use_yn_n" class="custom-control-input" value="N">
-                                                                <label class="custom-control-label" for="use_yn_n">N</label>
+                                                                <label class="custom-control-label" for="use_yn_n">미사용</label>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -233,14 +233,21 @@ var columns = [
             cellRenderer: 'loadingRenderer',
             cellStyle: {"background":"#F5F7F7"}
         },
-        {field:"kind",headerName:"템플릿 구분",width:100,cellStyle:StyleGoodsTypeNM,editable: true, },
-        {field:"tplkind",headerName:"템플릿 유형",width:100,editable: true, },
+        {field:"kind",headerName:"템플릿 구분",width:80,cellStyle:StyleGoodsTypeNM,editable: true, },
+        {field:"tplkind",headerName:"템플릿 유형",width:80,editable: true, },
         {field:"subject",headerName:"제목", width:150, editable: true, 
             cellRenderer:function(params){
                 return '<a href="javascript:;" data-code="'+params.data.qna_no+'" onClick="GetInfo(this)">'+ params.value+'</a>'
             }
         },
-        {field:"use_yn",headerName:"사용여부", editable: true,},
+        {field:"use_yn",headerName:"사용여부", editable: true, width:58,
+            cellStyle: {'text-align':'center'},
+            cellRenderer: function(params) {
+				if(params.value === 'Y') return "사용"
+				else if(params.value === 'N') return "미사용"
+                else return params.value
+			}
+        },
         {field:"qna_no", headerName:"qna_no", hide:true,},
         {field:"", headerName:"", width:"auto"}
 ];

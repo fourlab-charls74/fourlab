@@ -36,8 +36,8 @@
                             <div class="flax_box">
                                 <select name='use_yn' class="form-control form-control-sm">
                                     <option value="">전체</option>
-                                    <option value="Y">Y</option>
-                                    <option value="N">N</option>
+                                    <option value="Y">사용</option>
+                                    <option value="N">미사용</option>
                                 </select>
                             </div>
                         </div>
@@ -63,8 +63,8 @@
                             <div class="flax_box">
                                 <select name="limit_coupon_yn" id="limit_coupon_yn" class="form-control form-control-sm">
                                     <option value="">전체</option>
-                                    <option value="Y">Y</option>
-                                    <option value="N">N</option>
+                                    <option value="Y">제한</option>
+                                    <option value="N">제한 없음</option>
                                 </select>
                             </div>
                         </div>
@@ -75,8 +75,8 @@
                             <div class="flax_box">
                                 <select name="limit_point_yn" id="limit_point_yn" class="form-control form-control-sm">
                                     <option value="">전체</option>
-                                    <option value="Y">Y</option>
-                                    <option value="N">N</option>
+                                    <option value="Y">제한</option>
+                                    <option value="N">제한 없음</option>
                                 </select>
                             </div>
                         </div>
@@ -87,8 +87,8 @@
                             <div class="flax_box">
                                 <select name="add_point_yn" id="add_point_yn" class="form-control form-control-sm">
                                     <option value="">전체</option>
-                                    <option value="Y">Y</option>
-                                    <option value="N">N</option>
+                                    <option value="Y">지급</option>
+                                    <option value="N">지급 없음</option>
                                 </select>
                             </div>
                         </div>
@@ -132,18 +132,53 @@
                 return `<a href="#" onClick="openDetailPopup('${params.data.no}')">${params.value}</a>`;
             }
         },
-        {field: "use_yn", headerName: "사용"},
-        {field: "dc_range", headerName: "범위"},
-        {field: "dc_rate", headerName: "할인율(%)", type:'currencyType' },
-        {field: "dc_amt", headerName: "할인금액(원)", type:'currencyType' },
-        {field: "date_from", headerName: "할인기간 시작", width:100},
-        {field: "date_to", headerName: "할인기간 종료", width:100},
-        {field: "limit_margin_rate", headerName: "마진율제한(%)", type:'currencyType'},
-        {field: "limit_coupon_yn", headerName: "쿠폰제한"},
-        {field: "limit_point_yn", headerName: "적립금제한"},
-        {field: "add_point_yn", headerName: "적립금지급"},
-        {field: "add_point_rate", headerName: "추가적립율(%)", type:'currencyType'},
-        {field: "add_point_amt", headerName: "추가적립금액(원)", type:'currencyType'},
+        {field: "use_yn", headerName: "사용", width:45,
+            cellStyle: {'text-align':'center'},
+            cellRenderer: function(params) {
+				if(params.value === 'Y') return "사용"
+				else if(params.value === 'N') return "미사용"
+                else return params.value
+			}
+        },
+        {field: "dc_range", headerName: "범위", width:45,
+            cellStyle: {'text-align':'center'},
+            cellRenderer: function(params) {
+				if(params.value === 'A') return "전체"
+				else if(params.value === 'G') return "상품"
+                else return params.value
+			}
+        },
+        {field: "dc_rate", headerName: "할인율(%)", type:'currencyType', width: 70},
+        {field: "dc_amt", headerName: "할인금액(원)", type:'currencyType', width: 80},
+        {field: "date_from", headerName: "할인기간 시작", width:90, cellStyle:{'text-align':'right'}},
+        {field: "date_to", headerName: "할인기간 종료", width:90, cellStyle:{'text-align':'right'}},
+        {field: "limit_margin_rate", headerName: "마진율제한(%)", type:'currencyType', width: 90},
+        {field: "limit_coupon_yn", headerName: "쿠폰제한", width:58,
+            cellStyle: {'text-align':'center'},
+            cellRenderer: function(params) {
+				if(params.value === 'Y') return "제한"
+				else if(params.value === 'N') return "제한 없음"
+                else return params.value
+			}
+        },
+        {field: "limit_point_yn", headerName: "적립금제한", width:70,
+            cellStyle: {'text-align':'center'},
+            cellRenderer: function(params) {
+				if(params.value === 'Y') return "제한"
+				else if(params.value === 'N') return "제한 없음"
+                else return params.value
+			}
+        },
+        {field: "add_point_yn", headerName: "적립금지급", width:70,
+            cellStyle: {'text-align':'center'},
+            cellRenderer: function(params) {
+				if(params.value === 'Y') return "지급"
+				else if(params.value === 'N') return "지급 없음"
+                else return params.value
+			}
+        },
+        {field: "add_point_rate", headerName: "추가적립율(%)", type:'currencyType', width: 90},
+        {field: "add_point_amt", headerName: "추가적립금액(원)", type:'currencyType', width: 105},
         {field: "admin_nm", headerName: "관리자명"},
         {field: "rt", headerName: "등록일시", width: 130},
         {field: "ut", headerName: "수정일시", width: 130},
@@ -161,7 +196,7 @@
     pApp.ResizeGrid(275);
 
     function Search(){
-            let data = $('form[name="search"]').serialize();
+        let data = $('form[name="search"]').serialize();
         gx.Request('/head/standard/std11/search', data);
     }
 
