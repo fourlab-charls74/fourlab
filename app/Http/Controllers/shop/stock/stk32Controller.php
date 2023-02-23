@@ -330,8 +330,7 @@ class stk32Controller extends Controller
                 'edate' => date("Y-m-d"),
                 'msg_cd' => $msg_cd,
                 'content' => $res->content,
-                'sender_nm' => $result->sender_nm ?? '',
-                'store_cd' => $user_store
+                'sender_nm' => $result->sender_nm ?? ''
             ];
         }
 
@@ -501,6 +500,7 @@ class stk32Controller extends Controller
     public function msg_read(Request $request)
     {
         $msg_cd = $request->input('msg_cd');
+        $store_cd = Auth('head')->user()->store_cd;
 
         $msg_store_detail = [
             'check_yn' => 'Y',
@@ -517,8 +517,6 @@ class stk32Controller extends Controller
                         ->update($msg_store_detail);
                 }
             } else {
-                $store_cd = $request->input('store_cd');
-
                 DB::table('msg_store_detail')
                         ->where([
                             ['msg_cd', '=', $msg_cd],

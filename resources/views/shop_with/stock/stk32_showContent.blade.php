@@ -73,14 +73,12 @@
     <script type="text/javascript" charset="utf-8">
         function msgRead() {
             let msg_cd = "{{$msg_cd}}";
-            let store_cd = "{{$store_cd}}";
 
             $.ajax({
                 method: 'put',
                 url: '/shop/stock/stk32/msg_read',
                 data: { 
-                    msg_cd : msg_cd, 
-                    store_cd : store_cd
+                    msg_cd : msg_cd
                 },
                 success: function(data) {
                     if (data.code == '200') {
