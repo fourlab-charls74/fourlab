@@ -106,7 +106,15 @@
                 }
             },
         },
-        {field: "state", headerName: "상태", cellClass: 'hd-grid-code'},
+        {field: "state", headerName: "상태", cellClass: 'hd-grid-code', 
+            cellRenderer: function(params) {
+				if(params.value == '0') return "사용중"
+				else if(params.value == '2') return "개발중"
+				else if(params.value == '4') return "테스트중"
+				else if(params.value == '-1') return "미사용"
+                else return params.value
+			}
+        },
         {
             field: "kor_nm",
             headerName: "메뉴명",
@@ -122,20 +130,34 @@
             }
         },
         {field: "eng_nm", headerName: "영문명", width: 150},
-        {field: "kind", headerName: "종류", width: 100, cellClass: 'hd-grid-code',
+        {field: "kind", headerName: "유형", width: 100, cellClass: 'hd-grid-code',
             cellRenderer: function(params) {
-                if(params.value === "M") {
-                    return '<a href="#" data-code="' + params.data.menu_no + '" onClick="Add(this)">' + params.value + '</a>'
-                } else {
-                    return params.value;
-                }
+                if(params.value === "M") return '<a href="#" data-code="' + params.data.menu_no + '" onClick="Add(this)">메뉴</a>'
+                else if(params.value === 'P') return "프로그램"
+                else if(params.value === 'S') return "게시판"
+                else if(params.value === 'L') return "링크"
+                else if(params.value === 'D') return "구분선"
+                else return params.value;
             }
         },
         {field: "action", headerName: "동작", width: 200},
-        {field: "sys_menu", headerName: "유저", width: 100, cellClass: 'hd-grid-code'},
+        {field: "sys_menu", headerName: "시스템메뉴", width: 100, cellClass: 'hd-grid-code', 
+            cellRenderer: function(params) {
+				if(params.value === 'N') return "시스템 메뉴 아님"
+				else if(params.value === 'U') return "본사 시스템 관리"
+				else if(params.value === 'S') return "파트너 시스템 관리"
+                else return params.value
+			}
+        },
         {field: "regi_date", headerName: "등록일시", type:'DateTimeType'},
         {field: "ut", headerName: "수정일시", type:'DateTimeType'},
-        {field: "is_del", headerName: "삭제여부", width: 100, cellClass: 'hd-grid-code'},
+        {field: "is_del", headerName: "삭제여부", width: 100, cellClass: 'hd-grid-code', 
+            cellRenderer: function(params) {
+				if(params.value == '0') return "아니요"
+				else if(params.value == '1') return "예"
+                else return params.value
+			}
+        },
         {
             width: 'auto'
         }
