@@ -33,6 +33,7 @@ class acc07Controller extends Controller
 
         $f_sdate = Carbon::parse($sdate)->firstOfMonth()->format("Ymd");
         $f_edate = Carbon::parse($sdate)->lastOfMonth()->format("Ymd");
+		$sdate = Lib::quote(str_replace('-', '', $sdate));
 
         $store_type = $request->input('store_type', '');
         $store_kind = $request->input('store_kind', '');
@@ -51,18 +52,25 @@ class acc07Controller extends Controller
 				, c.coupon_amt, c.allot_amt, (c.coupon_amt - c.allot_amt) as coupon_com_amt, c.dlv_amt, c.etc_amt
 				, c.sale_net_taxation_amt, c.sale_net_taxfree_amt, c.sale_net_amt, c.tax_amt
 				, (c.sale_net_amt - c.tax_amt) as sales_amt_except_vat
-				, c.fee_JS1, c.fee_JS2, c.fee_JS3, c.fee_TG, c.fee_YP, c.fee_OL, c.fee, c.extra_amt
-				, (c.fee_JS1 + c.fee_JS2 + c.fee_JS3 + c.fee_TG + c.fee_YP + c.fee_OL) as fee_amt
+				, c.fee_JS1, c.fee_JS2, c.fee_JS3, c.fee_TG, c.fee_YP, c.fee_OL
+				, if(c.closed_yn = 'Y', c.extra_amt, e.extra_amt) as extra_amt
+				, if(c.closed_yn = 'Y', c.fee_net, (c.fee + e.extra_amt)) as fee_net
+				, c.fee as fee_amt
 				, c.closed_yn, date_format(c.closed_date, '%Y-%m-%d') as closed_date, date_format(c.pay_day, '%Y-%m-%d') as pay_day, c.tax_no, c.admin_nm, c.rt
 				, s.store_nm, s.manager_nm
 			from store_account_closed c
 				inner join store s on s.store_cd = c.store_cd
-			where c.sday = '$f_sdate' and c.eday = '$f_edate'
+				left outer join (
+					select store_cd, extra_amt
+					from store_account_extra
+					where ymonth = :ymonth
+				) e on e.store_cd = c.store_cd
+			where c.sday = :sday and c.eday = :eday
 				$where
 			order by c.idx desc
 		";
 
-        $rows = DB::select($sql);
+        $rows = DB::select($sql, ['ymonth' => $sdate, 'sday' => $f_sdate, 'eday' => $f_edate]);
 
         return response()->json([
             "code" => 200,
@@ -77,9 +85,12 @@ class acc07Controller extends Controller
     {
 		$sql = "
 			select c.idx, c.store_cd, s.store_nm, s.manager_nm, c.sday, c.eday, c.closed_yn, c.closed_date, c.rt, c.admin_nm
-				, c.fee_JS1, c.fee_JS2, c.fee_JS3, c.fee_TG, c.fee_YP, c.fee_OL, c.extra_amt, c.fee as account_amt, (c.fee - c.extra_amt) as fee_amt
+				, c.fee_JS1, c.fee_JS2, c.fee_JS3, c.fee_TG, c.fee_YP, c.fee_OL, c.fee as fee_amt
+				, if(c.closed_yn = 'Y', c.extra_amt, e.extra_amt) as extra_amt
+				, if(c.closed_yn = 'Y', c.fee_net, (c.fee + e.extra_amt)) as account_amt
 			from store_account_closed c
 				inner join store s on s.store_cd = c.store_cd
+				left outer join store_account_extra e on e.store_cd = c.store_cd and e.ymonth = left(c.sday, 6)
 			where c.idx = :idx
 		";
         $row = DB::selectOne($sql, ['idx' => $idx]);
@@ -127,10 +138,11 @@ class acc07Controller extends Controller
 					, (c.coupon_amt - c.allot_amt) as coupon_com_amt, c.dlv_amt, c.etc_amt
 					, c.sale_net_taxation_amt, c.sale_net_taxfree_amt, c.sale_type
 					, if(c.sale_type = 'JS', '정상', if(c.sale_type = 'TG', '특가', if(c.sale_type = 'YP', '용품', ''))) as sale_type_nm
+					, c.sale_net_amt
 					, if(c.sale_type = 'JS', c.sale_net_amt, 0)as sale_JS
 					, if(c.sale_type = 'TG', c.sale_net_amt, 0)as sale_TG
 					, if(c.sale_type = 'YP', c.sale_net_amt, 0)as sale_YP
-					, (c.sale_net_amt - c.tax_amt) as sale_amt_except_vat
+					, (c.sale_net_amt / 1.1) as sale_amt_except_vat
 					, m.user_nm, p.pay_type, w.ord_state, w.ord_state as clm_state
 					, if(c.type = 30, date_format(o.ord_date, '%Y-%m-%d'), '') as ord_date
 					, if(c.type in (60,61), (
@@ -185,7 +197,8 @@ class acc07Controller extends Controller
 					, c.qty, c.sale_amt, c.clm_amt, c.dc_amt, c.coupon_amt, c.allot_amt
 					, (c.coupon_amt - c.allot_amt) as coupon_com_amt, c.dlv_amt
 					, c.sale_net_taxation_amt, c.sale_net_taxfree_amt, c.sale_type
-					, (w.qty * w.price / 1.1) as sale_amt_except_vat
+					, c.sale_net_amt
+					, (c.sale_net_amt / 1.1) as sale_amt_except_vat
 					, c.fee_ratio as fee_rate_OL, c.fee as fee_OL
 					, m.user_nm, p.pay_type, w.ord_state, o.clm_state
 					, if(c.type = 30, date_format(o.ord_date, '%Y-%m-%d'), '') as ord_date

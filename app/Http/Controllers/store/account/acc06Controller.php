@@ -130,7 +130,9 @@ class acc06Controller extends Controller
 								, sum(if(ww.online_yn = 'Y', ww.recv_amt, 0)) as ord_OL_amt -- 온라인
 							from (
 								(
-									select www.ord_opt_no, www.goods_no, www.qty, www.price, www.recv_amt, www.ord_state, www.ord_kind, www.ord_type, www.ord_state_date, www.prd_cd, www.store_cd, 'N' as online_yn
+									select www.ord_opt_no, www.goods_no, www.qty, www.price, (www.recv_amt * if(www.ord_state = 30, 1, -1)) as recv_amt
+										, www.ord_state, www.ord_kind, www.ord_type, www.ord_state_date, www.prd_cd
+										, www.store_cd, 'N' as online_yn
 										-- , (www.qty * www.price * if(www.ord_state = 30, 1, -1)) as sale_price
 									from order_opt_wonga www
 									where www.ord_state >= 30
@@ -140,7 +142,9 @@ class acc06Controller extends Controller
 								)
 								union all
 								(
-									select www.ord_opt_no, www.goods_no, www.qty, www.price, www.recv_amt, www.ord_state, www.ord_kind, www.ord_type, www.ord_state_date, www.prd_cd, ooo.dlv_place_cd as store_cd, 'Y' as online_yn
+									select www.ord_opt_no, www.goods_no, www.qty, www.price, (www.recv_amt * if(www.ord_state = 30, 1, -1)) as recv_amt
+										, www.ord_state, www.ord_kind, www.ord_type, www.ord_state_date, www.prd_cd
+										, ooo.dlv_place_cd as store_cd, 'Y' as online_yn
 										-- , (www.qty * www.price * if(www.ord_state = 30, 1, -1)) as sale_price
 									from order_opt_wonga www
 										inner join order_opt ooo on ooo.ord_opt_no = www.ord_opt_no
@@ -438,12 +442,12 @@ class acc06Controller extends Controller
 				select :acc_idx as acc_idx
 					, b.type, b.sale_type, b.ord_opt_no, b.state_date, b.qty
 					, b.sale_amt, b.clm_amt, b.dc_amt, b.coupon_amt, b.allot_amt, b.dlv_amt
-					, if(b.tax_yn = 'Y', (b.sale_amt + b.clm_amt), 0) as sale_net_taxation_amt
-					, if(b.tax_yn = 'N', (b.sale_amt + b.clm_amt), 0) as sale_net_taxfree_amt
-					, (b.sale_amt + b.clm_amt) as sale_net_amt
-					, (b.sale_amt + b.clm_amt - ((b.sale_amt + b.clm_amt) / 1.1)) as tax_amt
+					, if(b.tax_yn = 'Y', b.recv_amt, 0) as sale_net_taxation_amt
+					, if(b.tax_yn = 'N', b.recv_amt, 0) as sale_net_taxfree_amt
+					, b.recv_amt as sale_net_amt
+					, (b.recv_amt - (b.recv_amt / 1.1)) as tax_amt
 					, b.fee_ratio
-					, round(if(b.sale_type = 'OL', b.sale_price / 1.1, (b.sale_amt + b.clm_amt) / 1.1) * b.fee_ratio / 100) as fee
+					, (b.recv_amt / 1.1 * b.fee_ratio / 100) as fee
 					, '' as memo
 					, 0 as sale_fee
 					, 0 as sale_clm_amt
@@ -458,10 +462,12 @@ class acc06Controller extends Controller
 						, a.ord_state_date as state_date
 						, a.qty as qty
 						, a.sale_price as sale_price
-						, if(a.ord_state = 30 and a.sale_type <> 'OL', a.sale_price, 0) as sale_amt
+						, if(a.ord_state = 30, a.sale_price, 0) as sale_amt
 						, if(a.ord_state = 30, 0, a.sale_price) as clm_amt
-						, ((a.goods_sh - abs(a.price)) * a.qty * -1) as dc_amt
-						, a.coupon_apply_amt as coupon_amt
+						-- , ((a.goods_sh - abs(a.price)) * a.qty * -1) as dc_amt
+						, (a.dc_apply_amt * if(a.ord_state = 30 and a.recv_amt > 0, -1, 1)) as dc_amt
+						, (a.coupon_apply_amt * if(a.ord_state = 30, -1, 1)) as coupon_amt
+						, (a.recv_amt * if(a.ord_state = 30, 1, -1)) as recv_amt
 						, 0 as allot_amt -- (본사부담)쿠폰금액 추후 수정필요
 						, a.dlv_amt as dlv_amt
 						, a.tax_yn
@@ -473,9 +479,9 @@ class acc06Controller extends Controller
 							)
 						) as fee_ratio
 					from (
-						select w.ord_opt_no, w.goods_no, w.qty, w.price, w.sale_price, w.ord_state
+						select w.ord_opt_no, w.goods_no, w.qty, w.price, w.recv_amt, w.sale_price, w.ord_state
 							, w.ord_state_date, w.prd_cd, w.store_cd
-							, w.coupon_apply_amt, w.dlv_amt
+							, w.dc_apply_amt, w.coupon_apply_amt, w.dlv_amt
 							, if(w.online_yn = 'Y', 'OL'
 								, if(g.brand in (select code_id from code where code_kind_cd = 'YP_BRAND'), 'YP'
 									, if(if(s.fee_10_info_over_yn = 'Y', ((1 - (w.price / g.goods_sh)) * 100) > s.fee_10_info, ((1 - (w.price / g.goods_sh)) * 100) >= s.fee_10_info), 'TG'
@@ -486,9 +492,10 @@ class acc06Controller extends Controller
 							, g.goods_sh, g.tax_yn, s.fee_10, s.fee_11, s.fee_12
 						from (
 							(
-								select ww.ord_opt_no, ww.goods_no, ww.qty, ww.price, (ww.qty * ww.price * if(ww.ord_state = 30, 1, -1)) as sale_price, ww.ord_state
+								select ww.ord_opt_no, ww.goods_no, ww.qty, ww.price, ww.recv_amt, ww.ord_state
+									, (ww.qty * ww.price * if(ww.ord_state = 30, 1, -1)) as sale_price
 									, ww.ord_state_date, ww.prd_cd, ww.store_cd, 'N' as online_yn
-									, ww.coupon_apply_amt, ww.dlv_amt
+									, ww.dc_apply_amt, ww.coupon_apply_amt, ww.dlv_amt
 								from order_opt_wonga ww
 								where ww.store_cd = :store_cd1
 									and ww.ord_state_date >= :sdate1
@@ -498,9 +505,10 @@ class acc06Controller extends Controller
 							)
 							union all
 							(
-								select ww.ord_opt_no, ww.goods_no, ww.qty, ww.price, (ww.qty * ww.price * if(ww.ord_state = 30, 1, -1)) as sale_price, ww.ord_state
+								select ww.ord_opt_no, ww.goods_no, ww.qty, ww.price, ww.recv_amt, ww.ord_state
+									, (ww.qty * ww.price * if(ww.ord_state = 30, 1, -1)) as sale_price
 									, ww.ord_state_date, ww.prd_cd, ooo.dlv_place_cd as store_cd, 'Y' as online_yn
-									, 0 as coupon_apply_amt, ww.dlv_amt
+									, 0 as dc_apply_amt, 0 as coupon_apply_amt, ww.dlv_amt
 								from order_opt_wonga ww
 									inner join order_opt ooo on ooo.ord_opt_no = ww.ord_opt_no
 								where ooo.dlv_place_type = 'STORE'
@@ -538,20 +546,22 @@ class acc06Controller extends Controller
 			$sql = "
 				update store_account_closed as c
 					, (
-						select b.*, (b.fee_JS1 + b.fee_JS2 + b.fee_JS3 + b.fee_TG + b.fee_YP + b.fee_OL + b.extra_amt) as fee
+						select b.*
+							, (b.fee_JS1 + b.fee_JS2 + b.fee_JS3 + b.fee_TG + b.fee_YP + b.fee_OL) as fee
+							, (b.fee_JS1 + b.fee_JS2 + b.fee_JS3 + b.fee_TG + b.fee_YP + b.fee_OL + b.extra_amt) as fee_net
 						from (
 							select
 								c.acc_idx
-								, sum(c.sale_amt) as sale_amt
-								, sum(c.clm_amt) as clm_amt
-								, sum(c.dc_amt) as dc_amt
-								, sum(c.coupon_amt) as coupon_amt
-								, sum(c.allot_amt) as allot_amt
-								, sum(c.dlv_amt) as dlv_amt
-								, sum(c.sale_net_taxation_amt) as sale_net_taxation_amt
-								, sum(c.sale_net_taxfree_amt) as sale_net_taxfree_amt
-								, sum(c.sale_net_amt) as sale_net_amt
-								, round(sum(c.tax_amt)) as tax_amt
+								, sum(if(c.sale_type = 'OL', 0, c.sale_amt)) as sale_amt
+								, sum(if(c.sale_type = 'OL', 0, c.clm_amt)) as clm_amt
+								, sum(if(c.sale_type = 'OL', 0, c.dc_amt)) as dc_amt
+								, sum(if(c.sale_type = 'OL', 0, c.coupon_amt)) as coupon_amt
+								, sum(if(c.sale_type = 'OL', 0, c.allot_amt)) as allot_amt
+								, sum(if(c.sale_type = 'OL', 0, c.dlv_amt)) as dlv_amt
+								, sum(if(c.sale_type = 'OL', 0, c.sale_net_taxation_amt)) as sale_net_taxation_amt
+								, sum(if(c.sale_type = 'OL', 0, c.sale_net_taxfree_amt)) as sale_net_taxfree_amt
+								, sum(if(c.sale_type = 'OL', 0, c.sale_net_amt)) as sale_net_amt
+								, round(sum(if(c.sale_type = 'OL', 0, c.tax_amt))) as tax_amt
 								, c.fee1 as fee_rate_JS1
 								, round(
 									if(sum(if(c.sale_type = 'JS', c.sale_net_amt, 0)) > c.amt1
@@ -581,7 +591,8 @@ class acc06Controller extends Controller
 								, c.fee_11 as fee_rate_YP
 								, round(sum(if(c.sale_type = 'YP', c.sale_net_amt, 0)) * c.fee_11 / 100 / 1.1) as fee_YP
 								, c.fee_12 as fee_rate_OL
-								, sum(if(c.sale_type = 'OL', c.fee, 0)) as fee_OL
+								-- , sum(if(c.sale_type = 'OL', c.fee, 0)) as fee_OL
+								, round(sum(if(c.sale_type = 'OL', c.sale_net_amt, 0)) * c.fee_12 / 100 / 1.1) as fee_OL
 								, ifnull(ae.extra_amt, 0) as extra_amt
 							from (
 								select cl.acc_idx, cl.type, cl.sale_type
@@ -599,7 +610,7 @@ class acc06Controller extends Controller
 								where cl.acc_idx = :acc_idx
 							) c
 								left outer join (
-									select store_cd, sum(extra_amt) as extra_amt
+									select store_cd, extra_amt
 									from store_account_extra
 									where ymonth = :ymonth
 									group by store_cd
@@ -630,6 +641,7 @@ class acc06Controller extends Controller
 					, c.fee_OL = a.fee_OL
 					, c.fee = a.fee
 					, c.extra_amt = a.extra_amt
+					, c.fee_net = a.fee_net
 					, c.ut = now()
 				where c.idx = a.acc_idx
 			";
@@ -683,16 +695,19 @@ class acc06Controller extends Controller
 			from (
 				select o.ord_no, w.ord_opt_no
 					, w.ord_state_date, date_format(w.ord_state_date, '%Y-%m-%d') as state_date, if(w.ord_state = 30, date_format(o.ord_date, '%Y-%m-%d'), '') as ord_date
-					, w.ord_state, o.clm_state, date_format(o.dlv_end_date, '%Y-%m-%d') as dlv_end_date
+					, w.ord_state, w.ord_state as clm_state, date_format(o.dlv_end_date, '%Y-%m-%d') as dlv_end_date
 					, if(o.ord_state in (60,61), (
 						select date_format(max(end_date),'%Y-%m-%d') as clm_end_date 
 						from claim
 						where ord_opt_no = w.ord_opt_no
 					), '') as clm_end_date
-					, w.store_cd, w.prd_cd, w.goods_no, w.goods_opt, w.qty, w.price, w.ord_kind, w.ord_type
+					, s.store_cd, w.prd_cd, w.goods_no, w.goods_opt, w.qty, w.price
+					, w.ord_kind, w.ord_type
 					, if(w.ord_state = 30, (w.qty * w.price), 0) as sale_amt
-					, if(w.ord_state in (60,61), (w.qty * w.price * -1), 0) as clm_amt
-					, ((g.goods_sh - abs(w.price)) * w.qty * -1) as dc_amt
+					-- , ((g.goods_sh - abs(w.price)) * w.qty * -1) as dc_amt
+					, (w.dc_apply_amt * if(w.ord_state = 30 and w.recv_amt > 0, -1, 1)) as dc_amt
+					, (w.coupon_apply_amt * if(w.ord_state = 30, -1, 1)) as coupon_amt
+					, (w.recv_amt * if(w.ord_state = 30, 1, -1)) as recv_amt
 					, o.pr_code, o.sale_place, s.store_nm, p.pay_type, m.user_nm
 					, g.style_no, g.goods_nm, g.tax_yn, g.goods_sh
 					, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color, pc.size

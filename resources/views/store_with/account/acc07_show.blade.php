@@ -159,7 +159,7 @@
                 <div class="card-title mb-2">
                     <div class="filter_wrap">
                         <div class="fl_box">
-                            <h6 class="m-0 font-weight-bold">특가(온라인) (총 <span id="gd-total-online" class="text-primary">0</span>건)</h6>
+                            <h6 class="m-0 font-weight-bold">특가(온라인) (총 <span id="gd-online-total" class="text-primary">0</span>건)</h6>
                         </div>
                         @if(@$closed->closed_yn !== 'Y')
                             <div class="fr_box">
@@ -240,6 +240,7 @@
 				{field: "sale_JS", headerName: "정상", width: 90, type: "currencyType", aggregation: true},
 				{field: "sale_TG", headerName: "특가", width: 90, type: "currencyType", aggregation: true},
 				{field: "sale_YP", headerName: "용품", width: 90, type: "currencyType", aggregation: true},
+				{field: "sale_net_amt", headerName: "매출합계", width: 90, type: "currencyType", aggregation: true},
 				{field: "sale_amt_except_vat", headerName: "매출합계(-VAT)", width: 90, type: "currencyType", aggregation: true},
 			]
         },
@@ -256,6 +257,7 @@
         if (col.field === 'store') return {...col, headerName: "배송매장정보"};
         if (col.field === 'sale_place_nm') return {...col, hide: false};
         if (col.field === 'sales') return {...col, headerName: "특가(온라인) 수수료", children: [
+            {field: "sale_net_amt", headerName: "판매처매출", width: 100, type: "currencyType", aggregation: true},
             {field: "sale_amt_except_vat", headerName: "판매처매출(-VAT)", width: 100, type: "currencyType", aggregation: true},
             {field: "fee_rate_OL", headerName: "수수료율(%)", width: 80, type: "currencyType", aggregation: true},
             {field: "fee_OL", headerName: "수수료", width: 90, type: "currencyType", aggregation: true},
