@@ -107,7 +107,7 @@
 <script>
 
     const columns = [
-        {field: "no", headerName: "코드", width: 70, cellClass: 'hd-grid-code',},
+        {field: "no", headerName: "코드", width: 50, cellClass: 'hd-grid-code',},
         {field: "plan_type", headerName: "유형", width:96},
         {field: "plan_kind", headerName: "구분"},
         {field: "title", headerName: "제목", width: 260,
@@ -118,7 +118,13 @@
         {field: "plan_date_yn", headerName: "기간", width:48},
         {field: "start_date", headerName: "시작일자", width:72},
         {field: "end_date", headerName: "종료일자", width:72},
-        {field: "folder_yn", headerName: "하위폴더",cellClass: 'hd-grid-code',width:72},
+        {field: "folder_yn", headerName: "하위폴더",cellClass: 'hd-grid-code',width:72,
+            cellRenderer: function(params) {
+                if(params.value == 'Y') return "존재"
+                else if(params.value == 'N') return "해당없음"
+                else return params.value
+            }
+        },
         {field: "cnt", headerName: "상품수", width:60, type: 'numberType' },
         {field: "p_cnt", headerName: "조회수", width:60, type: 'numberType' },
         {field: "preview", headerName: "미리보기", width:72,cellClass: 'hd-grid-code',
@@ -126,7 +132,12 @@
                 return '<a href="https://' + '{{ $domain }}' + '/app/planning/views/' + params.data.p_no + '/' + params.data.no + '?is_preview=y" target="_blank">보기</a>'
             }
         },
-        {field: "is_show", headerName: "사용여부", width:58, cellClass: 'hd-grid-code'},
+        {field: "is_show", headerName: "사용여부", width:58, cellClass: 'hd-grid-code',
+            cellRenderer: function(params) {
+                if(params.value == 'Y') return "사용"
+                else if(params.value == 'N') return "미사용"
+                else return params.value
+            }},
         {field: "admin_name", headerName: "등록자", },
         {field: "regi_date", headerName: "등록일시", width: 110,cellClass: 'hd-grid-code'},
         {field: "upd_date", headerName: "수정일시", width: 110,cellClass: 'hd-grid-code'},

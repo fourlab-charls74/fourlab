@@ -261,7 +261,7 @@
         { field: "goods_type", headerName: "상품구분", width: 58, cellStyle: (params) => cellStyleGoodsType(params), pinned: 'left' },
         { field: "opt_kind_nm", headerName: "품목", width: 100, pinned: 'left' },
         { field: "brand_nm", headerName: "브랜드", pinned: 'left' },
-        { field: "style_no", headerName: "스타일넘버", width: 120, pinned: 'left' },
+        { field: "style_no", headerName: "스타일넘버", width:70, cellStyle: {'text-align':'center'}, pinned: 'left' },
         { field: "head_desc", headerName: "상단홍보글", width: 120 },
         { field: "img", headerName: "이미지", width:46, type:'GoodsImageType', hide: true },
         { field: "img_url", headerName: "이미지_url", width:75, hide: true },
@@ -271,18 +271,30 @@
         { field: "normal_price", headerName: "정상가", width:60, type: 'currencyType' },
         { field: "price", headerName: "판매가", width:60, type: 'currencyType' },
         { field: "sale_type", headerName: "세일구분", width:72 },
-        { field: "sale_yn", headerName: "세일여부", width:72, cellStyle: YELLOW_CELL },
+        { field: "sale_yn", headerName: "세일여부", width:72, cellStyle: YELLOW_CELL,
+            cellRenderer: function(params) {
+                if(params.value == 'Y') return "해당"
+                else if(params.value == 'N') return "해당없음"
+                else return params.value
+            }
+        },
         { field: "before_sale_price", headerName: "이전세일가", width:84, type: 'currencyType' },
         { field: "sale_price", headerName: "세일가", width:60, cellStyle: YELLOW_CELL, type: 'currencyType' },
         { field: "sale_rate", headerName: "세일율(%)", width:84, cellStyle: YELLOW_CELL, cellRenderer: (params) => Math.round(params.data.sale_rate) },
-        { field: "sale_dt_yn", headerName: "타임세일여부", cellStyle: YELLOW_CELL },
+        { field: "sale_dt_yn", headerName: "타임세일여부", cellStyle: YELLOW_CELL, width:85,
+            cellRenderer: function(params) {
+                if(params.value == 'Y') return "해당"
+                else if(params.value == 'N') return "해당없음"
+                else return params.value
+            }
+        },
         { field: "sale_s_dt", headerName: "세일기간(시작)" },
         { field: "sale_e_dt", headerName: "세일기간(종료)" },
         { field: "coupon_price", headerName: "쿠폰가", width:60, type: 'currencyType' },
         { field: "wonga", headerName: "원가", width:60, type: 'currencyType' },         
         { field: "margin_amt", headerName: "마진액", width:60, type: 'currencyType' },
         { field: "margin_rate", headerName: "마진율(%)", cellRenderer: (params) => Math.round(params.data.margin_rate) },
-        { field: "qty", headerName: "재고수", width:60 },
+        { field: "qty", headerName: "재고수", width:58, cellStyle: {'text-align':'right'}},
         { field: "md_nm", headerName: "MD" },
         { field: "reg_dm", headerName: "등록일자", width: 120 },
         { field: "upd_dm", headerName: "수정일자", width: 120 },
@@ -312,7 +324,7 @@
     const Search = () => {
         let data = $('form[name="search"]').serialize();
         gx.Request('/head/product/prd04/search', data, 1, (data) => {
-            console.log(data);
+            // console.log(data);
         });
     };
 

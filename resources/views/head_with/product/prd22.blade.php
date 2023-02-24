@@ -102,13 +102,13 @@
     const columns = [{
             field: "type",
             headerName: "구분",
-            width: 150,
+            width: 80,
             cellClass: 'hd-grid-code'
         },
         {
             field: "qty",
             headerName: "상품수",
-            width: 100,
+            width: 80,
             cellClass: 'hd-grid-code'
         },
         {

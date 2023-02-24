@@ -60,8 +60,8 @@
                             <div class="flex_box">
                                 <select name="use_yn" class="form-control form-control-sm">
                                     <option value="">전체</option>
-                                    <option value="Y">Y</option>
-                                    <option value="N">N</option>
+                                    <option value="Y">사용</option>
+                                    <option value="N">미사용</option>
                                 </select>
                             </div>
                         </div>
@@ -98,15 +98,21 @@
 <script>
     const columns = [
         {field: "type", headerName: "구분"},
-        {field: "sec_no", headerName: "코드", width: 70, cellClass: 'hd-grid-code',},
+        {field: "sec_no", headerName: "코드", width: 50, cellClass: 'hd-grid-code',},
         {field: "name", headerName: "섹션명", width: 220,
             cellRenderer: function(params) {
                 return '<a href="#" data-code="'+params.data.sec_no +'" onClick="openCodePopup(this)">'+ params.value+'</a>'
             }
         },
         {field: "max_limit", headerName: "최대출력수", width:84, type:'numberType'},
-        {field: "soldout_ex_yn", headerName: "품절상품제외", width:96, cellClass: 'hd-grid-code'},
-        {field: "sort", headerName: "정렬"},
+        {field: "soldout_ex_yn", headerName: "품절상품제외", width:96, cellClass: 'hd-grid-code',
+            cellRenderer: function(params) {
+                if(params.value == 'Y') return "제외"
+                else if(params.value == 'N') return "해당없음"
+                else return params.value
+            }
+        },
+        {field: "sort", headerName: "정렬", cellStyle:{'text-align':'center'}},
         {headerName:"상품수",
             children : [
                 {headerName : "판매중", field : "40_cnt",type:'numberType'},
@@ -121,7 +127,13 @@
                 {headerName : "전체", field : "cnt",type:'numberType'}
             ]
         },
-        {field: "use_yn", headerName: "사용여부", width: 58,cellClass: 'hd-grid-code'},
+        {field: "use_yn", headerName: "사용여부", width: 58,cellClass: 'hd-grid-code',
+            cellRenderer: function(params) {
+                if(params.value == 'Y') return "사용"
+                else if(params.value == 'N') return "미사용"
+                else return params.value
+            }
+        },
         {field: "rt", headerName: "등록일시", width: 110,cellClass: 'hd-grid-code'},
         {field:"", headerName:"", width:"auto"}
     ];

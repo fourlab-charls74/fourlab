@@ -325,13 +325,15 @@
 					field: "goods_no",
 					headerName: "상품번호",
 					width: 58,
+					cellStyle: {'text-align':'center'},
 					type: 'HeadGoodsNameType',
 					pinned: 'left'
 				},
 				{
 					field: "style_no",
 					headerName: "스타일넘버",
-					width: 85,
+					width:70,
+					cellStyle: {'text-align':'center'},
 					pinned: 'left'
 				},
 			]
@@ -341,6 +343,7 @@
 			children: [{
 					field: "goods_type",
 					headerName: "구분",
+					cellStyle: {'text-align':'center'},
 					width: 46
 				},
 				{

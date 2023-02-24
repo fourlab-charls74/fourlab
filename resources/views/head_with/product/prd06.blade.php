@@ -283,11 +283,11 @@
 
         { headerName: '', pinned: 'left', headerCheckboxSelection: true, checkboxSelection: true, width: 28 },
         { field: "index", headerName: "인덱스", hide: true },
-        { field: "goods_no", headerName: "상품번호", width: 58, pinned: 'left' },
+        { field: "goods_no", headerName: "상품번호", width: 58, pinned: 'left', cellStyle: {'text-align':'center'}},
         { field: "goods_type", headerName: "상품구분", width: 58, cellStyle: (params) => cellStyleGoodsType(params), pinned: 'left' },
         { field: "opt_kind_nm", headerName: "품목", width: 100, pinned: 'left' },
         { field: "brand_nm", headerName: "브랜드", pinned: 'left' },
-        { field: "style_no", headerName: "스타일넘버", width: 120, pinned: 'left' },
+        { field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: {'text-align':'right'}, pinned: 'left' },
         { field: "head_desc", headerName: "상단홍보글", width: 120 },
         { field: "img", headerName: "이미지", width:46, type:'GoodsImageType', hide: true },
         { field: "img_url", headerName: "이미지_url", width:75, hide: true },

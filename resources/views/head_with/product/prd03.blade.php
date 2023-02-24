@@ -248,7 +248,7 @@
     let columns = [
         { headerName: '', headerCheckboxSelection: true, checkboxSelection: true, width: 28, pinned: 'left' },
         { field: "goods_no", headerName: "상품번호", width: 58, type:"HeadGoodsNameType", pinned: 'left' },
-        { field: "style_no", headerName: "스타일넘버", width: 100, pinned: 'left' },
+        { field: "style_no", headerName: "스타일넘버", width:70, cellStyle: {'text-align':'center'}, pinned: 'left' },
         { field: "opt_kind_nm", headerName: "품목", width: 100, pinned: 'left' },
         { field: "goods_type", headerName: "상품구분", width: 58, cellStyle: (params) => cellStyleGoodsType(params), pinned: 'left' },
         { field: "brand_nm", headerName: "브랜드", width:96, pinned: 'left' },
@@ -258,12 +258,12 @@
         { 
             headerName: "재고수", 
             children: [
-                { field: "qty", headerName: "온라인", type: 'numberType', width: 80 },
-                { field: "wqty", headerName: "보유", type: 'numberType', width: 80 },
+                { field: "qty", headerName: "온라인", type: 'numberType', width: 58 },
+                { field: "wqty", headerName: "보유", type: 'numberType', width: 58 },
             ] 
         },
-        { field: "price", headerName: "판매가", type: 'numberType', width: 80 },
-        { field: "wonga", headerName: "원가", type: 'numberType', width: 80, cellRenderer: (params) => `<a href="#" onclick="openWongaPopup(event, ${params.data.goods_no}, ${params.data.goods_sub})">${params.value}</a>` },
+        { field: "price", headerName: "판매가", type: 'numberType', width: 58 },
+        { field: "wonga", headerName: "원가", type: 'numberType', width: 58, cellRenderer: (params) => `<a href="#" onclick="openWongaPopup(event, ${params.data.goods_no}, ${params.data.goods_sub})">${params.value}</a>` },
         { field: "margin", headerName: "원가대비 마진율", type: 'numberType', width: 100 },
     ];
 

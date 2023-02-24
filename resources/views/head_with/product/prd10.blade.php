@@ -366,7 +366,8 @@
         {
             field: "style_no",
             headerName: "스타일넘버",
-            cellStyle:{'line-height':'40px'}
+            width: 70,
+            cellStyle:{'line-height':'40px', 'text-align':'center'}
         },
         {
             field: "goods_nm",
@@ -388,7 +389,28 @@
             field: "sale_stat_cl",
             headerName: "상품상태",
             width:70,
-            type:'GoodsStateTypeLH50',
+            cellStyle: function(params) {
+                var state = {
+                    판매중지: "#808080",
+                    등록대기중: "#669900",
+                    판매대기중: "#000000",
+                    임시저장: "#000000",
+                    판매중: "#0000ff",
+                    "품절[수동]": "#ff0000",
+                    품절: "#AAAAAA",
+                    휴지통: "#AAAAAA"
+                };
+                if (params.value !== undefined) {
+                    if (state[params.value]) {
+                        var color = state[params.value];
+                        return {
+                            color: color,
+                            "text-align": "center",
+                            "line-height": "40px"
+                        };
+                    }
+                }
+            }
         },
         {
             field: "before_sale_price",
@@ -499,11 +521,12 @@
             field: "new_product_day",
             headerName: "신상품일시",
             width:70,
-            cellStyle:{'line-height':'40px'}
+            cellStyle:{'line-height':'40px', 'text-align':'right'}
         },
         {
             field: "soldout_day",
-            headerName: "최근품절일시"
+            headerName: "최근품절일시",
+            cellStyle:{'line-height':'40px', 'text-align':'right'}
         },
         {
             field: "sale_price",
