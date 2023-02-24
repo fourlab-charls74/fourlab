@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class stk32Controller extends Controller
 {
@@ -153,6 +154,10 @@ class stk32Controller extends Controller
 
 	public function upload(Request $request)
 	{
+		$save_path = "data/head/stock/stk32/";
+		if (!Storage::disk('public')->exists($save_path)) {
+			Storage::disk('public')->makeDirectory($save_path);
+		}
 
         if ( 0 < $_FILES['file']['error'] ) {
             echo json_encode(array(
@@ -162,7 +167,7 @@ class stk32Controller extends Controller
         }
         else {
 			//$file = sprintf("data/stk32/%s", $_FILES['file']['name']);
-			$file = sprintf("data/head/stk32/%s", $_FILES['file']['name']);
+			$file = sprintf("data/head/stock/stk32/%s", $_FILES['file']['name']);
             move_uploaded_file($_FILES['file']['tmp_name'], $file);
             echo json_encode(array(
                 "code" => 200,

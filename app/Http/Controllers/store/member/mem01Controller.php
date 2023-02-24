@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use App\Models\Conf;
 use App\Models\Point;
 use Exception;
+use Illuminate\Support\Facades\Storage;
 
 //ini_set("upload_max_filesize", "50M");
 //ini_set("post_max_size", "50M");
@@ -299,6 +300,10 @@ class mem01Controller extends Controller
 
 	public function upload(Request $request)
 	{
+		$save_path = "data/store/member/mem01/";
+		if (!Storage::disk('public')->exists($save_path)) {
+			Storage::disk('public')->makeDirectory($save_path);
+		}
 
 		if ( 0 < $_FILES['file']['error'] ) {
 			echo json_encode(array(
@@ -308,7 +313,7 @@ class mem01Controller extends Controller
 		}
 		else {
 			//$file = sprintf("data/code02/%s", $_FILES['file']['name']);
-			$file = sprintf("data/store/mem01/%s", $_FILES['file']['name']);
+			$file = sprintf("data/store/member/mem01/%s", $_FILES['file']['name']);
 			move_uploaded_file($_FILES['file']['tmp_name'], $file);
 			echo json_encode(array(
 				"code" => 200,
