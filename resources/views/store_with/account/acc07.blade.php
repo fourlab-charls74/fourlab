@@ -187,7 +187,7 @@
 			]
 		},
 		{ field: "extra_amt", headerName: "기타재반", width: 90, type: "currencyType", aggregation: true },
-		{ field: "fee", headerName: "정산금액", width: 100, type: "currencyType", cellStyle: {"color": "#dd0000"}, aggregation: true },
+		{ field: "fee_net", headerName: "정산금액", width: 100, type: "currencyType", cellStyle: {"color": "#dd0000"}, aggregation: true },
 		{ field: "pay_day", headerName: "정산지급일", width: 80, cellStyle: CENTER },
 		{ field: "tax_no", headerName: "세금계산서", width: 80, cellStyle: CENTER },
 		{ field: "admin_nm", headerName: "마감자", width: 60, cellStyle: CENTER },
