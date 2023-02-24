@@ -557,11 +557,11 @@ class acc06Controller extends Controller
 								, sum(if(c.sale_type = 'OL', 0, c.dc_amt)) as dc_amt
 								, sum(if(c.sale_type = 'OL', 0, c.coupon_amt)) as coupon_amt
 								, sum(if(c.sale_type = 'OL', 0, c.allot_amt)) as allot_amt
-								, sum(if(c.sale_type = 'OL', 0, c.dlv_amt)) as dlv_amt
+								, sum(c.dlv_amt) as dlv_amt
 								, sum(if(c.sale_type = 'OL', 0, c.sale_net_taxation_amt)) as sale_net_taxation_amt
 								, sum(if(c.sale_type = 'OL', 0, c.sale_net_taxfree_amt)) as sale_net_taxfree_amt
 								, sum(if(c.sale_type = 'OL', 0, c.sale_net_amt)) as sale_net_amt
-								, round(sum(if(c.sale_type = 'OL', 0, c.tax_amt))) as tax_amt
+								, round(sum(if(c.sale_type = 'OL', 0, c.sale_net_amt)) / 11) as tax_amt
 								, c.fee1 as fee_rate_JS1
 								, round(
 									if(sum(if(c.sale_type = 'JS', c.sale_net_amt, 0)) > c.amt1
@@ -597,13 +597,14 @@ class acc06Controller extends Controller
 							from (
 								select cl.acc_idx, cl.type, cl.sale_type
 									, cl.qty, cl.sale_amt, cl.clm_amt, cl.dc_amt, cl.coupon_amt, cl.allot_amt, cl.dlv_amt
-									, cl.sale_net_taxation_amt, cl.sale_net_taxfree_amt, cl.sale_net_amt, cl.tax_amt, cl.fee
+									, cl.sale_net_taxation_amt, cl.sale_net_taxfree_amt, cl.sale_net_amt, cl.fee
 									, s.store_cd, sg.*
 								from store_account_closed_list cl
 									inner join store_account_closed cc on cc.idx = cl.acc_idx
 									inner join store s on s.store_cd = cc.store_cd
 									inner join (
-										select grade_cd, round(amt1 * 1.1) as amt1, fee1, round(amt2 * 1.1) as amt2, fee2, fee3, fee_10, fee_11, fee_12, fee_10_info, fee_10_info_over_yn from store_grade
+										select grade_cd, round(amt1 * 1.1) as amt1, fee1, round(amt2 * 1.1) as amt2, fee2, fee3, fee_10, fee_11, fee_12, fee_10_info, fee_10_info_over_yn 
+										from store_grade
 										where concat(replace(sdate, '-', ''), '01') <= :nowdate1
 											and concat(replace(edate, '-', ''), '31') >= :nowdate2
 									) sg on sg.grade_cd = s.grade_cd

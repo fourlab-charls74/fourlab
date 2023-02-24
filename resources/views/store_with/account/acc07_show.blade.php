@@ -230,10 +230,10 @@
 				{field: "allot_amt", headerName: "본사부담", width: 90, type: "currencyType", aggregation: true },
 			]
         },
-		{field: "dlv_amt", headerName: "배송비", width: 90, type: "currencyType", aggregation: true, cellStyle: SET_YELLOW, editable: SET_EDITABLE},
-		{field: "etc_amt", headerName: "기타정산액", width: 90, type: "currencyType", aggregation: true, cellStyle: SET_YELLOW, editable: SET_EDITABLE},
         {field: "sale_net_taxation_amt", headerName: "과세", width: 90, type: "currencyType", aggregation: true},
 		{field: "sale_net_taxfree_amt", headerName: "비과세", width: 50, type: "currencyType", aggregation: true},
+		{field: "dlv_amt", headerName: "배송비", width: 90, type: "currencyType", aggregation: true, cellStyle: SET_YELLOW, editable: SET_EDITABLE},
+		{field: "etc_amt", headerName: "기타정산액", width: 90, type: "currencyType", aggregation: true, cellStyle: SET_YELLOW, editable: SET_EDITABLE},
         {headerName: "매출", field: "sales",
 			children: [
 				{field: "sale_type_nm", headerName: "구분", width: 50, type: "currencyType", cellStyle: CENTER},
@@ -256,10 +256,11 @@
     const online_columns = columns.map((col, i) => {
         if (col.field === 'store') return {...col, headerName: "배송매장정보"};
         if (col.field === 'sale_place_nm') return {...col, hide: false};
+        if (col.field === 'clm_state_nm' || col.field === 'clm_end_date') return {...col, hide: true};
         if (col.field === 'sales') return {...col, headerName: "특가(온라인) 수수료", children: [
             {field: "sale_net_amt", headerName: "판매처매출", width: 100, type: "currencyType", aggregation: true},
             {field: "sale_amt_except_vat", headerName: "판매처매출(-VAT)", width: 100, type: "currencyType", aggregation: true},
-            {field: "fee_rate_OL", headerName: "수수료율(%)", width: 80, type: "currencyType", aggregation: true},
+            {field: "fee_rate_OL", headerName: "수수료율(%)", width: 80, type: "currencyType"},
             {field: "fee_OL", headerName: "수수료", width: 90, type: "currencyType", aggregation: true},
         ]};
         return col;
@@ -288,13 +289,26 @@
                 }
             },
             onCellValueChanged: (e) => {
-                e.node.setSelected(true);
-            }
-            // getRowNodeId: (data) => data.hasOwnProperty('index') ? data.index : "0",
-            // onCellValueChanged: (params) => evtAfterEdit(params),
-            // onPinnedRowDataChanged: (params) => {
-            //     initTopRowData(params);
-			// }
+				if (e.oldValue !== e.newValue) {
+                    if (e.column.colId !== 'memo') {
+                        const val = e.newValue;
+                        if (isNaN(val) || val == '' || parseFloat(val) < 0) {
+                            alert("숫자만 입력가능합니다.");
+                            e.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                        } else {                            
+                            const sale_type_colId = 'sale_' + e.data.sale_type;
+                            e.data[sale_type_colId] = e.data['old_' + sale_type_colId] - (e.data['old_' + e.column.colId] * 1) + (e.newValue * 1);
+                            e.data.sale_net_amt = e.data[sale_type_colId];
+                            e.data.sale_amt_except_vat = (e.data.sale_net_amt || 0) / 1.1;
+
+                            e.api.redrawRows({ rowNodes: [e.node] });
+                            updatePinnedRow(false, ['dlv_amt', 'etc_amt', 'sale_JS', 'sale_TG', 'sale_TG', 'sale_net_amt','sale_amt_except_vat']);
+                            gx.setFocusedWorkingCell();
+                        }
+                    }
+                    e.node.setSelected(true);
+				}
+			},
         });
 
         pApp2.ResizeGrid(550, 250);
@@ -307,8 +321,25 @@
                 }
             },
             onCellValueChanged: (e) => {
-                e.node.setSelected(true);
-            }
+				if (e.oldValue !== e.newValue) {
+                    if (e.column.colId !== 'memo') {
+                        const val = e.newValue;
+                        if (isNaN(val) || val == '' || parseFloat(val) < 0) {
+                            alert("숫자만 입력가능합니다.");
+                            e.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                        } else {                            
+                            e.data.sale_net_amt = e.data.old_sale_net_amt - (e.data['old_' + e.column.colId] * 1) + (e.newValue * 1);
+                            e.data.sale_amt_except_vat = (e.data.sale_net_amt || 0) / 1.1;
+                            e.data.fee_OL = Math.round((e.data.sale_net_amt || 0) / 1.1 * e.data.fee_rate_OL / 100);
+
+                            e.api.redrawRows({ rowNodes: [e.node] });
+                            updatePinnedRow(true, ['dlv_amt', 'etc_amt', 'sale_net_amt','sale_amt_except_vat', 'fee_OL']);
+                            gx2.setFocusedWorkingCell();
+                        }
+                    }
+                    e.node.setSelected(true);
+				}
+			},
         });
         
         Search();
@@ -325,6 +356,48 @@
         let data = $('form[name="search"]').serialize();
         gx2.Aggregation({ "sum": "top" });
         gx2.Request('/store/account/acc07/show-search/online', data, -1);
+    };
+
+    // 합계 row 업데이트
+    const updatePinnedRow = (is_online = false, colArray = []) => {
+        const defs = is_online 
+            ? gx2.gridOptions.columnApi.columnController.columnDefs 
+            : gx.gridOptions.columnApi.columnController.columnDefs;
+        
+        let cols = defs
+            .reduce((a,c) => {
+                let result = [];
+                if(c.children && c.children.length > 0) result = result.concat(c.children);
+                return a.concat(result).concat(c);
+            }, [])
+            .map(c => ({ field: c.field, value: 0 }))
+            .filter(c => colArray.includes(c.field));
+
+        const rows = is_online ? gx2.getRows() : gx.getRows();
+        if (rows && Array.isArray(rows) && rows.length > 0) {
+            rows.forEach((row, idx) => {
+                cols.forEach((col) => {
+                    col.value += parseFloat(row[col.field] || 0);
+                });
+            });
+        }
+
+        cols = cols.reduce((a,c) => {
+            a[c.field] = c.value;
+            return a;
+        }, {});
+
+        if (is_online) {
+            let pinnedRow = gx2.gridOptions.api.getPinnedTopRow(0);
+            gx2.gridOptions.api.setPinnedTopRowData([
+                { ...pinnedRow.data, ...cols }
+            ]);
+        } else {   
+            let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
+            gx.gridOptions.api.setPinnedTopRowData([
+                { ...pinnedRow.data, ...cols }
+            ]);
+        }
     };
 
     // 마감정보 수정
@@ -409,357 +482,6 @@
             console.log(err);
         });
     };
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    // const CELL_STYLE = {
-    //     EDIT: { 'background': '#DEEDB6', 'color': '#FF0000', 'font-weight': 'bold' }
-    // };
-
-    // const URL = {
-    //     UPDATE: '/store/account/acc07/show_update',
-    //     REMOVE: '/store/account/acc07/show_delete',
-    //     CLOSE: '/store/account/acc07/show_close'
-    // }
-    
-    // ag-grid set field
-    // var columns_d = [
-	// 	{field: "num",			headerName: "#", type:'NumType', pinned: 'left'},
-	// 	{field: "type",			headerName: "구분",			width:80, pinned: 'left', cellStyle: { 'text-align': 'center' }},
-	// 	{field: "state_date",	headerName: "일자",			width:80, pinned: 'left'},
-	// 	{field: "ord_no",		headerName: "주문번호",	    width:130, pinned: 'left'},
-	// 	{field: "ord_opt_no",	headerName: "일련번호",		width:90, type:'HeadOrdOptNoType', pinned: 'left'},
-	// 	{field: "multi_order",	headerName: "복수",			width:70,
-	// 		cellRenderer: function(params){
-	// 			if( params.value == "Y" ){
-	// 				return '<a href="#" onclick="return openHeadOrderOpt(\'' + params.data.ord_opt_no +'\');">'+ params.value +'</a>';
-	// 			}
-	// 		},
-    //         cellStyle: function(params){
-	// 			return params.value === 'Y' ? {"background-color": "yellow"} : {};
-	// 		},
-	// 		pinned: 'left'
-	// 	},
-	// 	{field: "coupon_nm",	headerName: "쿠폰",			width:70, pinned: 'left'},
-	// 	{field: "goods_nm",		headerName: "상품",		width:150, type:'HeadGoodsNameType'},
-	// 	{field: "opt_nm",		headerName: "옵션",			width:70},
-	// 	{field: "style_no",		headerName: "스타일넘버",	width:110},
-	// 	{field: "opt_type",		headerName: "출고형태",		width:90},
-	// 	{field: "com_nm",		headerName: "판매처",		width:80},
-	// 	{field: "user_nm",		headerName: "주문자",		width:80},
-	// 	{field: "pay_type",		headerName: "결제방법",		width:90},
-	// 	{field: "tax_yn",		headerName: "과세",			width:70},
-	// 	{field: "qty",			headerName: "수량",			width:70, type: 'currencyType', aggregation: true},
-	// 	{field: "sale_amt",		headerName: "판매금액",		width:90, type: 'currencyType', aggregation: true},
-	// 	{field: "clm_amt",		headerName: "클레임금액",	width:110, type: 'currencyType', aggregation: true},
-	// 	{field: "dc_amt",	headerName: "할인금액",		width:90, type: 'currencyType', aggregation: true},
-	// 	{
-	// 		headerName: '쿠폰금액',
-	// 		children: [{
-	// 				field: "coupon_com_amt",
-	// 				headerName: "(업체부담)",
-	// 				width:95,
-	// 				type: 'currencyType',
-	// 				aggregation: true
-	// 			}
-	// 		]
-	// 	},
-	// 	{field: "dlv_amt",		headerName: "배송비",		width:80, type: 'currencyType', aggregation: true,
-    //         editable: true,
-    //         cellStyle: (params) => { return params.node.rowPinned === 'top' ? {} : CELL_STYLE.EDIT; }
-    //     },
-	// 	{field: "fee_etc_amt",	headerName: "기타정산액",	width:110, type: 'currencyType', aggregation: true,
-    //         editable: true,
-    //         cellStyle: (params) => { return params.node.rowPinned === 'top' ? {} : CELL_STYLE.EDIT; }
-    //     },
-	// 	{
-	// 		headerName: '매출금액',
-	// 		children: [{
-	// 				field: "sale_net_taxation_amt",
-	// 				headerName: "과세",
-	// 				width:90,
-	// 				type: 'currencyType',
-	// 				aggregation: true
-	// 			},
-	// 			{
-	// 				field: "sale_net_taxfree_amt",
-	// 				headerName: "비과세",
-	// 				width:90,
-	// 				type: 'currencyType',
-	// 				aggregation: true
-	// 			},
-	// 			{
-	// 				field: "sale_net_amt",
-	// 				headerName: "소계",
-	// 				width:90,
-	// 				type: 'currencyType',
-	// 				aggregation: true
-	// 			},
-	// 		]
-	// 	},
-	// 	{field: "tax_amt",	headerName: "부가세",	type: 'currencyType',	hide:true},
-	// 	{
-	// 		headerName: '수수료',
-	// 		children: [{
-	// 				field: "fee_ratio",
-	// 				headerName: "수수료율(%)",
-	// 				width:135,
-    //                 editable: true,
-    //                 cellStyle: (params) => { 
-    //                     return (
-    //                         params.node.rowPinned === 'top' 
-    //                             ? {"text-align":"right"} 
-    //                             : {"text-align":"right", ...CELL_STYLE.EDIT }
-    //                     );
-    //                 }
-	// 			},
-	// 			{
-	// 				field: "fee",
-	// 				headerName: "판매수수료",
-	// 				width:110,
-	// 				type: 'currencyType',
-	// 				aggregation: true
-	// 			},
-	// 			{
-	// 				field: "fee_dc_amt",
-	// 				headerName: "할인금액",
-	// 				width:90,
-	// 				type: 'currencyType',
-	// 				aggregation: true
-	// 			},
-	// 			{
-	// 				field: "fee_net",
-	// 				headerName: "소계",
-	// 				width:90,
-	// 				type: 'currencyType',
-	// 				aggregation: true
-	// 			},
-	// 		]
-	// 	},
-	// 	{field: "acc_amt",		headerName: "정산금액",		width:90, type: 'currencyType', aggregation: true},
-	// 	{
-	// 		headerName: '쿠폰금액',
-	// 		children: [{
-	// 				field: "fee_allot_amt",
-	// 				headerName: "(본사부담)",
-	// 				width:95,
-	// 				type: 'currencyType',
-	// 				aggregation: true
-	// 			}
-	// 		]
-	// 	},
-	// 	{field: "ord_state",	headerName: "주문상태",		width:90},
-	// 	{field: "clm_state",	headerName: "클레임상태",	width:110},
-	// 	{field: "ord_date",		headerName: "주문일",		width:80},
-	// 	{field: "dlv_end_date",	headerName: "배송완료일",	width:110},
-	// 	{field: "clm_end_date",	headerName: "클레임완료일",	width:130},
-	// 	{field: "bigo",			headerName: "비고",			width:120, editable: true, 
-    //         cellStyle: (params) => { return params.node.rowPinned === 'top' ? {} : CELL_STYLE.EDIT; }
-    //     },
-    //     {field: "prd_cd",		headerName: "상품코드", width: 120},
-	// 	// {field: "goods_no",		headerName: "상품코드1"},
-	// 	// {field: "goods_sub",	headerName: "상품코드2"},
-	// 	{field: "idx",		headerName: "마감일련번호"}
-	// ];
-    
-    // const initTopRowData = () => {
-    //     let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
-    //     gx.gridOptions.api.setPinnedTopRowData([
-    //         { ...pinnedRow.data, type: '합계' }
-    //     ]);
-    // };
-
-
-    // const evtAfterEdit = async (params) => {
-    //     const bool = await validation(params);
-    //     if (bool) calculate(params);
-    // };
-
-    // const stopEditing = () => {
-    //     gx.gridOptions.api.stopEditing();
-    // };
-
-    // const startEditing = (row_index, col_key) => {
-    //     gx.gridOptions.api.startEditingCell({ rowIndex: row_index, colKey: col_key });
-    // };
-
-    // const validation = (params) => {
-
-    //     let row = params.data;
-    //     const row_index = params.data.index;
-    //     const col_key = params.column.colId;
-
-    //     let n = params.newValue;
-    //     let p = params.oldValue;
-
-    //     if (col_key == 'dlv_amt') {
-    //         n = Math.abs(n);
-    //         if (!isNumber(n)) {	// 숫자만 입력
-    //             stopEditing();
-    //             alert("배송비는 숫자만 입력하실 수 있습니다.");
-    //             startEditing(row_index, col_key)
-    //             row.dlv_amt = p;
-    //             return false;
-    //         } else if (n == "" && n != 0) {
-    //             stopEditing();
-    //             alert("배송비를 입력해 주십시오.");
-    //             startEditing(row_index, col_key)
-    //             return false;
-    //         }
-    //     }
-    //     if (col_key == 'fee_etc_amt') {
-    //         n = Math.abs(n);
-    //         if (!isNumber(n)) { // 숫자만 입력
-    //             stopEditing();
-    //             alert("기타정산액은 숫자만 입력하실 수 있습니다.");
-    //             startEditing(row_index, col_key)
-    //             row.fee_etc_amt = p;
-    //             return false;
-    //         } else if (n == "" && n != 0) {
-    //             stopEditing();
-    //             alert("기타정산액을 입력해 주십시오.");
-    //             startEditing(row_index, col_key)
-    //             return false;
-    //         }
-    //     } else if (col_key == 'tax_amt') {
-            
-    //         if (!isNumber(n)) {	// 숫자만 입력
-    //             stopEditing();
-    //             alert("수수료율은 숫자만 입력하실 수 있습니다.");
-    //             startEditing(row_index, col_key);
-    //             row.tax_amt = p;
-    //             return false;
-    //         }
-    //     }
-
-    //     gx.gridOptions.api.applyTransaction({ update: [row] });
-        
-    //     return true;
-
-    // };
-
-    // const calculate = (params) => {
-    //     const row = params.data;
-
-    //     var tax_yn		= row.tax_yn;
-    //     var sale_amt	= parseInt(row.sale_amt);
-    //     var clm_amt		= parseInt(row.clm_amt);
-    //     var dc_amt		= parseInt(row.dc_amt);
-    //     var coupon_amt	= parseInt(row.coupon_com_amt);
-    //     var dlv_amt		= parseInt(row.dlv_amt);
-    //     var etc_amt		= parseInt(row.fee_etc_amt);
-
-    //     // 매출금액
-    //     var sale_net_amt	= sale_amt - Math.abs(clm_amt) - dc_amt - coupon_amt + dlv_amt  + etc_amt;
-
-    //     // 매출금액
-    //     if (tax_yn == 'Y') {
-    //         // 비과세
-    //         var sale_net_taxation_amt	= sale_net_amt;
-	// 	    var sale_net_taxfree_amt	= 0;
-    //     } else { 
-    //         // 과세
-    //         var sale_net_taxation_amt	= 0;
-	// 	    var sale_net_taxfree_amt	= sale_net_amt;
-    //     }
-
-    //     var sale_net_amt	= sale_net_taxation_amt + sale_net_taxfree_amt;
-    //     let tax_amt			= Math.floor(sale_net_taxation_amt / 11);
-
-    //     let fee_ratio			= parseInt(row.fee_ratio);
-    //     let fee					= ( sale_amt + clm_amt ) * fee_ratio / 100;
-    //     let fee_dc_amt		= parseInt(row.fee_dc_amt);
-
-    //     // 수수료
-    //     let fee_net		= fee - fee_dc_amt;
-    //     // 정산금액
-    //     let acc_amt		= sale_net_amt - fee_net;
-
-    //     gx.gridOptions.api.applyTransaction({ update: [{...row,
-    //         sale_net_taxation_amt: sale_net_taxation_amt,
-    //         sale_net_taxfree_amt: sale_net_taxfree_amt,
-    //         sale_net_amt: sale_net_amt,
-    //         tax_amt: tax_amt,
-    //         fee: fee,
-    //         fee_net: fee_net,
-    //         acc_amt: acc_amt
-    //     }] });
-
-    //     gx.CalAggregation();
-
-    // };
-
-    // const updateData = () => {
-    //     if (confirm("마감 내역을 저장 하시겠습니까?")) {
-    //         const row = gx.getRows();
-    //         let data_arr = [];
-    //         for ( i = 0; i < row.length; i++ ) {
-
-    //             const { tax_yn, dlv_amt, fee_etc_amt, sale_tax_amt, sale_ntax_amt, sale_amt, tax_amt, fee_ratio, fee, fee_net, acc_amt, bigo, idx } = row[i];
-
-    //             if ( bigo.indexOf("::") != -1) { alert('비고란에 :: 문자는 허용되지 않습니다.'); return; }
-    //             if ( bigo.indexOf("<>") != -1) { alert('비고란에 <> 문자는 허용되지 않습니다.'); return; }
-
-    //             let line_arr = [];
-    //             line_arr.push(tax_yn);
-    //             line_arr.push(dlv_amt);
-    //             line_arr.push(fee_etc_amt);
-
-    //             line_arr.push(sale_tax_amt);
-    //             line_arr.push(sale_ntax_amt);
-    //             line_arr.push(sale_amt);
-    //             line_arr.push(tax_amt);
-
-    //             line_arr.push(fee_ratio);
-    //             line_arr.push(fee);
-    //             line_arr.push(fee_net);
-    //             line_arr.push(acc_amt);
-    //             line_arr.push(bigo);
-    //             line_arr.push(idx);
-
-    //             line_data = line_arr.join("::");
-    //             data_arr.push(line_data);
-                
-    //         }
-    //         if ( data_arr.length == 0 ) { alert('처리할 데이터가 없습니다.'); return; }
-    //         let data = data_arr.join("<>");
-            
-    //         axios({
-    //             url: URL.UPDATE,
-    //             method: 'put',
-    //             data: { idx: document.search.idx.value, data: data }
-    //         }).then((response) => {
-    //             console.log(response);
-    //             if (response.data.result == 1) {
-    //                 window.Search();
-    //             }
-    //         }).catch((error) => { console.log(error) });
-
-    //     }
-    // };
-
-    // /*
-    //     Function: isNumber
-    //         Check Number
-
-    //     Parameters:
-    //         Num - number
-
-    //     Returns:
-    //         true or false
-    //     */
-    // function isNumber(value) {
-    //     var num = parseFloat(value); // 정수 변환
-    //     if (isNaN(num)) { // 값이 NaN 이면 숫자 아님.
-    //         return false;
-    //     }
-    //     return true;
-    // }
 
 </script>
 

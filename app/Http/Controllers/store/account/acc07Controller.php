@@ -135,13 +135,17 @@ class acc07Controller extends Controller
 					, o.ord_no, c.ord_opt_no, ac.store_cd, s.store_nm
 					, o.prd_cd, o.goods_no, o.goods_nm, o.goods_opt
 					, c.qty, c.sale_amt, c.clm_amt, c.dc_amt, c.coupon_amt, c.allot_amt
-					, (c.coupon_amt - c.allot_amt) as coupon_com_amt, c.dlv_amt, c.etc_amt
+					, (c.coupon_amt - c.allot_amt) as coupon_com_amt
+					, c.dlv_amt, c.dlv_amt as old_dlv_amt, c.etc_amt, c.etc_amt as old_etc_amt
 					, c.sale_net_taxation_amt, c.sale_net_taxfree_amt, c.sale_type
 					, if(c.sale_type = 'JS', '정상', if(c.sale_type = 'TG', '특가', if(c.sale_type = 'YP', '용품', ''))) as sale_type_nm
-					, c.sale_net_amt
-					, if(c.sale_type = 'JS', c.sale_net_amt, 0)as sale_JS
-					, if(c.sale_type = 'TG', c.sale_net_amt, 0)as sale_TG
-					, if(c.sale_type = 'YP', c.sale_net_amt, 0)as sale_YP
+					, c.sale_net_amt, c.sale_net_amt as old_sale_net_amt
+					, if(c.sale_type = 'JS', c.sale_net_amt, 0) as sale_JS
+					, if(c.sale_type = 'TG', c.sale_net_amt, 0) as sale_TG
+					, if(c.sale_type = 'YP', c.sale_net_amt, 0) as sale_YP
+					, if(c.sale_type = 'JS', c.sale_net_amt, 0) as old_sale_JS
+					, if(c.sale_type = 'TG', c.sale_net_amt, 0) as old_sale_TG
+					, if(c.sale_type = 'YP', c.sale_net_amt, 0) as old_sale_YP
 					, (c.sale_net_amt / 1.1) as sale_amt_except_vat
 					, m.user_nm, p.pay_type, w.ord_state, w.ord_state as clm_state
 					, if(c.type = 30, date_format(o.ord_date, '%Y-%m-%d'), '') as ord_date
@@ -195,9 +199,10 @@ class acc07Controller extends Controller
 					, o.ord_no, c.ord_opt_no, ac.store_cd, s.store_nm, o.sale_place
 					, o.prd_cd, o.goods_no, o.goods_nm, o.goods_opt
 					, c.qty, c.sale_amt, c.clm_amt, c.dc_amt, c.coupon_amt, c.allot_amt
-					, (c.coupon_amt - c.allot_amt) as coupon_com_amt, c.dlv_amt
+					, (c.coupon_amt - c.allot_amt) as coupon_com_amt
+					, c.dlv_amt, c.dlv_amt as old_dlv_amt, c.etc_amt, c.etc_amt as old_etc_amt
 					, c.sale_net_taxation_amt, c.sale_net_taxfree_amt, c.sale_type
-					, c.sale_net_amt
+					, c.sale_net_amt, c.sale_net_amt as old_sale_net_amt
 					, (c.sale_net_amt / 1.1) as sale_amt_except_vat
 					, c.fee_ratio as fee_rate_OL, c.fee as fee_OL
 					, m.user_nm, p.pay_type, w.ord_state, o.clm_state
@@ -301,14 +306,96 @@ class acc07Controller extends Controller
 
 		try {
 			DB::beginTransaction();
-			
+
+			$acc_idx = $data[0]['acc_idx'];
+			$nowdate = now()->format("Ymd");
+
+			// Set store_account_closed_list
 			foreach ($data as $val) {
+				$dlv = ($val['dlv_amt'] ?? 0) * 1;
+				$etc = ($val['etc_amt'] ?? 0) * 1;
+
 				DB::table('store_account_closed_list')
 					->where('idx', $val['account_idx'])
 					->update([
+						'sale_net_amt' => DB::raw("(sale_net_amt - dlv_amt - etc_amt + $dlv + $etc)"),
+						'tax_amt' => DB::raw("(sale_net_amt / 11)"),
+						'fee' => DB::raw("(sale_net_amt / 1.1 * fee_ratio / 100)"),
+						'dlv_amt' => $dlv,
+						'etc_amt' => $etc,
 						'memo' => $val['memo'] ?? '',
 					]);
+
+				// Set store_account_etc
+				// 작업예정입니다.
 			}
+
+			// Set store_account_closed
+			$sql = "
+				update store_account_closed as c
+					, (
+						select b.*
+							, (b.fee_JS1 + b.fee_JS2 + b.fee_JS3 + b.fee_TG + b.fee_YP + b.fee_OL) as fee
+							, (b.fee_JS1 + b.fee_JS2 + b.fee_JS3 + b.fee_TG + b.fee_YP + b.fee_OL + b.extra_amt) as fee_net
+						from (
+							select ac.idx as acc_idx
+								, sum(c.dlv_amt) as dlv_amt
+								, sum(c.etc_amt) as etc_amt
+								, sum(if(c.sale_type = 'OL', 0, c.sale_net_amt)) as sale_net_amt
+								, round(sum(if(c.sale_type = 'OL', 0, c.sale_net_amt)) / 11) as tax_amt
+								, round(
+									if(sum(if(c.sale_type = 'JS', c.sale_net_amt, 0)) > sg.amt1
+										, sg.amt1
+										, sum(if(c.sale_type = 'JS', c.sale_net_amt, 0))
+									) * sg.fee1 / 100 / 1.1
+								) as fee_JS1
+								, round(
+									if(sum(if(c.sale_type = 'JS', c.sale_net_amt, 0)) > sg.amt2
+										, sg.amt2 - sg.amt1
+										, if(sum(if(c.sale_type = 'JS', c.sale_net_amt, 0)) > sg.amt1
+											, sum(if(c.sale_type = 'JS', c.sale_net_amt, 0)) - sg.amt1
+											, 0
+										)
+									) * sg.fee2 / 100 / 1.1
+								) as fee_JS2
+								, round(
+									if(sum(if(c.sale_type = 'JS', c.sale_net_amt, 0)) > sg.amt2
+										, sum(if(c.sale_type = 'JS', c.sale_net_amt, 0)) - sg.amt2
+										, 0
+									) * sg.fee3 / 100 / 1.1
+								) as fee_JS3
+								, round(sum(if(c.sale_type = 'TG', c.sale_net_amt, 0)) * sg.fee_10 / 100 / 1.1) as fee_TG
+								, round(sum(if(c.sale_type = 'YP', c.sale_net_amt, 0)) * sg.fee_11 / 100 / 1.1) as fee_YP
+								, round(sum(if(c.sale_type = 'OL', c.sale_net_amt, 0)) * sg.fee_12 / 100 / 1.1) as fee_OL
+								, ac.extra_amt
+							from store_account_closed_list c
+								inner join store_account_closed ac on ac.idx = c.acc_idx
+								inner join store s on s.store_cd = ac.store_cd
+								inner join (
+									select grade_cd, round(amt1 * 1.1) as amt1, fee1, round(amt2 * 1.1) as amt2, fee2, fee3, fee_10, fee_11, fee_12, fee_10_info, fee_10_info_over_yn 
+									from store_grade
+									where concat(replace(sdate, '-', ''), '01') <= :nowdate1
+										and concat(replace(edate, '-', ''), '31') >= :nowdate2
+								) sg on sg.grade_cd = s.grade_cd
+							where c.acc_idx = :acc_idx
+						) b
+					) as a
+					set c.dlv_amt = a.dlv_amt
+					, c.etc_amt = a.etc_amt
+					, c.sale_net_amt = a.sale_net_amt
+					, c.tax_amt = a.tax_amt
+					, c.fee_JS1 = a.fee_JS1
+					, c.fee_JS2 = a.fee_JS2
+					, c.fee_JS3 = a.fee_JS3
+					, c.fee_TG = a.fee_TG
+					, c.fee_YP = a.fee_YP
+					, c.fee_OL = a.fee_OL
+					, c.fee = a.fee
+					, c.fee_net = a.fee_net
+					, c.ut = now()
+				where c.idx = a.acc_idx
+			";
+			DB::update($sql, ['acc_idx' => $acc_idx, 'nowdate1' => $nowdate, 'nowdate2' => $nowdate]);
 
 			DB::commit();
 			$msg = "마감정보가 정상적으로 수정되었습니다.";
@@ -319,145 +406,5 @@ class acc07Controller extends Controller
 		}
 
 		return response()->json(["code" => $code, "msg" => $msg]);
-
-
-		// $acc_idx = $request->input("idx");
-		// $data = $request->input("data");
-
-		// $admin_id = Auth('head')->user()->id;
-		// $admin_nm = Auth('head')->user()->name;
-
-		// $lines = explode("<>", $data);
-
-		// try {
-		// 	DB::beginTransaction();
-		// 	// 정산 마감 상세 내역 업데이트 ( 배송비/기타정산액/비고 )
-		// 	for ( $i = 0; $i < count($lines); $i++ )
-		// 	{
-		// 		$fields = explode("::", $lines[$i]);
-
-		// 		$tax_yn			= str_replace(",", "", $fields[0]);
-		// 		$dlv_amt 		= str_replace(",", "", $fields[1]);
-		// 		$etc_amt 		= str_replace(",", "", $fields[2]);
-
-		// 		$sale_tax_amt 	= str_replace(",", "", $fields[3]);
-		// 		$sale_ntax_amt 	= str_replace(",", "", $fields[4]);
-		// 		$sale_amt		= str_replace(",", "", $fields[5]);
-		// 		$tax_amt		= str_replace(",", "", $fields[6]);
-		// 		$fee_ratio 	= str_replace(",", "", $fields[7]);
-		// 		$fee 				= str_replace(",", "", $fields[8]);
-		// 		$fee_net 		= str_replace(",", "", $fields[9]);
-
-		// 		$acc_amt 		= str_replace(",", "", $fields[10]);
-		// 		$memo	 		= str_replace(",", "", $fields[11]);
-		// 		$idx	 		= str_replace(",", "", $fields[12]);
-
-		// 		$sql = "
-		// 			update store_account_closed_list set
-		// 				dlv_amt					= :dlv_amt,
-		// 				etc_amt					= :etc_amt,
-		// 				sale_net_taxation_amt	= :sale_net_taxation_amt,
-		// 				sale_net_taxfree_amt	= :sale_net_taxfree_amt,
-		// 				sale_net_amt			= :sale_net_amt,
-		// 				tax_amt					= :tax_amt,
-		// 				fee_ratio				= :fee_ratio,
-		// 				fee						= :fee,
-		// 				fee_net	 				= :fee_net,
-		// 				memo					= :memo,
-		// 				acc_amt					= :acc_amt
-		// 			where
-		// 				idx = :idx
-		// 		";
-
-		// 		DB::update($sql,
-		// 			[
-		// 				'dlv_amt' => $dlv_amt,
-		// 				'etc_amt' => $etc_amt,
-		// 				'sale_net_taxation_amt' => $sale_tax_amt,
-		// 				'sale_net_taxfree_amt' => $sale_ntax_amt,
-		// 				'sale_net_amt' => $sale_amt,
-		// 				'tax_amt' => $tax_amt,
-		// 				'fee_ratio' => $fee_ratio,
-		// 				'fee' => $fee,
-		// 				'fee_net' => $fee_net,
-		// 				'memo' => $memo,
-		// 				'acc_amt' => $acc_amt,
-		// 				'idx' => $idx
-		// 			]
-		// 		);
-
-		// 	}
-
-		// 	// 정산 마감 마스터 업데이트 ( 배송비/기타정산액/비고 )
-		// 	$sql = "
-		// 		select
-		// 			sum(dlv_amt) as total_dlv_amt,
-		// 			sum(etc_amt) as total_etc_amt,
-		// 			sum(sale_net_taxation_amt) as total_sale_net_taxation_amt,
-		// 			sum(sale_net_taxfree_amt) as total_sale_net_taxfree_amt,
-		// 			sum(sale_net_amt) as total_sale_net_amt,
-		// 			sum(tax_amt) as total_tax_amt,
-		// 			sum(fee) as total_fee,
-		// 			sum(fee_net) as total_fee_net,
-		// 			sum(acc_amt) as total_acc_amt
-		// 		from
-		// 			store_account_closed_list
-		// 		where
-		// 			acc_idx= '$acc_idx'
-		// 		group by
-		// 			acc_idx
-		// 	";
-		// 	$row = DB::selectOne($sql);
-
-		// 	$total_dlv_amt = $row->total_dlv_amt;
-		// 	$total_etc_amt = $row->total_etc_amt;
-		// 	$total_sale_net_taxation_amt = $row->total_sale_net_taxation_amt;
-		// 	$total_sale_net_taxfree_amt = $row->total_sale_net_taxfree_amt;
-		// 	$total_sale_net_amt = $row->total_sale_net_amt;
-		// 	$total_tax_amt = $row->total_tax_amt;
-		// 	$total_fee	 = $row->total_fee;
-		// 	$total_fee_net = $row->total_fee_net;
-		// 	$total_acc_amt = $row->total_acc_amt;
-
-		// 	$sql = "
-		// 		update store_account_closed set
-		// 			dlv_amt = :total_dlv_amt,
-		// 			etc_amt = :total_etc_amt,
-		// 			sale_net_taxation_amt = :total_sale_net_taxation_amt,
-		// 			sale_net_taxfree_amt = :total_sale_net_taxfree_amt,
-		// 			sale_net_amt = :total_sale_net_amt,
-		// 			tax_amt = :total_tax_amt,
-		// 			fee = :total_fee,
-		// 			fee_net = :total_fee_net,
-		// 			acc_amt = :total_acc_amt,
-		// 			admin_id = :admin_id,
-		// 			admin_nm = :admin_nm,
-		// 			upd_date = now()
-		// 		where
-		// 			idx = :idx
-		// 	";
-
-		// 	DB::update($sql, 
-		// 		[
-		// 			"total_dlv_amt" => $total_dlv_amt,
-		// 			"total_etc_amt" => $total_etc_amt,
-		// 			"total_sale_net_taxation_amt" => $total_sale_net_taxation_amt,
-		// 			"total_sale_net_taxfree_amt" => $total_sale_net_taxfree_amt,
-		// 			"total_sale_net_amt" => $total_sale_net_amt,
-		// 			"total_tax_amt" => $total_tax_amt,
-		// 			"total_fee"	=> $total_fee,
-		// 			"total_fee_net" => $total_fee_net,
-		// 			"total_acc_amt" => $total_acc_amt,
-		// 			'admin_id' => $admin_id,
-		// 			'admin_nm' => $admin_nm,
-		// 			'idx' => $acc_idx
-		// 		]
-		// 		);
-		// 	DB::commit();
-		// 	return response()->json(["result" => 1]);
-		// } catch (Exception $e) {
-		// 	DB::rollBack();
-		// 	return response()->json(["result" => 0]);
-		// }
 	}
 }
