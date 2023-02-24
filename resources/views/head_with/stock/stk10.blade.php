@@ -269,7 +269,9 @@
             {field:"com_nm",headerName:"업체",pinned:'left',width:100},
             {field:"opt_kind_nm" ,headerName:"품목",pinned:'left',width:72},
             {field:"brand_nm" ,headerName:"브랜드",pinned:'left',width:84},
-            {field:"style_no" ,headerName:"스타일넘버",pinned:'left',width:96},
+            {field:"style_no" ,headerName:"스타일넘버",pinned:'left',width:85, 
+                cellStyle:{'text-align':'center'}
+            },
             {field:"org_nm" ,headerName:"원산지",pinned:'left',width:84},
             {headerName:"상품코드",
                 children: [

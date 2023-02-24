@@ -99,10 +99,10 @@
 			pinned:'left'
 		},
         {headerName: "상품코드", field: "goods_code", width:150, editable: true, cellStyle:{"background-color":"#FFFF99"}},
-        {headerName: "물류", field: "bonsa_cnt", width:70, editable: true, cellStyle:{"text-align":"right","background-color":"#FFFF99"}},
-        {headerName: "매장", field: "store_cnt", width:70, editable: true, cellStyle:{"text-align":"right","background-color":"#FFFF99"}},
+        {headerName: "물류", field: "bonsa_cnt", width:58, editable: true, cellStyle:{"text-align":"right","background-color":"#FFFF99"}},
+        {headerName: "매장", field: "store_cnt", width:58, editable: true, cellStyle:{"text-align":"right","background-color":"#FFFF99"}},
         {headerName: "정보", field: "comment", width:220, editable: true, cellStyle:{"background-color":"#FFFF99"}},
-        {headerName: "삭제", field: "del", width:80, cellStyle:{"text-align":"center"},
+        {headerName: "삭제", field: "del", width:58, cellStyle:{"text-align":"center"},
             cellRenderer: function(params) {
 				return '<a href="#" onClick="Del(\''+ params.data.idx +'\')">'+ params.value+'</a>'
             }

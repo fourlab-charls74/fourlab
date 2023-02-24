@@ -83,15 +83,15 @@
 <script language="javascript">
     var columns = [
         {headerName: "#", field: "num", width:35, type:'NumType', cellStyle: {"background":"#F5F7F7"}},
-		{field: "idx",		headerName: "일련번호", width:58},
-		{field: "rt",		headerName: "등록일시", width:140},
-		{field: "cnt",		headerName: "등록건수", width:100, type:'numberType'},
+		{field: "idx",		headerName: "일련번호", width:58, cellStyle: {"text-align":"center"}},
+		{field: "rt",		headerName: "등록일시", width:120},
+		{field: "cnt",		headerName: "등록건수", width:80, type:'numberType'},
 		{field: "match_cnt",		headerName: "매칭수", width:80, type:'numberType',
             cellRenderer: function(params) {
 				return '<a href="#" onClick="showList(\''+ params.data.idx +'\',\'match_cnt\')">'+ params.value + '</a>'
             }
 		},
-		{field: "non_match_cnt",	headerName: "비매칭수", width:90, type:'numberType',
+		{field: "non_match_cnt",	headerName: "비매칭수", width:80, type:'numberType',
             cellRenderer: function(params) {
 				return '<a href="#" onClick="showList(\''+ params.data.idx +'\',\'non_match_cnt\')">'+ params.value + '</a>'
             }

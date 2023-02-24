@@ -80,13 +80,13 @@
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box">
                                         <div class="form-group">
-                                            <input type='text' class="form-control form-control-sm" name='wqty_l' value=''>
+                                            <input type='text' class="form-control form-control-sm search-enter" name='wqty_l' value=''>
                                         </div>
                                     </div>
                                     <span class="text_line">~</span>
                                     <div class="form-inline-inner input_box">
                                         <div class="form-group">
-                                            <input type='text' class="form-control form-control-sm" name='wqty_h' value=''>
+                                            <input type='text' class="form-control form-control-sm search-enter" name='wqty_h' value=''>
                                         </div>
                                     </div>
                                 </div>
@@ -98,13 +98,13 @@
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box">
                                         <div class="form-group">
-                                            <input type='text' class="form-control form-control-sm" name='qty_l' value=''>
+                                            <input type='text' class="form-control form-control-sm search-enter" name='qty_l' value=''>
                                         </div>
                                     </div>
                                     <span class="text_line">~</span>
                                     <div class="form-inline-inner input_box">
                                         <div class="form-group">
-                                            <input type='text' class="form-control form-control-sm" name='qty_h' value=''>
+                                            <input type='text' class="form-control form-control-sm search-enter" name='qty_h' value=''>
                                         </div>
                                     </div>
                                 </div>
@@ -227,9 +227,9 @@
     <script language="javascript">
 
         var columns= [
-                {field:"opt_kind_nm" ,headerName:"품목", width:100, pinned:'left'},
-                {field:"brand_nm" ,headerName:"브랜드", width:118, pinned:'left' },
-                {field:"style_no" ,headerName:"스타일넘버",pinned:'left' },
+                {field:"opt_kind_nm" ,headerName:"품목", width:80, pinned:'left'},
+                {field:"brand_nm" ,headerName:"브랜드", width:110, pinned:'left' },
+                {field:"style_no" ,headerName:"스타일넘버",pinned:'left', width:80, cellStyle:{'text-align':'center'} },
                 {field:"goods_type_nm",headerName:"상품구분",pinned:'left',width:58,cellStyle:StyleGoodsType},
                 {field:"is_unlimited_nm",headerName:"재고구분",pinned:'left',width:58},
                 {field:"goods_no" ,headerName:"상품코드",pinned:'left',width:58},

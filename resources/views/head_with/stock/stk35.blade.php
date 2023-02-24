@@ -51,7 +51,7 @@
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input-box" style="width:47%">
                                     <div class="form-inline-inner inline_btn_box">
-                                        <input type='text' class="form-control form-control-sm w-100" name='goods_no' id='goods_no' value=''>
+                                        <input type='text' class="form-control form-control-sm w-100 search-enter" name='goods_no' id='goods_no' value=''>
                                         <a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                     </div>
                                 </div>
@@ -78,7 +78,7 @@
 						<div class="form-group">
 							<label for="formrow-email-input">상품명</label>
 							<div class="flax_box">
-								<input type='text' class="form-control form-control-sm ac-goods-nm" name='goods_nm' value=''>
+								<input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' value=''>
 							</div>
 						</div>
 					</div>
@@ -86,7 +86,7 @@
 						<div class="form-group">
 							<label for="formrow-email-input">온라인재고(~이하)</label>
 							<div class="flax_box">
-								<input type='text' class="form-control form-control-sm" name='bizest_qty' value=''>
+								<input type='text' class="form-control form-control-sm search-enter" name='bizest_qty' value=''>
 							</div>
 						</div>
                     </div>
@@ -94,7 +94,7 @@
 						<div class="form-group">
 							<label for="formrow-email-input">재고차이(~이상)</label>
 							<div class="flax_box">
-								<input type='text' class="form-control form-control-sm" name='qty_buffer_cnt' value=''>
+								<input type='text' class="form-control form-control-sm search-enter" name='qty_buffer_cnt' value=''>
 							</div>
 						</div>
 					</div>
@@ -159,16 +159,16 @@
 <script language="javascript">
     var columns = [
         {headerName: "#", field: "num", width:35, type:'NumType', cellStyle: {"background":"#F5F7F7"}},
-		{field: "goods_no", headerName: "상품번호", width: 80, type:'HeadGoodsNameType'},
+		{field: "goods_no", headerName: "상품코드", width: 65, type:'HeadGoodsNameType', cellStyle: {"text-align":"center"}},
 		{field: "head_desc", headerName: "XMD 코드", width:180},
 		{field: "goods_nm", headerName: "상품명", width: 320, type:'HeadGoodsNameType'},
 		{field: "goods_opt", headerName: "옵션", width: 220},
-		{field: "sale_stat_cl_val", headerName: "상품상태", width: 90, type:'GoodsStateType'},
-		{field: "xmd_qty", headerName: "매장재고", width: 75, type:'numberType'},
-		{field: "bizest_qty", headerName: "온라인재고", width: 85, type:'numberType'},
-		{field: "qty_term", headerName: "비교", width: 70, type:'numberType'},
-		{field: "month_ord", headerName: "최근3개월", width: 80, type:'numberType'},
-		{field: "tot_ord", headerName: "총주문", width:70, type:'numberType'},
+		{field: "sale_stat_cl_val", headerName: "상품상태", width: 65, type:'GoodsStateType'},
+		{field: "xmd_qty", headerName: "매장재고", width: 70, type:'numberType'},
+		{field: "bizest_qty", headerName: "온라인재고", width: 70, type:'numberType'},
+		{field: "qty_term", headerName: "비교", width: 65, type:'numberType'},
+		{field: "month_ord", headerName: "최근3개월", width: 65, type:'numberType'},
+		{field: "tot_ord", headerName: "총주문", width:65, type:'numberType'},
 		{field: "rt", headerName: "등록일", width:80},
 		{field:"", headerName:"", width:"auto"}
     ];

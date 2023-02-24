@@ -222,7 +222,7 @@
                 pinned:'left'},
                 {field:"opt_kind_nm" , headerName:"품목", width:118, pinned:'left'},
                 {field:"brand_nm" , headerName:"브랜드", pinned:'left', width: 90},
-                {field:"style_no" , headerName:"스타일넘버", width:150, pinned:'left'},
+                {field:"style_no" , headerName:"스타일넘버", width:80, cellStyle:{'text-align':'center'}, pinned:'left'},
                 {field:"head_desc", headerName:"상단홍보글", width:180},
                 {field:"goods_img" , headerName:"이미지", width:46,
                     cellRenderer: function(params) {

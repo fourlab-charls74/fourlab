@@ -245,14 +245,14 @@
 
         // ag-grid
         var columns= [        
-            {field:"date", headerName:"일시", pinned:'left', width: 110},
+            {field:"date", headerName:"일시", pinned:'left', width: 100},
             {field:"kind", headerName:"구분", pinned:'left', cellStyle:{'text-align': 'center'}},
-            {field:"type", headerName:"사유", pinned:'left', width: 100},
+            {field:"type", headerName:"사유", pinned:'left', width: 80},
             {field:"com_nm", headerName:"공급업체", pinned:'left', width: 130},
             {field:"opt_kind_nm", headerName:"품목", pinned:'left', width: 140},
             {field:"brand_nm", headerName:"브랜드", width: 100},
-            {field:"style_no", headerName:"스타일넘버", width: 120},
-            {field:"goods_type", headerName:"상품구분"},
+            {field:"style_no", headerName:"스타일넘버", width:80, cellStyle:{'text-align':'center'}},
+            {field:"goods_type", headerName:"상품구분", width:60},
             {headerName:"상품코드",
                 children: [
                     {headerName: "번호", field: "goods_no", width: 46, cellStyle:{'text-align': 'right'}},
@@ -260,7 +260,7 @@
                 ]
             },
             {field:"goods_nm", headerName:"상품명", width: 320, type:'HeadGoodsNameType'},
-            {field:"goods_opt", headerName:"옵션", width: 100},
+            {field:"goods_opt", headerName:"옵션", width: 150},
             {field: "qty", headerName: "수량", width:46, type:'numberType',
                 cellRenderer: (params) => {
                     if (params.value !== undefined) {

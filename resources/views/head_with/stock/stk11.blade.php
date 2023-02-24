@@ -136,16 +136,16 @@
         // ag-grid set
 
         var columns= [
-            { field: "stock_no", headerName: "입고번호", width: 100, cellStyle:{ 'text-align': 'center' } },
+            { field: "stock_no", headerName: "입고번호", width: 58, cellStyle:{ 'text-align': 'center' } },
             { field: "invoice_no", headerName: "송장번호", width: 120,
                 cellRenderer: (params) => `<a href="#" onClick="clickInvoiceNo(${params.data.stock_no})">${params.data.invoice_no}</a>`
             },
-            { field: "area_type", headerName: "입고지역", width: 100, cellStyle:{ 'text-align': 'center' } },
-            { field: "stock_date", headerName: "입고일자", width: 100, cellStyle:{ 'text-align': 'center' } },
-            { field: "state_nm", headerName: "입고상태", width: 100, cellStyle:{ 'text-align': 'center' } },
+            { field: "area_type", headerName: "입고지역", width: 80, cellStyle:{ 'text-align': 'center' } },
+            { field: "stock_date", headerName: "입고일자", width: 80, cellStyle:{ 'text-align': 'center' } },
+            { field: "state_nm", headerName: "입고상태", width: 80, cellStyle:{ 'text-align': 'center' } },
             { field: "com_nm", headerName: "공급업체", width: 110 },
             { field: "item", headerName: "품목", width: 100 },
-            { field: "currency_unit", headerName: "화폐단위", width: 110, cellStyle:{ 'text-align': 'center' } },
+            { field: "currency_unit", headerName: "화폐단위", width: 58, cellStyle:{ 'text-align': 'center' } },
             { field: "exchange_rate", headerName: "환율", width: 80, cellStyle:{ 'text-align': 'right' }, type:'percentType' },
             { field: "custom_amt", headerName: "신고금액", width: 90, cellStyle:{ 'text-align': 'right' }, type:'percentType' },
             { field: "custom_tax", headerName: "통관비", width: 80, cellStyle:{ 'text-align': 'right' }, type:'currencyType' },

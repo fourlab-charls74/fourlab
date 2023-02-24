@@ -102,14 +102,20 @@
 <script language="javascript">
     var columns = [
         {headerName: "#", field: "num", width:35, type:'NumType', cellStyle: {"background":"#F5F7F7"}},
-		{field: "goods_no",		headerName: "상품번호",		width:100},
+		{field: "goods_no",		headerName: "상품번호",		width:80, cellStyle:{"text-align":"center"}},
 		{field: "xmd_goods_nm", headerName: "XMD 상품명",	width:250},
 		{field: "goods_nm",		headerName: "Bizest 상품명",width:250},
 		{field: "goods_opt",	headerName: "상품옵션",		width:180},
-		{field: "qty",			headerName: "XMD 수량",		width:100, type: 'currencyType'},
-		{field: "good_qty",		headerName: "Bizest 수량",	width:100, type: 'currencyType'},
+		{field: "qty",			headerName: "XMD 수량",		width:50, type: 'currencyType'},
+		{field: "good_qty",		headerName: "Bizest 수량",	width:50, type: 'currencyType'},
 		{field: "sale_stat_cl",	headerName: "상품상태",		width:80, type:'GoodsStateType'},
-		{field: "match_yn",		headerName: "매칭유무",		width:80, cellStyle:{"text-align":"center"}},
+		{field: "match_yn",		headerName: "매칭유무",		width:58, cellStyle:{"text-align":"center"},
+            cellRenderer: function(params) {
+                if(params.value == 'Y') return "매칭"
+                else if(params.value == 'N') return "비매칭"
+                else return params.value
+            }
+        },
 		{field: "chk_cmt",		headerName: "비고",			width:300, cellStyle:{"color":"#FF0000"}},
         {field:"", headerName:"", width:"auto"}
     ];
