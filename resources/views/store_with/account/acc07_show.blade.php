@@ -197,8 +197,8 @@
 
 <script type="text/javascript" charset="utf-8">
 	const CENTER = { 'text-align': 'center' };
-    const SET_YELLOW = (params) => ({ "background-color": params.node.rowPinned === 'top' ? 'none' : '#ffff99' });
-    const SET_EDITABLE = (params, cond = true) => cond && params.node.rowPinned !== 'top';
+    const SET_YELLOW = (params) => ({ "background-color": params.node.rowPinned === 'top' ? 'none' : ("{{ @$closed->closed_yn }}" === 'Y' ? 'none' : '#ffff99') });
+    const SET_EDITABLE = (params, cond = true) => cond && "{{ @$closed->closed_yn }}" !== 'Y' && params.node.rowPinned !== 'top';
     
     const columns = [
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28},
