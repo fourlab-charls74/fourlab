@@ -181,7 +181,7 @@
 			cellRenderer: (params) => params.value == 'total' ? '합계' : params.node.level == 0 ? params.value : '',
         },
         {headerName: '품목명', showRowGroup: 'item_nm', cellRenderer: 'agGroupCellRenderer', width: 130, pinned:'left'},
-        { field: "br_cd", headerName: "브랜드", pinned:'left', width:60,
+        { field: "br_cd", headerName: "브랜드", pinned:'left', width:60, cellStyle: { 'text-align': "center" },
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.value == 'total' ? '합계' : params.node.level == 1 ? params.value : '',
         },
@@ -232,7 +232,7 @@
         {
             headerName: "출고",
             children: [
-                {field: "release_first_date", headerName: "최초출고일", minWidth: 100},
+                {field: "release_first_date", headerName: "최초출고일", minWidth: 100, cellStyle: { 'text-align': "center" }},
                 {field: "release_qty", headerName: "출고", minWidth: 60, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "return_qty", headerName: "반품", minWidth: 80, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "total_release_qty", headerName: "총출고", minWidth: 80, type: "currencyType", aggFunc: sumValuesFunc},

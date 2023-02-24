@@ -89,7 +89,7 @@ class sal27Controller extends Controller
 
         $sql = "
             select
-                a.item, a.item_nm, a.brand_nm, a.br_cd, a.prd_cd, a.prd_cd_p, a.goods_nm, a.goods_nm_eng, a.color, a.size, a.goods_no, a.color_nm, a.goods_opt
+                a.item, a.item_nm, a.brand_nm, a.br_cd, a.prd_cd, a.prd_cd_p, a.goods_nm, a.goods_nm_eng, a.color, a.size, a.goods_no, a.color_nm, a.goods_opt, a.release_first_date
                 , a.tag_price as tag_price
                 , a.price as price
                 , a.wonga as wonga
@@ -99,11 +99,16 @@ class sal27Controller extends Controller
                 , sum(a.order_price) as order_price
                 , sum(a.order_wonga) as order_wonga
                 , a.release_qty as release_qty
-                , sum(a.total_release_qty) as total_release_qty
+                , a.return_qty as return_qty
+                , a.total_release_qty as total_release_qty
                 , a.storage_stock_qty as storage_stock_qty
                 , sum(a.store_stock_qty) as store_stock_qty
                 , (a.storage_stock_qty + sum(a.store_stock_qty)) as total_stock_qty
-                , sum(a.return_qty) as return_qty
+                , a.sale_qty
+                , a.sale_wonga
+                , a.sale_price
+                , a.sale_recv_amt
+                , a.sale_tag_price
             from (
                 select 
                     pc.item as item
@@ -122,17 +127,31 @@ class sal27Controller extends Controller
                     , p.tag_price
                     , p.price
                     , p.wonga
+                    
+                    -- 입고
                     , psop2.qty as order_amt
                     , psop.qty as order_qty
                     , ( p.tag_price * psop.qty ) as order_tag_price
                     , ( p.price * psop.qty ) as order_price
                     , ( p.wonga * psop.qty ) as order_wonga
-                    , hst.rt as release_first_date
-                    , psr.qty as release_qty
-                    , srp.return_qty as return_qty
+                    
+                    -- 출고
+                    , DATE_FORMAT(hst.rt, '%Y-%m-%d') as release_first_date
+                    , ifnull(psr.qty, 0) as release_qty
+                    , ifnull(srp.return_qty, 0) as return_qty
                     , ( psr.qty - srp.return_qty) as total_release_qty
+
+                    -- 재고
                     , ifnull(pss.wqty, 0) as storage_stock_qty
                     , ifnull(pss2.wqty, 0) as store_stock_qty
+
+                    -- 판매
+                    , opt.qty as sale_qty
+                    , opt.wonga as sale_wonga
+                    , opt.price as sale_price
+                    , opt.recv_amt as sale_recv_amt
+                    , opt.tag_price as sale_tag_price
+
                 from product_code pc
                     inner join product p on p.prd_cd = pc.prd_cd
                     inner join code c1 on c1.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c1.code_id
@@ -153,14 +172,25 @@ class sal27Controller extends Controller
                                         h.prd_cd
                                         , h.rt 
                                     from product_stock_hst h
-                                        inner join product_code pcd on pcd.prd_cd = h.prd_cd
-                                    where h.prd_cd = pcd.prd_cd and h.type = 17 
+                                        left outer join product_code pcd on pcd.prd_cd = h.prd_cd
+                                    where h.type = 17 
                                     order by h.rt asc
                     ) hst on hst.prd_cd = pc.prd_cd
                     left outer join product_stock_release psr on psr.prd_cd = pc.prd_cd
                     left outer join store_return_product srp on srp.prd_cd = pc.prd_cd
                     left outer join product_stock_storage pss on pss.prd_cd = pc.prd_cd
                     left outer join product_stock_store pss2 on pss2.prd_cd = pc.prd_cd
+                    left outer join (
+                        select
+                            o.qty
+                            , o.wonga
+                            , o.price
+                            , o.prd_cd
+                            , o.recv_amt
+                            , p.tag_price
+                        from order_opt o
+                            inner join product p on p.prd_cd = o.prd_cd
+                    ) opt on opt.prd_cd = pc.prd_cd
 
                 where 1=1 and pc.goods_no != 0 and pc.goods_no != ''
                 $where
@@ -168,7 +198,6 @@ class sal27Controller extends Controller
             where 1=1
             group by a.item, a.brand_nm, a.prd_cd
             order by a.item
-        
         ";
 
         $result = DB::select($sql,['sdate' => $sdate, 'edate' => $edate]);
