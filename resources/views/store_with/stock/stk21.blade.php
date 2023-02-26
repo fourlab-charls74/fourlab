@@ -35,9 +35,11 @@
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="prd_cd">상품코드</label>
-                            <div class="flex_box">
-                                <input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
-                                <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                            <div class="form-inline">
+                                <div class="form-inline-inner input_box w-100">
+                                    <input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
+                                    <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -189,7 +191,7 @@
                 </div>
             </div>
             <div class="table-responsive">
-                <div id="div-gd-product" class="ag-theme-balham"></div>
+                <div id="div-gd-product" class="dark-grid ag-theme-balham"></div>
             </div>
         </div>
     </div>
@@ -212,7 +214,7 @@
                 </div>
             </div>
             <div class="table-responsive">
-                <div id="div-gd-stock" class="ag-theme-balham"></div>
+                <div id="div-gd-stock" class="dark-grid ag-theme-balham"></div>
             </div>
         </div>
     </div>
@@ -235,7 +237,7 @@
 			</div>
 		</div>
 		<div class="table-responsive">
-			<div id="div-gd-rt" class="ag-theme-balham" style="min-height: 300px;"></div>
+			<div id="div-gd-rt" class="dark-grid ag-theme-balham" style="min-height: 300px;"></div>
 		</div>
 	</div>
 </div>

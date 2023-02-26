@@ -193,7 +193,7 @@
                     updateThemeSetting(false, true);
                 } else if(alreadyVisited === "dark-mode") {
                     $(".top_setting_btn .mode").attr("class","mode app-dark");
-                    $("#div-gd, #goods-class-grid").attr("class","ag-theme-balham-dark");
+                    $("#div-gd, #goods-class-grid, .dark-grid").attr("class","ag-theme-balham-dark");
                     updateThemeSetting(true, false);
                 } 
             }
@@ -202,7 +202,7 @@
         $(".top_setting_btn .mode").on("click", function(e) {
             if($(this).hasClass("app-light")) {
                 $(this).attr("class","mode app-dark");
-                $("#div-gd, #goods-class-grid").attr("class","ag-theme-balham-dark");
+                $("#div-gd, #goods-class-grid, .dark-grid").attr("class","ag-theme-balham-dark");
                 sessionStorage.setItem("is_visited", "dark-mode");
                 updateThemeSetting(true, false);
             } else if($(this).hasClass("app-dark")) {
