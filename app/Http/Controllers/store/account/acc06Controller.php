@@ -750,27 +750,4 @@ class acc06Controller extends Controller
 			"body" => $result
 		]);
 	}
-
-	/** 기타재반자료 상세내역 팝업 */
-	public function show_extra(Request $request)
-	{
-		$sdate = $request->input('sdate', now()->format('Y-m'));
-		$store_cd = $request->input('store_cd', '');
-		$store_nm = '';
-
-		if ($store_cd != '') $store_nm = DB::table('store')->where('store_cd', $store_cd)->value('store_nm');
-
-		$values = [
-			'sdate' => $sdate,
-			'store_cd' => $store_cd,
-			'store_nm' => $store_nm,
-		];
-		return view( Config::get('shop.store.view') . '/account/acc06_extra', $values );
-	}
-
-	/** 기타재반자료 상세내역 조회 */
-	public function search_extra(Request $request)
-	{
-		// 작업예정입니다.
-	}
 }

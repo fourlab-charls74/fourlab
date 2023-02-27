@@ -91,14 +91,20 @@ class acc05Controller extends Controller
     public function show(Request $request)
     {
         $cmd = $request->input('date') === null ? 'add' : 'update';
+
         $sdate = $request->input('date', '');
         if ($sdate === '') $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m");
         else $sdate = substr_replace($sdate, '-', 4, 0);
+
+        $store_cd = $request->input('store_cd', '');
+        $store = DB::table('store')->where('store_cd', $store_cd)->select('store_cd', 'store_nm')->first();
+
         $extra_cols = SLib::getCodes('STORE_ACC_EXTRA_TYPE')->groupBy('code_val2'); // code_val2를 상위 카테고리로 사용
 
         $values = [
             'cmd' => $cmd,
             'sdate' => $sdate,
+            'store' => $store,
             'sdate_str' => Carbon::parse($sdate)->format("Y년 m월"),
             'extra_cols' => $extra_cols,
         ];
@@ -109,6 +115,7 @@ class acc05Controller extends Controller
     public function show_search(Request $request)
     {
         $cmd = $request->input('cmd', 'add');
+        $store_cd = $request->input('store_cd', '');
         $sdate = $request->input('sdate', Carbon::now()->startOfMonth()->subMonth()->format("Y-m"));
 
         // 유효성 검사
@@ -182,6 +189,9 @@ class acc05Controller extends Controller
         $f_sdate = Carbon::parse($f_sdate)->firstOfMonth()->format("Ymd");
         $f_edate = Carbon::parse($f_edate)->lastOfMonth()->format("Ymd");
 
+        $where = "";
+        if ($store_cd != '') $where .= " and s.store_cd = '" . Lib::quote($store_cd) . "'";
+
         // search
         $sql = "
             select s.store_cd, s.store_nm, s.store_type, e.*, c.*
@@ -200,7 +210,7 @@ class acc05Controller extends Controller
                     from store_account_closed c
                     where c.sday = :f_sdate and c.eday = :f_edate
                 ) c on c.c_store_cd = s.store_cd
-            where s.account_yn = 'Y'
+            where s.account_yn = 'Y' $where
             order by s.store_cd
         ";
         $result = DB::select($sql, ['sdate' => $sdate, 'f_sdate' => $f_sdate, 'f_edate' => $f_edate]);

@@ -49,7 +49,7 @@
                                     <tbody>
                                         <tr>
                                             <th>판매기간(판매연월)</th>
-                                            <td class="w-100">
+                                            <td class="@if (!isset($store)) w-100 @endif">
                                                 <div class="docs-datepicker w-100 flex_box">
                                                     @if (@$cmd === 'add')
                                                     <div class="input-group" style="max-width:300px;">
@@ -68,6 +68,12 @@
                                                     @endif
                                                 </div>
                                             </td>
+                                            @if (isset($store))
+                                            <th>매장정보</th>
+                                            <td>
+                                                <p class="fs-14 font-weight-bold">[{{ @$store->store_cd }}] {{ @$store->store_nm }}</p>
+                                            </td>
+                                            @endif
                                         </tr>
                                     </tbody>
                                 </table>
@@ -155,6 +161,7 @@
 
     let is_file_applied = false;
     let applied_date = "{{ @$sdate }}";
+    let applied_store_cd = "{{ isset($store) ? @$store->store_cd : '' }}";
 
     $(document).ready(function() {
         pApp.ResizeGrid(340);
@@ -224,6 +231,8 @@
 
         let data = $('form[name="search"]').serialize();
         data += "&cmd=" + CMD;
+
+        if (applied_store_cd !== '') data += "&store_cd=" + applied_store_cd;
 
 		gx.Request('/store/account/acc05/show-search', data, -1, function(e) {
             if (e.code === 200) {

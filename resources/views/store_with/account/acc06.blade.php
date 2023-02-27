@@ -295,7 +295,7 @@
 	// 기타재반자료 상세
 	function openExtraAmtPopup(store_cd) {
 		const sdate = $('input[name="sdate"]').val();
-		const url = '/store/account/acc06/show-extra?store_cd=' + store_cd + '&sdate=' + sdate;
+		const url = '/store/account/acc05/show?date=' + sdate.replaceAll('-', '') + '&store_cd=' + store_cd;
 		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=800");
 	}
 
