@@ -22,7 +22,7 @@
                     <div class="tab-content" id="myTabContent">
                         <div class="tab-pane fade" id="bar" role="tabpanel" aria-labelledby="bar-tab">
                             <div class="card shadow mb-1">
-                                <div style="margin-top:10px; margin-right:10px">
+                                <div style="margin-top:24px; margin-right:20px">
                                     <a href="#" id="msg_del_btn" onclick="sale_amt_days()"class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">더보기</a>
                                 </div>
                                 <canvas id="myChart"></canvas>
@@ -31,9 +31,7 @@
                         <div class="tab-pane fade" id="pie" role="tabpanel" aria-labelledby="pie-tab">
                             <div class="card-body mt-1">
                                 <a href="#" id="msg_del_btn" onclick="sale_amt_store()"class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">더보기</a>
-                                <div class="chart-container" style="position:relative; height:30vh; width:42vw">
-                                    <canvas id="myChart2" ></canvas>
-                                </div>
+                                <canvas id="myChart2" ></canvas>
                             </div>
                         </div>
                     </div>
@@ -141,7 +139,7 @@
     let gx;
 
     $(document).ready(function() {
-        pApp.ResizeGrid(275, 200);
+        pApp.ResizeGrid(275, 350);
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
         pApp.BindSearchEnter();
@@ -182,7 +180,7 @@
     let gx2;
 
     $(document).ready(function() {
-        pApp2.ResizeGrid(275, 200);
+        pApp2.ResizeGrid(275, 350);
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
         gx2 = new HDGrid(gridDiv2, columns2);
         pApp2.BindSearchEnter();
@@ -226,7 +224,7 @@
 
 <!-- 차트 -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
 <script>
   const ctx = document.getElementById('myChart');
 
@@ -241,42 +239,62 @@
   new Chart(ctx, {
     type: 'bar',
     data: {
-      datasets: [{
-            label: '매출액', 
-            data: [
-                {x: all_date[0], y: chartData[7].sum_amt},
-                {x: all_date[1], y: chartData[8].sum_amt},
-                {x: all_date[2], y: chartData[9].sum_amt},
-                {x: all_date[3], y: chartData[10].sum_amt},
-                {x: all_date[4], y: chartData[11].sum_amt},
-                {x: all_date[5], y: chartData[12].sum_amt},
-                {x: all_date[6], y: chartData[13].sum_amt},
-                {x: all_date[7], y: chartData[14].sum_amt},
-            ],
-            borderWidth: 3
-        },{
-            label: '매출원가',
-            data: [
-                {x: all_date[0], y: chartData[7].sum_wonga},
-                {x: all_date[1], y: chartData[8].sum_wonga},
-                {x: all_date[2], y: chartData[9].sum_wonga},
-                {x: all_date[3], y: chartData[10].sum_wonga},
-                {x: all_date[4], y: chartData[11].sum_wonga},
-                {x: all_date[5], y: chartData[12].sum_wonga},
-                {x: all_date[6], y: chartData[13].sum_wonga},
-                {x: all_date[7], y: chartData[14].sum_wonga},
-            ],
-            borderWidth: 3
-        }]
+      labels: [
+            all_date[0],
+            all_date[1],
+            all_date[2],
+            all_date[3],
+            all_date[4],
+            all_date[5],
+            all_date[6],
+            all_date[7],
+      ],
+      datasets: [
+        {
+        label: '매출액',
+        data: [
+            chartData[7].sum_amt,
+            chartData[8].sum_amt,
+            chartData[9].sum_amt,
+            chartData[10].sum_amt,
+            chartData[11].sum_amt,
+            chartData[12].sum_amt,
+            chartData[13].sum_amt,
+            chartData[14].sum_amt,
+        ],
+        borderColor: '#36A2EB',
+        backgroundColor: '#9BD0F5',
+        borderWidth: 1
+      },
+      {
+        label: '매출원가',
+        data: [
+            chartData[7].sum_wonga,
+            chartData[8].sum_wonga,
+            chartData[9].sum_wonga,
+            chartData[10].sum_wonga,
+            chartData[11].sum_wonga,
+            chartData[12].sum_wonga,
+            chartData[13].sum_wonga,
+            chartData[14].sum_wonga,
+        ],
+        borderColor: '#FF6384',
+        backgroundColor: '#FFB1C1',
+        borderWidth: 1
+      }
+    ]
     },
     options: {
-        responsive: true,
+        // responsive: true,
+        animation: {
+            easing:'easeOutElastic',
+        }, 
         legend:{
-            position : 'right'
+            position : 'top'
         },
         scales: {
             y: {
-            beginAtZero: true
+                beginAtZero: true
             }
         }
     }
@@ -343,6 +361,7 @@
             }]
         },
         options: {
+            responsive: true,
             legend: {
                 position: 'right',
             }

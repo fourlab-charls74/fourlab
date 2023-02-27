@@ -44,6 +44,8 @@ class sal27Controller extends Controller
 
         $where = "";
 
+        $period_data = "";
+
        // 상품코드 검색
        if ($prd_cd != '') {
         $prd_cd = explode(',', $prd_cd);
@@ -73,6 +75,18 @@ class sal27Controller extends Controller
             }
             $where	.= ")";
         }
+
+        $period_data .= "
+            left outer join (
+                select
+                    prd_cd,
+                    qty,
+                    rt
+                from product_stock_hst
+                where rt > '$sdate' and rt < '$edate' 
+            ) psh on psh.prd_cd = pc.prd_cd
+        ";
+
         
 
          // 상품옵션 범위검색
@@ -93,22 +107,26 @@ class sal27Controller extends Controller
                 , a.tag_price as tag_price
                 , a.price as price
                 , a.wonga as wonga
-                , sum(a.order_amt) as order_amt
-                , sum(a.order_qty) as order_qty
-                , sum(a.order_tag_price) as order_tag_price
-                , sum(a.order_price) as order_price
-                , sum(a.order_wonga) as order_wonga
+                , a.order_amt as order_amt
+                , a.order_qty as order_qty
+                , a.order_tag_price as order_tag_price
+                , a.order_price as order_price
+                , a.order_wonga as order_wonga
                 , a.release_qty as release_qty
                 , a.return_qty as return_qty
-                , a.total_release_qty as total_release_qty
+                , (a.release_qty - a.return_qty) as total_release_qty
                 , a.storage_stock_qty as storage_stock_qty
-                , sum(a.store_stock_qty) as store_stock_qty
-                , (a.storage_stock_qty + sum(a.store_stock_qty)) as total_stock_qty
-                , a.sale_qty
-                , a.sale_wonga
-                , a.sale_price
-                , a.sale_recv_amt
-                , a.sale_tag_price
+                , a.store_stock_qty as store_stock_qty
+                , (a.storage_stock_qty + a.store_stock_qty) as total_stock_qty
+
+
+
+                -- , a.sale_qty
+                -- , a.sale_wonga
+                -- , a.sale_price
+                -- , a.sale_recv_amt
+                -- , a.sale_tag_price
+                , a.202302
             from (
                 select 
                     pc.item as item
@@ -127,9 +145,9 @@ class sal27Controller extends Controller
                     , p.tag_price
                     , p.price
                     , p.wonga
+                    , psop2.qty as order_amt
                     
                     -- 입고
-                    , psop2.qty as order_amt
                     , psop.qty as order_qty
                     , ( p.tag_price * psop.qty ) as order_tag_price
                     , ( p.price * psop.qty ) as order_price
@@ -139,30 +157,31 @@ class sal27Controller extends Controller
                     , DATE_FORMAT(hst.rt, '%Y-%m-%d') as release_first_date
                     , ifnull(psr.qty, 0) as release_qty
                     , ifnull(srp.return_qty, 0) as return_qty
-                    , ( psr.qty - srp.return_qty) as total_release_qty
 
                     -- 재고
                     , ifnull(pss.wqty, 0) as storage_stock_qty
                     , ifnull(pss2.wqty, 0) as store_stock_qty
 
                     -- 판매
-                    , opt.qty as sale_qty
-                    , opt.wonga as sale_wonga
-                    , opt.price as sale_price
-                    , opt.recv_amt as sale_recv_amt
-                    , opt.tag_price as sale_tag_price
+                    -- , opt.qty as sale_qty
+                    -- , opt.wonga as sale_wonga
+                    -- , opt.price as sale_price
+                    -- , opt.recv_amt as sale_recv_amt
+                    -- , opt.tag_price as sale_tag_price
+
+                    -- 기간재고
+                    , if(psh.rt >= '2023-01' && psh.rt <= '2023-02',psh.qty,0) as '202302' 
 
                 from product_code pc
                     inner join product p on p.prd_cd = pc.prd_cd
                     inner join code c1 on c1.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c1.code_id
-                    left outer join product_stock_order_product psop on psop.prd_cd = pc.prd_cd
+                    left outer join product_stock_order_product psop on psop.prd_cd = pc.prd_cd and state >= 30
                     left outer join (
                                     select 
                                         qty
-                                        , state
                                         , prd_cd
                                     from product_stock_order_product
-                                    where state >= 10
+                                    where state != -10
                     ) psop2 on psop2.prd_cd = pc.prd_cd
                     left outer join goods g on g.goods_no = pc.goods_no
                     left outer join brand b on b.br_cd = pc.brand
@@ -179,18 +198,26 @@ class sal27Controller extends Controller
                     left outer join product_stock_release psr on psr.prd_cd = pc.prd_cd
                     left outer join store_return_product srp on srp.prd_cd = pc.prd_cd
                     left outer join product_stock_storage pss on pss.prd_cd = pc.prd_cd
-                    left outer join product_stock_store pss2 on pss2.prd_cd = pc.prd_cd
+                    left outer join product_stock_store pss2 on pss2.prd_cd = pc.prd_cd 
+                    -- left outer join (
+                    --     select
+                    --         o.qty
+                    --         , o.wonga
+                    --         , o.price
+                    --         , o.prd_cd
+                    --         , o.recv_amt
+                    --         , p.tag_price
+                    --     from order_opt o
+                    --         inner join product p on p.prd_cd = o.prd_cd
+                    -- ) opt on opt.prd_cd = pc.prd_cd
                     left outer join (
                         select
-                            o.qty
-                            , o.wonga
-                            , o.price
-                            , o.prd_cd
-                            , o.recv_amt
-                            , p.tag_price
-                        from order_opt o
-                            inner join product p on p.prd_cd = o.prd_cd
-                    ) opt on opt.prd_cd = pc.prd_cd
+                            prd_cd,
+                            qty,
+                            rt
+                        from product_stock_hst
+                        where rt > :sdate and rt < :edate
+                    ) psh on psh.prd_cd = pc.prd_cd
 
                 where 1=1 and pc.goods_no != 0 and pc.goods_no != ''
                 $where
