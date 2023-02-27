@@ -203,7 +203,7 @@
     const columns = [
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28},
 		{field: "account_idx", headerName: "마감일련", pinned: 'left', cellStyle: CENTER, width: 70,
-			cellRenderer: (params) => params.node.rowPinned === 'top' ? '합계' : parseInt(params.value) + 1,
+			cellRenderer: (params) => params.node.rowPinned === 'top' ? '합계' : params.value,
 		},
         {field: "a_ord_state_nm", headerName: "매출구분", width: 55, pinned: 'left', cellStyle: (params) => ({...CENTER, "color": params.data.ord_state != 30 ? "#dd0000" : "none"})},
 		{field: "state_date", headerName: "일자", width: 80, pinned: 'left', cellStyle: CENTER},
@@ -295,9 +295,9 @@
                         if (isNaN(val) || val == '' || parseFloat(val) < 0) {
                             alert("숫자만 입력가능합니다.");
                             e.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
-                        } else {                            
+                        } else {
                             const sale_type_colId = 'sale_' + e.data.sale_type;
-                            e.data[sale_type_colId] = e.data['old_' + sale_type_colId] - (e.data['old_' + e.column.colId] * 1) + (e.newValue * 1);
+                            e.data[sale_type_colId] = e.data['old_' + sale_type_colId] + (e.data.dlv_amt * 1) + (e.data.etc_amt * 1);
                             e.data.sale_net_amt = e.data[sale_type_colId];
                             e.data.sale_amt_except_vat = (e.data.sale_net_amt || 0) / 1.1;
 
@@ -328,7 +328,7 @@
                             alert("숫자만 입력가능합니다.");
                             e.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
                         } else {                            
-                            e.data.sale_net_amt = e.data.old_sale_net_amt - (e.data['old_' + e.column.colId] * 1) + (e.newValue * 1);
+                            e.data.sale_net_amt = e.data.old_sale_net_amt + (e.data.dlv_amt * 1) + (e.data.etc_amt * 1);
                             e.data.sale_amt_except_vat = (e.data.sale_net_amt || 0) / 1.1;
                             e.data.fee_OL = Math.round((e.data.sale_net_amt || 0) / 1.1 * e.data.fee_rate_OL / 100);
 
@@ -427,6 +427,18 @@
             if (res.data.code === "200") {
                 if (type === 'online') SearchOnline();
                 else Search();
+
+                // 업데이트 정보 반영
+                const closed = res.data.closed;
+                $("#fee_amt_JS1").text(Comma(closed.fee_JS1));
+                $("#fee_amt_JS2").text(Comma(closed.fee_JS2));
+                $("#fee_amt_JS3").text(Comma(closed.fee_JS3));
+                $("#fee_amt_TG").text(Comma(closed.fee_TG));
+                $("#fee_amt_YP").text(Comma(closed.fee_YP));
+                $("#fee_amt_OL").text(Comma(closed.fee_OL));
+                $("#fee_amt").text(Comma(closed.fee_amt));
+                $("#extra_amt").text(Comma(closed.extra_amt));
+                $("#account_amt").text(Comma(closed.account_amt));
             } else {
                 alert("저장 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
                 console.log(res);
@@ -468,7 +480,6 @@
             url: '/store/account/acc07/' + acc_idx,
             method: 'delete',
         }).then((res) => {
-            console.log(res);
             if (res.data.code === "200") {
                 alert("마감정보가 정상적으로 삭제되었습니다.");
                 opener.Search();

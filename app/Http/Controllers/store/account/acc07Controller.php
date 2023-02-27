@@ -154,7 +154,7 @@ class acc07Controller extends Controller
 						from claim
 						where ord_opt_no = c.ord_opt_no
 					), '') as clm_end_date
-					, c.memo
+					, c.memo, date_format(ac.sday, '%Y%m') as ymonth
 				from store_account_closed_list c
 					inner join store_account_closed ac on ac.idx = c.acc_idx
 					inner join order_opt_wonga w on w.ord_opt_no = c.ord_opt_no and w.ord_state = c.type
@@ -212,7 +212,7 @@ class acc07Controller extends Controller
 						from claim
 						where ord_opt_no = c.ord_opt_no
 					), '') as clm_end_date
-					, c.memo
+					, c.memo, date_format(ac.sday, '%Y%m') as ymonth
 				from store_account_closed_list c
 					inner join store_account_closed ac on ac.idx = c.acc_idx
 					inner join order_opt_wonga w on w.ord_opt_no = c.ord_opt_no and w.ord_state = c.type
@@ -249,8 +249,16 @@ class acc07Controller extends Controller
 		try {
 			DB::beginTransaction();
 
-			DB::table('store_account_closed_list')->where('acc_idx', $idx)->delete();
+			$acc_list = DB::table('store_account_closed_list')->where('acc_idx', $idx);
+
+			// 기타정산액 데이터 제거
+			$acc_list_idxs = array_map(function($acc) { return $acc->idx; }, $acc_list->select('idx')->get()->toArray());
+			DB::table('store_account_etc')->whereIn('acc_list_idx', $acc_list_idxs)->delete();
+
+			// 마감상세 데이터 제거
+			$acc_list->delete();
 			
+			// 마감 데이터 제거
 			DB::table('store_account_closed')->where('idx', $idx)->delete();
 
 			DB::commit();
@@ -301,8 +309,13 @@ class acc07Controller extends Controller
 	public function update_closed(Request $request)
 	{
 		$data = $request->input('data', []);
+		$admin_id = Auth('head')->user()->id;
+		$admin_nm = Auth('head')->user()->name;
+
 		$code = "200";
 		$msg = "";
+
+		$closed = [];
 
 		try {
 			DB::beginTransaction();
@@ -327,7 +340,20 @@ class acc07Controller extends Controller
 					]);
 
 				// Set store_account_etc
-				// 작업예정입니다.
+				$where = ['acc_list_idx' => $val['account_idx']];
+				$values = [
+					'ymonth' => $val['ymonth'] ?? '',
+					'etc_day' => DB::raw("date_format(now(),'%Y%m%d')"),
+					'store_cd' => $val['store_cd'] ?? '',
+					'ord_opt_no' => $val['ord_opt_no'] ?? '',
+					'etc_amt' => $etc,
+					'etc_memo' => $val['memo'] ?? '',
+					'admin_id' => $admin_id,
+					'admin_nm' => $admin_nm,
+					'rt' => now(),
+					'ut' => now(),
+				];
+				DB::table('store_account_etc')->updateOrInsert($where, $values);
 			}
 
 			// Set store_account_closed
@@ -397,6 +423,19 @@ class acc07Controller extends Controller
 			";
 			DB::update($sql, ['acc_idx' => $acc_idx, 'nowdate1' => $nowdate, 'nowdate2' => $nowdate]);
 
+			// 업데이트된 마감상세 수수료 정보 조회
+			$sql = "
+				select c.idx, c.store_cd, s.store_nm, s.manager_nm, c.sday, c.eday, c.closed_yn, c.closed_date, c.rt, c.admin_nm
+					, c.fee_JS1, c.fee_JS2, c.fee_JS3, c.fee_TG, c.fee_YP, c.fee_OL, c.fee as fee_amt
+					, if(c.closed_yn = 'Y', c.extra_amt, e.extra_amt) as extra_amt
+					, if(c.closed_yn = 'Y', c.fee_net, (c.fee + e.extra_amt)) as account_amt
+				from store_account_closed c
+					inner join store s on s.store_cd = c.store_cd
+					left outer join store_account_extra e on e.store_cd = c.store_cd and e.ymonth = left(c.sday, 6)
+				where c.idx = :idx
+			";
+			$closed = DB::selectOne($sql, ['idx' => $acc_idx]);
+
 			DB::commit();
 			$msg = "마감정보가 정상적으로 수정되었습니다.";
 		} catch(Exception $e) {
@@ -405,6 +444,6 @@ class acc07Controller extends Controller
 			$msg = $e->getmessage();
 		}
 
-		return response()->json(["code" => $code, "msg" => $msg]);
+		return response()->json(["code" => $code, "msg" => $msg, "closed" => $closed]);
 	}
 }
