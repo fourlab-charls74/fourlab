@@ -616,8 +616,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('acc05/show', 'acc05Controller@show');
         Route::get('acc05/show-search', 'acc05Controller@show_search');
         Route::post('acc05/save', 'acc05Controller@save');
-        // Route::get('acc05/show-batch', 'acc05Controller@show_batch');
-        // Route::post('acc05/batch-import', 'acc05Controller@import_excel');
+        Route::post('acc05/batch-import', 'acc05Controller@import_excel');
 
         // 매장중간관리자 - 정산
         Route::get('acc06', 'acc06Controller@index');

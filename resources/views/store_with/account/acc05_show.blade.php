@@ -7,7 +7,7 @@
 @section('content')
 
 <!-- import excel lib -->
-{{-- <script src="https://unpkg.com/xlsx-style@0.8.13/dist/xlsx.full.min.js"></script> --}}
+<script src="https://unpkg.com/xlsx-style@0.8.13/dist/xlsx.full.min.js"></script>
 
 <div class="show_layout py-3 px-sm-3">
     <div class="page_tit d-flex justify-content-between">
@@ -128,11 +128,13 @@
                                                 </div>
                                                 <a href="/sample/sample_extra_acc.xlsx" class="mt-2" id="sample_file_link" style="text-decoration: underline !important;">일괄등록양식 다운로드</a>
                                                 <a href="/sample/sample_old_extra_acc.xlsx" class="mt-2" id="sample_file_link2" style="text-decoration: underline !important;" hidden>(원부자재포함) 일괄등록양식 다운로드</a>
+                                                {{-- file_type: G(기본) / S(원부자재포함) --}}
+                                                <input type="hidden" id="file_type" value="G">
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="w-100 text-center mt-2">
+                                <div class="w-100 text-center mt-3">
                                     <a href="#" onclick="return upload();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus fa-sm text-white-50 pr-1"></i> 적용</a>
                                 </div>
                             </div>
@@ -254,20 +256,25 @@
 			resizable: false,
 			sortable: true,
 		};
-
-        // $('#excel_file').on('change', function(e){
-        //     if (validateFile() === false) {
-        //         $('.custom-file-label').html("");
-        //         return;
-        //     }
-        //     $('.custom-file-label').html(this.files[0].name);
-        // });
-
+        
         if (CMD === 'update') Search();
         updatePinnedRow();
+
+        /** 엑셀 관련 */
+        $('#excel_file').on('change', function(e) {
+            if (validateFile() === false) {
+                $('.custom-file-label').html("");
+                return;
+            }
+            $('.custom-file-label').html(this.files[0].name);
+        });
+        $('#SelectFileModal').on('hide.bs.modal', function (e) {
+            $('#excel_file').val('');
+            $('.custom-file-label').html('');
+        });
     });
 
-    function Search(applied = false) {
+    function Search(applied = false, callback = null) {
         if (applied && gx.getRows().length > 0) {
             if (!confirm("적용 시, 기존에 작성되었던 정보는 저장되지 않습니다.\n해당 판매기간을 적용하시겠습니까?")) return;
         }
@@ -283,14 +290,16 @@
                 is_file_applied = true;
                 if (CMD === 'add') applied_date = $("#sdate").val();
                 updatePinnedRow();
+                if (callback !== null) callback();
             } else {
+                is_file_applied = false;
                 alert(e.head.msg);
                 console.log(e);
             }
         });
     }
 
-    function setColumns({gifts, expandables}) {
+    function setColumns({ gifts = [], expandables = [] }) {
 		const cols = columns.reduce((a, c) => {
 			let col = {...c};
 			if(col.field === 'gifts') {
@@ -300,12 +309,12 @@
                         type: 'currencyType', width: 100, 
                         editable: (params) => setEditable(params),
                         cellStyle: (params) => setEditable(params) ? YELLOW : {}, 
-                        cellRenderer: (params) => params.value !== null ? Comma(params.value) : (CMD === 'add' ? '' : 0) 
+                        cellRenderer: (params) => params.value !== null ? Comma(params.value || 0) : (CMD === 'add' ? '' : 0) 
                     })).concat({ 
                         headerName: "소계", 
                         field: "G_sum", 
                         type: 'currencyType', width: 100, 
-                        cellRenderer: (params) => params.value !== null ? Comma(params.value) : (CMD === 'add' ? '' : 0) 
+                        cellRenderer: (params) => params.value !== null ? Comma(params.value || 0) : (CMD === 'add' ? '' : 0) 
                     });
 			}
             if(col.field === 'expandables') {
@@ -315,11 +324,11 @@
                     type: 'currencyType', width: 100, 
                     editable: (params) => setEditable(params),
                     cellStyle: (params) => setEditable(params) ? YELLOW : {}, 
-                    cellRenderer: (params) => params.value !== null ? Comma(params.value) : (CMD === 'add' ? '' : 0) 
+                    cellRenderer: (params) => params.value !== null ? Comma(params.value || 0) : (CMD === 'add' ? '' : 0) 
                 })).concat({ 
                     headerName: "소계", 
                     field: "S_sum", type: 'currencyType', width: 100, 
-                    cellRenderer: (params) => params.value !== null ? Comma(params.value) : (CMD === 'add' ? '' : 0) 
+                    cellRenderer: (params) => params.value !== null ? Comma(params.value || 0) : (CMD === 'add' ? '' : 0) 
                 });
 			}
 			a.push(col);
@@ -338,14 +347,40 @@
 		if (!confirm(`[${applied_date}]의 기타재반자료를 저장하시겠습니까?`)) return;
 		alert("다소 시간이 소요될 수 있습니다. 잠시만 기다려주세요.");
 
+        const file_type = $("#file_type").val(); // G(기본) / S(원부자재포함)
+        let colDef = [];
+
+        if (file_type === 'S') {
+            colDef = gx.gridOptions.columnApi.columnController.columnDefs
+                .reduce((a,c) => {
+                    let result = {};
+                    if(['gifts', 'expandables'].includes(c.field) && c.children && c.children.length > 0) {
+                        result = c.children
+                            .filter(child => !['G_sum', 'S_sum'].includes(child.field))
+                            .reduce((aa, cc) => {
+                                let vv = {};
+                                vv[cc.field] = cc.headerName;
+                                return {...aa, ...vv};
+                            }, {});
+                    }
+                    return {...a, ...result};
+                }, {});
+        }
+
 		axios({
             url: '/store/account/acc05/save',
             method: 'post',
-            data: { cmd: CMD, data: rows, sdate: applied_date }
+            data: { 
+                cmd: CMD, 
+                type: file_type,
+                data: rows, 
+                cols: colDef, 
+                sdate: applied_date 
+            }
         }).then((res) => {
             if (res.data.code === "200") {
                 alert("자료가 정상적으로 저장되었습니다.");
-                opener.Search();
+                if (opener) opener.Search();
                 self.close();
             } else {
                 alert("자료저장 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
@@ -394,99 +429,115 @@
         $("#sample_file_link").attr("hidden", with_sproduct);
         $("#sample_file_link2").attr("hidden", !with_sproduct);
 
+        $("#file_type").val(with_sproduct ? 'S' : 'G');
+
         $("#SelectFileModal").draggable();
-        $('#SelectFileModal').modal({
-            keyboard: false
-        });
+        $('#SelectFileModal').modal({ keyboard: false });
     }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////// 아래 작업중 ////////////////////////////////////////////
-
+    
     /** 
      * 엑셀 관련 함수
      * - read the raw data and convert it to a XLSX workbook
     */
-    
-    // 파일 적용
+
+    // 일괄등록 엑셀파일 적용
     const upload = () => {
         const file_data = $('#excel_file').prop('files')[0];
         if(!file_data) return alert("적용할 파일을 선택해주세요.");
 
-        if(is_file_applied && !confirm("새로 적용하시는 경우 기존에 수정하신 정보는 저장되지 않습니다.\n적용하시겠습니까?")) return;
+        if((gx.getRows().length > 0 || is_file_applied) && !confirm("적용 시, 기존에 작성되었던 정보는 저장되지 않습니다.\n파일을 적용하시겠습니까?\n판매기간 : " + applied_date)) return;
         is_file_applied = true;
-        
-		const form_data = new FormData();
-		form_data.append('file', file_data);
-		form_data.append('_token', "{{ csrf_token() }}");
 
-        alert("엑셀파일을 적용하고 있습니다. 잠시만 기다려주세요.");
-        
-        axios({
-            url: '/store/account/acc05/batch-import',
-            method: 'post',
-            headers: { "Content-Type": "multipart/form-data" },
-            data: form_data,
-        }).then(async (res) => {
-            gx.gridOptions.api.setRowData([]);
-            if (res.data.code == 1) {
-                const file = res.data.file;
-                await importExcel("/" + file);
-            } else {
-                alert("엑셀파일 적용 중 에러가 발생했습니다. 다시 시도해주세요.");
-                console.log(res);
-            }
-        }).catch((error) => {
-            alert("에러가 발생했습니다. 관리자에게 문의해주세요.");
-            console.log(error);
+        Search(false, () => {
+            
+            const form_data = new FormData();
+            form_data.append('file', file_data);
+            form_data.append('_token', "{{ csrf_token() }}");
+
+            $("#SelectFileModal").modal('hide');
+            alert("엑셀파일을 적용하고 있습니다. 잠시만 기다려주세요.");
+            
+            axios({
+                url: '/store/account/acc05/batch-import',
+                method: 'post',
+                headers: { "Content-Type": "multipart/form-data" },
+                data: form_data,
+            }).then(async (res) => {
+                if (res.data.code == 1) {
+                    const file = res.data.file;
+                    await importExcel("/" + file);
+                } else {
+                    alert("엑셀파일 적용 중 에러가 발생했습니다. 다시 시도해주세요.");
+                    console.log(res);
+                }
+            }).catch((error) => {
+                alert("에러가 발생했습니다. 관리자에게 문의해주세요.");
+                console.log(error);
+            });
         });
     }
 
     const populateGrid = async (workbook) => {
-		let firstSheetName = workbook.SheetNames[0]; // our data is in the first sheet
+        let firstSheetName = workbook.SheetNames[0]; // our data is in the first sheet
 		let worksheet = workbook.Sheets[firstSheetName];
 
+        const file_type = $("#file_type").val(); // G(기본) / S(원부자재포함)
+
 		let excel_columns = {
-			'B': 'store_cd',
-			'C': 'store_nm',
-			'E': 'P1_amt',
-			'J': 'E1_amt', 'K': 'E2_amt', 'M': 'E4_amt', 'N': 'E5_amt', 'O': 'E6_amt',
-			'Q': 'M1_amt', 'R': 'M2_amt', 'S': 'M3_amt', 'U': 'M4_amt',
-			'V': 'G', 'W': 'G', 'X': 'G', 'Y': 'G', 'Z': 'G', 'AA': 'G', 'AB': 'G', 'AC': 'G', 'AD': 'G', 'AE': 'G',
-			'AG': 'S', 'AH': 'S', 'AI': 'S', 'AJ': 'S', 'AK': 'S', 'AL': 'S', 'AM': 'S', 'AN': 'S', 'AO': 'S', 'AP': 'S',
-			'AS': 'O1_amt', 'AT': 'O2_amt', 'AU': 'O3_amt'
+			'B': 'store_cd', 'C': 'store_nm',
+			'D': 'P1_amt',
+			'G': 'E1_amt', 'H': 'E2_amt', 'J': 'E4_amt', 'K': 'E5_amt', 'L': 'E6_amt',
+			'N': 'M1_amt', 'O': 'M2_amt', 'P': 'M3_amt', 'R': 'M4_amt',
+			'S': 'O1_amt', 'T': 'O2_amt', 'U': 'O3_amt'
         };
 
-        const g_types = ['V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE']
-            .map(v => ({prd_nm: worksheet[v + '7']?.v, prd_cd: worksheet[v + '8']?.v, type: 'G', colId: v}))
-            .filter(v => v.prd_nm !== '-' && v.prd_nm !== '');
-        const s_types = ['AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP']
-            .map(v => ({prd_nm: worksheet[v + '7']?.v, prd_cd: worksheet[v + '8']?.v, type: 'S', colId: v}))
-            .filter(v => v.prd_nm !== '-' && v.prd_nm !== '');
+        let g_types = [];
+        let e_types = [];
 
-        let firstRowIndex = 9; // 엑셀 9행부터 시작 (샘플데이터 참고)
+        if (file_type === 'S') {
+            excel_columns = {
+                ...excel_columns,
+                'W': 'G', 'X': 'G', 'Y': 'G', 'Z': 'G', 'AA': 'G', 'AB': 'G', 'AC': 'G', 'AD': 'G', 'AE': 'G', 'AF': 'G',
+			    'AH': 'S', 'AI': 'S', 'AJ': 'S', 'AK': 'S', 'AL': 'S', 'AM': 'S', 'AN': 'S', 'AO': 'S', 'AP': 'S', 'AQ': 'S'
+            };
+
+            g_types = ['W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
+                .map(v => ({ prd_nm: worksheet[v + '4']?.v, prd_cd: v, type: 'G', colId: v }))
+                .filter(v => v.prd_nm !== '-' && v.prd_nm !== '');
+            e_types = ['AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ']
+                .map(v => ({ prd_nm: worksheet[v + '4']?.v, prd_cd: v, type: 'S', colId: v }))
+                .filter(v => v.prd_nm !== '-' && v.prd_nm !== '');
+        }
+
+
+        let firstRowIndex = 5; // 엑셀 5행부터 시작 (샘플데이터 참고)
 		let rowIndex = firstRowIndex; 
 
-        let count = gx.gridOptions.api.getDisplayedRowCount();
         let rows = [];
         let group_cd = '';
-        let p = '';
 		while (worksheet['B' + rowIndex]) {
 			let row = {};
 			Object.keys(excel_columns).forEach((column) => {
                 let item = worksheet[column + rowIndex];
 				if (item !== undefined) {
-                    if (excel_columns[column] === 'G') {
-                        p = g_types.filter(g => g.colId === column)?.[0];
-                        if (p) row[`G_${p.prd_cd || p.colId}_amt`] = item.v;
-                    } else if (excel_columns[column] === 'S') {
-                        p = s_types.filter(s => s.colId === column)?.[0];
-                        if (p) row[`S_${p.prd_cd || p.colId}_amt`] = item.v;
+                    let val = item.v;
+                    if (
+                        !['store_cd', 'store_nm'].includes(excel_columns[column]) 
+                        && (isNaN(item.v) || item.v == '' || parseFloat(item.v) < 0)
+                    ) val = 0;
+
+                    if (file_type === 'S') {
+                        if (excel_columns[column] === 'G') {
+                            let p = g_types.filter(g => g.colId === column)?.[0];
+                            if (p) row[`G_${p.prd_cd}_amt`] = val;
+                        } else if (excel_columns[column] === 'S') {
+                            let p = e_types.filter(s => s.colId === column)?.[0];
+                            if (p) row[`S_${p.prd_cd}_amt`] = val;
+                        } else {
+                            row[excel_columns[column]] = val;
+                        }
                     } else {
-                        row[excel_columns[column]] = item.v;
+                        row[excel_columns[column]] = val;
                     }
 				}
 			});
@@ -500,21 +551,26 @@
             row[group_cd + "_sum"]
                 = Object.keys(row).reduce((a,c) => (
                     (c.split("")[0] === group_cd && c.split("_").slice(-1)[0] === "amt" && !['E1', 'E2'].includes(c.split("_")[0])) 
-                        ? (row[c] * 1) : 0
+                        ? ['P1', 'M3'].includes(c.split("_")[0])
+                            ? Math.round(row[c] * 1 / 1.1) 
+                            : (row[c] * 1) 
+                        : 0
                 ) + a, 0);                
             @endforeach
 
-            row["G_sum"]
-                = Object.keys(row).reduce((a,c) => (
-                    (c.split("")[0] === 'G' && c.split("_").slice(-1)[0] === "amt") 
-                        ? (row[c] * 1) : 0
-                ) + a, 0);    
-
-            row["S_sum"]
-                = Object.keys(row).reduce((a,c) => (
-                    (c.split("")[0] === 'S' && c.split("_").slice(-1)[0] === "amt")
-                        ? (row[c] * 1) : 0
-                ) + a, 0);    
+            if (file_type === 'S') {
+                row["G_sum"]
+                    = Object.keys(row).reduce((a,c) => (
+                        (c.split("")[0] === 'G' && c.split("_").slice(-1)[0] === "amt") 
+                            ? (row[c] * 1) : 0
+                    ) + a, 0);    
+    
+                row["S_sum"]
+                    = Object.keys(row).reduce((a,c) => (
+                        (c.split("")[0] === 'S' && c.split("_").slice(-1)[0] === "amt")
+                            ? (row[c] * 1) : 0
+                    ) + a, 0);    
+            }
 
             // 총합계 계산
             row.total = Object.keys(row).reduce((a,c) => (c.split("_").slice(-1)[0] === "sum" ? (row[c] * 1) : 0) + a, 0);
@@ -525,8 +581,20 @@
 
         if(rows.length < 1) return alert("한 개 이상의 매장자료를 입력해주세요.");
         rows = rows.filter(r => r.store_cd);
-        await setColumns(g_types, s_types);
-        await gx.gridOptions.api.applyTransaction({ add : rows });
+
+        if (file_type === 'S') {
+            await setColumns({ gifts: g_types, expandables: e_types });
+        }
+
+        const rowsToUpdate = [];
+        gx.gridOptions.api.forEachNode(function(node) {
+            let data = node.data;
+            const item = rows.filter(row => row.store_cd === data.store_cd);
+            if (item.length > 0) data = {...item[0], closed_yn: data.closed_yn};
+            rowsToUpdate.push(data);
+        });
+        await gx.gridOptions.api.setRowData([]);
+        await gx.gridOptions.api.applyTransaction({ add : rowsToUpdate });
 	};
 
     const importExcel = async (url) => {
@@ -591,27 +659,5 @@
 		httpRequest.send();
 	};
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    const checkIsEditable = (params) => {
-        return params.data.hasOwnProperty('isEditable') && params.data.isEditable ? true : false;
-    };
-
-    // 상품 삭제
-    const deleteRow = (row) => { gx.gridOptions.api.applyTransaction({remove : [row]}); };
-
-    const delGoods = () => {
-        const ff = document.f1;
-        const rows = gx.getSelectedRows();
-        if (Array.isArray(rows) && !(rows.length > 0)) return alert("삭제할 상품을 선택해주세요.");
-
-        rows.filter((row, idx) => row.isEditable).map((row) => { deleteRow(row); });
-        updatePinnedRow();
-    };
 </script>
 @stop

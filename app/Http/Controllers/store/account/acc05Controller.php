@@ -145,16 +145,41 @@ class acc05Controller extends Controller
         $f_edate = Carbon::parse($sdate)->lastOfMonth()->format("Y-m-d H:i:s");
         $sdate = Lib::quote(str_replace('-', '', $sdate));
 
+        $gifts = [];
+        $expandables = [];
+
         $sql = "
-            select r.prd_cd, p.prd_nm, p.type
-            from sproduct_stock_release r
-                inner join store s on s.store_cd = r.store_cd and s.account_yn = 'Y'
-                inner join product p on p.prd_cd = r.prd_cd and p.type = :type
-            where r.fin_rt >= '$f_sdate' and r.fin_rt <= '$f_edate'
-            group by r.prd_cd
+            select el.type, el.prd_cd, el.prd_nm
+            from store_account_extra e
+                left outer join store_account_extra_list el on el.ext_idx = e.idx and el.type in ('G', 'S')
+            where e.ymonth = :sdate
+            group by el.type, el.prd_cd, el.prd_nm
         ";
-        $gifts = DB::select($sql, ['type' => 'G']); // 사은품
-        $expandables = DB::select($sql, ['type' => 'S']); // 소모품
+        $rows = DB::select($sql, ['sdate' => $sdate]);
+        
+        if (count($rows) > 0) {
+            // 이전에 등록한 자료에 원부자재정보가 포함되어 있을 경우
+            $gifts = array_reduce($rows, function($a, $c) { 
+                if ($c->type === 'G') return array_merge($a, [$c]); 
+                else return $a;
+            }, []); // 사은품
+            $expandables = array_reduce($rows, function($a, $c) { 
+                if ($c->type === 'S') return array_merge($a, [$c]); 
+                else return $a;
+            }, []); // 소모품
+        } else {
+            $sql = "
+                select r.prd_cd, p.prd_nm, p.type
+                from sproduct_stock_release r
+                    inner join store s on s.store_cd = r.store_cd and s.account_yn = 'Y'
+                    inner join product p on p.prd_cd = r.prd_cd and p.type = :type
+                where r.fin_rt >= '$f_sdate' and r.fin_rt <= '$f_edate'
+                group by r.prd_cd
+            ";
+            $gifts = DB::select($sql, ['type' => 'G']); // 사은품
+            $expandables = DB::select($sql, ['type' => 'S']); // 소모품
+        }
+
         $extra_types = SLib::getCodes('STORE_ACC_EXTRA_TYPE')->groupBy('code_val2')->toArray(); // 사은품/소모품 외 기타재반
 
         // 기타재반 항목별 쿼리문 생성
@@ -229,8 +254,9 @@ class acc05Controller extends Controller
     public function save(Request $request)
 	{
         $cmd = $request->input('cmd', 'add');
-        $save_type = $request->input('type', 'G'); // G: 일반, B: 일괄
-		$data = $request->input('data');
+        $file_type = $request->input('type', 'G'); // G: 일반, S: 원부자재포함
+		$data = $request->input('data', []);
+		$cols = $request->input('cols', []);
         $sdate = $request->input('sdate', '');
         $sdate = Lib::quote(str_replace('-', '', $sdate));
 
@@ -256,12 +282,16 @@ class acc05Controller extends Controller
                 foreach ($amts as $key => $value) {
                     $type = explode('_', $key)[0];
                     $prd_cd = null;
-                    if (in_array($type, ['S', 'G'])) $prd_cd = explode('_', $key)[1];
+                    $prd_nm = null;
+                    if (in_array($type, ['S', 'G'])) {
+                        if ($file_type === 'S') $prd_nm = $cols[$key] ?? '';
+                        $prd_cd = explode('_', $key)[1];
+                    }
 
                     array_push($extra_list, [
                         'type' => $type,
                         'prd_cd' => $prd_cd,
-                        'prd_nm' => null,
+                        'prd_nm' => $prd_nm,
                         'extra_amt' => $value ?? 0,
                     ]);
 
@@ -299,26 +329,6 @@ class acc05Controller extends Controller
 		}
 
 		return response()->json(["code" => $code, "msg" => $msg]);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////// 아래 작업중 ////////////////////////////////////////////
-
-    /** 기타재반자료 일괄등록 팝업오픈 */
-    public function show_batch()
-    {
-        $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 저번 달 기준
-        $extra_cols = SLib::getCodes('STORE_ACC_EXTRA_TYPE')->groupBy('code_val2'); // code_val2를 상위 카테고리로 사용
-
-        $values = [
-            'sdate' => $sdate,
-            'extra_cols' => $extra_cols,
-        ];
-
-        return view( Config::get('shop.store.view') . '/account/acc05_batch', $values );
     }
 
     /** 일괄등록 시 Excel 파일 저장 후 ag-grid(front)에 사용할 응답을 JSON으로 반환 */
