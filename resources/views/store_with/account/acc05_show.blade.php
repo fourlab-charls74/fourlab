@@ -86,16 +86,59 @@
         <div class="card shadow mt-3 pb-2">
             <div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
                 <a href="#">기타재반자료</a>
-                <div class="fl_box">
+                @if (!isset($store))
+                <div class="fr_box">
                     <button type="button" onclick="return openUploadModal();" class="btn btn-outline-primary mr-1"><i class="fas fa-plus fa-sm mr-1"></i> 엑셀일괄업로드</button>
-                    <button type="button" onclick="return openUploadModal({});" class="btn btn-outline-primary mr-1"><i class="fas fa-plus fa-sm mr-1"></i> 엑셀일괄업로드(원부자재포함)</button>
+                    <button type="button" onclick="return openUploadModal(true);" class="btn btn-outline-primary mr-1"><i class="fas fa-plus fa-sm mr-1"></i> 엑셀일괄업로드(원부자재포함)</button>
                 </div>
+                @endif
             </div>
             <div class="card-body">
                 <div class="table-responsive mt-2">
                     <div id="div-gd" class="ag-theme-balham"></div>
                 </div>
                 <p class="mt-2 text-success">* 해당연월에 <u class="font-weight-bold">마감완료처리</u>된 매장의 기타재반자료는 수정할 수 없습니다.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 엑셀파일 선택 및 적용 모달 -->
+<div id="SelectFileModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SelectFileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title mt-0" id="SelectFileModalLabel">엑셀일괄업로드<span id="modal-sub-title"></span></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body show_layout" style="background:#f5f5f5;">
+                <div class="card_wrap search_cum_form write">
+                    <div class="card shadow">
+                        <form name="search_prdcd_range" method="get" onsubmit="return false">
+                            <div class="card-body">
+                                <div class="row_wrap code-filter">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="flex_box justify-content-end">
+                                                <div class="custom-file">
+                                                    <input name="excel_file" type="file" class="custom-file-input" id="excel_file">
+                                                    <label class="custom-file-label" for="file"></label>
+                                                </div>
+                                                <a href="/sample/sample_extra_acc.xlsx" class="mt-2" id="sample_file_link" style="text-decoration: underline !important;">일괄등록양식 다운로드</a>
+                                                <a href="/sample/sample_old_extra_acc.xlsx" class="mt-2" id="sample_file_link2" style="text-decoration: underline !important;" hidden>(원부자재포함) 일괄등록양식 다운로드</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="w-100 text-center mt-2">
+                                    <a href="#" onclick="return upload();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus fa-sm text-white-50 pr-1"></i> 적용</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -347,7 +390,14 @@
 
     // 일괄업로드모달 오픈 (with_sproduct: 원부자재포함여부)
     function openUploadModal(with_sproduct = false) {
-        alert("개발중입니다.");
+        $("#modal-sub-title").text(with_sproduct ? '(원부자재포함)' : '');
+        $("#sample_file_link").attr("hidden", with_sproduct);
+        $("#sample_file_link2").attr("hidden", !with_sproduct);
+
+        $("#SelectFileModal").draggable();
+        $('#SelectFileModal').modal({
+            keyboard: false
+        });
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -281,6 +281,7 @@ class IndexController extends Controller
             group by s.ns_cd
             having stores like '%$user_store_nm%'
             order by s.rt desc
+            limit 0, 10
             
         ";
 
@@ -326,7 +327,7 @@ class IndexController extends Controller
             where md.receiver_type = '$receiver_type' and md.receiver_cd = '$user_store'
             and m.rt >= '$sdate' and m.rt < date_add('$edate', interval 1 day) and m.del_yn = 'N'
             group by md.msg_cd
-            limit 0, 5
+            limit 0, 10
         
         ";
 

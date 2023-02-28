@@ -279,7 +279,7 @@ class IndexController extends Controller
             where s.rt >= '$sdate' and s.rt < date_add( '$edate', interval 1 day) 
             group by s.ns_cd
             order by s.rt desc
-            limit 0, 5
+            limit 0, 10
         ";
 
         $result = DB::select($sql); 
@@ -313,7 +313,7 @@ class IndexController extends Controller
             where md.receiver_type = 'H' and md.receiver_cd = 'HEAD' 
             group by md.msg_cd
             order by md.rt desc
-            limit 0, 5
+            limit 0, 10
         
         ";
 

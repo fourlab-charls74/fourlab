@@ -186,7 +186,7 @@
     let gx;
 
     $(document).ready(function() {
-        pApp.ResizeGrid(275, 200);
+        pApp.ResizeGrid(275, 350);
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
         pApp.BindSearchEnter();
@@ -229,7 +229,7 @@
     let gx2;
 
     $(document).ready(function() {
-        pApp2.ResizeGrid(275, 200);
+        pApp2.ResizeGrid(275, 350);
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
         gx2 = new HDGrid(gridDiv2, columns2);
         pApp2.BindSearchEnter();
@@ -285,31 +285,46 @@
   new Chart(ctx, {
     type: 'bar',
     data: {
+      labels: [
+            all_date[0],
+            all_date[1],
+            all_date[2],
+            all_date[3],
+            all_date[4],
+            all_date[5],
+            all_date[6],
+            all_date[7],
+      ],
       datasets: [{
-        label: '매출액', 
+        label: '매출액',
         data: [
-            {x: all_date[0], y: chartData[7].sum_amt},
-            {x: all_date[1], y: chartData[8].sum_amt},
-            {x: all_date[2], y: chartData[9].sum_amt},
-            {x: all_date[3], y: chartData[10].sum_amt},
-            {x: all_date[4], y: chartData[11].sum_amt},
-            {x: all_date[5], y: chartData[12].sum_amt},
-            {x: all_date[6], y: chartData[13].sum_amt},
-            {x: all_date[7], y: chartData[14].sum_amt},
+            chartData[7].sum_amt,
+            chartData[8].sum_amt,
+            chartData[9].sum_amt,
+            chartData[10].sum_amt,
+            chartData[11].sum_amt,
+            chartData[12].sum_amt,
+            chartData[13].sum_amt,
+            chartData[14].sum_amt,
         ],
-        borderWidth: 3
+        borderColor: '#36A2EB',
+        backgroundColor: '#9BD0F5',
+        borderWidth: 1
       }]
     },
     options: {
-      responsive: true,
-      legend:{
-        position : 'right'
-      },
-      scales: {
-        y: {
-          beginAtZero: true
+        // responsive: true,
+        animation: {
+            easing:'easeInOutQuad',
+        }, 
+        legend:{
+            position : 'top'
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
         }
-      }
     }
   });
 
