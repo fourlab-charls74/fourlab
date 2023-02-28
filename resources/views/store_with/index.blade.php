@@ -6,105 +6,93 @@
     왼쪽 하단 - 공지사항
     오른쪽 하단 - 알리미
 -->
-
-<style>
-    .card-container { height: calc(100vh - 110px); }
-    @media (max-width: 991px) {
-        .card-container {
-            height: 100%;
-        }
-    }
-</style>
-   <div class="card-container">
-       <div class="row pb-3 h-50">
-           <div class="col-lg-6 h-100">
-               <div class="card shadow mb-3 h-100">
-                   <div class="card-body">
-                       <ul class="nav nav-tabs" id="myTab" role="tablist">
-                           <li class="nav-item" role="presentation">
-                               <a class="nav-link" id="bar-tab" data-toggle="tab" href="#bar" role="tab" aria-controls="bar" aria-selected="false">일별 매출</a>
-                           </li>
-                           <li class="nav-item" role="presentation">
-                               <a class="nav-link" id="pie-tab" data-toggle="tab" href="#pie" role="tab" aria-controls="pie" aria-selected="false">매장별 매출</a>
-                           </li>
-                       </ul>
-                       <div class="tab-content" id="myTabContent">
-                           <div class="tab-pane fade" id="bar" role="tabpanel" aria-labelledby="bar-tab">
-                               <div class="card shadow mb-1">
-                                   <div style="margin-top:24px; margin-right:20px">
-                                       <a href="#" id="msg_del_btn" onclick="sale_amt_days()"class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">더보기</a>
-                                   </div>
-                                   <canvas id="myChart"></canvas>
-                               </div>
-                           </div>
-                           <div class="tab-pane fade" id="pie" role="tabpanel" aria-labelledby="pie-tab">
-                               <div class="card-body mt-1">
-                                   <a href="#" id="msg_del_btn" onclick="sale_amt_store()"class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">더보기</a>
-                                   <canvas id="myChart2" ></canvas>
-                               </div>
-                           </div>
-                       </div>
-                   </div>
-               </div>
-            </div>
-            <div class="col-lg-6 h-100" >
-                <div class="card shadow-none mb-3 h-100">
-                    <div style="text-align:center; width:100%; height:100%">
-    
-                        <h5>자주 사용하는 메뉴 COMMING SOON</h5>
-                    
+   
+    <div class="row">
+        <div class="col-lg-6" >
+            <div class="card shadow mb-3">
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="bar-tab" data-toggle="tab" href="#bar" role="tab" aria-controls="bar" aria-selected="false">일별 매출</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="pie-tab" data-toggle="tab" href="#pie" role="tab" aria-controls="pie" aria-selected="false">매장별 매출</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="myTabContent" style="height:100%">
+                        <div class="tab-pane fade" id="bar" role="tabpanel" aria-labelledby="bar-tab">
+                            <div class="card shadow mb-1">
+                                <div style="margin-top:24px; margin-right:20px">
+                                    <a href="#" id="msg_del_btn" onclick="sale_amt_days()"class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">더보기</a>
+                                </div>
+                                <canvas id="myChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="pie" role="tabpanel" aria-labelledby="pie-tab">
+                            <div class="card-body mt-1">
+                                <a href="#" id="msg_del_btn" onclick="sale_amt_store()"class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">더보기</a>
+                                <canvas id="myChart2" ></canvas>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row h-50">
-           <div class="col-lg-6 h-100">
-               <div class="card shadow-none mb-3 h-100">
-                   <div class="filter_wrap" style="width: 100%; height:100%;">
-                       <div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
-                           <div class="card-body shadow">
-                               <div class="card-title">
-                                   <div class="filter_wrap">
-                                       <div class="fl_box">
-                                           <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
-                                       </div>
-                                       <a href="#" id="msg_del_btn" onclick="notice()"class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">더보기</a>
-                                       <div class="fr_box">
-   
-                                       </div>
-                                   </div>
-                               </div>
-                               <div class="table-responsive">
-                                   <div id="div-gd" style="height:auto;width:100%;" class="ag-theme-balham"></div>
-                               </div>
-                           </div>
-                       </div>
-                   </div>
-               </div>
-           </div>
-           <div class="col-lg-6 h-100" >
-               <div class="card shadow-none mb-3 h-100">
-                   <div class="filter_wrap" style="width: 100%; height:100%;">
-                       <div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
-                           <div class="card-body shadow h-100">
-                               <div class="card-title">
-                                   <div class="filter_wrap">
-                                       <div class="fl_box">
-                                           <h6 class="m-0 font-weight-bold">총 <span id="gd-alarm-total" class="text-primary">0</span> 건</h6>
-                                       </div>
-                                       <a href="#" id="msg_del_btn" onclick="msg()"class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">더보기</a>
-                                   </div>
-                               </div>
-                               <div class="table-responsive">
-                                   <div id="div-gd-alarm" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
-                               </div>
-                           </div>
-                       </div>
-                   </div>
-               </div>
-           </div>
-       </div>
-   </div>
+        <div class="col-lg-6" >
+            <div class="card shadow-none mb-3">
+                <div style="text-align:center; width:100%; height:100%">
+
+                    <h5>자주 사용하는 메뉴 COMMING SOON</h5>
+                
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-none mb-3">
+                    <div class="filter_wrap" style="width: 100%; height:100%;">
+                        <div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
+                            <div class="card-body shadow">
+                                <div class="card-title">
+                                    <div class="filter_wrap">
+                                        <div class="fl_box">
+                                            <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
+                                        </div>
+                                        <a href="#" id="msg_del_btn" onclick="notice()"class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">더보기</a>
+                                        <div class="fr_box">
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <div id="div-gd" style="height:100%;width:auto;" class="ag-theme-balham"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+        <div class="col-lg-6" >
+            <div class="card shadow-none mb-3">
+                <div class="filter_wrap" style="width: 100%; height:100%;">
+                    <div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
+                        <div class="card-body shadow">
+                            <div class="card-title">
+                                <div class="filter_wrap">
+                                    <div class="fl_box">
+                                        <h6 class="m-0 font-weight-bold">총 <span id="gd-alarm-total" class="text-primary">0</span> 건</h6>
+                                    </div>
+                                    <a href="#" id="msg_del_btn" onclick="msg()"class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">더보기</a>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <div id="div-gd-alarm" style="height:100%;width:auto;" class="ag-theme-balham"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 <!-- 공지사항 -->
 <script language="javascript">
@@ -141,6 +129,7 @@
         {headerName: "글번호", field: "ns_cd", hide:true },
         {width: 'auto'}
     ];
+
 </script>
 
 <script type="text/javascript" charset="utf-8">
@@ -148,16 +137,19 @@
         gridId:"#div-gd",
     });
     let gx;
+
     $(document).ready(function() {
-        pApp.ResizeGrid(275, 350);
+        pApp.ResizeGrid(790);
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
         pApp.BindSearchEnter();
         Search();
     });
+
     function Search() {
         gx.Request('/store/main');
     }
+
 </script>
 
 
@@ -178,6 +170,7 @@
         {headerName: "알림 번호", field: "msg_cd", hide: true},        
         {width: 'auto'}
     ];                              
+
 </script>
 
 <script type="text/javascript" charset="utf-8">
@@ -185,13 +178,15 @@
         gridId:"#div-gd-alarm",
     });
     let gx2;
+
     $(document).ready(function() {
-        pApp2.ResizeGrid(275, 350);
+        pApp2.ResizeGrid(790);
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
         gx2 = new HDGrid(gridDiv2, columns2);
         pApp2.BindSearchEnter();
         Search_alarm();
     });
+
     function Search_alarm() {
         gx2.Request('/store/main_alarm');
     }
@@ -202,16 +197,20 @@
     $(document).ready(function(){
         $('#bar-tab').trigger("click");
     }); 
+
      function showContent(msg_cd) {
         const url = '/store/stock/stk32/showContent?msg_type=receive&msg_cd=' + msg_cd;
         const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=615");
     }
+
     function notice() {
         window.location.href = "/store/stock/stk31";
     }
+
     function msg() {
         window.location.href = "/store/stock/stk32";
     }
+
     function sale_amt_store() {
         window.location.href = "/store/sale/sal26";
     }
@@ -219,6 +218,8 @@
     function sale_amt_days() {
         window.location.href = "/store/sale/sal24";
     }
+
+
 </script>
 
 <!-- 차트 -->
@@ -226,10 +227,15 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
 <script>
   const ctx = document.getElementById('myChart');
+
+
   let edate = '{{$edate}}';
   let sdate = '{{$sdate}}';
+
   let chartData = <?= json_encode($result)?>;
+
   let all_date = getDatesStartToLast(sdate, edate);
+
   new Chart(ctx, {
     type: 'bar',
     data: {
@@ -293,6 +299,7 @@
         }
     }
   });
+
     function getDatesStartToLast(sdate, edate) {
         var regex = RegExp(/^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/);
         if(!(regex.test(sdate) && regex.test(edate))) return "Not Date Format";
@@ -304,8 +311,11 @@
         }
         return result;
     }
+
     let pieChartData = <?= json_encode($pieResult)?>;
+
     const ctx2 = document.getElementById('myChart2');
+
     new Chart(ctx2, {
         type: 'pie',
         data: {
