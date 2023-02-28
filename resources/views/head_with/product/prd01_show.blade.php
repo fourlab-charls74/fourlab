@@ -68,8 +68,11 @@
     .ag-theme-balham .ag-rtl .ag-has-focus .locked-cell.ag-cell-focus:not(.ag-cell-range-selected) {
         border: 1px solid transparent;
     }
-    
 
+    table tr th {
+        background : #f5f5f5;
+    }
+    
 </style>
 
     <script type="text/javascript" src="/handle/editor/editor.js"></script>
@@ -180,7 +183,7 @@
                             <div class="tab-pane fade" id="usage" role="tabpanel" aria-labelledby="usage-tab">
                                 <div class="card shadow mb-1">
                                     <ul class="row category_list">
-                                        <li class="col-lg-6 mt-2 mt-lg-0">
+                                        <li class="col-lg-12 mt-2 mt-lg-0">
                                             <dl>
                                                 <dt class="d-flex align-items-center justify-content-between">
                                                     <div>
@@ -217,7 +220,7 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-lg-12">
-                                <div class="table-box-ty2 mobile">
+                                <div class="table-box mobile">
                                     @if( $type == '' )
                                     <div class="img_box cum_slider_cont p-4">
                                         <img src="{{@$goods_info->img}}" alt="{{@$goods_info->goods_nm}}">
@@ -253,16 +256,16 @@
                                 </div>
                             </div>
                             <div class="col-12 mt-4 mt-lg-4">
-                                <div class="table-box-ty2 mobile">
+                                <div class="table-box mobile">
                                     <table class="table incont table-bordered" width="100%" cellspacing="0">
                                         <tr>
-                                            <th class="required">상품명</th>
+                                            <th class="required" id="th">상품명</th>
                                             <td>
                                                 <div class="form-inline">
                                                     <input type="text" class="form-control form-control-sm search-all w-100" name="goods_nm" id="goods_nm" maxlength="100" value="{{ @$goods_info->goods_nm  }}" />
                                                 </div>
                                             </td>
-                                            <th>상품명(영문)</th>
+                                            <th id="th" >상품명(영문)</th>
                                             <td>
                                                 <div class="input_box">
                                                     <input type="text" class="form-control form-control-sm search-all w-100" name="goods_nm_eng" id="goods_nm_eng" maxlength="100" value="{{ @$goods_info->goods_nm_eng  }}" />
@@ -270,14 +273,14 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th>상단 홍보글</th>
+                                            <th id="th">상단 홍보글</th>
                                             <td>
                                                 <div class="input_box">
                                                     <input type="text" name="head_desc" class="form-control form-control-sm search-all" value="{{ @$goods_info->head_desc }}">
                                                 </div>
                                             </td>
-                                            <th>하단 홍보글</th>
-                                            <td>
+                                            <th >하단 홍보글</th>
+                                            <td >
                                                 <div class="input_box">
                                                     <input type="text" class="form-control form-control-sm search-all" name="ad_desc" id="ad_desc" value="{{ @$goods_info->ad_desc }}"/>
                                                 </div>

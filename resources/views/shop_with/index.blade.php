@@ -170,6 +170,8 @@
         },
         {headerName: "공지매장", field: "store_nm", width: 340, cellClass: 'hd-grid-code',
             cellRenderer: function(params) {
+
+                console.log(params.data);
                 return params.data.stores;
             }
         },

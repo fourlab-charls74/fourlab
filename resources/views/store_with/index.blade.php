@@ -141,7 +141,6 @@
         {headerName: "글번호", field: "ns_cd", hide:true },
         {width: 'auto'}
     ];
-
 </script>
 
 <script type="text/javascript" charset="utf-8">
@@ -149,7 +148,6 @@
         gridId:"#div-gd",
     });
     let gx;
-
     $(document).ready(function() {
         pApp.ResizeGrid(275, 350);
         let gridDiv = document.querySelector(pApp.options.gridId);
@@ -157,11 +155,9 @@
         pApp.BindSearchEnter();
         Search();
     });
-
     function Search() {
         gx.Request('/store/main');
     }
-
 </script>
 
 
@@ -182,7 +178,6 @@
         {headerName: "알림 번호", field: "msg_cd", hide: true},        
         {width: 'auto'}
     ];                              
-
 </script>
 
 <script type="text/javascript" charset="utf-8">
@@ -190,7 +185,6 @@
         gridId:"#div-gd-alarm",
     });
     let gx2;
-
     $(document).ready(function() {
         pApp2.ResizeGrid(275, 350);
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
@@ -198,7 +192,6 @@
         pApp2.BindSearchEnter();
         Search_alarm();
     });
-
     function Search_alarm() {
         gx2.Request('/store/main_alarm');
     }
@@ -209,20 +202,16 @@
     $(document).ready(function(){
         $('#bar-tab').trigger("click");
     }); 
-
      function showContent(msg_cd) {
         const url = '/store/stock/stk32/showContent?msg_type=receive&msg_cd=' + msg_cd;
         const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=615");
     }
-
     function notice() {
         window.location.href = "/store/stock/stk31";
     }
-
     function msg() {
         window.location.href = "/store/stock/stk32";
     }
-
     function sale_amt_store() {
         window.location.href = "/store/sale/sal26";
     }
@@ -230,8 +219,6 @@
     function sale_amt_days() {
         window.location.href = "/store/sale/sal24";
     }
-
-
 </script>
 
 <!-- 차트 -->
@@ -239,15 +226,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
 <script>
   const ctx = document.getElementById('myChart');
-
-
   let edate = '{{$edate}}';
   let sdate = '{{$sdate}}';
-
   let chartData = <?= json_encode($result)?>;
-
   let all_date = getDatesStartToLast(sdate, edate);
-
   new Chart(ctx, {
     type: 'bar',
     data: {
@@ -311,7 +293,6 @@
         }
     }
   });
-
     function getDatesStartToLast(sdate, edate) {
         var regex = RegExp(/^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/);
         if(!(regex.test(sdate) && regex.test(edate))) return "Not Date Format";
@@ -323,11 +304,8 @@
         }
         return result;
     }
-
     let pieChartData = <?= json_encode($pieResult)?>;
-
     const ctx2 = document.getElementById('myChart2');
-
     new Chart(ctx2, {
         type: 'pie',
         data: {
