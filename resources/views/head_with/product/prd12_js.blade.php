@@ -133,7 +133,8 @@
             if(d_cat_cd !== ''){
                 $('#d_cat_cd').val(d_cat_cd);
             }
-            let data = 'd_cat_cd=' + '{{ @$plan->p_no }}';
+            //let data = 'd_cat_cd=' + '{{ @$plan->p_no }}';
+            let data = 'd_cat_cd=' + $("#d_cat_cd").val();
             gx.Request('/head/product/prd12/' + code + '/search', data);
 
             CategorySearch();
