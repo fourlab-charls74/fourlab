@@ -178,7 +178,7 @@
     $(document).ready(function() {
 
         $("#apply").click(function() {
-            console.log('upload');
+            // console.log('upload');
             var file_data = $('#file').prop('files');
             uploadFile(file_data);
         });

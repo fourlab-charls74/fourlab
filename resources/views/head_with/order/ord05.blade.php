@@ -506,17 +506,17 @@
 		{
 			field: "ord_date",
 			headerName: "주문일시",
-			width: 130,
+			width: 120,
 		},
 		{
 			field: "pay_date",
 			headerName: "입금일시",
-			width: 130,
+			width: 120,
 		},
 		{
 			field: "dlv_end_date",
 			headerName: "배송일시",
-			width: 130,
+			width: 120,
 		},
 
 		{
