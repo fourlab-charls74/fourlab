@@ -23,6 +23,13 @@ class Shop
             return redirect('/shop/login');
         } else {
             if ($path != "/shop/login" && strpos($path, "shop/api/sabangnet") === false) {
+
+                //매장용 아이디가 아닐때 접근 못하게 세팅
+                if(Auth::guard('head')->user()->store_cd == ""){
+                    return redirect('/shop/login');
+                    exit;
+                }
+
                 $id = Auth::guard('head')->user()->id;
                 $name = Auth::guard('head')->user()->name;
 

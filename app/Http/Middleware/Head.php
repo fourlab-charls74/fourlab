@@ -28,6 +28,7 @@ class Head
         if($ssm_key != '' && $ssm_pwd != '') {
             $user = \App\Models\Head::where('id', '=', $ssm_key)
                 ->where('use_yn', '=', 'Y')
+                ->where('grade','!=','P')
                 ->first();
 
             if ($user) {
@@ -36,15 +37,22 @@ class Head
             }
         }
 
-
         $path = $request->getPathInfo();
+
         if($is_loin === false && ($path != "/head/login" && strpos($path, "/head/sign-up")  === false && strpos($path, "head/api/sabangnet")  === false) && Auth::guard('head')->check() == false){
             return redirect('/head/login');
         } else {
 
 			if( $path != "/head/login" && strpos($path, "/head/sign-up")  === false && strpos($path, "head/api/sabangnet")  === false )
 			{
-				$id		=  Auth::guard('head')->user()->id;
+
+                //매장용 아이디 일때 접근 못하게 세팅
+                if(Auth::guard('head')->user()->store_cd != ""){
+                    return redirect('/head/login');
+                    exit;
+                }
+
+                $id		=  Auth::guard('head')->user()->id;
 				$name	=  Auth::guard('head')->user()->name;
 
                 $action = $request->route()->action;

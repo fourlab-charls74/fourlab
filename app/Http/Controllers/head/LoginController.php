@@ -35,6 +35,7 @@ class LoginController extends Controller
             $password =  $request->password;
             $user = Head::where('id','=',$request->email)
                 ->where('use_yn','=','Y')
+                ->where('grade','!=','P')
                 ->where('passwd','=',DB::raw("CONCAT('*', UPPER(SHA1(UNHEX(SHA1('$password')))))"))
                 ->first();
             if($user){
@@ -50,7 +51,8 @@ class LoginController extends Controller
                         'visit_date' => DB::raw('now()')
                     ]);
 
-                return redirect('/head/order/ord01');
+                //return redirect('/head/order/ord01');
+                return redirect('/head/dashboard');
             } else {
                 return $this->sendFailedLoginResponse($request, 1);
                 //return redirect('/head/login');
@@ -69,6 +71,7 @@ class LoginController extends Controller
                 $password =  $request->password;
                 $user = Head::where('id','=',$request->email)
                         ->where('confirm_yn','=','N')
+                        ->where('grade','!=','P')
                         ->where('passwd','=',DB::raw("CONCAT('*', UPPER(SHA1(UNHEX(SHA1('$password')))))"))
                         ->first();
                 if($user){
