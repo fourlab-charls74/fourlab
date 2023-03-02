@@ -801,7 +801,7 @@ SearchCompany.prototype.SetGrid = function(divId) {
         {field:"com_type_nm" , headerName:"업체구분", width:80},
         {field:"com_id" , headerName:"업체코드", width:80},
         {field:"com_nm" , headerName: this.isWonboo === true ? "원부자재업체명" : "업체명", width:100},
-        {field:"biz_num" , headerName:"사업자번호", width:90},
+        {field:"biz_num" , headerName:"사업자번호", width:115},
         {field:"md_nm" , headerName:"담당MD", width:70, hide:true},
         {field:"com_type", headerName:"업체타입", hide:true},
         {field:"baesong_kind", headerName:"배송업체", hide:true},
