@@ -185,6 +185,7 @@ class stk30Controller extends Controller
             'storages'      => $storages,
             'sr_reasons'    => SLib::getCodes("SR_REASON"),
             'sr'            => $sr,
+            'sr_state'      => $sr->sr_state??'',
             'new_sr_cd'     => $new_sr_cd,
         ];
         return view(Config::get('shop.store.view') . '/stock/stk30_show', $values);
@@ -219,7 +220,10 @@ class stk30Controller extends Controller
                 ifnull(pss.wqty, 0) as store_wqty, 
                 srp.return_qty as qty,
                 (srp.return_qty * srp.return_price) as total_return_price,
-                true as isEditable
+                true as isEditable,
+                srp.fixed_return_price as fixed_return_price,
+                srp.fixed_return_qty as fixed_return_qty,
+                srp.fixed_comment as fixed_comment
             from store_return_product srp
                 inner join product_code pc on pc.prd_cd = srp.prd_cd
                 inner join goods g on g.goods_no = pc.goods_no
@@ -287,6 +291,8 @@ class stk30Controller extends Controller
                         'price' => $product['price'], // 판매가
                         'return_price' => $product['return_price'], // 반품단가
                         'return_qty' => $product['return_qty'], // 반품수량
+                        'fixed_return_qty' => $product['return_qty'],
+                        'fixed_return_price' => $product['return_price'],
                         'rt' => now(),
                         'admin_id' => $admin_id,
                     ]);
@@ -312,7 +318,7 @@ class stk30Controller extends Controller
         $sr_reason = $request->input("sr_reason", "");
         $comment = $request->input("comment", "");
         $products = $request->input("products", []);
-
+       
         try {
             DB::beginTransaction();
 
@@ -331,6 +337,9 @@ class stk30Controller extends Controller
                     ->update([
                         'return_price' => $product['return_price'], // 반품단가
                         'return_qty' => $product['return_qty'], // 반품수량
+                        'fixed_return_price' => $product['fixed_return_price'],
+                        'fixed_return_qty' => $product['fixed_return_qty'],
+                        'fixed_comment' => $product['fixed_comment']??'',
                         'ut' => now(),
                         'admin_id' => $admin_id,
                     ]);
@@ -355,6 +364,8 @@ class stk30Controller extends Controller
         $admin_id = Auth('head')->user()->id;
         $admin_nm = Auth('head')->user()->name;
         $data = $request->input("data", []);
+        $store_cd = $request->input('store_cd');
+        $storage_cd = $request->input('storage_cd');
 
         try {
             DB::beginTransaction();
@@ -375,6 +386,7 @@ class stk30Controller extends Controller
                             sr.sr_prd_cd,
                             sr.prd_cd,
                             sr.return_qty,
+                            sr.fixed_return_qty,
                             pc.goods_opt,
                             g.goods_no,
                             g.price,
@@ -392,10 +404,10 @@ class stk30Controller extends Controller
                             // 매장 재고,실재고 차감
                             DB::table('product_stock_store')
                                 ->where('prd_cd', '=', $row->prd_cd)
-                                ->where('store_cd', '=', $d['store_cd']) 
+                                ->where('store_cd', '=', $store_cd) 
                                 ->update([
-                                    'qty' => DB::raw('qty - ' . ($row->return_qty ?? 0)),
-                                    'wqty' => DB::raw('wqty - ' . ($row->return_qty ?? 0)),
+                                    'qty' => DB::raw('qty - ' . ($row->fixed_return_qty ?? 0)),
+                                    'wqty' => DB::raw('wqty - ' . ($row->fixed_return_qty ?? 0)),
                                     'ut' => now(),
                                 ]);
 
@@ -405,12 +417,12 @@ class stk30Controller extends Controller
                                     'goods_no' => $row->goods_no,
                                     'prd_cd' => $row->prd_cd,
                                     'goods_opt' => $row->goods_opt,
-                                    'location_cd' => $d['store_cd'],
+                                    'location_cd' => $store_cd,
                                     'location_type' => 'STORE',
                                     'type' => PRODUCT_STOCK_TYPE_RETURN, // 재고분류 : 반품(출고)
                                     'price' => $row->price,
                                     'wonga' => $row->wonga,
-                                    'qty' => ($row->return_qty ?? 0) * -1,
+                                    'qty' => ($row->fixed_return_qty ?? 0) * -1,
                                     'stock_state_date' => date('Ymd'),
                                     'ord_opt_no' => '',
                                     'comment' => '창고반품',
@@ -422,9 +434,9 @@ class stk30Controller extends Controller
                             // 창고 재고 플러스
                             DB::table('product_stock_storage')
                                 ->where('prd_cd', '=', $row->prd_cd)
-                                ->where('storage_cd', '=', $d['storage_cd']) 
+                                ->where('storage_cd', '=', $storage_cd) 
                                 ->update([
-                                    'wqty' => DB::raw('wqty + ' . ($row->return_qty ?? 0)),
+                                    'wqty' => DB::raw('wqty + ' . ($row->fixed_return_qty ?? 0)),
                                     'ut' => now(),
                                 ]);
                             
@@ -434,12 +446,12 @@ class stk30Controller extends Controller
                                     'goods_no' => $row->goods_no,
                                     'prd_cd' => $row->prd_cd,
                                     'goods_opt' => $row->goods_opt,
-                                    'location_cd' => $d['storage_cd'],
+                                    'location_cd' => $storage_cd,
                                     'location_type' => 'STORAGE',
                                     'type' => PRODUCT_STOCK_TYPE_RETURN, // 재고분류 : 반품(입고)
                                     'price' => $row->price,
                                     'wonga' => $row->wonga,
-                                    'qty' => $row->return_qty ?? 0,
+                                    'qty' => $row->fixed_return_qty ?? 0,
                                     'stock_state_date' => date('Ymd'),
                                     'ord_opt_no' => '',
                                     'comment' => '매장반품',
@@ -452,7 +464,7 @@ class stk30Controller extends Controller
                             DB::table('product_stock')
                                 ->where('prd_cd', '=', $row->prd_cd)
                                 ->update([
-                                    'wqty' => DB::raw('wqty + ' . ($row->return_qty ?? 0)),
+                                    'wqty' => DB::raw('wqty + ' . ($row->fixed_return_qty ?? 0)),
                                     'ut' => now(),
                                 ]);
                         }
@@ -462,9 +474,148 @@ class stk30Controller extends Controller
                             // 창고 실재고 플러스
                             DB::table('product_stock_storage')
                                 ->where('prd_cd', '=', $row->prd_cd)
-                                ->where('storage_cd', '=', $d['storage_cd']) 
+                                ->where('storage_cd', '=', $storage_cd) 
                                 ->update([
-                                    'qty' => DB::raw('qty + ' . ($row->return_qty ?? 0)),
+                                    'qty' => DB::raw('qty + ' . ($row->fixed_return_qty ?? 0)),
+                                    'ut' => now(),
+                                ]);
+                        }
+                    }
+                }
+            }
+
+			DB::commit();
+            $code = 200;
+            $msg = "창고반품 상태변경이 정상적으로 완료되었습니다.";
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+        return response()->json(["code" => $code, "msg" => $msg]);
+    }
+
+
+    public function update_state(Request $request)
+    {
+        $new_state = $request->input("new_state", "");
+        $admin_id = Auth('head')->user()->id;
+        $admin_nm = Auth('head')->user()->name;
+        $data = $request->input("data", []);
+        $store_cd = $request->input('store_cd');
+        $storage_cd = $request->input('storage_cd');
+
+        try {
+            DB::beginTransaction();
+
+            if($new_state != "") {
+                foreach($data as $d) {
+                    DB::table('store_return')
+                        ->where('sr_cd', '=', $d['sr_cd'])
+                        ->update([
+                            'sr_state' => $new_state,
+                            'ut' => now(),
+                            'admin_id' => $admin_id,
+                        ]);
+                    
+                    $sql = "
+                        select
+                            sr.sr_cd, 
+                            sr.sr_prd_cd,
+                            sr.prd_cd,
+                            sr.return_qty,
+                            sr.fixed_return_qty,
+                            pc.goods_opt,
+                            g.goods_no,
+                            g.price,
+                            g.wonga
+                        from store_return_product sr
+                            inner join product_code pc on pc.prd_cd = sr.prd_cd
+                            inner join goods g on g.goods_no = pc.goods_no
+                        where sr.sr_cd = :sr_cd
+                    ";
+                    $rows = DB::select($sql, ["sr_cd" => $d['sr_cd']]);
+
+                    if($new_state == 30) {
+                        // 이동처리
+                        foreach($rows as $row) {
+                            // 매장 재고,실재고 차감
+                            DB::table('product_stock_store')
+                                ->where('prd_cd', '=', $row->prd_cd)
+                                ->where('store_cd', '=', $store_cd) 
+                                ->update([
+                                    'qty' => DB::raw('qty - ' . ($row->fixed_return_qty ?? 0)),
+                                    'wqty' => DB::raw('wqty - ' . ($row->fixed_return_qty ?? 0)),
+                                    'ut' => now(),
+                                ]);
+
+                            // 재고이력 등록
+                            DB::table('product_stock_hst')
+                                ->insert([
+                                    'goods_no' => $row->goods_no,
+                                    'prd_cd' => $row->prd_cd,
+                                    'goods_opt' => $row->goods_opt,
+                                    'location_cd' => $store_cd,
+                                    'location_type' => 'STORE',
+                                    'type' => PRODUCT_STOCK_TYPE_RETURN, // 재고분류 : 반품(출고)
+                                    'price' => $row->price,
+                                    'wonga' => $row->wonga,
+                                    'qty' => ($row->fixed_return_qty ?? 0) * -1,
+                                    'stock_state_date' => date('Ymd'),
+                                    'ord_opt_no' => '',
+                                    'comment' => '창고반품',
+                                    'rt' => now(),
+                                    'admin_id' => $admin_id,
+                                    'admin_nm' => $admin_nm,
+                                ]);
+
+                            // 창고 재고 플러스
+                            DB::table('product_stock_storage')
+                                ->where('prd_cd', '=', $row->prd_cd)
+                                ->where('storage_cd', '=', $storage_cd) 
+                                ->update([
+                                    'wqty' => DB::raw('wqty + ' . ($row->fixed_return_qty ?? 0)),
+                                    'ut' => now(),
+                                ]);
+                            
+                            // 재고이력 등록
+                            DB::table('product_stock_hst')
+                                ->insert([
+                                    'goods_no' => $row->goods_no,
+                                    'prd_cd' => $row->prd_cd,
+                                    'goods_opt' => $row->goods_opt,
+                                    'location_cd' => $storage_cd,
+                                    'location_type' => 'STORAGE',
+                                    'type' => PRODUCT_STOCK_TYPE_RETURN, // 재고분류 : 반품(입고)
+                                    'price' => $row->price,
+                                    'wonga' => $row->wonga,
+                                    'qty' => $row->fixed_return_qty ?? 0,
+                                    'stock_state_date' => date('Ymd'),
+                                    'ord_opt_no' => '',
+                                    'comment' => '매장반품',
+                                    'rt' => now(),
+                                    'admin_id' => $admin_id,
+                                    'admin_nm' => $admin_nm,
+                                ]);
+
+                            // product_stock -> 창고보유재고 플러스
+                            DB::table('product_stock')
+                                ->where('prd_cd', '=', $row->prd_cd)
+                                ->update([
+                                    'wqty' => DB::raw('wqty + ' . ($row->fixed_return_qty ?? 0)),
+                                    'ut' => now(),
+                                ]);
+                        }
+                    } else if($new_state == 40) {
+                        // 완료처리
+                        foreach($rows as $row) {
+                            // 창고 실재고 플러스
+                            DB::table('product_stock_storage')
+                                ->where('prd_cd', '=', $row->prd_cd)
+                                ->where('storage_cd', '=', $storage_cd) 
+                                ->update([
+                                    'qty' => DB::raw('qty + ' . ($row->fixed_return_qty ?? 0)),
                                     'ut' => now(),
                                 ]);
                         }

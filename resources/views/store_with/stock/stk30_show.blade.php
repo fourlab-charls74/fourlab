@@ -16,8 +16,15 @@
             </div>
         </div>
         <div class="d-flex">
-            @if(@$cmd == 'add' or @$sr->sr_state == '10')
+            @if(@$cmd == 'add')
+                <a href="javascript:void(0)" onclick="Save('{{ @$cmd }}')" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 반품요청</a>
+            @elseif (@$cmd == 'update')
             <a href="javascript:void(0)" onclick="Save('{{ @$cmd }}')" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
+                @if (@$sr_state == 30)
+                    <a href="javascript:void(0)" onclick="ChangeState2()" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 반품완료</a>
+                @elseif (@$sr_state == 10)
+                    <a href="javascript:void(0)" onclick="ChangeState()" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 반품처리중</a>
+                @endif
             @endif
             <a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i> 닫기</a>
         </div>
@@ -72,6 +79,7 @@
                                                         @foreach (@$storages as $storage)
                                                             <option value='{{ $storage->storage_cd }}' @if(@$cmd == 'update' && $sr->storage_cd == $storage->storage_cd) selected @endif>{{ $storage->storage_nm }}</option>
                                                         @endforeach
+                                                        <input type="hidden" id="storage" value="{{ @$sr->storage_cd }}" class="form-control form-control-sm w-100" readonly />
                                                     </select>
                                                 </div>
                                             </td>
@@ -96,6 +104,7 @@
                                                     </div>
                                                     @else
                                                     <input type="text" name="store_nm" id="store_nm" value="{{ @$sr->store_nm }}" class="form-control form-control-sm w-100" readonly />
+                                                    <input type="hidden" name="store_cd" id="store_cd" value="{{ @$sr->store_cd }}" class="form-control form-control-sm w-100" readonly />
                                                     @endif
                                                 </div>
                                             </td>
@@ -155,7 +164,7 @@
 <script language="javascript">
     const cmd = '{{ @$cmd }}';
     const now_state = '{{ @$sr->sr_state }}';
-    const pinnedRowData = [{ prd_cd: '합계', qty: 0, total_return_price: 0 }];
+    const pinnedRowData = [{ prd_cd: '합계', qty: 0, total_return_price: 0 , fixed_return_qty: 0, fixed_return_price : 0}];
 
     let columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"},
@@ -184,12 +193,26 @@
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
-        {field: "store_wqty", headerName: "매장보유재고", width: 90, type: 'currencyType'},
+        {field: "store_wqty", headerName: "매장보유재고", width: 90, type: 'currencyType',
+            cellStyle: (params) => params.data.store_wqty != 0 ? {"color" : "red"} : {}
+        },
         {field: "qty", headerName: "반품수량", width: 60, type: 'currencyType', 
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
         {field: "total_return_price", headerName: "반품금액", width: 80, type: 'currencyType'},
+        @if (@$sr_state == 10 || @$sr_state == 30 || @$sr_state == 40)
+        {field: "fixed_return_qty", headerName: "확정수량", width: 60, type: 'currencyType',
+            editable: (params) => checkIsEditable(params),
+            cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
+        },
+        {field: "fixed_return_price", headerName: "확정금액", width: 80, type: 'currencyType'},
+        {field: "fixed_comment", headerName: "확정메모", width: 300, 
+            editable: (params) => checkIsEditable(params),
+            cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
+        
+        }
+        @endif
     ];
 </script>
 
@@ -208,7 +231,7 @@
             },
             getRowNodeId: (data) => data.hasOwnProperty('count') ? data.count : "0", // 업데이터 및 제거를 위한 식별 ID를 count로 할당
             onCellValueChanged: (e) => {
-                if (e.column.colId === "return_price" || e.column.colId === "qty") {
+                if (e.column.colId === "return_price" || e.column.colId === "qty" || e.column.colId === "fixed_return_qty") {
                     if (isNaN(e.newValue) == true || e.newValue == "") {
                         alert("숫자만 입력가능합니다.");
                         gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
@@ -222,6 +245,16 @@
                         } else {
                             e.node.setSelected(true);
                             e.data.total_return_price = parseInt(e.data.qty) * parseInt(e.data.return_price);
+                            // e.data.fixed_return_price = parseInt(e.data.fixed_return_qty) * parseInt(e.data.return_price);
+                            gx.gridOptions.api.updateRowData({update: [e.data]});
+                            updatePinnedRow();
+                        }
+                        if (e.column.colId === "fixed_return_qty" && e.data.store_wqty < parseInt(e.data.fixed_return_qty)) {
+                            alert("해당 매장의 보유재고보다 많은 수량을 반품할 수 없습니다.");
+                            gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                        } else {
+                            e.node.setSelected(true);
+                            e.data.fixed_return_price = parseInt(e.data.fixed_return_qty) * parseInt(e.data.return_price);
                             gx.gridOptions.api.updateRowData({update: [e.data]});
                             updatePinnedRow();
                         }
@@ -264,8 +297,8 @@
             }
             if(rows.length < 1) return alert("반품등록할 상품을 선택해주세요.");
 
-            let zero_qtys = rows.filter(r => r.qty < 1);
-            if(zero_qtys.length > 0) return alert("반품수량이 0개인 항목이 존재합니다.");
+            // let zero_qtys = rows.filter(r => r.qty < 1);
+            // if(zero_qtys.length > 0) return alert("반품수량이 0개인 항목이 존재합니다.");
 
             let excess_qtys = rows.filter(r => (r.qty * 1) > (r.store_wqty * 1));
             if(excess_qtys.length > 0) return alert("해당 매장의 보유재고보다 많은 수량을 반품할 수 없습니다.");
@@ -309,7 +342,7 @@
                     sr_cd,
                     sr_reason,
                     comment,
-                    products: rows.map(r => ({ sr_prd_cd: r.sr_prd_cd, return_price: r.return_price, return_qty: r.qty })),
+                    products: rows.map(r => ({ sr_prd_cd: r.sr_prd_cd, return_price: r.return_price, return_qty: r.qty, fixed_return_price:r.fixed_return_price, fixed_return_qty:r.fixed_return_qty, fixed_comment:r.fixed_comment})),
                 },
             }).then(function (res) {
                 if(res.data.code === 200) {
@@ -385,6 +418,8 @@
             // qty: row.store_wqty > 0 ? 1 : 0, 
             // total_return_price: row.price * (row.store_wqty > 0 ? 1 : 0),
             total_return_price: 0,
+            fixed_return_qty : 0,
+            fixed_return_price: 0,
             isEditable: true,
             count: count + 1,
         };
@@ -398,18 +433,20 @@
     }
 
     const updatePinnedRow = () => { // 총 반품금액, 반품수량을 반영한 PinnedRow를 업데이트
-        let [ qty, total_return_price ] = [ 0, 0 ];
+        let [ qty, total_return_price, fixed_return_qty, fixed_return_price ] = [ 0, 0, 0, 0 ];
         const rows = gx.getRows();
         if (rows && Array.isArray(rows) && rows.length > 0) {
             rows.forEach((row, idx) => {
                 qty += parseFloat(row.qty);
                 total_return_price += parseFloat(row.total_return_price);
+                fixed_return_qty += parseFloat(row.fixed_return_qty);
+                fixed_return_price += parseFloat(row.fixed_return_price);
             });
         }
 
         let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
         gx.gridOptions.api.setPinnedTopRowData([
-            { ...pinnedRow.data, qty: qty, total_return_price: total_return_price }
+            { ...pinnedRow.data, qty: qty, total_return_price: total_return_price, fixed_return_price, fixed_return_qty}
         ]);
     };
 
@@ -422,6 +459,72 @@
         gx.gridOptions.api.applyTransaction({ update : rows });
         gx.gridOptions.api.forEachNode(node => node.setSelected(!is_zero)); 
         updatePinnedRow();
+    }
+
+    function ChangeState() {
+        let rows = gx.getSelectedRows();
+        if(rows.length < 1) return alert("상태변경할 항목을 선택해주세요.");
+
+        let store_cd = $('#store_cd').val();
+        let storage_cd = $('#storage').val();
+        let chg_state = 30;
+
+        if(!confirm("선택한 항목의 반품상태를 변경하시겠습니까?")) return;
+
+        axios({
+            url: '/store/stock/stk30/update-return-state',
+            method: 'put',
+            data: {
+                data: rows,
+                new_state: chg_state,
+                store_cd : store_cd,
+                storage_cd : storage_cd
+            },
+        }).then(function (res) {
+            if(res.data.code === 200) {
+                alert(res.data.msg);
+                window.close();
+                opener.Search();
+            } else {
+                console.log(res.data);
+                alert("상태변경 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
+    }
+
+    function ChangeState2() {
+        let rows = gx.getSelectedRows();
+        if(rows.length < 1) return alert("상태변경할 항목을 선택해주세요.");
+
+        let store_cd = $('#store_cd').val();
+        let storage_cd = $('#storage').val();
+        let chg_state = 40;
+
+        if(!confirm("선택한 항목의 반품상태를 변경하시겠습니까?")) return;
+
+        axios({
+            url: '/store/stock/stk30/update-state',
+            method: 'put',
+            data: {
+                data: rows,
+                new_state: chg_state,
+                store_cd : store_cd,
+                storage_cd : storage_cd
+            },
+        }).then(function (res) {
+            if(res.data.code === 200) {
+                alert(res.data.msg);
+                window.close();
+                opener.Search();
+            } else {
+                console.log(res.data);
+                alert("상태변경 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
     }
 </script>
 @stop
