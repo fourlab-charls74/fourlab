@@ -11,11 +11,11 @@ Login
 	@section('content')
 	<div class="login_inner">
 		<div class="cont">
-			<div class="right_cont" style="background-image:url('/theme/{{config('shop.theme')}}/images/login_bg.jpg');background-size:auto;">
+			<div class="right_cont" style="background-image:url('/theme/{{config('shop.theme')}}/images/login_bg3.jpg');background-size:auto;">
 				<dl>
 					<dt>
-{{--                        <span>Log in to</span>--}}
-{{--                        <strong>Handle</strong>--}}
+                        <img src="/theme/{{config('shop.theme')}}/images/login_logo_w.png" style="width:50%;position:absolute;top:50%;left:50%;transform:translate(-50%, -50%);"
+                             onError="this.src='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='">
 					</dt>
 					<dd>
 						등록한 매장 아이디로 로그인해 주세요.<br/>
