@@ -59,9 +59,9 @@
 												<th class="required">비밀번호</th>
 												<td colspan="3">
 													<div class="txt_box flax_box">
-														<input type="password" id="pwd" class="mwidth form-control form-control-sm" style="width:29%; display:inline" value="{{ $company['pwd'] }}">
+														<input type="password" id="pwd" name="pwd" class="mwidth form-control form-control-sm" style="width:29%; display:inline" value="{{ $company['pwd'] }}">
 														<div class="custom-control custom-checkbox form-check-box ml-1">
-															<input type="checkbox" id="change_pwd" class="custom-control-input" value="y">
+															<input type="checkbox" id="change_pwd" name="change_pwd" class="custom-control-input" value="Y">
 															<label class="custom-control-label" for="change_pwd">비밀번호 변경</label>
 														</div>
 													</div>
