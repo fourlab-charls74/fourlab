@@ -48,7 +48,7 @@ Login
 							{{ __('LOGIN') }}
 						</button>
 					</div>
-					<ul class="list_link">
+					{{--<!-- <ul class="list_link">
 						<li>
 							<a href="">회원가입</a>
 						</li>
@@ -58,7 +58,7 @@ Login
 						<li>
 							<a href="">비밀번호찾기</a>
 						</li>
-					</ul>
+					</ul> -->--}}
 
                     <!-- QA 기간동안의 임시 URL 정보 노출 시작 //-->
 					@if($_SERVER['SERVER_NAME'] != 'devel.fjallraven.co.kr')
