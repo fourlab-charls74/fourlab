@@ -350,22 +350,20 @@
         const file_type = $("#file_type").val(); // G(기본) / S(원부자재포함)
         let colDef = [];
 
-        if (file_type === 'S') {
-            colDef = gx.gridOptions.columnApi.columnController.columnDefs
-                .reduce((a,c) => {
-                    let result = {};
-                    if(['gifts', 'expandables'].includes(c.field) && c.children && c.children.length > 0) {
-                        result = c.children
-                            .filter(child => !['G_sum', 'S_sum'].includes(child.field))
-                            .reduce((aa, cc) => {
-                                let vv = {};
-                                vv[cc.field] = cc.headerName;
-                                return {...aa, ...vv};
-                            }, {});
-                    }
-                    return {...a, ...result};
-                }, {});
-        }
+        colDef = gx.gridOptions.columnApi.columnController.columnDefs
+            .reduce((a,c) => {
+                let result = {};
+                if(['gifts', 'expandables'].includes(c.field) && c.children && c.children.length > 0) {
+                    result = c.children
+                        .filter(child => !['G_sum', 'S_sum'].includes(child.field))
+                        .reduce((aa, cc) => {
+                            let vv = {};
+                            vv[cc.field] = cc.headerName;
+                            return {...aa, ...vv};
+                        }, {});
+                }
+                return {...a, ...result};
+            }, {});
 
 		axios({
             url: '/store/account/acc05/save',
@@ -588,13 +586,28 @@
 
         const rowsToUpdate = [];
         gx.gridOptions.api.forEachNode(function(node) {
-            let data = node.data;
-            const item = rows.filter(row => row.store_cd === data.store_cd);
-            if (item.length > 0) data = {...item[0], closed_yn: data.closed_yn};
+            let data = [];
+            let old_data = node.data;
+            const item = rows.filter(row => row.store_cd === old_data.store_cd);
+
+            if (item.length > 0) {
+                if (file_type === 'S') {
+                    Object.keys(old_data)
+                        .filter(key => ['G', 'S'].includes(key.split("")[0]) && key.split("_").slice(-1)[0] === "amt")
+                        .forEach(key => {
+                            delete old_data[key];
+                        });
+                }
+                data = { ...old_data, ...item[0], store_nm: old_data.store_nm };
+                data.total = Object.keys(data).reduce((a,c) => (c.split("_").slice(-1)[0] === "sum" ? (data[c] * 1) : 0) + a, 0);
+            }
+
             rowsToUpdate.push(data);
         });
+
         await gx.gridOptions.api.setRowData([]);
         await gx.gridOptions.api.applyTransaction({ add : rowsToUpdate });
+        await updatePinnedRow();
 	};
 
     const importExcel = async (url) => {

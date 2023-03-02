@@ -76,6 +76,7 @@ class acc05Controller extends Controller
                 group by e.ymonth, e.store_cd
             ) a
             group by a.ymonth
+            order by a.ymonth desc
         ";
         $result = DB::select($sql);
 
@@ -284,7 +285,7 @@ class acc05Controller extends Controller
                     $prd_cd = null;
                     $prd_nm = null;
                     if (in_array($type, ['S', 'G'])) {
-                        if ($file_type === 'S') $prd_nm = $cols[$key] ?? '';
+                        $prd_nm = $cols[$key] ?? '';
                         $prd_cd = explode('_', $key)[1];
                     }
 
