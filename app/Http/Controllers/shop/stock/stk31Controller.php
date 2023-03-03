@@ -174,13 +174,33 @@ class stk31Controller extends Controller
         $store_cd	= $request->input("store_cd");
 
         $sql = "
-            select ns_cd
-                from notice_store_detail
-            where store_cd = :store_cd and check_yn = 'N' and rt >= date_add(now(), interval -1 month)
-            order by rt desc
+            select
+                aa.ns_cd
+            from
+            (
+                select
+                    ns.ns_cd
+                from notice_store ns
+                inner join notice_store_detail nsd on ns.ns_cd = nsd.ns_cd and nsd.check_yn = 'N'
+                where
+                    ns.all_store_yn = 'N'
+                    and ns.rt >= date_add(now(), interval -1 month)
+                    and nsd.store_cd = '$store_cd'
+                    
+                union all
+                select
+                    ns.ns_cd
+                from notice_store ns
+                left outer join notice_store_detail nsd on ns.ns_cd = nsd.ns_cd and nsd.check_yn = 'Y' and nsd.store_cd = '$store_cd'
+                where
+                    ns.all_store_yn = 'Y'
+                    and ns.rt >= date_add(now(), interval -1 month)
+                    and nsd.ns_cd is null
+            )aa
+            order by aa.ns_cd
         ";
 
-        $nos = DB::select($sql, ['store_cd'=>$store_cd]);
+        $nos = DB::select($sql);
 
         return response()->json([
 			"code" => 200,
@@ -203,17 +223,36 @@ class stk31Controller extends Controller
 
         $sql = "
             select
+                count(*) as cnt,
+                s.ns_cd as ns_cd,
+                s.all_store_yn,
+                d.ns_cd as ns_cd2,
                 d.check_yn,
-                d.ns_cd,
-                s.ns_cd,
                 d.store_cd,
                 store.store_nm
             from notice_store s 
                 left outer join notice_store_detail d on s.ns_cd = d.ns_cd
                 left outer join store on store.store_cd = d.store_cd
-            where s.ns_cd = '$no' and d.store_cd = '$store_cd'
+            where s.ns_cd = '$no' 
+                and ( d.store_cd = '$store_cd' or d.store_cd is null )
         ";
+        
         $storeCodes = DB::selectOne($sql);
+
+        if($storeCodes->cnt == 0) {
+            $sql = "
+                select
+                    s.ns_cd as ns_cd,
+                    if( d.store_cd = 'L0025', d.store_cd, '' ) as store_cd
+                from notice_store s 
+                    left outer join notice_store_detail d on s.ns_cd = d.ns_cd
+                    left outer join store on store.store_cd = d.store_cd
+                where s.ns_cd = '$no' 
+                    and ( d.store_cd <> '$store_cd' or s.all_store_yn = 'Y' )
+            ";
+            
+            $storeCodes = DB::selectOne($sql);
+        }
 
         $values = [
             'no' => $no,
@@ -229,20 +268,42 @@ class stk31Controller extends Controller
         $ns_cd = $request->input('ns_cd');
         $store_cd = $request->input('store_cd');
 
-        $notice_store_detail = [
-            'check_yn' => 'Y',
-            'check_date' => now()
-        ];
+        if($store_cd == '') {
+            $sql = "
+                select 
+                    rt
+                from notice_store
+                where ns_cd = :ns_cd
+            ";
+            $rt = DB::selectOne($sql, ['ns_cd' => $ns_cd]);
+
+            $notice_store_detail = [
+                'ns_cd' => $ns_cd,
+                'store_cd' => Auth('head')->user()->store_cd,
+                'check_yn' => 'Y',
+                'check_date' => now(),
+                'rt' => $rt->rt
+            ];
+        } else {
+            $notice_store_detail = [
+                'check_yn' => 'Y',
+                'check_date' => now()
+            ];
+        }
 
         try {
             DB::beginTransaction();
-
-            DB::table('notice_store_detail')
-                ->where([
-                    ['ns_cd', '=', $ns_cd],
-                    ['store_cd', '=', $store_cd]
-                ])
-                ->update($notice_store_detail);
+            if($store_cd == '') {
+                DB::table('notice_store_detail')
+                    ->insert($notice_store_detail);
+            } else {
+                DB::table('notice_store_detail')
+                    ->where([
+                        ['ns_cd', '=', $ns_cd],
+                        ['store_cd', '=', $store_cd]
+                    ])
+                    ->update($notice_store_detail);
+            }
 
             DB::commit();
             $code = 200;
