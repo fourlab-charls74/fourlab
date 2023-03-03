@@ -7,7 +7,17 @@
             @if(isset($lnb['sub']))
             <ul>
                 @foreach ($lnb['sub'] as $lnb_sub)
-                <li><a href="{{ $lnb_sub['action'] }}"@if($lnb_sub['target']) target="{{ $lnb_sub['target'] }}" @endif>{{ $lnb_sub['kor_nm'] }}</a></li>
+                <li><a href="{{ $lnb_sub['action'] }}"@if($lnb_sub['target']) target="{{ $lnb_sub['target'] }}" @endif>
+                    @switch($lnb_sub['state'])
+                        @case(2)
+                            (개)
+                            @break
+                        @case(4)
+                            (테)
+                            @break
+                    @endswitch
+                {{ $lnb_sub['kor_nm'] }}
+                </a></li>
                 @endforeach
             </ul>
             @endif
