@@ -93,7 +93,7 @@ var columns = [
         }
     },
     {field:"user_group_type" , headerName:"구분"},
-    {field:"dc_ratio" , headerName:"할인율(%)", width:80},
+    {field:"dc_ratio" , headerName:"할인율(%)", width:80, cellStyle:{"text-align" : "right"}},
     {
         field:"dc_ext_goods" , 
         headerName:"할인율제외상품",
@@ -102,11 +102,35 @@ var columns = [
         }, 
         type: 'currencyType'
     },
-    {field:"point_ratio", headerName:"추가적립율(%)", width:100},
-    {field:"is_wholesale" , headerName:"도매여부", width:100},
-    {field:"is_point_use" , headerName:"적립금사용"},
-    {field:"is_point_save" , headerName:"적립금지급"},
-    {field:"is_coupon_use" , headerName:"쿠폰사용"},
+    {field:"point_ratio", headerName:"추가적립율(%)", width:100, cellStyle:{"text-align" : "right"}},
+    {field:"is_wholesale" , headerName:"도매여부", width:80, cellStyle:{"text-align" : "center"},
+        cellRenderer: function(params) {
+            if(params.value == 'Y') return "해당"
+            else if(params.value == 'N') return "해당없음"
+            else return params.value
+        }
+    },
+    {field:"is_point_use" , headerName:"적립금사용", cellStyle:{"text-align" : "center"},
+        cellRenderer: function(params) {
+            if(params.value == 'Y') return "사용가능"
+            else if(params.value == 'N') return "사용불가능"
+            else return params.value
+        }
+    },
+    {field:"is_point_save" , headerName:"적립금지급", cellStyle:{"text-align" : "center"},
+        cellRenderer: function(params) {
+            if(params.value == 'Y') return "지급가능"
+            else if(params.value == 'N') return "지급불가능"
+            else return params.value
+        }
+    },
+    {field:"is_coupon_use" , headerName:"쿠폰사용", cellStyle:{"text-align" : "center"},
+        cellRenderer: function(params) {
+            if(params.value == 'Y') return "사용가능"
+            else if(params.value == 'N') return "사용불가능"
+            else return params.value
+        }
+    },
     {field:"rt" , headerName:"등록일시", width:135},
     {field:"ut" , headerName:"수정일시", width:135},
     { width: "auto" }

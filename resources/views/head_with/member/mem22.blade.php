@@ -106,16 +106,16 @@
 								 <div class="form-inline-inner input_box" style="width:47%;">
 									<select  name="best_yn" class="form-control form-control-sm">
 										<option value="">전체</option>
-										<option value="Y">Y</option>
-										<option value="N">N</option>
+										<option value="Y">예</option>
+										<option value="N">아니오</option>
 									</select>
 								</div>
 								<span class="text_line">/</span>
 								<div class="form-inline-inner input_box" style="width:47%;">
 									<select name="point_yn" id="point_yn" class="form-control form-control-sm">
 										<option value="">전체</option>
-										<option value="Y">Y</option>
-										<option value="N">N</option>
+										<option value="Y">있음</option>
+										<option value="N">없음</option>
 									</select>
 								</div>
 							</div>
@@ -131,8 +131,8 @@
 							<div class="flax_box">
 								<select  name="buy_yn" class="form-control form-control-sm">
 									<option value="">전체</option>
-									<option value="Y">Y</option>
-									<option value="N">N</option>
+									<option value="Y">예</option>
+									<option value="N">아니오</option>
 								</select>
 							</div>
 						</div>
@@ -144,8 +144,8 @@
 							<div class="flax_box">
 								<select  name="use_yn" class="form-control form-control-sm">
 									<option value="">전체</option>
-									<option value="Y">Y</option>
-									<option value="N">N</option>
+									<option value="Y">예</option>
+									<option value="N">아니오</option>
 								</select>
 							</div>
 						</div>
@@ -251,7 +251,7 @@
 		{
 			headerName: '선택',
 			checkboxSelection: true,
-			width:28,
+			width:34,
 			cellRenderer: function(params) {
 				if (params.data.group_cd !== undefined && params.data.group_cd !== null) {
 					return "<input type='checkbox' checked/>";
@@ -259,7 +259,7 @@
 			}
 		},
 
-		{field:"no" , headerName:"번호",width: 60,
+		{field:"no" , headerName:"번호",width: 58, cellStyle:{"text-align" : "center"}, 
 			cellRenderer: function(params) {
 				return '<a href="#" onClick="popPhotoView(\''+ params.value +'\')">'+ params.value+'</a>'
 			}
@@ -278,14 +278,31 @@
 
 
 
-		{field:"estimate" , headerName:"평점", width:80},
+		{field:"estimate" , headerName:"평점", width:80, cellStyle:{"text-align" : "center"}},
 		{field:'goods_est', headerName: 'goods_est', hide:true},
 		{field:'estimate_no', headerName:'estimate_no', hide:true},
 
-		{field:"best_yn" , headerName:"베스트", width:60},
+		{field:"best_yn" , headerName:"베스트", width:58, cellStyle:{"text-align" : "center"}, 
+			cellRenderer: function(params){
+				if( params.value == "Y" )
+					return "예";
+				else if( params.value == "N" )
+					return "아니오";
+				else
+					return params.value;
+			}
+		},
 		{field:'best_type', headerName: 'best_type', hide:true},
-		{field:"buy_yn" , headerName:"구매", width:50, },
-
+		{field:"buy_yn" , headerName:"구매", width:50, cellStyle:{"text-align" : "center"}, 
+			cellRenderer: function(params){
+				if( params.value == "Y" )
+					return "예";
+				else if( params.value == "N" )
+					return "아니오";
+				else
+					return params.value;
+			}
+		},
 		{field:"goods_title" , headerName:"제목", width:250,
 			cellRenderer: function(params){
 				return "<a href='#' onclick=\"popShow('"+ params.data.no +"');\">"+ params.value +"</a>";
@@ -297,16 +314,27 @@
 
 		{field:"ord_no" , headerName:"주문번호", type:'HeadOrderNoType', width:135},
 		{field:'ord_opt_no', headerName:'ord_opt_no', hide:true},
-		{field:"point_yn" , headerName:"적립금", width:75,
+		{field:"point_yn" , headerName:"적립금", width:75, cellStyle:{"text-align" : "center"}, 
 			cellRenderer: function(params){
 				if( params.value == "Y" )
 					return params.data.point.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "원";
+				else if( params.value == "N" )
+					return "";
 				else
 					return params.value;
 			}
 		},
 		{field:"g_sum" , headerName:"중복", width:60},
-		{field:"use_yn" , headerName:"출력", },
+		{field:"use_yn" , headerName:"출력", cellStyle:{"text-align" : "center"}, 
+			cellRenderer: function(params){
+				if( params.value == "Y" )
+					return "예";
+				else if( params.value == "N" )
+					return "아니오";
+				else
+					return params.value;
+			}
+		},
 		{field:"est_user_cnt" , headerName:"상품평수(회원/상품)", width:100,
 			cellRenderer: function(params) {
 				return params.value +"/"+params.data.est_goods_cnt;
@@ -314,7 +342,7 @@
 		},
 		{field:'est_goods_cnt', headerName:'est_goods_cnt', hide:true},
 		{field:'comment_cnt', headerName:'comment_cnt', hide:true},
-		{field:"cnt" , headerName:"조회수", width:60},
+		{field:"cnt" , headerName:"조회수", width:60, cellStyle:{"text-align" : "right"}},
 		{field:"regi_date" , headerName:"등록일시", width:135},
 		{ width: "auto" }
 	];

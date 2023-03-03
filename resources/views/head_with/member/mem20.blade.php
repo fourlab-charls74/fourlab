@@ -479,7 +479,7 @@ var columns = [
         let gridDiv = document.querySelector(pApp.options.gridId);
         let options = {
             getRowStyle: (params) => {
-                console.log(params);
+                // console.log(params);
                 if (params.data.ans_yn == "Y") return CELL_COLOR.YELLOW;
             }
         }

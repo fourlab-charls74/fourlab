@@ -338,7 +338,7 @@
             {headerName: '#', width:34, maxWidth: 90,type:'NumType', pinned:'left', cellStyle: {"background":"#F5F7F7"}},
             {field:"ord_no" , headerName:"주문번호",type:'HeadOrderNoType', pinned:'left', width:130},
 			{field:"opt_kind_cd" , headerName:"품목", pinned:'left', width:70  },
-            {field:"style_no" , headerName:"스타일넘버", pinned:'left', width:96  },
+            {field:"style_no" , headerName:"스타일넘버", pinned:'left', width:70, cellStyle: {'text-align':'center'}  },
             {field:"head_desc" , headerName:"상단홍보글", pinned:'left'  },
             {field:"goods_nm", headerName:"상품명", type:'HeadGoodsNameType', pinned:'left'},
             {field:"opt_val" , headerName:"옵션"  },

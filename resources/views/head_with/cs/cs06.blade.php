@@ -95,7 +95,7 @@
 						<div class="form-group">
 							<label for="ord_type">주문번호</label>
 							<div class="flax_box">
-								 <input type='text' class="form-control form-control-sm search-all" name='ord_no' value=''>
+								 <input type='text' class="form-control form-control-sm search-all search-enter" name='ord_no' value=''>
 							</div>
 						</div>
 					</div>

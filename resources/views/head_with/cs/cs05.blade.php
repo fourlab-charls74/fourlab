@@ -123,7 +123,7 @@
 						<div class="form-group">
 							<label for="ord_no">주문번호</label>
 							<div class="flax_box">
-								<input type='text' class="form-control form-control-sm search-all" name='ord_no' value=''>
+								<input type='text' class="form-control form-control-sm search-all search-enter" name='ord_no' value=''>
 							</div>
 						</div>
 					</div>
@@ -132,7 +132,7 @@
 						<div class="form-group">
 							<label for="user_nm">주문자</label>
 							<div class="flax_box">
-								<input type='text' class="form-control form-control-sm search-all" name='user_nm' value=''>
+								<input type='text' class="form-control form-control-sm search-all search-enter" name='user_nm' value=''>
 							</div>
 						</div>
 					</div>
@@ -513,8 +513,8 @@
 			data.push(selectedRowData.ord_opt_no);
 		});
 
-		console.log("MultiRefunds");
-		console.log(data);
+		// console.log("MultiRefunds");
+		// console.log(data);
 		if (selectedRowNum == 0) {
 			alert("일괄 환불완료 처리하실 건을 선택해 주십시오.");
 			return false;
