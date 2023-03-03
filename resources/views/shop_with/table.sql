@@ -1015,6 +1015,8 @@ ALTER TABLE `bizest_smart`.`order_opt_wonga` ADD INDEX `idx_prdcd` (`prd_cd`);
 
 ALTER TABLE `bizest_smart`.`mgr_user` ADD COLUMN `confirm_yn` CHAR(1) NULL COMMENT '승인여부' AFTER `md_yn`; 
 
+ALTER TABLE `bizest_smart`.`store_controller` ADD COLUMN `icon` VARCHAR(30) NULL COMMENT '아이콘 클래스명' AFTER `is_part_role`; 
+
 --
 -- 기존 테이블 컬럼 추가 종료
 --
