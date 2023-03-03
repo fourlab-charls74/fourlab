@@ -239,11 +239,49 @@ class IndexController extends Controller
 
         $piechart = DB::select($sql);
 
+        //주문금액
+        $sql = "
+            select
+                p.prd_nm, p.style_no, pc.prd_cd_p,
+                sum(oo.wonga * oo.qty) as wonga, sum(oo.recv_amt) as recv_amt
+            from order_opt oo
+            inner join product_code pc on oo.prd_cd = pc.prd_cd
+            inner join product p on oo.prd_cd = p.prd_cd
+            where
+                oo.ord_state >= '10' and ( oo.clm_state = '' or oo.clm_state is null or oo.clm_state = '-30' or oo.clm_state = '90' )
+                and oo.ord_date >= date_add(now(), interval -1 month)
+            group by pc.prd_cd_p
+            order by sum(oo.recv_amt) desc
+            limit 10
+        ";
+
+        $chart2Result = DB::select($sql);
+
+        // 주문수량
+        $sql = "
+            select
+                p.prd_nm, p.style_no, pc.prd_cd_p,
+                sum(oo.qty) as qty
+            from order_opt oo
+            inner join product_code pc on oo.prd_cd = pc.prd_cd
+            inner join product p on oo.prd_cd = p.prd_cd
+            where
+                oo.ord_state >= '10' and ( oo.clm_state = '' or oo.clm_state is null or oo.clm_state = '-30' or oo.clm_state = '90' )
+                and oo.ord_date >= date_add(now(), interval -1 month)
+            group by pc.prd_cd_p
+            order by sum(oo.qty) desc
+            limit 10
+        ";
+
+        $chart3Result = DB::select($sql);
+
         $values = [
             'sdate' => $sdate,
             'edate' => $edate,
             'result' => $result,
-            'pieResult' => $piechart
+            'pieResult' => $piechart,
+            'chart2Result' => $chart2Result,
+            'chart3Result' => $chart3Result
             
         ];
 

@@ -39,11 +39,28 @@
             </div>
         </div>
         <div class="col-lg-6" >
-            <div class="card shadow-none mb-3">
-                <div style="text-align:center; width:100%; height:100%">
-
-                    <h5>자주 사용하는 메뉴 COMMING SOON</h5>
-                
+            <div class="card shadow mb-3">
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="order_amt-tab" data-toggle="tab" href="#order_amt" role="tab" aria-controls="order_amt" aria-selected="false">주문금액</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="order_qty-tab" data-toggle="tab" href="#order_qty" role="tab" aria-controls="order_qty" aria-selected="false">주문수량</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="myTabContent" style="height:100%">
+                        <div class="tab-pane fade" id="order_amt" role="tabpanel" aria-labelledby="order_amt-tab">
+                            <div class="card shadow mb-1" style="margin-top:50px">
+                                <canvas id="myChart3"></canvas>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="order_qty" role="tabpanel" aria-labelledby="order_qty-tab">
+                            <div class="card shadow mb-1" style="margin-top:50px">
+                                <canvas id="myChart4" ></canvas>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -196,6 +213,7 @@
 <script>
     $(document).ready(function(){
         $('#bar-tab').trigger("click");
+        $('#order_amt-tab').trigger("click");
     }); 
 
      function showContent(msg_cd) {
@@ -367,6 +385,134 @@
             }
         }
     });
+
+
+const ctx3 = document.getElementById('myChart3');
+
+let chartData2 = <?= json_encode($chart2Result)?>;
+
+console.log(chartData2);
+
+  new Chart(ctx3, {
+    type: 'bar',
+    data: {
+      labels: [
+            chartData2[0].prd_nm,
+            chartData2[1].prd_nm,
+            chartData2[2].prd_nm,
+            chartData2[3].prd_nm,
+            chartData2[4].prd_nm,
+            chartData2[5].prd_nm,
+            chartData2[6].prd_nm,
+            chartData2[7].prd_nm,
+            chartData2[8].prd_nm,
+            chartData2[9].prd_nm,
+      ],
+      datasets: [
+        {
+        label: '매출액',
+        data: [
+            chartData2[0].recv_amt,
+            chartData2[1].recv_amt,
+            chartData2[2].recv_amt,
+            chartData2[3].recv_amt,
+            chartData2[4].recv_amt,
+            chartData2[5].recv_amt,
+            chartData2[6].recv_amt,
+            chartData2[7].recv_amt,
+            chartData2[8].recv_amt,
+            chartData2[9].recv_amt,
+        ],
+        borderColor: '#36A2EB',
+        backgroundColor: '#9BD0F5',
+        borderWidth: 1
+      },
+      {
+        label: '매출원가',
+        data: [
+            chartData2[0].wonga,
+            chartData2[1].wonga,
+            chartData2[2].wonga,
+            chartData2[3].wonga,
+            chartData2[4].wonga,
+            chartData2[5].wonga,
+            chartData2[6].wonga,
+            chartData2[7].wonga,
+            chartData2[8].wonga,
+            chartData2[9].wonga,
+        ],
+        borderColor: '#FF6384',
+        backgroundColor: '#FFB1C1',
+        borderWidth: 1
+      }
+    ]
+    },
+    options: {
+        // responsive: true,
+        legend:{
+            position : 'top'
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+  });
+
+  const ctx4 = document.getElementById('myChart4');
+
+let chartData3 = <?= json_encode($chart3Result)?>;
+
+
+  new Chart(ctx4, {
+    type: 'bar',
+    data: {
+      labels: [
+            chartData3[0].prd_nm,
+            chartData3[1].prd_nm,
+            chartData3[2].prd_nm,
+            chartData3[3].prd_nm,
+            chartData3[4].prd_nm,
+            chartData3[5].prd_nm,
+            chartData3[6].prd_nm,
+            chartData3[7].prd_nm,
+            chartData3[8].prd_nm,
+            chartData3[9].prd_nm,
+      ],
+      datasets: [
+        {
+        label: '주문수량',
+        data: [
+            chartData3[0].qty,
+            chartData3[1].qty,
+            chartData3[2].qty,
+            chartData3[3].qty,
+            chartData3[4].qty,
+            chartData3[5].qty,
+            chartData3[6].qty,
+            chartData3[7].qty,
+            chartData3[8].qty,
+            chartData3[9].qty,
+        ],
+        borderColor: '#36A2EB',
+        backgroundColor: '#9BD0F5',
+        borderWidth: 1
+      }
+    ]
+    },
+    options: {
+        // responsive: true,
+        legend:{
+            position : 'top'
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+  });
 </script>
 
 @stop
