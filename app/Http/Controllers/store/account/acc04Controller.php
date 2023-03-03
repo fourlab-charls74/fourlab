@@ -52,55 +52,15 @@ class acc04Controller extends Controller
         // if (count($sale_kind) > 0) $where .= " and w.sale_kind in (" . join(",", array_map(function($cd) { return "'$cd'"; }, $sale_kind)) . ") ";
         // if ($sale_yn == 'Y') $where .= " and w.sales_total > 0 ";
 
-        // $sql = "
-        //     select b.*
-        //         , (ifnull(b.sales_profit, 0) - ifnull(b.total_fee, 0)) as sales_real_profit
-        //         , (((ifnull(b.sales_profit, 0) - ifnull(b.total_fee, 0)) / ifnull(b.sales_total, 0)) * 100) as real_profit_rate
-        //     from (
-        //         select a.*
-        //             , (" . join(' + ', array_map(function($cd) { return "a." . $cd . "_fee"; }, $pr_codes)) . ") as total_fee
-        //         from (
-        //             select
-        //                 w.*
-        //                 , (w.sales_total - w.wonga_total) as sales_profit
-        //                 , (((w.sales_total - w.wonga_total) / w.sales_total) * 100) as profit_rate
-        //                 , s.store_cd
-        //                 , s.store_nm
-        //                 , st.code_val as store_type_nm
-        //                 , " . join(",", array_map(function($cd) { return "sf." . $cd . "_fee_rate"; }, $pr_codes)) . "
-        //                 , sf.etc_fee_rate
-        //                 , " . join(",", array_map(function($cd) { return "(ifnull(w.sales_" . $cd . ", 0) * (ifnull(sf." . $cd . "_fee_rate, 0) / 100)) as " . $cd . "_fee"; }, $pr_codes)) . "
-        //                 , (ifnull(w.sales_etc, 0) * (ifnull(sf.etc_fee_rate, 0) / 100)) as etc_fee
-        //             from store s 
-        //                 inner join code st on st.code_kind_cd = 'STORE_TYPE' and st.code_id = s.store_type
-        //                 left outer join (
-        //                     select oo.ord_opt_no, oo.pr_code, oo.sale_kind, oo.store_cd as ord_store_cd, ww.qty, ww.wonga, ww.price
-        //                         , sum(ww.qty) as sale_qty
-        //                         , sum(ww.qty * ww.wonga) as wonga_total
-        //                         , sum(ww.recv_amt) as sales_total
-        //                         , " . join(",", array_map(function($cd) { return "sum(if(oo.pr_code = '" . $cd . "', ww.recv_amt, 0)) as sales_" . $cd . ""; }, $pr_codes)) . "
-        //                         , sum(if(oo.pr_code not in (" . join(',', array_map(function($cd) { return "'$cd'"; }, $pr_codes)) . "), (ww.qty * ww.price), 0)) as sales_etc
-        //                     from order_opt_wonga ww
-        //                         inner join order_opt oo on oo.ord_opt_no = ww.ord_opt_no
-        //                     where ww.ord_state in (30,60,61) 
-        //                         and ww.ord_state_date >= '$sdate'
-        //                         and ww.ord_state_date <= '$edate'
-        //                     group by oo.store_cd
-        //                 ) w on w.ord_store_cd = s.store_cd
-        //                 left outer join (
-        //                     select 
-        //                         idx, store_cd, pr_code
-        //                         , " . join(",", array_map(function($cd) { return "sum(if(pr_code = '" . $cd . "', store_fee, 0)) as " . $cd . "_fee_rate"; }, $pr_codes)) . "
-        //                         , sum(if(pr_code not in (" . join(',', array_map(function($cd) { return "'$cd'"; }, $pr_codes)) . "), store_fee, 0)) as etc_fee_rate
-        //                     from store_fee 
-        //                     where idx in (select max(idx) from store_fee group by store_cd, pr_code)
-        //                     group by store_cd
-        //                 ) sf on sf.store_cd = s.store_cd
-        //             where 1=1 $where
-        //             order by w.sales_total desc
-        //         ) a
-        //     ) b
-        // ";
+        // 기타재반자료타입 조회 sql문 -> SLib 에 작업
+        $sql = "
+            select t.type_cd, t.type_nm, t.parent_type_cd, tt.type_nm as parent_type_nm, t.payer
+                , t.except_vat_yn, t.total_include_yn, t.has_child_yn, t.use_yn, t.seq, t.rt
+            from store_account_extra_type t
+                left outer join store_account_extra_type tt on tt.type_cd = t.parent_type_cd
+            where t.use_yn = 'Y' and t.has_child_yn = 'N'
+            order by t.parent_type_cd is null asc, t.seq
+        ";
 
         $sql = "
             select ord.*, s.*
@@ -129,7 +89,7 @@ class acc04Controller extends Controller
                     select date_format(ww.ord_state_date, '%Y%m') as ymonth
                     from order_opt_wonga ww
                     where ww.ord_state_date >= '20230101'
-                        and ww.ord_state_date <= '20230331'
+                        and ww.ord_state_date <= '20230131'
                     group by ymonth
                 ) y
                     left outer join (
@@ -188,7 +148,7 @@ class acc04Controller extends Controller
                                 and ww.ord_state >= 30
                                 and ww.ord_state in (30,60,61)
                                 and ww.ord_state_date >= '20230101'
-                                and ww.ord_state_date <= '20230331'
+                                and ww.ord_state_date <= '20230131'
                         )
                         union all
                         (
@@ -202,7 +162,7 @@ class acc04Controller extends Controller
                                 and ww.ord_state >= 30
                                 and ww.ord_state in (30,60,61)
                                 and ww.ord_state_date >= '20230101'
-                                and ww.ord_state_date <= '20230331'
+                                and ww.ord_state_date <= '20230131'
                         )
                     ) w
                         inner join goods g on g.goods_no = w.goods_no

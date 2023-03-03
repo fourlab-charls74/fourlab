@@ -167,6 +167,43 @@
 	const CLOSED_STATUS = { 'Y': '마감완료', 'N': '마감추가' };
 	const CENTER = { 'text-align': 'center' };
 
+	/**
+	 * 마감상태
+	 * 매장코드
+	 * 매장구분
+	 * 매장명
+	 * 매니저
+	 * 수수료등급
+	 * 매출정보
+	 * 	- 매출합계
+	 * 	- 매출합계(-VAT)
+	 * 	- 마일리지(-VAT) M1
+	 * 	- 원가
+	 * 	- 매출이익 : 매출합계(-VAT) - 마일리지(-VAT) - 원가
+	 * 판매수수료
+	 * 	- 정상 (매출액 / 매출액(-VAT) / 수수료율 / 수수료)
+	 * 	- 행사 (매출액 / 매출액(-VAT) / 수수료율 / 수수료)
+	 * 	- 균일 (매출액 / 매출액(-VAT) / 수수료율 / 수수료)
+	 * 	- 용품 (매출액 / 매출액(-VAT) / 수수료율 / 수수료)
+	 * 	- 수수료합계
+	 * 중간관리자수수료
+	 * 	- 정상1 (매출액 / 매출액(-VAT) / 수수료율 / 수수료)
+	 * 	- 정상2 (매출액 / 매출액(-VAT) / 수수료율 / 수수료)
+	 * 	- 정상3 (매출액 / 매출액(-VAT) / 수수료율 / 수수료)
+	 * 	- 특가 (매출액 / 매출액(-VAT) / 수수료율 / 수수료)
+	 * 	- 용품 (매출액 / 매출액(-VAT) / 수수료율 / 수수료)
+	 * 	- 특가(온라인) (매출액 / 매출액(-VAT) / 수수료율 / 수수료)
+	 * 	- 수수료합계
+	 * 인건비 P (온라인, 인센티브, 패널티, 기타수수료, 인건비합계)
+	 * 기타운영경비(본사부담) O (외부창고, 사용경비(기타), 운영경비합계)
+	 * 영업이익 : 매출이익 - 판매수수료 - 중간관리자수수료 - 인건비합계 - 기타운영경비합계
+	 * 영업이익율 : 영업이익 / 매출 * 100
+	 * 매장부담금
+	 * 	- 매장운영비용 S (전화요금, 인터넷, 본사수선비(-VAT), 외부창고/보안비)
+	 * 	- 사은품 G
+	 * 	- 소모품 E
+	*/
+
     const columns = [
         // { headerName: "#", field: "num", type: 'NumType', pinned: 'left', aggSum: "합계", cellStyle: CENTER,
 		// 	cellRenderer: (params) => params.node.rowPinned === 'top' ? '합계' : (parseInt(params.value) + 1),
@@ -213,7 +250,7 @@
                     ]
                 },
 				@endforeach
-                { headerName: "수수료 소계", field: "sales_fee", type: 'numberType', width: 100, headerClass: "merged-cell" },
+                { headerName: "수수료 합계", field: "sales_fee", type: 'numberType', width: 100, headerClass: "merged-cell" },
                 // { headerName: "임대관리비", field: "management_fee", type: 'numberType', width: 100, headerClass: "merged-cell" },
             ]
         },
@@ -259,18 +296,18 @@
 						{ headerName: "매출액(-VAT)", field: "ord_OL_amt_except_vat", type: 'currencyType', width: 90 },
                         { headerName: "수수료율", field: "fee_12", type: 'percentType', width: 60 },
                         { headerName: "수수료", field: "fee_amt_OL", type: 'currencyType', width: 90,
-							cellRenderer: (params) => ['0', null].includes(params.value) ? 0 : (params.node.rowPinned === 'top' ? params.valueFormatted : '<a href="javascript:void(0);" onClick="openOnlineFeePopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>')
+							// cellRenderer: (params) => ['0', null].includes(params.value) ? 0 : (params.node.rowPinned === 'top' ? params.valueFormatted : '<a href="javascript:void(0);" onClick="openOnlineFeePopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>')
 						},
                     ]
                 },
-				{ headerName: "수수료 소계", field: "fee_amt", type: 'currencyMinusColorType', width: 90, headerClass: "merged-cell", cellStyle: {"background-color": "#ededed"} },
+				{ headerName: "수수료 합계", field: "fee_amt", type: 'currencyMinusColorType', width: 90, headerClass: "merged-cell", cellStyle: {"background-color": "#ededed"} },
             ]
         },
         { field: "extra_amt", headerName: "기타재반", type: 'currencyMinusColorType', width: 70,
-			cellRenderer: (params) => ['0', null].includes(params.value) ? 0 : (params.node.rowPinned === 'top' ? params.valueFormatted : '<a href="javascript:void(0);" onClick="openExtraAmtPopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>')
+			// cellRenderer: (params) => ['0', null].includes(params.value) ? 0 : (params.node.rowPinned === 'top' ? params.valueFormatted : '<a href="javascript:void(0);" onClick="openExtraAmtPopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>')
 		},
-        // { field: "sales_real_profit", headerName: "매출이익-수수료", type: 'currencyMinusColorType', width: 100 },
-        // { field: "real_profit_rate", headerName: "수수료제외이익율(%)", type: 'percentType', width: 120 },
+        { field: "real_profit", headerName: "총마진금액", type: 'currencyMinusColorType', width: 100 },
+        { field: "real_profit_rate", headerName: "마진율(%)", type: 'percentType', width: 60 },
         { width: "auto" }
     ];
 
