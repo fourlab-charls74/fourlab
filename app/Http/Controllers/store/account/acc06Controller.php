@@ -184,38 +184,6 @@ class acc06Controller extends Controller
 		";
 		$result = DB::select($sql);
 
-		// 아래 작업중입니다. - 최유현
-
-		// -- 판매처 수수료
-		// , if(a.sale_place_fee_amt_JS < 0, 0, a.sale_place_fee_amt_JS) as sale_place_fee_amt_JS
-		// , if(a.sale_place_fee_amt_GL < 0, 0, a.sale_place_fee_amt_GL) as sale_place_fee_amt_GL
-		// , if(a.sale_place_fee_amt_J1 < 0, 0, a.sale_place_fee_amt_J1) as sale_place_fee_amt_J1
-		// , if(a.sale_place_fee_amt_J2 < 0, 0, a.sale_place_fee_amt_J2) as sale_place_fee_amt_J2
-		// , if((a.sale_place_fee_amt_JS + a.sale_place_fee_amt_GL + a.sale_place_fee_amt_J1 + a.sale_place_fee_amt_J2) < 0
-		// 	, 0, (a.sale_place_fee_amt_JS + a.sale_place_fee_amt_GL + a.sale_place_fee_amt_J1 + a.sale_place_fee_amt_J2)
-		// ) as sale_place_fee_amt
-		// -- 중간관리자 수수료
-
-		// left outer join (
-		// 	select idx, store_cd, pr_code
-		// 		, sum(if(pr_code = 'JS', store_fee, 0)) as sale_place_fee_rate_JS
-		// 		, sum(if(pr_code = 'GL', store_fee, 0)) as sale_place_fee_rate_GL
-		// 		, sum(if(pr_code = 'J1', store_fee, 0)) as sale_place_fee_rate_J1
-		// 		, sum(if(pr_code = 'J2', store_fee, 0)) as sale_place_fee_rate_J2
-		// 	from store_fee 
-		// 	where idx in (select max(idx) from store_fee group by store_cd, pr_code)
-		// 	group by store_cd
-		// ) sf on sf.store_cd = s.store_cd
-
-		// , sf.sale_place_fee_rate_JS
-		// , sf.sale_place_fee_rate_GL
-		// , sf.sale_place_fee_rate_J1
-		// , sf.sale_place_fee_rate_J2
-		// , round(ifnull(w.sales_JS_amt, 0) * ifnull(sf.sale_place_fee_rate_JS, 0) / 100) as sale_place_fee_amt_JS
-		// , round(ifnull(w.sales_GL_amt, 0) * ifnull(sf.sale_place_fee_rate_GL, 0) / 100) as sale_place_fee_amt_GL
-		// , round(ifnull(w.sales_J1_amt, 0) * ifnull(sf.sale_place_fee_rate_J1, 0) / 100) as sale_place_fee_amt_J1
-		// , round(ifnull(w.sales_J2_amt, 0) * ifnull(sf.sale_place_fee_rate_J2, 0) / 100) as sale_place_fee_amt_J2
-
         return response()->json([
             'code'	=> 200,
             'head'	=> array(

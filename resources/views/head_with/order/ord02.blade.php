@@ -481,7 +481,7 @@
         {field:"qty" , headerName:"수량", width:46},
         {field:"user_nm" , headerName:"주문자(아이디)"  },
         {field:"r_nm" , headerName:"수령자", width:60  },
-        {field:"goods_price" , headerName:"자사몰 판매가", width:84, type: 'currencyType'  },
+        {field:"goods_price" , headerName:"자사몰 판매가", width:96, type: 'currencyType'  },
         {field:"price" , headerName:"판매가", width:60, type: 'currencyType'  },
         {field:"dlv_amt" , headerName:"배송비", width:46, type: 'currencyType'  },
         {field:"sales_com_fee" , headerName:"판매수수료", width:72 , type: 'currencyType'  },

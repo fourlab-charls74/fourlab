@@ -34,7 +34,7 @@
 				<h4>검색</h4>
 				<div class="flax_box">
 					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-					<a href="#" onclick="initSearch(['#store_no', '#sale_kind'])" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
+					<a href="#" onclick="initSearch(['#store_no'])" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
 			</div>
@@ -43,11 +43,11 @@
 				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="good_types">판매기간</label>
+							<label for="sdate">판매기간(판매연월)</label>
 							<div class="form-inline date-select-inbox">
 								<div class="docs-datepicker form-inline-inner input_box">
 									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
+										<input type="text" class="form-control form-control-sm docs-date month" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
 										<div class="input-group-append">
 											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
 												<i class="fa fa-calendar" aria-hidden="true"></i>
@@ -59,7 +59,7 @@
 								<span class="text_line">~</span>
 								<div class="docs-datepicker form-inline-inner input_box">
 									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
+										<input type="text" class="form-control form-control-sm docs-date month" name="edate" value="{{ $sdate }}" autocomplete="off">
 										<div class="input-group-append">
 											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
 												<i class="fa fa-calendar" aria-hidden="true"></i>
@@ -86,36 +86,41 @@
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-                            <label for="store_cd">매장명</label>
-							<div class="form-inline inline_btn_box">
-								<select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select" multiple></select>
-								<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+							<label for="store_kind">매장종류</label>
+							<div class="flex_box">
+								<select name='store_kind' class="form-control form-control-sm">
+									<option value=''>전체</option>
+									@foreach ($store_kinds as $store_kind)
+										<option value='{{ $store_kind->code_id }}'>{{ $store_kind->code_val }}</option>
+									@endforeach
+								</select>
 							</div>
                         </div>
 					</div>
 				</div>
 				<div class="row">
 					<div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="pr_code">판매유형</label>
-                            <div class="flax_box">
-                                <select id="sale_kind" name="sale_kind[]" class="form-control form-control-sm multi_select w-100" multiple>
-                                    @foreach (@$sale_kinds as $sale_kind)
-                                    <option value='{{ $sale_kind->code_id }}' @if (@$sale_kind_id == $sale_kind->code_id) selected @endif>{{ $sale_kind->code_val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+						<div class="form-group">
+							<label for="store_cd">매장명</label>
+							<div class="form-inline inline_btn_box">
+								<select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select" multiple></select>
+								<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="store_kind">마감상태</label>
+							<div class="flex_box">
+								<select name='closed_yn' id="closed_yn" class="form-control form-control-sm">
+									<option value=''>전체</option>
+									<option value='Z'>상태없음</option>
+									<option value='N'>마감추가</option>
+									<option value='Y'>마감완료</option>
+								</select>
+							</div>
                         </div>
-                    </div>
-                    {{-- <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="brand_cd">브랜드</label>
-                            <div class="form-inline inline_btn_box">
-                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
-                        </div>
-                    </div> --}}
+					</div>	
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="sale_yn">매출여부</label>
@@ -159,48 +164,113 @@
 	</div>
 </div>
 <script language="javascript">
+	const CLOSED_STATUS = { 'Y': '마감완료', 'N': '마감추가' };
+	const CENTER = { 'text-align': 'center' };
+
     const columns = [
-        { headerName: "#", field: "num", type: 'NumType', pinned: 'left', aggSum: "합계", cellStyle: { 'text-align': "center" },
-			cellRenderer: (params) => params.node.rowPinned === 'top' ? '합계' : (parseInt(params.value) + 1),
+        // { headerName: "#", field: "num", type: 'NumType', pinned: 'left', aggSum: "합계", cellStyle: CENTER,
+		// 	cellRenderer: (params) => params.node.rowPinned === 'top' ? '합계' : (parseInt(params.value) + 1),
+        // },
+        // { field: "ymonth", headerName: "판매기간", rowGroup: true, hide: true },
+		// { headerName: '판매기간', showRowGroup: 'ymonth', cellRenderer: 'agGroupCellRenderer', minWidth: 100, pinned: 'left' },
+		{ headerName: '판매기간', field: 'ymonth', width: 100, pinned: 'left' },
+		{ field: "closed_yn", headerName: "마감상태", pinned: 'left', width: 57,
+            cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : (CLOSED_STATUS[params.value] || '-'),
+            cellStyle: (params) => ({
+                ...CENTER, 
+                "background-color": params.value === 'Y' ? '#E2FFE0' : params.value === 'N' ? '#FFE9E9' : 'none',
+                "color": params.value === 'Y' ? '#0BAC00' : params.value === 'N' ? '#ff0000' : 'none'
+            }),
         },
-        { field: "store_cd", headerName: "매장코드", pinned: 'left', width: 60, cellStyle: { 'text-align': "center" } },
-        { field: "store_type_nm", headerName: "매장구분", pinned: 'left', width: 70, cellStyle: { 'text-align': "center" } },
+        { field: "store_cd", headerName: "매장코드", pinned: 'left', width: 60, cellStyle: CENTER },
+        { field: "store_type_nm", headerName: "매장구분", pinned: 'left', width: 70, cellStyle: CENTER },
         { field: "store_nm", headerName: "매장명", pinned: 'left', type: 'StoreNameType', width: 150 },
+        { field: "manager_nm", headerName: "매니저", pinned: 'left', width: 55, cellStyle: CENTER },
+		{ field: "grade_nm", headerName: "수수료등급", pinned: 'left', width: 65, cellStyle: CENTER },
         { headerName: "매출",
             children: [
-                { headerName: "소계", field: "sales_total", type: 'numberType', width: 100, headerClass: "merged-cell", aggregation: true },
-				@foreach (@$pr_codes as $pr_code)
-                { headerName: "{{ @$pr_code->code_val }}", field: "sales_{{ @$pr_code->code_id }}", type: 'numberType', width: 100, headerClass: "merged-cell", aggregation: true},
-				@endforeach
-                { headerName: "기타", field: "sales_etc", type: 'numberType', width: 100, headerClass: "merged-cell", aggregation: true },
+				{ field: "sales_amt", headerName: "매출합계", width: 100, headerClass: "merged-cell", type: 'currencyType',
+					cellRenderer: (params) => {
+						if (params.value == undefined) return 0;
+						if (params.node.rowPinned === 'top') return params.valueFormatted;
+						return '<a href="#" onClick="openDetailPopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>';
+					}
+				},
+				{ field: "sales_amt_except_vat", headerName: "매출합계(-VAT)", width: 100, headerClass: "merged-cell", type: 'currencyType', cellStyle: {"background-color": "#ededed"} },
             ]
         },
-        // { field: "sale_qty", headerName: "판매상품수량", width: 100, hide: true, type: 'currencyType' },
-        { field: "wonga_total", headerName: "원가", width: 100, type: 'currencyMinusColorType', aggregation: true },
-        { field: "sales_profit", headerName: "매출이익", width: 100, type: 'currencyMinusColorType', aggregation: true }, // 매출이익 = 결제금액 - 원가 합계금액
-        { field: "profit_rate",	headerName: "이익율(%)", width: 80, type: 'percentType' }, // 매출이익 분의 매출액 = 이익율
-        { headerName: "수수료",
+        // { field: "wonga_total", headerName: "원가", width: 100, type: 'currencyMinusColorType' },
+        // { field: "sales_profit", headerName: "매출이익", width: 100, type: 'currencyMinusColorType' }, // 매출이익 = 결제금액 - 원가 합계금액
+        // { field: "profit_rate",	headerName: "이익율(%)", width: 80, type: 'percentType' }, // 매출이익 분의 매출액 = 이익율
+        { headerName: "판매 수수료",
             children: [
-                { headerName: "수수료합계", field: "total_fee", type: 'numberType', width: 100, headerClass: "merged-cell", aggregation: true },
-                // { headerName: "임대관리비", field: "management_fee", type: 'numberType', width: 100, headerClass: "merged-cell", aggregation: true },
 				@foreach (@$pr_codes as $pr_code)
                 { headerName: "{{ @$pr_code->code_val }}",
                     children: [
-                        { headerName: "수수료율", field: "{{ @$pr_code->code_id }}_fee_rate", type: 'percentType', width: 60 },
-                        { headerName: "수수료", field: "{{ @$pr_code->code_id }}_fee", type: 'numberType', width: 100, aggregation: true },
+						{ headerName: "매출액(-VAT)", field: "sales_{{ @$pr_code->code_id }}_amt_except_vat", type: 'currencyType', width: 90, },
+                        { headerName: "수수료율", field: "sales_{{ @$pr_code->code_id }}_fee_rate", type: 'percentType', width: 60 },
+                        { headerName: "수수료", field: "sales_{{ @$pr_code->code_id }}_fee", type: 'numberType', width: 100 },
                     ]
                 },
 				@endforeach
-                { headerName: "기타",
-                    children: [
-                        { headerName: "수수료율", field: "etc_fee_rate", type: 'percentType', width: 60 },
-                        { headerName: "수수료", field: "etc_fee", type: 'numberType', width: 100, aggregation: true },
-                    ]
-                },
+                { headerName: "수수료 소계", field: "sales_fee", type: 'numberType', width: 100, headerClass: "merged-cell" },
+                // { headerName: "임대관리비", field: "management_fee", type: 'numberType', width: 100, headerClass: "merged-cell" },
             ]
         },
-        { field: "sales_real_profit", headerName: "매출이익-수수료", type: 'currencyMinusColorType', width: 100, aggregation: true },
-        { field: "real_profit_rate", headerName: "수수료제외이익율(%)", type: 'percentType', width: 120 },
+		{ headerName: "중간관리자 수수료",
+            children: [
+                { headerName: "정상1",
+                    children: [
+                        { headerName: "매출액(-VAT)", field: "ord_JS1_amt_except_vat", type: 'currencyType', width: 90, },
+                        { headerName: "수수료율", field: "fee1", type: 'percentType', width: 60 },
+                        { headerName: "수수료", field: "fee_amt_JS1", type: 'currencyType', width: 90 },
+                    ]
+                },
+                { headerName: "정상2",
+                    children: [
+						{ headerName: "매출액(-VAT)", field: "ord_JS2_amt_except_vat", type: 'currencyType', width: 90 },
+                        { headerName: "수수료율", field: "fee2", type: 'percentType', width: 60 },
+                        { headerName: "수수료", field: "fee_amt_JS2", type: 'currencyType', width: 90 },
+                    ]
+                },
+                { headerName: "정상3",
+                    children: [
+						{ headerName: "매출액(-VAT)", field: "ord_JS3_amt_except_vat", type: 'currencyType', width: 90 },
+                        { headerName: "수수료율", field: "fee3", type: 'percentType', width: 60 },
+                        { headerName: "수수료", field: "fee_amt_JS3", type: 'currencyType', width: 90 },
+                    ]
+                },
+                { headerName: "특가",
+                    children: [
+						{ headerName: "매출액(-VAT)", field: "ord_TG_amt_except_vat", type: 'currencyType', width: 90 },
+                        { headerName: "수수료율", field: "fee_10", type: 'percentType', width: 60 },
+                        { headerName: "수수료", field: "fee_amt_TG", type: 'currencyType', width: 90 },
+                    ]
+                },
+                { headerName: "용품",
+                    children: [
+						{ headerName: "매출액(-VAT)", field: "ord_YP_amt_except_vat", type: 'currencyType', width: 90 },
+                        { headerName: "수수료율", field: "fee_11", type: 'percentType', width: 60 },
+                        { headerName: "수수료", field: "fee_amt_YP", type: 'currencyType', width: 90 },
+                    ]
+                },
+                { headerName: "특가(온라인)",
+                    children: [
+						{ headerName: "매출액(-VAT)", field: "ord_OL_amt_except_vat", type: 'currencyType', width: 90 },
+                        { headerName: "수수료율", field: "fee_12", type: 'percentType', width: 60 },
+                        { headerName: "수수료", field: "fee_amt_OL", type: 'currencyType', width: 90,
+							cellRenderer: (params) => ['0', null].includes(params.value) ? 0 : (params.node.rowPinned === 'top' ? params.valueFormatted : '<a href="javascript:void(0);" onClick="openOnlineFeePopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>')
+						},
+                    ]
+                },
+				{ headerName: "수수료 소계", field: "fee_amt", type: 'currencyMinusColorType', width: 90, headerClass: "merged-cell", cellStyle: {"background-color": "#ededed"} },
+            ]
+        },
+        { field: "extra_amt", headerName: "기타재반", type: 'currencyMinusColorType', width: 70,
+			cellRenderer: (params) => ['0', null].includes(params.value) ? 0 : (params.node.rowPinned === 'top' ? params.valueFormatted : '<a href="javascript:void(0);" onClick="openExtraAmtPopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>')
+		},
+        // { field: "sales_real_profit", headerName: "매출이익-수수료", type: 'currencyMinusColorType', width: 100 },
+        // { field: "real_profit_rate", headerName: "수수료제외이익율(%)", type: 'percentType', width: 120 },
         { width: "auto" }
     ];
 
@@ -218,10 +288,6 @@
                 if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#eee', 'border': 'none'};
             },
 		});
-
-		gx.Aggregation({
-            "sum": "top",
-        });
 
 		Search();
 

@@ -443,7 +443,7 @@
 			data.push({"no": selectedRowData.no, "memo" : selectedRowData.memo});
 		});
 
-		console.log(data);
+		// console.log(data);
 
 		if(data.length > 0){
 			if(!confirm('메모를 저장 하시겠습니까?')) {return false;}

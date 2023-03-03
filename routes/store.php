@@ -425,6 +425,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::put('stk30/add-store-return','stk30Controller@add_store_return'); // 창고반품등록
         Route::put('stk30/update-store-return','stk30Controller@update_store_return'); // 창고반품수정
         Route::put('stk30/update-return-state','stk30Controller@update_return_state'); // 창고반품 상태변경
+        Route::put('stk30/update-state','stk30Controller@update_state');
         Route::delete('stk30/del-return','stk30Controller@del_return'); // 창고반품 삭제
         Route::get('stk30/batch', 'stk30Controller@show_batch');
         Route::post('stk30/batch-import', 'stk30Controller@import_excel');

@@ -29,6 +29,7 @@ Login
 					<div class="login_mobile_tit">
 						<strong>fjällräven</strong>
 					</div>
+					<div class="txtc pt10 pb10" style="font-size:15px;font-weight:bold;color:#f09721;">※ 매장접속 ※</div>
 					<ul class="list_input">
 						<li>
 							<div class="input_box">
@@ -48,7 +49,7 @@ Login
 							{{ __('LOGIN') }}
 						</button>
 					</div>
-					<ul class="list_link">
+					{{--<!-- <ul class="list_link">
 						<li>
 							<a href="">회원가입</a>
 						</li>
@@ -58,10 +59,10 @@ Login
 						<li>
 							<a href="">비밀번호찾기</a>
 						</li>
-					</ul>
+					</ul> -->--}}
 
-                    <!-- QA 기간동안의 임시 URL 정보 노출 시작 //-->
-					@if($_SERVER['SERVER_NAME'] != 'devel.fjallraven.co.kr')
+                    {{--<!-- QA 기간동안의 임시 URL 정보 노출 시작 //-->
+					<!-- @if($_SERVER['SERVER_NAME'] != 'devel.fjallraven.co.kr')
 					<div class="pt50" style="font-size:15px;color:#FF0000;font-weight:bold;">
 						@if($_SERVER['SERVER_NAME'] == 'handle.fjallraven.co.kr')
 							※ 현재페이지는 실 데이터 입니다.<br>
@@ -71,8 +72,8 @@ Login
 					<div class="txtc pt10" style="font-size:15px;">
 						테스트 페이지 URL : <a href="https://devel.fjallraven.co.kr/" style="font-weight:bold;text-decoration:underline !important;">https://devel.fjallraven.co.kr/</a>
 					</div>
-					@endif
-                    <!-- QA 기간동안의 임시 URL 정보 노출 종료 //-->
+					@endif -->
+                    <!-- QA 기간동안의 임시 URL 정보 노출 종료 //-->--}}
 
 				</form>
 			</div>
