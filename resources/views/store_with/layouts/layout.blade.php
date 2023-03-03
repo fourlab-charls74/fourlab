@@ -3,7 +3,7 @@
 
     <head>
         <meta charset="utf-8" />
-        <title> @yield('title') | 매장관리</title>
+        <title> @yield('title') | 매장관리 </title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="format-detection" content="telephone=no">
@@ -18,7 +18,9 @@
     <body class="sidebar-enable">
         <!-- header -->
         @include('store_with.layouts.top')
-        @include('store_with.layouts.lnb')
+        @if(Cache::has('store_lnb'))
+        {!! Cache::get('store_lnb') !!}
+        @endif
         <!-- header -->
         <!-- content -->
         <div id="content">

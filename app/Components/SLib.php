@@ -64,8 +64,8 @@ class SLib
     public static function getValidStoreGrades()
     {
         $sql = "
-            select 
-                grade_cd as code_id, name as code_val, seq, sdate, edate 
+            select
+                grade_cd as code_id, name as code_val, seq, sdate, edate
             from store_grade sg
             where sg.sdate <= date_format(now(), '%Y-%m') and sg.edate >= date_format(now(), '%Y-%m')
             order by sg.seq asc
@@ -98,11 +98,11 @@ class SLib
 
     public static function getStoreTypes()
     {
-        $sql = " 
+        $sql = "
 			select *
 			from code
-			where 
-				code_kind_cd = 'store_type' and use_yn = 'Y' order by code_seq 
+			where
+				code_kind_cd = 'store_type' and use_yn = 'Y' order by code_seq
 		";
 		$store_types = DB::select($sql);
         return $store_types;
@@ -122,13 +122,13 @@ class SLib
 		}
 
         $sql = "
-            select 
-                s.sale_kind as code_id, c.code_val as code_val, s.idx as sale_type_cd, 
-                s.sale_type_nm, s.sale_apply, s.amt_kind, s.sale_amt, s.sale_per, s.use_yn, 
+            select
+                s.sale_kind as code_id, c.code_val as code_val, s.idx as sale_type_cd,
+                s.sale_type_nm, s.sale_apply, s.amt_kind, s.sale_amt, s.sale_per, s.use_yn,
                 (
-                    select count(ss.idx) 
-                    from sale_type_store ss 
-                    where ss.sale_type_cd = s.idx 
+                    select count(ss.idx)
+                    from sale_type_store ss
+                    where ss.sale_type_cd = s.idx
                         and ss.use_yn = 'Y'
                 ) as store_cnt
             from sale_type s
@@ -144,12 +144,29 @@ class SLib
     public static function getStoreProp($no)
     {
         $sql = "
-            select 
+            select
                 s.manage_type, s.account_yn, s.exp_manage_yn, s.priority, s.competitor_yn, s.pos_yn, s.ostore_stock_yn, s.sale_dist_yn, s.rt_yn, s.open_month_stock_yn, s.point_in_yn, s.sale_place_match_yn
             from store s
             where s.store_cd = :store_cd
         ";
         return DB::selectOne($sql, ['store_cd'=>$no]);
+    }
+
+    /* 메뉴정보 */
+    public static function getLnbs($type)
+    {
+        if($type == 'store') {
+            $query = DB::table('store_controller');
+        } else if ($type == 'shop') {
+            $query = DB::table('shop_controller');
+        } else if ($type == 'head') {
+            $query = DB::table('mgr_controller');
+        }
+        $query = $query->where('menu_no', '>', 1);
+        $query = $query->where('is_del', 0);
+        $query = $query->where('state', '>=', 0);
+        $query = $query->orderby('seq', 'asc');
+        return $query->get();
     }
 
 }

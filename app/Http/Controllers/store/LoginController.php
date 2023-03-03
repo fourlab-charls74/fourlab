@@ -4,10 +4,12 @@ namespace App\Http\Controllers\store;
 
 use App\Http\Controllers\Controller;
 use App\Components\Lib;
+use App\Components\SLib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Head;
 use Illuminate\Validation\ValidationException;
@@ -22,7 +24,6 @@ class LoginController extends Controller
     }
 
     public function login(Request $request){
-
         $request->validate([
             'email' => 'required|min:3',
             'password' => 'required',
@@ -52,6 +53,27 @@ class LoginController extends Controller
                         'visit_ip' => $ip,
                         'visit_date' => DB::raw('now()')
                     ]);
+
+
+                // LNB 메뉴생성
+                $menu['store']  = SLib::getLnbs('store');
+                $menu['shop']   = SLib::getLnbs('shop');
+                $menu['head']   = SLib::getLnbs('head');
+
+                $menu_list = [];
+                foreach($menu as $key => $value) {
+                    foreach($value as $sub_value) {
+                        $array_sub_value = (array)$sub_value;
+                        if(isset($menu_list[$key][$array_sub_value['entry']])) {
+                            $menu_list[$key][$array_sub_value['entry']]['sub'][$array_sub_value['menu_no']] = $array_sub_value;
+                        } else {
+                            $menu_list[$key][$array_sub_value['menu_no']] = $array_sub_value;
+                        }
+                    }
+                    $menu_html[$key] = view(Config::get('shop.'.$key.'.view') . '/layouts/lnb', ['menu_list' => $menu_list[$key]])->render();
+                    Cache::forever($key.'_lnb', $menu_html[$key]);
+                }
+
 
                 return redirect('/store');
             } else {
