@@ -243,7 +243,7 @@ class stk31Controller extends Controller
             $sql = "
                 select
                     s.ns_cd as ns_cd,
-                    if( d.store_cd = 'L0025', d.store_cd, '' ) as store_cd
+                    if( d.store_cd = '$store_cd', d.store_cd, '' ) as store_cd
                 from notice_store s 
                     left outer join notice_store_detail d on s.ns_cd = d.ns_cd
                     left outer join store on store.store_cd = d.store_cd

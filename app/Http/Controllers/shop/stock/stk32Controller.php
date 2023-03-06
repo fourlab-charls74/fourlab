@@ -270,7 +270,7 @@ class stk32Controller extends Controller
                 select 
                     m.msg_cd,
                     m.sender_cd,
-                    s.store_nm as sender_nm,
+                    if(m.sender_cd='HEAD', '본사', s.store_nm) as sender_nm,
                     s.phone as mobile,
                     m.content,
                     md.rt,
@@ -286,7 +286,7 @@ class stk32Controller extends Controller
                 select 
                     m.msg_cd,
                     m.sender_cd,
-                    s.store_nm as sender_nm,
+                    if(m.sender_cd='HEAD', '본사', s.store_nm) as sender_nm,
                     s.phone as mobile,
                     m.content,
                     md.rt,
