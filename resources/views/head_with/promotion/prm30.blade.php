@@ -81,8 +81,8 @@
                             <div class="flax_box">
                                 <select name="disp_yn" class="form-control form-control-sm">
                                     <option value="">선택</option>
-                                    <option value="Y">Y</option>
-                                    <option value="N">N</option>
+                                    <option value="Y">예</option>
+                                    <option value="N">아니오</option>
                                 </select>
                             </div>
                         </div>
@@ -95,8 +95,8 @@
                             <div class="flax_box">
                                 <select name="ex_pop_yn" class="form-control form-control-sm">
                                     <option value="">선택</option>
-                                    <option value="Y">Y</option>
-                                    <option value="N">N</option>
+                                    <option value="Y">예</option>
+                                    <option value="N">아니오</option>
                                 </select>
                             </div>
                         </div>
@@ -155,15 +155,15 @@
                 <div class="fr_box flax_box">
                     <select id="disp_yn" class="form-control form-control-sm mr-1" style="width:70px;">
                         <option value="">선택</option>
-                        <option value="Y">Y</option>
-                        <option value="N">N</option>
+                        <option value="Y">예</option>
+                        <option value="N">아니오</option>
                     </select>
                     <a href="#" class="btn btn-sm btn-primary shadow-sm mr-1 disp-btn">출력여부 변경</a>
 
                     <select id="ex_pop_yn" class="form-control form-control-sm mr-1" style="width:70px;">
                         <option value="">선택</option>
-                        <option value="Y">Y</option>
-                        <option value="N">N</option>
+                        <option value="Y">예</option>
+                        <option value="N">아니오</option>
                     </select>
                     <a href="#" class="btn btn-sm btn-primary shadow-sm mr-1 ex-pop-btn">인기제외여부 변경</a>
 
@@ -279,11 +279,25 @@
         },
         {
             field: "disp_yn",
-            headerName: "출력여부"
+            headerName: "출력여부",
+            width: 70,
+            cellStyle:{"text-align" : "center"},
+			cellRenderer: function(params) {
+				if(params.value == 'Y') return "예"
+				else if(params.value == 'N') return "아니오"
+				else return params.value
+			}
         },
         {
             field: "ex_pop_yn",
-            headerName: "인기제외여부"
+            headerName: "인기제외여부",
+            width: 90,
+            cellStyle:{"text-align" : "center"},
+			cellRenderer: function(params) {
+				if(params.value == 'Y') return "예"
+				else if(params.value == 'N') return "아니오"
+				else return params.value
+			}
         },
         // {
         //     field: "synonym",

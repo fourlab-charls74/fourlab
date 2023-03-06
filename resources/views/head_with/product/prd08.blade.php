@@ -214,25 +214,27 @@
 		},
 		{field:"goods_nm" , headerName:"상품명", pinned:'left', width:230, type: "HeadGoodsNameType"},
 		{field:"code_val" , headerName:"상품상태", pinned:'left',},
-		{field:"rank" , headerName:"순위", pinned:'left',},
-		{field:"variation" , headerName:"순위증감", pinned:'left', width:80},
-		{field:"sale_point" , headerName:"판매점수", pinned:'left', width:80},
+		{field:"rank" , headerName:"순위", pinned:'left', cellStyle:{"text-align" : "right"}},
+		{field:"variation" , headerName:"순위증감", pinned:'left', width:70, cellStyle:{"text-align" : "right"}},
+		{field:"sale_point" , headerName:"판매점수", pinned:'left', width:70, cellStyle:{"text-align" : "right"}},
 		{
-			field:"admin_point" , headerName:"관리자 점수", pinned:'left', width:100, editable: true, type: 'currencyType',
+			field:"admin_point" , headerName:"관리자 점수", pinned:'left', width:80, editable: true, type: 'currencyType',
 			cellStyle: CELL_COLOR.YELLOW
 		},
-		{field:"pre_point" , headerName:"예상총점", pinned:'left', width:80},
-		{field:"point" , headerName:"총점"},
+		{field:"pre_point" , headerName:"예상총점", pinned:'left', width:70, cellStyle:{"text-align" : "right"}},
+		{field:"point" , headerName:"총점", cellStyle:{"text-align" : "right"}},
 
 		{headerName:"조회수", width:120,
 			children : [
 				{
 					headerName : "누적",
 					field : "clm_sum",
+					cellStyle:{"text-align" : "right"}
 				},
 				{
 					headerName : "기간",
 					field : "clm_avg",
+					cellStyle:{"text-align" : "right"}
 				}
 			]
 		},
@@ -241,10 +243,12 @@
 				{
 					headerName : "누적",
 					field : "review",
+					cellStyle:{"text-align" : "right"}
 				},
 				{
 					headerName : "기간",
 					field : "review_avg",
+					cellStyle:{"text-align" : "right"}
 				}
 			]
 		},
@@ -253,10 +257,12 @@
 				{
 					headerName : "누적",
 					field : "qa",
+					cellStyle:{"text-align" : "right"}
 				},
 				{
 					headerName : "기간",
 					field : "qa_avg",
+					cellStyle:{"text-align" : "right"}
 				}
 			]
 		},

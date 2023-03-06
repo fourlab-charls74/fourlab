@@ -115,7 +115,7 @@
         },
         {headerName: "작성자", field: "name", cellClass: 'hd-grid-code'},
         {headerName: "등록일", field: "rt", cellClass: 'hd-grid-code'},
-        {headerName: "조회수", field: "cnt"},
+        {headerName: "조회수", field: "cnt", cellStyle:{"text-align" : "right"}},
         { width: "auto" }
     ];
 

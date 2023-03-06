@@ -171,7 +171,13 @@
                     {headerName:"종료", field:"use_to_date", width:100}
                 ]
             },
-            {field:"pub_dup_yn" , headerName:"복수발급"},
+            {field:"pub_dup_yn" , headerName:"복수발급", width: 70, cellStyle:{"text-align" : "center"},
+                cellRenderer: function(params) {
+                    if(params.value == 'Y') return "예"
+                    else if(params.value == 'N') return "아니오"
+                    else return params.value
+                }
+            },
             {field:"coupon_amt" , headerName:"발행금액", cellClass:'hd-grid-number'},
             {field:"pub_time" , headerName:"발행시점"},
             {field:"coupon_apply" , headerName:"사용가능 대상"},
@@ -200,7 +206,13 @@
                 }
             },
             {field:"coupon_order_cnt" , headerName:"사용수", type: 'currencyType'},
-            {field:"use_yn" , headerName:"사용여부"},
+            {field:"use_yn" , headerName:"사용여부", width: 70, cellStyle:{"text-align" : "center"},
+                cellRenderer: function(params) {
+                    if(params.value == 'Y') return "예"
+                    else if(params.value == 'N') return "아니오"
+                    else return params.value
+                }
+            },
             {field:"admin_nm" , headerName:"발행자"},
             {field:"regi_date" , headerName:"등록일시"},
             {width:"auto"}

@@ -136,8 +136,20 @@
 <script language="javascript">
     var columns = [
         {headerName: "#", field: "num",type:'NumType', cellClass: 'hd-grid-code'},
-        {headerName: "메인공지", field: "main_yn", cellClass: 'hd-grid-code'},
-        {headerName: "게시판공지", field: "notice_yn", cellClass: 'hd-grid-code'},
+        {headerName: "메인공지", field: "main_yn", cellClass: 'hd-grid-code', width: 70, 
+            cellRenderer: function(params) {
+                if(params.value == 'Y') return "예"
+                else if(params.value == 'N') return "아니오"
+                else return params.value
+            }
+        },
+        {headerName: "게시판공지", field: "notice_yn", cellClass: 'hd-grid-code', width: 70, 
+            cellRenderer: function(params) {
+                if(params.value == 'Y') return "예"
+                else if(params.value == 'N') return "아니오"
+                else return params.value
+            }
+        },
         {headerName: "제목", field: "subject",width:400,
             cellRenderer: function (params) {
                         if (params.value !== undefined) {
@@ -145,9 +157,15 @@
 
                         }
                     }},
-        {headerName: "조회수", field: "cnt", type:'numberType', cellClass: 'hd-grid-code'},
+        {headerName: "조회수", field: "cnt", type:'numberType', cellClass: 'hd-grid-code', cellStyle:{"text-align" : "right"}},
         {headerName: "작성자", field: "name", width:100},
-        {headerName: "공개여부", field: "use_yn", cellClass: 'hd-grid-code'},
+        {headerName: "공개여부", field: "use_yn", cellClass: 'hd-grid-code', width: 70, 
+            cellRenderer: function(params) {
+                if(params.value == 'Y') return "예"
+                else if(params.value == 'N') return "아니오"
+                else return params.value
+            }
+        },
         {headerName: "등록일시", field: "regi_date", width:130},
         {headerName: "수정일시", field: "ut", width:130},
         {headerName: "글번호", field: "idx", hide:true },

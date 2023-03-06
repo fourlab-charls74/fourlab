@@ -234,8 +234,14 @@
         // this row shows the row index, doesn't use any data from the row
         {headerName: '#', width:50, maxWidth: 90,type:'NumType'},
         {field:"subject",headerName:"이벤트", width:200 },
-        {field:"total",headerName:"댓글수",width:80, },
-        {field:"is_use",headerName:"사용여부", width:90 },
+        {field:"total",headerName:"댓글수",width:65, cellStyle:{"text-align" : "right"}},
+        {field:"is_use",headerName:"사용여부", width: 65, cellStyle:{"text-align" : "center"},
+			cellRenderer: function(params) {
+				if(params.value == 'Y') return "예"
+				else if(params.value == 'N') return "아니오"
+				else return params.value
+			}
+		},
         {field:"regi_date",headerName:"등록일",},
 		{field:"idx", headerName:"idx", hide:true},
 		{width:"auto"}
@@ -346,8 +352,14 @@
         {field:"gift",headerName:"찜한선물", width:90 },
         {field:"comment",headerName:"코멘트", width:500, wrapText: true },
         {field:"regi_date",headerName:"등록일", width:120, },
-		{field:"is_show",headerName:"출력여부", width:90},
-		{field:"award_level",headerName:"시상",},
+		{field:"is_show",headerName:"출력여부", width: 70, cellStyle:{"text-align" : "center"},
+			cellRenderer: function(params) {
+				if(params.value == 'Y') return "예"
+				else if(params.value == 'N') return "아니오"
+				else return params.value
+			}
+		},
+		{field:"award_level",headerName:"시상", cellStyle:{"text-align" : "right"}},
 		{field:"idx", headerName:"idx", hide:true},
 		{width:"auto"}
 	];
