@@ -256,7 +256,7 @@
         {
             headerName: "품목",
             field: "opt_kind_nm",
-            width: 120,
+            width: 80,
             pinned: 'left'
         },
         {
@@ -268,8 +268,9 @@
         {
             headerName: "스타일넘버",
             field: "style_no",
-            width: 120,
-            pinned: 'left'
+            width: 80,
+            pinned: 'left',
+            cellStyle:{"text-align" : "center"}
         },
         {
             headerName: "상품명",

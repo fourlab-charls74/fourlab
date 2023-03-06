@@ -152,26 +152,44 @@
 
 <script language="javascript">
 	var columns = [
-		{headerName: '#', width:50, maxWidth: 90,type:'NumType'},
-		{field:"b_no" , headerName:"번호", },
+		{headerName: '#', width:50, maxWidth: 90,type:'NumType', cellStyle:{"text-align" : "center"}},
+		{field:"b_no" , headerName:"번호", cellStyle:{"text-align" : "center"}},
 		{field:"board_nm" , headerName:"구분"},
 		{field:"subject" , headerName:"제목", width:250,
 			cellRenderer: function(params) {
 				return '<a href="#" onClick="PopBoardView(\''+ params.data.b_no +'\')">'+ params.value+'</a>'
 			}
 		},
-		{field:"hit", headerName:"조회수", width:80 },
-		{field:"comment_cnt" , headerName:"댓글수"  },
-		{field:"file_cnt", headerName:"파일수"},
+		{field:"hit", headerName:"조회수", width:70, cellStyle:{"text-align" : "right"}},
+		{field:"comment_cnt" , headerName:"댓글수", width:70, cellStyle:{"text-align" : "right"}},
+		{field:"file_cnt", headerName:"파일수", width:70, cellStyle:{"text-align" : "right"}},
 		{field:"user_nm" , headerName:"작성자",},
 		{field:"user_id", headerName:"아이디", type:"HeadUserType"},
 		{field:"regi_date" , headerName:"작성일", width:130 },
 		{field:"ip" , headerName:"IP", width:100 },
-		{field:"is_notice" , headerName:"공지", },
-		{field:"is_secret" , headerName:"비밀", },
+		{field:"is_notice" , headerName:"공지", cellStyle:{"text-align" : "center"},
+			cellRenderer: function(params) {
+				if(params.value == 'Y') return "예"
+				else if(params.value == 'N') return "아니오"
+				else return params.value
+			}
+		},
+		{field:"is_secret" , headerName:"비밀", cellStyle:{"text-align" : "center"},
+			cellRenderer: function(params) {
+				if(params.value == 'Y') return "예"
+				else if(params.value == 'N') return "아니오"
+				else return params.value
+			}
+		},
 		{field:"board_id", headerName:"board_id", hide:true},
 		{field:"step", headerName:"step", hide:true, },
-		{field:"points" , headerName:"적립금", },
+		{field:"points" , headerName:"적립금", cellStyle:{"text-align" : "center"},
+			cellRenderer: function(params) {
+				if(params.value == 'Y') return "예"
+				else if(params.value == 'N') return "아니오"
+				else return params.value
+			}
+		},
 		{ width: "auto" }
 	];
 	const pApp = new App('', { gridId: "#div-gd" });

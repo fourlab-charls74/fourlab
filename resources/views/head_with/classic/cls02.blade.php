@@ -190,7 +190,13 @@
         {headerName: "전예약룸", field: "s_dm_type_nm", width:140},
         {headerName: "후예약일", field: "e_dm_date_nm", width:84, cellStyle: defaultCellStyle},
         {headerName: "후예약룸", field: "e_dm_type_nm", width:140},
-        {headerName: "확정", field: "confirm_yn", cellStyle: defaultCellStyle},
+        {headerName: "확정", field: "confirm_yn", cellStyle: defaultCellStyle, 
+            cellRenderer: function(params) {
+                if(params.value == 'Y') return "예"
+                else if(params.value == 'N') return "아니오"
+                else return params.value
+            }
+        },
         {headerName: "확정일", field: "confirm_dt", width:110, cellStyle: defaultCellStyle},
         {headerName: "등록일", field: "reg_dt", width:110, cellStyle: defaultCellStyle},
         {headerName: "수정일", field: "updt_dt", width:110, cellStyle: defaultCellStyle},

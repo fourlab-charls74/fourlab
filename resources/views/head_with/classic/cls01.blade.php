@@ -166,9 +166,15 @@
             cellRenderer: (params) => `<a href="/head/classic/cls01/show/${params.data.idx}">${params.value}</a>`
         },
         {headerName: "작성자", field: "admin_nm", width:100},
-        {headerName: "공개여부", field: "use_yn", cellClass: 'hd-grid-code'},
+        {headerName: "공개여부", field: "use_yn", cellClass: 'hd-grid-code', width: 60, cellStyle: {'text-align':'center'},
+            cellRenderer: function(params) {
+            if(params.value == 'Y') return "예"
+            else if(params.value == 'N') return "아니오"
+            else return params.value
+            }
+        },
         {headerName: "등록일시", field: "regi_date", width:130},
-        {headerName: "조회수", field: "cnt", type:'numberType', cellClass: 'hd-grid-code'},
+        {headerName: "조회수", field: "cnt", type:'numberType', cellClass: 'hd-grid-code', width: 50, cellStyle: {'text-align':'right'}},
         {width: "auto"}
     ];
     

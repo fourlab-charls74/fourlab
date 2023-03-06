@@ -107,7 +107,16 @@
             },
         
         },
-        {field: "state", headerName: "상태", cellClass: 'hd-grid-code'},
+        {field: "state", headerName: "상태", cellClass: 'hd-grid-code',
+            cellRenderer: function(params) {
+                if(params.value == '-1') return "미사용"
+                else if(params.value == '0') return "사용중"
+                else if(params.value == '2') return "개발중"
+                else if(params.value == '4') return "테스트중"
+                else if(params.value == '6') return ""
+                else return params.value
+            }
+        },
         {
             field: "kor_nm",
             headerName: "메뉴명",

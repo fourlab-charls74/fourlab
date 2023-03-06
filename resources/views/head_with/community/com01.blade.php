@@ -105,7 +105,7 @@ var columns = [
         field:"display_comment_writer", 
         headerName:"댓글작성자 노출", 
         cellRenderer: function(params) {
-            console.log(params);
+            // console.log(params);
             return display_comment_writers[params.value];
         }
     },
@@ -137,7 +137,13 @@ var columns = [
         }
     },
     {field:"comment_date" , headerName:"댓글 최근 등록일시"},
-    {field:"is_use" , headerName:"사용여부", width: 120},
+    {field:"is_use" , headerName:"사용여부", width: 70, cellStyle:{"text-align" : "center"},
+        cellRenderer: function(params) {
+            if(params.value == 'Y') return "사용"
+            else if(params.value == 'N') return "미사용"
+            else return params.value
+        }
+    },
     {field:"regi_date" , headerName:"등록일시", width: 150},
     {field:"upd_date" , headerName:"수정일시", width: 150},
     { width: "auto" }
