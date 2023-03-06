@@ -9,6 +9,8 @@
                 @foreach ($lnb['sub'] as $lnb_sub)
                 <li><a href="{{ $lnb_sub['action'] }}"@if($lnb_sub['target']) target="{{ $lnb_sub['target'] }}" @endif>
                     @switch($lnb_sub['state'])
+                        @case(0)
+                            @break
                         @case(2)
                             (개)
                             @break
