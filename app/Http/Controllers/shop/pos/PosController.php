@@ -9,19 +9,20 @@ use App\Models\Conf;
 use App\Models\Order;
 use App\Models\Point;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Exception;
 
 // 테스트매장 -- 추후변경필요
-const STORE_CD = 'L0027';
+//const STORE_CD = 'L0027';
 
 class PosController extends Controller
 {
     public function index() 
     {
-        $store_cd = STORE_CD;
+        $store_cd = Auth::guard('head')->user()->store_cd;
         $today = date('Y-m-d');
         $sql = "
             select 
@@ -101,7 +102,7 @@ class PosController extends Controller
     public function search_analysis(Request $request)
     {
         $today = date("Y-m-d");
-        $store_cd = STORE_CD;
+        $store_cd = Auth::guard('head')->user()->store_cd;
         $sql = "
             select count(ord_no) as ord_cnt, sum(ord_amt) as ord_amt, sum(pay_amt) as pay_amt, sum(total_qty) as ord_qty
             from (
@@ -139,7 +140,7 @@ class PosController extends Controller
     /** 상품검색 */
     public function search_goods(Request $request)
     {
-        $store_cd = STORE_CD;
+        $store_cd = Auth::guard('head')->user()->store_cd;
         $search_type = $request->input('search_type', 'prd_cd');
         $search_keyword = $request->input('search_keyword', '');
 
@@ -245,7 +246,7 @@ class PosController extends Controller
     /** 고객검색 */
     public function search_member(Request $request)
     {
-        $store_cd = STORE_CD;
+        $store_cd = Auth::guard('head')->user()->store_cd;
         $search_type = $request->input('search_type', 'user_nm');
         $search_keyword = $request->input('search_keyword', '');
 
@@ -324,7 +325,7 @@ class PosController extends Controller
         
         $data = (object) $request->all();
         $admin_id = Auth('head')->user()->id;
-        $store_cd = STORE_CD;
+        $store_cd = Auth::guard('head')->user()->store_cd;
         $store_nm = '';
         if ($store_cd != '') {
             $row = DB::table('store')->select('store_nm')->where('store_cd', '=', $store_cd)->first();
@@ -428,7 +429,7 @@ class PosController extends Controller
         $ord_type = 15; // 출고형태 : 정상(15)
         $ord_kind = 20; // 출고구분 : 출고가능(20)
         $ord_state = $req->input("ord_state", ""); // 주문상태
-        $store_cd = STORE_CD; // 주문매장
+        $store_cd = Auth::guard('head')->user()->store_cd; // 주문매장
         $store_nm = '';
         $give_point = "N"; // 적립금지급 여부
         if ($store_cd != '') {
@@ -987,7 +988,7 @@ class PosController extends Controller
     /** 판매내역조회 */
     public function search_order_history(Request $request)
     {
-        $store_cd = STORE_CD;
+        $store_cd = Auth::guard('head')->user()->store_cd;
 
         $where = "";
         $sdate = $request->input('sdate', now()->sub(1, 'month')->format('Y-m-d'));
@@ -1150,7 +1151,7 @@ class PosController extends Controller
     /** 대기내역 조회 */
     public function search_waiting(Request $request)
     {
-        $store_cd = STORE_CD;
+        $store_cd = Auth::guard('head')->user()->store_cd;
         $sdate = now()->sub(1, 'month')->format('Y-m-d');
         $edate = date("Y-m-d");
 
