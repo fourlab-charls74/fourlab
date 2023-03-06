@@ -1147,6 +1147,6 @@
 	});
 </script>
 
-@include('store_with.pos.pos_js')
+@include('shop_with.pos.pos_js')
 
 @stop
