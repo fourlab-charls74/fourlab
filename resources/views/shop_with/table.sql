@@ -1033,6 +1033,8 @@ ALTER TABLE `bizest_smart`.`mgr_user` ADD COLUMN `confirm_yn` CHAR(1) NULL COMME
 
 ALTER TABLE `bizest_smart`.`store_controller` ADD COLUMN `icon` VARCHAR(30) NULL COMMENT '아이콘 클래스명' AFTER `is_part_role`; 
 
+Alter table `bizest_smart`.`shop_controller` add column `icon` varchar(30) NULL COMMENT '아이콘 클래스명' after `is_part_role`; 
+
 --
 -- 기존 테이블 컬럼 추가 종료
 --
