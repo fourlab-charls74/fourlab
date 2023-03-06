@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\store\api;
+namespace App\Http\Controllers\shop\api;
 
 use App\Components\SLib;
 use App\Components\Lib;
@@ -59,7 +59,7 @@ class SmsController extends Controller
             'store_areas'	=> SLib::getCodes("STORE_AREA"),
         ];
 
-        return view( Config::get('shop.store.view') . "/common/sms_all", $values);
+        return view( Config::get('shop.shop.view') . "/common/sms_all", $values);
     }
 
     public function sendMsg(Request $req) {

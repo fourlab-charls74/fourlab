@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\head\api;
+namespace App\Http\Controllers\shop\api;
 
 use App\Components\SLib;
 use App\Components\Lib;
@@ -33,7 +33,7 @@ class PointController extends Controller
 			'data' => $req->input('data', '')
 		];
 
-        return view( Config::get('shop.head.view') . "/common/point", $values);
+        return view( Config::get('shop.shop.view') . "/common/point", $values);
     }
 
     public function search(Request $req) {

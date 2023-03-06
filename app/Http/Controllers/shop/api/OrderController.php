@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\head\api;
+namespace App\Http\Controllers\shop\api;
 
 use App\Components\SLib;
 use App\Components\Lib;
@@ -35,6 +35,6 @@ class OrderController extends Controller
             'stat_pay_types' => SLib::getCodes('G_STAT_PAY_TYPE')
         ];
 
-        return view( Config::get('shop.head.view') . "/common/order", $values);
+        return view( Config::get('shop.shop.view') . "/common/order", $values);
     }
 }

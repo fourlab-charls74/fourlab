@@ -32,12 +32,16 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         // 매장명 조회 (자동완성)
         Route::get('/store', 'AutoCompleteController@store');
 
+        Route::get('/style-no', 'AutoCompleteController@style_no');
+        Route::get('/goods-nm', 'AutoCompleteController@goods_nm');
+        Route::get('/goods-nm-eng', 'AutoCompleteController@goods_nm_eng');
     });
 
     Route::prefix("api")->namespace('api')->group(function () {
 
         // 상품검색
         Route::get('goods', 'goods@search');
+        Route::get('goods-search', 'goods@head_search');
         Route::get('goods/show', 'goods@show');
         Route::get('goods/show/file/search', 'goods@file_search');
 

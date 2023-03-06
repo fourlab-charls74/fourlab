@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\store\api;
+namespace App\Http\Controllers\shop\api;
 
 use App\Http\Controllers\Controller;
 use App\Components\Lib;
@@ -16,7 +16,7 @@ class MemberController extends Controller {
      * 고객명 선택 화면 랜더링
      */
     public function show() {
-        return view(Config::get('shop.store.view') . "/common/member");
+        return view(Config::get('shop.shop.view') . "/common/member");
     }
 
     /**

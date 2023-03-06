@@ -1071,7 +1071,7 @@ class cs01Controller extends Controller {
 				$user_id = Auth::guard('head')->user()->id;
 				$extension = $file->extension();
 	
-				$save_path = "data/store/cs01/";
+				$save_path = "data/shop/cs01/";
 				$file_name = "${now}_${user_id}.${extension}";
 				
 				if (!Storage::disk('public')->exists($save_path)) {

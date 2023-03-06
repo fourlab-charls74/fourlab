@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Components\Lib;
 use App\Components\SLib;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -16,11 +17,9 @@ use App\Models\Conf;
 
 class stk33Controller extends Controller
 {
-    private $store_cd = 'L0025';
-
     public function index(Request $request)
     {
-        $store_cd = $this->store_cd;
+        $store_cd = Auth::guard('head')->user()->store_cd;
         $mutable = Carbon::now();
         $sdate = $mutable->sub(1, 'week')->format('Y-m-d');
         $edate = date("Y-m-d");
@@ -191,7 +190,7 @@ class stk33Controller extends Controller
     public function create()
     {
        
-        $store_cd = $this->store_cd;
+        $store_cd = Auth::guard('head')->user()->store_cd;
         $mutable = Carbon::now();
         $date = $mutable->now()->format('Y-m');
 

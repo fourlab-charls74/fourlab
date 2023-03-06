@@ -311,7 +311,7 @@ class mem01Controller extends Controller
 		}
 		else {
 			//$file = sprintf("data/code02/%s", $_FILES['file']['name']);
-			$file = sprintf("data/store/mem01/%s", $_FILES['file']['name']);
+			$file = sprintf("data/shop/mem01/%s", $_FILES['file']['name']);
 			move_uploaded_file($_FILES['file']['tmp_name'], $file);
 			echo json_encode(array(
 				"code" => 200,

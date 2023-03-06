@@ -132,7 +132,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4 inner-td">
+					{{-- <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label>창고명</label>
                             <div class="form-inline inline_btn_box">
@@ -141,7 +141,7 @@
                                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-storage"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="">자료수/정렬</label>

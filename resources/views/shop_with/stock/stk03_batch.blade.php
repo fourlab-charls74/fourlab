@@ -119,7 +119,7 @@
 
 <!-- script -->
 <script src="https://unpkg.com/xlsx-style@0.8.13/dist/xlsx.full.min.js"></script>
-@include('store_with.stock.stk03_batch_js')
+@include('shop_with.stock.stk03_batch_js')
 <script language="javascript">
     let columns = [
         {field: "result", headerName: "결과", width: 100, cellStyle: (params) => ({...StyleLineHeight, "color": params.value == '200' ? 'green' : 'red'}),

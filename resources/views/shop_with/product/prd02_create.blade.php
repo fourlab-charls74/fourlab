@@ -492,7 +492,7 @@
 
 
 <!-- script -->
-@include('store_with.product.prd02_js')
+@include('shop_with.product.prd02_js')
 <!-- script -->
 
 @stop

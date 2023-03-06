@@ -433,7 +433,7 @@
 </div>
 
 <!-- script -->
-@include('store_with.stock.stk03_js')
+@include('shop_with.stock.stk03_js')
 <script language="javascript">
     let columns = [
         {headerCheckboxSelection: true, checkboxSelection: true,  width: 28},

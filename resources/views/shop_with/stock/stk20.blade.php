@@ -262,7 +262,7 @@
 	</div>
 </div>
 <!-- script -->
-@include('store_with.stock.stk20_js')
+@include('shop_with.stock.stk20_js')
 <!-- script -->
 <script language="javascript">
     let rt_states = <?= json_encode(@$rt_states) ?> ;

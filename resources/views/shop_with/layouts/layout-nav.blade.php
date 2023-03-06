@@ -21,8 +21,7 @@
     <script src="{{ URL::asset('/with/libs/bootstrap/bootstrap.min.js')}}"></script>
     <script src="{{ URL::asset('/skin/libs/select2/select2.min.js')}}"></script>
     <script src="{{ URL::asset('/skin/libs/datepicker/datepicker.min.js')}}"></script>
-    <script src="{{ URL::asset('/js/head_search.js?20220707')}}"></script>
-    <script src="{{ URL::asset('/js/store_search.js?20220707')}}"></script>
+    <script src="{{ URL::asset('/js/shop_search.js?20230306')}}"></script>
     <script src="/with/js/app.js"></script>
     <script src="/handle/http/axios.js"></script>
 </html>

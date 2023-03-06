@@ -51,4 +51,97 @@ class AutoCompleteController extends Controller
         }
 
     }
+
+    public function style_no(Request $req)
+    {
+        $type = $req->input('type', 'ac');
+        $keyword = $req->input('keyword', '');
+
+        if ($keyword == '') return '';
+
+        if($type == "select2"){
+            $sql = /** @lang text */
+                        "
+                select goods_no,
+                    concat(:image_svr,REPLACE(img,'_a_500','_s_50')) AS img,style_no as id,style_no as text
+                from goods 
+                where style_no like :keyword
+                limit 0, 10
+              ";
+            $results =  DB::select($sql, [
+                "image_svr" => config('shop.image_svr'),
+                "keyword" => sprintf("%s%%", $keyword)
+            ]);
+
+            return response()->json([
+                "results" => $results
+            ]);
+        } else {
+            $sql = /** @lang text */
+                "
+            select style_no as label,goods_no,concat(:image_svr,REPLACE(img,'_a_500','_s_50')) AS img
+            from goods 
+            where style_no like :keyword
+            limit 0, 10
+          ";
+            $results =  DB::select($sql, [
+                "image_svr" => config('shop.image_svr'),
+                "keyword" => sprintf("%s%%", $keyword)
+            ]);
+            return response()->json($results);
+        }
+
+    }
+
+    public function goods_nm(Request $req) {
+
+        $type = $req->input('type', 'ac');
+        $keyword = $req->input('keyword', '');
+
+        if ($keyword == '') return '';
+
+        if($type == "select2") {
+        } else {
+
+            $sql = /** @lang text */
+                "
+                select 
+                    goods_nm as label,
+                    concat(:image_svr,REPLACE(img,'_a_500','_s_50')) AS img
+                from goods 
+                where goods_nm like :keyword
+                limit 0, 10
+          ";
+            return DB::select($sql, [
+                "image_svr" => config('shop.image_svr'),
+                "keyword" => sprintf("%%%s%%", $keyword)]
+            );
+        }
+    }
+
+    public function goods_nm_eng(Request $req) {
+
+        $type = $req->input('type', 'ac');
+        $keyword = $req->input('keyword', '');
+
+        if ($keyword == '') return '';
+
+        if($type == "select2") {
+        } else {
+
+            $sql = /** @lang text */
+                "
+                select 
+                    goods_nm_eng as label,
+                    concat(:image_svr,REPLACE(img,'_a_500','_s_50')) AS img
+                from goods 
+                where goods_nm_eng like :keyword
+                limit 0, 10
+          ";
+            return DB::select($sql, [
+                "image_svr" => config('shop.image_svr'),
+                "keyword" => sprintf("%%%s%%", $keyword)]
+            );
+        }
+    }
 }

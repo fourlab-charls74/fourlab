@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\head\api;
+namespace App\Http\Controllers\shop\api;
 
 use App\Components\SLib;
 use App\Components\Lib;

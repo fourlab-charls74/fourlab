@@ -1,4 +1,4 @@
-@extends('store_with.layouts.layout-nav')
+@extends('shop_with.layouts.layout-nav')
 @section('title', '수기 일괄판매')
 @section('content')
 <div class="show_layout py-3 px-sm-3">
@@ -116,7 +116,7 @@
 
 <!-- script -->
 <script src="https://unpkg.com/xlsx-style@0.8.13/dist/xlsx.full.min.js"></script>
-@include('store_with.order.ord01_batch_js')
+@include('shop_with.order.ord01_batch_js')
 <script language="javascript">
     let columns = [
         {field: "result", headerName: "결과", width: 100, cellStyle: (params) => ({...StyleLineHeight, "color": params.value == '200' ? 'green' : 'red'}),
