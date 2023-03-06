@@ -148,8 +148,14 @@
 
 <script language="javascript">
     const CMD = "{{ @$cmd }}";
+    const EXCLUED_TOTAL = "{{ @$extra_etc->exclude_total }}"; // 합계 계산 시 제외타입
+    const EXCEPT_VAT = "{{ @$extra_etc->except_vat }}"; // 세금제외타입
+    const S_PAYERS = "{{ @$extra_etc->pay_for_s }}"; // 매장부담타입
+    const C_PAYERS = "{{ @$extra_etc->pay_for_c }}"; // 본사부담타입
     
     const CLOSED_STATUS = { 'Y': '마감완료', 'N': '마감추가' };
+    const PAYER = { 'C': '(본사부담)', 'S': '(매장부담)' };
+
 	const YELLOW = { 'background-color': "#ffff99" };
 	const CENTER = { 'text-align': 'center' };
     const setEditable = (params, cond = true) => cond && params.node.rowPinned !== 'top' && params.data.closed_yn !== 'Y';
@@ -168,34 +174,37 @@
         },
         { field: "store_cd", headerName: "매장코드", pinned: 'left', width: 57, cellStyle: CENTER },
         { field: "store_nm", headerName: "매장명", pinned: 'left', type: 'StoreNameType', width: 170 },
-		@foreach ($extra_cols as $group_nm => $children)
-		{ headerName: "{{ $group_nm }}",
-			children: [
+        @foreach ($extra_cols as $entry_cd => $children)
+			@if ($entry_cd !== '')
+				{ headerName: `{{ $children[0]->entry_nm }} ${ PAYER["{{ $children[0]->payer }}"] || '' }`,
+					children: [
+						@foreach ($children as $child)
+							{ headerName: "{{ $child->type_nm }}", field: "{{ $child->type_cd }}_amt", type: 'currencyType', width: 100,
+                                editable: (params) => setEditable(params, "{{ $child->type_cd }}" !== 'P3'), 
+                                cellStyle: (params) => setEditable(params, "{{ $child->type_cd }}" !== 'P3') ? YELLOW : {},
+                                cellRenderer: (params) => params.value !== null ? Comma(params.value) : (CMD === 'add' ? '' : 0),
+                            },
+							@if ($child->except_vat_yn === 'Y')
+							{ headerName: "{{ $child->type_nm }}(-VAT)", field: "{{ $child->type_cd }}_novat", type: 'currencyType', width: 105,
+								cellRenderer: (params) => params.data["{{ $child->type_cd }}_amt"] ? Comma(Math.round((params.data["{{ $child->type_cd }}_amt"] || 0) / 1.1)) : (CMD === 'add' ? '' : 0),
+							},
+							@endif
+						@endforeach
+						@if (!in_array($entry_cd, ['M', 'O']))
+						{ headerName: "소계", field: "{{ $entry_cd }}_sum", type: 'currencyType', width: 100,
+                            cellRenderer: (params) => params.value !== null ? Comma(params.value) : (CMD === 'add' ? '' : 0),
+                        },
+						@endif
+					]
+				},
+			@else
 				@foreach ($children as $child)
-					{ headerName: "{{ $child->code_val }}", field: "{{ $child->code_id }}_amt", type: 'currencyType', width: 100, 
-						editable: (params) => setEditable(params, "{{ $child->code_id }}" !== 'E3'), 
-                        cellStyle: (params) => setEditable(params, "{{ $child->code_id }}" !== 'E3') ? YELLOW : {},
-                        cellRenderer: (params) => params.value !== null ? Comma(params.value) : (CMD === 'add' ? '' : 0),
-					},
-					@if (in_array($child->code_id, ['P1', 'M3']))
-					{ headerName: "{{ $child->code_val }}(-VAT)", field: "{{ $child->code_id }}_novat", type: 'currencyType', width: 105,
-						cellRenderer: (params) => params.data["{{ $child->code_id }}_amt"] ? Comma(Math.round((params.data["{{ $child->code_id }}_amt"] || 0) / 1.1)) : (CMD === 'add' ? '' : 0),
-					},
-					@endif
+					{ headerName: `{{ $child->type_nm }} ${ PAYER["{{ $child->payer }}"] || '' }`, field: "{{ $child->type_cd }}", type: 'currencyType', width: 120 },
 				@endforeach
-				@if (!in_array($group_nm, ['마일리지', '기타운영경비']))
-				{ headerName: "소계", field: "{{ str_split($children[0]->code_id ?? '')[0] }}_sum", type: 'currencyType', width: 100,
-                    cellRenderer: (params) => params.value !== null ? Comma(params.value) : (CMD === 'add' ? '' : 0),
-                },
-				@endif
-			]
-        },
-		@if ($group_nm === '관리')
-		{ headerName: "사은품", field: "gifts" },
-		{ headerName: "소모품", field: "expandables" },
-		@endif
+			@endif
 		@endforeach
-		{ field: "total", headerName: "총합계", type: 'currencyType', width: 100 },
+		{ field: "C_total", headerName: "본사부담금 합계", type: 'currencyType', width: 100, cellStyle: {"font-weight": "700"} }, // 추가지급금
+		{ field: "S_total", headerName: "매장부담금 합계", type: 'currencyType', width: 100, cellStyle: {"font-weight": "700"} }, // 공제금
         { width: "auto" }
     ];
 </script>
@@ -226,23 +235,23 @@
 					} else {
 						const group_cd = e.column.colId.split("")[0];
 
-						// E1(온라인RT), E2(온라인반송)은 소계에 포함시키지 않습니다. (because, E3(온라인) = E1 - E2)
-						if (['E1', 'E2'].includes(e.column.colId.split("_")[0])) {
-							e.data['E3_amt'] = e.data['E1_amt'] - e.data['E2_amt'];
+						if (['P1', 'P2'].includes(e.column.colId.split("_")[0])) {
+							e.data['P3_amt'] = e.data['P1_amt'] - e.data['P2_amt'];
 						}
 
 						// 각 소계 계산
 						e.data[group_cd + "_sum"] 
 							= Object.keys(e.data).reduce((a,c) => (
-								(c.split("")[0] === group_cd && c.split("_").slice(-1)[0] === "amt" && !['E1', 'E2'].includes(c.split("_")[0])) 
-									? ['P1', 'M3'].includes(c.split("_")[0])
+								(c.split("")[0] === group_cd && c.split("_").slice(-1)[0] === "amt" && !EXCLUED_TOTAL.split(",").includes(c.split("_")[0])) 
+									? EXCEPT_VAT.split(",").includes(c.split("_")[0])
                                         ? Math.round(e.data[c] * 1 / 1.1) 
                                         : (e.data[c] * 1) 
                                     : 0
 							) + a, 0);
 
 						// 총합계 계산
-						e.data.total = Object.keys(e.data).reduce((a,c) => (c.split("_").slice(-1)[0] === "sum" ? (e.data[c] * 1) : 0) + a, 0);
+						e.data.C_total = Object.keys(e.data).reduce((a,c) => (c.split("_").slice(-1)[0] === "sum" && C_PAYERS.includes(c.split("_")[0]) ? (e.data[c] * 1) : 0) + a, 0);
+						e.data.S_total = Object.keys(e.data).reduce((a,c) => (c.split("_").slice(-1)[0] === "sum" && S_PAYERS.includes(c.split("_")[0]) ? (e.data[c] * 1) : 0) + a, 0);
 
 						e.api.redrawRows({ rowNodes: [e.node] });
                         updatePinnedRow();
@@ -302,7 +311,7 @@
     function setColumns({ gifts = [], expandables = [] }) {
 		const cols = columns.reduce((a, c) => {
 			let col = {...c};
-			if(col.field === 'gifts') {
+			if(col.field === 'G') {
 				col.children = gifts.map(gf => ({ 
                         headerName: gf.prd_nm, 
                         field: "G_" + gf.prd_cd + "_amt", 
@@ -317,17 +326,18 @@
                         cellRenderer: (params) => params.value !== null ? Comma(params.value || 0) : (CMD === 'add' ? '' : 0) 
                     });
 			}
-            if(col.field === 'expandables') {
+            if(col.field === 'E') {
 				col.children = expandables.map(exp => ({ 
                     headerName: exp.prd_nm, 
-                    field: "S_" + exp.prd_cd  + "_amt", 
+                    field: "E_" + exp.prd_cd  + "_amt", 
                     type: 'currencyType', width: 100, 
                     editable: (params) => setEditable(params),
                     cellStyle: (params) => setEditable(params) ? YELLOW : {}, 
                     cellRenderer: (params) => params.value !== null ? Comma(params.value || 0) : (CMD === 'add' ? '' : 0) 
                 })).concat({ 
                     headerName: "소계", 
-                    field: "S_sum", type: 'currencyType', width: 100, 
+                    field: "E_sum", 
+                    type: 'currencyType', width: 100, 
                     cellRenderer: (params) => params.value !== null ? Comma(params.value || 0) : (CMD === 'add' ? '' : 0) 
                 });
 			}
@@ -353,9 +363,9 @@
         colDef = gx.gridOptions.columnApi.columnController.columnDefs
             .reduce((a,c) => {
                 let result = {};
-                if(['gifts', 'expandables'].includes(c.field) && c.children && c.children.length > 0) {
+                if(['G', 'E'].includes(c.field) && c.children && c.children.length > 0) {
                     result = c.children
-                        .filter(child => !['G_sum', 'S_sum'].includes(child.field))
+                        .filter(child => !['G_sum', 'E_sum'].includes(child.field))
                         .reduce((aa, cc) => {
                             let vv = {};
                             vv[cc.field] = cc.headerName;
@@ -399,7 +409,7 @@
                 return a.concat(result).concat(c);
             }, [])
             .map(c => ({ field: c.field, value: 0 }))
-            .filter(c => !['num', 'store_cd', 'store_nm', 'gifts', 'expandables', undefined].includes(c.field));
+            .filter(c => !['num', 'store_cd', 'store_nm', 'G', 'E', undefined].includes(c.field));
 
         const rows = gx.getRows();
         if (rows && Array.isArray(rows) && rows.length > 0) {
@@ -483,9 +493,9 @@
 
 		let excel_columns = {
 			'B': 'store_cd', 'C': 'store_nm',
-			'D': 'P1_amt',
-			'G': 'E1_amt', 'H': 'E2_amt', 'J': 'E4_amt', 'K': 'E5_amt', 'L': 'E6_amt',
-			'N': 'M1_amt', 'O': 'M2_amt', 'P': 'M3_amt', 'R': 'M4_amt',
+			'D': 'M1_amt',
+			'G': 'P1_amt', 'H': 'P2_amt', 'J': 'P4_amt', 'K': 'P5_amt', 'L': 'P6_amt',
+			'N': 'S1_amt', 'O': 'S2_amt', 'P': 'S3_amt', 'R': 'S4_amt',
 			'S': 'O1_amt', 'T': 'O2_amt', 'U': 'O3_amt'
         };
 
@@ -496,14 +506,14 @@
             excel_columns = {
                 ...excel_columns,
                 'W': 'G', 'X': 'G', 'Y': 'G', 'Z': 'G', 'AA': 'G', 'AB': 'G', 'AC': 'G', 'AD': 'G', 'AE': 'G', 'AF': 'G',
-			    'AH': 'S', 'AI': 'S', 'AJ': 'S', 'AK': 'S', 'AL': 'S', 'AM': 'S', 'AN': 'S', 'AO': 'S', 'AP': 'S', 'AQ': 'S'
+			    'AH': 'E', 'AI': 'E', 'AJ': 'E', 'AK': 'E', 'AL': 'E', 'AM': 'E', 'AN': 'E', 'AO': 'E', 'AP': 'E', 'AQ': 'E'
             };
 
             g_types = ['W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
                 .map(v => ({ prd_nm: worksheet[v + '4']?.v, prd_cd: v, type: 'G', colId: v }))
                 .filter(v => v.prd_nm !== '-' && v.prd_nm !== '');
             e_types = ['AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ']
-                .map(v => ({ prd_nm: worksheet[v + '4']?.v, prd_cd: v, type: 'S', colId: v }))
+                .map(v => ({ prd_nm: worksheet[v + '4']?.v, prd_cd: v, type: 'E', colId: v }))
                 .filter(v => v.prd_nm !== '-' && v.prd_nm !== '');
         }
 
@@ -528,9 +538,9 @@
                         if (excel_columns[column] === 'G') {
                             let p = g_types.filter(g => g.colId === column)?.[0];
                             if (p) row[`G_${p.prd_cd}_amt`] = val;
-                        } else if (excel_columns[column] === 'S') {
+                        } else if (excel_columns[column] === 'E') {
                             let p = e_types.filter(s => s.colId === column)?.[0];
-                            if (p) row[`S_${p.prd_cd}_amt`] = val;
+                            if (p) row[`E_${p.prd_cd}_amt`] = val;
                         } else {
                             row[excel_columns[column]] = val;
                         }
@@ -541,19 +551,19 @@
 			});
 
             // 온라인항목 처리
-            row = {...row, 'E3_amt': (row['E1_amt'] || 0) - (row['E2_amt'] || 0)};
+            row = {...row, 'P3_amt': (row['P1_amt'] || 0) - (row['P2_amt'] || 0)};
 
             // 각 소계 계산
-            @foreach ($extra_cols as $group_nm => $children)
-            group_cd = "{{ str_split($children[0]->code_id ?? '')[0] }}";
-            row[group_cd + "_sum"]
-                = Object.keys(row).reduce((a,c) => (
-                    (c.split("")[0] === group_cd && c.split("_").slice(-1)[0] === "amt" && !['E1', 'E2'].includes(c.split("_")[0])) 
-                        ? ['P1', 'M3'].includes(c.split("_")[0])
-                            ? Math.round(row[c] * 1 / 1.1) 
-                            : (row[c] * 1) 
-                        : 0
-                ) + a, 0);                
+            @foreach ($extra_cols as $entry_cd => $children)
+                group_cd = "{{ $entry_cd }}";
+                row[group_cd + "_sum"]
+                    = Object.keys(row).reduce((a,c) => (
+                        (c.split("")[0] === group_cd && c.split("_").slice(-1)[0] === "amt" && !EXCLUED_TOTAL.split(",").includes(c.split("_")[0])) 
+                            ? EXCEPT_VAT.split(",").includes(c.split("_")[0])
+                                ? Math.round(row[c] * 1 / 1.1) 
+                                : (row[c] * 1) 
+                            : 0
+                    ) + a, 0);                
             @endforeach
 
             if (file_type === 'S') {
@@ -563,15 +573,16 @@
                             ? (row[c] * 1) : 0
                     ) + a, 0);    
     
-                row["S_sum"]
+                row["E_sum"]
                     = Object.keys(row).reduce((a,c) => (
-                        (c.split("")[0] === 'S' && c.split("_").slice(-1)[0] === "amt")
+                        (c.split("")[0] === 'E' && c.split("_").slice(-1)[0] === "amt")
                             ? (row[c] * 1) : 0
                     ) + a, 0);    
             }
 
             // 총합계 계산
-            row.total = Object.keys(row).reduce((a,c) => (c.split("_").slice(-1)[0] === "sum" ? (row[c] * 1) : 0) + a, 0);
+            row.C_total = Object.keys(row).reduce((a,c) => (c.split("_").slice(-1)[0] === "sum" && C_PAYERS.includes(c.split("_")[0]) ? (row[c] * 1) : 0) + a, 0);
+            row.S_total = Object.keys(row).reduce((a,c) => (c.split("_").slice(-1)[0] === "sum" && S_PAYERS.includes(c.split("_")[0]) ? (row[c] * 1) : 0) + a, 0);
 
             rows.push(row);
             rowIndex++;
@@ -593,13 +604,19 @@
             if (item.length > 0) {
                 if (file_type === 'S') {
                     Object.keys(old_data)
-                        .filter(key => ['G', 'S'].includes(key.split("")[0]) && key.split("_").slice(-1)[0] === "amt")
+                        .filter(key => ['G', 'E'].includes(key.split("")[0]) && key.split("_").slice(-1)[0] === "amt")
                         .forEach(key => {
                             delete old_data[key];
                         });
                 }
-                data = { ...old_data, ...item[0], store_nm: old_data.store_nm };
-                data.total = Object.keys(data).reduce((a,c) => (c.split("_").slice(-1)[0] === "sum" ? (data[c] * 1) : 0) + a, 0);
+
+                if (old_data.closed_yn === 'Y') {
+                    data = { ...old_data };
+                } else {
+                    data = { ...old_data, ...item[0], store_nm: old_data.store_nm };
+                }
+                data.C_total = Object.keys(data).reduce((a,c) => (c.split("_").slice(-1)[0] === "sum" && C_PAYERS.includes(c.split("_")[0]) ? (data[c] * 1) : 0) + a, 0);
+                data.S_total = Object.keys(data).reduce((a,c) => (c.split("_").slice(-1)[0] === "sum" && S_PAYERS.includes(c.split("_")[0]) ? (data[c] * 1) : 0) + a, 0);
             }
 
             rowsToUpdate.push(data);

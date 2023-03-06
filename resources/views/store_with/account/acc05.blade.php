@@ -81,35 +81,41 @@
 	</div>
 </div>
 <script language="javascript">
+	const PAYER = { 'C': '(본사부담)', 'S': '(매장부담)' };
+
 	const YELLOW = {'background-color': "#ffff99"};
 	const CENTER = { 'text-align': 'center' };
+
     const columns = [
 		{ field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28 },
-        { field: "ymonth", headerName: "판매연월", pinned: 'left', width: 70, cellStyle: {...CENTER, "text-decoration": "underline"},
+        { field: "ymonth", headerName: "판매연월", pinned: 'left', width: 70, cellStyle: {...CENTER, "text-decoration": "underline", "text-decoration-color": "blue"},
 			cellRenderer: (params) => `<a href="javascript:void(0);" onclick="return openExtraPopup('${params.value}');">${params.value.slice(0,4) + '-' + params.value.slice(4,6)}</a>`,
 		},
-		{ field: "total_amt", headerName: "총합계", type: 'currencyType', width: 100, pinned: 'left', cellStyle: {"background-color": "#ededed", "font-weight": "bold"} },
-		@foreach ($extra_cols as $group_nm => $children)
-		{ headerName: "{{ $group_nm }}",
-			children: [
+		@foreach ($extra_cols as $entry_cd => $children)
+			@if ($entry_cd !== '')
+				{ headerName: `{{ $children[0]->entry_nm }} ${ PAYER["{{ $children[0]->payer }}"] || '' }`,
+					children: [
+						@foreach ($children as $child)
+							{ headerName: "{{ $child->type_nm }}", field: "{{ $child->type_cd }}_amt", type: 'currencyType', width: 100 },
+							@if ($child->except_vat_yn === 'Y')
+							{ headerName: "{{ $child->type_nm }}(-VAT)", field: "{{ $child->type_cd }}_novat", type: 'currencyType', width: 105,
+								cellRenderer: (params) => params.data["{{ $child->type_cd }}_amt"] ? Comma(Math.round((params.data["{{ $child->type_cd }}_amt"] || 0) / 1.1)) : 0,
+							},
+							@endif
+						@endforeach
+						@if (!in_array($entry_cd, ['M', 'O']))
+						{ headerName: "소계", field: "{{ $entry_cd }}_sum", type: 'currencyType', width: 100 },
+						@endif
+					]
+				},
+			@else
 				@foreach ($children as $child)
-					{ headerName: "{{ $child->code_val }}", field: "{{ $child->code_id }}_amt", type: 'currencyType', width: 100 },
-					@if (in_array($child->code_id, ['P1', 'M3']))
-					{ headerName: "{{ $child->code_val }}(-VAT)", field: "{{ $child->code_id }}_novat", type: 'currencyType', width: 105,
-						cellRenderer: (params) => params.data["{{ $child->code_id }}_amt"] ? Comma(Math.round((params.data["{{ $child->code_id }}_amt"] || 0) / 1.1)) : 0,
-					},
-					@endif
+					{ headerName: `{{ $child->type_nm }} ${ PAYER["{{ $child->payer }}"] || '' }`, field: "{{ $child->type_cd }}_sum", type: 'currencyType', width: 120 },
 				@endforeach
-				@if (!in_array($group_nm, ['마일리지', '기타운영경비']))
-				{ headerName: "소계", field: "{{ str_split($children[0]->code_id ?? '')[0] }}_sum", type: 'currencyType', width: 100 },
-				@endif
-			]
-        },
-		@if ($group_nm === '관리')
-		{ field: "G_sum", headerName: "사은품", type: 'currencyType', width: 100 },
-		{ field: "S_sum", headerName: "소모품", type: 'currencyType', width: 100 },
-		@endif
+			@endif
 		@endforeach
+		{ field: "C_total", headerName: "본사부담금 합계", type: 'currencyType', width: 100, cellStyle: {"font-weight": "700"} }, // 추가지급금
+		{ field: "S_total", headerName: "매장부담금 합계", type: 'currencyType', width: 100, cellStyle: {"font-weight": "700"} }, // 공제금
         { width: "auto" }
     ];
 </script>

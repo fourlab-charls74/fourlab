@@ -19,11 +19,10 @@ class acc05Controller extends Controller
     public function index(Request $request) 
     {
         $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 저번 달 기준
-        $extra_cols = SLib::getCodes('STORE_ACC_EXTRA_TYPE')->groupBy('code_val2'); // code_val2를 상위 카테고리로 사용
 
         $values = [
             'sdate' => $sdate,
-            'extra_cols' => $extra_cols,
+            'extra_cols' => $this->_get_account_extra_types(),
         ];
 
         return view( Config::get('shop.store.view') . '/account/acc05', $values );
@@ -35,40 +34,46 @@ class acc05Controller extends Controller
         $sdate = Lib::quote(str_replace('-', '', $sdate));
         $edate = $request->input('edate', Carbon::now()->startOfMonth()->subMonth()->format("Ym"));
         $edate = Lib::quote(str_replace('-', '', $edate));
-        $extra_types = SLib::getCodes('STORE_ACC_EXTRA_TYPE')->groupBy('code_val2')->toArray(); // 사은품/소모품 외 기타재반
+        $extra_types = $this->_get_account_extra_types()->toArray();
 
         $extra_sql = "";
         $sum_extra_sql = "";
         
         // 기타재반타입별 쿼리문 생성
         foreach ($extra_types as $key => $types) {
-            foreach ($types as $type) {
-                $extra_sql .= ", sum(if(el.type = '" . $type->code_id . "', el.extra_amt, null)) as " . $type->code_id . "_amt";
-                $sum_extra_sql .= ", sum(" . $type->code_id . "_amt) as " . $type->code_id . "_amt";
+            if ($key !== '') {
+                foreach ($types as $type) {
+                    $extra_sql .= ", sum(if(el.type = '" . $type->type_cd . "', el.extra_amt, null)) as " . $type->type_cd . "_amt";
+                    $sum_extra_sql .= ", sum(" . $type->type_cd . "_amt) as " . $type->type_cd . "_amt";
+                }
+    
+                $types_arr = array_filter($types, function($t) { return $t->total_include_yn === 'Y'; });
+                $types_str = array_map(function($t) { return "'" . $t->type_cd . "'"; }, $types_arr);
+    
+                $extra_sql .= ", sum(if(el.type in (" . join(',', $types_str) . "), if(el.type in (select type_cd from store_account_extra_type where except_vat_yn = 'Y'), round(el.extra_amt / 1.1), el.extra_amt), 0)) as " . $key . "_sum";
+                $sum_extra_sql .= ", sum(" . $key . "_sum) as " . $key . "_sum";
             }
-
-            $group_cd = str_split($types[0]->code_id ?? '')[0];
-            $types_arr = $group_cd === 'E' 
-                ? array_filter($types, function($t) { return !in_array($t->code_id, ['E1', 'E2']); }) // E1(온라인RT), E2(온라인반송)은 소계에 포함시키지 않습니다. (because, E3(온라인) = E1 - E2)
-                : $types;
-            $types_str = array_map(function($t) { return "'" . $t->code_id . "'"; }, $types_arr);
-
-            $extra_sql .= ", sum(if(el.type in (" . join(',', $types_str) . "), if(el.type in ('P1', 'M3'), round(el.extra_amt / 1.1), el.extra_amt), null)) as " . $group_cd . "_sum";
-            $sum_extra_sql .= ", sum(" . $group_cd . "_sum) as " . $group_cd . "_sum";
         }
-
-        // 사은품/소모품 쿼리문 생성
-        $extra_sql .= ", sum(if(el.type = 'G', el.extra_amt, null)) as G_sum";
-        $extra_sql .= ", sum(if(el.type = 'S', el.extra_amt, null)) as S_sum";
-        $sum_extra_sql .= ", sum(G_sum) as G_sum";
-        $sum_extra_sql .= ", sum(S_sum) as S_sum";
 
         $sql = "
             select a.ymonth as ymonth
-                , sum(total_amt) as total_amt
+                , sum(G_sum) as G_sum
+                , sum(E_sum) as E_sum
+                , sum(S_total) as S_total
+                , sum(C_total) as C_total
                 $sum_extra_sql
             from (
-                select e.ymonth, e.extra_amt as total_amt
+                select e.ymonth
+                    , sum(if(el.type = 'G', el.extra_amt, null)) as G_sum
+                    , sum(if(el.type = 'E', el.extra_amt, null)) as E_sum
+                    , sum(if(el.type in (select type_cd from store_account_extra_type where payer = 'S')
+                        , if(el.type in (select type_cd from store_account_extra_type where except_vat_yn = 'Y'), round(el.extra_amt / 1.1), el.extra_amt)
+                        , null
+                    )) as S_total
+                    , sum(if(el.type in (select type_cd from store_account_extra_type where payer = 'C')
+                        , if(el.type in (select type_cd from store_account_extra_type where except_vat_yn = 'Y'), round(el.extra_amt / 1.1), el.extra_amt)
+                        , null
+                    )) as C_total
                     $extra_sql
                 from store_account_extra e
                     inner join store_account_extra_list el on el.ext_idx = e.idx
@@ -100,14 +105,41 @@ class acc05Controller extends Controller
         $store_cd = $request->input('store_cd', '');
         $store = DB::table('store')->where('store_cd', $store_cd)->select('store_cd', 'store_nm')->first();
 
-        $extra_cols = SLib::getCodes('STORE_ACC_EXTRA_TYPE')->groupBy('code_val2'); // code_val2를 상위 카테고리로 사용
+        $extra_cols = $this->_get_account_extra_types();
+        $exclude_total_type = array_reduce($extra_cols->toArray(), function($a, $c) {
+            $type = array_filter($c, function($tt) { return $tt->total_include_yn === 'N'; });
+            if (count($type) > 0) return array_merge($a, array_map(function($tt) { return $tt->type_cd; }, $type)); 
+            else return $a;
+        }, []);
+        $except_vat_type = array_reduce($extra_cols->toArray(), function($a, $c) {
+            $type = array_filter($c, function($tt) { return $tt->except_vat_yn === 'Y'; });
+            if (count($type) > 0) return array_merge($a, array_map(function($tt) { return $tt->type_cd; }, $type)); 
+            else return $a;
+        }, []);
+
+        $payer_type = fn ($cd) => array_reduce($extra_cols->toArray(), function($a, $c) use ($cd) {
+            $type = array_filter($c, function($tt) use ($cd) { return $tt->payer === $cd; });
+            if (count($type) > 0) {
+                if ($type[0]->entry_cd === null) {
+                    return array_merge($a, array_map(function($tt) { return $tt->type_cd; }, $type)); 
+                }
+                return array_merge($a, [$type[0]->entry_cd]); 
+            }
+            return $a;
+        }, []);
 
         $values = [
             'cmd' => $cmd,
             'sdate' => $sdate,
             'store' => $store,
             'sdate_str' => Carbon::parse($sdate)->format("Y년 m월"),
-            'extra_cols' => $extra_cols,
+            'extra_cols' => $this->_get_account_extra_types(),
+            'extra_etc' => (object) [
+                'exclude_total' => join(',', $exclude_total_type),
+                'except_vat' => join(',', $except_vat_type),
+                'pay_for_s' => join(',', $payer_type('S')),
+                'pay_for_c' => join(',', $payer_type('C')),
+            ],
         ];
 
         return view( Config::get('shop.store.view') . '/account/acc05_show', $values );
@@ -152,7 +184,7 @@ class acc05Controller extends Controller
         $sql = "
             select el.type, el.prd_cd, el.prd_nm
             from store_account_extra e
-                left outer join store_account_extra_list el on el.ext_idx = e.idx and el.type in ('G', 'S')
+                left outer join store_account_extra_list el on el.ext_idx = e.idx and el.type in ('G', 'E')
             where e.ymonth = :sdate
             group by el.type, el.prd_cd, el.prd_nm
         ";
@@ -165,7 +197,7 @@ class acc05Controller extends Controller
                 else return $a;
             }, []); // 사은품
             $expandables = array_reduce($rows, function($a, $c) { 
-                if ($c->type === 'S') return array_merge($a, [$c]); 
+                if ($c->type === 'E') return array_merge($a, [$c]); 
                 else return $a;
             }, []); // 소모품
         } else {
@@ -181,36 +213,34 @@ class acc05Controller extends Controller
             $expandables = DB::select($sql, ['type' => 'S']); // 소모품
         }
 
-        $extra_types = SLib::getCodes('STORE_ACC_EXTRA_TYPE')->groupBy('code_val2')->toArray(); // 사은품/소모품 외 기타재반
+        $extra_types = $this->_get_account_extra_types()->toArray(); // 기타재반
 
         // 기타재반 항목별 쿼리문 생성
         $extra_sql = "";
         foreach ($extra_types as $key => $types) {
-            foreach ($types as $type) {
-                $extra_sql .= ", sum(if(el.type = '" . $type->code_id . "', el.extra_amt, null)) as " . $type->code_id . "_amt";
+            if ($key !== '') {
+                foreach ($types as $type) {
+                    $extra_sql .= ", sum(if(el.type = '" . $type->type_cd . "', el.extra_amt, null)) as " . $type->type_cd . "_amt";
+                }
+    
+                $types_arr = array_filter($types, function($t) { return $t->total_include_yn === 'Y'; });
+                $types_str = array_map(function($t) { return "'" . $t->type_cd . "'"; }, $types_arr);
+    
+                $extra_sql .= ", sum(if(el.type in (" . join(',', $types_str) . "), if(el.type in (select type_cd from store_account_extra_type where except_vat_yn = 'Y'), round(el.extra_amt / 1.1), el.extra_amt), null)) as " . $key . "_sum";
             }
-
-            $group_cd = str_split($types[0]->code_id ?? '')[0];
-            $types_arr = $group_cd === 'E' 
-                ? array_filter($types, function($t) { return !in_array($t->code_id, ['E1', 'E2']); }) // E1(온라인RT), E2(온라인반송)은 소계에 포함시키지 않습니다. (because, E3(온라인) = E1 - E2)
-                : $types;
-            $types_str = array_map(function($t) { return "'" . $t->code_id . "'"; }, $types_arr);
-
-            // 마일리지(P1)와 본사수선비(M3)의 경우, 세금을 제한 값을 합계로 조회합니다.
-            $extra_sql .= ", sum(if(el.type in (" . join(',', $types_str) . "), if(el.type in ('P1', 'M3'), round(el.extra_amt / 1.1), el.extra_amt), null)) as " . $group_cd . "_sum";
         }
 
         // 사은품 쿼리문 생성
         $extra_sql .= join('', array_map(function($value) {
-            return ", sum(if(el.type = 'G' and (el.prd_cd = '" . $value->prd_cd . "' or el.prd_nm = '" . $value->prd_nm . "'), el.extra_amt, null)) as G_" . $value->prd_cd . "_amt";
+            return ", sum(if(el.type = 'G' and el.prd_cd = '" . $value->prd_cd . "', el.extra_amt, null)) as G_" . $value->prd_cd . "_amt";
         }, $gifts));
         $extra_sql .= ", sum(if(el.type = 'G', el.extra_amt, null)) as G_sum";
         
         // 소모품 쿼리문 생성
         $extra_sql .= join('', array_map(function($value) {
-            return ", sum(if(el.type = 'S' and (el.prd_cd = '" . $value->prd_cd . "' or el.prd_nm = '" . $value->prd_nm . "'), el.extra_amt, null)) as S_" . $value->prd_cd . "_amt";
+            return ", sum(if(el.type = 'E' and el.prd_cd = '" . $value->prd_cd . "', el.extra_amt, null)) as E_" . $value->prd_cd . "_amt";
         }, $expandables));
-        $extra_sql .= ", sum(if(el.type = 'S', el.extra_amt, null)) as S_sum";
+        $extra_sql .= ", sum(if(el.type = 'E', el.extra_amt, null)) as E_sum";
 
         $f_sdate = Carbon::parse($f_sdate)->firstOfMonth()->format("Ymd");
         $f_edate = Carbon::parse($f_edate)->lastOfMonth()->format("Ymd");
@@ -224,7 +254,14 @@ class acc05Controller extends Controller
             from store s
                 left outer join (
                     select e.idx as ext_idx, e.ymonth, e.store_cd as e_store_cd
-                        , e.extra_amt as total
+                        , sum(if(el.type in (select type_cd from store_account_extra_type where payer = 'S')
+                            , if(el.type in (select type_cd from store_account_extra_type where except_vat_yn = 'Y'), round(el.extra_amt / 1.1), el.extra_amt)
+                            , null
+                        )) as S_total
+                        , sum(if(el.type in (select type_cd from store_account_extra_type where payer = 'C')
+                            , if(el.type in (select type_cd from store_account_extra_type where except_vat_yn = 'Y'), round(el.extra_amt / 1.1), el.extra_amt)
+                            , null
+                        )) as C_total
                         $extra_sql
                     from store_account_extra e
                         inner join store_account_extra_list el on el.ext_idx = e.idx
@@ -239,6 +276,7 @@ class acc05Controller extends Controller
             where s.account_yn = 'Y' $where
             order by s.store_cd
         ";
+
         $result = DB::select($sql, ['sdate' => $sdate, 'f_sdate' => $f_sdate, 'f_edate' => $f_edate]);
         
         return response()->json([
@@ -250,6 +288,19 @@ class acc05Controller extends Controller
             ],
             'body' => $result
         ]);
+    }
+
+    private function _get_account_extra_types()
+    {
+        $sql = "
+            select t.type_cd, t.type_nm, t.entry_cd, tt.type_nm as entry_nm, t.payer
+                , t.except_vat_yn, t.total_include_yn, t.has_child_yn, t.use_yn, t.seq, t.rt
+            from store_account_extra_type t
+                left outer join store_account_extra_type tt on tt.type_cd = t.entry_cd
+            where t.use_yn = 'Y' and t.has_child_yn = 'N'
+            order by t.payer is null desc, t.payer desc, t.entry_cd is null asc, t.seq
+        ";
+        return collect(DB::select($sql))->groupBy('entry_cd');
     }
 
     public function save(Request $request)
@@ -284,7 +335,7 @@ class acc05Controller extends Controller
                     $type = explode('_', $key)[0];
                     $prd_cd = null;
                     $prd_nm = null;
-                    if (in_array($type, ['S', 'G'])) {
+                    if (in_array($type, ['G', 'E'])) {
                         $prd_nm = $cols[$key] ?? '';
                         $prd_cd = explode('_', $key)[1];
                     }
@@ -295,10 +346,6 @@ class acc05Controller extends Controller
                         'prd_nm' => $prd_nm,
                         'extra_amt' => $value ?? 0,
                     ]);
-
-                    // 총합계 계산
-                    if (!in_array($type, ['P1', 'E1', 'E2', 'M3'])) $total_amt += $value ?? 0;
-                    if (in_array($type, ['P1', 'M3'])) $total_amt += round(($value ?? 0) / 1.1);
                 }
 
                 // 기존정보가 있을경우 삭제
@@ -333,7 +380,8 @@ class acc05Controller extends Controller
     }
 
     /** 일괄등록 시 Excel 파일 저장 후 ag-grid(front)에 사용할 응답을 JSON으로 반환 */
-	public function import_excel(Request $request) {
+	public function import_excel(Request $request) 
+    {
 		if (count($_FILES) > 0) {
 			if ( 0 < $_FILES['file']['error'] ) {
 				return response()->json(['code' => 0, 'message' => 'Error: ' . $_FILES['file']['error']], 200);
