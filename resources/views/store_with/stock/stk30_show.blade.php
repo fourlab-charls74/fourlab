@@ -480,9 +480,16 @@
         let rows = gx.getSelectedRows();
         if(rows.length < 1) return alert("상태변경할 항목을 선택해주세요.");
 
+        for (let row of rows) {
+            if(row.fixed_return_qty == 0){
+               return alert("확정수량을 입력해주세요.");
+            }
+        }
         let store_cd = $('#store_cd').val();
         let storage_cd = $('#storage').val();
         let chg_state = 30;
+
+       
 
         if(!confirm("선택한 항목의 반품상태를 변경하시겠습니까?")) return;
 

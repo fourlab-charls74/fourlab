@@ -386,12 +386,26 @@
            }
         },
 		{field: "rel_order", headerName: "출고차수", width: 100, cellStyle: {"text-align": "center"}},
-        {field: "last_release_date", headerName: "최근출고일", cellStyle: {"text-align": "center"}, width: 90,
+        {field: "last_release_date", headerName: "최근출고일", width: 90,
             cellRenderer: function(params){
-                console.log(params.data);
-                let last_release_date = params.data.prc_rt;
+                let last_release_date = params.data.last_release_date;
 
-                return last_release_date;
+                let date = new Date(last_release_date);
+
+                console.log(date);
+
+                let year = date.getFullYear();
+                let month = date.getMonth() + 1;
+                let day = date.getDate();
+
+                if (year > 1970) {
+                    return `${year}-${month >= 10 ? month : '0' + month}-${day >= 10 ? day : '0' + day}`;
+                }
+            },
+            cellStyle : function(params) {
+                if(params.data.prc_rt == params.data.last_release_date || params.data.req_rt == params.data.last_release_date) {
+                    return {"color" : "red", "text-align" : "center"};
+                } 
             }
         },
         {field: "req_comment", headerName: "매장메모", width: 300},
