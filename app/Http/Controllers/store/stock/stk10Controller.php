@@ -19,11 +19,11 @@ const PRODUCT_STOCK_TYPE_STORAGE_OUT = 17; // 출고
 class stk10Controller extends Controller
 {
     private $rel_states = [
-        '10' => '요청',
-        '20' => '접수',
-        '30' => '출고',
+        '10' => '출고요청',
+        '20' => '출고접수',
+        '30' => '출고완료',
         '40' => '매장입고',
-        '-10' => '거부',
+        '-10' => '출고거부',
     ];
 
     public function index()
@@ -188,6 +188,7 @@ class stk10Controller extends Controller
                 psr.state, 
                 -- cast(psr.exp_dlv_day as date) as exp_dlv_day, 
                 psr.exp_dlv_day as exp_dlv_day_data,
+                psr.prc_rt as last_release_date,
                 psr.rel_order, 
                 psr.req_comment,
                 psr.comment,

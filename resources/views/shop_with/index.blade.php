@@ -373,8 +373,6 @@
 
 let chartData2 = <?= json_encode($chart2Result)?>;
 
-console.log(chartData2);
-
   new Chart(ctx3, {
     type: 'bar',
     data: {
@@ -409,35 +407,18 @@ console.log(chartData2);
         backgroundColor: '#9BD0F5',
         borderWidth: 1
       },
-      {
-        label: '매출원가',
-        data: [
-            chartData2[0].wonga,
-            chartData2[1].wonga,
-            chartData2[2].wonga,
-            chartData2[3].wonga,
-            chartData2[4].wonga,
-            chartData2[5].wonga,
-            chartData2[6].wonga,
-            chartData2[7].wonga,
-            chartData2[8].wonga,
-            chartData2[9].wonga,
-        ],
-        borderColor: '#FF6384',
-        backgroundColor: '#FFB1C1',
-        borderWidth: 1
-      }
     ]
     },
     options: {
-        // responsive: true,
         legend:{
             position : 'top'
         },
         scales: {
-            y: {
-                beginAtZero: true
-            }
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                }
+            }]
         }
     }
   });
@@ -489,9 +470,11 @@ let chartData3 = <?= json_encode($chart3Result)?>;
             position : 'top'
         },
         scales: {
-            y: {
-                beginAtZero: true
-            }
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                }
+            }]
         }
     }
   });

@@ -291,8 +291,8 @@ class stk30Controller extends Controller
                         'price' => $product['price'], // 판매가
                         'return_price' => $product['return_price'], // 반품단가
                         'return_qty' => $product['return_qty'], // 반품수량
-                        'fixed_return_qty' => $product['return_qty'],
-                        'fixed_return_price' => $product['return_price'],
+                        'fixed_return_qty' => 0,
+                        'fixed_return_price' => 0,
                         'rt' => now(),
                         'admin_id' => $admin_id,
                     ]);
@@ -367,6 +367,9 @@ class stk30Controller extends Controller
         $store_cd = $request->input('store_cd');
         $storage_cd = $request->input('storage_cd');
 
+        dd($data);
+
+
         try {
             DB::beginTransaction();
 
@@ -465,18 +468,6 @@ class stk30Controller extends Controller
                                 ->where('prd_cd', '=', $row->prd_cd)
                                 ->update([
                                     'wqty' => DB::raw('wqty + ' . ($row->fixed_return_qty ?? 0)),
-                                    'ut' => now(),
-                                ]);
-                        }
-                    } else if($new_state == 40) {
-                        // 완료처리
-                        foreach($rows as $row) {
-                            // 창고 실재고 플러스
-                            DB::table('product_stock_storage')
-                                ->where('prd_cd', '=', $row->prd_cd)
-                                ->where('storage_cd', '=', $storage_cd) 
-                                ->update([
-                                    'qty' => DB::raw('qty + ' . ($row->fixed_return_qty ?? 0)),
                                     'ut' => now(),
                                 ]);
                         }
@@ -537,77 +528,7 @@ class stk30Controller extends Controller
                     ";
                     $rows = DB::select($sql, ["sr_cd" => $d['sr_cd']]);
 
-                    if($new_state == 30) {
-                        // 이동처리
-                        foreach($rows as $row) {
-                            // 매장 재고,실재고 차감
-                            DB::table('product_stock_store')
-                                ->where('prd_cd', '=', $row->prd_cd)
-                                ->where('store_cd', '=', $store_cd) 
-                                ->update([
-                                    'qty' => DB::raw('qty - ' . ($row->fixed_return_qty ?? 0)),
-                                    'wqty' => DB::raw('wqty - ' . ($row->fixed_return_qty ?? 0)),
-                                    'ut' => now(),
-                                ]);
-
-                            // 재고이력 등록
-                            DB::table('product_stock_hst')
-                                ->insert([
-                                    'goods_no' => $row->goods_no,
-                                    'prd_cd' => $row->prd_cd,
-                                    'goods_opt' => $row->goods_opt,
-                                    'location_cd' => $store_cd,
-                                    'location_type' => 'STORE',
-                                    'type' => PRODUCT_STOCK_TYPE_RETURN, // 재고분류 : 반품(출고)
-                                    'price' => $row->price,
-                                    'wonga' => $row->wonga,
-                                    'qty' => ($row->fixed_return_qty ?? 0) * -1,
-                                    'stock_state_date' => date('Ymd'),
-                                    'ord_opt_no' => '',
-                                    'comment' => '창고반품',
-                                    'rt' => now(),
-                                    'admin_id' => $admin_id,
-                                    'admin_nm' => $admin_nm,
-                                ]);
-
-                            // 창고 재고 플러스
-                            DB::table('product_stock_storage')
-                                ->where('prd_cd', '=', $row->prd_cd)
-                                ->where('storage_cd', '=', $storage_cd) 
-                                ->update([
-                                    'wqty' => DB::raw('wqty + ' . ($row->fixed_return_qty ?? 0)),
-                                    'ut' => now(),
-                                ]);
-                            
-                            // 재고이력 등록
-                            DB::table('product_stock_hst')
-                                ->insert([
-                                    'goods_no' => $row->goods_no,
-                                    'prd_cd' => $row->prd_cd,
-                                    'goods_opt' => $row->goods_opt,
-                                    'location_cd' => $storage_cd,
-                                    'location_type' => 'STORAGE',
-                                    'type' => PRODUCT_STOCK_TYPE_RETURN, // 재고분류 : 반품(입고)
-                                    'price' => $row->price,
-                                    'wonga' => $row->wonga,
-                                    'qty' => $row->fixed_return_qty ?? 0,
-                                    'stock_state_date' => date('Ymd'),
-                                    'ord_opt_no' => '',
-                                    'comment' => '매장반품',
-                                    'rt' => now(),
-                                    'admin_id' => $admin_id,
-                                    'admin_nm' => $admin_nm,
-                                ]);
-
-                            // product_stock -> 창고보유재고 플러스
-                            DB::table('product_stock')
-                                ->where('prd_cd', '=', $row->prd_cd)
-                                ->update([
-                                    'wqty' => DB::raw('wqty + ' . ($row->fixed_return_qty ?? 0)),
-                                    'ut' => now(),
-                                ]);
-                        }
-                    } else if($new_state == 40) {
+                   if($new_state == 40) {
                         // 완료처리
                         foreach($rows as $row) {
                             // 창고 실재고 플러스

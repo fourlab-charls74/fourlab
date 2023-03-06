@@ -24,7 +24,7 @@ class AutoCompleteController extends Controller
                 select 
                     store_cd as id, store_nm as text
                 from store
-                where $where ( store_cd like :store_cd or store_nm like :store_nm ) 
+                where store_nm like '%$keyword%' 
                 order by store_cd
                 limit 0, 10
             ";

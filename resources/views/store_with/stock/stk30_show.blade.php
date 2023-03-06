@@ -143,6 +143,9 @@
                         <button type="button" onclick="return setAllQty(true);" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn">반품재고초기화</button>
                     </div>
                     @endif
+                    @if(@$sr->sr_state == '10')
+                        <button type="button" onclick="return resetReturnQty(false);" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn">매장반품수량으로 초기화</button>
+                    @endif
                     @if(@$cmd == 'add')
                     <span class="ml-1 mr-2">|</span>
                     <div class="d-flex">
@@ -150,6 +153,7 @@
                         <button type="button" onclick="return delGoods();" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn"><i class="bx bx-trash"></i> 삭제</button>
                     </div>
                     @endif
+                  
                 </div>
             </div>
             <div class="card-body">
@@ -458,6 +462,17 @@
         }));
         gx.gridOptions.api.applyTransaction({ update : rows });
         gx.gridOptions.api.forEachNode(node => node.setSelected(!is_zero)); 
+        updatePinnedRow();
+    }
+
+    const resetReturnQty = (is_return = false) => {
+        const rows = gx.getRows().map(row => ({
+            ...row,
+            fixed_return_qty: is_return ? 0 : row.qty,
+            fixed_return_price: is_return ? 0 : row.total_return_price
+        }));
+        gx.gridOptions.api.applyTransaction({update : rows});
+        gx.gridOptions.api.forEachNode(node => node.setSelected(!is_return)); 
         updatePinnedRow();
     }
 

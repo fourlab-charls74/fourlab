@@ -114,7 +114,7 @@
                             <label for="store_no">매장명</label>
                             <div class="form-inline inline_btn_box">
                                 <input type='hidden' id="store_nm" name="store_nm">
-                                <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
+                                <select id="store_no" name="store_no" class="form-control form-control-sm select2-store multi_select" multiple></select>
                                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                             </div>
                         </div>
@@ -386,6 +386,14 @@
            }
         },
 		{field: "rel_order", headerName: "출고차수", width: 100, cellStyle: {"text-align": "center"}},
+        {field: "last_release_date", headerName: "최근출고일", cellStyle: {"text-align": "center"}, width: 90,
+            cellRenderer: function(params){
+                console.log(params.data);
+                let last_release_date = params.data.prc_rt;
+
+                return last_release_date;
+            }
+        },
         {field: "req_comment", headerName: "매장메모", width: 300},
         {field: "comment", headerName: "본사메모", width: 300, 
             editable: function(params) {return params.data.state === 10;}, 
@@ -422,6 +430,11 @@
             }
         });
         Search();
+
+        // 매장검색
+        $( ".sch-store" ).on("click", function() {
+            searchStore.Open(null, "multiple");
+        });
     });
 
 	function Search() {
