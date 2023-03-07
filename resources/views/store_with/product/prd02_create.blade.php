@@ -11,7 +11,7 @@
 			<div class="d-inline-flex location">
 				<span class="home"></span>
 				<span>/ 상품관리</span>
-				<span>/ 상품관리(코드)</span>
+				<span>/ 상품코드등록</span>
 			</div>
 		</div>
 		<div class="d-flex">
