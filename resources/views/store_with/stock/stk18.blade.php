@@ -111,7 +111,7 @@
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
-                                        <option value="p.prd_cd">상품코드</option>
+                                        <option value="p.prd_cd">바코드</option>
                                         <option value="p.price">판매가</option>
                                         <option value="p.wonga">원가</option>
                                     </select>
@@ -239,7 +239,7 @@
         {field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: DEFAULT, surl:"{{config('shop.front_url')}}"},
         {field: "img", headerName: "이미지_url", hide: true},
         {field: "prd_nm", headerName: "원부자재명", width: 200},
-        {field: "prd_cd", headerName: "상품코드", width:120, cellStyle: DEFAULT,
+        {field: "prd_cd", headerName: "바코드", width:120, cellStyle: DEFAULT,
             cellRenderer: function(params) {
                 if (params.value !== undefined) {
                     return '<a href="#" onclick="return EditProduct(\'' + params.value + '\');">' + params.value + '</a>';
@@ -365,7 +365,7 @@
             }
             return true; // 상품재고가 없는경우
         });
-        if (over_qty_rows.length > 0) return alert(`선택하신 창고의 재고보다 많은 수량을 요청하실 수 없습니다.\n상품코드 : ${over_qty_rows.map(o => o.prd_cd).join(", ")}`);
+        if (over_qty_rows.length > 0) return alert(`선택하신 창고의 재고보다 많은 수량을 요청하실 수 없습니다.\n바코드 : ${over_qty_rows.map(o => o.prd_cd).join(", ")}`);
 
         if (!confirm("해당 상품을 출고요청하시겠습니까?")) return;
 

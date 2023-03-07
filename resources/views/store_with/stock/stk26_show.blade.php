@@ -155,8 +155,8 @@
             },
         },
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 29},
-        {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
-        {field: "goods_no", headerName: "상품번호", width: 70, cellStyle: {"text-align": "center"}},
+        {field: "prd_cd", headerName: "바코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
+        {field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: {"text-align": "center"}},
         {field: "opt_kind_nm", headerName: "품목", width: 70, cellStyle: {"text-align": "center"}},
         {field: "brand", headerName: "브랜드", width: 70, cellStyle: {"text-align": "center"}},
         {field: "style_no",	headerName: "스타일넘버", width: 70, cellStyle: {"text-align": "center"}},
@@ -166,12 +166,12 @@
                 if (params.data.goods_no != '0') {
                     return '<a href="javascript:void(0);" onclick="return openHeadProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
                 } else {
-                    return '<a href="javascript:void(0);" onclick="return alert(`상품번호가 없는 상품입니다.`);">' + params.value + '</a>';
+                    return '<a href="javascript:void(0);" onclick="return alert(`온라인코드가 없는 상품입니다.`);">' + params.value + '</a>';
                 }
             }   
         },
         {field: "goods_nm_eng",	headerName: "상품명(영문)", width: 200},
-        {field: "prd_cd_p", headerName: "코드일련", width: 90, cellStyle: {"text-align": "center"}},
+        {field: "prd_cd_p", headerName: "품번", width: 90, cellStyle: {"text-align": "center"}},
         {field: "color", headerName: "컬러", width: 50, cellStyle: {"text-align": "center"}},
         {field: "size", headerName: "사이즈", width: 50, cellStyle: {"text-align": "center"}},
         {field: "goods_opt", headerName: "옵션", width: 130},

@@ -200,7 +200,7 @@
                                         <option value="o.ord_no">주문번호</option>
                                         <option value="om.user_nm">주문자명</option>
                                         <option value="om.r_nm">수령자</option>
-                                        <option value="p.prd_cd">상품코드</option>
+                                        <option value="p.prd_cd">바코드</option>
                                         <option value="g.goods_nm">상품명</option>
                                     </select>
                                 </div>
@@ -219,7 +219,7 @@
 				<div class="row search-area-ext d-none">
                     <div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label>상품코드</label>
+							<label>바코드</label>
 							<div class="flex_box">
                                 <input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
                                 <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
@@ -228,7 +228,7 @@
 					</div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="style_no">스타일넘버/상품번호</label>
+                            <label for="style_no">스타일넘버/온라인코드</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box">
                                     <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="{{ @$style_no }}">
@@ -269,7 +269,7 @@
 				<div class="row search-area-ext d-none">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="prd_cd">상품옵션 범위검색</label>
+							<label for="prd_cd">상품검색조건</label>
 							<div class="form-inline">
 								<div class="form-inline-inner input-box w-100">
 									<div class="form-inline inline_btn_box">
@@ -343,7 +343,7 @@
 			<div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
 		</div>
         <p class="mt-2 fs-14 text-secondary">* 창고/매장의 재고cell을 더블클릭하면 해당 창고/매장이 배송처로 적용됩니다. ( <span class="text-primary font-weight-bold">창고</span> / <span class="text-danger font-weight-bold">매장</span> )</p>
-        <p class="mt-1 fs-14 text-secondary">* <span class="text-danger">빨간색상의 상품코드</span>는 옵션이 매칭되지 않은 상품입니다.</p>
+        <p class="mt-1 fs-14 text-secondary">* <span class="text-danger">빨간색상의 바코드</span>는 옵션이 매칭되지 않은 상품입니다.</p>
 	</div>
 </div>
 
@@ -405,14 +405,14 @@
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
         },
-        {field: "goods_no", headerName: "상품번호", width: 70, cellStyle: {'text-align': 'center'}, pinned: "left",
+        {field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: {'text-align': 'center'}, pinned: "left",
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
         },
-        {field: "prd_cd", headerName: "상품코드", width: 125, cellStyle: (params) => ({'text-align': 'center', 'color': params.data?.prd_match === 'N' ? '#ff0000' : 'none'}), pinned: "left"},
-        {field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: (params) => ({'text-align': 'center', 'color': params.data?.prd_match === 'N' ? '#ff0000' : 'none'})},
+        {field: "prd_cd", headerName: "바코드", width: 125, cellStyle: (params) => ({'text-align': 'center', 'color': params.data?.prd_match === 'N' ? '#ff0000' : 'none'}), pinned: "left"},
+        {field: "prd_cd_p", headerName: "품번", width: 100, cellStyle: (params) => ({'text-align': 'center', 'color': params.data?.prd_match === 'N' ? '#ff0000' : 'none'})},
         {field: "goods_no_group", rowGroup: true, hide: true, rowGroupIndex: 1},
-        // {headerName: "상품번호", width: 100, pinned: 'left', cellStyle: {'text-align': 'center'},
+        // {headerName: "온라인코드", width: 100, pinned: 'left', cellStyle: {'text-align': 'center'},
         //     showRowGroup: 'goods_no_group', 
         //     cellRenderer: 'agGroupCellRenderer', 
         // },

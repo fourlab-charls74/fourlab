@@ -137,7 +137,7 @@
 									<span class="text_line">/</span>
 									<div class="form-inline-inner input_box" style="width:45%;">
 										<select name="ord_field" class="form-control form-control-sm">
-											<option value="prd_cd">상품코드</option>
+											<option value="prd_cd">바코드</option>
 											<option value="prd_nm">원부자재명</option>
 											<option value="p.price">판매가</option>
 											<option value="p.wonga">원가</option>

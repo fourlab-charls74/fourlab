@@ -54,7 +54,7 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="prd_cd">상품코드</label>
+                            <label for="prd_cd">바코드</label>
                             <div class="flex_box">
                                 <input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
                                 <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
@@ -63,7 +63,7 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="prd_cd">상품옵션 범위검색</label>
+                            <label for="prd_cd">상품검색조건</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input-box w-100">
                                     <div class="form-inline inline_btn_box">
@@ -94,8 +94,8 @@
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
 										<option value="pc.rt">등록일</option>
-										<option value="pc.prd_cd">상품코드</option>
-										<option value="pc.goods_no">상품번호</option>
+										<option value="pc.prd_cd">바코드</option>
+										<option value="pc.goods_no">온라인코드</option>
 										<option value="g.goods_nm">상품명</option>
                                     </select>
                                 </div>
@@ -155,10 +155,10 @@
     const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
 
     let columns = [
-        {field: "prd_cd_p", headerName: "코드일련", rowGroup: true, hide: true},
-        {headerName: '코드일련', showRowGroup: 'prd_cd_p', pinned: "left", cellRenderer: 'agGroupCellRenderer', minWidth: 150},
-        {field: "prd_cd", headerName: "상품코드", pinned: "left", width: 130, cellStyle: AlignCenter},
-        {field: "goods_no", headerName: "상품번호", pinned: "left", width: 70, cellStyle: AlignCenter, aggFunc: "first"},
+        {field: "prd_cd_p", headerName: "품번", rowGroup: true, hide: true},
+        {headerName: '품번', showRowGroup: 'prd_cd_p', pinned: "left", cellRenderer: 'agGroupCellRenderer', minWidth: 150},
+        {field: "prd_cd", headerName: "바코드", pinned: "left", width: 130, cellStyle: AlignCenter},
+        {field: "goods_no", headerName: "온라인코드", pinned: "left", width: 70, cellStyle: AlignCenter, aggFunc: "first"},
         {field: "goods_nm", headerName: "상품명", width: 170, aggFunc: "first",
             cellRenderer: function (params) {
                 if (params.data?.prd_cd === '합계') return '';

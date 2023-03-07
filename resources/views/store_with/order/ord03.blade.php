@@ -230,7 +230,7 @@
                                         <option value="o.ord_no">주문번호</option>
                                         <option value="om.user_nm">주문자명</option>
                                         <option value="om.r_nm">수령자</option>
-                                        <option value="p.prd_cd">상품코드</option>
+                                        <option value="p.prd_cd">바코드</option>
                                         <option value="g.goods_nm">상품명</option>
                                     </select>
                                 </div>
@@ -249,7 +249,7 @@
                 <div class="row search-area-ext d-none">
                     <div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label>상품코드</label>
+							<label>바코드</label>
 							<div class="flex_box">
                                 <input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
                                 <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
@@ -258,7 +258,7 @@
 					</div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="style_no">스타일넘버/상품번호</label>
+                            <label for="style_no">스타일넘버/온라인코드</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box">
                                     <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="{{ @$style_no }}">
@@ -299,7 +299,7 @@
 				<div class="row search-area-ext d-none">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="prd_cd">상품옵션 범위검색</label>
+							<label for="prd_cd">상품검색조건</label>
 							<div class="form-inline">
 								<div class="form-inline-inner input-box w-100">
 									<div class="form-inline inline_btn_box">
@@ -444,9 +444,9 @@
         {field: "ord_type_nm", headerName: "주문구분", width: 60, cellStyle: {'text-align': 'center'}},
         {field: "ord_kind_nm", headerName: "출고구분", width: 60, cellStyle: StyleOrdKind},
         {field: "sale_place_nm", headerName: "판매처", width: 80, cellStyle: {'text-align': 'center'}},
-        {field: "goods_no", headerName: "상품번호", width: 70, cellStyle: {'text-align': 'center'}},
-        {field: "prd_cd", headerName: "상품코드", width: 125, cellStyle: {'text-align': 'center'}},
-        {field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: {"text-align": "center"}},
+        {field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: {'text-align': 'center'}},
+        {field: "prd_cd", headerName: "바코드", width: 125, cellStyle: {'text-align': 'center'}},
+        {field: "prd_cd_p", headerName: "품번", width: 100, cellStyle: {"text-align": "center"}},
         {field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: {'text-align': 'center'}},
         {field: "goods_nm", headerName: "상품명", width: 150,
             cellRenderer: function (params) {

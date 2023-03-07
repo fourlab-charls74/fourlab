@@ -1199,7 +1199,7 @@ class stk03Controller extends Controller
                 foreach ($cart as $key => $item) {
                     if (!isset($item['prd_cd'])) {
                         $code = '-101';
-                        throw new Exception('상품코드 없음');
+                        throw new Exception('바코드 없음');
                     } else if (!isset($item['qty']) || (int)$item['qty'] < 1) {
                         $code = '-103';
                         throw new Exception('수량정보 부정확');
@@ -1224,7 +1224,7 @@ class stk03Controller extends Controller
 
                         if ($product == null) {
                             $code = '-102';
-                            throw new Exception('상품코드 부정확');
+                            throw new Exception('바코드 부정확');
                         } else {
                             $item['goods_no'] = $product->goods_no;
                             $item['goods_sub'] = $product->goods_sub;

@@ -553,7 +553,7 @@ class prd02Controller extends Controller
 				
 			DB::commit();
 			$code = 200;
-			$msg = "상품코드 등록이 완료되었습니다.";
+			$msg = "바코드 등록이 완료되었습니다.";
 
 		} catch (\Exception $e) {
 			DB::rollback();
@@ -626,7 +626,7 @@ class prd02Controller extends Controller
 				
 			DB::commit();
 			$code = 200;
-			$msg = "상품코드 매칭이 완료되었습니다.";
+			$msg = "바코드 매칭이 완료되었습니다.";
 
 		} catch (\Exception $e) {
 			DB::rollback();
@@ -722,7 +722,7 @@ class prd02Controller extends Controller
 
 			DB::commit();
 			$code = 200;
-			$msg = "상품코드 삭제가 완료되었습니다.";
+			$msg = "바코드 삭제가 완료되었습니다.";
 
 		} catch (\Exception $e) {
 			DB::rollback();
@@ -840,7 +840,7 @@ class prd02Controller extends Controller
 				
 			DB::commit();
 			$code = 200;
-			$msg = "상품코드 매칭이 완료되었습니다.";
+			$msg = "바코드 매칭이 완료되었습니다.";
 
 		} catch (\Exception $e) {
 			DB::rollback();

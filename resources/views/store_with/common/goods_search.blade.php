@@ -68,7 +68,7 @@
                     <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label>상품코드</label>
+                                <label>바코드</label>
 								<div class="flex_box">
 									<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
 									<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
@@ -77,7 +77,7 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="style_no">스타일넘버/상품번호</label>
+                                <label for="style_no">스타일넘버/온라인코드</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box">
                                         <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="{{ $style_no }}">
@@ -104,7 +104,7 @@
                     <div class="row">
                         {{-- <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="goods_stat">상품상태</label>
+                                <label for="goods_stat">전시상태</label>
                                 <div class="flax_box">
                                     <select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
                                         <option value=''>전체</option>
@@ -149,7 +149,7 @@
                     <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="prd_cd">상품옵션 범위검색</label>
+                                <label for="prd_cd">상품검색조건</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input-box w-100">
                                         <div class="form-inline inline_btn_box">
@@ -191,8 +191,8 @@
                                     <div class="form-inline-inner input_box" style="width:45%;">
                                         <select name="ord_field" class="form-control form-control-sm">
                                             <option value="pc.rt">등록일</option>
-                                            <option value="pc.prd_cd">상품코드</option>
-                                            <option value="pc.goods_no">상품번호</option>
+                                            <option value="pc.prd_cd">바코드</option>
+                                            <option value="pc.goods_no">온라인코드</option>
                                             <option value="g.goods_nm">상품명</option>
                                         </select>
                                     </div>
@@ -280,10 +280,10 @@
     const columns = [
         // {headerName: '#', pinned: 'left', type: 'NumType', width: 40, cellStyle: StyleLineHeight},
         // {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, pinned: 'left', sort: null},
-        {field: "prd_cd", headerName: "상품코드", width: 140, pinned: 'left', cellStyle: StyleLineHeight, checkboxSelection: true,
+        {field: "prd_cd", headerName: "바코드", width: 140, pinned: 'left', cellStyle: StyleLineHeight, checkboxSelection: true,
             cellRenderer: (params) => params.value ??= '',
         },
-        {field: "goods_no", headerName: "상품번호", width: 60, pinned: 'left', cellStyle: StyleLineHeight, aggFunc: "first"},
+        {field: "goods_no", headerName: "온라인코드", width: 60, pinned: 'left', cellStyle: StyleLineHeight, aggFunc: "first"},
         {field: "opt_kind_cd", hide: true},
         {field: "opt_kind_nm", headerName: "품목", width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
         {field: "brand_cd", hide: true},
@@ -296,7 +296,7 @@
         {field: "goods_nm", headerName: "상품명", width: 230, cellStyle: {"line-height": "30px"}, aggFunc: "first", 
             cellRenderer: function (params) {
 				if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
-					return '<a href="javascript:void(0);" onclick="return alert(`상품번호가 비어있는 상품입니다.`);">' + params.value + '</a>';
+					return '<a href="javascript:void(0);" onclick="return alert(`온라인코드가 비어있는 상품입니다.`);">' + params.value + '</a>';
 				} else {
 					let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
 					return '<a href="javascript:void(0);" onclick="return openHeadProduct(\'' + goods_no + '\');">' + params.value + '</a>';
@@ -304,7 +304,7 @@
 			}
         },
         {field: "goods_nm_eng", headerName: "상품명(영문)", width: 230, cellStyle: {"line-height": "30px"}, aggFunc: "first"},
-        {field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: StyleLineHeight, rowGroup: true, hide: true, checkboxSelection: true},
+        {field: "prd_cd_p", headerName: "품번", width: 100, cellStyle: StyleLineHeight, rowGroup: true, hide: true, checkboxSelection: true},
         {field: "color", headerName: "컬러", width: 55, cellStyle: StyleLineHeight},
         {field: "color_nm", hide: true},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: StyleLineHeight},
@@ -363,7 +363,7 @@
         {field: "make", headerName: "제조업체", width: 100, cellStyle: {"line-height": "30px"}, aggFunc: "first"},
         {field: "reg_dm", headerName: "등록일자", width: 120, cellStyle: {"line-height": "30px"}},
         // {field: "goods_type", headerName: "상품구분", width: 58, pinned: 'left', type: 'StyleGoodsTypeNM'},
-        // {field: "sale_stat_cl", headerName: "상품상태", width:70, type: 'GoodsStateTypeLH50'},
+        // {field: "sale_stat_cl", headerName: "전시상태", width:70, type: 'GoodsStateTypeLH50'},
         // {field: "full_nm", headerName: "대표카테고리", cellStyle: {"line-height": "30px"}},
         // {field: "head_desc", headerName: "상단홍보글", cellStyle: {"line-height": "30px"}},
         // {field: "upd_dm", headerName: "수정일자", width:110, cellStyle: {"line-height": "30px"}}
@@ -391,7 +391,7 @@
         gx = new HDGrid(gridDiv, columns, {
             onCellValueChanged: onCellValueChanged,
             rollup: true,
-            autoGroupColumnDef: basic_autoGroupColumnDef('코드일련'),
+            autoGroupColumnDef: basic_autoGroupColumnDef('품번'),
 			groupDefaultExpanded: 0, // 0: close, 1: open
 			suppressAggFuncInHeader: true,
 			animateRows: true,

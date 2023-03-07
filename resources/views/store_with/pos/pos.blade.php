@@ -77,7 +77,7 @@
                 <div class="butt w-100 br-1 mb-3 b-none">
                     <div class="d-flex align-items-center br-2 b-1-gray bg-white shadow-box p-2 pl-4">
                         <select name="search_prd_type_out" id="search_prd_type_out" class="sel fs-12" style="min-width: 120px;">
-                            <option value="prd_cd">상품코드</option>
+                            <option value="prd_cd">바코드</option>
                             <option value="goods_nm">상품명</option>
                             <option value="style_no">스타일넘버</option>
                         </select>
@@ -185,7 +185,7 @@
                             <p class="text-right" id="cur_goods_opt"></p>
                         </li>
                         <li class="d-flex justify-content-between">
-                            <p class="fc-blue fw-b" style="min-width: 80px;">상품코드</p>
+                            <p class="fc-blue fw-b" style="min-width: 80px;">바코드</p>
                             <p class="text-right" id="cur_prd_cd"></p>
                         </li>
                     </ul>
@@ -431,7 +431,7 @@
                         <div class="card-body b-none mt-4">
                             <div class="d-flex align-items-center br-2 b-1-gray bg-white shadow-box p-2 pl-4 mb-3">
                                 <select name="search_prd_type" id="search_prd_type" class="sel fs-12" style="min-width: 120px;">
-                                    <option value="prd_cd">상품코드</option>
+                                    <option value="prd_cd">바코드</option>
                                     <option value="goods_nm">상품명</option>
                                     <option value="style_no">스타일넘버</option>
                                 </select>
@@ -872,7 +872,7 @@
         {field: "goods_nm", headerName: "상품명", width: "auto", cellStyle: LineHeight50, wrapText: true, autoHeight: true,
             // cellRenderer: (params) => `<a href="javascript:void(0);" onclick="setProductDetail('${params.data.prd_cd}');">${params.value}</a>`,
         },
-        // {field: "prd_cd_sm", headerName: "코드일련", width: 130, cellStyle: {...AlignCenter, ...LineHeight50}},
+        // {field: "prd_cd_sm", headerName: "품번", width: 130, cellStyle: {...AlignCenter, ...LineHeight50}},
         {field: "color", headerName: "컬러", width: 180, cellStyle: {...LineHeight50}, wrapText: true, autoHeight: true},
         {field: "size", headerName: "사이즈", width: 150, cellStyle: {...LineHeight50}, wrapText: true, autoHeight: true},
         {field: "qty", headerName: "수량", width: 60, type: "currencyType", cellStyle: LineHeight50},
@@ -888,8 +888,8 @@
     let gx2;
 
     const product_columns = [
-        {field: "prd_cd" , headerName: "상품코드", width: 180, cellStyle: {...AlignCenter, ...LineHeight50}},
-        {field: "prd_cd_sm", headerName: "코드일련", width: 130, cellStyle: {...AlignCenter, ...LineHeight50}},
+        {field: "prd_cd" , headerName: "바코드", width: 180, cellStyle: {...AlignCenter, ...LineHeight50}},
+        {field: "prd_cd_sm", headerName: "품번", width: 130, cellStyle: {...AlignCenter, ...LineHeight50}},
         {field: "color", headerName: "컬러", width: 180, cellStyle: {...LineHeight50}},
         {field: "size", headerName: "사이즈", width: 150, cellStyle: {...LineHeight50}},
         {field: "style_no", headerName: "스타일넘버", width: 100, cellStyle: {...AlignCenter, ...LineHeight50}},

@@ -444,7 +444,7 @@
                                         <div class="row">
                                             <div class="col-lg-12 inner-td">
                                                 <div class="form-group">
-                                                    <label style="min-width:60px;">상품번호</label>
+                                                    <label style="min-width:60px;">온라인코드</label>
                                                     <div class="flax_box">
                                                         <input type="text" name="sch_goods_nos" id="sch_goods_nos" class="form-control form-control-sm w-80" >
                                                     </div>
@@ -553,12 +553,12 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<!-- 상품코드 검색 -->
+<!-- 바코드 검색 -->
 <div id="SearchPrdcdModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchPrdcdModalLabel" aria-hidden="true">
     <div class="modal-dialog" style="max-width: 1200px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title mt-0" id="SearchPrdcdModalLabel">상품코드 검색</h5>
+                <h5 class="modal-title mt-0" id="SearchPrdcdModalLabel">바코드 검색</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -572,7 +572,7 @@
                                     <div class="row">
                                         <div class="col-lg-4 inner-td" id="search_prdcd_code">
                                             <div class="form-group">
-                                                <label style="min-width:80px;">상품코드</label>
+                                                <label style="min-width:80px;">바코드</label>
                                                 <div class="flex_box">
                                                     <input type='text' class="form-control form-control-sm search-all" onkeypress="searchPrdcd.Search(event);" name='prd_cd' value=''>
                                                 </div>
@@ -673,7 +673,7 @@
     <div class="modal-dialog" style="max-width: 1200px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title mt-0" id="myModalLabel">상품옵션 범위검색</h5>
+                <h5 class="modal-title mt-0" id="myModalLabel">상품검색조건</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>

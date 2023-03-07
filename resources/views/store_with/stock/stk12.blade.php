@@ -66,7 +66,7 @@
                     <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="prd_cd">상품코드</label>
+                                <label for="prd_cd">바코드</label>
                                 <div class="flex_box">
 									<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
 									<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
@@ -93,7 +93,7 @@
                     <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="prd_cd">상품옵션 범위검색</label>
+                                <label for="prd_cd">상품검색조건</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input-box w-100">
                                         <div class="form-inline inline_btn_box">
@@ -119,8 +119,8 @@
                                     <span class="text_line">/</span>
                                     <div class="form-inline-inner input_box" style="width:45%;">
                                         <select name="ord_field" class="form-control form-control-sm">
-                                            <option value="goods_no">상품번호</option>
-                                            <option value="prd_cd">상품코드</option>
+                                            <option value="goods_no">온라인코드</option>
+                                            <option value="prd_cd">바코드</option>
                                         </select>
                                     </div>
                                     <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -138,7 +138,7 @@
                     <div class="row search-area-ext d-none">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="style_no">스타일넘버/상품번호</label>
+                                <label for="style_no">스타일넘버/온라인코드</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box">
                                         <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="{{ $style_no }}">
@@ -250,14 +250,14 @@
     <script language="javascript">
         let columns = [
             {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
-            {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
-            {field: "goods_no", headerName: "상품번호", pinned: 'left', width: 60, cellStyle: {"text-align": "center"}},
+            {field: "prd_cd", headerName: "바코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
+            {field: "goods_no", headerName: "온라인코드", pinned: 'left', width: 60, cellStyle: {"text-align": "center"}},
             {field: "opt_kind_nm", headerName: "품목", pinned: 'left', width: 80, cellStyle: {"text-align": "center"}},
             {field: "brand_nm", headerName: "브랜드", pinned: 'left', width: 60, cellStyle: {"text-align": "center"}},
             {field: "style_no",	headerName: "스타일넘버", pinned: 'left', width: 80, cellStyle: {"text-align": "center"}},
             {field: "goods_nm",	headerName: "상품명", pinned: 'left', type: 'HeadGoodsNameType', width: 250},
             {field: "goods_nm_eng",	headerName: "상품명(영문)", pinned: 'left', type: 'HeadGoodsNameType', width: 250},
-            {field: "prd_cd_p", headerName: "코드일련", pinned: 'left', width: 100, cellStyle: {"text-align": "center"}},
+            {field: "prd_cd_p", headerName: "품번", pinned: 'left', width: 100, cellStyle: {"text-align": "center"}},
             {field: "color", headerName: "컬러", pinned: 'left', width: 50, cellStyle: {"text-align": "center"}},
             {field: "size", headerName: "사이즈", pinned: 'left', width: 50, cellStyle: {"text-align": "center"}},
             {field: "goods_opt", headerName: "옵션", pinned: 'left', width: 200},
@@ -394,7 +394,7 @@
                 if(cnt > (r.storage_wqty || 0)) return true;
                 else return false;
             });
-            if(over_qty_rows.length > 0) return alert(`대표창고의 재고보다 많은 수량을 요청하실 수 없습니다.\n상품코드 : ${over_qty_rows.map(o => o.prd_cd).join(", ")}`);
+            if(over_qty_rows.length > 0) return alert(`대표창고의 재고보다 많은 수량을 요청하실 수 없습니다.\n바코드 : ${over_qty_rows.map(o => o.prd_cd).join(", ")}`);
 
             if(!confirm("해당 상품을 출고요청하시겠습니까?")) return;
 

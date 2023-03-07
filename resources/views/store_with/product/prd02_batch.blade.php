@@ -1,5 +1,5 @@
 @extends('store_with.layouts.layout-nav')
-@section('title', '상품코드 일괄등록')
+@section('title', '바코드 일괄등록')
 @section('content')
 
 <!-- import excel lib -->
@@ -8,13 +8,13 @@
 <div class="show_layout py-3 px-sm-3">
     <div class="page_tit d-flex justify-content-between">
         <div class="d-flex">
-            <h3 class="d-inline-flex">상품코드 일괄등록</h3>
+            <h3 class="d-inline-flex">바코드 일괄등록</h3>
             <div class="d-inline-flex location">
                 <span class="home"></span>
                 <span>/ 상품관리</span>
                 <span>/ 상품관리(코드)</span>
-                <span>/ 상품코드 등록</span>
-                <span>/ 상품코드 일괄등록</span>
+                <span>/ 바코드 등록</span>
+                <span>/ 바코드 일괄등록</span>
             </div>
         </div>
         <div class="d-flex">
@@ -89,7 +89,7 @@
 
     let columns = [
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 29},
-        {field: "prd_cd_p", headerName: "코드일련", width: 90, cellStyle: {"text-align": "center"}},
+        {field: "prd_cd_p", headerName: "품번", width: 90, cellStyle: {"text-align": "center"}},
         {field: "brand", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
 		{field: "year", headerName: "년도", width: 80, cellStyle: {"text-align": "center"}},
 		{field: "season", headerName: "시즌",width: 80, cellStyle: {"text-align": "center"}},
@@ -326,14 +326,14 @@
                 data: data,
             }).then(function (res) {
                 if(res.data.code === 200) {
-                        alert('상품코드 일괄등록에 성공하였습니다.');
+                        alert('바코드 일괄등록에 성공하였습니다.');
                         window.close();
                 } else if (res.data.code === -1) {
                     const prd_cd = res.data.prd_cd;
 				    alert(`${prd_cd}는 중복되었거나 이미 존재하는 상품 코드입니다.\n중복을 제거하거나 상품 코드를 재확인 후 다시 시도해주세요.`);
                 } else {
                     console.log(res.data);
-                    alert("상품코드 일괄등록 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+                    alert("바코드 일괄등록 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
                 }
             }).catch(function (err) {
                 console.log(err);

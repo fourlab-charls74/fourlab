@@ -80,7 +80,7 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <!-- <div class="form-group">
-                            <label for="goods_stat">상품상태</label>
+                            <label for="goods_stat">전시상태</label>
                             <div class="flax_box" style="width:45%">
                                 <select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
                                     <option value=''>전체</option>
@@ -95,7 +95,7 @@
                             </div>
                         </div> -->
                         <div class="form-group">
-                            <label for="goods_stat">상품상태</label>
+                            <label for="goods_stat">전시상태</label>
                             <div class="d-flex justify-content-between align-items-center">
                                 <select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
                                     <option value=''>전체</option>
@@ -112,7 +112,7 @@
                     </div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="style_no">스타일넘버/상품코드</label>
+							<label for="style_no">스타일넘버/바코드</label>
 							<div class="form-inline">
 								<div class="form-inline-inner input_box">
 									<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="{{ $style_no }}">
@@ -275,7 +275,7 @@
 								<span class="text_line">/</span>
 								<div class="form-inline-inner input_box" style="width:45%;">
 									<select name="ord_field" class="form-control form-control-sm">
-										<option value="goods_no">상품번호</option>
+										<option value="goods_no">온라인코드</option>
 										<option value="goods_nm">상품명</option>
 									</select>
 								</div>
@@ -374,7 +374,7 @@
         {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, pinned: 'left', sort: null},
         { 
             field: "goods_no", 
-            headerName: "상품번호",
+            headerName: "온라인코드",
             width: 58,
             pinned: 'left',
             cellStyle:{'text-align':'center'},
@@ -395,7 +395,7 @@
         {field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', width: 230, editable: true, cellStyle: { 'background' : '#ffff99'}},
         {field: "goods_nm_eng", headerName: "상품명(영문)", width: 230},
         {field: "ad_desc", headerName: "하단홍보글", editable: true, cellStyle: {'background' : '#ffff99'}},
-        {field: "sale_stat_cl", headerName: "상품상태", width:70, type: 'GoodsStateTypeLH50'},
+        {field: "sale_stat_cl", headerName: "전시상태", width:70, type: 'GoodsStateTypeLH50'},
         {field: "normal_price", headerName: "정상가", type: 'currencyType'},
         {field: "goods_sh", headerName: "시중가(Tag가)", type: 'currencyType'},
         {field: "price", headerName: "판매가", editable: true, type: 'currencyType', width:60, cellStyle: {'background' : '#ffff99'}},
@@ -490,16 +490,16 @@
 		});
 
 		if( chg_sale_stat === "" ){
-			alert('변경할 상품상태를 선택해 주십시오.');
+			alert('변경할 전시상태를 선택해 주십시오.');
 			return false;
 		}
 
 		if( goods_nos.length === 0 ){
-			alert("상품상태를 변경할 상품을 선택해 주십시오.");
+			alert("전시상태를 변경할 상품을 선택해 주십시오.");
 			return false;
 		}
 
-		if( confirm("선택된 상품의 상품상태를 변경하시겠습니까?") ){
+		if( confirm("선택된 상품의 전시상태를 변경하시겠습니까?") ){
 			$.ajax({
 				async: true,
 				type: 'put',
@@ -513,7 +513,7 @@
 					if (res.code === 200) {
 						var fail = res.head.fail;
 						if (fail === 0) {
-							alert('상품상태를 변경하였습니다.');
+							alert('전시상태를 변경하였습니다.');
 							Search(1);
 						} else {
 							alert(fail + ' 개의 상품이 재고부족으로 판매중 상태로 변경되지 않았습니다.\n해당 상품은 재고를 먼저 확인하신 후 판매중으로 상태 변경하시기 바랍니다.');

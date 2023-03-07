@@ -123,7 +123,7 @@
         {field: "",	headerName: "배분구분"},
         {field: "",	headerName: "매장코드"},
         {field: "",	headerName: "매장명"},
-        {field: "",	headerName: "상품코드"},
+        {field: "",	headerName: "바코드"},
         {field: "",	headerName: "상품명"},
         {field: "",	headerName: "칼라"},
         {field: "",	headerName: "칼라명"},

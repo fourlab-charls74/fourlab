@@ -59,7 +59,7 @@
 											<table class="table incont table-bordered" width="100%" cellspacing="0">
 												<tbody>
 													<tr>
-														<th class="required" style="text-align:center;vertical-align:middle;">상품번호</th>
+														<th class="required" style="text-align:center;vertical-align:middle;">온라인코드</th>
 														<td colspan="3">
 														<div class="flax_box">
 																<div class="form-inline-inner inline_btn_box">
@@ -155,7 +155,7 @@
 						</div>
 							<div class="card">
 								<div class="card-header mb-0">
-									<a href="#">상품코드정보</a>
+									<a href="#">바코드정보</a>
 								</div>
 								<div class="card-body pt-2">
 									<div class="card-title">
@@ -189,14 +189,14 @@
 												<table class="table incont table-bordered" width="100%" cellspacing="0">
 													<tbody>
 														<tr>
-															<th class="required" style="text-align:center;vertical-align:middle;">상품코드(매칭 X)</th>
+															<th class="required" style="text-align:center;vertical-align:middle;">바코드(매칭 X)</th>
 															<td>
 																<div class="flex_box">
 																	<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
 																	<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 																</div>
 															</td>
-															<th class="required" style="text-align:center;vertical-align:middle;">상품번호</th>
+															<th class="required" style="text-align:center;vertical-align:middle;">온라인코드</th>
 															<td>
 																<div class="flax_box">
 																	<div class="form-inline-inner inline_btn_box">
@@ -219,7 +219,7 @@
 							</div>
 							<div class="card">
 								<div class="card-header mb-0">
-									<a href="#">상품코드정보</a>
+									<a href="#">바코드정보</a>
 								</div>
 								<div class="card-body pt-2">
 									<div class="card-title">
@@ -252,11 +252,11 @@
                 return params.data.match_yn == '';
             },
 		},
-		{field:"goods_no",	headerName: "상품번호",		width:72},
+		{field:"goods_no",	headerName: "온라인코드",		width:72},
 		{field:"style_no",	headerName: "스타일넘버",	width:72},
 		{field:"goods_nm",	headerName: "상품명",		width:250},
 		{field:"goods_opt",	headerName: "상품옵션",		width:200},
-		{field:"prd_cd1",	headerName: "상품코드",		width:120},
+		{field:"prd_cd1",	headerName: "바코드",		width:120},
 		{field:"color",		headerName: "컬러",			width:72},
 		{field:"size",		headerName: "사이즈",		width:72},
 		{field:"match_yn", headerName: "매칭여부",		width:72},
@@ -276,7 +276,7 @@
 				return params.data.checkbox == true && params.data.is_product == 'Y';
             },
 		},
-		{field:"goods_no",	headerName: "상품번호",		width:72},
+		{field:"goods_no",	headerName: "온라인코드",		width:72},
 		{field:"style_no", headerName: "스타일넘버",	width:72},
 		{field:"prd_nm", headerName: "상품명",			width:250},
 		{field:"goods_opt",	headerName: "상품옵션",		width:200,
@@ -284,7 +284,7 @@
 				return params.data.goods_opt
 			}
 		},
-		{field:"prd_cd",	headerName: "상품코드",		width:120},
+		{field:"prd_cd",	headerName: "바코드",		width:120},
 		{field:"color",		headerName: "컬러",			width:72},
 		{field:"size",		headerName: "사이즈",		width:72},
 		{field:"", headerName: "알림",		width:120,
@@ -354,7 +354,7 @@
 		Search();
 	}
 
-	//상품코드별 불러오기
+	//바코드별 불러오기
 	function getOption_goods_code(){
 		var frm	= $('form[name="f2"]');
 
@@ -365,7 +365,7 @@
 
 	const validation = (cmd) => {
 
-		// 상품번호 입력여부
+		// 온라인코드 입력여부
 		if(f1.goods_no.value.trim() === '') {
 			f1.goods_no.focus();
 			return alert("상품번호를 입력해주세요.");
@@ -410,13 +410,13 @@
 		return true;
 	}
 	const validation_code = (cmd) => {
-		// 상품코드 입력 여부
+		// 바코드 입력 여부
 		if(f2.prd_cd.value.trim() === '') {
 			f2.prd_cd.focus();
-			return alert("상품코드를 입력해주세요.");
+			return alert("바코드를 입력해주세요.");
 		}
 
-		// 상품번호 입력 여부
+		// 온라인코드 입력 여부
 		if(f2.goods_no2.value.trim() === '') {
 			f2.goods_no2.focus();
 			return alert("상품번호를 입력해주세요.");
@@ -429,7 +429,7 @@
 	function addPrdCd(){
 
 		let rows	= gx.getSelectedRows();
-		if(rows.length < 1) return alert("저장할 상품코드 정보를 선택해주세요.");
+		if(rows.length < 1) return alert("저장할 바코드 정보를 선택해주세요.");
 
 		axios({
 			url: '/store/product/prd02/add-product-code',
@@ -444,20 +444,20 @@
 				self.close();
 			} else {
 				console.log(res.data);
-				alert("상품코드 등록중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+				alert("바코드 등록중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
 			}
 		}).catch(function (err) {
 			console.log(err);
 		});
 	}
 
-	// 상품코드별 매칭 
+	// 바코드별 매칭 
 	function addPrdCd_product(){
 
 		let rows	= gx2.getSelectedRows();
 		let goods_no2_val = document.getElementById('goods_no2').value;
 
-		if(rows.length < 1) return alert("저장할 상품코드 정보를 선택해주세요.");
+		if(rows.length < 1) return alert("저장할 바코드 정보를 선택해주세요.");
 
 		axios({
 			url: '/store/product/prd02/add-product-product',
@@ -472,7 +472,7 @@
 				self.close();
 			} else {
 				console.log(res.data);
-				alert("상품코드 등록중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+				alert("바코드 등록중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
 			}
 		}).catch(function (err) {
 			console.log(err);
@@ -483,7 +483,7 @@
         $('#tab-nav-1').trigger("click");  
     }); 
 
-	// 상품코드 검색 클릭 이벤트 바인딩 및 콜백 사용
+	// 바코드 검색 클릭 이벤트 바인딩 및 콜백 사용
 	$(".sch-prdcd").on("click", function() {
 		searchPrdcd.Open(null, "match");
     });

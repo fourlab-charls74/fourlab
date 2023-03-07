@@ -78,7 +78,7 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
-							<label>상품코드</label>
+							<label>바코드</label>
 							<div class="flex_box">
                                 <input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
                                 <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
@@ -87,7 +87,7 @@
                     </div>
                     <div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="prd_cd">상품옵션 범위검색</label>
+							<label for="prd_cd">상품검색조건</label>
 							<div class="form-inline">
 								<div class="form-inline-inner input-box w-100">
 									<div class="form-inline inline_btn_box">
@@ -101,7 +101,7 @@
 					</div>
                     <div class="col-lg-4">
                         <div class="form-group">
-                            <label for="style_no">스타일넘버/상품코드</label>
+                            <label for="style_no">스타일넘버/바코드</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box">
                                     <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="{{ $style_no }}">
@@ -149,8 +149,8 @@
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
-                                        <option value="goods_no">상품번호</option>
-                                        <option value="prd_cd">상품코드</option>
+                                        <option value="goods_no">온라인코드</option>
+                                        <option value="prd_cd">바코드</option>
                                     </select>
                                 </div>
                                 <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -241,8 +241,8 @@
 <script language="javascript">
 	var columns = [
 		{headerName: '#', pinned: 'left', type: 'NumType', width:40},
-        {field: "prd_cd", headerName: "상품코드", width: 120, pinned: 'left'},
-		{field: "goods_no", headerName: "상품번호", width: 58, pinned: 'left',
+        {field: "prd_cd", headerName: "바코드", width: 120, pinned: 'left'},
+		{field: "goods_no", headerName: "온라인코드", width: 58, pinned: 'left',
             cellRenderer: function (params) {
                 if (params.value) {
                     return `<a href="{{config('shop.front_url')}}/app/product/detail/${params.value}" target="_blank">${params.value}</a>`
@@ -256,7 +256,7 @@
         {field: "img", headerName: "이미지_url", hide: true},
 		{field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', width: 150},
 		{field: "goods_nm_eng", headerName: "상품명(영문)", width: 150},
-        {field: "prd_cd_p", headerName: "코드일련", width:90},
+        {field: "prd_cd_p", headerName: "품번", width:90},
         {field: "color", headerName: "컬러", width:55},
         {field: "size", headerName: "사이즈", width:55},
 		{field: "goods_opt", headerName: "옵션", width: 120},

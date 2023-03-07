@@ -81,7 +81,7 @@
 				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="">상품코드 :</label>
+							<label for="">바코드 :</label>
 							<div class="flax_box">
 								<input type='text' class="form-control form-control-sm search-enter" name='goods_code' value=''>
 							</div>
@@ -196,7 +196,7 @@
 		{field: "style_no",		headerName: "아이템코드",	width:100},
 		{field: "opt_kind_nm",	headerName: "품목",			width:100},
 		{field: "brand_nm",		headerName: "브랜드",		width:90},
-		{field: "goods_code",	headerName: "상품코드",		width:100},
+		{field: "goods_code",	headerName: "바코드",		width:100},
 		{field: "goods_nm",		headerName: "상품명",		width:150},
 		{field: "color",		headerName: "칼라",			width:85},
 		{field: "color_nm",		headerName: "칼라명",		width:100},

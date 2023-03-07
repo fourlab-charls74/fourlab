@@ -108,7 +108,7 @@
 				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label>상품코드</label>
+							<label>바코드</label>
 							<div class="flex_box">
 								<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
 								<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
@@ -117,7 +117,7 @@
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="prd_cd">상품옵션 범위검색</label>
+							<label for="prd_cd">상품검색조건</label>
 							<div class="form-inline">
 								<div class="form-inline-inner input-box w-100">
 									<div class="form-inline inline_btn_box">

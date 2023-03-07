@@ -1,5 +1,5 @@
 @extends('store_with.layouts.layout-nav')
-@section('title', '상품코드 매칭 정보')
+@section('title', '바코드 매칭 정보')
 @section('content')
 
 
@@ -7,7 +7,7 @@
 <div class="show_layout py-3 px-sm-3">
 	<div class="page_tit d-flex justify-content-between">
 		<div class="d-flex">
-			<h3 class="d-inline-flex">상품코드 매칭 정보</h3>
+			<h3 class="d-inline-flex">바코드 매칭 정보</h3>
 			<div class="d-inline-flex location">
 				<span class="home"></span>
 				<span>/ 상품관리</span>
@@ -42,13 +42,13 @@
 								<table class="table incont table-bordered" width="100%" cellspacing="0">
 									<tbody>
 										<tr>
-											<th>상품코드</th>
+											<th>바코드</th>
 											<td style="width:35%;">
 												<div class="flax_box">
 													<input type="text" name="prd_cd" id="prd_cd" value="{{ $prd_cd }}" class="form-control form-control-sm" readonly />
 												</div>
 											</td>
-											<th>상품번호</th>
+											<th>온라인코드</th>
 											<td style="width:35%;">
 												<div class="flax_box">
 													<input type="text" name="goods_no" id="goods_no" value="{{ $goods_no }}" class="form-control form-control-sm" readonly />
@@ -83,7 +83,7 @@
 
 		<div class="card">
 			<div class="card-header mb-0">
-				<a href="#">상품코드정보</a>
+				<a href="#">바코드정보</a>
 			</div>
 			<div class="card-body pt-2">
 				<div class="card-title">
@@ -114,11 +114,11 @@
 	};
 
 	const columns = [
-		{field:"goods_no",	headerName: "상품번호",		width:72},
+		{field:"goods_no",	headerName: "온라인코드",		width:72},
 		{field:"style_no",	headerName: "아이템코드",	width:72},
 		{field:"goods_nm",	headerName: "상품명",		width:250},
 		{field:"goods_opt",	headerName: "상품옵션",		width:200},
-		{field:"prd_cd1",	headerName: "상품코드",		width:120},
+		{field:"prd_cd1",	headerName: "바코드",		width:120},
 		{field:"color",		headerName: "컬러",			width:72},
 		{field:"size",		headerName: "사이즈",		width:72},
 		{field:"match_yn",  headerName: "등록유무",		width:60, cellStyle:{'text-align':'center'}},
@@ -138,7 +138,7 @@
 		{field:"opt",		headerName:"품목",			hide:true},
 		{field:"item",		headerName:"하위품목",		hide:true},
 		{field:"seq",		headerName:"순서차수",		hide:true},
-		{field:"prd_cd",	headerName:"상품코드",		hide:true},
+		{field:"prd_cd",	headerName:"바코드",		hide:true},
 		{field: "", headerName:"", width:"auto"},
 	];
 </script>
@@ -176,7 +176,7 @@
 	}
 
 	function delPrdCd(prd_cd){
-		if(!window.confirm("상품코드를 삭제하면 기존 재고 정보도 함께 삭제됩니다.\r\n삭제하시겠습니까?")) return;
+		if(!window.confirm("바코드를 삭제하면 기존 재고 정보도 함께 삭제됩니다.\r\n삭제하시겠습니까?")) return;
 
 		axios({
 			url: '/store/product/prd02/del-product-code',
@@ -192,7 +192,7 @@
 				Search();
 			} else {
 				console.log(res.data);
-				alert("상품코드 삭제중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+				alert("바코드 삭제중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
 			}
 		}).catch(function (err) {
 			console.log(err);

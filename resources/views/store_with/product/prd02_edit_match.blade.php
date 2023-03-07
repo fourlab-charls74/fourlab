@@ -1,5 +1,5 @@
 @extends('store_with.layouts.layout-nav')
-@section('title', '상품코드 매칭 정보')
+@section('title', '바코드 매칭 정보')
 @section('content')
 
 
@@ -7,7 +7,7 @@
 <div class="show_layout py-3 px-sm-3">
 	<div class="page_tit d-flex justify-content-between">
 		<div class="d-flex">
-			<h3 class="d-inline-flex">상품코드 매칭 정보</h3>
+			<h3 class="d-inline-flex">바코드 매칭 정보</h3>
 			<div class="d-inline-flex location">
 				<span class="home"></span>
 				<span>/ 상품관리</span>
@@ -43,13 +43,13 @@
 								<table class="table incont table-bordered" width="100%" cellspacing="0">
 									<tbody>
 										<tr>
-											<th>상품코드</th>
+											<th>바코드</th>
 											<td style="width:35%;">
 												<div class="flax_box">
 													<input type="text" name="prd_cd" id="prd_cd" value="{{ $prd_cd }}" class="form-control form-control-sm" readonly />
 												</div>
 											</td>
-											<th>상품번호</th>
+											<th>온라인코드</th>
 											<td style="width:35%;">
 												<div class="flax_box">
 													<div class="form-inline-inner inline_btn_box">
@@ -87,7 +87,7 @@
 
 		<div class="card">
 			<div class="card-header mb-0">
-				<a href="#">상품코드정보</a>
+				<a href="#">바코드정보</a>
 			</div>
 			<div class="card-body pt-2">
 				<div class="card-title">
@@ -123,15 +123,15 @@
 				return params.data.match_yn == '';
 			},
 		},
-		{field:"goods_no",	headerName: "상품번호",		width:72},
+		{field:"goods_no",	headerName: "온라인코드",		width:72},
 		{field:"style_no",	headerName: "아이템코드",	width:72},
 		{field:"goods_nm",	headerName: "상품명",		width:250},
 		{field:"goods_opt",	headerName: "상품옵션",		width:200},
-		{field:"prd_cd1",	headerName: "코드일련",		width:120},
+		{field:"prd_cd1",	headerName: "품번",		width:120},
 		{field:"color",		headerName: "컬러",			width:72},
 		{field:"size",		headerName: "사이즈",		width:72},
 		{field:"match_yn",  headerName: "등록유무",		width:60, cellStyle:{'text-align':'center'}},
-		{field:"prd_cd",	headerName: "상품코드", hide:true},
+		{field:"prd_cd",	headerName: "바코드", hide:true},
 		{field: "", headerName:"", width:"auto"},
 	];
 </script>
@@ -177,10 +177,10 @@
 	}
 
 	const validation = (cmd) => {
-		// 상품번호 입력여부
+		// 온라인코드 입력여부
 		if(f1.goods_no.value.trim() === '') {
 			f1.goods_no.focus();
-			return alert("상품번호를 입력해주세요.");
+			return alert("온라인코드를 입력해주세요.");
 		}
 
 		return true;
@@ -188,7 +188,7 @@
 
 	function addPrdCd(){
 		let rows	= gx.getSelectedRows();
-		if(rows.length < 1) return alert("저장할 상품코드 정보를 선택해주세요.");
+		if(rows.length < 1) return alert("저장할 바코드 정보를 선택해주세요.");
 
 		//console.log(rows);
 
@@ -205,7 +205,7 @@
 				Search();
 			} else {
 				console.log(res.data);
-				alert("상품코드 등록중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+				alert("바코드 등록중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
 			}
 		}).catch(function (err) {
 			console.log(err);

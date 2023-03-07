@@ -992,14 +992,14 @@ class ord03Controller extends Controller
 		";
 
 		$headers = [
-			'prd_cd' => '상품코드',
-			'goods_no' => '상품번호', 
+			'prd_cd' => '바코드',
+			'goods_no' => '온라인코드', 
 			'style_no' => '스타일넘버', 
 			'brand' => '브랜드', 
 			'com_nm' => '공급업체', 
 			'goods_nm' => '상품명', 
 			'goods_nm_eng' => '상품명(영문)', 
-			'prd_cd_p' => '코드일련', 
+			'prd_cd_p' => '품번', 
 			'color' => '컬러', 
 			'size' => '사이즈', 
 			'goods_opt' => '옵션명', 

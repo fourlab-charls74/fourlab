@@ -86,7 +86,7 @@
 		{headerName:"아이템코드",	field:"style_no",		width:100},
 		{headerName:"품목",			field:"opt_kind_nm",	width:100},
 		{headerName:"브랜드",		field:"brand_nm",		width:100},
-		{headerName:"상품코드",		field:"goods_code",		width:100},
+		{headerName:"바코드",		field:"goods_code",		width:100},
 		{headerName:"상품명",		field:"goods_nm",		width:100},
 		{headerName:"칼라",			field:"color",			width:100},
 		{headerName:"칼라명",		field:"color_nm",		width:100},
@@ -164,7 +164,7 @@
 
 	var out_order_errors = new Object();
     out_order_errors['-100'] = "판매처 주문번호 부정확";
-    out_order_errors['-101'] = "상품번호 없음";
+    out_order_errors['-101'] = "온라인코드 없음";
     out_order_errors['-102'] = "옵션 없음";
     out_order_errors['-106'] = "수량 없음";
     out_order_errors['-107'] = "금액 없음";
@@ -172,7 +172,7 @@
     out_order_errors['-110'] = "수령자 없음";
     out_order_errors['-111'] = "수령자 우편번호 없음";
     out_order_errors['-112'] = "수령자 주소 없음";
-    out_order_errors['-210'] = "상품번호 부정확";
+    out_order_errors['-210'] = "온라인코드 부정확";
     out_order_errors['-220'] = "옵션 부정확";
     out_order_errors['-310'] = "주문 중복";
     out_order_errors['-320'] = "묶음주문 주문자명 불일치";

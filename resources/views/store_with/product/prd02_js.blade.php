@@ -1,8 +1,8 @@
 
 
-<!-- 상품관리(코드) > 상품매칭 > 상품코드별 매칭 상품번호 검색 기능-->
+<!-- 상품관리(코드) > 상품매칭 > 바코드별 매칭 온라인코드 검색 기능-->
 
-<!-- 상품번호 검색 -->
+<!-- 온라인코드 검색 -->
 <div id="SearchGoodsNoModal2" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchGoodsNoModalLabel" aria-hidden="true">
         <div class="modal-dialog" >
             <div class="modal-content">
@@ -21,7 +21,7 @@
                                         <div class="row">
                                             <div class="col-lg-12 inner-td">
                                                 <div class="form-group">
-                                                    <label style="min-width:60px;">상품번호</label>
+                                                    <label style="min-width:60px;">온라인코드</label>
                                                     <div class="flax_box">
                                                         <input type="text" name="sch_goods_nos" id="sch_goods_nos" class="form-control form-control-sm w-80" >
                                                     </div>
@@ -109,11 +109,11 @@
     SearchGoodsNo2.prototype.SetGrid = function(divId){
         const columns = [
             {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 35, pinned: 'left', sort: null},
-            {field: "goods_no", headerName: "상품번호", width: 72, pinned: 'left'},
+            {field: "goods_no", headerName: "온라인코드", width: 72, pinned: 'left'},
             {field: "style_no", headerName: "스타일넘버", width: 84, pinned: 'left'},
             {field: "img", headerName: "이미지", type:'GoodsImageType',width: 40},
             {field: "img", headerName: "이미지_url", hide: true},
-            {field: "sale_stat_cl", headerName: "상품상태", type:'GoodsStateType',width: 72},
+            {field: "sale_stat_cl", headerName: "전시상태", type:'GoodsStateType',width: 72},
             {field: "goods_nm", headerName: "상품명",type:'HeadGoodsNameType'},
             {field:"nvl" , headerName:""},
         ];

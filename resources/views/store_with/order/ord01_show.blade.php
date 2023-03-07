@@ -437,7 +437,7 @@
 <script language="javascript">
     let columns = [
         {headerCheckboxSelection: true, checkboxSelection: true,  width: 28},
-        {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {"text-align": "center"}},
+        {field: "prd_cd", headerName: "바코드", width: 120, cellStyle: {"text-align": "center"}},
         {field: "goods_no", hide: true},
         {field: "goods_nm", headerName: "상품명", type: "HeadGoodsNameType", width: 400, wrapText: true, autoHeight: true},
         {field: "goods_opt", headerName: "옵션", width: 130},

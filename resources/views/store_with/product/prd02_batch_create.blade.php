@@ -1,5 +1,5 @@
 @extends('head_with.layouts.layout-nav')
-@section('title','상품코드 일괄 매칭')
+@section('title','바코드 일괄 매칭')
 @section('content')
 
 <script src="https://unpkg.com/xlsx-style@0.8.13/dist/xlsx.full.min.js"></script>
@@ -7,7 +7,7 @@
 <div class="show_layout py-3 px-sm-3">
 	<div class="page_tit d-flex justify-content-between">
 		<div class="d-flex">
-			<h3 class="d-inline-flex">상품코드 일괄 매칭</h3>
+			<h3 class="d-inline-flex">바코드 일괄 매칭</h3>
 			<div class="d-inline-flex location">
 				<span class="home"></span>
 				<span>/ 상품관리</span>
@@ -63,8 +63,8 @@
 						<h6 class="mt10 m-0 font-weight-bold text-primary fas fa-question-circle"> 주의사항</h6>
 					</div>
 					<ul class="mb-0">
-						<li>- 해당 상품번호의 재고가 초기화 됩니다.</li>
-						<li>- 해당 상품번호에 이미 매칭된 상품코드가 있다면 삭제됩니다.</li>
+						<li>- 해당 온라인코드의 재고가 초기화 됩니다.</li>
+						<li>- 해당 온라인코드에 이미 매칭된 바코드가 있다면 삭제됩니다.</li>
 					</ul>
 				</div>
 
@@ -99,8 +99,8 @@
 <script language="javascript">
 	var columnDefs = [
 		{headerName: "#", field: "num",filter:true,width:50,valueGetter: function(params) {return params.node.rowIndex+1;},pinned:'left'},
-		{headerName:"상품코드",field:"xmd_code", width:150},
-		{headerName:"상품번호",field:"goods_no", width:100},
+		{headerName:"바코드",field:"xmd_code", width:150},
+		{headerName:"온라인코드",field:"goods_no", width:100},
 		{headerName:"옵션",field:"goods_opt", width:250},
 	];
 

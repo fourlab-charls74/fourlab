@@ -7,7 +7,7 @@
             <h3 class="d-inline-flex">재고현황</h3>
             <div class="d-inline-flex location">
                 <span class="home"></span>
-                <span>/ 상품코드 - {{ @$prd->prd_cd }}</span>
+                <span>/ 바코드 - {{ @$prd->prd_cd }}</span>
             </div>
         </div>
     </div>
@@ -41,9 +41,9 @@
                                     <p class="d-flex align-items-center justify-content-center" style="min-width: 120px;max-width:120px; min-height: 120px;max-height:120px;">이미지 없음</p>
                                     @endif
                                 </td>
-                                <th>상품코드</th>
+                                <th>바코드</th>
                                 <td>{{ @$prd->prd_cd }}</td>
-                                <th>상품번호</th>
+                                <th>온라인코드</th>
                                 <td>{{ @$prd->goods_no }}</td>
                             </tr>
                             <tr>

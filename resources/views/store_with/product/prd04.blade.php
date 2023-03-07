@@ -65,7 +65,7 @@
 				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label>상품코드</label>
+							<label>바코드</label>
 							<div class="flex_box">
 								<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
 								<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
@@ -99,7 +99,7 @@
 				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="prd_cd">상품옵션 범위검색</label>
+							<label for="prd_cd">상품검색조건</label>
 							<div class="form-inline">
 								<div class="form-inline-inner input-box w-100">
 									<div class="form-inline inline_btn_box">
@@ -145,10 +145,10 @@
 								<span class="text_line">/</span>
 								<div class="form-inline-inner input_box" style="width:45%;">
 									<select name="ord_field" class="form-control form-control-sm">
-										<option value="prd_cd_p">등록일(코드일련별)</option>
+										<option value="prd_cd_p">등록일(품번별)</option>
 										<option value="pc.rt">등록일</option>
-										<option value="pc.prd_cd">상품코드</option>
-										<option value="pc.goods_no">상품번호</option>
+										<option value="pc.prd_cd">바코드</option>
+										<option value="pc.goods_no">온라인코드</option>
 										<option value="g.goods_nm">상품명</option>
 									</select>
 								</div>
@@ -167,7 +167,7 @@
 				<div class="row search-area-ext d-none">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="style_no">스타일넘버/상품번호</label>
+							<label for="style_no">스타일넘버/온라인코드</label>
 							<div class="form-inline">
 								<div class="form-inline-inner input_box">
 									<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="">
@@ -247,7 +247,7 @@
 		{headerName: '#', pinned: 'left', type: 'NumType', width:40, cellStyle: StyleLineHeight,
 			cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : parseInt(params.value) + 1,
 		},
-		{field: "prd_cd", headerName: "상품코드", pinned: 'left', width:120, cellStyle: StyleLineHeight,
+		{field: "prd_cd", headerName: "바코드", pinned: 'left', width:120, cellStyle: StyleLineHeight,
 			cellRenderer: function(params) {
 				if (params.node.rowPinned === 'top') return "합계";
 				if (params.value !== undefined) {
@@ -255,7 +255,7 @@
 				}
 			}
 		},
-		{field: "goods_no", headerName: "상품번호", pinned: 'left', width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
+		{field: "goods_no", headerName: "온라인코드", pinned: 'left', width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
 		{field: "style_no", headerName: "스타일넘버", pinned: 'left', width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
 
 		{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, surl:"{{config('shop.front_url')}}",
@@ -282,7 +282,7 @@
 				}
 			}
 		},
-		{field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: StyleLineHeight, rowGroup: true, hide: true,
+		{field: "prd_cd_p", headerName: "품번", width: 100, cellStyle: StyleLineHeight, rowGroup: true, hide: true,
 			cellRenderer: function (params) {
 				if(params.value === undefined) return "";
 				return `<a href="javascript:void(0);" onclick="return OpenStockPopup('${params.value}', '${$("[name=sdate]").val() || ''}');">${params.value}</a>`;
@@ -354,7 +354,7 @@
                 if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee !important', 'border': 'none'};
             },
 			rollup: true,
-			autoGroupColumnDef: basic_autoGroupColumnDef('코드일련'),
+			autoGroupColumnDef: basic_autoGroupColumnDef('품번'),
 			groupDefaultExpanded: 0, // 0: close, 1: open
 			suppressAggFuncInHeader: true,
 			animateRows: true,
@@ -373,7 +373,7 @@
 	});
 
 	function blank_goods_no() {
-		alert('상품번호가 비어있는 상품입니다.');
+		alert('온라인코드가 비어있는 상품입니다.');
 	}
 
 	function onCellValueChanged(e) {

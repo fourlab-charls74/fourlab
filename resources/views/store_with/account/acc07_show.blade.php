@@ -216,8 +216,8 @@
                 {field: "store_nm",	headerName: "매장명", width: 120},
             ]
         },
-        {field: "prd_cd", headerName: "상품코드", width: 125, cellStyle: CENTER},
-		{field: "goods_no", headerName: "상품번호",	width: 70, cellStyle: CENTER},
+        {field: "prd_cd", headerName: "바코드", width: 125, cellStyle: CENTER},
+		{field: "goods_no", headerName: "온라인코드",	width: 70, cellStyle: CENTER},
 		{field: "goods_nm", headerName: "상품명", width: 180, type: 'HeadGoodsNameType'},
 		{field: "goods_opt", headerName: "옵션", width: 150},
 		{field: "qty", headerName: "수량", width: 50, type: 'currencyType', aggregation: true},

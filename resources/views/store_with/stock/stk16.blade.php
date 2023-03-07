@@ -197,7 +197,7 @@
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
                                         <option value="req_rt">출고요청일</option>
-                                        <option value="p.prd_cd">상품코드</option>
+                                        <option value="p.prd_cd">바코드</option>
                                         <option value="p.price">판매가</option>
                                         <option value="p.wonga">원가</option>
                                     </select>
@@ -331,7 +331,7 @@
         },
         {field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: DEFAULT, surl:"{{config('shop.front_url')}}"},
         {field: "img", headerName: "이미지_url", hide: true},
-        {field: "prd_cd", headerName: "상품코드", width:120, cellStyle: DEFAULT,
+        {field: "prd_cd", headerName: "바코드", width:120, cellStyle: DEFAULT,
             cellRenderer: function(params) {
                 if (params.value !== undefined) {
                     return '<a href="#" onclick="return EditProduct(\'' + params.value + '\');">' + params.value + '</a>';
@@ -489,7 +489,7 @@
                 Search();
             } else if (res.data.code == -1) {
                 const prd_cd = res.data.prd_cd;
-                alert(`상품 코드 - ${prd_cd}\n창고재고가 입력하신 수량보다 적은 경우 접수처리가 불가능합니다.\n창고재고를 다시 확인해주세요.`);
+                alert(`바코드 - ${prd_cd}\n창고재고가 입력하신 수량보다 적은 경우 접수처리가 불가능합니다.\n창고재고를 다시 확인해주세요.`);
             } else {
                 // console.log(res.data);
                 alert("접수처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");

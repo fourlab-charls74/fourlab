@@ -68,7 +68,7 @@
                                     <option value="">조회내역없음</option>
                                     <option value="customer">고객명</option>
                                     <option value="mobile">전화번호</option>
-                                    <option value="product_cd">상품코드</option>
+                                    <option value="product_cd">바코드</option>
                                     <option value="product">상품명</option>
                                 </select>
                             </div>

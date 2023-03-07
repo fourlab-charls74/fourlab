@@ -67,7 +67,7 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="prd_cd">상품옵션 범위검색</label>
+                            <label for="prd_cd">상품검색조건</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input-box w-100">
                                     <div class="form-inline inline_btn_box">
@@ -83,7 +83,7 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="prd_cd">상품코드</label>
+                            <label for="prd_cd">바코드</label>
                             <div class="flex_box">
                                 <input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
                                 <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
@@ -107,7 +107,7 @@
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
                                         <option value="p.storage_cd">창고코드</option>
-                                        <option value="p.prd_cd">상품코드</option>
+                                        <option value="p.prd_cd">바코드</option>
                                     </select>
                                 </div>
                                 <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -168,17 +168,17 @@
 			aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.value == '합계' ? '합계' : params.node.level == 1 ? params.value : '',
 		},
-        {headerName: '코드일련', showRowGroup: 'prd_cd_p', pinned: "left", cellRenderer: 'agGroupCellRenderer', minWidth: 150},
+        {headerName: '품번', showRowGroup: 'prd_cd_p', pinned: "left", cellRenderer: 'agGroupCellRenderer', minWidth: 150},
         {field: "color", headerName: "컬러", width: 55, cellStyle: AlignCenter, pinned:'left'},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: AlignCenter, pinned:'left'},
-        {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: AlignCenter},
-        {field: "goods_no", headerName: "상품번호", width: 60, cellStyle: AlignCenter},
+        {field: "prd_cd", headerName: "바코드", width: 120, cellStyle: AlignCenter},
+        {field: "goods_no", headerName: "온라인코드", width: 60, cellStyle: AlignCenter},
         {field: "brand_nm", headerName: "브랜드", width: 60, cellStyle: AlignCenter},
         {field: "prd_nm", headerName: "상품명", width: 200,
             cellRenderer: function (params) {
                     if (params.value !== undefined) {
                         if(params.data.goods_no == '0') { 
-                            return '<a href="javascript:void(0);" onclick="return alert(`상품번호가 비어있는 상품입니다.`);">' + params.value + '</a>';
+                            return '<a href="javascript:void(0);" onclick="return alert(`온라인코드가 비어있는 상품입니다.`);">' + params.value + '</a>';
                         }
                         
                         return '<a href="#" onclick="return openHeadProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
@@ -186,7 +186,7 @@
                 }
         },
         {field: "goods_nm_eng", headerName: "상품명(영문)", width: 200},
-        {field: "prd_cd_p", headerName: "코드일련", rowGroup: true, hide: true},
+        {field: "prd_cd_p", headerName: "품번", rowGroup: true, hide: true},
         {field: "goods_opt", headerName: "옵션", width: 150},
         {field: "wonga", headerName: "원가", width: 80, type: "currencyType"},
         {field: "goods_sh", headerName: "TAG가", width: 80, type: "currencyType"},

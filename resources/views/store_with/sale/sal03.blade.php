@@ -78,7 +78,7 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
-                            <label for="prd_cd">상품코드</label>
+                            <label for="prd_cd">바코드</label>
                             <div class="flex_box">
                                 <input type='text' class="form-control form-control-sm search-enter" name='prd_cd' value=''>
                             </div>
@@ -86,7 +86,7 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="prd_cd">상품옵션 범위검색</label>
+                            <label for="prd_cd">상품검색조건</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input-box w-100">
                                     <div class="form-inline inline_btn_box">
@@ -111,7 +111,7 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
-                            <label for="style_no">스타일넘버/상품코드</label>
+                            <label for="style_no">스타일넘버/바코드</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box">
                                     <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="{{ $style_no }}">
@@ -253,10 +253,10 @@
 		{headerName: '#', pinned: 'left', type: 'NumType', width: 40, cellStyle: StyleLineHeight,
             cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : parseInt(params.value) + 1,
         },
-		{field: "prd_cd", headerName: "상품코드", width: 120, pinned: "left", cellStyle: StyleLineHeight},
+		{field: "prd_cd", headerName: "바코드", width: 120, pinned: "left", cellStyle: StyleLineHeight},
 		{
             field: "goods_no",
-            headerName: "상품번호",
+            headerName: "온라인코드",
             width: 58,
             pinned: 'left',
             cellStyle: StyleLineHeight,

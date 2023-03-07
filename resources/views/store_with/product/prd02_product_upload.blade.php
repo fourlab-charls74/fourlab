@@ -1,11 +1,11 @@
 @extends('store_with.layouts.layout-nav')
-@section('title', '상품코드 등록')
+@section('title', '바코드 등록')
 @section('content')
 
 <div class="show_layout py-3 px-sm-3">
 	<div class="page_tit d-flex justify-content-between">
 		<div class="d-flex">
-			<h3 class="d-inline-flex">상품코드 등록</h3>
+			<h3 class="d-inline-flex">바코드 등록</h3>
 			<div class="d-inline-flex location">
 				<span class="home"></span>
 				<span>/ 상품관리</span>
@@ -36,7 +36,7 @@
 			}
 		}
 
-		/* 상품코드 api로 검색시 code-filter 부분 제거 */
+		/* 바코드 api로 검색시 code-filter 부분 제거 */
 		#SearchPrdcdModal .code-filter {
 			display: none;
 			padding-top: 5px;
@@ -283,7 +283,7 @@
 		{field: "image", headerName: "이미지",
 			cellRenderer: (params) => `<img style="display:block; width: 100%; max-width: 30px; margin: 0 auto;" src="${params.data.image}">`
 		},
-		{field: "prd_cd", headerName: "코드일련", width: 140},
+		{field: "prd_cd", headerName: "품번", width: 140},
 		{field: "color", headerName: "컬러", width: 80,
 			cellRenderer: (params) => params.data.color.split(':')[1]
 		},

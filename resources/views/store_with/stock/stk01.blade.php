@@ -59,7 +59,7 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
-                            <label for="prd_cd">상품코드</label>
+                            <label for="prd_cd">바코드</label>
                             <div class="flex_box">
                                 <input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
                                 <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
@@ -68,7 +68,7 @@
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group">
-                            <label for="style_no">스타일넘버/상품코드</label>
+                            <label for="style_no">스타일넘버/바코드</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box">
                                     <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="{{ $style_no }}">
@@ -85,7 +85,7 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="prd_cd">상품옵션 범위검색</label>
+                            <label for="prd_cd">상품검색조건</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input-box w-100">
                                     <div class="form-inline inline_btn_box">
@@ -101,7 +101,7 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
-                            <label for="goods_stat">상품상태</label>
+                            <label for="goods_stat">전시상태</label>
                             <div class="flex_box">
                                 <select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
                                     <option value=''>전체</option>
@@ -140,8 +140,8 @@
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
-                                        <option value="goods_no">상품번호</option>
-                                        <option value="prd_cd">상품코드</option>
+                                        <option value="goods_no">온라인코드</option>
+                                        <option value="prd_cd">바코드</option>
                                     </select>
                                 </div>
                                 <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -230,7 +230,7 @@
 
     const columns = [
         {headerName: '#', pinned: 'left', type: 'NumType', width:40, cellStyle: {"line-height": "30px"}},
-        {field: "prd_cd", headerName: "상품코드", width:120, pinned: 'left', cellStyle: {"line-height": "30px"},
+        {field: "prd_cd", headerName: "바코드", width:120, pinned: 'left', cellStyle: {"line-height": "30px"},
             cellRenderer: function(params) {
                 if (params.value !== undefined) {
                     return '<a href="#" onclick="return EditProduct(\'' + params.value + '\',\'' + params.data.goods_no + '\');">' + params.value + '</a>';
@@ -239,7 +239,7 @@
         },
         {
             field: "goods_no",
-            headerName: "상품번호",
+            headerName: "온라인코드",
             width: 58,
             pinned: 'left',
             cellStyle: StyleGoodsNo,
@@ -259,7 +259,7 @@
         },
         {field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', cellStyle: {"line-height": "30px"}},
         {field: "goods_nm_eng", headerName: "상품명(영문)", width: 230, cellStyle: {"line-height": "30px"}},
-        {field: "sale_stat_cl", headerName: "상품상태", width: 70, type: 'GoodsStateTypeLH50'},
+        {field: "sale_stat_cl", headerName: "전시상태", width: 70, type: 'GoodsStateTypeLH50'},
         {field: "goods_opt", headerName: "옵션", width: 150, cellStyle: {"line-height": "30px"}},
         {
             field: "qty", headerName: "재고수", width: 70, type: 'numberType', cellStyle: {"line-height": "30px"},
