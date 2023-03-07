@@ -24,6 +24,7 @@ class stk33Controller extends Controller
         $sdate = $mutable->sub(1, 'week')->format('Y-m-d');
         $edate = date("Y-m-d");
 
+
         $req_date = $request->query('date');
         $lastDay = DATE('t', strtotime($req_date));
 
@@ -70,8 +71,9 @@ class stk33Controller extends Controller
         $r = $request->all();
 
         // $sdate = $request->input('sdate', Carbon::now()->sub(3, 'month'));
-        // $edate = $request->input('edate', date("Ymd"));
         $sdate = $request->input('sdate');
+        $edate = $request->input('edate', date("Y-m-d"));
+
         $store_no = $request->input('store_no', '');
         $store_nm = $request->input('store_nm', '');
         $store_type    = $request->input("store_type", '');
@@ -80,7 +82,7 @@ class stk33Controller extends Controller
         $where = "";
         $orderby = "";
         if ($store_no != "") $where .= " and cs.store_cd like '%" . Lib::quote($store_no) . "%'";
-        if ($store_type != "") $where .= " and s.store_type = '$store_type'";
+        // if ($store_type != "") $where .= " and s.store_type = '$store_type'";
 
         // ordreby
         $ord = $r['ord'] ?? 'desc';
@@ -128,13 +130,13 @@ class stk33Controller extends Controller
                 from competitor_sale cs
                     inner join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor'
                     inner join store s on s.store_cd = cs.store_cd
-                where 1=1 and sale_date like '$sdate%'
+                where 1=1 and sale_date >= '$sdate' and sale_date <= '$edate'
                 $where
                 group by cs.sale_date, cs.store_cd
                 $orderby
                 $limit
             ";
-
+            
             $rows = DB::select($sql);
             
             
@@ -161,7 +163,7 @@ class stk33Controller extends Controller
                         from competitor_sale cs
                             inner join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor'
                             inner join store s on s.store_cd = cs.store_cd
-                        where 1=1 and sale_date like '$sdate%'
+                        where 1=1 and sale_date >= '$sdate' and sale_date <= '$edate'
                         $where
                         group by cs.sale_date, cs.store_cd
                         $orderby
@@ -169,6 +171,7 @@ class stk33Controller extends Controller
                     ) a
                 ";
             }
+
             $row = DB::selectOne($query);
             $total_data = $row;
             $total = $row->total;

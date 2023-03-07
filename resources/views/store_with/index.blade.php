@@ -51,12 +51,18 @@
                     </ul>
                     <div class="tab-content" id="myTabContent" style="height:100%">
                         <div class="tab-pane fade" id="order_amt" role="tabpanel" aria-labelledby="order_amt-tab">
-                            <div class="card shadow mb-1" style="margin-top:50px">
+                            <div class="card shadow mb-1" style="margin-top:26px">
+                                <div style="text-align:right">
+                                    <span style="font-size: 17px; font-weight:bold">[ {{@$sdate}} ~ {{@$edate}} ]</span>
+                                </div>
                                 <canvas id="myChart3"></canvas>
                             </div>
                         </div>
                         <div class="tab-pane fade" id="order_qty" role="tabpanel" aria-labelledby="order_qty-tab">
-                            <div class="card shadow mb-1" style="margin-top:50px">
+                            <div class="card shadow mb-1" style="margin-top:26px">
+                                <div style="text-align:right">
+                                    <span style="font-size: 17px; font-weight:bold">[ {{@$sdate}} ~ {{@$edate}} ]</span>
+                                </div>
                                 <canvas id="myChart4" ></canvas>
                             </div>
                         </div>
@@ -102,7 +108,7 @@
                                 </div>
                             </div>
                             <div class="table-responsive">
-                                <div id="div-gd-alarm" style="height:100%;width:auto;" class="ag-theme-balham"></div>
+                                <div id="div-gd-alarm" style="height:100%;width:auto;" class="ag-theme-balham darkmode"></div>
                             </div>
                         </div>
                     </div>

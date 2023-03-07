@@ -331,9 +331,10 @@ class sys02Controller extends Controller
         $sys_menu = $request->input('sys_menu');
         $state = $request->input('state');
         $roles = (object)json_decode($request->input('roles'));
-
+        $seq = $request->input('seq');
         $id = Auth::guard('head')->user()->id;
 
+        
         if ($entry == 'entry_menu') {
             $entry = 1;
             $lev = 1;
@@ -346,8 +347,9 @@ class sys02Controller extends Controller
             ";
     
             $result = DB::selectOne($sql);
-    
+            
             $lev = $result->lev + 1;
+
         }
 
         $store_controller = [
@@ -367,7 +369,7 @@ class sys02Controller extends Controller
         ];
 
         try {
-            DB::transaction(function () use (&$result, $code, $store_controller, $roles) {
+            DB::transaction(function () use (&$result, $code, $store_controller, $roles, $seq) {
                 DB::table('store_controller')
                     ->where('menu_no', '=', $code)
                     ->update($store_controller);
@@ -387,6 +389,14 @@ class sys02Controller extends Controller
                             ]);
                     }
                 }
+
+                dd(count($seq));
+                // for($i=0;$i<count($seq);$i++){
+                //     DB::table('code')
+                //         ->where('code_kind_cd','=',$code)
+                //         ->where('code_id','=',$code_ids[$i])
+                //         ->update(['code_seq' => $i+1]);
+                // }
             });
             $code = 200;
             $msg = "";
@@ -424,6 +434,35 @@ class sys02Controller extends Controller
             select 
             g.`group_no`,g.`group_nm`,ifnull(r.`role`,0) as role
             from mgr_group g left outer join mgr_group_menu_role r on g.group_no = r.group_no and r.`menu_no` = :code    
+        ";
+
+        $rows = DB::select($sql, array("code" => $code));
+
+        return response()->json([
+            "code" => 200,
+            "head" => array(
+                "total" => count($rows)
+            ),
+            "body" => $rows
+        ]);
+    }
+
+    public function change_seq($code)
+    {
+
+        $sql = "
+            select
+                lev, entry
+            from store_controller
+            where menu_no = :code
+        ";
+        $lev = DB::selectOne($sql, array("code" => $code));
+
+        $sql = "
+            select
+                pid, kor_nm, eng_nm
+            from store_controller
+            where lev = '$lev->lev' and entry = '$lev->entry'
         ";
 
         $rows = DB::select($sql, array("code" => $code));

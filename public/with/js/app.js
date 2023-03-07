@@ -203,11 +203,13 @@
             if($(this).hasClass("app-light")) {
                 $(this).attr("class","mode app-dark");
                 $("#div-gd, #goods-class-grid, .dark-grid").attr("class","ag-theme-balham-dark");
+                $(".darkmode").attr("class","ag-theme-balham-dark darkmode");
                 sessionStorage.setItem("is_visited", "dark-mode");
                 updateThemeSetting(true, false);
             } else if($(this).hasClass("app-dark")) {
                 $(this).attr("class","mode app-light");
                 $("#div-gd, #goods-class-grid").attr("class","ag-theme-balham");
+                $(".darkmode").attr("class","ag-theme-balham darkmode");
                 sessionStorage.setItem("is_visited", "light-mode");
                 updateThemeSetting(false, true);
             }
