@@ -50,7 +50,7 @@ class sys03Controller extends Controller
 
         $query = "
             select 
-                group_no, wonga_yn, other_store_yn, release_price_yn, pos_use_yn
+                group_no, wonga_yn, other_store_yn, release_price_yn, pos_use_yn, auth_store_yn, auth_storage_yn
             from store_group_authority
             where group_no = $code
         ";

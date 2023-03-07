@@ -124,11 +124,11 @@
 											<td>
 												<div class="form-inline form-radio-box">
 													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="auth_store_y" name="auth_store_yn" value="Y" @if(@$store_group_authority->pos_use_yn == 'Y') checked @endif/>
+														<input type="radio" class="custom-control-input" id="auth_store_y" name="auth_store_yn" value="Y" @if(@$store_group_authority->auth_store_yn == 'Y') checked @endif/>
 														<label class="custom-control-label" for="auth_store_y">사용함</label>
 													</div>
 													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="auth_store_n" name="auth_store_yn" value="N" checked @if(@$store_group_authority->pos_use_yn == 'N') checked @endif/>
+														<input type="radio" class="custom-control-input" id="auth_store_n" name="auth_store_yn" value="N" @if(@$store_group_authority->auth_store_yn == 'N') checked @endif/>
 														<label class="custom-control-label" for="auth_store_n">사용안함</label>
 													</div>
 												</div>
@@ -137,11 +137,11 @@
 											<td>
 												<div class="form-inline form-radio-box">
 													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="auth_storage_y" name="auth_storage_yn" value="Y" @if(@$store_group_authority->pos_use_yn == 'Y') checked @endif/>
+														<input type="radio" class="custom-control-input" id="auth_storage_y" name="auth_storage_yn" value="Y" @if(@$store_group_authority->auth_storage_yn == 'Y') checked @endif/>
 														<label class="custom-control-label" for="auth_storage_y">사용함</label>
 													</div>
 													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="auth_storage_n" name="auth_storage_yn" value="N" checked @if(@$store_group_authority->pos_use_yn == 'N') checked @endif/>
+														<input type="radio" class="custom-control-input" id="auth_storage_n" name="auth_storage_yn" value="N" @if(@$store_group_authority->auth_storage_yn == 'N') checked @endif/>
 														<label class="custom-control-label" for="auth_storage_n">사용안함</label>
 													</div>
 												</div>
