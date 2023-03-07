@@ -56,7 +56,7 @@
 					<h4>검색</h4>
 					<div>
 						<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-						<a href="#" onclick="AddProduct_upload();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 상품코드 등록</a>
+						<a href="#" onclick="AddProduct_upload();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 바코드 등록</a>
 						<a href="#" onclick="AddProduct();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 상품 매칭</a>
 						<a href="#" onclick="AddProducts();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx fs-16"></i> 상품일괄매칭</a>
 						<a href="#" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
@@ -68,7 +68,7 @@
 					<div class="row">
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
-								<label>상품코드</label>
+								<label>바코드</label>
 								<div class="flex_box">
 									<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
 									<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
@@ -77,7 +77,7 @@
 						</div>
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
-								<label for="style_no">스타일넘버/상품번호</label>
+								<label for="style_no">스타일넘버/온라인코드</label>
 								<div class="form-inline">
 									<div class="form-inline-inner input_box">
 										<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="{{ $style_no }}">
@@ -112,7 +112,7 @@
 						</div>
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
-								<label for="goods_stat">상품상태</label>
+								<label for="goods_stat">전시상태</label>
 								<div class="flex_box">
 									<select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
 										<option value=''>전체</option>
@@ -125,23 +125,7 @@
 						</div>
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
-								<label for="item">품목</label>
-								<div class="flex_box">
-									<select name="item" class="form-control form-control-sm">
-										<option value="">전체</option>
-										@foreach ($items as $item)
-											<option value="{{ $item->cd }}">{{ $item->val }}</option>
-										@endforeach
-									</select>
-								</div>
-							</div>
-						</div>
-						
-					</div>
-					<div class="row">
-						<div class="col-lg-4 inner-td">
-							<div class="form-group">
-								<label for="prd_cd">상품옵션 범위검색</label>
+								<label for="prd_cd">상품검색조건</label>
 								<div class="form-inline">
 									<div class="form-inline-inner input-box w-100">
 										<div class="form-inline inline_btn_box">
@@ -153,40 +137,29 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-lg-4 inner-td">
-							<div class="form-group">
-								<label for="name">공급업체</label>
-								<div class="form-inline inline_select_box">
-									<div class="form-inline-inner input-box w-100">
-										<div class="form-inline inline_btn_box">
-											<input type="hidden" id="com_cd" name="com_cd" />
-											<input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
-											<a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
+					</div>
+					<div class="row">
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
 								<label for="">자료수/정렬</label>
 								<div class="form-inline">
 									<div class="form-inline-inner input_box" style="width:24%;">
 										<select name="limit" class="form-control form-control-sm">
-											<option value="500">500</option>
-											<option value="1000">1000</option>
-											<option value="2000">2000</option>
+											<option value="">모두</option>
+											<option value="1000" selected>1000</option>
+											<option value="5000">5000</option>
+											<option value="10000">10000</option>
 										</select>
 									</div>
 									<span class="text_line">/</span>
 									<div class="form-inline-inner input_box" style="width:45%;">
 										<select name="ord_field" class="form-control form-control-sm">
-											<option value="prd_cd1">등록일(코드일련별)</option>
+											<option value="prd_cd1">등록일(품번별)</option>
 											<option value="pc.rt">등록일</option>
 											<option value="pc.ut">수정일</option>
-											<option value="g.goods_no">상품번호</option>
+											<option value="g.goods_no">온라인코드</option>
 											<option value="g.goods_nm">상품명</option>
-											<option value="pc.prd_cd">상품코드</option>
+											<option value="pc.prd_cd">바코드</option>
 										</select>
 									</div>
 									<div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -260,7 +233,7 @@
 			</div>
 			<div class="resul_btn_wrap mb-3">
 				<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-				<a href="#" onclick="AddProduct_upload();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 상품코드 등록</a>
+				<a href="#" onclick="AddProduct_upload();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 바코드 등록</a>
 				<a href="#" onclick="AddProduct();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 상품 매칭</a>
 				<a href="#" onclick="AddProducts();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx fs-16"></i> 상품일괄매칭</a>
 				<a href="#" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
@@ -281,7 +254,7 @@
 						</div>
 						<div class="fr_box flex_box">
 						<!--
-							<span style="font-weight:500;line-height:30px;margin-left:5px;vertical-align:middle;" class="mr-1">선택한 상품코드를 상품번호</span>
+							<span style="font-weight:500;line-height:30px;margin-left:5px;vertical-align:middle;" class="mr-1">선택한 바코드를 온라인코드</span>
 							<div>
 								<input type="text" id="goods_no" class="form-control form-control-sm" name="goods_no" value="">
 							</div>
@@ -320,14 +293,14 @@
 		const columns = [
 			{headerName: '#', pinned: 'left', type: 'NumType', width:40, cellStyle: StyleLineHeight},
 			
-			{field: "prd_cd", headerName: "상품코드", width:120, pinned: 'left', cellStyle: StyleLineHeight,
+			{field: "prd_cd", headerName: "바코드", width:120, pinned: 'left', cellStyle: StyleLineHeight,
 				cellRenderer: function(params) {
 					if (params.value !== undefined) {
 						return '<a href="#" onclick="return EditProduct(\'' + params.value + '\',\'' + params.data.goods_no + '\');">' + params.value + '</a>';
 					}
 				}
 			},
-			{field: "goods_no", headerName: "상품번호", pinned: 'left',width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
+			{field: "goods_no", headerName: "온라인코드", pinned: 'left',width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
 			{field: "style_no", headerName: "스타일넘버", pinned: 'left', cellStyle: {"line-height": "30px", "text-align": "center"}, aggFunc: "first"},
 
 			{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}",
@@ -354,7 +327,7 @@
 					}
 				}
 			},
-			{field: "prd_cd1", headerName: "코드일련", width:100, cellStyle: StyleLineHeight, rowGroup: true, hide: true},
+			{field: "prd_cd1", headerName: "품번", width:100, cellStyle: StyleLineHeight, rowGroup: true, hide: true},
 			{field: "color", headerName: "컬러", width:50, cellStyle: {"text-align": "center"}},
 			{field: "color_nm", headerName: "컬러명", width:90},
 			{field: "size", headerName: "사이즈", width:50, cellStyle: {"text-align": "center"}},
@@ -424,7 +397,7 @@
 		$(document).ready(function() {
 			gx = new HDGrid(gridDiv, columns, {
 				rollup: true,
-				autoGroupColumnDef: basic_autoGroupColumnDef('코드일련'),
+				autoGroupColumnDef: basic_autoGroupColumnDef('품번'),
 				groupDefaultExpanded: 0, // 0: close, 1: open
 				suppressAggFuncInHeader: true,
 				animateRows: true,
@@ -526,7 +499,7 @@
 		}
 
 		function blank_goods_no() {
-			alert('상품번호가 비어있는 상품입니다.');
+			alert('온라인코드가 비어있는 상품입니다.');
 		}
 
 		function AddProductImages() {

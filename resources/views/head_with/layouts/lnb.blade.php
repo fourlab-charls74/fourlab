@@ -57,7 +57,7 @@
             <li data-menu-kind="M" data-menu-id="product" class="d-none">
                 <a href="javascript:;" class="arrow"><i class="bx bx-task fs-18"></i><span>상품/전시</span></a>
                 <ul>
-                    <li data-menu-kind="P" data-menu-id="prd01" class="d-none"><a href="/head/product/prd01">상품관리</a></li>
+                    <li data-menu-kind="P" data-menu-id="prd01" class="d-none"><a href="/head/product/prd01">상품정보관리</a></li>
                     <li><a href="/head/product/prd04">세일관리</a></li>
                     <li><a href="/head/product/prd06">원사이즈 및 클리어런스</a></li>
                     <li data-menu-kind="P" data-menu-id="prd05" class="d-none"><a href="/head/product/prd05">상품정보고시</a></li>

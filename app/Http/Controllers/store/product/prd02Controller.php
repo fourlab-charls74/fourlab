@@ -55,7 +55,7 @@ class prd02Controller extends Controller
 	{
 		$page	= $request->input('page', 1);
 		if( $page < 1 or $page == "" )	$page = 1;
-		$limit	= $request->input('limit', 100);
+		$limit	= $request->input('limit', 1000);
 
 		$goods_stat	= $request->input("goods_stat");
 		$style_no	= $request->input("style_no");
@@ -79,7 +79,7 @@ class prd02Controller extends Controller
 		$ad_desc	= $request->input("ad_desc");
 
 		$is_unlimited	= $request->input("is_unlimited");
-		$limit		= $request->input("limit",100);
+		$limit		= $request->input("limit", 1000);
 		$ord		= $request->input('ord','desc');
 		$ord_field	= $request->input('ord_field','prd_cd1');
 		if ($ord_field == 'prd_cd1') $ord_field = 'pc.rt';
@@ -187,7 +187,11 @@ class prd02Controller extends Controller
 
 		$page_size	= $limit;
 		$startno	= ($page - 1) * $page_size;
-		$limit		= " limit $startno, $page_size ";
+		if($limit == ''){
+			$limit		= "";
+		} else {
+			$limit		= " limit $startno, $page_size ";
+		}
 
 		$total		= 0;
 		$page_cnt	= 0;
@@ -218,7 +222,7 @@ class prd02Controller extends Controller
 			";
 			$row	= DB::select($query);
 			$total	= $row[0]->total;
-			$page_cnt = (int)(($total - 1) / $page_size) + 1;
+			if($limit != '') $page_cnt = (int)(($total - 1) / $page_size) + 1;
 		}
 
 		$goods_img_url		= '';
