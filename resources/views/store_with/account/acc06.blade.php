@@ -222,8 +222,8 @@
 		{ headerName: "기타재반자료",
 			children: [
 				{ field: "extra_P_amt", headerName: "인건비", type: 'currencyType', width: 70, aggregation: true, headerClass: "merged-cell" },
-				{ field: "extra_C_amt", headerName: "본사부담금", type: 'currencyType', width: 70, aggregation: true, headerClass: "merged-cell" },
 				{ field: "extra_S_amt", headerName: "매장부담금", type: 'currencyType', width: 70, aggregation: true, headerClass: "merged-cell" },
+				{ field: "extra_C_amt", headerName: "본사부담금", type: 'currencyType', width: 70, aggregation: true, headerClass: "merged-cell" },
 				{ field: "extra_amt", headerName: "기타재반 합계", type: 'currencyType', width: 90, aggregation: true, headerClass: "merged-cell",
 					cellRenderer: (params) => params.node.rowPinned === 'top' ? params.valueFormatted : '<a href="javascript:void(0);" onClick="openExtraAmtPopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>'
 				},

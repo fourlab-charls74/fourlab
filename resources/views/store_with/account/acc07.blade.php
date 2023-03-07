@@ -18,7 +18,8 @@
 				<h4>검색</h4>
 				<div class="flax_box">
 					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-					<a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
+					<a href="#" onclick="initSearch()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
+					{{-- <a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a> --}}
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
 			</div>
@@ -96,7 +97,8 @@
 
 		<div class="resul_btn_wrap mb-3">
 			<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-			<a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
+			<a href="#" onclick="initSearch()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
+			{{-- <a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a> --}}
 			<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 		</div>
 	</div>
@@ -117,22 +119,6 @@
 		</div>
 	</div>
 </div>
-{{-- 
-<div class="card shadow">
-	<div class="card-body">
-		<div class="card-title">
-			<h6 class="m-0 font-weight-bold text-primary fas fa-question-circle"> Help</h6>
-		</div>
-		<ul class="mb-0">
-			<li>매출금액 = 판매금액 - 클레임금액 - 할인금액 - 쿠폰금액(업체부담) + 배송비 + 기타정산액</li>
-			<li>판매수수료 = 수수료지정 : 판매가격 * 수수료율, 공급가지정 : 판매가격 - 공급가액</li>
-			<li>수수료 = 판매수수료 - 할인금액</li>
-			<li>정산금액 = 매출금액 - 수수료</li>
-			<li>쿠폰금액(본사부담) = 판매촉진비 수수료 매출 신고</li>
-			<li>카드수수료 등 수수료 부담의 주체가 귀사에 있으므로 입점업체의 경우 매출 신고 시에 해당 매출금액에 대하여 현금성으로 신고</li>
-		</ul>
-	</div>
-</div> --}}
 
 <script type="text/javascript" charset="utf-8">
 	const CLOSED_STATUS = { 'Y': '마감완료', 'N': '마감추가' };
@@ -183,10 +169,19 @@
 				{ field: "fee_TG", headerName: "특가", width: 90, type: "currencyType", aggregation: true },
 				{ field: "fee_YP", headerName: "용품", width: 90, type: "currencyType", aggregation: true },
 				{ field: "fee_OL", headerName: "특가(온라인)", width: 90, type: "currencyType", aggregation: true },
-				{ field: "fee_amt", headerName: "수수료소계", width: 90, type: "currencyType", aggregation: true },
+				{ field: "fee_amt", headerName: "수수료 합계", width: 90, type: "currencyType", aggregation: true },
 			]
 		},
-		{ field: "extra_amt", headerName: "기타재반", width: 90, type: "currencyType", aggregation: true },
+		{ headerName: "기타재반자료",
+			children: [
+				{ field: "extra_P_amt", headerName: "인건비", type: 'currencyType', width: 70, aggregation: true, headerClass: "merged-cell" },
+				{ field: "extra_S_amt", headerName: "매장부담금", type: 'currencyType', width: 70, aggregation: true, headerClass: "merged-cell" },
+				{ field: "extra_C_amt", headerName: "본사부담금", type: 'currencyType', width: 70, aggregation: true, headerClass: "merged-cell" },
+				{ field: "extra_amt", headerName: "기타재반 합계", type: 'currencyType', width: 90, aggregation: true, headerClass: "merged-cell",
+					cellRenderer: (params) => params.node.rowPinned === 'top' ? params.valueFormatted : '<a href="javascript:void(0);" onClick="openExtraAmtPopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>'
+				},
+			]
+		},
 		{ field: "fee_net", headerName: "정산금액", width: 100, type: "currencyType", cellStyle: {"color": "#dd0000"}, aggregation: true },
 		{ field: "pay_day", headerName: "정산지급일", width: 80, cellStyle: CENTER },
 		{ field: "tax_no", headerName: "세금계산서", width: 80, cellStyle: CENTER },
@@ -194,98 +189,6 @@
 		{ field: "closed_date", headerName: "마감일자", width: 80, cellStyle: CENTER },
 		{ width: "auto" },
 	];
-
-    // var columns_d = [
-	// 	{field: "num",			headerName: "#", type:'NumType', pinned: 'left'},
-	// 	{field: "closed_yn",		headerName: "마감",			width:65, pinned: 'left', cellStyle: { 'text-align': 'center' }},
-	// 	{field: "closed_day",			headerName: "마감일자",		width:140, pinned: 'left', cellStyle: { 'text-align': 'center' },
-	// 		cellRenderer: (params) => {
-	// 			if (params.node.rowPinned) return params.value;
-	// 			if (params.value != undefined) {
-	// 				return '<a href="#" class="pop" onClick="popDetail(\''+ params.data.idx +'\')">' + params.value+'</a>';
-	// 			}
-	// 		}
-	// 	},
-	// 	{field: "store_nm",		headerName: "매장명",	width:140 },
-	// 	// {field: "margin_type",	headerName: "수수료지정",	width:100},
-	// 	{field: "sale_amt",		headerName: "판매금액",		width:100, type: 'currencyType', aggregation: true},
-	// 	{field: "clm_amt",		headerName: "클레임금액",	width:100, type: 'currencyType', aggregation: true},
-	// 	{field: "dc_amt",	headerName: "할인금액",		width:90, type: 'currencyType', aggregation: true},
-	// 	{
-	// 		headerName: '쿠폰금액',
-	// 		children: [{
-	// 				field: "coupon_com_amt",
-	// 				headerName: "(업체부담)",
-	// 				type: 'currencyType',
-	// 				aggregation: true
-	// 			}
-	// 		]
-	// 	},
-	// 	{field: "dlv_amt",		headerName: "배송비",		width:90, type: 'currencyType', aggregation: true},
-	// 	{field: "etc_amt",	headerName: "기타정산액",	width:110, type: 'currencyType', aggregation: true},
-	// 	{
-	// 		headerName: '매출금액',
-	// 		children: [{
-	// 				field: "sale_net_taxation_amt",
-	// 				headerName: "과세",
-	// 				width:100,
-	// 				type: 'currencyType',
-	// 				aggregation: true
-	// 			},
-	// 			{
-	// 				field: "sale_net_taxfree_amt",
-	// 				headerName: "비과세",
-	// 				type: 'currencyType',
-	// 				aggregation: true
-	// 			},
-	// 			{
-	// 				field: "sale_net_amt",
-	// 				headerName: "소계",
-	// 				width:100,
-	// 				type: 'currencyType',
-	// 				aggregation: true
-	// 			},
-	// 		]
-	// 	},
-	// 	{field: "tax_amt",	headerName: "부가세",	type: 'currencyType',	hide:true},
-	// 	{
-	// 		headerName: '수수료',
-	// 		children: [{
-	// 				field: "fee",
-	// 				headerName: "판매수수료",
-	// 				type: 'currencyType',
-	// 				aggregation: true
-	// 			},
-	// 			{
-	// 				field: "fee_dc_amt",
-	// 				headerName: "할인금액",
-	// 				type: 'currencyType',
-	// 				aggregation: true
-	// 			},
-	// 			{
-	// 				field: "fee_net",
-	// 				headerName: "소계",
-	// 				type: 'currencyType',
-	// 				aggregation: true,
-	// 				width: 100
-	// 			},
-	// 		]
-	// 	},
-	// 	{field: "acc_amt",	headerName: "정산금액",	width:100,	type: 'currencyType', aggregation: true},
-	// 	{
-	// 		headerName: '쿠폰금액',
-	// 		children: [{
-	// 				field: "allot_amt",
-	// 				headerName: "(본사부담)",
-	// 				type: 'currencyType',
-	// 				aggregation: true
-	// 			}
-	// 		]
-	// 	},
-	// 	// {field: "tax_day", headerName: "세금계산서" },
-	// 	{field: "pay_day", headerName: "지급일" },
-	// 	{ width: 'auto' }
-	// ];
 
 	const pApp = new App('', { gridId: "#div-gd", height: 265 });
 	let gx;
@@ -308,7 +211,6 @@
 
 	function Search() {
         let data = $('form[name="search"]').serialize();
-        // gx.Aggregation({ "sum": "top" });
         gx.Request('/store/account/acc07/search', data, -1);
     }
 
@@ -316,6 +218,13 @@
 		const url = '/store/account/acc07/show/' + idx;
 		window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=2100,height=1200");
 	};
+
+	// 기타재반자료 상세
+	function openExtraAmtPopup(store_cd) {
+		const sdate = $('input[name="sdate"]').val();
+		const url = '/store/account/acc05/show?date=' + sdate.replaceAll('-', '') + '&store_cd=' + store_cd;
+		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=800");
+	}
 </script>
 
 @stop

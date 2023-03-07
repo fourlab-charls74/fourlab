@@ -33,7 +33,7 @@
                         <a href="#" onclick="return completeAccount();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-check mr-1"></i>마감완료</a>
                         <a href="#" onclick="return removeAccount();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-trash mr-1"></i>마감삭제</a>
                         @else
-                        <a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 정산서 다운로드</a>
+                        <a href="#" onclick="" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 정산서 다운로드</a>
                         @endif
                     </div>
                 </div>
@@ -118,11 +118,17 @@
                         <p class="col-3 col-lg-1">특가(온라인)</p>
                         <p class="col-3 col-lg-1" id="fee_amt_OL">{{ number_format(@$closed->fee_OL) }}</p>
                         <p class="col-3 col-lg-1">수수료합계</p>
-                        <p class="col-3 col-lg-1" id="fee_amt">{{ number_format(@$closed->fee_amt) }}</p>
-                        <p class="col-3 col-lg-1">기타재반</p>
-                        <p class="col-3 col-lg-1" id="extra_amt">{{ number_format(@$closed->extra_amt) }}</p>
+                        <p class="col-3 col-lg-1 fs-14 text-danger" id="fee_amt">{{ number_format(@$closed->fee_amt) }}</p>
+                        <p class="col-3 col-lg-1">인건비</p>
+                        <p class="col-3 col-lg-1" id="extra_P_amt">{{ number_format(@$closed->extra_P_amt) }}</p>
+                        <p class="col-3 col-lg-1">매장부담금</p>
+                        <p class="col-3 col-lg-1" id="extra_S_amt">{{ number_format(@$closed->extra_S_amt) }}</p>
+                        <p class="col-3 col-lg-1">본사부담금</p>
+                        <p class="col-3 col-lg-1" id="extra_C_amt">{{ number_format(@$closed->extra_C_amt) }}</p>
+                        <p class="col-3 col-lg-1">기타재반합계</p>
+                        <p class="col-3 col-lg-1 fs-14"><a href="javascript:void(0);" class="text-danger text-decoration-underline" onclick="return opener.openExtraAmtPopup('{{ @$closed->store_cd }}');"><u id="extra_amt">{{ number_format(@$closed->extra_amt) }}</u></a></p>
                         <p class="col-3 col-lg-1">정산금액</p>
-                        <p class="col-9 col-lg-7 fs-14 text-danger" id="account_amt" style="font-weight: 500;">{{ number_format(@$closed->account_amt) }}</p>
+                        <p class="col-3 col-lg-1 fs-14 text-danger" id="account_amt" style="font-weight: 600;">{{ number_format(@$closed->account_amt) }}</p>
                     </div>
                 </div>
             </div>
@@ -131,7 +137,7 @@
                 <a href="#" onclick="return completeAccount();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-check mr-1"></i>마감완료</a>
                 <a href="#" onclick="return removeAccount();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-trash mr-1"></i>마감삭제</a>
                 @else
-                <a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 정산서 다운로드</a>
+                <a href="#" onclick="" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 정산서 다운로드</a>
                 @endif
             </div>
         </div>
@@ -176,23 +182,6 @@
             </div>
         </div>
     </form>
-
-    {{-- <div class="card shadow">
-        <div class="card-body">
-            <div class="card-title">
-                <h6 class="m-0 font-weight-bold text-primary fas fa-question-circle"> Help</h6>
-            </div>
-            <ul class="mb-0">
-                <li>매출금액 = 판매금액 - 클레임금액 - 할인금액 - 쿠폰금액(업체부담) + 배송비 + 기타정산액</li>
-                <li>판매수수료 = 수수료지정 : 판매가격 * 수수료율, 공급가지정 : 판매가격 - 공급가액</li>
-                <li>수수료 = 판매수수료 - 할인금액</li>
-                <li>정산금액 = 매출금액 - 수수료</li>
-                <li>쿠폰금액(본사부담) = 판매촉진비 수수료 매출 신고</li>
-                <li><font color="red">배송비 , 기타 정산액 , 수수료율, 비고</font> 외에는 수정하실 수 없습니다.</li>
-                <li><strong><font color="red">배송비, 기타 정산액, 비고 수정 후 저장 버튼을 클릭하셔야 합니다.</font></strong></li>
-            </ul>
-        </div>
-    </div> --}}
 </div>
 
 <script type="text/javascript" charset="utf-8">
@@ -260,7 +249,7 @@
         if (col.field === 'sales') return {...col, headerName: "특가(온라인) 수수료", children: [
             {field: "sale_net_amt", headerName: "판매처매출", width: 100, type: "currencyType", aggregation: true},
             {field: "sale_amt_except_vat", headerName: "판매처매출(-VAT)", width: 100, type: "currencyType", aggregation: true},
-            {field: "fee_rate_OL", headerName: "수수료율(%)", width: 80, type: "currencyType"},
+            {field: "fee_rate_OL", headerName: "수수료율(%)", width: 80, type: "percentType"},
             {field: "fee_OL", headerName: "수수료", width: 90, type: "currencyType", aggregation: true},
         ]};
         return col;
@@ -437,6 +426,9 @@
                 $("#fee_amt_YP").text(Comma(closed.fee_YP));
                 $("#fee_amt_OL").text(Comma(closed.fee_OL));
                 $("#fee_amt").text(Comma(closed.fee_amt));
+                $("#extra_P_amt").text(Comma(closed.extra_P_amt));
+                $("#extra_S_amt").text(Comma(closed.extra_S_amt));
+                $("#extra_C_amt").text(Comma(closed.extra_C_amt));
                 $("#extra_amt").text(Comma(closed.extra_amt));
                 $("#account_amt").text(Comma(closed.account_amt));
             } else {

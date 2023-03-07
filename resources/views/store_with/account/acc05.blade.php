@@ -112,8 +112,8 @@
 				@endforeach
 			@endif
 		@endforeach
-		{ field: "C_total", headerName: "본사부담금 합계", type: 'currencyType', width: 100, cellStyle: {"font-weight": "700"} }, // 추가지급금
 		{ field: "S_total", headerName: "매장부담금 합계", type: 'currencyType', width: 100, cellStyle: {"font-weight": "700"} }, // 공제금
+		{ field: "C_total", headerName: "본사부담금 합계", type: 'currencyType', width: 100, cellStyle: {"font-weight": "700"} }, // 추가지급금
         { width: "auto" }
     ];
 </script>

@@ -53,18 +53,28 @@ class acc07Controller extends Controller
 				, c.sale_net_taxation_amt, c.sale_net_taxfree_amt, c.sale_net_amt, c.tax_amt
 				, (c.sale_net_amt - c.tax_amt) as sales_amt_except_vat
 				, c.fee_JS1, c.fee_JS2, c.fee_JS3, c.fee_TG, c.fee_YP, c.fee_OL
-				, if(c.closed_yn = 'Y', c.extra_amt, e.extra_amt) as extra_amt
-				, if(c.closed_yn = 'Y', c.fee_net, (c.fee + e.extra_amt)) as fee_net
+				, ae.*
+				, (ae.extra_P_amt + ae.extra_C_amt + ae.extra_S_amt) as extra_amt
+				, (c.fee + ae.extra_P_amt + ae.extra_C_amt + ae.extra_S_amt) as fee_net
 				, c.fee as fee_amt
 				, c.closed_yn, date_format(c.closed_date, '%Y-%m-%d') as closed_date, date_format(c.pay_day, '%Y-%m-%d') as pay_day, c.tax_no, c.admin_nm, c.rt
 				, s.store_nm, s.manager_nm
 			from store_account_closed c
 				inner join store s on s.store_cd = c.store_cd
 				left outer join (
-					select store_cd, extra_amt
-					from store_account_extra
-					where ymonth = :ymonth
-				) e on e.store_cd = c.store_cd
+					select e.store_cd as ae_store_cd
+						, sum(if(et.entry_cd = 'P' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0)) as extra_P_amt
+						, (sum(if(et.entry_cd = 'S' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0))
+							+ sum(if(el.type = 'G' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0))
+							+ sum(if(el.type = 'E' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0))
+						) * -1 as extra_S_amt
+						, sum(if(et.entry_cd = 'O' and el.type <> 'O1' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0)) as extra_C_amt
+					from store_account_extra e
+						inner join store_account_extra_list el on el.ext_idx = e.idx
+						inner join store_account_extra_type et on et.type_cd = el.type
+					where e.ymonth = :ymonth
+					group by e.store_cd
+				) ae on ae.ae_store_cd = c.store_cd
 			where c.sday = :sday and c.eday = :eday
 				$where
 			order by c.idx desc
@@ -86,20 +96,28 @@ class acc07Controller extends Controller
 		$sql = "
 			select c.idx, c.store_cd, s.store_nm, s.manager_nm, c.sday, c.eday, c.closed_yn, c.closed_date, c.rt, c.admin_nm
 				, c.fee_JS1, c.fee_JS2, c.fee_JS3, c.fee_TG, c.fee_YP, c.fee_OL, c.fee as fee_amt
-				, if(c.closed_yn = 'Y', c.extra_amt, e.extra_amt) as extra_amt
-				, if(c.closed_yn = 'Y', c.fee_net, (c.fee + e.extra_amt)) as account_amt
+				, ae.*
+				, (ae.extra_P_amt + ae.extra_C_amt + ae.extra_S_amt) as extra_amt
+				, (c.fee + ae.extra_P_amt + ae.extra_C_amt + ae.extra_S_amt) as account_amt
 			from store_account_closed c
 				inner join store s on s.store_cd = c.store_cd
-				left outer join store_account_extra e on e.store_cd = c.store_cd and e.ymonth = left(c.sday, 6)
+				left outer join (
+					select e.store_cd as ae_store_cd, e.ymonth
+						, sum(if(et.entry_cd = 'P' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0)) as extra_P_amt
+						, (sum(if(et.entry_cd = 'S' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0))
+							+ sum(if(el.type = 'G' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0))
+							+ sum(if(el.type = 'E' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0))
+						) * -1 as extra_S_amt
+						, sum(if(et.entry_cd = 'O' and el.type <> 'O1' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0)) as extra_C_amt
+					from store_account_extra e
+						inner join store_account_extra_list el on el.ext_idx = e.idx
+						inner join store_account_extra_type et on et.type_cd = el.type
+					group by e.store_cd, e.ymonth
+				) ae on ae.ae_store_cd = c.store_cd and ae.ymonth = left(c.sday, 6)
 			where c.idx = :idx
 		";
         $row = DB::selectOne($sql, ['idx' => $idx]);
-
-        $values = [
-			"closed" => $row,
-        ];
-
-        return view( Config::get('shop.store.view') . '/account/acc07_show', $values);
+        return view( Config::get('shop.store.view') . '/account/acc07_show', [ "closed" => $row ]);
     }
 
     public function search_command(Request $request, $cmd)
@@ -361,10 +379,11 @@ class acc07Controller extends Controller
 				update store_account_closed as c
 					, (
 						select b.*
+							, (ae.extra_P_amt + ae.extra_C_amt + ae.extra_S_amt) as extra_amt
 							, (b.fee_JS1 + b.fee_JS2 + b.fee_JS3 + b.fee_TG + b.fee_YP + b.fee_OL) as fee
-							, (b.fee_JS1 + b.fee_JS2 + b.fee_JS3 + b.fee_TG + b.fee_YP + b.fee_OL + b.extra_amt) as fee_net
+							, (b.fee_JS1 + b.fee_JS2 + b.fee_JS3 + b.fee_TG + b.fee_YP + b.fee_OL + (ae.extra_P_amt + ae.extra_C_amt + ae.extra_S_amt)) as fee_net
 						from (
-							select ac.idx as acc_idx
+							select ac.idx as acc_idx, ac.store_cd, ac.sday
 								, sum(c.dlv_amt) as dlv_amt
 								, sum(c.etc_amt) as etc_amt
 								, sum(if(c.sale_type = 'OL', 0, c.sale_net_amt)) as sale_net_amt
@@ -393,7 +412,6 @@ class acc07Controller extends Controller
 								, round(sum(if(c.sale_type = 'TG', c.sale_net_amt, 0)) * sg.fee_10 / 100 / 1.1) as fee_TG
 								, round(sum(if(c.sale_type = 'YP', c.sale_net_amt, 0)) * sg.fee_11 / 100 / 1.1) as fee_YP
 								, round(sum(if(c.sale_type = 'OL', c.sale_net_amt, 0)) * sg.fee_12 / 100 / 1.1) as fee_OL
-								, ac.extra_amt
 							from store_account_closed_list c
 								inner join store_account_closed ac on ac.idx = c.acc_idx
 								inner join store s on s.store_cd = ac.store_cd
@@ -405,6 +423,19 @@ class acc07Controller extends Controller
 								) sg on sg.grade_cd = s.grade_cd
 							where c.acc_idx = :acc_idx
 						) b
+							left outer join (
+								select e.store_cd as ae_store_cd, e.ymonth
+									, sum(if(et.entry_cd = 'P' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0)) as extra_P_amt
+									, (sum(if(et.entry_cd = 'S' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0))
+										+ sum(if(el.type = 'G' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0))
+										+ sum(if(el.type = 'E' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0))
+									) * -1 as extra_S_amt
+									, sum(if(et.entry_cd = 'O' and el.type <> 'O1' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0)) as extra_C_amt
+								from store_account_extra e
+									inner join store_account_extra_list el on el.ext_idx = e.idx
+									inner join store_account_extra_type et on et.type_cd = el.type
+								group by e.store_cd, e.ymonth
+							) ae on ae.ae_store_cd = b.store_cd and ae.ymonth = left(b.sday, 6)
 					) as a
 					set c.dlv_amt = a.dlv_amt
 					, c.etc_amt = a.etc_amt
@@ -427,11 +458,26 @@ class acc07Controller extends Controller
 			$sql = "
 				select c.idx, c.store_cd, s.store_nm, s.manager_nm, c.sday, c.eday, c.closed_yn, c.closed_date, c.rt, c.admin_nm
 					, c.fee_JS1, c.fee_JS2, c.fee_JS3, c.fee_TG, c.fee_YP, c.fee_OL, c.fee as fee_amt
-					, if(c.closed_yn = 'Y', c.extra_amt, e.extra_amt) as extra_amt
-					, if(c.closed_yn = 'Y', c.fee_net, (c.fee + e.extra_amt)) as account_amt
+					, round(ae.extra_P_amt) as extra_P_amt
+					, round(ae.extra_S_amt) as extra_S_amt
+					, round(ae.extra_C_amt) as extra_C_amt
+					, round(ae.extra_P_amt + ae.extra_C_amt + ae.extra_S_amt) as extra_amt
+					, round(c.fee + ae.extra_P_amt + ae.extra_C_amt + ae.extra_S_amt) as account_amt
 				from store_account_closed c
 					inner join store s on s.store_cd = c.store_cd
-					left outer join store_account_extra e on e.store_cd = c.store_cd and e.ymonth = left(c.sday, 6)
+					left outer join (
+						select e.store_cd as ae_store_cd, e.ymonth
+							, sum(if(et.entry_cd = 'P' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0)) as extra_P_amt
+							, (sum(if(et.entry_cd = 'S' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0))
+								+ sum(if(el.type = 'G' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0))
+								+ sum(if(el.type = 'E' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0))
+							) * -1 as extra_S_amt
+							, sum(if(et.entry_cd = 'O' and el.type <> 'O1' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0)) as extra_C_amt
+						from store_account_extra e
+							inner join store_account_extra_list el on el.ext_idx = e.idx
+							inner join store_account_extra_type et on et.type_cd = el.type
+						group by e.store_cd, e.ymonth
+					) ae on ae.ae_store_cd = c.store_cd and ae.ymonth = left(c.sday, 6)
 				where c.idx = :idx
 			";
 			$closed = DB::selectOne($sql, ['idx' => $acc_idx]);

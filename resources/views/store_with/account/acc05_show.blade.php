@@ -203,8 +203,8 @@
 				@endforeach
 			@endif
 		@endforeach
-		{ field: "C_total", headerName: "본사부담금 합계", type: 'currencyType', width: 100, cellStyle: { "font-weight": "700" } }, // 추가지급금
 		{ field: "S_total", headerName: "매장부담금 합계", type: 'currencyType', width: 100, cellStyle: { "font-weight": "700" } }, // 공제금
+		{ field: "C_total", headerName: "본사부담금 합계", type: 'currencyType', width: 100, cellStyle: { "font-weight": "700" } }, // 추가지급금
         { width: "auto" }
     ];
 </script>
@@ -216,6 +216,9 @@
     let is_file_applied = false;
     let applied_date = "{{ @$sdate }}";
     let applied_store_cd = "{{ isset($store) ? @$store->store_cd : '' }}";
+
+    // 본사/매장별 부담금 합계 계산
+    const get_total_amt = (payers, obj) => Object.keys(obj).reduce((a,c) => (c.split("_").slice(-1)[0] === "sum" && !EXCLUED_TOTAL.split(",").includes(c.split("_")[0]) && payers.includes(c.split("_")[0]) ? (obj[c] * 1) : 0) + a, 0);
 
     $(document).ready(function() {
         pApp.ResizeGrid(340);
@@ -250,8 +253,8 @@
 							) + a, 0);
 
 						// 총합계 계산
-						e.data.C_total = Object.keys(e.data).reduce((a,c) => (c.split("_").slice(-1)[0] === "sum" && C_PAYERS.includes(c.split("_")[0]) ? (e.data[c] * 1) : 0) + a, 0);
-						e.data.S_total = Object.keys(e.data).reduce((a,c) => (c.split("_").slice(-1)[0] === "sum" && S_PAYERS.includes(c.split("_")[0]) ? (e.data[c] * 1) : 0) + a, 0);
+						e.data.C_total = get_total_amt(C_PAYERS, e.data);
+						e.data.S_total = get_total_amt(S_PAYERS, e.data);
 
 						e.api.redrawRows({ rowNodes: [e.node] });
                         updatePinnedRow();
@@ -581,8 +584,8 @@
             }
 
             // 총합계 계산
-            row.C_total = Object.keys(row).reduce((a,c) => (c.split("_").slice(-1)[0] === "sum" && C_PAYERS.includes(c.split("_")[0]) ? (row[c] * 1) : 0) + a, 0);
-            row.S_total = Object.keys(row).reduce((a,c) => (c.split("_").slice(-1)[0] === "sum" && S_PAYERS.includes(c.split("_")[0]) ? (row[c] * 1) : 0) + a, 0);
+            row.C_total = get_total_amt(C_PAYERS, row);
+            row.S_total = get_total_amt(S_PAYERS, row);
 
             rows.push(row);
             rowIndex++;
@@ -615,8 +618,8 @@
                 } else {
                     data = { ...old_data, ...item[0], store_nm: old_data.store_nm };
                 }
-                data.C_total = Object.keys(data).reduce((a,c) => (c.split("_").slice(-1)[0] === "sum" && C_PAYERS.includes(c.split("_")[0]) ? (data[c] * 1) : 0) + a, 0);
-                data.S_total = Object.keys(data).reduce((a,c) => (c.split("_").slice(-1)[0] === "sum" && S_PAYERS.includes(c.split("_")[0]) ? (data[c] * 1) : 0) + a, 0);
+                data.C_total = get_total_amt(C_PAYERS, data);
+                data.S_total = get_total_amt(S_PAYERS, data);
             }
 
             rowsToUpdate.push(data);

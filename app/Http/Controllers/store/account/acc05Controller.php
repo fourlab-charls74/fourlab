@@ -66,11 +66,11 @@ class acc05Controller extends Controller
                 select e.ymonth
                     , sum(if(el.type = 'G', el.extra_amt, null)) as G_sum
                     , sum(if(el.type = 'E', el.extra_amt, null)) as E_sum
-                    , sum(if(el.type in (select type_cd from store_account_extra_type where payer = 'S')
+                    , sum(if(el.type in (select type_cd from store_account_extra_type where payer = 'S' and total_include_yn = 'Y')
                         , if(el.type in (select type_cd from store_account_extra_type where except_vat_yn = 'Y'), round(el.extra_amt / 1.1), el.extra_amt)
                         , null
                     )) as S_total
-                    , sum(if(el.type in (select type_cd from store_account_extra_type where payer = 'C')
+                    , sum(if(el.type in (select type_cd from store_account_extra_type where payer = 'C' and total_include_yn = 'Y')
                         , if(el.type in (select type_cd from store_account_extra_type where except_vat_yn = 'Y'), round(el.extra_amt / 1.1), el.extra_amt)
                         , null
                     )) as C_total
@@ -260,11 +260,11 @@ class acc05Controller extends Controller
             from store s
                 left outer join (
                     select e.idx as ext_idx, e.ymonth, e.store_cd as e_store_cd
-                        , sum(if(el.type in (select type_cd from store_account_extra_type where payer = 'S')
+                        , sum(if(el.type in (select type_cd from store_account_extra_type where payer = 'S' and total_include_yn = 'Y')
                             , if(el.type in (select type_cd from store_account_extra_type where except_vat_yn = 'Y'), round(el.extra_amt / 1.1), el.extra_amt)
                             , null
                         )) as S_total
-                        , sum(if(el.type in (select type_cd from store_account_extra_type where payer = 'C')
+                        , sum(if(el.type in (select type_cd from store_account_extra_type where payer = 'C' and total_include_yn = 'Y')
                             , if(el.type in (select type_cd from store_account_extra_type where except_vat_yn = 'Y'), round(el.extra_amt / 1.1), el.extra_amt)
                             , null
                         )) as C_total
