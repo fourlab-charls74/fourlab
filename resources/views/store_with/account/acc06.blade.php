@@ -29,7 +29,6 @@
 <form method="get" name="search">
 	<div id="search-area" class="search_cum_form">
 		<div class="card mb-3">
-
 			<div class="d-flex card-header justify-content-between">
 				<h4>검색</h4>
 				<div class="flax_box">
@@ -112,7 +111,7 @@
 		</div>
 		<div class="resul_btn_wrap mb-3">
 			<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-			<input type="reset" id="search_reset" value="검색조건 초기화" class="btn btn-sm btn-outline-primary shadow-sm" onclick="initSearch()">
+			<a href="#" onclick="initSearch()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
 			<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
 		</div>
 	</div>
@@ -168,25 +167,9 @@
 						return '<a href="#" onClick="openDetailPopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>';
 					}
 				},
-				{ field: "sales_amt_except_vat", headerName: "매출합계(-VAT)", width: 100, headerClass: "merged-cell", type: 'currencyType', cellStyle: {"background-color": "#ededed"}, aggregation: true },
+				{ field: "sales_amt_except_vat", headerName: "매출합계(-VAT)", width: 100, headerClass: "merged-cell", type: 'currencyType', aggregation: true },
 			]
         },
-        // { headerName: "판매처 수수료",
-        //     children: [
-		// 		@foreach (@$pr_codes as $pr_code)
-        //         { headerName: "{{ @$pr_code->code_val }}",
-        //             children: [
-        //                 { headerName: "수수료율", field: "sale_place_fee_rate_{{ @$pr_code->code_id }}", type: 'percentType', width: 60 },
-        //                 { headerName: "수수료", field: "sale_place_fee_amt_{{ @$pr_code->code_id }}", type: 'numberType', width: 100 },
-        //             ]
-        //         },
-		// 		@endforeach
-		// 		{ headerName: "소계", field: "sale_place_fee_amt", type: 'currencyMinusColorType', width: 100,
-		// 			cellStyle: {"font-weight": "bold"},
-		// 			headerClass: "merged-cell"
-		// 		},
-        //     ]
-        // },
         { headerName: "중간관리자 수수료",
             children: [
                 { headerName: "정상1",
@@ -233,13 +216,20 @@
 						},
                     ]
                 },
-				{ headerName: "수수료 소계", field: "fee_amt", type: 'currencyMinusColorType', width: 90, aggregation: true, headerClass: "merged-cell", cellStyle: {"background-color": "#ededed"} },
+				{ headerName: "수수료 합계", field: "fee_amt", type: 'currencyType', width: 90, aggregation: true, headerClass: "merged-cell" },
             ]
         },
-        { field: "extra_amt", headerName: "기타재반", type: 'currencyMinusColorType', width: 70, aggregation: true,
-			cellRenderer: (params) => ['0', null].includes(params.value) ? 0 : (params.node.rowPinned === 'top' ? params.valueFormatted : '<a href="javascript:void(0);" onClick="openExtraAmtPopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>')
+		{ headerName: "기타재반자료",
+			children: [
+				{ field: "extra_P_amt", headerName: "인건비", type: 'currencyType', width: 70, aggregation: true, headerClass: "merged-cell" },
+				{ field: "extra_C_amt", headerName: "본사부담금", type: 'currencyType', width: 70, aggregation: true, headerClass: "merged-cell" },
+				{ field: "extra_S_amt", headerName: "매장부담금", type: 'currencyType', width: 70, aggregation: true, headerClass: "merged-cell" },
+				{ field: "extra_amt", headerName: "기타재반 합계", type: 'currencyType', width: 90, aggregation: true, headerClass: "merged-cell",
+					cellRenderer: (params) => params.node.rowPinned === 'top' ? params.valueFormatted : '<a href="javascript:void(0);" onClick="openExtraAmtPopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>'
+				},
+			]
 		},
-        { field: "total_fee_amt", headerName: "수수료합계", type: 'currencyMinusColorType', width: 100, aggregation: true, cellStyle: {"font-weight": "bold", "color": "#dd0000"} },
+        { field: "total_fee_amt", headerName: "최종지급액", type: 'currencyType', width: 100, aggregation: true, cellStyle: { "font-weight": "bold", "color": "#dd0000" } },
         { width: "auto" }
     ];
 </script>
@@ -255,6 +245,7 @@
 			getRowStyle: (params) => params.node.rowPinned === 'top' ? { 'background': '#ededed', 'font-weight': '600' } : {},
 		});
 		gx.Aggregation({ "sum": "top" });
+
 		Search();
 	});
 
@@ -264,19 +255,6 @@
 			$("#current_date").text("( " + d.head.date + " )");
 		});
 	}
-
-	const sumSaleFees = (params) => {
-		const row = params.data;
-		const sum = parseInt(row.fee_amt_js1) + parseInt(row.fee_amt_js2) + parseInt(row.fee_amt_js3)
-			+ parseInt(row.fee_amt_gl) + parseInt(row.fee_amt_j1) + parseInt(row.fee_amt_j2);
-		return isNaN(sum) ? 0 : sum;
-	};
-
-	const sumFeeExtra = (params) => {
-		const extra = parseInt(params.data.extra_total);
-		const sum = sumSaleFees(params) + extra;
-		return isNaN(sum) ? 0 : sum;
-	};
 
 	// 판매내역 상세
 	function openDetailPopup(store_cd) {

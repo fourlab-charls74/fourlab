@@ -17,7 +17,7 @@
 				<div class="flax_box">
 					<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
 					<a href="#" onclick="return openExtraPopup();" class="btn btn-sm btn-outline-primary shadow-sm mr-1"><i class="fas fa-plus fa-sm"></i> 추가</a>
-					<a href="#" onclick="initSearch()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
+					<a href="#" onclick="initSearch()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm">검색조건 초기화</a>
 				</div>
 			</div>
 
@@ -59,7 +59,7 @@
 		<div class="resul_btn_wrap mb-3">
 			<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
 			<a href="#" onclick="return openExtraPopup();" class="btn btn-sm btn-outline-primary shadow-sm mr-1"><i class="fas fa-plus fa-sm"></i> 추가</a>
-			<a href="#" onclick="initSearch()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
+			<a href="#" onclick="initSearch()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm">검색조건 초기화</a>
 		</div>
 	</div>
 </form>

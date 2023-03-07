@@ -89,7 +89,7 @@
                 @if (!isset($store))
                 <div class="fr_box">
                     <button type="button" onclick="return openUploadModal();" class="btn btn-outline-primary mr-1"><i class="fas fa-plus fa-sm mr-1"></i> 엑셀일괄업로드</button>
-                    <button type="button" onclick="return openUploadModal(true);" class="btn btn-outline-primary mr-1"><i class="fas fa-plus fa-sm mr-1"></i> 엑셀일괄업로드(원부자재포함)</button>
+                    <button type="button" onclick="return openUploadModal(true);" class="btn btn-outline-primary"><i class="fas fa-plus fa-sm mr-1"></i> 엑셀일괄업로드(원부자재포함)</button>
                 </div>
                 @endif
             </div>

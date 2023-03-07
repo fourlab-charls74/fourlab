@@ -149,21 +149,6 @@
 		</div>
 	</div>
 </div>
-{{-- <div class="card shadow">
-	<div class="card-body">
-		<div class="card-title">
-			<h6 class="m-0 font-weight-bold text-primary fas fa-question-circle"> Help</h6>
-		</div>
-		<ul class="mb-0">
-			<li>매출금액 = 판매금액 - 클레임금액 - 할인금액 - 쿠폰금액(업체부담) + 배송비 + 기타정산액</li>
-			<li>판매수수료 = 수수료지정 : 판매가격 * 수수료율, 공급가지정 : 판매가격 - 공급가액</li>
-			<li>수수료 = 판매수수료 - 할인금액</li>
-			<li>정산금액 = 매출금액 - 수수료</li>
-			<li>쿠폰금액(본사부담) = 판매촉진비 수수료 매출 신고</li>
-			<li>카드수수료 등 수수료 부담의 주체가 귀사에 있으므로 입점업체의 경우 매출 신고 시에 해당 매출금액에 대하여 현금성으로 신고</li>
-		</ul>
-	</div>
-</div> --}}
 
 <script language="javascript">
 	const CENTER = { 'text-align': 'center' };
@@ -206,12 +191,8 @@
 		{field: "user_nm", headerName: "주문자", width: 60, cellStyle: CENTER},
 		{field: "pay_type_nm",	headerName: "결제방법",	width: 70, cellStyle: CENTER},
 		{field: "tax_yn", headerName: "과세", width: 40, cellStyle: CENTER},
-		// {field: "coupon_nm", headerName: "쿠폰", width: 70, pinned: 'left'},
-		// {field: "dlv_amt", headerName: "배송비", width: 80, type: 'currencyType', aggregation: true},
-		// {field: "",	headerName: "소계",		width: 80, type: 'currencyType', aggregation:true},
 		{field: "ord_state_nm", headerName: "주문상태", width: 70, cellStyle: StyleOrdState},
 		{field: "ord_date",	headerName: "출고완료일", width: 80, cellStyle: CENTER},
-		// {field: "dlv_end_date", headerName: "배송완료일", width: 80},
 		{field: "clm_state_nm",headerName: "클레임상태", width: 70, cellStyle: StyleClmState},
 		{field: "clm_end_date", headerName: "클레임완료일",	width: 80},
 		{width: "auto"}
@@ -263,7 +244,7 @@
 		const sdate = document.search.sdate.value;
 
 		if(!confirm(`${sdate} [ ${store_nm} ] 정산내용을 마감내역에 추가하시겠습니까?`)) return;
-		alert("다소 시간이 소요될 수 있습니다. 잠시만 기다려주세요.");
+		// alert("다소 시간이 소요될 수 있습니다. 잠시만 기다려주세요.");
 
 		$.ajax({
 			async: false,

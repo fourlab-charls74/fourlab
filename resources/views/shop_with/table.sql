@@ -1061,7 +1061,7 @@ INSERT INTO `bizest_smart`.`store_account_extra_type` (`type_cd`, `type_nm`, `en
 INSERT INTO `bizest_smart`.`store_account_extra_type` (`type_cd`, `type_nm`, `entry_cd`, `payer`, `except_vat_yn`, `total_include_yn`, `has_child_yn`, `use_yn`, `seq`, `rt`) VALUES ('S2', '인터넷', 'S', 'S', 'N', 'Y', 'N', 'Y', '8', now());
 INSERT INTO `bizest_smart`.`store_account_extra_type` (`type_cd`, `type_nm`, `entry_cd`, `payer`, `except_vat_yn`, `total_include_yn`, `has_child_yn`, `use_yn`, `seq`, `rt`) VALUES ('S3', '본사수선비', 'S', 'S', 'Y', 'Y', 'N', 'Y', '9', now());
 INSERT INTO `bizest_smart`.`store_account_extra_type` (`type_cd`, `type_nm`, `entry_cd`, `payer`, `except_vat_yn`, `total_include_yn`, `has_child_yn`, `use_yn`, `seq`, `rt`) VALUES ('S4', '외부창고/보안비', 'S', 'S', 'N', 'Y', 'N', 'Y', '10', now());
-INSERT INTO `bizest_smart`.`store_account_extra_type` (`type_cd`, `type_nm`, `entry_cd`, `payer`, `except_vat_yn`, `total_include_yn`, `has_child_yn`, `use_yn`, `seq`, `rt`) VALUES ('O1', '외부창고', 'O', 'C', 'N', 'Y', 'N', 'Y', '11', now());
+INSERT INTO `bizest_smart`.`store_account_extra_type` (`type_cd`, `type_nm`, `entry_cd`, `payer`, `except_vat_yn`, `total_include_yn`, `has_child_yn`, `use_yn`, `seq`, `rt`) VALUES ('O1', '외부창고', 'O', 'C', 'N', 'N', 'N', 'Y', '11', now());
 INSERT INTO `bizest_smart`.`store_account_extra_type` (`type_cd`, `type_nm`, `entry_cd`, `payer`, `except_vat_yn`, `total_include_yn`, `has_child_yn`, `use_yn`, `seq`, `rt`) VALUES ('O2', '추가지급', 'O', 'C', 'N', 'Y', 'N', 'Y', '12', now());
 INSERT INTO `bizest_smart`.`store_account_extra_type` (`type_cd`, `type_nm`, `entry_cd`, `payer`, `except_vat_yn`, `total_include_yn`, `has_child_yn`, `use_yn`, `seq`, `rt`) VALUES ('O3', '사용경비(기타)', 'O', 'C', 'N', 'Y', 'N', 'Y', '13', now());
 

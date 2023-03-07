@@ -106,12 +106,9 @@
 		{field: "user_nm", headerName: "주문자", width: 60, cellStyle: CENTER},
 		{field: "pay_type_nm",	headerName: "결제방법",	width: 70, cellStyle: CENTER},
 		{field: "tax_yn", headerName: "과세", width: 40, cellStyle: CENTER},
-		// {field: "dlv_amt", headerName: "배송비", width: 80, type: 'currencyType', aggregation: true},
 		{field: "ord_state_nm", headerName: "주문상태", width: 70, cellStyle: StyleOrdState},
-		// {field: "clm_state_nm",headerName: "클레임상태", width: 70, cellStyle: StyleClmState},
 		{field: "ord_date",	headerName: "주문일", width: 80, cellStyle: CENTER},
 		{field: "dlv_end_date", headerName: "배송완료일", width: 80},
-		// {field: "clm_end_date", headerName: "클레임완료일",	width: 80},
 		{width: "auto"}
 	];
 </script>
