@@ -262,6 +262,8 @@
             {field: "color",	headerName: "컬러", width: 60, cellStyle: {"text-align": "center"}},
             {field: "size",	headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"}},
             {field: "goods_opt", headerName: "옵션", width: 200},
+
+            {{--<!-- 
             {
                 headerName: '창고재고', // 대표창고의 재고를 조회
                 children: [
@@ -269,6 +271,9 @@
                     {field: "storage_wqty", headerName: "보유재고", type: 'currencyType', aggFunc: sumValuesFunc, cellRenderer: stock_render,},
                 ]
             },
+            -->--}}
+
+            {field: "storage_wqty", headerName: '창고재고',  type: 'currencyType', aggFunc: sumValuesFunc, cellRenderer: stock_render,},
             {
                 field: 'store_info',
                 headerName: '',
@@ -295,7 +300,7 @@
                     },
                     {
                         field: 'rel_qty',
-                        headerName: '배분수량',
+                        headerName: '요청수량',
                         type: "currencyType",
                         hide: true,
                         width: 80,

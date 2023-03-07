@@ -107,19 +107,6 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="item">품목</label>
-                                <div class="flax_box">
-                                    <select name="item" class="form-control form-control-sm">
-                                        <option value="">전체</option>
-                                        @foreach ($items as $item)
-                                            <option value="{{ $item->cd }}">{{ $item->val }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
                                 <label for="">자료수/정렬</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box" style="width:24%;">

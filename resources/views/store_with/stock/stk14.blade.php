@@ -296,7 +296,7 @@
                     },
                     {
                         field: 'rel_qty',
-                        headerName: '배분수량',
+                        headerName: '요청수량',
                         type: "currencyType",
                         hide: true,
                         width: 80,
