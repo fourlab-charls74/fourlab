@@ -105,18 +105,24 @@ class acc05Controller extends Controller
         $store_cd = $request->input('store_cd', '');
         $store = DB::table('store')->where('store_cd', $store_cd)->select('store_cd', 'store_nm')->first();
 
+        // 기타재반자료 타입 조회
         $extra_cols = $this->_get_account_extra_types();
+
+        // 합계에서 제외하는 타입 선별
         $exclude_total_type = array_reduce($extra_cols->toArray(), function($a, $c) {
             $type = array_filter($c, function($tt) { return $tt->total_include_yn === 'N'; });
             if (count($type) > 0) return array_merge($a, array_map(function($tt) { return $tt->type_cd; }, $type)); 
             else return $a;
         }, []);
+
+        // 세금 제외하는 타입 선별
         $except_vat_type = array_reduce($extra_cols->toArray(), function($a, $c) {
             $type = array_filter($c, function($tt) { return $tt->except_vat_yn === 'Y'; });
             if (count($type) > 0) return array_merge($a, array_map(function($tt) { return $tt->type_cd; }, $type)); 
             else return $a;
         }, []);
 
+        // 비용부담자에 따른 타입 선별 (본사 / 매장)
         $payer_type = fn ($cd) => array_reduce($extra_cols->toArray(), function($a, $c) use ($cd) {
             $type = array_filter($c, function($tt) use ($cd) { return $tt->payer === $cd; });
             if (count($type) > 0) {
@@ -290,6 +296,7 @@ class acc05Controller extends Controller
         ]);
     }
 
+    /** 기타재반자료 타입을 상위타입별로 묶어서 반환 */
     private function _get_account_extra_types()
     {
         $sql = "

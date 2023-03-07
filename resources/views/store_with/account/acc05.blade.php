@@ -18,7 +18,6 @@
 					<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
 					<a href="#" onclick="return openExtraPopup();" class="btn btn-sm btn-outline-primary shadow-sm mr-1"><i class="fas fa-plus fa-sm"></i> 추가</a>
 					<a href="#" onclick="initSearch()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
-					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
 			</div>
 
@@ -61,7 +60,6 @@
 			<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
 			<a href="#" onclick="return openExtraPopup();" class="btn btn-sm btn-outline-primary shadow-sm mr-1"><i class="fas fa-plus fa-sm"></i> 추가</a>
 			<a href="#" onclick="initSearch()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
-			<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 		</div>
 	</div>
 </form>
@@ -83,12 +81,12 @@
 <script language="javascript">
 	const PAYER = { 'C': '(본사부담)', 'S': '(매장부담)' };
 
-	const YELLOW = {'background-color': "#ffff99"};
+	const YELLOW = { 'background-color': '#ffff99' };
 	const CENTER = { 'text-align': 'center' };
 
     const columns = [
 		{ field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28 },
-        { field: "ymonth", headerName: "판매연월", pinned: 'left', width: 70, cellStyle: {...CENTER, "text-decoration": "underline", "text-decoration-color": "blue"},
+        { field: "ymonth", headerName: "판매연월", pinned: 'left', width: 70, cellStyle: { ...CENTER, "text-decoration": "underline", "text-decoration-color": "blue" },
 			cellRenderer: (params) => `<a href="javascript:void(0);" onclick="return openExtraPopup('${params.value}');">${params.value.slice(0,4) + '-' + params.value.slice(4,6)}</a>`,
 		},
 		@foreach ($extra_cols as $entry_cd => $children)

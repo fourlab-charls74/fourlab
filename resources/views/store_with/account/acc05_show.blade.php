@@ -156,7 +156,7 @@
     const CLOSED_STATUS = { 'Y': '마감완료', 'N': '마감추가' };
     const PAYER = { 'C': '(본사부담)', 'S': '(매장부담)' };
 
-	const YELLOW = { 'background-color': "#ffff99" };
+	const YELLOW = { 'background-color': '#ffff99' };
 	const CENTER = { 'text-align': 'center' };
     const setEditable = (params, cond = true) => cond && params.node.rowPinned !== 'top' && params.data.closed_yn !== 'Y';
 
@@ -203,8 +203,8 @@
 				@endforeach
 			@endif
 		@endforeach
-		{ field: "C_total", headerName: "본사부담금 합계", type: 'currencyType', width: 100, cellStyle: {"font-weight": "700"} }, // 추가지급금
-		{ field: "S_total", headerName: "매장부담금 합계", type: 'currencyType', width: 100, cellStyle: {"font-weight": "700"} }, // 공제금
+		{ field: "C_total", headerName: "본사부담금 합계", type: 'currencyType', width: 100, cellStyle: { "font-weight": "700" } }, // 추가지급금
+		{ field: "S_total", headerName: "매장부담금 합계", type: 'currencyType', width: 100, cellStyle: { "font-weight": "700" } }, // 공제금
         { width: "auto" }
     ];
 </script>
