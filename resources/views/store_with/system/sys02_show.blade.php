@@ -160,6 +160,7 @@
             </div>
         </div>
     </div>
+    @if ($code !== '')
     <div class="card shadow">
         <div class="card-header mb-0">
             <a href="#">메뉴 순서 변경</a>
@@ -170,6 +171,7 @@
             </div>
         </div>
     </div>
+    @endif
     <script>
         const columns = [{
                 field: "group_no",

@@ -257,6 +257,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('prd04/batch_store', 'prd04Controller@batch_store');
         Route::post('prd04/upload_store', 'prd04Controller@upload_store');
         Route::put('prd04/batch_store', 'prd04Controller@update_store');
+
+        // 상품가격 관리
+        Route::get('prd05','prd05Controller@index');
+        Route::get('prd05/show/','prd05Controller@show');
     });
 
     // 생산입고관리
