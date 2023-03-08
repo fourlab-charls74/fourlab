@@ -43,7 +43,7 @@
                         <div class="tab-pane fade" id="order_amt" role="tabpanel" aria-labelledby="order_amt-tab">
                             <div class="card shadow mb-1" style="margin-top:26px">
                                 <div style="text-align: right;">
-                                    <span style="font-size: 17px; font-weight:bold">[ {{@$sdate}} ~ {{@$edate}} ]</span>
+                                    <span style="font-size: 17px; font-weight:bold">[ {{@$sdate2}} ~ {{@$edate2}} ]</span>
                                 </div>
                                 <canvas id="myChart3"></canvas>
                             </div>
@@ -51,7 +51,7 @@
                         <div class="tab-pane fade" id="order_qty" role="tabpanel" aria-labelledby="order_qty-tab">
                             <div class="card shadow mb-1" style="margin-top:26px">
                                 <div style="text-align: right;">
-                                    <span style="font-size: 17px; font-weight:bold">[ {{@$sdate}} ~ {{@$edate}} ]</span>
+                                    <span style="font-size: 17px; font-weight:bold">[ {{@$sdate2}} ~ {{@$edate2}} ]</span>
                                 </div>
                                 <canvas id="myChart4" ></canvas>
                             </div>
@@ -333,14 +333,14 @@
       datasets: [{
         label: '매출액',
         data: [
+            chartData[0].sum_amt,
+            chartData[1].sum_amt,
+            chartData[2].sum_amt,
+            chartData[3].sum_amt,
+            chartData[4].sum_amt,
+            chartData[5].sum_amt,
+            chartData[6].sum_amt,
             chartData[7].sum_amt,
-            chartData[8].sum_amt,
-            chartData[9].sum_amt,
-            chartData[10].sum_amt,
-            chartData[11].sum_amt,
-            chartData[12].sum_amt,
-            chartData[13].sum_amt,
-            chartData[14].sum_amt,
         ],
         borderColor: '#36A2EB',
         backgroundColor: '#9BD0F5',

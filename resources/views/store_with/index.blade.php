@@ -53,7 +53,7 @@
                         <div class="tab-pane fade" id="order_amt" role="tabpanel" aria-labelledby="order_amt-tab">
                             <div class="card shadow mb-1" style="margin-top:26px">
                                 <div style="text-align:right">
-                                    <span style="font-size: 17px; font-weight:bold">[ {{@$sdate}} ~ {{@$edate}} ]</span>
+                                    <span style="font-size: 17px; font-weight:bold">[ {{@$sdate2}} ~ {{@$edate2}} ]</span>
                                 </div>
                                 <canvas id="myChart3"></canvas>
                             </div>
@@ -61,7 +61,7 @@
                         <div class="tab-pane fade" id="order_qty" role="tabpanel" aria-labelledby="order_qty-tab">
                             <div class="card shadow mb-1" style="margin-top:26px">
                                 <div style="text-align:right">
-                                    <span style="font-size: 17px; font-weight:bold">[ {{@$sdate}} ~ {{@$edate}} ]</span>
+                                    <span style="font-size: 17px; font-weight:bold">[ {{@$sdate2}} ~ {{@$edate2}} ]</span>
                                 </div>
                                 <canvas id="myChart4" ></canvas>
                             </div>
@@ -257,7 +257,6 @@
   let sdate = '{{$sdate}}';
 
   let chartData = <?= json_encode($result)?>;
-
   let all_date = getDatesStartToLast(sdate, edate);
 
   new Chart(ctx, {
@@ -277,14 +276,14 @@
         {
         label: '매출액',
         data: [
+            chartData[0].sum_amt,
+            chartData[1].sum_amt,
+            chartData[2].sum_amt,
+            chartData[3].sum_amt,
+            chartData[4].sum_amt,
+            chartData[5].sum_amt,
+            chartData[6].sum_amt,
             chartData[7].sum_amt,
-            chartData[8].sum_amt,
-            chartData[9].sum_amt,
-            chartData[10].sum_amt,
-            chartData[11].sum_amt,
-            chartData[12].sum_amt,
-            chartData[13].sum_amt,
-            chartData[14].sum_amt,
         ],
         borderColor: '#36A2EB',
         backgroundColor: '#9BD0F5',
@@ -293,14 +292,14 @@
       {
         label: '매출원가',
         data: [
+            chartData[0].sum_wonga,
+            chartData[1].sum_wonga,
+            chartData[2].sum_wonga,
+            chartData[3].sum_wonga,
+            chartData[4].sum_wonga,
+            chartData[5].sum_wonga,
+            chartData[6].sum_wonga,
             chartData[7].sum_wonga,
-            chartData[8].sum_wonga,
-            chartData[9].sum_wonga,
-            chartData[10].sum_wonga,
-            chartData[11].sum_wonga,
-            chartData[12].sum_wonga,
-            chartData[13].sum_wonga,
-            chartData[14].sum_wonga,
         ],
         borderColor: '#FF6384',
         backgroundColor: '#FFB1C1',
@@ -396,8 +395,6 @@
 const ctx3 = document.getElementById('myChart3');
 
 let chartData2 = <?= json_encode($chart2Result)?>;
-
-console.log(chartData2);
 
   new Chart(ctx3, {
     type: 'bar',

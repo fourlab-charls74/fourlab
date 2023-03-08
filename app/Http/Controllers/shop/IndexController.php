@@ -14,11 +14,16 @@ class IndexController extends Controller
     public function index() {
 
         $mutable = Carbon::now();
-        $sdate = $mutable->sub(1, 'month')->format('Y-m-d');
+        $sdate = $mutable->sub(1, 'week')->format('Y-m-d');
         $edate = date("Y-m-d");
 
-        $startdate = $mutable->sub(1, 'week')->format('Ymd');
+        $mutable2 = Carbon::now();
+        $startdate = $mutable2->sub(1, 'week')->format('Ymd');
         $enddate = date("Ymd");
+
+        $mutable3 = Carbon::now();
+        $sdate2 = $mutable3->sub(1, 'month')->format('Y-m-d');
+        $edate2 = date("Y-m-d");
 
         $user_store = Auth('head')->user()->store_cd;
 
@@ -281,6 +286,8 @@ class IndexController extends Controller
         $values = [
             'sdate' => $sdate,
             'edate' => $edate,
+            'sdate2' => $sdate2,
+            'edate2' => $edate2,
             'result' => $result,
             'pieResult' => $piechart,
             'chart2Result' => $chart2Result,
