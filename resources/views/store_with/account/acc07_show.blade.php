@@ -24,6 +24,7 @@
     </div>
     <form method="get" name="search">
         <input type="hidden" name="idx" value="{{ @$closed->idx }}"/>
+        <input type="hidden" name="sdate" value="{{ @$closed->sday }}"/>
         <div id="search-area" class="search_cum_form">
             <div class="card mb-3">
                 <div class="d-flex card-header justify-content-between">
@@ -126,7 +127,7 @@
                         <p class="col-3 col-lg-1">본사부담금</p>
                         <p class="col-3 col-lg-1" id="extra_C_amt">{{ number_format(@$closed->extra_C_amt) }}</p>
                         <p class="col-3 col-lg-1">기타재반합계</p>
-                        <p class="col-3 col-lg-1 fs-14"><a href="javascript:void(0);" class="text-danger text-decoration-underline" onclick="return opener.openExtraAmtPopup('{{ @$closed->store_cd }}');"><u id="extra_amt">{{ number_format(@$closed->extra_amt) }}</u></a></p>
+                        <p class="col-3 col-lg-1 fs-14"><a href="javascript:void(0);" class="text-danger text-decoration-underline" onclick="return openExtraAmtPopup('{{ @$closed->store_cd }}');"><u id="extra_amt">{{ number_format(@$closed->extra_amt) }}</u></a></p>
                         <p class="col-3 col-lg-1">정산금액</p>
                         <p class="col-3 col-lg-1 fs-14 text-danger" id="account_amt" style="font-weight: 600;">{{ number_format(@$closed->account_amt) }}</p>
                     </div>
@@ -286,7 +287,7 @@
                             e.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
                         } else {
                             const sale_type_colId = 'sale_' + e.data.sale_type;
-                            e.data[sale_type_colId] = e.data['old_' + sale_type_colId] + (e.data.dlv_amt * 1) + (e.data.etc_amt * 1);
+                            e.data[sale_type_colId] = e.data['old_sale_net_amt'] + (e.data.dlv_amt * 1) + (e.data.etc_amt * 1);
                             e.data.sale_net_amt = e.data[sale_type_colId];
                             e.data.sale_amt_except_vat = (e.data.sale_net_amt || 0) / 1.1;
 
@@ -335,7 +336,8 @@
         SearchOnline();
     });
 
-    function Search() {
+    function Search(callback) {
+        if (callback) return location.reload();
         let data = $('form[name="search"]').serialize();
         gx.Aggregation({ "sum": "top" });
         gx.Request('/store/account/acc07/show-search/except-online', data, -1);
@@ -485,6 +487,13 @@
             console.log(err);
         });
     };
+
+    // 기타재반자료 상세
+	function openExtraAmtPopup(store_cd) {
+		const sdate = $('input[name="sdate"]').val();
+		const url = '/store/account/acc05/show?date=' + sdate.substring(0,6) + '&store_cd=' + store_cd;
+		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=800");
+	}
 
 </script>
 

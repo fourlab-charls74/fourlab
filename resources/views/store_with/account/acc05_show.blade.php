@@ -391,7 +391,7 @@
         }).then((res) => {
             if (res.data.code === "200") {
                 alert("자료가 정상적으로 저장되었습니다.");
-                if (opener) opener.Search();
+                if (opener) opener.Search('callback');
                 self.close();
             } else {
                 alert("자료저장 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");

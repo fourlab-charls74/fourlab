@@ -180,7 +180,7 @@
 					cellRenderer: (params) => {
 						if (params.value == undefined) return 0;
 						if (params.node.rowPinned === 'top') return params.valueFormatted;
-						return '<a href="#" onClick="openDetailPopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>';
+						return '<a href="#" onClick="openDetailPopup(\''+ params.data.store_cd +'\', \''+ params.data.acc_idx +'\')">' + params.valueFormatted +'</a>';
 					}
 				},
 				{ field: "sales_amt_except_vat", headerName: "매출합계(-VAT)", width: 100, headerClass: "merged-cell", type: 'currencyType', aggregation: true },
@@ -255,7 +255,7 @@
                     children: [
 						{ headerName: "매출액", field: "ord_OL_amt", type: 'currencyType', width: 90, aggregation: true,
 							cellRenderer: (params) => ['0', null].includes(params.value) ? 0 : (params.node.rowPinned === 'top' ? params.valueFormatted 
-								: '<a href="javascript:void(0);" onClick="openOnlineFeePopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>')
+								: '<a href="javascript:void(0);" onClick="openOnlineFeePopup(\''+ params.data.store_cd +'\', \''+ params.data.acc_idx +'\')">' + params.valueFormatted +'</a>')
 						},
 						{ headerName: "매출액(-VAT)", field: "ord_OL_amt_except_vat", type: 'currencyType', width: 90, aggregation: true },
                         { headerName: "수수료율", field: "fee_12", type: 'percentType', width: 60 },
@@ -322,17 +322,27 @@
 	}
 
 	// 판매내역 상세
-	function openDetailPopup(store_cd) {
+	function openDetailPopup(store_cd, acc_idx) {
 		const sdate = $('input[name="sdate"]').val();
-		const url = '/store/account/acc06/show/' + store_cd + '/' + sdate;
-		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=800");
+		if (acc_idx !== 'null') {
+			let url = '/store/account/acc07/show/' + acc_idx;
+			window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=2100,height=1200");
+		} else {
+			url = '/store/account/acc06/show/' + store_cd + '/' + sdate;
+			window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=800");
+		}
 	}
 
 	// 특약(온라인) 판매내역 상세
-	function openOnlineFeePopup(store_cd) {
+	function openOnlineFeePopup(store_cd, acc_idx) {
 		const sdate = $('input[name="sdate"]').val();
-		const url = '/store/account/acc06/show-online?store_cd=' + store_cd + '&sdate=' + sdate;
-		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=800");
+		if (acc_idx !== 'null') {
+			let url = '/store/account/acc07/show/' + acc_idx;
+			window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=2100,height=1200");
+		} else {
+			utl = '/store/account/acc06/show-online?store_cd=' + store_cd + '&sdate=' + sdate;
+			window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=800");
+		}
 	}
 
 </script>

@@ -48,11 +48,11 @@ class acc04Controller extends Controller
         if (count($store_no) > 0) $where .= " and s.store_cd in (" . join(",", array_map(function($cd) { return "'$cd'"; }, $store_no)) . ") ";
         if ($store_kind != '') $where .= " and s.store_kind = '" . Lib::quote($store_kind) . "' ";
         if ($closed_yn != '') {
-			if ($closed_yn == 'Z') $where .= " and c.closed_yn is null ";
-			else $where .= " and c.closed_yn = '" . Lib::quote($closed_yn) . "'";
+			if ($closed_yn == 'Z') $where .= " and w.closed_yn is null ";
+			else $where .= " and w.closed_yn = '" . Lib::quote($closed_yn) . "'";
 		}
         if ($sale_yn == 'Y') $where .= " and w.sales_amt > 0 ";
-        else if ($sale_yn == 'N') $where .= " and w.sales_amt <= 0 ";
+        else if ($sale_yn == 'N') $where .= " and (w.sales_amt <= 0 or w.sales_amt is null) ";
 
         $pr_codes = SLib::getCodes('PR_CODE'); // 행사코드목록
         $pr_code_query1 = "";
@@ -103,7 +103,7 @@ class acc04Controller extends Controller
                         + a.ord_OL_amt_except_vat_s * a.fee_12 / 100
                     ) as fee_amt
                 from (
-                    select s.store_cd, s.store_nm, s.store_type, st.code_val as store_type_nm, s.manager_nm, c.closed_yn
+                    select s.store_cd, s.store_nm, s.store_type, st.code_val as store_type_nm, s.manager_nm
                         , w.*, ae.*, sf.*, s.grade_cd, sg.grade_nm, sg.fee1, sg.fee2, sg.fee3, sg.fee_10, sg.fee_11, sg.fee_12
                         , round(w.sales_amt / 1.1) as sales_amt_except_vat
                         , ((w.sales_amt / 1.1) - ifnull(ae.extra_M1_amt, 0)) as sales_profit_except_M1 -- 매출이익(원가제외)
@@ -123,7 +123,6 @@ class acc04Controller extends Controller
                         , w.ord_OL_amt / 1.1 as ord_OL_amt_except_vat_s
                     from store s
                         left outer join code st on st.code_kind_cd = 'STORE_TYPE' and st.code_id = s.store_type
-                        left outer join store_account_closed c on sday = '$f_sdate' and eday = '$f_edate' and c.store_cd = s.store_cd
                         left outer join (
                             select grade_cd, name as grade_nm
                                 , fee1, round(amt1 * 1.1) as amt1, fee2, round(amt2 * 1.1) as amt2, fee3
@@ -139,22 +138,22 @@ class acc04Controller extends Controller
                             group by f.store_cd
                         ) sf on sf.sf_store_cd = s.store_cd
                         left outer join (
-                            select ww.store_cd as ww_store_cd
+                            select ww.store_cd as ww_store_cd, c.closed_yn, c.acc_idx
                                 $pr_code_query1
-                                , sum(if(ww.online_yn = 'N', ww.recv_amt, 0)) as sales_amt -- 매출합계
+                                , sum(if(ww.online_yn = 'N', ww.recv_amt, 0)) + ifnull(c.dlv_etc_JS_amt, 0) + ifnull(c.dlv_etc_TG_amt, 0) + ifnull(c.dlv_etc_YP_amt, 0) as sales_amt -- 매출합계
                                 , sum(if(ww.online_yn = 'N', ww.wonga, 0)) as wonga_amt -- 원가합계
                                 , sum(if(
                                     ww.online_yn = 'N' and g.brand not in (select code_id from code where code_kind_cd = 'YP_BRAND') 
                                     and if(sg.fee_10_info_over_yn = 'Y', ((1 - (ww.price / g.goods_sh)) * 100) <= sg.fee_10_info, ((1 - (ww.price / g.goods_sh)) * 100) < sg.fee_10_info)
                                     , ww.recv_amt, 0
-                                )) as ord_JS_amt -- 정상매출(중간관리자)
+                                )) + ifnull(c.dlv_etc_JS_amt, 0) as ord_JS_amt -- 정상매출(중간관리자)
                                 , sum(if(
                                     ww.online_yn = 'N' and g.brand not in (select code_id from code where code_kind_cd = 'YP_BRAND') 
                                     and if(sg.fee_10_info_over_yn = 'Y', ((1 - (ww.price / g.goods_sh)) * 100) > sg.fee_10_info, ((1 - (ww.price / g.goods_sh)) * 100) >= sg.fee_10_info)
                                     , ww.recv_amt, 0
-                                )) as ord_TG_amt -- 특가매출(중간관리자)
-                                , sum(if(ww.online_yn = 'N' and g.brand in (select code_id from code where code_kind_cd = 'YP_BRAND'), ww.recv_amt, 0)) as ord_YP_amt -- 용품매출(중간관리자)
-                                , sum(if(ww.online_yn = 'Y', ww.recv_amt, 0)) as ord_OL_amt -- 특가(온라인)매출(중간관리자)
+                                )) + ifnull(c.dlv_etc_TG_amt, 0) as ord_TG_amt -- 특가매출(중간관리자)
+                                , sum(if(ww.online_yn = 'N' and g.brand in (select code_id from code where code_kind_cd = 'YP_BRAND'), ww.recv_amt, 0)) + ifnull(c.dlv_etc_YP_amt, 0) as ord_YP_amt -- 용품매출(중간관리자)
+                                , sum(if(ww.online_yn = 'Y', ww.recv_amt, 0)) + ifnull(c.dlv_etc_OL_amt, 0) as ord_OL_amt -- 특가(온라인)매출(중간관리자)
                             from (
                                 (
                                     select w.store_cd, w.goods_no, w.prd_cd, o.pr_code, 'N' as online_yn
@@ -178,6 +177,17 @@ class acc04Controller extends Controller
                                 inner join goods g on g.goods_no = ww.goods_no
                                 inner join store s on s.store_cd = ww.store_cd
                                 inner join store_grade sg on sg.grade_cd = s.grade_cd
+                                left outer join (
+                                    select cc.store_cd as cc_store_cd, cc.closed_yn, cc.idx as acc_idx
+										, sum(if(cl.sale_type = 'JS', (cl.dlv_amt + cl.etc_amt), 0)) as dlv_etc_JS_amt
+										, sum(if(cl.sale_type = 'TG', (cl.dlv_amt + cl.etc_amt), 0)) as dlv_etc_TG_amt
+										, sum(if(cl.sale_type = 'YP', (cl.dlv_amt + cl.etc_amt), 0)) as dlv_etc_YP_amt
+                                        , sum(if(cl.sale_type = 'OL', (cl.dlv_amt + cl.etc_amt), 0)) as dlv_etc_OL_amt
+                                    from store_account_closed cc
+                                        inner join store_account_closed_list cl on cl.acc_idx = cc.idx
+                                    where cc.sday = '$f_sdate' and cc.eday = '$f_edate'
+                                    group by cc.store_cd
+                                ) c on c.cc_store_cd = ww.store_cd
                             group by ww.store_cd
                         ) w on w.ww_store_cd = s.store_cd
                         left outer join (

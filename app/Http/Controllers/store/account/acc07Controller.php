@@ -157,7 +157,7 @@ class acc07Controller extends Controller
 					, c.dlv_amt, c.dlv_amt as old_dlv_amt, c.etc_amt, c.etc_amt as old_etc_amt
 					, c.sale_net_taxation_amt, c.sale_net_taxfree_amt, c.sale_type
 					, if(c.sale_type = 'JS', '정상', if(c.sale_type = 'TG', '특가', if(c.sale_type = 'YP', '용품', ''))) as sale_type_nm
-					, c.sale_net_amt, c.sale_net_amt as old_sale_net_amt
+					, c.sale_net_amt, (c.sale_net_taxation_amt + c.sale_net_taxfree_amt) as old_sale_net_amt
 					, if(c.sale_type = 'JS', c.sale_net_amt, 0) as sale_JS
 					, if(c.sale_type = 'TG', c.sale_net_amt, 0) as sale_TG
 					, if(c.sale_type = 'YP', c.sale_net_amt, 0) as sale_YP
