@@ -77,6 +77,14 @@
 						</div>
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
+								<label>품번</label>
+								<div class="flex_box">
+									<input type='text' id="prd_cd_p" name='prd_cd_p' class="form-control form-control-sm ac-style-no search-enter">
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-4 inner-td">
+							<div class="form-group">
 								<label for="style_no">스타일넘버/온라인코드</label>
 								<div class="form-inline">
 									<div class="form-inline-inner input_box">
@@ -92,6 +100,8 @@
 								</div>
 							</div>
 						</div>
+					</div>
+					<div class="row">
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
 								<label for="goods_nm">상품명</label>
@@ -100,8 +110,6 @@
 								</div>
 							</div>
 						</div>
-					</div>
-					<div class="row">
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
 								<label for="goods_nm_eng">상품명(영문)</label>
@@ -123,6 +131,8 @@
 								</div>
 							</div>
 						</div>
+					</div>
+					<div class="row">
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
 								<label for="prd_cd">상품검색조건</label>
@@ -137,16 +147,13 @@
 								</div>
 							</div>
 						</div>
-					</div>
-					<div class="row">
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
 								<label for="">자료수/정렬</label>
 								<div class="form-inline">
 									<div class="form-inline-inner input_box" style="width:24%;">
 										<select name="limit" class="form-control form-control-sm">
-											<option value="">모두</option>
-											<option value="1000" selected>1000</option>
+											<option value="1000">1000</option>
 											<option value="5000">5000</option>
 											<option value="10000">10000</option>
 										</select>
@@ -331,40 +338,43 @@
 			{field: "color", headerName: "컬러", width:50, cellStyle: {"text-align": "center"}},
 			{field: "color_nm", headerName: "컬러명", width:90},
 			{field: "size", headerName: "사이즈", width:50, cellStyle: {"text-align": "center"}},
-			{field: "goods_opt", headerName: "옵션", width:190},
+			{field: "size_nm", headerName: "사이즈명", width:100},
+			// {field: "goods_opt", headerName: "옵션", width:190},
 			// {field: "opt_kind_nm", headerName: "품목", width:70, cellStyle: {"line-height": "30px", "text-align": "center"}},
 			{field: "brand_nm", headerName: "브랜드", cellStyle: {"line-height": "30px", "text-align": "center"},aggFunc: "first"},
 			
-			
-			{field: "wqty", headerName: "창고재고", width:70,type: 'currencyType', cellStyle: {"line-height": "30px"},
-				aggFunc: (params) => {
-					return params.values.reduce((a,c) => a + (c * 1), 0);
-				},
-				cellRenderer: function(params) {
-					if (params.value === undefined) return "";
-					if (params.node.rowPinned === 'top') {
-					} else if (params.data) {
-						return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + params.value + '</a>';
-					} else if (params.node.aggData) {
-						return `<a href="#" onclick="return OpenStockPopup('${params.node.key}', '${$("[name=sdate]").val() || ''}');">${params.value}</a>`;
-					}
-				}
-			},
-			{
-				field: "sqty", headerName: "매장재고", width:70, type: 'currencyType', cellStyle: {"line-height": "30px"},
-					aggFunc: (params) => {
-					return params.values.reduce((a,c) => a + (c * 1), 0);
-					},
-					cellRenderer: function(params) {
-						if (params.value === undefined) return "";
-						if (params.node.rowPinned === 'top') {
-						} else if (params.data) {
-							return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + params.value + '</a>';
-						} else if (params.node.aggData) {
-							return `<a href="#" onclick="return OpenStockPopup('${params.node.key}', '${$("[name=sdate]").val() || ''}');">${params.value}</a>`;
-						}
-					}
-			},
+			{{--
+			// {field: "wqty", headerName: "창고재고", width:70,type: 'currencyType', cellStyle: {"line-height": "30px"},
+			// 	aggFunc: (params) => {
+			// 		return params.values.reduce((a,c) => a + (c * 1), 0);
+			// 	},
+			// 	cellRenderer: function(params) {
+			// 		if (params.value === undefined) return "";
+			// 		if (params.node.rowPinned === 'top') {
+			// 		} else if (params.data) {
+			// 			return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + params.value + '</a>';
+			// 		} else if (params.node.aggData) {
+			// 			return `<a href="#" onclick="return OpenStockPopup('${params.node.key}', '${$("[name=sdate]").val() || ''}');">${params.value}</a>`;
+			// 		}
+			// 	}
+			// },
+			// {
+			// 	field: "sqty", headerName: "매장재고", width:70, type: 'currencyType', cellStyle: {"line-height": "30px"},
+			// 		aggFunc: (params) => {
+			// 		return params.values.reduce((a,c) => a + (c * 1), 0);
+			// 		},
+			// 		cellRenderer: function(params) {
+			// 			if (params.value === undefined) return "";
+			// 			if (params.node.rowPinned === 'top') {
+			// 			} else if (params.data) {
+			// 				return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + params.value + '</a>';
+			// 			} else if (params.node.aggData) {
+			// 				return `<a href="#" onclick="return OpenStockPopup('${params.node.key}', '${$("[name=sdate]").val() || ''}');">${params.value}</a>`;
+			// 			}
+			// 		}
+			// },
+			--}}
+
 			{field: "goods_sh", headerName: "정상가", type: 'currencyType', cellStyle: {"line-height": "30px"}, aggFunc: 'first'},
 			{field: "price", headerName: "판매가", type: 'currencyType', width:80, cellStyle: {"line-height": "30px"}, aggFunc: 'first'},
 			{field: "wonga", headerName: "원가", type: 'currencyType', width:80, cellStyle: {"line-height": "30px"}, aggFunc: 'first'},
@@ -372,8 +382,10 @@
 			{field: "margin_rate", headerName: "마진율", type: 'percentType', width:80, cellStyle: {"line-height": "30px"}},
 			{field: "org_nm", headerName: "원산지", cellStyle: {"line-height": "30px"}},
 			{field: "com_nm", headerName: "업체", width:84, cellStyle: {"line-height": "30px"}},
-			{field: "reg_dm", headerName: "등록일자", width:110, cellStyle: {"line-height": "30px"}},
-			{field: "upd_dm", headerName: "수정일자", width:110, cellStyle: {"line-height": "30px"}},
+			{{--
+			// {field: "reg_dm", headerName: "등록일자", width:110, cellStyle: {"line-height": "30px"}},
+			// {field: "upd_dm", headerName: "수정일자", width:110, cellStyle: {"line-height": "30px"}},
+			--}}
 			{field: "match_yn", headerName: "매칭여부", width:60, hide:true},
 			{width:"auto"}
 		];

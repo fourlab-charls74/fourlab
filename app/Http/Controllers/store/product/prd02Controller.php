@@ -72,6 +72,7 @@ class prd02Controller extends Controller
 		$store_no	= $request->input("store_no", "");
 
 		$prd_cd		= $request->input("prd_cd", "");
+		$prd_cd_p	= $request->input("prd_cd_p");
 		$com_id		= $request->input("com_cd");
 		$prd_cd_range_text = $request->input("prd_cd_range", '');
 
@@ -98,6 +99,8 @@ class prd02Controller extends Controller
 			}
 			$where .= ")";
 		}
+
+		if($prd_cd_p != "")		$where .= " and pc.prd_cd_p = '" . Lib::quote($prd_cd_p) . "' ";
 
 		if($match_yn == 'Y' || $match_yn == 'N') $where .= " and p.match_yn = '$match_yn'";
 
@@ -187,11 +190,7 @@ class prd02Controller extends Controller
 
 		$page_size	= $limit;
 		$startno	= ($page - 1) * $page_size;
-		if($limit == ''){
-			$limit		= "";
-		} else {
-			$limit		= " limit $startno, $page_size ";
-		}
+		$limit		= " limit $startno, $page_size ";
 
 		$total		= 0;
 		$page_cnt	= 0;
@@ -222,14 +221,12 @@ class prd02Controller extends Controller
 			";
 			$row	= DB::select($query);
 			$total	= $row[0]->total;
-			if($limit != '') $page_cnt = (int)(($total - 1) / $page_size) + 1;
+			$page_cnt = (int)(($total - 1) / $page_size) + 1;
 		}
 
 		$goods_img_url		= '';
 		$cfg_img_size_real	= "a_500";
 		$cfg_img_size_list	 = "s_50";
-
-		
 
 		$query = "
 			select 
@@ -249,6 +246,11 @@ class prd02Controller extends Controller
 				, g.goods_nm_eng
 				, pc.goods_opt
 				, c.code_val as color_nm
+				, case
+					when pc.gender = 'M' then ( select code_val from code where code_kind_cd = 'PRD_CD_SIZE_MEN' and code_id =  pc.size  )
+					when pc.gender = 'W' then ( select code_val from code where code_kind_cd = 'PRD_CD_SIZE_WOMEN' and code_id =  pc.size  )
+					when pc.gender = 'U' then ( select code_val from code where code_kind_cd = 'PRD_CD_SIZE_UNISEX' and code_id =  pc.size  )
+					else '-' end as size_nm
 				, ps.wqty
 				, (ps.qty - ps.wqty) as sqty
 				, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
@@ -282,6 +284,7 @@ class prd02Controller extends Controller
 			$orderby
 			$limit
 		";
+
 		$pdo	= DB::connection()->getPdo();
 		$stmt	= $pdo->prepare($query);
 		$stmt->execute();
@@ -643,9 +646,12 @@ class prd02Controller extends Controller
 			$sql	= "
 				select
 					pc.prd_cd, pc.goods_no, g.goods_nm, g.style_no, pc.color, c1.code_val as color_nm,  pc.size, pc.goods_opt
+					, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
+					, if(pc.goods_no = 0, p.price, g.price) as price
 				from product_code pc
-				inner join goods g on g.goods_no = pc.goods_no
-				left outer join code c1 on c1.code_kind_cd = 'PRD_CD_COLOR' and c1.code_id = pc.color and c1.use_yn = 'Y'
+					inner join product p on p.prd_cd = pc.prd_cd
+					inner join goods g on g.goods_no = pc.goods_no
+					left outer join code c1 on c1.code_kind_cd = 'PRD_CD_COLOR' and c1.code_id = pc.color and c1.use_yn = 'Y'
 				where
 					pc.prd_cd = :prd_cd
 			";
@@ -1263,6 +1269,61 @@ class prd02Controller extends Controller
 		}
 
 		return response()->json(["code" => $code, "msg" => $msg]);
+	}
+
+	public function update_product(Request $request){
+		$admin_id = Auth('head')->user()->id;
+		$admin_name = Auth('head')->user()->name;
+
+		$goods_no	= $request->input('goods_no');
+		$tag_price	= $request->input('tag_price');
+		$price		= $request->input('price');
+
+		$sql = "
+			select
+				c.prd_cd
+			from goods_summary a
+			left outer join product_code c on c.goods_no = a.goods_no and c.goods_opt = a.goods_opt
+			where
+				a.goods_no = :goods_no
+		";
+		$result = DB::select($sql,['goods_no' => $goods_no]);
+
+		try {
+			DB::beginTransaction();
+
+			DB::table('goods')
+				->where('goods_no', '=', $goods_no)
+				->update([
+					"price" => $price,
+					"goods_sh" => $tag_price,
+					"admin_id"=> $admin_id,
+					"admin_nm"=> $admin_name,
+					"upd_dm" => now(),
+				]);
+			
+			foreach($result as $row){
+				DB::table('product')
+					->where('prd_cd', '=', $row->prd_cd)
+					->update([
+						"price" => $price,
+						"tag_price" => $tag_price,
+						"admin_id"=> $admin_id,
+						"ut" => now(),
+					]);
+			}
+
+			DB::commit();
+			$code = 200;
+			$msg = "가격 정보 수정이 완료되었습니다.";
+
+		} catch (\Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+        return response()->json(["code" => $code, "msg" => $msg]);
 	}
 
 	public function getSeq(Request $request) {

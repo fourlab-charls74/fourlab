@@ -15,6 +15,7 @@
 			</div>
 		</div>
 		<div class="d-flex">
+			<a href="javascript:void(0)" onclick="save();" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i>저장</a>
 			<a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i>닫기</a>
 		</div>
 	</div>
@@ -70,6 +71,20 @@
 											<td>{{ $product->goods_opt }}</td>
 											<th>아이템코드</th>
 											<td>{{ $product->style_no }}</td>
+										</tr>
+										<tr>
+											<th>TAG가</th>
+											<td>
+												<div class="flax_box">
+													<input type='text' class="form-control form-control-sm" name='tag_price' id="tag_price" value='{{ $product->goods_sh }}' onkeyup="onlynum(this)">
+												</div>
+											</td>
+											<th>판매가</th>
+											<td>
+												<div class="flax_box">
+													<input type='text' class="form-control form-control-sm" name='price' id="price" value='{{ $product->price }}' onkeyup="onlynum(this)">
+												</div>
+											</td>
 										</tr>
 									</tbody>
 								</table>
@@ -166,6 +181,21 @@
 		gx.gridOptions.animateRows = true;
 		Search();
 	});
+
+	const onlyNum = (obj) => {
+		val = obj.value;
+		new_val = '';
+		for (i=0; i<val.length; i++) {
+			char = val.substring(i, i+1);
+			if (char < '0' || char > '9') {
+				alert('숫자만 입력가능 합니다.');
+				obj.value = new_val;
+				return;
+			} else {
+				new_val = new_val + char;
+			}
+		}
+	};
 	
 	function Search() {
 		let data = $('form[name="f1"]').serialize();
@@ -173,6 +203,30 @@
 		//console.log(data);
 
 		gx.Request('/store/product/prd02/prd-edit-search/', data);
+	}
+
+	function save() {
+		if(!window.confirm("가격 정보를 수정하시겠습니까?")) return;
+
+		axios({
+			url: '/store/product/prd02/update_product',
+			method: 'post',
+			data: {
+				goods_no : $("#goods_no").val(),
+				tag_price : $("#tag_price").val(),
+				price : $("#price").val()
+			},
+		}).then(function(res) {
+			if (res.data.code === 200) {
+				alert("수정이 완료되었습니다.");
+				opener.Search();
+			} else {
+				console.log(res.data);
+				alert("가격 정보 수정 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+			}
+		}).catch(function(err) {
+			console.log(err);
+		});
 	}
 
 	function delPrdCd(prd_cd){

@@ -218,6 +218,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('prd02/change-gender', 'prd02Controller@change_gender');
         Route::post('prd02/get-seq', 'prd02Controller@getSeq');
         Route::post('prd02/save_product', 'prd02Controller@save_product');
+        Route::post('prd02/update_product', 'prd02Controller@update_product');
         Route::post('prd02/del-img', 'prd02Controller@delImg');
         Route::post('prd02/sel_seq', 'prd02Controller@selSeq');
         Route::post('prd02/change_seq', 'prd02Controller@changeSeq');

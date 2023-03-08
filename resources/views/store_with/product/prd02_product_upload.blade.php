@@ -197,24 +197,24 @@
 													</select>
 												</div>
 											</td>
+											<th class="required">원가</th>
+											<td>
+												<div class="flax_box">
+													<input type='text' class="form-control form-control-sm" name='wonga' id="wonga" value='' onkeyup="onlynum(this)">
+												</div>
+											</td>
+										</tr>
+										<tr>
 											<th>TAG가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='tag_price' id="tag_price" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
-										</tr>
-										<tr>
 											<th>판매가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='price' id="price" value='' onkeyup="onlynum(this)">
-												</div>
-											</td>
-											<th>원가</th>
-											<td>
-												<div class="flax_box">
-													<input type='text' class="form-control form-control-sm" name='wonga' id="wonga" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
 										</tr>
@@ -508,6 +508,12 @@
 		if (f1.style_no.value.trim() === '') {
 			f1.style_no.focus();
 			return alert("스타일넘버를 입력해주세요.");
+		}
+
+		// 원가 입력여부
+		if (f1.wonga.value.trim() === '') {
+			f1.wonga.focus();
+			return alert("원가를 입력해주세요.");
 		}
 
 		return true;
