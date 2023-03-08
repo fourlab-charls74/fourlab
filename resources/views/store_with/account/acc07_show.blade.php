@@ -6,10 +6,20 @@
     .text { box-sizing: border-box; margin-top: 1px;}
     .form-control-sm { padding: 0.25rem 0.5rem; }
     #gd {text-overflow: initial;}
-    .fee_table {border: 1px solid #ccc; border-width: 1px 1px 0;}
-    .fee_table p {padding: 7px 12px; display: flex; align-items: center; border-bottom: 1px solid #ccc;}
-    .fee_table p:nth-child(odd) {font-weight: 500;background-color: #ededed;}
-    .fee_table p:nth-child(even) {padding-left: 0;justify-content: flex-end;}
+    .custom-box { position: relative; background: #f6f6f6; border-radius: 7px; font-weight: 400; }
+    .custom-box:after {
+        bottom: 100%;
+        left: 3%;
+        border: solid transparent;
+        content: "";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+        border-bottom-color: #f6f6f6;
+        border-width: 7px;
+        margin-left: -7px;
+    }
 </style>
 
 <div class="py-3 px-sm-3">
@@ -105,31 +115,75 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row fee_table p-0 m-0 mt-3 w-100">
-                        <p class="col-3 col-lg-1">정상1</p>
-                        <p class="col-3 col-lg-1" id="fee_amt_JS1">{{ number_format(@$closed->fee_JS1) }}</p>
-                        <p class="col-3 col-lg-1">정상2</p>
-                        <p class="col-3 col-lg-1" id="fee_amt_JS2">{{ number_format(@$closed->fee_JS2) }}</p>
-                        <p class="col-3 col-lg-1">정상3</p>
-                        <p class="col-3 col-lg-1" id="fee_amt_JS3">{{ number_format(@$closed->fee_JS3) }}</p>
-                        <p class="col-3 col-lg-1">특가</p>
-                        <p class="col-3 col-lg-1" id="fee_amt_TG">{{ number_format(@$closed->fee_TG) }}</p>
-                        <p class="col-3 col-lg-1">용품</p>
-                        <p class="col-3 col-lg-1" id="fee_amt_YP">{{ number_format(@$closed->fee_YP) }}</p>
-                        <p class="col-3 col-lg-1">특가(온라인)</p>
-                        <p class="col-3 col-lg-1" id="fee_amt_OL">{{ number_format(@$closed->fee_OL) }}</p>
-                        <p class="col-3 col-lg-1">수수료합계</p>
-                        <p class="col-3 col-lg-1 fs-14 text-danger" id="fee_amt">{{ number_format(@$closed->fee_amt) }}</p>
-                        <p class="col-3 col-lg-1">인건비</p>
-                        <p class="col-3 col-lg-1" id="extra_P_amt">{{ number_format(@$closed->extra_P_amt) }}</p>
-                        <p class="col-3 col-lg-1">매장부담금</p>
-                        <p class="col-3 col-lg-1" id="extra_S_amt">{{ number_format(@$closed->extra_S_amt) }}</p>
-                        <p class="col-3 col-lg-1">본사부담금</p>
-                        <p class="col-3 col-lg-1" id="extra_C_amt">{{ number_format(@$closed->extra_C_amt) }}</p>
-                        <p class="col-3 col-lg-1">기타재반합계</p>
-                        <p class="col-3 col-lg-1 fs-14"><a href="javascript:void(0);" class="text-danger text-decoration-underline" onclick="return openExtraAmtPopup('{{ @$closed->store_cd }}');"><u id="extra_amt">{{ number_format(@$closed->extra_amt) }}</u></a></p>
-                        <p class="col-3 col-lg-1">정산금액</p>
-                        <p class="col-3 col-lg-1 fs-14 text-danger" id="account_amt" style="font-weight: 600;">{{ number_format(@$closed->account_amt) }}</p>
+                    <div class="row p-0 m-0 w-100">
+                        <div class="col-lg-4 pl-lg-0 mt-3">
+                            <p class="fs-14 font-weight-bold"><i class="bx bx-won fs-16 text-primary"></i> 최종정산금액 - <span id="account_amt" class="text-danger">{{ number_format(@$closed->account_amt) }}</span>원</p>
+                            <div class="p-3 mt-2 custom-box">
+                                <div class="row">
+                                    <div class="col-12 d-flex justify-content-between">
+                                        <p>중간관리자 수수료 + 기타재반자료</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 mt-3">
+                            <p class="fs-14 font-weight-bold"><i class="bx bx-won fs-16 text-primary"></i> 중간관리자 수수료 - <span id="fee_amt">{{ number_format(@$closed->fee_amt) }}</span>원</p>
+                            <div class="p-3 mt-2 custom-box">
+                                <div class="row">
+                                    <div class="col-6 d-flex justify-content-between">
+                                        <p>정상1 수수료</p>
+                                        <p id="fee_amt_JS1"><span id="fee_amt">{{ number_format(@$closed->fee_JS1) }}</span>원</p>
+                                    </div>
+                                    <div class="col-6 d-flex justify-content-between">
+                                        <p>특가 수수료</p>
+                                        <p id="fee_amt_TG"><span id="fee_amt">{{ number_format(@$closed->fee_TG) }}</span>원</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6 d-flex justify-content-between">
+                                        <p>정상2 수수료</p>
+                                        <p id="fee_amt_JS2"><span id="fee_amt">{{ number_format(@$closed->fee_JS2) }}</span>원</p>
+                                    </div>
+                                    <div class="col-6 d-flex justify-content-between">
+                                        <p>용품 수수료</p>
+                                        <p id="fee_amt_YP"><span id="fee_amt">{{ number_format(@$closed->fee_YP) }}</span>원</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6 d-flex justify-content-between">
+                                        <p>정상3 수수료</p>
+                                        <p id="fee_amt_JS3"><span id="fee_amt">{{ number_format(@$closed->fee_JS3) }}</span>원</p>
+                                    </div>
+                                    <div class="col-6 d-flex justify-content-between">
+                                        <p>특가(온라인) 수수료</p>
+                                        <p id="fee_amt_OL"><span id="fee_amt">{{ number_format(@$closed->fee_OL) }}</span>원</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 mt-3">
+                            <p class="fs-14 font-weight-bold"><i class="bx bx-won fs-16 text-primary"></i> 기타재반자료 - <a href="javascript:void(0);" class="text-decoration-underline" onclick="return openExtraAmtPopup('{{ @$closed->store_cd }}');"><u id="extra_amt">{{ number_format(@$closed->extra_amt) }}</u></a>원</p>
+                            <div class="p-3 mt-2 custom-box">
+                                <div class="row">
+                                    <div class="col-12 d-flex justify-content-between">
+                                        <p>인건비</p>
+                                        <p id="extra_P_amt"><span id="fee_amt">{{ number_format(@$closed->extra_P_amt) }}</span>원</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 d-flex justify-content-between">
+                                        <p>매장부담금</p>
+                                        <p id="extra_S_amt"><span id="fee_amt">{{ number_format(@$closed->extra_S_amt) }}</span>원</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 d-flex justify-content-between">
+                                        <p>본사부담금</p>
+                                        <p id="extra_C_amt"><span id="fee_amt">{{ number_format(@$closed->extra_C_amt) }}</span>원</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -143,7 +197,7 @@
             </div>
         </div>
         <div id="filter-area" class="card shadow-none mb-0 ty2 last-card">
-            <div class="card-body">
+            <div class="card-body pb-0">
                 <div class="card-title mb-2">
                     <div class="filter_wrap">
                         <div class="fl_box">
@@ -269,7 +323,7 @@
             else window.close();
         }
 
-        pApp.ResizeGrid(480, 425);
+        pApp.ResizeGrid(480, 380);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {
