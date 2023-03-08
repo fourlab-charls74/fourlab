@@ -45,23 +45,11 @@
 						<div class="form-group">
 							<label for="sdate">판매기간(판매연월)</label>
 							<div class="form-inline date-select-inbox">
-								<div class="docs-datepicker form-inline-inner input_box">
+								<div class="docs-datepicker form-inline-inner input_box w-100">
 									<div class="input-group">
 										<input type="text" class="form-control form-control-sm docs-date month" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
 										<div class="input-group-append">
 											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-												<i class="fa fa-calendar" aria-hidden="true"></i>
-											</button>
-										</div>
-									</div>
-									<div class="docs-datepicker-container"></div>
-								</div>
-								<span class="text_line">~</span>
-								<div class="docs-datepicker form-inline-inner input_box">
-									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date month" name="edate" value="{{ $sdate }}" autocomplete="off">
-										<div class="input-group-append">
-											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
 												<i class="fa fa-calendar" aria-hidden="true"></i>
 											</button>
 										</div>
@@ -153,8 +141,9 @@
 	<div class="card-body">
 		<div class="card-title">
 			<div class="filter_wrap">
-				<div class="fl_box">
+				<div class="fl_box flex_box">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
+					<p id="current_date" class="ml-3 pl-2 pr-2 fs-14 text-white bg-secondary rounded"></p>
 				</div>
 			</div>
 		</div>
@@ -165,54 +154,15 @@
 </div>
 <script language="javascript">
 	const CLOSED_STATUS = { 'Y': '마감완료', 'N': '마감추가' };
+	const PAYER = { 'C': '(본사부담)', 'S': '(매장부담)' };
 	const CENTER = { 'text-align': 'center' };
 
-	/**
-	 * 마감상태
-	 * 매장코드
-	 * 매장구분
-	 * 매장명
-	 * 매니저
-	 * 수수료등급
-	 * 매출정보
-	 * 	- 매출합계
-	 * 	- 매출합계(-VAT)
-	 * 	- 마일리지(-VAT) M1
-	 * 	- 원가
-	 * 	- 매출이익 : 매출합계(-VAT) - 마일리지(-VAT) - 원가
-	 * 판매수수료
-	 * 	- 정상 (매출액 / 매출액(-VAT) / 수수료율 / 수수료)
-	 * 	- 행사 (매출액 / 매출액(-VAT) / 수수료율 / 수수료)
-	 * 	- 균일 (매출액 / 매출액(-VAT) / 수수료율 / 수수료)
-	 * 	- 용품 (매출액 / 매출액(-VAT) / 수수료율 / 수수료)
-	 * 	- 수수료합계
-	 * 중간관리자수수료
-	 * 	- 정상1 (매출액 / 매출액(-VAT) / 수수료율 / 수수료)
-	 * 	- 정상2 (매출액 / 매출액(-VAT) / 수수료율 / 수수료)
-	 * 	- 정상3 (매출액 / 매출액(-VAT) / 수수료율 / 수수료)
-	 * 	- 특가 (매출액 / 매출액(-VAT) / 수수료율 / 수수료)
-	 * 	- 용품 (매출액 / 매출액(-VAT) / 수수료율 / 수수료)
-	 * 	- 특가(온라인) (매출액 / 매출액(-VAT) / 수수료율 / 수수료)
-	 * 	- 수수료합계
-	 * 인건비 P (온라인, 인센티브, 패널티, 기타수수료, 인건비합계)
-	 * 기타운영경비(본사부담) O (외부창고, 사용경비(기타), 운영경비합계)
-	 * 영업이익 : 매출이익 - 판매수수료 - 중간관리자수수료 - 인건비합계 - 기타운영경비합계
-	 * 영업이익율 : 영업이익 / 매출 * 100
-	 * 매장부담금
-	 * 	- 매장운영비용 S (전화요금, 인터넷, 본사수선비(-VAT), 외부창고/보안비)
-	 * 	- 사은품 G
-	 * 	- 소모품 E
-	*/
-
     const columns = [
-        // { headerName: "#", field: "num", type: 'NumType', pinned: 'left', aggSum: "합계", cellStyle: CENTER,
-		// 	cellRenderer: (params) => params.node.rowPinned === 'top' ? '합계' : (parseInt(params.value) + 1),
-        // },
-        // { field: "ymonth", headerName: "판매기간", rowGroup: true, hide: true },
-		// { headerName: '판매기간', showRowGroup: 'ymonth', cellRenderer: 'agGroupCellRenderer', minWidth: 100, pinned: 'left' },
-		{ headerName: '판매기간', field: 'ymonth', width: 100, pinned: 'left' },
+        { headerName: "#", field: "num", type: 'NumType', pinned: 'left', aggSum: "합계", cellStyle: CENTER, width: 30,
+			cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : (parseInt(params.value) + 1),
+        },
 		{ field: "closed_yn", headerName: "마감상태", pinned: 'left', width: 57,
-            cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : (CLOSED_STATUS[params.value] || '-'),
+            cellRenderer: (params) => params.node.rowPinned === 'top' ? '합계' : (CLOSED_STATUS[params.value] || '-'),
             cellStyle: (params) => ({
                 ...CENTER, 
                 "background-color": params.value === 'Y' ? '#E2FFE0' : params.value === 'N' ? '#FFE9E9' : 'none',
@@ -226,31 +176,36 @@
 		{ field: "grade_nm", headerName: "수수료등급", pinned: 'left', width: 65, cellStyle: CENTER },
         { headerName: "매출",
             children: [
-				{ field: "sales_amt", headerName: "매출합계", width: 100, headerClass: "merged-cell", type: 'currencyType',
+				{ field: "sales_amt", headerName: "매출합계", width: 100, headerClass: "merged-cell", type: 'currencyType', aggregation: true,
 					cellRenderer: (params) => {
 						if (params.value == undefined) return 0;
 						if (params.node.rowPinned === 'top') return params.valueFormatted;
 						return '<a href="#" onClick="openDetailPopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>';
 					}
 				},
-				{ field: "sales_amt_except_vat", headerName: "매출합계(-VAT)", width: 100, headerClass: "merged-cell", type: 'currencyType', cellStyle: {"background-color": "#ededed"} },
+				{ field: "sales_amt_except_vat", headerName: "매출합계(-VAT)", width: 100, headerClass: "merged-cell", type: 'currencyType', aggregation: true },
+				{ field: "extra_M1_amt", headerName: "마일리지(-VAT)", width: 100, headerClass: "merged-cell", type: 'currencyType', aggregation: true },
+				{ field: "wonga_amt", headerName: "원가", width: 100, headerClass: "merged-cell", type: 'currencyType', aggregation: true },
+				{ field: "sales_profit", headerName: "매출이익", width: 100, headerClass: "merged-cell", type: 'currencyType', aggregation: true,
+					cellStyle: (params) => params.node.rowPinned === 'top' ? '' : ({ 'color': '#0BAC00', 'background-color': '#fafffa' })
+				},
             ]
         },
-        // { field: "wonga_total", headerName: "원가", width: 100, type: 'currencyMinusColorType' },
-        // { field: "sales_profit", headerName: "매출이익", width: 100, type: 'currencyMinusColorType' }, // 매출이익 = 결제금액 - 원가 합계금액
-        // { field: "profit_rate",	headerName: "이익율(%)", width: 80, type: 'percentType' }, // 매출이익 분의 매출액 = 이익율
         { headerName: "판매 수수료",
             children: [
 				@foreach (@$pr_codes as $pr_code)
                 { headerName: "{{ @$pr_code->code_val }}",
                     children: [
-						{ headerName: "매출액(-VAT)", field: "sales_{{ @$pr_code->code_id }}_amt_except_vat", type: 'currencyType', width: 90, },
+						{ headerName: "매출액", field: "sales_{{ @$pr_code->code_id }}_amt", type: 'currencyType', width: 90, aggregation: true },
+						{ headerName: "매출액(-VAT)", field: "sales_{{ @$pr_code->code_id }}_amt_except_vat", type: 'currencyType', width: 90, aggregation: true },
                         { headerName: "수수료율", field: "sales_{{ @$pr_code->code_id }}_fee_rate", type: 'percentType', width: 60 },
-                        { headerName: "수수료", field: "sales_{{ @$pr_code->code_id }}_fee", type: 'numberType', width: 100 },
+                        { headerName: "수수료", field: "sales_{{ @$pr_code->code_id }}_fee", type: 'currencyType', width: 100, aggregation: true },
                     ]
                 },
 				@endforeach
-                { headerName: "수수료 합계", field: "sales_fee", type: 'numberType', width: 100, headerClass: "merged-cell" },
+                { headerName: "수수료 합계", field: "sales_fee", type: 'currencyType', width: 100, headerClass: "merged-cell", aggregation: true,
+					cellStyle: (params) => params.node.rowPinned === 'top' ? '' : ({ 'color': '#ff2222', 'background-color': '#fffafa', 'background-color': '#fffafa' }) 
+				},
                 // { headerName: "임대관리비", field: "management_fee", type: 'numberType', width: 100, headerClass: "merged-cell" },
             ]
         },
@@ -258,56 +213,80 @@
             children: [
                 { headerName: "정상1",
                     children: [
-                        { headerName: "매출액(-VAT)", field: "ord_JS1_amt_except_vat", type: 'currencyType', width: 90, },
+                        { headerName: "매출액", field: "ord_JS1_amt", type: 'currencyType', width: 90, aggregation: true },
+                        { headerName: "매출액(-VAT)", field: "ord_JS1_amt_except_vat", type: 'currencyType', width: 90, aggregation: true },
                         { headerName: "수수료율", field: "fee1", type: 'percentType', width: 60 },
-                        { headerName: "수수료", field: "fee_amt_JS1", type: 'currencyType', width: 90 },
+                        { headerName: "수수료", field: "fee_amt_JS1", type: 'currencyType', width: 90, aggregation: true },
                     ]
                 },
                 { headerName: "정상2",
                     children: [
-						{ headerName: "매출액(-VAT)", field: "ord_JS2_amt_except_vat", type: 'currencyType', width: 90 },
+						{ headerName: "매출액", field: "ord_JS2_amt", type: 'currencyType', width: 90, aggregation: true },
+						{ headerName: "매출액(-VAT)", field: "ord_JS2_amt_except_vat", type: 'currencyType', width: 90, aggregation: true },
                         { headerName: "수수료율", field: "fee2", type: 'percentType', width: 60 },
-                        { headerName: "수수료", field: "fee_amt_JS2", type: 'currencyType', width: 90 },
+                        { headerName: "수수료", field: "fee_amt_JS2", type: 'currencyType', width: 90, aggregation: true },
                     ]
                 },
                 { headerName: "정상3",
                     children: [
-						{ headerName: "매출액(-VAT)", field: "ord_JS3_amt_except_vat", type: 'currencyType', width: 90 },
+						{ headerName: "매출액", field: "ord_JS3_amt", type: 'currencyType', width: 90, aggregation: true },
+						{ headerName: "매출액(-VAT)", field: "ord_JS3_amt_except_vat", type: 'currencyType', width: 90, aggregation: true },
                         { headerName: "수수료율", field: "fee3", type: 'percentType', width: 60 },
-                        { headerName: "수수료", field: "fee_amt_JS3", type: 'currencyType', width: 90 },
+                        { headerName: "수수료", field: "fee_amt_JS3", type: 'currencyType', width: 90, aggregation: true },
                     ]
                 },
                 { headerName: "특가",
                     children: [
-						{ headerName: "매출액(-VAT)", field: "ord_TG_amt_except_vat", type: 'currencyType', width: 90 },
+						{ headerName: "매출액", field: "ord_TG_amt", type: 'currencyType', width: 90, aggregation: true },
+						{ headerName: "매출액(-VAT)", field: "ord_TG_amt_except_vat", type: 'currencyType', width: 90, aggregation: true },
                         { headerName: "수수료율", field: "fee_10", type: 'percentType', width: 60 },
-                        { headerName: "수수료", field: "fee_amt_TG", type: 'currencyType', width: 90 },
+                        { headerName: "수수료", field: "fee_amt_TG", type: 'currencyType', width: 90, aggregation: true },
                     ]
                 },
                 { headerName: "용품",
                     children: [
-						{ headerName: "매출액(-VAT)", field: "ord_YP_amt_except_vat", type: 'currencyType', width: 90 },
+						{ headerName: "매출액", field: "ord_YP_amt", type: 'currencyType', width: 90, aggregation: true },
+						{ headerName: "매출액(-VAT)", field: "ord_YP_amt_except_vat", type: 'currencyType', width: 90, aggregation: true },
                         { headerName: "수수료율", field: "fee_11", type: 'percentType', width: 60 },
-                        { headerName: "수수료", field: "fee_amt_YP", type: 'currencyType', width: 90 },
+                        { headerName: "수수료", field: "fee_amt_YP", type: 'currencyType', width: 90, aggregation: true },
                     ]
                 },
                 { headerName: "특가(온라인)",
                     children: [
-						{ headerName: "매출액(-VAT)", field: "ord_OL_amt_except_vat", type: 'currencyType', width: 90 },
-                        { headerName: "수수료율", field: "fee_12", type: 'percentType', width: 60 },
-                        { headerName: "수수료", field: "fee_amt_OL", type: 'currencyType', width: 90,
-							// cellRenderer: (params) => ['0', null].includes(params.value) ? 0 : (params.node.rowPinned === 'top' ? params.valueFormatted : '<a href="javascript:void(0);" onClick="openOnlineFeePopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>')
+						{ headerName: "매출액", field: "ord_OL_amt", type: 'currencyType', width: 90, aggregation: true,
+							cellRenderer: (params) => ['0', null].includes(params.value) ? 0 : (params.node.rowPinned === 'top' ? params.valueFormatted 
+								: '<a href="javascript:void(0);" onClick="openOnlineFeePopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>')
 						},
+						{ headerName: "매출액(-VAT)", field: "ord_OL_amt_except_vat", type: 'currencyType', width: 90, aggregation: true },
+                        { headerName: "수수료율", field: "fee_12", type: 'percentType', width: 60 },
+                        { headerName: "수수료", field: "fee_amt_OL", type: 'currencyType', width: 90, aggregation: true },
                     ]
                 },
-				{ headerName: "수수료 합계", field: "fee_amt", type: 'currencyMinusColorType', width: 90, headerClass: "merged-cell", cellStyle: {"background-color": "#ededed"} },
+				{ headerName: "수수료 합계", field: "fee_amt", type: 'currencyMinusColorType', width: 90, headerClass: "merged-cell", aggregation: true,
+					cellStyle: (params) => params.node.rowPinned === 'top' ? '' : ({ 'color': '#ff2222', 'background-color': '#fffafa' }) 
+				},
             ]
         },
-        { field: "extra_amt", headerName: "기타재반", type: 'currencyMinusColorType', width: 70,
-			// cellRenderer: (params) => ['0', null].includes(params.value) ? 0 : (params.node.rowPinned === 'top' ? params.valueFormatted : '<a href="javascript:void(0);" onClick="openExtraAmtPopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>')
+		{ headerName: "기타재반자료",
+			children: [
+				@foreach (@$extra_types as $entry_cd => $children)
+					@if (true)
+					{ headerName: `{{ $children[0]->entry_nm }} ${ PAYER["{{ $children[0]->payer }}"] || '' }`,
+						children: [
+							@foreach ($children as $child)
+								{ headerName: "{{ $child->type_nm }}", field: "extra_{{ $child->type_cd }}_amt", type: 'currencyType', width: 90, aggregation: true },
+							@endforeach
+							{ headerName: "합계", field: "extra_{{ $entry_cd }}_sum", type: 'currencyType', width: 90, aggregation: true,
+								cellStyle: (params) => params.node.rowPinned === 'top' ? '' : ({ 'color': '#ff2222', 'background-color': '#fffafa' }) 
+							},
+						]
+					},
+					@endif
+				@endforeach
+			]
 		},
-        { field: "real_profit", headerName: "총마진금액", type: 'currencyMinusColorType', width: 100 },
-        { field: "real_profit_rate", headerName: "마진율(%)", type: 'percentType', width: 60 },
+        { field: "real_profit", headerName: "영업이익", type: 'currencyType', width: 100, cellStyle: { 'font-weight': '700' }, aggregation: true, },
+        { field: "real_profit_rate", headerName: "영업이익율(%)", type: 'percentType', width: 100, cellStyle: { 'font-weight': '700' } },
         { width: "auto" }
     ];
 
@@ -325,6 +304,7 @@
                 if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#eee', 'border': 'none'};
             },
 		});
+		gx.Aggregation({ "sum": "top" });
 
 		Search();
 
@@ -336,7 +316,23 @@
 
 	function Search() {
 		const data = $('form[name="search"]').serialize();
-		gx.Request('/store/account/acc04/search', data, -1);
+		gx.Request('/store/account/acc04/search', data, -1, function(d) {
+			$("#current_date").text(d.head.date);
+		});
+	}
+
+	// 판매내역 상세
+	function openDetailPopup(store_cd) {
+		const sdate = $('input[name="sdate"]').val();
+		const url = '/store/account/acc06/show/' + store_cd + '/' + sdate;
+		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=800");
+	}
+
+	// 특약(온라인) 판매내역 상세
+	function openOnlineFeePopup(store_cd) {
+		const sdate = $('input[name="sdate"]').val();
+		const url = '/store/account/acc06/show-online?store_cd=' + store_cd + '&sdate=' + sdate;
+		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=800");
 	}
 
 </script>

@@ -123,7 +123,7 @@
 			<div class="filter_wrap">
 				<div class="fl_box flex_box">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
-					<p id="current_date" class="ml-2 text-danger fs-16 font-weight-bold"></p>
+					<p id="current_date" class="ml-3 pl-2 pr-2 fs-14 text-white bg-secondary rounded"></p>
 				</div>
 			</div>
 		</div>
@@ -252,7 +252,7 @@
 	function Search() {
 		let data = $('form[name="search"]').serialize();
 		gx.Request('/store/account/acc06/search', data, -1, function(d) {
-			$("#current_date").text("( " + d.head.date + " )");
+			$("#current_date").text(d.head.date);
 		});
 	}
 

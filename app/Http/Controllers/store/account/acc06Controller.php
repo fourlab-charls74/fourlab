@@ -160,7 +160,7 @@ class acc06Controller extends Controller
 								+ sum(if(el.type = 'G' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0))
 								+ sum(if(el.type = 'E' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0))
 							) * -1 as extra_S_amt
-							, sum(if(et.entry_cd = 'O' and el.type <> 'O1' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0)) as extra_C_amt
+							, sum(if(et.entry_cd = 'O' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0)) as extra_C_amt
 						from store_account_extra e
 							inner join store_account_extra_list el on el.ext_idx = e.idx
 							inner join store_account_extra_type et on et.type_cd = el.type
@@ -563,7 +563,7 @@ class acc06Controller extends Controller
 											+ sum(if(el.type = 'G' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0))
 											+ sum(if(el.type = 'E' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0))
 										) * -1 as extra_S_amt
-										, sum(if(et.entry_cd = 'O' and el.type <> 'O1' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0)) as extra_C_amt
+										, sum(if(et.entry_cd = 'O' and et.total_include_yn = 'Y', if(et.except_vat_yn = 'Y', el.extra_amt / 1.1, el.extra_amt), 0)) as extra_C_amt
 									from store_account_extra e
 										inner join store_account_extra_list el on el.ext_idx = e.idx
 										inner join store_account_extra_type et on et.type_cd = el.type
