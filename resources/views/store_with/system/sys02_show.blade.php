@@ -212,6 +212,7 @@
 <div class="resul_btn_wrap mt-3 d-block">
     <a href="javascript:Save();" class="btn btn-sm btn-primary submit-btn">저장</a>
     @if ($code !== '')
+    <a href="javascript:Change_seq();" class="btn btn-sm btn-primary submit-btn">메뉴 순서 변경</a>
     <a href="javascript:Delete();;" class="btn btn-sm btn-secondary delete-btn">삭제</a>
     @endif
     <a href="javascript:;" class="btn btn-sm btn-secondary" onclick="window.close()">취소</a>
@@ -279,11 +280,7 @@
                 }
             });
 
-            let seq = [];
-            gx2.gridOptions.api.forEachNode(function(node) {
-                seq.push(node.data.pid);
-            });
-
+          
             $.ajax({
                 method: 'put',
                 url: '/store/system/sys02/' + code,
@@ -305,6 +302,37 @@
             });
         }
         return true;
+    }
+
+    function Change_seq() {
+
+        let seq = [];
+            gx2.gridOptions.api.forEachNode(function(node) {
+                seq.push(node.data.pid);
+            });
+
+        $.ajax({
+            method: 'post',
+            url: '/store/system/sys02/' + code + '/change-seq',
+            data: {
+                seq : seq
+            },
+            dataType: 'json',
+            success: function(res) {
+                if (res.code == 200) {
+                    alert('메뉴순서가 변경 되었습니다.');
+                    opener.Search();
+                    Search2();
+                } else {
+                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                }
+            },
+            error: function(e) {
+                console.log(e.responseText)
+            }
+        });
+
+
     }
 
     function Delete() {

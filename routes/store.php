@@ -661,7 +661,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::delete('sys02/{code}', 'sys02Controller@delete');
 
         Route::get('sys02/{code?}/search', 'sys02Controller@role_search');
-        Route::get('sys02/{code?}/search-seq', 'sys02Controller@change_seq');
+        Route::get('sys02/{code?}/search-seq', 'sys02Controller@search_seq');
+        Route::post('sys02/{code?}/change-seq', 'sys02Controller@change_seq');
 
         //그룹관리
         Route::get('sys03', 'sys03Controller@index');
