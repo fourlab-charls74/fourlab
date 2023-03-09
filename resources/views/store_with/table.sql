@@ -993,10 +993,57 @@ CREATE TABLE `store_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='관리자 로그정보';
 
 
+-- 온라인 재고 매핑
+CREATE TABLE `bizest_stock_conf` (
+  `idx` int(11) NOT NULL COMMENT 'id',
+  `default_storage_cd` varchar(30) DEFAULT NULL COMMENT '대표창고 코드',
+  `default_storage_buffer` int(11) DEFAULT NULL COMMENT '대표창고 버퍼링값',
+  `online_storage_cd` varchar(30) DEFAULT NULL COMMENT '온라인창고 코드',
+  `online_storage_buffer` int(11) DEFAULT NULL COMMENT '온라인창고 버퍼링값',
+  `store_buffer_kind` char(1) DEFAULT 'A' COMMENT '매장 버퍼링 유형 (A : 통합, S : 개별)',
+  `store_tot_buffer` int(11) DEFAULT NULL COMMENT '매장 통합버퍼링 값',
+  `price_apply_yn` char(1) DEFAULT 'N' COMMENT '가격 반영 여부',
+  `id` varchar(30) DEFAULT NULL COMMENT '관리자 아이디',
+  `rt` datetime DEFAULT NULL COMMENT '등록일',
+  `ut` datetime DEFAULT NULL COMMENT '수정일',
+  PRIMARY KEY (`idx`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- 온라인 재고 매핑 매장관리
+CREATE TABLE `bizest_stock_store` (
+  `store_cd` varchar(30) NOT NULL COMMENT '매장코드',
+  `store_use_yn` char(1) DEFAULT 'Y' COMMENT '매장사용여부',
+  `buffer_cnt` int(11) DEFAULT NULL COMMENT '버퍼링 수',
+  `id` varchar(30) DEFAULT NULL COMMENT '관리자 아이디',
+  `rt` datetime DEFAULT NULL COMMENT '등록일',
+  `ut` datetime DEFAULT NULL COMMENT '수정일',
+  PRIMARY KEY (`store_cd`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- 온라인 재고 매핑 예외관리
+CREATE TABLE `bizest_stock_exp_product` (
+  `prd_cd` varchar(50) NOT NULL COMMENT '상품코드',
+  `store_limit_qty` int(11) DEFAULT NULL COMMENT '매장 제한수',
+  `storage_limit_qty` int(11) DEFAULT NULL COMMENT '창고 제한수',
+  `comment` varchar(255) DEFAULT NULL COMMENT '정보',
+  `id` varchar(30) DEFAULT NULL COMMENT '관리자 아이디',
+  `rt` datetime DEFAULT NULL COMMENT '등록일',
+  `ut` datetime DEFAULT NULL COMMENT '수정일',
+  PRIMARY KEY (`prd_cd`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+-- 온라인 재고 매핑 로그관리
+CREATE TABLE `bizest_stock_log` (
+  `idx` int(11) NOT NULL COMMENT 'id',
+  `price_apply_yn` char(1) DEFAULT NULL COMMENT '가격 반영 여부',
+  `store_buffer_kind` char(1) DEFAULT NULL COMMENT '매장 버퍼링 여부 (A : 통합, S : 개별)',
+  `store_cnt` int(11) DEFAULT NULL COMMENT '사용 매장 수',
+  `prd_stock_cnt` int(11) DEFAULT NULL COMMENT '결과 상품 재고 수',
+  `id` varchar(30) DEFAULT NULL COMMENT '관리자 아이디',
+  `rt` datetime DEFAULT NULL COMMENT '등록일',
+  `ut` datetime DEFAULT NULL COMMENT '수정일',
+  PRIMARY KEY (`idx`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 --
 -- 기존 테이블 컬럼 추가 시작
 --

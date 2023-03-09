@@ -266,6 +266,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
         // 온라인 재고 매핑
         Route::get('prd06', 'prd06Controller@index');
+        Route::get('prd06/create', 'prd06Controller@create');
     });
 
     // 생산입고관리
