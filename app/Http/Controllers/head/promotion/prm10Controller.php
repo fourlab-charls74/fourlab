@@ -224,7 +224,7 @@ class prm10Controller extends Controller
             -- IF (a.use_date_type = 'S', a.use_to_date, CONCAT(a.use_date, '일까지')) as use_to_date,
             a.use_fr_date,a.use_to_date,
             a.pub_dup_yn,
-            IF (a.coupon_amt_kind = 'W', a.coupon_amt, CONCAT(a.coupon_per, ' %')) AS coupon_amt, '' as pub_time,
+            IF (a.coupon_amt_kind = 'W', CONCAT(FORMAT(a.coupon_amt, 0), '원'), CONCAT(a.coupon_per, '%')) AS coupon_amt, '' as pub_time,
             (
             CASE
                 WHEN a.coupon_apply = 'AG' THEN '전체상품'
@@ -531,7 +531,7 @@ class prm10Controller extends Controller
             $coupon = new Coupon($user);
             $coupon_no = $coupon->setCouponInfo($values);
             // return $coupon_no;
-            $coupon -> delSerial($coupon_no);
+            $coupon->delSerial($coupon_no);
 
             $oldGoods = $this->__get_old_goods($coupon_no);
 
@@ -683,11 +683,12 @@ class prm10Controller extends Controller
 
 		$all['admin_id']			= Auth('head')->user()->id;
 		$all['pub_time']			= Request('pub_time');
-		//$all['pub_type']			= Request('pub_type');
+		$all['pub_type']			= Request('pub_type');
 		$all['pub_dup_yn']			= Request('pub_dup_yn', "N");
 		$all['coupon_type']			= Request('coupon_type', '');
 		$all['coupon_pub_kind']		= Request('coupon_pub_kind', '');
-        $all['use_date_alarm'] = Request('use_date_alarm_day', "");
+        $all['use_date_alarm_yn']   = Request('use_date_alarm_yn', "");
+        $all['use_date_alarm']      = Request('use_date_alarm_day', "");
         $all['use_date']			= $all['use_date'] ? Lib::uncm($all['use_date']) : 0;
 
         // 발급일 기준 유효기간 추가

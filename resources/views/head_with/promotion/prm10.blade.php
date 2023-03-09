@@ -140,6 +140,7 @@
 
 <script>
     let gx;
+    const CENTER = { 'text-align': 'center' };
 
     $(document).ready(function() {
         let columns = [
@@ -149,29 +150,29 @@
                 checkboxSelection: true,
                 width:28,
             },
-            {field:"coupon_no" , headerName:"번호"},
+            {field:"coupon_no" , headerName:"번호", cellStyle: CENTER},
             {
                 field:"coupon_nm",
                 headerName:"쿠폰명",
                 width:220,
                 type:"HeadCouponType"
             },
-            {field:"coupon_type_nm" , headerName:"구분"},
+            {field:"coupon_type_nm" , headerName:"구분", cellStyle: CENTER},
             {
                 headerName:"발행기간",
                 children : [
-                    {headerName:"시작", field:"pub_fr_date", width:80},
-                    {headerName:"종료", field:"pub_to_date", width:80}
+                    {headerName:"시작", field:"pub_fr_date", width:80, cellStyle: CENTER},
+                    {headerName:"종료", field:"pub_to_date", width:80, cellStyle: CENTER}
                 ]
             },
             {
                 headerName:"유효기간",
                 children : [
-                    {headerName:"시작", field:"use_fr_date", width:100},
-                    {headerName:"종료", field:"use_to_date", width:100}
+                    {headerName:"시작", field:"use_fr_date", width:80, cellStyle: CENTER},
+                    {headerName:"종료", field:"use_to_date", width:80, cellStyle: CENTER}
                 ]
             },
-            {field:"pub_dup_yn" , headerName:"복수발급", width: 70, cellStyle:{"text-align" : "center"},
+            {field:"pub_dup_yn" , headerName:"복수발급", width: 70, cellStyle: CENTER,
                 cellRenderer: function(params) {
                     if(params.value == 'Y') return "예"
                     else if(params.value == 'N') return "아니오"
@@ -180,13 +181,14 @@
             },
             {field:"coupon_amt" , headerName:"발행금액", cellClass:'hd-grid-number'},
             {field:"pub_time" , headerName:"발행시점"},
-            {field:"coupon_apply" , headerName:"사용가능 대상"},
+            {field:"coupon_apply" , headerName:"사용가능 대상", cellStyle: CENTER},
             {
                 field:"pub_cnt",
                 headerName:"발행수",
                 cellStyle : function(p){
                     if (p.value && p.value != "무제한")
                         return { 'text-align' : 'right' }
+                    else return {...CENTER}
                 },
                 cellRenderer: function(p) {
                     if (p.value && p.value != "무제한") {
@@ -206,15 +208,15 @@
                 }
             },
             {field:"coupon_order_cnt" , headerName:"사용수", type: 'currencyType'},
-            {field:"use_yn" , headerName:"사용여부", width: 70, cellStyle:{"text-align" : "center"},
+            {field:"use_yn" , headerName:"사용여부", width: 70, cellStyle: CENTER,
                 cellRenderer: function(params) {
                     if(params.value == 'Y') return "예"
                     else if(params.value == 'N') return "아니오"
                     else return params.value
                 }
             },
-            {field:"admin_nm" , headerName:"발행자"},
-            {field:"regi_date" , headerName:"등록일시"},
+            {field:"admin_nm" , headerName:"발행자", width: 80, cellStyle: CENTER},
+            {field:"regi_date" , headerName:"등록일시", width: 80, cellStyle: CENTER},
             {width:"auto"}
         ];
         

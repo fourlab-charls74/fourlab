@@ -1041,6 +1041,15 @@ ALTER TABLE `bizest_smart`.`mgr_user` ADD COLUMN `store_nm` VARCHAR(100) NULL CO
 
 ALTER TABLE `bizest_smart`.`notice_store_detail` ADD COLUMN `check_date` DATETIME NULL COMMENT '공지사항확인일시' AFTER `check_yn`;
 
+-- 쿠폰
+ALTER TABLE `bizest_smart`.`coupon` ADD COLUMN `pub_time` INT(11) NULL DEFAULT NULL COMMENT '발행시점' AFTER `coupon_type`;
+ALTER TABLE `bizest_smart`.`coupon` ADD COLUMN `pub_type` VARCHAR(1) NULL DEFAULT 'N' COMMENT '발행방법(매월:M,특정일:D,특정요일:W)' AFTER `pub_to_date`;
+ALTER TABLE `bizest_smart`.`coupon` ADD COLUMN `pub_day` INT(11) NULL DEFAULT NULL COMMENT '발행가능일(일자/요일)' AFTER `pub_type`;
+ALTER TABLE `bizest_smart`.`coupon` ADD COLUMN `use_date_type` CHAR(1) NOT NULL DEFAULT 'S' COMMENT '유효기간 유형' AFTER `pub_day`;
+ALTER TABLE `bizest_smart`.`coupon` ADD COLUMN `use_date_alarm_yn` CHAR(1) NULL DEFAULT NULL COMMENT '유효기간 알림 사용 여부' AFTER `use_date_type`;
+ALTER TABLE `bizest_smart`.`coupon` ADD COLUMN `use_date_alarm_day` INT(11) NULL DEFAULT NULL COMMENT '유효기간 알림 기간(일)' AFTER `use_date_alarm_yn`;
+ALTER TABLE `bizest_smart`.`coupon` ADD COLUMN `use_date` VARCHAR(4) NOT NULL DEFAULT '' COMMENT '유효기간 쿠폰발급일 기준(설정일/발급일 : S/P)' AFTER `use_to_date`;
+
 --
 -- 기존 테이블 컬럼 추가 종료
 --

@@ -112,9 +112,9 @@
                                                     <div class="form-inline">
                                                         <div class="docs-datepicker form-inline-inner input_box">
                                                             <div class="input-group">
-                                                                <input type="text" class="form-control form-control-sm docs-date" name="pub_fr_date" id="pub_fr_date" value="{{@$coupon->pub_fr_date}}" autocomplete="off" disable>
+                                                                <input type="text" class="form-control form-control-sm docs-date" name="pub_fr_date" id="pub_fr_date" value="{{@$coupon->pub_fr_date}}" autocomplete="off">
                                                                 <div class="input-group-append">
-                                                                    <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
+                                                                    <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
                                                                     <i class="fa fa-calendar" aria-hidden="true"></i>
                                                                     </button>
                                                                 </div>
@@ -153,7 +153,7 @@
                                                                 <label class="custom-control-label" for="use_date_type_P">발급일 기준</label>
                                                             </div>
                                                         </div>
-                                                        <div style="display: flex" class="my-1 use_date_p" @if(!isset($coupon->use_date_type) || @$coupon->use_date_type == 'S') style="display:none" @endif>
+                                                        <div class="my-1 use_date_p" @if(!isset($coupon->use_date_type) || @$coupon->use_date_type == 'S') style="display:none;" @else style="display:flex;" @endif>
                                                             <div class="txt_box">발급일 ~&nbsp;</div>
                                                             <input 
                                                                 type="text" 
@@ -167,13 +167,13 @@
                                                             />
                                                             <div class="txt_box">&nbsp;일 까지</div>
                                                         </div>
-                                                        <div class="my-1 use_date_s" style="display:@if(@$coupon->use_date_type == 'P') none @else block @endif">
+                                                        <div class="my-1 use_date_s" @if(@$coupon->use_date_type == 'P') style="display:none;" @else style="display:flex;" @endif>
                                                             <div class="form-inline">
                                                                 <div class="docs-datepicker form-inline-inner input_box">
                                                                     <div class="input-group">
-                                                                        <input type="text" class="form-control form-control-sm docs-date" name="use_fr_date" id="use_fr_date" value="{{@$coupon->use_fr_date}}" autocomplete="off" disable>
+                                                                        <input type="text" class="form-control form-control-sm docs-date" name="use_fr_date" id="use_fr_date" value="{{@$coupon->use_fr_date}}" autocomplete="off">
                                                                         <div class="input-group-append">
-                                                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
+                                                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
                                                                             <i class="fa fa-calendar" aria-hidden="true"></i>
                                                                             </button>
                                                                         </div>
@@ -268,7 +268,7 @@
                                                                 <label class="custom-control-label" for="pub_type_w">매주</label>
                                                             </div>
                                                         </div>
-                                                        <select name="pub_dayofweek" class="form-control form-control-sm" onclick="changeRadio(document.detail.pub_type, 3);" style="width:110px;" >
+                                                        <select name="pub_dayofweek" class="form-control form-control-sm" onclick="changeRadio(document.detail.pub_type, 3);" style="width:110px;" @if(@$coupon->coupon_type != "E") disabled @endif>
                                                             <option value="0" @if(@$coupon->pub_type == "W" && @$coupon->pub_day == '0') selected @endif>일요일</option>
                                                             <option value="1" @if(@$coupon->pub_type == "W" && @$coupon->pub_day == '1') selected @endif>월요일</option>
                                                             <option value="2" @if(@$coupon->pub_type == "W" && @$coupon->pub_day == '2') selected @endif>화요일</option>
@@ -617,7 +617,7 @@
             return false;
         }
 
-        //if (getRadioValue('use_date_type') == "S"){
+        if (getRadioValue('use_date_type') == "S") {
             if ($('#use_fr_date').val() == "")
             {
                 alert("쿠폰 유효 시작 기간을 입력해 주십시오.");
@@ -629,14 +629,14 @@
                 alert("쿠폰 유효 종료 기간을 입력해 주십시오.");
                 return false;
             }
-        //} else {
-        //    if ($('#use_date').val() == "")
-        //    {
-        //        alert("쿠폰 유효 기간을 입력해 주십시오.");
-        //        $('#use_date').focus();
-        //        return false;
-        //    }
-        //}
+        } else {
+           if ($('#use_date').val() == "")
+           {
+               alert("쿠폰 유효 기간을 입력해 주십시오.");
+               $('#use_date').focus();
+               return false;
+           }
+        }
 
         if (getRadioValue('pub_dup_yn') == undefined)
         {
@@ -796,7 +796,7 @@
         createSaveData();
 
         const data = $('form[name="detail"]').serialize();
-        
+
         $.ajax({    
             type: "put",
             url: `/head/promotion/prm10/${coupon_no}`,
