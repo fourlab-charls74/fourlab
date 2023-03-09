@@ -147,6 +147,9 @@
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
 					<p id="current_date" class="ml-3 pl-2 pr-2 fs-14 text-white bg-secondary rounded"></p>
 				</div>
+				<div class="fr_box">
+					<a href="javascript:void(0);" onclick="return openHelpModal();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="fas fa-question-circle fa-sm"></i> 도움말</a>
+				</div>
 			</div>
 		</div>
 		<div class="table-responsive">
@@ -154,6 +157,35 @@
 		</div>
 	</div>
 </div>
+
+<!-- 도움말 모달 -->
+<div id="HelpModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="HelpModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 30%;max-width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title mt-0" id="HelpModalLabel">도움말</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body show_layout" style="background:#f5f5f5;">
+                <div class="card_wrap search_cum_form write">
+                    <div class="card shadow">
+                        <form name="search_prdcd_range" method="get" onsubmit="return false">
+                            <div class="card-body">
+								<p class="fs-12 mb-2"><i class="bx bx-won fs-16 text-primary"></i> <span class="fs-14 font-weight-bold mr-2">매출이익</span> 매출합계(-VAT) - 마일리지(-VAT) - 원가</p>
+								<p class="fs-12 mb-2"><i class="bx bx-won fs-16 text-primary"></i> <span class="fs-14 font-weight-bold mr-2">수수료</span> 매출액(-VAT) x 수수료율 % 100</p>
+								<p class="fs-12 mb-2"><i class="bx bx-won fs-16 text-primary"></i> <span class="fs-14 font-weight-bold mr-2">영업이익</span> 매출이익 - 판매수수료 - 중간관리자수수료 - 기타재반자료(인건비 + 본사부담금)</p>
+								<p class="fs-12"><i class="bx bx-won fs-16 text-primary"></i> <span class="fs-14 font-weight-bold mr-2">영업이익율</span> 영업이익 % 매출합계 x 100</p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script language="javascript">
 	const CLOSED_STATUS = { 'Y': '마감완료', 'N': '마감추가' };
 	const PAYER = { 'C': '(본사부담)', 'S': '(매장부담)' };
@@ -346,6 +378,12 @@
 			window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=800");
 		}
 	}
+
+	// 도움말 모달 오픈
+	function openHelpModal() {
+        $("#HelpModal").draggable();
+        $('#HelpModal').modal({ keyboard: false });
+    }
 
 </script>
 @stop
