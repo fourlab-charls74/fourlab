@@ -156,15 +156,16 @@ class SLib
     public static function getLnbs($type)
     {
         if($type == 'store') {
-            $query = DB::table('store_controller');
+            $query = DB::table('store_controller as lnb');
         } else if ($type == 'shop') {
-            $query = DB::table('shop_controller');
+            $query = DB::table('shop_controller as lnb');
         } else if ($type == 'head') {
-            $query = DB::table('mgr_controller');
+            $query = DB::table('mgr_controller as lnb');
         }
         $query = $query->where('menu_no', '>', 1);
         $query = $query->where('is_del', 0);
         $query = $query->where('state', '>=', 0);
+        $query = $query->orderby('entry', 'asc');
         $query = $query->orderbyRaw('seq is null asc');
         $query = $query->orderby('seq', 'asc');
         return $query->get();
