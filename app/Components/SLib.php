@@ -165,6 +165,7 @@ class SLib
         $query = $query->where('menu_no', '>', 1);
         $query = $query->where('is_del', 0);
         $query = $query->where('state', '>=', 0);
+        $query = $query->orderbyRaw('seq is null asc');
         $query = $query->orderby('seq', 'asc');
         return $query->get();
     }
