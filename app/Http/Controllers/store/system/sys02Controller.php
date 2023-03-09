@@ -390,13 +390,6 @@ class sys02Controller extends Controller
                     }
                 }
 
-                dd(count($seq));
-                // for($i=0;$i<count($seq);$i++){
-                //     DB::table('code')
-                //         ->where('code_kind_cd','=',$code)
-                //         ->where('code_id','=',$code_ids[$i])
-                //         ->update(['code_seq' => $i+1]);
-                // }
             });
             $code = 200;
             $msg = "";

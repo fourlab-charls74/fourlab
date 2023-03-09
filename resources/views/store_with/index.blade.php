@@ -53,7 +53,7 @@
                         <div class="tab-pane fade" id="order_amt" role="tabpanel" aria-labelledby="order_amt-tab">
                             <div class="card shadow mb-1" style="margin-top:26px">
                                 <div style="text-align:right">
-                                    <span style="font-size: 17px; font-weight:bold">[ {{@$sdate2}} ~ {{@$edate2}} ]</span>
+                                    <span style="font-size: 17px;">[ {{@$sdate2}} ~ {{@$edate2}} ]</span>
                                 </div>
                                 <canvas id="myChart3"></canvas>
                             </div>
@@ -61,7 +61,7 @@
                         <div class="tab-pane fade" id="order_qty" role="tabpanel" aria-labelledby="order_qty-tab">
                             <div class="card shadow mb-1" style="margin-top:26px">
                                 <div style="text-align:right">
-                                    <span style="font-size: 17px; font-weight:bold">[ {{@$sdate2}} ~ {{@$edate2}} ]</span>
+                                    <span style="font-size: 17px;">[ {{@$sdate2}} ~ {{@$edate2}} ]</span>
                                 </div>
                                 <canvas id="myChart4" ></canvas>
                             </div>

@@ -12,7 +12,7 @@
             </div>
         </div>
         <div class="d-flex">
-            <a href="javascript:void(0)" onclick="Save('{{ @$cmd }}')" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
+            <a href="javascript:void(0)" onclick="Save();" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
             <a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i> 닫기</a>
         </div>
     </div>
@@ -44,7 +44,7 @@
                                                 <div class="form-inline">
                                                     <div class="docs-datepicker form-inline-inner input_box w-100">
                                                         <div class="input-group">
-                                                            <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="" autocomplete="off">
+                                                            <input type="text" class="form-control form-control-sm docs-date" name="change_date" id="change_date" value="{{@$edate}}" autocomplete="off">
                                                             <div class="input-group-append">
                                                                 <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
                                                                     <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -55,16 +55,11 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <th class="required"></th>
+                                            <th></th>
                                             <td>
                                                 <div class="form-inline inline_select_box">
                                                     <div class="d-flex w-100">
-                                                        <!-- <select name="target_type" id="target_type" class="form-control form-control-sm mr-1" style="min-width: 90px;">
-                                                            <option value="C">공급업체</option>
-                                                            <option value="S">창고</option>
-                                                        </select>
-                                                        <select name="target_cd" id="target_cd" class="form-control form-control-sm w-100">
-                                                        </select> -->
+                                                        
                                                     </div>
                                                 </div>
                                             </td>
@@ -81,8 +76,19 @@
             <div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
                 <a href="#">상품정보</a>
                 <div class="d-flex">
+                    <div class="d-flex mr-1 mb-1 mb-lg-0">
+                        <span class="mr-1" style="margin-top:5px;">선택한 상품을</span>
+                        <input type='text' id="change_price" name='change_price' class="form-control form-control-sm" style="width:90px;">
+                        <select id='change_kind' name='change_kind' class="form-control form-control-sm ml-1"  style='width:70px;display:inline;'>
+                                <option value=''>선택</option>
+                                <option value='P'>%</option>
+                                <option value='W'>원</option>
+                        </select>
+                        <button type="button" onclick="change_apply(false);" class="btn btn-sm btn-primary shadow-sm ml-1" id="change_btn"> 적용</button>
+                    </div>
+                    <span class="d-none d-lg-block ml-1 mr-2 tex-secondary" style="font-size:large">|</span>
                     <button type="button" onclick="addGoods();" class="btn btn-sm btn-primary shadow-sm mr-1" id="add_row_btn"><i class="bx bx-plus"></i> 상품추가</button>
-                    <button type="button" onclick="delGoods();" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn"><i class="bx bx-trash"></i> 삭제</button>
+                    <button type="button" onclick="delGoods();" class="btn btn-sm btn-outline-primary shadow-sm" id="add_row_btn"><i class="bx bx-trash"></i> 삭제</button>
                 </div>
             </div>
             <div class="card-body">
@@ -96,9 +102,7 @@
 
 <script language="javascript">
     let columns = [
-        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"},
-            cellRenderer: params => params.node.rowPinned == 'top' ? '' : params.data.count,
-        },
+        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 29},
         {field: "prd_cd", headerName: "바코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
         {field: "goods_no", headerName: "온라인코드", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
@@ -129,6 +133,8 @@
         // Search();
     });
 
+   
+
 
     // 등록된 상품리스트 가져오기
     function GetProducts() {
@@ -150,7 +156,6 @@
         if (Array.isArray(rows) && !(rows.length > 0)) return alert("삭제할 상품을 선택해주세요.");
 
         rows.filter((row, idx) => row.isEditable).map((row) => { deleteRow(row); });
-        updatePinnedRow();
     };
 
     /***************************************************************************/
@@ -183,13 +188,8 @@
     var addRow = (row) => { // goods_api에서 opener 함수로 사용하기 위해 var로 선언
         const count = gx.gridOptions.api.getDisplayedRowCount() + callbaackRows.length;
         row = { 
-            ...row, 
-            item: row.opt_kind_nm, 
-            qty: 0,
-            return_price: row.price,
-            total_return_price: 0,
-            isEditable: true,
-            count: count + 1,
+            ...row,
+            change_val : 0
         };
         callbaackRows.push(row);
     };
@@ -197,6 +197,81 @@
     var setGoodsRows = () => {
         gx.gridOptions.api.applyTransaction({ add : callbaackRows });
         callbaackRows = [];
+    }
+
+    function change_apply(is_zero = false) {
+
+        let change_price = parseInt($('#change_price').val());
+        let rows = gx.getSelectedRows();
+
+        if(rows.length < 1) {
+            alert('가격을 변경할 상품을 선택해주세요.');
+        } else if (change_price == '') {
+            alert('변경금액(율)을 입력해주세요');
+        } else if (change_kind == '') {
+            alert('변경종류를 선택해주세요.') 
+        } else {
+            const change_rows = gx.getSelectedRows().map(row => ({
+                ...row, 
+                change_val : change_price 
+            }));
+
+            gx.gridOptions.api.setRowData([]);
+            gx.gridOptions.api.applyTransaction({ add : change_rows });
+            gx.gridOptions.api.forEachNode(node => node.setSelected(!is_zero)); 
+        }
+       
+    }
+
+    // const change_apply = () => {
+    //     let change_price = parseInt($('#change_price').val());
+    //     let change_kind = $('#change_kind').val();
+    //     const rows = gx.getSelectedRows().map(row => ({
+    //         ...row, 
+    //        change_val : change_price 
+    //     }));
+    //     gx.gridOptions.api.setRowData([]);
+    //     gx.gridOptions.api.applyTransaction({ add : rows });
+        
+    // }
+    
+    function Save() {
+        let change_date = $('#change_date').val();
+        let change_price = parseInt($('#change_price').val());
+        let change_kind = $('#change_kind').val();
+        let rows = gx.getSelectedRows();
+        let change_cnt = rows.length;
+
+        if(rows.length < 1) return alert('저장할 상품을 선택해주세요.');
+
+        if(!confirm("선택한 상품의 가격을 변경하시겠습니까?")) return;
+
+        axios({
+            url: '/store/product/prd05/change-price',
+            method: 'put',
+            data: {
+                data: rows,
+                change_date : change_date,
+                change_kind : change_kind,
+                change_price : change_price,
+                change_cnt : change_cnt
+            },
+        }).then(function (res) {
+            if(res.data.code === 200) {
+                alert(res.data.msg);
+                window.close();
+                opener.Search();
+            } else {
+                console.log(res.data);
+                alert("상태변경 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
+
+
+        
+
     }
 
 </script>

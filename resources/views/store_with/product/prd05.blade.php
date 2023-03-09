@@ -180,13 +180,13 @@
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
-        // Search();
+        Search();
     });
 
-    // function Search() {
-    //     let data = $('form[name="search"]').serialize();
-    //     gx.Request('/store/system/sys02/search', data);
-    // }
+    function Search() {
+        let data = $('form[name="search"]').serialize();
+        gx.Request('/store/product/prd05/search', data);
+    }
 
     function Add () {
         const url = '/store/product/prd05/show/';
