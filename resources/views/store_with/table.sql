@@ -1036,7 +1036,7 @@ CREATE TABLE `bizest_stock_exp_product` (
 CREATE TABLE `bizest_stock_log` (
   `idx` int(11) NOT NULL COMMENT 'id',
   `price_apply_yn` char(1) DEFAULT NULL COMMENT '가격 반영 여부',
-  `store_buffer_kind` char(1) DEFAULT NULL COMMENT '매장 버퍼링 여부 (A : 통합, S : 개별)',
+  `store_buffer_kind` char(1) DEFAULT NULL COMMENT '매장 버퍼링 유형 (A : 통합, S : 개별)',
   `store_cnt` int(11) DEFAULT NULL COMMENT '사용 매장 수',
   `prd_stock_cnt` int(11) DEFAULT NULL COMMENT '결과 상품 재고 수',
   `id` varchar(30) DEFAULT NULL COMMENT '관리자 아이디',
