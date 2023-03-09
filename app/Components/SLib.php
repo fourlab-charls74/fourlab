@@ -162,6 +162,10 @@ class SLib
         } else if ($type == 'head') {
             $query = DB::table('mgr_controller as lnb');
         }
+        $query = $query->selectRaw('
+            lnb.*,
+            (select entry from store_controller where menu_no = lnb.entry and lev > 1) as main_no
+        ');
         $query = $query->where('menu_no', '>', 1);
         $query = $query->where('is_del', 0);
         $query = $query->where('state', '>=', 0);

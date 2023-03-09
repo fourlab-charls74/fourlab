@@ -57,22 +57,26 @@ class LoginController extends Controller
                     ]);
 
                 // LNB 메뉴생성
-                $menu['store']  = SLib::getLnbs('store');
-                $menu['shop']   = SLib::getLnbs('shop');
-                $menu['head']   = SLib::getLnbs('head');
+                $kind['store']  = SLib::getLnbs('store');
+                $kind['shop']   = SLib::getLnbs('shop');
+                $kind['head']   = SLib::getLnbs('head');
 
-                $menu_list = [];
-                foreach($menu as $key => $value) {
-                    foreach($value as $sub_value) {
-                        $array_sub_value = (array)$sub_value;
-                        if(isset($menu_list[$key][$array_sub_value['entry']])) {
-                            $menu_list[$key][$array_sub_value['entry']]['sub'][$array_sub_value['menu_no']] = $array_sub_value;
+                $menu = [];
+                foreach($kind as $key => $kind_val) {
+                    foreach($kind_val as $menu_val) {
+                        $arr_menu = (array)$menu_val;
+                        if(isset($menu[$key][$arr_menu['entry']])) {
+                            $menu[$key][$arr_menu['entry']]['sub'][$arr_menu['menu_no']] = $arr_menu;
                         } else {
-                            $menu_list[$key][$array_sub_value['menu_no']] = $array_sub_value;
+                            if($arr_menu['main_no']) {
+                                $menu[$key][$arr_menu['main_no']]['sub'][$arr_menu['entry']]['sub'][$arr_menu['menu_no']] = $arr_menu;
+                            } else {
+                                $menu[$key][$arr_menu['menu_no']] = $arr_menu;
+                            }
                         }
                     }
-                    $menu_html[$key] = view(Config::get('shop.'.$key.'.view') . '/layouts/lnb', ['menu_list' => $menu_list[$key]])->render();
-                    Cache::forever($key.'_lnb', $menu_html[$key]);
+                    $html[$key] = view(Config::get('shop.'.$key.'.view') . '/layouts/lnb', ['menu_list' => $menu[$key]])->render();
+                    Cache::forever($key.'_lnb', $html[$key]);
                 }
 
                 return redirect('/shop');
