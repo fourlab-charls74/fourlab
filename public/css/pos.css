@@ -98,6 +98,7 @@ textarea::placeholder {color: #999;font-size: inherit;}
 .bg-mint {background-color: #00B4AB;}
 .bg-blue {background-color: #0269A4;}
 .bg-navy {background-color: #011B56;}
+.bg-purple {background-color: #706AB6;}
 .bg-main {background-color: #222222;}
 .bg-trans {background-color: transparent;}
 
@@ -116,14 +117,18 @@ textarea::placeholder {color: #999;font-size: inherit;}
 .ag-header-row {height: 50px !important;}
 .main-grid {
     display: grid;
-    grid-template-columns: repeat(4, 200px);
-    grid-template-rows: repeat(4, 200px);
+    grid-template-columns: repeat(8, 100px);
+    grid-template-rows: repeat(8, 95px);
     gap: 12px;
     grid-template-areas: 
-        'a a b b'
-        'a a b b'
-        'c d e e'
-        'f g e e'
+        'a a a a b b b b'
+        'a a a a b b b b'
+        'a a a a b b b b'
+        'a a a a b b b b'
+        'c c d h e e e e'
+        'c c d h e e e e'
+        'f f g g e e e e'
+        'f f g g e e e e'
 }
 table.prd_info_table tr:not(:last-child) {border-bottom: 1px solid #bbb;}
 table.prd_info_table th {padding: 1.23rem;width: 100px;text-align: center;background-color: #e2e2e2;}
@@ -159,8 +164,9 @@ table.prd_info_table td {text-align: right;font-weight: bold;}
     color: #ffffff;
     background-color: #222222 !important;
 }
-table.search_table th {min-width: 15%;font-size: 1.1rem !important;font-weight: 400;}
+table.table th {width: 120px !important; vertical-align: middle;}
+/* table.search_table th {min-width: 15%;font-size: 1.1rem !important;font-weight: 400;}
 table.search_table td {width: 35%;}
 @media (max-width: 740px) {
     table.search_table td {float: unset !important;width: 100% !important;}
-}
+} */

@@ -518,4 +518,8 @@ class mem01Controller extends Controller
 		]);
 	}
 
+	// 회원 아이디 중복체크
+	public function check_id($id) {
+		return DB::table('member')->where('user_id', $id)->count();
+    }
 }

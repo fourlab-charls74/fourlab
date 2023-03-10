@@ -497,7 +497,7 @@
         let user_id = $("#user_id").val();
         if(user_id.trim().length < 1) return alert("아이디를 입력해주세요.");
 
-        let { data: cnt, status } = await axios({ url: '/head/member/mem01/check-id/' + user_id, method: 'get'});
+        let { data: cnt, status } = await axios({ url: '/shop/member/mem01/check-id/' + user_id, method: 'get'});
 
         if(status != 200) return alert("중복확인 중 오류가 발생했습니다.\n다시 시도해주세요.");
 
@@ -726,6 +726,54 @@
         $('#searchOrdNoModal').modal('hide');
         $("#search_ord_no").val('');
         $("#search_ord_no_result").html('');
+    }
+
+    /** 쿠폰등록 시 고객명으로 고객정보 검색 */
+    async function searchUserInCouponModal() {
+        const keyword = $("#cp_user_nm").val();
+
+        if (keyword == '') return $('#cp_user_nm').trigger('focus');
+
+        const { data, status } = await axios({ 
+            method: 'get', 
+            url: "/shop/pos/search/member?search_type=user_nm&search_keyword=" + keyword 
+        });
+        if (status === 200) {
+            const users = data.body;
+            let html = "";
+
+            if (users.length < 1) {
+                html += "<option value=''>---</option>";
+            } else {
+                html += users.reduce((a, c) => a + `<option value="${c.user_id}">[${c.user_id}] ${c.user_nm} ${c.mobile}</option>`, "");
+            }
+            $("#cp_user_id").html(html);
+        }
+    }
+
+    /** 오프라인 쿠폰 등록 */
+    function addCoupon() {
+        const user_id = $("#cp_user_id").val().trim();
+        const serial_num = $("#cp_serial_num").val().trim();
+
+        if (user_id === '') return alert("고객정보를 선택해주세요.");
+        if (serial_num === '') return alert("쿠폰의 시리얼넘버를 입력해주세요.");
+        
+        axios({
+            url: '/shop/pos/add-coupon',
+            method: 'post',
+            data: { user_id, serial_num },
+        }).then(function (res) {
+            if(res.data.code == 200) {
+                console.log(res);
+                // 개발중입니다.
+            } else {
+                alert(res.data.msg);
+                console.log(res);
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
     }
 
     /** ETC */

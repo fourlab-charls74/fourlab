@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\shop\pos;
 
-use App\Components\SLib;
 use App\Http\Controllers\Controller;
+use App\Components\SLib;
 use App\Components\Lib;
 use App\Models\Conf;
+use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\Point;
 use Illuminate\Http\Request;
@@ -14,9 +15,6 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Exception;
-
-// 테스트매장 -- 추후변경필요
-//const STORE_CD = 'L0027';
 
 class PosController extends Controller
 {
@@ -259,7 +257,7 @@ class PosController extends Controller
 
         $page = $request->input('page', 1);
         if ($page < 1 or $page == '') $page = 1;
-        $limit = 500;
+        $limit = $request->input('limit', 500);
 
         $page_size = $limit;
         $startno = ($page - 1) * $page_size;
@@ -1203,6 +1201,45 @@ class PosController extends Controller
         }
 
         return response()->json(['code' => $code, 'msg' => $msg], 200);
+    }
+
+    /** 오프라인 쿠폰 등록 */
+    public function add_coupon(Request $request)
+    {
+        $code = 0;
+        $msg = '';
+
+        $user_id = $request->input('user_id', '');
+        $serial_num = $request->input('serial_num', '');
+
+        // test
+        // $serial_num = '146057F75A0C';
+
+        $user = [
+            'id' => Auth('head')->user()->id,
+            'name' => Auth('head')->user()->name
+        ];
+
+        try {
+            DB::beginTransaction();
+
+            // $coupon = new Coupon($user);
+            // $result = $coupon->offCouponAdd($user_id, $serial_num);
+            // dd($user_id, $serial_num, $result);
+
+            dd('개발중입니다.');
+
+            DB::commit();
+
+            $code = 200;
+            $msg = '오프라인쿠폰이 정상적으로 등록되었습니다.';
+        } catch (Exception $e) {
+            DB::rollback();
+
+            $code = 500;
+            $msg = $e->getMessage();
+        }
+        return response()->json(['code' => $code, 'msg' => $msg], $code);
     }
 }
 

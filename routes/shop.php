@@ -91,6 +91,7 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         Route::get('search/{cmd?}', 'PosController@search_command');
         Route::post('save', 'PosController@save');
         Route::post('add-member', 'PosController@add_member');
+        Route::post('add-coupon', 'PosController@add_coupon');
         Route::delete('remove-waiting', 'PosController@remove_waiting');
     });
 
@@ -514,6 +515,7 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         Route::get('mem01','mem01Controller@index');
         Route::get('mem01/search', 'mem01Controller@search');
         Route::get('mem01/batch', 'mem01Controller@batch');
+        Route::get('mem01/check-id/{id}', 'mem01Controller@check_id');
         Route::post('mem01/upload',	'mem01Controller@upload');
         Route::put('mem01/batch', 'mem01Controller@update');
     });

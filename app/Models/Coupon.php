@@ -561,4 +561,37 @@ class Coupon
         	return -1;
         }
 	}
+
+	/**
+	* 오프라인 쿠폰 지급 시 에러상황별 코드 정의
+	*/
+	const COUPON_ERROR = [
+		'9' => '이미 시용된 쿠폰입니다.',
+		'10' => '시리얼넘버에 해댱하는 쿠폰정보가 존재하지 않습니다.',
+	];
+
+	/**
+	 * 오프라인 쿠폰 지급 (개발중)
+	 * @param $userID_data
+     * @param $serialNumber_data
+	 */
+	function offCouponAdd($user_id, $serial_num)
+	{
+		$return_values = fn ($err) => ['error_cd' => $err, 'error_msg' => COUPON_ERROR[$err]];
+
+		// 1. 쿠폰시리얼넘버로 coupon_no 조회
+		$coupon_serial = DB::table('coupon_serial')->where('serial', $serial_num)->first();
+
+		// 2. 해당쿠폰 사용여부 validation
+		if ($coupon_serial === null) return $return_values('10');
+		if ($coupon_serial->use_yn === 'Y') return $return_values('9');
+
+		/*
+			[검사항목]
+			- 존재하는 쿠폰인가? - 10
+			- 미사용된 쿠폰인가?
+			- 발행중지된 쿠폰인가? - 11
+			- 발행 회수가 1회로 제한된 쿠폰이며, 이미 사용 - 12
+		*/
+	}
 }

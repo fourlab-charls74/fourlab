@@ -36,8 +36,12 @@
                 <i class="fa fa-search d-block mb-3" aria-hidden="true" style="font-size:50px;"></i>
                 당일판매내역
             </button>
-            <button type="button" class="butt fs-14 fw-sb bg-gray" style="grid-area:d;" onclick="return alert('준비중입니다.');">
-                <i class="fa fa-plus-circle d-block mb-3" aria-hidden="true" style="font-size:50px;"></i>
+            <button type="button" class="butt fs-12 fw-sb bg-purple" style="grid-area:d;" data-toggle="modal" data-target="#addCouponModal">
+                <i class="fa fa-credit-card d-block mb-3" aria-hidden="true" style="font-size:40px;"></i>
+                쿠폰등록
+            </button>
+            <button type="button" class="butt fs-12 fw-sb bg-gray" style="grid-area:h;" onclick="return alert('준비중입니다.');">
+                <i class="fa fa-plus-circle d-block mb-3" aria-hidden="true" style="font-size:40px;"></i>
                 부가기능
             </button>
             <div class="d-flex flex-column justify-content-between align-items-stretch align-items-center fs-12 bg-navy p-1" style="grid-area:e;">
@@ -847,6 +851,57 @@
             </div>
         </div>
     </div>
+    {{-- 쿠폰등록 모달 --}}
+    <div class="modal fade" id="addCouponModal" tabindex="-1" role="dialog" aria-labelledby="addCouponModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 600px;">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-header">
+                            <button type="button" class="fs-20 close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h5 class="mt-1 fs-14 fw-b">쿠폰 등록</h5>
+                        </div>
+                        <div class="card-body b-none mt-4">
+                            <form name="add_coupon">
+                                <table class="table incont table-bordered mt-2" width="100%" cellspacing="0">
+                                    <tr>
+                                        <th>고객명 검색</th>
+                                        <td colspan="3">
+                                            <div class="flax_box inline_btn_box" style="padding-right:75px;">
+                                                <input type="text" name="cp_user_nm" id="cp_user_nm" class="form-control form-control-sm">
+                                                <a href="javascript:void(0);" onclick="return searchUserInCouponModal();" class="butt d-flex justify-content-center align-items-center fc-white fs-08 fw-sb br-05 bg-gray" style="width:70px;">조회</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="required">고객 선택</th>
+                                        <td>
+                                            <select name="cp_user_id" id="cp_user_id" class="form-control form-control-sm mr-1">
+                                                <option value="">---</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="required">쿠폰 시리얼넘버</th>
+                                        <td colspan="3">
+                                            <div class="flax_box inline_btn_box p-0">
+                                                <input type="text" name="cp_serial_num" id="cp_serial_num" class="form-control form-control-sm">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </form>
+                            <div class="text-center w-100">
+                                <button type="button" onclick="return addCoupon();" class="butt fc-white fs-12 fw-sb br-1 bg-purple w-100 p-3">등록</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script type="text/javascript" charset="utf-8">
@@ -1143,6 +1198,19 @@
         $("#search_ord_no_btn").on("click", function(e) {
             e.preventDefault();
             searchOrderByOrdNo($("#search_ord_no").val());
+        });
+
+        /** 쿠폰등록모달 관련 */
+        $('#addCouponModal').on('shown.bs.modal', function () {
+            $('#cp_user_nm').trigger('focus');
+        });
+        $('#addCouponModal').on('hide.bs.modal', function() {
+            $("#cp_user_nm").val('');
+            $("#cp_user_id").html("<option value=''>---</option>");
+            $("#cp_serial_num").val('');
+        });
+        $("#cp_user_nm").on("keypress", function(e) {
+            if (e.keyCode === 13) searchUserInCouponModal();
         });
 	});
 </script>
