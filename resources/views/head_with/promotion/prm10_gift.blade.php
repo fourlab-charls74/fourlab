@@ -227,7 +227,8 @@ $('.save-btn').click((e) => {
         data: { coupon_nos, user_ids },
         success: function(data) {
             alert("쿠폰을 지급하였습니다.");
-            // window.close();
+            opener.Search();
+            window.close();
         },
         error : function(res, a, b) {
             alert(res.responseJSON.message);

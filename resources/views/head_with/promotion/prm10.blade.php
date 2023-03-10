@@ -69,6 +69,7 @@
                             <label for="">사용가능 대상</label>
                             <div class="flax_box">
                                 <select name="apply" id="apply" class="form-control form-control-sm">
+                                    <option value="">전체</option>
                                     @foreach($apply as $key => $val)
                                         <option value="{{$key}}">{{$val}}</option>
                                     @endforeach
@@ -264,7 +265,7 @@
 
     function Search() {
         let data = $('form[name="search"]').serialize();
-        gx.Request(`/head/promotion/prm10/search`, data, 1);
+        gx.Request(`/head/promotion/prm10/search`, data, -1);
     }
 
     const openUsedList = (no) => {

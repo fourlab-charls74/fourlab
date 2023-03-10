@@ -23,7 +23,7 @@
             <div class="d-flex card-header justify-content-between">
                 <h4>검색</h4>
                 <div class="flax_box">
-                    <button id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</button>
+                    <button type="button" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</button>
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
             </div>
@@ -164,6 +164,7 @@ $('.remove-btn').click(function(){
         success: function(data) {
             alert("삭제되었습니다.");
             Search();
+            opener.Search();
         },
         error : function(res, a, b) {
             alert(res.responseJSON.message);

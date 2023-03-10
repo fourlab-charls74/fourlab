@@ -157,7 +157,7 @@ class prm10Controller extends Controller
         $coupon_nm		    = Request("coupon_nm");
         $coupon_type		= Request("coupon_type");
         $use_yn			    = Request("use_yn");
-        $coupon_apply		= Request("coupon_apply");
+        $coupon_apply		= Request("apply");
         $style_no			= Request("style_no");
         $goods_no			= Request("goods_no");
         $goods_nm			= Request("goods_nm");
