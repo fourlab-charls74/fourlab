@@ -995,7 +995,7 @@ CREATE TABLE `store_log` (
 
 -- 온라인 재고 매핑
 CREATE TABLE `bizest_stock_conf` (
-  `idx` int(11) NOT NULL COMMENT 'id',
+  `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT '인덱스',
   `default_storage_cd` varchar(30) DEFAULT NULL COMMENT '대표창고 코드',
   `default_storage_buffer` int(11) DEFAULT NULL COMMENT '대표창고 버퍼링값',
   `online_storage_cd` varchar(30) DEFAULT NULL COMMENT '온라인창고 코드',
@@ -1034,7 +1034,7 @@ CREATE TABLE `bizest_stock_exp_product` (
 
 -- 온라인 재고 매핑 로그관리
 CREATE TABLE `bizest_stock_log` (
-  `idx` int(11) NOT NULL COMMENT 'id',
+  `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT '인덱스',
   `price_apply_yn` char(1) DEFAULT NULL COMMENT '가격 반영 여부',
   `store_buffer_kind` char(1) DEFAULT NULL COMMENT '매장 버퍼링 유형 (A : 통합, S : 개별)',
   `store_cnt` int(11) DEFAULT NULL COMMENT '사용 매장 수',

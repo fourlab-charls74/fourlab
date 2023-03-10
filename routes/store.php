@@ -268,6 +268,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('prd06', 'prd06Controller@index');
         Route::get('prd06/search', 'prd06Controller@search');
         Route::get('prd06/create', 'prd06Controller@create');
+        Route::get('prd06/search-store', 'prd06Controller@search_store');
+        Route::get('prd06/search-prd', 'prd06Controller@search_product');
     });
 
     // 생산입고관리

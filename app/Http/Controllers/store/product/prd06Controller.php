@@ -91,6 +91,57 @@ class prd06Controller extends Controller
 
     public function create()
     {
-        return view(Config::get('shop.store.view') . '/product/prd06_show');
+        $id = Auth('head')->user()->id;
+        $default = DB::table('storage')
+                    ->where('default_yn', '=', 'Y')
+                    ->select('storage_cd', 'storage_nm')
+                    ->first();
+
+        $online = DB::table('storage')
+                    ->where('online_yn', '=', 'Y')
+                    ->select('storage_cd', 'storage_nm')
+                    ->first();
+
+        $values = [
+            'id' => $id,
+            'default' => $default,
+            'online' => $online,
+        ];
+
+        // dd($values);
+
+        return view(Config::get('shop.store.view') . '/product/prd06_show', $values);
+    }
+
+    public function search_store()
+    {
+
+        return response()->json([
+			"code"	=> 200,
+			"head"	=> array(
+				"total"		=> $total,
+				"page"		=> $page,
+				"page_cnt"	=> $page_cnt,
+				"page_total"=> count($result),
+				'total_row'  => $total_row,
+			),
+			"body"	=> $result
+		]);
+    }
+
+    public function search_product()
+    {
+        
+        return response()->json([
+			"code"	=> 200,
+			"head"	=> array(
+				"total"		=> $total,
+				"page"		=> $page,
+				"page_cnt"	=> $page_cnt,
+				"page_total"=> count($result),
+				'total_row'  => $total_row,
+			),
+			"body"	=> $result
+		]);
     }
 }
