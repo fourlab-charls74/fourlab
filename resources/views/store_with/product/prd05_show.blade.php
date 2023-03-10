@@ -1,10 +1,16 @@
 @extends('store_with.layouts.layout-nav')
-@section('title', '상품가격 변경')
+
+@php
+    $title = "상품가격 변경";
+    if($cmd == "update") $title = "상품가격 변경 상세";
+@endphp
+
+@section('title', $title)
 @section('content')
 <div class="show_layout py-3 px-sm-3">
     <div class="page_tit d-flex justify-content-between">
         <div class="d-flex">
-            <h3 class="d-inline-flex">상품가격 변경</h3>
+            <h3 class="d-inline-flex">{{ $title }}</h3>
             <div class="d-inline-flex location">
                 <span class="home"></span>
                 <span>/ 상품가격 관리</span>
@@ -12,7 +18,11 @@
             </div>
         </div>
         <div class="d-flex">
-            <a href="javascript:void(0)" onclick="Save();" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
+            @if ($cmd == 'add')
+                <a href="javascript:void(0)" onclick="Save();" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
+            @elseif ($cmd == 'update')
+                <a href="javascript:void(0)" onclick="Update();" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
+            @endif
             <a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i> 닫기</a>
         </div>
     </div>
@@ -44,7 +54,7 @@
                                                 <div class="form-inline">
                                                     <div class="docs-datepicker form-inline-inner input_box w-100">
                                                         <div class="input-group">
-                                                            <input type="text" class="form-control form-control-sm docs-date" name="change_date" id="change_date" value="{{@$edate}}" autocomplete="off">
+                                                            <input type="text" class="form-control form-control-sm docs-date" name="change_date" id="change_date" value="@if($cmd == 'update') {{$res->change_date}} @else {{$edate}} @endif" autocomplete="off">
                                                             <div class="input-group-append">
                                                                 <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
                                                                     <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -55,11 +65,11 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <th></th>
+                                            <th>@if ($cmd == 'update') 가격변경 코드 @endif</th>
                                             <td>
                                                 <div class="form-inline inline_select_box">
                                                     <div class="d-flex w-100">
-                                                        
+                                                        <span id="product_price_cd">@if ($cmd == 'update') {{@$code}} @endif </span>
                                                     </div>
                                                 </div>
                                             </td>
@@ -122,6 +132,7 @@
 </script>
 
 <script type="text/javascript" charset="utf-8">
+    let add_product = [];
     let gx;
     const pApp = new App('', { gridId: "#div-gd" });
 
@@ -130,22 +141,15 @@
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
-        // Search();
+        if('{{ @$cmd }}' === 'update') GetProducts();
     });
-
-   
-
+    
 
     // 등록된 상품리스트 가져오기
     function GetProducts() {
-        let data = "sgr_cd=" + '{{ @$sgr->sgr_cd }}';
-        gx.Request('/store/cs/cs02/search-return-products', data, -1, function(e) {
-        });
+        let data = "product_price_cd=" + '{{ @$res->product_price_cd }}';
+        gx.Request('/store/product/prd05/show-search', data, 1);
     }
-
-    const checkIsEditable = (params) => {
-        return (cmd == 'add' || now_state == '10') && params.data.hasOwnProperty('isEditable') && params.data.isEditable ? true : false;
-    };
 
     // 상품 삭제
     const deleteRow = (row) => { gx.gridOptions.api.applyTransaction({remove : [row]}); };
@@ -192,15 +196,17 @@
             change_val : 0
         };
         callbaackRows.push(row);
+
     };
     
     var setGoodsRows = () => {
         gx.gridOptions.api.applyTransaction({ add : callbaackRows });
         callbaackRows = [];
     }
-
+    
     function change_apply(is_zero = false) {
 
+        let change_kind = $('#change_kind').val();
         let change_price = parseInt($('#change_price').val());
         let rows = gx.getSelectedRows();
 
@@ -211,30 +217,41 @@
         } else if (change_kind == '') {
             alert('변경종류를 선택해주세요.') 
         } else {
-            const change_rows = gx.getSelectedRows().map(row => ({
-                ...row, 
-                change_val : change_price 
-            }));
+            if (change_kind == 'W') {
+                const change_rows = gx.getSelectedRows().map(row => ({
+                    ...row, 
+                    change_val : change_price 
+                }));
+                
+                for (let i = 0; i < rows.length; i++) {
+                    gx.gridOptions.api.applyTransaction({ remove : [rows[i]] });
+                }
+                gx.gridOptions.api.applyTransaction({ add : change_rows });
 
-            gx.gridOptions.api.setRowData([]);
-            gx.gridOptions.api.applyTransaction({ add : change_rows });
-            gx.gridOptions.api.forEachNode(node => node.setSelected(!is_zero)); 
+                // await gx.gridOptions.api.applyTransaction({ update: [change_rows] });
+                gx.gridOptions.api.forEachNode(node => node.setSelected(!is_zero)); 
+
+            } else if (change_kind == 'P') {
+                /**
+                 * 할인율  = 판매가 - (판매가 * 할인율)
+                 */
+
+                let sale = change_price/100;
+                const change_rate = gx.getSelectedRows().map(row => ({
+                    ...row, 
+                    change_val : row.price - (row.price * sale) 
+                }));
+
+                for (let i = 0; i < rows.length; i++) {
+                    gx.gridOptions.api.applyTransaction({ remove : [rows[i]] });
+                }
+                gx.gridOptions.api.applyTransaction({ add : change_rate });
+                gx.gridOptions.api.forEachNode(node => node.setSelected(!is_zero)); 
+            }
         }
        
     }
 
-    // const change_apply = () => {
-    //     let change_price = parseInt($('#change_price').val());
-    //     let change_kind = $('#change_kind').val();
-    //     const rows = gx.getSelectedRows().map(row => ({
-    //         ...row, 
-    //        change_val : change_price 
-    //     }));
-    //     gx.gridOptions.api.setRowData([]);
-    //     gx.gridOptions.api.applyTransaction({ add : rows });
-        
-    // }
-    
     function Save() {
         let change_date = $('#change_date').val();
         let change_price = parseInt($('#change_price').val());
@@ -263,16 +280,51 @@
                 opener.Search();
             } else {
                 console.log(res.data);
-                alert("상태변경 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+                alert("상품가격 변경 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
             }
         }).catch(function (err) {
             console.log(err);
         });
-
-
-        
-
     }
+
+    function Update() {
+        let change_date = $('#change_date').val();
+        let change_price = parseInt($('#change_price').val());
+        let change_kind = $('#change_kind').val();
+        let product_price_cd = '{{@$code}}';
+        console.log(product_price_cd);
+        let rows = gx.getSelectedRows();
+        let change_cnt = rows.length;
+
+        if(rows.length < 1) return alert('저장할 상품을 선택해주세요.');
+
+        if(!confirm("선택한 상품의 가격을 수정하시겠습니까?")) return;
+
+        axios({
+            url: '/store/product/prd05/update-price',
+            method: 'put',
+            data: {
+                data: rows,
+                change_date : change_date,
+                change_kind : change_kind,
+                change_price : change_price,
+                change_cnt : change_cnt,
+                product_price_cd : product_price_cd
+            },
+        }).then(function (res) {
+            if(res.data.code === 200) {
+                alert(res.data.msg);
+                window.close();
+                opener.Search();
+            } else {
+                console.log(res.data);
+                alert("상품가격 변경 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
+    }
+
 
 </script>
 @stop

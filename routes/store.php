@@ -261,8 +261,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 상품가격 관리
         Route::get('prd05','prd05Controller@index');
         Route::get('prd05/search','prd05Controller@search');
-        Route::get('prd05/show','prd05Controller@show');
+        Route::get('prd05/show-search','prd05Controller@show_search');
+        Route::get('prd05/show/{code?}','prd05Controller@show');
         Route::put('prd05/change-price', 'prd05Controller@change_price');
+        Route::put('prd05/update-price', 'prd05Controller@update_price');
 
         // 온라인 재고 매핑
         Route::get('prd06', 'prd06Controller@index');

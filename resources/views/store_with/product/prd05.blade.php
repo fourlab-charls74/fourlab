@@ -17,7 +17,8 @@
 				<div class="d-flex card-header justify-content-between">
 					<h4>검색</h4>
 					<div>
-                        <a href="#" onclick="Add();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 가격변경 추가</a>
+						<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                        <a href="#" onclick="Add('add');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 가격변경 추가</a>
 						<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 					</div>
 				</div>
@@ -99,21 +100,16 @@
 								<div class="form-inline">
 									<div class="form-inline-inner input_box" style="width:24%;">
 										<select name="limit" class="form-control form-control-sm">
-											<option value="">모두</option>
-											<option value="1000" selected>1000</option>
-											<option value="5000">5000</option>
-											<option value="10000">10000</option>
+											<option value="1000" selected>100</option>
+											<option value="5000">500</option>
+											<option value="10000">1000</option>
 										</select>
 									</div>
 									<span class="text_line">/</span>
 									<div class="form-inline-inner input_box" style="width:45%;">
 										<select name="ord_field" class="form-control form-control-sm">
-											<option value="prd_cd1">등록일(품번별)</option>
-											<option value="pc.rt">등록일</option>
-											<option value="pc.ut">수정일</option>
-											<option value="g.goods_no">온라인코드</option>
-											<option value="g.goods_nm">상품명</option>
-											<option value="pc.prd_cd">바코드</option>
+											<option value="change_date">변경일자</option>
+											<option value="rt">등록일</option>
 										</select>
 									</div>
 									<div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -159,11 +155,18 @@
 </div>
 <script>
     let columns = [
+            {field: "idx", headerName: "가격변경 코드", width: 100, cellClass: 'hd-grid-code',
+				cellRenderer: function(params) {
+					if (params.value !== undefined && params.data.idx != "") {
+						return '<a href="#" onclick="cmd(\''+ params.value +'\');" >'+ params.value+'</a>';
+					}
+				}
+			},
             {field: "change_date", headerName: "변경일자", width: 100, cellClass: 'hd-grid-code'},
-            {field: "change_date", headerName: "변경금액", width: 100, cellClass: 'hd-grid-code'},
-            {field: "change_kind", headerName: "변경종류", width: 100, cellClass: 'hd-grid-code'},
+            {field: "change_val", headerName: "변경금액", type: "currencyType", width: 100, cellClass: 'hd-grid-code'},
+            {field: "change_kind", headerName: "변경종류", width: 80, cellClass: 'hd-grid-code'},
             {field: "change_cnt", headerName: "변경상품수", width: 100, cellClass: 'hd-grid-code'},
-            {field: "rt", headerName: "등록일자", width: 100, cellClass: 'hd-grid-code'},
+            {field: "rt", headerName: "등록일자", width: 120, cellClass: 'hd-grid-code'},
             {width : 'auto'}
             
         ];
@@ -188,9 +191,16 @@
         gx.Request('/store/product/prd05/search', data);
     }
 
-    function Add () {
-        const url = '/store/product/prd05/show/';
-        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
+    function Add (cmd) {
+		if (cmd == 'add') {
+			const url = '/store/product/prd05/show/';
+			window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
+		}
+    };
+
+	function cmd (code) {
+		const url = '/store/product/prd05/show/' + code;
+		window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
     };
 </script>
 	
