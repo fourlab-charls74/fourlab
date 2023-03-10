@@ -467,7 +467,7 @@ class prm10Controller extends Controller
                 $result = $coupon->couponAdd($user_ids, $coupon_no);
 
                 if($result == -2) {
-                    throw new Exception("지급하려는 쿠폰수가 쿠폰의 발행수보다 많습니다.발행수를 느리거나 지급하려는 회원수를 조정 후 다시 처리하여 주십시오.");
+                    throw new Exception("지급하려는 쿠폰수가 쿠폰의 발행수보다 많습니다.발행수를 늘리거나 지급하려는 회원수를 조정 후 다시 처리하여 주십시오.");
                 }
 
                 if($result == -1) {

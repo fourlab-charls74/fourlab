@@ -13,7 +13,7 @@
         </div>
         <div>
             <a href="#" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm save-btn">쿠폰지급</a>
-            <a href="#" onclick="window.close()" class="btn btn-sm btn-primary shadow-sm">닫기</a>
+            <a href="#" onclick="window.close()" class="btn btn-sm btn-outline-primary shadow-sm"><i class="fas fa-times fa-sm"></i> 닫기</a>
         </div>
     </div>
     <div class="card_wrap aco_card_wrap">
@@ -23,11 +23,11 @@
                     쿠폰 선택 총 <span id="gx-total1" class="text-primary">0</span> 건 
                 </a>
                 <div class="fr_box">
-                    <button class="btn-sm btn btn-primary mr-1 add-coupon-btn">쿠폰추가</button>
-                    <button class="btn-sm btn btn-primary mr-1 del-coupon-btn">쿠폰삭제</button>
+                    <button class="btn-sm btn btn-outline-primary add-coupon-btn"><i class="fas fa-plus fa-sm"></i> 쿠폰추가</button>
+                    <button class="btn-sm btn btn-outline-primary del-coupon-btn"><i class="fas fa-minus fa-sm"></i> 쿠폰삭제</button>
                 </div>
             </div>
-            <div class="card-body brtn mx-0">
+            <div class="card-body brtn mx-0 mt-1">
                 <div class="table-responsive mt-1">
                     <div id="div-gd1" style="height:calc(100vh - 50vh); width:100%;" class="ag-theme-balham"></div>
                 </div>
@@ -39,11 +39,11 @@
                     회원 선택 총 <span id="gx-total2" class="text-primary">0</span> 건
                 </a>
                 <div class="flax_box">
-                    <button class="btn-sm btn btn-primary mr-1 add-user-btn">회원추가</button>
-                    <button class="btn-sm btn btn-primary mr-1 del-user-btn">회원삭제</button>
+                    <button class="btn-sm btn btn-outline-primary mr-1 add-user-btn"><i class="fas fa-plus fa-sm"></i> 회원추가</button>
+                    <button class="btn-sm btn btn-outline-primary del-user-btn"><i class="fas fa-minus fa-sm"></i> 회원삭제</button>
                 </div>
             </div>
-            <div class="card-body brtn mx-0">
+            <div class="card-body brtn mx-0 mt-1">
                 <div class="table-responsive mt-1">
                     <div id="div-gd2" style="height:calc(100vh - 50vh); width:100%;" class="ag-theme-balham"></div>
                 </div>
@@ -62,6 +62,7 @@ const coupon_types = {
     F : '오프라인',
     C : 'CRM'
 };
+const CENTER = { 'text-align': 'center' };
 
 const columns1 = [
     {
@@ -70,14 +71,12 @@ const columns1 = [
         checkboxSelection: true,
         width:28
     },
-    {field:"coupon_no", headerName:"상품코드"},
-    {
-        field:"coupon_type",
-        headerName:"구분",
+    {field:"coupon_no", headerName:"상품코드", cellStyle: CENTER},
+    {field:"coupon_type", headerName:"구분", width: 80, cellStyle: CENTER,
         cellRenderer : (p) => coupon_types[p.value]
     },
     {field:"coupon_nm", headerName:"쿠폰명", type:"HeadCouponType", width: 250},
-    { width:"auto" }
+    {width:"auto"}
 ];
 
 const columns2 = [
@@ -87,16 +86,18 @@ const columns2 = [
         checkboxSelection: true,
         width:28
     },
-    {field:"user_id", headerName:"아이디"},
-    {field:"name", headerName:"이름"},
-    { width:"auto" }
+    {field:"user_id", headerName:"아이디", width: 100, cellStyle: CENTER},
+    {field:"name", headerName:"이름", width: 80, cellStyle: CENTER},
+    {width:"auto"}
 ];
 
 const pApp1 = new App('', {gridId: "#div-gd1"});
+pApp1.ResizeGrid(275, 275);
 const gridDiv1 = document.querySelector(pApp1.options.gridId);
 const gx1 = new HDGrid(gridDiv1, columns1);
 
 const pApp2 = new App('', {gridId: "#div-gd2"});
+pApp2.ResizeGrid(275, 275);
 const gridDiv2 = document.querySelector(pApp2.options.gridId);
 const gx2 = new HDGrid(gridDiv2, columns2);
 
@@ -142,11 +143,12 @@ const validate = () => {
 
 function couponSelectedCallback(rows) {
     rows.forEach(addCoupon);
+    $('#gx-total1').html(gx1.gridOptions.api.getDisplayedRowCount());
 }
 
 function usersCallback(rows) {
-    console.log(rows);
     rows.forEach(addUser);
+    $('#gx-total2').html(gx2.gridOptions.api.getDisplayedRowCount());
 }
 
 $('.add-coupon-btn').click((e) => {
@@ -175,6 +177,23 @@ $('.del-coupon-btn').click((e) => {
 $('.add-user-btn').click((e) => {
     e.preventDefault();
     openUserSelect();
+});
+
+$('.del-user-btn').click((e) => {
+    e.preventDefault();
+
+    const rows = gx2.getSelectedRows();
+
+    if(rows.length === 0) {
+        alert("삭제할 회원을 선택해주세요.");
+        return;
+    }
+
+    rows.forEach(function(row){
+        gx2.gridOptions.api.updateRowData({remove: [row]});
+    });
+
+    $('#gx-total2').html(gx2.gridOptions.api.getDisplayedRowCount());
 });
 
 $('.save-btn').click((e) => {

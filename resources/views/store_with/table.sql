@@ -1097,6 +1097,8 @@ ALTER TABLE `bizest_smart`.`coupon` ADD COLUMN `use_date_alarm_yn` CHAR(1) NULL 
 ALTER TABLE `bizest_smart`.`coupon` ADD COLUMN `use_date_alarm_day` INT(11) NULL DEFAULT NULL COMMENT '유효기간 알림 기간(일)' AFTER `use_date_alarm_yn`;
 ALTER TABLE `bizest_smart`.`coupon` ADD COLUMN `use_date` VARCHAR(4) NOT NULL DEFAULT '' COMMENT '유효기간 쿠폰발급일 기준(설정일/발급일 : S/P)' AFTER `use_to_date`;
 
+ALTER TABLE `bizest_smart`.`coupon_member` ADD COLUMN `use_to_date` VARCHAR(8) NULL DEFAULT NULL COMMENT '사용가능 일시' AFTER `down_date`;
+
 --
 -- 기존 테이블 컬럼 추가 종료
 --

@@ -539,13 +539,6 @@ class Coupon
 			}
 
 	        for($i=0; $i < $user_cnt; $i++){
-	            $sql = "
-	                insert into  (
-	                    
-	                ) values (
-	                    ?, ?, now(), 'N', ?
-	                )
-                ";
                 DB::table('coupon_member')->insert([
                     'user_id' => $user_ids[$i], 
                     'coupon_no' => $coupon_no, 
