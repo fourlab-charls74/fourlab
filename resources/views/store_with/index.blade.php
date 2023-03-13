@@ -310,15 +310,30 @@
     options: {
         // responsive: true,
         animation: {
-            easing:'easeOutElastic',
+            // easing:'easeOutElastic',
         }, 
         legend:{
             position : 'top'
         },
+        tooltips: {
+            callbacks: {
+                label: function (tooltipItem, data) {
+                    return " " + Comma(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]) + "원";
+                }           
+            },
+        },
         scales: {
             y: {
                 beginAtZero: true
-            }
+            },
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    callback: function(value, index) {
+                        return Comma(value);
+                    }                  		
+                }
+            }]
         }
     }
   });
@@ -387,7 +402,14 @@
             responsive: true,
             legend: {
                 position: 'right',
-            }
+            },
+            tooltips: {
+                callbacks: {
+                    label: function (tooltipItem, data) {
+                        return " " + Comma(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]) + "원";
+                    }           
+                },
+            },
         }
     });
 
@@ -455,10 +477,25 @@ let chartData2 = <?= json_encode($chart2Result)?>;
         legend:{
             position : 'top'
         },
+        tooltips: {
+            callbacks: {
+                label: function (tooltipItem, data) {
+                    return " " + Comma(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]) + "원";
+                }           
+            },
+        },
         scales: {
             y: {
                 beginAtZero: true
-            }
+            },
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    callback: function(value, index) {
+                        return Comma(value);
+                    }                  		
+                }
+            }]
         }
     }
   });
@@ -509,10 +546,25 @@ let chartData3 = <?= json_encode($chart3Result)?>;
         legend:{
             position : 'top'
         },
+        tooltips: {
+            callbacks: {
+                label: function (tooltipItem, data) {
+                    return " " + Comma(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]);
+                }           
+            },
+        },
         scales: {
             y: {
                 beginAtZero: true
-            }
+            },
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    callback: function(value, index) {
+                        return Comma(value);
+                    }                  		
+                }
+            }]
         }
     }
   });
