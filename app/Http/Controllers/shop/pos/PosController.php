@@ -253,6 +253,9 @@ class PosController extends Controller
             if ($search_type == 'user_nm') {
                 $where .= " and name like '%$search_keyword%' ";
             }
+            if ($search_type == 'phone') {
+                $where .= " and mobile like '%$search_keyword' ";
+            }
         }
 
         $page = $request->input('page', 1);
@@ -1212,9 +1215,6 @@ class PosController extends Controller
         $user_id = $request->input('user_id', '');
         $serial_num = $request->input('serial_num', '');
 
-        // test
-        // $serial_num = '146057F75A0C';
-
         $user = [
             'id' => Auth('head')->user()->id,
             'name' => Auth('head')->user()->name
@@ -1223,11 +1223,13 @@ class PosController extends Controller
         try {
             DB::beginTransaction();
 
-            // $coupon = new Coupon($user);
-            // $result = $coupon->offCouponAdd($user_id, $serial_num);
-            // dd($user_id, $serial_num, $result);
+            $coupon = new Coupon($user);
+            $result = $coupon->offCouponAdd($user_id, $serial_num);
 
-            dd('개발중입니다.');
+            if ($result['code'] < 1) {
+                if ($result['code'] < -1) $code = 400;
+                throw new Exception($result['msg'] ?? '');
+            }
 
             DB::commit();
 
@@ -1236,10 +1238,11 @@ class PosController extends Controller
         } catch (Exception $e) {
             DB::rollback();
 
-            $code = 500;
+            if ($code < 1) $code = 500;
             $msg = $e->getMessage();
         }
-        return response()->json(['code' => $code, 'msg' => $msg], $code);
+
+        return response()->json(['code' => $code, 'msg' => $msg], 200);
     }
 }
 

@@ -36,14 +36,14 @@
                 <i class="fa fa-search d-block mb-3" aria-hidden="true" style="font-size:50px;"></i>
                 당일판매내역
             </button>
-            <button type="button" class="butt fs-12 fw-sb bg-purple" style="grid-area:d;" data-toggle="modal" data-target="#addCouponModal">
-                <i class="fa fa-credit-card d-block mb-3" aria-hidden="true" style="font-size:40px;"></i>
+            <button type="button" class="butt fs-14 fw-sb bg-purple" style="grid-area:d;" data-toggle="modal" data-target="#addCouponModal">
+                <i class="fa fa-credit-card d-block mb-3" aria-hidden="true" style="font-size:50px;"></i>
                 쿠폰등록
             </button>
-            <button type="button" class="butt fs-12 fw-sb bg-gray" style="grid-area:h;" onclick="return alert('준비중입니다.');">
+            {{-- <button type="button" class="butt fs-12 fw-sb bg-gray" style="grid-area:h;" onclick="return alert('준비중입니다.');">
                 <i class="fa fa-plus-circle d-block mb-3" aria-hidden="true" style="font-size:40px;"></i>
                 부가기능
-            </button>
+            </button> --}}
             <div class="d-flex flex-column justify-content-between align-items-stretch align-items-center fs-12 bg-navy p-1" style="grid-area:e;">
                 <div class="w-100">
                     <p class="text-center fs-16 fw-sb p-4" style="border-bottom:2px solid #999;">직전결제내역</p>
@@ -867,11 +867,11 @@
                             <form name="add_coupon">
                                 <table class="table incont table-bordered mt-2" width="100%" cellspacing="0">
                                     <tr>
-                                        <th>고객명 검색</th>
+                                        <th>휴대폰뒷자리 검색</th>
                                         <td colspan="3">
                                             <div class="flax_box inline_btn_box" style="padding-right:75px;">
-                                                <input type="text" name="cp_user_nm" id="cp_user_nm" class="form-control form-control-sm">
-                                                <a href="javascript:void(0);" onclick="return searchUserInCouponModal();" class="butt d-flex justify-content-center align-items-center fc-white fs-08 fw-sb br-05 bg-gray" style="width:70px;">조회</a>
+                                                <input type="text" name="cp_user_phone" id="cp_user_phone" class="form-control form-control-sm">
+                                                <a href="javascript:void(0);" onclick="return searchUserInCouponModal();" class="butt d-flex justify-content-center align-items-center fc-white fs-08 fw-sb br-05 bg-gray" style="width:70px;"><i class="fas fa-search fa-sm mr-1"></i> 검색</a>
                                             </div>
                                         </td>
                                     </tr>
@@ -1202,14 +1202,14 @@
 
         /** 쿠폰등록모달 관련 */
         $('#addCouponModal').on('shown.bs.modal', function () {
-            $('#cp_user_nm').trigger('focus');
+            $('#cp_user_phone').trigger('focus');
         });
         $('#addCouponModal').on('hide.bs.modal', function() {
-            $("#cp_user_nm").val('');
+            $("#cp_user_phone").val('');
             $("#cp_user_id").html("<option value=''>---</option>");
             $("#cp_serial_num").val('');
         });
-        $("#cp_user_nm").on("keypress", function(e) {
+        $("#cp_user_phone").on("keypress", function(e) {
             if (e.keyCode === 13) searchUserInCouponModal();
         });
 	});

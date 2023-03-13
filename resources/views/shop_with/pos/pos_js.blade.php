@@ -728,15 +728,15 @@
         $("#search_ord_no_result").html('');
     }
 
-    /** 쿠폰등록 시 고객명으로 고객정보 검색 */
+    /** 쿠폰등록 시 휴대폰번호 뒷자리로 고객정보 검색 */
     async function searchUserInCouponModal() {
-        const keyword = $("#cp_user_nm").val();
+        const keyword = $("#cp_user_phone").val();
 
-        if (keyword == '') return $('#cp_user_nm').trigger('focus');
+        if (keyword == '') return $('#cp_user_phone').trigger('focus');
 
         const { data, status } = await axios({ 
             method: 'get', 
-            url: "/shop/pos/search/member?search_type=user_nm&search_keyword=" + keyword 
+            url: "/shop/pos/search/member?search_type=phone&search_keyword=" + keyword 
         });
         if (status === 200) {
             const users = data.body;
@@ -765,8 +765,8 @@
             data: { user_id, serial_num },
         }).then(function (res) {
             if(res.data.code == 200) {
-                console.log(res);
-                // 개발중입니다.
+                alert("오프라인쿠폰이 정상적으로 등록되었습니다.");
+                $('#addCouponModal').modal('hide');
             } else {
                 alert(res.data.msg);
                 console.log(res);

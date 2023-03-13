@@ -565,33 +565,134 @@ class Coupon
 	/**
 	* 오프라인 쿠폰 지급 시 에러상황별 코드 정의
 	*/
-	const COUPON_ERROR = [
-		'9' => '이미 시용된 쿠폰입니다.',
-		'10' => '시리얼넘버에 해댱하는 쿠폰정보가 존재하지 않습니다.',
-	];
+	private function _get_coupon_error_msg($err)
+	{
+		$msgs = [
+			'10' => '시리얼넘버에 해댱하는 쿠폰정보가 존재하지 않습니다.',
+			'11' => '발행중지된 쿠폰입니다.',
+			'12' => '중복발급이 불가능한 쿠폰입니다.',
+			'13' => '발행된 쿠폰이 모두 발급완료된 쿠폰입니다.',
+			'701' => '오프라인 쿠폰이 아닙니다.',
+			'702' => '쿠폰의 지급기한이 아닙니다.',
+			'703' => '이미 발급된 쿠폰입니다.',
+		];
+		return ['code' => -2, 'msg' => $msgs[$err] . ' 해당 쿠폰을 등록할 수 없습니다.', 'error_code' => $err];
+	}
 
 	/**
-	 * 오프라인 쿠폰 지급 (개발중)
+	 * 오프라인 쿠폰 지급
 	 * @param $userID_data
      * @param $serialNumber_data
 	 */
 	function offCouponAdd($user_id, $serial_num)
 	{
-		$return_values = fn ($err) => ['error_cd' => $err, 'error_msg' => COUPON_ERROR[$err]];
+		$today = now()->format("Ymd");
+		
+		/**
+		 * COUPON 검사
+		 */
 
-		// 1. 쿠폰시리얼넘버로 coupon_no 조회
-		$coupon_serial = DB::table('coupon_serial')->where('serial', $serial_num)->first();
+		$cp_serial = DB::table('coupon_serial')->where('serial', $serial_num)->first();
 
-		// 2. 해당쿠폰 사용여부 validation
-		if ($coupon_serial === null) return $return_values('10');
-		if ($coupon_serial->use_yn === 'Y') return $return_values('9');
+		// 시리얼넘버에 해댱하는 쿠폰정보 존재여부 체크
+		if ($cp_serial === null) {
+			return $this->_get_coupon_error_msg('10');
+		}
 
-		/*
-			[검사항목]
-			- 존재하는 쿠폰인가? - 10
-			- 미사용된 쿠폰인가?
-			- 발행중지된 쿠폰인가? - 11
-			- 발행 회수가 1회로 제한된 쿠폰이며, 이미 사용 - 12
-		*/
+		$cp = DB::table('coupon')->where('coupon_no', $cp_serial->coupon_no)->first();
+
+		// 발행중지된 쿠폰여부 체크
+		if ($cp->use_yn === 'N') {
+			return $this->_get_coupon_error_msg('11');
+		}
+
+		$cp_member = DB::table('coupon_member')->where('user_id', $user_id)->where('coupon_no', $cp->coupon_no);
+
+		// 중복발급 불가능 시, 사용자가 해당 시리얼넘버 쿠폰을 발행받은적 있는지 체크
+		if ($cp->pub_dup_yn !== 'Y' && $cp_member->count() > 0) {
+			return $this->_get_coupon_error_msg('12');
+		}
+		// 쿠폰 지급횟수가 쿠폰 발행수를 초과했는지 체크
+		if ($cp->pub_cnt > 0 && $cp->coupon_pub_cnt >= $cp->pub_cnt) {
+			return $this->_get_coupon_error_msg('13');
+		}
+		// 오프라인쿠폰 여부 체크
+		if ($cp->coupon_type !== 'F') {
+			return $this->_get_coupon_error_msg('701');
+		}
+		// 쿠폰 지급기한 체크
+		if ($cp->pub_fr_date > $today && $cp->pub_fr_date != '99999999') {
+			return $this->_get_coupon_error_msg('702');
+		}
+		if ($cp->pub_to_date < $today && $cp->pub_to_date != '99999999') {
+			return $this->_get_coupon_error_msg('702');
+		}
+		// 이미 발급된 쿠폰인지 체크
+		if ($cp->pub_cnt > 0 && $cp->serial_dup_yn !== 'Y' && $cp_serial->use_yn === 'Y') {
+			return $this->_get_coupon_error_msg('703'); // coupon_serial 테이블에서 오프라인쿠폰의 경우 발급 시 사용처리됨
+		}
+
+		/**
+		 * COUPON 발급
+		 */
+
+		$use_to_date = '';
+		if ($cp->use_date_type === 'S') {
+			$use_to_date = $cp->use_to_date;
+		} else if ($cp->use_date_type === 'P') {
+			$use_to_date = now()->add($cp->use_date ?? 0, 'day')->format("Ymd");
+		}
+
+		// 1. coupon_member에 지급정보 추가
+		$result = DB::table('coupon_member')->insert([
+			'user_id' => $user_id,
+			'coupon_no' => $cp->coupon_no,
+			'down_date' => now(),
+			'use_to_date' => $use_to_date,
+			'serial' => $cp_serial->serial,
+			'use_yn' => 'N',
+			'rt' => now(),
+		]);
+		if ($result < 1) {
+			return ['code' => -1, 'msg' => 'failed: insert coupon_member'];
+		}
+
+		// 2. coupon_serial에 지급정보 업데이트
+		// coupon_serial 테이블에서 오프라인쿠폰의 경우 발급 시 사용처리함
+		$result = DB::table('coupon_serial')->where('serial', $cp_serial->serial)->update([
+			// 'pub_cnt' => DB::raw('ifnull(pub_cnt, 0) + 1'), // 사용안함
+			// 'pub_date' => now(), // 사용안함
+			// 'use_cnt' => DB::raw('ifnull(use_cnt, 0) + 1'), // 사용안함
+			'use_yn' => 'Y',
+			'use_date' => now(),
+			'ut' => now(),
+		]);
+		if ($result < 1) {
+			return ['code' => -1, 'msg' => 'failed: update coupon_serial'];
+		}
+
+		// 3. coupon 다운로드횟수 업데이트
+		$result = DB::table('coupon')->where('coupon_no', $cp->coupon_no)
+			->update([ 'coupon_pub_cnt' => DB::raw('ifnull(coupon_pub_cnt, 0) + 1') ]);
+		if ($result < 1) {
+			return ['code' => -1, 'msg' => 'failed: update coupon'];
+		}
+
+		// 4. coupon_use_log_t 로그 등록
+		$result = DB::table('coupon_use_log_t')->insert([
+			'coupon_no' => $cp->coupon_no,
+			'user_id' => $user_id,
+			'ord_opt_no' => '0',
+			'ord_no' => '0',
+			'order_amt' => '0',
+			'coupon_amt' => '0',
+			'regi_date' => now(),
+			'use_gubun' => '1',
+		]);
+		if ($result < 1) {
+			return ['code' => -1, 'msg' => 'failed: insert coupon_use_log_t'];
+		}
+		
+		return ['code' => 1, 'msg' => 'success'];
 	}
 }
