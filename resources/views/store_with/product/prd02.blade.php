@@ -77,9 +77,15 @@
 						</div>
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
-								<label>품번</label>
-								<div class="flex_box">
-									<input type='text' id="prd_cd_p" name='prd_cd_p' class="form-control form-control-sm ac-style-no search-enter">
+								<label for="prd_cd">상품검색조건</label>
+								<div class="form-inline">
+									<div class="form-inline-inner input-box w-100">
+										<div class="form-inline inline_btn_box">
+											<input type='hidden' id="prd_cd_range" name='prd_cd_range'>
+											<input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' onclick="openApi();" class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
+											<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -135,20 +141,6 @@
 					<div class="row">
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
-								<label for="prd_cd">상품검색조건</label>
-								<div class="form-inline">
-									<div class="form-inline-inner input-box w-100">
-										<div class="form-inline inline_btn_box">
-											<input type='hidden' id="prd_cd_range" name='prd_cd_range'>
-											<input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' onclick="openApi();" class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
-											<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="col-lg-4 inner-td">
-							<div class="form-group">
 								<label for="">자료수/정렬</label>
 								<div class="form-inline">
 									<div class="form-inline-inner input_box" style="width:24%;">
@@ -161,6 +153,7 @@
 									<span class="text_line">/</span>
 									<div class="form-inline-inner input_box" style="width:45%;">
 										<select name="ord_field" class="form-control form-control-sm">
+											<option value="pc.prd_cd_p">품번</option>
 											<option value="prd_cd1">등록일(품번별)</option>
 											<option value="pc.rt">등록일</option>
 											<option value="pc.ut">수정일</option>

@@ -72,7 +72,6 @@ class prd02Controller extends Controller
 		$store_no	= $request->input("store_no", "");
 
 		$prd_cd		= $request->input("prd_cd", "");
-		$prd_cd_p	= $request->input("prd_cd_p");
 		$com_id		= $request->input("com_cd");
 		$prd_cd_range_text = $request->input("prd_cd_range", '');
 
@@ -85,7 +84,8 @@ class prd02Controller extends Controller
 		$ord_field	= $request->input('ord_field','prd_cd1');
 		if ($ord_field == 'prd_cd1') $ord_field = 'pc.rt';
 
-		$orderby	= sprintf("order by p.match_yn desc, %s %s, pc.prd_cd ", $ord_field, $ord);
+		if ($ord_field == 'pc.prd_cd_p') $orderby = sprintf("order by p.match_yn desc, %s %s, pc.rt desc, pc.prd_cd ", $ord_field, $ord);
+		else $orderby = sprintf("order by p.match_yn desc, %s %s, pc.prd_cd ", $ord_field, $ord);
 
 		$in_store_sql = "";
 		$match_yn = $request->input('match_yn1');
@@ -99,8 +99,6 @@ class prd02Controller extends Controller
 			}
 			$where .= ")";
 		}
-
-		if($prd_cd_p != "")		$where .= " and pc.prd_cd_p = '" . Lib::quote($prd_cd_p) . "' ";
 
 		if($match_yn == 'Y' || $match_yn == 'N') $where .= " and p.match_yn = '$match_yn'";
 
