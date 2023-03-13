@@ -1,7 +1,7 @@
 @extends('store_with.layouts.layout-nav')
 @php
-    $title = "상품반품이동 등록";
-    if($cmd == "update") $title = "상품반품이동 관리";
+    $title = "거래처반품 등록";
+    if($cmd == "update") $title = "거래처반품 관리";
 @endphp
 @section('title', $title)
 @section('content')
@@ -12,7 +12,7 @@
             <div class="d-inline-flex location">
                 <span class="home"></span>
                 <span>/ 생산입고관리</span>
-                <span>/ 상품반품이동</span>
+                <span>/ 거래처반품</span>
             </div>
         </div>
         <div class="d-flex">
@@ -298,7 +298,7 @@
             let sgr_state = '{{ @$sgr->sgr_state }}';
             let sgr_cd = '{{ @$sgr->sgr_cd }}';
 
-            if('{{ @$sgr->sgr_state }}' != 10) return alert("상품반품이동이 '접수'상태일떄만 수정가능합니다.");
+            if('{{ @$sgr->sgr_state }}' != 10) return alert("거래처반품이 '접수'상태일떄만 수정가능합니다.");
             if(!confirm("수정하시겠습니까?")) return;
 
             axios({

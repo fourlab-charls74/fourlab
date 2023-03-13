@@ -1,12 +1,12 @@
 @extends('store_with.layouts.layout')
-@section('title','상품반품이동')
+@section('title','거래처반품')
 @section('content')
 <div class="page_tit">
-	<h3 class="d-inline-flex">상품반품이동</h3>
+	<h3 class="d-inline-flex">거래처반품</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
 		<span>/ 생산입고관리</span>
-		<span>/ 상품반품이동</span>
+		<span>/ 거래처반품</span>
 	</div>
 </div>
 <form method="get" name="search">
@@ -227,13 +227,13 @@
 		gx.Request('/store/cs/cs02/search', data, 1);
 	}
 
-    // 상품반품이동 상품관리 팝업 오픈
+    // 거래처반품 상품관리 팝업 오픈
     const openDetailPopup = (sgr_cd = '') => {
         const url = '/store/cs/cs02/show/' + sgr_cd;
         window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=880");
     };
     
-    // 상품반품이동 일괄등록 팝업 오픈
+    // 거래처반품 일괄등록 팝업 오픈
     const openBatchPopup = () => {
         const url = '/store/cs/cs02/batch';
         window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=880");
@@ -274,7 +274,7 @@
         let wrong_list = rows.filter(r => r.sgr_state != 10);
         if(wrong_list.length > 0) return alert("'접수'상태의 항목만 삭제할 수 있습니다.");
 
-        if(!confirm("삭제한 상품반품이동정보는 다시 되돌릴 수 없습니다.\n선택한 항목을 삭제하시겠습니까?")) return;
+        if(!confirm("삭제한 거래처반품정보는 다시 되돌릴 수 없습니다.\n선택한 항목을 삭제하시겠습니까?")) return;
 
         axios({
             url: '/store/cs/cs02/del-return',

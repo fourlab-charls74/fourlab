@@ -1,5 +1,5 @@
 @extends('store_with.layouts.layout-nav')
-@section('title', '상품반품이동 일괄등록')
+@section('title', '거래처반품 일괄등록')
 @section('content')
 
 <!-- import excel lib -->
@@ -8,11 +8,11 @@
 <div class="show_layout py-3 px-sm-3">
     <div class="page_tit d-flex justify-content-between">
         <div class="d-flex">
-            <h3 class="d-inline-flex">상품반품이동 일괄등록</h3>
+            <h3 class="d-inline-flex">거래처반품 일괄등록</h3>
             <div class="d-inline-flex location">
                 <span class="home"></span>
                 <span>/ 생산입고관리</span>
-                <span>/ 상품반품이동</span>
+                <span>/ 거래처반품</span>
             </div>
         </div>
         <div class="d-flex">
@@ -53,7 +53,7 @@
                                                     <div class="btn-group ml-2">
                                                         <button class="btn btn-outline-primary apply-btn" type="button" onclick="upload();">적용</button>
                                                     </div>
-                                                    <a href="/sample/sample_cs02.xlsx" class="ml-2" style="text-decoration: underline !important;">상품반품이동 등록양식 다운로드</a>
+                                                    <a href="/sample/sample_cs02.xlsx" class="ml-2" style="text-decoration: underline !important;">거래처반품 등록양식 다운로드</a>
                                                 </div>
                                             </td>
                                         </tr>
