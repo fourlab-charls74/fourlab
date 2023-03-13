@@ -359,8 +359,25 @@
             y: {
                 beginAtZero: true
             }
+        },
+        tooltips: {
+            callbacks: {
+                label: function (tooltipItem, data) {
+                    return " " + Comma(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]) + "원";
+                }           
+            },
+        },
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    callback: function(value, index) {
+                        return Comma(value);
+                    }                  		
+                }
+            }]
         }
-    }
+    },
   });
 
     function getDatesStartToLast(sdate, edate) {
@@ -425,6 +442,23 @@ let chartData2 = <?= json_encode($chart2Result)?>;
                     beginAtZero: true,
                 }
             }]
+        },
+        tooltips: {
+            callbacks: {
+                label: function (tooltipItem, data) {
+                    return " " + Comma(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]) + "원";
+                }           
+            },
+        },
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    callback: function(value, index) {
+                        return Comma(value);
+                    }                  		
+                }
+            }]
         }
     }
   });
@@ -479,6 +513,23 @@ let chartData3 = <?= json_encode($chart3Result)?>;
             yAxes: [{
                 ticks: {
                     beginAtZero: true,
+                }
+            }]
+        },
+        tooltips: {
+            callbacks: {
+                label: function (tooltipItem, data) {
+                    return " " + Comma(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]);
+                }           
+            },
+        },
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    callback: function(value, index) {
+                        return Comma(value);
+                    }                  		
                 }
             }]
         }
