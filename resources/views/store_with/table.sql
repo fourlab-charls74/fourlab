@@ -971,7 +971,7 @@ CREATE TABLE `store_group_authority` (
   `release_price_yn` char(1) DEFAULT 'Y' COMMENT '출고가보여주기',
   `pos_use_yn` char(1) DEFAULT 'Y' COMMENT 'POS 사용여부',
   `auth_store_yn` char(1) DEFAULT 'N' COMMENT '매장권한',
-  `auth_storage_yn` char(1) DEFAULT 'N' COMMENT '창고권한'
+  `auth_storage_yn` char(1) DEFAULT 'N' COMMENT '창고권한',
   PRIMARY KEY (`group_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -1044,6 +1044,21 @@ CREATE TABLE `bizest_stock_log` (
   `ut` datetime DEFAULT NULL COMMENT '수정일',
   PRIMARY KEY (`idx`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 온라인 재고 매핑 로우 데이터
+CREATE TABLE `bizest_stock_data` (
+	`idx` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Identify',
+	`stock_log_cd` int(11) NOT NULL COMMENT 'bizest_stock_log id',
+	`stock_cd` varchar(30) NOT NULL COMMENT '재고 매장/창고',
+	`prd_cd` varchar(50) NOT NULL COMMENT '상품 코드',
+	`goods_no` int(11) DEFAULT NULL COMMENT '상품 번호',
+	`goods_opt` varchar(100) DEFAULT NULL COMMENT '상품 옵션',
+	`qty` int(11) NOT NULL COMMENT '수량',
+	PRIMARY KEY (`idx`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
 --
 -- 기존 테이블 컬럼 추가 시작
 --
