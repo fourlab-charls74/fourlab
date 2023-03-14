@@ -36,14 +36,10 @@
                 <i class="fa fa-search d-block mb-3" aria-hidden="true" style="font-size:50px;"></i>
                 당일판매내역
             </button>
-            <button type="button" class="butt fs-14 fw-sb bg-purple" style="grid-area:d;" data-toggle="modal" data-target="#addCouponModal">
-                <i class="fa fa-credit-card d-block mb-3" aria-hidden="true" style="font-size:50px;"></i>
-                쿠폰등록
-            </button>
-            {{-- <button type="button" class="butt fs-12 fw-sb bg-gray" style="grid-area:h;" onclick="return alert('준비중입니다.');">
-                <i class="fa fa-plus-circle d-block mb-3" aria-hidden="true" style="font-size:40px;"></i>
+            <button type="button" class="butt fs-14 fw-sb bg-gray" style="grid-area:d;" onclick="return alert('준비중입니다.');">
+                <i class="fa fa-plus-circle d-block mb-3" aria-hidden="true" style="font-size:50px;"></i>
                 부가기능
-            </button> --}}
+            </button>
             <div class="d-flex flex-column justify-content-between align-items-stretch align-items-center fs-12 bg-navy p-1" style="grid-area:e;">
                 <div class="w-100">
                     <p class="text-center fs-16 fw-sb p-4" style="border-bottom:2px solid #999;">직전결제내역</p>
@@ -58,9 +54,13 @@
                 </div>
                 <button type="button" class="butt fc-navy fw-b bg-white m-2" style="height:60px;border-radius:12px;" onclick="return viewPrevOrder();">영수증 조회</button>
             </div>
-            <button type="button" class="butt fs-14 fw-sb bg-mint" style="grid-area:f;" data-toggle="modal" data-target="#searchWaitingModal">
+            {{-- <button type="button" class="butt fs-14 fw-sb bg-mint" style="grid-area:f;" data-toggle="modal" data-target="#searchWaitingModal">
                 <i class="fa fa-bookmark d-block mb-3" aria-hidden="true" style="font-size:50px;"></i>
                 대기 <span id="waiting_cnt">0</span>
+            </button> --}}
+            <button type="button" class="butt fs-14 fw-sb bg-mint" style="grid-area:f;" data-toggle="modal" data-target="#addCouponModal">
+                <i class="fa fa-credit-card d-block mb-3" aria-hidden="true" style="font-size:50px;"></i>
+                쿠폰등록
             </button>
             <button type="button" class="butt fs-14 fw-sb bg-red" style="grid-area:g;" data-toggle="modal" data-target="#searchOrdNoModal">
                 <i class="fa fa-reply d-block mb-3" aria-hidden="true" style="font-size:50px;"></i>
@@ -108,6 +108,10 @@
                             <p>거스름돈</p>
                             <p><strong id="change_amt" class="fc-red fw-b mr-1">0</strong>원</p>
                         </div>
+                        <div class="d-flex justify-content-between align-items-center fs-12 fw-sb mt-3">
+                            <p>총 주문수량</p>
+                            <p><strong id="total_order_qty" class="fw-b mr-1">0</strong>개</p>
+                        </div>
                     </div>
                     <div class="flex-2 d-flex">
                         <button type="button" class="butt flex-2 fc-white fs-20 fw-b br-2 bg-blue p-2 mr-3" data-toggle="modal" data-target="#payModal" data-title="신용카드 결제" data-pay-type="card_amt">
@@ -132,8 +136,8 @@
                 </div>
                 <div class="d-flex">
                     <div class="flex-1 d-flex mr-4">
-                        <button type="button" class="butt flex-1 fc-white fs-16 fw-sb br-1 bg-red p-4 mr-3" onclick="return cancelOrder();">전체취소</button>
-                        <button type="button" class="butt flex-1 fc-white fs-16 fw-sb br-1 bg-gray p-4" onclick="return waiting();">대기</button>
+                        <button type="button" class="butt flex-1 fc-white fs-16 fw-sb br-1 bg-red p-4" onclick="return cancelOrder();">주문 초기화</button>
+                        {{-- <button type="button" class="butt flex-1 fc-white fs-16 fw-sb br-1 bg-gray p-4" onclick="return waiting();">대기</button> --}}
                     </div>
                     <div class="flex-2">
                         <textarea name="memo" id="memo" rows="2" class="w-100 h-100 fs-12 p-2 mr-2 noresize" placeholder="특이사항"></textarea>
@@ -185,8 +189,12 @@
                             <p class="text-right" id="cur_goods_nm"></p>
                         </li>
                         <li class="d-flex justify-content-between mb-2">
-                            <p class="fc-blue fw-b" style="min-width: 80px;">옵션명</p>
-                            <p class="text-right" id="cur_goods_opt"></p>
+                            <p class="fc-blue fw-b" style="min-width: 80px;">컬러명</p>
+                            <p class="text-right" id="cur_goods_color"></p>
+                        </li>
+                        <li class="d-flex justify-content-between mb-2">
+                            <p class="fc-blue fw-b" style="min-width: 80px;">사이즈명</p>
+                            <p class="text-right" id="cur_goods_size"></p>
                         </li>
                         <li class="d-flex justify-content-between">
                             <p class="fc-blue fw-b" style="min-width: 80px;">상품코드</p>
@@ -200,7 +208,7 @@
                     <table class="prd_info_table w-100 fs-10">
                         <tr>
                             <th>수량</th>
-                            <td id="cur_qty" class="pr-3">-</td>
+                            <td class="pl-3 pr-3"><input type="text" id="cur_qty" class="inp_num" value=""></td>
                         </tr> 
                         <tr>
                             <th>단가</th>
@@ -254,7 +262,7 @@
                         <button type="button" class="butt fs-14 bg-lightgray" value="removeAll" style="grid-area:n;">clear</button>
                         <button type="button" class="butt fs-14 bg-lightgray" value="remove" style="grid-area:o;"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>
                         <button type="button" class="butt fs-14 fc-white bg-gray" value="qty" style="grid-area:p;">수량변경</button>
-                        <button type="button" class="butt fs-14 fc-white bg-gray" value="price" style="grid-area:q;">단가변경</button>
+                        {{-- <button type="button" class="butt fs-14 fc-white bg-gray" value="price" style="grid-area:q;">단가변경</button> --}}
                     </div>
                 </div>
             </div>
@@ -469,7 +477,7 @@
                             <form name="add_member">
                                 <table class="table incont table-bordered mt-2" id="dataTable" width="100%" cellspacing="0">
                                     <colgroup>
-                                        <col width="120px">
+                                        <col width="130px">
                                     </colgroup>
                                     <tr>
                                         <th class="required">아이디</th>
@@ -507,8 +515,8 @@
                                     <tr>
                                         <th class="required">휴대폰</th>
                                         <td>
-                                            <div class="flax_box">
-                                                <div class="form-inline mr-0 mr-sm-1" style="width:100%;max-width:400px;vertical-align:top;">
+                                            <div class="d-flex flex-column flex-sm-row">
+                                                <div class="form-inline mr-1 mb-2 mb-sm-0" style="width:100%;max-width:400px;vertical-align:top;">
                                                     <div class="form-inline-inner input_box" style="width:30%;">
                                                         <input type="text" name="mobile1" id="mobile1" class="form-control form-control-sm" maxlength="3" onkeyup="onlynum(this)">
                                                     </div>
@@ -521,6 +529,8 @@
                                                         <input type="text" name="mobile3" id="mobile3" class="form-control form-control-sm" maxlength="4" onkeyup="onlynum(this)">
                                                     </div>
                                                 </div>
+                                                <input type="hidden" name="user_mobile_check" id="user_mobile_check" value="N">
+                                                <a href="#" onclick="return checkUserPhone();" class="butt d-flex justify-content-center align-items-center fc-white fs-08 fw-sb br-05 bg-gray p-1" style="min-width:70px;">중복확인</a>
                                             </div>
                                         </td>
                                     </tr>
@@ -530,6 +540,21 @@
                                             <div class="flax_box">
                                                 <input type="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                                                     name="email" id="email" class="form-control form-control-sm">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>마케팅정보 수신여부</th>
+                                        <td>
+                                            <div class="flax_box">
+                                                <div class="custom-control custom-checkbox mr-3">
+                                                    <input type="checkbox" name="send_mail_yn" id="send_mail_yn" class="custom-control-input" value="Y" checked>
+                                                    <label class="custom-control-label" for="send_mail_yn">이메일 수신</label>
+                                                </div>
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox" name="send_mobile_yn" id="send_mobile_yn" class="custom-control-input" value="Y" checked>
+                                                    <label class="custom-control-label" for="send_mobile_yn">SMS 수신</label>
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>
@@ -620,7 +645,8 @@
                         </div>
                         <div class="card-body b-none mt-4">
                             <div class="d-flex align-items-center br-2 b-1-gray bg-white shadow-box p-2 pl-4 mb-3">
-                                <select name="search_member_type" id="search_member_type" class="sel fs-12" style="min-width: 120px;">
+                                <select name="search_member_type" id="search_member_type" class="sel fs-10" style="min-width: 120px;">
+                                    <option value="phone">휴대폰뒷자리</option>
                                     <option value="user_nm">고객명</option>
                                 </select>
                                 <input type="text" class="flex-1 inp h-40 fs-12 mr-1" id="search_member_keyword" name="search_member_keyword" placeholder="검색어를 입력하세요">
@@ -894,7 +920,7 @@
                                 </table>
                             </form>
                             <div class="text-center w-100">
-                                <button type="button" onclick="return addCoupon();" class="butt fc-white fs-12 fw-sb br-1 bg-purple w-100 p-3">등록</button>
+                                <button type="button" onclick="return addCoupon();" class="butt fc-white fs-12 fw-sb br-1 bg-mint w-100 p-3">등록</button>
                             </div>
                         </div>
                     </div>
@@ -1115,6 +1141,13 @@
                 }
             }
         });
+        $("#cur_qty").on("keypress", function(e) {
+            if(e.keyCode === 13) {
+                const val = e.target.value;
+                if (!isNaN(val * 1)) updateOrderValue('cur_qty', val * 1);
+                else e.target.value = '';
+            }
+        });
         
         $("#search_member_keyword").on("keypress", function (e) {
             if(e.keyCode === 13) SearchMember();
@@ -1198,6 +1231,10 @@
         $("#search_ord_no_btn").on("click", function(e) {
             e.preventDefault();
             searchOrderByOrdNo($("#search_ord_no").val());
+        });
+
+        $('#addMemberModal').on('hide.bs.modal', function() {
+            initAddMemberModal();
         });
 
         /** 쿠폰등록모달 관련 */

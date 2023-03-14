@@ -358,7 +358,7 @@ class PosController extends Controller
                 'name' => object_get($data, 'name', ''),
                 'sex' => object_get($data, 'sex', ''),
                 'email' => object_get($data, 'email', ''),
-                'email_chk' => 'Y',
+                'email_chk' => object_get($data, 'send_mail_yn', 'N'),
                 'zip' => object_get($data, 'zipcode', ''),
                 'addr' => object_get($data, 'addr1', ''),
                 'addr2' => object_get($data, 'addr2', ''),
@@ -370,7 +370,7 @@ class PosController extends Controller
                 'point' => 0,
                 'ypoint' => 0,
                 'yn' => 'Y',
-                'mobile_chk' => 'Y',
+                'mobile_chk' => object_get($data, 'send_mobile_yn', 'N'),
                 'yyyy_chk' => object_get($data, 'yyyy_chk', ''),
                 'yyyy' => object_get($data, 'yyyy', '0000'),
                 'mm' => sprintf("%02d", object_get($data, 'mm', '00')),
@@ -384,7 +384,7 @@ class PosController extends Controller
                 'store_cd' => $store_cd,
                 'store_nm' => $store_nm,
             ];
-
+            
             DB::table('member')->insert($values);
             
             $msg = "고객정보가 정상적으로 등록되었습니다.";
@@ -407,6 +407,16 @@ class PosController extends Controller
         }
 
         return response()->json(['code' => $code, 'msg' => $msg, 'user' => $member]);
+    }
+
+    /** 회원 휴대폰 중복체크 */
+	public function check_phone(Request $request) {
+        $mobile1 = $request->input('mobile1', '');
+        $mobile2 = $request->input('mobile2', '');
+        $mobile3 = $request->input('mobile3', '');
+        $mobile = $mobile1 . '-' . $mobile2 . '-' . $mobile3;
+
+		return DB::table('member')->where('mobile', $mobile)->count();
     }
 
     /** 주문등록 (판매 / 대기) */

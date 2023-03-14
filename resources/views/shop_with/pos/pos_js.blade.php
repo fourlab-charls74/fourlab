@@ -13,10 +13,10 @@
         $("#" + idx).addClass("d-flex");
 
         if(idx === "pos_order") {
-            $("#home_btn").css("display", "none");
+            // $("#home_btn").css("display", "none");
             $("#search_prd_keyword_out").trigger("focus");
         } else {
-            $("#home_btn").css("display", "inline-block");
+            // $("#home_btn").css("display", "inline-block");
             $("#search_prd_keyword_out").val('');
         }
     }
@@ -140,6 +140,7 @@
             $("#payed_amt").text(0);
             $("#change_amt").text(0);
             $("#due_amt").text(0);
+            $("#total_order_qty").text(0);
             
             $("#card_amt").text(0);
             $("#cash_amt").text(0);
@@ -147,12 +148,15 @@
         }
     }
     
-    /** 전체취소 */
+    /** 
+     * 전체취소
+     * 주문초기화로 기능변경 - 20230314
+     */
     function cancelOrder() {
-        if(!confirm("해당주문건을 취소하시겠습니까?")) return;
+        // if(!confirm("해당주문건을 취소하시겠습니까?")) return;
         initOrderScreen();
-        if($("[name=cur_ord_state]").val() == ORD_STATE.WAITING) setNewOrdNo(true);
-        setScreen('pos_main');
+        // if($("[name=cur_ord_state]").val() == ORD_STATE.WAITING) setNewOrdNo(true);
+        // setScreen('pos_main');
     }
 
     /** 새로운 주문번호 조회 */
@@ -210,9 +214,10 @@
         if(prd_cd == '') {
             // 초기화
             $("#cur_goods_nm").text('');
-            $("#cur_goods_opt").text('');
+            $("#cur_goods_color").text('');
+            $("#cur_goods_size").text('');
             $("#cur_prd_cd").text('');
-            $("#cur_qty").text('-');
+            $("#cur_qty").val('');
             $("#cur_price").text('-');
             $("#cur_goods_sh").text('-');
             $("#cur_img").attr('src', '');
@@ -226,9 +231,10 @@
         let goods = list.find(g => g.prd_cd === prd_cd);
 
         $("#cur_goods_nm").text(goods.goods_nm);
-        $("#cur_goods_opt").text(goods.goods_opt);
+        $("#cur_goods_color").text(goods.color);
+        $("#cur_goods_size").text(goods.size);
         $("#cur_prd_cd").text(goods.prd_cd);
-        $("#cur_qty").text(Comma(goods.qty));
+        $("#cur_qty").val(goods.qty);
         $("#cur_price").text(Comma(goods.price));
         $("#cur_goods_sh").text(Comma(goods.goods_sh));
         $("#cur_img").attr('src', "{{config('shop.image_svr')}}" + "/" + goods.img);
@@ -258,6 +264,8 @@
                 $("#pr_code").prop("selectedIndex", 0);
             }
         }
+
+        $("#cur_qty").trigger('focus');
     }
 
     /** 상품리스트에서 상품 삭제 */
@@ -289,7 +297,7 @@
             if(curRow.length > 0) {
                 let rowData = curRow[0].data;
                 if(key === 'cur_qty') {
-                    $("#cur_qty").text(Comma(value));
+                    $("#cur_qty").val(value);
                     curRow[0].setData({...rowData, qty: value, total: rowData.price * value});
                 } else if(key === 'cur_price') {
                     $("#cur_price").text(Comma(value));
@@ -311,6 +319,7 @@
         let list = gx.getRows();
 
         let order_price = list.reduce((a, c) => a + c.total, 0);
+        let order_qty = list.reduce((a, c) => a + c.qty, 0);
         let card_amt = $("[name=card_amt]").val() * 1;
         let cash_amt = $("[name=cash_amt]").val() * 1;
         let point_amt = $("[name=point_amt]").val() * 1;
@@ -321,6 +330,7 @@
         $("#payed_amt").text(Comma(payed_amt));
         $("#change_amt").text(Comma(payed_amt - order_price > 0 ? payed_amt - order_price : 0));
         $("#due_amt").text(Comma(order_price - payed_amt > 0 ? order_price - payed_amt : 0));
+        $("#total_order_qty").text(Comma(order_qty));
 
         $("#card_amt").text(Comma(card_amt));
         $("#cash_amt").text(Comma(cash_amt));
@@ -341,9 +351,14 @@
         let cash_amt = $("[name=cash_amt]").val() * 1;
         let point_amt = $("[name=point_amt]").val() * 1;
         let cart = gx.getRows();
-        let memo = $("[name=memo]").val();
+        let memo = $("[name=memo]").val().trim();
         let ord_no = "";
         let removed_goods = [];
+
+        // 판매유형이 '온라인판매'(81)일 경우, 특이사항에 온라인주문번호 등 해당정보를 반드시 기입할 수 있도록 설정
+        if (cart.filter((c) => c.sale_type === '81').length > 0 && memo === '') {
+            return alert("'온라인판매'의 경우, 특이사항에 온라인주문번호 등 해당정보를 반드시 기입해주세요.");
+        }
 
         if($("[name=cur_ord_state]").val() == ORD_STATE.WAITING) {
             ord_no = $("#ord_no").text();
@@ -396,52 +411,54 @@
         return true;
     }
 
-    /** 대기 */
-    function waiting() {
-        if(!validate(false)) return;
+    /** 
+     * 대기
+     * 대기기능제거(본사요청) - 20230314
+     */
+    // function waiting() {
+    //     if(!validate(false)) return;
 
-        let cart = gx.getRows();
-        let memo = $("[name=memo]").val();
-        let ord_no = "";
-        let removed_goods = [];
+    //     let cart = gx.getRows();
+    //     let memo = $("[name=memo]").val();
+    //     let ord_no = "";
+    //     let removed_goods = [];
 
-        if($("[name=cur_ord_state]").val() == ORD_STATE.WAITING) {
-            ord_no = $("#ord_no").text();
-            removed_goods = $("[name=removed_goods]").val().split(",").filter(g => g !== '');
-        }
+    //     if($("[name=cur_ord_state]").val() == ORD_STATE.WAITING) {
+    //         ord_no = $("#ord_no").text();
+    //         removed_goods = $("[name=removed_goods]").val().split(",").filter(g => g !== '');
+    //     }
         
-        axios({
-            async: true,
-            url: '/shop/pos/save',
-            method: 'post',
-            dataType: "json",
-            data: {
-                ord_no,
-                ord_state: '1', // 입금예정 처리
-                card_amt: 0,
-                cash_amt: 0,
-                point_amt: 0,
-                cart,
-                removed_cart: removed_goods,
-                memo,
-                user_id: $("#user_id_txt").text(),
-            },
-        }).then(function (res) {
-            console.log("등록완료", res);
-            if(res.data.code === '200') {
-                initOrderScreen();
-                setNewOrdNo(true);
-                searchWaiting();
-            } else if(res.data.code !== '500') {
-                alert(res.data.msg);
-            } else {
-                console.log(res);
-                alert("대기처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-            }
-        }).catch(function (err) {
-            console.log(err);
-        });
-    }
+    //     axios({
+    //         async: true,
+    //         url: '/shop/pos/save',
+    //         method: 'post',
+    //         dataType: "json",
+    //         data: {
+    //             ord_no,
+    //             ord_state: '1', // 입금예정 처리
+    //             card_amt: 0,
+    //             cash_amt: 0,
+    //             point_amt: 0,
+    //             cart,
+    //             removed_cart: removed_goods,
+    //             memo,
+    //             user_id: $("#user_id_txt").text(),
+    //         },
+    //     }).then(function (res) {
+    //         if(res.data.code === '200') {
+    //             initOrderScreen();
+    //             setNewOrdNo(true);
+    //             searchWaiting();
+    //         } else if(res.data.code !== '500') {
+    //             alert(res.data.msg);
+    //         } else {
+    //             console.log(res);
+    //             alert("대기처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+    //         }
+    //     }).catch(function (err) {
+    //         console.log(err);
+    //     });
+    // }
 
     /** 고객검색 */
     function SearchMember() {
@@ -510,6 +527,23 @@
         }
     }
 
+    /** 고객 휴대폰 중복확인 */
+    async function checkUserPhone() {
+        let form = $("form[name=add_member]");
+        if(!validateMember(getForm2JSON(form), true)) return;
+
+        let { data: cnt, status } = await axios({ url: '/shop/pos/check-phone?' + form.serialize(), method: 'get'});
+        if(status != 200) return alert("중복확인 중 오류가 발생했습니다.\n다시 시도해주세요.");
+
+        if(cnt > 0) {
+            $("#user_mobile_check").val("N");
+            alert("해당 휴대폰을 사용하는 고객정보가 이미 존재합니다.");
+        } else {
+            $("#user_mobile_check").val("Y");
+            alert("사용가능한 휴대폰정보입니다.");
+        }
+    }
+
     /** 주소검색 */
     function openFindAddress(zipName, addName) {
         new daum.Postcode({
@@ -525,6 +559,7 @@
     function initAddMemberModal() {
         document.add_member.reset();
         $("#user_id_check").val("N");
+        $("#user_mobile_check").val("N");
     }
 
     /** 고객등록 */
@@ -553,14 +588,20 @@
     }
 
     /** 고객등록 시 null check */
-    function validateMember(data) {
-        if(data.user_id.trim().length < 1) return alert("아이디를 입력해주세요.");
-        if(data.user_id_check !== 'Y') return alert("아이디 중복확인을 진행해주세요.");
-        if(data.name.trim().length < 1) return alert("이름을 입력해주세요.");
+    function validateMember(data, only_phone = false) {
+        if (!only_phone) {
+            if(data.user_id.trim().length < 1) return alert("아이디를 입력해주세요.");
+            if(data.user_id_check !== 'Y') return alert("아이디 중복확인을 진행해주세요.");
+            if(data.name.trim().length < 1) return alert("이름을 입력해주세요.");
+        }
 
         const mobile_reg = /^01(?:0|1|[6-9])$/;
         if (!mobile_reg.test(data.mobile1)) return alert("휴대폰 앞3자리를 정확하게 입력해주세요.");
         if (!data.mobile2 || !data.mobile3) return alert("휴대폰번호를 입력해주세요.");
+
+        if (!only_phone) {
+            if(data.user_mobile_check !== 'Y') return alert("휴대폰 중복확인을 진행해주세요.");
+        }
 
         return true;
     }

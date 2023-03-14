@@ -133,6 +133,8 @@ textarea::placeholder {color: #999;font-size: inherit;}
 table.prd_info_table tr:not(:last-child) {border-bottom: 1px solid #bbb;}
 table.prd_info_table th {padding: 1.23rem;width: 100px;text-align: center;background-color: #e2e2e2;}
 table.prd_info_table td {text-align: right;font-weight: bold;}
+table.prd_info_table td .inp_num {width: 100%;text-align: right;border: none;font-size: 20px;font-weight: inherit;}
+table.prd_info_table td .inp_num:focus {outline: none;}
 .calculator-grid {
     display: grid;
     border: 1px solid #bbb;
@@ -145,7 +147,7 @@ table.prd_info_table td {text-align: right;font-weight: bold;}
         'b c d n'
         'e f g o'
         'h i j p'
-        'k l m q'
+        'k l m p'
 }
 .calculator-grid.payment {
     grid-template-areas: 

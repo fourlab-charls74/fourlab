@@ -89,6 +89,7 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
     Route::prefix("pos")->namespace('pos')->group(function () {
         Route::get('', 'PosController@index');
         Route::get('search/{cmd?}', 'PosController@search_command');
+        Route::get('check-phone', 'PosController@check_phone');
         Route::post('save', 'PosController@save');
         Route::post('add-member', 'PosController@add_member');
         Route::post('add-coupon', 'PosController@add_coupon');
