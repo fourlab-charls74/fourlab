@@ -48,8 +48,11 @@
                 </div>
             </div>
 			<div class="card shadow">
-                <div class="card-header mb-0">
+                <div class="card-header mb-0 d-flex align-items-center justify-content-between">
                     <a href="#">창고 버퍼링 설정</a>
+                    <div class="fr_box flax_box" style="color:#FF0000;">
+                        <div class="mr-1">※ 버퍼링을 입력하지 않으면 버퍼링 설정 안함</div>
+                    </div>
                 </div>
                 <div class="card-body mt-1">
                     <div class="row_wrap">
@@ -97,8 +100,11 @@
                 </div>
             </div>
             <div class="card shadow">
-                <div class="card-header mb-0">
+                <div class="card-header mb-0 d-flex align-items-center justify-content-between">
                     <a href="#">매장 버퍼링 설정</a>
+                    <div class="fr_box flax_box" style="color:#FF0000;">
+                        <div class="mr-1">※ 통합버퍼링을 입력하지 않으면 버퍼링 설정 안함</div>
+                    </div>
                 </div>
                 <div class="card-body mt-1">
                     <div class="row_wrap">
@@ -127,7 +133,7 @@
                                                 <td>
                                                     <div class="form-inline">
                                                         <div class="d-flex w-100">
-                                                            <input type='text' class="form-control form-control-sm" name='store_buffer' id="store_buffer" />
+                                                            <input type='text' class="form-control form-control-sm" name='store_tot_buffer' id="store_tot_buffer" />
                                                         </div>
                                                     </div>
                                                 </td>
@@ -141,8 +147,11 @@
                 </div>
             </div>
 			<div class="card shadow" id="store_buffer_s_chk">
-				<div class="card-header mb-0">
+				<div class="card-header mb-0 d-flex align-items-center justify-content-between">
 					<a href="#">매장별 개별버퍼링</a>
+                    <div class="fr_box flax_box" style="color:#FF0000;">
+                        <div class="mr-1">※ 선택하지 않은 매장은 버퍼링 설정 안함</div>
+                    </div>
 				</div>
 				<div class="card-body mt-1">
 					<div class="card-title">
@@ -158,15 +167,24 @@
 				</div>
 			</div>
             <div class="card shadow">
-                <div class="card-header mb-0">
+                <div class="card-header mb-0 d-flex align-items-center justify-content-between">
                     <a href="#">재고예외</a>
+                    <div class="fr_box flax_box" style="color:#FF0000;">
+                        <div class="mr-1">※ 창고, 매장의 제한 수량을 입력하지 않으면 예외처리 안함</div>
+                    </div>
                 </div>
                 <div class="card-body mt-1">
                     <div class="card-title">
 						<div class="filter_wrap">
-							<div class="fl_box px-0 mx-0">
-								<h6 class="m-0 font-weight-bold">총 : <span id="gd_prd-total" class="text-primary">0</span> 건</h6>
-							</div>
+                            <div class="fl_box mt-1">
+                                <h6 class="font-weight-bold">총 : <span id="gd_prd-total" class="text-primary">0</span> 건</h6>
+                            </div>
+                            <div class="fr_box mt-1">
+                                <div class="flax_box">
+                                    <a href="#" onclick="Add()" class="btn-sm btn btn-primary shadow-sm pl-2 mr-1">추가</a>
+                                    <a href="#" onclick="ChangeData()" class="btn-sm btn btn-primary shadow-sm pl-2 mr-1">선택 정보 변경</a>
+                                <div>
+                            </div>
 						</div>
 					</div>
 					<div class="table-responsive">
@@ -183,18 +201,54 @@
 </div>
 <script>
     const store_columns = [
-        {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null, cellStyle: {"background":"#F5F7F7"}},
-        {field: "store_nm", headerName: "매장명", width:200},
-        {field: "store_buffer", headerName: "버퍼링 수", width:100},
+        {
+            headerName: '사용여부',
+            // headerCheckboxSelection: true,
+            checkboxSelection: true,
+            width: 28,
+            pinned:'left'    
+        },
+        {
+			headerName: '#',
+			width:35,
+			maxWidth: 100,
+			valueGetter: 'node.id',
+			cellRenderer: 'loadingRenderer',
+            cellStyle: {'text-align':'center'},
+			pinned:'left'
+		},
+        {field: "code_val", headerName: "매장명", width:200},
+        {field: "store_buffer", headerName: "버퍼링 수", width:100, editable: true, cellStyle: {'background' : '#ffff99', "text-align":"right"}},
+        {field: "code_id", headerName: "매장아이디", hide: true},
         {field: "", width:"auto"}
     ];
 
     const product_columns = [
-        {headerName: '#', width:35, pinned: 'left', type:'NumType', cellStyle: {"background":"#F5F7F7"}},
-        {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null, cellStyle: {"background":"#F5F7F7"}},
-        {field: "prd_nm", headerName: "매장명", width:200},
-        {field: "prd_limit_storage", headerName: "창고 제한 수", width:100},
-        {field: "prd_limit_store", headerName: "매장 제한 수", width:100},
+        {
+			headerName: '',
+			headerCheckboxSelection: true,
+			checkboxSelection: true,
+			width:28,
+			pinned:'left'
+		},
+		{
+			headerName: '#',
+			width:35,
+			maxWidth: 100,
+			valueGetter: 'node.id',
+			cellRenderer: 'loadingRenderer',
+            cellStyle: {'text-align':'center'},
+			pinned:'left'
+		},
+        {field: "prd_cd", headerName: "바코드", width:200},
+        {field: "storage_limit_qty", headerName: "창고 제한 수", width:100, editable: true, cellStyle:{"background-color":"#FFFF99", "text-align":"right"}},
+        {field: "store_limit_qty", headerName: "매장 제한 수", width:100, editable: true, cellStyle:{"background-color":"#FFFF99", "text-align":"right"}},
+        {field: "comment", headerName: "정보", width:220},
+        {headerName: "삭제", field: "del", width:58, cellStyle:{"text-align":"center"},
+            cellRenderer: function(params) {
+				return '<a href="#" onClick="Del(\''+ params.data.prd_cd +'\')">'+ params.value+'</a>'
+            }
+		},
         {field: "", width:"auto"}
     ];
 </script>
@@ -202,56 +256,196 @@
     const pApp = new App('', {
         gridId: "#div-gd_prd",
     });
+
     let gxStore;
     let gxProduct;
 
     $(document).ready(function() {
-        // pApp.ResizeGrid(550);
+        $("#store_buffer_s_chk").hide();
+
+        pApp.ResizeGrid(550);
         let gridPrdDiv = document.querySelector(pApp.options.gridId);
         if(gridPrdDiv !== null){
             gxProduct = new HDGrid(gridPrdDiv, product_columns);
             SearchProduct();
         }
 
-        let gridStoreDiv = document.querySelector("#div-gd_store");
+        const gridStoreDiv = document.querySelector("#div-gd_store");
         if(gridStoreDiv !== null) {
             gxStore = new HDGrid(gridStoreDiv, store_columns);
-            
-            if ($('#store_buffer_s').is(":checked") === true) {
-                SearchStore();
-            }
+            Search_Store();
+        }
+        
+        $("#store_buffer_s").click(function () {
+            $("#store_buffer_s_chk").toggle();
+            $("#store_tot_buffer").attr("readonly", true);
+        });
 
-            $("#store_buffer_s").click(function () {
-                $("#store_buffer_s_chk").toggle();
-            });
+        $("#store_buffer_a").click(function () {
+            $("#store_buffer_s_chk").toggle();
+            $("#store_tot_buffer").attr("readonly", false);
+        });
+    });
+
+    function Validate() {
+        const ff = document.detail;
+        let storeRows = gxStore.getSelectedRows();
+        let result = true;
+
+        if( ff.default_storage_buffer.value == "" ) {
+            ret = confirm("대표창고 버퍼링이 설정되지 않았습니다.\r\n이대로 진행하시겠습니까?");
+            if(!ret) {
+                ff.default_storage_buffer.focus();
+                result = false;
+                return false;
+            }
         }
 
-        // gxStore = new HDGrid(gridDiv, store_columns);
-        // storeSearch();
-        // gxProduct = new HDGrid(gridDiv, product_columns);
-        // prdSearch();
-    });
+        if( ff.online_storage_buffer.value == "" ) {
+            ret = confirm("온라인창고 버퍼링이 설정되지 않았습니다.\r\n이대로 진행하시겠습니까?");
+            if(!ret) {
+                ff.online_storage_buffer.focus();
+                result = false;
+                return false;
+            }
+        }
 
+        if( $("input[name='store_buffer_kind']:checked").val() == 'A' && ff.store_tot_buffer.value == "" ) {
+            ret = confirm("통합버퍼링이 설정되지 않았습니다.\r\n이대로 진행하시겠습니까?");
+            if(!ret) {
+                ff.store_tot_buffer.focus();
+                result = false;
+                return false;
+            }
+        }
 
-    $(document).ready(function() {
-  
-        if($("input[name='store_buffer_kind']:checked").val() == "S"){
-            $("input:text[name='store_buffer']").attr("readonly",true);
-            $('#store_buffer_s_chk').show();
-            // radio 버튼의 value 값이 S라면 활성화
-        } else {
-           
-        }  
-    });
+        if( $("input[name='store_buffer_kind']:checked").val() == 'S' ) {
+            if( storeRows.length == 0) {
+                alert("버퍼링을 설정할 매장을 선택하십시오.");
+                result = false;       
+                return false;
+            } else {
+                storeRows.forEach((row, idx) => {
+                    if ( typeof(row.store_buffer) == "undefined" ) {
+                        alert("매장별 개별버퍼링을 설정하세요.")
+                        result = false;
+                        return false;
+                    }
+                });
+            }
+            return result;
+        }
+        
+        return result;
+    }
 
-    function SearchStore() {
-        gxStore.Request('/store/product/prd06/search-store', data, 1);
+    function Search_Store() {
+        gxStore.Request('/store/product/prd06/search_store', '');
     }
 
     function SearchProduct() {
-        gxProduct.Request('/store/product/prd06/search-prd', 1);
+        gxProduct.Request('/store/product/prd06/search_prd', '');
     }
 
+    function Save() {
+        if (Validate() === false) return;
 
+        let data = $('form[name="detail"]').serialize();
+        let storeRows = gxStore.getSelectedRows();
+        let idArr = [];
+        
+        if(storeRows.length > 0) {
+            let sRows = gxStore.getRows();
+            sRows.forEach((row, idx) => {
+                idArr.push(row.code_id);
+            });
+    
+            storeRows.forEach((row, idx) => {
+                idArr = idArr.filter((element) => element != row.code_id);
+            });
+        }
+
+        axios({
+			url: '/store/product/prd06/save',
+			method: 'post',
+			data: data + '&store_data=' + JSON.stringify(storeRows) + '&idArr=' + JSON.stringify(idArr),
+		}).then(function(res) {
+			if (res.data.code === 200) {
+				alert("저장이 완료되었습니다.");
+				window.close();
+				opener.Search();
+			} else {
+				console.log(res.data);
+				alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+			}
+		}).catch(function(err) {
+			console.log(err);
+		});
+    }
+
+    function Add() {
+        const url='/store/product/prd06/add_show';
+        window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=330");
+	}
+
+    function ChangeData() {
+		let checkRows = gxProduct.gridOptions.api.getSelectedRows();
+
+		if (checkRows.length === 0) {
+            alert("수정할 데이터를 선택해주세요.");
+            return;
+		}
+
+		if (confirm("선택하신 데이터를 수정하시겠습니까?")) {
+			$.ajax({
+				async: true,
+				type: 'put',
+				url: '/store/product/prd06/prd_update',
+				data: {
+					data : JSON.stringify(checkRows),
+				},
+				success: function (data) {
+					if (data.code == "200") {
+						alert("선택한 데이터가 수정 되었습니다.");
+						SearchProduct();
+					} 
+					else {
+						alert("데이터 수정이 실패하였습니다.");
+					}
+				},
+				error: function(request, status, error) {
+					alert("시스템 에러입니다. 관리자에게 문의하여 주십시요.");
+					console.log("error")
+				}
+			});
+		}
+	}
+
+    function Del(item) {
+		ret	= confirm("삭제 하시겠습니까?");
+
+		if (ret) {
+			$.ajax({
+				async: true,
+				type: 'put',
+				url: '/store/product/prd06/prd_delete',
+				data: {
+					prd_cd : item,
+				},
+				success: function (data) {
+					if (data.code == "200") {
+						alert("삭제 되었습니다.");
+						SearchProduct();
+					} else {
+					    alert("삭제를 실패하였습니다.");
+					}
+				},
+				error: function(request, status, error) {
+					alert("시스템 에러입니다. 관리자에게 문의하여 주십시요.");
+					console.log("error")
+				}
+			});
+		}
+	}
 </script>
 @stop

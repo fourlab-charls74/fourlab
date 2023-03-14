@@ -53,7 +53,8 @@ class prd06Controller extends Controller
             $sql =
                 /** @lang text */
                 " 
-                select count(*) as total
+                select 
+                    count(*) as total
                 from bizest_stock_log
                 where rt >= :sdate and rt < date_add(:edate,interval 1 day) $where
 			";
@@ -68,7 +69,7 @@ class prd06Controller extends Controller
             /** @lang text */
             "
             select
-				rt, prd_stock_cnt, store_cnt, price_apply_yn, store_buffer_kind, id
+				rt, match_y_cnt, match_n_cnt, store_cnt, price_apply_yn, store_buffer_kind, id
             from bizest_stock_log
             where rt >= :sdate and rt < date_add(:edate,interval 1 day) $where
             order by rt desc
@@ -108,22 +109,25 @@ class prd06Controller extends Controller
             'online' => $online,
         ];
 
-        // dd($values);
-
         return view(Config::get('shop.store.view') . '/product/prd06_show', $values);
     }
 
     public function search_store()
     {
+        $sql = "
+            select
+                code_val, code_id 
+            from code 
+            where code_kind_cd = 'ONLINE_BUFFER_STORE'
+            order by code_seq asc
+        ";
+
+        $result = DB::select($sql);
 
         return response()->json([
 			"code"	=> 200,
 			"head"	=> array(
-				"total"		=> $total,
-				"page"		=> $page,
-				"page_cnt"	=> $page_cnt,
-				"page_total"=> count($result),
-				'total_row'  => $total_row,
+				"total"		=> count($result),
 			),
 			"body"	=> $result
 		]);
@@ -131,17 +135,214 @@ class prd06Controller extends Controller
 
     public function search_product()
     {
-        
+        $sql = "
+            select 
+                *, '삭제' as del
+            from bizest_stock_exp_product
+        ";
+        $result = DB::select($sql);
+
         return response()->json([
 			"code"	=> 200,
 			"head"	=> array(
-				"total"		=> $total,
-				"page"		=> $page,
-				"page_cnt"	=> $page_cnt,
-				"page_total"=> count($result),
-				'total_row'  => $total_row,
+				"total"		=> count($result),
 			),
 			"body"	=> $result
 		]);
     }
+
+    public function save(Request $request)
+    {
+        $admin_id                   = Auth('head')->user()->id;
+
+        $price_apply_yn             = $request->input('price_apply_yn');
+        $default_storage_cd         = $request->input('default_storage_cd');
+        $default_storage_nm         = $request->input('default_storage_nm');
+        $default_storage_buffer     = $request->input('default_storage_buffer');
+        $online_storage_cd          = $request->input('online_storage_cd');
+        $online_storage_nm          = $request->input('online_storage_nm');
+        $online_storage_buffer      = $request->input('online_storage_buffer');
+        $store_buffer_kind          = $request->input('store_buffer_kind');
+        $store_tot_buffer           = $request->input('store_buffer');
+        $store_data                 = json_decode($request->input('store_data'));
+        $idArr                      = json_decode($request->input('idArr'));
+
+        if($store_buffer_kind == 'A'){
+            $store_data       = '';
+            $idArr            = '';
+        }
+
+        try {
+			DB::beginTransaction();
+
+            DB::table('bizest_stock_conf')->insert([
+                'default_storage_cd'        => $default_storage_cd,
+                'default_storage_buffer'    => $default_storage_buffer,
+                'online_storage_cd'         => $online_storage_cd,
+                'online_storage_buffer'     => $online_storage_buffer,
+                'store_buffer_kind'         => $store_buffer_kind,
+                'store_tot_buffer'          => $store_tot_buffer,
+                'price_apply_yn'            => $price_apply_yn,
+                'rt' => now(),
+                'ut' => now(),
+                'id' => $admin_id
+            ]);
+            
+            if($store_data != '') {
+                foreach($store_data as $row) {
+                    $code_id 	    = $row->code_id;
+                    $code_val 	    = $row->code_val;
+                    $store_buffer 	= $row->store_buffer;
+                    
+                    $sql = "select count(*) as count from bizest_stock_store where store_cd = :code_id";
+                    $result	= DB::selectOne($sql, ['code_id' => $code_id]);
+                    
+                    if ($result->count == 0) {
+                        DB::table('bizest_stock_store')
+                        ->insert([
+                            'store_cd' => $code_id,
+                            'store_use_yn' => 'Y',
+                            'buffer_cnt' => $store_buffer,
+                            'rt' => now(),
+                            'id' => $admin_id
+                        ]);
+                    } else {
+                        DB::table('bizest_stock_store')
+                        ->where('store_cd', '=', $code_id)
+                        ->update([
+                            'store_use_yn' => 'Y',
+                            'buffer_cnt' => $store_buffer,
+                            'ut' => now(),
+                            'id' => $admin_id
+                        ]);
+                    }
+                }
+            }
+
+            if($idArr != '') {
+                foreach($idArr as $code_id) {
+                    $sql = "select count(*) as count from bizest_stock_store where store_cd = :code_id";
+                    $result	= DB::selectOne($sql, ['code_id' => $code_id]);
+                    if ($result->count != 0) {
+                        DB::table('bizest_stock_store')
+                        ->where('store_cd', '=', $code_id)
+                        ->update([
+                            'store_use_yn' => 'N',
+                            'ut' => now(),
+                            'id' => $admin_id
+                        ]);
+                    }
+                }
+            }
+			
+			DB::commit();
+			$code = 200;
+			$msg = "성공";
+		} catch (\Exception $e) {
+			DB::rollback();
+			$msg = $e->getMessage();
+			$code = 500;
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg]);
+        
+    }
+
+    public function prd_update(Request $request)
+	{
+		$id		= Auth('head')->user()->id;
+		$code	= "200";
+        $datas	= json_decode($request->input('data'));
+
+		if ($datas == "") {
+			$code	= "400";
+		}
+
+		DB::beginTransaction();
+		
+        foreach($datas as $data) {
+            $prd_cd = $data->prd_cd;
+            $comment = $data->comment;
+            $storage_limit_qty = $data->storage_limit_qty;
+            $store_limit_qty = $data->store_limit_qty;
+            $update = "";
+            if($storage_limit_qty != null) $update .= "storage_limit_qty = '$storage_limit_qty', ";
+            if($store_limit_qty != null) $update .= "store_limit_qty = '$store_limit_qty', ";
+
+            $sql = "
+                update bizest_stock_exp_product set
+                    $update
+                    comment = '" . Lib::quote($comment) . "',
+                    id = '$id',
+                    ut = now()
+                where
+                    prd_cd = :prd_cd
+            ";
+            DB::update($sql, ['prd_cd' => $prd_cd]);
+        }
+
+		DB::commit();
+
+		return response()->json([
+			"code" => $code
+		]);
+
+	}
+
+    public function prd_delete(Request $request)
+	{
+		$code   = "200";
+        $prd_cd	= $request->input('prd_cd');
+
+		if( $prd_cd == "" ){
+			$code = "400";
+		}
+
+		$sql = "delete from bizest_stock_exp_product where prd_cd = :prd_cd";
+		DB::delete($sql, ['prd_cd' => $prd_cd]);
+
+		return response()->json([
+			"code" => $code,
+		]);
+
+	}
+
+    public function add_show(Request $request) 
+    {
+		return view( Config::get('shop.store.view') . '/product/prd06_add_show');
+    }
+
+    public function add_save(Request $request)
+	{
+		$id		= Auth('head')->user()->id;
+		$code	= "200";
+
+        $prd_cd	            = $request->input('prd_cd');
+		$comment	        = $request->input('comment');
+		$storage_limit_qty	= $request->input('storage_limit_qty');
+		$store_limit_qty	= $request->input('store_limit_qty');
+
+		if( $prd_cd == "" ) {
+			$error_code	= "400";
+		}
+
+		$sql	= "
+			insert into bizest_stock_exp_prodcut( prd_cd, storage_limit_qty, store_limit_qty, comment, id, rt )
+			values ( :prd_cd, :storage_limit_qty, :store_limit_qty, :comment, :id, now() )
+		";
+		$result = DB::select($sql, 
+			[
+				'prd_cd'	        => $prd_cd,
+				'storage_limit_qty'	=> $storage_limit_qty,
+				'store_limit_qty'	=> $store_limit_qty,
+				'comment'		    => $comment,
+				'id'			    => $id
+			]
+		);
+
+		return response()->json([
+			"code" => $code
+		]);
+
+	}
 }

@@ -122,21 +122,15 @@
 <script>
     const columns = [
         {
-            field: "",
-            headerName: "번호",
-            width: 60,
-            cellClass: 'hd-grid-code'
+            headerName: '#',
+            width:35,
+            type:'NumType',
+            cellStyle: {"background":"#F5F7F7", "text-align":"center"}
         },
         {
             field: "rt",
             headerName: "등록일",
             width: 200,
-            cellClass: 'hd-grid-code'
-        },
-        {
-            field: "prd_stock_cnt",
-            headerName: "재고 수",
-            width: 100,
             cellClass: 'hd-grid-code'
         },
         {
@@ -146,16 +140,38 @@
             cellClass: 'hd-grid-code'
         },
         {
+            field: "match_y_cnt",
+            headerName: "매칭상품 수",
+            width: 100,
+            cellClass: 'hd-grid-code'
+        },
+        {
+            field: "match_n_cnt",
+            headerName: "비매칭 상품 수",
+            width: 100,
+            cellClass: 'hd-grid-code'
+        },
+        {
             field: "price_apply_yn",
             headerName: "가격반영",
             width: 80,
-            cellClass: 'hd-grid-code'
+            cellClass: 'hd-grid-code',
+            cellRenderer: function(params) {
+                if(params.value == 'Y') return "예"
+                else if(params.value == 'N') return "아니오"
+                else return params.value
+            }
         },
         {
             field: "store_buffer_kind",
             headerName: "매장 버퍼링 유형",
             width: 100,
-            cellClass: 'hd-grid-code'
+            cellClass: 'hd-grid-code',
+            cellRenderer: function(params) {
+                if(params.value == 'A') return "통합"
+                else if(params.value == 'S') return "개별"
+                else return params.value
+            }
         },
         {
             field: "id",

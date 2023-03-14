@@ -1023,8 +1023,8 @@ CREATE TABLE `bizest_stock_store` (
 -- 온라인 재고 매핑 예외관리
 CREATE TABLE `bizest_stock_exp_product` (
   `prd_cd` varchar(50) NOT NULL COMMENT '상품코드',
-  `store_limit_qty` int(11) DEFAULT NULL COMMENT '매장 제한수',
   `storage_limit_qty` int(11) DEFAULT NULL COMMENT '창고 제한수',
+  `store_limit_qty` int(11) DEFAULT NULL COMMENT '매장 제한수',
   `comment` varchar(255) DEFAULT NULL COMMENT '정보',
   `id` varchar(30) DEFAULT NULL COMMENT '관리자 아이디',
   `rt` datetime DEFAULT NULL COMMENT '등록일',
@@ -1038,7 +1038,8 @@ CREATE TABLE `bizest_stock_log` (
   `price_apply_yn` char(1) DEFAULT NULL COMMENT '가격 반영 여부',
   `store_buffer_kind` char(1) DEFAULT NULL COMMENT '매장 버퍼링 유형 (A : 통합, S : 개별)',
   `store_cnt` int(11) DEFAULT NULL COMMENT '사용 매장 수',
-  `prd_stock_cnt` int(11) DEFAULT NULL COMMENT '결과 상품 재고 수',
+  `match_y_cnt` int(11) DEFAULT NULL COMMENT '매칭상품 수량',
+  `match_n_cnt` int(11) DEFAULT NULL COMMENT '비매칭상품 수량',
   `id` varchar(30) DEFAULT NULL COMMENT '관리자 아이디',
   `rt` datetime DEFAULT NULL COMMENT '등록일',
   `ut` datetime DEFAULT NULL COMMENT '수정일',
