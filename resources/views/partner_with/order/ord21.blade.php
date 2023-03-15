@@ -382,7 +382,11 @@
         const gridDiv = document.querySelector(pApp.options.gridId);
         let gx;
         $(document).ready(function () {
-            gx = new HDGrid(gridDiv, columns);
+            gx = new HDGrid(gridDiv, columns, {
+                isRowSelectable : function(node){
+                    return node.data.ord_state < '30';
+                }
+            });
             pApp.ResizeGrid(300);
             Search();
 
