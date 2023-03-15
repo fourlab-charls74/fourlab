@@ -188,7 +188,11 @@
         },
         {field: "sr_cd", headerName: "반품코드", width: 100, cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {
-                return `<a href="javascript:void(0);" onclick="openDetailPopup(${params.value})">${params.value}</a>`;
+                if (params.data.sr_state == '10'){
+                    return `<a href="javascript:void(0);" onclick="openDetailPopup(${params.value})">${params.value}</a>`;
+                } else {
+                    return `<a href="javascript:void(0);" onclick="openDetailPopup2(${params.value})">${params.value}</a>`;
+                }
             }
         },
         {field: "sr_date", headerName: "반품일자", width: 100, cellStyle: {"text-align": "center"}},
@@ -228,6 +232,11 @@
     // 창고반품관리 팝업 오픈
     function openDetailPopup(sr_cd) {
         const url = '/shop/stock/stk30/show/' + sr_cd;
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=880");
+    }
+    // 창고반품관리 팝업 오픈
+    function openDetailPopup2(sr_cd) {
+        const url = '/shop/stock/stk30/view/' + sr_cd;
         window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=880");
     }
 

@@ -135,9 +135,9 @@
                         <button type="button" onclick="return setAllQty(true);" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn">반품0개처리</button>
                     </div>
                     @endif
-                    @if(@$sr_state == 30)
+                    <!-- @if(@$sr_state == 30)
                         <button type="button" onclick="return resetReturnQty(false);" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn">매장반품수량으로 초기화</button>
-                    @endif
+                    @endif -->
                     @if(@$cmd == 'add')
                     <span class="ml-1 mr-2">|</span>
                     <div class="d-flex">
@@ -196,18 +196,6 @@
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
         {field: "total_return_price", headerName: "반품금액", width: 80, type: 'currencyType'},
-        @if (@$sr_state == 30 || @$sr_state == 40)
-        {field: "fixed_return_qty", headerName: "확정수량", width: 60, type: 'currencyType',
-            editable: (params) => checkIsEditable2(params),
-            cellStyle: (params) => checkIsEditable2(params) ? {"background-color": "#ffff99"} : {}
-        },
-        {field: "fixed_return_price", headerName: "확정금액", width: 80, type: 'currencyType'},
-        {field: "fixed_comment", headerName: "확정메모", width: 300, 
-            editable: (params) => checkIsEditable2(params),
-            cellStyle: (params) => checkIsEditable2(params) ? {"background-color": "#ffff99"} : {}
-        
-        }
-        @endif
     ];
 </script>
 
@@ -477,12 +465,11 @@
 
         @if (@$sr_state == 30) 
         for (let row of rows) {
-            if(row.return_qty == 0){
-               return alert("반품수량을 입력해주세요.");
+            if(row.fixed_return_qty == 0){
+               return alert("확정수량을 입력해주세요.");
             }
         }
         @endif
-        let sr_cd = '{{ @$sr->sr_cd }}';
         let storage_cd = $('#storage_cd').val();
         let chg_state = 30;
 
@@ -493,7 +480,6 @@
             method: 'put',
             data: {
                 data: rows,
-                sr_cd : sr_cd,
                 new_state: chg_state,
                 storage_cd : storage_cd
             },

@@ -1,14 +1,10 @@
-@extends('shop_with.layouts.layout-nav')
-@php
-    $title = "창고반품등록";
-    if($cmd == "update") $title = "창고반품관리";
-@endphp
-@section('title', $title)
+@extends('store_with.layouts.layout-nav')
+@section('title', '창고반품관리')
 @section('content')
 <div class="show_layout py-3 px-sm-3">
     <div class="page_tit d-flex justify-content-between">
         <div class="d-flex">
-            <h3 class="d-inline-flex">{{ $title }}</h3>
+            <h3 class="d-inline-flex">창고반품관리</h3>
             <div class="d-inline-flex location">
                 <span class="home"></span>
                 <span>/ 매장관리</span>
@@ -16,11 +12,10 @@
             </div>
         </div>
         <div class="d-flex">
-        @if (@$sr_state == 10)
-            <a href="javascript:void(0)" onclick="Save('update')" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 처리중 </a>
-            <a href="javascript:void(0)" onclick="ChangeState()" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 이동중</a>
-        @endif
-        <a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i> 닫기</a>
+            @if(@$sr_state == '30')
+                <a href="javascript:void(0)" onclick="ChangeState2()" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 반품완료</a>
+            @endif
+            <a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i> 닫기</a>
         </div>
     </div>
 
@@ -69,10 +64,11 @@
                                             <th class="required">반품창고</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    <select name='storage_cd' id="storage_cd" class="form-control form-control-sm w-100" @if(@$cmd == 'update') disabled @endif>
+                                                    <select name='storage_cd' class="form-control form-control-sm w-100" @if(@$cmd == 'update') disabled @endif>
                                                         @foreach (@$storages as $storage)
                                                             <option value='{{ $storage->storage_cd }}' @if(@$cmd == 'update' && $sr->storage_cd == $storage->storage_cd) selected @endif>{{ $storage->storage_nm }}</option>
                                                         @endforeach
+                                                        <input type="hidden" id="storage" value="{{ @$sr->storage_cd }}" class="form-control form-control-sm w-100" readonly />
                                                     </select>
                                                 </div>
                                             </td>
@@ -97,13 +93,14 @@
                                                     </div>
                                                     @else
                                                     <input type="text" name="store_nm" id="store_nm" value="{{ @$sr->store_nm }}" class="form-control form-control-sm w-100" readonly />
+                                                    <input type="hidden" name="store_cd" id="store_cd" value="{{ @$sr->store_cd }}" class="form-control form-control-sm w-100" readonly />
                                                     @endif
                                                 </div>
                                             </td>
                                             <th class="required">반품사유</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    <select name='sr_reason' class="form-control form-control-sm w-100" @if(@$cmd == 'update') disabled @endif>
+                                                    <select name='sr_reason' class="form-control form-control-sm w-100" disabled>
                                                         @foreach ($sr_reasons as $sr_reason)
                                                         <option value='{{ $sr_reason->code_id }}' @if(@$cmd == 'update' && $sr->sr_reason == $sr_reason->code_id) selected @endif>{{ $sr_reason->code_val }}</option>
                                                         @endforeach
@@ -113,7 +110,7 @@
                                             <th>메모</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    <textarea name="comment" id="comment" class="w-100" rows="2" readonly disabled style="background-color:#ccc">{{ @$sr->comment }}</textarea>
+                                                    <textarea name="comment" id="comment" class="w-100" rows="2">{{ @$sr->comment }}</textarea>
                                                 </div>
                                             </td>
                                         </tr>
@@ -131,11 +128,11 @@
                 <div class="d-flex align-items-center">
                     @if(@$cmd == 'add' || @$sr->sr_state == '10')
                     <div class="d-flex">
-                        <button type="button" onclick="return setAllQty(false);" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn">전체반품처리</button>
-                        <button type="button" onclick="return setAllQty(true);" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn">반품0개처리</button>
+                        <button type="button" onclick="return setAllQty(false);" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn">전체재고반품처리</button>
+                        <button type="button" onclick="return setAllQty(true);" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn">반품재고초기화</button>
                     </div>
                     @endif
-                    @if(@$sr_state == 30)
+                    @if(@$sr->sr_state == '30')
                         <button type="button" onclick="return resetReturnQty(false);" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn">매장반품수량으로 초기화</button>
                     @endif
                     @if(@$cmd == 'add')
@@ -145,6 +142,7 @@
                         <button type="button" onclick="return delGoods();" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn"><i class="bx bx-trash"></i> 삭제</button>
                     </div>
                     @endif
+                  
                 </div>
             </div>
             <div class="card-body">
@@ -244,15 +242,15 @@
                             gx.gridOptions.api.updateRowData({update: [e.data]});
                             updatePinnedRow();
                         }
-                        if (e.column.colId === "fixed_return_qty" && e.data.store_wqty < parseInt(e.data.fixed_return_qty)) {
-                            alert("해당 매장의 보유재고보다 많은 수량을 반품할 수 없습니다.");
-                            gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
-                        } else {
-                            e.node.setSelected(true);
-                            e.data.fixed_return_price = parseInt(e.data.fixed_return_qty) * parseInt(e.data.return_price);
-                            gx.gridOptions.api.updateRowData({update: [e.data]});
-                            updatePinnedRow();
-                        }
+                        // if (e.column.colId === "fixed_return_qty" && e.data.store_wqty < parseInt(e.data.fixed_return_qty)) {
+                        //     alert("해당 매장의 보유재고보다 많은 수량을 반품할 수 없습니다.");
+                        //     gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                        // } else {
+                        //     e.node.setSelected(true);
+                        //     e.data.fixed_return_price = parseInt(e.data.fixed_return_qty) * parseInt(e.data.return_price);
+                        //     gx.gridOptions.api.updateRowData({update: [e.data]});
+                        //     updatePinnedRow();
+                        // }
                     }
                 }
             }
@@ -268,7 +266,7 @@
     // 등록된 상품리스트 가져오기
     function GetProducts() {
         let data = "sr_cd=" + '{{ @$sr->sr_cd }}';
-        gx.Request('/shop/stock/stk30/search-return-products', data, -1, function(e) {
+        gx.Request('/store/stock/stk30/search-return-products', data, -1, function(e) {
             updatePinnedRow();
         });
     }
@@ -301,7 +299,7 @@
             if(!confirm("등록하시겠습니까?")) return;
 
             axios({
-                url: '/shop/stock/stk30/add-store-return',
+                url: '/store/stock/stk30/add-store-return',
                 method: 'put',
                 data: {
                     sr_date,
@@ -331,7 +329,7 @@
             if(!confirm("수정하시겠습니까?")) return;
 
             axios({
-                url: '/shop/stock/stk30/update-store-return',
+                url: '/store/stock/stk30/update-store-return',
                 method: 'put',
                 data: {
                     sr_cd,
@@ -386,7 +384,7 @@
             return alert('매장을 선택해주세요.');
         }
 
-        const url = `/shop/api/goods/show?store_cd=` + ff.store_no.value;
+        const url = `/store/api/goods/show?store_cd=` + ff.store_no.value;
         window.open(url, "_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1800,height=1000");
     }
 
@@ -471,62 +469,32 @@
         updatePinnedRow();
     }
 
-    function ChangeState() {
-        let rows = gx.getSelectedRows();
-        if(rows.length < 1) return alert("상태변경할 항목을 선택해주세요.");
-
-        @if (@$sr_state == 30) 
-        for (let row of rows) {
-            if(row.return_qty == 0){
-               return alert("반품수량을 입력해주세요.");
-            }
-        }
-        @endif
-        let sr_cd = '{{ @$sr->sr_cd }}';
-        let storage_cd = $('#storage_cd').val();
-        let chg_state = 30;
-
-        if(!confirm("선택한 항목의 반품상태를 변경하시겠습니까?")) return;
-
-        axios({
-            url: '/shop/stock/stk30/update-return-state',
-            method: 'put',
-            data: {
-                data: rows,
-                sr_cd : sr_cd,
-                new_state: chg_state,
-                storage_cd : storage_cd
-            },
-        }).then(function (res) {
-            if(res.data.code === 200) {
-                alert(res.data.msg);
-                window.close();
-                opener.Search();
-            } else {
-                console.log(res.data);
-                alert("상태변경 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-            }
-        }).catch(function (err) {
-            console.log(err);
-        });
-    }
-
     function ChangeState2() {
         let rows = gx.getSelectedRows();
         if(rows.length < 1) return alert("상태변경할 항목을 선택해주세요.");
 
-        let storage_cd = $('#storage_cd').val();
+        let store_cd = $('#store_cd').val();
+        let storage_cd = $('#storage').val();
+        let sr_cd = '{{ @$sr_cd }}';
         let chg_state = 40;
+
+        for (let row of rows) {
+            if(row.fixed_return_qty == 0){
+               return alert("확정수량을 입력해주세요.");
+            }
+        }
 
         if(!confirm("선택한 항목의 반품상태를 변경하시겠습니까?")) return;
 
         axios({
-            url: '/shop/stock/stk30/update-state',
+            url: '/store/stock/stk30/update-state',
             method: 'put',
             data: {
                 data: rows,
                 new_state: chg_state,
-                storage_cd : storage_cd
+                store_cd : store_cd,
+                storage_cd : storage_cd,
+                sr_cd : sr_cd
             },
         }).then(function (res) {
             if(res.data.code === 200) {
@@ -541,6 +509,5 @@
             console.log(err);
         });
     }
-
 </script>
 @stop

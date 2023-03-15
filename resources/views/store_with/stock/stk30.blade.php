@@ -213,7 +213,11 @@
         },
         {field: "sr_cd", headerName: "반품코드", width: 100, cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {
-                return `<a href="javascript:void(0);" onclick="openDetailPopup(${params.value})">${params.value}</a>`;
+                if (params.data.sr_state == '10'){
+                    return `<a href="javascript:void(0);" onclick="openDetailPopup(${params.value})">${params.value}</a>`;
+                } else {
+                    return `<a href="javascript:void(0);" onclick="openDetailPopup2(${params.value})">${params.value}</a>`;
+                }
             }
         },
         {field: "sr_date", headerName: "반품일자", width: 100, cellStyle: {"text-align": "center"}},
@@ -251,9 +255,15 @@
 		gx.Request('/store/stock/stk30/search', data, 1);
 	}
 
-    // 창고반품관리 팝업 오픈
+    // 창고반품관리 팝업 오픈 (추가 , 반품요청상태)
     const openDetailPopup = (sr_cd = '') => {
         const url = '/store/stock/stk30/show/' + sr_cd;
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=880");
+    };
+
+    // 창고반품관리 팝업 오픈 (반품처리중, 반품완료 상태)
+    const openDetailPopup2 = (sr_cd = '') => {
+        const url = '/store/stock/stk30/view/' + sr_cd;
         window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=880");
     };
 

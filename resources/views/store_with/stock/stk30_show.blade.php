@@ -19,11 +19,9 @@
             @if(@$cmd == 'add')
                 <a href="javascript:void(0)" onclick="Save('{{ @$cmd }}')" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 반품요청</a>
             @elseif (@$cmd == 'update')
-            <a href="javascript:void(0)" onclick="Save('{{ @$cmd }}')" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
-                @if (@$sr_state == 30)
-                    <a href="javascript:void(0)" onclick="ChangeState2()" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 반품완료</a>
-                @elseif (@$sr_state == 10)
-                    <a href="javascript:void(0)" onclick="ChangeState()" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 반품처리중</a>
+                @if (@$sr_state == 10)
+                    <a href="javascript:void(0)" onclick="Save('{{ @$cmd }}')" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 처리중 </a>
+                    <a href="javascript:void(0)" onclick="ChangeState()" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 이동중</a>
                 @endif
             @endif
             <a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i> 닫기</a>
@@ -111,7 +109,7 @@
                                             <th class="required">반품사유</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    <select name='sr_reason' class="form-control form-control-sm w-100">
+                                                    <select name='sr_reason' id="sr_reason" class="form-control form-control-sm w-100">
                                                         @foreach ($sr_reasons as $sr_reason)
                                                         <option value='{{ $sr_reason->code_id }}' @if(@$cmd == 'update' && $sr->sr_reason == $sr_reason->code_id) selected @endif>{{ $sr_reason->code_val }}</option>
                                                         @endforeach
@@ -143,9 +141,9 @@
                         <button type="button" onclick="return setAllQty(true);" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn">반품재고초기화</button>
                     </div>
                     @endif
-                    @if(@$sr->sr_state == '10')
+                    <!-- @if(@$sr->sr_state == '10')
                         <button type="button" onclick="return resetReturnQty(false);" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn">매장반품수량으로 초기화</button>
-                    @endif
+                    @endif -->
                     @if(@$cmd == 'add')
                     <span class="ml-1 mr-2">|</span>
                     <div class="d-flex">
@@ -205,7 +203,7 @@
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
         {field: "total_return_price", headerName: "반품금액", width: 80, type: 'currencyType'},
-        @if (@$sr_state == 10 || @$sr_state == 30 || @$sr_state == 40)
+        @if (@$sr_state == 30 || @$sr_state == 40)
         {field: "fixed_return_qty", headerName: "확정수량", width: 60, type: 'currencyType',
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
@@ -481,15 +479,15 @@
         if(rows.length < 1) return alert("상태변경할 항목을 선택해주세요.");
 
         for (let row of rows) {
-            if(row.fixed_return_qty == 0){
-               return alert("확정수량을 입력해주세요.");
+            if(row.qty == 0){
+               return alert("반품수량을 입력해주세요.");
             }
         }
+        let sr_cd = '{{ @$sr->sr_cd }}';
         let store_cd = $('#store_cd').val();
         let storage_cd = $('#storage').val();
+        let sr_reason = $('#sr_reason').val();
         let chg_state = 30;
-
-       
 
         if(!confirm("선택한 항목의 반품상태를 변경하시겠습니까?")) return;
 
@@ -498,6 +496,8 @@
             method: 'put',
             data: {
                 data: rows,
+                sr_cd : sr_cd,
+                sr_reason : sr_reason,
                 new_state: chg_state,
                 store_cd : store_cd,
                 storage_cd : storage_cd
