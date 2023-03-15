@@ -117,17 +117,16 @@
 		$.ajax({
 			async: true,
 			type: 'post',
-			url: '/store/product/prd06/add_show',
+			url: '/store/product/prd06/prd_add',
 			data: $("[name=f1]").serialize(),
 			success: function (data) {
 				if( data.code == "200" )
 				{
 					alert("온라인상품 재고 예외 데이터가 등록되었습니다.");
-					window.opener.Search();
-					self.close();
+					window.close();
+					opener.SearchProduct();
 				} 
-				else 
-				{
+				else {
 					alert(data.code);
 					alert("데이터 등록이 실패하였습니다.");
 				}

@@ -275,8 +275,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('prd06/save', 'prd06Controller@save');
         Route::put('prd06/prd_update', 'prd06Controller@prd_update');
         Route::put('prd06/prd_delete', 'prd06Controller@prd_delete');
-        Route::get('prd06/add_show', 'prd06Controller@add_show');
-        Route::post('prd06/add_show', 'prd06Controller@add_save');
+        Route::get('prd06/prd_add', 'prd06Controller@add_show');
+        Route::post('prd06/prd_add', 'prd06Controller@add_save');
     });
 
     // 생산입고관리

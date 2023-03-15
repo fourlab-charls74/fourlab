@@ -1012,7 +1012,7 @@ CREATE TABLE `bizest_stock_conf` (
 -- 온라인 재고 매핑 매장관리
 CREATE TABLE `bizest_stock_store` (
   `store_cd` varchar(30) NOT NULL COMMENT '매장코드',
-  `store_use_yn` char(1) DEFAULT 'Y' COMMENT '매장사용여부',
+  `store_use_yn` char(1) DEFAULT 'N' COMMENT '매장사용여부',
   `buffer_cnt` int(11) DEFAULT NULL COMMENT '버퍼링 수',
   `id` varchar(30) DEFAULT NULL COMMENT '관리자 아이디',
   `rt` datetime DEFAULT NULL COMMENT '등록일',

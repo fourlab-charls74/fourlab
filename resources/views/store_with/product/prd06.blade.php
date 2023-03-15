@@ -56,7 +56,7 @@
                     </div>
                     <div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="price_apply">가격 반영</label>
+							<label for="price_apply_yn">가격 반영</label>
 							<div class="form-inline form-radio-box">
                                 <div class="custom-control custom-radio">
                                     <input type="radio" name="price_apply_yn" id="price_apply_yn_" class="custom-control-input" checked="" value="">
@@ -75,19 +75,19 @@
 					</div>
                     <div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="store_buffer">매장버퍼링 유형</label>
+							<label for="store_buffer_kind">매장버퍼링 유형</label>
 							<div class="form-inline form-radio-box">
                                 <div class="custom-control custom-radio">
-                                    <input type="radio" name="store_buffer" id="store_buffer_" class="custom-control-input" checked="" value="">
-                                    <label class="custom-control-label" for="store_buffer_">전체</label>
+                                    <input type="radio" name="store_buffer_kind" id="store_buffer_kind_" class="custom-control-input" checked="" value="">
+                                    <label class="custom-control-label" for="store_buffer_kind_">전체</label>
                                 </div>
 								<div class="custom-control custom-radio">
-									<input type="radio" name="store_buffer" id="store_buffer_a" class="custom-control-input" value="A">
-									<label class="custom-control-label" for="store_buffer_a">통합</label>
+									<input type="radio" name="store_buffer_kind" id="store_buffer_kind_a" class="custom-control-input" value="A">
+									<label class="custom-control-label" for="store_buffer_kind_a">통합</label>
 								</div>
 								<div class="custom-control custom-radio">
-									<input type="radio" name="store_buffer" id="store_buffer_s" class="custom-control-input" value="S">
-									<label class="custom-control-label" for="store_buffer_s">개별</label>
+									<input type="radio" name="store_buffer_kind" id="store_buffer_kind_s" class="custom-control-input" value="S">
+									<label class="custom-control-label" for="store_buffer_kind_s">개별</label>
 								</div>
 							</div>
 						</div>
@@ -134,12 +134,6 @@
             cellClass: 'hd-grid-code'
         },
         {
-            field: "store_cnt",
-            headerName: "매장 수",
-            width: 100,
-            cellClass: 'hd-grid-code'
-        },
-        {
             field: "match_y_cnt",
             headerName: "매칭상품 수",
             width: 100,
@@ -147,7 +141,7 @@
         },
         {
             field: "match_n_cnt",
-            headerName: "비매칭 상품 수",
+            headerName: "비매칭상품 수",
             width: 100,
             cellClass: 'hd-grid-code'
         },
@@ -164,7 +158,7 @@
         },
         {
             field: "store_buffer_kind",
-            headerName: "매장 버퍼링 유형",
+            headerName: "매장버퍼링 유형",
             width: 100,
             cellClass: 'hd-grid-code',
             cellRenderer: function(params) {
@@ -174,9 +168,15 @@
             }
         },
         {
+            field: "store_cnt",
+            headerName: "버퍼링매장 수",
+            width: 100,
+            cellClass: 'hd-grid-code'
+        },
+        {
             field: "id",
-            headerName: "담당자",
-            width: 80,
+            headerName: "담당자 아이디",
+            width: 100,
             cellClass: 'hd-grid-code'
         },
         {

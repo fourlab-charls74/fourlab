@@ -15,7 +15,8 @@ use PDO;
 
 class prd06Controller extends Controller
 {
-    public function index() {
+    public function index()
+    {
         $edate = date("Y-m-d");
         $sdate = date('Y-m-d', strtotime(-7 . 'days'));
 
@@ -31,11 +32,11 @@ class prd06Controller extends Controller
         $sdate              = $req->input("sdate", date('Y-m-d', strtotime(-7 . 'days')));
         $edate              = $req->input("edate", date("Y-m-d"));
         $price_apply_yn     = $req->input('price_apply_yn');
-        $store_buffer       = $req->input('store_buffer');
+        $store_buffer_kind  = $req->input('store_buffer_kind');
         
         $where = "";
         if ($price_apply_yn != "") $where .= " and price_apply_yn = '$price_apply_yn' ";
-        if ($store_buffer != "") $where .= " and store_buffer = '$store_buffer' ";
+        if ($store_buffer_kind != "") $where .= " and store_buffer_kind = '$store_buffer_kind' ";
 
         $limit   = $req->input("limit", 100);
 
@@ -93,6 +94,7 @@ class prd06Controller extends Controller
     public function create()
     {
         $id = Auth('head')->user()->id;
+
         $default = DB::table('storage')
                     ->where('default_yn', '=', 'Y')
                     ->select('storage_cd', 'storage_nm')
@@ -103,11 +105,33 @@ class prd06Controller extends Controller
                     ->select('storage_cd', 'storage_nm')
                     ->first();
 
-        $values = [
-            'id' => $id,
-            'default' => $default,
-            'online' => $online,
-        ];
+        $sql = "select *, count(*) as cnt from bizest_stock_conf";
+        $result = DB::selectOne($sql);
+        $cnt = $result->cnt;
+
+        //신규 등록
+        if($cnt == 0) {
+            $values = [
+                'id' => $id,
+                'default' => $default,
+                'online' => $online,
+            ];
+        
+        //기존 설정 데이터
+        } else {
+            $values = [
+                'id'                     => $id,
+                'default'                => $default,
+                'online'                 => $online,
+                'idx'                    => $result->idx,
+                'price_apply_yn'         => $result->price_apply_yn,
+                'default_storage_buffer' => $result->default_storage_buffer,
+                'online_storage_buffer'  => $result->online_storage_buffer,
+                'store_buffer_kind'      => $result->store_buffer_kind,
+                'store_tot_buffer'       => $result->store_tot_buffer,
+            ];
+        }
+        // dd($values);
 
         return view(Config::get('shop.store.view') . '/product/prd06_show', $values);
     }
@@ -116,10 +140,12 @@ class prd06Controller extends Controller
     {
         $sql = "
             select
-                code_val, code_id 
-            from code 
-            where code_kind_cd = 'ONLINE_BUFFER_STORE'
-            order by code_seq asc
+                c.code_id, s.store_nm, b.*
+            from code c
+                inner join store s on s.store_cd = c.code_id
+                inner join bizest_stock_store b on b.store_cd = c.code_id
+            where c.code_kind_cd = 'ONLINE_BUFFER_STORE' and c.use_yn = 'Y'
+            order by c.code_seq asc
         ";
 
         $result = DB::select($sql);
@@ -155,6 +181,7 @@ class prd06Controller extends Controller
     {
         $admin_id                   = Auth('head')->user()->id;
 
+        $idx                        = $request->input('idx');
         $price_apply_yn             = $request->input('price_apply_yn');
         $default_storage_cd         = $request->input('default_storage_cd');
         $default_storage_nm         = $request->input('default_storage_nm');
@@ -163,31 +190,76 @@ class prd06Controller extends Controller
         $online_storage_nm          = $request->input('online_storage_nm');
         $online_storage_buffer      = $request->input('online_storage_buffer');
         $store_buffer_kind          = $request->input('store_buffer_kind');
-        $store_tot_buffer           = $request->input('store_buffer');
+        $store_tot_buffer           = $request->input('store_tot_buffer');
         $store_data                 = json_decode($request->input('store_data'));
         $idArr                      = json_decode($request->input('idArr'));
 
         if($store_buffer_kind == 'A'){
             $store_data       = '';
-            $idArr            = '';
         }
+        // else if($store_buffer_kind == 'S'){
+        //     $store_tot_buffer       = null;
+        // }
 
         try {
 			DB::beginTransaction();
 
-            DB::table('bizest_stock_conf')->insert([
-                'default_storage_cd'        => $default_storage_cd,
-                'default_storage_buffer'    => $default_storage_buffer,
-                'online_storage_cd'         => $online_storage_cd,
-                'online_storage_buffer'     => $online_storage_buffer,
-                'store_buffer_kind'         => $store_buffer_kind,
-                'store_tot_buffer'          => $store_tot_buffer,
-                'price_apply_yn'            => $price_apply_yn,
-                'rt' => now(),
-                'ut' => now(),
-                'id' => $admin_id
-            ]);
+            //공통코드관리에 저장된 매장 정보 불러와서 저장
+            $sql = "
+                select
+                    c.code_id, s.store_nm
+                from code c
+                    inner join store s on s.store_cd = c.code_id
+                where c.code_kind_cd = 'ONLINE_BUFFER_STORE' and c.use_yn = 'Y'
+                order by c.code_seq asc
+            ";
+            $rows = DB::select($sql);
+            foreach ($rows as $row){
+                $code_id = $row->code_id;
+
+                DB::table('bizest_stock_store')->updateOrInsert(
+                    ['store_cd' => $code_id],
+                    [
+                        'store_cd' => $code_id,
+                        'rt'       => now(),
+                        'ut'       => now(),
+                        'id'       => $admin_id
+                    ]
+                );
+            }
+
+            //기존 conf 설정 업데이트
+            if($idx != '') {
+                DB::table('bizest_stock_conf')
+                    ->where('idx', '=', $idx)
+                    ->update([
+                        'default_storage_cd'       => $default_storage_cd,
+                        'default_storage_buffer'   => $default_storage_buffer,
+                        'online_storage_cd'        => $online_storage_cd,
+                        'online_storage_buffer'    => $online_storage_buffer,
+                        'store_buffer_kind'        => $store_buffer_kind,
+                        'store_tot_buffer'         => $store_tot_buffer,
+                        'price_apply_yn'           => $price_apply_yn,
+                        'ut' => now(),
+                        'id' => $admin_id
+                ]);
+            //conf 설정 신규등록
+            } else {
+                DB::table('bizest_stock_conf')->insert([
+                    'default_storage_cd'        => $default_storage_cd,
+                    'default_storage_buffer'    => $default_storage_buffer,
+                    'online_storage_cd'         => $online_storage_cd,
+                    'online_storage_buffer'     => $online_storage_buffer,
+                    'store_buffer_kind'         => $store_buffer_kind,
+                    'store_tot_buffer'          => $store_tot_buffer,
+                    'price_apply_yn'            => $price_apply_yn,
+                    'rt' => now(),
+                    'ut' => now(),
+                    'id' => $admin_id
+                ]);
+            }
             
+            //개별매장 버퍼링 설정
             if($store_data != '') {
                 foreach($store_data as $row) {
                     $code_id 	    = $row->code_id;
@@ -198,12 +270,12 @@ class prd06Controller extends Controller
                     $result	= DB::selectOne($sql, ['code_id' => $code_id]);
                     
                     if ($result->count == 0) {
-                        DB::table('bizest_stock_store')
-                        ->insert([
+                        DB::table('bizest_stock_store')->insert([
                             'store_cd' => $code_id,
                             'store_use_yn' => 'Y',
                             'buffer_cnt' => $store_buffer,
                             'rt' => now(),
+                            'ut' => now(),
                             'id' => $admin_id
                         ]);
                     } else {
@@ -219,15 +291,26 @@ class prd06Controller extends Controller
                 }
             }
 
+            //개별매장 버퍼링 미설정 매장
             if($idArr != '') {
                 foreach($idArr as $code_id) {
                     $sql = "select count(*) as count from bizest_stock_store where store_cd = :code_id";
                     $result	= DB::selectOne($sql, ['code_id' => $code_id]);
-                    if ($result->count != 0) {
+                    if ($result->count == 0) {
+                        DB::table('bizest_stock_store')->insert([
+                            'store_cd' => $code_id,
+                            'store_use_yn' => 'N',
+                            'buffer_cnt' => null,
+                            'rt' => now(),
+                            'ut' => now(),
+                            'id' => $admin_id
+                        ]);
+                    } else {
                         DB::table('bizest_stock_store')
                         ->where('store_cd', '=', $code_id)
                         ->update([
                             'store_use_yn' => 'N',
+                            'buffer_cnt' => null,
                             'ut' => now(),
                             'id' => $admin_id
                         ]);
@@ -327,7 +410,7 @@ class prd06Controller extends Controller
 		}
 
 		$sql	= "
-			insert into bizest_stock_exp_prodcut( prd_cd, storage_limit_qty, store_limit_qty, comment, id, rt )
+			insert into bizest_stock_exp_product( prd_cd, storage_limit_qty, store_limit_qty, comment, id, rt )
 			values ( :prd_cd, :storage_limit_qty, :store_limit_qty, :comment, :id, now() )
 		";
 		$result = DB::select($sql, 
