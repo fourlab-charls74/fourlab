@@ -108,9 +108,13 @@
                             <p>거스름돈</p>
                             <p><strong id="change_amt" class="fc-red fw-b mr-1">0</strong>원</p>
                         </div>
-                        <div class="d-flex justify-content-between align-items-center fs-12 fw-sb mt-3">
+                        <div class="d-flex justify-content-between align-items-center fs-12 fw-sb mt-3 mb-2">
                             <p>총 주문수량</p>
                             <p><strong id="total_order_qty" class="fw-b mr-1">0</strong>개</p>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center fs-12 fw-sb">
+                            <p>쿠폰할인금액</p>
+                            <p><strong id="total_coupon_discount_qty" class="fw-b mr-1">0</strong>원</p>
                         </div>
                     </div>
                     <div class="flex-2 d-flex">
@@ -204,7 +208,7 @@
                 </div>
             </div>
             <div class="d-flex">
-                <div class="flex-1 b-2-gray mr-4">
+                <div class="flex-1 b-2-gray">
                     <table class="prd_info_table w-100 fs-10">
                         <tr>
                             <th>수량</th>
@@ -240,11 +244,17 @@
                         </tr> 
                         <tr>
                             <th>쿠폰</th>
-                            <td class="pr-3">-</td>
+                            <td>
+                                <div class="d-flex pl-3 pr-1">
+                                    <select name="coupon_no" id="coupon_no" class="sel w-100" onchange="return updateOrderValue('coupon_no', event.target.value, event)">
+                                        <option value=''>-- 선택 안함 --</option>
+                                    </select>
+                                </div>
+                            </td>
                         </tr> 
                     </table>
                 </div>
-                <div class="flex-2 d-flex justify-content-end">
+                {{-- <div class="flex-2 d-flex justify-content-end">
                     <div id="product_calculator" class="calculator-grid product fs-20">
                         <input type="text" id="product_press_amt" class="inp fc-black fs-20 fw-b text-right pr-3" style="grid-area:a;border:2px solid #bbb;" value="0">
                         <button type="button" class="butt bg-white" value="1" style="grid-area:b;">1</button>
@@ -262,9 +272,9 @@
                         <button type="button" class="butt fs-14 bg-lightgray" value="removeAll" style="grid-area:n;">clear</button>
                         <button type="button" class="butt fs-14 bg-lightgray" value="remove" style="grid-area:o;"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>
                         <button type="button" class="butt fs-14 fc-white bg-gray" value="qty" style="grid-area:p;">수량변경</button>
-                        {{-- <button type="button" class="butt fs-14 fc-white bg-gray" value="price" style="grid-area:q;">단가변경</button> --}}
+                        <button type="button" class="butt fs-14 fc-white bg-gray" value="price" style="grid-area:q;">단가변경</button>
                     </div>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>
@@ -958,7 +968,13 @@
         {field: "size", headerName: "사이즈", width: 150, cellStyle: {...LineHeight50}, wrapText: true, autoHeight: true},
         {field: "qty", headerName: "수량", width: 60, type: "currencyType", cellStyle: LineHeight50},
         {field: "price", headerName: "단가", width: 80, type: "currencyType", cellStyle: LineHeight50},
-        {field: "total", headerName: "금액", width: 100, type: "currencyType", cellStyle: {...LineHeight50, "font-size": "18px", "font-weight": "700"}},
+        {field: "total", headerName: "금액", width: 100, type: "currencyType", cellStyle: {...LineHeight50, "font-size": "18px", "font-weight": "700"},
+            cellRenderer: (params) => `
+                <div class="d-flex flex-column">
+                    ${(params.data.ori_price * params.data.qty) !== params.value ? `<del class="fs-08 font-weight-normal" style="line-height:23px;">${Comma(params.data.ori_price * params.data.qty)}</del>` : ''}
+                    <p style="${(params.data.ori_price * params.data.qty) !== params.value ? 'line-height:20px;' : 'line-height:50px;' }">${Comma(params.value)}</p>
+                </div>`,
+        },
         {headerName: "삭제", width: 80, cellStyle: {...AlignCenter, ...LineHeight50},
             cellRenderer: (params) => `<a href="javascript:void(0);" onclick="return removeProduct('${params.data.prd_cd}')"><i class="fa fa-trash fc-red fs-12" aria-hidden="true"></i></a>`,
         }
@@ -1046,7 +1062,7 @@
                 } else {
                     setProductDetail();
                 }
-                updateOrderValue();
+                // updateOrderValue();
             }
         });
 

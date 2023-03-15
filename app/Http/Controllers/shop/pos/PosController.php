@@ -89,6 +89,9 @@ class PosController extends Controller
             case 'waiting':
                 $response = $this->search_waiting($request);
                 break;
+            case 'member-coupon':
+                $response = $this->get_member_coupon_list($request);
+                break;
             default:
                 $message = 'Command not found';
                 $response = response()->json(['code' => 0, 'msg' => $message], 404);
@@ -619,6 +622,13 @@ class PosController extends Controller
                 $com_rat = 0;
 
                 $coupon_no = $cart[$i]["coupon_no"] ?? '';
+                // dd($coupon_no);
+
+                // 개발중
+                // 해당쿠폰의 정보대로 정확히 '얼마'가 할인되는지 계산
+                // 총결제금액중 쿠폰금액에 해당금액 기입 -> 주문정보에 반영
+                // 쿠폰사용처리 및 쿠폰사용횟수 +1 처리
+
                 if ($coupon_no != '') {
                     // 쿠폰정보 얻기
                     $sql = "
@@ -1253,6 +1263,35 @@ class PosController extends Controller
         }
 
         return response()->json(['code' => $code, 'msg' => $msg], 200);
+    }
+
+    /** 해당고객의 사용가능한 쿠폰목록 조회 */
+    public function get_member_coupon_list(Request $request)
+    {
+        $user_id = $request->input('user_id', '');
+
+        $sql = "
+            select a.*
+            from (
+                select cm.user_id, cm.use_to_date as to_date, cm.down_date, cm.coupon_no, c.coupon_nm, c.coupon_type
+                    , if(c.use_date_type = 'S', c.use_fr_date, date_format(cm.down_date, '%Y%m%d')) as use_fr_date
+                    , if(c.use_date_type = 'S', c.use_to_date, date_format(date_add(cm.down_date, interval c.use_date DAY), '%Y%m%d')) as use_to_date
+                    , c.coupon_apply, ifnull(GROUP_CONCAT(cg.goods_no), '') as goods_nos, ifnull(GROUP_CONCAT(cge.goods_no), '') as ex_goods_nos
+                    , c.coupon_amt_kind, c.coupon_amt, c.coupon_per
+                    , c.price_yn, c.low_price, c.high_price
+                from coupon_member cm
+                    inner join coupon c on c.coupon_no = cm.coupon_no and c.use_yn = 'Y' and c.coupon_type <> 'O'
+                    left outer join coupon_goods cg on cg.coupon_no = cm.coupon_no
+                    left outer join coupon_goods_ex cge on cge.coupon_no = cm.coupon_no
+                where cm.user_id = :user_id and cm.use_yn = 'N'
+                group by cm.coupon_no
+            ) a
+                where date_format(now(), '%Y%m%d') >= a.use_fr_date and date_format(now(), '%Y%m%d') <= a.use_to_date
+        ";
+
+        $result = DB::select($sql, ['user_id' => $user_id]);
+
+        return response()->json(['code' => '200', 'body' => $result], 200);
     }
 }
 

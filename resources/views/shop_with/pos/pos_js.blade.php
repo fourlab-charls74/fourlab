@@ -141,6 +141,7 @@
             $("#change_amt").text(0);
             $("#due_amt").text(0);
             $("#total_order_qty").text(0);
+            $("#total_coupon_discount_qty").text(0);
             
             $("#card_amt").text(0);
             $("#cash_amt").text(0);
@@ -224,6 +225,7 @@
             $("#cur_img").attr('alt', '');
             $("#sale_type").find("option").remove();
             $('#pr_code').val('JS').prop("selected", true);
+            $('#coupon_no').val('').prop("selected", true);
             return;
         }
 
@@ -264,12 +266,28 @@
                 $("#pr_code").prop("selectedIndex", 0);
             }
         }
+ 
+        // 쿠폰 조건에 따라 disabled 처리
+        const selected_coupon_nos = list.filter(d => d.coupon_no !== '').map(d => d.coupon_no);
+        const usable_coupon_nos = $("#coupon_no option").toArray()
+            .filter(opt => {
+                let d = opt.dataset;
+                // if (d.price_yn === 'Y' && (goods.price < (d.low_price * 1) || (d.high_price < 1 ? 1 : goods.price > (d.high_price * 1)))) return false; -- 추후 최종판매 시에 고려 필요 (가격*수량 과 비교하기)
+                if (d.apply === 'AG' && d.ex_goods_nos.split(",").includes(goods.goods_no)) return false;
+                if (d.apply === 'SG' && !d.goods_nos.split(",").includes(goods.goods_no + '')) return false;
+                if (selected_coupon_nos.includes(opt.value) && goods.coupon_no !== opt.value) return false;
+                return true;
+            }).map(opt => opt.value);
+        $("#coupon_no > option").toArray().forEach(opt => {
+            $(opt).prop("disabled", !usable_coupon_nos.includes(opt.value));
+            if (opt.value === goods.coupon_no) $(opt).prop("selected", true);
+        });
 
         $("#cur_qty").trigger('focus');
     }
 
     /** 상품리스트에서 상품 삭제 */
-    function removeProduct(prd_cd = '') {
+    async function removeProduct(prd_cd = '') {
         if(prd_cd == '') return;
 
         let list = gx.getRows();
@@ -279,11 +297,12 @@
             $("[name=removed_goods]").val(($("[name=removed_goods]").val() || "") + "," + (goods.ord_opt_no || ""));
         }
 
-        gx.gridOptions.api.applyTransaction({remove: [goods]});
+        await gx.gridOptions.api.applyTransaction({remove: [goods]});
+        updateOrderValue();
     }
 
     /** 수량 및 금액 변경 시 업데이트 */
-    async function updateOrderValue(key = '', value = '') {
+    async function updateOrderValue(key = '', value = '', event = null) {
         if(key != '') {
             if(['card_amt', 'cash_amt', 'point_amt'].includes(key)) {
                 if(key === 'point_amt') {
@@ -298,10 +317,11 @@
                 let rowData = curRow[0].data;
                 if(key === 'cur_qty') {
                     $("#cur_qty").val(value);
-                    curRow[0].setData({...rowData, qty: value, total: rowData.price * value});
-                } else if(key === 'cur_price') {
-                    $("#cur_price").text(Comma(value));
-                    curRow[0].setData({...rowData, price: value, total: rowData.qty * value});
+                    curRow[0].setData({...rowData, qty: value, total: (rowData.price * value) - (rowData.coupon_discount_amt || 0)});
+                // 단가변경 기능 사용안함 - 20230314
+                // } else if(key === 'cur_price') {
+                    // $("#cur_price").text(Comma(value));
+                    // curRow[0].setData({...rowData, price: value, total: rowData.qty * value});
                 } else if(key === 'sale_type') {
                     let st = sale_types.find(s => s.sale_kind == value);
                     let std_price = st.sale_apply === 'tag' ? rowData.goods_sh : rowData.ori_price;
@@ -309,9 +329,25 @@
                     if(st.amt_kind === 'per') discount_amt = std_price * (unComma(st.sale_per || 0) / 100);
 
                     $("#cur_price").text(Comma(std_price - discount_amt));
-                    curRow[0].setData({...rowData, sale_type: value, price: std_price - discount_amt, total: rowData.qty * (std_price - discount_amt)});
+                    curRow[0].setData({
+                        ...rowData, 
+                        sale_type: value, 
+                        price: std_price - discount_amt,
+                        total: rowData.qty * (std_price - discount_amt) - (rowData.coupon_discount_amt || 0)
+                    });
                 } else if(key === 'pr_code') {
                     curRow[0].setData({...rowData, pr_code: value});
+                } else if(key === 'coupon_no') {
+                    const cp = event.target.selectedOptions[0]?.dataset;
+                    const discount_amt = cp.amt_kind === 'P' 
+                        ? Math.round(rowData.goods_sh * rowData.qty * ((cp.per || 0) * 1) / 100) 
+                        : ((cp.amt || 0) * 1);
+                    curRow[0].setData({
+                        ...rowData, 
+                        coupon_no: value,
+                        coupon_discount_amt: discount_amt,
+                        total: rowData.price * rowData.qty - discount_amt
+                    });
                 }
             } 
         }
@@ -320,6 +356,7 @@
 
         let order_price = list.reduce((a, c) => a + c.total, 0);
         let order_qty = list.reduce((a, c) => a + c.qty, 0);
+        let coupon_discount_amt = list.reduce((a, c) => a + (c.coupon_discount_amt || 0), 0);
         let card_amt = $("[name=card_amt]").val() * 1;
         let cash_amt = $("[name=cash_amt]").val() * 1;
         let point_amt = $("[name=point_amt]").val() * 1;
@@ -331,6 +368,7 @@
         $("#change_amt").text(Comma(payed_amt - order_price > 0 ? payed_amt - order_price : 0));
         $("#due_amt").text(Comma(order_price - payed_amt > 0 ? order_price - payed_amt : 0));
         $("#total_order_qty").text(Comma(order_qty));
+        $("#total_coupon_discount_qty").text(Comma(coupon_discount_amt));
 
         $("#card_amt").text(Comma(card_amt));
         $("#cash_amt").text(Comma(cash_amt));
@@ -365,6 +403,8 @@
             removed_goods = $("[name=removed_goods]").val().split(",").filter(g => g !== '');
         }
         
+        if (!confirm("쿠폰사용기능 개발중입니다. 주문정보가 정확하게 저장되지 않을 수 있습니다. 판매처리하시겠습니까?")) return;
+
         axios({
             async: true,
             url: '/shop/pos/save',
@@ -498,6 +538,8 @@
             $("#no_user").removeClass("d-flex");
             $("#no_user").addClass("d-none");
             $("#user").removeClass("d-none");
+
+            getUserCouponList(memb.user_id);
         }
 
         if(user_id != '') {
@@ -506,6 +548,37 @@
         } else if(user != null) {   
             $('#addMemberModal').modal('hide');
             initAddMemberModal();
+        }
+    }
+
+    /** 선택한 고객의 사용가능한 쿠폰목록 조회 */
+    async function getUserCouponList(user_id) {
+        const { data: { body }, status } = await axios({ method: "get", url: "/shop/pos/search/member-coupon?user_id=" + user_id });
+        if (status === 200) {
+            let html = "<option value=''>-- 선택 안함 --</option>";
+            html += body.reduce((a,c) => a + `
+                <option value='${c.coupon_no}' 
+                    data-apply='${c.coupon_apply}'
+                    data-goods_nos='${c.goods_nos}'
+                    data-ex_goods_nos='${c.ex_goods_nos}'
+                    data-amt_kind='${c.coupon_amt_kind}'
+                    data-amt='${c.coupon_amt}'
+                    data-per='${c.coupon_per}'
+                    data-price_yn='${c.price_yn}'
+                    data-low_price='${c.low_price}'
+                    data-high_price='${c.high_price}'
+                >
+                    ${c.coupon_nm}(${c.coupon_amt_kind === 'P' ? c.coupon_per + '%' : c.coupon_amt + '원'})
+                </option>
+            `, "");
+            $("#coupon_no").html(html);
+
+            const nodes = gx.getSelectedRows();
+            if (nodes.length > 0) {
+                setProductDetail(nodes[0]?.prd_cd);
+            } else {
+                setProductDetail(gx.getRows()?.[0]?.prd_cd);
+            }
         }
     }
 
@@ -784,7 +857,7 @@
             let html = "";
 
             if (users.length < 1) {
-                html += "<option value=''>---</option>";
+                html += "<option value=''>-- 선택 안함 --</option>";
             } else {
                 html += users.reduce((a, c) => a + `<option value="${c.user_id}">[${c.user_id}] ${c.user_nm} ${c.mobile}</option>`, "");
             }
