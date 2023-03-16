@@ -110,7 +110,7 @@
                                             <th>메모</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    <textarea name="comment" id="comment" class="w-100" rows="2">{{ @$sr->comment }}</textarea>
+                                                    <textarea name="comment" id="comment" class="w-100" rows="2" readonly disabled style="background-color:#ccc">{{ @$sr->comment }}</textarea>
                                                 </div>
                                             </td>
                                         </tr>
@@ -194,7 +194,7 @@
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
         {field: "total_return_price", headerName: "반품금액", width: 80, type: 'currencyType'},
-        @if (@$sr_state == 30 || @$sr_state == 40)
+        
         {field: "fixed_return_qty", headerName: "확정수량", width: 60, type: 'currencyType',
             editable: (params) => checkIsEditable2(params),
             cellStyle: (params) => checkIsEditable2(params) ? {"background-color": "#ffff99"} : {}
@@ -205,7 +205,7 @@
             cellStyle: (params) => checkIsEditable2(params) ? {"background-color": "#ffff99"} : {}
         
         }
-        @endif
+        
     ];
 </script>
 
@@ -238,7 +238,7 @@
                         } else {
                             e.node.setSelected(true);
                             e.data.total_return_price = parseInt(e.data.qty) * parseInt(e.data.return_price);
-                            // e.data.fixed_return_price = parseInt(e.data.fixed_return_qty) * parseInt(e.data.return_price);
+                            e.data.fixed_return_price = parseInt(e.data.fixed_return_qty) * parseInt(e.data.return_price);
                             gx.gridOptions.api.updateRowData({update: [e.data]});
                             updatePinnedRow();
                         }
@@ -481,6 +481,10 @@
         for (let row of rows) {
             if(row.fixed_return_qty == 0){
                return alert("확정수량을 입력해주세요.");
+            }
+
+            if (row.fixed_return_qty > (row.store_wqty + row.qty)){
+                return alert('확정수량을 기존매장보유재고보다 많이 입력할 수 없습니다.')
             }
         }
 

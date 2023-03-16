@@ -151,7 +151,6 @@
                         </div>
                         <a href="javascript:void(0);" onclick="ChangeState()" class="btn btn-sm btn-primary">상태변경</a>
                         <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span> -->
-                        <a href="javascript:void(0);" onclick="ChangeState()" class="btn btn-sm btn-outline-primary">반품진행</a>
                     </div>
 				</div>
 			</div>

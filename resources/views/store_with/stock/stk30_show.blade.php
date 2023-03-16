@@ -119,7 +119,7 @@
                                             <th>메모</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    <textarea name="comment" id="comment" class="w-100" rows="2">{{ @$sr->comment }}</textarea>
+                                                    <textarea name="comment" id="comment" class="w-100" rows="2" readonly disabled style="background-color:#ccc">{{ @$sr->comment }}</textarea>
                                                 </div>
                                             </td>
                                         </tr>

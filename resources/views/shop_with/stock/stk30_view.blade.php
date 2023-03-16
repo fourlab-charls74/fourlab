@@ -170,7 +170,9 @@
                 return (parseInt(valueA) > parseInt(valueB)) ? 1 : -1;
             },
         },
-        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 29},
+        @if(@$sr_state == 10)
+            {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 29},
+        @endif
         {field: "prd_cd", headerName: "바코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
         {field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: {"text-align": "center"}},
         {field: "opt_kind_nm", headerName: "품목", width: 70, cellStyle: {"text-align": "center"}},
@@ -196,6 +198,18 @@
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
         {field: "total_return_price", headerName: "반품금액", width: 80, type: 'currencyType'},
+        @if ($sr_state == '40')
+        {field: "fixed_return_qty", headerName: "확정수량", width: 60, type: 'currencyType',
+            editable: (params) => checkIsEditable2(params),
+            cellStyle: (params) => checkIsEditable2(params) ? {"background-color": "#ffff99"} : {}
+        },
+        {field: "fixed_return_price", headerName: "확정금액", width: 80, type: 'currencyType'},
+        {field: "fixed_comment", headerName: "확정메모", width: 300, 
+            editable: (params) => checkIsEditable2(params),
+            cellStyle: (params) => checkIsEditable2(params) ? {"background-color": "#ffff99"} : {}
+        
+        }
+        @endif
     ];
 </script>
 

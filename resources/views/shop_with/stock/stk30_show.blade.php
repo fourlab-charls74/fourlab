@@ -170,7 +170,9 @@
                 return (parseInt(valueA) > parseInt(valueB)) ? 1 : -1;
             },
         },
+        @if(@$sr_state == 10)
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 29},
+        @endif
         {field: "prd_cd", headerName: "바코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
         {field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: {"text-align": "center"}},
         {field: "opt_kind_nm", headerName: "품목", width: 70, cellStyle: {"text-align": "center"}},
@@ -475,13 +477,13 @@
         let rows = gx.getSelectedRows();
         if(rows.length < 1) return alert("상태변경할 항목을 선택해주세요.");
 
-        @if (@$sr_state == 30) 
+        console.log(rows);
+
         for (let row of rows) {
-            if(row.return_qty == 0){
+            if(row.qty == 0){
                return alert("반품수량을 입력해주세요.");
             }
         }
-        @endif
         let sr_cd = '{{ @$sr->sr_cd }}';
         let storage_cd = $('#storage_cd').val();
         let chg_state = 30;

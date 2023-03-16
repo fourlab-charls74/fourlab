@@ -230,8 +230,10 @@
         {field: "store_cd", headerName: "매장코드", width: 70, cellStyle: {"text-align": "center"}},
         {field: "store_type_nm", headerName: "매장구분", width: 80, cellStyle: {"text-align": "center"}},
         {field: "store_nm", headerName: "매장명", width: 200, cellStyle: {"text-align": "center"}},
+        
         {field: "sr_qty", headerName: "반품수량", type: "currencyType", width: 80},
         {field: "sr_price", headerName: "반품금액", type: "currencyType", width: 80},
+        
         {field: "sr_reason", hide: true},
         {field: "sr_reason_nm", headerName: "반품사유", width: 120, cellStyle: {"text-align": "center"}},
         {field: "comment", headerName: "메모", width: 300},
