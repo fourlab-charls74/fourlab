@@ -109,15 +109,20 @@ class prd06Controller extends Controller
         $result = DB::selectOne($sql);
         $cnt = $result->cnt;
 
-        //신규 등록
         if($cnt == 0) {
             $values = [
-                'id' => $id,
-                'default' => $default,
-                'online' => $online,
+                'id'                     => $id,
+                'default'                => $default,
+                'online'                 => $online,
+                'idx'                    => '',
+                'price_apply_yn'         => '',
+                'default_storage_buffer' => '',
+                'online_storage_buffer'  => '',
+                'store_buffer_kind'      => '',
+                'store_tot_buffer'       => '',
             ];
         
-        //기존 설정 데이터
+        //기존 config 데이터
         } else {
             $values = [
                 'id'                     => $id,
@@ -131,13 +136,31 @@ class prd06Controller extends Controller
                 'store_tot_buffer'       => $result->store_tot_buffer,
             ];
         }
-        // dd($values);
 
         return view(Config::get('shop.store.view') . '/product/prd06_show', $values);
     }
 
     public function search_store()
     {
+        $sql = "            
+            select
+                c.code_id, c.rt, c.ut, c.admin_id
+            from code c
+                left outer join bizest_stock_store b on b.store_cd = c.code_id
+            where c.code_kind_cd = 'ONLINE_BUFFER_STORE' and c.use_yn = 'Y' and b.store_cd is NULL
+            order by c.code_seq asc
+        ";
+        $rows = DB::select($sql);
+        
+        foreach ($rows as $row){
+            DB::table('bizest_stock_store')->insert([
+                'store_cd' => $row->code_id,
+                'rt'       => $row->rt,
+                'ut'       => $row->ut,
+                'id'       => $row->admin_id
+            ]);
+        }
+        
         $sql = "
             select
                 c.code_id, s.store_nm, b.*
@@ -194,41 +217,10 @@ class prd06Controller extends Controller
         $store_data                 = json_decode($request->input('store_data'));
         $idArr                      = json_decode($request->input('idArr'));
 
-        if($store_buffer_kind == 'A'){
-            $store_data       = '';
-        }
-        // else if($store_buffer_kind == 'S'){
-        //     $store_tot_buffer       = null;
-        // }
-
         try {
 			DB::beginTransaction();
 
-            //공통코드관리에 저장된 매장 정보 불러와서 저장
-            $sql = "
-                select
-                    c.code_id, s.store_nm
-                from code c
-                    inner join store s on s.store_cd = c.code_id
-                where c.code_kind_cd = 'ONLINE_BUFFER_STORE' and c.use_yn = 'Y'
-                order by c.code_seq asc
-            ";
-            $rows = DB::select($sql);
-            foreach ($rows as $row){
-                $code_id = $row->code_id;
-
-                DB::table('bizest_stock_store')->updateOrInsert(
-                    ['store_cd' => $code_id],
-                    [
-                        'store_cd' => $code_id,
-                        'rt'       => now(),
-                        'ut'       => now(),
-                        'id'       => $admin_id
-                    ]
-                );
-            }
-
-            //기존 conf 설정 업데이트
+            //기존 config 업데이트
             if($idx != '') {
                 DB::table('bizest_stock_conf')
                     ->where('idx', '=', $idx)
@@ -243,7 +235,7 @@ class prd06Controller extends Controller
                         'ut' => now(),
                         'id' => $admin_id
                 ]);
-            //conf 설정 신규등록
+            //config 신규등록
             } else {
                 DB::table('bizest_stock_conf')->insert([
                     'default_storage_cd'        => $default_storage_cd,
@@ -258,22 +250,22 @@ class prd06Controller extends Controller
                     'id' => $admin_id
                 ]);
             }
-            
-            //개별매장 버퍼링 설정
+
+            //선택 매장
             if($store_data != '') {
                 foreach($store_data as $row) {
                     $code_id 	    = $row->code_id;
-                    $code_val 	    = $row->code_val;
-                    $store_buffer 	= $row->store_buffer;
-                    
+                    $buffer_cnt 	= $row->buffer_cnt ?? null;
+                    if($buffer_cnt == '') $buffer_cnt = null;
+
                     $sql = "select count(*) as count from bizest_stock_store where store_cd = :code_id";
                     $result	= DB::selectOne($sql, ['code_id' => $code_id]);
-                    
+
                     if ($result->count == 0) {
                         DB::table('bizest_stock_store')->insert([
                             'store_cd' => $code_id,
                             'store_use_yn' => 'Y',
-                            'buffer_cnt' => $store_buffer,
+                            'buffer_cnt' => $buffer_cnt,
                             'rt' => now(),
                             'ut' => now(),
                             'id' => $admin_id
@@ -283,7 +275,7 @@ class prd06Controller extends Controller
                         ->where('store_cd', '=', $code_id)
                         ->update([
                             'store_use_yn' => 'Y',
-                            'buffer_cnt' => $store_buffer,
+                            'buffer_cnt' => $buffer_cnt,
                             'ut' => now(),
                             'id' => $admin_id
                         ]);
@@ -291,7 +283,7 @@ class prd06Controller extends Controller
                 }
             }
 
-            //개별매장 버퍼링 미설정 매장
+            //미선택 매장
             if($idArr != '') {
                 foreach($idArr as $code_id) {
                     $sql = "select count(*) as count from bizest_stock_store where store_cd = :code_id";
@@ -317,7 +309,7 @@ class prd06Controller extends Controller
                     }
                 }
             }
-			
+
 			DB::commit();
 			$code = 200;
 			$msg = "성공";
@@ -328,7 +320,6 @@ class prd06Controller extends Controller
 		}
 
 		return response()->json(["code" => $code, "msg" => $msg]);
-        
     }
 
     public function prd_update(Request $request)
@@ -342,7 +333,7 @@ class prd06Controller extends Controller
 		}
 
 		DB::beginTransaction();
-		
+
         foreach($datas as $data) {
             $prd_cd = $data->prd_cd;
             $comment = $data->comment;
@@ -351,11 +342,11 @@ class prd06Controller extends Controller
             $update = "";
             if($storage_limit_qty != null) $update .= "storage_limit_qty = '$storage_limit_qty', ";
             if($store_limit_qty != null) $update .= "store_limit_qty = '$store_limit_qty', ";
+            if($comment != null) $update .= "comment = '" . Lib::quote($comment) . "', ";
 
             $sql = "
                 update bizest_stock_exp_product set
                     $update
-                    comment = '" . Lib::quote($comment) . "',
                     id = '$id',
                     ut = now()
                 where
@@ -369,7 +360,6 @@ class prd06Controller extends Controller
 		return response()->json([
 			"code" => $code
 		]);
-
 	}
 
     public function prd_delete(Request $request)
@@ -385,9 +375,8 @@ class prd06Controller extends Controller
 		DB::delete($sql, ['prd_cd' => $prd_cd]);
 
 		return response()->json([
-			"code" => $code,
+			"code" => $code
 		]);
-
 	}
 
     public function add_show(Request $request) 
@@ -426,6 +415,5 @@ class prd06Controller extends Controller
 		return response()->json([
 			"code" => $code
 		]);
-
 	}
 }

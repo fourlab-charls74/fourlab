@@ -12,7 +12,7 @@
         </div>
     </div>
     <form name="detail">
-        <input type="hidden" name="idx" id="idx" value="{{ @$idx ?? '' }}"/>
+        <input type="hidden" name="idx" id="idx" value="{{ @$idx }}"/>
         <div class="card_wrap aco_card_wrap">
 			<div class="card shadow">
                 <div class="card-header mb-0">
@@ -30,11 +30,11 @@
                                                 <td>
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio">
-                                                            <input type="radio" name="price_apply_yn" id="price_apply_y" class="custom-control-input" value="Y" @if($price_apply_yn == 'Y' || $price_apply_yn == null) checked @endif/>
+                                                            <input type="radio" name="price_apply_yn" id="price_apply_y" class="custom-control-input" value="Y" @if($price_apply_yn == 'Y') checked @endif/>
                                                             <label class="custom-control-label" for="price_apply_y">예</label>
                                                         </div>
                                                         <div class="custom-control custom-radio">
-                                                            <input type="radio" name="price_apply_yn" id="price_apply_n" class="custom-control-input" value="N" @if($price_apply_yn == 'N') checked @endif/>
+                                                            <input type="radio" name="price_apply_yn" id="price_apply_n" class="custom-control-input" value="N" @if($price_apply_yn == 'N' || $price_apply_yn == null) checked @endif/>
                                                             <label class="custom-control-label" for="price_apply_n">아니오</label>
                                                         </div>
                                                     </div>
@@ -64,13 +64,13 @@
                                                 <td>
 													<div class="flax_box">
                                                         <input type="hidden" name="default_storage_cd" id="default_storage_cd" value="{{ $default->storage_cd }}">
-														<input type='text' class="form-control form-control-sm" name='default_storage_nm' id="default_storage_nm" value="{{ $default->storage_nm }}" autocomplete="off" readonly/>
+														<input type='text' class="form-control form-control-sm" name='default_storage_nm' id="default_storage_nm" value="{{ $default->storage_nm }}" readonly/>
 													</div>
                                                 </td>
 												<th>버퍼링</th>
                                                 <td>
 													<div class="flax_box">
-														<input type='text' class="form-control form-control-sm" name='default_storage_buffer' id="default_storage_buffer" value="{{ @$default_storage_buffer ?? 0 }}" autocomplete="off" />
+														<input type='text' class="form-control form-control-sm" name='default_storage_buffer' id="default_storage_buffer" value="{{ @$default_storage_buffer }}" autocomplete="off" />
 													</div>
                                                 </td>
                                             </tr>
@@ -85,7 +85,7 @@
                                                 <th>버퍼링</th>
                                                 <td>
                                                     <div class="flax_box">
-                                                        <input type='text' class="form-control form-control-sm" name='online_storage_buffer' id="online_storage_buffer" value="{{ @$online_storage_buffer ?? 0 }}" autocomplete="off" />
+                                                        <input type='text' class="form-control form-control-sm" name='online_storage_buffer' id="online_storage_buffer" value="{{ @$online_storage_buffer }}" autocomplete="off" />
                                                     </div>
                                                 </td>
                                             </tr>
@@ -128,7 +128,7 @@
                                                 <td>
                                                     <div class="form-inline">
                                                         <div class="d-flex w-100">
-                                                            <input type='text' class="form-control form-control-sm" name='store_tot_buffer' id="store_tot_buffer" value="{{ @$store_tot_buffer ?? 0 }}" />
+                                                            <input type='text' class="form-control form-control-sm" name='store_tot_buffer' id="store_tot_buffer" value="{{ @$store_tot_buffer }}" />
                                                         </div>
                                                     </div>
                                                 </td>
@@ -171,7 +171,7 @@
                             <div class="fr_box mt-1">
                                 <div class="flax_box">
                                     <a href="#" onclick="Add(); return false;" class="btn-sm btn btn-primary shadow-sm pl-2 mr-1">추가</a>
-                                    <a href="#" onclick="ChangeData()" class="btn-sm btn btn-primary shadow-sm pl-2 mr-1">선택 정보 변경</a>
+                                    <a href="#" onclick="ChangeData(); return false;" class="btn-sm btn btn-primary shadow-sm pl-2 mr-1">선택 정보 변경</a>
                                 <div>
                             </div>
 						</div>
@@ -212,12 +212,7 @@
 			pinned:'left'
 		},
         {field: "store_nm", headerName: "매장명", width:200},
-        {field: "buffer_cnt", headerName: "버퍼링 수", width:100, editable: true, cellStyle: {'background' : '#ffff99', "text-align":"right"},
-            // cellRenderer: (params) => {
-            //     if(params.data.store_use_yn == 'N') return null;
-            //     else return params.value
-            // }
-        },
+        {field: "buffer_cnt", headerName: "버퍼링 수", width:100, editable: true, cellStyle: {'background' : '#ffff99', "text-align":"right"}},
         {field: "code_id", headerName: "매장아이디", hide: true},
         {field: "", width:"auto"}
     ];
@@ -242,7 +237,7 @@
         {field: "prd_cd", headerName: "바코드", width:200},
         {field: "storage_limit_qty", headerName: "창고 제한 수", width:100, editable: true, cellStyle:{"background-color":"#FFFF99", "text-align":"right"}},
         {field: "store_limit_qty", headerName: "매장 제한 수", width:100, editable: true, cellStyle:{"background-color":"#FFFF99", "text-align":"right"}},
-        {field: "comment", headerName: "정보", width:220},
+        {field: "comment", headerName: "정보", width:220, editable: true, cellStyle:{"background-color":"#FFFF99"}},
         {headerName: "삭제", field: "del", width:58, cellStyle:{"text-align":"center"},
             cellRenderer: function(params) {
 				return '<a href="#" onClick="Del(\''+ params.data.prd_cd +'\')">'+ params.value+'</a>'
@@ -262,7 +257,7 @@
     $(document).ready(function() {
         let kind = "{{ @$store_buffer_kind }}";
         if( kind == 'S' ) {
-            $("#store_tot_buffer").val(null);
+            $("#store_tot_buffer").val('');
             $("#store_tot_buffer").attr("readonly", true);
         }
 
@@ -280,20 +275,19 @@
                     params.api.forEachNode((node) =>
                         node.setSelected(!!node.data && node.data.store_use_yn == 'Y')
                     );
+
                 }
             });
             Search_Store();
         }
-        
+
         $("#store_buffer_s").click(function () {
-            // $("#store_buffer_s_chk").show();
-            $("#store_tot_buffer").val(null);
+            $("#store_tot_buffer").val('');
             $("#store_tot_buffer").attr("readonly", true);
         });
 
         $("#store_buffer_a").click(function () {
-            // $("#store_buffer_s_chk").hide();
-            $("#store_tot_buffer").val("{{ @$store_tot_buffer ?? 0 }}");
+            $("#store_tot_buffer").val("{{ @$store_tot_buffer }}");
             $("#store_tot_buffer").attr("readonly", false);
         });
     });
@@ -362,22 +356,25 @@
             } else {
                 storeRows.forEach((row, idx) => {
                     if ( typeof(row.buffer_cnt) == "undefined" ) {
-                        alert("매장별 개별버퍼링을 설정하세요.")
+                        alert("매장별 개별버퍼링을 설정하세요.");
                         result = false;
                         return false;
                     }
-
-                    if ( isNaN(row.buffer_cnt) ) {
-                        alert("개별 버퍼링 수는 반드시 숫자로 입력해야 합니다.")
-                        result = false;
-                        return false;
-                    }
-
                 });
             }
-            return result;
         }
-        
+
+        storeRows.forEach((row, idx) => {
+            if ( isNaN(row.buffer_cnt) && typeof(row.buffer_cnt) != "undefined" ) {
+                console.log(row.buffer_cnt);
+                alert("개별 버퍼링 수는 반드시 숫자로 입력해야 합니다.");
+                gxStore.gridOptions.api.stopEditing();
+                gxStore.gridOptions.api.startEditingCell({ rowIndex: idx, colKey: 'buffer_cnt' });
+                result = false;
+                return false;
+            }
+        });
+
         return result;
     }
 
@@ -401,7 +398,7 @@
             idArr.push(row.code_id);
         });
 
-        if( $("input[name='store_buffer_kind']:checked").val() == 'S' && storeRows.length > 0 ) {
+        if( storeRows.length > 0 ) {
             storeRows.forEach((row, idx) => {
                 idArr = idArr.filter((element) => element != row.code_id);
             });
