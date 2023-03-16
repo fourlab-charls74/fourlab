@@ -146,6 +146,8 @@
             $("#card_amt").text(0);
             $("#cash_amt").text(0);
             $("#point_amt").text(0);
+
+            $("#memo").val('');
         }
     }
     
@@ -403,7 +405,7 @@
             removed_goods = $("[name=removed_goods]").val().split(",").filter(g => g !== '');
         }
         
-        if (!confirm("쿠폰사용기능 개발중입니다. 주문정보가 정확하게 저장되지 않을 수 있습니다. 판매처리하시겠습니까?")) return;
+        // 판매 전, 쿠폰사용 최저가최고가 체크 Validation 처리 필요 (개발중입니다.)
 
         axios({
             async: true,
@@ -516,6 +518,8 @@
             $("#no_user").addClass("d-flex");
             $("#user").addClass("d-none");
             $("#user_id_txt").text('');
+
+            getUserCouponList();
             return;
         }
 
@@ -552,10 +556,16 @@
     }
 
     /** 선택한 고객의 사용가능한 쿠폰목록 조회 */
-    async function getUserCouponList(user_id) {
+    async function getUserCouponList(user_id = '') {
+        let html = "<option value=''>-- 선택 안함 --</option>";
+
+        if (user_id === '') {
+            $("#coupon_no").html(html);
+            return;
+        }
+        
         const { data: { body }, status } = await axios({ method: "get", url: "/shop/pos/search/member-coupon?user_id=" + user_id });
         if (status === 200) {
-            let html = "<option value=''>-- 선택 안함 --</option>";
             html += body.reduce((a,c) => a + `
                 <option value='${c.coupon_no}' 
                     data-apply='${c.coupon_apply}'

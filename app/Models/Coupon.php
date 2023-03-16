@@ -678,20 +678,20 @@ class Coupon
 			return ['code' => -1, 'msg' => 'failed: update coupon'];
 		}
 
-		// 4. coupon_use_log_t 로그 등록
-		$result = DB::table('coupon_use_log_t')->insert([
-			'coupon_no' => $cp->coupon_no,
-			'user_id' => $user_id,
-			'ord_opt_no' => '0',
-			'ord_no' => '0',
-			'order_amt' => '0',
-			'coupon_amt' => '0',
-			'regi_date' => now(),
-			'use_gubun' => '1',
-		]);
-		if ($result < 1) {
-			return ['code' => -1, 'msg' => 'failed: insert coupon_use_log_t'];
-		}
+		// // 4. coupon_use_log_t 로그 등록
+		// $result = DB::table('coupon_use_log_t')->insert([
+		// 	'coupon_no' => $cp->coupon_no,
+		// 	'user_id' => $user_id,
+		// 	'ord_opt_no' => '0',
+		// 	'ord_no' => '0',
+		// 	'order_amt' => '0',
+		// 	'coupon_amt' => '0',
+		// 	'regi_date' => now(),
+		// 	'use_gubun' => '1',
+		// ]);
+		// if ($result < 1) {
+		// 	return ['code' => -1, 'msg' => 'failed: insert coupon_use_log_t'];
+		// }
 		
 		return ['code' => 1, 'msg' => 'success'];
 	}
