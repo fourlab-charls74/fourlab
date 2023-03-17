@@ -25,8 +25,6 @@ class prd05Controller extends Controller
 		$mutable	= now();
 		$sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
 
-		
-
 		$values = [
 			'sdate'         => $sdate,
 			'edate'         => date("Y-m-d"),
@@ -60,6 +58,9 @@ class prd05Controller extends Controller
 					, ppl.change_price as change_price
 					, pp.change_date as change_date
 					, ppl.product_price_cd as product_price_cd
+					, pp.apply_yn as apply_yn
+					, pp.change_kind as change_kind
+					, pp.change_val as change_val
 				from product_price_list ppl
 					inner join product p on p.prd_cd = ppl.prd_cd
 					left outer join product_code pc on pc.prd_cd = ppl.prd_cd
@@ -85,6 +86,12 @@ class prd05Controller extends Controller
 
 	public function search(Request $request)
 	{
+		$sdate = $request->input('sdate');
+		$edate = $request->input('edate');
+		$change_kind = $request->input('change_kind');
+
+		$where = "";
+		if( $change_kind != "" ) $where .= " and change_kind = '" . $change_kind . "' ";
 
 		// ordreby
         $ord_field  = $request->input("ord_field", "change_date");
@@ -104,17 +111,18 @@ class prd05Controller extends Controller
 				, change_date
 				, change_kind
 				, change_val
-				, use_yn
+				, apply_yn
 				, change_cnt
 				, rt
 				, ut
 			from product_price
-			where 1=1
+			where 1=1 and ( change_date >= :sdate and change_date < date_add(:edate,interval 1 day))
+			$where
 			$orderby
 			$limit
 		";
 
-		$result = DB::select($sql);
+		$result = DB::select($sql, ['sdate' => $sdate,'edate' => $edate]);
 
 		// pagination
 		$total = 0;
@@ -123,11 +131,11 @@ class prd05Controller extends Controller
 			$sql = "
 			select
 				count(*) as total
-			from product_price
-			where 1=1
+			from product_price 
+			$where
 			";
 
-			$row = DB::selectOne($sql);
+			$row = DB::selectOne($sql, ['sdate' => $sdate,'edate' => $edate]);
 			$total = $row->total;
 			$page_cnt = (int)(($total - 1) / $page_size) + 1;
 		}
@@ -149,6 +157,12 @@ class prd05Controller extends Controller
 	public function show_search(Request $request) {
 
 		$product_price_cd = $request->input('product_price_cd');
+
+		 // pagination
+		 $page       = $request->input("page", 1);
+		 $page_size  = $request->input("limit", 100);
+		 if ($page < 1 or $page == "") $page = 1;
+		 $startno    = ($page - 1) * $page_size;
 
 		$sql = "
 			select
@@ -178,16 +192,40 @@ class prd05Controller extends Controller
 
 		$result = DB::select($sql);
 
+
+		// pagination
+		$total = 0;
+		$page_cnt = 0;
+		if($page == 1) {
+			$sql = "
+				select
+					count(*) as total
+				from product_price_list ppl
+					inner join product p on p.prd_cd = ppl.prd_cd
+					left outer join product_code pc on pc.prd_cd = ppl.prd_cd
+					inner join goods g on g.goods_no = pc.goods_no
+					left outer join brand b on b.br_cd = pc.brand
+					left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
+				where 1=1 and ppl.product_price_cd = '$product_price_cd'
+			";
+
+			$row = DB::selectOne($sql);
+			$total = $row->total;
+			$page_cnt = (int)(($total - 1) / $page_size) + 1;
+		}
+	
+		
+
 		return response()->json([
 			"code"	=> 200,
 			"head"	=> array(
-				"page_total"=> count($result),
+				"total" => $total,
+				"page" => $page,
+				"page_cnt" => $page_cnt,
+				"page_total"=> count($result)
 			),
 			"body"	=> $result
 		]);
-
-
-
 	}
 	
 
@@ -290,6 +328,74 @@ class prd05Controller extends Controller
 		}
 
         return response()->json(["code" => $code, "msg" => $msg]);
+
+	}
+
+
+	public function del_product_price (Request $request) {
+
+		$data = $request->input('data');
+
+		try {
+            DB::beginTransaction();
+			foreach ($data as $d) {
+				DB::table('product_price')
+					->where('idx', '=', $d['idx'])
+					->delete();
+
+				DB::table('product_price_list')
+					->where('product_price_cd', '=' , $d['idx'])
+					->delete();
+			}
+				
+			DB::commit();
+            $code = 200;
+            $msg = "상품가격 변경 정보가 삭제되었습니다.";
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+        return response()->json(["code" => $code, "msg" => $msg]);
+
+
+	}
+
+
+	public function del_product (Request $request) {
+
+		$data = $request->input('data');
+		$idx = (int)$request->input('idx');
+		$row_cnt = $request->input('cnt');
+
+		try {
+            DB::beginTransaction();
+			foreach ($data as $d) {
+				DB::table('product_price_list')
+					->where('product_price_cd', '=' , $d['product_price_cd'])
+					->where('prd_cd', '=', $d['prd_cd'])
+					->delete();
+
+			}
+
+			DB::table('product_price')
+				->where('idx','=', $idx)
+				->update([
+					'change_cnt' => $row_cnt - count($data)
+				]);
+				
+			DB::commit();
+            $code = 200;
+            $msg = "상품가격 변경 정보가 삭제되었습니다.";
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+        return response()->json(["code" => $code, "msg" => $msg]);
+
 
 	}
 

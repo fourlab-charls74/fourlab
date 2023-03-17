@@ -1058,7 +1058,32 @@ CREATE TABLE `bizest_stock_data` (
 	PRIMARY KEY (`idx`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- 상품가격 변경 마스터
+CREATE TABLE `product_price` (
+  `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT '일련번호',
+  `change_date` varchar(30) NOT NULL COMMENT '변경날짜',
+  `change_kind` char(1) NOT NULL COMMENT '변경종류 (퍼센트 : P , 원 : W)',
+  `change_val` int(11) NOT NULL COMMENT '변경금액(율)',
+  `apply_yn` char(1) NOT NULL DEFAULT 'N' COMMENT '가격적용유무 (Y/N)',
+  `change_cnt` int(11) NOT NULL COMMENT '적용상품수',
+  `admin_id` varchar(50) NOT NULL COMMENT '관리자아이디',
+  `rt` datetime NOT NULL COMMENT '등록일자',
+  `ut` datetime DEFAULT NULL COMMENT '수정일자',
+  PRIMARY KEY (`idx`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 
+-- 상품가격 변경 리스트
+CREATE TABLE `product_price_list` (
+  `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT '일련번호',
+  `product_price_cd` int(11) NOT NULL COMMENT '상품가격코드 (참조 : product_price -> idx)',
+  `prd_cd` varchar(50) NOT NULL COMMENT '상품코드',
+  `org_price` int(11) NOT NULL COMMENT '기존가격',
+  `change_price` int(11) NOT NULL COMMENT '변경가격',
+  `admin_id` varchar(50) NOT NULL COMMENT '관리자아이디',
+  `rt` datetime NOT NULL COMMENT '등록일자',
+  `ut` datetime NOT NULL COMMENT '수정일자',
+  PRIMARY KEY (`idx`)
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8;
 
 --
 -- 기존 테이블 컬럼 추가 시작

@@ -11,7 +11,6 @@
 	</div>
 	<form method="get" name="search" id="search">
 		@csrf
-		<input type='hidden' name='goods_nos' value=''>
 		<div id="search-area" class="search_cum_form">
 			<div class="card mb-3">
 				<div class="d-flex card-header justify-content-between">
@@ -26,74 +25,46 @@
 					<div class="row">
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
-								<label>바코드</label>
-								<div class="flex_box">
-									<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
-									<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-								</div>
-							</div>
-						</div>
-						<div class="col-lg-4 inner-td">
-							<div class="form-group">
-								<label for="style_no">스타일넘버/온라인코드</label>
-								<div class="form-inline">
-									<div class="form-inline-inner input_box">
-										<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no">
-									</div>
-									<span class="text_line">/</span>
-									<div class="form-inline-inner input-box" style="width:47%">
-										<div class="form-inline-inner inline_btn_box">
-											<input type='text' class="form-control form-control-sm w-100 search-enter" name='goods_no' id='goods_no' value=''>
-											<a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+								<label for="">변경일자</label>
+								<div class="form-inline date-select-inbox">
+									<div class="docs-datepicker form-inline-inner input_box">
+										<div class="input-group">
+											<input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off">
+											<div class="input-group-append">
+												<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+													<i class="fa fa-calendar" aria-hidden="true"></i>
+												</button>
+											</div>
 										</div>
+										<div class="docs-datepicker-container"></div>
+									</div>
+									<span class="text_line">~</span>
+									<div class="docs-datepicker form-inline-inner input_box">
+										<div class="input-group">
+											<input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
+											<div class="input-group-append">
+												<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+													<i class="fa fa-calendar" aria-hidden="true"></i>
+												</button>
+											</div>
+										</div>
+										<div class="docs-datepicker-container"></div>
 									</div>
 								</div>
 							</div>
 						</div>
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
-								<label for="goods_nm">상품명</label>
-								<div class="flex_box">
-									<input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value=''>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-lg-4 inner-td">
-							<div class="form-group">
-								<label for="goods_nm_eng">상품명(영문)</label>
-								<div class="flex_box">
-									<input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
-								</div>
-							</div>
-						</div>
-						<div class="col-lg-4 inner-td">
-							<div class="form-group">
-								<label for="goods_stat">전시상태</label>
-								<div class="flex_box">
-									<select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
-										
+								<label for="">변경종류</label>
+								<div class="d-flex">
+									<select name='change_kind' class="form-control form-control-sm">
+										<option value=''>전체</option>
+										<option value='P'>%</option>
+										<option value='W'>원</option>
 									</select>
 								</div>
 							</div>
 						</div>
-						<div class="col-lg-4 inner-td">
-							<div class="form-group">
-								<label for="prd_cd">상품검색조건</label>
-								<div class="form-inline">
-									<div class="form-inline-inner input-box w-100">
-										<div class="form-inline inline_btn_box">
-											<input type='hidden' id="prd_cd_range" name='prd_cd_range'>
-											<input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' onclick="openApi();" class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
-											<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="row">
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
 								<label for="">자료수/정렬</label>
@@ -108,6 +79,7 @@
 									<span class="text_line">/</span>
 									<div class="form-inline-inner input_box" style="width:45%;">
 										<select name="ord_field" class="form-control form-control-sm">
+											<option value="idx">가격정보 코드</option>
 											<option value="change_date">변경일자</option>
 											<option value="rt">등록일</option>
 										</select>
@@ -127,12 +99,6 @@
 				</div>
 			</div>
 			<div class="resul_btn_wrap mb-3">
-				<!-- <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-				<a href="#" onclick="AddProduct_upload();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 바코드 등록</a>
-				<a href="#" onclick="AddProduct();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 상품 매칭</a>
-				<a href="#" onclick="AddProducts();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx fs-16"></i> 상품일괄매칭</a>
-				<a href="#" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
-				<a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a> -->
 			<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
 		</div>
 	</div>
@@ -145,6 +111,7 @@
                     <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                 </div>
                 <div class="fr_box">
+					<button type="button" onclick="del_product_price();" class="btn btn-sm btn-outline-primary shadow-sm" id="add_row_btn"><i class="bx bx-trash"></i> 삭제</button>
                 </div>
             </div>
         </div>
@@ -155,6 +122,15 @@
 </div>
 <script>
     let columns = [
+			{field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code',  headerCheckboxSelection: true, sort: null, width: 29,
+				checkboxSelection: params => {
+					if(params.data.apply_yn == 'Y') {
+						return false
+					} else {
+						return true
+					}
+				}
+			},
             {field: "idx", headerName: "가격변경 코드", width: 100, cellClass: 'hd-grid-code',
 				cellRenderer: function(params) {
 					if (params.value !== undefined && params.data.idx != "") {
@@ -163,10 +139,28 @@
 				}
 			},
             {field: "change_date", headerName: "변경일자", width: 100, cellClass: 'hd-grid-code'},
-            {field: "change_val", headerName: "변경금액", type: "currencyType", width: 100, cellClass: 'hd-grid-code'},
-            {field: "change_kind", headerName: "변경종류", width: 80, cellClass: 'hd-grid-code'},
+            {field: "change_val", headerName: "변경금액(율)", type: "currencyType", width: 100, cellClass: 'hd-grid-code',
+				cellRenderer:function(params) {
+					if (params.data.change_kind == 'P'){
+						return params.data.change_val + '%'
+					} else {
+						return params.data.change_val + '원'
+					}
+				}
+			},
+            {field: "change_kind", headerName: "변경종류", width: 80, cellClass: 'hd-grid-code' , hide:true},
             {field: "change_cnt", headerName: "변경상품수", width: 100, cellClass: 'hd-grid-code'},
+            {field: "apply_yn", headerName: "적용여부", width: 100, cellClass: 'hd-grid-code',
+				cellStyle: params => {
+                        if(params.data.apply_yn == 'Y'){
+							return {'color' : 'blue'}
+						} else {
+							return {'color' : 'red'}
+						}
+                    }
+			},
             {field: "rt", headerName: "등록일자", width: 120, cellClass: 'hd-grid-code'},
+            {field: "ut", headerName: "수정일자", width: 120, cellClass: 'hd-grid-code'},
             {width : 'auto'}
             
         ];
@@ -202,6 +196,32 @@
 		const url = '/store/product/prd05/show/' + code;
 		window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
     };
+
+	function del_product_price() {
+		let rows = gx.getSelectedRows();
+
+		if(rows.length < 1) return alert('삭제할 상품가격변경 정보를 선택해주세요.');
+
+		if(!confirm("선택한 상품가격변경 정보를 삭제하시겠습니까?")) return;
+
+		axios({
+			url: '/store/product/prd05/del-product-price',
+			method: 'put',
+			data: {
+				data: rows
+			},
+		}).then(function (res) {
+			if(res.data.code === 200) {
+				alert(res.data.msg);
+				Search();
+			} else {
+				console.log(res.data);
+				alert("상품가격변경 삭제 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+			}
+		}).catch(function (err) {
+			console.log(err);
+		});
+	}
 </script>
 	
 @stop
