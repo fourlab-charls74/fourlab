@@ -24,13 +24,13 @@
                             <div class="col-12">
                                 <div class="table-box-ty2 mobile">
                                     <table class="table incont table-bordered" width="100%" cellspacing="0">
-                                        <colgroup>
+                                        <!-- <colgroup>
                                             <col width="94px">
-                                        </colgroup>
+                                        </colgroup> -->
                                         <tbody>
                                             <tr>
                                                 <th>등급</th>
-                                                <td>
+                                                <td colspan="3">
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio">
                                                             <input type="radio" name="grade" id="grade_s" class="custom-control-input" value="S" @if(@$user->grade == 'S') checked @endif />
@@ -53,8 +53,8 @@
                                             </tr>
                                             <tr id="store">
                                                 <th>매장</th>
-                                                <td>
-                                                    <div class="form-group">
+                                                <td style="width:40%;">
+                                                    <div class="flax_box">
                                                         <div class="form-inline inline_btn_box" style="width:247px">
                                                             <input type='hidden' id="store_nm" name="store_nm">
                                                             <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
@@ -62,10 +62,23 @@
                                                         </div>
                                                     </div>
                                                 </td>
+                                                <th>정산마감 확인여부</th>
+                                                <td style="width:25%;">
+                                                    <div class="form-inline form-radio-box">
+                                                        <div class="custom-control custom-radio">
+                                                            <input type="radio" name="account_yn" id="account_y" class="custom-control-input" value="Y" @if(@$user->account_yn != 'N') checked @endif />
+                                                            <label class="custom-control-label" for="account_y">사용</label>
+                                                        </div>
+                                                        <div class="custom-control custom-radio">
+                                                            <input type="radio" name="account_yn" id="account_n" class="custom-control-input" value="N" @if(@$user->account_yn == 'N') checked @endif />
+                                                            <label class="custom-control-label" for="account_n">미사용</label>
+                                                        </div>
+                                                    </div>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>아이디</th>
-                                                <td>
+                                                <td colspan="3">
                                                     <div class="flax_box">
                                                         <input type='text' class="form-control form-control-sm search-enter w-25" name='id' id="id" value="{{@$user->id}}" autocomplete="off" />
                                                     </div>
@@ -73,7 +86,7 @@
                                             </tr>
                                             <tr>
                                                 <th>비밀번호</th>
-                                                <td>
+                                                <td colspan="3">
                                                     <div class="flax_box">
                                                         <input type='password' class="form-control form-control-sm w-25" name='passwd' id="passwd" autocomplete="new-password" />
                                                         <div class="custom-control custom-checkbox form-check-box ml-2" style="@if($code == '') display:none; @endif">
@@ -90,7 +103,7 @@
                                             </tr>
                                             <tr>
                                                 <th>이름</th>
-                                                <td>
+                                                <td colspan="3">
                                                     <div class="flax_box">
                                                         <input type='text' class="form-control form-control-sm search-enter w-25" name='name' id="name" value='{{@$user->name}}'>
                                                     </div>
@@ -98,7 +111,7 @@
                                             </tr>
                                             <tr>
                                                 <th>IP</th>
-                                                <td>
+                                                <td colspan="3">
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio">
                                                             <input type="radio" name="iptype" id="iptype_a" class="custom-control-input" value="A" @if(@$user->iptype == 'A') checked @endif />
@@ -119,7 +132,7 @@
                                             </tr>
                                             <tr>
                                                 <th>MD여부</th>
-                                                <td>
+                                                <td colspan="3">
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio">
                                                             <input type="radio" name="md_yn" id="md_y" class="custom-control-input" value="Y" @if(@$user->md_yn != 'N') checked @endif />
@@ -134,7 +147,7 @@
                                             </tr>
                                             <tr>
                                                 <th>사용여부</th>
-                                                <td>
+                                                <td colspan="3">
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio">
                                                             <input type="radio" name="use_yn" id="use_y" class="custom-control-input" value="Y" @if(@$user->use_yn != 'N') checked @endif />

@@ -112,6 +112,7 @@ class sys01Controller extends Controller
 
 		$grade			= $request->input('grade');
         $store_cd       = $request->input('store_no');
+        $account_yn     = $request->input('account_yn');
 		$id				= $request->input('id');
 		$passwd			= $request->input('passwd');
 		$pwchgperiod	= $request->input('pwchgperiod');
@@ -142,6 +143,7 @@ class sys01Controller extends Controller
                     'id' => $id,
                     'store_cd' => $store_cd,
                     'store_nm' => $store_nm,
+                    'account_yn' => $account_yn,
                     'passwd' => DB::raw("CONCAT('*', UPPER(SHA1(UNHEX(SHA1('$passwd')))))"),
                     'pwchgperiod' => $pwchgperiod,
                     'name' => $name,
@@ -204,6 +206,7 @@ class sys01Controller extends Controller
 	{
 		$grade		    = $request->input('grade');
         $store_cd       = $request->input('store_no');
+        $account_yn     = $request->input('account_yn');
 		$id			    = $request->input('id');
 		$passwd		    = $request->input('passwd');
 		$pwchgperiod	= $request->input('pwchgperiod');
@@ -231,6 +234,7 @@ class sys01Controller extends Controller
                 'id'			=> $id,
                 'store_cd'      => $store_cd,
                 'store_nm'      => $store_nm,
+                'account_yn'    => $account_yn,
                 'pwchgperiod'	=> $pwchgperiod,
                 'name'			=> $name,
                 'ipfrom'		=> $ipfrom,
@@ -253,6 +257,7 @@ class sys01Controller extends Controller
                 'id'			=> $id,
                 'store_cd'      => '',
                 'store_nm'      => '',
+                'account_yn'    => 'Y',
                 'pwchgperiod'	=> $pwchgperiod,
                 'name'			=> $name,
                 'ipfrom'		=> $ipfrom,

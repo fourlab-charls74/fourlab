@@ -16,14 +16,22 @@ class acc07Controller extends Controller
 {
     public function index()
     {
-        $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m");
-		$store_types = SLib::getStoreTypes();
-        $values = [ 
-			'sdate' => $sdate, 
-			'store_types' => $store_types,
-			'store_kinds' => SLib::getCodes("STORE_KIND")
-		];
-        return view( Config::get('shop.shop.view') . '/account/acc07', $values);
+		$account_yn = Auth('head')->user()->account_yn;
+
+		if( $account_yn == 'N') {
+			$msg = '페이지 접근 권한이 없습니다.';
+			Lib::printMsg($msg, 'back');
+			exit;
+		} else {
+			$sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m");
+			$store_types = SLib::getStoreTypes();
+			$values = [ 
+				'sdate' => $sdate, 
+				'store_types' => $store_types,
+				'store_kinds' => SLib::getCodes("STORE_KIND")
+			];
+			return view( Config::get('shop.shop.view') . '/account/acc07', $values);
+		}
     }
 
     public function search(Request $request)
