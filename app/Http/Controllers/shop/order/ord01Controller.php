@@ -484,9 +484,16 @@ class ord01Controller extends Controller
         // pagination
         $total = 0;
         $page_cnt = 0;
+        $total_row = [];
         if($page == 1) {
             $sql = "
-                select count(*) as total
+                select 
+                    count(*) as total,
+                    sum(o.qty) as total_qty,
+                    sum(g.price) as total_goods_price,
+                    sum(o.price) as total_price,
+                    sum(g.goods_sh) as total_goods_sh,
+                    sum(o.dlv_amt) as total_dlv_amt
                 from order_opt o
                     left outer join product_code pc on pc.prd_cd = o.prd_cd
                     inner join order_mst om on o.ord_no = om.ord_no
@@ -499,6 +506,7 @@ class ord01Controller extends Controller
 
             $row = DB::selectOne($sql);
             $total = $row->total;
+            $total_row = $row;
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
         }
 
@@ -508,7 +516,8 @@ class ord01Controller extends Controller
                 "total" => $total,
                 "page" => $page,
                 "page_cnt" => $page_cnt,
-                "page_total" => count($result)
+                "page_total" => count($result),
+                'total_row'  => $total_row,
             ],
             "body" => $result,
         ]);

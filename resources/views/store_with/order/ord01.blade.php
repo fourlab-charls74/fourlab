@@ -407,6 +407,7 @@
 	</div>
 </div>
 <script language="javascript">
+    const pinnedRowData = [{ qty: 0, goods_sh: 0, goods_price: 0, price: 0, dlv_amt: 0}];
     let columns = [
         // {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {'text-align': 'center'}},
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 28},
@@ -415,7 +416,11 @@
         {field: "ord_state", headerName: "주문상태", pinned: 'left', width: 70, cellStyle: StyleOrdState},
         {field: "clm_state", headerName: "클레임상태", pinned: 'left', width: 70, cellStyle: StyleClmState},
         {field: "pay_stat", headerName: "입금상태", pinned: 'left', width: 60, cellStyle: {'text-align': 'center'}},
-        {field: "prd_cd", headerName: "바코드", width: 120, cellStyle: {'text-align': 'center'}},
+        {field: "prd_cd", headerName: "바코드", width: 120, cellStyle: {'text-align': 'center'},
+            cellRenderer: function(params) {
+				if (params.node.rowPinned === 'top') return "합계";
+            }
+        },
         {field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: {'text-align': 'center'}},
         {field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: {'text-align': 'center'}},
         {field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, surl:"{{config('shop.front_url')}}"},
@@ -449,8 +454,26 @@
         {field: "ord_kind", headerName: "출고구분", width: 60, cellStyle: StyleOrdKind},
         {field: "store_nm", headerName: "주문매장", width: 100},
         {field: "baesong_kind", headerName: "배송구분", width: 60},
-        {field: "state", headerName: "처리현황", width: 120, editable: true, cellStyle: {'background-color': '#ffff99'}},
-        {field: "memo", headerName: "메모", width: 120, editable: true, cellStyle: {'background-color': '#ffff99'}},
+        {field: "state", headerName: "처리현황", width: 120, 
+            editable: params => params.node.rowPinned === 'top' ? false : true,
+            cellStyle: params => {
+                if (params.node.rowPinned === 'top') {
+                    return {};
+                } else {
+                    return { 'background': '#ffff99' };
+                }
+            } 
+        },
+        {field: "memo", headerName: "메모", width: 120,
+            editable: params => params.node.rowPinned === 'top' ? false : true,
+            cellStyle: params => {
+                if (params.node.rowPinned === 'top') {
+                    return {};
+                } else {
+                    return { 'background': '#ffff99' };
+                }
+            }
+        },
         {field: "ord_date", headerName: "주문일시", width: 120, cellStyle: {'text-align': 'center'}},
         {field: "pay_date", headerName: "입금일시", width: 120, cellStyle: {'text-align': 'center'}},
         {field: "dlv_end_date", headerName: "배송일시", width: 120, cellStyle: {'text-align': 'center'}},
@@ -466,6 +489,10 @@
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {
+            pinnedTopRowData: pinnedRowData,
+			getRowStyle: (params) => {
+                if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee !important', 'border': 'none'};
+            },
             isRowSelectable : function(node){
                 return node.data.ord_state_cd < 30;
             }
@@ -485,7 +512,16 @@
 
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/store/order/ord01/search', data, 1);
+		gx.Request('/store/order/ord01/search', data, 1, function(e) {
+			const t = e.head.total_row;
+			gx.gridOptions.api.setPinnedTopRowData([{ 
+				qty: t.total_qty,
+				goods_sh: t.total_goods_sh,
+				goods_price: t.total_goods_price,
+				price: t.total_price,
+				dlv_amt: t.total_dlv_amt
+			}]);
+		});
 	}
 
     // 수기등록 팝업오픈
