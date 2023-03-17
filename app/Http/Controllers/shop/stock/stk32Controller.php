@@ -294,7 +294,7 @@ class stk32Controller extends Controller
                 from msg_store_detail md
                     left outer join msg_store m on m.msg_cd = md.msg_cd
                     left outer join store s on s.store_cd = m.sender_cd
-                where md.receiver_type = '$admin_type' and md.receiver_cd = '$user_store' and m.msg_cd = '$msg_cd'
+                where md.receiver_cd = '$user_store' and m.msg_cd = '$msg_cd'
                 group by md.msg_cd
             ";
         }
@@ -324,13 +324,10 @@ class stk32Controller extends Controller
             ];
         } else if ($msg_type == 'pop') {
             $values = [
-                'store_types' => SLib::getCodes("STORE_TYPE"),
                 'msg_type' => $msg_type,
-                'sdate' => $sdate,
-                'edate' => date("Y-m-d"),
                 'msg_cd' => $msg_cd,
-                'content' => $res->content,
-                'sender_nm' => $result->sender_nm ?? ''
+                'content' => $result->content,
+                'sender_nm' => $result->sender_nm
             ];
         }
 
