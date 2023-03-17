@@ -373,16 +373,24 @@
     let columns = [
         // {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {'text-align': 'center'}},
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 28},
-        {field: "ord_no", headerName: "주문번호", pinned: 'left', width: 130, cellStyle: StyleOrdNo, type: 'StoreOrderNoType',},
+        {field: "ord_no", headerName: "주문번호", pinned: 'left', width: 130, cellStyle: StyleOrdNo, type: 'StoreOrderNoType',
+            cellStyle: params => {
+                if (params.node.rowPinned === 'top') {
+                    return {'text-align': 'center'};
+                } else {
+                    return {};
+                }
+            },
+            cellRenderer: function(params) {
+				if (params.node.rowPinned === 'top') return "합계";
+                else return params.value;
+            }
+        },
         {field: "ord_opt_no", headerName: "일련번호", pinned: 'left', width: 60, type: 'StoreOrderNoType', cellStyle: {'text-align': 'center'}},
         {field: "ord_state", headerName: "주문상태", pinned: 'left', width: 70, cellStyle: StyleOrdState},
         {field: "clm_state", headerName: "클레임상태", pinned: 'left', width: 70, cellStyle: StyleClmState},
         {field: "pay_stat", headerName: "입금상태", pinned: 'left', width: 60, cellStyle: {'text-align': 'center'}},
-        {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {'text-align': 'center'},
-            cellRenderer: function(params) {
-				if (params.node.rowPinned === 'top') return "합계";
-            }
-        },
+        {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {'text-align': 'center'}},
         {field: "goods_no", headerName: "상품번호", width: 70, cellStyle: {'text-align': 'center'}},
         {field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: {'text-align': 'center'}},
         {field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, surl:"{{config('shop.front_url')}}"},
