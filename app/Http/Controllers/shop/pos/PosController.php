@@ -550,13 +550,45 @@ class PosController extends Controller
                 if ($coupon_no !== '') {
                     $com_ratio = DB::table('coupon_company')->where('coupon_no', $coupon_no)->where('com_id', $goods->com_id)->value('com_rat');
 
-                    /** 
-                     * 쿠폰사용 체크리스트 (개발중) 
-                     * 1. 해당 사용자의 사용가능한(기간이 타당한) 쿠폰인가?
-                     * 2. 쿠폰의 price_yn이 'Y'일 경우, 해당상품의 ord_amt가 최고가/최저가 기준에 부합하는가?
-                     * 3. 전체상품일 때 제외상품목록에 포함되지 않는지? 또는 개별상품일 때 해당상품목록에 포함되는지?
-                    */
-                    $cp = DB::table('coupon')->where('coupon_no', $coupon_no)->first();
+                    $sql = "
+                        select a.*
+                        from (
+                            select cm.user_id, cm.use_to_date as to_date, cm.down_date, cm.coupon_no, c.coupon_nm, c.coupon_type
+                                , if(c.use_date_type = 'S', c.use_fr_date, date_format(cm.down_date, '%Y%m%d')) as use_fr_date
+                                , if(c.use_date_type = 'S', c.use_to_date, date_format(date_add(cm.down_date, interval c.use_date DAY), '%Y%m%d')) as use_to_date
+                                , c.coupon_apply, ifnull(GROUP_CONCAT(cg.goods_no), '') as goods_nos, ifnull(GROUP_CONCAT(cge.goods_no), '') as ex_goods_nos
+                                , c.coupon_amt_kind, c.coupon_amt, c.coupon_per
+                                , c.price_yn, c.low_price, c.high_price
+                            from coupon_member cm
+                                inner join coupon c on c.coupon_no = cm.coupon_no and c.use_yn = 'Y' and c.coupon_type <> 'O'
+                                left outer join coupon_goods cg on cg.coupon_no = cm.coupon_no
+                                left outer join coupon_goods_ex cge on cge.coupon_no = cm.coupon_no
+                            where cm.user_id = :user_id and cm.coupon_no = :coupon_no and cm.use_yn = 'N'
+                            group by cm.coupon_no
+                        ) a
+                            where date_format(now(), '%Y%m%d') >= a.use_fr_date and date_format(now(), '%Y%m%d') <= a.use_to_date
+                    ";
+                    $cp = DB::selectOne($sql, ['user_id' => $member_id, 'coupon_no' => $coupon_no]);
+
+                    // 해당 쿠폰의 사용기간 유효성 체크
+                    if ($cp === null) {
+                        $code = '-110';
+                        throw new Exception("사용하신 쿠폰 중 현재 사용할 수 없는 쿠폰이 있습니다.");
+                    }
+                    // 해당 쿠폰의 최고가/최저가 부합 체크
+                    if ($cp->price_yn === 'Y' && ($cp->low_price > 0 && ($cp->low_price > $item_ord_amt) || ($cp->high_price > 0 && $cp->high_price < $item_ord_amt))) {
+                        $code = '-111';
+                        throw new Exception("[" . $cp->coupon_nm . "]은 주문금액이 최소 " . number_format($cp->low_price) . "원 / 최대 " . number_format($cp->high_price) . "원인 상품에만 적용할 수 있습니다.");
+                    }
+                    // 해당 쿠폰의 해당/제외 상품정보 부합 체크
+                    if (
+                        ($cp->coupon_apply === 'AG' && in_array($goods->goods_no, explode(',', $cp->ex_goods_nos)))
+                        || ($cp->coupon_apply === 'SG' && !in_array($goods->goods_no, explode(',', $cp->goods_nos)))
+                    ) {
+                        $code = '-112';
+                        throw new Exception("[" . $goods->goods_nm . "]상품에는 해당 쿠폰을 적용할 수 없습니다.");
+                    }
+
                     // 쿠폰할인은 TAG가 기준입니다.
                     $item_coupon_amt = $cp->coupon_amt_kind === 'P' 
                         ? round($goods->goods_sh * $qty * ($cp->coupon_per ?? 0) / 100, 0) 

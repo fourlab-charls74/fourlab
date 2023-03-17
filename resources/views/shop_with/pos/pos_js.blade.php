@@ -275,8 +275,7 @@
         const usable_coupon_nos = $("#coupon_no option").toArray()
             .filter(opt => {
                 let d = opt.dataset;
-                // if (d.price_yn === 'Y' && (goods.price < (d.low_price * 1) || (d.high_price < 1 ? 1 : goods.price > (d.high_price * 1)))) return false; -- 추후 최종판매 시에 고려 필요 (가격*수량 과 비교하기)
-                if (d.apply === 'AG' && d.ex_goods_nos.split(",").includes(goods.goods_no)) return false;
+                if (d.apply === 'AG' && d.ex_goods_nos.split(",").includes(goods.goods_no + '')) return false;
                 if (d.apply === 'SG' && !d.goods_nos.split(",").includes(goods.goods_no + '')) return false;
                 if (selected_coupon_nos.includes(opt.value) && goods.coupon_no !== opt.value) return false;
                 return true;
