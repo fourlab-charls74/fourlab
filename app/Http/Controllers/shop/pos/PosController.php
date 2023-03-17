@@ -120,7 +120,8 @@ class PosController extends Controller
         $today_analysis = DB::selectOne($sql);
 
         $sql = "
-            select ord_no, date_format(ord_date, '%H시 %i분') as ord_date, ord_amt, recv_amt, (point_amt * -1) as point_amt, (dc_amt * -1) as dc_amt
+            select ord_no, date_format(ord_date, '%H시 %i분') as ord_date
+                , ord_amt, recv_amt, (point_amt * -1) as point_amt, (dc_amt * -1) as dc_amt, (coupon_amt * -1) as coupon_amt
             from order_mst
             where store_cd = '$store_cd'
                 and ord_state >= 30
@@ -787,12 +788,14 @@ class PosController extends Controller
             #   적립금 지급 & 차감
             #####################################################
 
-            if ($ord_state !== '1' && $point_flag && $member_id !== '') {
+            if ($ord_state !== '1' && $member_id !== '') {
                 $point = new Point($user, $member_id);
 
                 // 적립금 지급
-                $point->SetOrdNo($ord_no);
-                $point->StoreOrder();
+                if ($point_flag) {
+                    $point->SetOrdNo($ord_no);
+                    $point->StoreOrder();
+                }
 
                 // 적립금 차감
                 if ($point_amt > 0) {
@@ -915,6 +918,7 @@ class PosController extends Controller
                 , o.qty
                 , o.point_amt
                 , o.dc_amt
+                , o.coupon_amt
                 , o.recv_amt
                 , o.clm_state
                 , om.user_id
@@ -928,6 +932,8 @@ class PosController extends Controller
                 , m.point
                 , m.addr
                 , m.addr2
+                , om.coupon_amt as total_coupon_amt
+                , om.dc_amt as total_dc_amt
                 , om.point_amt as total_point_amt
                 , om.recv_amt as total_recv_amt
                 , om.ord_state
@@ -957,13 +963,14 @@ class PosController extends Controller
         $code = 0;
         $ord_no = '';
         $keyword = $request->input('ord_no', '');
+        $store_cd = Auth::guard('head')->user()->store_cd;
 
         $sql = "
             select ord_no
             from order_mst
             where ord_no = :ord_no and store_cd = :store_cd
         ";
-        $ord = DB::selectOne($sql, ['ord_no' => $keyword, 'store_cd' => STORE_CD]);
+        $ord = DB::selectOne($sql, ['ord_no' => $keyword, 'store_cd' => $store_cd]);
 
         if ($ord != null) {
             $code = 200;

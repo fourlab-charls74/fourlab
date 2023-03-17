@@ -46,7 +46,8 @@
                     <ul class="p-3">
                         <li class="d-flex justify-content-between fs-14 fw-sb mb-2"><p>총 결제금액</p><p class="fc-red"><span id="po_recv_amt">0</span>원</p></li>
                         <li class="d-flex justify-content-between mb-2"><p>주문금액</p><p><span id="po_ord_amt">0</span>원</p></li>
-                        <li class="d-flex justify-content-between mb-2"><p>할인금액</p><p><span id="po_dc_amt">0</span>원</p></li>
+                        <li class="d-flex justify-content-between mb-2"><p>판매할인금액</p><p><span id="po_dc_amt">0</span>원</p></li>
+                        <li class="d-flex justify-content-between mb-2"><p>쿠폰할인금액</p><p><span id="po_coupon_amt">0</span>원</p></li>
                         <li class="d-flex justify-content-between mb-2"><p>적립금사용</p><p><span id="po_point_amt">0</span>원</p></li>
                         <li class="d-flex justify-content-between"><p>결제시간</p><p id="po_ord_date"></p></li>
                     </ul>
@@ -370,6 +371,10 @@
                             <div class="d-flex justify-content-between fs-10 pl-2 mb-2">
                                 <p>&#8722; 판매할인금액</p>
                                 <p id="od_dc_amt">-</p>
+                            </div>
+                            <div class="d-flex justify-content-between fs-10 pl-2 mb-2">
+                                <p>&#8722; 쿠폰할인금액</p>
+                                <p id="od_coupon_amt">-</p>
                             </div>
                             <div class="d-flex justify-content-between fs-10 pl-2 mb-2">
                                 <p>&#8722; 적립금사용금액</p>
