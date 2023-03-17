@@ -38,6 +38,7 @@
             $("#po_recv_amt").text(Comma(data.prev_order?.recv_amt || 0));
             $("#po_ord_amt").text(Comma(data.prev_order?.ord_amt || 0));
             $("#po_dc_amt").text(Comma(data.prev_order?.dc_amt || 0));
+            $("#po_coupon_amt").text(Comma(data.prev_order?.coupon_amt || 0));
             $("#po_point_amt").text(Comma(data.prev_order?.point_amt || 0));
             $("#po_ord_date").text(data.prev_order?.ord_date || '-');
         }
@@ -405,7 +406,21 @@
             removed_goods = $("[name=removed_goods]").val().split(",").filter(g => g !== '');
         }
         
-        // 판매 전, 쿠폰사용 최저가최고가 체크 Validation 처리 필요 (개발중입니다.)
+        // 쿠폰사용 최저가최고가 체크
+        const all_coupons = $("#coupon_no option").toArray().map(opt => ({ ...opt.dataset, coupon_no: opt.value }));
+        const unavailable_coupons = cart.filter(c => {
+            if (c.coupon_no === '') return false;
+
+            let cp = all_coupons.find(coupon => coupon.coupon_no === c.coupon_no);
+            if (cp === undefined) return false;
+
+            if (cp.price_yn === 'Y' && (cp.low_price > 0 && (cp.low_price > (c.ori_price * c.qty)) || (cp.high_price > 0 && cp.high_price < (c.ori_price * c.qty)))) return true;
+            return false;
+        });
+        if (unavailable_coupons.length > 0) {
+            let cp = all_coupons.find(coupon => coupon.coupon_no === unavailable_coupons[0].coupon_no);  
+            return alert(`[${cp.coupon_nm}]은 주문금액이 최소 ${Comma(cp.low_price)}원 / 최대 ${Comma(cp.high_price)}원인 상품에만 적용할 수 있습니다.`);
+        }
 
         axios({
             async: true,
@@ -568,6 +583,7 @@
         if (status === 200) {
             html += body.reduce((a,c) => a + `
                 <option value='${c.coupon_no}' 
+                    data-coupon_nm='${c.coupon_nm}'
                     data-apply='${c.coupon_apply}'
                     data-goods_nos='${c.goods_nos}'
                     data-ex_goods_nos='${c.ex_goods_nos}'
@@ -725,9 +741,9 @@
             $("#od_ord_date").text(ord.ord_date);
             $("#od_ord_amt").text(Comma(data.reduce((a,c) => (c.price * c.qty) + a, 0)));
 
-            let dc_amt = Comma(data.reduce((a,c) => ((c.sale_kind == '99' ? ((c.price * c.qty) - c.recv_amt) : c.sale_amount) * 1) + a, 0) * -1);
-            $("#od_dc_amt").text(dc_amt);
-            $("#od_point_amt").text(Comma(ord.total_point_amt));
+            $("#od_dc_amt").text(Comma(ord.total_dc_amt * -1));
+            $("#od_coupon_amt").text(Comma(ord.total_coupon_amt * -1));
+            $("#od_point_amt").text(Comma(ord.total_point_amt * -1));
             $("#od_recv_amt").text(Comma(ord.total_recv_amt));
 
             $("#od_pay_type").text(ord.pay_type_nm.replaceAll("무통장", "현금"));
@@ -758,8 +774,13 @@
                         </td>
                         <td class="pt-2 pb-2 pr-1">
                             <div class="d-flex flex-column align-items-end">
+                                ${(o.coupon_amt > 0) ? `    
+                                    <span class="text-white fs-08 fw-sb br-05 bg-info pl-2 pr-2 mb-1">쿠폰사용</span>
+                                ` : ''}
                                 ${(o.sale_amount > 0 || o.sale_kind == '99') ? `    
-                                    <span class="fs-08 fw-sb br-05 bg-lightgray pl-2 pr-2">${o.sale_type_nm}</span>
+                                    <span class="text-white fs-08 fw-sb br-05 bg-warning pl-2 pr-2">${o.sale_type_nm}</span>
+                                ` : ''}
+                                ${(o.sale_amount > 0 || o.sale_kind == '99' || o.coupon_amt > 0) ? `    
                                     <del class="fc-gray fs-08">${Comma(o.qty * o.price)}</del>
                                 ` : ''}
                                 <p class="fw-sb">${Comma(o.recv_amt + o.point_amt)}</p>
