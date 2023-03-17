@@ -54,6 +54,9 @@
                                         </td>
                                     </tr>
                                 </table>
+                                <div class="card-title pt-3">
+                                    <a href="javascript:void(0);" onclick="locate(); return false;" type="text" style="float:right">공지사항 바로 가기</a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -91,6 +94,11 @@
                     // console.log(e.responseText)
             }
         });
+    }
+
+    function locate() {
+        window.opener.location.href = "/shop/stock/stk31";
+        window.close();
     }
 </script>
 @stop
