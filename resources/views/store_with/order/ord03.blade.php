@@ -459,7 +459,7 @@
         {field: "goods_opt", headerName: "옵션", width: 130},
         {field: "qty", headerName: "수량", width: 50, type: "currencyType", cellStyle: {"font-weight": "bold", 'background-color': '#D5FFDA'}, aggFunc: "first"},
         @foreach (@$dlv_locations as $loc)
-            {field: "{{ $loc->seq }}_{{ $loc->location_type }}_{{ $loc->location_cd }}_qty", headerName: "{{ $loc->location_nm }}", width: 100, type: "currencyType",
+            {field: "{{ $loc->seq }}_{{ $loc->location_type }}_{{ $loc->location_cd }}_qty", headerName: "{{ $loc->location_nm }}", width: 80, type: "currencyType",
                 cellStyle: (params) => (
                     {
                         'color': params.data.dlv_location_cd === '{{ $loc->location_cd }}' ? (params.data.dlv_location_type === 'STORAGE' ? '#0000ff' : '#ff0000') : 'none', 
@@ -481,7 +481,7 @@
         {field: "sale_kind_nm", headerName: "판매유형", width: 100, cellStyle: {"text-align": "center"}},
         {field: "pr_code_nm", headerName: "행사구분", width: 60, cellStyle: {"text-align": "center"}},
         {field: "dlv_amt", headerName: "배송비", width: 60, type: "currencyType"},
-        {field: "sales_com_fee", headerName: "판매수수료", width: 80, type: "currencyType"},
+        {field: "dlv_store_fee", headerName: "판매수수료율(%)", width: 100, type: "percentType"},
         {field: "pay_type_nm", headerName: "결제방법", width: 80, cellStyle: {'text-align': 'center'}},
         {field: "baesong_kind", headerName: "배송구분", width: 60, cellStyle: {'text-align': 'center'}},
         {field: "ord_date", headerName: "주문일시", width: 125, cellStyle: {'text-align': 'center'}},

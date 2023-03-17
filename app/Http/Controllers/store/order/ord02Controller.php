@@ -26,9 +26,17 @@ class ord02Controller extends Controller
 		$sale_places = DB::select($sale_places_sql);
 
 		$dlv_locations_sql = "
-			(select 'storage' as location_type, storage_cd as location_cd, storage_nm as location_nm, if(online_yn = 'Y', 0, 1) as seq from storage where online_yn = 'Y' or default_yn = 'Y')
+			(
+				select 'storage' as location_type, storage_cd as location_cd, storage_nm as location_nm, if(online_yn = 'Y', 0, 1) as seq 
+				from storage 
+				where online_yn = 'Y' or default_yn = 'Y'
+			)
 			union all
-			(select 'store' as location_type, store_cd as location_cd, store_nm as location_nm, 2 as seq from store where store_cd in (select code_id from code where code_kind_cd = 'ONLINE_ORDER_STORE'))
+			(
+				select 'store' as location_type, s.store_cd as location_cd, c.code_val as location_nm, 2 as seq 
+				from store s
+					inner join code c on c.code_kind_cd = 'ONLINE_ORDER_STORE' and c.code_id = s.store_cd
+			)
 			order by seq, location_cd
 		";
 		$dlv_locations = DB::select($dlv_locations_sql);
@@ -198,9 +206,17 @@ class ord02Controller extends Controller
 
 		// get list
 		$dlv_locations_sql = "
-			(select 'storage' as location_type, storage_cd as location_cd, storage_nm as location_nm, if(online_yn = 'Y', 0, 1) as seq from storage where online_yn = 'Y' or default_yn = 'Y')
+			(
+				select 'storage' as location_type, storage_cd as location_cd, storage_nm as location_nm, if(online_yn = 'Y', 0, 1) as seq 
+				from storage 
+				where online_yn = 'Y' or default_yn = 'Y'
+			)
 			union all
-			(select 'store' as location_type, store_cd as location_cd, store_nm as location_nm, 2 as seq from store where store_cd in (select code_id from code where code_kind_cd = 'ONLINE_ORDER_STORE'))
+			(
+				select 'store' as location_type, s.store_cd as location_cd, c.code_val as location_nm, 2 as seq 
+				from store s
+					inner join code c on c.code_kind_cd = 'ONLINE_ORDER_STORE' and c.code_id = s.store_cd
+			)
 			order by seq, location_cd
 		";
 		$dlv_locations = DB::select($dlv_locations_sql);

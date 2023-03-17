@@ -232,7 +232,7 @@ class ord03Controller extends Controller
 				select 
 					rcp.or_cd, rcp.or_prd_cd, rc.rel_order, rc.req_id, rcp.comment as receipt_comment
 					, rcp.state, rcp.dlv_location_type, rcp.dlv_location_cd, rcp.rt as receipt_date
-					, if(rcp.dlv_location_type = 'STORAGE', (select storage_nm from storage where storage_cd = rcp.dlv_location_cd), (select store_nm from store where store_cd = rcp.dlv_location_cd)) as dlv_location_nm
+					, if(rcp.dlv_location_type = 'STORAGE', (select storage_nm from storage where storage_cd = rcp.dlv_location_cd), (select code_val from code where code_kind_cd = 'ONLINE_ORDER_STORE' and code_id = rcp.dlv_location_cd)) as dlv_location_nm
 					, o.ord_no, o.ord_opt_no, o.goods_no, g.goods_nm, g.goods_nm_eng, g.style_no, o.goods_opt
 					, pc.prd_cd, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color, pc.size
 					, o.wonga, o.price, g.price as goods_price, g.goods_sh, o.qty, o.dlv_no
@@ -240,6 +240,7 @@ class ord03Controller extends Controller
 					, o.sale_place, o.store_cd, o.ord_state, o.clm_state, o.com_id, o.baesong_kind as dlv_baesong_kind, o.ord_date
 					, o.sale_kind, o.pr_code, o.sales_com_fee, o.ord_type, o.ord_kind, p.pay_stat, p.pay_date
 					, concat(ifnull(om.user_nm, ''), '(', ifnull(om.user_id, ''), ')') as user_nm, om.r_nm
+					, s.fee_12 as dlv_store_fee -- 판매수수료율
 					$qty_sql
 				from order_receipt_product rcp
 					inner join order_receipt rc on rc.or_cd = rcp.or_cd
@@ -248,6 +249,11 @@ class ord03Controller extends Controller
 					inner join product_code pc on pc.prd_cd = rcp.prd_cd
 					inner join goods g on g.goods_no = o.goods_no
 					left outer join payment p on p.ord_no = o.ord_no
+					left outer join (
+						select s.store_cd as s_store_cd, sg.grade_cd, sg.fee_12
+						from store s
+							inner join store_grade sg on sg.grade_cd = s.grade_cd
+					) s on s.s_store_cd = rcp.dlv_location_cd and rcp.dlv_location_type = 'STORE'
 				where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
 					and o.clm_state in (-30,1,90,0)
 					$where
@@ -311,9 +317,17 @@ class ord03Controller extends Controller
 
 		if ($user_group === HEAD) {
 			$dlv_locations_sql = "
-				(select 'storage' as location_type, storage_cd as location_cd, storage_nm as location_nm, if(online_yn = 'Y', 0, 1) as seq from storage where online_yn = 'Y' or default_yn = 'Y')
+				(
+					select 'storage' as location_type, storage_cd as location_cd, storage_nm as location_nm, if(online_yn = 'Y', 0, 1) as seq 
+					from storage 
+					where online_yn = 'Y' or default_yn = 'Y'
+				)
 				union all
-				(select 'store' as location_type, store_cd as location_cd, store_nm as location_nm, 2 as seq from store where store_cd in (select code_id from code where code_kind_cd = 'ONLINE_ORDER_STORE'))
+				(
+					select 'store' as location_type, s.store_cd as location_cd, c.code_val as location_nm, 2 as seq 
+					from store s
+						inner join code c on c.code_kind_cd = 'ONLINE_ORDER_STORE' and c.code_id = s.store_cd
+				)
 				order by seq, location_cd
 			";
 			$dlv_locations = DB::select($dlv_locations_sql);
@@ -1211,7 +1225,7 @@ class ord03Controller extends Controller
 					, om.mobile
 					, rcp.dlv_location_type
 					, rcp.dlv_location_cd
-					, if(rcp.dlv_location_type = 'STORAGE', (select storage_nm from storage where storage_cd = rcp.dlv_location_cd), (select store_nm from store where store_cd = rcp.dlv_location_cd)) as dlv_location_nm
+					, if(rcp.dlv_location_type = 'STORAGE', (select storage_nm from storage where storage_cd = rcp.dlv_location_cd), (select code_val from code where code_kind_cd = 'ONLINE_ORDER_STORE' and code_id = rcp.dlv_location_cd)) as dlv_location_nm
 					, if(rcp.dlv_location_type = 'STORAGE', (select qty from product_stock_storage where storage_cd = rcp.dlv_location_cd and prd_cd = pc.prd_cd), (select qty from product_stock_store where store_cd = rcp.dlv_location_cd and prd_cd = pc.prd_cd)) as qty
 					, o.dlv_no
 					, o.sale_kind
@@ -1357,7 +1371,7 @@ class ord03Controller extends Controller
 				select 
 					rcp.or_cd, rcp.or_prd_cd, rc.rel_order, rc.req_id, rcp.comment as receipt_comment
 					, rcp.state, rcp.dlv_location_type, rcp.dlv_location_cd, rcp.rt as receipt_date
-					, if(rcp.dlv_location_type = 'STORAGE', (select storage_nm from storage where storage_cd = rcp.dlv_location_cd), (select store_nm from store where store_cd = rcp.dlv_location_cd)) as dlv_location_nm
+					, if(rcp.dlv_location_type = 'STORAGE', (select storage_nm from storage where storage_cd = rcp.dlv_location_cd), (select code_val from code where code_kind_cd = 'ONLINE_ORDER_STORE' and code_id = rcp.dlv_location_cd)) as dlv_location_nm
 					, o.ord_no, o.ord_opt_no, o.goods_no, g.goods_nm, g.goods_nm_eng, g.style_no, o.goods_opt
 					, pc.prd_cd, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color, pc.size
 					, o.wonga, o.price, g.price as goods_price, g.goods_sh, o.qty, o.dlv_no
@@ -1365,6 +1379,7 @@ class ord03Controller extends Controller
 					, o.sale_place, o.store_cd, o.ord_state, o.clm_state, o.com_id, o.baesong_kind as dlv_baesong_kind, o.ord_date
 					, o.sale_kind, o.pr_code, o.sales_com_fee, o.ord_type, o.ord_kind, p.pay_stat, p.pay_date
 					, concat(ifnull(om.user_nm, ''), '(', ifnull(om.user_id, ''), ')') as user_nm, om.r_nm
+					, s.fee_12 as dlv_store_fee -- 판매수수료율
 					$qty_sql
 				from order_receipt_product rcp
 					inner join order_receipt rc on rc.or_cd = rcp.or_cd
@@ -1373,6 +1388,11 @@ class ord03Controller extends Controller
 					inner join product_code pc on pc.prd_cd = rcp.prd_cd
 					inner join goods g on g.goods_no = o.goods_no
 					left outer join payment p on p.ord_no = o.ord_no
+					left outer join (
+						select s.store_cd as s_store_cd, sg.grade_cd, sg.fee_12
+						from store s
+							inner join store_grade sg on sg.grade_cd = s.grade_cd
+					) s on s.s_store_cd = rcp.dlv_location_cd and rcp.dlv_location_type = 'STORE'
 				where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
 					and o.clm_state in (-30,1,90,0)
 					and o.ord_opt_no in ($opt_nos)
