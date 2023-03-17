@@ -621,11 +621,11 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         // 매장중간관리자 - 마감
         Route::get('acc07', 'acc07Controller@index');
         Route::get('acc07/search', 'acc07Controller@search');
-        Route::get('acc07/show', 'acc07Controller@show');
-        Route::get('acc07/show_search', 'acc07Controller@show_search');
-        Route::put('acc07/show_update', 'acc07Controller@show_update');
-        Route::delete('acc07/show_delete', 'acc07Controller@show_delete');
-        Route::post('acc07/show_close', 'acc07Controller@show_close');
+        Route::get('acc07/show/{idx}', 'acc07Controller@show');
+        Route::get('acc07/show-search/{cmd}', 'acc07Controller@search_command');
+        Route::delete('acc07/{idx}', 'acc07Controller@remove');
+        Route::post('acc07/complete', 'acc07Controller@complete_closed');
+        Route::put('acc07/update', 'acc07Controller@update_closed');
 
     });
 
