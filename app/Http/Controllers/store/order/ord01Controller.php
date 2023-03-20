@@ -488,9 +488,9 @@ class ord01Controller extends Controller
                 select 
                     count(*) as total,
                     sum(o.qty) as total_qty,
-                    sum(g.price) as total_goods_price,
-                    sum(o.price) as total_price,
-                    sum(g.goods_sh) as total_goods_sh,
+                    sum(o.qty * g.price) as total_goods_price,
+                    sum(o.qty * o.price) as total_price,
+                    sum(o.qty * g.goods_sh) as total_goods_sh,
                     sum(o.dlv_amt) as total_dlv_amt
                 from order_opt o
                     left outer join product_code pc on pc.prd_cd = o.prd_cd
