@@ -1031,9 +1031,11 @@ ALTER TABLE `bizest_smart`.`order_opt_wonga` ADD INDEX `idx_prdcd` (`prd_cd`);
 
 ALTER TABLE `bizest_smart`.`mgr_user` ADD COLUMN `confirm_yn` CHAR(1) NULL COMMENT '승인여부' AFTER `md_yn`; 
 
-ALTER TABLE `bizest_smart`.`store_controller` ADD COLUMN `icon` VARCHAR(30) NULL COMMENT '아이콘 클래스명' AFTER `is_part_role`; 
+ALTER TABLE `bizest_smart`.`store_controller` ADD COLUMN `icon` VARCHAR(30) NULL COMMENT '아이콘 클래스명' AFTER `is_part_role`;
+ALTER TABLE `bizest_smart`.`shop_controller` ADD COLUMN `icon` VARCHAR(30) NULL COMMENT '아이콘 클래스명' AFTER `is_part_role`;
 
-ALTER TABLE `bizest_smart`.`shop_controller` ADD COLUMN `icon` VARCHAR(30) NULL COMMENT '아이콘 클래스명' AFTER `is_part_role`; 
+ALTER TABLE `bizest_smart`.`after_service` ADD COLUMN `as_check_state` VARCHAR(20) NULL COMMENT '검수상태 (W: 대기, N: 정상, F: 불량)' AFTER `as_type`;
+ALTER TABLE `bizest_smart`.`msg_store` ADD COLUMN `msg_kind` VARCHAR(20) NULL COMMENT '알림 종류 (S: 매장알림, RT: RT알림, AS: 수선알림)' AFTER `msg_cd`; 
 
 -- 쿠폰
 ALTER TABLE `bizest_smart`.`coupon` ADD COLUMN `pub_time` INT(11) NULL DEFAULT NULL COMMENT '발행시점' AFTER `coupon_type`;

@@ -290,7 +290,8 @@ class stk32Controller extends Controller
                     s.phone as mobile,
                     m.content,
                     md.rt,
-                    md.check_yn
+                    md.check_yn,
+                    m.msg_kind
                 from msg_store_detail md
                     left outer join msg_store m on m.msg_cd = md.msg_cd
                     left outer join store s on s.store_cd = m.sender_cd
@@ -327,7 +328,8 @@ class stk32Controller extends Controller
                 'msg_type' => $msg_type,
                 'msg_cd' => $msg_cd,
                 'content' => $result->content,
-                'sender_nm' => $result->sender_nm
+                'sender_nm' => $result->sender_nm,
+                'msg_kind' => $result->msg_kind
             ];
         }
 

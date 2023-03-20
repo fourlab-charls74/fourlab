@@ -68,7 +68,7 @@
             </div><br>
             @if ($msg_type == 'pop')
             <div class="card-title">
-                <a href="javascript:void(0);" onclick="locate(); return false;" type="text" style="float:right">매장알림 바로 가기</a>
+                <a href="javascript:void(0);" onclick="locate('{{ @$msg_kind }}'); return false;" type="text" style="float:right">{{ @$msg_kind == 'AS' ? '수선관리' : @$msg_kind == 'RT' ? '매장RT' : '매장알림' }} 바로 가기</a>
             </div>
             @endif
         </div>
@@ -98,8 +98,17 @@
         });
     }
 
-    function locate() {
-        window.opener.location.href = "/shop/stock/stk32";
+    function locate(kind) {
+        let url = '';
+
+        if(kind == 'S' || kind == '') {
+            url = "/shop/stock/stk32";
+        } else if(kind == 'RT') {
+            url = "/shop/stock/stk20";
+        } else if(kind == 'AS') {
+            url = "/shop/standard/std11";
+        }
+        window.opener.location.href = url;
         window.close();
     }
 </script>
