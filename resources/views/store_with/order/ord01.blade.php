@@ -441,7 +441,8 @@
         {field: "opt_val", headerName: "옵션", width: 130},
         {field: "qty", headerName: "수량", width: 50, type: "currencyType" ,
             cellRenderer: function(params) {
-                    if (params.value !== undefined) {
+                    if (params.node.rowPinned === 'top') return params.value;
+                    else if (params.value !== undefined) {
                         return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
                     }
             }
