@@ -173,40 +173,51 @@
     }
 
     // 상품 삭제
-    // const deleteRow = (row) => { gx.gridOptions.api.applyTransaction({remove : [row]}); };
+    let del_product = [];
 
     function del_rows() {
-        let rows = gx.getSelectedRows();
-        let idx = document.getElementById('product_price_cd').innerHTML
-        let row = gx.getRows();
-        let row_cnt = row.length;
 
-        if(rows.length < 1) {
-            return alert('삭제할 상품을 선택해주세요.');
+        const rows = gx.getSelectedRows();
+
+        for (let i = 0; i < rows.length; i++) {
+            gx.gridOptions.api.applyTransaction({ remove : [rows[i]] });
+            del_product.push(rows[i]);
         }
 
-        if(!confirm("선택한 상품을 삭제하시겠습니까? \n삭제한 상품은 되돌릴 수 없습니다.")) return;
+        console.log(del_product);
+        // let rows = gx.getSelectedRows();
+        // let idx = document.getElementById('product_price_cd').innerHTML
+        // let row = gx.getRows();
+        // let row_cnt = row.length;
 
-        axios({
-            url: '/store/product/prd05/del-product',
-            method: 'put',
-            data: {
-                data: rows,
-                cnt: row_cnt,
-                idx: idx
-            },
-        }).then(function (res) {
-            if(res.data.code === 200) {
-                alert(res.data.msg);
-                location.reload();
-                opener.Search();
-            } else {
-                console.log(res.data);
-                alert("상품 삭제 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-            }
-        }).catch(function (err) {
-            console.log(err);
-        });
+        // console.log(rows[0].product_price_cd);
+
+        // if(rows.length < 1) {
+        //     return alert('삭제할 상품을 선택해주세요.');
+        // }
+
+        // if(!confirm("선택한 상품을 삭제하시겠습니까? \n삭제한 상품은 되돌릴 수 없습니다.")) return;
+
+        // axios({
+        //     url: '/store/product/prd05/del-product',
+        //     method: 'put',
+        //     data: {
+        //         data: rows,
+        //         cnt: row_cnt,
+        //         idx: idx
+        //     },
+        // }).then(function (res) {
+        //     if(res.data.code === 200) {
+        //         alert(res.data.msg);
+        //         location.reload();
+        //         opener.Search();
+        //     } else {
+        //         console.log(res.data);
+        //         alert("상품 삭제 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+        //     }
+        // }).catch(function (err) {
+        //     console.log(err);
+        // });
         
         
     };
@@ -214,8 +225,6 @@
 
     const delGoods = () => {
         const rows = gx.getSelectedRows();
-
-        console.log(rows);
 
         for (let i = 0; i < rows.length; i++) {
             gx.gridOptions.api.applyTransaction({ remove : [rows[i]] });
@@ -376,7 +385,8 @@
                 change_date : change_date,
                 change_kind : change_kind,
                 change_price : change_price,
-                change_cnt : change_cnt
+                change_cnt : change_cnt,
+                
             },
         }).then(function (res) {
             if(res.data.code === 200) {
@@ -402,7 +412,13 @@
 
         // if(rows.length < 1) return alert('저장할 상품을 선택해주세요.');
 
-        if(!confirm("선택한 상품의 변경금액(율)을 수정하시겠습니까?")) return;
+        for(let i = 0; i < rows.length;i++) {
+            if(rows[i].change_val == 0){
+                return alert('변경금액(율)을 입력해주세요.');
+            }
+        }
+
+        if(!confirm("상품을 수정하시겠습니까?")) return;
 
         axios({
             url: '/store/product/prd05/update-price',
@@ -413,7 +429,7 @@
                 change_kind : change_kind,
                 change_price : change_price,
                 change_cnt : change_cnt,
-                product_price_cd : product_price_cd
+                product_price_cd : product_price_cd,
             },
         }).then(function (res) {
             if(res.data.code === 200) {

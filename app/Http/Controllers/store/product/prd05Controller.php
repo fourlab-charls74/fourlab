@@ -237,6 +237,7 @@ class prd05Controller extends Controller
 		$change_price = $request->input('change_price');
 		$change_cnt = $request->input('change_cnt');
 		$admin_id = Auth('head')->user()->id;
+		$del_product = $request->input('del_product', []);
 
 		try {
             DB::beginTransaction();
@@ -257,7 +258,7 @@ class prd05Controller extends Controller
 						->insert([
 							'product_price_cd' => $product_price_cd,
 							'prd_cd' => $d['prd_cd'],
-							'org_price' => $d['price'],
+							'org_price' => $d['goods_sh'],
 							'change_price' => $d['change_val'],
 							'admin_id' => $admin_id,
 							'rt' => now(),

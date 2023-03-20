@@ -280,7 +280,7 @@
     const columns = [
         // {headerName: '#', pinned: 'left', type: 'NumType', width: 40, cellStyle: StyleLineHeight},
         // {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, pinned: 'left', sort: null},
-        {field: "prd_cd", headerName: "바코드", width: 140, pinned: 'left', cellStyle: StyleLineHeight, checkboxSelection: true,
+        {field: "prd_cd", headerName: "바코드", width: 140, pinned: 'left', cellStyle: StyleLineHeight, checkboxSelection: true, headerCheckboxSelection: true,
             cellRenderer: (params) => params.value ??= '',
         },
         {field: "goods_no", headerName: "온라인코드", width: 60, pinned: 'left', cellStyle: StyleLineHeight, aggFunc: "first"},
