@@ -191,6 +191,7 @@ const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
         {headerName: "매출액", field: "sale_amt",  pinned:'left', width: 110, cellClass: 'hd-grid-code', type:'currencyType', cellStyle: { 'text-align': "right" }, aggFunc: sumValuesFunc},
         {headerName: "매장코드", field: "store_cd",  pinned:'left', width: 70, cellClass: 'hd-grid-code' , hide:true},
         {headerName: "매장구분", field: "store_type",  pinned:'left', width: 70, cellClass: 'hd-grid-code', hide:true},
+        {headerName: "동종업계 메모", field: "sale_memo",  pinned:'left', width: 120, cellClass: 'hd-grid-code'},
         // {headerName: "합계(원)", field: "total_amt",  pinned:'left', width: 100, cellClass: 'hd-grid-code', type:'currencyType', cellStyle: { 'font-weight': '700', background: '#eee', textAlign: 'right' },aggFunc: "first",},
         {width: 'auto'}
     ];

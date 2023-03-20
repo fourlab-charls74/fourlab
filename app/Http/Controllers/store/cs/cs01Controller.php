@@ -348,6 +348,8 @@ class cs01Controller extends Controller {
 		$area_type 				= ($currency_unit == KRW) ? "D" : "O"; 		//입고지역
 		$data					= $request->input("data");
 
+		dd($data);
+
 		if ($currency_unit == KRW) {
 			$exchange_rate = 0;
 			$custom_amt = 0;

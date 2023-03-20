@@ -75,6 +75,7 @@ class stk34Controller extends Controller
                     , s.store_type
                     , c.code_val as competitor
                     , sum(cs.sale_amt) as sale_amt
+                    , cs.sale_memo
                 from competitor_sale cs
                     left outer join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor'
                     left outer join store s on s.store_cd = cs.store_cd

@@ -119,7 +119,7 @@
                                             <th>메모</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    <textarea name="comment" id="comment" class="w-100" rows="2" readonly disabled style="background-color:#ccc">{{ @$sr->comment }}</textarea>
+                                                    <textarea name="comment" id="comment" class="w-100" rows="2" @if(@$sr->sr_state == '10') readonly disabled style="background-color: #ccc" @endif>{{ @$sr->comment }}</textarea>
                                                 </div>
                                             </td>
                                         </tr>
@@ -303,7 +303,7 @@
             // if(zero_qtys.length > 0) return alert("반품수량이 0개인 항목이 존재합니다.");
 
             let excess_qtys = rows.filter(r => (r.qty * 1) > (r.store_wqty * 1));
-            if(excess_qtys.length > 0) return alert("해당 매장의 보유재고보다 많은 수량을 반품할 수 없습니다.");
+            // if(excess_qtys.length > 0) return alert("해당 매장의 보유재고보다 많은 수량을 반품할 수 없습니다.");
 
             if(!confirm("등록하시겠습니까?")) return;
 

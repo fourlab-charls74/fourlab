@@ -806,34 +806,34 @@
             alert("입고상품을 한 개 이상 등록해주세요.");
             return false;
         }
-        for (let row of rows) {
-            if (await checkPrdData(row) == false) return false;
-        }
+        // for (let row of rows) {
+        //     if (await checkPrdData(row) == false) return false;
+        // }
         return true;
     }
 
     /** 입고저장 전 값 체크 시 상품데이터 값 체크 */
-    async function checkPrdData(row) {
-        const rowIdx = row.count - 1;
-        const unit = document.search.currency_unit.value;
-        const { exp_qty, qty, unit_cost, prd_tariff_rate, stock_prd_no } = row;
+    // async function checkPrdData(row) {
+    //     const rowIdx = row.count - 1;
+    //     const unit = document.search.currency_unit.value;
+    //     const { exp_qty, qty, unit_cost, prd_tariff_rate, stock_prd_no } = row;
 
-        if (STATE != 30 || stock_prd_no != undefined) {
-            if ((qty || 0) == 0 && (exp_qty || 0) == 0) { // check qty
-                alert("입고수량(확정) 또는 입고수량(예정)을 입력해주세요.");
-                gx.gridOptions.api.stopEditing(); // stop editing
-                gx.gridOptions.api.startEditingCell({ rowIndex: rowIdx, colKey: 'qty' });
-                return false;
-            }
-            if (unit_cost == "" || unit_cost == 0) { // check unit_cost
-                alert("단가를 입력해주세요.");
-                gx.gridOptions.api.stopEditing(); // stop editing
-                gx.gridOptions.api.startEditingCell({ rowIndex: rowIdx, colKey: 'unit_cost' });
-                return false;
-            }
-        }
-        return true;
-    }
+    //     if (STATE != 30 || stock_prd_no != undefined) {
+    //         if ((qty || 0) == 0 && (exp_qty || 0) == 0) { // check qty
+    //             alert("입고수량(확정) 또는 입고수량(예정)을 입력해주세요.");
+    //             gx.gridOptions.api.stopEditing(); // stop editing
+    //             gx.gridOptions.api.startEditingCell({ rowIndex: rowIdx, colKey: 'qty' });
+    //             return false;
+    //         }
+    //         if (unit_cost == "" || unit_cost == 0) { // check unit_cost
+    //             alert("단가를 입력해주세요.");
+    //             gx.gridOptions.api.stopEditing(); // stop editing
+    //             gx.gridOptions.api.startEditingCell({ rowIndex: rowIdx, colKey: 'unit_cost' });
+    //             return false;
+    //         }
+    //     }
+    //     return true;
+    // }
 
     /** 입고저장 */
     const getFormValue = (form, key) => form.hasOwnProperty(key) ? form[key].value : '';

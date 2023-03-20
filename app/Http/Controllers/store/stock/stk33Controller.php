@@ -212,6 +212,7 @@ class stk33Controller extends Controller
                     c.code_id as competitor_cd
                     , cs.store_cd
                     , c.code_val as competitor_nm
+                    , cs.sale_memo
                     $sale_amt
                 from competitor_sale cs
                     left outer join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor' and c.use_yn = 'Y'
@@ -274,7 +275,6 @@ class stk33Controller extends Controller
         $date = $request->input('date');
         $day = $request->input('day');
 
-
         try {
             DB::beginTransaction();
 
@@ -303,6 +303,7 @@ class stk33Controller extends Controller
                             'competitor_cd' => $competitor_cd,
                             'sale_date' => $date.'-'.$day_arr[$i],
                             'sale_amt' => $rows['sale_amt_'.$day_arr[$i]]??'',
+                            'sale_memo' => $rows['sale_memo']??'',
                             'admin_id' => $admin_id,
                             'rt' => now(),
                             'ut' => now()

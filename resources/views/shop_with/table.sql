@@ -428,6 +428,7 @@ CREATE TABLE `competitor_sale` (
   `sale_date` varchar(10) NOT NULL COMMENT '매출일자 (yyyy-mm-dd)',
   `sale_amt` int(11) NOT NULL COMMENT '동종업계 매출액',
   `admin_id` varchar(50) DEFAULT NULL COMMENT '작성자',
+  `sale_memo` varchar(255) COMMENT '동종업계 월별 메모',
   `rt` datetime DEFAULT NULL COMMENT '등록일',
   `ut` datetime DEFAULT NULL COMMENT '최근 수정일',
   PRIMARY KEY (`idx`),

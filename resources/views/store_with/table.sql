@@ -428,6 +428,7 @@ CREATE TABLE `competitor_sale` (
   `sale_date` varchar(10) NOT NULL COMMENT '매출일자 (yyyy-mm-dd)',
   `sale_amt` int(11) NOT NULL COMMENT '동종업계 매출액',
   `admin_id` varchar(50) DEFAULT NULL COMMENT '작성자',
+  `sale_memo` varchar(255) COMMENT '동종업계 월별 메모',
   `rt` datetime DEFAULT NULL COMMENT '등록일',
   `ut` datetime DEFAULT NULL COMMENT '최근 수정일',
   PRIMARY KEY (`idx`),
@@ -1066,6 +1067,7 @@ CREATE TABLE `product_price` (
   `change_val` int(11) NOT NULL COMMENT '변경금액(율)',
   `apply_yn` char(1) NOT NULL DEFAULT 'N' COMMENT '가격적용유무 (Y/N)',
   `change_cnt` int(11) NOT NULL COMMENT '적용상품수',
+  `change_type` char(1) NOT NULL DEFAULT 'R' COMMENT '가격변경 타입 (예약 : R , 즉시 : A)'
   `admin_id` varchar(50) NOT NULL COMMENT '관리자아이디',
   `rt` datetime NOT NULL COMMENT '등록일자',
   `ut` datetime DEFAULT NULL COMMENT '수정일자',
