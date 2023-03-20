@@ -111,6 +111,7 @@
     $(document).ready(function(){
         $('#order_amt-tab').trigger("click");
         $('#bar-tab').trigger("click");
+        openNoticePopup();
     });
 </script>
 
@@ -173,7 +174,6 @@
     }
 
 </script>
-
 
 <!-- 알리미 -->
 <script language="javascript">
@@ -240,7 +240,33 @@
         window.location.href = "/shop/sale/sal24";
     }
 
-
+    // 공지사항팝업
+    function openNoticePopup() {
+        if( grade=="P" && store_cd != "" ) {
+            $.ajax({
+				async: true,
+				type: 'get',
+				url: '/shop/stock/stk31/popup_chk',
+				data: {
+					"store_cd": store_cd
+				},
+				success: function(data) {
+					if (data.code == 200) {
+                        $.each(data.nos, function(i, item){
+                            const url = '/shop/stock/stk31/popup_notice/' + item.ns_cd;
+                            const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=600,height=500");
+                        });
+					} else {
+						alert("공지사항 팝업을 표시할 수 없습니다.\n관리자에게 문의해 주십시오.");
+					}
+				},
+				error: function(request, status, error) {
+					alert("공지사항 팝업을 표시할 수 없습니다.\n관리자에게 문의해 주십시오.");
+					console.log("error")
+				}
+			});
+        }
+    }
 </script>
 
 <!-- 차트 -->
