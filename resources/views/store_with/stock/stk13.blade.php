@@ -282,6 +282,7 @@
         .ag-row-selected {background-color: #b7e4ff !important;}
     </style>
     <script language="javascript">
+        const rel_products = {};
         let columns = [
             {field: "store_nm" , headerName: "매장명", rowGroup: true, hide: true, width: 150, pinned: "left", checkboxSelection: true},
             {field: "store_cd" , headerName: "매장코드", width: 70, pinned: "left", cellStyle: {"text-align": "center"}, 
@@ -303,7 +304,10 @@
                 headerName: '(대표)창고재고', // 대표창고의 재고를 조회
                 children: [
                     {field: "storage_qty", headerName: "재고", type: 'currencyType', width: 60},
-                    {field: "storage_wqty", headerName: "보유재고", type: 'currencyType', width: 60},
+                    {field: "storage_wqty", headerName: "보유재고", type: 'currencyType', width: 80,
+                        cellRenderer: (params) => params.value === undefined ? '' 
+                            : ((params.value * 1) - (params.data?.already_cnt || 0)) + (params.data?.already_cnt > 0 ? ` <span class="text-danger">(-${params.data?.already_cnt || 0})</span>` : ''),
+                    },
                 ]
             },
             {
@@ -372,9 +376,25 @@
                 onCellValueChanged: (e) => {
                     e.node.setSelected(true);
                     if (e.column.colId === "rel_qty") {
-                        if (isNaN(e.newValue) == true || e.newValue == "") {
-                            alert("숫자만 입력가능합니다.");
+                        if (isNaN(e.newValue) == true || e.newValue == "" || e.newValue < 0) {
+                            alert("0 이상의 숫자만 입력가능합니다.");
                             gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                        } else {
+                            if (!rel_products[e.data.prd_cd]) rel_products[e.data.prd_cd] = {}; 
+                            let predicted_already_cnt = Object.keys(rel_products[e.data.prd_cd]).reduce((a,c) => a + (c === e.data.store_cd ? 0 : rel_products[e.data.prd_cd][c]), 0) + (e.newValue * 1);
+                            
+                            if (predicted_already_cnt > e.data.storage_wqty) {
+                                alert("창고재고보다 많은 수량을 배분할 수 없습니다.");
+                                gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                            } else {
+                                rel_products[e.data.prd_cd][e.data.store_cd] = e.newValue * 1;
+                                e.api.forEachNode((node) => {
+                                    if (node.data && node.data.prd_cd === e.data.prd_cd) {
+                                        node.data.already_cnt = Object.keys(rel_products[e.data.prd_cd]).reduce((a,c) => a + rel_products[e.data.prd_cd][c], 0);
+                                    }
+                                });
+                                e.api.redrawRows();
+                            }
                         }
                     }
                 }
