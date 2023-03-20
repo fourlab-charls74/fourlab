@@ -151,7 +151,7 @@ class stk13Controller extends Controller
         // pagination
         $page = $r['page'] ?? 1;
         if ($page < 1 or $page == "") $page = 1;
-        $page_size = $r['limit'] ?? 100;
+        $page_size = $r['limit'] ?? 1000;
         $startno = ($page - 1) * $page_size;
         $limit = " limit $startno, $page_size ";
 
@@ -178,7 +178,8 @@ class stk13Controller extends Controller
 				sum(ifnull(o.qty, 0)) as sale_cnt,
 				(select sum(qty) from order_opt where (o.clm_state = 90 or o.clm_state = -30 or o.clm_state = 0) and prd_cd = o.prd_cd and store_cd = o.store_cd) as total_sale_cnt,
 				DATE_FORMAT(DATE_ADD(NOW(), INTERVAL (ifnull(ROUND(ps.wqty * (TIMESTAMPDIFF(DAY, '$sdate 00:00:00', '$edate 23:59:59') / sum(o.qty))), 0)) DAY),'%Y-%m-%d') as exp_soldout_day,
-				LEAST(if(sum(ifnull(o.qty, 0)) < 0, 0, sum(o.qty)), ifnull(pss.wqty, 0)) as rel_qty
+				-- LEAST(if(sum(ifnull(o.qty, 0)) < 0, 0, sum(o.qty)), ifnull(pss.wqty, 0)) as rel_qty
+				0 as rel_qty
 			from order_opt o
 				inner join product_code pc on pc.prd_cd = o.prd_cd
 				inner join product_stock_storage pss on pss.prd_cd = o.prd_cd and pss.storage_cd = (select storage_cd from storage where default_yn = 'Y')
@@ -187,14 +188,13 @@ class stk13Controller extends Controller
 				left outer join goods g on g.goods_no = o.goods_no
 				left outer join brand b on b.brand = g.brand
 				left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
-			where 1=1
-				and o.ord_state = 30
-				and (o.clm_state = 90 or o.clm_state = -30 or o.clm_state = 0)
-				and o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59'
+			where o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59'
+				and o.ord_state = 30 and o.clm_state in (90,-30,0)
 				and ($store_where)
 				$where
 			group by o.store_cd, o.prd_cd
 			order by $orderby
+			$limit
 		";
 
 		$result = DB::select($sql);
@@ -210,8 +210,10 @@ class stk13Controller extends Controller
 			"body" => $result
 		]);
 	}
+
 	// 판매분출고 요청 (요청과 동시에 접수완료 처리됩니다.)
-	public function request_release(Request $request) {
+	public function request_release(Request $request) 
+	{
 		$r = $request->all();
 
 		$release_type = 'S';

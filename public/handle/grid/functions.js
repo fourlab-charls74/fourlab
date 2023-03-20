@@ -368,7 +368,7 @@ const StyleLineHeight = {
 };
 
 const setRowGroupExpanded = (e) => {
-    e.api.selectionController.lastSelectedNode.setExpanded(e.api.selectionController.lastSelectedNode.selected);
+    e.api.selectionController.lastSelectedNode?.setExpanded(e.api.selectionController.lastSelectedNode.selected);
 }
 
 const setAllRowGroupExpanded = (expand = true) => {

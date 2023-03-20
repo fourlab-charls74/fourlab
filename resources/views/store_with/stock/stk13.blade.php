@@ -146,7 +146,6 @@
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box" style="width:24%;">
                                         <select name="limit" class="form-control form-control-sm">
-                                            <option value="500">500</option>
                                             <option value="1000">1000</option>
                                             <option value="2000">2000</option>
                                             <option value="5000">5000</option>
@@ -289,7 +288,7 @@
                 aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
                 cellRenderer: (params) => params.data ? '' : params.value,
             },
-            {field: "prd_cd" , headerName: "바코드",  pinned: "left", width: 150, cellStyle: {"text-align": "center"}, checkboxSelection: true},
+            {field: "prd_cd" , headerName: "바코드",  pinned: "left", width: 150, cellStyle: {"text-align": "center"}, checkboxSelection: true, headerCheckboxSelection: true},
             {field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: {"text-align": "center"}},
             {field: "opt_kind_nm", headerName: "품목", width: 70, cellStyle: {"text-align": "center"}},
             {field: "brand_nm", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
@@ -320,17 +319,27 @@
                     {field: "store_qty", headerName: "재고", type: 'currencyType', width: 60},
                     {field: "store_wqty", headerName: "보유재고", type: 'currencyType', width: 60},
                     {field: "exp_soldout_day", headerName: "소진예상일", cellStyle: {"text-align": "center"}, width: 80},
-                    {
-                        field: "rel_qty",
-                        headerName: "배분수량",
-                        type: "currencyType",
-                        width: 60,
-                        editable: true,
-                        cellStyle: function(params) {return params.value ? {"background-color": "#ffff99"} : {}},
-                        valueFormatter: formatNumber,
-                    }
                 ]
             },
+            {field: "rel_qty", headerName: "배분수량", type: "currencyType", width: 60, valueFormatter: formatNumber,
+                editable: params => {
+                    if (params.data !== undefined) {
+                        if (params.data.store_wqty >= params.data.sale_cnt * 2 && params.data.store_wqty >= 5) return false;
+                    }
+                    return true;
+                },
+                cellStyle: params => {
+                    let color = "none";
+                    if (params.value !== undefined) {
+                        color = "#ffff99";
+                        if (params.data !== undefined) {
+                            if (params.data.store_wqty >= params.data.sale_cnt * 2 && params.data.store_wqty >= 5) color = "#4444ff";
+                            if (params.data.sale_cnt >= 3) color = "#ff6666";
+                        }
+                    }
+                    return { "background-color": color };
+                },
+            }
         ];
 
         const basic_autoGroupColumnDef = (headerName, minWidth = 230, maxWidth = 230) => ({
@@ -375,6 +384,8 @@
                 resizable: false,
                 sortable: true,
             };
+
+            Search();
 
             // 매장검색
             $( ".sch-store" ).on("click", function() {
