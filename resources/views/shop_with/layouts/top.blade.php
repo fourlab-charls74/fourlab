@@ -23,7 +23,7 @@
                 <li><a href="javascript:void(0);" onclick="return openSmsList();" class="mail act"></a></li> -->--}}
                 <li><a href="stk31" class="notice act"></a></li>
                 <li>
-                    <div class="dropdown d-inline-block">
+                    <div class="dropdown">
                         <button type="button" class="profile_btn btn header-item waves-effect notice" id="page-header-user-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             @if (auth('head')->user()->profile_img !== '')
                                 <span class="img"><img src="{{ auth('head')->user()->profile_img }}" class="rounded-circle" alt=""></span>
@@ -47,6 +47,13 @@
             </ul>
         </div>
     </div>
+    @if (auth('head')->user()->store_cd !== '' && auth('head')->user()->grade === 'P')
+    <div class="shop-title-mobile pb-2">
+        <span class="shop-title">{{auth('head')->user()->store_nm}}</span>
+        <span class="shop-title2" style="color:gray; text-shadow:none;"> &nbsp; / &nbsp;</span>
+        <span class="shop-title2">{{auth('head')->user()->store_cd}}</span>
+    </div>
+    @endif
 </header>
 <div class="mobile_sub_list shodow">
     <a href="" class="now_page"><span></span> <i class="bx bx-chevron-down fs-18"></i></a>

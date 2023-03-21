@@ -170,6 +170,8 @@ header .top_inner_box span.shop-title {text-align: center;text-shadow: 1px 1px 1
 header .top_inner_box span.shop-title2 {text-align: center;text-shadow: 1px 1px 1px gray;color: #FFD73C;font-family: arial, sans-serif;font-size: 20px;font-weight: bold;margin-top: 0px;margin-bottom: 1px;}
 /* =====여기까지1===== */
 
+header .shop-title-mobile {display: none !important;background-color: #2e2f3c;text-align: center;color: #FFD73C;font-family: arial, sans-serif;font-size: 14px;font-weight: bold;margin-top: 0px;margin-bottom: 1px;}
+header .shop-title-mobile .shop-title {color: #D92222;}
 
 nav{position:fixed;left:0px;top:70px;background:#1c1e2a;width:210px;height:calc(100% - 70px);overflow-y:auto;}
 
@@ -578,12 +580,13 @@ footer a:active{color:#fff !important;}
 
     header .top_inner_box{padding-right:10px;height:50px;}
     header .top_inner_box .logo{display:none;}
-    header .top_inner_box .top_setting_btn{margin-left:5px;}
+    header .top_inner_box .top_setting_btn{margin-left:5px;display:flex;}
     header .top_inner_box .top_setting_btn .view{display:none;}
     header .top_inner_box .top_setting_btn li a{height:50px;}
     header .top_inner_box .top_setting_btn li a.side{background:url(../images/top_left_m_menu.png) no-repeat center center / 16px !important;}
     header .top_inner_box .top_setting_btn li a.mode{background-size:16px;}
-    header .top_inner_box .top_link_btn li > a{height:50px !important;background-size:auto 17px !important;}
+    header .top_inner_box .top_link_btn{display:flex;margin-left:5px;}
+    header .top_inner_box .top_link_btn li > a{width:40px;height:50px !important;background-size:auto 17px !important;}
     header .top_inner_box .top_link_btn li .btn{display:block;height:50px;padding:8px;}
     header .top_inner_box .top_link_btn li .btn .txt{color:#a8b1c2;font-size:12px;}
     header .top_inner_box .top_link_btn li > a.mail.act:before{border-color:#2e2f3c;}
@@ -591,11 +594,14 @@ footer a:active{color:#fff !important;}
     /* header .top_inner_box .top_link_btn li > a.history{display:none;} */
     header .top_inner_box .logout_btn{margin-left:0px;width:40px;height:50px;}
     header .top_inner_box .logout_btn a{background-size:auto 17px !important;padding:0 8px;box-sizing:border-box;}
-    header .top_inner_box .top_link_btn li a.notice{height:50px;}
+    header .top_inner_box .top_link_btn li a.notice{width:40px;height:50px;}
     header .top_inner_box .top_link_btn li a.notice em{border:1px solid #2e2f3c;}
+    header .top_inner_box .top_link_btn li .btn.profile_btn{padding:0 15px 0 10px;}
 
-    header .top_inner_box span.shop-title {font-size: 12px; text-shadow: none;}
+    header .top_inner_box span.shop-title {font-size: 12px; text-shadow: none;display:none !important;}
     header .top_inner_box span.shop-title2 {display:none !important;}
+
+    header .shop-title-mobile {display: block !important;}
 
     nav{display:none !important;}
     .mobile-side nav{position:absolute !important;display:block !important;z-index:1001 !important;top:50px;height:calc(100% - 50px);}

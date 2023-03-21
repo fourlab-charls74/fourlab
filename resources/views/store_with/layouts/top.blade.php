@@ -16,7 +16,7 @@
                 <li><a href="javascript:void(0);" onclick="return openSmsList();" class="mail"></a></li>
                 <li><a href="stk31" class="notice act"></a></li>
                 <li>
-                    <div class="dropdown d-inline-block">
+                    <div class="dropdown">
                         <button type="button" class="profile_btn btn header-item waves-effect notice" id="page-header-user-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             @if (auth('head')->user()->profile_img !== '')
                                 <span class="img"><img src="{{ auth('head')->user()->profile_img }}" class="rounded-circle" alt=""></span>
