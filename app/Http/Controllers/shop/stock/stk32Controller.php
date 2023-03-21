@@ -379,6 +379,7 @@ class stk32Controller extends Controller
                 if($reservation_date > date("Y-m-d H:i:s")){
                     $res = DB::table('msg_store')
                     ->insertGetId([
+                        'msg_kind' => 'S',
                         'sender_type' => $sender_type,
                         'sender_cd' => $sender_cd,
                         'reservation_yn' => $reservation_yn,
@@ -434,6 +435,7 @@ class stk32Controller extends Controller
             } else {
                 $res = DB::table('msg_store')
                     ->insertGetId([
+                        'msg_kind' => 'S',
                         'sender_type' => $sender_type,
                         'sender_cd' => $sender_cd,
                         'reservation_yn' => $reservation_yn,
