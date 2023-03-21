@@ -31,7 +31,7 @@
                                                 <th>아이디</th>
                                                 <td>
                                                     <div class="flax_box">
-                                                        <input type='text' class="form-control form-control-sm w-25" name='id' id="id" value='{{@$user->id}}'>
+                                                        <input type='text' class="form-control form-control-sm w-25" name='id' id="id" value='{{@$user->id}}' readonly>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -178,7 +178,7 @@
             var frm = $("form[name=detail]")[0];
             var formData = new FormData(frm);
 
-            console.log(formData);
+            // console.log(formData);
 
 
 
@@ -223,7 +223,7 @@
                 contentType: false,
                 dataType: 'json',
                 success: function (res) {
-                    console.log(res);
+                    // console.log(res);
                     if(res.code == '200'){
                         alert("정상적으로 저장 되었습니다.");
                         //location.reload();

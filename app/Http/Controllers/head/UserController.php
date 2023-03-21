@@ -39,12 +39,16 @@ class UserController extends Controller
         $part = $request->input('part');
         $posi = $request->input('posi');
         $email = $request->input('email');
+        $tel = $request->input('tel', '');
+        $exttel = $request->input('exttel', '');
 
         $user = [
             'name' => $name,
             'part' => $part,
             'posi' => $posi,
             'email' => $email,
+            'tel'   => $tel,
+            'exttel'   => $exttel,
         ];
 
         if($passwd_chg == "Y"){
