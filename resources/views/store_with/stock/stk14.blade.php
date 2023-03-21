@@ -180,6 +180,12 @@
                         </div> --}}
                         <div class="d-flex">
                             <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+                                <input type="checkbox" class="custom-control-input" name="grid_expand" id="grid_expand" onchange="return setAllRowGroupExpanded(this.checked);" checked>
+                                <label class="custom-control-label font-weight-normal" for="grid_expand">항목펼쳐보기</label>
+                            </div>
+                        </div>
+                        <div class="d-flex">
+                            <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
                                 <input type="checkbox" class="custom-control-input" name="ext_storage_qty" id="ext_storage_qty" value="Y" checked>
                                 <label class="custom-control-label font-weight-normal" for="ext_storage_qty">창고재고 0 제외</label>
                             </div>
@@ -261,6 +267,7 @@
                 }
             },
             {field: "color",	headerName: "컬러", width: 60, cellStyle: {"text-align": "center"}},
+            {field: "color_nm",	headerName: "컬러명", width: 100},
             {field: "size",	headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"}},
             {field: "goods_opt", headerName: "옵션", width: 200},
             {
@@ -383,7 +390,9 @@
             }).then(function (res) {
                 if(res.data.code === 200) {
                     setColumn(res.data.body[0]);
-                    gx.Request('/store/stock/stk14/search', data, 1);
+                    gx.Request('/store/stock/stk14/search', data, 1, function(e){
+                        setAllRowGroupExpanded($("#grid_expand").is(":checked"));
+                    });
                 } else {
                     console.log(res.data);
                 }

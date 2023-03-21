@@ -97,7 +97,7 @@
                             <div class="form-group">
                                 <label for="" class="required">입고상태</label>
                                 <div class="flex_box">
-                                    <select name="state" class="form-control form-control-sm w-100">
+                                    <select name="state" id="state" class="form-control form-control-sm w-100">
                                         @foreach (@$states as $stt)
                                             <option value="{{ $stt['code_id'] }}" {{ $state == $stt['code_id'] ? 'selected' : '' }}>{{ $stt['code_val'] }}</option>
                                         @endforeach
@@ -818,27 +818,48 @@
     //     const unit = document.search.currency_unit.value;
     //     const { exp_qty, qty, unit_cost, prd_tariff_rate, stock_prd_no } = row;
 
-    //     if (STATE != 30 || stock_prd_no != undefined) {
-    //         if ((qty || 0) == 0 && (exp_qty || 0) == 0) { // check qty
-    //             alert("입고수량(확정) 또는 입고수량(예정)을 입력해주세요.");
-    //             gx.gridOptions.api.stopEditing(); // stop editing
-    //             gx.gridOptions.api.startEditingCell({ rowIndex: rowIdx, colKey: 'qty' });
-    //             return false;
-    //         }
-    //         if (unit_cost == "" || unit_cost == 0) { // check unit_cost
-    //             alert("단가를 입력해주세요.");
-    //             gx.gridOptions.api.stopEditing(); // stop editing
-    //             gx.gridOptions.api.startEditingCell({ rowIndex: rowIdx, colKey: 'unit_cost' });
-    //             return false;
-    //         }
-    //     }
-    //     return true;
+        // if (STATE == 40 || stock_prd_no != undefined) {
+        //     if ((qty || 0) == 0 && (exp_qty || 0) == 0) { // check qty
+        //         alert("입고수량(확정) 또는 입고수량(예정)을 입력해주세요.");
+        //         gx.gridOptions.api.stopEditing(); // stop editing
+        //         gx.gridOptions.api.startEditingCell({ rowIndex: rowIdx, colKey: 'qty' });
+        //         return false;
+        //     }
+        //     if (unit_cost == "" || unit_cost == 0) { // check unit_cost
+        //         alert("단가를 입력해주세요.");
+        //         gx.gridOptions.api.stopEditing(); // stop editing
+        //         gx.gridOptions.api.startEditingCell({ rowIndex: rowIdx, colKey: 'unit_cost' });
+        //         return false;
+        //     }
+        // }
+        // return true;
     // }
 
     /** 입고저장 */
     const getFormValue = (form, key) => form.hasOwnProperty(key) ? form[key].value : '';
     function saveCmd(cmd) {
         const rows = gx.getRows();
+        let state = $('#state').val();
+
+        for (let row of rows) {
+            const rowIdx = row.count - 1;
+            const { exp_qty, qty, unit_cost, prd_tariff_rate, stock_prd_no } = row;
+            
+            if(state == 30) {
+                if ((qty || 0) == 0 && (exp_qty || 0) == 0) { // check qty
+                    alert("입고수량(확정) 또는 입고수량(예정)을 입력해주세요.");
+                    gx.gridOptions.api.stopEditing(); // stop editing
+                    gx.gridOptions.api.startEditingCell({ rowIndex: rowIdx, colKey: 'qty' });
+                    return false;
+                }
+                if (unit_cost == "" || unit_cost == 0) { // check unit_cost
+                    alert("단가를 입력해주세요.");
+                    gx.gridOptions.api.stopEditing(); // stop editing
+                    gx.gridOptions.api.startEditingCell({ rowIndex: rowIdx, colKey: 'unit_cost' });
+                    return false;
+                }
+            }
+        }
 
         let confirm_msg = "저장하시겠습니까?";
         if (cmd == 'addstockcmd') {
@@ -865,12 +886,15 @@
             custom_amt: getFormValue(ff, 'custom_amt'), // 신고금액
         };
 
+        console.log(data);
+
         axios({
             url: COMMAND_URL,
             method: 'post',
             data: data,
         }).then((response) => {
             if (response.data.code == 1) {
+                alert(response.data.message);
                 window.opener.Search();
                 window.close();
             } else {

@@ -348,8 +348,6 @@ class cs01Controller extends Controller {
 		$area_type 				= ($currency_unit == KRW) ? "D" : "O"; 		//입고지역
 		$data					= $request->input("data");
 
-		dd($data);
-
 		if ($currency_unit == KRW) {
 			$exchange_rate = 0;
 			$custom_amt = 0;
@@ -419,6 +417,7 @@ class cs01Controller extends Controller {
 			// 개별상품 입고처리
 			$params = array_merge($params, [ 'stock_no' => $stock_no ]);
 			$this->saveStockOrderProduct("E", $params, $data, $id);
+			$code = 1;
 
 			DB::commit();
 		} catch (Exception $e) {
@@ -431,7 +430,9 @@ class cs01Controller extends Controller {
 			}
             return response()->json(['code' => $code, 'message' => $message], 200);
 		}
-		return response()->json(['code' => 1, 'message' => "입고 추가가 완료되었습니다."], 201);
+		return response()->json(['code' => $code, 'message' => "입고 추가가 완료되었습니다."], 201);
+
+		
 	}
 
 	/**
@@ -875,7 +876,7 @@ class cs01Controller extends Controller {
 						if ($goods_no > 0) {
 							$exp_qty = $row['exp_qty'] ?? 0;
 							$qty = $row['qty'] ?? 0;
-							$unit_cost = str_replace(",","",str_replace("\\","",$row['unit_cost'])); // 단가
+							$unit_cost = str_replace(",","",str_replace("\\","",$row['unit_cost']))??0; // 단가
 							$prd_tariff_rate = round($row['prd_tariff_rate'] ?? 0, 2); // 상품별 관세율
 							$cost = str_replace(",","",$row['cost']);
 							$total_cost = str_replace(",","",$row['total_cost']);
@@ -884,7 +885,7 @@ class cs01Controller extends Controller {
 							$opt = array_key_exists('opt_kor', $row) ? trim($row['opt_kor']) : "NONE";
 							if ($opt == "") $opt = "NONE";
 
-							if ($opt != "" && ($qty > 0 || $exp_qty > 0)) {
+							if ($opt != "" ) {
 								$params = [
 									'stock_no' => $stock_no,
 									'invoice_no' => $invoice_no,
@@ -910,6 +911,7 @@ class cs01Controller extends Controller {
 									'ut' => now(),
 								];
 								DB::table('product_stock_order_product')->insert($params);
+
 							}
 
 							if ($state == 30 && ($cur_state < $state || $type == 'A')) {

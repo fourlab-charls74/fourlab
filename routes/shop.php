@@ -187,6 +187,12 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
 
     // 상품관리
     Route::prefix("product")->namespace('product')->group(function () {
+
+        
+        Route::get('prd01/{no}', 'prd01Controller@show');
+       
+
+
         Route::get('prd02','prd02Controller@index');
         Route::get('prd02/search','prd02Controller@search');
         Route::get('prd02/create', 'prd02Controller@create');

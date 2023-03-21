@@ -17,7 +17,8 @@
 					<h4>검색</h4>
 					<div>
 						<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                        <a href="#" onclick="Add('add');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 가격변경 추가</a>
+                        <a href="#" onclick="Add('add');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 가격변경 예약 추가</a>
+                        <a href="#" onclick="Instant('add');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 가격변경 즉시 추가</a>
 						<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 					</div>
 				</div>
@@ -134,7 +135,11 @@
             {field: "idx", headerName: "가격변경 코드", width: 100, cellClass: 'hd-grid-code',
 				cellRenderer: function(params) {
 					if (params.value !== undefined && params.data.idx != "") {
-						return '<a href="#" onclick="cmd(\''+ params.value +'\');" >'+ params.value+'</a>';
+						if (params.data.change_type == 'A') {
+							return '<a href="#" onclick="cmd2(\''+ params.value +'\');" >'+ params.value+'</a>';
+						} else {
+							return '<a href="#" onclick="cmd(\''+ params.value +'\');" >'+ params.value+'</a>';
+						}
 					}
 				}
 			},
@@ -144,20 +149,43 @@
 					if (params.data.change_kind == 'P'){
 						return params.data.change_val + '%'
 					} else {
-						return params.data.change_val + '원'
+						return Comma(params.data.change_val) + '원'
 					}
 				}
 			},
             {field: "change_kind", headerName: "변경종류", width: 80, cellClass: 'hd-grid-code' , hide:true},
             {field: "change_cnt", headerName: "변경상품수", width: 100, cellClass: 'hd-grid-code'},
-            {field: "apply_yn", headerName: "적용여부", width: 100, cellClass: 'hd-grid-code',
+            {field: "change_type", headerName: "적용타입", width: 80, cellClass: 'hd-grid-code',
+				cellStyle: params => {
+					if (params.data.change_type == 'A') {
+						return { "background-color": "#FFDFDF" }
+					} else {
+						return {'color' : '#8a2be2'}
+					}
+				},
+				cellRenderer: params => {
+					if(params.data.change_type == 'A') {
+						return '즉시';
+					} else {
+						return '예약';
+					}
+				}
+			},
+            {field: "apply_yn", headerName: "적용여부", width: 80, cellClass: 'hd-grid-code',
 				cellStyle: params => {
                         if(params.data.apply_yn == 'Y'){
 							return {'color' : 'blue'}
 						} else {
 							return {'color' : 'red'}
 						}
-                    }
+                    },
+				cellRenderer: params => {
+					if(params.data.apply_yn == 'Y') {
+						return '적용';
+					} else {
+						return '미적용';
+					}
+				}
 			},
             {field: "rt", headerName: "등록일자", width: 120, cellClass: 'hd-grid-code'},
             {field: "ut", headerName: "수정일자", width: 120, cellClass: 'hd-grid-code'},
@@ -197,6 +225,11 @@
 		window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
     };
 
+	function cmd2 (code) {
+		const url = '/store/product/prd05/view/' + code;
+		window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
+    };
+
 	function del_product_price() {
 		let rows = gx.getSelectedRows();
 
@@ -221,6 +254,14 @@
 		}).catch(function (err) {
 			console.log(err);
 		});
+	}
+
+	// 가격변경 즉시 
+	function Instant(cmd) {
+		if (cmd == 'add') {
+			const url = '/store/product/prd05/view/';
+			window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
+		}
 	}
 </script>
 	

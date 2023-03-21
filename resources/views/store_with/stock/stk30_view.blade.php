@@ -168,7 +168,9 @@
                 return (parseInt(valueA) > parseInt(valueB)) ? 1 : -1;
             },
         },
-        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 29},
+        @if(@$sr_state == 10)
+            {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 29},
+        @endif
         {field: "prd_cd", headerName: "바코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
         {field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: {"text-align": "center"}},
         {field: "opt_kind_nm", headerName: "품목", width: 70, cellStyle: {"text-align": "center"}},
@@ -470,8 +472,8 @@
     }
 
     function ChangeState2() {
-        let rows = gx.getSelectedRows();
-        if(rows.length < 1) return alert("상태변경할 항목을 선택해주세요.");
+        let rows = gx.getRows();
+        // if(rows.length < 1) return alert("상태변경할 항목을 선택해주세요.");
 
         let store_cd = $('#store_cd').val();
         let storage_cd = $('#storage').val();

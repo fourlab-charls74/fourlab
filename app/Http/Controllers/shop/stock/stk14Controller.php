@@ -140,6 +140,7 @@ class stk14Controller extends Controller
                 g.goods_nm_eng,
                 concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p,
                 pc.color,
+                c.code_val as color_nm,
                 pc.size,
                 g.goods_nm_eng,
                 p.goods_opt,
@@ -155,6 +156,7 @@ class stk14Controller extends Controller
                 inner join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
                 inner join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
                 left outer join product_code pc on pc.prd_cd = p.prd_cd
+                left outer join code c on c.code_id = pc.color and c.code_kind_cd = 'PRD_CD_COLOR'
             where p.storage_cd = (select storage_cd from storage where default_yn = 'Y') $where
             $orderby
             $limit

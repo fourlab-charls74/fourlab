@@ -262,9 +262,13 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('prd05','prd05Controller@index');
         Route::get('prd05/search','prd05Controller@search');
         Route::get('prd05/show-search','prd05Controller@show_search');
+        Route::get('prd05/view-search','prd05Controller@view_search');
         Route::get('prd05/show/{code?}','prd05Controller@show');
+        Route::get('prd05/view/{code?}','prd05Controller@view');
         Route::put('prd05/change-price', 'prd05Controller@change_price');
+        Route::put('prd05/change-price-now', 'prd05Controller@change_price_now');
         Route::put('prd05/update-price', 'prd05Controller@update_price');
+        Route::put('prd05/update-price-now', 'prd05Controller@update_price_now');
         Route::put('prd05/del-product-price', 'prd05Controller@del_product_price');
         Route::put('prd05/del-product', 'prd05Controller@del_product');
 
