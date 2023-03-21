@@ -36,8 +36,6 @@
                             @if (auth('head')->user()->store_cd !== '' && auth('head')->user()->grade === 'P')
                             <a class="dropdown-item" href="/shop/standard/std02/show/{{ auth('head')->user()->store_cd }}"><i class="bx bx-store font-size-16 align-middle mr-1"></i> My Store</a>
                             @endif
-                            <a class="dropdown-item d-block" href="#"><span class="badge badge-success float-right">11</span><i class="bx bx-wrench font-size-16 align-middle mr-1"></i> Settings</a>
-                            <a class="dropdown-item" href="#"><i class="bx bx-lock-open font-size-16 align-middle mr-1"></i> Lock screen</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="/shop/logout">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>

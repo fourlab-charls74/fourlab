@@ -16,6 +16,57 @@ use PDO;
 
 class UserController extends Controller
 {
+    public function index()
+    {
+        $user =  Auth::guard('head')->user();
+        $id = $user->id;
+
+        return view( Config::get('shop.shop.view') . '/auth/user',
+            ['id' => $id, 'user' => $user]
+        );
+    }
+
+    public function store(Request $request)
+    {
+        $id =  Auth::guard('head')->user()->id;
+
+        $passwd = $request->input('passwd');
+        $passwd_chg = $request->input('passwd_chg');
+        $name = $request->input('name');
+        $part = $request->input('part');
+        $posi = $request->input('posi');
+        $email = $request->input('email');
+        $tel = $request->input('tel', '');
+        $exttel = $request->input('exttel', '');
+
+        $user = [
+            'name' => $name,
+            'part' => $part,
+            'posi' => $posi,
+            'email' => $email,
+            'tel'   => $tel,
+            'exttel'   => $exttel,
+        ];
+
+        if($passwd_chg == "Y"){
+            $user["passwd"] = DB::raw("password('$passwd')");
+        }
+
+        try {
+            DB::transaction(function () use (&$result,$id,$user) {
+                DB::table('mgr_user')
+                    ->where('id','=',$id)
+                    ->update($user);
+            });
+            $code = 200;
+            $msg = '';
+        } catch(Exception $e){
+            $code = 500;
+            $msg = $e->getMessage();
+        }
+
+        return response()->json(['code' => $code,'msg' => $msg]);
+    }
 
     public function log(){
 
