@@ -50,12 +50,12 @@
     </div>
     <div class="mobile_header">
         <ul>
-            <li><a href="/partner">대시보드</a></li>
-            <li><a href="/partner/product/prd01">상품/재고</a></li>
-            <li><a href="/partner/order/ord01">주문/배송</a></li>
-            <li><a href="/partner/cs/cs01">클레임/CS</a></li>
-            <li><a href="/partner/sales/sal02">매출정산</a></li>
-            <li><a href="/partner/promotion/prm01">게시판</a></li>
+            <li><a href="/head">대시보드</a></li>
+            <li><a href="/head/product/prd01">상품/재고</a></li>
+            <li><a href="/head/order/ord01">주문/배송</a></li>
+            <li><a href="/head/cs/cs01">클레임/CS</a></li>
+            <li><a href="/head/sales/sal02">매출정산</a></li>
+            <li><a href="/head/promotion/prm01">게시판</a></li>
         </ul>
     </div>
 </header>
