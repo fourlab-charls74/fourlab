@@ -60,13 +60,15 @@
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="store_type">매장구분</label>
-                                <div class="flex_box">
-                                    <select name='store_type' class="form-control form-control-sm">
-                                        <option value=''>전체</option>
-                                        @foreach ($store_types as $store_type)
+                                <div class="form-inline inline_select_box">
+                                    <div class="form-inline-inner select-box w-100 mr-0">
+                                        <select name='store_type' class="form-control form-control-sm">
+                                            <option value=''>전체</option>
+                                            @foreach ($store_types as $store_type)
                                             <option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
-                                        @endforeach
-                                    </select>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -85,10 +87,12 @@
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="prd_cd">바코드</label>
-                                <div class="flex_box">
-									<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
-									<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-								</div>
+                                <div class="form-inline inline_input_box">
+                                    <div class="form-inline-inner input-box w-100">
+                                        <input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter w-100">
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="col-lg-4 inner-td">
@@ -220,7 +224,7 @@
     </form>
     <!-- DataTales Example -->
     <div class="card shadow mb-0 last-card pt-2 pt-sm-0">
-        <div class="card-body">
+        <div class="card-body pb-2">
             <div class="card-title">
                 <div class="filter_wrap">
                     <div class="fl_box">
@@ -272,9 +276,11 @@
                     </div>
                 </div>
             </div>
-            <div class="table-responsive">
+            <div class="table-responsive mb-2">
                 <div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
             </div>
+            <p>* <span class="p-1 mr-1 d-inline-block" style="background-color: #6666ff; width:20px;"></span>색상처리된 재고는 출고할 수 없습니다. (매장재고가 5개 이상이거나, 판매수량의 2배보다 많은 경우)</p>
+            <p>* <span class="p-1 mr-1 d-inline-block" style="background-color: #ff6666; width:20px;"></span>색상처리된 재고는 반드시 출고가 필요합니다. (판매수량이 10개 이상인 경우)</p>
         </div>
     </div>
     <style>
@@ -282,7 +288,7 @@
         .ag-row-selected {background-color: #b7e4ff !important;}
     </style>
     <script language="javascript">
-        const rel_products = {};
+        let rel_products = {};
         let columns = [
             {field: "store_nm" , headerName: "매장명", rowGroup: true, hide: true, width: 150, pinned: "left", checkboxSelection: true},
             {field: "store_cd" , headerName: "매장코드", width: 70, pinned: "left", cellStyle: {"text-align": "center"}, 
@@ -337,8 +343,8 @@
                     if (params.value !== undefined) {
                         color = "#ffff99";
                         if (params.data !== undefined) {
-                            if (params.data.store_wqty >= params.data.sale_cnt * 2 && params.data.store_wqty >= 5) color = "#4444ff";
-                            if (params.data.sale_cnt >= 3) color = "#ff6666";
+                            if (params.data.store_wqty >= params.data.sale_cnt * 2 && params.data.store_wqty >= 5) color = "#6666ff";
+                            if (params.data.sale_cnt >= 10) color = "#ff6666";
                         }
                     }
                     return { "background-color": color };
@@ -357,10 +363,10 @@
     </script>
     <script type="text/javascript" charset="utf-8">
         let gx;
-        const pApp = new App('', { gridId: "#div-gd" });
+        const pApp = new App('', { gridId: "#div-gd", height: 300 });
 
         $(document).ready(function() {
-            pApp.ResizeGrid(275);
+            pApp.ResizeGrid(300);
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
             gx = new HDGrid(gridDiv, columns, {
@@ -374,15 +380,14 @@
                 animateRows: true,
                 onSelectionChanged: setRowGroupExpanded,
                 onCellValueChanged: (e) => {
-                    e.node.setSelected(true);
                     if (e.column.colId === "rel_qty") {
                         if (isNaN(e.newValue) == true || e.newValue == "" || e.newValue < 0) {
                             alert("0 이상의 숫자만 입력가능합니다.");
                             gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
                         } else {
                             if (!rel_products[e.data.prd_cd]) rel_products[e.data.prd_cd] = {}; 
-                            let predicted_already_cnt = Object.keys(rel_products[e.data.prd_cd]).reduce((a,c) => a + (c === e.data.store_cd ? 0 : rel_products[e.data.prd_cd][c]), 0) + (e.newValue * 1);
-                            
+                            let predicted_already_cnt = Object.keys(rel_products[e.data.prd_cd])
+                                .reduce((a,c) => a + ((c === e.data.store_cd || c === 'storage_wqty') ? 0 : rel_products[e.data.prd_cd][c]), 0) + (e.newValue * 1);
                             if (predicted_already_cnt > e.data.storage_wqty) {
                                 alert("창고재고보다 많은 수량을 배분할 수 없습니다.");
                                 gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
@@ -390,10 +395,12 @@
                                 rel_products[e.data.prd_cd][e.data.store_cd] = e.newValue * 1;
                                 e.api.forEachNode((node) => {
                                     if (node.data && node.data.prd_cd === e.data.prd_cd) {
-                                        node.data.already_cnt = Object.keys(rel_products[e.data.prd_cd]).reduce((a,c) => a + rel_products[e.data.prd_cd][c], 0);
+                                        node.data.already_cnt = Object.keys(rel_products[e.data.prd_cd])
+                                            .reduce((a,c) => a + (c === 'storage_wqty' ? 0 : rel_products[e.data.prd_cd][c]), 0);
                                     }
                                 });
                                 e.api.redrawRows();
+                                e.node.setSelected(e.newValue * 1 > 0);
                             }
                         }
                     }
@@ -419,8 +426,13 @@
             
             let data = $('form[name="search"]').serialize();
             data += "&ext_storage_qty=" + $("[name=ext_storage_qty]").is(":checked");
-            gx.Request('/store/stock/stk13/search', data, -1, function(d) {
+            gx.Request('/store/stock/stk13/search', data, 1, function(d) {
                 setAllRowGroupExpanded($("#grid_expand").is(":checked"));
+                rel_products = d.head.rel_products;
+
+                gx.gridOptions.api.forEachNode((node) => {
+                    if (!!node.data && node.data.rel_qty > 0) node.setSelected(true);
+                });
             });
         }
 

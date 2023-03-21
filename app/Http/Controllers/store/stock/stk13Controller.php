@@ -154,6 +154,33 @@ class stk13Controller extends Controller
         $page_size = $r['limit'] ?? 1000;
         $startno = ($page - 1) * $page_size;
         $limit = " limit $startno, $page_size ";
+		$total = 0;
+		$page_cnt = 0;
+
+		if ($page == 1) {
+			$sql = "
+				select count(total) as total
+				from (
+					select count(pc.prd_cd) as total
+					from order_opt o
+						inner join product_code pc on pc.prd_cd = o.prd_cd
+						inner join product_stock_storage pss on pss.prd_cd = o.prd_cd and pss.storage_cd = (select storage_cd from storage where default_yn = 'Y')
+						inner join product_stock_store ps on ps.prd_cd = o.prd_cd and ps.store_cd = o.store_cd
+						inner join store on store.store_cd = o.store_cd
+						left outer join goods g on g.goods_no = o.goods_no
+						left outer join brand b on b.brand = g.brand
+						left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
+					where o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59'
+						and o.ord_state = 30 and o.clm_state in (90,-30,0)
+						and ($store_where)
+						$where
+					group by o.store_cd, o.prd_cd
+					order by $orderby
+				) a
+			";
+			$total = DB::selectOne($sql)->total;
+			$page_cnt = (int)(($total - 1) / $page_size) + 1;
+		}
 
         // search
 		$sql = "
@@ -196,16 +223,72 @@ class stk13Controller extends Controller
 			order by $orderby
 			$limit
 		";
-
 		$result = DB::select($sql);
 
+		$releases = [];
+		foreach ($result as $row) {
+			if (!isset($releases[$row->prd_cd])) $releases[$row->prd_cd] = ['storage_wqty' => $row->storage_wqty];
+
+			$releases[$row->prd_cd] = array_merge($releases[$row->prd_cd], [
+				$row->store_cd => [
+					'rel_qty' => 0,
+					'sale_cnt' => ($row->sale_cnt * 1),
+					'store_wqty' => $row->store_wqty,
+				]
+			]);
+
+			// 1순위 : 매장보유재고가 0인 경우
+			if ($row->store_wqty < 1) {
+				$rel_qty = $row->sale_cnt < 0 ? 0 : ($row->sale_cnt * 1);
+				$predicted_cnt = $releases[$row->prd_cd]['storage_wqty'] - $rel_qty;
+				if ($predicted_cnt < 0) $rel_qty = $releases[$row->prd_cd]['storage_wqty'];
+				$releases[$row->prd_cd]['storage_wqty'] -= $rel_qty;
+				$releases[$row->prd_cd][$row->store_cd]['rel_qty'] = $rel_qty;
+			}
+		}
+		
+		foreach ((array) $releases as $key => $value) {
+			$sort_arr = [];
+			foreach ((array) $releases[$key] as $k => $v) {
+				if ($k !== 'storage_wqty') $sort_arr[] = $v['sale_cnt'];
+			}
+			$data_arr = array_filter($releases[$key], function($n, $r) { return $r !== 'storage_wqty'; }, ARRAY_FILTER_USE_BOTH);
+			array_multisort($sort_arr, SORT_DESC, $data_arr);
+			$releases[$key] = array_merge(['storage_wqty' => $releases[$key]['storage_wqty']], $data_arr);
+
+			foreach ((array) $releases[$key] as $k => $v) {
+				if ($k !== 'storage_wqty' && $v['rel_qty'] < 1) {
+					$rr = $v['sale_cnt'] < 0 ? 0 : $v['sale_cnt'];
+					$rel_qty = $rr;
+					if ($v['store_wqty'] >= 5 && $v['store_wqty'] > ($v['sale_cnt'] * 2)) $rel_qty = 0;
+					if ($v['sale_cnt'] >= 10) $rel_qty = $rr;
+
+					$predicted_cnt = $releases[$key]['storage_wqty'] - $rel_qty;
+					if ($predicted_cnt < 0) $rel_qty = $releases[$key]['storage_wqty'];
+					$releases[$key]['storage_wqty'] -= $rel_qty;
+					$releases[$key][$k]['rel_qty'] = $rel_qty;
+				}
+				if ($k !== 'storage_wqty') $releases[$key][$k] = $releases[$key][$k]['rel_qty'];
+			}
+		}
+
+		foreach ($result as $row) {
+			$row->rel_qty = $releases[$row->prd_cd][$row->store_cd];
+			$row->already_cnt = $row->storage_wqty - $releases[$row->prd_cd]['storage_wqty'];
+		}
+
+		// TEST PRD_CD
+		// F225UAC12ACSA99,W205UAC08AC0099,F225UKK10BASK99
+		// F205UAC01AC0099 - 보유재고가 많지만, 판매수량이 10개 이상인 경우
+		
 		return response()->json([
 			"code" => $code,
 			"head" => [
-				"total" => count($result),
-				"page" => 1,
-				"page_cnt" => 1,
-				"page_total" => 1,
+				"total" => $total,
+				"page" => $page,
+				"page_cnt" => $page_cnt,
+				"page_total" => count($result),
+				"rel_products" => $releases,
 			],
 			"body" => $result
 		]);
