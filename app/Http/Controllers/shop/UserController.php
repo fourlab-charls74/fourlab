@@ -50,6 +50,7 @@ class UserController extends Controller
 
         if($passwd_chg == "Y"){
             $user["passwd"] = DB::raw("password('$passwd')");
+            $user["pwchgdate"] = DB::raw('now()');
         }
 
         try {

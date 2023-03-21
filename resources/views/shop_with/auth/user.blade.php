@@ -115,11 +115,36 @@
          * @return {boolean}
          */
         function Save() {
+            const reg = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,12}$/;
 
             if ($('#name').val() === '') {
                 $('#name').focus();
                 alert('이름을 입력해 주세요.');
                 return false;
+            }
+
+            if ($('#passwd_chg').is(":checked") === true) {
+                if ($('#passwd').val() === '') {
+                    $('#passwd').focus();
+                    alert('비밀번호를 입력해 주세요.');
+                    return false;
+                }
+            }
+
+            if ($('#passwd').val() !== '') {
+                if ($('#passwd_chg').is(":checked") === false) {
+                    alert('비밀번호변경을 체크해 주세요.');
+                    return false;
+                }
+            }
+
+            if ($('#passwd_chg').is(":checked") === true && $('#passwd').val() !== '') {
+                if (!reg.test($("#passwd").val())) {
+                    $("#passwd").val('');
+                    $('#passwd').focus();
+                    alert('비밀번호는 6~12자 영문과 숫자가 조합되어야 합니다.');
+                    return false;
+                }
             }
 
             // if ($('#part').val() === '') {
@@ -157,7 +182,7 @@
                 success: function (res) {
                     if(res.code == '200'){
                         alert("정상적으로 저장 되었습니다.");
-                        //location.reload();
+                        location.reload();
                     } else {
                         alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
                         console.log(res.msg)
