@@ -338,6 +338,26 @@ class stk22Controller extends Controller
                         'admin_id' => $admin_id,
                         'admin_nm' => $admin_nm,
                     ]);
+
+                //RT처리 알림 전송
+                $res = DB::table('msg_store')
+                    ->insertGetId([
+                        'msg_kind' => 'RT',
+                        'sender_type' => 'S',
+                        'sender_cd' => $d['dep_store_cd'] ?? '',
+                        'reservation_yn' => 'N',
+                        'content' => $d['dep_store_nm'].'에서 일반RT를 처리하였습니다.',
+                        'rt' => now()
+                    ]);
+                
+                DB::table('msg_store_detail')
+                    ->insert([
+                        'msg_cd' => $res,
+                        'receiver_type' => 'S',
+                        'receiver_cd' => $d['store_cd'] ?? '',
+                        'check_yn' => 'N',
+                        'rt' => now()
+                    ]);
             }
 
 			DB::commit();

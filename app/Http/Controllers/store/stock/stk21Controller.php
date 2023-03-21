@@ -240,6 +240,26 @@ class stk21Controller extends Controller
                         'req_rt' => now(),
                         'rt' => now(),
                     ]);
+                
+                //RT요청 알림 전송
+                $res = DB::table('msg_store')
+                    ->insertGetId([
+                        'msg_kind' => 'RT',
+                        'sender_type' => 'H',
+                        'sender_cd' => 'HEAD',
+                        'reservation_yn' => 'N',
+                        'content' => 'RT요청이 있습니다.',
+                        'rt' => now()
+                    ]);
+                
+                DB::table('msg_store_detail')
+                    ->insert([
+                        'msg_cd' => $res,
+                        'receiver_type' => 'S',
+                        'receiver_cd' => $d['dep_store_cd'] ?? '',
+                        'check_yn' => 'N',
+                        'rt' => now()
+                    ]);
             }
 
 			DB::commit();

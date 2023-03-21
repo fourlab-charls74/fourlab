@@ -339,6 +339,30 @@ class stk20Controller extends Controller
                         'admin_id' => $admin_id,
                         'admin_nm' => $admin_nm,
                     ]);
+
+                //RT접수 알림 전송
+                $content = $d['dep_store_nm'] . '에서 ';
+                if ($d['type'] == 'R') $content .= '요청RT를 접수하였습니다.';
+                else if ($d['type'] == 'G') $content .= '일반RT를 접수하였습니다.';
+
+                $res = DB::table('msg_store')
+                    ->insertGetId([
+                        'msg_kind' => 'RT',
+                        'sender_type' => 'S',
+                        'sender_cd' => $d['dep_store_cd'] ?? '',
+                        'reservation_yn' => 'N',
+                        'content' => $content,
+                        'rt' => now()
+                    ]);
+                
+                DB::table('msg_store_detail')
+                    ->insert([
+                        'msg_cd' => $res,
+                        'receiver_type' => 'S',
+                        'receiver_cd' => $d['store_cd'] ?? '',
+                        'check_yn' => 'N',
+                        'rt' => now()
+                    ]);
             }
 
 			DB::commit();
@@ -384,6 +408,30 @@ class stk20Controller extends Controller
                     ->update([
                         'qty' => DB::raw('qty - ' . ($d['qty'] ?? 0)),
                         'ut' => now(),
+                    ]);
+
+                //RT처리 알림 전송
+                $content = $d['dep_store_nm'] . '에서 ';
+                if ($d['type'] == 'R') $content .= '요청RT를 처리하였습니다.';
+                else if ($d['type'] == 'G') $content .= '일반RT를 처리하였습니다.';
+
+                $res = DB::table('msg_store')
+                    ->insertGetId([
+                        'msg_kind' => 'RT',
+                        'sender_type' => 'S',
+                        'sender_cd' => $d['dep_store_cd'] ?? '',
+                        'reservation_yn' => 'N',
+                        'content' => $content,
+                        'rt' => now()
+                    ]);
+                
+                DB::table('msg_store_detail')
+                    ->insert([
+                        'msg_cd' => $res,
+                        'receiver_type' => 'S',
+                        'receiver_cd' => $d['store_cd'] ?? '',
+                        'check_yn' => 'N',
+                        'rt' => now()
                     ]);
             }
 
