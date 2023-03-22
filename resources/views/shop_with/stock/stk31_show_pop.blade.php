@@ -54,8 +54,8 @@
                                         </td>
                                     </tr>
                                 </table>
-                                <div class="card-title pt-3">
-                                    <a href="javascript:void(0);" onclick="locate(); return false;" type="text" style="float:right">공지사항 바로 가기</a>
+                                <div class="resul_btn_wrap mt-3 d-block">
+                                    <a href="javascript:locate();" class="btn btn-sm btn-primary">공지사항 바로 가기</a>
                                 </div>
                             </div>
                         </div>
