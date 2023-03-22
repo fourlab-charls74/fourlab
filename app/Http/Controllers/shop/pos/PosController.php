@@ -576,7 +576,7 @@ class PosController extends Controller
                         throw new Exception("사용하신 쿠폰 중 현재 사용할 수 없는 쿠폰이 있습니다.");
                     }
                     // 해당 쿠폰의 최고가/최저가 부합 체크
-                    if ($cp->price_yn === 'Y' && ($cp->low_price > 0 && ($cp->low_price > $item_ord_amt) || ($cp->high_price > 0 && $cp->high_price < $item_ord_amt))) {
+                    if ($cp->price_yn === 'Y' && ($cp->low_price >= 0 && ($cp->low_price > $item_ord_amt) || ($cp->high_price > 0 && $cp->high_price < $item_ord_amt))) {
                         $code = '-111';
                         throw new Exception("[" . $cp->coupon_nm . "]은 주문금액이 최소 " . number_format($cp->low_price) . "원 / 최대 " . number_format($cp->high_price) . "원인 상품에만 적용할 수 있습니다.");
                     }

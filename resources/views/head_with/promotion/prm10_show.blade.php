@@ -13,11 +13,12 @@
         </div>
         <div>
             @if ($type == 'add')
-                <a href="#" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm save-btn">저장</a>
+                <a href="#" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm save-btn"><i class="fas fa-save fa-sm mr-1"></i> 저장</a>
             @elseif($type == 'edit')
-                <a href="#" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm update-btn">수정</a>
-                <a href="#" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm delete-btn">삭제</a>
+                <a href="#" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm update-btn"><i class="fas fa-save fa-sm mr-1"></i> 수정</a>
+                <a href="#" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm delete-btn"><i class="fas fa-trash fa-sm mr-1"></i> 삭제</a>
             @endif
+            <a href="#" onclick="self.close();" class="d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"><i class="fas fa-times fa-sm mr-1"></i> 닫기</a>
         </div>
     </div>
     <form name="detail">

@@ -276,10 +276,6 @@ class stk13Controller extends Controller
 			$row->rel_qty = $releases[$row->prd_cd][$row->store_cd];
 			$row->already_cnt = $row->storage_wqty - $releases[$row->prd_cd]['storage_wqty'];
 		}
-
-		// TEST PRD_CD
-		// F225UAC12ACSA99,W205UAC08AC0099,F225UKK10BASK99
-		// F205UAC01AC0099 - 보유재고가 많지만, 판매수량이 10개 이상인 경우
 		
 		return response()->json([
 			"code" => $code,

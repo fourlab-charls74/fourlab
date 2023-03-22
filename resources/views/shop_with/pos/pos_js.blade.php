@@ -413,7 +413,7 @@
             let cp = all_coupons.find(coupon => coupon.coupon_no === c.coupon_no);
             if (cp === undefined) return false;
 
-            if (cp.price_yn === 'Y' && (cp.low_price > 0 && (cp.low_price > (c.ori_price * c.qty)) || (cp.high_price > 0 && cp.high_price < (c.ori_price * c.qty)))) return true;
+            if (cp.price_yn === 'Y' && (cp.low_price >= 0 && (cp.low_price > (c.ori_price * c.qty)) || (cp.high_price > 0 && cp.high_price < (c.ori_price * c.qty)))) return true;
             return false;
         });
         if (unavailable_coupons.length > 0) {
