@@ -472,7 +472,7 @@
             if(rows.length < 1) return alert("출고요청할 상품을 선택해주세요.");
 
             let empty_rows = rows.filter(r => {
-                if(!r.rel_qty || !r.rel_qty.trim() || r.rel_qty == 0 || isNaN(parseInt(r.rel_qty))) return true;
+                if(r.rel_qty === undefined || r.rel_qty === '' || isNaN(parseInt(r.rel_qty))) return true;
                 return false;
             });
             if(empty_rows.length > 0) return alert("선택한 상품의 배분수량을 모두 입력해주세요.");
@@ -497,10 +497,17 @@
                 data: data,
             }).then(function (res) {
                 if(res.data.code === 200) {
-                    if(!confirm(res.data.msg + "\n출고요청을 계속하시겠습니까?")) {
-                        location.href = "/store/stock/stk10";
+                    if (res.data.failed_list.length > 0) {
+                        alert("출고요청에 실패한 건이 존재합니다. 확인 후 다시 요청해주세요.\n(사유 : 창고재고부족 / 상품정보없음)")
+                        gx.gridOptions.api.forEachNode((node) => {
+                            node.setSelected(!!res.data.failed_list.find(f => f.store_cd === node.data?.store_cd && f.prd_cd === node.data?.prd_cd));
+                        });
                     } else {
-                        Search();
+                        if(!confirm(res.data.msg + "\n출고요청을 계속하시겠습니까?")) {
+                            location.href = "/store/stock/stk10";
+                        } else {
+                            Search();
+                        }
                     }
                 } else {
                     console.log(res.data);

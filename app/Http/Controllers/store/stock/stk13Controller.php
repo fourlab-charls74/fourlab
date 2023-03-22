@@ -306,6 +306,7 @@ class stk13Controller extends Controller
 		$exp_dlv_day = $request->input("exp_dlv_day", '');
 		$rel_order = $request->input("rel_order", '');
 		$data = $request->input("products", []);
+		$failed_result = [];
 
 		try {
 			DB::beginTransaction();
@@ -315,6 +316,8 @@ class stk13Controller extends Controller
 
 			foreach($data as $d) {
 				$rel_qty = $d['rel_qty'] ?? 0;
+				if ($rel_qty < 1) continue;
+
 				$store_cd = $d['store_cd'] ?? '';
 
 				$sql = "
@@ -324,7 +327,17 @@ class stk13Controller extends Controller
 					where prd_cd = :prd_cd
 				";
 				$prd = DB::selectOne($sql, ['prd_cd' => $d['prd_cd']]);
-				if($prd == null) continue;
+				if($prd == null) {
+					array_push($failed_result, $d);
+					continue;
+				}
+
+				// 창고재고수량 체크
+				$current_wqty = DB::table('product_stock_storage')->where('storage_cd', $storage_cd)->where('prd_cd', $prd->prd_cd)->value('wqty');
+				if ($current_wqty < $rel_qty) {
+					array_push($failed_result, $d);
+					continue;
+				}
 
 				DB::table('product_stock_release')
 					->insert([
@@ -435,13 +448,13 @@ class stk13Controller extends Controller
 
 			DB::commit();
 			$code = 200;
-			$msg = "초도출고 요청 및 접수가 정상적으로 등록되었습니다.";
+			$msg = "판매분출고가 정상적으로 접수처리되었습니다.";
 		} catch (Exception $e) {
 			DB::rollback();
 			$code = 500;
 			$msg = $e->getMessage();
 		}
 
-		return response()->json(["code" => $code, "msg" => $msg]);
+		return response()->json(["code" => $code, "msg" => $msg, "failed_list" => $failed_result]);
 	}
 }
