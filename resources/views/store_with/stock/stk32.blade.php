@@ -21,7 +21,7 @@
                     <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                     
                     <a href="#" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
-                    <a href="#" onclick="openMsgPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"> 알림전송</a>
+                    <a href="#" onclick="openPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"> 알림전송</a>
                     @if(@$cmd == 'receive')
                         <a href="/store/stock/stk32?is_send_msg=true" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"> 보낸알림 보관함</a>
                     @elseif(@$cmd == 'send')
@@ -240,10 +240,9 @@
     const initSearchInputs = () => {
         document.search.reset(); // 모든 일반 input 초기화
         $('#store_no').val(null).trigger('change'); // 브랜드 select2 박스 초기화
-        location.reload();
     };
 
-    function openMsgPopup() {
+    function openPopup() {
         const url = '/store/stock/stk32/create';
         const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1100,height=700");
     }

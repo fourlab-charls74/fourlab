@@ -353,6 +353,25 @@ class stk32Controller extends Controller
                 where md.receiver_type = '$admin_type' and md.receiver_cd = '$admin_cd' and m.msg_cd = '$msg_cd'
                 group by md.msg_cd
             ";
+        } else if ($msg_type == 'pop') {
+            $sql = "
+                select 
+                    m.msg_cd,
+                    m.sender_cd,
+                    if(m.sender_cd='HEAD', '본사', s.store_nm) as sender_nm,
+                    m.reservation_yn,
+                    m.reservation_date,
+                    s.phone as mobile,
+                    m.content,
+                    md.rt,
+                    md.check_yn,
+                    m.msg_kind
+                from msg_store_detail md
+                    left outer join msg_store m on m.msg_cd = md.msg_cd
+                    left outer join store s on s.store_cd = m.sender_cd
+                where md.receiver_cd = '$admin_cd' and m.msg_cd = '$msg_cd'
+                group by md.msg_cd
+            ";
         }
        
         $result = DB::selectOne($sql);
@@ -400,6 +419,17 @@ class stk32Controller extends Controller
                 'content' => $res->content,
                 'sender_nm' => $result->sender_nm,
                 'store' => $store
+            ];
+        } else if ($msg_type == 'pop') {
+            $values = [
+                'msg_type' => $msg_type,
+                'msg_cd' => $msg_cd,
+                'content' => $result->content,
+                'sender_nm' => $result->sender_nm,
+                'msg_kind' => $result->msg_kind,
+                'reservation_yn' => $result->reservation_yn,
+                'reservation_date' => $result->reservation_date,
+                'rt' => $result->rt,
             ];
         }
 
@@ -563,6 +593,7 @@ class stk32Controller extends Controller
     public function msg_read(Request $request)
     {
         $msg_cd = $request->input('msg_cd');
+        $admin_cd = 'HEAD';
 
         $msg_store_detail = [
             'check_yn' => 'Y',
@@ -572,10 +603,19 @@ class stk32Controller extends Controller
         try {
             DB::beginTransaction();
 
-            foreach ($msg_cd as $mc) {
+            if(is_array($msg_cd)) {
+                foreach ($msg_cd as $mc) {
+                    DB::table('msg_store_detail')
+                        ->where('msg_cd', '=', $mc)
+                        ->update($msg_store_detail);
+                }
+            } else {
                 DB::table('msg_store_detail')
-                    ->where('msg_cd', '=', $mc)
-                    ->update($msg_store_detail);
+                        ->where([
+                            ['msg_cd', '=', $msg_cd],
+                            ['receiver_cd', '=', $admin_cd]
+                        ])
+                        ->update($msg_store_detail);
             }
 
             DB::commit();
@@ -967,4 +1007,24 @@ class stk32Controller extends Controller
         ]);
     }
 
+    public function popup_chk(Request $request)
+    {
+        $sql = "
+            select 
+                md.msg_cd as msg_cd
+            from msg_store_detail md
+                left outer join msg_store m on m.msg_cd = md.msg_cd
+                left outer join store s on s.store_cd = m.sender_cd
+            where md.receiver_cd = 'HEAD' and md.check_yn = 'N' and (m.reservation_yn = 'N' 
+                and (md.rt >= date_add(now(), interval -1 month)) or (m.reservation_yn = 'Y' and (m.reservation_date < now() and m.reservation_date >= date_add(now(), interval -1 month))))
+            order by md.rt desc
+        ";
+
+        $msgs = DB::select($sql);
+
+        return response()->json([
+			"code" => 200,
+            "msgs"  => $msgs,
+		]);
+    }
 }

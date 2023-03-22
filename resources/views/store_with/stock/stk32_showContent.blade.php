@@ -10,6 +10,12 @@
                     <span>/ 알림 보기</span>
                 </div>
             </div>
+            @if ($msg_type == 'pop')
+            <div class="flax_box">
+                <button type="button" onclick="msgRead()" class="btn btn-sm btn-primary shadow-sm mr-1">읽음</button>
+                <button type="button" onclick="window.close()" class="btn btn-sm btn-outline-primary shadow-sm mr-1">닫기</button>
+            </div>
+            @endif
         </div>
         <div class="card_wrap aco_card_wrap">
             <div class="card shadow">
@@ -59,6 +65,19 @@
                                                         @endforeach
                                                     </td>
                                                 </tr>
+                                            @elseif ($msg_type == 'pop')
+                                                <tr>
+                                                    <th>발신일</th>
+                                                    <td>
+                                                        <div class="flax_box" name="date" id="date">
+                                                            @if($reservation_yn == 'Y')
+                                                                <span>{{@$reservation_date}}</span>
+                                                            @else
+                                                                <span>{{@$rt}}</span>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                </tr>
                                             @endif
                                         </tbody>
                                     </table>
@@ -81,6 +100,11 @@
                 <div class="form-group">
                     <textarea class="form-control" id="content" name="content" rows="10" style="margin:auto;resize: none;background-color: transparent !important;" readonly >{{@$content}}</textarea>
                 </div><br>
+                @if ($msg_type == 'pop')
+                <div class="resul_btn_wrap mt-1 d-block">
+                    <a href="javascript:locate('{{ @$msg_kind }}');" class="btn btn-sm btn-primary">{{ (@$msg_kind == 'AS' ? '수선관리' : (@$msg_kind == 'RT' ? '매장RT' : '매장알림')) }} 바로 가기</a>
+                </div>
+                @endif
             </div>
         </div>
     </div>
@@ -101,5 +125,41 @@
         }
     }
 
+    function msgRead() {
+        let msg_cd = "{{$msg_cd}}";
+
+        $.ajax({
+            method: 'put',
+            url: '/store/stock/stk32/msg_read',
+            data: { 
+                msg_cd : msg_cd
+            },
+            success: function(data) {
+                if (data.code == '200') {
+                    alert('읽음 처리 되었습니다.');
+                    window.close();
+                } else {
+                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                }
+            },
+            error: function(e) {
+                    // console.log(e.responseText)
+            }
+        });
+    }
+
+    function locate(kind) {
+        let url = '';
+
+        if(kind == 'S' || kind == '') {
+            url = "/store/stock/stk32";
+        } else if(kind == 'RT') {
+            url = "/store/stock/stk20";
+        } else if(kind == 'AS') {
+            url = "/store/standard/std11";
+        }
+        window.opener.location.href = url;
+        window.close();
+    }
 </script>
 @stop

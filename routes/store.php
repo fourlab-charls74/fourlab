@@ -485,6 +485,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('stk32/store', 'stk32Controller@store');
         Route::put('stk32/msg_read', 'stk32Controller@msg_read');
         Route::post('stk32/msg_del', 'stk32Controller@msg_del');
+        Route::get('stk32/popup_chk', 'stk32Controller@popup_chk');
         Route::get('stk32/group', 'stk32Controller@group');
         Route::get('stk32/group_show', 'stk32Controller@group_show');
         Route::post('stk32/add_group', 'stk32Controller@add_group');
