@@ -82,7 +82,7 @@
             </div><br>
             @if ($msg_type == 'pop')
             <div class="resul_btn_wrap mt-1 d-block">
-                <a href="javascript:locate('{{ @$msg_kind }}');" class="btn btn-sm btn-primary">{{ @$msg_kind == 'AS' ? '수선관리' : @$msg_kind == 'RT' ? '매장RT' : '매장알림' }} 바로 가기</a>
+                <a href="javascript:locate('{{ @$msg_kind }}');" class="btn btn-sm btn-primary">{{ (@$msg_kind == 'AS' ? '수선관리' : (@$msg_kind == 'RT' ? '매장RT' : '매장알림')) }} 바로 가기</a>
             </div>
             @endif
         </div>
