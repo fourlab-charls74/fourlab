@@ -45,6 +45,20 @@
                                                 </div>
                                             </td>
                                         </tr>
+                                        @if ($msg_type == 'pop')
+                                        <tr>
+                                            <th>발신일</th>
+                                            <td>
+                                                <div class="flax_box" name="date" id="date">
+                                                    @if($reservation_yn == 'Y')
+                                                        <span>{{@$reservation_date}}</span>
+                                                    @else
+                                                        <span>{{@$rt}}</span>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        @endif
                                     </tbody>
                                 </table>
                             </div>
@@ -67,8 +81,8 @@
                 <textarea class="form-control" id="content" name="content" rows="10" style="margin:auto;resize: none;background-color: transparent !important;" readonly >{{@$content}}</textarea>
             </div><br>
             @if ($msg_type == 'pop')
-            <div class="card-title">
-                <a href="javascript:void(0);" onclick="locate('{{ @$msg_kind }}'); return false;" type="text" style="float:right">{{ @$msg_kind == 'AS' ? '수선관리' : @$msg_kind == 'RT' ? '매장RT' : '매장알림' }} 바로 가기</a>
+            <div class="resul_btn_wrap mt-1 d-block">
+                <a href="javascript:locate('{{ @$msg_kind }}');" class="btn btn-sm btn-primary">{{ @$msg_kind == 'AS' ? '수선관리' : @$msg_kind == 'RT' ? '매장RT' : '매장알림' }} 바로 가기</a>
             </div>
             @endif
         </div>

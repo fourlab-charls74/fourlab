@@ -287,6 +287,8 @@ class stk32Controller extends Controller
                     m.msg_cd,
                     m.sender_cd,
                     if(m.sender_cd='HEAD', '본사', s.store_nm) as sender_nm,
+                    m.reservation_yn,
+                    m.reservation_date,
                     s.phone as mobile,
                     m.content,
                     md.rt,
@@ -329,7 +331,10 @@ class stk32Controller extends Controller
                 'msg_cd' => $msg_cd,
                 'content' => $result->content,
                 'sender_nm' => $result->sender_nm,
-                'msg_kind' => $result->msg_kind
+                'msg_kind' => $result->msg_kind,
+                'reservation_yn' => $result->reservation_yn,
+                'reservation_date' => $result->reservation_date,
+                'rt' => $result->rt,
             ];
         }
 
