@@ -552,11 +552,14 @@ class S_Stock
                 // $this->PlusStockQty($goods_no, $prd_cd, $goods_opt, $qty, $type,
                     // $invoice_no, $etc, $wonga, $com_id, $ord_no, $ord_opt_no);   
 
-                // 입고완료시 재고처리 (product_stock)
+                // 입고완료시 창고재고처리 (product_stock)
                 $this->PlusInQty($goods_no, $prd_cd, $goods_opt, $qty, $goods_wonga, $is_unlimited);
                 
                 // 입고완료시 재고처리 (product_stock_storage)
                 $this->__IncreasePrdStockStorageQty($goods_no, $prd_cd, $goods_opt, $qty);
+
+                // 입고완료시 매장재고 0처리 (product_stock_store)
+                $this->__IncreasePrdStockStoreQty($goods_no, $prd_cd, $goods_opt);
 
                 // 재고처리 history 기록 (product_stock_hst)
                 $history = array(
@@ -737,6 +740,38 @@ class S_Stock
                 'rt' => now(),
                 'ut' => now(),
             ]);
+            return 1;
+        } catch (Exception $e) {
+            return 0;
+        }
+    }
+
+    private function __IncreasePrdStockStoreQty($goods_no, $prd_cd, $goods_opt)
+    {
+        try {
+            $stores = DB::table('store')->select('store_cd')->where('store_type', '08')->get();
+            $values = [];
+
+            foreach ($stores as $store) {
+                $old_data_cnt = DB::table('product_stock_store')->where('store_cd', $store->store_cd)->where('prd_cd', $prd_cd)->count();
+
+                if ($old_data_cnt < 1) {
+                    array_push($values, [
+                        'goods_no' => $goods_no,
+                        'prd_cd' => $prd_cd,
+                        'store_cd' => $store->store_cd,
+                        'qty' => 0,
+                        'wqty' => 0,
+                        'goods_opt' => $goods_opt,
+                        'use_yn' => 'Y',
+                        'rt' => now(),
+                        'ut' => now(),
+                    ]);
+                }
+            }
+
+            DB::table('product_stock_store')->insert($values);
+
             return 1;
         } catch (Exception $e) {
             return 0;

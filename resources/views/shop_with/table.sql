@@ -191,7 +191,7 @@ CREATE TABLE `product_stock_store` (
 	`ut` DATETIME DEFAULT NULL COMMENT '변경일시',
 	PRIMARY KEY (`idx`),
 	KEY `idx_prdcd` (`prd_cd`),
-	KEY `idx_storecd` (`store_cd`)
+	KEY `idx_storecd` (`store_cd`, `prd_cd`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='상품재고 매장별';
 
 -- 오프라인 재고(물류)
@@ -208,7 +208,7 @@ CREATE TABLE `product_stock_storage` (
 	`ut` DATETIME DEFAULT NULL COMMENT '변경일시',
 	PRIMARY KEY (`idx`),
 	KEY `idx_prdcd` (`prd_cd`),
-	KEY `idx_storagecd` (`storage_cd`)
+	KEY `idx_storagecd` (`storage_cd`, `prd_cd`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='상품재고 물류별';
 
 -- 오프라인 출고
