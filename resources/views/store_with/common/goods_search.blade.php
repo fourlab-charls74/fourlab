@@ -371,6 +371,7 @@
 
     const store_cd = '{{ @$store->store_cd }}';
     const storage_cd = '{{ @$storage->storage_cd }}';
+    const include_not_match = '{{ @$include_not_match }}';
 
     const pApp = new App('', { gridId: "#div-gd", height: 202 });
     let gx;
@@ -433,7 +434,7 @@
     const Search = () => {
         if (isOpenerCallback('beforeSearchCallback')) opener.beforeSearchCallback(document);
         let data = $('form[name="search"]').serialize();
-        data += `&store_cd=${store_cd}&storage_cd=${storage_cd}`;
+        data += `&store_cd=${store_cd}&storage_cd=${storage_cd}&include_not_match=${include_not_match}`;
         if($("[name=ext_zero_qty]").length > 0) {
             data += '&ext_zero_qty=' + $("[name=ext_zero_qty]").is(":checked");
         }

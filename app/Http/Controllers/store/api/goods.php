@@ -19,6 +19,7 @@ class goods extends Controller
         $sdate		= now()->sub(1, 'week')->format('Y-m-d');
         $store_cd   = $request->input('store_cd', '');
         $storage_cd   = $request->input('storage_cd', '');
+        $include_not_match = $request->input('include_not_match', '');
 
         $store = null;
         $storage = null;
@@ -46,6 +47,7 @@ class goods extends Controller
             'style_no'		=> "",
             'store'         => $store,
             'storage'       => $storage,
+            'include_not_match' => $include_not_match,
             'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
             'items'			=> SLib::getItems(),
 			// 'event_cds'		=> $event_cds,
@@ -66,6 +68,7 @@ class goods extends Controller
 	{
         $store_cd = $request->input('store_cd', '');
         $storage_cd = $request->input('storage_cd', '');
+        $include_not_match = $request->input('include_not_match', ''); // 비매칭상품 포함검색 여부
         $ext_zero_qty = $request->input("ext_zero_qty", '');
 
 		$page = $request->input('page', 1);
@@ -170,6 +173,7 @@ class goods extends Controller
         $sqls = '';
         if ($store_cd != '') $sqls = $this->_store_sql($store_cd, $where, $orderby, $limit, $having);
         else if ($storage_cd != '') $sqls = $this->_storage_sql($storage_cd, $where, $orderby, $limit, $having);
+        else if ($include_not_match === 'Y') $sqls = $this->_normal_include_not_match_sql($where, $orderby, $limit);
         else $sqls = $this->_normal_sql($where, $orderby, $limit);
 
         $total = 0;
@@ -260,6 +264,73 @@ class goods extends Controller
                 inner join product_stock ps on ps.prd_cd = pc.prd_cd
                 inner join goods g on g.goods_no = pc.goods_no
                 inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c.code_id
+                left outer join company com on com.com_id = g.com_id
+                left outer join brand b on b.br_cd = pc.brand
+                left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
+            where 1=1 $where
+            group by pc.prd_cd
+            $orderby
+            $limit
+        ";
+        return (object)['total_sql' => $total_sql, 'sql' => $sql];
+    }
+
+    // 기본 상품검색 sql (비매칭상품 포함검색)
+    private function _normal_include_not_match_sql($where = '', $orderby = '', $limit = '')
+    {
+        $cfg_img_size_real = "a_500";
+        $cfg_img_size_list = "s_50";
+
+        $total_sql = "
+            select count(prd_cd) as total
+            from (
+                select pc.prd_cd
+                from product_code pc
+                    inner join product_stock ps on ps.prd_cd = pc.prd_cd
+                    left outer join goods g on g.goods_no = pc.goods_no
+                    left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c.code_id
+                where 1=1 $where
+                group by pc.prd_cd
+            ) a
+        ";
+
+        $sql = "
+            select
+                pc.prd_cd
+                , concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
+                , pc.goods_no
+                , g.style_no
+                , g.opt_kind_cd
+                , opt.opt_kind_nm
+                , if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
+                    select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
+                    from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
+                )) as img
+                , g.goods_nm
+                , g.goods_nm_eng
+                , pc.brand as brand_cd
+                , b.brand_nm as brand
+                , pc.color, c.code_val as color_nm
+                , pc.size
+                , pc.goods_opt
+                , (ps.qty - ps.wqty) as s_qty
+                , ps.wqty as sg_qty
+                , ps.qty as total_qty
+                , g.goods_sh
+                , g.price
+                , g.wonga
+                -- , ps.wonga
+                , (100 / (g.price / (g.price - g.wonga))) as margin_rate
+                , (g.price - g.wonga) as margin_amt
+                , g.org_nm
+                , g.com_id
+                , com.com_nm
+                , g.make
+                , pc.rt as reg_dm
+            from product_code pc
+                inner join product_stock ps on ps.prd_cd = pc.prd_cd
+                left outer join goods g on g.goods_no = pc.goods_no
+                left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c.code_id
                 left outer join company com on com.com_id = g.com_id
                 left outer join brand b on b.br_cd = pc.brand
                 left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'

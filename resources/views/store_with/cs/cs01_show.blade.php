@@ -521,7 +521,7 @@
             alert("공급처를 선택해주세요.");
             return document.search.com_nm.click();
         }
-        const url = '/store/api/goods/show';
+        const url = '/store/api/goods/show?include_not_match=Y';
         const pop_up = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1800,height=1000");
     }
 
