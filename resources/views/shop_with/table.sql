@@ -1035,7 +1035,9 @@ ALTER TABLE `bizest_smart`.`mgr_user` ADD COLUMN `confirm_yn` CHAR(1) NULL COMME
 ALTER TABLE `bizest_smart`.`store_controller` ADD COLUMN `icon` VARCHAR(30) NULL COMMENT '아이콘 클래스명' AFTER `is_part_role`;
 ALTER TABLE `bizest_smart`.`shop_controller` ADD COLUMN `icon` VARCHAR(30) NULL COMMENT '아이콘 클래스명' AFTER `is_part_role`;
 
-ALTER TABLE `bizest_smart`.`after_service` ADD COLUMN `as_check_state` VARCHAR(20) NULL COMMENT '검수상태 (W: 대기, N: 정상, F: 불량)' AFTER `as_type`;
+ALTER TABLE `bizest_smart`.`after_service` ADD COLUMN `as_state` SMALLINT(6) NULL COMMENT '수선진행상태' AFTER `as_type`;
+ALTER TABLE `bizest_smart`.`after_service` ADD COLUMN `as_check_state` VARCHAR(20) NULL COMMENT '검수상태 (W: 대기, N: 정상, F: 불량)' AFTER `as_state`;
+ALTER TABLE `bizest_smart`.`after_service` CHANGE `customer_no` `customer_no` VARCHAR(30) NULL COMMENT '고객아이디';
 ALTER TABLE `bizest_smart`.`msg_store` ADD COLUMN `msg_kind` VARCHAR(20) NULL COMMENT '알림 종류 (S: 매장알림, RT: RT알림, AS: 수선알림)' AFTER `msg_cd`; 
 
 -- 쿠폰

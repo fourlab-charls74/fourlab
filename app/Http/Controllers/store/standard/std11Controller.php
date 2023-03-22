@@ -23,11 +23,13 @@ class std11Controller extends Controller
         $sdate = $mutable->sub(1, 'day')->format('Y-m-d');
 		$items = SLib::getItems();
         $com_types = SLib::getCodes("G_COM_TYPE");
+		$as_states = SLib::getCodes("AS_STATE");
 		$values = [
             'sdate' => $sdate,
             'edate' => date("Y-m-d"),
 			'items' => $items,
-		    'com_types' => $com_types
+		    'com_types' => $com_types,
+		    'as_states' => $as_states
         ];
 		return view(Config::get('shop.store.view') . '/standard/std11', $values);
 	}
@@ -41,6 +43,8 @@ class std11Controller extends Controller
 		$store_nm = $request->input('store_nm', "");
 		$item = $request->input('item', "");
 		$as_type = $request->input('as_type', "");
+		$as_state = $request->input('as_state', "");
+		$as_check_state = $request->input('as_check_state', "");
 		$where1 = $request->input('where1', "");
 		$where2 = $request->input('where2', "");
 
@@ -51,10 +55,15 @@ class std11Controller extends Controller
 		if ($store_nm != "") $where .= " and a.store_nm like '%" . Lib::quote($store_nm) . "%'";
 		if ($item != "") $where .= " and a.item like '%" . Lib::quote($item) . "%'";
 		if ($as_type != "") $where .= "and a.as_type = '" . Lib::quote($as_type) . "'";
+		if ($as_state != "") $where .= "and a.as_state = '" . Lib::quote($as_state) . "'";
+		if ($as_check_state != "") $where .= "and a.as_check_state = '" . Lib::quote($as_check_state) . "'";
 		if ($where1 != "") $where .= " and a.${where1} like '%" . Lib::quote($where2) . "%'";
 
 		$query = /** @lang text */
-            "select * from after_service as `a`
+            "select
+				a.*, c.code_val as as_state_nm
+			from after_service as `a`
+				left outer join code c on c.code_kind_cd = 'AS_STATE' and c.code_id = a.as_state
 			where 1=1 $where
         ";
 
@@ -77,11 +86,13 @@ class std11Controller extends Controller
         $sdate = $mutable->format('Y-m-d');
 		$items = SLib::getItems();
         $com_types = SLib::getCodes("G_COM_TYPE");
+		$as_states = SLib::getCodes("AS_STATE");
 		$values = [
 			'type' => 'create',
             'sdate' => $sdate,
 			'items' => $items,
-		    'com_types' => $com_types
+		    'com_types' => $com_types,
+			'as_states' => $as_states
         ];
 		return view(Config::get('shop.store.view') . '/standard/std11_show', $values);
 	}
@@ -92,11 +103,13 @@ class std11Controller extends Controller
 		$mobile = $row->mobile;
 		$items = SLib::getItems();
 		if ($mobile != "") $row->mobile = explode("-", $mobile);
+		$as_states = SLib::getCodes("AS_STATE");
 		$values = [ 
 			'type' => 'detail',
 			'idx' => $idx,
 			'items' => $items,
 			'row' => $row,
+			'as_states' => $as_states
 		];
 		return view(Config::get('shop.store.view') . '/standard/std11_show', $values);
 	}

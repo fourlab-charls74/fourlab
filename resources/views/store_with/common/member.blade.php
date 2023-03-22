@@ -58,6 +58,7 @@
             },
             cellStyle: DEFAULT_STYLE
         },
+        {field: "user_id", headerName: "고객아이디", width: 70, cellStyle: DEFAULT_STYLE, hide:true},
         {field: "name", headerName: "고객명", width: 70, cellRenderer: (params) => `${params.value}`, cellStyle: DEFAULT_STYLE},
         {field: "phone", headerName: "핸드폰", width: 100, cellStyle: DEFAULT_STYLE},
         {field: "addr", headerName: "주소1", width: "auto"},
