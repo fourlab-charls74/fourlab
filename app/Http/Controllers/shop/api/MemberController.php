@@ -25,7 +25,7 @@ class MemberController extends Controller {
     public function search(Request $request) {
         $name = $request->input('name');
         $sql = "
-            select name, phone, addr, addr2 from member where name like '%" . Lib::quote($name) . "%'
+            select user_id, name, phone, addr, addr2 from member where name like '%" . Lib::quote($name) . "%'
         ";
         $rows = DB::select($sql);
         return response()->json([

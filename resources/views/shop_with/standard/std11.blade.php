@@ -120,6 +120,34 @@
                         </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="as_state">진행상태</label>
+                            <div class="flex_box">
+                                <select class="form-control form-control-sm" name="as_state" id="as_state">
+                                    <option value="">전체</option>
+                                    @foreach ($as_states as $as_state)
+                                    <option value="{{ $as_state->code_id }}">{{ $as_state->code_val }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="as_check_state">검수상태</label>
+                            <div class="flex_box">
+                                <select class="form-control form-control-sm" name="as_check_state" id="as_check_state">
+                                    <option value="">전체</option>
+                                    <option value="W">대기</option>
+                                    <option value="N">정상</option>
+                                    <option value="F">불량</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="resul_btn_wrap mb-3">
@@ -202,7 +230,9 @@
             pinned: 'left'
         },
         { field: "receipt_date", headerName: "접수일자", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
-        { field: "customer_no", headerName: "고객번호", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
+        { field: "as_state", headerName: "진행상태", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left', hide:true},
+        { field: "as_state_nm", headerName: "진행상태", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left'},
+        { field: "customer_no", headerName: "고객아이디", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
         { field: "customer", headerName: "고객명", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
         { field: "as_type", headerName: "수선구분", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left',
             cellRenderer: (params) => {
@@ -226,6 +256,20 @@
         { field: "receipt_no", headerName: "접수번호", width: 100, cellStyle: DEFAULT_STYLE },
         { field: "store_no", headerName: "매장번호", width: 100, cellStyle: DEFAULT_STYLE },
         { field: "store_nm", headerName: "매장명", width: 100, cellStyle: DEFAULT_STYLE },
+        { field: "as_check_state", headerName: "검수상태", width: 100, cellStyle: DEFAULT_STYLE,
+            cellRenderer: (params) => {
+                switch (params.value) {
+                    case "W": 
+                        return "대기";
+                    case "N": 
+                        return "정상";
+                    case "F": 
+                        return "불량";
+                    default:
+                        return params.value;
+                };
+            }
+        },
         { field: "item", headerName: "수선품목", width: 100, cellStyle: DEFAULT_STYLE,
             cellRenderer: (params) => {
                 switch (params.value) {

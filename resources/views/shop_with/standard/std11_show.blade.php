@@ -137,12 +137,12 @@
                                     </div>
                                 </td>
                                 <th><!-- 추후 api 작업 예상됨 -->
-                                    <label for="customer_no" class="required">고객번호 / 고객명</label>
+                                    <label for="customer_no" class="required">고객아이디 / 고객명</label>
                                 </th>
                                 <td>
                                     <div class="flex_box">
                                         <input type="text" class="form-control form-control-sm search-enter" name='customer_no' id="customer_no" value="{{ @$type === 'detail' ? @$row->customer_no : '' }}"
-                                        style="width:30%;">
+                                        style="width:30%;" readonly="readonly">
                                         <span class="text_line mx-2">/</span>
                                         <input type="text" style="width:30%;" class="form-control form-control-sm search-enter" name="customer" id="customer" value="{{ @$type === 'detail' ? @$row->customer : '' }}">
                                         <a href="#" onclick="getMember();"class="ml-2 btn btn-sm btn-outline-primary"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
@@ -259,6 +259,38 @@
                                         <div class="form-inline-inner input_box">
                                             <input type="text" class="form-control form-control-sm search-enter" name="free_price" value="{{ @$type === 'detail' ? @$row->free_price : '' }}" placeholder="무료비용" onkeyup="onlynum(this)">
                                         </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <label for="as_state" class="required">진행상태</label>
+                                </th>
+                                <td>
+                                    <div class="flex_box">
+                                        <select id="as_state" name="as_state" class="form-control form-control-sm">
+                                            <option value="">선택</option>
+                                            @foreach ($as_states as $as_state)
+                                                @if (@$type === 'detail')
+                                                <option value="{{ $as_state->code_id }}" {{ @$as_state->code_id == @$row->as_state ? "selected" : "" }} >{{ $as_state->code_val }}</option>
+                                                @else
+                                                <option value="{{ $as_state->code_id }}">{{ $as_state->code_val }}</option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </td>
+                                <th>
+                                    <label for="as_check_state" class="required">검수상태</label>
+                                </th>
+                                <td>
+                                    <div class="flex_box">
+                                        <select id="as_check_state" name="as_check_state" class="form-control form-control-sm">
+                                            <option value="">선택</option>
+                                            <option value="W" {{ (@$type === 'detail' && @$row->as_check_state == 'W') ? "selected" : "" }} >대기</option>
+                                            <option value="N" {{ (@$type === 'detail' && @$row->as_check_state == 'N') ? "selected" : "" }} >정상</option>
+                                            <option value="F" {{ (@$type === 'detail' && @$row->as_check_state == 'F') ? "selected" : "" }} >불량</option>
+                                        </select>
                                     </div>
                                 </td>
                             </tr>
@@ -508,11 +540,11 @@
             return false;
         }
 
-        if ($('#customer_no').val() == "") {
-            alert("고객번호를 선택해 주십시오.");
-            f1.customer_no.focus();
-            return false;
-        }
+        // if ($('#customer_no').val() == "") {
+        //     alert("고객아이디를 선택해 주십시오.");
+        //     f1.customer_no.focus();
+        //     return false;
+        // }
 
         if ($('#customer').val() == "") {
             alert("고객명를 선택해 주십시오.");
@@ -548,6 +580,18 @@
             f1.is_free.focus();
             return false;
         }
+
+        if ($('#as_state').val() == "") {
+            alert("진행상태를 선택해 주십시오.");
+            f1.as_state.focus();
+            return false;
+        }
+
+        if ($('#as_check_state').val() == "") {
+            alert("검수상태를 선택해 주십시오.");
+            f1.as_check_state.focus();
+            return false;
+        }
         
         if ($('#quantity').val() == "") {
             alert("수량을 입력해 주십시오.");
@@ -569,7 +613,9 @@
      */
     var goodsCallback = (row) => {
         const { name } = row;
+        const { user_id } = row;
         $('#customer').val(name);
+        $('#customer_no').val(user_id);
     };
 
     const getMember = () => {
