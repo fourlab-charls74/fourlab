@@ -338,7 +338,16 @@
         },
         {field: "prd_cd", headerName: "바코드", width: 120, pinned: 'left', cellStyle: StyleCenter},
         {field: "goods_no", headerName: "온라인코드", width: 70, pinned: 'left', cellStyle: StyleCenter},
-        {field: "goods_nm", headerName: "상품명", type: "HeadGoodsNameType", width: 150},
+        {field: "goods_nm", headerName: "상품명", type: "HeadGoodsNameType", width: 150,
+            cellRenderer: (params) => {
+                if (params.data.goods_no === undefined) return '';
+                if (params.data.goods_no != '0') {
+                    return '<a href="javascript:void(0);" onclick="return openHeadProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
+                } else {
+                    return '<a href="javascript:void(0);" onclick="return alert(`온라인코드가 없는 상품입니다.`);">' + params.value + '</a>';
+                }
+            }   
+        },
         {field: "goods_nm_eng", headerName:"상품명(영문)", width: 150},
         {field: "prd_cd_p", headerName: "품번", width: 90, cellStyle: StyleCenter},
         {field: "color", headerName: "컬러", width: 55, cellStyle: StyleCenter},

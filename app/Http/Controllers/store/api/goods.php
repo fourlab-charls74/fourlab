@@ -115,8 +115,6 @@ class goods extends Controller
         if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%' ";
         if ($goods_nm_eng != "") $where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
 
-        if ($com_id != "") $where .= " and g.com_id = '" . Lib::quote($com_id) . "'";
-
         // if ($head_desc != "") $where .= " and g.head_desc like '%" . Lib::quote($head_desc) . "%' ";
         // if ($ad_desc != "") $where .= " and g.ad_desc like '%" . Lib::quote($ad_desc) . "%' ";
 
@@ -171,10 +169,10 @@ class goods extends Controller
         $limit = " limit $startno, $page_size ";
 
         $sqls = '';
-        if ($store_cd != '') $sqls = $this->_store_sql($store_cd, $where, $orderby, $limit, $having);
-        else if ($storage_cd != '') $sqls = $this->_storage_sql($storage_cd, $where, $orderby, $limit, $having);
-        else if ($include_not_match === 'Y') $sqls = $this->_normal_include_not_match_sql($where, $orderby, $limit);
-        else $sqls = $this->_normal_sql($where, $orderby, $limit);
+        if ($store_cd != '') $sqls = $this->_store_sql($store_cd, $where, $orderby, $limit, $having, ['com_id' => $com_id]);
+        else if ($storage_cd != '') $sqls = $this->_storage_sql($storage_cd, $where, $orderby, $limit, $having, ['com_id' => $com_id]);
+        else if ($include_not_match === 'Y') $sqls = $this->_normal_include_not_match_sql($where, $orderby, $limit, ['com_id' => $com_id]);
+        else $sqls = $this->_normal_sql($where, $orderby, $limit, ['com_id' => $com_id]);
 
         $total = 0;
         $page_cnt = 0;
@@ -209,10 +207,13 @@ class goods extends Controller
 	}
 
     // 기본 상품검색 sql
-    private function _normal_sql($where = '', $orderby = '', $limit = '')
+    private function _normal_sql($where = '', $orderby = '', $limit = '', $values = [])
     {
         $cfg_img_size_real = "a_500";
         $cfg_img_size_list = "s_50";
+
+        $inner_where = "";
+        if (isset($values['com_id'])) $inner_where .= " and g.com_id = '" . Lib::quote($values['com_id'] ?? '') . "'";
 
         $total_sql = "
             select count(prd_cd) as total
@@ -267,7 +268,7 @@ class goods extends Controller
                 left outer join company com on com.com_id = g.com_id
                 left outer join brand b on b.br_cd = pc.brand
                 left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
-            where 1=1 $where
+            where 1=1 $inner_where $where
             group by pc.prd_cd
             $orderby
             $limit
@@ -276,80 +277,80 @@ class goods extends Controller
     }
 
     // 기본 상품검색 sql (비매칭상품 포함검색)
-    private function _normal_include_not_match_sql($where = '', $orderby = '', $limit = '')
+    private function _normal_include_not_match_sql($where = '', $orderby = '', $limit = '', $values = [])
     {
         $cfg_img_size_real = "a_500";
         $cfg_img_size_list = "s_50";
 
+        $inner_where = "";
+        if (isset($values['com_id'])) $inner_where .= " and a.com_id = '" . Lib::quote($values['com_id'] ?? '') . "'";
+
         $total_sql = "
             select count(prd_cd) as total
             from (
-                select pc.prd_cd
-                from product_code pc
-                    inner join product_stock ps on ps.prd_cd = pc.prd_cd
+                select p.prd_cd
+                    , if(pc.goods_no = 0, p.com_id, g.com_id) as com_id
+                from product p
+                    inner join product_code pc on pc.prd_cd = p.prd_cd
+                    inner join product_stock ps on ps.prd_cd = p.prd_cd
                     left outer join goods g on g.goods_no = pc.goods_no
-                    left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c.code_id
                 where 1=1 $where
                 group by pc.prd_cd
             ) a
+            where 1=1 $inner_where
         ";
 
         $sql = "
-            select
-                pc.prd_cd
-                , concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
-                , pc.goods_no
-                , g.style_no
-                , g.opt_kind_cd
-                , opt.opt_kind_nm
-                , if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
-                    select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
-                    from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
-                )) as img
-                , g.goods_nm
-                , g.goods_nm_eng
-                , pc.brand as brand_cd
-                , b.brand_nm as brand
-                , pc.color, c.code_val as color_nm
-                , pc.size
-                , pc.goods_opt
-                , (ps.qty - ps.wqty) as s_qty
-                , ps.wqty as sg_qty
-                , ps.qty as total_qty
-                , g.goods_sh
-                , g.price
-                , g.wonga
-                -- , ps.wonga
-                , (100 / (g.price / (g.price - g.wonga))) as margin_rate
-                , (g.price - g.wonga) as margin_amt
-                , g.org_nm
-                , g.com_id
-                , com.com_nm
-                , g.make
-                , pc.rt as reg_dm
-            from product_code pc
-                inner join product_stock ps on ps.prd_cd = pc.prd_cd
-                left outer join goods g on g.goods_no = pc.goods_no
-                left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c.code_id
-                left outer join company com on com.com_id = g.com_id
-                left outer join brand b on b.br_cd = pc.brand
-                left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
-            where 1=1 $where
-            group by pc.prd_cd
-            $orderby
+            select a.*, com.com_nm, opt.opt_kind_nm
+            from (
+                select p.prd_cd, p.style_no
+                    , pc.prd_cd_p, pc.goods_no, pc.brand as brand_cd, pc.color, pc.size, pc.goods_opt, pc.rt as reg_dm
+                    , (ps.qty - ps.wqty) as s_qty, ps.wqty as sg_qty, ps.qty as total_qty
+                    , if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
+                    , if(pc.goods_no = 0, p.prd_nm_eng, g.goods_nm_eng) as goods_nm_eng
+                    , if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
+                    , if(pc.goods_no = 0, p.price, g.price) as price
+                    , if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
+                    , if(pc.goods_no = 0, (100 / (p.price / (p.price - p.wonga))), (100 / (g.price / (g.price - g.wonga)))) as margin_rate
+                    , if(pc.goods_no = 0, p.price - p.wonga, g.price - g.wonga) as margin_amt
+                    , if(pc.goods_no = 0, p.com_id, g.com_id) as com_id
+                    , g.org_nm, g.make, g.opt_kind_cd
+                    , if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
+                        select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
+                        from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
+                    )) as img
+                    , b.brand_nm as brand
+                    , c.code_val as color_nm
+                from product p
+                    inner join product_code pc on pc.prd_cd = p.prd_cd
+                    inner join product_stock ps on ps.prd_cd = p.prd_cd
+                    left outer join goods g on g.goods_no = pc.goods_no
+                    left outer join brand b on b.br_cd = pc.brand
+                    left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c.code_id
+                where 1=1 $where
+                group by pc.prd_cd
+                $orderby
+            ) a
+                left outer join company com on com.com_id = a.com_id
+                left outer join opt opt on opt.opt_kind_cd = a.opt_kind_cd and opt.opt_id = 'K'
+            where 1=1 $inner_where
             $limit
         ";
+
         return (object)['total_sql' => $total_sql, 'sql' => $sql];
     }
 
     // 매장별 상품검색 sql
-    private function _store_sql($store_cd, $where = '', $orderby = '', $limit = '', $having = '')
+    private function _store_sql($store_cd, $where = '', $orderby = '', $limit = '', $having = '', $values = [])
     {
         $cfg_img_size_real = "a_500";
         $cfg_img_size_list = "s_50";
 
         $store_where = "";
         if ($store_cd != '' && $store_cd != 'ALL') $store_where .= " and pss.store_cd = '$store_cd' ";
+
+        $inner_where = "";
+        if (isset($values['com_id'])) $inner_where .= " and g.com_id = '" . Lib::quote($values['com_id'] ?? '') . "'";
 
         $total_sql = "
             select count(prd_cd) as total
@@ -409,7 +410,7 @@ class goods extends Controller
                 left outer join company com on com.com_id = g.com_id
                 left outer join brand b on b.br_cd = pc.brand
                 left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
-            where 1=1 $where
+            where 1=1 $inner_where $where
             group by pc.prd_cd
             having 1=1 $having
             $orderby
@@ -419,13 +420,16 @@ class goods extends Controller
     }
 
     // 창고별 상품검색 sql
-    private function _storage_sql($storage_cd, $where = '', $orderby = '', $limit = '', $having = '')
+    private function _storage_sql($storage_cd, $where = '', $orderby = '', $limit = '', $having = '', $values = [])
     {
         $cfg_img_size_real = "a_500";
         $cfg_img_size_list = "s_50";
 
         $storage_where = "";
         if ($storage_cd != '' && $storage_cd != 'ALL') $storage_where .= " and pss.storage_cd = '$storage_cd' ";
+
+        $inner_where = "";
+        if (isset($values['com_id'])) $inner_where .= " and g.com_id = '" . Lib::quote($values['com_id'] ?? '') . "'";
 
         $total_sql = "
             select count(prd_cd) as total
@@ -485,7 +489,7 @@ class goods extends Controller
                 left outer join company com on com.com_id = g.com_id
                 left outer join brand b on b.br_cd = pc.brand
                 left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
-            where 1=1 $where
+            where 1=1 $inner_where $where
             group by pc.prd_cd
             having 1=1 $having
             $orderby
