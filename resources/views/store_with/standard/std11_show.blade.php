@@ -442,7 +442,7 @@
             id: "{{ @$type === 'detail' ? @$row->store_no : '' }}",
             text: "{{ @$type === 'detail' ? @$row->store_nm : '' }}"
         }], tags: true});
-        document.f1.store_nm.value = "{{ @$type === 'detail' ? @$row->store_nm : '' }}"; 
+        // document.f1.store_nm.value = "{{ @$type === 'detail' ? @$row->store_nm : '' }}"; 
         
     });
     
@@ -523,16 +523,16 @@
         }
 
         if ($('#store_no').val() == "") {
-            alert("매장번호를 입력하여 주십시오.");
+            alert("매장명을 입력하여 주십시오.");
             f1.store_no.focus();
             return false;
         }
 
-        if ($('#store_nm').val() == "") {
-            alert("매장명를 입력하여 주십시오.");
-            f1.store_nm.focus();
-            return false;
-        }
+        // if ($('#store_nm').val() == "") {
+        //     alert("매장명를 입력하여 주십시오.");
+        //     f1.store_nm.focus();
+        //     return false;
+        // }
 
         if ($('#item').val() == "") {
             alert("품목구분을 선택해 주십시오.");

@@ -117,11 +117,46 @@ class std11Controller extends Controller
 	public function create(Request $request)
 	{
 		$inputs = $request->all();
+		$store_cd = $request->input("store_no");
 		$inputs['mobile'] = $inputs['mobile'] ? implode("-", array_filter($inputs['mobile'])) : "";
+		if($inputs['store_nm'] == '') {
+			$store_nm = DB::table('store')
+							->where('store_cd', $store_cd)
+							->value('store_nm');
+			$inputs['store_nm'] = $store_nm;
+		}
+
 		try {
 			DB::transaction(function () use ($inputs) {
 				DB::table(self::T)->insert($inputs);
 			});
+
+			//수선요청 알림 전송
+			if ($inputs['as_state'] == 10) {
+				DB::beginTransaction();
+
+                $res = DB::table('msg_store')
+                    ->insertGetId([
+                        'msg_kind' => 'AS',
+                        'sender_type' => 'S',
+                        'sender_cd' => $store_cd,
+                        'reservation_yn' => 'N',
+                        'content' => '수선요청이 있습니다.',
+                        'rt' => now()
+                    ]);
+                
+                DB::table('msg_store_detail')
+                    ->insert([
+                        'msg_cd' => $res,
+                        'receiver_type' => 'H',
+                        'receiver_cd' =>'HEAD',
+                        'check_yn' => 'N',
+                        'rt' => now()
+                    ]);
+				
+				DB::commit();
+			}
+
 			return response()->json(['code'	=> '200']);
 		} catch (Exception $e) {
 			return response()->json(['code' => '500']);
@@ -131,11 +166,50 @@ class std11Controller extends Controller
 	public function edit(Request $request)
 	{
 		$inputs = $request->all();
+		$store_cd = $request->input("store_no");
 		$inputs['mobile'] = $inputs['mobile'] ? implode("-", array_filter($inputs['mobile'])) : "";
+		if($inputs['store_nm'] == '') {
+			$store_nm = DB::table('store')
+							->where('store_cd', $store_cd)
+							->value('store_nm');
+			$inputs['store_nm'] = $store_nm;
+		}
+
+		$ori_as_state = DB::table('after_service')
+							->where('idx', $inputs['idx'])
+							->value('as_state');
+
 		try {
 			DB::transaction(function () use ($inputs) {
 				DB::table(self::T)->where('idx', $inputs['idx'])->update($inputs);
 			});
+
+			//수선요청 알림 전송
+			if ($ori_as_state != $inputs['as_state'] && $inputs['as_state'] == 10) {
+				DB::beginTransaction();
+
+                $res = DB::table('msg_store')
+                    ->insertGetId([
+                        'msg_kind' => 'AS',
+                        'sender_type' => 'S',
+                        'sender_cd' => $store_cd,
+                        'reservation_yn' => 'N',
+                        'content' => '수선요청이 있습니다.',
+                        'rt' => now()
+                    ]);
+                
+                DB::table('msg_store_detail')
+                    ->insert([
+                        'msg_cd' => $res,
+                        'receiver_type' => 'H',
+                        'receiver_cd' =>'HEAD',
+                        'check_yn' => 'N',
+                        'rt' => now()
+                    ]);
+				
+				DB::commit();
+			}
+
 			return response()->json(['code'	=> '200']);
 		} catch (Exception $e) {
 			return response()->json(['code'	=> '500']);
