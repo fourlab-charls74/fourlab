@@ -166,7 +166,14 @@
         {field: "prd_cd", headerName: "상품코드", width: 130, cellStyle: AlignCenter, pinned: 'left'},
         {field: "goods_no", headerName: "상품번호", width: 60, cellStyle: AlignCenter, pinned: 'left'},
         {field: "brand_nm", headerName: "브랜드", width: 60, cellStyle: AlignCenter},
-        {field: "goods_nm", headerName: "상품명", width: 200, type: "HeadGoodsNameType"},
+        {field: "goods_nm", headerName: "상품명", width: 200,
+            cellRenderer: function (params) {
+                if (params.value !== undefined) {
+                    if(params.data.goods_no == null) return '존재하지 않는 상품입니다.';
+                    return '<a href="#" onclick="return openShopProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
+                }
+            }
+        },
         {field: "goods_nm_eng", headerName: "상품명(영문)", width: 200},
         {field: "prd_cd_sm", headerName: "코드일련", width: 100, cellStyle: AlignCenter},
         {field: "color", headerName: "컬러", width: 55, cellStyle: AlignCenter},
@@ -286,6 +293,11 @@
 
     function openApi() {
         document.getElementsByClassName('sch-prdcd-range')[0].click();
+    }
+
+    function openShopProduct(prd_no){
+        var url = '/shop/product/prd01/' + prd_no;
+        var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
     }
 </script>
 @stop

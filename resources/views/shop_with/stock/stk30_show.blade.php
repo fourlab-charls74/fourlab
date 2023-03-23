@@ -180,11 +180,11 @@
         {field: "style_no",	headerName: "스타일넘버", width: 70, cellStyle: {"text-align": "center"}},
         {field: "goods_nm",	headerName: "상품명", width: 180,
             cellRenderer: function (params) {
-                    if (params.value !== undefined) {
-                        if(params.data.goods_no == null) return '존재하지 않는 상품입니다.';
-                        return '<a href="#" onclick="return openShopProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
-                    }
+                if (params.value !== undefined) {
+                    if(params.data.goods_no == null) return '존재하지 않는 상품입니다.';
+                    return '<a href="#" onclick="return openShopProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
                 }
+            }
         },
         {field: "goods_nm_eng",	headerName: "상품명(영문)", width: 180},
         {field: "prd_cd_p",	headerName: "품번", width: 90, cellStyle: {"text-align": "center"}},

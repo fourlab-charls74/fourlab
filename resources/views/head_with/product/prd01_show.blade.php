@@ -2190,6 +2190,8 @@
 							if (selectRowCount -1 === idx) {
 							    alert("변경된 내용이 정상적으로 저장 되었습니다.");
                                 goodsClassSearch();
+                                window.close();
+                                opener.Search();
 							}
 						},
 						error: function(request, status, error) {

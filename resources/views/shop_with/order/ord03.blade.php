@@ -382,7 +382,7 @@
         {field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: {'text-align': 'center'}},
         {field: "goods_nm", headerName: "상품명", width: 150,
             cellRenderer: function (params) {
-                return '<a href="#" onclick="return openHeadProduct(\'' + params.data?.goods_no + '\');">' + params.value + '</a>';
+                return '<a href="#" onclick="return openShopProduct(\'' + params.data?.goods_no + '\');">' + params.value + '</a>';
 			}
         },
         {field: "goods_nm_eng", headerName: "상품명(영문)", width: 150},
@@ -538,6 +538,11 @@
     // ord03_invoice.blade.php 에서 사용
     function getFormSerializedData() {
         return $('form[name="search"]').serialize();
+    }
+
+    function openShopProduct(prd_no){
+        var url = '/shop/product/prd01/' + prd_no;
+        var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
     }
 </script>
 @stop

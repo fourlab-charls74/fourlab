@@ -331,7 +331,7 @@
                     return '<a href="javascript:void(0);" onclick="return alert(`상품번호가 비어있는 상품입니다.`);">' + (params.value || '') + '</a>';
                 } else {
                     let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
-                    return '<a href="#" onclick="return openHeadProduct(\'' + goods_no + '\');">' + (params.value || '') + '</a>';
+                    return '<a href="#" onclick="return openShopProduct(\'' + goods_no + '\');">' + (params.value || '') + '</a>';
                 }
             }
         },
@@ -564,6 +564,11 @@
 
     function openApi() {
         document.getElementsByClassName('sch-prdcd-range')[0].click();
+    }
+
+    function openShopProduct(prd_no){
+        var url = '/shop/product/prd01/' + prd_no;
+        var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
     }
 </script>
 @stop

@@ -44,6 +44,7 @@ class prd31Controller extends Controller
 		$s_goods_no		= $request->input("goods_no");
 		$s_style_no		= $request->input("style_no");
 		$s_sale_place	= $request->input("s_site");
+		$com_id			= $request->input('site');
 		$s_state		= $request->input("s_state");
 		$s_ord_no		= $request->input("ord_no");
 		$s_ord_nm		= $request->input("ord_nm");
@@ -67,12 +68,14 @@ class prd31Controller extends Controller
 		if( $s_ord_nm != "" )		$where .= " and s.order_name = '$s_ord_nm' ";
 		if( $s_rcv_nm != "" )		$where .= " and s.receive = '$s_rcv_nm' ";
 		if( $s_goods_nm != "" )		$where .= " and s.product_name like '%$s_goods_nm%' ";
+		if( $com_id != "") 			$where .= " and com.com_id = '$com_id'";
+
 
 		if( $s_ord_state != "" )	$where .= " and o.ord_state = '$s_ord_state' ";
 		if( $s_clm_state == "90" ){
 			$where .= " and o.clm_state = 0 ";
 		} else {
-			if( $s_clm_state != "" )	$where .= " and o.clm_state = '$S_CLM_STATE' ";
+			// if( $s_clm_state != "" )	$where .= " and o.clm_state = '$S_CLM_STATE' ";
 		}
 
         $page_size	= $limit;
@@ -89,6 +92,10 @@ class prd31Controller extends Controller
 				from shop_sabangnet_order s
 					left outer join order_opt o on s.ord_opt_no = o.ord_opt_no
 					left outer join goods g on s.partner_product_id = g.goods_no
+					left outer join code dlv_cd on  dlv_cd.code_kind_cd = 'DELIVERY' and o.dlv_cd = dlv_cd.code_id
+					left outer join code ord_state on o.ord_state = ord_state.code_id and ord_state.code_kind_cd = 'G_ORD_STATE'
+					left outer join code clm_state on o.clm_state = clm_state.code_id and clm_state.code_kind_cd = 'G_CLM_STATE'
+					left outer join company com on com.com_nm = s.mall_name
 				where 
 					1 = 1
 					and ( s.orderdate >= :sdate and s.orderdate < date_add(:edate,interval 1 day))
@@ -118,6 +125,7 @@ class prd31Controller extends Controller
 				ord_state.code_val as ord_state,
 				clm_state.code_val as clm_state,
 				s.orderdate,s.order_reg_date,
+				com.com_id,
 				s.admin_nm,
 				s.rt,s.ut
 			from shop_sabangnet_order s
@@ -126,6 +134,7 @@ class prd31Controller extends Controller
 				left outer join code dlv_cd on  dlv_cd.code_kind_cd = 'DELIVERY' and o.dlv_cd = dlv_cd.code_id
 				left outer join code ord_state on o.ord_state = ord_state.code_id and ord_state.code_kind_cd = 'G_ORD_STATE'
 				left outer join code clm_state on o.clm_state = clm_state.code_id and clm_state.code_kind_cd = 'G_CLM_STATE'
+				left outer join company com on com.com_nm = s.mall_name
 			where 
 				1 = 1	
 				and ( s.orderdate >= :sdate and s.orderdate < date_add(:edate,interval 1 day))
@@ -133,6 +142,8 @@ class prd31Controller extends Controller
             $orderby
 			$limit
 		";
+
+
 
         $result = DB::select($sql, ['sdate' => $sdate,'edate' => $edate]);
         
@@ -367,6 +378,7 @@ class prd31Controller extends Controller
 					$supply_price		= Lib::quote($array->DATA[$i]->MALL_WON_COST);
 					$sku				= Lib::quote($array->DATA[$i]->SKU_VALUE);
 					$orderdate			= Lib::quote($array->DATA[$i]->ORDER_DATE);
+					
 	
 					//
 					// 세트상품처리
@@ -380,6 +392,12 @@ class prd31Controller extends Controller
 	
 					if( $order_name != "" && $receive != "" && $receive_tel != "" && $receive_zipcode != "" && $receive_addr != "" )	$ord_state = 10;
 	
+
+					// 인코딩 과정에서 주문자 데이터가 누락되면 수령자를 주문자에 넣어주기
+					if ( $order_name == '') {
+						$order_name = $receive;
+					}
+
 					$sql	= " select count(*) as cnt from shop_sabangnet_order where sabangnet_order_id = '$sabangnet_order_id' ";
 					$row	= DB::selectOne($sql);
 

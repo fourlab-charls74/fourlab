@@ -352,8 +352,7 @@
 
         if(rows.length < 1) return alert('저장할 상품을 선택해주세요.');
 
-        if(!confirm("선택한 상품의 변경금액(율)을 저장하시겠습니까?")) return;
-        if(!confirm("바로 상품가격변경 정보가 반영되고 되돌릴 수 없습니다.\n그래도 저장 하시겠습니까?")) return;
+        if(!confirm("선택한 상품의 가격이 즉시 변경되고 되돌릴 수 없습니다.\n저장하시겠습니까?")) return;
 
         axios({
             url: '/store/product/prd05/change-price-now',

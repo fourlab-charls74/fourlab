@@ -127,7 +127,14 @@
         {field: "ord_date", headerName: "주문일", width: 80, cellStyle: StyleLineHeight},
         {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: StyleLineHeight},
         {field: "goods_no", headerName: "상품번호", width: 60, cellStyle: StyleLineHeight},
-        {field: "goods_nm", headerName: "상품명", type: "HeadGoodsNameType", width: 230, cellStyle: {"line-height": "30px"}},
+        {field: "goods_nm", headerName: "상품명", width: 230, cellStyle: {"line-height": "30px"},
+            cellRenderer: function (params) {
+                if (params.value !== undefined) {
+                    if(params.data.goods_no == null) return '존재하지 않는 상품입니다.';
+                    return '<a href="#" onclick="return openShopProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
+                }
+            }
+        },
         {field: "goods_opt", headerName: "옵션", width: 180, cellStyle: {"line-height": "30px"}},
         {field: "qty", headerName: "수량", width: 50, type: 'currencyType', cellStyle: {"line-height": "30px"}},
         {field: "price", headerName: "판매가", width: 60, type: 'currencyType', cellStyle: {"line-height": "30px"}},
@@ -168,6 +175,11 @@
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
     });
+
+    function openShopProduct(prd_no){
+        var url = '/shop/product/prd01/' + prd_no;
+        var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
+    }
 
 </script>
 @stop

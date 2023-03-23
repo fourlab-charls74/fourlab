@@ -456,6 +456,7 @@ class prd07Controller extends Controller
         $result = [];
 		$code = "";
 
+
         foreach($data as $key => $d)
         {
 			$com_id = $d['com_id'];						//업체
@@ -477,6 +478,8 @@ class prd07Controller extends Controller
 			$opt_price = $d['opt_price']??'';			//옵션가격
 			$head_desc = $d['head_desc']??'';			//상단홍보글
 			$ad_desc = $d['ad_desc']??'';				//하단홍보글
+			$baesong_info = $d['baesong_info'];			//배송지역
+			$baesong_kind = $d['baesong_kind'];			//배송업체
 			$dlv_pay_type = $d['dlv_pay_type'];			//배송비지불
 			$dlv_fee_cfg = $d['dlv_fee_cfg'];			//배송비 설정
 			$bae_yn = $d['bae_yn']??'';					//배송비여부
@@ -520,6 +523,8 @@ class prd07Controller extends Controller
 					'$opt_price' as opt_price,
 					'$head_desc' as head_desc,
 					'$ad_desc' as ad_desc,
+					'$baesong_info' as baesong_info,
+					'$baesong_kind' as baesong_kind,
 					'$dlv_pay_type' as dlv_pay_type,
 					'$dlv_fee_cfg' as dlv_fee_cfg,
 					'$bae_yn' as bae_yn,

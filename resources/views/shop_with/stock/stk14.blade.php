@@ -245,7 +245,7 @@
                         return '<a href="javascript:void(0);" onclick="return blank_goods_no();">' + params.value + '</a>';
                     } else {
                         let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
-                        return '<a href="#" onclick="return openHeadProduct(\'' + goods_no + '\');">' + params.value + '</a>';
+                        return '<a href="#" onclick="return openShopProduct(\'' + goods_no + '\');">' + params.value + '</a>';
                     }
                 }
             },
@@ -255,7 +255,7 @@
                         return '<a href="javascript:void(0);" onclick="return blank_goods_no();">' + params.value + '</a>';
                     } else {
                         let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
-                        return '<a href="#" onclick="return openHeadProduct(\'' + goods_no + '\');">' + params.value + '</a>';
+                        return '<a href="#" onclick="return openShopProduct(\'' + goods_no + '\');">' + params.value + '</a>';
                     }
                 }
             },
@@ -509,5 +509,9 @@
             var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1000,height=900");
         }
 
+        function openShopProduct(prd_no){
+            var url = '/shop/product/prd01/' + prd_no;
+            var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
+        }
     </script>
 @stop

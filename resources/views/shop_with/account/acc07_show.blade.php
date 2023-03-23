@@ -243,7 +243,14 @@
         },
         {field: "prd_cd", headerName: "바코드", width: 125, cellStyle: CENTER},
 		{field: "goods_no", headerName: "온라인코드",	width: 70, cellStyle: CENTER},
-		{field: "goods_nm", headerName: "상품명", width: 180},
+		{field: "goods_nm", headerName: "상품명", width: 180,
+            cellRenderer: function (params) {
+                if (params.value !== undefined) {
+                    if(params.data.goods_no == null) return '존재하지 않는 상품입니다.';
+                    return '<a href="#" onclick="return openShopProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
+                }
+            }
+        },
 		{field: "goods_opt", headerName: "옵션", width: 150},
 		{field: "qty", headerName: "수량", width: 50, type: 'currencyType', aggregation: true},
 		{field: "sale_amt", headerName: "판매금액", width: 90, type: "currencyType", aggregation: true },
@@ -432,7 +439,11 @@
 	// 	const url = '/shop/account/acc05/show?date=' + sdate.substring(0,6) + '&store_cd=' + store_cd;
 	// 	window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=800");
 	// }
-
+    
+    function openShopProduct(prd_no){
+        var url = '/shop/product/prd01/' + prd_no;
+        var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
+    }
 </script>
 
 @stop

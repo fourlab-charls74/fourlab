@@ -117,36 +117,12 @@
                         </div> --}}
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="item">품목</label>
-                                <div class="flax_box">
-                                    <select name="item" class="form-control form-control-sm">
-                                        <option value="">전체</option>
-                                        @foreach ($items as $item)
-                                            <option value="{{ $item->cd }}">{{ $item->val }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="brand_cd">브랜드</label>
-                                <div class="form-inline inline_btn_box">
-                                    <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-                                    <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
                                 <label for="goods_nm_eng">상품명(영문)</label>
                                 <div class="flax_box">
                                     <input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="prd_cd">상품옵션 범위검색</label>
@@ -156,20 +132,6 @@
                                             <input type='hidden' id="prd_cd_range" name='prd_cd_range'>
                                             <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' onclick="openApi();" class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
                                             <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="name">공급업체</label>
-                                <div class="form-inline inline_select_box">
-                                    <div class="form-inline-inner input-box w-100">
-                                        <div class="form-inline inline_btn_box">
-                                            <input type="hidden" id="com_cd" name="com_cd" />
-                                            <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
-                                            <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                         </div>
                                     </div>
                                 </div>
@@ -207,6 +169,23 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="row d-none search-area-ext">
+                        <div class="col-lg-4 inner-td">
+                            <div class="form-group">
+                                <label for="name">공급업체</label>
+                                <div class="form-inline inline_select_box">
+                                    <div class="form-inline-inner input-box w-100">
+                                        <div class="form-inline inline_btn_box">
+                                            <input type="hidden" id="com_cd" name="com_cd" />
+                                            <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
+                                            <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
                     </div>
                 </div>
             </div>
@@ -299,7 +278,7 @@
 					return '<a href="javascript:void(0);" onclick="return alert(`상품번호가 비어있는 상품입니다.`);">' + params.value + '</a>';
 				} else {
 					let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
-					return '<a href="javascript:void(0);" onclick="return openHeadProduct(\'' + goods_no + '\');">' + params.value + '</a>';
+					return '<a href="javascript:void(0);" onclick="return openShopProduct(\'' + goods_no + '\');">' + params.value + '</a>';
 				}
 			}
         },
@@ -469,5 +448,10 @@
 		var url = `/shop/product/prd04/stock?prd_cd_p=${prd_cd_p}&date=${date}&color=${color}&size=${size}`;
 		var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1000,height=900");
 	}
+
+    function openShopProduct(prd_no){
+        var url = '/shop/product/prd01/' + prd_no;
+        var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
+    }
 </script>
 @stop
