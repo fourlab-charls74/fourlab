@@ -895,7 +895,7 @@
             custom_amt: getFormValue(ff, 'custom_amt'), // 신고금액
         };
 
-        console.log(data);
+        // console.log(data);
 
         axios({
             url: COMMAND_URL,
@@ -907,7 +907,8 @@
                 window.opener.Search();
                 window.close();
             } else {
-                alert(response.data.message);
+                alert("저장 시 오류가 발생했습니다. 관리자에게 문의해주세요.");
+                console.log(response.data.message);
             }
         }).catch((error) => {
             console.log(error);
@@ -928,7 +929,8 @@
                 window.opener.Search();
                 window.close();
             } else {
-                alert(res.data.message);
+                alert("입고취소 시 오류가 발생했습니다. 관리자에게 문의해주세요.");
+                console.log(res.data.message);
             }
         }).catch((error) => {
             console.log(error);
@@ -949,6 +951,7 @@
                 window.close();
             } else {
                 alert('삭제에 실패했습니다. 다시 시도해주세요. 코드번호 : ' + res.data.code );
+                console.log(res.data);
             }
         }).catch((error) => {
             console.log(error);

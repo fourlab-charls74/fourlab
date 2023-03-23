@@ -301,10 +301,12 @@ class goods extends Controller
         ";
 
         $sql = "
-            select a.*, com.com_nm, opt.opt_kind_nm
+            select a.*, com.com_nm
+                , if (a.goods_no = 0, a.opt, a.opt_kind_cd) as opt_kind_cd
+                , if (a.goods_no = 0, c.code_val, opt.opt_kind_nm) as opt_kind_nm
             from (
                 select p.prd_cd, p.style_no
-                    , pc.prd_cd_p, pc.goods_no, pc.brand as brand_cd, pc.color, pc.size, pc.goods_opt, pc.rt as reg_dm
+                    , pc.prd_cd_p, pc.goods_no, pc.brand as brand_cd, pc.color, pc.size, pc.goods_opt, pc.opt, pc.rt as reg_dm
                     , (ps.qty - ps.wqty) as s_qty, ps.wqty as sg_qty, ps.qty as total_qty
                     , if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
                     , if(pc.goods_no = 0, p.prd_nm_eng, g.goods_nm_eng) as goods_nm_eng
@@ -333,6 +335,7 @@ class goods extends Controller
             ) a
                 left outer join company com on com.com_id = a.com_id
                 left outer join opt opt on opt.opt_kind_cd = a.opt_kind_cd and opt.opt_id = 'K'
+                left outer join code c on c.code_kind_cd = 'PRD_CD_OPT' and c.code_id = a.opt
             where 1=1 $inner_where
             $limit
         ";

@@ -59,11 +59,21 @@ class S_Stock
         $ord_price = "";
 
         // 상품 정보 얻기
-        $sql = "
-			select com_id, com_type, goods_type, is_unlimited, wonga, price
-			from goods
-			where goods_no = '$goods_no'
-        ";
+        if ($goods_no == 0) {
+            $sql = "
+                select p.com_id, c.com_type, 'N' as is_unlimited, pc.type as goods_type, p.wonga, p.price
+                from product p
+                    inner join product_code pc on pc.prd_cd = p.prd_cd
+                    left outer join company c on c.com_id = p.com_id
+                where p.prd_cd = '$prd_cd'
+            ";
+        } else {
+            $sql = "
+                select com_id, com_type, goods_type, is_unlimited, wonga, price
+                from goods
+                where goods_no = '$goods_no'
+            ";
+        }
 
         $row = DB::selectOne($sql);
         $com_id = $row->com_id;
@@ -535,46 +545,55 @@ class S_Stock
         $this->SetPrdCd($prd_cd);
         $this->SetGoodsOpt($goods_no, $goods_opt, $opt_price, $opt_name, $opt_seq);
 
-        $sql = "
-			select com_id, is_unlimited, goods_type, wonga, price
-			from goods
-			where goods_no = '$goods_no'
-		";
+        $sql = "";
+        if ($goods_no == 0) {
+            $sql = "
+                select p.com_id, 'N' as is_unlimited, pc.type as goods_type, p.wonga, p.price
+                from product p
+                    inner join product_code pc on pc.prd_cd = p.prd_cd
+                where p.prd_cd = '$prd_cd'
+            ";
+        } else {
+            $sql = "
+                select com_id, is_unlimited, goods_type, wonga, price
+                from goods
+                where goods_no = '$goods_no'
+            ";
+        }
         $rows = DB::selectOne($sql);
+
         $com_id = $rows->com_id;
         $goods_type = $rows->goods_type;
         $is_unlimited = $rows->is_unlimited;
         $goods_wonga = $rows->wonga;
         $goods_price = $rows->price;
-        
-        if ($goods_type == "S" || $goods_type == "I") {
-            if ($ord_opt_no == "" || ($ord_opt_no != "" && $ord_state >= 30)) {
-                // $this->PlusStockQty($goods_no, $prd_cd, $goods_opt, $qty, $type,
-                    // $invoice_no, $etc, $wonga, $com_id, $ord_no, $ord_opt_no);   
 
-                // 입고완료시 창고재고처리 (product_stock)
-                $this->PlusInQty($goods_no, $prd_cd, $goods_opt, $qty, $goods_wonga, $is_unlimited);
-                
-                // 입고완료시 재고처리 (product_stock_storage)
-                $this->__IncreasePrdStockStorageQty($goods_no, $prd_cd, $goods_opt, $qty);
+        if ($ord_opt_no == "" || ($ord_opt_no != "" && $ord_state >= 30)) {
+            // $this->PlusStockQty($goods_no, $prd_cd, $goods_opt, $qty, $type,
+                // $invoice_no, $etc, $wonga, $com_id, $ord_no, $ord_opt_no);   
 
-                // 입고완료시 매장재고 0처리 (product_stock_store)
-                $this->__IncreasePrdStockStoreQty($goods_no, $prd_cd, $goods_opt);
+            // 입고완료시 창고재고처리 (product_stock)
+            $this->PlusInQty($goods_no, $prd_cd, $goods_opt, $qty, $goods_wonga, $is_unlimited);
+            
+            // 입고완료시 재고처리 (product_stock_storage)
+            $this->__IncreasePrdStockStorageQty($goods_no, $prd_cd, $goods_opt, $qty);
 
-                // 재고처리 history 기록 (product_stock_hst)
-                $history = array(
-                    "type" => $type,
-                    "etc" => $etc,
-                    "qty" => $qty,
-                    "wonga" => $wonga,
-                    "price" => $goods_price,
-                    "invoice_no" => $invoice_no,
-                    "com_id" => $com_id,
-                    "ord_no" => $ord_no,
-                    "ord_opt_no" => $ord_opt_no
-                );
-                $this->__InsertHistory($history);
-            }
+            // 입고완료시 매장재고 0처리 (product_stock_store)
+            $this->__IncreasePrdStockStoreQty($goods_no, $prd_cd, $goods_opt);
+
+            // 재고처리 history 기록 (product_stock_hst)
+            $history = array(
+                "type" => $type,
+                "etc" => $etc,
+                "qty" => $qty,
+                "wonga" => $wonga,
+                "price" => $goods_price,
+                "invoice_no" => $invoice_no,
+                "com_id" => $com_id,
+                "ord_no" => $ord_no,
+                "ord_opt_no" => $ord_opt_no
+            );
+            $this->__InsertHistory($history);
         }
 
         //
