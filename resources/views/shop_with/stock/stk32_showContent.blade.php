@@ -114,16 +114,23 @@
 
     function locate(kind) {
         let url = '';
+        let msg = '';
 
         if(kind == 'S' || kind == '') {
             url = "/shop/stock/stk32";
+            msg = '매장알림 메뉴로 이동시 자동으로 읽음 처리 됩니다.\r\n이동하시겠습니까?';
         } else if(kind == 'RT') {
             url = "/shop/stock/stk20";
+            msg = '매장RT 메뉴로 이동시 자동으로 읽음 처리 됩니다.\r\n이동하시겠습니까?';
         } else if(kind == 'AS') {
             url = "/shop/standard/std11";
+            msg = '수선관리 메뉴로 이동시 자동으로 읽음 처리 됩니다.\r\n이동하시겠습니까?';
         }
-        window.opener.location.href = url;
-        window.close();
+        if(confirm(msg)){
+            msgRead();
+            window.opener.location.href = url;
+            window.close();
+        }
     }
 </script>
 @stop
