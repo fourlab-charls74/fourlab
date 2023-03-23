@@ -488,7 +488,7 @@ class prd04Controller extends Controller
 					, sum(ps.qty) as qty
 					, sum(ps.wqty) as wqty
 				from product_code pc
-					inner join storage s on s.use_yn = 'Y'
+					inner join storage s on s.use_yn = 'Y' and s.online_yn <> 'Y'
 					inner join (
 						select ps.prd_cd
 							, ps.storage_cd
