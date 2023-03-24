@@ -184,6 +184,7 @@ class stk31Controller extends Controller
                 inner join notice_store_detail nsd on ns.ns_cd = nsd.ns_cd and nsd.check_yn = 'N'
                 where
                     ns.all_store_yn = 'N'
+                    and ns.store_notice_type = '01'
                     and ns.rt >= date_add(now(), interval -1 month)
                     and nsd.store_cd = '$store_cd'
                     
@@ -194,6 +195,7 @@ class stk31Controller extends Controller
                 left outer join notice_store_detail nsd on ns.ns_cd = nsd.ns_cd and nsd.check_yn = 'Y' and nsd.store_cd = '$store_cd'
                 where
                     ns.all_store_yn = 'Y'
+                    and ns.store_notice_type = '01'
                     and ns.rt >= date_add(now(), interval -1 month)
                     and nsd.ns_cd is null
             )aa
