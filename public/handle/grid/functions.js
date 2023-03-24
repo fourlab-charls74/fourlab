@@ -55,6 +55,13 @@ function openSmsList(phone='', name='') {
     var url = '/head/api/sms/list?phone=' + phone + '&name=' + name;
     window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
 }
+
+function openStoreSmsList(phone='', name='') {
+    var url = '/store/api/sms/list?phone=' + phone + '&name=' + name;
+    window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
+}
+
+
 function openSchDetail(idx='') {
     const url = `/head/promotion/prm32/show/${idx}`;
     window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800")

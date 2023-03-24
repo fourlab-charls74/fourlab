@@ -1028,7 +1028,7 @@
 			data: frm.serialize() + '&data=' + next_data,
 			success: function(data) {
 				alert('선택하신 상품의 정보고시 데이터가 삭제 되었습니다.');
-				location.reload();
+				Search();
 				//console.log(data);
 			},
 			complete: function() {

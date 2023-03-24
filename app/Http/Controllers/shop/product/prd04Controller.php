@@ -373,6 +373,8 @@ class prd04Controller extends Controller
 		$o_prd_cd_p = $prd_cd_p;
 		$store_type = $request->input('store_type', '');
 		$color = $request->input('color', '');
+		$user_store = Auth('head')->user()->store_cd;
+
 		if ($color != '') $prd_cd_p .= $color;
 
 		$values = [];
@@ -439,6 +441,17 @@ class prd04Controller extends Controller
 			// get store stock
 			$where = "";
 			if ($store_type != '') $where .= " and s.store_type = '$store_type' ";
+
+			$sql = "
+				select
+					ostore_stock_yn
+				from store
+				where store_cd = '$user_store'
+			";
+
+			$res = DB::selectOne($sql);
+
+			if($res->ostore_stock_yn == 'N') $where .= " and s.store_cd = '$user_store'";
 
 			$case_sql = "";
 			foreach ($sizes as $size) {

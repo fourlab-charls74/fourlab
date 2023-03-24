@@ -1503,7 +1503,7 @@
     $('.sms-list-btn').click(function(e) {
         e.preventDefault();
 
-        openSmsList('{{ @$ord->mobile }}', '{{ @$ord->user_nm }}');
+        openStoreSmsList('{{ @$ord->mobile }}', '{{ @$ord->user_nm }}');
     });
 
     $('.claim-save-btn').click(function(e) {

@@ -403,7 +403,7 @@
         let user_store_nm = '{{$store_nm}}';
 
         for(let i = 0; i < rows.length; i++){
-            if(rows[i].dep_store_cd != user_store) return alert('보내는 매장이 ' + user_store_nm + '인 매장만 접수가 가능합니다.');
+            if(rows[i].dep_store_cd != user_store) return alert('보내는 매장이 ' + rows[i].dep_store_nm + '인 매장만 접수가 가능합니다.');
         }
         if(rows.length < 1) return alert("접수처리할 항목을 선택해주세요.");
         if(rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 접수처리 가능합니다.");
@@ -437,7 +437,7 @@
         let user_store_nm = '{{$store_nm}}';
 
         for(let i = 0; i < rows.length; i++){
-            if(rows[i].dep_store_cd != user_store) return alert('보내는 매장이 ' + user_store_nm + '인 매장만 출고가 가능합니다.')
+            if(rows[i].dep_store_cd != user_store) return alert('보내는 매장이 ' + rows[i].dep_store_nm + '인 매장만 출고가 가능합니다.')
         }
         if(rows.length < 1) return alert("출고처리할 항목을 선택해주세요.");
         if(rows.filter(r => r.state !== 20).length > 0) return alert("'접수'상태의 항목만 출고처리 가능합니다.");
@@ -467,7 +467,7 @@
         let user_store_nm = '{{$store_nm}}';
 
         for(let i = 0; i < rows.length; i++){
-            if(rows[i].store_cd != user_store) return alert('받는 매장이 ' + user_store_nm + '인 매장만 매장입고처리가 가능합니다.')
+            if(rows[i].store_cd != user_store) return alert('받는 매장이 ' + rows[i].store_nm + '인 매장만 매장입고처리가 가능합니다.')
         }
         if(rows.length < 1) return alert("매장입고처리할 항목을 선택해주세요.");
         if(rows.filter(r => r.state !== 30).length > 0) return alert("'출고'상태의 항목만 매장입고처리 가능합니다.");
@@ -497,7 +497,7 @@
         let user_store_nm = '{{$store_nm}}';
 
         for(let i = 0; i < rows.length; i++){
-            if(rows[i].dep_store_cd != user_store) return alert('보내는 매장이 ' + user_store_nm + '인 매장만 거부가 가능합니다.');
+            if(rows[i].dep_store_cd != user_store) return alert('보내는 매장이 ' + rows[i].dep_store_nm + '인 매장만 거부가 가능합니다.');
         }
         if(rows.length < 1) return alert("거부처리할 항목을 선택해주세요.");
         if(rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 거부처리 가능합니다.");
@@ -541,7 +541,7 @@
             rows = [{idx}];
         }
         for(let i = 0; i < rows.length; i++){
-            if(rows[i].store_cd != user_store) return alert('받는 매장이 ' + user_store_nm + '인 매장만 삭제가 가능합니다.')
+            if(rows[i].store_cd != user_store) return alert('받는 매장이 ' + rows[i].store_nm + '인 매장만 삭제가 가능합니다.')
         }
         if(!confirm("선택한 항목을 삭제하시겠습니까?")) return;
 

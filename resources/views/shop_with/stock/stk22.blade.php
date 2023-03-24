@@ -459,7 +459,7 @@
     function RequestRT() {
         let rows = gx3.getSelectedRows();
         if(rows.length < 1) return alert("RT등록할 항목을 선택해주세요.");
-        if(!confirm("일반RT등록 시, 출고처리가 완료됩니다.\n선택한 항목을 RT등록하시겠습니까?")) return;
+        if(!confirm("선택한 상품을 RT등록하시겠습니까?")) return;
 
         axios({
             url: '/shop/stock/stk22/request-rt',
