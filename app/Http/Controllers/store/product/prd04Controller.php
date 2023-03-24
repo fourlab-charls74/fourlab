@@ -443,6 +443,7 @@ class prd04Controller extends Controller
 			$sql = "
 				select 
 					pc.color
+					, c.code_val as color_nm
 					, s.store_cd
 					, s.store_nm
 					, ps.prd_cd
@@ -452,6 +453,7 @@ class prd04Controller extends Controller
 					, sum(ps.wqty) as wqty
 				from product_code pc
 					inner join store s
+					inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = pc.color
 					inner join (
 						select ps.prd_cd
 							, ps.store_cd
@@ -474,6 +476,7 @@ class prd04Controller extends Controller
 			$sql = "
 				select 
 					pc.color
+					, c.code_val as color_nm
 					, s.storage_cd
 					, s.storage_nm
 					, ps.prd_cd
@@ -483,6 +486,7 @@ class prd04Controller extends Controller
 					, sum(ps.wqty) as wqty
 				from product_code pc
 					inner join storage s on s.use_yn = 'Y'
+					inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = pc.color
 					inner join (
 						select ps.prd_cd
 							, ps.storage_cd

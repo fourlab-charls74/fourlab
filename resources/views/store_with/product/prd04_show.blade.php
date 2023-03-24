@@ -180,11 +180,20 @@
     let storage_columns = [
         {field: "storage_cd", hide: true},
         {field: "storage_nm", headerName: "창고명", width: 180, cellStyle: AlignCenter, pinned: "left", rowGroup: true, hide: true},
-        {field: "color", headerName: "컬러", width: 60, cellStyle: AlignCenter, pinned: "left"},
+        {field: "color", headerName: "컬러", width: 180, pinned: "left",
+            cellRenderer: function(params){
+                if (params.node.group === true) return;
+                else return params.data.color_nm + ' [' + params.data.color + ']';
+            }
+        },
     ];
 
     let store_columns = [
-        {field: "color", headerName: "컬러", width: 60, cellStyle: AlignCenter, pinned: "left", rowGroup: true, hide: true},
+        {field: "color", headerName: "컬러", width: 60, cellStyle: AlignCenter, pinned: "left", rowGroup: true, hide: true,
+            valueGetter:function(params){
+                return params.data.color_nm + ' [' + params.data.color + ']';
+            }
+        },
         {field: "store_cd", hide: true},
         {field: "store_nm", headerName: "매장명", width: 180, pinned: "left"},
     ];
@@ -223,7 +232,7 @@
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
         if (gridDiv2 !== null) {
             gx2 = new HDGrid(gridDiv2, store_columns, {
-                autoGroupColumnDef: basic_autoGroupColumnDef('컬러'),
+                autoGroupColumnDef: basic_autoGroupColumnDef('컬러', 180),
                 groupDefaultExpanded: 1, // 0: close, 1: open
                 suppressAggFuncInHeader: true,
                 animateRows: true,
