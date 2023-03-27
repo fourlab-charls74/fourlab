@@ -195,9 +195,8 @@ class comm01Controller extends Controller
             if (count($_FILES) > 0) {
                 $url_array = [];
                 foreach($files as $file) {
-                    $extension = $file->getClientOriginalExtension();
-                    $file_name = "$now"."$id".".$extension";
-                    $save_path = config::get('file.store_notice_path');;
+                    $file_name = "$now"."$id"."_".$file->getClientOriginalName();
+                    $save_path = config::get('file.store_notice_path');
                     $url_array[] = ULib::uploadFile($save_path, $file_name, $file);
                 }
                 $file_url = implode(',', $url_array);
@@ -338,19 +337,56 @@ class comm01Controller extends Controller
         ]);
     }
 
-    public function delete_file($path) {
+    public function delete_file($no, $path) {
 
-        if (file_exists(storage_path('\\app\\public\\data\\community\\comm02\\'.$path))) {
+        $file_path = storage_path('\\app\\public\\data\\community\\comm02\\'.$path);
+        $delete_file_url = config::get('file.store_notice_path').$path;
+
+        if (file_exists($file_path)) {
 
             try{
-                storage::delete(storage_path('\\app\\public\\data\\community\\comm02\\'.$path));
+                DB::beginTransaction();
+                storage::delete($file_path);
                 
+                $sql = "
+                    update notice_store s
+                    set s.attach_file_url = (
+                        select 
+                            GROUP_CONCAT(files)
+                        from (
+                            select 
+                                substring_index(substring_index(ns.attach_file_url, ',', fileCnt.n), ',' , -1) as files
+                            from (
+                                select 1 as n union all 
+                                select 2 union all
+                                select 3 union all 
+                                select 4 union all
+                                select 5
+                            ) as fileCnt
+                            inner join notice_store ns on char_length(ns.attach_file_url) - char_length(replace(ns.attach_file_url, ',' , '')) >= fileCnt.n - 1
+                            where 
+                                ns.ns_cd  = $no
+                        ) list
+                        where 
+                            list.files not in (
+                                '$delete_file_url'
+                            )
+                    )
+                    where 
+                        s.ns_cd = $no
+                ";
+
+                DB::update($sql);
+                DB::commit();
+
                 return response()->json([
                     "code" => '200',
                     "msg" => 'file success deleted'
                 ]);
 
             } catch(Exception $e){
+                DB::rollBack();
+
                 return response()->json([
                     "code" => '500',
                     "msg" => $e->getMessage()

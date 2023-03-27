@@ -119,10 +119,10 @@
                                                 <th>파일 다운로드</th>
                                                 <td>
                                                     @foreach(explode(',', $user->attach_file_url) as $file_url) 
-                                                        <a href="javascript:downloadFile('{{$file_url}}')">{{$file_url}}</a>
-                                                        &nbsp;&nbsp;
-                                                        <a href="javascript:deleteFile('{{$file_url}}')">X</a>
-                                                        <br/>
+                                                            <a href="javascript:downloadFile('{{$file_url}}')">{{explode('/', $file_url)[3]}}</a>
+                                                            &nbsp;&nbsp;
+                                                            <a href="javascript:deleteFile('{{$no}}', '{{$file_url}}')">X</a>
+                                                            <br/>
                                                     @endforeach
                                                 </td>
                                             @else
@@ -350,24 +350,26 @@
         });
     }
 
-    function deleteFile(path) {
+    function deleteFile(no, path) {
 
-        $.ajax({
-            method: 'delete',
-            url: `/store/common/comm01/file/delete/${path.split('/').reverse()[0]}`,
-            success: function(data) {
-                if (data.code == '200') {
-                    alert('파일 삭제에 성공하였습니다.');
-                    location.reload();
-                } else {
-                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+        if(confirm("삭제하시겠습니까?")){
+            $.ajax({
+                method: 'delete',
+                url: `/store/common/comm01/file/delete/${no}/${path.split('/').reverse()[0]}`,
+                success: function(data) {
+                    if (data.code == '200') {
+                        alert('파일 삭제에 성공하였습니다.');
+                        location.reload();
+                    } else {
+                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                    }
+
+                },
+                error: function(res, status, error) {
+                    console.log(res.responseText);
                 }
-
-            },
-            error: function(res, status, error) {
-                console.log(res.responseText);
-            }
-        });
+            });
+        }
     }
 
     function Update(no) {

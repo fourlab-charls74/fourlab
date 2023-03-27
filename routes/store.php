@@ -330,7 +330,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('comm01/{notice_id}/create', 'comm01Controller@create');
         Route::get('comm01/show/{notice_id}/{no}', 'comm01Controller@show');
         Route::get('comm01/file/download/{path}', 'comm01Controller@download_file');
-        Route::delete('comm01/file/delete/{path}', 'comm01Controller@delete_file');
+        Route::delete('comm01/file/delete/{no}/{path}', 'comm01Controller@delete_file');
         Route::post('comm01/store', 'comm01Controller@store');
         Route::put('comm01/edit/{no}', 'comm01Controller@update');
         Route::post('comm01/del_store', 'comm01Controller@del_store');
