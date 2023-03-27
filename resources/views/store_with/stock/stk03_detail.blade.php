@@ -1497,7 +1497,7 @@
     $('.sms-send-btn').click(function(e) {
         e.preventDefault();
 
-        openSmsSend('{{ @$ord->mobile }}', '{{ @$ord->user_nm }}');
+        openStoreSmsSend('{{ @$ord->mobile }}', '{{ @$ord->user_nm }}');
     });
 
     $('.sms-list-btn').click(function(e) {
@@ -1595,7 +1595,7 @@
 
         if ($('#refund_yn').val() === 'n') return;
 
-        const url = '/head/order/ord01/refund/' + ord_no + '/' + ord_opt_no;
+        const url = '/store/order/ord01/refund/' + ord_no + '/' + ord_opt_no;
         const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
     });
 
@@ -1618,7 +1618,7 @@
         const params = [
             `p_ord_opt_no=${p_ord_opt_no}`,
         ];
-        const url = `/head/order/ord20/show?${params.join('&')}`;
+        const url = `/store/order/ord01/view?${params.join('&')}`;
         const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
     });
 

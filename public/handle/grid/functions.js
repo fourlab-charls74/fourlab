@@ -41,6 +41,16 @@ function openSmsSend(phone='', name='') {
     window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
 }
 
+function openShopSmsSend(phone='', name='') {
+    var url = '/shop/api/sms/send?phone=' + phone + '&name=' + name;
+    window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
+}
+
+function openStoreSmsSend(phone='', name='') {
+    var url = '/store/api/sms/send?phone=' + phone + '&name=' + name;
+    window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
+}
+
 function openMultiSmsSend(ids = '') {
     var url = '/head/api/sms/send?ids=' + ids;
     window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
@@ -53,6 +63,11 @@ function openStoreMultiSmsSend(ids = '') {
 
 function openSmsList(phone='', name='') {
     var url = '/head/api/sms/list?phone=' + phone + '&name=' + name;
+    window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
+}
+
+function openShopSmsList(phone='', name='') {
+    var url = '/shop/api/sms/list?phone=' + phone + '&name=' + name;
     window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
 }
 
@@ -78,6 +93,11 @@ function openStoreStock(prd_cd, date = ''){
 }
 function openStoreOrder(ord_no,ord_opt_no){
     var url = '/store/stock/stk03/order/' + ord_no + '/' + ord_opt_no;
+    var order = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
+}
+
+function openShopOrder(ord_no,ord_opt_no){
+    var url = '/shop/stock/stk03/order/' + ord_no + '/' + ord_opt_no;
     var order = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
 }
 

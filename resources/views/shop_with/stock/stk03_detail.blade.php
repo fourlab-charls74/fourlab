@@ -1497,13 +1497,13 @@
     $('.sms-send-btn').click(function(e) {
         e.preventDefault();
 
-        openSmsSend('{{ @$ord->mobile }}', '{{ @$ord->user_nm }}');
+        openShopSmsSend('{{ @$ord->mobile }}', '{{ @$ord->user_nm }}');
     });
 
     $('.sms-list-btn').click(function(e) {
         e.preventDefault();
 
-        openSmsList('{{ @$ord->mobile }}', '{{ @$ord->user_nm }}');
+        openShopSmsList('{{ @$ord->mobile }}', '{{ @$ord->user_nm }}');
     });
 
     $('.claim-save-btn').click(function(e) {

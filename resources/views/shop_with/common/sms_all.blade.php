@@ -359,7 +359,7 @@ function selectTemplate(data) {
 
 const Search = () => {
     const data = $('form[name="search"]').serialize();
-    listGx.Request('/head/api/sms/search', data, 1);
+    listGx.Request('/shop/api/sms/search', data, 1);
 }
 
 $('.phone-check-btn').click((e) => {
@@ -467,7 +467,7 @@ $('#file').change((e) => {
 
 $('.template-btn').click((e) => {
     e.preventDefault();
-    const url='/head/api/template';
+    const url='/shop/api/template';
     const product=window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
 });
 
@@ -489,7 +489,7 @@ $('.send-btn').click((e) => {
     rows.forEach((row, idx) => {
         $.ajax({
             type: 'put',
-            url: '/head/api/sms/send',
+            url: '/shop/api/sms/send',
             dataType:'json',
             data: { "data" : row, "shop_tel" : $('.send-phone').val() },
             success: function (data) {

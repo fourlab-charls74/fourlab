@@ -386,7 +386,7 @@
                 else return params.value;
             }
         },
-        {field: "ord_opt_no", headerName: "일련번호", pinned: 'left', width: 60, type: 'StoreOrderNoType', cellStyle: {'text-align': 'center'}},
+        {field: "ord_opt_no", headerName: "일련번호", pinned: 'left', width: 60, type: 'ShopOrderNoType', cellStyle: {'text-align': 'center'}},
         {field: "ord_state", headerName: "주문상태", pinned: 'left', width: 70, cellStyle: StyleOrdState},
         {field: "clm_state", headerName: "클레임상태", pinned: 'left', width: 70, cellStyle: StyleClmState},
         {field: "pay_stat", headerName: "입금상태", pinned: 'left', width: 60, cellStyle: {'text-align': 'center'}},
