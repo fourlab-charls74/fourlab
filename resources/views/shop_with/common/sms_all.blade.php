@@ -493,8 +493,11 @@ $('.send-btn').click((e) => {
             dataType:'json',
             data: { "data" : row, "shop_tel" : $('.send-phone').val() },
             success: function (data) {
-                if (cnt -1 === idx) {
-                    alert("전송되었습니다.");
+                // if (cnt -1 === idx) {
+                //     alert("전송되었습니다.");
+                // }
+                if (data.code == '200'){
+                    alert('전송되었습니다.');
                 }
             },
             error: function(xhr, status, error) {

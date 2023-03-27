@@ -108,6 +108,8 @@ class SMS
             // 즉시 전송으로 구성하실경우
             $result = $sms->SendSMS($sms_id, $sms_pwd, $snd_number, $rcv_number, $sms_content);// 5개의 인자로 함수를 호출합니다.
 
+            dd($result);
+
             // 수행시간 확인
             $time_end = microtime(true);
             $elapsed_time = $time_end - $time_start;

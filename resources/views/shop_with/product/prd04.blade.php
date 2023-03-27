@@ -284,7 +284,7 @@
 				if (params.node.rowPinned === 'top') {
                     return params.value;
                 } else if (params.data) {
-					return '<a href="#" onclick="return OpenStoreStockPopup(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + Comma(params.value) + '</a>';
+					return '<a href="#" onclick="return OpenShopStockPopup(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + Comma(params.value) + '</a>';
                 } else if (params.node.aggData) {
 					return `<a href="#" onclick="return OpenStockPopup('${params.node.key}', '${$("[name=sdate]").val() || ''}');">${Comma(params.value)}</a>`;
 				}
@@ -392,7 +392,7 @@
 		var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1000,height=900");
 	}
 
-	function OpenStoreStockPopup(prd_cd, date) {
+	function OpenShopStockPopup(prd_cd, date) {
 		var url = `/shop/stock/stk01/${prd_cd}?date=${date}`;
 		var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1000,height=900");
 	}

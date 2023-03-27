@@ -1404,6 +1404,7 @@ class stk03Controller extends Controller
         $cfg_img_size_detail	= SLib::getCodesValue("G_IMG_SIZE","detail");
         $cfg_img_size_real		= SLib::getCodesValue("G_IMG_SIZE","real");
         $cfg_bank_code			= SLib::getCodes("G_BANK_CODE");
+        $user_store             = Auth('head')->user()->store_cd;
 
         // 현금영수증 사용여부 설정값 얻기
         $cfg_cash_use_yn		= $conf->getConfigValue("shop","cash_use_yn", "N");
@@ -1575,13 +1576,13 @@ class stk03Controller extends Controller
                     ), 0
                  ) as wqty
                 , ifnull(
-                    ( select sum(good_qty) from goods_summary
-                        where goods_no = g.goods_no and goods_sub = g.goods_sub and goods_opt = o.goods_opt
+                    ( select sum(qty) from product_stock_store
+                        where goods_no = g.goods_no and goods_opt = o.goods_opt and store_cd = '$user_store'
                     ), 0
                  ) as jaego_qty
                 , ifnull(
-                    ( select sum(wqty) from goods_summary
-                        where goods_no = g.goods_no and goods_sub = g.goods_sub and goods_opt = o.goods_opt
+                    ( select sum(wqty) from product_stock_store
+                        where goods_no = g.goods_no and goods_opt = o.goods_opt and store_cd = '$user_store'
                     ), 0
                  ) as stock_qty
                  , o.coupon_amt,o.dc_amt, o.dlv_amt, o.recv_amt

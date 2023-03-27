@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\head\api;
+namespace App\Http\Controllers\shop\api;
 
 use App\Components\SLib;
 use App\Components\Lib;
@@ -17,7 +17,7 @@ class template extends Controller
     public function index(Request $req){
         $values = [  ];
 
-        return view( Config::get('shop.head.view') . "/common/template", $values);
+        return view( Config::get('shop.shop.view') . "/common/template", $values);
     }
 
     public function search() {

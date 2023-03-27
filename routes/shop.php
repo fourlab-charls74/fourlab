@@ -77,8 +77,18 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         Route::get('prdcd/search_p', 'goods@search_prdcd_p');
 
         // sms
-        Route::get('sms/{type}', 'SmsController@index');
+        // Route::get('sms/{type}', 'SmsController@index');
+        
         Route::get('sms/search/member', 'SmsController@search_member');
+        Route::get('sms/search', 'SmsController@search');
+        Route::get('sms/{type}', 'SmsController@index');
+        Route::put('sms/send', 'SmsController@sendMsg');
+
+
+        //템플릿 선택
+        Route::get('template', 'template@index');
+        Route::get('template/search', 'template@search');
+        Route::get('template/detail/{no}', 'template@detail');
 
         //판매유형검색
         Route::get('sale/search_sell_type', 'goods@search_sell_type');
@@ -497,12 +507,37 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         Route::get('ord01/search', 'ord01Controller@search');
         Route::delete('ord01', 'ord01Controller@del_order'); // 출고 전 주문삭제
         Route::get('ord01/create', 'ord01Controller@create');
+        Route::get('ord01/view', 'ord01Controller@view');
         Route::post('ord01/save', 'ord01Controller@save');
         Route::get('ord01/batch-create', 'ord01Controller@batch_create');
         Route::post('ord01/batch-import', 'ord01Controller@batch_import');
         Route::put('ord01/batch-add', 'ord01Controller@batch_add');
         Route::get('ord01/order/{ord_no}/{ord_opt_no?}', 'ord01Controller@show'); // 매장주문 상세
         Route::post('ord01/order/store_refund', 'ord01Controller@store_refund_save'); // 매장환불처리
+        Route::get('ord01/refund/{ord_no}/{ord_opt_no?}', 'ord01Controller@refund');
+
+        Route::get('ord01/receipt/{ord_no}', 'ord01Controller@receipt');
+        Route::get('ord01/dlv/{ord_no}/{ord_opt_no}', 'ord01Controller@dlv');
+        Route::get('ord01/order-list/{ord_no}', 'ord01Controller@order_list');
+        Route::get('ord01/order-goods/{ord_no}/{ord_opt_no}', 'ord01Controller@order_goods');
+        Route::get('ord01/get/{ord_no}/{ord_opt_no?}', 'ord01Controller@get');
+        Route::get('ord01/{ord_no}/{ord_opt_no}/cash', 'ord01Controller@show_cash');
+        Route::get('ord01/{ord_no}/cash/list', 'ord01Controller@search_cash_receipt_list');
+        Route::get('ord01/{ord_no}/{ord_opt_no}/tax', 'ord01Controller@show_tax');
+        Route::get('ord01/{ord_no}/tax/list', 'ord01Controller@search_tax_receipt_list');
+
+        Route::put('ord01/dlv-info-save/{ord_no}', 'ord01Controller@dlv_info_save');
+        Route::put('ord01/claim-save', 'ord01Controller@claim_save');
+        Route::put('ord01/order-save', 'ord01Controller@order_save');
+        Route::put('ord01/update/order-state', 'ord01Controller@update_order_state');
+        Route::put('ord01/dlv-comment', 'ord01Controller@dlv_comment');
+        Route::put('ord01/order-memo', 'ord01Controller@order_memo');
+        Route::put('ord01/cancel-order', 'ord01Controller@cancel_orders');
+        Route::put('ord01/confirm-orders', 'ord01Controller@confirm_orders');
+        Route::put('ord01/claim-message-save', 'ord01Controller@claim_message_save');
+        Route::put('ord01/order-goods/{ord_no}/{ord_opt_no}', 'ord01Controller@order_goods_save');
+        Route::put('ord01/{ord_no}/{ord_opt_no}/cash-receipt', 'ord01Controller@set_cash_receipt');
+        Route::put('ord01/{ord_no}/{ord_opt_no}/tax-receipt', 'ord01Controller@set_tax_receipt');
 
         // 온라인 주문접수
         Route::get('ord02','ord02Controller@index');
