@@ -97,8 +97,11 @@
     }
 
     function locate() {
-        window.opener.location.href = "/shop/stock/stk31";
-        window.close();
+        if(confirm('공지사항 메뉴로 이동시 자동으로 읽음 처리 됩니다.\r\n이동하시겠습니까?')){
+            noticeRead();
+            window.opener.location.href = "/shop/stock/stk31";
+            window.close();
+        }
     }
 </script>
 @stop
