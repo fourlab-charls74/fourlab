@@ -151,6 +151,7 @@
     function locate(kind) {
         let url = '';
         let msg = '';
+        let msg_cd = "{{$msg_cd}}";
 
         if(kind == 'S' || kind == '') {
             url = "/store/stock/stk32";
@@ -162,11 +163,28 @@
             url = "/store/standard/std11";
             msg = '수선관리 메뉴로 이동시 자동으로 읽음 처리 됩니다.\r\n이동하시겠습니까?';
         }
-        if(confirm(msg)){
-            msgRead();
-            window.opener.location.href = url;
-            window.close();
+
+        if(!confirm(msg)){
+            return false;
         }
+
+        axios({
+            method: 'put',
+            url: '/store/stock/stk32/msg_read',
+            data: { 
+                msg_cd : msg_cd
+            }
+        }).then(function (res) {
+            if(res.data.code == '200') {
+                alert('읽음 처리 되었습니다.');
+                window.opener.location.href = url;
+                window.close();
+            } else {
+                alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
     }
 </script>
 @stop

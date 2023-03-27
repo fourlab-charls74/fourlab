@@ -97,11 +97,31 @@
     }
 
     function locate() {
-        if(confirm('공지사항 메뉴로 이동시 자동으로 읽음 처리 됩니다.\r\n이동하시겠습니까?')){
-            noticeRead();
-            window.opener.location.href = "/shop/stock/stk31";
-            window.close();
+        let ns_cd = "{{$storeCode->ns_cd}}";
+        let store_cd = "{{$storeCode->store_cd}}";
+
+        if(!confirm('공지사항 메뉴로 이동시 자동으로 읽음 처리 됩니다.\r\n이동하시겠습니까?')){
+            return false;
         }
+
+        axios({
+            method: 'put',
+            url: '/shop/stock/stk31/notice_read',
+            data: {
+                ns_cd : ns_cd,
+                store_cd : store_cd,
+            }
+        }).then(function (res) {
+            if(res.data.code == '200') {
+                alert('읽음 처리 되었습니다.');
+                window.opener.location.href = "/shop/stock/stk31";
+                window.close();
+            } else {
+                alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
     }
 </script>
 @stop
