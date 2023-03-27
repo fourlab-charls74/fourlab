@@ -151,18 +151,14 @@ class cs02Controller extends Controller
                     ]);
                 
                 $sql = "
-                    select
-                        sr.sgr_cd, 
-                        sr.sgr_prd_cd,
-                        sr.prd_cd,
-                        sr.return_qty,
-                        pc.goods_opt,
-                        g.goods_no,
-                        g.price,
-                        g.wonga
+                    select sr.sgr_cd, sr.sgr_prd_cd, sr.prd_cd, sr.return_qty
+                        , pc.goods_opt, pc.goods_no
+                        , if(pc.goods_no = 0, p.price, g.price) as price
+                        , if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
                     from storage_return_product sr
+                        inner join product p on p.prd_cd = sr.prd_cd
                         inner join product_code pc on pc.prd_cd = sr.prd_cd
-                        inner join goods g on g.goods_no = pc.goods_no
+                        left outer join goods g on g.goods_no = pc.goods_no
                     where sr.sgr_cd = :sgr_cd
                 ";
                 $rows = DB::select($sql, ["sgr_cd" => $d['sgr_cd']]);
@@ -357,40 +353,46 @@ class cs02Controller extends Controller
     {
         $sgr_cd = $request->input('sgr_cd', '');
         $sql = "
-            select 
-                @rownum := @rownum + 1 as count,
-                srp.sgr_prd_cd, 
-                srp.sgr_cd, 
-                srp.prd_cd,
-                concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p,
-                pc.color,
-                pc.size,
-                pc.goods_no,
-                ifnull(type.code_val, 'N/A') as goods_type,
-                op.opt_kind_nm,
-                b.brand_nm as brand, 
-                g.style_no, 
-                -- stat.code_val as sale_stat_cl, 
-                g.goods_nm,
-                pc.goods_opt,
-                g.goods_sh,
-                srp.price,
-                srp.return_price, 
-                ifnull(pss.wqty, 0) as storage_wqty, 
-                srp.return_qty as qty,
-                (srp.return_qty * srp.return_price) as total_return_price,
-                true as isEditable
-            from storage_return_product srp
-                inner join product_code pc on pc.prd_cd = srp.prd_cd
-                inner join goods g on g.goods_no = pc.goods_no
-                left outer join storage_return sr on sr.sgr_cd = srp.sgr_cd
-                left outer join product_stock_storage pss on pss.storage_cd = sr.storage_cd and pss.prd_cd = srp.prd_cd
-                left outer join brand b on b.brand = g.brand
-                left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
-                left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
-                -- left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
+            select a.*
+                , if (a.goods_no = 0, a.opt, a.opt_kind_cd) as opt_kind_cd
+                , if (a.goods_no = 0, c.code_val, opt.opt_kind_nm) as opt_kind_nm
+            from (
+                select 
+                    @rownum := @rownum + 1 as count,
+                    srp.sgr_prd_cd, 
+                    srp.sgr_cd, 
+                    srp.prd_cd,
+                    pc.prd_cd_p,
+                    pc.goods_no,
+                    if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm,
+                    if(pc.goods_no = 0, p.prd_nm_eng, g.goods_nm_eng) as goods_nm_eng,
+                    if(pc.goods_no = 0, p.style_no, g.style_no) as style_no,
+                    if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh,
+                    pc.color,
+                    pc.size,
+                    pc.goods_opt,
+                    pc.opt,
+                    g.opt_kind_cd,
+                    pc.brand as brand_cd,
+                    b.brand_nm as brand,
+                    srp.price,
+                    srp.return_price, 
+                    ifnull(pss.wqty, 0) as storage_wqty, 
+                    srp.return_qty as qty,
+                    (srp.return_qty * srp.return_price) as total_return_price,
+                    true as isEditable
+                from storage_return_product srp
+                    inner join product_code pc on pc.prd_cd = srp.prd_cd
+                    inner join product p on p.prd_cd = srp.prd_cd
+                    left outer join goods g on g.goods_no = pc.goods_no
+                    left outer join storage_return sr on sr.sgr_cd = srp.sgr_cd
+                    left outer join product_stock_storage pss on pss.storage_cd = sr.storage_cd and pss.prd_cd = srp.prd_cd
+                    left outer join brand b on b.br_cd = pc.brand
                 , (select @rownum :=0) as r
-            where srp.sgr_cd = :sgr_cd
+                where srp.sgr_cd = :sgr_cd
+            ) a
+                left outer join opt opt on opt.opt_kind_cd = a.opt_kind_cd and opt.opt_id = 'K'
+                left outer join code c on c.code_kind_cd = 'PRD_CD_OPT' and c.code_id = a.opt
         ";
         $products = DB::select($sql, ['sgr_cd' => $sgr_cd]);
 
@@ -442,10 +444,13 @@ class cs02Controller extends Controller
 
             foreach($products as $product) {
                 $sql = "
-                    select pc.prd_cd, pc.goods_no, pc.goods_opt, g.price, g.wonga
-                    from product_code pc
-                        inner join goods g on g.goods_no = pc.goods_no
-                    where prd_cd = :prd_cd
+                    select pc.prd_cd, pc.goods_opt, pc.goods_no
+                        , if(pc.goods_no = 0, p.price, g.price) as price
+                        , if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
+                    from product p
+                        inner join product_code pc on pc.prd_cd = p.prd_cd
+                        left outer join goods g on g.goods_no = pc.goods_no
+                    where p.prd_cd = :prd_cd
                 ";
                 $prd = DB::selectOne($sql, ['prd_cd' => $product['prd_cd']]);
                 if($prd == null) continue;
@@ -683,40 +688,40 @@ class cs02Controller extends Controller
             $return_qty = $d['return_qty'];
             $count = $d['count'] ?? '';
             $sql = "
-                select
-                    g.goods_no
-                    , ifnull( type.code_val, 'N/A') as goods_type
-                    , com.com_nm
-                    , opt.opt_kind_nm
-                    , brand.brand_nm as brand
-                    , g.style_no
-                    , g.goods_nm
-                    , g.goods_nm_eng
-                    -- , stat.code_val as sale_stat_cl
-                    , g.price
-                    , g.wonga
-                    , g.goods_sh 
-                    , g.goods_type as goods_type_cd
-                    , com.com_type as com_type_d
-                    , s.prd_cd , s.goods_opt
-                    , ps.qty as storage_qty, ps.wqty as storage_wqty
-                    , '$return_price' as return_price, '$return_qty' as qty
-                    , true as isEditable
-                    , '$count' as count
-                    , ('$return_price' * '$return_qty') as total_return_price
-                from goods g inner join product_stock s on g.goods_no = s.goods_no
-                    left outer join product_stock_storage ps on s.prd_cd = ps.prd_cd and ps.storage_cd = '$storage_cd'
-                    left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
-                    left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
-                    -- left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
-                    left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
-                    left outer join company com on com.com_id = g.com_id
-                    left outer join brand brand on brand.brand = g.brand
-                    left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
-                    left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
-                    left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
-                where s.prd_cd = '$prd_cd'
-                limit 1
+                select a.*, com.com_nm, com.com_type as com_type_d
+                    , if (a.goods_no = 0, a.opt, a.opt_kind_cd) as opt_kind_cd
+                    , if (a.goods_no = 0, c.code_val, opt.opt_kind_nm) as opt_kind_nm
+                from (
+                    select pc.prd_cd, pc.goods_no, pc.goods_opt, p.style_no, pc.opt
+                        , pc.brand as brand_cd
+                        , if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
+                        , if(pc.goods_no = 0, p.prd_nm_eng, g.goods_nm_eng) as goods_nm_eng
+                        , if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
+                        , if(pc.goods_no = 0, p.price, g.price) as price
+                        , if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
+                        , if(pc.goods_no = 0, p.com_id, g.com_id) as com_id
+                        , g.goods_type as goods_type_cd
+                        , ifnull(type.code_val, 'N/A') as goods_type
+                        , g.opt_kind_cd
+                        , b.brand_nm as brand
+                        , ps.qty as storage_qty, ps.wqty as storage_wqty
+                        , '$return_price' as return_price, '$return_qty' as qty
+                        , true as isEditable
+                        , '$count' as count
+                        , ('$return_price' * '$return_qty') as total_return_price
+                    from product_code pc
+                        inner join product p on p.prd_cd = pc.prd_cd
+                        inner join product_stock s on pc.prd_cd = s.prd_cd
+                        left outer join product_stock_storage ps on s.prd_cd = ps.prd_cd and ps.storage_cd = '$storage_cd'
+                        left outer join goods g on g.goods_no = pc.goods_no
+                        left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
+                        left outer join brand b on b.br_cd = pc.brand
+                    where pc.prd_cd = '$prd_cd'
+                    limit 1
+                ) a
+                    left outer join company com on com.com_id = a.com_id
+                    left outer join opt opt on opt.opt_kind_cd = a.opt_kind_cd and opt.opt_id = 'K'
+                    left outer join code c on c.code_kind_cd = 'PRD_CD_OPT' and c.code_id = a.opt
             ";
             $row = DB::selectOne($sql);
             array_push($result, $row);

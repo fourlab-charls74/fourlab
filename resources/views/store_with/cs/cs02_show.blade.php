@@ -157,7 +157,16 @@
         {field: "opt_kind_nm", headerName: "품목", width: 70, cellStyle: {"text-align": "center"}},
         {field: "brand", headerName: "브랜드", width: 70, cellStyle: {"text-align": "center"}},
         {field: "style_no",	headerName: "스타일넘버", width: 70, cellStyle: {"text-align": "center"}},
-        {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 200},
+        {field: "goods_nm",	headerName: "상품명", width: 200,
+            cellRenderer: (params) => {
+                if (params.data.goods_no === undefined) return '';
+                if (params.data.goods_no != '0') {
+                    return '<a href="javascript:void(0);" onclick="return openHeadProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
+                } else {
+                    return '<a href="javascript:void(0);" onclick="return alert(`온라인코드가 없는 상품입니다.`);">' + params.value + '</a>';
+                }
+            }   
+        },
         {field: "goods_nm_eng",	headerName: "상품명(영문)", width: 200},
         {field: "prd_cd_p", headerName: "품번", width: 90, cellStyle: {"text-align": "center"}},
         {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
@@ -175,6 +184,7 @@
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
         {field: "total_return_price", headerName: "반품금액", width: 65, type: 'currencyType'},
+        {width: "auto"}
     ];
 </script>
 
@@ -346,7 +356,7 @@
 
     // 상품 추가
     function addGoods() {
-        const url = `/store/api/goods/show?storage_cd=` + document.f1.storage_cd.value;
+        const url = `/store/api/goods/show?storage_cd=` + document.f1.storage_cd.value + "&include_not_match=Y";
         window.open(url, "_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1800,height=1000");
     }
 
