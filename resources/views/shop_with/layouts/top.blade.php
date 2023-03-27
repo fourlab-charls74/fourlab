@@ -21,7 +21,14 @@
                 <li><a href="" class="history"></a></li>
                 {{--<!-- <li><a href="" class="cart"></a></li>
                 <li><a href="javascript:void(0);" onclick="return openSmsList();" class="mail act"></a></li> -->--}}
-                <li><a href="stk31" class="notice act"></a></li>
+                <li>
+                    <div class="dropdown">
+                        <a href="javascript:;" class="notice act" id="em_cnt" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right p-0" id="em_subject">
+                        </div>
+                    </div>
+                </li>
                 <li>
                     <div class="dropdown">
                         <button type="button" class="profile_btn btn header-item waves-effect notice" id="page-header-user-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -59,3 +66,51 @@
     <a href="" class="now_page"><span></span> <i class="bx bx-chevron-down fs-18"></i></a>
     <ul class="page_list"></ul>
 </div>
+<script>
+    $(document).ready(function(){
+        noticeAct();
+    });
+    
+    // 미확인 공지사항 상단 아이콘 표시
+    function noticeAct() {
+        localStorage.removeItem("n_readMsg_cnt");
+        localStorage.removeItem("n_readMsg");
+
+        if( grade=="P" && store_cd != "" ) {
+            $.ajax({
+				async: true,
+				type: 'get',
+				url: '/shop/stock/stk31/popup_chk',
+				data: {
+					"store_cd": store_cd
+				},
+				success: function(data) {
+                    if(data.cnt > 0) {
+                        localStorage.setItem("n_readMsg_cnt", data.cnt);
+                        let cnt = window.localStorage.getItem('n_readMsg_cnt');
+                        document.getElementById("em_cnt").innerHTML = '<em>'+cnt+'</em>';
+                        
+                        let msgObj = {};
+                        $.each(data.nos, function(i, item){
+                            item.content = item.content.replace(/<[^>]*>?/g, ''); 
+                            msgObj[item.ns_cd] = "<span style='font-weight:bold;'>" + item.subject + "</span><font style='size:9px;'>" + item.content + "</font>";
+                        });
+                        localStorage.setItem("n_readMsg", JSON.stringify(msgObj));
+                        let nReadMsg = localStorage.getItem("n_readMsg");
+                        nReadMsg = JSON.parse(nReadMsg);
+
+                        $.each(nReadMsg, function(i, item){
+                            $('#em_subject').prepend(`<a class="dropdown-item" href="/shop/stock/stk31/notice/${i}">${item}</a>`);
+                        });
+                    } else if(data.cnt == 0) {
+                        $('#em_subject').prepend(`<a class="dropdown-item" href="#">공지사항을 모두 읽었습니다.</a>`);
+                    }
+				},
+				error: function(request, status, error) {
+					console.log("error")
+				}
+			});
+        }
+    }
+
+</script>
