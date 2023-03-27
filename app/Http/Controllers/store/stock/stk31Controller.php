@@ -181,6 +181,7 @@ class stk31Controller extends Controller
                     'admin_nm' => $admin_nm,
                     'admin_email' => $email,
                     'all_store_yn' => $all_store_yn,
+                    'store_notice_type' => '01',
                     'cnt' => 0,
                     'rt' => $rt
                 ]);
