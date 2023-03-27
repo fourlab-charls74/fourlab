@@ -251,7 +251,7 @@
 
     function downloadFile(path) {
         $.ajax({
-            url: `/store/stock/stk31/file/download/${path.split('/').reverse()[0]}`,
+            url: `/store/common/comm01/file/download/${path.split('/').reverse()[0]}`,
             type: 'GET',
             cache: false,
             xhrFields: {
@@ -328,7 +328,7 @@
 
         $.ajax({
             method: 'POST',
-            url: '/store/stock/stk31/store',
+            url: '/store/common/comm01/store',
             data: formData,
             cache: false,
             contentType: false,
@@ -337,7 +337,7 @@
                 if (data.code == '200') {
                     clearFormData();
                     alert('게시물 등록에 성공하였습니다.');
-                    document.location.href = `/store/stock/stk31/${type}`;
+                    document.location.href = `/store/common/comm01/${type}`;
                 } else {
                     clearFormData();
                     alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
@@ -354,7 +354,7 @@
 
         $.ajax({
             method: 'delete',
-            url: `/store/stock/stk31/file/delete/${path.split('/').reverse()[0]}`,
+            url: `/store/common/comm01/file/delete/${path.split('/').reverse()[0]}`,
             success: function(data) {
                 if (data.code == '200') {
                     alert('파일 삭제에 성공하였습니다.');
@@ -376,7 +376,7 @@
 
         $.ajax({
             method: 'PUT',
-            url: '/store/stock/stk31/edit/' + no,
+            url: '/store/common/comm01/edit/' + no,
             data: frm.serialize(),
             success: function(data) {
                 if (data.code == '200') {
@@ -409,7 +409,7 @@
         if(confirm("삭제하시겠습니까?")){
             $.ajax({
                 method: 'post',
-                url: '/store/stock/stk31/del_store',
+                url: '/store/common/comm01/del_store',
                 data: {data_store : store_cd, ns_cd : ns_cd},
                 success: function(data) {
                     if (data.code == '200') {

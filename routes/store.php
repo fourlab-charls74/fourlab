@@ -323,6 +323,19 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         
     });
 
+    //게시판
+    Route::prefix("common")->namespace('common')->group(function () {
+        Route::get('comm01/{notice_id}','comm01Controller@index');
+        Route::get('comm01/{notice_id}/search', 'comm01Controller@search');
+        Route::get('comm01/{notice_id}/create', 'comm01Controller@create');
+        Route::get('comm01/show/{notice_id}/{no}', 'comm01Controller@show');
+        Route::get('comm01/file/download/{path}', 'comm01Controller@download_file');
+        Route::delete('comm01/file/delete/{path}', 'comm01Controller@delete_file');
+        Route::post('comm01/store', 'comm01Controller@store');
+        Route::put('comm01/edit/{no}', 'comm01Controller@update');
+        Route::post('comm01/del_store', 'comm01Controller@del_store');
+    });
+
     //매장관리
     Route::prefix("stock")->namespace('stock')->group(function () {
 
@@ -460,12 +473,14 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('stk30/batch-getgoods', 'stk30Controller@get_goods');
         Route::put('stk30/save', 'stk30Controller@save');
 
-        // 매장 공지사항
-        Route::get('stk31','stk31Controller@index');
-        Route::get('stk31/search', 'stk31Controller@search');
-        Route::get('stk31/create', 'stk31Controller@create');
-        Route::get('stk31/{no}', 'stk31Controller@show');
-        Route::put('stk31/store', 'stk31Controller@store');
+        // 매장 및 vmd 공지사항
+        Route::get('stk31/{notice_id}','stk31Controller@index');
+        Route::get('stk31/{notice_id}/search', 'stk31Controller@search');
+        Route::get('stk31/{notice_id}/create', 'stk31Controller@create');
+        Route::get('stk31/show/{notice_id}/{no}', 'stk31Controller@show');
+        Route::get('stk31/file/download/{path}', 'stk31Controller@download_file');
+        Route::delete('stk31/file/delete/{path}', 'stk31Controller@delete_file');
+        Route::post('stk31/store', 'stk31Controller@store');
         Route::put('stk31/edit/{no}', 'stk31Controller@update');
         Route::post('stk31/del_store', 'stk31Controller@del_store');
 

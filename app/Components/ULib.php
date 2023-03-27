@@ -4,6 +4,7 @@ namespace App\Components;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class ULib
 {
@@ -36,6 +37,18 @@ class ULib
         
         return sprintf('%s', $save_file);
     }
+
+    public static function uploadFile($save_path, $file_name, $file) {	
+        if (!Storage::disk('public')->exists($save_path)) {
+            Storage::disk('public')->makeDirectory($save_path);
+        }
+
+        $file_path = sprintf("%s", $save_path);
+        Storage::disk('public')->putFileAs($file_path, $file, $file_name);
+
+        return sprintf('%s/%s', $file_path, $file_name);
+        //return storage::url($file_path);
+	}
 
     public static function deleteFile($path) {
         Storage::disk('public')->delete($path);

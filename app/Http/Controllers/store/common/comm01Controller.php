@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\store\stock;
+namespace App\Http\Controllers\store\common;
 
 use App\Http\Controllers\Controller;
 use App\Components\Lib;
@@ -15,7 +15,7 @@ use GuzzleHttp;
 use App\Models\Conf;
 use Illuminate\Support\Facades\Storage;
 
-class stk31Controller extends Controller
+class comm01Controller extends Controller
 {
     public function index($notice_id, Request $request)
     {
@@ -28,7 +28,7 @@ class stk31Controller extends Controller
             'sdate' => $sdate,
             'edate' => date("Y-m-d")
         ];
-        return view(Config::get('shop.store.view') . '/stock/stk31', $values);
+        return view(Config::get('shop.store.view') . '/common/comm01', $values);
     }
 
     // 검색
@@ -123,7 +123,7 @@ class stk31Controller extends Controller
 
         $values = ['no' => $no, 'user' => $user, 'store_notice_type' => $notice_id];
 
-        return view(Config::get('shop.store.view') . '/stock/stk31_show', $values);
+        return view(Config::get('shop.store.view') . '/common/comm01_show', $values);
     }
 
     public function show($notice_id, $no)
@@ -153,7 +153,7 @@ class stk31Controller extends Controller
             'store_notice_type' => $notice_id
         ];
 
-        return view(Config::get('shop.store.view') . '/stock/stk31_show', $values);
+        return view(Config::get('shop.store.view') . '/common/comm01_show', $values);
     }
 
     public function store(Request $request)
