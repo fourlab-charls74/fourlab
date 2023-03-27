@@ -171,37 +171,30 @@ class PosController extends Controller
         $cfg_img_size_real = "a_500";
         $cfg_img_size_list = "a_500";
 
-        $sql = " 
-            select 
-                pc.prd_cd
-                , concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_sm
-                , c.code_val as color
-                , size.code_val2 as size
-                , g.goods_no
-                , g.goods_sub
-                , g.goods_type as goods_type_cd
-                , pc.goods_opt
-                , pc.brand
-                , g.goods_nm
-                , g.style_no
-                , g.price
-                , g.price as ori_price
-                , g.goods_sh
-                , ps.wqty
+        $sql = "
+            select pc.prd_cd, pc.prd_cd_p as prd_cd_sm
+                , pc.goods_no, g.goods_sub, g.goods_nm, g.goods_nm_eng, pc.goods_opt, g.style_no
+                , g.goods_type as goods_type_cd, g.brand, g.price, g.price as ori_price, g.goods_sh
                 , if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
                     select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
                     from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
                 )) as img
+                , ps.wqty
+                , color.code_val as color
+                , if(pc.gender in ('M', 'W', 'U'), size.code_val, size.code_val2) as size
                 , '' as sale_type
                 , '' as pr_code
                 , '' as coupon_no
             from product_code pc
+                inner join product_stock_store ps on ps.prd_cd = pc.prd_cd
                 inner join goods g on g.goods_no = pc.goods_no
-                inner join product_stock_store ps on ps.prd_cd = pc.prd_cd and ps.store_cd = '$store_cd'
-                inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = pc.color
-                inner join code size on size.code_kind_cd = 'PRD_CD_SIZE_MATCH' and size.code_val = pc.size
-            where 1=1 $where
-            order by (CASE WHEN pc.year = '99' THEN 0 ELSE 1 END) desc, pc.year desc
+                inner join code color on color.code_kind_cd = 'PRD_CD_COLOR' and color.code_id = pc.color
+                inner join code size on size.code_kind_cd = if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', if(pc.gender = 'U', 'PRD_CD_SIZE_UNISEX', 'PRD_CD_SIZE_MATCH'))) and size.code_id = pc.size
+                left outer join (select prd_cd, store_cd from product_stock_release where type = 'F' and state >= 30 group by prd_cd) psr on psr.prd_cd = pc.prd_cd and psr.store_cd = ps.store_cd   -- 해당매장에 초도출고된적이 있는 상품만 검색가능하도록 설정
+            where ps.store_cd = '$store_cd' and if(ps.wqty > 0, 1=1, psr.prd_cd is not null) $where
+            order by (case when pc.year = '99' then 0 else 1 end) desc
+                , (case when pc.brand = 'F' then 0 else 1 end) asc
+                , pc.prd_cd desc
             $limit
         ";
         $rows = DB::select($sql);
@@ -210,9 +203,11 @@ class PosController extends Controller
             $sql = "
                 select count(*) as total
                 from product_code pc
+                    inner join product_stock_store ps on ps.prd_cd = pc.prd_cd
                     inner join goods g on g.goods_no = pc.goods_no
-                    inner join product_stock_store ps on ps.prd_cd = pc.prd_cd and ps.wqty > 0 and ps.store_cd = '$store_cd'
-                where 1=1 $where
+                    inner join code color on color.code_kind_cd = 'PRD_CD_COLOR' and color.code_id = pc.color
+                    inner join code size on size.code_kind_cd = if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', if(pc.gender = 'U', 'PRD_CD_SIZE_UNISEX', 'PRD_CD_SIZE_MATCH'))) and size.code_id = pc.size
+                where ps.store_cd = '$store_cd' $where
 			";
             $row = DB::selectOne($sql);
             $total = $row->total;
@@ -537,6 +532,8 @@ class PosController extends Controller
 
                 ######################### 재고수량 판매가능여부 체크 ############################
                 $prd_wqty = DB::table('product_stock_store')->where('prd_cd', $prd_cd)->where('store_cd', $store_cd)->value('wqty');
+
+                // 재고부족할 경우, 예약판매기능 추가 필요 (작업중입니다.)
 
                 if (($goods->is_unlimited === 'Y' && $prd_wqty < 1) || $qty > $prd_wqty) {
                     $code = '-105';
