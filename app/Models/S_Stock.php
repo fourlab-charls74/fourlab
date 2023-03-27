@@ -430,19 +430,34 @@ class S_Stock
 
     private function __GetPartnerGoodsWonga($com_id, $price, $ord_date)
     {
-        $sql = "
-			select wonga
-			from goods_wonga
-			where goods_no = '$this->goods_no'
-				and goods_sub ='0'
-				-- and com_id = '$com_id'
-				and price = '$price'
-				and sdate <= '$ord_date'
-				and edate >= '$ord_date'
-			order by regi_date desc limit 0,1
-        ";
+        $goods_no = $this->goods_no;
 
-        return DB::selectOne($sql)->wonga;
+        if ($goods_no == 0 || $goods_no == '') {
+            $prd_cd = $this->prd_cd;
+
+            $sql = "
+                select wonga
+                from order_opt_wonga
+                where ord_state_date = '$ord_date'
+                    and prd_cd = '$prd_cd'
+                    and price = '$price'
+                order by ord_wonga_no desc
+            ";
+        } else {
+            $sql = "
+                select wonga
+                from goods_wonga
+                where goods_no = '$goods_no'
+                    and goods_sub ='0'
+                    -- and com_id = '$com_id'
+                    and price = '$price'
+                    and sdate <= '$ord_date'
+                    and edate >= '$ord_date'
+                order by regi_date desc limit 0,1
+            ";
+        }
+
+        return DB::selectOne($sql)->wonga ?? 0;
     }
 
     public function MinusQty($goods_no, $prd_cd, $goods_opt, $qty, $wonga, $is_unlimited = "N")
@@ -463,10 +478,7 @@ class S_Stock
                 in_qty = in_qty - $qty
                 $qty_sql
                 , ut = now()
-            where goods_no = '$goods_no' 
-                and prd_cd = '$prd_cd'
-                and goods_opt = '$goods_opt'
-                and qty >= '$qty'
+            where prd_cd = '$prd_cd' and qty >= '$qty'
         ";
 
         return DB::update($sql);
@@ -481,10 +493,7 @@ class S_Stock
                 wqty = wqty - $qty
                 , qty = qty - $qty
                 , ut = now()
-            where goods_no = '$goods_no'
-                and prd_cd = '$prd_cd'
-                and goods_opt = '$goods_opt'
-                and storage_cd = '$storage_cd'
+            where prd_cd = '$prd_cd' and storage_cd = '$storage_cd'
         ");
     }
 
@@ -740,10 +749,8 @@ class S_Stock
                 wqty = wqty + $qty
                 , qty = qty + $qty
                 , ut = now()
-            where goods_no = '$goods_no'
+            where storage_cd = '$storage_cd'
                 and prd_cd = '$prd_cd'
-                and goods_opt = '$goods_opt'
-                and storage_cd = '$storage_cd'
         ");
         if ($affected_rows > 0) return $affected_rows;
 
@@ -817,11 +824,9 @@ class S_Stock
                     in_qty = in_qty + $qty
                     $qty_sql
                     , ut = now()
-                where goods_no = '$goods_no' 
-                    and prd_cd = '$prd_cd'
-                    and goods_opt = '$goods_opt'
+                where prd_cd = '$prd_cd'
             ";
-    
+
             $result_code = DB::update($sql);
         } else {
             $params = [

@@ -656,8 +656,7 @@ class cs01Controller extends Controller {
 
 				$sql = "
 					update product_stock_order_product set state = '-10'
-					where stock_no = '$stock_no' and goods_no = '$goods_no' and prd_cd = '$prd_cd'
-							and opt_kor = '$opt' and cost = '$cost'
+					where stock_no = '$stock_no' and prd_cd = '$prd_cd' and cost = '$cost'
 				";
 				DB::update($sql);
 			}
@@ -868,7 +867,7 @@ class cs01Controller extends Controller {
 						$prd_cd = $row['prd_cd'] ?? '';
 						$style_no = $row['style_no'] ?? '';
 						$goods_no = $row['goods_no'] ?? 0;
-						
+
 						$exp_qty = $row['exp_qty'] ?? 0;
 						$qty = $row['qty'] ?? 0;
 						$unit_cost = str_replace(",","",str_replace("\\","",$row['unit_cost'])) ?? 0; // 단가
@@ -920,10 +919,13 @@ class cs01Controller extends Controller {
 							DB::table('product_stock_hst')
 								->where('prd_cd', $prd_cd)->where('type', '1')->where('invoice_no', $invoice_no)
 								->update([ 'wonga' => $cost ]);
-							
+
 							// 입고완료 이후 수량 변경 시 재고 업데이트 (슈퍼권한)
 							if ($id == SUPER_ADMIN_ID) {
-								$plus_qty = array_filter($ori_products, function($p) use ($prd_cd, $qty) {return $p->prd_cd == $prd_cd && $p->qty != $qty;});
+								$plus_qty = array_reduce($ori_products, function($a, $c) use ($prd_cd, $qty) { 
+									if ($c->prd_cd == $prd_cd && $c->qty != $qty) return array_merge($a, [$c]); 
+									else return $a;
+								}, []);
 								if ($plus_qty != null && count($plus_qty) > 0) {
 									$plus_qty = $plus_qty[0]->qty;
 									$plus_qty = $qty - $plus_qty;
@@ -936,7 +938,10 @@ class cs01Controller extends Controller {
 								$this->confirmWonga($stock_no, $prd_cd, $goods_no, $qty, $cost, $invoice_no);
 							} else if ($state == 40 && $id == SUPER_ADMIN_ID) {
 								// 재원가확정
-								$stk_ord_product = array_filter($stk_ord_products, function($p) use ($prd_cd) {return $p->prd_cd == $prd_cd;});
+								$stk_ord_product = array_reduce($stk_ord_products, function($a, $c) use ($prd_cd) { 
+									if ($c->prd_cd === $prd_cd) return array_merge($a, [$c]); 
+									else return $a;
+								}, []);
 								if (count($stk_ord_product) > 0) $stk_ord_product = $stk_ord_product[0];
 								$this->updateConfirmedWonga($stock_no, $prd_cd, $goods_no, $qty, $cost, $prd_tariff_rate, $invoice_no, $ori_product_stock, $stk_ord_product);
 							}
@@ -1085,7 +1090,7 @@ class cs01Controller extends Controller {
 	private function updateConfirmedWonga($stock_no, $prd_cd, $goods_no, $qty, $cost, $prd_tariff_rate, $invoice_no, $ori_product_stock, $stk_ord_product)
 	{
 		$stock = DB::table('product_stock')->select('wonga', 'in_qty')->where('prd_cd', '=', $prd_cd)->first();
-		
+
 		try {
 			if (
 				$stock != null
@@ -1097,8 +1102,7 @@ class cs01Controller extends Controller {
 				$total_old_wonga = ($ori_product_stock->wonga * $ori_product_stock->in_qty) - ($stk_ord_product->qty * $stk_ord_product->cost);
 				$total_cur_wonga = $qty * $cost;
 				$total_wonga = $total_old_wonga + $total_cur_wonga;
-				$avg_wonga = round($total_wonga / $stock->in_qty);
-
+				$avg_wonga = round($total_wonga / ($stock->in_qty ?? 1));
 				$values = [
 					'wonga' => $avg_wonga,
 					'qty_wonga' => DB::raw('qty * ' . $avg_wonga),
