@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\store\common;
+namespace App\Http\Controllers\store\community;
 
 use App\Http\Controllers\Controller;
 use App\Components\Lib;
@@ -28,7 +28,7 @@ class comm01Controller extends Controller
             'sdate' => $sdate,
             'edate' => date("Y-m-d")
         ];
-        return view(Config::get('shop.store.view') . '/common/comm01', $values);
+        return view(Config::get('shop.store.view') . '/community/comm01', $values);
     }
 
     // 검색
@@ -42,7 +42,6 @@ class comm01Controller extends Controller
         $subject = $request->input('subject', '');
         $content = $request->input('content', '');
         $store_no = $request->input('store_no', '');
-        $store_nm = $request->input('store_nm', '');
         $store_type    = $request->input("store_type", '');
 
         $where = "";
@@ -81,7 +80,8 @@ class comm01Controller extends Controller
                 group_concat(a.store_nm separator ', ') as stores,
                 s.rt,
                 c.code_val as store_type_nm,
-                s.ut
+                s.ut,
+                (case when ifnull(char_length(s.attach_file_url), 0) > 0 then 'Y' else 'N' end ) as attach_file_yn
             from notice_store s 
                 left outer join notice_store_detail d on s.ns_cd = d.ns_cd
                 left outer join store a on a.store_cd = d.store_cd
@@ -123,7 +123,7 @@ class comm01Controller extends Controller
 
         $values = ['no' => $no, 'user' => $user, 'store_notice_type' => $notice_id];
 
-        return view(Config::get('shop.store.view') . '/common/comm01_show', $values);
+        return view(Config::get('shop.store.view') . '/community/comm01_show', $values);
     }
 
     public function show($notice_id, $no)
@@ -153,7 +153,7 @@ class comm01Controller extends Controller
             'store_notice_type' => $notice_id
         ];
 
-        return view(Config::get('shop.store.view') . '/common/comm01_show', $values);
+        return view(Config::get('shop.store.view') . '/community/comm01_show', $values);
     }
 
     public function store(Request $request)
@@ -307,22 +307,10 @@ class comm01Controller extends Controller
 
     public function download_file($path) {
 
-        if (file_exists(storage_path('\\app\\public\\data\\community\\comm02\\'.$path))) {
+        if (file_exists(storage_path('\\app\\public\\data\\community\\comm01\\'.$path))) {
 
             try{
-                $file_contents = storage::download(storage_path('\\app\\public\\data\\community\\comm02\\'.$path));
-                $mimetype = new \GuzzleHttp\Psr7\MimeType;
-                $extension = explode('.', $path)[1];
-                //$file_contents = storage::download('C:/Desktop/develop/bluewolf/storage/app/public/data/community/comm02/20230324174303sm_dh.xlsx');
-
-                return response($file_contents)
-                        ->header('Cache-Control', 'no-cache private')
-                        ->header('Content-Description', 'File Transfer')
-                        ->header('Content-Type', $mimetype->fromExtension($extension))
-                        ->header('Content-length', strlen($file_contents))
-                        ->header('Content-Disposition', 'attachment; filename=' . $path)
-                        ->header('Content-Transfer-Encoding', 'binary');
-
+                return response()->download(public_path('\\data\\community\\comm01\\'.$path));
             } catch(Exception $e){
                 return response()->json([
                     "code" => '500',
@@ -339,7 +327,7 @@ class comm01Controller extends Controller
 
     public function delete_file($no, $path) {
 
-        $file_path = storage_path('\\app\\public\\data\\community\\comm02\\'.$path);
+        $file_path = storage_path('\\app\\public\\data\\community\\comm01\\'.$path);
         $delete_file_url = config::get('file.store_notice_path').$path;
 
         if (file_exists($file_path)) {

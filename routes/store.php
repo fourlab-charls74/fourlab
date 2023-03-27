@@ -324,7 +324,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
     });
 
     //게시판
-    Route::prefix("common")->namespace('common')->group(function () {
+    Route::prefix("community")->namespace('community')->group(function () {
         Route::get('comm01/{notice_id}','comm01Controller@index');
         Route::get('comm01/{notice_id}/search', 'comm01Controller@search');
         Route::get('comm01/{notice_id}/create', 'comm01Controller@create');

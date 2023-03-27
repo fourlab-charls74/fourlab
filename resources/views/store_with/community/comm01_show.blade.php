@@ -120,6 +120,7 @@
                                                 <td>
                                                     @foreach(explode(',', $user->attach_file_url) as $file_url) 
                                                             <a href="javascript:downloadFile('{{$file_url}}')">{{explode('/', $file_url)[3]}}</a>
+                                                            <!-- a href ="{{asset('storage/'.$file_url)}}">{{explode('/', $file_url)[3]}}</a> -->
                                                             &nbsp;&nbsp;
                                                             <a href="javascript:deleteFile('{{$no}}', '{{$file_url}}')">X</a>
                                                             <br/>
@@ -251,7 +252,7 @@
 
     function downloadFile(path) {
         $.ajax({
-            url: `/store/common/comm01/file/download/${path.split('/').reverse()[0]}`,
+            url: `/store/community/comm01/file/download/${path.split('/').reverse()[0]}`,
             type: 'GET',
             cache: false,
             xhrFields: {
@@ -265,8 +266,6 @@
 
             try {
                 let blob = new Blob([data], { type: jqXhr.getResponseHeader('content-type') });
-                //let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                
                 let fileName = getFileName(jqXhr.getResponseHeader('content-disposition'));
                 fileName = decodeURI(fileName);
     
@@ -274,12 +273,8 @@
                 if (window.navigator.msSaveOrOpenBlob) {
                     window.navigator.msSaveOrOpenBlob(blob, fileName);
                 } else { 
-                    //그 외
-                    const fileReader = new FileReader();
-
-                    let file = fileReader.readAsBinaryString(blob);
                     let link = document.createElement('a');
-                    let url = window.URL.createObjectURL(file);
+                    let url = window.URL.createObjectURL(blob);
                     link.href = url;
                     link.target = '_self';
                     link.download = fileName;
@@ -328,7 +323,7 @@
 
         $.ajax({
             method: 'POST',
-            url: '/store/common/comm01/store',
+            url: '/store/community/comm01/store',
             data: formData,
             cache: false,
             contentType: false,
@@ -337,7 +332,7 @@
                 if (data.code == '200') {
                     clearFormData();
                     alert('게시물 등록에 성공하였습니다.');
-                    document.location.href = `/store/common/comm01/${type}`;
+                    document.location.href = `/store/community/comm01/${type}`;
                 } else {
                     clearFormData();
                     alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
@@ -355,7 +350,7 @@
         if(confirm("삭제하시겠습니까?")){
             $.ajax({
                 method: 'delete',
-                url: `/store/common/comm01/file/delete/${no}/${path.split('/').reverse()[0]}`,
+                url: `/store/community/comm01/file/delete/${no}/${path.split('/').reverse()[0]}`,
                 success: function(data) {
                     if (data.code == '200') {
                         alert('파일 삭제에 성공하였습니다.');
@@ -378,7 +373,7 @@
 
         $.ajax({
             method: 'PUT',
-            url: '/store/common/comm01/edit/' + no,
+            url: '/store/community/comm01/edit/' + no,
             data: frm.serialize(),
             success: function(data) {
                 if (data.code == '200') {
@@ -411,7 +406,7 @@
         if(confirm("삭제하시겠습니까?")){
             $.ajax({
                 method: 'post',
-                url: '/store/common/comm01/del_store',
+                url: '/store/community/comm01/del_store',
                 data: {data_store : store_cd, ns_cd : ns_cd},
                 success: function(data) {
                     if (data.code == '200') {
