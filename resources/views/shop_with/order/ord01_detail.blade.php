@@ -633,7 +633,7 @@
                                                         [[확정]]
                                                     @endif
                                                 </td>
-                                                <td><a href="/shop/order/ord01/order/{{$ord_no}}/{{$ord_list->ord_opt_no}}">{{@$ord_list->order_state}}</a></td>
+                                                <td><a href="/shop/stock/stk03/order/{{$ord_no}}/{{$ord_list->ord_opt_no}}">{{@$ord_list->order_state}}</a></td>
                                                 <td>
                                                     <a href="#" onClick="PopOrderGoods('{{$ord_no}}','{{$ord_list->ord_opt_no}}');return false;">{{@$ord_list->ord_kind_nm}}</a>/<br />
                                                     {{@$ord_list->ord_kind_nm}}
@@ -646,7 +646,7 @@
                                                     <img src="{{config('shop.image_svr')}}/{{@$ord_list->img}}" class="img" style="width:40px" />
                                                 </td>
                                                 <td style="font-weight:400;">
-                                                    <a href="#" onclick="return openHeadProduct('{{@$ord_list->goods_no}}');">{{@$ord_list->goods_nm}}</a><br>
+                                                    <a href="#" onclick="return openShopProduct('{{@$ord_list->goods_no}}');">{{@$ord_list->goods_nm}}</a><br>
                                                     {{@$ord_list->goods_opt}}
                                                 </td>
                                                 <td>
@@ -656,7 +656,7 @@
                                                 </td>
                                                 <td>
                                                     {{@$ord_list->wqty}}<br>
-                                                    <a href="#" onClick="openStoreStock('{{$ord_list->prd_cd}}');return false;">({{@$ord_list->jaego_qty}}/{{@$ord_list->stock_qty}})</a>
+                                                    <a href="#" onClick="OpenShopStockPopup('{{$ord_list->prd_cd}}', '{{$today}}' );return false;">({{@$ord_list->jaego_qty}}/{{@$ord_list->stock_qty}})</a>
                                                 </td>
                                                 <td style="text-align:right">{{number_format(@$ord_list->price)}}</td>
                                                 <td style="text-align:right">{{number_format(@$ord_list->dc_amt)}}</td>
@@ -1356,7 +1356,7 @@
         $.ajax({
             async: true,
             type: 'put',
-            url: '/head/order/ord01/claim-save',
+            url: '/shop/order/ord01/claim-save',
             data: {
                 "ord_opt_no": ord_opt_no,
                 "ord_opt_nos": ord_opt_nos.join(','),
@@ -1396,12 +1396,12 @@
 
     $('.ord-no-btn').click((e) => {
         e.preventDefault();
-        const url = '/head/api/order';
+        const url = '/shop/api/order';
         const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
     });
 
     $('.search-btn').click((e) => {
-        location.href = "/shop/order/ord01/order/" + $('#ord_no').val();
+        location.href = "/shop/stock/stk03/order/" + $('#ord_no').val();
     });
 
     $('.dlv-comment-btn').click((e) => {
@@ -1410,7 +1410,7 @@
         $.ajax({
             async: true,
             type: 'put',
-            url: '/head/order/ord01/dlv-comment',
+            url: '/shop/order/ord01/dlv-comment',
             data: {
                 "comment": $('#dlv_coment').val(),
                 "ord_opt_no": ord_opt_no
@@ -1434,7 +1434,7 @@
         $.ajax({
             async: true,
             type: 'put',
-            url: '/head/order/ord01/claim-message-save',
+            url: '/shop/order/ord01/claim-message-save',
             data: {
                 "ord_opt_no": ord_opt_no,
                 "cs_form": $("#cs_form").val(),
@@ -1523,13 +1523,13 @@
     $('.sms-send-btn').click(function(e) {
         e.preventDefault();
 
-        openSmsSend('{{ @$ord->mobile }}', '{{ @$ord->user_nm }}');
+        openShopSmsSend('{{ @$ord->mobile }}', '{{ @$ord->user_nm }}');
     });
 
     $('.sms-list-btn').click(function(e) {
         e.preventDefault();
 
-        openSmsList('{{ @$ord->mobile }}', '{{ @$ord->user_nm }}');
+        openShopSmsList('{{ @$ord->mobile }}', '{{ @$ord->user_nm }}');
     });
 
     $('.claim-save-btn').click(function(e) {
@@ -1558,7 +1558,7 @@
 		$.ajax({
             async: true,
             type: 'put',
-            url: '/head/order/ord01/claim-save',
+            url: '/shop/order/ord01/claim-save',
             data: {
                 "ord_opt_no": ord_opt_no,
                 "ord_opt_nos": data.join(','),
@@ -1595,7 +1595,7 @@
         $.ajax({
             async: true,
             type: 'put',
-            url: '/head/order/ord01/order-save',
+            url: '/shop/order/ord01/order-save',
             data: {
                 "ord_no": ord_no,
                 "ord_opt_no": ord_opt_no,
@@ -1621,21 +1621,21 @@
 
         if ($('#refund_yn').val() === 'n') return;
 
-        const url = '/head/order/ord01/refund/' + ord_no + '/' + ord_opt_no;
+        const url = '/shop/order/ord01/refund/' + ord_no + '/' + ord_opt_no;
         const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
     });
 
     $('.dlv-info-btn').click(function(e) {
         e.preventDefault();
 
-        const url = '/head/order/ord01/dlv/' + ord_no + '/' + ord_opt_no;
+        const url = '/shop/order/ord01/dlv/' + ord_no + '/' + ord_opt_no;
         const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
     });
 
     $('.receipt-btn').click(function(e) {
         e.preventDefault();
 
-        const url = '/head/order/ord01/receipt/' + ord_no;
+        const url = '/shop/order/ord01/receipt/' + ord_no;
         const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
     });
 
@@ -1644,7 +1644,7 @@
         const params = [
             `p_ord_opt_no=${p_ord_opt_no}`,
         ];
-        const url = `/head/order/ord20/show?${params.join('&')}`;
+        const url = `/shop/order/ord01/view?${params.join('&')}`;
         const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
     });
 
@@ -1674,7 +1674,7 @@
         $.ajax({
             async: true,
             type: 'put',
-            url: '/head/order/ord01/cancel-order',
+            url: '/shop/order/ord01/cancel-order',
             data: {
                 "datas": data
             },
@@ -1690,7 +1690,7 @@
     });
 
     function PopOrderGoods(ord_no,ord_opt_no){
-		const url = `/head/order/ord01/order-goods/${ord_no}/${ord_opt_no}`;
+		const url = `/shop/order/ord01/order-goods/${ord_no}/${ord_opt_no}`;
 		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=700")
     }
 
@@ -1753,7 +1753,7 @@
         $.ajax({
             async: true,
             type: 'put',
-            url: '/head/order/ord01/update/order-state',
+            url: '/shop/order/ord01/update/order-state',
             data: data,
             success: function(res) {
                 console.log(res);
@@ -1781,7 +1781,7 @@
         $.ajax({
             async: true,
             type: 'put',
-            url: '/head/order/ord01/claim-message-save',
+            url: '/shop/order/ord01/claim-message-save',
             data: {
                 "ord_opt_no": ord_opt_no,
                 "cs_form": $("#cs_form").val(),
@@ -1792,7 +1792,7 @@
             success: function(data) {
                 alert("클레임 내용이 등록되었습니다.");
                 //location.reload();
-				location.href	= `/shop/order/ord01/order/${ord_no}/${ord_opt_no}?refund_yn=${refund_yn}`;
+				location.href	= `/shop/stock/stk03/order/${ord_no}/${ord_opt_no}?refund_yn=${refund_yn}`;
             },
             error: function(request, status, error) {
                 console.log("error")
@@ -1849,7 +1849,7 @@
         $.ajax({
             async: true,
             type: 'put',
-            url: '/head/order/ord01/update/order-state',
+            url: '/shop/order/ord01/update/order-state',
             data: data,
             success: function(res) {
                 console.log(res);
@@ -1867,12 +1867,12 @@
         if(type === "cash") {
             // 현금영수증 발행내역 오픈
             const cash_no = '{{ @$pay->cash_yn }}' === "Y" ? 1 : '';
-            const url = `/head/order/ord01/${ord_no}/${ord_opt_no}/cash?cash_no=${cash_no}`;
+            const url = `/shop/order/ord01/${ord_no}/${ord_opt_no}/cash?cash_no=${cash_no}`;
 		    window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=900,height=700");
         } else if(type === "tax") {
             // 세금계산서 내역 오픈
             const tax_no = '{{ @$pay->tax_yn }}' === "Y" ? 1 : '';
-            const url = `/head/order/ord01/${ord_no}/${ord_opt_no}/tax?tax_no=${tax_no}`;
+            const url = `/shop/order/ord01/${ord_no}/${ord_opt_no}/tax?tax_no=${tax_no}`;
 		    window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=900,height=700");
         }
     }
@@ -1919,6 +1919,16 @@
             +''+today.getDate()
             +''+(today.getHours() < 10 ? '0' : '')
             +''+today.getHours();
-    }   
+    } 
+
+    function openShopProduct(prd_no){
+        var url = '/shop/product/prd01/' + prd_no;
+        var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
+    }
+
+    function OpenShopStockPopup(prd_cd, date) {
+		var url = `/shop/stock/stk01/${prd_cd}?date=${date}`;
+		var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1000,height=900");
+	}
 </script>
 @stop

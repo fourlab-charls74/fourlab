@@ -444,8 +444,6 @@
             </div>
     </form>
     </div>
-    <!-- script -->
-    <!-- script -->
     <script type="text/javascript">
 
         const columns = [
@@ -456,20 +454,44 @@
                 editable: true,
                 cellClass:['hd-grid-edit'],
                 cellEditor: 'agRichSelectCellEditor',
-                cellEditorParams:cellOpionsParams,
-                // cellEditorSelector: function(params) {
-                //     return {
-                //         component: 'agRichSelectCellEditor',
-                //         params: {
-                //             values: []
-                //         }
-                //     };
-                // }
+                cellEditorParams: function(params) {
+                    var goods_no = params.data.goods_no;
+                    var options = [];
+                    if(_goods_options.hasOwnProperty(goods_no)){
+                        options =  _goods_options[goods_no];
+                    } else {
+                    }
+                    return {
+                        values :options
+                    }
+                },
+            
             },
             {field:"qty" , headerName:"수량", width:90,type: 'numberType',
                 editable: true,
-                cellClass:['hd-grid-number','hd-grid-edit'],onCellValueChanged:EditAmt,
-                //cellStyle:StyleChangeYN,
+                cellClass:['hd-grid-number','hd-grid-edit'],onCellValueChanged: function(params) {
+                    if (params.oldValue !== params.newValue) {
+                        console.log(params);
+                        var rowNode = params.node;
+                        var qty = params.data.qty;
+                        var price = params.data.price;
+                        var option_price = 0;
+                        price += option_price;
+
+                        var ord_amt = qty * price;
+                        var point_amt = params.data.point_amt;
+                        var coupon_amt = params.data.coupon_amt;
+                        var dc_amt = params.data.dc_amt;
+                        var dlv_amt = params.data.dlv_amt;
+                        var pay_fee = 0;
+                        var recv_amt = ord_amt - point_amt - coupon_amt - dc_amt + pay_fee;
+
+                        //ff.recv_amt.value = ord_amt + dlv_amt - point - coupon - dc + pay_fee;
+                        params.data.ord_amt = ord_amt;
+                        params.data.recv_amt = recv_amt;
+                        gx.gridOptions.api.redrawRows({rowNodes:[rowNode]});
+                    }
+                },
             },
             {field:"price" , headerName:"판매가", width:90, type: 'currencyType'  },
             {field:"ord_amt" , headerName:"주문액", width:90, type: 'currencyType'  },
@@ -803,7 +825,7 @@
                 async: true,
                 dataType: "json",
                 type: 'get',
-                url: "/head/member/mem01/" + user_id + "/get",
+                url: "/shop/member/mem01/" + user_id + "/get",
                 success: function (res) {
                     console.log(res);
                     if(res.hasOwnProperty('user')){
@@ -828,29 +850,6 @@
                 },
             });
         }
-    }
-
-    function SameInfo(){
-        $('#r_user_nm').val($('#user_nm').val());
-        $('#r_phone').val($('#phone').val());
-        $('#r_mobile').val($('#mobile').val());
-    }
-
-    function CheckAddDlvArea(obj){
-        // var param = "CMD=check_add_dlv_area";
-        // param += "&ZIPCODE=" + obj.value;
-        // var http = new xmlHttp();
-        // http.onexec("ord20_detail.php","POST",param,true,cbCheckAddDlvArea);
-    }
-
-    function cbCheckAddDlvArea(res){
-        // var add_dlv_fee = res.responseText;
-        // var ff = document.f1;
-
-        // ff.ADD_DLV_FEE.value = add_dlv_fee;
-        // com(ff.ADD_DLV_FEE);
-
-        // CalAmt();
     }
 
     function ApplyGroup(obj){
@@ -900,39 +899,6 @@
             tmp = goods_opt.split("|");
             goods_opt = tmp[0];
         }
-
-        // if ( option_cnt > 1 && goods_opt != "") {
-        //     var param = "CMD=get_second_option";
-        //     param += "&GOODS_NO=" + goods_no + "&GOODS_SUB=" + goods_sub + "&GOODS_OPT=" + urlEncode(goods_opt);
-        //     var http = new xmlHttp();
-        //     http.onexec("ord20_detail.php","POST",param,true,cbGetSecondOption);
-        // } else {
-        //     opt_select2[opt_select2.length] = new Option("옵션(옵션가격)", "");
-        // }
-    }
-
-    function cbGetSecondOption(res)
-    {
-        // var ff = document.f1;
-        // var object = Dom2Obj(res);
-        // var second_opt_list = (object["record"]) ? object["record"] : "";
-        // var obj = ff.GOODS_OPT2;
-
-        // //브랜드 리스트를 select에 option 넣기
-        // obj[obj.length] = new Option("옵션(옵션가격)", "");
-        // for(i=0; i < second_opt_list.length; i++)
-        // {
-        //     var goods_opt 		= second_opt_list[i].goods_opt;
-
-        //     var tmp_txt	= "";
-        //     var tmp_val	= "";
-
-        //     var tmp = goods_opt.split("^");
-
-        //     tmp_txt	= tmp[1];
-        //     tmp_val	= tmp[1];
-        //     obj[obj.length] = new Option(tmp_txt, tmp_val);
-        // }
     }
 
     function SetOptionValue(value, depth) {
@@ -1138,69 +1104,6 @@
                 }
             },
         });
-    }
-
-    /**
-     * @return {boolean}
-     */
-    function AddGoods(){
-        var url = '/shop/product/prd01/choice';
-        var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
-    }
-
-    /**
-     * @return {boolean}
-     */
-    function ChoiceGoodsNo(goods_nos){
-        for(var i=0;i<goods_nos.length;i++){
-            $.ajax({
-                type: "get",
-                url: '/shop/product/prd01/' + goods_nos[i] + '/get',
-                contentType: "application/x-www-form-urlencoded; charset=utf-8",
-                dataType: 'json',
-                // data: {},
-                success: function(res) {
-                    //console.log(res);
-                    qty = 1;
-                    gx.addRows([{
-                        "goods_no":res.goods_no,
-                        "goods_nm":res.goods_info.goods_nm,
-                        "style_no" : res.goods_info.style_no,
-                        "opt_val" : res.goods_info.opt_val,
-                        "qty" : qty,
-                        "price" : res.goods_info.price,
-                        "ord_amt" : res.goods_info.price * qty,
-                        "recv_amt" : res.goods_info.price * qty + res.goods_info.baesong_price,
-                        "point_amt" : 0,
-                        "coupon_amt" : 0,
-                        "dc_amt" : 0,
-                        "dlv_amt" : res.goods_info.baesong_price,
-                    }]);
-
-                    //console.log(res.options);
-                    var options = [];
-                    for(var j = 0; j < res.options.length;j++){
-                        if(res.options[j].qty > 0){
-                            options.push(res.options[j].goods_opt);
-                        }
-                    }
-                    _goods_options[goods_no] = options;
-                },
-
-                error: function(e){
-                    console.log(e.responseText);
-                }
-            });
-        }
-        return true;
-    }
-
-    /**
-     * @return {boolean}
-     */
-    function DelGoods(){
-        //console.log('삭제');
-        gx.delSelectedRows();
     }
 
     if ($('#goods_opt1').length > 0) {

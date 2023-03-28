@@ -1698,10 +1698,12 @@ class ord01Controller extends Controller
 			select
 				d.goods_nm, replace(a.goods_opt, '^', ' : ') as opt_val
 				, a.qty, a.ord_type, ord_type.code_val ord_type_nm, a.ord_kind
-				, a.price, c.wonga, f.code_val, a.dlv_no,  b.upd_date, a.ord_state
+				, a.price
+                -- , c.wonga
+                , f.code_val, a.dlv_no,  b.upd_date, a.ord_state
 			from order_opt a
 				inner join order_mst b on a.ord_no = b.ord_no
-				inner join order_opt_wonga c on a.ord_opt_no = c.ord_opt_no
+				-- inner join order_opt_wonga c on a.ord_opt_no = c.ord_opt_no
 				inner join goods d on a.goods_no = d.goods_no and a.goods_sub = d.goods_sub
 				left outer join code f on a.dlv_cd = f.code_id and f.code_kind_cd = 'DELIVERY'
 				left outer join code ord_type on (a.ord_type = ord_type.code_id and ord_type.code_kind_cd = 'G_ORD_TYPE')
@@ -1710,7 +1712,7 @@ class ord01Controller extends Controller
 
         $row = DB::selectOne($sql);
 		$row->price	= Lib::cm($row->price);
-		$row->wonga	= Lib::cm($row->wonga);
+		// $row->wonga	= Lib::cm($row->wonga);
 
 		// 판매 구분
 		$sql	= " select code_id id, code_val val from code where code_kind_cd = 'G_ORD_KIND' and code_id <> 'K' ";

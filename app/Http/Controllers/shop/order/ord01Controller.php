@@ -11,6 +11,7 @@ use App\Models\Point;
 use App\Models\Claim;
 use App\Models\Gift;
 use App\Models\Pay;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -654,8 +655,6 @@ class ord01Controller extends Controller
         $dlv_no = $req->input("dlv_no", ""); // 출고완료시 송장번호
 
         $reservation_yn = $req->input("reservation_yn", 'N'); // 예약판매여부
-        if ($ord_type == 4) $reservation_yn = 'Y';
-        if ($reservation_yn === 'Y') $ord_type = 4; // 예약(4)
 
         try {
             DB::beginTransaction();
@@ -855,8 +854,11 @@ class ord01Controller extends Controller
             $addopt_amt = $cart[$i]['addopt_amt'] ?? 0;
             $order_addopt_amt = $addopt_amt * $qty;
 
+<<<<<<< Updated upstream
             $opt_ord_type = 14; // order_opt의 ord_type (수기판매:14 / 예약:4)
 
+=======
+>>>>>>> Stashed changes
             // 옵션가격
             $a_goods_opt = explode("|", $goods_opt);
             $opt_amt = $cart[$i]["opt_amt"] ?? 0;
@@ -894,6 +896,7 @@ class ord01Controller extends Controller
             if ($row != null) $product_stock = $row->wqty;
 
             // 예약판매가 아닐 경우에만 재고부족 에러처리
+<<<<<<< Updated upstream
             if ($goods->is_unlimited == "Y") {
                 if ($product_stock < 1) {
                     if ($reservation_yn === 'Y') {
@@ -908,6 +911,16 @@ class ord01Controller extends Controller
                     if ($reservation_yn === 'Y') {
                         $opt_ord_type = 4; // order_opt의 ord_type (수기판매:14 / 예약:4)
                     } else {
+=======
+            if ($reservation_yn !== 'Y') {
+                if ($goods->is_unlimited == "Y") {
+                    if ($product_stock < 1) {
+                        $code = '-105';
+                        // throw new Exception("재고가 부족하여 수기판매 처리를 할 수 없습니다.");
+                    }
+                } else {
+                    if ($qty > $product_stock) {
+>>>>>>> Stashed changes
                         $code = '-105';
                         // throw new Exception("[상품코드 : $prd_cd] 재고가 부족하여 수기판매 처리를 할 수 없습니다.");
                     }
@@ -996,7 +1009,7 @@ class ord01Controller extends Controller
                     'com_id' => $goods->com_id,
                     'add_point' => $ord_opt_add_point,
                     'ord_kind' => $ord_kind,
-                    'ord_type' => $opt_ord_type,
+                    'ord_type' => $ord_type,
                     'baesong_kind' => $goods->baesong_kind,
                     'dlv_start_date' => null,
                     'dlv_proc_date' => null,
@@ -1467,7 +1480,7 @@ class ord01Controller extends Controller
         ]);
     }
 
-    /**
+     /**
      * 전화번호 숫자에 '-' 넣어서 반환
      * - Parameters: $tel(전화번호)
      * - Returns: String
@@ -2981,6 +2994,785 @@ class ord01Controller extends Controller
 
         return $clm_no;
     }
+
+    public function order_save(Request $req) {
+
+		$ord_no			= $req->input("ord_no", "");
+		$ord_opt_no		= $req->input("ord_opt_no", "");
+		$ord_opt_nos	= $req->input("ord_opt_nos", "");
+		$a_ord_opt_no	= explode(",", $ord_opt_nos);
+
+		$result_code	= "200";
+		$msg			= "";
+
+		try {
+			DB::beginTransaction();
+
+			$user = [
+				'id'	=> Auth('head')->user()->id,
+				'name'	=> Auth('head')->user()->name
+			];
+
+			$order = new Order( $user );
+			$order->SetOrdNo( $ord_no );
+
+			for( $i=0; $i<count($a_ord_opt_no); $i++){
+				$ord_opt_no = $a_ord_opt_no[$i];
+
+				if( $order->GetOrderState($ord_opt_no) == "5" ){
+                    $result = $order->ProcOrder($ord_opt_no);
+                    if($result == "-2"){
+                        $result_code    = "400";
+                    }
+				}
+			}
+			DB::commit();
+
+			//return true;
+		}catch(Exception $e) {
+			DB::rollback();
+			$result_code    = "500";
+            $msg = $e->getMessage();
+		}
+
+		return response()->json([
+			"code"	=> $result_code,
+			"msg"	=> $msg
+		]);
+	}
+
+     // 주문상태 변경 (출고요청->출고처리중 / 출고처리중->출고완료)
+     public function update_order_state(Request $req) {
+        $code = 200;
+        $msg = '';
+
+        $user = [
+			'id'	=> Auth('head')->user()->id,
+			'name'	=> Auth('head')->user()->name
+		];
+        $order = new Order($user);
+
+        $ord_state = $req->input('ord_state');
+        $ord_opt_nos = $req->input('ord_opt_nos');
+        $dlv_series_no = '';
+
+        try {
+            DB::beginTransaction();
+
+            if($ord_state === '20') { // 출고처리중으로 변경
+
+                $dlv_series_no = $req->input('dlv_series_no');
+
+                $sql = "
+                    select
+                        dlv_series_no
+                    from order_dlv_series
+                    where dlv_day >= date_format(date_sub(now(),interval 1 day),'%Y%m%d')
+                        and dlv_series_nm = :dlv_series_no
+                    order by dlv_series_no desc limit 0,1
+                ";
+                $row = DB::selectOne($sql, ['dlv_series_no' => $dlv_series_no]);
+
+                if($row === NULL) {
+                    $dlv_series_no = DB::table('order_dlv_series')->insertGetId([
+                        'dlv_series_nm'	=> $dlv_series_no,
+                        'dlv_day'		=> date('Ymd'),
+                        'regi_date'		=> now(),
+                    ]);
+                } else {
+                    $dlv_series_no = $row->dlv_series_no;
+                }
+
+                $is_soldout = false;
+    
+                foreach($ord_opt_nos as $datas) {
+                    if(trim($datas) == "") continue;
+        
+                    list($ord_no,$ord_opt_no) = explode("||", $datas);
+                    $order->SetOrdOptNo($ord_opt_no,$ord_no);
+        
+                    if($order->CheckStockQty($ord_opt_no)) {
+                        $state_log = array("ord_no" => $ord_no, "ord_state" => $ord_state, "comment" => "배송 출고요청", "admin_id" => $user['id'], "admin_nm" => $user['name']);
+                        $order->AddStateLog($state_log);
+                        $order->DlvProc($dlv_series_no, $ord_state);
+                    } else {
+                        $is_soldout = true;
+                    }
+                }
+    
+                if($is_soldout === true) {
+                    $code = 400;
+                    $msg = '품절된 제품이 포함되어있습니다.';
+                } else {
+                    $msg = '변경되었습니다.';
+                }
+            
+            } else if($ord_state === '30') { // 출고완료로 변경
+
+                $conf = new Conf();
+                $cfg_shop_name		= $conf->getConfigValue("shop","name");
+                $cfg_kakao_yn		= $conf->getConfigValue("kakao","kakao_yn");
+                $cfg_sms			= $conf->getConfig("sms");
+                $cfg_sms_yn			= $conf->getValue($cfg_sms,"sms_yn");
+                $cfg_delivery_yn	= $conf->getValue($cfg_sms,"delivery_yn");
+                $cfg_delivery_msg	= $conf->getValue($cfg_sms,"delivery_msg");
+                $shop_phone =       $conf->getConfigValue("shop","phone");
+
+                $dlv_no = $req->input("dlv_no", '');
+                $dlv_cd = $req->input("dlv_cd", '');
+                $send_sms_yn = $req->input("send_sms_yn", 'N');
+
+                // 아래부터 출고완료처리 작업필요
+                $dlv_nm = SLib::getCodesValue('DELIVERY',$dlv_cd);
+                if($dlv_nm === "") $dlv_nm = $dlv_cd;
+
+                foreach($ord_opt_nos as $datas) {
+                    if(trim($datas) == "") continue;
+        
+                    list($ord_no,$ord_opt_no) = explode("||", $datas);
+                    $order->SetOrdOptNo($ord_opt_no,$ord_no);
+        
+                    if($order->CheckState("30") === false) {
+                        $msg = '선택하신 주문 중 이미 출고된 주문건이 있습니다. 검색 후 다시 처리해주세요. [주문일련번호: ' . $ord_opt_no . ']';
+                        throw new Exception($msg);
+                    }
+
+                    /* 주문상태 로그 */
+                    $state_log	= [
+                        "ord_no"		=> $ord_no,
+                        "ord_opt_no"	=> $ord_opt_no,
+                        "ord_state"		=> "30",
+                        "comment"		=> "배송 출고처리",
+                        "admin_id"		=> $user['id'],
+                        "admin_nm"		=> $user['name']
+                    ];
+                    $order->AddStateLog($state_log);
+                    $order->DlvEnd($dlv_cd, $dlv_no);
+                    $order->DlvLog($ord_state = 30);
+
+                    /* 보유재고 차감 */
+                    $sql = "
+                        select qty, goods_no, goods_sub, goods_opt
+                        from order_opt
+                        where ord_opt_no = '$ord_opt_no'
+                    ";
+                    $opt	= DB::selectOne($sql);
+                    $_qty	= $opt->qty;
+
+                    $_goods_no	= $opt->goods_no;
+                    $_goods_sub	= $opt->goods_sub;
+                    $_goods_opt	= $opt->goods_opt;
+
+                    $prd = new Product($user);
+
+                    $stocks = $ret = $prd->Minus([
+                        "type"			=> $type = 2,
+                        "etc" 			=> $etc = "",
+                        "qty" 			=> $_qty,
+                        "goods_no"		=> $_goods_no,
+                        "goods_sub"		=> $_goods_sub,
+                        "goods_opt"		=> $_goods_opt,
+                        "ord_no"		=> $ord_no,
+                        "ord_opt_no"	=> $ord_opt_no
+                    ]);
+
+                    if(count($stocks) > 0) {
+
+                        // 추가옵션에 대한 재고 차감
+                        $sql = "
+                            select addopt_idx, addopt_qty
+                            from order_opt_addopt
+                            where ord_opt_no = '$ord_opt_no'
+                        ";
+                        $rows = DB::select($sql);
+
+                        foreach($rows as $row) {
+                            $_addopt_idx	= $row->addopt_idx;
+                            $_addopt_qty	= $row->addopt_qty;
+    
+                            $sql2 = "
+                                update options set
+                                    wqty = wqty - $_addopt_qty
+                                where no = '$_addopt_idx'
+                            ";
+                            DB::update($sql2);
+                        }
+
+                        ///////////////////////////////////////
+
+                        // 에스크로 결제여부 검사
+                        $is_escrow = $order->IsEscrowOrder();
+
+                        if( $is_escrow ) {
+                            // 거래번호 얻기
+                            $sql = "select tno from payment where ord_no = '$ord_no' ";
+                            $row = DB::selectOne($sql);
+                            $tno = $row->tno;
+    
+                            // Parameters
+                            $ip = $_SERVER["REMOTE_ADDR"];
+                            $memo = "배송 시작 요청";
+                            $a_param = array( "deli_numb" => $dlv_no, "deli_corp" => $dlv_nm );
+    
+                            // 배송요청 시작
+                            $pg	= new Pay();
+                            list( $res_cd, $res_msg ) = $pg->mod_escrow("STE1", $tno, $ord_no, $ip, $memo, $a_param);
+                            //$res_cd		= "9999";
+                            //$res_msg    = "에스크로 확인 제외";
+    
+                            // 클레임 메모 등록
+                            $param = array(
+                                "ord_state"	=> 30,
+                                "clm_state"	=> 30,
+                                "cs_form"	=> 10,
+                                "memo"		=> $msg = "[에스크로] 배송시작[ $dlv_nm ($dlv_no) ] - $res_msg [$res_cd]",
+                            );
+                            $claim	= new Claim($user);
+                            $claim->SetOrdOptNo( $ord_opt_no );
+                            $claim->SetClmNo("");
+                            $memo_no = $claim->InsertMessage( $param );
+                        }
+
+                        ///////////////////////////////////////
+
+                        // 사은품 지급
+                        $gift = new Gift();
+                        $msg_yn  = "N";
+
+                        $sql = "
+                            select no
+                            from order_gift
+                            where ord_no = '$ord_no' and ord_opt_no = '$ord_opt_no'
+                        ";
+                        $gifts = DB::select($sql);
+    
+                        foreach( $gifts as $g_row ) {
+                            $order_gift_no	= $g_row->no;
+                            if( $order_gift_no != "" ) $gift->GiveGift($order_gift_no);
+                        }
+
+                        if( $send_sms_yn != "N" ){
+                            if( $cfg_sms_yn == "Y" && $cfg_delivery_yn == "Y" ) {
+    
+                                $sql = "
+                                    select
+                                        b.user_nm, b.mobile, a.goods_nm,
+                                        ( select count(*) from delivery_import where dlv_cd = a.dlv_cd and dlv_no = a.dlv_no and msg_yn = 'Y' ) as msg_cnt
+                                    from order_opt a
+                                         inner join order_mst b on a.ord_no = b.ord_no
+                                    where ord_opt_no = '$ord_opt_no'
+                                          and ( select count(*) from delivery_import where dlv_cd = a.dlv_cd and dlv_no = a.dlv_no and msg_yn = 'Y' ) = 0
+                                ";
+                                $opt = DB::selectone($sql);
+                                if ( !empty($opt->user_nm) ) {
+                                    $user_nm	= $opt->user_nm;
+                                    $mobile		= $opt->mobile;
+                                    $goods_nm	= mb_substr($opt->goods_nm, 0, 10);
+    
+                                    $sms = new SMS( $user );
+                                    $sms_msg = sprintf("[%s]%s..발송완료 %s(%s)",$cfg_shop_name, $goods_nm, $dlv_nm, $dlv_no);
+    
+                                    if($cfg_kakao_yn == "Y"){
+                                        /*
+                                        $template_code = "OrderCode6";
+                                        $msgarr = array(
+                                            "SHOP_NAME" => $cfg_shop_name,
+                                            "GOODS_NAME" => $goods_nm,
+                                            "DELIVERY_NAME" => $dlv_nm,
+                                            "DELIVERY_NO" => $dlv_no,
+                                            "USER_NAME"	=> $user_nm,
+                                            "ORDER_NO"	=> $ord_no,
+                                            "SHOP_URL"	=> 'http://www.doortodoor.co.kr/jsp/cmn/Tracking.jsp?QueryType=3&pTdNo='.$dlv_no
+                                        );
+                                        $btnarr = array(
+                                            "BUTTON_TYPE" => '1',
+                                            "BUTTON_INFO" => '배송 조회하기^DS^http://www.doortodoor.co.kr/jsp/cmn/Tracking.jsp?QueryType=3&pTdNo='.$dlv_no
+                                        );
+                                        $sms->SendKakao( $template_code, $mobile, $user_nm, $sms_msg, $msgarr, '', $btnarr);
+                                        */
+                                    } else {
+                                        if($mobile != ""){
+                                            //$sms->Send( $sms_msg, $mobile, $user_nm,$shop_phone);
+                                            $sms->SendAligoSMS( $mobile, $sms_msg, $user_nm );
+                                            $msg_yn  = "Y";
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        DB::table("delivery_import")
+                            ->where("com_id",'HEAD')
+                            ->where("admin_id",$user['id'])
+                            ->where("ord_opt_no",$ord_opt_no)
+                            ->update([
+                                'dlv_yn' =>'Y',
+                                'msg_yn' => $msg_yn,
+                                'rt' => DB::raw("now()")
+                            ]);
+
+                    } else {
+                        $msg = '선택하신 주문 중 이미 출고된 주문건이 있습니다. 검색 후 다시 처리해주세요. [주문일련번호: ' . $ord_opt_no . ']';
+                        throw new Exception($msg);
+                    }
+                }
+            }
+
+            DB::commit();
+            $msg = '출고완료 처리되었습니다.';
+        } catch(Exception $e) {
+            DB::rollBack();
+            $code = 500;
+        }
+
+        return response()->json(["code"	=> $code, "msg"	=> $msg], $code);
+    }
+
+    public function refund_save($ord_opt_no, Request $req)
+    {
+        $user = [
+            'id' => Auth('head')->user()->id,
+            'name' => Auth('head')->user()->name
+        ];
+
+		$refund_no  = $req->input("refund_no");
+
+        if( empty($refund_no) ) $refund_no = $ord_opt_no;
+
+		$opt_nos			= str_replace("%3D", "=", $req->input("opt_nos"));
+		$opt_nos			= str_replace("%2C", ",", $opt_nos);
+		$opt_nos			= explode(',', $opt_nos);
+		$refund_price		= Lib::uncm($req->input("refund_price"));
+		$refund_dlv_amt		= Lib::uncm($req->input("refund_dlv_amt"));
+		$refund_dlv_ret_amt	= Lib::uncm($req->input("refund_dlv_ret_amt"));
+		$refund_dlv_enc_amt	= Lib::uncm($req->input("refund_dlv_enc_amt"));
+		$refund_dlv_pay_amt	= Lib::uncm($req->input("refund_dlv_pay_amt"));
+		$refund_point_amt	= Lib::uncm($req->input("refund_point"));
+		$refund_coupon_amt	= Lib::uncm($req->input("refund_coupon"));
+		$refund_pay_fee		= Lib::uncm($req->input("refund_pay_fee"));
+		$refund_pay_fee_yn	= $req->input("refund_pay_fee_yn", "N");
+		$refund_etc_amt		= Lib::uncm($req->input("refund_etc"));
+
+		$refund_bank	= $req->input("refund_bank");
+		$refund_account	= $req->input("refund_account");
+		$refund_nm		= $req->input("refund_nm");
+		$refund_amt		= Lib::uncm($req->input("refund_amt"));
+
+		//사은품 정보
+		$order_gift_nos		= explode(',', $req->input("order_gift_nos"));
+		$refund_gift_amt	= Lib::uncm($req->input("refund_gift"));
+
+		//사은품 처리
+		//
+		//Gift Class
+		$gift = new Gift();
+
+		for( $i = 0; $i < count($order_gift_nos); $i++ )
+		{
+			if( isset($order_gift_nos[$i]) && $order_gift_nos[$i] != "" )
+			 {
+				list($order_gift_no, $value)	= explode('=', $order_gift_nos[$i]);
+
+				if( $value == "Y" )
+				{
+					$gifts_ref_amt	= $req->input("gifts_ref_amt_$order_gift_no", 0);
+
+					// 사은품 환불
+					$gift->SetRefundGiftAmt($order_gift_no, $refund_no, $gifts_ref_amt);
+				}
+				else
+				{
+					// 사은품 환불취소
+					$gift->SetRefundGiftAmt($order_gift_no, 0, 0);
+				}
+			}
+		}
+
+		for( $i = 0; $i < count($opt_nos); $i++ )
+		{
+			list($opt_no,$value)	= explode('=', $opt_nos[$i]);
+
+			if( $value == "y" )
+			{
+				$dlv_type		= $req->input("DLV_TYPE_$opt_no");
+				$dlv_cm			= $req->input("DLV_CM_$opt_no");
+				$dlv_amt		= $req->input("DLV_AMT_$opt_no");
+				$dlv_ret_amt	= $req->input("DLV_RET_AMT_$opt_no", 0);
+				$dlv_add_amt	= $req->input("DLV_ADD_AMT_$opt_no", 0);
+				$dlv_enc_amt	= $req->input("DLV_ENC_AMT_$opt_no", 0);
+				$dlv_pay_amt	= $req->input("DLV_PAY_AMT_$opt_no", 0);
+				$ref_amt		= $req->input("REF_AMT_$opt_no", 0);
+
+				$sql	= "select clm_no,refund_no from claim where ord_opt_no = '$opt_no'";
+                $row	= DB::selectOne($sql);
+
+				if( !empty($row->clm_no) )
+				{
+					$clm_no	= $row->clm_no;
+
+					if( $ord_opt_no == $opt_no )
+					{
+						$sql	= "
+							update claim set
+								dlv_type		= '$dlv_type',
+								dlv_cm			= '$dlv_cm',
+								dlv_amt			= '$dlv_amt',
+								dlv_ret_amt		= '$dlv_ret_amt',
+								dlv_add_amt		= '$dlv_add_amt',
+								dlv_enc_amt		= '$dlv_enc_amt',
+								dlv_pay_amt		= '$dlv_pay_amt',
+								ref_amt			= '$ref_amt',
+								refund_no		= '$refund_no',
+								refund_yn		= 'y',
+								refund_price	= '$refund_price',
+								refund_dlv_amt	= '$refund_dlv_amt',
+								refund_dlv_ret_amt	= '$refund_dlv_ret_amt',
+								refund_dlv_enc_amt	= '$refund_dlv_enc_amt',
+								refund_dlv_pay_amt	= '$refund_dlv_pay_amt',
+								refund_point_amt	= '$refund_point_amt',
+								refund_coupon_amt	= '$refund_coupon_amt',
+								-- refund_pay_fee	= '$refund_pay_fee',
+								refund_etc_amt	= '$refund_etc_amt',
+								refund_gift_amt	= '$refund_gift_amt',
+								refund_amt		= '$refund_amt',
+								refund_bank		= '$refund_bank',
+								refund_account	= '$refund_account',
+								refund_nm		= '$refund_nm'
+								-- refund_pay_fee_yn = '$refund_pay_fee_yn'
+							where clm_no = '$clm_no'
+						";
+					}
+					else
+					{
+						$sql	= "
+							update claim set
+								dlv_type	= '$dlv_type',
+								dlv_cm		= '$dlv_cm',
+								dlv_amt		= '$dlv_amt',
+								dlv_ret_amt	= '$dlv_ret_amt',
+								dlv_add_amt	= '$dlv_add_amt',
+								dlv_enc_amt	= '$dlv_enc_amt',
+								dlv_pay_amt	= '$dlv_pay_amt',
+								ref_amt		= '$ref_amt',
+								refund_no	= '$refund_no'
+								-- refund_pay_fee_yn = '$refund_pay_fee_yn'
+							where clm_no = '$clm_no'
+						";
+					}
+                    DB::update($sql);
+
+				}
+				else
+				{
+					if( $ord_opt_no == $opt_no )
+					{
+                        /*
+						$sql = "
+							insert into claim (
+								ord_opt_no, clm_state, dlv_type, dlv_cm, dlv_amt, dlv_ret_amt, dlv_add_amt, dlv_enc_amt, dlv_pay_amt, ref_amt,
+								refund_no, refund_yn, refund_price,
+								refund_dlv_amt, refund_dlv_ret_amt, refund_dlv_enc_amt, refund_dlv_pay_amt,
+								refund_point_amt, refund_coupon_amt, refund_pay_fee, refund_etc_amt, refund_gift_amt, refund_amt,
+								refund_bank, refund_account, refund_nm, refund_pay_fee_yn
+							) values (
+								'$opt_no', 1, '$dlv_type','$dlv_cm', '$dlv_amt', '$dlv_ret_amt', '$dlv_add_amt', '$dlv_enc_amt', '$dlv_pay_amt', '$ref_amt',
+								'$refund_no', 'y', '$refund_price',
+								'$refund_dlv_amt', '$refund_dlv_ret_amt', '$refund_dlv_enc_amt', '$refund_dlv_pay_amt',
+								'$refund_point_amt', '$refund_coupon_amt', '$refund_pay_fee', '$refund_etc_amt', '$refund_gift_amt', '$refund_amt',
+								'$refund_bank', '$refund_account', '$refund_nm', '$refund_pay_fee_yn'
+							)
+						";
+                        */
+						$sql	= "
+							insert into claim (
+								ord_opt_no, clm_state, dlv_type, dlv_cm, dlv_amt, dlv_ret_amt, dlv_add_amt, dlv_enc_amt, dlv_pay_amt, ref_amt,
+								refund_no, refund_yn, refund_price,
+								refund_dlv_amt, refund_dlv_ret_amt, refund_dlv_enc_amt, refund_dlv_pay_amt,
+								refund_point_amt, refund_coupon_amt, refund_etc_amt, refund_gift_amt, refund_amt,
+								refund_bank, refund_account, refund_nm
+							) values (
+								'$opt_no', 1, '$dlv_type','$dlv_cm', '$dlv_amt', '$dlv_ret_amt', '$dlv_add_amt', '$dlv_enc_amt', '$dlv_pay_amt', '$ref_amt',
+								'$refund_no', 'y', '$refund_price',
+								'$refund_dlv_amt', '$refund_dlv_ret_amt', '$refund_dlv_enc_amt', '$refund_dlv_pay_amt',
+								'$refund_point_amt', '$refund_coupon_amt', '$refund_etc_amt', '$refund_gift_amt', '$refund_amt',
+								'$refund_bank', '$refund_account', '$refund_nm'
+							)
+						";
+					}
+					else
+					{
+                        /*
+						$sql = "
+							insert into claim (
+								ord_opt_no, clm_state,dlv_type, dlv_cm, dlv_amt, dlv_ret_amt, dlv_add_amt, dlv_enc_amt, dlv_pay_amt, ref_amt, refund_no, refund_pay_fee_yn
+							) values (
+								'$opt_no', 1,'$dlv_type','$dlv_cm','$dlv_amt', '$dlv_ret_amt', '$dlv_add_amt', '$dlv_enc_amt', '$dlv_pay_amt', '$ref_amt', '$refund_no', '$refund_pay_fee_yn'
+							)
+						";
+                        */
+						$sql	= "
+							insert into claim (
+								ord_opt_no, clm_state,dlv_type, dlv_cm, dlv_amt, dlv_ret_amt, dlv_add_amt, dlv_enc_amt, dlv_pay_amt, ref_amt, refund_no
+							) values (
+								'$opt_no', 1,'$dlv_type','$dlv_cm','$dlv_amt', '$dlv_ret_amt', '$dlv_add_amt', '$dlv_enc_amt', '$dlv_pay_amt', '$ref_amt', '$refund_no'
+							)
+						";
+                    }
+                    DB::insert($sql);
+				}
+
+			}
+			else
+			{
+				$sql	= "
+					update claim set
+						dlv_type	= '',
+						dlv_cm		= '',
+						dlv_amt		= '0',
+						dlv_ret_amt	= '0',
+						dlv_add_amt	= '0',
+						dlv_enc_amt	= '0',
+						dlv_pay_amt	= '0',
+						ref_amt		= '0',
+						refund_no	= '0'
+						-- refund_pay_fee_yn = 'N'
+					where ord_opt_no = '$opt_no'
+                ";
+
+                DB::update($sql);
+			}
+		}
+
+    }
+
+
+    public function dlv_info_save($ord_no, Request $req){
+        try {
+            $r_nm		= $req->input("r_nm", "");
+            $r_phone	= $req->input("r_phone", "");
+            $r_mobile	= $req->input("r_mobile", "");
+            $r_zipcode	= $req->input("r_zipcode", "");
+            $r_addr1	= $req->input("r_addr1", "");
+            $r_addr2	= $req->input("r_addr2", "");
+            $dlv_msg	= $req->input("dlv_msg", "");
+
+            $ord_opt_nos = $req->input("ord_opt_nos", "");
+
+            DB::beginTransaction();
+
+            // 배송정보 수정
+            $sql = "
+                update order_mst set
+                    r_nm = '$r_nm',
+                    r_phone = '$r_phone',
+                    r_mobile = '$r_mobile',
+                    r_zipcode = '$r_zipcode',
+                    r_addr1 = '$r_addr1',
+                    r_addr2 = '$r_addr2',
+                    dlv_msg = '$dlv_msg',
+                    upd_date = now()
+                where ord_no = '$ord_no'
+            ";
+            DB::update($sql);
+
+            // 택배사, 송장번호 수정
+            for( $i = 0; $i < count($ord_opt_nos); $i++){
+
+                $_ord_opt_no = $ord_opt_nos[$i];
+                $_dlv_no = $req->input("dlv_no_". $_ord_opt_no );
+                $_dlv_cd = $req->input("dlv_cd_". $_ord_opt_no );
+
+                if( $_dlv_no != "" && $_dlv_cd != "" ){
+                    $sql = " /* admin : order/ord01.php (3) */
+                        update order_opt set
+                            dlv_cd = '$_dlv_cd'
+                            , dlv_no = '$_dlv_no'
+                        where ord_opt_no = '$_ord_opt_no'
+                    ";
+                    DB::update($sql);
+                }
+            }
+
+            DB::commit();
+            return true;
+        }catch(Exception $e) {
+            DB::rollback();
+            return false;
+        }
+
+    }
+
+
+     /*
+    ***
+    현금영수증 관련
+    ***
+    */
+    public function show_cash(Request $req, $order_no, $order_opt_no) {
+        $ord = $this->_get($order_no, $order_opt_no);
+        $type = $req->done == '1' ? "result" : ($req->cash_no == '' ? 'create' : 'update');
+        
+        $values = [
+            'type' => $type,
+            'ord' => $type !== "result" ? $ord : '',
+            'result' => $type === "result" ? [
+                "msg" => "발행 구현중입니다.",
+                "type" => $req->cash_no == '' ? 'create' : 'update'
+            ] : [],
+        ];
+
+        return view(Config::get('shop.shop.view') . '/order/ord01_cash', $values);
+    }
+
+    public function search_cash_receipt_list($ord_no) {
+        $code = 200;
+
+        $sql = "
+            select
+                if((cash_stat = 'STSC'), '취소', if((cash_stat = 'STPC'), '부분취소', '발행')) as cash_stat
+                , cash_no, ord_no, receipt_no, user_id, user_nm, admin_id, admin_nm, app_time, reg_stat, reg_desc, rt, ut
+            from cash_history
+            where ord_no = :ord_no
+            order by rt desc
+        ";
+
+        $result = DB::select($sql, ['ord_no' => $ord_no]);
+
+        return response()->json([
+            "code" => $code,
+            "head" => ['total' => count($result)],
+            "body" => $result
+        ]);
+    }
+
+    public function set_cash_receipt(Request $req, $ord_no, $ord_opt_no) {
+        $code = 200;
+        $msg = '';
+
+        // 현금영수증 발행 작업필요
+
+        return response()->json(["code" => $code, "msg" => $msg], $code);
+    }
+
+     /*
+    ***
+    세금계산서 관련
+    ***
+    */
+    public function show_tax(Request $req, $order_no, $order_opt_no) {
+        $ord = $this->_get($order_no, $order_opt_no);
+        $type = $req->tax_no == '' ? 'create' : 'update';
+        
+        $values = [
+            'type' => $type,
+            'ord' => $ord,
+        ];
+
+        return view(Config::get('shop.shop.view') . '/order/ord01_tax', $values);
+    }
+
+
+    public function search_tax_receipt_list($ord_no) {
+        $code = 200;
+
+		$sql = "
+			select
+				if((tax_stat = 'C'), '취소', '발행') as tax_stat
+				, tax_no, ord_no, user_id, user_nm, admin_id, admin_nm, format(amt_tot, 0) as amt_tot, date_format(rt, '%Y-%m-%d') as rt
+			from payment_tax_history
+			where ord_no = :ord_no
+			order by tax_no desc
+		";
+
+        $result = DB::select($sql, ['ord_no' => $ord_no]);
+
+        return response()->json([
+            "code" => $code,
+            "head" => ['total' => count($result)],
+            "body" => $result
+        ]);
+    }
+
+
+    public function set_tax_receipt(Request $req, $ord_no, $ord_opt_no) {
+        $type = $req->type;
+        $admin_id = Auth('head')->user()->id;
+        $admin_nm = Auth('head')->user()->name;
+
+
+        // 세금계산서 취소 데이터
+
+
+        $code = 200;
+        $msg = '';
+
+        try {
+            DB::beginTransaction();
+            
+            if($type === "create") {            // 세금계산서 발행
+                $amt_tot = str_replace(",", "", $req->input("amt_tot"));
+                $amt_sup = str_replace(",", "", $req->input("amt_sup"));
+                $amt_svc = str_replace(",", "", $req->input("amt_svc"));
+                $amt_tax = str_replace(",", "", $req->input("amt_tax"));
+                $user_id = $req->input("user_id");
+                $user_nm = $req->input("user_nm");
+                $comment = $req->input("comment");
+
+                $sql = "
+                    update payment set tax_yn = 'Y', tax_date = now()
+                    where ord_no = :ord_no
+                ";
+                DB::update($sql, ['ord_no' => $ord_no]);
+
+                $sql = "
+                    insert into payment_tax_history (
+                        ord_no, tax_stat, amt_tot, amt_sup, amt_svc, amt_tax, user_id, user_nm, admin_id, admin_nm, comment, rt
+                    ) values (
+                        '$ord_no', 'R', '$amt_tot', '$amt_sup', '$amt_svc', '$amt_tax', '$user_id', '$user_nm', '$admin_id', '$admin_nm', '$comment', now()
+                    )
+                ";
+                DB::insert($sql);
+                
+            } else if($type === "update") {     // 세금계산서 취소
+
+                $tax_no = $req->input("tax_no");
+
+                $sql = "
+                    update payment_tax_history set 
+                        tax_stat = 'C',
+                        admin_id = :admin_id,
+                        admin_nm = :admin_nm
+                    where tax_no = :tax_no
+                ";
+                DB::update($sql, ['admin_id' => $admin_id, 'admin_nm' => $admin_nm, 'tax_no' => $tax_no]);
+
+                $sql = "
+                    select tax_no 
+                    from payment_tax_history 
+                    where ord_no = :ord_no and tax_stat = 'R'
+                ";
+                $rows = DB::select($sql, ['ord_no' => $ord_no]);
+
+                if(count($rows) < 1) {
+                    $sql = "
+                        update payment set tax_yn = 'N', tax_date = now()
+                        where ord_no = :ord_no
+                    ";
+                    DB::update($sql, ['ord_no' => $ord_no]);
+                }
+            }
+
+            DB::commit();
+            $msg = "세금계산서 " . ($type === "create" ? "발행" : "취소") . "에 성공했습니다.";
+        }catch(Exception $e) {
+            DB::rollback();
+            $msg = "에러가 발행했습니다. 다시 시도해주세요.";
+        }
+
+        return response()->json(["code" => $code, "msg" => $msg], $code);
+    }
+
+
 
 
     public function cancel_orders(Request $req) {

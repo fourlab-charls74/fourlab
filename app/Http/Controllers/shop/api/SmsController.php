@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\Conf;
 use App\Models\SMS;
@@ -23,6 +24,8 @@ class SmsController extends Controller
 
         $s_phone = $req->input('phone', '');
         $s_name = $req->input('name', '');
+        $user_store = Auth('head')->user()->store_cd;
+        $user_store_nm = Auth('head')->user()->store_nm;
 
         $ids = $req->input('ids', '');
         $users = [];
@@ -57,6 +60,8 @@ class SmsController extends Controller
             's_name'        => $s_name,
             'users'         => json_encode($users),
             'store_areas'	=> SLib::getCodes("STORE_AREA"),
+            'user_store'    => $user_store,
+            'user_store_nm' => $user_store_nm
         ];
 
         return view( Config::get('shop.shop.view') . "/common/sms_all", $values);
