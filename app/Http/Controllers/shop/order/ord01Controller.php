@@ -654,6 +654,8 @@ class ord01Controller extends Controller
         $dlv_no = $req->input("dlv_no", ""); // 출고완료시 송장번호
 
         $reservation_yn = $req->input("reservation_yn", 'N'); // 예약판매여부
+        if ($ord_type == 4) $reservation_yn = 'Y';
+        if ($reservation_yn === 'Y') $ord_type = 4; // 예약(4)
 
         try {
             DB::beginTransaction();
@@ -853,6 +855,8 @@ class ord01Controller extends Controller
             $addopt_amt = $cart[$i]['addopt_amt'] ?? 0;
             $order_addopt_amt = $addopt_amt * $qty;
 
+            $opt_ord_type = 15; // order_opt의 ord_type (정상:15 / 예약:4)
+
             // 옵션가격
             $a_goods_opt = explode("|", $goods_opt);
             $opt_amt = $cart[$i]["opt_amt"] ?? 0;
@@ -890,14 +894,20 @@ class ord01Controller extends Controller
             if ($row != null) $product_stock = $row->wqty;
 
             // 예약판매가 아닐 경우에만 재고부족 에러처리
-            if ($reservation_yn !== 'Y') {
-                if ($goods->is_unlimited == "Y") {
-                    if ($product_stock < 1) {
+            if ($goods->is_unlimited == "Y") {
+                if ($product_stock < 1) {
+                    if ($reservation_yn === 'Y') {
+                        $opt_ord_type = 4; // order_opt의 ord_type (정상:15 / 예약:4)
+                    } else {
                         $code = '-105';
                         // throw new Exception("재고가 부족하여 수기판매 처리를 할 수 없습니다.");
                     }
-                } else {
-                    if ($qty > $product_stock) {
+                }
+            } else {
+                if ($qty > $product_stock) {
+                    if ($reservation_yn === 'Y') {
+                        $opt_ord_type = 4; // order_opt의 ord_type (정상:15 / 예약:4)
+                    } else {
                         $code = '-105';
                         // throw new Exception("[상품코드 : $prd_cd] 재고가 부족하여 수기판매 처리를 할 수 없습니다.");
                     }
@@ -986,7 +996,7 @@ class ord01Controller extends Controller
                     'com_id' => $goods->com_id,
                     'add_point' => $ord_opt_add_point,
                     'ord_kind' => $ord_kind,
-                    'ord_type' => $ord_type,
+                    'ord_type' => $opt_ord_type,
                     'baesong_kind' => $goods->baesong_kind,
                     'dlv_start_date' => null,
                     'dlv_proc_date' => null,
