@@ -115,20 +115,27 @@
                                                 @endif
                                             </td>
                                         @else
-                                            @if($user->attach_file_url != '')
+                                            @if(($user->attach_file_url != '' && $user->attach_file_url !== null) && count(explode(',', $user->attach_file_url)) >= 5)
                                                 <th>파일 다운로드</th>
                                                 <td>
                                                     @foreach(explode(',', $user->attach_file_url) as $file_url) 
                                                             <a href="javascript:downloadFile('{{$file_url}}')">{{explode('/', $file_url)[3]}}</a>
-                                                            <!-- a href ="{{asset('storage/'.$file_url)}}">{{explode('/', $file_url)[3]}}</a> -->
                                                             &nbsp;&nbsp;
                                                             <a href="javascript:deleteFile('{{$no}}', '{{$file_url}}')">X</a>
                                                             <br/>
                                                     @endforeach
                                                 </td>
                                             @else
-                                                <th>파일 업로드</th>
+                                                <th>파일 업로드 및 다운로드</th>
                                                 <td>
+                                                    @if($user->attach_file_url != '' && $user->attach_file_url !== null)
+                                                        @foreach(explode(',', $user->attach_file_url) as $file_url) 
+                                                                <a href="javascript:downloadFile('{{$file_url}}')">{{explode('/', $file_url)[3]}}</a>
+                                                                &nbsp;&nbsp;
+                                                                <a href="javascript:deleteFile('{{$no}}', '{{$file_url}}')">X</a>
+                                                                <br/>
+                                                        @endforeach
+                                                    @endif
                                                     <div class="form-inline inline_btn_box">
                                                         <input type = "file" name= "notice_add_file" id="notice_add_file" multiple>
                                                     </div>
@@ -175,16 +182,10 @@
         editor1 = new HDEditor('#editor1', editorOptions, true);
 
         //파일 업로드 로직
-        $('#notice_add_file').change(() => {
+        $('#notice_add_file').change((e) => {
             let files = $("input[name=notice_add_file]")[0].files;
 
-            if(files.length > 5) {
-                alert('첨부파일은 5개까지만 가능합니다.');
-                return;
-            }
-
             for(let i = 0; i < files.length; i++) {
-                console.log(files[i].name);
                 if(availableCheckExtension(files[i].name)) {
                     formData.append(`files[]`, files[i]);
                 } else {
@@ -291,12 +292,15 @@
 
     function clearFormData() {
         for (const key of formData.keys()) {
-            formData.delete(key);
+            console.log(key);
+            formData.delete(`${key}`);
         };
     }
 
     function Create() {
         const type = $('#store_notice_type').val();
+        
+        let attachFileCnt = String('{{$user->attach_file_url}}').split(',');
 
         if ($('input[name="subject"]').val() === '') {
             $('input[name="subject"]').focus();
@@ -310,6 +314,13 @@
             return false;
         }
 
+        if($("input[name=notice_add_file]")[0] !== undefined && attachFileCnt.length + $("input[name=notice_add_file]")[0].files.length > 5){
+            $("input[name=notice_add_file]").val('');
+            formData.delete('files[]');
+            alert('첨부파일의 개수는 5개 까지 입니다.');
+            return false;
+        }
+
         $('input[name="content"]').val(editor1.html());
 
         //form data 재설정
@@ -320,6 +331,7 @@
         formData.append('store_no', $('#store_no').val() == undefined ? '' : $('#store_no').val());
         formData.append('store_nm', $('input[name="store_nm"]').val());
         formData.append('_token', "{{ csrf_token() }}");
+        
 
         $.ajax({
             method: 'POST',
@@ -368,13 +380,45 @@
     }
 
     function Update(no) {
-        let frm = $('form[name=store]');
         $('input[name="content"]').val(editor1.html());
 
+        let attachFileCnt = String('{{$user->attach_file_url}}').split(',');
+
+        if ($('input[name="subject"]').val() === '') {
+            $('input[name="subject"]').focus();
+            alert('제목을 입력해 주세요.');
+            return false;
+        }
+
+        if ($('#editor1').val() === '') {
+            $('#editor1').focus();
+            alert('내용을 입력해 주세요.');
+            return false;
+        }
+
+        if($("input[name=notice_add_file]")[0] !== undefined && attachFileCnt.length + $("input[name=notice_add_file]")[0].files.length > 5){
+            $("input[name=notice_add_file]").val('');
+            formData.delete('files[]');
+            alert('첨부파일의 개수는 5개 까지 입니다.');
+            return false;
+        }
+
+        //form data 재설정
+        formData.append('store_notice_type', $('#store_notice_type').val());
+        formData.append('subject', $('input[name="subject"]').val());
+        formData.append('name', $('input[name="name"]').val());
+        formData.append('content', $('input[name="content"]').val());
+        formData.append('store_no', $('#store_no').val() == undefined ? '' : $('#store_no').val());
+        formData.append('store_nm', $('input[name="store_nm"]').val());
+        formData.append('_token', "{{ csrf_token() }}");
+
         $.ajax({
-            method: 'PUT',
+            method: 'POST',
             url: '/store/community/comm01/edit/' + no,
-            data: frm.serialize(),
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
             success: function(data) {
                 if (data.code == '200') {
                     clearFormData();

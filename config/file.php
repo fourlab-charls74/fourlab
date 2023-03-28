@@ -30,5 +30,5 @@ return [
         'png'
     ],
 
-    'store_notice_path' => 'data/communit/comm01/'
+    'store_notice_path' => 'data/community/comm01'
 ];

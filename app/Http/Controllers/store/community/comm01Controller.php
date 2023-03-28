@@ -195,7 +195,7 @@ class comm01Controller extends Controller
             if (count($_FILES) > 0) {
                 $url_array = [];
                 foreach($files as $file) {
-                    $file_name = "$now"."$id"."_".$file->getClientOriginalName();
+                    $file_name = "$now"."$id"."_".uniqid().".".$file->extension();
                     $save_path = config::get('file.store_notice_path');
                     $url_array[] = ULib::uploadFile($save_path, $file_name, $file);
                 }
@@ -254,7 +254,9 @@ class comm01Controller extends Controller
 
         $subject = $request->input('subject');
         $content = $request->input('content');
-        $store_cd = $request->input('store_no', '');
+        $store_cd = explode(',', $request->input('store_no', ''));
+        $files = $request->file('files');
+        $file_url = null;
 
         $ns_cd = $no;
         $ut = DB::raw('now()');
@@ -274,13 +276,34 @@ class comm01Controller extends Controller
         ];
 
         try {
+            //엑셀 및 ppt, image 업로드 
+            if (count($_FILES) > 0) {
+                $url_array = [];
+                foreach($files as $file) {
+                    $file_name = "$now"."$id"."_".uniqid().".".$file->extension();
+                    $save_path = config::get('file.store_notice_path');
+                    $url_array[] = ULib::uploadFile($save_path, $file_name, $file);
+                }
+                $file_url = implode(',', $url_array);
+            }
+
             DB::beginTransaction();
+            
+            $sql = "
+                update notice_store
+                set 
+                    subject = '$subject', 
+                    content = '$content',
+                    all_store_yn =  '$all_store_yn',
+                    ut = $ut,
+                    attach_file_url = (case when '$file_url' != '' then CONCAT(attach_file_url, ',' , '$file_url') else attach_file_url end)
+                where 
+                    ns_cd = $ns_cd
+            ";
 
-            DB::table('notice_store')
-                ->where('ns_cd', '=', $ns_cd)
-                ->update($notice_store);
-
-            if ($store_cd != '') {
+            DB::update($sql);
+            
+            if (count($store_cd) > 0) {
                 foreach ($store_cd as $sc) {
                     DB::table('notice_store_detail')
                         ->insert([
@@ -291,6 +314,7 @@ class comm01Controller extends Controller
                         ]);
                 }
             }
+
             DB::commit();
             $code = 200;
             $msg = "";
@@ -328,7 +352,7 @@ class comm01Controller extends Controller
     public function delete_file($no, $path) {
 
         $file_path = storage_path('\\app\\public\\data\\community\\comm01\\'.$path);
-        $delete_file_url = config::get('file.store_notice_path').$path;
+        $delete_file_url = 'data/community/comm01/'.$path;
 
         if (file_exists($file_path)) {
 
