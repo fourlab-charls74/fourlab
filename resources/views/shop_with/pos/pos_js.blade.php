@@ -384,7 +384,7 @@
     }
 
     /** 주문등록 (판매) */
-    function sale() {
+    function sale(reservation_yn = 'N') {
         if(!validate()) return;
 
         let card_amt = $("[name=card_amt]").val() * 1;
@@ -436,6 +436,7 @@
                 removed_cart: removed_goods,
                 memo,
                 user_id: $("#user_id_txt").text(),
+                reservation_yn: reservation_yn
             },
         }).then(function (res) {
             if(res.data.code === '200') {
@@ -445,7 +446,13 @@
                 getOrderAnalysisData();
                 searchWaiting();
             } else if(res.data.code !== '500') {
-                alert(res.data.msg);
+                if (res.data.code === '-105' && reservation_yn === 'N') {
+                    if(confirm("해당상품의 매장재고가 부족합니다.\n예약판매하시겠습니까?")) {
+                        sale('Y');
+                    }
+                } else {
+                    alert(res.data.msg);
+                }
             } else {
                 console.log(res);
                 alert("주문등록 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");

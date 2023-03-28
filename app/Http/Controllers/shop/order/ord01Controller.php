@@ -653,6 +653,8 @@ class ord01Controller extends Controller
         $dlv_cd = $req->input("dlv_cd", ""); // 출고완료시 택배업체
         $dlv_no = $req->input("dlv_no", ""); // 출고완료시 송장번호
 
+        $reservation_yn = $req->input("reservation_yn", 'N'); // 예약판매여부
+
         try {
             DB::beginTransaction();
 
@@ -691,6 +693,7 @@ class ord01Controller extends Controller
                     'id' => Auth('head')->user()->id,
                     'name' => Auth('head')->user()->name,
                 ],
+                'reservation_yn' => $reservation_yn,
             ]);
 
             if ($order_result['code'] != '200') {
@@ -789,6 +792,8 @@ class ord01Controller extends Controller
         $ord_date = date_format(date_create($ord_date), 'Y-m-d H:i:s');
         $fee_rate = $data['fee_rate'] ?? 0;
 
+        $reservation_yn = $data['reservation_yn'] ?? 'N';
+
         ################################
         #	수기 주문번호 생성
         ################################
@@ -884,15 +889,18 @@ class ord01Controller extends Controller
             }
             if ($row != null) $product_stock = $row->wqty;
 
-            if ($goods->is_unlimited == "Y") {
-                if ($product_stock < 1) {
-                    $code = '-105';
-                    // throw new Exception("재고가 부족하여 수기판매 처리를 할 수 없습니다.");
-                }
-            } else {
-                if ($qty > $product_stock) {
-                    $code = '-105';
-                    // throw new Exception("[상품코드 : $prd_cd] 재고가 부족하여 수기판매 처리를 할 수 없습니다.");
+            // 예약판매가 아닐 경우에만 재고부족 에러처리
+            if ($reservation_yn !== 'Y') {
+                if ($goods->is_unlimited == "Y") {
+                    if ($product_stock < 1) {
+                        $code = '-105';
+                        // throw new Exception("재고가 부족하여 수기판매 처리를 할 수 없습니다.");
+                    }
+                } else {
+                    if ($qty > $product_stock) {
+                        $code = '-105';
+                        // throw new Exception("[상품코드 : $prd_cd] 재고가 부족하여 수기판매 처리를 할 수 없습니다.");
+                    }
                 }
             }
 

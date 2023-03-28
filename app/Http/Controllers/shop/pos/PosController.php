@@ -444,6 +444,7 @@ class PosController extends Controller
         $memo = $req->input('memo', '') ?? ''; // 특이사항 메모
         $cart = $req->input('cart', []); // 상품목록
         $removed_cart = $req->input('removed_cart', []); // 삭제할 ord_opt_no 목록 (대기주문 판매처리 시 사용)
+        $reservation_yn = $req->input('reservation_yn', 'N'); // 예약판매여부
 
         $is_new = $ord_no === '';
         $ord_date = date('Y-m-d H:i:s');
@@ -533,11 +534,12 @@ class PosController extends Controller
                 ######################### 재고수량 판매가능여부 체크 ############################
                 $prd_wqty = DB::table('product_stock_store')->where('prd_cd', $prd_cd)->where('store_cd', $store_cd)->value('wqty');
 
-                // 재고부족할 경우, 예약판매기능 추가 필요 (작업중입니다.)
-
-                if (($goods->is_unlimited === 'Y' && $prd_wqty < 1) || $qty > $prd_wqty) {
-                    $code = '-105';
-                    throw new Exception("재고가 부족하여 판매할 수 없습니다.");
+                // 예약판매가 아닐 경우에만 재고부족 에러처리
+                if ($reservation_yn !== 'Y') {
+                    if (($goods->is_unlimited === 'Y' && $prd_wqty < 1) || $qty > $prd_wqty) {
+                        $code = '-105';
+                        throw new Exception("재고가 부족하여 판매할 수 없습니다.");
+                    }
                 }
 
                 ######################### 상품별 쿠폰금액 반영 ############################

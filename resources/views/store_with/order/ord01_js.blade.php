@@ -82,7 +82,7 @@
     }
 
     // 판매등록
-    function save() {
+    function save(reservation_yn = 'N') {
         let order_data = getForm2JSON($('form[name=f1]'));
         
         let rows = [];
@@ -92,7 +92,8 @@
             }
         })
         order_data["cart"] = rows;
-        
+        order_data["reservation_yn"] = reservation_yn;
+
         $.ajax({
             async: true,
             dataType: "json",
@@ -106,7 +107,13 @@
                     opener.Search();
                     document.location.href = '/store/order/ord01/order/' + res.ord_no;
                 } else {
-                    alert("저장에 실패했습니다.\n실패 사유 : " + out_order_errors[res.code]);
+                    if (res.code === '-105' && reservation_yn === 'N') {
+                        if (confirm("해당상품의 매장재고가 부족합니다.\n예약판매하시겠습니까?")) {
+                            save('Y');
+                        }
+                    } else {
+                        alert("저장에 실패했습니다.\n실패 사유 : " + out_order_errors[res.code]);
+                    }
                 }
             },
             error: function(e) {
