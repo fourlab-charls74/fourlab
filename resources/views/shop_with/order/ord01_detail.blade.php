@@ -709,6 +709,9 @@
                             @if (@$store && ($order_opt->clm_state == "0" || $order_opt->clm_state == "1" || $order_opt->clm_state == "-30"))
                             <button class="btn-sm btn btn-primary store-refund-btn fs-12">매장환불</button>
                             @endif
+                            @if (@$store && ($order_opt->ord_type == 4))
+                            <button class="btn-sm btn btn-primary store-complete-reservation-btn fs-12">예약상품지급</button>
+                            @endif
                             <button class="btn-sm btn btn-secondary sms-send-btn fs-12">SMS 발송</button>
                             <button class="btn-sm btn btn-secondary sms-list-btn fs-12">SMS 내역</button>
                             <button class="btn-sm btn btn-secondary ord20-btn fs-12">수기판매</button>
@@ -1459,6 +1462,29 @@
         if ($('[name=goods]:checked').length === 0) return alert("상품을 선택해주세요.");
         $('#StoreClaimModal').modal({
             keyboard: false
+        });
+    });
+
+    $('.store-complete-reservation-btn').click(function(e) {
+        e.preventDefault();
+
+        if ($('[name=goods]:checked').length === 0) return alert("상품을 선택해주세요.");
+        if (!confirm("예약판매된 해당상품을 지급완료처리하시겠습니까?")) return;
+
+        axios({
+            url: '/shop/order/ord01/complete-reservation',
+            method: 'post',
+            data: { ord_no, ord_opt_no },
+        }).then(function (res) {
+            if(res.data.code == 200) {
+                window.opener.Search();
+                location.reload();
+            } else {
+                alert(res.data.msg);
+                console.log(res);
+            }
+        }).catch(function (err) {
+            console.log(err);
         });
     });
 

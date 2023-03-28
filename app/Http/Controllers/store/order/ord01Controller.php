@@ -911,7 +911,7 @@ class ord01Controller extends Controller
             $addopt_amt = $cart[$i]['addopt_amt'] ?? 0;
             $order_addopt_amt = $addopt_amt * $qty;
 
-            $opt_ord_type = 15; // order_opt의 ord_type (정상:15 / 예약:4)
+            $opt_ord_type = 14; // order_opt의 ord_type (수기판매:14 / 예약:4)
 
             // 옵션가격
             $a_goods_opt = explode("|", $goods_opt);
@@ -953,7 +953,7 @@ class ord01Controller extends Controller
             if ($goods->is_unlimited == "Y") {
                 if ($product_stock < 1) {
                     if ($reservation_yn === 'Y') {
-                        $opt_ord_type = 4; // order_opt의 ord_type (정상:15 / 예약:4)
+                        $opt_ord_type = 4; // order_opt의 ord_type (수기판매:14 / 예약:4)
                     } else {
                         $code = '-105';
                         // throw new Exception("재고가 부족하여 수기판매 처리를 할 수 없습니다.");
@@ -962,7 +962,7 @@ class ord01Controller extends Controller
             } else {
                 if ($qty > $product_stock) {
                     if ($reservation_yn === 'Y') {
-                        $opt_ord_type = 4; // order_opt의 ord_type (정상:15 / 예약:4)
+                        $opt_ord_type = 4; // order_opt의 ord_type (수기판매:14 / 예약:4)
                     } else {
                         $code = '-105';
                         // throw new Exception("[상품코드 : $prd_cd] 재고가 부족하여 수기판매 처리를 할 수 없습니다.");
@@ -1999,7 +1999,7 @@ class ord01Controller extends Controller
                     , (select code_val from code where code_kind_cd = 'G_ORD_STATE' and code_id = o.ord_state)
                     , (select code_val from code where code_kind_cd = 'G_CLM_STATE' and code_id = o.clm_state)
                  ) as order_state
-                 , o.ord_state, o.clm_state
+                 , o.ord_state, o.clm_state, o.ord_type
                  , o.recv_amt, o.dc_amt, o.point_amt, o.coupon_amt
             from order_opt o
                 inner join goods g on g.goods_no = o.goods_no and g.goods_sub = o.goods_sub
@@ -2627,5 +2627,35 @@ class ord01Controller extends Controller
 
         // dd($values);
         return view( Config::get('shop.store.view') . '/order/ord01_refund',$values);
+    }
+
+    /** 예약판매상품 지급완료처리 (예약주문건 정상주문처리) */
+    public function complete_reservation(Request $request)
+    {
+        $ord_no = $request->input('ord_no', '');
+        $ord_opt_no = $request->input('ord_opt_no', '');
+        $ord_type = 15; // 정상:15
+
+        try {
+            DB::beginTransaction();
+
+            DB::table('order_opt')->where('ord_opt_no', $ord_opt_no)->update([ 'ord_type' => $ord_type ]);
+            DB::table('order_opt_wonga')->where('ord_opt_no', $ord_opt_no)->update([ 'ord_type' => $ord_type ]);
+
+            $reservation_ord_cnt = DB::table('order_opt')->where('ord_no', $ord_no)->where('ord_type', 4)->count();
+            if ($reservation_ord_cnt < 1) {
+                DB::table('order_mst')->where('ord_no', $ord_no)->update([ 'ord_type' => $ord_type ]);
+            }
+
+            DB::commit();
+            $code = 200;
+            $msg = '예약판매상품이 지급완료처리되었습니다.';
+        } catch (Exception $e) {
+            DB::rollback();
+            $code = 500;
+            $msg = $e->getMessage();
+        }
+
+        return response()->json(['code' => $code, 'msg' => $msg], 200);
     }
 }

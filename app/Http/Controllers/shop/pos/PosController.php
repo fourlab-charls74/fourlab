@@ -1150,10 +1150,6 @@ class PosController extends Controller
         $ord_no = $request->input('ord_no', '');
         $ord_opt_no = $request->input('ord_opt_no', '');
         $ord_type = 15; // 정상:15
-        $user = [
-            'id' => Auth('head')->user()->id,
-            'name' => Auth('head')->user()->name
-        ];
 
         try {
             DB::beginTransaction();
