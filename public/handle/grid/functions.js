@@ -92,12 +92,12 @@ function openStoreStock(prd_cd, date = ''){
     var stock = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=900,height=768");
 }
 function openStoreOrder(ord_no,ord_opt_no){
-    var url = '/store/stock/stk03/order/' + ord_no + '/' + ord_opt_no;
+    var url = '/store/order/ord01/order/' + ord_no + '/' + ord_opt_no;
     var order = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
 }
 
 function openShopOrder(ord_no,ord_opt_no){
-    var url = '/shop/stock/stk03/order/' + ord_no + '/' + ord_opt_no;
+    var url = '/shop/order/ord01/order/' + ord_no + '/' + ord_opt_no;
     var order = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
 }
 
