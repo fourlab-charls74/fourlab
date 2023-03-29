@@ -20,7 +20,7 @@ class stk33Controller extends Controller
     {
 
         $mutable = Carbon::now();
-        $sdate = $mutable->sub(1, 'week')->format('Y-m-d');
+        $sdate = $mutable->sub(1, 'month')->format('Y-m-d');
         $edate = date("Y-m-d");
 
         $req_date = $request->query('date');

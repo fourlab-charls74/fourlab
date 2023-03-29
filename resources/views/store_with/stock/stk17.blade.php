@@ -258,24 +258,16 @@
                 width: 80,
                 hide: true
             },
-            {
-                headerName: '창고재고', // 대표창고의 재고를 조회
-                children: [
-                    {field: "storage_qty", headerName: "재고", type: 'currencyType', 
-                        cellRenderer: function(params) {
-                            if (params.value !== undefined) {
-                                return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
-                            }
-                        }
-                    },
-                    {field: "storage_wqty", headerName: "보유재고", type: 'currencyType',
-                        cellRenderer: function(params) {
-                            if (params.value !== undefined) {
-                                return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
-                            }
-                        }
-                    },
-                ]
+            {   
+                field: 'storage_wqty',
+                headerName: '창고재고',
+                type: 'currencyType', // 대표창고의 재고를 조회
+                cellRenderer: function(params) {
+                    if (params.value !== undefined) {
+                        return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                    }
+                },
+
             },
             {
                 field: 'store_info',

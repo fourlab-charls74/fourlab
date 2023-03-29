@@ -139,7 +139,7 @@ class stk17Controller extends Controller
         $state = 10;
         $admin_id = Auth('head')->user()->id;
 
-        $store_cd = $request->input("store_cd", '');
+        $store_cd = Auth('head')->user()->store_cd;
         $data = $request->input("products", []);
         // $exp_dlv_day = $request->input("exp_dlv_day", '');
         // $rel_order = $request->input("rel_order", '');
@@ -163,6 +163,7 @@ class stk17Controller extends Controller
                         // 'exp_dlv_day' => str_replace("-", "", $exp_dlv_day),
                         // 'rel_order' => $rel_order,
                         'req_id' => $admin_id,
+                        'req_comment' => $row['req_comment'],
                         'req_rt' => now(),
                         'rt' => now(),
                     ]);

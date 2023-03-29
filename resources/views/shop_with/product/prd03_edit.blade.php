@@ -12,11 +12,13 @@
 				<span>/ 수정</span>
 			</div>
 		</div>
+		@if($method == 'edit')
 		<div class="d-flex">
 			<a href="javascript:void(0);" onclick="save();" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i>수정</a>
 			<a href="javascript:void(0);" onclick="del();" class="btn btn-outline-primary mr-1"><i class="far fa-trash-alt fs-12"></i> 삭제</a>
 			<a href="javascript:void(0);" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i>닫기</a>
 		</div>
+		@endif
 	</div>
 
 	<style>
@@ -112,16 +114,24 @@
 										</tr>
 										<tr>
 											<th>이미지</th>
-											<td colspan="3">
-												<div style="text-align:center;" id="multi_img">
-													<input type='file' id='btnAdd' name="btnAdd" multiple='multiple' accept=".jpg" />
-												</div>
-												<div id='img_div'></div>
-												<div id='img_show_div' data-img="" style="display:inline-block;position:relative;width:150px;height:150px;margin:5px;z-index:1">
-													<img src="{{$img_url}}" alt="" id="img_show" style="width:100%;height:100%;z-index:none">
-													<input type="button" value="x" onclick="delete_img('{{$prd_cd}}','01')" style="width:20px;height:20px;position:absolute;right:0px;top:0px;border:none;font-size:large;font-weight:bolder;background:none;color:black;padding-bottom:20px;">
-												</div>
-											</td>
+											@if($method == 'edit')
+												<td colspan="3">
+													<div style="text-align:center;" id="multi_img">
+														<input type='file' id='btnAdd' name="btnAdd" multiple='multiple' accept=".jpg" />
+													</div>
+													<div id='img_div'></div>
+													<div id='img_show_div' data-img="" style="display:inline-block;position:relative;width:150px;height:150px;margin:5px;z-index:1">
+														<img src="{{$img_url}}" alt="" id="img_show" style="width:100%;height:100%;z-index:none">
+														<input type="button" value="x" onclick="delete_img('{{$prd_cd}}','01')" style="width:20px;height:20px;position:absolute;right:0px;top:0px;border:none;font-size:large;font-weight:bolder;background:none;color:black;padding-bottom:20px;">
+													</div>
+												</td>
+											@else 
+												<td colspan="3">
+													<div id='img_show_div' data-img="" style="display:inline-block;position:relative;width:150px;height:150px;margin:5px;z-index:1">
+														<img src="{{$img_url}}" alt="" id="img_show" style="width:100%;height:100%;z-index:none">
+													</div>
+												</td>
+											@endif
 										</tr>
 								</table>
 							</div>
@@ -134,6 +144,16 @@
 
 </div>
 <script type="text/javascript" charset="utf-8">
+
+	$(document).ready(function() {
+        if('{{$method}}' === 'show') {
+            //view일 떈, readonly 처리
+            $("#prd_nm").attr("readonly",true); 
+            $("#price").attr("readonly",true); 
+            $("#wonga").attr("readonly",true); 
+            $("#unit").attr("readonly",true); 
+        }
+    });
 
 	const onlyNum = (obj) => {
 		val = obj.value;

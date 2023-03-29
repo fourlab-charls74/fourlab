@@ -212,7 +212,7 @@
             {field: "prd_cd", headerName: "상품코드", width:120, cellStyle: DEFAULT,
                 cellRenderer: function(params) {
                     if (params.value !== undefined) {
-                        return '<a href="#" onclick="return EditProduct(\'' + params.value + '\');">' + params.value + '</a>';
+                        return '<a href="#" onclick="return ShowProduct(\'' + params.value + '\');">' + params.value + '</a>';
                     }
                 }
             },
@@ -250,23 +250,14 @@
                 hide: true
             },
             {
+                field: "storage_wqty",
                 headerName: '창고재고', // 대표창고의 재고를 조회
-                children: [
-                    {field: "storage_qty", headerName: "재고", type: 'currencyType', 
-                        cellRenderer: function(params) {
-                            if (params.value !== undefined) {
-                                return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
-                            }
-                        }
-                    },
-                    {field: "storage_wqty", headerName: "보유재고", type: 'currencyType',
-                        cellRenderer: function(params) {
-                            if (params.value !== undefined) {
-                                return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
-                            }
-                        }
-                    },
-                ]
+                type: 'currencyType',
+                cellRenderer: function(params) {
+                    if (params.value !== undefined) {
+                        return '<a href="#" onclick="return openShopStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                    }
+                }
             },
             {
                 field: 'store_info',
@@ -281,7 +272,7 @@
                         width: 50,
                         cellRenderer: function(params) {
                             if (params.value !== undefined) {
-                                return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                                return '<a href="#" onclick="return openShopStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
                             }
                         }
                     },
@@ -293,7 +284,7 @@
                         width: 80,
                         cellRenderer: function(params) {
                             if (params.value !== undefined) {
-                                return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                                return '<a href="#" onclick="return openShopStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
                             }
                         }
                     },
@@ -310,6 +301,8 @@
                 ],
             },
             {field: "amount", headerName: "합계", type: 'currencyType', width:100, valueGetter: (params) => calAmount(params)},
+            {field: 'rel_qty', headerName: '요청수량', type: "currencyType", width: 80, editable: true, cellStyle: {'background-color': '#ffff99'}, valueFormatter: formatNumber},
+            {field: "req_comment", headerName: "요청메모", width: 300, editable: true, cellStyle: {'background-color': '#ffff99'}},
             {width: 'auto'}
         ];
 
@@ -363,8 +356,8 @@
             Search();
         });
 
-        function EditProduct(product_code) {
-			var url = '/shop/product/prd03/edit/' + product_code;
+        function ShowProduct(product_code) {
+			var url = '/shop/product/prd03/show/' + product_code;
 			var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1100,height=555");
 		}
 
@@ -393,7 +386,7 @@
         function requestRelease() {
             let rows = gx.getSelectedRows();
             if (rows.length < 1) return alert("출고요청할 상품을 선택해주세요.");
-            if (rows.filter(r => !r.rel_qty || !r.rel_qty.trim() || r.rel_qty == 0 || isNaN(parseInt(r.rel_qty))).length > 0) return alert("선택한 상품의 배분수량을 입력해주세요.");
+            if (rows.filter(r => !r.rel_qty || !r.rel_qty.trim() || r.rel_qty == 0 || isNaN(parseInt(r.rel_qty))).length > 0) return alert("선택한 상품의 요청수량을 입력해주세요.");
 
             let over_qty_rows = rows.filter(row => {
                 if (row.storage_wqty !== null) {

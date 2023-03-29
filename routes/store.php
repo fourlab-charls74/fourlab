@@ -234,7 +234,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('prd03/change-gender', 'prd03Controller@change_gender');
         Route::post('prd03/create', 'prd03Controller@create');
 
-        Route::get('prd03/edit/{product_code}','prd03Controller@showEdit');
+        Route::get('prd03/{type}/{product_code}','prd03Controller@showAndEdit');
         Route::post('prd03/edit','prd03Controller@edit');
 
         Route::get('prd03/delete/{product_code}','prd03Controller@delete');

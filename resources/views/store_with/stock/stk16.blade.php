@@ -334,7 +334,7 @@
         {field: "prd_cd", headerName: "바코드", width:120, cellStyle: DEFAULT,
             cellRenderer: function(params) {
                 if (params.value !== undefined) {
-                    return '<a href="#" onclick="return EditProduct(\'' + params.value + '\');">' + params.value + '</a>';
+                    return '<a href="#" onclick="return ShowProduct(\'' + params.value + '\');">' + params.value + '</a>';
                 }
             }
         },
@@ -458,8 +458,8 @@
         node.setDataValue(fieldName, e.value);
     }
 
-    function EditProduct(product_code) {
-        var url = '/store/product/prd03/edit/' + product_code;
+    function ShowProduct(product_code) {
+        var url = '/store/product/prd03/show/' + product_code;
         var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1100,height=555");
     }
 
