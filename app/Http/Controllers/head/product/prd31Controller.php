@@ -23,12 +23,19 @@ class prd31Controller extends Controller
         $mutable = Carbon::now();
         $sdate	= $mutable->sub(3, 'day')->format('Y-m-d');
 
+		$sql = "
+			select distinct(mall_name) as mall_name from shop_sabangnet_order
+		";
+
+		$sale_places = DB::select($sql);
+
+
         $values = [
             'sdate'         => $sdate,
             'edate'         => date("Y-m-d"),
             'ord_states'    => SLib::getOrdStates(),
             'clm_states'     => SLib::getCodes('G_CLM_STATE'),
-            'sale_places'   => SLib::getSalePlaces(),
+            'sale_places'   => $sale_places,
         ];
         return view( Config::get('shop.head.view') . '/product/prd31',$values);
     }
@@ -44,7 +51,7 @@ class prd31Controller extends Controller
 		$s_goods_no		= $request->input("goods_no");
 		$s_style_no		= $request->input("style_no");
 		$s_sale_place	= $request->input("s_site");
-		$com_id			= $request->input('site');
+		$sale_place		= $request->input('site');
 		$s_state		= $request->input("s_state");
 		$s_ord_no		= $request->input("ord_no");
 		$s_ord_nm		= $request->input("ord_nm");
@@ -68,7 +75,8 @@ class prd31Controller extends Controller
 		if( $s_ord_nm != "" )		$where .= " and s.order_name = '$s_ord_nm' ";
 		if( $s_rcv_nm != "" )		$where .= " and s.receive = '$s_rcv_nm' ";
 		if( $s_goods_nm != "" )		$where .= " and s.product_name like '%$s_goods_nm%' ";
-		if( $com_id != "") 			$where .= " and com.com_id = '$com_id'";
+		if( $sale_place != "" )		$where .= " and s.mall_name = '$sale_place' ";
+		// if( $com_id != "") 			$where .= " and com.com_id = '$com_id'";
 
 
 		if( $s_ord_state != "" )	$where .= " and o.ord_state = '$s_ord_state' ";
@@ -95,7 +103,7 @@ class prd31Controller extends Controller
 					left outer join code dlv_cd on  dlv_cd.code_kind_cd = 'DELIVERY' and o.dlv_cd = dlv_cd.code_id
 					left outer join code ord_state on o.ord_state = ord_state.code_id and ord_state.code_kind_cd = 'G_ORD_STATE'
 					left outer join code clm_state on o.clm_state = clm_state.code_id and clm_state.code_kind_cd = 'G_CLM_STATE'
-					left outer join company com on com.com_nm = s.mall_name
+					-- left outer join company com on com.com_nm = s.mall_name
 				where 
 					1 = 1
 					and ( s.orderdate >= :sdate and s.orderdate < date_add(:edate,interval 1 day))
@@ -125,7 +133,7 @@ class prd31Controller extends Controller
 				ord_state.code_val as ord_state,
 				clm_state.code_val as clm_state,
 				s.orderdate,s.order_reg_date,
-				com.com_id,
+				-- com.com_id,
 				s.admin_nm,
 				s.rt,s.ut
 			from shop_sabangnet_order s
@@ -134,7 +142,7 @@ class prd31Controller extends Controller
 				left outer join code dlv_cd on  dlv_cd.code_kind_cd = 'DELIVERY' and o.dlv_cd = dlv_cd.code_id
 				left outer join code ord_state on o.ord_state = ord_state.code_id and ord_state.code_kind_cd = 'G_ORD_STATE'
 				left outer join code clm_state on o.clm_state = clm_state.code_id and clm_state.code_kind_cd = 'G_CLM_STATE'
-				left outer join company com on com.com_nm = s.mall_name
+				-- left outer join company com on com.com_nm = s.mall_name
 			where 
 				1 = 1	
 				and ( s.orderdate >= :sdate and s.orderdate < date_add(:edate,interval 1 day))
