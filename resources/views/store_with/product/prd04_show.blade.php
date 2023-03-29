@@ -167,7 +167,7 @@
 
 <style>
     .ag-row-level-1 {
-		background-color: #edf4fd !important;
+		background-color: #f2f2f2 !important;
 	}
 </style>
 
@@ -302,26 +302,13 @@
             list.push({
                 headerName: size,
                 children: [
-                    {field: ss + "_qty", headerName: "실재고", maxWidth: 60, minWidth: 60, 
-                        cellStyle: (params) => ({"text-align": "right", "background-color": size === setting_size ? "#AAFF99" : "none"}),
+                    {field: ss + "_qty", headerName: "실재고", maxWidth: 60, minWidth: 60,
+                        cellStyle: (params) => ({ 'text-align': 'right', "background-color": size === setting_size ? "#AAFF99" : "none" }),
                         aggFunc: (params) => params.values.reduce((a,c) => a + (c * 1), 0),
-                        cellRenderer: (params) => {
-                            if (params.data !== undefined) {
-                                return params.data[ss + "_qty"] < 1 ? '' : params.data[ss + "_qty"];
-                            }
-                            else return params.value || 0;
-                        },
                     },
                     {field: ss + "_wqty", headerName: "보유재고", maxWidth: 65, minWidth: 65,
-                        cellStyle: (params) => ({"text-align": "right", "background-color": size === setting_size ? "#AAFF99" : "none"}),
+                        cellStyle: (params) => ({ 'text-align': 'right', "background-color": size === setting_size ? "#AAFF99" : "none" }),
                         aggFunc: (params) => params.values.reduce((a,c) => a + (c * 1), 0),
-                        cellRenderer: (params) => {
-                            if (params.data !== undefined) {
-                                return params.data[ss + "_wqty"] < 1 ? '' : params.data[ss + "_wqty"];
-                            } else {
-                                return params.value || 0;
-                            }
-                        }
                     },        
                 ],
             });

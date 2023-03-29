@@ -58,7 +58,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-6 inner-td">
+                        {{-- <div class="col-lg-6 inner-td">
                             <div class="form-group">
                                 <label for="">매장구분</label>
                                 <div class="flax_box">
@@ -70,7 +70,7 @@
                                     </select>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
                         <div class="col-lg-6 inner-td">
                             <div class="form-group">
                                 <label for="">컬러</label>
@@ -167,7 +167,7 @@
 
 <style>
     .ag-row-level-1 {
-		background-color: #edf4fd !important;
+		background-color: #f2f2f2 !important;
 	}
 </style>
 
@@ -305,23 +305,10 @@
                     {field: ss + "_qty", headerName: "실재고", maxWidth: 60, minWidth: 60, 
                         cellStyle: (params) => ({"text-align": "right", "background-color": size === setting_size ? "#AAFF99" : "none"}),
                         aggFunc: (params) => params.values.reduce((a,c) => a + (c * 1), 0),
-                        cellRenderer: (params) => {
-                            if (params.data !== undefined) {
-                                return params.data[ss + "_qty"] < 1 ? '' : params.data[ss + "_qty"];
-                            }
-                            else return params.value || 0;
-                        },
                     },
                     {field: ss + "_wqty", headerName: "보유재고", maxWidth: 65, minWidth: 65,
                         cellStyle: (params) => ({"text-align": "right", "background-color": size === setting_size ? "#AAFF99" : "none"}),
                         aggFunc: (params) => params.values.reduce((a,c) => a + (c * 1), 0),
-                        cellRenderer: (params) => {
-                            if (params.data !== undefined) {
-                                return params.data[ss + "_wqty"] < 1 ? '' : params.data[ss + "_wqty"];
-                            } else {
-                                return params.value || 0;
-                            }
-                        }
                     },        
                 ],
             });
