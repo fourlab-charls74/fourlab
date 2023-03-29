@@ -152,6 +152,8 @@ class ord01Controller extends Controller
                     , company.r_zip_code as com_r_zip_code, company.r_addr1 as com_r_addr1, company.r_addr2  as com_r_addr2
                     , company.md_nm, company.memo as com_memo, a.price, a.dlv_pay_type
                     , m.memo as member_memo, 'Y' as taxpayer_yn,mu.name as seller
+                    , ifnull(mbl.black_yn, 'N') as black_yn
+                    , ifnull(mbl.black_reason, '') as black_reason
                 from order_opt a
                     inner join order_mst b on a.ord_no = b.ord_no
                     left outer join code c on c.code_kind_cd = 'DELIVERY' and a.dlv_cd = c.code_id
@@ -160,6 +162,7 @@ class ord01Controller extends Controller
                     left outer join code com_type on com_type.code_kind_cd = 'G_COM_TYPE' and company.com_type = com_type.code_id
                     left outer join code ord_state on ord_state.code_kind_cd = 'G_ORD_STATE' and a.ord_state = ord_state.code_id
                     left outer join member m on b.user_id = m.user_id
+                    left outer join member_black_list mbl on b.user_id = mbl.user_id
                     left outer join mgr_user mu on b.admin_id = mu.id
                 where a.ord_opt_no = :ord_opt_no
             ";

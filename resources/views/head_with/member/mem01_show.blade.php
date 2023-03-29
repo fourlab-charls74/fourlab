@@ -512,6 +512,26 @@
                                                 @endif
                                             </td>
                                         </tr>
+                                        @if(@$type == 'edit')
+                                        <tr>
+                                            <th>블랙리스트</th>
+                                            <td>
+                                                <div class="form-inline form-radio-box mt-1 mt-sm-0">
+                                                    <div class="custom-control custom-radio">
+                                                        <input type="radio" name="black_yn" id="black_yn_y" class="custom-control-input" value="Y" @if(@$user->black_yn == 'Y') checked @endif>
+                                                        <label class="custom-control-label" for="black_yn_y">Y</label>
+                                                    </div>
+                                                    <div class="custom-control custom-radio">
+                                                        <input type="radio" name="black_yn" id="black_yn_n" class="custom-control-input" value="N"  @if(@$user->black_yn == 'N') checked @endif>
+                                                        <label class="custom-control-label" for="black_yn_n">N</label>
+                                                    </div>
+                                                    <div class="flax_box inline_btn_box">
+                                                        <input type="text" name="black_reason" id="black_reason" class="form-control form-control-sm" value="{{@$user->black_reason}}" readonly>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        @endif
                                         <tr>
                                             <th>메모</th>
                                             <td>
@@ -711,6 +731,16 @@
     const app = new App('', {gridId: "#div-gd"});
     const gridDiv = document.querySelector(app.options.gridId);
     const gx = new HDGrid(gridDiv, column1);
+
+    $('input[name="black_yn"]').change(function() {
+        let value = $(this).val();   
+
+        if(value ===  'Y'){
+            $('#black_reason').removeAttr('readonly');
+        } else {
+            $('#black_reason').attr('readonly', true);
+        }
+    });
 
     $('.nav-link').click(function(){
         const num = this.id.split('-')[2] - 1;

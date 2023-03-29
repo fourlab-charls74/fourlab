@@ -107,9 +107,12 @@ class mem01Controller extends Controller
                 a.job, a.interest, a.yn, a.memo, a.visit_cnt, a.opt, a.recommend_id,
                 b.ord_date, b.ord_cnt, b.ord_amt,
                 c.code_val as auth_type_nm, a.auth_type, a.auth_yn, a.auth_key, a.ipin, a.foreigner, a.mobile_cert_yn,
-                a.yyyy_chk, a.yyyy, a.mm, a.dd, a.sex, a.store_nm
+                a.yyyy_chk, a.yyyy, a.mm, a.dd, a.sex, a.store_nm,
+                ifnull(mbl.black_yn, 'N') as black_yn,
+                (case when mbl.black_reason is not null then mbl.black_reason else '' end) as black_reason
             from $member_table a
                 left outer join member_stat b on a.user_id = b.user_id
+                left outer join member_black_list mbl on a.user_id = mbl.user_id
                 left outer join code c on c.code_kind_cd = 'G_AUTH_TYPE' and c.code_id = a.auth_type
             where a.user_id = '$user_id'
         ";
@@ -376,26 +379,36 @@ class mem01Controller extends Controller
         //     $mm = substr($jumin1,2,2);
         //     $dd = substr($jumin1,4,2);
         // }
+        
+        try {
+            DB::beginTransaction();
 
-        $sql= "
-            insert into member (
-                user_id, user_pw, name, name_eng, jumin, jumin1, jumin2, email, email_chk
-                , zip, addr, addr2, phone, mobile, rmobile, regdate
-                , point, ypoint, yn, mobile_chk, yyyy_chk
-                , yyyy, mm, dd, opt, out_yn, name_chk, wsale_status, taxpayer_yn, enjumin, anniv_date, anniv_type
-                , job, interest, memo, pwd_reset_yn, sex, recommend_id
-                , auth_type, auth_yn, auth_key, store_nm, store_cd, type
-            ) values (
-                '$user_id', '$enc_pwd', '$name', '', '$jumin', '$jumin1', '$enc_jumin2', '$email', '$email_chk'
-                , '$zip', '$addr', '$addr2', '$phone', '$mobile', '$rmobile', now()
-                , '0', '0', 'Y', '$mobile_chk', ''
-                , '$yyyy', '$mm', '$dd', '$opt', 'N', 'N', 'N', '$taxpayer_yn', '', '$anniv_date', ''
-                , '$job', '$interest', '$memo', 'N', '$sex', ''
-                , '$auth_type', '$auth_yn', '$auth_key', '$store_nm', '$store_cd', '$type'
-            )
-        ";
+            $sql= "
+                insert into member (
+                    user_id, user_pw, name, name_eng, jumin, jumin1, jumin2, email, email_chk
+                    , zip, addr, addr2, phone, mobile, rmobile, regdate
+                    , point, ypoint, yn, mobile_chk, yyyy_chk
+                    , yyyy, mm, dd, opt, out_yn, name_chk, wsale_status, taxpayer_yn, enjumin, anniv_date, anniv_type
+                    , job, interest, memo, pwd_reset_yn, sex, recommend_id
+                    , auth_type, auth_yn, auth_key, store_nm, store_cd, type
+                ) values (
+                    '$user_id', '$enc_pwd', '$name', '', '$jumin', '$jumin1', '$enc_jumin2', '$email', '$email_chk'
+                    , '$zip', '$addr', '$addr2', '$phone', '$mobile', '$rmobile', now()
+                    , '0', '0', 'Y', '$mobile_chk', ''
+                    , '$yyyy', '$mm', '$dd', '$opt', 'N', 'N', 'N', '$taxpayer_yn', '', '$anniv_date', ''
+                    , '$job', '$interest', '$memo', 'N', '$sex', ''
+                    , '$auth_type', '$auth_yn', '$auth_key', '$store_nm', '$store_cd', '$type'
+                )
+            ";
+            
+            DB::insert($sql);
+            DB::commit();
 
-        DB::insert($sql);
+        } catch(Exception $e){
+            DB::rollBack();
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    
 
         return response()->json($user_id, 201);
     }
@@ -435,42 +448,95 @@ class mem01Controller extends Controller
         $store_nm           = "";
         $store_cd           = Request("store_no", "");
         $store_chg          = Request("store_chg", "false"); // 가입매장변경여부
-
+        $black_yn           = Request("black_yn");
+        $black_reason       = Request("black_reason");
+        $id = Auth('head')->user()->id;
         $store_sql = "";
-        if ($store_chg == 'true') {
-            $store_nm = DB::table('store')->where('store_cd', $store_cd)->value('store_nm');
-            $store_sql = "
-                , store_nm = '$store_nm'
-                , store_cd = '$store_cd'
+
+        try {
+            DB::beginTransaction();
+
+            if ($store_chg == 'true') {
+                $store_nm = DB::table('store')->where('store_cd', $store_cd)->value('store_nm');
+                $store_sql = "
+                    , store_nm = '$store_nm'
+                    , store_cd = '$store_cd'
+                ";
+            }
+    
+            $sql = "
+                update member set
+                    name ='$name'
+                    , phone = '$phone'
+                    , mobile = '$mobile'
+                    , email = '$email'
+                    , zip = '$zip'
+                    , addr = '$addr'
+                    , addr2 = '$addr2'
+                    , email_chk = '$email_chk'
+                    , mobile_chk = '$mobile_chk'
+                    , wsale_status = '$wsale_status'
+                    -- , taxpayer_yn = '$taxpayer_yn'
+                    , married_yn	= '$married_yn'
+                    , married_date = '$married_date'
+                    , anniv_date	= '$anniv_date'
+                    , job = '$job'
+                    , interest = '$interest'
+                    , opt = '$opt'
+                    , memo = '$memo'
+                    , type = '$type'
+                    $store_sql
+                where user_id = '$user_id'
             ";
+            
+            DB::update($sql);
+
+            $sql = "
+                select 
+                    user_id,
+                    black_yn
+                from 
+                    member_black_list
+                where 
+                    user_id = '$user_id'
+            ";
+
+            $row = DB::select($sql);
+
+            if(count($row) > 0) {
+                $sql = "
+                    update member_black_list 
+                    set ut_date = now(), black_yn ='$black_yn', black_reason ='$black_reason', ut_user_id = '$id'
+                    where 
+                        user_id = '$user_id'
+                ";
+                DB::update($sql);
+            } else if(count($row) === 0 && $black_yn === 'Y'){
+                $sql= "
+                    insert into member_black_list (
+                        user_id ,
+                        black_yn ,
+                        black_reason,
+                        rt_user_id ,
+                        rt_date
+                    ) values (
+                        '$user_id', 
+                        '$black_yn', 
+                        '$black_reason',
+                        '$id',
+                        now()
+                    )
+                ";
+
+                DB::insert($sql);
+            }
+
+            DB::commit();
+
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => $e->getMessage()], 500);
         }
-
-        $sql = "
-            update member set
-                name ='$name'
-                , phone = '$phone'
-                , mobile = '$mobile'
-                , email = '$email'
-                , zip = '$zip'
-                , addr = '$addr'
-                , addr2 = '$addr2'
-                , email_chk = '$email_chk'
-                , mobile_chk = '$mobile_chk'
-                , wsale_status = '$wsale_status'
-                -- , taxpayer_yn = '$taxpayer_yn'
-                , married_yn	= '$married_yn'
-                , married_date = '$married_date'
-                , anniv_date	= '$anniv_date'
-                , job = '$job'
-                , interest = '$interest'
-                , opt = '$opt'
-                , memo = '$memo'
-                , type = '$type'
-                $store_sql
-            where user_id = '$user_id'
-        ";
-
-        DB::update($sql);
 
         return response()->json(null, 204);
     }

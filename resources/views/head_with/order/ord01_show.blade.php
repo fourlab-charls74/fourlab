@@ -105,7 +105,11 @@
                                             <th>아이디</th>
                                             <td colspan="3">
                                                 <div class="txt_box">
-                                                    <a href="#" onclick="return openUserEdit('{{ @$ord->user_id }}');return false;">{{ @$ord->user_id }}</a> <span style="color:#ff0000;">@if(@$ord->member_memo != "")&lbbrk;{{ @$ord->member_memo }}&rbbrk;@endif</span>
+                                                    @if(@$ord->black_yn == 'Y')
+                                                        <a href="#" style="color: red; background-color: transparent;text-decoration: underline;" onclick="return openUserEdit('{{ @$ord->user_id }}');return false;"> {{ @$ord->user_id }}  </a> <span>({{@$ord->black_reason}})</span> <span style="color:#ff0000;">@if(@$ord->member_memo != "")&lbbrk;{{ @$ord->member_memo }}&rbbrk;@endif</span>
+                                                    @else
+                                                        <a href="#" onclick="return openUserEdit('{{ @$ord->user_id }}');return false;"> {{ @$ord->user_id }}  </a> <span style="color:#ff0000;">@if(@$ord->member_memo != "")&lbbrk;{{ @$ord->member_memo }}&rbbrk;@endif</span>
+                                                    @endif
                                                     <p style="color:#06a800;">{{ @$group->group_nm }}</p>
                                                 </div>
                                             </td>
