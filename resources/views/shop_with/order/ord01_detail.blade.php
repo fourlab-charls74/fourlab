@@ -633,7 +633,7 @@
                                                         [[확정]]
                                                     @endif
                                                 </td>
-                                                <td><a href="/shop/stock/stk03/order/{{$ord_no}}/{{$ord_list->ord_opt_no}}">{{@$ord_list->order_state}}</a></td>
+                                                <td><a href="/shop/order/ord01/order/{{$ord_no}}/{{$ord_list->ord_opt_no}}">{{@$ord_list->order_state}}</a></td>
                                                 <td>
                                                     <a href="#" onClick="PopOrderGoods('{{$ord_no}}','{{$ord_list->ord_opt_no}}');return false;">{{@$ord_list->ord_kind_nm}}</a>/<br />
                                                     {{@$ord_list->ord_kind_nm}}
@@ -1401,7 +1401,7 @@
     });
 
     $('.search-btn').click((e) => {
-        location.href = "/shop/stock/stk03/order/" + $('#ord_no').val();
+        location.href = "/shop/order/ord01/order/" + $('#ord_no').val();
     });
 
     $('.dlv-comment-btn').click((e) => {
@@ -1792,7 +1792,7 @@
             success: function(data) {
                 alert("클레임 내용이 등록되었습니다.");
                 //location.reload();
-				location.href	= `/shop/stock/stk03/order/${ord_no}/${ord_opt_no}?refund_yn=${refund_yn}`;
+				location.href	= `/shop/order/ord01/order/${ord_no}/${ord_opt_no}?refund_yn=${refund_yn}`;
             },
             error: function(request, status, error) {
                 console.log("error")
