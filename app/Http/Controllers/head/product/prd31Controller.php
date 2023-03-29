@@ -151,6 +151,8 @@ class prd31Controller extends Controller
 			$limit
 		";
 
+		dd($sql);
+
 
 
         $result = DB::select($sql, ['sdate' => $sdate,'edate' => $edate]);
