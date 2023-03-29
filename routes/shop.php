@@ -201,6 +201,7 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
 
         
         Route::get('prd01/{no}', 'prd01Controller@show');
+        Route::get('prd01/{no}/get', 'prd01Controller@get');
        
 
 
@@ -566,6 +567,8 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         Route::get('mem01/check-id/{id}', 'mem01Controller@check_id');
         Route::post('mem01/upload',	'mem01Controller@upload');
         Route::put('mem01/batch', 'mem01Controller@update');
+        Route::get('mem01/{user_id}/get', 'mem01Controller@get');
+
     });
 
     // 영업관리

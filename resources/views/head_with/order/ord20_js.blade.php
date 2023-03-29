@@ -79,7 +79,7 @@
                 return false;
             }
 
-            if(ff.bank_number.value == "") {
+            if(ff.bank_inpnm.value == "") {
                 alert("입금자를 입력해 주십시오.");
                 ff.bank_number.focus();
                 return false;
@@ -506,9 +506,11 @@
                 $('#add_dlv_fee').val(ord.add_dlv_fee);
                 $('#sale_place').val(ord.sale_place);
                 $('#pay_type').val(pay.pay_type);
-                $('#bank_code').val(pay.bank_code);
+                // $('#bank_code').val(pay.bank_code);
                 $('#bank_number').val(pay.bank_number);
                 $('#sale_place').val(ord.com_id);
+                $('#bank_inpnm').val(pay.bank_inpnm);
+                $('#bank_code').val(pay.bank_code + '_' + pay.bank_number).prop("selected",true);
                 if($('#ord_type_' +  ord.ord_type)){
                     $('#ord_type_' +  ord.ord_type).attr("checked", true);
                 }

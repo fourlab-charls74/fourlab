@@ -21,16 +21,16 @@
 
         const ord_state = $("[name=ord_state]:checked");
         if(ord_state.length === 0) return alert('주문상태를 선택해 주십시오.');
-        if(ord_state.val() == 30) {
-            if(ff.dlv_cd.value == "") {
-                ff.dlv_cd.focus();
-                return alert("택배사를 선택하십시오.");
-            }
-            if(ff.dlv_no.value == "") {
-                ff.dlv_no.focus();
-                return alert("택배 송장번호를 입력하십시오.");
-            }
-        }
+        // if(ord_state.val() == 30) {
+        //     if(ff.dlv_cd.value == "") {
+        //         ff.dlv_cd.focus();
+        //         return alert("택배사를 선택하십시오.");
+        //     }
+        //     if(ff.dlv_no.value == "") {
+        //         ff.dlv_no.focus();
+        //         return alert("택배 송장번호를 입력하십시오.");
+        //     }
+        // }
 
         const ord_type = $('[name=ord_type]:checked');
         if( ord_type.length === 0 ) return alert('출고형태를 선택해 주십시오.');

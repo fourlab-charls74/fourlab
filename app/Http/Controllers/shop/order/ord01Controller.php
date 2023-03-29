@@ -1546,7 +1546,7 @@ class ord01Controller extends Controller
             'clm_reasons'	=> SLib::getCodes("G_CLM_REASON"),
             'clm_states'	=> SLib::getCodes("G_CLM_STATE"),
             'dlv_cds'		=> SLib::getCodes("DELIVERY"),
-			// 'refund_yn'		=> ''
+			'refund_yn'		=> ''
         ]);
         
         return view(Config::get('shop.shop.view') . '/order/ord01_detail', $values);
@@ -1564,6 +1564,7 @@ class ord01Controller extends Controller
         $cfg_img_size_detail	= SLib::getCodesValue("G_IMG_SIZE","detail");
         $cfg_img_size_real		= SLib::getCodesValue("G_IMG_SIZE","real");
         $cfg_bank_code			= SLib::getCodes("G_BANK_CODE");
+        $user_store             = Auth('head')->user()->store_cd;
 
         // 현금영수증 사용여부 설정값 얻기
         $cfg_cash_use_yn		= $conf->getConfigValue("shop","cash_use_yn", "N");
@@ -1735,13 +1736,13 @@ class ord01Controller extends Controller
                     ), 0
                  ) as wqty
                 , ifnull(
-                    ( select sum(good_qty) from goods_summary
-                        where goods_no = g.goods_no and goods_sub = g.goods_sub and goods_opt = o.goods_opt
+                    ( select sum(qty) from product_stock_store
+                        where goods_no = g.goods_no and goods_opt = o.goods_opt and store_cd = '$user_store'
                     ), 0
                  ) as jaego_qty
                 , ifnull(
-                    ( select sum(wqty) from goods_summary
-                        where goods_no = g.goods_no and goods_sub = g.goods_sub and goods_opt = o.goods_opt
+                    ( select sum(wqty) from product_stock_store
+                        where goods_no = g.goods_no and goods_opt = o.goods_opt and store_cd = '$user_store'
                     ), 0
                  ) as stock_qty
                  , o.coupon_amt,o.dc_amt, o.dlv_amt, o.recv_amt
@@ -2579,6 +2580,138 @@ class ord01Controller extends Controller
         return view( Config::get('shop.shop.view') . '/order/ord01_refund',$values);
     }
 
+    public function dlv($ord_no, $ord_opt_no, Request $req) {
+        // 설정 값 얻기
+        $conf = new Conf();
+        $cfg_shop_name			= $conf->getConfigValue("shop","name");
+		$cfg_img_size_detail	= SLib::getCodesValue("G_IMG_SIZE","detail");
+		$cfg_img_size_real		= SLib::getCodesValue("G_IMG_SIZE","real");
+
+        //주문정보
+		$ordSql = "
+            /* admin : order/ord01_dlv.php (1) */
+            select a.r_nm, a.r_phone, a.r_mobile, a.r_zipcode, a.r_addr1, a.r_addr2, a.dlv_msg, b.dlv_no, b.dlv_cd
+            from order_mst a
+                inner join order_opt b on a.ord_no = b.ord_no
+            where a.ord_no = '$ord_no'
+        ";
+
+		// 상품 택배 정보
+		$dlvSql = "
+            select
+                o.ord_opt_no, ord_state, o.clm_state
+                , if(ifnull(o.clm_state, 0) = 0
+                    , (select code_val from code where code_kind_cd = 'G_ORD_STATE' and code_id = o.ord_state)
+                    , (select code_val from code where code_kind_cd = 'G_CLM_STATE' and code_id = o.clm_state)
+                ) as order_state
+                , o.ord_kind
+                , ord_kind.code_val as ord_kind_nm
+                , o.ord_type
+                , ord_type.code_val as ord_type_nm
+                , if(g.com_type = 1, g.com_type, o.com_id) as com_id
+                , if(g.com_type = 1, '$cfg_shop_name', cm.com_nm) as com_nm
+                , o.head_desc, o.goods_nm, g.goods_no, g.goods_sub, g.style_no, replace(g.img,'$cfg_img_size_real','$cfg_img_size_detail') as img
+                , o.goods_opt
+                , replace(o.goods_opt,'^',' : ') as opt_val
+                , o.qty,o.price
+                , ifnull(
+                    if( o.ord_state < 10, o.qty, (
+                            select sum(qty) from order_opt_wonga where ord_opt_no = o.ord_opt_no and ord_state = 10
+                        )
+                    ), 0
+                ) as wqty
+                , ifnull(
+                    ( select sum(good_qty) from goods_summary
+                        where goods_no = g.goods_no and goods_sub = g.goods_sub and goods_opt = o.goods_opt
+                    ), 0
+                ) as jaego_qty
+                , ifnull(
+                    ( select sum(wqty) from goods_summary
+                        where goods_no = g.goods_no and goods_sub = g.goods_sub and goods_opt = o.goods_opt
+                    ), 0
+                ) as stock_qty
+                , g.is_unlimited, g.goods_type
+                , o.dlv_cd, o.dlv_no, dlv.code_val as dlv_nm, dlv.code_val2 as dlv_homepage
+            from order_opt o
+                inner join goods g on g.goods_no = o.goods_no and g.goods_sub = o.goods_sub
+                inner join company cm on o.com_id = cm.com_id
+                -- left outer join claim c on o.ord_opt_no = c.ord_opt_no
+                left outer join code ord_type on ord_type.code_kind_cd = 'G_ORD_TYPE' and o.ord_type = ord_type.code_id
+                left outer join code ord_kind on ord_kind.code_kind_cd = 'G_ORD_KIND' and o.ord_kind = ord_kind.code_id
+                -- left outer join order_opt_memo om on o.ord_opt_no = om.ord_opt_no
+                left outer join code dlv on dlv.code_kind_cd = 'DELIVERY' and o.dlv_cd = dlv.code_id
+            where o.ord_no = '$ord_no' and g.goods_type <> 'O'
+            order by com_id, o.ord_opt_no desc
+        ";
+        $rows = DB::select($dlvSql);
+        $dlvs = [];
+        foreach($rows as $row) {
+			$_ord_opt_no	= $row->ord_opt_no;
+			$is_unlimited	= $row->is_unlimited;		// 2008-09-25 추가
+
+			$choice_class		= "";
+
+			if($ord_opt_no == $_ord_opt_no){
+				$choice_class = "choice";
+			}
+
+			// 추가 옵션
+			$sql = "
+				select addopt, addopt_amt, addopt_qty
+				from order_opt_addopt
+				where ord_opt_no = '$_ord_opt_no'
+            ";
+            $rows2 = DB::select($sql);
+
+            $a_addopts = [];
+
+            foreach($rows2 as $row2) {
+                $a_addopts[] = $row2;
+            }
+
+			array_push($dlvs,
+				array(
+					"ord_no"			=> $ord_no,
+					"ord_opt_no"		=> $_ord_opt_no,
+					"ord_state_nm"		=> $row->order_state,
+					"ord_state"			=> $row->ord_state,
+					"ord_kind"			=> $row->ord_kind_nm,
+					"ord_type"			=> ($row->ord_type == 0) ? "정상" : $row->ord_type_nm,
+					"head_desc"			=> $row->head_desc,
+					"goods_no"			=> $row->goods_no,
+					"goods_sub"			=> $row->goods_sub,
+					"goods_nm"			=> $row->goods_nm,
+					"goods_snm"			=> mb_substr($row->goods_nm, 0, 28),
+					"img"				=> $row->img,
+					"com_nm"			=> $row->com_nm,
+					"style_no"			=> $row->style_no,
+					"opt_val"			=> $row->opt_val,
+					"goods_opt"			=> $row->goods_opt,
+					"price"				=> $row->price,
+					"qty"				=> $row->qty,
+					"wqty"				=> $row->wqty,
+					"jaego_qty"			=> ( $is_unlimited == "Y" ) ? "∞" : $row->jaego_qty,
+					"stock_qty"			=> $row->stock_qty,
+					"addopts"			=> $a_addopts,
+					"dlv_cd"			=> $row->dlv_cd,
+					"dlv_no"			=> trim($row->dlv_no),
+					"dlv_nm"			=> $row->dlv_nm,
+					"dlv_homepage"		=> $row->dlv_homepage,
+					"dlv_cds"			=> SLib::getCodes("DELIVERY"),
+					"choice_class"		=> $choice_class
+				)
+			);
+        }
+        $values = [
+            'ord_no' => $ord_no,
+            'ord_opt_no' => $ord_opt_no,
+            'ord' => DB::selectOne($ordSql),
+            'dlvs' => $dlvs
+        ];
+        // dd($values);
+        return view( Config::get('shop.shop.view') . '/order/ord01_dlv',$values);
+    }
+
     public function dlv_comment(Request $req) {
 		$sql = " /* admin : order/ord01.php (44) */
 			update order_opt set
@@ -2662,6 +2795,8 @@ class ord01Controller extends Controller
 
     public function view(Request $req)
     {
+        $user_store = Auth('head')->user()->store_cd;
+        $user_store_nm = Auth('head')->user()->store_nm;
         $p_ord_opt_no = $req->input("p_ord_opt_no","");
 
         $sql = /** @lang text */
@@ -2709,17 +2844,30 @@ class ord01Controller extends Controller
         ";
         $banks = DB::select($sql);
 
+        $sql = "
+            select 
+                * 
+            from payment
+            where ord_no = '$ord_no'
+        ";        
+
+        $payment = DB::selectOne($sql);
+
         $values = [
             'ord_no' => $ord_no,
             'ord_opt_no' => $ord_opt_no,
             'p_ord_opt_no' => $p_ord_opt_no,
             'p_ord_opt' => $p_ord_opt,
             'banks' => $banks,
+            'payment' => $payment,
             'pay_types' => SLib::getCodes("G_STAT_PAY_TYPE"),
             'ord_types' => SLib::getCodes('G_ORD_TYPE'),
             'sale_places' => SLib::getSalePlaces(),
             'dlv_cds' => SLib::getCodes('DELIVERY'),
+            'store_cd' => $user_store,
+            'store_nm' => $user_store_nm
         ];
+
         return view(Config::get('shop.shop.view') . '/order/ord01_view', $values);
     }
 
@@ -2735,6 +2883,8 @@ class ord01Controller extends Controller
 		$cmd            = $req->input("cmd", "");
 		$clm_det_no		= $req->input("clm_det_no", "");
 		$refund_yn      = $req->input("refund_yn", "");
+
+
 		// 여러개 동시에 클레임 처리할 경우, 클레임 수량은 주문수량과 동일하게 처리
 		if(count($a_ord_opt_no) > 1 && $clm_qty > 0){
 			$clm_qty = 0;
@@ -2791,6 +2941,7 @@ class ord01Controller extends Controller
 	}
 
     private function __claim_order_save($ord_opt_nos,$clm){
+
         try {
             DB::beginTransaction();
 
@@ -2800,6 +2951,7 @@ class ord01Controller extends Controller
             ];
 
             $claim = new Claim( $user );
+            
 
             for( $i=0; $i<count($ord_opt_nos); $i++){
                 $ord_opt_no = $ord_opt_nos[$i];
@@ -3891,4 +4043,135 @@ class ord01Controller extends Controller
         return response()->json(['code' => $code, 'msg' => $msg], 200);
     }
 
+
+    public function claim_message_save(Request $req) {
+
+		$ord_opt_no = $req->input("ord_opt_no", "");
+		$clm_no     = $req->input("clm_no", "");
+		$msg        = $req->input("msg", "");
+		$ord_state  = $req->input("ord_state", "");
+		$clm_state  = $req->input("clm_state", "");
+		$cs_form    = $req->input("cs_form", "");
+
+        $user = [
+            'id' => Auth('head')->user()->id,
+            'name' => Auth('head')->user()->name
+        ];
+
+        try {
+            if(empty($clm_state)){
+                $clm_state = $ord_state;
+            }
+
+            if(empty($clm_no)){
+                $sql = "
+                    select ifnull(max(clm_no),'') as clm_no
+                    from claim
+                    where ord_opt_no = '$ord_opt_no'
+                ";
+                $row = DB::selectOne($sql);
+                $clm_no = $row->clm_no;
+            }
+
+            $param = array(
+                "ord_state"=>$ord_state
+                ,"clm_state"=>$clm_state
+                ,"cs_form"=>$cs_form
+                ,"memo"=>$msg
+            );
+
+            $claim = new Claim($user);
+
+            $claim->SetOrdOptNo( $ord_opt_no );
+            $claim->SetClmNo( $clm_no );
+
+            $memo_no = $claim->InsertMessage( $param );
+
+            return response()->json(null, 204);
+        }catch(Exception $e) {
+            DB::rollback();
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function order_goods($ord_no, $ord_opt_no){
+		$sql	= "
+			select
+				d.goods_nm, replace(a.goods_opt, '^', ' : ') as opt_val
+				, a.qty, a.ord_type, ord_type.code_val ord_type_nm, a.ord_kind
+				, a.price
+                -- , c.wonga
+                , f.code_val, a.dlv_no,  b.upd_date, a.ord_state
+			from order_opt a
+				inner join order_mst b on a.ord_no = b.ord_no
+				-- inner join order_opt_wonga c on a.ord_opt_no = c.ord_opt_no
+				inner join goods d on a.goods_no = d.goods_no and a.goods_sub = d.goods_sub
+				left outer join code f on a.dlv_cd = f.code_id and f.code_kind_cd = 'DELIVERY'
+				left outer join code ord_type on (a.ord_type = ord_type.code_id and ord_type.code_kind_cd = 'G_ORD_TYPE')
+			where a.ord_opt_no = '$ord_opt_no'
+		";
+
+        $row = DB::selectOne($sql);
+		$row->price	= Lib::cm($row->price);
+		// $row->wonga	= Lib::cm($row->wonga);
+
+		// 판매 구분
+		$sql	= " select code_id id, code_val val from code where code_kind_cd = 'G_ORD_KIND' and code_id <> 'K' ";
+
+		if( $row->ord_type == 0 ){
+			// 정상판매
+			$sql .= " and code_id < 20";
+		}else{
+			// 수기판매
+			$sql .= " and code_id > 10";
+		}
+
+		$ord_kinds	= DB::select($sql);
+
+		$values = [
+			'ord_no'		=> $ord_no,
+			'ord_opt_no'	=> $ord_opt_no,
+			'ord_kinds'		=> $ord_kinds,
+			'goods_list'	=> $row
+		];
+
+		return view( Config::get('shop.shop.view') . '/order/ord01_goods',$values);
+    }
+
+	public function order_goods_save($ord_no, $ord_opt_no, Request $req){
+		$ord_kind	= $req->input('ord_kind');
+
+		try {
+            DB::beginTransaction();
+
+			// 판매구분 변경
+			$sql	= "
+				update order_opt set
+					ord_kind = :ord_kind
+				where ord_opt_no = :ord_opt_no
+			";
+			DB::update($sql, ['ord_kind' => $ord_kind, 'ord_opt_no'	=> $ord_opt_no]);
+
+			// 최종 수정일 변경
+			$sql = "
+				update order_mst set
+					upd_date = now()
+				where ord_no = :ord_no
+			";
+			DB::update($sql, ['ord_no' => $ord_no]);
+
+            DB::commit();
+            return response()->json(null, 201);
+        } catch(Exception $e){
+            DB::rollback();
+            return response()->json(['msg' => $e->getMessage()], 500);
+        }
+	}
+
+    public function get($ord_no, $ord_opt_no = '', Request $req) {
+        $values = $this->_get($ord_no,$ord_opt_no);
+        return response()->json($values);
+    }
+
+    
 }
