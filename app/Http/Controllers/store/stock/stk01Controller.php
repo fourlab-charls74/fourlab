@@ -347,7 +347,7 @@ class stk01Controller extends Controller
 				from store s
 					left outer join product_stock_store p on p.store_cd = s.store_cd and p.prd_cd = :prd_cd
 				where 1=1 $where
-				order by p.wqty desc
+				order by p.wqty desc, s.store_cd
 			";
 			$rows = DB::select($sql, ['prd_cd' => $prd_cd]);
 		}
@@ -383,7 +383,7 @@ class stk01Controller extends Controller
 
 		if ($prd_cd == '') return response()->json([ 'code' => 500, 'head' => [ 'total' => 0 ], 'body' => $rows ]);
 
-		$where = " and ps.prd_cd like '$prd_cd%' ";
+		$where = " and ps.prd_cd = '$prd_cd' ";
 		if ($store_type) $where .= " and s.store_type = '$store_type' ";
 
 		if (count($store_cds) > 0) {

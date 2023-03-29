@@ -165,7 +165,7 @@
                     <div id="div-gd-store-stock" class="ag-theme-balham"></div>
                 </div>
                 @endif
-                <h6 class="fs-16 mt-3">[ 매장 기간 재고 ] <span style="font-size: 12px;"> - 조회일자 반영</span></h6>
+                <h6 class="fs-16 mt-3">[ 매장 기간 재고 ] <span style="font-size: 12px;"> - 조회일자 반영, 보유재고 기준</span></h6>
                 <div class="table-responsive">
                     <div id="div-gd-store-stock-detail" class="ag-theme-balham"></div>
                 </div>
@@ -180,7 +180,7 @@
     let AlignCenter = {"text-align": "center"};
 
     let storage_cnt = '{{ count(@$storages) }}' * 1;
-    const storageLastWidth = 713 - (storage_cnt * 100);
+    const storageLastWidth = 919 - (storage_cnt * 100);
 
     let storage_columns = [
         @foreach (@$storages as $storage)
@@ -193,24 +193,26 @@
     let gx;
 
     let store_columns = [
-        {field: "total_qty", headerName: "매장 총재고", width: 100, pinned: "left", cellStyle: AlignCenter},
+        // {field: "total_qty", headerName: "매장 총재고", width: 100, pinned: "left", cellStyle: AlignCenter},
     ];
 
     const pApp2 = new App('', { gridId: "#div-gd-store-stock" });
     let gx2;
 
     const pinnedRowData = [{ store_cd: '합계' }];
+    const setStockBgColor = (params) => params.node.rowPinned === 'top' ? '' : ({ 'background-color': params.value != 0 ? '#FFF5E5' : 'none' });
     let store_detail_columns = [
         {field: "store_cd",	headerName: "매장코드", pinned: 'left', width: 60, cellStyle: AlignCenter},
         {field: "store_nm",	headerName: "매장명", pinned: 'left', width: 140},
-        {field: "prev_qty", headerName: "이전재고", width: 74, type: "currencyType"},
-        {field: "store_in_qty", headerName: "매장입고", width: 74, type: "currencyType"},
-        {field: "store_return_qty", headerName: "매장반품", width: 74, type: "currencyType"},
-        {field: "rt_in_qty", headerName: "이동입고", width: 74, type: "currencyType"},
-        {field: "rt_out_qty", headerName: "이동출고", width: 74, type: "currencyType"},
-        {field: "sale_qty", headerName: "매장판매", width: 74, type: "currencyType"},
-        {field: "loss_qty", headerName: "LOSS", width: 74, type: "currencyType"},
-        {field: "term_qty", headerName: "기간재고", width: 74, type: "currencyType"},
+        {field: "prev_qty", headerName: "이전재고", width: 74, type: "currencyType", cellStyle: setStockBgColor},
+        {field: "store_in_qty", headerName: "매장입고", width: 74, type: "currencyType", cellStyle: setStockBgColor},
+        {field: "store_return_qty", headerName: "매장반품", width: 74, type: "currencyType", cellStyle: setStockBgColor},
+        {field: "rt_in_qty", headerName: "이동입고", width: 74, type: "currencyType", cellStyle: setStockBgColor},
+        {field: "rt_out_qty", headerName: "이동출고", width: 74, type: "currencyType", cellStyle: setStockBgColor},
+        {field: "sale_qty", headerName: "매장판매", width: 74, type: "currencyType", cellStyle: setStockBgColor},
+        {field: "loss_qty", headerName: "LOSS", width: 74, type: "currencyType", cellStyle: setStockBgColor},
+        {field: "term_qty", headerName: "기간재고", width: 74, type: "currencyType", cellStyle: setStockBgColor},
+        {width: "auto"}
     ];
 
     const pApp3 = new App('', { gridId: "#div-gd-store-stock-detail" });
@@ -280,7 +282,7 @@
                 width: 100,
             });
         }
-        const lastWidth = 713 - (stores.length * 100);
+        const lastWidth = 921 - (stores.length * 100);
         store_columns.push({ width: lastWidth > 0 ? lastWidth : 0 });
         gx2.gridOptions.api.setColumnDefs(store_columns);
     }
