@@ -95,6 +95,10 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         
         //행사코드검색
         Route::get('sale/search_prcode', 'goods@search_prcode');
+
+        //주문선택
+        Route::get('order', 'OrderController@index');
+        Route::get('order/search', 'OrderController@search');
     });
 
     // 포스
@@ -507,6 +511,7 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         // 매장주문
         Route::get('ord01', 'ord01Controller@index');
         Route::get('ord01/search', 'ord01Controller@search');
+        Route::get('ord01/search2/{cmd}', 'ord01Controller@search2');
         Route::delete('ord01', 'ord01Controller@del_order'); // 출고 전 주문삭제
         Route::get('ord01/create', 'ord01Controller@create');
         Route::get('ord01/view', 'ord01Controller@view');

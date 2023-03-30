@@ -4171,5 +4171,459 @@ class ord01Controller extends Controller
         return response()->json($values);
     }
 
+
+    public function search2($cmd, Request $req) {
+        // 설정 값 얻기
+        $conf = new Conf();
+
+        $cfg_img_size_list		= SLib::getCodesValue('G_IMG_SIZE', 'list');
+		$cfg_img_size_real		= SLib::getCodesValue('G_IMG_SIZE', 'list');
+        $cfg_domain_img			= $conf->getConfigValue("shop","domain_img");
+
+		// if($cfg_domain_img == ""){
+		// 	$cfg_domain_img = $_SERVER["HTTP_HOST"];
+        // }
+		// $goods_img_url = sprintf("http://%s",$cfg_domain_img);
+        $goods_img_url = '';
+
+		$page       = $req->input("page",1);
+		$page_size  = $req->input("limit", 100);
+
+		if ($page < 1 or $page == "") $page = 1;
+
+		$edate          = $req->input("edate", date("Ymd"));
+		$sdate          = $req->input("sdate", now()->sub(3, 'month')->format('Ymd'));
+		$ord_no         = $req->input("ord_no", "");
+		$user_nm        = $req->input("user_nm", "");
+		$user_id        = $req->input("user_id", "");
+		$goods_no       = $req->input("goods_no", "");
+		$style_no       = $req->input("style_no", "");
+		$r_nm           = $req->input("r_nm", "");
+		$bank_inpnm     = $req->input("bank_inpnm", "");
+		$stat_pay_type  = $req->input("stat_pay_type", "");
+		$ord_state      = $req->input("ord_state", "");
+		$clm_state      = $req->input("clm_state", "");
+		$dlv_no         = $req->input("dlv_no", "");
+		$sale_place     = $req->input("sale_place", "");
+		$com_type       = $req->input("com_type", "");
+		$com_id         = $req->input("com_id", "");
+		$out_ord_no     = $req->input("out_ord_no", "");
+		$cols           = $req->input("cols", "");
+		$baesong_kind   = $req->input("baesong_kind", "");
+		$ord_type       = $req->input("ord_type", "");
+		$ord_kind       = $req->input("ord_kind", "");
+		$goods_type     = $req->input("goods_type", "");
+		$brand_cd       = $req->input("s_brand_cd", "");
+		$brand_nm       = $req->input("brand_nm", "");
+		$goods_nm       = $req->input("goods_nm", "");
+		$head_desc      = $req->input("head_desc", "");
+		$limit          = $req->input("limit", 100);
+		$ord_field      = $req->input("ord_field","a.ord_no");
+		$ord            = $req->input("ord","desc");
+		$opt_kind_cd    = $req->input("item", "");
+		$not_complex    = $req->input("not_complex", "");
+		$baesong_info   = $req->input("baesong_info", "");
+		$special_yn     = $req->input("special_yn", "");
+		$key            = $req->input("key", "");
+		$nud            = $req->input("s_nud", "Y");
+		$pay_nm         = $req->input("pay_nm", "");
+		$pay_stat       = $req->input("pay_stat", "");
+		$goods          = $req->input("goods", "");		// 상품선택
+		$mobile_yn      = $req->input("mobile_yn", "");	// 모바일 주문 여부
+		$app_yn         = $req->input("app_yn", "");    // 앱 주문 여부
+		$receipt        = $req->input("receipt", "N");	// 현금영수증 : N(미신청), R(신청), Y(발행)
+		$dlv_type       = $req->input("dlv_type", "");	// 배송방식: D(택배), T(택배(당일배송)), G(직접수령)
+		$pay_fee        = $req->input("pay_fee", "");	// 결제수수료 주문
+        $fintech        = $req->input("fintech", "");	// 핀테크
+
+        $str_order_by = $ord_field." ".$ord;
+
+		if($ord_field == "a.head_desc"){ // 상단 홍보글인경우, 상단홍보글, 상품명 순.
+			$str_order_by = $ord_field." ".$ord." ,a.goods_nm ".$ord;
+		}
+
+		$where = "";
+		$insql = "";
+		$is_not_use_date = false;
+
+		/////////////////////////////////////////////////////////
+		// 날짜검색 미 사용여부
+
+		if($ord_no != ""){
+			$is_not_use_date = true;
+		} else if($user_id != ""){
+			$is_not_use_date = true;
+		} else if($user_nm != ""){
+			$is_not_use_date = true;
+		} else if(strlen($r_nm) >= 4){
+			$is_not_use_date = true;
+		} else if($cols == "b.mobile" && strlen($key) >= 8){
+			$is_not_use_date = true;
+		} else if($cols == "b.phone" && strlen($key) >= 8){
+			$is_not_use_date = true;
+		} else if($cols == "b.r_mobile" && strlen($key) >= 8){
+			$is_not_use_date = true;
+		}
+
+		if($is_not_use_date == true && $nud == "Y"){
+		} else {
+			$where .= " and a.ord_date >= cast('$sdate' as date) ";
+			$where .= " and a.ord_date < DATE_ADD('$edate', INTERVAL 1 DAY) ";
+		}
+
+		if($ord_no != "")		$where .= " and a.ord_no = '$ord_no' ";
+		if($user_nm != "")	    $where .= " and b.user_nm = '$user_nm' ";
+		if($r_nm != "")		    $where .= " and b.r_nm like '%$r_nm%' ";
+		if($user_id != "")	    $where .= " and b.user_id = '$user_id' ";
+		if($pay_nm != "")		$where .= " and d.pay_nm like '$pay_nm%' ";
+
+		if($cols != "" && $key != ""){
+			if(in_array($cols, array("b.mobile","b.phone","b.r_phone","b.r_mobile"))){
+				$key = $this->__replaceTel($key);
+				if($cols == "b.mobile" || $cols == "b.phone" || $cols == "b.r_mobile"){
+                    $where .= " and $cols = '$key' ";
+				} else {
+					$where .= " and $cols like '$key%' ";
+				}
+			} else {
+				if( $cols == "memo" ){
+					$where = " and ( h.state like '%$key%' or h.memo like '%$key%' )";
+				} else if($cols == "a.dlv_end_date"){
+					$where = " and date_format($cols, '%Y%m%d') = $key";
+				}else {
+					$where .= " and $cols like '$key%' ";
+				}
+			}
+		}
+
+		if($sale_place != "")	$where .= " and a.sale_place = '$sale_place' ";
+		if($com_type != "")	    $where .= " and c.com_type   = '$com_type' ";
+		if($com_id != "")		$where .= " and c.com_id     = '$com_id' ";
+		if($ord_kind != "")	    $where .= " and a.ord_kind   = '$ord_kind' ";
+		if($ord_type != "") 	$where .= " and a.ord_type   = '$ord_type' ";
+		if($bank_inpnm != "")	$where .= " and d.bank_inpnm = '$bank_inpnm' ";
+
+		// 결제조건
+		if($stat_pay_type != ""){
+			if($not_complex == "Y"){
+                $where .= " and a.pay_type = '$stat_pay_type' ";
+			}else{
+				$where .= " and (( a.pay_type & $stat_pay_type ) = $stat_pay_type) ";
+			}
+        }
+
+        if($ord_state != "")	$where .= " and a.ord_state = '$ord_state' ";
+
+        if($clm_state == "90")  $where .= " and a.clm_state = 0 ";
+
+		else{
+			if($clm_state != ""){
+				$where .= " and a.clm_state = '$clm_state' ";
+			}
+        }
+
+		if($baesong_kind != "")	$where .= " and c.baesong_kind = '$baesong_kind' ";
+
+		//2005.12.27 추가 지명근
+		if ($opt_kind_cd != "")	$where .= " and OPT_KIND_CD = '$opt_kind_cd' ";
+
+
+		if($brand_cd != ""){
+			$where .= " and c.brand ='$brand_cd'";
+		} else if ($brand_cd == "" && $brand_nm != ""){
+			$where .= " and c.brand ='$brand_cd'";
+		}
+
+		if($goods_nm != "")     $where .= " and a.goods_nm like '%$goods_nm%'";
+		if($style_no != "")     $where .= " and c.style_no like '$style_no%'";
+
+		//if($goods_no != "")     $where .= " and c.goods_no = '$goods_no' ";
+
+		$goods_no = preg_replace("/\s/",",",$goods_no);
+        $goods_no = preg_replace("/\t/",",",$goods_no);
+        $goods_no = preg_replace("/\n/",",",$goods_no);
+        $goods_no = preg_replace("/,,/",",",$goods_no);
+
+        if( $goods_no != "" ){
+            $goods_nos = explode(",",$goods_no);
+            if(count($goods_nos) > 1){
+                if(count($goods_nos) > 500) array_splice($goods_nos,500);
+                $in_goods_nos = join(",",$goods_nos);
+                $where .= " and c.goods_no in ( $in_goods_nos ) ";
+            } else {
+                if ($goods_no != "") $where .= " and c.goods_no = '" . Lib::quote($goods_no) . "' ";
+            }
+        }
+
+		if($head_desc != "")    $where .= " and a.head_desc like '%$head_desc%' ";
+		if($special_yn != "")   $where .= " and c.special_yn = '$special_yn' ";
+		if($baesong_info != "") $where .= " and c.baesong_info = '$baesong_info' ";
+		if($goods_type != "")   $where .= " and c.goods_type = '$goods_type' ";
+		if($out_ord_no != "")   $where .= " and b.out_ord_no = '$out_ord_no' ";
+		if($dlv_no != "")       $where .= " and a.dlv_no = '$dlv_no' ";
+		if($pay_stat != "")     $where .= " and d.pay_stat = '$pay_stat' ";
+		if($mobile_yn != "")    $where .= " and b.mobile_yn = '$mobile_yn' ";
+		if($app_yn != "")	    $where .= " and b.app_yn = '$app_yn' ";
+		if($pay_fee == "Y")     $where .= " and a.pay_fee > 0 ";
+        if($fintech == "Y")     $where .= " and d.fintech <> '' ";
+
+
+		// Cash Receipt Search
+		if($receipt == "R"){	// 신청
+			$where .= " and d.cash_apply_yn = 'Y' ";
+		} elseif($receipt == "Y"){	// 발행
+			$where .= " and d.cash_yn = 'Y' ";
+        }
+
+		// Delivery Type
+		if($dlv_type != "")		$where .= " and b.dlv_type = '$dlv_type' ";
+
+		if($goods != ""){			// 파일로 검색일 경우
+			$goods = explode(",",$goods);
+			for($i=0;$i<count($goods);$i++){
+				if(empty($goods[$i])) continue;
+				list($no,$sub) = explode("\|",$goods[$i]);
+				if($insql == ""){
+					$insql .= " select '$no' as no,'$sub' as sub ";
+				} else {
+					$insql .= " union select '$no' as no,'$sub' as sub  ";
+				}
+			}
+			$insql = " inner join ( $insql ) sg on c.goods_no = sg.no and c.goods_sub = sg.sub ";
+		}
+
+		$id = Auth('head')->user()->id;
+		$ip = $_SERVER["REMOTE_ADDR"];
+
+        $total      = 0;
+        $page_cnt   = 0;
+
+		// 2번째 페이지 이후로는 데이터 갯수를 얻는 로직을 실행하지 않는다.
+		if ($page == 1)
+        {
+			// 갯수 얻기
+			$sql = " /* [$id][$ip] admin : order/ord01.php (1) */
+				select
+					count(*) total
+				from order_opt a
+                inner join order_mst b on a.ord_no = b.ord_no
+                inner join goods c on a.goods_no = c.goods_no and a.goods_sub = c.goods_sub $insql
+                left outer join payment d on b.ord_no = d.ord_no
+                left outer join coupon f on ( a.coupon_no = f.coupon_no )
+                left outer join company e on a.sale_place = e.com_id and e.com_type = '4'
+                left outer join company i on a.com_id = i.com_id
+                left outer join claim g on g.ord_opt_no = a.ord_opt_no
+                left outer join order_opt_memo h on a.ord_opt_no = h.ord_opt_no
+                left outer join order_track ot on a.ord_no = ot.ord_no
+				where 1=1 $where
+			";
+
+            
+			$row = DB::selectOne($sql);
+			$total = $row->total;
+
+			$page_cnt   = (int)(($total-1)/$page_size) + 1;
+			$startno    = ($page-1) * $page_size;
+
+		} else {
+			$startno = ($page-1) * $page_size;
+			//$arr_header = null;
+        }
+
+       
+
+		if($limit == -1){
+			$limit = "";
+		} else {
+			$limit = " limit $startno, $page_size ";
+		}
+
+		if($cmd == "list"){
+			$sql = "
+				select
+					'' as chkbox, a.ord_no, a.ord_opt_no, ord_state.code_val ord_state_nm, a.ord_state , clm_state.code_val clm_state, pay_stat.code_val as pay_stat,
+					ifnull(gt.code_val,'N/A') as goods_type_nm, a.style_no, '' as img_view, a.goods_nm,
+					replace(a.goods_opt, '^', ' : ') as opt_val, a.goods_addopt, a.qty, a.user_nm, a.r_nm, a.price,
+					a.sale_amt, a.gift, a.dlv_amt, 0 as pay_fee, pay_type.code_val as pay_type, fintech,
+					a.cash_apply_yn,
+					a.cash_yn,
+					ord_type.code_val as ord_type,
+					ord_kind.code_val as ord_kind,
+					a.sale_place, a.out_ord_no, a.com_nm,
+					baesong_kind.code_val as baesong_kind,
+					dlv_type.code_val as dlv_type,
+					dlv_cd.code_val, a.dlv_no,
+					a.state, a.memo,
+					a.coupon_nm,
+					a.mobile_yn, a.app_yn, a.browser,
+					a.ord_date, a.pay_date, a.dlv_end_date,
+					a.last_up_date, a.goods_no, a.goods_sub,
+					concat('$goods_img_url',replace(a.img,'$cfg_img_size_real','$cfg_img_size_list')) as img,
+					a.goods_type,
+					'2' as depth,
+					a.sms_name, a.sms_mobile, a.head_desc
+				from (
+					select
+						b.ord_no, a.ord_opt_no, a.ord_state, d.pay_stat, c.goods_type, c.style_no, a.goods_nm,
+						a.goods_opt, a.qty, concat(ifnull(b.user_nm, ''),'(',ifnull(b.user_id, ''),')') as user_nm, b.r_nm,
+						a.price, (a.coupon_amt+a.dc_amt) as sale_amt,
+						(
+							select group_concat(gf.name)
+							from order_gift og
+								inner join gift gf on og.gift_no = gf.no
+							where og.ord_no = a.ord_no and og.ord_opt_no = a.ord_opt_no
+						) as gift,
+						a.dlv_amt, 0 as pay_fee, d.pay_type,'' as fintech,
+						a.ord_type, a.ord_kind, f.coupon_nm, a.dlv_cd, a.dlv_no,
+						a.clm_state, e.com_nm as sale_place, b.out_ord_no, i.com_nm,
+						c.baesong_kind as dlv_baesong_kind, b.ord_date, d.pay_date,
+						a.dlv_end_date, g.last_up_date, c.goods_no, c.goods_sub, c.img, c.com_type,
+						h.state, h.memo, b.user_nm as sms_name, b.mobile as sms_mobile,
+						b.mobile_yn, '' as app_yn, ifnull(ot.browser, '') as browser,
+						if(d.cash_apply_yn = 'Y', '신청', '') as cash_apply_yn,
+						if(d.cash_yn = 'Y', '발행', '') as cash_yn,
+                        b.dlv_type,
+                        a.head_desc,
+						if(ifnull(a.goods_addopt,'') = '',
+							(select ifnull(group_concat(if(addopt_amt>0,concat(addopt,'(+',addopt_amt,')'),addopt)),'')
+							from order_opt_addopt where ord_opt_no = a.ord_opt_no),
+							a.goods_addopt
+						) as goods_addopt
+					from order_opt a
+						inner join order_mst b on a.ord_no = b.ord_no
+						inner join goods c on a.goods_no = c.goods_no and a.goods_sub = c.goods_sub $insql
+						left outer join payment d on b.ord_no = d.ord_no
+						left outer join coupon f on ( a.coupon_no = f.coupon_no )
+						left outer join company e on a.sale_place = e.com_id and e.com_type = '4'
+						left outer join company i on a.com_id = i.com_id
+						left outer join claim g on g.ord_opt_no = a.ord_opt_no
+						left outer join order_opt_memo h on a.ord_opt_no = h.ord_opt_no
+						left outer join order_track ot on a.ord_no = ot.ord_no
+					where 1=1 $where
+					order by $str_order_by
+					$limit
+				) a
+				left outer join code ord_type on (a.ord_type = ord_type.code_id and ord_type.code_kind_cd = 'G_ORD_TYPE')
+				left outer join code ord_kind on (a.ord_kind = ord_kind.code_id and ord_kind.code_kind_cd = 'G_ORD_KIND')
+				left outer join code ord_state on (a.ord_state = ord_state.code_id and ord_state.code_kind_cd = 'G_ORD_STATE')
+				left outer join code pay_type on (a.pay_type = pay_type.code_id and pay_type.code_kind_cd = 'G_PAY_TYPE')
+				left outer join code clm_state on (a.clm_state = clm_state.code_id and clm_state.code_kind_cd = 'G_CLM_STATE')
+				left outer join code com_type on (a.com_type = com_type.code_id and com_type.code_kind_cd = 'G_COM_TYPE')
+				left outer join code baesong_kind on (a.dlv_baesong_kind = baesong_kind.code_id and baesong_kind.code_kind_cd = 'G_BAESONG_KIND')
+				left outer join code gt on (a.goods_type = gt.code_id and gt.code_kind_cd = 'G_GOODS_TYPE')
+				left outer join code dlv_cd on (a.dlv_cd = dlv_cd.code_id and dlv_cd.code_kind_cd = 'DELIVERY')
+				left outer join code pay_stat on (a.pay_stat = pay_stat.code_id and pay_stat.code_kind_cd = 'G_PAY_STAT')
+				left outer join code dlv_type on (a.dlv_type = dlv_type.code_id and dlv_type.code_kind_cd = 'G_G_DLV_TYPE')
+			";
+		} else if($cmd == "popup"){ // 주문검색 쿼리
+
+			$sql = " /* [$id][$ip] admin : order/ord01.php (2) */
+				select  SQL_BUFFER_RESULT
+					'선택' as choice
+					, date_format(a.ord_date, '%Y.%m.%d %H:%i:%s') ord_date, a.ord_no, a.ord_seq, 'view' as view, '' as goods_img
+					, a.goods_nm, a.style_no
+					, replace(a.goods_opt, '^', ' : ') as opt_val
+					, a.qty, a.user_nm, a.r_nm, a.price, pay_type.code_val pay_type
+					, a.head_desc, a.coupon_nm
+                    , ord_type.code_val ord_type, ord_type.code_id ord_type_cd
+                    , ord_kind.code_val ord_kind, ord_kind.code_id ord_kind_cd
+                    , ord_state.code_val ord_state, ord_state.code_id ord_state_cd
+                    , clm_state.code_val clm_state
+					, a.sale_place, com_type.code_val com_type, a.com_nm
+					, baesong_kind.code_val baesong_kind, baesong_info.code_val baesong_info
+					, date_format(a.upd_dm,'%Y.%m.%d %H:%i:%s') upd_dm
+					, date_format(a.dlv_end_date,'%Y.%m.%d %H:%i:%s') dlv_end_date
+					, date_format(a.upd_date,'%Y.%m.%d %H:%i:%s') upd_date
+					, a.goods_no, a.goods_sub
+					, concat('$goods_img_url',replace(a.img,'$cfg_img_size_real','$cfg_img_size_list')) as img, a.special_yn
+					, if(a.jaego_out_qty <>'', if(a.jaego_out_qty <> a.qty, '1', '0'), 0) as odd, a.jaego_out_qty, a.qty as ord_qty,a.ord_opt_no
+					, a.goods_type
+					, '2' as depth
+				from (
+					select
+						a.ord_opt_no,b.ord_date, b.ord_no, a.ord_seq, a.goods_nm, a.head_desc, a.qty
+						, a.goods_opt, b.user_nm, b.r_nm, a.price, d.pay_type, c.img
+						, case d.pay_type
+							when '2' then d.card_name
+							when '1' then d.bank_code
+							when '6' then d.card_name
+							else d.bank_code
+						 end bank_code
+						, a.ord_state, a.clm_state, i.com_nm, c.com_type, c.price-c.wonga as prf
+						, case a.ord_state
+							when '-20' then null
+							else d.upd_dm
+						 end upd_dm
+						, a.dlv_end_date, b.upd_date, c.goods_no, c.goods_sub, a.ord_kind, c.baesong_kind, a.ord_type, c.style_no
+						, e.com_nm sale_place,special_yn, c.baesong_info,f.coupon_nm
+						, ifnull((select sum(qty) from order_opt_wonga where ord_opt_no = a.ord_opt_no and ord_state = '10' ),'') as jaego_out_qty
+						, c.goods_type, b.out_ord_no
+						, h.state, h.memo
+						, if(ifnull(a.goods_addopt,'') = '',
+							(select ifnull(group_concat(if(addopt_amt>0,concat(addopt,'(+',addopt_amt,')'),addopt)),'')
+							from order_opt_addopt where ord_opt_no = a.ord_opt_no),
+							a.goods_addopt
+						) as goods_addopt
+					from order_opt a
+						inner join order_mst b on a.ord_no = b.ord_no
+						left outer join goods c on a.goods_no = c.goods_no and a.goods_sub = c.goods_sub
+						left outer join payment d on b.ord_no = d.ord_no
+						left outer join coupon f on ( a.coupon_no = f.coupon_no )
+						left outer join company e on a.sale_place = e.com_id and e.com_type = '4'
+						left outer join company i on a.com_id = i.com_id
+						left outer join order_opt_memo h on a.ord_opt_no = h.ord_opt_no
+					where 1=1 $where
+					order by $str_order_by
+					$limit
+				) a
+				left outer join code ord_type on (a.ord_type = ord_type.code_id and ord_type.code_kind_cd = 'G_ORD_TYPE')
+				left outer join code ord_kind on (a.ord_kind = ord_kind.code_id and ord_kind.code_kind_cd = 'G_ORD_KIND')
+				left outer join code ord_state on (a.ord_state = ord_state.code_id and ord_state.code_kind_cd = 'G_ORD_STATE')
+				left outer join code pay_type on (a.pay_type = pay_type.code_id and pay_type.code_kind_cd = 'G_PAY_TYPE')
+				left outer join code clm_state on (a.clm_state = clm_state.code_id and clm_state.code_kind_cd = 'G_CLM_STATE')
+				left outer join code com_type on (a.com_type = com_type.code_id and com_type.code_kind_cd = 'G_COM_TYPE')
+				left outer join code baesong_kind on (a.baesong_kind = baesong_kind.code_id and baesong_kind.code_kind_cd = 'G_BAESONG_KIND')
+				left outer join code baesong_info on (a.baesong_info = baesong_info.code_id and baesong_info.code_kind_cd = 'G_BAESONG_INFO')
+				left outer join code goods_type on (a.goods_type = goods_type.code_id and goods_type.code_kind_cd = 'G_GOODS_TYPE')
+			";
+        }
+
+        $depth_no = "";
+        $rows = DB::select($sql);
+        
+		foreach ($rows as $row) {
+			$ord_no = $row->ord_no;
+
+			if($depth_no == ""){
+				$depth_no = $ord_no;
+				$row->depth = "1";
+			}
+
+			if($ord_no != $depth_no){
+				$row->depth = "1";
+				$depth_no = $ord_no;
+			}
+
+            if ($row->img != "") { // 이미지 url
+				$row->img = sprintf("%s%s",config("shop.image_svr"),$row->img);
+			}
+		}
+        $arr_header = array(
+            "total" => $total,
+            "page" => $page,
+            "page_cnt" => $page_cnt,
+            "page_total" => count($rows)
+        );
+
+        // $arr_header['page_total'] = count($rows);
+
+        return response()->json([
+            "code" => 200,
+            "head" => $arr_header,
+            "body" => $rows
+        ]);
+    }
+
+
     
 }

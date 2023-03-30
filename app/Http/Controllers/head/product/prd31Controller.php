@@ -151,7 +151,6 @@ class prd31Controller extends Controller
 			$limit
 		";
 
-		dd($sql);
 
 
 
