@@ -20,9 +20,22 @@ function openOrder(ord_no,ord_opt_no = ''){
     }
     var order = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
 }
+function openOrder2(ord_no,ord_opt_no = ''){
+    if(ord_opt_no !== ''){
+        var url = '/shop/order/ord01/order/' + ord_no + '/' + ord_opt_no;
+    } else {
+        var url = '/shop/order/ord01/order/' + ord_no;
+    }
+    var order = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
+}
 
 function openHeadOrder(ord_no,ord_opt_no){
     var url = '/head/order/ord01/' + ord_no + '/' + ord_opt_no;
+    var order = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
+}
+
+function openShopOrder(ord_no,ord_opt_no){
+    var url = '/shop/order/ord01/' + ord_no + '/' + ord_opt_no;
     var order = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
 }
 
@@ -41,6 +54,16 @@ function openSmsSend(phone='', name='') {
     window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
 }
 
+function openShopSmsSend(phone='', name='') {
+    var url = '/shop/api/sms/send?phone=' + phone + '&name=' + name;
+    window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
+}
+
+function openStoreSmsSend(phone='', name='') {
+    var url = '/store/api/sms/send?phone=' + phone + '&name=' + name;
+    window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
+}
+
 function openMultiSmsSend(ids = '') {
     var url = '/head/api/sms/send?ids=' + ids;
     window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
@@ -55,6 +78,18 @@ function openSmsList(phone='', name='') {
     var url = '/head/api/sms/list?phone=' + phone + '&name=' + name;
     window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
 }
+
+function openShopSmsList(phone='', name='') {
+    var url = '/shop/api/sms/list?phone=' + phone + '&name=' + name;
+    window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
+}
+
+function openStoreSmsList(phone='', name='') {
+    var url = '/store/api/sms/list?phone=' + phone + '&name=' + name;
+    window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
+}
+
+
 function openSchDetail(idx='') {
     const url = `/head/promotion/prm32/show/${idx}`;
     window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800")
@@ -69,8 +104,23 @@ function openStoreStock(prd_cd, date = ''){
     var url = '/store/stock/stk01/' + prd_cd + '?date=' + date;
     var stock = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=900,height=768");
 }
+
+function openShopStock(prd_cd, date = ''){
+    var url = '/shop/stock/stk01/' + prd_cd + '?date=' + date;
+    var stock = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=900,height=768");
+}
+
 function openStoreOrder(ord_no,ord_opt_no){
-    var url = '/store/stock/stk03/order/' + ord_no + '/' + ord_opt_no;
+    var url = '/store/order/ord01/order/' + ord_no + '/' + ord_opt_no;
+    var order = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
+}
+
+function openShopStock(prd_cd, date = '') {
+    var url = '/shop/stock/stk01/' + prd_cd + '?date=' + date;
+    window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1000,height=900");
+}
+function openShopOrder(ord_no,ord_opt_no){
+    var url = '/shop/order/ord01/order/' + ord_no + '/' + ord_opt_no;
     var order = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
 }
 

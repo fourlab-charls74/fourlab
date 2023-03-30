@@ -58,7 +58,7 @@
                                         <tr>
                                             <th>부모 주문번호</th>
                                             <td style="padding:0px 10px 0px 10px;">
-                                                <a href="#" onClick="openOrder('{{ $p_ord_no }}');" style="font-weight:700;">{{ $p_ord_no }}</a>
+                                                <a href="#" onClick="openOrder2('{{ $p_ord_no }}');" style="font-weight:700;">{{ $p_ord_no }}</a>
                                             </td>
                                         </tr>
                                         @endif
@@ -646,7 +646,7 @@
                                                     <img src="{{config('shop.image_svr')}}/{{@$ord_list->img}}" class="img" style="width:40px" />
                                                 </td>
                                                 <td style="font-weight:400;">
-                                                    <a href="#" onclick="return openHeadProduct('{{@$ord_list->goods_no}}');">{{@$ord_list->goods_nm}}</a><br>
+                                                    <a href="#" onclick="return openShopProduct('{{@$ord_list->goods_no}}');">{{@$ord_list->goods_nm}}</a><br>
                                                     {{@$ord_list->goods_opt}}
                                                 </td>
                                                 <td>
@@ -656,7 +656,7 @@
                                                 </td>
                                                 <td>
                                                     {{@$ord_list->wqty}}<br>
-                                                    <a href="#" onClick="openStoreStock('{{$ord_list->prd_cd}}');return false;">({{@$ord_list->jaego_qty}}/{{@$ord_list->stock_qty}})</a>
+                                                    <a href="#" onClick="OpenShopStockPopup('{{$ord_list->prd_cd}}', '{{$today}}' );return false;">({{@$ord_list->jaego_qty}}/{{@$ord_list->stock_qty}})</a>
                                                 </td>
                                                 <td style="text-align:right">{{number_format(@$ord_list->price)}}</td>
                                                 <td style="text-align:right">{{number_format(@$ord_list->dc_amt)}}</td>
@@ -704,10 +704,13 @@
                         </div>
                         <div class="fr_box">
                             @if( @$c_ord_no != "" )
-                            <span style="color:#FF0000;">*</span> 해당건의 자식 주문번호는 <span onClick="openHeadOrder('{{ $c_ord_no }}','{{ $c_ord_opt_no }}');" style="cursor:pointer;color:#0000FF;font-weight:700;">{{ @$c_ord_no }}</span> 입니다.&nbsp;&nbsp;
+                            <span style="color:#FF0000;">*</span> 해당건의 자식 주문번호는 <span onClick="openShopOrder('{{ $c_ord_no }}','{{ $c_ord_opt_no }}');" style="cursor:pointer;color:#0000FF;font-weight:700;">{{ @$c_ord_no }}</span> 입니다.&nbsp;&nbsp;
                             @endif
                             @if (@$store && ($order_opt->clm_state == "0" || $order_opt->clm_state == "1" || $order_opt->clm_state == "-30"))
                             <button class="btn-sm btn btn-primary store-refund-btn fs-12">매장환불</button>
+                            @endif
+                            @if (@$store && ($order_opt->ord_type == 4))
+                            <button class="btn-sm btn btn-primary store-complete-reservation-btn fs-12">예약상품지급</button>
                             @endif
                             <button class="btn-sm btn btn-secondary sms-send-btn fs-12">SMS 발송</button>
                             <button class="btn-sm btn btn-secondary sms-list-btn fs-12">SMS 내역</button>
@@ -1353,7 +1356,7 @@
         $.ajax({
             async: true,
             type: 'put',
-            url: '/head/order/ord01/claim-save',
+            url: '/shop/order/ord01/claim-save',
             data: {
                 "ord_opt_no": ord_opt_no,
                 "ord_opt_nos": ord_opt_nos.join(','),
@@ -1393,7 +1396,7 @@
 
     $('.ord-no-btn').click((e) => {
         e.preventDefault();
-        const url = '/head/api/order';
+        const url = '/shop/api/order';
         const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
     });
 
@@ -1407,7 +1410,7 @@
         $.ajax({
             async: true,
             type: 'put',
-            url: '/head/order/ord01/dlv-comment',
+            url: '/shop/order/ord01/dlv-comment',
             data: {
                 "comment": $('#dlv_coment').val(),
                 "ord_opt_no": ord_opt_no
@@ -1431,7 +1434,7 @@
         $.ajax({
             async: true,
             type: 'put',
-            url: '/head/order/ord01/claim-message-save',
+            url: '/shop/order/ord01/claim-message-save',
             data: {
                 "ord_opt_no": ord_opt_no,
                 "cs_form": $("#cs_form").val(),
@@ -1459,6 +1462,29 @@
         if ($('[name=goods]:checked').length === 0) return alert("상품을 선택해주세요.");
         $('#StoreClaimModal').modal({
             keyboard: false
+        });
+    });
+
+    $('.store-complete-reservation-btn').click(function(e) {
+        e.preventDefault();
+
+        if ($('[name=goods]:checked').length === 0) return alert("상품을 선택해주세요.");
+        if (!confirm("예약판매된 해당상품을 지급완료처리하시겠습니까?")) return;
+
+        axios({
+            url: '/shop/order/ord01/complete-reservation',
+            method: 'post',
+            data: { ord_no, ord_opt_no },
+        }).then(function (res) {
+            if(res.data.code == 200) {
+                window.opener.Search();
+                location.reload();
+            } else {
+                alert(res.data.msg);
+                console.log(res);
+            }
+        }).catch(function (err) {
+            console.log(err);
         });
     });
 
@@ -1497,13 +1523,13 @@
     $('.sms-send-btn').click(function(e) {
         e.preventDefault();
 
-        openSmsSend('{{ @$ord->mobile }}', '{{ @$ord->user_nm }}');
+        openShopSmsSend('{{ @$ord->mobile }}', '{{ @$ord->user_nm }}');
     });
 
     $('.sms-list-btn').click(function(e) {
         e.preventDefault();
 
-        openSmsList('{{ @$ord->mobile }}', '{{ @$ord->user_nm }}');
+        openShopSmsList('{{ @$ord->mobile }}', '{{ @$ord->user_nm }}');
     });
 
     $('.claim-save-btn').click(function(e) {
@@ -1532,7 +1558,7 @@
 		$.ajax({
             async: true,
             type: 'put',
-            url: '/head/order/ord01/claim-save',
+            url: '/shop/order/ord01/claim-save',
             data: {
                 "ord_opt_no": ord_opt_no,
                 "ord_opt_nos": data.join(','),
@@ -1569,7 +1595,7 @@
         $.ajax({
             async: true,
             type: 'put',
-            url: '/head/order/ord01/order-save',
+            url: '/shop/order/ord01/order-save',
             data: {
                 "ord_no": ord_no,
                 "ord_opt_no": ord_opt_no,
@@ -1595,21 +1621,21 @@
 
         if ($('#refund_yn').val() === 'n') return;
 
-        const url = '/head/order/ord01/refund/' + ord_no + '/' + ord_opt_no;
+        const url = '/shop/order/ord01/refund/' + ord_no + '/' + ord_opt_no;
         const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
     });
 
     $('.dlv-info-btn').click(function(e) {
         e.preventDefault();
 
-        const url = '/head/order/ord01/dlv/' + ord_no + '/' + ord_opt_no;
-        const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
+        const url = '/shop/order/ord01/dlv/' + ord_no + '/' + ord_opt_no;
+        const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=600");
     });
 
     $('.receipt-btn').click(function(e) {
         e.preventDefault();
 
-        const url = '/head/order/ord01/receipt/' + ord_no;
+        const url = '/shop/order/ord01/receipt/' + ord_no;
         const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
     });
 
@@ -1618,7 +1644,7 @@
         const params = [
             `p_ord_opt_no=${p_ord_opt_no}`,
         ];
-        const url = `/head/order/ord20/show?${params.join('&')}`;
+        const url = `/shop/order/ord01/view?${params.join('&')}`;
         const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
     });
 
@@ -1648,7 +1674,7 @@
         $.ajax({
             async: true,
             type: 'put',
-            url: '/head/order/ord01/cancel-order',
+            url: '/shop/order/ord01/cancel-order',
             data: {
                 "datas": data
             },
@@ -1664,7 +1690,7 @@
     });
 
     function PopOrderGoods(ord_no,ord_opt_no){
-		const url = `/head/order/ord01/order-goods/${ord_no}/${ord_opt_no}`;
+		const url = `/shop/order/ord01/order-goods/${ord_no}/${ord_opt_no}`;
 		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=700")
     }
 
@@ -1727,7 +1753,7 @@
         $.ajax({
             async: true,
             type: 'put',
-            url: '/head/order/ord01/update/order-state',
+            url: '/shop/order/ord01/update/order-state',
             data: data,
             success: function(res) {
                 console.log(res);
@@ -1755,7 +1781,7 @@
         $.ajax({
             async: true,
             type: 'put',
-            url: '/head/order/ord01/claim-message-save',
+            url: '/shop/order/ord01/claim-message-save',
             data: {
                 "ord_opt_no": ord_opt_no,
                 "cs_form": $("#cs_form").val(),
@@ -1823,7 +1849,7 @@
         $.ajax({
             async: true,
             type: 'put',
-            url: '/head/order/ord01/update/order-state',
+            url: '/shop/order/ord01/update/order-state',
             data: data,
             success: function(res) {
                 console.log(res);
@@ -1841,12 +1867,12 @@
         if(type === "cash") {
             // 현금영수증 발행내역 오픈
             const cash_no = '{{ @$pay->cash_yn }}' === "Y" ? 1 : '';
-            const url = `/head/order/ord01/${ord_no}/${ord_opt_no}/cash?cash_no=${cash_no}`;
+            const url = `/shop/order/ord01/${ord_no}/${ord_opt_no}/cash?cash_no=${cash_no}`;
 		    window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=900,height=700");
         } else if(type === "tax") {
             // 세금계산서 내역 오픈
             const tax_no = '{{ @$pay->tax_yn }}' === "Y" ? 1 : '';
-            const url = `/head/order/ord01/${ord_no}/${ord_opt_no}/tax?tax_no=${tax_no}`;
+            const url = `/shop/order/ord01/${ord_no}/${ord_opt_no}/tax?tax_no=${tax_no}`;
 		    window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=900,height=700");
         }
     }
@@ -1893,6 +1919,16 @@
             +''+today.getDate()
             +''+(today.getHours() < 10 ? '0' : '')
             +''+today.getHours();
-    }   
+    } 
+
+    function openShopProduct(prd_no){
+        var url = '/shop/product/prd01/' + prd_no;
+        var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
+    }
+
+    function OpenShopStockPopup(prd_cd, date) {
+		var url = `/shop/stock/stk01/${prd_cd}?date=${date}`;
+		var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1000,height=900");
+	}
 </script>
 @stop

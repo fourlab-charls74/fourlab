@@ -184,6 +184,7 @@ class stk22Controller extends Controller
 		$code = 200;
 		$prd_cd = $request->input("prd_cd", '');
         $store_type = $request->input("store_type", '');
+        $now_date = date('Ymd');
         $where = "";
 
         if($store_type != '') $where .= " and s.store_type = $store_type";
@@ -203,6 +204,7 @@ class stk22Controller extends Controller
                 left outer join product_stock_store ps on s.store_cd = ps.store_cd and ps.prd_cd = '$prd_cd'
                 left outer join product_stock_storage pss on pss.storage_cd = (select storage_cd from storage where default_yn = 'Y') and pss.prd_cd = '$prd_cd'
             where s.use_yn = 'Y' and s.store_type = '08' and s.rt_yn = 'Y'
+                and if(s.sdate <= '$now_date' and date_format(date_add(date_format(s.sdate, '%Y-%m-%d'), interval 1 month), '%Y%m%d') >= '$now_date', s.open_month_stock_yn <> 'Y', 1=1)
 		";
 
 		$result = DB::select($sql);
@@ -224,10 +226,10 @@ class stk22Controller extends Controller
 		]);
     }
 
-    // 일반RT등록 (접수&출고처리까지)
+    // 일반RT등록
     public function request_rt(Request $request)
     {
-        $state = 30;
+        $state = 10;
         $rt_type = 'G';
         $admin_id = Auth('head')->user()->id;
         $admin_nm = Auth('head')->user()->name;
@@ -251,102 +253,98 @@ class stk22Controller extends Controller
                         'req_comment' => $d['comment'] ?? '',
                         'req_id' => $admin_id,
                         'req_rt' => now(),
-                        'rec_id' => $admin_id,
-                        'rec_rt' => now(),
-                        'prc_id' => $admin_id,
-                        'prc_rt' => now(),
                         'rt' => now(),
                         'ut' => now(),
                     ]);
 
-                // 보내는 매장
-                // product_stock_store -> 보유재고 차감
-                DB::table('product_stock_store')
-                    ->where('prd_cd', '=', $d['prd_cd'])
-                    ->where('store_cd', '=', $d['dep_store_cd']) 
-                    ->update([
-                        'qty' => DB::raw('qty - ' . ($d['rt_qty'] ?? 0)),
-                        'wqty' => DB::raw('wqty - ' . ($d['rt_qty'] ?? 0)),
-                        'ut' => now(),
-                    ]);
-                // 재고이력 등록
-                DB::table('product_stock_hst')
-                    ->insert([
-                        'goods_no' => $d['goods_no'],
-                        'prd_cd' => $d['prd_cd'],
-                        'goods_opt' => $d['goods_opt'],
-                        'location_cd' => $d['dep_store_cd'],
-                        'location_type' => 'STORE',
-                        'type' => PRODUCT_STOCK_TYPE_STORE_RT, // 재고분류 : RT출고
-                        'price' => $d['price'],
-                        'wonga' => $d['wonga'],
-                        'qty' => ($d['rt_qty'] ?? 0) * -1,
-                        'stock_state_date' => date('Ymd'),
-                        'ord_opt_no' => '',
-                        'comment' => 'RT출고',
-                        'rt' => now(),
-                        'admin_id' => $admin_id,
-                        'admin_nm' => $admin_nm,
-                    ]);
+                // // 보내는 매장
+                // // product_stock_store -> 보유재고 차감
+                // DB::table('product_stock_store')
+                //     ->where('prd_cd', '=', $d['prd_cd'])
+                //     ->where('store_cd', '=', $d['dep_store_cd']) 
+                //     ->update([
+                //         'qty' => DB::raw('qty - ' . ((int)$d['rt_qty'] ?? 0)),
+                //         'wqty' => DB::raw('wqty - ' . ((int)$d['rt_qty'] ?? 0)),
+                //         'ut' => now(),
+                //     ]);
+                // // 재고이력 등록
+                // DB::table('product_stock_hst')
+                //     ->insert([
+                //         'goods_no' => $d['goods_no'],
+                //         'prd_cd' => $d['prd_cd'],
+                //         'goods_opt' => $d['goods_opt'],
+                //         'location_cd' => $d['dep_store_cd'],
+                //         'location_type' => 'STORE',
+                //         'type' => PRODUCT_STOCK_TYPE_STORE_RT, // 재고분류 : RT출고
+                //         'price' => $d['price'],
+                //         'wonga' => $d['wonga'],
+                //         'qty' => ((int)$d['rt_qty'] ?? 0) * -1,
+                //         'stock_state_date' => date('Ymd'),
+                //         'ord_opt_no' => '',
+                //         'comment' => 'RT출고',
+                //         'rt' => now(),
+                //         'admin_id' => $admin_id,
+                //         'admin_nm' => $admin_nm,
+                //     ]);
 
-                // 받는 매장
-                // product_stock_store -> 재고 존재여부 확인 후 보유재고 플러스
-                $store_stock_cnt = 
-                    DB::table('product_stock_store')
-                        ->where('prd_cd', '=', $d['prd_cd'])
-                        ->where('store_cd', '=', $d['store_cd'])
-                        ->count();
-                if($store_stock_cnt < 1) {
-                    // 해당 매장에 상품 기존재고가 없을 경우
-                    DB::table('product_stock_store')
-                        ->insert([
-                            'goods_no' => $d['goods_no'] ?? 0,
-                            'prd_cd' => $d['prd_cd'],
-                            'store_cd' => $d['store_cd'],
-                            'qty' => 0,
-                            'wqty' => $d['rt_qty'] ?? 0,
-                            'goods_opt' => $d['goods_opt'],
-                            'use_yn' => 'Y',
-                            'rt' => now(),
-                        ]);
-                } else {
-                    // 해당 매장에 상품 기존재고가 이미 존재할 경우
-                    DB::table('product_stock_store')
-                        ->where('prd_cd', '=', $d['prd_cd'])
-                        ->where('store_cd', '=', $d['store_cd']) 
-                        ->update([
-                            'wqty' => DB::raw('wqty + ' . ($d['rt_qty'] ?? 0)),
-                            'ut' => now(),
-                        ]);
-                }
-                // 재고이력 등록
-                DB::table('product_stock_hst')
-                    ->insert([
-                        'goods_no' => $d['goods_no'],
-                        'prd_cd' => $d['prd_cd'],
-                        'goods_opt' => $d['goods_opt'],
-                        'location_cd' => $d['store_cd'],
-                        'location_type' => 'STORE',
-                        'type' => PRODUCT_STOCK_TYPE_STORE_RT, // 재고분류 : RT입고
-                        'price' => $d['price'],
-                        'wonga' => $d['wonga'],
-                        'qty' => $d['rt_qty'] ?? 0,
-                        'stock_state_date' => date('Ymd'),
-                        'ord_opt_no' => '',
-                        'comment' => 'RT입고',
-                        'rt' => now(),
-                        'admin_id' => $admin_id,
-                        'admin_nm' => $admin_nm,
-                    ]);
+                // // 받는 매장
+                // // product_stock_store -> 재고 존재여부 확인 후 보유재고 플러스
+                // $store_stock_cnt = 
+                //     DB::table('product_stock_store')
+                //         ->where('prd_cd', '=', $d['prd_cd'])
+                //         ->where('store_cd', '=', $d['store_cd'])
+                //         ->count();
+                // if($store_stock_cnt < 1) {
+                //     // 해당 매장에 상품 기존재고가 없을 경우
+                //     DB::table('product_stock_store')
+                //         ->insert([
+                //             'goods_no' => $d['goods_no'] ?? 0,
+                //             'prd_cd' => $d['prd_cd'],
+                //             'store_cd' => $d['store_cd'],
+                //             'qty' => 0,
+                //             'wqty' => (int)$d['rt_qty'] ?? 0,
+                //             'goods_opt' => $d['goods_opt'],
+                //             'use_yn' => 'Y',
+                //             'rt' => now(),
+                //         ]);
+                // } else {
+                //     // 해당 매장에 상품 기존재고가 이미 존재할 경우
+                //     DB::table('product_stock_store')
+                //         ->where('prd_cd', '=', $d['prd_cd'])
+                //         ->where('store_cd', '=', $d['store_cd']) 
+                //         ->update([
+                //             'wqty' => DB::raw('wqty + ' . ((int)$d['rt_qty'] ?? 0)),
+                //             'ut' => now(),
+                //         ]);
+                // }
+                // // 재고이력 등록
+                // DB::table('product_stock_hst')
+                //     ->insert([
+                //         'goods_no' => $d['goods_no'],
+                //         'prd_cd' => $d['prd_cd'],
+                //         'goods_opt' => $d['goods_opt'],
+                //         'location_cd' => $d['store_cd'],
+                //         'location_type' => 'STORE',
+                //         'type' => PRODUCT_STOCK_TYPE_STORE_RT, // 재고분류 : RT입고
+                //         'price' => $d['price'],
+                //         'wonga' => $d['wonga'],
+                //         'qty' => $d['rt_qty'] ?? 0,
+                //         'stock_state_date' => date('Ymd'),
+                //         'ord_opt_no' => '',
+                //         'comment' => 'RT입고',
+                //         'rt' => now(),
+                //         'admin_id' => $admin_id,
+                //         'admin_nm' => $admin_nm,
+                //     ]);
 
                 //RT처리 알림 전송
                 $res = DB::table('msg_store')
                     ->insertGetId([
                         'msg_kind' => 'RT',
                         'sender_type' => 'S',
-                        'sender_cd' => $d['dep_store_cd'] ?? '',
+                        'sender_cd' => $d['store_cd'] ?? '',
                         'reservation_yn' => 'N',
-                        'content' => $d['dep_store_nm'].'에서 일반RT를 처리하였습니다.',
+                        'content' => $d['store_nm'].'에서 일반RT를 요청 하였습니다.',
                         'rt' => now()
                     ]);
                 
@@ -354,7 +352,7 @@ class stk22Controller extends Controller
                     ->insert([
                         'msg_cd' => $res,
                         'receiver_type' => 'S',
-                        'receiver_cd' => $d['store_cd'] ?? '',
+                        'receiver_cd' => $d['dep_store_cd'] ?? '',
                         'check_yn' => 'N',
                         'rt' => now()
                     ]);

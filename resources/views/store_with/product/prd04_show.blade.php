@@ -167,7 +167,7 @@
 
 <style>
     .ag-row-level-1 {
-		background-color: #edf4fd !important;
+		background-color: #f2f2f2 !important;
 	}
 </style>
 
@@ -180,11 +180,20 @@
     let storage_columns = [
         {field: "storage_cd", hide: true},
         {field: "storage_nm", headerName: "창고명", width: 180, cellStyle: AlignCenter, pinned: "left", rowGroup: true, hide: true},
-        {field: "color", headerName: "컬러", width: 60, cellStyle: AlignCenter, pinned: "left"},
+        {field: "color", headerName: "컬러", width: 180, pinned: "left",
+            cellRenderer: function(params){
+                if (params.node.group === true) return;
+                else return params.data.color_nm + ' [' + params.data.color + ']';
+            }
+        },
     ];
 
     let store_columns = [
-        {field: "color", headerName: "컬러", width: 60, cellStyle: AlignCenter, pinned: "left", rowGroup: true, hide: true},
+        {field: "color", headerName: "컬러", width: 60, cellStyle: AlignCenter, pinned: "left", rowGroup: true, hide: true,
+            valueGetter:function(params){
+                return params.data.color_nm + ' [' + params.data.color + ']';
+            }
+        },
         {field: "store_cd", hide: true},
         {field: "store_nm", headerName: "매장명", width: 180, pinned: "left"},
     ];
@@ -223,7 +232,7 @@
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
         if (gridDiv2 !== null) {
             gx2 = new HDGrid(gridDiv2, store_columns, {
-                autoGroupColumnDef: basic_autoGroupColumnDef('컬러'),
+                autoGroupColumnDef: basic_autoGroupColumnDef('컬러', 180),
                 groupDefaultExpanded: 1, // 0: close, 1: open
                 suppressAggFuncInHeader: true,
                 animateRows: true,
@@ -293,26 +302,13 @@
             list.push({
                 headerName: size,
                 children: [
-                    {field: ss + "_qty", headerName: "실재고", maxWidth: 60, minWidth: 60, 
-                        cellStyle: (params) => ({"text-align": "right", "background-color": size === setting_size ? "#AAFF99" : "none"}),
+                    {field: ss + "_qty", headerName: "실재고", maxWidth: 60, minWidth: 60,
+                        cellStyle: (params) => ({ 'text-align': 'right', "background-color": size === setting_size ? "#AAFF99" : "none" }),
                         aggFunc: (params) => params.values.reduce((a,c) => a + (c * 1), 0),
-                        cellRenderer: (params) => {
-                            if (params.data !== undefined) {
-                                return params.data[ss + "_qty"] < 1 ? '' : params.data[ss + "_qty"];
-                            }
-                            else return params.value || 0;
-                        },
                     },
                     {field: ss + "_wqty", headerName: "보유재고", maxWidth: 65, minWidth: 65,
-                        cellStyle: (params) => ({"text-align": "right", "background-color": size === setting_size ? "#AAFF99" : "none"}),
+                        cellStyle: (params) => ({ 'text-align': 'right', "background-color": size === setting_size ? "#AAFF99" : "none" }),
                         aggFunc: (params) => params.values.reduce((a,c) => a + (c * 1), 0),
-                        cellRenderer: (params) => {
-                            if (params.data !== undefined) {
-                                return params.data[ss + "_wqty"] < 1 ? '' : params.data[ss + "_wqty"];
-                            } else {
-                                return params.value || 0;
-                            }
-                        }
                     },        
                 ],
             });

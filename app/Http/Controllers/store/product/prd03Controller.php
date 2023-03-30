@@ -366,7 +366,7 @@ class prd03Controller extends Controller
 		return response()->json(["code" => $code]);
 	}
 
-	public function showEdit($product_code) {
+	public function showAndEdit($type, $product_code) {
 		$sql = "
 			select
 				c.code_val as type_nm,
@@ -403,8 +403,9 @@ class prd03Controller extends Controller
 		";
 		$values = (array)DB::selectOne($sql, ['prd_cd' => $product_code]);
 		$values['units'] = SLib::getCodes("PRD_CD_UNIT");
-
-		return view( Config::get('shop.store.view') . '/product/prd03_edit', $values);
+		$values['method'] = $type;
+		
+		return view( Config::get('shop.store.view').'/product/prd03_edit' , $values);
 	}
 
 	public function edit(Request $request) {

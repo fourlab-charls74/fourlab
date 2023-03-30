@@ -248,7 +248,7 @@
     const stock_render = (params) => {
         if (params.value === undefined) return "";
         if (params.data) {
-            return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\');">' + Comma(params.value) + '</a>';
+            return '<a href="#" onclick="return openShopStock(\'' + (params.data.prd_cd || '') + '\');">' + Comma(params.value) + '</a>';
         } else if (params.node.aggData) {
             return `<a href="#" onclick="return OpenStockPopup('${params.node.key}');">${Comma(params.value)}</a>`;
         } else {
@@ -333,9 +333,6 @@
         @endif
         {field: "goods_sh", headerName: "TAG가", type: 'currencyType', width: 60, cellStyle: {"line-height": "30px"}, aggFunc: "first"},
         {field: "price", headerName: "판매가", type: 'currencyType', width: 60, cellStyle: {"line-height": "30px"}, aggFunc: "first"},
-        {field: "wonga", headerName: "원가", type: 'currencyType', width: 60, cellStyle: {"line-height": "30px"}, aggFunc: "first"},
-        {field: "margin_rate", headerName: "마진율", type: 'percentType', width: 60, cellStyle: {"line-height": "30px"}, aggFunc: "first"},
-        {field: "margin_amt", headerName: "마진액", type: 'numberType', width: 60, cellStyle: {"line-height": "30px"}, aggFunc: "first"},
         {field: "org_nm", headerName: "원산지", width: 80, cellStyle: StyleLineHeight, aggFunc: "first"},
         {field: "com_id", hide: true},
         {field: "com_nm", headerName: "공급업체", width: 100, cellStyle: StyleLineHeight, aggFunc: "first"},

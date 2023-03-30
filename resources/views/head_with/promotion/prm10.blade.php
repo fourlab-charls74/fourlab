@@ -160,14 +160,14 @@
         },
         {field:"coupon_type_nm" , headerName:"구분", cellStyle: CENTER},
         {
-            headerName:"발행기간",
+            headerName:"지급기간",
             children : [
                 {headerName:"시작", field:"pub_fr_date", width:80, cellStyle: CENTER},
                 {headerName:"종료", field:"pub_to_date", width:80, cellStyle: CENTER}
             ]
         },
         {
-            headerName:"유효기간",
+            headerName:"사용기간",
             children : [
                 {headerName:"시작", field:"use_fr_date", width:80, cellStyle: CENTER},
                 {headerName:"종료", field:"use_to_date", width:80, cellStyle: CENTER}

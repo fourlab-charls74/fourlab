@@ -116,7 +116,8 @@ class prd01Controller extends Controller
         $is_unlimited = $request->input("is_unlimited");
 
 		$com_id = $request->input("com_cd");
-		
+		$com_type = $request->input("com_type");
+
         $head_desc = $request->input("head_desc");
 		$ad_desc = $request->input("ad_desc");
 
@@ -146,6 +147,7 @@ class prd01Controller extends Controller
         if ($is_unlimited != "") $where .= " and g.is_unlimited = '" . Lib::quote($is_unlimited) . "' ";
 
 		if ($com_id != "") $where .= " and g.com_id = '" . Lib::quote($com_id) . "'";
+		if ($com_type != "") $where .= " and c.code_id = '$com_type' ";
 
         if($cat_cd != ""){
             if($cat_type === "DISPLAY"){
@@ -209,7 +211,17 @@ class prd01Controller extends Controller
                 "
                 select count(*) as total
                 from goods g 
-				left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
+					left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
+					left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
+					left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
+					left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
+					left outer join company com on com.com_id = g.com_id
+					left outer join brand brand on brand.brand = g.brand
+					left outer join category cat on cat.d_cat_cd = g.rep_cat_cd and cat.cat_type = 'DISPLAY'
+					left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
+					left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
+					left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
+					left outer join code c on c.code_id = com.com_type and c.code_kind_cd = 'G_COM_TYPE'
                 where 1=1 
                     -- g.com_id = :com_id 
                     $where
@@ -279,6 +291,7 @@ class prd01Controller extends Controller
 				, com.com_type as com_type_d
 				,g.sale_type,g.sale_yn,g.before_sale_price,g.sale_price,0 as sale_rate,
 				g.sale_dt_yn,g.sale_s_dt,g.sale_e_dt
+				, c.code_id as com_type
 				
 			from goods g
 				left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
@@ -291,6 +304,7 @@ class prd01Controller extends Controller
 				left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
 				left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
 				left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
+				left outer join code c on c.code_id = com.com_type and c.code_kind_cd = 'G_COM_TYPE'
 			where 1 = 1
                 $where
             $orderby

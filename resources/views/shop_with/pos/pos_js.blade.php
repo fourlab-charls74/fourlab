@@ -384,7 +384,7 @@
     }
 
     /** 주문등록 (판매) */
-    function sale() {
+    function sale(reservation_yn = 'N') {
         if(!validate()) return;
 
         let card_amt = $("[name=card_amt]").val() * 1;
@@ -436,6 +436,7 @@
                 removed_cart: removed_goods,
                 memo,
                 user_id: $("#user_id_txt").text(),
+                reservation_yn: reservation_yn
             },
         }).then(function (res) {
             if(res.data.code === '200') {
@@ -445,7 +446,13 @@
                 getOrderAnalysisData();
                 searchWaiting();
             } else if(res.data.code !== '500') {
-                alert(res.data.msg);
+                if (res.data.code === '-105' && reservation_yn === 'N') {
+                    if(confirm("재고가 부족한 상품이 있습니다.\n예약판매하시겠습니까?")) {
+                        sale('Y');
+                    }
+                } else {
+                    alert(res.data.msg);
+                }
             } else {
                 console.log(res);
                 alert("주문등록 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
@@ -769,6 +776,7 @@
                             <div class="d-flex flex-column align-items-center justify-content-center h-100">
                                 <p>${o.qty}</p>
                                 ${o.clm_state != 61 && o.qty > 0 ? `<button type="button" class="butt fc-white fs-08 br-05 bg-red mt-1" style="width:60px;height:25px;" onclick="openRefundModal('${o.ord_no}', '${o.ord_opt_no}', ${o.qty}, ${o.recv_amt}, ${o.point_amt});">환불하기</button>` : ''}
+                                ${o.ord_type === 4 ? `<button type="button" class="butt fc-white fs-08 br-05 bg-success mt-1" style="width:80px;height:25px;" onclick="setReservationOrdType('${o.ord_no}', '${o.ord_opt_no}');">예약상품지급</button>` : ''}
                             </div>
                         </td>
                         <td class="pt-2 pb-2 pr-1">
@@ -859,6 +867,26 @@
             html = `<p class="fc-gray fs-10">검색 중 오류 발생</p>`;
         }
         $("#search_ord_no_result").html(html);
+    }
+
+    /** 예약판매된 상품 지급처리 (예약주문건 정상주문처리) */
+    function setReservationOrdType(ord_no, ord_opt_no) {
+        if (!confirm("예약판매된 해당상품을 지급완료처리하시겠습니까?")) return;
+
+        axios({
+            url: '/shop/pos/complete-reservation',
+            method: 'post',
+            data: { ord_no, ord_opt_no },
+        }).then(function (res) {
+            if(res.data.code == 200) {
+                setOrderDetail(ord_no);
+            } else {
+                alert(res.data.msg);
+                console.log(res);
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
     }
 
     /** 해당 주문건 상세로 이동 */

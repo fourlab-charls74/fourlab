@@ -9,6 +9,7 @@ use App\Models\Conf;
 use App\Models\Order;
 use App\Models\Point;
 use App\Models\Claim;
+use App\Models\Pay;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -136,6 +137,70 @@ class ord01Controller extends Controller
         return view(Config::get('shop.store.view') . '/order/ord01', $values);
 
 	}
+
+
+    public function view(Request $req)
+    {
+        $p_ord_opt_no = $req->input("p_ord_opt_no","");
+
+        $sql = /** @lang text */
+            "
+            select
+                a.ord_no,a.ord_opt_no,a.goods_no,a.head_desc, a.goods_nm, replace(a.goods_opt, '^', ' : ') as opt_val
+                , a.qty, a.price, a.point_amt, a.coupon_amt, a.recv_amt, a.dlv_amt
+                , a.dc_amt, a.opt_amt, 0 as pay_fee
+                , substr(IFNULL(a.head_desc, ''), 0, 12 ) as old_head_desc
+                , substr(a.goods_nm, 0, 30) as old_goods_nm
+                , a.dlv_amt + a.recv_amt + 0 as total_amt
+                , a.qty * a.price as ord_amt
+            from order_opt a
+                inner join order_mst b on a.ord_no = b.ord_no
+                inner join goods c on a.goods_no = c.goods_no and a.goods_sub = c.goods_sub
+            where a.ord_opt_no = '$p_ord_opt_no'
+        ";
+        $p_ord_opt = DB::selectOne($sql);
+        $ord_no = $p_ord_opt->ord_no;
+        $ord_opt_no = $p_ord_opt->ord_opt_no;
+
+        $p_ord_opt->addopts = [];
+        if (!empty($p_ord_opt->ord_opt_no)) {
+            // 추가 옵션 값 얻기
+            $sql = /** @lang text */
+                "
+                select *
+                from order_opt_addopt
+                where ord_opt_no = '$p_ord_opt_no'
+                order by no
+            ";
+            $p_ord_opt->addopts  = DB::select($sql);
+        }
+
+        $sql = /** @lang text */
+            "
+            select 
+                concat(code_val,'_',ifnull(code_val2, '')) as 'name',
+                concat(code_val,' [',ifnull(code_val2, ''),']') as 'value'
+            from code 
+            where code_kind_cd ='BANK' 
+                and code_id != 'K' 
+                and use_yn = 'Y' 
+            order by code_seq        
+        ";
+        $banks = DB::select($sql);
+
+        $values = [
+            'ord_no' => $ord_no,
+            'ord_opt_no' => $ord_opt_no,
+            'p_ord_opt_no' => $p_ord_opt_no,
+            'p_ord_opt' => $p_ord_opt,
+            'banks' => $banks,
+            'pay_types' => SLib::getCodes("G_STAT_PAY_TYPE"),
+            'ord_types' => SLib::getCodes('G_ORD_TYPE'),
+            'sale_places' => SLib::getSalePlaces(),
+            'dlv_cds' => SLib::getCodes('DELIVERY'),
+        ];
+        return view(Config::get('shop.store.view') . '/order/ord01_view', $values);
+    }
 
     public function search(Request $request)
     {
@@ -644,6 +709,10 @@ class ord01Controller extends Controller
         $dlv_cd = $req->input("dlv_cd", ""); // 출고완료시 택배업체
         $dlv_no = $req->input("dlv_no", ""); // 출고완료시 송장번호
 
+        $reservation_yn = $req->input("reservation_yn", 'N'); // 예약판매여부
+        if ($ord_type == 4) $reservation_yn = 'Y';
+        if ($reservation_yn === 'Y') $ord_type = 4; // 예약(4)
+
         try {
             DB::beginTransaction();
 
@@ -682,6 +751,7 @@ class ord01Controller extends Controller
                     'id' => Auth('head')->user()->id,
                     'name' => Auth('head')->user()->name,
                 ],
+                'reservation_yn' => $reservation_yn,
             ]);
 
             if ($order_result['code'] != '200') {
@@ -780,6 +850,8 @@ class ord01Controller extends Controller
         $ord_date = date_format(date_create($ord_date), 'Y-m-d H:i:s');
         $fee_rate = $data['fee_rate'] ?? 0;
 
+        $reservation_yn = $data['reservation_yn'] ?? 'N';
+
         ################################
         #	수기 주문번호 생성
         ################################
@@ -839,6 +911,8 @@ class ord01Controller extends Controller
             $addopt_amt = $cart[$i]['addopt_amt'] ?? 0;
             $order_addopt_amt = $addopt_amt * $qty;
 
+            $opt_ord_type = 14; // order_opt의 ord_type (수기판매:14 / 예약:4)
+
             // 옵션가격
             $a_goods_opt = explode("|", $goods_opt);
             $opt_amt = $cart[$i]["opt_amt"] ?? 0;
@@ -875,15 +949,24 @@ class ord01Controller extends Controller
             }
             if ($row != null) $product_stock = $row->wqty;
 
+            // 예약판매가 아닐 경우에만 재고부족 에러처리
             if ($goods->is_unlimited == "Y") {
                 if ($product_stock < 1) {
-                    $code = '-105';
-                    // throw new Exception("재고가 부족하여 수기판매 처리를 할 수 없습니다.");
+                    if ($reservation_yn === 'Y') {
+                        $opt_ord_type = 4; // order_opt의 ord_type (수기판매:14 / 예약:4)
+                    } else {
+                        $code = '-105';
+                        // throw new Exception("재고가 부족하여 수기판매 처리를 할 수 없습니다.");
+                    }
                 }
             } else {
                 if ($qty > $product_stock) {
-                    $code = '-105';
-                    // throw new Exception("[상품코드 : $prd_cd] 재고가 부족하여 수기판매 처리를 할 수 없습니다.");
+                    if ($reservation_yn === 'Y') {
+                        $opt_ord_type = 4; // order_opt의 ord_type (수기판매:14 / 예약:4)
+                    } else {
+                        $code = '-105';
+                        // throw new Exception("[상품코드 : $prd_cd] 재고가 부족하여 수기판매 처리를 할 수 없습니다.");
+                    }
                 }
             }
 
@@ -969,7 +1052,7 @@ class ord01Controller extends Controller
                     'com_id' => $goods->com_id,
                     'add_point' => $ord_opt_add_point,
                     'ord_kind' => $ord_kind,
-                    'ord_type' => $ord_type,
+                    'ord_type' => $opt_ord_type,
                     'baesong_kind' => $goods->baesong_kind,
                     'dlv_start_date' => null,
                     'dlv_proc_date' => null,
@@ -1513,7 +1596,7 @@ class ord01Controller extends Controller
             'clm_reasons'	=> SLib::getCodes("G_CLM_REASON"),
             'clm_states'	=> SLib::getCodes("G_CLM_STATE"),
             'dlv_cds'		=> SLib::getCodes("DELIVERY"),
-			// 'refund_yn'		=> ''
+			'refund_yn'		=> ''
         ]);
         
         return view(Config::get('shop.store.view') . '/order/ord01_detail', $values);
@@ -1702,13 +1785,13 @@ class ord01Controller extends Controller
                     ), 0
                  ) as wqty
                 , ifnull(
-                    ( select sum(good_qty) from goods_summary
-                        where goods_no = g.goods_no and goods_sub = g.goods_sub and goods_opt = o.goods_opt
+                    ( select sum(qty) from product_stock
+                        where goods_no = g.goods_no and goods_opt = o.goods_opt
                     ), 0
                  ) as jaego_qty
                 , ifnull(
-                    ( select sum(wqty) from goods_summary
-                        where goods_no = g.goods_no and goods_sub = g.goods_sub and goods_opt = o.goods_opt
+                    ( select sum(wqty) from product_stock
+                        where goods_no = g.goods_no and goods_opt = o.goods_opt
                     ), 0
                  ) as stock_qty
                  , o.coupon_amt,o.dc_amt, o.dlv_amt, o.recv_amt
@@ -1916,7 +1999,7 @@ class ord01Controller extends Controller
                     , (select code_val from code where code_kind_cd = 'G_ORD_STATE' and code_id = o.ord_state)
                     , (select code_val from code where code_kind_cd = 'G_CLM_STATE' and code_id = o.clm_state)
                  ) as order_state
-                 , o.ord_state, o.clm_state
+                 , o.ord_state, o.clm_state, o.ord_type
                  , o.recv_amt, o.dc_amt, o.point_amt, o.coupon_amt
             from order_opt o
                 inner join goods g on g.goods_no = o.goods_no and g.goods_sub = o.goods_sub
@@ -2128,5 +2211,451 @@ class ord01Controller extends Controller
         }
 
         return response()->json(['code' => $code, 'msg' => $msg], $code);
+    }
+
+    public function refund($ord_no, $ord_opt_no, Request $req) {
+		// 설정 값 얻기
+        $conf = new Conf();
+		$cfg_shop_name				= $conf->getConfigValue("shop","name");
+		$cfg_dlv_fee				= $conf->getConfigValue("delivery","base_delivery_fee");
+		$cfg_free_dlv_fee_limit		= $conf->getConfigValue("delivery","free_delivery_amt");
+        $cfg_add_dlv_fee			= $conf->getConfigValue("delivery","add_delivery_fee");
+
+        $IsGroupDlv = true;
+
+		// 환불계좌 입력 여부
+        $isrefund_bank = "Y";
+
+		$refund_bank = "";
+		$refund_account = "";
+		$refund_depositor = "";
+        $p_ord_opt_no = "";
+        $refunded_amt = 0;
+        $pgcancelstate = "";
+		// 주문 건수
+        $sql = "select count(*) as cnt from order_opt where ord_no = '$ord_no'";
+
+        $row = DB::selectOne($sql);
+
+		$ord_cnt = $row->cnt;
+
+		// 주문 & 입금정보
+		$ordSql = "
+            select
+                a.ord_state,a.ord_amt, a.add_dlv_fee,
+                b.pay_type, b.pay_nm, b.pay_amt, b.pay_point, b.pay_baesong, b.coupon_amt, b.dc_amt, 0 as pay_fee,
+                b.bank_inpnm, bank_code, bank_number, tno, card_name, c.code_val as pay_name,
+                b.escw_use,
+                b.refund_bank, b.refund_account, b.refund_depositor
+            from order_mst a
+                inner join payment b on a.ord_no = b.ord_no
+                left outer join code c on c.code_kind_cd = 'G_PAY_TYPE' and b.pay_type = c.code_id
+            where a.ord_no = '$ord_no'
+        ";
+
+        $ord = DB::selectOne($ordSql);
+
+        if (!empty($ord->ord_state)) {
+            $ord_state = $ord->ord_state;
+            $ord_amt = $ord->ord_amt;
+            $add_dlv_fee = $ord->add_dlv_fee;
+
+            $pay_amt = $ord->pay_amt;
+            $pay_point = $ord->pay_point;
+            $pay_baesong = $ord->pay_baesong;
+            $coupon_amt = $ord->coupon_amt;
+            $dc_amt = $ord->dc_amt;
+            $pay_fee = $ord->pay_fee;
+
+            $pay_type = $ord->pay_type;
+            $pay_name = $ord->pay_name;
+            $pay_nm = $ord->pay_nm;
+            $card_name = $ord->card_name;
+            $tno = $ord->tno;
+
+            $pg = new Pay();
+            $pgcancelstate = $pg->cancelstate($ord->pay_type, $ord->tno, $ord->card_name);
+
+            if(($pay_type & 2) == 2){	// 카드
+                $isrefund_bank = "N";
+                $refund_bank = "";
+                $refund_account = "";
+            } else if(($pay_type & 16) == 16){	// 계좌이체 : PG 거래번호를 기본값으로 출력
+                if($pgcancelstate > 0){
+                    $isrefund_bank = "N";
+                }
+
+                $refund_bank = $ord->bank_code;
+            } else if(($pay_type & 1) == 1 || ($pay_type & 64) == 64){	// 무통장 OR 가상계좌(에스크로)
+                $refund_bank = $ord->refund_bank;
+                $refund_account = $ord->refund_account;
+                $pay_nm = $ord->refund_depositor;
+            }
+        } else {
+			// 주문 정보 또는 입금 정보가 없는 경우는 에러처리!!!
+        }
+
+		//
+		//	환불정보는 공유
+		//
+
+		$refund_no = "";
+
+		$sql = "
+			select refund_no
+			from claim
+			where ord_opt_no = '$ord_opt_no'
+        ";
+
+        $row = DB::selectOne($sql);
+
+		if(!empty($row->refund_no)) {
+			$refund_no = $row->refund_no;
+		}
+
+		// 환불정보
+		$refundSql = "
+			select
+				clm_state,refund_price,refund_dlv_amt, refund_dlv_ret_amt, refund_dlv_enc_amt, refund_dlv_pay_amt,
+				refund_point_amt, refund_coupon_amt, refund_etc_amt, 0 as refund_pay_fee, refund_gift_amt, refund_amt,
+				refund_bank, refund_account, refund_nm, '' as refund_pay_fee_yn
+			from claim a
+			where a.ord_opt_no = '$refund_no'
+        ";
+
+		// 환불금액
+		if($tno != ""){
+			$sql = "
+				select sum(ifnull(c.refund_amt,0)) as refunded_amt
+				from (
+					select ord_no
+					from payment where tno = '$tno' and ord_no <> ''
+				) a inner join order_opt o on a.ord_no = o.ord_no
+					inner join claim c on o.ord_opt_no = c.ord_opt_no
+				where c.clm_state = 61
+			";
+		} else {
+			$sql = "
+				select
+					sum(ifnull(d.refund_amt,0)) as refunded_amt
+				from order_opt a inner join claim d on a.ord_opt_no = d.ord_opt_no
+				where a.ord_no = '$ord_no'
+			";
+        }
+
+        $row = DB::selectOne($sql);
+
+        if (!empty($row->refunded_amt)) {
+            $refunded_amt = $row->refunded_amt;
+        }
+
+		// 그룹 주문
+        $sum_dlv_amt = 0;
+
+		if($IsGroupDlv){
+			$sql = "
+				select
+					if(g.com_type = 1, g.com_type, a.com_id) as com_id,
+					count(*) as cnt,
+					sum(a.dlv_amt) as dlv_amt,
+					sum(ifnull(c.dlv_add_amt,0)) as dlv_add_amt
+				from order_opt a
+					inner join goods g on a.goods_no = g.goods_no and a.goods_sub = g.goods_sub
+						and g.goods_type <> 'O'
+					left outer join claim c on a.ord_opt_no = c.ord_opt_no
+				where a.ord_no = '$ord_no'
+				group by if(g.com_type = 1, g.com_type, a.com_id)
+			";
+			$rows = DB::select($sql);
+
+			$group_dlv = array();
+
+			foreach ($rows as $row) {
+				$group_dlv[$row->com_id]["cnt"] = $row->cnt;
+				$group_dlv[$row->com_id]["dlv_amt"] = $row->dlv_amt;
+				$group_dlv[$row->com_id]["dlv_add_amt"] = $row->dlv_add_amt;
+				$sum_dlv_amt += $row->dlv_amt;
+			}
+		} else {
+
+			$sql = "
+				select
+					count(*) as cnt,
+					sum(a.dlv_amt) as dlv_amt,
+					sum(ifnull(c.dlv_add_amt,0)) as dlv_add_amt
+				from order_opt a
+					inner join goods g
+						on a.goods_no = g.goods_no and a.goods_sub = g.goods_sub and g.goods_type <> 'O'
+					left outer join claim c on a.ord_opt_no = c.ord_opt_no
+				where a.ord_no = '$ord_no'
+            ";
+            $row = DB::selectOne($sql);
+
+			$group_dlv = array();
+			$group_dlv["1"]["cnt"] = $ord_cnt;
+			$group_dlv["1"]["dlv_amt"] = $pay_baesong;
+			$group_dlv["1"]["dlv_add_amt"] = $row->dlv_add_amt;
+		}
+
+		// 주문 상품
+		$sql = "
+            select
+                a.ord_opt_no, a.p_ord_opt_no, a.ord_state, a.clm_state,
+                if(ifnull(a.clm_state,0) = 0,
+                    (select code_val from code where code_kind_cd = 'G_ORD_STATE' and code_id = a.ord_state),
+                    (select code_val from code where code_kind_cd = 'G_CLM_STATE' and code_id = a.clm_state)
+                ) as state,
+                if(g.com_type = 1, g.com_type, a.com_id) as com_id,
+                if(g.com_type = 1, '$cfg_shop_name',e.com_nm) as com_nm,
+                a.goods_nm,
+                replace(a.goods_opt, '^',':') as opt_nm,
+                a.price, a.qty, a.price * a.qty as amt,
+                a.coupon_amt , a.dc_amt, 0 as pay_fee,
+                ifnull(a.dlv_amt, 0) as dlv_amt,
+                ifnull(d.dlv_type, '') as clm_clm_dlv_type,
+                ifnull(d.dlv_cm, '') as clm_dlv_cm,
+                ifnull(d.dlv_amt, '') as clm_dlv_amt,
+                ifnull(d.dlv_ret_amt, '') as clm_dlv_ret_amt,
+                ifnull(d.dlv_add_amt, '') as clm_dlv_add_amt,
+                ifnull(d.dlv_enc_amt, '') as clm_dlv_enc_amt,
+                ifnull(d.dlv_pay_amt, '') as clm_dlv_pay_amt,
+                ifnull(d.ref_amt, 0) as ref_amt,
+                ifnull(d.refund_no, 0) as refund_no,
+                ifnull(d.refund_amt, '') as refund_amt,
+                g.goods_type,
+                ifnull(e.dlv_policy,'S') as com_dlv_policy,
+                ifnull(e.dlv_amt, 0) as com_dlv_amt,
+                ifnull(e.free_dlv_amt_limit, 0) as com_free_dlv_amt_limit
+            from order_opt a
+                inner join goods g on a.goods_no = g.goods_no and a.goods_sub = g.goods_sub
+                inner join company e on a.com_id = e.com_id
+                left outer join coupon b on a.coupon_no = b.coupon_no
+                left outer join claim d on a.ord_opt_no = d.ord_opt_no
+            where a.ord_no = '$ord_no'
+            order by com_id,ord_opt_no desc
+        ";
+
+        $rows = DB::select($sql);
+		$prds = array();
+        $pre_com_id = "";
+        $s_prd = null;
+        foreach($rows as $row) {
+            $class = "";
+
+			if($row->ord_opt_no == $ord_opt_no){
+				$class ="choice";
+                $p_ord_opt_no = $row->p_ord_opt_no;
+                $s_prd = $row;
+			}
+
+			// 배송비 및 열수
+			if($IsGroupDlv){
+				$com_id = $row->com_id;
+
+				if($sum_dlv_amt == 0 && $pay_baesong > 0){
+					$dlv_amt = $pay_baesong;
+				} else {
+					//$dlv_amt = $row->dlv_amt;
+					$dlv_amt = $group_dlv[$com_id]["dlv_amt"]; // 2008-07-18 : 그룹 배송 처
+				}
+				$dlv_grp_amt = $group_dlv[$com_id]["dlv_amt"];
+				$dlv_grp_add_amt = $group_dlv[$com_id]["dlv_add_amt"];
+				$dlv_grp_cnt = ($pre_com_id != $row->com_id)? $group_dlv[$com_id]["cnt"]:"";
+			} else {
+				$com_id = "1";
+				$dlv_amt = $pay_baesong;
+				$dlv_grp_amt = $group_dlv[$com_id]["dlv_amt"];
+				$dlv_grp_add_amt = $group_dlv[$com_id]["dlv_add_amt"];
+				$dlv_grp_cnt = $ord_cnt;
+			}
+
+			array_push($prds,
+				array(
+					"class"				=> $class,
+					"refund_no"			=> $row->refund_no,
+					"ord_opt_no"		=> $row->ord_opt_no,
+					"ord_state"			=> $row->ord_state,
+					"clm_state"	 		=> $row->clm_state,
+					"state"				=> $row->state,
+					"com_id"			=> $com_id,
+					"com_nm"			=> $row->com_nm,
+					"goods_nm"			=> $row->goods_nm,
+					"goods_snm"			=> $row->goods_nm,
+					"opt_nm"			=> $row->opt_nm,
+					"price"				=> $row->price,
+					"qty"				=> $row->qty,
+					"amt"				=> $row->amt,
+					"dc_amt"			=> $row->dc_amt,
+					"refunded_amt"		=> $refunded_amt,
+					"pay_fee"			=> $row->pay_fee,
+					// "coupon_amt"		=> $row->coupon_amt+$row->dc_amt,
+					"coupon_amt"		=> $row->coupon_amt,
+					"dlv_amt"			=> $dlv_amt,
+					"dlv_grp_cnt"		=> $dlv_grp_cnt,
+					"dlv_grp_amt"		=> $dlv_grp_amt,
+					"dlv_grp_add_amt"	=> $dlv_grp_add_amt,
+					"clm_clm_dlv_type"		=> $row->clm_clm_dlv_type,
+					"clm_dlv_cm"		=> $row->clm_dlv_cm,
+					"clm_dlv_amt"		=> $row->clm_dlv_amt,
+					"clm_dlv_ret_amt"	=> $row->clm_dlv_ret_amt,
+					"clm_dlv_add_amt"	=> $row->clm_dlv_add_amt,
+					"clm_dlv_enc_amt"	=> $row->clm_dlv_enc_amt,
+					"clm_dlv_pay_amt"	=> $row->clm_dlv_pay_amt,
+					"ref_amt"			=> $row->ref_amt,
+					"goods_type"		=> $row->goods_type,
+					"com_dlv_policy"	=> $row->com_dlv_policy,
+					"com_dlv_amt"		=> $row->com_dlv_amt,
+                    "com_dlv_amt_free_limit"	=> $row->com_free_dlv_amt_limit,
+                    "refund_amt"        => $row->refund_amt
+				)
+			);
+
+			$pre_com_id = $com_id;
+        }
+
+		###################################################################
+		#	사은품 정보
+        ###################################################################
+		$array_gift = array();
+		$sql = "
+			select a.no, a.ord_no, a.ord_opt_no,
+				ifnull(a.give_yn, 'N') as give_yn,
+				ifnull(a.give_date, '') as give_date,
+				ifnull(a.refund_no, '0') as refund_no,
+				ifnull(a.refund_yn, 'N') as refund_yn,
+				ifnull(a.refund_amt, '0') as refund_amt,
+				ifnull(a.refund_date, '') as refund_date,
+				a.admin_id, a.admin_nm, a.rt, a.ut,
+				b.no as gift_no, b.name, b.type, b.kind, b.refund_yn as g_refund_yn,
+				ifnull(cd.code_val, '') as type_val,
+				ifnull(cd2.code_val, '') as kind_val,
+				b.img, b.apply_amt, 0 as gift_price,
+				g.goods_no, g.goods_sub, g.goods_nm
+			from order_gift a
+				inner join gift b on a.gift_no = b.no
+				inner join order_opt c on c.ord_opt_no = a.ord_opt_no
+				inner join goods g on g.goods_no = c.goods_no and g.goods_sub = c.goods_sub
+				left outer join code cd on cd.code_kind_cd = 'G_GIFT_TYPE' and cd.code_id = b.type
+				left outer join code cd2 on cd2.code_kind_cd = 'G_GIFT_KIND' and cd2.code_id = b.kind
+			where a.ord_no = '$ord_no'
+			order by b.kind desc, b.apply_amt desc, a.ord_opt_no desc
+        ";
+
+        $rows = DB::select($sql);
+
+		foreach($rows as $row){
+			$order_gift_no		= $row->no;
+			$gift_no			= $row->gift_no;
+			$gift_nm			= $row->name;
+			$gift_type			= $row->type;
+			$gift_type_val		= $row->type_val;
+			$gift_kind			= $row->kind;
+			$gift_kind_val		= $row->kind_val;
+			$gift_img			= $row->img;
+			$gift_apply_amt		= $row->apply_amt;
+			$g_refund_yn		= $row->g_refund_yn;
+			$gift_give_yn		= $row->give_yn;
+			$gift_give_date		= $row->give_date;
+			$gift_refund_no		= $row->refund_no;
+			$gift_refund_yn		= $row->refund_yn;
+			$gift_refund_amt	= $row->refund_amt;
+			$gift_refund_date	= $row->refund_date;
+			$gift_goods_no		= $row->goods_no;
+			$gift_goods_sub		= $row->goods_sub;
+			$gift_goods_nm		= $row->goods_nm;
+			$gift_price			= $row->gift_price;
+
+			$_ord_opt_no = $row->ord_opt_no;
+
+			$choice_class = "";
+			if( $gift_kind == "P" && $ord_opt_no == $_ord_opt_no ) {
+				$choice_class	= "choice";
+			}
+
+			array_push($array_gift, array(
+				"order_gift_no"	=> $order_gift_no,
+				"gift_no"		=> $gift_no,
+				"name"			=> $gift_nm,
+				"type"			=> $gift_type,
+				"type_val"		=> $gift_type_val,
+				"kind"			=> $gift_kind,
+				"kind_val"		=> $gift_kind_val,
+				"img"			=> $gift_img,
+				"apply_amt"		=> $gift_apply_amt,
+				"g_refund_yn"	=> $g_refund_yn,
+				"give_yn"		=> $gift_give_yn,
+				"give_date"		=> $gift_give_date,
+				"refund_no"		=> $gift_refund_no,
+				"refund_yn"		=> $gift_refund_yn,
+				"refund_amt"	=> $gift_refund_amt,
+				"refund_date"	=> $gift_refund_date,
+				"ord_opt_no"	=> $_ord_opt_no,
+				"ord_no"		=> $ord_no,
+				"goods_no"		=> $gift_goods_no,
+				"goods_sub"		=> $gift_goods_sub,
+				"goods_nm"		=> $gift_goods_nm,
+				"goods_snm"		=> $gift_goods_nm,
+				"choice_class"	=> $choice_class,
+				"gift_price"	=> $gift_price
+			));
+        }
+
+        $values = [
+            "g_dlv_fee"             => Lib::CheckInt($cfg_dlv_fee),
+            "g_dlv_add_fee"         => Lib::CheckInt($cfg_add_dlv_fee),
+            "g_free_dlv_fee_limit"  => Lib::CheckInt($cfg_free_dlv_fee_limit),
+
+            'ord_no'		=> $ord_no,
+            'ord_opt_no'	=> $ord_opt_no,
+            'refund_no'		=> $refund_no,
+            'ord'			=> $ord,
+            'refund'		=> DB::selectOne($refundSql),
+            'group_dlv'		=> $group_dlv,
+            'prds'			=> $prds,
+            'gifts'			=> $array_gift,
+            'p_ord_opt_no'	=> $p_ord_opt_no,
+            'ord_cnt'		=> $ord_cnt,
+            'refunded_amt'	=> $refunded_amt,
+            's_prd'			=> $s_prd,
+            'refund_bank'	=> $refund_bank,
+            'refund_account'=> $refund_account,
+            'pay_nm'		=> $pay_nm,
+            'pgcancelstate'	=> $pgcancelstate,
+            'isrefund_bank'	=> $isrefund_bank,
+            'escw_show'		=> ( ($ord->escw_use == "O" || $ord->escw_use == "Y") && $ord->pay_amt >= 100000 ) ? "" : "none"
+        ];
+
+        // dd($values);
+        return view( Config::get('shop.store.view') . '/order/ord01_refund',$values);
+    }
+
+    /** 예약판매상품 지급완료처리 (예약주문건 정상주문처리) */
+    public function complete_reservation(Request $request)
+    {
+        $ord_no = $request->input('ord_no', '');
+        $ord_opt_no = $request->input('ord_opt_no', '');
+        $ord_type = 15; // 정상:15
+
+        try {
+            DB::beginTransaction();
+
+            DB::table('order_opt')->where('ord_opt_no', $ord_opt_no)->update([ 'ord_type' => $ord_type ]);
+            DB::table('order_opt_wonga')->where('ord_opt_no', $ord_opt_no)->update([ 'ord_type' => $ord_type ]);
+
+            $reservation_ord_cnt = DB::table('order_opt')->where('ord_no', $ord_no)->where('ord_type', 4)->count();
+            if ($reservation_ord_cnt < 1) {
+                DB::table('order_mst')->where('ord_no', $ord_no)->update([ 'ord_type' => $ord_type ]);
+            }
+
+            DB::commit();
+            $code = 200;
+            $msg = '예약판매상품이 지급완료처리되었습니다.';
+        } catch (Exception $e) {
+            DB::rollback();
+            $code = 500;
+            $msg = $e->getMessage();
+        }
+
+        return response()->json(['code' => $code, 'msg' => $msg], 200);
     }
 }

@@ -79,7 +79,7 @@
                 return false;
             }
 
-            if(ff.bank_inpnm.value == "") {
+            if(ff.bank_number.value == "") {
                 alert("입금자를 입력해 주십시오.");
                 ff.bank_number.focus();
                 return false;
@@ -449,7 +449,7 @@
     }
 
     function PopSearchOrder() {
-        const url='/head/api/order?isld=Y';
+        const url='/shop/api/order?isld=Y';
         window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
     }
 
@@ -473,9 +473,9 @@
     function SetOrder(ord_no,ord_opt_no = ''){
 
         if(ord_opt_no == ''){
-            url = '/head/order/ord01/get/' + ord_no + '?fmt=json';
+            url = '/shop/order/ord01/get/' + ord_no + '?fmt=json';
         } else {
-            url = '/head/order/ord01/get/' + ord_no + '/'  + ord_opt_no + '?fmt=json'
+            url = '/shop/order/ord01/get/' + ord_no + '/'  + ord_opt_no + '?fmt=json'
         }
 
         $.ajax({
@@ -506,11 +506,9 @@
                 $('#add_dlv_fee').val(ord.add_dlv_fee);
                 $('#sale_place').val(ord.sale_place);
                 $('#pay_type').val(pay.pay_type);
-                // $('#bank_code').val(pay.bank_code);
+                $('#bank_code').val(pay.bank_code);
                 $('#bank_number').val(pay.bank_number);
                 $('#sale_place').val(ord.com_id);
-                $('#bank_inpnm').val(pay.bank_inpnm);
-                $('#bank_code').val(pay.bank_code + '_' + pay.bank_number).prop("selected",true);
                 if($('#ord_type_' +  ord.ord_type)){
                     $('#ord_type_' +  ord.ord_type).attr("checked", true);
                 }
@@ -545,7 +543,7 @@
 
                         $.ajax({
                             type: "get",
-                            url: '/head/product/prd01/' + goods_no + '/get',
+                            url: '/shop/product/prd01/' + goods_no + '/get',
                             contentType: "application/x-www-form-urlencoded; charset=utf-8",
                             dataType: 'json',
                             // data: {},
@@ -617,13 +615,13 @@
             async: true,
             dataType: "json",
             type: 'post',
-            url: "/head/order/ord02/save",
+            url: "/shop/order/ord02/save",
             data: order_data,
             success: function (res) {
                 console.log(res);
                 is_processing = false;
                 alert("저장되었습니다.");
-                document.location.href = '/head/order/ord01/' + res.ord_no;
+                document.location.href = '/shop/order/ord01/' + res.ord_no;
             },
             error: function(e) {
                 is_processing = false;
@@ -640,7 +638,7 @@
      * @return {boolean}
      */
     function AddGoods(){
-        var url = '/head/product/prd01/choice';
+        var url = '/shop/product/prd01/choice';
         var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
     }
 
@@ -651,7 +649,7 @@
         for(var i=0;i<goods_nos.length;i++){
             $.ajax({
                 type: "get",
-                url: '/head/product/prd01/' + goods_nos[i] + '/get',
+                url: '/shop/product/prd01/' + goods_nos[i] + '/get',
                 contentType: "application/x-www-form-urlencoded; charset=utf-8",
                 dataType: 'json',
                 // data: {},

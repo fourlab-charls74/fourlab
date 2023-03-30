@@ -18,12 +18,11 @@ class stk34Controller extends Controller
     public function index()
     {
         $mutable = Carbon::now();
-        $sdate = $mutable->sub(1, 'month')->format('Y-m');
 
         $values = [
             'store_types' => SLib::getCodes("STORE_TYPE"),
             'competitors' => SLib::getCodes("COMPETITOR"),
-            'sdate' => $sdate,
+            'sdate' => date("Y-m"),
             'edate' => date("Y-m")
         ];
         return view(Config::get('shop.store.view') . '/stock/stk34', $values);

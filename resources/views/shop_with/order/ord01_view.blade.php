@@ -1,4 +1,4 @@
-@extends('head_with.layouts.layout-nav')
+@extends('shop_with.layouts.layout-nav')
 @section('title','수기판매')
 @section('content')
     <form name="f1" method="post">
@@ -54,7 +54,7 @@
                                                         <input type="text" name="user_id" id="user_id" value='{{@$ord->user_id}}' class="form-control form-control-sm mr-1" style="width:260px;">
                                                         <a href="#" onclick="GetUserInfo(document.f1.user_id.value)" class="btn btn-sm btn-primary shadow-sm fs-12 mr-1">회원정보 불러오기</a>
                                                         <a href="#" onclick="SameInfo();" class="btn btn-sm btn-primary shadow-sm fs-12 mr-1">수령자정보 동일</a>
-                                                        <a href="#" onclick="PopSearchOrder();" class="btn btn-sm btn-primary shadow-sm fs-12">기존 주문정보 불러오기</a>
+                                                        {{-- <!-- <a href="#" onclick="PopSearchOrder();" class="btn btn-sm btn-primary shadow-sm fs-12">기존 주문정보 불러오기</a> --> --}}
                                                         <div id="p_ord_no" class="p-2"></div>
                                                     </div>
                                                 </td>
@@ -154,7 +154,7 @@
                                                     </div>
                                                 </td>
                                                 <th>배송비적용</th>
-                                                <td style="padding:0px 10px 0px 10px;">
+                                                <td colspan="3" style="padding:0px 10px 0px 10px;">
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio" onclick="CheckPoint(this);">
                                                             <input type="radio" name="dlv_apply" id="dlv_apply_y" value="Y" class="custom-control-input" checked><label class="custom-control-label" for="dlv_apply_y">적용함</label>
@@ -164,7 +164,7 @@
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <th>적립금지급</th>
+                                                {{-- <th>적립금지급</th>
                                                 <td style="padding:0px 10px 0px 10px;">
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio" onclick="CheckPoint(this);">
@@ -176,7 +176,7 @@
                                                             <label class="custom-control-label" for="give_point_n">지급안함</label>
                                                         </div>
                                                     </div>
-                                                </td>
+                                                </td> --}}
                                             </tr>
                                             </tbody>
                                         </table>
@@ -233,15 +233,13 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th>판매업체</th>
+                                                <th>주문매장</th>
                                                 <td style="padding:0px 10px 0px 10px;">
-                                                    <div class="flax_box">
-                                                        <select name="sale_place" id="sale_place" class="form-control form-control-sm">
-                                                            <option value="">선택</option>
-                                                            @foreach($sale_places as $val)
-                                                                <option value="{{$val->com_id}}" @if($val->com_id == "HEAD_OFFICE") selected @endif>{{$val->com_nm}}</option>
-                                                            @endforeach
-                                                        </select>
+                                                    <div class="d-flex flex-column pt-2 pb-1">
+                                                        <div class="flax_box mr-2 mb-1" style="width: 307px;">
+                                                            <input type='hidden' id="store_no" name="store_no" value="{{$store_cd}}">
+                                                            <input type='text' id="store_nm" name="store_nm" class="form-control form-control-sm mt-1 mt-sm-0" value="{{$store_nm}}" readonly>
+                                                        </div>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -444,9 +442,6 @@
             </div> -->
     </form>
     </div>
-    <!-- script -->
-    @include('head_with.order.ord20_js')
-    <!-- script -->
     <script type="text/javascript">
 
         const columns = [
@@ -457,20 +452,44 @@
                 editable: true,
                 cellClass:['hd-grid-edit'],
                 cellEditor: 'agRichSelectCellEditor',
-                cellEditorParams:cellOpionsParams,
-                // cellEditorSelector: function(params) {
-                //     return {
-                //         component: 'agRichSelectCellEditor',
-                //         params: {
-                //             values: []
-                //         }
-                //     };
-                // }
+                cellEditorParams: function(params) {
+                    var goods_no = params.data.goods_no;
+                    var options = [];
+                    if(_goods_options.hasOwnProperty(goods_no)){
+                        options =  _goods_options[goods_no];
+                    } else {
+                    }
+                    return {
+                        values :options
+                    }
+                },
+            
             },
             {field:"qty" , headerName:"수량", width:90,type: 'numberType',
                 editable: true,
-                cellClass:['hd-grid-number','hd-grid-edit'],onCellValueChanged:EditAmt,
-                //cellStyle:StyleChangeYN,
+                cellClass:['hd-grid-number','hd-grid-edit'],onCellValueChanged: function(params) {
+                    if (params.oldValue !== params.newValue) {
+                        console.log(params);
+                        var rowNode = params.node;
+                        var qty = params.data.qty;
+                        var price = params.data.price;
+                        var option_price = 0;
+                        price += option_price;
+
+                        var ord_amt = qty * price;
+                        var point_amt = params.data.point_amt;
+                        var coupon_amt = params.data.coupon_amt;
+                        var dc_amt = params.data.dc_amt;
+                        var dlv_amt = params.data.dlv_amt;
+                        var pay_fee = 0;
+                        var recv_amt = ord_amt - point_amt - coupon_amt - dc_amt + pay_fee;
+
+                        //ff.recv_amt.value = ord_amt + dlv_amt - point - coupon - dc + pay_fee;
+                        params.data.ord_amt = ord_amt;
+                        params.data.recv_amt = recv_amt;
+                        gx.gridOptions.api.redrawRows({rowNodes:[rowNode]});
+                    }
+                },
             },
             {field:"price" , headerName:"판매가", width:90, type: 'currencyType'  },
             {field:"ord_amt" , headerName:"주문액", width:90, type: 'currencyType'  },
@@ -504,4 +523,594 @@
         });
 
     </script>
+
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script>
+    let is_processing = false;
+
+    const Validate = (ff) => {
+        if (is_processing) {
+            alert("잠시만 기다려 주십시오. 지금 등록중입니다.");
+            return;
+        }
+
+        const ord_state = $("[name=ord_state]:checked");
+
+        if(ord_state.length === 0){
+            alert('주문상태를 선택해 주십시오.');
+            return false;
+        }
+
+        if( ord_state.val() == 30 ){
+            if( ff.dlv_cd.value == "" ){
+                alert("택배사를 선택하십시오.");
+                ff.dlv_cd.focus();
+                return false;
+            }
+            if( ff.dlv_no.value == "" ){
+                alert("택배 송장번호를 입력하십시오.");
+                ff.dlv_no.focus();
+                return false;
+            }
+        }
+        const ord_type = $('[name=ord_type]:checked');
+
+        if( ord_type.length === 0 ){
+            alert('출고형태를 선택해 주십시오.');
+            return false;
+        }
+
+       
+        const ord_kind = $('[name=ord_kind]:checked');
+
+        if(ord_kind.length === 0){
+            alert('출고구분을 선택해 주십시오.');
+            return false;
+        }
+
+        if(gx.getRowCount() == 0){
+            alert("수기판매등록하실 상품을 검색해 주십시오.");
+            return false;
+        } else {
+            var is_option = true;
+            gx.gridOptions.api.forEachNode(function(node) {
+                if(node.data.opt_val === undefined || node.data.opt_val === ""){
+                    is_option = false;
+                    gx.gridOptions.api.setFocusedCell(node.rowIndex,"opt_val");
+                    return false;
+                }
+            });
+            if(is_option === false){
+                alert('옵션을 선택 해 주십시오.');
+                return false;
+            }
+        }
+
+
+        if(ff.pay_type.value == ""){
+            alert("결제수단을 선택해 주십시오.");
+            ff.pay_type.focus();
+            return false;
+        }
+
+        if(ff.pay_type.value == "1" || ff.pay_type.value == "5" || ff.pay_type.value == "9" || ff.pay_type.value == "13"){
+
+            if(ff.bank_code.value == ""){
+                alert("입금은행을 선택해 주십시오.");
+                ff.bank_code.focus();
+                return false;
+            }
+
+            if(ff.bank_inpnm.value == "") {
+                alert("입금자를 입력해 주십시오.");
+                ff.bank_number.focus();
+                return false;
+            }
+        }
+
+        if(ff.pay_type.value == "9" || ff.pay_type.value=="13"){
+            if(ff.coupon_no.value == ""){
+                alert("쿠폰번호를 입력해 주십시오.");
+                ff.coupon_no.focus();
+                return false;
+            }
+        }
+
+        if(confirm("수기판매로 등록하시면 더이상 수정하실 수 없습니다.\n등록 하시겠습니까?")){
+            if( ! is_processing ){
+                is_processing = true;
+                save();
+            }
+        }
+        return;
+    }
+
+    $('[name=ord_state]').change(function(){
+        $('#delivery_info').css('display', this.value == '30' ? 'block' : 'none');
+    });
+
+    // 상품 옵션변경(옵션 가격)에 따른 판매가 초기화
+    const CheckOptPrice = (goods_opt) => {
+        if(goods_opt == "")
+        {
+            $("price").value = $("goods_price").value;
+        }
+        else
+        {
+            var ff = document.f1;
+            var opt_price = 0;
+
+            //옵션 가격 처리
+            m_val = goods_opt.split("|");
+            opt_price = (m_val[9] > 0) ? unComma(m_val[9]) : 0;
+
+            // 추가옵션 가격
+            var add_opt_cnt = 0;
+            if(ff.addopt_cnt){
+                add_opt_cnt = ff.addopt_cnt.value;
+            }
+
+            addopt = "";
+            for( var i = 1; i<= add_opt_cnt; i++)
+            {
+                var addopt_obj = ff["addopt" + i];
+                if( addopt_obj.value ){
+                    addopt += ( addopt != "" ) ? "^":"";
+                    addopt += addopt_obj.value;
+                }
+            }
+
+            // 추가옵션 포맷 : 옵션값|상품번호|상품하위번호|추가옵션가격|추가옵션일련번호
+            var addopt_price = 0;
+            if( addopt ){
+                is_multi = addopt.indexOf("^");
+                is_price = addopt.indexOf("|");
+                if( is_price > -1 ){
+                    if( is_multi > -1 ){
+                        tmp_addopt = addopt.split("^");
+                        for(i = 0; i < tmp_addopt.length; i++){
+                            tmp = tmp_addopt[i].split("|");
+                            addopt_price += parseInt(tmp[3]);
+                        }
+                    } else {
+                        tmp = addopt.split("|");
+                        addopt_price += parseInt(tmp[3]);
+                    }
+                }
+            }
+
+            $("price").value = numberFormat(parseInt($("goods_price").value) + (opt_price + addopt_price));
+        }
+    }
+
+    function EditAmt(params){
+        if (params.oldValue !== params.newValue) {
+            console.log(params);
+            var rowNode = params.node;
+            var qty = params.data.qty;
+            var price = params.data.price;
+            var option_price = 0;
+            price += option_price;
+
+            var ord_amt = qty * price;
+            var point_amt = params.data.point_amt;
+            var coupon_amt = params.data.coupon_amt;
+            var dc_amt = params.data.dc_amt;
+            var dlv_amt = params.data.dlv_amt;
+            var pay_fee = 0;
+            var recv_amt = ord_amt - point_amt - coupon_amt - dc_amt + pay_fee;
+
+            //ff.recv_amt.value = ord_amt + dlv_amt - point - coupon - dc + pay_fee;
+            params.data.ord_amt = ord_amt;
+            params.data.recv_amt = recv_amt;
+            gx.gridOptions.api.redrawRows({rowNodes:[rowNode]});
+        }
+    }
+
+    function CalAmt() {
+        var ff = document.f1;
+        var qty = ff.qty.value;
+        var price = (ff.price.value != "") ? unComma(ff.price.value):0;
+        var goods_price = (ff.goods_price.value != "") ? unComma(ff.goods_price.value):0;
+        var goods_opt = ff.goods_opt.value;
+
+        //옵션 가격 처리
+        m_val = goods_opt.split("|");
+        opt_price = (m_val[9] > 0) ? unComma(m_val[9]) : 0;
+
+        // 추가옵션
+        if(ff.addopt_cnt){
+            add_opt_cnt = ff.addopt_cnt.value;
+        } else {
+            add_opt_cnt = 0;
+        }
+
+        addopt = "";
+        for( var i = 1; i<= add_opt_cnt; i++)
+        {
+            var addopt_obj = ff["addopt" + i];
+
+            if( addopt_obj.value ){
+                addopt += ( addopt != "" ) ? "^":"";
+                addopt += addopt_obj.value;
+            } else {
+            }
+        }
+
+        // 추가옵션 포맷 : 옵션값|상품번호|상품하위번호|추가옵션가격|추가옵션일련번호
+        var addopt_price = 0;
+        if( addopt ){
+            is_multi = addopt.indexOf("^");
+            is_price = addopt.indexOf("|");
+            if( is_price > -1 ){
+                if( is_multi > -1 ){
+                    tmp_addopt = addopt.split("^");
+                    for(i = 0; i < tmp_addopt.length; i++){
+                        tmp = tmp_addopt[i].split("|");
+                        addopt_price += parseInt(tmp[3]);
+                    }
+                } else {
+                    tmp = addopt.split("|");
+                    addopt_price += parseInt(tmp[3]);
+                }
+            }
+        }
+
+        ff.goods_addopt.value = addopt;
+        ff.addopt_price.value = addopt_price;
+
+        // 옵션 가격이 있는 경우는 상품 가격을 수정할 수 없음.
+        if((opt_price + addopt_price) == 0){
+            $("price").className = "input";
+            $("price").readOnly = false;
+        } else {
+            $("price").className = "input-disable";
+            $("price").readOnly = true;
+            // 가격에 옵션금액 포함
+            $("price").value = numberFormat(goods_price + opt_price + addopt_price);
+        }
+
+        price = (ff.price.value != "") ? unComma(ff.price.value) : 0;
+        var point = (ff.point_amt.value != "") ? unComma(ff.point_amt.value):0;
+        var coupon = (ff.coupon_amt.value != "") ? unComma(ff.coupon_amt.value):0;
+        var pay_fee = (ff.pay_fee.value != "") ? unComma(ff.pay_fee.value):0;
+        var dc = (ff.dc_amt.value != "") ? unComma(ff.dc_amt.value):0;
+        var dlv_amt = (ff.dlv_amt.value != "") ? unComma(ff.dlv_amt.value):0;
+        var add_dlv_fee = unComma(add_dlv_fee);
+
+        var dlv_apply = $('[name=dlv_apply]:checked').val();
+
+        var ord_amt = price * qty;
+
+        // 도매회원 배송비 무료
+        if(ff.group_type.value == "WS" && $("#group_apply_y")[0].checked){
+            free_dlv_fee_limit = wholesale_free_dlv_fee_limit;
+        } else {
+            free_dlv_fee_limit = base_free_dlv_fee_limit;
+        }
+
+        if( dlv_apply == "Y"){
+            if( ord_amt < free_dlv_fee_limit ){
+                dlv_amt = parseInt(dlv_fee) + parseInt(add_dlv_fee);
+            } else {
+                dlv_amt = 0 + parseInt(add_dlv_fee);
+            }
+            ff.dlv_amt.value = dlv_amt;
+        } else {
+            dlv_amt = 0 + parseInt(add_dlv_fee);
+            ff.dlv_amt.value = dlv_amt;
+        }
+
+        com(ff.dlv_amt);
+
+        ff.ord_amt.value = ord_amt;
+        com(ff.ord_amt);
+
+        ff.recv_amt.value = ord_amt + dlv_amt - point - coupon - dc + pay_fee;
+        com(ff.recv_amt);
+    }
+
+    function GetUserInfo(){
+        var user_id = $("#user_id").val();
+        if(user_id == ""){
+            alert("아이디를 입력해 주십시오.");
+        }else{
+            $.ajax({
+                async: true,
+                dataType: "json",
+                type: 'get',
+                url: "/shop/member/mem01/" + user_id + "/get",
+                success: function (res) {
+                    console.log(res);
+                    if(res.hasOwnProperty('user')){
+                        var user = res.user;
+                        $('#user_nm').val(user.name);
+                        $('#phone').val(user.phone);
+                        $('#mobile').val(user.mobile);
+                        $('#r_user_nm').val(user.name);
+                        $('#r_phone').val(user.phone);
+                        $('#r_mobile').val(user.mobile);
+                        $('#r_zip_code').val(user.zip);
+                        $('#r_addr1').val(user.addr);
+                        $('#r_addr2').val(user.addr2);
+                        $('#give_point_y').attr("checked", true);;
+
+                    } else {
+                        alert("아이디를 정확하게 입력해 주십시오.");
+                    }
+                },
+                error: function(e) {
+                    console.log(e.responseText);
+                },
+            });
+        }
+    }
+
+    function ApplyGroup(obj){
+        if( obj.checked ){
+            var ff = document.f1;
+            var group_type = ff.group_type.value;
+            if( obj.value == "Y" ){
+                if( group_type == "DC"){
+                    var price = ( ff.price.value != "" ) ? unComma(ff.price.value):0;
+                    var dc_ratio = ( ff.group_ratio.value != "" ) ? unComma(ff.group_ratio.value):0;
+                    ff.dc_amt.value = parseInt(price * ( dc_ratio / 100 ));
+                    com(ff.DC_AMT);
+                } else if( group_type == "PT"){
+
+                } else if( group_type == "WS"){
+                    ff.price.value = ff.wholesale_price.value;
+                    ff.com_price.value = ff.wholesale_price.value;
+                    com(ff.PRICE);
+                }
+            } else {
+                if( group_type == "DC"){
+                    ff.dc_amt.value = 0;
+                } else if( group_type == "PT"){
+
+                } else if( group_type == "WS"){
+                    ff.price.value = ff.org_price.value;
+                    ff.com_price.value = ff.org_price.value;
+                    com(ff.PRICE);
+                }
+            }
+            CalAmt();
+        }
+    }
+
+    function GetSecondOption(goods_no, goods_sub, goods_opt, option_cnt){
+
+        var ff = document.f1;
+        var opt_select2 = ff.goods_opt2;
+        var cnt = opt_select2.length;
+        for( i = 0; i < cnt; i++)
+        {
+            opt_select2.options[0] = null;
+        }
+
+        var is_price_include = goods_opt.indexOf("|");
+        if( is_price_include > -1){
+            tmp = goods_opt.split("|");
+            goods_opt = tmp[0];
+        }
+    }
+
+    function SetOptionValue(value, depth) {
+        var ff = document.f1;
+        if(depth == 1)
+        {
+            ff.goods_opt.value = value;
+        }
+        else if(depth == 2)
+        {
+            var goods_opt = ff.goods_opt1.value;
+            var a_goods_opt = goods_opt.split("|");
+            var opt1 = a_goods_opt[0];
+            var opt = opt1 + "^" + value;
+            goods_opt = goods_opt.replace(opt1, opt);
+            ff.goods_opt.value = goods_opt.replace("|" + opt1 + "|", "|" + opt + "|");
+        }
+
+        CalAmt();
+    }
+
+    function PopSearchOrder() {
+        const url='/shop/api/order?isld=Y';
+        window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
+    }
+
+    function PopOrder(obj){
+        openOrder2(obj.innerHTML);
+    }
+
+    function selectOrder(data) {
+        const params = [
+            `p_ord_opt_no=${data.ord_opt_no}`,
+            `goods_no=${data.goods_no}`,
+            `goods_sub=${data.goods_sub}`,
+            `ord_state=${data.ord_state_cd}`,
+            `ord_type=${data.ord_type_cd}`,
+            `ord_kind=${data.ord_kind_cd}`,
+            `sale_place=${data.sale_place}`
+        ];
+        SetOrder(data.ord_no,data.ord_opt_no);
+    }
+
+    function SetOrder(ord_no,ord_opt_no = ''){
+
+        if(ord_opt_no == ''){
+            url = '/shop/order/ord01/get/' + ord_no + '?fmt=json';
+        } else {
+            url = '/shop/order/ord01/get/' + ord_no + '/'  + ord_opt_no + '?fmt=json'
+        }
+
+        $.ajax({
+            type: "get",
+            url: url,
+            contentType: "application/x-www-form-urlencoded; charset=utf-8",
+            dataType: 'json',
+            // data: {},
+            success: function(res) {
+                let ord = res.ord;
+                let pay = res.pay;
+                let ord_lists = res.ord_lists;
+
+                $("#p_ord_no").html("<a href='javascript:void(0);' onclick='return PopOrder(this);'>" + res.ord_no + "</a>");
+                $('#user_id').val(ord.user_id);
+                $('#user_nm').val(ord.user_nm);
+                $('#phone').val(ord.phone);
+                $('#mobile').val(ord.mobile);
+                $('#r_user_nm').val(ord.r_nm);
+                $('#r_phone').val(ord.r_phone);
+                $('#r_mobile').val(ord.r_mobile);
+                $('#r_zip_code').val(ord.r_zipcode);
+                $('#r_addr1').val(ord.r_addr1);
+                $('#r_addr2').val(ord.r_addr2);
+                $('#dlv_msg').val(ord.dlv_msg);
+                $('#r_mobile').val(ord.r_mobile);
+                $('#add_dlv_fee').val(ord.add_dlv_fee);
+                $('#sale_place').val(ord.sale_place);
+                $('#pay_type').val(pay.pay_type);
+                // $('#bank_code').val(pay.bank_code);
+                $('#bank_number').val(pay.bank_number);
+                $('#sale_place').val(ord.com_id);
+                $('#bank_inpnm').val(pay.bank_inpnm);
+                $('#bank_code').val(pay.bank_code + '_' + pay.bank_number).prop("selected",true);
+
+
+                if($('#ord_type_' +  ord.ord_type)){
+                    $('#ord_type_' +  ord.ord_type).attr("checked", true);
+                }
+
+                $('input[name="ord_state"]').each(function() {
+                    //console.log(this.name + '-' + this.value);
+                    if(this.value == ord.ord_state){
+                        $(this).prop('checked', true);
+                    } else {
+                        $(this).prop('checked', false);
+                    }
+                });
+                // console.log(count($ord_lists));
+
+                $('input[name="ord_kind"]').each(function() {
+                    //console.log(this.name + '-' + this.value);
+                    if(this.value == ord.ord_kind){
+                        $(this).prop('checked', true);
+                    } else {
+                        $(this).prop('checked', false);
+                    }
+                });
+
+                console.log(ord_lists);
+                let goods_lists = [];
+                for(i=0;i<ord_lists.length;i++){
+                    if(ord_opt_no == "" || ord_opt_no == ord_lists[i]["ord_opt_no"]){
+
+                        goods_no = ord_lists[i]["goods_no"];
+                        ord_lists[i]["ord_amt"] = ord_lists[i]["price"] * ord_lists[i]["qty"];
+                        goods_lists.push(ord_lists[i]);
+
+                        $.ajax({
+                            type: "get",
+                            url: '/shop/product/prd01/' + goods_no + '/get',
+                            contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                            dataType: 'json',
+                            // data: {},
+                            success: function (res) {
+                                //console.log(res);
+                                var options = [];
+                                for (var j = 0; j < res.options.length; j++) {
+                                    if (res.options[j].qty > 0) {
+                                        options.push(res.options[j].goods_opt);
+                                    }
+                                }
+                                _goods_options[goods_no] = options;
+                            },
+
+                            error: function (e) {
+                                console.log(e.responseText);
+                            }
+                        });
+                    }
+                }
+
+                //console.log(ord_lists);
+                gx.gridOptions.api.setRowData(goods_lists);
+            },
+            error: function(e){
+                console.log(e.responseText);
+            }
+        });
+    }
+
+    function cellOpionsParams(params){
+        var goods_no = params.data.goods_no;
+        var options = [];
+        if(_goods_options.hasOwnProperty(goods_no)){
+            options =  _goods_options[goods_no];
+        } else {
+        }
+        return {
+            values :options
+        }
+    }
+
+    function openFindAddress(zipName, addName) {
+        new daum.Postcode({
+            // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분입니다..
+            oncomplete: function(data) {
+                $("#" + zipName).val(data.zonecode);
+                $("#" + addName).val(data.address);
+            }
+        }).open();
+    }
+
+    function getForm2JSON($form){
+        var unindexed_array = $form.serializeArray();
+        var indexed_array = {};
+
+        $.map(unindexed_array, function(n, i){
+            indexed_array[n['name']] = n['value'];
+        });
+        return indexed_array;
+    }
+
+    function save() {
+
+        var order_data = getForm2JSON($('form[name=f1]'));
+        order_data["cart"] = gx.getRows();
+
+        $.ajax({
+            async: true,
+            dataType: "json",
+            type: 'post',
+            url: "/shop/order/ord01/save",
+            data: order_data,
+            success: function (res) {
+                console.log(res);
+                is_processing = false;
+                alert("저장되었습니다.");
+                document.location.href = '/shop/order/ord01/order/' + res.ord_no;
+            },
+            error: function(e) {
+                is_processing = false;
+                console.log('[error] ' + e.responseText);
+                var err = JSON.parse(e.responseText);
+                if(err.hasOwnProperty("code") && err.code == "500"){
+                    alert(err.msg);
+                }
+            },
+        });
+    }
+
+    if ($('#goods_opt1').length > 0) {
+        $('#goods_opt1').change(function(){
+            SetOptionValue(this.value, 1);
+            GetSecondOption('{$goods->goods_no}', '{$goods->goods_sub}', this.value, '{$option_cnt}');
+            CalAmt();
+        });
+    }
+
+</script>
+
 @stop

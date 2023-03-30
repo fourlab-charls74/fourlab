@@ -115,8 +115,6 @@ class stk12Controller extends Controller
 
         if($r['com_cd'] != null) 
             $where .= " and g.com_id = '" . $r['com_cd'] . "'";
-        if($r['item'] != null) 
-            $where .= " and g.opt_kind_cd = '" . $r['item'] . "'";
         if(isset($r['brand_cd']))
             $where .= " and g.brand = '" . $r['brand_cd'] . "'";
         if($r['goods_nm'] != null) 

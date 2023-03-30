@@ -368,11 +368,14 @@ class prd04Controller extends Controller
 	public function search_stock(Request $request)
 	{
 		$sdate = $request->input('sdate', date('Y-m-d'));
-		$next_edate = date("Y-m-d", strtotime("+1 day", strtotime($sdate)));
+		$next_edate = date("Ymd", strtotime("+1 day", strtotime($sdate)));
+		$now_date = date("Ymd");
 		$prd_cd_p = $request->input('prd_cd_p', '');
 		$o_prd_cd_p = $prd_cd_p;
 		$store_type = $request->input('store_type', '');
 		$color = $request->input('color', '');
+		$user_store = Auth('head')->user()->store_cd;
+
 		if ($color != '') $prd_cd_p .= $color;
 
 		$values = [];
@@ -394,7 +397,7 @@ class prd04Controller extends Controller
 
 			$sql = "
 				select
-					concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
+					pc.prd_cd_p
 					, pc.prd_cd
 					, pc.goods_no
 					, g.goods_nm
@@ -435,76 +438,94 @@ class prd04Controller extends Controller
 				";
 				$prd = DB::selectOne($sql, ['prd_cd_p' => $o_prd_cd_p]);
 			}
-			
+
 			// get store stock
 			$where = "";
-			if ($store_type != '') $where .= " and s.store_type = '$store_type' ";
+			
+			/**
+			 * 매장의 "타매장재고조회"항목이 'Y'일 경우 => 같은 매장구분값을 가지는 매장들의 재고 조회
+			 * 매장의 "타매장재고조회"항목이 'N'일 경우 => 해당매장재고만 조회
+			 */
+			$store = DB::table('store')->where('store_cd', $user_store)->first();
+			if ($store->ostore_stock_yn === 'Y') $where .= " and s.store_type = '$store->store_type'";
+			else $where .= " and s.store_cd = '$user_store'";
+
+			/**
+             * "오픈후한달재고보기제외여부"항목이 'Y'인 모든 매장의 오픈달이 현재 해당될 때, 매장재고을 보여주지 않음
+             */
+            $where .= " and if(s.sdate <= '$now_date' and date_format(date_add(date_format(s.sdate, '%Y-%m-%d'), interval 1 month), '%Y%m%d') >= '$now_date', s.open_month_stock_yn <> 'Y', 1=1)";
 
 			$case_sql = "";
 			foreach ($sizes as $size) {
-				$case_sql .= " , sum(case when pc.size = '$size' then ps.qty end) as '" . str_replace('.', '', $size) . "_qty' ";
-				$case_sql .= " , sum(case when pc.size = '$size' then ps.wqty end) as '" . str_replace('.', '', $size) . "_wqty' ";
+				$case_sql .= "
+					, if(pc.size = '$size', (ps.qty 
+						- sum(if(hst.type in (1, 11, 14, 15), ifnull(hst.qty, 0), 0)) 
+						- ifnull(w.qty, 0)
+					), 0) as '" . str_replace('.', '', $size) . "_qty'  
+					, if(pc.size = '$size', (ps.wqty 
+						- sum(if(hst.type in (1, 11, 14, 15), ifnull(hst.qty, 0), 0)) 
+						- ifnull(w.qty, 0)
+					), 0) as '" . str_replace('.', '', $size) . "_wqty' 
+				";
 			}
 
 			$sql = "
-				select 
-					pc.color
-					, s.store_cd
-					, s.store_nm
-					, ps.prd_cd
-					, pc.color
+				select pc.color, c.code_val as color_nm, ps.store_cd, s.store_nm, ps.prd_cd
 					$case_sql
-					, sum(ps.qty) as qty
-					, sum(ps.wqty) as wqty
-				from product_code pc
-					inner join store s
-					inner join (
-						select ps.prd_cd
-							, ps.store_cd
-							, (ps.qty - ifnull(hst.qty, 0)) as qty
-							, (ps.wqty - ifnull(hst.qty, 0)) as wqty
-						from product_stock_store ps
-							left outer join (
-								select prd_cd, sum(qty) as qty, location_cd, stock_state_date
-								from product_stock_hst
-								where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
-								group by prd_cd
-							) hst on hst.prd_cd = ps.prd_cd and hst.location_cd = ps.store_cd	
-					) ps on ps.store_cd = s.store_cd and ps.prd_cd = pc.prd_cd
-				where pc.prd_cd like '$prd_cd_p%' $where
-				group by pc.color, s.store_cd
+					, (ps.qty 
+						- sum(if(hst.type in (1, 11, 14, 15), ifnull(hst.qty, 0), 0)) 
+						- ifnull(w.qty, 0)
+					) as qty
+					, (ps.wqty 
+						- sum(if(hst.type in (1, 11, 14, 15), ifnull(hst.qty, 0), 0)) 
+						- ifnull(w.qty, 0)
+					) as wqty
+				from product_stock_store ps
+					inner join product_code pc on pc.prd_cd = ps.prd_cd
+					inner join store s on s.store_cd = ps.store_cd
+					left outer join (		
+						select prd_cd, location_cd, type, qty
+						from product_stock_hst
+						where stock_state_date >= '$next_edate' and stock_state_date <= '$now_date' and location_type = 'STORE'
+					) hst on hst.prd_cd = ps.prd_cd and hst.location_cd = ps.store_cd
+					left outer join (
+						select prd_cd, store_cd, sum(qty * if(ord_state = 30, -1, 1)) as qty
+						from order_opt_wonga
+						where ord_state_date >= '$next_edate' and ord_state_date <= '$now_date' and ord_state in (30,60,61)
+						group by prd_cd, store_cd
+					) w on w.prd_cd = ps.prd_cd and w.store_cd = ps.store_cd
+					left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = pc.color
+				where ps.prd_cd like '$prd_cd_p%' $where
+				group by ps.store_cd, ps.prd_cd, pc.color
 				order by pc.color, s.store_nm
 			";
 			$store_rows = DB::select($sql);
 
+			$case_sql = "";
+			foreach ($sizes as $size) {
+				$case_sql .= "
+					, if(pc.size = '$size', (ps.qty - sum(if(hst.type in (1, 9, 11, 16, 17), ifnull(hst.qty, 0), 0))), 0) as '" . str_replace('.', '', $size) . "_qty'  
+					, if(pc.size = '$size', (ps.wqty - sum(if(hst.type in (1, 9, 11, 16, 17), ifnull(hst.qty, 0), 0))), 0) as '" . str_replace('.', '', $size) . "_wqty' 
+				";
+			}
+
 			$sql = "
-				select 
-					pc.color
-					, s.storage_cd
-					, s.storage_nm
-					, ps.prd_cd
-					, pc.color
+				select pc.color, c.code_val as color_nm, ps.storage_cd, s.storage_nm, ps.prd_cd
 					$case_sql
-					, sum(ps.qty) as qty
-					, sum(ps.wqty) as wqty
-				from product_code pc
-					inner join storage s on s.use_yn = 'Y' and s.online_yn <> 'Y'
-					inner join (
-						select ps.prd_cd
-							, ps.storage_cd
-							, (ps.qty - ifnull(hst.qty, 0)) as qty
-							, (ps.wqty - ifnull(hst.qty, 0)) as wqty
-						from product_stock_storage ps
-							left outer join (
-								select prd_cd, sum(qty) as qty, location_cd, stock_state_date
-								from product_stock_hst
-								where location_type = 'STORAGE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
-								group by prd_cd
-							) hst on hst.prd_cd = ps.prd_cd and hst.location_cd = ps.storage_cd	
-					) ps on ps.storage_cd = s.storage_cd and ps.prd_cd = pc.prd_cd
-				where pc.prd_cd like '$prd_cd_p%'
-				group by s.storage_cd, pc.color
-				order by s.storage_cd, pc.color
+					, (ps.qty - sum(if(hst.type in (1, 9, 11, 16, 17), ifnull(hst.qty, 0), 0))) as qty
+					, (ps.wqty - sum(if(hst.type in (1, 9, 11, 16, 17), ifnull(hst.qty, 0), 0))) as wqty
+				from product_stock_storage ps
+					inner join product_code pc on pc.prd_cd = ps.prd_cd
+					inner join storage s on s.storage_cd = ps.storage_cd and s.use_yn = 'Y'
+					left outer join (		
+						select prd_cd, location_cd, type, qty
+						from product_stock_hst
+						where stock_state_date >= '$next_edate' and stock_state_date <= '$now_date' and location_type = 'STORAGE'
+					) hst on hst.prd_cd = ps.prd_cd and hst.location_cd = ps.storage_cd
+					left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = pc.color
+				where ps.prd_cd like '$prd_cd_p%'
+				group by ps.storage_cd, ps.prd_cd, pc.color
+				order by pc.color, s.storage_nm
 			";
 			$storage_rows = DB::select($sql);
 

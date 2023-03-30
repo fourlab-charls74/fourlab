@@ -108,7 +108,7 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th class="required">발행기간</th>
+                                                <th class="required">지급기간</th>
                                                 <td>
                                                     <div class="form-inline">
                                                         <div class="docs-datepicker form-inline-inner input_box">
@@ -138,7 +138,7 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th class="required">유효기간</th>
+                                                <th class="required">사용기간</th>
                                                 <td>
                                                     <div>
                                                         <div class="form-inline form-radio-box">
@@ -199,11 +199,11 @@
                                                             <div class="form-inline form-check-box">
                                                                 <div class="custom-control custom-checkbox">
                                                                     <input type="checkbox" name="use_date_alarm_yn" id="use_date_alarm_y" class="custom-control-input" value="Y" @if(@$coupon->use_date_alarm_yn == 'Y') checked @endif />
-                                                                    <label class="custom-control-label" for="use_date_alarm_y">유효기간 알림 사용,</label>
+                                                                    <label class="custom-control-label" for="use_date_alarm_y">사용기간 알림 사용,</label>
                                                                 </div>
                                                             </div>
                                                             <label for="use_date_alarm_day" class="flax_box">
-                                                                <div class="txt_box mr-1">유효기간 알림일자 :</div>
+                                                                <div class="txt_box mr-1">사용기간 알림일자 :</div>
                                                                 <input 
                                                                     type="text" 
                                                                     name="use_date_alarm_day"
@@ -606,7 +606,7 @@
 
         if ($('#pub_fr_date').val() == "")
         {
-            alert("쿠폰 발행 시작 기간을 입력해 주십시오.");
+            alert("쿠폰 지급 시작 기간을 입력해 주십시오.");
             $('#pub_fr_date').focus();
             return false;
         }
@@ -621,19 +621,19 @@
         if (getRadioValue('use_date_type') == "S") {
             if ($('#use_fr_date').val() == "")
             {
-                alert("쿠폰 유효 시작 기간을 입력해 주십시오.");
+                alert("쿠폰 사용 시작 기간을 입력해 주십시오.");
                 return false;
             }
 
             if ($('#use_to_date').val() == "")
             {
-                alert("쿠폰 유효 종료 기간을 입력해 주십시오.");
+                alert("쿠폰 사용 종료 기간을 입력해 주십시오.");
                 return false;
             }
         } else {
            if ($('#use_date').val() == "")
            {
-               alert("쿠폰 유효 기간을 입력해 주십시오.");
+               alert("쿠폰 사용 기간을 입력해 주십시오.");
                $('#use_date').focus();
                return false;
            }

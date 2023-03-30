@@ -171,37 +171,30 @@ class PosController extends Controller
         $cfg_img_size_real = "a_500";
         $cfg_img_size_list = "a_500";
 
-        $sql = " 
-            select 
-                pc.prd_cd
-                , concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_sm
-                , c.code_val as color
-                , size.code_val2 as size
-                , g.goods_no
-                , g.goods_sub
-                , g.goods_type as goods_type_cd
-                , pc.goods_opt
-                , pc.brand
-                , g.goods_nm
-                , g.style_no
-                , g.price
-                , g.price as ori_price
-                , g.goods_sh
-                , ps.wqty
+        $sql = "
+            select pc.prd_cd, pc.prd_cd_p as prd_cd_sm
+                , pc.goods_no, g.goods_sub, g.goods_nm, g.goods_nm_eng, pc.goods_opt, g.style_no
+                , g.goods_type as goods_type_cd, g.brand, g.price, g.price as ori_price, g.goods_sh
                 , if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
                     select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
                     from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
                 )) as img
+                , ps.wqty
+                , color.code_val as color
+                , if(pc.gender in ('M', 'W', 'U'), size.code_val, size.code_val2) as size
                 , '' as sale_type
                 , '' as pr_code
                 , '' as coupon_no
             from product_code pc
+                inner join product_stock_store ps on ps.prd_cd = pc.prd_cd
                 inner join goods g on g.goods_no = pc.goods_no
-                inner join product_stock_store ps on ps.prd_cd = pc.prd_cd and ps.store_cd = '$store_cd'
-                inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = pc.color
-                inner join code size on size.code_kind_cd = 'PRD_CD_SIZE_MATCH' and size.code_val = pc.size
-            where 1=1 $where
-            order by (CASE WHEN pc.year = '99' THEN 0 ELSE 1 END) desc, pc.year desc
+                inner join code color on color.code_kind_cd = 'PRD_CD_COLOR' and color.code_id = pc.color
+                inner join code size on size.code_kind_cd = if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', if(pc.gender = 'U', 'PRD_CD_SIZE_UNISEX', 'PRD_CD_SIZE_MATCH'))) and size.code_id = pc.size
+                left outer join (select prd_cd, store_cd from product_stock_release where type = 'F' and state >= 30 group by prd_cd) psr on psr.prd_cd = pc.prd_cd and psr.store_cd = ps.store_cd   -- 해당매장에 초도출고된적이 있는 상품만 검색가능하도록 설정
+            where ps.store_cd = '$store_cd' and if(ps.wqty > 0, 1=1, psr.prd_cd is not null) $where
+            order by (case when pc.year = '99' then 0 else 1 end) desc
+                , (case when pc.brand = 'F' then 0 else 1 end) asc
+                , pc.prd_cd desc
             $limit
         ";
         $rows = DB::select($sql);
@@ -210,9 +203,11 @@ class PosController extends Controller
             $sql = "
                 select count(*) as total
                 from product_code pc
+                    inner join product_stock_store ps on ps.prd_cd = pc.prd_cd
                     inner join goods g on g.goods_no = pc.goods_no
-                    inner join product_stock_store ps on ps.prd_cd = pc.prd_cd and ps.wqty > 0 and ps.store_cd = '$store_cd'
-                where 1=1 $where
+                    inner join code color on color.code_kind_cd = 'PRD_CD_COLOR' and color.code_id = pc.color
+                    inner join code size on size.code_kind_cd = if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', if(pc.gender = 'U', 'PRD_CD_SIZE_UNISEX', 'PRD_CD_SIZE_MATCH'))) and size.code_id = pc.size
+                where ps.store_cd = '$store_cd' $where
 			";
             $row = DB::selectOne($sql);
             $total = $row->total;
@@ -449,10 +444,12 @@ class PosController extends Controller
         $memo = $req->input('memo', '') ?? ''; // 특이사항 메모
         $cart = $req->input('cart', []); // 상품목록
         $removed_cart = $req->input('removed_cart', []); // 삭제할 ord_opt_no 목록 (대기주문 판매처리 시 사용)
+        $reservation_yn = $req->input('reservation_yn', 'N'); // 예약판매여부
 
         $is_new = $ord_no === '';
         $ord_date = date('Y-m-d H:i:s');
         $ord_type = 15; // 출고형태: 정상(15)
+        if ($reservation_yn === 'Y') $ord_type = 4; // 예약(4)
         $ord_kind = 20; // 출고구분: 출고가능(20)
         $dlv_apply = 'N'; // 배송비적용여부
         $store_cd = Auth::guard('head')->user()->store_cd;
@@ -523,6 +520,8 @@ class PosController extends Controller
                 $pr_code = $item['pr_code'] ?? ''; // 행사명
                 $coupon_no = $item['coupon_no'] ?? ''; // 쿠폰아이디
 
+                $opt_ord_type = 15; // order_opt의 ord_type (정상:15 / 예약:4)
+
                 $sql = "
                     select g.goods_no, g.goods_sub, g.goods_nm, g.com_id, g.com_type, c.com_nm, (c.pay_fee / 100) as com_rate
                         , g.head_desc, g.goods_type, g.baesong_kind, g.baesong_price, g.md_id, g.md_nm
@@ -538,9 +537,14 @@ class PosController extends Controller
                 ######################### 재고수량 판매가능여부 체크 ############################
                 $prd_wqty = DB::table('product_stock_store')->where('prd_cd', $prd_cd)->where('store_cd', $store_cd)->value('wqty');
 
+                // 예약판매가 아닐 경우에만 재고부족 에러처리
                 if (($goods->is_unlimited === 'Y' && $prd_wqty < 1) || $qty > $prd_wqty) {
-                    $code = '-105';
-                    throw new Exception("재고가 부족하여 판매할 수 없습니다.");
+                    if ($reservation_yn === 'Y') {
+                        $opt_ord_type = 4; // order_opt의 ord_type (정상:15 / 예약:4)
+                    } else {
+                        $code = '-105';
+                        throw new Exception("재고가 부족하여 판매할 수 없습니다.");
+                    }
                 }
 
                 ######################### 상품별 쿠폰금액 반영 ############################
@@ -662,7 +666,7 @@ class PosController extends Controller
                     'com_id'        => $goods->com_id ?? '',
                     'add_point'     => $ord_opt_add_point,
                     'ord_kind'      => $ord_kind,
-                    'ord_type'      => $ord_type,
+                    'ord_type'      => $opt_ord_type,
                     'baesong_kind'  => $goods->baesong_kind,
                     'ord_date'      => $ord_date,
                     'dlv_comment'   => $memo,
@@ -927,6 +931,7 @@ class PosController extends Controller
                 o.ord_no
                 , o.ord_opt_no
                 , o.ord_date
+                , o.ord_type
                 , o.prd_cd
                 , o.goods_no
                 , g.goods_sub
@@ -1137,6 +1142,36 @@ class PosController extends Controller
         $result = DB::select($sql, ['user_id' => $user_id]);
 
         return response()->json(['code' => '200', 'body' => $result], 200);
+    }
+
+    /** 예약판매상품 지급완료처리 (예약주문건 정상주문처리) */
+    public function complete_reservation(Request $request)
+    {
+        $ord_no = $request->input('ord_no', '');
+        $ord_opt_no = $request->input('ord_opt_no', '');
+        $ord_type = 15; // 정상:15
+
+        try {
+            DB::beginTransaction();
+
+            DB::table('order_opt')->where('ord_opt_no', $ord_opt_no)->update([ 'ord_type' => $ord_type ]);
+            DB::table('order_opt_wonga')->where('ord_opt_no', $ord_opt_no)->update([ 'ord_type' => $ord_type ]);
+
+            $reservation_ord_cnt = DB::table('order_opt')->where('ord_no', $ord_no)->where('ord_type', 4)->count();
+            if ($reservation_ord_cnt < 1) {
+                DB::table('order_mst')->where('ord_no', $ord_no)->update([ 'ord_type' => $ord_type ]);
+            }
+
+            DB::commit();
+            $code = 200;
+            $msg = '예약판매상품이 지급완료처리되었습니다.';
+        } catch (Exception $e) {
+            DB::rollback();
+            $code = 500;
+            $msg = $e->getMessage();
+        }
+
+        return response()->json(['code' => $code, 'msg' => $msg], 200);
     }
 }
 

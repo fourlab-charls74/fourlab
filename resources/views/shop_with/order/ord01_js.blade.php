@@ -21,16 +21,16 @@
 
         const ord_state = $("[name=ord_state]:checked");
         if(ord_state.length === 0) return alert('주문상태를 선택해 주십시오.');
-        if(ord_state.val() == 30) {
-            if(ff.dlv_cd.value == "") {
-                ff.dlv_cd.focus();
-                return alert("택배사를 선택하십시오.");
-            }
-            if(ff.dlv_no.value == "") {
-                ff.dlv_no.focus();
-                return alert("택배 송장번호를 입력하십시오.");
-            }
-        }
+        // if(ord_state.val() == 30) {
+        //     if(ff.dlv_cd.value == "") {
+        //         ff.dlv_cd.focus();
+        //         return alert("택배사를 선택하십시오.");
+        //     }
+        //     if(ff.dlv_no.value == "") {
+        //         ff.dlv_no.focus();
+        //         return alert("택배 송장번호를 입력하십시오.");
+        //     }
+        // }
 
         const ord_type = $('[name=ord_type]:checked');
         if( ord_type.length === 0 ) return alert('출고형태를 선택해 주십시오.');
@@ -82,7 +82,7 @@
     }
 
     // 판매등록
-    function save() {
+    function save(reservation_yn = 'N') {
         let order_data = getForm2JSON($('form[name=f1]'));
         
         let rows = [];
@@ -92,6 +92,7 @@
             }
         })
         order_data["cart"] = rows;
+        order_data["reservation_yn"] = reservation_yn;
         
         $.ajax({
             async: true,
@@ -106,7 +107,13 @@
                     opener.Search();
                     document.location.href = '/shop/order/ord01/order/' + res.ord_no;
                 } else {
-                    alert("저장에 실패했습니다.\n실패 사유 : " + out_order_errors[res.code]);
+                    if (res.code === '-105' && reservation_yn === 'N') {
+                        if (confirm("해당상품의 매장재고가 부족합니다.\n예약판매하시겠습니까?")) {
+                            save('Y');
+                        }
+                    } else {
+                        alert("저장에 실패했습니다.\n실패 사유 : " + out_order_errors[res.code]);
+                    }
                 }
             },
             error: function(e) {
@@ -134,7 +141,7 @@
                 async: true,
                 dataType: "json",
                 type: 'get',
-                url: "/head/member/mem01/" + user_id + "/get",
+                url: "/shop/member/mem01/" + user_id + "/get",
                 success: function (res) {
                     if(res.hasOwnProperty('user')){
                         let user = res.user;

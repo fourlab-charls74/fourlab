@@ -77,7 +77,7 @@
                                 <select name='site' class="form-control form-control-sm">
                                     <option value=''>전체</option>
                                     @foreach ($sale_places as $sale_place)
-                                        <option value='{{ $sale_place->com_id }}'>{{ $sale_place->com_nm }}</option>
+                                        <option value='{{ $sale_place->mall_name }}'>{{ $sale_place->mall_name }}</option>
                                     @endforeach
                                 </select>
                             </div>

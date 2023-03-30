@@ -166,6 +166,36 @@ class stk31Controller extends Controller
             'storeCode' => $storeCodes
         ];
 
+        //읽음 처리
+        $store_cd = Auth('head')->user()->store_cd;
+        $sql = "select count(*) as cnt from notice_store_detail where ns_cd = '$no' and store_cd = '$store_cd'";
+        $cnt = DB::selectOne($sql)->cnt;
+        if($cnt > 0) {
+            $sql = "
+                update notice_store_detail set 
+                    check_yn = 'Y', 
+                    check_date = now() 
+                where ns_cd = '$no' and store_cd = '$store_cd'
+            ";
+            DB::update($sql);
+        } else if($cnt == 0) {
+            $sql = "
+                select 
+                    rt
+                from notice_store
+                where ns_cd = '$no'
+            ";
+            $rt = DB::selectOne($sql)->rt;
+
+            $sql = "insert into notice_store_detail (
+                      ns_cd, store_cd, check_yn, check_date, rt  
+                    ) values (
+                        '$no', '$store_cd', 'Y', now(), '$rt'
+                    )
+            ";
+            DB::insert($sql);
+        }
+
         return view(Config::get('shop.shop.view') . '/stock/stk31_show', $values);
     }
 
@@ -175,25 +205,27 @@ class stk31Controller extends Controller
 
         $sql = "
             select
-                aa.ns_cd
+                aa.ns_cd, aa.subject, aa.content
             from
             (
                 select
-                    ns.ns_cd
+                    ns.ns_cd, ns.subject, ns.content
                 from notice_store ns
                 inner join notice_store_detail nsd on ns.ns_cd = nsd.ns_cd and nsd.check_yn = 'N'
                 where
                     ns.all_store_yn = 'N'
+                    and ns.store_notice_type = '01'
                     and ns.rt >= date_add(now(), interval -1 month)
                     and nsd.store_cd = '$store_cd'
                     
                 union all
                 select
-                    ns.ns_cd
+                    ns.ns_cd, ns.subject, ns.content
                 from notice_store ns
                 left outer join notice_store_detail nsd on ns.ns_cd = nsd.ns_cd and nsd.check_yn = 'Y' and nsd.store_cd = '$store_cd'
                 where
                     ns.all_store_yn = 'Y'
+                    and ns.store_notice_type = '01'
                     and ns.rt >= date_add(now(), interval -1 month)
                     and nsd.ns_cd is null
             )aa
@@ -204,7 +236,8 @@ class stk31Controller extends Controller
 
         return response()->json([
 			"code" => 200,
-            "nos"  => $nos
+            "nos"  => $nos,
+            "cnt"  => count($nos),
 		]);
     }
 
@@ -266,7 +299,7 @@ class stk31Controller extends Controller
     public function notice_read(Request $request)
     {
         $ns_cd = $request->input('ns_cd');
-        $store_cd = $request->input('store_cd');
+        $store_cd = $request->input('store_cd', '');
 
         if($store_cd == '') {
             $sql = "

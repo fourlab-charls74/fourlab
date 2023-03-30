@@ -283,6 +283,15 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
                     }
                 }
             },
+
+            ShopOrderNoType:{
+                width:170,
+                cellRenderer: function(params) {
+                    if(params.value){
+                        return '<a href="javascript:void(0);" onclick="return openShopOrder(\'' + params.data.ord_no + '\',\'' + params.data.ord_opt_no +'\');">'+ params.value +'</a>';
+                    }
+                }
+            },
         },
 
         components: {

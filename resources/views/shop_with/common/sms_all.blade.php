@@ -76,11 +76,7 @@
                             <div class="form-group">
                                 <label>매장회원적용</label>
                                 <div class="d-flex align-items-center">
-                                    <div class="form-inline inline_btn_box w-100 mr-2">
-                                        <input type='hidden' id="store_nm" name="store_nm">
-                                        <select id="store_no" name="store_no" class="form-control form-control-sm select2-store w-100"></select>
-                                        <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
+                                    <input type='text' style="width:100%; margin-right:8px;" class="form-control form-control-sm" value="{{@$user_store_nm}}" readonly>
                                     <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm store-member-btn" style="min-width: 80px;">회원적용</a>
                                 </div>
                             </div>
@@ -359,7 +355,7 @@ function selectTemplate(data) {
 
 const Search = () => {
     const data = $('form[name="search"]').serialize();
-    listGx.Request('/head/api/sms/search', data, 1);
+    listGx.Request('/shop/api/sms/search', data, 1);
 }
 
 $('.phone-check-btn').click((e) => {
@@ -412,7 +408,7 @@ $('.add-msg-btn').click((e) => {
 $(".store-member-btn").on("click", async function(e) {
     e.preventDefault();
 
-    let store_cd = $("#store_no").val();
+    let store_cd = '{{@$user_store}}';
     if (store_cd == null) return;
 
     const { data: { code, data } } = await axios({ method: "get", url: "/shop/api/sms/search/member?store=" + store_cd });
@@ -467,7 +463,7 @@ $('#file').change((e) => {
 
 $('.template-btn').click((e) => {
     e.preventDefault();
-    const url='/head/api/template';
+    const url='/shop/api/template';
     const product=window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
 });
 
@@ -489,12 +485,15 @@ $('.send-btn').click((e) => {
     rows.forEach((row, idx) => {
         $.ajax({
             type: 'put',
-            url: '/head/api/sms/send',
+            url: '/shop/api/sms/send',
             dataType:'json',
             data: { "data" : row, "shop_tel" : $('.send-phone').val() },
             success: function (data) {
-                if (cnt -1 === idx) {
-                    alert("전송되었습니다.");
+                // if (cnt -1 === idx) {
+                //     alert("전송되었습니다.");
+                // }
+                if (data.code == '200'){
+                    alert('전송되었습니다.');
                 }
             },
             error: function(xhr, status, error) {

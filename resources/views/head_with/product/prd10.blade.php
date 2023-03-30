@@ -17,7 +17,7 @@
             <div class="d-flex card-header justify-content-between">
                 <h4>검색</h4>
                 <div>
-                    <a href="#" id="search_sbtn" onclick="return SearchGoods2();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                    <a href="#" id="search_sbtn" onclick="return validate();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
             </div>
@@ -569,6 +569,16 @@
         $('input[name="d_cat_cd"]').val($(a).attr('data-code'));
         SearchGoods2();
     }
+
+    function validate() {
+        if(gx2.getRows().length > 0){
+            return SearchGoods2();
+        } else {
+            return alert('카테고리를 선택해주세요');
+        }
+    }
+
+
 
     function SearchGoods2() {
         const d_cat_cd = $('input[name="d_cat_cd"]').val();

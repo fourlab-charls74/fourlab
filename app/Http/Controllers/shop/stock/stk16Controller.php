@@ -145,7 +145,8 @@ class stk16Controller extends Controller
                 psr.prc_id, 
                 psr.prc_rt, 
                 psr.fin_id, 
-                psr.fin_rt
+                psr.fin_rt,
+                psr.req_comment
             from sproduct_stock_release psr
                 inner join product p on psr.prd_cd = p.prd_cd
                 inner join product_code pc on p.prd_cd = pc.prd_cd
@@ -183,7 +184,7 @@ class stk16Controller extends Controller
                     left outer join store s on s.store_cd = psr.store_cd
                     left outer join storage sg on sg.storage_cd = psr.storage_cd
                 where 1=1 $where
-                order by psr.rt
+                $orderby
             ";
 
             $row = DB::selectOne($sql);
