@@ -120,7 +120,7 @@
      let columns = [
         {headerName: "제목", field: "subject", width: 300,
             cellRenderer: function(params) {
-                return '<a href="/shop/stock/stk31/notice/' + params.data.ns_cd +'" rel="noopener">'+ params.value+'</a>';
+                return '<a href="/shop/community/comm01/notice/' + params.data.ns_cd +'" rel="noopener">'+ params.value+'</a>';
             }
         },
         {headerName: "이름", field: "admin_nm",  width: 60, cellClass: 'hd-grid-code'},
@@ -225,7 +225,7 @@
     }
 
     function notice() {
-        window.location.href = "/shop/stock/stk31";
+        window.location.href = "/shop/common/comm01";
     }
 
     function msg() {

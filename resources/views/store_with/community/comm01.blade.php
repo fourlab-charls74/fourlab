@@ -29,7 +29,7 @@
                 <div class="flax_box">
                     <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                     <a href="#" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
-                    <a href="/store/stock/stk31/{{ $store_notice_type }}/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
+                    <a href="/store/community/comm01/{{ $store_notice_type }}/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
             </div>
@@ -155,7 +155,7 @@
             </div>
         <div class="resul_btn_wrap mb-3">
             <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-            <a href="/store/stock/stk31/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
+            <a href="/store/community/comm01/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
             <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
         </div>
     </div>
@@ -184,8 +184,8 @@
         {headerName: "#", field: "num",type:'NumType', cellClass: 'hd-grid-code'},
         {headerName: "제목", field: "subject", width: 400,
             cellRenderer: function(params) {
-                return '<a href="/store/stock/stk31/show/' + $('#store_notice_type').val() + '/' + params.data.ns_cd +'" rel="noopener">'+ params.value+'</a>';
-            }
+                return '<a href="/store/community/comm01/show/' + $('#store_notice_type').val() + '/' + params.data.ns_cd +'" rel="noopener">'+ params.value+`${params.data.attach_file_yn === 'Y' ? `<i class="bi bi-paperclip"></i>` : '' }</a>`;
+            },
         },
         {headerName: "ID", field: "admin_id",  width: 80, cellClass: 'hd-grid-code'},
         {headerName: "이름", field: "admin_nm",  width: 80, cellClass: 'hd-grid-code'},
@@ -239,9 +239,9 @@
         const notice_type = $('#store_notice_type').val();
 
         if(notice_type === 'notice'){
-            gx.Request('/store/stock/stk31/notice/search', data);
+            gx.Request('/store/community/comm01/notice/search', data);
         } else {
-            gx.Request('/store/stock/stk31/vmd/search', data);
+            gx.Request('/store/community/comm01/vmd/search', data);
         }
     }
 

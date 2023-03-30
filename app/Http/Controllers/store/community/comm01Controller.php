@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\store\stock;
+namespace App\Http\Controllers\store\community;
 
 use App\Http\Controllers\Controller;
 use App\Components\Lib;
@@ -15,7 +15,7 @@ use GuzzleHttp;
 use App\Models\Conf;
 use Illuminate\Support\Facades\Storage;
 
-class stk31Controller extends Controller
+class comm01Controller extends Controller
 {
     public function index($notice_id, Request $request)
     {
@@ -28,7 +28,7 @@ class stk31Controller extends Controller
             'sdate' => $sdate,
             'edate' => date("Y-m-d")
         ];
-        return view(Config::get('shop.store.view') . '/stock/stk31', $values);
+        return view(Config::get('shop.store.view') . '/community/comm01', $values);
     }
 
     // 검색
@@ -42,7 +42,6 @@ class stk31Controller extends Controller
         $subject = $request->input('subject', '');
         $content = $request->input('content', '');
         $store_no = $request->input('store_no', '');
-        $store_nm = $request->input('store_nm', '');
         $store_type    = $request->input("store_type", '');
 
         $where = "";
@@ -81,7 +80,8 @@ class stk31Controller extends Controller
                 group_concat(a.store_nm separator ', ') as stores,
                 s.rt,
                 c.code_val as store_type_nm,
-                s.ut
+                s.ut,
+                (case when ifnull(char_length(s.attach_file_url), 0) > 0 then 'Y' else 'N' end ) as attach_file_yn
             from notice_store s 
                 left outer join notice_store_detail d on s.ns_cd = d.ns_cd
                 left outer join store a on a.store_cd = d.store_cd
@@ -123,7 +123,7 @@ class stk31Controller extends Controller
 
         $values = ['no' => $no, 'user' => $user, 'store_notice_type' => $notice_id];
 
-        return view(Config::get('shop.store.view') . '/stock/stk31_show', $values);
+        return view(Config::get('shop.store.view') . '/community/comm01_show', $values);
     }
 
     public function show($notice_id, $no)
@@ -153,7 +153,7 @@ class stk31Controller extends Controller
             'store_notice_type' => $notice_id
         ];
 
-        return view(Config::get('shop.store.view') . '/stock/stk31_show', $values);
+        return view(Config::get('shop.store.view') . '/community/comm01_show', $values);
     }
 
     public function store(Request $request)
@@ -195,9 +195,8 @@ class stk31Controller extends Controller
             if (count($_FILES) > 0) {
                 $url_array = [];
                 foreach($files as $file) {
-                    $extension = $file->getClientOriginalExtension();
-                    $file_name = "$now"."$id".".$extension";
-                    $save_path = config::get('file.store_notice_path');;
+                    $file_name = "$now"."$id"."_".uniqid().".".$file->extension();
+                    $save_path = config::get('file.store_notice_path');
                     $url_array[] = ULib::uploadFile($save_path, $file_name, $file);
                 }
                 $file_url = implode(',', $url_array);
@@ -216,7 +215,6 @@ class stk31Controller extends Controller
                     'admin_nm' => $admin_nm,
                     'admin_email' => $email,
                     'all_store_yn' => $all_store_yn,
-                    'store_notice_type' => '01',
                     'cnt' => 0,
                     'rt' => $rt
                 ]);
@@ -256,7 +254,9 @@ class stk31Controller extends Controller
 
         $subject = $request->input('subject');
         $content = $request->input('content');
-        $store_cd = $request->input('store_no', '');
+        $store_cd = explode(',', $request->input('store_no', ''));
+        $files = $request->file('files');
+        $file_url = null;
 
         $ns_cd = $no;
         $ut = DB::raw('now()');
@@ -276,13 +276,34 @@ class stk31Controller extends Controller
         ];
 
         try {
+            //엑셀 및 ppt, image 업로드 
+            if (count($_FILES) > 0) {
+                $url_array = [];
+                foreach($files as $file) {
+                    $file_name = "$now"."$id"."_".uniqid().".".$file->extension();
+                    $save_path = config::get('file.store_notice_path');
+                    $url_array[] = ULib::uploadFile($save_path, $file_name, $file);
+                }
+                $file_url = implode(',', $url_array);
+            }
+
             DB::beginTransaction();
+            
+            $sql = "
+                update notice_store
+                set 
+                    subject = '$subject', 
+                    content = '$content',
+                    all_store_yn =  '$all_store_yn',
+                    ut = $ut,
+                    attach_file_url = (case when '$file_url' != '' then CONCAT(attach_file_url, ',' , '$file_url') else attach_file_url end)
+                where 
+                    ns_cd = $ns_cd
+            ";
 
-            DB::table('notice_store')
-                ->where('ns_cd', '=', $ns_cd)
-                ->update($notice_store);
-
-            if ($store_cd != '') {
+            DB::update($sql);
+            
+            if (count($store_cd) > 0) {
                 foreach ($store_cd as $sc) {
                     DB::table('notice_store_detail')
                         ->insert([
@@ -293,6 +314,7 @@ class stk31Controller extends Controller
                         ]);
                 }
             }
+
             DB::commit();
             $code = 200;
             $msg = "";
@@ -309,22 +331,10 @@ class stk31Controller extends Controller
 
     public function download_file($path) {
 
-        if (file_exists(storage_path('\\app\\public\\data\\community\\comm02\\'.$path))) {
+        if (file_exists(storage_path('\\app\\public\\data\\community\\comm01\\'.$path))) {
 
             try{
-                $file_contents = storage::download(storage_path('\\app\\public\\data\\community\\comm02\\'.$path));
-                $mimetype = new \GuzzleHttp\Psr7\MimeType;
-                $extension = explode('.', $path)[1];
-                //$file_contents = storage::download('C:/Desktop/develop/bluewolf/storage/app/public/data/community/comm02/20230324174303sm_dh.xlsx');
-
-                return response($file_contents)
-                        ->header('Cache-Control', 'no-cache private')
-                        ->header('Content-Description', 'File Transfer')
-                        ->header('Content-Type', $mimetype->fromExtension($extension))
-                        ->header('Content-length', strlen($file_contents))
-                        ->header('Content-Disposition', 'attachment; filename=' . $path)
-                        ->header('Content-Transfer-Encoding', 'binary');
-
+                return response()->download(public_path('\\data\\community\\comm01\\'.$path));
             } catch(Exception $e){
                 return response()->json([
                     "code" => '500',
@@ -339,19 +349,56 @@ class stk31Controller extends Controller
         ]);
     }
 
-    public function delete_file($path) {
+    public function delete_file($no, $path) {
 
-        if (file_exists(storage_path('\\app\\public\\data\\community\\comm02\\'.$path))) {
+        $file_path = storage_path('\\app\\public\\data\\community\\comm01\\'.$path);
+        $delete_file_url = 'data/community/comm01/'.$path;
+
+        if (file_exists($file_path)) {
 
             try{
-                storage::delete(storage_path('\\app\\public\\data\\community\\comm02\\'.$path));
+                DB::beginTransaction();
+                storage::delete($file_path);
                 
+                $sql = "
+                    update notice_store s
+                    set s.attach_file_url = (
+                        select 
+                            GROUP_CONCAT(files)
+                        from (
+                            select 
+                                substring_index(substring_index(ns.attach_file_url, ',', fileCnt.n), ',' , -1) as files
+                            from (
+                                select 1 as n union all 
+                                select 2 union all
+                                select 3 union all 
+                                select 4 union all
+                                select 5
+                            ) as fileCnt
+                            inner join notice_store ns on char_length(ns.attach_file_url) - char_length(replace(ns.attach_file_url, ',' , '')) >= fileCnt.n - 1
+                            where 
+                                ns.ns_cd  = $no
+                        ) list
+                        where 
+                            list.files not in (
+                                '$delete_file_url'
+                            )
+                    )
+                    where 
+                        s.ns_cd = $no
+                ";
+
+                DB::update($sql);
+                DB::commit();
+
                 return response()->json([
                     "code" => '200',
                     "msg" => 'file success deleted'
                 ]);
 
             } catch(Exception $e){
+                DB::rollBack();
+
                 return response()->json([
                     "code" => '500',
                     "msg" => $e->getMessage()

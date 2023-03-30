@@ -115,19 +115,27 @@
                                                 @endif
                                             </td>
                                         @else
-                                            @if($user->attach_file_url != '')
+                                            @if(($user->attach_file_url != '' && $user->attach_file_url !== null) && count(explode(',', $user->attach_file_url)) >= 5)
                                                 <th>파일 다운로드</th>
                                                 <td>
                                                     @foreach(explode(',', $user->attach_file_url) as $file_url) 
-                                                        <a href="javascript:downloadFile('{{$file_url}}')">{{$file_url}}</a>
-                                                        &nbsp;&nbsp;
-                                                        <a href="javascript:deleteFile('{{$file_url}}')">X</a>
-                                                        <br/>
+                                                            <a href="javascript:downloadFile('{{$file_url}}')">{{explode('/', $file_url)[3]}}</a>
+                                                            &nbsp;&nbsp;
+                                                            <a href="javascript:deleteFile('{{$no}}', '{{$file_url}}')">X</a>
+                                                            <br/>
                                                     @endforeach
                                                 </td>
                                             @else
-                                                <th>파일 업로드</th>
+                                                <th>파일 업로드 및 다운로드</th>
                                                 <td>
+                                                    @if($user->attach_file_url != '' && $user->attach_file_url !== null)
+                                                        @foreach(explode(',', $user->attach_file_url) as $file_url) 
+                                                                <a href="javascript:downloadFile('{{$file_url}}')">{{explode('/', $file_url)[3]}}</a>
+                                                                &nbsp;&nbsp;
+                                                                <a href="javascript:deleteFile('{{$no}}', '{{$file_url}}')">X</a>
+                                                                <br/>
+                                                        @endforeach
+                                                    @endif
                                                     <div class="form-inline inline_btn_box">
                                                         <input type = "file" name= "notice_add_file" id="notice_add_file" multiple>
                                                     </div>
@@ -174,16 +182,10 @@
         editor1 = new HDEditor('#editor1', editorOptions, true);
 
         //파일 업로드 로직
-        $('#notice_add_file').change(() => {
+        $('#notice_add_file').change((e) => {
             let files = $("input[name=notice_add_file]")[0].files;
 
-            if(files.length > 5) {
-                alert('첨부파일은 5개까지만 가능합니다.');
-                return;
-            }
-
             for(let i = 0; i < files.length; i++) {
-                console.log(files[i].name);
                 if(availableCheckExtension(files[i].name)) {
                     formData.append(`files[]`, files[i]);
                 } else {
@@ -251,7 +253,7 @@
 
     function downloadFile(path) {
         $.ajax({
-            url: `/store/stock/stk31/file/download/${path.split('/').reverse()[0]}`,
+            url: `/store/community/comm01/file/download/${path.split('/').reverse()[0]}`,
             type: 'GET',
             cache: false,
             xhrFields: {
@@ -265,8 +267,6 @@
 
             try {
                 let blob = new Blob([data], { type: jqXhr.getResponseHeader('content-type') });
-                //let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                
                 let fileName = getFileName(jqXhr.getResponseHeader('content-disposition'));
                 fileName = decodeURI(fileName);
     
@@ -274,12 +274,8 @@
                 if (window.navigator.msSaveOrOpenBlob) {
                     window.navigator.msSaveOrOpenBlob(blob, fileName);
                 } else { 
-                    //그 외
-                    const fileReader = new FileReader();
-
-                    let file = fileReader.readAsBinaryString(blob);
                     let link = document.createElement('a');
-                    let url = window.URL.createObjectURL(file);
+                    let url = window.URL.createObjectURL(blob);
                     link.href = url;
                     link.target = '_self';
                     link.download = fileName;
@@ -296,12 +292,15 @@
 
     function clearFormData() {
         for (const key of formData.keys()) {
-            formData.delete(key);
+            console.log(key);
+            formData.delete(`${key}`);
         };
     }
 
     function Create() {
         const type = $('#store_notice_type').val();
+        
+        let attachFileCnt = String('{{$user->attach_file_url}}').split(',');
 
         if ($('input[name="subject"]').val() === '') {
             $('input[name="subject"]').focus();
@@ -315,6 +314,13 @@
             return false;
         }
 
+        if($("input[name=notice_add_file]")[0] !== undefined && attachFileCnt.length + $("input[name=notice_add_file]")[0].files.length > 5){
+            $("input[name=notice_add_file]").val('');
+            formData.delete('files[]');
+            alert('첨부파일의 개수는 5개 까지 입니다.');
+            return false;
+        }
+
         $('input[name="content"]').val(editor1.html());
 
         //form data 재설정
@@ -325,10 +331,11 @@
         formData.append('store_no', $('#store_no').val() == undefined ? '' : $('#store_no').val());
         formData.append('store_nm', $('input[name="store_nm"]').val());
         formData.append('_token', "{{ csrf_token() }}");
+        
 
         $.ajax({
             method: 'POST',
-            url: '/store/stock/stk31/store',
+            url: '/store/community/comm01/store',
             data: formData,
             cache: false,
             contentType: false,
@@ -337,7 +344,7 @@
                 if (data.code == '200') {
                     clearFormData();
                     alert('게시물 등록에 성공하였습니다.');
-                    document.location.href = `/store/stock/stk31/${type}`;
+                    document.location.href = `/store/community/comm01/${type}`;
                 } else {
                     clearFormData();
                     alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
@@ -350,34 +357,68 @@
         });
     }
 
-    function deleteFile(path) {
+    function deleteFile(no, path) {
 
-        $.ajax({
-            method: 'delete',
-            url: `/store/stock/stk31/file/delete/${path.split('/').reverse()[0]}`,
-            success: function(data) {
-                if (data.code == '200') {
-                    alert('파일 삭제에 성공하였습니다.');
-                    location.reload();
-                } else {
-                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+        if(confirm("삭제하시겠습니까?")){
+            $.ajax({
+                method: 'delete',
+                url: `/store/community/comm01/file/delete/${no}/${path.split('/').reverse()[0]}`,
+                success: function(data) {
+                    if (data.code == '200') {
+                        alert('파일 삭제에 성공하였습니다.');
+                        location.reload();
+                    } else {
+                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                    }
+
+                },
+                error: function(res, status, error) {
+                    console.log(res.responseText);
                 }
-
-            },
-            error: function(res, status, error) {
-                console.log(res.responseText);
-            }
-        });
+            });
+        }
     }
 
     function Update(no) {
-        let frm = $('form[name=store]');
         $('input[name="content"]').val(editor1.html());
 
+        let attachFileCnt = String('{{$user->attach_file_url}}').split(',');
+
+        if ($('input[name="subject"]').val() === '') {
+            $('input[name="subject"]').focus();
+            alert('제목을 입력해 주세요.');
+            return false;
+        }
+
+        if ($('#editor1').val() === '') {
+            $('#editor1').focus();
+            alert('내용을 입력해 주세요.');
+            return false;
+        }
+
+        if($("input[name=notice_add_file]")[0] !== undefined && attachFileCnt.length + $("input[name=notice_add_file]")[0].files.length > 5){
+            $("input[name=notice_add_file]").val('');
+            formData.delete('files[]');
+            alert('첨부파일의 개수는 5개 까지 입니다.');
+            return false;
+        }
+
+        //form data 재설정
+        formData.append('store_notice_type', $('#store_notice_type').val());
+        formData.append('subject', $('input[name="subject"]').val());
+        formData.append('name', $('input[name="name"]').val());
+        formData.append('content', $('input[name="content"]').val());
+        formData.append('store_no', $('#store_no').val() == undefined ? '' : $('#store_no').val());
+        formData.append('store_nm', $('input[name="store_nm"]').val());
+        formData.append('_token', "{{ csrf_token() }}");
+
         $.ajax({
-            method: 'PUT',
-            url: '/store/stock/stk31/edit/' + no,
-            data: frm.serialize(),
+            method: 'POST',
+            url: '/store/community/comm01/edit/' + no,
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
             success: function(data) {
                 if (data.code == '200') {
                     clearFormData();
@@ -409,7 +450,7 @@
         if(confirm("삭제하시겠습니까?")){
             $.ajax({
                 method: 'post',
-                url: '/store/stock/stk31/del_store',
+                url: '/store/community/comm01/del_store',
                 data: {data_store : store_cd, ns_cd : ns_cd},
                 success: function(data) {
                     if (data.code == '200') {
