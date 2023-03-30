@@ -1234,12 +1234,10 @@ class ord01Controller extends Controller
         #####################################################
         #	포인트 지급
         #####################################################
-        if ($ord_state != "1") {
-            if ($point_flag === true && $user_id != null) {
-                $point = new Point($user, $user_id);
-                $point->SetOrdNo($ord_no);
-                $point->StoreOrder();
-            }
+        if ($ord_state !== '1' && $user_id !== null && $point_flag === true) {
+            $point = new Point($user, $user_id);
+            $point->SetOrdNo($ord_no);
+            $point->StoreOrder();
         }
 
         return ['code' => $code, 'ord_no' => $ord_no];
