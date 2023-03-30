@@ -146,7 +146,7 @@
                                                     </div>
                                                 </td>
                                                 <th class="required">배송비적용</th>
-                                                <td style="padding:0px 10px 0px 10px;">
+                                                <td colspan="3" style="padding:0px 10px 0px 10px;">
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio">
                                                             <input type="radio" name="dlv_apply" id="dlv_apply_y" value="Y" class="custom-control-input" checked onclick="EditAmtTable();"><label class="custom-control-label" for="dlv_apply_y">적용함</label>
@@ -156,11 +156,11 @@
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <th class="required">적립금지급</th>
+                                                {{-- <th class="required">적립금지급</th>
                                                 <td style="padding:0px 10px 0px 10px;">
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio" onclick="CheckPoint(this);">
-                                                            <input type="radio" name="give_point" id="give_point_y" value="Y" class="custom-control-input">
+                                                            <input type="radio" name="give_point" id="give_point_y" value="Y" checked class="custom-control-input">
                                                             <label class="custom-control-label" for="give_point_y">지급함</label>
                                                         </div>
                                                         <div class="custom-control custom-radio">
@@ -168,7 +168,7 @@
                                                             <label class="custom-control-label" for="give_point_n">지급안함</label>
                                                         </div>
                                                     </div>
-                                                </td>
+                                                </td> --}}
                                             </tr>
                                         </tbody>
                                     </table>

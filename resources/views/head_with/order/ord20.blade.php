@@ -168,7 +168,7 @@
                                                 <td style="padding:0px 10px 0px 10px;">
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio" onclick="CheckPoint(this);">
-                                                            <input type="radio" name="give_point" id="give_point_y" value="Y" class="custom-control-input">
+                                                            <input type="radio" name="give_point" id="give_point_y" value="Y" checked class="custom-control-input">
                                                             <label class="custom-control-label" for="give_point_y">지급함</label>
                                                         </div>
                                                         <div class="custom-control custom-radio">
@@ -421,7 +421,7 @@
                                                 <th>입금자</th>
                                                 <td style="padding:0px 10px 0px 10px;">
                                                     <div class="flax_box">
-                                                        <input type="text" class="form-control form-control-sm" name="bank_number" id="bank_number" value=""/>
+                                                        <input type="text" class="form-control form-control-sm" name="bank_inpnm" id="bank_inpnm" value=""/>
                                                         <input type="hidden" name="coupon_no" value="">
                                                     </div>
                                                 </td>
@@ -435,13 +435,13 @@
                     </div>
                 </div>
             </div>
-            <div class="text-center mt-3">
+            <!-- <div class="text-center mt-3">
                 @if (@$cmd == 'edit')
                     <input type="button" value=" 판매수정" class="btn btn-sm btn-primary shadow-sm mr-1 save-btn" onclick="Validate(document.f1);"/>
                 @else
                     <input type="button" value=" 판매등록" class="btn btn-sm btn-primary shadow-sm mr-1 save-btn" onclick="Validate(document.f1);"/>
                 @endif
-            </div>
+            </div> -->
     </form>
     </div>
     <!-- script -->

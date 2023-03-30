@@ -54,7 +54,7 @@
                                                         <input type="text" name="user_id" id="user_id" value='{{@$ord->user_id}}' class="form-control form-control-sm mr-1" style="width:260px;">
                                                         <a href="#" onclick="GetUserInfo(document.f1.user_id.value)" class="btn btn-sm btn-primary shadow-sm fs-12 mr-1">회원정보 불러오기</a>
                                                         <a href="#" onclick="SameInfo();" class="btn btn-sm btn-primary shadow-sm fs-12 mr-1">수령자정보 동일</a>
-                                                        <a href="#" onclick="PopSearchOrder();" class="btn btn-sm btn-primary shadow-sm fs-12">기존 주문정보 불러오기</a>
+                                                        {{-- <!-- <a href="#" onclick="PopSearchOrder();" class="btn btn-sm btn-primary shadow-sm fs-12">기존 주문정보 불러오기</a> --> --}}
                                                         <div id="p_ord_no" class="p-2"></div>
                                                     </div>
                                                 </td>
@@ -154,7 +154,7 @@
                                                     </div>
                                                 </td>
                                                 <th>배송비적용</th>
-                                                <td style="padding:0px 10px 0px 10px;">
+                                                <td colspan="3" style="padding:0px 10px 0px 10px;">
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio" onclick="CheckPoint(this);">
                                                             <input type="radio" name="dlv_apply" id="dlv_apply_y" value="Y" class="custom-control-input" checked><label class="custom-control-label" for="dlv_apply_y">적용함</label>
@@ -164,11 +164,11 @@
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <th>적립금지급</th>
+                                                {{-- <th>적립금지급</th>
                                                 <td style="padding:0px 10px 0px 10px;">
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio" onclick="CheckPoint(this);">
-                                                            <input type="radio" name="give_point" id="give_point_y" value="Y" class="custom-control-input">
+                                                            <input type="radio" name="give_point" id="give_point_y" value="Y" checked class="custom-control-input">
                                                             <label class="custom-control-label" for="give_point_y">지급함</label>
                                                         </div>
                                                         <div class="custom-control custom-radio">
@@ -176,7 +176,7 @@
                                                             <label class="custom-control-label" for="give_point_n">지급안함</label>
                                                         </div>
                                                     </div>
-                                                </td>
+                                                </td> --}}
                                             </tr>
                                             </tbody>
                                         </table>
@@ -233,15 +233,13 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th>판매업체</th>
+                                                <th>주문매장</th>
                                                 <td style="padding:0px 10px 0px 10px;">
-                                                    <div class="flax_box">
-                                                        <select name="sale_place" id="sale_place" class="form-control form-control-sm">
-                                                            <option value="">선택</option>
-                                                            @foreach($sale_places as $val)
-                                                                <option value="{{$val->com_id}}" @if($val->com_id == "HEAD_OFFICE") selected @endif>{{$val->com_nm}}</option>
-                                                            @endforeach
-                                                        </select>
+                                                    <div class="d-flex flex-column pt-2 pb-1">
+                                                        <div class="flax_box mr-2 mb-1" style="width: 307px;">
+                                                            <input type='hidden' id="store_no" name="store_no" value="{{$store_cd}}">
+                                                            <input type='text' id="store_nm" name="store_nm" class="form-control form-control-sm mt-1 mt-sm-0" value="{{$store_nm}}" readonly>
+                                                        </div>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -421,7 +419,7 @@
                                                 <th>입금자</th>
                                                 <td style="padding:0px 10px 0px 10px;">
                                                     <div class="flax_box">
-                                                        <input type="text" class="form-control form-control-sm" name="bank_number" id="bank_number" value=""/>
+                                                        <input type="text" class="form-control form-control-sm" name="bank_inpnm" id="bank_inpnm" value=""/>
                                                         <input type="hidden" name="coupon_no" value="">
                                                     </div>
                                                 </td>
@@ -435,13 +433,13 @@
                     </div>
                 </div>
             </div>
-            <div class="text-center mt-3">
+            <!-- <div class="text-center mt-3">
                 @if (@$cmd == 'edit')
                     <input type="button" value=" 판매수정" class="btn btn-sm btn-primary shadow-sm mr-1 save-btn" onclick="Validate(document.f1);"/>
                 @else
                     <input type="button" value=" 판매등록" class="btn btn-sm btn-primary shadow-sm mr-1 save-btn" onclick="Validate(document.f1);"/>
                 @endif
-            </div>
+            </div> -->
     </form>
     </div>
     <script type="text/javascript">
@@ -562,11 +560,7 @@
             return false;
         }
 
-        if(ff.sale_place.value == ""){
-            alert('판매업체를 선택해 주십시오.');
-            ff.sale_place.focus();
-            return false;
-        }
+       
         const ord_kind = $('[name=ord_kind]:checked');
 
         if(ord_kind.length === 0){
@@ -607,7 +601,7 @@
                 return false;
             }
 
-            if(ff.bank_number.value == "") {
+            if(ff.bank_inpnm.value == "") {
                 alert("입금자를 입력해 주십시오.");
                 ff.bank_number.focus();
                 return false;
@@ -926,7 +920,7 @@
     }
 
     function PopOrder(obj){
-        openOrder(obj.innerHTML);
+        openOrder2(obj.innerHTML);
     }
 
     function selectOrder(data) {
@@ -962,7 +956,6 @@
                 let ord_lists = res.ord_lists;
 
                 $("#p_ord_no").html("<a href='javascript:void(0);' onclick='return PopOrder(this);'>" + res.ord_no + "</a>");
-
                 $('#user_id').val(ord.user_id);
                 $('#user_nm').val(ord.user_nm);
                 $('#phone').val(ord.phone);
@@ -978,9 +971,13 @@
                 $('#add_dlv_fee').val(ord.add_dlv_fee);
                 $('#sale_place').val(ord.sale_place);
                 $('#pay_type').val(pay.pay_type);
-                $('#bank_code').val(pay.bank_code);
+                // $('#bank_code').val(pay.bank_code);
                 $('#bank_number').val(pay.bank_number);
                 $('#sale_place').val(ord.com_id);
+                $('#bank_inpnm').val(pay.bank_inpnm);
+                $('#bank_code').val(pay.bank_code + '_' + pay.bank_number).prop("selected",true);
+
+
                 if($('#ord_type_' +  ord.ord_type)){
                     $('#ord_type_' +  ord.ord_type).attr("checked", true);
                 }
@@ -1087,13 +1084,13 @@
             async: true,
             dataType: "json",
             type: 'post',
-            url: "/shop/order/ord02/save",
+            url: "/shop/order/ord01/save",
             data: order_data,
             success: function (res) {
                 console.log(res);
                 is_processing = false;
                 alert("저장되었습니다.");
-                document.location.href = '/shop/order/ord01/' + res.ord_no;
+                document.location.href = '/shop/order/ord01/order/' + res.ord_no;
             },
             error: function(e) {
                 is_processing = false;

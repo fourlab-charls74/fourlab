@@ -1596,7 +1596,7 @@ class ord01Controller extends Controller
             'clm_reasons'	=> SLib::getCodes("G_CLM_REASON"),
             'clm_states'	=> SLib::getCodes("G_CLM_STATE"),
             'dlv_cds'		=> SLib::getCodes("DELIVERY"),
-			// 'refund_yn'		=> ''
+			'refund_yn'		=> ''
         ]);
         
         return view(Config::get('shop.store.view') . '/order/ord01_detail', $values);
@@ -1785,13 +1785,13 @@ class ord01Controller extends Controller
                     ), 0
                  ) as wqty
                 , ifnull(
-                    ( select sum(good_qty) from goods_summary
-                        where goods_no = g.goods_no and goods_sub = g.goods_sub and goods_opt = o.goods_opt
+                    ( select sum(qty) from product_stock
+                        where goods_no = g.goods_no and goods_opt = o.goods_opt
                     ), 0
                  ) as jaego_qty
                 , ifnull(
-                    ( select sum(wqty) from goods_summary
-                        where goods_no = g.goods_no and goods_sub = g.goods_sub and goods_opt = o.goods_opt
+                    ( select sum(wqty) from product_stock
+                        where goods_no = g.goods_no and goods_opt = o.goods_opt
                     ), 0
                  ) as stock_qty
                  , o.coupon_amt,o.dc_amt, o.dlv_amt, o.recv_amt

@@ -1629,7 +1629,7 @@
         e.preventDefault();
 
         const url = '/head/order/ord01/dlv/' + ord_no + '/' + ord_opt_no;
-        const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
+        const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=600");
     });
 
     $('.receipt-btn').click(function(e) {

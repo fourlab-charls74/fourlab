@@ -64,6 +64,7 @@ class stk20Controller extends Controller
 		$where = "";
         $orderby = "";
         $prd_cd_range_text = $request->input("prd_cd_range", '');
+        $user_store	= Auth('head')->user()->store_cd;
         
         // where
         $sdate = str_replace("-", "", $r['sdate'] ?? now()->sub(1, 'week')->format('Ymd'));
@@ -131,11 +132,13 @@ class stk20Controller extends Controller
             }
         }
 
-        
         if($r['goods_nm'] != null) 
             $where .= " and g.goods_nm like '%" . $r['goods_nm'] . "%'";
         if($r['goods_nm_eng'] != null) 
             $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
+
+        // 해당매장이 보내는매장이거나, 받는매장인 경우에만 조회
+        $where .= " and (psr.dep_store_cd = '$user_store' or psr.store_cd = '$user_store')";
 
         // ordreby
         $ord = $r['ord'] ?? 'desc';

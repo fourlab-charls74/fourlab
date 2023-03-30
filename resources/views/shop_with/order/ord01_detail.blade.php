@@ -58,7 +58,7 @@
                                         <tr>
                                             <th>부모 주문번호</th>
                                             <td style="padding:0px 10px 0px 10px;">
-                                                <a href="#" onClick="openOrder('{{ $p_ord_no }}');" style="font-weight:700;">{{ $p_ord_no }}</a>
+                                                <a href="#" onClick="openOrder2('{{ $p_ord_no }}');" style="font-weight:700;">{{ $p_ord_no }}</a>
                                             </td>
                                         </tr>
                                         @endif
@@ -704,7 +704,7 @@
                         </div>
                         <div class="fr_box">
                             @if( @$c_ord_no != "" )
-                            <span style="color:#FF0000;">*</span> 해당건의 자식 주문번호는 <span onClick="openHeadOrder('{{ $c_ord_no }}','{{ $c_ord_opt_no }}');" style="cursor:pointer;color:#0000FF;font-weight:700;">{{ @$c_ord_no }}</span> 입니다.&nbsp;&nbsp;
+                            <span style="color:#FF0000;">*</span> 해당건의 자식 주문번호는 <span onClick="openShopOrder('{{ $c_ord_no }}','{{ $c_ord_opt_no }}');" style="cursor:pointer;color:#0000FF;font-weight:700;">{{ @$c_ord_no }}</span> 입니다.&nbsp;&nbsp;
                             @endif
                             @if (@$store && ($order_opt->clm_state == "0" || $order_opt->clm_state == "1" || $order_opt->clm_state == "-30"))
                             <button class="btn-sm btn btn-primary store-refund-btn fs-12">매장환불</button>
@@ -1629,7 +1629,7 @@
         e.preventDefault();
 
         const url = '/shop/order/ord01/dlv/' + ord_no + '/' + ord_opt_no;
-        const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
+        const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=600");
     });
 
     $('.receipt-btn').click(function(e) {

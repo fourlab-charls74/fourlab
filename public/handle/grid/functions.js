@@ -20,9 +20,22 @@ function openOrder(ord_no,ord_opt_no = ''){
     }
     var order = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
 }
+function openOrder2(ord_no,ord_opt_no = ''){
+    if(ord_opt_no !== ''){
+        var url = '/shop/order/ord01/order/' + ord_no + '/' + ord_opt_no;
+    } else {
+        var url = '/shop/order/ord01/order/' + ord_no;
+    }
+    var order = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
+}
 
 function openHeadOrder(ord_no,ord_opt_no){
     var url = '/head/order/ord01/' + ord_no + '/' + ord_opt_no;
+    var order = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
+}
+
+function openShopOrder(ord_no,ord_opt_no){
+    var url = '/shop/order/ord01/' + ord_no + '/' + ord_opt_no;
     var order = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
 }
 
@@ -96,6 +109,10 @@ function openStoreOrder(ord_no,ord_opt_no){
     var order = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
 }
 
+function openShopStock(prd_cd, date = '') {
+    var url = '/shop/stock/stk01/' + prd_cd + '?date=' + date;
+    window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1000,height=900");
+}
 function openShopOrder(ord_no,ord_opt_no){
     var url = '/shop/order/ord01/order/' + ord_no + '/' + ord_opt_no;
     var order = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
