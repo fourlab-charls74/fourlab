@@ -68,7 +68,7 @@ class sal03Controller extends Controller
         $goods_nm_eng = $request->input("goods_nm_eng");
 		$prd_cd_range_text = $request->input("prd_cd_range", '');
 		$best_worst = $request->input('best_worst');
-
+		$group_type_condition = $request->input('group_type_condition');
         $type = $request->input("type");
         $goods_type = $request->input("goods_type");
 
@@ -114,6 +114,17 @@ class sal03Controller extends Controller
 		$goods_no = preg_replace("/\t/", ",", $goods_no);
 		$goods_no = preg_replace("/\n/", ",", $goods_no);
 		$goods_no = preg_replace("/,,/", ",", $goods_no);
+
+		$group_by = null;
+
+		//보기 그룹 조건 설정
+		if($group_type_condition == 'size') {
+			$group_by = "group by pc2.`size`, pc2.prd_cd_p";
+		} else if($group_type_condition == 'color') {
+			$group_by = "group by pc2.`color`, pc2.prd_cd_p";
+		} else {
+			$group_by = "group by pc2.prd_cd_p";
+		}
 
 		// 상품옵션 범위검색
 		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
@@ -209,14 +220,15 @@ class sal03Controller extends Controller
 					, oo.goods_no, oo.goods_opt
 					-- oow.*
 				from order_opt oo
-				left outer join store s on oo.store_cd = s.store_cd
+					left outer join store s on oo.store_cd = s.store_cd
+					inner join product_code pc2 on oo.prd_cd = pc2.prd_cd 
 				where
 					oo.ord_state = '30'
 					and ( oo.clm_state = 0 or oo.clm_state = -30 or oo.clm_state = 90)
 					and oo.ord_date >= '$sdate2'
 					and oo.ord_date <= '$edate2'
 					$in_where
-				group by oo.prd_cd
+				$group_by
 			) as a
 			inner join goods g on a.goods_no = g.goods_no
 			left outer join brand brd on g.brand = brd.brand
@@ -344,14 +356,15 @@ class sal03Controller extends Controller
 						, oo.goods_no, oo.goods_opt
 						-- oow.*
 					from order_opt oo
-					left outer join store s on oo.store_cd = s.store_cd
+						left outer join store s on oo.store_cd = s.store_cd
+						inner join product_code pc2 on oo.prd_cd = pc2.prd_cd 
 					where
 						oo.ord_state = '30'
 						and ( oo.clm_state = 0 or oo.clm_state = -30 or oo.clm_state = 90)
 						and oo.ord_date >= '$sdate2'
 						and oo.ord_date <= '$edate2'
 						$in_where
-						group by oo.prd_cd
+					$group_by
 				) as a
 				inner join goods g on a.goods_no = g.goods_no
 				left outer join brand brd on g.brand = brd.brand

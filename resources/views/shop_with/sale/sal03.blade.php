@@ -112,20 +112,39 @@
                 </div>
                 <div class="row">
                     <div class="col-lg-4 inner-td">
-							<div class="form-group">
-							<label for="formrow-email-input">조회 기준</label>
-								<div class="form-inline form-radio-box">
-									<div class="custom-control custom-radio">
-										<input type="radio" name="best_worst" value="B" id="best" class="custom-control-input" checked>
-										<label class="custom-control-label" for="best">Best</label>
-									</div>
-									<div class="custom-control custom-radio">
-										<input type="radio" name="best_worst" value="W" id="worst" class="custom-control-input">
-										<label class="custom-control-label" for="worst">Worst</label>
-									</div>
-								</div>
-							</div>
-						</div>
+                        <div class="form-group">
+                        <label for="formrow-email-input">조회 기준</label>
+                            <div class="form-inline form-radio-box">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="best_worst" value="B" id="best" class="custom-control-input" checked>
+                                    <label class="custom-control-label" for="best">Best</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="best_worst" value="W" id="worst" class="custom-control-input">
+                                    <label class="custom-control-label" for="worst">Worst</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                        <label for="formrow-email-input">보기</label>
+                            <div class="form-inline form-radio-box">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="group_type_condition" value="color" id="color" class="custom-control-input" checked>
+                                    <label class="custom-control-label" for="color">색상</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="group_type_condition" value="size" id="size" class="custom-control-input">
+                                    <label class="custom-control-label" for="size">사이즈</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="group_type_condition" value="goods_part_num" id="goods_part_num" class="custom-control-input">
+                                    <label class="custom-control-label" for="goods_part_num">품번</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label for="">순위/구분</label>
@@ -211,6 +230,7 @@
 		{
             field: "goods_no",
             headerName: "상품번호",
+            hide: true,
             width: 58,
             pinned: 'left',
             cellStyle: StyleLineHeight,
