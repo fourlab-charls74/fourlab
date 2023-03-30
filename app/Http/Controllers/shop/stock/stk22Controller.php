@@ -184,6 +184,7 @@ class stk22Controller extends Controller
 		$code = 200;
 		$prd_cd = $request->input("prd_cd", '');
         $store_type = $request->input("store_type", '');
+        $now_date = date('Ymd');
         $where = "";
 
         if($store_type != '') $where .= " and s.store_type = $store_type";
@@ -203,6 +204,7 @@ class stk22Controller extends Controller
                 left outer join product_stock_store ps on s.store_cd = ps.store_cd and ps.prd_cd = '$prd_cd'
                 left outer join product_stock_storage pss on pss.storage_cd = (select storage_cd from storage where default_yn = 'Y') and pss.prd_cd = '$prd_cd'
             where s.use_yn = 'Y' and s.store_type = '08' and s.rt_yn = 'Y'
+                and if(s.sdate <= '$now_date' and date_format(date_add(date_format(s.sdate, '%Y-%m-%d'), interval 1 month), '%Y%m%d') >= '$now_date', s.open_month_stock_yn <> 'Y', 1=1)
 		";
 
 		$result = DB::select($sql);

@@ -13,7 +13,7 @@ use Carbon\Carbon;
 
 class stk01Controller extends Controller
 {
-	public function index() 
+	public function index()
 	{
 
 		$values = [
@@ -68,7 +68,7 @@ class stk01Controller extends Controller
 		if ($store_type != "")	$where .= " and s.store_type = '" . $store_type . "' ";
         if ($ext_store_qty == 'true')
             $where .= " and (p.wqty != '' and p.wqty != '0')";
-		
+
 		if($prd_cd != "") {
 			$prd_cd = explode(',', $prd_cd);
 			$where .= " and (1!=1";
@@ -158,24 +158,24 @@ class stk01Controller extends Controller
 
 		$sql = /** @lang text */
             "
-			select 
-				p.goods_no, goods_type, p.prd_cd, g.opt_kind_cd, opt_kind_nm, b.brand_nm, style_no, 
+			select
+				p.goods_no, goods_type, p.prd_cd, g.opt_kind_cd, opt_kind_nm, b.brand_nm, style_no,
 				c.code_val as sale_stat_cl, ifnull( c2.code_val, 'N/A') as goods_type_nm,
 				if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
 					select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
 					from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
 				)) as img, goods_nm, goods_nm_eng, p.goods_opt, p.store_cd, store_nm, store_type, qty, wqty, p.rt, p.ut,
 				g.goods_sh, g.price
-			from product_stock_store p 
+			from product_stock_store p
 				left outer join product_code pc on pc.prd_cd = p.prd_cd
 				left outer join goods g on p.goods_no = g.goods_no
 				left outer join store s on p.store_cd = s.store_cd
 				left outer join opt o on g.opt_kind_cd = o.opt_kind_cd
 				left outer join `code` c on c.code_kind_cd = 'G_GOODS_STAT' and sale_stat_cl = c.code_id
-				left outer join `code` c2 on c2.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = c2.code_id 
+				left outer join `code` c2 on c2.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = c2.code_id
 				left outer join brand b on b.brand = g.brand
 			where 1=1 $where
-			$orderby 
+			$orderby
 			$limit
 		";
 
@@ -248,7 +248,7 @@ class stk01Controller extends Controller
 
 		if ($row->goods_no == '0') {
 			$sql = "
-				select 
+				select
 					p.prd_cd, p.prd_nm as goods_nm, p.style_no, p.tag_price as goods_sh
 					, p.price, p.wonga, p.type, p.com_id, c.com_nm, p.match_yn, p.use_yn
 					, pc.brand, b.brand_nm
@@ -341,6 +341,7 @@ class stk01Controller extends Controller
 		$prd_cd = $request->input('prd_cd', '');
 		$sdate = $request->input('sdate', date('Y-m-d'));
 		$edate = $request->input('edate', date('Y-m-d'));
+		$now_date = date('Ymd');
 
 		$user_store_cd	= Auth('head')->user()->store_cd;
 		$store = DB::table('store')->where('store_cd', $user_store_cd)->first();
@@ -355,6 +356,11 @@ class stk01Controller extends Controller
 			 */
 			if ($store->ostore_stock_yn === 'Y') $where .= " and s.store_type = '$store->store_type'";
 			else $where .= " and s.store_cd = '$user_store_cd'";
+
+            /**
+             * "오픈후한달재고보기제외여부"항목이 'Y'인 모든 매장의 오픈달이 현재 해당될 때, 매장재고을 보여주지 않음
+             */
+            $where .= " and if(s.sdate <= '$now_date' and date_format(date_add(date_format(s.sdate, '%Y-%m-%d'), interval 1 month), '%Y%m%d') >= '$now_date', s.open_month_stock_yn <> 'Y', 1=1)";
 
 			$sql = "
 				select p.prd_cd, s.store_cd, s.store_nm, ifnull(p.qty, 0) as qty, ifnull(p.wqty, 0) as wqty
@@ -400,31 +406,31 @@ class stk01Controller extends Controller
 		if (isset($user_store_cd)) $where .= " and ps.store_cd = '" . Lib::quote($user_store_cd) . "'";
 
 		$sql = "
-			select ps.store_cd, s.store_nm, ps.prd_cd, ps.qty, ps.wqty               
+			select ps.store_cd, s.store_nm, ps.prd_cd, ps.qty, ps.wqty
 				, sum(if(hst.type = 1, ifnull(hst.qty, 0), 0)) as store_in_qty -- 매장입고
 				, sum(if(hst.type = 11, ifnull(hst.qty, 0), 0)) as store_return_qty -- 매장반품
 				, sum(if(hst.type = 15 and hst.qty > 0, ifnull(hst.qty, 0), 0)) as rt_in_qty -- 이동입고
 				, sum(if(hst.type = 15 and hst.qty < 0, ifnull(hst.qty, 0), 0)) as rt_out_qty -- 이동출고
 				, sum(if(hst.type = 14, ifnull(hst.qty, 0), 0)) as loss_qty -- LOSS
 				, ifnull(w.qty, 0) as sale_qty -- 판매재고
-				, (ps.wqty 
-					- sum(if(_next.type in (1, 11, 14, 15), ifnull(_next.qty, 0), 0)) 
+				, (ps.wqty
+					- sum(if(_next.type in (1, 11, 14, 15), ifnull(_next.qty, 0), 0))
 					- ifnull(w_next.qty, 0)
 				) as term_qty -- 기간재고
-				, (ps.wqty 
-					- sum(if(_next.type in (1, 11, 14, 15), ifnull(_next.qty, 0), 0)) 
+				, (ps.wqty
+					- sum(if(_next.type in (1, 11, 14, 15), ifnull(_next.qty, 0), 0))
 					- ifnull(w_next.qty, 0)
-					- sum(if(hst.type in (1, 11, 14, 15), ifnull(hst.qty, 0), 0)) 
+					- sum(if(hst.type in (1, 11, 14, 15), ifnull(hst.qty, 0), 0))
 					- ifnull(w.qty, 0)
 				) as prev_qty -- 이전재고
 			from product_stock_store ps
 				inner join store s on s.store_cd = ps.store_cd
-				left outer join (		
+				left outer join (
 					select prd_cd, location_cd, type, qty
 					from product_stock_hst
 					where stock_state_date >= '$sdate' and stock_state_date <= '$edate' and location_type = 'STORE'
 				) hst on hst.prd_cd = ps.prd_cd and hst.location_cd = ps.store_cd
-				left outer join (		
+				left outer join (
 					select prd_cd, location_cd, type, qty
 					from product_stock_hst
 					where stock_state_date >= '$next_edate' and stock_state_date <= '$now_date' and location_type = 'STORE'

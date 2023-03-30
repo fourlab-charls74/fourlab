@@ -441,7 +441,6 @@ class prd04Controller extends Controller
 
 			// get store stock
 			$where = "";
-			// if ($store_type != '') $where .= " and s.store_type = '$store_type' ";
 			
 			/**
 			 * 매장의 "타매장재고조회"항목이 'Y'일 경우 => 같은 매장구분값을 가지는 매장들의 재고 조회
@@ -450,6 +449,11 @@ class prd04Controller extends Controller
 			$store = DB::table('store')->where('store_cd', $user_store)->first();
 			if ($store->ostore_stock_yn === 'Y') $where .= " and s.store_type = '$store->store_type'";
 			else $where .= " and s.store_cd = '$user_store'";
+
+			/**
+             * "오픈후한달재고보기제외여부"항목이 'Y'인 모든 매장의 오픈달이 현재 해당될 때, 매장재고을 보여주지 않음
+             */
+            $where .= " and if(s.sdate <= '$now_date' and date_format(date_add(date_format(s.sdate, '%Y-%m-%d'), interval 1 month), '%Y%m%d') >= '$now_date', s.open_month_stock_yn <> 'Y', 1=1)";
 
 			$case_sql = "";
 			foreach ($sizes as $size) {
