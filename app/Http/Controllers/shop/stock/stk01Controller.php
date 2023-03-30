@@ -213,6 +213,7 @@ class stk01Controller extends Controller
 		$cfg_img_size_real = "a_500";
 		$cfg_img_size_list = "a_500";
 
+        // language=TEXT
 		$sql = "
 			select
 				p.prd_cd
@@ -247,6 +248,7 @@ class stk01Controller extends Controller
 		$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
 		if ($row->goods_no == '0') {
+            // language=TEXT
 			$sql = "
 				select
 					p.prd_cd, p.prd_nm as goods_nm, p.style_no, p.tag_price as goods_sh
@@ -314,6 +316,7 @@ class stk01Controller extends Controller
 		$sdate = $request->input('sdate', date('Y-m-d'));
 		$edate = $request->input('edate', date('Y-m-d'));
 
+        // language=TEXT
 		$sql = "
 			select p.prd_cd, s.storage_cd, s.storage_nm, ifnull(p.qty, 0) as qty, ifnull(p.wqty, 0) as wqty
 			from storage s
@@ -322,6 +325,7 @@ class stk01Controller extends Controller
 		";
 		$rows = DB::select($sql, ['prd_cd' => $prd_cd]);
 
+        // language=TEXT
 		$sql = "
 			select ifnull(sum(qty), 0) as qty, ifnull(sum(wqty), 0) as wqty
 			from product_stock_storage
@@ -362,6 +366,7 @@ class stk01Controller extends Controller
              */
             $where .= " and if(s.sdate <= '$now_date' and date_format(date_add(date_format(s.sdate, '%Y-%m-%d'), interval 1 month), '%Y%m%d') >= '$now_date', s.open_month_stock_yn <> 'Y', 1=1)";
 
+            // language=TEXT
 			$sql = "
 				select p.prd_cd, s.store_cd, s.store_nm, ifnull(p.qty, 0) as qty, ifnull(p.wqty, 0) as wqty
 				from store s
@@ -405,6 +410,7 @@ class stk01Controller extends Controller
 		$where = " and ps.prd_cd = '$prd_cd' ";
 		if (isset($user_store_cd)) $where .= " and ps.store_cd = '" . Lib::quote($user_store_cd) . "'";
 
+        // language=TEXT
 		$sql = "
 			select ps.store_cd, s.store_nm, ps.prd_cd, ps.qty, ps.wqty
 				, sum(if(hst.type = 1, ifnull(hst.qty, 0), 0)) as store_in_qty -- 매장입고
@@ -453,6 +459,7 @@ class stk01Controller extends Controller
 		";
 		$rows = DB::select($sql);
 
+        // language=TEXT
 		$sql = "
 			select
 				sum(prev_qty) as prev_qty,
