@@ -277,39 +277,10 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th >상품상태</th>
-                                            <td>
-                                                <div class="txt_box flax_box">
-                                                    <div class="input_box">
-                                                        @foreach ($goods_stats as $goods_stat)
-                                                            {{ ($goods_stat->code_id === @$goods_info->sale_stat_cl) ? $goods_stat->code_val : "" }}
-                                                        @endforeach
-                                                    </div>
-                                                </div>
-                                            </td>
                                             <th >스타일넘버</th>
                                             <td>
                                                 <div class="input_box">
                                                     {{ @$goods_info->style_no  }}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th >상품구분</th>
-                                            <td>
-                                                <div class="flex">
-                                                        @foreach($goods_types as $goods_type )
-                                                            {{ ($goods_type->code_id === @$goods_info->goods_type) ?  $goods_type->code_val : '' }}
-                                                        @endforeach
-                                                    <x-tool-tip>
-                                                        <x-slot name="arrow">top</x-slot>
-                                                        <x-slot name="align">left</x-slot>
-                                                        <x-slot name="html">
-                                                            위탁판매 : 입점사가 상품에 대한 판매를 위탁하고 일정한 수수료를 지급하는 상품<br/>
-                                                            위탁매입 : 입점사가 상품에 대한 <u>재고를 선 제공 후, 판매된 매출에 대하여 정산</u>하는 상품<br/>
-                                                            ※ <b>매입, 위탁매입 상품은 보유재고 관리가 가능</b>합니다.
-                                                        </x-slot>
-                                                    </x-tool-tip>
                                                 </div>
                                             </td>
                                             <th >업체</th>
@@ -348,7 +319,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th>시중가</th>
+                                            <th>Tag가</th>
                                             <td>
                                                 <div class="input_box">
                                                     {{@number_format(@$goods_info->goods_sh)}}원

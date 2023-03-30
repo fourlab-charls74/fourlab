@@ -33,7 +33,7 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
 
         // 매장명 조회 (자동완성)
         Route::get('/store', 'AutoCompleteController@store');
-
+        Route::get('/brand', 'AutoCompleteController@brand');
         Route::get('/style-no', 'AutoCompleteController@style_no');
         Route::get('/goods-nm', 'AutoCompleteController@goods_nm');
         Route::get('/goods-nm-eng', 'AutoCompleteController@goods_nm_eng');
@@ -46,6 +46,10 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         Route::get('goods-search', 'goods@head_search');
         Route::get('goods/show', 'goods@show');
         Route::get('goods/show/file/search', 'goods@file_search');
+
+        //brand 리스트
+        Route::get('brand/get_brand_nm', 'brand@get_brand_nm');
+        Route::get('brand/getlist', 'brand@getlist');
 
         // 고객명 조회
         Route::get('members', 'MemberController@show');
@@ -566,13 +570,28 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
 
     // 고객관리
     Route::prefix("member")->namespace('member')->group(function () {
-        Route::get('mem01','mem01Controller@index');
+        Route::get('mem01', 'mem01Controller@index');
         Route::get('mem01/search', 'mem01Controller@search');
+        Route::get('mem01/show/{type}/{id?}', 'mem01Controller@show');
         Route::get('mem01/batch', 'mem01Controller@batch');
         Route::get('mem01/check-id/{id}', 'mem01Controller@check_id');
         Route::post('mem01/upload',	'mem01Controller@upload');
         Route::put('mem01/batch', 'mem01Controller@update');
         Route::get('mem01/{user_id}/get', 'mem01Controller@get');
+
+        Route::get('mem01/download', 'mem01Controller@download');
+        Route::get('mem01/download/show', 'mem01Controller@download_show');
+        Route::get('mem01/show/search/{type}/{id}', 'mem01Controller@show_search');
+
+        Route::post('mem01/user', 'mem01Controller@add_user');
+        Route::post('mem01/user/group/{id}', 'mem01Controller@add_group');
+
+        Route::put('mem01/pw/{id}', 'mem01Controller@change_pw');
+        Route::put('mem01/user/{id}', 'mem01Controller@edit_user');
+        Route::put('mem01/active-user/{id}', 'mem01Controller@active_user');
+
+        Route::delete('mem01/user/{id}', 'mem01Controller@delete_user');
+        Route::delete('mem01/user/group/{id}', 'mem01Controller@del_group');
 
     });
 

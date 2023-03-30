@@ -153,6 +153,11 @@ function openUserEdit(id='') {
     window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
 }
 
+function openUserEditShop(id='') {
+    var url = '/shop/member/mem01/show/edit/'+id;
+    window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
+}
+
 /**
  * [쿠폰지급 버튼]
  * user_ids와 coupon_nos의 구분은 ,로 해주세요
@@ -186,6 +191,11 @@ function openCouponDetail(type='add',no='') {
 
 function openStore(store_cd){
     const url='/store/standard/std02/show/' + store_cd;
+    window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
+}
+
+function openStoreShop(store_cd){
+    const url='/shop/standard/std02/show/' + store_cd;
     window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
 }
 

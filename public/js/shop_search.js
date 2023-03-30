@@ -133,6 +133,59 @@ $( document ).ready(function() {
         }
     });
 
+    $('.select2-brand').select2({
+        ajax: {
+            url: "/shop/auto-complete/brand",
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    type:'select2',
+                    keyword: params.term, // search term
+                    page: params.page,
+                    is_all: this[0].dataset.allBrand == "true",
+                };
+            },
+            cache: true
+        },
+        width:'100%',
+        placeholder: '',
+        allowClear: true,
+        minimumInputLength: 1,
+        templateResult: function (state) {
+            if (!state.id) {
+                return state.text;
+            }
+            if(state.img !== undefined && state.img !== ""){
+                var $state = $(
+                    '<span><img src="' + state.img + '" style="width:50px" onError="this.src=\'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\'"/> ' + '[' + state.id +  '] '  + state.text + '</span>'
+                );
+            } else {
+                var $state = $(
+                    '<span>' + '[' + state.id +  '] ' + state.text + '</span>'
+                );
+            }
+            return $state;
+        },
+        //templateSelection: formatRepoSelection,
+        language: {
+            // You can find all of the options in the language files provided in the
+            // build. They all must be functions that return the string that should be
+            // displayed.
+            inputTooShort: function () {
+                return "한글자 이상 입력해 주세요.";
+            }
+        }
+    });
+
+    $( ".sch-brand" ).click(function() {
+        searchBrand.Open();
+    });
+
+    $(".select2-user_group").select2();
+
+    
+
     $('.select2-store').select2({
         ajax: {
             url: "/shop/auto-complete/store",
@@ -177,6 +230,76 @@ $( document ).ready(function() {
         }
     });    
 });
+
+function SearchBrand(){
+    this.grid = null;
+}
+
+SearchBrand.prototype.Open = function(callback = null){
+    if(this.grid === null){
+        this.SetGrid("#div-gd-brand");
+        //gxBrand = new HDGrid(document.querySelector("#div-gd-brand"), columnsBrand);
+        $("#SearchBrandModal").draggable();
+        this.callback = callback;
+    }
+    $('#SearchBrandModal').modal({
+        keyboard: false
+    });
+};
+
+SearchBrand.prototype.SetGrid = function(divId){
+    const columns = [
+        {field:"brand" , headerName:"브랜드",width:100},
+        {field:"brand_nm" , headerName:"브랜명",width:150},
+        {field:"use_yn" , headerName:"사용여부",width:100,cellClass:'hd-grid-code'},
+        {field:"choice" , headerName:"선택",width:100,cellClass:'hd-grid-code',
+            cellRenderer: function (params) {
+                if (params.data.brand !== undefined) {
+                    return '<a href="javascript:void(0);" onclick="return searchBrand.Choice(\'' + params.data.brand + '\',\'' + params.data.brand_nm + '\');">선택</a>';
+                }
+            }
+        },
+        {field:"nvl" , headerName:""},
+    ];
+
+    this.grid = new HDGrid(document.querySelector( divId ), columns);
+};
+
+SearchBrand.prototype.Search = function(e) {
+    const event_type = e?.type;
+    if (event_type == 'keypress') {
+        if (e.key && e.key == 'Enter') {
+            let data = $('form[name="search_brand"]').serialize();
+            this.grid.Request('/shop/api/brand/getlist', data);
+        } else {
+            return false;
+        }
+    } else {
+        let data = $('form[name="search_brand"]').serialize();
+        this.grid.Request('/shop/api/brand/getlist', data);
+    }
+};
+
+SearchBrand.prototype.Choice = function(code,name){
+    if(this.callback !== null){
+        this.callback(code,name);
+    } else {
+        if($('#brand_cd.select2-brand').length > 0){
+            $('#brand_cd').val(null);
+            const option = new Option(name, code, true, true);
+            $('#brand_cd').append(option).trigger('change');
+        } else {
+            if($('#brand_cd').length > 0){
+                $('#brand_cd').val(code);
+            }
+            if($('#brand_nm').length > 0){
+                $('#brand_nm').val(name);
+            }
+        }
+    }
+    $('#SearchBrandModal').modal('toggle');
+};
+let searchBrand = new SearchBrand();
 
 function SearchStore(){
     this.grid = null;

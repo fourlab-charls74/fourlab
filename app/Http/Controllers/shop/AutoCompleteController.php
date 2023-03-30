@@ -52,6 +52,53 @@ class AutoCompleteController extends Controller
 
     }
 
+    public function brand(Request $req) {
+
+        $type = $req->input('type', 'ac');
+        $keyword = $req->input('keyword', '');
+        $isAll = $req->input("is_all", "false");
+
+        if ($keyword == '') return '';
+
+        $where = '';
+        if($isAll == "false") $where .= ' use_yn = "Y" and ';
+
+        if($type == "select2"){
+            $sql = /** @lang text */
+                "
+                select 
+                    brand as id,brand_nm as text, concat(:image_svr,brand_logo) as img
+                from brand 
+                where $where ( brand like :brand or brand_nm like :brand_nm ) 
+                order by brand
+                limit 0, 10
+            ";
+            $results =  DB::select($sql, [
+                "image_svr" => config('shop.image_svr'),
+                "brand" => sprintf("%s%%", $keyword),
+                "brand_nm" => sprintf("%%%s%%", $keyword)
+            ]);
+
+            return response()->json([
+                "results" => $results
+            ]);
+
+        } else {
+            $sql = /** @lang text */
+            "
+                select brand as id, brand_nm as label
+                from brand 
+                where brand_nm like :keyword
+                limit 0, 5
+            ";
+
+            return DB::select($sql,["keyword" => sprintf("%s%%",$keyword)]);
+
+        }
+
+    }
+
+
     public function style_no(Request $req)
     {
         $type = $req->input('type', 'ac');

@@ -424,7 +424,7 @@
 <script language="javascript">
 	var columns = [
 		{headerName:'', headerCheckboxSelection:true, checkboxSelection:true, width:28, pinned:'left'},
-		{field:"user_id", headerName:"아이디", pinned:'left', type:"HeadUserType", width:100},
+		{field:"user_id", headerName:"아이디", pinned:'left', type:"ShopUserType", width:100},
 		{field:"name", headerName:"이름", width:70, cellStyle:{"text-align": "center"}},
 		{field:"sex", headerName:"성별", width:50},
 		{field:"birth_day", headerName:"생년월일", width:80},

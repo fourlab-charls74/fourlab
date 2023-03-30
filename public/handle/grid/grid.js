@@ -225,6 +225,18 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
                     }
                 }
             },
+
+            ShopUserType: {
+                cellRenderer: function(params){
+                    if(params.value !== undefined){
+                        if( params.data.user_id != "" )
+                            return '<a href="#" onclick="return openUserEditShop(\'' + params.data.user_id + '\');">'+ params.value +'</a>';
+                        else
+                            return params.value;
+                    }
+                }
+            },
+
             SearchType: {
                 cellRenderer: function(params){
                     if(params.value !== undefined){
@@ -275,6 +287,16 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
                     }
                 }
             },
+
+            ShopNameType:{
+                width:200,
+                cellRenderer: function (params) {
+                    if (params.value !== undefined) {
+                        return '<a href="javascript:void(0);" onclick="return openStoreShop(\'' + params.data.store_cd + '\');">' + params.value + '</a>';
+                    }
+                }
+            },
+
             StoreOrderNoType:{
                 width:170,
                 cellRenderer: function(params) {

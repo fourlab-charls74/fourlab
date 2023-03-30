@@ -7,6 +7,7 @@ use App\Components\Lib;
 use App\Components\SLib;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\Conf;
 use App\Models\Point;
@@ -42,6 +43,42 @@ class mem01Controller extends Controller
 
 		return view( Config::get('shop.shop.view') . '/member/mem01', $values);
 	}
+
+	public function show($type = '', $user_id="", Request $req) {
+
+		$user_store = Auth('head')->user()->store_cd;
+
+        if ($type == 'add')
+            $values = $this->__getShowAddData();
+        else if ($type == 'edit')
+            $values = $this->__getShowEditData($user_id);
+
+        // 회원그룹 콤보
+        $sql = " select group_no as id, group_nm as val from user_group order by group_no ";
+        $values['groups'] = DB::select($sql);
+
+
+        $values['type'] = $type;
+        $values['admin_id'] = Auth('head')->user()->id;
+		$values['user_store'] = Auth('head')->user()->store_cd;;
+		$values['user_store_nm'] = Auth('head')->user()->store_nm;;
+
+        // dd($values);
+        return view( Config::get('shop.shop.view') . '/member/mem01_show', $values);
+    }
+
+    private function __getShowAddData() {
+        $values = [
+            'user' => (object) [],
+            'out_yn' => '',
+            'out_nm' => '',
+            'user_groups' => (object) [],
+            'use_point' => 0,
+            'interest' => '없음'
+        ];
+
+        return $values;
+    }
 
 	public function search(Request $req) {
 		$cond = $this->get_condition($req);
@@ -236,6 +273,479 @@ class mem01Controller extends Controller
             $values = [];
         }
         return $values;
+    }
+
+
+	public function add_user(Request $req) {
+
+        // 설정 값 얻기
+        $conf = new Conf();
+
+        $encrypt_mode = $conf->getConfigValue("shop","encrypt_mode");
+
+        // 암호화 키
+        $encrypt_key = "";
+        if( $encrypt_mode == "mhash" ){
+            $encrypt_key = $conf->getConfigValue("shop","encrypt_key");
+        }
+
+        $resno_enc_yn = $conf->getConfigValue("shop","resno_enc_yn");
+
+        $id = Auth('head')->user()->id;
+        $name = Auth('head')->user()->name;
+
+        $user_id			= Request("user_id");
+        $pw     			= Request("pw");
+        $name				= Request("name");
+
+        $jumin1				= Request("jumin1");
+        $jumin2				= Request("jumin2");
+        $chk_jumin			= Request("chk_jumin");
+        $phone1				= Request("phone1");
+        $phone2				= Request("phone2");
+        $phone3				= Request("phone3");
+        $phone				= $phone1."-".$phone2."-".$phone3;
+        $mobile1			= Request("mobile1");
+        $mobile2			= Request("mobile2");
+        $mobile3			= Request("mobile3");
+        $mobile				= $mobile1."-".$mobile2."-".$mobile3;
+        $rmobile			= strrev($mobile);
+        $email				= Request("email");
+        $zip				= Request("zipcode");
+        $addr				= Request("addr1");
+        $addr2				= Request("addr2");
+        $email_chk			= Request("send_mail_yn");
+        $mobile_chk			= Request("send_mobile_yn");
+        $married_yn			= Request("married_yn");
+        $married_date		= Request("married_date");
+        $anniv_date			= Request("anniv_date");
+        $job				= Request("job");
+        $interest			= Request("interest", "");
+        $yn					= Request("yn");
+        $opt				= Request("opt");
+        $memo				= Request("memo");
+        $taxpayer_yn		= Request("taxpayer_yn");
+        $type               = Request("type");
+        $store_nm           = Request("store_nm");
+        $store_cd           = Request("store_no");
+
+        $auth_type			= Request("auth_type");
+        $auth_yn			= Request("auth_yn");
+        $auth_key			= Request("auth_key");
+        $yyyy				= Request("yyyy");
+        $mm					= sprintf("%02d", Request("mm", 01));
+        $dd					= sprintf("%02d", Request("dd", 01));
+        $yyyy_chk			= Request("yyyy_chk");
+        $sex				= Request("sex");
+
+        // 비밀번호 암호화
+        $enc_pwd = Lib::get_enc_hash($pw, $encrypt_mode, $encrypt_key);
+        // $enc_pwd = $pw;
+
+        // 주민등록번호 관련
+        $jumin = "";
+        $enc_jumin2 = "";
+
+        // 주민등록번호 암호화
+        // $enc_jumin2 = $jumin2;
+        // $first_jumin2 = substr($jumin2, 0, 1);
+        // $second_jumin2 = substr($jumin2, 1, 6);
+        // if( $chk_jumin == "Y" ){
+        //     if( $resno_enc_yn == "Y" ){
+        //         $enc_jumin2 = $first_jumin2."[".Lib::get_enc_hash($second_jumin2, $encrypt_mode, $encrypt_key)."]";
+        //     }
+        //     $jumin = $jumin1."-".$first_jumin2."******";
+        // } else {
+        //     $jumin = "";
+        // }
+        // // 주민등록 번호 중복사용 체크
+        // $sql = "
+        //     select count(*) as cnt
+        //     from member
+        //     where jumin1 = '$jumin1'
+        //         and jumin2 = '$enc_jumin2'
+        // ";
+        // $row = DB::selectOne($sql);
+        // $resno_cnt = $row->cnt;
+        // if( $resno_cnt > 0 ){
+        //     return response()->json("사용이 불가능한 주민등록번호 입니다.\\n정확하게 입력하시기 바랍니다.", 500);
+        // }
+
+        // // 성별 및 생년월일
+        // $sex = "M";
+        // $yyyy = "";
+        // $mm = "";
+        // $dd = "";
+        // if( $chk_jumin == "Y" ){
+        //     $sex =  ( $first_jumin2 % 2 == 0 ) ? "F" : "M";
+        //     $yyyy_prefix =  ( $first_jumin2 > 2 ) ? "20":"19";
+        //     $yyyy = $yyyy_prefix . substr($jumin1,0,2);
+        //     $mm = substr($jumin1,2,2);
+        //     $dd = substr($jumin1,4,2);
+        // }
+
+        $sql= "
+            insert into member (
+                user_id, user_pw, name, name_eng, jumin, jumin1, jumin2, email, email_chk
+                , zip, addr, addr2, phone, mobile, rmobile, regdate
+                , point, ypoint, yn, mobile_chk, yyyy_chk
+                , yyyy, mm, dd, opt, out_yn, name_chk, wsale_status, taxpayer_yn, enjumin, anniv_date, anniv_type
+                , job, interest, memo, pwd_reset_yn, sex, recommend_id
+                , auth_type, auth_yn, auth_key, store_nm, store_cd, type
+            ) values (
+                '$user_id', '$enc_pwd', '$name', '', '$jumin', '$jumin1', '$enc_jumin2', '$email', '$email_chk'
+                , '$zip', '$addr', '$addr2', '$phone', '$mobile', '$rmobile', now()
+                , '0', '0', 'Y', '$mobile_chk', ''
+                , '$yyyy', '$mm', '$dd', '$opt', 'N', 'N', 'N', '$taxpayer_yn', '', '$anniv_date', ''
+                , '$job', '$interest', '$memo', 'N', '$sex', ''
+                , '$auth_type', '$auth_yn', '$auth_key', '$store_nm', '$store_cd', '$type'
+            )
+        ";
+
+        DB::insert($sql);
+
+        return response()->json($user_id, 201);
+    }
+
+    public function edit_user($user_id='', Request $req) {
+        $name				= Request("name");
+        $pw     			= Request("pw");
+        $jumin1				= Request("jumin1");
+        $jumin2				= Request("jumin2");
+        $chk_jumin			= Request("chk_jumin");
+        $phone1				= Request("phone1");
+        $phone2				= Request("phone2");
+        $phone3				= Request("phone3");
+        $phone				= $phone1."-".$phone2."-".$phone3;
+        $mobile1			= Request("mobile1");
+        $mobile2			= Request("mobile2");
+        $mobile3			= Request("mobile3");
+        $mobile				= $mobile1."-".$mobile2."-".$mobile3;
+        $rmobile			= strrev($mobile);
+        $email				= Request("email");
+        $zip				= Request("zipcode");
+        $addr				= Request("addr1");
+        $addr2				= Request("addr2");
+        $email_chk			= Request("send_mail_yn");
+        $mobile_chk			= Request("send_mobile_yn");
+        $married_yn			= Request("married_yn");
+        $married_date		= Request("married_date");
+        $anniv_date			= Request("anniv_date");
+        $job				= Request("job");
+        $interest			= Request("interest", "");
+        //$yn					= Request("yn");
+        $opt				= Request("opt");
+        $memo				= Request("memo");
+        $taxpayer_yn		= Request("taxpayer_yn","");            // 피엘라벤 사용안함
+        $wsale_status		= Request("wsale_status", "");
+        $type               = Request("type");
+        // $store_nm           = "";
+        // $store_cd           = Request("store_no", "");
+        // $store_chg          = Request("store_chg", "false"); // 가입매장변경여부
+
+        // $store_sql = "";
+        // if ($store_chg == 'true') {
+        //     $store_nm = DB::table('store')->where('store_cd', $store_cd)->value('store_nm');
+        //     $store_sql = "
+        //         , store_nm = '$store_nm'
+        //         , store_cd = '$store_cd'
+        //     ";
+        // }
+
+        $sql = "
+            update member set
+                name ='$name'
+                , phone = '$phone'
+                , mobile = '$mobile'
+                , email = '$email'
+                , zip = '$zip'
+                , addr = '$addr'
+                , addr2 = '$addr2'
+                , email_chk = '$email_chk'
+                , mobile_chk = '$mobile_chk'
+                , wsale_status = '$wsale_status'
+                -- , taxpayer_yn = '$taxpayer_yn'
+                , married_yn	= '$married_yn'
+                , married_date = '$married_date'
+                , anniv_date	= '$anniv_date'
+                , job = '$job'
+                , interest = '$interest'
+                , opt = '$opt'
+                , memo = '$memo'
+                , type = '$type'
+            where user_id = '$user_id'
+        ";
+
+        DB::update($sql);
+
+        return response()->json(null, 204);
+    }
+
+	public function change_pw($user_id='', Request $req) {
+        // 설정 값 얻기
+        $conf = new Conf();
+
+        $encrypt_mode = $conf->getConfigValue("shop","encrypt_mode");
+
+        // 암호화 키
+        $encrypt_key = "";
+        if( $encrypt_mode == "mhash" ){
+            $encrypt_key = $conf->getConfigValue("shop","encrypt_key");
+        }
+
+        $resno_enc_yn = $conf->getConfigValue("shop","resno_enc_yn");
+
+        $pw = Request("pw");
+
+        // 암호화 모드
+        $enc_pwd = Lib::get_enc_hash($pw, $encrypt_mode, $encrypt_key);
+
+        $sql = "
+            update member set
+                user_pw = '$enc_pwd'
+                , pwd_reset_yn = 'N'
+            where user_id = '$user_id'
+        ";
+        DB::update($sql);
+
+        return response()->json(null, 204);
+    }
+
+    public function show_search($type='', $user_id='') {
+        $sql = $this->__get_show_sql($type, $user_id);
+
+        $rows = DB::select($sql);
+
+        $header = ['total' => count($rows)];
+
+        if ($type == 'buylist') {
+            $data = $this->__get_buylist_total($user_id);
+
+            $header['qty'] = $data->qty;
+            $header['ord_amt'] = $data->ord_amt;
+            $header['clm_qty'] = $data->clm_qty;
+            $header['clm_amt'] = $data->clm_amt;
+        }
+
+        if ($type == 'coupon_list') {
+            $data = $this->__get_coupon_use_count($user_id);
+
+            $header['use_cnt'] = $data->use_cnt;
+        }
+
+        return response()->json([
+            "code" => 200,
+            "head" => $header,
+            "body" => $rows
+        ]);
+    }
+
+	private function __get_coupon_use_count($user_id) {
+        $sql = "
+			select
+				count(a.idx) use_cnt
+			from coupon_member a
+				inner join coupon c on a.coupon_no = c.coupon_no
+			where a.user_id = '$user_id' and ifnull(a.use_yn, 'N') <> 'Y' and ifnull(c.use_yn, 'N') = 'Y'
+				-- and if( c.use_date_type = 'P' ,a.use_to_date,c.use_to_date) >= date_format(now(), '%Y%m%d')
+				-- and c.use_to_date >= date_format(now(), '%Y%m%d')
+			";
+
+        return DB::selectOne($sql);
+    }
+
+	private function __get_buylist_total($user_id) {
+        $sql = "
+            select
+                sum(a.qty) as qty ,
+                ifnull(sum(a.qty * a.price),0) as ord_amt,
+                ifnull(sum(if(a.clm_state = 60 or a.clm_state = 61,a.qty,0)),0) as clm_qty,
+                ifnull(sum(if(a.clm_state = 60 or a.clm_state = 61,a.qty * a.price,0)),0) as clm_amt
+            from order_opt a
+                inner join order_mst b on a.ord_no = b.ord_no
+            where
+                b.user_id = '$user_id'
+                and a.ord_state >= 10
+        ";
+
+        return DB::selectOne($sql);
+    }
+
+    private function __get_show_sql($type, $user_id){
+        $sql = "";
+
+        switch($type) {
+            //상담 목록 검색 쿼리
+            case "claim_msg" :
+                $sql ="
+                    select
+                        date_format(regi_date,'%Y.%m.%d %H:%i:%s') regi_date, ord_no, contents, admin_nm
+                    from member_cousel
+                    where user_id = '$user_id'
+                    order by idx desc
+                ";
+                break;
+            //주문 목록 검색 쿼리
+            case "buylist" :
+                $sql = "
+                    select
+                        date_format(a.ord_date,'%Y.%m.%d') ord_date, a.ord_no, a.ord_seq, a.goods_nm, ifnull(e.opt_val, a.goods_opt) as opt, a.qty, a.price,
+                        cp.code_val as pay_type, a.bank_code, co.code_val as ord_state, cc.code_val as clm_state, a.sale_place, a.coupon_nm, a.ord_opt_no, a.goods_no
+                    from
+                    (
+                        select
+                            a.ord_opt_no,b.ord_date, b.ord_no, a.ord_seq, c.goods_nm, a.qty, a.goods_opt, b.user_nm, b.r_nm, a.price,
+                            d.pay_type, c.opt_kind_cd,
+                            case d.pay_type
+                                when '2' then d.card_name
+                                when '1' then d.bank_code
+                                when '6' then d.card_name
+                                else d.bank_code
+                            end bank_code,
+                            a.ord_state, a.clm_state, 
+                            -- e.com_nm as sale_place, 
+                            ifnull(e.com_nm, a.sale_place) as sale_place,
+                            i.com_nm, c.price-c.wonga as prf,
+                            case a.ord_state
+                                when '-20' then null
+                                else d.upd_dm
+                            end upd_dm,
+                            a.dlv_end_date, b.upd_date, c.goods_no, c.goods_sub, a.ord_kind, c.baesong_kind, f.coupon_nm
+                        from order_opt a
+                            inner join order_mst b on a.ord_no = b.ord_no
+                            inner join goods c on a.goods_no = c.goods_no and a.goods_sub = c.goods_sub
+                            inner join payment d on b.ord_no = d.ord_no
+                            left outer join company e on a.sale_place = e.com_id and e.com_type= '4'
+                            left outer join company i on c.com_id = i.com_id
+                            left outer join coupon f on a.coupon_no = f.coupon_no
+                        where b.user_id = '$user_id'
+                    ) a left outer join opt e on e.opt_kind_cd = a.opt_kind_cd and e. a.goods_opt = e.opt_id
+                    left outer join code cc on cc.code_kind_cd = 'G_CLM_STATE' and cc.code_id = a.clm_state
+                    left outer join code co on co.code_kind_cd = 'G_ORD_STATE' and co.code_id = a.ord_state
+                    left outer join code cp on cp.code_kind_cd = 'G_PAY_TYPE' and cp.code_id = a.pay_type
+                    order by a.ord_opt_no desc
+                ";
+                break;
+            //적립금 목록 검색 쿼리
+            case "point" :
+                $sql = "
+                    select
+                        ord_no, point_st,
+                        if(point_status = 'N',concat(point_nm,'\(대기\)'),point_nm) as point_nm, point, regi_date, '' as expire_day,admin_nm, admin_id, '' as ord_opt_no
+                    from point_list
+                    where user_id = '$user_id'
+                    order by no desc
+                ";
+                break;
+            //고객문의 목록 검색 쿼리
+            case "claim" :
+                $ans_y = "답변완료";
+                $ans_s = "답변대기";
+                $ans_c = "등록불가";
+
+                $sql = "
+                    select
+                        date_format(q.regi_date,'%Y.%m.%d %H:%i:%s') regi_date, cd.code_val as typenm, q.subject,
+                        (case ans_yn when 'Y' then '$ans_y' when 'C' then '$ans_c' else '$ans_s' end) as ans_state
+                        , q.ans_nm, date_format(q.regi_date,'%Y%m%d'), cd.code_id as type
+                    from qna q
+                    left outer join code cd on cd.code_kind_cd = 'G_TYPE_CD' and cd.code_id = substring(q.qna_type,1,3)
+                    where user_id = '$user_id'
+                ";
+                break;
+            //Q&A 목록 검색 쿼리
+            case "qa" :
+                $sql = "
+                    select
+                        date_format(q.q_date,'%Y.%m.%d %H:%i:%s') q_date, g.goods_nm,
+                        q.subject, q.answer_yn, q.admin_nm,
+                        q.goods_no, q.goods_sub,
+                        date_format(q.q_date,'%Y%m%d')
+                    from goods_qa_new q
+                        inner join goods g on g.goods_no = q.goods_no and g.goods_sub = q.goods_sub
+                    where q.user_id = '$user_id'
+                    order by
+                        q.no desc
+                    limit 300
+                ";
+                break;
+            //삼품평 목록 검색 쿼리
+            case "estimate" :
+                // 설정 값 얻기
+                $cfg_img_size_list		= SLib::getCodesValue("G_IMG_SIZE","list");
+                $cfg_img_size_real		= SLib::getCodesValue("G_IMG_SIZE","real");
+
+                $sql = "
+                    select
+                        '' as img
+                        , b.goods_nm
+                        , (case a.goods_est
+                            when '1' then '★☆☆☆☆'
+                            when '2' then '★★☆☆☆'
+                            when '3' then '★★★☆☆'
+                            when '4' then '★★★★☆'
+                            when '5' then '★★★★★'
+                        end) as estimate
+                        , ifnull(a.best_yn, 'N') as best_yn
+                        , ifnull(a.buy_yn, 'N') as buy_yn
+                        , a.goods_title, ifnull(a.point, 0) as point, a.use_yn, a.cnt, a.regi_date
+                        , a.no, a.goods_no, a.goods_sub
+                        , if(b.special_yn <> 'Y', replace(b.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
+                            select replace(c.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
+                            from goods c where c.goods_no = b.goods_no and c.goods_sub = 0
+                          )) as img_s_50
+                    from goods_estimate a
+                        inner join goods b on a.goods_no = b.goods_no and a.goods_sub = b.goods_sub
+                    where a.user_id = '$user_id'
+                    order by a.regi_date desc
+                ";
+                break;
+            //클레임 목록 검색 쿼리
+            case "claim_list" :
+                $today = date("Ymd");
+
+                $sql ="
+                    select
+                        date_format(c.regi_date, '%y.%m.%d %H:%i:%s') as regi_date, a.ord_no, '' as ord_opt_no,
+                        cd.code_val as cs_form,
+                        if(cd3.code_id is not null,cd3.code_val,cd2.code_val) as clm_state,c.memo,c.admin_nm
+                    from order_mst a
+                        inner join order_opt b on a.ord_no = b.ord_no
+                        inner join claim_memo c on c.ord_opt_no = b.ord_opt_no
+                        left outer join code cd on cd.code_kind_cd = 'CS_FORM2' and cd.code_id = c.cs_form
+                        left outer join code cd2 on cd2.code_kind_cd = 'G_ORD_STATE' and cd2.code_id = c.ord_state
+                        left outer join code cd3 on cd3.code_kind_cd = 'G_CLM_STATE' and cd3.code_id = c.clm_state
+                    where a.user_id = '$user_id' and c.regi_date >= date_sub($today, INTERVAL 6 MONTH)
+                    order by c.regi_date desc
+                ";
+                break;
+            //쿠폰 목록 검색 쿼리
+            case "coupon_list" :
+                $today = date("Ymd");
+
+                $sql ="
+                    select
+                        b.coupon_no, b.coupon_nm, b.coupon_type, c.ord_no, a.ord_opt_no, a.down_date, a.use_date, a.serial
+                        , ifnull(a.use_yn, 'N') as coupon_member_use_yn
+                        , ifnull(b.use_yn, 'N') as coupon_use_yn
+                        , if(b.use_fr_date = '99999999', '$today', b.use_fr_date) as use_fr_date
+                        -- , if(b.use_date_type = 'P' ,a.use_to_date,b.use_to_date) as use_to_date
+						, b.use_to_date
+                        , g.goods_nm, c.goods_no, c.goods_sub
+                    from coupon_member a
+                        inner join coupon b on a.coupon_no = b.coupon_no
+                        left outer join order_opt c on a.ord_opt_no = c.ord_opt_no
+                        left outer join goods g on c.goods_no = g.goods_no
+                        left outer join code d on d.code_kind_cd = 'G_COUPON_USE_YN' and a.use_yn = d.code_id
+                    where a.user_id = '$user_id'
+						-- and if( b.use_date_type = 'P' ,a.use_to_date,b.use_to_date) >= date_format(now(), '%Y%m%d')
+						-- and b.use_to_date >= date_format(now(), '%Y%m%d')
+                    order by a.idx desc
+                ";
+                break;
+        }
+
+        return $sql;
     }
 
 	private function get_condition(Request $req) {
@@ -622,5 +1132,45 @@ class mem01Controller extends Controller
 	// 회원 아이디 중복체크
 	public function check_id($id) {
 		return DB::table('member')->where('user_id', $id)->count();
+    }
+
+	public function delete_user($user_id='', Request $req) {
+        $code = 200;
+        $msg = '';
+
+        $user = [
+            'id' => Auth('head')->user()->id,
+            'name' => Auth('head')->user()->name,
+        ];
+
+        try {
+            
+            DB::beginTransaction();
+
+            $sql = "
+                update member set
+                    user_pw='',name='',jumin='',email='',email_chk='',zip='',addr='',addr2=''
+                    ,phone='',mobile='',yn='',mobile_chk='', interest = '', anniv_date = ''
+                    ,yyyy_chk='',yyyy='',mm='',dd='',opt='',out_yn='Y',out_date=now()
+                    ,name_chk = '', name_eng = '', job = '', married_yn = '', married_date = ''
+                    ,rmobile = '', opt = '', wsale_status = '', taxpayer_yn = '', memo = ''
+                    ,visit_cnt = '', jumin1 = '', jumin2 = ''
+                    ,sex='', auth_type='', auth_yn='', auth_key='', ipin='', foreigner='', mobile_cert_yn='' , type='',store_nm='',store_cd=''
+                where user_id = '$user_id'
+            ";
+            DB::update($sql);
+
+            $point = new Point($user, $user_id);
+            $point->DeleteUser();
+
+            DB::commit();
+            $msg = '해당 회원이 탈퇴처리 되었습니다.';
+        }catch(Exception $e) {
+            DB::rollback();
+            $code = 500;
+            $msg = $e->getMessage();
+        }
+
+        return response()->json(['code' => $code, 'message' => $msg], $code);
     }
 }
