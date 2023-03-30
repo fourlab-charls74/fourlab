@@ -54,7 +54,7 @@
                                                         <input type="text" name="user_id" id="user_id" value='{{@$ord->user_id}}' class="form-control form-control-sm mr-1" style="width:260px;">
                                                         <a href="#" onclick="GetUserInfo(document.f1.user_id.value)" class="btn btn-sm btn-primary shadow-sm fs-12 mr-1">회원정보 불러오기</a>
                                                         <a href="#" onclick="SameInfo();" class="btn btn-sm btn-primary shadow-sm fs-12 mr-1">수령자정보 동일</a>
-                                                        <a href="#" onclick="PopSearchOrder();" class="btn btn-sm btn-primary shadow-sm fs-12">기존 주문정보 불러오기</a>
+                                                        {{-- <!-- <a href="#" onclick="PopSearchOrder();" class="btn btn-sm btn-primary shadow-sm fs-12">기존 주문정보 불러오기</a> --> --}}
                                                         <div id="p_ord_no" class="p-2"></div>
                                                     </div>
                                                 </td>
@@ -154,7 +154,7 @@
                                                     </div>
                                                 </td>
                                                 <th>배송비적용</th>
-                                                <td style="padding:0px 10px 0px 10px;">
+                                                <td colspan="3" style="padding:0px 10px 0px 10px;">
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio" onclick="CheckPoint(this);">
                                                             <input type="radio" name="dlv_apply" id="dlv_apply_y" value="Y" class="custom-control-input" checked><label class="custom-control-label" for="dlv_apply_y">적용함</label>
@@ -164,11 +164,11 @@
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <th>적립금지급</th>
+                                                {{-- <th>적립금지급</th>
                                                 <td style="padding:0px 10px 0px 10px;">
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio" onclick="CheckPoint(this);">
-                                                            <input type="radio" name="give_point" id="give_point_y" value="Y" class="custom-control-input">
+                                                            <input type="radio" name="give_point" id="give_point_y" value="Y" checked class="custom-control-input">
                                                             <label class="custom-control-label" for="give_point_y">지급함</label>
                                                         </div>
                                                         <div class="custom-control custom-radio">
@@ -176,7 +176,7 @@
                                                             <label class="custom-control-label" for="give_point_n">지급안함</label>
                                                         </div>
                                                     </div>
-                                                </td>
+                                                </td> --}}
                                             </tr>
                                             </tbody>
                                         </table>
@@ -233,15 +233,13 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th>판매업체</th>
+                                                <th>주문매장</th>
                                                 <td style="padding:0px 10px 0px 10px;">
-                                                    <div class="flax_box">
-                                                        <select name="sale_place" id="sale_place" class="form-control form-control-sm">
-                                                            <option value="">선택</option>
-                                                            @foreach($sale_places as $val)
-                                                                <option value="{{$val->com_id}}" @if($val->com_id == "HEAD_OFFICE") selected @endif>{{$val->com_nm}}</option>
-                                                            @endforeach
-                                                        </select>
+                                                    <div class="d-flex flex-column pt-2 pb-1">
+                                                        <div class="flax_box mr-2 mb-1" style="width: 307px;">
+                                                            <input type='hidden' id="store_no" name="store_no" value="{{$store_cd}}">
+                                                            <input type='text' id="store_nm" name="store_nm" class="form-control form-control-sm mt-1 mt-sm-0" value="{{$store_nm}}" readonly>
+                                                        </div>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -421,7 +419,7 @@
                                                 <th>입금자</th>
                                                 <td style="padding:0px 10px 0px 10px;">
                                                     <div class="flax_box">
-                                                        <input type="text" class="form-control form-control-sm" name="bank_number" id="bank_number" value=""/>
+                                                        <input type="text" class="form-control form-control-sm" name="bank_inpnm" id="bank_inpnm" value=""/>
                                                         <input type="hidden" name="coupon_no" value="">
                                                     </div>
                                                 </td>
@@ -435,17 +433,15 @@
                     </div>
                 </div>
             </div>
-            <div class="text-center mt-3">
+            <!-- <div class="text-center mt-3">
                 @if (@$cmd == 'edit')
                     <input type="button" value=" 판매수정" class="btn btn-sm btn-primary shadow-sm mr-1 save-btn" onclick="Validate(document.f1);"/>
                 @else
                     <input type="button" value=" 판매등록" class="btn btn-sm btn-primary shadow-sm mr-1 save-btn" onclick="Validate(document.f1);"/>
                 @endif
-            </div>
+            </div> -->
     </form>
     </div>
-    <!-- script -->
-    <!-- script -->
     <script type="text/javascript">
 
         const columns = [
@@ -456,20 +452,44 @@
                 editable: true,
                 cellClass:['hd-grid-edit'],
                 cellEditor: 'agRichSelectCellEditor',
-                cellEditorParams:cellOpionsParams,
-                // cellEditorSelector: function(params) {
-                //     return {
-                //         component: 'agRichSelectCellEditor',
-                //         params: {
-                //             values: []
-                //         }
-                //     };
-                // }
+                cellEditorParams: function(params) {
+                    var goods_no = params.data.goods_no;
+                    var options = [];
+                    if(_goods_options.hasOwnProperty(goods_no)){
+                        options =  _goods_options[goods_no];
+                    } else {
+                    }
+                    return {
+                        values :options
+                    }
+                },
+            
             },
             {field:"qty" , headerName:"수량", width:90,type: 'numberType',
                 editable: true,
-                cellClass:['hd-grid-number','hd-grid-edit'],onCellValueChanged:EditAmt,
-                //cellStyle:StyleChangeYN,
+                cellClass:['hd-grid-number','hd-grid-edit'],onCellValueChanged: function(params) {
+                    if (params.oldValue !== params.newValue) {
+                        console.log(params);
+                        var rowNode = params.node;
+                        var qty = params.data.qty;
+                        var price = params.data.price;
+                        var option_price = 0;
+                        price += option_price;
+
+                        var ord_amt = qty * price;
+                        var point_amt = params.data.point_amt;
+                        var coupon_amt = params.data.coupon_amt;
+                        var dc_amt = params.data.dc_amt;
+                        var dlv_amt = params.data.dlv_amt;
+                        var pay_fee = 0;
+                        var recv_amt = ord_amt - point_amt - coupon_amt - dc_amt + pay_fee;
+
+                        //ff.recv_amt.value = ord_amt + dlv_amt - point - coupon - dc + pay_fee;
+                        params.data.ord_amt = ord_amt;
+                        params.data.recv_amt = recv_amt;
+                        gx.gridOptions.api.redrawRows({rowNodes:[rowNode]});
+                    }
+                },
             },
             {field:"price" , headerName:"판매가", width:90, type: 'currencyType'  },
             {field:"ord_amt" , headerName:"주문액", width:90, type: 'currencyType'  },
@@ -540,11 +560,7 @@
             return false;
         }
 
-        if(ff.sale_place.value == ""){
-            alert('판매업체를 선택해 주십시오.');
-            ff.sale_place.focus();
-            return false;
-        }
+       
         const ord_kind = $('[name=ord_kind]:checked');
 
         if(ord_kind.length === 0){
@@ -585,7 +601,7 @@
                 return false;
             }
 
-            if(ff.bank_number.value == "") {
+            if(ff.bank_inpnm.value == "") {
                 alert("입금자를 입력해 주십시오.");
                 ff.bank_number.focus();
                 return false;
@@ -803,7 +819,7 @@
                 async: true,
                 dataType: "json",
                 type: 'get',
-                url: "/head/member/mem01/" + user_id + "/get",
+                url: "/shop/member/mem01/" + user_id + "/get",
                 success: function (res) {
                     console.log(res);
                     if(res.hasOwnProperty('user')){
@@ -828,29 +844,6 @@
                 },
             });
         }
-    }
-
-    function SameInfo(){
-        $('#r_user_nm').val($('#user_nm').val());
-        $('#r_phone').val($('#phone').val());
-        $('#r_mobile').val($('#mobile').val());
-    }
-
-    function CheckAddDlvArea(obj){
-        // var param = "CMD=check_add_dlv_area";
-        // param += "&ZIPCODE=" + obj.value;
-        // var http = new xmlHttp();
-        // http.onexec("ord20_detail.php","POST",param,true,cbCheckAddDlvArea);
-    }
-
-    function cbCheckAddDlvArea(res){
-        // var add_dlv_fee = res.responseText;
-        // var ff = document.f1;
-
-        // ff.ADD_DLV_FEE.value = add_dlv_fee;
-        // com(ff.ADD_DLV_FEE);
-
-        // CalAmt();
     }
 
     function ApplyGroup(obj){
@@ -900,39 +893,6 @@
             tmp = goods_opt.split("|");
             goods_opt = tmp[0];
         }
-
-        // if ( option_cnt > 1 && goods_opt != "") {
-        //     var param = "CMD=get_second_option";
-        //     param += "&GOODS_NO=" + goods_no + "&GOODS_SUB=" + goods_sub + "&GOODS_OPT=" + urlEncode(goods_opt);
-        //     var http = new xmlHttp();
-        //     http.onexec("ord20_detail.php","POST",param,true,cbGetSecondOption);
-        // } else {
-        //     opt_select2[opt_select2.length] = new Option("옵션(옵션가격)", "");
-        // }
-    }
-
-    function cbGetSecondOption(res)
-    {
-        // var ff = document.f1;
-        // var object = Dom2Obj(res);
-        // var second_opt_list = (object["record"]) ? object["record"] : "";
-        // var obj = ff.GOODS_OPT2;
-
-        // //브랜드 리스트를 select에 option 넣기
-        // obj[obj.length] = new Option("옵션(옵션가격)", "");
-        // for(i=0; i < second_opt_list.length; i++)
-        // {
-        //     var goods_opt 		= second_opt_list[i].goods_opt;
-
-        //     var tmp_txt	= "";
-        //     var tmp_val	= "";
-
-        //     var tmp = goods_opt.split("^");
-
-        //     tmp_txt	= tmp[1];
-        //     tmp_val	= tmp[1];
-        //     obj[obj.length] = new Option(tmp_txt, tmp_val);
-        // }
     }
 
     function SetOptionValue(value, depth) {
@@ -960,7 +920,7 @@
     }
 
     function PopOrder(obj){
-        openOrder(obj.innerHTML);
+        openOrder2(obj.innerHTML);
     }
 
     function selectOrder(data) {
@@ -996,7 +956,6 @@
                 let ord_lists = res.ord_lists;
 
                 $("#p_ord_no").html("<a href='javascript:void(0);' onclick='return PopOrder(this);'>" + res.ord_no + "</a>");
-
                 $('#user_id').val(ord.user_id);
                 $('#user_nm').val(ord.user_nm);
                 $('#phone').val(ord.phone);
@@ -1012,9 +971,13 @@
                 $('#add_dlv_fee').val(ord.add_dlv_fee);
                 $('#sale_place').val(ord.sale_place);
                 $('#pay_type').val(pay.pay_type);
-                $('#bank_code').val(pay.bank_code);
+                // $('#bank_code').val(pay.bank_code);
                 $('#bank_number').val(pay.bank_number);
                 $('#sale_place').val(ord.com_id);
+                $('#bank_inpnm').val(pay.bank_inpnm);
+                $('#bank_code').val(pay.bank_code + '_' + pay.bank_number).prop("selected",true);
+
+
                 if($('#ord_type_' +  ord.ord_type)){
                     $('#ord_type_' +  ord.ord_type).attr("checked", true);
                 }
@@ -1121,13 +1084,13 @@
             async: true,
             dataType: "json",
             type: 'post',
-            url: "/shop/order/ord02/save",
+            url: "/shop/order/ord01/save",
             data: order_data,
             success: function (res) {
                 console.log(res);
                 is_processing = false;
                 alert("저장되었습니다.");
-                document.location.href = '/shop/order/ord01/' + res.ord_no;
+                document.location.href = '/shop/order/ord01/order/' + res.ord_no;
             },
             error: function(e) {
                 is_processing = false;
@@ -1138,69 +1101,6 @@
                 }
             },
         });
-    }
-
-    /**
-     * @return {boolean}
-     */
-    function AddGoods(){
-        var url = '/shop/product/prd01/choice';
-        var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
-    }
-
-    /**
-     * @return {boolean}
-     */
-    function ChoiceGoodsNo(goods_nos){
-        for(var i=0;i<goods_nos.length;i++){
-            $.ajax({
-                type: "get",
-                url: '/shop/product/prd01/' + goods_nos[i] + '/get',
-                contentType: "application/x-www-form-urlencoded; charset=utf-8",
-                dataType: 'json',
-                // data: {},
-                success: function(res) {
-                    //console.log(res);
-                    qty = 1;
-                    gx.addRows([{
-                        "goods_no":res.goods_no,
-                        "goods_nm":res.goods_info.goods_nm,
-                        "style_no" : res.goods_info.style_no,
-                        "opt_val" : res.goods_info.opt_val,
-                        "qty" : qty,
-                        "price" : res.goods_info.price,
-                        "ord_amt" : res.goods_info.price * qty,
-                        "recv_amt" : res.goods_info.price * qty + res.goods_info.baesong_price,
-                        "point_amt" : 0,
-                        "coupon_amt" : 0,
-                        "dc_amt" : 0,
-                        "dlv_amt" : res.goods_info.baesong_price,
-                    }]);
-
-                    //console.log(res.options);
-                    var options = [];
-                    for(var j = 0; j < res.options.length;j++){
-                        if(res.options[j].qty > 0){
-                            options.push(res.options[j].goods_opt);
-                        }
-                    }
-                    _goods_options[goods_no] = options;
-                },
-
-                error: function(e){
-                    console.log(e.responseText);
-                }
-            });
-        }
-        return true;
-    }
-
-    /**
-     * @return {boolean}
-     */
-    function DelGoods(){
-        //console.log('삭제');
-        gx.delSelectedRows();
     }
 
     if ($('#goods_opt1').length > 0) {

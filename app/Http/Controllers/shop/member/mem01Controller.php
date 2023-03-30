@@ -137,6 +137,107 @@ class mem01Controller extends Controller
 		return $sql;
 	}
 
+	public function get($user_id){
+        $values = $this->__getShowEditData($user_id);
+        return response()->json($values);
+    }
+
+	private function __getShowEditData($user_id) {
+        $values = [];
+        $member_table = "";
+
+        $out_yn = DB::table('member')
+            ->where("user_id",$user_id)
+            ->value('out_yn');
+        if(isset($out_yn)){
+            $values["out_yn"] = $out_yn;
+
+            if($values['out_yn'] == "I") {
+                $member_table = "member_inactive";
+            } else {
+                $member_table = "member";
+            }
+
+            $sql = "
+            select b.group_nm, a.group_no
+            from user_group_member a
+                inner join user_group b on a.group_no = b.group_no
+            where a.user_id = '$user_id'
+        ";
+            $values['user_groups'] = DB::select($sql);
+
+            $sql = "
+            select
+                a.user_id, a.name, a.user_pw, substring(a.jumin,1,8) as jumin, a.phone, a.mobile, a.email, a.email_chk, a.out_yn, a.point,
+                a.zip, a.addr, a.addr2, a.mobile_chk, a.regdate, a.lastdate, a.name_chk, a.wsale_status, '' as taxpayer_yn,
+                a.married_yn, date_format(a.married_date,'%Y%m%d') as married_date, date_format(a.anniv_date,'%Y%m%d') as anniv_date,
+                a.job, a.interest, a.yn, a.memo, a.visit_cnt, a.opt, a.recommend_id,
+                b.ord_date, b.ord_cnt, b.ord_amt,
+                c.code_val as auth_type_nm, a.auth_type, a.auth_yn, a.auth_key, a.ipin, a.foreigner, a.mobile_cert_yn,
+                a.yyyy_chk, a.yyyy, a.mm, a.dd, a.sex, a.store_nm
+            from $member_table a
+                left outer join member_stat b on a.user_id = b.user_id
+                left outer join code c on c.code_kind_cd = 'G_AUTH_TYPE' and c.code_id = a.auth_type
+            where a.user_id = '$user_id'
+        ";
+
+            $user = DB::selectOne($sql);
+            $user->point = number_format($user->point);
+            $user->ord_amt = number_format($user->ord_amt);
+
+            $phone = explode("-", $user->phone);
+            $mobile = explode("-", $user->mobile);
+
+            $user->phone1 = $phone[0] ? $phone[0] : '';
+            if($user->phone !== '') {
+                $user->phone2 = $phone[1] ? $phone[1] : '';
+                $user->phone3 = $phone[2] ? $phone[2] : '';
+            }
+            
+            $user->mobile1 = $mobile[0] ? $mobile[0] : '';
+            if($user->mobile !== '') {
+                $user->mobile2 = $mobile[1] ? $mobile[1] : '';
+                $user->mobile3 = $mobile[2] ? $mobile[2] : '';
+            }
+
+            if($values['out_yn'] == "I") {
+                $values['out_nm'] = "휴면회원";
+            } else if($values['out_yn'] == "Y") {
+                $values['out_nm'] = "탈퇴회원";
+            } else if ($values['out_yn'] == "N") {
+                $values['out_nm'] = "회원";
+            }
+
+            // 사용한 적립금
+            $sql = " select sum(point) as total from point_list where user_id = '$user_id' and point_st = '사용' ";
+            $total = DB::selectOne($sql)->total;
+            $values['use_point'] = number_format($total);
+
+            //관심분야
+            $sql = " select count(*) as cnt from code where code_kind_cd = 'G_INTEREST' ";
+            $cnt = DB::selectOne($sql)->cnt;
+
+            $interest = [];
+            for($j = $cnt; $j > 0; $j--){
+                $code = pow(2,$j);
+                if($user->interest > $code){
+                    $user->interest = $user->interest - $code;
+
+                    $sql = " select code_val from code where code_kind_cd = 'G_INTEREST' and code_id = '$code' ";
+                    $code_val = DB::selectOne($sql)->code_val;
+                    $interest[] = sprintf("%s", $code_val);
+                }
+            }
+
+            $values['user'] = $user;
+            $values['interest'] = count($interest) > 0 ? implode(',', $interest) : '없음';
+
+        } else {
+            $values = [];
+        }
+        return $values;
+    }
+
 	private function get_condition(Request $req) {
 
 		$user_id	= Request("user_ids");

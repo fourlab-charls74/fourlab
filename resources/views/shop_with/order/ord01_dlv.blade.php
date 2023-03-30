@@ -1,4 +1,4 @@
-@extends('head_with.layouts.layout-nav')
+@extends('shop_with.layouts.layout-nav')
 @section('title','배송정보 변경')
 @section('content')
 
@@ -191,7 +191,7 @@
         $.ajax({
             async: true,
             type: 'put',
-            url: '/head/order/ord01/dlv-info-save/' + ord_no,
+            url: '/shop/order/ord01/dlv-info-save/' + ord_no,
             data: data,
             success: function (data) {
                 alert("저장되었습니다.");
@@ -208,7 +208,7 @@
 
   // 상품명 클릭시 상품관리상세페이지 열기
   function openGoodsDetail(goods_no) {
-    const url = '/head/product/prd01/' + goods_no;
+    const url = '/shop/product/prd01/' + goods_no;
     window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
   }
 </script>

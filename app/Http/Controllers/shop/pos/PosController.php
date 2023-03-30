@@ -449,6 +449,7 @@ class PosController extends Controller
         $is_new = $ord_no === '';
         $ord_date = date('Y-m-d H:i:s');
         $ord_type = 15; // 출고형태: 정상(15)
+        if ($reservation_yn === 'Y') $ord_type = 4; // 예약(4)
         $ord_kind = 20; // 출고구분: 출고가능(20)
         $dlv_apply = 'N'; // 배송비적용여부
         $store_cd = Auth::guard('head')->user()->store_cd;
@@ -519,6 +520,8 @@ class PosController extends Controller
                 $pr_code = $item['pr_code'] ?? ''; // 행사명
                 $coupon_no = $item['coupon_no'] ?? ''; // 쿠폰아이디
 
+                $opt_ord_type = 15; // order_opt의 ord_type (정상:15 / 예약:4)
+
                 $sql = "
                     select g.goods_no, g.goods_sub, g.goods_nm, g.com_id, g.com_type, c.com_nm, (c.pay_fee / 100) as com_rate
                         , g.head_desc, g.goods_type, g.baesong_kind, g.baesong_price, g.md_id, g.md_nm
@@ -535,8 +538,10 @@ class PosController extends Controller
                 $prd_wqty = DB::table('product_stock_store')->where('prd_cd', $prd_cd)->where('store_cd', $store_cd)->value('wqty');
 
                 // 예약판매가 아닐 경우에만 재고부족 에러처리
-                if ($reservation_yn !== 'Y') {
-                    if (($goods->is_unlimited === 'Y' && $prd_wqty < 1) || $qty > $prd_wqty) {
+                if (($goods->is_unlimited === 'Y' && $prd_wqty < 1) || $qty > $prd_wqty) {
+                    if ($reservation_yn === 'Y') {
+                        $opt_ord_type = 4; // order_opt의 ord_type (정상:15 / 예약:4)
+                    } else {
                         $code = '-105';
                         throw new Exception("재고가 부족하여 판매할 수 없습니다.");
                     }
@@ -661,7 +666,7 @@ class PosController extends Controller
                     'com_id'        => $goods->com_id ?? '',
                     'add_point'     => $ord_opt_add_point,
                     'ord_kind'      => $ord_kind,
-                    'ord_type'      => $ord_type,
+                    'ord_type'      => $opt_ord_type,
                     'baesong_kind'  => $goods->baesong_kind,
                     'ord_date'      => $ord_date,
                     'dlv_comment'   => $memo,
@@ -926,6 +931,7 @@ class PosController extends Controller
                 o.ord_no
                 , o.ord_opt_no
                 , o.ord_date
+                , o.ord_type
                 , o.prd_cd
                 , o.goods_no
                 , g.goods_sub
@@ -1136,6 +1142,36 @@ class PosController extends Controller
         $result = DB::select($sql, ['user_id' => $user_id]);
 
         return response()->json(['code' => '200', 'body' => $result], 200);
+    }
+
+    /** 예약판매상품 지급완료처리 (예약주문건 정상주문처리) */
+    public function complete_reservation(Request $request)
+    {
+        $ord_no = $request->input('ord_no', '');
+        $ord_opt_no = $request->input('ord_opt_no', '');
+        $ord_type = 15; // 정상:15
+
+        try {
+            DB::beginTransaction();
+
+            DB::table('order_opt')->where('ord_opt_no', $ord_opt_no)->update([ 'ord_type' => $ord_type ]);
+            DB::table('order_opt_wonga')->where('ord_opt_no', $ord_opt_no)->update([ 'ord_type' => $ord_type ]);
+
+            $reservation_ord_cnt = DB::table('order_opt')->where('ord_no', $ord_no)->where('ord_type', 4)->count();
+            if ($reservation_ord_cnt < 1) {
+                DB::table('order_mst')->where('ord_no', $ord_no)->update([ 'ord_type' => $ord_type ]);
+            }
+
+            DB::commit();
+            $code = 200;
+            $msg = '예약판매상품이 지급완료처리되었습니다.';
+        } catch (Exception $e) {
+            DB::rollback();
+            $code = 500;
+            $msg = $e->getMessage();
+        }
+
+        return response()->json(['code' => $code, 'msg' => $msg], 200);
     }
 }
 

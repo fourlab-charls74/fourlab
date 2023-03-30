@@ -63,6 +63,7 @@ class prd05Controller extends Controller
         $style_no       = $request->input("style_no");      // 스타일 넘버
         $goods_no       = $request->input("goods_no");      // 상품번호
         $com_cd         = $request->input("com_cd");        // 업체
+        $com_type         = $request->input("com_type");    // 업체구분
         $opt_kind_cd    = $request->input("item");          // 품목
         $brand_nm       = $request->input("brand_nm");      // 브랜드 이름
         $brand_cd       = $request->input("brand_cd");      // 브랜드
@@ -126,6 +127,7 @@ class prd05Controller extends Controller
 		}
 
         if( $com_cd != "" )         $where .= " and g.com_id = '$com_cd' ";
+        if ($com_type != "")        $where .= " and c.code_id = '$com_type' ";
 
         foreach($oms_col as $col) {
             if($col !== '') {
@@ -181,7 +183,13 @@ class prd05Controller extends Controller
             $query = "
                 select count(*) as total
                 from goods g $insql
+                    left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
+                    left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
+                    left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
+                    left outer join company com on com.com_id = g.com_id
+                    left outer join brand brand on brand.brand = g.brand
                     left outer join goods_class class on g.goods_no = class.goods_no and g.goods_sub = class.goods_sub and g.class = class.class
+                    left outer join code c on c.code_id = com.com_type and c.code_kind_cd = 'G_COM_TYPE'
                 where 1=1 
                     $where
             ";
@@ -207,6 +215,7 @@ class prd05Controller extends Controller
                 )) as img, g.goods_nm, stat.code_val as sale_stat_cl,
                 g.goods_no, g.goods_sub, com.com_id,
                 (select class_nm from code_class where class = g.class group by class, class_nm) as class
+                , c.code_id as com_type
                 $sql_cols
 			from goods g $insql
                 left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
@@ -215,6 +224,7 @@ class prd05Controller extends Controller
                 left outer join company com on com.com_id = g.com_id
                 left outer join brand brand on brand.brand = g.brand
                 left outer join goods_class class on g.goods_no = class.goods_no and g.goods_sub = class.goods_sub and g.class = class.class
+                left outer join code c on c.code_id = com.com_type and c.code_kind_cd = 'G_COM_TYPE'
             where 1=1 
                 $where
             $order_field

@@ -1021,18 +1021,19 @@
     let gx4;
 
     const order_columns = [
+        {field: "ord_type", headerName: "주문타입", hide: true},
         {field: "ord_date", headerName: "주문일자", width: 180, cellStyle: {...AlignCenter, ...LineHeight50}},
-        {field: "ord_no", headerName: "주문번호", width: 220, cellStyle: {...AlignCenter, ...LineHeight50},
-            // cellRenderer: (params) => `<a href="javascript:void(0);" onclick="return setOrderDetail('${params.value}')">${params.value}</a>`,
+        {field: "ord_no", headerName: "주문번호", width: 230, cellStyle: {...AlignCenter, ...LineHeight50},
+            cellRenderer: (params) => `${params.data.ord_type == '4' ? '<span class="text-danger">[예약]</span> ' : ''}${params.value}`,
         },
-        {field: "user_id", headerName: "고객명", width: 200, cellStyle: LineHeight50,
-            cellRenderer: (params) => `${params.data.user_nm}${params.data.user_id ? ` (${params.data.user_id})` : ''}`,
+        {field: "user_id", headerName: "고객명", width: 150, cellStyle: LineHeight50,
+            cellRenderer: (params) => `${!!params.data.user_nm ? params.data.user_nm : '비회원'}${params.data.user_id ? ` (${params.data.user_id})` : ''}`,
         },
-        {field: "mobile", headerName: "고객연락처", width: 160, cellStyle: {...AlignCenter, ...LineHeight50}},
-        {field: "pay_type_nm", headerName: "결제수단", width: 150, cellStyle: {...AlignCenter, ...LineHeight50},
+        {field: "mobile", headerName: "고객연락처", width: 150, cellStyle: {...AlignCenter, ...LineHeight50}},
+        {field: "pay_type_nm", headerName: "결제수단", width: 100, cellStyle: {...AlignCenter, ...LineHeight50},
             cellRenderer: (params) => params.value.replaceAll("무통장", "현금"),
         },
-        {field: "recv_amt", headerName: "결제금액", width: 170, type: "currencyType", cellStyle: {"font-size": "1.1rem", "font-weight": "700", ...LineHeight50},
+        {field: "recv_amt", headerName: "결제금액", width: 150, type: "currencyType", cellStyle: {"font-size": "1.1rem", "font-weight": "700", ...LineHeight50},
             cellRenderer: (params) => Comma(params.value) + "원",
         },
         {width: "auto"}

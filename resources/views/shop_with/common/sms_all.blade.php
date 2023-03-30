@@ -76,11 +76,7 @@
                             <div class="form-group">
                                 <label>매장회원적용</label>
                                 <div class="d-flex align-items-center">
-                                    <div class="form-inline inline_btn_box w-100 mr-2">
-                                        <input type='hidden' id="store_nm" name="store_nm">
-                                        <select id="store_no" name="store_no" class="form-control form-control-sm select2-store w-100"></select>
-                                        <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
+                                    <input type='text' style="width:100%; margin-right:8px;" class="form-control form-control-sm" value="{{@$user_store_nm}}" readonly>
                                     <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm store-member-btn" style="min-width: 80px;">회원적용</a>
                                 </div>
                             </div>
@@ -412,7 +408,7 @@ $('.add-msg-btn').click((e) => {
 $(".store-member-btn").on("click", async function(e) {
     e.preventDefault();
 
-    let store_cd = $("#store_no").val();
+    let store_cd = '{{@$user_store}}';
     if (store_cd == null) return;
 
     const { data: { code, data } } = await axios({ method: "get", url: "/shop/api/sms/search/member?store=" + store_cd });

@@ -569,7 +569,7 @@
 													</div>
 												</div>
 											</td>
-											<th>오픈 후 한달 재고보기 제외여부</th>
+											<th>오픈후한달 재고보기제외 여부</th>
 											<td>
 												<div class="form-inline form-radio-box">
 													@if ($cmd == "")

@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Conf;
 use Carbon\Carbon;
 use PDO;
@@ -168,7 +169,11 @@ class goods extends Controller
         $limit = " limit $startno, $page_size ";
 
         $sqls = '';
-        if ($store_cd != '') $sqls = $this->_store_sql($store_cd, $where, $orderby, $limit, $having);
+        if ($store_cd != '') {
+            $user_store = Auth('head')->user()->store_cd;
+            if ($user_store == $store_cd) $sqls = $this->_store_sql($store_cd, $where, $orderby, $limit, $having);
+            else return response()->json(['code' => 200, 'head' => [ 'total' => 0 ], 'body' => []]);
+        }
         else if ($storage_cd != '') $sqls = $this->_storage_sql($storage_cd, $where, $orderby, $limit, $having);
         else $sqls = $this->_normal_sql($where, $orderby, $limit);
 

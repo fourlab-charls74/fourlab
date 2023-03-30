@@ -54,22 +54,12 @@ class stk01Controller extends Controller
 		$ord_field = $request->input('ord_field','p.goods_no');
 		$orderby = sprintf("order by %s %s", $ord_field, $ord);
 
-		
-
-		$store_cds = $request->input('store_no') ?? [];
-		$store_where = "";
-		foreach ($store_cds as $key => $cd) {
-			if ($key === 0) {
-				$store_where .= "p.store_cd = '$cd'";
-			} else {
-				$store_where .= " or p.store_cd = '$cd'";
-			}
-		}
-		if (count($store_cds) < 1) {
-			$store_where = "1=1";
-		}
-
 		$where	= "";
+		$store_cds = $request->input('store_no') ?? [];
+		if (count($store_cds) > 0) {
+			$where .= " and p.store_cd in (" . join(',', array_map(function($s) { return "'$s'"; }, $store_cds)) . ")";
+		}
+
 		if ($store_type != "")	$where .= " and s.store_type = '" . $store_type . "' ";
         if ($ext_store_qty == 'true')
             $where .= " and (p.wqty != '' and p.wqty != '0')";
@@ -179,7 +169,7 @@ class stk01Controller extends Controller
 				left outer join `code` c on c.code_kind_cd = 'G_GOODS_STAT' and sale_stat_cl = c.code_id
 				left outer join `code` c2 on c2.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = c2.code_id 
 				left outer join brand b on b.brand = g.brand
-			where 1=1 $where and ($store_where)
+			where 1=1 $where
 			$orderby 
 			$limit
 		";
@@ -348,24 +338,16 @@ class stk01Controller extends Controller
 			$where = "";
 			if ($store_type != '') $where .= " and s.store_type = '$store_type' ";
 
-			$store_where = "";
-			foreach($store_cds as $key => $cd) {
-				if ($key === 0) {
-					$store_where .= "s.store_cd = '$cd'";
-				} else {
-					$store_where .= " or s.store_cd = '$cd'";
-				}
-			}
-			if (count($store_cds) < 1) {
-				$store_where = "1=1";
+			if (count($store_cds) > 0) {
+				$where .= " and s.store_cd in (" . join(',', array_map(function($s) { return "'$s'"; }, $store_cds)) . ")";
 			}
 			
 			$sql = "
 				select p.prd_cd, s.store_cd, s.store_nm, ifnull(p.qty, 0) as qty, ifnull(p.wqty, 0) as wqty
 				from store s
 					left outer join product_stock_store p on p.store_cd = s.store_cd and p.prd_cd = :prd_cd
-				where ($store_where) $where
-				order by p.wqty desc
+				where 1=1 $where
+				order by p.wqty desc, s.store_cd
 			";
 			$rows = DB::select($sql, ['prd_cd' => $prd_cd]);
 		}
@@ -389,119 +371,86 @@ class stk01Controller extends Controller
 		$prd_cd = $request->input('prd_cd', '');
 		$sdate = $request->input('sdate', date('Y-m-d'));
 		$edate = $request->input('edate', date('Y-m-d'));
-		$next_edate = date("Y-m-d", strtotime("+1 day", strtotime($edate)));
+		$next_edate = date("Ymd", strtotime("+1 day", strtotime($edate)));
 		$now_date = date('Ymd');
+        $sdate = str_replace("-", "", $sdate);
+        $edate = str_replace("-", "", $edate);
 		$store_type = $request->input('store_type', '');
 		$store_cds = $request->input('store_no', []);
 		
 		$rows = [];
-		if ($prd_cd != '') {
-			$where = " and p.prd_cd like '$prd_cd%' ";
-			if ($store_type) $where .= " and store.store_type = '$store_type' ";
+		$total_data = [];
 
-			// store_where
-			$store_where = "";
-			foreach($store_cds as $key => $cd) {
-				if ($key === 0) {
-					$store_where .= "p.store_cd = '$cd'";
-				} else {
-					$store_where .= " or p.store_cd = '$cd'";
-				}
-			}
-			if (count($store_cds) < 1) {
-				$store_where = "1=1";
-			}
+		if ($prd_cd == '') return response()->json([ 'code' => 500, 'head' => [ 'total' => 0 ], 'body' => $rows ]);
 
-			$sql = "
-				select 
-					p.store_cd, 
-					store.store_nm,
-					p.prd_cd, 
-					(p.wqty - sum(ifnull(_next.qty, 0)) - sum(ifnull(hst.qty, 0))) as prev_qty,
-					sum(ifnull(store_in.qty, 0)) as store_in_qty,
-					sum(ifnull(store_return.qty, 0)) * -1 as store_return_qty,
-					sum(ifnull(rt_in.qty, 0)) as rt_in_qty,
-					sum(ifnull(rt_out.qty, 0)) * -1 as rt_out_qty,
-					sum(ifnull(sale.qty, 0)) * -1 as sale_qty,
-					sum(ifnull(loss.qty, 0)) * -1 as loss_qty,
-					p.wqty - sum(ifnull(_next.qty, 0)) as term_qty,
-					p.qty as qty,
-					p.wqty as wqty
-				from product_stock_store p
-					inner join product_code pc on pc.prd_cd = p.prd_cd
-					inner join store on store.store_cd = p.store_cd
-					left outer join (
-						select idx, prd_cd, location_cd, type, qty, stock_state_date
-						from product_stock_hst
-						where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$sdate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= '$edate 23:59:59'
-					) hst on hst.location_cd = p.store_cd and hst.prd_cd = p.prd_cd
-					left outer join product_stock_hst store_in on store_in.idx = hst.idx and store_in.type = '1'
-					left outer join product_stock_hst store_return on store_return.idx = hst.idx and store_return.type = '11'
-					left outer join product_stock_hst rt_in on rt_in.idx = hst.idx and rt_in.type = '15' and rt_in.qty > 0
-					left outer join product_stock_hst rt_out on rt_out.idx = hst.idx and rt_out.type = '15' and rt_out.qty < 0
-					left outer join product_stock_hst sale on sale.idx = hst.idx and (sale.type = '2' or sale.type = '5' or sale.type = '6') -- 주문&교환&환불
-					left outer join product_stock_hst loss on loss.idx = hst.idx and loss.type = '14'
-					left outer join (
-						select idx, prd_cd, location_cd, type, qty, stock_state_date
-						from product_stock_hst
-						where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
-					) _next on _next.location_cd = p.store_cd and _next.prd_cd = p.prd_cd
-				where ($store_where) $where
-				group by p.store_cd, p.prd_cd
-				order by p.store_cd
-			";
-			$rows = DB::select($sql);
+		$where = " and ps.prd_cd = '$prd_cd' ";
+		if ($store_type) $where .= " and s.store_type = '$store_type' ";
 
-			$sql = "
-				select
-					sum(prev_qty) as prev_qty,
-					sum(store_in_qty) as store_in_qty,
-					sum(store_return_qty) as store_return_qty,
-					sum(rt_in_qty) as rt_in_qty,
-					sum(rt_out_qty) as rt_out_qty,
-					sum(sale_qty) as sale_qty,
-					sum(loss_qty) as loss_qty,
-					sum(term_qty) as term_qty
-				from (
-					select 
-						p.store_cd, 
-						store.store_nm,
-						p.prd_cd, 
-						(p.wqty - sum(ifnull(_next.qty, 0)) - sum(ifnull(hst.qty, 0))) as prev_qty,
-						sum(ifnull(store_in.qty, 0)) as store_in_qty,
-						sum(ifnull(store_return.qty, 0)) * -1 as store_return_qty,
-						sum(ifnull(rt_in.qty, 0)) as rt_in_qty,
-						sum(ifnull(rt_out.qty, 0)) * -1 as rt_out_qty,
-						sum(ifnull(sale.qty, 0)) * -1 as sale_qty,
-						sum(ifnull(loss.qty, 0)) * -1 as loss_qty,
-						p.wqty - sum(ifnull(_next.qty, 0)) as term_qty,
-						p.wqty as current_qty
-					from product_stock_store p
-						inner join product_code pc on pc.prd_cd = p.prd_cd
-						inner join store on store.store_cd = p.store_cd
-						left outer join (
-							select idx, prd_cd, location_cd, type, qty, stock_state_date
-							from product_stock_hst
-							where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$sdate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= '$edate 23:59:59'
-						) hst on hst.location_cd = p.store_cd and hst.prd_cd = p.prd_cd
-						left outer join product_stock_hst store_in on store_in.idx = hst.idx and store_in.type = '1'
-						left outer join product_stock_hst store_return on store_return.idx = hst.idx and store_return.type = '11'
-						left outer join product_stock_hst rt_in on rt_in.idx = hst.idx and rt_in.type = '15' and rt_in.qty > 0
-						left outer join product_stock_hst rt_out on rt_out.idx = hst.idx and rt_out.type = '15' and rt_out.qty < 0
-						left outer join product_stock_hst sale on sale.idx = hst.idx and (sale.type = '2' or sale.type = '5' or sale.type = '6') -- 주문&교환&환불
-						left outer join product_stock_hst loss on loss.idx = hst.idx and loss.type = '14'
-						left outer join (
-							select idx, prd_cd, location_cd, type, qty, stock_state_date
-							from product_stock_hst
-							where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
-						) _next on _next.location_cd = p.store_cd and _next.prd_cd = p.prd_cd
-					where ($store_where) $where
-					group by p.store_cd, p.prd_cd
-					order by p.store_cd
-				) c
-			";
-			$total_data = DB::selectOne($sql);
+		if (count($store_cds) > 0) {
+			$where .= " and ps.store_cd in (" . join(',', array_map(function($s) { return "'$s'"; }, $store_cds)) . ")";
 		}
+
+		$sql = "
+			select ps.store_cd, s.store_nm, ps.prd_cd, ps.qty, ps.wqty               
+				, sum(if(hst.type = 1, ifnull(hst.qty, 0), 0)) as store_in_qty -- 매장입고
+				, sum(if(hst.type = 11, ifnull(hst.qty, 0), 0)) as store_return_qty -- 매장반품
+				, sum(if(hst.type = 15 and hst.qty > 0, ifnull(hst.qty, 0), 0)) as rt_in_qty -- 이동입고
+				, sum(if(hst.type = 15 and hst.qty < 0, ifnull(hst.qty, 0), 0)) as rt_out_qty -- 이동출고
+				, sum(if(hst.type = 14, ifnull(hst.qty, 0), 0)) as loss_qty -- LOSS
+				, ifnull(w.qty, 0) as sale_qty -- 판매재고
+				, (ps.wqty 
+					- sum(if(_next.type in (1, 11, 14, 15), ifnull(_next.qty, 0), 0)) 
+					- ifnull(w_next.qty, 0)
+				) as term_qty -- 기간재고
+				, (ps.wqty 
+					- sum(if(_next.type in (1, 11, 14, 15), ifnull(_next.qty, 0), 0)) 
+					- ifnull(w_next.qty, 0)
+					- sum(if(hst.type in (1, 11, 14, 15), ifnull(hst.qty, 0), 0)) 
+					- ifnull(w.qty, 0)
+				) as prev_qty -- 이전재고
+			from product_stock_store ps
+				inner join store s on s.store_cd = ps.store_cd
+				left outer join (		
+					select prd_cd, location_cd, type, qty
+					from product_stock_hst
+					where stock_state_date >= '$sdate' and stock_state_date <= '$edate' and location_type = 'STORE'
+				) hst on hst.prd_cd = ps.prd_cd and hst.location_cd = ps.store_cd
+				left outer join (		
+					select prd_cd, location_cd, type, qty
+					from product_stock_hst
+					where stock_state_date >= '$next_edate' and stock_state_date <= '$now_date' and location_type = 'STORE'
+				) _next on _next.prd_cd = ps.prd_cd and _next.location_cd = ps.store_cd
+				left outer join (
+					select prd_cd, store_cd, sum(qty * if(ord_state = 30, -1, 1)) as qty
+					from order_opt_wonga
+					where ord_state_date >= '$sdate' and ord_state_date <= '$edate' and ord_state in (30,60,61)
+					group by prd_cd, store_cd
+				) w on w.prd_cd = ps.prd_cd and w.store_cd = ps.store_cd
+				left outer join (
+					select prd_cd, store_cd, sum(qty * if(ord_state = 30, -1, 1)) as qty
+					from order_opt_wonga
+					where ord_state_date >= '$next_edate' and ord_state_date <= '$now_date' and ord_state in (30,60,61)
+					group by prd_cd, store_cd
+				) w_next on w_next.prd_cd = ps.prd_cd and w_next.store_cd = ps.store_cd
+			where 1=1 $where
+			group by ps.store_cd, ps.prd_cd
+			order by ps.store_cd
+		";
+		$rows = DB::select($sql);
+
+		$sql = "
+			select
+				sum(prev_qty) as prev_qty,
+				sum(store_in_qty) as store_in_qty,
+				sum(store_return_qty) as store_return_qty,
+				sum(rt_in_qty) as rt_in_qty,
+				sum(rt_out_qty) as rt_out_qty,
+				sum(sale_qty) as sale_qty,
+				sum(loss_qty) as loss_qty,
+				sum(term_qty) as term_qty
+			from ( $sql ) a
+		";
+		$total_data = DB::selectOne($sql);
 
 		return response()->json([
 			'code' => 200,

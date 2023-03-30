@@ -95,6 +95,10 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         
         //행사코드검색
         Route::get('sale/search_prcode', 'goods@search_prcode');
+
+        //주문선택
+        Route::get('order', 'OrderController@index');
+        Route::get('order/search', 'OrderController@search');
     });
 
     // 포스
@@ -103,6 +107,7 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         Route::get('search/{cmd?}', 'PosController@search_command');
         Route::get('check-phone', 'PosController@check_phone');
         Route::post('save', 'PosController@save');
+        Route::post('complete-reservation', 'PosController@complete_reservation');
         Route::post('add-member', 'PosController@add_member');
         Route::post('add-coupon', 'PosController@add_coupon');
         Route::delete('remove-waiting', 'PosController@remove_waiting');
@@ -200,6 +205,7 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
 
         
         Route::get('prd01/{no}', 'prd01Controller@show');
+        Route::get('prd01/{no}/get', 'prd01Controller@get');
        
 
 
@@ -505,6 +511,7 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         // 매장주문
         Route::get('ord01', 'ord01Controller@index');
         Route::get('ord01/search', 'ord01Controller@search');
+        Route::get('ord01/search2/{cmd}', 'ord01Controller@search2');
         Route::delete('ord01', 'ord01Controller@del_order'); // 출고 전 주문삭제
         Route::get('ord01/create', 'ord01Controller@create');
         Route::get('ord01/view', 'ord01Controller@view');
@@ -515,6 +522,7 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         Route::get('ord01/order/{ord_no}/{ord_opt_no?}', 'ord01Controller@show'); // 매장주문 상세
         Route::post('ord01/order/store_refund', 'ord01Controller@store_refund_save'); // 매장환불처리
         Route::get('ord01/refund/{ord_no}/{ord_opt_no?}', 'ord01Controller@refund');
+        Route::post('ord01/complete-reservation', 'ord01Controller@complete_reservation'); // 예약판매상품 지급처리
 
         Route::get('ord01/receipt/{ord_no}', 'ord01Controller@receipt');
         Route::get('ord01/dlv/{ord_no}/{ord_opt_no}', 'ord01Controller@dlv');
@@ -564,6 +572,8 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         Route::get('mem01/check-id/{id}', 'mem01Controller@check_id');
         Route::post('mem01/upload',	'mem01Controller@upload');
         Route::put('mem01/batch', 'mem01Controller@update');
+        Route::get('mem01/{user_id}/get', 'mem01Controller@get');
+
     });
 
     // 영업관리

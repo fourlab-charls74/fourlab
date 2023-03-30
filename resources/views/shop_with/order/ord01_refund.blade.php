@@ -1008,6 +1008,8 @@ $('.save-btn').click(function(e){
 		}
 	}
 
+	console.log(ff["prds"]);
+
 	if( ff["prds"].length )
 	{
 		var opts  = ff["prds"];

@@ -1339,7 +1339,7 @@ class ord01Controller extends Controller
 
 		if($ord_no != "")		$where .= " and a.ord_no = '$ord_no' ";
 		if($user_nm != "")	    $where .= " and b.user_nm = '$user_nm' ";
-		if($r_nm != "")		    $where .= " and b.r_nm = '$r_nm' ";
+		if($r_nm != "")		    $where .= " and b.r_nm like '%$r_nm%' ";
 		if($user_id != "")	    $where .= " and b.user_id = '$user_id' ";
 		if($pay_nm != "")		$where .= " and d.pay_nm like '$pay_nm%' ";
 
@@ -1472,8 +1472,15 @@ class ord01Controller extends Controller
 				select
 					count(*) total
 				from order_opt a
-					inner join order_mst b on a.ord_no = b.ord_no
-					inner join goods c on a.goods_no = c.goods_no and a.goods_sub = c.goods_sub $insql
+                inner join order_mst b on a.ord_no = b.ord_no
+                inner join goods c on a.goods_no = c.goods_no and a.goods_sub = c.goods_sub $insql
+                left outer join payment d on b.ord_no = d.ord_no
+                left outer join coupon f on ( a.coupon_no = f.coupon_no )
+                left outer join company e on a.sale_place = e.com_id and e.com_type = '4'
+                left outer join company i on a.com_id = i.com_id
+                left outer join claim g on g.ord_opt_no = a.ord_opt_no
+                left outer join order_opt_memo h on a.ord_opt_no = h.ord_opt_no
+                left outer join order_track ot on a.ord_no = ot.ord_no
 				where 1=1 $where
 			";
 
@@ -1698,10 +1705,12 @@ class ord01Controller extends Controller
 			select
 				d.goods_nm, replace(a.goods_opt, '^', ' : ') as opt_val
 				, a.qty, a.ord_type, ord_type.code_val ord_type_nm, a.ord_kind
-				, a.price, c.wonga, f.code_val, a.dlv_no,  b.upd_date, a.ord_state
+				, a.price
+                -- , c.wonga
+                , f.code_val, a.dlv_no,  b.upd_date, a.ord_state
 			from order_opt a
 				inner join order_mst b on a.ord_no = b.ord_no
-				inner join order_opt_wonga c on a.ord_opt_no = c.ord_opt_no
+				-- inner join order_opt_wonga c on a.ord_opt_no = c.ord_opt_no
 				inner join goods d on a.goods_no = d.goods_no and a.goods_sub = d.goods_sub
 				left outer join code f on a.dlv_cd = f.code_id and f.code_kind_cd = 'DELIVERY'
 				left outer join code ord_type on (a.ord_type = ord_type.code_id and ord_type.code_kind_cd = 'G_ORD_TYPE')
@@ -1710,7 +1719,7 @@ class ord01Controller extends Controller
 
         $row = DB::selectOne($sql);
 		$row->price	= Lib::cm($row->price);
-		$row->wonga	= Lib::cm($row->wonga);
+		// $row->wonga	= Lib::cm($row->wonga);
 
 		// 판매 구분
 		$sql	= " select code_id id, code_val val from code where code_kind_cd = 'G_ORD_KIND' and code_id <> 'K' ";

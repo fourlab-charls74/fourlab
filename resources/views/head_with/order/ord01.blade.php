@@ -805,15 +805,32 @@
             return;
         }
 
-        if(this.value) {
-            if (confirm('자동검색 하시겠습니까?') === false) {
+        console.log(this.value);
+
+        if (this.value == 1) {
+            if(!confirm('자동검색 하시겠습니까?')) {
                 this.value = 0;
                 return;
+            } else {
+                this.value = 1;
+                autoSearchFnc = setTimeout(autoSearch, loadTime * ONE_SECOND);
             }
-            autoSearchFnc = setTimeout(autoSearch, loadTime * ONE_SECOND);
-        } else if (confirm('자동검색을 그만하시겠습니까?') === false) {
-            this.value = 1;
+        } else {
+            if(!confirm('수동검색 하시겠습니까?')) {
+                this.value = 1;
+                autoSearchFnc = setTimeout(autoSearch, loadTime * ONE_SECOND);
+            }
         }
+
+        // if(this.value) {
+        //     if (!confirm('자동검색 하시겠습니까?')) {
+        //         this.value = 0;
+        //         return;
+        //     }
+        //     autoSearchFnc = setTimeout(autoSearch, loadTime * ONE_SECOND);
+        // } else if (confirm('자동검색을 그만하시겠습니까?') === false) {
+        //     this.value = 1;
+        // }
     });
 
     $('#load-time').change(function(e){

@@ -527,6 +527,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('ord01/order/{ord_no}/{ord_opt_no?}', 'ord01Controller@show'); // 매장주문 상세
         Route::post('ord01/order/store_refund', 'ord01Controller@store_refund_save'); // 매장환불처리
         Route::get('ord01/refund/{ord_no}/{ord_opt_no?}', 'ord01Controller@refund');
+        Route::post('ord01/complete-reservation', 'ord01Controller@complete_reservation'); // 예약판매상품 지급처리
 
         // 온라인 주문접수
         Route::get('ord02','ord02Controller@index');
