@@ -16,6 +16,7 @@
                 <div>
                     <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                     <a href="/store/standard/std11/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
+                    <a href="#" onclick="openReceipt()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 등록</a>
 		            <a href="#" onclick="formReset()" class="btn btn-sm btn-outline-primary shadow-sm">검색조건 초기화</a>
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
@@ -102,19 +103,6 @@
                                     @foreach ($items as $item)
                                         <option value="{{ $item->cd }}">{{ $item->val }}</option>
                                     @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="as_type">수선구분</label>
-                            <div class="flex_box">
-                                <select id="as_type" name="as_type" class="form-control form-control-sm">
-                                    <option value="">전체</option>
-                                    <option value="C">고객수선</option>
-                                    <option value="S">매장수선</option>
-                                    <option value="H">본사수선</option>
                                 </select>
                             </div>
                         </div>
@@ -234,20 +222,20 @@
         { field: "as_state_nm", headerName: "진행상태", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left'},
         { field: "customer_no", headerName: "고객아이디", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
         { field: "customer", headerName: "고객명", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
-        { field: "as_type", headerName: "수선구분", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left',
-            cellRenderer: (params) => {
-                switch (params.value) {
-                    case "C": 
-                        return "고객수선";
-                    case "S": 
-                        return "매장수선";
-                    case "H": 
-                        return "본사수선";
-                    default:
-                        return params.value;
-                };
-            }
-        },
+        // { field: "as_type", headerName: "수선구분", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left',
+        //     cellRenderer: (params) => {
+        //         switch (params.value) {
+        //             case "C": 
+        //                 return "고객수선";
+        //             case "S": 
+        //                 return "매장수선";
+        //             case "H": 
+        //                 return "본사수선";
+        //             default:
+        //                 return params.value;
+        //         };
+        //     }
+        // },
         { field: "sale_date", headerName: "판매일자", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
         { field: "h_receipt_date", headerName: "본사접수일", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
         { field: "start_date", headerName: "수선인도일", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
@@ -322,9 +310,9 @@
         { field: "content", headerName: "수선내용", width: 180, cellStyle: DEFAULT_STYLE },
         { field: "h_explain", headerName: "본사설명", width: 180, cellStyle: DEFAULT_STYLE },
         { field: "storing_cd", headerName: "입고처코드", width: 100, cellStyle: DEFAULT_STYLE },
-        { field: "storing_nm", headerName: "입고처명", width: 100, cellStyle: DEFAULT_STYLE },
-        { field: "as_cd", headerName: "수선처코드", width: 100, cellStyle: DEFAULT_STYLE },
-        { field: "as_place", headerName: "수선처명", width: 100, cellStyle: DEFAULT_STYLE },
+        // { field: "storing_nm", headerName: "입고처명", width: 100, cellStyle: DEFAULT_STYLE },
+        // { field: "as_cd", headerName: "수선처코드", width: 100, cellStyle: DEFAULT_STYLE },
+        // { field: "as_place", headerName: "수선처명", width: 100, cellStyle: DEFAULT_STYLE },
         { field: "", width: "auto" }
     ];
 
@@ -405,6 +393,13 @@
             }
         }
     };
+
+    function openReceipt() {
+        const url = '/store/standard/std11/view/';
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=880");
+    }
+
+
 
 </script>
 

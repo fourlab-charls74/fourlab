@@ -503,7 +503,7 @@ SearchPrdcd.prototype.Open = async function(callback = null, match = false, prd_
         this.callback = callback;
 
         if (this.isMatch == false) {
-            $("input:radio[name='match_yn']:radio[value='A']").prop('checked', true); 
+            $("input:radio[name='match_yn']:radio[value='Y']").prop('checked', true); 
         }
     }
     $('#SearchPrdcdModal').modal({
@@ -650,11 +650,16 @@ SearchPrdcd.prototype.Choice = function() {
     } else {
         let rows = this.grid.getSelectedRows();
         if(rows.length < 1) return alert("항목을 선택해주세요.");
+        if(rows.length > 1) return alert("항목을 한 개만 선택해주세요.");
         
         if($('#prd_cd').length > 0){
             $('#prd_cd').val(rows.map(r => r.prd_cd).join(","));
         }
-    }
+
+        $('#goods_nm').val(rows.map(r => r.goods_nm));
+        $('#color').val(rows.map(r => r.color));
+        $('#size').val(rows.map(r => r.size));
+    } 
 
     document.search_prdcd.reset();
     this.grid.setRows([]);

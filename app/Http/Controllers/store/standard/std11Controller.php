@@ -34,6 +34,34 @@ class std11Controller extends Controller
 		return view(Config::get('shop.store.view') . '/standard/std11', $values);
 	}
 
+	public function view()
+	{
+        $mutable = now();
+        $sdate = $mutable->sub(1, 'day')->format('Y-m-d');
+		$items = SLib::getItems();
+        $com_types = SLib::getCodes("G_COM_TYPE");
+		$as_states = SLib::getCodes("AS_STATE");
+
+		//컬러
+		$color_sql = "select code_id, code_val from code where code_kind_cd = 'prd_cd_color' order by code_id asc ";
+		$colors = DB::select($color_sql);
+		
+		//사이즈
+		$size_sql = "select code_id, code_val, code_val2 from code where code_kind_cd = 'prd_cd_size_match' order by code_id asc ";
+		$sizes = DB::select($size_sql);
+
+		$values = [
+            'sdate' 	=> $sdate,
+            'edate' 	=> date("Y-m-d"),
+			'items' 	=> $items,
+		    'com_types' => $com_types,
+		    'as_states' => $as_states,
+			'colors'	=> $colors,
+			'sizes'		=> $sizes
+        ];
+		return view(Config::get('shop.store.view') . '/standard/std11_view', $values);
+	}
+
 	public function search(Request $request)
 	{
 		$date_type = $request->input('date_type', "receipt_date");

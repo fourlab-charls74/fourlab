@@ -167,6 +167,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
         Route::get('std11/create', 'std11Controller@showCreate');
         Route::post('std11/create', 'std11Controller@create');
+        Route::get('std11/view', 'std11Controller@view');
 
         Route::get('std11/detail/{idx?}', 'std11Controller@showDetail');
         Route::post('std11/edit', 'std11Controller@edit');
