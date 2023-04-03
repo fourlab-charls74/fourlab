@@ -1145,13 +1145,13 @@
         // sms 발송
         $('.sms-send-btn').click(function(e){
             e.preventDefault();
-            openSmsSend(mobile, name);
+            openShopSmsSend(mobile, name);
         });
 
         //sms 목록
         $('.sms-list-btn').click(function(e){
             e.preventDefault();
-            openSmsList(mobile, name);
+            openShopSmsList(mobile, name);
         });
 
         //crm 쿠폰

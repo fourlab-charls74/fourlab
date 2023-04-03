@@ -154,7 +154,7 @@
                     <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                 </div>
                 <div class="fr_box">
-                    <form method="get" name="batch">
+                    <!-- <form method="get" name="batch">
                         <div class="flex_box">
                             <span class="mr-2">
                                 <select name="edit_date_type" class="form-control form-control-sm" style="min-width: 100px;">
@@ -177,7 +177,9 @@
                             </span>
                             <a href="#" onclick="return batchEdit();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>일괄수정</a>
                         </div>
-                    </form>
+                    </form> -->
+
+                    
                 </div>
             </div>
         </div>
@@ -213,107 +215,57 @@
         { field: "idx", headerName: '접수번호', width:100, pinned:'left', maxWidth: 100, cellRenderer: 'loadingRenderer', 
             cellStyle: { ...DEFAULT_STYLE, 'font-size': '13px', 'font-weight': 500 },
             cellRenderer: (params) => {
-                return `<a href="/store/standard/std11/detail/${params.value}" style="text-decoration: underline !important">${params.value}</a>`
+                return `<a href="#" onclick="openReceiptDetail(${params.value})" style="text-decoration: underline !important">${params.value}</a>`
             },
             pinned: 'left'
         },
         { field: "receipt_date", headerName: "접수일자", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
-        { field: "as_state", headerName: "진행상태", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left', hide:true},
-        { field: "as_state_nm", headerName: "진행상태", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left'},
-        { field: "customer_no", headerName: "고객아이디", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
-        { field: "customer", headerName: "고객명", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
-        // { field: "as_type", headerName: "수선구분", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left',
-        //     cellRenderer: (params) => {
-        //         switch (params.value) {
-        //             case "C": 
-        //                 return "고객수선";
-        //             case "S": 
-        //                 return "매장수선";
-        //             case "H": 
-        //                 return "본사수선";
-        //             default:
-        //                 return params.value;
-        //         };
-        //     }
-        // },
-        { field: "sale_date", headerName: "판매일자", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
-        { field: "h_receipt_date", headerName: "본사접수일", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
-        { field: "start_date", headerName: "수선인도일", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
-        { field: "due_date", headerName: "수선예정일", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
-        { field: "end_date", headerName: "수선완료일", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
-        { field: "receipt_no", headerName: "접수번호", width: 100, cellStyle: DEFAULT_STYLE },
-        { field: "store_no", headerName: "매장번호", width: 100, cellStyle: DEFAULT_STYLE },
-        { field: "store_nm", headerName: "매장명", width: 100, cellStyle: DEFAULT_STYLE },
-        { field: "as_check_state", headerName: "검수상태", width: 100, cellStyle: DEFAULT_STYLE,
+        { field: "as_state", headerName: "수선상태", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' ,
             cellRenderer: (params) => {
                 switch (params.value) {
-                    case "W": 
-                        return "대기";
-                    case "N": 
-                        return "정상";
-                    case "F": 
+                    case 10:
+                        return "수선요청";
+                    case 20:
+                        return "수선접수";
+                    case 30:
+                        return "수선진행";
+                    case 40:
+                        return "수선완료";
+                }
+            }
+        },
+        { field: "store_cd", headerName: "접수매장", width: 80, cellStyle: DEFAULT_STYLE, pinned: 'left' },
+        { field: "as_type", headerName: "접수구분", width: 80, cellStyle: DEFAULT_STYLE, pinned: 'left',
+            cellRenderer: (params) => {
+                switch (params.value) {
+                    case "1": 
+                        return "A/S";
+                    case "2": 
                         return "불량";
+                    case "3": 
+                        return "본사심의";
                     default:
                         return params.value;
                 };
             }
         },
-        { field: "item", headerName: "수선품목", width: 100, cellStyle: DEFAULT_STYLE,
-            cellRenderer: (params) => {
-                switch (params.value) {
-                    case "bag": 
-                        return "가방";
-                    case "books": 
-                        return "도서";
-                    case "stove": 
-                        return "스토브";
-                    case "shoes": 
-                        return "신발";
-                    case "accessory": 
-                        return "악세사리";
-                    case "clothes": 
-                        return "의류";
-                    case "cooker":
-                        return "조리기구";
-                    case "kanken":
-                        return "칸켄백";
-                    case "bottle":
-                        return "텀블러";
-                    default:
-                        return params.value;
-                };
-            }
-        },
-        { field: "product_cd", headerName: "제품코드", width: 100, cellStyle: DEFAULT_STYLE },
-        { field: "product", headerName: "제품명", width: 150, cellStyle: DEFAULT_STYLE },
-        { field: "color", headerName: "칼라", width: 80, cellStyle: DEFAULT_STYLE },
-        { field: "size", headerName: "사이즈", width: 80, cellStyle: DEFAULT_STYLE },
-        { field: "quantity", headerName: "수량", width: 80, cellStyle: DEFAULT_STYLE },
-        { field: "is_free", headerName: "수선유료구분", width: 100, cellStyle: DEFAULT_STYLE,
-            cellRenderer: (params) => {
-                switch (params.value) {
-                    case "Y": 
-                        return "유료";
-                    case "N": 
-                        return "무료";
-                    default:
-                        return params.value;
-                };
-            }
-        },
-        { field: "charged_price", headerName: "유료수선금액", width: 100, type: 'currencyType' },
-        { field: "free_price", headerName: "무료수선금액", width: 100, type: 'currencyType' },
-        { field: "mobile", headerName: "핸드폰", width: 100, cellStyle: DEFAULT_STYLE },
-        { field: "zipcode", headerName: "우편번호", width: 80, cellStyle: DEFAULT_STYLE },
-        { field: "addr1", headerName: "주소1", width: 150, cellStyle: DEFAULT_STYLE },
-        { field: "addr2", headerName: "주소2", width: 150, cellStyle: DEFAULT_STYLE },
-        { field: "content", headerName: "수선내용", width: 180, cellStyle: DEFAULT_STYLE },
-        { field: "h_explain", headerName: "본사설명", width: 180, cellStyle: DEFAULT_STYLE },
-        { field: "storing_cd", headerName: "입고처코드", width: 100, cellStyle: DEFAULT_STYLE },
-        // { field: "storing_nm", headerName: "입고처명", width: 100, cellStyle: DEFAULT_STYLE },
-        // { field: "as_cd", headerName: "수선처코드", width: 100, cellStyle: DEFAULT_STYLE },
-        // { field: "as_place", headerName: "수선처명", width: 100, cellStyle: DEFAULT_STYLE },
-        { field: "", width: "auto" }
+        { field: "customer_no", headerName: "고객 아이디", width: 100, cellStyle: DEFAULT_STYLE, },
+        { field: "customer", headerName: "고객명", width: 100, cellStyle: DEFAULT_STYLE, },
+        { field: "mobile", headerName: "핸드폰번호", width: 100, cellStyle: DEFAULT_STYLE,  },
+        { field: "zipcode", headerName: "우편번호", width: 80, cellStyle: DEFAULT_STYLE,  },
+        { field: "addr1", headerName: "주소", width: 200, cellStyle: DEFAULT_STYLE,  },
+        { field: "addr2", headerName: "상세주소", width: 100, cellStyle: DEFAULT_STYLE, },
+        { field: "prd_cd", headerName: "바코드", width: 120, cellStyle: DEFAULT_STYLE, },
+        { field: "goods_nm", headerName: "상품명", width: 300, cellStyle: DEFAULT_STYLE,  },
+        { field: "color", headerName: "컬러", width: 60, cellStyle: DEFAULT_STYLE,  },
+        { field: "size", headerName: "사이즈", width: 60, cellStyle: DEFAULT_STYLE, },
+        { field: "qty", headerName: "수량", width: 60, cellStyle: DEFAULT_STYLE, },
+        { field: "is_free", headerName: "수선 유료구분", width: 100, cellStyle: DEFAULT_STYLE, },
+        { field: "as_amt", headerName: "수선 금액", width: 80, cellStyle: {'text-align' : 'right'} },
+        { field: "content", headerName: "수선내용", width: 300, cellStyle: DEFAULT_STYLE, },
+        { field: "rt", headerName: "등록일", width: 200, cellStyle: DEFAULT_STYLE, },
+        { field: "ut", headerName: "수정일", width: 200, cellStyle: DEFAULT_STYLE, },
+        
     ];
 
 </script>
@@ -396,6 +348,12 @@
 
     function openReceipt() {
         const url = '/store/standard/std11/view/';
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=880");
+    }
+
+
+    function openReceiptDetail(idx) {
+        const url = '/store/standard/std11/detail/' + idx;
         window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=880");
     }
 

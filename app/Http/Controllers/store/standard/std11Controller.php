@@ -77,21 +77,41 @@ class std11Controller extends Controller
 		$where2 = $request->input('where2', "");
 
 		$where = "";
-		if ($sdate) $where .= " and a.${date_type} >= '${sdate}'";
-		if ($edate) $where .= " and a.${date_type} < date_add('${edate}', interval 1 day)";
-		if ($store_no != "") $where .= " and a.store_no like '%" . Lib::quote($store_no) . "%'";
-		if ($store_nm != "") $where .= " and a.store_nm like '%" . Lib::quote($store_nm) . "%'";
-		if ($item != "") $where .= " and a.item like '%" . Lib::quote($item) . "%'";
-		if ($as_type != "") $where .= "and a.as_type = '" . Lib::quote($as_type) . "'";
-		if ($as_state != "") $where .= "and a.as_state = '" . Lib::quote($as_state) . "'";
-		if ($as_check_state != "") $where .= "and a.as_check_state = '" . Lib::quote($as_check_state) . "'";
-		if ($where1 != "") $where .= " and a.${where1} like '%" . Lib::quote($where2) . "%'";
+		// if ($sdate) $where .= " and a.${date_type} >= '${sdate}'";
+		// if ($edate) $where .= " and a.${date_type} < date_add('${edate}', interval 1 day)";
+		// if ($store_no != "") $where .= " and a.store_no like '%" . Lib::quote($store_no) . "%'";
+		// if ($store_nm != "") $where .= " and a.store_nm like '%" . Lib::quote($store_nm) . "%'";
+		// if ($item != "") $where .= " and a.item like '%" . Lib::quote($item) . "%'";
+		// if ($as_type != "") $where .= "and a.as_type = '" . Lib::quote($as_type) . "'";
+		// if ($as_state != "") $where .= "and a.as_state = '" . Lib::quote($as_state) . "'";
+		// if ($as_check_state != "") $where .= "and a.as_check_state = '" . Lib::quote($as_check_state) . "'";
+		// if ($where1 != "") $where .= " and a.${where1} like '%" . Lib::quote($where2) . "%'";
 
 		$query = /** @lang text */
             "select
-				a.*, c.code_val as as_state_nm
-			from after_service as `a`
-				left outer join code c on c.code_kind_cd = 'AS_STATE' and c.code_id = a.as_state
+				idx
+				, receipt_date
+				, as_state
+				, store_cd
+				, as_type
+				, customer_no
+				, customer
+				, mobile
+				, zipcode
+				, addr1
+				, addr2
+				, prd_cd
+				, goods_nm
+				, color
+				, size
+				, qty
+				, is_free
+				, as_amt
+				, content
+				, rt
+				, ut
+
+			from after_service2
 			where 1=1 $where
         ";
 
@@ -127,19 +147,31 @@ class std11Controller extends Controller
 
 	public function showDetail($idx = "")
 	{
-		$row = DB::table(self::T)->where("idx", "=", $idx)->first();
+		$row = DB::table('after_service2')->where("idx", "=", $idx)->first();
 		$mobile = $row->mobile;
 		$items = SLib::getItems();
 		if ($mobile != "") $row->mobile = explode("-", $mobile);
 		$as_states = SLib::getCodes("AS_STATE");
+		//컬러
+		$color_sql = "select code_id, code_val from code where code_kind_cd = 'prd_cd_color' order by code_id asc ";
+		$colors = DB::select($color_sql);
+
+		//사이즈
+		$size_sql = "select code_id, code_val, code_val2 from code where code_kind_cd = 'prd_cd_size_match' order by code_id asc ";
+		$sizes = DB::select($size_sql);
+
+
 		$values = [ 
 			'type' => 'detail',
 			'idx' => $idx,
 			'items' => $items,
 			'row' => $row,
-			'as_states' => $as_states
+			'store' => DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', '=', $row->store_cd)->first(),
+			'as_states' => $as_states,
+			'colors'	=> $colors,
+			'sizes'		=> $sizes
 		];
-		return view(Config::get('shop.store.view') . '/standard/std11_show', $values);
+		return view(Config::get('shop.store.view') . '/standard/std11_detail', $values);
 	}
 
 	public function create(Request $request)
@@ -303,5 +335,81 @@ class std11Controller extends Controller
 			// dd($e);
 			return response()->json(['code'	=> '500']);
 		}
+	}
+
+	public function save(Request $request) {
+
+		$data = $request->all();
+
+		$mobile = $data['mobile'][0].'-'.$data['mobile'][1].'-'.$data['mobile'][2];
+
+		try {
+			DB::beginTransaction();
+
+			DB::table('after_service2')
+				->insert([
+					'receipt_date' => $data['edate'],
+					'as_state' => 10,
+					'store_cd' => $data['store_no'],
+					'as_type' => $data['as_type'],
+					'customer_no' => $data['customer_no'],
+					'customer' => $data['customer'],
+					'mobile' => $mobile,
+					'zipcode' => $data['zipcode'],
+					'addr1' => $data['addr1'],
+					'addr2' => $data['addr2'],
+					'prd_cd' => $data['prd_cd'],
+					'goods_nm' => $data['goods_nm'],
+					'color' => $data['color'],
+					'size' => $data['size'],
+					'qty' => $data['qty'],
+					'is_free' => $data['is_free'],
+					'as_amt' => $data['as_amt']??'',
+					'content' => $data['content']??'',
+					'rt' => now(),
+					'ut' => now()
+				]);
+
+			DB::commit();
+			$code = 200;
+			$msg = "수선등록이 완료되었습니다.";
+
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg]);
+
+	}
+
+	public function change_state(Request $request) {
+
+		$data = $request->all();
+		$idx = $request->input('idx');
+
+		dd($data);
+
+		
+		try {
+			DB::beginTransaction();
+
+			
+
+			DB::commit();
+			$code = 200;
+			$msg = "수선등록이 완료되었습니다.";
+
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg]);
+
+
+
 	}
 }

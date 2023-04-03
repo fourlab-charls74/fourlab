@@ -164,10 +164,11 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('std11', 'std11Controller@index');
         Route::get('std11/search', 'std11Controller@search');
         Route::post('std11/batch-edit', 'std11Controller@batchEdit');
-
+        Route::post('std11/repair-info-save', 'std11Controller@save');
+        Route::post('std11/change_state', 'std11Controller@change_state');
         Route::get('std11/create', 'std11Controller@showCreate');
         Route::post('std11/create', 'std11Controller@create');
-        Route::get('std11/view', 'std11Controller@view');
+        Route::get('std11/view/{idx?}', 'std11Controller@view');
 
         Route::get('std11/detail/{idx?}', 'std11Controller@showDetail');
         Route::post('std11/edit', 'std11Controller@edit');
