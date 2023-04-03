@@ -112,20 +112,35 @@
                 </div>
                 <div class="row">
                     <div class="col-lg-4 inner-td">
-							<div class="form-group">
-							<label for="formrow-email-input">조회 기준</label>
-								<div class="form-inline form-radio-box">
-									<div class="custom-control custom-radio">
-										<input type="radio" name="best_worst" value="B" id="best" class="custom-control-input" checked>
-										<label class="custom-control-label" for="best">Best</label>
-									</div>
-									<div class="custom-control custom-radio">
-										<input type="radio" name="best_worst" value="W" id="worst" class="custom-control-input">
-										<label class="custom-control-label" for="worst">Worst</label>
-									</div>
-								</div>
-							</div>
-						</div>
+                        <div class="form-group">
+                        <label for="formrow-email-input">조회 기준</label>
+                            <div class="form-inline form-radio-box">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="best_worst" value="B" id="best" class="custom-control-input" checked>
+                                    <label class="custom-control-label" for="best">Best</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="best_worst" value="W" id="worst" class="custom-control-input">
+                                    <label class="custom-control-label" for="worst">Worst</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                        <label for="formrow-email-input">보기</label>
+                            <div class="form-inline form-radio-box">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="group_type_condition" value="color_and_size" id="color_and_size" class="custom-control-input" checked>
+                                    <label class="custom-control-label" for="color_and_size">컬러, 사이즈</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="group_type_condition" value="online_code" id="online_code" class="custom-control-input">
+                                    <label class="custom-control-label" for="online_code">온라인코드</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label for="">순위/구분</label>
@@ -211,6 +226,7 @@
 		{
             field: "goods_no",
             headerName: "상품번호",
+            hide: true,
             width: 58,
             pinned: 'left',
             cellStyle: StyleLineHeight,
@@ -220,6 +236,7 @@
                 }
             }
         },
+        {field: "goods_no", headerName: "온라인코드", cellStyle: StyleLineHeight, width: 70},
 		{field: "brand_nm", headerName: "브랜드", cellStyle: StyleLineHeight, width: 70},
         {field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: StyleLineHeight},
 		{field: "img", headerName: "이미지", type: 'GoodsImageType', width: 50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}"},
@@ -290,7 +307,7 @@
 	});
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/shop/sale/sal03/search', data,-1, function(e) {
+		gx.Request('/shop/sale/sal03/search', data, -1, function(e) {
             let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
             let total_data = e.head.total_data;
 
