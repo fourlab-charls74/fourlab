@@ -131,16 +131,12 @@
                         <label for="formrow-email-input">보기</label>
                             <div class="form-inline form-radio-box">
                                 <div class="custom-control custom-radio">
-                                    <input type="radio" name="group_type_condition" value="color" id="color" class="custom-control-input" checked>
-                                    <label class="custom-control-label" for="color">색상</label>
+                                    <input type="radio" name="group_type_condition" value="color_and_size" id="color_and_size" class="custom-control-input" checked>
+                                    <label class="custom-control-label" for="color_and_size">컬러, 사이즈</label>
                                 </div>
                                 <div class="custom-control custom-radio">
-                                    <input type="radio" name="group_type_condition" value="size" id="size" class="custom-control-input">
-                                    <label class="custom-control-label" for="size">사이즈</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="group_type_condition" value="goods_part_num" id="goods_part_num" class="custom-control-input">
-                                    <label class="custom-control-label" for="goods_part_num">품번</label>
+                                    <input type="radio" name="group_type_condition" value="online_code" id="online_code" class="custom-control-input">
+                                    <label class="custom-control-label" for="online_code">온라인코드</label>
                                 </div>
                             </div>
                         </div>
@@ -240,6 +236,7 @@
                 }
             }
         },
+        {field: "goods_no", headerName: "온라인코드", cellStyle: StyleLineHeight, width: 70},
 		{field: "brand_nm", headerName: "브랜드", cellStyle: StyleLineHeight, width: 70},
         {field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: StyleLineHeight},
 		{field: "img", headerName: "이미지", type: 'GoodsImageType', width: 50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}"},
@@ -310,7 +307,7 @@
 	});
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/shop/sale/sal03/search', data,-1, function(e) {
+		gx.Request('/shop/sale/sal03/search', data, -1, function(e) {
             let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
             let total_data = e.head.total_data;
 
