@@ -320,10 +320,8 @@ class sal03Controller extends Controller
 						where
 							oo.ord_state = '30'
 							and ( oo.clm_state = 0 or oo.clm_state = -30 or oo.clm_state = 90)
-							and oo.ord_date >= '2023-03-03 00:00:00'
-							and oo.ord_date <= '2023-04-03 23:59:59'
-							-- and oo.ord_date >= '$sdate2'
-							-- and oo.ord_date <= '$edate2'
+							and oo.ord_date >= '$sdate2'
+							and oo.ord_date <= '$edate2'
 							$in_where
 						$group_by
 						$in_orderby
@@ -539,10 +537,8 @@ class sal03Controller extends Controller
 							where
 								oo.ord_state = '30'
 								and ( oo.clm_state = 0 or oo.clm_state = -30 or oo.clm_state = 90)
-								and oo.ord_date >= '2023-03-03 00:00:00'
-								and oo.ord_date <= '2023-04-03 23:59:59'
-								-- and oo.ord_date >= '$sdate2'
-								-- and oo.ord_date <= '$edate2'
+								and oo.ord_date >= '$sdate2'
+								and oo.ord_date <= '$edate2'
 								$in_where
 							$group_by
 							$in_orderby

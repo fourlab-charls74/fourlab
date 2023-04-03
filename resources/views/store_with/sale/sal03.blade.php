@@ -158,21 +158,38 @@
                         </div>
                     </div>
                     <div class="col-lg-4 inner-td">
-							<div class="form-group">
-							<label for="formrow-email-input">조회 기준</label>
-								<div class="form-inline form-radio-box">
-									<div class="custom-control custom-radio">
-										<input type="radio" name="best_worst" value="B" id="best" class="custom-control-input" checked>
-										<label class="custom-control-label" for="best">Best</label>
-									</div>
-									<div class="custom-control custom-radio">
-										<input type="radio" name="best_worst" value="W" id="worst" class="custom-control-input">
-										<label class="custom-control-label" for="worst">Worst</label>
-									</div>
-								</div>
-							</div>
-						</div>
-                    <div class="col-lg-4">
+                        <div class="form-group">
+                        <label for="formrow-email-input">조회 기준</label>
+                            <div class="form-inline form-radio-box">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="best_worst" value="B" id="best" class="custom-control-input" checked>
+                                    <label class="custom-control-label" for="best">Best</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="best_worst" value="W" id="worst" class="custom-control-input">
+                                    <label class="custom-control-label" for="worst">Worst</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                        <label for="formrow-email-input">보기</label>
+                            <div class="form-inline form-radio-box">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="group_type_condition" value="color_and_size" id="color_and_size" class="custom-control-input" checked>
+                                    <label class="custom-control-label" for="color_and_size">컬러, 사이즈</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="group_type_condition" value="online_code" id="online_code" class="custom-control-input">
+                                    <label class="custom-control-label" for="online_code">온라인코드</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="">순위/구분</label>
                             <div class="form-inline">

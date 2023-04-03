@@ -68,6 +68,7 @@ class sal03Controller extends Controller
 
         $type = $request->input("type");
         $goods_type = $request->input("goods_type");
+		$group_type_condition = $request->input("group_type_condition");
 
         $page = $request->input('page', 1);
 		if ( $page < 1 or $page == "" )	$page = 1;
@@ -75,34 +76,47 @@ class sal03Controller extends Controller
 		$list_total = $request->input('limit', 100);
 
 		$orderby = '';
+		$in_orderby = '';
+		$rank_column = '';
+
 		$ord = $request->input('ord','desc');
-		$ord_field = $request->input('ord_field','p.goods_no');
+		$ord_field = $request->input('ord_field','final.ord_qty');
 
 		if ($best_worst == 'B') {
-			$orderby = sprintf("order by %s %s, total_sale_rate asc", $ord_field, "desc");
+			$orderby = sprintf("order by %s %s, total_sale_rate asc", 'final.'.$ord_field, "desc");
+			$in_field = $ord_field == 'ord_qty' ? ' sum(oo.qty)' : ' sum(oo.qty * oo.price)';
+			$in_orderby = sprintf("order by %s %s", $in_field, "desc");
+			$rank_column = $ord_field == 'ord_qty' ? ' sum(oo.qty)' : ' sum(oo.qty * oo.price)';
 		} else if ($best_worst == 'W') {
-			$orderby = sprintf("order by %s %s, total_sale_rate asc" , $ord_field, "asc");
-		}else {
-			$orderby = sprintf("order by %s %s, total_sale_rate asc", $ord_field, $ord);
+			$orderby = sprintf("order by %s %s, total_sale_rate asc" , 'final.'.$ord_field, "asc");
+			$in_field = $ord_field == 'ord_qty' ? ' sum(oo.qty)' : ' sum(oo.qty * oo.price)';
+			$in_orderby = sprintf("order by %s %s", $in_field, "asc");
+			$rank_column = $ord_field == 'ord_qty' ? ' sum(oo.qty)' : ' sum(oo.qty * oo.price)';
+		} else {
+			$orderby = sprintf("order by %s %s, total_sale_rate asc", 'final.'.$ord_field, $ord);
+			$in_field = $ord_field == 'ord_qty' ? ' sum(oo.qty)' : ' sum(oo.qty * oo.price)';
+			$in_orderby = sprintf("order by %s %s", $in_field, "asc");
+			$rank_column = $ord_field == 'ord_qty' ? ' sum(oo.qty)' : ' sum(oo.qty * oo.price)';
 		}
 
 		$where	= "";
 		$in_where	= "";
-		if ($com_type != "") $where .= " and g.com_type = '$com_type' ";
+
+		if ($com_type != "") $where .= " and final.com_type = '$com_type' ";
 		if ($store_type != "")	$in_where .= " and s.store_type = '" . $store_type . "' ";
 		if ($store_cd != "")	$in_where .= " and oo.store_cd = '" . $store_cd . "' ";
 		if ($prd_cd != "")	$in_where .= " and oo.prd_cd like '" . $prd_cd . "%' ";
-		if ($com_id != "") $where .= " and g.com_id = '" . Lib::quote($com_id) . "'";
-		if ($com_nm != "") $where .= " and g.com_nm like '%" . Lib::quote($com_nm) . "%' ";
-		if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%' ";
-		if ($item != "") $where .= " and g.opt_kind_cd = '" . Lib::quote($item) . "' ";
+		if ($com_id != "") $where .= " and final.com_id = '" . Lib::quote($com_id) . "'";
+		if ($com_nm != "") $where .= " and final.com_nm like '%" . Lib::quote($com_nm) . "%' ";
+		if ($style_no != "") $where .= " and final.style_no like '" . Lib::quote($style_no) . "%' ";
+		if ($item != "") $where .= " and final.opt_kind_cd = '" . Lib::quote($item) . "' ";
 		if ($brand_cd != "") {
-			$where .= " and g.brand = '" . Lib::quote($brand_cd) . "' ";
+			$where .= " and final.brand = '" . Lib::quote($brand_cd) . "' ";
 		} else if ($brand_cd == "" && $brand_nm != "") {
-			$where .= " and g.brand = '" . Lib::quote($brand_cd) . "' ";
+			$where .= " and final.brand = '" . Lib::quote($brand_cd) . "' ";
 		}
-		if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%' ";
-		if ($goods_nm_eng != "") $where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
+		if ($goods_nm != "") $where .= " and final.goods_nm like '%" . Lib::quote($goods_nm) . "%' ";
+		if ($goods_nm_eng != "") $where .= " and final.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
 
 		if ($goods_nos != "") {
 			$goods_no = $goods_nos;
@@ -112,6 +126,69 @@ class sal03Controller extends Controller
 		$goods_no = preg_replace("/\n/", ",", $goods_no);
 		$goods_no = preg_replace("/,,/", ",", $goods_no);
 
+		//보기 그룹 조건 설정
+		$group_by = null;
+		$total_sale_rate = null;
+		$sale_rate = null;
+		$prd_cd_p = null;
+		$size = null;
+		$color = null;
+		$stock_qty = null;
+		$stock_wqty = null;
+		$group_column = null;
+		$max_column = null;
+		$prd_cd = null;
+		$goods_opt = null;
+
+		if($group_type_condition == 'color_and_size') {
+			$group_by = "group by pc2.prd_cd";
+
+			$total_sale_rate = "(select ifnull(round((final.total_ord_qty / ps.qty) * 100),0) from product_stock ps where ps.prd_cd = final.prd_cd) as total_sale_rate,";
+
+			$sale_rate = "(select if(ps.qty = 0, 0, round((final.ord_qty / ps.qty) * 100)) from product_stock ps where ps.prd_cd = final.prd_cd) as sale_rate,";
+
+			$prd_cd_p = "(select concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) from product_code pc where pc.prd_cd = final.prd_cd) as prd_cd_p,";
+			
+			$color =  "(select pc.color from product_code pc where pc.prd_cd = final.prd_cd) as color,";
+
+			$size =  "(select pc.size from product_code pc where pc.prd_cd = final.prd_cd) as size,";
+
+			$stock_qty = "(select sum(ifnull(ps.qty, '0')) from product_stock ps where ps.prd_cd = final.prd_cd group by ps.prd_cd) as stock_qty,";
+
+			$prd_cd = "final.prd_cd,";
+
+			$goods_opt = "final.goods_opt,";
+
+			$stock_wqty = "(select sum(ifnull(ps.wqty, '0')) from product_stock ps where ps.prd_cd = final.prd_cd group by ps.prd_cd) as stock_wqty";
+
+			$group_column = "prd_cd";
+
+			$max_column = "max(oo.goods_no) as goods_no";
+
+		} else {
+			$group_by = "group by oo.goods_no";
+			
+			$total_sale_rate = "(select ifnull(round((final.total_ord_qty / sum(ps.qty)) * 100),0) from product_stock ps where ps.goods_no = final.goods_no group by ps.goods_no) as total_sale_rate,";
+
+			$sale_rate = "(select if(ps.qty = 0, 0, round((final.ord_qty / sum(ps.qty)) * 100)) from product_stock ps where ps.goods_no = final.goods_no group by ps.goods_no) as sale_rate,";
+
+			$prd_cd_p = "'' as prd_cd_p, ";
+			$color = "'' as color,";
+			$size = "'' as size,";
+
+			$stock_qty = "(select sum(ifnull(ps.qty, '0')) from product_stock ps where ps.goods_no = final.goods_no group by ps.goods_no) as stock_qty,";
+
+			$prd_cd = "'' as prd_cd,";
+
+			$goods_opt = "'' as goods_opt,";
+
+			$stock_wqty = "(select sum(ifnull(ps.wqty, '0')) from product_stock ps where ps.goods_no = final.goods_no group by ps.goods_no) as stock_wqty";
+
+			$group_column = "goods_no";
+
+			$max_column = "max(oo.prd_cd) as prd_cd";
+		} 
+
 		// 상품옵션 범위검색
 		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
 		parse_str($prd_cd_range_text, $prd_cd_range);
@@ -120,7 +197,7 @@ class sal03Controller extends Controller
 			if (count($rows) > 0) {
 				$in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
 				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
-				$where .= " and pc.$opt $in_query ($opt_join) ";
+				$in_where .= " and pc2.$opt $in_query ($opt_join) ";
 			}
 		}
 
@@ -129,22 +206,22 @@ class sal03Controller extends Controller
 			if (count($goods_nos) > 1) {
 				if (count($goods_nos) > 500) array_splice($goods_nos, 500);
 				$in_goods_nos = join(",", $goods_nos);
-				$where .= " and g.goods_no in ( $in_goods_nos ) ";
+				$where .= " and final.goods_no in ( $in_goods_nos ) ";
 			} else {
-				if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
+				if ($goods_no != "") $where .= " and final.goods_no = '" . Lib::quote($goods_no) . "' ";
 			}
 		}
 
-		if ($type != "") $where .= " and g.type = '" . Lib::quote($type) . "' ";
-		if ($goods_type != "") $where .= " and g.goods_type = '" . Lib::quote($goods_type) . "' ";
+		if ($type != "") $where .= " and final.type = '" . Lib::quote($type) . "' ";
+		if ($goods_type != "") $where .= " and final.goods_type = '" . Lib::quote($goods_type) . "' ";
 		if (is_array($goods_stat)) {
 			if (count($goods_stat) == 1 && $goods_stat[0] != "") {
-				$where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat[0]) . "' ";
+				$where .= " and final.sale_stat_cl = '" . Lib::quote($goods_stat[0]) . "' ";
 			} else if (count($goods_stat) > 1) {
-				$where .= " and g.sale_stat_cl in (" . join(",", $goods_stat) . ") ";
+				$where .= " and final.sale_stat_cl in (" . join(",", $goods_stat) . ") ";
 			}
 		} else if ($goods_stat != "") {
-			$where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
+			$where .= " and final.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
 		} 
 
 		$page_size = $limit;
@@ -156,69 +233,105 @@ class sal03Controller extends Controller
 		
 		$sql	= "
 			select 
-				a.goods_no,
-				a.prd_cd,
-				g.brand,
-				brd.brand_nm,
-				g.style_no,
-				a.goods_opt,
-				if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
-					select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
-					from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
-				)) as img,
-				'' as img_view,
-				g.goods_nm,
-				g.goods_nm_eng,
-				concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, 
-				pc.color, 
-				pc.size,
+				final.goods_no,
+				final.brand_nm,
+				final.style_no,
+				final.img,
+				final.goods_nm,
+				final.goods_nm_eng,
+				final.in_sum_qty,
+				final.in_sum_amt,
+				final.in_sale_rate,
+				final.ex_sum_qty,
+				final.total_ord_qty,
+				final.total_ord_amt,
+				final.ord_qty,
+				final.ord_amt,
+				$prd_cd
+				$goods_opt
+				$total_sale_rate
+				$sale_rate
+				$prd_cd_p
+				$color
+				$size
+				$stock_qty
+				$stock_wqty
+			from (
+				select 
+					a.prd_cd,
+					a.goods_no,
+					g.brand,
+					brd.brand_nm,
+					g.style_no,
+					a.goods_opt,
+					if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
+						select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
+						from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
+					)) as img,
+					'' as img_view,
+					g.goods_nm,
+					g.goods_nm_eng,
+					g.type,
+					g.goods_type,
+					g.sale_stat_cl,
+					g.com_type,
+					g.com_id,
+					g.com_nm,
+					g.opt_kind_cd,
+
+					-- 입고
+					0 as in_sum_qty,
+					0 as in_sum_amt,
+					0 as in_sale_rate,
 				
-				-- 입고
-				0 as in_sum_qty,
-				0 as in_sum_amt,
-				0 as in_sale_rate,
-			
-				-- 출고
-				0 as ex_sum_qty,
-				'' as ex_date,
-				
-				-- 총판매
-				a.qty as total_ord_qty,
-				0 as total_ord_amt,
-				ifnull(round((a.qty / ps.qty) * 100),0) as total_sale_rate,
-				
-				-- 기간판매
-				a.per_qty as ord_qty,
-				a.t_price as ord_amt,
-				if(ps.qty = 0, 0, round((a.per_qty / ps.qty) * 100)) as sale_rate,
-			
-				-- 매장재고, 창고재고
-				ifnull(ps.qty, '0') as stock_qty, 
-				ifnull(ps.wqty, '0') as stock_wqty
-			from ( 
-				select
-					sum(oo.qty) as per_qty
-					, sum(oo.recv_amt) as t_price
-					, oo.prd_cd
-					,0 as qty
-					,0 as total_ord_amt
-					, sum(oo.price * oo.qty) as ord_amt
-					, oo.goods_no, oo.goods_opt
-					-- oow.*
-				from order_opt oo
-				left outer join store s on oo.store_cd = s.store_cd
-				where
-					oo.ord_state = '30'
-					and ( oo.clm_state = 0 or oo.clm_state = -30 or oo.clm_state = 90)
-					and oo.ord_date >= '$sdate2'
-					and oo.ord_date <= '$edate2'
-					$in_where
-				group by oo.prd_cd
-			) as a
-			inner join goods g on a.goods_no = g.goods_no
-			left outer join brand brd on g.brand = brd.brand
-			inner join product_code pc on pc.prd_cd = a.prd_cd
-			inner join product_stock ps on a.prd_cd = ps.prd_cd 
+					-- 출고
+					0 as ex_sum_qty,
+					'' as ex_date,
+					
+					-- 총판매
+					a.qty as total_ord_qty,
+					0 as total_ord_amt,
+					
+					-- 기간판매
+					a.per_qty as ord_qty,
+					a.t_price as ord_amt
+				from ( 
+					select 
+						d.*
+					from (
+						select
+							sum(oo.qty) as per_qty
+							, sum(oo.recv_amt) as t_price
+							, oo.$group_column
+							, 0 as qty
+							, 0 as total_ord_amt
+							, sum(oo.price * oo.qty) as ord_amt
+							, $max_column
+							, oo.goods_opt
+							, ( @rank := @rank + 1 ) AS rank
+							, ( @real_rank := IF ( @last > $rank_column, @real_rank:=@real_rank+1, @real_rank ) ) AS real_rank
+							, ( @last := $rank_column) 
+						from order_opt oo
+							left outer join store s on oo.store_cd = s.store_cd
+							inner join product_code pc2 on oo.prd_cd = pc2.prd_cd 
+							, ( SELECT @rank := 0, @last := 0, @real_rank := 1 ) AS c
+						where
+							oo.ord_state = '30'
+							and ( oo.clm_state = 0 or oo.clm_state = -30 or oo.clm_state = 90)
+							and oo.ord_date >= '2023-03-03 00:00:00'
+							and oo.ord_date <= '2023-04-03 23:59:59'
+							-- and oo.ord_date >= '$sdate2'
+							-- and oo.ord_date <= '$edate2'
+							$in_where
+						$group_by
+						$in_orderby
+					) d
+					where 
+						d.rank <= $page_size
+				) as a
+				inner join goods g on a.goods_no = g.goods_no and g.goods_sub = 0
+				left outer join brand brd on g.brand = brd.brand
+			)final
 			where
 				1=1
 				$where
@@ -242,18 +355,38 @@ class sal03Controller extends Controller
 				$row["img"] = sprintf("%s%s", config("shop.image_svr"), $row["img"]);
 			}
 			
-			$prd_cd	= $row['prd_cd'];
+			$prd_cd		= $row['prd_cd'];
+			$goods_no	= $row['goods_no'];
+			
+			$sql_tot_ord = null;
+			$sql_in = null;
+			$sql_out = null;
 
 			//전체주문데이터
-			$sql_tot_ord	= "
-				select 
-					sum(qty) as qty, sum(recv_amt) as total_ord_amt
-				from order_opt 
-				where 
-					prd_cd = '$prd_cd' 
-					and ord_state = '30' 
-					and ( clm_state = 0 or clm_state = -30 or clm_state = 90)
-			";
+			if($group_type_condition == 'color_and_size') {
+				$sql_tot_ord	= "
+					select 
+						ifnull(sum(qty), 0) as qty,  ifnull(sum(recv_amt),0) as total_ord_amt
+					from order_opt 
+					where 
+						prd_cd = '$prd_cd' 
+						and ord_state = '30' 
+						and ( clm_state = 0 or clm_state = -30 or clm_state = 90)
+					group by prd_cd
+				";
+			} else {
+				$sql_tot_ord	= "
+					select 
+						ifnull(sum(qty), 0) as qty, ifnull(sum(recv_amt),0) as total_ord_amt
+					from order_opt 
+					where 
+						goods_no = '$goods_no' 
+						and ord_state = '30' 
+						and ( clm_state = 0 or clm_state = -30 or clm_state = 90)
+					group by goods_no
+				";
+			}
+			
 			$tot_ord = DB::selectOne($sql_tot_ord);
 
 			$row['total_ord_qty']	= $tot_ord->qty;
@@ -263,15 +396,30 @@ class sal03Controller extends Controller
 			$tot_ord_sum_amt	+= $row['total_ord_amt'];
 
 			//입고 데이터
-			$sql_in	= "
-				select 
-					sum(p.qty) as in_sum_qty, sum(p.cost * p.qty) as in_sum_amt
-				from product_stock_order_product p
-				inner join product_stock ps on p.prd_cd = ps.prd_cd
-				where 
-					p.state >= '30'
-					and p.prd_cd = '$prd_cd'
-			";
+			if($group_type_condition == 'color_and_size') {
+				$sql_in	= "
+					select 
+						ifnull(sum(p.qty), 0) as in_sum_qty, ifnull(sum(p.cost * p.qty), 0) as in_sum_amt
+					from product_stock_order_product p
+					inner join product_stock ps on p.prd_cd = ps.prd_cd
+					where 
+						p.state >= '30'
+						and p.prd_cd = '$prd_cd'
+					group by p.prd_cd
+				";
+			} else {
+				$sql_in	= "
+					select 
+						ifnull(sum(p.qty), 0) as in_sum_qty, ifnull(sum(p.cost * p.qty), 0) as in_sum_amt
+					from product_stock_order_product p
+					inner join product_stock ps on p.prd_cd = ps.prd_cd
+					where 
+						p.state >= '30'
+						and ps.goods_no = '$goods_no'
+					group by ps.goods_no
+				";
+			}
+
 			$tot_in = DB::selectOne($sql_in);
 
 			$row['in_sum_qty']	= $tot_in->in_sum_qty;
@@ -281,22 +429,37 @@ class sal03Controller extends Controller
 			$tot_in_sum_qty	+= $tot_in->in_sum_qty;
 			$tot_in_sum_amt	+= $tot_in->in_sum_amt;
 
-			//출고 데이
-			$sql_out	= "
-				select 
-					sum(psr.qty) as qty,
-					left(min(psr.prc_rt), 10) as prc_rt
-				from product_stock_release psr
-				where 
-					psr.state = '40'
-					and psr.prd_cd = '$prd_cd'
-			";
+			//출고 데이터
+			if($group_type_condition == 'color_and_size') {
+				$sql_out	= "
+					select 
+						ifnull(sum(psr.qty), 0) as qty,
+						left(min(psr.prc_rt), 10) as prc_rt
+					from product_stock_release psr
+					where 
+						psr.state = '40'
+						and psr.prd_cd = '$prd_cd'
+					group by psr.prd_cd
+				";
+			} else {
+				$sql_out	= "
+					select 
+						ifnull(sum(psr.qty), 0) as qty,
+						left(min(psr.prc_rt), 10) as prc_rt
+					from product_stock_release psr
+					where 
+						psr.state = '40'
+						and psr.goods_no = '$goods_no'
+					group by psr.goods_no
+				";
+			}
+
 			$tot_out = DB::selectOne($sql_out);
 
-			$row['ex_sum_qty']	= $tot_out->qty;
-			$row['ex_date']		= $tot_out->prc_rt;
+			$row['ex_sum_qty']	= $tot_out !== null ? $tot_out->qty : 0;
+			$row['ex_date']		= $tot_out !== null ? $tot_out->prc_rt: '';
 
-			$tot_ex_sum_qty	+= $tot_out->qty;
+			$tot_ex_sum_qty	+= $tot_out !== null ? $tot_out->qty : 0;
 
 			$row['total_sale_rate']	= ($row['in_sum_qty'] == 0)?0:round($row['total_ord_qty'] / $row['in_sum_qty'] * 100);
 
@@ -312,61 +475,91 @@ class sal03Controller extends Controller
 
 			$query	= "
 				select 
-					-- 입고
-					0 as in_sum_qty,
-					0 as in_sum_amt,
-				
-					-- 출고
-					0 as ex_sum_qty,
+					$total_sale_rate
+					final.in_sum_qty,
+					final.in_sum_amt,
+					final.ex_sum_qty,
+					final.total_ord_qty,
+					final.total_ord_amt,
+					final.ord_qty,
+					final.ord_amt,
+					$stock_qty
+					$stock_wqty
+				from (
+					select 
+						-- 입고
+						0 as in_sum_qty,
+						0 as in_sum_amt,
 					
-					-- 총판매
-					0 as total_ord_qty,
-					0 as total_ord_amt,
-					
-					-- 기간판매
-					sum(a.per_qty) as ord_qty,
-					sum(a.t_price) as ord_amt,
-				
-					-- 매장재고, 창고재고
-					sum(ifnull(ps.qty, '0')) as stock_qty, 
-					sum(ifnull(ps.wqty, '0')) as stock_wqty
-				from ( 
-					select
-						sum(oo.qty) as per_qty
-						, sum(oo.recv_amt) as t_price
-						, oo.prd_cd
-						, 0 as qty
-						, 0 as total_ord_amt
-						, sum(oo.price * oo.qty) as ord_amt
-						, oo.goods_no, oo.goods_opt
-						-- oow.*
-					from order_opt oo
-					left outer join store s on oo.store_cd = s.store_cd
-					where
-						oo.ord_state = '30'
-						and ( oo.clm_state = 0 or oo.clm_state = -30 or oo.clm_state = 90)
-						and oo.ord_date >= '$sdate2'
-						and oo.ord_date <= '$edate2'
-						$in_where
-						group by oo.prd_cd
-				) as a
-				inner join goods g on a.goods_no = g.goods_no
-				left outer join brand brd on g.brand = brd.brand
-				inner join product_code pc on pc.prd_cd = a.prd_cd
-				inner join product_stock ps on a.prd_cd = ps.prd_cd 
+						-- 출고
+						0 as ex_sum_qty,
+						
+						-- 총판매
+						0 as total_ord_qty,
+						0 as total_ord_amt,
+						
+						-- 기간판매
+						sum(a.per_qty) as ord_qty,
+						sum(a.t_price) as ord_amt,
+						a.prd_cd,
+						a.goods_no,
+						g.brand,
+						g.style_no,
+						g.goods_nm,
+						g.goods_nm_eng,
+						g.type,
+						g.goods_type,
+						g.sale_stat_cl,
+						g.com_type,
+						g.com_id,
+						g.com_nm,
+						g.opt_kind_cd
+					from ( 
+						select 
+							d.*
+						from (
+							select
+								sum(oo.qty) as per_qty
+								, sum(oo.recv_amt) as t_price
+								, oo.$group_column
+								, 0 as qty
+								, 0 as total_ord_amt
+								, sum(oo.price * oo.qty) as ord_amt
+								, $max_column
+								, oo.goods_opt
+								, ( @rank := @rank + 1 ) AS rank
+								, ( @real_rank := IF ( @last > $rank_column, @real_rank:=@real_rank+1, @real_rank ) ) AS real_rank
+								, ( @last := $rank_column) 
+							from order_opt oo
+								left outer join store s on oo.store_cd = s.store_cd
+								inner join product_code pc2 on oo.prd_cd = pc2.prd_cd 
+								, ( SELECT @rank := 0, @last := 0, @real_rank := 1 ) AS c
+							where
+								oo.ord_state = '30'
+								and ( oo.clm_state = 0 or oo.clm_state = -30 or oo.clm_state = 90)
+								and oo.ord_date >= '$sdate2'
+								and oo.ord_date <= '$edate2'
+								$in_where
+							$group_by
+							$in_orderby
+						) d
+					) as a
+					inner join goods g on a.goods_no = g.goods_no and g.goods_sub = 0
+					left outer join brand brd on g.brand = brd.brand
+				) final
 				where
 					1=1
 					$where
-				$limit
+				$orderby
 			";
 
 			$row = DB::selectOne($query);
 
-			$row->in_sum_qty	= $tot_in_sum_qty;	// 총입고수량
-			$row->in_sum_amt	= $tot_in_sum_amt;	// 총입고금액
-			$row->ex_sum_qty	= $tot_ex_sum_qty;	// 총출고수량
-			$row->total_ord_qty	= $tot_ord_sum_qty;	// 총판매수량
-			$row->total_ord_amt	= $tot_ord_sum_amt;	// 총판매금액
+			$row !== null ? $row->in_sum_qty = $tot_in_sum_qty : 0;	// 총입고수량
+			$row !== null ? $row->in_sum_amt = $tot_in_sum_amt : 0;	// 총입고금액
+			$row !== null ? $row->ex_sum_qty = $tot_ex_sum_qty : 0;	// 총출고수량
+			$row !== null ? $row->total_ord_qty = $tot_ord_sum_qty: 0;	// 총판매수량
+			$row !== null ? $row->total_ord_amt = $tot_ord_sum_amt: 0;	// 총판매금액
 
 			$total_data = $row;
 
