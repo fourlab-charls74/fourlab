@@ -175,4 +175,35 @@ class SLib
         return $query->get();
     }
 
+    /* 특정권한 메뉴정보 */
+    public static function getSpecialGroupLnbs($type, $id)
+    {
+        $menu_table = null;
+
+        if($type == 'store') {
+            $menu_table = 'store_controller as lnb';
+        } else if ($type == 'shop') {
+            $menu_table = 'shop_controller as lnb';
+        } else if ($type == 'head') {
+            $menu_table = 'mgr_controller as lnb';
+        }
+
+        $sql = "
+            select 
+                lnb.*,
+                (select entry from store_controller where menu_no = lnb.entry and lev > 1) as main_no 
+            from $menu_table
+            where 
+                lnb.menu_no  > 1
+                and lnb.is_del = 0
+                and lnb.state >= 0
+                and lnb.menu_no in (
+                    select menu_no from mgr_group_menu_role mgmr where group_no in (select group_no from mgr_user_group mug where id = '$id')
+                )
+            order by entry asc, seq asc
+        ";
+
+        return DB::select($sql);
+    }
+
 }

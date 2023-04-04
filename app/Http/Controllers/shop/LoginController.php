@@ -57,10 +57,14 @@ class LoginController extends Controller
                     ]);
 
                 // LNB 메뉴생성
+                /*$kind['store']  = SLib::getSpecialGroupLnbs('store', $request->email);
+                $kind['shop']   = SLib::getSpecialGroupLnbs('shop', $request->email);
+                $kind['head']   = SLib::getSpecialGroupLnbs('head', $request->email);
+                */
                 $kind['store']  = SLib::getLnbs('store');
                 $kind['shop']   = SLib::getLnbs('shop');
                 $kind['head']   = SLib::getLnbs('head');
-
+                
                 $menu = [];
                 foreach($kind as $key => $kind_val) {
                     foreach($kind_val as $menu_val) {

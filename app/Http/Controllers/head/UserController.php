@@ -4,6 +4,7 @@ namespace App\Http\Controllers\head;
 
 use App\Http\Controllers\Controller;
 use App\Components\Lib;
+use App\Components\SLib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
@@ -214,18 +215,36 @@ class UserController extends Controller
 
     public function menu(){
         $id =  Auth::guard('head')->user()->id;
-
-        $query = /** @lang text */
-            "
-            select * from mgr_controller 
-            where is_del = 0 and state >= 0
+        $mgr_group_sql = "
+            select group_no from mgr_user_group mug where id = '$id';
         ";
+
+        $group_id = DB::selectOne($mgr_group_sql);
+        $group_no = $group_id->group_no;
+
+        $sql = "
+            select 
+                lnb.*,
+                (select entry from store_controller where menu_no = lnb.entry and lev > 1) as main_no 
+            from mgr_controller lnb
+            where 
+                lnb.menu_no  > 1
+                and lnb.is_del = 0
+                and lnb.state >= 0
+                and lnb.menu_no in (
+                    select menu_no from mgr_group_menu_role mgmr where group_no = '$group_no'
+                )
+            order by entry asc, seq asc
+        ";
+
+        
         $pdo = DB::connection()->getPdo();
-        $stmt = $pdo->prepare($query);
+        $stmt = $pdo->prepare($sql);
         $stmt->execute();
         $menu = [];
         while($row = $stmt->fetch(PDO::FETCH_ASSOC))
         {
+            echo 'here';
             $menu[strtolower($row["pid"])] = $row["action"];
         }
         return response()->json(['code' => 200,'menu' => $menu]);
