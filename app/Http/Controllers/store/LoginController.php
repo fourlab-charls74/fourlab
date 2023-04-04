@@ -55,29 +55,38 @@ class LoginController extends Controller
                     ]);
 
 
-                $mgr_group_sql = "
-                    select group_no from mgr_user_group mug where id = '$request->email';
+                $mgr_groups_sql = "
+                    select group_no from mgr_user_group mug where id = '$request->email'
                 ";
 
-                $group_ids = DB::select($mgr_group_sql);
+                $group_ids = DB::select($mgr_groups_sql);
+
 
                 // LNB 메뉴생성
                 $kind = [
                     'store' => []
                 ];
 
-                $logistics_group = null;
-
-                //물류그룹만 특정 메뉴 조회
+                $exception_yn = false;
+                $exception_id = null;
+    
+                //특정 그룹만 특정 메뉴 조회
                 foreach($group_ids as $group_id) {
-                    if($group_id->group_no == '19') {
-                        $logistics_group = true;
+                    $exception_group_sql = "
+                        select * from mgr_group_menu_exception where group_no = '$group_id->group_no'
+                    ";
+
+                    $exception_cnt = DB::select($exception_group_sql);
+
+                    if(count($exception_cnt) > 0) {
+                        $exception_yn = true;
+                        $exception_id = $group_id->group_no;
                         break;
                     }
                 }
-                
-                if($logistics_group) {
-                    $kind['store']  = SLib::getSpecialGroupLnbs('store', $group_id->group_no);
+
+                if($exception_yn) {
+                    $kind['store']  = SLib::getSpecialGroupLnbs('store', $exception_id);
                 } else {
                     $kind['store']  = SLib::getLnbs('store');
                 }
