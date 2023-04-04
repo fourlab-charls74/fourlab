@@ -30,9 +30,9 @@
                             <label for="goods_stat">분류</label>
                             <div class="flax_box">
                                 <select name="class" id="class" class="form-control form-control-sm">
-                                    @foreach ($class_items as $class_item)
+                                @foreach ($class_items as $class_item)
                                     <option value='{{ $class_item->class }}'>{{ $class_item->class_nm }}[{{ $class_item->cnt }}]</option>
-                                    @endforeach
+                                @endforeach
                                 </select>
                             </div>
                         </div>
@@ -55,9 +55,9 @@
                             <div class="flax_box">
                                 <select name='goods_type' class="form-control form-control-sm">
                                     <option value=''>전체</option>
-                                    @foreach ($goods_types as $goods_type)
+                                @foreach ($goods_types as $goods_type)
                                     <option value='{{ $goods_type->code_id }}'>{{ $goods_type->code_val }}</option>
-                                    @endforeach
+                                @endforeach
                                 </select>
                             </div>
                         </div>
@@ -246,7 +246,7 @@
 </form>
 <!-- DataTales Example -->
 <form method="post" name="save" action="/head/stock/stk01">
-    <iuput type="hidden" name="goods_info" id="goods_info" value="">
+    <input type="hidden" name="goods_info" id="goods_info" value="">
 	@csrf
 	<div id="filter-area" class="card shadow-none mb-0 ty2 last-card">
 		<div class="card-body">
@@ -288,7 +288,7 @@
 </form>
 <style>
     /* 상품 이미지 사이즈 픽스 */
-    img{
+    img {
         height:30px;
     }
     .color_title {
@@ -478,12 +478,14 @@
             headerName: "세탁방법 및 취급시 주의사항",
             cellStyle: {'background' : '#ffff99'},
             editable: true,
+            width: 300,
         },
         {
             field: "item_007",
             headerName: "제조연월",
             cellStyle: {'background' : '#ffff99'},
             editable: true,
+            width: 300,
         },
         {
             field: "item_008",
@@ -520,6 +522,8 @@
     ];
 </script>
 <script type="text/javascript" charset="utf-8">
+    const pApp = new App('', { gridId: "#div-gd" });
+    let gx;
 
     function cloneObject(obj) {
         var clone = {};
@@ -533,10 +537,6 @@
 
         return clone;
     }
-    const pApp = new App('', {
-        gridId: "#div-gd",
-    });
-    let gx;
     $(document).ready(function() {
         pApp.ResizeGrid(275);
         let gridDiv = document.querySelector(pApp.options.gridId);
@@ -571,13 +571,13 @@
         //     console.log(columnDefs);
         //     columnDefs.forEach(d => { // columndefs 배열에 null 속성 참조가 있으면 버그 발생 - null 속성 제거
         //         console.log(d);
-        //         Object.keys(d).forEach((key) => (d[key] == null) && delete d[key]); 
+        //         Object.keys(d).forEach((key) => (d[key] == null) && delete d[key]);
         //     });
         //     console.log(columnDefs);
         //     gx.gridOptions.api.setColumnDefs(columnDefs);
         // }
     };
-    
+
     var _isloading = false;
 
     function onscroll(params) {
@@ -805,13 +805,15 @@
 
 
                     */
+                    let cellWidth = columns.find(c => c.field === col_arr[i][0])?.width;
                     col_val = {
                         field: col_arr[i][0],
                         headerName: col_arr[i][1],
                         editable: true,
-                        minWidth: 100,
+                        minWidth: cellWidth || 100,
+                        maxWidth: cellWidth || 100,
                         lockPosition: true,
-                        cellStyle: {'background' : '#ffff99'},
+                        cellStyle: {'background' : '#ffff99', 'white-space': 'normal'},
                     };
                     col_style = {
                         colId: col_arr[i][0],
@@ -829,7 +831,7 @@
                     state: [setCol_style]
                 });
                 gx.gridOptions.columnApi.autoSizeColumns(basic_keys, false);
-                
+
                 onPrintColumns();
 
                 //var res = IsJsonString(data);
