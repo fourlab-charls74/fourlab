@@ -157,15 +157,18 @@ class SLib
     {
         if($type == 'store') {
             $query = DB::table('store_controller as lnb');
+            $main_table = 'store_controller';
         } else if ($type == 'shop') {
             $query = DB::table('shop_controller as lnb');
+            $main_table = 'shop_controller';
         } else if ($type == 'head') {
             $query = DB::table('mgr_controller as lnb');
+            $main_table = 'mgr_controller';
         }
-        $query = $query->selectRaw('
+        $query = $query->selectRaw("
             lnb.*,
-            (select entry from store_controller where menu_no = lnb.entry and lev > 1) as main_no
-        ');
+            (select entry from $main_table where menu_no = lnb.entry and lev > 1) as main_no
+        ");
         $query = $query->where('menu_no', '>', 1);
         $query = $query->where('is_del', 0);
         $query = $query->where('state', '>=', 0);
@@ -179,31 +182,36 @@ class SLib
     public static function getSpecialGroupLnbs($type, $id)
     {
         $menu_table = null;
+        $main_table = null;
 
         if($type == 'store') {
             $menu_table = 'store_controller as lnb';
+            $main_table = 'store_controller';
         } else if ($type == 'shop') {
             $menu_table = 'shop_controller as lnb';
+            $main_table = 'shop_controller';
         } else if ($type == 'head') {
             $menu_table = 'mgr_controller as lnb';
+            $main_table = 'mgr_controller';
         }
 
         $sql = "
             select 
                 lnb.*,
-                (select entry from store_controller where menu_no = lnb.entry and lev > 1) as main_no 
+                (select entry from $main_table where menu_no = lnb.entry and lev > 1) as main_no 
             from $menu_table
             where 
                 lnb.menu_no  > 1
                 and lnb.is_del = 0
                 and lnb.state >= 0
                 and lnb.menu_no in (
-                    select menu_no from mgr_group_menu_role mgmr where group_no in (select group_no from mgr_user_group mug where id = '$id')
+                    select menu_no from mgr_group_menu_role mgmr where group_no = '$id'
                 )
             order by entry asc, seq asc
         ";
 
         return DB::select($sql);
+
     }
 
 }

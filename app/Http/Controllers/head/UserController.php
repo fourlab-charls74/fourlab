@@ -222,29 +222,19 @@ class UserController extends Controller
         $group_id = DB::selectOne($mgr_group_sql);
         $group_no = $group_id->group_no;
 
-        $sql = "
-            select 
-                lnb.*,
-                (select entry from store_controller where menu_no = lnb.entry and lev > 1) as main_no 
-            from mgr_controller lnb
-            where 
-                lnb.menu_no  > 1
-                and lnb.is_del = 0
-                and lnb.state >= 0
-                and lnb.menu_no in (
-                    select menu_no from mgr_group_menu_role mgmr where group_no = '$group_no'
-                )
-            order by entry asc, seq asc
+        $query = /** @lang text */
+        "
+            select * from mgr_controller 
+            where is_del = 0 and state >= 0
         ";
 
         
         $pdo = DB::connection()->getPdo();
-        $stmt = $pdo->prepare($sql);
+        $stmt = $pdo->prepare($query);
         $stmt->execute();
         $menu = [];
         while($row = $stmt->fetch(PDO::FETCH_ASSOC))
         {
-            echo 'here';
             $menu[strtolower($row["pid"])] = $row["action"];
         }
         return response()->json(['code' => 200,'menu' => $menu]);

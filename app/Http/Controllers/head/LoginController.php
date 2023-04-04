@@ -53,31 +53,6 @@ class LoginController extends Controller
                         'visit_date' => DB::raw('now()')
                     ]);
 
-
-                // LNB 메뉴생성
-                /*
-                $kind['store']  = SLib::getSpecialGroupLnbs('store', $request->email);
-                $kind['shop']   = SLib::getSpecialGroupLnbs('shop', $request->email);
-                $kind['head']   = SLib::getSpecialGroupLnbs('head', $request->email);
-
-                $menu = [];
-                foreach($kind as $key => $kind_val) {
-                    foreach($kind_val as $menu_val) {
-                        $arr_menu = (array)$menu_val;
-                        if(isset($menu[$key][$arr_menu['entry']])) {
-                            $menu[$key][$arr_menu['entry']]['sub'][$arr_menu['menu_no']] = $arr_menu;
-                        } else {
-                            if($arr_menu['main_no']) {
-                                $menu[$key][$arr_menu['main_no']]['sub'][$arr_menu['entry']]['sub'][$arr_menu['menu_no']] = $arr_menu;
-                            } else {
-                                $menu[$key][$arr_menu['menu_no']] = $arr_menu;
-                            }
-                        }
-                    }
-                    $html[$key] = view(Config::get('shop.'.$key.'.view') . '/layouts/lnb', ['menu_list' => $menu[$key]])->render();
-                    Cache::forever($key.'_lnb', $html[$key]);
-                }
-                */
                 //return redirect('/head/order/ord01');
                 return redirect('/head/dashboard');
             } else {
