@@ -152,6 +152,7 @@ class std11Controller extends Controller
 		$items = SLib::getItems();
 		if ($mobile != "") $row->mobile = explode("-", $mobile);
 		$as_states = SLib::getCodes("AS_STATE");
+
 		//컬러
 		$color_sql = "select code_id, code_val from code where code_kind_cd = 'prd_cd_color' order by code_id asc ";
 		$colors = DB::select($color_sql);
@@ -343,13 +344,21 @@ class std11Controller extends Controller
 
 		$mobile = $data['mobile'][0].'-'.$data['mobile'][1].'-'.$data['mobile'][2];
 
+		if($data['as_type'] == '1') { // A/S
+			$as_state = 10;
+		} elseif ($data['as_type'] == '2') { //불량
+			$as_state = -10;
+		} else {
+			$as_state = -20;
+		}
+
 		try {
 			DB::beginTransaction();
 
 			DB::table('after_service2')
 				->insert([
 					'receipt_date' => $data['edate'],
-					'as_state' => 10,
+					'as_state' => $as_state,
 					'store_cd' => $data['store_no'],
 					'as_type' => $data['as_type'],
 					'customer_no' => $data['customer_no'],
@@ -387,19 +396,129 @@ class std11Controller extends Controller
 	public function change_state(Request $request) {
 
 		$data = $request->all();
-		$idx = $request->input('idx');
+		$mobile = $data['mobile'][0].'-'.$data['mobile'][1].'-'.$data['mobile'][2];
 
-		dd($data);
-
-		
 		try {
 			DB::beginTransaction();
 
-			
+			if ($data['as_type'] == '4') { // 본사 A/S 접수인 경우
+
+				DB::table('after_service2')
+					->where('idx', '=', $data['idx'])
+					->update([
+						'receipt_date' => $data['edate'],
+						'as_state' => 30,
+						'store_cd' => $data['store_no'],
+						'as_type' => $data['as_type'],
+						'customer_no' => $data['customer_no'],
+						'customer' => $data['customer'],
+						'mobile' => $mobile,
+						'zipcode' => $data['zipcode'],
+						'addr1' => $data['addr1'],
+						'addr2' => $data['addr2'],
+						'prd_cd' => $data['prd_cd'],
+						'goods_nm' => $data['goods_nm'],
+						'color' => $data['color'],
+						'size' => $data['size'],
+						'qty' => $data['qty'],
+						'is_free' => $data['is_free'],
+						'as_amt' => $data['as_amt']??'',
+						'content' => $data['content']??'',
+						'h_receipt_date' => $data['h_receipt_date']??now(),
+						'end_date' => $data['end_date']??'',
+						'h_content'	=> $data['h_content']??'',
+				]);
+
+			} elseif($data['as_type'] == '5') { //본사 A/S 완료인 경우
+
+				DB::table('after_service2')
+					->where('idx', '=', $data['idx'])
+					->update([
+						'receipt_date' => $data['edate'],
+						'as_state' => 40,
+						'store_cd' => $data['store_no'],
+						'as_type' => $data['as_type'],
+						'customer_no' => $data['customer_no'],
+						'customer' => $data['customer'],
+						'mobile' => $mobile,
+						'zipcode' => $data['zipcode'],
+						'addr1' => $data['addr1'],
+						'addr2' => $data['addr2'],
+						'prd_cd' => $data['prd_cd'],
+						'goods_nm' => $data['goods_nm'],
+						'color' => $data['color'],
+						'size' => $data['size'],
+						'qty' => $data['qty'],
+						'is_free' => $data['is_free'],
+						'as_amt' => $data['as_amt']??'',
+						'content' => $data['content']??'',
+						'h_receipt_date' => $data['h_receipt_date']??now(),
+						'end_date' => $data['end_date']??now(),
+						'h_content'	=> $data['h_content']??'',
+				]);
+
+			} elseif ($data['as_type'] == '6') { //본사불량인 경우
+
+				DB::table('after_service2')
+					->where('idx', '=', $data['idx'])
+					->update([
+						'receipt_date' => $data['edate'],
+						'as_state' => -10,
+						'store_cd' => $data['store_no'],
+						'as_type' => $data['as_type'],
+						'customer_no' => $data['customer_no'],
+						'customer' => $data['customer'],
+						'mobile' => $mobile,
+						'zipcode' => $data['zipcode'],
+						'addr1' => $data['addr1'],
+						'addr2' => $data['addr2'],
+						'prd_cd' => $data['prd_cd'],
+						'goods_nm' => $data['goods_nm'],
+						'color' => $data['color'],
+						'size' => $data['size'],
+						'qty' => $data['qty'],
+						'is_free' => $data['is_free'],
+						'as_amt' => $data['as_amt']??'',
+						'content' => $data['content']??'',
+						'h_receipt_date' => $data['h_receipt_date']??'',
+						'end_date' => $data['end_date']??'',
+						'err_date' => $data['end_date']??now(),
+						'h_content'	=> $data['h_content']??'',
+				]);
+
+			}
 
 			DB::commit();
 			$code = 200;
-			$msg = "수선등록이 완료되었습니다.";
+			$msg = "수선정보가 저장되었습니다.";
+
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg]);
+	}
+
+	public function change_state2(Request $request) {
+
+		$data = $request->all();
+
+		try {
+			DB::beginTransaction();
+
+			DB::table('after_service2')
+				->where('idx', '=', $data['idx'])
+				->update([
+					'end_date' => $data['end_date'],
+					'h_content'	=> $data['h_content']??'',
+					'as_state' => 40
+				]);
+
+			DB::commit();
+			$code = 200;
+			$msg = "수선완료 처리되었습니다.";
 
 		} catch (Exception $e) {
 			DB::rollback();

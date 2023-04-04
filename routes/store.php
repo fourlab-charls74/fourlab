@@ -166,6 +166,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('std11/batch-edit', 'std11Controller@batchEdit');
         Route::post('std11/repair-info-save', 'std11Controller@save');
         Route::post('std11/change_state', 'std11Controller@change_state');
+        Route::post('std11/change_state2', 'std11Controller@change_state2');
         Route::get('std11/create', 'std11Controller@showCreate');
         Route::post('std11/create', 'std11Controller@create');
         Route::get('std11/view/{idx?}', 'std11Controller@view');

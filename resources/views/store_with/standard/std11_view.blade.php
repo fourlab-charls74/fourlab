@@ -347,7 +347,8 @@
         }).then(function (res) {
             if(res.data.code === 200) {
                 alert(res.data.msg);
-                // opener.SearchDetail(store_cd, store_nm);
+                window.close();
+                opener.Search();
             } else {
                 console.log(res.data);
                 alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");

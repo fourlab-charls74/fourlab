@@ -12,8 +12,7 @@
             </div>
         </div>
         <div class="d-flex">
-            <!-- <a href="javascript:void(0)" onclick="Save()" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 수선요청</a> -->
-            <a href="javascript:void(0)" onclick="change_state()" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 수선접수</a>
+            <a href="javascript:void(0)" onclick="change_state()" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
             <a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i> 닫기</a>
         </div>
     </div>
@@ -74,9 +73,12 @@
                                                 <div class="flex_box">
                                                     <select id="as_type" name="as_type" class="form-control form-control-sm">
                                                         <option value="">선택</option>
-                                                        <option value="1" @if($row->as_type == '1') selected @endif>AS 요청</option>
-                                                        <option value="2" @if($row->as_type == '2') selected @endif>불량 요청</option>
-                                                        <option value="3" @if($row->as_type == '3') selected @endif>본사 심의</option>
+                                                        <option value="1" @if($row->as_type == '1') selected @endif>매장접수(A/S)</option>
+                                                        <option value="2" @if($row->as_type == '2') selected @endif>매장접수(불량)</option>
+                                                        <option value="3" @if($row->as_type == '3') selected @endif>매장접수(심의)</option>
+                                                        <option value="4" @if($row->as_type == '4') selected @endif>본사A/S접수/진행</option>
+                                                        <option value="5" @if($row->as_type == '5') selected @endif>본사A/S완료</option>
+                                                        <option value="6" @if($row->as_type == '6') selected @endif>본사불량</option>
                                                     </select>
                                                 </div>
                                             </td>
@@ -216,12 +218,14 @@
                     <div class="table-responsive">
                         <div class="table-box-ty2 mobile">
                             <table class="table incont table-bordered" width="100%" cellspacing="0">
-                                <colgroup>
+                                <!-- <colgroup>
+                                    <col width="10%">
                                     <col width="20%">
-                                    <col width="30%">
+                                    <col width="10%">
                                     <col width="20%">
-                                    <col width="30%">
-                                </colgroup>
+                                    <col width="10%">
+                                    <col width="20%">
+                                </colgroup> -->
                                 <tbody>
                                 <tr>
                                     <th>
@@ -231,7 +235,7 @@
                                         <div class="form-inline">
                                             <div class="docs-datepicker form-inline-inner input_box w-100">
                                                 <div class="input-group">
-                                                    <input type="text" class="form-control form-control-sm docs-date" name="h_receipt_date" value="" id="h_receipt_date" autocomplete="off">
+                                                    <input type="text" class="form-control form-control-sm docs-date" name="h_receipt_date" value="{{@$row->h_receipt_date}}" id="h_receipt_date" autocomplete="off">
                                                     <div class="input-group-append">
                                                         <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
                                                             <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -249,7 +253,25 @@
                                         <div class="form-inline">
                                             <div class="docs-datepicker form-inline-inner input_box w-100">
                                                 <div class="input-group">
-                                                    <input type="text" class="form-control form-control-sm docs-date" name="end_date" value="" id="end_date" autocomplete="off">
+                                                    <input type="text" class="form-control form-control-sm docs-date" name="end_date" value="{{@$row->end_date}}" id="end_date" autocomplete="off">
+                                                    <div class="input-group-append">
+                                                        <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+                                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="docs-datepicker-container"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <th>
+                                        <label for="end_date">불량등록일</label>
+                                    </th>
+                                    <td>
+                                        <div class="form-inline">
+                                            <div class="docs-datepicker form-inline-inner input_box w-100">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control form-control-sm docs-date" name="err_date" value="{{@$row->err_date}}" id="err_date" autocomplete="off">
                                                     <div class="input-group-append">
                                                         <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
                                                             <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -265,9 +287,9 @@
                                     <th>
                                         <label for="h_content">본사설명</label>
                                     </th>
-                                    <td colspan="4">
+                                    <td colspan="5">
                                         <div class="flex_box">
-                                            <textarea name="h_content" id="h_content" class="form-control form-control-sm" style="height: 200px;"></textarea>
+                                            <textarea name="h_content" id="h_content" class="form-control form-control-sm" style="height: 200px;">{{@$row->h_content}}</textarea>
                                         </div>
                                     </td>
                                 </tr>
@@ -413,31 +435,37 @@
             }
         }
 
-        if($('#h_receipt_date').val() == "") {
-            alert('본사 접수일자를 선택해주세요');
-            return false;
-        }
+        //     if($('#h_receipt_date').val() == "") {
+        //         alert('본사 접수일자를 선택해주세요');
+        //         return false;
+        //     }
+
+
+        // if($('#end_date').val() == "") {
+        //     alert('수선완료일자를 선택해주세요');
+        //     return false;
+        // }
 
     }
 
     function change_state() {
         if (validate() === false) return;
-        if (confirm('수선정보를 접수처리하시겠습니까?') === false) return;
+        if (confirm('수선정보를 저장하시겠습니까?') === false) return;
 
-        let data = $('form[name="f2"]').serialize();
         let idx = '{{@$row->idx}}';
+        let data = $('form[name="f2"]').serialize();
+        data += '&' + $('form[name="f1"]').serialize();
+        data += '&idx=' + idx;
 
         axios({
             url: '/store/standard/std11/change_state',
             method: 'post',
-            data: {
-                data : data,
-                idx : idx
-            },
+            data: data
         }).then(function (res) {
             if(res.data.code === 200) {
                 alert(res.data.msg);
-                // opener.SearchDetail(store_cd, store_nm);
+                window.close();
+                opener.Search();
             } else {
                 console.log(res.data);
                 alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
@@ -445,10 +473,34 @@
         }).catch(function (err) {
             console.log(err);
         });
-
-
-
     }
+        
+    // function change_state2() {
+    //     if (validate() === false) return;
+    //     if (confirm('수선정보를 완료처리하시겠습니까?') === false) return;
+
+    //     let idx = '{{@$row->idx}}';
+    //     let data = $('form[name="f2"]').serialize();
+    //     data += $('form[name="f1"]').serialize();
+    //     data += '&idx=' + idx;
+
+    //     axios({
+    //         url: '/store/standard/std11/change_state2',
+    //         method: 'post',
+    //         data: data
+    //     }).then(function (res) {
+    //         if(res.data.code === 200) {
+    //             alert(res.data.msg);
+    //             window.close();
+    //             opener.Search();
+    //         } else {
+    //             console.log(res.data);
+    //             alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+    //         }
+    //     }).catch(function (err) {
+    //         console.log(err);
+    //     });
+    // }
         
 
 </script>
