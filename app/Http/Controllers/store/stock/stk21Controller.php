@@ -44,7 +44,7 @@ class stk21Controller extends Controller
 		$where = "";
         $orderby = "";
         $prd_cd_range_text = $request->input("prd_cd_range", '');
-        
+
         // where
 		if($r['prd_cd'] != null) {
             $prd_cd = explode(',', $r['prd_cd']);
@@ -54,7 +54,7 @@ class stk21Controller extends Controller
 			}
 			$where .= ")";
         }
-        if($r['style_no'] != null) 
+        if($r['style_no'] != null)
             $where .= " and if(pc.goods_no <> '0', g.style_no, p.style_no) = '" . $r['style_no'] . "'";
 
         $goods_no = $r['goods_no'];
@@ -75,7 +75,7 @@ class stk21Controller extends Controller
                 if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
             }
         }
-        
+
          // 상품옵션 범위검색
 		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
 		parse_str($prd_cd_range_text, $prd_cd_range);
@@ -88,17 +88,17 @@ class stk21Controller extends Controller
 			}
 		}
 
-        if($r['com_cd'] != null) 
+        if($r['com_cd'] != null)
             $where .= " and g.com_id = '" . $r['com_cd'] . "'";
-        if($r['item'] != null) 
+        if($r['item'] != null)
             $where .= " and g.opt_kind_cd = '" . $r['item'] . "'";
         if(isset($r['brand_cd']))
             $where .= " and g.brand = '" . $r['brand_cd'] . "'";
-        if($r['goods_nm'] != null) 
+        if($r['goods_nm'] != null)
             $where .= " and g.goods_nm like '%" . $r['goods_nm'] . "%'";
-        if($r['goods_nm_eng'] != null) 
+        if($r['goods_nm_eng'] != null)
             $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
-            
+
         // ordreby
         $ord = $r['ord'] ?? 'desc';
         $ord_field = $r['ord_field'] ?? "pc.rt";
@@ -176,27 +176,31 @@ class stk21Controller extends Controller
 		$code = 200;
 		$prd_cd = $request->input("prd_cd", '');
         $store_type = $request->input("store_type", '');
+        $now_date = date('Ymd');
         $where = "";
 
         if($store_type != '') $where .= " and s.store_type = $store_type";
 
 		$sql = "
             select
-                s.store_cd as dep_store_cd, 
-                s.store_nm as dep_store_nm, 
-                ifnull(ps.qty, 0) as qty, 
+                s.store_cd as dep_store_cd,
+                s.store_nm as dep_store_nm,
+                ifnull(ps.qty, 0) as qty,
                 ifnull(ps.wqty, 0) as wqty,
-                ifnull(pss.qty, 0) as storage_qty, 
+                ifnull(pss.qty, 0) as storage_qty,
                 ifnull(pss.wqty, 0) as storage_wqty
             from store s
                 left outer join product_stock_store ps on s.store_cd = ps.store_cd and ps.prd_cd = '$prd_cd'
                 left outer join product_stock_storage pss on pss.storage_cd = (select storage_cd from storage where default_yn = 'Y') and pss.prd_cd = '$prd_cd'
-            where s.use_yn = 'Y' $where
+            where
+                s.use_yn = 'Y'
+                and if(s.sdate <= '$now_date' and date_format(date_add(date_format(s.sdate, '%Y-%m-%d'), interval 1 month), '%Y%m%d') >= '$now_date', s.open_month_stock_yn <> 'Y', 1=1)
+                $where
 		";
 
 		$result = DB::select($sql);
 
-        foreach($result as $r) 
+        foreach($result as $r)
         {
             $r->prd_cd = $prd_cd;
         }
@@ -240,7 +244,7 @@ class stk21Controller extends Controller
                         'req_rt' => now(),
                         'rt' => now(),
                     ]);
-                
+
                 //RT요청 알림 전송
                 $res = DB::table('msg_store')
                     ->insertGetId([
@@ -251,7 +255,7 @@ class stk21Controller extends Controller
                         'content' => 'RT요청이 있습니다.',
                         'rt' => now()
                     ]);
-                
+
                 DB::table('msg_store_detail')
                     ->insert([
                         'msg_cd' => $res,

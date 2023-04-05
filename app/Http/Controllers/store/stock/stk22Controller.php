@@ -45,7 +45,7 @@ class stk22Controller extends Controller
 		$code = 200;
 		$where = "";
         $orderby = "";
-        
+
         // where
 		if($r['prd_cd'] != null) {
             $prd_cd = explode(',', $r['prd_cd']);
@@ -66,7 +66,7 @@ class stk22Controller extends Controller
                 $where .= " and pc.$opt $in_query ($opt_join) ";
             }
         }
-        if($r['style_no'] != null) 
+        if($r['style_no'] != null)
             $where .= " and if(pc.goods_no <> '0', g.style_no, p.style_no) = '" . $r['style_no'] . "'";
 
         $goods_no = $r['goods_no'];
@@ -88,15 +88,15 @@ class stk22Controller extends Controller
             }
         }
 
-        if($r['com_cd'] != null) 
+        if($r['com_cd'] != null)
             $where .= " and g.com_id = '" . $r['com_cd'] . "'";
-        if($r['item'] != null) 
+        if($r['item'] != null)
             $where .= " and g.opt_kind_cd = '" . $r['item'] . "'";
         if(isset($r['brand_cd']))
             $where .= " and g.brand = '" . $r['brand_cd'] . "'";
-        if($r['goods_nm'] != null) 
+        if($r['goods_nm'] != null)
             $where .= " and g.goods_nm like '%" . $r['goods_nm'] . "%'";
-        if($r['goods_nm_eng'] != null) 
+        if($r['goods_nm_eng'] != null)
             $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
 
         // ordreby
@@ -177,28 +177,31 @@ class stk22Controller extends Controller
 		$code = 200;
 		$prd_cd = $request->input("prd_cd", '');
         $store_type = $request->input("store_type", '');
+        $now_date = date('Ymd');
         $where = "";
 
         if($store_type != '') $where .= " and s.store_type = $store_type";
 
 		$sql = "
             select
-                s.store_cd as dep_store_cd, 
-                s.store_nm as dep_store_nm, 
-                ifnull(ps.qty, 0) as qty, 
+                s.store_cd as dep_store_cd,
+                s.store_nm as dep_store_nm,
+                ifnull(ps.qty, 0) as qty,
                 ifnull(ps.wqty, 0) as wqty,
-                ifnull(pss.qty, 0) as storage_qty, 
+                ifnull(pss.qty, 0) as storage_qty,
                 ifnull(pss.wqty, 0) as storage_wqty
             from store s
                 left outer join product_stock_store ps on s.store_cd = ps.store_cd and ps.prd_cd = '$prd_cd'
                 left outer join product_stock_storage pss on pss.storage_cd = (select storage_cd from storage where default_yn = 'Y') and pss.prd_cd = '$prd_cd'
-            where s.use_yn = 'Y' $where
+            where
+                s.use_yn = 'Y'
+                and if(s.sdate <= '$now_date' and date_format(date_add(date_format(s.sdate, '%Y-%m-%d'), interval 1 month), '%Y%m%d') >= '$now_date', s.open_month_stock_yn <> 'Y', 1=1)
+                $where
 		";
 
 		$result = DB::select($sql);
 
-        foreach($result as $r) 
-        {
+        foreach ($result as $r) {
             $r->prd_cd = $prd_cd;
         }
 
@@ -253,7 +256,7 @@ class stk22Controller extends Controller
                 // product_stock_store -> 보유재고 차감
                 DB::table('product_stock_store')
                     ->where('prd_cd', '=', $d['prd_cd'])
-                    ->where('store_cd', '=', $d['dep_store_cd']) 
+                    ->where('store_cd', '=', $d['dep_store_cd'])
                     ->update([
                         'qty' => DB::raw('qty - ' . ($d['rt_qty'] ?? 0)),
                         'wqty' => DB::raw('wqty - ' . ($d['rt_qty'] ?? 0)),
@@ -281,7 +284,7 @@ class stk22Controller extends Controller
 
                 // 받는 매장
                 // product_stock_store -> 재고 존재여부 확인 후 보유재고 플러스
-                $store_stock_cnt = 
+                $store_stock_cnt =
                     DB::table('product_stock_store')
                         ->where('prd_cd', '=', $d['prd_cd'])
                         ->where('store_cd', '=', $d['store_cd'])
@@ -303,7 +306,7 @@ class stk22Controller extends Controller
                     // 해당 매장에 상품 기존재고가 이미 존재할 경우
                     DB::table('product_stock_store')
                         ->where('prd_cd', '=', $d['prd_cd'])
-                        ->where('store_cd', '=', $d['store_cd']) 
+                        ->where('store_cd', '=', $d['store_cd'])
                         ->update([
                             'wqty' => DB::raw('wqty + ' . ($d['rt_qty'] ?? 0)),
                             'ut' => now(),
@@ -328,7 +331,7 @@ class stk22Controller extends Controller
                         'admin_id' => $admin_id,
                         'admin_nm' => $admin_nm,
                     ]);
-                
+
                 //RT처리 알림 전송
                 $res = DB::table('msg_store')
                     ->insertGetId([
@@ -339,7 +342,7 @@ class stk22Controller extends Controller
                         'content' => $d['dep_store_nm'].'에서 일반RT를 처리하였습니다.',
                         'rt' => now()
                     ]);
-            
+
                 DB::table('msg_store_detail')
                     ->insert([
                         'msg_cd' => $res,

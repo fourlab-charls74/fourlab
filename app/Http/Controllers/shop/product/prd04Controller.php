@@ -17,14 +17,14 @@ use PDO;
 class prd04Controller extends Controller
 {
 
-	public function index() 
+	public function index()
 	{
 		//로그인한 아이디의 매칭된 매장을 불러옴
 		$user_store	= Auth('head')->user()->store_cd;
 
 
 		$values = [
-			'sdate'			=> date('Y-m-d'), 
+			'sdate'			=> date('Y-m-d'),
             'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
 			'user_store'	=> $user_store
 		];
@@ -162,7 +162,7 @@ class prd04Controller extends Controller
 		if( $page == 1 ){
 			$query	= /** @lang text */
 			"
-				select 
+				select
 					count(prd_cd) as total,
 					sum(a.goods_sh * a.wqty) as total_goods_sh,
 					sum(a.price * a.wqty) as total_price,
@@ -170,7 +170,7 @@ class prd04Controller extends Controller
 					sum(a.wqty) as total_wqty,
 					sum(a.sqty) as total_sqty
 				from (
-					select 
+					select
 						pc.prd_cd
 						, (ps.wqty - ifnull(_next_storage.qty, 0)) as wqty
 						, ($store_qty_sql - ifnull(_next_store.qty, 0)) as sqty
@@ -201,7 +201,7 @@ class prd04Controller extends Controller
 							group by prd_cd
 						) _next_store on _next_store.prd_cd = ps.prd_cd $next_store_qty_sql
 						left outer join product_stock_storage pss2 on pss2.prd_cd = pc.prd_cd
-					where 
+					where
 						c.code_kind_cd = 'PRD_CD_COLOR'
 						$where
 					group by pc.prd_cd
@@ -222,7 +222,7 @@ class prd04Controller extends Controller
 
 		$query	= /** @lang text */
 		"
-			select 
+			select
 				pc.prd_cd
 				, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
 				, if(pc.goods_no = 0, '', ps.goods_no) as goods_no
@@ -267,8 +267,8 @@ class prd04Controller extends Controller
 					group by prd_cd
 				) _next_store on _next_store.prd_cd = ps.prd_cd $next_store_qty_sql
 				left outer join product_stock_storage pss2 on pss2.prd_cd = pc.prd_cd
-			where 
-				c.code_kind_cd = 'PRD_CD_COLOR' 
+			where
+				c.code_kind_cd = 'PRD_CD_COLOR'
 				$where
 			group by pc.prd_cd
 			$having
@@ -343,7 +343,7 @@ class prd04Controller extends Controller
 		// 		left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = p.color
 		// 	having prd_cd_p = :prd_cd_p
 		// ";
-		
+
 		// $colors = array_unique(array_map(function($row) {
 		// 	return (object)['code' => $row->color_cd, 'name' => $row->color];
 		// }, $rows), SORT_REGULAR);
@@ -351,7 +351,7 @@ class prd04Controller extends Controller
 		// $sizes = array_unique(array_map(function($row) {
 		// 	return (object)['code' => $row->size];
 		// }, $rows), SORT_REGULAR);
-		
+
 		$values = [
 			'prd_cd_p' => $prd_cd_p,
 			'sdate' => $sdate,
@@ -361,7 +361,7 @@ class prd04Controller extends Controller
 			'store_types' => SLib::getCodes("STORE_TYPE"), // 매장구분
 		];
 
-		return view(Config::get('shop.shop.view') . '/product/prd04_show', $values);		
+		return view(Config::get('shop.shop.view') . '/product/prd04_show', $values);
 	}
 
 	/** search_stock: 옵션별 재고현황 검색 */
@@ -374,20 +374,19 @@ class prd04Controller extends Controller
 		$o_prd_cd_p = $prd_cd_p;
 		$store_type = $request->input('store_type', '');
 		$color = $request->input('color', '');
-		$user_store = Auth('head')->user()->store_cd;
+        if ($color != '') $prd_cd_p .= $color;
+        $user_store = Auth('head')->user()->store_cd;
 
-		if ($color != '') $prd_cd_p .= $color;
-
-		$values = [];
+        $values = [];
 
 		if ($prd_cd_p != '') {
 
 			// get sizes
 			$sql = "
-				select size 
+				select size
 				from product_code
 				where prd_cd like '$prd_cd_p%'
-				group by size		
+				group by size
 			";
 			$sizes = array_map(function($row) {return $row->size;}, DB::select($sql));
 
@@ -425,7 +424,7 @@ class prd04Controller extends Controller
 
 			if (!isset($prd) || $prd->goods_no == '0') {
 				$sql = "
-					select 
+					select
 						p.prd_cd, p.prd_nm as goods_nm, p.style_no, p.type, p.com_id, c.com_nm
 						, p.match_yn, p.use_yn, pc.brand, b.brand_nm
 						, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
@@ -441,7 +440,7 @@ class prd04Controller extends Controller
 
 			// get store stock
 			$where = "";
-			
+
 			/**
 			 * 매장의 "타매장재고조회"항목이 'Y'일 경우 => 같은 매장구분값을 가지는 매장들의 재고 조회
 			 * 매장의 "타매장재고조회"항목이 'N'일 경우 => 해당매장재고만 조회
@@ -458,32 +457,32 @@ class prd04Controller extends Controller
 			$case_sql = "";
 			foreach ($sizes as $size) {
 				$case_sql .= "
-					, if(pc.size = '$size', (ps.qty 
-						- sum(if(hst.type in (1, 11, 14, 15), ifnull(hst.qty, 0), 0)) 
+					, if(pc.size = '$size', (ps.qty
+						- sum(if(hst.type in (1, 11, 14, 15), ifnull(hst.qty, 0), 0))
 						- ifnull(w.qty, 0)
-					), 0) as '" . str_replace('.', '', $size) . "_qty'  
-					, if(pc.size = '$size', (ps.wqty 
-						- sum(if(hst.type in (1, 11, 14, 15), ifnull(hst.qty, 0), 0)) 
+					), 0) as '" . str_replace('.', '', $size) . "_qty'
+					, if(pc.size = '$size', (ps.wqty
+						- sum(if(hst.type in (1, 11, 14, 15), ifnull(hst.qty, 0), 0))
 						- ifnull(w.qty, 0)
-					), 0) as '" . str_replace('.', '', $size) . "_wqty' 
+					), 0) as '" . str_replace('.', '', $size) . "_wqty'
 				";
 			}
 
 			$sql = "
 				select pc.color, c.code_val as color_nm, ps.store_cd, s.store_nm, ps.prd_cd
 					$case_sql
-					, (ps.qty 
-						- sum(if(hst.type in (1, 11, 14, 15), ifnull(hst.qty, 0), 0)) 
+					, (ps.qty
+						- sum(if(hst.type in (1, 11, 14, 15), ifnull(hst.qty, 0), 0))
 						- ifnull(w.qty, 0)
 					) as qty
-					, (ps.wqty 
-						- sum(if(hst.type in (1, 11, 14, 15), ifnull(hst.qty, 0), 0)) 
+					, (ps.wqty
+						- sum(if(hst.type in (1, 11, 14, 15), ifnull(hst.qty, 0), 0))
 						- ifnull(w.qty, 0)
 					) as wqty
 				from product_stock_store ps
 					inner join product_code pc on pc.prd_cd = ps.prd_cd
 					inner join store s on s.store_cd = ps.store_cd
-					left outer join (		
+					left outer join (
 						select prd_cd, location_cd, type, qty
 						from product_stock_hst
 						where stock_state_date >= '$next_edate' and stock_state_date <= '$now_date' and location_type = 'STORE'
@@ -504,8 +503,8 @@ class prd04Controller extends Controller
 			$case_sql = "";
 			foreach ($sizes as $size) {
 				$case_sql .= "
-					, if(pc.size = '$size', (ps.qty - sum(if(hst.type in (1, 9, 11, 16, 17), ifnull(hst.qty, 0), 0))), 0) as '" . str_replace('.', '', $size) . "_qty'  
-					, if(pc.size = '$size', (ps.wqty - sum(if(hst.type in (1, 9, 11, 16, 17), ifnull(hst.qty, 0), 0))), 0) as '" . str_replace('.', '', $size) . "_wqty' 
+					, if(pc.size = '$size', (ps.qty - sum(if(hst.type in (1, 9, 11, 16, 17), ifnull(hst.qty, 0), 0))), 0) as '" . str_replace('.', '', $size) . "_qty'
+					, if(pc.size = '$size', (ps.wqty - sum(if(hst.type in (1, 9, 11, 16, 17), ifnull(hst.qty, 0), 0))), 0) as '" . str_replace('.', '', $size) . "_wqty'
 				";
 			}
 
@@ -517,7 +516,7 @@ class prd04Controller extends Controller
 				from product_stock_storage ps
 					inner join product_code pc on pc.prd_cd = ps.prd_cd
 					inner join storage s on s.storage_cd = ps.storage_cd and s.use_yn = 'Y'
-					left outer join (		
+					left outer join (
 						select prd_cd, location_cd, type, qty
 						from product_stock_hst
 						where stock_state_date >= '$next_edate' and stock_state_date <= '$now_date' and location_type = 'STORAGE'
@@ -585,7 +584,7 @@ class prd04Controller extends Controller
 			$error_code	= "400";
 		}
 
-        //try 
+        //try
 		//{
         //    DB::beginTransaction();
 
@@ -595,7 +594,7 @@ class prd04Controller extends Controller
 			for( $i = 0; $i < count($datas); $i++ )
 			{
 				$data		= (array)$datas[$i];
-	
+
 				$storage_cd	= trim($data['storage_cd']);
 				$prd_cd_p	= trim($data['prd_cd_p']);
 				$prd_cd		= trim($data['prd_cd']);
@@ -732,10 +731,10 @@ class prd04Controller extends Controller
 				DB::table('product_stock_storage')->updateOrInsert($where, $values);
 
 			}
-	
+
 		//	DB::commit();
         //}
-		//catch(Exception $e) 
+		//catch(Exception $e)
 		//{
         //    DB::rollback();
 
@@ -794,14 +793,14 @@ class prd04Controller extends Controller
 			$error_code	= "400";
 		}
 
-        //try 
+        //try
 		//{
         //    DB::beginTransaction();
 
 			for( $i = 0; $i < count($datas); $i++ )
 			{
 				$data		= (array)$datas[$i];
-	
+
 				$prd_cd_p	= trim($data['prd_cd_p']);
 				$style_no	= trim($data['style_no']);
 				$prd_nm		= trim($data['prd_nm']);
@@ -835,7 +834,7 @@ class prd04Controller extends Controller
 						if( $brand == "" ){
 							$error_code		= "501";
 							$result_code	= "브랜드정보가 존재하지 않습니다. [" . $prd_cd . "]";
-		
+
 							break;
 						}
 
@@ -866,7 +865,7 @@ class prd04Controller extends Controller
 							'admin_id'	=> $id
 						];
 						DB::table('product_code')->Insert($values);
-		
+
 					}
 
 					//product 등록/수정
@@ -923,10 +922,10 @@ class prd04Controller extends Controller
 				}
 
 			}
-	
+
 		//	DB::commit();
         //}
-		//catch(Exception $e) 
+		//catch(Exception $e)
 		//{
         //    DB::rollback();
 
@@ -986,7 +985,7 @@ class prd04Controller extends Controller
 			$error_code	= "400";
 		}
 
-        //try 
+        //try
 		//{
         //    DB::beginTransaction();
 
@@ -998,7 +997,7 @@ class prd04Controller extends Controller
 			for( $i = 0; $i < count($datas); $i++ )
 			{
 				$data		= (array)$datas[$i];
-	
+
 				$store_cd	= trim($data['store_cd']);
 				$prd_cd_p	= trim($data['prd_cd_p']);
 				$prd_nm		= trim($data['prd_nm']);
@@ -1042,7 +1041,7 @@ class prd04Controller extends Controller
 					$goods_no	= $row->goods_no;
 					$goods_opt	= $row->goods_opt;
 				}
-		
+
 				if( $wonga == 0 ){
 					//$error_code		= "502";
 					//$result_code	= "상품정보 혹은 원가정보가 존재하지 않습니다. [" . $prd_cd . "]";
@@ -1083,10 +1082,10 @@ class prd04Controller extends Controller
 				}
 
 			}
-	
+
 		//	DB::commit();
         //}
-		//catch(Exception $e) 
+		//catch(Exception $e)
 		//{
         //   DB::rollback();
 
