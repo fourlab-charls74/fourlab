@@ -84,7 +84,7 @@
     // 판매등록
     function save(reservation_yn = 'N') {
         let order_data = getForm2JSON($('form[name=f1]'));
-        
+
         let rows = [];
         gx.gridOptions.api.forEachNode(node => {
             if(node.data.goods_no !== undefined) {
@@ -93,7 +93,7 @@
         })
         order_data["cart"] = rows;
         order_data["reservation_yn"] = reservation_yn;
-        
+
         $.ajax({
             async: true,
             dataType: "json",
@@ -111,6 +111,8 @@
                         if (confirm("해당상품의 매장재고가 부족합니다.\n예약판매하시겠습니까?")) {
                             save('Y');
                         }
+                    } else if (res.code === '-104') {
+                        alert("해당상품의 매장재고가 부족합니다. 재고가 1개 이상 존재할 때는 예약판매할 수 없습니다.");
                     } else {
                         alert("저장에 실패했습니다.\n실패 사유 : " + out_order_errors[res.code]);
                     }
@@ -259,14 +261,14 @@
         const store_cd = $("[name=store_no]").val();
         const url = `/shop/api/goods/show?store_cd=${store_cd || 'ALL'}`;
         window.open(url, "_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1800,height=1000");
-        
+
     }
 
     // 상품추가팝업 callback
     var goodsCallback = (row) => {
         setGoodsGrid([row]);
     };
-    
+
     // 상품추가팝업 callback
     var multiGoodsCallback = (rows) => {
         if (rows && Array.isArray(rows)) setGoodsGrid(rows);

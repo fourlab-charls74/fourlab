@@ -56,9 +56,9 @@ class ord01Controller extends Controller
         }
 
         $pr_code = substr($pr_code_str,0,-1);
-        
+
         $sql = "
-            select 
+            select
                 code_id, code_val
             from code
             where code_kind_cd = 'PR_CODE'
@@ -84,9 +84,9 @@ class ord01Controller extends Controller
         }
 
         $sell_type = substr($sell_type_str,0,-1);
-        
+
         $sql = "
-            select 
+            select
                 code_id, code_val
             from code
             where code_kind_cd = 'sale_kind'
@@ -120,7 +120,7 @@ class ord01Controller extends Controller
             'goods_stats'	    => SLib::getCodes('G_GOODS_STAT'), // 상품상태
 			'items'			    => SLib::getItems(), // 품목
             'sale_kinds'        => SLib::getUsedSaleKinds(),
-            'store'             => DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', '=', $store_cd)->first(),      
+            'store'             => DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', '=', $store_cd)->first(),
             'sell_type'         => $sell_type,
             'pr_code_id'        => $str,
             'pr_code_val'       => $str2,
@@ -177,14 +177,14 @@ class ord01Controller extends Controller
 
         $sql = /** @lang text */
             "
-            select 
+            select
                 concat(code_val,'_',ifnull(code_val2, '')) as 'name',
                 concat(code_val,' [',ifnull(code_val2, ''),']') as 'value'
-            from code 
-            where code_kind_cd ='BANK' 
-                and code_id != 'K' 
-                and use_yn = 'Y' 
-            order by code_seq        
+            from code
+            where code_kind_cd ='BANK'
+                and code_id != 'K'
+                and use_yn = 'Y'
+            order by code_seq
         ";
         $banks = DB::select($sql);
 
@@ -239,7 +239,7 @@ class ord01Controller extends Controller
         $prd_cd_range_text = $request->input("prd_cd_range", '');
         $sale_form      = $request->input('sale_form', '');
         $sell_type      = $request->input('sell_type');
-       
+
         if ($page < 1 or $page == '') $page = 1;
 
         $offline_store = 'HEAD_OFFICE';
@@ -253,11 +253,11 @@ class ord01Controller extends Controller
 
         $where = "";
         $where .= " and o.ord_kind != '10' "; // 정상판매건이 아닌 경우에만 출력
-        
+
         // 날짜검색 미사용 여부
         $is_not_use_date = false;
         // if (
-        //     $ord_no != '' 
+        //     $ord_no != ''
         //     || ($ord_info_key == 'om.user_id' && $ord_info_value != '')
         //     || ($ord_info_key == 'om.user_nm' && $ord_info_value != '')
         //     || ($ord_info_key == 'om.r_nm' && strlen($ord_info_value) >= 4)
@@ -550,7 +550,7 @@ class ord01Controller extends Controller
         $total_row = [];
         if($page == 1) {
             $sql = "
-                select 
+                select
                     count(*) as total,
                     sum(o.qty) as total_qty,
                     sum(o.qty * g.price) as total_goods_price,
@@ -611,10 +611,10 @@ class ord01Controller extends Controller
         }
 
         return response()->json([
-            'code' => $code, 
-            'msg' => $msg, 
+            'code' => $code,
+            'msg' => $msg,
             'data' => [
-                'total_count' => count($ord_nos), 
+                'total_count' => count($ord_nos),
                 'success_count' => $success_cnt
             ],
         ]);
@@ -623,12 +623,12 @@ class ord01Controller extends Controller
     public function create()
     {
         $sql = "
-            select 
+            select
                 concat(code_val,'_',ifnull(code_val2, '')) as 'name',
                 concat(code_val,' [',ifnull(code_val2, ''),']') as 'value'
-            from code 
+            from code
             where code_kind_cd ='BANK'
-                and code_id != 'K' 
+                and code_id != 'K'
                 and use_yn = 'Y'
             order by code_seq
         ";
@@ -653,8 +653,8 @@ class ord01Controller extends Controller
             'banks'         => $banks,
             'dlv_cds'       => SLib::getCodes('DELIVERY'),
             'dlv_fee'       => [
-                'base_dlv_fee'  => $conf->getConfigValue('delivery', 'base_delivery_fee'), 
-                'add_dlv_fee'   => $conf->getConfigValue('delivery', 'add_delivery_fee'), 
+                'base_dlv_fee'  => $conf->getConfigValue('delivery', 'base_delivery_fee'),
+                'add_dlv_fee'   => $conf->getConfigValue('delivery', 'add_delivery_fee'),
                 'free_dlv_amt'  => $conf->getConfigValue('delivery', 'free_delivery_amt'),
             ],
         ];
@@ -894,7 +894,7 @@ class ord01Controller extends Controller
         ################################
         #	재고 수량 확인
         ################################
-        
+
         $order_opt = [];
 
         for ($i = 0; $i < count($cart); $i++) {
@@ -919,7 +919,7 @@ class ord01Controller extends Controller
             $order_opt_amt = $opt_amt * $qty;
 
             $sql = "
-                select 
+                select
                     a.goods_nm, a.head_desc, a.md_id, a.md_nm, b.com_nm, a.com_id, a.baesong_kind,
                     a.baesong_price, b.pay_fee/100 as com_rate, a.com_type, a.goods_type, a.is_unlimited,
                     a.point_cfg, a.point_yn, a.point_unit, a.price, a.point, a.wonga, '' as margin_rate
@@ -978,7 +978,7 @@ class ord01Controller extends Controller
                 $coupon_no = $cart[$i]["coupon_no"];
                 // 쿠폰정보 얻기
                 $sql = "
-                    select com_rat 
+                    select com_rat
                     from coupon_company
                     where coupon_no = :coupon_no and com_id = :com_id
                 ";
@@ -987,7 +987,7 @@ class ord01Controller extends Controller
                     $com_rat = $coupon->com_rat;
                 }
             }
-            
+
             $add_group_point = 0;
             if ($add_point_ratio > 0) {
                 $add_group_point = ($goods_price * ($add_point_ratio / 100)) * $qty;
@@ -1123,7 +1123,7 @@ class ord01Controller extends Controller
             'chk_dlv_fee' => DB::raw('NULL'),
             'admin_id' => $c_admin_id
         ]);
-        
+
         $pay_stat = 0;
         $tno = '';
         $pay_amt = $recv_amt + $dlv_amt + $add_dlv_fee - $point_amt - $coupon_amt - $dc_amt;
@@ -1301,21 +1301,21 @@ class ord01Controller extends Controller
     }
 
     /**
-     * 
+     *
      * 수기 일괄등록
-     * 
+     *
      */
 
     /** 수기 일괄등록 화면 */
     public function batch_create()
     {
         $sql = "
-            select 
+            select
                 concat(code_val,'_',ifnull(code_val2, '')) as 'name',
                 concat(code_val,' [',ifnull(code_val2, ''),']') as 'value'
-            from code 
+            from code
             where code_kind_cd ='BANK'
-                and code_id != 'K' 
+                and code_id != 'K'
                 and use_yn = 'Y'
             order by code_seq
         ";
@@ -1340,14 +1340,14 @@ class ord01Controller extends Controller
             'banks'         => $banks,
             'dlv_cds'       => SLib::getCodes('DELIVERY'),
             'dlv_fee'       => [
-                'base_dlv_fee'  => $conf->getConfigValue('delivery', 'base_delivery_fee'), 
-                'add_dlv_fee'   => $conf->getConfigValue('delivery', 'add_delivery_fee'), 
+                'base_dlv_fee'  => $conf->getConfigValue('delivery', 'base_delivery_fee'),
+                'add_dlv_fee'   => $conf->getConfigValue('delivery', 'add_delivery_fee'),
                 'free_dlv_amt'  => $conf->getConfigValue('delivery', 'free_delivery_amt'),
             ],
         ];
         return view(Config::get('shop.store.view') . '/order/ord01_batch', $values);
     }
-    
+
     /** Excel 파일 저장 후 ag-grid(front)에 사용할 응답을 JSON으로 반환 */
     public function batch_import(Request $request)
     {
@@ -1360,17 +1360,17 @@ class ord01Controller extends Controller
 				$now = date('YmdHis');
 				$user_id = Auth::guard('head')->user()->id;
 				$extension = $file->extension();
-	
+
 				$save_path = "data/store/ord01/";
 				$file_name = "${now}_${user_id}.${extension}";
 
                 if (!Storage::disk('public')->exists($save_path)) {
 					Storage::disk('public')->makeDirectory($save_path);
 				}
-	
+
 				$file = sprintf("${save_path}%s", $file_name);
 				move_uploaded_file($_FILES['file']['tmp_name'], $file);
-	
+
 				return response()->json(['code' => '1', 'file' => $file], 200);
 			}
 		}
@@ -1394,10 +1394,10 @@ class ord01Controller extends Controller
         $dlv_apply = 'Y'; // 배송비적용
         $give_point = 'N'; // 적립금지급
         $group_apply = 'N';
-        
+
         $success_list = [];
         $failed_list = [];
-        
+
         foreach ($orders as $order) {
             $code = '200';
             $cart = $order['cart'] ?? [];
@@ -1495,7 +1495,7 @@ class ord01Controller extends Controller
                 $order['order_no'] = $order_result['ord_no'];
                 $order['code'] = $code;
                 array_push($success_list, $order);
-                
+
                 DB::commit();
             } catch (Exception $e) {
                 DB::rollback();
@@ -1526,7 +1526,7 @@ class ord01Controller extends Controller
     private function __replaceTel($tel)
     {
         $tel = trim($tel);
-        if (strpos($tel, '-') === false) { 
+        if (strpos($tel, '-') === false) {
             $len = strlen($tel);
             if ($len == 9) {
                 $patterns = array("/(\d{2})(\d{3})(\d{4})/");
@@ -1563,10 +1563,10 @@ class ord01Controller extends Controller
         }
     }
 
-    /** 
-     * 
-     * 주문상세내역 
-     * 
+    /**
+     *
+     * 주문상세내역
+     *
      */
     public function show($ord_no, $ord_opt_no = '')
     {
@@ -1598,7 +1598,7 @@ class ord01Controller extends Controller
             'dlv_cds'		=> SLib::getCodes("DELIVERY"),
 			'refund_yn'		=> ''
         ]);
-        
+
         return view(Config::get('shop.store.view') . '/order/ord01_detail', $values);
     }
 
@@ -1686,7 +1686,7 @@ class ord01Controller extends Controller
         // 주문매장정보 조회
         $store_cd = $row->store_cd;
         $sql = "
-            select 
+            select
                 a.store_cd, a.store_nm_s as store_nm
                 , a.store_type, a.store_kind, a.zipcode, a.addr1, a.addr2
                 , c.code_val as store_type_nm, d.code_val as store_kind_nm
@@ -2123,7 +2123,7 @@ class ord01Controller extends Controller
 
         $values['gifts'] = $rows;
 
-        return $values;        
+        return $values;
     }
 
     /** 매장환불처리 */
@@ -2135,7 +2135,7 @@ class ord01Controller extends Controller
         $refund_nm = $request->input('store_refund_nm', '');
         $refund_account = $request->input('store_refund_account', '');
         $refund_memo = $request->input('store_refund_memo', '');
-        
+
         $code = 200;
         $msg = '';
         $user = [
@@ -2147,7 +2147,7 @@ class ord01Controller extends Controller
             DB::beginTransaction();
 
             $sql = "
-			    select 
+			    select
                     o.ord_no, o.ord_opt_no, o.prd_cd, o.goods_no, o.goods_sub, o.goods_opt
                     , o.qty, o.wonga, o.price, o.dc_amt, o.point_amt, o.recv_amt, o.ord_state
                     , o.coupon_amt, o.com_id, c.pay_fee as com_rate, o.ord_kind, o.ord_type
@@ -2197,7 +2197,7 @@ class ord01Controller extends Controller
 
                 // 포인트 환원
                 $point->Cancel($ord->refund_point_amt);
-                
+
                 // 포인트 반납(차감)
                 $point->Refund($ord->ord_opt_no, $ord->add_point, '61');
             }
@@ -2636,8 +2636,19 @@ class ord01Controller extends Controller
         $ord_opt_no = $request->input('ord_opt_no', '');
         $ord_type = 15; // 정상:15
 
+        $code = 200;
+        $msg = '';
+
         try {
             DB::beginTransaction();
+
+            $order = DB::table('order_opt')->where('ord_opt_no', $ord_opt_no)->first();
+            $stock_amt = DB::table('product_stock_store')->where('store_cd', $order->store_cd)->where('prd_cd', $order->prd_cd)->value('wqty');
+
+            if (is_null($stock_amt) || $stock_amt < 0) {
+                $code = 404;
+                throw new Exception('매장 보유재고가 0개 이상일 때만 예약상품지급이 가능합니다. 해당상품의 현재 보유재고는 ' . ($stock_amt ?? '-') . '개 입니다.');
+            }
 
             DB::table('order_opt')->where('ord_opt_no', $ord_opt_no)->update([ 'ord_type' => $ord_type ]);
             DB::table('order_opt_wonga')->where('ord_opt_no', $ord_opt_no)->update([ 'ord_type' => $ord_type ]);
@@ -2648,11 +2659,10 @@ class ord01Controller extends Controller
             }
 
             DB::commit();
-            $code = 200;
             $msg = '예약판매상품이 지급완료처리되었습니다.';
         } catch (Exception $e) {
             DB::rollback();
-            $code = 500;
+            if ($code === 200) $code = 500;
             $msg = $e->getMessage();
         }
 

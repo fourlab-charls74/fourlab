@@ -542,8 +542,13 @@ class PosController extends Controller
                     if ($reservation_yn === 'Y') {
                         $opt_ord_type = 4; // order_opt의 ord_type (정상:15 / 예약:4)
                     } else {
-                        $code = '-105';
-                        throw new Exception("재고가 부족하여 판매할 수 없습니다.");
+                        if ($prd_wqty > 0) {
+                            $code = '-104';
+                            throw  new Exception("재고가 부족하여 판매할 수 없습니다. (재고 1개 이상 예약판매 불가)");
+                        } else {
+                            $code = '-105';
+                            throw new Exception("재고가 부족하여 판매할 수 없습니다.");
+                        }
                     }
                 }
 
@@ -1159,8 +1164,19 @@ class PosController extends Controller
         $ord_opt_no = $request->input('ord_opt_no', '');
         $ord_type = 15; // 정상:15
 
+        $code = 200;
+        $msg = '';
+
         try {
             DB::beginTransaction();
+
+            $order = DB::table('order_opt')->where('ord_opt_no', $ord_opt_no)->first();
+            $stock_amt = DB::table('product_stock_store')->where('store_cd', $order->store_cd)->where('prd_cd', $order->prd_cd)->value('wqty');
+
+            if (is_null($stock_amt) || $stock_amt < 0) {
+                $code = 404;
+                throw new Exception('매장 보유재고가 0개 이상일 때만 예약상품지급이 가능합니다. 해당상품의 현재 보유재고는 ' . ($stock_amt ?? '-') . '개 입니다.');
+            }
 
             DB::table('order_opt')->where('ord_opt_no', $ord_opt_no)->update([ 'ord_type' => $ord_type ]);
             DB::table('order_opt_wonga')->where('ord_opt_no', $ord_opt_no)->update([ 'ord_type' => $ord_type ]);
@@ -1171,11 +1187,10 @@ class PosController extends Controller
             }
 
             DB::commit();
-            $code = 200;
             $msg = '예약판매상품이 지급완료처리되었습니다.';
         } catch (Exception $e) {
             DB::rollback();
-            $code = 500;
+            if ($code === 200) $code = 500;
             $msg = $e->getMessage();
         }
 

@@ -23,9 +23,9 @@
 
     /** 매출분석 & 직전결제내역 데이터 조회 */
     async function getOrderAnalysisData() {
-        const { status, data } = await axios({ 
+        const { status, data } = await axios({
             url: '/shop/pos/search/analysis',
-            method: 'get' 
+            method: 'get'
         });
 
         if(status === 200) {
@@ -33,7 +33,7 @@
             $("#to_pay_amt").text(Comma(data.today_order?.pay_amt || 0));
             $("#to_qty").text(Comma(data.today_order?.ord_qty || 0));
             $("#to_ord_cnt").text(Comma(data.today_order?.ord_cnt));
-            
+
             $("[name=po_ord_no]").val(data.prev_order?.ord_no || '');
             $("#po_recv_amt").text(Comma(data.prev_order?.recv_amt || 0));
             $("#po_ord_amt").text(Comma(data.prev_order?.ord_amt || 0));
@@ -93,18 +93,18 @@
             $('#searchWaitingModal').modal('hide');
             setScreen("pos_order");
             $("[name=cur_ord_state]").val(ORD_STATE.WAITING);
-            
+
             order = res.data.data[0];
             $("#ord_no").text(order.ord_no);
             $("#memo").val(order.dlv_comment);
             setMember('', order);
 
             for(let goods of res.data.data) {
-                await gx.gridOptions.api.applyTransaction({ 
+                await gx.gridOptions.api.applyTransaction({
                     add: [{
-                        ...goods, 
+                        ...goods,
                         total: goods.qty * goods.price,
-                        sale_type: goods.sale_kind || sale_types[0].sale_kind, 
+                        sale_type: goods.sale_kind || sale_types[0].sale_kind,
                         pr_code: goods.pr_code || pr_codes[0].pr_code
                     }],
                 });
@@ -131,11 +131,11 @@
 
             $("[name=cur_ord_state]").val(ORD_STATE.NEW);
             $("[name=removed_goods]").val("");
-            
+
             $("[name=card_amt]").val(0);
             $("[name=cash_amt]").val(0);
             $("[name=point_amt]").val(0);
-            
+
             $("#total_order_amt").text(0);
             $("#total_order_amt2").text(0);
             $("#payed_amt").text(0);
@@ -143,7 +143,7 @@
             $("#due_amt").text(0);
             $("#total_order_qty").text(0);
             $("#total_coupon_discount_qty").text(0);
-            
+
             $("#card_amt").text(0);
             $("#cash_amt").text(0);
             $("#point_amt").text(0);
@@ -151,8 +151,8 @@
             $("#memo").val('');
         }
     }
-    
-    /** 
+
+    /**
      * 전체취소
      * 주문초기화로 기능변경 - 20230314
      */
@@ -166,9 +166,9 @@
     /** 새로운 주문번호 조회 */
     async function setNewOrdNo(create = false) {
         if(create) {
-            const { data: { ord_no } } = await axios({ 
+            const { data: { ord_no } } = await axios({
                 url: '/shop/pos/search/ordno',
-                method: 'get' 
+                method: 'get'
             });
             $("#ord_no").text(ord_no);
         } else {
@@ -184,7 +184,7 @@
         let data = "search_type=" + type + "&search_keyword=" + keyword;
         gx2.Request("/shop/pos/search/goods", data, 1);
     }
-    
+
     /** 상품리스트에 상품 추가 */
     function addProduct(prd_cd = '') {
         if(prd_cd == '') return;
@@ -193,7 +193,7 @@
         let goods = list.find(g => g.prd_cd === prd_cd);
 
         let same_goods = gx.getRows().find(g => g.prd_cd === prd_cd);
-        if(same_goods === undefined) {    
+        if(same_goods === undefined) {
             gx.gridOptions.api.applyTransaction({ add: [{...goods, qty: 1, total: 1 * goods.price, sale_type: sale_types[0].sale_kind, pr_code: pr_codes[0].pr_code}] });
             gx.gridOptions.api.forEachNode((node) => {
                 if(node.data.prd_cd === prd_cd) {
@@ -257,7 +257,7 @@
         if(goods.sale_type != "") {
             $(sale_type).val(goods.sale_type).prop("selected", true);
         }
-         
+
         if(goods.pr_code != "") {
             $('#pr_code').val(goods.pr_code).prop("selected", true);
         } else {
@@ -269,7 +269,7 @@
                 $("#pr_code").prop("selectedIndex", 0);
             }
         }
- 
+
         // 쿠폰 조건에 따라 disabled 처리
         const selected_coupon_nos = list.filter(d => d.coupon_no !== '').map(d => d.coupon_no);
         const usable_coupon_nos = $("#coupon_no option").toArray()
@@ -332,8 +332,8 @@
 
                     $("#cur_price").text(Comma(std_price - discount_amt));
                     curRow[0].setData({
-                        ...rowData, 
-                        sale_type: value, 
+                        ...rowData,
+                        sale_type: value,
                         price: std_price - discount_amt,
                         total: rowData.qty * (std_price - discount_amt) - (rowData.coupon_discount_amt || 0)
                     });
@@ -341,17 +341,17 @@
                     curRow[0].setData({...rowData, pr_code: value});
                 } else if(key === 'coupon_no') {
                     const cp = event.target.selectedOptions[0]?.dataset;
-                    const discount_amt = cp.amt_kind === 'P' 
-                        ? Math.round(rowData.goods_sh * rowData.qty * ((cp.per || 0) * 1) / 100) 
+                    const discount_amt = cp.amt_kind === 'P'
+                        ? Math.round(rowData.goods_sh * rowData.qty * ((cp.per || 0) * 1) / 100)
                         : ((cp.amt || 0) * 1);
                     curRow[0].setData({
-                        ...rowData, 
+                        ...rowData,
                         coupon_no: value,
                         coupon_discount_amt: discount_amt,
                         total: rowData.price * rowData.qty - discount_amt
                     });
                 }
-            } 
+            }
         }
 
         let list = gx.getRows();
@@ -363,7 +363,7 @@
         let cash_amt = $("[name=cash_amt]").val() * 1;
         let point_amt = $("[name=point_amt]").val() * 1;
         let payed_amt = card_amt + cash_amt + point_amt;
-        
+
         $("#total_order_amt").text(Comma(order_price));
         $("#total_order_amt2").text(Comma(order_price));
         $("#payed_amt").text(Comma(payed_amt));
@@ -404,7 +404,7 @@
             ord_no = $("#ord_no").text();
             removed_goods = $("[name=removed_goods]").val().split(",").filter(g => g !== '');
         }
-        
+
         // 쿠폰사용 최저가최고가 체크
         const all_coupons = $("#coupon_no option").toArray().map(opt => ({ ...opt.dataset, coupon_no: opt.value }));
         const unavailable_coupons = cart.filter(c => {
@@ -417,7 +417,7 @@
             return false;
         });
         if (unavailable_coupons.length > 0) {
-            let cp = all_coupons.find(coupon => coupon.coupon_no === unavailable_coupons[0].coupon_no);  
+            let cp = all_coupons.find(coupon => coupon.coupon_no === unavailable_coupons[0].coupon_no);
             return alert(`[${cp.coupon_nm}]은 주문금액이 최소 ${Comma(cp.low_price)}원 / 최대 ${Comma(cp.high_price)}원인 상품에만 적용할 수 있습니다.`);
         }
 
@@ -447,9 +447,11 @@
                 searchWaiting();
             } else if(res.data.code !== '500') {
                 if (res.data.code === '-105' && reservation_yn === 'N') {
-                    if(confirm("재고가 부족한 상품이 있습니다.\n예약판매하시겠습니까?")) {
+                    if (confirm("재고가 부족한 상품이 있습니다.\n예약판매하시겠습니까?")) {
                         sale('Y');
                     }
+                } else if (res.data.code === '-104') {
+                    alert("재고가 부족한 상품이 있습니다. 재고가 1개 이상 존재할 때는 예약판매할 수 없습니다.");
                 } else {
                     alert(res.data.msg);
                 }
@@ -470,11 +472,11 @@
             let due_amt = unComma($("#due_amt").text());
             if(due_amt > 0) return alert("결제할 금액이 남아있습니다.");
         }
-        
+
         return true;
     }
 
-    /** 
+    /**
      * 대기
      * 대기기능제거(본사요청) - 20230314
      */
@@ -490,7 +492,7 @@
     //         ord_no = $("#ord_no").text();
     //         removed_goods = $("[name=removed_goods]").val().split(",").filter(g => g !== '');
     //     }
-        
+
     //     axios({
     //         async: true,
     //         url: '/shop/pos/save',
@@ -559,7 +561,7 @@
             $("#user_email").text(memb.email || "-");
             $("#user_address").text(memb.addr ? `${memb.addr} ${memb.addr2}` : "-");
             $("#user_point").text(Comma(memb.point || 0));
-    
+
             $("#no_user").removeClass("d-flex");
             $("#no_user").addClass("d-none");
             $("#user").removeClass("d-none");
@@ -570,7 +572,7 @@
         if(user_id != '') {
             $('#searchMemberModal').modal('hide');
             $("#search_member_keyword").val('');
-        } else if(user != null) {   
+        } else if(user != null) {
             $('#addMemberModal').modal('hide');
             initAddMemberModal();
         }
@@ -584,11 +586,11 @@
             $("#coupon_no").html(html);
             return;
         }
-        
+
         const { data: { body }, status } = await axios({ method: "get", url: "/shop/pos/search/member-coupon?user_id=" + user_id });
         if (status === 200) {
             html += body.reduce((a,c) => a + `
-                <option value='${c.coupon_no}' 
+                <option value='${c.coupon_no}'
                     data-coupon_nm='${c.coupon_nm}'
                     data-apply='${c.coupon_apply}'
                     data-goods_nos='${c.goods_nos}'
@@ -710,7 +712,7 @@
 
         return true;
     }
-    
+
     function getForm2JSON($form){
         var unindexed_array = $form.serializeArray();
         var indexed_array = {};
@@ -781,13 +783,13 @@
                         </td>
                         <td class="pt-2 pb-2 pr-1">
                             <div class="d-flex flex-column align-items-end">
-                                ${(o.coupon_amt > 0) ? `    
+                                ${(o.coupon_amt > 0) ? `
                                     <span class="text-white fs-08 fw-sb br-05 bg-info pl-2 pr-2 mb-1">쿠폰사용</span>
                                 ` : ''}
-                                ${(o.sale_amount > 0 || o.sale_kind == '99') ? `    
+                                ${(o.sale_amount > 0 || o.sale_kind == '99') ? `
                                     <span class="text-white fs-08 fw-sb br-05 bg-warning pl-2 pr-2">${o.sale_type_nm}</span>
                                 ` : ''}
-                                ${(o.sale_amount > 0 || o.sale_kind == '99' || o.coupon_amt > 0) ? `    
+                                ${(o.sale_amount > 0 || o.sale_kind == '99' || o.coupon_amt > 0) ? `
                                     <del class="fc-gray fs-08">${Comma(o.qty * o.price)}</del>
                                 ` : ''}
                                 <p class="fw-sb">${Comma(o.recv_amt + o.point_amt)}</p>
@@ -846,9 +848,9 @@
 
     /** 주문번호로 환불할 주문건 검색 */
     async function searchOrderByOrdNo(ord_no) {
-        const { status, data } = await axios({ 
+        const { status, data } = await axios({
             url: '/shop/pos/search/order-by-ordno?ord_no=' + ord_no,
-            method: 'get' 
+            method: 'get'
         });
 
         let html = "";
@@ -906,9 +908,9 @@
 
         if (keyword == '') return $('#cp_user_phone').trigger('focus');
 
-        const { data, status } = await axios({ 
-            method: 'get', 
-            url: "/shop/pos/search/member?search_type=phone&search_keyword=" + keyword 
+        const { data, status } = await axios({
+            method: 'get',
+            url: "/shop/pos/search/member?search_type=phone&search_keyword=" + keyword
         });
         if (status === 200) {
             const users = data.body;
@@ -930,7 +932,7 @@
 
         if (user_id === '') return alert("고객정보를 선택해주세요.");
         if (serial_num === '') return alert("쿠폰의 시리얼넘버를 입력해주세요.");
-        
+
         axios({
             url: '/shop/pos/add-coupon',
             method: 'post',
@@ -954,7 +956,7 @@
         if (value >= 10) return value;
         return `0${value}`;
     }
-        
+
     function getFormatDate(date, delimiter = '-') {
         const year = date.getFullYear();
         const month = leftPad(date.getMonth() + 1);
