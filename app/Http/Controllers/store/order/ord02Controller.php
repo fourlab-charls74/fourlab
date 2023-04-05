@@ -27,17 +27,17 @@ class ord02Controller extends Controller
 
 		$dlv_locations_sql = "
 			(
-				select 'storage' as location_type, storage_cd as location_cd, storage_nm as location_nm, if(online_yn = 'Y', 0, 1) as seq 
-				from storage 
+				select 'storage' as location_type, storage_cd as location_cd, storage_nm as location_nm, if(online_yn = 'Y', 0, 1) as seq, 0 as location_seq
+				from storage
 				where online_yn = 'Y' or default_yn = 'Y'
 			)
 			union all
 			(
-				select 'store' as location_type, s.store_cd as location_cd, c.code_val as location_nm, 2 as seq 
+				select 'store' as location_type, s.store_cd as location_cd, c.code_val as location_nm, 2 as seq, c.code_seq as location_seq
 				from store s
 					inner join code c on c.code_kind_cd = 'ONLINE_ORDER_STORE' and c.code_id = s.store_cd
 			)
-			order by seq, location_cd
+			order by seq, location_seq
 		";
 		$dlv_locations = DB::select($dlv_locations_sql);
 
@@ -206,18 +206,18 @@ class ord02Controller extends Controller
 
 		// get list
 		$dlv_locations_sql = "
-			(
-				select 'storage' as location_type, storage_cd as location_cd, storage_nm as location_nm, if(online_yn = 'Y', 0, 1) as seq 
-				from storage 
+            (
+				select 'storage' as location_type, storage_cd as location_cd, storage_nm as location_nm, if(online_yn = 'Y', 0, 1) as seq, 0 as location_seq
+				from storage
 				where online_yn = 'Y' or default_yn = 'Y'
 			)
 			union all
 			(
-				select 'store' as location_type, s.store_cd as location_cd, c.code_val as location_nm, 2 as seq 
+				select 'store' as location_type, s.store_cd as location_cd, c.code_val as location_nm, 2 as seq, c.code_seq as location_seq
 				from store s
 					inner join code c on c.code_kind_cd = 'ONLINE_ORDER_STORE' and c.code_id = s.store_cd
 			)
-			order by seq, location_cd
+			order by seq, location_seq
 		";
 		$dlv_locations = DB::select($dlv_locations_sql);
 		$qty_sql = "";
@@ -236,7 +236,7 @@ class ord02Controller extends Controller
 				, null as goods_no_group
 				, if(a.goods_no_group < 2, null, a.ord_opt_no) as ord_opt_no_group
 			from (
-				select 
+				select
 					o.ord_no, o.ord_opt_no, o.goods_no, g.goods_nm, g.goods_nm_eng, g.style_no, pc.goods_opt
 					, pc.prd_cd, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color, pc.size
 					, o.wonga, o.price, g.price as goods_price, g.goods_sh, o.qty
@@ -250,7 +250,7 @@ class ord02Controller extends Controller
 							inner join code inc on inc.code_kind_cd = 'PRD_CD_COLOR' and inc.code_id = inpc.color
 							inner join code incs on if(inpc.gender = 'M', incs.code_kind_cd = 'PRD_CD_SIZE_MEN', if(inpc.gender = 'W', incs.code_kind_cd = 'PRD_CD_SIZE_WOMEN', if(inpc.gender = 'U', incs.code_kind_cd = 'PRD_CD_SIZE_UNISEX', incs.code_kind_cd = 'PRD_CD_SIZE_MATCH' ))) and incs.code_id = inpc.size
                         where inpc.goods_no = o.goods_no
-							and inc.code_val = substring_index(o.goods_opt, '^', 1) 
+							and inc.code_val = substring_index(o.goods_opt, '^', 1)
 							and replace(incs.code_val, ' ', '') = replace(substring_index(o.goods_opt, '^', -1), ' ', '')
 							$prd_where
 					) as goods_no_group
@@ -265,7 +265,7 @@ class ord02Controller extends Controller
 							inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = color
 							inner join code cs on if(gender = 'M', cs.code_kind_cd = 'PRD_CD_SIZE_MEN', if(gender = 'W', cs.code_kind_cd = 'PRD_CD_SIZE_WOMEN', if(gender = 'U', cs.code_kind_cd = 'PRD_CD_SIZE_UNISEX', cs.code_kind_cd = 'PRD_CD_SIZE_MATCH' ))) and cs.code_id = size
 					) pc on pc.goods_no = o.goods_no and pc.color_nm = substring_index(o.goods_opt, '^', 1) and replace(pc.size_nm, ' ', '') = replace(substring_index(o.goods_opt, '^', -1), ' ', '')
-				where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
+				where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE')
 					and o.clm_state in (-30,1,90,0)
 					$where
 				$orderby
@@ -287,7 +287,7 @@ class ord02Controller extends Controller
 		$result = array_reduce($result, function($a, $c) use ($qty_sql) {
 			if (!isset($c->prd_cd)) {
 				$sql = "
-						select 
+						select
 							pc.prd_cd, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
 							, pc.color, pc.size, o.ord_opt_no as ord_opt_no_group, 'N' as prd_match
 							$qty_sql
@@ -322,13 +322,13 @@ class ord02Controller extends Controller
 								inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = color
 								inner join code cs on if(gender = 'M', cs.code_kind_cd = 'PRD_CD_SIZE_MEN', if(gender = 'W', cs.code_kind_cd = 'PRD_CD_SIZE_WOMEN', if(gender = 'U', cs.code_kind_cd = 'PRD_CD_SIZE_UNISEX', cs.code_kind_cd = 'PRD_CD_SIZE_MATCH' ))) and cs.code_id = size
 						) pc on pc.goods_no = o.goods_no and pc.color_nm = substring_index(o.goods_opt, '^', 1) and replace(pc.size_nm, ' ', '') = replace(substring_index(o.goods_opt, '^', -1), ' ', '')
-					where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
+					where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE')
 						and o.clm_state in (-30,1,90,0)
 						$where
 					group by o.ord_opt_no
 				) a
 			";
-			
+
 			$row = DB::selectOne($sql);
 			$total = $row->total;
 			$page_cnt = (int)(($total - 1) / $page_size) + 1;
@@ -367,7 +367,7 @@ class ord02Controller extends Controller
 
 			// 신규형식 출고차수 설정
 			$rel_order = date('ymd') . "-" . $rel_order; // 신규형식 (000000-온라인01)
-			
+
 			// 구형식 출고차수 설정
 			$dlv_series_no = date('YmdH'); // 구형식 (0000000000)
 			$sql = "
@@ -416,15 +416,15 @@ class ord02Controller extends Controller
 					$sql = DB::table('product_stock_store')->where('store_cd', $row['dlv_place_cd'])->where('prd_cd', $row['prd_cd']);
 					if ($sql->count() > 0) $stock_check = $sql->value('wqty') >= $row['qty'];
 				}
-				
+
 				if ($stock_check) {
 					// 출고처리중 처리
 					$state_log = [
-						'ord_no' => $row['ord_no'], 
-						'ord_opt_no' => $row['ord_opt_no'], 
-						'ord_state' => $ord_state, 
-						'comment' => "배송출고요청(온라인주문접수)", 
-						'admin_id' => $user['id'], 
+						'ord_no' => $row['ord_no'],
+						'ord_opt_no' => $row['ord_opt_no'],
+						'ord_state' => $ord_state,
+						'comment' => "배송출고요청(온라인주문접수)",
+						'admin_id' => $user['id'],
 						'admin_nm' => $user['name']
 					];
 					$order->AddStateLog($state_log);
@@ -475,12 +475,12 @@ class ord02Controller extends Controller
 		$wonga = $row['wonga'] ?? 0;
 		$location_type = strtoupper($row['dlv_place_type'] ?? '');
 		$location_cd = $row['dlv_place_cd'] ?? '';
-		
+
 		// 보유재고 차감
 		if ($location_type === 'STORE') {
 			DB::table('product_stock_store')
 				->where('prd_cd', '=', $prd_cd)
-				->where('store_cd', '=', $location_cd) 
+				->where('store_cd', '=', $location_cd)
 				->update([
 					'wqty' => DB::raw('wqty - ' . $ord_qty),
 					'ut' => now(),
@@ -579,7 +579,7 @@ class ord02Controller extends Controller
     private function __replaceTel($tel)
     {
         $tel = trim($tel);
-        if (strpos($tel, '-') === false) { 
+        if (strpos($tel, '-') === false) {
             $len = strlen($tel);
             if ($len == 9) {
                 $patterns = array("/(\d{2})(\d{3})(\d{4})/");
