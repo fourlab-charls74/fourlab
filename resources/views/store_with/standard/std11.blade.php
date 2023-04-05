@@ -35,7 +35,7 @@
                                 </select>
                                 <div class="docs-datepicker form-inline-inner input_box" style="width:30%">
                                     <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date search-enter" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
+                                        <input type="text" class="form-control form-control-sm docs-date search-enter" id="sdate" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
                                                 <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -47,7 +47,7 @@
                                 <span class="text_line">~</span>
                                 <div class="docs-datepicker form-inline-inner input_box" style="width:30%">
                                     <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date search-enter" name="edate" value="{{ $edate }}" autocomplete="off">
+                                        <input type="text" class="form-control form-control-sm docs-date search-enter" id="edate" name="edate" value="{{ $edate }}" autocomplete="off">
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
                                                 <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -65,10 +65,10 @@
                             <div class="flex_box">
                                 <select class="form-control form-control-sm" name="where1" id="where1" onchange="changeWhere1(this)">
                                     <option value="">조회내역없음</option>
-                                    <option value="customer">고객명</option>
-                                    <option value="mobile">전화번호</option>
-                                    <option value="product_cd">바코드</option>
-                                    <option value="product">상품명</option>
+                                    <option value="a.customer">고객명</option>
+                                    <option value="a.mobile">전화번호</option>
+                                    <option value="a.prd_cd">바코드</option>
+                                    <option value="a.goods_nm">상품명</option>
                                 </select>
                             </div>
                         </div>
@@ -77,7 +77,7 @@
                         <div class="form-group">
                             <label for="where2">조회내역</label>
                             <div class="flex_box">
-                                <input type='text' class="form-control form-control-sm search-enter" name='where2' value='' disabled>
+                                <input type='text' class="form-control form-control-sm search-enter" id='where2' name='where2' value='' disabled>
                             </div>
                         </div>
                     </div>
@@ -94,25 +94,9 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="as_state">수선상태</label>
+                            <label for="as_type">접수구분</label>
                             <div class="flex_box">
-                                <select class="form-control form-control-sm" name="as_state" id="as_state">
-                                    <option value="">전체</option>
-                                    <option value="10">수선요청</option>
-                                    <option value="20">수선접수</option>
-                                    <option value="30">수선진행</option>
-                                    <option value="40">수선완료</option>
-                                    <option value="-10">불량</option>
-                                    <option value="-20">본사심의</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="as_state">접수구분</label>
-                            <div class="flex_box">
-                                <select class="form-control form-control-sm" name="as_state" id="as_state">
+                                <select class="form-control form-control-sm" name="as_type" id="as_type">
                                     <option value="">전체</option>
                                     <option value="1">매장접수(A/S)</option>
                                     <option value="2">매장접수(불량)</option>
@@ -143,32 +127,7 @@
                     <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                 </div>
                 <div class="fr_box">
-                    <!-- <form method="get" name="batch">
-                        <div class="flex_box">
-                            <span class="mr-2">
-                                <select name="edit_date_type" class="form-control form-control-sm" style="min-width: 100px;">
-                                    <option value="h_receipt_date">본사접수일</option>
-                                    <option value="start_date">수선인도일</option>
-                                    <option value="due_date">수선예정일</option>
-                                    <option value="end_date">수선완료일</option>
-                                </select>
-                            </span>
-                            <span class="docs-datepicker mr-2">
-                                <div class="input-group">
-                                    <input type="text" class="form-control form-control-sm docs-date search-enter" name="edit_date" value="{{ $sdate }}" autocomplete="off" disable>
-                                    <div class="input-group-append">
-                                        <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-                                            <i class="fa fa-calendar" aria-hidden="true"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="docs-datepicker-container"></div>
-                            </span>
-                            <a href="#" onclick="return batchEdit();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>일괄수정</a>
-                        </div>
-                    </form> -->
-
-                    
+                    <a href="#" onclick="return remove();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>수선삭제</a>
                 </div>
             </div>
         </div>
@@ -179,6 +138,27 @@
 </div>
 <script language="javascript">
 
+        /*
+		 * 접수 구분
+		 *  1 : 매장접수(A/S)
+		 *  2 : 매장접수(불량)
+		 *  3 : 매장접수(심의)
+		 *  4 : 본사A/S접수/진행
+		 *  5 : 본사A/S완료
+		 *  6 : 본사불량
+		 */
+
+		/**
+		 * 수선진행상태
+		 *  10 : 수선요청
+		 *  11 : 불량요청
+		 *  12 : 본사심의요청
+		 *  20 : 수선접수
+		 *  30 : 수선진행
+		 *  40 : 수선완료
+		 *  50 : 불량
+		 */
+
     const DEFAULT_STYLE = {'text-align': 'center'};
 
     const CELL_COLOR = {
@@ -187,7 +167,16 @@
     };
 
     const columns = [
-        {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
+        {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, width: 40, pinned: 'left', sort: null,
+            checkboxSelection: params => {
+                //본사에서만 본사AS진행중일때도 삭제 가능
+					if(params.data.as_state == 10 || params.data.as_state == 11 || params.data.as_state == 12 || params.data.as_state == 30) {
+						return true;
+					} else {
+						return false;
+					}
+				}
+        },
         // this row shows the row index, doesn't use any data from the row
         {
             headerName: '#',
@@ -248,7 +237,8 @@
 
             }
         },
-        { field: "store_cd", headerName: "접수매장", width: 80, cellStyle: DEFAULT_STYLE, pinned: 'left' },
+        { field: "store_cd", headerName: "접수매장", width: 80, cellStyle: DEFAULT_STYLE, pinned: 'left', hide:true },
+        { field: "store_nm", headerName: "접수매장", width: 80, cellStyle: DEFAULT_STYLE, pinned: 'left' },
         { field: "as_type", headerName: "접수구분", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left',
             cellRenderer: (params) => {
                 switch (params.value) {
@@ -283,11 +273,12 @@
         { field: "is_free", headerName: "수선 유료구분", width: 100, cellStyle: DEFAULT_STYLE, },
         { field: "as_amt", headerName: "수선 금액", width: 80, cellStyle: {'text-align' : 'right'}, type: 'currencyType'},
         { field: "content", headerName: "수선내용", width: 300, cellStyle: DEFAULT_STYLE, },
-        { field: "h_receipt_date", headerName: "본사접수일", width: 200, cellStyle: DEFAULT_STYLE, },
-        { field: "end_date", headerName: "수선완료일", width: 200, cellStyle: DEFAULT_STYLE, },
-        { field: "err_date", headerName: "불량등록일", width: 200, cellStyle: DEFAULT_STYLE, },
+        { field: "h_receipt_date", headerName: "본사접수일", width: 100, cellStyle: DEFAULT_STYLE, },
+        { field: "end_date", headerName: "수선완료일", width: 100, cellStyle: DEFAULT_STYLE, },
+        { field: "err_date", headerName: "불량등록일", width: 100, cellStyle: DEFAULT_STYLE, },
         { field: "h_content", headerName: "본사설명", width: 300, cellStyle: DEFAULT_STYLE, },
-        { field: "rt", headerName: "등록일", width: 200, cellStyle: DEFAULT_STYLE, },
+        { field: "rt", headerName: "등록일", width: 120, cellStyle: DEFAULT_STYLE, },
+        { field: "ut", headerName: "수정일", width: 120, cellStyle: DEFAULT_STYLE, },
         
     ];
 
@@ -321,6 +312,7 @@
 
     const formReset = () => {
         document.search.reset();
+        $('#store_no').val(null).trigger('change');
     };
 
     const changeWhere1 = (obj) => {
@@ -381,6 +373,30 @@
         window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=880");
     }
 
+
+    function remove() {
+        let rows = gx.getSelectedRows();
+        if(rows.length < 1) return alert("삭제할 항목을 선택해주세요.");
+        if(!confirm("수선정보를 삭제하시겠습니까?")) return;
+        
+        axios({
+            url: '/store/standard/std11/delete',
+            method: 'post',
+            data: {
+                idx : rows.map(r => r.idx),
+            },
+        }).then(function (res) {
+            if(res.data.code === 200) {
+                alert(res.data.msg);
+                Search();
+            } else {
+                console.log(res.data);
+                alert("삭제 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
+    }
 
 
 </script>

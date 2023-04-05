@@ -15,7 +15,8 @@
                 <h4>검색</h4>
                 <div>
                     <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                    <a href="/shop/standard/std11/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
+                    <!-- {{-- <a href="/store/standard/std11/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a> --}} -->
+                    <a href="#" onclick="openReceipt()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 등록</a>
 		            <a href="#" onclick="formReset()" class="btn btn-sm btn-outline-primary shadow-sm">검색조건 초기화</a>
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
@@ -24,19 +25,17 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="date_type">연월일</label>
+                            <label for="date_type">일자</label>
                             <div class="form-inline date-select-inbox">
                                 <select id="date_type" name="date_type" class="form-control form-control-sm" style="width:30%; margin-right: auto;">
                                     <option value="receipt_date">접수일자</option>
-                                    <option value="sale_date">판매일자</option>
                                     <option value="h_receipt_date">본사접수일</option>
-                                    <option value="start_date">수선인도일</option>
-                                    <option value="due_date">수선예정일</option>
                                     <option value="end_date">수선완료일</option>
+                                    <option value="err_date">불량등록일</option>
                                 </select>
                                 <div class="docs-datepicker form-inline-inner input_box" style="width:30%">
                                     <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date search-enter" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
+                                        <input type="text" class="form-control form-control-sm docs-date search-enter" id="sdate" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
                                                 <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -48,7 +47,7 @@
                                 <span class="text_line">~</span>
                                 <div class="docs-datepicker form-inline-inner input_box" style="width:30%">
                                     <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date search-enter" name="edate" value="{{ $edate }}" autocomplete="off">
+                                        <input type="text" class="form-control form-control-sm docs-date search-enter" id="edate" name="edate" value="{{ $edate }}" autocomplete="off">
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
                                                 <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -66,10 +65,10 @@
                             <div class="flex_box">
                                 <select class="form-control form-control-sm" name="where1" id="where1" onchange="changeWhere1(this)">
                                     <option value="">조회내역없음</option>
-                                    <option value="customer">고객명</option>
-                                    <option value="mobile">전화번호</option>
-                                    <option value="product_cd">상품코드</option>
-                                    <option value="product">상품명</option>
+                                    <option value="a.customer">고객명</option>
+                                    <option value="a.mobile">전화번호</option>
+                                    <option value="a.prd_cd">바코드</option>
+                                    <option value="a.goods_nm">상품명</option>
                                 </select>
                             </div>
                         </div>
@@ -78,7 +77,7 @@
                         <div class="form-group">
                             <label for="where2">조회내역</label>
                             <div class="flex_box">
-                                <input type='text' class="form-control form-control-sm search-enter" name='where2' value='' disabled>
+                                <input type='text' class="form-control form-control-sm search-enter" id='where2' name='where2' value='' disabled>
                             </div>
                         </div>
                     </div>
@@ -86,63 +85,16 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="store_no">매장명</label>
-							<div class="form-inline inline_btn_box">
-								<select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
-								<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-							</div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="item">품목</label>
+                            <label for="as_type">접수구분</label>
                             <div class="flex_box">
-                                <select name="item" class="form-control form-control-sm">
+                                <select class="form-control form-control-sm" name="as_type" id="as_type">
                                     <option value="">전체</option>
-                                    @foreach ($items as $item)
-                                        <option value="{{ $item->cd }}">{{ $item->val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="as_type">수선구분</label>
-                            <div class="flex_box">
-                                <select id="as_type" name="as_type" class="form-control form-control-sm">
-                                    <option value="">전체</option>
-                                    <option value="C">고객수선</option>
-                                    <option value="S">매장수선</option>
-                                    <option value="H">본사수선</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="as_state">진행상태</label>
-                            <div class="flex_box">
-                                <select class="form-control form-control-sm" name="as_state" id="as_state">
-                                    <option value="">전체</option>
-                                    @foreach ($as_states as $as_state)
-                                    <option value="{{ $as_state->code_id }}">{{ $as_state->code_val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="as_check_state">검수상태</label>
-                            <div class="flex_box">
-                                <select class="form-control form-control-sm" name="as_check_state" id="as_check_state">
-                                    <option value="">전체</option>
-                                    <option value="W">대기</option>
-                                    <option value="N">정상</option>
-                                    <option value="F">불량</option>
+                                    <option value="1">매장접수(A/S)</option>
+                                    <option value="2">매장접수(불량)</option>
+                                    <option value="3">매장접수(심의)</option>
+                                    <option value="4">본사A/S접수/진행</option>
+                                    <option value="5">본사A/S완료</option>
+                                    <option value="6">본사불량</option>
                                 </select>
                             </div>
                         </div>
@@ -152,7 +104,7 @@
         </div>
         <div class="resul_btn_wrap mb-3">
             <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-            <a href="/shop/standard/std11/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
+            <a href="/store/standard/std11/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
             <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
         </div>
     </div>
@@ -166,30 +118,7 @@
                     <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                 </div>
                 <div class="fr_box">
-                    <form method="get" name="batch">
-                        <div class="flex_box">
-                            <span class="mr-2">
-                                <select name="edit_date_type" class="form-control form-control-sm" style="min-width: 100px;">
-                                    <option value="h_receipt_date">본사접수일</option>
-                                    <option value="start_date">수선인도일</option>
-                                    <option value="due_date">수선예정일</option>
-                                    <option value="end_date">수선완료일</option>
-                                </select>
-                            </span>
-                            <span class="docs-datepicker mr-2">
-                                <div class="input-group">
-                                    <input type="text" class="form-control form-control-sm docs-date search-enter" name="edit_date" value="{{ $sdate }}" autocomplete="off" disable>
-                                    <div class="input-group-append">
-                                        <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-                                            <i class="fa fa-calendar" aria-hidden="true"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="docs-datepicker-container"></div>
-                            </span>
-                            <a href="#" onclick="return batchEdit();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>일괄수정</a>
-                        </div>
-                    </form>
+                    <a href="#" onclick="return remove();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>수선삭제</a>
                 </div>
             </div>
         </div>
@@ -200,16 +129,45 @@
 </div>
 <script language="javascript">
 
+        /*
+		 * 접수 구분
+		 *  1 : 매장접수(A/S)
+		 *  2 : 매장접수(불량)
+		 *  3 : 매장접수(심의)
+		 *  4 : 본사A/S접수/진행
+		 *  5 : 본사A/S완료
+		 *  6 : 본사불량
+		 */
+
+		/**
+		 * 수선진행상태
+		 *  10 : 수선요청
+		 *  11 : 불량요청
+		 *  12 : 본사심의요청
+		 *  20 : 수선접수
+		 *  30 : 수선진행
+		 *  40 : 수선완료
+		 *  50 : 불량
+		 */
+
     const DEFAULT_STYLE = {'text-align': 'center'};
 
     const CELL_COLOR = {
-        COMMON: {'background' : '#FFFFFF'},
-        IN_PROGRESS: {'background' : '#FFFF99'},
-        DONE: {'background' : '#F5F7F7'}
+        HQ_RECEIPT: {'background' : '#ffff99'},
+        DONE: {'background' : '#E5E7E9'}
     };
 
     const columns = [
-        {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
+        {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, width: 40, pinned: 'left', sort: null,
+            checkboxSelection: params => {
+                //본사에서만 본사AS진행중일때도 삭제 가능
+					if(params.data.as_state == 10 || params.data.as_state == 11 || params.data.as_state == 12) {
+						return true;
+					} else {
+						return false;
+					}
+				}
+        },
         // this row shows the row index, doesn't use any data from the row
         {
             headerName: '#',
@@ -225,107 +183,94 @@
         { field: "idx", headerName: '접수번호', width:100, pinned:'left', maxWidth: 100, cellRenderer: 'loadingRenderer', 
             cellStyle: { ...DEFAULT_STYLE, 'font-size': '13px', 'font-weight': 500 },
             cellRenderer: (params) => {
-                return `<a href="/shop/standard/std11/detail/${params.value}" style="text-decoration: underline !important">${params.value}</a>`
+                return `<a href="#" onclick="openReceiptDetail(${params.value})" style="text-decoration: underline !important">${params.value}</a>`
             },
             pinned: 'left'
         },
         { field: "receipt_date", headerName: "접수일자", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
-        { field: "as_state", headerName: "진행상태", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left', hide:true},
-        { field: "as_state_nm", headerName: "진행상태", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left'},
-        { field: "customer_no", headerName: "고객아이디", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
-        { field: "customer", headerName: "고객명", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
-        { field: "as_type", headerName: "수선구분", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left',
+        { field: "as_state", headerName: "수선상태", width: 100, pinned: 'left' ,
             cellRenderer: (params) => {
                 switch (params.value) {
-                    case "C": 
-                        return "고객수선";
-                    case "S": 
-                        return "매장수선";
-                    case "H": 
-                        return "본사수선";
-                    default:
-                        return params.value;
-                };
-            }
-        },
-        { field: "sale_date", headerName: "판매일자", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
-        { field: "h_receipt_date", headerName: "본사접수일", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
-        { field: "start_date", headerName: "수선인도일", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
-        { field: "due_date", headerName: "수선예정일", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
-        { field: "end_date", headerName: "수선완료일", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
-        { field: "receipt_no", headerName: "접수번호", width: 100, cellStyle: DEFAULT_STYLE },
-        { field: "store_no", headerName: "매장번호", width: 100, cellStyle: DEFAULT_STYLE },
-        { field: "store_nm", headerName: "매장명", width: 100, cellStyle: DEFAULT_STYLE },
-        { field: "as_check_state", headerName: "검수상태", width: 100, cellStyle: DEFAULT_STYLE,
-            cellRenderer: (params) => {
-                switch (params.value) {
-                    case "W": 
-                        return "대기";
-                    case "N": 
-                        return "정상";
-                    case "F": 
+                    case 10:
+                        return "수선요청";
+                    case 11:
+                        return "불량요청";
+                    case 12:
+                        return "본사심의요청";
+                    case 20:
+                        return "수선접수";
+                    case 30:
+                        return "수선진행";
+                    case 40:
+                        return "수선완료";
+                    case 50:
                         return "불량";
-                    default:
-                        return params.value;
-                };
+                }
+            },
+            cellStyle: (params) => {
+                switch (params.value) {
+                    case 10:
+                        return {'text-align' : 'center'};
+                    case 11:
+                        return {'text-align' : 'center'};
+                    case 12:
+                        return {'text-align' : 'center'};
+                    case 20:
+                        return {'color' : 'blue' , 'text-align' : 'center'};
+                    case 30:
+                        return {'color' : 'green' , 'text-align' : 'center'};
+                    case 40:
+                        return {'color' : 'red' , 'text-align' : 'center'};
+                    case 50:
+                        return {'color' : 'purple' , 'text-align' : 'center'};
+                   
+                }
+
             }
         },
-        { field: "item", headerName: "수선품목", width: 100, cellStyle: DEFAULT_STYLE,
+        { field: "store_cd", headerName: "접수매장", width: 80, cellStyle: DEFAULT_STYLE, pinned: 'left', hide:true },
+        { field: "store_nm", headerName: "접수매장", width: 80, cellStyle: DEFAULT_STYLE, pinned: 'left' },
+        { field: "as_type", headerName: "접수구분", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left',
             cellRenderer: (params) => {
                 switch (params.value) {
-                    case "bag": 
-                        return "가방";
-                    case "books": 
-                        return "도서";
-                    case "stove": 
-                        return "스토브";
-                    case "shoes": 
-                        return "신발";
-                    case "accessory": 
-                        return "악세사리";
-                    case "clothes": 
-                        return "의류";
-                    case "cooker":
-                        return "조리기구";
-                    case "kanken":
-                        return "칸켄백";
-                    case "bottle":
-                        return "텀블러";
+                    case "1": 
+                        return "매장접수(A/S)";
+                    case "2": 
+                        return "매장접수(불량)";
+                    case "3": 
+                        return "매장접수(심의)";
+                    case "4": 
+                        return "본사A/S접수/진행";
+                    case "5": 
+                        return "본사A/S완료";
+                    case "6": 
+                        return "본사불량";
                     default:
                         return params.value;
                 };
             }
         },
-        { field: "product_cd", headerName: "제품코드", width: 100, cellStyle: DEFAULT_STYLE },
-        { field: "product", headerName: "제품명", width: 150, cellStyle: DEFAULT_STYLE },
-        { field: "color", headerName: "칼라", width: 80, cellStyle: DEFAULT_STYLE },
-        { field: "size", headerName: "사이즈", width: 80, cellStyle: DEFAULT_STYLE },
-        { field: "quantity", headerName: "수량", width: 80, cellStyle: DEFAULT_STYLE },
-        { field: "is_free", headerName: "수선유료구분", width: 100, cellStyle: DEFAULT_STYLE,
-            cellRenderer: (params) => {
-                switch (params.value) {
-                    case "Y": 
-                        return "유료";
-                    case "N": 
-                        return "무료";
-                    default:
-                        return params.value;
-                };
-            }
-        },
-        { field: "charged_price", headerName: "유료수선금액", width: 100, type: 'currencyType' },
-        { field: "free_price", headerName: "무료수선금액", width: 100, type: 'currencyType' },
-        { field: "mobile", headerName: "핸드폰", width: 100, cellStyle: DEFAULT_STYLE },
-        { field: "zipcode", headerName: "우편번호", width: 80, cellStyle: DEFAULT_STYLE },
-        { field: "addr1", headerName: "주소1", width: 150, cellStyle: DEFAULT_STYLE },
-        { field: "addr2", headerName: "주소2", width: 150, cellStyle: DEFAULT_STYLE },
-        { field: "content", headerName: "수선내용", width: 180, cellStyle: DEFAULT_STYLE },
-        { field: "h_explain", headerName: "본사설명", width: 180, cellStyle: DEFAULT_STYLE },
-        { field: "storing_cd", headerName: "입고처코드", width: 100, cellStyle: DEFAULT_STYLE },
-        { field: "storing_nm", headerName: "입고처명", width: 100, cellStyle: DEFAULT_STYLE },
-        { field: "as_cd", headerName: "수선처코드", width: 100, cellStyle: DEFAULT_STYLE },
-        { field: "as_place", headerName: "수선처명", width: 100, cellStyle: DEFAULT_STYLE },
-        { field: "", width: "auto" }
+        { field: "customer_no", headerName: "고객 아이디", width: 100, cellStyle: DEFAULT_STYLE, },
+        { field: "customer", headerName: "고객명", width: 80, cellStyle: DEFAULT_STYLE, },
+        { field: "mobile", headerName: "핸드폰번호", width: 100, cellStyle: DEFAULT_STYLE,  },
+        { field: "zipcode", headerName: "우편번호", width: 80, cellStyle: DEFAULT_STYLE,  },
+        { field: "addr1", headerName: "주소", width: 200, cellStyle: DEFAULT_STYLE,  },
+        { field: "addr2", headerName: "상세주소", width: 100, cellStyle: DEFAULT_STYLE, },
+        { field: "prd_cd", headerName: "바코드", width: 120, cellStyle: DEFAULT_STYLE, },
+        { field: "goods_nm", headerName: "상품명", width: 300, cellStyle: DEFAULT_STYLE,  },
+        { field: "color", headerName: "컬러", width: 60, cellStyle: DEFAULT_STYLE,  },
+        { field: "size", headerName: "사이즈", width: 60, cellStyle: DEFAULT_STYLE, },
+        { field: "qty", headerName: "수량", width: 60, cellStyle: DEFAULT_STYLE, },
+        { field: "is_free", headerName: "수선 유료구분", width: 100, cellStyle: DEFAULT_STYLE, },
+        { field: "as_amt", headerName: "수선 금액", width: 80, cellStyle: {'text-align' : 'right'}, type: 'currencyType'},
+        { field: "content", headerName: "수선내용", width: 300, cellStyle: DEFAULT_STYLE, },
+        { field: "h_receipt_date", headerName: "본사접수일", width: 100, cellStyle: DEFAULT_STYLE, },
+        { field: "end_date", headerName: "수선완료일", width: 100, cellStyle: DEFAULT_STYLE, },
+        { field: "err_date", headerName: "불량등록일", width: 100, cellStyle: DEFAULT_STYLE, },
+        { field: "h_content", headerName: "본사설명", width: 300, cellStyle: DEFAULT_STYLE, },
+        { field: "rt", headerName: "등록일", width: 120, cellStyle: DEFAULT_STYLE, },
+        { field: "ut", headerName: "수정일", width: 120, cellStyle: DEFAULT_STYLE, },
+        
     ];
 
 </script>
@@ -338,8 +283,9 @@
     const options = {
         rowStyle: CELL_COLOR.COMMON,
         getRowStyle: params => {
-            if (params.data.end_date) return CELL_COLOR.IN_PROGRESS;
-            if (params.data.h_receipt_date) return CELL_COLOR.DONE;
+            let as_type = params.data.as_type;
+            if (as_type == '4') return CELL_COLOR.HQ_RECEIPT;
+            if (as_type == '5' || as_type == '6') return CELL_COLOR.DONE
         },
     };
 
@@ -389,7 +335,7 @@
         if (confirmed == true) {
             try {
                 const response = await axios({ 
-                    url: '/shop/standard/std11/batch-edit',
+                    url: '/store/standard/std11/batch-edit',
                     method: 'post', 
                     data: { data: rows, type: date_type, date: date }
                 });
@@ -405,6 +351,43 @@
             }
         }
     };
+
+    function openReceipt() {
+        const url = '/shop/standard/std11/view/';
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=880");
+    }
+
+
+    function openReceiptDetail(idx) {
+        const url = '/shop/standard/std11/detail/' + idx;
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=880");
+    }
+
+
+    function remove() {
+        let rows = gx.getSelectedRows();
+        if(rows.length < 1) return alert("삭제할 항목을 선택해주세요.");
+        if(!confirm("수선정보를 삭제하시겠습니까?")) return;
+        
+        axios({
+            url: '/shop/standard/std11/delete',
+            method: 'post',
+            data: {
+                idx : rows.map(r => r.idx),
+            },
+        }).then(function (res) {
+            if(res.data.code === 200) {
+                alert(res.data.msg);
+                Search();
+            } else {
+                console.log(res.data);
+                alert("삭제 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
+    }
+
 
 </script>
 
