@@ -42,10 +42,14 @@ class LoginController extends Controller
                 ->where('passwd','=',DB::raw("CONCAT('*', UPPER(SHA1(UNHEX(SHA1('$password')))))"))
                 ->first();
             if($user){
-                Auth::guard('head')->login($user,true);
+
+                //물류그룹 권한 여부 조회
+                $user['logistics_group_yn'] = SLib::getLogisticsGroupYn($request->email, 'logistics');
+
+                Auth::guard('head')->login($user, true);
 
                 $ip = $request->ip;
-
+                
                 DB::table('mgr_user')
                     ->where('id','=',$request->email)
                     ->update([
@@ -53,7 +57,6 @@ class LoginController extends Controller
                         'visit_ip' => $ip,
                         'visit_date' => DB::raw('now()')
                     ]);
-
 
                 $mgr_groups_sql = "
                     select group_no from mgr_user_group mug where id = '$request->email'

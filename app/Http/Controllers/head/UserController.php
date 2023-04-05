@@ -113,9 +113,9 @@ class UserController extends Controller
 
 
         try {
-            DB::transaction(function () use (&$result,$id,$user) {
+            DB::transaction(function () use (&$result, $id, $user) {
                 DB::table('mgr_user')
-                    ->where('id','=',$id)
+                    ->where('id','=', $id)
                     ->update($user);
             });
             $code = 200;

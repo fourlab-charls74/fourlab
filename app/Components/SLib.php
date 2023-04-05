@@ -211,7 +211,42 @@ class SLib
         ";
 
         return DB::select($sql);
+    }
 
+    public static function getLogisticsGroupYn($id, $group_code) {
+
+        $logistics_sql = "
+            select 
+                group_no
+            from 
+                mgr_group_menu_exception
+            where
+                group_no in (
+                    select group_no from mgr_user_group mug where id = '$id'
+                )   
+        ";
+
+        $group_code_sql = "
+            select 
+                group_no
+            from 
+                mgr_button_into_menu_exception
+            where
+                group_code = '$group_code'
+        ";
+        
+        $group_code = DB::selectOne($group_code_sql);
+        $results = DB::select($logistics_sql);
+        
+        if(count($results) > 0) {
+            foreach($results as $result) {
+                if($result->group_no === $group_code->group_no) {
+                    return 'Y';
+                }
+            }
+        }
+
+        return 'N';
     }
 
 }
