@@ -936,6 +936,36 @@ CREATE TABLE `after_service` (
 	PRIMARY KEY (`idx`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- 고객수선2
+CREATE TABLE `after_service2` (
+  `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT '접수번호',
+  `receipt_date` date DEFAULT NULL COMMENT '접수일자',
+  `as_state` smallint(6) DEFAULT NULL COMMENT '수선진행상태 (10 : 수선요청, 11 : 불량요청, 12 : 본사심의요청, 20 : 수선접수, 30 : 수선진행, 40 : 수선완료, 50 : 불량)',
+  `store_cd` varchar(20) DEFAULT NULL COMMENT '매장코드',
+  `as_type` char(1) DEFAULT NULL COMMENT '접수구분 (1 : 매장접수(A/S), 2 : 매장접수(불량), 3 : 매장접수(심의), 4 : 본사A/S접수/진행, 5 : 본사A/S완료, 6 : 본사불량)',
+  `customer_no` varchar(30) DEFAULT NULL COMMENT '고객아이디',
+  `customer` varchar(20) DEFAULT NULL COMMENT '고객명',
+  `mobile` varchar(20) DEFAULT NULL COMMENT '핸드폰번호',
+  `zipcode` varchar(10) DEFAULT NULL COMMENT '우편번호',
+  `addr1` varchar(50) DEFAULT NULL COMMENT '주소1',
+  `addr2` varchar(50) DEFAULT NULL COMMENT '주소2',
+  `prd_cd` varchar(50) DEFAULT NULL COMMENT '바코드',
+  `goods_nm` varchar(100) DEFAULT NULL COMMENT '수선 상품명',
+  `color` varchar(30) DEFAULT NULL COMMENT '컬러',
+  `size` varchar(30) DEFAULT NULL COMMENT '사이즈',
+  `qty` int(11) DEFAULT NULL COMMENT '수량',
+  `is_free` char(1) DEFAULT NULL COMMENT '수선 유료구분',
+  `as_amt` int(11) DEFAULT NULL COMMENT '수선 비용',
+  `content` text COMMENT '수선 내용',
+  `h_receipt_date` date DEFAULT NULL COMMENT '본사접수일',
+  `end_date` date DEFAULT NULL COMMENT '수선완료일',
+  `err_date` date DEFAULT NULL COMMENT '불량등록일',
+  `h_content` text COMMENT '본사 설명',
+  `rt` datetime DEFAULT NULL COMMENT '등록일',
+  `ut` datetime DEFAULT NULL COMMENT '수정일',
+  PRIMARY KEY (`idx`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
+
 -- 메뉴관리
 CREATE TABLE `shop_controller` (
   `menu_no` int(11) NOT NULL AUTO_INCREMENT COMMENT '메뉴번호',
