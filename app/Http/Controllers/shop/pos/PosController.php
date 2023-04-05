@@ -18,13 +18,13 @@ use Exception;
 
 class PosController extends Controller
 {
-    public function index() 
+    public function index()
     {
         $store_cd = Auth::guard('head')->user()->store_cd;
         $today = date('Y-m-d');
         $sql = "
-            select 
-                s.idx as sale_type, s.sale_kind, s.sale_type_nm, 
+            select
+                s.idx as sale_type, s.sale_kind, s.sale_type_nm,
                 s.sale_apply, s.amt_kind, s.sale_amt, s.sale_per
             from sale_type_store ss
                 inner join sale_type s on s.idx = ss.sale_type_cd
@@ -34,8 +34,8 @@ class PosController extends Controller
         $sale_types = DB::select($sql);
 
         $sql = "
-            select 
-                code_id as pr_code, 
+            select
+                code_id as pr_code,
                 code_val as pr_code_nm
             from code
             where code_kind_cd = 'PR_CODE' and use_yn = 'Y'
@@ -112,7 +112,7 @@ class PosController extends Controller
                     inner join order_opt opt on opt.ord_no = o.ord_no
                 where o.store_cd = '$store_cd'
                     and o.ord_state >= 30
-                    and o.ord_date >= '$today 00:00:00' 
+                    and o.ord_date >= '$today 00:00:00'
                     and o.ord_date <= '$today 23:59:59'
                 group by o.ord_no
             ) a
@@ -125,7 +125,7 @@ class PosController extends Controller
             from order_mst
             where store_cd = '$store_cd'
                 and ord_state >= 30
-                and ord_date >= '$today 00:00:00' 
+                and ord_date >= '$today 00:00:00'
                 and ord_date <= '$today 23:59:59'
             order by ord_date desc
             limit 0,1
@@ -236,7 +236,7 @@ class PosController extends Controller
         $order = new Order($user, false);
         $ord_no = $order->GetNextOrdNo();
         // $ord_no = 'test-order-no';
-        
+
         return response()->json(['code' => '200', 'ord_no' => $ord_no], 200);
     }
 
@@ -268,8 +268,8 @@ class PosController extends Controller
         $total = 0;
         $page_cnt = 0;
 
-        $sql = " 
-            select 
+        $sql = "
+            select
                 user_id
                 , name as user_nm
                 , mobile
@@ -284,10 +284,10 @@ class PosController extends Controller
                 , if(store_cd = '$store_cd', 'Y', 'N') as store_member
             from member
             where 1=1 $where
-            order by 
-                (case when store_cd = '$store_cd' then 1 else 2 end), 
-                (case when ASCII(substring(user_nm, 1)) < 123 then 2 else 1 end), 
-                user_nm, 
+            order by
+                (case when store_cd = '$store_cd' then 1 else 2 end),
+                (case when ASCII(substring(user_nm, 1)) < 123 then 2 else 1 end),
+                user_nm,
                 user_id
             $limit
         ";
@@ -322,7 +322,7 @@ class PosController extends Controller
         $code = '200';
         $msg = '';
         $member = '';
-        
+
         $data = (object) $request->all();
         $admin_id = Auth('head')->user()->id;
         $store_cd = Auth::guard('head')->user()->store_cd;
@@ -383,9 +383,9 @@ class PosController extends Controller
                 'store_cd' => $store_cd,
                 'store_nm' => $store_nm,
             ];
-            
+
             DB::table('member')->insert($values);
-            
+
             $msg = "고객정보가 정상적으로 등록되었습니다.";
             DB::commit();
         } catch (Exception $e) {
@@ -396,8 +396,8 @@ class PosController extends Controller
 
         if ($code == '200') {
             $sql = "
-                select 
-                    user_id, name as user_nm, sex, if(sex = 'F', '여', if(sex = 'M', '남', '-')) as gender, 
+                select
+                    user_id, name as user_nm, sex, if(sex = 'F', '여', if(sex = 'M', '남', '-')) as gender,
                     yyyy, mm, dd, phone, mobile, email, addr, addr2, point
                 from member
                 where user_id = '$user_id'
@@ -594,8 +594,8 @@ class PosController extends Controller
                     }
 
                     // 쿠폰할인은 TAG가 기준입니다.
-                    $item_coupon_amt = $cp->coupon_amt_kind === 'P' 
-                        ? round($goods->goods_sh * $qty * ($cp->coupon_per ?? 0) / 100, 0) 
+                    $item_coupon_amt = $cp->coupon_amt_kind === 'P'
+                        ? round($goods->goods_sh * $qty * ($cp->coupon_per ?? 0) / 100, 0)
                         : ($cp->coupon_amt ?? 0);
                 }
 
@@ -627,7 +627,7 @@ class PosController extends Controller
                 $sk = DB::table('sale_type')->select('sale_apply', 'amt_kind', 'sale_amt', 'sale_per')
                     ->where('sale_kind', $sale_kind)->where('use_yn', 'Y')->first();
                 if ($sk !== null) {
-                    $item_dc_amt = $sk->amt_kind === 'per' 
+                    $item_dc_amt = $sk->amt_kind === 'per'
                     ? $sk->sale_apply === 'tag'
                         ? round($goods->goods_sh * $qty * ($sk->sale_per ?? 0) / 100, 0)
                         : round($goods->price * $qty * ($sk->sale_per ?? 0) / 100, 0)
@@ -881,7 +881,7 @@ class PosController extends Controller
         $page_cnt = 0;
 
         $sql = "
-            select 
+            select
                 o.ord_no, o.ord_date, o.user_id, o.user_nm, o.phone, o.mobile, o.ord_amt, o.recv_amt,
                 o.ord_state, o.ord_type, o.ord_kind, o.clm_type, pay.pay_type, pt.code_val as pay_type_nm
             from order_mst o
@@ -1027,22 +1027,22 @@ class PosController extends Controller
         $edate = date("Y-m-d");
 
         $sql = "
-            select 
-                o.ord_no, o.ord_date, o.user_nm, o.ord_amt, 
+            select
+                o.ord_no, o.ord_date, o.user_nm, o.ord_amt,
                 o.recv_amt, o.ord_state, sum(opt.qty) as qty
             from order_mst o
                 inner join order_opt opt on opt.ord_no = o.ord_no
-            where o.store_cd = :store_cd 
-                and o.ord_state = 1 
-                and o.ord_date >= '$sdate 00:00:00' 
+            where o.store_cd = :store_cd
+                and o.ord_state = 1
+                and o.ord_date >= '$sdate 00:00:00'
                 and o.ord_date <= '$edate 23:59:59'
             group by o.ord_no
             order by o.ord_date desc
         ";
         $rows = DB::select($sql, ['store_cd' => $store_cd]);
-        
+
         return response()->json([
-            'code' => '200', 
+            'code' => '200',
             'head' => [
                 'total' => count($rows),
                 'page' => 1,
@@ -1126,15 +1126,23 @@ class PosController extends Controller
                 select cm.user_id, cm.use_to_date as to_date, cm.down_date, cm.coupon_no, c.coupon_nm, c.coupon_type
                     , if(c.use_date_type = 'S', c.use_fr_date, date_format(cm.down_date, '%Y%m%d')) as use_fr_date
                     , if(c.use_date_type = 'S', c.use_to_date, date_format(date_add(cm.down_date, interval c.use_date DAY), '%Y%m%d')) as use_to_date
-                    , c.coupon_apply, ifnull(GROUP_CONCAT(cg.goods_no), '') as goods_nos, ifnull(GROUP_CONCAT(cge.goods_no), '') as ex_goods_nos
-                    , c.coupon_amt_kind, c.coupon_amt, c.coupon_per
+                    , if(c.coupon_apply = 'AG', ifnull(cg.goods_no, ''), '') as goods_nos
+                    , if(c.coupon_apply = 'SG', ifnull(cge.goods_no, ''), '') as ex_goods_nos
+                    , c.coupon_apply, c.coupon_amt_kind, c.coupon_amt, c.coupon_per
                     , c.price_yn, c.low_price, c.high_price
                 from coupon_member cm
                     inner join coupon c on c.coupon_no = cm.coupon_no and c.use_yn = 'Y' and c.coupon_type <> 'O'
-                    left outer join coupon_goods cg on cg.coupon_no = cm.coupon_no
-                    left outer join coupon_goods_ex cge on cge.coupon_no = cm.coupon_no
+                    left outer join (
+                        select coupon_no, GROUP_CONCAT(goods_no) as goods_no
+                        from coupon_goods
+                        group by coupon_no
+                    ) cg on cg.coupon_no = cm.coupon_no
+                    left outer join (
+                        select coupon_no, GROUP_CONCAT(goods_no) as goods_no
+                        from coupon_goods_ex
+                        group by coupon_no
+                    ) cge on cge.coupon_no = cm.coupon_no
                 where cm.user_id = :user_id and cm.use_yn = 'N'
-                group by cm.coupon_no
             ) a
                 where date_format(now(), '%Y%m%d') >= a.use_fr_date and date_format(now(), '%Y%m%d') <= a.use_to_date
         ";
