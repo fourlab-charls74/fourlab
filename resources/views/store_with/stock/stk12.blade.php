@@ -153,7 +153,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="name">공급업체</label>
@@ -168,7 +168,7 @@
                                 </div>
                             </div>
                         </div>
-                       
+
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="brand_cd">브랜드</label>
@@ -180,7 +180,7 @@
                         </div>
                     </div>
                     <div class="row search-area-ext d-none">
-                        
+
                     </div>
                 </div>
             </div>
@@ -251,16 +251,16 @@
         let columns = [
             {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
             {field: "prd_cd", headerName: "바코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
-            {field: "goods_no", headerName: "온라인코드", pinned: 'left', width: 60, cellStyle: {"text-align": "center"}},
+            {field: "goods_no", headerName: "온라인코드", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
             {field: "opt_kind_nm", headerName: "품목", pinned: 'left', width: 80, cellStyle: {"text-align": "center"}},
             {field: "brand_nm", headerName: "브랜드", pinned: 'left', width: 60, cellStyle: {"text-align": "center"}},
             {field: "style_no",	headerName: "스타일넘버", pinned: 'left', width: 80, cellStyle: {"text-align": "center"}},
             {field: "goods_nm",	headerName: "상품명", pinned: 'left', type: 'HeadGoodsNameType', width: 250},
-            {field: "goods_nm_eng",	headerName: "상품명(영문)", pinned: 'left', type: 'HeadGoodsNameType', width: 250},
-            {field: "prd_cd_p", headerName: "품번", pinned: 'left', width: 100, cellStyle: {"text-align": "center"}},
-            {field: "color", headerName: "컬러", pinned: 'left', width: 50, cellStyle: {"text-align": "center"}},
-            {field: "size", headerName: "사이즈", pinned: 'left', width: 50, cellStyle: {"text-align": "center"}},
-            {field: "goods_opt", headerName: "옵션", pinned: 'left', width: 200},
+            {field: "goods_nm_eng",	headerName: "상품명(영문)", type: 'HeadGoodsNameType', width: 250},
+            {field: "prd_cd_p", headerName: "품번", width: 100, cellStyle: {"text-align": "center"}},
+            {field: "color", headerName: "컬러", width: 50, cellStyle: {"text-align": "center"}},
+            {field: "size", headerName: "사이즈", width: 50, cellStyle: {"text-align": "center"}},
+            {field: "goods_opt", headerName: "옵션", width: 200},
             {
                 headerName: '(대표)창고재고', // 대표창고의 재고를 조회
                 children: [
@@ -283,7 +283,7 @@
                     children: [
                         {
                             field: cd + '_qty',
-                            headerName: '재고', 
+                            headerName: '재고',
                             type: "currencyType",
                             width: 50,
                             cellRenderer: function(params) {
@@ -311,6 +311,7 @@
                     ],
                 });
             }
+            columns.push({ width: "auto" });
             gx.gridOptions.api.setColumnDefs(columns);
         }
     </script>

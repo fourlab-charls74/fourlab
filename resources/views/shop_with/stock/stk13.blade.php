@@ -121,7 +121,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>                    
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-lg-4 inner-td">
@@ -285,7 +285,7 @@
     <script language="javascript">
         let columns = [
             {field: "store_nm" , headerName: "매장명", rowGroup: true, hide: true, width: 150, pinned: "left", checkboxSelection: true},
-            {field: "store_cd" , headerName: "매장코드", width: 70, pinned: "left", cellStyle: {"text-align": "center"}, 
+            {field: "store_cd" , headerName: "매장코드", width: 70, pinned: "left", cellStyle: {"text-align": "center"},
                 aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
                 cellRenderer: (params) => params.data ? '' : params.value,
             },
@@ -331,6 +331,7 @@
                     }
                 ]
             },
+            {width: "auto"},
         ];
 
         const basic_autoGroupColumnDef = (headerName, minWidth = 230, maxWidth = 230) => ({
@@ -385,7 +386,7 @@
         // 검색버튼 클릭 시
         function Search() {
             setColumn();
-            
+
             let data = $('form[name="search"]').serialize();
             data += "&ext_storage_qty=" + $("[name=ext_storage_qty]").is(":checked");
             gx.Request('/shop/stock/stk13/search', data, -1, function(d) {
@@ -397,10 +398,10 @@
         function setColumn() {
             let ord_field = $("[name=ord_field]").val();
             if(ord_field === "store_cd") {
-                let prd_columns = columns.map(c => c.field === "store_nm" 
-                    ? ({...c, rowGroup: true, hide: true}) 
-                    : c.field === "prd_cd_sm" 
-                        ? ({...c, rowGroup: false, hide: false}) 
+                let prd_columns = columns.map(c => c.field === "store_nm"
+                    ? ({...c, rowGroup: true, hide: true})
+                    : c.field === "prd_cd_sm"
+                        ? ({...c, rowGroup: false, hide: false})
                         : c.field === "prd_cd"
                             ? ({...c, width: 150})
                             : c
@@ -408,14 +409,14 @@
                 gx.gridOptions.api.setColumnDefs(prd_columns);
                 gx.gridOptions.api.setAutoGroupColumnDef(basic_autoGroupColumnDef('매장', 180, 180));
             } else if(ord_field === "prd_cd") {
-                let prd_columns = columns.map(c => c.field === "store_nm" 
-                    ? ({...c, rowGroup: false, hide: false}) 
+                let prd_columns = columns.map(c => c.field === "store_nm"
+                    ? ({...c, rowGroup: false, hide: false})
                     : c.field === "store_cd"
                         ? ({...c, aggFunc: false, cellRenderer: (params) => params.value})
-                        : c.field === "prd_cd_sm" 
-                            ? ({...c, rowGroup: true, hide: true}) 
-                            : c.field === "prd_cd" 
-                                ? ({...c, checkboxSelection: false, width: 110}) 
+                        : c.field === "prd_cd_sm"
+                            ? ({...c, rowGroup: true, hide: true})
+                            : c.field === "prd_cd"
+                                ? ({...c, checkboxSelection: false, width: 110})
                                 : c
                 );
                 gx.gridOptions.api.setColumnDefs(prd_columns);
