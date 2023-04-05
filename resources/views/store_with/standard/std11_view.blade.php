@@ -73,9 +73,9 @@
                                                 <div class="flex_box">
                                                     <select id="as_type" name="as_type" class="form-control form-control-sm">
                                                         <option value="">선택</option>
-                                                        <option value="1">A/S</option>
-                                                        <option value="2">불량</option>
-                                                        <option value="3">본사심의</option>
+                                                        <option value="1">매장접수(A/S)</option>
+                                                        <option value="2">매장접수(불량)</option>
+                                                        <option value="3">매장접수(심의)</option>
                                                     </select>
                                                 </div>
                                             </td>

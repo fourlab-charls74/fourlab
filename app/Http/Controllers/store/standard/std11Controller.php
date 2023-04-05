@@ -108,6 +108,10 @@ class std11Controller extends Controller
 				, is_free
 				, as_amt
 				, content
+				, h_receipt_date
+				, end_date
+				, err_date
+				, h_content
 				, rt
 				, ut
 
@@ -344,12 +348,12 @@ class std11Controller extends Controller
 
 		$mobile = $data['mobile'][0].'-'.$data['mobile'][1].'-'.$data['mobile'][2];
 
-		if($data['as_type'] == '1') { // A/S
+		if($data['as_type'] == '1') { //매장접수(A/S)
 			$as_state = 10;
-		} elseif ($data['as_type'] == '2') { //불량
-			$as_state = -10;
-		} else {
-			$as_state = -20;
+		} elseif ($data['as_type'] == '2') { //매장접수(불량)
+			$as_state = 11;
+		} elseif ($data['as_type'] == '3') { //매장접수(심의)
+			$as_state = 12;
 		}
 
 		try {
@@ -376,7 +380,6 @@ class std11Controller extends Controller
 					'as_amt' => $data['as_amt']??'',
 					'content' => $data['content']??'',
 					'rt' => now(),
-					'ut' => now()
 				]);
 
 			DB::commit();
@@ -425,7 +428,6 @@ class std11Controller extends Controller
 						'as_amt' => $data['as_amt']??'',
 						'content' => $data['content']??'',
 						'h_receipt_date' => $data['h_receipt_date']??now(),
-						'end_date' => $data['end_date']??'',
 						'h_content'	=> $data['h_content']??'',
 				]);
 
@@ -452,7 +454,6 @@ class std11Controller extends Controller
 						'is_free' => $data['is_free'],
 						'as_amt' => $data['as_amt']??'',
 						'content' => $data['content']??'',
-						'h_receipt_date' => $data['h_receipt_date']??now(),
 						'end_date' => $data['end_date']??now(),
 						'h_content'	=> $data['h_content']??'',
 				]);
@@ -463,7 +464,7 @@ class std11Controller extends Controller
 					->where('idx', '=', $data['idx'])
 					->update([
 						'receipt_date' => $data['edate'],
-						'as_state' => -10,
+						'as_state' => 50,
 						'store_cd' => $data['store_no'],
 						'as_type' => $data['as_type'],
 						'customer_no' => $data['customer_no'],
@@ -480,9 +481,7 @@ class std11Controller extends Controller
 						'is_free' => $data['is_free'],
 						'as_amt' => $data['as_amt']??'',
 						'content' => $data['content']??'',
-						'h_receipt_date' => $data['h_receipt_date']??'',
-						'end_date' => $data['end_date']??'',
-						'err_date' => $data['end_date']??now(),
+						'err_date' => $data['err_date']??now(),
 						'h_content'	=> $data['h_content']??'',
 				]);
 
@@ -501,34 +500,4 @@ class std11Controller extends Controller
 		return response()->json(["code" => $code, "msg" => $msg]);
 	}
 
-	public function change_state2(Request $request) {
-
-		$data = $request->all();
-
-		try {
-			DB::beginTransaction();
-
-			DB::table('after_service2')
-				->where('idx', '=', $data['idx'])
-				->update([
-					'end_date' => $data['end_date'],
-					'h_content'	=> $data['h_content']??'',
-					'as_state' => 40
-				]);
-
-			DB::commit();
-			$code = 200;
-			$msg = "수선완료 처리되었습니다.";
-
-		} catch (Exception $e) {
-			DB::rollback();
-			$code = 500;
-			$msg = $e->getMessage();
-		}
-
-		return response()->json(["code" => $code, "msg" => $msg]);
-
-
-
-	}
 }

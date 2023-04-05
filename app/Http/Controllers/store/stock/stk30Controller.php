@@ -42,7 +42,7 @@ class stk30Controller extends Controller
             'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
             'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
             'items'			=> SLib::getItems(), // 품목
-            'sr_state'      => $sr_state->sr_state,
+            // 'sr_state'      => $sr_state->sr_state,
 		];
 
         return view(Config::get('shop.store.view') . '/stock/stk30', $values);

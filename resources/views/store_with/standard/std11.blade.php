@@ -25,15 +25,13 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="date_type">연월일</label>
+                            <label for="date_type">일자</label>
                             <div class="form-inline date-select-inbox">
                                 <select id="date_type" name="date_type" class="form-control form-control-sm" style="width:30%; margin-right: auto;">
                                     <option value="receipt_date">접수일자</option>
-                                    <option value="sale_date">판매일자</option>
                                     <option value="h_receipt_date">본사접수일</option>
-                                    <option value="start_date">수선인도일</option>
-                                    <option value="due_date">수선예정일</option>
                                     <option value="end_date">수선완료일</option>
+                                    <option value="err_date">불량등록일</option>
                                 </select>
                                 <div class="docs-datepicker form-inline-inner input_box" style="width:30%">
                                     <div class="input-group">
@@ -96,41 +94,32 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="item">품목</label>
-                            <div class="flex_box">
-                                <select name="item" class="form-control form-control-sm">
-                                    <option value="">전체</option>
-                                    @foreach ($items as $item)
-                                        <option value="{{ $item->cd }}">{{ $item->val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="as_state">진행상태</label>
+                            <label for="as_state">수선상태</label>
                             <div class="flex_box">
                                 <select class="form-control form-control-sm" name="as_state" id="as_state">
                                     <option value="">전체</option>
-                                    @foreach ($as_states as $as_state)
-                                    <option value="{{ $as_state->code_id }}">{{ $as_state->code_val }}</option>
-                                    @endforeach
+                                    <option value="10">수선요청</option>
+                                    <option value="20">수선접수</option>
+                                    <option value="30">수선진행</option>
+                                    <option value="40">수선완료</option>
+                                    <option value="-10">불량</option>
+                                    <option value="-20">본사심의</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="as_check_state">검수상태</label>
+                            <label for="as_state">접수구분</label>
                             <div class="flex_box">
-                                <select class="form-control form-control-sm" name="as_check_state" id="as_check_state">
+                                <select class="form-control form-control-sm" name="as_state" id="as_state">
                                     <option value="">전체</option>
-                                    <option value="W">대기</option>
-                                    <option value="N">정상</option>
-                                    <option value="F">불량</option>
+                                    <option value="1">매장접수(A/S)</option>
+                                    <option value="2">매장접수(불량)</option>
+                                    <option value="3">매장접수(심의)</option>
+                                    <option value="4">본사A/S접수/진행</option>
+                                    <option value="5">본사A/S완료</option>
+                                    <option value="6">본사불량</option>
                                 </select>
                             </div>
                         </div>
@@ -193,9 +182,8 @@
     const DEFAULT_STYLE = {'text-align': 'center'};
 
     const CELL_COLOR = {
-        COMMON: {'background' : '#FFFFFF'},
-        IN_PROGRESS: {'background' : '#FFFF99'},
-        DONE: {'background' : '#F5F7F7'}
+        HQ_RECEIPT: {'background' : '#ffff99'},
+        DONE: {'background' : '#E5E7E9'}
     };
 
     const columns = [
@@ -220,41 +208,69 @@
             pinned: 'left'
         },
         { field: "receipt_date", headerName: "접수일자", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
-        { field: "as_state", headerName: "수선상태", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' ,
+        { field: "as_state", headerName: "수선상태", width: 100, pinned: 'left' ,
             cellRenderer: (params) => {
                 switch (params.value) {
                     case 10:
                         return "수선요청";
+                    case 11:
+                        return "불량요청";
+                    case 12:
+                        return "본사심의요청";
                     case 20:
                         return "수선접수";
                     case 30:
                         return "수선진행";
                     case 40:
                         return "수선완료";
-                    case -10:
+                    case 50:
                         return "불량";
-                    case -20:
-                        return "본사심의";
                 }
+            },
+            cellStyle: (params) => {
+                switch (params.value) {
+                    case 10:
+                        return {'text-align' : 'center'};
+                    case 11:
+                        return {'text-align' : 'center'};
+                    case 12:
+                        return {'text-align' : 'center'};
+                    case 20:
+                        return {'color' : 'blue' , 'text-align' : 'center'};
+                    case 30:
+                        return {'color' : 'green' , 'text-align' : 'center'};
+                    case 40:
+                        return {'color' : 'red' , 'text-align' : 'center'};
+                    case 50:
+                        return {'color' : 'purple' , 'text-align' : 'center'};
+                   
+                }
+
             }
         },
         { field: "store_cd", headerName: "접수매장", width: 80, cellStyle: DEFAULT_STYLE, pinned: 'left' },
-        { field: "as_type", headerName: "접수구분", width: 80, cellStyle: DEFAULT_STYLE, pinned: 'left',
+        { field: "as_type", headerName: "접수구분", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left',
             cellRenderer: (params) => {
                 switch (params.value) {
                     case "1": 
-                        return "A/S";
+                        return "매장접수(A/S)";
                     case "2": 
-                        return "불량";
+                        return "매장접수(불량)";
                     case "3": 
-                        return "본사심의";
+                        return "매장접수(심의)";
+                    case "4": 
+                        return "본사A/S접수/진행";
+                    case "5": 
+                        return "본사A/S완료";
+                    case "6": 
+                        return "본사불량";
                     default:
                         return params.value;
                 };
             }
         },
         { field: "customer_no", headerName: "고객 아이디", width: 100, cellStyle: DEFAULT_STYLE, },
-        { field: "customer", headerName: "고객명", width: 100, cellStyle: DEFAULT_STYLE, },
+        { field: "customer", headerName: "고객명", width: 80, cellStyle: DEFAULT_STYLE, },
         { field: "mobile", headerName: "핸드폰번호", width: 100, cellStyle: DEFAULT_STYLE,  },
         { field: "zipcode", headerName: "우편번호", width: 80, cellStyle: DEFAULT_STYLE,  },
         { field: "addr1", headerName: "주소", width: 200, cellStyle: DEFAULT_STYLE,  },
@@ -265,10 +281,13 @@
         { field: "size", headerName: "사이즈", width: 60, cellStyle: DEFAULT_STYLE, },
         { field: "qty", headerName: "수량", width: 60, cellStyle: DEFAULT_STYLE, },
         { field: "is_free", headerName: "수선 유료구분", width: 100, cellStyle: DEFAULT_STYLE, },
-        { field: "as_amt", headerName: "수선 금액", width: 80, cellStyle: {'text-align' : 'right'} },
+        { field: "as_amt", headerName: "수선 금액", width: 80, cellStyle: {'text-align' : 'right'}, type: 'currencyType'},
         { field: "content", headerName: "수선내용", width: 300, cellStyle: DEFAULT_STYLE, },
+        { field: "h_receipt_date", headerName: "본사접수일", width: 200, cellStyle: DEFAULT_STYLE, },
+        { field: "end_date", headerName: "수선완료일", width: 200, cellStyle: DEFAULT_STYLE, },
+        { field: "err_date", headerName: "불량등록일", width: 200, cellStyle: DEFAULT_STYLE, },
+        { field: "h_content", headerName: "본사설명", width: 300, cellStyle: DEFAULT_STYLE, },
         { field: "rt", headerName: "등록일", width: 200, cellStyle: DEFAULT_STYLE, },
-        { field: "ut", headerName: "수정일", width: 200, cellStyle: DEFAULT_STYLE, },
         
     ];
 
@@ -282,8 +301,9 @@
     const options = {
         rowStyle: CELL_COLOR.COMMON,
         getRowStyle: params => {
-            if (params.data.end_date) return CELL_COLOR.IN_PROGRESS;
-            if (params.data.h_receipt_date) return CELL_COLOR.DONE;
+            let as_type = params.data.as_type;
+            if (as_type == '4') return CELL_COLOR.HQ_RECEIPT;
+            if (as_type == '5' || as_type == '6') return CELL_COLOR.DONE
         },
     };
 
