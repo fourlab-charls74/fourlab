@@ -22,7 +22,7 @@
                 </div>
             </div>
 			<div class="card-body">
-				
+
 				<!-- 구분/종류/내용 -->
 				<div class="search-area-ext  row">
 					<div class="col-lg-4 inner-td">
@@ -154,19 +154,19 @@
 						</div>
 					</div>
 
-					
+
 				</div>
 
-				
+
 				<div class="resul_btn_wrap d-sm-none">
-					<a href="javascript:;" class="btn btn-sm w-xs btn-primary shadow-sm apply-btn" onclick="return Search();"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+					<a href="javascript:void(0);" class="btn btn-sm w-xs btn-primary shadow-sm apply-btn" onclick="return Search();"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
 				</div>
 			</div>
 		</div>
 	</div>
 </form>
 
-<div id="filter-area" class="card shadow-none mb-4 search_cum_form ty2 last-card">
+<div id="filter-area" class="card shadow-none search_cum_form ty2 last-card">
 	<div class="card-body shadow">
 		<div class="card-title">
             <div class="filter_wrap">
@@ -203,12 +203,12 @@
 	const gx = new HDGrid(gridDiv, columns);
 	gx.gridOptions.suppressRowClickSelection = true;
 
-	pApp.ResizeGrid();
+	pApp.ResizeGrid(275);
 
 	function Search() {
 		let data = $('form[name="search"]').serialize();
 		gx.Request('/head/member/mem05/search', data,1);
-		
+
 	}
 
 	$(function(){
@@ -217,8 +217,6 @@
 
 	});
 
-	
-</script>
 
-적립금내역
+</script>
 @stop
