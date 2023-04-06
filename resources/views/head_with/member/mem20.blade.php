@@ -441,24 +441,18 @@ var columns = [
                 }
             }
         },
-        {field:"type",headerName:"문의유형",width:80,cellStyle:StyleGoodsTypeNM,editable: true, },
-        {field:"subject",headerName:"제목",width:200,editable: true,
+        {field:"type",headerName:"문의유형",width:80,cellStyle: (params) => ({...StyleGoodsTypeNM(params), 'text-align': 'center'})},
+        {field:"subject",headerName:"제목",width:200,
             cellRenderer: function(params) {
                 var qna_data = params.data.idx;
                 return '<a href="javascript:;" onClick="GetContents('+ qna_data +')">'+ params.value+'</a>'
             }
         },
-        {field:"user_nm",headerName:"작성자", width:75, editable: true, },
-        {field:"regi_date",headerName:"작성일", width:120, editable: true,},
-        {field:"open_state",headerName:"출력", editable: true,},
+        {field:"user_nm",headerName:"작성자", width:75, cellStyle: {'text-align': 'center'}},
+        {field:"regi_date",headerName:"작성일", width:120, cellStyle: {'text-align': 'center'}},
+        {field:"open_state",headerName:"출력", cellStyle: {'text-align': 'center'}},
         {field:"ans_state",headerName:"상태",
-			cellStyle: function(params) {
-				if (params.value == '대기') {
-					return {'color':'#FF0000'};
-				}else{
-					return {'color':'#0000FF'};
-				}
-			}
+            cellStyle: (params) => ({ 'text-align': 'center', 'color': (params.value === '대기' ? '#FF0000' : '#0000FF') }),
         },
         {field:"idx",headerName:"idx", hide: true,},
         {field:"user_id",headerName:"user_id", hide: true,},
@@ -571,7 +565,7 @@ var columns = [
             $("#qa_goods_nm").html("");
 
         if(qa_data.check_id != "" && qa_data.check_id != undefined){
-            
+
             $("#btn_checkin").val(qa_data.check_nm + " 접수취소 ");
 			$("#btn_save").attr("disabled",false);
 			$("#qa_state").html(qa_data.check_nm + " 접수중 ");

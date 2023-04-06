@@ -86,7 +86,7 @@
                             </div>
                         </div>
                     </div>
-				
+
 					<!-- 클레임상태/유형/클레임사유/환불여부/환불지급사 -->
                     <div class="row">
                         <div class="col-lg-4 inner-td">
@@ -111,7 +111,7 @@
 												@foreach($clm_type_item as $clm_type)
 													<option value="{{ $clm_type->code_id }}">{{ $clm_type->code_val }}</option>
 												@endforeach
-                                               
+
                                             </select>
                                         </div>
                                     </div>
@@ -165,9 +165,9 @@
                         </div>
                     </div>
 
-					
+
 					<!-- 스타일넘버/상품명/출력자료수/상단홍보글 -->
-                    <div class="row search-area-ext">
+                    <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                <label for="style_no">스타일넘버</label>
@@ -212,7 +212,7 @@
 
 
 					<!-- 품목/업체/환불여부/환불지급사 -->
-                    <div class="row search-area-ext">
+                    <div class="row search-area-ext d-none">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="">품목</label>
@@ -262,13 +262,13 @@
                             <div class="form-group">
                                <label for="style_no">결제방법</label>
                                <div class="flax_box">
-                                    <select name="stat_pay_type" class="form-control form-control-sm" style="width:calc(20% - 10px);margin-right:10px;">
+                                    <select name="stat_pay_type" class="form-control form-control-sm" style="width:calc(50% - 10px);margin-right:10px;">
                                         <option value="">전체</option>
                                             @foreach($stat_pay_types as $stat_pay_type)
                                                 <option value="{{ $stat_pay_type->code_id }}">{{ $stat_pay_type->code_val }}</option>
                                             @endforeach
                                     </select>
-                                    <div class="form-inline" style="width:80%;">
+                                    <div class="form-inline" style="width:50%;">
                                         <div class="custom-control custom-checkbox form-check-box">
                                             <input type="checkbox" name="not_complex" id="not_complex_y" class="custom-control-input" value="Y">
                                             <label class="custom-control-label" for="not_complex_y">복합결제 제외</label>
@@ -279,7 +279,7 @@
                         </div>
                     </div>
 					<!-- 결제방법/예금주/은행명/접수자 -->
-                    <div class="row search-area-ext">
+                    <div class="row search-area-ext d-none">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="goods_nm">예금주/은행명</label>
@@ -364,7 +364,7 @@
         ];
     </script>
     <script type="text/javascript" charset="utf-8">
-		const pApp = new App('', { gridId: "#div-gd" });
+		const pApp = new App('', { gridId: "#div-gd", height: 265 });
 		const gridDiv = document.querySelector(pApp.options.gridId);
 		const gx = new HDGrid(gridDiv, columns);
 
@@ -375,7 +375,7 @@
 			let data = $('form[name="search"]').serialize();
             gx.Request('/head/cs/cs01/search', data,1);
 		}
-		
+
 		$(function(){
 			$('.ac-company2').autocomplete({
 				//keydown 됬을때 해당 값을 가지고 서버에서 검색함.
@@ -451,7 +451,7 @@
 
 					$("#com_nm").val(name);
 					$("#com_id").val(code);
-					
+
 				});
 			});
 
