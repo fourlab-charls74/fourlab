@@ -12,7 +12,7 @@
             </div>
         </div>
         <div class="d-flex">
-            @if ($row->as_type < 3)
+            @if ($row->as_type == '1' || $row->as_type == '2' || $row->as_type == '3')
                 <a href="javascript:void(0)" onclick="change_state()" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
             @endif
             <a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i> 닫기</a>
@@ -66,13 +66,20 @@
                                             <td>
                                                 <div class="flex_box">
                                                     <select id="as_type" name="as_type" class="form-control form-control-sm">
-                                                        <option value="">선택</option>
-                                                        <option value="1" @if($row->as_type == '1') selected @endif>매장접수(A/S)</option>
-                                                        <option value="2" @if($row->as_type == '2') selected @endif>매장접수(불량)</option>
-                                                        <option value="3" @if($row->as_type == '3') selected @endif>매장접수(심의)</option>
-                                                        <option value="4" @if($row->as_type == '4') selected @endif>본사A/S접수/진행</option>
-                                                        <option value="5" @if($row->as_type == '5') selected @endif>본사A/S완료</option>
-                                                        <option value="6" @if($row->as_type == '6') selected @endif>본사불량</option>
+                                                        @if ($row->as_type == '1' || $row->as_type == '2' || $row->as_type == '3')
+                                                            <option value="">선택</option>
+                                                            <option value="1" @if($row->as_type == '1') selected @endif>매장접수(A/S)</option>
+                                                            <option value="2" @if($row->as_type == '2') selected @endif>매장접수(불량)</option>
+                                                            <option value="3" @if($row->as_type == '3') selected @endif>매장접수(심의)</option>
+                                                        @else
+                                                            <option value="">선택</option>
+                                                            <option value="1" @if($row->as_type == '1') selected @endif>매장접수(A/S)</option>
+                                                            <option value="2" @if($row->as_type == '2') selected @endif>매장접수(불량)</option>
+                                                            <option value="3" @if($row->as_type == '3') selected @endif>매장접수(심의)</option>
+                                                            <option value="4" @if($row->as_type == '4') selected @endif>본사A/S접수/진행</option>
+                                                            <option value="5" @if($row->as_type == '5') selected @endif>본사A/S완료</option>
+                                                            <option value="6" @if($row->as_type == '6') selected @endif>본사불량</option>
+                                                        @endif
                                                     </select>
                                                 </div>
                                             </td>

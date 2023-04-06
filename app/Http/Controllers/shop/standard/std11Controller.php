@@ -94,6 +94,7 @@ class std11Controller extends Controller
 				left outer join store s on s.store_cd = a.store_cd 
 			where 1=1 and a.store_cd = '$user_store'
 			$where
+			order by a.idx desc
         ";
 
 		$result = DB::select($query);
