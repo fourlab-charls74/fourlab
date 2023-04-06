@@ -186,7 +186,7 @@
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
-        Search(1);
+        Search();
     });
     /*
     function Search() {
@@ -213,7 +213,7 @@
 
             if (gridOptions.api.getLastDisplayedRow() > 0 && gridOptions.api.getLastDisplayedRow() == rowtotal - 1) {
                 // console.log(params);
-                Search(0);
+                Search();
             }
             // var rowtotal = gridOptions.api.getDisplayedRowCount();
             // var rowHeight = 25;
@@ -252,10 +252,10 @@
     var columns_arr = {};
     var option_key = {};
 
-    function Search(page) {
+    function Search() {
         let data = $('form[name="search"]').serialize();
         //console.log(data);
-        gx.Request('/head/standard/std05/search', data, page);
+        gx.Request('/head/standard/std05/search', data, -1);
     }
 </script>
 @stop

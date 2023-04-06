@@ -25,40 +25,25 @@ class std05Controller extends Controller
 
     public function search(Request $request)
     {
-        $id = Auth('head')->user()->id;
-        $name = Auth('head')->user()->name;
+        $id      = Auth('head')->user()->id;
+        $name    = Auth('head')->user()->name;
 
-        $page = $request->input("page");
-        $type        = Request("type");
-        $show        = Request("show");
-        $que        = Request("que");
-        $ans        = Request("ans");
-        $best_yn    = Request("best_yn");
+        $page    = $request->input('page', 1);
+        $type    = $request->input('type', '');
+        $show    = $request->input('show', '');
+        $que     = $request->input('que', '');
+        $ans     = $request->input('ans', '');
+        $best_yn = $request->input('best_yn', '');
 
+        // set where
         $where = "";
+        if ($type != '')     $where .= " and a.type = '" . Lib::quote($type) . "' ";
+        if ($show != '')     $where .= " and a.show_yn = '" . Lib::quote($show) . "' ";
+        if ($que != '')      $where .= " and a.question like '%" . Lib::quote($que) . "%' ";
+        if ($ans != '')      $where .= " and a.answer like '%" . Lib::quote($ans) . "%' ";
+        if ($best_yn != '')  $where .= " and a.best_yn = '" . Lib::quote($best_yn) . "' ";
 
-        if ($type != "") $where     .= " and a.type = '$type' ";
-        if ($show != "") $where     .= " and a.show_yn = '$show' ";
-        if ($que != "") $where      .= " and a.question like '%$que%' ";
-        if ($ans != "") $where      .= " and a.answer like '%$ans%' ";
-        if ($best_yn != "") $where  .= " and a.best_yn = '$best_yn' ";
-
-        $page_size = 10;
-        if ($page == 1) {
-            $query = "
-                select count(a.no) as total
-                FROM faq a
-                    inner join code b on b.code_kind_cd = 'G_FAQ_TYPE' and a.type = b.code_id
-                where 1=1 $where
-            ";
-            //echo $query;
-            //$row = DB::select($query,['com_id' => $com_id]);
-            $row = DB::select($query);
-            $total = $row[0]->total;
-            $page_cnt = (int)(($total - 1) / $page_size) + 1;
-        }
-
-        $query = "
+        $sql = "
 			SELECT
 				case when 'kor' = 'kor' then b.code_val else b.code_val_eng end as type
 				, a.question, a.admin_nm
@@ -68,17 +53,18 @@ class std05Controller extends Controller
 			where 1=1 $where
 			order by seq,no desc
         ";
-        //echo $query;
-        $result = DB::select($query);
+        $result = DB::select($sql);
+
         return response()->json([
-            "code" => 200,
-			"head" => array(
-				"total" => count($result),
-				"page" => 1,
-				"page_cnt" => 1,
-				"page_total" => 1
+            'code' => 200,
+            'msg' => 'FAQ내역이 정상적으로 조회되었습니다.',
+			'head' => array(
+				'total' => count($result),
+				'page' => 1,
+				'page_cnt' => 1,
+				'page_total' => 1,
 			),
-			"body" => $result
+			'body' => $result
         ]);
     }
 
