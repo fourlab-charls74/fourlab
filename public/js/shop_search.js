@@ -851,6 +851,10 @@ SearchPrdcd.prototype.Choice = function() {
         if($('#prd_cd').length > 0){
             $('#prd_cd').val(rows.map(r => r.prd_cd).join(","));
         }
+
+        $('#goods_nm').val(rows.map(r => r.goods_nm));
+        $('#color').val(rows.map(r => r.color));
+        $('#size').val(rows.map(r => r.size));
     }
 
     document.search_prdcd.reset();

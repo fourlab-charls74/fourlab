@@ -73,7 +73,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="required">고객아이디/고객명</th>
+                                            <th>고객아이디/고객명</th>
                                             <td>
                                                 <div class="flex_box">
                                                     <input type="text" class="form-control form-control-sm search-enter" name='customer_no' id="customer_no" value="" style="width:41%;" readonly="readonly">
@@ -100,7 +100,7 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <th class="required">주소</th>
+                                            <th>주소</th>
                                             <td>
                                                 <div class="input_box flex_box address_box">
                                                     <input type="text" id="zipcode" name="zipcode" class="form-control form-control-sm" value="" style="width:calc(25% - 10px);margin-right:10px;" readonly="readonly">
@@ -170,14 +170,6 @@
                                             </td>
                                             <th></th>
                                             <td>
-                                                <!-- <div class="flex_box">
-                                                    <select id="as_state" name="as_state" class="form-control form-control-sm">
-                                                        <option value="">선택</option>
-                                                        @foreach ($as_states as $as_state)
-                                                            <option value="{{ $as_state->code_id }}">{{ $as_state->code_val }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div> -->
                                             </td>
                                         </tr>
                                         <tr>
@@ -269,28 +261,13 @@
             return false;
         }
 
-        if(!$("[name=store_no]").val()) {
-            alert("접수매장을 선택해주세요.");
-            return false;
-        }
-
         if ($("#as_type").val() == "") {
             alert("접수구분을 선택해 주세요");
             return false;
         }
 
-        if ($("#customer_no").val() == "") {
-            alert("고객아이디/고객명을 입력해 주세요");
-            return false;
-        }
-
         if ($("#phone1").val() == "" || $("#phone2").val() == "" || $("#phone3").val() == "") {
             alert("핸드폰 번호를 입력해 주세요");
-            return false;
-        }
-
-        if ($("#zipcode").val() == "") {
-            alert("주소를 입력해 주세요");
             return false;
         }
 

@@ -86,7 +86,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="required">고객아이디/고객명</th>
+                                            <th>고객아이디/고객명</th>
                                             <td>
                                                 <div class="flex_box">
                                                     <input type="text" class="form-control form-control-sm search-enter" name='customer_no' id="customer_no" value="{{@$row->customer_no}}" style="width:41%;" readonly="readonly">
@@ -113,7 +113,7 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <th class="required">주소</th>
+                                            <th>주소</th>
                                             <td>
                                                 <div class="input_box flex_box address_box">
                                                     <input type="text" id="zipcode" name="zipcode" class="form-control form-control-sm" value="{{@$row->zipcode}}" style="width:calc(25% - 10px);margin-right:10px;" readonly="readonly">
@@ -237,7 +237,7 @@
                                         <div class="form-inline">
                                             <div class="docs-datepicker form-inline-inner input_box w-100">
                                                 <div class="input-group">
-                                                    <input type="text" class="form-control form-control-sm docs-date" name="h_receipt_date" value="{{@$row->h_receipt_date}}" id="h_receipt_date" autocomplete="off">
+                                                    <input type="text" class="form-control form-control-sm docs-date" name="h_receipt_date" value="{{@$row->h_receipt_date}}" id="h_receipt_date" autocomplete="off" onchange="return isChange(this);">
                                                     <div class="input-group-append">
                                                         <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
                                                             <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -255,7 +255,7 @@
                                         <div class="form-inline">
                                             <div class="docs-datepicker form-inline-inner input_box w-100">
                                                 <div class="input-group">
-                                                    <input type="text" class="form-control form-control-sm docs-date" name="end_date" value="{{@$row->end_date}}" id="end_date" autocomplete="off">
+                                                    <input type="text" class="form-control form-control-sm docs-date" name="end_date" value="{{@$row->end_date}}" id="end_date" autocomplete="off" onchange="return isChange2(this);">
                                                     <div class="input-group-append">
                                                         <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
                                                             <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -273,7 +273,7 @@
                                         <div class="form-inline">
                                             <div class="docs-datepicker form-inline-inner input_box w-100">
                                                 <div class="input-group">
-                                                    <input type="text" class="form-control form-control-sm docs-date" name="err_date" value="{{@$row->err_date}}" id="err_date" autocomplete="off">
+                                                    <input type="text" class="form-control form-control-sm docs-date" name="err_date" value="{{@$row->err_date}}" id="err_date" autocomplete="off" onchange="return isChange3(this);">
                                                     <div class="input-group-append">
                                                         <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
                                                             <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -390,20 +390,20 @@
             return false;
         }
 
-        if ($("#customer_no").val() == "") {
-            alert("고객아이디/고객명을 입력해 주세요");
-            return false;
-        }
+        // if ($("#customer_no").val() == "") {
+        //     alert("고객아이디/고객명을 입력해 주세요");
+        //     return false;
+        // }
 
         if ($("#phone1").val() == "" || $("#phone2").val() == "" || $("#phone3").val() == "") {
             alert("핸드폰 번호를 입력해 주세요");
             return false;
         }
 
-        if ($("#zipcode").val() == "") {
-            alert("주소를 입력해 주세요");
-            return false;
-        }
+        // if ($("#zipcode").val() == "") {
+        //     alert("주소를 입력해 주세요");
+        //     return false;
+        // }
 
         if ($("#prd_cd").val() == "") {
             alert("바코드를 입력해 주세요");
@@ -437,17 +437,6 @@
             }
         }
 
-        //     if($('#h_receipt_date').val() == "") {
-        //         alert('본사 접수일자를 선택해주세요');
-        //         return false;
-        //     }
-
-
-        // if($('#end_date').val() == "") {
-        //     alert('수선완료일자를 선택해주세요');
-        //     return false;
-        // }
-
     }
 
     function change_state() {
@@ -476,34 +465,46 @@
             console.log(err);
         });
     }
-        
-    // function change_state2() {
-    //     if (validate() === false) return;
-    //     if (confirm('수선정보를 완료처리하시겠습니까?') === false) return;
 
-    //     let idx = '{{@$row->idx}}';
-    //     let data = $('form[name="f2"]').serialize();
-    //     data += $('form[name="f1"]').serialize();
-    //     data += '&idx=' + idx;
+    // 본사접수일이 선택되면 접수구분이 매장A/S접수/진행으로 변경
+    function isChange() {
+        let as_type = '{{@$row->as_type}}';
 
-    //     axios({
-    //         url: '/store/standard/std11/change_state2',
-    //         method: 'post',
-    //         data: data
-    //     }).then(function (res) {
-    //         if(res.data.code === 200) {
-    //             alert(res.data.msg);
-    //             window.close();
-    //             opener.Search();
-    //         } else {
-    //             console.log(res.data);
-    //             alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-    //         }
-    //     }).catch(function (err) {
-    //         console.log(err);
-    //     });
-    // }
-        
+        if ($('#h_receipt_date').val() != '') {
+            $('#as_type').val('4');
+            $('#err_date').val('');
+        } else {
+            $('#as_type').val(as_type);
+        }
+    }
+
+    // 수선완료일이 선택되면 접수구분이 본사A/S완료로 변경
+    // 수선완료일이 선택될 때 본사접수일이 빈값이면 수선완료일과 같은 날짜로 변경
+    function isChange2(obj) {
+        let as_type = '{{@$row->as_type}}';
+
+        if ($('#end_date').val() != '') {
+            $('#as_type').val('5');
+            if ($('#h_receipt_date').val() == '') {
+                $('#h_receipt_date').val(obj.value);
+                $('#err_date').val('');
+            }
+        } else {
+            $('#as_type').val(as_type);
+        }
+    }
+
+    //불량등록일이 선택되면 접수구분을 본사불량으로 변경
+    function isChange3(obj) {
+        let as_type = '{{@$row->as_type}}';
+
+        if ($('#err_date').val() != '') {
+            $('#as_type').val('6');
+        } else {
+            $('#as_type').val(as_type);
+        }
+    }
+
 
 </script>
 @stop

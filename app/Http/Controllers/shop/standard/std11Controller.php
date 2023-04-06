@@ -324,9 +324,11 @@ class std11Controller extends Controller
 		}
 	}
 
-	public function save(Request $request) {
+	public function save(Request $request) 
+	{
 
 		$data = $request->all();
+		$user_store = Auth('head')->user()->store_cd;
 
 		$mobile = $data['mobile'][0].'-'.$data['mobile'][1].'-'.$data['mobile'][2];
 
@@ -345,14 +347,14 @@ class std11Controller extends Controller
 				->insert([
 					'receipt_date' => $data['edate'],
 					'as_state' => $as_state,
-					'store_cd' => $data['store_no'],
+					'store_cd' => $user_store,
 					'as_type' => $data['as_type'],
-					'customer_no' => $data['customer_no'],
-					'customer' => $data['customer'],
+					'customer_no' => $data['customer_no']??'',
+					'customer' => $data['customer']??'',
 					'mobile' => $mobile,
-					'zipcode' => $data['zipcode'],
-					'addr1' => $data['addr1'],
-					'addr2' => $data['addr2'],
+					'zipcode' => $data['zipcode']??'',
+					'addr1' => $data['addr1']??'',
+					'addr2' => $data['addr2']??'',
 					'prd_cd' => $data['prd_cd'],
 					'goods_nm' => $data['goods_nm'],
 					'color' => $data['color'],

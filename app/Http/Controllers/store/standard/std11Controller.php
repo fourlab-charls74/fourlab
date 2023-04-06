@@ -312,7 +312,8 @@ class std11Controller extends Controller
 		}
 	}
 
-	public function save(Request $request) {
+	public function save(Request $request) 
+	{
 
 		$data = $request->all();
 
@@ -335,12 +336,12 @@ class std11Controller extends Controller
 					'as_state' => $as_state,
 					'store_cd' => $data['store_no'],
 					'as_type' => $data['as_type'],
-					'customer_no' => $data['customer_no'],
-					'customer' => $data['customer'],
+					'customer_no' => $data['customer_no']??'',
+					'customer' => $data['customer']??'',
 					'mobile' => $mobile,
-					'zipcode' => $data['zipcode'],
-					'addr1' => $data['addr1'],
-					'addr2' => $data['addr2'],
+					'zipcode' => $data['zipcode']??'',
+					'addr1' => $data['addr1']??'',
+					'addr2' => $data['addr2']??'',
 					'prd_cd' => $data['prd_cd'],
 					'goods_nm' => $data['goods_nm'],
 					'color' => $data['color'],
@@ -392,7 +393,6 @@ class std11Controller extends Controller
 		$data = $request->all();
 		$mobile = $data['mobile'][0].'-'.$data['mobile'][1].'-'.$data['mobile'][2];
 
-
 		try {
 			DB::beginTransaction();
 			if ($data['as_type'] == '1') { // 매장접수(A/S)
@@ -404,12 +404,12 @@ class std11Controller extends Controller
 						'as_state' => 10,
 						'store_cd' => $data['store_no'],
 						'as_type' => '1',
-						'customer_no' => $data['customer_no'],
-						'customer' => $data['customer'],
+						'customer_no' => $data['customer_no']??'',
+						'customer' => $data['customer']??'',
 						'mobile' => $mobile,
-						'zipcode' => $data['zipcode'],
-						'addr1' => $data['addr1'],
-						'addr2' => $data['addr2'],
+						'zipcode' => $data['zipcode']??'',
+						'addr1' => $data['addr1']??'',
+						'addr2' => $data['addr2']??'',
 						'prd_cd' => $data['prd_cd'],
 						'goods_nm' => $data['goods_nm'],
 						'color' => $data['color'],
@@ -434,12 +434,12 @@ class std11Controller extends Controller
 						'as_state' => 11,
 						'store_cd' => $data['store_no'],
 						'as_type' => '2',
-						'customer_no' => $data['customer_no'],
-						'customer' => $data['customer'],
+						'customer_no' => $data['customer_no']??'',
+						'customer' => $data['customer']??'',
 						'mobile' => $mobile,
-						'zipcode' => $data['zipcode'],
-						'addr1' => $data['addr1'],
-						'addr2' => $data['addr2'],
+						'zipcode' => $data['zipcode']??'',
+						'addr1' => $data['addr1']??'',
+						'addr2' => $data['addr2']??'',
 						'prd_cd' => $data['prd_cd'],
 						'goods_nm' => $data['goods_nm'],
 						'color' => $data['color'],
@@ -464,12 +464,12 @@ class std11Controller extends Controller
 						'as_state' => 12,
 						'store_cd' => $data['store_no'],
 						'as_type' => '3',
-						'customer_no' => $data['customer_no'],
-						'customer' => $data['customer'],
+						'customer_no' => $data['customer_no']??'',
+						'customer' => $data['customer']??'',
 						'mobile' => $mobile,
-						'zipcode' => $data['zipcode'],
-						'addr1' => $data['addr1'],
-						'addr2' => $data['addr2'],
+						'zipcode' => $data['zipcode']??'',
+						'addr1' => $data['addr1']??'',
+						'addr2' => $data['addr2']??'',
 						'prd_cd' => $data['prd_cd'],
 						'goods_nm' => $data['goods_nm'],
 						'color' => $data['color'],
@@ -493,13 +493,13 @@ class std11Controller extends Controller
 						'receipt_date' => $data['edate'],
 						'as_state' => 30,
 						'store_cd' => $data['store_no'],
-						'as_type' => $data['as_type'],
-						'customer_no' => $data['customer_no'],
-						'customer' => $data['customer'],
+						'as_type' => '4',
+						'customer_no' => $data['customer_no']??'',
+						'customer' => $data['customer']??'',
 						'mobile' => $mobile,
-						'zipcode' => $data['zipcode'],
-						'addr1' => $data['addr1'],
-						'addr2' => $data['addr2'],
+						'zipcode' => $data['zipcode']??'',
+						'addr1' => $data['addr1']??'',
+						'addr2' => $data['addr2']??'',
 						'prd_cd' => $data['prd_cd'],
 						'goods_nm' => $data['goods_nm'],
 						'color' => $data['color'],
@@ -521,13 +521,13 @@ class std11Controller extends Controller
 							'receipt_date' => $data['edate'],
 							'as_state' => 40,
 							'store_cd' => $data['store_no'],
-							'as_type' => $data['as_type'],
-							'customer_no' => $data['customer_no'],
-							'customer' => $data['customer'],
+							'as_type' => '5',
+							'customer_no' => $data['customer_no']??'',
+							'customer' => $data['customer']??'',
 							'mobile' => $mobile,
-							'zipcode' => $data['zipcode'],
-							'addr1' => $data['addr1'],
-							'addr2' => $data['addr2'],
+							'zipcode' => $data['zipcode']??'',
+							'addr1' => $data['addr1']??'',
+							'addr2' => $data['addr2']??'',
 							'prd_cd' => $data['prd_cd'],
 							'goods_nm' => $data['goods_nm'],
 							'color' => $data['color'],
@@ -550,13 +550,13 @@ class std11Controller extends Controller
 						'receipt_date' => $data['edate'],
 						'as_state' => 50,
 						'store_cd' => $data['store_no'],
-						'as_type' => $data['as_type'],
-						'customer_no' => $data['customer_no'],
-						'customer' => $data['customer'],
+						'as_type' => '6',
+						'customer_no' => $data['customer_no']??'',
+						'customer' => $data['customer']??'',
 						'mobile' => $mobile,
-						'zipcode' => $data['zipcode'],
-						'addr1' => $data['addr1'],
-						'addr2' => $data['addr2'],
+						'zipcode' => $data['zipcode']??'',
+						'addr1' => $data['addr1']??'',
+						'addr2' => $data['addr2']??'',
 						'prd_cd' => $data['prd_cd'],
 						'goods_nm' => $data['goods_nm'],
 						'color' => $data['color'],
@@ -570,92 +570,95 @@ class std11Controller extends Controller
 						'ut' => now()
 				]);
 
-			} elseif ($data['h_receipt_date'] != '') { //본사접수일이 입력되어있으면 접수구분이 자동으로 본사 A/S접수 진행으로 변경 수선진행상태를 수선진행으로 변경
-
-				DB::table('after_service2')
-					->where('idx', '=', $data['idx'])
-					->update([
-						'receipt_date' => $data['edate'],
-						'as_state' => 30,
-						'store_cd' => $data['store_no'],
-						'as_type' => '4',
-						'customer_no' => $data['customer_no'],
-						'customer' => $data['customer'],
-						'mobile' => $mobile,
-						'zipcode' => $data['zipcode'],
-						'addr1' => $data['addr1'],
-						'addr2' => $data['addr2'],
-						'prd_cd' => $data['prd_cd'],
-						'goods_nm' => $data['goods_nm'],
-						'color' => $data['color'],
-						'size' => $data['size'],
-						'qty' => $data['qty'],
-						'is_free' => $data['is_free'],
-						'as_amt' => $data['as_amt']??'',
-						'content' => $data['content']??'',
-						'h_receipt_date' => $data['h_receipt_date']??now(),
-						'h_content'	=> $data['h_content']??'',
-						'ut' => now()
-				]);
-				
-			} elseif ($data['end_date'] != '') { //수선완료일이 빈값이 아니면 자동으로 접수구분이 본사A/S완료로 변경 수선진행상태를 수선완료로 변경
-
-					DB::table('after_service2')
-						->where('idx', '=', $data['idx'])
-						->update([
-							'receipt_date' => $data['edate'],
-							'as_state' => 40,
-							'store_cd' => $data['store_no'],
-							'as_type' => '5',
-							'customer_no' => $data['customer_no'],
-							'customer' => $data['customer'],
-							'mobile' => $mobile,
-							'zipcode' => $data['zipcode'],
-							'addr1' => $data['addr1'],
-							'addr2' => $data['addr2'],
-							'prd_cd' => $data['prd_cd'],
-							'goods_nm' => $data['goods_nm'],
-							'color' => $data['color'],
-							'size' => $data['size'],
-							'qty' => $data['qty'],
-							'is_free' => $data['is_free'],
-							'as_amt' => $data['as_amt']??'',
-							'content' => $data['content']??'',
-							'h_receipt_date' => $data['h_receipt_date']??$data['end_date'],
-							'end_date' => $data['end_date'],
-							'h_content'	=> $data['h_content']??'',
-							'ut' => now()
-					]);
-
-			} elseif ($data['err_date'] != '') { // 불량등록일이 빈값이 아닐때 접수구분을 본사불량으로 변경 수선진행상태를 본사 불량 처리
-
-				DB::table('after_service2')
-					->where('idx', '=', $data['idx'])
-					->update([
-						'receipt_date' => $data['edate'],
-						'as_state' => 50,
-						'store_cd' => $data['store_no'],
-						'as_type' => '6',
-						'customer_no' => $data['customer_no'],
-						'customer' => $data['customer'],
-						'mobile' => $mobile,
-						'zipcode' => $data['zipcode'],
-						'addr1' => $data['addr1'],
-						'addr2' => $data['addr2'],
-						'prd_cd' => $data['prd_cd'],
-						'goods_nm' => $data['goods_nm'],
-						'color' => $data['color'],
-						'size' => $data['size'],
-						'qty' => $data['qty'],
-						'is_free' => $data['is_free'],
-						'as_amt' => $data['as_amt']??'',
-						'content' => $data['content']??'',
-						'err_date' => $data['err_date'],
-						'h_content'	=> $data['h_content']??'',
-						'ut' => now()
-				]);
-
 			}
+
+
+			// if ($data['h_receipt_date'] != '') { //본사접수일이 입력되어있으면 접수구분이 자동으로 본사 A/S접수 진행으로 변경 수선진행상태를 수선진행으로 변경
+
+			// 	DB::table('after_service2')
+			// 		->where('idx', '=', $data['idx'])
+			// 		->update([
+			// 			'receipt_date' => $data['edate'],
+			// 			'as_state' => 30,
+			// 			'store_cd' => $data['store_no'],
+			// 			'as_type' => '4',
+			// 			'customer_no' => $data['customer_no'],
+			// 			'customer' => $data['customer'],
+			// 			'mobile' => $mobile,
+			// 			'zipcode' => $data['zipcode'],
+			// 			'addr1' => $data['addr1'],
+			// 			'addr2' => $data['addr2'],
+			// 			'prd_cd' => $data['prd_cd'],
+			// 			'goods_nm' => $data['goods_nm'],
+			// 			'color' => $data['color'],
+			// 			'size' => $data['size'],
+			// 			'qty' => $data['qty'],
+			// 			'is_free' => $data['is_free'],
+			// 			'as_amt' => $data['as_amt']??'',
+			// 			'content' => $data['content']??'',
+			// 			'h_receipt_date' => $data['h_receipt_date']??now(),
+			// 			'h_content'	=> $data['h_content']??'',
+			// 			'ut' => now()
+			// 	]);
+				
+			// } elseif ($data['end_date'] != '') { //수선완료일이 빈값이 아니면 자동으로 접수구분이 본사A/S완료로 변경 수선진행상태를 수선완료로 변경
+
+			// 		DB::table('after_service2')
+			// 			->where('idx', '=', $data['idx'])
+			// 			->update([
+			// 				'receipt_date' => $data['edate'],
+			// 				'as_state' => 40,
+			// 				'store_cd' => $data['store_no'],
+			// 				'as_type' => '5',
+			// 				'customer_no' => $data['customer_no'],
+			// 				'customer' => $data['customer'],
+			// 				'mobile' => $mobile,
+			// 				'zipcode' => $data['zipcode'],
+			// 				'addr1' => $data['addr1'],
+			// 				'addr2' => $data['addr2'],
+			// 				'prd_cd' => $data['prd_cd'],
+			// 				'goods_nm' => $data['goods_nm'],
+			// 				'color' => $data['color'],
+			// 				'size' => $data['size'],
+			// 				'qty' => $data['qty'],
+			// 				'is_free' => $data['is_free'],
+			// 				'as_amt' => $data['as_amt']??'',
+			// 				'content' => $data['content']??'',
+			// 				'h_receipt_date' => $data['h_receipt_date']??$data['end_date'],
+			// 				'end_date' => $data['end_date'],
+			// 				'h_content'	=> $data['h_content']??'',
+			// 				'ut' => now()
+			// 		]);
+
+			// } elseif ($data['err_date'] != '') { // 불량등록일이 빈값이 아닐때 접수구분을 본사불량으로 변경 수선진행상태를 본사 불량 처리
+
+			// 	DB::table('after_service2')
+			// 		->where('idx', '=', $data['idx'])
+			// 		->update([
+			// 			'receipt_date' => $data['edate'],
+			// 			'as_state' => 50,
+			// 			'store_cd' => $data['store_no'],
+			// 			'as_type' => '6',
+			// 			'customer_no' => $data['customer_no'],
+			// 			'customer' => $data['customer'],
+			// 			'mobile' => $mobile,
+			// 			'zipcode' => $data['zipcode'],
+			// 			'addr1' => $data['addr1'],
+			// 			'addr2' => $data['addr2'],
+			// 			'prd_cd' => $data['prd_cd'],
+			// 			'goods_nm' => $data['goods_nm'],
+			// 			'color' => $data['color'],
+			// 			'size' => $data['size'],
+			// 			'qty' => $data['qty'],
+			// 			'is_free' => $data['is_free'],
+			// 			'as_amt' => $data['as_amt']??'',
+			// 			'content' => $data['content']??'',
+			// 			'err_date' => $data['err_date'],
+			// 			'h_content'	=> $data['h_content']??'',
+			// 			'ut' => now()
+			// 	]);
+
+			// }
 
 			DB::commit();
 			$code = 200;

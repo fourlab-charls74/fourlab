@@ -12,7 +12,7 @@
             </div>
         </div>
         <div class="d-flex">
-            @if ($row->as_type != '5' && $row->as_type != '6' && $row->as_type != '4')
+            @if ($row->as_type < 3)
                 <a href="javascript:void(0)" onclick="change_state()" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
             @endif
             <a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i> 닫기</a>
@@ -70,15 +70,15 @@
                                                         <option value="1" @if($row->as_type == '1') selected @endif>매장접수(A/S)</option>
                                                         <option value="2" @if($row->as_type == '2') selected @endif>매장접수(불량)</option>
                                                         <option value="3" @if($row->as_type == '3') selected @endif>매장접수(심의)</option>
-                                                        <!-- <option value="4" @if($row->as_type == '4') selected @endif>본사A/S접수/진행</option>
+                                                        <option value="4" @if($row->as_type == '4') selected @endif>본사A/S접수/진행</option>
                                                         <option value="5" @if($row->as_type == '5') selected @endif>본사A/S완료</option>
-                                                        <option value="6" @if($row->as_type == '6') selected @endif>본사불량</option> -->
+                                                        <option value="6" @if($row->as_type == '6') selected @endif>본사불량</option>
                                                     </select>
                                                 </div>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="required">고객아이디/고객명</th>
+                                            <th>고객아이디/고객명</th>
                                             <td>
                                                 <div class="flex_box">
                                                     <input type="text" class="form-control form-control-sm search-enter" name='customer_no' id="customer_no" value="{{@$row->customer_no}}" style="width:41%;" readonly="readonly">
@@ -105,7 +105,7 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <th class="required">주소</th>
+                                            <th>주소</th>
                                             <td>
                                                 <div class="input_box flex_box address_box">
                                                     <input type="text" id="zipcode" name="zipcode" class="form-control form-control-sm" value="{{@$row->zipcode}}" style="width:calc(25% - 10px);margin-right:10px;" readonly="readonly">
@@ -175,14 +175,6 @@
                                             </td>
                                             <th></th>
                                             <td>
-                                                <!-- <div class="flex_box">
-                                                    <select id="as_state" name="as_state" class="form-control form-control-sm">
-                                                        <option value="">선택</option>
-                                                        @foreach ($as_states as $as_state)
-                                                            <option value="{{ $as_state->code_id }}">{{ $as_state->code_val }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div> -->
                                             </td>
                                         </tr>
                                         <tr>
@@ -191,7 +183,7 @@
                                             </th>
                                             <td colspan="5">
                                                 <div class="flex_box">
-                                                    <textarea name="content" id="as_content" class="form-control form-control-sm" style="height: 200px;">{{@$row->content}}</textarea>
+                                                    <textarea name="content" id="as_content" class="form-control form-control-sm" @if ($row->as_type == '1' || $row->as_type == '2' || $row->as_type == '3') style="height: 400px;" @else style="height: 200px;" @endif>{{@$row->content}}</textarea>
                                                 </div>
                                             </td>
                                         </tr>
@@ -203,6 +195,7 @@
                 </form>
             </div>
         </div>
+        @if($row->as_type == '4' || $row->as_type == '5' || $row->as_type == '6')
         <div class="card mb-3">
             <div class="card-header mb-0">
                 <a href="javascript:void(0);">본사처리</a>
@@ -293,6 +286,7 @@
                 </form>
             </div>
         </div>
+        @endif
     </div>
 </div>
 
@@ -343,14 +337,6 @@
 
     $(document).ready(function() {
         $('#as_amt').hide();
-
-        // const store_cd = '{{ @$store->store_cd }}';
-        // const store_nm = '{{ @$store->store_nm }}';
-
-        // if(store_cd != '') {
-        //     const option = new Option(store_nm, store_cd, true, true);
-        //     $('#store_no').append(option).trigger('change');
-        // }
     });
 
     
@@ -372,28 +358,13 @@
             return false;
         }
 
-        if(!$("[name=store_no]").val()) {
-            alert("접수매장을 선택해주세요.");
-            return false;
-        }
-
         if ($("#as_type").val() == "") {
             alert("접수구분을 선택해 주세요");
             return false;
         }
 
-        if ($("#customer_no").val() == "") {
-            alert("고객아이디/고객명을 입력해 주세요");
-            return false;
-        }
-
         if ($("#phone1").val() == "" || $("#phone2").val() == "" || $("#phone3").val() == "") {
             alert("핸드폰 번호를 입력해 주세요");
-            return false;
-        }
-
-        if ($("#zipcode").val() == "") {
-            alert("주소를 입력해 주세요");
             return false;
         }
 
@@ -428,18 +399,6 @@
                 return false;
             }
         }
-
-        //     if($('#h_receipt_date').val() == "") {
-        //         alert('본사 접수일자를 선택해주세요');
-        //         return false;
-        //     }
-
-
-        // if($('#end_date').val() == "") {
-        //     alert('수선완료일자를 선택해주세요');
-        //     return false;
-        // }
-
     }
 
     function change_state() {
