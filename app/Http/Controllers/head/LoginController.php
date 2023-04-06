@@ -4,10 +4,12 @@ namespace App\Http\Controllers\head;
 
 use App\Http\Controllers\Controller;
 use App\Components\Lib;
+use App\Components\SLib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Head;
 use Illuminate\Validation\ValidationException;

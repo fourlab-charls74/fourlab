@@ -42,10 +42,14 @@ class LoginController extends Controller
                 ->where('passwd','=',DB::raw("CONCAT('*', UPPER(SHA1(UNHEX(SHA1('$password')))))"))
                 ->first();
             if($user){
-                Auth::guard('head')->login($user,true);
+
+                //물류그룹 권한 여부 조회
+                $user['logistics_group_yn'] = SLib::getLogisticsGroupYn($request->email, 'logistics');
+
+                Auth::guard('head')->login($user, true);
 
                 $ip = $request->ip;
-
+                
                 DB::table('mgr_user')
                     ->where('id','=',$request->email)
                     ->update([
@@ -54,11 +58,41 @@ class LoginController extends Controller
                         'visit_date' => DB::raw('now()')
                     ]);
 
+                $mgr_groups_sql = "
+                    select group_no from mgr_user_group mug where id = '$request->email'
+                ";
+
+                $group_ids = DB::select($mgr_groups_sql);
+
 
                 // LNB 메뉴생성
-                $kind['store']  = SLib::getLnbs('store');
-                $kind['shop']   = SLib::getLnbs('shop');
-                $kind['head']   = SLib::getLnbs('head');
+                $kind = [
+                    'store' => []
+                ];
+
+                $exception_yn = false;
+                $exception_id = null;
+    
+                //특정 그룹만 특정 메뉴 조회
+                foreach($group_ids as $group_id) {
+                    $exception_group_sql = "
+                        select * from mgr_group_menu_exception where group_no = '$group_id->group_no'
+                    ";
+
+                    $exception_cnt = DB::select($exception_group_sql);
+
+                    if(count($exception_cnt) > 0) {
+                        $exception_yn = true;
+                        $exception_id = $group_id->group_no;
+                        break;
+                    }
+                }
+
+                if($exception_yn) {
+                    $kind['store']  = SLib::getSpecialGroupLnbs('store', $exception_id);
+                } else {
+                    $kind['store']  = SLib::getLnbs('store');
+                }
 
                 $menu = [];
                 foreach($kind as $key => $kind_val) {

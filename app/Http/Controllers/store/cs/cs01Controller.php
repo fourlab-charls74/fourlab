@@ -29,6 +29,7 @@ class cs01Controller extends Controller {
             'items' => SLib::getItems(),
             'order_stock_states' => Slib::getCodes('STOCK_ORDER_STATE')
         ];
+
         return view( Config::get('shop.store.view') . '/cs/cs01', $values);
     }
 
