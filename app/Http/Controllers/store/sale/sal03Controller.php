@@ -155,11 +155,15 @@ class sal03Controller extends Controller
 
 			$stock_qty = "(select sum(ifnull(ps.qty, '0')) from product_stock ps where ps.prd_cd = final.prd_cd group by ps.prd_cd) as stock_qty,";
 
+			$partial_stock_qty = "(select sum(ifnull(ps.qty, '0')) from product_stock ps where ps.prd_cd = oo.prd_cd group by ps.prd_cd) as partial_stock_qty,";
+			
 			$prd_cd = "final.prd_cd,";
 
 			$goods_opt = "final.goods_opt,";
 
 			$stock_wqty = "(select sum(ifnull(ps.wqty, '0')) from product_stock ps where ps.prd_cd = final.prd_cd group by ps.prd_cd) as stock_wqty";
+
+			$partial_stock_wqty = "(select sum(ifnull(ps.wqty, '0')) from product_stock ps where ps.prd_cd = oo.prd_cd group by ps.prd_cd) as partial_stock_wqty";
 
 			$group_column = "prd_cd";
 
@@ -178,11 +182,15 @@ class sal03Controller extends Controller
 
 			$stock_qty = "(select sum(ifnull(ps.qty, '0')) from product_stock ps where ps.goods_no = final.goods_no group by ps.goods_no) as stock_qty,";
 
+			$partial_stock_qty = "(select sum(ifnull(ps.qty, '0')) from product_stock ps where ps.goods_no = oo.goods_no group by ps.goods_no) as partial_stock_qty,";
+
 			$prd_cd = "'' as prd_cd,";
 
 			$goods_opt = "'' as goods_opt,";
 
 			$stock_wqty = "(select sum(ifnull(ps.wqty, '0')) from product_stock ps where ps.goods_no = final.goods_no group by ps.goods_no) as stock_wqty";
+
+			$partial_stock_wqty = "(select sum(ifnull(ps.wqty, '0')) from product_stock ps where ps.goods_no = oo.goods_no group by ps.goods_no) as partial_stock_wqty";
 
 			$group_column = "goods_no";
 
@@ -254,8 +262,8 @@ class sal03Controller extends Controller
 				$prd_cd_p
 				$color
 				$size
-				$stock_qty
-				$stock_wqty
+				final.partial_stock_qty as stock_qty,
+				final.partial_stock_wqty as stock_wqty
 			from (
 				select 
 					a.prd_cd,
@@ -294,23 +302,28 @@ class sal03Controller extends Controller
 					
 					-- 기간판매
 					a.per_qty as ord_qty,
-					a.t_price as ord_amt
+					a.t_price as ord_amt,
+
+					a.partial_stock_qty,
+					a.partial_stock_wqty
 				from ( 
 					select 
 						d.*
 					from (
 						select
-							sum(oo.qty) as per_qty
-							, sum(oo.recv_amt) as t_price
-							, oo.$group_column
-							, 0 as qty
-							, 0 as total_ord_amt
-							, sum(oo.price * oo.qty) as ord_amt
-							, $max_column
-							, oo.goods_opt
-							, ( @rank := @rank + 1 ) AS rank
-							, ( @real_rank := IF ( @last > $rank_column, @real_rank:=@real_rank+1, @real_rank ) ) AS real_rank
-							, ( @last := $rank_column) 
+							sum(oo.qty) as per_qty,
+							sum(oo.recv_amt) as t_price,
+							oo.$group_column,
+							0 as qty,
+							0 as total_ord_amt,
+							sum(oo.price * oo.qty) as ord_amt,
+							$max_column,
+							oo.goods_opt,
+							( @rank := @rank + 1 ) AS rank,
+							( @real_rank := IF ( @last > $rank_column, @real_rank:=@real_rank+1, @real_rank ) ) AS real_rank,
+							( @last := $rank_column) ,
+							$partial_stock_qty
+							$partial_stock_wqty
 						from order_opt oo
 							left outer join store s on oo.store_cd = s.store_cd
 							inner join product_code pc2 on oo.prd_cd = pc2.prd_cd 
@@ -318,10 +331,8 @@ class sal03Controller extends Controller
 						where
 							oo.ord_state = '30'
 							and ( oo.clm_state = 0 or oo.clm_state = -30 or oo.clm_state = 90)
-							and oo.ord_date >= '2023-03-03 00:00:00'
-							and oo.ord_date <= '2023-04-03 23:59:59'
-							-- and oo.ord_date >= '$sdate2'
-							-- and oo.ord_date <= '$edate2'
+							and oo.ord_date >= '$sdate2'
+							and oo.ord_date <= '$edate2'
 							$in_where
 						$group_by
 						$in_orderby
@@ -338,7 +349,7 @@ class sal03Controller extends Controller
 			$orderby 
 			$limit
 		";
-		
+
 		$pdo	= DB::connection()->getPdo();
 		$stmt	= $pdo->prepare($sql);
 		$stmt->execute();
@@ -422,12 +433,12 @@ class sal03Controller extends Controller
 
 			$tot_in = DB::selectOne($sql_in);
 
-			$row['in_sum_qty']	= $tot_in->in_sum_qty;
-			$row['in_sum_amt']	= $tot_in->in_sum_amt;
+			$row['in_sum_qty']	=  $tot_in !== null ? $tot_in->in_sum_qty : 0;
+			$row['in_sum_amt']	= $tot_in !== null ? $tot_in->in_sum_amt : 0;
 			$row['in_sale_rate']	= ($row['in_sum_qty'] == 0)?0:round($row['total_ord_qty'] / $row['in_sum_qty'] * 100);
 
-			$tot_in_sum_qty	+= $tot_in->in_sum_qty;
-			$tot_in_sum_amt	+= $tot_in->in_sum_amt;
+			$tot_in_sum_qty	+=  $tot_in !== null ?  $tot_in->in_sum_qty : 0;
+			$tot_in_sum_amt	+=  $tot_in !== null ?  $tot_in->in_sum_amt : 0;
 
 			//출고 데이터
 			if($group_type_condition == 'color_and_size') {
@@ -483,8 +494,8 @@ class sal03Controller extends Controller
 					final.total_ord_amt,
 					final.ord_qty,
 					final.ord_amt,
-					$stock_qty
-					$stock_wqty
+					final.stock_qty,
+					final.stock_wqty
 				from (
 					select 
 						-- 입고
@@ -501,6 +512,10 @@ class sal03Controller extends Controller
 						-- 기간판매
 						sum(a.per_qty) as ord_qty,
 						sum(a.t_price) as ord_amt,
+
+						sum(a.partial_stock_qty) as stock_qty,
+						sum(a.partial_stock_wqty) as stock_wqty,
+
 						a.prd_cd,
 						a.goods_no,
 						g.brand,
@@ -519,17 +534,19 @@ class sal03Controller extends Controller
 							d.*
 						from (
 							select
-								sum(oo.qty) as per_qty
-								, sum(oo.recv_amt) as t_price
-								, oo.$group_column
-								, 0 as qty
-								, 0 as total_ord_amt
-								, sum(oo.price * oo.qty) as ord_amt
-								, $max_column
-								, oo.goods_opt
-								, ( @rank := @rank + 1 ) AS rank
-								, ( @real_rank := IF ( @last > $rank_column, @real_rank:=@real_rank+1, @real_rank ) ) AS real_rank
-								, ( @last := $rank_column) 
+								sum(oo.qty) as per_qty,
+								sum(oo.recv_amt) as t_price,
+								oo.$group_column,
+								0 as qty,
+								0 as total_ord_amt,
+								sum(oo.price * oo.qty) as ord_amt,
+								$max_column,
+								oo.goods_opt,
+								( @rank := @rank + 1 ) AS rank,
+								( @real_rank := IF ( @last > $rank_column, @real_rank:=@real_rank+1, @real_rank ) ) AS real_rank,
+								( @last := $rank_column) ,
+								$partial_stock_qty
+								$partial_stock_wqty
 							from order_opt oo
 								left outer join store s on oo.store_cd = s.store_cd
 								inner join product_code pc2 on oo.prd_cd = pc2.prd_cd 
@@ -543,6 +560,8 @@ class sal03Controller extends Controller
 							$group_by
 							$in_orderby
 						) d
+						where 
+							d.rank <= $page_size
 					) as a
 					inner join goods g on a.goods_no = g.goods_no and g.goods_sub = 0
 					left outer join brand brd on g.brand = brd.brand
@@ -552,7 +571,7 @@ class sal03Controller extends Controller
 					$where
 				$orderby
 			";
-
+		
 			$row = DB::selectOne($query);
 
 			$row !== null ? $row->in_sum_qty = $tot_in_sum_qty : 0;	// 총입고수량
