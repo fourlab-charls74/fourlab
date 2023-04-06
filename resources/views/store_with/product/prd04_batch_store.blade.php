@@ -166,7 +166,7 @@
 				}
 			},
 			error: function(request, status, error) {
-				alert("시스템 에러입니다. 관리자에게 문의하여 주십시요.");
+				alert("시스템 에러입니다. 관리자에게 문의하여 주십시요." + error);
 				console.log(status);
 			}
 		});
