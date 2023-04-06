@@ -4,6 +4,7 @@ namespace App\Http\Controllers\head;
 
 use App\Http\Controllers\Controller;
 use App\Components\Lib;
+use App\Components\SLib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
@@ -112,9 +113,9 @@ class UserController extends Controller
 
 
         try {
-            DB::transaction(function () use (&$result,$id,$user) {
+            DB::transaction(function () use (&$result, $id, $user) {
                 DB::table('mgr_user')
-                    ->where('id','=',$id)
+                    ->where('id','=', $id)
                     ->update($user);
             });
             $code = 200;
@@ -214,12 +215,20 @@ class UserController extends Controller
 
     public function menu(){
         $id =  Auth::guard('head')->user()->id;
+        $mgr_group_sql = "
+            select group_no from mgr_user_group mug where id = '$id';
+        ";
+
+        $group_id = DB::selectOne($mgr_group_sql);
+        $group_no = $group_id->group_no;
 
         $query = /** @lang text */
-            "
+        "
             select * from mgr_controller 
             where is_del = 0 and state >= 0
         ";
+
+        
         $pdo = DB::connection()->getPdo();
         $stmt = $pdo->prepare($query);
         $stmt->execute();
