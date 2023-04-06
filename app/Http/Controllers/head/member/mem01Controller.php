@@ -15,7 +15,8 @@ use Exception;
 
 class mem01Controller extends Controller
 {
-    public function index($type='') {
+    public function index($type='')
+    {
         //taxpayer_yn
         $values = [
             'mail' => SLib::getCodes('S_MAIL'),
@@ -39,11 +40,13 @@ class mem01Controller extends Controller
         return view( Config::get('shop.head.view') . '/member/mem01', $values);
     }
 
-    public function show($type = '', $user_id="", Request $req) {
-        if ($type == 'add')
+    public function show(Request $req, $type = '', $user_id = '')
+    {
+        if ($type === 'add') {
             $values = $this->__getShowAddData();
-        else if ($type == 'edit')
+        } else if ($type === 'edit') {
             $values = $this->__getShowEditData($user_id);
+        }
 
         // 회원그룹 콤보
         $sql = " select group_no as id, group_nm as val from user_group order by group_no ";
@@ -57,12 +60,14 @@ class mem01Controller extends Controller
         return view( Config::get('shop.head.view') . '/member/mem01_show', $values);
     }
 
-    public function get($user_id){
+    public function get($user_id)
+    {
         $values = $this->__getShowEditData($user_id);
         return response()->json($values);
     }
 
-    private function __getShowAddData() {
+    private function __getShowAddData()
+    {
         $values = [
             'user' => (object) [],
             'out_yn' => '',
@@ -75,14 +80,15 @@ class mem01Controller extends Controller
         return $values;
     }
 
-    private function __getShowEditData($user_id) {
+    private function __getShowEditData($user_id)
+    {
         $values = [];
         $member_table = "";
 
         $out_yn = DB::table('member')
             ->where("user_id",$user_id)
             ->value('out_yn');
-        if(isset($out_yn)){
+        if (isset($out_yn)) {
             $values["out_yn"] = $out_yn;
 
             if($values['out_yn'] == "I") {
@@ -92,32 +98,34 @@ class mem01Controller extends Controller
             }
 
             $sql = "
-            select b.group_nm, a.group_no
-            from user_group_member a
-                inner join user_group b on a.group_no = b.group_no
-            where a.user_id = '$user_id'
-        ";
-            $values['user_groups'] = DB::select($sql);
+                select
+                    b.group_nm
+                     , a.group_no
+                from user_group_member a
+                    inner join user_group b on a.group_no = b.group_no
+                where a.user_id = :user_id
+            ";
+            $values['user_groups'] = DB::select($sql, [ 'user_id' => $user_id ]);
 
             $sql = "
-            select
-                a.user_id, a.name, a.user_pw, substring(a.jumin,1,8) as jumin, a.phone, a.mobile, a.email, a.email_chk, a.out_yn, a.point,
-                a.zip, a.addr, a.addr2, a.mobile_chk, a.regdate, a.lastdate, a.name_chk, a.wsale_status, '' as taxpayer_yn,
-                a.married_yn, date_format(a.married_date,'%Y%m%d') as married_date, date_format(a.anniv_date,'%Y%m%d') as anniv_date,
-                a.job, a.interest, a.yn, a.memo, a.visit_cnt, a.opt, a.recommend_id,
-                b.ord_date, b.ord_cnt, b.ord_amt,
-                c.code_val as auth_type_nm, a.auth_type, a.auth_yn, a.auth_key, a.ipin, a.foreigner, a.mobile_cert_yn,
-                a.yyyy_chk, a.yyyy, a.mm, a.dd, a.sex, a.store_nm,
-                ifnull(mbl.black_yn, 'N') as black_yn,
-                (case when mbl.black_reason is not null then mbl.black_reason else '' end) as black_reason
-            from $member_table a
-                left outer join member_stat b on a.user_id = b.user_id
-                left outer join member_black_list mbl on a.user_id = mbl.user_id
-                left outer join code c on c.code_kind_cd = 'G_AUTH_TYPE' and c.code_id = a.auth_type
-            where a.user_id = '$user_id'
-        ";
+                select
+                    a.user_id, a.name, a.user_pw, substring(a.jumin,1,8) as jumin, a.phone, a.mobile, a.email, a.email_chk, a.out_yn, a.point,
+                    a.zip, a.addr, a.addr2, a.mobile_chk, a.regdate, a.lastdate, a.name_chk, a.wsale_status, '' as taxpayer_yn,
+                    a.married_yn, date_format(a.married_date,'%Y%m%d') as married_date, date_format(a.anniv_date,'%Y%m%d') as anniv_date,
+                    a.job, a.interest, a.yn, a.memo, a.visit_cnt, a.opt, a.recommend_id,
+                    b.ord_date, b.ord_cnt, b.ord_amt,
+                    c.code_val as auth_type_nm, a.auth_type, a.auth_yn, a.auth_key, a.ipin, a.foreigner, a.mobile_cert_yn,
+                    a.yyyy_chk, a.yyyy, a.mm, a.dd, a.sex, a.store_nm,
+                    ifnull(mbl.black_yn, 'N') as black_yn,
+                    (case when mbl.black_reason is not null then mbl.black_reason else '' end) as black_reason
+                from $member_table a
+                    left outer join member_stat b on a.user_id = b.user_id
+                    left outer join member_black_list mbl on a.user_id = mbl.user_id
+                    left outer join code c on c.code_kind_cd = 'G_AUTH_TYPE' and c.code_id = a.auth_type
+                where a.user_id = :user_id
+            ";
 
-            $user = DB::selectOne($sql);
+            $user = DB::selectOne($sql, [ 'user_id' => $user_id ]);
             $user->point = number_format($user->point);
             $user->ord_amt = number_format($user->ord_amt);
 
@@ -129,7 +137,7 @@ class mem01Controller extends Controller
                 $user->phone2 = $phone[1] ? $phone[1] : '';
                 $user->phone3 = $phone[2] ? $phone[2] : '';
             }
-            
+
             $user->mobile1 = $mobile[0] ? $mobile[0] : '';
             if($user->mobile !== '') {
                 $user->mobile2 = $mobile[1] ? $mobile[1] : '';
@@ -174,7 +182,8 @@ class mem01Controller extends Controller
         return $values;
     }
 
-    public function check_id($id) {
+    public function check_id($id)
+    {
         $sql = "
 			select count(*) as cnt from member
 			where user_id = '$id'
@@ -185,11 +194,13 @@ class mem01Controller extends Controller
         return $row->cnt;
     }
 
-    public function download_show() {
+    public function download_show()
+    {
         return view( Config::get('shop.head.view') . '/member/mem01_download_pop');
     }
 
-    public function download(Request $req) {
+    public function download(Request $req)
+    {
         $this->set_excel_download("usr01_%s.xls");
 
         /** method : get_condition
@@ -214,13 +225,14 @@ class mem01Controller extends Controller
             ];
         }
 
-    return view( Config::get('shop.head.view') . '/member/mem01_download', [
+        return view( Config::get('shop.head.view') . '/member/mem01_download', [
             'fields' => $fields,
             'rows' => DB::select($sql)
         ]);
     }
 
-    public function search(Request $req) {
+    public function search(Request $req)
+    {
         $cond = $this->get_condition($req);
 
         $where = $cond[0];
@@ -272,7 +284,8 @@ class mem01Controller extends Controller
         ]);
     }
 
-    public function add_user(Request $req) {
+    public function add_user(Request $req)
+    {
 
         // 설정 값 얻기
         $conf = new Conf();
@@ -379,7 +392,7 @@ class mem01Controller extends Controller
         //     $mm = substr($jumin1,2,2);
         //     $dd = substr($jumin1,4,2);
         // }
-        
+
         try {
             DB::beginTransaction();
 
@@ -400,7 +413,7 @@ class mem01Controller extends Controller
                     , '$auth_type', '$auth_yn', '$auth_key', '$store_nm', '$store_cd', '$type'
                 )
             ";
-            
+
             DB::insert($sql);
             DB::commit();
 
@@ -408,12 +421,13 @@ class mem01Controller extends Controller
             DB::rollBack();
             return response()->json(['message' => $e->getMessage()], 500);
         }
-    
+
 
         return response()->json($user_id, 201);
     }
 
-    public function edit_user($user_id='', Request $req) {
+    public function edit_user($user_id='', Request $req)
+    {
         $name				= Request("name");
         $pw     			= Request("pw");
         $jumin1				= Request("jumin1");
@@ -463,7 +477,7 @@ class mem01Controller extends Controller
                     , store_cd = '$store_cd'
                 ";
             }
-    
+
             $sql = "
                 update member set
                     name ='$name'
@@ -488,16 +502,16 @@ class mem01Controller extends Controller
                     $store_sql
                 where user_id = '$user_id'
             ";
-            
+
             DB::update($sql);
 
             $sql = "
-                select 
+                select
                     user_id,
                     black_yn
-                from 
+                from
                     member_black_list
-                where 
+                where
                     user_id = '$user_id'
             ";
 
@@ -505,9 +519,9 @@ class mem01Controller extends Controller
 
             if(count($row) > 0) {
                 $sql = "
-                    update member_black_list 
+                    update member_black_list
                     set ut_date = now(), black_yn ='$black_yn', black_reason ='$black_reason', ut_user_id = '$id'
-                    where 
+                    where
                         user_id = '$user_id'
                 ";
                 DB::update($sql);
@@ -520,8 +534,8 @@ class mem01Controller extends Controller
                         rt_user_id ,
                         rt_date
                     ) values (
-                        '$user_id', 
-                        '$black_yn', 
+                        '$user_id',
+                        '$black_yn',
                         '$black_reason',
                         '$id',
                         now()
@@ -551,7 +565,7 @@ class mem01Controller extends Controller
         ];
 
         try {
-            
+
             DB::beginTransaction();
 
             $sql = "
@@ -728,8 +742,8 @@ class mem01Controller extends Controller
                                 when '6' then d.card_name
                                 else d.bank_code
                             end bank_code,
-                            a.ord_state, a.clm_state, 
-                            -- e.com_nm as sale_place, 
+                            a.ord_state, a.clm_state,
+                            -- e.com_nm as sale_place,
                             ifnull(e.com_nm, a.sale_place) as sale_place,
                             i.com_nm, c.price-c.wonga as prf,
                             case a.ord_state
