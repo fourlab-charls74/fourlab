@@ -1117,8 +1117,6 @@ CREATE TABLE `product_price_list` (
   PRIMARY KEY (`idx`)
 ) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8;
 
-
-
 --
 -- 기존 테이블 컬럼 추가 시작
 --
@@ -1175,6 +1173,13 @@ ALTER TABLE `bizest_smart`.`coupon` ADD COLUMN `use_date` VARCHAR(4) NOT NULL DE
 
 ALTER TABLE `bizest_smart`.`coupon_member` ADD COLUMN `use_to_date` VARCHAR(8) NULL DEFAULT NULL COMMENT '사용가능 일시' AFTER `down_date`;
 
+-- 물류 창고 그룹 포함 여부
+ALTER TABLE bizest_smart.mgr_user ADD COLUMN logistics_group_yn varchar(1) DEFAULT 'N' NULL COMMENT '물류창고 그룹 포함 여부';
+-- 공지사항 분기 코드값
+ALTER TABLE bizest_smart.mgr_user ADD COLUMN store_notice_type varchar(30) NOT NULL COMMENT '공지사항 종류 (01 - 메인공지사항 / 02 - vmd게시판)';
+-- 공지사항 첨부파일
+ALTER TABLE bizest_smart.mgr_user ADD COLUMN attach_file_url  varchar(2000) DEFAULT NULL COMMENT '첨부파일  url';
+
 --
 -- 기존 테이블 컬럼 추가 종료
 --
@@ -1205,6 +1210,30 @@ INSERT INTO `bizest_smart`.`store_account_extra_type` (`type_cd`, `type_nm`, `en
 INSERT INTO `bizest_smart`.`store_account_extra_type` (`type_cd`, `type_nm`, `entry_cd`, `payer`, `except_vat_yn`, `total_include_yn`, `has_child_yn`, `use_yn`, `seq`, `rt`) VALUES ('O2', '추가지급', 'O', 'C', 'N', 'Y', 'N', 'Y', '12', now());
 INSERT INTO `bizest_smart`.`store_account_extra_type` (`type_cd`, `type_nm`, `entry_cd`, `payer`, `except_vat_yn`, `total_include_yn`, `has_child_yn`, `use_yn`, `seq`, `rt`) VALUES ('O3', '사용경비(기타)', 'O', 'C', 'N', 'Y', 'N', 'Y', '13', now());
 
+
+-- 공지사항 코드값 등록
+INSERT INTO bizest_smart.code
+(code_kind_cd, code_id, code_val, code_val2, code_val3, code_val_eng, use_yn, code_seq, admin_id, admin_nm, rt, ut)
+VALUES('STORE_NOTICE_TYPE', '01', 'notice', '', '', '', 'Y', 1, 'sm_dh', '이두희', now(), now());
+
+INSERT INTO bizest_smart.code
+(code_kind_cd, code_id, code_val, code_val2, code_val3, code_val_eng, use_yn, code_seq, admin_id, admin_nm, rt, ut)
+VALUES('STORE_NOTICE_TYPE', '02', 'vmd', '', '', '', 'Y', 2, 'sm_dh', '이두희', now(), now());
+
+
+-- 공지사항 메뉴 그룹 최신화
+INSERT INTO bizest_smart.store_controller
+(entry, pid, seq, lev, kor_nm, eng_nm, kind, id, target, `action`, btype, state, sys_menu, regi_date, ut, is_del, is_part_role, icon)
+VALUES(1, 'COMM', 11, 1, '공지사항', '곤지시항', 'N', 'sm_dh', null, null, null, 4, 'U', now(), now(), 0, null, 'bx-clipboard');
+
+
+INSERT INTO bizest_smart.store_controller
+(entry, pid, seq, lev, kor_nm, eng_nm, kind, id, target, `action`, btype, state, sys_menu, regi_date, ut, is_del, is_part_role, icon)
+VALUES(72, 'comm01', 1, 2, '매장 공지사항', '매장 공지시항', 'M', 'sm_dh', null, '/store/community/comm01/notice', null, 4, 'U', now(), now(), 0, null, null);
+
+INSERT INTO bizest_smart.store_controller
+(entry, pid, seq, lev, kor_nm, eng_nm, kind, id, target, `action`, btype, state, sys_menu, regi_date, ut, is_del, is_part_role, icon)
+VALUES(72, 'comm01', 2, 2, 'VMD 게시판', 'VMD 게시판', 'M', 'sm_dh', null, '/store/community/comm01/vmd', null, 4, 'U', now(), now(), 0, null, null);
 --
 -- 테이블 데이터 추가 종료
 --

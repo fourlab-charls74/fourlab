@@ -1018,9 +1018,33 @@ CREATE TABLE `shop_log` (
   KEY `pid` (`pid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='관리자 로그정보';
 
+-- 특정 메뉴 제외 그룹 등록 테이블
+create table mgr_group_menu_exception (
+ seq       	int comment '일련번호',
+ group_no  	int(11) comment '메뉴그룹넘버',
+ PRIMARY KEY(group_no)
+) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='특정 메뉴 제외 그룹 등록 테이블';
 
+-- 특정 메뉴 노출 버튼 제외 그룹 등록 테이블
+create table mgr_button_into_menu_exception (
+ seq       	int comment '일련번호',
+ group_no  	int(11) comment '메뉴그룹넘버',
+ group_code varchar(30) comment '메뉴그룹코드',
+ PRIMARY KEY(group_no)
+) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='특정 메뉴 노출 버튼 제외 그룹 등록 테이블';
 
-
+-- 블랙리스트 관리 테이블
+CREATE TABLE member_black_list (
+  `seq` int(11) NOT NULL AUTO_INCREMENT COMMENT 'seq 번호',
+  `user_id` varchar(30) DEFAULT NULL COMMENT '사용자 번호',
+  `black_yn` varchar(1) DEFAULT NULL COMMENT '블랙리스트 여부',
+  `black_reason` varchar(200) DEFAULT NULL COMMENT '블랙사유',
+  `rt_user_id` varchar(30) DEFAULT NULL COMMENT '블랙리스트 등록 관리자 번호',
+  `ut_user_id` varchar(30) DEFAULT NULL COMMENT '블랙리스트 수정 관리자 번호',
+  `rt_date` date DEFAULT NULL COMMENT '블랙리스트 등록일자',
+  `ut_date` date DEFAULT NULL COMMENT '블랙리스트 수정일자',
+  PRIMARY KEY (`seq`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='블랙리스트 관리 테이블';
 
 --
 -- 기존 테이블 컬럼 추가 시작
@@ -1110,6 +1134,13 @@ INSERT INTO `bizest_smart`.`store_account_extra_type` (`type_cd`, `type_nm`, `en
 INSERT INTO `bizest_smart`.`store_account_extra_type` (`type_cd`, `type_nm`, `entry_cd`, `payer`, `except_vat_yn`, `total_include_yn`, `has_child_yn`, `use_yn`, `seq`, `rt`) VALUES ('O1', '외부창고', 'O', 'C', 'N', 'N', 'N', 'Y', '11', now());
 INSERT INTO `bizest_smart`.`store_account_extra_type` (`type_cd`, `type_nm`, `entry_cd`, `payer`, `except_vat_yn`, `total_include_yn`, `has_child_yn`, `use_yn`, `seq`, `rt`) VALUES ('O2', '추가지급', 'O', 'C', 'N', 'Y', 'N', 'Y', '12', now());
 INSERT INTO `bizest_smart`.`store_account_extra_type` (`type_cd`, `type_nm`, `entry_cd`, `payer`, `except_vat_yn`, `total_include_yn`, `has_child_yn`, `use_yn`, `seq`, `rt`) VALUES ('O3', '사용경비(기타)', 'O', 'C', 'N', 'Y', 'N', 'Y', '13', now());
+
+
+-- 특정 메뉴 노출 그룹 등록
+insert into mgr_group_menu_exception(seq, group_no) values (1, 71);
+
+-- 특정 메뉴 노출 버튼 제외 그룹 등록
+insert into mgr_button_into_menu_exception(seq, group_no, group_code) values (1, 71, 'logistics');
 
 --
 -- 테이블 데이터 추가 종료
