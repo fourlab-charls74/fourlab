@@ -33,20 +33,13 @@ class Gift
       'ut' => now()
     ];
   }
-	/*
-		Function: SetGiftInfo
-		사은품 정보 설정
 
-		Returns:
-			$data - 사은품 정보 파라미터
-  */
-  //사용하는 페이지를 찾을 수 없음.(테스트 불가.)
+    /** 사은품 정보 등록 */
 	public function SetGiftInfo($data)
 	{
-    return DB::table('gift')->insertGetId($this->getValue($data));
-  }
+        return DB::table('gift')->insertGetId($this->getValue($data));
+    }
 
-  
 	/*
 		Function: ModGiftInfo
 		사은품 정보 수정
@@ -61,8 +54,8 @@ class Gift
 
     foreach($values as $key => $value) {
       if ($key === "rt") continue;
-		
-      if ($value !== "") { 
+
+      if ($value !== "") {
 		//$columns[] = [ $key => $value ];
 		$columns[$key] = $value;
         continue;
@@ -86,7 +79,7 @@ class Gift
     return $data->gift_no;
   }
 
-  
+
 	/*
 		Function: DelGiftInfo
 		사은품 정보 삭제
@@ -111,7 +104,7 @@ class Gift
 	*/
 	public function SetGoods($gift_no, $goods)
 	{
-    $user = Auth('head')->user();
+        $user = Auth('head')->user();
 		$admin_id = $user->com_id;
 		$admin_nm = $user->name;
 
@@ -136,7 +129,7 @@ class Gift
 			}
 		}
   }
-  
+
 	/*
 		Function: SetExGoods
 		사은품 제외상품 설정
@@ -150,7 +143,7 @@ class Gift
     	$user = Auth('head')->user();
 		$admin_id = $user->com_id;
 		$admin_nm = $user->name;
-		
+
 		if (is_array($goods))
 		{
 			$goods = collect($goods)->unique()->all();
@@ -172,7 +165,7 @@ class Gift
       }
 		}
   }
-  
+
 	/*
 		Function: DelGoods
 		사은품 적용 상품 삭제
@@ -182,11 +175,11 @@ class Gift
 	*/
 	public function DelGoods($gift_no)
 	{
-        DB::table('gift_goods')
-        ->where('gift_no', $gift_no)
-        ->delete();
+        return DB::table('gift_goods')
+            ->where('gift_no', $gift_no)
+            ->delete();
     }
-  
+
 	/*
 		Function: DelExGoods
 		사은품 제외 상품 삭제
@@ -195,14 +188,14 @@ class Gift
 			$gift_no - 사은품 번호
 
 		Returns:
-			
+
 	*/
 	public function DelExGoods($gift_no)
 	{
-    DB::table('gift_ex_goods')
-      ->where('gift_no', $gift_no)
-      ->delete();
-  }
+        return DB::table('gift_ex_goods')
+          ->where('gift_no', $gift_no)
+          ->delete();
+    }
 
 	/*
 		Function: GiveGift
@@ -223,7 +216,7 @@ class Gift
                'give_date' => now()
              ]);
   }
-  
+
 	/*
 		Function: RefundGift
 		사은품 환불
@@ -266,8 +259,8 @@ class Gift
 			'refund_date' => now()
 		]);
 	}
-  
-  
+
+
 	/*
 		Function: SetRefundGiftAmt
 		사은품 환불 금액 저장

@@ -16,7 +16,8 @@
             </div>
         </div>
         <div>
-        	<a href="#" id="search_sbtn" onclick="self.close();" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm">닫기</a>
+            <a href="#" class="btn btn-sm btn-primary shadow-sm submit-btn">저장</a>
+        	<a href="#" id="search_sbtn" onclick="self.close();" class="d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm">닫기</a>
         </div>
     </div>
     @csrf
@@ -43,7 +44,7 @@
 									</colgroup>
 									<tbody>
 										<tr>
-											<th>사은품명</th>
+											<th class="required">사은품명</th>
 											<td>
 												<div class="input_box">
 													<input type="text" name="name" class="form-control form-control-sm search-all" value="{{ $gift_info->name }}" >
@@ -94,7 +95,7 @@
 											</td>
 										</tr>
 										<tr>
-											<th>증정기간</th>
+											<th class="required">증정기간</th>
 											<td>
 												<div class="form-inline">
 													<div class="docs-datepicker form-inline-inner input_box">
@@ -124,7 +125,7 @@
 											</td>
 										</tr>
 										<tr>
-											<th>적용구매금액</th>
+											<th class="required">적용구매금액</th>
 											<td>
 												<div class="flax_box">
 													<div><input type="text" class="form-control form-control-sm search-all" name="apply_amt" id="apply_amt" value="{{ $gift_info->apply_amt }}" ></div>
@@ -141,23 +142,23 @@
 											</td>
 										</tr>
 										<tr>
-											<th class="brbn">사은품 갯수</th>
+											<th class="brbn required">사은품 갯수</th>
 											<td class="brbn">
 												<div class="flax_box">
 													<div>
-													<input type="text" name="qty" id="qty" style="width:50px;" class="form-control form-control-sm search-all" 
+													<input type="text" name="qty" id="qty" style="width:50px;" class="form-control form-control-sm search-all"
 														value="{{ $gift_info->qty ? $gift_info->qty : 0 }}" {{ $gift_info->unlimited_yn == 'Y' ? 'disabled' : null }}/></div>
 													<span class="ml-1 mr-3">개</span>
 													<div class="form-inline form-check-box">
 														<div class="custom-control custom-checkbox">
-															<input type="checkbox" name="unlimited_yn" id="unlimited_yn" class="custom-control-input" 
+															<input type="checkbox" name="unlimited_yn" id="unlimited_yn" class="custom-control-input"
 																{{ $gift_info->unlimited_yn == 'Y' ? 'checked' : null }}/>
 															<label class="custom-control-label" for="unlimited_yn">무한재고</label>
 														</div>
 														<div class="custom-control custom-checkbox">
-															<input type="checkbox" name="dp_soldout_yn" id="dp_soldout_yn" class="custom-control-input" 
+															<input type="checkbox" name="dp_soldout_yn" id="dp_soldout_yn" class="custom-control-input"
 																{{ $gift_info->dp_soldout_yn == 'Y' ? 'checked' : null }}>
-															<label class="custom-control-label" for="dp_soldout_yn">품절시 출력여부</label>
+															<label class="custom-control-label" for="dp_soldout_yn">품절시 출력함</label>
 														</div>
 													</div>
 												</div>
@@ -208,7 +209,7 @@
 											</td>
 										</tr>
 										<tr>
-											<th>지급업체</th>
+											<th class="required">지급업체</th>
 											<td>
 												<div class="flax_box">
 													<select name="apply_com" id="apply_com" class="form-control form-control-sm">
@@ -258,7 +259,7 @@
 											<td>
 												<div class="form-inline form-radio-box">
 													<div class="custom-control custom-radio">
-														<input type="radio" name="apply_product" id="apply_product_ag" class="custom-control-input" value="AG" onclick="Search(this.value)" @if($gift_info->apply_product == "AG") checked @endif>
+														<input type="radio" name="apply_product" id="apply_product_ag" class="custom-control-input" value="AG" onclick="Search(this.value)" @if($gift_info->apply_product != "SG") checked @endif>
 														<label class="custom-control-label" for="apply_product_ag">전체상품</label>
 													</div>
 													<div class="custom-control custom-radio">
@@ -342,7 +343,7 @@
 			e.preventDefault();
 		});
 
-		
+
 		$(".submit-btn").click(function(e){
 			e.stopPropagation();
 			const goods_array = [];
@@ -407,7 +408,7 @@
 
 			//var selectedRows = mainGrid.gridOpts.api.getSelectedRows();
 			selectedRowData.forEach( function(selectedRowData, index) {
-				
+
 				gx.gridOptions.api.applyTransaction({remove: [selectedRowData]});
 			});
 		});
@@ -418,7 +419,7 @@
 	var columns = [
 		{headerName: '#', width:50, maxWidth: 90,type:'NumType', pinned : 'left', width: 40},
 		{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
-		{headerName:"상품번호", width:120, 
+		{headerName:"상품번호", width:120,
 			children : [
 				{
 					headerName : "",
@@ -492,7 +493,7 @@
 			obj.options[obj.length-1].value = choice_group;
 			for(var i=0;i<obj.length;i++){
 				if(in_group_nos == ""){
-					in_group_nos = obj.options[i].value; 
+					in_group_nos = obj.options[i].value;
 				} else {
 					in_group_nos += "^" + obj.options[i].value;
 				}
@@ -513,9 +514,9 @@
 			obj.options[index] = null;
 			for(var i=0;i<obj.length;i++){
 				if(in_group_nos == ""){
-					in_group_nos = obj.options[i].value; 
+					in_group_nos = obj.options[i].value;
 				} else {
-					in_group_nos += "^" + obj.options[i].value; 
+					in_group_nos += "^" + obj.options[i].value;
 				}
 			}
 			document.f1.in_group_nos.value = in_group_nos;
@@ -540,7 +541,7 @@
         }
 
         return true;
-    
+
     }
 
     function appendCanvas(size, id, type) {
@@ -586,7 +587,6 @@
 	}
 
 	function Save(cmd){
-        console.log($("[name='cmd']").val());
         var f1 = $("form[name=f1]")[0];
         var content = $("textarea[name=contents]").val();
         var img_url = "";
@@ -599,6 +599,8 @@
 
         content = content.replace(/(<([^>]+)>)/ig,"");
 
+        if (!confirm("사은품 정보를 저장하시겠습니까?")) return;
+
         $.ajax({
             type: 'post',
             url: '/head/promotion/prm06/comm',
@@ -607,18 +609,17 @@
             //contentType: "application/x-www-form-urlencoded; charset=utf-8",
             data: formData,
             success: function (data) {
-                var save_msg = "";
-                if(data.code == "1"){
-                    if(cmd == "editcmd"){
-                        save_msg = "수정되었습니다.";
-                    }else{
-                        save_msg = "등록되었습니다.";
+                if (data.code === 200) {
+                    alert('사은품정보가 정상적으로 저장되었습니다.');
+                    opener.Search();
+                    if (f1.cmd.value === 'editcmd') {
+                        self.close();
+                    } else {
+                        location.replace('/head/promotion/prm06/' + data.gift_no);
                     }
-					alert(save_msg);
-					window.opener.Search();
-					location.replace('/head/promotion/prm06/'+data.gift_no);
-                }else{
-                    save_msg = "처리 중 오류가 발생하였습니다. 관리자에게 문의하세요.";
+                } else {
+                    alert('저장 중 오류가 발생하였습니다. 관리자에게 문의해주세요.');
+                    console.error(data);
                 }
             },
             complete:function(){
@@ -629,7 +630,7 @@
                 console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
             }
         });
-		
+
     }
 
 
@@ -642,7 +643,7 @@
 			return false;
 		}
 
-		if ($("[naem=fr_date]").val() == "")
+		if ($("[name=fr_date]").val() == "")
 		{
 			alert("사은품 증정 기간을 입력해 주세요");
 			$("[name=fr_date]").focus();
@@ -662,7 +663,7 @@
 			$("[name=apply_amt]").focus();
 			return false;
 		}
-		
+
 		if (!$("[name=unlimited_yn]").checked){
 			if($("[name=qty]").val() == ""){
 				alert("사은품 갯수를 입력해 주세요");

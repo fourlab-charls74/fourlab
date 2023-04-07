@@ -10,16 +10,16 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
-
 use App\Models\Conf;
 use App\Models\Gift;
 use Facade\FlareClient\Stacktrace\File;
+use Exception;
 
 class prm06Controller extends Controller
 {
 	public function index() {
 		$gift_kinds = SLib::getCodes("G_GIFT_KIND");
-		  
+
 		$values = [
 			"gift_kinds" => $gift_kinds
 		];
@@ -94,8 +94,8 @@ class prm06Controller extends Controller
 				$join
 			where 1=1 $where
 		";
-		$row = DB::selectOne($sql);
-		$data_cnt = $row->cnt;
+        $row = DB::selectOne($sql);
+        $data_cnt = $row->cnt;
 
 		// 페이지 얻기
 		$page_cnt=(int)(($data_cnt-1)/$page_size) + 1;
@@ -108,7 +108,9 @@ class prm06Controller extends Controller
 
 		$sql = "
 			select
-				'' as chk, a.no, a.name, cd2.code_val as kind, a.fr_date, a.to_date,
+				'' as chk, a.no, a.name, cd2.code_val as kind,
+				date_format(a.fr_date, '%Y-%m-%d') as fr_date,
+				date_format(a.to_date, '%Y-%m-%d') as to_date,
 				cd3.code_val as apply_product,
 				(
 					select count(*)
@@ -133,8 +135,8 @@ class prm06Controller extends Controller
 			limit $startno, $page_size
 		";
 
+        $result = DB::select($sql);
 
-		$result = DB::select($sql);
         return response()->json([
             "code" => 200,
             "head" => array(
@@ -226,11 +228,32 @@ class prm06Controller extends Controller
 		$apply_com = DB::select($sql);
 
 		$sql = "
-				select name, kind, fr_date, to_date, apply_amt, gift_price, qty, unlimited_yn, dp_soldout_yn, img, contents, memo, use_yn, apply_product, apply_com, apply_group, refund_yn, admin_id, admin_nm, rt, ut
-				from gift a
-				where a.no = '$gift_no'
-			";
-		$gift_info = DB::selectOne($sql);
+            select
+                name
+                 , kind
+                 , date_format(fr_date, '%Y-%m-%d') as fr_date
+                 , date_format(to_date, '%Y-%m-%d') as to_date
+                 , apply_amt
+                 , gift_price
+                 , qty
+                 , unlimited_yn
+                 , dp_soldout_yn
+                 , img
+                 , contents
+                 , memo
+                 , use_yn
+                 , apply_product
+                 , apply_com
+                 , apply_group
+                 , refund_yn
+                 , admin_id
+                 , admin_nm
+                 , rt
+                 , ut
+            from gift
+            where no = :gift_no
+        ";
+		$gift_info = DB::selectOne($sql, [ 'gift_no' => $gift_no ]);
 
 		$values = [
 			'gift_group_nos'	=> $gift_group_nos,
@@ -243,176 +266,113 @@ class prm06Controller extends Controller
 		return view( Config::get('shop.head.view') . '/promotion/prm06_show', $values);
 	}
 
-	public function command(Request $request) {
+    /** 사은품 등록 or 업데이트 */
+	public function command(Request $request)
+    {
+        // get request values
+		$cmd				= $request->input('cmd');
+		$gift_no			= $request->input('gift_no');
+		$gift_name			= $request->input('name');
+		$gift_kind			= $request->input('kind');
+		$fr_date			= $request->input('fr_date');
+		$to_date			= $request->input('to_date');
+		$apply_amt			= $request->input('apply_amt');
+		$gift_price			= $request->input('gift_price');
+		$qty				= $request->input('qty');
+		$unlimited_yn		= $request->input('unlimited_yn', 'N');
+		$dp_soldout_yn		= $request->input('dp_soldout_yn', 'N');
+		$contents			= $request->input('contents');
+		$memo				= $request->input('memo');
+		$apply_com			= $request->input('apply_com');
+		$refund_yn			= $request->input('refund_yn');
+		$use_yn				= $request->input('use_yn');
+		$apply_product		= $request->input('apply_product');
+		$goods				= $request->input('goods');
+		$ex_goods			= $request->input('ex_goods');
+		$apply_group		= $request->input('in_group_nos');
+        $gift_file          = $request->file("file");
 
-		$cmd				= $request->input("cmd");
-		$data				= $request->input("data");
-		$gift_no			= $request->input("gift_no");
-		$gift_name			= $request->input("name");
-		//$gift_type		= $request->input("type");
-		$gift_kind			= $request->input("kind");
-		$fr_date			= $request->input("fr_date");
-		$to_date			= $request->input("to_date");
-		$apply_amt			= $request->input("apply_amt");
-		$gift_price			= $request->input("gift_price");
-		$qty				= $request->input("qty");
-		$unlimited_yn		= $request->input("unlimited_yn", "N");
-		$dp_soldout_yn		= $request->input("dp_soldout_yn", "N");
-		
-		$contents			= $request->input("contents");
-		$memo				= $request->input("memo");
-		$apply_com			= $request->input("apply_com");
-		$refund_yn			= $request->input("refund_yn");
-		$use_yn				= $request->input("use_yn");
-		$apply_product		= $request->input("apply_product");
-		$goods				= $request->input("goods");
-		$ex_goods			= $request->input("ex_goods");
-		$apply_group		= $request->input("in_group_nos");
+        $fr_date = str_replace('-','', $fr_date);
+        $to_date = str_replace('-','', $to_date);
 
-		$fr_date = str_replace("-","", $fr_date);
-		$to_date = str_replace("-","", $to_date);
-
-		$return_code = 0;
-
-		$gift_file	= $request->file("file");
-		
-		$base_path = "/images/gift";
+		$base_path = '/images/gift';
+        $file_path = '';
 
 		$id = Auth('head')->user()->id;
         $name = Auth('head')->user()->name;
 
-		/* 이미지를 저장할 경로 폴더가 없다면 생성 */
-		
-		if(!Storage::disk('public')->exists($base_path)){
-			Storage::disk('public')->makeDirectory($base_path);
-		}
-		
-		$file_path = "";
-		if($gift_file != null &&  $gift_file != ""){
-			$file_path = Storage::disk('public')->put($base_path, $gift_file);
-		}
+        $code = 200;
+        $msg = '';
 
-		//Gift Class
-		$gift = new Gift();
-		
-		if($cmd == "addcmd"){
-			/*
-			$data = array(
-				"gift_nm"			=> $gift_name,
-				//"gift_type"			=> $gift_type,
-				"gift_kind"			=> $gift_kind,
-				"fr_date"			=> $fr_date,
-				"to_date"			=> $to_date,
-				"apply_amt"			=> $apply_amt,
-				"gift_price"		=> $gift_price,
-				"qty"				=> $qty,
-				"unlimited_yn"		=> $unlimited_yn,
-				"dp_soldout_yn"		=> $dp_soldout_yn,
-				"img"				=> $img_url,
-				"contents"			=> $contents,
-				"memo"				=> $memo,
-				"refund_yn"			=> $refund_yn,
-				"use_yn"			=> $use_yn,
-				"apply_product"		=> $apply_product,
-				"apply_com"			=> $apply_com,
-				"apply_group"		=> $apply_group,
-				"admin_id"			=> $id,
-				"admin_nm"			=> $name
-			);
-			*/
-			$data = new \stdClass();
-			$data->gift_nm			= $gift_name;
-			//"gift_type"				=> $gift_type,
-			$data->gift_kind		= $gift_kind;
-			$data->fr_date			= $fr_date;
-			$data->to_date			= $to_date;
-			$data->apply_amt		= $apply_amt;
-			$data->gift_price		= $gift_price;
-			$data->qty				= $qty;
-			$data->unlimited_yn		= $unlimited_yn;
-			$data->dp_soldout_yn	= $dp_soldout_yn;
-			$data->img				= $file_path;
-			$data->contents			= $contents;
-			$data->memo				= $memo;
-			$data->refund_yn		= $refund_yn;
-			$data->use_yn			= $use_yn;
-			$data->apply_product	= $apply_product;
-			$data->apply_com		= $apply_com;
-			$data->apply_group		= $apply_group;
-			$data->admin_id			= $id;
-			$data->admin_nm			= $name;
+        try {
+            DB::beginTransaction();
 
-			$gift_no = $gift->SetGiftInfo($data);
-		}else if($cmd == "editcmd"){
+            // 이미지 저장경로폴더 부재 시 생성
+            if (!Storage::disk('public')->exists($base_path)) {
+                Storage::disk('public')->makeDirectory($base_path);
+            }
 
-			$data = new \stdClass();
-			$data->gift_no			= $gift_no;
-			$data->gift_nm			= $gift_name;
-			//"gift_type"				=> $gift_type,
-			$data->gift_kind		= $gift_kind;
-			$data->fr_date			= $fr_date;
-			$data->to_date			= $to_date;
-			$data->apply_amt		= $apply_amt;
-			$data->gift_price		= $gift_price;
-			$data->qty				= $qty;
-			$data->unlimited_yn		= $unlimited_yn;
-			$data->dp_soldout_yn	= $dp_soldout_yn;
-			$data->img				= $file_path;
-			$data->contents			= $contents;
-			$data->memo				= $memo;
-			$data->refund_yn		= $refund_yn;
-			$data->use_yn			= $use_yn;
-			$data->apply_product	= $apply_product;
-			$data->apply_com		= $apply_com;
-			$data->apply_group		= $apply_group;
-			$data->admin_id			= $id;
-			$data->admin_nm			= $name;
+            // 파일 저장경로 설정
+            if ($gift_file !== null) {
+                $file_path = Storage::disk('public')->put($base_path, $gift_file);
+            }
 
-			$gift_no = $gift->ModGiftInfo($data);
+            $gift = new Gift();
+            $data = (object) [
+                'gift_nm'       => $gift_name,
+                'gift_kind'		=> $gift_kind,
+                'fr_date'       => $fr_date,
+                'to_date'       => $to_date,
+                'apply_amt'     => $apply_amt,
+                'gift_price'    => $gift_price,
+                'qty'           => $qty,
+                'unlimited_yn'  => $unlimited_yn,
+                'dp_soldout_yn' => $dp_soldout_yn,
+                'img'			=> $file_path,
+                'contents'		=> $contents,
+                'memo'			=> $memo,
+                'refund_yn'		=> $refund_yn,
+                'use_yn'		=> $use_yn,
+                'apply_product'	=> $apply_product,
+                'apply_com'		=> $apply_com,
+                'apply_group'	=> $apply_group,
+                'admin_id'		=> $id,
+                'admin_nm'		=> $name,
+            ];
 
-		}
+            if ($cmd === 'addcmd') {
+                $gift_no = $gift->SetGiftInfo($data);
+            } else if ($cmd === 'editcmd') {
+                $data->gift_no = $gift_no;
+                $gift_no = $gift->ModGiftInfo($data);
+            }
 
-		$goods = @explode("^", $goods);
-		$ex_goods = @explode("^", $ex_goods);
+            $goods = explode('^', $goods);
+            $ex_goods = explode('^', $ex_goods);
 
-		//기존에 등록되어 있는 상품 삭제 후 등록
+            if ($gift_no) {
+                // 기존 적용/제외상품 삭제
+                $gift->DelGoods($gift_no);
+                $gift->DelExGoods($gift_no);
 
-		if($gift_no){
-			try {
-				$gift->DelGoods($gift_no);
-				$return_code = 1;
-			} catch(Exception $e){
-				$return_code = 0;
-			}
+                if ($apply_product === 'SG') {
+                    // 적용상품정보 등록
+                    $gift->SetGoods($gift_no, $goods);
+                } else {
+                    // 제외상품정보 등록
+                    $gift->SetExGoods($gift_no, $ex_goods);
+                }
+            }
 
-			if($return_code == 1){
-				try {
-					$gift->DelExGoods($gift_no);
-					$return_code = 1;
-				} catch(Exception $e){
-					$return_code = -1;
-				}
+            DB::commit();
+            $msg = '사은품정보가 정상적으로 저장되었습니다.';
+        } catch(Exception $e) {
+            DB::rollback();
+            $code = 500;
+            $msg = $e->getmessage();
+        }
 
-				if($return_code == 1){
-					try {
-						if($apply_product == "SG") {	// 일부상품일 경우
-							$gift->SetGoods($gift_no, $goods);
-						}else{
-							$gift->SetExGoods($gift_no, $ex_goods);
-						}
-						$return_code = 1;
-					} catch(Exception $e){
-						$return_code = -2;
-					}
-				}
-			}
-		}
-		
-		return response()->json([
-			"code" => $return_code,
-			"gift_no"	=> $gift_no
-		]);
-
+        return response()->json([ 'code' => $code, 'msg' => $msg, 'gift_no' => $gift_no ], 200);
 	}
 
 	public function delGift(Request $request){
@@ -422,7 +382,7 @@ class prm06Controller extends Controller
 
 		//Gift Class
 		$gift = new Gift();
-		
+
 		//print_r($date );
 
 		for($i = 0; $i < count($date); $i++){
@@ -436,7 +396,7 @@ class prm06Controller extends Controller
 				}catch(Exception $e){
 					$return_codes[$i] = 0;
 				}
-				
+
 				if($return_codes[$i] == 1){
 					try {
 						$gift->DelExGoods($gift_no);
@@ -448,7 +408,7 @@ class prm06Controller extends Controller
 
 				if($return_codes[$i] == 1){
 				// 사은품 기본정보 삭제
-				
+
 					try {
 						$gift->DelGiftInfo($gift_no);
 						$return_codes[$i] = 1;
@@ -500,7 +460,7 @@ class prm06Controller extends Controller
 		$total = $row->total;
 
 		$page_cnt=(int)(($total-1)/$lmit) + 1;
-		
+
 		$sql = "
 			select
 				'' as chk,
@@ -514,11 +474,11 @@ class prm06Controller extends Controller
 			where
 				a.gift_no = '".$gift_no."'
 			limit $startNo, $lmit
-			
+
 		";
 		//debugSQL($sql);
 		//$x2gate->select($conn, $sql, "xml");
-		
+
 		$result = DB::select($sql);
 
 		return response()->json([
@@ -531,7 +491,7 @@ class prm06Controller extends Controller
             ),
             "body" => $result
         ]);
-		
+
 
 	}
 
@@ -543,7 +503,7 @@ class prm06Controller extends Controller
 	{
 		$gift_no = $request->input("gift_no");
 		$page	= $request->input("page");
-		
+
 		$startNo = 0;
 		$lmit = 50;
 		if($page>1){

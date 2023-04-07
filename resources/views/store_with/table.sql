@@ -1156,9 +1156,9 @@ ALTER TABLE `bizest_smart`.`order_opt_wonga` ADD INDEX `idx_ord_state_date` (`or
 ALTER TABLE `bizest_smart`.`order_opt_wonga` ADD INDEX `idx_prdcd` (`prd_cd`);
 
 
-ALTER TABLE `bizest_smart`.`mgr_user` ADD COLUMN `confirm_yn` CHAR(1) NULL COMMENT '승인여부' AFTER `md_yn`; 
+ALTER TABLE `bizest_smart`.`mgr_user` ADD COLUMN `confirm_yn` CHAR(1) NULL COMMENT '승인여부' AFTER `md_yn`;
 ALTER TABLE `bizest_smart`.`mgr_user` ADD COLUMN `store_nm` VARCHAR(100) NULL COMMENT '매장명' AFTER `store_cd`;
-ALTER TABLE `bizest_smart`.`mgr_user` ADD COLUMN `account_yn` CHAR(1) DEFAULT 'Y' NULL COMMENT '정산/마감 확인여부' AFTER `store_nm`; 
+ALTER TABLE `bizest_smart`.`mgr_user` ADD COLUMN `account_yn` CHAR(1) DEFAULT 'Y' NULL COMMENT '정산/마감 확인여부' AFTER `store_nm`;
 
 ALTER TABLE `bizest_smart`.`notice_store_detail` ADD COLUMN `check_date` DATETIME NULL COMMENT '공지사항확인일시' AFTER `check_yn`;
 
@@ -1179,6 +1179,11 @@ ALTER TABLE bizest_smart.mgr_user ADD COLUMN logistics_group_yn varchar(1) DEFAU
 ALTER TABLE bizest_smart.mgr_user ADD COLUMN store_notice_type varchar(30) NOT NULL COMMENT '공지사항 종류 (01 - 메인공지사항 / 02 - vmd게시판)';
 -- 공지사항 첨부파일
 ALTER TABLE bizest_smart.mgr_user ADD COLUMN attach_file_url  varchar(2000) DEFAULT NULL COMMENT '첨부파일  url';
+
+-- 사은품
+ALTER TABLE `bizest_smart`.`gift` ADD COLUMN `dp_soldout_yn` CHAR(1) NULL DEFAULT 'N' COMMENT '품절시 출력여부' AFTER `unlimited_yn`;
+ALTER TABLE `bizest_smart`.`gift` ADD COLUMN `gift_price` INT(11) NULL DEFAULT NULL COMMENT '사은품가격' AFTER `apply_amt`;
+ALTER TABLE `bizest_smart`.`gift` ADD COLUMN `apply_group` VARCHAR(20) NULL DEFAULT NULL COMMENT '증정대상' AFTER `apply_com`;
 
 --
 -- 기존 테이블 컬럼 추가 종료

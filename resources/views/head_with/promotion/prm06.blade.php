@@ -22,14 +22,14 @@
                 <h4>검색</h4>
                 <div class="flax_box">
                     <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                    <a href="#" onclick="AddGiftInfo();" class="btn btn-sm btn-outline-primary shadow-sm mr-1 pl-2 add-btn"><i class="bx bx-plus fs-16"></i> 추가</a>
+                    <a href="#" onclick="AddGiftInfo();" class="btn btn-sm btn-outline-primary shadow-sm mr-1 pl-2 add-btn"><i class="fas fa-plus fa-sm"></i> 추가</a>
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
             </div>
 			<div class="card-body">
-				
+
 				<!-- 사은품명/증정구분/사용여부 -->
-				<div class="search-area-ext  row">
+				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="">사은품명</label>
@@ -69,7 +69,7 @@
 				</div>
 
 				<!-- 스타일 넘버 / 상품 코드/상품명/구매금액 -->
-				<div class="search-area-ext  row">
+				<div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="name">스타일넘버/상품코드</label>
@@ -119,7 +119,7 @@
 				</div>
 
 				<!-- 증정기간/출력자료수/정렬순서 -->
-				<div class="search-area-ext  row">
+				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="">증정기간</label>
@@ -190,8 +190,8 @@
 			</div>
 		</div>
         <div class="resul_btn_wrap mb-3">
-            <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-            <a href="#" onclick="AddGiftInfo();"class="btn btn-sm btn-outline-primary shadow-sm mr-1 pl-2 add-btn"><i class="bx bx-plus fs-16"></i> 추가</a>
+            <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm mr-1 text-white-50"></i> 조회</a>
+            <a href="#" onclick="AddGiftInfo();" class="btn btn-sm btn-outline-primary shadow-sm mr-1 pl-2 add-btn"><i class="fas fa-plus fa-sm"></i> 추가</a>
             <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
         </div>
 	</div>
@@ -205,8 +205,7 @@
                     <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                 </div>
                 <div class="fr_box">
-					<span>선택한 사은품을</span>
-					<a href="#" class="btn-sm btn btn-primary confirm-del-btn">삭제</a>
+					<a href="#" class="btn-sm btn btn-primary confirm-del-btn"><i class="fas fa-times fa-sm mr-1 text-white-50"></i> 선택 삭제</a>
                 </div>
             </div>
         </div>
@@ -220,53 +219,57 @@
 <script type="text/javascript" charset="utf-8">
 	var columns = [
 		{field:"chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
-		{field:"no",  headerName: "번호", width: 70},
+		{field: "no",  headerName: "번호", width: 60},
 		{field:"name" , headerName:"사은품명", width:220,
 			cellRenderer: function(params) {
 				return '<a href="#" onClick="PopGiftInfo(\''+ params.data.no +'\')">'+ params.value+'</a>'
 			}
 		},
-		{field:"kind" , headerName:"증정구분",},
-		{headerName:"증정기간", width:120, 
+		{field: "kind", headerName: "증정구분", cellStyle: { 'text-align': 'center' }},
+		{headerName: "증정기간", width: 120,
 			children : [
 				{
-					headerName : "시작",
-					field : "fr_date",
-					width:80
+					headerName: "시작",
+					field: "fr_date",
+					width: 80,
+                    cellStyle: { 'text-align': 'center' },
 				},
 				{
-					headerName : "종료",
-					field : "to_date",
-					width:80
+					headerName: "종료",
+					field: "to_date",
+					width: 80,
+                    cellStyle: { 'text-align': 'center' },
 				}
 			]
 		},
 		{field:"user_id", headerName:"user_id", hide:true},
-		{field:"apply_product" , headerName:"적용대상" },
-		{field:"ext_godos", headerName:"제외상품", width:100},
-		{field:"gift_price" , headerName:"사은품가격", width:100, type:'currencyType'  },
-		{field:"apply_amt" , headerName:"구매금액", width:100,type:'currencyType' },
-		{headerName:"수량", width:120, 
+		{field:"apply_product" , headerName:"적용대상", cellStyle: { 'text-align': 'center' }},
+		{field: "ext_godos", headerName: "제외상품", width: 60, type: 'currencyType'},
+		{field: "gift_price", headerName: "사은품가격", width: 70, type: 'currencyType'},
+		{field: "apply_amt", headerName: "구매금액", width: 70, type: 'currencyType'},
+		{headerName:"수량", width:120,
 			children : [
 				{
-					headerName : "재고수량",
-					field : "qty",
-					width:100
+					headerName: "재고수량",
+					field: "qty",
+					width: 100,
+                    type: 'currencyType'
 				},
 				{
-					headerName : "주문수량",
-					field : "ord_qty",
-					width:100
+					headerName: "주문수량",
+					field: "ord_qty",
+					width: 100,
+                    type: 'currencyType'
 				}
 			]
 		},
-		{field:"dp_soldout_yn" , headerName:"품절시 출력" },
-		{field:"refund_yn" , headerName:"환불여부", width:100},
-		{field:"use_yn" , headerName:"사용여부", width:110},
-		{field:"admin_nm" , headerName:"등록자" },
-		{field:"rt" , headerName:"등록일시", width:150},
-		{field:"ut" , headerName:"수정일시", width:150},
-		{field:"memo" , headerName:"메모", width:200},
+		{field:"dp_soldout_yn" , headerName:"품절시 출력", width: 90, cellStyle: { 'text-align': 'center' }},
+		{field:"refund_yn" , headerName:"환불여부", width: 80, cellStyle: { 'text-align': 'center' }},
+		{field:"use_yn" , headerName:"사용여부", width: 80, cellStyle: { 'text-align': 'center' }},
+		{field:"admin_nm" , headerName:"등록자", width: 80, cellStyle: { 'text-align': 'center' }},
+		{field:"rt" , headerName:"등록일시", width: 130, cellStyle: { 'text-align': 'center' }},
+		{field:"ut" , headerName:"수정일시", width: 130, cellStyle: { 'text-align': 'center' }},
+		{field:"memo" , headerName:"메모", width: 200},
 		{ width: "auto" }
 	];
 	const pApp = new App('', { gridId: "#div-gd" });
@@ -334,7 +337,7 @@
 					if(data.code==1){
 						Search(1);
 					}
-					
+
 				},
 				complete:function(){
 					_grid_loading = false;
@@ -404,12 +407,12 @@
 		});
 
 		Search();
-		
+
 		$(".confirm-del-btn").click(function(){
 			DelGift();
 		});;
 
 	});
-	
+
 </script>
 @stop

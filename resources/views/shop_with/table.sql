@@ -1084,7 +1084,7 @@ ALTER TABLE `bizest_smart`.`order_opt` ADD INDEX `idx_store_cd_orddate` (`store_
 ALTER TABLE `bizest_smart`.`order_opt_wonga` ADD INDEX `idx_ord_state_date` (`ord_state_date`,`ord_state,store_cd`);
 ALTER TABLE `bizest_smart`.`order_opt_wonga` ADD INDEX `idx_prdcd` (`prd_cd`);
 
-ALTER TABLE `bizest_smart`.`mgr_user` ADD COLUMN `confirm_yn` CHAR(1) NULL COMMENT '승인여부' AFTER `md_yn`; 
+ALTER TABLE `bizest_smart`.`mgr_user` ADD COLUMN `confirm_yn` CHAR(1) NULL COMMENT '승인여부' AFTER `md_yn`;
 
 ALTER TABLE `bizest_smart`.`store_controller` ADD COLUMN `icon` VARCHAR(30) NULL COMMENT '아이콘 클래스명' AFTER `is_part_role`;
 ALTER TABLE `bizest_smart`.`shop_controller` ADD COLUMN `icon` VARCHAR(30) NULL COMMENT '아이콘 클래스명' AFTER `is_part_role`;
@@ -1092,7 +1092,7 @@ ALTER TABLE `bizest_smart`.`shop_controller` ADD COLUMN `icon` VARCHAR(30) NULL 
 ALTER TABLE `bizest_smart`.`after_service` ADD COLUMN `as_state` SMALLINT(6) NULL COMMENT '수선진행상태' AFTER `as_type`;
 ALTER TABLE `bizest_smart`.`after_service` ADD COLUMN `as_check_state` VARCHAR(20) NULL COMMENT '검수상태 (W: 대기, N: 정상, F: 불량)' AFTER `as_state`;
 ALTER TABLE `bizest_smart`.`after_service` CHANGE `customer_no` `customer_no` VARCHAR(30) NULL COMMENT '고객아이디';
-ALTER TABLE `bizest_smart`.`msg_store` ADD COLUMN `msg_kind` VARCHAR(20) NULL COMMENT '알림 종류 (S: 매장알림, RT: RT알림, AS: 수선알림)' AFTER `msg_cd`; 
+ALTER TABLE `bizest_smart`.`msg_store` ADD COLUMN `msg_kind` VARCHAR(20) NULL COMMENT '알림 종류 (S: 매장알림, RT: RT알림, AS: 수선알림)' AFTER `msg_cd`;
 
 -- 쿠폰
 ALTER TABLE `bizest_smart`.`coupon` ADD COLUMN `pub_time` INT(11) NULL DEFAULT NULL COMMENT '발행시점' AFTER `coupon_type`;
@@ -1104,6 +1104,11 @@ ALTER TABLE `bizest_smart`.`coupon` ADD COLUMN `use_date_alarm_day` INT(11) NULL
 ALTER TABLE `bizest_smart`.`coupon` ADD COLUMN `use_date` VARCHAR(4) NOT NULL DEFAULT '' COMMENT '유효기간 쿠폰발급일 기준(설정일/발급일 : S/P)' AFTER `use_to_date`;
 
 ALTER TABLE `bizest_smart`.`coupon_member` ADD COLUMN `use_to_date` VARCHAR(8) NULL DEFAULT NULL COMMENT '사용가능 일시' AFTER `down_date`;
+
+-- 사은품
+ALTER TABLE `bizest_smart`.`gift` ADD COLUMN `dp_soldout_yn` CHAR(1) NULL DEFAULT 'N' COMMENT '품절시 출력여부' AFTER `unlimited_yn`;
+ALTER TABLE `bizest_smart`.`gift` ADD COLUMN `gift_price` INT(11) NULL DEFAULT NULL COMMENT '사은품가격' AFTER `apply_amt`;
+ALTER TABLE `bizest_smart`.`gift` ADD COLUMN `apply_group` VARCHAR(20) NULL DEFAULT NULL COMMENT '증정대상' AFTER `apply_com`;
 
 --
 -- 기존 테이블 컬럼 추가 종료
