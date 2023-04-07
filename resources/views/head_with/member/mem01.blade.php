@@ -173,7 +173,7 @@
                                 <div class="form-inline-inner input_box" style="width:54%">
                                     <div class="flax_box inline_btn_box" style="padding-right:60px;">
 			                            <input type="text" name="mmdd" id="mmdd"  class="form-control form-control-sm text-center" maxlength="8" placeholder="예)1224">
-                                        <a href="#" onClick="getToday();" class="btn btn-sm btn-secondary now-btn" style="width:50px;">금일</a> 
+                                        <a href="#" onClick="getToday();" class="btn btn-sm btn-secondary now-btn" style="width:50px;">금일</a>
                                     </div>
                                 </div>
                             </div>
@@ -417,7 +417,7 @@
             </div>
         </div>
         <div class="table-responsive">
-            <div id="div-gd" style="height:calc(100vh - 50vh); width:100%;" class="ag-theme-balham"></div>
+            <div id="div-gd" style="height:calc(100vh - 370px); width:100%;" class="ag-theme-balham"></div>
         </div>
     </div>
 </div>
@@ -453,21 +453,24 @@ var columns = [
     {field:"yn" , headerName:"승인", width:50},
     {field:"site" , headerName:"판매처", width:70},
     { width: "auto" }
-    
+
 ];
 
-const pApp = new App('', {gridId: "#div-gd"});
-const gridDiv = document.querySelector(pApp.options.gridId);
-const gx = new HDGrid(gridDiv, columns);
+const pApp = new App('', { gridId:"#div-gd", height: 275 });
+let gx;
 
-pApp.ResizeGrid(275);
-pApp.BindSearchEnter();
+$(document).ready(function() {
+    pApp.ResizeGrid(220);
+    pApp.BindSearchEnter();
+    let gridDiv = document.querySelector(pApp.options.gridId);
+    gx = new HDGrid(gridDiv, columns);
+});
 
 function Search() {
     let data = $('form[name="search"]').serialize();
     let user_group_data = "&user_group=" + $("[name='user_group']").val().join(",");
     gx.Request('/head/member/mem01/search', data+user_group_data, 1);
-};
+}
 
 function Download(fields) {
     $('[name=fields]').val(fields);
