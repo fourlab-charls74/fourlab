@@ -95,7 +95,7 @@ class stk01Controller extends Controller
             $query = /** @lang text */
                 "
                 select count(*) as total
-                from goods g 
+                from goods g
                     inner join goods_summary s on g.goods_no = s.goods_no and g.goods_sub = s.goods_sub
                 where 1=1 $where
 			";
@@ -211,8 +211,9 @@ class stk01Controller extends Controller
         );
     }
 
-    public function show_search($goods_no, Request $req) {
-
+    /** 재고현황팝업 상세정보 조회 */
+    public function show_search($goods_no, Request $req)
+    {
         $conf = new Conf();
 
         $cfg_domain_img			= $conf->getConfigValue("shop","domain_img");
@@ -256,8 +257,7 @@ class stk01Controller extends Controller
 
         if ($page == 1) {
 
-            $sql = /** @lang text */
-                "
+            $sql = "
                 select
                     style_no, goods_nm, a.com_id, c.com_nm, a.opt_kind_cd,
                     o.opt_kind_nm, ifnull(r.brand_nm,'') as brand_nm, a.rep_cat_cd,
@@ -272,11 +272,10 @@ class stk01Controller extends Controller
             $img = str_replace("a_500","s_100",$goods_info["img"]);
             $goods_info["img"] = sprintf("%s%s",$goods_img_url,$img);
 
-
-            $sql = /** @lang text */
-                "
-                    select no,type,name from goods_option
-                    where goods_no = :goods_no
+            $sql = "
+                select no, type, name
+                from goods_option
+                where goods_no = :goods_no
             ";
             $options_basic = DB::select($sql,array("goods_no" => $goods_no));
 
@@ -286,7 +285,7 @@ class stk01Controller extends Controller
                 select
                     a.goods_opt,good_qty, wqty
                 from goods_summary a
-                where goods_no = :goods_no and goods_sub = :goods_sub 
+                where goods_no = :goods_no and goods_sub = :goods_sub
                 order by a.seq,a.goods_opt
             ";
 
@@ -298,7 +297,8 @@ class stk01Controller extends Controller
 
             while ($i<count($row)) {
 
-                $goods_opt = strtoupper(addslashes($row[$i]->goods_opt));
+//                $goods_opt = strtoupper(addslashes($row[$i]->goods_opt));
+                $goods_opt = $row[$i]->goods_opt;
                 $qty = $row[$i]->good_qty;
                 $wqty = $row[$i]->wqty;
                 $a_jaego_qty[$goods_opt] = $qty;
@@ -360,16 +360,15 @@ class stk01Controller extends Controller
                 $stock_sale[$row["goods_opt"]] = $row["salecnt"];
             }
 
-            $sql = /** @lang text */
-                " 
-            select count(*) as total
-            from goods_history a
-              left outer join order_opt oo on a.ord_opt_no = oo.ord_opt_no and a.goods_no = oo.goods_no and a.goods_sub = oo.goods_sub
-              left outer join code cd on cd.code_kind_cd = 'G_JAEGO_TYPE' and cd.code_id = a.type
-              left outer join code cd2 on cd2.code_kind_cd = 'G_ORD_KIND' and cd2.code_id = oo.ord_kind
-              left outer join code cd3 on cd3.code_kind_cd = 'G_ORD_STATE' and cd3.code_id = oo.ord_state
-              left outer join code cd4 on cd4.code_kind_cd = 'G_CLM_STATE' and cd4.code_id = oo.clm_state
-            where a.goods_no = :goods_no $where 
+            $sql = "
+                select count(*) as total
+                from goods_history a
+                  left outer join order_opt oo on a.ord_opt_no = oo.ord_opt_no and a.goods_no = oo.goods_no and a.goods_sub = oo.goods_sub
+                  left outer join code cd on cd.code_kind_cd = 'G_JAEGO_TYPE' and cd.code_id = a.type
+                  left outer join code cd2 on cd2.code_kind_cd = 'G_ORD_KIND' and cd2.code_id = oo.ord_kind
+                  left outer join code cd3 on cd3.code_kind_cd = 'G_ORD_STATE' and cd3.code_id = oo.ord_state
+                  left outer join code cd4 on cd4.code_kind_cd = 'G_CLM_STATE' and cd4.code_id = oo.clm_state
+                where a.goods_no = :goods_no $where
 			";
             $row = DB::selectOne($sql, array("goods_no" => $goods_no));
 
@@ -392,7 +391,7 @@ class stk01Controller extends Controller
               left outer join code cd2 on cd2.code_kind_cd = 'G_ORD_KIND' and cd2.code_id = oo.ord_kind
               left outer join code cd3 on cd3.code_kind_cd = 'G_ORD_STATE' and cd3.code_id = oo.ord_state
               left outer join code cd4 on cd4.code_kind_cd = 'G_CLM_STATE' and cd4.code_id = oo.clm_state
-            where a.goods_no = :goods_no $where 
+            where a.goods_no = :goods_no $where
             order by a.history_no desc
             limit $startno,$page_size
         ";
@@ -406,11 +405,12 @@ class stk01Controller extends Controller
                 "page_cnt" => $page_cnt,
                 "page_total" => count($rows)
             ),
-            "goods_opt" => strtoupper($goods_opt),
+//            "goods_opt" => strtoupper($goods_opt),
+            "goods_opt" => $goods_opt,
             "info" => $goods_info,
             "options" => $a_opt,
-            "qty" => $a_jaego_qty,
-            "wqty" => $a_jaego_wqty,
+            "qty" => $a_jaego_qty ?? [],
+            "wqty" => $a_jaego_wqty ?? [],
             "sale" => $stock_sale,
             "body" => $rows
         ]);

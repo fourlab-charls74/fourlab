@@ -260,16 +260,6 @@
         }
         Search();
     });
-    
-    function SelectOption(e, value, value2) {
-        e.preventDefault();
-        if(value2 === "재고" || value === 'null') {
-            $("[name='goods_opt']").val(value);
-        } else {
-            $("[name='goods_opt']").val(value+"^"+value2);
-        }
-        Search();
-    }
 
     function SelectOption(e, value, value2) {
         e.preventDefault();
@@ -290,10 +280,10 @@
                 for(i=0;i<options[0].length;i++){
                     columns_opt.push(
                         {
-                            field: 'opt_' + options[0][i], 
-                            headerName:options[0][i], 
-                            cellRenderer: function (params) { 
-                                return `<a href="#" onclick="return SelectOption(event, '${params.colDef.headerName}', '${params.data.option}');">${params.value}</a>`; 
+                            field: 'opt_' + options[0][i],
+                            headerName:options[0][i],
+                            cellRenderer: function (params) {
+                                return `<a href="#" onclick="return SelectOption(event, '${params.colDef.headerName}', '${params.data.option}');">${params.data[params.colDef.field]}</a>`;
                             }
                         },
                     );
@@ -301,10 +291,10 @@
                 if(options[1].length < 1) {
                     columns_opt.push(
                         {
-                            field: 'opt_tot', 
+                            field: 'opt_tot',
                             headerName:"합계",
-                            cellRenderer: function (params) { 
-                                return `<a href="#" onclick="return SelectOption(event, 'null');">${params.value}</a>`; 
+                            cellRenderer: function (params) {
+                                return `<a href="#" onclick="return SelectOption(event, 'null');">${params.value}</a>`;
                             }
                         },
                     );
@@ -378,7 +368,7 @@
         // goods_img.attr('src',info[0].img);
         // gx_n.gridOptions.api.setRowData(info);
     }
-    
+
     function ViewQtys(qty_list) {
         const import_tot = qty_list.reduce((a,c) => c.io_gubun === "입고" ? a + c.qty : a, 0);
         const export_tot = qty_list.reduce((a,c) => c.io_gubun === "출고" ? a + c.qty : a, 0);
@@ -396,28 +386,15 @@
     }
 
     function Search() {
-        var goods_no = $("#goods_no").val();
-        let data = $('form[name="search"]').serialize();
-        gx.Request('/head/stock/stk01/option/search/' + goods_no, data, 1);
-        // gx_n.Request('/head/stock/stk01/option/search/' + goods_no, data, 1);
-        var goods_img = $('.goods_img');
-        $.ajax({
-            type: "get",
-            url: '/head/stock/stk01/option/search/' + goods_no,
-            contentType: "application/x-www-form-urlencoded; charset=utf-8",
-            dataType: 'json',
-            data: $('form').serialize(),
-            // data: {},
-            success: function (data) {
-                console.log(data);
-                ViewGoods(data.info);
-                ViewOptions(data.options,data.qty,data.wqty,data.sale);
-                ViewQtys(data.body);
-            },
-            error: function (e) {
-                console.log(e.responseText);
-            }
+        const goods_no = $("#goods_no").val();
+        const data = $('form[name="search"]').serialize();
+        gx.Request('/head/stock/stk01/option/search/' + goods_no, data, 1, function (d) {
+            ViewGoods(d.info);
+            ViewOptions(d.options,d.qty,d.wqty,d.sale);
+            ViewQtys(d.body);
         });
+
+        // gx_n.Request('/head/stock/stk01/option/search/' + goods_no, data, 1);
     }
 
 </script>

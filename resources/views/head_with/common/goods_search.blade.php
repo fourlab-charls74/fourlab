@@ -83,7 +83,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="brand_cd">브랜드</label>
@@ -93,7 +93,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="com_type">업체</label>
@@ -117,7 +117,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="row search-area-ext d-none">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
@@ -132,7 +132,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="state">홍보글/단축명</label>
@@ -153,7 +153,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="state">이벤트 문구</label>
@@ -163,7 +163,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="row search-area-ext d-none">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
@@ -172,7 +172,7 @@
                                     <select name="site" class="form-control form-control-sm">
                                         <option value="">전체</option>
                                         @foreach ($sites as $val)
-                                            <option 
+                                            <option
                                                 value='{{ $val->com_id }}'
                                                 @if($val->com_id === $site) selected @endif
                                             >{{ $val->com_nm }}</option>
@@ -245,7 +245,7 @@
             </div>
         </form>
     </div>
-    
+
     <!-- DataTales Example -->
     <div id="filter-area" class="card shadow-none mb-0 ty2 last-card">
         <div class="card-body">
@@ -274,14 +274,14 @@
 <script>
 /**
  * 파일 : 상품 검색 팝업
- * 
+ *
  * [사용법]
  * window open 한 php 파일에
  * goodsCallback나 multiGoodsCallback 메서드를 만들어서 선택한 데이터를 받습니다.
- * 
+ *
  * goodsCallback : 그리드에서 단일 항목을 선택할 경우 발생. 단일 항목만 callback에 전달됨.
  * multiGoodsCallback : 그리드에서 상품을 선택 후 확인 버튼을 눌렀을 경우 발생. 선택된 항목 모두 전달
- * 
+ *
  */
     const columnDefs = [
         {
@@ -294,15 +294,15 @@
         {field: "goods_no", headerName: "상품번호", pinned:'left'},
         {field: "opt_kind_nm", headerName: "품목", pinned:'left', width:120},
         {
-            field: "brand_nm", 
-            headerName: "브랜드", 
+            field: "brand_nm",
+            headerName: "브랜드",
             pinned:'left'
         },
         {field: "goods_type", headerName: "상품구분", pinned:'left', width: 80},
         {field: "style_no", headerName: "스타일넘버", pinned:'left'},
         {
-            field: "img", 
-            headerName: "이미지", 
+            field: "img",
+            headerName: "이미지",
             pinned:'left',
             cellRenderer: function(params) {
                 if (params.value !== undefined && params.data.img != "") {
@@ -312,25 +312,25 @@
         },
         {field: "head_desc", headerName: "상단홍보글", pinned:'left'},
         {
-            field: "goods_nm", 
-            headerName: "상품명", 
-            type:"HeadGoodsNameType", 
+            field: "goods_nm",
+            headerName: "상품명",
+            type:"HeadGoodsNameType",
             width:400
         },
         {field: "com_nm", headerName: "업체", width: 130},
         {field: "price", headerName: "판매가", type:'currencyType'},
         {
-            field: "qty", 
-            headerName: "재고수", 
+            field: "qty",
+            headerName: "재고수",
             type:'currencyType',
             cellRenderer: function(params) {
-                return '<a href="#" data-code="'+params.value+'" onClick="">'+ params.value+'</a>'
+                return '<a href="#" onclick="return openHeadStock(' + params.data.goods_no + ', \'\')">' + params.value + '</a>';
             }
         },
         {field: "sale_stat_cl", headerName: "상품상태", type:'GoodsStateType'},
         {field: "reg_dm", headerName: "등록일자", width: 130},
         {
-            field: "", 
+            field: "",
             headerName: "선택",
             cellRenderer: function(params) {
                 return "<a href='#' onclick='selectGoods("+JSON.stringify(params.data)+")'>선택</a>";
@@ -358,7 +358,7 @@
         if(arr.length < 1) return alert("추가할 상품을 한 개 이상 선택해주세요.");
         if (confirm("상품을 추가하시겠습니까?") === false) return;
         if (opener.multiGoodsCallback) opener.multiGoodsCallback(arr);
-        window.close();   
+        window.close();
     };
 
     const Search = () => {
@@ -366,7 +366,7 @@
         let data = $('form[name="search"]').serialize();
         gx.Request('/head/api/goods', data, 1);
     };
-    
+
     const openFileSearch = () => {
         const url='/head/api/goods/show/file/search';
         const product=window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=600");
