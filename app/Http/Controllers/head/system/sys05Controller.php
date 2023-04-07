@@ -20,16 +20,16 @@ class sys05Controller extends Controller
         //상점 탭
         $sql_name = "select * from conf where type = 'shop' and name = 'name'";
         $name = DB::selectOne($sql_name);
-        
+
         $sql_code = "select * from conf where type = 'shop' and name = 'code'";
         $code = DB::selectOne($sql_code);
 
         $sql_phone = "select * from conf where type = 'shop' and name = 'company_phone_number'";
         $phone = DB::selectOne($sql_phone);
-       
+
         $sql_store_domain = "select * from conf where type = 'shop' and name = 'domain'";
         $s_domain = DB::selectOne($sql_store_domain);
-       
+
         $sql_admin_domain = "select * from conf where type = 'shop' and name = 'domain_bizest'";
         $a_domain = DB::selectOne($sql_admin_domain);
 
@@ -104,7 +104,7 @@ class sys05Controller extends Controller
         //적립금 탭
         $sql_estimate_point_yn = "select * from conf where type = 'point' and name = 'estimate_point_yn'";
         $estimate_point_yn = DB::selectOne($sql_estimate_point_yn);
-       
+
         $sql_estimate_point = "select * from conf where type = 'point' and name = 'estimate_point'";
         $estimate_point = DB::selectOne($sql_estimate_point);
 
@@ -119,10 +119,10 @@ class sys05Controller extends Controller
 
         $sql_point_limit = "select * from conf where type = 'point' and name = 'point_limit'";
         $point_limit = DB::selectOne($sql_point_limit);
-       
+
         $sql_p_give_type = "select * from conf where type = 'point' and name = 'p_give_type'";
         $p_give_type = DB::selectOne($sql_p_give_type);
-    
+
         $sql_return_yn = "select * from conf where type = 'point' and name = 'return_yn'";
         $return_yn = DB::selectOne($sql_return_yn);
 
@@ -137,10 +137,10 @@ class sys05Controller extends Controller
         //SMS 탭
         $sql_sms_yn = "select * from conf where type = 'sms' and name = 'sms_yn'";
         $sms_yn = DB::selectOne($sql_sms_yn);
-       
+
         $sql_join_yn = "select * from conf where type = 'sms' and name = 'join_yn'";
         $join_yn = DB::selectOne($sql_join_yn);
-       
+
         $sql_join_msg = "select * from conf where type = 'sms' and name = 'join_msg'";
         $join_msg = DB::selectOne($sql_join_msg);
 
@@ -164,7 +164,7 @@ class sys05Controller extends Controller
 
         $sql_delivery_yn = "select * from conf where type = 'sms' and name = 'delivery_yn'";
         $delivery_yn = DB::selectOne($sql_delivery_yn);
-        
+
         $sql_delivery_msg = "select * from conf where type = 'sms' and name = 'delivery_msg'";
         $delivery_msg = DB::selectOne($sql_delivery_msg);
 
@@ -219,7 +219,7 @@ class sys05Controller extends Controller
         $sql_welcome_msg = "select * from conf where type = 'sms' and name = 'welcome_msg'";
         $welcome_msg = DB::selectOne($sql_welcome_msg);
 
-        
+
 
         //부가 기능 탭
         $sql_ssl_yn = "select * from conf where type = 'shop' and name = 'ssl_yn'";
@@ -272,7 +272,7 @@ class sys05Controller extends Controller
 
         $sql_member_inactive_yn = "select * from conf where type = 'stock_reduction' and name = 'member_inactive_yn'";
         $member_inactive_yn = DB::selectOne($sql_member_inactive_yn);
-        
+
 
         //게시물 탭
         $sql_community_goods_qa = "select * from conf where type = 'list_count' and name = 'community_goods_qa'";
@@ -299,7 +299,7 @@ class sys05Controller extends Controller
         //서비스 탭
         $sql_shoplinker_id = "select * from conf where type = 'api' and name = 'shoplinker_id'";
         $shoplinker_id = DB::selectOne($sql_shoplinker_id);
-       
+
         $sql_shoplinker_user_id = "select * from conf where type = 'api' and name = 'shoplinker_user_id'";
         $shoplinker_user_id = DB::selectOne($sql_shoplinker_user_id);
 
@@ -377,138 +377,136 @@ class sys05Controller extends Controller
         $sql_home_dir = "select * from conf where type = 'image' and name = 'home_dir'";
         $home_dir = DB::selectOne($sql_home_dir);
 
-        
         $values = [
             //상점 탭
-            'name' => $name->value,
-            'code'  => $code->value,
-            'phone' => $phone->value,
-            's_domain' => $s_domain->value,
-            'a_domain' => $a_domain->value,
-            'email' => $email->value,
-            'title' => $title->value,
-            'title_main' => $title_main->value,
-            'meta_tag' => $meta_tag->value,
-            'add_script_content' => $add_script_content->value,
-            'sale_place' => $sale_place->value,
+            'name' => $name->value ?? '',
+            'code'  => $code->value ?? '',
+            'phone' => $phone->value ?? '',
+            's_domain' => $s_domain->value ?? '',
+            'a_domain' => $a_domain->value ?? '',
+            'email' => $email->value ?? '',
+            'title' => $title->value ?? '',
+            'title_main' => $title_main->value ?? '',
+            'meta_tag' => $meta_tag->value ?? '',
+            'add_script_content' => $add_script_content->value ?? '',
+            'sale_place' => $sale_place->value ?? '',
             //주문 탭
-            'cash_use_yn' => $cash_use_yn->value,
+            'cash_use_yn' => $cash_use_yn->value ?? '',
             'bank_nm' => $bank_nm,
             'account_no' => $account_no,
             'account_holder' => $account_holder,
-            'cancel_period' => $cancel_period->value,
+            'cancel_period' => $cancel_period->value ?? '',
             //배송 탭
-            'base_delivery_fee' => $base_delivery_fee->value,
-            'add_delivery_fee' => $add_delivery_fee->value,
-            'free_delivery_amt' => $free_delivery_amt->value,
-            'wholesale_free_delivery_amt' => $wholesale_free_delivery_amt->value,
-            'wholesale_base_delivery_fee' => $wholesale_base_delivery_fee->value,
-            'wholesale_add_delivery_fee' => $wholesale_add_delivery_fee->value,
-            'day_delivery_yn' => $day_delivery_yn->value,
-            'day_delivery_amt' => $day_delivery_amt->value,
-            'day_delivery_type' => $day_delivery_type->value,
-            'day_delivery_zone' => $day_delivery_zone->value,
-            'dlv_cd' => $dlv_cd->value,
+            'base_delivery_fee' => $base_delivery_fee->value ?? '',
+            'add_delivery_fee' => $add_delivery_fee->value ?? '',
+            'free_delivery_amt' => $free_delivery_amt->value ?? '',
+            'wholesale_free_delivery_amt' => $wholesale_free_delivery_amt->value ?? '',
+            'wholesale_base_delivery_fee' => $wholesale_base_delivery_fee->value ?? '',
+            'wholesale_add_delivery_fee' => $wholesale_add_delivery_fee->value ?? '',
+            'day_delivery_yn' => $day_delivery_yn->value ?? '',
+            'day_delivery_amt' => $day_delivery_amt->value ?? '',
+            'day_delivery_type' => $day_delivery_type->value ?? '',
+            'day_delivery_zone' => $day_delivery_zone->value ?? '',
+            'dlv_cd' => $dlv_cd->value ?? '',
             //적립금 탭
-            'estimate_point_yn' => $estimate_point_yn->value,
-            'estimate_point' => $estimate_point->value,
-            'join_point' => $join_point->value,
-            'policy' => $policy->value,
-            'ratio' => $ratio->value,
-            'return_yn' => $return_yn->value,
-            'point_limit' => $point_limit->value,
-            'p_give_type' => $p_give_type->value,
+            'estimate_point_yn' => $estimate_point_yn->value ?? '',
+            'estimate_point' => $estimate_point->value ?? '',
+            'join_point' => $join_point->value ?? '',
+            'policy' => $policy->value ?? '',
+            'ratio' => $ratio->value ?? '',
+            'return_yn' => $return_yn->value ?? '',
+            'point_limit' => $point_limit->value ?? '',
+            'p_give_type' => $p_give_type->value ?? '',
             //카카오 탭
-            'kakao_yn' => $kakao_yn->value,
-            'sender_key' => $sender_key->value,
+            'kakao_yn' => $kakao_yn->value ?? '',
+            'sender_key' => $sender_key->value ?? '',
             //SMS 탭
-            'sms_yn' => $sms_yn->value,
-            'join_yn' => $join_yn->value,
-            'join_msg' => $join_msg->content,
-            'passwd_yn' => $passwd_yn->value,
-            'passwd_msg' => $passwd_msg->content,
-            'order_yn' => $order_yn->value,
-            'payment_yn' => $payment_yn->value,
-            'payment_msg' => $payment_msg->content,
-            'delivery_yn' => $delivery_yn->value,
-            'delivery_msg' => $delivery_msg->content,
-            'refund_yn' => $refund_yn->value,
-            'refund_msg_complete' => $refund_msg_complete->content,
-            'refund_msg_cancel' => $refund_msg_cancel->content,
-            'out_of_stock_yn' => $out_of_stock_yn->value,
-            'out_of_stock_msg' => $out_of_stock_msg->content,
-            'auth_yn' => $auth_yn->value,
-            'auth_msg' => $auth_msg->value,
-            'order_msg_pay' => $order_msg_pay->value,
-            'order_msg_not_pay' => $order_msg_not_pay->value,
-            'cancel_yn' => $cancel_yn->value,
-            'cancel_msg_bank' => $cancel_msg_bank->value,
-            'cancel_msg_card' => $cancel_msg_card->value,
-            'cancel_msg_transfer' => $cancel_msg_transfer->value,
-            'birth_yn' => $birth_yn->value,
-            'birth_msg' => $birth_msg->value,
-            'welcome_yn' => $welcome_yn->value,
-            'welcome_msg' => $welcome_msg->value,
+            'sms_yn' => $sms_yn->value ?? '',
+            'join_yn' => $join_yn->value ?? '',
+            'join_msg' => $join_msg->content ?? '',
+            'passwd_yn' => $passwd_yn->value ?? '',
+            'passwd_msg' => $passwd_msg->content ?? '',
+            'order_yn' => $order_yn->value ?? '',
+            'payment_yn' => $payment_yn->value ?? '',
+            'payment_msg' => $payment_msg->content ?? '',
+            'delivery_yn' => $delivery_yn->value ?? '',
+            'delivery_msg' => $delivery_msg->content ?? '',
+            'refund_yn' => $refund_yn->value ?? '',
+            'refund_msg_complete' => $refund_msg_complete->content ?? '',
+            'refund_msg_cancel' => $refund_msg_cancel->content ?? '',
+            'out_of_stock_yn' => $out_of_stock_yn->value ?? '',
+            'out_of_stock_msg' => $out_of_stock_msg->content ?? '',
+            'auth_yn' => $auth_yn->value ?? '',
+            'auth_msg' => $auth_msg->value ?? '',
+            'order_msg_pay' => $order_msg_pay->value ?? '',
+            'order_msg_not_pay' => $order_msg_not_pay->value ?? '',
+            'cancel_yn' => $cancel_yn->value ?? '',
+            'cancel_msg_bank' => $cancel_msg_bank->value ?? '',
+            'cancel_msg_card' => $cancel_msg_card->value ?? '',
+            'cancel_msg_transfer' => $cancel_msg_transfer->value ?? '',
+            'birth_yn' => $birth_yn->value ?? '',
+            'birth_msg' => $birth_msg->value ?? '',
+            'welcome_yn' => $welcome_yn->value ?? '',
+            'welcome_msg' => $welcome_msg->value ?? '',
             //부가기능 탭
-            'ssl_yn' => $ssl_yn->value,
-            'wholesale_yn' => $wholesale_yn->value,
-            'est_confirm_yn' => $est_confirm_yn->value,
-            'new_good_day' => $new_good_day->value,
-            'new_data_day' => $new_data_day->value,
-            'category_goods_cnt' => $category_goods_cnt->value,
-            'newarrival_goods_cnt' => $newarrival_goods_cnt->value,
-            'onsale_goods_cnt' => $onsale_goods_cnt->value,
-            'brandshop_goods_cnt' => $brandshop_goods_cnt->value,
-            'best_rank_goods_cnt' => $best_rank_goods_cnt->value,
-            'relative_goods_cnt' => $relative_goods_cnt->value,
-            'search_goods_cnt' => $search_goods_cnt->value,
-            'search_goods_sort' => $search_goods_sort->value,
-            'counsel_yn' => $counsel_yn->value,
-            'goods_qa_yn' => $goods_qa_yn->value,
-            'init_url' => $init_url->value,
-            'member_inactive_yn' => $member_inactive_yn->value,
+            'ssl_yn' => $ssl_yn->value ?? '',
+            'wholesale_yn' => $wholesale_yn->value ?? '',
+            'est_confirm_yn' => $est_confirm_yn->value ?? '',
+            'new_good_day' => $new_good_day->value ?? '',
+            'new_data_day' => $new_data_day->value ?? '',
+            'category_goods_cnt' => $category_goods_cnt->value ?? '',
+            'newarrival_goods_cnt' => $newarrival_goods_cnt->value ?? '',
+            'onsale_goods_cnt' => $onsale_goods_cnt->value ?? '',
+            'brandshop_goods_cnt' => $brandshop_goods_cnt->value ?? '',
+            'best_rank_goods_cnt' => $best_rank_goods_cnt->value ?? '',
+            'relative_goods_cnt' => $relative_goods_cnt->value ?? '',
+            'search_goods_cnt' => $search_goods_cnt->value ?? '',
+            'search_goods_sort' => $search_goods_sort->value ?? '',
+            'counsel_yn' => $counsel_yn->value ?? '',
+            'goods_qa_yn' => $goods_qa_yn->value ?? '',
+            'init_url' => $init_url->value ?? '',
+            'member_inactive_yn' => $member_inactive_yn->value ?? '',
             //게시물 탭
-            'community_goods_qa' => $community_goods_qa->value,
-            'community_goods_review' => $community_goods_review->value,
-            'community_main_notice' => $community_main_notice->value,
-            'community_main_qa' =>$community_main_qa->value,
-            'community_main_review' => $community_main_review->value,
-            'main_notice' => $main_notice->value,
-            'notice' => $notice->value,
+            'community_goods_qa' => $community_goods_qa->value ?? '',
+            'community_goods_review' => $community_goods_review->value ?? '',
+            'community_main_notice' => $community_main_notice->value ?? '',
+            'community_main_qa' =>$community_main_qa->value ?? '',
+            'community_main_review' => $community_main_review->value ?? '',
+            'main_notice' => $main_notice->value ?? '',
+            'notice' => $notice->value ?? '',
 
             //서비스 탭
-            'sabangnet_id' => $sabangnet_id->value,
-            'sabangnet_key' => $sabangnet_key->value,
-            'shoplinker_id' => $shoplinker_id->value,
-            'shoplinker_user_id' => $shoplinker_user_id->value,
-            'ipin_site_cd' => $ipin_site_cd->value,
-            'ipin_site_pw' => $ipin_site_pw->value,
-            'ipin_site_seq' => $ipin_site_seq->value,
+            'sabangnet_id' => $sabangnet_id->value ?? '',
+            'sabangnet_key' => $sabangnet_key->value ?? '',
+            'shoplinker_id' => $shoplinker_id->value ?? '',
+            'shoplinker_user_id' => $shoplinker_user_id->value ?? '',
+            'ipin_site_cd' => $ipin_site_cd->value ?? '',
+            'ipin_site_pw' => $ipin_site_pw->value ?? '',
+            'ipin_site_seq' => $ipin_site_seq->value ?? '',
 
             //모바일 탭
-            'm_domain' => $m_domain->value,
-            'm_category_goods_cnt' => $m_category_goods_cnt->value,
-            'm_newarrival_cnt' => $m_newarrival_cnt->value,
-            'm_onsale_goods_cnt' => $m_onsale_goods_cnt->value,
-            'm_brandshop_goods_cnt' => $m_brandshop_goods_cnt->value,
-            'm_best_rank_goods_cnt' => $m_best_rank_goods_cnt->value,
-            'm_search_goods_cnt' => $m_search_goods_cnt->value,
-            'app_main_banner_1' => $app_main_banner_1->value,
-            'app_main_banner_2' => $app_main_banner_2->value,
-            'app_main_section_1' => $app_main_section_1->value,
-            'app_main_section_2' => $app_main_section_2->value,
-            'app_main_section_3' => $app_main_section_3->value,
+            'm_domain' => $m_domain->value ?? '',
+            'm_category_goods_cnt' => $m_category_goods_cnt->value ?? '',
+            'm_newarrival_cnt' => $m_newarrival_cnt->value ?? '',
+            'm_onsale_goods_cnt' => $m_onsale_goods_cnt->value ?? '',
+            'm_brandshop_goods_cnt' => $m_brandshop_goods_cnt->value ?? '',
+            'm_best_rank_goods_cnt' => $m_best_rank_goods_cnt->value ?? '',
+            'm_search_goods_cnt' => $m_search_goods_cnt->value ?? '',
+            'app_main_banner_1' => $app_main_banner_1->value ?? '',
+            'app_main_banner_2' => $app_main_banner_2->value ?? '',
+            'app_main_section_1' => $app_main_section_1->value ?? '',
+            'app_main_section_2' => $app_main_section_2->value ?? '',
+            'app_main_section_3' => $app_main_section_3->value ?? '',
 
             //이미지 탭
-            'image_yn' => $image_yn->value,
-            'i_domain' => $i_domain->value,
-            'ftp_yn' => $ftp_yn->value,
-            'hostname' => $hostname->value,
-            'username' => $username->value,
-            'password' => $password->value,
-            'home_dir' => $home_dir->value,
+            'image_yn' => $image_yn->value ?? '',
+            'i_domain' => $i_domain->value ?? '',
+            'ftp_yn' => $ftp_yn->value ?? '',
+            'hostname' => $hostname->value ?? '',
+            'username' => $username->value ?? '',
+            'password' => $password->value ?? '',
+            'home_dir' => $home_dir->value ?? '',
         ];
-
 
         return view(Config::get('shop.head.view') . '/system/sys05', $values);
     }
@@ -766,43 +764,43 @@ class sys05Controller extends Controller
                 //sms 탭
                 $sql_sms_yn = "update conf set value='$sms_yn', ut='$ut' where type='sms' and name='sms_yn'";
                 DB::update($sql_sms_yn);
-                
+
                 $sql_join_yn = "update conf set value='$join_yn', ut='$ut' where type='sms' and name='join_yn'";
                 DB::update($sql_join_yn);
-                
+
                 $sql_join_msg = "update conf set value='$join_yn', content='$join_msg', ut='$ut' where type='sms' and name='join_msg'";
                 DB::update($sql_join_msg);
 
                 $sql_delivery_msg = "update conf set value='$delivery_yn', content='$delivery_msg', ut='$ut' where type='sms' and name='delivery_msg'";
                 DB::update($sql_delivery_msg);
-                
+
                 $sql_delivery_yn = "update conf set value='$delivery_yn', ut = '$ut' where type='sms' and name='delivery_yn'";
                 DB::update($sql_delivery_yn);
 
                 $sql_out_of_stock_yn = "update conf set value='$out_of_stock_yn', ut = '$ut' where type='sms' and name='out_of_stock_yn'";
                 DB::update($sql_out_of_stock_yn);
-               
+
                 $sql_out_of_stock_msg = "update conf set value='$out_of_stock_yn', content='$out_of_stock_msg', ut = '$ut' where type='sms' and name='out_of_stock_msg'";
                 DB::update($sql_out_of_stock_msg);
 
                 $sql_passwd_yn = "update conf set value='$passwd_yn', ut = '$ut' where type='sms' and name='passwd_yn'";
                 DB::update($sql_passwd_yn);
-                
+
                 $sql_passwd_msg = "update conf set value='$passwd_yn', content='$passwd_msg', ut = '$ut' where type='sms' and name='passwd_msg'";
                 DB::update($sql_passwd_msg);
 
                 $sql_payment_yn = "update conf set value='$payment_yn', ut = '$ut' where type='sms' and name='payment_yn'";
                 DB::update($sql_payment_yn);
-                
+
                 $sql_payment_msg = "update conf set value='$payment_yn', content='$payment_msg', ut = '$ut' where type='sms' and name='payment_msg'";
                 DB::update($sql_payment_msg);
 
                 $sql_refund_yn = "update conf set value='$refund_yn', ut = '$ut' where type='sms' and name='refund_yn'";
                 DB::update($sql_refund_yn);
-                
+
                 $sql_refund_msg_complete = "update conf set value='$refund_yn', content='$refund_msg_complete', ut = '$ut' where type='sms' and name='refund_msg_complete'";
                 DB::update($sql_refund_msg_complete);
-               
+
                 $sql_refund_msg_cancel = "update conf set value='$refund_yn', content='$refund_msg_cancel', ut = '$ut' where type='sms' and name='refund_msg_cancel'";
                 DB::update($sql_refund_msg_cancel);
 
@@ -885,7 +883,7 @@ class sys05Controller extends Controller
 
                 $sql_counsel_yn = "update conf set value='$counsel_yn', ut = '$ut' where type='email' and name='counsel_yn'";
                 DB::update($sql_counsel_yn);
-                
+
                 $sql_goods_qa_yn = "update conf set value='$goods_qa_yn', ut = '$ut' where type='email' and name='goods_qa_yn'";
                 DB::update($sql_goods_qa_yn);
 
@@ -928,7 +926,7 @@ class sys05Controller extends Controller
 
                 $sql_shoplinker_id = "update conf set value='$shoplinker_id', ut = '$ut' where type='api' and name='shoplinker_id'";
                 DB::update($sql_shoplinker_id);
-               
+
                 $sql_shoplinker_user_id = "update conf set value='$shoplinker_user_id', ut = '$ut' where type='api' and name='shoplinker_user_id'";
                 DB::update($sql_shoplinker_user_id);
 
@@ -940,7 +938,7 @@ class sys05Controller extends Controller
 
                 $sql_ipin_site_seq = "update conf set value='$ipin_site_seq', ut = '$ut' where type='admin' and name='ipin_site_seq'";
                 DB::update($sql_ipin_site_seq);
-                
+
             } else if ($type == 'mobile') {
                 //모바일 탭
                 $sql_m_domain = "update conf set value='$m_domain', ut = '$ut' where type='mobile' and name='m_domain'";
@@ -1012,8 +1010,8 @@ class sys05Controller extends Controller
             DB::rollBack();
             $msg = $e->getMessage();
         }
-        
+
         return response()->json(['code' => $code, 'msg' => $msg]);
     }
-   
+
 }
