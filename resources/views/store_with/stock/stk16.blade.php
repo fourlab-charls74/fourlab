@@ -17,7 +17,7 @@
 				<h4>검색</h4>
 				<div class="flax_box">
 					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-                    @if("{{Auth('head')->user()->logistics_group_yn}}" == 'N')
+                    @if(Auth('head')->user()->logistics_group_yn == 'N')
                     <a href="/store/stock/stk17" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>요청분출고</a>
                     <a href="/store/stock/stk18" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>일반출고</a>
                     @endif
@@ -221,7 +221,7 @@
         
         <div class="resul_btn_wrap mb-3">
             <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-            @if("{{Auth('head')->user()->logistics_group_yn}}" == 'N')
+            @if(Auth('head')->user()->logistics_group_yn == 'N')
             <a href="/store/stock/stk17" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>요청분출고</a>
             <a href="/store/stock/stk18" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>일반출고</a>
             @endif
@@ -261,7 +261,7 @@
                         </div>
                         <a href="javascript:void(0);" onclick="receipt()" class="btn btn-sm btn-primary shadow-sm">접수</a>
                         <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
-                        @if("{{Auth('head')->user()->logistics_group_yn}}" == 'N')
+                        @if(Auth('head')->user()->logistics_group_yn == 'N')
                         <a href="javascript:void(0);" onclick="release()" class="btn btn-sm btn-primary shadow-sm mr-1">출고</a>
                         <a href="javascript:void(0);" onclick="receive()" class="btn btn-sm btn-primary shadow-sm mr-1">매장입고</a>
                         @endif
