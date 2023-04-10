@@ -165,7 +165,7 @@
                 </div>
             </div>
 		</div>
-        
+
         <div class="resul_btn_wrap mb-3">
             <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
             <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1" onclick="initSearch()">검색조건 초기화</a>
@@ -202,12 +202,12 @@
                     <div class="d-flex justify-content-between">
                         <h6 class="font-weight-bold m-0 mr-2">총 : <span id="gd-stock-total" class="text-primary">0</span>건 <strong id="selected_prd_nm" class="ml-2 fs-14" style="font-weight: 500; color: blue;"></strong></h6>
                         <div class="d-flex align-items-start">
-                            <select id="store_type" name="store_type" class="form-control form-control-sm mr-2" style="width:140px;">
-                                <option value="">전체</option>
-                                    @foreach ($store_types as $store_type)
-                                        <option value='{{ $store_type->code_id }}' @if($store_type->code_id == '08') selected @endif>{{ $store_type->code_val }}</option>
-                                    @endforeach
-                            </select>
+{{--                            <select id="store_type" name="store_type" class="form-control form-control-sm mr-2" style="width:140px;">--}}
+{{--                                <option value="">전체</option>--}}
+{{--                                    @foreach ($store_types as $store_type)--}}
+{{--                                        <option value='{{ $store_type->code_id }}' @if($store_type->code_id == '08') selected @endif>{{ $store_type->code_val }}</option>--}}
+{{--                                    @endforeach--}}
+{{--                            </select>--}}
                             <a href="javascript:void(0);" onclick="AddRTToFinalTable()" class="btn btn-sm btn-outline-primary shadow-sm" style="min-width:150px;">RT리스트에 등록</a>
                         </div>
                     </div>
@@ -246,7 +246,7 @@
     .ag-row-level-1 {background-color: #f2f2f2 !important;}
 </style>
 
-<script language="javascript">
+<script type="text/javascript" charset="utf-8">
     let product_columns = [
         {field: "idx", hide: true},
         {field: "prd_cd_p", headerName: "품번", rowGroup: true, hide: true},
@@ -289,15 +289,15 @@
         {field: "dep_store_cd",	headerName: "매장코드", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
         {field: "dep_store_nm",	headerName: "보내는 매장", pinned: 'left', width: 140},
         {field: "store_cd",	headerName: "매장코드", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
-        {field: "store_nm",	headerName: "받는 매장", pinned: 'left', width: 140, editable: true, cellStyle: {"background-color": "#ffFF99"},
-            cellEditorSelector: function(params) {
-                return {
-                    component: 'agRichSelectCellEditor',
-                    params: { 
-                        values: stores.map(s => s.store_nm)
-                    },
-                };
-            },
+        {field: "store_nm",	headerName: "받는 매장", pinned: 'left', width: 140, editable: true, cellStyle: {"background-color": "#ffff99"},
+            // cellEditorSelector: function(params) {
+            //     return {
+            //         component: 'agRichSelectCellEditor',
+            //         params: {
+            //             values: stores.map(s => s.store_nm)
+            //         },
+            //     };
+            // },
         },
         {field: "store_cd", hide: true},
         {headerName: "창고재고",
@@ -375,6 +375,7 @@
         {field: "comment", headerName: "메모", width: 200},
     ];
 </script>
+
 <script type="text/javascript" charset="utf-8">
     let gx, gx2, gx3;
     const pApp = new App('', { gridId: "#div-gd-product", height: 450 });
@@ -428,9 +429,9 @@
         let gridDiv3 = document.querySelector(pApp3.options.gridId);
         gx3 = new HDGrid(gridDiv3, rt_columns);
 
-        $("[name=store_type]").on("change", function(e) {
-            SearchStock();
-        })
+        // $("[name=store_type]").on("change", function(e) {
+        //     SearchStock();
+        // })
 
         // 검색조건 숨김 시 grid 높이 설정
         $(".search_mode_wrap .dropdown-menu a").on("click", function(e) {
@@ -457,8 +458,9 @@
         }
         if(!selected_prd.prd_cd) return alert("좌측에서 상품을 선택해주세요.");
 
-        let store_type = $("[name=store_type]").val();
-        let data = 'prd_cd=' + selected_prd.prd_cd + "&store_type=" + store_type;
+        // let store_type = $("[name=store_type]").val();
+        // let data = 'prd_cd=' + selected_prd.prd_cd + "&store_type=" + store_type;
+        let data = 'prd_cd=' + selected_prd.prd_cd;
 		gx2.Request('/store/stock/stk21/search-stock', data, -1, function(d) {
             $("#selected_prd_nm").html(`[${selected_prd.prd_cd}] ${selected_prd.goods_nm}`);
             setReceiveStoreListOptions(d.body.map(r => ({ store_cd: r.dep_store_cd, store_nm: r.dep_store_nm })));
@@ -466,11 +468,11 @@
     }
 
 	function setReceiveStoreListOptions(new_stores) {
-        let store_columns = stock_columns.map(c => c.field === 'store_nm' ? ({...c, 
+        let store_columns = stock_columns.map(c => c.field === 'store_nm' ? ({...c,
             cellEditorSelector: function(params) {
                 return {
                     component: 'agRichSelectCellEditor',
-                    params: { 
+                    params: {
                         values: new_stores.map(s => s.store_nm)
                     },
                 };
@@ -483,9 +485,9 @@
     function AddRTToFinalTable() {
         let rows = gx2.getSelectedRows();
         if(rows.length < 1) return alert("RT리스트에 등록할 항목을 선택해주세요.");
-        if(rows.filter(r => !r.rt_qty || !r.rt_qty.trim() || r.rt_qty == 0 || isNaN(parseInt(r.rt_qty))).length > 0) 
+        if(rows.filter(r => !r.rt_qty || !r.rt_qty.trim() || r.rt_qty == 0 || isNaN(parseInt(r.rt_qty))).length > 0)
             return alert("선택한 항목의 RT수량을 입력해주세요.");
-        if(rows.filter(r => !r.store_cd).length > 0) 
+        if(rows.filter(r => !r.store_cd).length > 0)
             return alert("선택한 항목의 받는 매장을 선택해주세요.");
 
         let over_qty_rows = rows.filter(row => {
