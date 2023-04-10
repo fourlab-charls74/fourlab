@@ -314,7 +314,6 @@
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            // responsive: true,
             animation: {
             // easing:'easeOutElastic',
             },
