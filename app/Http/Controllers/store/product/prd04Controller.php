@@ -231,7 +231,7 @@ class prd04Controller extends Controller
 				, g.goods_nm_eng
 				, pc.color, c.code_val as color_nm, pc.size
 				, pc.goods_opt
-				, (ps.wqty - ifnull(_next_storage.qty, 0)) as wqty
+				, (pss2.wqty - ifnull(_next_storage.qty, 0)) as wqty
 				, ($store_qty_sql - ifnull(_next_store.qty, 0)) as sqty
 				, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
 				, if(pc.goods_no = 0, p.price, g.price) as price
@@ -503,7 +503,7 @@ class prd04Controller extends Controller
 						where stock_state_date >= '$next_edate' and stock_state_date <= '$now_date' and location_type = 'STORAGE'
 					) hst on hst.prd_cd = ps.prd_cd and hst.location_cd = ps.storage_cd
 					left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = pc.color
-				where ps.prd_cd like '$prd_cd_p%'
+				where ps.prd_cd like '$prd_cd_p%' and ps.qty != 0 and ps.wqty != 0
 				group by ps.storage_cd, ps.prd_cd, pc.color
 				order by pc.color, s.storage_nm
 			";

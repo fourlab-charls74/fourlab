@@ -262,7 +262,7 @@ function SearchStorage(){
     this.grid = null;
 }
 
-SearchStorage.prototype.Open = async function(callback = null, multiple_type = false){
+SearchStorage.prototype.Open = async function(callback = null, multiple_type = "multiple"){
     if(this.grid === null){
         this.isMultiple = multiple_type === "multiple";
         this.SetGrid("#div-gd-storage");
@@ -351,46 +351,46 @@ SearchStorage.prototype.Choice = function(code,name){
     $('#SearchStorageModal').modal('toggle');
 };
 
-// SearchStorage.prototype.ChoiceMultiple = function(){
-//     let rows = this.grid.getSelectedRows();
-//     if(this.callback !== null){
-//         this.callback(rows);
-//     } else {
-//         let store_cds = rows.map(r => r.store_cd);
-//         let store_nms = rows.map(r => r.store_nm);
+SearchStorage.prototype.ChoiceMultiple = function(){
+    let rows = this.grid.getSelectedRows();
+    if(this.callback !== null){
+        this.callback(rows);
+    } else {
+        let storage_cds = rows.map(r => r.storage_cd);
+        let storage_nms = rows.map(r => r.storage_nm);
 
-//         if($('#store_no.select2-store').length > 0){
-//             for(let r of rows) {
-//                 if($("#store_no").val().includes(r.store_cd)) continue;
-//                 const option = new Option(r.store_nm, r.store_cd, true, true);
-//                 $('#store_no').append(option).trigger('change');
-//             }
-//         } else {
-//             if($('#store_no').length > 0){
-//                 $('#store_no').val(store_cds);
-//             }
-//             if($('#store_nm').length > 0){
-//                 $('#store_nm').val(store_nms);
-//             }
-//         }
-//         if($('#store_cd.select2-store').length > 0){
-//             for(let r of rows) {
-//                 if($("#store_cd").val().includes(r.store_cd)) continue;
-//                 const option = new Option(r.store_nm, r.store_cd, true, true);
-//                 $('#store_cd').append(option).trigger('change');
-//             }
-//         } else {
-//             if($('#store_cd').length > 0){
-//                 $('#store_cd').val(store_cds);
-//             }
-//             if($('#store_nm').length > 0){
-//                 $('#store_nm').val(store_nms);
-//             }
-//         }
-//     }
-//     this.InitValue();
-//     $('#SearchStoreModal').modal('toggle');
-// }
+        if($('#storage_no.select2-storage').length > 0){
+            for(let r of rows) {
+                if($("#storage_no").val().includes(r.storage_cd)) continue;
+                const option = new Option(r.storage_nm, r.storage_cd, true, true);
+                $('#storage_no').append(option).trigger('change');
+            }
+        } else {
+            if($('#storage_no').length > 0){
+                $('#storage_no').val(storage_cds);
+            }
+            if($('#storage_nm').length > 0){
+                $('#storage_nm').val(storage_nms);
+            }
+        }
+        if($('#storage_cd.select2-storage').length > 0){
+            for(let r of rows) {
+                if($("#storage_cd").val().includes(r.storage_cd)) continue;
+                const option = new Option(r.storage_nm, r.storage_cd, true, true);
+                $('#storage_cd').append(option).trigger('change');
+            }
+        } else {
+            if($('#storage_cd').length > 0){
+                $('#storage_cd').val(storage_cds);
+            }
+            if($('#storage_nm').length > 0){
+                $('#storage_nm').val(storage_nms);
+            }
+        }
+    }
+    this.InitValue();
+    $('#SearchStorageModal').modal('toggle');
+}
 
 SearchStorage.prototype.InitValue = () => {
     document.search_store.reset();
