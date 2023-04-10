@@ -141,12 +141,12 @@ class Lib
 
      /*
          function : enc_password
-     
+
          MySQL password() 함수 구현
-     
+
          Parameters:
              $pw : 비밀번호
-     
+
          Returns:
              $pw : 암호화된 hash 문자열
      */
@@ -161,7 +161,7 @@ class Lib
              return null;
          }
      }
-     
+
     /*
         function : enc_old_password
 
@@ -203,19 +203,19 @@ class Lib
 
     /*
         function : enc_md5
-    
+
         MySQL md5() 함수 구현
-    
+
         Parameters:
             $pw : 비밀번호
-    
+
         Returns:
             $pw : 암호화된 hash 문자열
     */
     public static function enc_md5( $pw ) {
         if( $pw === null )
             return null;
-    
+
         return md5($pw);
     }
 
@@ -285,7 +285,7 @@ class Lib
 
     /**
      * pretty var_dump data
-     * 
+     *
      * @param Any ...$arguments
      * @return void
      */
@@ -303,7 +303,7 @@ class Lib
 
     /**
      * 화면에 메세지 출력하기
-     * 
+     *
      * @param string $msg 출력할 메세지
      * @param null|string $action
      * * 'close' - 메세지 출력 후 창닫기
@@ -354,5 +354,5 @@ class Lib
         echo "<pre>" . $sql. "</pre>";
         exit;
     }
-   
+
 }
