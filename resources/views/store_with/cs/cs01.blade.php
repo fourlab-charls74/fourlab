@@ -134,7 +134,7 @@
             <div class="resul_btn_wrap mb-3">
                 <a href="#" id="search_sbtn" onclick="Search()" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2" onclick="initSearch();">검색조건 초기화</a>
-                @if("{{Auth('head')->user()->logistics_group_yn}}" == 'N')
+                @if(Auth('head')->user()->logistics_group_yn == 'N')
                     <a href="#" onclick="add();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
                 @endIf
                 <a href="javascript:void(0);" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>    
