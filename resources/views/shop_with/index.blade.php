@@ -19,7 +19,7 @@
             'c d'
     }
     .my-chart {
-        min-height: 400px;
+        min-height: 300px;
     }
     @media (max-width: 740px) {
         #main_grid {
@@ -29,6 +29,9 @@
         }
         .ag-theme-balham {
             height: 400px !important;
+        }
+        .my-chart {
+            min-height: 400px;
         }
     }
 </style>
