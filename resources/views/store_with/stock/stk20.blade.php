@@ -252,7 +252,7 @@
                 </div>
             </div>
 		</div>
-        
+
         <div class="resul_btn_wrap mb-3">
             <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
             <a href="/store/stock/stk21" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>RT요청</a>
@@ -392,7 +392,7 @@
         {field: "prc_rt", headerName: "처리일시", width: 120, cellStyle: {"text-align": "center"}},
         {field: "fin_rt", headerName: "완료일시", width: 120, cellStyle: {"text-align": "center"}},
         {field: "req_comment", headerName: "요청메모", width: 300},
-        {field: "rec_comment", headerName: "접수메모", width: 300, 
+        {field: "rec_comment", headerName: "접수메모", width: 300,
             editable: function(params) {return params.data.state === 10;},
             cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};}
         },
@@ -445,8 +445,8 @@
             url: '/store/stock/stk20/receipt',
             method: 'post',
             data: {
-                data: rows, 
-                exp_dlv_day: $("[name=exp_dlv_day]").val(), 
+                data: rows,
+                exp_dlv_day: $("[name=exp_dlv_day]").val(),
                 rel_order: $("[name=exp_rel_order]").val(),
             },
         }).then(function (res) {

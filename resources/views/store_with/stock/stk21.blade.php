@@ -246,7 +246,10 @@
     .ag-row-level-1 {background-color: #f2f2f2 !important;}
 </style>
 
+@include('store_with.stock.stk21_js')
 <script type="text/javascript" charset="utf-8">
+    const stores = <?= json_encode(@$stores) ?> ;
+
     let product_columns = [
         {field: "idx", hide: true},
         {field: "prd_cd_p", headerName: "품번", rowGroup: true, hide: true},
@@ -257,7 +260,7 @@
                 return `<a href="javascript:void(0);" onclick="SearchStock('${params.rowIndex}')">${params.value}</a>`;
             }
         },
-        {field: "goods_no", headerName: "온라인코드", width: 60, cellStyle: {"text-align": "center"}, aggFunc: "first"},
+        {field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: {"text-align": "center"}, aggFunc: "first"},
         {field: "opt_kind_nm", headerName: "품목", width: 60, cellStyle: {"text-align": "center"}, aggFunc: "first"},
         {field: "brand_nm", headerName: "브랜드", width: 70, cellStyle: {"text-align": "center"}, aggFunc: "first"},
         {field: "style_no",	headerName: "스타일넘버", width: 70, cellStyle: {"text-align": "center"}, aggFunc: "first"},
@@ -280,8 +283,6 @@
         {field: "price", headerName: "판매가", type: "currencyType", width: 60, aggFunc: "first"},
 	];
 
-    const stores = <?= json_encode(@$stores) ?> ;
-
     let stock_columns = [
         {field: "prd_cd", hide: true},
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 30, cellStyle: {"text-align": "center"}},
@@ -289,15 +290,14 @@
         {field: "dep_store_cd",	headerName: "매장코드", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
         {field: "dep_store_nm",	headerName: "보내는 매장", pinned: 'left', width: 140},
         {field: "store_cd",	headerName: "매장코드", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
-        {field: "store_nm",	headerName: "받는 매장", pinned: 'left', width: 140, editable: true, cellStyle: {"background-color": "#ffff99"},
-            // cellEditorSelector: function(params) {
-            //     return {
-            //         component: 'agRichSelectCellEditor',
-            //         params: {
-            //             values: stores.map(s => s.store_nm)
-            //         },
-            //     };
-            // },
+        {field: "store_nm",	headerName: "받는 매장", pinned: 'left', width: 140, cellStyle: {"background-color": "#ffff99"},
+            editable: true,
+            cellEditor: StoreAutoCompleteEditor,
+            cellEditorParams: {
+                cellEditor: StoreAutoCompleteEditor,
+                values: stores
+            },
+            cellEditorPopup: true,
         },
         {field: "store_cd", hide: true},
         {headerName: "창고재고",
@@ -420,9 +420,12 @@
                         e.data.store_cd = arr[0].store_cd;
                         e.api.redrawRows({rowNodes:[e.node]});
                     }
+                    e.api.setFocusedCell(e.rowIndex, e.colDef.field);
                 }
             }
         });
+        gx2.gridOptions.popupParent = document.body;
+
 
         pApp3.ResizeGrid(275, 400);
         pApp3.BindSearchEnter();
@@ -467,19 +470,19 @@
         });
     }
 
-	function setReceiveStoreListOptions(new_stores) {
-        let store_columns = stock_columns.map(c => c.field === 'store_nm' ? ({...c,
-            cellEditorSelector: function(params) {
-                return {
-                    component: 'agRichSelectCellEditor',
-                    params: {
-                        values: new_stores.map(s => s.store_nm)
-                    },
-                };
-            },
-        }) : c);
-        gx2.gridOptions.api.setColumnDefs(store_columns);
-	}
+    function setReceiveStoreListOptions(new_stores) {
+        // let store_columns = stock_columns.map(c => c.field === 'store_nm' ? ({...c,
+        //     cellEditorSelector: function(params) {
+        //         return {
+        //             component: 'agRichSelectCellEditor',
+        //             params: {
+        //                 values: new_stores.map(s => s.store_nm)
+        //             },
+        //         };
+        //     },
+        // }) : c);
+        // gx2.gridOptions.api.setColumnDefs(store_columns);
+    }
 
     // 최종RT리스트에 등록
     function AddRTToFinalTable() {
