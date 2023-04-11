@@ -231,7 +231,7 @@ class prd04Controller extends Controller
 				, g.goods_nm_eng
 				, pc.color, c.code_val as color_nm, pc.size
 				, pc.goods_opt
-				, (pss2.wqty - ifnull(_next_storage.qty, 0)) as wqty
+				, (sum(pss2.wqty) - ifnull(_next_storage.qty, 0)) as wqty
 				, ($store_qty_sql - ifnull(_next_store.qty, 0)) as sqty
 				, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
 				, if(pc.goods_no = 0, p.price, g.price) as price

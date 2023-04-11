@@ -33,6 +33,7 @@ class sal23Controller extends Controller
 		$prd_cd	= $request->input('prd_cd', ''); // 상품코드
 		$prd_cd_range_text = $request->input('prd_cd_range', ''); // 상품옵션범위
         $ext_current_qty = $request->input('ext_current_qty', ''); // 현재재고 0 제외여부
+        $storage_cd = $request->input('storage_no');
 
         /** 검색조건 필터링 */
         $where = "";
@@ -46,6 +47,16 @@ class sal23Controller extends Controller
 			}
 			$where .= ") ";
 		}
+
+        // 창고검색
+        if ( $storage_cd != "" ) {
+            $where	.= " and (1!=1";
+            foreach($storage_cd as $storage_cd) {
+                $where .= " or storage_cd = '$storage_cd' ";
+
+            }
+            $where	.= ")";
+        }
 
 		// 상품옵션 범위검색
 		parse_str($prd_cd_range_text, $prd_cd_range);
@@ -108,6 +119,7 @@ class sal23Controller extends Controller
                     - sum(if(_next.type = 9, ifnull(_next.qty, 0), 0)) 
                     - sum(if(_next.type = 14, ifnull(_next.qty, 0), 0))
                 ) as term_qty
+                , pss.storage_cd as storage_cd
             from product_stock ps
                 inner join product_code pc on pc.prd_cd = ps.prd_cd
                 inner join product p on p.prd_cd = ps.prd_cd
@@ -125,6 +137,7 @@ class sal23Controller extends Controller
                         and stock_state_date >= '$next_edate'
                         and stock_state_date <= '$now_date'
                 ) _next on _next.prd_cd = ps.prd_cd
+                left outer join product_stock_storage pss on pss.prd_cd = pc.prd_cd
             where 1=1 $where
             group by ps.prd_cd
             $orderby
@@ -136,10 +149,12 @@ class sal23Controller extends Controller
             select
                 w.prd_cd
                 , ifnull(sum(w.qty * if(w.ord_state = 30, -1, 1)), 0) as sale_qty
+                , pss.storage_cd as storage_cd
             from order_opt_wonga w
                 inner join product_stock ps on ps.prd_cd = w.prd_cd
                 inner join product p on p.prd_cd = w.prd_cd
                 inner join product_code pc on pc.prd_cd = w.prd_cd
+                left outer join product_stock_storage pss on pss.prd_cd = pc.prd_cd
             where w.ord_state in (30,60,61) 
                 and w.ord_state_date >= '$sdate'
                 and w.ord_state_date <= '$edate'
@@ -153,10 +168,12 @@ class sal23Controller extends Controller
             select
                 w.prd_cd
                 , ifnull(sum(w.qty * if(w.ord_state = 30, 1, -1)), 0) as sale_qty
+                , pss.storage_cd as storage_cd
             from order_opt_wonga w
                 inner join product_stock ps on ps.prd_cd = w.prd_cd
                 inner join product p on p.prd_cd = w.prd_cd
                 inner join product_code pc on pc.prd_cd = w.prd_cd
+                left outer join product_stock_storage pss on pss.prd_cd = pc.prd_cd
             where w.ord_state in (30,60,61) 
                 and w.ord_state_date >= '$next_edate'
                 and w.ord_state_date <= '$now_date'
@@ -253,6 +270,7 @@ class sal23Controller extends Controller
                             - sum(if(_next.type = 9, ifnull(_next.qty, 0), 0)) 
                             - sum(if(_next.type = 14, ifnull(_next.qty, 0), 0))
                         ) * p.wonga as term_wonga
+                        , pss.storage_cd as storage_cd
                     from product_stock ps
                         inner join product_code pc on pc.prd_cd = ps.prd_cd
                         inner join product p on p.prd_cd = ps.prd_cd
@@ -270,6 +288,7 @@ class sal23Controller extends Controller
                                 and stock_state_date >= '$next_edate'
                                 and stock_state_date <= '$now_date'
                         ) _next on _next.prd_cd = ps.prd_cd
+                        left outer join product_stock_storage pss on pss.prd_cd = pc.prd_cd
                     where 1=1 $where
                     group by ps.prd_cd
                 ) a
@@ -282,10 +301,12 @@ class sal23Controller extends Controller
                     , sum(ifnull(w.qty, 0) * p.tag_price * if(w.ord_state = 30, -1, 1)) as sale_tag_price
                     , sum(ifnull(w.qty, 0) * p.price * if(w.ord_state = 30, -1, 1)) as sale_price
                     , sum(ifnull(w.qty, 0) * p.wonga * if(w.ord_state = 30, -1, 1)) as sale_wonga
+                    , pss.storage_cd as storage_cd
                 from order_opt_wonga w
                     inner join product_stock ps on ps.prd_cd = w.prd_cd
                     inner join product_code pc on pc.prd_cd = w.prd_cd
                     inner join product p on p.prd_cd = w.prd_cd
+                    left outer join product_stock_storage pss on pss.prd_cd = pc.prd_cd
                 where w.ord_state in (30,60,61) 
                     and w.ord_state_date >= '$sdate'
                     and w.ord_state_date <= '$edate'
@@ -303,10 +324,12 @@ class sal23Controller extends Controller
                     , $total_row->term_tag_price + ifnull(sum(w.qty * p.tag_price * if(w.ord_state = 30, 1, -1)), 0) as term_tag_price
                     , $total_row->term_price + ifnull(sum(w.qty * p.price * if(w.ord_state = 30, 1, -1)), 0) as term_price
                     , $total_row->term_wonga + ifnull(sum(w.qty * p.wonga * if(w.ord_state = 30, 1, -1)), 0) as term_wonga
+                    , pss.storage_cd as storage_cd
                 from order_opt_wonga w
                     inner join product_stock ps on ps.prd_cd = w.prd_cd
                     inner join product_code pc on pc.prd_cd = w.prd_cd
                     inner join product p on p.prd_cd = w.prd_cd
+                    left outer join product_stock_storage pss on pss.prd_cd = pc.prd_cd
                 where w.ord_state in (30,60,61)
                     and w.ord_state_date >= '$next_edate'
                     and w.ord_state_date <= '$now_date'

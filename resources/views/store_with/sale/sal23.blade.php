@@ -79,6 +79,16 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
+                            <label>창고명</label>
+                            <div class="form-inline inline_btn_box">
+                                <input type='hidden' id="storage_nm" name="storage_nm">
+                                <select id="storage_no" name="storage_no[]" class="form-control form-control-sm select2-storage multi_select" multiple></select>
+                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-storage"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
                             <label for="">자료수/정렬</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box" style="width:24%;">

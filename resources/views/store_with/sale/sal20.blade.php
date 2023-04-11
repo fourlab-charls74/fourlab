@@ -1,12 +1,12 @@
 @extends('store_with.layouts.layout')
-@section('title','매장LOSS등록')
+@section('title','매장LOSS관리')
 @section('content')
 <div class="page_tit">
-	<h3 class="d-inline-flex">매장LOSS등록</h3>
+	<h3 class="d-inline-flex">매장LOSS관리</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
         <span>/ 영업관리</span>
-		<span>/ 매장LOSS등록</span>
+		<span>/ 매장LOSS관리</span>
 	</div>
 </div>
 <div id="search-area" class="search_cum_form">
@@ -105,9 +105,6 @@
 			<div class="filter_wrap">
 				<div class="d-flex justify-content-between">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
-                    <div class="fr_box">
-                        <a href="javascript:void(0);" onclick="addLossData()" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus fa-sm text-white-50 mr-1"></i> LOSS 등록</a>
-                    </div>
 				</div>
 			</div>
 		</div>
@@ -178,33 +175,8 @@
     }
 
     function openDetailPopup(sc_cd = '') {
-        const url = '/store/stock/stk26/show/' + sc_cd + "?editable=N";
+        const url = '/store/sale/sal20/show/' + sc_cd;
         window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=880");
-    }
-
-    function addLossData() {
-        // loss 등록처리
-        let rows = gx.getSelectedRows();
-        if(rows.length < 1) return alert("LOSS 등록할 항목을 선택해주세요.");
-        if(!confirm("LOSS 등록하시겠습니까?")) return;
-
-        axios({
-            url: '/store/sale/sal20/loss',
-            method: 'post',
-            data: {
-                data: rows.map(r => ({ sc_cd: r.sc_cd, store_cd: r.store_cd })),
-            },
-        }).then(function (res) {
-            if(res.data.code === '200') {
-                alert("LOSS 등록이 성공적으로 완료되었습니다.");
-                Search();
-            } else {
-                console.log(res.data);
-                alert("등록 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-            }
-        }).catch(function (err) {
-            console.log(err);
-        });
     }
 </script>
 @stop

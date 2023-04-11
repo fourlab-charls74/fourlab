@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Exception;
 
+const PRODUCT_STOCK_TYPE_LOSS = 14;		// 재고분류 : LOSS
 class stk26Controller extends Controller
 {
 	public function index()
@@ -50,8 +51,8 @@ class stk26Controller extends Controller
                 s.sc_cd,
                 s.store_cd,
                 store.store_nm,
-                sum(sp.store_qty - sp.qty) as loss_qty,
-                sum(sp.price * (sp.store_qty - sp.qty)) as loss_price,
+                sum(sp.loss_rec_qty) as loss_qty,
+                sum(sp.loss_price) as loss_price,
                 s.sc_state,
                 s.md_id,
                 m.name as md_nm,
@@ -103,7 +104,8 @@ class stk26Controller extends Controller
             $sc = DB::selectOne($sql, ['sc_cd' => $sc_cd]);
         } else {
             $sql = "
-                select sc_cd
+                select 
+                    sc_cd
                 from stock_check
                 order by sc_cd desc
                 limit 1
@@ -149,7 +151,10 @@ class stk26Controller extends Controller
                 s.qty,
                 s.store_qty as store_wqty, 
                 (s.store_qty - s.qty) as loss_qty,
+                (s.store_qty - s.qty) as loss_rec_qty,
                 (s.price * (s.store_qty - s.qty)) as loss_price,
+                if(g.goods_no <> '0', g.goods_sh * (s.store_qty - s.qty), p.tag_price * (s.store_qty - s.qty)) as loss_tag_price,
+                (s.price * (s.store_qty - s.qty)) as loss_price2,
                 true as isEditable
             from stock_check_product s
                 inner join product_code pc on pc.prd_cd = s.prd_cd

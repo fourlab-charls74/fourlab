@@ -456,6 +456,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk26/search-check-products','stk26Controller@search_check_products');
         Route::put('stk26/save', 'stk26Controller@save');
         Route::put('stk26/update', 'stk26Controller@update');
+        Route::post('stk26/save-loss', 'stk26Controller@save_loss');
         Route::delete('stk26','stk26Controller@delete');
         Route::get('stk26/batch', 'stk26Controller@show_batch');
         Route::post('stk26/batch-import', 'stk26Controller@import_excel');
@@ -616,7 +617,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 매장LOSS등록
         Route::get('sal20', 'sal20Controller@index');
         Route::get('sal20/search', 'sal20Controller@search');
-        Route::post('sal20/loss', 'sal20Controller@save_loss');
+        Route::post('sal20/save-loss', 'sal20Controller@save_loss');
+        Route::get('sal20/show/{sc_cd?}', 'sal20Controller@show');
+        Route::get('sal20/search-check-products','sal20Controller@search_check_products');
 
         // 매장수불집계표
         Route::get('sal21', 'sal21Controller@index');
