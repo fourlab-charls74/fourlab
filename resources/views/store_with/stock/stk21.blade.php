@@ -246,7 +246,7 @@
     .ag-row-level-1 {background-color: #f2f2f2 !important;}
 </style>
 
-@include('store_with.stock.stk21_js')
+<script src="/handle/grid/grid_auto_complete.js"></script>
 <script type="text/javascript" charset="utf-8">
     const stores = <?= json_encode(@$stores) ?> ;
 
@@ -292,10 +292,11 @@
         {field: "store_cd",	headerName: "매장코드", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
         {field: "store_nm",	headerName: "받는 매장", pinned: 'left', width: 140, cellStyle: {"background-color": "#ffff99"},
             editable: true,
-            cellEditor: StoreAutoCompleteEditor,
+            cellEditor: GridAutoCompleteEditor,
             cellEditorParams: {
-                cellEditor: StoreAutoCompleteEditor,
-                values: stores
+                cellEditor: GridAutoCompleteEditor,
+                rowData: stores,
+                width: "138px",
             },
             cellEditorPopup: true,
         },
@@ -416,10 +417,8 @@
                 }
                 if (e.column.colId == "store_nm") {
                     let arr = stores.filter(s => s.store_nm === e.newValue);
-                    if(arr.length > 0) {
-                        e.data.store_cd = arr[0].store_cd;
-                        e.api.redrawRows({rowNodes:[e.node]});
-                    }
+                    e.data.store_cd = arr.length > 0 ? arr[0].store_cd : null;
+                    e.api.redrawRows({rowNodes:[e.node]});
                     e.api.setFocusedCell(e.rowIndex, e.colDef.field);
                 }
             }
