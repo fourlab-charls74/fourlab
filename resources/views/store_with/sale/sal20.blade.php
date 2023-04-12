@@ -117,11 +117,6 @@
 <script language="javascript">
     let columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
-        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, sort: null, width: 30,
-            checkboxSelection: function(params) {
-                return params.data.sc_state === "N";
-            }
-        },
         {field: "sc_date", headerName: "실사일자", width: 100, cellStyle: {"text-align": "center"}},
         {field: "sc_cd", headerName: "실사코드", width: 100, cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {

@@ -158,8 +158,8 @@
                                     <span class="text_line">/</span>
                                     <div class="form-inline-inner input_box" style="width:45%;">
                                         <select name="ord_field" class="form-control form-control-sm">
-                                            <option value="store_cd">매장</option>
                                             <option value="prd_cd">바코드</option>
+                                            <option value="store_cd">매장</option>
                                         </select>
                                     </div>
                                     <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -331,7 +331,20 @@
                     {field: "exp_soldout_day", headerName: "소진예상일", cellStyle: {"text-align": "center"}, width: 80},
                 ]
             },
-            {field: "rel_qty", headerName: "배분수량", type: "currencyType", width: 60, valueFormatter: formatNumber,
+            {field: "rel_qty", headerName: "배분추천수량", type: "currencyType", width: 85, valueFormatter: formatNumber,
+                cellStyle: params => {
+                    let color = "none";
+                    if (params.value !== undefined) {
+                        color = "#ffff99";
+                        if (params.data !== undefined) {
+                            if (params.data.store_wqty >= params.data.sale_cnt * 2 && params.data.store_wqty >= 5) color = "#6666ff";
+                            if (params.data.sale_cnt >= 10) color = "#ff6666";
+                        }
+                    }
+                    return { "background-color": color };
+                },
+            },
+            {field: "rel_qty2", headerName: "배분수량", type: "currencyType", width: 60, valueFormatter: formatNumber,
                 editable: params => {
                     if (params.data !== undefined) {
                         if (params.data.store_wqty >= params.data.sale_cnt * 2 && params.data.store_wqty >= 5) return false;
@@ -350,7 +363,7 @@
                     return { "background-color": color };
                 },
             },
-            {width: "auto"}
+            // {width: "auto"}
         ];
 
         const basic_autoGroupColumnDef = (headerName, minWidth = 230, maxWidth = 230) => ({
@@ -381,7 +394,7 @@
                 animateRows: true,
                 onSelectionChanged: setRowGroupExpanded,
                 onCellValueChanged: (e) => {
-                    if (e.column.colId === "rel_qty") {
+                    if (e.column.colId === "rel_qty2") {
                         if (isNaN(e.newValue) == true || e.newValue == "" || e.newValue < 0) {
                             alert("0 이상의 숫자만 입력가능합니다.");
                             gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
@@ -473,13 +486,13 @@
             if(rows.length < 1) return alert("출고요청할 상품을 선택해주세요.");
 
             let empty_rows = rows.filter(r => {
-                if(r.rel_qty === undefined || r.rel_qty === '' || isNaN(parseInt(r.rel_qty))) return true;
+                if(r.rel_qty2 === undefined || r.rel_qty2 === '' || isNaN(parseInt(r.rel_qty2))) return true;
                 return false;
             });
             if(empty_rows.length > 0) return alert("선택한 상품의 배분수량을 모두 입력해주세요.");
 
             let over_qty_rows = rows.filter(r => {
-                if(r.rel_qty > (r.storage_wqty || 0)) return true;
+                if(r.rel_qty2 > (r.storage_wqty || 0)) return true;
                 return false;
             });
             if(over_qty_rows.length > 0) return alert(`대표창고의 재고보다 많은 수량을 요청하실 수 없습니다.\n바코드 : ${over_qty_rows.map(o => o.prd_cd).join(", ")}`);

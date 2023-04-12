@@ -206,7 +206,8 @@ class stk13Controller extends Controller
 				(select sum(qty) from order_opt where (o.clm_state = 90 or o.clm_state = -30 or o.clm_state = 0) and prd_cd = o.prd_cd and store_cd = o.store_cd) as total_sale_cnt,
 				DATE_FORMAT(DATE_ADD(NOW(), INTERVAL (ifnull(ROUND(ps.wqty * (TIMESTAMPDIFF(DAY, '$sdate 00:00:00', '$edate 23:59:59') / sum(o.qty))), 0)) DAY),'%Y-%m-%d') as exp_soldout_day,
 				-- LEAST(if(sum(ifnull(o.qty, 0)) < 0, 0, sum(o.qty)), ifnull(pss.wqty, 0)) as rel_qty
-				0 as rel_qty
+				0 as rel_qty,
+				0 as rel_qty2
 			from order_opt o
 				inner join product_code pc on pc.prd_cd = o.prd_cd
 				inner join product_stock_storage pss on pss.prd_cd = o.prd_cd and pss.storage_cd = (select storage_cd from storage where default_yn = 'Y')
@@ -274,6 +275,7 @@ class stk13Controller extends Controller
 
 		foreach ($result as $row) {
 			$row->rel_qty = $releases[$row->prd_cd][$row->store_cd];
+			$row->rel_qty2 = $releases[$row->prd_cd][$row->store_cd];
 			$row->already_cnt = $row->storage_wqty - $releases[$row->prd_cd]['storage_wqty'];
 		}
 		
@@ -311,8 +313,8 @@ class stk13Controller extends Controller
 			$storage_cd = $storage_cd[0]->storage_cd;
 
 			foreach($data as $d) {
-				$rel_qty = $d['rel_qty'] ?? 0;
-				if ($rel_qty < 1) continue;
+				$rel_qty2 = $d['rel_qty2'] ?? 0;
+				if ($rel_qty2 < 1) continue;
 
 				$store_cd = $d['store_cd'] ?? '';
 
@@ -330,7 +332,7 @@ class stk13Controller extends Controller
 
 				// 창고재고수량 체크
 				$current_wqty = DB::table('product_stock_storage')->where('storage_cd', $storage_cd)->where('prd_cd', $prd->prd_cd)->value('wqty');
-				if ($current_wqty < $rel_qty) {
+				if ($current_wqty < $rel_qty2) {
 					array_push($failed_result, $d);
 					continue;
 				}
@@ -341,7 +343,7 @@ class stk13Controller extends Controller
 						'goods_no' => $prd->goods_no,
 						'prd_cd' => $prd->prd_cd,
 						'goods_opt' => $prd->goods_opt,
-						'qty' => $rel_qty,
+						'qty' => $rel_qty2,
 						'store_cd' => $store_cd,
 						'storage_cd' => $storage_cd,
 						'state' => $state,
@@ -368,7 +370,7 @@ class stk13Controller extends Controller
 							'prd_cd' => $prd->prd_cd,
 							'store_cd' => $store_cd,
 							'qty' => 0,
-							'wqty' => $rel_qty,
+							'wqty' => $rel_qty2,
 							'goods_opt' => $prd->goods_opt,
 							'use_yn' => 'Y',
 							'rt' => now(),
@@ -379,7 +381,7 @@ class stk13Controller extends Controller
 						->where('prd_cd', '=', $prd->prd_cd)
 						->where('store_cd', '=', $store_cd) 
 						->update([
-							'wqty' => DB::raw('wqty + ' . ($rel_qty)),
+							'wqty' => DB::raw('wqty + ' . ($rel_qty2)),
 							'ut' => now(),
 						]);
 				}
@@ -395,7 +397,7 @@ class stk13Controller extends Controller
 						'type' => PRODUCT_STOCK_TYPE_STORE_IN, // 재고분류 : (매장)입고
 						'price' => $prd->price,
 						'wonga' => $prd->wonga,
-						'qty' => $rel_qty,
+						'qty' => $rel_qty2,
 						'stock_state_date' => date('Ymd'),
 						'ord_opt_no' => '',
 						'comment' => '매장입고',
@@ -408,7 +410,7 @@ class stk13Controller extends Controller
 				DB::table('product_stock')
 					->where('prd_cd', '=', $prd->prd_cd)
 					->update([
-						'wqty' => DB::raw("wqty - $rel_qty"),
+						'wqty' => DB::raw("wqty - $rel_qty2"),
 						'ut' => now(),
 					]);
 
@@ -417,7 +419,7 @@ class stk13Controller extends Controller
 					->where('prd_cd', '=', $prd->prd_cd)
 					->where('storage_cd', '=', $storage_cd)
 					->update([
-						'wqty' => DB::raw("wqty - $rel_qty"),
+						'wqty' => DB::raw("wqty - $rel_qty2"),
 						'ut' => now(),
 					]);
 
@@ -432,7 +434,7 @@ class stk13Controller extends Controller
                         'type' => PRODUCT_STOCK_TYPE_STORAGE_OUT, // 재고분류 : (창고)출고
                         'price' => $prd->price,
                         'wonga' => $prd->wonga,
-                        'qty' => $rel_qty * -1,
+                        'qty' => $rel_qty2 * -1,
                         'stock_state_date' => date('Ymd'),
                         'ord_opt_no' => '',
                         'comment' => '창고출고',

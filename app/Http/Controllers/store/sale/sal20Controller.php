@@ -92,6 +92,9 @@ class sal20Controller extends Controller
 
             foreach($data as $d)
             {
+                //저장할 때 매장보유재고에서 LOSS인정수량을 뺴준 값을 DB에 저장
+                $qty = $d['store_wqty'] - (int)$d['loss_rec_qty'];
+
                 DB::table('stock_check')
                     ->where('sc_cd', '=', $sc_cd)
                     ->update([
@@ -105,7 +108,7 @@ class sal20Controller extends Controller
                 DB::table('stock_check_product')
                     ->where('sc_prd_cd', '=', $d['sc_prd_cd'])
                     ->update([
-                        'qty' => $d['qty'], //실사재고
+                        'qty' => $qty, //실사재고
                         'loss_qty' => $d['loss_qty'], //LOSS수량
                         'loss_rec_qty' => $d['loss_rec_qty'], //LOSS인정수량
                         'loss_price' => $d['loss_price'], // LOSS금액
@@ -117,14 +120,14 @@ class sal20Controller extends Controller
 
                     $original_wqty = DB::table('product_stock_store')->where('store_cd', '=', $store_cd)->where('prd_cd', '=', $d['prd_cd'])->first()->wqty;
 
-                    $minus_qty = ($original_wqty ?? 0) - ($d['qty'] ?? 0);
+                    $minus_qty = ($original_wqty ?? 0) - ($qty ?? 0);
                     
                     DB::table('product_stock_store')
                         ->where('store_cd', '=', $store_cd)
                         ->where('prd_cd', '=', $d['prd_cd'])
                         ->update([
-                            'qty' => $d['qty'],
-                            'wqty' => $d['qty'],
+                            'qty' => $qty,
+                            'wqty' => $qty,
                             'ut' => now(),
                         ]);
 

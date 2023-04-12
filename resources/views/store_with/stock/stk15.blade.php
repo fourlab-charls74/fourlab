@@ -162,7 +162,6 @@
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
-                                        <option value="goods_no">온라인코드</option>
                                         <option value="prd_cd">바코드</option>
                                     </select>
                                 </div>
