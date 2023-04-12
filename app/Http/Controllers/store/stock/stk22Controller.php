@@ -42,29 +42,19 @@ class stk22Controller extends Controller
     {
         $r = $request->all();
 
-		$code = 200;
-		$where = "";
+        $code = 200;
+        $where = "";
         $orderby = "";
+        $prd_cd_range_text = $request->input("prd_cd_range", '');
 
         // where
-		if($r['prd_cd'] != null) {
+        if($r['prd_cd'] != null) {
             $prd_cd = explode(',', $r['prd_cd']);
-			$where .= " and (1!=1";
-			foreach($prd_cd as $cd) {
-				$where .= " or pc.prd_cd = '" . Lib::quote($cd) . "' ";
-			}
-			$where .= ")";
-        }
-        // 상품옵션 범위검색
-        $range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
-        parse_str($r['prd_cd_range'] ?? '', $prd_cd_range);
-        foreach ($range_opts as $opt) {
-            $rows = $prd_cd_range[$opt] ?? [];
-            if (count($rows) > 0) {
-                $in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
-                $opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
-                $where .= " and pc.$opt $in_query ($opt_join) ";
+            $where .= " and (1!=1";
+            foreach($prd_cd as $cd) {
+                $where .= " or pc.prd_cd like '" . Lib::quote($cd) . "%' ";
             }
+            $where .= ")";
         }
         if($r['style_no'] != null)
             $where .= " and if(pc.goods_no <> '0', g.style_no, p.style_no) = '" . $r['style_no'] . "'";
@@ -85,6 +75,18 @@ class stk22Controller extends Controller
                 $where .= " and g.goods_no in ( $in_goods_nos ) ";
             } else {
                 if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
+            }
+        }
+
+        // 상품옵션 범위검색
+        $range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+        parse_str($prd_cd_range_text, $prd_cd_range);
+        foreach ($range_opts as $opt) {
+            $rows = $prd_cd_range[$opt] ?? [];
+            if (count($rows) > 0) {
+                $in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+                $opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+                $where .= " and pc.$opt $in_query ($opt_join) ";
             }
         }
 
@@ -112,7 +114,7 @@ class stk22Controller extends Controller
         $limit = " limit $startno, $page_size ";
 
         // search goods
-		$sql = "
+        $sql = "
             select
                 pc.prd_cd
                 , pc.goods_no
@@ -132,16 +134,15 @@ class stk22Controller extends Controller
                 , if(pc.goods_no <> '0', g.wonga, p.wonga) as wonga
             from product_code pc
                 inner join product p on p.prd_cd = pc.prd_cd
-                left outer join goods g on g.goods_no = pc.goods_no
+                inner join goods g on g.goods_no = pc.goods_no
                 left outer join brand b on b.br_cd = pc.brand
                 left outer join opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
                 left outer join code color on color.code_kind_cd = 'PRD_CD_COLOR' and color.code_id = pc.color
             where pc.type = 'N' $where
             $orderby
             $limit
-		";
-
-		$result = DB::select($sql);
+        ";
+        $result = DB::select($sql);
 
         // pagination
         $total = 0;
@@ -151,7 +152,8 @@ class stk22Controller extends Controller
                 select count(*) as total
                 from product_code pc
                     inner join product p on p.prd_cd = pc.prd_cd
-                where 1=1 $where
+                    inner join goods g on g.goods_no = pc.goods_no
+                where pc.type = 'N' $where
             ";
 
             $row = DB::selectOne($sql);
@@ -159,16 +161,16 @@ class stk22Controller extends Controller
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
         }
 
-		return response()->json([
-			"code" => $code,
-			"head" => [
-				"total" => $total,
-				"page" => $page,
-				"page_cnt" => $page_cnt,
-				"page_total" => count($result)
-			],
-			"body" => $result
-		]);
+        return response()->json([
+            "code" => $code,
+            "head" => [
+                "total" => $total,
+                "page" => $page,
+                "page_cnt" => $page_cnt,
+                "page_total" => count($result)
+            ],
+            "body" => $result
+        ]);
     }
 
     // 매장/창고별 상품재고 검색
