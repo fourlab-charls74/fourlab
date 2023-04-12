@@ -326,7 +326,7 @@ class IndexController extends Controller
                 left outer join notice_store_detail d on s.ns_cd = d.ns_cd
                 left outer join store a on a.store_cd = d.store_cd
                 left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = a.store_type
-            where s.rt >= '$sdate' and s.rt < date_add( '$edate', interval 1 day) and s.all_store_yn = 'Y' or d.store_cd = '$user_store'
+            where 1=1 and s.all_store_yn = 'Y' or d.store_cd = '$user_store'
             group by s.ns_cd
             order by s.rt desc
             limit 0, 10
