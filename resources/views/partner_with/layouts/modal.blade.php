@@ -176,7 +176,15 @@
                                 <div class="card-body">
                                     <div class="row_wrap">
                                         <div class="row">
-                                            <div class="col-lg-12 inner-td">
+                                            <div class="col-lg-6 inner-td">
+                                                <div class="form-group">
+                                                    <label style="min-width:70px;">스타일넘버</label>
+                                                    <div class="flax_box">
+                                                        <textarea name="sch_style_nos" id="sch_style_nos" rows=4 class="form-control form-control-sm" ></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6 inner-td">
                                                 <div class="form-group">
                                                     <label style="min-width:60px;">상품</label>
                                                     <div class="flax_box">
