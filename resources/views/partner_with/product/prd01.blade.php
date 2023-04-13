@@ -308,12 +308,12 @@
 </form>
 <style>
     .img {
-        height:40px;
+        height:30px;
     }
 </style>
 <script language="javascript">
 
-    const style_obj = {"line-height": "48px"};
+    const style_obj = {"line-height": "30px"};
     
     const columns = [
         {headerName: '#', pinned: 'left', type: 'NumType', cellStyle: style_obj},

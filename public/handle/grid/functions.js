@@ -255,7 +255,8 @@ function StyleGoodsState(params){
 		"품절[수동]":"#ff0000",
 		"품절":"#AAAAAA",
 		"휴지통":"#AAAAAA",
-        "임시저장":"#000000"
+        "임시저장":"#000000",
+        "판매대기중":"#000000"
 	}
 	if (params.value !== undefined) {
 		if (state[params.value]) {

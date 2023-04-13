@@ -427,13 +427,14 @@ CREATE TABLE `competitor_sale` (
   `competitor_cd` int(11) NOT NULL COMMENT '동종업계 번호 - competitor : idx',
   `sale_date` varchar(10) NOT NULL COMMENT '매출일자 (yyyy-mm-dd)',
   `sale_amt` int(11) NOT NULL COMMENT '동종업계 매출액',
+  `sale_memo` varchar(255) DEFAULT NULL COMMENT '동종업계 월별 메모',
   `admin_id` varchar(50) DEFAULT NULL COMMENT '작성자',
-  `sale_memo` varchar(255) COMMENT '동종업계 월별 메모',
   `rt` datetime DEFAULT NULL COMMENT '등록일',
   `ut` datetime DEFAULT NULL COMMENT '최근 수정일',
   PRIMARY KEY (`idx`),
+  UNIQUE KEY `row_key` (`store_cd`,`competitor_cd`,`sale_date`),
   KEY `idx` (`idx`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=12525 DEFAULT CHARSET=utf8;
 
 -- 판매 유형 관리
 CREATE TABLE `sale_type` (
