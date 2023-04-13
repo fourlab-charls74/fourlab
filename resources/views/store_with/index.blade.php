@@ -362,7 +362,7 @@
 
     const ctx2 = document.getElementById('myChart2');
 
-    new Chart(ctx2, {
+    const pieChart = new Chart(ctx2, {
         type: 'pie',
         data: {
             labels: [
@@ -371,11 +371,11 @@
                 pieChartData[2].store_nm,
                 pieChartData[3].store_nm,
                 pieChartData[4].store_nm,
-                // pieChartData[5].store_nm,
-                // pieChartData[6].store_nm,
-                // pieChartData[7].store_nm,
-                // pieChartData[8].store_nm,
-                // pieChartData[9].store_nm,
+                pieChartData[5].store_nm,
+                pieChartData[6].store_nm,
+                pieChartData[7].store_nm,
+                pieChartData[8].store_nm,
+                pieChartData[9].store_nm,
             ],
             datasets: [{
                 label: '매출액',
@@ -385,11 +385,11 @@
                     pieChartData[2].sum_amt,
                     pieChartData[3].sum_amt,
                     pieChartData[4].sum_amt,
-                    // pieChartData[5].sum_amt,
-                    // pieChartData[6].sum_amt,
-                    // pieChartData[7].sum_amt,
-                    // pieChartData[8].sum_amt,
-                    // pieChartData[9].sum_amt,
+                    pieChartData[5].sum_amt,
+                    pieChartData[6].sum_amt,
+                    pieChartData[7].sum_amt,
+                    pieChartData[8].sum_amt,
+                    pieChartData[9].sum_amt,
                 ],
                 backgroundColor: [
                     'rgb(255, 99, 132)',
@@ -397,11 +397,11 @@
                     'rgb(255, 205, 86)',
                     'rgb(130, 36, 227)',
                     'rgb(129, 215, 66)',
-                    // 'rgb(57, 233, 215)',
-                    // 'rgb(144, 141, 135)',
-                    // 'rgb(221, 51, 51)',
-                    // 'rgb(33, 145, 51)',
-                    // 'rgb(249, 213, 158)'
+                    'rgb(57, 233, 215)',
+                    'rgb(144, 141, 135)',
+                    'rgb(221, 51, 51)',
+                    'rgb(33, 145, 51)',
+                    'rgb(249, 213, 158)'
                 ],
                 hoverOffset: 4
             }]
@@ -421,6 +421,12 @@
             },
         }
     });
+
+    // 상위 6~10위는 hidden 처리
+    for (let i = 0; i < 5; i++) {
+        pieChart.getDatasetMeta(0).data[i + 5].hidden = true;
+    }
+    pieChart.update();
 
     const ctx3 = document.getElementById('myChart3');
 
